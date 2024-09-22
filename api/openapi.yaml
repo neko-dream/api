@@ -1,0 +1,460 @@
+openapi: 3.0.1
+info:
+  title: cats-dream
+  description: ''
+  version: 1.0.0
+tags:
+  - name: User
+  - name: Auth
+paths:
+  /api/talksessions/{talkSessionId}:
+    get:
+      summary: トークセッションの詳細
+      deprecated: false
+      description: ''
+      operationId: getTalkSessionDetail
+      tags:
+        - talk_session
+        - TalkSession
+      parameters:
+        - name: talkSessionId
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  talkSessionID:
+                    type: string
+                  talkSessionTheme:
+                    type: string
+                  talkSessionStatus:
+                    type: string
+                required:
+                  - talkSessionID
+                  - talkSessionTheme
+                  - talkSessionStatus
+      security: []
+  /api/talksessions:
+    post:
+      summary: トークセッション作成
+      deprecated: false
+      description: ''
+      operationId: createTalkSession
+      tags:
+        - talk_session
+        - TalkSession
+      parameters: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  talkSessionID:
+                    type: string
+                  talkSessionTheme:
+                    type: string
+                  talkSessionStatus:
+                    type: string
+                required:
+                  - talkSessionID
+                  - talkSessionTheme
+                  - talkSessionStatus
+      security: []
+    get:
+      summary: トークセッションリスト
+      deprecated: false
+      description: ''
+      operationId: getTalkSessions
+      tags:
+        - talk_session
+        - TalkSession
+      parameters: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      security: []
+  /api/user:
+    get:
+      summary: ユーザー情報の取得
+      deprecated: false
+      description: ''
+      operationId: getUserProfile
+      tags:
+        - user
+        - User
+      parameters: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  displayID:
+                    type: string
+                    x-apidog-mock: '{{$string.uuid}}'
+                  displayName:
+                    type: string
+                    x-apidog-mock: '{{$person.firstName}}'
+                required:
+                  - displayID
+                  - displayName
+      security: []
+    post:
+      summary: ユーザー作成
+      deprecated: false
+      description: ''
+      operationId: registerUser
+      tags:
+        - user
+        - User
+      parameters:
+        - name: displayName
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+        - name: displayID
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  displayID:
+                    type: string
+                    x-apidog-mock: '{{$string.uuid}}'
+                  displayName:
+                    type: string
+                    x-apidog-mock: '{{$person.firstName}}'
+                required:
+                  - displayID
+                  - displayName
+      security: []
+    put:
+      summary: ユーザー情報の変更
+      deprecated: false
+      description: ''
+      operationId: editUserProfile
+      tags:
+        - user
+        - User
+      parameters: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  displayID:
+                    type: string
+                    x-apidog-mock: '{{$string.uuid}}'
+                  displayName:
+                    type: string
+                    x-apidog-mock: '{{$person.firstName}}'
+                required:
+                  - displayID
+                  - displayName
+      security: []
+  /api/talksession/{talkSessionID}/opinions:
+    get:
+      summary: セッションの意見一覧
+      deprecated: false
+      description: ''
+      operationId: listOpinions
+      tags:
+        - talk_session/opinion
+        - Opinion
+      parameters:
+        - name: talkSessionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '500':
+          description: ServerErrorResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      security: []
+  /api/talksessions/{talkSessionID}/opinions:
+    post:
+      summary: セッションに対して意見投稿
+      deprecated: false
+      description: ''
+      operationId: postOpinionPost
+      tags:
+        - talk_session/opinion
+        - Opinion
+      parameters:
+        - name: talkSessionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+        - name: opinionContent
+          in: query
+          description: 意見の内容
+          required: true
+          example: オブジェクト思考は悪だと思う
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '500':
+          description: ServerErrorResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      security: []
+  /api/talksessions/{talkSessionID}/opinions/{opinionID}/intentions:
+    post:
+      summary: 意思表明API
+      deprecated: false
+      description: ''
+      operationId: indicateIntention
+      tags:
+        - talk_session/opinion/intention
+        - Intention
+      parameters:
+        - name: talkSessionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+        - name: opinionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '500':
+          description: ServerErrorResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      security: []
+  /auth/{provider}/login:
+    get:
+      summary: OAuthログイン
+      deprecated: false
+      description: ''
+      operationId: auth_login
+      tags:
+        - Auth
+      parameters:
+        - in: path
+          name: provider
+          schema:
+            type: string
+          required: true
+          description: OIDCプロバイダ名
+        - in: query
+          name: redirect_url
+          schema:
+            type: string
+          required: true
+          description: コールバック後のリダイレクトURL
+      responses:
+        '302':
+          description: ログインページへリダイレクト
+          headers:
+            Location:
+              description: ログインページのURL
+              schema:
+                type: string
+                format: uri
+              example: https://example.com/login
+            Set-Cookie:
+              description: OAuth2.0 State
+              schema:
+                type: string
+                format: cookie
+              example: state=1234567890; Path=/; Secure; HttpOnly
+      security: []
+      x-ogen-operation-group: Auth
+    post: null
+  /auth/{provider}/callback:
+    get:
+      get: null
+      summary: Auth Callback
+      deprecated: false
+      description: ''
+      operationId: oauth_callback
+      tags: []
+      parameters:
+        - name: state
+          in: cookie
+          description: ''
+          required: false
+          example: uuid
+          schema:
+            type: string
+        - name: provider
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+        - name: code
+          in: query
+          description: ''
+          required: false
+          example: '{% faker datatype.uuid %}'
+          schema:
+            type: string
+        - name: state
+          in: query
+          description: ''
+          required: false
+          example: '{% faker datatype.uuid %}'
+          schema:
+            type: string
+      responses:
+        '302':
+          description: リダイレクト先へリダイレクt
+          headers:
+            Location:
+              description: 指定されたリダイレクトURL
+              schema:
+                type: string
+                format: uri
+              example: https://example.com/login
+            Set-Cookie:
+              description: OAuth2.0 State
+              schema:
+                type: string
+                format: cookie
+              example: state=1234567890; Path=/; Secure; HttpOnly
+      security: []
+      x-ogen-operation-group: Auth
+components:
+  schemas:
+    opinion:
+      type: object
+      properties:
+        opinionID:
+          type: string
+          faker: '1'
+          description: 意見ID
+        opinionContent:
+          type: string
+          description: 意見のテキスト
+          minLength: 1
+          maxLength: 140
+        parentOpinionID:
+          type: string
+          description: 親の意見ID。ルートならば無し
+      required:
+        - opinionID
+        - opinionContent
+    user:
+      type: object
+      properties:
+        displayID:
+          type: string
+          x-apidog-mock: '{{$string.uuid}}'
+        displayName:
+          type: string
+          x-apidog-mock: '{{$person.firstName}}'
+      required:
+        - displayID
+        - displayName
+    error:
+      type: object
+      properties:
+        errorCode:
+          type: string
+        errorMessage:
+          type: string
+        errorData:
+          type: string
+      required:
+        - errorCode
+        - errorMessage
+        - errorData
+    validationErrorItem:
+      type: object
+      properties:
+        field:
+          type: string
+          faker: id
+          description: バリデーションエラーのフィールド
+        message:
+          type: string
+          description: バリデーションエラーメッセージ
+      required:
+        - field
+        - message
+    talkSession:
+      type: object
+      properties:
+        talkSessionID:
+          type: string
+        talkSessionTheme:
+          type: string
+        talkSessionStatus:
+          type: string
+      required:
+        - talkSessionID
+        - talkSessionTheme
+        - talkSessionStatus
+  securitySchemes: {}

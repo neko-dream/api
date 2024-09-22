@@ -1,0 +1,4 @@
+[tools]
+"go:github.com/ogen-go/ogen/cmd/ogen" = "latest"
+yq = "latest"
+jq = "latest"

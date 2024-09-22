@@ -1,0 +1,53 @@
+get:
+      get:
+      summary: Auth Callback
+      deprecated: false
+      description: ''
+      operationId: oauth_callback
+      tags: []
+      parameters:
+        - name: state
+          in: cookie
+          description: ''
+          required: false
+          example: uuid
+          schema:
+            type: string
+        - name: provider
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+        - name: code
+          in: query
+          description: ''
+          required: false
+          example: '{% faker datatype.uuid %}'
+          schema:
+            type: string
+        - name: state
+          in: query
+          description: ''
+          required: false
+          example: '{% faker datatype.uuid %}'
+          schema:
+            type: string
+      responses:
+        '302':
+          description: リダイレクト先へリダイレクt
+          headers:
+            Location:
+              description: 指定されたリダイレクトURL
+              schema:
+                type: string
+                format: uri
+              example: 'https://example.com/login'
+            Set-Cookie:
+              description: OAuth2.0 State
+              schema:
+                type: string
+                format: cookie
+              example: 'state=1234567890; Path=/; Secure; HttpOnly'
+      security: []
+      x-ogen-operation-group: Auth

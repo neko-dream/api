@@ -1,0 +1,39 @@
+get:
+  summary: OAuthログイン
+  deprecated: false
+  description: ''
+  operationId: auth_login
+  tags:
+    - Auth
+  parameters:
+    - in: path
+      name: provider
+      schema:
+        type: string
+      required: true
+      description: OIDCプロバイダ名
+    - in: query
+      name: redirect_url
+      schema:
+        type: string
+      required: true
+      description: コールバック後のリダイレクトURL
+  responses:
+    '302':
+      description: ログインページへリダイレクト
+      headers:
+        Location:
+          description: ログインページのURL
+          schema:
+            type: string
+            format: uri
+          example: 'https://example.com/login'
+        Set-Cookie:
+          description: OAuth2.0 State
+          schema:
+            type: string
+            format: cookie
+          example: 'state=1234567890; Path=/; Secure; HttpOnly'
+  security: []
+  x-ogen-operation-group: Auth
+post:

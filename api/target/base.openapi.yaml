@@ -1,0 +1,16 @@
+openapi: 3.0.1
+info:
+  title: cats-dream
+  description: ''
+  version: 1.0.0
+tags:
+  - name: User
+  - name: Auth
+paths:
+  $ref: './apidog.openapi.yaml#/paths'
+  /auth/{provider}/login:
+    $ref: './paths/login.yaml'
+  /auth/{provider}/callback:
+    $ref: './paths/callback.yaml'
+components:
+  $ref: './apidog.openapi.yaml#/components'
