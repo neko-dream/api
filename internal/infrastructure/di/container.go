@@ -24,6 +24,7 @@ func BuildContainer() *dig.Container {
 		{handler.NewTalkSessionHandler, nil},
 		{handler.NewUserHandler, nil},
 		{handler.NewTalkSessionHandler, nil},
+		{handler.NewHandler, nil},
 	}
 
 	container := ProvideDependencies(deps)
