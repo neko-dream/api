@@ -3,6 +3,7 @@ package di
 import (
 	"log"
 
+	"github.com/neko-dream/server/internal/infrastructure/auth"
 	"github.com/neko-dream/server/internal/presentation/handler"
 	"go.uber.org/dig"
 )
@@ -17,6 +18,7 @@ func AddProvider(arg ProvideArg) {
 
 func BuildContainer() *dig.Container {
 	deps := []ProvideArg{
+		{auth.NewTokenManager, nil},
 		{handler.NewAuthHandler, nil},
 		{handler.NewUserHandler, nil},
 		{handler.NewIntentionHandler, nil},

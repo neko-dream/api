@@ -925,6 +925,10 @@ func (s *Server) handleOAuthCallbackRequest(args [1]string, argsEscaped bool, w 
 					In:   "cookie",
 				}: params.CookieState,
 				{
+					Name: "redirect_url",
+					In:   "cookie",
+				}: params.RedirectURL,
+				{
 					Name: "provider",
 					In:   "path",
 				}: params.Provider,

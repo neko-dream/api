@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16-bullseye
+    container_name: pg
+    ports:
+      - "5432:5432"
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: catsdream
+      POSTGRES_USER: catsdream
+      POSTGRES_PASSWORD: catsdream
+volumes:
+  pgdata:

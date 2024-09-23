@@ -65,7 +65,8 @@
             }
           }
         },
-        "security": []
+        "security": [],
+        "x-ogen-operation-group": "TalkSession"
       }
     },
     "/api/talksessions": {
@@ -107,7 +108,8 @@
             }
           }
         },
-        "security": []
+        "security": [],
+        "x-ogen-operation-group": "TalkSession"
       },
       "get": {
         "summary": "トークセッションリスト",
@@ -132,7 +134,8 @@
             }
           }
         },
-        "security": []
+        "security": [],
+        "x-ogen-operation-group": "TalkSession"
       }
     },
     "/api/user": {
@@ -172,7 +175,8 @@
             }
           }
         },
-        "security": []
+        "security": [],
+        "x-ogen-operation-group": "User"
       },
       "post": {
         "summary": "ユーザー作成",
@@ -229,7 +233,12 @@
             }
           }
         },
-        "security": []
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
+        "x-ogen-operation-group": "User"
       },
       "put": {
         "summary": "ユーザー情報の変更",
@@ -267,7 +276,8 @@
             }
           }
         },
-        "security": []
+        "security": [],
+        "x-ogen-operation-group": "User"
       }
     },
     "/api/talksession/{talkSessionID}/opinions": {
@@ -289,6 +299,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "parentOpinionID",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -297,8 +316,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {}
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/opinion"
+                  }
                 }
               }
             }
@@ -315,7 +336,8 @@
             }
           }
         },
-        "security": []
+        "security": [],
+        "x-ogen-operation-group": "Opinion"
       }
     },
     "/api/talksessions/{talkSessionID}/opinions": {
@@ -373,7 +395,8 @@
             }
           }
         },
-        "security": []
+        "security": [],
+        "x-ogen-operation-group": "Opinion"
       }
     },
     "/api/talksessions/{talkSessionID}/opinions/{opinionID}/intentions": {
@@ -390,7 +413,7 @@
           {
             "name": "talkSessionID",
             "in": "path",
-            "description": "",
+            "description": "セッションのID",
             "required": true,
             "schema": {
               "type": "string"
@@ -399,7 +422,7 @@
           {
             "name": "opinionID",
             "in": "path",
-            "description": "",
+            "description": "意見のID",
             "required": true,
             "schema": {
               "type": "string"
@@ -412,8 +435,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {}
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/opinion"
+                  }
                 }
               }
             }
@@ -430,7 +455,8 @@
             }
           }
         },
-        "security": []
+        "security": [],
+        "x-ogen-operation-group": "Intention"
       }
     }
   },
@@ -534,7 +560,13 @@
         ]
       }
     },
-    "securitySchemes": {}
+    "securitySchemes": {
+      "SessionId": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "SessionId"
+      }
+    }
   },
   "servers": []
 }

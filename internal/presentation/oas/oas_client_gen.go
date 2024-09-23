@@ -1017,6 +1017,19 @@ func (c *Client) sendOAuthCallback(ctx context.Context, params OAuthCallbackPara
 			return res, errors.Wrap(err, "encode cookie")
 		}
 	}
+	{
+		// Encode "redirect_url" parameter.
+		cfg := uri.CookieParameterEncodingConfig{
+			Name:    "redirect_url",
+			Explode: true,
+		}
+
+		if err := cookie.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.StringToString(params.RedirectURL))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode cookie")
+		}
+	}
 
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)

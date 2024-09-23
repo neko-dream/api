@@ -431,10 +431,15 @@ func decodeListOpinionsParams(args [1]string, argsEscaped bool, r *http.Request)
 
 // OAuthCallbackParams is parameters of oauth_callback operation.
 type OAuthCallbackParams struct {
+	// OAuth2.0 State from Cookie.
 	CookieState OptString
-	Provider    string
-	Code        OptString
-	QueryState  OptString
+	// Auth Callback URL.
+	RedirectURL string
+	// Google.
+	Provider string
+	Code     OptString
+	// OAuth2.0 State from Query.
+	QueryState OptString
 }
 
 func unpackOAuthCallbackParams(packed middleware.Parameters) (params OAuthCallbackParams) {
@@ -446,6 +451,13 @@ func unpackOAuthCallbackParams(packed middleware.Parameters) (params OAuthCallba
 		if v, ok := packed[key]; ok {
 			params.CookieState = v.(OptString)
 		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "redirect_url",
+			In:   "cookie",
+		}
+		params.RedirectURL = packed[key].(string)
 	}
 	{
 		key := middleware.ParameterKey{
@@ -513,6 +525,40 @@ func decodeOAuthCallbackParams(args [1]string, argsEscaped bool, r *http.Request
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "state",
+			In:   "cookie",
+			Err:  err,
+		}
+	}
+	// Decode cookie: redirect_url.
+	if err := func() error {
+		cfg := uri.CookieParameterDecodingConfig{
+			Name:    "redirect_url",
+			Explode: true,
+		}
+		if err := c.HasParam(cfg); err == nil {
+			if err := c.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.RedirectURL = c
+				return nil
+			}); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "redirect_url",
 			In:   "cookie",
 			Err:  err,
 		}
