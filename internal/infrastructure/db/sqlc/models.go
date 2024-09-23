@@ -110,8 +110,8 @@ type Session struct {
 	SessionID     uuid.UUID
 	UserID        uuid.NullUUID
 	Provider      interface{}
-	SessionStatus NullSessionStatus
-	CreatedAt     sql.NullTime
+	SessionStatus SessionStatus
+	CreatedAt     time.Time
 }
 
 type TalkSession struct {
@@ -123,21 +123,21 @@ type TalkSession struct {
 
 type User struct {
 	UserID      uuid.UUID
-	DisplayID   sql.NullString
-	DisplayName sql.NullString
+	DisplayID   string
+	DisplayName string
 	CreatedAt   time.Time
 }
 
 type UserAuth struct {
 	UserID    uuid.NullUUID
 	Provider  interface{}
-	Subject   sql.NullString
-	CreatedAt sql.NullTime
+	Subject   string
+	CreatedAt time.Time
 }
 
 type Vote struct {
 	VoteID    uuid.UUID
-	OpinionID uuid.NullUUID
-	UserID    uuid.NullUUID
+	OpinionID uuid.UUID
+	UserID    uuid.UUID
 	CreatedAt time.Time
 }

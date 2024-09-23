@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -22,8 +23,38 @@ type CreateTalkSessionParams struct {
 	CreatedAt     time.Time
 }
 
-// args: [f1b9b1b4-0b3b-4b3b-8b3b-0b3b4b3b4b3b, "test", 2021-01-01 00:00:00 +0000 UTC]
 func (q *Queries) CreateTalkSession(ctx context.Context, arg CreateTalkSessionParams) error {
 	_, err := q.db.ExecContext(ctx, createTalkSession, arg.TalkSessionID, arg.Theme, arg.CreatedAt)
 	return err
+}
+
+const editTalkSession = `-- name: EditTalkSession :exec
+UPDATE talk_sessions SET theme = $2, finished_at = $3 WHERE talk_session_id = $1
+`
+
+type EditTalkSessionParams struct {
+	TalkSessionID uuid.UUID
+	Theme         string
+	FinishedAt    sql.NullTime
+}
+
+func (q *Queries) EditTalkSession(ctx context.Context, arg EditTalkSessionParams) error {
+	_, err := q.db.ExecContext(ctx, editTalkSession, arg.TalkSessionID, arg.Theme, arg.FinishedAt)
+	return err
+}
+
+const getTalkSessionByID = `-- name: GetTalkSessionByID :one
+SELECT talk_session_id, theme, finished_at, created_at FROM talk_sessions WHERE talk_session_id = $1
+`
+
+func (q *Queries) GetTalkSessionByID(ctx context.Context, talkSessionID uuid.UUID) (TalkSession, error) {
+	row := q.db.QueryRowContext(ctx, getTalkSessionByID, talkSessionID)
+	var i TalkSession
+	err := row.Scan(
+		&i.TalkSessionID,
+		&i.Theme,
+		&i.FinishedAt,
+		&i.CreatedAt,
+	)
+	return i, err
 }
