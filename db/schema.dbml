@@ -8,17 +8,17 @@ Enum AuthProvider {
 
 Table user_auths {
     user_id uuid [ref: > users.user_id]
-    provider AuthProvider
-    subject varchar
-    created_at timestamp
+    provider AuthProvider [not null]
+    subject varchar [not null]
+    created_at timestamp [not null, default: `now()`]
 }
 
 Table sessions {
     session_id uuid [primary key]
     user_id uuid [ref: > users.user_id]
-    provider AuthProvider
-    session_status session_status
-    created_at timestamp
+    provider AuthProvider [not null]
+    session_status session_status [not null]
+    created_at timestamp [not null, default: `now()`]
 }
 
 Enum session_status {
@@ -28,8 +28,8 @@ Enum session_status {
 
 Table users {
     user_id uuid [primary key]
-    display_id varchar
-    display_name varchar
+    display_id varchar [not null]
+    display_name varchar [not null]
     created_at timestamp [not null, default: `now()`]
 
     indexes {
@@ -62,8 +62,8 @@ Table opinions {
 
 Table votes {
     vote_id uuid [primary key]
-    opinion_id uuid [ref: > opinions.opinion_id]
-    user_id uuid [ref: > users.user_id]
+    opinion_id uuid [not null, ref: > opinions.opinion_id]
+    user_id uuid [not null, ref: > users.user_id]
     created_at timestamp [not null, default: `now()`]
 }
 
