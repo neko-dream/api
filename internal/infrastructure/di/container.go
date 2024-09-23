@@ -6,7 +6,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/infrastructure/auth"
-	"github.com/neko-dream/server/internal/infrastructure/repository"
+	"github.com/neko-dream/server/internal/infrastructure/datasource/repository"
 	"github.com/neko-dream/server/internal/presentation/handler"
 	"github.com/neko-dream/server/internal/usecase/auth_usecase"
 	"go.uber.org/dig"
@@ -22,6 +22,7 @@ func AddProvider(arg ProvideArg) {
 
 func BuildContainer() *dig.Container {
 	deps := []ProvideArg{
+		// {func() *db.Queries { return db.New(postgresql.Connect()) }, nil},
 		{repository.NewSessionRepository, nil},
 		{repository.NewUserRepository, nil},
 

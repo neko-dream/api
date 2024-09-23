@@ -3,3 +3,4 @@
 yq = "latest"
 jq = "latest"
 "go:github.com/masaushi/accessory" = "latest"
+"go:github.com/pressly/goose/v3/cmd/goose" = "latest"

@@ -1,0 +1,69 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+// 認証コンテキスト
+Enum AuthProvider {
+    GOOGLE
+}
+
+Table user_auths {
+    user_id uuid [ref: > users.user_id]
+    provider AuthProvider
+    subject varchar
+    created_at timestamp
+}
+
+Table sessions {
+    session_id uuid [primary key]
+    user_id uuid [ref: > users.user_id]
+    provider AuthProvider
+    session_status session_status
+    created_at timestamp
+}
+
+Enum session_status {
+    ACTIVE
+    INACTIVE
+}
+
+Table users {
+    user_id uuid [primary key]
+    display_id varchar
+    display_name varchar
+    created_at timestamp [not null, default: `now()`]
+
+    indexes {
+        display_id [unique, name: "users_display_id_index"]
+    }
+}
+
+Table talk_sessions {
+    talk_session_id uuid [primary key]
+    theme varchar [not null]
+    finished_at timestamp
+    created_at timestamp [not null, default: `now()`]
+
+    indexes {
+        (theme) [name: "talk_sessions_theme_index"]
+    }
+}
+
+Table opinions {
+    opinion_id uuid [primary key]
+    talk_session_id uuid [not null, ref: > talk_sessions.talk_session_id]
+    user_id uuid [not null, ref: > users.user_id]
+    opinionContent varchar [not null]
+
+    parent_opinion_id uuid [ref: > opinions.opinion_id]
+    vote_id uuid [ref: > votes.vote_id]
+
+    created_at timestamp [not null, default: `now()`]
+}
+
+Table votes {
+    vote_id uuid [primary key]
+    opinion_id uuid [ref: > opinions.opinion_id]
+    user_id uuid [ref: > users.user_id]
+    created_at timestamp [not null, default: `now()`]
+}
+

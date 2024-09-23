@@ -56,6 +56,7 @@ func (a *authService) Authenticate(
 
 	newUser, err := a.userRepository.Create(ctx, user.NewUser(
 		shared.NewUUID[user.User](),
+		"",
 		userName,
 		subject,
 		authProviderName,

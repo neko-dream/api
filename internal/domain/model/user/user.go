@@ -27,23 +27,24 @@ type (
 	}
 
 	User struct {
-		userID   shared.UUID[User]
-		name     string
-		subject  string
-		provider oauth.AuthProviderName
+		userID      shared.UUID[User]
+		displayID   string
+		displayName string
+		subject     string
+		provider    oauth.AuthProviderName
 	}
 )
 
 func (u *User) ChangeName(name string) {
-	u.name = name
+	u.displayName = name
 }
 
 func (u *User) UserID() shared.UUID[User] {
 	return u.userID
 }
 
-func (u *User) Name() string {
-	return u.name
+func (u *User) DisplayName() string {
+	return u.displayName
 }
 
 func (u *User) Provider() oauth.AuthProviderName {
@@ -52,14 +53,16 @@ func (u *User) Provider() oauth.AuthProviderName {
 
 func NewUser(
 	userID shared.UUID[User],
-	name string,
+	displayID string,
+	displayName string,
 	subject string,
 	provider oauth.AuthProviderName,
 ) User {
 	return User{
-		userID:   userID,
-		name:     name,
-		subject:  subject,
-		provider: provider,
+		userID:      userID,
+		displayID:   displayID,
+		displayName: displayName,
+		subject:     subject,
+		provider:    provider,
 	}
 }
