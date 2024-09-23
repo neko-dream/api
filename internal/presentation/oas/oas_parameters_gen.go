@@ -435,7 +435,7 @@ type OAuthCallbackParams struct {
 	CookieState OptString
 	// Auth Callback URL.
 	RedirectURL string
-	// Google.
+	// OAUTH Provider.
 	Provider string
 	Code     OptString
 	// OAuth2.0 State from Query.

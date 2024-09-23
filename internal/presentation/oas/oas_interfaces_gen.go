@@ -12,3 +12,7 @@ type ListOpinionsRes interface {
 type PostOpinionPostRes interface {
 	postOpinionPostRes()
 }
+
+type RegisterUserRes interface {
+	registerUserRes()
+}

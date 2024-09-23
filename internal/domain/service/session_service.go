@@ -13,7 +13,12 @@ type sessionService struct {
 	sessionRepository session.SessionRepository
 }
 
-// DeactivateUserSessions implements session.SessionService.
+var (
+	SessionIsExpired                = errors.New("セッションの期限が切れています。再ログインしてください")
+	FailedToDeactivateSessionStatus = errors.New("セッションステータスの無効化に失敗しました")
+	SessionRefreshFailed            = errors.New("セッションの更新に失敗しました。再ログインしてください")
+)
+
 func (s *sessionService) DeactivateUserSessions(ctx context.Context, userID shared.UUID[user.User]) error {
 	sessions, err := s.sessionRepository.FindByUserID(ctx, userID)
 	if err != nil {
@@ -28,12 +33,6 @@ func (s *sessionService) DeactivateUserSessions(ctx context.Context, userID shar
 
 	return nil
 }
-
-var (
-	SessionIsExpired                = errors.New("セッションの期限が切れています。再ログインしてください")
-	FailedToDeactivateSessionStatus = errors.New("セッションステータスの無効化に失敗しました")
-	SessionRefreshFailed            = errors.New("セッションの更新に失敗しました。再ログインしてください")
-)
 
 // RefreshSession implements session.SessionService.
 func (s *sessionService) RefreshSession(ctx context.Context, sess session.Session) (*session.Session, error) {

@@ -124,7 +124,7 @@ type UserInvoker interface {
 	// ユーザー作成.
 	//
 	// POST /api/user
-	RegisterUser(ctx context.Context, params RegisterUserParams) (*RegisterUserOK, error)
+	RegisterUser(ctx context.Context, params RegisterUserParams) (RegisterUserRes, error)
 }
 
 // Client implements OAS client.
@@ -1161,12 +1161,12 @@ func (c *Client) sendPostOpinionPost(ctx context.Context, params PostOpinionPost
 // ユーザー作成.
 //
 // POST /api/user
-func (c *Client) RegisterUser(ctx context.Context, params RegisterUserParams) (*RegisterUserOK, error) {
+func (c *Client) RegisterUser(ctx context.Context, params RegisterUserParams) (RegisterUserRes, error) {
 	res, err := c.sendRegisterUser(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendRegisterUser(ctx context.Context, params RegisterUserParams) (res *RegisterUserOK, err error) {
+func (c *Client) sendRegisterUser(ctx context.Context, params RegisterUserParams) (res RegisterUserRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("registerUser"),
 		semconv.HTTPRequestMethodKey.String("POST"),

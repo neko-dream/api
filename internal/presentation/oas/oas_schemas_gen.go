@@ -376,6 +376,14 @@ type PostOpinionPostOK struct{}
 
 func (*PostOpinionPostOK) postOpinionPostRes() {}
 
+type RegisterUserBadRequest struct{}
+
+func (*RegisterUserBadRequest) registerUserRes() {}
+
+type RegisterUserInternalServerError struct{}
+
+func (*RegisterUserInternalServerError) registerUserRes() {}
+
 type RegisterUserOK struct {
 	DisplayID   string `json:"displayID"`
 	DisplayName string `json:"displayName"`
@@ -400,6 +408,8 @@ func (s *RegisterUserOK) SetDisplayID(val string) {
 func (s *RegisterUserOK) SetDisplayName(val string) {
 	s.DisplayName = val
 }
+
+func (*RegisterUserOK) registerUserRes() {}
 
 type SessionId struct {
 	APIKey string

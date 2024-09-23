@@ -231,6 +231,28 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "ValidationErroResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "ServerErrorResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
           }
         },
         "security": [
@@ -506,20 +528,20 @@
       "error": {
         "type": "object",
         "properties": {
-          "errorCode": {
+          "code": {
             "type": "string"
           },
-          "errorMessage": {
+          "message": {
             "type": "string"
           },
-          "errorData": {
+          "data": {
             "type": "string"
           }
         },
         "required": [
-          "errorCode",
-          "errorMessage",
-          "errorData"
+          "code",
+          "message",
+          "data"
         ]
       },
       "validationErrorItem": {
