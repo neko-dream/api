@@ -9,23 +9,23 @@ CREATE TYPE "session_status" AS ENUM (
 
 CREATE TABLE "user_auths" (
   "user_id" uuid,
-  "provider" AuthProvider,
-  "subject" varchar,
-  "created_at" timestamp
+  "provider" AuthProvider NOT NULL,
+  "subject" varchar NOT NULL,
+  "created_at" timestamp NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "sessions" (
   "session_id" uuid PRIMARY KEY,
   "user_id" uuid,
-  "provider" AuthProvider,
-  "session_status" session_status,
-  "created_at" timestamp
+  "provider" AuthProvider NOT NULL,
+  "session_status" session_status NOT NULL,
+  "created_at" timestamp NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "users" (
   "user_id" uuid PRIMARY KEY,
-  "display_id" varchar,
-  "display_name" varchar,
+  "display_id" varchar NOT NULL,
+  "display_name" varchar NOT NULL,
   "created_at" timestamp NOT NULL DEFAULT (now())
 );
 
@@ -48,8 +48,8 @@ CREATE TABLE "opinions" (
 
 CREATE TABLE "votes" (
   "vote_id" uuid PRIMARY KEY,
-  "opinion_id" uuid,
-  "user_id" uuid,
+  "opinion_id" uuid NOT NULL,
+  "user_id" uuid NOT NULL,
   "created_at" timestamp NOT NULL DEFAULT (now())
 );
 
