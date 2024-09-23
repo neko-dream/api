@@ -23,8 +23,6 @@ func EncodeCookies(cookies []*http.Cookie) string {
 
 		if cookie.MaxAge > 0 {
 			result += fmt.Sprintf("; Max-Age=%d", cookie.MaxAge)
-		} else if cookie.MaxAge < 0 {
-			result += "; Max-Age=0"
 		}
 
 		if cookie.Domain != "" {
@@ -40,8 +38,10 @@ func EncodeCookies(cookies []*http.Cookie) string {
 		}
 
 		if cookie.SameSite != http.SameSiteDefaultMode {
-			result += fmt.Sprintf("; SameSite=%s", string(cookie.SameSite))
+			result += fmt.Sprintf("; SameSite=%v", "Lax")
 		}
+
+		result += "; Secure"
 
 		results = append(results, result)
 	}

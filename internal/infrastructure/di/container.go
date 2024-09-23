@@ -3,8 +3,10 @@ package di
 import (
 	"log"
 
+	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/infrastructure/auth"
+	"github.com/neko-dream/server/internal/infrastructure/repository"
 	"github.com/neko-dream/server/internal/presentation/handler"
 	"github.com/neko-dream/server/internal/usecase/auth_usecase"
 	"go.uber.org/dig"
@@ -20,19 +22,22 @@ func AddProvider(arg ProvideArg) {
 
 func BuildContainer() *dig.Container {
 	deps := []ProvideArg{
-		{auth.NewTokenManager, nil},
+		{repository.NewSessionRepository, nil},
+		{repository.NewUserRepository, nil},
+
+		{func() session.TokenManager {
+			return auth.NewTokenManager("")
+		}, nil},
 
 		{service.NewAuthService, nil},
 		{service.NewSessionService, nil},
 		{auth_usecase.NewAuthLoginUseCase, nil},
 		{auth_usecase.NewAuthCallbackUseCase, nil},
-
+		{handler.NewSecurityHandler, nil},
 		{handler.NewAuthHandler, nil},
 		{handler.NewUserHandler, nil},
 		{handler.NewIntentionHandler, nil},
 		{handler.NewOpinionHandler, nil},
-		{handler.NewTalkSessionHandler, nil},
-		{handler.NewUserHandler, nil},
 		{handler.NewTalkSessionHandler, nil},
 		{handler.NewHandler, nil},
 	}

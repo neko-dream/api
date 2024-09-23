@@ -6,7 +6,6 @@ import (
 	"net/url"
 
 	"github.com/neko-dream/server/internal/domain/model/auth"
-	cookie_utils "github.com/neko-dream/server/pkg/cookie"
 )
 
 type (
@@ -21,7 +20,7 @@ type (
 
 	AuthLoginOutput struct {
 		RedirectURL *url.URL
-		Cookie      string
+		Cookies     []*http.Cookie
 	}
 
 	authLoginInteractor struct {
@@ -30,7 +29,7 @@ type (
 )
 
 func (a *authLoginInteractor) Execute(ctx context.Context, input AuthLoginInput) (AuthLoginOutput, error) {
-	authUrl, state, err := a.GetAuthURL(ctx, input.Provider)
+	authUrl, state, err := a.AuthService.GetAuthURL(ctx, input.Provider)
 	if err != nil {
 		return AuthLoginOutput{}, err
 	}
@@ -39,7 +38,6 @@ func (a *authLoginInteractor) Execute(ctx context.Context, input AuthLoginInput)
 		Name:     "state",
 		Value:    state,
 		HttpOnly: true,
-		Path:     "/",
 		SameSite: http.SameSiteLaxMode,
 		Domain:   "localhost",
 	}
@@ -47,21 +45,20 @@ func (a *authLoginInteractor) Execute(ctx context.Context, input AuthLoginInput)
 		Name:     "redirect_url",
 		Value:    input.RedirectURL,
 		HttpOnly: true,
-		Path:     "/",
 		SameSite: http.SameSiteLaxMode,
 		Domain:   "localhost",
 	}
-	encoded := cookie_utils.EncodeCookies([]*http.Cookie{
-		&stateCookie,
-		&redirectURLCookie,
-	})
 
 	return AuthLoginOutput{
 		RedirectURL: authUrl,
-		Cookie:      encoded,
+		Cookies:     []*http.Cookie{&stateCookie, &redirectURLCookie},
 	}, nil
 }
 
-func NewAuthLoginUseCase() AuthLoginUseCase {
-	return &authLoginInteractor{}
+func NewAuthLoginUseCase(
+	authService auth.AuthService,
+) AuthLoginUseCase {
+	return &authLoginInteractor{
+		AuthService: authService,
+	}
 }

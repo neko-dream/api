@@ -2,11 +2,13 @@ package handler
 
 import (
 	"context"
-	"errors"
+	"net/http"
 	"net/url"
 
+	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/internal/usecase/auth_usecase"
+	http_utils "github.com/neko-dream/server/pkg/http"
 )
 
 type authHandler struct {
@@ -26,6 +28,7 @@ func NewAuthHandler(
 
 // AuthLogin implements oas.AuthHandler.
 func (a *authHandler) AuthLogin(ctx context.Context, params oas.AuthLoginParams) (*oas.AuthLoginFound, error) {
+
 	out, err := a.AuthLoginUseCase.Execute(ctx, auth_usecase.AuthLoginInput{
 		RedirectURL: params.RedirectURL,
 		Provider:    params.Provider,
@@ -35,8 +38,12 @@ func (a *authHandler) AuthLogin(ctx context.Context, params oas.AuthLoginParams)
 	}
 
 	res := new(oas.AuthLoginFound)
-	res.SetCookie = oas.NewOptString(out.Cookie)
-	res.Location = oas.NewOptURI(*out.RedirectURL)
+	res.SetLocation(oas.NewOptURI(*out.RedirectURL))
+	w := http_utils.GetHTTPResponse(ctx)
+	for _, c := range out.Cookies {
+		http.SetCookie(w, c)
+	}
+
 	return res, nil
 }
 
@@ -44,7 +51,7 @@ func (a *authHandler) AuthLogin(ctx context.Context, params oas.AuthLoginParams)
 func (a *authHandler) OAuthCallback(ctx context.Context, params oas.OAuthCallbackParams) (*oas.OAuthCallbackFound, error) {
 	if params.CookieState.Value != params.QueryState.Value {
 		res := new(oas.OAuthCallbackFound)
-		return res, errors.New("invalid state")
+		return res, messages.InvalidStateError
 	}
 
 	input := auth_usecase.CallbackInput{
@@ -62,5 +69,6 @@ func (a *authHandler) OAuthCallback(ctx context.Context, params oas.OAuthCallbac
 	// LoginでRedirectURLを設定しているためエラーは発生しない
 	loc, _ := url.Parse(params.RedirectURL)
 	res.Location = oas.NewOptURI(*loc)
+
 	return res, nil
 }

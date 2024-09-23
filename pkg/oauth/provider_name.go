@@ -1,6 +1,9 @@
 package oauth
 
-import "errors"
+import (
+	"errors"
+	"strings"
+)
 
 type AuthProviderName string
 
@@ -13,7 +16,7 @@ const (
 )
 
 func NewAuthProviderName(provider string) (AuthProviderName, error) {
-	switch provider {
+	switch strings.ToUpper(provider) {
 	case ProviderGoogle.String():
 		return ProviderGoogle, nil
 	default:

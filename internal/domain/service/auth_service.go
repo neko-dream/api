@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/url"
 
+	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
@@ -29,7 +30,7 @@ func (a *authService) Authenticate(
 ) (*user.User, error) {
 	authProviderName, err := oauth.NewAuthProviderName(providerName)
 	if err != nil {
-		return nil, err
+		return nil, messages.InvalidProviderError
 	}
 
 	provider, err := oauth.OIDCProviderFactory(

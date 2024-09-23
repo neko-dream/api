@@ -33,7 +33,8 @@ get:
           schema:
             type: string
             format: cookie
-          example: 'state=1234567890; Path=/; Secure; HttpOnly'
+          example: 'state=1234567890; Path=/; Secure; HttpOnly, redirect_url=https://example.com/login; Path=/; Secure; HttpOnly'
+
   security: []
   x-ogen-operation-group: Auth
 post:
