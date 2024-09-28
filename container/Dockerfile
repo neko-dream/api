@@ -16,8 +16,6 @@ COPY . .
 RUN go build -tags timetzdata -ldflags="-s -w" -trimpath -o server ./cmd/server
 
 FROM alpine:latest
-
-WORKDIR /app
-
+EXPOSE 3000
 COPY --from=builder /app/server ./server
-ENTRYPOINT ["/app/server"]
+ENTRYPOINT "./server"]
