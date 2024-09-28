@@ -9,7 +9,6 @@ import (
 	"github.com/go-faster/errors"
 	"go.uber.org/multierr"
 
-	"braces.dev/errtrace"
 	"github.com/ogen-go/ogen/conv"
 	ht "github.com/ogen-go/ogen/http"
 	"github.com/ogen-go/ogen/uri"
@@ -29,11 +28,11 @@ func (s *Server) decodeCreateTalkSessionRequest(r *http.Request) (
 			c := closers[i]
 			merr = multierr.Append(merr, c())
 		}
-		return errtrace.Wrap(merr)
+		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = errtrace.Wrap(multierr.Append(rerr, close()))
+			rerr = multierr.Append(rerr, close())
 		}
 	}()
 	if _, ok := r.Header["Content-Type"]; !ok && r.ContentLength == 0 {
@@ -41,7 +40,7 @@ func (s *Server) decodeCreateTalkSessionRequest(r *http.Request) (
 	}
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errtrace.Wrap(errors.Wrap(err, "parse media type"))
+		return req, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "application/x-www-form-urlencoded":
@@ -50,7 +49,7 @@ func (s *Server) decodeCreateTalkSessionRequest(r *http.Request) (
 		}
 		form, err := ht.ParseForm(r)
 		if err != nil {
-			return req, close, errtrace.Wrap(errors.Wrap(err, "parse form"))
+			return req, close, errors.Wrap(err, "parse form")
 		}
 
 		var request OptCreateTalkSessionReq
@@ -69,23 +68,23 @@ func (s *Server) decodeCreateTalkSessionRequest(r *http.Request) (
 						if err := func() error {
 							val, err := d.DecodeValue()
 							if err != nil {
-								return errtrace.Wrap(err)
+								return err
 							}
 
 							c, err := conv.ToString(val)
 							if err != nil {
-								return errtrace.Wrap(err)
+								return err
 							}
 
 							optFormDotThemeVal = c
 							return nil
 						}(); err != nil {
-							return errtrace.Wrap(err)
+							return err
 						}
 						optForm.Theme.SetTo(optFormDotThemeVal)
 						return nil
 					}); err != nil {
-						return req, close, errtrace.Wrap(errors.Wrap(err, "decode \"theme\""))
+						return req, close, errors.Wrap(err, "decode \"theme\"")
 					}
 				}
 			}
@@ -96,6 +95,6 @@ func (s *Server) decodeCreateTalkSessionRequest(r *http.Request) (
 		}
 		return request, close, nil
 	default:
-		return req, close, errtrace.Wrap(validate.InvalidContentType(ct))
+		return req, close, validate.InvalidContentType(ct)
 	}
 }

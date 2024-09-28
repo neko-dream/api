@@ -4,6 +4,8 @@ package oas
 
 import (
 	"net/url"
+
+	"github.com/go-faster/errors"
 )
 
 // AuthLoginFound is response for AuthLogin operation.
@@ -170,15 +172,15 @@ func (s *GetUserProfileOK) SetDisplayName(val string) {
 	s.DisplayName = val
 }
 
-type IndicateIntentionInternalServerError struct{}
+type IntentionInternalServerError struct{}
 
-func (*IndicateIntentionInternalServerError) indicateIntentionRes() {}
+func (*IntentionInternalServerError) intentionRes() {}
 
-type IndicateIntentionOKApplicationJSON []IndicateIntentionOKItem
+type IntentionOKApplicationJSON []IntentionOKItem
 
-func (*IndicateIntentionOKApplicationJSON) indicateIntentionRes() {}
+func (*IntentionOKApplicationJSON) intentionRes() {}
 
-type IndicateIntentionOKItem struct {
+type IntentionOKItem struct {
 	// 意見ID.
 	OpinionID string `json:"opinionID"`
 	// 意見のテキスト.
@@ -188,32 +190,32 @@ type IndicateIntentionOKItem struct {
 }
 
 // GetOpinionID returns the value of OpinionID.
-func (s *IndicateIntentionOKItem) GetOpinionID() string {
+func (s *IntentionOKItem) GetOpinionID() string {
 	return s.OpinionID
 }
 
 // GetOpinionContent returns the value of OpinionContent.
-func (s *IndicateIntentionOKItem) GetOpinionContent() string {
+func (s *IntentionOKItem) GetOpinionContent() string {
 	return s.OpinionContent
 }
 
 // GetParentOpinionID returns the value of ParentOpinionID.
-func (s *IndicateIntentionOKItem) GetParentOpinionID() OptString {
+func (s *IntentionOKItem) GetParentOpinionID() OptString {
 	return s.ParentOpinionID
 }
 
 // SetOpinionID sets the value of OpinionID.
-func (s *IndicateIntentionOKItem) SetOpinionID(val string) {
+func (s *IntentionOKItem) SetOpinionID(val string) {
 	s.OpinionID = val
 }
 
 // SetOpinionContent sets the value of OpinionContent.
-func (s *IndicateIntentionOKItem) SetOpinionContent(val string) {
+func (s *IntentionOKItem) SetOpinionContent(val string) {
 	s.OpinionContent = val
 }
 
 // SetParentOpinionID sets the value of ParentOpinionID.
-func (s *IndicateIntentionOKItem) SetParentOpinionID(val OptString) {
+func (s *IntentionOKItem) SetParentOpinionID(val OptString) {
 	s.ParentOpinionID = val
 }
 
@@ -435,6 +437,103 @@ func (*PostOpinionPostInternalServerError) postOpinionPostRes() {}
 type PostOpinionPostOK struct{}
 
 func (*PostOpinionPostOK) postOpinionPostRes() {}
+
+type RegisterUserAge string
+
+const (
+	RegisterUserAge10  RegisterUserAge = "10"
+	RegisterUserAge20  RegisterUserAge = "20"
+	RegisterUserAge30  RegisterUserAge = "30"
+	RegisterUserAge40  RegisterUserAge = "40"
+	RegisterUserAge50  RegisterUserAge = "50"
+	RegisterUserAge60  RegisterUserAge = "60"
+	RegisterUserAge70  RegisterUserAge = "70"
+	RegisterUserAge80  RegisterUserAge = "80"
+	RegisterUserAge90  RegisterUserAge = "90"
+	RegisterUserAge100 RegisterUserAge = "100"
+)
+
+// AllValues returns all RegisterUserAge values.
+func (RegisterUserAge) AllValues() []RegisterUserAge {
+	return []RegisterUserAge{
+		RegisterUserAge10,
+		RegisterUserAge20,
+		RegisterUserAge30,
+		RegisterUserAge40,
+		RegisterUserAge50,
+		RegisterUserAge60,
+		RegisterUserAge70,
+		RegisterUserAge80,
+		RegisterUserAge90,
+		RegisterUserAge100,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s RegisterUserAge) MarshalText() ([]byte, error) {
+	switch s {
+	case RegisterUserAge10:
+		return []byte(s), nil
+	case RegisterUserAge20:
+		return []byte(s), nil
+	case RegisterUserAge30:
+		return []byte(s), nil
+	case RegisterUserAge40:
+		return []byte(s), nil
+	case RegisterUserAge50:
+		return []byte(s), nil
+	case RegisterUserAge60:
+		return []byte(s), nil
+	case RegisterUserAge70:
+		return []byte(s), nil
+	case RegisterUserAge80:
+		return []byte(s), nil
+	case RegisterUserAge90:
+		return []byte(s), nil
+	case RegisterUserAge100:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *RegisterUserAge) UnmarshalText(data []byte) error {
+	switch RegisterUserAge(data) {
+	case RegisterUserAge10:
+		*s = RegisterUserAge10
+		return nil
+	case RegisterUserAge20:
+		*s = RegisterUserAge20
+		return nil
+	case RegisterUserAge30:
+		*s = RegisterUserAge30
+		return nil
+	case RegisterUserAge40:
+		*s = RegisterUserAge40
+		return nil
+	case RegisterUserAge50:
+		*s = RegisterUserAge50
+		return nil
+	case RegisterUserAge60:
+		*s = RegisterUserAge60
+		return nil
+	case RegisterUserAge70:
+		*s = RegisterUserAge70
+		return nil
+	case RegisterUserAge80:
+		*s = RegisterUserAge80
+		return nil
+	case RegisterUserAge90:
+		*s = RegisterUserAge90
+		return nil
+	case RegisterUserAge100:
+		*s = RegisterUserAge100
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
 
 type RegisterUserBadRequest struct{}
 

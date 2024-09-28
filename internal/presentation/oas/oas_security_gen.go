@@ -9,7 +9,6 @@ import (
 
 	"github.com/go-faster/errors"
 
-	"braces.dev/errtrace"
 	"github.com/ogen-go/ogen/ogenerrors"
 )
 
@@ -44,16 +43,16 @@ func (s *Server) securitySessionId(ctx context.Context, operationName string, re
 	case errors.Is(err, http.ErrNoCookie):
 		return ctx, false, nil
 	default:
-		return nil, false, errtrace.Wrap(errors.Wrap(err, "get cookie value"))
+		return nil, false, errors.Wrap(err, "get cookie value")
 	}
 	t.APIKey = value
 	rctx, err := s.sec.HandleSessionId(ctx, operationName, t)
 	if errors.Is(err, ogenerrors.ErrSkipServerSecurity) {
 		return nil, false, nil
 	} else if err != nil {
-		return nil, false, errtrace.Wrap(err)
+		return nil, false, err
 	}
-	return rctx, true, errtrace.Wrap(err)
+	return rctx, true, err
 }
 
 // SecuritySource is provider of security values (tokens, passwords, etc.).
@@ -65,7 +64,7 @@ type SecuritySource interface {
 func (s *Client) securitySessionId(ctx context.Context, operationName string, req *http.Request) error {
 	t, err := s.sec.SessionId(ctx, operationName)
 	if err != nil {
-		return errtrace.Wrap(errors.Wrap(err, "security source \"SessionId\""))
+		return errors.Wrap(err, "security source \"SessionId\"")
 	}
 	req.AddCookie(&http.Cookie{
 		Name:  "SessionId",

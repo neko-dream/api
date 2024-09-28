@@ -2,23 +2,27 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
+	"github.com/neko-dream/server/internal/infrastructure/db"
 	"github.com/neko-dream/server/internal/infrastructure/di"
 	"github.com/neko-dream/server/internal/infrastructure/middleware"
 	"github.com/neko-dream/server/internal/presentation/handler"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/pkg/utils"
+
+	swMiddleware "github.com/go-openapi/runtime/middleware"
 )
 
 func main() {
-	log.Println("starting server...")
 	// .envを読み込む
 	if err := utils.LoadEnv(); err != nil {
 		panic(err)
 	}
+
+	db.Down()
+	db.Migration()
 
 	container := di.BuildContainer()
 	srv, err := oas.NewServer(
@@ -32,9 +36,21 @@ func main() {
 
 	reqMiddleware := middleware.ReqMiddleware(srv)
 	corsHandler := middleware.CORSMiddleware(reqMiddleware)
+	mux := http.NewServeMux()
+
+	mux.Handle("/static/",
+		http.StripPrefix("/static/",
+			http.FileServer(http.Dir("./static")),
+		),
+	)
+
+	opts := swMiddleware.SwaggerUIOpts{SpecURL: "/static/openapi.yaml"}
+	sh := swMiddleware.SwaggerUI(opts, nil)
+	mux.Handle("/docs/", sh)
+	mux.Handle("/", corsHandler)
+
 	port := os.Getenv("PORT")
-	log.Println("server started on port", port)
-	if err := http.ListenAndServe(fmt.Sprintf(":%s", port), corsHandler); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf(":%s", port), mux); err != nil {
 		panic(err)
 	}
 }

@@ -237,7 +237,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 											// Leaf node.
 											switch r.Method {
 											case "POST":
-												s.handleIndicateIntentionRequest([2]string{
+												s.handleIntentionRequest([2]string{
 													args[0],
 													args[1],
 												}, elemIsEscaped, w, r)
@@ -273,19 +273,39 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					}
 
 					if len(elem) == 0 {
-						// Leaf node.
 						switch r.Method {
 						case "GET":
 							s.handleGetUserProfileRequest([0]string{}, elemIsEscaped, w, r)
-						case "POST":
-							s.handleRegisterUserRequest([0]string{}, elemIsEscaped, w, r)
 						case "PUT":
 							s.handleEditUserProfileRequest([0]string{}, elemIsEscaped, w, r)
 						default:
-							s.notAllowed(w, r, "GET,POST,PUT")
+							s.notAllowed(w, r, "GET,PUT")
 						}
 
 						return
+					}
+					switch elem[0] {
+					case '/': // Prefix: "/register"
+						origElem := elem
+						if l := len("/register"); len(elem) >= l && elem[0:l] == "/register" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch r.Method {
+							case "POST":
+								s.handleRegisterUserRequest([0]string{}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "POST")
+							}
+
+							return
+						}
+
+						elem = origElem
 					}
 
 					elem = origElem
@@ -664,9 +684,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											// Leaf node.
 											switch method {
 											case "POST":
-												r.name = "IndicateIntention"
+												r.name = "Intention"
 												r.summary = "意思表明API"
-												r.operationID = "indicateIntention"
+												r.operationID = "Intention"
 												r.pathPattern = "/api/talksessions/{talkSessionID}/opinions/{opinionID}/intentions"
 												r.args = args
 												r.count = 2
@@ -701,20 +721,11 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					}
 
 					if len(elem) == 0 {
-						// Leaf node.
 						switch method {
 						case "GET":
 							r.name = "GetUserProfile"
 							r.summary = "ユーザー情報の取得"
 							r.operationID = "getUserProfile"
-							r.pathPattern = "/api/user"
-							r.args = args
-							r.count = 0
-							return r, true
-						case "POST":
-							r.name = "RegisterUser"
-							r.summary = "ユーザー作成"
-							r.operationID = "registerUser"
 							r.pathPattern = "/api/user"
 							r.args = args
 							r.count = 0
@@ -730,6 +741,33 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						default:
 							return
 						}
+					}
+					switch elem[0] {
+					case '/': // Prefix: "/register"
+						origElem := elem
+						if l := len("/register"); len(elem) >= l && elem[0:l] == "/register" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch method {
+							case "POST":
+								r.name = "RegisterUser"
+								r.summary = "ユーザー作成"
+								r.operationID = "registerUser"
+								r.pathPattern = "/api/user/register"
+								r.args = args
+								r.count = 0
+								return r, true
+							default:
+								return
+							}
+						}
+
+						elem = origElem
 					}
 
 					elem = origElem

@@ -8,7 +8,6 @@ import (
 
 	"github.com/go-faster/errors"
 
-	"braces.dev/errtrace"
 	"github.com/ogen-go/ogen/conv"
 	"github.com/ogen-go/ogen/middleware"
 	"github.com/ogen-go/ogen/ogenerrors"
@@ -50,7 +49,7 @@ func decodeAuthLoginParams(args [1]string, argsEscaped bool, r *http.Request) (p
 		if argsEscaped {
 			unescaped, err := url.PathUnescape(args[0])
 			if err != nil {
-				return errtrace.Wrap(errors.Wrap(err, "unescape path"))
+				return errors.Wrap(err, "unescape path")
 			}
 			param = unescaped
 		}
@@ -65,29 +64,29 @@ func decodeAuthLoginParams(args [1]string, argsEscaped bool, r *http.Request) (p
 			if err := func() error {
 				val, err := d.DecodeValue()
 				if err != nil {
-					return errtrace.Wrap(err)
+					return err
 				}
 
 				c, err := conv.ToString(val)
 				if err != nil {
-					return errtrace.Wrap(err)
+					return err
 				}
 
 				params.Provider = c
 				return nil
 			}(); err != nil {
-				return errtrace.Wrap(err)
+				return err
 			}
 		} else {
-			return errtrace.Wrap(validate.ErrFieldRequired)
+			return validate.ErrFieldRequired
 		}
 		return nil
 	}(); err != nil {
-		return params, errtrace.Wrap(&ogenerrors.DecodeParamError{
+		return params, &ogenerrors.DecodeParamError{
 			Name: "provider",
 			In:   "path",
 			Err:  err,
-		})
+		}
 	}
 	// Decode query: redirect_url.
 	if err := func() error {
@@ -101,29 +100,29 @@ func decodeAuthLoginParams(args [1]string, argsEscaped bool, r *http.Request) (p
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
 				val, err := d.DecodeValue()
 				if err != nil {
-					return errtrace.Wrap(err)
+					return err
 				}
 
 				c, err := conv.ToString(val)
 				if err != nil {
-					return errtrace.Wrap(err)
+					return err
 				}
 
 				params.RedirectURL = c
 				return nil
 			}); err != nil {
-				return errtrace.Wrap(err)
+				return err
 			}
 		} else {
-			return errtrace.Wrap(validate.ErrFieldRequired)
+			return validate.ErrFieldRequired
 		}
 		return nil
 	}(); err != nil {
-		return params, errtrace.Wrap(&ogenerrors.DecodeParamError{
+		return params, &ogenerrors.DecodeParamError{
 			Name: "redirect_url",
 			In:   "query",
 			Err:  err,
-		})
+		}
 	}
 	return params, nil
 }
@@ -151,7 +150,7 @@ func decodeGetTalkSessionDetailParams(args [1]string, argsEscaped bool, r *http.
 		if argsEscaped {
 			unescaped, err := url.PathUnescape(args[0])
 			if err != nil {
-				return errtrace.Wrap(errors.Wrap(err, "unescape path"))
+				return errors.Wrap(err, "unescape path")
 			}
 			param = unescaped
 		}
@@ -166,42 +165,42 @@ func decodeGetTalkSessionDetailParams(args [1]string, argsEscaped bool, r *http.
 			if err := func() error {
 				val, err := d.DecodeValue()
 				if err != nil {
-					return errtrace.Wrap(err)
+					return err
 				}
 
 				c, err := conv.ToString(val)
 				if err != nil {
-					return errtrace.Wrap(err)
+					return err
 				}
 
 				params.TalkSessionId = c
 				return nil
 			}(); err != nil {
-				return errtrace.Wrap(err)
+				return err
 			}
 		} else {
-			return errtrace.Wrap(validate.ErrFieldRequired)
+			return validate.ErrFieldRequired
 		}
 		return nil
 	}(); err != nil {
-		return params, errtrace.Wrap(&ogenerrors.DecodeParamError{
+		return params, &ogenerrors.DecodeParamError{
 			Name: "talkSessionId",
 			In:   "path",
 			Err:  err,
-		})
+		}
 	}
 	return params, nil
 }
 
-// IndicateIntentionParams is parameters of indicateIntention operation.
-type IndicateIntentionParams struct {
+// IntentionParams is parameters of Intention operation.
+type IntentionParams struct {
 	// セッションのID.
 	TalkSessionID string
 	// 意見のID.
 	OpinionID string
 }
 
-func unpackIndicateIntentionParams(packed middleware.Parameters) (params IndicateIntentionParams) {
+func unpackIntentionParams(packed middleware.Parameters) (params IntentionParams) {
 	{
 		key := middleware.ParameterKey{
 			Name: "talkSessionID",
@@ -219,14 +218,14 @@ func unpackIndicateIntentionParams(packed middleware.Parameters) (params Indicat
 	return params
 }
 
-func decodeIndicateIntentionParams(args [2]string, argsEscaped bool, r *http.Request) (params IndicateIntentionParams, _ error) {
+func decodeIntentionParams(args [2]string, argsEscaped bool, r *http.Request) (params IntentionParams, _ error) {
 	// Decode path: talkSessionID.
 	if err := func() error {
 		param := args[0]
 		if argsEscaped {
 			unescaped, err := url.PathUnescape(args[0])
 			if err != nil {
-				return errtrace.Wrap(errors.Wrap(err, "unescape path"))
+				return errors.Wrap(err, "unescape path")
 			}
 			param = unescaped
 		}
@@ -241,29 +240,29 @@ func decodeIndicateIntentionParams(args [2]string, argsEscaped bool, r *http.Req
 			if err := func() error {
 				val, err := d.DecodeValue()
 				if err != nil {
-					return errtrace.Wrap(err)
+					return err
 				}
 
 				c, err := conv.ToString(val)
 				if err != nil {
-					return errtrace.Wrap(err)
+					return err
 				}
 
 				params.TalkSessionID = c
 				return nil
 			}(); err != nil {
-				return errtrace.Wrap(err)
+				return err
 			}
 		} else {
-			return errtrace.Wrap(validate.ErrFieldRequired)
+			return validate.ErrFieldRequired
 		}
 		return nil
 	}(); err != nil {
-		return params, errtrace.Wrap(&ogenerrors.DecodeParamError{
+		return params, &ogenerrors.DecodeParamError{
 			Name: "talkSessionID",
 			In:   "path",
 			Err:  err,
-		})
+		}
 	}
 	// Decode path: opinionID.
 	if err := func() error {
@@ -271,7 +270,7 @@ func decodeIndicateIntentionParams(args [2]string, argsEscaped bool, r *http.Req
 		if argsEscaped {
 			unescaped, err := url.PathUnescape(args[1])
 			if err != nil {
-				return errtrace.Wrap(errors.Wrap(err, "unescape path"))
+				return errors.Wrap(err, "unescape path")
 			}
 			param = unescaped
 		}
@@ -286,29 +285,29 @@ func decodeIndicateIntentionParams(args [2]string, argsEscaped bool, r *http.Req
 			if err := func() error {
 				val, err := d.DecodeValue()
 				if err != nil {
-					return errtrace.Wrap(err)
+					return err
 				}
 
 				c, err := conv.ToString(val)
 				if err != nil {
-					return errtrace.Wrap(err)
+					return err
 				}
 
 				params.OpinionID = c
 				return nil
 			}(); err != nil {
-				return errtrace.Wrap(err)
+				return err
 			}
 		} else {
-			return errtrace.Wrap(validate.ErrFieldRequired)
+			return validate.ErrFieldRequired
 		}
 		return nil
 	}(); err != nil {
-		return params, errtrace.Wrap(&ogenerrors.DecodeParamError{
+		return params, &ogenerrors.DecodeParamError{
 			Name: "opinionID",
 			In:   "path",
 			Err:  err,
-		})
+		}
 	}
 	return params, nil
 }
@@ -347,7 +346,7 @@ func decodeListOpinionsParams(args [1]string, argsEscaped bool, r *http.Request)
 		if argsEscaped {
 			unescaped, err := url.PathUnescape(args[0])
 			if err != nil {
-				return errtrace.Wrap(errors.Wrap(err, "unescape path"))
+				return errors.Wrap(err, "unescape path")
 			}
 			param = unescaped
 		}
@@ -362,29 +361,29 @@ func decodeListOpinionsParams(args [1]string, argsEscaped bool, r *http.Request)
 			if err := func() error {
 				val, err := d.DecodeValue()
 				if err != nil {
-					return errtrace.Wrap(err)
+					return err
 				}
 
 				c, err := conv.ToString(val)
 				if err != nil {
-					return errtrace.Wrap(err)
+					return err
 				}
 
 				params.TalkSessionID = c
 				return nil
 			}(); err != nil {
-				return errtrace.Wrap(err)
+				return err
 			}
 		} else {
-			return errtrace.Wrap(validate.ErrFieldRequired)
+			return validate.ErrFieldRequired
 		}
 		return nil
 	}(); err != nil {
-		return params, errtrace.Wrap(&ogenerrors.DecodeParamError{
+		return params, &ogenerrors.DecodeParamError{
 			Name: "talkSessionID",
 			In:   "path",
 			Err:  err,
-		})
+		}
 	}
 	// Decode query: parentOpinionID.
 	if err := func() error {
@@ -400,32 +399,32 @@ func decodeListOpinionsParams(args [1]string, argsEscaped bool, r *http.Request)
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
-						return errtrace.Wrap(err)
+						return err
 					}
 
 					c, err := conv.ToString(val)
 					if err != nil {
-						return errtrace.Wrap(err)
+						return err
 					}
 
 					paramsDotParentOpinionIDVal = c
 					return nil
 				}(); err != nil {
-					return errtrace.Wrap(err)
+					return err
 				}
 				params.ParentOpinionID.SetTo(paramsDotParentOpinionIDVal)
 				return nil
 			}); err != nil {
-				return errtrace.Wrap(err)
+				return err
 			}
 		}
 		return nil
 	}(); err != nil {
-		return params, errtrace.Wrap(&ogenerrors.DecodeParamError{
+		return params, &ogenerrors.DecodeParamError{
 			Name: "parentOpinionID",
 			In:   "query",
 			Err:  err,
-		})
+		}
 	}
 	return params, nil
 }
@@ -503,32 +502,32 @@ func decodeOAuthCallbackParams(args [1]string, argsEscaped bool, r *http.Request
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
-						return errtrace.Wrap(err)
+						return err
 					}
 
 					c, err := conv.ToString(val)
 					if err != nil {
-						return errtrace.Wrap(err)
+						return err
 					}
 
 					paramsDotCookieStateVal = c
 					return nil
 				}(); err != nil {
-					return errtrace.Wrap(err)
+					return err
 				}
 				params.CookieState.SetTo(paramsDotCookieStateVal)
 				return nil
 			}); err != nil {
-				return errtrace.Wrap(err)
+				return err
 			}
 		}
 		return nil
 	}(); err != nil {
-		return params, errtrace.Wrap(&ogenerrors.DecodeParamError{
+		return params, &ogenerrors.DecodeParamError{
 			Name: "state",
 			In:   "cookie",
 			Err:  err,
-		})
+		}
 	}
 	// Decode cookie: redirect_url.
 	if err := func() error {
@@ -540,29 +539,29 @@ func decodeOAuthCallbackParams(args [1]string, argsEscaped bool, r *http.Request
 			if err := c.DecodeParam(cfg, func(d uri.Decoder) error {
 				val, err := d.DecodeValue()
 				if err != nil {
-					return errtrace.Wrap(err)
+					return err
 				}
 
 				c, err := conv.ToString(val)
 				if err != nil {
-					return errtrace.Wrap(err)
+					return err
 				}
 
 				params.RedirectURL = c
 				return nil
 			}); err != nil {
-				return errtrace.Wrap(err)
+				return err
 			}
 		} else {
-			return errtrace.Wrap(validate.ErrFieldRequired)
+			return validate.ErrFieldRequired
 		}
 		return nil
 	}(); err != nil {
-		return params, errtrace.Wrap(&ogenerrors.DecodeParamError{
+		return params, &ogenerrors.DecodeParamError{
 			Name: "redirect_url",
 			In:   "cookie",
 			Err:  err,
-		})
+		}
 	}
 	// Decode path: provider.
 	if err := func() error {
@@ -570,7 +569,7 @@ func decodeOAuthCallbackParams(args [1]string, argsEscaped bool, r *http.Request
 		if argsEscaped {
 			unescaped, err := url.PathUnescape(args[0])
 			if err != nil {
-				return errtrace.Wrap(errors.Wrap(err, "unescape path"))
+				return errors.Wrap(err, "unescape path")
 			}
 			param = unescaped
 		}
@@ -585,29 +584,29 @@ func decodeOAuthCallbackParams(args [1]string, argsEscaped bool, r *http.Request
 			if err := func() error {
 				val, err := d.DecodeValue()
 				if err != nil {
-					return errtrace.Wrap(err)
+					return err
 				}
 
 				c, err := conv.ToString(val)
 				if err != nil {
-					return errtrace.Wrap(err)
+					return err
 				}
 
 				params.Provider = c
 				return nil
 			}(); err != nil {
-				return errtrace.Wrap(err)
+				return err
 			}
 		} else {
-			return errtrace.Wrap(validate.ErrFieldRequired)
+			return validate.ErrFieldRequired
 		}
 		return nil
 	}(); err != nil {
-		return params, errtrace.Wrap(&ogenerrors.DecodeParamError{
+		return params, &ogenerrors.DecodeParamError{
 			Name: "provider",
 			In:   "path",
 			Err:  err,
-		})
+		}
 	}
 	// Decode query: code.
 	if err := func() error {
@@ -623,32 +622,32 @@ func decodeOAuthCallbackParams(args [1]string, argsEscaped bool, r *http.Request
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
-						return errtrace.Wrap(err)
+						return err
 					}
 
 					c, err := conv.ToString(val)
 					if err != nil {
-						return errtrace.Wrap(err)
+						return err
 					}
 
 					paramsDotCodeVal = c
 					return nil
 				}(); err != nil {
-					return errtrace.Wrap(err)
+					return err
 				}
 				params.Code.SetTo(paramsDotCodeVal)
 				return nil
 			}); err != nil {
-				return errtrace.Wrap(err)
+				return err
 			}
 		}
 		return nil
 	}(); err != nil {
-		return params, errtrace.Wrap(&ogenerrors.DecodeParamError{
+		return params, &ogenerrors.DecodeParamError{
 			Name: "code",
 			In:   "query",
 			Err:  err,
-		})
+		}
 	}
 	// Decode query: state.
 	if err := func() error {
@@ -664,32 +663,32 @@ func decodeOAuthCallbackParams(args [1]string, argsEscaped bool, r *http.Request
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
-						return errtrace.Wrap(err)
+						return err
 					}
 
 					c, err := conv.ToString(val)
 					if err != nil {
-						return errtrace.Wrap(err)
+						return err
 					}
 
 					paramsDotQueryStateVal = c
 					return nil
 				}(); err != nil {
-					return errtrace.Wrap(err)
+					return err
 				}
 				params.QueryState.SetTo(paramsDotQueryStateVal)
 				return nil
 			}); err != nil {
-				return errtrace.Wrap(err)
+				return err
 			}
 		}
 		return nil
 	}(); err != nil {
-		return params, errtrace.Wrap(&ogenerrors.DecodeParamError{
+		return params, &ogenerrors.DecodeParamError{
 			Name: "state",
 			In:   "query",
 			Err:  err,
-		})
+		}
 	}
 	return params, nil
 }
@@ -727,7 +726,7 @@ func decodePostOpinionPostParams(args [1]string, argsEscaped bool, r *http.Reque
 		if argsEscaped {
 			unescaped, err := url.PathUnescape(args[0])
 			if err != nil {
-				return errtrace.Wrap(errors.Wrap(err, "unescape path"))
+				return errors.Wrap(err, "unescape path")
 			}
 			param = unescaped
 		}
@@ -742,29 +741,29 @@ func decodePostOpinionPostParams(args [1]string, argsEscaped bool, r *http.Reque
 			if err := func() error {
 				val, err := d.DecodeValue()
 				if err != nil {
-					return errtrace.Wrap(err)
+					return err
 				}
 
 				c, err := conv.ToString(val)
 				if err != nil {
-					return errtrace.Wrap(err)
+					return err
 				}
 
 				params.TalkSessionID = c
 				return nil
 			}(); err != nil {
-				return errtrace.Wrap(err)
+				return err
 			}
 		} else {
-			return errtrace.Wrap(validate.ErrFieldRequired)
+			return validate.ErrFieldRequired
 		}
 		return nil
 	}(); err != nil {
-		return params, errtrace.Wrap(&ogenerrors.DecodeParamError{
+		return params, &ogenerrors.DecodeParamError{
 			Name: "talkSessionID",
 			In:   "path",
 			Err:  err,
-		})
+		}
 	}
 	// Decode query: opinionContent.
 	if err := func() error {
@@ -778,37 +777,40 @@ func decodePostOpinionPostParams(args [1]string, argsEscaped bool, r *http.Reque
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
 				val, err := d.DecodeValue()
 				if err != nil {
-					return errtrace.Wrap(err)
+					return err
 				}
 
 				c, err := conv.ToString(val)
 				if err != nil {
-					return errtrace.Wrap(err)
+					return err
 				}
 
 				params.OpinionContent = c
 				return nil
 			}); err != nil {
-				return errtrace.Wrap(err)
+				return err
 			}
 		} else {
-			return errtrace.Wrap(validate.ErrFieldRequired)
+			return validate.ErrFieldRequired
 		}
 		return nil
 	}(); err != nil {
-		return params, errtrace.Wrap(&ogenerrors.DecodeParamError{
+		return params, &ogenerrors.DecodeParamError{
 			Name: "opinionContent",
 			In:   "query",
 			Err:  err,
-		})
+		}
 	}
 	return params, nil
 }
 
 // RegisterUserParams is parameters of registerUser operation.
 type RegisterUserParams struct {
-	DisplayName OptString
-	DisplayID   OptString
+	// 一意のユーザーID.
+	DisplayName string
+	DisplayID   string
+	Picture     OptString
+	Age         RegisterUserAge
 }
 
 func unpackRegisterUserParams(packed middleware.Parameters) (params RegisterUserParams) {
@@ -817,18 +819,30 @@ func unpackRegisterUserParams(packed middleware.Parameters) (params RegisterUser
 			Name: "displayName",
 			In:   "query",
 		}
-		if v, ok := packed[key]; ok {
-			params.DisplayName = v.(OptString)
-		}
+		params.DisplayName = packed[key].(string)
 	}
 	{
 		key := middleware.ParameterKey{
 			Name: "displayID",
 			In:   "query",
 		}
-		if v, ok := packed[key]; ok {
-			params.DisplayID = v.(OptString)
+		params.DisplayID = packed[key].(string)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "picture",
+			In:   "query",
 		}
+		if v, ok := packed[key]; ok {
+			params.Picture = v.(OptString)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "age",
+			In:   "query",
+		}
+		params.Age = packed[key].(RegisterUserAge)
 	}
 	return params
 }
@@ -845,36 +859,47 @@ func decodeRegisterUserParams(args [0]string, argsEscaped bool, r *http.Request)
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotDisplayNameVal string
-				if err := func() error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return errtrace.Wrap(err)
-					}
-
-					c, err := conv.ToString(val)
-					if err != nil {
-						return errtrace.Wrap(err)
-					}
-
-					paramsDotDisplayNameVal = c
-					return nil
-				}(); err != nil {
-					return errtrace.Wrap(err)
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
 				}
-				params.DisplayName.SetTo(paramsDotDisplayNameVal)
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.DisplayName = c
 				return nil
 			}); err != nil {
-				return errtrace.Wrap(err)
+				return err
 			}
+			if err := func() error {
+				if err := (validate.String{
+					MinLength:    5,
+					MinLengthSet: true,
+					MaxLength:    0,
+					MaxLengthSet: false,
+					Email:        false,
+					Hostname:     false,
+					Regex:        nil,
+				}).Validate(string(params.DisplayName)); err != nil {
+					return errors.Wrap(err, "string")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
 		}
 		return nil
 	}(); err != nil {
-		return params, errtrace.Wrap(&ogenerrors.DecodeParamError{
+		return params, &ogenerrors.DecodeParamError{
 			Name: "displayName",
 			In:   "query",
 			Err:  err,
-		})
+		}
 	}
 	// Decode query: displayID.
 	if err := func() error {
@@ -886,36 +911,132 @@ func decodeRegisterUserParams(args [0]string, argsEscaped bool, r *http.Request)
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotDisplayIDVal string
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.DisplayID = c
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if err := (validate.String{
+					MinLength:    4,
+					MinLengthSet: true,
+					MaxLength:    30,
+					MaxLengthSet: true,
+					Email:        false,
+					Hostname:     false,
+					Regex:        regexMap["^\\#[A-Za-z0-9]*$"],
+				}).Validate(string(params.DisplayID)); err != nil {
+					return errors.Wrap(err, "string")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "displayID",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: picture.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "picture",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotPictureVal string
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
-						return errtrace.Wrap(err)
+						return err
 					}
 
 					c, err := conv.ToString(val)
 					if err != nil {
-						return errtrace.Wrap(err)
+						return err
 					}
 
-					paramsDotDisplayIDVal = c
+					paramsDotPictureVal = c
 					return nil
 				}(); err != nil {
-					return errtrace.Wrap(err)
+					return err
 				}
-				params.DisplayID.SetTo(paramsDotDisplayIDVal)
+				params.Picture.SetTo(paramsDotPictureVal)
 				return nil
 			}); err != nil {
-				return errtrace.Wrap(err)
+				return err
 			}
 		}
 		return nil
 	}(); err != nil {
-		return params, errtrace.Wrap(&ogenerrors.DecodeParamError{
-			Name: "displayID",
+		return params, &ogenerrors.DecodeParamError{
+			Name: "picture",
 			In:   "query",
 			Err:  err,
-		})
+		}
+	}
+	// Decode query: age.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "age",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.Age = RegisterUserAge(c)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if err := params.Age.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "age",
+			In:   "query",
+			Err:  err,
+		}
 	}
 	return params, nil
 }

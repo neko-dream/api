@@ -193,6 +193,47 @@
         "security": [],
         "x-ogen-operation-group": "User"
       },
+      "put": {
+        "summary": "ユーザー情報の変更",
+        "deprecated": false,
+        "description": "",
+        "operationId": "editUserProfile",
+        "tags": [
+          "user",
+          "User"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "displayID": {
+                      "type": "string",
+                      "x-apidog-mock": "{{$string.uuid}}"
+                    },
+                    "displayName": {
+                      "type": "string",
+                      "x-apidog-mock": "{{$person.firstName}}"
+                    }
+                  },
+                  "required": [
+                    "displayID",
+                    "displayName"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "x-ogen-operation-group": "User"
+      }
+    },
+    "/api/user/register": {
       "post": {
         "summary": "ユーザー作成",
         "deprecated": false,
@@ -206,6 +247,32 @@
           {
             "name": "displayName",
             "in": "query",
+            "description": "一意のユーザーID",
+            "required": true,
+            "example": "ユーザー",
+            "schema": {
+              "type": "string",
+              "format": "regex",
+              "minLength": 5
+            }
+          },
+          {
+            "name": "displayID",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "example": "user1",
+            "schema": {
+              "type": "string",
+              "pattern": "^\\#[A-Za-z0-9]*$",
+              "format": "char",
+              "minLength": 4,
+              "maxLength": 30
+            }
+          },
+          {
+            "name": "picture",
+            "in": "query",
             "description": "",
             "required": false,
             "schema": {
@@ -213,12 +280,38 @@
             }
           },
           {
-            "name": "displayID",
+            "name": "age",
             "in": "query",
             "description": "",
-            "required": false,
+            "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "10",
+                "20",
+                "30",
+                "40",
+                "50",
+                "60",
+                "70",
+                "80",
+                "90",
+                "100"
+              ],
+              "x-apidog": {
+                "enumDescriptions": {
+                  "10": "",
+                  "20": "",
+                  "30": "",
+                  "40": "",
+                  "50": "",
+                  "60": "",
+                  "70": "",
+                  "80": "",
+                  "90": "",
+                  "100": ""
+                }
+              }
             }
           }
         ],
@@ -275,45 +368,6 @@
             "SessionId": []
           }
         ],
-        "x-ogen-operation-group": "User"
-      },
-      "put": {
-        "summary": "ユーザー情報の変更",
-        "deprecated": false,
-        "description": "",
-        "operationId": "editUserProfile",
-        "tags": [
-          "user",
-          "User"
-        ],
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "displayID": {
-                      "type": "string",
-                      "x-apidog-mock": "{{$string.uuid}}"
-                    },
-                    "displayName": {
-                      "type": "string",
-                      "x-apidog-mock": "{{$person.firstName}}"
-                    }
-                  },
-                  "required": [
-                    "displayID",
-                    "displayName"
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "security": [],
         "x-ogen-operation-group": "User"
       }
     },
@@ -441,7 +495,7 @@
         "summary": "意思表明API",
         "deprecated": false,
         "description": "",
-        "operationId": "indicateIntention",
+        "operationId": "Intention",
         "tags": [
           "talk_session/opinion/intention",
           "Intention"

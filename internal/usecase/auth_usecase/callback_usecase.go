@@ -81,7 +81,7 @@ func (u *authCallbackInteractor) Execute(ctx context.Context, input CallbackInpu
 			return errtrace.Wrap(err)
 		}
 
-		token, err := u.TokenManager.GenerateToken(ctx, *user, sess.SessionID())
+		token, err := u.TokenManager.Generate(ctx, *user, sess.SessionID())
 		if err != nil {
 			return errtrace.Wrap(err)
 		}

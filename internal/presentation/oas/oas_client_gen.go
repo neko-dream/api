@@ -15,7 +15,6 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 	"go.opentelemetry.io/otel/trace"
 
-	"braces.dev/errtrace"
 	"github.com/ogen-go/ogen/conv"
 	ht "github.com/ogen-go/ogen/http"
 	"github.com/ogen-go/ogen/ogenerrors"
@@ -54,12 +53,12 @@ type AuthInvoker interface {
 //
 // x-gen-operation-group: Intention
 type IntentionInvoker interface {
-	// IndicateIntention invokes indicateIntention operation.
+	// Intention invokes Intention operation.
 	//
 	// 意思表明API.
 	//
 	// POST /api/talksessions/{talkSessionID}/opinions/{opinionID}/intentions
-	IndicateIntention(ctx context.Context, params IndicateIntentionParams) (IndicateIntentionRes, error)
+	Intention(ctx context.Context, params IntentionParams) (IntentionRes, error)
 }
 
 // OpinionInvoker invokes operations described by OpenAPI v3 specification.
@@ -124,7 +123,7 @@ type UserInvoker interface {
 	//
 	// ユーザー作成.
 	//
-	// POST /api/user
+	// POST /api/user/register
 	RegisterUser(ctx context.Context, params RegisterUserParams) (RegisterUserRes, error)
 }
 
@@ -148,13 +147,13 @@ func trimTrailingSlashes(u *url.URL) {
 func NewClient(serverURL string, sec SecuritySource, opts ...ClientOption) (*Client, error) {
 	u, err := url.Parse(serverURL)
 	if err != nil {
-		return nil, errtrace.Wrap(err)
+		return nil, err
 	}
 	trimTrailingSlashes(u)
 
 	c, err := newClientConfig(opts...).baseClient()
 	if err != nil {
-		return nil, errtrace.Wrap(err)
+		return nil, err
 	}
 	return &Client{
 		serverURL:  u,
@@ -185,7 +184,7 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 // GET /auth/{provider}/login
 func (c *Client) AuthLogin(ctx context.Context, params AuthLoginParams) (*AuthLoginFound, error) {
 	res, err := c.sendAuthLogin(ctx, params)
-	return res, errtrace.Wrap(err)
+	return res, err
 }
 
 func (c *Client) sendAuthLogin(ctx context.Context, params AuthLoginParams) (res *AuthLoginFound, err error) {
@@ -234,13 +233,13 @@ func (c *Client) sendAuthLogin(ctx context.Context, params AuthLoginParams) (res
 			Explode: false,
 		})
 		if err := func() error {
-			return errtrace.Wrap(e.EncodeValue(conv.StringToString(params.Provider)))
+			return e.EncodeValue(conv.StringToString(params.Provider))
 		}(); err != nil {
-			return res, errtrace.Wrap(errors.Wrap(err, "encode path"))
+			return res, errors.Wrap(err, "encode path")
 		}
 		encoded, err := e.Result()
 		if err != nil {
-			return res, errtrace.Wrap(errors.Wrap(err, "encode path"))
+			return res, errors.Wrap(err, "encode path")
 		}
 		pathParts[1] = encoded
 	}
@@ -258,9 +257,9 @@ func (c *Client) sendAuthLogin(ctx context.Context, params AuthLoginParams) (res
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			return errtrace.Wrap(e.EncodeValue(conv.StringToString(params.RedirectURL)))
+			return e.EncodeValue(conv.StringToString(params.RedirectURL))
 		}); err != nil {
-			return res, errtrace.Wrap(errors.Wrap(err, "encode query"))
+			return res, errors.Wrap(err, "encode query")
 		}
 	}
 	u.RawQuery = q.Values().Encode()
@@ -268,20 +267,20 @@ func (c *Client) sendAuthLogin(ctx context.Context, params AuthLoginParams) (res
 	stage = "EncodeRequest"
 	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "create request"))
+		return res, errors.Wrap(err, "create request")
 	}
 
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "do request"))
+		return res, errors.Wrap(err, "do request")
 	}
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeAuthLoginResponse(resp)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "decode response"))
+		return res, errors.Wrap(err, "decode response")
 	}
 
 	return result, nil
@@ -294,7 +293,7 @@ func (c *Client) sendAuthLogin(ctx context.Context, params AuthLoginParams) (res
 // POST /api/talksessions
 func (c *Client) CreateTalkSession(ctx context.Context, request OptCreateTalkSessionReq) (*CreateTalkSessionOK, error) {
 	res, err := c.sendCreateTalkSession(ctx, request)
-	return res, errtrace.Wrap(err)
+	return res, err
 }
 
 func (c *Client) sendCreateTalkSession(ctx context.Context, request OptCreateTalkSessionReq) (res *CreateTalkSessionOK, err error) {
@@ -340,23 +339,23 @@ func (c *Client) sendCreateTalkSession(ctx context.Context, request OptCreateTal
 	stage = "EncodeRequest"
 	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "create request"))
+		return res, errors.Wrap(err, "create request")
 	}
 	if err := encodeCreateTalkSessionRequest(request, r); err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "encode request"))
+		return res, errors.Wrap(err, "encode request")
 	}
 
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "do request"))
+		return res, errors.Wrap(err, "do request")
 	}
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeCreateTalkSessionResponse(resp)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "decode response"))
+		return res, errors.Wrap(err, "decode response")
 	}
 
 	return result, nil
@@ -369,7 +368,7 @@ func (c *Client) sendCreateTalkSession(ctx context.Context, request OptCreateTal
 // PUT /api/user
 func (c *Client) EditUserProfile(ctx context.Context) (*EditUserProfileOK, error) {
 	res, err := c.sendEditUserProfile(ctx)
-	return res, errtrace.Wrap(err)
+	return res, err
 }
 
 func (c *Client) sendEditUserProfile(ctx context.Context) (res *EditUserProfileOK, err error) {
@@ -415,20 +414,20 @@ func (c *Client) sendEditUserProfile(ctx context.Context) (res *EditUserProfileO
 	stage = "EncodeRequest"
 	r, err := ht.NewRequest(ctx, "PUT", u)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "create request"))
+		return res, errors.Wrap(err, "create request")
 	}
 
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "do request"))
+		return res, errors.Wrap(err, "do request")
 	}
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeEditUserProfileResponse(resp)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "decode response"))
+		return res, errors.Wrap(err, "decode response")
 	}
 
 	return result, nil
@@ -441,7 +440,7 @@ func (c *Client) sendEditUserProfile(ctx context.Context) (res *EditUserProfileO
 // GET /api/talksessions/{talkSessionId}
 func (c *Client) GetTalkSessionDetail(ctx context.Context, params GetTalkSessionDetailParams) (*GetTalkSessionDetailOK, error) {
 	res, err := c.sendGetTalkSessionDetail(ctx, params)
-	return res, errtrace.Wrap(err)
+	return res, err
 }
 
 func (c *Client) sendGetTalkSessionDetail(ctx context.Context, params GetTalkSessionDetailParams) (res *GetTalkSessionDetailOK, err error) {
@@ -490,13 +489,13 @@ func (c *Client) sendGetTalkSessionDetail(ctx context.Context, params GetTalkSes
 			Explode: false,
 		})
 		if err := func() error {
-			return errtrace.Wrap(e.EncodeValue(conv.StringToString(params.TalkSessionId)))
+			return e.EncodeValue(conv.StringToString(params.TalkSessionId))
 		}(); err != nil {
-			return res, errtrace.Wrap(errors.Wrap(err, "encode path"))
+			return res, errors.Wrap(err, "encode path")
 		}
 		encoded, err := e.Result()
 		if err != nil {
-			return res, errtrace.Wrap(errors.Wrap(err, "encode path"))
+			return res, errors.Wrap(err, "encode path")
 		}
 		pathParts[1] = encoded
 	}
@@ -505,20 +504,20 @@ func (c *Client) sendGetTalkSessionDetail(ctx context.Context, params GetTalkSes
 	stage = "EncodeRequest"
 	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "create request"))
+		return res, errors.Wrap(err, "create request")
 	}
 
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "do request"))
+		return res, errors.Wrap(err, "do request")
 	}
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeGetTalkSessionDetailResponse(resp)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "decode response"))
+		return res, errors.Wrap(err, "decode response")
 	}
 
 	return result, nil
@@ -531,7 +530,7 @@ func (c *Client) sendGetTalkSessionDetail(ctx context.Context, params GetTalkSes
 // GET /api/talksessions
 func (c *Client) GetTalkSessions(ctx context.Context) error {
 	_, err := c.sendGetTalkSessions(ctx)
-	return errtrace.Wrap(err)
+	return err
 }
 
 func (c *Client) sendGetTalkSessions(ctx context.Context) (res *GetTalkSessionsOK, err error) {
@@ -577,20 +576,20 @@ func (c *Client) sendGetTalkSessions(ctx context.Context) (res *GetTalkSessionsO
 	stage = "EncodeRequest"
 	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "create request"))
+		return res, errors.Wrap(err, "create request")
 	}
 
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "do request"))
+		return res, errors.Wrap(err, "do request")
 	}
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeGetTalkSessionsResponse(resp)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "decode response"))
+		return res, errors.Wrap(err, "decode response")
 	}
 
 	return result, nil
@@ -603,7 +602,7 @@ func (c *Client) sendGetTalkSessions(ctx context.Context) (res *GetTalkSessionsO
 // GET /api/user
 func (c *Client) GetUserProfile(ctx context.Context) (*GetUserProfileOK, error) {
 	res, err := c.sendGetUserProfile(ctx)
-	return res, errtrace.Wrap(err)
+	return res, err
 }
 
 func (c *Client) sendGetUserProfile(ctx context.Context) (res *GetUserProfileOK, err error) {
@@ -649,38 +648,38 @@ func (c *Client) sendGetUserProfile(ctx context.Context) (res *GetUserProfileOK,
 	stage = "EncodeRequest"
 	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "create request"))
+		return res, errors.Wrap(err, "create request")
 	}
 
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "do request"))
+		return res, errors.Wrap(err, "do request")
 	}
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeGetUserProfileResponse(resp)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "decode response"))
+		return res, errors.Wrap(err, "decode response")
 	}
 
 	return result, nil
 }
 
-// IndicateIntention invokes indicateIntention operation.
+// Intention invokes Intention operation.
 //
 // 意思表明API.
 //
 // POST /api/talksessions/{talkSessionID}/opinions/{opinionID}/intentions
-func (c *Client) IndicateIntention(ctx context.Context, params IndicateIntentionParams) (IndicateIntentionRes, error) {
-	res, err := c.sendIndicateIntention(ctx, params)
-	return res, errtrace.Wrap(err)
+func (c *Client) Intention(ctx context.Context, params IntentionParams) (IntentionRes, error) {
+	res, err := c.sendIntention(ctx, params)
+	return res, err
 }
 
-func (c *Client) sendIndicateIntention(ctx context.Context, params IndicateIntentionParams) (res IndicateIntentionRes, err error) {
+func (c *Client) sendIntention(ctx context.Context, params IntentionParams) (res IntentionRes, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("indicateIntention"),
+		otelogen.OperationID("Intention"),
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/api/talksessions/{talkSessionID}/opinions/{opinionID}/intentions"),
 	}
@@ -697,7 +696,7 @@ func (c *Client) sendIndicateIntention(ctx context.Context, params IndicateInten
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "IndicateIntention",
+	ctx, span := c.cfg.Tracer.Start(ctx, "Intention",
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -724,13 +723,13 @@ func (c *Client) sendIndicateIntention(ctx context.Context, params IndicateInten
 			Explode: false,
 		})
 		if err := func() error {
-			return errtrace.Wrap(e.EncodeValue(conv.StringToString(params.TalkSessionID)))
+			return e.EncodeValue(conv.StringToString(params.TalkSessionID))
 		}(); err != nil {
-			return res, errtrace.Wrap(errors.Wrap(err, "encode path"))
+			return res, errors.Wrap(err, "encode path")
 		}
 		encoded, err := e.Result()
 		if err != nil {
-			return res, errtrace.Wrap(errors.Wrap(err, "encode path"))
+			return res, errors.Wrap(err, "encode path")
 		}
 		pathParts[1] = encoded
 	}
@@ -743,13 +742,13 @@ func (c *Client) sendIndicateIntention(ctx context.Context, params IndicateInten
 			Explode: false,
 		})
 		if err := func() error {
-			return errtrace.Wrap(e.EncodeValue(conv.StringToString(params.OpinionID)))
+			return e.EncodeValue(conv.StringToString(params.OpinionID))
 		}(); err != nil {
-			return res, errtrace.Wrap(errors.Wrap(err, "encode path"))
+			return res, errors.Wrap(err, "encode path")
 		}
 		encoded, err := e.Result()
 		if err != nil {
-			return res, errtrace.Wrap(errors.Wrap(err, "encode path"))
+			return res, errors.Wrap(err, "encode path")
 		}
 		pathParts[3] = encoded
 	}
@@ -759,20 +758,20 @@ func (c *Client) sendIndicateIntention(ctx context.Context, params IndicateInten
 	stage = "EncodeRequest"
 	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "create request"))
+		return res, errors.Wrap(err, "create request")
 	}
 
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "do request"))
+		return res, errors.Wrap(err, "do request")
 	}
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeIndicateIntentionResponse(resp)
+	result, err := decodeIntentionResponse(resp)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "decode response"))
+		return res, errors.Wrap(err, "decode response")
 	}
 
 	return result, nil
@@ -785,7 +784,7 @@ func (c *Client) sendIndicateIntention(ctx context.Context, params IndicateInten
 // GET /api/talksession/{talkSessionID}/opinions
 func (c *Client) ListOpinions(ctx context.Context, params ListOpinionsParams) (ListOpinionsRes, error) {
 	res, err := c.sendListOpinions(ctx, params)
-	return res, errtrace.Wrap(err)
+	return res, err
 }
 
 func (c *Client) sendListOpinions(ctx context.Context, params ListOpinionsParams) (res ListOpinionsRes, err error) {
@@ -834,13 +833,13 @@ func (c *Client) sendListOpinions(ctx context.Context, params ListOpinionsParams
 			Explode: false,
 		})
 		if err := func() error {
-			return errtrace.Wrap(e.EncodeValue(conv.StringToString(params.TalkSessionID)))
+			return e.EncodeValue(conv.StringToString(params.TalkSessionID))
 		}(); err != nil {
-			return res, errtrace.Wrap(errors.Wrap(err, "encode path"))
+			return res, errors.Wrap(err, "encode path")
 		}
 		encoded, err := e.Result()
 		if err != nil {
-			return res, errtrace.Wrap(errors.Wrap(err, "encode path"))
+			return res, errors.Wrap(err, "encode path")
 		}
 		pathParts[1] = encoded
 	}
@@ -859,11 +858,11 @@ func (c *Client) sendListOpinions(ctx context.Context, params ListOpinionsParams
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.ParentOpinionID.Get(); ok {
-				return errtrace.Wrap(e.EncodeValue(conv.StringToString(val)))
+				return e.EncodeValue(conv.StringToString(val))
 			}
 			return nil
 		}); err != nil {
-			return res, errtrace.Wrap(errors.Wrap(err, "encode query"))
+			return res, errors.Wrap(err, "encode query")
 		}
 	}
 	u.RawQuery = q.Values().Encode()
@@ -871,20 +870,20 @@ func (c *Client) sendListOpinions(ctx context.Context, params ListOpinionsParams
 	stage = "EncodeRequest"
 	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "create request"))
+		return res, errors.Wrap(err, "create request")
 	}
 
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "do request"))
+		return res, errors.Wrap(err, "do request")
 	}
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeListOpinionsResponse(resp)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "decode response"))
+		return res, errors.Wrap(err, "decode response")
 	}
 
 	return result, nil
@@ -897,7 +896,7 @@ func (c *Client) sendListOpinions(ctx context.Context, params ListOpinionsParams
 // GET /auth/{provider}/callback
 func (c *Client) OAuthCallback(ctx context.Context, params OAuthCallbackParams) (*OAuthCallbackFound, error) {
 	res, err := c.sendOAuthCallback(ctx, params)
-	return res, errtrace.Wrap(err)
+	return res, err
 }
 
 func (c *Client) sendOAuthCallback(ctx context.Context, params OAuthCallbackParams) (res *OAuthCallbackFound, err error) {
@@ -946,13 +945,13 @@ func (c *Client) sendOAuthCallback(ctx context.Context, params OAuthCallbackPara
 			Explode: false,
 		})
 		if err := func() error {
-			return errtrace.Wrap(e.EncodeValue(conv.StringToString(params.Provider)))
+			return e.EncodeValue(conv.StringToString(params.Provider))
 		}(); err != nil {
-			return res, errtrace.Wrap(errors.Wrap(err, "encode path"))
+			return res, errors.Wrap(err, "encode path")
 		}
 		encoded, err := e.Result()
 		if err != nil {
-			return res, errtrace.Wrap(errors.Wrap(err, "encode path"))
+			return res, errors.Wrap(err, "encode path")
 		}
 		pathParts[1] = encoded
 	}
@@ -971,11 +970,11 @@ func (c *Client) sendOAuthCallback(ctx context.Context, params OAuthCallbackPara
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.Code.Get(); ok {
-				return errtrace.Wrap(e.EncodeValue(conv.StringToString(val)))
+				return e.EncodeValue(conv.StringToString(val))
 			}
 			return nil
 		}); err != nil {
-			return res, errtrace.Wrap(errors.Wrap(err, "encode query"))
+			return res, errors.Wrap(err, "encode query")
 		}
 	}
 	{
@@ -988,11 +987,11 @@ func (c *Client) sendOAuthCallback(ctx context.Context, params OAuthCallbackPara
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.QueryState.Get(); ok {
-				return errtrace.Wrap(e.EncodeValue(conv.StringToString(val)))
+				return e.EncodeValue(conv.StringToString(val))
 			}
 			return nil
 		}); err != nil {
-			return res, errtrace.Wrap(errors.Wrap(err, "encode query"))
+			return res, errors.Wrap(err, "encode query")
 		}
 	}
 	u.RawQuery = q.Values().Encode()
@@ -1000,7 +999,7 @@ func (c *Client) sendOAuthCallback(ctx context.Context, params OAuthCallbackPara
 	stage = "EncodeRequest"
 	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "create request"))
+		return res, errors.Wrap(err, "create request")
 	}
 
 	stage = "EncodeCookieParams"
@@ -1014,11 +1013,11 @@ func (c *Client) sendOAuthCallback(ctx context.Context, params OAuthCallbackPara
 
 		if err := cookie.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.CookieState.Get(); ok {
-				return errtrace.Wrap(e.EncodeValue(conv.StringToString(val)))
+				return e.EncodeValue(conv.StringToString(val))
 			}
 			return nil
 		}); err != nil {
-			return res, errtrace.Wrap(errors.Wrap(err, "encode cookie"))
+			return res, errors.Wrap(err, "encode cookie")
 		}
 	}
 	{
@@ -1029,23 +1028,23 @@ func (c *Client) sendOAuthCallback(ctx context.Context, params OAuthCallbackPara
 		}
 
 		if err := cookie.EncodeParam(cfg, func(e uri.Encoder) error {
-			return errtrace.Wrap(e.EncodeValue(conv.StringToString(params.RedirectURL)))
+			return e.EncodeValue(conv.StringToString(params.RedirectURL))
 		}); err != nil {
-			return res, errtrace.Wrap(errors.Wrap(err, "encode cookie"))
+			return res, errors.Wrap(err, "encode cookie")
 		}
 	}
 
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "do request"))
+		return res, errors.Wrap(err, "do request")
 	}
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeOAuthCallbackResponse(resp)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "decode response"))
+		return res, errors.Wrap(err, "decode response")
 	}
 
 	return result, nil
@@ -1058,7 +1057,7 @@ func (c *Client) sendOAuthCallback(ctx context.Context, params OAuthCallbackPara
 // POST /api/talksessions/{talkSessionID}/opinions
 func (c *Client) PostOpinionPost(ctx context.Context, params PostOpinionPostParams) (PostOpinionPostRes, error) {
 	res, err := c.sendPostOpinionPost(ctx, params)
-	return res, errtrace.Wrap(err)
+	return res, err
 }
 
 func (c *Client) sendPostOpinionPost(ctx context.Context, params PostOpinionPostParams) (res PostOpinionPostRes, err error) {
@@ -1107,13 +1106,13 @@ func (c *Client) sendPostOpinionPost(ctx context.Context, params PostOpinionPost
 			Explode: false,
 		})
 		if err := func() error {
-			return errtrace.Wrap(e.EncodeValue(conv.StringToString(params.TalkSessionID)))
+			return e.EncodeValue(conv.StringToString(params.TalkSessionID))
 		}(); err != nil {
-			return res, errtrace.Wrap(errors.Wrap(err, "encode path"))
+			return res, errors.Wrap(err, "encode path")
 		}
 		encoded, err := e.Result()
 		if err != nil {
-			return res, errtrace.Wrap(errors.Wrap(err, "encode path"))
+			return res, errors.Wrap(err, "encode path")
 		}
 		pathParts[1] = encoded
 	}
@@ -1131,9 +1130,9 @@ func (c *Client) sendPostOpinionPost(ctx context.Context, params PostOpinionPost
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			return errtrace.Wrap(e.EncodeValue(conv.StringToString(params.OpinionContent)))
+			return e.EncodeValue(conv.StringToString(params.OpinionContent))
 		}); err != nil {
-			return res, errtrace.Wrap(errors.Wrap(err, "encode query"))
+			return res, errors.Wrap(err, "encode query")
 		}
 	}
 	u.RawQuery = q.Values().Encode()
@@ -1141,20 +1140,20 @@ func (c *Client) sendPostOpinionPost(ctx context.Context, params PostOpinionPost
 	stage = "EncodeRequest"
 	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "create request"))
+		return res, errors.Wrap(err, "create request")
 	}
 
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "do request"))
+		return res, errors.Wrap(err, "do request")
 	}
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodePostOpinionPostResponse(resp)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "decode response"))
+		return res, errors.Wrap(err, "decode response")
 	}
 
 	return result, nil
@@ -1164,17 +1163,17 @@ func (c *Client) sendPostOpinionPost(ctx context.Context, params PostOpinionPost
 //
 // ユーザー作成.
 //
-// POST /api/user
+// POST /api/user/register
 func (c *Client) RegisterUser(ctx context.Context, params RegisterUserParams) (RegisterUserRes, error) {
 	res, err := c.sendRegisterUser(ctx, params)
-	return res, errtrace.Wrap(err)
+	return res, err
 }
 
 func (c *Client) sendRegisterUser(ctx context.Context, params RegisterUserParams) (res RegisterUserRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("registerUser"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/api/user"),
+		semconv.HTTPRouteKey.String("/api/user/register"),
 	}
 
 	// Run stopwatch.
@@ -1207,7 +1206,7 @@ func (c *Client) sendRegisterUser(ctx context.Context, params RegisterUserParams
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
-	pathParts[0] = "/api/user"
+	pathParts[0] = "/api/user/register"
 	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
@@ -1221,12 +1220,9 @@ func (c *Client) sendRegisterUser(ctx context.Context, params RegisterUserParams
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.DisplayName.Get(); ok {
-				return errtrace.Wrap(e.EncodeValue(conv.StringToString(val)))
-			}
-			return nil
+			return e.EncodeValue(conv.StringToString(params.DisplayName))
 		}); err != nil {
-			return res, errtrace.Wrap(errors.Wrap(err, "encode query"))
+			return res, errors.Wrap(err, "encode query")
 		}
 	}
 	{
@@ -1238,12 +1234,40 @@ func (c *Client) sendRegisterUser(ctx context.Context, params RegisterUserParams
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.DisplayID.Get(); ok {
-				return errtrace.Wrap(e.EncodeValue(conv.StringToString(val)))
+			return e.EncodeValue(conv.StringToString(params.DisplayID))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "picture" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "picture",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Picture.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
 			}
 			return nil
 		}); err != nil {
-			return res, errtrace.Wrap(errors.Wrap(err, "encode query"))
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "age" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "age",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.StringToString(string(params.Age)))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
 		}
 	}
 	u.RawQuery = q.Values().Encode()
@@ -1251,7 +1275,7 @@ func (c *Client) sendRegisterUser(ctx context.Context, params RegisterUserParams
 	stage = "EncodeRequest"
 	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "create request"))
+		return res, errors.Wrap(err, "create request")
 	}
 
 	{
@@ -1265,7 +1289,7 @@ func (c *Client) sendRegisterUser(ctx context.Context, params RegisterUserParams
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
 				// Skip this security.
 			default:
-				return res, errtrace.Wrap(errors.Wrap(err, "security \"SessionId\""))
+				return res, errors.Wrap(err, "security \"SessionId\"")
 			}
 		}
 
@@ -1283,21 +1307,21 @@ func (c *Client) sendRegisterUser(ctx context.Context, params RegisterUserParams
 			}
 			return false
 		}(); !ok {
-			return res, errtrace.Wrap(ogenerrors.ErrSecurityRequirementIsNotSatisfied)
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
 		}
 	}
 
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "do request"))
+		return res, errors.Wrap(err, "do request")
 	}
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
 	result, err := decodeRegisterUserResponse(resp)
 	if err != nil {
-		return res, errtrace.Wrap(errors.Wrap(err, "decode response"))
+		return res, errors.Wrap(err, "decode response")
 	}
 
 	return result, nil

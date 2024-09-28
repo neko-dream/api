@@ -1,10 +1,3 @@
-CREATE TABLE "user_auths" (
-  "user_id" uuid,
-  "provider" varchar NOT NULL,
-  "subject" varchar NOT NULL,
-  "created_at" timestamp NOT NULL DEFAULT (now())
-);
-
 CREATE TABLE "sessions" (
   "session_id" uuid PRIMARY KEY,
   "user_id" uuid NOT NULL,
@@ -17,8 +10,18 @@ CREATE TABLE "sessions" (
 
 CREATE TABLE "users" (
   "user_id" uuid PRIMARY KEY,
-  "display_id" varchar NOT NULL,
-  "display_name" varchar NOT NULL,
+  "display_id" varchar,
+  "display_name" varchar,
+  "picture" varchar,
+  "created_at" timestamp NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "user_auths" (
+  "user_auth_id" uuid PRIMARY KEY,
+  "user_id" uuid NOT NULL,
+  "provider" varchar NOT NULL,
+  "subject" varchar NOT NULL,
+  "is_verified" boolean NOT NULL,
   "created_at" timestamp NOT NULL DEFAULT (now())
 );
 
@@ -51,9 +54,9 @@ CREATE UNIQUE INDEX "users_display_id_index" ON "users" ("display_id");
 
 CREATE INDEX "talk_sessions_theme_index" ON "talk_sessions" ("theme");
 
-ALTER TABLE "user_auths" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
-
 ALTER TABLE "sessions" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
+
+ALTER TABLE "user_auths" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
 
 ALTER TABLE "talk_sessions" ADD FOREIGN KEY ("owner_id") REFERENCES "users" ("user_id");
 
@@ -69,4 +72,3 @@ ALTER TABLE "votes" ADD FOREIGN KEY ("opinion_id") REFERENCES "opinions" ("opini
 
 ALTER TABLE "votes" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
 
-ALTER TABLE "users" ADD COLUMN "picture" varchar;

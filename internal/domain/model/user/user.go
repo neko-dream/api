@@ -5,6 +5,7 @@ import (
 
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/pkg/oauth"
+	"github.com/samber/lo"
 )
 
 type UserName string
@@ -21,34 +22,35 @@ func (a UserSubject) String() string {
 
 type (
 	UserRepository interface {
-		Create(context.Context, User) (User, error)
+		Create(context.Context, User) error
 		FindByID(context.Context, shared.UUID[User]) (*User, error)
 		FindBySubject(context.Context, UserSubject) (*User, error)
+		Update(context.Context, User) error
 	}
 
 	User struct {
 		userID      shared.UUID[User]
-		displayID   string
-		displayName string
+		displayID   *string
+		displayName *string
+		picture     *string
 		subject     string
 		provider    oauth.AuthProviderName
-		picture     *string
 	}
 )
 
 func (u *User) ChangeName(name string) {
-	u.displayName = name
+	u.displayName = lo.ToPtr(name)
 }
 
 func (u *User) UserID() shared.UUID[User] {
 	return u.userID
 }
 
-func (u *User) DisplayName() string {
+func (u *User) DisplayName() *string {
 	return u.displayName
 }
 
-func (u *User) DisplayID() string {
+func (u *User) DisplayID() *string {
 	return u.displayID
 }
 
@@ -64,10 +66,14 @@ func (u *User) Provider() oauth.AuthProviderName {
 	return u.provider
 }
 
+func (u *User) Verify() bool {
+	return u.displayID != nil && u.displayName != nil
+}
+
 func NewUser(
 	userID shared.UUID[User],
-	displayID string,
-	displayName string,
+	displayID *string,
+	displayName *string,
 	subject string,
 	provider oauth.AuthProviderName,
 	picture *string,

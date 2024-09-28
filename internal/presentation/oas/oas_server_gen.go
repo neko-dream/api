@@ -3,7 +3,6 @@
 package oas
 
 import (
-	"braces.dev/errtrace"
 	"context"
 )
 
@@ -38,12 +37,12 @@ type AuthHandler interface {
 //
 // x-ogen-operation-group: Intention
 type IntentionHandler interface {
-	// IndicateIntention implements indicateIntention operation.
+	// Intention implements Intention operation.
 	//
 	// 意思表明API.
 	//
 	// POST /api/talksessions/{talkSessionID}/opinions/{opinionID}/intentions
-	IndicateIntention(ctx context.Context, params IndicateIntentionParams) (IndicateIntentionRes, error)
+	Intention(ctx context.Context, params IntentionParams) (IntentionRes, error)
 }
 
 // OpinionHandler handles operations described by OpenAPI v3 specification.
@@ -108,7 +107,7 @@ type UserHandler interface {
 	//
 	// ユーザー作成.
 	//
-	// POST /api/user
+	// POST /api/user/register
 	RegisterUser(ctx context.Context, params RegisterUserParams) (RegisterUserRes, error)
 }
 
@@ -124,7 +123,7 @@ type Server struct {
 func NewServer(h Handler, sec SecurityHandler, opts ...ServerOption) (*Server, error) {
 	s, err := newServerConfig(opts...).baseServer()
 	if err != nil {
-		return nil, errtrace.Wrap(err)
+		return nil, err
 	}
 	return &Server{
 		h:          h,

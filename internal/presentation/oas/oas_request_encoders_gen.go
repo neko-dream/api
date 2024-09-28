@@ -8,7 +8,6 @@ import (
 
 	"github.com/go-faster/errors"
 
-	"braces.dev/errtrace"
 	"github.com/ogen-go/ogen/conv"
 	ht "github.com/ogen-go/ogen/http"
 	"github.com/ogen-go/ogen/uri"
@@ -35,11 +34,11 @@ func encodeCreateTalkSessionRequest(
 		}
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := request.Theme.Get(); ok {
-				return errtrace.Wrap(e.EncodeValue(conv.StringToString(val)))
+				return e.EncodeValue(conv.StringToString(val))
 			}
 			return nil
 		}); err != nil {
-			return errtrace.Wrap(errors.Wrap(err, "encode query"))
+			return errors.Wrap(err, "encode query")
 		}
 	}
 	encoded := q.Values().Encode()

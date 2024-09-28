@@ -53,15 +53,16 @@ func (a *authService) Authenticate(
 	if existUser != nil {
 		return existUser, nil
 	}
-	newUser, err := a.userRepository.Create(ctx, user.NewUser(
+
+	newUser := user.NewUser(
 		shared.NewUUID[user.User](),
-		userInfo.Name,
-		userInfo.Name,
+		nil,
+		nil,
 		userInfo.Subject,
 		authProviderName,
 		&userInfo.Picture,
-	))
-	if err != nil {
+	)
+	if err := a.userRepository.Create(ctx, newUser); err != nil {
 		return nil, errtrace.Wrap(err)
 	}
 

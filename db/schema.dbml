@@ -1,14 +1,6 @@
 // Use DBML to define your database structure
 // Docs: https://dbml.dbdiagram.io/docs
 
-
-Table user_auths {
-    user_id uuid [ref: > users.user_id]
-    provider varchar [not null]
-    subject varchar [not null]
-    created_at timestamp [not null, default: `now()`]
-}
-
 Table sessions {
     session_id uuid [primary key]
     user_id uuid [not null, ref: > users.user_id]
@@ -21,14 +13,23 @@ Table sessions {
 
 Table users {
     user_id uuid [primary key]
-    display_id varchar [not null]
-    display_name varchar [not null]
+    display_id varchar
+    display_name varchar
     picture varchar
     created_at timestamp [not null, default: `now()`]
 
     indexes {
         display_id [unique, name: "users_display_id_index"]
     }
+}
+
+Table user_auths {
+    user_auth_id uuid [primary key]
+    user_id uuid [not null, ref: > users.user_id]
+    provider varchar [not null]
+    subject varchar [not null]
+    is_verified boolean [not null]
+    created_at timestamp [not null, default: `now()`]
 }
 
 Table talk_sessions {

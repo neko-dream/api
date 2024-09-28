@@ -6,6 +6,6 @@ rm -f ./tmp.openapi.yaml
 sed -i.back -e 's/apikey-header-SessionId/SessionId/g' ./api/target/apidog.openapi.yaml
 rm -f ./api/target/apidog.openapi.yaml.back
 
-swagger-merger -i ./api/target/base.openapi.yaml -o ./api/openapi.yaml
-ogen --package oas --target internal/presentation/oas --clean ./api/openapi.yaml
-rm -f ./api/openapi.yaml
+swagger-merger -i ./api/target/base.openapi.yaml -o ./static/openapi.yaml
+ogen --package oas --target internal/presentation/oas --clean ./static/openapi.yaml --convenient-errors=on
+

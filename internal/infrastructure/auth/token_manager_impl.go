@@ -16,30 +16,27 @@ type tokenManager struct {
 	secret string
 }
 
-func (j *tokenManager) GenerateToken(ctx context.Context, user user.User, sessionID shared.UUID[session.Session]) (string, error) {
-
+func (j *tokenManager) Generate(ctx context.Context, user user.User, sessionID shared.UUID[session.Session]) (string, error) {
 	claim := session.NewClaim(user, sessionID)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim.GenMapClaim())
 	return errtrace.Wrap2(token.SignedString([]byte(j.secret)))
 }
 
-func (j *tokenManager) ParseToken(ctx context.Context, token string) (*session.Claim, error) {
-	t, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+func (j *tokenManager) Parse(ctx context.Context, token string) (*session.Claim, error) {
+
+	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		return []byte(j.secret), nil
 	})
 	if err != nil {
 		return nil, errtrace.Wrap(err)
 	}
-	claims, ok := t.Claims.(jwt.MapClaims)
+
+	mapClaim, ok := parsedToken.Claims.(jwt.MapClaims)
 	if !ok {
 		return nil, errtrace.Wrap(jwt.ErrInvalidKeyType)
 	}
-	return &session.Claim{
-		Sub: claims["sub"].(string),
-		Iat: int64(claims["iat"].(float64)),
-		Exp: int64(claims["exp"].(float64)),
-		Jti: claims["jti"].(string),
-	}, nil
+	claim := session.NewClaimFromMap(mapClaim)
+	return &claim, nil
 }
 
 var (

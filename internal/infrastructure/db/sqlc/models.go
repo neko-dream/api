@@ -41,17 +41,19 @@ type TalkSession struct {
 
 type User struct {
 	UserID      uuid.UUID
-	DisplayID   string
-	DisplayName string
+	DisplayID   sql.NullString
+	DisplayName sql.NullString
 	Picture     sql.NullString
 	CreatedAt   time.Time
 }
 
 type UserAuth struct {
-	UserID    uuid.NullUUID
-	Provider  string
-	Subject   string
-	CreatedAt time.Time
+	UserAuthID uuid.UUID
+	UserID     uuid.UUID
+	Provider   string
+	Subject    string
+	IsVerified bool
+	CreatedAt  time.Time
 }
 
 type Vote struct {

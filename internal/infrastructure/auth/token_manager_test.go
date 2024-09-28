@@ -40,12 +40,12 @@ func TestNewTokenManagerTest(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			util := auth.NewTokenManager(tt.firstSecret)
-			token, err := util.GenerateToken(
+			token, err := util.Generate(
 				tt.ctx,
 				user.NewUser(
 					shared.NewUUID[user.User](),
-					"test",
-					"test",
+					lo.ToPtr("test"),
+					lo.ToPtr("test"),
 					"test",
 					oauth.ProviderGoogle,
 					lo.ToPtr("https://example.com"),
@@ -58,7 +58,7 @@ func TestNewTokenManagerTest(t *testing.T) {
 			}
 
 			util = auth.NewTokenManager(tt.secondSecret)
-			_, err = util.ParseToken(tt.ctx, token)
+			_, err = util.Parse(tt.ctx, token)
 			if tt.success {
 				if err != nil {
 					t.Errorf("error: %v", err)

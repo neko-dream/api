@@ -14,7 +14,6 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 	"go.opentelemetry.io/otel/trace"
 
-	"braces.dev/errtrace"
 	ht "github.com/ogen-go/ogen/http"
 	"github.com/ogen-go/ogen/middleware"
 	"github.com/ogen-go/ogen/ogenerrors"
@@ -116,7 +115,7 @@ func (s *Server) handleAuthLoginRequest(args [1]string, argsEscaped bool, w http
 			unpackAuthLoginParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
 				response, err = s.h.AuthLogin(ctx, params)
-				return response, errtrace.Wrap(err)
+				return response, err
 			},
 		)
 	} else {
@@ -228,7 +227,7 @@ func (s *Server) handleCreateTalkSessionRequest(args [0]string, argsEscaped bool
 			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
 				response, err = s.h.CreateTalkSession(ctx, request)
-				return response, errtrace.Wrap(err)
+				return response, err
 			},
 		)
 	} else {
@@ -321,7 +320,7 @@ func (s *Server) handleEditUserProfileRequest(args [0]string, argsEscaped bool, 
 			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
 				response, err = s.h.EditUserProfile(ctx)
-				return response, errtrace.Wrap(err)
+				return response, err
 			},
 		)
 	} else {
@@ -433,7 +432,7 @@ func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped b
 			unpackGetTalkSessionDetailParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
 				response, err = s.h.GetTalkSessionDetail(ctx, params)
-				return response, errtrace.Wrap(err)
+				return response, err
 			},
 		)
 	} else {
@@ -526,7 +525,7 @@ func (s *Server) handleGetTalkSessionsRequest(args [0]string, argsEscaped bool, 
 			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
 				err = s.h.GetTalkSessions(ctx)
-				return response, errtrace.Wrap(err)
+				return response, err
 			},
 		)
 	} else {
@@ -619,7 +618,7 @@ func (s *Server) handleGetUserProfileRequest(args [0]string, argsEscaped bool, w
 			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
 				response, err = s.h.GetUserProfile(ctx)
-				return response, errtrace.Wrap(err)
+				return response, err
 			},
 		)
 	} else {
@@ -640,20 +639,20 @@ func (s *Server) handleGetUserProfileRequest(args [0]string, argsEscaped bool, w
 	}
 }
 
-// handleIndicateIntentionRequest handles indicateIntention operation.
+// handleIntentionRequest handles Intention operation.
 //
 // 意思表明API.
 //
 // POST /api/talksessions/{talkSessionID}/opinions/{opinionID}/intentions
-func (s *Server) handleIndicateIntentionRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleIntentionRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("indicateIntention"),
+		otelogen.OperationID("Intention"),
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/api/talksessions/{talkSessionID}/opinions/{opinionID}/intentions"),
 	}
 
 	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "IndicateIntention",
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "Intention",
 		trace.WithAttributes(otelAttrs...),
 		serverSpanKind,
 	)
@@ -684,11 +683,11 @@ func (s *Server) handleIndicateIntentionRequest(args [2]string, argsEscaped bool
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: "IndicateIntention",
-			ID:   "indicateIntention",
+			Name: "Intention",
+			ID:   "Intention",
 		}
 	)
-	params, err := decodeIndicateIntentionParams(args, argsEscaped, r)
+	params, err := decodeIntentionParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
 			OperationContext: opErrContext,
@@ -699,13 +698,13 @@ func (s *Server) handleIndicateIntentionRequest(args [2]string, argsEscaped bool
 		return
 	}
 
-	var response IndicateIntentionRes
+	var response IntentionRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
-			OperationName:    "IndicateIntention",
+			OperationName:    "Intention",
 			OperationSummary: "意思表明API",
-			OperationID:      "indicateIntention",
+			OperationID:      "Intention",
 			Body:             nil,
 			Params: middleware.Parameters{
 				{
@@ -722,8 +721,8 @@ func (s *Server) handleIndicateIntentionRequest(args [2]string, argsEscaped bool
 
 		type (
 			Request  = struct{}
-			Params   = IndicateIntentionParams
-			Response = IndicateIntentionRes
+			Params   = IntentionParams
+			Response = IntentionRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -732,14 +731,14 @@ func (s *Server) handleIndicateIntentionRequest(args [2]string, argsEscaped bool
 		](
 			m,
 			mreq,
-			unpackIndicateIntentionParams,
+			unpackIntentionParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.IndicateIntention(ctx, params)
-				return response, errtrace.Wrap(err)
+				response, err = s.h.Intention(ctx, params)
+				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.IndicateIntention(ctx, params)
+		response, err = s.h.Intention(ctx, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -747,7 +746,7 @@ func (s *Server) handleIndicateIntentionRequest(args [2]string, argsEscaped bool
 		return
 	}
 
-	if err := encodeIndicateIntentionResponse(response, w, span); err != nil {
+	if err := encodeIntentionResponse(response, w, span); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -851,7 +850,7 @@ func (s *Server) handleListOpinionsRequest(args [1]string, argsEscaped bool, w h
 			unpackListOpinionsParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
 				response, err = s.h.ListOpinions(ctx, params)
-				return response, errtrace.Wrap(err)
+				return response, err
 			},
 		)
 	} else {
@@ -979,7 +978,7 @@ func (s *Server) handleOAuthCallbackRequest(args [1]string, argsEscaped bool, w 
 			unpackOAuthCallbackParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
 				response, err = s.h.OAuthCallback(ctx, params)
-				return response, errtrace.Wrap(err)
+				return response, err
 			},
 		)
 	} else {
@@ -1095,7 +1094,7 @@ func (s *Server) handlePostOpinionPostRequest(args [1]string, argsEscaped bool, 
 			unpackPostOpinionPostParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
 				response, err = s.h.PostOpinionPost(ctx, params)
-				return response, errtrace.Wrap(err)
+				return response, err
 			},
 		)
 	} else {
@@ -1120,12 +1119,12 @@ func (s *Server) handlePostOpinionPostRequest(args [1]string, argsEscaped bool, 
 //
 // ユーザー作成.
 //
-// POST /api/user
+// POST /api/user/register
 func (s *Server) handleRegisterUserRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("registerUser"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/api/user"),
+		semconv.HTTPRouteKey.String("/api/user/register"),
 	}
 
 	// Start a span for this request.
@@ -1236,6 +1235,14 @@ func (s *Server) handleRegisterUserRequest(args [0]string, argsEscaped bool, w h
 					Name: "displayID",
 					In:   "query",
 				}: params.DisplayID,
+				{
+					Name: "picture",
+					In:   "query",
+				}: params.Picture,
+				{
+					Name: "age",
+					In:   "query",
+				}: params.Age,
 			},
 			Raw: r,
 		}
@@ -1255,7 +1262,7 @@ func (s *Server) handleRegisterUserRequest(args [0]string, argsEscaped bool, w h
 			unpackRegisterUserParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
 				response, err = s.h.RegisterUser(ctx, params)
-				return response, errtrace.Wrap(err)
+				return response, err
 			},
 		)
 	} else {
