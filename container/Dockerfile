@@ -2,7 +2,7 @@ FROM golang:1.23.1-alpine3.20 AS builder
 
 ENV CGO_ENABLED=0
 ENV GOOS=linux
-ENV GOARCH=arm64
+ENV GOARCH=amd64
 
 EXPOSE 3000
 
