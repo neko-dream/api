@@ -8,7 +8,7 @@ EXPOSE 3000
 
 WORKDIR /app
 
-COPY ./go.* .
+COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
@@ -22,4 +22,6 @@ COPY --from=builder /app/server /server
 
 RUN chmod +x /server
 
-ENTRYPOINT ["/server"]
+
+
+CMD ["./server"]

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -13,6 +14,7 @@ import (
 )
 
 func main() {
+	log.Println("starting server...")
 	// .envを読み込む
 	if err := utils.LoadEnv(); err != nil {
 		panic(err)
@@ -31,8 +33,8 @@ func main() {
 	reqMiddleware := middleware.ReqMiddleware(srv)
 	corsHandler := middleware.CORSMiddleware(reqMiddleware)
 	port := os.Getenv("PORT")
+	log.Println("server started on port", port)
 	if err := http.ListenAndServe(fmt.Sprintf(":%s", port), corsHandler); err != nil {
 		panic(err)
 	}
-
 }
