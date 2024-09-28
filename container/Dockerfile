@@ -1,4 +1,4 @@
-FROM golang:1.23.1-alpine3.20 as base
+FROM golang:1.23.1-alpine3.20 as builder
 
 ENV CGO_ENABLED=0
 ENV GOOS=linux
@@ -8,13 +8,16 @@ EXPOSE 3000
 
 WORKDIR /app
 
-COPY ./go.* /app
+COPY ./go.* .
 RUN go mod download
 
-COPY . /app
-RUN go build -tags timetzdata -ldflags="-s -w" -trimpath -o server .
+COPY . .
 
-FROM --platform=linux/arm64 alpine:latest
+RUN go build -tags timetzdata -ldflags="-s -w" -trimpath -o server ./cmd/server
 
-COPY --from=base /app/server /app/server
-CMD /app/server
+FROM alpine:latest
+
+WORKDIR /app
+
+COPY --from=builder /app/server ./server
+RUN /app/server
