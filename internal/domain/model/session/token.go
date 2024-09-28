@@ -62,14 +62,14 @@ const (
 
 func (c *Claim) GenMapClaim() *jwt.MapClaims {
 	return &jwt.MapClaims{
-		"exp":          c.Exp,
-		"iat":          c.Iat,
-		"jti":          c.Jti,
-		"sub":          c.Sub,
-		"iss":          Issuer,
-		"aud":          Audience,
-		"picture":      c.Picture,
-		"display_name": c.DisplayName,
-		"display_id":   c.DisplayID,
+		"exp":         c.Exp,
+		"iat":         c.Iat,
+		"jti":         c.Jti,
+		"sub":         c.Sub,
+		"iss":         Issuer,
+		"aud":         Audience,
+		"picture":     c.Picture,
+		"displayName": c.DisplayName,
+		"displayId":   c.DisplayID,
 	}
 }

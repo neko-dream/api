@@ -3,6 +3,7 @@ package auth_usecase
 import (
 	"context"
 	"net/http"
+	"os"
 	"time"
 
 	"braces.dev/errtrace"
@@ -84,14 +85,14 @@ func (u *authCallbackInteractor) Execute(ctx context.Context, input CallbackInpu
 		if err != nil {
 			return errtrace.Wrap(err)
 		}
-
+		domain := os.Getenv("DOMAIN")
 		cookie := http.Cookie{
 			Name:     "SessionId",
 			Value:    token,
 			HttpOnly: true,
 			Path:     "/",
 			SameSite: http.SameSiteLaxMode,
-			Domain:   "localhost",
+			Domain:   domain,
 		}
 		if input.Remember {
 			cookie.MaxAge = 60 * 60 * 24 * 30

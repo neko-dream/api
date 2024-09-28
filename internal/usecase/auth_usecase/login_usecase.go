@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/url"
+	"os"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/auth"
@@ -49,20 +50,20 @@ func (a *authLoginInteractor) Execute(ctx context.Context, input AuthLoginInput)
 	}); err != nil {
 		return AuthLoginOutput{}, errtrace.Wrap(err)
 	}
-
+	domain := os.Getenv("DOMAIN")
 	stateCookie := http.Cookie{
 		Name:     "state",
 		Value:    s,
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
-		Domain:   "localhost",
+		Domain:   domain,
 	}
 	redirectURLCookie := http.Cookie{
 		Name:     "redirect_url",
 		Value:    input.RedirectURL,
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
-		Domain:   "localhost",
+		Domain:   domain,
 	}
 
 	return AuthLoginOutput{
