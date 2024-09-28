@@ -36,6 +36,7 @@ func Migration() {
 }
 
 func Down() {
+	log.Println("a ", os.Getenv("DATABASE_URL"))
 	pgx, err := sql.Open("pgx", os.Getenv("DATABASE_URL"))
 	if err != nil {
 		log.Println("a ", err)

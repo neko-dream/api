@@ -1,4 +1,4 @@
-FROM golang:1.23.1-alpine3.20 as builder
+FROM golang:1.23.1-alpine3.20 AS builder
 
 ENV CGO_ENABLED=0
 ENV GOOS=linux
@@ -20,4 +20,4 @@ FROM alpine:latest
 WORKDIR /app
 
 COPY --from=builder /app/server ./server
-CMD /app/server
+CMD ["/app/server"]
