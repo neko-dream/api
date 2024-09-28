@@ -20,4 +20,4 @@ FROM alpine:latest
 WORKDIR /app
 
 COPY --from=builder /app/server ./server
-RUN /app/server
+CMD /app/server
