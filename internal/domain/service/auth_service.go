@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/url"
 
+	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -30,7 +31,7 @@ func (a *authService) Authenticate(
 ) (*user.User, error) {
 	authProviderName, err := oauth.NewAuthProviderName(providerName)
 	if err != nil {
-		return nil, messages.InvalidProviderError
+		return nil, errtrace.Wrap(messages.InvalidProviderError)
 	}
 
 	provider, err := oauth.OIDCProviderFactory(
@@ -38,31 +39,30 @@ func (a *authService) Authenticate(
 		authProviderName,
 	)
 	if err != nil {
-		return nil, err
+		return nil, errtrace.Wrap(err)
 	}
 
-	subject, userName, err := provider.UserInfo(ctx, code)
+	userInfo, err := provider.UserInfo(ctx, code)
 	if err != nil {
-		return nil, err
+		return nil, errtrace.Wrap(err)
 	}
-
-	existUser, err := a.userRepository.FindBySubject(ctx, user.UserSubject(subject))
+	existUser, err := a.userRepository.FindBySubject(ctx, user.UserSubject(userInfo.Subject))
 	if err != nil {
-		return nil, err
+		return nil, errtrace.Wrap(err)
 	}
 	if existUser != nil {
 		return existUser, nil
 	}
-
 	newUser, err := a.userRepository.Create(ctx, user.NewUser(
 		shared.NewUUID[user.User](),
-		"",
-		userName,
-		subject,
+		userInfo.Name,
+		userInfo.Name,
+		userInfo.Subject,
 		authProviderName,
+		&userInfo.Picture,
 	))
 	if err != nil {
-		return nil, err
+		return nil, errtrace.Wrap(err)
 	}
 
 	return &newUser, nil
@@ -74,7 +74,7 @@ func (a *authService) GetAuthURL(
 ) (*url.URL, string, error) {
 	authProviderName, err := oauth.NewAuthProviderName(providerName)
 	if err != nil {
-		return nil, "", err
+		return nil, "", errtrace.Wrap(err)
 	}
 
 	provider, err := oauth.OIDCProviderFactory(
@@ -82,14 +82,14 @@ func (a *authService) GetAuthURL(
 		authProviderName,
 	)
 	if err != nil {
-		return nil, "", err
+		return nil, "", errtrace.Wrap(err)
 	}
 
 	state := provider.GenerateState()
 	authURL := provider.GetAuthURL(ctx, state)
 	url, err := url.Parse(authURL)
 	if err != nil {
-		return nil, "", err
+		return nil, "", errtrace.Wrap(err)
 	}
 
 	return url, state, nil

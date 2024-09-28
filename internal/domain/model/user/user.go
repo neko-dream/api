@@ -32,6 +32,7 @@ type (
 		displayName string
 		subject     string
 		provider    oauth.AuthProviderName
+		picture     *string
 	}
 )
 
@@ -47,6 +48,18 @@ func (u *User) DisplayName() string {
 	return u.displayName
 }
 
+func (u *User) DisplayID() string {
+	return u.displayID
+}
+
+func (u *User) Subject() string {
+	return u.subject
+}
+
+func (u *User) Picture() *string {
+	return u.picture
+}
+
 func (u *User) Provider() oauth.AuthProviderName {
 	return u.provider
 }
@@ -57,6 +70,7 @@ func NewUser(
 	displayName string,
 	subject string,
 	provider oauth.AuthProviderName,
+	picture *string,
 ) User {
 	return User{
 		userID:      userID,
@@ -64,5 +78,6 @@ func NewUser(
 		displayName: displayName,
 		subject:     subject,
 		provider:    provider,
+		picture:     picture,
 	}
 }

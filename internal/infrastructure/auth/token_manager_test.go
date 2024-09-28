@@ -8,6 +8,8 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/auth"
+	"github.com/neko-dream/server/pkg/oauth"
+	"github.com/samber/lo"
 )
 
 func TestNewTokenManagerTest(t *testing.T) {
@@ -40,7 +42,14 @@ func TestNewTokenManagerTest(t *testing.T) {
 			util := auth.NewTokenManager(tt.firstSecret)
 			token, err := util.GenerateToken(
 				tt.ctx,
-				shared.NewUUID[user.User](),
+				user.NewUser(
+					shared.NewUUID[user.User](),
+					"test",
+					"test",
+					"test",
+					oauth.ProviderGoogle,
+					lo.ToPtr("https://example.com"),
+				),
 				shared.NewUUID[session.Session](),
 			)
 

@@ -3,12 +3,14 @@ package oauth
 import (
 	"errors"
 	"strings"
+
+	"braces.dev/errtrace"
 )
 
 type AuthProviderName string
 
 func (a AuthProviderName) String() string {
-	return string(a)
+	return strings.ToUpper(string(a))
 }
 
 const (
@@ -20,6 +22,6 @@ func NewAuthProviderName(provider string) (AuthProviderName, error) {
 	case ProviderGoogle.String():
 		return ProviderGoogle, nil
 	default:
-		return "", errors.New("invalid auth provider")
+		return "", errtrace.Wrap(errors.New("invalid auth provider"))
 	}
 }

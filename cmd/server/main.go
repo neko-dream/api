@@ -5,11 +5,12 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/neko-dream/server/internal/infrastructure/db"
 	"github.com/neko-dream/server/internal/infrastructure/di"
 	"github.com/neko-dream/server/internal/infrastructure/middleware"
-	"github.com/neko-dream/server/internal/infrastructure/utils"
 	"github.com/neko-dream/server/internal/presentation/handler"
 	"github.com/neko-dream/server/internal/presentation/oas"
+	"github.com/neko-dream/server/pkg/utils"
 )
 
 func main() {
@@ -17,6 +18,9 @@ func main() {
 	if err := utils.LoadEnv(); err != nil {
 		panic(err)
 	}
+
+	db.Down()
+	db.Migration()
 
 	container := di.BuildContainer()
 	srv, err := oas.NewServer(
@@ -27,10 +31,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
 	reqMiddleware := middleware.ReqMiddleware(srv)
 	corsHandler := middleware.CORSMiddleware(reqMiddleware)
 	port := os.Getenv("PORT")
 	if err := http.ListenAndServe(fmt.Sprintf(":%s", port), corsHandler); err != nil {
 		panic(err)
 	}
+
 }

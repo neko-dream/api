@@ -10,6 +10,7 @@ import (
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 
+	"braces.dev/errtrace"
 	"github.com/ogen-go/ogen/conv"
 	"github.com/ogen-go/ogen/uri"
 )
@@ -26,11 +27,11 @@ func encodeAuthLoginResponse(response *AuthLoginFound, w http.ResponseWriter, sp
 			}
 			if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
 				if val, ok := response.Location.Get(); ok {
-					return e.EncodeValue(conv.URLToString(val))
+					return errtrace.Wrap(e.EncodeValue(conv.URLToString(val)))
 				}
 				return nil
 			}); err != nil {
-				return errors.Wrap(err, "encode Location header")
+				return errtrace.Wrap(errors.Wrap(err, "encode Location header"))
 			}
 		}
 		// Encode "Set-Cookie" header.
@@ -41,11 +42,11 @@ func encodeAuthLoginResponse(response *AuthLoginFound, w http.ResponseWriter, sp
 			}
 			if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
 				if val, ok := response.SetCookie.Get(); ok {
-					return e.EncodeValue(conv.StringToString(val))
+					return errtrace.Wrap(e.EncodeValue(conv.StringToString(val)))
 				}
 				return nil
 			}); err != nil {
-				return errors.Wrap(err, "encode Set-Cookie header")
+				return errtrace.Wrap(errors.Wrap(err, "encode Set-Cookie header"))
 			}
 		}
 	}
@@ -63,7 +64,7 @@ func encodeCreateTalkSessionResponse(response *CreateTalkSessionOK, w http.Respo
 	e := new(jx.Encoder)
 	response.Encode(e)
 	if _, err := e.WriteTo(w); err != nil {
-		return errors.Wrap(err, "write")
+		return errtrace.Wrap(errors.Wrap(err, "write"))
 	}
 
 	return nil
@@ -77,7 +78,7 @@ func encodeEditUserProfileResponse(response *EditUserProfileOK, w http.ResponseW
 	e := new(jx.Encoder)
 	response.Encode(e)
 	if _, err := e.WriteTo(w); err != nil {
-		return errors.Wrap(err, "write")
+		return errtrace.Wrap(errors.Wrap(err, "write"))
 	}
 
 	return nil
@@ -91,7 +92,7 @@ func encodeGetTalkSessionDetailResponse(response *GetTalkSessionDetailOK, w http
 	e := new(jx.Encoder)
 	response.Encode(e)
 	if _, err := e.WriteTo(w); err != nil {
-		return errors.Wrap(err, "write")
+		return errtrace.Wrap(errors.Wrap(err, "write"))
 	}
 
 	return nil
@@ -105,7 +106,7 @@ func encodeGetTalkSessionsResponse(response *GetTalkSessionsOK, w http.ResponseW
 	e := new(jx.Encoder)
 	response.Encode(e)
 	if _, err := e.WriteTo(w); err != nil {
-		return errors.Wrap(err, "write")
+		return errtrace.Wrap(errors.Wrap(err, "write"))
 	}
 
 	return nil
@@ -119,7 +120,7 @@ func encodeGetUserProfileResponse(response *GetUserProfileOK, w http.ResponseWri
 	e := new(jx.Encoder)
 	response.Encode(e)
 	if _, err := e.WriteTo(w); err != nil {
-		return errors.Wrap(err, "write")
+		return errtrace.Wrap(errors.Wrap(err, "write"))
 	}
 
 	return nil
@@ -135,7 +136,7 @@ func encodeIndicateIntentionResponse(response IndicateIntentionRes, w http.Respo
 		e := new(jx.Encoder)
 		response.Encode(e)
 		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
+			return errtrace.Wrap(errors.Wrap(err, "write"))
 		}
 
 		return nil
@@ -148,13 +149,13 @@ func encodeIndicateIntentionResponse(response IndicateIntentionRes, w http.Respo
 		e := new(jx.Encoder)
 		response.Encode(e)
 		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
+			return errtrace.Wrap(errors.Wrap(err, "write"))
 		}
 
 		return nil
 
 	default:
-		return errors.Errorf("unexpected response type: %T", response)
+		return errtrace.Wrap(errors.Errorf("unexpected response type: %T", response))
 	}
 }
 
@@ -168,7 +169,7 @@ func encodeListOpinionsResponse(response ListOpinionsRes, w http.ResponseWriter,
 		e := new(jx.Encoder)
 		response.Encode(e)
 		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
+			return errtrace.Wrap(errors.Wrap(err, "write"))
 		}
 
 		return nil
@@ -181,13 +182,13 @@ func encodeListOpinionsResponse(response ListOpinionsRes, w http.ResponseWriter,
 		e := new(jx.Encoder)
 		response.Encode(e)
 		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
+			return errtrace.Wrap(errors.Wrap(err, "write"))
 		}
 
 		return nil
 
 	default:
-		return errors.Errorf("unexpected response type: %T", response)
+		return errtrace.Wrap(errors.Errorf("unexpected response type: %T", response))
 	}
 }
 
@@ -203,11 +204,11 @@ func encodeOAuthCallbackResponse(response *OAuthCallbackFound, w http.ResponseWr
 			}
 			if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
 				if val, ok := response.Location.Get(); ok {
-					return e.EncodeValue(conv.URLToString(val))
+					return errtrace.Wrap(e.EncodeValue(conv.URLToString(val)))
 				}
 				return nil
 			}); err != nil {
-				return errors.Wrap(err, "encode Location header")
+				return errtrace.Wrap(errors.Wrap(err, "encode Location header"))
 			}
 		}
 		// Encode "Set-Cookie" header.
@@ -218,11 +219,11 @@ func encodeOAuthCallbackResponse(response *OAuthCallbackFound, w http.ResponseWr
 			}
 			if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
 				if val, ok := response.SetCookie.Get(); ok {
-					return e.EncodeValue(conv.StringToString(val))
+					return errtrace.Wrap(e.EncodeValue(conv.StringToString(val)))
 				}
 				return nil
 			}); err != nil {
-				return errors.Wrap(err, "encode Set-Cookie header")
+				return errtrace.Wrap(errors.Wrap(err, "encode Set-Cookie header"))
 			}
 		}
 	}
@@ -242,7 +243,7 @@ func encodePostOpinionPostResponse(response PostOpinionPostRes, w http.ResponseW
 		e := new(jx.Encoder)
 		response.Encode(e)
 		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
+			return errtrace.Wrap(errors.Wrap(err, "write"))
 		}
 
 		return nil
@@ -255,13 +256,13 @@ func encodePostOpinionPostResponse(response PostOpinionPostRes, w http.ResponseW
 		e := new(jx.Encoder)
 		response.Encode(e)
 		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
+			return errtrace.Wrap(errors.Wrap(err, "write"))
 		}
 
 		return nil
 
 	default:
-		return errors.Errorf("unexpected response type: %T", response)
+		return errtrace.Wrap(errors.Errorf("unexpected response type: %T", response))
 	}
 }
 
@@ -275,7 +276,7 @@ func encodeRegisterUserResponse(response RegisterUserRes, w http.ResponseWriter,
 		e := new(jx.Encoder)
 		response.Encode(e)
 		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
+			return errtrace.Wrap(errors.Wrap(err, "write"))
 		}
 
 		return nil
@@ -288,7 +289,7 @@ func encodeRegisterUserResponse(response RegisterUserRes, w http.ResponseWriter,
 		e := new(jx.Encoder)
 		response.Encode(e)
 		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
+			return errtrace.Wrap(errors.Wrap(err, "write"))
 		}
 
 		return nil
@@ -301,12 +302,12 @@ func encodeRegisterUserResponse(response RegisterUserRes, w http.ResponseWriter,
 		e := new(jx.Encoder)
 		response.Encode(e)
 		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
+			return errtrace.Wrap(errors.Wrap(err, "write"))
 		}
 
 		return nil
 
 	default:
-		return errors.Errorf("unexpected response type: %T", response)
+		return errtrace.Wrap(errors.Errorf("unexpected response type: %T", response))
 	}
 }

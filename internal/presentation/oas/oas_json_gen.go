@@ -9,6 +9,7 @@ import (
 	"github.com/go-faster/errors"
 	"github.com/go-faster/jx"
 
+	"braces.dev/errtrace"
 	"github.com/ogen-go/ogen/validate"
 )
 
@@ -44,7 +45,7 @@ var jsonFieldsNameOfCreateTalkSessionOK = [3]string{
 // Decode decodes CreateTalkSessionOK from json.
 func (s *CreateTalkSessionOK) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode CreateTalkSessionOK to nil")
+		return errtrace.Wrap(errors.New("invalid: unable to decode CreateTalkSessionOK to nil"))
 	}
 	var requiredBitSet [1]uint8
 
@@ -56,11 +57,11 @@ func (s *CreateTalkSessionOK) Decode(d *jx.Decoder) error {
 				v, err := d.Str()
 				s.TalkSessionID = string(v)
 				if err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"talkSessionID\"")
+				return errtrace.Wrap(errors.Wrap(err, "decode field \"talkSessionID\""))
 			}
 		case "talkSessionTheme":
 			requiredBitSet[0] |= 1 << 1
@@ -68,11 +69,11 @@ func (s *CreateTalkSessionOK) Decode(d *jx.Decoder) error {
 				v, err := d.Str()
 				s.TalkSessionTheme = string(v)
 				if err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"talkSessionTheme\"")
+				return errtrace.Wrap(errors.Wrap(err, "decode field \"talkSessionTheme\""))
 			}
 		case "talkSessionStatus":
 			requiredBitSet[0] |= 1 << 2
@@ -80,18 +81,18 @@ func (s *CreateTalkSessionOK) Decode(d *jx.Decoder) error {
 				v, err := d.Str()
 				s.TalkSessionStatus = string(v)
 				if err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"talkSessionStatus\"")
+				return errtrace.Wrap(errors.Wrap(err, "decode field \"talkSessionStatus\""))
 			}
 		default:
-			return d.Skip()
+			return errtrace.Wrap(d.Skip())
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode CreateTalkSessionOK")
+		return errtrace.Wrap(errors.Wrap(err, "decode CreateTalkSessionOK"))
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
@@ -123,7 +124,7 @@ func (s *CreateTalkSessionOK) Decode(d *jx.Decoder) error {
 		}
 	}
 	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
+		return errtrace.Wrap(&validate.Error{Fields: failures})
 	}
 
 	return nil
@@ -139,7 +140,7 @@ func (s *CreateTalkSessionOK) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *CreateTalkSessionOK) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
-	return s.Decode(d)
+	return errtrace.Wrap(s.Decode(d))
 }
 
 // Encode implements json.Marshaler.
@@ -169,7 +170,7 @@ var jsonFieldsNameOfEditUserProfileOK = [2]string{
 // Decode decodes EditUserProfileOK from json.
 func (s *EditUserProfileOK) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode EditUserProfileOK to nil")
+		return errtrace.Wrap(errors.New("invalid: unable to decode EditUserProfileOK to nil"))
 	}
 	var requiredBitSet [1]uint8
 
@@ -181,11 +182,11 @@ func (s *EditUserProfileOK) Decode(d *jx.Decoder) error {
 				v, err := d.Str()
 				s.DisplayID = string(v)
 				if err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"displayID\"")
+				return errtrace.Wrap(errors.Wrap(err, "decode field \"displayID\""))
 			}
 		case "displayName":
 			requiredBitSet[0] |= 1 << 1
@@ -193,18 +194,18 @@ func (s *EditUserProfileOK) Decode(d *jx.Decoder) error {
 				v, err := d.Str()
 				s.DisplayName = string(v)
 				if err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"displayName\"")
+				return errtrace.Wrap(errors.Wrap(err, "decode field \"displayName\""))
 			}
 		default:
-			return d.Skip()
+			return errtrace.Wrap(d.Skip())
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode EditUserProfileOK")
+		return errtrace.Wrap(errors.Wrap(err, "decode EditUserProfileOK"))
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
@@ -236,7 +237,7 @@ func (s *EditUserProfileOK) Decode(d *jx.Decoder) error {
 		}
 	}
 	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
+		return errtrace.Wrap(&validate.Error{Fields: failures})
 	}
 
 	return nil
@@ -252,7 +253,7 @@ func (s *EditUserProfileOK) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *EditUserProfileOK) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
-	return s.Decode(d)
+	return errtrace.Wrap(s.Decode(d))
 }
 
 // Encode implements json.Marshaler.
@@ -287,7 +288,7 @@ var jsonFieldsNameOfGetTalkSessionDetailOK = [3]string{
 // Decode decodes GetTalkSessionDetailOK from json.
 func (s *GetTalkSessionDetailOK) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode GetTalkSessionDetailOK to nil")
+		return errtrace.Wrap(errors.New("invalid: unable to decode GetTalkSessionDetailOK to nil"))
 	}
 	var requiredBitSet [1]uint8
 
@@ -299,11 +300,11 @@ func (s *GetTalkSessionDetailOK) Decode(d *jx.Decoder) error {
 				v, err := d.Str()
 				s.TalkSessionID = string(v)
 				if err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"talkSessionID\"")
+				return errtrace.Wrap(errors.Wrap(err, "decode field \"talkSessionID\""))
 			}
 		case "talkSessionTheme":
 			requiredBitSet[0] |= 1 << 1
@@ -311,11 +312,11 @@ func (s *GetTalkSessionDetailOK) Decode(d *jx.Decoder) error {
 				v, err := d.Str()
 				s.TalkSessionTheme = string(v)
 				if err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"talkSessionTheme\"")
+				return errtrace.Wrap(errors.Wrap(err, "decode field \"talkSessionTheme\""))
 			}
 		case "talkSessionStatus":
 			requiredBitSet[0] |= 1 << 2
@@ -323,18 +324,18 @@ func (s *GetTalkSessionDetailOK) Decode(d *jx.Decoder) error {
 				v, err := d.Str()
 				s.TalkSessionStatus = string(v)
 				if err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"talkSessionStatus\"")
+				return errtrace.Wrap(errors.Wrap(err, "decode field \"talkSessionStatus\""))
 			}
 		default:
-			return d.Skip()
+			return errtrace.Wrap(d.Skip())
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode GetTalkSessionDetailOK")
+		return errtrace.Wrap(errors.Wrap(err, "decode GetTalkSessionDetailOK"))
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
@@ -366,7 +367,7 @@ func (s *GetTalkSessionDetailOK) Decode(d *jx.Decoder) error {
 		}
 	}
 	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
+		return errtrace.Wrap(&validate.Error{Fields: failures})
 	}
 
 	return nil
@@ -382,7 +383,7 @@ func (s *GetTalkSessionDetailOK) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *GetTalkSessionDetailOK) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
-	return s.Decode(d)
+	return errtrace.Wrap(s.Decode(d))
 }
 
 // Encode implements json.Marshaler.
@@ -401,16 +402,16 @@ var jsonFieldsNameOfGetTalkSessionsOK = [0]string{}
 // Decode decodes GetTalkSessionsOK from json.
 func (s *GetTalkSessionsOK) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode GetTalkSessionsOK to nil")
+		return errtrace.Wrap(errors.New("invalid: unable to decode GetTalkSessionsOK to nil"))
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		default:
-			return d.Skip()
+			return errtrace.Wrap(d.Skip())
 		}
 	}); err != nil {
-		return errors.Wrap(err, "decode GetTalkSessionsOK")
+		return errtrace.Wrap(errors.Wrap(err, "decode GetTalkSessionsOK"))
 	}
 
 	return nil
@@ -426,7 +427,7 @@ func (s *GetTalkSessionsOK) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *GetTalkSessionsOK) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
-	return s.Decode(d)
+	return errtrace.Wrap(s.Decode(d))
 }
 
 // Encode implements json.Marshaler.
@@ -456,7 +457,7 @@ var jsonFieldsNameOfGetUserProfileOK = [2]string{
 // Decode decodes GetUserProfileOK from json.
 func (s *GetUserProfileOK) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode GetUserProfileOK to nil")
+		return errtrace.Wrap(errors.New("invalid: unable to decode GetUserProfileOK to nil"))
 	}
 	var requiredBitSet [1]uint8
 
@@ -468,11 +469,11 @@ func (s *GetUserProfileOK) Decode(d *jx.Decoder) error {
 				v, err := d.Str()
 				s.DisplayID = string(v)
 				if err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"displayID\"")
+				return errtrace.Wrap(errors.Wrap(err, "decode field \"displayID\""))
 			}
 		case "displayName":
 			requiredBitSet[0] |= 1 << 1
@@ -480,18 +481,18 @@ func (s *GetUserProfileOK) Decode(d *jx.Decoder) error {
 				v, err := d.Str()
 				s.DisplayName = string(v)
 				if err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"displayName\"")
+				return errtrace.Wrap(errors.Wrap(err, "decode field \"displayName\""))
 			}
 		default:
-			return d.Skip()
+			return errtrace.Wrap(d.Skip())
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode GetUserProfileOK")
+		return errtrace.Wrap(errors.Wrap(err, "decode GetUserProfileOK"))
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
@@ -523,7 +524,7 @@ func (s *GetUserProfileOK) Decode(d *jx.Decoder) error {
 		}
 	}
 	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
+		return errtrace.Wrap(&validate.Error{Fields: failures})
 	}
 
 	return nil
@@ -539,7 +540,7 @@ func (s *GetUserProfileOK) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *GetUserProfileOK) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
-	return s.Decode(d)
+	return errtrace.Wrap(s.Decode(d))
 }
 
 // Encode implements json.Marshaler.
@@ -558,16 +559,16 @@ var jsonFieldsNameOfIndicateIntentionInternalServerError = [0]string{}
 // Decode decodes IndicateIntentionInternalServerError from json.
 func (s *IndicateIntentionInternalServerError) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode IndicateIntentionInternalServerError to nil")
+		return errtrace.Wrap(errors.New("invalid: unable to decode IndicateIntentionInternalServerError to nil"))
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		default:
-			return d.Skip()
+			return errtrace.Wrap(d.Skip())
 		}
 	}); err != nil {
-		return errors.Wrap(err, "decode IndicateIntentionInternalServerError")
+		return errtrace.Wrap(errors.Wrap(err, "decode IndicateIntentionInternalServerError"))
 	}
 
 	return nil
@@ -583,7 +584,7 @@ func (s *IndicateIntentionInternalServerError) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *IndicateIntentionInternalServerError) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
-	return s.Decode(d)
+	return errtrace.Wrap(s.Decode(d))
 }
 
 // Encode encodes IndicateIntentionOKApplicationJSON as json.
@@ -600,7 +601,7 @@ func (s IndicateIntentionOKApplicationJSON) Encode(e *jx.Encoder) {
 // Decode decodes IndicateIntentionOKApplicationJSON from json.
 func (s *IndicateIntentionOKApplicationJSON) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode IndicateIntentionOKApplicationJSON to nil")
+		return errtrace.Wrap(errors.New("invalid: unable to decode IndicateIntentionOKApplicationJSON to nil"))
 	}
 	var unwrapped []IndicateIntentionOKItem
 	if err := func() error {
@@ -608,16 +609,16 @@ func (s *IndicateIntentionOKApplicationJSON) Decode(d *jx.Decoder) error {
 		if err := d.Arr(func(d *jx.Decoder) error {
 			var elem IndicateIntentionOKItem
 			if err := elem.Decode(d); err != nil {
-				return err
+				return errtrace.Wrap(err)
 			}
 			unwrapped = append(unwrapped, elem)
 			return nil
 		}); err != nil {
-			return err
+			return errtrace.Wrap(err)
 		}
 		return nil
 	}(); err != nil {
-		return errors.Wrap(err, "alias")
+		return errtrace.Wrap(errors.Wrap(err, "alias"))
 	}
 	*s = IndicateIntentionOKApplicationJSON(unwrapped)
 	return nil
@@ -633,7 +634,7 @@ func (s IndicateIntentionOKApplicationJSON) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *IndicateIntentionOKApplicationJSON) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
-	return s.Decode(d)
+	return errtrace.Wrap(s.Decode(d))
 }
 
 // Encode implements json.Marshaler.
@@ -670,7 +671,7 @@ var jsonFieldsNameOfIndicateIntentionOKItem = [3]string{
 // Decode decodes IndicateIntentionOKItem from json.
 func (s *IndicateIntentionOKItem) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode IndicateIntentionOKItem to nil")
+		return errtrace.Wrap(errors.New("invalid: unable to decode IndicateIntentionOKItem to nil"))
 	}
 	var requiredBitSet [1]uint8
 
@@ -682,11 +683,11 @@ func (s *IndicateIntentionOKItem) Decode(d *jx.Decoder) error {
 				v, err := d.Str()
 				s.OpinionID = string(v)
 				if err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"opinionID\"")
+				return errtrace.Wrap(errors.Wrap(err, "decode field \"opinionID\""))
 			}
 		case "opinionContent":
 			requiredBitSet[0] |= 1 << 1
@@ -694,28 +695,28 @@ func (s *IndicateIntentionOKItem) Decode(d *jx.Decoder) error {
 				v, err := d.Str()
 				s.OpinionContent = string(v)
 				if err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"opinionContent\"")
+				return errtrace.Wrap(errors.Wrap(err, "decode field \"opinionContent\""))
 			}
 		case "parentOpinionID":
 			if err := func() error {
 				s.ParentOpinionID.Reset()
 				if err := s.ParentOpinionID.Decode(d); err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"parentOpinionID\"")
+				return errtrace.Wrap(errors.Wrap(err, "decode field \"parentOpinionID\""))
 			}
 		default:
-			return d.Skip()
+			return errtrace.Wrap(d.Skip())
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode IndicateIntentionOKItem")
+		return errtrace.Wrap(errors.Wrap(err, "decode IndicateIntentionOKItem"))
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
@@ -747,7 +748,7 @@ func (s *IndicateIntentionOKItem) Decode(d *jx.Decoder) error {
 		}
 	}
 	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
+		return errtrace.Wrap(&validate.Error{Fields: failures})
 	}
 
 	return nil
@@ -763,7 +764,7 @@ func (s *IndicateIntentionOKItem) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *IndicateIntentionOKItem) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
-	return s.Decode(d)
+	return errtrace.Wrap(s.Decode(d))
 }
 
 // Encode implements json.Marshaler.
@@ -782,16 +783,16 @@ var jsonFieldsNameOfListOpinionsInternalServerError = [0]string{}
 // Decode decodes ListOpinionsInternalServerError from json.
 func (s *ListOpinionsInternalServerError) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ListOpinionsInternalServerError to nil")
+		return errtrace.Wrap(errors.New("invalid: unable to decode ListOpinionsInternalServerError to nil"))
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		default:
-			return d.Skip()
+			return errtrace.Wrap(d.Skip())
 		}
 	}); err != nil {
-		return errors.Wrap(err, "decode ListOpinionsInternalServerError")
+		return errtrace.Wrap(errors.Wrap(err, "decode ListOpinionsInternalServerError"))
 	}
 
 	return nil
@@ -807,7 +808,7 @@ func (s *ListOpinionsInternalServerError) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *ListOpinionsInternalServerError) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
-	return s.Decode(d)
+	return errtrace.Wrap(s.Decode(d))
 }
 
 // Encode encodes ListOpinionsOKApplicationJSON as json.
@@ -824,7 +825,7 @@ func (s ListOpinionsOKApplicationJSON) Encode(e *jx.Encoder) {
 // Decode decodes ListOpinionsOKApplicationJSON from json.
 func (s *ListOpinionsOKApplicationJSON) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ListOpinionsOKApplicationJSON to nil")
+		return errtrace.Wrap(errors.New("invalid: unable to decode ListOpinionsOKApplicationJSON to nil"))
 	}
 	var unwrapped []ListOpinionsOKItem
 	if err := func() error {
@@ -832,16 +833,16 @@ func (s *ListOpinionsOKApplicationJSON) Decode(d *jx.Decoder) error {
 		if err := d.Arr(func(d *jx.Decoder) error {
 			var elem ListOpinionsOKItem
 			if err := elem.Decode(d); err != nil {
-				return err
+				return errtrace.Wrap(err)
 			}
 			unwrapped = append(unwrapped, elem)
 			return nil
 		}); err != nil {
-			return err
+			return errtrace.Wrap(err)
 		}
 		return nil
 	}(); err != nil {
-		return errors.Wrap(err, "alias")
+		return errtrace.Wrap(errors.Wrap(err, "alias"))
 	}
 	*s = ListOpinionsOKApplicationJSON(unwrapped)
 	return nil
@@ -857,7 +858,7 @@ func (s ListOpinionsOKApplicationJSON) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *ListOpinionsOKApplicationJSON) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
-	return s.Decode(d)
+	return errtrace.Wrap(s.Decode(d))
 }
 
 // Encode implements json.Marshaler.
@@ -894,7 +895,7 @@ var jsonFieldsNameOfListOpinionsOKItem = [3]string{
 // Decode decodes ListOpinionsOKItem from json.
 func (s *ListOpinionsOKItem) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ListOpinionsOKItem to nil")
+		return errtrace.Wrap(errors.New("invalid: unable to decode ListOpinionsOKItem to nil"))
 	}
 	var requiredBitSet [1]uint8
 
@@ -906,11 +907,11 @@ func (s *ListOpinionsOKItem) Decode(d *jx.Decoder) error {
 				v, err := d.Str()
 				s.OpinionID = string(v)
 				if err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"opinionID\"")
+				return errtrace.Wrap(errors.Wrap(err, "decode field \"opinionID\""))
 			}
 		case "opinionContent":
 			requiredBitSet[0] |= 1 << 1
@@ -918,28 +919,28 @@ func (s *ListOpinionsOKItem) Decode(d *jx.Decoder) error {
 				v, err := d.Str()
 				s.OpinionContent = string(v)
 				if err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"opinionContent\"")
+				return errtrace.Wrap(errors.Wrap(err, "decode field \"opinionContent\""))
 			}
 		case "parentOpinionID":
 			if err := func() error {
 				s.ParentOpinionID.Reset()
 				if err := s.ParentOpinionID.Decode(d); err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"parentOpinionID\"")
+				return errtrace.Wrap(errors.Wrap(err, "decode field \"parentOpinionID\""))
 			}
 		default:
-			return d.Skip()
+			return errtrace.Wrap(d.Skip())
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode ListOpinionsOKItem")
+		return errtrace.Wrap(errors.Wrap(err, "decode ListOpinionsOKItem"))
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
@@ -971,7 +972,7 @@ func (s *ListOpinionsOKItem) Decode(d *jx.Decoder) error {
 		}
 	}
 	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
+		return errtrace.Wrap(&validate.Error{Fields: failures})
 	}
 
 	return nil
@@ -987,7 +988,7 @@ func (s *ListOpinionsOKItem) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *ListOpinionsOKItem) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
-	return s.Decode(d)
+	return errtrace.Wrap(s.Decode(d))
 }
 
 // Encode encodes string as json.
@@ -1001,12 +1002,12 @@ func (o OptString) Encode(e *jx.Encoder) {
 // Decode decodes string from json.
 func (o *OptString) Decode(d *jx.Decoder) error {
 	if o == nil {
-		return errors.New("invalid: unable to decode OptString to nil")
+		return errtrace.Wrap(errors.New("invalid: unable to decode OptString to nil"))
 	}
 	o.Set = true
 	v, err := d.Str()
 	if err != nil {
-		return err
+		return errtrace.Wrap(err)
 	}
 	o.Value = string(v)
 	return nil
@@ -1022,7 +1023,7 @@ func (s OptString) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptString) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
-	return s.Decode(d)
+	return errtrace.Wrap(s.Decode(d))
 }
 
 // Encode implements json.Marshaler.
@@ -1041,16 +1042,16 @@ var jsonFieldsNameOfPostOpinionPostInternalServerError = [0]string{}
 // Decode decodes PostOpinionPostInternalServerError from json.
 func (s *PostOpinionPostInternalServerError) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode PostOpinionPostInternalServerError to nil")
+		return errtrace.Wrap(errors.New("invalid: unable to decode PostOpinionPostInternalServerError to nil"))
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		default:
-			return d.Skip()
+			return errtrace.Wrap(d.Skip())
 		}
 	}); err != nil {
-		return errors.Wrap(err, "decode PostOpinionPostInternalServerError")
+		return errtrace.Wrap(errors.Wrap(err, "decode PostOpinionPostInternalServerError"))
 	}
 
 	return nil
@@ -1066,7 +1067,7 @@ func (s *PostOpinionPostInternalServerError) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *PostOpinionPostInternalServerError) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
-	return s.Decode(d)
+	return errtrace.Wrap(s.Decode(d))
 }
 
 // Encode implements json.Marshaler.
@@ -1085,16 +1086,16 @@ var jsonFieldsNameOfPostOpinionPostOK = [0]string{}
 // Decode decodes PostOpinionPostOK from json.
 func (s *PostOpinionPostOK) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode PostOpinionPostOK to nil")
+		return errtrace.Wrap(errors.New("invalid: unable to decode PostOpinionPostOK to nil"))
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		default:
-			return d.Skip()
+			return errtrace.Wrap(d.Skip())
 		}
 	}); err != nil {
-		return errors.Wrap(err, "decode PostOpinionPostOK")
+		return errtrace.Wrap(errors.Wrap(err, "decode PostOpinionPostOK"))
 	}
 
 	return nil
@@ -1110,7 +1111,7 @@ func (s *PostOpinionPostOK) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *PostOpinionPostOK) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
-	return s.Decode(d)
+	return errtrace.Wrap(s.Decode(d))
 }
 
 // Encode implements json.Marshaler.
@@ -1129,16 +1130,16 @@ var jsonFieldsNameOfRegisterUserBadRequest = [0]string{}
 // Decode decodes RegisterUserBadRequest from json.
 func (s *RegisterUserBadRequest) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode RegisterUserBadRequest to nil")
+		return errtrace.Wrap(errors.New("invalid: unable to decode RegisterUserBadRequest to nil"))
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		default:
-			return d.Skip()
+			return errtrace.Wrap(d.Skip())
 		}
 	}); err != nil {
-		return errors.Wrap(err, "decode RegisterUserBadRequest")
+		return errtrace.Wrap(errors.Wrap(err, "decode RegisterUserBadRequest"))
 	}
 
 	return nil
@@ -1154,7 +1155,7 @@ func (s *RegisterUserBadRequest) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *RegisterUserBadRequest) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
-	return s.Decode(d)
+	return errtrace.Wrap(s.Decode(d))
 }
 
 // Encode implements json.Marshaler.
@@ -1173,16 +1174,16 @@ var jsonFieldsNameOfRegisterUserInternalServerError = [0]string{}
 // Decode decodes RegisterUserInternalServerError from json.
 func (s *RegisterUserInternalServerError) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode RegisterUserInternalServerError to nil")
+		return errtrace.Wrap(errors.New("invalid: unable to decode RegisterUserInternalServerError to nil"))
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		default:
-			return d.Skip()
+			return errtrace.Wrap(d.Skip())
 		}
 	}); err != nil {
-		return errors.Wrap(err, "decode RegisterUserInternalServerError")
+		return errtrace.Wrap(errors.Wrap(err, "decode RegisterUserInternalServerError"))
 	}
 
 	return nil
@@ -1198,7 +1199,7 @@ func (s *RegisterUserInternalServerError) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *RegisterUserInternalServerError) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
-	return s.Decode(d)
+	return errtrace.Wrap(s.Decode(d))
 }
 
 // Encode implements json.Marshaler.
@@ -1228,7 +1229,7 @@ var jsonFieldsNameOfRegisterUserOK = [2]string{
 // Decode decodes RegisterUserOK from json.
 func (s *RegisterUserOK) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode RegisterUserOK to nil")
+		return errtrace.Wrap(errors.New("invalid: unable to decode RegisterUserOK to nil"))
 	}
 	var requiredBitSet [1]uint8
 
@@ -1240,11 +1241,11 @@ func (s *RegisterUserOK) Decode(d *jx.Decoder) error {
 				v, err := d.Str()
 				s.DisplayID = string(v)
 				if err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"displayID\"")
+				return errtrace.Wrap(errors.Wrap(err, "decode field \"displayID\""))
 			}
 		case "displayName":
 			requiredBitSet[0] |= 1 << 1
@@ -1252,18 +1253,18 @@ func (s *RegisterUserOK) Decode(d *jx.Decoder) error {
 				v, err := d.Str()
 				s.DisplayName = string(v)
 				if err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"displayName\"")
+				return errtrace.Wrap(errors.Wrap(err, "decode field \"displayName\""))
 			}
 		default:
-			return d.Skip()
+			return errtrace.Wrap(d.Skip())
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode RegisterUserOK")
+		return errtrace.Wrap(errors.Wrap(err, "decode RegisterUserOK"))
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
@@ -1295,7 +1296,7 @@ func (s *RegisterUserOK) Decode(d *jx.Decoder) error {
 		}
 	}
 	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
+		return errtrace.Wrap(&validate.Error{Fields: failures})
 	}
 
 	return nil
@@ -1311,5 +1312,5 @@ func (s *RegisterUserOK) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *RegisterUserOK) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
-	return s.Decode(d)
+	return errtrace.Wrap(s.Decode(d))
 }

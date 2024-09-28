@@ -68,6 +68,20 @@ func (s *CreateTalkSessionOK) SetTalkSessionStatus(val string) {
 	s.TalkSessionStatus = val
 }
 
+type CreateTalkSessionReq struct {
+	Theme OptString `json:"theme"`
+}
+
+// GetTheme returns the value of Theme.
+func (s *CreateTalkSessionReq) GetTheme() OptString {
+	return s.Theme
+}
+
+// SetTheme sets the value of Theme.
+func (s *CreateTalkSessionReq) SetTheme(val OptString) {
+	s.Theme = val
+}
+
 type EditUserProfileOK struct {
 	DisplayID   string `json:"displayID"`
 	DisplayName string `json:"displayName"`
@@ -274,6 +288,52 @@ func (s *OAuthCallbackFound) SetLocation(val OptURI) {
 // SetSetCookie sets the value of SetCookie.
 func (s *OAuthCallbackFound) SetSetCookie(val OptString) {
 	s.SetCookie = val
+}
+
+// NewOptCreateTalkSessionReq returns new OptCreateTalkSessionReq with value set to v.
+func NewOptCreateTalkSessionReq(v CreateTalkSessionReq) OptCreateTalkSessionReq {
+	return OptCreateTalkSessionReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptCreateTalkSessionReq is optional CreateTalkSessionReq.
+type OptCreateTalkSessionReq struct {
+	Value CreateTalkSessionReq
+	Set   bool
+}
+
+// IsSet returns true if OptCreateTalkSessionReq was set.
+func (o OptCreateTalkSessionReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptCreateTalkSessionReq) Reset() {
+	var v CreateTalkSessionReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptCreateTalkSessionReq) SetTo(v CreateTalkSessionReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptCreateTalkSessionReq) Get() (v CreateTalkSessionReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptCreateTalkSessionReq) Or(d CreateTalkSessionReq) CreateTalkSessionReq {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
 }
 
 // NewOptString returns new OptString with value set to v.

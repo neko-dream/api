@@ -3,7 +3,7 @@
 //   sqlc v1.27.0
 // source: talk_session.sql
 
-package db
+package model
 
 import (
 	"context"
@@ -14,17 +14,23 @@ import (
 )
 
 const createTalkSession = `-- name: CreateTalkSession :exec
-INSERT INTO talk_sessions (talk_session_id, theme, created_at) VALUES ($1, $2, $3)
+INSERT INTO talk_sessions (talk_session_id, theme, owner_id, created_at) VALUES ($1, $2, $3, $4)
 `
 
 type CreateTalkSessionParams struct {
 	TalkSessionID uuid.UUID
 	Theme         string
+	OwnerID       uuid.UUID
 	CreatedAt     time.Time
 }
 
 func (q *Queries) CreateTalkSession(ctx context.Context, arg CreateTalkSessionParams) error {
-	_, err := q.db.ExecContext(ctx, createTalkSession, arg.TalkSessionID, arg.Theme, arg.CreatedAt)
+	_, err := q.db.ExecContext(ctx, createTalkSession,
+		arg.TalkSessionID,
+		arg.Theme,
+		arg.OwnerID,
+		arg.CreatedAt,
+	)
 	return err
 }
 
@@ -44,7 +50,7 @@ func (q *Queries) EditTalkSession(ctx context.Context, arg EditTalkSessionParams
 }
 
 const getTalkSessionByID = `-- name: GetTalkSessionByID :one
-SELECT talk_session_id, theme, finished_at, created_at FROM talk_sessions WHERE talk_session_id = $1
+SELECT talk_session_id, owner_id, theme, finished_at, created_at FROM talk_sessions WHERE talk_session_id = $1
 `
 
 func (q *Queries) GetTalkSessionByID(ctx context.Context, talkSessionID uuid.UUID) (TalkSession, error) {
@@ -52,6 +58,7 @@ func (q *Queries) GetTalkSessionByID(ctx context.Context, talkSessionID uuid.UUI
 	var i TalkSession
 	err := row.Scan(
 		&i.TalkSessionID,
+		&i.OwnerID,
 		&i.Theme,
 		&i.FinishedAt,
 		&i.CreatedAt,

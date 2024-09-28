@@ -1,14 +1,19 @@
 package di
 
 import (
+	"database/sql"
 	"log"
 
+	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/infrastructure/auth"
+	"github.com/neko-dream/server/internal/infrastructure/datasource/postgresql"
 	"github.com/neko-dream/server/internal/infrastructure/datasource/repository"
+	"github.com/neko-dream/server/internal/infrastructure/db"
 	"github.com/neko-dream/server/internal/presentation/handler"
 	"github.com/neko-dream/server/internal/usecase/auth_usecase"
+	talk_session_usecase "github.com/neko-dream/server/internal/usecase/talk_session"
 	"go.uber.org/dig"
 )
 
@@ -22,9 +27,11 @@ func AddProvider(arg ProvideArg) {
 
 func BuildContainer() *dig.Container {
 	deps := []ProvideArg{
-		// {func() *db.Queries { return db.New(postgresql.Connect()) }, nil},
+		{func() *sql.DB { return postgresql.Connect() }, nil},
+		{db.NewDBManager, nil},
 		{repository.NewSessionRepository, nil},
 		{repository.NewUserRepository, nil},
+		{repository.NewTalkSessionRepository, nil},
 
 		{func() session.TokenManager {
 			return auth.NewTokenManager("")
@@ -34,6 +41,7 @@ func BuildContainer() *dig.Container {
 		{service.NewSessionService, nil},
 		{auth_usecase.NewAuthLoginUseCase, nil},
 		{auth_usecase.NewAuthCallbackUseCase, nil},
+		{talk_session_usecase.NewCreateTalkSessionUseCase, nil},
 		{handler.NewSecurityHandler, nil},
 		{handler.NewAuthHandler, nil},
 		{handler.NewUserHandler, nil},
@@ -73,15 +81,15 @@ func Invoke[T any](container *dig.Container, opts ...dig.InvokeOption) T {
 
 // Provide コンテナにコンストラクタを登録する。Invokeされるとここで登録されたコンストラクタが実行される
 func Provide(container *dig.Container, constructor any, opts ...dig.ProvideOption) error {
-	return container.Provide(constructor, opts...)
+	return errtrace.Wrap(container.Provide(constructor, opts...))
 }
 
 // Decorate Provideで登録したコンストラクタを上書きする
 func Decorate(container *dig.Container, constructor any, opts ...dig.DecorateOption) error {
 	if len(opts) >= 0 || opts[0] == nil {
-		return container.Decorate(constructor)
+		return errtrace.Wrap(container.Decorate(constructor))
 	} else {
-		return container.Decorate(constructor, opts...)
+		return errtrace.Wrap(container.Decorate(constructor, opts...))
 	}
 }
 

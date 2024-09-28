@@ -3,7 +3,9 @@ package service
 import (
 	"context"
 	"errors"
+	"time"
 
+	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
@@ -22,12 +24,12 @@ var (
 func (s *sessionService) DeactivateUserSessions(ctx context.Context, userID shared.UUID[user.User]) error {
 	sessions, err := s.sessionRepository.FindByUserID(ctx, userID)
 	if err != nil {
-		return err
+		return errtrace.Wrap(err)
 	}
 
 	for _, sess := range sessions {
 		if err := sess.Deactivate(ctx); err != nil {
-			return err
+			return errtrace.Wrap(err)
 		}
 	}
 
@@ -38,17 +40,17 @@ func (s *sessionService) DeactivateUserSessions(ctx context.Context, userID shar
 func (s *sessionService) RefreshSession(ctx context.Context, sess session.Session) (*session.Session, error) {
 	// sessionが有効期限内であることを確認
 	if !sess.IsActive() {
-		return nil, SessionIsExpired
+		return nil, errtrace.Wrap(SessionIsExpired)
 	}
 
 	if err := sess.Deactivate(ctx); err != nil {
-		return nil, FailedToDeactivateSessionStatus
+		return nil, errtrace.Wrap(FailedToDeactivateSessionStatus)
 	}
 
 	// 最終アクティビティを更新
 	sess.UpdateLastActivity()
 	if _, err := s.sessionRepository.Update(ctx, sess); err != nil {
-		return nil, err
+		return nil, errtrace.Wrap(err)
 	}
 
 	// sessionを更新
@@ -58,10 +60,11 @@ func (s *sessionService) RefreshSession(ctx context.Context, sess session.Sessio
 		sess.Provider(),
 		session.SESSION_ACTIVE,
 		*session.NewExpiresAt(),
+		time.Now(),
 	)
 	updatedSess, err := s.sessionRepository.Create(ctx, *newSess)
 	if err != nil {
-		return nil, SessionRefreshFailed
+		return nil, errtrace.Wrap(SessionRefreshFailed)
 	}
 
 	return updatedSess, nil

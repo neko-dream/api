@@ -4,8 +4,8 @@ import (
 	"context"
 	"os"
 	"sync"
-	"time"
 
+	"braces.dev/errtrace"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -16,21 +16,11 @@ type tokenManager struct {
 	secret string
 }
 
-const (
-	Issuer   = "neko-dream"
-	Audience = "neko-dream"
-)
+func (j *tokenManager) GenerateToken(ctx context.Context, user user.User, sessionID shared.UUID[session.Session]) (string, error) {
 
-func (j *tokenManager) GenerateToken(ctx context.Context, userID shared.UUID[user.User], sessionID shared.UUID[session.Session]) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": userID.String(),
-		"iss": Issuer,
-		"aud": Audience,
-		"exp": time.Now().Add(24 * time.Hour).Unix(),
-		"iat": time.Now().Unix(),
-		"jti": sessionID.String(),
-	})
-	return token.SignedString([]byte(j.secret))
+	claim := session.NewClaim(user, sessionID)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim.GenMapClaim())
+	return errtrace.Wrap2(token.SignedString([]byte(j.secret)))
 }
 
 func (j *tokenManager) ParseToken(ctx context.Context, token string) (*session.Claim, error) {
@@ -38,11 +28,11 @@ func (j *tokenManager) ParseToken(ctx context.Context, token string) (*session.C
 		return []byte(j.secret), nil
 	})
 	if err != nil {
-		return nil, err
+		return nil, errtrace.Wrap(err)
 	}
 	claims, ok := t.Claims.(jwt.MapClaims)
 	if !ok {
-		return nil, jwt.ErrInvalidKeyType
+		return nil, errtrace.Wrap(jwt.ErrInvalidKeyType)
 	}
 	return &session.Claim{
 		Sub: claims["sub"].(string),

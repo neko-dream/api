@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/internal/usecase/auth_usecase"
@@ -34,7 +35,7 @@ func (a *authHandler) AuthLogin(ctx context.Context, params oas.AuthLoginParams)
 		Provider:    params.Provider,
 	})
 	if err != nil {
-		return nil, err
+		return nil, errtrace.Wrap(err)
 	}
 
 	res := new(oas.AuthLoginFound)
@@ -51,7 +52,7 @@ func (a *authHandler) AuthLogin(ctx context.Context, params oas.AuthLoginParams)
 func (a *authHandler) OAuthCallback(ctx context.Context, params oas.OAuthCallbackParams) (*oas.OAuthCallbackFound, error) {
 	if params.CookieState.Value != params.QueryState.Value {
 		res := new(oas.OAuthCallbackFound)
-		return res, messages.InvalidStateError
+		return res, errtrace.Wrap(messages.InvalidStateError)
 	}
 
 	input := auth_usecase.CallbackInput{
@@ -61,7 +62,7 @@ func (a *authHandler) OAuthCallback(ctx context.Context, params oas.OAuthCallbac
 
 	output, err := a.AuthCallbackUseCase.Execute(ctx, input)
 	if err != nil {
-		return nil, err
+		return nil, errtrace.Wrap(err)
 	}
 
 	res := new(oas.OAuthCallbackFound)

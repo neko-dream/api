@@ -11,6 +11,7 @@ import (
 	"github.com/go-faster/errors"
 	"github.com/go-faster/jx"
 
+	"braces.dev/errtrace"
 	"github.com/ogen-go/ogen/conv"
 	"github.com/ogen-go/ogen/ogenerrors"
 	"github.com/ogen-go/ogen/uri"
@@ -36,28 +37,28 @@ func decodeAuthLoginResponse(resp *http.Response) (res *AuthLoginFound, _ error)
 						if err := func() error {
 							val, err := d.DecodeValue()
 							if err != nil {
-								return err
+								return errtrace.Wrap(err)
 							}
 
 							c, err := conv.ToURL(val)
 							if err != nil {
-								return err
+								return errtrace.Wrap(err)
 							}
 
 							wrapperDotLocationVal = c
 							return nil
 						}(); err != nil {
-							return err
+							return errtrace.Wrap(err)
 						}
 						wrapper.Location.SetTo(wrapperDotLocationVal)
 						return nil
 					}); err != nil {
-						return err
+						return errtrace.Wrap(err)
 					}
 				}
 				return nil
 			}(); err != nil {
-				return res, errors.Wrap(err, "parse Location header")
+				return res, errtrace.Wrap(errors.Wrap(err, "parse Location header"))
 			}
 		}
 		// Parse "Set-Cookie" header.
@@ -73,33 +74,33 @@ func decodeAuthLoginResponse(resp *http.Response) (res *AuthLoginFound, _ error)
 						if err := func() error {
 							val, err := d.DecodeValue()
 							if err != nil {
-								return err
+								return errtrace.Wrap(err)
 							}
 
 							c, err := conv.ToString(val)
 							if err != nil {
-								return err
+								return errtrace.Wrap(err)
 							}
 
 							wrapperDotSetCookieVal = c
 							return nil
 						}(); err != nil {
-							return err
+							return errtrace.Wrap(err)
 						}
 						wrapper.SetCookie.SetTo(wrapperDotSetCookieVal)
 						return nil
 					}); err != nil {
-						return err
+						return errtrace.Wrap(err)
 					}
 				}
 				return nil
 			}(); err != nil {
-				return res, errors.Wrap(err, "parse Set-Cookie header")
+				return res, errtrace.Wrap(errors.Wrap(err, "parse Set-Cookie header"))
 			}
 		}
 		return &wrapper, nil
 	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+	return res, errtrace.Wrap(validate.UnexpectedStatusCode(resp.StatusCode))
 }
 
 func decodeCreateTalkSessionResponse(resp *http.Response) (res *CreateTalkSessionOK, _ error) {
@@ -108,23 +109,23 @@ func decodeCreateTalkSessionResponse(resp *http.Response) (res *CreateTalkSessio
 		// Code 200.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
+			return res, errtrace.Wrap(errors.Wrap(err, "parse media type"))
 		}
 		switch {
 		case ct == "application/json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			d := jx.DecodeBytes(buf)
 
 			var response CreateTalkSessionOK
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
+					return errtrace.Wrap(errors.New("unexpected trailing data"))
 				}
 				return nil
 			}(); err != nil {
@@ -133,14 +134,14 @@ func decodeCreateTalkSessionResponse(resp *http.Response) (res *CreateTalkSessio
 					Body:        buf,
 					Err:         err,
 				}
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			return &response, nil
 		default:
-			return res, validate.InvalidContentType(ct)
+			return res, errtrace.Wrap(validate.InvalidContentType(ct))
 		}
 	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+	return res, errtrace.Wrap(validate.UnexpectedStatusCode(resp.StatusCode))
 }
 
 func decodeEditUserProfileResponse(resp *http.Response) (res *EditUserProfileOK, _ error) {
@@ -149,23 +150,23 @@ func decodeEditUserProfileResponse(resp *http.Response) (res *EditUserProfileOK,
 		// Code 200.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
+			return res, errtrace.Wrap(errors.Wrap(err, "parse media type"))
 		}
 		switch {
 		case ct == "application/json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			d := jx.DecodeBytes(buf)
 
 			var response EditUserProfileOK
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
+					return errtrace.Wrap(errors.New("unexpected trailing data"))
 				}
 				return nil
 			}(); err != nil {
@@ -174,14 +175,14 @@ func decodeEditUserProfileResponse(resp *http.Response) (res *EditUserProfileOK,
 					Body:        buf,
 					Err:         err,
 				}
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			return &response, nil
 		default:
-			return res, validate.InvalidContentType(ct)
+			return res, errtrace.Wrap(validate.InvalidContentType(ct))
 		}
 	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+	return res, errtrace.Wrap(validate.UnexpectedStatusCode(resp.StatusCode))
 }
 
 func decodeGetTalkSessionDetailResponse(resp *http.Response) (res *GetTalkSessionDetailOK, _ error) {
@@ -190,23 +191,23 @@ func decodeGetTalkSessionDetailResponse(resp *http.Response) (res *GetTalkSessio
 		// Code 200.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
+			return res, errtrace.Wrap(errors.Wrap(err, "parse media type"))
 		}
 		switch {
 		case ct == "application/json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			d := jx.DecodeBytes(buf)
 
 			var response GetTalkSessionDetailOK
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
+					return errtrace.Wrap(errors.New("unexpected trailing data"))
 				}
 				return nil
 			}(); err != nil {
@@ -215,14 +216,14 @@ func decodeGetTalkSessionDetailResponse(resp *http.Response) (res *GetTalkSessio
 					Body:        buf,
 					Err:         err,
 				}
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			return &response, nil
 		default:
-			return res, validate.InvalidContentType(ct)
+			return res, errtrace.Wrap(validate.InvalidContentType(ct))
 		}
 	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+	return res, errtrace.Wrap(validate.UnexpectedStatusCode(resp.StatusCode))
 }
 
 func decodeGetTalkSessionsResponse(resp *http.Response) (res *GetTalkSessionsOK, _ error) {
@@ -231,23 +232,23 @@ func decodeGetTalkSessionsResponse(resp *http.Response) (res *GetTalkSessionsOK,
 		// Code 200.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
+			return res, errtrace.Wrap(errors.Wrap(err, "parse media type"))
 		}
 		switch {
 		case ct == "application/json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			d := jx.DecodeBytes(buf)
 
 			var response GetTalkSessionsOK
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
+					return errtrace.Wrap(errors.New("unexpected trailing data"))
 				}
 				return nil
 			}(); err != nil {
@@ -256,14 +257,14 @@ func decodeGetTalkSessionsResponse(resp *http.Response) (res *GetTalkSessionsOK,
 					Body:        buf,
 					Err:         err,
 				}
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			return &response, nil
 		default:
-			return res, validate.InvalidContentType(ct)
+			return res, errtrace.Wrap(validate.InvalidContentType(ct))
 		}
 	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+	return res, errtrace.Wrap(validate.UnexpectedStatusCode(resp.StatusCode))
 }
 
 func decodeGetUserProfileResponse(resp *http.Response) (res *GetUserProfileOK, _ error) {
@@ -272,23 +273,23 @@ func decodeGetUserProfileResponse(resp *http.Response) (res *GetUserProfileOK, _
 		// Code 200.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
+			return res, errtrace.Wrap(errors.Wrap(err, "parse media type"))
 		}
 		switch {
 		case ct == "application/json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			d := jx.DecodeBytes(buf)
 
 			var response GetUserProfileOK
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
+					return errtrace.Wrap(errors.New("unexpected trailing data"))
 				}
 				return nil
 			}(); err != nil {
@@ -297,14 +298,14 @@ func decodeGetUserProfileResponse(resp *http.Response) (res *GetUserProfileOK, _
 					Body:        buf,
 					Err:         err,
 				}
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			return &response, nil
 		default:
-			return res, validate.InvalidContentType(ct)
+			return res, errtrace.Wrap(validate.InvalidContentType(ct))
 		}
 	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+	return res, errtrace.Wrap(validate.UnexpectedStatusCode(resp.StatusCode))
 }
 
 func decodeIndicateIntentionResponse(resp *http.Response) (res IndicateIntentionRes, _ error) {
@@ -313,23 +314,23 @@ func decodeIndicateIntentionResponse(resp *http.Response) (res IndicateIntention
 		// Code 200.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
+			return res, errtrace.Wrap(errors.Wrap(err, "parse media type"))
 		}
 		switch {
 		case ct == "application/json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			d := jx.DecodeBytes(buf)
 
 			var response IndicateIntentionOKApplicationJSON
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
+					return errtrace.Wrap(errors.New("unexpected trailing data"))
 				}
 				return nil
 			}(); err != nil {
@@ -338,42 +339,42 @@ func decodeIndicateIntentionResponse(resp *http.Response) (res IndicateIntention
 					Body:        buf,
 					Err:         err,
 				}
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			// Validate response.
 			if err := func() error {
 				if err := response.Validate(); err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				return nil
 			}(); err != nil {
-				return res, errors.Wrap(err, "validate")
+				return res, errtrace.Wrap(errors.Wrap(err, "validate"))
 			}
 			return &response, nil
 		default:
-			return res, validate.InvalidContentType(ct)
+			return res, errtrace.Wrap(validate.InvalidContentType(ct))
 		}
 	case 500:
 		// Code 500.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
+			return res, errtrace.Wrap(errors.Wrap(err, "parse media type"))
 		}
 		switch {
 		case ct == "application/json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			d := jx.DecodeBytes(buf)
 
 			var response IndicateIntentionInternalServerError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
+					return errtrace.Wrap(errors.New("unexpected trailing data"))
 				}
 				return nil
 			}(); err != nil {
@@ -382,14 +383,14 @@ func decodeIndicateIntentionResponse(resp *http.Response) (res IndicateIntention
 					Body:        buf,
 					Err:         err,
 				}
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			return &response, nil
 		default:
-			return res, validate.InvalidContentType(ct)
+			return res, errtrace.Wrap(validate.InvalidContentType(ct))
 		}
 	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+	return res, errtrace.Wrap(validate.UnexpectedStatusCode(resp.StatusCode))
 }
 
 func decodeListOpinionsResponse(resp *http.Response) (res ListOpinionsRes, _ error) {
@@ -398,23 +399,23 @@ func decodeListOpinionsResponse(resp *http.Response) (res ListOpinionsRes, _ err
 		// Code 200.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
+			return res, errtrace.Wrap(errors.Wrap(err, "parse media type"))
 		}
 		switch {
 		case ct == "application/json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			d := jx.DecodeBytes(buf)
 
 			var response ListOpinionsOKApplicationJSON
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
+					return errtrace.Wrap(errors.New("unexpected trailing data"))
 				}
 				return nil
 			}(); err != nil {
@@ -423,42 +424,42 @@ func decodeListOpinionsResponse(resp *http.Response) (res ListOpinionsRes, _ err
 					Body:        buf,
 					Err:         err,
 				}
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			// Validate response.
 			if err := func() error {
 				if err := response.Validate(); err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				return nil
 			}(); err != nil {
-				return res, errors.Wrap(err, "validate")
+				return res, errtrace.Wrap(errors.Wrap(err, "validate"))
 			}
 			return &response, nil
 		default:
-			return res, validate.InvalidContentType(ct)
+			return res, errtrace.Wrap(validate.InvalidContentType(ct))
 		}
 	case 500:
 		// Code 500.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
+			return res, errtrace.Wrap(errors.Wrap(err, "parse media type"))
 		}
 		switch {
 		case ct == "application/json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			d := jx.DecodeBytes(buf)
 
 			var response ListOpinionsInternalServerError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
+					return errtrace.Wrap(errors.New("unexpected trailing data"))
 				}
 				return nil
 			}(); err != nil {
@@ -467,14 +468,14 @@ func decodeListOpinionsResponse(resp *http.Response) (res ListOpinionsRes, _ err
 					Body:        buf,
 					Err:         err,
 				}
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			return &response, nil
 		default:
-			return res, validate.InvalidContentType(ct)
+			return res, errtrace.Wrap(validate.InvalidContentType(ct))
 		}
 	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+	return res, errtrace.Wrap(validate.UnexpectedStatusCode(resp.StatusCode))
 }
 
 func decodeOAuthCallbackResponse(resp *http.Response) (res *OAuthCallbackFound, _ error) {
@@ -496,28 +497,28 @@ func decodeOAuthCallbackResponse(resp *http.Response) (res *OAuthCallbackFound, 
 						if err := func() error {
 							val, err := d.DecodeValue()
 							if err != nil {
-								return err
+								return errtrace.Wrap(err)
 							}
 
 							c, err := conv.ToURL(val)
 							if err != nil {
-								return err
+								return errtrace.Wrap(err)
 							}
 
 							wrapperDotLocationVal = c
 							return nil
 						}(); err != nil {
-							return err
+							return errtrace.Wrap(err)
 						}
 						wrapper.Location.SetTo(wrapperDotLocationVal)
 						return nil
 					}); err != nil {
-						return err
+						return errtrace.Wrap(err)
 					}
 				}
 				return nil
 			}(); err != nil {
-				return res, errors.Wrap(err, "parse Location header")
+				return res, errtrace.Wrap(errors.Wrap(err, "parse Location header"))
 			}
 		}
 		// Parse "Set-Cookie" header.
@@ -533,33 +534,33 @@ func decodeOAuthCallbackResponse(resp *http.Response) (res *OAuthCallbackFound, 
 						if err := func() error {
 							val, err := d.DecodeValue()
 							if err != nil {
-								return err
+								return errtrace.Wrap(err)
 							}
 
 							c, err := conv.ToString(val)
 							if err != nil {
-								return err
+								return errtrace.Wrap(err)
 							}
 
 							wrapperDotSetCookieVal = c
 							return nil
 						}(); err != nil {
-							return err
+							return errtrace.Wrap(err)
 						}
 						wrapper.SetCookie.SetTo(wrapperDotSetCookieVal)
 						return nil
 					}); err != nil {
-						return err
+						return errtrace.Wrap(err)
 					}
 				}
 				return nil
 			}(); err != nil {
-				return res, errors.Wrap(err, "parse Set-Cookie header")
+				return res, errtrace.Wrap(errors.Wrap(err, "parse Set-Cookie header"))
 			}
 		}
 		return &wrapper, nil
 	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+	return res, errtrace.Wrap(validate.UnexpectedStatusCode(resp.StatusCode))
 }
 
 func decodePostOpinionPostResponse(resp *http.Response) (res PostOpinionPostRes, _ error) {
@@ -568,23 +569,23 @@ func decodePostOpinionPostResponse(resp *http.Response) (res PostOpinionPostRes,
 		// Code 200.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
+			return res, errtrace.Wrap(errors.Wrap(err, "parse media type"))
 		}
 		switch {
 		case ct == "application/json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			d := jx.DecodeBytes(buf)
 
 			var response PostOpinionPostOK
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
+					return errtrace.Wrap(errors.New("unexpected trailing data"))
 				}
 				return nil
 			}(); err != nil {
@@ -593,33 +594,33 @@ func decodePostOpinionPostResponse(resp *http.Response) (res PostOpinionPostRes,
 					Body:        buf,
 					Err:         err,
 				}
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			return &response, nil
 		default:
-			return res, validate.InvalidContentType(ct)
+			return res, errtrace.Wrap(validate.InvalidContentType(ct))
 		}
 	case 500:
 		// Code 500.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
+			return res, errtrace.Wrap(errors.Wrap(err, "parse media type"))
 		}
 		switch {
 		case ct == "application/json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			d := jx.DecodeBytes(buf)
 
 			var response PostOpinionPostInternalServerError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
+					return errtrace.Wrap(errors.New("unexpected trailing data"))
 				}
 				return nil
 			}(); err != nil {
@@ -628,14 +629,14 @@ func decodePostOpinionPostResponse(resp *http.Response) (res PostOpinionPostRes,
 					Body:        buf,
 					Err:         err,
 				}
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			return &response, nil
 		default:
-			return res, validate.InvalidContentType(ct)
+			return res, errtrace.Wrap(validate.InvalidContentType(ct))
 		}
 	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+	return res, errtrace.Wrap(validate.UnexpectedStatusCode(resp.StatusCode))
 }
 
 func decodeRegisterUserResponse(resp *http.Response) (res RegisterUserRes, _ error) {
@@ -644,23 +645,23 @@ func decodeRegisterUserResponse(resp *http.Response) (res RegisterUserRes, _ err
 		// Code 200.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
+			return res, errtrace.Wrap(errors.Wrap(err, "parse media type"))
 		}
 		switch {
 		case ct == "application/json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			d := jx.DecodeBytes(buf)
 
 			var response RegisterUserOK
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
+					return errtrace.Wrap(errors.New("unexpected trailing data"))
 				}
 				return nil
 			}(); err != nil {
@@ -669,33 +670,33 @@ func decodeRegisterUserResponse(resp *http.Response) (res RegisterUserRes, _ err
 					Body:        buf,
 					Err:         err,
 				}
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			return &response, nil
 		default:
-			return res, validate.InvalidContentType(ct)
+			return res, errtrace.Wrap(validate.InvalidContentType(ct))
 		}
 	case 400:
 		// Code 400.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
+			return res, errtrace.Wrap(errors.Wrap(err, "parse media type"))
 		}
 		switch {
 		case ct == "application/json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			d := jx.DecodeBytes(buf)
 
 			var response RegisterUserBadRequest
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
+					return errtrace.Wrap(errors.New("unexpected trailing data"))
 				}
 				return nil
 			}(); err != nil {
@@ -704,33 +705,33 @@ func decodeRegisterUserResponse(resp *http.Response) (res RegisterUserRes, _ err
 					Body:        buf,
 					Err:         err,
 				}
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			return &response, nil
 		default:
-			return res, validate.InvalidContentType(ct)
+			return res, errtrace.Wrap(validate.InvalidContentType(ct))
 		}
 	case 500:
 		// Code 500.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
+			return res, errtrace.Wrap(errors.Wrap(err, "parse media type"))
 		}
 		switch {
 		case ct == "application/json":
 			buf, err := io.ReadAll(resp.Body)
 			if err != nil {
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			d := jx.DecodeBytes(buf)
 
 			var response RegisterUserInternalServerError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
-					return err
+					return errtrace.Wrap(err)
 				}
 				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
+					return errtrace.Wrap(errors.New("unexpected trailing data"))
 				}
 				return nil
 			}(); err != nil {
@@ -739,12 +740,12 @@ func decodeRegisterUserResponse(resp *http.Response) (res RegisterUserRes, _ err
 					Body:        buf,
 					Err:         err,
 				}
-				return res, err
+				return res, errtrace.Wrap(err)
 			}
 			return &response, nil
 		default:
-			return res, validate.InvalidContentType(ct)
+			return res, errtrace.Wrap(validate.InvalidContentType(ct))
 		}
 	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+	return res, errtrace.Wrap(validate.UnexpectedStatusCode(resp.StatusCode))
 }

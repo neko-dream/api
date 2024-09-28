@@ -1,6 +1,7 @@
 package shared
 
 import "github.com/google/uuid"
+import "braces.dev/errtrace"
 
 type UUID[T any] uuid.UUID
 
@@ -23,5 +24,5 @@ func MustParseUUID[T any](s string) UUID[T] {
 
 func ParseUUID[T any](s string) (UUID[T], error) {
 	u, err := uuid.Parse(s)
-	return UUID[T](u), err
+	return UUID[T](u), errtrace.Wrap(err)
 }

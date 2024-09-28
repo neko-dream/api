@@ -5,6 +5,7 @@ package oas
 import (
 	"context"
 
+	"braces.dev/errtrace"
 	ht "github.com/ogen-go/ogen/http"
 )
 
@@ -19,7 +20,7 @@ var _ Handler = UnimplementedHandler{}
 //
 // GET /auth/{provider}/login
 func (UnimplementedHandler) AuthLogin(ctx context.Context, params AuthLoginParams) (r *AuthLoginFound, _ error) {
-	return r, ht.ErrNotImplemented
+	return r, errtrace.Wrap(ht.ErrNotImplemented)
 }
 
 // CreateTalkSession implements createTalkSession operation.
@@ -27,8 +28,8 @@ func (UnimplementedHandler) AuthLogin(ctx context.Context, params AuthLoginParam
 // トークセッション作成.
 //
 // POST /api/talksessions
-func (UnimplementedHandler) CreateTalkSession(ctx context.Context) (r *CreateTalkSessionOK, _ error) {
-	return r, ht.ErrNotImplemented
+func (UnimplementedHandler) CreateTalkSession(ctx context.Context, req OptCreateTalkSessionReq) (r *CreateTalkSessionOK, _ error) {
+	return r, errtrace.Wrap(ht.ErrNotImplemented)
 }
 
 // EditUserProfile implements editUserProfile operation.
@@ -37,7 +38,7 @@ func (UnimplementedHandler) CreateTalkSession(ctx context.Context) (r *CreateTal
 //
 // PUT /api/user
 func (UnimplementedHandler) EditUserProfile(ctx context.Context) (r *EditUserProfileOK, _ error) {
-	return r, ht.ErrNotImplemented
+	return r, errtrace.Wrap(ht.ErrNotImplemented)
 }
 
 // GetTalkSessionDetail implements getTalkSessionDetail operation.
@@ -46,7 +47,7 @@ func (UnimplementedHandler) EditUserProfile(ctx context.Context) (r *EditUserPro
 //
 // GET /api/talksessions/{talkSessionId}
 func (UnimplementedHandler) GetTalkSessionDetail(ctx context.Context, params GetTalkSessionDetailParams) (r *GetTalkSessionDetailOK, _ error) {
-	return r, ht.ErrNotImplemented
+	return r, errtrace.Wrap(ht.ErrNotImplemented)
 }
 
 // GetTalkSessions implements getTalkSessions operation.
@@ -55,7 +56,7 @@ func (UnimplementedHandler) GetTalkSessionDetail(ctx context.Context, params Get
 //
 // GET /api/talksessions
 func (UnimplementedHandler) GetTalkSessions(ctx context.Context) error {
-	return ht.ErrNotImplemented
+	return errtrace.Wrap(ht.ErrNotImplemented)
 }
 
 // GetUserProfile implements getUserProfile operation.
@@ -64,7 +65,7 @@ func (UnimplementedHandler) GetTalkSessions(ctx context.Context) error {
 //
 // GET /api/user
 func (UnimplementedHandler) GetUserProfile(ctx context.Context) (r *GetUserProfileOK, _ error) {
-	return r, ht.ErrNotImplemented
+	return r, errtrace.Wrap(ht.ErrNotImplemented)
 }
 
 // IndicateIntention implements indicateIntention operation.
@@ -73,7 +74,7 @@ func (UnimplementedHandler) GetUserProfile(ctx context.Context) (r *GetUserProfi
 //
 // POST /api/talksessions/{talkSessionID}/opinions/{opinionID}/intentions
 func (UnimplementedHandler) IndicateIntention(ctx context.Context, params IndicateIntentionParams) (r IndicateIntentionRes, _ error) {
-	return r, ht.ErrNotImplemented
+	return r, errtrace.Wrap(ht.ErrNotImplemented)
 }
 
 // ListOpinions implements listOpinions operation.
@@ -82,7 +83,7 @@ func (UnimplementedHandler) IndicateIntention(ctx context.Context, params Indica
 //
 // GET /api/talksession/{talkSessionID}/opinions
 func (UnimplementedHandler) ListOpinions(ctx context.Context, params ListOpinionsParams) (r ListOpinionsRes, _ error) {
-	return r, ht.ErrNotImplemented
+	return r, errtrace.Wrap(ht.ErrNotImplemented)
 }
 
 // OAuthCallback implements oauth_callback operation.
@@ -91,7 +92,7 @@ func (UnimplementedHandler) ListOpinions(ctx context.Context, params ListOpinion
 //
 // GET /auth/{provider}/callback
 func (UnimplementedHandler) OAuthCallback(ctx context.Context, params OAuthCallbackParams) (r *OAuthCallbackFound, _ error) {
-	return r, ht.ErrNotImplemented
+	return r, errtrace.Wrap(ht.ErrNotImplemented)
 }
 
 // PostOpinionPost implements postOpinionPost operation.
@@ -100,7 +101,7 @@ func (UnimplementedHandler) OAuthCallback(ctx context.Context, params OAuthCallb
 //
 // POST /api/talksessions/{talkSessionID}/opinions
 func (UnimplementedHandler) PostOpinionPost(ctx context.Context, params PostOpinionPostParams) (r PostOpinionPostRes, _ error) {
-	return r, ht.ErrNotImplemented
+	return r, errtrace.Wrap(ht.ErrNotImplemented)
 }
 
 // RegisterUser implements registerUser operation.
@@ -109,5 +110,5 @@ func (UnimplementedHandler) PostOpinionPost(ctx context.Context, params PostOpin
 //
 // POST /api/user
 func (UnimplementedHandler) RegisterUser(ctx context.Context, params RegisterUserParams) (r RegisterUserRes, _ error) {
-	return r, ht.ErrNotImplemented
+	return r, errtrace.Wrap(ht.ErrNotImplemented)
 }

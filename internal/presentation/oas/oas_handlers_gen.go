@@ -14,6 +14,7 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 	"go.opentelemetry.io/otel/trace"
 
+	"braces.dev/errtrace"
 	ht "github.com/ogen-go/ogen/http"
 	"github.com/ogen-go/ogen/middleware"
 	"github.com/ogen-go/ogen/ogenerrors"
@@ -115,7 +116,7 @@ func (s *Server) handleAuthLoginRequest(args [1]string, argsEscaped bool, w http
 			unpackAuthLoginParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
 				response, err = s.h.AuthLogin(ctx, params)
-				return response, err
+				return response, errtrace.Wrap(err)
 			},
 		)
 	} else {
@@ -178,8 +179,27 @@ func (s *Server) handleCreateTalkSessionRequest(args [0]string, argsEscaped bool
 			span.SetStatus(codes.Error, stage)
 			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
 		}
-		err error
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "CreateTalkSession",
+			ID:   "createTalkSession",
+		}
 	)
+	request, close, err := s.decodeCreateTalkSessionRequest(r)
+	if err != nil {
+		err = &ogenerrors.DecodeRequestError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		defer recordError("DecodeRequest", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	defer func() {
+		if err := close(); err != nil {
+			recordError("CloseRequest", err)
+		}
+	}()
 
 	var response *CreateTalkSessionOK
 	if m := s.cfg.Middleware; m != nil {
@@ -188,13 +208,13 @@ func (s *Server) handleCreateTalkSessionRequest(args [0]string, argsEscaped bool
 			OperationName:    "CreateTalkSession",
 			OperationSummary: "トークセッション作成",
 			OperationID:      "createTalkSession",
-			Body:             nil,
+			Body:             request,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
 
 		type (
-			Request  = struct{}
+			Request  = OptCreateTalkSessionReq
 			Params   = struct{}
 			Response = *CreateTalkSessionOK
 		)
@@ -207,12 +227,12 @@ func (s *Server) handleCreateTalkSessionRequest(args [0]string, argsEscaped bool
 			mreq,
 			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.CreateTalkSession(ctx)
-				return response, err
+				response, err = s.h.CreateTalkSession(ctx, request)
+				return response, errtrace.Wrap(err)
 			},
 		)
 	} else {
-		response, err = s.h.CreateTalkSession(ctx)
+		response, err = s.h.CreateTalkSession(ctx, request)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -301,7 +321,7 @@ func (s *Server) handleEditUserProfileRequest(args [0]string, argsEscaped bool, 
 			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
 				response, err = s.h.EditUserProfile(ctx)
-				return response, err
+				return response, errtrace.Wrap(err)
 			},
 		)
 	} else {
@@ -413,7 +433,7 @@ func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped b
 			unpackGetTalkSessionDetailParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
 				response, err = s.h.GetTalkSessionDetail(ctx, params)
-				return response, err
+				return response, errtrace.Wrap(err)
 			},
 		)
 	} else {
@@ -506,7 +526,7 @@ func (s *Server) handleGetTalkSessionsRequest(args [0]string, argsEscaped bool, 
 			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
 				err = s.h.GetTalkSessions(ctx)
-				return response, err
+				return response, errtrace.Wrap(err)
 			},
 		)
 	} else {
@@ -599,7 +619,7 @@ func (s *Server) handleGetUserProfileRequest(args [0]string, argsEscaped bool, w
 			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
 				response, err = s.h.GetUserProfile(ctx)
-				return response, err
+				return response, errtrace.Wrap(err)
 			},
 		)
 	} else {
@@ -715,7 +735,7 @@ func (s *Server) handleIndicateIntentionRequest(args [2]string, argsEscaped bool
 			unpackIndicateIntentionParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
 				response, err = s.h.IndicateIntention(ctx, params)
-				return response, err
+				return response, errtrace.Wrap(err)
 			},
 		)
 	} else {
@@ -831,7 +851,7 @@ func (s *Server) handleListOpinionsRequest(args [1]string, argsEscaped bool, w h
 			unpackListOpinionsParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
 				response, err = s.h.ListOpinions(ctx, params)
-				return response, err
+				return response, errtrace.Wrap(err)
 			},
 		)
 	} else {
@@ -959,7 +979,7 @@ func (s *Server) handleOAuthCallbackRequest(args [1]string, argsEscaped bool, w 
 			unpackOAuthCallbackParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
 				response, err = s.h.OAuthCallback(ctx, params)
-				return response, err
+				return response, errtrace.Wrap(err)
 			},
 		)
 	} else {
@@ -1075,7 +1095,7 @@ func (s *Server) handlePostOpinionPostRequest(args [1]string, argsEscaped bool, 
 			unpackPostOpinionPostParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
 				response, err = s.h.PostOpinionPost(ctx, params)
-				return response, err
+				return response, errtrace.Wrap(err)
 			},
 		)
 	} else {
@@ -1235,7 +1255,7 @@ func (s *Server) handleRegisterUserRequest(args [0]string, argsEscaped bool, w h
 			unpackRegisterUserParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
 				response, err = s.h.RegisterUser(ctx, params)
-				return response, err
+				return response, errtrace.Wrap(err)
 			},
 		)
 	} else {

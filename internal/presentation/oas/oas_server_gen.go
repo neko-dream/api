@@ -3,6 +3,7 @@
 package oas
 
 import (
+	"braces.dev/errtrace"
 	"context"
 )
 
@@ -72,7 +73,7 @@ type TalkSessionHandler interface {
 	// トークセッション作成.
 	//
 	// POST /api/talksessions
-	CreateTalkSession(ctx context.Context) (*CreateTalkSessionOK, error)
+	CreateTalkSession(ctx context.Context, req OptCreateTalkSessionReq) (*CreateTalkSessionOK, error)
 	// GetTalkSessionDetail implements getTalkSessionDetail operation.
 	//
 	// トークセッションの詳細.
@@ -123,7 +124,7 @@ type Server struct {
 func NewServer(h Handler, sec SecurityHandler, opts ...ServerOption) (*Server, error) {
 	s, err := newServerConfig(opts...).baseServer()
 	if err != nil {
-		return nil, err
+		return nil, errtrace.Wrap(err)
 	}
 	return &Server{
 		h:          h,

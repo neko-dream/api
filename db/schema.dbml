@@ -1,35 +1,29 @@
 // Use DBML to define your database structure
 // Docs: https://dbml.dbdiagram.io/docs
 
-// 認証コンテキスト
-Enum AuthProvider {
-    GOOGLE
-}
 
 Table user_auths {
     user_id uuid [ref: > users.user_id]
-    provider AuthProvider [not null]
+    provider varchar [not null]
     subject varchar [not null]
     created_at timestamp [not null, default: `now()`]
 }
 
 Table sessions {
     session_id uuid [primary key]
-    user_id uuid [ref: > users.user_id]
-    provider AuthProvider [not null]
-    session_status session_status [not null]
+    user_id uuid [not null, ref: > users.user_id]
+    provider varchar [not null]
+    session_status int [not null]
+    expires_at timestamp [not null]
     created_at timestamp [not null, default: `now()`]
-}
-
-Enum session_status {
-    ACTIVE
-    INACTIVE
+    last_activity_at timestamp [not null, default: `now()`]
 }
 
 Table users {
     user_id uuid [primary key]
     display_id varchar [not null]
     display_name varchar [not null]
+    picture varchar
     created_at timestamp [not null, default: `now()`]
 
     indexes {
@@ -39,7 +33,10 @@ Table users {
 
 Table talk_sessions {
     talk_session_id uuid [primary key]
+    owner_id uuid [not null, ref: > users.user_id]
+
     theme varchar [not null]
+
     finished_at timestamp
     created_at timestamp [not null, default: `now()`]
 

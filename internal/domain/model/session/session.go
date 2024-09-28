@@ -9,16 +9,24 @@ import (
 	"github.com/neko-dream/server/pkg/oauth"
 )
 
-type status string
+type status int
 
 const (
-	SESSION_ACTIVE   status = "ACTIVE"
-	SESSION_INACTIVE status = "INACTIVE"
+	SESSION_ACTIVE status = iota
+	SESSION_INACTIVE
 )
 
-func NewSessionStatusStr(str string) *status {
-	s := status(str)
-	return &s
+func NewSessionStatus(num int) *status {
+	switch num {
+	case 0:
+		s := SESSION_ACTIVE
+		return &s
+	case 1:
+		s := SESSION_INACTIVE
+		return &s
+	default:
+		return nil
+	}
 }
 
 type expiresAt = time.Time
@@ -58,6 +66,7 @@ func NewSession(
 	authProvider oauth.AuthProviderName,
 	status status,
 	expires time.Time,
+	lastActivity time.Time,
 ) *Session {
 	return &Session{
 		sessionID:    sessionID,
@@ -65,7 +74,7 @@ func NewSession(
 		authProvider: authProvider,
 		status:       status,
 		expires:      expires,
-		lastActivity: time.Now(),
+		lastActivity: lastActivity,
 	}
 }
 
@@ -81,13 +90,25 @@ func (s *Session) Provider() oauth.AuthProviderName {
 	return s.authProvider
 }
 
+func (s *Session) Status() status {
+	return s.status
+}
+
 func (s *Session) IsActive() bool {
 	return s.expires.After(time.Now())
 }
 
 func (s *Session) Deactivate(ctx context.Context) error {
-	s.status = *NewSessionStatusStr("INACTIVE")
+	s.status = SESSION_INACTIVE
 	return nil
+}
+
+func (s *Session) ExpiresAt() time.Time {
+	return s.expires
+}
+
+func (s *Session) LastActivityAt() time.Time {
+	return s.lastActivity
 }
 
 func (s *Session) UpdateLastActivity() {

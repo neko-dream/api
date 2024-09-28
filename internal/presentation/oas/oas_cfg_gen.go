@@ -9,6 +9,7 @@ import (
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 
+	"braces.dev/errtrace"
 	ht "github.com/ogen-go/ogen/http"
 	"github.com/ogen-go/ogen/middleware"
 	"github.com/ogen-go/ogen/ogenerrors"
@@ -122,13 +123,13 @@ func (s baseServer) notAllowed(w http.ResponseWriter, r *http.Request, allowed s
 func (cfg serverConfig) baseServer() (s baseServer, err error) {
 	s = baseServer{cfg: cfg}
 	if s.requests, err = otelogen.ServerRequestCountCounter(s.cfg.Meter); err != nil {
-		return s, err
+		return s, errtrace.Wrap(err)
 	}
 	if s.errors, err = otelogen.ServerErrorsCountCounter(s.cfg.Meter); err != nil {
-		return s, err
+		return s, errtrace.Wrap(err)
 	}
 	if s.duration, err = otelogen.ServerDurationHistogram(s.cfg.Meter); err != nil {
-		return s, err
+		return s, errtrace.Wrap(err)
 	}
 	return s, nil
 }
@@ -176,13 +177,13 @@ type baseClient struct {
 func (cfg clientConfig) baseClient() (c baseClient, err error) {
 	c = baseClient{cfg: cfg}
 	if c.requests, err = otelogen.ClientRequestCountCounter(c.cfg.Meter); err != nil {
-		return c, err
+		return c, errtrace.Wrap(err)
 	}
 	if c.errors, err = otelogen.ClientErrorsCountCounter(c.cfg.Meter); err != nil {
-		return c, err
+		return c, errtrace.Wrap(err)
 	}
 	if c.duration, err = otelogen.ClientDurationHistogram(c.cfg.Meter); err != nil {
-		return c, err
+		return c, errtrace.Wrap(err)
 	}
 	return c, nil
 }

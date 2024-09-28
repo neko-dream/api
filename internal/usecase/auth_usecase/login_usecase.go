@@ -5,7 +5,9 @@ import (
 	"net/http"
 	"net/url"
 
+	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/auth"
+	"github.com/neko-dream/server/internal/infrastructure/db"
 )
 
 type (
@@ -24,19 +26,33 @@ type (
 	}
 
 	authLoginInteractor struct {
+		*db.DBManager
 		auth.AuthService
 	}
 )
 
 func (a *authLoginInteractor) Execute(ctx context.Context, input AuthLoginInput) (AuthLoginOutput, error) {
-	authUrl, state, err := a.AuthService.GetAuthURL(ctx, input.Provider)
-	if err != nil {
-		return AuthLoginOutput{}, err
+	var (
+		s  string
+		au *url.URL
+	)
+
+	if err := a.ExecTx(ctx, func(ctx context.Context) error {
+		authURL, state, err := a.AuthService.GetAuthURL(ctx, input.Provider)
+		if err != nil {
+			return errtrace.Wrap(err)
+		}
+
+		s = state
+		au = authURL
+		return nil
+	}); err != nil {
+		return AuthLoginOutput{}, errtrace.Wrap(err)
 	}
 
 	stateCookie := http.Cookie{
 		Name:     "state",
-		Value:    state,
+		Value:    s,
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
 		Domain:   "localhost",
@@ -50,15 +66,17 @@ func (a *authLoginInteractor) Execute(ctx context.Context, input AuthLoginInput)
 	}
 
 	return AuthLoginOutput{
-		RedirectURL: authUrl,
+		RedirectURL: au,
 		Cookies:     []*http.Cookie{&stateCookie, &redirectURLCookie},
 	}, nil
 }
 
 func NewAuthLoginUseCase(
+	tm *db.DBManager,
 	authService auth.AuthService,
 ) AuthLoginUseCase {
 	return &authLoginInteractor{
+		DBManager:   tm,
 		AuthService: authService,
 	}
 }

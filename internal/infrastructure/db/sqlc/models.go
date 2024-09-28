@@ -2,99 +2,14 @@
 // versions:
 //   sqlc v1.27.0
 
-package db
+package model
 
 import (
 	"database/sql"
-	"database/sql/driver"
-	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 )
-
-type AuthProvider string
-
-const (
-	AuthProviderGOOGLE AuthProvider = "GOOGLE"
-)
-
-func (e *AuthProvider) Scan(src interface{}) error {
-	switch s := src.(type) {
-	case []byte:
-		*e = AuthProvider(s)
-	case string:
-		*e = AuthProvider(s)
-	default:
-		return fmt.Errorf("unsupported scan type for AuthProvider: %T", src)
-	}
-	return nil
-}
-
-type NullAuthProvider struct {
-	AuthProvider AuthProvider
-	Valid        bool // Valid is true if AuthProvider is not NULL
-}
-
-// Scan implements the Scanner interface.
-func (ns *NullAuthProvider) Scan(value interface{}) error {
-	if value == nil {
-		ns.AuthProvider, ns.Valid = "", false
-		return nil
-	}
-	ns.Valid = true
-	return ns.AuthProvider.Scan(value)
-}
-
-// Value implements the driver Valuer interface.
-func (ns NullAuthProvider) Value() (driver.Value, error) {
-	if !ns.Valid {
-		return nil, nil
-	}
-	return string(ns.AuthProvider), nil
-}
-
-type SessionStatus string
-
-const (
-	SessionStatusACTIVE   SessionStatus = "ACTIVE"
-	SessionStatusINACTIVE SessionStatus = "INACTIVE"
-)
-
-func (e *SessionStatus) Scan(src interface{}) error {
-	switch s := src.(type) {
-	case []byte:
-		*e = SessionStatus(s)
-	case string:
-		*e = SessionStatus(s)
-	default:
-		return fmt.Errorf("unsupported scan type for SessionStatus: %T", src)
-	}
-	return nil
-}
-
-type NullSessionStatus struct {
-	SessionStatus SessionStatus
-	Valid         bool // Valid is true if SessionStatus is not NULL
-}
-
-// Scan implements the Scanner interface.
-func (ns *NullSessionStatus) Scan(value interface{}) error {
-	if value == nil {
-		ns.SessionStatus, ns.Valid = "", false
-		return nil
-	}
-	ns.Valid = true
-	return ns.SessionStatus.Scan(value)
-}
-
-// Value implements the driver Valuer interface.
-func (ns NullSessionStatus) Value() (driver.Value, error) {
-	if !ns.Valid {
-		return nil, nil
-	}
-	return string(ns.SessionStatus), nil
-}
 
 type Opinion struct {
 	OpinionID       uuid.UUID
@@ -107,15 +22,18 @@ type Opinion struct {
 }
 
 type Session struct {
-	SessionID     uuid.UUID
-	UserID        uuid.NullUUID
-	Provider      interface{}
-	SessionStatus SessionStatus
-	CreatedAt     time.Time
+	SessionID      uuid.UUID
+	UserID         uuid.UUID
+	Provider       string
+	SessionStatus  int32
+	ExpiresAt      time.Time
+	CreatedAt      time.Time
+	LastActivityAt time.Time
 }
 
 type TalkSession struct {
 	TalkSessionID uuid.UUID
+	OwnerID       uuid.UUID
 	Theme         string
 	FinishedAt    sql.NullTime
 	CreatedAt     time.Time
@@ -125,12 +43,13 @@ type User struct {
 	UserID      uuid.UUID
 	DisplayID   string
 	DisplayName string
+	Picture     sql.NullString
 	CreatedAt   time.Time
 }
 
 type UserAuth struct {
 	UserID    uuid.NullUUID
-	Provider  interface{}
+	Provider  string
 	Subject   string
 	CreatedAt time.Time
 }

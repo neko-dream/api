@@ -7,19 +7,20 @@ import (
 
 	"github.com/go-faster/errors"
 
+	"braces.dev/errtrace"
 	"github.com/ogen-go/ogen/validate"
 )
 
 func (s IndicateIntentionOKApplicationJSON) Validate() error {
 	alias := ([]IndicateIntentionOKItem)(s)
 	if alias == nil {
-		return errors.New("nil is invalid value")
+		return errtrace.Wrap(errors.New("nil is invalid value"))
 	}
 	var failures []validate.FieldError
 	for i, elem := range alias {
 		if err := func() error {
 			if err := elem.Validate(); err != nil {
-				return err
+				return errtrace.Wrap(err)
 			}
 			return nil
 		}(); err != nil {
@@ -30,14 +31,14 @@ func (s IndicateIntentionOKApplicationJSON) Validate() error {
 		}
 	}
 	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
+		return errtrace.Wrap(&validate.Error{Fields: failures})
 	}
 	return nil
 }
 
 func (s *IndicateIntentionOKItem) Validate() error {
 	if s == nil {
-		return validate.ErrNilPointer
+		return errtrace.Wrap(validate.ErrNilPointer)
 	}
 
 	var failures []validate.FieldError
@@ -51,7 +52,7 @@ func (s *IndicateIntentionOKItem) Validate() error {
 			Hostname:     false,
 			Regex:        nil,
 		}).Validate(string(s.OpinionContent)); err != nil {
-			return errors.Wrap(err, "string")
+			return errtrace.Wrap(errors.Wrap(err, "string"))
 		}
 		return nil
 	}(); err != nil {
@@ -61,7 +62,7 @@ func (s *IndicateIntentionOKItem) Validate() error {
 		})
 	}
 	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
+		return errtrace.Wrap(&validate.Error{Fields: failures})
 	}
 	return nil
 }
@@ -69,13 +70,13 @@ func (s *IndicateIntentionOKItem) Validate() error {
 func (s ListOpinionsOKApplicationJSON) Validate() error {
 	alias := ([]ListOpinionsOKItem)(s)
 	if alias == nil {
-		return errors.New("nil is invalid value")
+		return errtrace.Wrap(errors.New("nil is invalid value"))
 	}
 	var failures []validate.FieldError
 	for i, elem := range alias {
 		if err := func() error {
 			if err := elem.Validate(); err != nil {
-				return err
+				return errtrace.Wrap(err)
 			}
 			return nil
 		}(); err != nil {
@@ -86,14 +87,14 @@ func (s ListOpinionsOKApplicationJSON) Validate() error {
 		}
 	}
 	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
+		return errtrace.Wrap(&validate.Error{Fields: failures})
 	}
 	return nil
 }
 
 func (s *ListOpinionsOKItem) Validate() error {
 	if s == nil {
-		return validate.ErrNilPointer
+		return errtrace.Wrap(validate.ErrNilPointer)
 	}
 
 	var failures []validate.FieldError
@@ -107,7 +108,7 @@ func (s *ListOpinionsOKItem) Validate() error {
 			Hostname:     false,
 			Regex:        nil,
 		}).Validate(string(s.OpinionContent)); err != nil {
-			return errors.Wrap(err, "string")
+			return errtrace.Wrap(errors.Wrap(err, "string"))
 		}
 		return nil
 	}(); err != nil {
@@ -117,7 +118,7 @@ func (s *ListOpinionsOKItem) Validate() error {
 		})
 	}
 	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
+		return errtrace.Wrap(&validate.Error{Fields: failures})
 	}
 	return nil
 }
