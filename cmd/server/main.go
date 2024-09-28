@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/neko-dream/server/internal/infrastructure/db"
 	"github.com/neko-dream/server/internal/infrastructure/di"
 	"github.com/neko-dream/server/internal/infrastructure/middleware"
 	"github.com/neko-dream/server/internal/presentation/handler"
@@ -18,9 +17,6 @@ func main() {
 	if err := utils.LoadEnv(); err != nil {
 		panic(err)
 	}
-
-	db.Down()
-	db.Migration()
 
 	container := di.BuildContainer()
 	srv, err := oas.NewServer(
