@@ -20,4 +20,4 @@ FROM alpine:latest
 WORKDIR /app
 
 COPY --from=builder /app/server ./server
-CMD ["/app/server"]
+ENTRYPOINT ["/app/server"]
