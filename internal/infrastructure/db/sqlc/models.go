@@ -45,6 +45,7 @@ type User struct {
 	DisplayName sql.NullString
 	Picture     sql.NullString
 	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 type UserAuth struct {
@@ -54,6 +55,17 @@ type UserAuth struct {
 	Subject    string
 	IsVerified bool
 	CreatedAt  time.Time
+}
+
+type UserDemographic struct {
+	UserDemographicsID uuid.UUID
+	UserID             uuid.UUID
+	YearOfBirth        sql.NullInt32
+	Occupation         sql.NullInt16
+	Gender             int16
+	Municipality       sql.NullString
+	HouseholdSize      sql.NullInt16
+	CreatedAt          time.Time
 }
 
 type Vote struct {

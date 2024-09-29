@@ -50,65 +50,67 @@ func (q *Queries) CreateUserAuth(ctx context.Context, arg CreateUserAuthParams) 
 	return err
 }
 
+const getUserAuthByUserID = `-- name: GetUserAuthByUserID :one
+SELECT
+    user_auth_id, user_id, provider, subject, is_verified, created_at
+FROM
+    "user_auths"
+WHERE
+    user_id = $1
+`
+
+func (q *Queries) GetUserAuthByUserID(ctx context.Context, userID uuid.UUID) (UserAuth, error) {
+	row := q.db.QueryRowContext(ctx, getUserAuthByUserID, userID)
+	var i UserAuth
+	err := row.Scan(
+		&i.UserAuthID,
+		&i.UserID,
+		&i.Provider,
+		&i.Subject,
+		&i.IsVerified,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const getUserByID = `-- name: GetUserByID :one
 SELECT
-    users.user_id,
-    users.display_id,
-    users.display_name,
-    user_auths.provider,
-    user_auths.subject,
-    user_auths.created_at,
-    users.picture,
-    user_auths.is_verified
+    user_id, display_id, display_name, picture, created_at, updated_at
 FROM
-    users
-    JOIN user_auths ON users.user_id = user_auths.user_id
+    "users"
 WHERE
     users.user_id = $1
 `
 
-type GetUserByIDRow struct {
-	UserID      uuid.UUID
-	DisplayID   sql.NullString
-	DisplayName sql.NullString
-	Provider    string
-	Subject     string
-	CreatedAt   time.Time
-	Picture     sql.NullString
-	IsVerified  bool
-}
-
-func (q *Queries) GetUserByID(ctx context.Context, userID uuid.UUID) (GetUserByIDRow, error) {
+func (q *Queries) GetUserByID(ctx context.Context, userID uuid.UUID) (User, error) {
 	row := q.db.QueryRowContext(ctx, getUserByID, userID)
-	var i GetUserByIDRow
+	var i User
 	err := row.Scan(
 		&i.UserID,
 		&i.DisplayID,
 		&i.DisplayName,
-		&i.Provider,
-		&i.Subject,
-		&i.CreatedAt,
 		&i.Picture,
-		&i.IsVerified,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const getUserBySubject = `-- name: GetUserBySubject :one
 SELECT
-    users.user_id,
-    users.display_id,
-    users.display_name,
-    user_auths.provider,
-    user_auths.subject,
-    user_auths.created_at,
-    users.picture,
-    user_auths.is_verified
+    "users".user_id,
+    "users".display_id,
+    "users".display_name,
+    "user_auths".provider,
+    "user_auths".subject,
+    "user_auths".created_at,
+    "users".picture,
+    "user_auths".is_verified
 FROM
-    users
-    JOIN user_auths ON users.user_id = user_auths.user_id
+    "users"
+    JOIN "user_auths" ON "users".user_id = "user_auths".user_id
 WHERE
-    user_auths.subject = $1
+    "user_auths".subject = $1
 `
 
 type GetUserBySubjectRow struct {
@@ -138,8 +140,50 @@ func (q *Queries) GetUserBySubject(ctx context.Context, subject string) (GetUser
 	return i, err
 }
 
+const updateOrCreateUserDemographics = `-- name: UpdateOrCreateUserDemographics :exec
+INSERT INTO user_demographics (
+    user_id,
+    year_of_birth,
+    occupation,
+    gender,
+    municipality,
+    household_size,
+    created_at,
+    updated_at
+) VALUES ($1, $2, $3, $4, $5, $6, now(), now())
+ON CONFLICT (user_id)
+DO UPDATE SET
+    year_of_birth = $2,
+    occupation = $3,
+    gender = $4,
+    municipality = $5,
+    household_size = $6,
+    updated_at = now()
+`
+
+type UpdateOrCreateUserDemographicsParams struct {
+	UserID        uuid.UUID
+	YearOfBirth   sql.NullInt32
+	Occupation    sql.NullInt16
+	Gender        int16
+	Municipality  sql.NullString
+	HouseholdSize sql.NullInt16
+}
+
+func (q *Queries) UpdateOrCreateUserDemographics(ctx context.Context, arg UpdateOrCreateUserDemographicsParams) error {
+	_, err := q.db.ExecContext(ctx, updateOrCreateUserDemographics,
+		arg.UserID,
+		arg.YearOfBirth,
+		arg.Occupation,
+		arg.Gender,
+		arg.Municipality,
+		arg.HouseholdSize,
+	)
+	return err
+}
+
 const updateUser = `-- name: UpdateUser :exec
-UPDATE users SET display_id = $2, display_name = $3, picture = $4 WHERE user_id = $1
+UPDATE "users" SET display_id = $2, display_name = $3, picture = $4 WHERE user_id = $1
 `
 
 type UpdateUserParams struct {
@@ -160,7 +204,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
 }
 
 const verifyUser = `-- name: VerifyUser :exec
-UPDATE user_auths SET is_verified = true WHERE user_id = $1
+UPDATE "user_auths" SET is_verified = true WHERE user_id = $1
 `
 
 func (q *Queries) VerifyUser(ctx context.Context, userID uuid.UUID) error {

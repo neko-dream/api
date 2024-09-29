@@ -1,14 +1,4 @@
-CREATE TABLE "sessions" (
-  "session_id" uuid PRIMARY KEY,
-  "user_id" uuid NOT NULL,
-  "provider" varchar NOT NULL,
-  "session_status" int NOT NULL,
-  "expires_at" timestamp NOT NULL,
-  "created_at" timestamp NOT NULL DEFAULT (now()),
-  "last_activity_at" timestamp NOT NULL DEFAULT (now()),
 
-  FOREIGN KEY ("user_id") REFERENCES "users" ("user_id")
-);
 
 CREATE TABLE "users" (
   "user_id" uuid PRIMARY KEY,
@@ -16,10 +6,18 @@ CREATE TABLE "users" (
   "display_name" varchar,
   "picture" varchar,
   "created_at" timestamp NOT NULL DEFAULT (now()),
-
-  INDEX "users_display_id_index" ("display_id")
+  "updated_at" timestamp NOT NULL DEFAULT (now())
 );
 
+CREATE TABLE "sessions" (
+  "session_id" uuid PRIMARY KEY,
+  "user_id" uuid NOT NULL,
+  "provider" varchar NOT NULL,
+  "session_status" int NOT NULL,
+  "expires_at" timestamp NOT NULL,
+  "created_at" timestamp NOT NULL DEFAULT (now()),
+  "last_activity_at" timestamp NOT NULL DEFAULT (now())
+);
 
 CREATE TABLE "user_auths" (
   "user_auth_id" uuid PRIMARY KEY,
@@ -27,22 +25,18 @@ CREATE TABLE "user_auths" (
   "provider" varchar NOT NULL,
   "subject" varchar NOT NULL,
   "is_verified" boolean NOT NULL,
-  "created_at" timestamp NOT NULL DEFAULT (now()),
-
-  FOREIGN KEY ("user_id") REFERENCES "users" ("user_id")
+  "created_at" timestamp NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "user_demographics" (
-  "user_id" uuid PRIMARY KEY,
-  "year_of_birth" int NOT NULL,
-  "occupation" tinyint NOT NULL,
-  "gender" tinyint NOT NULL,
-  "municipality" varchar NOT NULL,
-  "household_size" tinyint NOT NULL,
-  "created_at" timestamp NOT NULL DEFAULT (now()),
-
-  FOREIGN KEY ("user_id") REFERENCES "users" ("user_id"),
-  INDEX "user_demographics_year_of_birth_index" ("year_of_birth")
+  "user_demographics_id" uuid PRIMARY KEY,
+  "user_id" uuid NOT NULL,
+  "year_of_birth" int,
+  "occupation" SMALLINT,
+  "gender" SMALLINT NOT NULL,
+  "municipality" varchar,
+  "household_size" SMALLINT,
+  "created_at" timestamp NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "talk_sessions" (
@@ -50,11 +44,14 @@ CREATE TABLE "talk_sessions" (
   "owner_id" uuid NOT NULL,
   "theme" varchar NOT NULL,
   "finished_at" timestamp,
-  "created_at" timestamp NOT NULL DEFAULT (now()),
+  "created_at" timestamp NOT NULL DEFAULT (now())
+);
 
-  INDEX "talk_sessions_theme_index" ("theme"),
-
-  FOREIGN KEY ("owner_id") REFERENCES "users" ("user_id")
+CREATE TABLE "votes" (
+  "vote_id" uuid PRIMARY KEY,
+  "opinion_id" uuid NOT NULL,
+  "user_id" uuid NOT NULL,
+  "created_at" timestamp NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "opinions" (
@@ -64,20 +61,6 @@ CREATE TABLE "opinions" (
   "opinionContent" varchar NOT NULL,
   "parent_opinion_id" uuid,
   "vote_id" uuid,
-  "created_at" timestamp NOT NULL DEFAULT (now()),
-
-  FOREIGN KEY ("talk_session_id") REFERENCES "talk_sessions" ("talk_session_id"),
-  FOREIGN KEY ("user_id") REFERENCES "users" ("user_id"),
-  FOREIGN KEY ("parent_opinion_id") REFERENCES "opinions" ("opinion_id"),
-  FOREIGN KEY ("vote_id") REFERENCES "votes" ("vote_id")
+  "created_at" timestamp NOT NULL DEFAULT (now())
 );
 
-CREATE TABLE "votes" (
-  "vote_id" uuid PRIMARY KEY,
-  "opinion_id" uuid NOT NULL,
-  "user_id" uuid NOT NULL,
-  "created_at" timestamp NOT NULL DEFAULT (now()),
-
-  FOREIGN KEY ("user_id") REFERENCES "users" ("user_id"),
-  FOREIGN KEY ("opinion_id") REFERENCES "opinions" ("opinion_id")
-);
