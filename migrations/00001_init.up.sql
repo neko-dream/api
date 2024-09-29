@@ -37,7 +37,7 @@ CREATE TABLE "user_demographics" (
   "year_of_birth" int NOT NULL,
   "occupation" tinyint NOT NULL,
   "gender" tinyint NOT NULL,
-  "municiplaity" varchar NOT NULL,
+  "municipality" varchar NOT NULL,
   "household_size" tinyint NOT NULL,
   "created_at" timestamp NOT NULL DEFAULT (now()),
 
