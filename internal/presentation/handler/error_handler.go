@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/neko-dream/server/internal/domain/messages"
+	"github.com/neko-dream/server/pkg/utils"
 	"github.com/ogen-go/ogen/ogenerrors"
 )
 
@@ -18,6 +19,7 @@ func CustomErrorHandler(ctx context.Context, w http.ResponseWriter, r *http.Requ
 		apiErr = messages.ForbiddenError
 	case errors.As(err, &apiErr):
 	default:
+		utils.HandleErrorWithCaller(ctx, err, "failed to handle error", 3)
 		apiErr = messages.InternalServerError
 	}
 
