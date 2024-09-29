@@ -75,6 +75,10 @@ func (u *User) SetDemographics(demographics *UserDemographics) {
 	u.demographics = demographics
 }
 
+func (u *User) Demographics() *UserDemographics {
+	return u.demographics
+}
+
 func NewUser(
 	userID shared.UUID[User],
 	displayID *string,
