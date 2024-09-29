@@ -74,10 +74,12 @@ func (a *authLoginInteractor) Execute(ctx context.Context, input AuthLoginInput)
 
 func NewAuthLoginUseCase(
 	tm *db.DBManager,
+	config *config.Config,
 	authService auth.AuthService,
 ) AuthLoginUseCase {
 	return &authLoginInteractor{
 		DBManager:   tm,
+		Config:      config,
 		AuthService: authService,
 	}
 }
