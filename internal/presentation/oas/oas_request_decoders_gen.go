@@ -322,43 +322,31 @@ func (s *Server) decodeRegisterUserRequest(r *http.Request) (
 				}
 				if err := q.HasParam(cfg); err == nil {
 					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-						var optFormDotGenderVal RegisterUserReqGender
-						if err := func() error {
-							val, err := d.DecodeValue()
-							if err != nil {
-								return err
-							}
-
-							c, err := conv.ToString(val)
-							if err != nil {
-								return err
-							}
-
-							optFormDotGenderVal = RegisterUserReqGender(c)
-							return nil
-						}(); err != nil {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
-						optForm.Gender.SetTo(optFormDotGenderVal)
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						optForm.Gender = RegisterUserReqGender(c)
 						return nil
 					}); err != nil {
 						return req, close, errors.Wrap(err, "decode \"gender\"")
 					}
 					if err := func() error {
-						if value, ok := optForm.Gender.Get(); ok {
-							if err := func() error {
-								if err := value.Validate(); err != nil {
-									return err
-								}
-								return nil
-							}(); err != nil {
-								return err
-							}
+						if err := optForm.Gender.Validate(); err != nil {
+							return err
 						}
 						return nil
 					}(); err != nil {
 						return req, close, errors.Wrap(err, "validate")
 					}
+				} else {
+					return req, close, errors.Wrap(err, "query")
 				}
 			}
 			{
@@ -401,7 +389,7 @@ func (s *Server) decodeRegisterUserRequest(r *http.Request) (
 				}
 				if err := q.HasParam(cfg); err == nil {
 					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-						var optFormDotOccupationVal string
+						var optFormDotOccupationVal RegisterUserReqOccupation
 						if err := func() error {
 							val, err := d.DecodeValue()
 							if err != nil {
@@ -413,7 +401,7 @@ func (s *Server) decodeRegisterUserRequest(r *http.Request) (
 								return err
 							}
 
-							optFormDotOccupationVal = c
+							optFormDotOccupationVal = RegisterUserReqOccupation(c)
 							return nil
 						}(); err != nil {
 							return err
@@ -422,6 +410,21 @@ func (s *Server) decodeRegisterUserRequest(r *http.Request) (
 						return nil
 					}); err != nil {
 						return req, close, errors.Wrap(err, "decode \"occupation\"")
+					}
+					if err := func() error {
+						if value, ok := optForm.Occupation.Get(); ok {
+							if err := func() error {
+								if err := value.Validate(); err != nil {
+									return err
+								}
+								return nil
+							}(); err != nil {
+								return err
+							}
+						}
+						return nil
+					}(); err != nil {
+						return req, close, errors.Wrap(err, "validate")
 					}
 				}
 			}

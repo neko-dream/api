@@ -194,7 +194,18 @@ func (s *RegisterUserReq) Validate() error {
 		})
 	}
 	if err := func() error {
-		if value, ok := s.Gender.Get(); ok {
+		if err := s.Gender.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "gender",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if value, ok := s.Occupation.Get(); ok {
 			if err := func() error {
 				if err := value.Validate(); err != nil {
 					return err
@@ -207,7 +218,7 @@ func (s *RegisterUserReq) Validate() error {
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "gender",
+			Name:  "occupation",
 			Error: err,
 		})
 	}
@@ -224,6 +235,35 @@ func (s RegisterUserReqGender) Validate() error {
 	case "female":
 		return nil
 	case "other":
+		return nil
+	case "preferNotToSay":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s RegisterUserReqOccupation) Validate() error {
+	switch s {
+	case "正社員":
+		return nil
+	case "契約社員":
+		return nil
+	case "公務員":
+		return nil
+	case "自営業":
+		return nil
+	case "会社役員":
+		return nil
+	case "パート・アルバイト":
+		return nil
+	case "家事従事者":
+		return nil
+	case "学生":
+		return nil
+	case "無職":
+		return nil
+	case "その他":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)

@@ -430,38 +430,38 @@ func (o OptRegisterUserReq) Or(d RegisterUserReq) RegisterUserReq {
 	return d
 }
 
-// NewOptRegisterUserReqGender returns new OptRegisterUserReqGender with value set to v.
-func NewOptRegisterUserReqGender(v RegisterUserReqGender) OptRegisterUserReqGender {
-	return OptRegisterUserReqGender{
+// NewOptRegisterUserReqOccupation returns new OptRegisterUserReqOccupation with value set to v.
+func NewOptRegisterUserReqOccupation(v RegisterUserReqOccupation) OptRegisterUserReqOccupation {
+	return OptRegisterUserReqOccupation{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptRegisterUserReqGender is optional RegisterUserReqGender.
-type OptRegisterUserReqGender struct {
-	Value RegisterUserReqGender
+// OptRegisterUserReqOccupation is optional RegisterUserReqOccupation.
+type OptRegisterUserReqOccupation struct {
+	Value RegisterUserReqOccupation
 	Set   bool
 }
 
-// IsSet returns true if OptRegisterUserReqGender was set.
-func (o OptRegisterUserReqGender) IsSet() bool { return o.Set }
+// IsSet returns true if OptRegisterUserReqOccupation was set.
+func (o OptRegisterUserReqOccupation) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptRegisterUserReqGender) Reset() {
-	var v RegisterUserReqGender
+func (o *OptRegisterUserReqOccupation) Reset() {
+	var v RegisterUserReqOccupation
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptRegisterUserReqGender) SetTo(v RegisterUserReqGender) {
+func (o *OptRegisterUserReqOccupation) SetTo(v RegisterUserReqOccupation) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptRegisterUserReqGender) Get() (v RegisterUserReqGender, ok bool) {
+func (o OptRegisterUserReqOccupation) Get() (v RegisterUserReqOccupation, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -469,7 +469,7 @@ func (o OptRegisterUserReqGender) Get() (v RegisterUserReqGender, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptRegisterUserReqGender) Or(d RegisterUserReqGender) RegisterUserReqGender {
+func (o OptRegisterUserReqOccupation) Or(d RegisterUserReqOccupation) RegisterUserReqOccupation {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -621,11 +621,11 @@ type RegisterUserReq struct {
 	// 生まれ年.
 	YearOfBirth OptInt `json:"yearOfBirth"`
 	// 性別.
-	Gender OptRegisterUserReqGender `json:"gender"`
+	Gender RegisterUserReqGender `json:"gender"`
 	// 市区町村.
 	Municipality OptString `json:"municipality"`
 	// ユーザーの職業.
-	Occupation OptString `json:"occupation"`
+	Occupation OptRegisterUserReqOccupation `json:"occupation"`
 	// 世帯人数.
 	HouseholdSize OptInt `json:"householdSize"`
 }
@@ -651,7 +651,7 @@ func (s *RegisterUserReq) GetYearOfBirth() OptInt {
 }
 
 // GetGender returns the value of Gender.
-func (s *RegisterUserReq) GetGender() OptRegisterUserReqGender {
+func (s *RegisterUserReq) GetGender() RegisterUserReqGender {
 	return s.Gender
 }
 
@@ -661,7 +661,7 @@ func (s *RegisterUserReq) GetMunicipality() OptString {
 }
 
 // GetOccupation returns the value of Occupation.
-func (s *RegisterUserReq) GetOccupation() OptString {
+func (s *RegisterUserReq) GetOccupation() OptRegisterUserReqOccupation {
 	return s.Occupation
 }
 
@@ -691,7 +691,7 @@ func (s *RegisterUserReq) SetYearOfBirth(val OptInt) {
 }
 
 // SetGender sets the value of Gender.
-func (s *RegisterUserReq) SetGender(val OptRegisterUserReqGender) {
+func (s *RegisterUserReq) SetGender(val RegisterUserReqGender) {
 	s.Gender = val
 }
 
@@ -701,7 +701,7 @@ func (s *RegisterUserReq) SetMunicipality(val OptString) {
 }
 
 // SetOccupation sets the value of Occupation.
-func (s *RegisterUserReq) SetOccupation(val OptString) {
+func (s *RegisterUserReq) SetOccupation(val OptRegisterUserReqOccupation) {
 	s.Occupation = val
 }
 
@@ -714,9 +714,10 @@ func (s *RegisterUserReq) SetHouseholdSize(val OptInt) {
 type RegisterUserReqGender string
 
 const (
-	RegisterUserReqGenderMale   RegisterUserReqGender = "male"
-	RegisterUserReqGenderFemale RegisterUserReqGender = "female"
-	RegisterUserReqGenderOther  RegisterUserReqGender = "other"
+	RegisterUserReqGenderMale           RegisterUserReqGender = "male"
+	RegisterUserReqGenderFemale         RegisterUserReqGender = "female"
+	RegisterUserReqGenderOther          RegisterUserReqGender = "other"
+	RegisterUserReqGenderPreferNotToSay RegisterUserReqGender = "preferNotToSay"
 )
 
 // AllValues returns all RegisterUserReqGender values.
@@ -725,6 +726,7 @@ func (RegisterUserReqGender) AllValues() []RegisterUserReqGender {
 		RegisterUserReqGenderMale,
 		RegisterUserReqGenderFemale,
 		RegisterUserReqGenderOther,
+		RegisterUserReqGenderPreferNotToSay,
 	}
 }
 
@@ -736,6 +738,8 @@ func (s RegisterUserReqGender) MarshalText() ([]byte, error) {
 	case RegisterUserReqGenderFemale:
 		return []byte(s), nil
 	case RegisterUserReqGenderOther:
+		return []byte(s), nil
+	case RegisterUserReqGenderPreferNotToSay:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -753,6 +757,107 @@ func (s *RegisterUserReqGender) UnmarshalText(data []byte) error {
 		return nil
 	case RegisterUserReqGenderOther:
 		*s = RegisterUserReqGenderOther
+		return nil
+	case RegisterUserReqGenderPreferNotToSay:
+		*s = RegisterUserReqGenderPreferNotToSay
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// ユーザーの職業.
+type RegisterUserReqOccupation string
+
+const (
+	RegisterUserReqOccupation_0 RegisterUserReqOccupation = "正社員"
+	RegisterUserReqOccupation_1 RegisterUserReqOccupation = "契約社員"
+	RegisterUserReqOccupation_2 RegisterUserReqOccupation = "公務員"
+	RegisterUserReqOccupation_3 RegisterUserReqOccupation = "自営業"
+	RegisterUserReqOccupation_4 RegisterUserReqOccupation = "会社役員"
+	RegisterUserReqOccupation_5 RegisterUserReqOccupation = "パート・アルバイト"
+	RegisterUserReqOccupation_6 RegisterUserReqOccupation = "家事従事者"
+	RegisterUserReqOccupation_7 RegisterUserReqOccupation = "学生"
+	RegisterUserReqOccupation_8 RegisterUserReqOccupation = "無職"
+	RegisterUserReqOccupation_9 RegisterUserReqOccupation = "その他"
+)
+
+// AllValues returns all RegisterUserReqOccupation values.
+func (RegisterUserReqOccupation) AllValues() []RegisterUserReqOccupation {
+	return []RegisterUserReqOccupation{
+		RegisterUserReqOccupation_0,
+		RegisterUserReqOccupation_1,
+		RegisterUserReqOccupation_2,
+		RegisterUserReqOccupation_3,
+		RegisterUserReqOccupation_4,
+		RegisterUserReqOccupation_5,
+		RegisterUserReqOccupation_6,
+		RegisterUserReqOccupation_7,
+		RegisterUserReqOccupation_8,
+		RegisterUserReqOccupation_9,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s RegisterUserReqOccupation) MarshalText() ([]byte, error) {
+	switch s {
+	case RegisterUserReqOccupation_0:
+		return []byte(s), nil
+	case RegisterUserReqOccupation_1:
+		return []byte(s), nil
+	case RegisterUserReqOccupation_2:
+		return []byte(s), nil
+	case RegisterUserReqOccupation_3:
+		return []byte(s), nil
+	case RegisterUserReqOccupation_4:
+		return []byte(s), nil
+	case RegisterUserReqOccupation_5:
+		return []byte(s), nil
+	case RegisterUserReqOccupation_6:
+		return []byte(s), nil
+	case RegisterUserReqOccupation_7:
+		return []byte(s), nil
+	case RegisterUserReqOccupation_8:
+		return []byte(s), nil
+	case RegisterUserReqOccupation_9:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *RegisterUserReqOccupation) UnmarshalText(data []byte) error {
+	switch RegisterUserReqOccupation(data) {
+	case RegisterUserReqOccupation_0:
+		*s = RegisterUserReqOccupation_0
+		return nil
+	case RegisterUserReqOccupation_1:
+		*s = RegisterUserReqOccupation_1
+		return nil
+	case RegisterUserReqOccupation_2:
+		*s = RegisterUserReqOccupation_2
+		return nil
+	case RegisterUserReqOccupation_3:
+		*s = RegisterUserReqOccupation_3
+		return nil
+	case RegisterUserReqOccupation_4:
+		*s = RegisterUserReqOccupation_4
+		return nil
+	case RegisterUserReqOccupation_5:
+		*s = RegisterUserReqOccupation_5
+		return nil
+	case RegisterUserReqOccupation_6:
+		*s = RegisterUserReqOccupation_6
+		return nil
+	case RegisterUserReqOccupation_7:
+		*s = RegisterUserReqOccupation_7
+		return nil
+	case RegisterUserReqOccupation_8:
+		*s = RegisterUserReqOccupation_8
+		return nil
+	case RegisterUserReqOccupation_9:
+		*s = RegisterUserReqOccupation_9
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)

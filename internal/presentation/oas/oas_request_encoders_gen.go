@@ -124,10 +124,7 @@ func encodeRegisterUserRequest(
 			Explode: true,
 		}
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := request.Gender.Get(); ok {
-				return e.EncodeValue(conv.StringToString(string(val)))
-			}
-			return nil
+			return e.EncodeValue(conv.StringToString(string(request.Gender)))
 		}); err != nil {
 			return errors.Wrap(err, "encode query")
 		}
@@ -157,7 +154,7 @@ func encodeRegisterUserRequest(
 		}
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := request.Occupation.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.StringToString(string(val)))
 			}
 			return nil
 		}); err != nil {

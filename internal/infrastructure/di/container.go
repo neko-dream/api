@@ -12,7 +12,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/datasource/repository"
 	"github.com/neko-dream/server/internal/infrastructure/db"
 	"github.com/neko-dream/server/internal/presentation/handler"
-	"github.com/neko-dream/server/internal/usecase/auth_usecase"
+	auth_usecase "github.com/neko-dream/server/internal/usecase/auth"
 	talk_session_usecase "github.com/neko-dream/server/internal/usecase/talk_session"
 	"go.uber.org/dig"
 )

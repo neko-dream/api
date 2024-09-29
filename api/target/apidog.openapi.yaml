@@ -299,7 +299,8 @@
                     "enum": [
                       "male",
                       "female",
-                      "other"
+                      "other",
+                      "preferNotToSay"
                     ],
                     "description": "性別",
                     "example": ""
@@ -310,9 +311,21 @@
                     "type": "string"
                   },
                   "occupation": {
+                    "type": "string",
+                    "enum": [
+                      "正社員",
+                      "契約社員",
+                      "公務員",
+                      "自営業",
+                      "会社役員",
+                      "パート・アルバイト",
+                      "家事従事者",
+                      "学生",
+                      "無職",
+                      "その他"
+                    ],
                     "description": "ユーザーの職業",
-                    "example": "",
-                    "type": "string"
+                    "example": ""
                   },
                   "householdSize": {
                     "type": "integer",
@@ -322,7 +335,8 @@
                 },
                 "required": [
                   "displayName",
-                  "displayID"
+                  "displayID",
+                  "gender"
                 ]
               }
             }
