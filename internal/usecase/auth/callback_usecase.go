@@ -12,6 +12,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/db"
 	cookie_utils "github.com/neko-dream/server/pkg/cookie"
+	"github.com/neko-dream/server/pkg/utils"
 )
 
 type (
@@ -41,6 +42,7 @@ type (
 
 func NewAuthCallbackUseCase(
 	tm *db.DBManager,
+	config *config.Config,
 	authService auth.AuthService,
 	sessionRepository session.SessionRepository,
 	sessionService session.SessionService,
@@ -48,6 +50,7 @@ func NewAuthCallbackUseCase(
 ) AuthCallbackUseCase {
 	return &authCallbackInteractor{
 		DBManager:         tm,
+		Config:            config,
 		AuthService:       authService,
 		SessionRepository: sessionRepository,
 		SessionService:    sessionService,
@@ -57,15 +60,15 @@ func NewAuthCallbackUseCase(
 
 func (u *authCallbackInteractor) Execute(ctx context.Context, input CallbackInput) (CallbackOutput, error) {
 	var c http.Cookie
-
 	if err := u.ExecTx(ctx, func(ctx context.Context) error {
 		user, err := u.AuthService.Authenticate(ctx, input.Provider, input.Code)
 		if err != nil {
+			utils.HandleError(ctx, err, "failed to authenticate")
 			return errtrace.Wrap(err)
 		}
 		if user != nil {
 			if err := u.SessionService.DeactivateUserSessions(ctx, user.UserID()); err != nil {
-				return errtrace.Wrap(err)
+				utils.HandleError(ctx, err, "failed to deactivate user sessions")
 			}
 		}
 
@@ -79,11 +82,13 @@ func (u *authCallbackInteractor) Execute(ctx context.Context, input CallbackInpu
 		)
 
 		if _, err := u.SessionRepository.Create(ctx, *sess); err != nil {
+			utils.HandleError(ctx, err, "failed to create session")
 			return errtrace.Wrap(err)
 		}
 
 		token, err := u.TokenManager.Generate(ctx, *user, sess.SessionID())
 		if err != nil {
+			utils.HandleError(ctx, err, "failed to generate token")
 			return errtrace.Wrap(err)
 		}
 		cookie := http.Cookie{
