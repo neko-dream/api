@@ -98,3 +98,372 @@ func (s *Server) decodeCreateTalkSessionRequest(r *http.Request) (
 		return req, close, validate.InvalidContentType(ct)
 	}
 }
+
+func (s *Server) decodeRegisterUserRequest(r *http.Request) (
+	req OptRegisterUserReq,
+	close func() error,
+	rerr error,
+) {
+	var closers []func() error
+	close = func() error {
+		var merr error
+		// Close in reverse order, to match defer behavior.
+		for i := len(closers) - 1; i >= 0; i-- {
+			c := closers[i]
+			merr = multierr.Append(merr, c())
+		}
+		return merr
+	}
+	defer func() {
+		if rerr != nil {
+			rerr = multierr.Append(rerr, close())
+		}
+	}()
+	if _, ok := r.Header["Content-Type"]; !ok && r.ContentLength == 0 {
+		return req, close, nil
+	}
+	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
+	if err != nil {
+		return req, close, errors.Wrap(err, "parse media type")
+	}
+	switch {
+	case ct == "application/x-www-form-urlencoded":
+		if r.ContentLength == 0 {
+			return req, close, nil
+		}
+		form, err := ht.ParseForm(r)
+		if err != nil {
+			return req, close, errors.Wrap(err, "parse form")
+		}
+
+		var request OptRegisterUserReq
+		{
+			var optForm RegisterUserReq
+			q := uri.NewQueryDecoder(form)
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "displayName",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						optForm.DisplayName = c
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"displayName\"")
+					}
+					if err := func() error {
+						if err := (validate.String{
+							MinLength:    4,
+							MinLengthSet: true,
+							MaxLength:    30,
+							MaxLengthSet: true,
+							Email:        false,
+							Hostname:     false,
+							Regex:        nil,
+						}).Validate(string(optForm.DisplayName)); err != nil {
+							return errors.Wrap(err, "string")
+						}
+						return nil
+					}(); err != nil {
+						return req, close, errors.Wrap(err, "validate")
+					}
+				} else {
+					return req, close, errors.Wrap(err, "query")
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "displayID",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						optForm.DisplayID = c
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"displayID\"")
+					}
+					if err := func() error {
+						if err := (validate.String{
+							MinLength:    4,
+							MinLengthSet: true,
+							MaxLength:    30,
+							MaxLengthSet: true,
+							Email:        false,
+							Hostname:     false,
+							Regex:        regexMap["^\\#[A-Za-z0-9]*$"],
+						}).Validate(string(optForm.DisplayID)); err != nil {
+							return errors.Wrap(err, "string")
+						}
+						return nil
+					}(); err != nil {
+						return req, close, errors.Wrap(err, "validate")
+					}
+				} else {
+					return req, close, errors.Wrap(err, "query")
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "picture",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotPictureVal string
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToString(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotPictureVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.Picture.SetTo(optFormDotPictureVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"picture\"")
+					}
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "yearOfBirth",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotYearOfBirthVal int
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToInt(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotYearOfBirthVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.YearOfBirth.SetTo(optFormDotYearOfBirthVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"yearOfBirth\"")
+					}
+					if err := func() error {
+						if value, ok := optForm.YearOfBirth.Get(); ok {
+							if err := func() error {
+								if err := (validate.Int{
+									MinSet:        true,
+									Min:           1900,
+									MaxSet:        true,
+									Max:           9999,
+									MinExclusive:  false,
+									MaxExclusive:  false,
+									MultipleOfSet: false,
+									MultipleOf:    0,
+								}).Validate(int64(value)); err != nil {
+									return errors.Wrap(err, "int")
+								}
+								return nil
+							}(); err != nil {
+								return err
+							}
+						}
+						return nil
+					}(); err != nil {
+						return req, close, errors.Wrap(err, "validate")
+					}
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "gender",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotGenderVal RegisterUserReqGender
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToString(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotGenderVal = RegisterUserReqGender(c)
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.Gender.SetTo(optFormDotGenderVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"gender\"")
+					}
+					if err := func() error {
+						if value, ok := optForm.Gender.Get(); ok {
+							if err := func() error {
+								if err := value.Validate(); err != nil {
+									return err
+								}
+								return nil
+							}(); err != nil {
+								return err
+							}
+						}
+						return nil
+					}(); err != nil {
+						return req, close, errors.Wrap(err, "validate")
+					}
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "municipality",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotMunicipalityVal string
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToString(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotMunicipalityVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.Municipality.SetTo(optFormDotMunicipalityVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"municipality\"")
+					}
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "occupation",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotOccupationVal string
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToString(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotOccupationVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.Occupation.SetTo(optFormDotOccupationVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"occupation\"")
+					}
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "householdSize",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotHouseholdSizeVal int
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToInt(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotHouseholdSizeVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.HouseholdSize.SetTo(optFormDotHouseholdSizeVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"householdSize\"")
+					}
+				}
+			}
+			request = OptRegisterUserReq{
+				Value: optForm,
+				Set:   true,
+			}
+		}
+		return request, close, nil
+	default:
+		return req, close, validate.InvalidContentType(ct)
+	}
+}

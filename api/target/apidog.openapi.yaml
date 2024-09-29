@@ -243,78 +243,91 @@
           "user",
           "User"
         ],
-        "parameters": [
-          {
-            "name": "displayName",
-            "in": "query",
-            "description": "一意のユーザーID",
-            "required": true,
-            "example": "ユーザー",
-            "schema": {
-              "type": "string",
-              "format": "regex",
-              "minLength": 5
-            }
-          },
-          {
-            "name": "displayID",
-            "in": "query",
-            "description": "",
-            "required": true,
-            "example": "user1",
-            "schema": {
-              "type": "string",
-              "pattern": "^\\#[A-Za-z0-9]*$",
-              "format": "char",
-              "minLength": 4,
-              "maxLength": 30
-            }
-          },
-          {
-            "name": "picture",
-            "in": "query",
-            "description": "",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "age",
-            "in": "query",
-            "description": "",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "10",
-                "20",
-                "30",
-                "40",
-                "50",
-                "60",
-                "70",
-                "80",
-                "90",
-                "100"
-              ],
-              "x-apidog": {
-                "enumDescriptions": {
-                  "10": "",
-                  "20": "",
-                  "30": "",
-                  "40": "",
-                  "50": "",
-                  "60": "",
-                  "70": "",
-                  "80": "",
-                  "90": "",
-                  "100": ""
-                }
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "displayName": {
+                    "type": "string",
+                    "minLength": 4,
+                    "maxLength": 30,
+                    "examples": [
+                      "太郎",
+                      "花子"
+                    ],
+                    "format": "char",
+                    "description": "ユーザー名。日本語なども設定可能。",
+                    "example": ""
+                  },
+                  "displayID": {
+                    "type": "string",
+                    "pattern": "^\\#[A-Za-z0-9]*$",
+                    "format": "regex",
+                    "minLength": 4,
+                    "maxLength": 30,
+                    "examples": [
+                      "tarou",
+                      "hanako"
+                    ],
+                    "description": "ユーザーID。プロフィールのパスなどで使用される。DBのIDとは別。",
+                    "example": ""
+                  },
+                  "picture": {
+                    "description": "ユーザーアイコンURL",
+                    "example": "",
+                    "type": "string"
+                  },
+                  "yearOfBirth": {
+                    "type": "integer",
+                    "format": "sint32",
+                    "minimum": 1900,
+                    "maximum": 9999,
+                    "examples": [
+                      2000,
+                      2005,
+                      2012,
+                      1989
+                    ],
+                    "description": "生まれ年",
+                    "example": 0
+                  },
+                  "gender": {
+                    "type": "string",
+                    "enum": [
+                      "male",
+                      "female",
+                      "other"
+                    ],
+                    "description": "性別",
+                    "example": ""
+                  },
+                  "municipality": {
+                    "description": "市区町村",
+                    "example": "",
+                    "type": "string"
+                  },
+                  "occupation": {
+                    "description": "ユーザーの職業",
+                    "example": "",
+                    "type": "string"
+                  },
+                  "householdSize": {
+                    "type": "integer",
+                    "description": "世帯人数",
+                    "example": 0
+                  }
+                },
+                "required": [
+                  "displayName",
+                  "displayID"
+                ]
               }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "成功",

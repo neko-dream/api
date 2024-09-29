@@ -108,7 +108,7 @@ type UserHandler interface {
 	// ユーザー作成.
 	//
 	// POST /api/user/register
-	RegisterUser(ctx context.Context, params RegisterUserParams) (RegisterUserRes, error)
+	RegisterUser(ctx context.Context, req OptRegisterUserReq) (RegisterUserRes, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and

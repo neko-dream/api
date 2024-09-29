@@ -122,27 +122,108 @@ func (s *ListOpinionsOKItem) Validate() error {
 	return nil
 }
 
-func (s RegisterUserAge) Validate() error {
+func (s *RegisterUserReq) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := (validate.String{
+			MinLength:    4,
+			MinLengthSet: true,
+			MaxLength:    30,
+			MaxLengthSet: true,
+			Email:        false,
+			Hostname:     false,
+			Regex:        nil,
+		}).Validate(string(s.DisplayName)); err != nil {
+			return errors.Wrap(err, "string")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "displayName",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if err := (validate.String{
+			MinLength:    4,
+			MinLengthSet: true,
+			MaxLength:    30,
+			MaxLengthSet: true,
+			Email:        false,
+			Hostname:     false,
+			Regex:        regexMap["^\\#[A-Za-z0-9]*$"],
+		}).Validate(string(s.DisplayID)); err != nil {
+			return errors.Wrap(err, "string")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "displayID",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if value, ok := s.YearOfBirth.Get(); ok {
+			if err := func() error {
+				if err := (validate.Int{
+					MinSet:        true,
+					Min:           1900,
+					MaxSet:        true,
+					Max:           9999,
+					MinExclusive:  false,
+					MaxExclusive:  false,
+					MultipleOfSet: false,
+					MultipleOf:    0,
+				}).Validate(int64(value)); err != nil {
+					return errors.Wrap(err, "int")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "yearOfBirth",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if value, ok := s.Gender.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "gender",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s RegisterUserReqGender) Validate() error {
 	switch s {
-	case "10":
+	case "male":
 		return nil
-	case "20":
+	case "female":
 		return nil
-	case "30":
-		return nil
-	case "40":
-		return nil
-	case "50":
-		return nil
-	case "60":
-		return nil
-	case "70":
-		return nil
-	case "80":
-		return nil
-	case "90":
-		return nil
-	case "100":
+	case "other":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)

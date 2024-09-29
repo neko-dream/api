@@ -1207,16 +1207,21 @@ func (s *Server) handleRegisterUserRequest(args [0]string, argsEscaped bool, w h
 			return
 		}
 	}
-	params, err := decodeRegisterUserParams(args, argsEscaped, r)
+	request, close, err := s.decodeRegisterUserRequest(r)
 	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
+		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
 			Err:              err,
 		}
-		defer recordError("DecodeParams", err)
+		defer recordError("DecodeRequest", err)
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
+	defer func() {
+		if err := close(); err != nil {
+			recordError("CloseRequest", err)
+		}
+	}()
 
 	var response RegisterUserRes
 	if m := s.cfg.Middleware; m != nil {
@@ -1225,31 +1230,14 @@ func (s *Server) handleRegisterUserRequest(args [0]string, argsEscaped bool, w h
 			OperationName:    "RegisterUser",
 			OperationSummary: "ユーザー作成",
 			OperationID:      "registerUser",
-			Body:             nil,
-			Params: middleware.Parameters{
-				{
-					Name: "displayName",
-					In:   "query",
-				}: params.DisplayName,
-				{
-					Name: "displayID",
-					In:   "query",
-				}: params.DisplayID,
-				{
-					Name: "picture",
-					In:   "query",
-				}: params.Picture,
-				{
-					Name: "age",
-					In:   "query",
-				}: params.Age,
-			},
-			Raw: r,
+			Body:             request,
+			Params:           middleware.Parameters{},
+			Raw:              r,
 		}
 
 		type (
-			Request  = struct{}
-			Params   = RegisterUserParams
+			Request  = OptRegisterUserReq
+			Params   = struct{}
 			Response = RegisterUserRes
 		)
 		response, err = middleware.HookMiddleware[
@@ -1259,14 +1247,14 @@ func (s *Server) handleRegisterUserRequest(args [0]string, argsEscaped bool, w h
 		](
 			m,
 			mreq,
-			unpackRegisterUserParams,
+			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.RegisterUser(ctx, params)
+				response, err = s.h.RegisterUser(ctx, request)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.RegisterUser(ctx, params)
+		response, err = s.h.RegisterUser(ctx, request)
 	}
 	if err != nil {
 		defer recordError("Internal", err)

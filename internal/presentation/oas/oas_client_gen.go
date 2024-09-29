@@ -124,7 +124,7 @@ type UserInvoker interface {
 	// ユーザー作成.
 	//
 	// POST /api/user/register
-	RegisterUser(ctx context.Context, params RegisterUserParams) (RegisterUserRes, error)
+	RegisterUser(ctx context.Context, request OptRegisterUserReq) (RegisterUserRes, error)
 }
 
 // Client implements OAS client.
@@ -1164,12 +1164,12 @@ func (c *Client) sendPostOpinionPost(ctx context.Context, params PostOpinionPost
 // ユーザー作成.
 //
 // POST /api/user/register
-func (c *Client) RegisterUser(ctx context.Context, params RegisterUserParams) (RegisterUserRes, error) {
-	res, err := c.sendRegisterUser(ctx, params)
+func (c *Client) RegisterUser(ctx context.Context, request OptRegisterUserReq) (RegisterUserRes, error) {
+	res, err := c.sendRegisterUser(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendRegisterUser(ctx context.Context, params RegisterUserParams) (res RegisterUserRes, err error) {
+func (c *Client) sendRegisterUser(ctx context.Context, request OptRegisterUserReq) (res RegisterUserRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("registerUser"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -1209,73 +1209,13 @@ func (c *Client) sendRegisterUser(ctx context.Context, params RegisterUserParams
 	pathParts[0] = "/api/user/register"
 	uri.AddPathParts(u, pathParts[:]...)
 
-	stage = "EncodeQueryParams"
-	q := uri.NewQueryEncoder()
-	{
-		// Encode "displayName" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "displayName",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			return e.EncodeValue(conv.StringToString(params.DisplayName))
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "displayID" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "displayID",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			return e.EncodeValue(conv.StringToString(params.DisplayID))
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "picture" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "picture",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Picture.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "age" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "age",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			return e.EncodeValue(conv.StringToString(string(params.Age)))
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	u.RawQuery = q.Values().Encode()
-
 	stage = "EncodeRequest"
 	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeRegisterUserRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
 	}
 
 	{

@@ -338,6 +338,144 @@ func (o OptCreateTalkSessionReq) Or(d CreateTalkSessionReq) CreateTalkSessionReq
 	return d
 }
 
+// NewOptInt returns new OptInt with value set to v.
+func NewOptInt(v int) OptInt {
+	return OptInt{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptInt is optional int.
+type OptInt struct {
+	Value int
+	Set   bool
+}
+
+// IsSet returns true if OptInt was set.
+func (o OptInt) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptInt) Reset() {
+	var v int
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptInt) SetTo(v int) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptInt) Get() (v int, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptInt) Or(d int) int {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptRegisterUserReq returns new OptRegisterUserReq with value set to v.
+func NewOptRegisterUserReq(v RegisterUserReq) OptRegisterUserReq {
+	return OptRegisterUserReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptRegisterUserReq is optional RegisterUserReq.
+type OptRegisterUserReq struct {
+	Value RegisterUserReq
+	Set   bool
+}
+
+// IsSet returns true if OptRegisterUserReq was set.
+func (o OptRegisterUserReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptRegisterUserReq) Reset() {
+	var v RegisterUserReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptRegisterUserReq) SetTo(v RegisterUserReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptRegisterUserReq) Get() (v RegisterUserReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptRegisterUserReq) Or(d RegisterUserReq) RegisterUserReq {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptRegisterUserReqGender returns new OptRegisterUserReqGender with value set to v.
+func NewOptRegisterUserReqGender(v RegisterUserReqGender) OptRegisterUserReqGender {
+	return OptRegisterUserReqGender{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptRegisterUserReqGender is optional RegisterUserReqGender.
+type OptRegisterUserReqGender struct {
+	Value RegisterUserReqGender
+	Set   bool
+}
+
+// IsSet returns true if OptRegisterUserReqGender was set.
+func (o OptRegisterUserReqGender) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptRegisterUserReqGender) Reset() {
+	var v RegisterUserReqGender
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptRegisterUserReqGender) SetTo(v RegisterUserReqGender) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptRegisterUserReqGender) Get() (v RegisterUserReqGender, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptRegisterUserReqGender) Or(d RegisterUserReqGender) RegisterUserReqGender {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptString returns new OptString with value set to v.
 func NewOptString(v string) OptString {
 	return OptString{
@@ -438,103 +576,6 @@ type PostOpinionPostOK struct{}
 
 func (*PostOpinionPostOK) postOpinionPostRes() {}
 
-type RegisterUserAge string
-
-const (
-	RegisterUserAge10  RegisterUserAge = "10"
-	RegisterUserAge20  RegisterUserAge = "20"
-	RegisterUserAge30  RegisterUserAge = "30"
-	RegisterUserAge40  RegisterUserAge = "40"
-	RegisterUserAge50  RegisterUserAge = "50"
-	RegisterUserAge60  RegisterUserAge = "60"
-	RegisterUserAge70  RegisterUserAge = "70"
-	RegisterUserAge80  RegisterUserAge = "80"
-	RegisterUserAge90  RegisterUserAge = "90"
-	RegisterUserAge100 RegisterUserAge = "100"
-)
-
-// AllValues returns all RegisterUserAge values.
-func (RegisterUserAge) AllValues() []RegisterUserAge {
-	return []RegisterUserAge{
-		RegisterUserAge10,
-		RegisterUserAge20,
-		RegisterUserAge30,
-		RegisterUserAge40,
-		RegisterUserAge50,
-		RegisterUserAge60,
-		RegisterUserAge70,
-		RegisterUserAge80,
-		RegisterUserAge90,
-		RegisterUserAge100,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s RegisterUserAge) MarshalText() ([]byte, error) {
-	switch s {
-	case RegisterUserAge10:
-		return []byte(s), nil
-	case RegisterUserAge20:
-		return []byte(s), nil
-	case RegisterUserAge30:
-		return []byte(s), nil
-	case RegisterUserAge40:
-		return []byte(s), nil
-	case RegisterUserAge50:
-		return []byte(s), nil
-	case RegisterUserAge60:
-		return []byte(s), nil
-	case RegisterUserAge70:
-		return []byte(s), nil
-	case RegisterUserAge80:
-		return []byte(s), nil
-	case RegisterUserAge90:
-		return []byte(s), nil
-	case RegisterUserAge100:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *RegisterUserAge) UnmarshalText(data []byte) error {
-	switch RegisterUserAge(data) {
-	case RegisterUserAge10:
-		*s = RegisterUserAge10
-		return nil
-	case RegisterUserAge20:
-		*s = RegisterUserAge20
-		return nil
-	case RegisterUserAge30:
-		*s = RegisterUserAge30
-		return nil
-	case RegisterUserAge40:
-		*s = RegisterUserAge40
-		return nil
-	case RegisterUserAge50:
-		*s = RegisterUserAge50
-		return nil
-	case RegisterUserAge60:
-		*s = RegisterUserAge60
-		return nil
-	case RegisterUserAge70:
-		*s = RegisterUserAge70
-		return nil
-	case RegisterUserAge80:
-		*s = RegisterUserAge80
-		return nil
-	case RegisterUserAge90:
-		*s = RegisterUserAge90
-		return nil
-	case RegisterUserAge100:
-		*s = RegisterUserAge100
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
-}
-
 type RegisterUserBadRequest struct{}
 
 func (*RegisterUserBadRequest) registerUserRes() {}
@@ -569,6 +610,154 @@ func (s *RegisterUserOK) SetDisplayName(val string) {
 }
 
 func (*RegisterUserOK) registerUserRes() {}
+
+type RegisterUserReq struct {
+	// ユーザー名。日本語なども設定可能。.
+	DisplayName string `json:"displayName"`
+	// ユーザーID。プロフィールのパスなどで使用される。DBのIDとは別。.
+	DisplayID string `json:"displayID"`
+	// ユーザーアイコンURL.
+	Picture OptString `json:"picture"`
+	// 生まれ年.
+	YearOfBirth OptInt `json:"yearOfBirth"`
+	// 性別.
+	Gender OptRegisterUserReqGender `json:"gender"`
+	// 市区町村.
+	Municipality OptString `json:"municipality"`
+	// ユーザーの職業.
+	Occupation OptString `json:"occupation"`
+	// 世帯人数.
+	HouseholdSize OptInt `json:"householdSize"`
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *RegisterUserReq) GetDisplayName() string {
+	return s.DisplayName
+}
+
+// GetDisplayID returns the value of DisplayID.
+func (s *RegisterUserReq) GetDisplayID() string {
+	return s.DisplayID
+}
+
+// GetPicture returns the value of Picture.
+func (s *RegisterUserReq) GetPicture() OptString {
+	return s.Picture
+}
+
+// GetYearOfBirth returns the value of YearOfBirth.
+func (s *RegisterUserReq) GetYearOfBirth() OptInt {
+	return s.YearOfBirth
+}
+
+// GetGender returns the value of Gender.
+func (s *RegisterUserReq) GetGender() OptRegisterUserReqGender {
+	return s.Gender
+}
+
+// GetMunicipality returns the value of Municipality.
+func (s *RegisterUserReq) GetMunicipality() OptString {
+	return s.Municipality
+}
+
+// GetOccupation returns the value of Occupation.
+func (s *RegisterUserReq) GetOccupation() OptString {
+	return s.Occupation
+}
+
+// GetHouseholdSize returns the value of HouseholdSize.
+func (s *RegisterUserReq) GetHouseholdSize() OptInt {
+	return s.HouseholdSize
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *RegisterUserReq) SetDisplayName(val string) {
+	s.DisplayName = val
+}
+
+// SetDisplayID sets the value of DisplayID.
+func (s *RegisterUserReq) SetDisplayID(val string) {
+	s.DisplayID = val
+}
+
+// SetPicture sets the value of Picture.
+func (s *RegisterUserReq) SetPicture(val OptString) {
+	s.Picture = val
+}
+
+// SetYearOfBirth sets the value of YearOfBirth.
+func (s *RegisterUserReq) SetYearOfBirth(val OptInt) {
+	s.YearOfBirth = val
+}
+
+// SetGender sets the value of Gender.
+func (s *RegisterUserReq) SetGender(val OptRegisterUserReqGender) {
+	s.Gender = val
+}
+
+// SetMunicipality sets the value of Municipality.
+func (s *RegisterUserReq) SetMunicipality(val OptString) {
+	s.Municipality = val
+}
+
+// SetOccupation sets the value of Occupation.
+func (s *RegisterUserReq) SetOccupation(val OptString) {
+	s.Occupation = val
+}
+
+// SetHouseholdSize sets the value of HouseholdSize.
+func (s *RegisterUserReq) SetHouseholdSize(val OptInt) {
+	s.HouseholdSize = val
+}
+
+// 性別.
+type RegisterUserReqGender string
+
+const (
+	RegisterUserReqGenderMale   RegisterUserReqGender = "male"
+	RegisterUserReqGenderFemale RegisterUserReqGender = "female"
+	RegisterUserReqGenderOther  RegisterUserReqGender = "other"
+)
+
+// AllValues returns all RegisterUserReqGender values.
+func (RegisterUserReqGender) AllValues() []RegisterUserReqGender {
+	return []RegisterUserReqGender{
+		RegisterUserReqGenderMale,
+		RegisterUserReqGenderFemale,
+		RegisterUserReqGenderOther,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s RegisterUserReqGender) MarshalText() ([]byte, error) {
+	switch s {
+	case RegisterUserReqGenderMale:
+		return []byte(s), nil
+	case RegisterUserReqGenderFemale:
+		return []byte(s), nil
+	case RegisterUserReqGenderOther:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *RegisterUserReqGender) UnmarshalText(data []byte) error {
+	switch RegisterUserReqGender(data) {
+	case RegisterUserReqGenderMale:
+		*s = RegisterUserReqGenderMale
+		return nil
+	case RegisterUserReqGenderFemale:
+		*s = RegisterUserReqGenderFemale
+		return nil
+	case RegisterUserReqGenderOther:
+		*s = RegisterUserReqGenderOther
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
 
 type SessionId struct {
 	APIKey string
