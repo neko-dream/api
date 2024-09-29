@@ -20,8 +20,11 @@ type ErrorInfo struct {
 
 // HandleError はエラーを処理し、追加情報を記録する関数です
 func HandleError(ctx context.Context, err error, message string) {
-	// スタックトレース情報を取得
-	pc, file, line, _ := runtime.Caller(1)
+	HandleErrorWithCaller(ctx, err, message, 2)
+}
+
+func HandleErrorWithCaller(ctx context.Context, err error, message string, caller int) {
+	pc, file, line, _ := runtime.Caller(caller)
 	function := runtime.FuncForPC(pc).Name()
 
 	// エラーメッセージを出力
