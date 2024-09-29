@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 	"net/http"
-	"os"
 	"strings"
 
 	"braces.dev/errtrace"
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/google/uuid"
+	"github.com/neko-dream/server/internal/infrastructure/config"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
@@ -30,16 +30,16 @@ type (
 	}
 )
 
-func OIDCProviderFactory(ctx context.Context, providerName AuthProviderName) (OIDCProvider, error) {
+func OIDCProviderFactory(ctx context.Context, config *config.Config, providerName AuthProviderName) (OIDCProvider, error) {
 	var issuerURL, clientID, clientSecret, redirectURL string
 	var scopes = []string{oidc.ScopeOpenID, "profile", "email"}
 
 	switch providerName {
 	case ProviderGoogle:
-		issuerURL = os.Getenv("GOOGLE_ISSUER")
-		clientID = os.Getenv("GOOGLE_CLIENT_ID")
-		clientSecret = os.Getenv("GOOGLE_CLIENT_SECRET")
-		redirectURL = os.Getenv("GOOGLE_CALLBACK_URL")
+		issuerURL = config.GoogleIssuer
+		clientID = config.GoogleClientID
+		clientSecret = config.GoogleClientSecret
+		redirectURL = config.GoogleCallbackURL
 	default:
 		return nil, errtrace.Wrap(errors.New("invalid provider"))
 	}

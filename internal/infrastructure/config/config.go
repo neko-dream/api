@@ -10,7 +10,7 @@ type Config struct {
 	DatabaseURL        string `mapstructure:"DATABASE_URL"`
 	GoogleClientID     string `mapstructure:"GOOGLE_CLIENT_ID"`
 	GoogleClientSecret string `mapstructure:"GOOGLE_CLIENT_SECRET"`
-	GoogleRedirectURL  string `mapstructure:"GOOGLE_REDIRECT_URL"`
+	GoogleCallbackURL  string `mapstructure:"GOOGLE_CALLBACK_URL"`
 	GoogleIssuer       string `mapstructure:"GOOGLE_ISSUER"`
 	DOMAIN             string `mapstructure:"DOMAIN"`
 	PORT               string `mapstructure:"PORT"`
