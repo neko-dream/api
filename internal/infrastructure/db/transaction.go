@@ -8,6 +8,7 @@ import (
 
 	"braces.dev/errtrace"
 	model "github.com/neko-dream/server/internal/infrastructure/db/sqlc"
+	"github.com/neko-dream/server/pkg/utils"
 )
 
 // DBManager DBコネクションおよびトランザクションを管理
@@ -18,7 +19,6 @@ type DBManager struct {
 // ExecTx トランザクションを実行
 func (s *DBManager) ExecTx(ctx context.Context, fn func(context.Context) error) error {
 	var tx *sql.Tx
-
 	// トランザククションが終了するまで待つ
 	wg := sync.WaitGroup{}
 	wg.Add(1)
@@ -31,6 +31,7 @@ func (s *DBManager) ExecTx(ctx context.Context, fn func(context.Context) error) 
 		// トランザクションが開始されていない場合は新しくトランザクションを開始する
 		tmpTx, err := s.db.BeginTx(ctx, nil)
 		if err != nil {
+			utils.HandleError(ctx, err, "トランザクションの開始に失敗")
 			return errtrace.Wrap(err)
 		}
 		tx = tmpTx
@@ -39,12 +40,14 @@ func (s *DBManager) ExecTx(ctx context.Context, fn func(context.Context) error) 
 	// トランザクションをコンテキストにセットし処理を実行
 	if err := fn(context.WithValue(ctx, key, tx)); err != nil {
 		if rbErr := tx.Rollback(); rbErr != nil {
+			utils.HandleError(ctx, rbErr, "トランザクションのロールバックに失敗")
 			return errtrace.Wrap(fmt.Errorf("tx err: %v, rb err: %v", err, rbErr))
 		}
 		return errtrace.Wrap(err)
 	}
 
 	if err := tx.Commit(); err != nil {
+		utils.HandleError(ctx, err, "トランザクションのコミットに失敗")
 		return errtrace.Wrap(err)
 	}
 
@@ -54,7 +57,7 @@ func (s *DBManager) ExecTx(ctx context.Context, fn func(context.Context) error) 
 // GetQueries トランザクションが開始されている場合はトラトランザクションを返す。そうでない場合はDBコネクションを返す。
 func (s *DBManager) GetQueries(ctx context.Context) *model.Queries {
 	// トランザクションが開始されている場合はトランザクションを返す
-	if tx := getTransaction(ctx); tx != nil {
+	if tx, ok := ctx.Value(key).(*sql.Tx); ok {
 		return model.New(tx)
 	}
 	// トランザクションが開始されていない場合はDBコネクションを返す
