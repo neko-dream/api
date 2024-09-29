@@ -42,7 +42,7 @@ CREATE TABLE "user_demographics" (
   "created_at" timestamp NOT NULL DEFAULT (now()),
 
   FOREIGN KEY ("user_id") REFERENCES "users" ("user_id"),
-  INDEX "user_demographics_year_of_birth_index" ("year_of_birth"),
+  INDEX "user_demographics_year_of_birth_index" ("year_of_birth")
 );
 
 CREATE TABLE "talk_sessions" (
