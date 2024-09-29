@@ -29,12 +29,13 @@ type (
 	}
 
 	User struct {
-		userID      shared.UUID[User]
-		displayID   *string
-		displayName *string
-		picture     *string
-		subject     string
-		provider    oauth.AuthProviderName
+		userID       shared.UUID[User]
+		displayID    *string
+		displayName  *string
+		picture      *string
+		subject      string
+		provider     oauth.AuthProviderName
+		demographics *UserDemographics
 	}
 )
 
@@ -68,6 +69,10 @@ func (u *User) Provider() oauth.AuthProviderName {
 
 func (u *User) Verify() bool {
 	return u.displayID != nil && u.displayName != nil
+}
+
+func (u *User) SetDemographics(demographics *UserDemographics) {
+	u.demographics = demographics
 }
 
 func NewUser(
