@@ -7,7 +7,7 @@ import (
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/presentation/oas"
-	"github.com/neko-dream/server/internal/usecase/auth_usecase"
+	auth_usecase "github.com/neko-dream/server/internal/usecase/auth"
 	http_utils "github.com/neko-dream/server/pkg/http"
 )
 
