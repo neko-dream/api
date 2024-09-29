@@ -9,17 +9,22 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/pkg/oauth"
+	"github.com/neko-dream/server/pkg/utils"
 )
 
 type authService struct {
+	config         *config.Config
 	userRepository user.UserRepository
 }
 
 func NewAuthService(
+	config *config.Config,
 	userRepository user.UserRepository,
 ) auth.AuthService {
 	return &authService{
+		config:         config,
 		userRepository: userRepository,
 	}
 }
@@ -31,23 +36,28 @@ func (a *authService) Authenticate(
 ) (*user.User, error) {
 	authProviderName, err := oauth.NewAuthProviderName(providerName)
 	if err != nil {
+		utils.HandleError(ctx, err, "NewAuthProviderName")
 		return nil, errtrace.Wrap(messages.InvalidProviderError)
 	}
 
 	provider, err := oauth.OIDCProviderFactory(
 		ctx,
+		a.config,
 		authProviderName,
 	)
 	if err != nil {
+		utils.HandleError(ctx, err, "OIDCProviderFactory")
 		return nil, errtrace.Wrap(err)
 	}
 
 	userInfo, err := provider.UserInfo(ctx, code)
 	if err != nil {
+		utils.HandleError(ctx, err, "OIDCProvider.UserInfo")
 		return nil, errtrace.Wrap(err)
 	}
 	existUser, err := a.userRepository.FindBySubject(ctx, user.UserSubject(userInfo.Subject))
 	if err != nil {
+		utils.HandleError(ctx, err, "UserRepository.FindBySubject")
 		return nil, errtrace.Wrap(err)
 	}
 	if existUser != nil {
@@ -63,6 +73,7 @@ func (a *authService) Authenticate(
 		&userInfo.Picture,
 	)
 	if err := a.userRepository.Create(ctx, newUser); err != nil {
+		utils.HandleError(ctx, err, "UserRepository.Create")
 		return nil, errtrace.Wrap(err)
 	}
 
@@ -80,9 +91,11 @@ func (a *authService) GetAuthURL(
 
 	provider, err := oauth.OIDCProviderFactory(
 		ctx,
+		a.config,
 		authProviderName,
 	)
 	if err != nil {
+		utils.HandleError(ctx, err, "OIDCProviderFactory")
 		return nil, "", errtrace.Wrap(err)
 	}
 
@@ -90,6 +103,7 @@ func (a *authService) GetAuthURL(
 	authURL := provider.GetAuthURL(ctx, state)
 	url, err := url.Parse(authURL)
 	if err != nil {
+		utils.HandleError(ctx, err, "url.Parse")
 		return nil, "", errtrace.Wrap(err)
 	}
 
