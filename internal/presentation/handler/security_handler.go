@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"log"
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
@@ -14,12 +13,15 @@ type securityHandler struct {
 }
 
 func (s *securityHandler) HandleSessionId(ctx context.Context, operationName string, t oas.SessionId) (context.Context, error) {
-	log.Println("HandleSessionId")
-	token, err := s.TokenManager.Parse(ctx, t.GetAPIKey())
+	claim, err := s.TokenManager.Parse(ctx, t.GetAPIKey())
 	if err != nil {
 		return ctx, messages.ForbiddenError
 	}
-	return session.SetSession(ctx, token), nil
+	if claim.IsExpired() {
+		return ctx, messages.TokenExpiredError
+	}
+
+	return session.SetSession(ctx, claim), nil
 }
 
 func NewSecurityHandler(

@@ -21,4 +21,9 @@ var (
 		Code:       "AUTH-0003",
 		Message:    "ユーザIDが不正です。",
 	}
+	TokenExpiredError = &APIError{
+		StatusCode: 401,
+		Code:       "AUTH-0004",
+		Message:    "トークンが期限切れです。再ログインしてください。",
+	}
 )
