@@ -1,13 +1,13 @@
 package di
 
 import (
-	"database/sql"
 	"log"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/infrastructure/auth"
+	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/datasource/postgresql"
 	"github.com/neko-dream/server/internal/infrastructure/datasource/repository"
 	"github.com/neko-dream/server/internal/infrastructure/db"
@@ -27,7 +27,9 @@ func AddProvider(arg ProvideArg) {
 
 func BuildContainer() *dig.Container {
 	deps := []ProvideArg{
-		{func() *sql.DB { return postgresql.Connect() }, nil},
+		{config.LoadConfig, nil},
+		{db.NewMigrator, nil},
+		{postgresql.Connect, nil},
 		{db.NewDBManager, nil},
 		{repository.NewSessionRepository, nil},
 		{repository.NewUserRepository, nil},

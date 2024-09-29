@@ -46,7 +46,7 @@ var (
 
 func initSecret() {
 	secretReadOnce.Do(func() {
-		secretSingleton = os.Getenv("JWT_SECRET")
+		secretSingleton = os.Getenv("TOKEN_SECRET")
 	})
 }
 

@@ -2,13 +2,14 @@ package postgresql
 
 import (
 	"database/sql"
-	"os"
+
+	"github.com/neko-dream/server/internal/infrastructure/config"
 )
 
-func Connect() *sql.DB {
+func Connect(config *config.Config) *sql.DB {
 	pgx, err := sql.Open(
 		"pgx",
-		os.Getenv("DATABASE_URL"),
+		config.DatabaseURL,
 	)
 	if err != nil {
 		panic(err)

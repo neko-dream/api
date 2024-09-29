@@ -3,27 +3,18 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
 
+	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/db"
 	"github.com/neko-dream/server/internal/infrastructure/di"
 	"github.com/neko-dream/server/internal/infrastructure/middleware"
 	"github.com/neko-dream/server/internal/presentation/handler"
 	"github.com/neko-dream/server/internal/presentation/oas"
-	"github.com/neko-dream/server/pkg/utils"
 
 	swMiddleware "github.com/go-openapi/runtime/middleware"
 )
 
 func main() {
-	// .envを読み込む
-	if err := utils.LoadEnv(); err != nil {
-		panic(err)
-	}
-
-	db.Down()
-	db.Migration()
-
 	container := di.BuildContainer()
 	srv, err := oas.NewServer(
 		di.Invoke[oas.Handler](container),
@@ -33,6 +24,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	config := di.Invoke[*config.Config](container)
+	migrator := di.Invoke[*db.Migrator](container)
+	migrator.Down()
+	migrator.Up()
 
 	reqMiddleware := middleware.ReqMiddleware(srv)
 	corsHandler := middleware.CORSMiddleware(reqMiddleware)
@@ -49,8 +45,7 @@ func main() {
 	mux.Handle("/docs/", sh)
 	mux.Handle("/", corsHandler)
 
-	port := os.Getenv("PORT")
-	if err := http.ListenAndServe(fmt.Sprintf(":%s", port), mux); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf(":%s", config.PORT), mux); err != nil {
 		panic(err)
 	}
 }

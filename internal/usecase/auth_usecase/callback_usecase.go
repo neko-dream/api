@@ -3,13 +3,13 @@ package auth_usecase
 import (
 	"context"
 	"net/http"
-	"os"
 	"time"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
+	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/db"
 	cookie_utils "github.com/neko-dream/server/pkg/cookie"
 )
@@ -31,6 +31,7 @@ type (
 
 	authCallbackInteractor struct {
 		*db.DBManager
+		*config.Config
 		auth.AuthService
 		session.SessionRepository
 		session.SessionService
@@ -85,14 +86,13 @@ func (u *authCallbackInteractor) Execute(ctx context.Context, input CallbackInpu
 		if err != nil {
 			return errtrace.Wrap(err)
 		}
-		domain := os.Getenv("DOMAIN")
 		cookie := http.Cookie{
 			Name:     "SessionId",
 			Value:    token,
 			HttpOnly: true,
 			Path:     "/",
 			SameSite: http.SameSiteLaxMode,
-			Domain:   domain,
+			Domain:   u.DOMAIN,
 		}
 		if input.Remember {
 			cookie.MaxAge = 60 * 60 * 24 * 30

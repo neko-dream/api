@@ -4,10 +4,10 @@ import (
 	"context"
 	"net/http"
 	"net/url"
-	"os"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/auth"
+	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/db"
 )
 
@@ -28,6 +28,7 @@ type (
 
 	authorizeInteractor struct {
 		*db.DBManager
+		*config.Config
 		auth.AuthService
 	}
 )
@@ -50,20 +51,19 @@ func (a *authorizeInteractor) Execute(ctx context.Context, input AuthLoginInput)
 	}); err != nil {
 		return AuthLoginOutput{}, errtrace.Wrap(err)
 	}
-	domain := os.Getenv("DOMAIN")
 	stateCookie := http.Cookie{
 		Name:     "state",
 		Value:    s,
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
-		Domain:   domain,
+		Domain:   a.DOMAIN,
 	}
 	redirectURLCookie := http.Cookie{
 		Name:     "redirect_url",
 		Value:    input.RedirectURL,
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
-		Domain:   domain,
+		Domain:   a.DOMAIN,
 	}
 
 	return AuthLoginOutput{
