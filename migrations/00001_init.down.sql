@@ -4,3 +4,4 @@ DROP TABLE "talk_sessions";
 DROP TABLE "opinions";
 DROP TABLE "votes";
 DROP TABLE "sessions";
+DROP TABLE "user_demographics";
