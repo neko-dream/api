@@ -30,7 +30,7 @@ func (m *Migrator) Up() {
 	}
 	mi, err := migrate.NewWithDatabaseInstance(
 		"file://migrations",
-		"catsdream",
+		"postgres",
 		driver,
 	)
 	if err != nil {
@@ -38,6 +38,7 @@ func (m *Migrator) Up() {
 	}
 	if err := mi.Up(); err != nil {
 		if err != migrate.ErrNoChange {
+			log.Println(err)
 		}
 	}
 }
@@ -54,7 +55,7 @@ func (m *Migrator) Down() {
 	}
 	mi, err := migrate.NewWithDatabaseInstance(
 		"file://migrations",
-		"catsdream",
+		"postgres",
 		driver,
 	)
 	if err := mi.Drop(); err != nil {
