@@ -27,7 +27,7 @@ func main() {
 
 	config := di.Invoke[*config.Config](container)
 	migrator := di.Invoke[*db.Migrator](container)
-	migrator.Down()
+	// migrator.Down()
 	migrator.Up()
 
 	reqMiddleware := middleware.ReqMiddleware(srv)
