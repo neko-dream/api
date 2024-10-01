@@ -2,12 +2,14 @@ package handler
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/infrastructure/db"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	user_usecase "github.com/neko-dream/server/internal/usecase/user"
+	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/utils"
 )
 
@@ -81,6 +83,9 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 		utils.HandleError(ctx, err, "RegisterUserUseCase.Execute")
 		return nil, err
 	}
+
+	w := http_utils.GetHTTPResponse(ctx)
+	http.SetCookie(w, out.Cookie)
 
 	return &oas.RegisterUserOK{
 		DisplayID:   out.DisplayID,

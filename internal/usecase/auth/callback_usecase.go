@@ -98,10 +98,9 @@ func (u *authCallbackInteractor) Execute(ctx context.Context, input CallbackInpu
 			Path:     "/",
 			SameSite: http.SameSiteLaxMode,
 			Domain:   u.DOMAIN,
+			MaxAge:   60 * 60 * 24 * 7,
 		}
-		if input.Remember {
-			cookie.MaxAge = 60 * 60 * 24 * 30
-		}
+
 		c = cookie
 		return nil
 	}); err != nil {

@@ -37,7 +37,20 @@ func (s *sessionService) DeactivateUserSessions(ctx context.Context, userID shar
 }
 
 // RefreshSession implements session.SessionService.
-func (s *sessionService) RefreshSession(ctx context.Context, sess session.Session) (*session.Session, error) {
+func (s *sessionService) RefreshSession(ctx context.Context, userID shared.UUID[user.User]) (*session.Session, error) {
+	// sessionを取得
+	sessList, err := s.sessionRepository.FindByUserID(ctx, userID)
+	if err != nil {
+		return nil, errtrace.Wrap(err)
+	}
+	if len(sessList) == 0 {
+		return nil, errtrace.Wrap(FailedToDeactivateSessionStatus)
+	}
+
+	// sessionが複数存在する場合は最新のものを取得
+	sessList = session.SortByLastActivity(sessList)
+	sess := sessList[:1][1]
+
 	// sessionが有効期限内であることを確認
 	if !sess.IsActive() {
 		return nil, errtrace.Wrap(SessionIsExpired)

@@ -46,7 +46,7 @@ type (
 	}
 
 	SessionService interface {
-		RefreshSession(context.Context, Session) (*Session, error)
+		RefreshSession(context.Context, shared.UUID[user.User]) (*Session, error)
 		DeactivateUserSessions(context.Context, shared.UUID[user.User]) error
 	}
 
@@ -113,4 +113,19 @@ func (s *Session) LastActivityAt() time.Time {
 
 func (s *Session) UpdateLastActivity() {
 	s.lastActivity = time.Now()
+}
+
+func SortByLastActivity(sessions []Session) []Session {
+	sortedSession := make([]Session, len(sessions))
+	copy(sortedSession, sessions)
+
+	for i := 0; i < len(sortedSession); i++ {
+		for j := i + 1; j < len(sortedSession); j++ {
+			if sortedSession[i].lastActivity.Before(sortedSession[j].lastActivity) {
+				sortedSession[i], sortedSession[j] = sortedSession[j], sortedSession[i]
+			}
+		}
+	}
+
+	return sessions
 }
