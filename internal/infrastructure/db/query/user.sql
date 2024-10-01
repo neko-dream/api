@@ -63,4 +63,10 @@ DO UPDATE SET
     updated_at = now();
 
 
-
+-- name: UserFindByDisplayID :one
+SELECT
+    *
+FROM
+    "users"
+WHERE
+    display_id = $1;

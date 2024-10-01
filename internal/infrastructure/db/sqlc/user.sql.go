@@ -203,6 +203,29 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
 	return err
 }
 
+const userFindByDisplayID = `-- name: UserFindByDisplayID :one
+SELECT
+    user_id, display_id, display_name, picture, created_at, updated_at
+FROM
+    "users"
+WHERE
+    display_id = $1
+`
+
+func (q *Queries) UserFindByDisplayID(ctx context.Context, displayID sql.NullString) (User, error) {
+	row := q.db.QueryRowContext(ctx, userFindByDisplayID, displayID)
+	var i User
+	err := row.Scan(
+		&i.UserID,
+		&i.DisplayID,
+		&i.DisplayName,
+		&i.Picture,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const verifyUser = `-- name: VerifyUser :exec
 UPDATE "user_auths" SET is_verified = true WHERE user_id = $1
 `
