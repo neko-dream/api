@@ -1,5 +1,7 @@
 package user
 
+import "github.com/samber/lo"
+
 type Occupation int
 
 const (
@@ -38,11 +40,17 @@ func (o Occupation) String() string {
 	return str
 }
 
-func NewOccupation(occupation string) (Occupation, error) {
+func NewOccupation(occupation *string) *Occupation {
+	if occupation == nil {
+		return nil
+	}
+	if *occupation == "" {
+		return nil
+	}
 	for key, val := range OccupationMap {
-		if val == occupation {
-			return key, nil
+		if val == *occupation {
+			return lo.ToPtr(key)
 		}
 	}
-	return OccupationOther, nil
+	return nil
 }

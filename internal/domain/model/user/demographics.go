@@ -2,11 +2,11 @@ package user
 
 type (
 	UserDemographics struct {
-		yearOfBirth   *YearOfBirth  // ユーザーの生年
-		occupation    *Occupation   // ユーザーの職業
-		gender        *Gender       // ユーザーの性別
-		municipality  *Municipality // ユーザーの居住地
-		householdSize *int          // ユーザーの世帯人数
+		yearOfBirth   *YearOfBirth   // ユーザーの生年
+		occupation    *Occupation    // ユーザーの職業
+		gender        *Gender        // ユーザーの性別
+		municipality  *Municipality  // ユーザーの居住地
+		householdSize *HouseholdSize // ユーザーの世帯人数
 	}
 )
 
@@ -31,7 +31,7 @@ func (u *UserDemographics) Municipality() *Municipality {
 	return u.municipality
 }
 
-func (u *UserDemographics) HouseholdSize() *int {
+func (u *UserDemographics) HouseholdSize() *HouseholdSize {
 	return u.householdSize
 }
 
@@ -44,7 +44,7 @@ func NewUserDemographics(
 	occupation *Occupation,
 	gender *Gender,
 	municipality *Municipality,
-	householdSize *int,
+	householdSize *HouseholdSize,
 ) UserDemographics {
 	return UserDemographics{
 		yearOfBirth:   yearOfBirth,

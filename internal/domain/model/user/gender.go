@@ -26,9 +26,15 @@ func (g *Gender) String() string {
 	return str
 }
 
-func NewGender(s string) Gender {
+func NewGender(s *string) Gender {
+	if s == nil {
+		return GenderPreferNotToSay
+	}
+	if *s == "" {
+		return GenderPreferNotToSay
+	}
 	for key, val := range GenderMap {
-		if val == s {
+		if val == *s {
 			return key
 		}
 	}
