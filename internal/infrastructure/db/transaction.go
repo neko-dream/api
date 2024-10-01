@@ -3,8 +3,6 @@ package db
 import (
 	"context"
 	"database/sql"
-	"fmt"
-	"sync"
 
 	"braces.dev/errtrace"
 	model "github.com/neko-dream/server/internal/infrastructure/db/sqlc"
@@ -16,13 +14,9 @@ type DBManager struct {
 	db *sql.DB
 }
 
-// ExecTx トランザクションを実行
 func (s *DBManager) ExecTx(ctx context.Context, fn func(context.Context) error) error {
+	panicked := true
 	var tx *sql.Tx
-	// トランザククションが終了するまで待つ
-	wg := sync.WaitGroup{}
-	wg.Add(1)
-	defer wg.Done()
 
 	if tmpTx := getTransaction(ctx); tmpTx != nil {
 		// トランザクションが既に開始されているのならそれを使う
@@ -37,19 +31,25 @@ func (s *DBManager) ExecTx(ctx context.Context, fn func(context.Context) error) 
 		tx = tmpTx
 	}
 
-	// トランザクションをコンテキストにセットし処理を実行
-	if err := fn(context.WithValue(ctx, key, tx)); err != nil {
-		if rbErr := tx.Rollback(); rbErr != nil {
-			utils.HandleError(ctx, rbErr, "トランザクションのロールバックに失敗")
-			return errtrace.Wrap(fmt.Errorf("tx err: %v, rb err: %v", err, rbErr))
+	defer func() {
+		if panicked {
+			if rbErr := tx.Rollback(); rbErr != nil {
+				utils.HandleError(ctx, rbErr, "トランザクションのロールバックに失敗")
+			}
 		}
-		return errtrace.Wrap(err)
+	}()
+
+	if err := fn(context.WithValue(ctx, key, tx)); err != nil {
+		utils.HandleError(ctx, err, "トランザクション内の処理で失敗")
+		return err
 	}
 
 	if err := tx.Commit(); err != nil {
 		utils.HandleError(ctx, err, "トランザクションのコミットに失敗")
 		return errtrace.Wrap(err)
 	}
+
+	panicked = false
 
 	return nil
 }
