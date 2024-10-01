@@ -9,7 +9,6 @@ import (
 	"github.com/neko-dream/server/internal/presentation/oas"
 	user_usecase "github.com/neko-dream/server/internal/usecase/user"
 	"github.com/neko-dream/server/pkg/utils"
-	"github.com/samber/lo"
 )
 
 type userHandler struct {
@@ -18,7 +17,7 @@ type userHandler struct {
 }
 
 // EditUserProfile implements oas.UserHandler.
-func (u *userHandler) EditUserProfile(ctx context.Context) (*oas.EditUserProfileOK, error) {
+func (u *userHandler) EditUserProfile(ctx context.Context) (oas.EditUserProfileRes, error) {
 	panic("unimplemented")
 }
 
@@ -37,44 +36,50 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 	if !params.IsSet() {
 		return nil, messages.RequiredParameterError
 	}
-	value := params.Value
-	if err := value.Validate(); err != nil {
-		utils.HandleError(ctx, err, "value.Validate")
-		return nil, messages.RequiredParameterError
-	}
 	userID, err := claim.UserID()
 	if err != nil {
 		utils.HandleError(ctx, err, "claim.UserID")
 		return nil, messages.InternalServerError
 	}
-	genderByte, err := value.Gender.MarshalText()
-	if err != nil {
-		utils.HandleError(ctx, err, "value.Gender")
-		return nil, messages.InternalServerError
+	value := params.Value
+	if err := value.Validate(); err != nil {
+		utils.HandleError(ctx, err, "value.Validate")
+		return nil, messages.RequiredParameterError
 	}
-	gender := string(genderByte)
-	occupationByte, err := value.Occupation.Value.MarshalText()
-	if err != nil {
-		utils.HandleError(ctx, err, "value.Occupation")
-		return nil, messages.InternalServerError
-	}
-	occupation := string(occupationByte)
+	gender := utils.ToPtrIfNotNullFunc(value.Gender.Null, func() string {
+		txt, err := value.Gender.Value.MarshalText()
+		if err != nil {
+			utils.HandleError(ctx, err, "value.Gender")
+			return ""
+		}
+		return string(txt)
+	})
+	occupation := utils.ToPtrIfNotNullFunc(value.Occupation.Null, func() string {
+		txt, err := value.Occupation.Value.MarshalText()
+		if err != nil {
+			utils.HandleError(ctx, err, "value.Occupation")
+			return ""
+		}
+		return string(txt)
+	})
+	municipality := utils.ToPtrIfNotNullValue(value.Municipality.Null, value.Municipality.Value)
+	yearOfBirth := utils.ToPtrIfNotNullValue(value.YearOfBirth.Null, value.YearOfBirth.Value)
 
 	input := user_usecase.RegisterUserInput{
 		UserID:        userID,
 		DisplayID:     value.DisplayID,
 		DisplayName:   value.DisplayName,
 		PictureURL:    claim.Picture,
-		YearOfBirth:   &value.YearOfBirth.Value,
-		Gender:        lo.ToPtr(gender),
-		Municipality:  lo.ToPtr(value.Municipality.Value),
-		Occupation:    lo.ToPtr(occupation),
+		YearOfBirth:   yearOfBirth,
+		Gender:        gender,
+		Municipality:  municipality,
+		Occupation:    occupation,
 		HouseholdSize: &value.HouseholdSize.Value,
 	}
 	out, err := u.RegisterUserUseCase.Execute(ctx, input)
 	if err != nil {
 		utils.HandleError(ctx, err, "RegisterUserUseCase.Execute")
-		return nil, messages.InternalServerError
+		return nil, err
 	}
 
 	return &oas.RegisterUserOK{
@@ -85,8 +90,10 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 
 func NewUserHandler(
 	DBManager *db.DBManager,
+	registerUserUsecase user_usecase.RegisterUserUseCase,
 ) oas.UserHandler {
 	return &userHandler{
-		DBManager: DBManager,
+		DBManager:           DBManager,
+		RegisterUserUseCase: registerUserUsecase,
 	}
 }
