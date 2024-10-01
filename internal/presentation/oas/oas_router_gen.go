@@ -115,7 +115,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							}
 
 							if len(elem) == 0 {
-								// Leaf node.
 								switch r.Method {
 								case "GET":
 									s.handleListOpinionsRequest([1]string{
@@ -126,6 +125,37 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								}
 
 								return
+							}
+							switch elem[0] {
+							case '/': // Prefix: "/"
+								origElem := elem
+								if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								// Param: "opinionID"
+								// Leaf parameter
+								args[1] = elem
+								elem = ""
+
+								if len(elem) == 0 {
+									// Leaf node.
+									switch r.Method {
+									case "GET":
+										s.handleOpinionCommentsRequest([2]string{
+											args[0],
+											args[1],
+										}, elemIsEscaped, w, r)
+									default:
+										s.notAllowed(w, r, "GET")
+									}
+
+									return
+								}
+
+								elem = origElem
 							}
 
 							elem = origElem
@@ -183,9 +213,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								return
 							}
 							switch elem[0] {
-							case '/': // Prefix: "/opinions"
+							case '/': // Prefix: "/opinion"
 								origElem := elem
-								if l := len("/opinions"); len(elem) >= l && elem[0:l] == "/opinions" {
+								if l := len("/opinion"); len(elem) >= l && elem[0:l] == "/opinion" {
 									elem = elem[l:]
 								} else {
 									break
@@ -193,59 +223,83 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 								if len(elem) == 0 {
 									switch r.Method {
-									case "POST":
-										s.handlePostOpinionPostRequest([1]string{
+									case "GET":
+										s.handleGetTopOpinionsRequest([1]string{
 											args[0],
 										}, elemIsEscaped, w, r)
 									default:
-										s.notAllowed(w, r, "POST")
+										s.notAllowed(w, r, "GET")
 									}
 
 									return
 								}
 								switch elem[0] {
-								case '/': // Prefix: "/"
+								case 's': // Prefix: "s"
 									origElem := elem
-									if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+									if l := len("s"); len(elem) >= l && elem[0:l] == "s" {
 										elem = elem[l:]
 									} else {
 										break
 									}
 
-									// Param: "opinionID"
-									// Match until "/"
-									idx := strings.IndexByte(elem, '/')
-									if idx < 0 {
-										idx = len(elem)
-									}
-									args[1] = elem[:idx]
-									elem = elem[idx:]
-
 									if len(elem) == 0 {
-										break
+										switch r.Method {
+										case "POST":
+											s.handlePostOpinionPostRequest([1]string{
+												args[0],
+											}, elemIsEscaped, w, r)
+										default:
+											s.notAllowed(w, r, "POST")
+										}
+
+										return
 									}
 									switch elem[0] {
-									case '/': // Prefix: "/intentions"
+									case '/': // Prefix: "/"
 										origElem := elem
-										if l := len("/intentions"); len(elem) >= l && elem[0:l] == "/intentions" {
+										if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 											elem = elem[l:]
 										} else {
 											break
 										}
 
+										// Param: "opinionID"
+										// Match until "/"
+										idx := strings.IndexByte(elem, '/')
+										if idx < 0 {
+											idx = len(elem)
+										}
+										args[1] = elem[:idx]
+										elem = elem[idx:]
+
 										if len(elem) == 0 {
-											// Leaf node.
-											switch r.Method {
-											case "POST":
-												s.handleIntentionRequest([2]string{
-													args[0],
-													args[1],
-												}, elemIsEscaped, w, r)
-											default:
-												s.notAllowed(w, r, "POST")
+											break
+										}
+										switch elem[0] {
+										case '/': // Prefix: "/intentions"
+											origElem := elem
+											if l := len("/intentions"); len(elem) >= l && elem[0:l] == "/intentions" {
+												elem = elem[l:]
+											} else {
+												break
 											}
 
-											return
+											if len(elem) == 0 {
+												// Leaf node.
+												switch r.Method {
+												case "POST":
+													s.handleIntentionRequest([2]string{
+														args[0],
+														args[1],
+													}, elemIsEscaped, w, r)
+												default:
+													s.notAllowed(w, r, "POST")
+												}
+
+												return
+											}
+
+											elem = origElem
 										}
 
 										elem = origElem
@@ -546,7 +600,6 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							}
 
 							if len(elem) == 0 {
-								// Leaf node.
 								switch method {
 								case "GET":
 									r.name = "ListOpinions"
@@ -559,6 +612,38 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								default:
 									return
 								}
+							}
+							switch elem[0] {
+							case '/': // Prefix: "/"
+								origElem := elem
+								if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								// Param: "opinionID"
+								// Leaf parameter
+								args[1] = elem
+								elem = ""
+
+								if len(elem) == 0 {
+									// Leaf node.
+									switch method {
+									case "GET":
+										r.name = "OpinionComments"
+										r.summary = "意見に対するコメント一覧を返す"
+										r.operationID = "opinionComments"
+										r.pathPattern = "/api/talksession/{talkSessionID}/opinions/{opinionID}"
+										r.args = args
+										r.count = 2
+										return r, true
+									default:
+										return
+									}
+								}
+
+								elem = origElem
 							}
 
 							elem = origElem
@@ -577,7 +662,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							switch method {
 							case "GET":
 								r.name = "GetTalkSessions"
-								r.summary = "トークセッションリスト"
+								r.summary = "トークセッションコレクション"
 								r.operationID = "getTalkSessions"
 								r.pathPattern = "/api/talksessions"
 								r.args = args
@@ -628,9 +713,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								}
 							}
 							switch elem[0] {
-							case '/': // Prefix: "/opinions"
+							case '/': // Prefix: "/opinion"
 								origElem := elem
-								if l := len("/opinions"); len(elem) >= l && elem[0:l] == "/opinions" {
+								if l := len("/opinion"); len(elem) >= l && elem[0:l] == "/opinion" {
 									elem = elem[l:]
 								} else {
 									break
@@ -638,11 +723,11 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 
 								if len(elem) == 0 {
 									switch method {
-									case "POST":
-										r.name = "PostOpinionPost"
-										r.summary = "セッションに対して意見投稿"
-										r.operationID = "postOpinionPost"
-										r.pathPattern = "/api/talksessions/{talkSessionID}/opinions"
+									case "GET":
+										r.name = "GetTopOpinions"
+										r.summary = "🚧 分析に関する意見"
+										r.operationID = "getTopOpinions"
+										r.pathPattern = "/api/talksessions/{talkSessionId}/opinion"
 										r.args = args
 										r.count = 1
 										return r, true
@@ -651,49 +736,75 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									}
 								}
 								switch elem[0] {
-								case '/': // Prefix: "/"
+								case 's': // Prefix: "s"
 									origElem := elem
-									if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+									if l := len("s"); len(elem) >= l && elem[0:l] == "s" {
 										elem = elem[l:]
 									} else {
 										break
 									}
 
-									// Param: "opinionID"
-									// Match until "/"
-									idx := strings.IndexByte(elem, '/')
-									if idx < 0 {
-										idx = len(elem)
-									}
-									args[1] = elem[:idx]
-									elem = elem[idx:]
-
 									if len(elem) == 0 {
-										break
+										switch method {
+										case "POST":
+											r.name = "PostOpinionPost"
+											r.summary = "セッションに対して意見投稿"
+											r.operationID = "postOpinionPost"
+											r.pathPattern = "/api/talksessions/{talkSessionID}/opinions"
+											r.args = args
+											r.count = 1
+											return r, true
+										default:
+											return
+										}
 									}
 									switch elem[0] {
-									case '/': // Prefix: "/intentions"
+									case '/': // Prefix: "/"
 										origElem := elem
-										if l := len("/intentions"); len(elem) >= l && elem[0:l] == "/intentions" {
+										if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 											elem = elem[l:]
 										} else {
 											break
 										}
 
+										// Param: "opinionID"
+										// Match until "/"
+										idx := strings.IndexByte(elem, '/')
+										if idx < 0 {
+											idx = len(elem)
+										}
+										args[1] = elem[:idx]
+										elem = elem[idx:]
+
 										if len(elem) == 0 {
-											// Leaf node.
-											switch method {
-											case "POST":
-												r.name = "Intention"
-												r.summary = "意思表明API"
-												r.operationID = "Intention"
-												r.pathPattern = "/api/talksessions/{talkSessionID}/opinions/{opinionID}/intentions"
-												r.args = args
-												r.count = 2
-												return r, true
-											default:
-												return
+											break
+										}
+										switch elem[0] {
+										case '/': // Prefix: "/intentions"
+											origElem := elem
+											if l := len("/intentions"); len(elem) >= l && elem[0:l] == "/intentions" {
+												elem = elem[l:]
+											} else {
+												break
 											}
+
+											if len(elem) == 0 {
+												// Leaf node.
+												switch method {
+												case "POST":
+													r.name = "Intention"
+													r.summary = "意思表明API"
+													r.operationID = "Intention"
+													r.pathPattern = "/api/talksessions/{talkSessionID}/opinions/{opinionID}/intentions"
+													r.args = args
+													r.count = 2
+													return r, true
+												default:
+													return
+												}
+											}
+
+											elem = origElem
 										}
 
 										elem = origElem

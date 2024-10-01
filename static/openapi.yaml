@@ -31,16 +31,33 @@ paths:
               schema:
                 type: object
                 properties:
-                  talkSessionID:
+                  id:
                     type: string
-                  talkSessionTheme:
+                  theme:
                     type: string
-                  talkSessionStatus:
-                    type: string
+                  owner:
+                    type: object
+                    properties:
+                      displayID:
+                        type: string
+                        x-apidog-mock: '{{$string.uuid}}'
+                        pattern: ^[A-Za-z0-9]$
+                        examples:
+                          - userid
+                        minLength: 3
+                        maxLength: 25
+                      displayName:
+                        type: string
+                        x-apidog-mock: '{{$person.firstName}}'
+                      pictureURL:
+                        type: string
+                    required:
+                      - displayID
+                      - displayName
                 required:
-                  - talkSessionID
-                  - talkSessionTheme
-                  - talkSessionStatus
+                  - id
+                  - theme
+                  - owner
       security: []
       x-ogen-operation-group: TalkSession
   /api/talksessions:
@@ -70,20 +87,37 @@ paths:
               schema:
                 type: object
                 properties:
-                  talkSessionID:
+                  id:
                     type: string
-                  talkSessionTheme:
+                  theme:
                     type: string
-                  talkSessionStatus:
-                    type: string
+                  owner:
+                    type: object
+                    properties:
+                      displayID:
+                        type: string
+                        x-apidog-mock: '{{$string.uuid}}'
+                        pattern: ^[A-Za-z0-9]$
+                        examples:
+                          - userid
+                        minLength: 3
+                        maxLength: 25
+                      displayName:
+                        type: string
+                        x-apidog-mock: '{{$person.firstName}}'
+                      pictureURL:
+                        type: string
+                    required:
+                      - displayID
+                      - displayName
                 required:
-                  - talkSessionID
-                  - talkSessionTheme
-                  - talkSessionStatus
+                  - id
+                  - theme
+                  - owner
       security: []
       x-ogen-operation-group: TalkSession
     get:
-      summary: トークセッションリスト
+      summary: トークセッションコレクション
       deprecated: false
       description: ''
       operationId: getTalkSessions
@@ -98,7 +132,49 @@ paths:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  talkSessions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        talkSession:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            theme:
+                              type: string
+                            owner:
+                              type: object
+                              properties:
+                                displayID:
+                                  type: string
+                                  x-apidog-mock: '{{$string.uuid}}'
+                                  pattern: ^[A-Za-z0-9]$
+                                  examples:
+                                    - userid
+                                  minLength: 3
+                                  maxLength: 25
+                                displayName:
+                                  type: string
+                                  x-apidog-mock: '{{$person.firstName}}'
+                                pictureURL:
+                                  type: string
+                              required:
+                                - displayID
+                                - displayName
+                          required:
+                            - id
+                            - theme
+                            - owner
+                        opinionCount:
+                          type: integer
+                      required:
+                        - talkSession
+                        - opinionCount
+                required:
+                  - talkSessions
       security: []
       x-ogen-operation-group: TalkSession
   /api/user:
@@ -109,7 +185,7 @@ paths:
       operationId: getUserProfile
       tags:
         - user
-        - User
+        - user
       parameters: []
       responses:
         '200':
@@ -122,14 +198,21 @@ paths:
                   displayID:
                     type: string
                     x-apidog-mock: '{{$string.uuid}}'
+                    pattern: ^[A-Za-z0-9]$
+                    examples:
+                      - userid
+                    minLength: 3
+                    maxLength: 25
                   displayName:
                     type: string
                     x-apidog-mock: '{{$person.firstName}}'
+                  pictureURL:
+                    type: string
                 required:
                   - displayID
                   - displayName
       security: []
-      x-ogen-operation-group: User
+      x-ogen-operation-group: user
     put:
       summary: ユーザー情報の変更
       deprecated: false
@@ -137,7 +220,7 @@ paths:
       operationId: editUserProfile
       tags:
         - user
-        - User
+        - user
       parameters: []
       responses:
         '200':
@@ -150,14 +233,28 @@ paths:
                   displayID:
                     type: string
                     x-apidog-mock: '{{$string.uuid}}'
+                    pattern: ^[A-Za-z0-9]$
+                    examples:
+                      - userid
+                    minLength: 3
+                    maxLength: 25
                   displayName:
                     type: string
                     x-apidog-mock: '{{$person.firstName}}'
+                  pictureURL:
+                    type: string
                 required:
                   - displayID
                   - displayName
+        '500':
+          description: ServerErrorResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
       security: []
-      x-ogen-operation-group: User
+      x-ogen-operation-group: user
   /api/user/register:
     post:
       summary: ユーザー作成
@@ -166,7 +263,7 @@ paths:
       operationId: registerUser
       tags:
         - user
-        - User
+        - user
       parameters: []
       requestBody:
         content:
@@ -176,41 +273,23 @@ paths:
               properties:
                 displayName:
                   type: string
-                  minLength: 4
-                  maxLength: 30
-                  examples:
-                    - 太郎
-                    - 花子
-                  format: char
                   description: ユーザー名。日本語なども設定可能。
                   example: ''
                 displayID:
                   type: string
-                  pattern: ^\#[A-Za-z0-9]*$
-                  format: regex
-                  minLength: 4
-                  maxLength: 30
-                  examples:
-                    - tarou
-                    - hanako
                   description: ユーザーID。プロフィールのパスなどで使用される。DBのIDとは別。
                   example: ''
                 picture:
+                  type: string
                   description: ユーザーアイコンURL
                   example: ''
-                  type: string
+                  nullable: true
                 yearOfBirth:
                   type: integer
-                  format: sint32
-                  minimum: 1900
-                  maximum: 9999
-                  examples:
-                    - 2000
-                    - 2005
-                    - 2012
-                    - 1989
+                  default: 0
                   description: 生まれ年
                   example: 0
+                  nullable: true
                 gender:
                   type: string
                   enum:
@@ -218,12 +297,15 @@ paths:
                     - female
                     - other
                     - preferNotToSay
+                  default: preferNotToSay
                   description: 性別
                   example: ''
+                  nullable: true
                 municipality:
+                  type: string
                   description: 市区町村
                   example: ''
-                  type: string
+                  nullable: true
                 occupation:
                   type: string
                   enum:
@@ -237,16 +319,22 @@ paths:
                     - 学生
                     - 無職
                     - その他
+                    - 無回答
+                  default: 無回答
                   description: ユーザーの職業
                   example: ''
+                  nullable: true
                 householdSize:
                   type: integer
+                  minimum: 0
                   description: 世帯人数
                   example: 0
+                  nullable: true
               required:
                 - displayName
                 - displayID
                 - gender
+                - occupation
       responses:
         '200':
           description: 成功
@@ -258,9 +346,16 @@ paths:
                   displayID:
                     type: string
                     x-apidog-mock: '{{$string.uuid}}'
+                    pattern: ^[A-Za-z0-9]$
+                    examples:
+                      - userid
+                    minLength: 3
+                    maxLength: 25
                   displayName:
                     type: string
                     x-apidog-mock: '{{$person.firstName}}'
+                  pictureURL:
+                    type: string
                 required:
                   - displayID
                   - displayName
@@ -280,12 +375,12 @@ paths:
                 properties: {}
       security:
         - SessionId: []
-      x-ogen-operation-group: User
+      x-ogen-operation-group: user
   /api/talksession/{talkSessionID}/opinions:
     get:
       summary: セッションの意見一覧
       deprecated: false
-      description: ''
+      description: ランダムな意見
       operationId: listOpinions
       tags:
         - talk_session/opinion
@@ -313,21 +408,75 @@ paths:
                 items:
                   type: object
                   properties:
-                    opinionID:
+                    opinion:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          faker: '1'
+                          description: 意見ID
+                        title:
+                          type: string
+                        content:
+                          type: string
+                          description: 意見のテキスト
+                          minLength: 1
+                          maxLength: 140
+                        parentID:
+                          type: string
+                          description: 親の意見ID。ルートならば無し
+                        intentionStatus:
+                          type: string
+                          description: 意見投稿主の意見
+                          enum:
+                            - agree
+                            - disagree
+                            - pass
+                          x-apidog-enum:
+                            - name: ''
+                              value: agree
+                              description: 良さそう
+                            - name: ''
+                              value: disagree
+                              description: 違うかも
+                            - name: ''
+                              value: pass
+                              description: 保留
+                        pictureURL:
+                          type: string
+                          description: 画像が返る場合もある
+                        referenceURL:
+                          type: string
+                          description: 参考文献URL
+                      required:
+                        - content
+                        - id
+                        - intentionStatus
+                    user:
+                      type: object
+                      properties:
+                        displayID:
+                          type: string
+                          x-apidog-mock: '{{$string.uuid}}'
+                          pattern: ^[A-Za-z0-9]$
+                          examples:
+                            - userid
+                          minLength: 3
+                          maxLength: 25
+                        displayName:
+                          type: string
+                          x-apidog-mock: '{{$person.firstName}}'
+                        pictureURL:
+                          type: string
+                      required:
+                        - displayID
+                        - displayName
+                    commentCount:
                       type: string
-                      faker: '1'
-                      description: 意見ID
-                    opinionContent:
-                      type: string
-                      description: 意見のテキスト
-                      minLength: 1
-                      maxLength: 140
-                    parentOpinionID:
-                      type: string
-                      description: 親の意見ID。ルートならば無し
                   required:
-                    - opinionID
-                    - opinionContent
+                    - opinion
+                    - user
+                    - commentCount
         '500':
           description: ServerErrorResponse
           content:
@@ -360,6 +509,34 @@ paths:
           example: オブジェクト思考は悪だと思う
           schema:
             type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                parentOpinionID:
+                  example: ''
+                  type: string
+                intentionStatus:
+                  example: ''
+                  type: string
+                title:
+                  example: ''
+                  type: string
+                opinion:
+                  example: ''
+                  type: string
+                referenceURL:
+                  example: ''
+                  type: string
+                picture:
+                  format: binary
+                  type: string
+                  example: ''
+              required:
+                - intentionStatus
+                - opinion
       responses:
         '200':
           description: 成功
@@ -399,6 +576,17 @@ paths:
           required: true
           schema:
             type: string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                intentionStatus:
+                  example: ''
+                  type: string
+              required:
+                - intentionStatus
       responses:
         '200':
           description: 成功
@@ -409,21 +597,47 @@ paths:
                 items:
                   type: object
                   properties:
-                    opinionID:
+                    id:
                       type: string
                       faker: '1'
                       description: 意見ID
-                    opinionContent:
+                    title:
+                      type: string
+                    content:
                       type: string
                       description: 意見のテキスト
                       minLength: 1
                       maxLength: 140
-                    parentOpinionID:
+                    parentID:
                       type: string
                       description: 親の意見ID。ルートならば無し
+                    intentionStatus:
+                      type: string
+                      description: 意見投稿主の意見
+                      enum:
+                        - agree
+                        - disagree
+                        - pass
+                      x-apidog-enum:
+                        - name: ''
+                          value: agree
+                          description: 良さそう
+                        - name: ''
+                          value: disagree
+                          description: 違うかも
+                        - name: ''
+                          value: pass
+                          description: 保留
+                    pictureURL:
+                      type: string
+                      description: 画像が返る場合もある
+                    referenceURL:
+                      type: string
+                      description: 参考文献URL
                   required:
-                    - opinionID
-                    - opinionContent
+                    - content
+                    - id
+                    - intentionStatus
         '500':
           description: ServerErrorResponse
           content:
@@ -433,6 +647,241 @@ paths:
                 properties: {}
       security: []
       x-ogen-operation-group: Intention
+  /api/talksession/{talkSessionID}/opinions/{opinionID}:
+    get:
+      summary: 意見に対するコメント一覧を返す
+      deprecated: false
+      description: ''
+      operationId: opinionComments
+      tags:
+        - talk_session/opinion
+        - Opinion
+      parameters:
+        - name: talkSessionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+        - name: opinionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rootOpinion:
+                    type: object
+                    properties:
+                      user:
+                        type: object
+                        properties:
+                          displayID:
+                            type: string
+                            x-apidog-mock: '{{$string.uuid}}'
+                            pattern: ^[A-Za-z0-9]$
+                            examples:
+                              - userid
+                            minLength: 3
+                            maxLength: 25
+                          displayName:
+                            type: string
+                            x-apidog-mock: '{{$person.firstName}}'
+                          pictureURL:
+                            type: string
+                        required:
+                          - displayID
+                          - displayName
+                      opinion:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            faker: '1'
+                            description: 意見ID
+                          title:
+                            type: string
+                          content:
+                            type: string
+                            description: 意見のテキスト
+                            minLength: 1
+                            maxLength: 140
+                          parentID:
+                            type: string
+                            description: 親の意見ID。ルートならば無し
+                          intentionStatus:
+                            type: string
+                            description: 意見投稿主の意見
+                            enum:
+                              - agree
+                              - disagree
+                              - pass
+                            x-apidog-enum:
+                              - name: ''
+                                value: agree
+                                description: 良さそう
+                              - name: ''
+                                value: disagree
+                                description: 違うかも
+                              - name: ''
+                                value: pass
+                                description: 保留
+                          pictureURL:
+                            type: string
+                            description: 画像が返る場合もある
+                          referenceURL:
+                            type: string
+                            description: 参考文献URL
+                        required:
+                          - content
+                          - id
+                          - intentionStatus
+                    required:
+                      - user
+                      - opinion
+                  opinions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        opinion:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              faker: '1'
+                              description: 意見ID
+                            title:
+                              type: string
+                            content:
+                              type: string
+                              description: 意見のテキスト
+                              minLength: 1
+                              maxLength: 140
+                            parentID:
+                              type: string
+                              description: 親の意見ID。ルートならば無し
+                            intentionStatus:
+                              type: string
+                              description: 意見投稿主の意見
+                              enum:
+                                - agree
+                                - disagree
+                                - pass
+                              x-apidog-enum:
+                                - name: ''
+                                  value: agree
+                                  description: 良さそう
+                                - name: ''
+                                  value: disagree
+                                  description: 違うかも
+                                - name: ''
+                                  value: pass
+                                  description: 保留
+                            pictureURL:
+                              type: string
+                              description: 画像が返る場合もある
+                            referenceURL:
+                              type: string
+                              description: 参考文献URL
+                          required:
+                            - content
+                            - id
+                            - intentionStatus
+                        user:
+                          type: object
+                          properties:
+                            displayID:
+                              type: string
+                              x-apidog-mock: '{{$string.uuid}}'
+                              pattern: ^[A-Za-z0-9]$
+                              examples:
+                                - userid
+                              minLength: 3
+                              maxLength: 25
+                            displayName:
+                              type: string
+                              x-apidog-mock: '{{$person.firstName}}'
+                            pictureURL:
+                              type: string
+                          required:
+                            - displayID
+                            - displayName
+                        myItentionStatus:
+                          type: string
+                          description: 意見投稿主の意見
+                          enum:
+                            - agree
+                            - disagree
+                            - pass
+                          x-apidog-enum:
+                            - name: ''
+                              value: agree
+                              description: 良さそう
+                            - name: ''
+                              value: disagree
+                              description: 違うかも
+                            - name: ''
+                              value: pass
+                              description: 保留
+                      required:
+                        - opinion
+                        - user
+                        - myItentionStatus
+                required:
+                  - rootOpinion
+                  - opinions
+        '500':
+          description: ServerErrorResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      security: []
+      x-ogen-operation-group: Opinion
+  /api/talksessions/{talkSessionId}/opinion:
+    get:
+      summary: 🚧 分析に関する意見
+      deprecated: false
+      description: ''
+      operationId: getTopOpinions
+      tags:
+        - talk_session/opinion
+        - Opinion
+      parameters:
+        - name: talkSessionId
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+                required:
+                  - 01J93WTW4J3ZBAAVVZV8PSWZ6R
+        '500':
+          description: ServerErrorResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      security: []
+      x-ogen-operation-group: Opinion
   /auth/{provider}/login:
     get:
       summary: OAuthログイン
@@ -538,33 +987,83 @@ paths:
       x-ogen-operation-group: Auth
 components:
   schemas:
+    intentionStatus:
+      type: string
+      description: 意見の3種のステータス
+      enum:
+        - agree
+        - disagree
+        - pass
+      x-apidog-enum:
+        - name: ''
+          value: agree
+          description: 良さそう
+        - name: ''
+          value: disagree
+          description: 違うかも
+        - name: ''
+          value: pass
+          description: 保留
     opinion:
       type: object
       properties:
-        opinionID:
+        id:
           type: string
           faker: '1'
           description: 意見ID
-        opinionContent:
+        title:
+          type: string
+        content:
           type: string
           description: 意見のテキスト
           minLength: 1
           maxLength: 140
-        parentOpinionID:
+        parentID:
           type: string
           description: 親の意見ID。ルートならば無し
+        intentionStatus:
+          type: string
+          description: 意見投稿主の意見
+          enum:
+            - agree
+            - disagree
+            - pass
+          x-apidog-enum:
+            - name: ''
+              value: agree
+              description: 良さそう
+            - name: ''
+              value: disagree
+              description: 違うかも
+            - name: ''
+              value: pass
+              description: 保留
+        pictureURL:
+          type: string
+          description: 画像が返る場合もある
+        referenceURL:
+          type: string
+          description: 参考文献URL
       required:
-        - opinionID
-        - opinionContent
+        - content
+        - id
+        - intentionStatus
     user:
       type: object
       properties:
         displayID:
           type: string
           x-apidog-mock: '{{$string.uuid}}'
+          pattern: ^[A-Za-z0-9]$
+          examples:
+            - userid
+          minLength: 3
+          maxLength: 25
         displayName:
           type: string
           x-apidog-mock: '{{$person.firstName}}'
+        pictureURL:
+          type: string
       required:
         - displayID
         - displayName
@@ -597,16 +1096,33 @@ components:
     talkSession:
       type: object
       properties:
-        talkSessionID:
+        id:
           type: string
-        talkSessionTheme:
+        theme:
           type: string
-        talkSessionStatus:
-          type: string
+        owner:
+          type: object
+          properties:
+            displayID:
+              type: string
+              x-apidog-mock: '{{$string.uuid}}'
+              pattern: ^[A-Za-z0-9]$
+              examples:
+                - userid
+              minLength: 3
+              maxLength: 25
+            displayName:
+              type: string
+              x-apidog-mock: '{{$person.firstName}}'
+            pictureURL:
+              type: string
+          required:
+            - displayID
+            - displayName
       required:
-        - talkSessionID
-        - talkSessionTheme
-        - talkSessionStatus
+        - id
+        - theme
+        - owner
   securitySchemes:
     SessionId:
       type: apiKey

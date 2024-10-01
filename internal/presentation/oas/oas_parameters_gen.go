@@ -192,6 +192,71 @@ func decodeGetTalkSessionDetailParams(args [1]string, argsEscaped bool, r *http.
 	return params, nil
 }
 
+// GetTopOpinionsParams is parameters of getTopOpinions operation.
+type GetTopOpinionsParams struct {
+	TalkSessionId string
+}
+
+func unpackGetTopOpinionsParams(packed middleware.Parameters) (params GetTopOpinionsParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "talkSessionId",
+			In:   "path",
+		}
+		params.TalkSessionId = packed[key].(string)
+	}
+	return params
+}
+
+func decodeGetTopOpinionsParams(args [1]string, argsEscaped bool, r *http.Request) (params GetTopOpinionsParams, _ error) {
+	// Decode path: talkSessionId.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "talkSessionId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.TalkSessionId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "talkSessionId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // IntentionParams is parameters of Intention operation.
 type IntentionParams struct {
 	// セッションのID.
@@ -687,6 +752,124 @@ func decodeOAuthCallbackParams(args [1]string, argsEscaped bool, r *http.Request
 		return params, &ogenerrors.DecodeParamError{
 			Name: "state",
 			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// OpinionCommentsParams is parameters of opinionComments operation.
+type OpinionCommentsParams struct {
+	TalkSessionID string
+	OpinionID     string
+}
+
+func unpackOpinionCommentsParams(packed middleware.Parameters) (params OpinionCommentsParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "talkSessionID",
+			In:   "path",
+		}
+		params.TalkSessionID = packed[key].(string)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "opinionID",
+			In:   "path",
+		}
+		params.OpinionID = packed[key].(string)
+	}
+	return params
+}
+
+func decodeOpinionCommentsParams(args [2]string, argsEscaped bool, r *http.Request) (params OpinionCommentsParams, _ error) {
+	// Decode path: talkSessionID.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "talkSessionID",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.TalkSessionID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "talkSessionID",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	// Decode path: opinionID.
+	if err := func() error {
+		param := args[1]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[1])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "opinionID",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.OpinionID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "opinionID",
+			In:   "path",
 			Err:  err,
 		}
 	}

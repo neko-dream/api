@@ -42,25 +42,37 @@ type IntentionHandler interface {
 	// 意思表明API.
 	//
 	// POST /api/talksessions/{talkSessionID}/opinions/{opinionID}/intentions
-	Intention(ctx context.Context, params IntentionParams) (IntentionRes, error)
+	Intention(ctx context.Context, req OptIntentionReq, params IntentionParams) (IntentionRes, error)
 }
 
 // OpinionHandler handles operations described by OpenAPI v3 specification.
 //
 // x-ogen-operation-group: Opinion
 type OpinionHandler interface {
+	// GetTopOpinions implements getTopOpinions operation.
+	//
+	// 🚧 分析に関する意見.
+	//
+	// GET /api/talksessions/{talkSessionId}/opinion
+	GetTopOpinions(ctx context.Context, params GetTopOpinionsParams) (GetTopOpinionsRes, error)
 	// ListOpinions implements listOpinions operation.
 	//
-	// セッションの意見一覧.
+	// ランダムな意見.
 	//
 	// GET /api/talksession/{talkSessionID}/opinions
 	ListOpinions(ctx context.Context, params ListOpinionsParams) (ListOpinionsRes, error)
+	// OpinionComments implements opinionComments operation.
+	//
+	// 意見に対するコメント一覧を返す.
+	//
+	// GET /api/talksession/{talkSessionID}/opinions/{opinionID}
+	OpinionComments(ctx context.Context, params OpinionCommentsParams) (OpinionCommentsRes, error)
 	// PostOpinionPost implements postOpinionPost operation.
 	//
 	// セッションに対して意見投稿.
 	//
 	// POST /api/talksessions/{talkSessionID}/opinions
-	PostOpinionPost(ctx context.Context, params PostOpinionPostParams) (PostOpinionPostRes, error)
+	PostOpinionPost(ctx context.Context, req OptPostOpinionPostReq, params PostOpinionPostParams) (PostOpinionPostRes, error)
 }
 
 // TalkSessionHandler handles operations described by OpenAPI v3 specification.
@@ -81,10 +93,10 @@ type TalkSessionHandler interface {
 	GetTalkSessionDetail(ctx context.Context, params GetTalkSessionDetailParams) (*GetTalkSessionDetailOK, error)
 	// GetTalkSessions implements getTalkSessions operation.
 	//
-	// トークセッションリスト.
+	// トークセッションコレクション.
 	//
 	// GET /api/talksessions
-	GetTalkSessions(ctx context.Context) error
+	GetTalkSessions(ctx context.Context) (*GetTalkSessionsOK, error)
 }
 
 // UserHandler handles operations described by OpenAPI v3 specification.
@@ -96,7 +108,7 @@ type UserHandler interface {
 	// ユーザー情報の変更.
 	//
 	// PUT /api/user
-	EditUserProfile(ctx context.Context) (*EditUserProfileOK, error)
+	EditUserProfile(ctx context.Context) (EditUserProfileRes, error)
 	// GetUserProfile implements getUserProfile operation.
 	//
 	// ユーザー情報の取得.

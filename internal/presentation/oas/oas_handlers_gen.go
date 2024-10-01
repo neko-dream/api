@@ -293,7 +293,7 @@ func (s *Server) handleEditUserProfileRequest(args [0]string, argsEscaped bool, 
 		err error
 	)
 
-	var response *EditUserProfileOK
+	var response EditUserProfileRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -308,7 +308,7 @@ func (s *Server) handleEditUserProfileRequest(args [0]string, argsEscaped bool, 
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = *EditUserProfileOK
+			Response = EditUserProfileRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -455,7 +455,7 @@ func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped b
 
 // handleGetTalkSessionsRequest handles getTalkSessions operation.
 //
-// トークセッションリスト.
+// トークセッションコレクション.
 //
 // GET /api/talksessions
 func (s *Server) handleGetTalkSessionsRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
@@ -503,7 +503,7 @@ func (s *Server) handleGetTalkSessionsRequest(args [0]string, argsEscaped bool, 
 		mreq := middleware.Request{
 			Context:          ctx,
 			OperationName:    "GetTalkSessions",
-			OperationSummary: "トークセッションリスト",
+			OperationSummary: "トークセッションコレクション",
 			OperationID:      "getTalkSessions",
 			Body:             nil,
 			Params:           middleware.Parameters{},
@@ -524,12 +524,12 @@ func (s *Server) handleGetTalkSessionsRequest(args [0]string, argsEscaped bool, 
 			mreq,
 			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				err = s.h.GetTalkSessions(ctx)
+				response, err = s.h.GetTalkSessions(ctx)
 				return response, err
 			},
 		)
 	} else {
-		err = s.h.GetTalkSessions(ctx)
+		response, err = s.h.GetTalkSessions(ctx)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -538,6 +538,118 @@ func (s *Server) handleGetTalkSessionsRequest(args [0]string, argsEscaped bool, 
 	}
 
 	if err := encodeGetTalkSessionsResponse(response, w, span); err != nil {
+		defer recordError("EncodeResponse", err)
+		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+		}
+		return
+	}
+}
+
+// handleGetTopOpinionsRequest handles getTopOpinions operation.
+//
+// 🚧 分析に関する意見.
+//
+// GET /api/talksessions/{talkSessionId}/opinion
+func (s *Server) handleGetTopOpinionsRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("getTopOpinions"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/api/talksessions/{talkSessionId}/opinion"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "GetTopOpinions",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Add Labeler to context.
+	labeler := &Labeler{attrs: otelAttrs}
+	ctx = contextWithLabeler(ctx, labeler)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
+
+		// Increment request counter.
+		s.requests.Add(ctx, 1, attrOpt)
+
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
+	}()
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "GetTopOpinions",
+			ID:   "getTopOpinions",
+		}
+	)
+	params, err := decodeGetTopOpinionsParams(args, argsEscaped, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		defer recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	var response GetTopOpinionsRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:          ctx,
+			OperationName:    "GetTopOpinions",
+			OperationSummary: "🚧 分析に関する意見",
+			OperationID:      "getTopOpinions",
+			Body:             nil,
+			Params: middleware.Parameters{
+				{
+					Name: "talkSessionId",
+					In:   "path",
+				}: params.TalkSessionId,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = struct{}
+			Params   = GetTopOpinionsParams
+			Response = GetTopOpinionsRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackGetTopOpinionsParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.GetTopOpinions(ctx, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.GetTopOpinions(ctx, params)
+	}
+	if err != nil {
+		defer recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeGetTopOpinionsResponse(response, w, span); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -697,6 +809,21 @@ func (s *Server) handleIntentionRequest(args [2]string, argsEscaped bool, w http
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
+	request, close, err := s.decodeIntentionRequest(r)
+	if err != nil {
+		err = &ogenerrors.DecodeRequestError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		defer recordError("DecodeRequest", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	defer func() {
+		if err := close(); err != nil {
+			recordError("CloseRequest", err)
+		}
+	}()
 
 	var response IntentionRes
 	if m := s.cfg.Middleware; m != nil {
@@ -705,7 +832,7 @@ func (s *Server) handleIntentionRequest(args [2]string, argsEscaped bool, w http
 			OperationName:    "Intention",
 			OperationSummary: "意思表明API",
 			OperationID:      "Intention",
-			Body:             nil,
+			Body:             request,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -720,7 +847,7 @@ func (s *Server) handleIntentionRequest(args [2]string, argsEscaped bool, w http
 		}
 
 		type (
-			Request  = struct{}
+			Request  = OptIntentionReq
 			Params   = IntentionParams
 			Response = IntentionRes
 		)
@@ -733,12 +860,12 @@ func (s *Server) handleIntentionRequest(args [2]string, argsEscaped bool, w http
 			mreq,
 			unpackIntentionParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.Intention(ctx, params)
+				response, err = s.h.Intention(ctx, request, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.Intention(ctx, params)
+		response, err = s.h.Intention(ctx, request, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -757,7 +884,7 @@ func (s *Server) handleIntentionRequest(args [2]string, argsEscaped bool, w http
 
 // handleListOpinionsRequest handles listOpinions operation.
 //
-// セッションの意見一覧.
+// ランダムな意見.
 //
 // GET /api/talksession/{talkSessionID}/opinions
 func (s *Server) handleListOpinionsRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
@@ -999,6 +1126,122 @@ func (s *Server) handleOAuthCallbackRequest(args [1]string, argsEscaped bool, w 
 	}
 }
 
+// handleOpinionCommentsRequest handles opinionComments operation.
+//
+// 意見に対するコメント一覧を返す.
+//
+// GET /api/talksession/{talkSessionID}/opinions/{opinionID}
+func (s *Server) handleOpinionCommentsRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("opinionComments"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/api/talksession/{talkSessionID}/opinions/{opinionID}"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "OpinionComments",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Add Labeler to context.
+	labeler := &Labeler{attrs: otelAttrs}
+	ctx = contextWithLabeler(ctx, labeler)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
+
+		// Increment request counter.
+		s.requests.Add(ctx, 1, attrOpt)
+
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
+	}()
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "OpinionComments",
+			ID:   "opinionComments",
+		}
+	)
+	params, err := decodeOpinionCommentsParams(args, argsEscaped, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		defer recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	var response OpinionCommentsRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:          ctx,
+			OperationName:    "OpinionComments",
+			OperationSummary: "意見に対するコメント一覧を返す",
+			OperationID:      "opinionComments",
+			Body:             nil,
+			Params: middleware.Parameters{
+				{
+					Name: "talkSessionID",
+					In:   "path",
+				}: params.TalkSessionID,
+				{
+					Name: "opinionID",
+					In:   "path",
+				}: params.OpinionID,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = struct{}
+			Params   = OpinionCommentsParams
+			Response = OpinionCommentsRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackOpinionCommentsParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.OpinionComments(ctx, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.OpinionComments(ctx, params)
+	}
+	if err != nil {
+		defer recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeOpinionCommentsResponse(response, w, span); err != nil {
+		defer recordError("EncodeResponse", err)
+		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+		}
+		return
+	}
+}
+
 // handlePostOpinionPostRequest handles postOpinionPost operation.
 //
 // セッションに対して意見投稿.
@@ -1057,6 +1300,21 @@ func (s *Server) handlePostOpinionPostRequest(args [1]string, argsEscaped bool, 
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
+	request, close, err := s.decodePostOpinionPostRequest(r)
+	if err != nil {
+		err = &ogenerrors.DecodeRequestError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		defer recordError("DecodeRequest", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	defer func() {
+		if err := close(); err != nil {
+			recordError("CloseRequest", err)
+		}
+	}()
 
 	var response PostOpinionPostRes
 	if m := s.cfg.Middleware; m != nil {
@@ -1065,7 +1323,7 @@ func (s *Server) handlePostOpinionPostRequest(args [1]string, argsEscaped bool, 
 			OperationName:    "PostOpinionPost",
 			OperationSummary: "セッションに対して意見投稿",
 			OperationID:      "postOpinionPost",
-			Body:             nil,
+			Body:             request,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -1080,7 +1338,7 @@ func (s *Server) handlePostOpinionPostRequest(args [1]string, argsEscaped bool, 
 		}
 
 		type (
-			Request  = struct{}
+			Request  = OptPostOpinionPostReq
 			Params   = PostOpinionPostParams
 			Response = PostOpinionPostRes
 		)
@@ -1093,12 +1351,12 @@ func (s *Server) handlePostOpinionPostRequest(args [1]string, argsEscaped bool, 
 			mreq,
 			unpackPostOpinionPostParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.PostOpinionPost(ctx, params)
+				response, err = s.h.PostOpinionPost(ctx, request, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.PostOpinionPost(ctx, params)
+		response, err = s.h.PostOpinionPost(ctx, request, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)

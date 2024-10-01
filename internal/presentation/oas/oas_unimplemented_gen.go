@@ -36,7 +36,7 @@ func (UnimplementedHandler) CreateTalkSession(ctx context.Context, req OptCreate
 // ユーザー情報の変更.
 //
 // PUT /api/user
-func (UnimplementedHandler) EditUserProfile(ctx context.Context) (r *EditUserProfileOK, _ error) {
+func (UnimplementedHandler) EditUserProfile(ctx context.Context) (r EditUserProfileRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -51,11 +51,20 @@ func (UnimplementedHandler) GetTalkSessionDetail(ctx context.Context, params Get
 
 // GetTalkSessions implements getTalkSessions operation.
 //
-// トークセッションリスト.
+// トークセッションコレクション.
 //
 // GET /api/talksessions
-func (UnimplementedHandler) GetTalkSessions(ctx context.Context) error {
-	return ht.ErrNotImplemented
+func (UnimplementedHandler) GetTalkSessions(ctx context.Context) (r *GetTalkSessionsOK, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetTopOpinions implements getTopOpinions operation.
+//
+// 🚧 分析に関する意見.
+//
+// GET /api/talksessions/{talkSessionId}/opinion
+func (UnimplementedHandler) GetTopOpinions(ctx context.Context, params GetTopOpinionsParams) (r GetTopOpinionsRes, _ error) {
+	return r, ht.ErrNotImplemented
 }
 
 // GetUserProfile implements getUserProfile operation.
@@ -72,13 +81,13 @@ func (UnimplementedHandler) GetUserProfile(ctx context.Context) (r *GetUserProfi
 // 意思表明API.
 //
 // POST /api/talksessions/{talkSessionID}/opinions/{opinionID}/intentions
-func (UnimplementedHandler) Intention(ctx context.Context, params IntentionParams) (r IntentionRes, _ error) {
+func (UnimplementedHandler) Intention(ctx context.Context, req OptIntentionReq, params IntentionParams) (r IntentionRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
 // ListOpinions implements listOpinions operation.
 //
-// セッションの意見一覧.
+// ランダムな意見.
 //
 // GET /api/talksession/{talkSessionID}/opinions
 func (UnimplementedHandler) ListOpinions(ctx context.Context, params ListOpinionsParams) (r ListOpinionsRes, _ error) {
@@ -94,12 +103,21 @@ func (UnimplementedHandler) OAuthCallback(ctx context.Context, params OAuthCallb
 	return r, ht.ErrNotImplemented
 }
 
+// OpinionComments implements opinionComments operation.
+//
+// 意見に対するコメント一覧を返す.
+//
+// GET /api/talksession/{talkSessionID}/opinions/{opinionID}
+func (UnimplementedHandler) OpinionComments(ctx context.Context, params OpinionCommentsParams) (r OpinionCommentsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // PostOpinionPost implements postOpinionPost operation.
 //
 // セッションに対して意見投稿.
 //
 // POST /api/talksessions/{talkSessionID}/opinions
-func (UnimplementedHandler) PostOpinionPost(ctx context.Context, params PostOpinionPostParams) (r PostOpinionPostRes, _ error) {
+func (UnimplementedHandler) PostOpinionPost(ctx context.Context, req OptPostOpinionPostReq, params PostOpinionPostParams) (r PostOpinionPostRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
