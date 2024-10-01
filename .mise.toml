@@ -1,4 +1,6 @@
 [tools]
 "go:github.com/ogen-go/ogen/cmd/ogen" = "latest"
-yq = "latest"
 jq = "latest"
+"go:github.com/air-verse/air" = "latest"
+"go:github.com/sqlc-dev/sqlc/cmd/sqlc" = "latest"
+"npm:swagger-merger" = "latest"
