@@ -29,7 +29,7 @@ func HandleErrorWithCaller(ctx context.Context, err error, message string, calle
 
 	// エラーメッセージを出力
 	log.Printf("%s: %s\n", message, err.Error())
-	log.Printf("file: %s, line: %d, function: %s\n", file, line, function)
+	log.Printf("file: %s:%d, function: %s\n", file, line, function)
 
 	// スパンに情報を追加
 	span := trace.SpanFromContext(ctx)
