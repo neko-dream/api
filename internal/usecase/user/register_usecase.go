@@ -40,20 +40,27 @@ type (
 	}
 )
 
-func (i *registerUserInteractor) Execute(ctx context.Context, input RegisterUserInput) (*RegisterUserOutput, error) {
-	errChan := make(chan error)
-	defer close(errChan)
+func NewRegisterUserUseCase(
+	tm *db.DBManager,
+	userRep user.UserRepository,
+	userService user.UserService,
+) RegisterUserUseCase {
+	return &registerUserInteractor{
+		DBManager:   tm,
+		userRep:     userRep,
+		userService: userService,
+	}
+}
 
-	if err := i.ExecTx(ctx, func(ctx context.Context) error {
+func (i *registerUserInteractor) Execute(ctx context.Context, input RegisterUserInput) (*RegisterUserOutput, error) {
+	err := i.ExecTx(ctx, func(ctx context.Context) error {
 		// ユーザーの存在を確認
 		foundUser, err := i.userRep.FindByID(ctx, input.UserID)
 		if err != nil {
 			utils.HandleError(ctx, err, "UserRepository.FindByID")
-			errChan <- messages.UserNotFoundError
 			return messages.UserNotFoundError
 		}
-		if foundUser != nil {
-			errChan <- messages.UserNotFoundError
+		if foundUser == nil {
 			return messages.UserNotFoundError
 		}
 
@@ -61,18 +68,15 @@ func (i *registerUserInteractor) Execute(ctx context.Context, input RegisterUser
 		duplicated, err := i.userService.DisplayIDCheckDuplicate(ctx, input.DisplayID)
 		if err != nil {
 			utils.HandleError(ctx, err, "UserService.DisplayIDCheckDuplicate")
-			errChan <- messages.UserDisplayIDAlreadyExistsError
 			return messages.UserDisplayIDAlreadyExistsError
 		}
 		if duplicated {
-			errChan <- messages.UserDisplayIDAlreadyExistsError
 			return messages.UserDisplayIDAlreadyExistsError
 		}
 
 		// ユーザー名と表示名を設定
 		if err := foundUser.SetDisplayID(input.DisplayID); err != nil {
 			utils.HandleError(ctx, err, "User.SetDisplayID")
-			errChan <- messages.UserDisplayIDAlreadyExistsError
 			return messages.UserDisplayIDAlreadyExistsError
 		}
 		foundUser.ChangeName(input.DisplayName)
@@ -85,35 +89,21 @@ func (i *registerUserInteractor) Execute(ctx context.Context, input RegisterUser
 			user.NewMunicipality(input.Municipality),
 			user.NewHouseholdSize(input.HouseholdSize),
 		))
+
 		if err := i.userRep.Update(ctx, *foundUser); err != nil {
 			utils.HandleError(ctx, err, "UserRepository.Update")
-			errChan <- messages.UserUpdateError
 			return messages.UserUpdateError
 		}
 
 		return nil
-	}); err != nil {
-		return nil, err
-	}
+	})
 
-	select {
-	case err := <-errChan:
+	if err != nil {
 		return nil, err
-	default:
 	}
 
 	return &RegisterUserOutput{
 		DisplayID:   input.DisplayID,
 		DisplayName: input.DisplayName,
 	}, nil
-}
-
-func NewRegisterUserUseCase(
-	tm *db.DBManager,
-	userRep user.UserRepository,
-) RegisterUserUseCase {
-	return &registerUserInteractor{
-		DBManager: tm,
-		userRep:   userRep,
-	}
 }
