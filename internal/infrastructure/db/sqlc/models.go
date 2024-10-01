@@ -66,6 +66,7 @@ type UserDemographic struct {
 	Municipality       sql.NullString
 	HouseholdSize      sql.NullInt16
 	CreatedAt          time.Time
+	UpdatedAt          time.Time
 }
 
 type Vote struct {

@@ -36,8 +36,11 @@ CREATE TABLE "user_demographics" (
   "gender" SMALLINT NOT NULL,
   "municipality" varchar,
   "household_size" SMALLINT,
-  "created_at" timestamp NOT NULL DEFAULT (now())
+  "created_at" timestamp NOT NULL DEFAULT (now()),
+  "updated_at" timestamp NOT NULL DEFAULT (now())
 );
+
+CREATE UNIQUE INDEX "user_demographics_user_id_index" ON "user_demographics" ("user_id");
 
 CREATE TABLE "talk_sessions" (
   "talk_session_id" uuid PRIMARY KEY,

@@ -142,6 +142,7 @@ func (q *Queries) GetUserBySubject(ctx context.Context, subject string) (GetUser
 
 const updateOrCreateUserDemographics = `-- name: UpdateOrCreateUserDemographics :exec
 INSERT INTO user_demographics (
+    user_demographics_id,
     user_id,
     year_of_birth,
     occupation,
@@ -150,28 +151,30 @@ INSERT INTO user_demographics (
     household_size,
     created_at,
     updated_at
-) VALUES ($1, $2, $3, $4, $5, $6, now(), now())
+) VALUES ($1, $2, $3, $4, $5, $6, $7, now(), now())
 ON CONFLICT (user_id)
 DO UPDATE SET
-    year_of_birth = $2,
-    occupation = $3,
-    gender = $4,
-    municipality = $5,
-    household_size = $6,
+    year_of_birth = $3,
+    occupation = $4,
+    gender = $5,
+    municipality = $6,
+    household_size = $7,
     updated_at = now()
 `
 
 type UpdateOrCreateUserDemographicsParams struct {
-	UserID        uuid.UUID
-	YearOfBirth   sql.NullInt32
-	Occupation    sql.NullInt16
-	Gender        int16
-	Municipality  sql.NullString
-	HouseholdSize sql.NullInt16
+	UserDemographicsID uuid.UUID
+	UserID             uuid.UUID
+	YearOfBirth        sql.NullInt32
+	Occupation         sql.NullInt16
+	Gender             int16
+	Municipality       sql.NullString
+	HouseholdSize      sql.NullInt16
 }
 
 func (q *Queries) UpdateOrCreateUserDemographics(ctx context.Context, arg UpdateOrCreateUserDemographicsParams) error {
 	_, err := q.db.ExecContext(ctx, updateOrCreateUserDemographics,
+		arg.UserDemographicsID,
 		arg.UserID,
 		arg.YearOfBirth,
 		arg.Occupation,

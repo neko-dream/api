@@ -111,12 +111,13 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 
 		if err := u.DBManager.GetQueries(ctx).
 			UpdateOrCreateUserDemographics(ctx, model.UpdateOrCreateUserDemographicsParams{
-				UserID:        user.UserID().UUID(),
-				YearOfBirth:   yearOfBirth,
-				Occupation:    occupation,
-				Municipality:  municipality,
-				HouseholdSize: householdSize,
-				Gender:        gender,
+				UserDemographicsID: shared.NewUUID[um.UserDemographics]().UUID(),
+				UserID:             user.UserID().UUID(),
+				YearOfBirth:        yearOfBirth,
+				Occupation:         occupation,
+				Municipality:       municipality,
+				HouseholdSize:      householdSize,
+				Gender:             gender,
 			}); err != nil {
 			return errtrace.Wrap(err)
 		}
