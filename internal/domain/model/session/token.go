@@ -71,12 +71,12 @@ func (c *Claim) IsExpired() bool {
 	return time.Now().Unix() > c.Exp
 }
 
-func (c *Claim) UserID() string {
-	return c.Sub
+func (c *Claim) UserID() (shared.UUID[user.User], error) {
+	return shared.ParseUUID[user.User](c.Sub)
 }
 
-func (c *Claim) SessionID() string {
-	return c.Jti
+func (c *Claim) SessionID() (shared.UUID[Session], error) {
+	return shared.ParseUUID[Session](c.Jti)
 }
 
 const (
