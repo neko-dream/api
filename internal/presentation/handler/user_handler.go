@@ -85,6 +85,7 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 	return &oas.RegisterUserOK{
 		DisplayID:   out.DisplayID,
 		DisplayName: out.DisplayName,
+		PictureURL:  utils.StringToOptString(claim.Picture),
 	}, nil
 }
 
