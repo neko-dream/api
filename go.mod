@@ -5,8 +5,8 @@ go 1.23.0
 require (
 	braces.dev/errtrace v0.3.0
 	github.com/go-openapi/runtime v0.28.0
-	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/joho/godotenv v1.5.1
+	github.com/pkg/errors v0.9.1
 	go.uber.org/dig v1.18.0
 )
 
