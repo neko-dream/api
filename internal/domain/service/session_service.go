@@ -49,7 +49,12 @@ func (s *sessionService) RefreshSession(ctx context.Context, userID shared.UUID[
 
 	// sessionが複数存在する場合は最新のものを取得
 	sessList = session.SortByLastActivity(sessList)
-	sess := sessList[:1][1]
+	var sess session.Session
+	if len(sessList) > 1 {
+		sess = sessList[:1][0]
+	} else {
+		sess = sessList[0]
+	}
 
 	// sessionが有効期限内であることを確認
 	if !sess.IsActive() {

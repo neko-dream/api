@@ -76,3 +76,20 @@ func (q *Queries) FindActiveSessionsByUserID(ctx context.Context, userID uuid.UU
 	}
 	return items, nil
 }
+
+const updateSession = `-- name: UpdateSession :exec
+UPDATE sessions
+SET session_status = $2, last_activity_at = $3
+WHERE session_id = $1
+`
+
+type UpdateSessionParams struct {
+	SessionID      uuid.UUID
+	SessionStatus  int32
+	LastActivityAt time.Time
+}
+
+func (q *Queries) UpdateSession(ctx context.Context, arg UpdateSessionParams) error {
+	_, err := q.db.ExecContext(ctx, updateSession, arg.SessionID, arg.SessionStatus, arg.LastActivityAt)
+	return err
+}

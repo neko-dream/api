@@ -66,9 +66,17 @@ func (s *sessionRepository) FindByUserID(ctx context.Context, userID shared.UUID
 	return sessions, nil
 }
 
-// Update implements session.SessionRepository.
-func (s *sessionRepository) Update(context.Context, session.Session) (*session.Session, error) {
-	panic("unimplemented")
+// Update セッションの状態と最終アクティビティ時間を更新する
+func (s *sessionRepository) Update(ctx context.Context, sess session.Session) (*session.Session, error) {
+	if err := s.GetQueries(ctx).UpdateSession(ctx, model.UpdateSessionParams{
+		SessionID:      sess.SessionID().UUID(),
+		SessionStatus:  int32(sess.Status()),
+		LastActivityAt: sess.LastActivityAt(),
+	}); err != nil {
+		return nil, errtrace.Wrap(err)
+	}
+
+	return &sess, nil
 }
 
 func NewSessionRepository(
