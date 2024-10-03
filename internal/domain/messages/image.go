@@ -21,4 +21,10 @@ var (
 		Code:       "IMG-0004",
 		Message:    "画像のデコードに失敗しました。しばらくしてから再度お試しください。",
 	}
+
+	ImageFilePathEmptyError = &APIError{
+		StatusCode: 500,
+		Code:       "IMG-0005",
+		Message:    "画像のファイルパスが空です。",
+	}
 )

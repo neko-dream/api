@@ -26,6 +26,9 @@ func NewImage(image []byte) Image {
 func (i *Image) GetImage() []byte {
 	return *i
 }
+func (i *Image) GetImageReader() io.Reader {
+	return bytes.NewReader(*i)
+}
 
 func CheckSize(imageByte []byte, x, y int) error {
 	// 画像のサイズを取得
@@ -45,30 +48,34 @@ func CheckSize(imageByte []byte, x, y int) error {
 var supportedExtension = "png jpg"
 
 // ValidateImage 拡張子やファイルサイズなどの画像のバリデーションを行う
-func ValidateImage(ctx context.Context, file *multipart.FileHeader, maxSize int) ([]byte, error) {
+func ValidateImage(ctx context.Context, file *multipart.FileHeader, maxSize int) ([]byte, *string, error) {
 	img, err := file.Open()
 	if err != nil {
-		return nil, messages.ImageOpenFailedError
+		return nil, nil, messages.ImageOpenFailedError
 	}
 
 	buf := new(bytes.Buffer)
 	if _, err := buf.ReadFrom(img); err != nil {
-		return nil, messages.ImageOpenFailedError
+		return nil, nil, messages.ImageOpenFailedError
 	}
 
 	// 最大サイズに収まっているか
 	if buf.Len() >= maxSize {
-		return nil, messages.ImageSizeTooLargeError
+		return nil, nil, messages.ImageSizeTooLargeError
 	}
 
 	// 対応画像形式か
 	reader, t, err := detectExt(buf)
 	// ファイル形式を検知するのに必要なバイト数だけ先に読む
 	if err != nil || !strings.Contains(supportedExtension, t.Extension) {
-		return nil, messages.ImageUnsupportedExtError
+		return nil, nil, messages.ImageUnsupportedExtError
+	}
+	body, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, nil, messages.ImageOpenFailedError
 	}
 
-	return io.ReadAll(reader)
+	return body, &t.MIME.Value, nil
 }
 
 func detectExt(file *bytes.Buffer) (io.Reader, types.Type, error) {

@@ -10,16 +10,23 @@ import (
 )
 
 type ProfileIcon struct {
-	image image.ImageInfo
-	url   string
+	image *image.ImageInfo
+	url   *string
 }
 
 func NewProfileIcon(
-	url string,
+	url *string,
 ) *ProfileIcon {
 	return &ProfileIcon{
 		url: url,
 	}
+}
+
+func (p *ProfileIcon) ImageInfo() *image.ImageInfo {
+	return p.image
+}
+func (p *ProfileIcon) URL() *string {
+	return p.url
 }
 
 var (
@@ -32,7 +39,10 @@ func (p *ProfileIcon) SetProfileIconImage(
 	file *multipart.FileHeader,
 	user User,
 ) error {
-	bytes, err := image.ValidateImage(ctx, file, maxImageSize4MiB)
+	if file == nil {
+		return nil
+	}
+	bytes, ext, err := image.ValidateImage(ctx, file, maxImageSize4MiB)
 	if err != nil {
 		return err
 	}
@@ -42,7 +52,8 @@ func (p *ProfileIcon) SetProfileIconImage(
 	}
 
 	img := image.NewImage(bytes)
-	imageInfo := image.NewImageInfo(fmt.Sprintf(objectPath, user.UserID().String(), time.Now().Unix()), img)
-	p.image = *imageInfo
+	imageInfo := image.NewImageInfo(fmt.Sprintf(objectPath, user.UserID().String(), time.Now().Unix()), *ext, img)
+	p.image = imageInfo
+
 	return nil
 }

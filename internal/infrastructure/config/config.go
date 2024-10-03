@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/spf13/viper"
 )
@@ -14,11 +15,23 @@ type Config struct {
 	GoogleIssuer       string `mapstructure:"GOOGLE_ISSUER"`
 	DOMAIN             string `mapstructure:"DOMAIN"`
 	PORT               string `mapstructure:"PORT"`
+
+	AWS_REGION            string `mapstructure:"AWS_REGION"`
+	AWS_ACCESS_KEY_ID     string `mapstructure:"AWS_ACCESS_KEY_ID"`
+	AWS_SECRET_ACCESS_KEY string `mapstructure:"AWS_SECRET_ACCESS_KEY"`
+	AWS_S3_ENDPOINT       string `mapstructure:"AWS_S3_ENDPOINT"`
+	AWS_S3_BUCKET         string `mapstructure:"AWS_S3_BUCKET"`
+	IMAGE_DOMAIN          string `mapstructure:"IMAGE_DOMAIN"`
 }
 
 func LoadConfig() *Config {
 	// .envファイルを読み込む
 	viper.AddConfigPath(".")
+	viper.AddConfigPath(".")
+	viper.AddConfigPath("../")
+	viper.AddConfigPath("../../")
+	viper.AddConfigPath("../../../")
+	viper.AddConfigPath("../../../../")
 	viper.SetConfigName(".env")
 	viper.SetConfigType("env")
 
@@ -40,5 +53,6 @@ func LoadConfig() *Config {
 		panic(fmt.Errorf("設定ファイルの読み込みエラー: %w", err))
 	}
 
+	log.Println(config)
 	return &config
 }

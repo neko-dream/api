@@ -86,12 +86,20 @@ func (u *User) ProfileIconURL() *string {
 	if u.profileIcon == nil {
 		return nil
 	} else {
-		return &u.profileIcon.url
+		return u.profileIcon.url
 	}
 }
 
+func (u *User) ProfileIcon() *ProfileIcon {
+	return u.profileIcon
+}
+
+func (u *User) IsIconUpdateRequired() bool {
+	return u.profileIcon != nil && u.profileIcon.url == nil && u.profileIcon.ImageInfo() != nil
+}
+
 func (u *User) SetIconFile(ctx context.Context, file *multipart.FileHeader) error {
-	profileIcon := NewProfileIcon("")
+	profileIcon := NewProfileIcon(nil)
 	if err := profileIcon.SetProfileIconImage(ctx, file, *u); err != nil {
 		return err
 	}

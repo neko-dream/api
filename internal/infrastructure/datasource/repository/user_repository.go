@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"braces.dev/errtrace"
+	"github.com/neko-dream/server/internal/domain/model/image"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	um "github.com/neko-dream/server/internal/domain/model/user"
@@ -19,6 +20,17 @@ import (
 
 type userRepository struct {
 	*db.DBManager
+	imageRepository image.ImageRepository
+}
+
+func NewUserRepository(
+	DBManager *db.DBManager,
+	imageRepository image.ImageRepository,
+) user.UserRepository {
+	return &userRepository{
+		DBManager:       DBManager,
+		imageRepository: imageRepository,
+	}
 }
 
 // FindByDisplayID ユーザーのDisplayIDを元にユーザーを取得する
@@ -49,7 +61,7 @@ func (u *userRepository) FindByDisplayID(ctx context.Context, displayID string) 
 	}
 	var profileIcon *user.ProfileIcon
 	if userRow.IconUrl.Valid {
-		profileIcon = user.NewProfileIcon(userRow.IconUrl.String)
+		profileIcon = user.NewProfileIcon(lo.ToPtr(userRow.IconUrl.String))
 	}
 
 	user := user.NewUser(
@@ -67,8 +79,12 @@ func (u *userRepository) FindByDisplayID(ctx context.Context, displayID string) 
 // Update ユーザー情報を更新する
 func (u *userRepository) Update(ctx context.Context, user um.User) error {
 	var iconURL, displayID, displayName sql.NullString
-	if user.ProfileIconURL() != nil {
-		iconURL = sql.NullString{String: *user.ProfileIconURL(), Valid: true}
+	if user.IsIconUpdateRequired() {
+		url, err := u.imageRepository.Create(ctx, *user.ProfileIcon().ImageInfo())
+		if err != nil {
+			return errtrace.Wrap(err)
+		}
+		iconURL = sql.NullString{String: *url, Valid: true}
 	}
 	if user.DisplayID() != nil {
 		displayID = sql.NullString{String: *user.DisplayID(), Valid: true}
@@ -180,9 +196,9 @@ func (u *userRepository) FindByID(ctx context.Context, userID shared.UUID[user.U
 	if userRow.DisplayName.Valid {
 		displayName = &userRow.DisplayName.String
 	}
-	var profIcon user.ProfileIcon
+	var profIcon *user.ProfileIcon
 	if userRow.IconUrl.Valid {
-		profIcon = *user.NewProfileIcon(userRow.IconUrl.String)
+		profIcon = user.NewProfileIcon(lo.ToPtr(userRow.IconUrl.String))
 	}
 
 	user := user.NewUser(
@@ -191,7 +207,7 @@ func (u *userRepository) FindByID(ctx context.Context, userID shared.UUID[user.U
 		displayName,
 		userAuthRow.Subject,
 		providerName,
-		&profIcon,
+		profIcon,
 	)
 
 	return &user, nil
@@ -214,9 +230,9 @@ func (u *userRepository) FindBySubject(ctx context.Context, subject user.UserSub
 	if row.DisplayName.Valid {
 		displayName = &row.DisplayName.String
 	}
-	var iconURL user.ProfileIcon
+	var profileIcon *user.ProfileIcon
 	if row.IconUrl.Valid {
-		iconURL = *user.NewProfileIcon(row.IconUrl.String)
+		profileIcon = user.NewProfileIcon(lo.ToPtr(row.IconUrl.String))
 	}
 
 	user := user.NewUser(
@@ -225,16 +241,8 @@ func (u *userRepository) FindBySubject(ctx context.Context, subject user.UserSub
 		displayName,
 		row.Subject,
 		providerName,
-		&iconURL,
+		profileIcon,
 	)
 
 	return &user, nil
-}
-
-func NewUserRepository(
-	DBManager *db.DBManager,
-) user.UserRepository {
-	return &userRepository{
-		DBManager: DBManager,
-	}
 }

@@ -1,25 +1,42 @@
 package image
 
-import "context"
+import (
+	"context"
+	"io"
+)
 
 type (
 	ImageRepository interface {
-		Create(context.Context, Image) error
+		Create(context.Context, ImageInfo) (*string, error)
 	}
 
 	ImageInfo struct {
-		FileName string
-		URL      string
-		Image    Image
+		filePath    string
+		contentType string
+		image       Image
 	}
 )
 
 func NewImageInfo(
-	fileName string,
+	filePath string,
+	contentType string,
 	image Image,
 ) *ImageInfo {
 	return &ImageInfo{
-		FileName: fileName,
-		Image:    image,
+		filePath:    filePath,
+		contentType: contentType,
+		image:       image,
 	}
+}
+
+func (i *ImageInfo) FilePath() string {
+	return i.filePath
+}
+
+func (i *ImageInfo) ImageReader() io.Reader {
+	return i.image.GetImageReader()
+}
+
+func (i *ImageInfo) ContentType() string {
+	return i.contentType
 }
