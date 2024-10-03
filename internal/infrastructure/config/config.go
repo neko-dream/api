@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/spf13/viper"
 )
@@ -53,6 +52,5 @@ func LoadConfig() *Config {
 		panic(fmt.Errorf("設定ファイルの読み込みエラー: %w", err))
 	}
 
-	log.Println(config)
 	return &config
 }

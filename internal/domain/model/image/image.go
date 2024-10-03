@@ -11,6 +11,9 @@ import (
 
 	"github.com/neko-dream/server/internal/domain/messages"
 
+	_ "image/jpeg"
+	_ "image/png"
+
 	"github.com/h2non/filetype"
 	"github.com/h2non/filetype/types"
 )
