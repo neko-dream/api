@@ -75,7 +75,7 @@ func (q *Queries) GetUserAuthByUserID(ctx context.Context, userID uuid.UUID) (Us
 
 const getUserByID = `-- name: GetUserByID :one
 SELECT
-    user_id, display_id, display_name, picture, created_at, updated_at
+    user_id, display_id, display_name, icon_url, created_at, updated_at
 FROM
     "users"
 WHERE
@@ -89,7 +89,7 @@ func (q *Queries) GetUserByID(ctx context.Context, userID uuid.UUID) (User, erro
 		&i.UserID,
 		&i.DisplayID,
 		&i.DisplayName,
-		&i.Picture,
+		&i.IconUrl,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -104,7 +104,7 @@ SELECT
     "user_auths".provider,
     "user_auths".subject,
     "user_auths".created_at,
-    "users".picture,
+    "users".icon_url,
     "user_auths".is_verified
 FROM
     "users"
@@ -120,7 +120,7 @@ type GetUserBySubjectRow struct {
 	Provider    string
 	Subject     string
 	CreatedAt   time.Time
-	Picture     sql.NullString
+	IconUrl     sql.NullString
 	IsVerified  bool
 }
 
@@ -134,7 +134,7 @@ func (q *Queries) GetUserBySubject(ctx context.Context, subject string) (GetUser
 		&i.Provider,
 		&i.Subject,
 		&i.CreatedAt,
-		&i.Picture,
+		&i.IconUrl,
 		&i.IsVerified,
 	)
 	return i, err
@@ -186,14 +186,14 @@ func (q *Queries) UpdateOrCreateUserDemographics(ctx context.Context, arg Update
 }
 
 const updateUser = `-- name: UpdateUser :exec
-UPDATE "users" SET display_id = $2, display_name = $3, picture = $4 WHERE user_id = $1
+UPDATE "users" SET display_id = $2, display_name = $3, icon_url = $4 WHERE user_id = $1
 `
 
 type UpdateUserParams struct {
 	UserID      uuid.UUID
 	DisplayID   sql.NullString
 	DisplayName sql.NullString
-	Picture     sql.NullString
+	IconUrl     sql.NullString
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
@@ -201,14 +201,14 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
 		arg.UserID,
 		arg.DisplayID,
 		arg.DisplayName,
-		arg.Picture,
+		arg.IconUrl,
 	)
 	return err
 }
 
 const userFindByDisplayID = `-- name: UserFindByDisplayID :one
 SELECT
-    user_id, display_id, display_name, picture, created_at, updated_at
+    user_id, display_id, display_name, icon_url, created_at, updated_at
 FROM
     "users"
 WHERE
@@ -222,7 +222,7 @@ func (q *Queries) UserFindByDisplayID(ctx context.Context, displayID sql.NullStr
 		&i.UserID,
 		&i.DisplayID,
 		&i.DisplayName,
-		&i.Picture,
+		&i.IconUrl,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

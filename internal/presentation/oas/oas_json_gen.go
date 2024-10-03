@@ -158,9 +158,9 @@ func (s *CreateTalkSessionOKOwner) encodeFields(e *jx.Encoder) {
 		e.Str(s.DisplayName)
 	}
 	{
-		if s.PictureURL.Set {
-			e.FieldStart("pictureURL")
-			s.PictureURL.Encode(e)
+		if s.IconURL.Set {
+			e.FieldStart("iconURL")
+			s.IconURL.Encode(e)
 		}
 	}
 }
@@ -168,7 +168,7 @@ func (s *CreateTalkSessionOKOwner) encodeFields(e *jx.Encoder) {
 var jsonFieldsNameOfCreateTalkSessionOKOwner = [3]string{
 	0: "displayID",
 	1: "displayName",
-	2: "pictureURL",
+	2: "iconURL",
 }
 
 // Decode decodes CreateTalkSessionOKOwner from json.
@@ -204,15 +204,15 @@ func (s *CreateTalkSessionOKOwner) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"displayName\"")
 			}
-		case "pictureURL":
+		case "iconURL":
 			if err := func() error {
-				s.PictureURL.Reset()
-				if err := s.PictureURL.Decode(d); err != nil {
+				s.IconURL.Reset()
+				if err := s.IconURL.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"pictureURL\"")
+				return errors.Wrap(err, "decode field \"iconURL\"")
 			}
 		default:
 			return d.Skip()
@@ -332,9 +332,9 @@ func (s *EditUserProfileOK) encodeFields(e *jx.Encoder) {
 		e.Str(s.DisplayName)
 	}
 	{
-		if s.PictureURL.Set {
-			e.FieldStart("pictureURL")
-			s.PictureURL.Encode(e)
+		if s.IconURL.Set {
+			e.FieldStart("iconURL")
+			s.IconURL.Encode(e)
 		}
 	}
 }
@@ -342,7 +342,7 @@ func (s *EditUserProfileOK) encodeFields(e *jx.Encoder) {
 var jsonFieldsNameOfEditUserProfileOK = [3]string{
 	0: "displayID",
 	1: "displayName",
-	2: "pictureURL",
+	2: "iconURL",
 }
 
 // Decode decodes EditUserProfileOK from json.
@@ -378,15 +378,15 @@ func (s *EditUserProfileOK) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"displayName\"")
 			}
-		case "pictureURL":
+		case "iconURL":
 			if err := func() error {
-				s.PictureURL.Reset()
-				if err := s.PictureURL.Decode(d); err != nil {
+				s.IconURL.Reset()
+				if err := s.IconURL.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"pictureURL\"")
+				return errors.Wrap(err, "decode field \"iconURL\"")
 			}
 		default:
 			return d.Skip()
@@ -590,9 +590,9 @@ func (s *GetTalkSessionDetailOKOwner) encodeFields(e *jx.Encoder) {
 		e.Str(s.DisplayName)
 	}
 	{
-		if s.PictureURL.Set {
-			e.FieldStart("pictureURL")
-			s.PictureURL.Encode(e)
+		if s.IconURL.Set {
+			e.FieldStart("iconURL")
+			s.IconURL.Encode(e)
 		}
 	}
 }
@@ -600,7 +600,7 @@ func (s *GetTalkSessionDetailOKOwner) encodeFields(e *jx.Encoder) {
 var jsonFieldsNameOfGetTalkSessionDetailOKOwner = [3]string{
 	0: "displayID",
 	1: "displayName",
-	2: "pictureURL",
+	2: "iconURL",
 }
 
 // Decode decodes GetTalkSessionDetailOKOwner from json.
@@ -636,15 +636,15 @@ func (s *GetTalkSessionDetailOKOwner) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"displayName\"")
 			}
-		case "pictureURL":
+		case "iconURL":
 			if err := func() error {
-				s.PictureURL.Reset()
-				if err := s.PictureURL.Decode(d); err != nil {
+				s.IconURL.Reset()
+				if err := s.IconURL.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"pictureURL\"")
+				return errors.Wrap(err, "decode field \"iconURL\"")
 			}
 		default:
 			return d.Skip()
@@ -1065,9 +1065,9 @@ func (s *GetTalkSessionsOKTalkSessionsItemTalkSessionOwner) encodeFields(e *jx.E
 		e.Str(s.DisplayName)
 	}
 	{
-		if s.PictureURL.Set {
-			e.FieldStart("pictureURL")
-			s.PictureURL.Encode(e)
+		if s.IconURL.Set {
+			e.FieldStart("iconURL")
+			s.IconURL.Encode(e)
 		}
 	}
 }
@@ -1075,7 +1075,7 @@ func (s *GetTalkSessionsOKTalkSessionsItemTalkSessionOwner) encodeFields(e *jx.E
 var jsonFieldsNameOfGetTalkSessionsOKTalkSessionsItemTalkSessionOwner = [3]string{
 	0: "displayID",
 	1: "displayName",
-	2: "pictureURL",
+	2: "iconURL",
 }
 
 // Decode decodes GetTalkSessionsOKTalkSessionsItemTalkSessionOwner from json.
@@ -1111,15 +1111,15 @@ func (s *GetTalkSessionsOKTalkSessionsItemTalkSessionOwner) Decode(d *jx.Decoder
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"displayName\"")
 			}
-		case "pictureURL":
+		case "iconURL":
 			if err := func() error {
-				s.PictureURL.Reset()
-				if err := s.PictureURL.Decode(d); err != nil {
+				s.IconURL.Reset()
+				if err := s.IconURL.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"pictureURL\"")
+				return errors.Wrap(err, "decode field \"iconURL\"")
 			}
 		default:
 			return d.Skip()
@@ -1283,9 +1283,9 @@ func (s *GetUserProfileOK) encodeFields(e *jx.Encoder) {
 		e.Str(s.DisplayName)
 	}
 	{
-		if s.PictureURL.Set {
-			e.FieldStart("pictureURL")
-			s.PictureURL.Encode(e)
+		if s.IconURL.Set {
+			e.FieldStart("iconURL")
+			s.IconURL.Encode(e)
 		}
 	}
 }
@@ -1293,7 +1293,7 @@ func (s *GetUserProfileOK) encodeFields(e *jx.Encoder) {
 var jsonFieldsNameOfGetUserProfileOK = [3]string{
 	0: "displayID",
 	1: "displayName",
-	2: "pictureURL",
+	2: "iconURL",
 }
 
 // Decode decodes GetUserProfileOK from json.
@@ -1329,15 +1329,15 @@ func (s *GetUserProfileOK) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"displayName\"")
 			}
-		case "pictureURL":
+		case "iconURL":
 			if err := func() error {
-				s.PictureURL.Reset()
-				if err := s.PictureURL.Decode(d); err != nil {
+				s.IconURL.Reset()
+				if err := s.IconURL.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"pictureURL\"")
+				return errors.Wrap(err, "decode field \"iconURL\"")
 			}
 		default:
 			return d.Skip()
@@ -2203,9 +2203,9 @@ func (s *ListOpinionsOKItemUser) encodeFields(e *jx.Encoder) {
 		e.Str(s.DisplayName)
 	}
 	{
-		if s.PictureURL.Set {
-			e.FieldStart("pictureURL")
-			s.PictureURL.Encode(e)
+		if s.IconURL.Set {
+			e.FieldStart("iconURL")
+			s.IconURL.Encode(e)
 		}
 	}
 }
@@ -2213,7 +2213,7 @@ func (s *ListOpinionsOKItemUser) encodeFields(e *jx.Encoder) {
 var jsonFieldsNameOfListOpinionsOKItemUser = [3]string{
 	0: "displayID",
 	1: "displayName",
-	2: "pictureURL",
+	2: "iconURL",
 }
 
 // Decode decodes ListOpinionsOKItemUser from json.
@@ -2249,15 +2249,15 @@ func (s *ListOpinionsOKItemUser) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"displayName\"")
 			}
-		case "pictureURL":
+		case "iconURL":
 			if err := func() error {
-				s.PictureURL.Reset()
-				if err := s.PictureURL.Decode(d); err != nil {
+				s.IconURL.Reset()
+				if err := s.IconURL.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"pictureURL\"")
+				return errors.Wrap(err, "decode field \"iconURL\"")
 			}
 		default:
 			return d.Skip()
@@ -2902,9 +2902,9 @@ func (s *OpinionCommentsOKOpinionsItemUser) encodeFields(e *jx.Encoder) {
 		e.Str(s.DisplayName)
 	}
 	{
-		if s.PictureURL.Set {
-			e.FieldStart("pictureURL")
-			s.PictureURL.Encode(e)
+		if s.IconURL.Set {
+			e.FieldStart("iconURL")
+			s.IconURL.Encode(e)
 		}
 	}
 }
@@ -2912,7 +2912,7 @@ func (s *OpinionCommentsOKOpinionsItemUser) encodeFields(e *jx.Encoder) {
 var jsonFieldsNameOfOpinionCommentsOKOpinionsItemUser = [3]string{
 	0: "displayID",
 	1: "displayName",
-	2: "pictureURL",
+	2: "iconURL",
 }
 
 // Decode decodes OpinionCommentsOKOpinionsItemUser from json.
@@ -2948,15 +2948,15 @@ func (s *OpinionCommentsOKOpinionsItemUser) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"displayName\"")
 			}
-		case "pictureURL":
+		case "iconURL":
 			if err := func() error {
-				s.PictureURL.Reset()
-				if err := s.PictureURL.Decode(d); err != nil {
+				s.IconURL.Reset()
+				if err := s.IconURL.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"pictureURL\"")
+				return errors.Wrap(err, "decode field \"iconURL\"")
 			}
 		default:
 			return d.Skip()
@@ -3379,9 +3379,9 @@ func (s *OpinionCommentsOKRootOpinionUser) encodeFields(e *jx.Encoder) {
 		e.Str(s.DisplayName)
 	}
 	{
-		if s.PictureURL.Set {
-			e.FieldStart("pictureURL")
-			s.PictureURL.Encode(e)
+		if s.IconURL.Set {
+			e.FieldStart("iconURL")
+			s.IconURL.Encode(e)
 		}
 	}
 }
@@ -3389,7 +3389,7 @@ func (s *OpinionCommentsOKRootOpinionUser) encodeFields(e *jx.Encoder) {
 var jsonFieldsNameOfOpinionCommentsOKRootOpinionUser = [3]string{
 	0: "displayID",
 	1: "displayName",
-	2: "pictureURL",
+	2: "iconURL",
 }
 
 // Decode decodes OpinionCommentsOKRootOpinionUser from json.
@@ -3425,15 +3425,15 @@ func (s *OpinionCommentsOKRootOpinionUser) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"displayName\"")
 			}
-		case "pictureURL":
+		case "iconURL":
 			if err := func() error {
-				s.PictureURL.Reset()
-				if err := s.PictureURL.Decode(d); err != nil {
+				s.IconURL.Reset()
+				if err := s.IconURL.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"pictureURL\"")
+				return errors.Wrap(err, "decode field \"iconURL\"")
 			}
 		default:
 			return d.Skip()
@@ -3720,9 +3720,9 @@ func (s *RegisterUserOK) encodeFields(e *jx.Encoder) {
 		e.Str(s.DisplayName)
 	}
 	{
-		if s.PictureURL.Set {
-			e.FieldStart("pictureURL")
-			s.PictureURL.Encode(e)
+		if s.IconURL.Set {
+			e.FieldStart("iconURL")
+			s.IconURL.Encode(e)
 		}
 	}
 }
@@ -3730,7 +3730,7 @@ func (s *RegisterUserOK) encodeFields(e *jx.Encoder) {
 var jsonFieldsNameOfRegisterUserOK = [3]string{
 	0: "displayID",
 	1: "displayName",
-	2: "pictureURL",
+	2: "iconURL",
 }
 
 // Decode decodes RegisterUserOK from json.
@@ -3766,15 +3766,15 @@ func (s *RegisterUserOK) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"displayName\"")
 			}
-		case "pictureURL":
+		case "iconURL":
 			if err := func() error {
-				s.PictureURL.Reset()
-				if err := s.PictureURL.Decode(d); err != nil {
+				s.IconURL.Reset()
+				if err := s.IconURL.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"pictureURL\"")
+				return errors.Wrap(err, "decode field \"iconURL\"")
 			}
 		default:
 			return d.Skip()
@@ -3828,6 +3828,146 @@ func (s *RegisterUserOK) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *RegisterUserOK) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *TestInternalServerError) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *TestInternalServerError) encodeFields(e *jx.Encoder) {
+}
+
+var jsonFieldsNameOfTestInternalServerError = [0]string{}
+
+// Decode decodes TestInternalServerError from json.
+func (s *TestInternalServerError) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode TestInternalServerError to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		default:
+			return d.Skip()
+		}
+	}); err != nil {
+		return errors.Wrap(err, "decode TestInternalServerError")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *TestInternalServerError) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *TestInternalServerError) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *TestOK) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *TestOK) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("url")
+		e.Str(s.URL)
+	}
+}
+
+var jsonFieldsNameOfTestOK = [1]string{
+	0: "url",
+}
+
+// Decode decodes TestOK from json.
+func (s *TestOK) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode TestOK to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "url":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Str()
+				s.URL = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"url\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode TestOK")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfTestOK) {
+					name = jsonFieldsNameOfTestOK[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *TestOK) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *TestOK) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

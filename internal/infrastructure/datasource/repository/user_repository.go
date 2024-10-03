@@ -47,17 +47,18 @@ func (u *userRepository) FindByDisplayID(ctx context.Context, displayID string) 
 	if err != nil {
 		return nil, errtrace.Wrap(err)
 	}
-	var picture *string
-	if userRow.Picture.Valid {
-		picture = &userRow.Picture.String
+	var profileIcon *user.ProfileIcon
+	if userRow.IconUrl.Valid {
+		profileIcon = user.NewProfileIcon(userRow.IconUrl.String)
 	}
+
 	user := user.NewUser(
 		shared.MustParseUUID[user.User](userRow.UserID.String()),
 		lo.ToPtr(displayID),
 		lo.ToPtr(userRow.DisplayName.String),
 		userAuthRow.Subject,
 		providerName,
-		picture,
+		profileIcon,
 	)
 
 	return &user, nil
@@ -65,9 +66,9 @@ func (u *userRepository) FindByDisplayID(ctx context.Context, displayID string) 
 
 // Update ユーザー情報を更新する
 func (u *userRepository) Update(ctx context.Context, user um.User) error {
-	var picture, displayID, displayName sql.NullString
-	if user.Picture() != nil {
-		picture = sql.NullString{String: *user.Picture(), Valid: true}
+	var iconURL, displayID, displayName sql.NullString
+	if user.ProfileIconURL() != nil {
+		iconURL = sql.NullString{String: *user.ProfileIconURL(), Valid: true}
 	}
 	if user.DisplayID() != nil {
 		displayID = sql.NullString{String: *user.DisplayID(), Valid: true}
@@ -80,7 +81,7 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 		UserID:      user.UserID().UUID(),
 		DisplayID:   displayID,
 		DisplayName: displayName,
-		Picture:     picture,
+		IconUrl:     iconURL,
 	}); err != nil {
 		return errtrace.Wrap(err)
 	}
@@ -172,15 +173,16 @@ func (u *userRepository) FindByID(ctx context.Context, userID shared.UUID[user.U
 	if err != nil {
 		return nil, errtrace.Wrap(err)
 	}
-	var picture, displayID, displayName *string
-	if userRow.Picture.Valid {
-		picture = &userRow.Picture.String
-	}
+	var displayID, displayName *string
 	if userRow.DisplayID.Valid {
 		displayID = &userRow.DisplayID.String
 	}
 	if userRow.DisplayName.Valid {
 		displayName = &userRow.DisplayName.String
+	}
+	var profIcon user.ProfileIcon
+	if userRow.IconUrl.Valid {
+		profIcon = *user.NewProfileIcon(userRow.IconUrl.String)
 	}
 
 	user := user.NewUser(
@@ -189,7 +191,7 @@ func (u *userRepository) FindByID(ctx context.Context, userID shared.UUID[user.U
 		displayName,
 		userAuthRow.Subject,
 		providerName,
-		picture,
+		&profIcon,
 	)
 
 	return &user, nil
@@ -205,15 +207,16 @@ func (u *userRepository) FindBySubject(ctx context.Context, subject user.UserSub
 	if err != nil {
 		return nil, errtrace.Wrap(err)
 	}
-	var picture, displayID, displayName *string
-	if row.Picture.Valid {
-		picture = &row.Picture.String
-	}
+	var displayID, displayName *string
 	if row.DisplayID.Valid {
 		displayID = &row.DisplayID.String
 	}
 	if row.DisplayName.Valid {
 		displayName = &row.DisplayName.String
+	}
+	var iconURL user.ProfileIcon
+	if row.IconUrl.Valid {
+		iconURL = *user.NewProfileIcon(row.IconUrl.String)
 	}
 
 	user := user.NewUser(
@@ -222,7 +225,7 @@ func (u *userRepository) FindBySubject(ctx context.Context, subject user.UserSub
 		displayName,
 		row.Subject,
 		providerName,
-		picture,
+		&iconURL,
 	)
 
 	return &user, nil

@@ -28,6 +28,7 @@ type Invoker interface {
 	IntentionInvoker
 	OpinionInvoker
 	TalkSessionInvoker
+	TestInvoker
 	UserInvoker
 }
 
@@ -113,6 +114,18 @@ type TalkSessionInvoker interface {
 	//
 	// GET /api/talksessions
 	GetTalkSessions(ctx context.Context) (*GetTalkSessionsOK, error)
+}
+
+// TestInvoker invokes operations described by OpenAPI v3 specification.
+//
+// x-gen-operation-group: Test
+type TestInvoker interface {
+	// Test invokes Test operation.
+	//
+	// 🚧 ファイルアップロードテスト.
+	//
+	// GET /api/files
+	Test(ctx context.Context, request OptTestReq) (TestRes, error)
 }
 
 // UserInvoker invokes operations described by OpenAPI v3 specification.
@@ -1478,6 +1491,81 @@ func (c *Client) sendRegisterUser(ctx context.Context, request OptRegisterUserRe
 
 	stage = "DecodeResponse"
 	result, err := decodeRegisterUserResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// Test invokes Test operation.
+//
+// 🚧 ファイルアップロードテスト.
+//
+// GET /api/files
+func (c *Client) Test(ctx context.Context, request OptTestReq) (TestRes, error) {
+	res, err := c.sendTest(ctx, request)
+	return res, err
+}
+
+func (c *Client) sendTest(ctx context.Context, request OptTestReq) (res TestRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("Test"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/api/files"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "Test",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/api/files"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeTestRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeTestResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

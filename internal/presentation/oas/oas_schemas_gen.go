@@ -75,7 +75,7 @@ func (s *CreateTalkSessionOK) SetOwner(val CreateTalkSessionOKOwner) {
 type CreateTalkSessionOKOwner struct {
 	DisplayID   string    `json:"displayID"`
 	DisplayName string    `json:"displayName"`
-	PictureURL  OptString `json:"pictureURL"`
+	IconURL     OptString `json:"iconURL"`
 }
 
 // GetDisplayID returns the value of DisplayID.
@@ -88,9 +88,9 @@ func (s *CreateTalkSessionOKOwner) GetDisplayName() string {
 	return s.DisplayName
 }
 
-// GetPictureURL returns the value of PictureURL.
-func (s *CreateTalkSessionOKOwner) GetPictureURL() OptString {
-	return s.PictureURL
+// GetIconURL returns the value of IconURL.
+func (s *CreateTalkSessionOKOwner) GetIconURL() OptString {
+	return s.IconURL
 }
 
 // SetDisplayID sets the value of DisplayID.
@@ -103,9 +103,9 @@ func (s *CreateTalkSessionOKOwner) SetDisplayName(val string) {
 	s.DisplayName = val
 }
 
-// SetPictureURL sets the value of PictureURL.
-func (s *CreateTalkSessionOKOwner) SetPictureURL(val OptString) {
-	s.PictureURL = val
+// SetIconURL sets the value of IconURL.
+func (s *CreateTalkSessionOKOwner) SetIconURL(val OptString) {
+	s.IconURL = val
 }
 
 type CreateTalkSessionReq struct {
@@ -129,7 +129,7 @@ func (*EditUserProfileInternalServerError) editUserProfileRes() {}
 type EditUserProfileOK struct {
 	DisplayID   string    `json:"displayID"`
 	DisplayName string    `json:"displayName"`
-	PictureURL  OptString `json:"pictureURL"`
+	IconURL     OptString `json:"iconURL"`
 }
 
 // GetDisplayID returns the value of DisplayID.
@@ -142,9 +142,9 @@ func (s *EditUserProfileOK) GetDisplayName() string {
 	return s.DisplayName
 }
 
-// GetPictureURL returns the value of PictureURL.
-func (s *EditUserProfileOK) GetPictureURL() OptString {
-	return s.PictureURL
+// GetIconURL returns the value of IconURL.
+func (s *EditUserProfileOK) GetIconURL() OptString {
+	return s.IconURL
 }
 
 // SetDisplayID sets the value of DisplayID.
@@ -157,9 +157,9 @@ func (s *EditUserProfileOK) SetDisplayName(val string) {
 	s.DisplayName = val
 }
 
-// SetPictureURL sets the value of PictureURL.
-func (s *EditUserProfileOK) SetPictureURL(val OptString) {
-	s.PictureURL = val
+// SetIconURL sets the value of IconURL.
+func (s *EditUserProfileOK) SetIconURL(val OptString) {
+	s.IconURL = val
 }
 
 func (*EditUserProfileOK) editUserProfileRes() {}
@@ -203,7 +203,7 @@ func (s *GetTalkSessionDetailOK) SetOwner(val GetTalkSessionDetailOKOwner) {
 type GetTalkSessionDetailOKOwner struct {
 	DisplayID   string    `json:"displayID"`
 	DisplayName string    `json:"displayName"`
-	PictureURL  OptString `json:"pictureURL"`
+	IconURL     OptString `json:"iconURL"`
 }
 
 // GetDisplayID returns the value of DisplayID.
@@ -216,9 +216,9 @@ func (s *GetTalkSessionDetailOKOwner) GetDisplayName() string {
 	return s.DisplayName
 }
 
-// GetPictureURL returns the value of PictureURL.
-func (s *GetTalkSessionDetailOKOwner) GetPictureURL() OptString {
-	return s.PictureURL
+// GetIconURL returns the value of IconURL.
+func (s *GetTalkSessionDetailOKOwner) GetIconURL() OptString {
+	return s.IconURL
 }
 
 // SetDisplayID sets the value of DisplayID.
@@ -231,9 +231,9 @@ func (s *GetTalkSessionDetailOKOwner) SetDisplayName(val string) {
 	s.DisplayName = val
 }
 
-// SetPictureURL sets the value of PictureURL.
-func (s *GetTalkSessionDetailOKOwner) SetPictureURL(val OptString) {
-	s.PictureURL = val
+// SetIconURL sets the value of IconURL.
+func (s *GetTalkSessionDetailOKOwner) SetIconURL(val OptString) {
+	s.IconURL = val
 }
 
 type GetTalkSessionsOK struct {
@@ -314,7 +314,7 @@ func (s *GetTalkSessionsOKTalkSessionsItemTalkSession) SetOwner(val GetTalkSessi
 type GetTalkSessionsOKTalkSessionsItemTalkSessionOwner struct {
 	DisplayID   string    `json:"displayID"`
 	DisplayName string    `json:"displayName"`
-	PictureURL  OptString `json:"pictureURL"`
+	IconURL     OptString `json:"iconURL"`
 }
 
 // GetDisplayID returns the value of DisplayID.
@@ -327,9 +327,9 @@ func (s *GetTalkSessionsOKTalkSessionsItemTalkSessionOwner) GetDisplayName() str
 	return s.DisplayName
 }
 
-// GetPictureURL returns the value of PictureURL.
-func (s *GetTalkSessionsOKTalkSessionsItemTalkSessionOwner) GetPictureURL() OptString {
-	return s.PictureURL
+// GetIconURL returns the value of IconURL.
+func (s *GetTalkSessionsOKTalkSessionsItemTalkSessionOwner) GetIconURL() OptString {
+	return s.IconURL
 }
 
 // SetDisplayID sets the value of DisplayID.
@@ -342,9 +342,9 @@ func (s *GetTalkSessionsOKTalkSessionsItemTalkSessionOwner) SetDisplayName(val s
 	s.DisplayName = val
 }
 
-// SetPictureURL sets the value of PictureURL.
-func (s *GetTalkSessionsOKTalkSessionsItemTalkSessionOwner) SetPictureURL(val OptString) {
-	s.PictureURL = val
+// SetIconURL sets the value of IconURL.
+func (s *GetTalkSessionsOKTalkSessionsItemTalkSessionOwner) SetIconURL(val OptString) {
+	s.IconURL = val
 }
 
 type GetTopOpinionsInternalServerError struct{}
@@ -358,7 +358,7 @@ func (*GetTopOpinionsOK) getTopOpinionsRes() {}
 type GetUserProfileOK struct {
 	DisplayID   string    `json:"displayID"`
 	DisplayName string    `json:"displayName"`
-	PictureURL  OptString `json:"pictureURL"`
+	IconURL     OptString `json:"iconURL"`
 }
 
 // GetDisplayID returns the value of DisplayID.
@@ -371,9 +371,9 @@ func (s *GetUserProfileOK) GetDisplayName() string {
 	return s.DisplayName
 }
 
-// GetPictureURL returns the value of PictureURL.
-func (s *GetUserProfileOK) GetPictureURL() OptString {
-	return s.PictureURL
+// GetIconURL returns the value of IconURL.
+func (s *GetUserProfileOK) GetIconURL() OptString {
+	return s.IconURL
 }
 
 // SetDisplayID sets the value of DisplayID.
@@ -386,9 +386,9 @@ func (s *GetUserProfileOK) SetDisplayName(val string) {
 	s.DisplayName = val
 }
 
-// SetPictureURL sets the value of PictureURL.
-func (s *GetUserProfileOK) SetPictureURL(val OptString) {
-	s.PictureURL = val
+// SetIconURL sets the value of IconURL.
+func (s *GetUserProfileOK) SetIconURL(val OptString) {
+	s.IconURL = val
 }
 
 type IntentionInternalServerError struct{}
@@ -730,7 +730,7 @@ func (s *ListOpinionsOKItemOpinionIntentionStatus) UnmarshalText(data []byte) er
 type ListOpinionsOKItemUser struct {
 	DisplayID   string    `json:"displayID"`
 	DisplayName string    `json:"displayName"`
-	PictureURL  OptString `json:"pictureURL"`
+	IconURL     OptString `json:"iconURL"`
 }
 
 // GetDisplayID returns the value of DisplayID.
@@ -743,9 +743,9 @@ func (s *ListOpinionsOKItemUser) GetDisplayName() string {
 	return s.DisplayName
 }
 
-// GetPictureURL returns the value of PictureURL.
-func (s *ListOpinionsOKItemUser) GetPictureURL() OptString {
-	return s.PictureURL
+// GetIconURL returns the value of IconURL.
+func (s *ListOpinionsOKItemUser) GetIconURL() OptString {
+	return s.IconURL
 }
 
 // SetDisplayID sets the value of DisplayID.
@@ -758,9 +758,9 @@ func (s *ListOpinionsOKItemUser) SetDisplayName(val string) {
 	s.DisplayName = val
 }
 
-// SetPictureURL sets the value of PictureURL.
-func (s *ListOpinionsOKItemUser) SetPictureURL(val OptString) {
-	s.PictureURL = val
+// SetIconURL sets the value of IconURL.
+func (s *ListOpinionsOKItemUser) SetIconURL(val OptString) {
+	s.IconURL = val
 }
 
 // NewNilRegisterUserReqGender returns new NilRegisterUserReqGender with value set to v.
@@ -1134,7 +1134,7 @@ func (s *OpinionCommentsOKOpinionsItemOpinionIntentionStatus) UnmarshalText(data
 type OpinionCommentsOKOpinionsItemUser struct {
 	DisplayID   string    `json:"displayID"`
 	DisplayName string    `json:"displayName"`
-	PictureURL  OptString `json:"pictureURL"`
+	IconURL     OptString `json:"iconURL"`
 }
 
 // GetDisplayID returns the value of DisplayID.
@@ -1147,9 +1147,9 @@ func (s *OpinionCommentsOKOpinionsItemUser) GetDisplayName() string {
 	return s.DisplayName
 }
 
-// GetPictureURL returns the value of PictureURL.
-func (s *OpinionCommentsOKOpinionsItemUser) GetPictureURL() OptString {
-	return s.PictureURL
+// GetIconURL returns the value of IconURL.
+func (s *OpinionCommentsOKOpinionsItemUser) GetIconURL() OptString {
+	return s.IconURL
 }
 
 // SetDisplayID sets the value of DisplayID.
@@ -1162,9 +1162,9 @@ func (s *OpinionCommentsOKOpinionsItemUser) SetDisplayName(val string) {
 	s.DisplayName = val
 }
 
-// SetPictureURL sets the value of PictureURL.
-func (s *OpinionCommentsOKOpinionsItemUser) SetPictureURL(val OptString) {
-	s.PictureURL = val
+// SetIconURL sets the value of IconURL.
+func (s *OpinionCommentsOKOpinionsItemUser) SetIconURL(val OptString) {
+	s.IconURL = val
 }
 
 type OpinionCommentsOKRootOpinion struct {
@@ -1330,7 +1330,7 @@ func (s *OpinionCommentsOKRootOpinionOpinionIntentionStatus) UnmarshalText(data 
 type OpinionCommentsOKRootOpinionUser struct {
 	DisplayID   string    `json:"displayID"`
 	DisplayName string    `json:"displayName"`
-	PictureURL  OptString `json:"pictureURL"`
+	IconURL     OptString `json:"iconURL"`
 }
 
 // GetDisplayID returns the value of DisplayID.
@@ -1343,9 +1343,9 @@ func (s *OpinionCommentsOKRootOpinionUser) GetDisplayName() string {
 	return s.DisplayName
 }
 
-// GetPictureURL returns the value of PictureURL.
-func (s *OpinionCommentsOKRootOpinionUser) GetPictureURL() OptString {
-	return s.PictureURL
+// GetIconURL returns the value of IconURL.
+func (s *OpinionCommentsOKRootOpinionUser) GetIconURL() OptString {
+	return s.IconURL
 }
 
 // SetDisplayID sets the value of DisplayID.
@@ -1358,9 +1358,9 @@ func (s *OpinionCommentsOKRootOpinionUser) SetDisplayName(val string) {
 	s.DisplayName = val
 }
 
-// SetPictureURL sets the value of PictureURL.
-func (s *OpinionCommentsOKRootOpinionUser) SetPictureURL(val OptString) {
-	s.PictureURL = val
+// SetIconURL sets the value of IconURL.
+func (s *OpinionCommentsOKRootOpinionUser) SetIconURL(val OptString) {
+	s.IconURL = val
 }
 
 // NewOptCreateTalkSessionReq returns new OptCreateTalkSessionReq with value set to v.
@@ -1765,6 +1765,52 @@ func (o OptString) Or(d string) string {
 	return d
 }
 
+// NewOptTestReq returns new OptTestReq with value set to v.
+func NewOptTestReq(v TestReq) OptTestReq {
+	return OptTestReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptTestReq is optional TestReq.
+type OptTestReq struct {
+	Value TestReq
+	Set   bool
+}
+
+// IsSet returns true if OptTestReq was set.
+func (o OptTestReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptTestReq) Reset() {
+	var v TestReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptTestReq) SetTo(v TestReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptTestReq) Get() (v TestReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptTestReq) Or(d TestReq) TestReq {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptURI returns new OptURI with value set to v.
 func NewOptURI(v url.URL) OptURI {
 	return OptURI{
@@ -1899,7 +1945,7 @@ func (*RegisterUserInternalServerError) registerUserRes() {}
 type RegisterUserOK struct {
 	DisplayID   string    `json:"displayID"`
 	DisplayName string    `json:"displayName"`
-	PictureURL  OptString `json:"pictureURL"`
+	IconURL     OptString `json:"iconURL"`
 }
 
 // GetDisplayID returns the value of DisplayID.
@@ -1912,9 +1958,9 @@ func (s *RegisterUserOK) GetDisplayName() string {
 	return s.DisplayName
 }
 
-// GetPictureURL returns the value of PictureURL.
-func (s *RegisterUserOK) GetPictureURL() OptString {
-	return s.PictureURL
+// GetIconURL returns the value of IconURL.
+func (s *RegisterUserOK) GetIconURL() OptString {
+	return s.IconURL
 }
 
 // SetDisplayID sets the value of DisplayID.
@@ -1927,9 +1973,9 @@ func (s *RegisterUserOK) SetDisplayName(val string) {
 	s.DisplayName = val
 }
 
-// SetPictureURL sets the value of PictureURL.
-func (s *RegisterUserOK) SetPictureURL(val OptString) {
-	s.PictureURL = val
+// SetIconURL sets the value of IconURL.
+func (s *RegisterUserOK) SetIconURL(val OptString) {
+	s.IconURL = val
 }
 
 func (*RegisterUserOK) registerUserRes() {}
@@ -1939,8 +1985,8 @@ type RegisterUserReq struct {
 	DisplayName string `json:"displayName"`
 	// ユーザーID。プロフィールのパスなどで使用される。DBのIDとは別。.
 	DisplayID string `json:"displayID"`
-	// ユーザーアイコンURL.
-	Picture OptNilString `json:"picture"`
+	// ユーザーアイコン.
+	Icon OptMultipartFile `json:"icon"`
 	// 生まれ年.
 	YearOfBirth OptNilInt `json:"yearOfBirth"`
 	// 性別.
@@ -1963,9 +2009,9 @@ func (s *RegisterUserReq) GetDisplayID() string {
 	return s.DisplayID
 }
 
-// GetPicture returns the value of Picture.
-func (s *RegisterUserReq) GetPicture() OptNilString {
-	return s.Picture
+// GetIcon returns the value of Icon.
+func (s *RegisterUserReq) GetIcon() OptMultipartFile {
+	return s.Icon
 }
 
 // GetYearOfBirth returns the value of YearOfBirth.
@@ -2003,9 +2049,9 @@ func (s *RegisterUserReq) SetDisplayID(val string) {
 	s.DisplayID = val
 }
 
-// SetPicture sets the value of Picture.
-func (s *RegisterUserReq) SetPicture(val OptNilString) {
-	s.Picture = val
+// SetIcon sets the value of Icon.
+func (s *RegisterUserReq) SetIcon(val OptMultipartFile) {
+	s.Icon = val
 }
 
 // SetYearOfBirth sets the value of YearOfBirth.
@@ -2206,4 +2252,38 @@ func (s *SessionId) GetAPIKey() string {
 // SetAPIKey sets the value of APIKey.
 func (s *SessionId) SetAPIKey(val string) {
 	s.APIKey = val
+}
+
+type TestInternalServerError struct{}
+
+func (*TestInternalServerError) testRes() {}
+
+type TestOK struct {
+	URL string `json:"url"`
+}
+
+// GetURL returns the value of URL.
+func (s *TestOK) GetURL() string {
+	return s.URL
+}
+
+// SetURL sets the value of URL.
+func (s *TestOK) SetURL(val string) {
+	s.URL = val
+}
+
+func (*TestOK) testRes() {}
+
+type TestReq struct {
+	File ht.MultipartFile `json:"file"`
+}
+
+// GetFile returns the value of File.
+func (s *TestReq) GetFile() ht.MultipartFile {
+	return s.File
+}
+
+// SetFile sets the value of File.
+func (s *TestReq) SetFile(val ht.MultipartFile) {
+	s.File = val
 }

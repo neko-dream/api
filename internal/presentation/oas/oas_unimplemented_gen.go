@@ -129,3 +129,12 @@ func (UnimplementedHandler) PostOpinionPost(ctx context.Context, req OptPostOpin
 func (UnimplementedHandler) RegisterUser(ctx context.Context, req OptRegisterUserReq) (r RegisterUserRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
+
+// Test implements Test operation.
+//
+// 🚧 ファイルアップロードテスト.
+//
+// GET /api/files
+func (UnimplementedHandler) Test(ctx context.Context, req OptTestReq) (r TestRes, _ error) {
+	return r, ht.ErrNotImplemented
+}

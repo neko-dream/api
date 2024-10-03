@@ -23,10 +23,10 @@ type (
 		Iat         int64   `json:"iat"` // issued at (seconds)
 		Exp         int64   `json:"exp"` // expiration time (seconds)
 		Jti         string  `json:"jti"` // JWT ID（SessionID）
-		Picture     *string `json:"picture,omitempty"`
+		IconURL     *string `json:"iconURL,omitempty"`
 		DisplayName *string `json:"displayName,omitempty"`
 		DisplayID   *string `json:"displayId,omitempty"`
-		IsVerify    bool    `json:"is_verify"`
+		IsVerify    bool    `json:"isVerify"`
 	}
 )
 
@@ -36,7 +36,7 @@ func NewClaim(user user.User, sessionID shared.UUID[Session]) Claim {
 		Iat:       time.Now().Unix(),
 		Exp:       time.Now().Add(24 * time.Hour).Unix(),
 		Jti:       sessionID.String(),
-		Picture:   user.Picture(),
+		IconURL:   user.ProfileIconURL(),
 		DisplayID: user.DisplayID(),
 		IsVerify:  user.Verify(),
 	}
@@ -45,8 +45,8 @@ func NewClaim(user user.User, sessionID shared.UUID[Session]) Claim {
 func NewClaimFromMap(claims jwt.MapClaims) Claim {
 	var picture, displayName, displayID *string
 
-	if claims["picture"] != nil {
-		picture = lo.ToPtr(claims["picture"].(string))
+	if claims["iconURL"] != nil {
+		picture = lo.ToPtr(claims["iconURL"].(string))
 	}
 	if claims["displayName"] != nil {
 		displayName = lo.ToPtr(claims["displayName"].(string))
@@ -60,7 +60,7 @@ func NewClaimFromMap(claims jwt.MapClaims) Claim {
 		Iat:         int64(claims["iat"].(float64)),
 		Exp:         int64(claims["exp"].(float64)),
 		Jti:         claims["jti"].(string),
-		Picture:     picture,
+		IconURL:     picture,
 		DisplayName: displayName,
 		DisplayID:   displayID,
 		IsVerify:    claims["isVerify"].(bool),
@@ -92,7 +92,7 @@ func (c *Claim) GenMapClaim() *jwt.MapClaims {
 		"sub":         c.Sub,
 		"iss":         Issuer,
 		"aud":         Audience,
-		"picture":     c.Picture,
+		"iconURL":     c.IconURL,
 		"displayName": c.DisplayName,
 		"displayId":   c.DisplayID,
 		"isVerify":    c.IsVerify,

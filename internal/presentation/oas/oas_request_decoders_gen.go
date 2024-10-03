@@ -440,14 +440,21 @@ func (s *Server) decodeRegisterUserRequest(r *http.Request) (
 		return req, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
-	case ct == "application/x-www-form-urlencoded":
+	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
 			return req, close, nil
 		}
-		form, err := ht.ParseForm(r)
-		if err != nil {
-			return req, close, errors.Wrap(err, "parse form")
+		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
+			return req, close, errors.Wrap(err, "parse multipart form")
 		}
+		// Remove all temporary files created by ParseMultipartForm when the request is done.
+		//
+		// Notice that the closers are called in reverse order, to match defer behavior, so
+		// any opened file will be closed before RemoveAll call.
+		closers = append(closers, r.MultipartForm.RemoveAll)
+		// Form values may be unused.
+		form := url.Values(r.MultipartForm.Value)
+		_ = form
 
 		var request OptRegisterUserReq
 		{
@@ -505,38 +512,6 @@ func (s *Server) decodeRegisterUserRequest(r *http.Request) (
 					}
 				} else {
 					return req, close, errors.Wrap(err, "query")
-				}
-			}
-			{
-				cfg := uri.QueryParameterDecodingConfig{
-					Name:    "picture",
-					Style:   uri.QueryStyleForm,
-					Explode: true,
-				}
-				if err := q.HasParam(cfg); err == nil {
-					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-						var optFormDotPictureVal string
-						if err := func() error {
-							val, err := d.DecodeValue()
-							if err != nil {
-								return err
-							}
-
-							c, err := conv.ToString(val)
-							if err != nil {
-								return err
-							}
-
-							optFormDotPictureVal = c
-							return nil
-						}(); err != nil {
-							return err
-						}
-						optForm.Picture.SetTo(optFormDotPictureVal)
-						return nil
-					}); err != nil {
-						return req, close, errors.Wrap(err, "decode \"picture\"")
-					}
 				}
 			}
 			{
@@ -757,7 +732,113 @@ func (s *Server) decodeRegisterUserRequest(r *http.Request) (
 					}
 				}
 			}
+			{
+				if err := func() error {
+					files, ok := r.MultipartForm.File["icon"]
+					if !ok || len(files) < 1 {
+						return nil
+					}
+					fh := files[0]
+
+					f, err := fh.Open()
+					if err != nil {
+						return errors.Wrap(err, "open")
+					}
+					closers = append(closers, f.Close)
+					optForm.Icon.SetTo(ht.MultipartFile{
+						Name:   fh.Filename,
+						File:   f,
+						Size:   fh.Size,
+						Header: fh.Header,
+					})
+					return nil
+				}(); err != nil {
+					return req, close, errors.Wrap(err, "decode \"icon\"")
+				}
+			}
 			request = OptRegisterUserReq{
+				Value: optForm,
+				Set:   true,
+			}
+		}
+		return request, close, nil
+	default:
+		return req, close, validate.InvalidContentType(ct)
+	}
+}
+
+func (s *Server) decodeTestRequest(r *http.Request) (
+	req OptTestReq,
+	close func() error,
+	rerr error,
+) {
+	var closers []func() error
+	close = func() error {
+		var merr error
+		// Close in reverse order, to match defer behavior.
+		for i := len(closers) - 1; i >= 0; i-- {
+			c := closers[i]
+			merr = multierr.Append(merr, c())
+		}
+		return merr
+	}
+	defer func() {
+		if rerr != nil {
+			rerr = multierr.Append(rerr, close())
+		}
+	}()
+	if _, ok := r.Header["Content-Type"]; !ok && r.ContentLength == 0 {
+		return req, close, nil
+	}
+	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
+	if err != nil {
+		return req, close, errors.Wrap(err, "parse media type")
+	}
+	switch {
+	case ct == "multipart/form-data":
+		if r.ContentLength == 0 {
+			return req, close, nil
+		}
+		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
+			return req, close, errors.Wrap(err, "parse multipart form")
+		}
+		// Remove all temporary files created by ParseMultipartForm when the request is done.
+		//
+		// Notice that the closers are called in reverse order, to match defer behavior, so
+		// any opened file will be closed before RemoveAll call.
+		closers = append(closers, r.MultipartForm.RemoveAll)
+		// Form values may be unused.
+		form := url.Values(r.MultipartForm.Value)
+		_ = form
+
+		var request OptTestReq
+		{
+			var optForm TestReq
+			{
+				if err := func() error {
+					files, ok := r.MultipartForm.File["file"]
+					if !ok || len(files) < 1 {
+						return validate.ErrFieldRequired
+					}
+					fh := files[0]
+
+					f, err := fh.Open()
+					if err != nil {
+						return errors.Wrap(err, "open")
+					}
+					closers = append(closers, f.Close)
+					optForm.File = ht.MultipartFile{
+						Name:   fh.Filename,
+						File:   f,
+						Size:   fh.Size,
+						Header: fh.Header,
+					}
+					return nil
+				}(); err != nil {
+					return req, close, errors.Wrap(err, "decode \"file\"")
+				}
+			}
+			request = OptTestReq{
 				Value: optForm,
 				Set:   true,
 			}

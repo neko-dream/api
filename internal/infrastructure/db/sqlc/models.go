@@ -43,7 +43,7 @@ type User struct {
 	UserID      uuid.UUID
 	DisplayID   sql.NullString
 	DisplayName sql.NullString
-	Picture     sql.NullString
+	IconUrl     sql.NullString
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }

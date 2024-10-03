@@ -69,6 +69,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/golang-migrate/migrate/v4 v4.18.1
 	github.com/google/uuid v1.6.0
+	github.com/h2non/filetype v1.1.3
 	github.com/jackc/pgx/v4 v4.18.3
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect

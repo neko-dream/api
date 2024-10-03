@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"mime/multipart"
 	"net/http"
 
 	"braces.dev/errtrace"
@@ -22,14 +23,14 @@ type (
 
 	RegisterUserInput struct {
 		UserID        shared.UUID[user.User]
-		DisplayID     string  // ユーザーの表示用ID
-		DisplayName   string  // ユーザーの表示名
-		PictureURL    *string // ユーザーのプロフィール画像
-		YearOfBirth   *int    // ユーザーの生年
-		Gender        *string // ユーザーの性別
-		Municipality  *string // ユーザーの住んでいる市町村
-		Occupation    *string // ユーザーの職業
-		HouseholdSize *int    // ユーザーの世帯人数
+		DisplayID     string                // ユーザーの表示用ID
+		DisplayName   string                // ユーザーの表示名
+		Icon          *multipart.FileHeader // ユーザーのアイコン
+		YearOfBirth   *int                  // ユーザーの生年
+		Gender        *string               // ユーザーの性別
+		Municipality  *string               // ユーザーの住んでいる市町村
+		Occupation    *string               // ユーザーの職業
+		HouseholdSize *int                  // ユーザーの世帯人数
 	}
 
 	RegisterUserOutput struct {
@@ -95,6 +96,10 @@ func (i *registerUserInteractor) Execute(ctx context.Context, input RegisterUser
 			return messages.UserDisplayIDAlreadyExistsError
 		}
 		foundUser.ChangeName(input.DisplayName)
+		if err := foundUser.SetIconFile(ctx, input.Icon); err != nil {
+			utils.HandleError(ctx, err, "User.SetIconFile")
+			return messages.UserUpdateError
+		}
 
 		// デモグラ情報を設定
 		foundUser.SetDemographics(user.NewUserDemographics(

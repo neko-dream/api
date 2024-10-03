@@ -183,7 +183,7 @@ func encodeRegisterUserRequest(
 	req OptRegisterUserReq,
 	r *http.Request,
 ) error {
-	const contentType = "application/x-www-form-urlencoded"
+	const contentType = "multipart/form-data"
 	if !req.Set {
 		// Keep request with empty body if value is not set.
 		return nil
@@ -213,22 +213,6 @@ func encodeRegisterUserRequest(
 		}
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			return e.EncodeValue(conv.StringToString(request.DisplayID))
-		}); err != nil {
-			return errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "picture" form field.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "picture",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := request.Picture.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
-			}
-			return nil
 		}); err != nil {
 			return errors.Wrap(err, "encode query")
 		}
@@ -313,7 +297,42 @@ func encodeRegisterUserRequest(
 			return errors.Wrap(err, "encode query")
 		}
 	}
-	encoded := q.Values().Encode()
-	ht.SetBody(r, strings.NewReader(encoded), contentType)
+	body, boundary := ht.CreateMultipartBody(func(w *multipart.Writer) error {
+		if val, ok := request.Icon.Get(); ok {
+			if err := val.WriteMultipart("icon", w); err != nil {
+				return errors.Wrap(err, "write \"icon\"")
+			}
+		}
+		if err := q.WriteMultipart(w); err != nil {
+			return errors.Wrap(err, "write multipart")
+		}
+		return nil
+	})
+	ht.SetCloserBody(r, body, mime.FormatMediaType(contentType, map[string]string{"boundary": boundary}))
+	return nil
+}
+
+func encodeTestRequest(
+	req OptTestReq,
+	r *http.Request,
+) error {
+	const contentType = "multipart/form-data"
+	if !req.Set {
+		// Keep request with empty body if value is not set.
+		return nil
+	}
+	request := req.Value
+
+	q := uri.NewFormEncoder(map[string]string{})
+	body, boundary := ht.CreateMultipartBody(func(w *multipart.Writer) error {
+		if err := request.File.WriteMultipart("file", w); err != nil {
+			return errors.Wrap(err, "write \"file\"")
+		}
+		if err := q.WriteMultipart(w); err != nil {
+			return errors.Wrap(err, "write multipart")
+		}
+		return nil
+	})
+	ht.SetCloserBody(r, body, mime.FormatMediaType(contentType, map[string]string{"boundary": boundary}))
 	return nil
 }

@@ -28,3 +28,7 @@ type PostOpinionPostRes interface {
 type RegisterUserRes interface {
 	registerUserRes()
 }
+
+type TestRes interface {
+	testRes()
+}

@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"mime/multipart"
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -40,7 +41,7 @@ type (
 		userID       shared.UUID[User]
 		displayID    *string
 		displayName  *string
-		picture      *string
+		profileIcon  *ProfileIcon
 		subject      string
 		provider     oauth.AuthProviderName
 		demographics *UserDemographics
@@ -81,8 +82,21 @@ func (u *User) Subject() string {
 	return u.subject
 }
 
-func (u *User) Picture() *string {
-	return u.picture
+func (u *User) ProfileIconURL() *string {
+	if u.profileIcon == nil {
+		return nil
+	} else {
+		return &u.profileIcon.url
+	}
+}
+
+func (u *User) SetIconFile(ctx context.Context, file *multipart.FileHeader) error {
+	profileIcon := NewProfileIcon("")
+	if err := profileIcon.SetProfileIconImage(ctx, file, *u); err != nil {
+		return err
+	}
+	u.profileIcon = profileIcon
+	return nil
 }
 
 func (u *User) Provider() oauth.AuthProviderName {
@@ -93,12 +107,12 @@ func (u *User) Verify() bool {
 	return u.displayID != nil && u.displayName != nil
 }
 
-func (u *User) SetDemographics(demographics UserDemographics) {
-	u.demographics = lo.ToPtr(demographics)
-}
-
 func (u *User) Demographics() *UserDemographics {
 	return u.demographics
+}
+
+func (u *User) SetDemographics(demographics UserDemographics) {
+	u.demographics = lo.ToPtr(demographics)
 }
 
 func NewUser(
@@ -107,7 +121,7 @@ func NewUser(
 	displayName *string,
 	subject string,
 	provider oauth.AuthProviderName,
-	picture *string,
+	profileIcon *ProfileIcon,
 ) User {
 	return User{
 		userID:      userID,
@@ -115,6 +129,6 @@ func NewUser(
 		displayName: displayName,
 		subject:     subject,
 		provider:    provider,
-		picture:     picture,
+		profileIcon: profileIcon,
 	}
 }

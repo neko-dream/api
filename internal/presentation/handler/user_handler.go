@@ -1,7 +1,10 @@
 package handler
 
 import (
+	"bytes"
 	"context"
+	"io"
+	"mime/multipart"
 	"net/http"
 
 	"github.com/neko-dream/server/internal/domain/messages"
@@ -67,11 +70,25 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 	municipality := utils.ToPtrIfNotNullValue(value.Municipality.Null, value.Municipality.Value)
 	yearOfBirth := utils.ToPtrIfNotNullValue(value.YearOfBirth.Null, value.YearOfBirth.Value)
 
+	var file *multipart.FileHeader
+	if value.Icon.IsSet() {
+		content, err := io.ReadAll(value.Icon.Value.File)
+		if err != nil {
+			utils.HandleError(ctx, err, "io.ReadAll")
+			return nil, messages.InternalServerError
+		}
+		file, err = MakeFileHeader(value.Icon.Value.Name, content)
+		if err != nil {
+			utils.HandleError(ctx, err, "MakeFileHeader")
+			return nil, messages.InternalServerError
+		}
+	}
+
 	input := user_usecase.RegisterUserInput{
 		UserID:        userID,
 		DisplayID:     value.DisplayID,
 		DisplayName:   value.DisplayName,
-		PictureURL:    claim.Picture,
+		Icon:          file,
 		YearOfBirth:   yearOfBirth,
 		Gender:        gender,
 		Municipality:  municipality,
@@ -90,7 +107,7 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 	return &oas.RegisterUserOK{
 		DisplayID:   out.DisplayID,
 		DisplayName: out.DisplayName,
-		PictureURL:  utils.StringToOptString(claim.Picture),
+		IconURL:     utils.StringToOptString(claim.IconURL),
 	}, nil
 }
 
@@ -102,4 +119,29 @@ func NewUserHandler(
 		DBManager:           DBManager,
 		RegisterUserUseCase: registerUserUsecase,
 	}
+}
+func MakeFileHeader(name string, dateBytes []byte) (*multipart.FileHeader, error) {
+	body := new(bytes.Buffer)
+	writer := multipart.NewWriter(body)
+	part, err := writer.CreateFormFile("file", name)
+	if err != nil {
+		return nil, err
+	}
+	if _, err := io.Copy(part, bytes.NewReader(dateBytes)); err != nil {
+		return nil, err
+	}
+	if err := writer.Close(); err != nil {
+		return nil, err
+	}
+
+	// ダミーファイルをパースして、multipart.FileHeaderを取得する
+	reader := multipart.NewReader(body, writer.Boundary())
+	// 2M
+	form, err := reader.ReadForm(2 * 1_000_000)
+	if err != nil {
+		return nil, err
+	}
+	fh := form.File["file"]
+
+	return fh[0], nil
 }

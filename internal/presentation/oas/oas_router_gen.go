@@ -73,6 +73,27 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					break
 				}
 				switch elem[0] {
+				case 'f': // Prefix: "files"
+					origElem := elem
+					if l := len("files"); len(elem) >= l && elem[0:l] == "files" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch r.Method {
+						case "GET":
+							s.handleTestRequest([0]string{}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, "GET")
+						}
+
+						return
+					}
+
+					elem = origElem
 				case 't': // Prefix: "talksession"
 					origElem := elem
 					if l := len("talksession"); len(elem) >= l && elem[0:l] == "talksession" {
@@ -558,6 +579,31 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					break
 				}
 				switch elem[0] {
+				case 'f': // Prefix: "files"
+					origElem := elem
+					if l := len("files"); len(elem) >= l && elem[0:l] == "files" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch method {
+						case "GET":
+							r.name = "Test"
+							r.summary = "🚧 ファイルアップロードテスト"
+							r.operationID = "Test"
+							r.pathPattern = "/api/files"
+							r.args = args
+							r.count = 0
+							return r, true
+						default:
+							return
+						}
+					}
+
+					elem = origElem
 				case 't': // Prefix: "talksession"
 					origElem := elem
 					if l := len("talksession"); len(elem) >= l && elem[0:l] == "talksession" {

@@ -49,7 +49,7 @@ paths:
                       displayName:
                         type: string
                         x-apidog-mock: '{{$person.firstName}}'
-                      pictureURL:
+                      iconURL:
                         type: string
                     required:
                       - displayID
@@ -105,7 +105,7 @@ paths:
                       displayName:
                         type: string
                         x-apidog-mock: '{{$person.firstName}}'
-                      pictureURL:
+                      iconURL:
                         type: string
                     required:
                       - displayID
@@ -159,7 +159,7 @@ paths:
                                 displayName:
                                   type: string
                                   x-apidog-mock: '{{$person.firstName}}'
-                                pictureURL:
+                                iconURL:
                                   type: string
                               required:
                                 - displayID
@@ -206,7 +206,7 @@ paths:
                   displayName:
                     type: string
                     x-apidog-mock: '{{$person.firstName}}'
-                  pictureURL:
+                  iconURL:
                     type: string
                 required:
                   - displayID
@@ -241,7 +241,7 @@ paths:
                   displayName:
                     type: string
                     x-apidog-mock: '{{$person.firstName}}'
-                  pictureURL:
+                  iconURL:
                     type: string
                 required:
                   - displayID
@@ -267,7 +267,7 @@ paths:
       parameters: []
       requestBody:
         content:
-          application/x-www-form-urlencoded:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -279,11 +279,11 @@ paths:
                   type: string
                   description: ユーザーID。プロフィールのパスなどで使用される。DBのIDとは別。
                   example: ''
-                picture:
+                icon:
+                  format: binary
                   type: string
-                  description: ユーザーアイコンURL
+                  description: ユーザーアイコン
                   example: ''
-                  nullable: true
                 yearOfBirth:
                   type: integer
                   default: 0
@@ -354,7 +354,7 @@ paths:
                   displayName:
                     type: string
                     x-apidog-mock: '{{$person.firstName}}'
-                  pictureURL:
+                  iconURL:
                     type: string
                 required:
                   - displayID
@@ -466,7 +466,7 @@ paths:
                         displayName:
                           type: string
                           x-apidog-mock: '{{$person.firstName}}'
-                        pictureURL:
+                        iconURL:
                           type: string
                       required:
                         - displayID
@@ -694,7 +694,7 @@ paths:
                           displayName:
                             type: string
                             x-apidog-mock: '{{$person.firstName}}'
-                          pictureURL:
+                          iconURL:
                             type: string
                         required:
                           - displayID
@@ -809,7 +809,7 @@ paths:
                             displayName:
                               type: string
                               x-apidog-mock: '{{$person.firstName}}'
-                            pictureURL:
+                            iconURL:
                               type: string
                           required:
                             - displayID
@@ -882,6 +882,48 @@ paths:
                 properties: {}
       security: []
       x-ogen-operation-group: Opinion
+  /api/files:
+    get:
+      summary: 🚧 ファイルアップロードテスト
+      deprecated: false
+      description: ''
+      operationId: Test
+      tags:
+        - test
+      parameters: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  format: binary
+                  type: string
+                  example: ''
+              required:
+                - file
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                required:
+                  - url
+        '500':
+          description: ServerErrorResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      security: []
+      x-ogen-operation-group: test
   /auth/{provider}/login:
     get:
       summary: OAuthログイン
@@ -1062,7 +1104,7 @@ components:
         displayName:
           type: string
           x-apidog-mock: '{{$person.firstName}}'
-        pictureURL:
+        iconURL:
           type: string
       required:
         - displayID
@@ -1114,7 +1156,7 @@ components:
             displayName:
               type: string
               x-apidog-mock: '{{$person.firstName}}'
-            pictureURL:
+            iconURL:
               type: string
           required:
             - displayID

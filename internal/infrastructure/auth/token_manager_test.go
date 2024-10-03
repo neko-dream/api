@@ -48,7 +48,7 @@ func TestNewTokenManagerTest(t *testing.T) {
 					lo.ToPtr("test"),
 					"test",
 					oauth.ProviderGoogle,
-					lo.ToPtr("https://example.com"),
+					nil,
 				),
 				shared.NewUUID[session.Session](),
 			)

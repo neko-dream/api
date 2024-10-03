@@ -12,6 +12,7 @@ type Handler interface {
 	IntentionHandler
 	OpinionHandler
 	TalkSessionHandler
+	TestHandler
 	UserHandler
 }
 
@@ -97,6 +98,18 @@ type TalkSessionHandler interface {
 	//
 	// GET /api/talksessions
 	GetTalkSessions(ctx context.Context) (*GetTalkSessionsOK, error)
+}
+
+// TestHandler handles operations described by OpenAPI v3 specification.
+//
+// x-ogen-operation-group: Test
+type TestHandler interface {
+	// Test implements Test operation.
+	//
+	// 🚧 ファイルアップロードテスト.
+	//
+	// GET /api/files
+	Test(ctx context.Context, req OptTestReq) (TestRes, error)
 }
 
 // UserHandler handles operations described by OpenAPI v3 specification.

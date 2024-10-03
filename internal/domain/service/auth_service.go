@@ -70,7 +70,7 @@ func (a *authService) Authenticate(
 		nil,
 		userInfo.Subject,
 		authProviderName,
-		&userInfo.Picture,
+		nil,
 	)
 	if err := a.userRepository.Create(ctx, newUser); err != nil {
 		utils.HandleError(ctx, err, "UserRepository.Create")

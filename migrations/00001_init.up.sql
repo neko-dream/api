@@ -4,7 +4,7 @@ CREATE TABLE "users" (
   "user_id" uuid PRIMARY KEY,
   "display_id" varchar,
   "display_name" varchar,
-  "picture" varchar,
+  "icon_url" varchar,
   "created_at" timestamp NOT NULL DEFAULT (now()),
   "updated_at" timestamp NOT NULL DEFAULT (now())
 );
