@@ -17,6 +17,14 @@ func ToPtrIfNotNullFunc[T any](nullFlag bool, getValue func() T) *T {
 	return &val
 }
 
+// 三項演算子
+func IfThenElse[T any](condition bool, thenValue T, elseValue T) T {
+	if condition {
+		return thenValue
+	}
+	return elseValue
+}
+
 // ogen用のユーティリティ関数
 
 func StringToOptString(s *string) oas.OptString {

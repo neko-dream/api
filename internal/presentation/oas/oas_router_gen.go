@@ -73,27 +73,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					break
 				}
 				switch elem[0] {
-				case 'f': // Prefix: "files"
-					origElem := elem
-					if l := len("files"); len(elem) >= l && elem[0:l] == "files" {
-						elem = elem[l:]
-					} else {
-						break
-					}
-
-					if len(elem) == 0 {
-						// Leaf node.
-						switch r.Method {
-						case "GET":
-							s.handleTestRequest([0]string{}, elemIsEscaped, w, r)
-						default:
-							s.notAllowed(w, r, "GET")
-						}
-
-						return
-					}
-
-					elem = origElem
 				case 't': // Prefix: "talksession"
 					origElem := elem
 					if l := len("talksession"); len(elem) >= l && elem[0:l] == "talksession" {
@@ -348,39 +327,19 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					}
 
 					if len(elem) == 0 {
+						// Leaf node.
 						switch r.Method {
 						case "GET":
 							s.handleGetUserProfileRequest([0]string{}, elemIsEscaped, w, r)
+						case "POST":
+							s.handleRegisterUserRequest([0]string{}, elemIsEscaped, w, r)
 						case "PUT":
 							s.handleEditUserProfileRequest([0]string{}, elemIsEscaped, w, r)
 						default:
-							s.notAllowed(w, r, "GET,PUT")
+							s.notAllowed(w, r, "GET,POST,PUT")
 						}
 
 						return
-					}
-					switch elem[0] {
-					case '/': // Prefix: "/register"
-						origElem := elem
-						if l := len("/register"); len(elem) >= l && elem[0:l] == "/register" {
-							elem = elem[l:]
-						} else {
-							break
-						}
-
-						if len(elem) == 0 {
-							// Leaf node.
-							switch r.Method {
-							case "POST":
-								s.handleRegisterUserRequest([0]string{}, elemIsEscaped, w, r)
-							default:
-								s.notAllowed(w, r, "POST")
-							}
-
-							return
-						}
-
-						elem = origElem
 					}
 
 					elem = origElem
@@ -579,31 +538,6 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					break
 				}
 				switch elem[0] {
-				case 'f': // Prefix: "files"
-					origElem := elem
-					if l := len("files"); len(elem) >= l && elem[0:l] == "files" {
-						elem = elem[l:]
-					} else {
-						break
-					}
-
-					if len(elem) == 0 {
-						// Leaf node.
-						switch method {
-						case "GET":
-							r.name = "Test"
-							r.summary = "🚧 ファイルアップロードテスト"
-							r.operationID = "Test"
-							r.pathPattern = "/api/files"
-							r.args = args
-							r.count = 0
-							return r, true
-						default:
-							return
-						}
-					}
-
-					elem = origElem
 				case 't': // Prefix: "talksession"
 					origElem := elem
 					if l := len("talksession"); len(elem) >= l && elem[0:l] == "talksession" {
@@ -878,11 +812,20 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					}
 
 					if len(elem) == 0 {
+						// Leaf node.
 						switch method {
 						case "GET":
 							r.name = "GetUserProfile"
 							r.summary = "ユーザー情報の取得"
 							r.operationID = "getUserProfile"
+							r.pathPattern = "/api/user"
+							r.args = args
+							r.count = 0
+							return r, true
+						case "POST":
+							r.name = "RegisterUser"
+							r.summary = "ユーザー作成"
+							r.operationID = "registerUser"
 							r.pathPattern = "/api/user"
 							r.args = args
 							r.count = 0
@@ -898,33 +841,6 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						default:
 							return
 						}
-					}
-					switch elem[0] {
-					case '/': // Prefix: "/register"
-						origElem := elem
-						if l := len("/register"); len(elem) >= l && elem[0:l] == "/register" {
-							elem = elem[l:]
-						} else {
-							break
-						}
-
-						if len(elem) == 0 {
-							// Leaf node.
-							switch method {
-							case "POST":
-								r.name = "RegisterUser"
-								r.summary = "ユーザー作成"
-								r.operationID = "registerUser"
-								r.pathPattern = "/api/user/register"
-								r.args = args
-								r.count = 0
-								return r, true
-							default:
-								return
-							}
-						}
-
-						elem = origElem
 					}
 
 					elem = origElem

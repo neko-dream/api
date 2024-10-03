@@ -12,7 +12,6 @@ type Handler interface {
 	IntentionHandler
 	OpinionHandler
 	TalkSessionHandler
-	TestHandler
 	UserHandler
 }
 
@@ -100,18 +99,6 @@ type TalkSessionHandler interface {
 	GetTalkSessions(ctx context.Context) (*GetTalkSessionsOK, error)
 }
 
-// TestHandler handles operations described by OpenAPI v3 specification.
-//
-// x-ogen-operation-group: Test
-type TestHandler interface {
-	// Test implements Test operation.
-	//
-	// 🚧 ファイルアップロードテスト.
-	//
-	// GET /api/files
-	Test(ctx context.Context, req OptTestReq) (TestRes, error)
-}
-
 // UserHandler handles operations described by OpenAPI v3 specification.
 //
 // x-ogen-operation-group: User
@@ -121,7 +108,7 @@ type UserHandler interface {
 	// ユーザー情報の変更.
 	//
 	// PUT /api/user
-	EditUserProfile(ctx context.Context) (EditUserProfileRes, error)
+	EditUserProfile(ctx context.Context, req OptEditUserProfileReq) (EditUserProfileRes, error)
 	// GetUserProfile implements getUserProfile operation.
 	//
 	// ユーザー情報の取得.
@@ -132,7 +119,7 @@ type UserHandler interface {
 	//
 	// ユーザー作成.
 	//
-	// POST /api/user/register
+	// POST /api/user
 	RegisterUser(ctx context.Context, req OptRegisterUserReq) (RegisterUserRes, error)
 }
 

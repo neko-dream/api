@@ -26,4 +26,9 @@ var (
 		Code:       "AUTH-0004",
 		Message:    "トークンが期限切れです。再ログインしてください。",
 	}
+	TokenGenerateError = &APIError{
+		StatusCode: 500,
+		Code:       "AUTH-0005",
+		Message:    "トークンの生成に失敗しました。",
+	}
 )

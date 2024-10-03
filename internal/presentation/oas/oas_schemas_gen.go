@@ -164,6 +164,254 @@ func (s *EditUserProfileOK) SetIconURL(val OptString) {
 
 func (*EditUserProfileOK) editUserProfileRes() {}
 
+type EditUserProfileReq struct {
+	// ユーザー名.
+	DisplayName OptNilString `json:"displayName"`
+	// ユーザーアイコン.
+	Icon OptMultipartFile `json:"icon"`
+	// 生まれ年.
+	YearOfBirth OptNilInt `json:"yearOfBirth"`
+	// 性別.
+	Gender OptNilEditUserProfileReqGender `json:"gender"`
+	// 市区町村.
+	Municipality OptNilString `json:"municipality"`
+	// 職業.
+	Occupation OptNilEditUserProfileReqOccupation `json:"occupation"`
+	// 世帯人数.
+	HouseholdSize OptNilInt `json:"householdSize"`
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *EditUserProfileReq) GetDisplayName() OptNilString {
+	return s.DisplayName
+}
+
+// GetIcon returns the value of Icon.
+func (s *EditUserProfileReq) GetIcon() OptMultipartFile {
+	return s.Icon
+}
+
+// GetYearOfBirth returns the value of YearOfBirth.
+func (s *EditUserProfileReq) GetYearOfBirth() OptNilInt {
+	return s.YearOfBirth
+}
+
+// GetGender returns the value of Gender.
+func (s *EditUserProfileReq) GetGender() OptNilEditUserProfileReqGender {
+	return s.Gender
+}
+
+// GetMunicipality returns the value of Municipality.
+func (s *EditUserProfileReq) GetMunicipality() OptNilString {
+	return s.Municipality
+}
+
+// GetOccupation returns the value of Occupation.
+func (s *EditUserProfileReq) GetOccupation() OptNilEditUserProfileReqOccupation {
+	return s.Occupation
+}
+
+// GetHouseholdSize returns the value of HouseholdSize.
+func (s *EditUserProfileReq) GetHouseholdSize() OptNilInt {
+	return s.HouseholdSize
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *EditUserProfileReq) SetDisplayName(val OptNilString) {
+	s.DisplayName = val
+}
+
+// SetIcon sets the value of Icon.
+func (s *EditUserProfileReq) SetIcon(val OptMultipartFile) {
+	s.Icon = val
+}
+
+// SetYearOfBirth sets the value of YearOfBirth.
+func (s *EditUserProfileReq) SetYearOfBirth(val OptNilInt) {
+	s.YearOfBirth = val
+}
+
+// SetGender sets the value of Gender.
+func (s *EditUserProfileReq) SetGender(val OptNilEditUserProfileReqGender) {
+	s.Gender = val
+}
+
+// SetMunicipality sets the value of Municipality.
+func (s *EditUserProfileReq) SetMunicipality(val OptNilString) {
+	s.Municipality = val
+}
+
+// SetOccupation sets the value of Occupation.
+func (s *EditUserProfileReq) SetOccupation(val OptNilEditUserProfileReqOccupation) {
+	s.Occupation = val
+}
+
+// SetHouseholdSize sets the value of HouseholdSize.
+func (s *EditUserProfileReq) SetHouseholdSize(val OptNilInt) {
+	s.HouseholdSize = val
+}
+
+// 性別.
+type EditUserProfileReqGender string
+
+const (
+	EditUserProfileReqGenderMale           EditUserProfileReqGender = "male"
+	EditUserProfileReqGenderFemale         EditUserProfileReqGender = "female"
+	EditUserProfileReqGenderOther          EditUserProfileReqGender = "other"
+	EditUserProfileReqGenderPreferNotToSay EditUserProfileReqGender = "preferNotToSay"
+)
+
+// AllValues returns all EditUserProfileReqGender values.
+func (EditUserProfileReqGender) AllValues() []EditUserProfileReqGender {
+	return []EditUserProfileReqGender{
+		EditUserProfileReqGenderMale,
+		EditUserProfileReqGenderFemale,
+		EditUserProfileReqGenderOther,
+		EditUserProfileReqGenderPreferNotToSay,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s EditUserProfileReqGender) MarshalText() ([]byte, error) {
+	switch s {
+	case EditUserProfileReqGenderMale:
+		return []byte(s), nil
+	case EditUserProfileReqGenderFemale:
+		return []byte(s), nil
+	case EditUserProfileReqGenderOther:
+		return []byte(s), nil
+	case EditUserProfileReqGenderPreferNotToSay:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *EditUserProfileReqGender) UnmarshalText(data []byte) error {
+	switch EditUserProfileReqGender(data) {
+	case EditUserProfileReqGenderMale:
+		*s = EditUserProfileReqGenderMale
+		return nil
+	case EditUserProfileReqGenderFemale:
+		*s = EditUserProfileReqGenderFemale
+		return nil
+	case EditUserProfileReqGenderOther:
+		*s = EditUserProfileReqGenderOther
+		return nil
+	case EditUserProfileReqGenderPreferNotToSay:
+		*s = EditUserProfileReqGenderPreferNotToSay
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// 職業.
+type EditUserProfileReqOccupation string
+
+const (
+	EditUserProfileReqOccupation_0  EditUserProfileReqOccupation = "正社員"
+	EditUserProfileReqOccupation_1  EditUserProfileReqOccupation = "契約社員"
+	EditUserProfileReqOccupation_2  EditUserProfileReqOccupation = "公務員"
+	EditUserProfileReqOccupation_3  EditUserProfileReqOccupation = "自営業"
+	EditUserProfileReqOccupation_4  EditUserProfileReqOccupation = "会社役員"
+	EditUserProfileReqOccupation_5  EditUserProfileReqOccupation = "パート・アルバイト"
+	EditUserProfileReqOccupation_6  EditUserProfileReqOccupation = "家事従事者"
+	EditUserProfileReqOccupation_7  EditUserProfileReqOccupation = "学生"
+	EditUserProfileReqOccupation_8  EditUserProfileReqOccupation = "無職"
+	EditUserProfileReqOccupation_9  EditUserProfileReqOccupation = "その他"
+	EditUserProfileReqOccupation_10 EditUserProfileReqOccupation = "無回答"
+)
+
+// AllValues returns all EditUserProfileReqOccupation values.
+func (EditUserProfileReqOccupation) AllValues() []EditUserProfileReqOccupation {
+	return []EditUserProfileReqOccupation{
+		EditUserProfileReqOccupation_0,
+		EditUserProfileReqOccupation_1,
+		EditUserProfileReqOccupation_2,
+		EditUserProfileReqOccupation_3,
+		EditUserProfileReqOccupation_4,
+		EditUserProfileReqOccupation_5,
+		EditUserProfileReqOccupation_6,
+		EditUserProfileReqOccupation_7,
+		EditUserProfileReqOccupation_8,
+		EditUserProfileReqOccupation_9,
+		EditUserProfileReqOccupation_10,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s EditUserProfileReqOccupation) MarshalText() ([]byte, error) {
+	switch s {
+	case EditUserProfileReqOccupation_0:
+		return []byte(s), nil
+	case EditUserProfileReqOccupation_1:
+		return []byte(s), nil
+	case EditUserProfileReqOccupation_2:
+		return []byte(s), nil
+	case EditUserProfileReqOccupation_3:
+		return []byte(s), nil
+	case EditUserProfileReqOccupation_4:
+		return []byte(s), nil
+	case EditUserProfileReqOccupation_5:
+		return []byte(s), nil
+	case EditUserProfileReqOccupation_6:
+		return []byte(s), nil
+	case EditUserProfileReqOccupation_7:
+		return []byte(s), nil
+	case EditUserProfileReqOccupation_8:
+		return []byte(s), nil
+	case EditUserProfileReqOccupation_9:
+		return []byte(s), nil
+	case EditUserProfileReqOccupation_10:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *EditUserProfileReqOccupation) UnmarshalText(data []byte) error {
+	switch EditUserProfileReqOccupation(data) {
+	case EditUserProfileReqOccupation_0:
+		*s = EditUserProfileReqOccupation_0
+		return nil
+	case EditUserProfileReqOccupation_1:
+		*s = EditUserProfileReqOccupation_1
+		return nil
+	case EditUserProfileReqOccupation_2:
+		*s = EditUserProfileReqOccupation_2
+		return nil
+	case EditUserProfileReqOccupation_3:
+		*s = EditUserProfileReqOccupation_3
+		return nil
+	case EditUserProfileReqOccupation_4:
+		*s = EditUserProfileReqOccupation_4
+		return nil
+	case EditUserProfileReqOccupation_5:
+		*s = EditUserProfileReqOccupation_5
+		return nil
+	case EditUserProfileReqOccupation_6:
+		*s = EditUserProfileReqOccupation_6
+		return nil
+	case EditUserProfileReqOccupation_7:
+		*s = EditUserProfileReqOccupation_7
+		return nil
+	case EditUserProfileReqOccupation_8:
+		*s = EditUserProfileReqOccupation_8
+		return nil
+	case EditUserProfileReqOccupation_9:
+		*s = EditUserProfileReqOccupation_9
+		return nil
+	case EditUserProfileReqOccupation_10:
+		*s = EditUserProfileReqOccupation_10
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
 type GetTalkSessionDetailOK struct {
 	ID    string                      `json:"id"`
 	Theme string                      `json:"theme"`
@@ -1409,6 +1657,52 @@ func (o OptCreateTalkSessionReq) Or(d CreateTalkSessionReq) CreateTalkSessionReq
 	return d
 }
 
+// NewOptEditUserProfileReq returns new OptEditUserProfileReq with value set to v.
+func NewOptEditUserProfileReq(v EditUserProfileReq) OptEditUserProfileReq {
+	return OptEditUserProfileReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptEditUserProfileReq is optional EditUserProfileReq.
+type OptEditUserProfileReq struct {
+	Value EditUserProfileReq
+	Set   bool
+}
+
+// IsSet returns true if OptEditUserProfileReq was set.
+func (o OptEditUserProfileReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptEditUserProfileReq) Reset() {
+	var v EditUserProfileReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptEditUserProfileReq) SetTo(v EditUserProfileReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptEditUserProfileReq) Get() (v EditUserProfileReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptEditUserProfileReq) Or(d EditUserProfileReq) EditUserProfileReq {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptIntentionReq returns new OptIntentionReq with value set to v.
 func NewOptIntentionReq(v IntentionReq) OptIntentionReq {
 	return OptIntentionReq{
@@ -1495,6 +1789,132 @@ func (o OptMultipartFile) Get() (v ht.MultipartFile, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptMultipartFile) Or(d ht.MultipartFile) ht.MultipartFile {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilEditUserProfileReqGender returns new OptNilEditUserProfileReqGender with value set to v.
+func NewOptNilEditUserProfileReqGender(v EditUserProfileReqGender) OptNilEditUserProfileReqGender {
+	return OptNilEditUserProfileReqGender{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilEditUserProfileReqGender is optional nullable EditUserProfileReqGender.
+type OptNilEditUserProfileReqGender struct {
+	Value EditUserProfileReqGender
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilEditUserProfileReqGender was set.
+func (o OptNilEditUserProfileReqGender) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilEditUserProfileReqGender) Reset() {
+	var v EditUserProfileReqGender
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilEditUserProfileReqGender) SetTo(v EditUserProfileReqGender) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilEditUserProfileReqGender) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilEditUserProfileReqGender) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v EditUserProfileReqGender
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilEditUserProfileReqGender) Get() (v EditUserProfileReqGender, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilEditUserProfileReqGender) Or(d EditUserProfileReqGender) EditUserProfileReqGender {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilEditUserProfileReqOccupation returns new OptNilEditUserProfileReqOccupation with value set to v.
+func NewOptNilEditUserProfileReqOccupation(v EditUserProfileReqOccupation) OptNilEditUserProfileReqOccupation {
+	return OptNilEditUserProfileReqOccupation{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilEditUserProfileReqOccupation is optional nullable EditUserProfileReqOccupation.
+type OptNilEditUserProfileReqOccupation struct {
+	Value EditUserProfileReqOccupation
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilEditUserProfileReqOccupation was set.
+func (o OptNilEditUserProfileReqOccupation) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilEditUserProfileReqOccupation) Reset() {
+	var v EditUserProfileReqOccupation
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilEditUserProfileReqOccupation) SetTo(v EditUserProfileReqOccupation) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilEditUserProfileReqOccupation) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilEditUserProfileReqOccupation) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v EditUserProfileReqOccupation
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilEditUserProfileReqOccupation) Get() (v EditUserProfileReqOccupation, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilEditUserProfileReqOccupation) Or(d EditUserProfileReqOccupation) EditUserProfileReqOccupation {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -1759,52 +2179,6 @@ func (o OptString) Get() (v string, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptString) Or(d string) string {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptTestReq returns new OptTestReq with value set to v.
-func NewOptTestReq(v TestReq) OptTestReq {
-	return OptTestReq{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptTestReq is optional TestReq.
-type OptTestReq struct {
-	Value TestReq
-	Set   bool
-}
-
-// IsSet returns true if OptTestReq was set.
-func (o OptTestReq) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptTestReq) Reset() {
-	var v TestReq
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptTestReq) SetTo(v TestReq) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptTestReq) Get() (v TestReq, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptTestReq) Or(d TestReq) TestReq {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -2252,38 +2626,4 @@ func (s *SessionId) GetAPIKey() string {
 // SetAPIKey sets the value of APIKey.
 func (s *SessionId) SetAPIKey(val string) {
 	s.APIKey = val
-}
-
-type TestInternalServerError struct{}
-
-func (*TestInternalServerError) testRes() {}
-
-type TestOK struct {
-	URL string `json:"url"`
-}
-
-// GetURL returns the value of URL.
-func (s *TestOK) GetURL() string {
-	return s.URL
-}
-
-// SetURL sets the value of URL.
-func (s *TestOK) SetURL(val string) {
-	s.URL = val
-}
-
-func (*TestOK) testRes() {}
-
-type TestReq struct {
-	File ht.MultipartFile `json:"file"`
-}
-
-// GetFile returns the value of File.
-func (s *TestReq) GetFile() ht.MultipartFile {
-	return s.File
-}
-
-// SetFile sets the value of File.
-func (s *TestReq) SetFile(val ht.MultipartFile) {
-	s.File = val
 }

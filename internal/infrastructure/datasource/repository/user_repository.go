@@ -15,6 +15,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/db"
 	model "github.com/neko-dream/server/internal/infrastructure/db/sqlc"
 	"github.com/neko-dream/server/pkg/oauth"
+	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
 )
 
@@ -78,7 +79,7 @@ func (u *userRepository) FindByDisplayID(ctx context.Context, displayID string) 
 
 // Update ユーザー情報を更新する
 func (u *userRepository) Update(ctx context.Context, user um.User) error {
-	var iconURL, displayID, displayName sql.NullString
+	var iconURL sql.NullString
 	if user.IsIconUpdateRequired() {
 		url, err := u.imageRepository.Create(ctx, *user.ProfileIcon().ImageInfo())
 		if err != nil {
@@ -86,55 +87,54 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 		}
 		iconURL = sql.NullString{String: *url, Valid: true}
 	}
-	if user.DisplayID() != nil {
-		displayID = sql.NullString{String: *user.DisplayID(), Valid: true}
-	}
-	if user.DisplayName() != nil {
-		displayName = sql.NullString{String: *user.DisplayName(), Valid: true}
-	}
 
-	if err := u.DBManager.GetQueries(ctx).UpdateUser(ctx, model.UpdateUserParams{
-		UserID:      user.UserID().UUID(),
-		DisplayID:   displayID,
-		DisplayName: displayName,
-		IconUrl:     iconURL,
+	if err := u.GetQueries(ctx).UpdateUser(ctx, model.UpdateUserParams{
+		UserID: user.UserID().UUID(),
+		DisplayName: utils.IfThenElse(
+			user.DisplayName() != nil,
+			sql.NullString{String: *user.DisplayName(), Valid: true},
+			sql.NullString{},
+		),
+		IconUrl: iconURL,
 	}); err != nil {
 		return errtrace.Wrap(err)
 	}
 
 	if user.Demographics() != nil {
-		var (
-			yearOfBirth   sql.NullInt32
-			occupation    sql.NullInt16
-			municipality  sql.NullString
-			householdSize sql.NullInt16
-			gender        int16
-		)
-		if user.Demographics().YearOfBirth() != nil {
-			yearOfBirth = sql.NullInt32{Int32: int32(*user.Demographics().YearOfBirth()), Valid: true}
-		}
-		if user.Demographics().Occupation() != nil {
-			occupation = sql.NullInt16{Int16: int16(*user.Demographics().Occupation()), Valid: true}
-		}
-		if user.Demographics().Municipality() != nil {
-			municipality = sql.NullString{String: user.Demographics().Municipality().String(), Valid: true}
-		}
-		if user.Demographics().HouseholdSize() != nil {
-			householdSize = sql.NullInt16{Int16: int16(*user.Demographics().HouseholdSize()), Valid: true}
-		}
-		if user.Demographics().Gender() == nil {
+		userDemographics := user.Demographics()
+
+		var gender int16
+		if userDemographics.Gender() == nil {
 			gender = int16(um.GenderPreferNotToSay)
+		} else {
+			gender = int16(*userDemographics.Gender())
 		}
 
-		if err := u.DBManager.GetQueries(ctx).
+		if err := u.GetQueries(ctx).
 			UpdateOrCreateUserDemographics(ctx, model.UpdateOrCreateUserDemographicsParams{
-				UserDemographicsID: shared.NewUUID[um.UserDemographics]().UUID(),
+				UserDemographicsID: userDemographics.UserDemographicsID().UUID(),
 				UserID:             user.UserID().UUID(),
-				YearOfBirth:        yearOfBirth,
-				Occupation:         occupation,
-				Municipality:       municipality,
-				HouseholdSize:      householdSize,
-				Gender:             gender,
+				YearOfBirth: utils.IfThenElse(
+					userDemographics.YearOfBirth() != nil,
+					sql.NullInt32{Int32: int32(*userDemographics.YearOfBirth()), Valid: true},
+					sql.NullInt32{},
+				),
+				Occupation: utils.IfThenElse(
+					userDemographics.Occupation() != nil,
+					sql.NullInt16{Int16: int16(*userDemographics.Occupation()), Valid: true},
+					sql.NullInt16{},
+				),
+				Municipality: utils.IfThenElse(
+					userDemographics.Municipality() != nil,
+					sql.NullString{String: userDemographics.Municipality().String(), Valid: true},
+					sql.NullString{},
+				),
+				HouseholdSize: utils.IfThenElse(
+					userDemographics.HouseholdSize() != nil,
+					sql.NullInt16{Int16: int16(*userDemographics.HouseholdSize()), Valid: true},
+					sql.NullInt16{},
+				),
+				Gender: gender,
 			}); err != nil {
 			return errtrace.Wrap(err)
 		}
@@ -184,6 +184,10 @@ func (u *userRepository) FindByID(ctx context.Context, userID shared.UUID[user.U
 			return nil, nil
 		}
 	}
+	userDemographics, err := u.findUserDemographics(ctx, userID)
+	if err != nil {
+		return nil, errtrace.Wrap(err)
+	}
 
 	providerName, err := oauth.NewAuthProviderName(userAuthRow.Provider)
 	if err != nil {
@@ -209,8 +213,41 @@ func (u *userRepository) FindByID(ctx context.Context, userID shared.UUID[user.U
 		providerName,
 		profIcon,
 	)
+	if userDemographics != nil {
+		user.SetDemographics(*userDemographics)
+	}
 
 	return &user, nil
+}
+
+func (u *userRepository) findUserDemographics(ctx context.Context, userID shared.UUID[user.User]) (*user.UserDemographics, error) {
+	userDemoRow, err := u.GetQueries(ctx).GetUserDemographicsByUserID(ctx, userID.UUID())
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, errtrace.Wrap(err)
+	}
+
+	var (
+		yearOfBirth   *um.YearOfBirth
+		occupation    *um.Occupation
+		municipality  *um.Municipality
+		householdSize *um.HouseholdSize
+		gender        *um.Gender
+	)
+	userDemographicsID := shared.MustParseUUID[user.UserDemographics](userDemoRow.UserDemographicsID.String())
+
+	ud := user.NewUserDemographics(
+		userDemographicsID,
+		yearOfBirth,
+		occupation,
+		gender,
+		municipality,
+		householdSize,
+	)
+
+	return &ud, nil
 }
 
 func (u *userRepository) FindBySubject(ctx context.Context, subject user.UserSubject) (*user.User, error) {

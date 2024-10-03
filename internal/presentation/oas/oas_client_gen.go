@@ -28,7 +28,6 @@ type Invoker interface {
 	IntentionInvoker
 	OpinionInvoker
 	TalkSessionInvoker
-	TestInvoker
 	UserInvoker
 }
 
@@ -116,18 +115,6 @@ type TalkSessionInvoker interface {
 	GetTalkSessions(ctx context.Context) (*GetTalkSessionsOK, error)
 }
 
-// TestInvoker invokes operations described by OpenAPI v3 specification.
-//
-// x-gen-operation-group: Test
-type TestInvoker interface {
-	// Test invokes Test operation.
-	//
-	// 🚧 ファイルアップロードテスト.
-	//
-	// GET /api/files
-	Test(ctx context.Context, request OptTestReq) (TestRes, error)
-}
-
 // UserInvoker invokes operations described by OpenAPI v3 specification.
 //
 // x-gen-operation-group: User
@@ -137,7 +124,7 @@ type UserInvoker interface {
 	// ユーザー情報の変更.
 	//
 	// PUT /api/user
-	EditUserProfile(ctx context.Context) (EditUserProfileRes, error)
+	EditUserProfile(ctx context.Context, request OptEditUserProfileReq) (EditUserProfileRes, error)
 	// GetUserProfile invokes getUserProfile operation.
 	//
 	// ユーザー情報の取得.
@@ -148,7 +135,7 @@ type UserInvoker interface {
 	//
 	// ユーザー作成.
 	//
-	// POST /api/user/register
+	// POST /api/user
 	RegisterUser(ctx context.Context, request OptRegisterUserReq) (RegisterUserRes, error)
 }
 
@@ -391,12 +378,12 @@ func (c *Client) sendCreateTalkSession(ctx context.Context, request OptCreateTal
 // ユーザー情報の変更.
 //
 // PUT /api/user
-func (c *Client) EditUserProfile(ctx context.Context) (EditUserProfileRes, error) {
-	res, err := c.sendEditUserProfile(ctx)
+func (c *Client) EditUserProfile(ctx context.Context, request OptEditUserProfileReq) (EditUserProfileRes, error) {
+	res, err := c.sendEditUserProfile(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendEditUserProfile(ctx context.Context) (res EditUserProfileRes, err error) {
+func (c *Client) sendEditUserProfile(ctx context.Context, request OptEditUserProfileReq) (res EditUserProfileRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("editUserProfile"),
 		semconv.HTTPRequestMethodKey.String("PUT"),
@@ -440,6 +427,42 @@ func (c *Client) sendEditUserProfile(ctx context.Context) (res EditUserProfileRe
 	r, err := ht.NewRequest(ctx, "PUT", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeEditUserProfileRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:SessionId"
+			switch err := c.securitySessionId(ctx, "EditUserProfile", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"SessionId\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
 	}
 
 	stage = "SendRequest"
@@ -1394,7 +1417,7 @@ func (c *Client) sendPostOpinionPost(ctx context.Context, request OptPostOpinion
 //
 // ユーザー作成.
 //
-// POST /api/user/register
+// POST /api/user
 func (c *Client) RegisterUser(ctx context.Context, request OptRegisterUserReq) (RegisterUserRes, error) {
 	res, err := c.sendRegisterUser(ctx, request)
 	return res, err
@@ -1404,7 +1427,7 @@ func (c *Client) sendRegisterUser(ctx context.Context, request OptRegisterUserRe
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("registerUser"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/api/user/register"),
+		semconv.HTTPRouteKey.String("/api/user"),
 	}
 
 	// Run stopwatch.
@@ -1437,7 +1460,7 @@ func (c *Client) sendRegisterUser(ctx context.Context, request OptRegisterUserRe
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
-	pathParts[0] = "/api/user/register"
+	pathParts[0] = "/api/user"
 	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
@@ -1491,81 +1514,6 @@ func (c *Client) sendRegisterUser(ctx context.Context, request OptRegisterUserRe
 
 	stage = "DecodeResponse"
 	result, err := decodeRegisterUserResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// Test invokes Test operation.
-//
-// 🚧 ファイルアップロードテスト.
-//
-// GET /api/files
-func (c *Client) Test(ctx context.Context, request OptTestReq) (TestRes, error) {
-	res, err := c.sendTest(ctx, request)
-	return res, err
-}
-
-func (c *Client) sendTest(ctx context.Context, request OptTestReq) (res TestRes, err error) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("Test"),
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/api/files"),
-	}
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "Test",
-		trace.WithAttributes(otelAttrs...),
-		clientSpanKind,
-	)
-	// Track stage for error reporting.
-	var stage string
-	defer func() {
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		span.End()
-	}()
-
-	stage = "BuildURL"
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [1]string
-	pathParts[0] = "/api/files"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-	if err := encodeTestRequest(request, r); err != nil {
-		return res, errors.Wrap(err, "encode request")
-	}
-
-	stage = "SendRequest"
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	stage = "DecodeResponse"
-	result, err := decodeTestResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

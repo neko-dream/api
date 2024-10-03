@@ -5,7 +5,6 @@ import (
 	"mime/multipart"
 	"net/http"
 
-	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -17,14 +16,13 @@ import (
 )
 
 type (
-	RegisterUserUseCase interface {
-		Execute(ctx context.Context, input RegisterUserInput) (*RegisterUserOutput, error)
+	EditUserUseCase interface {
+		Execute(ctx context.Context, input EditUserInput) (*EditUserOutput, error)
 	}
 
-	RegisterUserInput struct {
+	EditUserInput struct {
 		UserID        shared.UUID[user.User]
-		DisplayID     string                // ユーザーの表示用ID
-		DisplayName   string                // ユーザーの表示名
+		DisplayName   *string               // ユーザーの表示名
 		Icon          *multipart.FileHeader // ユーザーのアイコン
 		YearOfBirth   *int                  // ユーザーの生年
 		Gender        *string               // ユーザーの性別
@@ -33,13 +31,13 @@ type (
 		HouseholdSize *int                  // ユーザーの世帯人数
 	}
 
-	RegisterUserOutput struct {
+	EditUserOutput struct {
 		DisplayID   string // ユーザーの表示用ID
 		DisplayName string // ユーザーの表示名
 		Cookie      *http.Cookie
 	}
 
-	registerUserInteractor struct {
+	editUserInteractor struct {
 		*db.DBManager
 		session.TokenManager
 		conf        *config.Config
@@ -49,15 +47,15 @@ type (
 	}
 )
 
-func NewRegisterUserUseCase(
+func NewEditUserUseCase(
 	dm *db.DBManager,
 	tm session.TokenManager,
 	conf *config.Config,
 	userRep user.UserRepository,
 	userService user.UserService,
 	sessService session.SessionService,
-) RegisterUserUseCase {
-	return &registerUserInteractor{
+) EditUserUseCase {
+	return &editUserInteractor{
 		DBManager:    dm,
 		TokenManager: tm,
 		conf:         conf,
@@ -67,11 +65,13 @@ func NewRegisterUserUseCase(
 	}
 }
 
-func (i *registerUserInteractor) Execute(ctx context.Context, input RegisterUserInput) (*RegisterUserOutput, error) {
+func (e *editUserInteractor) Execute(ctx context.Context, input EditUserInput) (*EditUserOutput, error) {
 	var c http.Cookie
-	err := i.ExecTx(ctx, func(ctx context.Context) error {
+	var u *user.User
+
+	err := e.ExecTx(ctx, func(ctx context.Context) error {
 		// ユーザーの存在を確認
-		foundUser, err := i.userRep.FindByID(ctx, input.UserID)
+		foundUser, err := e.userRep.FindByID(ctx, input.UserID)
 		if err != nil {
 			utils.HandleError(ctx, err, "UserRepository.FindByID")
 			return messages.UserNotFoundError
@@ -80,52 +80,51 @@ func (i *registerUserInteractor) Execute(ctx context.Context, input RegisterUser
 			return messages.UserNotFoundError
 		}
 
-		// ユーザーの表示用IDが重複していないかチェック
-		duplicated, err := i.userService.DisplayIDCheckDuplicate(ctx, input.DisplayID)
-		if err != nil {
-			utils.HandleError(ctx, err, "UserService.DisplayIDCheckDuplicate")
-			return messages.UserDisplayIDAlreadyExistsError
-		}
-		if duplicated {
-			return messages.UserDisplayIDAlreadyExistsError
-		}
-
 		// ユーザー名と表示名を設定
-		if err := foundUser.SetDisplayID(input.DisplayID); err != nil {
-			utils.HandleError(ctx, err, "User.SetDisplayID")
-			return messages.UserDisplayIDAlreadyExistsError
+		if input.Icon != nil {
+			if err := foundUser.SetIconFile(ctx, input.Icon); err != nil {
+				utils.HandleError(ctx, err, "User.SetIconFile")
+				return messages.UserUpdateError
+			}
 		}
-		foundUser.ChangeName(input.DisplayName)
-		if err := foundUser.SetIconFile(ctx, input.Icon); err != nil {
-			utils.HandleError(ctx, err, "User.SetIconFile")
-			return messages.UserUpdateError
+		if input.YearOfBirth != nil ||
+			input.Gender != nil ||
+			input.Municipality != nil ||
+			input.Occupation != nil ||
+			input.HouseholdSize != nil {
+			var demograID shared.UUID[user.UserDemographics]
+			if foundUser.Demographics() != nil {
+				demograID = foundUser.Demographics().UserDemographicsID()
+			} else {
+				demograID = shared.NewUUID[user.UserDemographics]()
+			}
+
+			// デモグラ情報を設定
+			foundUser.SetDemographics(user.NewUserDemographics(
+				demograID,
+				user.NewYearOfBirth(input.YearOfBirth),
+				user.NewOccupation(input.Occupation),
+				lo.ToPtr(user.NewGender(input.Gender)),
+				user.NewMunicipality(input.Municipality),
+				user.NewHouseholdSize(input.HouseholdSize),
+			))
 		}
 
-		// デモグラ情報を設定
-		foundUser.SetDemographics(user.NewUserDemographics(
-			shared.NewUUID[user.UserDemographics](),
-			user.NewYearOfBirth(input.YearOfBirth),
-			user.NewOccupation(input.Occupation),
-			lo.ToPtr(user.NewGender(input.Gender)),
-			user.NewMunicipality(input.Municipality),
-			user.NewHouseholdSize(input.HouseholdSize),
-		))
-
-		if err := i.userRep.Update(ctx, *foundUser); err != nil {
+		if err := e.userRep.Update(ctx, *foundUser); err != nil {
 			utils.HandleError(ctx, err, "UserRepository.Update")
 			return messages.UserUpdateError
 		}
 
-		sess, err := i.sessService.RefreshSession(ctx, input.UserID)
+		sess, err := e.sessService.RefreshSession(ctx, input.UserID)
 		if err != nil {
 			utils.HandleError(ctx, err, "SessionService.RefreshSession")
 			return messages.UserUpdateError
 		}
 
-		token, err := i.TokenManager.Generate(ctx, *foundUser, sess.SessionID())
+		token, err := e.TokenManager.Generate(ctx, *foundUser, sess.SessionID())
 		if err != nil {
 			utils.HandleError(ctx, err, "failed to generate token")
-			return errtrace.Wrap(err)
+			return messages.TokenGenerateError
 		}
 		cookie := http.Cookie{
 			Name:     "SessionId",
@@ -133,7 +132,7 @@ func (i *registerUserInteractor) Execute(ctx context.Context, input RegisterUser
 			HttpOnly: true,
 			Path:     "/",
 			SameSite: http.SameSiteLaxMode,
-			Domain:   i.conf.DOMAIN,
+			Domain:   e.conf.DOMAIN,
 			MaxAge:   60 * 60 * 24 * 7,
 		}
 
@@ -144,9 +143,9 @@ func (i *registerUserInteractor) Execute(ctx context.Context, input RegisterUser
 		return nil, err
 	}
 
-	return &RegisterUserOutput{
-		DisplayID:   input.DisplayID,
-		DisplayName: input.DisplayName,
+	return &EditUserOutput{
+		DisplayID:   *u.DisplayID(),
+		DisplayName: *u.DisplayName(),
 		Cookie:      &c,
 	}, nil
 }

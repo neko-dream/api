@@ -213,49 +213,6 @@ paths:
                   - displayName
       security: []
       x-ogen-operation-group: user
-    put:
-      summary: ユーザー情報の変更
-      deprecated: false
-      description: ''
-      operationId: editUserProfile
-      tags:
-        - user
-        - user
-      parameters: []
-      responses:
-        '200':
-          description: 成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  displayID:
-                    type: string
-                    x-apidog-mock: '{{$string.uuid}}'
-                    pattern: ^[A-Za-z0-9]$
-                    examples:
-                      - userid
-                    minLength: 3
-                    maxLength: 25
-                  displayName:
-                    type: string
-                    x-apidog-mock: '{{$person.firstName}}'
-                  iconURL:
-                    type: string
-                required:
-                  - displayID
-                  - displayName
-        '500':
-          description: ServerErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-      security: []
-      x-ogen-operation-group: user
-  /api/user/register:
     post:
       summary: ユーザー作成
       deprecated: false
@@ -366,6 +323,107 @@ paths:
               schema:
                 type: object
                 properties: {}
+        '500':
+          description: ServerErrorResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      security:
+        - SessionId: []
+      x-ogen-operation-group: user
+    put:
+      summary: ユーザー情報の変更
+      deprecated: false
+      description: ''
+      operationId: editUserProfile
+      tags:
+        - user
+        - user
+      parameters: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                displayName:
+                  type: string
+                  description: ユーザー名
+                  example: ''
+                  nullable: true
+                icon:
+                  type: string
+                  format: binary
+                  description: ユーザーアイコン
+                  example: ''
+                yearOfBirth:
+                  type: integer
+                  description: 生まれ年
+                  example: 0
+                  nullable: true
+                gender:
+                  type: string
+                  enum:
+                    - male
+                    - female
+                    - other
+                    - preferNotToSay
+                  description: 性別
+                  example: ''
+                  nullable: true
+                municipality:
+                  type: string
+                  description: 市区町村
+                  example: ''
+                  nullable: true
+                occupation:
+                  type: string
+                  enum:
+                    - 正社員
+                    - 契約社員
+                    - 公務員
+                    - 自営業
+                    - 会社役員
+                    - パート・アルバイト
+                    - 家事従事者
+                    - 学生
+                    - 無職
+                    - その他
+                    - 無回答
+                  description: 職業
+                  example: ''
+                  nullable: true
+                householdSize:
+                  type: integer
+                  description: 世帯人数
+                  example: 0
+                  nullable: true
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  displayID:
+                    type: string
+                    x-apidog-mock: '{{$string.uuid}}'
+                    pattern: ^[A-Za-z0-9]$
+                    examples:
+                      - userid
+                    minLength: 3
+                    maxLength: 25
+                  displayName:
+                    type: string
+                    x-apidog-mock: '{{$person.firstName}}'
+                  iconURL:
+                    type: string
+                required:
+                  - displayID
+                  - displayName
         '500':
           description: ServerErrorResponse
           content:
@@ -882,48 +940,6 @@ paths:
                 properties: {}
       security: []
       x-ogen-operation-group: Opinion
-  /api/files:
-    get:
-      summary: 🚧 ファイルアップロードテスト
-      deprecated: false
-      description: ''
-      operationId: Test
-      tags:
-        - test
-      parameters: []
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                file:
-                  format: binary
-                  type: string
-                  example: ''
-              required:
-                - file
-      responses:
-        '200':
-          description: 成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  url:
-                    type: string
-                required:
-                  - url
-        '500':
-          description: ServerErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-      security: []
-      x-ogen-operation-group: test
   /auth/{provider}/login:
     get:
       summary: OAuthログイン

@@ -1,14 +1,21 @@
 package user
 
+import "github.com/neko-dream/server/internal/domain/model/shared"
+
 type (
 	UserDemographics struct {
-		yearOfBirth   *YearOfBirth   // ユーザーの生年
-		occupation    *Occupation    // ユーザーの職業
-		gender        *Gender        // ユーザーの性別
-		municipality  *Municipality  // ユーザーの居住地
-		householdSize *HouseholdSize // ユーザーの世帯人数
+		userDemographicsID shared.UUID[UserDemographics] // ユーザーのデモグラフィックスID
+		yearOfBirth        *YearOfBirth                  // ユーザーの生年
+		occupation         *Occupation                   // ユーザーの職業
+		gender             *Gender                       // ユーザーの性別
+		municipality       *Municipality                 // ユーザーの居住地
+		householdSize      *HouseholdSize                // ユーザーの世帯人数
 	}
 )
+
+func (u *UserDemographics) UserDemographicsID() shared.UUID[UserDemographics] {
+	return u.userDemographicsID
+}
 
 func (u *UserDemographics) YearOfBirth() *YearOfBirth {
 	return u.yearOfBirth
@@ -40,6 +47,7 @@ func (u *UserDemographics) ChangeYearOfBirth(yearOfBirth *YearOfBirth) {
 }
 
 func NewUserDemographics(
+	userDemographicsID shared.UUID[UserDemographics],
 	yearOfBirth *YearOfBirth,
 	occupation *Occupation,
 	gender *Gender,
@@ -47,10 +55,11 @@ func NewUserDemographics(
 	householdSize *HouseholdSize,
 ) UserDemographics {
 	return UserDemographics{
-		yearOfBirth:   yearOfBirth,
-		occupation:    occupation,
-		gender:        gender,
-		municipality:  municipality,
-		householdSize: householdSize,
+		userDemographicsID: userDemographicsID,
+		yearOfBirth:        yearOfBirth,
+		occupation:         occupation,
+		gender:             gender,
+		municipality:       municipality,
+		householdSize:      householdSize,
 	}
 }

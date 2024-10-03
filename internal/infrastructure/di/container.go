@@ -50,13 +50,13 @@ func BuildContainer() *dig.Container {
 		{auth_usecase.NewAuthCallbackUseCase, nil},
 		{talk_session_usecase.NewCreateTalkSessionUseCase, nil},
 		{user_usecase.NewRegisterUserUseCase, nil},
+		{user_usecase.NewEditUserUseCase, nil},
 		{handler.NewSecurityHandler, nil},
 		{handler.NewAuthHandler, nil},
 		{handler.NewUserHandler, nil},
 		{handler.NewIntentionHandler, nil},
 		{handler.NewOpinionHandler, nil},
 		{handler.NewTalkSessionHandler, nil},
-		{handler.NewTestHandler, nil},
 		{handler.NewHandler, nil},
 	}
 

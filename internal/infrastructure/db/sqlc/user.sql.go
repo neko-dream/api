@@ -140,6 +140,32 @@ func (q *Queries) GetUserBySubject(ctx context.Context, subject string) (GetUser
 	return i, err
 }
 
+const getUserDemographicsByUserID = `-- name: GetUserDemographicsByUserID :one
+SELECT
+    user_demographics_id, user_id, year_of_birth, occupation, gender, municipality, household_size, created_at, updated_at
+FROM
+    "user_demographics"
+WHERE
+    user_id = $1
+`
+
+func (q *Queries) GetUserDemographicsByUserID(ctx context.Context, userID uuid.UUID) (UserDemographic, error) {
+	row := q.db.QueryRowContext(ctx, getUserDemographicsByUserID, userID)
+	var i UserDemographic
+	err := row.Scan(
+		&i.UserDemographicsID,
+		&i.UserID,
+		&i.YearOfBirth,
+		&i.Occupation,
+		&i.Gender,
+		&i.Municipality,
+		&i.HouseholdSize,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const updateOrCreateUserDemographics = `-- name: UpdateOrCreateUserDemographics :exec
 INSERT INTO user_demographics (
     user_demographics_id,
@@ -186,23 +212,17 @@ func (q *Queries) UpdateOrCreateUserDemographics(ctx context.Context, arg Update
 }
 
 const updateUser = `-- name: UpdateUser :exec
-UPDATE "users" SET display_id = $2, display_name = $3, icon_url = $4 WHERE user_id = $1
+UPDATE "users" SET display_name = $2, icon_url = $3 WHERE user_id = $1
 `
 
 type UpdateUserParams struct {
 	UserID      uuid.UUID
-	DisplayID   sql.NullString
 	DisplayName sql.NullString
 	IconUrl     sql.NullString
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
-	_, err := q.db.ExecContext(ctx, updateUser,
-		arg.UserID,
-		arg.DisplayID,
-		arg.DisplayName,
-		arg.IconUrl,
-	)
+	_, err := q.db.ExecContext(ctx, updateUser, arg.UserID, arg.DisplayName, arg.IconUrl)
 	return err
 }
 

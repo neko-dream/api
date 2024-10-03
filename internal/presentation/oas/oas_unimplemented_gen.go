@@ -36,7 +36,7 @@ func (UnimplementedHandler) CreateTalkSession(ctx context.Context, req OptCreate
 // ユーザー情報の変更.
 //
 // PUT /api/user
-func (UnimplementedHandler) EditUserProfile(ctx context.Context) (r EditUserProfileRes, _ error) {
+func (UnimplementedHandler) EditUserProfile(ctx context.Context, req OptEditUserProfileReq) (r EditUserProfileRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -125,16 +125,7 @@ func (UnimplementedHandler) PostOpinionPost(ctx context.Context, req OptPostOpin
 //
 // ユーザー作成.
 //
-// POST /api/user/register
+// POST /api/user
 func (UnimplementedHandler) RegisterUser(ctx context.Context, req OptRegisterUserReq) (r RegisterUserRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// Test implements Test operation.
-//
-// 🚧 ファイルアップロードテスト.
-//
-// GET /api/files
-func (UnimplementedHandler) Test(ctx context.Context, req OptTestReq) (r TestRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
