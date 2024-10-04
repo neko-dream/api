@@ -12,3 +12,8 @@ INSERT INTO sessions (session_id, user_id, provider, session_status, created_at,
 UPDATE sessions
 SET session_status = $2, last_activity_at = $3
 WHERE session_id = $1;
+
+-- name: FindSessionBySessionID :one
+SELECT *
+FROM sessions
+WHERE session_id = $1;

@@ -77,6 +77,27 @@ func (q *Queries) FindActiveSessionsByUserID(ctx context.Context, userID uuid.UU
 	return items, nil
 }
 
+const findSessionBySessionID = `-- name: FindSessionBySessionID :one
+SELECT session_id, user_id, provider, session_status, expires_at, created_at, last_activity_at
+FROM sessions
+WHERE session_id = $1
+`
+
+func (q *Queries) FindSessionBySessionID(ctx context.Context, sessionID uuid.UUID) (Session, error) {
+	row := q.db.QueryRowContext(ctx, findSessionBySessionID, sessionID)
+	var i Session
+	err := row.Scan(
+		&i.SessionID,
+		&i.UserID,
+		&i.Provider,
+		&i.SessionStatus,
+		&i.ExpiresAt,
+		&i.CreatedAt,
+		&i.LastActivityAt,
+	)
+	return i, err
+}
+
 const updateSession = `-- name: UpdateSession :exec
 UPDATE sessions
 SET session_status = $2, last_activity_at = $3
