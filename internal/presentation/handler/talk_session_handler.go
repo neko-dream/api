@@ -15,7 +15,7 @@ type talkSessionHandler struct {
 	createTalkSessionUsecase talk_session_usecase.CreateTalkSessionUseCase
 }
 
-// CreateTalkSession implements oas.TalkSessionHandler.
+// CreateTalkSession トークセッション作成
 func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptCreateTalkSessionReq) (*oas.CreateTalkSessionOK, error) {
 	claim := session.GetSession(ctx)
 	if !req.IsSet() {
@@ -50,12 +50,12 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 	}, nil
 }
 
-// GetTalkSessionDetail implements oas.TalkSessionHandler.
+// GetTalkSessionDetail トークセッション詳細取得
 func (t *talkSessionHandler) GetTalkSessionDetail(ctx context.Context, params oas.GetTalkSessionDetailParams) (*oas.GetTalkSessionDetailOK, error) {
 	panic("unimplemented")
 }
 
-// GetTalkSessions implements oas.TalkSessionHandler.
+// GetTalkSessions トークセッション一覧取得
 func (t *talkSessionHandler) GetTalkSessions(context.Context) (*oas.GetTalkSessionsOK, error) {
 	panic("unimplemented")
 }
