@@ -5,6 +5,7 @@ import (
 	"os/user"
 
 	"braces.dev/errtrace"
+	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/infrastructure/db"
@@ -33,7 +34,7 @@ type (
 func (i *createTalkSessionInteractor) Execute(ctx context.Context, input CreateTalkSessionInput) (AuthLoginOutput, error) {
 	var output AuthLoginOutput
 
-	err := i.ExecTx(ctx, func(ctx context.Context) error {
+	if err := i.ExecTx(ctx, func(ctx context.Context) error {
 		talkSession := talksession.NewTalkSession(
 			shared.NewUUID[talksession.TalkSession](),
 			input.Theme,
@@ -41,14 +42,13 @@ func (i *createTalkSessionInteractor) Execute(ctx context.Context, input CreateT
 			nil,
 		)
 		if err := i.TalkSessionRepository.Create(ctx, talkSession); err != nil {
-			return errtrace.Wrap(err)
+			return messages.TalkSessionCreateFailed
 		}
 
 		output.TalkSession = *talkSession
 		return nil
-	})
-	if err != nil {
-		return AuthLoginOutput{}, errtrace.Wrap(err)
+	}); err != nil {
+		return output, errtrace.Wrap(err)
 	}
 
 	return output, nil
