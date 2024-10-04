@@ -104,6 +104,7 @@ func (u *User) SetIconFile(ctx context.Context, file *multipart.FileHeader) erro
 		return err
 	}
 	u.profileIcon = profileIcon
+	u.profileIcon.url = nil
 	return nil
 }
 
