@@ -36,9 +36,24 @@ func (s *sessionRepository) Create(ctx context.Context, sess session.Session) (*
 	return &sess, nil
 }
 
-// FindBySessionID implements session.SessionRepository.
-func (s *sessionRepository) FindBySessionID(context.Context, shared.UUID[session.Session]) (*session.Session, error) {
-	panic("unimplemented")
+// FindBySessionID セッションIDを元にセッションを取得する
+func (s *sessionRepository) FindBySessionID(ctx context.Context, sess shared.UUID[session.Session]) (*session.Session, error) {
+	sessRow, err := s.GetQueries(ctx).FindSessionBySessionID(ctx, sess.UUID())
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, errtrace.Wrap(err)
+	}
+
+	return session.NewSession(
+		shared.UUID[session.Session](sessRow.SessionID),
+		shared.UUID[user.User](sessRow.UserID),
+		oauth.AuthProviderName(sessRow.Provider),
+		*session.NewSessionStatus(int(sessRow.SessionStatus)),
+		sessRow.ExpiresAt,
+		sessRow.LastActivityAt,
+	), nil
 }
 
 // FindByUserID implements session.SessionRepository.
