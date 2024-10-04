@@ -101,7 +101,7 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 	}
 
 	if user.Demographics() != nil {
-		userDemographics := user.Demographics()
+		userDemographics := *user.Demographics()
 
 		var gender int16
 		if userDemographics.Gender() == nil {

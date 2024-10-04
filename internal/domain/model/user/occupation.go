@@ -1,6 +1,8 @@
 package user
 
-import "github.com/samber/lo"
+import (
+	"github.com/samber/lo"
+)
 
 type Occupation int
 
@@ -14,7 +16,7 @@ const (
 	OccupationHomemaker                              // 専業主婦
 	OccupationStudent                                // 学生
 	OccupationUnemployed                             // 無職
-	OccupationOther                                  // その他
+	OccupationOther                                  // 無回答
 )
 
 var (
@@ -28,7 +30,7 @@ var (
 		OccupationHomemaker:        "家事従事者",
 		OccupationStudent:          "学生",
 		OccupationUnemployed:       "無職",
-		OccupationOther:            "その他",
+		OccupationOther:            "無回答",
 	}
 )
 
