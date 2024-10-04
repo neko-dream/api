@@ -10,14 +10,30 @@ import (
 
 type securityHandler struct {
 	session.TokenManager
+	session.SessionRepository
 }
 
 func (s *securityHandler) HandleSessionId(ctx context.Context, operationName string, t oas.SessionId) (context.Context, error) {
+	// セッションIDを取得
 	claim, err := s.TokenManager.Parse(ctx, t.GetAPIKey())
 	if err != nil {
 		return ctx, messages.ForbiddenError
 	}
+	// トークンの有効性を確認
 	if claim.IsExpired() {
+		return ctx, messages.TokenExpiredError
+	}
+	sessID, err := claim.SessionID()
+	if err != nil {
+		return ctx, messages.InternalServerError
+	}
+
+	// サーバー側でセッションの有効性を確認
+	sess, err := s.SessionRepository.FindBySessionID(ctx, sessID)
+	if err != nil {
+		return ctx, messages.TokenExpiredError
+	}
+	if !sess.IsActive() {
 		return ctx, messages.TokenExpiredError
 	}
 
@@ -26,8 +42,10 @@ func (s *securityHandler) HandleSessionId(ctx context.Context, operationName str
 
 func NewSecurityHandler(
 	tokenManager session.TokenManager,
+	sessRepository session.SessionRepository,
 ) oas.SecurityHandler {
 	return &securityHandler{
-		TokenManager: tokenManager,
+		TokenManager:      tokenManager,
+		SessionRepository: sessRepository,
 	}
 }

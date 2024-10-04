@@ -28,16 +28,17 @@ func (s *sessionService) DeactivateUserSessions(ctx context.Context, userID shar
 	}
 
 	for _, sess := range sessions {
-		if err := sess.Deactivate(ctx); err != nil {
-			return errtrace.Wrap(err)
-		}
+		sess.Deactivate()
 	}
 
 	return nil
 }
 
 // RefreshSession implements session.SessionService.
-func (s *sessionService) RefreshSession(ctx context.Context, userID shared.UUID[user.User]) (*session.Session, error) {
+func (s *sessionService) RefreshSession(
+	ctx context.Context,
+	userID shared.UUID[user.User],
+) (*session.Session, error) {
 	// sessionを取得
 	sessList, err := s.sessionRepository.FindByUserID(ctx, userID)
 	if err != nil {
@@ -47,35 +48,26 @@ func (s *sessionService) RefreshSession(ctx context.Context, userID shared.UUID[
 		return nil, errtrace.Wrap(FailedToDeactivateSessionStatus)
 	}
 
-	// sessionが複数存在する場合は最新のものを取得
 	sessList = session.SortByLastActivity(sessList)
-	var sess session.Session
-	if len(sessList) > 1 {
-		sess = sessList[:1][0]
-	} else {
-		sess = sessList[0]
-	}
+	for _, sess := range sessList {
+		// sessionが有効期限内であることを確認
+		if !sess.IsActive() {
+			return nil, errtrace.Wrap(SessionIsExpired)
+		}
 
-	// sessionが有効期限内であることを確認
-	if !sess.IsActive() {
-		return nil, errtrace.Wrap(SessionIsExpired)
-	}
-
-	if err := sess.Deactivate(ctx); err != nil {
-		return nil, errtrace.Wrap(FailedToDeactivateSessionStatus)
-	}
-
-	// 最終アクティビティを更新
-	sess.UpdateLastActivity()
-	if _, err := s.sessionRepository.Update(ctx, sess); err != nil {
-		return nil, errtrace.Wrap(err)
+		// 最終アクティビティを更新
+		sess.UpdateLastActivity()
+		sess.Deactivate()
+		if _, err := s.sessionRepository.Update(ctx, sess); err != nil {
+			return nil, errtrace.Wrap(err)
+		}
 	}
 
 	// sessionを更新
 	newSess := session.NewSession(
 		shared.NewUUID[session.Session](),
-		sess.UserID(),
-		sess.Provider(),
+		sessList[0].UserID(),
+		sessList[0].Provider(),
 		session.SESSION_ACTIVE,
 		*session.NewExpiresAt(),
 		time.Now(),

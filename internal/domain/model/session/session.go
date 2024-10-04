@@ -95,12 +95,11 @@ func (s *Session) Status() status {
 }
 
 func (s *Session) IsActive() bool {
-	return s.expires.After(time.Now())
+	return s.expires.After(time.Now()) && s.status == SESSION_ACTIVE
 }
 
-func (s *Session) Deactivate(ctx context.Context) error {
+func (s *Session) Deactivate() {
 	s.status = SESSION_INACTIVE
-	return nil
 }
 
 func (s *Session) ExpiresAt() time.Time {

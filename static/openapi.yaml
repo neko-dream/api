@@ -114,7 +114,8 @@ paths:
                   - id
                   - theme
                   - owner
-      security: []
+      security:
+        - SessionId: []
       x-ogen-operation-group: TalkSession
     get:
       summary: トークセッションコレクション
