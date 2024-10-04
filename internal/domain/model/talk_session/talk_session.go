@@ -2,10 +2,10 @@ package talksession
 
 import (
 	"context"
-	"os/user"
 	"time"
 
 	"github.com/neko-dream/server/internal/domain/model/shared"
+	"github.com/neko-dream/server/internal/domain/model/user"
 )
 
 type (

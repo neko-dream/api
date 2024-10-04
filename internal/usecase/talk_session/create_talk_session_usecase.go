@@ -2,50 +2,59 @@ package talk_session_usecase
 
 import (
 	"context"
-	"os/user"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
+	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/db"
 )
 
 type (
 	CreateTalkSessionUseCase interface {
-		Execute(context.Context, CreateTalkSessionInput) (AuthLoginOutput, error)
+		Execute(context.Context, CreateTalkSessionInput) (CreateTalkSessionOutput, error)
 	}
 
 	CreateTalkSessionInput struct {
 		Theme   string
-		OwnerID string
+		OwnerID shared.UUID[user.User]
 	}
 
-	AuthLoginOutput struct {
-		talksession.TalkSession
+	CreateTalkSessionOutput struct {
+		TalkSession talksession.TalkSession
+		OwnerUser   user.User
 	}
 
 	createTalkSessionInteractor struct {
 		talksession.TalkSessionRepository
+		user.UserRepository
 		*db.DBManager
 	}
 )
 
-func (i *createTalkSessionInteractor) Execute(ctx context.Context, input CreateTalkSessionInput) (AuthLoginOutput, error) {
-	var output AuthLoginOutput
+func (i *createTalkSessionInteractor) Execute(ctx context.Context, input CreateTalkSessionInput) (CreateTalkSessionOutput, error) {
+	var output CreateTalkSessionOutput
 
 	if err := i.ExecTx(ctx, func(ctx context.Context) error {
 		talkSession := talksession.NewTalkSession(
 			shared.NewUUID[talksession.TalkSession](),
 			input.Theme,
-			shared.MustParseUUID[user.User](input.OwnerID),
+			input.OwnerID,
 			nil,
 		)
 		if err := i.TalkSessionRepository.Create(ctx, talkSession); err != nil {
 			return messages.TalkSessionCreateFailed
 		}
-
 		output.TalkSession = *talkSession
+
+		// オーナーのユーザー情報を取得
+		ownerUser, err := i.UserRepository.FindByID(ctx, input.OwnerID)
+		if err != nil {
+			return messages.ForbiddenError
+		}
+		output.OwnerUser = *ownerUser
+
 		return nil
 	}); err != nil {
 		return output, errtrace.Wrap(err)
@@ -56,10 +65,12 @@ func (i *createTalkSessionInteractor) Execute(ctx context.Context, input CreateT
 
 func NewCreateTalkSessionUseCase(
 	talkSessionRepository talksession.TalkSessionRepository,
+	userRepository user.UserRepository,
 	DBManager *db.DBManager,
 ) CreateTalkSessionUseCase {
 	return &createTalkSessionInteractor{
 		TalkSessionRepository: talkSessionRepository,
+		UserRepository:        userRepository,
 		DBManager:             DBManager,
 	}
 }

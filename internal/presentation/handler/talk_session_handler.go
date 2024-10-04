@@ -3,8 +3,12 @@ package handler
 import (
 	"context"
 
+	"braces.dev/errtrace"
+	"github.com/neko-dream/server/internal/domain/messages"
+	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	talk_session_usecase "github.com/neko-dream/server/internal/usecase/talk_session"
+	"github.com/neko-dream/server/pkg/utils"
 )
 
 type talkSessionHandler struct {
@@ -13,17 +17,37 @@ type talkSessionHandler struct {
 
 // CreateTalkSession implements oas.TalkSessionHandler.
 func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptCreateTalkSessionReq) (*oas.CreateTalkSessionOK, error) {
-	// out, err := t.createTalkSessionUsecase.Execute(ctx, talk_session_usecase.CreateTalkSessionInput{
-	// 	Theme:   req.Value.Theme.Value,
-	// 	OwnerID: shared.NewUUID[user.User]().String(),
-	// })
+	claim := session.GetSession(ctx)
+	if !req.IsSet() {
+		return nil, messages.RequiredParameterError
+	}
+	userID, err := claim.UserID()
+	if err != nil {
+		utils.HandleError(ctx, err, "claim.UserID")
+		return nil, messages.ForbiddenError
+	}
 
-	// if err != nil {
-	// 	return nil, errtrace.Wrap(err)
-	// }
+	out, err := t.createTalkSessionUsecase.Execute(ctx, talk_session_usecase.CreateTalkSessionInput{
+		Theme:   req.Value.Theme.Value,
+		OwnerID: userID,
+	})
+	if err != nil {
+		return nil, errtrace.Wrap(err)
+	}
 
-	res := &oas.CreateTalkSessionOK{}
-	return res, nil
+	return &oas.CreateTalkSessionOK{
+		Owner: oas.CreateTalkSessionOKOwner{
+			DisplayID:   *out.OwnerUser.DisplayID(),
+			DisplayName: *out.OwnerUser.DisplayName(),
+			IconURL: utils.IfThenElse(
+				out.OwnerUser.ProfileIconURL() != nil,
+				oas.OptString{Value: *out.OwnerUser.ProfileIconURL()},
+				oas.OptString{},
+			),
+		},
+		Theme: out.TalkSession.Theme(),
+		ID:    out.TalkSession.TalkSessionID().String(),
+	}, nil
 }
 
 // GetTalkSessionDetail implements oas.TalkSessionHandler.
