@@ -4,7 +4,6 @@ info:
   description: ''
   version: 1.0.0
 tags:
-  - name: User
   - name: Auth
 paths:
   /api/talksessions/{talkSessionId}:
@@ -15,7 +14,7 @@ paths:
       operationId: getTalkSessionDetail
       tags:
         - talk_session
-        - TalkSession
+        - talk_session
       parameters:
         - name: talkSessionId
           in: path
@@ -82,7 +81,7 @@ paths:
       operationId: createTalkSession
       tags:
         - talk_session
-        - TalkSession
+        - talk_session
       parameters: []
       requestBody:
         content:
@@ -161,7 +160,7 @@ paths:
       operationId: getTalkSessionList
       tags:
         - talk_session
-        - TalkSession
+        - talk_session
       parameters:
         - name: limit
           in: query
@@ -537,7 +536,7 @@ paths:
       operationId: listOpinions
       tags:
         - talk_session/opinion
-        - Opinion
+        - opinion
       parameters:
         - name: talkSessionID
           in: path
@@ -648,19 +647,12 @@ paths:
       operationId: postOpinionPost
       tags:
         - talk_session/opinion
-        - Opinion
+        - opinion
       parameters:
         - name: talkSessionID
           in: path
           description: ''
           required: true
-          schema:
-            type: string
-        - name: opinionContent
-          in: query
-          description: 意見の内容
-          required: true
-          example: オブジェクト思考は悪だと思う
           schema:
             type: string
       requestBody:
@@ -670,27 +662,31 @@ paths:
               type: object
               properties:
                 parentOpinionID:
-                  example: ''
                   type: string
+                  example: ''
+                  nullable: true
                 intentionStatus:
                   example: ''
                   type: string
                 title:
-                  example: ''
                   type: string
-                opinion:
+                  example: ''
+                  nullable: true
+                opinionContent:
                   example: ''
                   type: string
                 referenceURL:
-                  example: ''
                   type: string
+                  example: ''
+                  nullable: true
                 picture:
-                  format: binary
                   type: string
+                  format: binary
                   example: ''
+                  nullable: true
               required:
                 - intentionStatus
-                - opinion
+                - opinionContent
       responses:
         '200':
           description: 成功
@@ -716,7 +712,7 @@ paths:
       operationId: Intention
       tags:
         - talk_session/opinion/intention
-        - Intention
+        - intention
       parameters:
         - name: talkSessionID
           in: path
@@ -809,7 +805,7 @@ paths:
       operationId: opinionComments
       tags:
         - talk_session/opinion
-        - Opinion
+        - opinion
       parameters:
         - name: talkSessionID
           in: path
@@ -1011,7 +1007,7 @@ paths:
       operationId: getTopOpinions
       tags:
         - talk_session/opinion
-        - Opinion
+        - opinion
       parameters:
         - name: talkSessionId
           in: path
@@ -1038,12 +1034,56 @@ paths:
                 properties: {}
       security: []
       x-ogen-operation-group: Opinion
+  /test:
+    get:
+      summary: 無題のAPI
+      deprecated: false
+      description: ''
+      operationId: test
+      tags:
+        - test
+        - user
+      parameters: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  optInt:
+                    type: integer
+                    nullable: true
+                  optNilInt:
+                    type: integer
+                  optNilBool:
+                    type: boolean
+                    nullable: true
+                  optBool:
+                    type: boolean
+                  optUrl:
+                    type: string
+                    format: uri
+                  optNilUrl:
+                    type: string
+                    format: url
+                    nullable: true
+        '500':
+          description: ServerErrorResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      security: []
+      x-ogen-operation-group: test
   /auth/{provider}/login:
     get:
       summary: OAuthログイン
       deprecated: false
-      description: ''
-      operationId: auth_login
+      description: 認証画面を表示する
+      operationId: authorize
       tags:
         - Auth
       parameters:
@@ -1140,6 +1180,95 @@ paths:
                 format: cookie
               example: state=1234567890; Path=/; Secure; HttpOnly
       security: []
+      x-ogen-operation-group: Auth
+  /auth/token/info:
+    get:
+      summary: アクセストークンの情報を取得
+      deprecated: false
+      description: アクセストークンの情報を取得
+      operationId: oauth_token_info
+      tags:
+        - Auth
+      responses:
+        '200':
+          description: アクセストークンの情報
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - aud
+                  - exp
+                  - iat
+                  - iss
+                  - sub
+                  - jti
+                  - isVerify
+                properties:
+                  aud:
+                    type: string
+                    description: Audience
+                  exp:
+                    type: string
+                    description: 有効期限
+                  iat:
+                    type: string
+                    description: 発行日時
+                  iss:
+                    type: string
+                    description: 発行者
+                  sub:
+                    type: string
+                    description: ユーザID
+                  jti:
+                    type: string
+                    description: JWT ID
+                  displayId:
+                    type: string
+                    description: 表示用ユーザID
+                    nullable: true
+                  displayName:
+                    type: string
+                    description: 表示名
+                    nullable: true
+                  iconURL:
+                    type: string
+                    description: アイコンURL
+                    nullable: true
+                  isVerify:
+                    type: boolean
+                    description: ユーザー登録済みか
+              required:
+                - aud
+                - exp
+                - iat
+                - iss
+                - sub
+                - jti
+                - isVerify
+      security:
+        - SessionId: []
+      x-ogen-operation-group: Auth
+  /auth/revoke:
+    post:
+      summary: アクセストークンを失効
+      deprecated: false
+      description: アクセストークンを失効
+      operationId: oauth_revoke
+      tags:
+        - Auth
+      responses:
+        '204':
+          description: 失効できていれば204
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '401':
+          description: 認証エラー
+      security:
+        - SessionId: []
       x-ogen-operation-group: Auth
 components:
   schemas:
