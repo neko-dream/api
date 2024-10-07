@@ -27,7 +27,11 @@ SELECT
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     users.display_name AS display_name,
     users.display_id AS display_id,
-    users.icon_url AS icon_url
+    users.icon_url AS icon_url,
+    ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))) AS latitude,
+    ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))) AS longitude,
+    talk_session_locations.city AS city,
+    talk_session_locations.prefecture AS prefecture
 FROM talk_sessions
 LEFT JOIN (
     SELECT talk_session_id, COUNT(opinion_id) AS opinion_count
@@ -36,6 +40,8 @@ LEFT JOIN (
 ) oc ON talk_sessions.talk_session_id = oc.talk_session_id
 LEFT JOIN users
     ON talk_sessions.owner_id = users.user_id
+LEFT JOIN talk_session_locations
+    ON talk_sessions.talk_session_id = talk_session_locations.talk_session_id
 WHERE
     CASE
         WHEN sqlc.narg('status')::text = 'finished' THEN finished_at IS NOT NULL
