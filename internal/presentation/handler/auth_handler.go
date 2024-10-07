@@ -112,24 +112,14 @@ func (a *authHandler) OAuthTokenInfo(ctx context.Context) (*oas.OAuthTokenInfoOK
 		return nil, messages.TokenExpiredError
 	}
 
-	var (
-		Aud      string = claim.Audience()
-		Iat      string = time.NewTime(ctx, claim.IssueAt()).Format(ctx)
-		Exp      string = time.NewTime(ctx, claim.ExpiresAt()).Format(ctx)
-		Iss      string = claim.Issuer()
-		Sub      string = claim.Sub
-		Jti      string = sessID.String()
-		IsVerify bool   = claim.IsVerify
-	)
-
 	return &oas.OAuthTokenInfoOK{
-		Aud:         Aud,
-		Iat:         Iat,
-		Exp:         Exp,
-		Iss:         Iss,
-		Sub:         Sub,
-		Jti:         Jti,
-		IsVerify:    IsVerify,
+		Aud:         claim.Audience(),
+		Iat:         time.NewTime(ctx, claim.IssueAt()).Format(ctx),
+		Exp:         time.NewTime(ctx, claim.ExpiresAt()).Format(ctx),
+		Iss:         claim.Issuer(),
+		Sub:         claim.Sub,
+		Jti:         sessID.String(),
+		IsVerify:    claim.IsVerify,
 		DisplayId:   utils.ToOptNil[oas.OptNilString](claim.DisplayID),
 		DisplayName: utils.ToOptNil[oas.OptNilString](claim.DisplayName),
 		IconURL:     utils.ToOptNil[oas.OptNilString](claim.IconURL),
