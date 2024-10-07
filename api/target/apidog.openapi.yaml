@@ -93,6 +93,18 @@
                     "type": "string",
                     "format": "date-time",
                     "example": ""
+                  },
+                  "latitude": {
+                    "type": "number",
+                    "description": "緯度",
+                    "example": 0,
+                    "nullable": true
+                  },
+                  "longitude": {
+                    "type": "number",
+                    "description": "経度",
+                    "example": 0,
+                    "nullable": true
                   }
                 },
                 "required": [
@@ -134,6 +146,17 @@
                     "scheduledEndTime": {
                       "type": "string",
                       "description": "終了予定日時"
+                    },
+                    "location": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/components/schemas/location"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "位置情報"
                     }
                   },
                   "required": [
@@ -1085,11 +1108,11 @@
         "type": "object",
         "properties": {
           "latitude": {
-            "type": "string",
+            "type": "number",
             "description": "緯度"
           },
-          "longtitude": {
-            "type": "string",
+          "longitude": {
+            "type": "number",
             "description": "経度"
           },
           "prefecture": {
@@ -1103,7 +1126,7 @@
         },
         "required": [
           "latitude",
-          "longtitude",
+          "longitude",
           "prefecture",
           "city"
         ]
@@ -1263,6 +1286,17 @@
           "scheduledEndTime": {
             "type": "string",
             "description": "終了予定日時"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/location"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "位置情報"
           }
         },
         "required": [

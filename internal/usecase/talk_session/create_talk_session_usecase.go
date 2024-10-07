@@ -21,11 +21,14 @@ type (
 		OwnerID          shared.UUID[user.User]
 		Theme            string
 		ScheduledEndTime time.Time
+		Latitude         *float64
+		Longitude        *float64
 	}
 
 	CreateTalkSessionOutput struct {
 		TalkSession talksession.TalkSession
 		OwnerUser   *user.User
+		Location    *talksession.Location
 	}
 
 	createTalkSessionInteractor struct {

@@ -63,6 +63,29 @@ paths:
                   scheduledEndTime:
                     type: string
                     description: 終了予定日時
+                  location:
+                    anyOf:
+                      - type: object
+                        properties:
+                          latitude:
+                            type: number
+                            description: 緯度
+                          longitude:
+                            type: number
+                            description: 経度
+                          prefecture:
+                            type: string
+                            description: 都道府県
+                          city:
+                            type: string
+                            description: 市区町村
+                        required:
+                          - latitude
+                          - longitude
+                          - prefecture
+                          - city
+                      - type: 'null'
+                    description: 位置情報
                 required:
                   - id
                   - theme
@@ -96,6 +119,16 @@ paths:
                   type: string
                   format: date-time
                   example: ''
+                latitude:
+                  type: number
+                  description: 緯度
+                  example: 0
+                  nullable: true
+                longitude:
+                  type: number
+                  description: 経度
+                  example: 0
+                  nullable: true
               required:
                 - theme
                 - scheduledEndTime
@@ -142,6 +175,29 @@ paths:
                   scheduledEndTime:
                     type: string
                     description: 終了予定日時
+                  location:
+                    anyOf:
+                      - type: object
+                        properties:
+                          latitude:
+                            type: number
+                            description: 緯度
+                          longitude:
+                            type: number
+                            description: 経度
+                          prefecture:
+                            type: string
+                            description: 都道府県
+                          city:
+                            type: string
+                            description: 市区町村
+                        required:
+                          - latitude
+                          - longitude
+                          - prefecture
+                          - city
+                      - type: 'null'
+                    description: 位置情報
                 required:
                   - id
                   - theme
@@ -247,6 +303,29 @@ paths:
                             scheduledEndTime:
                               type: string
                               description: 終了予定日時
+                            location:
+                              anyOf:
+                                - type: object
+                                  properties:
+                                    latitude:
+                                      type: number
+                                      description: 緯度
+                                    longitude:
+                                      type: number
+                                      description: 経度
+                                    prefecture:
+                                      type: string
+                                      description: 都道府県
+                                    city:
+                                      type: string
+                                      description: 市区町村
+                                  required:
+                                    - latitude
+                                    - longitude
+                                    - prefecture
+                                    - city
+                                - type: 'null'
+                              description: 位置情報
                           required:
                             - id
                             - theme
@@ -1273,10 +1352,10 @@ components:
       type: object
       properties:
         latitude:
-          type: string
+          type: number
           description: 緯度
-        longtitude:
-          type: string
+        longitude:
+          type: number
           description: 経度
         prefecture:
           type: string
@@ -1286,7 +1365,7 @@ components:
           description: 市区町村
       required:
         - latitude
-        - longtitude
+        - longitude
         - prefecture
         - city
     intentionStatus:
@@ -1433,6 +1512,29 @@ components:
         scheduledEndTime:
           type: string
           description: 終了予定日時
+        location:
+          anyOf:
+            - type: object
+              properties:
+                latitude:
+                  type: number
+                  description: 緯度
+                longitude:
+                  type: number
+                  description: 経度
+                prefecture:
+                  type: string
+                  description: 都道府県
+                city:
+                  type: string
+                  description: 市区町村
+              required:
+                - latitude
+                - longitude
+                - prefecture
+                - city
+            - type: 'null'
+          description: 位置情報
       required:
         - id
         - theme

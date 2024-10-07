@@ -39,14 +39,32 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 		utils.HandleError(ctx, err, "claim.UserID")
 		return nil, messages.ForbiddenError
 	}
+	var latitude, longitude *float64
+	if req.Value.Latitude.IsSet() {
+		latitude = &req.Value.Latitude.Value
+	}
+	if req.Value.Longitude.IsSet() {
+		longitude = &req.Value.Longitude.Value
+	}
 
 	out, err := t.createTalkSessionUsecase.Execute(ctx, talk_session_usecase.CreateTalkSessionInput{
 		Theme:            req.Value.Theme,
 		OwnerID:          userID,
 		ScheduledEndTime: time.NewTime(ctx, req.Value.ScheduledEndTime),
+		Latitude:         latitude,
+		Longitude:        longitude,
 	})
 	if err != nil {
 		return nil, errtrace.Wrap(err)
+	}
+
+	var location oas.OptCreateTalkSessionOKLocation
+	if out.Location != nil {
+		location = oas.OptCreateTalkSessionOKLocation{}
+		location.Value.CreateTalkSessionOKLocation0.Latitude = out.Location.Latitude()
+		location.Value.CreateTalkSessionOKLocation0.Longitude = out.Location.Longitude()
+		location.Value.CreateTalkSessionOKLocation0.City = out.Location.City()
+		location.Value.CreateTalkSessionOKLocation0.Prefecture = out.Location.Prefecture()
 	}
 
 	return &oas.CreateTalkSessionOK{
@@ -63,6 +81,7 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 		ID:               out.TalkSession.TalkSessionID().String(),
 		CreatedAt:        time.Now(ctx).Format(ctx),
 		ScheduledEndTime: out.TalkSession.ScheduledEndTime().Format(ctx),
+		Location:         location,
 	}, nil
 }
 

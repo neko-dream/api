@@ -35,12 +35,19 @@ type (
 		FinishedAt       *string
 		CreatedAt        string
 		ScheduledEndTime string
+		Location         *LocationDTO
 	}
 
 	UserDTO struct {
 		DisplayID   string
 		DisplayName string
 		IconURL     *string
+	}
+	LocationDTO struct {
+		City       string
+		Prefecture string
+		Latitude   float64
+		Longitude  float64
 	}
 
 	listTalkSessionQueryHandler struct {
@@ -86,6 +93,16 @@ func (h *listTalkSessionQueryHandler) Execute(ctx context.Context, input ListTal
 
 	talkSessionDTOList := make([]TalkSessionDTO, 0, len(talkSessionRow))
 	for _, row := range talkSessionRow {
+		var locationDTO *LocationDTO
+		if row.City.Valid && row.Prefecture.Valid {
+			locationDTO = &LocationDTO{
+				City:       row.City.String,
+				Prefecture: row.Prefecture.String,
+				Latitude:   row.Latitude.(float64),
+				Longitude:  row.Longitude.(float64),
+			}
+		}
+
 		talkSessionDTOList = append(talkSessionDTOList, TalkSessionDTO{
 			ID:    row.TalkSessionID.String(),
 			Theme: row.Theme,
@@ -103,6 +120,7 @@ func (h *listTalkSessionQueryHandler) Execute(ctx context.Context, input ListTal
 				return time.NewTime(ctx, row.FinishedAt.Time).Format(ctx)
 			}),
 			ScheduledEndTime: time.NewTime(ctx, row.ScheduledEndTime).Format(ctx),
+			Location:         locationDTO,
 		})
 	}
 
