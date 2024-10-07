@@ -105,7 +105,7 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 	return &oas.EditUserProfileOK{
 		DisplayID:   out.DisplayID,
 		DisplayName: out.DisplayName,
-		IconURL:     utils.StringToOptString(claim.IconURL),
+		IconURL:     utils.ToOpt[oas.OptString](claim.IconURL),
 	}, nil
 }
 
