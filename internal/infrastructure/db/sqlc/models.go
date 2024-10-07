@@ -32,11 +32,12 @@ type Session struct {
 }
 
 type TalkSession struct {
-	TalkSessionID uuid.UUID
-	OwnerID       uuid.UUID
-	Theme         string
-	FinishedAt    sql.NullTime
-	CreatedAt     time.Time
+	TalkSessionID    uuid.UUID
+	OwnerID          uuid.UUID
+	Theme            string
+	ScheduledEndTime time.Time
+	FinishedAt       sql.NullTime
+	CreatedAt        time.Time
 }
 
 type User struct {

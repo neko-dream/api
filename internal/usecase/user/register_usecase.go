@@ -101,6 +101,14 @@ func (i *registerUserInteractor) Execute(ctx context.Context, input RegisterUser
 			return messages.UserUpdateError
 		}
 
+		// アイコンが指定されていればアイコンを設定
+		if input.Icon != nil {
+			if err := foundUser.SetIconFile(ctx, input.Icon); err != nil {
+				utils.HandleError(ctx, err, "User.SetIconFile")
+				return messages.UserUpdateError
+			}
+		}
+
 		// デモグラ情報を設定
 		foundUser.SetDemographics(user.NewUserDemographics(
 			shared.NewUUID[user.UserDemographics](),

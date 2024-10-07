@@ -6,6 +6,7 @@ import (
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/shared"
+	"github.com/neko-dream/server/internal/domain/model/shared/time"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/db"
@@ -17,13 +18,14 @@ type (
 	}
 
 	CreateTalkSessionInput struct {
-		Theme   string
-		OwnerID shared.UUID[user.User]
+		OwnerID          shared.UUID[user.User]
+		Theme            string
+		ScheduledEndTime time.Time
 	}
 
 	CreateTalkSessionOutput struct {
 		TalkSession talksession.TalkSession
-		OwnerUser   user.User
+		OwnerUser   *user.User
 	}
 
 	createTalkSessionInteractor struct {
@@ -42,6 +44,8 @@ func (i *createTalkSessionInteractor) Execute(ctx context.Context, input CreateT
 			input.Theme,
 			input.OwnerID,
 			nil,
+			time.Now(ctx),
+			input.ScheduledEndTime,
 		)
 		if err := i.TalkSessionRepository.Create(ctx, talkSession); err != nil {
 			return messages.TalkSessionCreateFailed
@@ -53,7 +57,7 @@ func (i *createTalkSessionInteractor) Execute(ctx context.Context, input CreateT
 		if err != nil {
 			return messages.ForbiddenError
 		}
-		output.OwnerUser = *ownerUser
+		output.OwnerUser = ownerUser
 
 		return nil
 	}); err != nil {

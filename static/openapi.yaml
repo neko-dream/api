@@ -33,8 +33,10 @@ paths:
                 properties:
                   id:
                     type: string
+                    description: トークセッションID
                   theme:
                     type: string
+                    description: テーマ
                   owner:
                     type: object
                     properties:
@@ -54,15 +56,22 @@ paths:
                     required:
                       - displayID
                       - displayName
+                    description: 作成ユーザー
                   createdAt:
                     type: string
+                    description: 作成日時
                   finishedAt:
                     type: string
+                    description: 終了日時
+                  scheduledEndTime:
+                    type: string
+                    description: 終了予定日時
                 required:
                   - id
                   - theme
                   - owner
                   - createdAt
+                  - scheduledEndTime
       security: []
       x-ogen-operation-group: TalkSession
   /api/talksessions:
@@ -82,8 +91,17 @@ paths:
               type: object
               properties:
                 theme:
-                  example: ''
                   type: string
+                  maxLength: 50
+                  minLength: 5
+                  example: ''
+                scheduledEndTime:
+                  type: string
+                  format: date-time
+                  example: ''
+              required:
+                - theme
+                - scheduledEndTime
       responses:
         '200':
           description: 成功
@@ -94,8 +112,10 @@ paths:
                 properties:
                   id:
                     type: string
+                    description: トークセッションID
                   theme:
                     type: string
+                    description: テーマ
                   owner:
                     type: object
                     properties:
@@ -115,15 +135,22 @@ paths:
                     required:
                       - displayID
                       - displayName
+                    description: 作成ユーザー
                   createdAt:
                     type: string
+                    description: 作成日時
                   finishedAt:
                     type: string
+                    description: 終了日時
+                  scheduledEndTime:
+                    type: string
+                    description: 終了予定日時
                 required:
                   - id
                   - theme
                   - owner
                   - createdAt
+                  - scheduledEndTime
       security:
         - SessionId: []
       x-ogen-operation-group: TalkSession
@@ -190,8 +217,10 @@ paths:
                           properties:
                             id:
                               type: string
+                              description: トークセッションID
                             theme:
                               type: string
+                              description: テーマ
                             owner:
                               type: object
                               properties:
@@ -211,15 +240,22 @@ paths:
                               required:
                                 - displayID
                                 - displayName
+                              description: 作成ユーザー
                             createdAt:
                               type: string
+                              description: 作成日時
                             finishedAt:
                               type: string
+                              description: 終了日時
+                            scheduledEndTime:
+                              type: string
+                              description: 終了予定日時
                           required:
                             - id
                             - theme
                             - owner
                             - createdAt
+                            - scheduledEndTime
                         opinionCount:
                           type: integer
                       required:
@@ -588,6 +624,7 @@ paths:
                       required:
                         - displayID
                         - displayName
+                      description: 作成ユーザー
                     commentCount:
                       type: string
                   required:
@@ -816,6 +853,7 @@ paths:
                         required:
                           - displayID
                           - displayName
+                        description: 作成ユーザー
                       opinion:
                         type: object
                         properties:
@@ -931,6 +969,7 @@ paths:
                           required:
                             - displayID
                             - displayName
+                          description: 作成ユーザー
                         myItentionStatus:
                           type: string
                           description: 意見投稿主の意見
@@ -1215,8 +1254,10 @@ components:
       properties:
         id:
           type: string
+          description: トークセッションID
         theme:
           type: string
+          description: テーマ
         owner:
           type: object
           properties:
@@ -1236,15 +1277,22 @@ components:
           required:
             - displayID
             - displayName
+          description: 作成ユーザー
         createdAt:
           type: string
+          description: 作成日時
         finishedAt:
           type: string
+          description: 終了日時
+        scheduledEndTime:
+          type: string
+          description: 終了予定日時
       required:
         - id
         - theme
         - owner
         - createdAt
+        - scheduledEndTime
   securitySchemes:
     SessionId:
       type: apiKey

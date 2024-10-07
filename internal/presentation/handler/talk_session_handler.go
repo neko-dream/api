@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"log"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/messages"
@@ -33,6 +34,7 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 	if !req.IsSet() {
 		return nil, messages.RequiredParameterError
 	}
+
 	userID, err := claim.UserID()
 	if err != nil {
 		utils.HandleError(ctx, err, "claim.UserID")
@@ -40,8 +42,9 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 	}
 
 	out, err := t.createTalkSessionUsecase.Execute(ctx, talk_session_usecase.CreateTalkSessionInput{
-		Theme:   req.Value.Theme.Value,
-		OwnerID: userID,
+		Theme:            req.Value.Theme,
+		OwnerID:          userID,
+		ScheduledEndTime: time.NewTime(ctx, req.Value.ScheduledEndTime),
 	})
 	if err != nil {
 		return nil, errtrace.Wrap(err)
@@ -57,9 +60,10 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 				oas.OptString{},
 			),
 		},
-		Theme:     out.TalkSession.Theme(),
-		ID:        out.TalkSession.TalkSessionID().String(),
-		CreatedAt: time.Now(ctx).Format(ctx),
+		Theme:            out.TalkSession.Theme(),
+		ID:               out.TalkSession.TalkSessionID().String(),
+		CreatedAt:        time.Now(ctx).Format(ctx),
+		ScheduledEndTime: out.TalkSession.ScheduledEndTime().Format(ctx),
 	}, nil
 }
 
@@ -105,11 +109,12 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 		}
 		resultTalkSession = append(resultTalkSession, oas.GetTalkSessionListOKTalkSessionsItem{
 			TalkSession: oas.GetTalkSessionListOKTalkSessionsItemTalkSession{
-				ID:         talkSession.ID,
-				Theme:      talkSession.Theme,
-				Owner:      owner,
-				FinishedAt: utils.StringToOptString(talkSession.FinishedAt),
-				CreatedAt:  talkSession.CreatedAt,
+				ID:               talkSession.ID,
+				Theme:            talkSession.Theme,
+				Owner:            owner,
+				FinishedAt:       utils.StringToOptString(talkSession.FinishedAt),
+				CreatedAt:        talkSession.CreatedAt,
+				ScheduledEndTime: talkSession.ScheduledEndTime,
 			},
 			OpinionCount: talkSession.OpinionCount,
 		})

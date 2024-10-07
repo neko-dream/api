@@ -65,28 +65,66 @@ func (s *Server) decodeCreateTalkSessionRequest(r *http.Request) (
 				}
 				if err := q.HasParam(cfg); err == nil {
 					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-						var optFormDotThemeVal string
-						if err := func() error {
-							val, err := d.DecodeValue()
-							if err != nil {
-								return err
-							}
-
-							c, err := conv.ToString(val)
-							if err != nil {
-								return err
-							}
-
-							optFormDotThemeVal = c
-							return nil
-						}(); err != nil {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
-						optForm.Theme.SetTo(optFormDotThemeVal)
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						optForm.Theme = c
 						return nil
 					}); err != nil {
 						return req, close, errors.Wrap(err, "decode \"theme\"")
 					}
+					if err := func() error {
+						if err := (validate.String{
+							MinLength:    5,
+							MinLengthSet: true,
+							MaxLength:    50,
+							MaxLengthSet: true,
+							Email:        false,
+							Hostname:     false,
+							Regex:        nil,
+						}).Validate(string(optForm.Theme)); err != nil {
+							return errors.Wrap(err, "string")
+						}
+						return nil
+					}(); err != nil {
+						return req, close, errors.Wrap(err, "validate")
+					}
+				} else {
+					return req, close, errors.Wrap(err, "query")
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "scheduledEndTime",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToDateTime(val)
+						if err != nil {
+							return err
+						}
+
+						optForm.ScheduledEndTime = c
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"scheduledEndTime\"")
+					}
+				} else {
+					return req, close, errors.Wrap(err, "query")
 				}
 			}
 			request = OptCreateTalkSessionReq{

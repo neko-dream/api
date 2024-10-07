@@ -9,7 +9,12 @@ var (
 
 	RequiredParameterError = &APIError{
 		StatusCode: 400,
-		Code:       "GEN-0001",
+		Code:       "REQ-0001",
 		Message:    "必須パラメータが不足しています。",
+	}
+	BadRequestError = &APIError{
+		StatusCode: 400,
+		Code:       "REQ-0002",
+		Message:    "Bad Request",
 	}
 )

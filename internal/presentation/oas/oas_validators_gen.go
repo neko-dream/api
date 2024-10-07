@@ -64,6 +64,37 @@ func (s *CreateTalkSessionOKOwner) Validate() error {
 	return nil
 }
 
+func (s *CreateTalkSessionReq) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := (validate.String{
+			MinLength:    5,
+			MinLengthSet: true,
+			MaxLength:    50,
+			MaxLengthSet: true,
+			Email:        false,
+			Hostname:     false,
+			Regex:        nil,
+		}).Validate(string(s.Theme)); err != nil {
+			return errors.Wrap(err, "string")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "theme",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
 func (s *EditUserProfileOK) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer

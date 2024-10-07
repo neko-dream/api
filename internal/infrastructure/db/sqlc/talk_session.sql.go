@@ -14,14 +14,15 @@ import (
 )
 
 const createTalkSession = `-- name: CreateTalkSession :exec
-INSERT INTO talk_sessions (talk_session_id, theme, owner_id, created_at) VALUES ($1, $2, $3, $4)
+INSERT INTO talk_sessions (talk_session_id, theme, owner_id, scheduled_end_time, created_at) VALUES ($1, $2, $3, $4, $5)
 `
 
 type CreateTalkSessionParams struct {
-	TalkSessionID uuid.UUID
-	Theme         string
-	OwnerID       uuid.UUID
-	CreatedAt     time.Time
+	TalkSessionID    uuid.UUID
+	Theme            string
+	OwnerID          uuid.UUID
+	ScheduledEndTime time.Time
+	CreatedAt        time.Time
 }
 
 func (q *Queries) CreateTalkSession(ctx context.Context, arg CreateTalkSessionParams) error {
@@ -29,28 +30,39 @@ func (q *Queries) CreateTalkSession(ctx context.Context, arg CreateTalkSessionPa
 		arg.TalkSessionID,
 		arg.Theme,
 		arg.OwnerID,
+		arg.ScheduledEndTime,
 		arg.CreatedAt,
 	)
 	return err
 }
 
 const editTalkSession = `-- name: EditTalkSession :exec
-UPDATE talk_sessions SET theme = $2, finished_at = $3 WHERE talk_session_id = $1
+UPDATE talk_sessions
+    SET theme = $2,
+        finished_at = $3,
+        scheduled_end_time = $4
+    WHERE talk_session_id = $1
 `
 
 type EditTalkSessionParams struct {
-	TalkSessionID uuid.UUID
-	Theme         string
-	FinishedAt    sql.NullTime
+	TalkSessionID    uuid.UUID
+	Theme            string
+	FinishedAt       sql.NullTime
+	ScheduledEndTime time.Time
 }
 
 func (q *Queries) EditTalkSession(ctx context.Context, arg EditTalkSessionParams) error {
-	_, err := q.db.ExecContext(ctx, editTalkSession, arg.TalkSessionID, arg.Theme, arg.FinishedAt)
+	_, err := q.db.ExecContext(ctx, editTalkSession,
+		arg.TalkSessionID,
+		arg.Theme,
+		arg.FinishedAt,
+		arg.ScheduledEndTime,
+	)
 	return err
 }
 
 const getTalkSessionByID = `-- name: GetTalkSessionByID :one
-SELECT talk_session_id, owner_id, theme, finished_at, created_at FROM talk_sessions WHERE talk_session_id = $1
+SELECT talk_session_id, owner_id, theme, scheduled_end_time, finished_at, created_at FROM talk_sessions WHERE talk_session_id = $1
 `
 
 func (q *Queries) GetTalkSessionByID(ctx context.Context, talkSessionID uuid.UUID) (TalkSession, error) {
@@ -60,6 +72,7 @@ func (q *Queries) GetTalkSessionByID(ctx context.Context, talkSessionID uuid.UUI
 		&i.TalkSessionID,
 		&i.OwnerID,
 		&i.Theme,
+		&i.ScheduledEndTime,
 		&i.FinishedAt,
 		&i.CreatedAt,
 	)
@@ -72,6 +85,7 @@ SELECT
     talk_sessions.theme,
     talk_sessions.finished_at,
     talk_sessions.created_at,
+    talk_sessions.scheduled_end_time,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     users.display_name AS display_name,
     users.display_id AS display_id,
@@ -87,7 +101,7 @@ LEFT JOIN users
 WHERE
     CASE
         WHEN $3::text = 'finished' THEN finished_at IS NOT NULL
-        WHEN $3::text = 'open' THEN finished_at IS NULL
+        WHEN $3::text = 'open' THEN finished_at IS NULL AND scheduled_end_time > now()
         ELSE TRUE
     END
     AND
@@ -97,7 +111,11 @@ WHERE
         ELSE TRUE
     END)
 ORDER BY
-    talk_sessions.created_at DESC
+    CASE
+        WHEN $3::text = 'finished' THEN finished_at IS NOT NULL
+        WHEN $3::text = 'open' THEN scheduled_end_time > now()
+        ELSE TRUE
+    END DESC
 LIMIT $1 OFFSET $2
 `
 
@@ -109,14 +127,15 @@ type ListTalkSessionsParams struct {
 }
 
 type ListTalkSessionsRow struct {
-	TalkSessionID uuid.UUID
-	Theme         string
-	FinishedAt    sql.NullTime
-	CreatedAt     time.Time
-	OpinionCount  int64
-	DisplayName   sql.NullString
-	DisplayID     sql.NullString
-	IconUrl       sql.NullString
+	TalkSessionID    uuid.UUID
+	Theme            string
+	FinishedAt       sql.NullTime
+	CreatedAt        time.Time
+	ScheduledEndTime time.Time
+	OpinionCount     int64
+	DisplayName      sql.NullString
+	DisplayID        sql.NullString
+	IconUrl          sql.NullString
 }
 
 func (q *Queries) ListTalkSessions(ctx context.Context, arg ListTalkSessionsParams) ([]ListTalkSessionsRow, error) {
@@ -138,6 +157,7 @@ func (q *Queries) ListTalkSessions(ctx context.Context, arg ListTalkSessionsPara
 			&i.Theme,
 			&i.FinishedAt,
 			&i.CreatedAt,
+			&i.ScheduledEndTime,
 			&i.OpinionCount,
 			&i.DisplayName,
 			&i.DisplayID,

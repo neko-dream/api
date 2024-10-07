@@ -80,13 +80,14 @@ func (e *editUserInteractor) Execute(ctx context.Context, input EditUserInput) (
 			return messages.UserNotFoundError
 		}
 
-		// ユーザー名と表示名を設定
+		// アイコンがある場合は設定
 		if input.Icon != nil {
 			if err := foundUser.SetIconFile(ctx, input.Icon); err != nil {
 				utils.HandleError(ctx, err, "User.SetIconFile")
 				return messages.UserUpdateError
 			}
 		}
+
 		if input.YearOfBirth != nil ||
 			input.Gender != nil ||
 			input.Municipality != nil ||
@@ -114,6 +115,7 @@ func (e *editUserInteractor) Execute(ctx context.Context, input EditUserInput) (
 			utils.HandleError(ctx, err, "UserRepository.Update")
 			return messages.UserUpdateError
 		}
+		u = foundUser
 
 		sess, err := e.sessService.RefreshSession(ctx, input.UserID)
 		if err != nil {

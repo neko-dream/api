@@ -43,14 +43,19 @@ func (s *CreateTalkSessionOK) encodeFields(e *jx.Encoder) {
 			s.FinishedAt.Encode(e)
 		}
 	}
+	{
+		e.FieldStart("scheduledEndTime")
+		e.Str(s.ScheduledEndTime)
+	}
 }
 
-var jsonFieldsNameOfCreateTalkSessionOK = [5]string{
+var jsonFieldsNameOfCreateTalkSessionOK = [6]string{
 	0: "id",
 	1: "theme",
 	2: "owner",
 	3: "createdAt",
 	4: "finishedAt",
+	5: "scheduledEndTime",
 }
 
 // Decode decodes CreateTalkSessionOK from json.
@@ -118,6 +123,18 @@ func (s *CreateTalkSessionOK) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"finishedAt\"")
 			}
+		case "scheduledEndTime":
+			requiredBitSet[0] |= 1 << 5
+			if err := func() error {
+				v, err := d.Str()
+				s.ScheduledEndTime = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"scheduledEndTime\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -128,7 +145,7 @@ func (s *CreateTalkSessionOK) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00001111,
+		0b00101111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -509,14 +526,19 @@ func (s *GetTalkSessionDetailOK) encodeFields(e *jx.Encoder) {
 			s.FinishedAt.Encode(e)
 		}
 	}
+	{
+		e.FieldStart("scheduledEndTime")
+		e.Str(s.ScheduledEndTime)
+	}
 }
 
-var jsonFieldsNameOfGetTalkSessionDetailOK = [5]string{
+var jsonFieldsNameOfGetTalkSessionDetailOK = [6]string{
 	0: "id",
 	1: "theme",
 	2: "owner",
 	3: "createdAt",
 	4: "finishedAt",
+	5: "scheduledEndTime",
 }
 
 // Decode decodes GetTalkSessionDetailOK from json.
@@ -584,6 +606,18 @@ func (s *GetTalkSessionDetailOK) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"finishedAt\"")
 			}
+		case "scheduledEndTime":
+			requiredBitSet[0] |= 1 << 5
+			if err := func() error {
+				v, err := d.Str()
+				s.ScheduledEndTime = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"scheduledEndTime\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -594,7 +628,7 @@ func (s *GetTalkSessionDetailOK) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00001111,
+		0b00101111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -1062,14 +1096,19 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) encodeFields(e *jx.Enc
 			s.FinishedAt.Encode(e)
 		}
 	}
+	{
+		e.FieldStart("scheduledEndTime")
+		e.Str(s.ScheduledEndTime)
+	}
 }
 
-var jsonFieldsNameOfGetTalkSessionListOKTalkSessionsItemTalkSession = [5]string{
+var jsonFieldsNameOfGetTalkSessionListOKTalkSessionsItemTalkSession = [6]string{
 	0: "id",
 	1: "theme",
 	2: "owner",
 	3: "createdAt",
 	4: "finishedAt",
+	5: "scheduledEndTime",
 }
 
 // Decode decodes GetTalkSessionListOKTalkSessionsItemTalkSession from json.
@@ -1137,6 +1176,18 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder) 
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"finishedAt\"")
 			}
+		case "scheduledEndTime":
+			requiredBitSet[0] |= 1 << 5
+			if err := func() error {
+				v, err := d.Str()
+				s.ScheduledEndTime = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"scheduledEndTime\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -1147,7 +1198,7 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder) 
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00001111,
+		0b00101111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

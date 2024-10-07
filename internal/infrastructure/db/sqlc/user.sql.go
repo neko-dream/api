@@ -212,17 +212,23 @@ func (q *Queries) UpdateOrCreateUserDemographics(ctx context.Context, arg Update
 }
 
 const updateUser = `-- name: UpdateUser :exec
-UPDATE "users" SET display_name = $2, icon_url = $3 WHERE user_id = $1
+UPDATE "users" SET display_id = $2, display_name = $3, icon_url = $4 WHERE user_id = $1
 `
 
 type UpdateUserParams struct {
 	UserID      uuid.UUID
+	DisplayID   sql.NullString
 	DisplayName sql.NullString
 	IconUrl     sql.NullString
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
-	_, err := q.db.ExecContext(ctx, updateUser, arg.UserID, arg.DisplayName, arg.IconUrl)
+	_, err := q.db.ExecContext(ctx, updateUser,
+		arg.UserID,
+		arg.DisplayID,
+		arg.DisplayName,
+		arg.IconUrl,
+	)
 	return err
 }
 

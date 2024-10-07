@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"log"
 	"strings"
 	"time"
 
@@ -93,6 +94,11 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 		DisplayName: utils.IfThenElse(
 			user.DisplayName() != nil,
 			sql.NullString{String: *user.DisplayName(), Valid: true},
+			sql.NullString{},
+		),
+		DisplayID: utils.IfThenElse(
+			user.DisplayID() != nil,
+			sql.NullString{String: *user.DisplayID(), Valid: true},
 			sql.NullString{},
 		),
 		IconUrl: iconURL,
@@ -216,7 +222,6 @@ func (u *userRepository) FindByID(ctx context.Context, userID shared.UUID[user.U
 	if userDemographics != nil {
 		user.SetDemographics(*userDemographics)
 	}
-
 	return &user, nil
 }
 

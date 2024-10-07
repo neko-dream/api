@@ -84,10 +84,21 @@
                 "type": "object",
                 "properties": {
                   "theme": {
-                    "example": "",
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 5,
+                    "example": ""
+                  },
+                  "scheduledEndTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": ""
                   }
-                }
+                },
+                "required": [
+                  "theme",
+                  "scheduledEndTime"
+                ]
               }
             }
           }
@@ -101,26 +112,36 @@
                   "type": "object",
                   "properties": {
                     "id": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "トークセッションID"
                     },
                     "theme": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "テーマ"
                     },
                     "owner": {
-                      "$ref": "#/components/schemas/user"
+                      "$ref": "#/components/schemas/user",
+                      "description": "作成ユーザー"
                     },
                     "createdAt": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "作成日時"
                     },
                     "finishedAt": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "終了日時"
+                    },
+                    "scheduledEndTime": {
+                      "type": "string",
+                      "description": "終了予定日時"
                     }
                   },
                   "required": [
                     "id",
                     "theme",
                     "owner",
-                    "createdAt"
+                    "createdAt",
+                    "scheduledEndTime"
                   ]
                 }
               }
@@ -635,7 +656,8 @@
                         "$ref": "#/components/schemas/opinion"
                       },
                       "user": {
-                        "$ref": "#/components/schemas/user"
+                        "$ref": "#/components/schemas/user",
+                        "description": "作成ユーザー"
                       },
                       "commentCount": {
                         "type": "string"
@@ -886,7 +908,8 @@
                       "type": "object",
                       "properties": {
                         "user": {
-                          "$ref": "#/components/schemas/user"
+                          "$ref": "#/components/schemas/user",
+                          "description": "作成ユーザー"
                         },
                         "opinion": {
                           "$ref": "#/components/schemas/opinion"
@@ -906,7 +929,8 @@
                             "$ref": "#/components/schemas/opinion"
                           },
                           "user": {
-                            "$ref": "#/components/schemas/user"
+                            "$ref": "#/components/schemas/user",
+                            "description": "作成ユーザー"
                           },
                           "myItentionStatus": {
                             "$ref": "#/components/schemas/intentionStatus",
@@ -1133,26 +1157,36 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "トークセッションID"
           },
           "theme": {
-            "type": "string"
+            "type": "string",
+            "description": "テーマ"
           },
           "owner": {
-            "$ref": "#/components/schemas/user"
+            "$ref": "#/components/schemas/user",
+            "description": "作成ユーザー"
           },
           "createdAt": {
-            "type": "string"
+            "type": "string",
+            "description": "作成日時"
           },
           "finishedAt": {
-            "type": "string"
+            "type": "string",
+            "description": "終了日時"
+          },
+          "scheduledEndTime": {
+            "type": "string",
+            "description": "終了予定日時"
           }
         },
         "required": [
           "id",
           "theme",
           "owner",
-          "createdAt"
+          "createdAt",
+          "scheduledEndTime"
         ]
       }
     },

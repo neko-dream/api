@@ -46,6 +46,7 @@ CREATE TABLE "talk_sessions" (
   "talk_session_id" uuid PRIMARY KEY,
   "owner_id" uuid NOT NULL,
   "theme" varchar NOT NULL,
+  "scheduled_end_time" timestamp NOT NULL,
   "finished_at" timestamp,
   "created_at" timestamp NOT NULL DEFAULT (now())
 );

@@ -1,11 +1,15 @@
 -- name: CreateTalkSession :exec
-INSERT INTO talk_sessions (talk_session_id, theme, owner_id, created_at) VALUES ($1, $2, $3, $4);
+INSERT INTO talk_sessions (talk_session_id, theme, owner_id, scheduled_end_time, created_at) VALUES ($1, $2, $3, $4, $5);
 
 -- name: GetTalkSessionByID :one
 SELECT * FROM talk_sessions WHERE talk_session_id = $1;
 
 -- name: EditTalkSession :exec
-UPDATE talk_sessions SET theme = $2, finished_at = $3 WHERE talk_session_id = $1;
+UPDATE talk_sessions
+    SET theme = $2,
+        finished_at = $3,
+        scheduled_end_time = $4
+    WHERE talk_session_id = $1;
 
 -- name: ListTalkSessions :many
 SELECT
@@ -13,6 +17,7 @@ SELECT
     talk_sessions.theme,
     talk_sessions.finished_at,
     talk_sessions.created_at,
+    talk_sessions.scheduled_end_time,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     users.display_name AS display_name,
     users.display_id AS display_id,
@@ -28,7 +33,7 @@ LEFT JOIN users
 WHERE
     CASE
         WHEN sqlc.narg('status')::text = 'finished' THEN finished_at IS NOT NULL
-        WHEN sqlc.narg('status')::text = 'open' THEN finished_at IS NULL
+        WHEN sqlc.narg('status')::text = 'open' THEN finished_at IS NULL AND scheduled_end_time > now()
         ELSE TRUE
     END
     AND
@@ -38,5 +43,9 @@ WHERE
         ELSE TRUE
     END)
 ORDER BY
-    talk_sessions.created_at DESC
+    CASE
+        WHEN sqlc.narg('status')::text = 'finished' THEN finished_at IS NOT NULL
+        WHEN sqlc.narg('status')::text = 'open' THEN scheduled_end_time > now()
+        ELSE TRUE
+    END DESC
 LIMIT $1 OFFSET $2;

@@ -4,6 +4,7 @@ package oas
 
 import (
 	"net/url"
+	"time"
 
 	"github.com/go-faster/errors"
 
@@ -37,11 +38,18 @@ func (s *AuthLoginFound) SetSetCookie(val OptString) {
 }
 
 type CreateTalkSessionOK struct {
-	ID         string                   `json:"id"`
-	Theme      string                   `json:"theme"`
-	Owner      CreateTalkSessionOKOwner `json:"owner"`
-	CreatedAt  string                   `json:"createdAt"`
-	FinishedAt OptString                `json:"finishedAt"`
+	// トークセッションID.
+	ID string `json:"id"`
+	// テーマ.
+	Theme string `json:"theme"`
+	// 作成ユーザー.
+	Owner CreateTalkSessionOKOwner `json:"owner"`
+	// 作成日時.
+	CreatedAt string `json:"createdAt"`
+	// 終了日時.
+	FinishedAt OptString `json:"finishedAt"`
+	// 終了予定日時.
+	ScheduledEndTime string `json:"scheduledEndTime"`
 }
 
 // GetID returns the value of ID.
@@ -69,6 +77,11 @@ func (s *CreateTalkSessionOK) GetFinishedAt() OptString {
 	return s.FinishedAt
 }
 
+// GetScheduledEndTime returns the value of ScheduledEndTime.
+func (s *CreateTalkSessionOK) GetScheduledEndTime() string {
+	return s.ScheduledEndTime
+}
+
 // SetID sets the value of ID.
 func (s *CreateTalkSessionOK) SetID(val string) {
 	s.ID = val
@@ -94,6 +107,12 @@ func (s *CreateTalkSessionOK) SetFinishedAt(val OptString) {
 	s.FinishedAt = val
 }
 
+// SetScheduledEndTime sets the value of ScheduledEndTime.
+func (s *CreateTalkSessionOK) SetScheduledEndTime(val string) {
+	s.ScheduledEndTime = val
+}
+
+// 作成ユーザー.
 type CreateTalkSessionOKOwner struct {
 	DisplayID   string    `json:"displayID"`
 	DisplayName string    `json:"displayName"`
@@ -131,17 +150,28 @@ func (s *CreateTalkSessionOKOwner) SetIconURL(val OptString) {
 }
 
 type CreateTalkSessionReq struct {
-	Theme OptString `json:"theme"`
+	Theme            string    `json:"theme"`
+	ScheduledEndTime time.Time `json:"scheduledEndTime"`
 }
 
 // GetTheme returns the value of Theme.
-func (s *CreateTalkSessionReq) GetTheme() OptString {
+func (s *CreateTalkSessionReq) GetTheme() string {
 	return s.Theme
 }
 
+// GetScheduledEndTime returns the value of ScheduledEndTime.
+func (s *CreateTalkSessionReq) GetScheduledEndTime() time.Time {
+	return s.ScheduledEndTime
+}
+
 // SetTheme sets the value of Theme.
-func (s *CreateTalkSessionReq) SetTheme(val OptString) {
+func (s *CreateTalkSessionReq) SetTheme(val string) {
 	s.Theme = val
+}
+
+// SetScheduledEndTime sets the value of ScheduledEndTime.
+func (s *CreateTalkSessionReq) SetScheduledEndTime(val time.Time) {
+	s.ScheduledEndTime = val
 }
 
 type EditUserProfileInternalServerError struct{}
@@ -435,11 +465,18 @@ func (s *EditUserProfileReqOccupation) UnmarshalText(data []byte) error {
 }
 
 type GetTalkSessionDetailOK struct {
-	ID         string                      `json:"id"`
-	Theme      string                      `json:"theme"`
-	Owner      GetTalkSessionDetailOKOwner `json:"owner"`
-	CreatedAt  string                      `json:"createdAt"`
-	FinishedAt OptString                   `json:"finishedAt"`
+	// トークセッションID.
+	ID string `json:"id"`
+	// テーマ.
+	Theme string `json:"theme"`
+	// 作成ユーザー.
+	Owner GetTalkSessionDetailOKOwner `json:"owner"`
+	// 作成日時.
+	CreatedAt string `json:"createdAt"`
+	// 終了日時.
+	FinishedAt OptString `json:"finishedAt"`
+	// 終了予定日時.
+	ScheduledEndTime string `json:"scheduledEndTime"`
 }
 
 // GetID returns the value of ID.
@@ -467,6 +504,11 @@ func (s *GetTalkSessionDetailOK) GetFinishedAt() OptString {
 	return s.FinishedAt
 }
 
+// GetScheduledEndTime returns the value of ScheduledEndTime.
+func (s *GetTalkSessionDetailOK) GetScheduledEndTime() string {
+	return s.ScheduledEndTime
+}
+
 // SetID sets the value of ID.
 func (s *GetTalkSessionDetailOK) SetID(val string) {
 	s.ID = val
@@ -492,6 +534,12 @@ func (s *GetTalkSessionDetailOK) SetFinishedAt(val OptString) {
 	s.FinishedAt = val
 }
 
+// SetScheduledEndTime sets the value of ScheduledEndTime.
+func (s *GetTalkSessionDetailOK) SetScheduledEndTime(val string) {
+	s.ScheduledEndTime = val
+}
+
+// 作成ユーザー.
 type GetTalkSessionDetailOKOwner struct {
 	DisplayID   string    `json:"displayID"`
 	DisplayName string    `json:"displayName"`
@@ -574,11 +622,18 @@ func (s *GetTalkSessionListOKTalkSessionsItem) SetOpinionCount(val int) {
 }
 
 type GetTalkSessionListOKTalkSessionsItemTalkSession struct {
-	ID         string                                               `json:"id"`
-	Theme      string                                               `json:"theme"`
-	Owner      GetTalkSessionListOKTalkSessionsItemTalkSessionOwner `json:"owner"`
-	CreatedAt  string                                               `json:"createdAt"`
-	FinishedAt OptString                                            `json:"finishedAt"`
+	// トークセッションID.
+	ID string `json:"id"`
+	// テーマ.
+	Theme string `json:"theme"`
+	// 作成ユーザー.
+	Owner GetTalkSessionListOKTalkSessionsItemTalkSessionOwner `json:"owner"`
+	// 作成日時.
+	CreatedAt string `json:"createdAt"`
+	// 終了日時.
+	FinishedAt OptString `json:"finishedAt"`
+	// 終了予定日時.
+	ScheduledEndTime string `json:"scheduledEndTime"`
 }
 
 // GetID returns the value of ID.
@@ -606,6 +661,11 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetFinishedAt() OptStr
 	return s.FinishedAt
 }
 
+// GetScheduledEndTime returns the value of ScheduledEndTime.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetScheduledEndTime() string {
+	return s.ScheduledEndTime
+}
+
 // SetID sets the value of ID.
 func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetID(val string) {
 	s.ID = val
@@ -631,6 +691,12 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetFinishedAt(val OptS
 	s.FinishedAt = val
 }
 
+// SetScheduledEndTime sets the value of ScheduledEndTime.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetScheduledEndTime(val string) {
+	s.ScheduledEndTime = val
+}
+
+// 作成ユーザー.
 type GetTalkSessionListOKTalkSessionsItemTalkSessionOwner struct {
 	DisplayID   string    `json:"displayID"`
 	DisplayName string    `json:"displayName"`
@@ -918,9 +984,10 @@ type ListOpinionsOKApplicationJSON []ListOpinionsOKItem
 func (*ListOpinionsOKApplicationJSON) listOpinionsRes() {}
 
 type ListOpinionsOKItem struct {
-	Opinion      ListOpinionsOKItemOpinion `json:"opinion"`
-	User         ListOpinionsOKItemUser    `json:"user"`
-	CommentCount string                    `json:"commentCount"`
+	Opinion ListOpinionsOKItemOpinion `json:"opinion"`
+	// 作成ユーザー.
+	User         ListOpinionsOKItemUser `json:"user"`
+	CommentCount string                 `json:"commentCount"`
 }
 
 // GetOpinion returns the value of Opinion.
@@ -1088,6 +1155,7 @@ func (s *ListOpinionsOKItemOpinionIntentionStatus) UnmarshalText(data []byte) er
 	}
 }
 
+// 作成ユーザー.
 type ListOpinionsOKItemUser struct {
 	DisplayID   string    `json:"displayID"`
 	DisplayName string    `json:"displayName"`
@@ -1273,7 +1341,8 @@ func (*OpinionCommentsOK) opinionCommentsRes() {}
 
 type OpinionCommentsOKOpinionsItem struct {
 	Opinion OpinionCommentsOKOpinionsItemOpinion `json:"opinion"`
-	User    OpinionCommentsOKOpinionsItemUser    `json:"user"`
+	// 作成ユーザー.
+	User OpinionCommentsOKOpinionsItemUser `json:"user"`
 	// 意見投稿主の意見.
 	MyItentionStatus OpinionCommentsOKOpinionsItemMyItentionStatus `json:"myItentionStatus"`
 }
@@ -1492,6 +1561,7 @@ func (s *OpinionCommentsOKOpinionsItemOpinionIntentionStatus) UnmarshalText(data
 	}
 }
 
+// 作成ユーザー.
 type OpinionCommentsOKOpinionsItemUser struct {
 	DisplayID   string    `json:"displayID"`
 	DisplayName string    `json:"displayName"`
@@ -1529,6 +1599,7 @@ func (s *OpinionCommentsOKOpinionsItemUser) SetIconURL(val OptString) {
 }
 
 type OpinionCommentsOKRootOpinion struct {
+	// 作成ユーザー.
 	User    OpinionCommentsOKRootOpinionUser    `json:"user"`
 	Opinion OpinionCommentsOKRootOpinionOpinion `json:"opinion"`
 }
@@ -1688,6 +1759,7 @@ func (s *OpinionCommentsOKRootOpinionOpinionIntentionStatus) UnmarshalText(data 
 	}
 }
 
+// 作成ユーザー.
 type OpinionCommentsOKRootOpinionUser struct {
 	DisplayID   string    `json:"displayID"`
 	DisplayName string    `json:"displayName"`

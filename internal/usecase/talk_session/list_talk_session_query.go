@@ -28,12 +28,13 @@ type (
 	}
 
 	TalkSessionDTO struct {
-		ID           string
-		Theme        string
-		Owner        UserDTO
-		OpinionCount int
-		FinishedAt   *string
-		CreatedAt    string
+		ID               string
+		Theme            string
+		Owner            UserDTO
+		OpinionCount     int
+		FinishedAt       *string
+		CreatedAt        string
+		ScheduledEndTime string
 	}
 
 	UserDTO struct {
@@ -101,6 +102,7 @@ func (h *listTalkSessionQueryHandler) Execute(ctx context.Context, input ListTal
 			FinishedAt: utils.ToPtrIfNotNullFunc[string](!row.FinishedAt.Valid, func() string {
 				return time.NewTime(ctx, row.FinishedAt.Time).Format(ctx)
 			}),
+			ScheduledEndTime: time.NewTime(ctx, row.ScheduledEndTime).Format(ctx),
 		})
 	}
 
