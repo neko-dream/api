@@ -1,15 +1,16 @@
 services:
   db:
-    image: postgres:16-bullseye
+    image: imresamu/postgis-arm64:16-recent-postgis3.5-geos3.13-proj9.5-gdal3.9-cgal5.6-sfcgal1.5-bookworm-ver20240928-0cd66e4-2024w41
     container_name: pg
     ports:
       - "5432:5432"
     restart: always
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./container/init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
-      POSTGRES_DB: catsdream
-      POSTGRES_USER: catsdream
-      POSTGRES_PASSWORD: catsdream
+      POSTGRES_DB: kotohiro
+      POSTGRES_USER: kotohiro
+      POSTGRES_PASSWORD: kotohiro
 volumes:
   pgdata:
