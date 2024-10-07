@@ -4,13 +4,16 @@ info:
   description: ''
   version: 1.0.0
 tags:
-  - name: User
   - name: Auth
 paths:
   $ref: './apidog.openapi.yaml#/paths'
   /auth/{provider}/login:
-    $ref: './paths/login.yaml'
+    $ref: './paths/authorize.yaml'
   /auth/{provider}/callback:
     $ref: './paths/callback.yaml'
+  /auth/token/info:
+    $ref: './paths/token_info.yaml'
+  /auth/revoke:
+    $ref: './paths/revoke.yaml'
 components:
   $ref: './apidog.openapi.yaml#/components'

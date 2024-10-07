@@ -1,8 +1,8 @@
 get:
   summary: OAuthログイン
   deprecated: false
-  description: ''
-  operationId: auth_login
+  description: '認証画面を表示する'
+  operationId: authorize
   tags:
     - Auth
   parameters:

@@ -19,13 +19,13 @@
       "name": "user"
     },
     {
-      "name": "TalkSession"
+      "name": "test"
     },
     {
-      "name": "Opinion"
+      "name": "opinion"
     },
     {
-      "name": "Intention"
+      "name": "intention"
     }
   ],
   "paths": {
@@ -37,7 +37,7 @@
         "operationId": "getTalkSessionDetail",
         "tags": [
           "talk_session",
-          "TalkSession"
+          "talk_session"
         ],
         "parameters": [
           {
@@ -74,7 +74,7 @@
         "operationId": "createTalkSession",
         "tags": [
           "talk_session",
-          "TalkSession"
+          "talk_session"
         ],
         "parameters": [],
         "requestBody": {
@@ -162,7 +162,7 @@
         "operationId": "getTalkSessionList",
         "tags": [
           "talk_session",
-          "TalkSession"
+          "talk_session"
         ],
         "parameters": [
           {
@@ -620,7 +620,7 @@
         "operationId": "listOpinions",
         "tags": [
           "talk_session/opinion",
-          "Opinion"
+          "opinion"
         ],
         "parameters": [
           {
@@ -697,7 +697,7 @@
         "operationId": "postOpinionPost",
         "tags": [
           "talk_session/opinion",
-          "Opinion"
+          "opinion"
         ],
         "parameters": [
           {
@@ -705,16 +705,6 @@
             "in": "path",
             "description": "",
             "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "opinionContent",
-            "in": "query",
-            "description": "意見の内容",
-            "required": true,
-            "example": "オブジェクト思考は悪だと思う",
             "schema": {
               "type": "string"
             }
@@ -727,34 +717,38 @@
                 "type": "object",
                 "properties": {
                   "parentOpinionID": {
+                    "type": "string",
                     "example": "",
-                    "type": "string"
+                    "nullable": true
                   },
                   "intentionStatus": {
                     "example": "",
                     "type": "string"
                   },
                   "title": {
+                    "type": "string",
                     "example": "",
-                    "type": "string"
+                    "nullable": true
                   },
-                  "opinion": {
+                  "opinionContent": {
                     "example": "",
                     "type": "string"
                   },
                   "referenceURL": {
+                    "type": "string",
                     "example": "",
-                    "type": "string"
+                    "nullable": true
                   },
                   "picture": {
-                    "format": "binary",
                     "type": "string",
-                    "example": ""
+                    "format": "binary",
+                    "example": "",
+                    "nullable": true
                   }
                 },
                 "required": [
                   "intentionStatus",
-                  "opinion"
+                  "opinionContent"
                 ]
               }
             }
@@ -796,7 +790,7 @@
         "operationId": "Intention",
         "tags": [
           "talk_session/opinion/intention",
-          "Intention"
+          "intention"
         ],
         "parameters": [
           {
@@ -874,7 +868,7 @@
         "operationId": "opinionComments",
         "tags": [
           "talk_session/opinion",
-          "Opinion"
+          "opinion"
         ],
         "parameters": [
           {
@@ -977,7 +971,7 @@
         "operationId": "getTopOpinions",
         "tags": [
           "talk_session/opinion",
-          "Opinion"
+          "opinion"
         ],
         "parameters": [
           {
@@ -1019,6 +1013,69 @@
         },
         "security": [],
         "x-ogen-operation-group": "Opinion"
+      }
+    },
+    "/test": {
+      "get": {
+        "summary": "無題のAPI",
+        "deprecated": false,
+        "description": "",
+        "operationId": "test",
+        "tags": [
+          "test",
+          "user"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "optInt": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "optNilInt": {
+                      "type": "integer"
+                    },
+                    "optNilBool": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
+                    "optBool": {
+                      "type": "boolean"
+                    },
+                    "optUrl": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "optNilUrl": {
+                      "type": "string",
+                      "format": "url",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "ServerErrorResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "x-ogen-operation-group": "test"
       }
     }
   },
