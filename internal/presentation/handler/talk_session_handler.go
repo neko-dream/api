@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"log"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/messages"
