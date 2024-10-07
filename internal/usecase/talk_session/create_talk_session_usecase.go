@@ -46,6 +46,7 @@ func (i *createTalkSessionInteractor) Execute(ctx context.Context, input CreateT
 			nil,
 			time.Now(ctx),
 			input.ScheduledEndTime,
+			nil,
 		)
 		if err := i.TalkSessionRepository.Create(ctx, talkSession); err != nil {
 			return messages.TalkSessionCreateFailed

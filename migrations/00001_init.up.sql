@@ -51,6 +51,13 @@ CREATE TABLE "talk_sessions" (
   "created_at" timestamp NOT NULL DEFAULT (now())
 );
 
+CREATE TABLE "talk_session_locations" (
+  "talk_session_id" uuid PRIMARY KEY,
+  "location" GEOGRAPHY(POINT, 4326) NOT NULL,
+  "city" varchar NOT NULL,
+  "prefecture" varchar NOT NULL
+);
+
 CREATE TABLE "votes" (
   "vote_id" uuid PRIMARY KEY,
   "opinion_id" uuid NOT NULL,

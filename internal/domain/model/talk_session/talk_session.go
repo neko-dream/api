@@ -22,6 +22,7 @@ type (
 		scheduledEndTime time.Time  // 予定終了時間
 		finishedAt       *time.Time // 実際の終了時間
 		createdAt        time.Time  // 作成日時
+		location         *Location
 	}
 )
 
@@ -32,6 +33,7 @@ func NewTalkSession(
 	finishedAt *time.Time,
 	createdAt time.Time,
 	scheduledEndTime time.Time,
+	location *Location,
 ) *TalkSession {
 	return &TalkSession{
 		talkSessionID:    talkSessionID,
@@ -40,6 +42,7 @@ func NewTalkSession(
 		finishedAt:       finishedAt,
 		createdAt:        createdAt,
 		scheduledEndTime: scheduledEndTime,
+		location:         location,
 	}
 }
 
@@ -65,6 +68,10 @@ func (t *TalkSession) FinishedAt() *time.Time {
 
 func (t *TalkSession) CreatedAt() time.Time {
 	return t.createdAt
+}
+
+func (t *TalkSession) Location() *Location {
+	return t.location
 }
 
 func (t *TalkSession) ChangeTheme(theme string) {

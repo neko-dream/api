@@ -36,6 +36,27 @@ func (q *Queries) CreateTalkSession(ctx context.Context, arg CreateTalkSessionPa
 	return err
 }
 
+const createTalkSessionLocation = `-- name: CreateTalkSessionLocation :exec
+INSERT INTO talk_session_locations (talk_session_id, location, city, prefecture) VALUES ($1, ST_GeographyFromText($2), $3, $4)
+`
+
+type CreateTalkSessionLocationParams struct {
+	TalkSessionID       uuid.UUID
+	StGeographyfromtext interface{}
+	City                string
+	Prefecture          string
+}
+
+func (q *Queries) CreateTalkSessionLocation(ctx context.Context, arg CreateTalkSessionLocationParams) error {
+	_, err := q.db.ExecContext(ctx, createTalkSessionLocation,
+		arg.TalkSessionID,
+		arg.StGeographyfromtext,
+		arg.City,
+		arg.Prefecture,
+	)
+	return err
+}
+
 const editTalkSession = `-- name: EditTalkSession :exec
 UPDATE talk_sessions
     SET theme = $2,
@@ -174,4 +195,25 @@ func (q *Queries) ListTalkSessions(ctx context.Context, arg ListTalkSessionsPara
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateTalkSessionLocation = `-- name: UpdateTalkSessionLocation :exec
+UPDATE talk_session_locations SET location = ST_GeographyFromText($2), city = $3, prefecture = $4 WHERE talk_session_id = $1
+`
+
+type UpdateTalkSessionLocationParams struct {
+	TalkSessionID       uuid.UUID
+	StGeographyfromtext interface{}
+	City                string
+	Prefecture          string
+}
+
+func (q *Queries) UpdateTalkSessionLocation(ctx context.Context, arg UpdateTalkSessionLocationParams) error {
+	_, err := q.db.ExecContext(ctx, updateTalkSessionLocation,
+		arg.TalkSessionID,
+		arg.StGeographyfromtext,
+		arg.City,
+		arg.Prefecture,
+	)
+	return err
 }

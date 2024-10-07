@@ -1081,6 +1081,33 @@
   },
   "components": {
     "schemas": {
+      "location": {
+        "type": "object",
+        "properties": {
+          "latitude": {
+            "type": "string",
+            "description": "緯度"
+          },
+          "longtitude": {
+            "type": "string",
+            "description": "経度"
+          },
+          "prefecture": {
+            "type": "string",
+            "description": "都道府県"
+          },
+          "city": {
+            "type": "string",
+            "description": "市区町村"
+          }
+        },
+        "required": [
+          "latitude",
+          "longtitude",
+          "prefecture",
+          "city"
+        ]
+      },
       "intentionStatus": {
         "type": "string",
         "description": "意見の3種のステータス",

@@ -33,6 +33,17 @@ func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talkses
 	}); err != nil {
 		return errtrace.Wrap(err)
 	}
+	// 位置情報がある場合は登録
+	if talkSession.Location() != nil {
+		if err := t.GetQueries(ctx).CreateTalkSessionLocation(ctx, model.CreateTalkSessionLocationParams{
+			TalkSessionID:       talkSession.TalkSessionID().UUID(),
+			StGeographyfromtext: talkSession.Location().ToGeographyText(),
+			City:                talkSession.Location().City(),
+			Prefecture:          talkSession.Location().Prefecture(),
+		}); err != nil {
+			return errtrace.Wrap(err)
+		}
+	}
 
 	return nil
 }
@@ -61,6 +72,17 @@ func (t *talkSessionRepository) Update(ctx context.Context, talkSession *talkses
 		ScheduledEndTime: talkSession.ScheduledEndTime().Time,
 	}); err != nil {
 		return errtrace.Wrap(err)
+	}
+
+	if talkSession.Location() != nil {
+		if err := t.GetQueries(ctx).UpdateTalkSessionLocation(ctx, model.UpdateTalkSessionLocationParams{
+			TalkSessionID:       talkSession.TalkSessionID().UUID(),
+			StGeographyfromtext: talkSession.Location().ToGeographyText(),
+			City:                talkSession.Location().City(),
+			Prefecture:          talkSession.Location().Prefecture(),
+		}); err != nil {
+			return errtrace.Wrap(err)
+		}
 	}
 
 	return nil

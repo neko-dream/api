@@ -40,6 +40,13 @@ type TalkSession struct {
 	CreatedAt        time.Time
 }
 
+type TalkSessionLocation struct {
+	TalkSessionID uuid.UUID
+	Location      interface{}
+	City          string
+	Prefecture    string
+}
+
 type User struct {
 	UserID      uuid.UUID
 	DisplayID   sql.NullString
