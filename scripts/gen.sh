@@ -9,3 +9,4 @@ rm -f ./api/target/apidog.openapi.yaml.back
 swagger-merger -i ./api/target/base.openapi.yaml -o ./static/openapi.yaml
 ogen --package oas --target internal/presentation/oas --clean ./static/openapi.yaml --convenient-errors=on
 
+sqlc generate
