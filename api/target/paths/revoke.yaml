@@ -4,7 +4,7 @@ post:
   description: 'アクセストークンを失効'
   operationId: oauth_revoke
   tags:
-    - Auth
+    - auth
   responses:
     '204':
       description: 失効できていれば204

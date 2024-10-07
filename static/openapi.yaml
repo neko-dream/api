@@ -3,8 +3,6 @@ info:
   title: cats-dream
   description: ''
   version: 1.0.0
-tags:
-  - name: Auth
 paths:
   /api/talksessions/{talkSessionId}:
     get:
@@ -1085,7 +1083,7 @@ paths:
       description: 認証画面を表示する
       operationId: authorize
       tags:
-        - Auth
+        - auth
       parameters:
         - in: path
           name: provider
@@ -1119,15 +1117,14 @@ paths:
                 redirect_url=https://example.com/login; Path=/; Secure; HttpOnly
       security: []
       x-ogen-operation-group: Auth
-    post: null
   /auth/{provider}/callback:
     get:
-      get: null
       summary: Auth Callback
       deprecated: false
       description: ''
       operationId: oauth_callback
-      tags: []
+      tags:
+        - auth
       parameters:
         - name: state
           in: cookie
@@ -1188,7 +1185,7 @@ paths:
       description: アクセストークンの情報を取得
       operationId: oauth_token_info
       tags:
-        - Auth
+        - auth
       responses:
         '200':
           description: アクセストークンの情報
@@ -1256,7 +1253,7 @@ paths:
       description: アクセストークンを失効
       operationId: oauth_revoke
       tags:
-        - Auth
+        - auth
       responses:
         '204':
           description: 失効できていれば204

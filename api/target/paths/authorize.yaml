@@ -4,7 +4,7 @@ get:
   description: '認証画面を表示する'
   operationId: authorize
   tags:
-    - Auth
+    - auth
   parameters:
     - in: path
       name: provider
@@ -37,4 +37,3 @@ get:
 
   security: []
   x-ogen-operation-group: Auth
-post:

@@ -4,7 +4,7 @@ get:
   description: 'アクセストークンの情報を取得'
   operationId: oauth_token_info
   tags:
-    - Auth
+    - auth
   responses:
     '200':
       description: アクセストークンの情報
