@@ -173,7 +173,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						if len(elem) == 0 {
 							switch r.Method {
 							case "GET":
-								s.handleGetTalkSessionsRequest([0]string{}, elemIsEscaped, w, r)
+								s.handleGetTalkSessionListRequest([0]string{}, elemIsEscaped, w, r)
 							case "POST":
 								s.handleCreateTalkSessionRequest([0]string{}, elemIsEscaped, w, r)
 							default:
@@ -641,9 +641,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						if len(elem) == 0 {
 							switch method {
 							case "GET":
-								r.name = "GetTalkSessions"
+								r.name = "GetTalkSessionList"
 								r.summary = "トークセッションコレクション"
-								r.operationID = "getTalkSessions"
+								r.operationID = "getTalkSessionList"
 								r.pathPattern = "/api/talksessions"
 								r.args = args
 								r.count = 0

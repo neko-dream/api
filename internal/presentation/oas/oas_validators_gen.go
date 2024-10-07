@@ -241,7 +241,7 @@ func (s *GetTalkSessionDetailOKOwner) Validate() error {
 	return nil
 }
 
-func (s *GetTalkSessionsOK) Validate() error {
+func (s *GetTalkSessionListOK) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
@@ -281,7 +281,7 @@ func (s *GetTalkSessionsOK) Validate() error {
 	return nil
 }
 
-func (s *GetTalkSessionsOKTalkSessionsItem) Validate() error {
+func (s *GetTalkSessionListOKTalkSessionsItem) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
@@ -304,7 +304,7 @@ func (s *GetTalkSessionsOKTalkSessionsItem) Validate() error {
 	return nil
 }
 
-func (s *GetTalkSessionsOKTalkSessionsItemTalkSession) Validate() error {
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
@@ -327,7 +327,7 @@ func (s *GetTalkSessionsOKTalkSessionsItemTalkSession) Validate() error {
 	return nil
 }
 
-func (s *GetTalkSessionsOKTalkSessionsItemTalkSessionOwner) Validate() error {
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionOwner) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
@@ -356,6 +356,17 @@ func (s *GetTalkSessionsOKTalkSessionsItemTalkSessionOwner) Validate() error {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
+}
+
+func (s GetTalkSessionListStatus) Validate() error {
+	switch s {
+	case "open":
+		return nil
+	case "finished":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
 }
 
 func (s *GetUserProfileOK) Validate() error {

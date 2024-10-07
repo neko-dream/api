@@ -54,21 +54,3 @@ func (s *Server) securitySessionId(ctx context.Context, operationName string, re
 	}
 	return rctx, true, err
 }
-
-// SecuritySource is provider of security values (tokens, passwords, etc.).
-type SecuritySource interface {
-	// SessionId provides SessionId security value.
-	SessionId(ctx context.Context, operationName string) (SessionId, error)
-}
-
-func (s *Client) securitySessionId(ctx context.Context, operationName string, req *http.Request) error {
-	t, err := s.sec.SessionId(ctx, operationName)
-	if err != nil {
-		return errors.Wrap(err, "security source \"SessionId\"")
-	}
-	req.AddCookie(&http.Cookie{
-		Name:  "SessionId",
-		Value: t.APIKey,
-	})
-	return nil
-}

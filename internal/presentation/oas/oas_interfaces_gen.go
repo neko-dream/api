@@ -5,6 +5,10 @@ type EditUserProfileRes interface {
 	editUserProfileRes()
 }
 
+type GetTalkSessionListRes interface {
+	getTalkSessionListRes()
+}
+
 type GetTopOpinionsRes interface {
 	getTopOpinionsRes()
 }

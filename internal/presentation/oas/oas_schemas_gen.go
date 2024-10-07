@@ -37,9 +37,11 @@ func (s *AuthLoginFound) SetSetCookie(val OptString) {
 }
 
 type CreateTalkSessionOK struct {
-	ID    string                   `json:"id"`
-	Theme string                   `json:"theme"`
-	Owner CreateTalkSessionOKOwner `json:"owner"`
+	ID         string                   `json:"id"`
+	Theme      string                   `json:"theme"`
+	Owner      CreateTalkSessionOKOwner `json:"owner"`
+	CreatedAt  string                   `json:"createdAt"`
+	FinishedAt OptString                `json:"finishedAt"`
 }
 
 // GetID returns the value of ID.
@@ -57,6 +59,16 @@ func (s *CreateTalkSessionOK) GetOwner() CreateTalkSessionOKOwner {
 	return s.Owner
 }
 
+// GetCreatedAt returns the value of CreatedAt.
+func (s *CreateTalkSessionOK) GetCreatedAt() string {
+	return s.CreatedAt
+}
+
+// GetFinishedAt returns the value of FinishedAt.
+func (s *CreateTalkSessionOK) GetFinishedAt() OptString {
+	return s.FinishedAt
+}
+
 // SetID sets the value of ID.
 func (s *CreateTalkSessionOK) SetID(val string) {
 	s.ID = val
@@ -70,6 +82,16 @@ func (s *CreateTalkSessionOK) SetTheme(val string) {
 // SetOwner sets the value of Owner.
 func (s *CreateTalkSessionOK) SetOwner(val CreateTalkSessionOKOwner) {
 	s.Owner = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *CreateTalkSessionOK) SetCreatedAt(val string) {
+	s.CreatedAt = val
+}
+
+// SetFinishedAt sets the value of FinishedAt.
+func (s *CreateTalkSessionOK) SetFinishedAt(val OptString) {
+	s.FinishedAt = val
 }
 
 type CreateTalkSessionOKOwner struct {
@@ -413,9 +435,11 @@ func (s *EditUserProfileReqOccupation) UnmarshalText(data []byte) error {
 }
 
 type GetTalkSessionDetailOK struct {
-	ID    string                      `json:"id"`
-	Theme string                      `json:"theme"`
-	Owner GetTalkSessionDetailOKOwner `json:"owner"`
+	ID         string                      `json:"id"`
+	Theme      string                      `json:"theme"`
+	Owner      GetTalkSessionDetailOKOwner `json:"owner"`
+	CreatedAt  string                      `json:"createdAt"`
+	FinishedAt OptString                   `json:"finishedAt"`
 }
 
 // GetID returns the value of ID.
@@ -433,6 +457,16 @@ func (s *GetTalkSessionDetailOK) GetOwner() GetTalkSessionDetailOKOwner {
 	return s.Owner
 }
 
+// GetCreatedAt returns the value of CreatedAt.
+func (s *GetTalkSessionDetailOK) GetCreatedAt() string {
+	return s.CreatedAt
+}
+
+// GetFinishedAt returns the value of FinishedAt.
+func (s *GetTalkSessionDetailOK) GetFinishedAt() OptString {
+	return s.FinishedAt
+}
+
 // SetID sets the value of ID.
 func (s *GetTalkSessionDetailOK) SetID(val string) {
 	s.ID = val
@@ -446,6 +480,16 @@ func (s *GetTalkSessionDetailOK) SetTheme(val string) {
 // SetOwner sets the value of Owner.
 func (s *GetTalkSessionDetailOK) SetOwner(val GetTalkSessionDetailOKOwner) {
 	s.Owner = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *GetTalkSessionDetailOK) SetCreatedAt(val string) {
+	s.CreatedAt = val
+}
+
+// SetFinishedAt sets the value of FinishedAt.
+func (s *GetTalkSessionDetailOK) SetFinishedAt(val OptString) {
+	s.FinishedAt = val
 }
 
 type GetTalkSessionDetailOKOwner struct {
@@ -484,115 +528,184 @@ func (s *GetTalkSessionDetailOKOwner) SetIconURL(val OptString) {
 	s.IconURL = val
 }
 
-type GetTalkSessionsOK struct {
-	TalkSessions []GetTalkSessionsOKTalkSessionsItem `json:"talkSessions"`
+type GetTalkSessionListInternalServerError struct{}
+
+func (*GetTalkSessionListInternalServerError) getTalkSessionListRes() {}
+
+type GetTalkSessionListOK struct {
+	TalkSessions []GetTalkSessionListOKTalkSessionsItem `json:"talkSessions"`
 }
 
 // GetTalkSessions returns the value of TalkSessions.
-func (s *GetTalkSessionsOK) GetTalkSessions() []GetTalkSessionsOKTalkSessionsItem {
+func (s *GetTalkSessionListOK) GetTalkSessions() []GetTalkSessionListOKTalkSessionsItem {
 	return s.TalkSessions
 }
 
 // SetTalkSessions sets the value of TalkSessions.
-func (s *GetTalkSessionsOK) SetTalkSessions(val []GetTalkSessionsOKTalkSessionsItem) {
+func (s *GetTalkSessionListOK) SetTalkSessions(val []GetTalkSessionListOKTalkSessionsItem) {
 	s.TalkSessions = val
 }
 
-type GetTalkSessionsOKTalkSessionsItem struct {
-	TalkSession  GetTalkSessionsOKTalkSessionsItemTalkSession `json:"talkSession"`
-	OpinionCount int                                          `json:"opinionCount"`
+func (*GetTalkSessionListOK) getTalkSessionListRes() {}
+
+type GetTalkSessionListOKTalkSessionsItem struct {
+	TalkSession  GetTalkSessionListOKTalkSessionsItemTalkSession `json:"talkSession"`
+	OpinionCount int                                             `json:"opinionCount"`
 }
 
 // GetTalkSession returns the value of TalkSession.
-func (s *GetTalkSessionsOKTalkSessionsItem) GetTalkSession() GetTalkSessionsOKTalkSessionsItemTalkSession {
+func (s *GetTalkSessionListOKTalkSessionsItem) GetTalkSession() GetTalkSessionListOKTalkSessionsItemTalkSession {
 	return s.TalkSession
 }
 
 // GetOpinionCount returns the value of OpinionCount.
-func (s *GetTalkSessionsOKTalkSessionsItem) GetOpinionCount() int {
+func (s *GetTalkSessionListOKTalkSessionsItem) GetOpinionCount() int {
 	return s.OpinionCount
 }
 
 // SetTalkSession sets the value of TalkSession.
-func (s *GetTalkSessionsOKTalkSessionsItem) SetTalkSession(val GetTalkSessionsOKTalkSessionsItemTalkSession) {
+func (s *GetTalkSessionListOKTalkSessionsItem) SetTalkSession(val GetTalkSessionListOKTalkSessionsItemTalkSession) {
 	s.TalkSession = val
 }
 
 // SetOpinionCount sets the value of OpinionCount.
-func (s *GetTalkSessionsOKTalkSessionsItem) SetOpinionCount(val int) {
+func (s *GetTalkSessionListOKTalkSessionsItem) SetOpinionCount(val int) {
 	s.OpinionCount = val
 }
 
-type GetTalkSessionsOKTalkSessionsItemTalkSession struct {
-	ID    string                                            `json:"id"`
-	Theme string                                            `json:"theme"`
-	Owner GetTalkSessionsOKTalkSessionsItemTalkSessionOwner `json:"owner"`
+type GetTalkSessionListOKTalkSessionsItemTalkSession struct {
+	ID         string                                               `json:"id"`
+	Theme      string                                               `json:"theme"`
+	Owner      GetTalkSessionListOKTalkSessionsItemTalkSessionOwner `json:"owner"`
+	CreatedAt  string                                               `json:"createdAt"`
+	FinishedAt OptString                                            `json:"finishedAt"`
 }
 
 // GetID returns the value of ID.
-func (s *GetTalkSessionsOKTalkSessionsItemTalkSession) GetID() string {
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetID() string {
 	return s.ID
 }
 
 // GetTheme returns the value of Theme.
-func (s *GetTalkSessionsOKTalkSessionsItemTalkSession) GetTheme() string {
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetTheme() string {
 	return s.Theme
 }
 
 // GetOwner returns the value of Owner.
-func (s *GetTalkSessionsOKTalkSessionsItemTalkSession) GetOwner() GetTalkSessionsOKTalkSessionsItemTalkSessionOwner {
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetOwner() GetTalkSessionListOKTalkSessionsItemTalkSessionOwner {
 	return s.Owner
 }
 
+// GetCreatedAt returns the value of CreatedAt.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetCreatedAt() string {
+	return s.CreatedAt
+}
+
+// GetFinishedAt returns the value of FinishedAt.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetFinishedAt() OptString {
+	return s.FinishedAt
+}
+
 // SetID sets the value of ID.
-func (s *GetTalkSessionsOKTalkSessionsItemTalkSession) SetID(val string) {
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetID(val string) {
 	s.ID = val
 }
 
 // SetTheme sets the value of Theme.
-func (s *GetTalkSessionsOKTalkSessionsItemTalkSession) SetTheme(val string) {
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetTheme(val string) {
 	s.Theme = val
 }
 
 // SetOwner sets the value of Owner.
-func (s *GetTalkSessionsOKTalkSessionsItemTalkSession) SetOwner(val GetTalkSessionsOKTalkSessionsItemTalkSessionOwner) {
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetOwner(val GetTalkSessionListOKTalkSessionsItemTalkSessionOwner) {
 	s.Owner = val
 }
 
-type GetTalkSessionsOKTalkSessionsItemTalkSessionOwner struct {
+// SetCreatedAt sets the value of CreatedAt.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetCreatedAt(val string) {
+	s.CreatedAt = val
+}
+
+// SetFinishedAt sets the value of FinishedAt.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetFinishedAt(val OptString) {
+	s.FinishedAt = val
+}
+
+type GetTalkSessionListOKTalkSessionsItemTalkSessionOwner struct {
 	DisplayID   string    `json:"displayID"`
 	DisplayName string    `json:"displayName"`
 	IconURL     OptString `json:"iconURL"`
 }
 
 // GetDisplayID returns the value of DisplayID.
-func (s *GetTalkSessionsOKTalkSessionsItemTalkSessionOwner) GetDisplayID() string {
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionOwner) GetDisplayID() string {
 	return s.DisplayID
 }
 
 // GetDisplayName returns the value of DisplayName.
-func (s *GetTalkSessionsOKTalkSessionsItemTalkSessionOwner) GetDisplayName() string {
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionOwner) GetDisplayName() string {
 	return s.DisplayName
 }
 
 // GetIconURL returns the value of IconURL.
-func (s *GetTalkSessionsOKTalkSessionsItemTalkSessionOwner) GetIconURL() OptString {
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionOwner) GetIconURL() OptString {
 	return s.IconURL
 }
 
 // SetDisplayID sets the value of DisplayID.
-func (s *GetTalkSessionsOKTalkSessionsItemTalkSessionOwner) SetDisplayID(val string) {
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionOwner) SetDisplayID(val string) {
 	s.DisplayID = val
 }
 
 // SetDisplayName sets the value of DisplayName.
-func (s *GetTalkSessionsOKTalkSessionsItemTalkSessionOwner) SetDisplayName(val string) {
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionOwner) SetDisplayName(val string) {
 	s.DisplayName = val
 }
 
 // SetIconURL sets the value of IconURL.
-func (s *GetTalkSessionsOKTalkSessionsItemTalkSessionOwner) SetIconURL(val OptString) {
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionOwner) SetIconURL(val OptString) {
 	s.IconURL = val
+}
+
+type GetTalkSessionListStatus string
+
+const (
+	GetTalkSessionListStatusOpen     GetTalkSessionListStatus = "open"
+	GetTalkSessionListStatusFinished GetTalkSessionListStatus = "finished"
+)
+
+// AllValues returns all GetTalkSessionListStatus values.
+func (GetTalkSessionListStatus) AllValues() []GetTalkSessionListStatus {
+	return []GetTalkSessionListStatus{
+		GetTalkSessionListStatusOpen,
+		GetTalkSessionListStatusFinished,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s GetTalkSessionListStatus) MarshalText() ([]byte, error) {
+	switch s {
+	case GetTalkSessionListStatusOpen:
+		return []byte(s), nil
+	case GetTalkSessionListStatusFinished:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *GetTalkSessionListStatus) UnmarshalText(data []byte) error {
+	switch GetTalkSessionListStatus(data) {
+	case GetTalkSessionListStatusOpen:
+		*s = GetTalkSessionListStatusOpen
+		return nil
+	case GetTalkSessionListStatusFinished:
+		*s = GetTalkSessionListStatusFinished
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
 type GetTopOpinionsInternalServerError struct{}
@@ -1915,6 +2028,69 @@ func (o OptNilEditUserProfileReqOccupation) Get() (v EditUserProfileReqOccupatio
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilEditUserProfileReqOccupation) Or(d EditUserProfileReqOccupation) EditUserProfileReqOccupation {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilGetTalkSessionListStatus returns new OptNilGetTalkSessionListStatus with value set to v.
+func NewOptNilGetTalkSessionListStatus(v GetTalkSessionListStatus) OptNilGetTalkSessionListStatus {
+	return OptNilGetTalkSessionListStatus{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilGetTalkSessionListStatus is optional nullable GetTalkSessionListStatus.
+type OptNilGetTalkSessionListStatus struct {
+	Value GetTalkSessionListStatus
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilGetTalkSessionListStatus was set.
+func (o OptNilGetTalkSessionListStatus) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilGetTalkSessionListStatus) Reset() {
+	var v GetTalkSessionListStatus
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilGetTalkSessionListStatus) SetTo(v GetTalkSessionListStatus) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilGetTalkSessionListStatus) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilGetTalkSessionListStatus) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v GetTalkSessionListStatus
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilGetTalkSessionListStatus) Get() (v GetTalkSessionListStatus, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilGetTalkSessionListStatus) Or(d GetTalkSessionListStatus) GetTalkSessionListStatus {
 	if v, ok := o.Get(); ok {
 		return v
 	}

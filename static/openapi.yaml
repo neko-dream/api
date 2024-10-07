@@ -54,10 +54,15 @@ paths:
                     required:
                       - displayID
                       - displayName
+                  createdAt:
+                    type: string
+                  finishedAt:
+                    type: string
                 required:
                   - id
                   - theme
                   - owner
+                  - createdAt
       security: []
       x-ogen-operation-group: TalkSession
   /api/talksessions:
@@ -110,10 +115,15 @@ paths:
                     required:
                       - displayID
                       - displayName
+                  createdAt:
+                    type: string
+                  finishedAt:
+                    type: string
                 required:
                   - id
                   - theme
                   - owner
+                  - createdAt
       security:
         - SessionId: []
       x-ogen-operation-group: TalkSession
@@ -121,11 +131,47 @@ paths:
       summary: トークセッションコレクション
       deprecated: false
       description: ''
-      operationId: getTalkSessions
+      operationId: getTalkSessionList
       tags:
         - talk_session
         - TalkSession
-      parameters: []
+      parameters:
+        - name: limit
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: integer
+            nullable: true
+        - name: offset
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: integer
+            nullable: true
+        - name: theme
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+            nullable: true
+        - name: status
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+            enum:
+              - open
+              - finished
+            x-apidog:
+              enumDescriptions:
+                open: 開催中
+                finished: 終了済み
+            default: open
+            nullable: true
       responses:
         '200':
           description: 成功
@@ -165,10 +211,15 @@ paths:
                               required:
                                 - displayID
                                 - displayName
+                            createdAt:
+                              type: string
+                            finishedAt:
+                              type: string
                           required:
                             - id
                             - theme
                             - owner
+                            - createdAt
                         opinionCount:
                           type: integer
                       required:
@@ -176,6 +227,13 @@ paths:
                         - opinionCount
                 required:
                   - talkSessions
+        '500':
+          description: ServerErrorResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
       security: []
       x-ogen-operation-group: TalkSession
   /api/user:
@@ -1178,10 +1236,15 @@ components:
           required:
             - displayID
             - displayName
+        createdAt:
+          type: string
+        finishedAt:
+          type: string
       required:
         - id
         - theme
         - owner
+        - createdAt
   securitySchemes:
     SessionId:
       type: apiKey

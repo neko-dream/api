@@ -108,12 +108,19 @@
                     },
                     "owner": {
                       "$ref": "#/components/schemas/user"
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    },
+                    "finishedAt": {
+                      "type": "string"
                     }
                   },
                   "required": [
                     "id",
                     "theme",
-                    "owner"
+                    "owner",
+                    "createdAt"
                   ]
                 }
               }
@@ -131,12 +138,64 @@
         "summary": "トークセッションコレクション",
         "deprecated": false,
         "description": "",
-        "operationId": "getTalkSessions",
+        "operationId": "getTalkSessionList",
         "tags": [
           "talk_session",
           "TalkSession"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "nullable": true
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "nullable": true
+            }
+          },
+          {
+            "name": "theme",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "open",
+                "finished"
+              ],
+              "x-apidog": {
+                "enumDescriptions": {
+                  "open": "開催中",
+                  "finished": "終了済み"
+                }
+              },
+              "default": "open",
+              "nullable": true
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "成功",
@@ -167,6 +226,17 @@
                   "required": [
                     "talkSessions"
                   ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "ServerErrorResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
                 }
               }
             }
@@ -1070,12 +1140,19 @@
           },
           "owner": {
             "$ref": "#/components/schemas/user"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "finishedAt": {
+            "type": "string"
           }
         },
         "required": [
           "id",
           "theme",
-          "owner"
+          "owner",
+          "createdAt"
         ]
       }
     },

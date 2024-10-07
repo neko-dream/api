@@ -1,0 +1,12 @@
+parser:
+generator:
+  ignore_not_implemented:
+    # - "complex form schema"
+  features:
+    disable:
+      - server/response/validation
+      - debug/example_tests
+      - client/request/validation
+      - paths/client
+      - webhooks/client
+      - webhooks/server

@@ -1,6 +1,9 @@
 package utils
 
-import "github.com/neko-dream/server/internal/presentation/oas"
+import (
+	"github.com/neko-dream/server/internal/presentation/oas"
+	"github.com/samber/lo"
+)
 
 func ToPtrIfNotNullValue[T any](nullFlag bool, value T) *T {
 	if nullFlag {
@@ -19,14 +22,10 @@ func ToPtrIfNotNullFunc[T any](nullFlag bool, getValue func() T) *T {
 
 // 三項演算子
 func IfThenElse[T any](condition bool, thenValue T, elseValue T) T {
-	if condition {
-		return thenValue
-	}
-	return elseValue
+	return lo.If(condition, thenValue).Else(elseValue)
 }
 
 // ogen用のユーティリティ関数
-
 func StringToOptString(s *string) oas.OptString {
 	if s == nil {
 		return oas.OptString{Set: false}

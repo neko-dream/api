@@ -91,12 +91,12 @@ type TalkSessionHandler interface {
 	//
 	// GET /api/talksessions/{talkSessionId}
 	GetTalkSessionDetail(ctx context.Context, params GetTalkSessionDetailParams) (*GetTalkSessionDetailOK, error)
-	// GetTalkSessions implements getTalkSessions operation.
+	// GetTalkSessionList implements getTalkSessionList operation.
 	//
 	// トークセッションコレクション.
 	//
 	// GET /api/talksessions
-	GetTalkSessions(ctx context.Context) (*GetTalkSessionsOK, error)
+	GetTalkSessionList(ctx context.Context, params GetTalkSessionListParams) (GetTalkSessionListRes, error)
 }
 
 // UserHandler handles operations described by OpenAPI v3 specification.

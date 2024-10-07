@@ -560,20 +560,20 @@ func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped b
 	}
 }
 
-// handleGetTalkSessionsRequest handles getTalkSessions operation.
+// handleGetTalkSessionListRequest handles getTalkSessionList operation.
 //
 // トークセッションコレクション.
 //
 // GET /api/talksessions
-func (s *Server) handleGetTalkSessionsRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleGetTalkSessionListRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("getTalkSessions"),
+		otelogen.OperationID("getTalkSessionList"),
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/api/talksessions"),
 	}
 
 	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "GetTalkSessions",
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "GetTalkSessionList",
 		trace.WithAttributes(otelAttrs...),
 		serverSpanKind,
 	)
@@ -602,25 +602,56 @@ func (s *Server) handleGetTalkSessionsRequest(args [0]string, argsEscaped bool, 
 			span.SetStatus(codes.Error, stage)
 			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
 		}
-		err error
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "GetTalkSessionList",
+			ID:   "getTalkSessionList",
+		}
 	)
+	params, err := decodeGetTalkSessionListParams(args, argsEscaped, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		defer recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
 
-	var response *GetTalkSessionsOK
+	var response GetTalkSessionListRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
-			OperationName:    "GetTalkSessions",
+			OperationName:    "GetTalkSessionList",
 			OperationSummary: "トークセッションコレクション",
-			OperationID:      "getTalkSessions",
+			OperationID:      "getTalkSessionList",
 			Body:             nil,
-			Params:           middleware.Parameters{},
-			Raw:              r,
+			Params: middleware.Parameters{
+				{
+					Name: "limit",
+					In:   "query",
+				}: params.Limit,
+				{
+					Name: "offset",
+					In:   "query",
+				}: params.Offset,
+				{
+					Name: "theme",
+					In:   "query",
+				}: params.Theme,
+				{
+					Name: "status",
+					In:   "query",
+				}: params.Status,
+			},
+			Raw: r,
 		}
 
 		type (
 			Request  = struct{}
-			Params   = struct{}
-			Response = *GetTalkSessionsOK
+			Params   = GetTalkSessionListParams
+			Response = GetTalkSessionListRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -629,14 +660,14 @@ func (s *Server) handleGetTalkSessionsRequest(args [0]string, argsEscaped bool, 
 		](
 			m,
 			mreq,
-			nil,
+			unpackGetTalkSessionListParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.GetTalkSessions(ctx)
+				response, err = s.h.GetTalkSessionList(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.GetTalkSessions(ctx)
+		response, err = s.h.GetTalkSessionList(ctx, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -644,7 +675,7 @@ func (s *Server) handleGetTalkSessionsRequest(args [0]string, argsEscaped bool, 
 		return
 	}
 
-	if err := encodeGetTalkSessionsResponse(response, w, span); err != nil {
+	if err := encodeGetTalkSessionListResponse(response, w, span); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)

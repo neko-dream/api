@@ -49,12 +49,12 @@ func (UnimplementedHandler) GetTalkSessionDetail(ctx context.Context, params Get
 	return r, ht.ErrNotImplemented
 }
 
-// GetTalkSessions implements getTalkSessions operation.
+// GetTalkSessionList implements getTalkSessionList operation.
 //
 // トークセッションコレクション.
 //
 // GET /api/talksessions
-func (UnimplementedHandler) GetTalkSessions(ctx context.Context) (r *GetTalkSessionsOK, _ error) {
+func (UnimplementedHandler) GetTalkSessionList(ctx context.Context, params GetTalkSessionListParams) (r GetTalkSessionListRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
