@@ -5,7 +5,6 @@ import (
 	"database/sql"
 
 	"braces.dev/errtrace"
-	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/infrastructure/db"
 	model "github.com/neko-dream/server/internal/infrastructure/db/sqlc"
@@ -46,11 +45,6 @@ func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talkses
 	}
 
 	return nil
-}
-
-// FindByID implements talksession.TalkSessionRepository.
-func (t *talkSessionRepository) FindByID(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession]) (*talksession.TalkSession, error) {
-	panic("unimplemented")
 }
 
 // Update implements talksession.TalkSessionRepository.
