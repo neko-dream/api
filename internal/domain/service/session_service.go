@@ -56,7 +56,6 @@ func (s *sessionService) RefreshSession(
 		}
 
 		// 最終アクティビティを更新
-		sess.UpdateLastActivity()
 		sess.Deactivate()
 		if _, err := s.sessionRepository.Update(ctx, sess); err != nil {
 			return nil, errtrace.Wrap(err)

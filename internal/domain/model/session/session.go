@@ -100,6 +100,7 @@ func (s *Session) IsActive() bool {
 
 func (s *Session) Deactivate() {
 	s.status = SESSION_INACTIVE
+	s.UpdateLastActivity()
 }
 
 func (s *Session) ExpiresAt() time.Time {
