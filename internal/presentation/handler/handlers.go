@@ -10,6 +10,7 @@ type handlers struct {
 	oas.OpinionHandler
 	oas.TalkSessionHandler
 	oas.UserHandler
+	oas.TestHandler
 }
 
 func NewHandler(
@@ -25,5 +26,6 @@ func NewHandler(
 		OpinionHandler:     opinionHandler,
 		TalkSessionHandler: talkSessionHandler,
 		UserHandler:        userHandler,
+		TestHandler:        oas.UnimplementedHandler{},
 	}
 }
