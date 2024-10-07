@@ -26,9 +26,8 @@ func NewAuthHandler(
 	}
 }
 
-// AuthLogin implements oas.AuthHandler.
-func (a *authHandler) AuthLogin(ctx context.Context, params oas.AuthLoginParams) (*oas.AuthLoginFound, error) {
-
+// Authorize implements oas.AuthHandler.
+func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams) (*oas.AuthorizeFound, error) {
 	out, err := a.AuthLoginUseCase.Execute(ctx, auth_usecase.AuthLoginInput{
 		RedirectURL: params.RedirectURL,
 		Provider:    params.Provider,
@@ -37,7 +36,7 @@ func (a *authHandler) AuthLogin(ctx context.Context, params oas.AuthLoginParams)
 		return nil, err
 	}
 
-	res := new(oas.AuthLoginFound)
+	res := new(oas.AuthorizeFound)
 	res.SetLocation(oas.NewOptURI(*out.RedirectURL))
 	w := http_utils.GetHTTPResponse(ctx)
 	for _, c := range out.Cookies {
