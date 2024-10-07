@@ -67,16 +67,28 @@ func NewClaimFromMap(claims jwt.MapClaims) Claim {
 	}
 }
 
-func (c *Claim) IsExpired() bool {
-	return time.Now().Unix() > c.Exp
-}
-
 func (c *Claim) UserID() (shared.UUID[user.User], error) {
 	return shared.ParseUUID[user.User](c.Sub)
 }
-
 func (c *Claim) SessionID() (shared.UUID[Session], error) {
 	return shared.ParseUUID[Session](c.Jti)
+}
+
+func (c *Claim) Audience() string {
+	return Audience
+}
+func (c *Claim) Issuer() string {
+	return Issuer
+}
+
+func (c *Claim) IsExpired() bool {
+	return time.Now().Unix() > c.Exp
+}
+func (c *Claim) IssueAt() time.Time {
+	return time.Unix(c.Iat, 0)
+}
+func (c *Claim) ExpiresAt() time.Time {
+	return time.Unix(c.Exp, 0)
 }
 
 const (
