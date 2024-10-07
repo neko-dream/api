@@ -83,19 +83,66 @@ func (q *Queries) EditTalkSession(ctx context.Context, arg EditTalkSessionParams
 }
 
 const getTalkSessionByID = `-- name: GetTalkSessionByID :one
-SELECT talk_session_id, owner_id, theme, scheduled_end_time, finished_at, created_at FROM talk_sessions WHERE talk_session_id = $1
+SELECT
+    talk_sessions.talk_session_id,
+    talk_sessions.theme,
+    talk_sessions.finished_at,
+    talk_sessions.created_at,
+    talk_sessions.scheduled_end_time,
+    COALESCE(oc.opinion_count, 0) AS opinion_count,
+    users.display_name AS display_name,
+    users.display_id AS display_id,
+    users.icon_url AS icon_url,
+    ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))) AS latitude,
+    ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))) AS longitude,
+    talk_session_locations.city AS city,
+    talk_session_locations.prefecture AS prefecture
+FROM talk_sessions
+LEFT JOIN users
+    ON talk_sessions.owner_id = users.user_id
+LEFT JOIN (
+    SELECT opinions.talk_session_id, COUNT(opinions.opinion_id) AS opinion_count
+    FROM opinions
+    GROUP BY opinions.talk_session_id
+) oc ON talk_sessions.talk_session_id = oc.talk_session_id
+LEFT JOIN talk_session_locations
+    ON talk_sessions.talk_session_id = talk_session_locations.talk_session_id
+WHERE talk_sessions.talk_session_id = $1
 `
 
-func (q *Queries) GetTalkSessionByID(ctx context.Context, talkSessionID uuid.UUID) (TalkSession, error) {
+type GetTalkSessionByIDRow struct {
+	TalkSessionID    uuid.UUID
+	Theme            string
+	FinishedAt       sql.NullTime
+	CreatedAt        time.Time
+	ScheduledEndTime time.Time
+	OpinionCount     int64
+	DisplayName      sql.NullString
+	DisplayID        sql.NullString
+	IconUrl          sql.NullString
+	Latitude         interface{}
+	Longitude        interface{}
+	City             sql.NullString
+	Prefecture       sql.NullString
+}
+
+func (q *Queries) GetTalkSessionByID(ctx context.Context, talkSessionID uuid.UUID) (GetTalkSessionByIDRow, error) {
 	row := q.db.QueryRowContext(ctx, getTalkSessionByID, talkSessionID)
-	var i TalkSession
+	var i GetTalkSessionByIDRow
 	err := row.Scan(
 		&i.TalkSessionID,
-		&i.OwnerID,
 		&i.Theme,
-		&i.ScheduledEndTime,
 		&i.FinishedAt,
 		&i.CreatedAt,
+		&i.ScheduledEndTime,
+		&i.OpinionCount,
+		&i.DisplayName,
+		&i.DisplayID,
+		&i.IconUrl,
+		&i.Latitude,
+		&i.Longitude,
+		&i.City,
+		&i.Prefecture,
 	)
 	return i, err
 }

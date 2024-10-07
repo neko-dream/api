@@ -21,6 +21,10 @@ func (t Time) Format(ctx context.Context) string {
 	return t.FormatWithLayout(ctx, time.RFC3339)
 }
 
+func (t Time) Add(ctx context.Context, d time.Duration) Time {
+	return Time{t.Time.Add(d)}
+}
+
 func Now(ctx context.Context) Time {
 	return Time{time.Now()}
 }
@@ -36,3 +40,13 @@ func ParseWithLayout(ctx context.Context, str string, layout string) *Time {
 	}
 	return &Time{t}
 }
+
+const (
+	Second = time.Second
+	Minute = time.Minute
+	Hour   = time.Hour
+	Day    = 24 * time.Hour
+	Week   = 7 * Day
+	Month  = 30 * Day
+	Year   = 365 * Day
+)

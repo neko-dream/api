@@ -1,5 +1,4 @@
-
-
+CREATE EXTENSION IF NOT EXISTS postgis;
 CREATE TABLE "users" (
   "user_id" uuid PRIMARY KEY,
   "display_id" varchar,
