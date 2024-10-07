@@ -50,6 +50,8 @@ type CreateTalkSessionOK struct {
 	FinishedAt OptString `json:"finishedAt"`
 	// 終了予定日時.
 	ScheduledEndTime string `json:"scheduledEndTime"`
+	// 位置情報.
+	Location OptCreateTalkSessionOKLocation `json:"location"`
 }
 
 // GetID returns the value of ID.
@@ -82,6 +84,11 @@ func (s *CreateTalkSessionOK) GetScheduledEndTime() string {
 	return s.ScheduledEndTime
 }
 
+// GetLocation returns the value of Location.
+func (s *CreateTalkSessionOK) GetLocation() OptCreateTalkSessionOKLocation {
+	return s.Location
+}
+
 // SetID sets the value of ID.
 func (s *CreateTalkSessionOK) SetID(val string) {
 	s.ID = val
@@ -110,6 +117,129 @@ func (s *CreateTalkSessionOK) SetFinishedAt(val OptString) {
 // SetScheduledEndTime sets the value of ScheduledEndTime.
 func (s *CreateTalkSessionOK) SetScheduledEndTime(val string) {
 	s.ScheduledEndTime = val
+}
+
+// SetLocation sets the value of Location.
+func (s *CreateTalkSessionOK) SetLocation(val OptCreateTalkSessionOKLocation) {
+	s.Location = val
+}
+
+// 位置情報.
+// CreateTalkSessionOKLocation represents sum type.
+type CreateTalkSessionOKLocation struct {
+	Type                         CreateTalkSessionOKLocationType // switch on this field
+	CreateTalkSessionOKLocation0 CreateTalkSessionOKLocation0
+	Null                         struct{}
+}
+
+// CreateTalkSessionOKLocationType is oneOf type of CreateTalkSessionOKLocation.
+type CreateTalkSessionOKLocationType string
+
+// Possible values for CreateTalkSessionOKLocationType.
+const (
+	CreateTalkSessionOKLocation0CreateTalkSessionOKLocation CreateTalkSessionOKLocationType = "CreateTalkSessionOKLocation0"
+	NullCreateTalkSessionOKLocation                         CreateTalkSessionOKLocationType = "struct{}"
+)
+
+// IsCreateTalkSessionOKLocation0 reports whether CreateTalkSessionOKLocation is CreateTalkSessionOKLocation0.
+func (s CreateTalkSessionOKLocation) IsCreateTalkSessionOKLocation0() bool {
+	return s.Type == CreateTalkSessionOKLocation0CreateTalkSessionOKLocation
+}
+
+// IsNull reports whether CreateTalkSessionOKLocation is struct{}.
+func (s CreateTalkSessionOKLocation) IsNull() bool { return s.Type == NullCreateTalkSessionOKLocation }
+
+// SetCreateTalkSessionOKLocation0 sets CreateTalkSessionOKLocation to CreateTalkSessionOKLocation0.
+func (s *CreateTalkSessionOKLocation) SetCreateTalkSessionOKLocation0(v CreateTalkSessionOKLocation0) {
+	s.Type = CreateTalkSessionOKLocation0CreateTalkSessionOKLocation
+	s.CreateTalkSessionOKLocation0 = v
+}
+
+// GetCreateTalkSessionOKLocation0 returns CreateTalkSessionOKLocation0 and true boolean if CreateTalkSessionOKLocation is CreateTalkSessionOKLocation0.
+func (s CreateTalkSessionOKLocation) GetCreateTalkSessionOKLocation0() (v CreateTalkSessionOKLocation0, ok bool) {
+	if !s.IsCreateTalkSessionOKLocation0() {
+		return v, false
+	}
+	return s.CreateTalkSessionOKLocation0, true
+}
+
+// NewCreateTalkSessionOKLocation0CreateTalkSessionOKLocation returns new CreateTalkSessionOKLocation from CreateTalkSessionOKLocation0.
+func NewCreateTalkSessionOKLocation0CreateTalkSessionOKLocation(v CreateTalkSessionOKLocation0) CreateTalkSessionOKLocation {
+	var s CreateTalkSessionOKLocation
+	s.SetCreateTalkSessionOKLocation0(v)
+	return s
+}
+
+// SetNull sets CreateTalkSessionOKLocation to struct{}.
+func (s *CreateTalkSessionOKLocation) SetNull(v struct{}) {
+	s.Type = NullCreateTalkSessionOKLocation
+	s.Null = v
+}
+
+// GetNull returns struct{} and true boolean if CreateTalkSessionOKLocation is struct{}.
+func (s CreateTalkSessionOKLocation) GetNull() (v struct{}, ok bool) {
+	if !s.IsNull() {
+		return v, false
+	}
+	return s.Null, true
+}
+
+// NewNullCreateTalkSessionOKLocation returns new CreateTalkSessionOKLocation from struct{}.
+func NewNullCreateTalkSessionOKLocation(v struct{}) CreateTalkSessionOKLocation {
+	var s CreateTalkSessionOKLocation
+	s.SetNull(v)
+	return s
+}
+
+type CreateTalkSessionOKLocation0 struct {
+	// 緯度.
+	Latitude float64 `json:"latitude"`
+	// 経度.
+	Longitude float64 `json:"longitude"`
+	// 都道府県.
+	Prefecture string `json:"prefecture"`
+	// 市区町村.
+	City string `json:"city"`
+}
+
+// GetLatitude returns the value of Latitude.
+func (s *CreateTalkSessionOKLocation0) GetLatitude() float64 {
+	return s.Latitude
+}
+
+// GetLongitude returns the value of Longitude.
+func (s *CreateTalkSessionOKLocation0) GetLongitude() float64 {
+	return s.Longitude
+}
+
+// GetPrefecture returns the value of Prefecture.
+func (s *CreateTalkSessionOKLocation0) GetPrefecture() string {
+	return s.Prefecture
+}
+
+// GetCity returns the value of City.
+func (s *CreateTalkSessionOKLocation0) GetCity() string {
+	return s.City
+}
+
+// SetLatitude sets the value of Latitude.
+func (s *CreateTalkSessionOKLocation0) SetLatitude(val float64) {
+	s.Latitude = val
+}
+
+// SetLongitude sets the value of Longitude.
+func (s *CreateTalkSessionOKLocation0) SetLongitude(val float64) {
+	s.Longitude = val
+}
+
+// SetPrefecture sets the value of Prefecture.
+func (s *CreateTalkSessionOKLocation0) SetPrefecture(val string) {
+	s.Prefecture = val
+}
+
+// SetCity sets the value of City.
+func (s *CreateTalkSessionOKLocation0) SetCity(val string) {
+	s.City = val
 }
 
 // 作成ユーザー.
@@ -152,6 +282,10 @@ func (s *CreateTalkSessionOKOwner) SetIconURL(val OptString) {
 type CreateTalkSessionReq struct {
 	Theme            string    `json:"theme"`
 	ScheduledEndTime time.Time `json:"scheduledEndTime"`
+	// 緯度.
+	Latitude OptNilFloat64 `json:"latitude"`
+	// 経度.
+	Longitude OptNilFloat64 `json:"longitude"`
 }
 
 // GetTheme returns the value of Theme.
@@ -164,6 +298,16 @@ func (s *CreateTalkSessionReq) GetScheduledEndTime() time.Time {
 	return s.ScheduledEndTime
 }
 
+// GetLatitude returns the value of Latitude.
+func (s *CreateTalkSessionReq) GetLatitude() OptNilFloat64 {
+	return s.Latitude
+}
+
+// GetLongitude returns the value of Longitude.
+func (s *CreateTalkSessionReq) GetLongitude() OptNilFloat64 {
+	return s.Longitude
+}
+
 // SetTheme sets the value of Theme.
 func (s *CreateTalkSessionReq) SetTheme(val string) {
 	s.Theme = val
@@ -172,6 +316,16 @@ func (s *CreateTalkSessionReq) SetTheme(val string) {
 // SetScheduledEndTime sets the value of ScheduledEndTime.
 func (s *CreateTalkSessionReq) SetScheduledEndTime(val time.Time) {
 	s.ScheduledEndTime = val
+}
+
+// SetLatitude sets the value of Latitude.
+func (s *CreateTalkSessionReq) SetLatitude(val OptNilFloat64) {
+	s.Latitude = val
+}
+
+// SetLongitude sets the value of Longitude.
+func (s *CreateTalkSessionReq) SetLongitude(val OptNilFloat64) {
+	s.Longitude = val
 }
 
 type EditUserProfileInternalServerError struct{}
@@ -477,6 +631,8 @@ type GetTalkSessionDetailOK struct {
 	FinishedAt OptString `json:"finishedAt"`
 	// 終了予定日時.
 	ScheduledEndTime string `json:"scheduledEndTime"`
+	// 位置情報.
+	Location OptGetTalkSessionDetailOKLocation `json:"location"`
 }
 
 // GetID returns the value of ID.
@@ -509,6 +665,11 @@ func (s *GetTalkSessionDetailOK) GetScheduledEndTime() string {
 	return s.ScheduledEndTime
 }
 
+// GetLocation returns the value of Location.
+func (s *GetTalkSessionDetailOK) GetLocation() OptGetTalkSessionDetailOKLocation {
+	return s.Location
+}
+
 // SetID sets the value of ID.
 func (s *GetTalkSessionDetailOK) SetID(val string) {
 	s.ID = val
@@ -537,6 +698,131 @@ func (s *GetTalkSessionDetailOK) SetFinishedAt(val OptString) {
 // SetScheduledEndTime sets the value of ScheduledEndTime.
 func (s *GetTalkSessionDetailOK) SetScheduledEndTime(val string) {
 	s.ScheduledEndTime = val
+}
+
+// SetLocation sets the value of Location.
+func (s *GetTalkSessionDetailOK) SetLocation(val OptGetTalkSessionDetailOKLocation) {
+	s.Location = val
+}
+
+// 位置情報.
+// GetTalkSessionDetailOKLocation represents sum type.
+type GetTalkSessionDetailOKLocation struct {
+	Type                            GetTalkSessionDetailOKLocationType // switch on this field
+	GetTalkSessionDetailOKLocation0 GetTalkSessionDetailOKLocation0
+	Null                            struct{}
+}
+
+// GetTalkSessionDetailOKLocationType is oneOf type of GetTalkSessionDetailOKLocation.
+type GetTalkSessionDetailOKLocationType string
+
+// Possible values for GetTalkSessionDetailOKLocationType.
+const (
+	GetTalkSessionDetailOKLocation0GetTalkSessionDetailOKLocation GetTalkSessionDetailOKLocationType = "GetTalkSessionDetailOKLocation0"
+	NullGetTalkSessionDetailOKLocation                            GetTalkSessionDetailOKLocationType = "struct{}"
+)
+
+// IsGetTalkSessionDetailOKLocation0 reports whether GetTalkSessionDetailOKLocation is GetTalkSessionDetailOKLocation0.
+func (s GetTalkSessionDetailOKLocation) IsGetTalkSessionDetailOKLocation0() bool {
+	return s.Type == GetTalkSessionDetailOKLocation0GetTalkSessionDetailOKLocation
+}
+
+// IsNull reports whether GetTalkSessionDetailOKLocation is struct{}.
+func (s GetTalkSessionDetailOKLocation) IsNull() bool {
+	return s.Type == NullGetTalkSessionDetailOKLocation
+}
+
+// SetGetTalkSessionDetailOKLocation0 sets GetTalkSessionDetailOKLocation to GetTalkSessionDetailOKLocation0.
+func (s *GetTalkSessionDetailOKLocation) SetGetTalkSessionDetailOKLocation0(v GetTalkSessionDetailOKLocation0) {
+	s.Type = GetTalkSessionDetailOKLocation0GetTalkSessionDetailOKLocation
+	s.GetTalkSessionDetailOKLocation0 = v
+}
+
+// GetGetTalkSessionDetailOKLocation0 returns GetTalkSessionDetailOKLocation0 and true boolean if GetTalkSessionDetailOKLocation is GetTalkSessionDetailOKLocation0.
+func (s GetTalkSessionDetailOKLocation) GetGetTalkSessionDetailOKLocation0() (v GetTalkSessionDetailOKLocation0, ok bool) {
+	if !s.IsGetTalkSessionDetailOKLocation0() {
+		return v, false
+	}
+	return s.GetTalkSessionDetailOKLocation0, true
+}
+
+// NewGetTalkSessionDetailOKLocation0GetTalkSessionDetailOKLocation returns new GetTalkSessionDetailOKLocation from GetTalkSessionDetailOKLocation0.
+func NewGetTalkSessionDetailOKLocation0GetTalkSessionDetailOKLocation(v GetTalkSessionDetailOKLocation0) GetTalkSessionDetailOKLocation {
+	var s GetTalkSessionDetailOKLocation
+	s.SetGetTalkSessionDetailOKLocation0(v)
+	return s
+}
+
+// SetNull sets GetTalkSessionDetailOKLocation to struct{}.
+func (s *GetTalkSessionDetailOKLocation) SetNull(v struct{}) {
+	s.Type = NullGetTalkSessionDetailOKLocation
+	s.Null = v
+}
+
+// GetNull returns struct{} and true boolean if GetTalkSessionDetailOKLocation is struct{}.
+func (s GetTalkSessionDetailOKLocation) GetNull() (v struct{}, ok bool) {
+	if !s.IsNull() {
+		return v, false
+	}
+	return s.Null, true
+}
+
+// NewNullGetTalkSessionDetailOKLocation returns new GetTalkSessionDetailOKLocation from struct{}.
+func NewNullGetTalkSessionDetailOKLocation(v struct{}) GetTalkSessionDetailOKLocation {
+	var s GetTalkSessionDetailOKLocation
+	s.SetNull(v)
+	return s
+}
+
+type GetTalkSessionDetailOKLocation0 struct {
+	// 緯度.
+	Latitude float64 `json:"latitude"`
+	// 経度.
+	Longitude float64 `json:"longitude"`
+	// 都道府県.
+	Prefecture string `json:"prefecture"`
+	// 市区町村.
+	City string `json:"city"`
+}
+
+// GetLatitude returns the value of Latitude.
+func (s *GetTalkSessionDetailOKLocation0) GetLatitude() float64 {
+	return s.Latitude
+}
+
+// GetLongitude returns the value of Longitude.
+func (s *GetTalkSessionDetailOKLocation0) GetLongitude() float64 {
+	return s.Longitude
+}
+
+// GetPrefecture returns the value of Prefecture.
+func (s *GetTalkSessionDetailOKLocation0) GetPrefecture() string {
+	return s.Prefecture
+}
+
+// GetCity returns the value of City.
+func (s *GetTalkSessionDetailOKLocation0) GetCity() string {
+	return s.City
+}
+
+// SetLatitude sets the value of Latitude.
+func (s *GetTalkSessionDetailOKLocation0) SetLatitude(val float64) {
+	s.Latitude = val
+}
+
+// SetLongitude sets the value of Longitude.
+func (s *GetTalkSessionDetailOKLocation0) SetLongitude(val float64) {
+	s.Longitude = val
+}
+
+// SetPrefecture sets the value of Prefecture.
+func (s *GetTalkSessionDetailOKLocation0) SetPrefecture(val string) {
+	s.Prefecture = val
+}
+
+// SetCity sets the value of City.
+func (s *GetTalkSessionDetailOKLocation0) SetCity(val string) {
+	s.City = val
 }
 
 // 作成ユーザー.
@@ -634,6 +920,8 @@ type GetTalkSessionListOKTalkSessionsItemTalkSession struct {
 	FinishedAt OptString `json:"finishedAt"`
 	// 終了予定日時.
 	ScheduledEndTime string `json:"scheduledEndTime"`
+	// 位置情報.
+	Location OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation `json:"location"`
 }
 
 // GetID returns the value of ID.
@@ -666,6 +954,11 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetScheduledEndTime() 
 	return s.ScheduledEndTime
 }
 
+// GetLocation returns the value of Location.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetLocation() OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation {
+	return s.Location
+}
+
 // SetID sets the value of ID.
 func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetID(val string) {
 	s.ID = val
@@ -694,6 +987,131 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetFinishedAt(val OptS
 // SetScheduledEndTime sets the value of ScheduledEndTime.
 func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetScheduledEndTime(val string) {
 	s.ScheduledEndTime = val
+}
+
+// SetLocation sets the value of Location.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetLocation(val OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation) {
+	s.Location = val
+}
+
+// 位置情報.
+// GetTalkSessionListOKTalkSessionsItemTalkSessionLocation represents sum type.
+type GetTalkSessionListOKTalkSessionsItemTalkSessionLocation struct {
+	Type                                                     GetTalkSessionListOKTalkSessionsItemTalkSessionLocationType // switch on this field
+	GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0 GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0
+	Null                                                     struct{}
+}
+
+// GetTalkSessionListOKTalkSessionsItemTalkSessionLocationType is oneOf type of GetTalkSessionListOKTalkSessionsItemTalkSessionLocation.
+type GetTalkSessionListOKTalkSessionsItemTalkSessionLocationType string
+
+// Possible values for GetTalkSessionListOKTalkSessionsItemTalkSessionLocationType.
+const (
+	GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0GetTalkSessionListOKTalkSessionsItemTalkSessionLocation GetTalkSessionListOKTalkSessionsItemTalkSessionLocationType = "GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0"
+	NullGetTalkSessionListOKTalkSessionsItemTalkSessionLocation                                                     GetTalkSessionListOKTalkSessionsItemTalkSessionLocationType = "struct{}"
+)
+
+// IsGetTalkSessionListOKTalkSessionsItemTalkSessionLocation0 reports whether GetTalkSessionListOKTalkSessionsItemTalkSessionLocation is GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0.
+func (s GetTalkSessionListOKTalkSessionsItemTalkSessionLocation) IsGetTalkSessionListOKTalkSessionsItemTalkSessionLocation0() bool {
+	return s.Type == GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0GetTalkSessionListOKTalkSessionsItemTalkSessionLocation
+}
+
+// IsNull reports whether GetTalkSessionListOKTalkSessionsItemTalkSessionLocation is struct{}.
+func (s GetTalkSessionListOKTalkSessionsItemTalkSessionLocation) IsNull() bool {
+	return s.Type == NullGetTalkSessionListOKTalkSessionsItemTalkSessionLocation
+}
+
+// SetGetTalkSessionListOKTalkSessionsItemTalkSessionLocation0 sets GetTalkSessionListOKTalkSessionsItemTalkSessionLocation to GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation) SetGetTalkSessionListOKTalkSessionsItemTalkSessionLocation0(v GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) {
+	s.Type = GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0GetTalkSessionListOKTalkSessionsItemTalkSessionLocation
+	s.GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0 = v
+}
+
+// GetGetTalkSessionListOKTalkSessionsItemTalkSessionLocation0 returns GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0 and true boolean if GetTalkSessionListOKTalkSessionsItemTalkSessionLocation is GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0.
+func (s GetTalkSessionListOKTalkSessionsItemTalkSessionLocation) GetGetTalkSessionListOKTalkSessionsItemTalkSessionLocation0() (v GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0, ok bool) {
+	if !s.IsGetTalkSessionListOKTalkSessionsItemTalkSessionLocation0() {
+		return v, false
+	}
+	return s.GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0, true
+}
+
+// NewGetTalkSessionListOKTalkSessionsItemTalkSessionLocation0GetTalkSessionListOKTalkSessionsItemTalkSessionLocation returns new GetTalkSessionListOKTalkSessionsItemTalkSessionLocation from GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0.
+func NewGetTalkSessionListOKTalkSessionsItemTalkSessionLocation0GetTalkSessionListOKTalkSessionsItemTalkSessionLocation(v GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) GetTalkSessionListOKTalkSessionsItemTalkSessionLocation {
+	var s GetTalkSessionListOKTalkSessionsItemTalkSessionLocation
+	s.SetGetTalkSessionListOKTalkSessionsItemTalkSessionLocation0(v)
+	return s
+}
+
+// SetNull sets GetTalkSessionListOKTalkSessionsItemTalkSessionLocation to struct{}.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation) SetNull(v struct{}) {
+	s.Type = NullGetTalkSessionListOKTalkSessionsItemTalkSessionLocation
+	s.Null = v
+}
+
+// GetNull returns struct{} and true boolean if GetTalkSessionListOKTalkSessionsItemTalkSessionLocation is struct{}.
+func (s GetTalkSessionListOKTalkSessionsItemTalkSessionLocation) GetNull() (v struct{}, ok bool) {
+	if !s.IsNull() {
+		return v, false
+	}
+	return s.Null, true
+}
+
+// NewNullGetTalkSessionListOKTalkSessionsItemTalkSessionLocation returns new GetTalkSessionListOKTalkSessionsItemTalkSessionLocation from struct{}.
+func NewNullGetTalkSessionListOKTalkSessionsItemTalkSessionLocation(v struct{}) GetTalkSessionListOKTalkSessionsItemTalkSessionLocation {
+	var s GetTalkSessionListOKTalkSessionsItemTalkSessionLocation
+	s.SetNull(v)
+	return s
+}
+
+type GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0 struct {
+	// 緯度.
+	Latitude float64 `json:"latitude"`
+	// 経度.
+	Longitude float64 `json:"longitude"`
+	// 都道府県.
+	Prefecture string `json:"prefecture"`
+	// 市区町村.
+	City string `json:"city"`
+}
+
+// GetLatitude returns the value of Latitude.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) GetLatitude() float64 {
+	return s.Latitude
+}
+
+// GetLongitude returns the value of Longitude.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) GetLongitude() float64 {
+	return s.Longitude
+}
+
+// GetPrefecture returns the value of Prefecture.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) GetPrefecture() string {
+	return s.Prefecture
+}
+
+// GetCity returns the value of City.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) GetCity() string {
+	return s.City
+}
+
+// SetLatitude sets the value of Latitude.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) SetLatitude(val float64) {
+	s.Latitude = val
+}
+
+// SetLongitude sets the value of Longitude.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) SetLongitude(val float64) {
+	s.Longitude = val
+}
+
+// SetPrefecture sets the value of Prefecture.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) SetPrefecture(val string) {
+	s.Prefecture = val
+}
+
+// SetCity sets the value of City.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) SetCity(val string) {
+	s.City = val
 }
 
 // 作成ユーザー.
@@ -1974,6 +2392,52 @@ func (o OptBool) Or(d bool) bool {
 	return d
 }
 
+// NewOptCreateTalkSessionOKLocation returns new OptCreateTalkSessionOKLocation with value set to v.
+func NewOptCreateTalkSessionOKLocation(v CreateTalkSessionOKLocation) OptCreateTalkSessionOKLocation {
+	return OptCreateTalkSessionOKLocation{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptCreateTalkSessionOKLocation is optional CreateTalkSessionOKLocation.
+type OptCreateTalkSessionOKLocation struct {
+	Value CreateTalkSessionOKLocation
+	Set   bool
+}
+
+// IsSet returns true if OptCreateTalkSessionOKLocation was set.
+func (o OptCreateTalkSessionOKLocation) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptCreateTalkSessionOKLocation) Reset() {
+	var v CreateTalkSessionOKLocation
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptCreateTalkSessionOKLocation) SetTo(v CreateTalkSessionOKLocation) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptCreateTalkSessionOKLocation) Get() (v CreateTalkSessionOKLocation, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptCreateTalkSessionOKLocation) Or(d CreateTalkSessionOKLocation) CreateTalkSessionOKLocation {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptCreateTalkSessionReq returns new OptCreateTalkSessionReq with value set to v.
 func NewOptCreateTalkSessionReq(v CreateTalkSessionReq) OptCreateTalkSessionReq {
 	return OptCreateTalkSessionReq{
@@ -2060,6 +2524,98 @@ func (o OptEditUserProfileReq) Get() (v EditUserProfileReq, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptEditUserProfileReq) Or(d EditUserProfileReq) EditUserProfileReq {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptGetTalkSessionDetailOKLocation returns new OptGetTalkSessionDetailOKLocation with value set to v.
+func NewOptGetTalkSessionDetailOKLocation(v GetTalkSessionDetailOKLocation) OptGetTalkSessionDetailOKLocation {
+	return OptGetTalkSessionDetailOKLocation{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptGetTalkSessionDetailOKLocation is optional GetTalkSessionDetailOKLocation.
+type OptGetTalkSessionDetailOKLocation struct {
+	Value GetTalkSessionDetailOKLocation
+	Set   bool
+}
+
+// IsSet returns true if OptGetTalkSessionDetailOKLocation was set.
+func (o OptGetTalkSessionDetailOKLocation) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptGetTalkSessionDetailOKLocation) Reset() {
+	var v GetTalkSessionDetailOKLocation
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptGetTalkSessionDetailOKLocation) SetTo(v GetTalkSessionDetailOKLocation) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptGetTalkSessionDetailOKLocation) Get() (v GetTalkSessionDetailOKLocation, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptGetTalkSessionDetailOKLocation) Or(d GetTalkSessionDetailOKLocation) GetTalkSessionDetailOKLocation {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation returns new OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation with value set to v.
+func NewOptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation(v GetTalkSessionListOKTalkSessionsItemTalkSessionLocation) OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation {
+	return OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation is optional GetTalkSessionListOKTalkSessionsItemTalkSessionLocation.
+type OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation struct {
+	Value GetTalkSessionListOKTalkSessionsItemTalkSessionLocation
+	Set   bool
+}
+
+// IsSet returns true if OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation was set.
+func (o OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation) Reset() {
+	var v GetTalkSessionListOKTalkSessionsItemTalkSessionLocation
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation) SetTo(v GetTalkSessionListOKTalkSessionsItemTalkSessionLocation) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation) Get() (v GetTalkSessionListOKTalkSessionsItemTalkSessionLocation, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation) Or(d GetTalkSessionListOKTalkSessionsItemTalkSessionLocation) GetTalkSessionListOKTalkSessionsItemTalkSessionLocation {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -2387,6 +2943,69 @@ func (o OptNilEditUserProfileReqOccupation) Get() (v EditUserProfileReqOccupatio
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilEditUserProfileReqOccupation) Or(d EditUserProfileReqOccupation) EditUserProfileReqOccupation {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilFloat64 returns new OptNilFloat64 with value set to v.
+func NewOptNilFloat64(v float64) OptNilFloat64 {
+	return OptNilFloat64{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilFloat64 is optional nullable float64.
+type OptNilFloat64 struct {
+	Value float64
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilFloat64 was set.
+func (o OptNilFloat64) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilFloat64) Reset() {
+	var v float64
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilFloat64) SetTo(v float64) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilFloat64) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilFloat64) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v float64
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilFloat64) Get() (v float64, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilFloat64) Or(d float64) float64 {
 	if v, ok := o.Get(); ok {
 		return v
 	}

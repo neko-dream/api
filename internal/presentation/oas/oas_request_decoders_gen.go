@@ -127,6 +127,100 @@ func (s *Server) decodeCreateTalkSessionRequest(r *http.Request) (
 					return req, close, errors.Wrap(err, "query")
 				}
 			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "latitude",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotLatitudeVal float64
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToFloat64(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotLatitudeVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.Latitude.SetTo(optFormDotLatitudeVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"latitude\"")
+					}
+					if err := func() error {
+						if value, ok := optForm.Latitude.Get(); ok {
+							if err := func() error {
+								if err := (validate.Float{}).Validate(float64(value)); err != nil {
+									return errors.Wrap(err, "float")
+								}
+								return nil
+							}(); err != nil {
+								return err
+							}
+						}
+						return nil
+					}(); err != nil {
+						return req, close, errors.Wrap(err, "validate")
+					}
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "longitude",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotLongitudeVal float64
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToFloat64(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotLongitudeVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.Longitude.SetTo(optFormDotLongitudeVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"longitude\"")
+					}
+					if err := func() error {
+						if value, ok := optForm.Longitude.Get(); ok {
+							if err := func() error {
+								if err := (validate.Float{}).Validate(float64(value)); err != nil {
+									return errors.Wrap(err, "float")
+								}
+								return nil
+							}(); err != nil {
+								return err
+							}
+						}
+						return nil
+					}(); err != nil {
+						return req, close, errors.Wrap(err, "validate")
+					}
+				}
+			}
 			request = OptCreateTalkSessionReq{
 				Value: optForm,
 				Set:   true,
