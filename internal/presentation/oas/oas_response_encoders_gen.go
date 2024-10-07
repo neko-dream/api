@@ -14,7 +14,7 @@ import (
 	"github.com/ogen-go/ogen/uri"
 )
 
-func encodeAuthLoginResponse(response *AuthLoginFound, w http.ResponseWriter, span trace.Span) error {
+func encodeAuthorizeResponse(response *AuthorizeFound, w http.ResponseWriter, span trace.Span) error {
 	// Encoding response headers.
 	{
 		h := uri.NewHeaderEncoder(w.Header())
@@ -303,6 +303,46 @@ func encodeOAuthCallbackResponse(response *OAuthCallbackFound, w http.ResponseWr
 	return nil
 }
 
+func encodeOAuthRevokeResponse(response OAuthRevokeRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *OAuthRevokeNoContent:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(204)
+		span.SetStatus(codes.Ok, http.StatusText(204))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *OAuthRevokeUnauthorized:
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
+func encodeOAuthTokenInfoResponse(response *OAuthTokenInfoOK, w http.ResponseWriter, span trace.Span) error {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(200)
+	span.SetStatus(codes.Ok, http.StatusText(200))
+
+	e := new(jx.Encoder)
+	response.Encode(e)
+	if _, err := e.WriteTo(w); err != nil {
+		return errors.Wrap(err, "write")
+	}
+
+	return nil
+}
+
 func encodeOpinionCommentsResponse(response OpinionCommentsRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
 	case *OpinionCommentsOK:
@@ -398,6 +438,39 @@ func encodeRegisterUserResponse(response RegisterUserRes, w http.ResponseWriter,
 		return nil
 
 	case *RegisterUserInternalServerError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(500)
+		span.SetStatus(codes.Error, http.StatusText(500))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
+func encodeTestResponse(response TestRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *TestOK:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *TestInternalServerError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))

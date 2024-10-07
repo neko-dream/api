@@ -13,12 +13,12 @@ type UnimplementedHandler struct{}
 
 var _ Handler = UnimplementedHandler{}
 
-// AuthLogin implements auth_login operation.
+// Authorize implements authorize operation.
 //
-// OAuthログイン.
+// 認証画面を表示する.
 //
 // GET /auth/{provider}/login
-func (UnimplementedHandler) AuthLogin(ctx context.Context, params AuthLoginParams) (r *AuthLoginFound, _ error) {
+func (UnimplementedHandler) Authorize(ctx context.Context, params AuthorizeParams) (r *AuthorizeFound, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -103,6 +103,24 @@ func (UnimplementedHandler) OAuthCallback(ctx context.Context, params OAuthCallb
 	return r, ht.ErrNotImplemented
 }
 
+// OAuthRevoke implements oauth_revoke operation.
+//
+// アクセストークンを失効.
+//
+// POST /auth/revoke
+func (UnimplementedHandler) OAuthRevoke(ctx context.Context) (r OAuthRevokeRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// OAuthTokenInfo implements oauth_token_info operation.
+//
+// アクセストークンの情報を取得.
+//
+// GET /auth/token/info
+func (UnimplementedHandler) OAuthTokenInfo(ctx context.Context) (r *OAuthTokenInfoOK, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // OpinionComments implements opinionComments operation.
 //
 // 意見に対するコメント一覧を返す.
@@ -127,5 +145,14 @@ func (UnimplementedHandler) PostOpinionPost(ctx context.Context, req OptPostOpin
 //
 // POST /api/user
 func (UnimplementedHandler) RegisterUser(ctx context.Context, req OptRegisterUserReq) (r RegisterUserRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// Test implements test operation.
+//
+// 無題のAPI.
+//
+// GET /test
+func (UnimplementedHandler) Test(ctx context.Context) (r TestRes, _ error) {
 	return r, ht.ErrNotImplemented
 }

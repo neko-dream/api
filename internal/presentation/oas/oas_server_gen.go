@@ -12,6 +12,7 @@ type Handler interface {
 	IntentionHandler
 	OpinionHandler
 	TalkSessionHandler
+	TestHandler
 	UserHandler
 }
 
@@ -19,18 +20,30 @@ type Handler interface {
 //
 // x-ogen-operation-group: Auth
 type AuthHandler interface {
-	// AuthLogin implements auth_login operation.
+	// Authorize implements authorize operation.
 	//
-	// OAuthログイン.
+	// 認証画面を表示する.
 	//
 	// GET /auth/{provider}/login
-	AuthLogin(ctx context.Context, params AuthLoginParams) (*AuthLoginFound, error)
+	Authorize(ctx context.Context, params AuthorizeParams) (*AuthorizeFound, error)
 	// OAuthCallback implements oauth_callback operation.
 	//
 	// Auth Callback.
 	//
 	// GET /auth/{provider}/callback
 	OAuthCallback(ctx context.Context, params OAuthCallbackParams) (*OAuthCallbackFound, error)
+	// OAuthRevoke implements oauth_revoke operation.
+	//
+	// アクセストークンを失効.
+	//
+	// POST /auth/revoke
+	OAuthRevoke(ctx context.Context) (OAuthRevokeRes, error)
+	// OAuthTokenInfo implements oauth_token_info operation.
+	//
+	// アクセストークンの情報を取得.
+	//
+	// GET /auth/token/info
+	OAuthTokenInfo(ctx context.Context) (*OAuthTokenInfoOK, error)
 }
 
 // IntentionHandler handles operations described by OpenAPI v3 specification.
@@ -97,6 +110,18 @@ type TalkSessionHandler interface {
 	//
 	// GET /api/talksessions
 	GetTalkSessionList(ctx context.Context, params GetTalkSessionListParams) (GetTalkSessionListRes, error)
+}
+
+// TestHandler handles operations described by OpenAPI v3 specification.
+//
+// x-ogen-operation-group: Test
+type TestHandler interface {
+	// Test implements test operation.
+	//
+	// 無題のAPI.
+	//
+	// GET /test
+	Test(ctx context.Context) (TestRes, error)
 }
 
 // UserHandler handles operations described by OpenAPI v3 specification.

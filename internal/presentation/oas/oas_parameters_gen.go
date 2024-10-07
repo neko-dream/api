@@ -15,15 +15,15 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
-// AuthLoginParams is parameters of auth_login operation.
-type AuthLoginParams struct {
+// AuthorizeParams is parameters of authorize operation.
+type AuthorizeParams struct {
 	// OIDCプロバイダ名.
 	Provider string
 	// コールバック後のリダイレクトURL.
 	RedirectURL string
 }
 
-func unpackAuthLoginParams(packed middleware.Parameters) (params AuthLoginParams) {
+func unpackAuthorizeParams(packed middleware.Parameters) (params AuthorizeParams) {
 	{
 		key := middleware.ParameterKey{
 			Name: "provider",
@@ -41,7 +41,7 @@ func unpackAuthLoginParams(packed middleware.Parameters) (params AuthLoginParams
 	return params
 }
 
-func decodeAuthLoginParams(args [1]string, argsEscaped bool, r *http.Request) (params AuthLoginParams, _ error) {
+func decodeAuthorizeParams(args [1]string, argsEscaped bool, r *http.Request) (params AuthorizeParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: provider.
 	if err := func() error {
@@ -1116,8 +1116,6 @@ func decodeOpinionCommentsParams(args [2]string, argsEscaped bool, r *http.Reque
 // PostOpinionPostParams is parameters of postOpinionPost operation.
 type PostOpinionPostParams struct {
 	TalkSessionID string
-	// 意見の内容.
-	OpinionContent string
 }
 
 func unpackPostOpinionPostParams(packed middleware.Parameters) (params PostOpinionPostParams) {
@@ -1128,18 +1126,10 @@ func unpackPostOpinionPostParams(packed middleware.Parameters) (params PostOpini
 		}
 		params.TalkSessionID = packed[key].(string)
 	}
-	{
-		key := middleware.ParameterKey{
-			Name: "opinionContent",
-			In:   "query",
-		}
-		params.OpinionContent = packed[key].(string)
-	}
 	return params
 }
 
 func decodePostOpinionPostParams(args [1]string, argsEscaped bool, r *http.Request) (params PostOpinionPostParams, _ error) {
-	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: talkSessionID.
 	if err := func() error {
 		param := args[0]
@@ -1182,42 +1172,6 @@ func decodePostOpinionPostParams(args [1]string, argsEscaped bool, r *http.Reque
 		return params, &ogenerrors.DecodeParamError{
 			Name: "talkSessionID",
 			In:   "path",
-			Err:  err,
-		}
-	}
-	// Decode query: opinionContent.
-	if err := func() error {
-		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "opinionContent",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.HasParam(cfg); err == nil {
-			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.OpinionContent = c
-				return nil
-			}); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "opinionContent",
-			In:   "query",
 			Err:  err,
 		}
 	}

@@ -663,7 +663,7 @@ func (s *Server) decodePostOpinionPostRequest(r *http.Request) (
 			}
 			{
 				cfg := uri.QueryParameterDecodingConfig{
-					Name:    "opinion",
+					Name:    "opinionContent",
 					Style:   uri.QueryStyleForm,
 					Explode: true,
 				}
@@ -679,10 +679,10 @@ func (s *Server) decodePostOpinionPostRequest(r *http.Request) (
 							return err
 						}
 
-						optForm.Opinion = c
+						optForm.OpinionContent = c
 						return nil
 					}); err != nil {
-						return req, close, errors.Wrap(err, "decode \"opinion\"")
+						return req, close, errors.Wrap(err, "decode \"opinionContent\"")
 					}
 				} else {
 					return req, close, errors.Wrap(err, "query")
@@ -721,27 +721,35 @@ func (s *Server) decodePostOpinionPostRequest(r *http.Request) (
 				}
 			}
 			{
-				if err := func() error {
-					files, ok := r.MultipartForm.File["picture"]
-					if !ok || len(files) < 1 {
-						return nil
-					}
-					fh := files[0]
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "picture",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotPictureVal string
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
 
-					f, err := fh.Open()
-					if err != nil {
-						return errors.Wrap(err, "open")
+							c, err := conv.ToString(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotPictureVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.Picture.SetTo(optFormDotPictureVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"picture\"")
 					}
-					closers = append(closers, f.Close)
-					optForm.Picture.SetTo(ht.MultipartFile{
-						Name:   fh.Filename,
-						File:   f,
-						Size:   fh.Size,
-						Header: fh.Header,
-					})
-					return nil
-				}(); err != nil {
-					return req, close, errors.Wrap(err, "decode \"picture\"")
 				}
 			}
 			request = OptPostOpinionPostReq{

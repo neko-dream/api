@@ -11,29 +11,29 @@ import (
 	ht "github.com/ogen-go/ogen/http"
 )
 
-// AuthLoginFound is response for AuthLogin operation.
-type AuthLoginFound struct {
+// AuthorizeFound is response for Authorize operation.
+type AuthorizeFound struct {
 	Location  OptURI
 	SetCookie OptString
 }
 
 // GetLocation returns the value of Location.
-func (s *AuthLoginFound) GetLocation() OptURI {
+func (s *AuthorizeFound) GetLocation() OptURI {
 	return s.Location
 }
 
 // GetSetCookie returns the value of SetCookie.
-func (s *AuthLoginFound) GetSetCookie() OptString {
+func (s *AuthorizeFound) GetSetCookie() OptString {
 	return s.SetCookie
 }
 
 // SetLocation sets the value of Location.
-func (s *AuthLoginFound) SetLocation(val OptURI) {
+func (s *AuthorizeFound) SetLocation(val OptURI) {
 	s.Location = val
 }
 
 // SetSetCookie sets the value of SetCookie.
-func (s *AuthLoginFound) SetSetCookie(val OptString) {
+func (s *AuthorizeFound) SetSetCookie(val OptString) {
 	s.SetCookie = val
 }
 
@@ -1308,6 +1308,138 @@ func (s *OAuthCallbackFound) SetSetCookie(val OptString) {
 	s.SetCookie = val
 }
 
+type OAuthRevokeNoContent struct{}
+
+func (*OAuthRevokeNoContent) oAuthRevokeRes() {}
+
+// OAuthRevokeUnauthorized is response for OAuthRevoke operation.
+type OAuthRevokeUnauthorized struct{}
+
+func (*OAuthRevokeUnauthorized) oAuthRevokeRes() {}
+
+type OAuthTokenInfoOK struct {
+	// Audience.
+	Aud string `json:"aud"`
+	// 有効期限.
+	Exp string `json:"exp"`
+	// 発行日時.
+	Iat string `json:"iat"`
+	// 発行者.
+	Iss string `json:"iss"`
+	// ユーザID.
+	Sub string `json:"sub"`
+	// JWT ID.
+	Jti string `json:"jti"`
+	// 表示用ユーザID.
+	DisplayId OptNilString `json:"displayId"`
+	// 表示名.
+	DisplayName OptNilString `json:"displayName"`
+	// アイコンURL.
+	IconURL OptNilString `json:"iconURL"`
+	// ユーザー登録済みか.
+	IsVerify bool `json:"isVerify"`
+}
+
+// GetAud returns the value of Aud.
+func (s *OAuthTokenInfoOK) GetAud() string {
+	return s.Aud
+}
+
+// GetExp returns the value of Exp.
+func (s *OAuthTokenInfoOK) GetExp() string {
+	return s.Exp
+}
+
+// GetIat returns the value of Iat.
+func (s *OAuthTokenInfoOK) GetIat() string {
+	return s.Iat
+}
+
+// GetIss returns the value of Iss.
+func (s *OAuthTokenInfoOK) GetIss() string {
+	return s.Iss
+}
+
+// GetSub returns the value of Sub.
+func (s *OAuthTokenInfoOK) GetSub() string {
+	return s.Sub
+}
+
+// GetJti returns the value of Jti.
+func (s *OAuthTokenInfoOK) GetJti() string {
+	return s.Jti
+}
+
+// GetDisplayId returns the value of DisplayId.
+func (s *OAuthTokenInfoOK) GetDisplayId() OptNilString {
+	return s.DisplayId
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *OAuthTokenInfoOK) GetDisplayName() OptNilString {
+	return s.DisplayName
+}
+
+// GetIconURL returns the value of IconURL.
+func (s *OAuthTokenInfoOK) GetIconURL() OptNilString {
+	return s.IconURL
+}
+
+// GetIsVerify returns the value of IsVerify.
+func (s *OAuthTokenInfoOK) GetIsVerify() bool {
+	return s.IsVerify
+}
+
+// SetAud sets the value of Aud.
+func (s *OAuthTokenInfoOK) SetAud(val string) {
+	s.Aud = val
+}
+
+// SetExp sets the value of Exp.
+func (s *OAuthTokenInfoOK) SetExp(val string) {
+	s.Exp = val
+}
+
+// SetIat sets the value of Iat.
+func (s *OAuthTokenInfoOK) SetIat(val string) {
+	s.Iat = val
+}
+
+// SetIss sets the value of Iss.
+func (s *OAuthTokenInfoOK) SetIss(val string) {
+	s.Iss = val
+}
+
+// SetSub sets the value of Sub.
+func (s *OAuthTokenInfoOK) SetSub(val string) {
+	s.Sub = val
+}
+
+// SetJti sets the value of Jti.
+func (s *OAuthTokenInfoOK) SetJti(val string) {
+	s.Jti = val
+}
+
+// SetDisplayId sets the value of DisplayId.
+func (s *OAuthTokenInfoOK) SetDisplayId(val OptNilString) {
+	s.DisplayId = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *OAuthTokenInfoOK) SetDisplayName(val OptNilString) {
+	s.DisplayName = val
+}
+
+// SetIconURL sets the value of IconURL.
+func (s *OAuthTokenInfoOK) SetIconURL(val OptNilString) {
+	s.IconURL = val
+}
+
+// SetIsVerify sets the value of IsVerify.
+func (s *OAuthTokenInfoOK) SetIsVerify(val bool) {
+	s.IsVerify = val
+}
+
 type OpinionCommentsInternalServerError struct{}
 
 func (*OpinionCommentsInternalServerError) opinionCommentsRes() {}
@@ -1796,6 +1928,52 @@ func (s *OpinionCommentsOKRootOpinionUser) SetIconURL(val OptString) {
 	s.IconURL = val
 }
 
+// NewOptBool returns new OptBool with value set to v.
+func NewOptBool(v bool) OptBool {
+	return OptBool{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptBool is optional bool.
+type OptBool struct {
+	Value bool
+	Set   bool
+}
+
+// IsSet returns true if OptBool was set.
+func (o OptBool) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptBool) Reset() {
+	var v bool
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptBool) SetTo(v bool) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptBool) Get() (v bool, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptBool) Or(d bool) bool {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptCreateTalkSessionReq returns new OptCreateTalkSessionReq with value set to v.
 func NewOptCreateTalkSessionReq(v CreateTalkSessionReq) OptCreateTalkSessionReq {
 	return OptCreateTalkSessionReq{
@@ -1888,6 +2066,52 @@ func (o OptEditUserProfileReq) Or(d EditUserProfileReq) EditUserProfileReq {
 	return d
 }
 
+// NewOptInt returns new OptInt with value set to v.
+func NewOptInt(v int) OptInt {
+	return OptInt{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptInt is optional int.
+type OptInt struct {
+	Value int
+	Set   bool
+}
+
+// IsSet returns true if OptInt was set.
+func (o OptInt) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptInt) Reset() {
+	var v int
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptInt) SetTo(v int) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptInt) Get() (v int, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptInt) Or(d int) int {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptIntentionReq returns new OptIntentionReq with value set to v.
 func NewOptIntentionReq(v IntentionReq) OptIntentionReq {
 	return OptIntentionReq{
@@ -1974,6 +2198,69 @@ func (o OptMultipartFile) Get() (v ht.MultipartFile, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptMultipartFile) Or(d ht.MultipartFile) ht.MultipartFile {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilBool returns new OptNilBool with value set to v.
+func NewOptNilBool(v bool) OptNilBool {
+	return OptNilBool{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilBool is optional nullable bool.
+type OptNilBool struct {
+	Value bool
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilBool was set.
+func (o OptNilBool) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilBool) Reset() {
+	var v bool
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilBool) SetTo(v bool) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilBool) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilBool) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v bool
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilBool) Get() (v bool, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilBool) Or(d bool) bool {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -2488,16 +2775,16 @@ type PostOpinionPostOK struct{}
 func (*PostOpinionPostOK) postOpinionPostRes() {}
 
 type PostOpinionPostReq struct {
-	ParentOpinionID OptString        `json:"parentOpinionID"`
-	IntentionStatus string           `json:"intentionStatus"`
-	Title           OptString        `json:"title"`
-	Opinion         string           `json:"opinion"`
-	ReferenceURL    OptString        `json:"referenceURL"`
-	Picture         OptMultipartFile `json:"picture"`
+	ParentOpinionID OptNilString `json:"parentOpinionID"`
+	IntentionStatus string       `json:"intentionStatus"`
+	Title           OptNilString `json:"title"`
+	OpinionContent  string       `json:"opinionContent"`
+	ReferenceURL    OptNilString `json:"referenceURL"`
+	Picture         OptNilString `json:"picture"`
 }
 
 // GetParentOpinionID returns the value of ParentOpinionID.
-func (s *PostOpinionPostReq) GetParentOpinionID() OptString {
+func (s *PostOpinionPostReq) GetParentOpinionID() OptNilString {
 	return s.ParentOpinionID
 }
 
@@ -2507,27 +2794,27 @@ func (s *PostOpinionPostReq) GetIntentionStatus() string {
 }
 
 // GetTitle returns the value of Title.
-func (s *PostOpinionPostReq) GetTitle() OptString {
+func (s *PostOpinionPostReq) GetTitle() OptNilString {
 	return s.Title
 }
 
-// GetOpinion returns the value of Opinion.
-func (s *PostOpinionPostReq) GetOpinion() string {
-	return s.Opinion
+// GetOpinionContent returns the value of OpinionContent.
+func (s *PostOpinionPostReq) GetOpinionContent() string {
+	return s.OpinionContent
 }
 
 // GetReferenceURL returns the value of ReferenceURL.
-func (s *PostOpinionPostReq) GetReferenceURL() OptString {
+func (s *PostOpinionPostReq) GetReferenceURL() OptNilString {
 	return s.ReferenceURL
 }
 
 // GetPicture returns the value of Picture.
-func (s *PostOpinionPostReq) GetPicture() OptMultipartFile {
+func (s *PostOpinionPostReq) GetPicture() OptNilString {
 	return s.Picture
 }
 
 // SetParentOpinionID sets the value of ParentOpinionID.
-func (s *PostOpinionPostReq) SetParentOpinionID(val OptString) {
+func (s *PostOpinionPostReq) SetParentOpinionID(val OptNilString) {
 	s.ParentOpinionID = val
 }
 
@@ -2537,22 +2824,22 @@ func (s *PostOpinionPostReq) SetIntentionStatus(val string) {
 }
 
 // SetTitle sets the value of Title.
-func (s *PostOpinionPostReq) SetTitle(val OptString) {
+func (s *PostOpinionPostReq) SetTitle(val OptNilString) {
 	s.Title = val
 }
 
-// SetOpinion sets the value of Opinion.
-func (s *PostOpinionPostReq) SetOpinion(val string) {
-	s.Opinion = val
+// SetOpinionContent sets the value of OpinionContent.
+func (s *PostOpinionPostReq) SetOpinionContent(val string) {
+	s.OpinionContent = val
 }
 
 // SetReferenceURL sets the value of ReferenceURL.
-func (s *PostOpinionPostReq) SetReferenceURL(val OptString) {
+func (s *PostOpinionPostReq) SetReferenceURL(val OptNilString) {
 	s.ReferenceURL = val
 }
 
 // SetPicture sets the value of Picture.
-func (s *PostOpinionPostReq) SetPicture(val OptMultipartFile) {
+func (s *PostOpinionPostReq) SetPicture(val OptNilString) {
 	s.Picture = val
 }
 
@@ -2875,3 +3162,78 @@ func (s *SessionId) GetAPIKey() string {
 func (s *SessionId) SetAPIKey(val string) {
 	s.APIKey = val
 }
+
+type TestInternalServerError struct{}
+
+func (*TestInternalServerError) testRes() {}
+
+type TestOK struct {
+	OptInt     OptNilInt    `json:"optInt"`
+	OptNilInt  OptInt       `json:"optNilInt"`
+	OptNilBool OptNilBool   `json:"optNilBool"`
+	OptBool    OptBool      `json:"optBool"`
+	OptUrl     OptURI       `json:"optUrl"`
+	OptNilUrl  OptNilString `json:"optNilUrl"`
+}
+
+// GetOptInt returns the value of OptInt.
+func (s *TestOK) GetOptInt() OptNilInt {
+	return s.OptInt
+}
+
+// GetOptNilInt returns the value of OptNilInt.
+func (s *TestOK) GetOptNilInt() OptInt {
+	return s.OptNilInt
+}
+
+// GetOptNilBool returns the value of OptNilBool.
+func (s *TestOK) GetOptNilBool() OptNilBool {
+	return s.OptNilBool
+}
+
+// GetOptBool returns the value of OptBool.
+func (s *TestOK) GetOptBool() OptBool {
+	return s.OptBool
+}
+
+// GetOptUrl returns the value of OptUrl.
+func (s *TestOK) GetOptUrl() OptURI {
+	return s.OptUrl
+}
+
+// GetOptNilUrl returns the value of OptNilUrl.
+func (s *TestOK) GetOptNilUrl() OptNilString {
+	return s.OptNilUrl
+}
+
+// SetOptInt sets the value of OptInt.
+func (s *TestOK) SetOptInt(val OptNilInt) {
+	s.OptInt = val
+}
+
+// SetOptNilInt sets the value of OptNilInt.
+func (s *TestOK) SetOptNilInt(val OptInt) {
+	s.OptNilInt = val
+}
+
+// SetOptNilBool sets the value of OptNilBool.
+func (s *TestOK) SetOptNilBool(val OptNilBool) {
+	s.OptNilBool = val
+}
+
+// SetOptBool sets the value of OptBool.
+func (s *TestOK) SetOptBool(val OptBool) {
+	s.OptBool = val
+}
+
+// SetOptUrl sets the value of OptUrl.
+func (s *TestOK) SetOptUrl(val OptURI) {
+	s.OptUrl = val
+}
+
+// SetOptNilUrl sets the value of OptNilUrl.
+func (s *TestOK) SetOptNilUrl(val OptNilString) {
+	s.OptNilUrl = val
+}
+
+func (*TestOK) testRes() {}

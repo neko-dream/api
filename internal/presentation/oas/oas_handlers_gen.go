@@ -20,20 +20,20 @@ import (
 	"github.com/ogen-go/ogen/otelogen"
 )
 
-// handleAuthLoginRequest handles auth_login operation.
+// handleAuthorizeRequest handles authorize operation.
 //
-// OAuthログイン.
+// 認証画面を表示する.
 //
 // GET /auth/{provider}/login
-func (s *Server) handleAuthLoginRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleAuthorizeRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("auth_login"),
+		otelogen.OperationID("authorize"),
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/auth/{provider}/login"),
 	}
 
 	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "AuthLogin",
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "Authorize",
 		trace.WithAttributes(otelAttrs...),
 		serverSpanKind,
 	)
@@ -64,11 +64,11 @@ func (s *Server) handleAuthLoginRequest(args [1]string, argsEscaped bool, w http
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: "AuthLogin",
-			ID:   "auth_login",
+			Name: "Authorize",
+			ID:   "authorize",
 		}
 	)
-	params, err := decodeAuthLoginParams(args, argsEscaped, r)
+	params, err := decodeAuthorizeParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
 			OperationContext: opErrContext,
@@ -79,13 +79,13 @@ func (s *Server) handleAuthLoginRequest(args [1]string, argsEscaped bool, w http
 		return
 	}
 
-	var response *AuthLoginFound
+	var response *AuthorizeFound
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
-			OperationName:    "AuthLogin",
+			OperationName:    "Authorize",
 			OperationSummary: "OAuthログイン",
-			OperationID:      "auth_login",
+			OperationID:      "authorize",
 			Body:             nil,
 			Params: middleware.Parameters{
 				{
@@ -102,8 +102,8 @@ func (s *Server) handleAuthLoginRequest(args [1]string, argsEscaped bool, w http
 
 		type (
 			Request  = struct{}
-			Params   = AuthLoginParams
-			Response = *AuthLoginFound
+			Params   = AuthorizeParams
+			Response = *AuthorizeFound
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -112,14 +112,14 @@ func (s *Server) handleAuthLoginRequest(args [1]string, argsEscaped bool, w http
 		](
 			m,
 			mreq,
-			unpackAuthLoginParams,
+			unpackAuthorizeParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.AuthLogin(ctx, params)
+				response, err = s.h.Authorize(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.AuthLogin(ctx, params)
+		response, err = s.h.Authorize(ctx, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -127,7 +127,7 @@ func (s *Server) handleAuthLoginRequest(args [1]string, argsEscaped bool, w http
 		return
 	}
 
-	if err := encodeAuthLoginResponse(response, w, span); err != nil {
+	if err := encodeAuthorizeResponse(response, w, span); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -1264,6 +1264,288 @@ func (s *Server) handleOAuthCallbackRequest(args [1]string, argsEscaped bool, w 
 	}
 }
 
+// handleOAuthRevokeRequest handles oauth_revoke operation.
+//
+// アクセストークンを失効.
+//
+// POST /auth/revoke
+func (s *Server) handleOAuthRevokeRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("oauth_revoke"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/auth/revoke"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "OAuthRevoke",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Add Labeler to context.
+	labeler := &Labeler{attrs: otelAttrs}
+	ctx = contextWithLabeler(ctx, labeler)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
+
+		// Increment request counter.
+		s.requests.Add(ctx, 1, attrOpt)
+
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
+	}()
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "OAuthRevoke",
+			ID:   "oauth_revoke",
+		}
+	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securitySessionId(ctx, "OAuthRevoke", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "SessionId",
+					Err:              err,
+				}
+				defer recordError("Security:SessionId", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			defer recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
+
+	var response OAuthRevokeRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:          ctx,
+			OperationName:    "OAuthRevoke",
+			OperationSummary: "アクセストークンを失効",
+			OperationID:      "oauth_revoke",
+			Body:             nil,
+			Params:           middleware.Parameters{},
+			Raw:              r,
+		}
+
+		type (
+			Request  = struct{}
+			Params   = struct{}
+			Response = OAuthRevokeRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			nil,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.OAuthRevoke(ctx)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.OAuthRevoke(ctx)
+	}
+	if err != nil {
+		defer recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeOAuthRevokeResponse(response, w, span); err != nil {
+		defer recordError("EncodeResponse", err)
+		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+		}
+		return
+	}
+}
+
+// handleOAuthTokenInfoRequest handles oauth_token_info operation.
+//
+// アクセストークンの情報を取得.
+//
+// GET /auth/token/info
+func (s *Server) handleOAuthTokenInfoRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("oauth_token_info"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/auth/token/info"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "OAuthTokenInfo",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Add Labeler to context.
+	labeler := &Labeler{attrs: otelAttrs}
+	ctx = contextWithLabeler(ctx, labeler)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
+
+		// Increment request counter.
+		s.requests.Add(ctx, 1, attrOpt)
+
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
+	}()
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "OAuthTokenInfo",
+			ID:   "oauth_token_info",
+		}
+	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securitySessionId(ctx, "OAuthTokenInfo", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "SessionId",
+					Err:              err,
+				}
+				defer recordError("Security:SessionId", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			defer recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
+
+	var response *OAuthTokenInfoOK
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:          ctx,
+			OperationName:    "OAuthTokenInfo",
+			OperationSummary: "アクセストークンの情報を取得",
+			OperationID:      "oauth_token_info",
+			Body:             nil,
+			Params:           middleware.Parameters{},
+			Raw:              r,
+		}
+
+		type (
+			Request  = struct{}
+			Params   = struct{}
+			Response = *OAuthTokenInfoOK
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			nil,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.OAuthTokenInfo(ctx)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.OAuthTokenInfo(ctx)
+	}
+	if err != nil {
+		defer recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeOAuthTokenInfoResponse(response, w, span); err != nil {
+		defer recordError("EncodeResponse", err)
+		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+		}
+		return
+	}
+}
+
 // handleOpinionCommentsRequest handles opinionComments operation.
 //
 // 意見に対するコメント一覧を返す.
@@ -1467,10 +1749,6 @@ func (s *Server) handlePostOpinionPostRequest(args [1]string, argsEscaped bool, 
 					Name: "talkSessionID",
 					In:   "path",
 				}: params.TalkSessionID,
-				{
-					Name: "opinionContent",
-					In:   "query",
-				}: params.OpinionContent,
 			},
 			Raw: r,
 		}
@@ -1659,6 +1937,99 @@ func (s *Server) handleRegisterUserRequest(args [0]string, argsEscaped bool, w h
 	}
 
 	if err := encodeRegisterUserResponse(response, w, span); err != nil {
+		defer recordError("EncodeResponse", err)
+		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+		}
+		return
+	}
+}
+
+// handleTestRequest handles test operation.
+//
+// 無題のAPI.
+//
+// GET /test
+func (s *Server) handleTestRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("test"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/test"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "Test",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Add Labeler to context.
+	labeler := &Labeler{attrs: otelAttrs}
+	ctx = contextWithLabeler(ctx, labeler)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
+
+		// Increment request counter.
+		s.requests.Add(ctx, 1, attrOpt)
+
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
+	}()
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
+		}
+		err error
+	)
+
+	var response TestRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:          ctx,
+			OperationName:    "Test",
+			OperationSummary: "無題のAPI",
+			OperationID:      "test",
+			Body:             nil,
+			Params:           middleware.Parameters{},
+			Raw:              r,
+		}
+
+		type (
+			Request  = struct{}
+			Params   = struct{}
+			Response = TestRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			nil,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.Test(ctx)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.Test(ctx)
+	}
+	if err != nil {
+		defer recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeTestResponse(response, w, span); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
