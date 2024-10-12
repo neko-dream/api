@@ -11,6 +11,8 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/middleware"
 	"github.com/neko-dream/server/internal/presentation/handler"
 	"github.com/neko-dream/server/internal/presentation/oas"
+
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -27,12 +29,19 @@ func main() {
 	config := di.Invoke[*config.Config](container)
 	migrator := di.Invoke[*db.Migrator](container)
 	if config.Env != "production" {
-		migrator.Down()
+		// migrator.Down()
 		migrator.Up()
 	}
 
 	reqMiddleware := middleware.ReqMiddleware(srv)
-	corsHandler := middleware.CORSMiddleware(reqMiddleware)
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"https://*", "http://*", "localhost:*"},
+		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
+		AllowedHeaders:   []string{"*"},
+		AllowCredentials: true,
+		Debug:            true,
+	})
+	corsHandler := c.Handler(reqMiddleware)
 	mux := http.NewServeMux()
 
 	mux.Handle("/static/",
