@@ -1,4 +1,4 @@
-package vote
+package vote_usecase
 
 import (
 	"context"
