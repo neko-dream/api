@@ -9,11 +9,6 @@ var (
 		Code:       "VOTE-001",
 		Message:    "投票は必須です",
 	}
-	VoteAlreadyVoted = &APIError{
-		StatusCode: http.StatusBadRequest,
-		Code:       "VOTE-002",
-		Message:    "この意見へはすでに投票しています",
-	}
 	VoteFailed = &APIError{
 		StatusCode: http.StatusInternalServerError,
 		Code:       "VOTE-003",

@@ -18,4 +18,14 @@ var (
 		Code:       "OPINION-003",
 		Message:    "意見の投稿に失敗しました。時間をおいて再度お試しください",
 	}
+	OpinionAlreadyVoted = &APIError{
+		StatusCode: http.StatusBadRequest,
+		Code:       "OPINION-004",
+		Message:    "この意見へはすでに投票しています",
+	}
+	OpinionTitleBadLength = &APIError{
+		StatusCode: http.StatusBadRequest,
+		Code:       "OPINION-005",
+		Message:    "タイトルは5~50文字で入力してください",
+	}
 )
