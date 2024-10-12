@@ -40,6 +40,7 @@ func BuildContainer() *dig.Container {
 		{repository.NewUserRepository, nil},
 		{repository.NewTalkSessionRepository, nil},
 		{repository.NewOpinionRepository, nil},
+		{repository.NewVoteRepository, nil},
 
 		{func() session.TokenManager {
 			return auth.NewTokenManager("")
@@ -56,7 +57,7 @@ func BuildContainer() *dig.Container {
 		{user_usecase.NewEditUserUseCase, nil},
 		{talk_session_usecase.NewCreateTalkSessionUseCase, nil},
 		{talk_session_usecase.NewListTalkSessionQueryHandler, nil},
-		{opinion_usecase.NewPostOpinionInteractor, nil},
+		{opinion_usecase.NewPostOpinionUseCase, nil},
 		{handler.NewSecurityHandler, nil},
 		{handler.NewAuthHandler, nil},
 		{handler.NewUserHandler, nil},
