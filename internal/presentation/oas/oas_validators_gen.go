@@ -750,8 +750,15 @@ func (s *ListOpinionsOKItemOpinion) Validate() error {
 		})
 	}
 	if err := func() error {
-		if err := s.VoteType.Validate(); err != nil {
-			return err
+		if value, ok := s.VoteType.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {
@@ -945,8 +952,15 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) Validate() error {
 		})
 	}
 	if err := func() error {
-		if err := s.VoteType.Validate(); err != nil {
-			return err
+		if value, ok := s.VoteType.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {
@@ -1065,8 +1079,15 @@ func (s *OpinionCommentsOKRootOpinionOpinion) Validate() error {
 		})
 	}
 	if err := func() error {
-		if err := s.VoteType.Validate(); err != nil {
-			return err
+		if value, ok := s.VoteType.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {
@@ -1357,8 +1378,15 @@ func (s *VoteOKItem) Validate() error {
 		})
 	}
 	if err := func() error {
-		if err := s.VoteType.Validate(); err != nil {
-			return err
+		if value, ok := s.VoteType.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {

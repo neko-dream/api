@@ -25,7 +25,7 @@ type (
 
 	OpinionService interface {
 		// すでに自分が意見に投票OR返信しているかどうかを判定
-		IsVotedOrReplied(ctx context.Context, opinionID shared.UUID[Opinion], userID shared.UUID[user.User]) (bool, error)
+		IsVoted(ctx context.Context, opinionID shared.UUID[Opinion], userID shared.UUID[user.User]) (bool, error)
 	}
 
 	Opinion struct {
@@ -37,7 +37,6 @@ type (
 		content         string
 		createdAt       time.Time
 		opinions        []Opinion
-		voteType        VoteType
 	}
 )
 
@@ -49,7 +48,6 @@ func NewOpinion(
 	title *string,
 	content string,
 	createdAt time.Time,
-	VoteType VoteType,
 ) (*Opinion, error) {
 	if content == "" {
 		return nil, messages.OpinionContentBadLength
@@ -72,7 +70,6 @@ func NewOpinion(
 		title:           title,
 		content:         content,
 		createdAt:       createdAt,
-		voteType:        VoteType,
 		opinions:        []Opinion{},
 	}, nil
 }
@@ -83,14 +80,6 @@ func (o *Opinion) Reply(opinion Opinion) {
 
 func (o *Opinion) Count() int {
 	return len(o.opinions)
-}
-
-func (o *Opinion) IsVoted() bool {
-	return o.voteType == UnVoted
-}
-
-func (o *Opinion) Vote(VoteType VoteType) {
-	o.voteType = VoteType
 }
 
 func (o *Opinion) OpinionID() shared.UUID[Opinion] {
@@ -118,10 +107,6 @@ func (o *Opinion) Content() string {
 
 func (o *Opinion) CreatedAt() time.Time {
 	return o.createdAt
-}
-
-func (o *Opinion) VoteType() VoteType {
-	return o.voteType
 }
 
 func (o *Opinion) Opinions() []Opinion {

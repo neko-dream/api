@@ -771,7 +771,6 @@
                   }
                 },
                 "required": [
-                  "voteStatus",
                   "opinionContent"
                 ]
               }
@@ -952,7 +951,7 @@
                           },
                           "myItentionStatus": {
                             "$ref": "#/components/schemas/voteType",
-                            "description": "意見投稿主の意見"
+                            "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
                           }
                         },
                         "required": [
@@ -1181,7 +1180,7 @@
           },
           "voteType": {
             "$ref": "#/components/schemas/voteType",
-            "description": "意見投稿主の意見"
+            "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
           },
           "pictureURL": {
             "type": "string",
@@ -1194,8 +1193,7 @@
         },
         "required": [
           "content",
-          "id",
-          "voteType"
+          "id"
         ]
       },
       "user": {

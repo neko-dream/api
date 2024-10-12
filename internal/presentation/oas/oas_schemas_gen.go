@@ -1289,8 +1289,8 @@ type ListOpinionsOKItemOpinion struct {
 	Content string `json:"content"`
 	// 親の意見ID。ルートならば無し.
 	ParentID OptString `json:"parentID"`
-	// 意見投稿主の意見.
-	VoteType ListOpinionsOKItemOpinionVoteType `json:"voteType"`
+	// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+	VoteType OptListOpinionsOKItemOpinionVoteType `json:"voteType"`
 	// 画像が返る場合もある.
 	PictureURL OptString `json:"pictureURL"`
 	// 参考文献URL.
@@ -1318,7 +1318,7 @@ func (s *ListOpinionsOKItemOpinion) GetParentID() OptString {
 }
 
 // GetVoteType returns the value of VoteType.
-func (s *ListOpinionsOKItemOpinion) GetVoteType() ListOpinionsOKItemOpinionVoteType {
+func (s *ListOpinionsOKItemOpinion) GetVoteType() OptListOpinionsOKItemOpinionVoteType {
 	return s.VoteType
 }
 
@@ -1353,7 +1353,7 @@ func (s *ListOpinionsOKItemOpinion) SetParentID(val OptString) {
 }
 
 // SetVoteType sets the value of VoteType.
-func (s *ListOpinionsOKItemOpinion) SetVoteType(val ListOpinionsOKItemOpinionVoteType) {
+func (s *ListOpinionsOKItemOpinion) SetVoteType(val OptListOpinionsOKItemOpinionVoteType) {
 	s.VoteType = val
 }
 
@@ -1367,7 +1367,7 @@ func (s *ListOpinionsOKItemOpinion) SetReferenceURL(val OptString) {
 	s.ReferenceURL = val
 }
 
-// 意見投稿主の意見.
+// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
 type ListOpinionsOKItemOpinionVoteType string
 
 const (
@@ -1736,7 +1736,7 @@ type OpinionCommentsOKOpinionsItem struct {
 	Opinion OpinionCommentsOKOpinionsItemOpinion `json:"opinion"`
 	// 作成ユーザー.
 	User OpinionCommentsOKOpinionsItemUser `json:"user"`
-	// 意見投稿主の意見.
+	// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
 	MyItentionStatus OpinionCommentsOKOpinionsItemMyItentionStatus `json:"myItentionStatus"`
 }
 
@@ -1770,7 +1770,7 @@ func (s *OpinionCommentsOKOpinionsItem) SetMyItentionStatus(val OpinionCommentsO
 	s.MyItentionStatus = val
 }
 
-// 意見投稿主の意見.
+// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
 type OpinionCommentsOKOpinionsItemMyItentionStatus string
 
 const (
@@ -1827,8 +1827,8 @@ type OpinionCommentsOKOpinionsItemOpinion struct {
 	Content string `json:"content"`
 	// 親の意見ID。ルートならば無し.
 	ParentID OptString `json:"parentID"`
-	// 意見投稿主の意見.
-	VoteType OpinionCommentsOKOpinionsItemOpinionVoteType `json:"voteType"`
+	// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+	VoteType OptOpinionCommentsOKOpinionsItemOpinionVoteType `json:"voteType"`
 	// 画像が返る場合もある.
 	PictureURL OptString `json:"pictureURL"`
 	// 参考文献URL.
@@ -1856,7 +1856,7 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) GetParentID() OptString {
 }
 
 // GetVoteType returns the value of VoteType.
-func (s *OpinionCommentsOKOpinionsItemOpinion) GetVoteType() OpinionCommentsOKOpinionsItemOpinionVoteType {
+func (s *OpinionCommentsOKOpinionsItemOpinion) GetVoteType() OptOpinionCommentsOKOpinionsItemOpinionVoteType {
 	return s.VoteType
 }
 
@@ -1891,7 +1891,7 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) SetParentID(val OptString) {
 }
 
 // SetVoteType sets the value of VoteType.
-func (s *OpinionCommentsOKOpinionsItemOpinion) SetVoteType(val OpinionCommentsOKOpinionsItemOpinionVoteType) {
+func (s *OpinionCommentsOKOpinionsItemOpinion) SetVoteType(val OptOpinionCommentsOKOpinionsItemOpinionVoteType) {
 	s.VoteType = val
 }
 
@@ -1905,7 +1905,7 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) SetReferenceURL(val OptString) {
 	s.ReferenceURL = val
 }
 
-// 意見投稿主の意見.
+// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
 type OpinionCommentsOKOpinionsItemOpinionVoteType string
 
 const (
@@ -2025,8 +2025,8 @@ type OpinionCommentsOKRootOpinionOpinion struct {
 	Content string `json:"content"`
 	// 親の意見ID。ルートならば無し.
 	ParentID OptString `json:"parentID"`
-	// 意見投稿主の意見.
-	VoteType OpinionCommentsOKRootOpinionOpinionVoteType `json:"voteType"`
+	// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+	VoteType OptOpinionCommentsOKRootOpinionOpinionVoteType `json:"voteType"`
 	// 画像が返る場合もある.
 	PictureURL OptString `json:"pictureURL"`
 	// 参考文献URL.
@@ -2054,7 +2054,7 @@ func (s *OpinionCommentsOKRootOpinionOpinion) GetParentID() OptString {
 }
 
 // GetVoteType returns the value of VoteType.
-func (s *OpinionCommentsOKRootOpinionOpinion) GetVoteType() OpinionCommentsOKRootOpinionOpinionVoteType {
+func (s *OpinionCommentsOKRootOpinionOpinion) GetVoteType() OptOpinionCommentsOKRootOpinionOpinionVoteType {
 	return s.VoteType
 }
 
@@ -2089,7 +2089,7 @@ func (s *OpinionCommentsOKRootOpinionOpinion) SetParentID(val OptString) {
 }
 
 // SetVoteType sets the value of VoteType.
-func (s *OpinionCommentsOKRootOpinionOpinion) SetVoteType(val OpinionCommentsOKRootOpinionOpinionVoteType) {
+func (s *OpinionCommentsOKRootOpinionOpinion) SetVoteType(val OptOpinionCommentsOKRootOpinionOpinionVoteType) {
 	s.VoteType = val
 }
 
@@ -2103,7 +2103,7 @@ func (s *OpinionCommentsOKRootOpinionOpinion) SetReferenceURL(val OptString) {
 	s.ReferenceURL = val
 }
 
-// 意見投稿主の意見.
+// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
 type OpinionCommentsOKRootOpinionOpinionVoteType string
 
 const (
@@ -2505,6 +2505,52 @@ func (o OptInt) Get() (v int, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptInt) Or(d int) int {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptListOpinionsOKItemOpinionVoteType returns new OptListOpinionsOKItemOpinionVoteType with value set to v.
+func NewOptListOpinionsOKItemOpinionVoteType(v ListOpinionsOKItemOpinionVoteType) OptListOpinionsOKItemOpinionVoteType {
+	return OptListOpinionsOKItemOpinionVoteType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptListOpinionsOKItemOpinionVoteType is optional ListOpinionsOKItemOpinionVoteType.
+type OptListOpinionsOKItemOpinionVoteType struct {
+	Value ListOpinionsOKItemOpinionVoteType
+	Set   bool
+}
+
+// IsSet returns true if OptListOpinionsOKItemOpinionVoteType was set.
+func (o OptListOpinionsOKItemOpinionVoteType) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptListOpinionsOKItemOpinionVoteType) Reset() {
+	var v ListOpinionsOKItemOpinionVoteType
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptListOpinionsOKItemOpinionVoteType) SetTo(v ListOpinionsOKItemOpinionVoteType) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptListOpinionsOKItemOpinionVoteType) Get() (v ListOpinionsOKItemOpinionVoteType, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptListOpinionsOKItemOpinionVoteType) Or(d ListOpinionsOKItemOpinionVoteType) ListOpinionsOKItemOpinionVoteType {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -2998,6 +3044,98 @@ func (o OptNilString) Or(d string) string {
 	return d
 }
 
+// NewOptOpinionCommentsOKOpinionsItemOpinionVoteType returns new OptOpinionCommentsOKOpinionsItemOpinionVoteType with value set to v.
+func NewOptOpinionCommentsOKOpinionsItemOpinionVoteType(v OpinionCommentsOKOpinionsItemOpinionVoteType) OptOpinionCommentsOKOpinionsItemOpinionVoteType {
+	return OptOpinionCommentsOKOpinionsItemOpinionVoteType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptOpinionCommentsOKOpinionsItemOpinionVoteType is optional OpinionCommentsOKOpinionsItemOpinionVoteType.
+type OptOpinionCommentsOKOpinionsItemOpinionVoteType struct {
+	Value OpinionCommentsOKOpinionsItemOpinionVoteType
+	Set   bool
+}
+
+// IsSet returns true if OptOpinionCommentsOKOpinionsItemOpinionVoteType was set.
+func (o OptOpinionCommentsOKOpinionsItemOpinionVoteType) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptOpinionCommentsOKOpinionsItemOpinionVoteType) Reset() {
+	var v OpinionCommentsOKOpinionsItemOpinionVoteType
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptOpinionCommentsOKOpinionsItemOpinionVoteType) SetTo(v OpinionCommentsOKOpinionsItemOpinionVoteType) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptOpinionCommentsOKOpinionsItemOpinionVoteType) Get() (v OpinionCommentsOKOpinionsItemOpinionVoteType, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptOpinionCommentsOKOpinionsItemOpinionVoteType) Or(d OpinionCommentsOKOpinionsItemOpinionVoteType) OpinionCommentsOKOpinionsItemOpinionVoteType {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptOpinionCommentsOKRootOpinionOpinionVoteType returns new OptOpinionCommentsOKRootOpinionOpinionVoteType with value set to v.
+func NewOptOpinionCommentsOKRootOpinionOpinionVoteType(v OpinionCommentsOKRootOpinionOpinionVoteType) OptOpinionCommentsOKRootOpinionOpinionVoteType {
+	return OptOpinionCommentsOKRootOpinionOpinionVoteType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptOpinionCommentsOKRootOpinionOpinionVoteType is optional OpinionCommentsOKRootOpinionOpinionVoteType.
+type OptOpinionCommentsOKRootOpinionOpinionVoteType struct {
+	Value OpinionCommentsOKRootOpinionOpinionVoteType
+	Set   bool
+}
+
+// IsSet returns true if OptOpinionCommentsOKRootOpinionOpinionVoteType was set.
+func (o OptOpinionCommentsOKRootOpinionOpinionVoteType) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptOpinionCommentsOKRootOpinionOpinionVoteType) Reset() {
+	var v OpinionCommentsOKRootOpinionOpinionVoteType
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptOpinionCommentsOKRootOpinionOpinionVoteType) SetTo(v OpinionCommentsOKRootOpinionOpinionVoteType) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptOpinionCommentsOKRootOpinionOpinionVoteType) Get() (v OpinionCommentsOKRootOpinionOpinionVoteType, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptOpinionCommentsOKRootOpinionOpinionVoteType) Or(d OpinionCommentsOKRootOpinionOpinionVoteType) OpinionCommentsOKRootOpinionOpinionVoteType {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptPostOpinionPostReq returns new OptPostOpinionPostReq with value set to v.
 func NewOptPostOpinionPostReq(v PostOpinionPostReq) OptPostOpinionPostReq {
 	return OptPostOpinionPostReq{
@@ -3182,6 +3320,52 @@ func (o OptURI) Or(d url.URL) url.URL {
 	return d
 }
 
+// NewOptVoteOKItemVoteType returns new OptVoteOKItemVoteType with value set to v.
+func NewOptVoteOKItemVoteType(v VoteOKItemVoteType) OptVoteOKItemVoteType {
+	return OptVoteOKItemVoteType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptVoteOKItemVoteType is optional VoteOKItemVoteType.
+type OptVoteOKItemVoteType struct {
+	Value VoteOKItemVoteType
+	Set   bool
+}
+
+// IsSet returns true if OptVoteOKItemVoteType was set.
+func (o OptVoteOKItemVoteType) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptVoteOKItemVoteType) Reset() {
+	var v VoteOKItemVoteType
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptVoteOKItemVoteType) SetTo(v VoteOKItemVoteType) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptVoteOKItemVoteType) Get() (v VoteOKItemVoteType, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptVoteOKItemVoteType) Or(d VoteOKItemVoteType) VoteOKItemVoteType {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptVoteReq returns new OptVoteReq with value set to v.
 func NewOptVoteReq(v VoteReq) OptVoteReq {
 	return OptVoteReq{
@@ -3238,7 +3422,7 @@ func (*PostOpinionPostOK) postOpinionPostRes() {}
 
 type PostOpinionPostReq struct {
 	ParentOpinionID OptNilString `json:"parentOpinionID"`
-	VoteStatus      string       `json:"voteStatus"`
+	VoteStatus      OptString    `json:"voteStatus"`
 	Title           OptNilString `json:"title"`
 	OpinionContent  string       `json:"opinionContent"`
 	ReferenceURL    OptNilString `json:"referenceURL"`
@@ -3251,7 +3435,7 @@ func (s *PostOpinionPostReq) GetParentOpinionID() OptNilString {
 }
 
 // GetVoteStatus returns the value of VoteStatus.
-func (s *PostOpinionPostReq) GetVoteStatus() string {
+func (s *PostOpinionPostReq) GetVoteStatus() OptString {
 	return s.VoteStatus
 }
 
@@ -3281,7 +3465,7 @@ func (s *PostOpinionPostReq) SetParentOpinionID(val OptNilString) {
 }
 
 // SetVoteStatus sets the value of VoteStatus.
-func (s *PostOpinionPostReq) SetVoteStatus(val string) {
+func (s *PostOpinionPostReq) SetVoteStatus(val OptString) {
 	s.VoteStatus = val
 }
 
@@ -3716,8 +3900,8 @@ type VoteOKItem struct {
 	Content string `json:"content"`
 	// 親の意見ID。ルートならば無し.
 	ParentID OptString `json:"parentID"`
-	// 意見投稿主の意見.
-	VoteType VoteOKItemVoteType `json:"voteType"`
+	// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+	VoteType OptVoteOKItemVoteType `json:"voteType"`
 	// 画像が返る場合もある.
 	PictureURL OptString `json:"pictureURL"`
 	// 参考文献URL.
@@ -3745,7 +3929,7 @@ func (s *VoteOKItem) GetParentID() OptString {
 }
 
 // GetVoteType returns the value of VoteType.
-func (s *VoteOKItem) GetVoteType() VoteOKItemVoteType {
+func (s *VoteOKItem) GetVoteType() OptVoteOKItemVoteType {
 	return s.VoteType
 }
 
@@ -3780,7 +3964,7 @@ func (s *VoteOKItem) SetParentID(val OptString) {
 }
 
 // SetVoteType sets the value of VoteType.
-func (s *VoteOKItem) SetVoteType(val VoteOKItemVoteType) {
+func (s *VoteOKItem) SetVoteType(val OptVoteOKItemVoteType) {
 	s.VoteType = val
 }
 
@@ -3794,7 +3978,7 @@ func (s *VoteOKItem) SetReferenceURL(val OptString) {
 	s.ReferenceURL = val
 }
 
-// 意見投稿主の意見.
+// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
 type VoteOKItemVoteType string
 
 const (

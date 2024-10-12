@@ -2476,8 +2476,10 @@ func (s *ListOpinionsOKItemOpinion) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		e.FieldStart("voteType")
-		s.VoteType.Encode(e)
+		if s.VoteType.Set {
+			e.FieldStart("voteType")
+			s.VoteType.Encode(e)
+		}
 	}
 	{
 		if s.PictureURL.Set {
@@ -2557,8 +2559,8 @@ func (s *ListOpinionsOKItemOpinion) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"parentID\"")
 			}
 		case "voteType":
-			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
+				s.VoteType.Reset()
 				if err := s.VoteType.Decode(d); err != nil {
 					return err
 				}
@@ -2596,7 +2598,7 @@ func (s *ListOpinionsOKItemOpinion) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00010101,
+		0b00000101,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -3469,8 +3471,10 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		e.FieldStart("voteType")
-		s.VoteType.Encode(e)
+		if s.VoteType.Set {
+			e.FieldStart("voteType")
+			s.VoteType.Encode(e)
+		}
 	}
 	{
 		if s.PictureURL.Set {
@@ -3550,8 +3554,8 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"parentID\"")
 			}
 		case "voteType":
-			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
+				s.VoteType.Reset()
 				if err := s.VoteType.Decode(d); err != nil {
 					return err
 				}
@@ -3589,7 +3593,7 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00010101,
+		0b00000101,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -3946,8 +3950,10 @@ func (s *OpinionCommentsOKRootOpinionOpinion) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		e.FieldStart("voteType")
-		s.VoteType.Encode(e)
+		if s.VoteType.Set {
+			e.FieldStart("voteType")
+			s.VoteType.Encode(e)
+		}
 	}
 	{
 		if s.PictureURL.Set {
@@ -4027,8 +4033,8 @@ func (s *OpinionCommentsOKRootOpinionOpinion) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"parentID\"")
 			}
 		case "voteType":
-			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
+				s.VoteType.Reset()
 				if err := s.VoteType.Decode(d); err != nil {
 					return err
 				}
@@ -4066,7 +4072,7 @@ func (s *OpinionCommentsOKRootOpinionOpinion) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00010101,
+		0b00000101,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -4453,6 +4459,39 @@ func (s *OptInt) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes ListOpinionsOKItemOpinionVoteType as json.
+func (o OptListOpinionsOKItemOpinionVoteType) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes ListOpinionsOKItemOpinionVoteType from json.
+func (o *OptListOpinionsOKItemOpinionVoteType) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptListOpinionsOKItemOpinionVoteType to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptListOpinionsOKItemOpinionVoteType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptListOpinionsOKItemOpinionVoteType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes bool as json.
 func (o OptNilBool) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -4606,6 +4645,72 @@ func (s *OptNilString) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes OpinionCommentsOKOpinionsItemOpinionVoteType as json.
+func (o OptOpinionCommentsOKOpinionsItemOpinionVoteType) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes OpinionCommentsOKOpinionsItemOpinionVoteType from json.
+func (o *OptOpinionCommentsOKOpinionsItemOpinionVoteType) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptOpinionCommentsOKOpinionsItemOpinionVoteType to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptOpinionCommentsOKOpinionsItemOpinionVoteType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptOpinionCommentsOKOpinionsItemOpinionVoteType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes OpinionCommentsOKRootOpinionOpinionVoteType as json.
+func (o OptOpinionCommentsOKRootOpinionOpinionVoteType) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes OpinionCommentsOKRootOpinionOpinionVoteType from json.
+func (o *OptOpinionCommentsOKRootOpinionOpinionVoteType) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptOpinionCommentsOKRootOpinionOpinionVoteType to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptOpinionCommentsOKRootOpinionOpinionVoteType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptOpinionCommentsOKRootOpinionOpinionVoteType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes string as json.
 func (o OptString) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -4672,6 +4777,39 @@ func (s OptURI) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptURI) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes VoteOKItemVoteType as json.
+func (o OptVoteOKItemVoteType) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes VoteOKItemVoteType from json.
+func (o *OptVoteOKItemVoteType) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptVoteOKItemVoteType to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptVoteOKItemVoteType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptVoteOKItemVoteType) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -5298,8 +5436,10 @@ func (s *VoteOKItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		e.FieldStart("voteType")
-		s.VoteType.Encode(e)
+		if s.VoteType.Set {
+			e.FieldStart("voteType")
+			s.VoteType.Encode(e)
+		}
 	}
 	{
 		if s.PictureURL.Set {
@@ -5379,8 +5519,8 @@ func (s *VoteOKItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"parentID\"")
 			}
 		case "voteType":
-			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
+				s.VoteType.Reset()
 				if err := s.VoteType.Decode(d); err != nil {
 					return err
 				}
@@ -5418,7 +5558,7 @@ func (s *VoteOKItem) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00010101,
+		0b00000101,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

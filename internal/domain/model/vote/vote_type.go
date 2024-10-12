@@ -1,4 +1,4 @@
-package opinion
+package vote
 
 type VoteType int
 

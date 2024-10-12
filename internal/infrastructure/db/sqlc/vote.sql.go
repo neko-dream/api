@@ -41,25 +41,17 @@ func (q *Queries) CreateVote(ctx context.Context, arg CreateVoteParams) error {
 	return err
 }
 
-const getVoteByUserIDAndOpinionID = `-- name: GetVoteByUserIDAndOpinionID :one
-SELECT
-    vote_id,
-    opinion_id,
-    user_id,
-    vote_type,
-    created_at
-FROM votes
-WHERE opinion_id = $1 AND user_id = $2
-LIMIT 1
+const findVoteByUserIDAndOpinionID = `-- name: FindVoteByUserIDAndOpinionID :one
+SELECT vote_id, opinion_id, user_id, vote_type, created_at FROM votes WHERE user_id = $1 AND opinion_id = $2
 `
 
-type GetVoteByUserIDAndOpinionIDParams struct {
-	OpinionID uuid.UUID
+type FindVoteByUserIDAndOpinionIDParams struct {
 	UserID    uuid.UUID
+	OpinionID uuid.UUID
 }
 
-func (q *Queries) GetVoteByUserIDAndOpinionID(ctx context.Context, arg GetVoteByUserIDAndOpinionIDParams) (Vote, error) {
-	row := q.db.QueryRowContext(ctx, getVoteByUserIDAndOpinionID, arg.OpinionID, arg.UserID)
+func (q *Queries) FindVoteByUserIDAndOpinionID(ctx context.Context, arg FindVoteByUserIDAndOpinionIDParams) (Vote, error) {
+	row := q.db.QueryRowContext(ctx, findVoteByUserIDAndOpinionID, arg.UserID, arg.OpinionID)
 	var i Vote
 	err := row.Scan(
 		&i.VoteID,

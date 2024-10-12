@@ -6,8 +6,7 @@ INSERT INTO opinions (
     parent_opinion_id,
     title,
     content,
-    vote_id,
     created_at
-) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
+) VALUES ($1, $2, $3, $4, $5, $6, $7);
 
 

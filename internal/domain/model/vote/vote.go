@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
@@ -20,25 +19,21 @@ type (
 		VoteID    shared.UUID[Vote]
 		OpinionID shared.UUID[opinion.Opinion]
 		UserID    shared.UUID[user.User]
-		VoteType  opinion.VoteType
+		VoteType  VoteType
 		CreatedAt time.Time
 	}
 )
 
 func NewVote(
 	voteID shared.UUID[Vote],
-	opinionID shared.UUID[opinion.Opinion],
+	parentOpinionID shared.UUID[opinion.Opinion],
 	userID shared.UUID[user.User],
-	VoteType opinion.VoteType,
+	VoteType VoteType,
 	createdAt time.Time,
 ) (*Vote, error) {
-	if VoteType == opinion.UnVoted {
-		return nil, messages.VoteUnvoteNotAllowed
-	}
-
 	return &Vote{
 		VoteID:    voteID,
-		OpinionID: opinionID,
+		OpinionID: parentOpinionID,
 		UserID:    userID,
 		VoteType:  VoteType,
 		CreatedAt: createdAt,

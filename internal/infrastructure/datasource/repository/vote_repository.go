@@ -34,7 +34,7 @@ func (o *voteRepository) Create(ctx context.Context, vote vote.Vote) error {
 }
 
 func (o *voteRepository) FindByOpinionAndUserID(ctx context.Context, opinionID shared.UUID[opinion.Opinion], userID shared.UUID[user.User]) (*vote.Vote, error) {
-	voteRow, err := o.GetQueries(ctx).GetVoteByUserIDAndOpinionID(ctx, model.GetVoteByUserIDAndOpinionIDParams{
+	voteRow, err := o.GetQueries(ctx).FindVoteByUserIDAndOpinionID(ctx, model.FindVoteByUserIDAndOpinionIDParams{
 		OpinionID: opinionID.UUID(),
 		UserID:    userID.UUID(),
 	})
@@ -46,7 +46,7 @@ func (o *voteRepository) FindByOpinionAndUserID(ctx context.Context, opinionID s
 		shared.MustParseUUID[vote.Vote](voteRow.VoteID.String()),
 		shared.MustParseUUID[opinion.Opinion](voteRow.OpinionID.String()),
 		shared.MustParseUUID[user.User](voteRow.UserID.String()),
-		opinion.VoteTypeFromInt(int(voteRow.VoteType)),
+		vote.VoteTypeFromInt(int(voteRow.VoteType)),
 		voteRow.CreatedAt,
 	)
 	if err != nil {

@@ -7,13 +7,5 @@ INSERT INTO votes (
     created_at
 ) VALUES ($1, $2, $3, $4, $5);
 
--- name: GetVoteByUserIDAndOpinionID :one
-SELECT
-    vote_id,
-    opinion_id,
-    user_id,
-    vote_type,
-    created_at
-FROM votes
-WHERE opinion_id = $1 AND user_id = $2
-LIMIT 1;
+-- name: FindVoteByUserIDAndOpinionID :one
+SELECT * FROM votes WHERE user_id = $1 AND opinion_id = $2;

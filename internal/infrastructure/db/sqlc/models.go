@@ -18,7 +18,6 @@ type Opinion struct {
 	ParentOpinionID uuid.NullUUID
 	Title           sql.NullString
 	Content         string
-	VoteID          uuid.NullUUID
 	CreatedAt       time.Time
 }
 

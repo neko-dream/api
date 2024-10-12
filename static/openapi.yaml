@@ -656,7 +656,7 @@ paths:
                           description: 親の意見ID。ルートならば無し
                         voteType:
                           type: string
-                          description: 意見投稿主の意見
+                          description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
                           enum:
                             - agree
                             - disagree
@@ -680,7 +680,6 @@ paths:
                       required:
                         - content
                         - id
-                        - voteType
                     user:
                       type: object
                       properties:
@@ -763,7 +762,6 @@ paths:
                   example: ''
                   nullable: true
               required:
-                - voteStatus
                 - opinionContent
       responses:
         '200':
@@ -841,7 +839,7 @@ paths:
                       description: 親の意見ID。ルートならば無し
                     voteType:
                       type: string
-                      description: 意見投稿主の意見
+                      description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
                       enum:
                         - agree
                         - disagree
@@ -865,7 +863,6 @@ paths:
                   required:
                     - content
                     - id
-                    - voteType
         '500':
           description: ServerErrorResponse
           content:
@@ -947,7 +944,7 @@ paths:
                             description: 親の意見ID。ルートならば無し
                           voteType:
                             type: string
-                            description: 意見投稿主の意見
+                            description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
                             enum:
                               - agree
                               - disagree
@@ -971,7 +968,6 @@ paths:
                         required:
                           - content
                           - id
-                          - voteType
                     required:
                       - user
                       - opinion
@@ -999,7 +995,7 @@ paths:
                               description: 親の意見ID。ルートならば無し
                             voteType:
                               type: string
-                              description: 意見投稿主の意見
+                              description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
                               enum:
                                 - agree
                                 - disagree
@@ -1023,7 +1019,6 @@ paths:
                           required:
                             - content
                             - id
-                            - voteType
                         user:
                           type: object
                           properties:
@@ -1046,7 +1041,7 @@ paths:
                           description: 作成ユーザー
                         myItentionStatus:
                           type: string
-                          description: 意見投稿主の意見
+                          description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
                           enum:
                             - agree
                             - disagree
@@ -1405,7 +1400,7 @@ components:
           description: 親の意見ID。ルートならば無し
         voteType:
           type: string
-          description: 意見投稿主の意見
+          description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
           enum:
             - agree
             - disagree
@@ -1429,7 +1424,6 @@ components:
       required:
         - content
         - id
-        - voteType
     user:
       type: object
       properties:

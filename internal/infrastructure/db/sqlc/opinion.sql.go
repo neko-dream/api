@@ -21,9 +21,8 @@ INSERT INTO opinions (
     parent_opinion_id,
     title,
     content,
-    vote_id,
     created_at
-) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+) VALUES ($1, $2, $3, $4, $5, $6, $7)
 `
 
 type CreateOpinionParams struct {
@@ -33,7 +32,6 @@ type CreateOpinionParams struct {
 	ParentOpinionID uuid.NullUUID
 	Title           sql.NullString
 	Content         string
-	VoteID          uuid.NullUUID
 	CreatedAt       time.Time
 }
 
@@ -45,7 +43,6 @@ func (q *Queries) CreateOpinion(ctx context.Context, arg CreateOpinionParams) er
 		arg.ParentOpinionID,
 		arg.Title,
 		arg.Content,
-		arg.VoteID,
 		arg.CreatedAt,
 	)
 	return err
