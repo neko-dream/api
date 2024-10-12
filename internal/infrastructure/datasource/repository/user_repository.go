@@ -145,6 +145,10 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 		}
 	}
 
+	if err := u.GetQueries(ctx).VerifyUser(ctx, user.UserID().UUID()); err != nil {
+		return errtrace.Wrap(err)
+	}
+
 	return nil
 }
 
