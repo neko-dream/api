@@ -55,7 +55,7 @@ func NewOpinion(
 	if len(content) > 140 && len(content) < 5 {
 		return nil, messages.OpinionContentBadLength
 	}
-	if opinionID == *parentOpinionID {
+	if parentOpinionID != nil && opinionID == *parentOpinionID {
 		return nil, messages.OpinionParentOpinionIDIsSame
 	}
 	if title != nil && len(*title) > 50 && len(*title) < 5 {
