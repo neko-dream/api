@@ -1236,163 +1236,6 @@ func (s *GetUserProfileOK) SetIconURL(val OptString) {
 	s.IconURL = val
 }
 
-type IntentionInternalServerError struct{}
-
-func (*IntentionInternalServerError) intentionRes() {}
-
-type IntentionOKApplicationJSON []IntentionOKItem
-
-func (*IntentionOKApplicationJSON) intentionRes() {}
-
-type IntentionOKItem struct {
-	// 意見ID.
-	ID    string    `json:"id"`
-	Title OptString `json:"title"`
-	// 意見のテキスト.
-	Content string `json:"content"`
-	// 親の意見ID。ルートならば無し.
-	ParentID OptString `json:"parentID"`
-	// 意見投稿主の意見.
-	IntentionStatus IntentionOKItemIntentionStatus `json:"intentionStatus"`
-	// 画像が返る場合もある.
-	PictureURL OptString `json:"pictureURL"`
-	// 参考文献URL.
-	ReferenceURL OptString `json:"referenceURL"`
-}
-
-// GetID returns the value of ID.
-func (s *IntentionOKItem) GetID() string {
-	return s.ID
-}
-
-// GetTitle returns the value of Title.
-func (s *IntentionOKItem) GetTitle() OptString {
-	return s.Title
-}
-
-// GetContent returns the value of Content.
-func (s *IntentionOKItem) GetContent() string {
-	return s.Content
-}
-
-// GetParentID returns the value of ParentID.
-func (s *IntentionOKItem) GetParentID() OptString {
-	return s.ParentID
-}
-
-// GetIntentionStatus returns the value of IntentionStatus.
-func (s *IntentionOKItem) GetIntentionStatus() IntentionOKItemIntentionStatus {
-	return s.IntentionStatus
-}
-
-// GetPictureURL returns the value of PictureURL.
-func (s *IntentionOKItem) GetPictureURL() OptString {
-	return s.PictureURL
-}
-
-// GetReferenceURL returns the value of ReferenceURL.
-func (s *IntentionOKItem) GetReferenceURL() OptString {
-	return s.ReferenceURL
-}
-
-// SetID sets the value of ID.
-func (s *IntentionOKItem) SetID(val string) {
-	s.ID = val
-}
-
-// SetTitle sets the value of Title.
-func (s *IntentionOKItem) SetTitle(val OptString) {
-	s.Title = val
-}
-
-// SetContent sets the value of Content.
-func (s *IntentionOKItem) SetContent(val string) {
-	s.Content = val
-}
-
-// SetParentID sets the value of ParentID.
-func (s *IntentionOKItem) SetParentID(val OptString) {
-	s.ParentID = val
-}
-
-// SetIntentionStatus sets the value of IntentionStatus.
-func (s *IntentionOKItem) SetIntentionStatus(val IntentionOKItemIntentionStatus) {
-	s.IntentionStatus = val
-}
-
-// SetPictureURL sets the value of PictureURL.
-func (s *IntentionOKItem) SetPictureURL(val OptString) {
-	s.PictureURL = val
-}
-
-// SetReferenceURL sets the value of ReferenceURL.
-func (s *IntentionOKItem) SetReferenceURL(val OptString) {
-	s.ReferenceURL = val
-}
-
-// 意見投稿主の意見.
-type IntentionOKItemIntentionStatus string
-
-const (
-	IntentionOKItemIntentionStatusAgree    IntentionOKItemIntentionStatus = "agree"
-	IntentionOKItemIntentionStatusDisagree IntentionOKItemIntentionStatus = "disagree"
-	IntentionOKItemIntentionStatusPass     IntentionOKItemIntentionStatus = "pass"
-)
-
-// AllValues returns all IntentionOKItemIntentionStatus values.
-func (IntentionOKItemIntentionStatus) AllValues() []IntentionOKItemIntentionStatus {
-	return []IntentionOKItemIntentionStatus{
-		IntentionOKItemIntentionStatusAgree,
-		IntentionOKItemIntentionStatusDisagree,
-		IntentionOKItemIntentionStatusPass,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s IntentionOKItemIntentionStatus) MarshalText() ([]byte, error) {
-	switch s {
-	case IntentionOKItemIntentionStatusAgree:
-		return []byte(s), nil
-	case IntentionOKItemIntentionStatusDisagree:
-		return []byte(s), nil
-	case IntentionOKItemIntentionStatusPass:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *IntentionOKItemIntentionStatus) UnmarshalText(data []byte) error {
-	switch IntentionOKItemIntentionStatus(data) {
-	case IntentionOKItemIntentionStatusAgree:
-		*s = IntentionOKItemIntentionStatusAgree
-		return nil
-	case IntentionOKItemIntentionStatusDisagree:
-		*s = IntentionOKItemIntentionStatusDisagree
-		return nil
-	case IntentionOKItemIntentionStatusPass:
-		*s = IntentionOKItemIntentionStatusPass
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
-}
-
-type IntentionReq struct {
-	IntentionStatus string `json:"intentionStatus"`
-}
-
-// GetIntentionStatus returns the value of IntentionStatus.
-func (s *IntentionReq) GetIntentionStatus() string {
-	return s.IntentionStatus
-}
-
-// SetIntentionStatus sets the value of IntentionStatus.
-func (s *IntentionReq) SetIntentionStatus(val string) {
-	s.IntentionStatus = val
-}
-
 type ListOpinionsInternalServerError struct{}
 
 func (*ListOpinionsInternalServerError) listOpinionsRes() {}
@@ -1447,7 +1290,7 @@ type ListOpinionsOKItemOpinion struct {
 	// 親の意見ID。ルートならば無し.
 	ParentID OptString `json:"parentID"`
 	// 意見投稿主の意見.
-	IntentionStatus ListOpinionsOKItemOpinionIntentionStatus `json:"intentionStatus"`
+	VoteStatus ListOpinionsOKItemOpinionVoteStatus `json:"voteStatus"`
 	// 画像が返る場合もある.
 	PictureURL OptString `json:"pictureURL"`
 	// 参考文献URL.
@@ -1474,9 +1317,9 @@ func (s *ListOpinionsOKItemOpinion) GetParentID() OptString {
 	return s.ParentID
 }
 
-// GetIntentionStatus returns the value of IntentionStatus.
-func (s *ListOpinionsOKItemOpinion) GetIntentionStatus() ListOpinionsOKItemOpinionIntentionStatus {
-	return s.IntentionStatus
+// GetVoteStatus returns the value of VoteStatus.
+func (s *ListOpinionsOKItemOpinion) GetVoteStatus() ListOpinionsOKItemOpinionVoteStatus {
+	return s.VoteStatus
 }
 
 // GetPictureURL returns the value of PictureURL.
@@ -1509,9 +1352,9 @@ func (s *ListOpinionsOKItemOpinion) SetParentID(val OptString) {
 	s.ParentID = val
 }
 
-// SetIntentionStatus sets the value of IntentionStatus.
-func (s *ListOpinionsOKItemOpinion) SetIntentionStatus(val ListOpinionsOKItemOpinionIntentionStatus) {
-	s.IntentionStatus = val
+// SetVoteStatus sets the value of VoteStatus.
+func (s *ListOpinionsOKItemOpinion) SetVoteStatus(val ListOpinionsOKItemOpinionVoteStatus) {
+	s.VoteStatus = val
 }
 
 // SetPictureURL sets the value of PictureURL.
@@ -1525,31 +1368,31 @@ func (s *ListOpinionsOKItemOpinion) SetReferenceURL(val OptString) {
 }
 
 // 意見投稿主の意見.
-type ListOpinionsOKItemOpinionIntentionStatus string
+type ListOpinionsOKItemOpinionVoteStatus string
 
 const (
-	ListOpinionsOKItemOpinionIntentionStatusAgree    ListOpinionsOKItemOpinionIntentionStatus = "agree"
-	ListOpinionsOKItemOpinionIntentionStatusDisagree ListOpinionsOKItemOpinionIntentionStatus = "disagree"
-	ListOpinionsOKItemOpinionIntentionStatusPass     ListOpinionsOKItemOpinionIntentionStatus = "pass"
+	ListOpinionsOKItemOpinionVoteStatusAgree    ListOpinionsOKItemOpinionVoteStatus = "agree"
+	ListOpinionsOKItemOpinionVoteStatusDisagree ListOpinionsOKItemOpinionVoteStatus = "disagree"
+	ListOpinionsOKItemOpinionVoteStatusPass     ListOpinionsOKItemOpinionVoteStatus = "pass"
 )
 
-// AllValues returns all ListOpinionsOKItemOpinionIntentionStatus values.
-func (ListOpinionsOKItemOpinionIntentionStatus) AllValues() []ListOpinionsOKItemOpinionIntentionStatus {
-	return []ListOpinionsOKItemOpinionIntentionStatus{
-		ListOpinionsOKItemOpinionIntentionStatusAgree,
-		ListOpinionsOKItemOpinionIntentionStatusDisagree,
-		ListOpinionsOKItemOpinionIntentionStatusPass,
+// AllValues returns all ListOpinionsOKItemOpinionVoteStatus values.
+func (ListOpinionsOKItemOpinionVoteStatus) AllValues() []ListOpinionsOKItemOpinionVoteStatus {
+	return []ListOpinionsOKItemOpinionVoteStatus{
+		ListOpinionsOKItemOpinionVoteStatusAgree,
+		ListOpinionsOKItemOpinionVoteStatusDisagree,
+		ListOpinionsOKItemOpinionVoteStatusPass,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s ListOpinionsOKItemOpinionIntentionStatus) MarshalText() ([]byte, error) {
+func (s ListOpinionsOKItemOpinionVoteStatus) MarshalText() ([]byte, error) {
 	switch s {
-	case ListOpinionsOKItemOpinionIntentionStatusAgree:
+	case ListOpinionsOKItemOpinionVoteStatusAgree:
 		return []byte(s), nil
-	case ListOpinionsOKItemOpinionIntentionStatusDisagree:
+	case ListOpinionsOKItemOpinionVoteStatusDisagree:
 		return []byte(s), nil
-	case ListOpinionsOKItemOpinionIntentionStatusPass:
+	case ListOpinionsOKItemOpinionVoteStatusPass:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -1557,16 +1400,16 @@ func (s ListOpinionsOKItemOpinionIntentionStatus) MarshalText() ([]byte, error) 
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *ListOpinionsOKItemOpinionIntentionStatus) UnmarshalText(data []byte) error {
-	switch ListOpinionsOKItemOpinionIntentionStatus(data) {
-	case ListOpinionsOKItemOpinionIntentionStatusAgree:
-		*s = ListOpinionsOKItemOpinionIntentionStatusAgree
+func (s *ListOpinionsOKItemOpinionVoteStatus) UnmarshalText(data []byte) error {
+	switch ListOpinionsOKItemOpinionVoteStatus(data) {
+	case ListOpinionsOKItemOpinionVoteStatusAgree:
+		*s = ListOpinionsOKItemOpinionVoteStatusAgree
 		return nil
-	case ListOpinionsOKItemOpinionIntentionStatusDisagree:
-		*s = ListOpinionsOKItemOpinionIntentionStatusDisagree
+	case ListOpinionsOKItemOpinionVoteStatusDisagree:
+		*s = ListOpinionsOKItemOpinionVoteStatusDisagree
 		return nil
-	case ListOpinionsOKItemOpinionIntentionStatusPass:
-		*s = ListOpinionsOKItemOpinionIntentionStatusPass
+	case ListOpinionsOKItemOpinionVoteStatusPass:
+		*s = ListOpinionsOKItemOpinionVoteStatusPass
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -1985,7 +1828,7 @@ type OpinionCommentsOKOpinionsItemOpinion struct {
 	// 親の意見ID。ルートならば無し.
 	ParentID OptString `json:"parentID"`
 	// 意見投稿主の意見.
-	IntentionStatus OpinionCommentsOKOpinionsItemOpinionIntentionStatus `json:"intentionStatus"`
+	VoteStatus OpinionCommentsOKOpinionsItemOpinionVoteStatus `json:"voteStatus"`
 	// 画像が返る場合もある.
 	PictureURL OptString `json:"pictureURL"`
 	// 参考文献URL.
@@ -2012,9 +1855,9 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) GetParentID() OptString {
 	return s.ParentID
 }
 
-// GetIntentionStatus returns the value of IntentionStatus.
-func (s *OpinionCommentsOKOpinionsItemOpinion) GetIntentionStatus() OpinionCommentsOKOpinionsItemOpinionIntentionStatus {
-	return s.IntentionStatus
+// GetVoteStatus returns the value of VoteStatus.
+func (s *OpinionCommentsOKOpinionsItemOpinion) GetVoteStatus() OpinionCommentsOKOpinionsItemOpinionVoteStatus {
+	return s.VoteStatus
 }
 
 // GetPictureURL returns the value of PictureURL.
@@ -2047,9 +1890,9 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) SetParentID(val OptString) {
 	s.ParentID = val
 }
 
-// SetIntentionStatus sets the value of IntentionStatus.
-func (s *OpinionCommentsOKOpinionsItemOpinion) SetIntentionStatus(val OpinionCommentsOKOpinionsItemOpinionIntentionStatus) {
-	s.IntentionStatus = val
+// SetVoteStatus sets the value of VoteStatus.
+func (s *OpinionCommentsOKOpinionsItemOpinion) SetVoteStatus(val OpinionCommentsOKOpinionsItemOpinionVoteStatus) {
+	s.VoteStatus = val
 }
 
 // SetPictureURL sets the value of PictureURL.
@@ -2063,31 +1906,31 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) SetReferenceURL(val OptString) {
 }
 
 // 意見投稿主の意見.
-type OpinionCommentsOKOpinionsItemOpinionIntentionStatus string
+type OpinionCommentsOKOpinionsItemOpinionVoteStatus string
 
 const (
-	OpinionCommentsOKOpinionsItemOpinionIntentionStatusAgree    OpinionCommentsOKOpinionsItemOpinionIntentionStatus = "agree"
-	OpinionCommentsOKOpinionsItemOpinionIntentionStatusDisagree OpinionCommentsOKOpinionsItemOpinionIntentionStatus = "disagree"
-	OpinionCommentsOKOpinionsItemOpinionIntentionStatusPass     OpinionCommentsOKOpinionsItemOpinionIntentionStatus = "pass"
+	OpinionCommentsOKOpinionsItemOpinionVoteStatusAgree    OpinionCommentsOKOpinionsItemOpinionVoteStatus = "agree"
+	OpinionCommentsOKOpinionsItemOpinionVoteStatusDisagree OpinionCommentsOKOpinionsItemOpinionVoteStatus = "disagree"
+	OpinionCommentsOKOpinionsItemOpinionVoteStatusPass     OpinionCommentsOKOpinionsItemOpinionVoteStatus = "pass"
 )
 
-// AllValues returns all OpinionCommentsOKOpinionsItemOpinionIntentionStatus values.
-func (OpinionCommentsOKOpinionsItemOpinionIntentionStatus) AllValues() []OpinionCommentsOKOpinionsItemOpinionIntentionStatus {
-	return []OpinionCommentsOKOpinionsItemOpinionIntentionStatus{
-		OpinionCommentsOKOpinionsItemOpinionIntentionStatusAgree,
-		OpinionCommentsOKOpinionsItemOpinionIntentionStatusDisagree,
-		OpinionCommentsOKOpinionsItemOpinionIntentionStatusPass,
+// AllValues returns all OpinionCommentsOKOpinionsItemOpinionVoteStatus values.
+func (OpinionCommentsOKOpinionsItemOpinionVoteStatus) AllValues() []OpinionCommentsOKOpinionsItemOpinionVoteStatus {
+	return []OpinionCommentsOKOpinionsItemOpinionVoteStatus{
+		OpinionCommentsOKOpinionsItemOpinionVoteStatusAgree,
+		OpinionCommentsOKOpinionsItemOpinionVoteStatusDisagree,
+		OpinionCommentsOKOpinionsItemOpinionVoteStatusPass,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s OpinionCommentsOKOpinionsItemOpinionIntentionStatus) MarshalText() ([]byte, error) {
+func (s OpinionCommentsOKOpinionsItemOpinionVoteStatus) MarshalText() ([]byte, error) {
 	switch s {
-	case OpinionCommentsOKOpinionsItemOpinionIntentionStatusAgree:
+	case OpinionCommentsOKOpinionsItemOpinionVoteStatusAgree:
 		return []byte(s), nil
-	case OpinionCommentsOKOpinionsItemOpinionIntentionStatusDisagree:
+	case OpinionCommentsOKOpinionsItemOpinionVoteStatusDisagree:
 		return []byte(s), nil
-	case OpinionCommentsOKOpinionsItemOpinionIntentionStatusPass:
+	case OpinionCommentsOKOpinionsItemOpinionVoteStatusPass:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -2095,16 +1938,16 @@ func (s OpinionCommentsOKOpinionsItemOpinionIntentionStatus) MarshalText() ([]by
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *OpinionCommentsOKOpinionsItemOpinionIntentionStatus) UnmarshalText(data []byte) error {
-	switch OpinionCommentsOKOpinionsItemOpinionIntentionStatus(data) {
-	case OpinionCommentsOKOpinionsItemOpinionIntentionStatusAgree:
-		*s = OpinionCommentsOKOpinionsItemOpinionIntentionStatusAgree
+func (s *OpinionCommentsOKOpinionsItemOpinionVoteStatus) UnmarshalText(data []byte) error {
+	switch OpinionCommentsOKOpinionsItemOpinionVoteStatus(data) {
+	case OpinionCommentsOKOpinionsItemOpinionVoteStatusAgree:
+		*s = OpinionCommentsOKOpinionsItemOpinionVoteStatusAgree
 		return nil
-	case OpinionCommentsOKOpinionsItemOpinionIntentionStatusDisagree:
-		*s = OpinionCommentsOKOpinionsItemOpinionIntentionStatusDisagree
+	case OpinionCommentsOKOpinionsItemOpinionVoteStatusDisagree:
+		*s = OpinionCommentsOKOpinionsItemOpinionVoteStatusDisagree
 		return nil
-	case OpinionCommentsOKOpinionsItemOpinionIntentionStatusPass:
-		*s = OpinionCommentsOKOpinionsItemOpinionIntentionStatusPass
+	case OpinionCommentsOKOpinionsItemOpinionVoteStatusPass:
+		*s = OpinionCommentsOKOpinionsItemOpinionVoteStatusPass
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -2183,7 +2026,7 @@ type OpinionCommentsOKRootOpinionOpinion struct {
 	// 親の意見ID。ルートならば無し.
 	ParentID OptString `json:"parentID"`
 	// 意見投稿主の意見.
-	IntentionStatus OpinionCommentsOKRootOpinionOpinionIntentionStatus `json:"intentionStatus"`
+	VoteStatus OpinionCommentsOKRootOpinionOpinionVoteStatus `json:"voteStatus"`
 	// 画像が返る場合もある.
 	PictureURL OptString `json:"pictureURL"`
 	// 参考文献URL.
@@ -2210,9 +2053,9 @@ func (s *OpinionCommentsOKRootOpinionOpinion) GetParentID() OptString {
 	return s.ParentID
 }
 
-// GetIntentionStatus returns the value of IntentionStatus.
-func (s *OpinionCommentsOKRootOpinionOpinion) GetIntentionStatus() OpinionCommentsOKRootOpinionOpinionIntentionStatus {
-	return s.IntentionStatus
+// GetVoteStatus returns the value of VoteStatus.
+func (s *OpinionCommentsOKRootOpinionOpinion) GetVoteStatus() OpinionCommentsOKRootOpinionOpinionVoteStatus {
+	return s.VoteStatus
 }
 
 // GetPictureURL returns the value of PictureURL.
@@ -2245,9 +2088,9 @@ func (s *OpinionCommentsOKRootOpinionOpinion) SetParentID(val OptString) {
 	s.ParentID = val
 }
 
-// SetIntentionStatus sets the value of IntentionStatus.
-func (s *OpinionCommentsOKRootOpinionOpinion) SetIntentionStatus(val OpinionCommentsOKRootOpinionOpinionIntentionStatus) {
-	s.IntentionStatus = val
+// SetVoteStatus sets the value of VoteStatus.
+func (s *OpinionCommentsOKRootOpinionOpinion) SetVoteStatus(val OpinionCommentsOKRootOpinionOpinionVoteStatus) {
+	s.VoteStatus = val
 }
 
 // SetPictureURL sets the value of PictureURL.
@@ -2261,31 +2104,31 @@ func (s *OpinionCommentsOKRootOpinionOpinion) SetReferenceURL(val OptString) {
 }
 
 // 意見投稿主の意見.
-type OpinionCommentsOKRootOpinionOpinionIntentionStatus string
+type OpinionCommentsOKRootOpinionOpinionVoteStatus string
 
 const (
-	OpinionCommentsOKRootOpinionOpinionIntentionStatusAgree    OpinionCommentsOKRootOpinionOpinionIntentionStatus = "agree"
-	OpinionCommentsOKRootOpinionOpinionIntentionStatusDisagree OpinionCommentsOKRootOpinionOpinionIntentionStatus = "disagree"
-	OpinionCommentsOKRootOpinionOpinionIntentionStatusPass     OpinionCommentsOKRootOpinionOpinionIntentionStatus = "pass"
+	OpinionCommentsOKRootOpinionOpinionVoteStatusAgree    OpinionCommentsOKRootOpinionOpinionVoteStatus = "agree"
+	OpinionCommentsOKRootOpinionOpinionVoteStatusDisagree OpinionCommentsOKRootOpinionOpinionVoteStatus = "disagree"
+	OpinionCommentsOKRootOpinionOpinionVoteStatusPass     OpinionCommentsOKRootOpinionOpinionVoteStatus = "pass"
 )
 
-// AllValues returns all OpinionCommentsOKRootOpinionOpinionIntentionStatus values.
-func (OpinionCommentsOKRootOpinionOpinionIntentionStatus) AllValues() []OpinionCommentsOKRootOpinionOpinionIntentionStatus {
-	return []OpinionCommentsOKRootOpinionOpinionIntentionStatus{
-		OpinionCommentsOKRootOpinionOpinionIntentionStatusAgree,
-		OpinionCommentsOKRootOpinionOpinionIntentionStatusDisagree,
-		OpinionCommentsOKRootOpinionOpinionIntentionStatusPass,
+// AllValues returns all OpinionCommentsOKRootOpinionOpinionVoteStatus values.
+func (OpinionCommentsOKRootOpinionOpinionVoteStatus) AllValues() []OpinionCommentsOKRootOpinionOpinionVoteStatus {
+	return []OpinionCommentsOKRootOpinionOpinionVoteStatus{
+		OpinionCommentsOKRootOpinionOpinionVoteStatusAgree,
+		OpinionCommentsOKRootOpinionOpinionVoteStatusDisagree,
+		OpinionCommentsOKRootOpinionOpinionVoteStatusPass,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s OpinionCommentsOKRootOpinionOpinionIntentionStatus) MarshalText() ([]byte, error) {
+func (s OpinionCommentsOKRootOpinionOpinionVoteStatus) MarshalText() ([]byte, error) {
 	switch s {
-	case OpinionCommentsOKRootOpinionOpinionIntentionStatusAgree:
+	case OpinionCommentsOKRootOpinionOpinionVoteStatusAgree:
 		return []byte(s), nil
-	case OpinionCommentsOKRootOpinionOpinionIntentionStatusDisagree:
+	case OpinionCommentsOKRootOpinionOpinionVoteStatusDisagree:
 		return []byte(s), nil
-	case OpinionCommentsOKRootOpinionOpinionIntentionStatusPass:
+	case OpinionCommentsOKRootOpinionOpinionVoteStatusPass:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -2293,16 +2136,16 @@ func (s OpinionCommentsOKRootOpinionOpinionIntentionStatus) MarshalText() ([]byt
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *OpinionCommentsOKRootOpinionOpinionIntentionStatus) UnmarshalText(data []byte) error {
-	switch OpinionCommentsOKRootOpinionOpinionIntentionStatus(data) {
-	case OpinionCommentsOKRootOpinionOpinionIntentionStatusAgree:
-		*s = OpinionCommentsOKRootOpinionOpinionIntentionStatusAgree
+func (s *OpinionCommentsOKRootOpinionOpinionVoteStatus) UnmarshalText(data []byte) error {
+	switch OpinionCommentsOKRootOpinionOpinionVoteStatus(data) {
+	case OpinionCommentsOKRootOpinionOpinionVoteStatusAgree:
+		*s = OpinionCommentsOKRootOpinionOpinionVoteStatusAgree
 		return nil
-	case OpinionCommentsOKRootOpinionOpinionIntentionStatusDisagree:
-		*s = OpinionCommentsOKRootOpinionOpinionIntentionStatusDisagree
+	case OpinionCommentsOKRootOpinionOpinionVoteStatusDisagree:
+		*s = OpinionCommentsOKRootOpinionOpinionVoteStatusDisagree
 		return nil
-	case OpinionCommentsOKRootOpinionOpinionIntentionStatusPass:
-		*s = OpinionCommentsOKRootOpinionOpinionIntentionStatusPass
+	case OpinionCommentsOKRootOpinionOpinionVoteStatusPass:
+		*s = OpinionCommentsOKRootOpinionOpinionVoteStatusPass
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -2662,52 +2505,6 @@ func (o OptInt) Get() (v int, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptInt) Or(d int) int {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptIntentionReq returns new OptIntentionReq with value set to v.
-func NewOptIntentionReq(v IntentionReq) OptIntentionReq {
-	return OptIntentionReq{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptIntentionReq is optional IntentionReq.
-type OptIntentionReq struct {
-	Value IntentionReq
-	Set   bool
-}
-
-// IsSet returns true if OptIntentionReq was set.
-func (o OptIntentionReq) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptIntentionReq) Reset() {
-	var v IntentionReq
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptIntentionReq) SetTo(v IntentionReq) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptIntentionReq) Get() (v IntentionReq, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptIntentionReq) Or(d IntentionReq) IntentionReq {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -3385,6 +3182,52 @@ func (o OptURI) Or(d url.URL) url.URL {
 	return d
 }
 
+// NewOptVoteReq returns new OptVoteReq with value set to v.
+func NewOptVoteReq(v VoteReq) OptVoteReq {
+	return OptVoteReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptVoteReq is optional VoteReq.
+type OptVoteReq struct {
+	Value VoteReq
+	Set   bool
+}
+
+// IsSet returns true if OptVoteReq was set.
+func (o OptVoteReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptVoteReq) Reset() {
+	var v VoteReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptVoteReq) SetTo(v VoteReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptVoteReq) Get() (v VoteReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptVoteReq) Or(d VoteReq) VoteReq {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 type PostOpinionPostInternalServerError struct{}
 
 func (*PostOpinionPostInternalServerError) postOpinionPostRes() {}
@@ -3395,7 +3238,7 @@ func (*PostOpinionPostOK) postOpinionPostRes() {}
 
 type PostOpinionPostReq struct {
 	ParentOpinionID OptNilString `json:"parentOpinionID"`
-	IntentionStatus string       `json:"intentionStatus"`
+	VoteStatus      string       `json:"voteStatus"`
 	Title           OptNilString `json:"title"`
 	OpinionContent  string       `json:"opinionContent"`
 	ReferenceURL    OptNilString `json:"referenceURL"`
@@ -3407,9 +3250,9 @@ func (s *PostOpinionPostReq) GetParentOpinionID() OptNilString {
 	return s.ParentOpinionID
 }
 
-// GetIntentionStatus returns the value of IntentionStatus.
-func (s *PostOpinionPostReq) GetIntentionStatus() string {
-	return s.IntentionStatus
+// GetVoteStatus returns the value of VoteStatus.
+func (s *PostOpinionPostReq) GetVoteStatus() string {
+	return s.VoteStatus
 }
 
 // GetTitle returns the value of Title.
@@ -3437,9 +3280,9 @@ func (s *PostOpinionPostReq) SetParentOpinionID(val OptNilString) {
 	s.ParentOpinionID = val
 }
 
-// SetIntentionStatus sets the value of IntentionStatus.
-func (s *PostOpinionPostReq) SetIntentionStatus(val string) {
-	s.IntentionStatus = val
+// SetVoteStatus sets the value of VoteStatus.
+func (s *PostOpinionPostReq) SetVoteStatus(val string) {
+	s.VoteStatus = val
 }
 
 // SetTitle sets the value of Title.
@@ -3856,3 +3699,160 @@ func (s *TestOK) SetOptNilUrl(val OptNilString) {
 }
 
 func (*TestOK) testRes() {}
+
+type VoteInternalServerError struct{}
+
+func (*VoteInternalServerError) voteRes() {}
+
+type VoteOKApplicationJSON []VoteOKItem
+
+func (*VoteOKApplicationJSON) voteRes() {}
+
+type VoteOKItem struct {
+	// 意見ID.
+	ID    string    `json:"id"`
+	Title OptString `json:"title"`
+	// 意見のテキスト.
+	Content string `json:"content"`
+	// 親の意見ID。ルートならば無し.
+	ParentID OptString `json:"parentID"`
+	// 意見投稿主の意見.
+	VoteStatus VoteOKItemVoteStatus `json:"voteStatus"`
+	// 画像が返る場合もある.
+	PictureURL OptString `json:"pictureURL"`
+	// 参考文献URL.
+	ReferenceURL OptString `json:"referenceURL"`
+}
+
+// GetID returns the value of ID.
+func (s *VoteOKItem) GetID() string {
+	return s.ID
+}
+
+// GetTitle returns the value of Title.
+func (s *VoteOKItem) GetTitle() OptString {
+	return s.Title
+}
+
+// GetContent returns the value of Content.
+func (s *VoteOKItem) GetContent() string {
+	return s.Content
+}
+
+// GetParentID returns the value of ParentID.
+func (s *VoteOKItem) GetParentID() OptString {
+	return s.ParentID
+}
+
+// GetVoteStatus returns the value of VoteStatus.
+func (s *VoteOKItem) GetVoteStatus() VoteOKItemVoteStatus {
+	return s.VoteStatus
+}
+
+// GetPictureURL returns the value of PictureURL.
+func (s *VoteOKItem) GetPictureURL() OptString {
+	return s.PictureURL
+}
+
+// GetReferenceURL returns the value of ReferenceURL.
+func (s *VoteOKItem) GetReferenceURL() OptString {
+	return s.ReferenceURL
+}
+
+// SetID sets the value of ID.
+func (s *VoteOKItem) SetID(val string) {
+	s.ID = val
+}
+
+// SetTitle sets the value of Title.
+func (s *VoteOKItem) SetTitle(val OptString) {
+	s.Title = val
+}
+
+// SetContent sets the value of Content.
+func (s *VoteOKItem) SetContent(val string) {
+	s.Content = val
+}
+
+// SetParentID sets the value of ParentID.
+func (s *VoteOKItem) SetParentID(val OptString) {
+	s.ParentID = val
+}
+
+// SetVoteStatus sets the value of VoteStatus.
+func (s *VoteOKItem) SetVoteStatus(val VoteOKItemVoteStatus) {
+	s.VoteStatus = val
+}
+
+// SetPictureURL sets the value of PictureURL.
+func (s *VoteOKItem) SetPictureURL(val OptString) {
+	s.PictureURL = val
+}
+
+// SetReferenceURL sets the value of ReferenceURL.
+func (s *VoteOKItem) SetReferenceURL(val OptString) {
+	s.ReferenceURL = val
+}
+
+// 意見投稿主の意見.
+type VoteOKItemVoteStatus string
+
+const (
+	VoteOKItemVoteStatusAgree    VoteOKItemVoteStatus = "agree"
+	VoteOKItemVoteStatusDisagree VoteOKItemVoteStatus = "disagree"
+	VoteOKItemVoteStatusPass     VoteOKItemVoteStatus = "pass"
+)
+
+// AllValues returns all VoteOKItemVoteStatus values.
+func (VoteOKItemVoteStatus) AllValues() []VoteOKItemVoteStatus {
+	return []VoteOKItemVoteStatus{
+		VoteOKItemVoteStatusAgree,
+		VoteOKItemVoteStatusDisagree,
+		VoteOKItemVoteStatusPass,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s VoteOKItemVoteStatus) MarshalText() ([]byte, error) {
+	switch s {
+	case VoteOKItemVoteStatusAgree:
+		return []byte(s), nil
+	case VoteOKItemVoteStatusDisagree:
+		return []byte(s), nil
+	case VoteOKItemVoteStatusPass:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *VoteOKItemVoteStatus) UnmarshalText(data []byte) error {
+	switch VoteOKItemVoteStatus(data) {
+	case VoteOKItemVoteStatusAgree:
+		*s = VoteOKItemVoteStatusAgree
+		return nil
+	case VoteOKItemVoteStatusDisagree:
+		*s = VoteOKItemVoteStatusDisagree
+		return nil
+	case VoteOKItemVoteStatusPass:
+		*s = VoteOKItemVoteStatusPass
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type VoteReq struct {
+	VoteStatus string `json:"voteStatus"`
+}
+
+// GetVoteStatus returns the value of VoteStatus.
+func (s *VoteReq) GetVoteStatus() string {
+	return s.VoteStatus
+}
+
+// SetVoteStatus sets the value of VoteStatus.
+func (s *VoteReq) SetVoteStatus(val string) {
+	s.VoteStatus = val
+}

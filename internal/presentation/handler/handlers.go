@@ -6,7 +6,7 @@ import (
 
 type handlers struct {
 	oas.AuthHandler
-	oas.IntentionHandler
+	oas.VoteHandler
 	oas.OpinionHandler
 	oas.TalkSessionHandler
 	oas.UserHandler
@@ -15,14 +15,14 @@ type handlers struct {
 
 func NewHandler(
 	authHandler oas.AuthHandler,
-	intentionHandler oas.IntentionHandler,
+	voteHandler oas.VoteHandler,
 	opinionHandler oas.OpinionHandler,
 	talkSessionHandler oas.TalkSessionHandler,
 	userHandler oas.UserHandler,
 ) oas.Handler {
 	return &handlers{
 		AuthHandler:        authHandler,
-		IntentionHandler:   intentionHandler,
+		VoteHandler:        voteHandler,
 		OpinionHandler:     opinionHandler,
 		TalkSessionHandler: talkSessionHandler,
 		UserHandler:        userHandler,

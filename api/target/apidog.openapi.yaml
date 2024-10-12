@@ -13,7 +13,7 @@
       "name": "talk_session/opinion"
     },
     {
-      "name": "talk_session/opinion/intention"
+      "name": "talk_session/opinion/vote"
     },
     {
       "name": "user"
@@ -25,7 +25,7 @@
       "name": "opinion"
     },
     {
-      "name": "intention"
+      "name": "vote"
     }
   ],
   "paths": {
@@ -716,7 +716,7 @@
       "post": {
         "summary": "セッションに対して意見投稿",
         "deprecated": false,
-        "description": "",
+        "description": "parentOpinionIDがなければルートの意見として投稿される",
         "operationId": "postOpinionPost",
         "tags": [
           "talk_session/opinion",
@@ -744,7 +744,7 @@
                     "example": "",
                     "nullable": true
                   },
-                  "intentionStatus": {
+                  "voteStatus": {
                     "example": "",
                     "type": "string"
                   },
@@ -770,7 +770,7 @@
                   }
                 },
                 "required": [
-                  "intentionStatus",
+                  "voteStatus",
                   "opinionContent"
                 ]
               }
@@ -805,15 +805,15 @@
         "x-ogen-operation-group": "Opinion"
       }
     },
-    "/api/talksessions/{talkSessionID}/opinions/{opinionID}/intentions": {
+    "/api/talksessions/{talkSessionID}/opinions/{opinionID}/votes": {
       "post": {
         "summary": "意思表明API",
         "deprecated": false,
         "description": "",
-        "operationId": "Intention",
+        "operationId": "vote",
         "tags": [
-          "talk_session/opinion/intention",
-          "intention"
+          "talk_session/opinion/vote",
+          "vote"
         ],
         "parameters": [
           {
@@ -841,13 +841,13 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "intentionStatus": {
+                  "voteStatus": {
                     "example": "",
                     "type": "string"
                   }
                 },
                 "required": [
-                  "intentionStatus"
+                  "voteStatus"
                 ]
               }
             }
@@ -880,7 +880,7 @@
           }
         },
         "security": [],
-        "x-ogen-operation-group": "Intention"
+        "x-ogen-operation-group": "Vote"
       }
     },
     "/api/talksession/{talkSessionID}/opinions/{opinionID}": {
@@ -950,7 +950,7 @@
                             "description": "作成ユーザー"
                           },
                           "myItentionStatus": {
-                            "$ref": "#/components/schemas/intentionStatus",
+                            "$ref": "#/components/schemas/voteStatus",
                             "description": "意見投稿主の意見"
                           }
                         },
@@ -1131,7 +1131,7 @@
           "city"
         ]
       },
-      "intentionStatus": {
+      "voteStatus": {
         "type": "string",
         "description": "意見の3種のステータス",
         "enum": [
@@ -1178,8 +1178,8 @@
             "type": "string",
             "description": "親の意見ID。ルートならば無し"
           },
-          "intentionStatus": {
-            "$ref": "#/components/schemas/intentionStatus",
+          "voteStatus": {
+            "$ref": "#/components/schemas/voteStatus",
             "description": "意見投稿主の意見"
           },
           "pictureURL": {
@@ -1194,7 +1194,7 @@
         "required": [
           "content",
           "id",
-          "intentionStatus"
+          "voteStatus"
         ]
       },
       "user": {

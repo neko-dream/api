@@ -288,9 +288,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 												break
 											}
 											switch elem[0] {
-											case '/': // Prefix: "/intentions"
+											case '/': // Prefix: "/votes"
 												origElem := elem
-												if l := len("/intentions"); len(elem) >= l && elem[0:l] == "/intentions" {
+												if l := len("/votes"); len(elem) >= l && elem[0:l] == "/votes" {
 													elem = elem[l:]
 												} else {
 													break
@@ -300,7 +300,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 													// Leaf node.
 													switch r.Method {
 													case "POST":
-														s.handleIntentionRequest([2]string{
+														s.handleVoteRequest([2]string{
 															args[0],
 															args[1],
 														}, elemIsEscaped, w, r)
@@ -855,9 +855,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 												break
 											}
 											switch elem[0] {
-											case '/': // Prefix: "/intentions"
+											case '/': // Prefix: "/votes"
 												origElem := elem
-												if l := len("/intentions"); len(elem) >= l && elem[0:l] == "/intentions" {
+												if l := len("/votes"); len(elem) >= l && elem[0:l] == "/votes" {
 													elem = elem[l:]
 												} else {
 													break
@@ -867,10 +867,10 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 													// Leaf node.
 													switch method {
 													case "POST":
-														r.name = "Intention"
+														r.name = "Vote"
 														r.summary = "意思表明API"
-														r.operationID = "Intention"
-														r.pathPattern = "/api/talksessions/{talkSessionID}/opinions/{opinionID}/intentions"
+														r.operationID = "vote"
+														r.pathPattern = "/api/talksessions/{talkSessionID}/opinions/{opinionID}/votes"
 														r.args = args
 														r.count = 2
 														return r, true

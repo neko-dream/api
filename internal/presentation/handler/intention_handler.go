@@ -2,6 +2,6 @@ package handler
 
 import "github.com/neko-dream/server/internal/presentation/oas"
 
-func NewIntentionHandler() oas.IntentionHandler {
+func NewVoteHandler() oas.VoteHandler {
 	return oas.UnimplementedHandler{}
 }

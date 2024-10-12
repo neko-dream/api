@@ -494,126 +494,6 @@ func decodeGetTopOpinionsParams(args [1]string, argsEscaped bool, r *http.Reques
 	return params, nil
 }
 
-// IntentionParams is parameters of Intention operation.
-type IntentionParams struct {
-	// セッションのID.
-	TalkSessionID string
-	// 意見のID.
-	OpinionID string
-}
-
-func unpackIntentionParams(packed middleware.Parameters) (params IntentionParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "talkSessionID",
-			In:   "path",
-		}
-		params.TalkSessionID = packed[key].(string)
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "opinionID",
-			In:   "path",
-		}
-		params.OpinionID = packed[key].(string)
-	}
-	return params
-}
-
-func decodeIntentionParams(args [2]string, argsEscaped bool, r *http.Request) (params IntentionParams, _ error) {
-	// Decode path: talkSessionID.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "talkSessionID",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.TalkSessionID = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "talkSessionID",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	// Decode path: opinionID.
-	if err := func() error {
-		param := args[1]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[1])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "opinionID",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.OpinionID = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "opinionID",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
 // ListOpinionsParams is parameters of listOpinions operation.
 type ListOpinionsParams struct {
 	TalkSessionID   string
@@ -1171,6 +1051,126 @@ func decodePostOpinionPostParams(args [1]string, argsEscaped bool, r *http.Reque
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "talkSessionID",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// VoteParams is parameters of vote operation.
+type VoteParams struct {
+	// セッションのID.
+	TalkSessionID string
+	// 意見のID.
+	OpinionID string
+}
+
+func unpackVoteParams(packed middleware.Parameters) (params VoteParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "talkSessionID",
+			In:   "path",
+		}
+		params.TalkSessionID = packed[key].(string)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "opinionID",
+			In:   "path",
+		}
+		params.OpinionID = packed[key].(string)
+	}
+	return params
+}
+
+func decodeVoteParams(args [2]string, argsEscaped bool, r *http.Request) (params VoteParams, _ error) {
+	// Decode path: talkSessionID.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "talkSessionID",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.TalkSessionID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "talkSessionID",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	// Decode path: opinionID.
+	if err := func() error {
+		param := args[1]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[1])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "opinionID",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.OpinionID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "opinionID",
 			In:   "path",
 			Err:  err,
 		}

@@ -13,10 +13,6 @@ type GetTopOpinionsRes interface {
 	getTopOpinionsRes()
 }
 
-type IntentionRes interface {
-	intentionRes()
-}
-
 type ListOpinionsRes interface {
 	listOpinionsRes()
 }
@@ -39,4 +35,8 @@ type RegisterUserRes interface {
 
 type TestRes interface {
 	testRes()
+}
+
+type VoteRes interface {
+	voteRes()
 }

@@ -59,7 +59,7 @@ func BuildContainer() *dig.Container {
 		{handler.NewSecurityHandler, nil},
 		{handler.NewAuthHandler, nil},
 		{handler.NewUserHandler, nil},
-		{handler.NewIntentionHandler, nil},
+		{handler.NewVoteHandler, nil},
 		{handler.NewOpinionHandler, nil},
 		{handler.NewTalkSessionHandler, nil},
 		{handler.NewHandler, nil},

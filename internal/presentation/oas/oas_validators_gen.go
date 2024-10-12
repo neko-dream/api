@@ -665,86 +665,6 @@ func (s *GetUserProfileOK) Validate() error {
 	return nil
 }
 
-func (s IntentionOKApplicationJSON) Validate() error {
-	alias := ([]IntentionOKItem)(s)
-	if alias == nil {
-		return errors.New("nil is invalid value")
-	}
-	var failures []validate.FieldError
-	for i, elem := range alias {
-		if err := func() error {
-			if err := elem.Validate(); err != nil {
-				return err
-			}
-			return nil
-		}(); err != nil {
-			failures = append(failures, validate.FieldError{
-				Name:  fmt.Sprintf("[%d]", i),
-				Error: err,
-			})
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *IntentionOKItem) Validate() error {
-	if s == nil {
-		return validate.ErrNilPointer
-	}
-
-	var failures []validate.FieldError
-	if err := func() error {
-		if err := (validate.String{
-			MinLength:    1,
-			MinLengthSet: true,
-			MaxLength:    140,
-			MaxLengthSet: true,
-			Email:        false,
-			Hostname:     false,
-			Regex:        nil,
-		}).Validate(string(s.Content)); err != nil {
-			return errors.Wrap(err, "string")
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "content",
-			Error: err,
-		})
-	}
-	if err := func() error {
-		if err := s.IntentionStatus.Validate(); err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "intentionStatus",
-			Error: err,
-		})
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s IntentionOKItemIntentionStatus) Validate() error {
-	switch s {
-	case "agree":
-		return nil
-	case "disagree":
-		return nil
-	case "pass":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
-}
-
 func (s ListOpinionsOKApplicationJSON) Validate() error {
 	alias := ([]ListOpinionsOKItem)(s)
 	if alias == nil {
@@ -830,13 +750,13 @@ func (s *ListOpinionsOKItemOpinion) Validate() error {
 		})
 	}
 	if err := func() error {
-		if err := s.IntentionStatus.Validate(); err != nil {
+		if err := s.VoteStatus.Validate(); err != nil {
 			return err
 		}
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "intentionStatus",
+			Name:  "voteStatus",
 			Error: err,
 		})
 	}
@@ -846,7 +766,7 @@ func (s *ListOpinionsOKItemOpinion) Validate() error {
 	return nil
 }
 
-func (s ListOpinionsOKItemOpinionIntentionStatus) Validate() error {
+func (s ListOpinionsOKItemOpinionVoteStatus) Validate() error {
 	switch s {
 	case "agree":
 		return nil
@@ -1025,13 +945,13 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) Validate() error {
 		})
 	}
 	if err := func() error {
-		if err := s.IntentionStatus.Validate(); err != nil {
+		if err := s.VoteStatus.Validate(); err != nil {
 			return err
 		}
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "intentionStatus",
+			Name:  "voteStatus",
 			Error: err,
 		})
 	}
@@ -1041,7 +961,7 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) Validate() error {
 	return nil
 }
 
-func (s OpinionCommentsOKOpinionsItemOpinionIntentionStatus) Validate() error {
+func (s OpinionCommentsOKOpinionsItemOpinionVoteStatus) Validate() error {
 	switch s {
 	case "agree":
 		return nil
@@ -1145,13 +1065,13 @@ func (s *OpinionCommentsOKRootOpinionOpinion) Validate() error {
 		})
 	}
 	if err := func() error {
-		if err := s.IntentionStatus.Validate(); err != nil {
+		if err := s.VoteStatus.Validate(); err != nil {
 			return err
 		}
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "intentionStatus",
+			Name:  "voteStatus",
 			Error: err,
 		})
 	}
@@ -1161,7 +1081,7 @@ func (s *OpinionCommentsOKRootOpinionOpinion) Validate() error {
 	return nil
 }
 
-func (s OpinionCommentsOKRootOpinionOpinionIntentionStatus) Validate() error {
+func (s OpinionCommentsOKRootOpinionOpinionVoteStatus) Validate() error {
 	switch s {
 	case "agree":
 		return nil
@@ -1349,6 +1269,86 @@ func (s RegisterUserReqOccupation) Validate() error {
 	case "その他":
 		return nil
 	case "無回答":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s VoteOKApplicationJSON) Validate() error {
+	alias := ([]VoteOKItem)(s)
+	if alias == nil {
+		return errors.New("nil is invalid value")
+	}
+	var failures []validate.FieldError
+	for i, elem := range alias {
+		if err := func() error {
+			if err := elem.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			failures = append(failures, validate.FieldError{
+				Name:  fmt.Sprintf("[%d]", i),
+				Error: err,
+			})
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s *VoteOKItem) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := (validate.String{
+			MinLength:    1,
+			MinLengthSet: true,
+			MaxLength:    140,
+			MaxLengthSet: true,
+			Email:        false,
+			Hostname:     false,
+			Regex:        nil,
+		}).Validate(string(s.Content)); err != nil {
+			return errors.Wrap(err, "string")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "content",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if err := s.VoteStatus.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "voteStatus",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s VoteOKItemVoteStatus) Validate() error {
+	switch s {
+	case "agree":
+		return nil
+	case "disagree":
+		return nil
+	case "pass":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)

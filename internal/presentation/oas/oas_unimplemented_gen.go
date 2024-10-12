@@ -76,15 +76,6 @@ func (UnimplementedHandler) GetUserProfile(ctx context.Context) (r *GetUserProfi
 	return r, ht.ErrNotImplemented
 }
 
-// Intention implements Intention operation.
-//
-// 意思表明API.
-//
-// POST /api/talksessions/{talkSessionID}/opinions/{opinionID}/intentions
-func (UnimplementedHandler) Intention(ctx context.Context, req OptIntentionReq, params IntentionParams) (r IntentionRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // ListOpinions implements listOpinions operation.
 //
 // ランダムな意見.
@@ -132,7 +123,7 @@ func (UnimplementedHandler) OpinionComments(ctx context.Context, params OpinionC
 
 // PostOpinionPost implements postOpinionPost operation.
 //
-// セッションに対して意見投稿.
+// ParentOpinionIDがなければルートの意見として投稿される.
 //
 // POST /api/talksessions/{talkSessionID}/opinions
 func (UnimplementedHandler) PostOpinionPost(ctx context.Context, req OptPostOpinionPostReq, params PostOpinionPostParams) (r PostOpinionPostRes, _ error) {
@@ -154,5 +145,14 @@ func (UnimplementedHandler) RegisterUser(ctx context.Context, req OptRegisterUse
 //
 // GET /test
 func (UnimplementedHandler) Test(ctx context.Context) (r TestRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// Vote implements vote operation.
+//
+// 意思表明API.
+//
+// POST /api/talksessions/{talkSessionID}/opinions/{opinionID}/votes
+func (UnimplementedHandler) Vote(ctx context.Context, req OptVoteReq, params VoteParams) (r VoteRes, _ error) {
 	return r, ht.ErrNotImplemented
 }

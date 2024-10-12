@@ -9,11 +9,11 @@ import (
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
 	AuthHandler
-	IntentionHandler
 	OpinionHandler
 	TalkSessionHandler
 	TestHandler
 	UserHandler
+	VoteHandler
 }
 
 // AuthHandler handles operations described by OpenAPI v3 specification.
@@ -46,18 +46,6 @@ type AuthHandler interface {
 	OAuthTokenInfo(ctx context.Context) (*OAuthTokenInfoOK, error)
 }
 
-// IntentionHandler handles operations described by OpenAPI v3 specification.
-//
-// x-ogen-operation-group: Intention
-type IntentionHandler interface {
-	// Intention implements Intention operation.
-	//
-	// 意思表明API.
-	//
-	// POST /api/talksessions/{talkSessionID}/opinions/{opinionID}/intentions
-	Intention(ctx context.Context, req OptIntentionReq, params IntentionParams) (IntentionRes, error)
-}
-
 // OpinionHandler handles operations described by OpenAPI v3 specification.
 //
 // x-ogen-operation-group: Opinion
@@ -82,7 +70,7 @@ type OpinionHandler interface {
 	OpinionComments(ctx context.Context, params OpinionCommentsParams) (OpinionCommentsRes, error)
 	// PostOpinionPost implements postOpinionPost operation.
 	//
-	// セッションに対して意見投稿.
+	// ParentOpinionIDがなければルートの意見として投稿される.
 	//
 	// POST /api/talksessions/{talkSessionID}/opinions
 	PostOpinionPost(ctx context.Context, req OptPostOpinionPostReq, params PostOpinionPostParams) (PostOpinionPostRes, error)
@@ -146,6 +134,18 @@ type UserHandler interface {
 	//
 	// POST /api/user
 	RegisterUser(ctx context.Context, req OptRegisterUserReq) (RegisterUserRes, error)
+}
+
+// VoteHandler handles operations described by OpenAPI v3 specification.
+//
+// x-ogen-operation-group: Vote
+type VoteHandler interface {
+	// Vote implements vote operation.
+	//
+	// 意思表明API.
+	//
+	// POST /api/talksessions/{talkSessionID}/opinions/{opinionID}/votes
+	Vote(ctx context.Context, req OptVoteReq, params VoteParams) (VoteRes, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and
