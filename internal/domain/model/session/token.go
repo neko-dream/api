@@ -32,13 +32,14 @@ type (
 
 func NewClaim(user user.User, sessionID shared.UUID[Session]) Claim {
 	return Claim{
-		Sub:       user.UserID().String(),
-		Iat:       time.Now().Unix(),
-		Exp:       time.Now().Add(24 * time.Hour).Unix(),
-		Jti:       sessionID.String(),
-		IconURL:   user.ProfileIconURL(),
-		DisplayID: user.DisplayID(),
-		IsVerify:  user.Verify(),
+		Sub:         user.UserID().String(),
+		Iat:         time.Now().Unix(),
+		Exp:         time.Now().Add(24 * time.Hour).Unix(),
+		Jti:         sessionID.String(),
+		IconURL:     user.ProfileIconURL(),
+		DisplayID:   user.DisplayID(),
+		DisplayName: user.DisplayName(),
+		IsVerify:    user.Verify(),
 	}
 }
 
