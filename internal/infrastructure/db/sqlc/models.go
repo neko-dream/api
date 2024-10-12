@@ -81,5 +81,6 @@ type Vote struct {
 	VoteID    uuid.UUID
 	OpinionID uuid.UUID
 	UserID    uuid.UUID
+	VoteType  int16
 	CreatedAt time.Time
 }

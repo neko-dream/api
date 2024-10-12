@@ -1290,7 +1290,7 @@ type ListOpinionsOKItemOpinion struct {
 	// 親の意見ID。ルートならば無し.
 	ParentID OptString `json:"parentID"`
 	// 意見投稿主の意見.
-	VoteStatus ListOpinionsOKItemOpinionVoteStatus `json:"voteStatus"`
+	VoteType ListOpinionsOKItemOpinionVoteType `json:"voteType"`
 	// 画像が返る場合もある.
 	PictureURL OptString `json:"pictureURL"`
 	// 参考文献URL.
@@ -1317,9 +1317,9 @@ func (s *ListOpinionsOKItemOpinion) GetParentID() OptString {
 	return s.ParentID
 }
 
-// GetVoteStatus returns the value of VoteStatus.
-func (s *ListOpinionsOKItemOpinion) GetVoteStatus() ListOpinionsOKItemOpinionVoteStatus {
-	return s.VoteStatus
+// GetVoteType returns the value of VoteType.
+func (s *ListOpinionsOKItemOpinion) GetVoteType() ListOpinionsOKItemOpinionVoteType {
+	return s.VoteType
 }
 
 // GetPictureURL returns the value of PictureURL.
@@ -1352,9 +1352,9 @@ func (s *ListOpinionsOKItemOpinion) SetParentID(val OptString) {
 	s.ParentID = val
 }
 
-// SetVoteStatus sets the value of VoteStatus.
-func (s *ListOpinionsOKItemOpinion) SetVoteStatus(val ListOpinionsOKItemOpinionVoteStatus) {
-	s.VoteStatus = val
+// SetVoteType sets the value of VoteType.
+func (s *ListOpinionsOKItemOpinion) SetVoteType(val ListOpinionsOKItemOpinionVoteType) {
+	s.VoteType = val
 }
 
 // SetPictureURL sets the value of PictureURL.
@@ -1368,31 +1368,31 @@ func (s *ListOpinionsOKItemOpinion) SetReferenceURL(val OptString) {
 }
 
 // 意見投稿主の意見.
-type ListOpinionsOKItemOpinionVoteStatus string
+type ListOpinionsOKItemOpinionVoteType string
 
 const (
-	ListOpinionsOKItemOpinionVoteStatusAgree    ListOpinionsOKItemOpinionVoteStatus = "agree"
-	ListOpinionsOKItemOpinionVoteStatusDisagree ListOpinionsOKItemOpinionVoteStatus = "disagree"
-	ListOpinionsOKItemOpinionVoteStatusPass     ListOpinionsOKItemOpinionVoteStatus = "pass"
+	ListOpinionsOKItemOpinionVoteTypeAgree    ListOpinionsOKItemOpinionVoteType = "agree"
+	ListOpinionsOKItemOpinionVoteTypeDisagree ListOpinionsOKItemOpinionVoteType = "disagree"
+	ListOpinionsOKItemOpinionVoteTypePass     ListOpinionsOKItemOpinionVoteType = "pass"
 )
 
-// AllValues returns all ListOpinionsOKItemOpinionVoteStatus values.
-func (ListOpinionsOKItemOpinionVoteStatus) AllValues() []ListOpinionsOKItemOpinionVoteStatus {
-	return []ListOpinionsOKItemOpinionVoteStatus{
-		ListOpinionsOKItemOpinionVoteStatusAgree,
-		ListOpinionsOKItemOpinionVoteStatusDisagree,
-		ListOpinionsOKItemOpinionVoteStatusPass,
+// AllValues returns all ListOpinionsOKItemOpinionVoteType values.
+func (ListOpinionsOKItemOpinionVoteType) AllValues() []ListOpinionsOKItemOpinionVoteType {
+	return []ListOpinionsOKItemOpinionVoteType{
+		ListOpinionsOKItemOpinionVoteTypeAgree,
+		ListOpinionsOKItemOpinionVoteTypeDisagree,
+		ListOpinionsOKItemOpinionVoteTypePass,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s ListOpinionsOKItemOpinionVoteStatus) MarshalText() ([]byte, error) {
+func (s ListOpinionsOKItemOpinionVoteType) MarshalText() ([]byte, error) {
 	switch s {
-	case ListOpinionsOKItemOpinionVoteStatusAgree:
+	case ListOpinionsOKItemOpinionVoteTypeAgree:
 		return []byte(s), nil
-	case ListOpinionsOKItemOpinionVoteStatusDisagree:
+	case ListOpinionsOKItemOpinionVoteTypeDisagree:
 		return []byte(s), nil
-	case ListOpinionsOKItemOpinionVoteStatusPass:
+	case ListOpinionsOKItemOpinionVoteTypePass:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -1400,16 +1400,16 @@ func (s ListOpinionsOKItemOpinionVoteStatus) MarshalText() ([]byte, error) {
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *ListOpinionsOKItemOpinionVoteStatus) UnmarshalText(data []byte) error {
-	switch ListOpinionsOKItemOpinionVoteStatus(data) {
-	case ListOpinionsOKItemOpinionVoteStatusAgree:
-		*s = ListOpinionsOKItemOpinionVoteStatusAgree
+func (s *ListOpinionsOKItemOpinionVoteType) UnmarshalText(data []byte) error {
+	switch ListOpinionsOKItemOpinionVoteType(data) {
+	case ListOpinionsOKItemOpinionVoteTypeAgree:
+		*s = ListOpinionsOKItemOpinionVoteTypeAgree
 		return nil
-	case ListOpinionsOKItemOpinionVoteStatusDisagree:
-		*s = ListOpinionsOKItemOpinionVoteStatusDisagree
+	case ListOpinionsOKItemOpinionVoteTypeDisagree:
+		*s = ListOpinionsOKItemOpinionVoteTypeDisagree
 		return nil
-	case ListOpinionsOKItemOpinionVoteStatusPass:
-		*s = ListOpinionsOKItemOpinionVoteStatusPass
+	case ListOpinionsOKItemOpinionVoteTypePass:
+		*s = ListOpinionsOKItemOpinionVoteTypePass
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -1828,7 +1828,7 @@ type OpinionCommentsOKOpinionsItemOpinion struct {
 	// 親の意見ID。ルートならば無し.
 	ParentID OptString `json:"parentID"`
 	// 意見投稿主の意見.
-	VoteStatus OpinionCommentsOKOpinionsItemOpinionVoteStatus `json:"voteStatus"`
+	VoteType OpinionCommentsOKOpinionsItemOpinionVoteType `json:"voteType"`
 	// 画像が返る場合もある.
 	PictureURL OptString `json:"pictureURL"`
 	// 参考文献URL.
@@ -1855,9 +1855,9 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) GetParentID() OptString {
 	return s.ParentID
 }
 
-// GetVoteStatus returns the value of VoteStatus.
-func (s *OpinionCommentsOKOpinionsItemOpinion) GetVoteStatus() OpinionCommentsOKOpinionsItemOpinionVoteStatus {
-	return s.VoteStatus
+// GetVoteType returns the value of VoteType.
+func (s *OpinionCommentsOKOpinionsItemOpinion) GetVoteType() OpinionCommentsOKOpinionsItemOpinionVoteType {
+	return s.VoteType
 }
 
 // GetPictureURL returns the value of PictureURL.
@@ -1890,9 +1890,9 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) SetParentID(val OptString) {
 	s.ParentID = val
 }
 
-// SetVoteStatus sets the value of VoteStatus.
-func (s *OpinionCommentsOKOpinionsItemOpinion) SetVoteStatus(val OpinionCommentsOKOpinionsItemOpinionVoteStatus) {
-	s.VoteStatus = val
+// SetVoteType sets the value of VoteType.
+func (s *OpinionCommentsOKOpinionsItemOpinion) SetVoteType(val OpinionCommentsOKOpinionsItemOpinionVoteType) {
+	s.VoteType = val
 }
 
 // SetPictureURL sets the value of PictureURL.
@@ -1906,31 +1906,31 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) SetReferenceURL(val OptString) {
 }
 
 // 意見投稿主の意見.
-type OpinionCommentsOKOpinionsItemOpinionVoteStatus string
+type OpinionCommentsOKOpinionsItemOpinionVoteType string
 
 const (
-	OpinionCommentsOKOpinionsItemOpinionVoteStatusAgree    OpinionCommentsOKOpinionsItemOpinionVoteStatus = "agree"
-	OpinionCommentsOKOpinionsItemOpinionVoteStatusDisagree OpinionCommentsOKOpinionsItemOpinionVoteStatus = "disagree"
-	OpinionCommentsOKOpinionsItemOpinionVoteStatusPass     OpinionCommentsOKOpinionsItemOpinionVoteStatus = "pass"
+	OpinionCommentsOKOpinionsItemOpinionVoteTypeAgree    OpinionCommentsOKOpinionsItemOpinionVoteType = "agree"
+	OpinionCommentsOKOpinionsItemOpinionVoteTypeDisagree OpinionCommentsOKOpinionsItemOpinionVoteType = "disagree"
+	OpinionCommentsOKOpinionsItemOpinionVoteTypePass     OpinionCommentsOKOpinionsItemOpinionVoteType = "pass"
 )
 
-// AllValues returns all OpinionCommentsOKOpinionsItemOpinionVoteStatus values.
-func (OpinionCommentsOKOpinionsItemOpinionVoteStatus) AllValues() []OpinionCommentsOKOpinionsItemOpinionVoteStatus {
-	return []OpinionCommentsOKOpinionsItemOpinionVoteStatus{
-		OpinionCommentsOKOpinionsItemOpinionVoteStatusAgree,
-		OpinionCommentsOKOpinionsItemOpinionVoteStatusDisagree,
-		OpinionCommentsOKOpinionsItemOpinionVoteStatusPass,
+// AllValues returns all OpinionCommentsOKOpinionsItemOpinionVoteType values.
+func (OpinionCommentsOKOpinionsItemOpinionVoteType) AllValues() []OpinionCommentsOKOpinionsItemOpinionVoteType {
+	return []OpinionCommentsOKOpinionsItemOpinionVoteType{
+		OpinionCommentsOKOpinionsItemOpinionVoteTypeAgree,
+		OpinionCommentsOKOpinionsItemOpinionVoteTypeDisagree,
+		OpinionCommentsOKOpinionsItemOpinionVoteTypePass,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s OpinionCommentsOKOpinionsItemOpinionVoteStatus) MarshalText() ([]byte, error) {
+func (s OpinionCommentsOKOpinionsItemOpinionVoteType) MarshalText() ([]byte, error) {
 	switch s {
-	case OpinionCommentsOKOpinionsItemOpinionVoteStatusAgree:
+	case OpinionCommentsOKOpinionsItemOpinionVoteTypeAgree:
 		return []byte(s), nil
-	case OpinionCommentsOKOpinionsItemOpinionVoteStatusDisagree:
+	case OpinionCommentsOKOpinionsItemOpinionVoteTypeDisagree:
 		return []byte(s), nil
-	case OpinionCommentsOKOpinionsItemOpinionVoteStatusPass:
+	case OpinionCommentsOKOpinionsItemOpinionVoteTypePass:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -1938,16 +1938,16 @@ func (s OpinionCommentsOKOpinionsItemOpinionVoteStatus) MarshalText() ([]byte, e
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *OpinionCommentsOKOpinionsItemOpinionVoteStatus) UnmarshalText(data []byte) error {
-	switch OpinionCommentsOKOpinionsItemOpinionVoteStatus(data) {
-	case OpinionCommentsOKOpinionsItemOpinionVoteStatusAgree:
-		*s = OpinionCommentsOKOpinionsItemOpinionVoteStatusAgree
+func (s *OpinionCommentsOKOpinionsItemOpinionVoteType) UnmarshalText(data []byte) error {
+	switch OpinionCommentsOKOpinionsItemOpinionVoteType(data) {
+	case OpinionCommentsOKOpinionsItemOpinionVoteTypeAgree:
+		*s = OpinionCommentsOKOpinionsItemOpinionVoteTypeAgree
 		return nil
-	case OpinionCommentsOKOpinionsItemOpinionVoteStatusDisagree:
-		*s = OpinionCommentsOKOpinionsItemOpinionVoteStatusDisagree
+	case OpinionCommentsOKOpinionsItemOpinionVoteTypeDisagree:
+		*s = OpinionCommentsOKOpinionsItemOpinionVoteTypeDisagree
 		return nil
-	case OpinionCommentsOKOpinionsItemOpinionVoteStatusPass:
-		*s = OpinionCommentsOKOpinionsItemOpinionVoteStatusPass
+	case OpinionCommentsOKOpinionsItemOpinionVoteTypePass:
+		*s = OpinionCommentsOKOpinionsItemOpinionVoteTypePass
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -2026,7 +2026,7 @@ type OpinionCommentsOKRootOpinionOpinion struct {
 	// 親の意見ID。ルートならば無し.
 	ParentID OptString `json:"parentID"`
 	// 意見投稿主の意見.
-	VoteStatus OpinionCommentsOKRootOpinionOpinionVoteStatus `json:"voteStatus"`
+	VoteType OpinionCommentsOKRootOpinionOpinionVoteType `json:"voteType"`
 	// 画像が返る場合もある.
 	PictureURL OptString `json:"pictureURL"`
 	// 参考文献URL.
@@ -2053,9 +2053,9 @@ func (s *OpinionCommentsOKRootOpinionOpinion) GetParentID() OptString {
 	return s.ParentID
 }
 
-// GetVoteStatus returns the value of VoteStatus.
-func (s *OpinionCommentsOKRootOpinionOpinion) GetVoteStatus() OpinionCommentsOKRootOpinionOpinionVoteStatus {
-	return s.VoteStatus
+// GetVoteType returns the value of VoteType.
+func (s *OpinionCommentsOKRootOpinionOpinion) GetVoteType() OpinionCommentsOKRootOpinionOpinionVoteType {
+	return s.VoteType
 }
 
 // GetPictureURL returns the value of PictureURL.
@@ -2088,9 +2088,9 @@ func (s *OpinionCommentsOKRootOpinionOpinion) SetParentID(val OptString) {
 	s.ParentID = val
 }
 
-// SetVoteStatus sets the value of VoteStatus.
-func (s *OpinionCommentsOKRootOpinionOpinion) SetVoteStatus(val OpinionCommentsOKRootOpinionOpinionVoteStatus) {
-	s.VoteStatus = val
+// SetVoteType sets the value of VoteType.
+func (s *OpinionCommentsOKRootOpinionOpinion) SetVoteType(val OpinionCommentsOKRootOpinionOpinionVoteType) {
+	s.VoteType = val
 }
 
 // SetPictureURL sets the value of PictureURL.
@@ -2104,31 +2104,31 @@ func (s *OpinionCommentsOKRootOpinionOpinion) SetReferenceURL(val OptString) {
 }
 
 // 意見投稿主の意見.
-type OpinionCommentsOKRootOpinionOpinionVoteStatus string
+type OpinionCommentsOKRootOpinionOpinionVoteType string
 
 const (
-	OpinionCommentsOKRootOpinionOpinionVoteStatusAgree    OpinionCommentsOKRootOpinionOpinionVoteStatus = "agree"
-	OpinionCommentsOKRootOpinionOpinionVoteStatusDisagree OpinionCommentsOKRootOpinionOpinionVoteStatus = "disagree"
-	OpinionCommentsOKRootOpinionOpinionVoteStatusPass     OpinionCommentsOKRootOpinionOpinionVoteStatus = "pass"
+	OpinionCommentsOKRootOpinionOpinionVoteTypeAgree    OpinionCommentsOKRootOpinionOpinionVoteType = "agree"
+	OpinionCommentsOKRootOpinionOpinionVoteTypeDisagree OpinionCommentsOKRootOpinionOpinionVoteType = "disagree"
+	OpinionCommentsOKRootOpinionOpinionVoteTypePass     OpinionCommentsOKRootOpinionOpinionVoteType = "pass"
 )
 
-// AllValues returns all OpinionCommentsOKRootOpinionOpinionVoteStatus values.
-func (OpinionCommentsOKRootOpinionOpinionVoteStatus) AllValues() []OpinionCommentsOKRootOpinionOpinionVoteStatus {
-	return []OpinionCommentsOKRootOpinionOpinionVoteStatus{
-		OpinionCommentsOKRootOpinionOpinionVoteStatusAgree,
-		OpinionCommentsOKRootOpinionOpinionVoteStatusDisagree,
-		OpinionCommentsOKRootOpinionOpinionVoteStatusPass,
+// AllValues returns all OpinionCommentsOKRootOpinionOpinionVoteType values.
+func (OpinionCommentsOKRootOpinionOpinionVoteType) AllValues() []OpinionCommentsOKRootOpinionOpinionVoteType {
+	return []OpinionCommentsOKRootOpinionOpinionVoteType{
+		OpinionCommentsOKRootOpinionOpinionVoteTypeAgree,
+		OpinionCommentsOKRootOpinionOpinionVoteTypeDisagree,
+		OpinionCommentsOKRootOpinionOpinionVoteTypePass,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s OpinionCommentsOKRootOpinionOpinionVoteStatus) MarshalText() ([]byte, error) {
+func (s OpinionCommentsOKRootOpinionOpinionVoteType) MarshalText() ([]byte, error) {
 	switch s {
-	case OpinionCommentsOKRootOpinionOpinionVoteStatusAgree:
+	case OpinionCommentsOKRootOpinionOpinionVoteTypeAgree:
 		return []byte(s), nil
-	case OpinionCommentsOKRootOpinionOpinionVoteStatusDisagree:
+	case OpinionCommentsOKRootOpinionOpinionVoteTypeDisagree:
 		return []byte(s), nil
-	case OpinionCommentsOKRootOpinionOpinionVoteStatusPass:
+	case OpinionCommentsOKRootOpinionOpinionVoteTypePass:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -2136,16 +2136,16 @@ func (s OpinionCommentsOKRootOpinionOpinionVoteStatus) MarshalText() ([]byte, er
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *OpinionCommentsOKRootOpinionOpinionVoteStatus) UnmarshalText(data []byte) error {
-	switch OpinionCommentsOKRootOpinionOpinionVoteStatus(data) {
-	case OpinionCommentsOKRootOpinionOpinionVoteStatusAgree:
-		*s = OpinionCommentsOKRootOpinionOpinionVoteStatusAgree
+func (s *OpinionCommentsOKRootOpinionOpinionVoteType) UnmarshalText(data []byte) error {
+	switch OpinionCommentsOKRootOpinionOpinionVoteType(data) {
+	case OpinionCommentsOKRootOpinionOpinionVoteTypeAgree:
+		*s = OpinionCommentsOKRootOpinionOpinionVoteTypeAgree
 		return nil
-	case OpinionCommentsOKRootOpinionOpinionVoteStatusDisagree:
-		*s = OpinionCommentsOKRootOpinionOpinionVoteStatusDisagree
+	case OpinionCommentsOKRootOpinionOpinionVoteTypeDisagree:
+		*s = OpinionCommentsOKRootOpinionOpinionVoteTypeDisagree
 		return nil
-	case OpinionCommentsOKRootOpinionOpinionVoteStatusPass:
-		*s = OpinionCommentsOKRootOpinionOpinionVoteStatusPass
+	case OpinionCommentsOKRootOpinionOpinionVoteTypePass:
+		*s = OpinionCommentsOKRootOpinionOpinionVoteTypePass
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -3717,7 +3717,7 @@ type VoteOKItem struct {
 	// 親の意見ID。ルートならば無し.
 	ParentID OptString `json:"parentID"`
 	// 意見投稿主の意見.
-	VoteStatus VoteOKItemVoteStatus `json:"voteStatus"`
+	VoteType VoteOKItemVoteType `json:"voteType"`
 	// 画像が返る場合もある.
 	PictureURL OptString `json:"pictureURL"`
 	// 参考文献URL.
@@ -3744,9 +3744,9 @@ func (s *VoteOKItem) GetParentID() OptString {
 	return s.ParentID
 }
 
-// GetVoteStatus returns the value of VoteStatus.
-func (s *VoteOKItem) GetVoteStatus() VoteOKItemVoteStatus {
-	return s.VoteStatus
+// GetVoteType returns the value of VoteType.
+func (s *VoteOKItem) GetVoteType() VoteOKItemVoteType {
+	return s.VoteType
 }
 
 // GetPictureURL returns the value of PictureURL.
@@ -3779,9 +3779,9 @@ func (s *VoteOKItem) SetParentID(val OptString) {
 	s.ParentID = val
 }
 
-// SetVoteStatus sets the value of VoteStatus.
-func (s *VoteOKItem) SetVoteStatus(val VoteOKItemVoteStatus) {
-	s.VoteStatus = val
+// SetVoteType sets the value of VoteType.
+func (s *VoteOKItem) SetVoteType(val VoteOKItemVoteType) {
+	s.VoteType = val
 }
 
 // SetPictureURL sets the value of PictureURL.
@@ -3795,31 +3795,31 @@ func (s *VoteOKItem) SetReferenceURL(val OptString) {
 }
 
 // 意見投稿主の意見.
-type VoteOKItemVoteStatus string
+type VoteOKItemVoteType string
 
 const (
-	VoteOKItemVoteStatusAgree    VoteOKItemVoteStatus = "agree"
-	VoteOKItemVoteStatusDisagree VoteOKItemVoteStatus = "disagree"
-	VoteOKItemVoteStatusPass     VoteOKItemVoteStatus = "pass"
+	VoteOKItemVoteTypeAgree    VoteOKItemVoteType = "agree"
+	VoteOKItemVoteTypeDisagree VoteOKItemVoteType = "disagree"
+	VoteOKItemVoteTypePass     VoteOKItemVoteType = "pass"
 )
 
-// AllValues returns all VoteOKItemVoteStatus values.
-func (VoteOKItemVoteStatus) AllValues() []VoteOKItemVoteStatus {
-	return []VoteOKItemVoteStatus{
-		VoteOKItemVoteStatusAgree,
-		VoteOKItemVoteStatusDisagree,
-		VoteOKItemVoteStatusPass,
+// AllValues returns all VoteOKItemVoteType values.
+func (VoteOKItemVoteType) AllValues() []VoteOKItemVoteType {
+	return []VoteOKItemVoteType{
+		VoteOKItemVoteTypeAgree,
+		VoteOKItemVoteTypeDisagree,
+		VoteOKItemVoteTypePass,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s VoteOKItemVoteStatus) MarshalText() ([]byte, error) {
+func (s VoteOKItemVoteType) MarshalText() ([]byte, error) {
 	switch s {
-	case VoteOKItemVoteStatusAgree:
+	case VoteOKItemVoteTypeAgree:
 		return []byte(s), nil
-	case VoteOKItemVoteStatusDisagree:
+	case VoteOKItemVoteTypeDisagree:
 		return []byte(s), nil
-	case VoteOKItemVoteStatusPass:
+	case VoteOKItemVoteTypePass:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -3827,16 +3827,16 @@ func (s VoteOKItemVoteStatus) MarshalText() ([]byte, error) {
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *VoteOKItemVoteStatus) UnmarshalText(data []byte) error {
-	switch VoteOKItemVoteStatus(data) {
-	case VoteOKItemVoteStatusAgree:
-		*s = VoteOKItemVoteStatusAgree
+func (s *VoteOKItemVoteType) UnmarshalText(data []byte) error {
+	switch VoteOKItemVoteType(data) {
+	case VoteOKItemVoteTypeAgree:
+		*s = VoteOKItemVoteTypeAgree
 		return nil
-	case VoteOKItemVoteStatusDisagree:
-		*s = VoteOKItemVoteStatusDisagree
+	case VoteOKItemVoteTypeDisagree:
+		*s = VoteOKItemVoteTypeDisagree
 		return nil
-	case VoteOKItemVoteStatusPass:
-		*s = VoteOKItemVoteStatusPass
+	case VoteOKItemVoteTypePass:
+		*s = VoteOKItemVoteTypePass
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)

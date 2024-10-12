@@ -654,7 +654,7 @@ paths:
                         parentID:
                           type: string
                           description: 親の意見ID。ルートならば無し
-                        intentionStatus:
+                        voteType:
                           type: string
                           description: 意見投稿主の意見
                           enum:
@@ -680,7 +680,7 @@ paths:
                       required:
                         - content
                         - id
-                        - intentionStatus
+                        - voteType
                     user:
                       type: object
                       properties:
@@ -720,7 +720,7 @@ paths:
     post:
       summary: セッションに対して意見投稿
       deprecated: false
-      description: ''
+      description: parentOpinionIDがなければルートの意見として投稿される
       operationId: postOpinionPost
       tags:
         - talk_session/opinion
@@ -742,7 +742,7 @@ paths:
                   type: string
                   example: ''
                   nullable: true
-                intentionStatus:
+                voteStatus:
                   example: ''
                   type: string
                 title:
@@ -750,8 +750,9 @@ paths:
                   example: ''
                   nullable: true
                 opinionContent:
-                  example: ''
                   type: string
+                  maxLength: 140
+                  example: ''
                 referenceURL:
                   type: string
                   example: ''
@@ -762,7 +763,7 @@ paths:
                   example: ''
                   nullable: true
               required:
-                - intentionStatus
+                - voteStatus
                 - opinionContent
       responses:
         '200':
@@ -781,15 +782,15 @@ paths:
                 properties: {}
       security: []
       x-ogen-operation-group: Opinion
-  /api/talksessions/{talkSessionID}/opinions/{opinionID}/intentions:
+  /api/talksessions/{talkSessionID}/opinions/{opinionID}/votes:
     post:
       summary: 意思表明API
       deprecated: false
       description: ''
-      operationId: Intention
+      operationId: vote
       tags:
-        - talk_session/opinion/intention
-        - intention
+        - talk_session/opinion/vote
+        - vote
       parameters:
         - name: talkSessionID
           in: path
@@ -809,11 +810,11 @@ paths:
             schema:
               type: object
               properties:
-                intentionStatus:
+                voteStatus:
                   example: ''
                   type: string
               required:
-                - intentionStatus
+                - voteStatus
       responses:
         '200':
           description: 成功
@@ -838,7 +839,7 @@ paths:
                     parentID:
                       type: string
                       description: 親の意見ID。ルートならば無し
-                    intentionStatus:
+                    voteType:
                       type: string
                       description: 意見投稿主の意見
                       enum:
@@ -864,7 +865,7 @@ paths:
                   required:
                     - content
                     - id
-                    - intentionStatus
+                    - voteType
         '500':
           description: ServerErrorResponse
           content:
@@ -873,7 +874,7 @@ paths:
                 type: object
                 properties: {}
       security: []
-      x-ogen-operation-group: Intention
+      x-ogen-operation-group: Vote
   /api/talksession/{talkSessionID}/opinions/{opinionID}:
     get:
       summary: 意見に対するコメント一覧を返す
@@ -944,7 +945,7 @@ paths:
                           parentID:
                             type: string
                             description: 親の意見ID。ルートならば無し
-                          intentionStatus:
+                          voteType:
                             type: string
                             description: 意見投稿主の意見
                             enum:
@@ -970,7 +971,7 @@ paths:
                         required:
                           - content
                           - id
-                          - intentionStatus
+                          - voteType
                     required:
                       - user
                       - opinion
@@ -996,7 +997,7 @@ paths:
                             parentID:
                               type: string
                               description: 親の意見ID。ルートならば無し
-                            intentionStatus:
+                            voteType:
                               type: string
                               description: 意見投稿主の意見
                               enum:
@@ -1022,7 +1023,7 @@ paths:
                           required:
                             - content
                             - id
-                            - intentionStatus
+                            - voteType
                         user:
                           type: object
                           properties:
@@ -1368,7 +1369,7 @@ components:
         - longitude
         - prefecture
         - city
-    intentionStatus:
+    voteType:
       type: string
       description: 意見の3種のステータス
       enum:
@@ -1402,7 +1403,7 @@ components:
         parentID:
           type: string
           description: 親の意見ID。ルートならば無し
-        intentionStatus:
+        voteType:
           type: string
           description: 意見投稿主の意見
           enum:
@@ -1428,7 +1429,7 @@ components:
       required:
         - content
         - id
-        - intentionStatus
+        - voteType
     user:
       type: object
       properties:

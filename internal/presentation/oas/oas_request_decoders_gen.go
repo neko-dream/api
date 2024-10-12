@@ -699,6 +699,22 @@ func (s *Server) decodePostOpinionPostRequest(r *http.Request) (
 					}); err != nil {
 						return req, close, errors.Wrap(err, "decode \"opinionContent\"")
 					}
+					if err := func() error {
+						if err := (validate.String{
+							MinLength:    0,
+							MinLengthSet: false,
+							MaxLength:    140,
+							MaxLengthSet: true,
+							Email:        false,
+							Hostname:     false,
+							Regex:        nil,
+						}).Validate(string(optForm.OpinionContent)); err != nil {
+							return errors.Wrap(err, "string")
+						}
+						return nil
+					}(); err != nil {
+						return req, close, errors.Wrap(err, "validate")
+					}
 				} else {
 					return req, close, errors.Wrap(err, "query")
 				}

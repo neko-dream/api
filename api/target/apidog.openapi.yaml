@@ -754,8 +754,9 @@
                     "nullable": true
                   },
                   "opinionContent": {
-                    "example": "",
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 140,
+                    "example": ""
                   },
                   "referenceURL": {
                     "type": "string",
@@ -950,7 +951,7 @@
                             "description": "作成ユーザー"
                           },
                           "myItentionStatus": {
-                            "$ref": "#/components/schemas/voteStatus",
+                            "$ref": "#/components/schemas/voteType",
                             "description": "意見投稿主の意見"
                           }
                         },
@@ -1131,7 +1132,7 @@
           "city"
         ]
       },
-      "voteStatus": {
+      "voteType": {
         "type": "string",
         "description": "意見の3種のステータス",
         "enum": [
@@ -1178,8 +1179,8 @@
             "type": "string",
             "description": "親の意見ID。ルートならば無し"
           },
-          "voteStatus": {
-            "$ref": "#/components/schemas/voteStatus",
+          "voteType": {
+            "$ref": "#/components/schemas/voteType",
             "description": "意見投稿主の意見"
           },
           "pictureURL": {
@@ -1194,7 +1195,7 @@
         "required": [
           "content",
           "id",
-          "voteStatus"
+          "voteType"
         ]
       },
       "user": {

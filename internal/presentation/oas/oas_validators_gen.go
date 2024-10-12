@@ -750,13 +750,13 @@ func (s *ListOpinionsOKItemOpinion) Validate() error {
 		})
 	}
 	if err := func() error {
-		if err := s.VoteStatus.Validate(); err != nil {
+		if err := s.VoteType.Validate(); err != nil {
 			return err
 		}
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "voteStatus",
+			Name:  "voteType",
 			Error: err,
 		})
 	}
@@ -766,7 +766,7 @@ func (s *ListOpinionsOKItemOpinion) Validate() error {
 	return nil
 }
 
-func (s ListOpinionsOKItemOpinionVoteStatus) Validate() error {
+func (s ListOpinionsOKItemOpinionVoteType) Validate() error {
 	switch s {
 	case "agree":
 		return nil
@@ -945,13 +945,13 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) Validate() error {
 		})
 	}
 	if err := func() error {
-		if err := s.VoteStatus.Validate(); err != nil {
+		if err := s.VoteType.Validate(); err != nil {
 			return err
 		}
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "voteStatus",
+			Name:  "voteType",
 			Error: err,
 		})
 	}
@@ -961,7 +961,7 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) Validate() error {
 	return nil
 }
 
-func (s OpinionCommentsOKOpinionsItemOpinionVoteStatus) Validate() error {
+func (s OpinionCommentsOKOpinionsItemOpinionVoteType) Validate() error {
 	switch s {
 	case "agree":
 		return nil
@@ -1065,13 +1065,13 @@ func (s *OpinionCommentsOKRootOpinionOpinion) Validate() error {
 		})
 	}
 	if err := func() error {
-		if err := s.VoteStatus.Validate(); err != nil {
+		if err := s.VoteType.Validate(); err != nil {
 			return err
 		}
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "voteStatus",
+			Name:  "voteType",
 			Error: err,
 		})
 	}
@@ -1081,7 +1081,7 @@ func (s *OpinionCommentsOKRootOpinionOpinion) Validate() error {
 	return nil
 }
 
-func (s OpinionCommentsOKRootOpinionOpinionVoteStatus) Validate() error {
+func (s OpinionCommentsOKRootOpinionOpinionVoteType) Validate() error {
 	switch s {
 	case "agree":
 		return nil
@@ -1116,6 +1116,37 @@ func (s *OpinionCommentsOKRootOpinionUser) Validate() error {
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
 			Name:  "displayID",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s *PostOpinionPostReq) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := (validate.String{
+			MinLength:    0,
+			MinLengthSet: false,
+			MaxLength:    140,
+			MaxLengthSet: true,
+			Email:        false,
+			Hostname:     false,
+			Regex:        nil,
+		}).Validate(string(s.OpinionContent)); err != nil {
+			return errors.Wrap(err, "string")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "opinionContent",
 			Error: err,
 		})
 	}
@@ -1326,13 +1357,13 @@ func (s *VoteOKItem) Validate() error {
 		})
 	}
 	if err := func() error {
-		if err := s.VoteStatus.Validate(); err != nil {
+		if err := s.VoteType.Validate(); err != nil {
 			return err
 		}
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "voteStatus",
+			Name:  "voteType",
 			Error: err,
 		})
 	}
@@ -1342,7 +1373,7 @@ func (s *VoteOKItem) Validate() error {
 	return nil
 }
 
-func (s VoteOKItemVoteStatus) Validate() error {
+func (s VoteOKItemVoteType) Validate() error {
 	switch s {
 	case "agree":
 		return nil
