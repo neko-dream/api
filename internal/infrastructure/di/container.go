@@ -13,6 +13,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/db"
 	"github.com/neko-dream/server/internal/presentation/handler"
 	auth_usecase "github.com/neko-dream/server/internal/usecase/auth"
+	opinion_usecase "github.com/neko-dream/server/internal/usecase/opinion"
 	talk_session_usecase "github.com/neko-dream/server/internal/usecase/talk_session"
 	user_usecase "github.com/neko-dream/server/internal/usecase/user"
 	"go.uber.org/dig"
@@ -53,6 +54,7 @@ func BuildContainer() *dig.Container {
 		{user_usecase.NewEditUserUseCase, nil},
 		{talk_session_usecase.NewCreateTalkSessionUseCase, nil},
 		{talk_session_usecase.NewListTalkSessionQueryHandler, nil},
+		{opinion_usecase.NewPostOpinionInteractor, nil},
 		{handler.NewSecurityHandler, nil},
 		{handler.NewAuthHandler, nil},
 		{handler.NewUserHandler, nil},
