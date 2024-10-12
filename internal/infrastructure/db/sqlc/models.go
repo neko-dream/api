@@ -16,6 +16,7 @@ type Opinion struct {
 	TalkSessionID   uuid.UUID
 	UserID          uuid.UUID
 	ParentOpinionID uuid.NullUUID
+	Title           sql.NullString
 	Content         string
 	VoteID          uuid.NullUUID
 	CreatedAt       time.Time

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/google/uuid"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
@@ -32,6 +33,11 @@ func (o *opinionRepository) Create(ctx context.Context, op opinion.Opinion) erro
 			op.ParentOpinionID() == nil,
 			uuid.NullUUID{},
 			uuid.NullUUID{UUID: op.ParentOpinionID().UUID(), Valid: true},
+		),
+		Title: utils.IfThenElse(
+			op.Title() == nil,
+			sql.NullString{},
+			sql.NullString{String: *op.Title(), Valid: true},
 		),
 		Content:   op.Content(),
 		CreatedAt: op.CreatedAt(),

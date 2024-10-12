@@ -33,6 +33,7 @@ type (
 		talkSessionID   shared.UUID[talksession.TalkSession]
 		userID          shared.UUID[user.User]
 		parentOpinionID *shared.UUID[Opinion]
+		title           *string
 		content         string
 		createdAt       time.Time
 		opinions        []Opinion
@@ -45,6 +46,7 @@ func NewOpinion(
 	talkSessionID shared.UUID[talksession.TalkSession],
 	userID shared.UUID[user.User],
 	parentOpinionID *shared.UUID[Opinion],
+	title *string,
 	content string,
 	createdAt time.Time,
 	VoteType VoteType,
@@ -58,12 +60,16 @@ func NewOpinion(
 	if opinionID == *parentOpinionID {
 		return nil, messages.OpinionParentOpinionIDIsSame
 	}
+	if title != nil && len(*title) > 50 && len(*title) < 5 {
+		return nil, messages.OpinionTitleBadLength
+	}
 
 	return &Opinion{
 		opinionID:       opinionID,
 		talkSessionID:   talkSessionID,
 		userID:          userID,
 		parentOpinionID: parentOpinionID,
+		title:           title,
 		content:         content,
 		createdAt:       createdAt,
 		voteType:        VoteType,
@@ -101,6 +107,9 @@ func (o *Opinion) UserID() shared.UUID[user.User] {
 
 func (o *Opinion) ParentOpinionID() *shared.UUID[Opinion] {
 	return o.parentOpinionID
+}
+func (o *Opinion) Title() *string {
+	return o.title
 }
 
 func (o *Opinion) Content() string {

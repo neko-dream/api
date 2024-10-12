@@ -70,6 +70,7 @@ CREATE TABLE "opinions" (
   "talk_session_id" uuid NOT NULL,
   "user_id" uuid NOT NULL,
   "parent_opinion_id" uuid, -- NULLならルート
+  "title" varchar,
   "content" varchar NOT NULL,
   "vote_id" uuid,
   "created_at" timestamp NOT NULL DEFAULT (now())
