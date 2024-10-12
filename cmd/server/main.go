@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"net/http"
 
+	swMiddleware "github.com/go-openapi/runtime/middleware"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/db"
 	"github.com/neko-dream/server/internal/infrastructure/di"
 	"github.com/neko-dream/server/internal/infrastructure/middleware"
 	"github.com/neko-dream/server/internal/presentation/handler"
 	"github.com/neko-dream/server/internal/presentation/oas"
-
-	swMiddleware "github.com/go-openapi/runtime/middleware"
 )
 
 func main() {
