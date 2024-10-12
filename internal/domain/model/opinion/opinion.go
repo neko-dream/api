@@ -33,7 +33,7 @@ type (
 		content         string
 		createdAt       time.Time
 		opinions        []Opinion
-		voteStatus      vote.VoteStatus
+		voteType        VoteType
 	}
 )
 
@@ -44,7 +44,7 @@ func NewOpinion(
 	parentOpinionID *shared.UUID[Opinion],
 	content string,
 	createdAt time.Time,
-	voteStatus vote.VoteStatus,
+	VoteType VoteType,
 ) (*Opinion, error) {
 	if content == "" {
 		return nil, messages.OpinionContentBadLength
@@ -63,7 +63,7 @@ func NewOpinion(
 		parentOpinionID: parentOpinionID,
 		content:         content,
 		createdAt:       createdAt,
-		voteStatus:      voteStatus,
+		voteType:        VoteType,
 		opinions:        []Opinion{},
 	}, nil
 }
@@ -77,11 +77,11 @@ func (o *Opinion) Count() int {
 }
 
 func (o *Opinion) IsVoted() bool {
-	return o.voteStatus == vote.UnVoted
+	return o.voteType == UnVoted
 }
 
-func (o *Opinion) Vote(voteStatus vote.VoteStatus) {
-	o.voteStatus = voteStatus
+func (o *Opinion) Vote(VoteType VoteType) {
+	o.voteType = VoteType
 }
 
 func (o *Opinion) OpinionID() shared.UUID[Opinion] {
@@ -108,8 +108,8 @@ func (o *Opinion) CreatedAt() time.Time {
 	return o.createdAt
 }
 
-func (o *Opinion) VoteStatus() vote.VoteStatus {
-	return o.voteStatus
+func (o *Opinion) VoteType() VoteType {
+	return o.voteType
 }
 
 func (o *Opinion) Opinions() []Opinion {

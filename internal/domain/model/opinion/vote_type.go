@@ -1,15 +1,15 @@
-package vote
+package opinion
 
-type VoteStatus int
+type VoteType int
 
 const (
-	UnVoted VoteStatus = iota
+	UnVoted VoteType = iota
 	Agreed
 	Disagreed
 	Pass
 )
 
-func FromString(s *string) VoteStatus {
+func VoteFromString(s *string) VoteType {
 	if s == nil {
 		return UnVoted
 	}
