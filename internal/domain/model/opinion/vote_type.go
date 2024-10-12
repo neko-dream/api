@@ -9,6 +9,23 @@ const (
 	Pass
 )
 
+func (v VoteType) Int() int {
+	return int(v)
+}
+
+func (v VoteType) String() string {
+	switch v {
+	case Agreed:
+		return "agreed"
+	case Disagreed:
+		return "disagreed"
+	case Pass:
+		return "pass"
+	default:
+		return "unvoted"
+	}
+}
+
 func VoteTypeFromInt(i int) VoteType {
 	switch i {
 	case 1:
