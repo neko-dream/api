@@ -8,13 +8,11 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/domain/model/vote"
 )
 
 type (
 	OpinionRepository interface {
 		Create(context.Context, Opinion) error
-		FindByTalkSessionID(context.Context, shared.UUID[talksession.TalkSession]) ([]Opinion, error)
 		FindByParentID(context.Context, shared.UUID[Opinion]) ([]Opinion, error)
 		// FindByTalkSessionWithoutVote まだユーザーが投票していない意見をランダムに取得
 		FindByTalkSessionWithoutVote(
@@ -23,6 +21,11 @@ type (
 			talkSessionID shared.UUID[talksession.TalkSession],
 			limit int,
 		) ([]Opinion, error)
+	}
+
+	OpinionService interface {
+		// すでに自分が意見に投票OR返信しているかどうかを判定
+		IsVotedOrReplied(ctx context.Context, opinionID shared.UUID[Opinion], userID shared.UUID[user.User]) (bool, error)
 	}
 
 	Opinion struct {

@@ -48,6 +48,7 @@ func BuildContainer() *dig.Container {
 		{service.NewAuthService, nil},
 		{service.NewSessionService, nil},
 		{service.NewUserService, nil},
+		{service.NewOpinionService, nil},
 		{auth_usecase.NewAuthLoginUseCase, nil},
 		{auth_usecase.NewAuthCallbackUseCase, nil},
 		{auth_usecase.NewRevokeUseCase, nil},
