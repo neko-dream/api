@@ -15,8 +15,22 @@ type voteRepository struct {
 	*db.DBManager
 }
 
-func NewVoteRepository(dbManager *db.DBManager) *voteRepository {
+func NewVoteRepository(dbManager *db.DBManager) vote.VoteRepository {
 	return &voteRepository{dbManager}
+}
+
+func (o *voteRepository) Create(ctx context.Context, vote vote.Vote) error {
+	if err := o.GetQueries(ctx).CreateVote(ctx, model.CreateVoteParams{
+		VoteID:    vote.VoteID.UUID(),
+		OpinionID: vote.OpinionID.UUID(),
+		UserID:    vote.UserID.UUID(),
+		VoteType:  int16(vote.VoteType.Int()),
+		CreatedAt: vote.CreatedAt,
+	}); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (o *voteRepository) FindByOpinionAndUserID(ctx context.Context, opinionID shared.UUID[opinion.Opinion], userID shared.UUID[user.User]) (*vote.Vote, error) {

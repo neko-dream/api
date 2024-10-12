@@ -12,6 +12,7 @@ import (
 
 type (
 	VoteRepository interface {
+		Create(ctx context.Context, vote Vote) error
 		FindByOpinionAndUserID(ctx context.Context, opinionID shared.UUID[opinion.Opinion], userID shared.UUID[user.User]) (*Vote, error)
 	}
 
