@@ -61,6 +61,7 @@ CREATE TABLE "votes" (
   "vote_id" uuid PRIMARY KEY,
   "opinion_id" uuid NOT NULL,
   "user_id" uuid NOT NULL,
+  "vote_type" SMALLINT NOT NULL,
   "created_at" timestamp NOT NULL DEFAULT (now())
 );
 
