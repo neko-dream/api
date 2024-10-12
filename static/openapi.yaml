@@ -774,7 +774,8 @@ paths:
               schema:
                 type: object
                 properties: {}
-      security: []
+      security:
+        - SessionId: []
       x-ogen-operation-group: Opinion
   /api/talksessions/{talkSessionID}/opinions/{opinionID}/votes:
     post:
