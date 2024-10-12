@@ -3421,11 +3421,11 @@ type PostOpinionPostOK struct{}
 func (*PostOpinionPostOK) postOpinionPostRes() {}
 
 type PostOpinionPostReq struct {
-	ParentOpinionID OptNilString `json:"parentOpinionID"`
-	Title           OptNilString `json:"title"`
-	OpinionContent  string       `json:"opinionContent"`
-	ReferenceURL    OptNilString `json:"referenceURL"`
-	Picture         OptNilString `json:"picture"`
+	ParentOpinionID OptNilString     `json:"parentOpinionID"`
+	Title           OptNilString     `json:"title"`
+	OpinionContent  string           `json:"opinionContent"`
+	ReferenceURL    OptNilString     `json:"referenceURL"`
+	Picture         OptMultipartFile `json:"picture"`
 }
 
 // GetParentOpinionID returns the value of ParentOpinionID.
@@ -3449,7 +3449,7 @@ func (s *PostOpinionPostReq) GetReferenceURL() OptNilString {
 }
 
 // GetPicture returns the value of Picture.
-func (s *PostOpinionPostReq) GetPicture() OptNilString {
+func (s *PostOpinionPostReq) GetPicture() OptMultipartFile {
 	return s.Picture
 }
 
@@ -3474,7 +3474,7 @@ func (s *PostOpinionPostReq) SetReferenceURL(val OptNilString) {
 }
 
 // SetPicture sets the value of Picture.
-func (s *PostOpinionPostReq) SetPicture(val OptNilString) {
+func (s *PostOpinionPostReq) SetPicture(val OptMultipartFile) {
 	s.Picture = val
 }
 

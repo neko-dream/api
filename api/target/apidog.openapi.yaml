@@ -762,8 +762,7 @@
                   "picture": {
                     "type": "string",
                     "format": "binary",
-                    "example": "",
-                    "nullable": true
+                    "example": ""
                   }
                 },
                 "required": [

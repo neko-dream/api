@@ -757,7 +757,6 @@ paths:
                   type: string
                   format: binary
                   example: ''
-                  nullable: true
               required:
                 - opinionContent
       responses:
