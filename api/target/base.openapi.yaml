@@ -9,8 +9,8 @@ paths:
     $ref: './paths/authorize.yaml'
   /auth/{provider}/callback:
     $ref: './paths/callback.yaml'
-  /auth/token/info:
-    $ref: './paths/token_info.yaml'
+  # /auth/token/info:
+  #   $ref: './paths/token_info.yaml'
   /auth/revoke:
     $ref: './paths/revoke.yaml'
 components:

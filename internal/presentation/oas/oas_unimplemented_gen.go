@@ -26,7 +26,7 @@ func (UnimplementedHandler) Authorize(ctx context.Context, params AuthorizeParam
 //
 // トークセッション作成.
 //
-// POST /api/talksessions
+// POST /talksessions
 func (UnimplementedHandler) CreateTalkSession(ctx context.Context, req OptCreateTalkSessionReq) (r *CreateTalkSessionOK, _ error) {
 	return r, ht.ErrNotImplemented
 }
@@ -35,7 +35,7 @@ func (UnimplementedHandler) CreateTalkSession(ctx context.Context, req OptCreate
 //
 // ユーザー情報の変更.
 //
-// PUT /api/user
+// PUT /user
 func (UnimplementedHandler) EditUserProfile(ctx context.Context, req OptEditUserProfileReq) (r EditUserProfileRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
@@ -44,7 +44,7 @@ func (UnimplementedHandler) EditUserProfile(ctx context.Context, req OptEditUser
 //
 // 🚧 トークセッションの詳細.
 //
-// GET /api/talksessions/{talkSessionId}
+// GET /talksessions/{talkSessionId}
 func (UnimplementedHandler) GetTalkSessionDetail(ctx context.Context, params GetTalkSessionDetailParams) (r *GetTalkSessionDetailOK, _ error) {
 	return r, ht.ErrNotImplemented
 }
@@ -53,7 +53,7 @@ func (UnimplementedHandler) GetTalkSessionDetail(ctx context.Context, params Get
 //
 // トークセッションコレクション.
 //
-// GET /api/talksessions
+// GET /talksessions
 func (UnimplementedHandler) GetTalkSessionList(ctx context.Context, params GetTalkSessionListParams) (r GetTalkSessionListRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
@@ -62,17 +62,8 @@ func (UnimplementedHandler) GetTalkSessionList(ctx context.Context, params GetTa
 //
 // 🚧 分析に関する意見.
 //
-// GET /api/talksessions/{talkSessionId}/opinion
+// GET /talksessions/{talkSessionId}/opinion
 func (UnimplementedHandler) GetTopOpinions(ctx context.Context, params GetTopOpinionsParams) (r GetTopOpinionsRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// GetUserProfile implements getUserProfile operation.
-//
-// ユーザー情報の取得.
-//
-// GET /api/user
-func (UnimplementedHandler) GetUserProfile(ctx context.Context) (r *GetUserProfileOK, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -80,7 +71,7 @@ func (UnimplementedHandler) GetUserProfile(ctx context.Context) (r *GetUserProfi
 //
 // ランダムな意見.
 //
-// GET /api/talksession/{talkSessionID}/opinions
+// GET /talksession/{talkSessionID}/opinions
 func (UnimplementedHandler) ListOpinions(ctx context.Context, params ListOpinionsParams) (r ListOpinionsRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
@@ -105,10 +96,10 @@ func (UnimplementedHandler) OAuthRevoke(ctx context.Context) (r OAuthRevokeRes, 
 
 // OAuthTokenInfo implements oauth_token_info operation.
 //
-// アクセストークンの情報を取得.
+// JWTの内容を返してくれる.
 //
 // GET /auth/token/info
-func (UnimplementedHandler) OAuthTokenInfo(ctx context.Context) (r *OAuthTokenInfoOK, _ error) {
+func (UnimplementedHandler) OAuthTokenInfo(ctx context.Context) (r OAuthTokenInfoRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -116,7 +107,7 @@ func (UnimplementedHandler) OAuthTokenInfo(ctx context.Context) (r *OAuthTokenIn
 //
 // 意見に対するコメント一覧を返す.
 //
-// GET /api/talksession/{talkSessionID}/opinions/{opinionID}
+// GET /talksession/{talkSessionID}/opinions/{opinionID}
 func (UnimplementedHandler) OpinionComments(ctx context.Context, params OpinionCommentsParams) (r OpinionCommentsRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
@@ -125,7 +116,7 @@ func (UnimplementedHandler) OpinionComments(ctx context.Context, params OpinionC
 //
 // ParentOpinionIDがなければルートの意見として投稿される.
 //
-// POST /api/talksessions/{talkSessionID}/opinions
+// POST /talksessions/{talkSessionID}/opinions
 func (UnimplementedHandler) PostOpinionPost(ctx context.Context, req OptPostOpinionPostReq, params PostOpinionPostParams) (r PostOpinionPostRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
@@ -134,14 +125,14 @@ func (UnimplementedHandler) PostOpinionPost(ctx context.Context, req OptPostOpin
 //
 // ユーザー作成.
 //
-// POST /api/user
+// POST /user
 func (UnimplementedHandler) RegisterUser(ctx context.Context, req OptRegisterUserReq) (r RegisterUserRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
 // Test implements test operation.
 //
-// 無題のAPI.
+// OpenAPIテスト用.
 //
 // GET /test
 func (UnimplementedHandler) Test(ctx context.Context) (r TestRes, _ error) {
@@ -152,7 +143,7 @@ func (UnimplementedHandler) Test(ctx context.Context) (r TestRes, _ error) {
 //
 // 意思表明API.
 //
-// POST /api/talksessions/{talkSessionID}/opinions/{opinionID}/votes
+// POST /talksessions/{talkSessionID}/opinions/{opinionID}/votes
 func (UnimplementedHandler) Vote(ctx context.Context, req OptVoteReq, params VoteParams) (r VoteRes, _ error) {
 	return r, ht.ErrNotImplemented
 }

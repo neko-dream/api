@@ -33,15 +33,6 @@ func NewUserHandler(
 	}
 }
 
-// GetUserProfile implements oas.UserHandler.
-func (u *userHandler) GetUserProfile(ctx context.Context) (*oas.GetUserProfileOK, error) {
-
-	return &oas.GetUserProfileOK{
-		DisplayID:   "string",
-		DisplayName: "string",
-	}, nil
-}
-
 // EditUserProfile ユーザープロフィールの編集
 func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUserProfileReq) (oas.EditUserProfileRes, error) {
 	claim := session.GetSession(ctx)

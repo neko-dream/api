@@ -140,12 +140,12 @@ func (s *Server) handleAuthorizeRequest(args [1]string, argsEscaped bool, w http
 //
 // トークセッション作成.
 //
-// POST /api/talksessions
+// POST /talksessions
 func (s *Server) handleCreateTalkSessionRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("createTalkSession"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/api/talksessions"),
+		semconv.HTTPRouteKey.String("/talksessions"),
 	}
 
 	// Start a span for this request.
@@ -296,12 +296,12 @@ func (s *Server) handleCreateTalkSessionRequest(args [0]string, argsEscaped bool
 //
 // ユーザー情報の変更.
 //
-// PUT /api/user
+// PUT /user
 func (s *Server) handleEditUserProfileRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("editUserProfile"),
 		semconv.HTTPRequestMethodKey.String("PUT"),
-		semconv.HTTPRouteKey.String("/api/user"),
+		semconv.HTTPRouteKey.String("/user"),
 	}
 
 	// Start a span for this request.
@@ -452,12 +452,12 @@ func (s *Server) handleEditUserProfileRequest(args [0]string, argsEscaped bool, 
 //
 // 🚧 トークセッションの詳細.
 //
-// GET /api/talksessions/{talkSessionId}
+// GET /talksessions/{talkSessionId}
 func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getTalkSessionDetail"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/api/talksessions/{talkSessionId}"),
+		semconv.HTTPRouteKey.String("/talksessions/{talkSessionId}"),
 	}
 
 	// Start a span for this request.
@@ -564,12 +564,12 @@ func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped b
 //
 // トークセッションコレクション.
 //
-// GET /api/talksessions
+// GET /talksessions
 func (s *Server) handleGetTalkSessionListRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getTalkSessionList"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/api/talksessions"),
+		semconv.HTTPRouteKey.String("/talksessions"),
 	}
 
 	// Start a span for this request.
@@ -688,12 +688,12 @@ func (s *Server) handleGetTalkSessionListRequest(args [0]string, argsEscaped boo
 //
 // 🚧 分析に関する意見.
 //
-// GET /api/talksessions/{talkSessionId}/opinion
+// GET /talksessions/{talkSessionId}/opinion
 func (s *Server) handleGetTopOpinionsRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getTopOpinions"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/api/talksessions/{talkSessionId}/opinion"),
+		semconv.HTTPRouteKey.String("/talksessions/{talkSessionId}/opinion"),
 	}
 
 	// Start a span for this request.
@@ -796,109 +796,16 @@ func (s *Server) handleGetTopOpinionsRequest(args [1]string, argsEscaped bool, w
 	}
 }
 
-// handleGetUserProfileRequest handles getUserProfile operation.
-//
-// ユーザー情報の取得.
-//
-// GET /api/user
-func (s *Server) handleGetUserProfileRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("getUserProfile"),
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/api/user"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "GetUserProfile",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
-
-	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
-		err error
-	)
-
-	var response *GetUserProfileOK
-	if m := s.cfg.Middleware; m != nil {
-		mreq := middleware.Request{
-			Context:          ctx,
-			OperationName:    "GetUserProfile",
-			OperationSummary: "ユーザー情報の取得",
-			OperationID:      "getUserProfile",
-			Body:             nil,
-			Params:           middleware.Parameters{},
-			Raw:              r,
-		}
-
-		type (
-			Request  = struct{}
-			Params   = struct{}
-			Response = *GetUserProfileOK
-		)
-		response, err = middleware.HookMiddleware[
-			Request,
-			Params,
-			Response,
-		](
-			m,
-			mreq,
-			nil,
-			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.GetUserProfile(ctx)
-				return response, err
-			},
-		)
-	} else {
-		response, err = s.h.GetUserProfile(ctx)
-	}
-	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-
-	if err := encodeGetUserProfileResponse(response, w, span); err != nil {
-		defer recordError("EncodeResponse", err)
-		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
-			s.cfg.ErrorHandler(ctx, w, r, err)
-		}
-		return
-	}
-}
-
 // handleListOpinionsRequest handles listOpinions operation.
 //
 // ランダムな意見.
 //
-// GET /api/talksession/{talkSessionID}/opinions
+// GET /talksession/{talkSessionID}/opinions
 func (s *Server) handleListOpinionsRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("listOpinions"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/api/talksession/{talkSessionID}/opinions"),
+		semconv.HTTPRouteKey.String("/talksession/{talkSessionID}/opinions"),
 	}
 
 	// Start a span for this request.
@@ -1276,7 +1183,7 @@ func (s *Server) handleOAuthRevokeRequest(args [0]string, argsEscaped bool, w ht
 
 // handleOAuthTokenInfoRequest handles oauth_token_info operation.
 //
-// アクセストークンの情報を取得.
+// JWTの内容を返してくれる.
 //
 // GET /auth/token/info
 func (s *Server) handleOAuthTokenInfoRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
@@ -1367,12 +1274,12 @@ func (s *Server) handleOAuthTokenInfoRequest(args [0]string, argsEscaped bool, w
 		}
 	}
 
-	var response *OAuthTokenInfoOK
+	var response OAuthTokenInfoRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
 			OperationName:    "OAuthTokenInfo",
-			OperationSummary: "アクセストークンの情報を取得",
+			OperationSummary: "JWTの内容を返してくれる",
 			OperationID:      "oauth_token_info",
 			Body:             nil,
 			Params:           middleware.Parameters{},
@@ -1382,7 +1289,7 @@ func (s *Server) handleOAuthTokenInfoRequest(args [0]string, argsEscaped bool, w
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = *OAuthTokenInfoOK
+			Response = OAuthTokenInfoRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -1419,12 +1326,12 @@ func (s *Server) handleOAuthTokenInfoRequest(args [0]string, argsEscaped bool, w
 //
 // 意見に対するコメント一覧を返す.
 //
-// GET /api/talksession/{talkSessionID}/opinions/{opinionID}
+// GET /talksession/{talkSessionID}/opinions/{opinionID}
 func (s *Server) handleOpinionCommentsRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("opinionComments"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/api/talksession/{talkSessionID}/opinions/{opinionID}"),
+		semconv.HTTPRouteKey.String("/talksession/{talkSessionID}/opinions/{opinionID}"),
 	}
 
 	// Start a span for this request.
@@ -1535,12 +1442,12 @@ func (s *Server) handleOpinionCommentsRequest(args [2]string, argsEscaped bool, 
 //
 // ParentOpinionIDがなければルートの意見として投稿される.
 //
-// POST /api/talksessions/{talkSessionID}/opinions
+// POST /talksessions/{talkSessionID}/opinions
 func (s *Server) handlePostOpinionPostRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("postOpinionPost"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/api/talksessions/{talkSessionID}/opinions"),
+		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/opinions"),
 	}
 
 	// Start a span for this request.
@@ -1706,12 +1613,12 @@ func (s *Server) handlePostOpinionPostRequest(args [1]string, argsEscaped bool, 
 //
 // ユーザー作成.
 //
-// POST /api/user
+// POST /user
 func (s *Server) handleRegisterUserRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("registerUser"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/api/user"),
+		semconv.HTTPRouteKey.String("/user"),
 	}
 
 	// Start a span for this request.
@@ -1860,7 +1767,7 @@ func (s *Server) handleRegisterUserRequest(args [0]string, argsEscaped bool, w h
 
 // handleTestRequest handles test operation.
 //
-// 無題のAPI.
+// OpenAPIテスト用.
 //
 // GET /test
 func (s *Server) handleTestRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
@@ -1908,7 +1815,7 @@ func (s *Server) handleTestRequest(args [0]string, argsEscaped bool, w http.Resp
 		mreq := middleware.Request{
 			Context:          ctx,
 			OperationName:    "Test",
-			OperationSummary: "無題のAPI",
+			OperationSummary: "OpenAPIテスト用",
 			OperationID:      "test",
 			Body:             nil,
 			Params:           middleware.Parameters{},
@@ -1955,12 +1862,12 @@ func (s *Server) handleTestRequest(args [0]string, argsEscaped bool, w http.Resp
 //
 // 意思表明API.
 //
-// POST /api/talksessions/{talkSessionID}/opinions/{opinionID}/votes
+// POST /talksessions/{talkSessionID}/opinions/{opinionID}/votes
 func (s *Server) handleVoteRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("vote"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/api/talksessions/{talkSessionID}/opinions/{opinionID}/votes"),
+		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/opinions/{opinionID}/votes"),
 	}
 
 	// Start a span for this request.

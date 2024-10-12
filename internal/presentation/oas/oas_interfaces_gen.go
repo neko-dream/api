@@ -21,6 +21,10 @@ type OAuthRevokeRes interface {
 	oAuthRevokeRes()
 }
 
+type OAuthTokenInfoRes interface {
+	oAuthTokenInfoRes()
+}
+
 type OpinionCommentsRes interface {
 	opinionCommentsRes()
 }

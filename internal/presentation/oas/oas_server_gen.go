@@ -40,10 +40,10 @@ type AuthHandler interface {
 	OAuthRevoke(ctx context.Context) (OAuthRevokeRes, error)
 	// OAuthTokenInfo implements oauth_token_info operation.
 	//
-	// アクセストークンの情報を取得.
+	// JWTの内容を返してくれる.
 	//
 	// GET /auth/token/info
-	OAuthTokenInfo(ctx context.Context) (*OAuthTokenInfoOK, error)
+	OAuthTokenInfo(ctx context.Context) (OAuthTokenInfoRes, error)
 }
 
 // OpinionHandler handles operations described by OpenAPI v3 specification.
@@ -54,25 +54,25 @@ type OpinionHandler interface {
 	//
 	// 🚧 分析に関する意見.
 	//
-	// GET /api/talksessions/{talkSessionId}/opinion
+	// GET /talksessions/{talkSessionId}/opinion
 	GetTopOpinions(ctx context.Context, params GetTopOpinionsParams) (GetTopOpinionsRes, error)
 	// ListOpinions implements listOpinions operation.
 	//
 	// ランダムな意見.
 	//
-	// GET /api/talksession/{talkSessionID}/opinions
+	// GET /talksession/{talkSessionID}/opinions
 	ListOpinions(ctx context.Context, params ListOpinionsParams) (ListOpinionsRes, error)
 	// OpinionComments implements opinionComments operation.
 	//
 	// 意見に対するコメント一覧を返す.
 	//
-	// GET /api/talksession/{talkSessionID}/opinions/{opinionID}
+	// GET /talksession/{talkSessionID}/opinions/{opinionID}
 	OpinionComments(ctx context.Context, params OpinionCommentsParams) (OpinionCommentsRes, error)
 	// PostOpinionPost implements postOpinionPost operation.
 	//
 	// ParentOpinionIDがなければルートの意見として投稿される.
 	//
-	// POST /api/talksessions/{talkSessionID}/opinions
+	// POST /talksessions/{talkSessionID}/opinions
 	PostOpinionPost(ctx context.Context, req OptPostOpinionPostReq, params PostOpinionPostParams) (PostOpinionPostRes, error)
 }
 
@@ -84,19 +84,19 @@ type TalkSessionHandler interface {
 	//
 	// トークセッション作成.
 	//
-	// POST /api/talksessions
+	// POST /talksessions
 	CreateTalkSession(ctx context.Context, req OptCreateTalkSessionReq) (*CreateTalkSessionOK, error)
 	// GetTalkSessionDetail implements getTalkSessionDetail operation.
 	//
 	// 🚧 トークセッションの詳細.
 	//
-	// GET /api/talksessions/{talkSessionId}
+	// GET /talksessions/{talkSessionId}
 	GetTalkSessionDetail(ctx context.Context, params GetTalkSessionDetailParams) (*GetTalkSessionDetailOK, error)
 	// GetTalkSessionList implements getTalkSessionList operation.
 	//
 	// トークセッションコレクション.
 	//
-	// GET /api/talksessions
+	// GET /talksessions
 	GetTalkSessionList(ctx context.Context, params GetTalkSessionListParams) (GetTalkSessionListRes, error)
 }
 
@@ -106,7 +106,7 @@ type TalkSessionHandler interface {
 type TestHandler interface {
 	// Test implements test operation.
 	//
-	// 無題のAPI.
+	// OpenAPIテスト用.
 	//
 	// GET /test
 	Test(ctx context.Context) (TestRes, error)
@@ -120,19 +120,13 @@ type UserHandler interface {
 	//
 	// ユーザー情報の変更.
 	//
-	// PUT /api/user
+	// PUT /user
 	EditUserProfile(ctx context.Context, req OptEditUserProfileReq) (EditUserProfileRes, error)
-	// GetUserProfile implements getUserProfile operation.
-	//
-	// ユーザー情報の取得.
-	//
-	// GET /api/user
-	GetUserProfile(ctx context.Context) (*GetUserProfileOK, error)
 	// RegisterUser implements registerUser operation.
 	//
 	// ユーザー作成.
 	//
-	// POST /api/user
+	// POST /user
 	RegisterUser(ctx context.Context, req OptRegisterUserReq) (RegisterUserRes, error)
 }
 
@@ -144,7 +138,7 @@ type VoteHandler interface {
 	//
 	// 意思表明API.
 	//
-	// POST /api/talksessions/{talkSessionID}/opinions/{opinionID}/votes
+	// POST /talksessions/{talkSessionID}/opinions/{opinionID}/votes
 	Vote(ctx context.Context, req OptVoteReq, params VoteParams) (VoteRes, error)
 }
 

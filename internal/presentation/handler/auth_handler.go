@@ -102,7 +102,7 @@ func (a *authHandler) OAuthRevoke(ctx context.Context) (oas.OAuthRevokeRes, erro
 }
 
 // OAuthTokenInfo implements oas.AuthHandler.
-func (a *authHandler) OAuthTokenInfo(ctx context.Context) (*oas.OAuthTokenInfoOK, error) {
+func (a *authHandler) OAuthTokenInfo(ctx context.Context) (oas.OAuthTokenInfoRes, error) {
 	claim := session.GetSession(ctx)
 	sessID, err := claim.SessionID()
 	if err != nil {
@@ -120,9 +120,8 @@ func (a *authHandler) OAuthTokenInfo(ctx context.Context) (*oas.OAuthTokenInfoOK
 		Sub:         claim.Sub,
 		Jti:         sessID.String(),
 		IsVerify:    claim.IsVerify,
-		DisplayId:   utils.ToOptNil[oas.OptNilString](claim.DisplayID),
-		DisplayName: utils.ToOptNil[oas.OptNilString](claim.DisplayName),
-		IconURL:     utils.ToOptNil[oas.OptNilString](claim.IconURL),
+		DisplayId:   utils.ToOptNil[oas.OptString](claim.DisplayID),
+		DisplayName: utils.ToOptNil[oas.OptString](claim.DisplayName),
+		IconURL:     utils.ToOptNil[oas.OptString](claim.IconURL),
 	}, nil
-
 }

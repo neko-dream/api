@@ -4,7 +4,7 @@ info:
   description: ''
   version: 1.0.0
 paths:
-  /api/talksessions/{talkSessionId}:
+  /talksessions/{talkSessionId}:
     get:
       summary: 🚧 トークセッションの詳細
       deprecated: false
@@ -94,7 +94,7 @@ paths:
                   - scheduledEndTime
       security: []
       x-ogen-operation-group: TalkSession
-  /api/talksessions:
+  /talksessions:
     post:
       summary: トークセッション作成
       deprecated: false
@@ -246,11 +246,14 @@ paths:
             enum:
               - open
               - finished
-            x-apidog:
-              enumDescriptions:
-                open: 開催中
-                finished: 終了済み
             default: open
+            x-apidog-enum:
+              - name: ''
+                value: open
+                description: 開催中
+              - name: ''
+                value: finished
+                description: 終了済み
             nullable: true
       responses:
         '200':
@@ -348,42 +351,7 @@ paths:
                 properties: {}
       security: []
       x-ogen-operation-group: TalkSession
-  /api/user:
-    get:
-      summary: ユーザー情報の取得
-      deprecated: false
-      description: ''
-      operationId: getUserProfile
-      tags:
-        - user
-        - user
-      parameters: []
-      responses:
-        '200':
-          description: 成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  displayID:
-                    type: string
-                    x-apidog-mock: '{{$string.uuid}}'
-                    pattern: ^[A-Za-z0-9]$
-                    examples:
-                      - userid
-                    minLength: 3
-                    maxLength: 25
-                  displayName:
-                    type: string
-                    x-apidog-mock: '{{$person.firstName}}'
-                  iconURL:
-                    type: string
-                required:
-                  - displayID
-                  - displayName
-      security: []
-      x-ogen-operation-group: user
+  /user:
     post:
       summary: ユーザー作成
       deprecated: false
@@ -426,6 +394,19 @@ paths:
                     - other
                     - preferNotToSay
                   default: preferNotToSay
+                  x-apidog-enum:
+                    - name: ''
+                      value: male
+                      description: 男
+                    - name: ''
+                      value: female
+                      description: 女
+                    - name: ''
+                      value: other
+                      description: その他
+                    - name: ''
+                      value: preferNotToSay
+                      description: 未回答
                   description: 性別
                   example: ''
                   nullable: true
@@ -449,6 +430,40 @@ paths:
                     - その他
                     - 無回答
                   default: 無回答
+                  x-apidog-enum:
+                    - name: ''
+                      value: 正社員
+                      description: ''
+                    - name: ''
+                      value: 契約社員
+                      description: ''
+                    - name: ''
+                      value: 公務員
+                      description: ''
+                    - name: ''
+                      value: 自営業
+                      description: ''
+                    - name: ''
+                      value: 会社役員
+                      description: ''
+                    - name: ''
+                      value: パート・アルバイト
+                      description: ''
+                    - name: ''
+                      value: 家事従事者
+                      description: ''
+                    - name: ''
+                      value: 学生
+                      description: ''
+                    - name: ''
+                      value: 無職
+                      description: ''
+                    - name: ''
+                      value: その他
+                      description: ''
+                    - name: ''
+                      value: 無回答
+                      description: ''
                   description: ユーザーの職業
                   example: ''
                   nullable: true
@@ -541,6 +556,19 @@ paths:
                     - female
                     - other
                     - preferNotToSay
+                  x-apidog-enum:
+                    - name: ''
+                      value: male
+                      description: 男
+                    - name: ''
+                      value: female
+                      description: 女
+                    - name: ''
+                      value: other
+                      description: その他
+                    - name: ''
+                      value: preferNotToSay
+                      description: 無回答
                   description: 性別
                   example: ''
                   nullable: true
@@ -563,6 +591,40 @@ paths:
                     - 無職
                     - その他
                     - 無回答
+                  x-apidog-enum:
+                    - name: ''
+                      value: 正社員
+                      description: ''
+                    - name: ''
+                      value: 契約社員
+                      description: ''
+                    - name: ''
+                      value: 公務員
+                      description: ''
+                    - name: ''
+                      value: 自営業
+                      description: ''
+                    - name: ''
+                      value: 会社役員
+                      description: ''
+                    - name: ''
+                      value: パート・アルバイト
+                      description: ''
+                    - name: ''
+                      value: 家事従事者
+                      description: ''
+                    - name: ''
+                      value: 学生
+                      description: ''
+                    - name: ''
+                      value: 無職
+                      description: ''
+                    - name: ''
+                      value: その他
+                      description: ''
+                    - name: ''
+                      value: 無回答
+                      description: ''
                   description: 職業
                   example: ''
                   nullable: true
@@ -605,7 +667,7 @@ paths:
       security:
         - SessionId: []
       x-ogen-operation-group: user
-  /api/talksession/{talkSessionID}/opinions:
+  /talksession/{talkSessionID}/opinions:
     get:
       summary: セッションの意見一覧
       deprecated: false
@@ -715,7 +777,7 @@ paths:
                 properties: {}
       security: []
       x-ogen-operation-group: Opinion
-  /api/talksessions/{talkSessionID}/opinions:
+  /talksessions/{talkSessionID}/opinions:
     post:
       summary: セッションに対して意見投稿
       deprecated: false
@@ -777,7 +839,7 @@ paths:
       security:
         - SessionId: []
       x-ogen-operation-group: Opinion
-  /api/talksessions/{talkSessionID}/opinions/{opinionID}/votes:
+  /talksessions/{talkSessionID}/opinions/{opinionID}/votes:
     post:
       summary: 意思表明API
       deprecated: false
@@ -869,7 +931,7 @@ paths:
                 properties: {}
       security: []
       x-ogen-operation-group: Vote
-  /api/talksession/{talkSessionID}/opinions/{opinionID}:
+  /talksession/{talkSessionID}/opinions/{opinionID}:
     get:
       summary: 意見に対するコメント一覧を返す
       deprecated: false
@@ -1069,7 +1131,7 @@ paths:
                 properties: {}
       security: []
       x-ogen-operation-group: Opinion
-  /api/talksessions/{talkSessionId}/opinion:
+  /talksessions/{talkSessionId}/opinion:
     get:
       summary: 🚧 分析に関する意見
       deprecated: false
@@ -1106,7 +1168,7 @@ paths:
       x-ogen-operation-group: Opinion
   /test:
     get:
-      summary: 無題のAPI
+      summary: OpenAPIテスト用
       deprecated: false
       description: ''
       operationId: test
@@ -1148,6 +1210,72 @@ paths:
                 properties: {}
       security: []
       x-ogen-operation-group: test
+  /auth/token/info:
+    get:
+      summary: JWTの内容を返してくれる
+      deprecated: false
+      description: ''
+      operationId: oauth_token_info
+      tags:
+        - auth
+        - auth
+      parameters: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  aud:
+                    type: string
+                    description: Audience
+                  exp:
+                    type: string
+                    description: 有効期限
+                  iat:
+                    type: string
+                    description: 発行日時
+                  iss:
+                    type: string
+                    description: 発行者
+                  sub:
+                    type: string
+                    description: ユーザID
+                  jti:
+                    type: string
+                    description: JWT ID
+                  displayId:
+                    type: string
+                    description: ユーザーID
+                  displayName:
+                    type: string
+                    description: ユーザー名
+                  iconURL:
+                    type: string
+                    description: アイコンURL
+                  isVerify:
+                    type: boolean
+                    description: ユーザ登録済みか
+                required:
+                  - aud
+                  - exp
+                  - iat
+                  - iss
+                  - sub
+                  - jti
+                  - isVerify
+        '500':
+          description: ServerErrorResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      security:
+        - SessionId: []
+      x-ogen-operation-group: Auth
   /auth/{provider}/login:
     get:
       summary: OAuthログイン
@@ -1250,74 +1378,6 @@ paths:
               example: state=1234567890; Path=/; Secure; HttpOnly
       security: []
       x-ogen-operation-group: Auth
-  /auth/token/info:
-    get:
-      summary: アクセストークンの情報を取得
-      deprecated: false
-      description: アクセストークンの情報を取得
-      operationId: oauth_token_info
-      tags:
-        - auth
-      responses:
-        '200':
-          description: アクセストークンの情報
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - aud
-                  - exp
-                  - iat
-                  - iss
-                  - sub
-                  - jti
-                  - isVerify
-                properties:
-                  aud:
-                    type: string
-                    description: Audience
-                  exp:
-                    type: string
-                    description: 有効期限
-                  iat:
-                    type: string
-                    description: 発行日時
-                  iss:
-                    type: string
-                    description: 発行者
-                  sub:
-                    type: string
-                    description: ユーザID
-                  jti:
-                    type: string
-                    description: JWT ID
-                  displayId:
-                    type: string
-                    description: 表示用ユーザID
-                    nullable: true
-                  displayName:
-                    type: string
-                    description: 表示名
-                    nullable: true
-                  iconURL:
-                    type: string
-                    description: アイコンURL
-                    nullable: true
-                  isVerify:
-                    type: boolean
-                    description: ユーザー登録済みか
-              required:
-                - aud
-                - exp
-                - iat
-                - iss
-                - sub
-                - jti
-                - isVerify
-      security:
-        - SessionId: []
-      x-ogen-operation-group: Auth
   /auth/revoke:
     post:
       summary: アクセストークンを失効
@@ -1341,6 +1401,47 @@ paths:
       x-ogen-operation-group: Auth
 components:
   schemas:
+    tokenClaim:
+      type: object
+      properties:
+        aud:
+          type: string
+          description: Audience
+        exp:
+          type: string
+          description: 有効期限
+        iat:
+          type: string
+          description: 発行日時
+        iss:
+          type: string
+          description: 発行者
+        sub:
+          type: string
+          description: ユーザID
+        jti:
+          type: string
+          description: JWT ID
+        displayId:
+          type: string
+          description: ユーザーID
+        displayName:
+          type: string
+          description: ユーザー名
+        iconURL:
+          type: string
+          description: アイコンURL
+        isVerify:
+          type: boolean
+          description: ユーザ登録済みか
+      required:
+        - aud
+        - exp
+        - iat
+        - iss
+        - sub
+        - jti
+        - isVerify
     location:
       type: object
       properties:

@@ -1200,42 +1200,6 @@ type GetTopOpinionsOK struct{}
 
 func (*GetTopOpinionsOK) getTopOpinionsRes() {}
 
-type GetUserProfileOK struct {
-	DisplayID   string    `json:"displayID"`
-	DisplayName string    `json:"displayName"`
-	IconURL     OptString `json:"iconURL"`
-}
-
-// GetDisplayID returns the value of DisplayID.
-func (s *GetUserProfileOK) GetDisplayID() string {
-	return s.DisplayID
-}
-
-// GetDisplayName returns the value of DisplayName.
-func (s *GetUserProfileOK) GetDisplayName() string {
-	return s.DisplayName
-}
-
-// GetIconURL returns the value of IconURL.
-func (s *GetUserProfileOK) GetIconURL() OptString {
-	return s.IconURL
-}
-
-// SetDisplayID sets the value of DisplayID.
-func (s *GetUserProfileOK) SetDisplayID(val string) {
-	s.DisplayID = val
-}
-
-// SetDisplayName sets the value of DisplayName.
-func (s *GetUserProfileOK) SetDisplayName(val string) {
-	s.DisplayName = val
-}
-
-// SetIconURL sets the value of IconURL.
-func (s *GetUserProfileOK) SetIconURL(val OptString) {
-	s.IconURL = val
-}
-
 type ListOpinionsInternalServerError struct{}
 
 func (*ListOpinionsInternalServerError) listOpinionsRes() {}
@@ -1578,6 +1542,10 @@ type OAuthRevokeUnauthorized struct{}
 
 func (*OAuthRevokeUnauthorized) oAuthRevokeRes() {}
 
+type OAuthTokenInfoInternalServerError struct{}
+
+func (*OAuthTokenInfoInternalServerError) oAuthTokenInfoRes() {}
+
 type OAuthTokenInfoOK struct {
 	// Audience.
 	Aud string `json:"aud"`
@@ -1591,13 +1559,13 @@ type OAuthTokenInfoOK struct {
 	Sub string `json:"sub"`
 	// JWT ID.
 	Jti string `json:"jti"`
-	// 表示用ユーザID.
-	DisplayId OptNilString `json:"displayId"`
-	// 表示名.
-	DisplayName OptNilString `json:"displayName"`
+	// ユーザーID.
+	DisplayId OptString `json:"displayId"`
+	// ユーザー名.
+	DisplayName OptString `json:"displayName"`
 	// アイコンURL.
-	IconURL OptNilString `json:"iconURL"`
-	// ユーザー登録済みか.
+	IconURL OptString `json:"iconURL"`
+	// ユーザ登録済みか.
 	IsVerify bool `json:"isVerify"`
 }
 
@@ -1632,17 +1600,17 @@ func (s *OAuthTokenInfoOK) GetJti() string {
 }
 
 // GetDisplayId returns the value of DisplayId.
-func (s *OAuthTokenInfoOK) GetDisplayId() OptNilString {
+func (s *OAuthTokenInfoOK) GetDisplayId() OptString {
 	return s.DisplayId
 }
 
 // GetDisplayName returns the value of DisplayName.
-func (s *OAuthTokenInfoOK) GetDisplayName() OptNilString {
+func (s *OAuthTokenInfoOK) GetDisplayName() OptString {
 	return s.DisplayName
 }
 
 // GetIconURL returns the value of IconURL.
-func (s *OAuthTokenInfoOK) GetIconURL() OptNilString {
+func (s *OAuthTokenInfoOK) GetIconURL() OptString {
 	return s.IconURL
 }
 
@@ -1682,17 +1650,17 @@ func (s *OAuthTokenInfoOK) SetJti(val string) {
 }
 
 // SetDisplayId sets the value of DisplayId.
-func (s *OAuthTokenInfoOK) SetDisplayId(val OptNilString) {
+func (s *OAuthTokenInfoOK) SetDisplayId(val OptString) {
 	s.DisplayId = val
 }
 
 // SetDisplayName sets the value of DisplayName.
-func (s *OAuthTokenInfoOK) SetDisplayName(val OptNilString) {
+func (s *OAuthTokenInfoOK) SetDisplayName(val OptString) {
 	s.DisplayName = val
 }
 
 // SetIconURL sets the value of IconURL.
-func (s *OAuthTokenInfoOK) SetIconURL(val OptNilString) {
+func (s *OAuthTokenInfoOK) SetIconURL(val OptString) {
 	s.IconURL = val
 }
 
@@ -1700,6 +1668,8 @@ func (s *OAuthTokenInfoOK) SetIconURL(val OptNilString) {
 func (s *OAuthTokenInfoOK) SetIsVerify(val bool) {
 	s.IsVerify = val
 }
+
+func (*OAuthTokenInfoOK) oAuthTokenInfoRes() {}
 
 type OpinionCommentsInternalServerError struct{}
 
