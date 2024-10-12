@@ -40,7 +40,46 @@ func LoadConfig() *Config {
 	if err := viper.ReadInConfig(); err != nil {
 		switch err.(type) {
 		case viper.ConfigFileNotFoundError:
-			// .envファイルが存在しない場合は環境変数を読み込む
+			if err := viper.BindEnv("DATABASE_URL"); err != nil {
+				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
+			}
+			if err := viper.BindEnv("GOOGLE_CLIENT_ID"); err != nil {
+				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
+			}
+			if err := viper.BindEnv("GOOGLE_CLIENT_SECRET"); err != nil {
+				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
+			}
+			if err := viper.BindEnv("GOOGLE_CALLBACK_URL"); err != nil {
+				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
+			}
+			if err := viper.BindEnv("GOOGLE_ISSUER"); err != nil {
+				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
+			}
+			if err := viper.BindEnv("DOMAIN"); err != nil {
+				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
+			}
+			if err := viper.BindEnv("PORT"); err != nil {
+				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
+			}
+
+			if err := viper.BindEnv("AWS_REGION"); err != nil {
+				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
+			}
+			if err := viper.BindEnv("AWS_ACCESS_KEY_ID"); err != nil {
+				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
+			}
+			if err := viper.BindEnv("AWS_SECRET_ACCESS_KEY"); err != nil {
+				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
+			}
+			if err := viper.BindEnv("AWS_S3_ENDPOINT"); err != nil {
+				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
+			}
+			if err := viper.BindEnv("AWS_S3_BUCKET"); err != nil {
+				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
+			}
+			if err := viper.BindEnv("IMAGE_DOMAIN"); err != nil {
+				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
+			}
 		default:
 			panic(fmt.Errorf("設定ファイルの読み込みエラー: %w", err))
 		}
