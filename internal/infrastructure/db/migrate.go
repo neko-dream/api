@@ -22,14 +22,10 @@ func NewMigrator(config *config.Config) *Migrator {
 func (m *Migrator) Up() {
 	pgx, err := sql.Open("pgx", m.config.DatabaseURL)
 	if err != nil {
-		log.Println("Panic in pgx")
 		panic(err)
 	}
-	log.Println("DatabaseURL:", m.config.DatabaseURL)
-	log.Println("pgx:", pgx)
 	driver, err := postgres.WithInstance(pgx, &postgres.Config{})
 	if err != nil {
-		log.Println("Panic in postgres", err)
 		panic(err)
 	}
 	mi, err := migrate.NewWithDatabaseInstance(
@@ -38,7 +34,6 @@ func (m *Migrator) Up() {
 		driver,
 	)
 	if err != nil {
-		log.Println("Panic in migrate")
 		panic(err)
 	}
 	if err := mi.Up(); err != nil {
@@ -51,7 +46,6 @@ func (m *Migrator) Up() {
 func (m *Migrator) Down() {
 	pgx, err := sql.Open("pgx", m.config.DatabaseURL)
 	if err != nil {
-		log.Println("Panic in pgx")
 		panic(err)
 	}
 	if _, err := pgx.Exec("SET session_replication_role = replica;"); err != nil {
@@ -59,7 +53,6 @@ func (m *Migrator) Down() {
 	}
 	driver, err := postgres.WithInstance(pgx, &postgres.Config{})
 	if err != nil {
-		log.Println("Panic in postgres")
 		panic(err)
 	}
 	mi, err := migrate.NewWithDatabaseInstance(
