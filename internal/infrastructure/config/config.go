@@ -7,6 +7,7 @@ import (
 )
 
 type Config struct {
+	Env                string `mapstructure:"ENV"`
 	DatabaseURL        string `mapstructure:"DATABASE_URL"`
 	GoogleClientID     string `mapstructure:"GOOGLE_CLIENT_ID"`
 	GoogleClientSecret string `mapstructure:"GOOGLE_CLIENT_SECRET"`
@@ -40,6 +41,9 @@ func LoadConfig() *Config {
 	if err := viper.ReadInConfig(); err != nil {
 		switch err.(type) {
 		case viper.ConfigFileNotFoundError:
+			if err := viper.BindEnv("ENV"); err != nil {
+				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
+			}
 			if err := viper.BindEnv("DATABASE_URL"); err != nil {
 				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
 			}
