@@ -11,7 +11,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/db"
 	model "github.com/neko-dream/server/internal/infrastructure/db/sqlc"
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/samber/lo"
 )
 
 type opinionRepository struct {
@@ -26,21 +26,19 @@ func NewOpinionRepository(dbManager *db.DBManager) opinion.OpinionRepository {
 
 // Create Opinion作成
 func (o *opinionRepository) Create(ctx context.Context, op opinion.Opinion) error {
+	var parentOpinionID uuid.NullUUID
+	if op.ParentOpinionID() != nil {
+		parentOpinionID = uuid.NullUUID{UUID: op.ParentOpinionID().UUID(), Valid: true}
+	}
+
 	if err := o.GetQueries(ctx).CreateOpinion(ctx, model.CreateOpinionParams{
-		TalkSessionID: op.TalkSessionID().UUID(),
-		UserID:        op.UserID().UUID(),
-		ParentOpinionID: utils.IfThenElse[uuid.NullUUID](
-			op.ParentOpinionID() == nil,
-			uuid.NullUUID{},
-			uuid.NullUUID{UUID: op.ParentOpinionID().UUID(), Valid: true},
-		),
-		Title: utils.IfThenElse(
-			op.Title() == nil,
-			sql.NullString{},
-			sql.NullString{String: *op.Title(), Valid: true},
-		),
-		Content:   op.Content(),
-		CreatedAt: op.CreatedAt(),
+		OpinionID:       op.OpinionID().UUID(),
+		TalkSessionID:   op.TalkSessionID().UUID(),
+		UserID:          op.UserID().UUID(),
+		ParentOpinionID: parentOpinionID,
+		Title:           lo.If(op.Title() != nil, sql.NullString{String: *op.Title(), Valid: true}).Else(sql.NullString{}),
+		Content:         op.Content(),
+		CreatedAt:       op.CreatedAt(),
 	}); err != nil {
 		return err
 	}
