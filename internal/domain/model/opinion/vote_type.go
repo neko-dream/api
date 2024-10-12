@@ -9,6 +9,19 @@ const (
 	Pass
 )
 
+func VoteTypeFromInt(i int) VoteType {
+	switch i {
+	case 1:
+		return Agreed
+	case 2:
+		return Disagreed
+	case 3:
+		return Pass
+	default:
+		return UnVoted
+	}
+}
+
 func VoteFromString(s *string) VoteType {
 	if s == nil {
 		return UnVoted
