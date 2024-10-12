@@ -27,7 +27,6 @@ type (
 		Content         string
 		ReferenceURL    *string
 		Picture         *multipart.FileHeader
-		VoteType        *string
 	}
 
 	PostOpinionOutput struct {
