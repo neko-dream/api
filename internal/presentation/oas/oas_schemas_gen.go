@@ -3422,7 +3422,6 @@ func (*PostOpinionPostOK) postOpinionPostRes() {}
 
 type PostOpinionPostReq struct {
 	ParentOpinionID OptNilString `json:"parentOpinionID"`
-	VoteStatus      OptString    `json:"voteStatus"`
 	Title           OptNilString `json:"title"`
 	OpinionContent  string       `json:"opinionContent"`
 	ReferenceURL    OptNilString `json:"referenceURL"`
@@ -3432,11 +3431,6 @@ type PostOpinionPostReq struct {
 // GetParentOpinionID returns the value of ParentOpinionID.
 func (s *PostOpinionPostReq) GetParentOpinionID() OptNilString {
 	return s.ParentOpinionID
-}
-
-// GetVoteStatus returns the value of VoteStatus.
-func (s *PostOpinionPostReq) GetVoteStatus() OptString {
-	return s.VoteStatus
 }
 
 // GetTitle returns the value of Title.
@@ -3462,11 +3456,6 @@ func (s *PostOpinionPostReq) GetPicture() OptNilString {
 // SetParentOpinionID sets the value of ParentOpinionID.
 func (s *PostOpinionPostReq) SetParentOpinionID(val OptNilString) {
 	s.ParentOpinionID = val
-}
-
-// SetVoteStatus sets the value of VoteStatus.
-func (s *PostOpinionPostReq) SetVoteStatus(val OptString) {
-	s.VoteStatus = val
 }
 
 // SetTitle sets the value of Title.

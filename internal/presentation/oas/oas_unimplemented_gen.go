@@ -42,7 +42,7 @@ func (UnimplementedHandler) EditUserProfile(ctx context.Context, req OptEditUser
 
 // GetTalkSessionDetail implements getTalkSessionDetail operation.
 //
-// トークセッションの詳細.
+// 🚧 トークセッションの詳細.
 //
 // GET /api/talksessions/{talkSessionId}
 func (UnimplementedHandler) GetTalkSessionDetail(ctx context.Context, params GetTalkSessionDetailParams) (r *GetTalkSessionDetailOK, _ error) {

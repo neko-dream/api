@@ -619,38 +619,6 @@ func (s *Server) decodePostOpinionPostRequest(r *http.Request) (
 			}
 			{
 				cfg := uri.QueryParameterDecodingConfig{
-					Name:    "voteStatus",
-					Style:   uri.QueryStyleForm,
-					Explode: true,
-				}
-				if err := q.HasParam(cfg); err == nil {
-					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-						var optFormDotVoteStatusVal string
-						if err := func() error {
-							val, err := d.DecodeValue()
-							if err != nil {
-								return err
-							}
-
-							c, err := conv.ToString(val)
-							if err != nil {
-								return err
-							}
-
-							optFormDotVoteStatusVal = c
-							return nil
-						}(); err != nil {
-							return err
-						}
-						optForm.VoteStatus.SetTo(optFormDotVoteStatusVal)
-						return nil
-					}); err != nil {
-						return req, close, errors.Wrap(err, "decode \"voteStatus\"")
-					}
-				}
-			}
-			{
-				cfg := uri.QueryParameterDecodingConfig{
 					Name:    "title",
 					Style:   uri.QueryStyleForm,
 					Explode: true,

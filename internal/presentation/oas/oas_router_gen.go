@@ -777,7 +777,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									switch method {
 									case "GET":
 										r.name = "GetTalkSessionDetail"
-										r.summary = "トークセッションの詳細"
+										r.summary = "🚧 トークセッションの詳細"
 										r.operationID = "getTalkSessionDetail"
 										r.pathPattern = "/api/talksessions/{talkSessionId}"
 										r.args = args

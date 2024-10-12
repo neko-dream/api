@@ -450,7 +450,7 @@ func (s *Server) handleEditUserProfileRequest(args [0]string, argsEscaped bool, 
 
 // handleGetTalkSessionDetailRequest handles getTalkSessionDetail operation.
 //
-// トークセッションの詳細.
+// 🚧 トークセッションの詳細.
 //
 // GET /api/talksessions/{talkSessionId}
 func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
@@ -512,7 +512,7 @@ func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped b
 		mreq := middleware.Request{
 			Context:          ctx,
 			OperationName:    "GetTalkSessionDetail",
-			OperationSummary: "トークセッションの詳細",
+			OperationSummary: "🚧 トークセッションの詳細",
 			OperationID:      "getTalkSessionDetail",
 			Body:             nil,
 			Params: middleware.Parameters{

@@ -31,7 +31,7 @@
   "paths": {
     "/api/talksessions/{talkSessionId}": {
       "get": {
-        "summary": "トークセッションの詳細",
+        "summary": "🚧 トークセッションの詳細",
         "deprecated": false,
         "description": "",
         "operationId": "getTalkSessionDetail",
@@ -87,12 +87,12 @@
                     "type": "string",
                     "maxLength": 50,
                     "minLength": 5,
-                    "example": ""
+                    "example": "オブジェクト指向は悪"
                   },
                   "scheduledEndTime": {
                     "type": "string",
                     "format": "date-time",
-                    "example": ""
+                    "example": "2024-12-17T03:24:00Z"
                   },
                   "latitude": {
                     "type": "number",
@@ -743,10 +743,6 @@
                     "type": "string",
                     "example": "",
                     "nullable": true
-                  },
-                  "voteStatus": {
-                    "example": "",
-                    "type": "string"
                   },
                   "title": {
                     "type": "string",

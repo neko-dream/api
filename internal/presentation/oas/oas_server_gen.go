@@ -88,7 +88,7 @@ type TalkSessionHandler interface {
 	CreateTalkSession(ctx context.Context, req OptCreateTalkSessionReq) (*CreateTalkSessionOK, error)
 	// GetTalkSessionDetail implements getTalkSessionDetail operation.
 	//
-	// トークセッションの詳細.
+	// 🚧 トークセッションの詳細.
 	//
 	// GET /api/talksessions/{talkSessionId}
 	GetTalkSessionDetail(ctx context.Context, params GetTalkSessionDetailParams) (*GetTalkSessionDetailOK, error)
