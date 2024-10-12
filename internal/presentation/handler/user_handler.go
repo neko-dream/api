@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"bytes"
 	"context"
 	"io"
 	"mime/multipart"
@@ -67,7 +66,7 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 			utils.HandleError(ctx, err, "io.ReadAll")
 			return nil, messages.InternalServerError
 		}
-		file, err = MakeFileHeader(value.Icon.Value.Name, content)
+		file, err = http_utils.MakeFileHeader(value.Icon.Value.Name, content)
 		if err != nil {
 			utils.HandleError(ctx, err, "MakeFileHeader")
 			return nil, messages.InternalServerError
@@ -133,7 +132,7 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 			utils.HandleError(ctx, err, "io.ReadAll")
 			return nil, messages.InternalServerError
 		}
-		file, err = MakeFileHeader(value.Icon.Value.Name, content)
+		file, err = http_utils.MakeFileHeader(value.Icon.Value.Name, content)
 		if err != nil {
 			utils.HandleError(ctx, err, "MakeFileHeader")
 			return nil, messages.InternalServerError
@@ -179,30 +178,4 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 		DisplayName: out.DisplayName,
 		IconURL:     utils.StringToOptString(claim.IconURL),
 	}, nil
-}
-
-func MakeFileHeader(name string, dateBytes []byte) (*multipart.FileHeader, error) {
-	body := new(bytes.Buffer)
-	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile("file", name)
-	if err != nil {
-		return nil, err
-	}
-	if _, err := io.Copy(part, bytes.NewReader(dateBytes)); err != nil {
-		return nil, err
-	}
-	if err := writer.Close(); err != nil {
-		return nil, err
-	}
-
-	// ダミーファイルをパースして、multipart.FileHeaderを取得する
-	reader := multipart.NewReader(body, writer.Boundary())
-	// 2M
-	form, err := reader.ReadForm(2 * 1_000_000)
-	if err != nil {
-		return nil, err
-	}
-	fh := form.File["file"]
-
-	return fh[0], nil
 }
