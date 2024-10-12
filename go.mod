@@ -97,6 +97,7 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/ogen-go/ogen v1.4.1
+	github.com/rs/cors v1.11.1
 	github.com/samber/lo v1.47.0
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/spf13/viper v1.19.0
