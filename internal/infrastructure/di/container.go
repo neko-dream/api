@@ -39,6 +39,7 @@ func BuildContainer() *dig.Container {
 		{repository.NewSessionRepository, nil},
 		{repository.NewUserRepository, nil},
 		{repository.NewTalkSessionRepository, nil},
+		{repository.NewOpinionRepository, nil},
 
 		{func() session.TokenManager {
 			return auth.NewTokenManager("")
