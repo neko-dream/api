@@ -14,6 +14,7 @@ import (
 	opinion_usecase "github.com/neko-dream/server/internal/usecase/opinion"
 	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/utils"
+	"github.com/samber/lo"
 )
 
 type opinionHandler struct {
@@ -46,6 +47,11 @@ func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.Opinion
 // PostOpinionPost implements oas.OpinionHandler.
 func (o *opinionHandler) PostOpinionPost(ctx context.Context, req oas.OptPostOpinionPostReq, params oas.PostOpinionPostParams) (oas.PostOpinionPostRes, error) {
 	claim := session.GetSession(ctx)
+	userID, err := claim.UserID()
+	if err != nil {
+		return nil, messages.ForbiddenError
+	}
+
 	if !req.IsSet() {
 		return nil, messages.RequiredParameterError
 	}
@@ -56,10 +62,6 @@ func (o *opinionHandler) PostOpinionPost(ctx context.Context, req oas.OptPostOpi
 	}
 	value := req.Value
 
-	userID, err := claim.UserID()
-	if err != nil {
-		return nil, messages.ForbiddenError
-	}
 	var file *multipart.FileHeader
 	if value.Picture.IsSet() {
 		content, err := io.ReadAll(value.Picture.Value.File)
@@ -73,14 +75,18 @@ func (o *opinionHandler) PostOpinionPost(ctx context.Context, req oas.OptPostOpi
 			return nil, messages.InternalServerError
 		}
 	}
+	var parentOpinionID *shared.UUID[opinion.Opinion]
+	if value.ParentOpinionID.IsSet() {
+		parentOpinionID = lo.ToPtr(shared.MustParseUUID[opinion.Opinion](value.ParentOpinionID.Value))
+	}
 
 	_, err = o.postOpinionUsecase.Execute(ctx, opinion_usecase.PostOpinionInput{
 		TalkSessionID:   talkSessionID,
 		OwnerID:         userID,
-		ParentOpinionID: utils.ToPtrIfNotNullValue(req.Value.ParentOpinionID.Null, shared.MustParseUUID[opinion.Opinion](value.ParentOpinionID.Value)),
-		Title:           utils.ToPtrIfNotNullValue(req.Value.Title.Null, value.Title.Value),
+		ParentOpinionID: parentOpinionID,
+		Title:           utils.ToPtrIfNotNullValue(!req.Value.Title.IsSet(), value.Title.Value),
 		Content:         req.Value.OpinionContent,
-		ReferenceURL:    utils.ToPtrIfNotNullValue(req.Value.ReferenceURL.Null, value.ReferenceURL.Value),
+		ReferenceURL:    utils.ToPtrIfNotNullValue(!req.Value.ReferenceURL.IsSet(), value.ReferenceURL.Value),
 		Picture:         file,
 	})
 	if err != nil {
