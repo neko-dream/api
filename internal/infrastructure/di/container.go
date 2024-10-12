@@ -28,8 +28,9 @@ func AddProvider(arg ProvideArg) {
 }
 
 func BuildContainer() *dig.Container {
+	conf := config.LoadConfig()
 	deps := []ProvideArg{
-		{config.LoadConfig, nil},
+		{func() *config.Config { return conf }, nil},
 		{db.NewMigrator, nil},
 		{postgresql.Connect, nil},
 		{db.NewDBManager, nil},
