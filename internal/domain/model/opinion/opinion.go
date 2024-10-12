@@ -2,11 +2,12 @@ package opinion
 
 import (
 	"context"
-	"os/user"
 	"time"
 
+	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
+	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/domain/model/vote"
 )
 
@@ -32,7 +33,7 @@ type (
 		content         string
 		createdAt       time.Time
 		opinions        []Opinion
-		voteStatus      *vote.VoteStatus
+		voteStatus      vote.VoteStatus
 	}
 )
 
@@ -43,9 +44,19 @@ func NewOpinion(
 	parentOpinionID *shared.UUID[Opinion],
 	content string,
 	createdAt time.Time,
-	voteStatus *vote.VoteStatus,
-) Opinion {
-	return Opinion{
+	voteStatus vote.VoteStatus,
+) (*Opinion, error) {
+	if content == "" {
+		return nil, messages.OpinionContentBadLength
+	}
+	if len(content) > 140 && len(content) < 5 {
+		return nil, messages.OpinionContentBadLength
+	}
+	if opinionID == *parentOpinionID {
+		return nil, messages.OpinionParentOpinionIDIsSame
+	}
+
+	return &Opinion{
 		opinionID:       opinionID,
 		talkSessionID:   talkSessionID,
 		userID:          userID,
@@ -54,7 +65,7 @@ func NewOpinion(
 		createdAt:       createdAt,
 		voteStatus:      voteStatus,
 		opinions:        []Opinion{},
-	}
+	}, nil
 }
 
 func (o *Opinion) Reply(opinion Opinion) {
@@ -66,11 +77,11 @@ func (o *Opinion) Count() int {
 }
 
 func (o *Opinion) IsVoted() bool {
-	return o.voteStatus != nil
+	return o.voteStatus == vote.UnVoted
 }
 
 func (o *Opinion) Vote(voteStatus vote.VoteStatus) {
-	o.voteStatus = &voteStatus
+	o.voteStatus = voteStatus
 }
 
 func (o *Opinion) OpinionID() shared.UUID[Opinion] {
@@ -98,10 +109,7 @@ func (o *Opinion) CreatedAt() time.Time {
 }
 
 func (o *Opinion) VoteStatus() vote.VoteStatus {
-	if o.voteStatus == nil {
-		return vote.UnVoted
-	}
-	return *o.voteStatus
+	return o.voteStatus
 }
 
 func (o *Opinion) Opinions() []Opinion {

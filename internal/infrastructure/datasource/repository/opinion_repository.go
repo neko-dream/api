@@ -2,12 +2,15 @@ package repository
 
 import (
 	"context"
-	"os/user"
 
+	"github.com/google/uuid"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
+	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/db"
+	model "github.com/neko-dream/server/internal/infrastructure/db/sqlc"
+	"github.com/neko-dream/server/pkg/utils"
 )
 
 type opinionRepository struct {
@@ -20,9 +23,22 @@ func NewOpinionRepository(dbManager *db.DBManager) opinion.OpinionRepository {
 	}
 }
 
-// Create implements opinion.OpinionRepository.
+// Create Opinion作成
 func (o *opinionRepository) Create(ctx context.Context, op opinion.Opinion) error {
-	panic("unimplemented")
+	if err := o.GetQueries(ctx).CreateOpinion(ctx, model.CreateOpinionParams{
+		TalkSessionID: op.TalkSessionID().UUID(),
+		UserID:        op.UserID().UUID(),
+		ParentOpinionID: utils.IfThenElse[uuid.NullUUID](
+			op.ParentOpinionID() == nil,
+			uuid.NullUUID{},
+			uuid.NullUUID{UUID: op.ParentOpinionID().UUID(), Valid: true},
+		),
+		Content:   op.Content(),
+		CreatedAt: op.CreatedAt(),
+	}); err != nil {
+		return err
+	}
+	return nil
 }
 
 // FindByParentID implements opinion.OpinionRepository.

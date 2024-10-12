@@ -8,3 +8,19 @@ const (
 	Disagreed
 	Pass
 )
+
+func FromString(s *string) VoteStatus {
+	if s == nil {
+		return UnVoted
+	}
+	switch *s {
+	case "agreed":
+		return Agreed
+	case "disagreed":
+		return Disagreed
+	case "pass":
+		return Pass
+	default:
+		return UnVoted
+	}
+}
