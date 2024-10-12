@@ -25,9 +25,11 @@ func (m *Migrator) Up() {
 		log.Println("Panic in pgx")
 		panic(err)
 	}
+	log.Println("DatabaseURL:", m.config.DatabaseURL)
+	log.Println("pgx:", pgx)
 	driver, err := postgres.WithInstance(pgx, &postgres.Config{})
 	if err != nil {
-		log.Println("Panic in postgres")
+		log.Println("Panic in postgres", err)
 		panic(err)
 	}
 	mi, err := migrate.NewWithDatabaseInstance(
