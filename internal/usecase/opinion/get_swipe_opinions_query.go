@@ -66,9 +66,8 @@ func (h *getSwipeOpinionsQueryHandler) Execute(ctx context.Context, q GetSwipeOp
 			Content:         row.Content,
 			CreatedAt:       row.CreatedAt,
 			VoteType:        vote.VoteTypeFromInt(int(row.VoteType)).String(),
-
-			// ReferenceURL:    utils.ToPtrIfNotNullValue[string](!row.Re.Valid, row.ReferenceURL.String),
-			// PictureURL:      utils.ToPtrIfNotNullValue[string](!row.PictureURL.Valid, row.PictureURL.String),
+			ReferenceURL:    utils.ToPtrIfNotNullValue[string](!row.ReferenceUrl.Valid, row.ReferenceUrl.String),
+			PictureURL:      utils.ToPtrIfNotNullValue[string](!row.PictureUrl.Valid, row.PictureUrl.String),
 		}
 		userDTO := UserDTO{
 			ID:   row.DisplayID.String,

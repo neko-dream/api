@@ -2,6 +2,7 @@ package opinion
 
 import (
 	"context"
+	"mime/multipart"
 	"time"
 
 	"github.com/neko-dream/server/internal/domain/messages"
@@ -37,6 +38,8 @@ type (
 		content         string
 		createdAt       time.Time
 		opinions        []Opinion
+		referenceURL    *string
+		referenceImage  *ReferenceImage
 	}
 )
 
@@ -48,6 +51,7 @@ func NewOpinion(
 	title *string,
 	content string,
 	createdAt time.Time,
+	referenceURL *string,
 ) (*Opinion, error) {
 	if content == "" {
 		return nil, messages.OpinionContentBadLength
@@ -111,4 +115,36 @@ func (o *Opinion) CreatedAt() time.Time {
 
 func (o *Opinion) Opinions() []Opinion {
 	return o.opinions
+}
+
+func (o *Opinion) ReferenceURL() *string {
+	return o.referenceURL
+}
+
+func (o *Opinion) ReferenceImageURL() *string {
+	if o.referenceImage == nil {
+		return nil
+	} else {
+		return o.referenceImage.URL()
+	}
+}
+
+func (o *Opinion) ReferenceImage() *ReferenceImage {
+	return o.referenceImage
+}
+
+// IsReferenceImageUpdateRequired 画像がアップロードされているかどうかを判定
+func (o *Opinion) IsReferenceImageUpdateRequired() bool {
+	return o.referenceImage != nil && o.referenceImage.url == nil && o.referenceImage.ImageInfo() != nil
+}
+
+// SetReferenceImage 画像をアップロード
+func (o *Opinion) SetReferenceImage(ctx context.Context, file *multipart.FileHeader) error {
+	referenceImage := NewReferenceImage(nil)
+	if err := referenceImage.SetReferenceImage(ctx, file); err != nil {
+		return err
+	}
+	o.referenceImage = referenceImage
+	o.referenceImage.url = nil
+	return nil
 }

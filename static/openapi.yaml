@@ -1084,6 +1084,7 @@ paths:
                   example: ''
                 referenceURL:
                   type: string
+                  format: url
                   example: ''
                   nullable: true
                 picture:

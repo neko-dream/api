@@ -6,8 +6,10 @@ INSERT INTO opinions (
     parent_opinion_id,
     title,
     content,
+    reference_url,
+    picture_url,
     created_at
-) VALUES ($1, $2, $3, $4, $5, $6, $7);
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);
 
 -- name: GetOpinionByID :one
 SELECT
@@ -17,6 +19,8 @@ SELECT
     opinions.parent_opinion_id,
     opinions.title,
     opinions.content,
+    opinions.reference_url,
+    opinions.picture_url,
     opinions.created_at,
     users.display_name AS display_name,
     users.display_id AS display_id,
@@ -48,6 +52,8 @@ SELECT
     opinions.parent_opinion_id,
     opinions.title,
     opinions.content,
+    opinions.reference_url,
+    opinions.picture_url,
     opinions.created_at,
     users.display_name AS display_name,
     users.display_id AS display_id,
@@ -79,6 +85,8 @@ SELECT
     opinions.parent_opinion_id,
     opinions.title,
     opinions.content,
+    opinions.reference_url,
+    opinions.picture_url,
     opinions.created_at,
     users.display_name AS display_name,
     users.display_id AS display_id,

@@ -19,6 +19,8 @@ type Opinion struct {
 	Title           sql.NullString
 	Content         string
 	CreatedAt       time.Time
+	PictureUrl      sql.NullString
+	ReferenceUrl    sql.NullString
 }
 
 type RepresentativeOpinion struct {

@@ -65,11 +65,19 @@ func (i *postOpinionInteractor) Execute(ctx context.Context, input PostOpinionIn
 			input.Title,
 			input.Content,
 			time.Now(),
+			input.ReferenceURL,
 		)
 		if err != nil {
 			utils.HandleError(ctx, err, "NewOpinion")
 			return err
 		}
+		if input.Picture != nil {
+			if err := opinion.SetReferenceImage(ctx, input.Picture); err != nil {
+				utils.HandleError(ctx, err, "SetReferenceImage")
+				return err
+			}
+		}
+
 		if err := i.OpinionRepository.Create(ctx, *opinion); err != nil {
 			utils.HandleError(ctx, err, "OpinionRepository.Create")
 			return messages.OpinionCreateFailed

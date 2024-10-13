@@ -21,8 +21,10 @@ INSERT INTO opinions (
     parent_opinion_id,
     title,
     content,
+    reference_url,
+    picture_url,
     created_at
-) VALUES ($1, $2, $3, $4, $5, $6, $7)
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 `
 
 type CreateOpinionParams struct {
@@ -32,6 +34,8 @@ type CreateOpinionParams struct {
 	ParentOpinionID uuid.NullUUID
 	Title           sql.NullString
 	Content         string
+	ReferenceUrl    sql.NullString
+	PictureUrl      sql.NullString
 	CreatedAt       time.Time
 }
 
@@ -43,6 +47,8 @@ func (q *Queries) CreateOpinion(ctx context.Context, arg CreateOpinionParams) er
 		arg.ParentOpinionID,
 		arg.Title,
 		arg.Content,
+		arg.ReferenceUrl,
+		arg.PictureUrl,
 		arg.CreatedAt,
 	)
 	return err
@@ -56,6 +62,8 @@ SELECT
     opinions.parent_opinion_id,
     opinions.title,
     opinions.content,
+    opinions.reference_url,
+    opinions.picture_url,
     opinions.created_at,
     users.display_name AS display_name,
     users.display_id AS display_id,
@@ -90,6 +98,8 @@ type GetOpinionByIDRow struct {
 	ParentOpinionID uuid.NullUUID
 	Title           sql.NullString
 	Content         string
+	ReferenceUrl    sql.NullString
+	PictureUrl      sql.NullString
 	CreatedAt       time.Time
 	DisplayName     sql.NullString
 	DisplayID       sql.NullString
@@ -110,6 +120,8 @@ func (q *Queries) GetOpinionByID(ctx context.Context, arg GetOpinionByIDParams) 
 		&i.ParentOpinionID,
 		&i.Title,
 		&i.Content,
+		&i.ReferenceUrl,
+		&i.PictureUrl,
 		&i.CreatedAt,
 		&i.DisplayName,
 		&i.DisplayID,
@@ -128,6 +140,8 @@ SELECT
     opinions.parent_opinion_id,
     opinions.title,
     opinions.content,
+    opinions.reference_url,
+    opinions.picture_url,
     opinions.created_at,
     users.display_name AS display_name,
     users.display_id AS display_id,
@@ -162,6 +176,8 @@ type GetOpinionRepliesRow struct {
 	ParentOpinionID uuid.NullUUID
 	Title           sql.NullString
 	Content         string
+	ReferenceUrl    sql.NullString
+	PictureUrl      sql.NullString
 	CreatedAt       time.Time
 	DisplayName     sql.NullString
 	DisplayID       sql.NullString
@@ -188,6 +204,8 @@ func (q *Queries) GetOpinionReplies(ctx context.Context, arg GetOpinionRepliesPa
 			&i.ParentOpinionID,
 			&i.Title,
 			&i.Content,
+			&i.ReferenceUrl,
+			&i.PictureUrl,
 			&i.CreatedAt,
 			&i.DisplayName,
 			&i.DisplayID,
@@ -216,6 +234,8 @@ SELECT
     opinions.parent_opinion_id,
     opinions.title,
     opinions.content,
+    opinions.reference_url,
+    opinions.picture_url,
     opinions.created_at,
     users.display_name AS display_name,
     users.display_id AS display_id,
@@ -259,6 +279,8 @@ type GetRandomOpinionsRow struct {
 	ParentOpinionID uuid.NullUUID
 	Title           sql.NullString
 	Content         string
+	ReferenceUrl    sql.NullString
+	PictureUrl      sql.NullString
 	CreatedAt       time.Time
 	DisplayName     sql.NullString
 	DisplayID       sql.NullString
@@ -283,6 +305,8 @@ func (q *Queries) GetRandomOpinions(ctx context.Context, arg GetRandomOpinionsPa
 			&i.ParentOpinionID,
 			&i.Title,
 			&i.Content,
+			&i.ReferenceUrl,
+			&i.PictureUrl,
 			&i.CreatedAt,
 			&i.DisplayName,
 			&i.DisplayID,

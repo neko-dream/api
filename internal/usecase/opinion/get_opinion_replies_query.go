@@ -99,6 +99,8 @@ func (i *GetOpinionRepliesInteractor) Execute(ctx context.Context, input GetOpin
 		Content:         opinionRow.Content,
 		CreatedAt:       opinionRow.CreatedAt,
 		VoteType:        vote.VoteTypeFromInt(int(opinionRow.VoteType)).String(),
+		ReferenceURL:    utils.ToPtrIfNotNullValue(!opinionRow.ReferenceUrl.Valid, opinionRow.ReferenceUrl.String),
+		PictureURL:      utils.ToPtrIfNotNullValue(!opinionRow.PictureUrl.Valid, opinionRow.PictureUrl.String),
 	}
 	rootUser := UserDTO{
 		ID:   opinionRow.UserID.String(),
@@ -130,6 +132,8 @@ func (i *GetOpinionRepliesInteractor) Execute(ctx context.Context, input GetOpin
 				Content:         r.Content,
 				CreatedAt:       r.CreatedAt,
 				VoteType:        vote.VoteTypeFromInt(int(r.VoteType)).String(),
+				ReferenceURL:    utils.ToPtrIfNotNullValue(!r.ReferenceUrl.Valid, r.ReferenceUrl.String),
+				PictureURL:      utils.ToPtrIfNotNullValue(!r.PictureUrl.Valid, r.PictureUrl.String),
 			},
 			User: UserDTO{
 				ID:   r.UserID.String(),
