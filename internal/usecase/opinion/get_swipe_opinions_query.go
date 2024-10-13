@@ -49,6 +49,7 @@ func (h *getSwipeOpinionsQueryHandler) Execute(ctx context.Context, q GetSwipeOp
 	swipeRow, err := h.GetQueries(ctx).GetRandomOpinions(ctx, model.GetRandomOpinionsParams{
 		UserID:        q.UserID.UUID(),
 		TalkSessionID: q.TalkSessionID.UUID(),
+		Limit:         10,
 	})
 	if err != nil {
 		return nil, err
@@ -75,9 +76,9 @@ func (h *getSwipeOpinionsQueryHandler) Execute(ctx context.Context, q GetSwipeOp
 			Icon: utils.ToPtrIfNotNullValue[string](!row.IconUrl.Valid, row.IconUrl.String),
 		}
 		opinions = append(opinions, SwipeOpinionDTO{
-			Opinion:    opinionDTO,
-			User:       userDTO,
-			ReplyCount: int(row.ReplyCount),
+			Opinion: opinionDTO,
+			User:    userDTO,
+			// ReplyCount: int(row.ReplyCount),
 		})
 	}
 

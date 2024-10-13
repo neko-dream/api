@@ -83,9 +83,9 @@ SELECT
     users.display_name AS display_name,
     users.display_id AS display_id,
     users.icon_url AS icon_url,
-    COALESCE(pv.vote_type, 0) AS vote_type,
+    COALESCE(pv.vote_type, 0) AS vote_type
     -- 意見に対するリプライ数（再帰）
-    (SELECT COUNT(*) FROM opinions WHERE parent_opinion_id = opinions.opinion_id) AS reply_count
+    -- 0 AS reply_count
 FROM opinions
 LEFT JOIN users
     ON opinions.user_id = users.user_id
@@ -106,5 +106,6 @@ LEFT JOIN (
 ) vote_count ON opinions.opinion_id = vote_count.opinion_id
 WHERE opinions.talk_session_id = $1
     AND vote_count.opinion_id = opinions.opinion_id
-ORDER BY RANDOM();
+ORDER BY RANDOM()
+LIMIT $3;
 

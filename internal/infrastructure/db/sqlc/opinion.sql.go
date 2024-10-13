@@ -8,6 +8,7 @@ package model
 import (
 	"context"
 	"database/sql"
+	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -220,9 +221,9 @@ SELECT
     users.display_name AS display_name,
     users.display_id AS display_id,
     users.icon_url AS icon_url,
-    COALESCE(pv.vote_type, 0) AS vote_type,
+    COALESCE(pv.vote_type, 0) AS vote_type
     -- 意見に対するリプライ数（再帰）
-    (SELECT COUNT(*) FROM opinions WHERE parent_opinion_id = opinions.opinion_id) AS reply_count
+    -- 0 AS reply_count
 FROM opinions
 LEFT JOIN users
     ON opinions.user_id = users.user_id
@@ -243,11 +244,13 @@ LEFT JOIN (
 WHERE opinions.talk_session_id = $1
     AND vote_count.opinion_id = opinions.opinion_id
 ORDER BY RANDOM()
+LIMIT $3
 `
 
 type GetRandomOpinionsParams struct {
 	TalkSessionID uuid.UUID
 	UserID        uuid.UUID
+	Limit         int32
 }
 
 type GetRandomOpinionsRow struct {
@@ -262,12 +265,11 @@ type GetRandomOpinionsRow struct {
 	DisplayID       sql.NullString
 	IconUrl         sql.NullString
 	VoteType        int16
-	ReplyCount      int64
 }
 
 // 指定されたユーザーが投票していない意見のみを取得
 func (q *Queries) GetRandomOpinions(ctx context.Context, arg GetRandomOpinionsParams) ([]GetRandomOpinionsRow, error) {
-	rows, err := q.db.QueryContext(ctx, getRandomOpinions, arg.TalkSessionID, arg.UserID)
+	rows, err := q.db.QueryContext(ctx, getRandomOpinions, arg.TalkSessionID, arg.UserID, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
@@ -287,12 +289,12 @@ func (q *Queries) GetRandomOpinions(ctx context.Context, arg GetRandomOpinionsPa
 			&i.DisplayID,
 			&i.IconUrl,
 			&i.VoteType,
-			&i.ReplyCount,
 		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
 	}
+	log.Println(items)
 	if err := rows.Close(); err != nil {
 		return nil, err
 	}
