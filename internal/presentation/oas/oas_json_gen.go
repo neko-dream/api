@@ -6973,15 +6973,15 @@ func (s *SwipeOpinionsOKItem) encodeFields(e *jx.Encoder) {
 		s.User.Encode(e)
 	}
 	{
-		e.FieldStart("commentCount")
-		e.Str(s.CommentCount)
+		e.FieldStart("replyCount")
+		e.Int(s.ReplyCount)
 	}
 }
 
 var jsonFieldsNameOfSwipeOpinionsOKItem = [3]string{
 	0: "opinion",
 	1: "user",
-	2: "commentCount",
+	2: "replyCount",
 }
 
 // Decode decodes SwipeOpinionsOKItem from json.
@@ -7013,17 +7013,17 @@ func (s *SwipeOpinionsOKItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"user\"")
 			}
-		case "commentCount":
+		case "replyCount":
 			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				v, err := d.Str()
-				s.CommentCount = string(v)
+				v, err := d.Int()
+				s.ReplyCount = int(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"commentCount\"")
+				return errors.Wrap(err, "decode field \"replyCount\"")
 			}
 		default:
 			return d.Skip()

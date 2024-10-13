@@ -4561,8 +4561,8 @@ func (*SwipeOpinionsOKApplicationJSON) swipeOpinionsRes() {}
 type SwipeOpinionsOKItem struct {
 	Opinion SwipeOpinionsOKItemOpinion `json:"opinion"`
 	// 作成ユーザー.
-	User         SwipeOpinionsOKItemUser `json:"user"`
-	CommentCount string                  `json:"commentCount"`
+	User       SwipeOpinionsOKItemUser `json:"user"`
+	ReplyCount int                     `json:"replyCount"`
 }
 
 // GetOpinion returns the value of Opinion.
@@ -4575,9 +4575,9 @@ func (s *SwipeOpinionsOKItem) GetUser() SwipeOpinionsOKItemUser {
 	return s.User
 }
 
-// GetCommentCount returns the value of CommentCount.
-func (s *SwipeOpinionsOKItem) GetCommentCount() string {
-	return s.CommentCount
+// GetReplyCount returns the value of ReplyCount.
+func (s *SwipeOpinionsOKItem) GetReplyCount() int {
+	return s.ReplyCount
 }
 
 // SetOpinion sets the value of Opinion.
@@ -4590,9 +4590,9 @@ func (s *SwipeOpinionsOKItem) SetUser(val SwipeOpinionsOKItemUser) {
 	s.User = val
 }
 
-// SetCommentCount sets the value of CommentCount.
-func (s *SwipeOpinionsOKItem) SetCommentCount(val string) {
-	s.CommentCount = val
+// SetReplyCount sets the value of ReplyCount.
+func (s *SwipeOpinionsOKItem) SetReplyCount(val int) {
+	s.ReplyCount = val
 }
 
 type SwipeOpinionsOKItemOpinion struct {

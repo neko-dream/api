@@ -1071,14 +1071,14 @@
                         "$ref": "#/components/schemas/user",
                         "description": "作成ユーザー"
                       },
-                      "commentCount": {
-                        "type": "string"
+                      "replyCount": {
+                        "type": "integer"
                       }
                     },
                     "required": [
                       "opinion",
                       "user",
-                      "commentCount"
+                      "replyCount"
                     ]
                   }
                 }

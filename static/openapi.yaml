@@ -999,12 +999,12 @@ paths:
                         - displayID
                         - displayName
                       description: 作成ユーザー
-                    commentCount:
-                      type: string
+                    replyCount:
+                      type: integer
                   required:
                     - opinion
                     - user
-                    - commentCount
+                    - replyCount
         '400':
           description: ErrorResponse
           content:

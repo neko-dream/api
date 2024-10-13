@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"io"
-	"log"
 
 	"mime/multipart"
 
@@ -23,15 +22,18 @@ import (
 type opinionHandler struct {
 	postOpinionUsecase       opinion_usecase.PostOpinionUseCase
 	getOpinionRepliesUsecase opinion_usecase.GetOpinionRepliesUseCase
+	getSwipeOpinionsUseCase  opinion_usecase.GetSwipeOpinionsQueryHandler
 }
 
 func NewOpinionHandler(
 	postOpinionUsecase opinion_usecase.PostOpinionUseCase,
 	getOpinionRepliesUsecase opinion_usecase.GetOpinionRepliesUseCase,
+	getSwipeOpinionsUseCase opinion_usecase.GetSwipeOpinionsQueryHandler,
 ) oas.OpinionHandler {
 	return &opinionHandler{
 		postOpinionUsecase:       postOpinionUsecase,
 		getOpinionRepliesUsecase: getOpinionRepliesUsecase,
+		getSwipeOpinionsUseCase:  getSwipeOpinionsUseCase,
 	}
 }
 
@@ -43,7 +45,47 @@ func (o *opinionHandler) GetTopOpinions(ctx context.Context, params oas.GetTopOp
 // SwipeOpinions スワイプ用の意見取得
 // 自分が投稿した意見は取得しない
 func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpinionsParams) (oas.SwipeOpinionsRes, error) {
-	panic("unimplemented")
+	claim := session.GetSession(ctx)
+	userID, err := claim.UserID()
+	if err != nil {
+		return nil, messages.ForbiddenError
+	}
+
+	opinions, err := o.getSwipeOpinionsUseCase.Execute(ctx, opinion_usecase.GetSwipeOpinionsQuery{
+		UserID: userID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var res oas.SwipeOpinionsOKApplicationJSON
+	for _, opinion := range opinions.Opinions {
+		user := &oas.SwipeOpinionsOKItemUser{
+			DisplayID:   opinion.User.ID,
+			DisplayName: opinion.User.Name,
+			IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.Icon),
+		}
+
+		ops := &oas.SwipeOpinionsOKItemOpinion{
+			ID:       opinion.Opinion.OpinionID,
+			ParentID: utils.ToOpt[oas.OptString](opinion.Opinion.ParentOpinionID),
+			Title:    utils.ToOpt[oas.OptString](opinion.Opinion.Title),
+			Content:  opinion.Opinion.Content,
+			VoteType: oas.OptSwipeOpinionsOKItemOpinionVoteType{
+				Value: oas.SwipeOpinionsOKItemOpinionVoteType(opinion.Opinion.VoteType),
+				Set:   true,
+			},
+			PictureURL:   utils.ToOpt[oas.OptString](opinion.Opinion.PictureURL),
+			ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
+		}
+		res = append(res, oas.SwipeOpinionsOKItem{
+			User:       *user,
+			Opinion:    *ops,
+			ReplyCount: opinion.ReplyCount,
+		})
+	}
+
+	return &res, nil
 }
 
 // OpinionComments 意見に対するリプライ意見取得
@@ -93,7 +135,7 @@ func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.Opinion
 			DisplayName: reply.User.Name,
 			IconURL:     utils.ToOptNil[oas.OptNilString](reply.User.Icon),
 		}
-		log.Println(reply.Opinion.VoteType)
+
 		opinion := &oas.OpinionCommentsOKOpinionsItemOpinion{
 			ID:       reply.Opinion.OpinionID,
 			ParentID: utils.ToOpt[oas.OptString](reply.Opinion.ParentOpinionID),

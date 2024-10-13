@@ -6,7 +6,10 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/server/internal/domain/model/vote"
 	"github.com/neko-dream/server/internal/infrastructure/db"
+	model "github.com/neko-dream/server/internal/infrastructure/db/sqlc"
+	"github.com/neko-dream/server/pkg/utils"
 )
 
 type (
@@ -24,9 +27,9 @@ type (
 	}
 
 	SwipeOpinionDTO struct {
-		Opinion      OpinionDTO
-		User         UserDTO
-		CommentCount int
+		Opinion    OpinionDTO
+		User       UserDTO
+		ReplyCount int
 	}
 
 	getSwipeOpinionsQueryHandler struct {
@@ -43,6 +46,42 @@ func NewGetSwipeOpinionsQueryHandler(
 }
 
 func (h *getSwipeOpinionsQueryHandler) Execute(ctx context.Context, q GetSwipeOpinionsQuery) (*GetSwipeOpinionsOutput, error) {
+	swipeRow, err := h.GetQueries(ctx).GetRandomOpinions(ctx, model.GetRandomOpinionsParams{
+		UserID:        q.UserID.UUID(),
+		TalkSessionID: q.TalkSessionID.UUID(),
+	})
+	if err != nil {
+		return nil, err
+	}
 
-	return nil, nil
+	opinions := make([]SwipeOpinionDTO, 0, len(swipeRow))
+	for _, row := range swipeRow {
+		opinionDTO := OpinionDTO{
+			OpinionID:       row.OpinionID.String(),
+			TalkSessionID:   row.TalkSessionID.String(),
+			UserID:          row.UserID.String(),
+			ParentOpinionID: utils.ToPtrIfNotNullValue[string](!row.ParentOpinionID.Valid, row.ParentOpinionID.UUID.String()),
+			Title:           utils.ToPtrIfNotNullValue[string](!row.Title.Valid, row.Title.String),
+			Content:         row.Content,
+			CreatedAt:       row.CreatedAt,
+			VoteType:        vote.VoteTypeFromInt(int(row.VoteType)).String(),
+
+			// ReferenceURL:    utils.ToPtrIfNotNullValue[string](!row.Re.Valid, row.ReferenceURL.String),
+			// PictureURL:      utils.ToPtrIfNotNullValue[string](!row.PictureURL.Valid, row.PictureURL.String),
+		}
+		userDTO := UserDTO{
+			ID:   row.DisplayID.String,
+			Name: row.DisplayName.String,
+			Icon: utils.ToPtrIfNotNullValue[string](!row.IconUrl.Valid, row.IconUrl.String),
+		}
+		opinions = append(opinions, SwipeOpinionDTO{
+			Opinion:    opinionDTO,
+			User:       userDTO,
+			ReplyCount: int(row.ReplyCount),
+		})
+	}
+
+	return &GetSwipeOpinionsOutput{
+		Opinions: opinions,
+	}, nil
 }

@@ -84,7 +84,8 @@ SELECT
     users.display_id AS display_id,
     users.icon_url AS icon_url,
     COALESCE(pv.vote_type, 0) AS vote_type,
-    vote_count.vote_count AS vote_count
+    -- 意見に対するリプライ数（再帰）
+    (SELECT COUNT(*) FROM opinions WHERE parent_opinion_id = opinions.opinion_id) AS reply_count
 FROM opinions
 LEFT JOIN users
     ON opinions.user_id = users.user_id
@@ -95,7 +96,7 @@ LEFT JOIN (
     AND opinions.user_id = pv.user_id
 -- 指定されたユーザーが投票していない意見のみを取得
 LEFT JOIN (
-    SELECT opinions.opinion_id, COUNT(votes.vote_id) AS vote_count
+    SELECT opinions.opinion_id
     FROM opinions
     LEFT JOIN votes
         ON opinions.opinion_id = votes.opinion_id
