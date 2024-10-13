@@ -91,9 +91,9 @@ SELECT
     users.display_name AS display_name,
     users.display_id AS display_id,
     users.icon_url AS icon_url,
-    COALESCE(pv.vote_type, 0) AS vote_type
+    COALESCE(pv.vote_type, 0) AS vote_type,
     -- 意見に対するリプライ数（再帰）
-    -- 0 AS reply_count
+    COALESCE(rc.reply_count, 0) AS reply_count
 FROM opinions
 LEFT JOIN users
     ON opinions.user_id = users.user_id
@@ -112,6 +112,11 @@ LEFT JOIN (
     GROUP BY opinions.opinion_id
     HAVING COUNT(votes.vote_id) = 0
 ) vote_count ON opinions.opinion_id = vote_count.opinion_id
+LEFT JOIN (
+    SELECT COUNT(opinion_id) AS reply_count, parent_opinion_id
+    FROM opinions
+    GROUP BY parent_opinion_id
+) rc ON opinions.opinion_id = rc.parent_opinion_id
 WHERE opinions.talk_session_id = $2
     AND vote_count.opinion_id = opinions.opinion_id
 ORDER BY RANDOM()

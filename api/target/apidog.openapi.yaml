@@ -1207,6 +1207,7 @@
                   "picture": {
                     "type": "string",
                     "format": "binary",
+                    "description": "参考画像。4MiBまで",
                     "example": ""
                   }
                 },

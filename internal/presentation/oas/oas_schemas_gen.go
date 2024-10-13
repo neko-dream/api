@@ -4065,11 +4065,12 @@ type PostOpinionPostOK struct{}
 func (*PostOpinionPostOK) postOpinionPostRes() {}
 
 type PostOpinionPostReq struct {
-	ParentOpinionID OptNilString     `json:"parentOpinionID"`
-	Title           OptNilString     `json:"title"`
-	OpinionContent  string           `json:"opinionContent"`
-	ReferenceURL    OptNilString     `json:"referenceURL"`
-	Picture         OptMultipartFile `json:"picture"`
+	ParentOpinionID OptNilString `json:"parentOpinionID"`
+	Title           OptNilString `json:"title"`
+	OpinionContent  string       `json:"opinionContent"`
+	ReferenceURL    OptNilString `json:"referenceURL"`
+	// 参考画像。4MiBまで.
+	Picture OptMultipartFile `json:"picture"`
 }
 
 // GetParentOpinionID returns the value of ParentOpinionID.

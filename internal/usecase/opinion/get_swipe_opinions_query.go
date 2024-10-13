@@ -75,9 +75,9 @@ func (h *getSwipeOpinionsQueryHandler) Execute(ctx context.Context, q GetSwipeOp
 			Icon: utils.ToPtrIfNotNullValue[string](!row.IconUrl.Valid, row.IconUrl.String),
 		}
 		opinions = append(opinions, SwipeOpinionDTO{
-			Opinion: opinionDTO,
-			User:    userDTO,
-			// ReplyCount: int(row.ReplyCount),
+			Opinion:    opinionDTO,
+			User:       userDTO,
+			ReplyCount: int(row.ReplyCount),
 		})
 	}
 
