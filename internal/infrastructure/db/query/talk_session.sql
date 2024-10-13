@@ -10,15 +10,13 @@ UPDATE talk_session_locations SET location = ST_GeographyFromText($2), city = $3
 -- name: EditTalkSession :exec
 UPDATE talk_sessions
     SET theme = $2,
-        finished_at = $3,
-        scheduled_end_time = $4
+        scheduled_end_time = $3
     WHERE talk_session_id = $1;
 
 -- name: GetTalkSessionByID :one
 SELECT
     talk_sessions.talk_session_id,
     talk_sessions.theme,
-    talk_sessions.finished_at,
     talk_sessions.created_at,
     talk_sessions.scheduled_end_time,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
@@ -45,7 +43,6 @@ WHERE talk_sessions.talk_session_id = $1;
 SELECT
     talk_sessions.talk_session_id,
     talk_sessions.theme,
-    talk_sessions.finished_at,
     talk_sessions.created_at,
     talk_sessions.scheduled_end_time,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
@@ -68,8 +65,8 @@ LEFT JOIN talk_session_locations
     ON talk_sessions.talk_session_id = talk_session_locations.talk_session_id
 WHERE
     CASE
-        WHEN sqlc.narg('status')::text = 'finished' THEN finished_at IS NOT NULL
-        WHEN sqlc.narg('status')::text = 'open' THEN finished_at IS NULL AND scheduled_end_time > now()
+        WHEN sqlc.narg('status')::text = 'finished' THEN scheduled_end_time <= now()
+        WHEN sqlc.narg('status')::text = 'open' THEN scheduled_end_time > now()
         ELSE TRUE
     END
     AND
@@ -80,7 +77,7 @@ WHERE
     END)
 ORDER BY
     CASE
-        WHEN sqlc.narg('status')::text = 'finished' THEN finished_at IS NOT NULL
+        WHEN sqlc.narg('status')::text = 'finished' THEN scheduled_end_time <= now()
         WHEN sqlc.narg('status')::text = 'open' THEN scheduled_end_time > now()
         ELSE TRUE
     END DESC
@@ -94,8 +91,8 @@ LEFT JOIN talk_session_locations
     ON talk_sessions.talk_session_id = talk_session_locations.talk_session_id
 WHERE
     CASE
-        WHEN sqlc.narg('status')::text = 'finished' THEN finished_at IS NOT NULL
-        WHEN sqlc.narg('status')::text = 'open' THEN finished_at IS NULL AND scheduled_end_time > now()
+        WHEN sqlc.narg('status')::text = 'finished' THEN scheduled_end_time <= now()
+        WHEN sqlc.narg('status')::text = 'open' THEN scheduled_end_time > now()
         ELSE TRUE
     END
     AND

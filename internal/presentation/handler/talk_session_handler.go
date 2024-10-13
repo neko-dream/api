@@ -131,7 +131,6 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 				ID:               talkSession.ID,
 				Theme:            talkSession.Theme,
 				Owner:            owner,
-				FinishedAt:       utils.StringToOptString(talkSession.FinishedAt),
 				CreatedAt:        talkSession.CreatedAt,
 				ScheduledEndTime: talkSession.ScheduledEndTime,
 			},

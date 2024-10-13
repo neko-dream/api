@@ -21,8 +21,8 @@ LEFT JOIN talk_session_locations
     ON talk_sessions.talk_session_id = talk_session_locations.talk_session_id
 WHERE
     CASE
-        WHEN $1::text = 'finished' THEN finished_at IS NOT NULL
-        WHEN $1::text = 'open' THEN finished_at IS NULL AND scheduled_end_time > now()
+        WHEN $1::text = 'finished' THEN scheduled_end_time <= now()
+        WHEN $1::text = 'open' THEN scheduled_end_time > now()
         ELSE TRUE
     END
     AND
@@ -92,25 +92,18 @@ func (q *Queries) CreateTalkSessionLocation(ctx context.Context, arg CreateTalkS
 const editTalkSession = `-- name: EditTalkSession :exec
 UPDATE talk_sessions
     SET theme = $2,
-        finished_at = $3,
-        scheduled_end_time = $4
+        scheduled_end_time = $3
     WHERE talk_session_id = $1
 `
 
 type EditTalkSessionParams struct {
 	TalkSessionID    uuid.UUID
 	Theme            string
-	FinishedAt       sql.NullTime
 	ScheduledEndTime time.Time
 }
 
 func (q *Queries) EditTalkSession(ctx context.Context, arg EditTalkSessionParams) error {
-	_, err := q.db.ExecContext(ctx, editTalkSession,
-		arg.TalkSessionID,
-		arg.Theme,
-		arg.FinishedAt,
-		arg.ScheduledEndTime,
-	)
+	_, err := q.db.ExecContext(ctx, editTalkSession, arg.TalkSessionID, arg.Theme, arg.ScheduledEndTime)
 	return err
 }
 
@@ -118,7 +111,6 @@ const getTalkSessionByID = `-- name: GetTalkSessionByID :one
 SELECT
     talk_sessions.talk_session_id,
     talk_sessions.theme,
-    talk_sessions.finished_at,
     talk_sessions.created_at,
     talk_sessions.scheduled_end_time,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
@@ -145,7 +137,6 @@ WHERE talk_sessions.talk_session_id = $1
 type GetTalkSessionByIDRow struct {
 	TalkSessionID    uuid.UUID
 	Theme            string
-	FinishedAt       sql.NullTime
 	CreatedAt        time.Time
 	ScheduledEndTime time.Time
 	OpinionCount     int64
@@ -164,7 +155,6 @@ func (q *Queries) GetTalkSessionByID(ctx context.Context, talkSessionID uuid.UUI
 	err := row.Scan(
 		&i.TalkSessionID,
 		&i.Theme,
-		&i.FinishedAt,
 		&i.CreatedAt,
 		&i.ScheduledEndTime,
 		&i.OpinionCount,
@@ -183,7 +173,6 @@ const listTalkSessions = `-- name: ListTalkSessions :many
 SELECT
     talk_sessions.talk_session_id,
     talk_sessions.theme,
-    talk_sessions.finished_at,
     talk_sessions.created_at,
     talk_sessions.scheduled_end_time,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
@@ -206,8 +195,8 @@ LEFT JOIN talk_session_locations
     ON talk_sessions.talk_session_id = talk_session_locations.talk_session_id
 WHERE
     CASE
-        WHEN $3::text = 'finished' THEN finished_at IS NOT NULL
-        WHEN $3::text = 'open' THEN finished_at IS NULL AND scheduled_end_time > now()
+        WHEN $3::text = 'finished' THEN scheduled_end_time <= now()
+        WHEN $3::text = 'open' THEN scheduled_end_time > now()
         ELSE TRUE
     END
     AND
@@ -218,7 +207,7 @@ WHERE
     END)
 ORDER BY
     CASE
-        WHEN $3::text = 'finished' THEN finished_at IS NOT NULL
+        WHEN $3::text = 'finished' THEN scheduled_end_time <= now()
         WHEN $3::text = 'open' THEN scheduled_end_time > now()
         ELSE TRUE
     END DESC
@@ -235,7 +224,6 @@ type ListTalkSessionsParams struct {
 type ListTalkSessionsRow struct {
 	TalkSessionID    uuid.UUID
 	Theme            string
-	FinishedAt       sql.NullTime
 	CreatedAt        time.Time
 	ScheduledEndTime time.Time
 	OpinionCount     int64
@@ -265,7 +253,6 @@ func (q *Queries) ListTalkSessions(ctx context.Context, arg ListTalkSessionsPara
 		if err := rows.Scan(
 			&i.TalkSessionID,
 			&i.Theme,
-			&i.FinishedAt,
 			&i.CreatedAt,
 			&i.ScheduledEndTime,
 			&i.OpinionCount,

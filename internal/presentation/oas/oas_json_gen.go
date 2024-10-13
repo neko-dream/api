@@ -152,12 +152,6 @@ func (s *CreateTalkSessionOK) encodeFields(e *jx.Encoder) {
 		e.Str(s.CreatedAt)
 	}
 	{
-		if s.FinishedAt.Set {
-			e.FieldStart("finishedAt")
-			s.FinishedAt.Encode(e)
-		}
-	}
-	{
 		e.FieldStart("scheduledEndTime")
 		e.Str(s.ScheduledEndTime)
 	}
@@ -169,14 +163,13 @@ func (s *CreateTalkSessionOK) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfCreateTalkSessionOK = [7]string{
+var jsonFieldsNameOfCreateTalkSessionOK = [6]string{
 	0: "id",
 	1: "theme",
 	2: "owner",
 	3: "createdAt",
-	4: "finishedAt",
-	5: "scheduledEndTime",
-	6: "location",
+	4: "scheduledEndTime",
+	5: "location",
 }
 
 // Decode decodes CreateTalkSessionOK from json.
@@ -234,18 +227,8 @@ func (s *CreateTalkSessionOK) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"createdAt\"")
 			}
-		case "finishedAt":
-			if err := func() error {
-				s.FinishedAt.Reset()
-				if err := s.FinishedAt.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"finishedAt\"")
-			}
 		case "scheduledEndTime":
-			requiredBitSet[0] |= 1 << 5
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
 				v, err := d.Str()
 				s.ScheduledEndTime = string(v)
@@ -276,7 +259,7 @@ func (s *CreateTalkSessionOK) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00101111,
+		0b00011111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -1141,12 +1124,6 @@ func (s *GetTalkSessionDetailOK) encodeFields(e *jx.Encoder) {
 		e.Str(s.CreatedAt)
 	}
 	{
-		if s.FinishedAt.Set {
-			e.FieldStart("finishedAt")
-			s.FinishedAt.Encode(e)
-		}
-	}
-	{
 		e.FieldStart("scheduledEndTime")
 		e.Str(s.ScheduledEndTime)
 	}
@@ -1158,14 +1135,13 @@ func (s *GetTalkSessionDetailOK) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfGetTalkSessionDetailOK = [7]string{
+var jsonFieldsNameOfGetTalkSessionDetailOK = [6]string{
 	0: "id",
 	1: "theme",
 	2: "owner",
 	3: "createdAt",
-	4: "finishedAt",
-	5: "scheduledEndTime",
-	6: "location",
+	4: "scheduledEndTime",
+	5: "location",
 }
 
 // Decode decodes GetTalkSessionDetailOK from json.
@@ -1223,18 +1199,8 @@ func (s *GetTalkSessionDetailOK) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"createdAt\"")
 			}
-		case "finishedAt":
-			if err := func() error {
-				s.FinishedAt.Reset()
-				if err := s.FinishedAt.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"finishedAt\"")
-			}
 		case "scheduledEndTime":
-			requiredBitSet[0] |= 1 << 5
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
 				v, err := d.Str()
 				s.ScheduledEndTime = string(v)
@@ -1265,7 +1231,7 @@ func (s *GetTalkSessionDetailOK) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00101111,
+		0b00011111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -2249,12 +2215,6 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) encodeFields(e *jx.Enc
 		e.Str(s.CreatedAt)
 	}
 	{
-		if s.FinishedAt.Set {
-			e.FieldStart("finishedAt")
-			s.FinishedAt.Encode(e)
-		}
-	}
-	{
 		e.FieldStart("scheduledEndTime")
 		e.Str(s.ScheduledEndTime)
 	}
@@ -2266,14 +2226,13 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) encodeFields(e *jx.Enc
 	}
 }
 
-var jsonFieldsNameOfGetTalkSessionListOKTalkSessionsItemTalkSession = [7]string{
+var jsonFieldsNameOfGetTalkSessionListOKTalkSessionsItemTalkSession = [6]string{
 	0: "id",
 	1: "theme",
 	2: "owner",
 	3: "createdAt",
-	4: "finishedAt",
-	5: "scheduledEndTime",
-	6: "location",
+	4: "scheduledEndTime",
+	5: "location",
 }
 
 // Decode decodes GetTalkSessionListOKTalkSessionsItemTalkSession from json.
@@ -2331,18 +2290,8 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder) 
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"createdAt\"")
 			}
-		case "finishedAt":
-			if err := func() error {
-				s.FinishedAt.Reset()
-				if err := s.FinishedAt.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"finishedAt\"")
-			}
 		case "scheduledEndTime":
-			requiredBitSet[0] |= 1 << 5
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
 				v, err := d.Str()
 				s.ScheduledEndTime = string(v)
@@ -2373,7 +2322,7 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder) 
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00101111,
+		0b00011111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

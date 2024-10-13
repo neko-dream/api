@@ -45,7 +45,6 @@ type TalkSession struct {
 	OwnerID          uuid.UUID
 	Theme            string
 	ScheduledEndTime time.Time
-	FinishedAt       sql.NullTime
 	CreatedAt        time.Time
 }
 

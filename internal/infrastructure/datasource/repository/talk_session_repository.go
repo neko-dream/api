@@ -62,7 +62,6 @@ func (t *talkSessionRepository) Update(ctx context.Context, talkSession *talkses
 	if err := t.GetQueries(ctx).EditTalkSession(ctx, model.EditTalkSessionParams{
 		TalkSessionID:    talkSession.TalkSessionID().UUID(),
 		Theme:            talkSession.Theme(),
-		FinishedAt:       finishedAt,
 		ScheduledEndTime: talkSession.ScheduledEndTime().Time,
 	}); err != nil {
 		return errtrace.Wrap(err)

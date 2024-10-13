@@ -173,10 +173,6 @@
                       "type": "string",
                       "description": "作成日時"
                     },
-                    "finishedAt": {
-                      "type": "string",
-                      "description": "終了日時"
-                    },
                     "scheduledEndTime": {
                       "type": "string",
                       "description": "終了予定日時"
@@ -2125,10 +2121,6 @@
           "createdAt": {
             "type": "string",
             "description": "作成日時"
-          },
-          "finishedAt": {
-            "type": "string",
-            "description": "終了日時"
           },
           "scheduledEndTime": {
             "type": "string",

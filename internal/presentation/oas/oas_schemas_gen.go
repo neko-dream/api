@@ -73,8 +73,6 @@ type CreateTalkSessionOK struct {
 	Owner CreateTalkSessionOKOwner `json:"owner"`
 	// 作成日時.
 	CreatedAt string `json:"createdAt"`
-	// 終了日時.
-	FinishedAt OptString `json:"finishedAt"`
 	// 終了予定日時.
 	ScheduledEndTime string `json:"scheduledEndTime"`
 	// 位置情報.
@@ -99,11 +97,6 @@ func (s *CreateTalkSessionOK) GetOwner() CreateTalkSessionOKOwner {
 // GetCreatedAt returns the value of CreatedAt.
 func (s *CreateTalkSessionOK) GetCreatedAt() string {
 	return s.CreatedAt
-}
-
-// GetFinishedAt returns the value of FinishedAt.
-func (s *CreateTalkSessionOK) GetFinishedAt() OptString {
-	return s.FinishedAt
 }
 
 // GetScheduledEndTime returns the value of ScheduledEndTime.
@@ -134,11 +127,6 @@ func (s *CreateTalkSessionOK) SetOwner(val CreateTalkSessionOKOwner) {
 // SetCreatedAt sets the value of CreatedAt.
 func (s *CreateTalkSessionOK) SetCreatedAt(val string) {
 	s.CreatedAt = val
-}
-
-// SetFinishedAt sets the value of FinishedAt.
-func (s *CreateTalkSessionOK) SetFinishedAt(val OptString) {
-	s.FinishedAt = val
 }
 
 // SetScheduledEndTime sets the value of ScheduledEndTime.
@@ -745,8 +733,6 @@ type GetTalkSessionDetailOK struct {
 	Owner GetTalkSessionDetailOKOwner `json:"owner"`
 	// 作成日時.
 	CreatedAt string `json:"createdAt"`
-	// 終了日時.
-	FinishedAt OptString `json:"finishedAt"`
 	// 終了予定日時.
 	ScheduledEndTime string `json:"scheduledEndTime"`
 	// 位置情報.
@@ -771,11 +757,6 @@ func (s *GetTalkSessionDetailOK) GetOwner() GetTalkSessionDetailOKOwner {
 // GetCreatedAt returns the value of CreatedAt.
 func (s *GetTalkSessionDetailOK) GetCreatedAt() string {
 	return s.CreatedAt
-}
-
-// GetFinishedAt returns the value of FinishedAt.
-func (s *GetTalkSessionDetailOK) GetFinishedAt() OptString {
-	return s.FinishedAt
 }
 
 // GetScheduledEndTime returns the value of ScheduledEndTime.
@@ -806,11 +787,6 @@ func (s *GetTalkSessionDetailOK) SetOwner(val GetTalkSessionDetailOKOwner) {
 // SetCreatedAt sets the value of CreatedAt.
 func (s *GetTalkSessionDetailOK) SetCreatedAt(val string) {
 	s.CreatedAt = val
-}
-
-// SetFinishedAt sets the value of FinishedAt.
-func (s *GetTalkSessionDetailOK) SetFinishedAt(val OptString) {
-	s.FinishedAt = val
 }
 
 // SetScheduledEndTime sets the value of ScheduledEndTime.
@@ -1133,8 +1109,6 @@ type GetTalkSessionListOKTalkSessionsItemTalkSession struct {
 	Owner GetTalkSessionListOKTalkSessionsItemTalkSessionOwner `json:"owner"`
 	// 作成日時.
 	CreatedAt string `json:"createdAt"`
-	// 終了日時.
-	FinishedAt OptString `json:"finishedAt"`
 	// 終了予定日時.
 	ScheduledEndTime string `json:"scheduledEndTime"`
 	// 位置情報.
@@ -1159,11 +1133,6 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetOwner() GetTalkSess
 // GetCreatedAt returns the value of CreatedAt.
 func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetCreatedAt() string {
 	return s.CreatedAt
-}
-
-// GetFinishedAt returns the value of FinishedAt.
-func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetFinishedAt() OptString {
-	return s.FinishedAt
 }
 
 // GetScheduledEndTime returns the value of ScheduledEndTime.
@@ -1194,11 +1163,6 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetOwner(val GetTalkSe
 // SetCreatedAt sets the value of CreatedAt.
 func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetCreatedAt(val string) {
 	s.CreatedAt = val
-}
-
-// SetFinishedAt sets the value of FinishedAt.
-func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetFinishedAt(val OptString) {
-	s.FinishedAt = val
 }
 
 // SetScheduledEndTime sets the value of ScheduledEndTime.

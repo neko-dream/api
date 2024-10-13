@@ -29,10 +29,10 @@ func main() {
 	config := di.Invoke[*config.Config](container)
 	migrator := di.Invoke[*db.Migrator](container)
 	if config.Env != "production" {
-		migrator.Down()
-		dummyInitializer := di.Invoke[*db.DummyInitializer](container)
+		// migrator.Down()
 		migrator.Up()
-		dummyInitializer.Initialize()
+		// dummyInitializer := di.Invoke[*db.DummyInitializer](container)
+		// dummyInitializer.Initialize()
 	}
 
 	reqMiddleware := middleware.ReqMiddleware(srv)
