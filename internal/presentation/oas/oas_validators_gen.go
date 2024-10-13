@@ -313,7 +313,7 @@ func (s EditUserProfileReqOccupation) Validate() error {
 		return nil
 	case "その他":
 		return nil
-	case "無回答":
+	case "回答しない":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)

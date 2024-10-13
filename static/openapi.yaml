@@ -702,7 +702,7 @@ paths:
                     - 学生
                     - 無職
                     - その他
-                    - 無回答
+                    - 回答しない
                   x-apidog-enum:
                     - name: ''
                       value: 正社員

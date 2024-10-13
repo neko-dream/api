@@ -606,7 +606,7 @@ const (
 	EditUserProfileReqOccupation_7  EditUserProfileReqOccupation = "学生"
 	EditUserProfileReqOccupation_8  EditUserProfileReqOccupation = "無職"
 	EditUserProfileReqOccupation_9  EditUserProfileReqOccupation = "その他"
-	EditUserProfileReqOccupation_10 EditUserProfileReqOccupation = "無回答"
+	EditUserProfileReqOccupation_10 EditUserProfileReqOccupation = "回答しない"
 )
 
 // AllValues returns all EditUserProfileReqOccupation values.
