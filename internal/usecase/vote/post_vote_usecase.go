@@ -11,6 +11,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/domain/model/vote"
 	"github.com/neko-dream/server/internal/infrastructure/db"
+	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
 )
 
@@ -52,6 +53,7 @@ func (i *postVoteInteractor) Execute(ctx context.Context, input PostVoteInput) (
 	// Opinionに対して投票を行っているか確認
 	voted, err := i.OpinionService.IsVoted(ctx, input.TargetOpinionID, input.UserID)
 	if err != nil {
+		utils.HandleError(ctx, err, "IsVoted")
 		return nil, errtrace.Wrap(err)
 	}
 	// 投票を行っている場合、エラーを返す
@@ -69,6 +71,7 @@ func (i *postVoteInteractor) Execute(ctx context.Context, input PostVoteInput) (
 			time.Now(),
 		)
 		if err != nil {
+			utils.HandleError(ctx, err, "NewVote")
 			return err
 		}
 

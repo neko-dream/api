@@ -68,7 +68,6 @@ func NewEditUserUseCase(
 func (e *editUserInteractor) Execute(ctx context.Context, input EditUserInput) (*EditUserOutput, error) {
 	var c http.Cookie
 	var u *user.User
-
 	err := e.ExecTx(ctx, func(ctx context.Context) error {
 		// ユーザーの存在を確認
 		foundUser, err := e.userRep.FindByID(ctx, input.UserID)

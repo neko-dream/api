@@ -10,6 +10,7 @@ import (
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/db"
+	"github.com/neko-dream/server/pkg/utils"
 )
 
 type (
@@ -52,6 +53,7 @@ func (i *createTalkSessionInteractor) Execute(ctx context.Context, input CreateT
 			nil,
 		)
 		if err := i.TalkSessionRepository.Create(ctx, talkSession); err != nil {
+			utils.HandleError(ctx, err, "TalkSessionRepository.Create")
 			return messages.TalkSessionCreateFailed
 		}
 		output.TalkSession = *talkSession
@@ -59,6 +61,7 @@ func (i *createTalkSessionInteractor) Execute(ctx context.Context, input CreateT
 		// オーナーのユーザー情報を取得
 		ownerUser, err := i.UserRepository.FindByID(ctx, input.OwnerID)
 		if err != nil {
+			utils.HandleError(ctx, err, "UserRepository.FindByID")
 			return messages.ForbiddenError
 		}
 		output.OwnerUser = ownerUser

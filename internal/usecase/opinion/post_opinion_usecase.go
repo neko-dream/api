@@ -12,6 +12,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/domain/model/vote"
 	"github.com/neko-dream/server/internal/infrastructure/db"
+	"github.com/neko-dream/server/pkg/utils"
 )
 
 type (
@@ -66,9 +67,11 @@ func (i *postOpinionInteractor) Execute(ctx context.Context, input PostOpinionIn
 			time.Now(),
 		)
 		if err != nil {
+			utils.HandleError(ctx, err, "NewOpinion")
 			return err
 		}
 		if err := i.OpinionRepository.Create(ctx, *opinion); err != nil {
+			utils.HandleError(ctx, err, "OpinionRepository.Create")
 			return messages.OpinionCreateFailed
 		}
 
@@ -81,6 +84,7 @@ func (i *postOpinionInteractor) Execute(ctx context.Context, input PostOpinionIn
 			time.Now(),
 		)
 		if err != nil {
+			utils.HandleError(ctx, err, "NewVote")
 			return err
 		}
 		if err := i.VoteRepository.Create(ctx, *v); err != nil {

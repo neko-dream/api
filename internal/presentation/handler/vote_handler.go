@@ -9,6 +9,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	vote_usecase "github.com/neko-dream/server/internal/usecase/vote"
+	"github.com/neko-dream/server/pkg/utils"
 )
 
 type voteHandler struct {
@@ -41,6 +42,7 @@ func (v *voteHandler) Vote(ctx context.Context, req oas.OptVoteReq, params oas.V
 		VoteType:        string(value.VoteStatus.Value),
 	})
 	if err != nil {
+		utils.HandleError(ctx, err, "postVoteUseCase.Execute")
 		return nil, err
 	}
 
