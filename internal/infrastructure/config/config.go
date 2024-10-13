@@ -69,7 +69,7 @@ func LoadConfig() *Config {
 			if err := viper.BindEnv("AWS_REGION"); err != nil {
 				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
 			}
-			if err := viper.BindEnv("AWS_ACCESS_KEY_ID"); err != nil {
+			if err := viper.BindEnv("AWS_ACCESS_KEY"); err != nil {
 				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
 			}
 			if err := viper.BindEnv("AWS_SECRET_ACCESS_KEY"); err != nil {
