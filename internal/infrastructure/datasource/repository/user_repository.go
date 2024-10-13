@@ -83,6 +83,7 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 	if user.IsIconUpdateRequired() {
 		url, err := u.imageRepository.Create(ctx, *user.ProfileIcon().ImageInfo())
 		if err != nil {
+			utils.HandleError(ctx, err, "ImageRepository.Create")
 			return errtrace.Wrap(err)
 		}
 		iconURL = sql.NullString{String: *url, Valid: true}
@@ -102,6 +103,7 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 		),
 		IconUrl: iconURL,
 	}); err != nil {
+		utils.HandleError(ctx, err, "UpdateUser")
 		return errtrace.Wrap(err)
 	}
 
@@ -141,11 +143,13 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 				),
 				Gender: gender,
 			}); err != nil {
+			utils.HandleError(ctx, err, "UpdateOrCreateUserDemographics")
 			return errtrace.Wrap(err)
 		}
 	}
 
 	if err := u.GetQueries(ctx).VerifyUser(ctx, user.UserID().UUID()); err != nil {
+		utils.HandleError(ctx, err, "VerifyUser")
 		return errtrace.Wrap(err)
 	}
 
