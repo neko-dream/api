@@ -57,7 +57,10 @@ func (m *Migrator) Down() {
 		"postgres",
 		driver,
 	)
-	if err := mi.Drop(); err != nil {
+	if err != nil {
+		panic(err)
+	}
+	if err := mi.Down(); err != nil {
 		if err != migrate.ErrNoChange {
 			log.Println(err)
 		}

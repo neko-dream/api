@@ -79,6 +79,7 @@ func (i *postOpinionInteractor) Execute(ctx context.Context, input PostOpinionIn
 		v, err := vote.NewVote(
 			shared.NewUUID[vote.Vote](),
 			opinion.OpinionID(),
+			input.TalkSessionID,
 			input.OwnerID,
 			vote.Agreed,
 			time.Now(),

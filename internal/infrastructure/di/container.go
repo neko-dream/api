@@ -42,7 +42,7 @@ func BuildContainer() *dig.Container {
 		{repository.NewTalkSessionRepository, nil},
 		{repository.NewOpinionRepository, nil},
 		{repository.NewVoteRepository, nil},
-
+		{db.NewDummyInitializer, nil},
 		{func() session.TokenManager {
 			return auth.NewTokenManager("")
 		}, nil},
@@ -60,6 +60,7 @@ func BuildContainer() *dig.Container {
 		{talk_session_usecase.NewListTalkSessionQueryHandler, nil},
 		{opinion_usecase.NewPostOpinionUseCase, nil},
 		{opinion_usecase.NewGetOpinionRepliesUseCase, nil},
+		{opinion_usecase.NewGetSwipeOpinionsQueryHandler, nil},
 		{vote_usecase.NewPostVoteUseCase, nil},
 		{handler.NewSecurityHandler, nil},
 		{handler.NewAuthHandler, nil},

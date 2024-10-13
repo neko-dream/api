@@ -16,24 +16,27 @@ const createVote = `-- name: CreateVote :exec
 INSERT INTO votes (
     vote_id,
     opinion_id,
+    talk_session_id,
     user_id,
     vote_type,
     created_at
-) VALUES ($1, $2, $3, $4, $5)
+) VALUES ($1, $2, $3, $4, $5, $6)
 `
 
 type CreateVoteParams struct {
-	VoteID    uuid.UUID
-	OpinionID uuid.UUID
-	UserID    uuid.UUID
-	VoteType  int16
-	CreatedAt time.Time
+	VoteID        uuid.UUID
+	OpinionID     uuid.UUID
+	TalkSessionID uuid.UUID
+	UserID        uuid.UUID
+	VoteType      int16
+	CreatedAt     time.Time
 }
 
 func (q *Queries) CreateVote(ctx context.Context, arg CreateVoteParams) error {
 	_, err := q.db.ExecContext(ctx, createVote,
 		arg.VoteID,
 		arg.OpinionID,
+		arg.TalkSessionID,
 		arg.UserID,
 		arg.VoteType,
 		arg.CreatedAt,
@@ -42,7 +45,7 @@ func (q *Queries) CreateVote(ctx context.Context, arg CreateVoteParams) error {
 }
 
 const findVoteByUserIDAndOpinionID = `-- name: FindVoteByUserIDAndOpinionID :one
-SELECT vote_id, opinion_id, user_id, vote_type, created_at FROM votes WHERE user_id = $1 AND opinion_id = $2
+SELECT vote_id, opinion_id, user_id, vote_type, created_at, talk_session_id FROM votes WHERE user_id = $1 AND opinion_id = $2
 `
 
 type FindVoteByUserIDAndOpinionIDParams struct {
@@ -59,6 +62,7 @@ func (q *Queries) FindVoteByUserIDAndOpinionID(ctx context.Context, arg FindVote
 		&i.UserID,
 		&i.VoteType,
 		&i.CreatedAt,
+		&i.TalkSessionID,
 	)
 	return i, err
 }

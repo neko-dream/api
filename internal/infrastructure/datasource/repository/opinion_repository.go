@@ -12,7 +12,6 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/db"
 	model "github.com/neko-dream/server/internal/infrastructure/db/sqlc"
 	"github.com/neko-dream/server/pkg/utils"
-	"github.com/samber/lo"
 )
 
 type opinionRepository struct {
@@ -31,13 +30,17 @@ func (o *opinionRepository) Create(ctx context.Context, op opinion.Opinion) erro
 	if op.ParentOpinionID() != nil {
 		parentOpinionID = uuid.NullUUID{UUID: op.ParentOpinionID().UUID(), Valid: true}
 	}
+	var title sql.NullString
+	if op.Title() != nil {
+		title = sql.NullString{String: *op.Title(), Valid: true}
+	}
 
 	if err := o.GetQueries(ctx).CreateOpinion(ctx, model.CreateOpinionParams{
 		OpinionID:       op.OpinionID().UUID(),
 		TalkSessionID:   op.TalkSessionID().UUID(),
 		UserID:          op.UserID().UUID(),
 		ParentOpinionID: parentOpinionID,
-		Title:           lo.If(op.Title() != nil, sql.NullString{String: *op.Title(), Valid: true}).Else(sql.NullString{}),
+		Title:           title,
 		Content:         op.Content(),
 		CreatedAt:       op.CreatedAt(),
 	}); err != nil {

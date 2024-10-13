@@ -8,6 +8,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/shared"
+	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/domain/model/vote"
 	"github.com/neko-dream/server/internal/infrastructure/db"
@@ -21,6 +22,7 @@ type (
 	}
 
 	PostVoteInput struct {
+		TalkSessionID   shared.UUID[talksession.TalkSession]
 		TargetOpinionID shared.UUID[opinion.Opinion]
 		UserID          shared.UUID[user.User]
 		VoteType        string
@@ -66,6 +68,7 @@ func (i *postVoteInteractor) Execute(ctx context.Context, input PostVoteInput) (
 		vote, err := vote.NewVote(
 			shared.NewUUID[vote.Vote](),
 			input.TargetOpinionID,
+			input.TalkSessionID,
 			input.UserID,
 			vote.VoteFromString(lo.ToPtr(input.VoteType)),
 			time.Now(),

@@ -207,3 +207,96 @@ func (q *Queries) GetOpinionReplies(ctx context.Context, arg GetOpinionRepliesPa
 	}
 	return items, nil
 }
+
+const getRandomOpinions = `-- name: GetRandomOpinions :many
+SELECT
+    opinions.opinion_id,
+    opinions.talk_session_id,
+    opinions.user_id,
+    opinions.parent_opinion_id,
+    opinions.title,
+    opinions.content,
+    opinions.created_at,
+    users.display_name AS display_name,
+    users.display_id AS display_id,
+    users.icon_url AS icon_url,
+    COALESCE(pv.vote_type, 0) AS vote_type,
+    vote_count.vote_count AS vote_count
+FROM opinions
+LEFT JOIN users
+    ON opinions.user_id = users.user_id
+LEFT JOIN (
+    SELECT votes.vote_type, votes.user_id, votes.opinion_id
+    FROM votes
+) pv ON opinions.parent_opinion_id = pv.opinion_id
+    AND opinions.user_id = pv.user_id
+LEFT JOIN (
+    SELECT opinions.opinion_id, COUNT(votes.vote_id) AS vote_count
+    FROM opinions
+    LEFT JOIN votes
+        ON opinions.opinion_id = votes.opinion_id
+        AND votes.user_id = $2
+    GROUP BY opinions.opinion_id
+    HAVING COUNT(votes.vote_id) = 0
+) vote_count ON opinions.opinion_id = vote_count.opinion_id
+WHERE opinions.talk_session_id = $1
+    AND vote_count.opinion_id = opinions.opinion_id
+ORDER BY RANDOM()
+`
+
+type GetRandomOpinionsParams struct {
+	TalkSessionID uuid.UUID
+	UserID        uuid.UUID
+}
+
+type GetRandomOpinionsRow struct {
+	OpinionID       uuid.UUID
+	TalkSessionID   uuid.UUID
+	UserID          uuid.UUID
+	ParentOpinionID uuid.NullUUID
+	Title           sql.NullString
+	Content         string
+	CreatedAt       time.Time
+	DisplayName     sql.NullString
+	DisplayID       sql.NullString
+	IconUrl         sql.NullString
+	VoteType        int16
+	VoteCount       int64
+}
+
+// 指定されたユーザーが投票していない意見のみを取得
+func (q *Queries) GetRandomOpinions(ctx context.Context, arg GetRandomOpinionsParams) ([]GetRandomOpinionsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getRandomOpinions, arg.TalkSessionID, arg.UserID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetRandomOpinionsRow
+	for rows.Next() {
+		var i GetRandomOpinionsRow
+		if err := rows.Scan(
+			&i.OpinionID,
+			&i.TalkSessionID,
+			&i.UserID,
+			&i.ParentOpinionID,
+			&i.Title,
+			&i.Content,
+			&i.CreatedAt,
+			&i.DisplayName,
+			&i.DisplayID,
+			&i.IconUrl,
+			&i.VoteType,
+			&i.VoteCount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

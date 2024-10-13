@@ -97,9 +97,10 @@ type UserGroupInfo struct {
 }
 
 type Vote struct {
-	VoteID    uuid.UUID
-	OpinionID uuid.UUID
-	UserID    uuid.UUID
-	VoteType  int16
-	CreatedAt time.Time
+	VoteID        uuid.UUID
+	OpinionID     uuid.UUID
+	UserID        uuid.UUID
+	VoteType      int16
+	CreatedAt     time.Time
+	TalkSessionID uuid.UUID
 }

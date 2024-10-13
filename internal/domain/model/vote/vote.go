@@ -6,6 +6,7 @@ import (
 
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/shared"
+	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/domain/model/user"
 )
 
@@ -16,26 +17,29 @@ type (
 	}
 
 	Vote struct {
-		VoteID    shared.UUID[Vote]
-		OpinionID shared.UUID[opinion.Opinion]
-		UserID    shared.UUID[user.User]
-		VoteType  VoteType
-		CreatedAt time.Time
+		VoteID        shared.UUID[Vote]
+		OpinionID     shared.UUID[opinion.Opinion]
+		TalkSessionID shared.UUID[talksession.TalkSession]
+		UserID        shared.UUID[user.User]
+		VoteType      VoteType
+		CreatedAt     time.Time
 	}
 )
 
 func NewVote(
 	voteID shared.UUID[Vote],
 	parentOpinionID shared.UUID[opinion.Opinion],
+	talkSessionID shared.UUID[talksession.TalkSession],
 	userID shared.UUID[user.User],
 	VoteType VoteType,
 	createdAt time.Time,
 ) (*Vote, error) {
 	return &Vote{
-		VoteID:    voteID,
-		OpinionID: parentOpinionID,
-		UserID:    userID,
-		VoteType:  VoteType,
-		CreatedAt: createdAt,
+		VoteID:        voteID,
+		OpinionID:     parentOpinionID,
+		TalkSessionID: talkSessionID,
+		UserID:        userID,
+		VoteType:      VoteType,
+		CreatedAt:     createdAt,
 	}, nil
 }
