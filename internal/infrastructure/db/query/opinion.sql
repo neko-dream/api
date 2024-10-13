@@ -70,3 +70,40 @@ LEFT JOIN (
 ) cv ON opinions.user_id = COALESCE(sqlc.narg('user_id'), opinions.user_id)
     AND opinions.opinion_id = cv.opinion_id
 WHERE opinions.parent_opinion_id = $1;
+
+-- name: GetRandomOpinions :many
+SELECT
+    opinions.opinion_id,
+    opinions.talk_session_id,
+    opinions.user_id,
+    opinions.parent_opinion_id,
+    opinions.title,
+    opinions.content,
+    opinions.created_at,
+    users.display_name AS display_name,
+    users.display_id AS display_id,
+    users.icon_url AS icon_url,
+    COALESCE(pv.vote_type, 0) AS vote_type,
+    vote_count.vote_count AS vote_count
+FROM opinions
+LEFT JOIN users
+    ON opinions.user_id = users.user_id
+LEFT JOIN (
+    SELECT votes.vote_type, votes.user_id, votes.opinion_id
+    FROM votes
+) pv ON opinions.parent_opinion_id = pv.opinion_id
+    AND opinions.user_id = pv.user_id
+-- 指定されたユーザーが投票していない意見のみを取得
+LEFT JOIN (
+    SELECT opinions.opinion_id, COUNT(votes.vote_id) AS vote_count
+    FROM opinions
+    LEFT JOIN votes
+        ON opinions.opinion_id = votes.opinion_id
+        AND votes.user_id = $2
+    GROUP BY opinions.opinion_id
+    HAVING COUNT(votes.vote_id) = 0
+) vote_count ON opinions.opinion_id = vote_count.opinion_id
+WHERE opinions.talk_session_id = $1
+    AND vote_count.opinion_id = opinions.opinion_id
+ORDER BY RANDOM();
+
