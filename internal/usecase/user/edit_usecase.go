@@ -114,6 +114,12 @@ func (e *editUserInteractor) Execute(ctx context.Context, input EditUserInput) (
 			utils.HandleError(ctx, err, "UserRepository.Update")
 			return messages.UserUpdateError
 		}
+		// 再度ユーザー情報を取得
+		foundUser, err = e.userRep.FindByID(ctx, input.UserID)
+		if err != nil {
+			utils.HandleError(ctx, err, "UserRepository.FindByID")
+			return messages.UserNotFoundError
+		}
 		u = foundUser
 
 		sess, err := e.sessService.RefreshSession(ctx, input.UserID)
