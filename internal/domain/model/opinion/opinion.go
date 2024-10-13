@@ -74,6 +74,7 @@ func NewOpinion(
 		title:           title,
 		content:         content,
 		createdAt:       createdAt,
+		referenceURL:    referenceURL,
 		opinions:        []Opinion{},
 	}, nil
 }
