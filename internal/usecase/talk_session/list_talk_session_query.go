@@ -25,6 +25,7 @@ type (
 
 	ListTalkSessionOutput struct {
 		TalkSessions []TalkSessionDTO
+		TotalCount   int
 	}
 
 	TalkSessionDTO struct {
@@ -124,6 +125,16 @@ func (h *listTalkSessionQueryHandler) Execute(ctx context.Context, input ListTal
 		})
 	}
 
+	talkSessionCount, err := h.GetQueries(ctx).CountTalkSessions(ctx, model.CountTalkSessionsParams{
+		Theme: utils.IfThenElse(
+			input.Theme != nil,
+			sql.NullString{String: *input.Theme, Valid: true},
+			sql.NullString{},
+		),
+		Status: sql.NullString{String: input.Status, Valid: true},
+	})
+
 	talkSessionOut.TalkSessions = talkSessionDTOList
+	talkSessionOut.TotalCount = int(talkSessionCount)
 	return &talkSessionOut, nil
 }

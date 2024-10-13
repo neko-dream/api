@@ -218,15 +218,17 @@ paths:
       parameters:
         - name: limit
           in: query
-          description: ''
+          description: 1ページあたりの要素数
           required: false
+          example: 10
           schema:
             type: integer
             nullable: true
         - name: offset
           in: query
-          description: ''
+          description: どの要素から始めるか
           required: false
+          example: 0
           schema:
             type: integer
             nullable: true
@@ -340,8 +342,22 @@ paths:
                       required:
                         - talkSession
                         - opinionCount
+                  pagination:
+                    type: object
+                    properties:
+                      totalCount:
+                        type: integer
+                      offset:
+                        type: integer
+                      limit:
+                        type: integer
+                    required:
+                      - totalCount
+                      - offset
+                      - limit
                 required:
                   - talkSessions
+                  - pagination
         '500':
           description: ServerErrorResponse
           content:
@@ -1406,6 +1422,19 @@ paths:
       x-ogen-operation-group: Auth
 components:
   schemas:
+    offsetPagination:
+      type: object
+      properties:
+        totalCount:
+          type: integer
+        offset:
+          type: integer
+        limit:
+          type: integer
+      required:
+        - totalCount
+        - offset
+        - limit
     tokenClaim:
       type: object
       properties:

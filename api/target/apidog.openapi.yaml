@@ -194,8 +194,9 @@
           {
             "name": "limit",
             "in": "query",
-            "description": "",
+            "description": "1ページあたりの要素数",
             "required": false,
+            "example": 10,
             "schema": {
               "type": "integer",
               "nullable": true
@@ -204,8 +205,9 @@
           {
             "name": "offset",
             "in": "query",
-            "description": "",
+            "description": "どの要素から始めるか",
             "required": false,
+            "example": 0,
             "schema": {
               "type": "integer",
               "nullable": true
@@ -274,10 +276,14 @@
                           "opinionCount"
                         ]
                       }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/offsetPagination"
                     }
                   },
                   "required": [
-                    "talkSessions"
+                    "talkSessions",
+                    "pagination"
                   ]
                 }
               }
@@ -1321,6 +1327,25 @@
   },
   "components": {
     "schemas": {
+      "offsetPagination": {
+        "type": "object",
+        "properties": {
+          "totalCount": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "totalCount",
+          "offset",
+          "limit"
+        ]
+      },
       "tokenClaim": {
         "type": "object",
         "properties": {

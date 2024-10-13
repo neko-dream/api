@@ -13,6 +13,38 @@ import (
 	"github.com/google/uuid"
 )
 
+const countTalkSessions = `-- name: CountTalkSessions :one
+SELECT
+    COUNT(talk_sessions.*) AS talk_session_count
+FROM talk_sessions
+LEFT JOIN talk_session_locations
+    ON talk_sessions.talk_session_id = talk_session_locations.talk_session_id
+WHERE
+    CASE
+        WHEN $1::text = 'finished' THEN finished_at IS NOT NULL
+        WHEN $1::text = 'open' THEN finished_at IS NULL AND scheduled_end_time > now()
+        ELSE TRUE
+    END
+    AND
+    (CASE
+        WHEN $2::text IS NOT NULL
+        THEN talk_sessions.theme LIKE '%' || $2::text || '%'
+        ELSE TRUE
+    END)
+`
+
+type CountTalkSessionsParams struct {
+	Status sql.NullString
+	Theme  sql.NullString
+}
+
+func (q *Queries) CountTalkSessions(ctx context.Context, arg CountTalkSessionsParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countTalkSessions, arg.Status, arg.Theme)
+	var talk_session_count int64
+	err := row.Scan(&talk_session_count)
+	return talk_session_count, err
+}
+
 const createTalkSession = `-- name: CreateTalkSession :exec
 INSERT INTO talk_sessions (talk_session_id, theme, owner_id, scheduled_end_time, created_at) VALUES ($1, $2, $3, $4, $5)
 `

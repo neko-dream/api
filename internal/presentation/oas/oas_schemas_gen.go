@@ -868,6 +868,7 @@ func (*GetTalkSessionListInternalServerError) getTalkSessionListRes() {}
 
 type GetTalkSessionListOK struct {
 	TalkSessions []GetTalkSessionListOKTalkSessionsItem `json:"talkSessions"`
+	Pagination   GetTalkSessionListOKPagination         `json:"pagination"`
 }
 
 // GetTalkSessions returns the value of TalkSessions.
@@ -875,12 +876,58 @@ func (s *GetTalkSessionListOK) GetTalkSessions() []GetTalkSessionListOKTalkSessi
 	return s.TalkSessions
 }
 
+// GetPagination returns the value of Pagination.
+func (s *GetTalkSessionListOK) GetPagination() GetTalkSessionListOKPagination {
+	return s.Pagination
+}
+
 // SetTalkSessions sets the value of TalkSessions.
 func (s *GetTalkSessionListOK) SetTalkSessions(val []GetTalkSessionListOKTalkSessionsItem) {
 	s.TalkSessions = val
 }
 
+// SetPagination sets the value of Pagination.
+func (s *GetTalkSessionListOK) SetPagination(val GetTalkSessionListOKPagination) {
+	s.Pagination = val
+}
+
 func (*GetTalkSessionListOK) getTalkSessionListRes() {}
+
+type GetTalkSessionListOKPagination struct {
+	TotalCount int `json:"totalCount"`
+	Offset     int `json:"offset"`
+	Limit      int `json:"limit"`
+}
+
+// GetTotalCount returns the value of TotalCount.
+func (s *GetTalkSessionListOKPagination) GetTotalCount() int {
+	return s.TotalCount
+}
+
+// GetOffset returns the value of Offset.
+func (s *GetTalkSessionListOKPagination) GetOffset() int {
+	return s.Offset
+}
+
+// GetLimit returns the value of Limit.
+func (s *GetTalkSessionListOKPagination) GetLimit() int {
+	return s.Limit
+}
+
+// SetTotalCount sets the value of TotalCount.
+func (s *GetTalkSessionListOKPagination) SetTotalCount(val int) {
+	s.TotalCount = val
+}
+
+// SetOffset sets the value of Offset.
+func (s *GetTalkSessionListOKPagination) SetOffset(val int) {
+	s.Offset = val
+}
+
+// SetLimit sets the value of Limit.
+func (s *GetTalkSessionListOKPagination) SetLimit(val int) {
+	s.Limit = val
+}
 
 type GetTalkSessionListOKTalkSessionsItem struct {
 	TalkSession  GetTalkSessionListOKTalkSessionsItemTalkSession `json:"talkSession"`
