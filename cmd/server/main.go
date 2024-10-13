@@ -39,7 +39,6 @@ func main() {
 		AllowedMethods:   []string{"GET", "POST", "PUT", "OPTIONS"},
 		AllowedHeaders:   []string{"*"},
 		AllowCredentials: true,
-		Debug:            true,
 	})
 	corsHandler := c.Handler(reqMiddleware)
 	mux := http.NewServeMux()
