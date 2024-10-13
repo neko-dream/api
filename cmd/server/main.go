@@ -36,7 +36,7 @@ func main() {
 	reqMiddleware := middleware.ReqMiddleware(srv)
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*", "localhost:*"},
-		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "OPTIONS"},
 		AllowedHeaders:   []string{"*"},
 		AllowCredentials: true,
 		Debug:            true,
