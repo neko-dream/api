@@ -33,10 +33,16 @@ func NewGender(s *string) Gender {
 	if *s == "" {
 		return GenderPreferNotToSay
 	}
-	for key, val := range GenderMap {
-		if val == *s {
-			return key
-		}
+	switch *s {
+	case "男性":
+		return GenderMale
+	case "女性":
+		return GenderFemale
+	case "その他":
+		return GenderOther
+	case "回答しない":
+		return GenderPreferNotToSay
+	default:
+		return GenderPreferNotToSay
 	}
-	return GenderPreferNotToSay
 }

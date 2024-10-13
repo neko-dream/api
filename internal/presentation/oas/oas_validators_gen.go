@@ -278,13 +278,13 @@ func (s *EditUserProfileReq) Validate() error {
 
 func (s EditUserProfileReqGender) Validate() error {
 	switch s {
-	case "male":
+	case "男性":
 		return nil
-	case "female":
+	case "女性":
 		return nil
-	case "other":
+	case "その他":
 		return nil
-	case "preferNotToSay":
+	case "回答しない":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
@@ -1102,13 +1102,13 @@ func (s *RegisterUserReq) Validate() error {
 
 func (s RegisterUserReqGender) Validate() error {
 	switch s {
-	case "male":
+	case "男性":
 		return nil
-	case "female":
+	case "女性":
 		return nil
-	case "other":
+	case "その他":
 		return nil
-	case "preferNotToSay":
+	case "回答しない":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)

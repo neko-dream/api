@@ -348,10 +348,10 @@
                   "gender": {
                     "type": "string",
                     "enum": [
-                      "male",
-                      "female",
-                      "other",
-                      "preferNotToSay"
+                      "男性",
+                      "女性",
+                      "その他",
+                      "回答しない"
                     ],
                     "default": "preferNotToSay",
                     "x-apidog-enum": [
@@ -473,9 +473,7 @@
                 },
                 "required": [
                   "displayName",
-                  "displayID",
-                  "gender",
-                  "occupation"
+                  "displayID"
                 ]
               }
             }
@@ -582,10 +580,10 @@
                   "gender": {
                     "type": "string",
                     "enum": [
-                      "male",
-                      "female",
-                      "other",
-                      "preferNotToSay"
+                      "男性",
+                      "女性",
+                      "その他",
+                      "回答しない"
                     ],
                     "x-apidog-enum": [
                       {

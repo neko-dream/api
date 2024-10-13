@@ -405,10 +405,10 @@ paths:
                 gender:
                   type: string
                   enum:
-                    - male
-                    - female
-                    - other
-                    - preferNotToSay
+                    - 男性
+                    - 女性
+                    - その他
+                    - 回答しない
                   default: preferNotToSay
                   x-apidog-enum:
                     - name: ''
@@ -492,8 +492,6 @@ paths:
               required:
                 - displayName
                 - displayID
-                - gender
-                - occupation
       responses:
         '200':
           description: 成功
@@ -568,10 +566,10 @@ paths:
                 gender:
                   type: string
                   enum:
-                    - male
-                    - female
-                    - other
-                    - preferNotToSay
+                    - 男性
+                    - 女性
+                    - その他
+                    - 回答しない
                   x-apidog-enum:
                     - name: ''
                       value: male

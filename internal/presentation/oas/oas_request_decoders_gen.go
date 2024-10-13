@@ -938,8 +938,6 @@ func (s *Server) decodeRegisterUserRequest(r *http.Request) (
 					}(); err != nil {
 						return req, close, errors.Wrap(err, "validate")
 					}
-				} else {
-					return req, close, errors.Wrap(err, "query")
 				}
 			}
 			{
@@ -1019,8 +1017,6 @@ func (s *Server) decodeRegisterUserRequest(r *http.Request) (
 					}(); err != nil {
 						return req, close, errors.Wrap(err, "validate")
 					}
-				} else {
-					return req, close, errors.Wrap(err, "query")
 				}
 			}
 			{

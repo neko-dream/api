@@ -461,32 +461,32 @@ func (s *EditUserProfileReq) SetHouseholdSize(val OptNilInt) {
 type EditUserProfileReqGender string
 
 const (
-	EditUserProfileReqGenderMale           EditUserProfileReqGender = "male"
-	EditUserProfileReqGenderFemale         EditUserProfileReqGender = "female"
-	EditUserProfileReqGenderOther          EditUserProfileReqGender = "other"
-	EditUserProfileReqGenderPreferNotToSay EditUserProfileReqGender = "preferNotToSay"
+	EditUserProfileReqGender_0 EditUserProfileReqGender = "男性"
+	EditUserProfileReqGender_1 EditUserProfileReqGender = "女性"
+	EditUserProfileReqGender_2 EditUserProfileReqGender = "その他"
+	EditUserProfileReqGender_3 EditUserProfileReqGender = "回答しない"
 )
 
 // AllValues returns all EditUserProfileReqGender values.
 func (EditUserProfileReqGender) AllValues() []EditUserProfileReqGender {
 	return []EditUserProfileReqGender{
-		EditUserProfileReqGenderMale,
-		EditUserProfileReqGenderFemale,
-		EditUserProfileReqGenderOther,
-		EditUserProfileReqGenderPreferNotToSay,
+		EditUserProfileReqGender_0,
+		EditUserProfileReqGender_1,
+		EditUserProfileReqGender_2,
+		EditUserProfileReqGender_3,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
 func (s EditUserProfileReqGender) MarshalText() ([]byte, error) {
 	switch s {
-	case EditUserProfileReqGenderMale:
+	case EditUserProfileReqGender_0:
 		return []byte(s), nil
-	case EditUserProfileReqGenderFemale:
+	case EditUserProfileReqGender_1:
 		return []byte(s), nil
-	case EditUserProfileReqGenderOther:
+	case EditUserProfileReqGender_2:
 		return []byte(s), nil
-	case EditUserProfileReqGenderPreferNotToSay:
+	case EditUserProfileReqGender_3:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -496,17 +496,17 @@ func (s EditUserProfileReqGender) MarshalText() ([]byte, error) {
 // UnmarshalText implements encoding.TextUnmarshaler.
 func (s *EditUserProfileReqGender) UnmarshalText(data []byte) error {
 	switch EditUserProfileReqGender(data) {
-	case EditUserProfileReqGenderMale:
-		*s = EditUserProfileReqGenderMale
+	case EditUserProfileReqGender_0:
+		*s = EditUserProfileReqGender_0
 		return nil
-	case EditUserProfileReqGenderFemale:
-		*s = EditUserProfileReqGenderFemale
+	case EditUserProfileReqGender_1:
+		*s = EditUserProfileReqGender_1
 		return nil
-	case EditUserProfileReqGenderOther:
-		*s = EditUserProfileReqGenderOther
+	case EditUserProfileReqGender_2:
+		*s = EditUserProfileReqGender_2
 		return nil
-	case EditUserProfileReqGenderPreferNotToSay:
-		*s = EditUserProfileReqGenderPreferNotToSay
+	case EditUserProfileReqGender_3:
+		*s = EditUserProfileReqGender_3
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -1246,96 +1246,6 @@ func (*GetTopOpinionsInternalServerError) getTopOpinionsRes() {}
 type GetTopOpinionsOK struct{}
 
 func (*GetTopOpinionsOK) getTopOpinionsRes() {}
-
-// NewNilRegisterUserReqGender returns new NilRegisterUserReqGender with value set to v.
-func NewNilRegisterUserReqGender(v RegisterUserReqGender) NilRegisterUserReqGender {
-	return NilRegisterUserReqGender{
-		Value: v,
-	}
-}
-
-// NilRegisterUserReqGender is nullable RegisterUserReqGender.
-type NilRegisterUserReqGender struct {
-	Value RegisterUserReqGender
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilRegisterUserReqGender) SetTo(v RegisterUserReqGender) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsSet returns true if value is Null.
-func (o NilRegisterUserReqGender) IsNull() bool { return o.Null }
-
-// SetNull sets value to null.
-func (o *NilRegisterUserReqGender) SetToNull() {
-	o.Null = true
-	var v RegisterUserReqGender
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilRegisterUserReqGender) Get() (v RegisterUserReqGender, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilRegisterUserReqGender) Or(d RegisterUserReqGender) RegisterUserReqGender {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilRegisterUserReqOccupation returns new NilRegisterUserReqOccupation with value set to v.
-func NewNilRegisterUserReqOccupation(v RegisterUserReqOccupation) NilRegisterUserReqOccupation {
-	return NilRegisterUserReqOccupation{
-		Value: v,
-	}
-}
-
-// NilRegisterUserReqOccupation is nullable RegisterUserReqOccupation.
-type NilRegisterUserReqOccupation struct {
-	Value RegisterUserReqOccupation
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilRegisterUserReqOccupation) SetTo(v RegisterUserReqOccupation) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsSet returns true if value is Null.
-func (o NilRegisterUserReqOccupation) IsNull() bool { return o.Null }
-
-// SetNull sets value to null.
-func (o *NilRegisterUserReqOccupation) SetToNull() {
-	o.Null = true
-	var v RegisterUserReqOccupation
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilRegisterUserReqOccupation) Get() (v RegisterUserReqOccupation, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilRegisterUserReqOccupation) Or(d RegisterUserReqOccupation) RegisterUserReqOccupation {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
 
 // NewNilVoteReqVoteStatus returns new NilVoteReqVoteStatus with value set to v.
 func NewNilVoteReqVoteStatus(v VoteReqVoteStatus) NilVoteReqVoteStatus {
@@ -2780,6 +2690,132 @@ func (o OptNilInt) Or(d int) int {
 	return d
 }
 
+// NewOptNilRegisterUserReqGender returns new OptNilRegisterUserReqGender with value set to v.
+func NewOptNilRegisterUserReqGender(v RegisterUserReqGender) OptNilRegisterUserReqGender {
+	return OptNilRegisterUserReqGender{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilRegisterUserReqGender is optional nullable RegisterUserReqGender.
+type OptNilRegisterUserReqGender struct {
+	Value RegisterUserReqGender
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilRegisterUserReqGender was set.
+func (o OptNilRegisterUserReqGender) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilRegisterUserReqGender) Reset() {
+	var v RegisterUserReqGender
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilRegisterUserReqGender) SetTo(v RegisterUserReqGender) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilRegisterUserReqGender) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilRegisterUserReqGender) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v RegisterUserReqGender
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilRegisterUserReqGender) Get() (v RegisterUserReqGender, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilRegisterUserReqGender) Or(d RegisterUserReqGender) RegisterUserReqGender {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilRegisterUserReqOccupation returns new OptNilRegisterUserReqOccupation with value set to v.
+func NewOptNilRegisterUserReqOccupation(v RegisterUserReqOccupation) OptNilRegisterUserReqOccupation {
+	return OptNilRegisterUserReqOccupation{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilRegisterUserReqOccupation is optional nullable RegisterUserReqOccupation.
+type OptNilRegisterUserReqOccupation struct {
+	Value RegisterUserReqOccupation
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilRegisterUserReqOccupation was set.
+func (o OptNilRegisterUserReqOccupation) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilRegisterUserReqOccupation) Reset() {
+	var v RegisterUserReqOccupation
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilRegisterUserReqOccupation) SetTo(v RegisterUserReqOccupation) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilRegisterUserReqOccupation) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilRegisterUserReqOccupation) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v RegisterUserReqOccupation
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilRegisterUserReqOccupation) Get() (v RegisterUserReqOccupation, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilRegisterUserReqOccupation) Or(d RegisterUserReqOccupation) RegisterUserReqOccupation {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilString returns new OptNilString with value set to v.
 func NewOptNilString(v string) OptNilString {
 	return OptNilString{
@@ -3379,11 +3415,11 @@ type RegisterUserReq struct {
 	// 生まれ年.
 	YearOfBirth OptNilInt `json:"yearOfBirth"`
 	// 性別.
-	Gender NilRegisterUserReqGender `json:"gender"`
+	Gender OptNilRegisterUserReqGender `json:"gender"`
 	// 市区町村.
 	Municipality OptNilString `json:"municipality"`
 	// ユーザーの職業.
-	Occupation NilRegisterUserReqOccupation `json:"occupation"`
+	Occupation OptNilRegisterUserReqOccupation `json:"occupation"`
 	// 世帯人数.
 	HouseholdSize OptNilInt `json:"householdSize"`
 }
@@ -3409,7 +3445,7 @@ func (s *RegisterUserReq) GetYearOfBirth() OptNilInt {
 }
 
 // GetGender returns the value of Gender.
-func (s *RegisterUserReq) GetGender() NilRegisterUserReqGender {
+func (s *RegisterUserReq) GetGender() OptNilRegisterUserReqGender {
 	return s.Gender
 }
 
@@ -3419,7 +3455,7 @@ func (s *RegisterUserReq) GetMunicipality() OptNilString {
 }
 
 // GetOccupation returns the value of Occupation.
-func (s *RegisterUserReq) GetOccupation() NilRegisterUserReqOccupation {
+func (s *RegisterUserReq) GetOccupation() OptNilRegisterUserReqOccupation {
 	return s.Occupation
 }
 
@@ -3449,7 +3485,7 @@ func (s *RegisterUserReq) SetYearOfBirth(val OptNilInt) {
 }
 
 // SetGender sets the value of Gender.
-func (s *RegisterUserReq) SetGender(val NilRegisterUserReqGender) {
+func (s *RegisterUserReq) SetGender(val OptNilRegisterUserReqGender) {
 	s.Gender = val
 }
 
@@ -3459,7 +3495,7 @@ func (s *RegisterUserReq) SetMunicipality(val OptNilString) {
 }
 
 // SetOccupation sets the value of Occupation.
-func (s *RegisterUserReq) SetOccupation(val NilRegisterUserReqOccupation) {
+func (s *RegisterUserReq) SetOccupation(val OptNilRegisterUserReqOccupation) {
 	s.Occupation = val
 }
 
@@ -3472,32 +3508,32 @@ func (s *RegisterUserReq) SetHouseholdSize(val OptNilInt) {
 type RegisterUserReqGender string
 
 const (
-	RegisterUserReqGenderMale           RegisterUserReqGender = "male"
-	RegisterUserReqGenderFemale         RegisterUserReqGender = "female"
-	RegisterUserReqGenderOther          RegisterUserReqGender = "other"
-	RegisterUserReqGenderPreferNotToSay RegisterUserReqGender = "preferNotToSay"
+	RegisterUserReqGender_0 RegisterUserReqGender = "男性"
+	RegisterUserReqGender_1 RegisterUserReqGender = "女性"
+	RegisterUserReqGender_2 RegisterUserReqGender = "その他"
+	RegisterUserReqGender_3 RegisterUserReqGender = "回答しない"
 )
 
 // AllValues returns all RegisterUserReqGender values.
 func (RegisterUserReqGender) AllValues() []RegisterUserReqGender {
 	return []RegisterUserReqGender{
-		RegisterUserReqGenderMale,
-		RegisterUserReqGenderFemale,
-		RegisterUserReqGenderOther,
-		RegisterUserReqGenderPreferNotToSay,
+		RegisterUserReqGender_0,
+		RegisterUserReqGender_1,
+		RegisterUserReqGender_2,
+		RegisterUserReqGender_3,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
 func (s RegisterUserReqGender) MarshalText() ([]byte, error) {
 	switch s {
-	case RegisterUserReqGenderMale:
+	case RegisterUserReqGender_0:
 		return []byte(s), nil
-	case RegisterUserReqGenderFemale:
+	case RegisterUserReqGender_1:
 		return []byte(s), nil
-	case RegisterUserReqGenderOther:
+	case RegisterUserReqGender_2:
 		return []byte(s), nil
-	case RegisterUserReqGenderPreferNotToSay:
+	case RegisterUserReqGender_3:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -3507,17 +3543,17 @@ func (s RegisterUserReqGender) MarshalText() ([]byte, error) {
 // UnmarshalText implements encoding.TextUnmarshaler.
 func (s *RegisterUserReqGender) UnmarshalText(data []byte) error {
 	switch RegisterUserReqGender(data) {
-	case RegisterUserReqGenderMale:
-		*s = RegisterUserReqGenderMale
+	case RegisterUserReqGender_0:
+		*s = RegisterUserReqGender_0
 		return nil
-	case RegisterUserReqGenderFemale:
-		*s = RegisterUserReqGenderFemale
+	case RegisterUserReqGender_1:
+		*s = RegisterUserReqGender_1
 		return nil
-	case RegisterUserReqGenderOther:
-		*s = RegisterUserReqGenderOther
+	case RegisterUserReqGender_2:
+		*s = RegisterUserReqGender_2
 		return nil
-	case RegisterUserReqGenderPreferNotToSay:
-		*s = RegisterUserReqGenderPreferNotToSay
+	case RegisterUserReqGender_3:
+		*s = RegisterUserReqGender_3
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
