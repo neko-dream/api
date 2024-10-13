@@ -453,8 +453,7 @@ func (d *DummyInitializer) TalkSession() error {
 			time.Now(ctx),
 			time.Now(ctx).Add(ctx, 3*time.Month),
 			nil,
-			lo.ToPtr("東京都"),
-			lo.ToPtr("中野区"),
+			nil, nil,
 		),
 		talksession.NewTalkSession(
 			shared.NewUUID[talksession.TalkSession](),
@@ -463,7 +462,8 @@ func (d *DummyInitializer) TalkSession() error {
 			time.Now(ctx),
 			time.Now(ctx).Add(ctx, 3*time.Month),
 			nil,
-			nil, nil,
+			nil,
+			nil,
 		),
 	}
 

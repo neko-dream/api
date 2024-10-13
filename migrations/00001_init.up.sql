@@ -47,9 +47,9 @@ CREATE TABLE "talk_sessions" (
   "theme" varchar NOT NULL,
   "scheduled_end_time" timestamp NOT NULL,
   "finished_at" timestamp,
-  "created_at" timestamp NOT NULL DEFAULT (now())
-  "city" varchar NOT NULL,
-  "prefecture" varchar NOT NULL
+  "created_at" timestamp NOT NULL DEFAULT (now()),
+  "city" varchar,
+  "prefecture" varchar
 );
 
 CREATE TABLE "talk_session_locations" (
