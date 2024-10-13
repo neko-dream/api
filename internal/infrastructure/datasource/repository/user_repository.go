@@ -114,6 +114,10 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 		} else {
 			gender = int16(*userDemographics.Gender())
 		}
+		var municipality sql.NullString
+		if userDemographics.Municipality() != nil {
+			municipality = sql.NullString{String: (*userDemographics.Municipality()).String(), Valid: true}
+		}
 
 		if err := u.GetQueries(ctx).
 			UpdateOrCreateUserDemographics(ctx, model.UpdateOrCreateUserDemographicsParams{
@@ -129,11 +133,7 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 					sql.NullInt16{Int16: int16(*userDemographics.Occupation()), Valid: true},
 					sql.NullInt16{},
 				),
-				Municipality: utils.IfThenElse(
-					userDemographics.Municipality() != nil,
-					sql.NullString{String: userDemographics.Municipality().String(), Valid: true},
-					sql.NullString{},
-				),
+				Municipality: municipality,
 				HouseholdSize: utils.IfThenElse(
 					userDemographics.HouseholdSize() != nil,
 					sql.NullInt16{Int16: int16(*userDemographics.HouseholdSize()), Valid: true},
