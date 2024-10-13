@@ -1,6 +1,8 @@
 package user
 
-import "github.com/neko-dream/server/internal/domain/model/shared"
+import (
+	"github.com/neko-dream/server/internal/domain/model/shared"
+)
 
 type (
 	UserDemographics struct {
@@ -26,12 +28,18 @@ func (u *UserDemographics) Age() int {
 	return u.yearOfBirth.Age()
 }
 
-func (u *UserDemographics) Occupation() *Occupation {
-	return u.occupation
+func (u *UserDemographics) Occupation() Occupation {
+	if u.occupation == nil {
+		return OccupationOther
+	}
+	return *u.occupation
 }
 
-func (u *UserDemographics) Gender() *Gender {
-	return u.gender
+func (u *UserDemographics) Gender() Gender {
+	if u.gender == nil {
+		return GenderPreferNotToSay
+	}
+	return *u.gender
 }
 
 func (u *UserDemographics) Municipality() *Municipality {

@@ -8,7 +8,6 @@ import (
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
-	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	user_usecase "github.com/neko-dream/server/internal/usecase/user"
 	http_utils "github.com/neko-dream/server/pkg/http"
@@ -67,19 +66,12 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 		} else {
 			municipality = ""
 		}
-		var occupation string
-		if res.User.Demographics().Occupation() != nil {
-			occupation = res.User.Demographics().Occupation().String()
-		} else {
-			occupation = user.OccupationOther.String()
-		}
-
 		out.Demographics = oas.OptGetUserInfoOKDemographics{
 			Value: oas.GetUserInfoOKDemographics{
 				GetUserInfoOKDemographics0: oas.GetUserInfoOKDemographics0{
 					YearOfBirth:   utils.ToOptNil[oas.OptNilInt](res.User.Demographics().YearOfBirth()),
 					Municipality:  municipality,
-					Occupation:    occupation,
+					Occupation:    res.User.Demographics().Occupation().String(),
 					Gender:        res.User.Demographics().Gender().String(),
 					HouseholdSize: utils.ToOptNil[oas.OptNilInt](res.User.Demographics().HouseholdSize()),
 				},

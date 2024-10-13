@@ -18,8 +18,8 @@ var (
 	}
 )
 
-func (g *Gender) String() string {
-	str, ok := GenderMap[*g]
+func (g Gender) String() string {
+	str, ok := GenderMap[g]
 	if !ok {
 		return ""
 	}

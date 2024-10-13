@@ -903,7 +903,8 @@ paths:
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
-      security: []
+      security:
+        - SessionId: []
       x-ogen-operation-group: User
   /talksession/{talkSessionID}/swipe_opinions:
     get:

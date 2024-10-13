@@ -110,12 +110,6 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 	if user.Demographics() != nil {
 		userDemographics := *user.Demographics()
 
-		var gender int16
-		if userDemographics.Gender() == nil {
-			gender = int16(um.GenderPreferNotToSay)
-		} else {
-			gender = int16(*userDemographics.Gender())
-		}
 		var municipality sql.NullString
 		if userDemographics.Municipality() != nil {
 			municipality = sql.NullString{String: (*userDemographics.Municipality()).String(), Valid: true}
@@ -128,20 +122,16 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 		if userDemographics.HouseholdSize() != nil {
 			householdSize = sql.NullInt16{Int16: int16(*userDemographics.HouseholdSize()), Valid: true}
 		}
-		var occupation sql.NullInt16
-		if userDemographics.Occupation() != nil {
-			occupation = sql.NullInt16{Int16: int16(*userDemographics.Occupation()), Valid: true}
-		}
 
 		if err := u.GetQueries(ctx).
 			UpdateOrCreateUserDemographics(ctx, model.UpdateOrCreateUserDemographicsParams{
 				UserDemographicsID: userDemographics.UserDemographicsID().UUID(),
 				UserID:             user.UserID().UUID(),
 				YearOfBirth:        yearOfBirth,
-				Occupation:         occupation,
+				Occupation:         sql.NullInt16{Int16: int16(userDemographics.Occupation()), Valid: true},
 				Municipality:       municipality,
 				HouseholdSize:      householdSize,
-				Gender:             gender,
+				Gender:             int16(userDemographics.Gender()),
 			}); err != nil {
 			utils.HandleError(ctx, err, "UpdateOrCreateUserDemographics")
 			return errtrace.Wrap(err)
