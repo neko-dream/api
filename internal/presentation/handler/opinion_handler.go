@@ -3,6 +3,8 @@ package handler
 import (
 	"context"
 	"io"
+	"log"
+
 	"mime/multipart"
 
 	"github.com/neko-dream/server/internal/domain/messages"
@@ -10,6 +12,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
+	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	opinion_usecase "github.com/neko-dream/server/internal/usecase/opinion"
 	http_utils "github.com/neko-dream/server/pkg/http"
@@ -45,15 +48,74 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 
 // OpinionComments 意見に対するリプライ意見取得
 func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.OpinionCommentsParams) (oas.OpinionCommentsRes, error) {
-	_, err := o.getOpinionRepliesUsecase.Execute(ctx, opinion_usecase.GetOpinionRepliesInput{
+	claim := session.GetSession(ctx)
+	var userID *shared.UUID[user.User]
+	if claim != nil {
+		userIDTmp, err := claim.UserID()
+		if err != nil {
+			return nil, messages.ForbiddenError
+		}
+		userID = lo.ToPtr(userIDTmp)
+	}
+
+	opinions, err := o.getOpinionRepliesUsecase.Execute(ctx, opinion_usecase.GetOpinionRepliesInput{
 		OpinionID: shared.MustParseUUID[opinion.Opinion](params.OpinionID),
+		UserID:    userID,
 	})
 	if err != nil {
 		return nil, err
 	}
+	rootUser := &oas.OpinionCommentsOKRootOpinionUser{
+		DisplayID:   opinions.RootOpinion.User.ID,
+		DisplayName: opinions.RootOpinion.User.Name,
+		IconURL:     utils.ToOpt[oas.OptString](opinions.RootOpinion.User.Icon),
+	}
+	rootOpinion := &oas.OpinionCommentsOKRootOpinionOpinion{
+		ID:      opinions.RootOpinion.Opinion.OpinionID,
+		Title:   utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.Title),
+		Content: opinions.RootOpinion.Opinion.Content,
+		VoteType: oas.OptOpinionCommentsOKRootOpinionOpinionVoteType{
+			Value: oas.OpinionCommentsOKRootOpinionOpinionVoteType(opinions.RootOpinion.Opinion.VoteType),
+			Set:   true,
+		},
+		PictureURL:   utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.PictureURL),
+		ReferenceURL: utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.ReferenceURL),
+	}
+	root := oas.OpinionCommentsOKRootOpinion{
+		User:    *rootUser,
+		Opinion: *rootOpinion,
+	}
 
-	out := &oas.OpinionCommentsOK{}
-	return out, nil
+	var replies []oas.OpinionCommentsOKOpinionsItem
+	for _, reply := range opinions.Replies {
+		user := &oas.OpinionCommentsOKOpinionsItemUser{
+			DisplayID:   reply.User.ID,
+			DisplayName: reply.User.Name,
+			IconURL:     utils.ToOpt[oas.OptString](reply.User.Icon),
+		}
+		log.Println(reply.Opinion.VoteType)
+		opinion := &oas.OpinionCommentsOKOpinionsItemOpinion{
+			ID:       reply.Opinion.OpinionID,
+			ParentID: utils.ToOpt[oas.OptString](reply.Opinion.ParentOpinionID),
+			Title:    utils.ToOpt[oas.OptString](reply.Opinion.Title),
+			Content:  reply.Opinion.Content,
+			VoteType: oas.OptOpinionCommentsOKOpinionsItemOpinionVoteType{
+				Value: oas.OpinionCommentsOKOpinionsItemOpinionVoteType(reply.Opinion.VoteType),
+				Set:   true,
+			},
+			PictureURL:   utils.ToOpt[oas.OptString](reply.Opinion.PictureURL),
+			ReferenceURL: utils.ToOpt[oas.OptString](reply.Opinion.ReferenceURL),
+		}
+		replies = append(replies, oas.OpinionCommentsOKOpinionsItem{
+			User:    *user,
+			Opinion: *opinion,
+		})
+	}
+
+	return &oas.OpinionCommentsOK{
+		RootOpinion: root,
+		Opinions:    replies,
+	}, nil
 
 }
 

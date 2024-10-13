@@ -60,7 +60,8 @@ SELECT
     users.display_name AS display_name,
     users.display_id AS display_id,
     users.icon_url AS icon_url,
-    COALESCE(pv.vote_type, 0) AS vote_type
+    COALESCE(pv.vote_type, 0) AS vote_type,
+    COALESCE(cv.vote_type, 0) AS current_vote_type
 FROM opinions
 LEFT JOIN users
     ON opinions.user_id = users.user_id
@@ -68,9 +69,19 @@ LEFT JOIN (
     SELECT votes.vote_type, votes.user_id, votes.opinion_id
     FROM votes
 ) pv ON opinions.parent_opinion_id = pv.opinion_id
-    AND opinions.user_id = vote.user_id
+    AND opinions.user_id = pv.user_id
+LEFT JOIN (
+    SELECT votes.vote_type, votes.user_id, votes.opinion_id
+    FROM votes
+) cv ON opinions.user_id = COALESCE($2, opinions.user_id)
+    AND opinions.opinion_id = cv.opinion_id
 WHERE opinions.opinion_id = $1
 `
+
+type GetOpinionByIDParams struct {
+	OpinionID uuid.UUID
+	UserID    uuid.NullUUID
+}
 
 type GetOpinionByIDRow struct {
 	OpinionID       uuid.UUID
@@ -84,11 +95,13 @@ type GetOpinionByIDRow struct {
 	DisplayID       sql.NullString
 	IconUrl         sql.NullString
 	VoteType        int16
+	CurrentVoteType int16
 }
 
 // 親意見に対するユーザーの投票を取得
-func (q *Queries) GetOpinionByID(ctx context.Context, opinionID uuid.UUID) (GetOpinionByIDRow, error) {
-	row := q.db.QueryRowContext(ctx, getOpinionByID, opinionID)
+// ユーザーIDが提供された場合、そのユーザーの投票ステータスを一緒に取得
+func (q *Queries) GetOpinionByID(ctx context.Context, arg GetOpinionByIDParams) (GetOpinionByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getOpinionByID, arg.OpinionID, arg.UserID)
 	var i GetOpinionByIDRow
 	err := row.Scan(
 		&i.OpinionID,
@@ -102,6 +115,7 @@ func (q *Queries) GetOpinionByID(ctx context.Context, opinionID uuid.UUID) (GetO
 		&i.DisplayID,
 		&i.IconUrl,
 		&i.VoteType,
+		&i.CurrentVoteType,
 	)
 	return i, err
 }
@@ -118,7 +132,8 @@ SELECT
     users.display_name AS display_name,
     users.display_id AS display_id,
     users.icon_url AS icon_url,
-    COALESCE(parent_vote.vote_type, 0) AS vote_type
+    COALESCE(pv.vote_type, 0) AS vote_type,
+    COALESCE(cv.vote_type, 0) AS current_vote_type
 FROM opinions
 LEFT JOIN users
     ON opinions.user_id = users.user_id
@@ -126,9 +141,19 @@ LEFT JOIN (
     SELECT votes.vote_type, votes.user_id
     FROM votes
     WHERE votes.opinion_id = $1
-) parent_vote ON opinions.user_id = parent_vote.user_id
+) pv ON opinions.user_id = pv.user_id
+LEFT JOIN (
+    SELECT votes.vote_type, votes.user_id, votes.opinion_id
+    FROM votes
+) cv ON opinions.user_id = COALESCE($2, opinions.user_id)
+    AND opinions.opinion_id = cv.opinion_id
 WHERE opinions.parent_opinion_id = $1
 `
+
+type GetOpinionRepliesParams struct {
+	OpinionID uuid.UUID
+	UserID    uuid.NullUUID
+}
 
 type GetOpinionRepliesRow struct {
 	OpinionID       uuid.UUID
@@ -142,11 +167,13 @@ type GetOpinionRepliesRow struct {
 	DisplayID       sql.NullString
 	IconUrl         sql.NullString
 	VoteType        int16
+	CurrentVoteType int16
 }
 
 // 親意見に対する子意見主の投票を取得
-func (q *Queries) GetOpinionReplies(ctx context.Context, opinionID uuid.UUID) ([]GetOpinionRepliesRow, error) {
-	rows, err := q.db.QueryContext(ctx, getOpinionReplies, opinionID)
+// ユーザーIDが提供された場合、そのユーザーの投票ステータスを一緒に取得
+func (q *Queries) GetOpinionReplies(ctx context.Context, arg GetOpinionRepliesParams) ([]GetOpinionRepliesRow, error) {
+	rows, err := q.db.QueryContext(ctx, getOpinionReplies, arg.OpinionID, arg.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -166,6 +193,7 @@ func (q *Queries) GetOpinionReplies(ctx context.Context, opinionID uuid.UUID) ([
 			&i.DisplayID,
 			&i.IconUrl,
 			&i.VoteType,
+			&i.CurrentVoteType,
 		); err != nil {
 			return nil, err
 		}

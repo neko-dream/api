@@ -4,10 +4,13 @@ import (
 	"context"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/shared"
+	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/domain/model/vote"
 	"github.com/neko-dream/server/internal/infrastructure/db"
+	model "github.com/neko-dream/server/internal/infrastructure/db/sqlc"
 	"github.com/neko-dream/server/pkg/utils"
 )
 
@@ -18,6 +21,7 @@ type (
 
 	GetOpinionRepliesInput struct {
 		OpinionID shared.UUID[opinion.Opinion]
+		UserID    *shared.UUID[user.User]
 	}
 
 	GetOpinionRepliesOutput struct {
@@ -27,8 +31,9 @@ type (
 
 	// RepliesDTO 親意見に対するリプライ意見
 	ReplyDTO struct {
-		Opinion OpinionDTO
-		User    UserDTO
+		Opinion    OpinionDTO
+		User       UserDTO
+		MyVoteType string
 	}
 	UserDTO struct {
 		ID   string
@@ -43,6 +48,9 @@ type (
 		Title           *string
 		Content         string
 		CreatedAt       time.Time
+		VoteType        string
+		PictureURL      *string
+		ReferenceURL    *string
 	}
 
 	GetOpinionRepliesInteractor struct {
@@ -68,8 +76,16 @@ func NewGetOpinionRepliesUseCase(
 }
 
 func (i *GetOpinionRepliesInteractor) Execute(ctx context.Context, input GetOpinionRepliesInput) (*GetOpinionRepliesOutput, error) {
+	var userID uuid.NullUUID
+	if input.UserID != nil {
+		userID = uuid.NullUUID{Valid: true, UUID: input.UserID.UUID()}
+	}
+
 	// 親意見を取得
-	opinionRow, err := i.GetQueries(ctx).GetOpinionByID(ctx, input.OpinionID.UUID())
+	opinionRow, err := i.GetQueries(ctx).GetOpinionByID(ctx, model.GetOpinionByIDParams{
+		OpinionID: input.OpinionID.UUID(),
+		UserID:    userID,
+	})
 	if err != nil {
 		utils.HandleError(ctx, err, "GetOpinionRepliesInteractor.Execute")
 		return nil, err
@@ -82,6 +98,7 @@ func (i *GetOpinionRepliesInteractor) Execute(ctx context.Context, input GetOpin
 		Title:           utils.ToPtrIfNotNullValue(!opinionRow.Title.Valid, opinionRow.Title.String),
 		Content:         opinionRow.Content,
 		CreatedAt:       opinionRow.CreatedAt,
+		VoteType:        vote.VoteTypeFromInt(int(opinionRow.VoteType)).String(),
 	}
 	rootUser := UserDTO{
 		ID:   opinionRow.UserID.String(),
@@ -89,11 +106,15 @@ func (i *GetOpinionRepliesInteractor) Execute(ctx context.Context, input GetOpin
 		Icon: utils.ToPtrIfNotNullValue(!opinionRow.IconUrl.Valid, opinionRow.IconUrl.String),
 	}
 	rootOpinionDTO := ReplyDTO{
-		Opinion: rootOpinion,
-		User:    rootUser,
+		Opinion:    rootOpinion,
+		User:       rootUser,
+		MyVoteType: vote.VoteTypeFromInt(int(opinionRow.CurrentVoteType)).String(),
 	}
 
-	row, err := i.GetQueries(ctx).GetOpinionReplies(ctx, input.OpinionID.UUID())
+	row, err := i.GetQueries(ctx).GetOpinionReplies(ctx, model.GetOpinionRepliesParams{
+		OpinionID: input.OpinionID.UUID(),
+		UserID:    userID,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -108,12 +129,14 @@ func (i *GetOpinionRepliesInteractor) Execute(ctx context.Context, input GetOpin
 				Title:           utils.ToPtrIfNotNullValue(!r.Title.Valid, r.Title.String),
 				Content:         r.Content,
 				CreatedAt:       r.CreatedAt,
+				VoteType:        vote.VoteTypeFromInt(int(r.VoteType)).String(),
 			},
 			User: UserDTO{
 				ID:   r.UserID.String(),
 				Name: r.DisplayName.String,
 				Icon: utils.ToPtrIfNotNullValue(!r.IconUrl.Valid, r.IconUrl.String),
 			},
+			MyVoteType: vote.VoteTypeFromInt(int(r.CurrentVoteType)).String(),
 		})
 	}
 

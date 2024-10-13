@@ -1067,6 +1067,17 @@
                         "opinion"
                       ]
                     },
+                    "myVoteType": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/components/schemas/voteType",
+                          "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
                     "opinions": {
                       "type": "array",
                       "items": {
@@ -1079,15 +1090,21 @@
                             "$ref": "#/components/schemas/user",
                             "description": "作成ユーザー"
                           },
-                          "myItentionStatus": {
-                            "$ref": "#/components/schemas/voteType",
-                            "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
+                          "myVoteType": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/components/schemas/voteType",
+                                "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           }
                         },
                         "required": [
                           "opinion",
-                          "user",
-                          "myItentionStatus"
+                          "user"
                         ]
                       }
                     }

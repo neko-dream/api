@@ -1052,6 +1052,25 @@ paths:
                     required:
                       - user
                       - opinion
+                  myVoteType:
+                    anyOf:
+                      - type: string
+                        description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                        enum:
+                          - agree
+                          - disagree
+                          - pass
+                        x-apidog-enum:
+                          - name: ''
+                            value: agree
+                            description: 良さそう
+                          - name: ''
+                            value: disagree
+                            description: 違うかも
+                          - name: ''
+                            value: pass
+                            description: 保留
+                      - type: 'null'
                   opinions:
                     type: array
                     items:
@@ -1120,27 +1139,28 @@ paths:
                             - displayID
                             - displayName
                           description: 作成ユーザー
-                        myItentionStatus:
-                          type: string
-                          description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                          enum:
-                            - agree
-                            - disagree
-                            - pass
-                          x-apidog-enum:
-                            - name: ''
-                              value: agree
-                              description: 良さそう
-                            - name: ''
-                              value: disagree
-                              description: 違うかも
-                            - name: ''
-                              value: pass
-                              description: 保留
+                        myVoteType:
+                          anyOf:
+                            - type: string
+                              description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              enum:
+                                - agree
+                                - disagree
+                                - pass
+                              x-apidog-enum:
+                                - name: ''
+                                  value: agree
+                                  description: 良さそう
+                                - name: ''
+                                  value: disagree
+                                  description: 違うかも
+                                - name: ''
+                                  value: pass
+                                  description: 保留
+                            - type: 'null'
                       required:
                         - opinion
                         - user
-                        - myItentionStatus
                 required:
                   - rootOpinion
                   - opinions

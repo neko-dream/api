@@ -21,7 +21,8 @@ SELECT
     users.display_name AS display_name,
     users.display_id AS display_id,
     users.icon_url AS icon_url,
-    COALESCE(pv.vote_type, 0) AS vote_type
+    COALESCE(pv.vote_type, 0) AS vote_type,
+    COALESCE(cv.vote_type, 0) AS current_vote_type
 FROM opinions
 LEFT JOIN users
     ON opinions.user_id = users.user_id
@@ -30,7 +31,13 @@ LEFT JOIN (
     SELECT votes.vote_type, votes.user_id, votes.opinion_id
     FROM votes
 ) pv ON opinions.parent_opinion_id = pv.opinion_id
-    AND opinions.user_id = vote.user_id
+    AND opinions.user_id = pv.user_id
+-- ユーザーIDが提供された場合、そのユーザーの投票ステータスを一緒に取得
+LEFT JOIN (
+    SELECT votes.vote_type, votes.user_id, votes.opinion_id
+    FROM votes
+) cv ON opinions.user_id = COALESCE(sqlc.narg('user_id'), opinions.user_id)
+    AND opinions.opinion_id = cv.opinion_id
 WHERE opinions.opinion_id = $1;
 
 -- name: GetOpinionReplies :many
@@ -45,7 +52,8 @@ SELECT
     users.display_name AS display_name,
     users.display_id AS display_id,
     users.icon_url AS icon_url,
-    COALESCE(parent_vote.vote_type, 0) AS vote_type
+    COALESCE(pv.vote_type, 0) AS vote_type,
+    COALESCE(cv.vote_type, 0) AS current_vote_type
 FROM opinions
 LEFT JOIN users
     ON opinions.user_id = users.user_id
@@ -54,5 +62,11 @@ LEFT JOIN (
     SELECT votes.vote_type, votes.user_id
     FROM votes
     WHERE votes.opinion_id = $1
-) parent_vote ON opinions.user_id = parent_vote.user_id
+) pv ON opinions.user_id = pv.user_id
+-- ユーザーIDが提供された場合、そのユーザーの投票ステータスを一緒に取得
+LEFT JOIN (
+    SELECT votes.vote_type, votes.user_id, votes.opinion_id
+    FROM votes
+) cv ON opinions.user_id = COALESCE(sqlc.narg('user_id'), opinions.user_id)
+    AND opinions.opinion_id = cv.opinion_id
 WHERE opinions.parent_opinion_id = $1;

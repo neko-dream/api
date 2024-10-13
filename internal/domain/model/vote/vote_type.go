@@ -16,13 +16,13 @@ func (v VoteType) Int() int {
 func (v VoteType) String() string {
 	switch v {
 	case Agreed:
-		return "agreed"
+		return "agree"
 	case Disagreed:
-		return "disagreed"
+		return "disagree"
 	case Pass:
 		return "pass"
 	default:
-		return "unvoted"
+		return "unvote"
 	}
 }
 
