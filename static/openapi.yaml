@@ -1045,7 +1045,8 @@ paths:
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
-      security: []
+      security:
+        - SessionId: []
       x-ogen-operation-group: Opinion
   /talksessions/{talkSessionID}/opinions:
     post:
