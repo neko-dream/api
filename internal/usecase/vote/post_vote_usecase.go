@@ -54,6 +54,7 @@ func (i *postVoteInteractor) Execute(ctx context.Context, input PostVoteInput) (
 	if err != nil {
 		return nil, errtrace.Wrap(err)
 	}
+	// 投票を行っている場合、エラーを返す
 	if voted {
 		return nil, messages.OpinionAlreadyVoted
 	}
@@ -74,6 +75,7 @@ func (i *postVoteInteractor) Execute(ctx context.Context, input PostVoteInput) (
 		if err := i.VoteRepository.Create(ctx, *vote); err != nil {
 			return messages.VoteFailed
 		}
+		// TODO: 分析エンドポイントへのリクエストを追加
 
 		return nil
 	}); err != nil {
