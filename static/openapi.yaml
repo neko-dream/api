@@ -93,12 +93,25 @@ paths:
                   - createdAt
                   - scheduledEndTime
         '400':
-          description: ErroResponse
+          description: ErrorResponse
           content:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
       security: []
       x-ogen-operation-group: TalkSession
   /talksessions:
@@ -212,12 +225,25 @@ paths:
                   - createdAt
                   - scheduledEndTime
         '400':
-          description: ErroResponse
+          description: ErrorResponse
           content:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
       security:
         - SessionId: []
       x-ogen-operation-group: TalkSession
@@ -373,19 +399,45 @@ paths:
                   - talkSessions
                   - pagination
         '400':
-          description: ErroResponse
+          description: ErrorResponse
           content:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
         '500':
           description: ServerErrorResponse
           content:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
       security: []
       x-ogen-operation-group: TalkSession
   /user:
@@ -542,19 +594,45 @@ paths:
                   - displayID
                   - displayName
         '400':
-          description: ErroResponse
+          description: ErrorResponse
           content:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
         '500':
           description: ServerErrorResponse
           content:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
       security:
         - SessionId: []
       x-ogen-operation-group: user
@@ -702,19 +780,45 @@ paths:
                   - displayID
                   - displayName
         '400':
-          description: ErroResponse
+          description: ErrorResponse
           content:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
         '500':
           description: ServerErrorResponse
           content:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
       security:
         - SessionId: []
       x-ogen-operation-group: user
@@ -814,19 +918,45 @@ paths:
                     - user
                     - commentCount
         '400':
-          description: ErroResponse
+          description: ErrorResponse
           content:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
         '500':
           description: ServerErrorResponse
           content:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
       security: []
       x-ogen-operation-group: Opinion
   /talksessions/{talkSessionID}/opinions:
@@ -882,19 +1012,45 @@ paths:
                 type: object
                 properties: {}
         '400':
-          description: ErroResponse
+          description: ErrorResponse
           content:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
         '500':
           description: ServerErrorResponse
           content:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
       security:
         - SessionId: []
       x-ogen-operation-group: Opinion
@@ -987,19 +1143,45 @@ paths:
                     - content
                     - id
         '400':
-          description: ErroResponse
+          description: ErrorResponse
           content:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
         '500':
           description: ServerErrorResponse
           content:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
       security: []
       x-ogen-operation-group: Vote
   /talksessions/{talkSessionID}/opinions/{opinionID}/replies:
@@ -1214,19 +1396,45 @@ paths:
                   - rootOpinion
                   - opinions
         '400':
-          description: ErroResponse
+          description: ErrorResponse
           content:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
         '500':
           description: ServerErrorResponse
           content:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
       security: []
       x-ogen-operation-group: Opinion
   /talksessions/{talkSessionId}/opinion:
@@ -1256,19 +1464,45 @@ paths:
                 required:
                   - 01J93WTW4J3ZBAAVVZV8PSWZ6R
         '400':
-          description: ErroResponse
+          description: ErrorResponse
           content:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
         '500':
           description: ServerErrorResponse
           content:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
       security: []
       x-ogen-operation-group: Opinion
   /test:
@@ -1307,12 +1541,18 @@ paths:
                     format: url
                     nullable: true
         '400':
-          description: ErroResponse
+          description: ErrorResponse
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
         '500':
           description: ServerErrorResponse
           content:
@@ -1320,6 +1560,12 @@ paths:
               schema:
                 type: object
                 properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
       security: []
       x-ogen-operation-group: test
   /auth/token/info:
@@ -1379,19 +1625,45 @@ paths:
                   - jti
                   - isVerify
         '400':
-          description: ErroResponse
+          description: ErrorResponse
           content:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
         '500':
           description: ServerErrorResponse
           content:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
       security:
         - SessionId: []
       x-ogen-operation-group: Auth

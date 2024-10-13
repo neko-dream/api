@@ -37,7 +37,30 @@ func (s *AuthorizeFound) SetSetCookie(val OptString) {
 	s.SetCookie = val
 }
 
-type CreateTalkSessionBadRequest struct{}
+type CreateTalkSessionBadRequest struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *CreateTalkSessionBadRequest) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *CreateTalkSessionBadRequest) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *CreateTalkSessionBadRequest) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *CreateTalkSessionBadRequest) SetMessage(val string) {
+	s.Message = val
+}
 
 func (*CreateTalkSessionBadRequest) createTalkSessionRes() {}
 
@@ -334,11 +357,57 @@ func (s *CreateTalkSessionReq) SetLongitude(val OptNilFloat64) {
 	s.Longitude = val
 }
 
-type EditUserProfileBadRequest struct{}
+type EditUserProfileBadRequest struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *EditUserProfileBadRequest) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *EditUserProfileBadRequest) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *EditUserProfileBadRequest) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *EditUserProfileBadRequest) SetMessage(val string) {
+	s.Message = val
+}
 
 func (*EditUserProfileBadRequest) editUserProfileRes() {}
 
-type EditUserProfileInternalServerError struct{}
+type EditUserProfileInternalServerError struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *EditUserProfileInternalServerError) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *EditUserProfileInternalServerError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *EditUserProfileInternalServerError) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *EditUserProfileInternalServerError) SetMessage(val string) {
+	s.Message = val
+}
 
 func (*EditUserProfileInternalServerError) editUserProfileRes() {}
 
@@ -640,7 +709,30 @@ func (s *EditUserProfileReqOccupation) UnmarshalText(data []byte) error {
 	}
 }
 
-type GetTalkSessionDetailBadRequest struct{}
+type GetTalkSessionDetailBadRequest struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *GetTalkSessionDetailBadRequest) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *GetTalkSessionDetailBadRequest) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *GetTalkSessionDetailBadRequest) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *GetTalkSessionDetailBadRequest) SetMessage(val string) {
+	s.Message = val
+}
 
 func (*GetTalkSessionDetailBadRequest) getTalkSessionDetailRes() {}
 
@@ -890,11 +982,57 @@ func (s *GetTalkSessionDetailOKOwner) SetIconURL(val OptString) {
 	s.IconURL = val
 }
 
-type GetTalkSessionListBadRequest struct{}
+type GetTalkSessionListBadRequest struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *GetTalkSessionListBadRequest) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *GetTalkSessionListBadRequest) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *GetTalkSessionListBadRequest) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *GetTalkSessionListBadRequest) SetMessage(val string) {
+	s.Message = val
+}
 
 func (*GetTalkSessionListBadRequest) getTalkSessionListRes() {}
 
-type GetTalkSessionListInternalServerError struct{}
+type GetTalkSessionListInternalServerError struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *GetTalkSessionListInternalServerError) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *GetTalkSessionListInternalServerError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *GetTalkSessionListInternalServerError) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *GetTalkSessionListInternalServerError) SetMessage(val string) {
+	s.Message = val
+}
 
 func (*GetTalkSessionListInternalServerError) getTalkSessionListRes() {}
 
@@ -1271,11 +1409,57 @@ func (s *GetTalkSessionListStatus) UnmarshalText(data []byte) error {
 	}
 }
 
-type GetTopOpinionsBadRequest struct{}
+type GetTopOpinionsBadRequest struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *GetTopOpinionsBadRequest) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *GetTopOpinionsBadRequest) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *GetTopOpinionsBadRequest) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *GetTopOpinionsBadRequest) SetMessage(val string) {
+	s.Message = val
+}
 
 func (*GetTopOpinionsBadRequest) getTopOpinionsRes() {}
 
-type GetTopOpinionsInternalServerError struct{}
+type GetTopOpinionsInternalServerError struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *GetTopOpinionsInternalServerError) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *GetTopOpinionsInternalServerError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *GetTopOpinionsInternalServerError) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *GetTopOpinionsInternalServerError) SetMessage(val string) {
+	s.Message = val
+}
 
 func (*GetTopOpinionsInternalServerError) getTopOpinionsRes() {}
 
@@ -1363,11 +1547,57 @@ type OAuthRevokeUnauthorized struct{}
 
 func (*OAuthRevokeUnauthorized) oAuthRevokeRes() {}
 
-type OAuthTokenInfoBadRequest struct{}
+type OAuthTokenInfoBadRequest struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *OAuthTokenInfoBadRequest) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *OAuthTokenInfoBadRequest) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *OAuthTokenInfoBadRequest) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *OAuthTokenInfoBadRequest) SetMessage(val string) {
+	s.Message = val
+}
 
 func (*OAuthTokenInfoBadRequest) oAuthTokenInfoRes() {}
 
-type OAuthTokenInfoInternalServerError struct{}
+type OAuthTokenInfoInternalServerError struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *OAuthTokenInfoInternalServerError) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *OAuthTokenInfoInternalServerError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *OAuthTokenInfoInternalServerError) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *OAuthTokenInfoInternalServerError) SetMessage(val string) {
+	s.Message = val
+}
 
 func (*OAuthTokenInfoInternalServerError) oAuthTokenInfoRes() {}
 
@@ -1496,11 +1726,57 @@ func (s *OAuthTokenInfoOK) SetIsVerify(val bool) {
 
 func (*OAuthTokenInfoOK) oAuthTokenInfoRes() {}
 
-type OpinionCommentsBadRequest struct{}
+type OpinionCommentsBadRequest struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *OpinionCommentsBadRequest) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *OpinionCommentsBadRequest) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *OpinionCommentsBadRequest) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *OpinionCommentsBadRequest) SetMessage(val string) {
+	s.Message = val
+}
 
 func (*OpinionCommentsBadRequest) opinionCommentsRes() {}
 
-type OpinionCommentsInternalServerError struct{}
+type OpinionCommentsInternalServerError struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *OpinionCommentsInternalServerError) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *OpinionCommentsInternalServerError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *OpinionCommentsInternalServerError) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *OpinionCommentsInternalServerError) SetMessage(val string) {
+	s.Message = val
+}
 
 func (*OpinionCommentsInternalServerError) opinionCommentsRes() {}
 
@@ -3622,11 +3898,57 @@ func (o OptVoteReq) Or(d VoteReq) VoteReq {
 	return d
 }
 
-type PostOpinionPostBadRequest struct{}
+type PostOpinionPostBadRequest struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *PostOpinionPostBadRequest) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *PostOpinionPostBadRequest) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *PostOpinionPostBadRequest) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *PostOpinionPostBadRequest) SetMessage(val string) {
+	s.Message = val
+}
 
 func (*PostOpinionPostBadRequest) postOpinionPostRes() {}
 
-type PostOpinionPostInternalServerError struct{}
+type PostOpinionPostInternalServerError struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *PostOpinionPostInternalServerError) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *PostOpinionPostInternalServerError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *PostOpinionPostInternalServerError) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *PostOpinionPostInternalServerError) SetMessage(val string) {
+	s.Message = val
+}
 
 func (*PostOpinionPostInternalServerError) postOpinionPostRes() {}
 
@@ -3692,11 +4014,57 @@ func (s *PostOpinionPostReq) SetPicture(val OptMultipartFile) {
 	s.Picture = val
 }
 
-type RegisterUserBadRequest struct{}
+type RegisterUserBadRequest struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *RegisterUserBadRequest) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *RegisterUserBadRequest) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *RegisterUserBadRequest) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *RegisterUserBadRequest) SetMessage(val string) {
+	s.Message = val
+}
 
 func (*RegisterUserBadRequest) registerUserRes() {}
 
-type RegisterUserInternalServerError struct{}
+type RegisterUserInternalServerError struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *RegisterUserInternalServerError) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *RegisterUserInternalServerError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *RegisterUserInternalServerError) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *RegisterUserInternalServerError) SetMessage(val string) {
+	s.Message = val
+}
 
 func (*RegisterUserInternalServerError) registerUserRes() {}
 
@@ -4024,11 +4392,57 @@ func (s *SessionId) SetAPIKey(val string) {
 	s.APIKey = val
 }
 
-type SwipeOpinionsBadRequest struct{}
+type SwipeOpinionsBadRequest struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *SwipeOpinionsBadRequest) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *SwipeOpinionsBadRequest) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *SwipeOpinionsBadRequest) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *SwipeOpinionsBadRequest) SetMessage(val string) {
+	s.Message = val
+}
 
 func (*SwipeOpinionsBadRequest) swipeOpinionsRes() {}
 
-type SwipeOpinionsInternalServerError struct{}
+type SwipeOpinionsInternalServerError struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *SwipeOpinionsInternalServerError) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *SwipeOpinionsInternalServerError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *SwipeOpinionsInternalServerError) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *SwipeOpinionsInternalServerError) SetMessage(val string) {
+	s.Message = val
+}
 
 func (*SwipeOpinionsInternalServerError) swipeOpinionsRes() {}
 
@@ -4324,11 +4738,57 @@ func (s *TestOK) SetOptNilUrl(val OptNilString) {
 
 func (*TestOK) testRes() {}
 
-type VoteBadRequest struct{}
+type VoteBadRequest struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *VoteBadRequest) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *VoteBadRequest) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *VoteBadRequest) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *VoteBadRequest) SetMessage(val string) {
+	s.Message = val
+}
 
 func (*VoteBadRequest) voteRes() {}
 
-type VoteInternalServerError struct{}
+type VoteInternalServerError struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *VoteInternalServerError) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *VoteInternalServerError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *VoteInternalServerError) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *VoteInternalServerError) SetMessage(val string) {
+	s.Message = val
+}
 
 func (*VoteInternalServerError) voteRes() {}
 
