@@ -120,28 +120,28 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 		if userDemographics.Municipality() != nil {
 			municipality = sql.NullString{String: (*userDemographics.Municipality()).String(), Valid: true}
 		}
+		var yearOfBirth sql.NullInt32
+		if userDemographics.YearOfBirth() != nil {
+			yearOfBirth = sql.NullInt32{Int32: int32(*userDemographics.YearOfBirth()), Valid: true}
+		}
+		var householdSize sql.NullInt16
+		if userDemographics.HouseholdSize() != nil {
+			householdSize = sql.NullInt16{Int16: int16(*userDemographics.HouseholdSize()), Valid: true}
+		}
+		var occupation sql.NullInt16
+		if userDemographics.Occupation() != nil {
+			occupation = sql.NullInt16{Int16: int16(*userDemographics.Occupation()), Valid: true}
+		}
 
 		if err := u.GetQueries(ctx).
 			UpdateOrCreateUserDemographics(ctx, model.UpdateOrCreateUserDemographicsParams{
 				UserDemographicsID: userDemographics.UserDemographicsID().UUID(),
 				UserID:             user.UserID().UUID(),
-				YearOfBirth: utils.IfThenElse(
-					userDemographics.YearOfBirth() != nil,
-					sql.NullInt32{Int32: int32(*userDemographics.YearOfBirth()), Valid: true},
-					sql.NullInt32{},
-				),
-				Occupation: utils.IfThenElse(
-					userDemographics.Occupation() != nil,
-					sql.NullInt16{Int16: int16(*userDemographics.Occupation()), Valid: true},
-					sql.NullInt16{},
-				),
-				Municipality: municipality,
-				HouseholdSize: utils.IfThenElse(
-					userDemographics.HouseholdSize() != nil,
-					sql.NullInt16{Int16: int16(*userDemographics.HouseholdSize()), Valid: true},
-					sql.NullInt16{},
-				),
-				Gender: gender,
+				YearOfBirth:        yearOfBirth,
+				Occupation:         occupation,
+				Municipality:       municipality,
+				HouseholdSize:      householdSize,
+				Gender:             gender,
 			}); err != nil {
 			utils.HandleError(ctx, err, "UpdateOrCreateUserDemographics")
 			return errtrace.Wrap(err)
