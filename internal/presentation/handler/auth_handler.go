@@ -98,7 +98,8 @@ func (a *authHandler) OAuthRevoke(ctx context.Context) (oas.OAuthRevokeRes, erro
 	}
 
 	// 204 No Content
-	return *new(oas.OAuthRevokeRes), nil
+	res := &oas.OAuthRevokeNoContent{}
+	return res, nil
 }
 
 // OAuthTokenInfo implements oas.AuthHandler.
@@ -120,8 +121,8 @@ func (a *authHandler) OAuthTokenInfo(ctx context.Context) (oas.OAuthTokenInfoRes
 		Sub:         claim.Sub,
 		Jti:         sessID.String(),
 		IsVerify:    claim.IsVerify,
-		DisplayId:   utils.ToOptNil[oas.OptString](claim.DisplayID),
-		DisplayName: utils.ToOptNil[oas.OptString](claim.DisplayName),
-		IconURL:     utils.ToOptNil[oas.OptString](claim.IconURL),
+		DisplayId:   utils.ToOpt[oas.OptString](claim.DisplayID),
+		DisplayName: utils.ToOpt[oas.OptString](claim.DisplayName),
+		IconURL:     utils.ToOpt[oas.OptString](claim.IconURL),
 	}, nil
 }
