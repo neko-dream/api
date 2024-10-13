@@ -67,15 +67,6 @@ func (UnimplementedHandler) GetTopOpinions(ctx context.Context, params GetTopOpi
 	return r, ht.ErrNotImplemented
 }
 
-// ListOpinions implements listOpinions operation.
-//
-// ランダムな意見.
-//
-// GET /talksession/{talkSessionID}/opinions
-func (UnimplementedHandler) ListOpinions(ctx context.Context, params ListOpinionsParams) (r ListOpinionsRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // OAuthCallback implements oauth_callback operation.
 //
 // Auth Callback.
@@ -107,7 +98,7 @@ func (UnimplementedHandler) OAuthTokenInfo(ctx context.Context) (r OAuthTokenInf
 //
 // 意見に対するコメント一覧を返す.
 //
-// GET /talksessions/{talkSessionID}/opinions/{opinionID}
+// GET /talksessions/{talkSessionID}/opinions/{opinionID}/replies
 func (UnimplementedHandler) OpinionComments(ctx context.Context, params OpinionCommentsParams) (r OpinionCommentsRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
@@ -127,6 +118,15 @@ func (UnimplementedHandler) PostOpinionPost(ctx context.Context, req OptPostOpin
 //
 // POST /user
 func (UnimplementedHandler) RegisterUser(ctx context.Context, req OptRegisterUserReq) (r RegisterUserRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// SwipeOpinions implements swipe_opinions operation.
+//
+// セッションの中からまだ投票していない意見をランダムに取得する.
+//
+// GET /talksession/{talkSessionID}/swipe_opinions
+func (UnimplementedHandler) SwipeOpinions(ctx context.Context, params SwipeOpinionsParams) (r SwipeOpinionsRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

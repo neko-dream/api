@@ -18,30 +18,43 @@ import (
 )
 
 type opinionHandler struct {
-	postOpinionUsecase opinion_usecase.PostOpinionUseCase
+	postOpinionUsecase       opinion_usecase.PostOpinionUseCase
+	getOpinionRepliesUsecase opinion_usecase.GetOpinionRepliesUseCase
 }
 
 func NewOpinionHandler(
 	postOpinionUsecase opinion_usecase.PostOpinionUseCase,
+	getOpinionRepliesUsecase opinion_usecase.GetOpinionRepliesUseCase,
 ) oas.OpinionHandler {
 	return &opinionHandler{
-		postOpinionUsecase: postOpinionUsecase,
+		postOpinionUsecase:       postOpinionUsecase,
+		getOpinionRepliesUsecase: getOpinionRepliesUsecase,
 	}
 }
 
-// GetTopOpinions implements oas.OpinionHandler.
+// GetTopOpinions 代表意見取得
 func (o *opinionHandler) GetTopOpinions(ctx context.Context, params oas.GetTopOpinionsParams) (oas.GetTopOpinionsRes, error) {
 	panic("unimplemented")
 }
 
-// ListOpinions implements oas.OpinionHandler.
-func (o *opinionHandler) ListOpinions(ctx context.Context, params oas.ListOpinionsParams) (oas.ListOpinionsRes, error) {
+// SwipeOpinions スワイプ用の意見取得
+// 自分が投稿した意見は取得しない
+func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpinionsParams) (oas.SwipeOpinionsRes, error) {
 	panic("unimplemented")
 }
 
-// OpinionComments implements oas.OpinionHandler.
+// OpinionComments 意見に対するリプライ意見取得
 func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.OpinionCommentsParams) (oas.OpinionCommentsRes, error) {
-	panic("unimplemented")
+	_, err := o.getOpinionRepliesUsecase.Execute(ctx, opinion_usecase.GetOpinionRepliesInput{
+		OpinionID: shared.MustParseUUID[opinion.Opinion](params.OpinionID),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	out := &oas.OpinionCommentsOK{}
+	return out, nil
+
 }
 
 // PostOpinionPost implements oas.OpinionHandler.

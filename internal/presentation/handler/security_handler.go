@@ -23,6 +23,11 @@ func (s *securityHandler) HandleSessionId(ctx context.Context, operationName str
 	if claim.IsExpired() {
 		return ctx, messages.TokenExpiredError
 	}
+	// RegisterUser以外の操作はユーザー登録済みであることを確認
+	if !claim.IsVerify && operationName != "RegisterUser" {
+		return ctx, messages.TokenNotUserRegisteredError
+	}
+
 	sessID, err := claim.SessionID()
 	if err != nil {
 		return ctx, messages.InternalServerError
@@ -33,6 +38,10 @@ func (s *securityHandler) HandleSessionId(ctx context.Context, operationName str
 	if err != nil {
 		return ctx, messages.TokenExpiredError
 	}
+	if sess == nil {
+		return ctx, messages.ForbiddenError
+	}
+
 	if !sess.IsActive() {
 		return ctx, messages.TokenExpiredError
 	}

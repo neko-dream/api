@@ -59,6 +59,7 @@ func BuildContainer() *dig.Container {
 		{talk_session_usecase.NewCreateTalkSessionUseCase, nil},
 		{talk_session_usecase.NewListTalkSessionQueryHandler, nil},
 		{opinion_usecase.NewPostOpinionUseCase, nil},
+		{opinion_usecase.NewGetOpinionRepliesUseCase, nil},
 		{vote_usecase.NewPostVoteUseCase, nil},
 		{handler.NewSecurityHandler, nil},
 		{handler.NewAuthHandler, nil},

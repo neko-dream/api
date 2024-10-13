@@ -47,3 +47,135 @@ func (q *Queries) CreateOpinion(ctx context.Context, arg CreateOpinionParams) er
 	)
 	return err
 }
+
+const getOpinionByID = `-- name: GetOpinionByID :one
+SELECT
+    opinions.opinion_id,
+    opinions.talk_session_id,
+    opinions.user_id,
+    opinions.parent_opinion_id,
+    opinions.title,
+    opinions.content,
+    opinions.created_at,
+    users.display_name AS display_name,
+    users.display_id AS display_id,
+    users.icon_url AS icon_url,
+    COALESCE(pv.vote_type, 0) AS vote_type
+FROM opinions
+LEFT JOIN users
+    ON opinions.user_id = users.user_id
+LEFT JOIN (
+    SELECT votes.vote_type, votes.user_id, votes.opinion_id
+    FROM votes
+) pv ON opinions.parent_opinion_id = pv.opinion_id
+    AND opinions.user_id = vote.user_id
+WHERE opinions.opinion_id = $1
+`
+
+type GetOpinionByIDRow struct {
+	OpinionID       uuid.UUID
+	TalkSessionID   uuid.UUID
+	UserID          uuid.UUID
+	ParentOpinionID uuid.NullUUID
+	Title           sql.NullString
+	Content         string
+	CreatedAt       time.Time
+	DisplayName     sql.NullString
+	DisplayID       sql.NullString
+	IconUrl         sql.NullString
+	VoteType        int16
+}
+
+// 親意見に対するユーザーの投票を取得
+func (q *Queries) GetOpinionByID(ctx context.Context, opinionID uuid.UUID) (GetOpinionByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getOpinionByID, opinionID)
+	var i GetOpinionByIDRow
+	err := row.Scan(
+		&i.OpinionID,
+		&i.TalkSessionID,
+		&i.UserID,
+		&i.ParentOpinionID,
+		&i.Title,
+		&i.Content,
+		&i.CreatedAt,
+		&i.DisplayName,
+		&i.DisplayID,
+		&i.IconUrl,
+		&i.VoteType,
+	)
+	return i, err
+}
+
+const getOpinionReplies = `-- name: GetOpinionReplies :many
+SELECT
+    opinions.opinion_id,
+    opinions.talk_session_id,
+    opinions.user_id,
+    opinions.parent_opinion_id,
+    opinions.title,
+    opinions.content,
+    opinions.created_at,
+    users.display_name AS display_name,
+    users.display_id AS display_id,
+    users.icon_url AS icon_url,
+    COALESCE(parent_vote.vote_type, 0) AS vote_type
+FROM opinions
+LEFT JOIN users
+    ON opinions.user_id = users.user_id
+LEFT JOIN (
+    SELECT votes.vote_type, votes.user_id
+    FROM votes
+    WHERE votes.opinion_id = $1
+) parent_vote ON opinions.user_id = parent_vote.user_id
+WHERE opinions.parent_opinion_id = $1
+`
+
+type GetOpinionRepliesRow struct {
+	OpinionID       uuid.UUID
+	TalkSessionID   uuid.UUID
+	UserID          uuid.UUID
+	ParentOpinionID uuid.NullUUID
+	Title           sql.NullString
+	Content         string
+	CreatedAt       time.Time
+	DisplayName     sql.NullString
+	DisplayID       sql.NullString
+	IconUrl         sql.NullString
+	VoteType        int16
+}
+
+// 親意見に対する子意見主の投票を取得
+func (q *Queries) GetOpinionReplies(ctx context.Context, opinionID uuid.UUID) ([]GetOpinionRepliesRow, error) {
+	rows, err := q.db.QueryContext(ctx, getOpinionReplies, opinionID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetOpinionRepliesRow
+	for rows.Next() {
+		var i GetOpinionRepliesRow
+		if err := rows.Scan(
+			&i.OpinionID,
+			&i.TalkSessionID,
+			&i.UserID,
+			&i.ParentOpinionID,
+			&i.Title,
+			&i.Content,
+			&i.CreatedAt,
+			&i.DisplayName,
+			&i.DisplayID,
+			&i.IconUrl,
+			&i.VoteType,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

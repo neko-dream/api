@@ -31,4 +31,9 @@ var (
 		Code:       "AUTH-0005",
 		Message:    "トークンの生成に失敗しました。",
 	}
+	TokenNotUserRegisteredError = &APIError{
+		StatusCode: 401,
+		Code:       "AUTH-0006",
+		Message:    "ユーザー登録が完了していません。登録を完了してください。",
+	}
 )

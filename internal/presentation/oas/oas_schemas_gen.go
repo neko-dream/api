@@ -1247,223 +1247,6 @@ type GetTopOpinionsOK struct{}
 
 func (*GetTopOpinionsOK) getTopOpinionsRes() {}
 
-type ListOpinionsInternalServerError struct{}
-
-func (*ListOpinionsInternalServerError) listOpinionsRes() {}
-
-type ListOpinionsOKApplicationJSON []ListOpinionsOKItem
-
-func (*ListOpinionsOKApplicationJSON) listOpinionsRes() {}
-
-type ListOpinionsOKItem struct {
-	Opinion ListOpinionsOKItemOpinion `json:"opinion"`
-	// 作成ユーザー.
-	User         ListOpinionsOKItemUser `json:"user"`
-	CommentCount string                 `json:"commentCount"`
-}
-
-// GetOpinion returns the value of Opinion.
-func (s *ListOpinionsOKItem) GetOpinion() ListOpinionsOKItemOpinion {
-	return s.Opinion
-}
-
-// GetUser returns the value of User.
-func (s *ListOpinionsOKItem) GetUser() ListOpinionsOKItemUser {
-	return s.User
-}
-
-// GetCommentCount returns the value of CommentCount.
-func (s *ListOpinionsOKItem) GetCommentCount() string {
-	return s.CommentCount
-}
-
-// SetOpinion sets the value of Opinion.
-func (s *ListOpinionsOKItem) SetOpinion(val ListOpinionsOKItemOpinion) {
-	s.Opinion = val
-}
-
-// SetUser sets the value of User.
-func (s *ListOpinionsOKItem) SetUser(val ListOpinionsOKItemUser) {
-	s.User = val
-}
-
-// SetCommentCount sets the value of CommentCount.
-func (s *ListOpinionsOKItem) SetCommentCount(val string) {
-	s.CommentCount = val
-}
-
-type ListOpinionsOKItemOpinion struct {
-	// 意見ID.
-	ID    string    `json:"id"`
-	Title OptString `json:"title"`
-	// 意見のテキスト.
-	Content string `json:"content"`
-	// 親の意見ID。ルートならば無し.
-	ParentID OptString `json:"parentID"`
-	// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
-	VoteType OptListOpinionsOKItemOpinionVoteType `json:"voteType"`
-	// 画像が返る場合もある.
-	PictureURL OptString `json:"pictureURL"`
-	// 参考文献URL.
-	ReferenceURL OptString `json:"referenceURL"`
-}
-
-// GetID returns the value of ID.
-func (s *ListOpinionsOKItemOpinion) GetID() string {
-	return s.ID
-}
-
-// GetTitle returns the value of Title.
-func (s *ListOpinionsOKItemOpinion) GetTitle() OptString {
-	return s.Title
-}
-
-// GetContent returns the value of Content.
-func (s *ListOpinionsOKItemOpinion) GetContent() string {
-	return s.Content
-}
-
-// GetParentID returns the value of ParentID.
-func (s *ListOpinionsOKItemOpinion) GetParentID() OptString {
-	return s.ParentID
-}
-
-// GetVoteType returns the value of VoteType.
-func (s *ListOpinionsOKItemOpinion) GetVoteType() OptListOpinionsOKItemOpinionVoteType {
-	return s.VoteType
-}
-
-// GetPictureURL returns the value of PictureURL.
-func (s *ListOpinionsOKItemOpinion) GetPictureURL() OptString {
-	return s.PictureURL
-}
-
-// GetReferenceURL returns the value of ReferenceURL.
-func (s *ListOpinionsOKItemOpinion) GetReferenceURL() OptString {
-	return s.ReferenceURL
-}
-
-// SetID sets the value of ID.
-func (s *ListOpinionsOKItemOpinion) SetID(val string) {
-	s.ID = val
-}
-
-// SetTitle sets the value of Title.
-func (s *ListOpinionsOKItemOpinion) SetTitle(val OptString) {
-	s.Title = val
-}
-
-// SetContent sets the value of Content.
-func (s *ListOpinionsOKItemOpinion) SetContent(val string) {
-	s.Content = val
-}
-
-// SetParentID sets the value of ParentID.
-func (s *ListOpinionsOKItemOpinion) SetParentID(val OptString) {
-	s.ParentID = val
-}
-
-// SetVoteType sets the value of VoteType.
-func (s *ListOpinionsOKItemOpinion) SetVoteType(val OptListOpinionsOKItemOpinionVoteType) {
-	s.VoteType = val
-}
-
-// SetPictureURL sets the value of PictureURL.
-func (s *ListOpinionsOKItemOpinion) SetPictureURL(val OptString) {
-	s.PictureURL = val
-}
-
-// SetReferenceURL sets the value of ReferenceURL.
-func (s *ListOpinionsOKItemOpinion) SetReferenceURL(val OptString) {
-	s.ReferenceURL = val
-}
-
-// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
-type ListOpinionsOKItemOpinionVoteType string
-
-const (
-	ListOpinionsOKItemOpinionVoteTypeAgree    ListOpinionsOKItemOpinionVoteType = "agree"
-	ListOpinionsOKItemOpinionVoteTypeDisagree ListOpinionsOKItemOpinionVoteType = "disagree"
-	ListOpinionsOKItemOpinionVoteTypePass     ListOpinionsOKItemOpinionVoteType = "pass"
-)
-
-// AllValues returns all ListOpinionsOKItemOpinionVoteType values.
-func (ListOpinionsOKItemOpinionVoteType) AllValues() []ListOpinionsOKItemOpinionVoteType {
-	return []ListOpinionsOKItemOpinionVoteType{
-		ListOpinionsOKItemOpinionVoteTypeAgree,
-		ListOpinionsOKItemOpinionVoteTypeDisagree,
-		ListOpinionsOKItemOpinionVoteTypePass,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s ListOpinionsOKItemOpinionVoteType) MarshalText() ([]byte, error) {
-	switch s {
-	case ListOpinionsOKItemOpinionVoteTypeAgree:
-		return []byte(s), nil
-	case ListOpinionsOKItemOpinionVoteTypeDisagree:
-		return []byte(s), nil
-	case ListOpinionsOKItemOpinionVoteTypePass:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *ListOpinionsOKItemOpinionVoteType) UnmarshalText(data []byte) error {
-	switch ListOpinionsOKItemOpinionVoteType(data) {
-	case ListOpinionsOKItemOpinionVoteTypeAgree:
-		*s = ListOpinionsOKItemOpinionVoteTypeAgree
-		return nil
-	case ListOpinionsOKItemOpinionVoteTypeDisagree:
-		*s = ListOpinionsOKItemOpinionVoteTypeDisagree
-		return nil
-	case ListOpinionsOKItemOpinionVoteTypePass:
-		*s = ListOpinionsOKItemOpinionVoteTypePass
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
-}
-
-// 作成ユーザー.
-type ListOpinionsOKItemUser struct {
-	DisplayID   string    `json:"displayID"`
-	DisplayName string    `json:"displayName"`
-	IconURL     OptString `json:"iconURL"`
-}
-
-// GetDisplayID returns the value of DisplayID.
-func (s *ListOpinionsOKItemUser) GetDisplayID() string {
-	return s.DisplayID
-}
-
-// GetDisplayName returns the value of DisplayName.
-func (s *ListOpinionsOKItemUser) GetDisplayName() string {
-	return s.DisplayName
-}
-
-// GetIconURL returns the value of IconURL.
-func (s *ListOpinionsOKItemUser) GetIconURL() OptString {
-	return s.IconURL
-}
-
-// SetDisplayID sets the value of DisplayID.
-func (s *ListOpinionsOKItemUser) SetDisplayID(val string) {
-	s.DisplayID = val
-}
-
-// SetDisplayName sets the value of DisplayName.
-func (s *ListOpinionsOKItemUser) SetDisplayName(val string) {
-	s.DisplayName = val
-}
-
-// SetIconURL sets the value of IconURL.
-func (s *ListOpinionsOKItemUser) SetIconURL(val OptString) {
-	s.IconURL = val
-}
-
 // NewNilRegisterUserReqGender returns new NilRegisterUserReqGender with value set to v.
 func NewNilRegisterUserReqGender(v RegisterUserReqGender) NilRegisterUserReqGender {
 	return NilRegisterUserReqGender{
@@ -2573,52 +2356,6 @@ func (o OptInt) Or(d int) int {
 	return d
 }
 
-// NewOptListOpinionsOKItemOpinionVoteType returns new OptListOpinionsOKItemOpinionVoteType with value set to v.
-func NewOptListOpinionsOKItemOpinionVoteType(v ListOpinionsOKItemOpinionVoteType) OptListOpinionsOKItemOpinionVoteType {
-	return OptListOpinionsOKItemOpinionVoteType{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptListOpinionsOKItemOpinionVoteType is optional ListOpinionsOKItemOpinionVoteType.
-type OptListOpinionsOKItemOpinionVoteType struct {
-	Value ListOpinionsOKItemOpinionVoteType
-	Set   bool
-}
-
-// IsSet returns true if OptListOpinionsOKItemOpinionVoteType was set.
-func (o OptListOpinionsOKItemOpinionVoteType) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptListOpinionsOKItemOpinionVoteType) Reset() {
-	var v ListOpinionsOKItemOpinionVoteType
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptListOpinionsOKItemOpinionVoteType) SetTo(v ListOpinionsOKItemOpinionVoteType) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptListOpinionsOKItemOpinionVoteType) Get() (v ListOpinionsOKItemOpinionVoteType, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptListOpinionsOKItemOpinionVoteType) Or(d ListOpinionsOKItemOpinionVoteType) ListOpinionsOKItemOpinionVoteType {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptMultipartFile returns new OptMultipartFile with value set to v.
 func NewOptMultipartFile(v ht.MultipartFile) OptMultipartFile {
 	return OptMultipartFile{
@@ -3336,6 +3073,52 @@ func (o OptString) Or(d string) string {
 	return d
 }
 
+// NewOptSwipeOpinionsOKItemOpinionVoteType returns new OptSwipeOpinionsOKItemOpinionVoteType with value set to v.
+func NewOptSwipeOpinionsOKItemOpinionVoteType(v SwipeOpinionsOKItemOpinionVoteType) OptSwipeOpinionsOKItemOpinionVoteType {
+	return OptSwipeOpinionsOKItemOpinionVoteType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptSwipeOpinionsOKItemOpinionVoteType is optional SwipeOpinionsOKItemOpinionVoteType.
+type OptSwipeOpinionsOKItemOpinionVoteType struct {
+	Value SwipeOpinionsOKItemOpinionVoteType
+	Set   bool
+}
+
+// IsSet returns true if OptSwipeOpinionsOKItemOpinionVoteType was set.
+func (o OptSwipeOpinionsOKItemOpinionVoteType) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptSwipeOpinionsOKItemOpinionVoteType) Reset() {
+	var v SwipeOpinionsOKItemOpinionVoteType
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptSwipeOpinionsOKItemOpinionVoteType) SetTo(v SwipeOpinionsOKItemOpinionVoteType) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptSwipeOpinionsOKItemOpinionVoteType) Get() (v SwipeOpinionsOKItemOpinionVoteType, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptSwipeOpinionsOKItemOpinionVoteType) Or(d SwipeOpinionsOKItemOpinionVoteType) SwipeOpinionsOKItemOpinionVoteType {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptURI returns new OptURI with value set to v.
 func NewOptURI(v url.URL) OptURI {
 	return OptURI{
@@ -3858,6 +3641,223 @@ func (s *SessionId) GetAPIKey() string {
 // SetAPIKey sets the value of APIKey.
 func (s *SessionId) SetAPIKey(val string) {
 	s.APIKey = val
+}
+
+type SwipeOpinionsInternalServerError struct{}
+
+func (*SwipeOpinionsInternalServerError) swipeOpinionsRes() {}
+
+type SwipeOpinionsOKApplicationJSON []SwipeOpinionsOKItem
+
+func (*SwipeOpinionsOKApplicationJSON) swipeOpinionsRes() {}
+
+type SwipeOpinionsOKItem struct {
+	Opinion SwipeOpinionsOKItemOpinion `json:"opinion"`
+	// 作成ユーザー.
+	User         SwipeOpinionsOKItemUser `json:"user"`
+	CommentCount string                  `json:"commentCount"`
+}
+
+// GetOpinion returns the value of Opinion.
+func (s *SwipeOpinionsOKItem) GetOpinion() SwipeOpinionsOKItemOpinion {
+	return s.Opinion
+}
+
+// GetUser returns the value of User.
+func (s *SwipeOpinionsOKItem) GetUser() SwipeOpinionsOKItemUser {
+	return s.User
+}
+
+// GetCommentCount returns the value of CommentCount.
+func (s *SwipeOpinionsOKItem) GetCommentCount() string {
+	return s.CommentCount
+}
+
+// SetOpinion sets the value of Opinion.
+func (s *SwipeOpinionsOKItem) SetOpinion(val SwipeOpinionsOKItemOpinion) {
+	s.Opinion = val
+}
+
+// SetUser sets the value of User.
+func (s *SwipeOpinionsOKItem) SetUser(val SwipeOpinionsOKItemUser) {
+	s.User = val
+}
+
+// SetCommentCount sets the value of CommentCount.
+func (s *SwipeOpinionsOKItem) SetCommentCount(val string) {
+	s.CommentCount = val
+}
+
+type SwipeOpinionsOKItemOpinion struct {
+	// 意見ID.
+	ID    string    `json:"id"`
+	Title OptString `json:"title"`
+	// 意見のテキスト.
+	Content string `json:"content"`
+	// 親の意見ID。ルートならば無し.
+	ParentID OptString `json:"parentID"`
+	// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+	VoteType OptSwipeOpinionsOKItemOpinionVoteType `json:"voteType"`
+	// 画像が返る場合もある.
+	PictureURL OptString `json:"pictureURL"`
+	// 参考文献URL.
+	ReferenceURL OptString `json:"referenceURL"`
+}
+
+// GetID returns the value of ID.
+func (s *SwipeOpinionsOKItemOpinion) GetID() string {
+	return s.ID
+}
+
+// GetTitle returns the value of Title.
+func (s *SwipeOpinionsOKItemOpinion) GetTitle() OptString {
+	return s.Title
+}
+
+// GetContent returns the value of Content.
+func (s *SwipeOpinionsOKItemOpinion) GetContent() string {
+	return s.Content
+}
+
+// GetParentID returns the value of ParentID.
+func (s *SwipeOpinionsOKItemOpinion) GetParentID() OptString {
+	return s.ParentID
+}
+
+// GetVoteType returns the value of VoteType.
+func (s *SwipeOpinionsOKItemOpinion) GetVoteType() OptSwipeOpinionsOKItemOpinionVoteType {
+	return s.VoteType
+}
+
+// GetPictureURL returns the value of PictureURL.
+func (s *SwipeOpinionsOKItemOpinion) GetPictureURL() OptString {
+	return s.PictureURL
+}
+
+// GetReferenceURL returns the value of ReferenceURL.
+func (s *SwipeOpinionsOKItemOpinion) GetReferenceURL() OptString {
+	return s.ReferenceURL
+}
+
+// SetID sets the value of ID.
+func (s *SwipeOpinionsOKItemOpinion) SetID(val string) {
+	s.ID = val
+}
+
+// SetTitle sets the value of Title.
+func (s *SwipeOpinionsOKItemOpinion) SetTitle(val OptString) {
+	s.Title = val
+}
+
+// SetContent sets the value of Content.
+func (s *SwipeOpinionsOKItemOpinion) SetContent(val string) {
+	s.Content = val
+}
+
+// SetParentID sets the value of ParentID.
+func (s *SwipeOpinionsOKItemOpinion) SetParentID(val OptString) {
+	s.ParentID = val
+}
+
+// SetVoteType sets the value of VoteType.
+func (s *SwipeOpinionsOKItemOpinion) SetVoteType(val OptSwipeOpinionsOKItemOpinionVoteType) {
+	s.VoteType = val
+}
+
+// SetPictureURL sets the value of PictureURL.
+func (s *SwipeOpinionsOKItemOpinion) SetPictureURL(val OptString) {
+	s.PictureURL = val
+}
+
+// SetReferenceURL sets the value of ReferenceURL.
+func (s *SwipeOpinionsOKItemOpinion) SetReferenceURL(val OptString) {
+	s.ReferenceURL = val
+}
+
+// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+type SwipeOpinionsOKItemOpinionVoteType string
+
+const (
+	SwipeOpinionsOKItemOpinionVoteTypeAgree    SwipeOpinionsOKItemOpinionVoteType = "agree"
+	SwipeOpinionsOKItemOpinionVoteTypeDisagree SwipeOpinionsOKItemOpinionVoteType = "disagree"
+	SwipeOpinionsOKItemOpinionVoteTypePass     SwipeOpinionsOKItemOpinionVoteType = "pass"
+)
+
+// AllValues returns all SwipeOpinionsOKItemOpinionVoteType values.
+func (SwipeOpinionsOKItemOpinionVoteType) AllValues() []SwipeOpinionsOKItemOpinionVoteType {
+	return []SwipeOpinionsOKItemOpinionVoteType{
+		SwipeOpinionsOKItemOpinionVoteTypeAgree,
+		SwipeOpinionsOKItemOpinionVoteTypeDisagree,
+		SwipeOpinionsOKItemOpinionVoteTypePass,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s SwipeOpinionsOKItemOpinionVoteType) MarshalText() ([]byte, error) {
+	switch s {
+	case SwipeOpinionsOKItemOpinionVoteTypeAgree:
+		return []byte(s), nil
+	case SwipeOpinionsOKItemOpinionVoteTypeDisagree:
+		return []byte(s), nil
+	case SwipeOpinionsOKItemOpinionVoteTypePass:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *SwipeOpinionsOKItemOpinionVoteType) UnmarshalText(data []byte) error {
+	switch SwipeOpinionsOKItemOpinionVoteType(data) {
+	case SwipeOpinionsOKItemOpinionVoteTypeAgree:
+		*s = SwipeOpinionsOKItemOpinionVoteTypeAgree
+		return nil
+	case SwipeOpinionsOKItemOpinionVoteTypeDisagree:
+		*s = SwipeOpinionsOKItemOpinionVoteTypeDisagree
+		return nil
+	case SwipeOpinionsOKItemOpinionVoteTypePass:
+		*s = SwipeOpinionsOKItemOpinionVoteTypePass
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// 作成ユーザー.
+type SwipeOpinionsOKItemUser struct {
+	DisplayID   string    `json:"displayID"`
+	DisplayName string    `json:"displayName"`
+	IconURL     OptString `json:"iconURL"`
+}
+
+// GetDisplayID returns the value of DisplayID.
+func (s *SwipeOpinionsOKItemUser) GetDisplayID() string {
+	return s.DisplayID
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *SwipeOpinionsOKItemUser) GetDisplayName() string {
+	return s.DisplayName
+}
+
+// GetIconURL returns the value of IconURL.
+func (s *SwipeOpinionsOKItemUser) GetIconURL() OptString {
+	return s.IconURL
+}
+
+// SetDisplayID sets the value of DisplayID.
+func (s *SwipeOpinionsOKItemUser) SetDisplayID(val string) {
+	s.DisplayID = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *SwipeOpinionsOKItemUser) SetDisplayName(val string) {
+	s.DisplayName = val
+}
+
+// SetIconURL sets the value of IconURL.
+func (s *SwipeOpinionsOKItemUser) SetIconURL(val OptString) {
+	s.IconURL = val
 }
 
 type TestInternalServerError struct{}

@@ -74,4 +74,3 @@ CREATE TABLE "opinions" (
   "content" varchar NOT NULL,
   "created_at" timestamp NOT NULL DEFAULT (now())
 );
-

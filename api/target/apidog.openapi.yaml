@@ -760,12 +760,12 @@
         "x-ogen-operation-group": "user"
       }
     },
-    "/talksession/{talkSessionID}/opinions": {
+    "/talksession/{talkSessionID}/swipe_opinions": {
       "get": {
-        "summary": "セッションの意見一覧",
+        "summary": "スワイプ用のエンドポイント",
         "deprecated": false,
-        "description": "ランダムな意見",
-        "operationId": "listOpinions",
+        "description": "セッションの中からまだ投票していない意見をランダムに取得する",
+        "operationId": "swipe_opinions",
         "tags": [
           "talk_session/opinion",
           "opinion"
@@ -776,15 +776,6 @@
             "in": "path",
             "description": "",
             "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "parentOpinionID",
-            "in": "query",
-            "description": "",
-            "required": false,
             "schema": {
               "type": "string"
             }
@@ -1013,7 +1004,7 @@
         "x-ogen-operation-group": "Vote"
       }
     },
-    "/talksessions/{talkSessionID}/opinions/{opinionID}": {
+    "/talksessions/{talkSessionID}/opinions/{opinionID}/replies": {
       "get": {
         "summary": "意見に対するコメント一覧を返す",
         "deprecated": false,
@@ -1036,7 +1027,7 @@
           {
             "name": "opinionID",
             "in": "path",
-            "description": "",
+            "description": "親意見のID",
             "required": true,
             "schema": {
               "type": "string"

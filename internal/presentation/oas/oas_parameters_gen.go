@@ -496,123 +496,6 @@ func decodeGetTopOpinionsParams(args [1]string, argsEscaped bool, r *http.Reques
 	return params, nil
 }
 
-// ListOpinionsParams is parameters of listOpinions operation.
-type ListOpinionsParams struct {
-	TalkSessionID   string
-	ParentOpinionID OptString
-}
-
-func unpackListOpinionsParams(packed middleware.Parameters) (params ListOpinionsParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "talkSessionID",
-			In:   "path",
-		}
-		params.TalkSessionID = packed[key].(string)
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "parentOpinionID",
-			In:   "query",
-		}
-		if v, ok := packed[key]; ok {
-			params.ParentOpinionID = v.(OptString)
-		}
-	}
-	return params
-}
-
-func decodeListOpinionsParams(args [1]string, argsEscaped bool, r *http.Request) (params ListOpinionsParams, _ error) {
-	q := uri.NewQueryDecoder(r.URL.Query())
-	// Decode path: talkSessionID.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "talkSessionID",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.TalkSessionID = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "talkSessionID",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	// Decode query: parentOpinionID.
-	if err := func() error {
-		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "parentOpinionID",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.HasParam(cfg); err == nil {
-			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotParentOpinionIDVal string
-				if err := func() error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-
-					c, err := conv.ToString(val)
-					if err != nil {
-						return err
-					}
-
-					paramsDotParentOpinionIDVal = c
-					return nil
-				}(); err != nil {
-					return err
-				}
-				params.ParentOpinionID.SetTo(paramsDotParentOpinionIDVal)
-				return nil
-			}); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "parentOpinionID",
-			In:   "query",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
 // OAuthCallbackParams is parameters of oauth_callback operation.
 type OAuthCallbackParams struct {
 	// OAuth2.0 State from Cookie.
@@ -880,7 +763,8 @@ func decodeOAuthCallbackParams(args [1]string, argsEscaped bool, r *http.Request
 // OpinionCommentsParams is parameters of opinionComments operation.
 type OpinionCommentsParams struct {
 	TalkSessionID string
-	OpinionID     string
+	// 親意見のID.
+	OpinionID string
 }
 
 func unpackOpinionCommentsParams(packed middleware.Parameters) (params OpinionCommentsParams) {
@@ -1012,6 +896,71 @@ func unpackPostOpinionPostParams(packed middleware.Parameters) (params PostOpini
 }
 
 func decodePostOpinionPostParams(args [1]string, argsEscaped bool, r *http.Request) (params PostOpinionPostParams, _ error) {
+	// Decode path: talkSessionID.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "talkSessionID",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.TalkSessionID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "talkSessionID",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// SwipeOpinionsParams is parameters of swipe_opinions operation.
+type SwipeOpinionsParams struct {
+	TalkSessionID string
+}
+
+func unpackSwipeOpinionsParams(packed middleware.Parameters) (params SwipeOpinionsParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "talkSessionID",
+			In:   "path",
+		}
+		params.TalkSessionID = packed[key].(string)
+	}
+	return params
+}
+
+func decodeSwipeOpinionsParams(args [1]string, argsEscaped bool, r *http.Request) (params SwipeOpinionsParams, _ error) {
 	// Decode path: talkSessionID.
 	if err := func() error {
 		param := args[0]

@@ -13,10 +13,6 @@ type GetTopOpinionsRes interface {
 	getTopOpinionsRes()
 }
 
-type ListOpinionsRes interface {
-	listOpinionsRes()
-}
-
 type OAuthRevokeRes interface {
 	oAuthRevokeRes()
 }
@@ -35,6 +31,10 @@ type PostOpinionPostRes interface {
 
 type RegisterUserRes interface {
 	registerUserRes()
+}
+
+type SwipeOpinionsRes interface {
+	swipeOpinionsRes()
 }
 
 type TestRes interface {

@@ -48,9 +48,6 @@ func (m *Migrator) Down() {
 	if err != nil {
 		panic(err)
 	}
-	if _, err := pgx.Exec("SET session_replication_role = replica;"); err != nil {
-		log.Println("Error setting session replication role:", err)
-	}
 	driver, err := postgres.WithInstance(pgx, &postgres.Config{})
 	if err != nil {
 		panic(err)

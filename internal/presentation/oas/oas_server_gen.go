@@ -56,17 +56,11 @@ type OpinionHandler interface {
 	//
 	// GET /talksessions/{talkSessionId}/opinion
 	GetTopOpinions(ctx context.Context, params GetTopOpinionsParams) (GetTopOpinionsRes, error)
-	// ListOpinions implements listOpinions operation.
-	//
-	// ランダムな意見.
-	//
-	// GET /talksession/{talkSessionID}/opinions
-	ListOpinions(ctx context.Context, params ListOpinionsParams) (ListOpinionsRes, error)
 	// OpinionComments implements opinionComments operation.
 	//
 	// 意見に対するコメント一覧を返す.
 	//
-	// GET /talksessions/{talkSessionID}/opinions/{opinionID}
+	// GET /talksessions/{talkSessionID}/opinions/{opinionID}/replies
 	OpinionComments(ctx context.Context, params OpinionCommentsParams) (OpinionCommentsRes, error)
 	// PostOpinionPost implements postOpinionPost operation.
 	//
@@ -74,6 +68,12 @@ type OpinionHandler interface {
 	//
 	// POST /talksessions/{talkSessionID}/opinions
 	PostOpinionPost(ctx context.Context, req OptPostOpinionPostReq, params PostOpinionPostParams) (PostOpinionPostRes, error)
+	// SwipeOpinions implements swipe_opinions operation.
+	//
+	// セッションの中からまだ投票していない意見をランダムに取得する.
+	//
+	// GET /talksession/{talkSessionID}/swipe_opinions
+	SwipeOpinions(ctx context.Context, params SwipeOpinionsParams) (SwipeOpinionsRes, error)
 }
 
 // TalkSessionHandler handles operations described by OpenAPI v3 specification.

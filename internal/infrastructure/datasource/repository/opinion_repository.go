@@ -11,6 +11,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/db"
 	model "github.com/neko-dream/server/internal/infrastructure/db/sqlc"
+	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
 )
 
@@ -40,6 +41,7 @@ func (o *opinionRepository) Create(ctx context.Context, op opinion.Opinion) erro
 		Content:         op.Content(),
 		CreatedAt:       op.CreatedAt(),
 	}); err != nil {
+		utils.HandleError(ctx, err, "opinionRepository.Create")
 		return err
 	}
 	return nil
