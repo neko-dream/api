@@ -42,14 +42,12 @@ func NewDummyInitializer(
 	}
 }
 
-func (i *DummyInitializer) Initialize() error {
+func (i *DummyInitializer) Initialize() {
 	log.Println("-------- Start DummyInitializer Initialize --------")
-	i.User()
-	i.TalkSession()
-	i.Opinion()
+	_ = i.User()
+	_ = i.TalkSession()
+	_ = i.Opinion()
 	log.Println("-------- End DummyInitializer Initialize --------")
-
-	return nil
 }
 
 func (d *DummyInitializer) User() error {
