@@ -931,7 +931,7 @@ paths:
                 properties: {}
       security: []
       x-ogen-operation-group: Vote
-  /talksession/{talkSessionID}/opinions/{opinionID}:
+  /talksessions/{talkSessionID}/opinions/{opinionID}:
     get:
       summary: 意見に対するコメント一覧を返す
       deprecated: false

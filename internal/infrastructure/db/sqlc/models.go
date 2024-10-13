@@ -21,6 +21,15 @@ type Opinion struct {
 	CreatedAt       time.Time
 }
 
+type RepresentativeOpinion struct {
+	TalkSessionID uuid.UUID
+	OpinionID     uuid.UUID
+	GroupID       int32
+	Rank          int32
+	UpdatedAt     time.Time
+	CreatedAt     time.Time
+}
+
 type Session struct {
 	SessionID      uuid.UUID
 	UserID         uuid.UUID
@@ -75,6 +84,16 @@ type UserDemographic struct {
 	HouseholdSize      sql.NullInt16
 	CreatedAt          time.Time
 	UpdatedAt          time.Time
+}
+
+type UserGroupInfo struct {
+	TalkSessionID uuid.UUID
+	UserID        uuid.UUID
+	GroupID       int32
+	PosX          float64
+	PosY          float64
+	UpdatedAt     time.Time
+	CreatedAt     time.Time
 }
 
 type Vote struct {

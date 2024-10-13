@@ -107,7 +107,7 @@ func (UnimplementedHandler) OAuthTokenInfo(ctx context.Context) (r OAuthTokenInf
 //
 // 意見に対するコメント一覧を返す.
 //
-// GET /talksession/{talkSessionID}/opinions/{opinionID}
+// GET /talksessions/{talkSessionID}/opinions/{opinionID}
 func (UnimplementedHandler) OpinionComments(ctx context.Context, params OpinionCommentsParams) (r OpinionCommentsRes, _ error) {
 	return r, ht.ErrNotImplemented
 }

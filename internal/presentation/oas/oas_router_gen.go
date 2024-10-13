@@ -247,6 +247,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							}
 
 							if len(elem) == 0 {
+								// Leaf node.
 								switch r.Method {
 								case "GET":
 									s.handleListOpinionsRequest([1]string{
@@ -257,37 +258,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								}
 
 								return
-							}
-							switch elem[0] {
-							case '/': // Prefix: "/"
-								origElem := elem
-								if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
-									elem = elem[l:]
-								} else {
-									break
-								}
-
-								// Param: "opinionID"
-								// Leaf parameter
-								args[1] = elem
-								elem = ""
-
-								if len(elem) == 0 {
-									// Leaf node.
-									switch r.Method {
-									case "GET":
-										s.handleOpinionCommentsRequest([2]string{
-											args[0],
-											args[1],
-										}, elemIsEscaped, w, r)
-									default:
-										s.notAllowed(w, r, "GET")
-									}
-
-									return
-								}
-
-								elem = origElem
 							}
 
 							elem = origElem
@@ -405,7 +375,17 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										elem = elem[idx:]
 
 										if len(elem) == 0 {
-											break
+											switch r.Method {
+											case "GET":
+												s.handleOpinionCommentsRequest([2]string{
+													args[0],
+													args[1],
+												}, elemIsEscaped, w, r)
+											default:
+												s.notAllowed(w, r, "GET")
+											}
+
+											return
 										}
 										switch elem[0] {
 										case '/': // Prefix: "/votes"
@@ -790,6 +770,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							}
 
 							if len(elem) == 0 {
+								// Leaf node.
 								switch method {
 								case "GET":
 									r.name = "ListOpinions"
@@ -802,38 +783,6 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								default:
 									return
 								}
-							}
-							switch elem[0] {
-							case '/': // Prefix: "/"
-								origElem := elem
-								if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
-									elem = elem[l:]
-								} else {
-									break
-								}
-
-								// Param: "opinionID"
-								// Leaf parameter
-								args[1] = elem
-								elem = ""
-
-								if len(elem) == 0 {
-									// Leaf node.
-									switch method {
-									case "GET":
-										r.name = "OpinionComments"
-										r.summary = "意見に対するコメント一覧を返す"
-										r.operationID = "opinionComments"
-										r.pathPattern = "/talksession/{talkSessionID}/opinions/{opinionID}"
-										r.args = args
-										r.count = 2
-										return r, true
-									default:
-										return
-									}
-								}
-
-								elem = origElem
 							}
 
 							elem = origElem
@@ -967,7 +916,18 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										elem = elem[idx:]
 
 										if len(elem) == 0 {
-											break
+											switch method {
+											case "GET":
+												r.name = "OpinionComments"
+												r.summary = "意見に対するコメント一覧を返す"
+												r.operationID = "opinionComments"
+												r.pathPattern = "/talksessions/{talkSessionID}/opinions/{opinionID}"
+												r.args = args
+												r.count = 2
+												return r, true
+											default:
+												return
+											}
 										}
 										switch elem[0] {
 										case '/': // Prefix: "/votes"

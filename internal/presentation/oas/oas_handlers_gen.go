@@ -1326,12 +1326,12 @@ func (s *Server) handleOAuthTokenInfoRequest(args [0]string, argsEscaped bool, w
 //
 // 意見に対するコメント一覧を返す.
 //
-// GET /talksession/{talkSessionID}/opinions/{opinionID}
+// GET /talksessions/{talkSessionID}/opinions/{opinionID}
 func (s *Server) handleOpinionCommentsRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("opinionComments"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/talksession/{talkSessionID}/opinions/{opinionID}"),
+		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/opinions/{opinionID}"),
 	}
 
 	// Start a span for this request.

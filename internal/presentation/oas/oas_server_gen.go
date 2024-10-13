@@ -66,7 +66,7 @@ type OpinionHandler interface {
 	//
 	// 意見に対するコメント一覧を返す.
 	//
-	// GET /talksession/{talkSessionID}/opinions/{opinionID}
+	// GET /talksessions/{talkSessionID}/opinions/{opinionID}
 	OpinionComments(ctx context.Context, params OpinionCommentsParams) (OpinionCommentsRes, error)
 	// PostOpinionPost implements postOpinionPost operation.
 	//
