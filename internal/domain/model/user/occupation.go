@@ -16,7 +16,7 @@ const (
 	OccupationHomemaker                              // 専業主婦
 	OccupationStudent                                // 学生
 	OccupationUnemployed                             // 無職
-	OccupationOther                                  // 無回答
+	OccupationOther                                  // 回答しない
 )
 
 var (
@@ -30,7 +30,7 @@ var (
 		OccupationHomemaker:        "家事従事者",
 		OccupationStudent:          "学生",
 		OccupationUnemployed:       "無職",
-		OccupationOther:            "無回答",
+		OccupationOther:            "回答しない",
 	}
 )
 

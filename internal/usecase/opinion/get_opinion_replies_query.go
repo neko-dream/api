@@ -68,10 +68,10 @@ func NewGetOpinionRepliesUseCase(
 }
 
 func (i *GetOpinionRepliesInteractor) Execute(ctx context.Context, input GetOpinionRepliesInput) (*GetOpinionRepliesOutput, error) {
-
-	// // 親意見を取得
+	// 親意見を取得
 	opinionRow, err := i.GetQueries(ctx).GetOpinionByID(ctx, input.OpinionID.UUID())
 	if err != nil {
+		utils.HandleError(ctx, err, "GetOpinionRepliesInteractor.Execute")
 		return nil, err
 	}
 	rootOpinion := OpinionDTO{

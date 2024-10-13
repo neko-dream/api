@@ -380,6 +380,11 @@
                     "example": "",
                     "nullable": true
                   },
+                  "prefectures": {
+                    "description": "都道府県",
+                    "example": "",
+                    "type": "string"
+                  },
                   "municipality": {
                     "type": "string",
                     "description": "市区町村",
@@ -399,7 +404,7 @@
                       "学生",
                       "無職",
                       "その他",
-                      "無回答"
+                      "回答しない"
                     ],
                     "default": "無回答",
                     "x-apidog-enum": [
@@ -697,6 +702,12 @@
                     "type": "integer",
                     "description": "世帯人数",
                     "example": 0,
+                    "nullable": true
+                  },
+                  "prefectures": {
+                    "type": "string",
+                    "description": "都道府県",
+                    "example": "",
                     "nullable": true
                   }
                 }

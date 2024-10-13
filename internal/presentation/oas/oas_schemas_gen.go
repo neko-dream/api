@@ -385,6 +385,8 @@ type EditUserProfileReq struct {
 	Occupation OptNilEditUserProfileReqOccupation `json:"occupation"`
 	// 世帯人数.
 	HouseholdSize OptNilInt `json:"householdSize"`
+	// 都道府県.
+	Prefectures OptNilString `json:"prefectures"`
 }
 
 // GetDisplayName returns the value of DisplayName.
@@ -422,6 +424,11 @@ func (s *EditUserProfileReq) GetHouseholdSize() OptNilInt {
 	return s.HouseholdSize
 }
 
+// GetPrefectures returns the value of Prefectures.
+func (s *EditUserProfileReq) GetPrefectures() OptNilString {
+	return s.Prefectures
+}
+
 // SetDisplayName sets the value of DisplayName.
 func (s *EditUserProfileReq) SetDisplayName(val OptNilString) {
 	s.DisplayName = val
@@ -455,6 +462,11 @@ func (s *EditUserProfileReq) SetOccupation(val OptNilEditUserProfileReqOccupatio
 // SetHouseholdSize sets the value of HouseholdSize.
 func (s *EditUserProfileReq) SetHouseholdSize(val OptNilInt) {
 	s.HouseholdSize = val
+}
+
+// SetPrefectures sets the value of Prefectures.
+func (s *EditUserProfileReq) SetPrefectures(val OptNilString) {
+	s.Prefectures = val
 }
 
 // 性別.
@@ -3416,6 +3428,8 @@ type RegisterUserReq struct {
 	YearOfBirth OptNilInt `json:"yearOfBirth"`
 	// 性別.
 	Gender OptNilRegisterUserReqGender `json:"gender"`
+	// 都道府県.
+	Prefectures OptString `json:"prefectures"`
 	// 市区町村.
 	Municipality OptNilString `json:"municipality"`
 	// ユーザーの職業.
@@ -3447,6 +3461,11 @@ func (s *RegisterUserReq) GetYearOfBirth() OptNilInt {
 // GetGender returns the value of Gender.
 func (s *RegisterUserReq) GetGender() OptNilRegisterUserReqGender {
 	return s.Gender
+}
+
+// GetPrefectures returns the value of Prefectures.
+func (s *RegisterUserReq) GetPrefectures() OptString {
+	return s.Prefectures
 }
 
 // GetMunicipality returns the value of Municipality.
@@ -3487,6 +3506,11 @@ func (s *RegisterUserReq) SetYearOfBirth(val OptNilInt) {
 // SetGender sets the value of Gender.
 func (s *RegisterUserReq) SetGender(val OptNilRegisterUserReqGender) {
 	s.Gender = val
+}
+
+// SetPrefectures sets the value of Prefectures.
+func (s *RegisterUserReq) SetPrefectures(val OptString) {
+	s.Prefectures = val
 }
 
 // SetMunicipality sets the value of Municipality.
@@ -3574,7 +3598,7 @@ const (
 	RegisterUserReqOccupation_7  RegisterUserReqOccupation = "学生"
 	RegisterUserReqOccupation_8  RegisterUserReqOccupation = "無職"
 	RegisterUserReqOccupation_9  RegisterUserReqOccupation = "その他"
-	RegisterUserReqOccupation_10 RegisterUserReqOccupation = "無回答"
+	RegisterUserReqOccupation_10 RegisterUserReqOccupation = "回答しない"
 )
 
 // AllValues returns all RegisterUserReqOccupation values.

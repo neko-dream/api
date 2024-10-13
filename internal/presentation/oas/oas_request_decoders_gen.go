@@ -503,6 +503,38 @@ func (s *Server) decodeEditUserProfileRequest(r *http.Request) (
 				}
 			}
 			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "prefectures",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotPrefecturesVal string
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToString(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotPrefecturesVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.Prefectures.SetTo(optFormDotPrefecturesVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"prefectures\"")
+					}
+				}
+			}
+			{
 				if err := func() error {
 					files, ok := r.MultipartForm.File["icon"]
 					if !ok || len(files) < 1 {
@@ -937,6 +969,38 @@ func (s *Server) decodeRegisterUserRequest(r *http.Request) (
 						return nil
 					}(); err != nil {
 						return req, close, errors.Wrap(err, "validate")
+					}
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "prefectures",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotPrefecturesVal string
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToString(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotPrefecturesVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.Prefectures.SetTo(optFormDotPrefecturesVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"prefectures\"")
 					}
 				}
 			}
