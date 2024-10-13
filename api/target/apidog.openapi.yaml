@@ -993,18 +993,12 @@
                       "description": "作成ユーザー"
                     },
                     "demographics": {
-                      "anyOf": [
-                        {
-                          "$ref": "#/components/schemas/userDemographics"
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ]
+                      "$ref": "#/components/schemas/userDemographics"
                     }
                   },
                   "required": [
-                    "user"
+                    "user",
+                    "demographics"
                   ]
                 }
               }
@@ -1969,8 +1963,9 @@
           },
           "municipality": {
             "type": "string",
+            "title": "市区町村",
             "description": "市町村",
-            "title": "市区町村"
+            "nullable": true
           },
           "householdSize": {
             "type": "integer",
@@ -1983,8 +1978,7 @@
         },
         "required": [
           "occupation",
-          "gender",
-          "municipality"
+          "gender"
         ]
       },
       "offsetPagination": {

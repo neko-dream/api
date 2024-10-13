@@ -219,6 +219,7 @@ func (u *userRepository) FindByID(ctx context.Context, userID shared.UUID[user.U
 	if userDemographics != nil {
 		user.SetDemographics(*userDemographics)
 	}
+
 	return &user, nil
 }
 
@@ -228,6 +229,7 @@ func (u *userRepository) findUserDemographics(ctx context.Context, userID shared
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
 		}
+		utils.HandleError(ctx, err, "GetUserDemographicsByUserID")
 		return nil, errtrace.Wrap(err)
 	}
 
@@ -240,6 +242,20 @@ func (u *userRepository) findUserDemographics(ctx context.Context, userID shared
 	)
 	userDemographicsID := shared.MustParseUUID[user.UserDemographics](userDemoRow.UserDemographicsID.String())
 
+	if userDemoRow.YearOfBirth.Valid {
+		yearOfBirth = um.NewYearOfBirth(lo.ToPtr(int(userDemoRow.YearOfBirth.Int32)))
+	}
+	if userDemoRow.Occupation.Valid {
+		occupation = lo.ToPtr(um.Occupation(int(userDemoRow.Occupation.Int16)))
+	}
+	gender = lo.ToPtr(um.Gender(int(userDemoRow.Gender)))
+	if userDemoRow.Municipality.Valid {
+		municipality = um.NewMunicipality(lo.ToPtr(userDemoRow.Municipality.String))
+	}
+	if userDemoRow.HouseholdSize.Valid {
+		householdSize = um.NewHouseholdSize(lo.ToPtr(int(userDemoRow.HouseholdSize.Int16)))
+	}
+
 	ud := user.NewUserDemographics(
 		userDemographicsID,
 		yearOfBirth,
@@ -248,7 +264,6 @@ func (u *userRepository) findUserDemographics(ctx context.Context, userID shared
 		municipality,
 		householdSize,
 	)
-
 	return &ud, nil
 }
 

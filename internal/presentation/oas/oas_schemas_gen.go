@@ -1437,8 +1437,8 @@ func (*GetUserInfoInternalServerError) getUserInfoRes() {}
 
 type GetUserInfoOK struct {
 	// 作成ユーザー.
-	User         GetUserInfoOKUser            `json:"user"`
-	Demographics OptGetUserInfoOKDemographics `json:"demographics"`
+	User         GetUserInfoOKUser         `json:"user"`
+	Demographics GetUserInfoOKDemographics `json:"demographics"`
 }
 
 // GetUser returns the value of User.
@@ -1447,7 +1447,7 @@ func (s *GetUserInfoOK) GetUser() GetUserInfoOKUser {
 }
 
 // GetDemographics returns the value of Demographics.
-func (s *GetUserInfoOK) GetDemographics() OptGetUserInfoOKDemographics {
+func (s *GetUserInfoOK) GetDemographics() GetUserInfoOKDemographics {
 	return s.Demographics
 }
 
@@ -1457,79 +1457,13 @@ func (s *GetUserInfoOK) SetUser(val GetUserInfoOKUser) {
 }
 
 // SetDemographics sets the value of Demographics.
-func (s *GetUserInfoOK) SetDemographics(val OptGetUserInfoOKDemographics) {
+func (s *GetUserInfoOK) SetDemographics(val GetUserInfoOKDemographics) {
 	s.Demographics = val
 }
 
 func (*GetUserInfoOK) getUserInfoRes() {}
 
-// GetUserInfoOKDemographics represents sum type.
 type GetUserInfoOKDemographics struct {
-	Type                       GetUserInfoOKDemographicsType // switch on this field
-	GetUserInfoOKDemographics0 GetUserInfoOKDemographics0
-	Null                       struct{}
-}
-
-// GetUserInfoOKDemographicsType is oneOf type of GetUserInfoOKDemographics.
-type GetUserInfoOKDemographicsType string
-
-// Possible values for GetUserInfoOKDemographicsType.
-const (
-	GetUserInfoOKDemographics0GetUserInfoOKDemographics GetUserInfoOKDemographicsType = "GetUserInfoOKDemographics0"
-	NullGetUserInfoOKDemographics                       GetUserInfoOKDemographicsType = "struct{}"
-)
-
-// IsGetUserInfoOKDemographics0 reports whether GetUserInfoOKDemographics is GetUserInfoOKDemographics0.
-func (s GetUserInfoOKDemographics) IsGetUserInfoOKDemographics0() bool {
-	return s.Type == GetUserInfoOKDemographics0GetUserInfoOKDemographics
-}
-
-// IsNull reports whether GetUserInfoOKDemographics is struct{}.
-func (s GetUserInfoOKDemographics) IsNull() bool { return s.Type == NullGetUserInfoOKDemographics }
-
-// SetGetUserInfoOKDemographics0 sets GetUserInfoOKDemographics to GetUserInfoOKDemographics0.
-func (s *GetUserInfoOKDemographics) SetGetUserInfoOKDemographics0(v GetUserInfoOKDemographics0) {
-	s.Type = GetUserInfoOKDemographics0GetUserInfoOKDemographics
-	s.GetUserInfoOKDemographics0 = v
-}
-
-// GetGetUserInfoOKDemographics0 returns GetUserInfoOKDemographics0 and true boolean if GetUserInfoOKDemographics is GetUserInfoOKDemographics0.
-func (s GetUserInfoOKDemographics) GetGetUserInfoOKDemographics0() (v GetUserInfoOKDemographics0, ok bool) {
-	if !s.IsGetUserInfoOKDemographics0() {
-		return v, false
-	}
-	return s.GetUserInfoOKDemographics0, true
-}
-
-// NewGetUserInfoOKDemographics0GetUserInfoOKDemographics returns new GetUserInfoOKDemographics from GetUserInfoOKDemographics0.
-func NewGetUserInfoOKDemographics0GetUserInfoOKDemographics(v GetUserInfoOKDemographics0) GetUserInfoOKDemographics {
-	var s GetUserInfoOKDemographics
-	s.SetGetUserInfoOKDemographics0(v)
-	return s
-}
-
-// SetNull sets GetUserInfoOKDemographics to struct{}.
-func (s *GetUserInfoOKDemographics) SetNull(v struct{}) {
-	s.Type = NullGetUserInfoOKDemographics
-	s.Null = v
-}
-
-// GetNull returns struct{} and true boolean if GetUserInfoOKDemographics is struct{}.
-func (s GetUserInfoOKDemographics) GetNull() (v struct{}, ok bool) {
-	if !s.IsNull() {
-		return v, false
-	}
-	return s.Null, true
-}
-
-// NewNullGetUserInfoOKDemographics returns new GetUserInfoOKDemographics from struct{}.
-func NewNullGetUserInfoOKDemographics(v struct{}) GetUserInfoOKDemographics {
-	var s GetUserInfoOKDemographics
-	s.SetNull(v)
-	return s
-}
-
-type GetUserInfoOKDemographics0 struct {
 	// 誕生年.
 	YearOfBirth OptNilInt `json:"yearOfBirth"`
 	// 職業.
@@ -1537,58 +1471,58 @@ type GetUserInfoOKDemographics0 struct {
 	// 性別.
 	Gender string `json:"gender"`
 	// 市町村.
-	Municipality string `json:"municipality"`
+	Municipality OptNilString `json:"municipality"`
 	// 世帯人数.
 	HouseholdSize OptNilInt `json:"householdSize"`
 }
 
 // GetYearOfBirth returns the value of YearOfBirth.
-func (s *GetUserInfoOKDemographics0) GetYearOfBirth() OptNilInt {
+func (s *GetUserInfoOKDemographics) GetYearOfBirth() OptNilInt {
 	return s.YearOfBirth
 }
 
 // GetOccupation returns the value of Occupation.
-func (s *GetUserInfoOKDemographics0) GetOccupation() string {
+func (s *GetUserInfoOKDemographics) GetOccupation() string {
 	return s.Occupation
 }
 
 // GetGender returns the value of Gender.
-func (s *GetUserInfoOKDemographics0) GetGender() string {
+func (s *GetUserInfoOKDemographics) GetGender() string {
 	return s.Gender
 }
 
 // GetMunicipality returns the value of Municipality.
-func (s *GetUserInfoOKDemographics0) GetMunicipality() string {
+func (s *GetUserInfoOKDemographics) GetMunicipality() OptNilString {
 	return s.Municipality
 }
 
 // GetHouseholdSize returns the value of HouseholdSize.
-func (s *GetUserInfoOKDemographics0) GetHouseholdSize() OptNilInt {
+func (s *GetUserInfoOKDemographics) GetHouseholdSize() OptNilInt {
 	return s.HouseholdSize
 }
 
 // SetYearOfBirth sets the value of YearOfBirth.
-func (s *GetUserInfoOKDemographics0) SetYearOfBirth(val OptNilInt) {
+func (s *GetUserInfoOKDemographics) SetYearOfBirth(val OptNilInt) {
 	s.YearOfBirth = val
 }
 
 // SetOccupation sets the value of Occupation.
-func (s *GetUserInfoOKDemographics0) SetOccupation(val string) {
+func (s *GetUserInfoOKDemographics) SetOccupation(val string) {
 	s.Occupation = val
 }
 
 // SetGender sets the value of Gender.
-func (s *GetUserInfoOKDemographics0) SetGender(val string) {
+func (s *GetUserInfoOKDemographics) SetGender(val string) {
 	s.Gender = val
 }
 
 // SetMunicipality sets the value of Municipality.
-func (s *GetUserInfoOKDemographics0) SetMunicipality(val string) {
+func (s *GetUserInfoOKDemographics) SetMunicipality(val OptNilString) {
 	s.Municipality = val
 }
 
 // SetHouseholdSize sets the value of HouseholdSize.
-func (s *GetUserInfoOKDemographics0) SetHouseholdSize(val OptNilInt) {
+func (s *GetUserInfoOKDemographics) SetHouseholdSize(val OptNilInt) {
 	s.HouseholdSize = val
 }
 
@@ -2889,52 +2823,6 @@ func (o OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation) Get() (v Get
 
 // Or returns value if set, or given parameter if does not.
 func (o OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation) Or(d GetTalkSessionListOKTalkSessionsItemTalkSessionLocation) GetTalkSessionListOKTalkSessionsItemTalkSessionLocation {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptGetUserInfoOKDemographics returns new OptGetUserInfoOKDemographics with value set to v.
-func NewOptGetUserInfoOKDemographics(v GetUserInfoOKDemographics) OptGetUserInfoOKDemographics {
-	return OptGetUserInfoOKDemographics{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptGetUserInfoOKDemographics is optional GetUserInfoOKDemographics.
-type OptGetUserInfoOKDemographics struct {
-	Value GetUserInfoOKDemographics
-	Set   bool
-}
-
-// IsSet returns true if OptGetUserInfoOKDemographics was set.
-func (o OptGetUserInfoOKDemographics) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptGetUserInfoOKDemographics) Reset() {
-	var v GetUserInfoOKDemographics
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptGetUserInfoOKDemographics) SetTo(v GetUserInfoOKDemographics) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptGetUserInfoOKDemographics) Get() (v GetUserInfoOKDemographics, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptGetUserInfoOKDemographics) Or(d GetUserInfoOKDemographics) GetUserInfoOKDemographics {
 	if v, ok := o.Get(); ok {
 		return v
 	}

@@ -18,7 +18,7 @@ type (
 	}
 
 	GetUserInformationOutput struct {
-		User user.User
+		User *user.User
 	}
 
 	getUserInformationQueryHandler struct {
@@ -45,6 +45,6 @@ func (g *getUserInformationQueryHandler) Execute(ctx context.Context, input GetU
 	}
 
 	return &GetUserInformationOutput{
-		User: *u,
+		User: u,
 	}, nil
 }

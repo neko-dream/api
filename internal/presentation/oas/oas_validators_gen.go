@@ -652,15 +652,8 @@ func (s *GetUserInfoOK) Validate() error {
 		})
 	}
 	if err := func() error {
-		if value, ok := s.Demographics.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
+		if err := s.Demographics.Validate(); err != nil {
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -675,21 +668,7 @@ func (s *GetUserInfoOK) Validate() error {
 	return nil
 }
 
-func (s GetUserInfoOKDemographics) Validate() error {
-	switch s.Type {
-	case GetUserInfoOKDemographics0GetUserInfoOKDemographics:
-		if err := s.GetUserInfoOKDemographics0.Validate(); err != nil {
-			return err
-		}
-		return nil
-	case NullGetUserInfoOKDemographics:
-		return nil // no validation needed
-	default:
-		return errors.Errorf("invalid type %q", s.Type)
-	}
-}
-
-func (s *GetUserInfoOKDemographics0) Validate() error {
+func (s *GetUserInfoOKDemographics) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}

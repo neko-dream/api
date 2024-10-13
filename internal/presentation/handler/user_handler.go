@@ -53,33 +53,49 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 		utils.HandleError(ctx, err, "GetUserInformationQueryHandler.Execute")
 		return nil, messages.InternalServerError
 	}
-	out := oas.GetUserInfoOK{}
-	out.User = oas.GetUserInfoOKUser{
+
+	userResp := oas.GetUserInfoOKUser{
 		DisplayID:   *res.User.DisplayID(),
 		DisplayName: *res.User.DisplayName(),
 		IconURL:     utils.ToOptNil[oas.OptNilString](res.User.ProfileIconURL()),
 	}
+	var demographicsResp oas.GetUserInfoOKDemographics
 	if res.User.Demographics() != nil {
-		var municipality string
-		if res.User.Demographics().Municipality() != nil {
-			municipality = res.User.Demographics().Municipality().String()
-		} else {
-			municipality = ""
+		demographics := res.User.Demographics()
+		var municipality oas.OptNilString
+		if demographics.Municipality() != nil {
+			municipality = oas.OptNilString{
+				Set:   true,
+				Value: demographics.Municipality().String(),
+			}
 		}
-		out.Demographics = oas.OptGetUserInfoOKDemographics{
-			Value: oas.GetUserInfoOKDemographics{
-				GetUserInfoOKDemographics0: oas.GetUserInfoOKDemographics0{
-					YearOfBirth:   utils.ToOptNil[oas.OptNilInt](res.User.Demographics().YearOfBirth()),
-					Municipality:  municipality,
-					Occupation:    res.User.Demographics().Occupation().String(),
-					Gender:        res.User.Demographics().Gender().String(),
-					HouseholdSize: utils.ToOptNil[oas.OptNilInt](res.User.Demographics().HouseholdSize()),
-				},
-			},
+		var yearOfBirth oas.OptNilInt
+		if demographics.YearOfBirth() != nil {
+			yearOfBirth = oas.OptNilInt{
+				Set:   true,
+				Value: int(*demographics.YearOfBirth()),
+			}
+		}
+		var householdSize oas.OptNilInt
+		if demographics.HouseholdSize() != nil {
+			householdSize = oas.OptNilInt{
+				Set:   true,
+				Value: int(*demographics.HouseholdSize()),
+			}
+		}
+		demographicsResp = oas.GetUserInfoOKDemographics{
+			YearOfBirth:   yearOfBirth,
+			Municipality:  municipality,
+			Occupation:    demographics.Occupation().String(),
+			Gender:        demographics.Gender().String(),
+			HouseholdSize: householdSize,
 		}
 	}
 
-	return &out, nil
+	return &oas.GetUserInfoOK{
+		User:         userResp,
+		Demographics: demographicsResp,
+	}, nil
 }
 
 // EditUserProfile ユーザープロフィールの編集
@@ -112,13 +128,27 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 			return nil, messages.InternalServerError
 		}
 	}
+	var yearOfBirth *int
+	if !value.YearOfBirth.Null {
+		yearOfBirth = &value.YearOfBirth.Value
+	}
+
+	var municipality *string
+	if !value.Municipality.Null {
+		municipality = &value.Municipality.Value
+	}
+
+	var householdSize *int
+	if !value.HouseholdSize.Null {
+		householdSize = &value.HouseholdSize.Value
+	}
 
 	out, err := u.EditUserUseCase.Execute(ctx, user_usecase.EditUserInput{
 		UserID:       userID,
 		DisplayName:  utils.ToPtrIfNotNullValue(value.DisplayName.Null, value.DisplayName.Value),
 		Icon:         file,
-		YearOfBirth:  utils.ToPtrIfNotNullValue(value.YearOfBirth.Null, value.YearOfBirth.Value),
-		Municipality: utils.ToPtrIfNotNullValue(value.Municipality.Null, value.Municipality.Value),
+		YearOfBirth:  yearOfBirth,
+		Municipality: municipality,
 		Occupation: utils.ToPtrIfNotNullFunc(value.Occupation.Null, func() *string {
 			txt, err := value.Occupation.Value.MarshalText()
 			if err != nil {
@@ -133,6 +163,7 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 			}
 			return lo.ToPtr(string(txt))
 		}),
+		HouseholdSize: householdSize,
 	})
 	if err != nil {
 		utils.HandleError(ctx, err, "EditUserUseCase.Execute")

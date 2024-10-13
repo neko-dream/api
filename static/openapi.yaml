@@ -857,39 +857,38 @@ paths:
                       - displayName
                     description: 作成ユーザー
                   demographics:
-                    anyOf:
-                      - type: object
-                        properties:
-                          yearOfBirth:
-                            type: integer
-                            description: 誕生年
-                            nullable: true
-                          occupation:
-                            type: string
-                            title: 職業
-                            description: 職業
-                          gender:
-                            type: string
-                            title: 性別
-                            description: 性別
-                          municipality:
-                            type: string
-                            description: 市町村
-                            title: 市区町村
-                          householdSize:
-                            type: integer
-                            minimum: 1
-                            maximum: 5
-                            title: 世帯人数
-                            description: 世帯人数
-                            nullable: true
-                        required:
-                          - occupation
-                          - gender
-                          - municipality
-                      - type: 'null'
+                    type: object
+                    properties:
+                      yearOfBirth:
+                        type: integer
+                        description: 誕生年
+                        nullable: true
+                      occupation:
+                        type: string
+                        title: 職業
+                        description: 職業
+                      gender:
+                        type: string
+                        title: 性別
+                        description: 性別
+                      municipality:
+                        type: string
+                        title: 市区町村
+                        description: 市町村
+                        nullable: true
+                      householdSize:
+                        type: integer
+                        minimum: 1
+                        maximum: 5
+                        title: 世帯人数
+                        description: 世帯人数
+                        nullable: true
+                    required:
+                      - occupation
+                      - gender
                 required:
                   - user
+                  - demographics
         '500':
           description: ServerErrorResponse
           content:
@@ -1896,8 +1895,9 @@ components:
           description: 性別
         municipality:
           type: string
-          description: 市町村
           title: 市区町村
+          description: 市町村
+          nullable: true
         householdSize:
           type: integer
           minimum: 1
@@ -1908,7 +1908,6 @@ components:
       required:
         - occupation
         - gender
-        - municipality
     offsetPagination:
       type: object
       properties:

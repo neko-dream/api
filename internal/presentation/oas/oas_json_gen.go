@@ -3020,10 +3020,8 @@ func (s *GetUserInfoOK) encodeFields(e *jx.Encoder) {
 		s.User.Encode(e)
 	}
 	{
-		if s.Demographics.Set {
-			e.FieldStart("demographics")
-			s.Demographics.Encode(e)
-		}
+		e.FieldStart("demographics")
+		s.Demographics.Encode(e)
 	}
 }
 
@@ -3052,8 +3050,8 @@ func (s *GetUserInfoOK) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"user\"")
 			}
 		case "demographics":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.Demographics.Reset()
 				if err := s.Demographics.Decode(d); err != nil {
 					return err
 				}
@@ -3071,7 +3069,7 @@ func (s *GetUserInfoOK) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000001,
+		0b00000011,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -3117,62 +3115,15 @@ func (s *GetUserInfoOK) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes GetUserInfoOKDemographics as json.
-func (s GetUserInfoOKDemographics) Encode(e *jx.Encoder) {
-	switch s.Type {
-	case GetUserInfoOKDemographics0GetUserInfoOKDemographics:
-		s.GetUserInfoOKDemographics0.Encode(e)
-	case NullGetUserInfoOKDemographics:
-		_ = s.Null
-		e.Null()
-	}
-}
-
-// Decode decodes GetUserInfoOKDemographics from json.
-func (s *GetUserInfoOKDemographics) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode GetUserInfoOKDemographics to nil")
-	}
-	// Sum type type_discriminator.
-	switch t := d.Next(); t {
-	case jx.Null:
-		if err := d.Null(); err != nil {
-			return err
-		}
-		s.Type = NullGetUserInfoOKDemographics
-	case jx.Object:
-		if err := s.GetUserInfoOKDemographics0.Decode(d); err != nil {
-			return err
-		}
-		s.Type = GetUserInfoOKDemographics0GetUserInfoOKDemographics
-	default:
-		return errors.Errorf("unexpected json type %q", t)
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s GetUserInfoOKDemographics) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *GetUserInfoOKDemographics) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode implements json.Marshaler.
-func (s *GetUserInfoOKDemographics0) Encode(e *jx.Encoder) {
+func (s *GetUserInfoOKDemographics) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *GetUserInfoOKDemographics0) encodeFields(e *jx.Encoder) {
+func (s *GetUserInfoOKDemographics) encodeFields(e *jx.Encoder) {
 	{
 		if s.YearOfBirth.Set {
 			e.FieldStart("yearOfBirth")
@@ -3188,8 +3139,10 @@ func (s *GetUserInfoOKDemographics0) encodeFields(e *jx.Encoder) {
 		e.Str(s.Gender)
 	}
 	{
-		e.FieldStart("municipality")
-		e.Str(s.Municipality)
+		if s.Municipality.Set {
+			e.FieldStart("municipality")
+			s.Municipality.Encode(e)
+		}
 	}
 	{
 		if s.HouseholdSize.Set {
@@ -3199,7 +3152,7 @@ func (s *GetUserInfoOKDemographics0) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfGetUserInfoOKDemographics0 = [5]string{
+var jsonFieldsNameOfGetUserInfoOKDemographics = [5]string{
 	0: "yearOfBirth",
 	1: "occupation",
 	2: "gender",
@@ -3207,10 +3160,10 @@ var jsonFieldsNameOfGetUserInfoOKDemographics0 = [5]string{
 	4: "householdSize",
 }
 
-// Decode decodes GetUserInfoOKDemographics0 from json.
-func (s *GetUserInfoOKDemographics0) Decode(d *jx.Decoder) error {
+// Decode decodes GetUserInfoOKDemographics from json.
+func (s *GetUserInfoOKDemographics) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode GetUserInfoOKDemographics0 to nil")
+		return errors.New("invalid: unable to decode GetUserInfoOKDemographics to nil")
 	}
 	var requiredBitSet [1]uint8
 
@@ -3251,11 +3204,9 @@ func (s *GetUserInfoOKDemographics0) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"gender\"")
 			}
 		case "municipality":
-			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				v, err := d.Str()
-				s.Municipality = string(v)
-				if err != nil {
+				s.Municipality.Reset()
+				if err := s.Municipality.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -3277,12 +3228,12 @@ func (s *GetUserInfoOKDemographics0) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode GetUserInfoOKDemographics0")
+		return errors.Wrap(err, "decode GetUserInfoOKDemographics")
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00001110,
+		0b00000110,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -3294,8 +3245,8 @@ func (s *GetUserInfoOKDemographics0) Decode(d *jx.Decoder) error {
 				bitIdx := bits.TrailingZeros8(result)
 				fieldIdx := i*8 + bitIdx
 				var name string
-				if fieldIdx < len(jsonFieldsNameOfGetUserInfoOKDemographics0) {
-					name = jsonFieldsNameOfGetUserInfoOKDemographics0[fieldIdx]
+				if fieldIdx < len(jsonFieldsNameOfGetUserInfoOKDemographics) {
+					name = jsonFieldsNameOfGetUserInfoOKDemographics[fieldIdx]
 				} else {
 					name = strconv.Itoa(fieldIdx)
 				}
@@ -3316,14 +3267,14 @@ func (s *GetUserInfoOKDemographics0) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *GetUserInfoOKDemographics0) MarshalJSON() ([]byte, error) {
+func (s *GetUserInfoOKDemographics) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *GetUserInfoOKDemographics0) UnmarshalJSON(data []byte) error {
+func (s *GetUserInfoOKDemographics) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -5625,39 +5576,6 @@ func (s OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation) MarshalJSON(
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes GetUserInfoOKDemographics as json.
-func (o OptGetUserInfoOKDemographics) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes GetUserInfoOKDemographics from json.
-func (o *OptGetUserInfoOKDemographics) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptGetUserInfoOKDemographics to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptGetUserInfoOKDemographics) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptGetUserInfoOKDemographics) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
