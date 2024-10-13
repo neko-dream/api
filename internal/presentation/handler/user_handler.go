@@ -13,6 +13,7 @@ import (
 	user_usecase "github.com/neko-dream/server/internal/usecase/user"
 	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/utils"
+	"github.com/samber/lo"
 )
 
 type userHandler struct {
@@ -70,27 +71,28 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 		Icon:         file,
 		YearOfBirth:  utils.ToPtrIfNotNullValue(value.YearOfBirth.Null, value.YearOfBirth.Value),
 		Municipality: utils.ToPtrIfNotNullValue(value.Municipality.Null, value.Municipality.Value),
-		Occupation: utils.ToPtrIfNotNullFunc(value.Occupation.Null, func() string {
+		Occupation: utils.ToPtrIfNotNullFunc(value.Occupation.Null, func() *string {
 			txt, err := value.Occupation.Value.MarshalText()
 			if err != nil {
-				utils.HandleError(ctx, err, "value.Occupation")
-				return ""
+				return nil
 			}
-			return string(txt)
+			return lo.ToPtr(string(txt))
 		}),
-		Gender: utils.ToPtrIfNotNullFunc(value.Gender.Null, func() string {
+		Gender: utils.ToPtrIfNotNullFunc(value.Gender.Null, func() *string {
 			txt, err := value.Gender.Value.MarshalText()
 			if err != nil {
-				utils.HandleError(ctx, err, "value.Gender")
-				return ""
+				return nil
 			}
-			return string(txt)
+			return lo.ToPtr(string(txt))
 		}),
 	})
 	if err != nil {
 		utils.HandleError(ctx, err, "EditUserUseCase.Execute")
 		return nil, err
 	}
+
+	w := http_utils.GetHTTPResponse(ctx)
+	http.SetCookie(w, out.Cookie)
 
 	return &oas.EditUserProfileOK{
 		DisplayID:   out.DisplayID,
@@ -137,21 +139,19 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 		Icon:         file,
 		YearOfBirth:  utils.ToPtrIfNotNullValue(value.YearOfBirth.Null, value.YearOfBirth.Value),
 		Municipality: utils.ToPtrIfNotNullValue(value.Municipality.Null, value.Municipality.Value),
-		Occupation: utils.ToPtrIfNotNullFunc(value.Occupation.Null, func() string {
+		Occupation: utils.ToPtrIfNotNullFunc(value.Occupation.Null, func() *string {
 			txt, err := value.Occupation.Value.MarshalText()
 			if err != nil {
-				utils.HandleError(ctx, err, "value.Occupation")
-				return ""
+				return nil
 			}
-			return string(txt)
+			return lo.ToPtr(string(txt))
 		}),
-		Gender: utils.ToPtrIfNotNullFunc(value.Gender.Null, func() string {
+		Gender: utils.ToPtrIfNotNullFunc(value.Gender.Null, func() *string {
 			txt, err := value.Gender.Value.MarshalText()
 			if err != nil {
-				utils.HandleError(ctx, err, "value.Gender")
-				return ""
+				return nil
 			}
-			return string(txt)
+			return lo.ToPtr(string(txt))
 		}),
 		HouseholdSize: &value.HouseholdSize.Value,
 	}

@@ -9,6 +9,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/db"
 	model "github.com/neko-dream/server/internal/infrastructure/db/sqlc"
 	"github.com/neko-dream/server/pkg/utils"
+	"github.com/samber/lo"
 )
 
 type (
@@ -117,8 +118,8 @@ func (h *listTalkSessionQueryHandler) Execute(ctx context.Context, input ListTal
 			},
 			OpinionCount: int(row.OpinionCount),
 			CreatedAt:    time.NewTime(ctx, row.CreatedAt).Format(ctx),
-			FinishedAt: utils.ToPtrIfNotNullFunc[string](!row.FinishedAt.Valid, func() string {
-				return time.NewTime(ctx, row.FinishedAt.Time).Format(ctx)
+			FinishedAt: utils.ToPtrIfNotNullFunc[string](!row.FinishedAt.Valid, func() *string {
+				return lo.ToPtr(time.NewTime(ctx, row.FinishedAt.Time).Format(ctx))
 			}),
 			ScheduledEndTime: time.NewTime(ctx, row.ScheduledEndTime).Format(ctx),
 			Location:         locationDTO,
