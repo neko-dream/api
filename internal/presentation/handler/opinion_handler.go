@@ -52,7 +52,8 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 	}
 
 	opinions, err := o.getSwipeOpinionsUseCase.Execute(ctx, opinion_usecase.GetSwipeOpinionsQuery{
-		UserID: userID,
+		UserID:        userID,
+		TalkSessionID: shared.MustParseUUID[talksession.TalkSession](params.TalkSessionID),
 	})
 	if err != nil {
 		return nil, err

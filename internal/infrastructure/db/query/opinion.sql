@@ -100,11 +100,11 @@ LEFT JOIN (
     FROM opinions
     LEFT JOIN votes
         ON opinions.opinion_id = votes.opinion_id
-        AND votes.user_id = $2
+        AND votes.user_id = $1
     GROUP BY opinions.opinion_id
     HAVING COUNT(votes.vote_id) = 0
 ) vote_count ON opinions.opinion_id = vote_count.opinion_id
-WHERE opinions.talk_session_id = $1
+WHERE opinions.talk_session_id = $2
     AND vote_count.opinion_id = opinions.opinion_id
 ORDER BY RANDOM()
 LIMIT $3;
