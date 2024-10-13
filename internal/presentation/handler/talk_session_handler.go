@@ -28,7 +28,7 @@ func NewTalkSessionHandler(
 }
 
 // CreateTalkSession トークセッション作成
-func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptCreateTalkSessionReq) (*oas.CreateTalkSessionOK, error) {
+func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptCreateTalkSessionReq) (oas.CreateTalkSessionRes, error) {
 	claim := session.GetSession(ctx)
 	if !req.IsSet() {
 		return nil, messages.RequiredParameterError
@@ -67,7 +67,7 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 		location.Value.CreateTalkSessionOKLocation0.Prefecture = out.Location.Prefecture()
 	}
 
-	return &oas.CreateTalkSessionOK{
+	res := &oas.CreateTalkSessionOK{
 		Owner: oas.CreateTalkSessionOKOwner{
 			DisplayID:   *out.OwnerUser.DisplayID(),
 			DisplayName: *out.OwnerUser.DisplayName(),
@@ -82,11 +82,12 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 		CreatedAt:        time.Now(ctx).Format(ctx),
 		ScheduledEndTime: out.TalkSession.ScheduledEndTime().Format(ctx),
 		Location:         location,
-	}, nil
+	}
+	return res, nil
 }
 
 // GetTalkSessionDetail トークセッション詳細取得
-func (t *talkSessionHandler) GetTalkSessionDetail(ctx context.Context, params oas.GetTalkSessionDetailParams) (*oas.GetTalkSessionDetailOK, error) {
+func (t *talkSessionHandler) GetTalkSessionDetail(ctx context.Context, params oas.GetTalkSessionDetailParams) (oas.GetTalkSessionDetailRes, error) {
 	panic("unimplemented")
 }
 

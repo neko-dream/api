@@ -63,6 +63,17 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "ErroResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
           }
         },
         "security": [],
@@ -169,6 +180,17 @@
                     "createdAt",
                     "scheduledEndTime"
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ErroResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
                 }
               }
             }
@@ -285,6 +307,17 @@
                     "talkSessions",
                     "pagination"
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ErroResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
                 }
               }
             }
@@ -519,7 +552,7 @@
             }
           },
           "400": {
-            "description": "ValidationErroResponse",
+            "description": "ErroResponse",
             "content": {
               "application/json": {
                 "schema": {
@@ -749,6 +782,17 @@
               }
             }
           },
+          "400": {
+            "description": "ErroResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
           "500": {
             "description": "ServerErrorResponse",
             "content": {
@@ -817,6 +861,17 @@
                       "commentCount"
                     ]
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ErroResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
                 }
               }
             }
@@ -900,6 +955,17 @@
         "responses": {
           "200": {
             "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ErroResponse",
             "content": {
               "application/json": {
                 "schema": {
@@ -993,6 +1059,17 @@
                   "items": {
                     "$ref": "#/components/schemas/opinion"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ErroResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
                 }
               }
             }
@@ -1117,6 +1194,17 @@
               }
             }
           },
+          "400": {
+            "description": "ErroResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
           "500": {
             "description": "ServerErrorResponse",
             "content": {
@@ -1165,6 +1253,17 @@
                   "required": [
                     "01J93WTW4J3ZBAAVVZV8PSWZ6R"
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ErroResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
                 }
               }
             }
@@ -1228,6 +1327,17 @@
                       "nullable": true
                     }
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ErroResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
                 }
               }
             }
@@ -1317,6 +1427,17 @@
                     "jti",
                     "isVerify"
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ErroResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
                 }
               }
             }
@@ -1543,15 +1664,11 @@
           },
           "message": {
             "type": "string"
-          },
-          "data": {
-            "type": "string"
           }
         },
         "required": [
           "code",
-          "message",
-          "data"
+          "message"
         ]
       },
       "validationErrorItem": {

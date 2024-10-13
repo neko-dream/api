@@ -85,13 +85,13 @@ type TalkSessionHandler interface {
 	// トークセッション作成.
 	//
 	// POST /talksessions
-	CreateTalkSession(ctx context.Context, req OptCreateTalkSessionReq) (*CreateTalkSessionOK, error)
+	CreateTalkSession(ctx context.Context, req OptCreateTalkSessionReq) (CreateTalkSessionRes, error)
 	// GetTalkSessionDetail implements getTalkSessionDetail operation.
 	//
 	// 🚧 トークセッションの詳細.
 	//
 	// GET /talksessions/{talkSessionId}
-	GetTalkSessionDetail(ctx context.Context, params GetTalkSessionDetailParams) (*GetTalkSessionDetailOK, error)
+	GetTalkSessionDetail(ctx context.Context, params GetTalkSessionDetailParams) (GetTalkSessionDetailRes, error)
 	// GetTalkSessionList implements getTalkSessionList operation.
 	//
 	// トークセッションコレクション.

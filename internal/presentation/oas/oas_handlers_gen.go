@@ -244,7 +244,7 @@ func (s *Server) handleCreateTalkSessionRequest(args [0]string, argsEscaped bool
 		}
 	}()
 
-	var response *CreateTalkSessionOK
+	var response CreateTalkSessionRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -259,7 +259,7 @@ func (s *Server) handleCreateTalkSessionRequest(args [0]string, argsEscaped bool
 		type (
 			Request  = OptCreateTalkSessionReq
 			Params   = struct{}
-			Response = *CreateTalkSessionOK
+			Response = CreateTalkSessionRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -507,7 +507,7 @@ func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped b
 		return
 	}
 
-	var response *GetTalkSessionDetailOK
+	var response GetTalkSessionDetailRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -527,7 +527,7 @@ func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped b
 		type (
 			Request  = struct{}
 			Params   = GetTalkSessionDetailParams
-			Response = *GetTalkSessionDetailOK
+			Response = GetTalkSessionDetailRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,

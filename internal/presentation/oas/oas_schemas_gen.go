@@ -37,6 +37,10 @@ func (s *AuthorizeFound) SetSetCookie(val OptString) {
 	s.SetCookie = val
 }
 
+type CreateTalkSessionBadRequest struct{}
+
+func (*CreateTalkSessionBadRequest) createTalkSessionRes() {}
+
 type CreateTalkSessionOK struct {
 	// トークセッションID.
 	ID string `json:"id"`
@@ -123,6 +127,8 @@ func (s *CreateTalkSessionOK) SetScheduledEndTime(val string) {
 func (s *CreateTalkSessionOK) SetLocation(val OptCreateTalkSessionOKLocation) {
 	s.Location = val
 }
+
+func (*CreateTalkSessionOK) createTalkSessionRes() {}
 
 // 位置情報.
 // CreateTalkSessionOKLocation represents sum type.
@@ -327,6 +333,10 @@ func (s *CreateTalkSessionReq) SetLatitude(val OptNilFloat64) {
 func (s *CreateTalkSessionReq) SetLongitude(val OptNilFloat64) {
 	s.Longitude = val
 }
+
+type EditUserProfileBadRequest struct{}
+
+func (*EditUserProfileBadRequest) editUserProfileRes() {}
 
 type EditUserProfileInternalServerError struct{}
 
@@ -630,6 +640,10 @@ func (s *EditUserProfileReqOccupation) UnmarshalText(data []byte) error {
 	}
 }
 
+type GetTalkSessionDetailBadRequest struct{}
+
+func (*GetTalkSessionDetailBadRequest) getTalkSessionDetailRes() {}
+
 type GetTalkSessionDetailOK struct {
 	// トークセッションID.
 	ID string `json:"id"`
@@ -716,6 +730,8 @@ func (s *GetTalkSessionDetailOK) SetScheduledEndTime(val string) {
 func (s *GetTalkSessionDetailOK) SetLocation(val OptGetTalkSessionDetailOKLocation) {
 	s.Location = val
 }
+
+func (*GetTalkSessionDetailOK) getTalkSessionDetailRes() {}
 
 // 位置情報.
 // GetTalkSessionDetailOKLocation represents sum type.
@@ -873,6 +889,10 @@ func (s *GetTalkSessionDetailOKOwner) SetDisplayName(val string) {
 func (s *GetTalkSessionDetailOKOwner) SetIconURL(val OptString) {
 	s.IconURL = val
 }
+
+type GetTalkSessionListBadRequest struct{}
+
+func (*GetTalkSessionListBadRequest) getTalkSessionListRes() {}
 
 type GetTalkSessionListInternalServerError struct{}
 
@@ -1251,6 +1271,10 @@ func (s *GetTalkSessionListStatus) UnmarshalText(data []byte) error {
 	}
 }
 
+type GetTopOpinionsBadRequest struct{}
+
+func (*GetTopOpinionsBadRequest) getTopOpinionsRes() {}
+
 type GetTopOpinionsInternalServerError struct{}
 
 func (*GetTopOpinionsInternalServerError) getTopOpinionsRes() {}
@@ -1338,6 +1362,10 @@ func (*OAuthRevokeNoContent) oAuthRevokeRes() {}
 type OAuthRevokeUnauthorized struct{}
 
 func (*OAuthRevokeUnauthorized) oAuthRevokeRes() {}
+
+type OAuthTokenInfoBadRequest struct{}
+
+func (*OAuthTokenInfoBadRequest) oAuthTokenInfoRes() {}
 
 type OAuthTokenInfoInternalServerError struct{}
 
@@ -1467,6 +1495,10 @@ func (s *OAuthTokenInfoOK) SetIsVerify(val bool) {
 }
 
 func (*OAuthTokenInfoOK) oAuthTokenInfoRes() {}
+
+type OpinionCommentsBadRequest struct{}
+
+func (*OpinionCommentsBadRequest) opinionCommentsRes() {}
 
 type OpinionCommentsInternalServerError struct{}
 
@@ -3590,6 +3622,10 @@ func (o OptVoteReq) Or(d VoteReq) VoteReq {
 	return d
 }
 
+type PostOpinionPostBadRequest struct{}
+
+func (*PostOpinionPostBadRequest) postOpinionPostRes() {}
+
 type PostOpinionPostInternalServerError struct{}
 
 func (*PostOpinionPostInternalServerError) postOpinionPostRes() {}
@@ -3988,6 +4024,10 @@ func (s *SessionId) SetAPIKey(val string) {
 	s.APIKey = val
 }
 
+type SwipeOpinionsBadRequest struct{}
+
+func (*SwipeOpinionsBadRequest) swipeOpinionsRes() {}
+
 type SwipeOpinionsInternalServerError struct{}
 
 func (*SwipeOpinionsInternalServerError) swipeOpinionsRes() {}
@@ -4205,6 +4245,10 @@ func (s *SwipeOpinionsOKItemUser) SetIconURL(val OptString) {
 	s.IconURL = val
 }
 
+type TestBadRequest struct{}
+
+func (*TestBadRequest) testRes() {}
+
 type TestInternalServerError struct{}
 
 func (*TestInternalServerError) testRes() {}
@@ -4279,6 +4323,10 @@ func (s *TestOK) SetOptNilUrl(val OptNilString) {
 }
 
 func (*TestOK) testRes() {}
+
+type VoteBadRequest struct{}
+
+func (*VoteBadRequest) voteRes() {}
 
 type VoteInternalServerError struct{}
 

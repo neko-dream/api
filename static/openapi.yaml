@@ -92,6 +92,13 @@ paths:
                   - owner
                   - createdAt
                   - scheduledEndTime
+        '400':
+          description: ErroResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
       security: []
       x-ogen-operation-group: TalkSession
   /talksessions:
@@ -204,6 +211,13 @@ paths:
                   - owner
                   - createdAt
                   - scheduledEndTime
+        '400':
+          description: ErroResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
       security:
         - SessionId: []
       x-ogen-operation-group: TalkSession
@@ -358,6 +372,13 @@ paths:
                 required:
                   - talkSessions
                   - pagination
+        '400':
+          description: ErroResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
         '500':
           description: ServerErrorResponse
           content:
@@ -521,7 +542,7 @@ paths:
                   - displayID
                   - displayName
         '400':
-          description: ValidationErroResponse
+          description: ErroResponse
           content:
             application/json:
               schema:
@@ -680,6 +701,13 @@ paths:
                 required:
                   - displayID
                   - displayName
+        '400':
+          description: ErroResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
         '500':
           description: ServerErrorResponse
           content:
@@ -785,6 +813,13 @@ paths:
                     - opinion
                     - user
                     - commentCount
+        '400':
+          description: ErroResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
         '500':
           description: ServerErrorResponse
           content:
@@ -841,6 +876,13 @@ paths:
       responses:
         '200':
           description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: ErroResponse
           content:
             application/json:
               schema:
@@ -944,6 +986,13 @@ paths:
                   required:
                     - content
                     - id
+        '400':
+          description: ErroResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
         '500':
           description: ServerErrorResponse
           content:
@@ -1164,6 +1213,13 @@ paths:
                 required:
                   - rootOpinion
                   - opinions
+        '400':
+          description: ErroResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
         '500':
           description: ServerErrorResponse
           content:
@@ -1199,6 +1255,13 @@ paths:
                 properties: {}
                 required:
                   - 01J93WTW4J3ZBAAVVZV8PSWZ6R
+        '400':
+          description: ErroResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
         '500':
           description: ServerErrorResponse
           content:
@@ -1243,6 +1306,13 @@ paths:
                     type: string
                     format: url
                     nullable: true
+        '400':
+          description: ErroResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
         '500':
           description: ServerErrorResponse
           content:
@@ -1308,6 +1378,13 @@ paths:
                   - sub
                   - jti
                   - isVerify
+        '400':
+          description: ErroResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
         '500':
           description: ServerErrorResponse
           content:
@@ -1603,12 +1680,9 @@ components:
           type: string
         message:
           type: string
-        data:
-          type: string
       required:
         - code
         - message
-        - data
     validationErrorItem:
       type: object
       properties:

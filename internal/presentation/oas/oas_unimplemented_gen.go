@@ -27,7 +27,7 @@ func (UnimplementedHandler) Authorize(ctx context.Context, params AuthorizeParam
 // トークセッション作成.
 //
 // POST /talksessions
-func (UnimplementedHandler) CreateTalkSession(ctx context.Context, req OptCreateTalkSessionReq) (r *CreateTalkSessionOK, _ error) {
+func (UnimplementedHandler) CreateTalkSession(ctx context.Context, req OptCreateTalkSessionReq) (r CreateTalkSessionRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -45,7 +45,7 @@ func (UnimplementedHandler) EditUserProfile(ctx context.Context, req OptEditUser
 // 🚧 トークセッションの詳細.
 //
 // GET /talksessions/{talkSessionId}
-func (UnimplementedHandler) GetTalkSessionDetail(ctx context.Context, params GetTalkSessionDetailParams) (r *GetTalkSessionDetailOK, _ error) {
+func (UnimplementedHandler) GetTalkSessionDetail(ctx context.Context, params GetTalkSessionDetailParams) (r GetTalkSessionDetailRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
