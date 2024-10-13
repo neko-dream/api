@@ -110,9 +110,9 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 	if user.Demographics() != nil {
 		userDemographics := *user.Demographics()
 
-		var municipality sql.NullString
-		if userDemographics.Municipality() != nil {
-			municipality = sql.NullString{String: (*userDemographics.Municipality()).String(), Valid: true}
+		var city sql.NullString
+		if userDemographics.City() != nil {
+			city = sql.NullString{String: (*userDemographics.City()).String(), Valid: true}
 		}
 		var yearOfBirth sql.NullInt32
 		if userDemographics.YearOfBirth() != nil {
@@ -129,7 +129,7 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 				UserID:             user.UserID().UUID(),
 				YearOfBirth:        yearOfBirth,
 				Occupation:         sql.NullInt16{Int16: int16(userDemographics.Occupation()), Valid: true},
-				Municipality:       municipality,
+				City:               city,
 				HouseholdSize:      householdSize,
 				Gender:             int16(userDemographics.Gender()),
 			}); err != nil {
@@ -236,7 +236,7 @@ func (u *userRepository) findUserDemographics(ctx context.Context, userID shared
 	var (
 		yearOfBirth   *um.YearOfBirth
 		occupation    *um.Occupation
-		municipality  *um.Municipality
+		city          *um.City
 		householdSize *um.HouseholdSize
 		gender        *um.Gender
 		prefecture    *string
@@ -250,8 +250,8 @@ func (u *userRepository) findUserDemographics(ctx context.Context, userID shared
 		occupation = lo.ToPtr(um.Occupation(int(userDemoRow.Occupation.Int16)))
 	}
 	gender = lo.ToPtr(um.Gender(int(userDemoRow.Gender)))
-	if userDemoRow.Municipality.Valid {
-		municipality = um.NewMunicipality(lo.ToPtr(userDemoRow.Municipality.String))
+	if userDemoRow.City.Valid {
+		city = um.NewCity(lo.ToPtr(userDemoRow.City.String))
 	}
 	if userDemoRow.HouseholdSize.Valid {
 		householdSize = um.NewHouseholdSize(lo.ToPtr(int(userDemoRow.HouseholdSize.Int16)))
@@ -265,7 +265,7 @@ func (u *userRepository) findUserDemographics(ctx context.Context, userID shared
 		yearOfBirth,
 		occupation,
 		gender,
-		municipality,
+		city,
 		householdSize,
 		prefecture,
 	)

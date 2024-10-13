@@ -29,7 +29,7 @@ func main() {
 	config := di.Invoke[*config.Config](container)
 	migrator := di.Invoke[*db.Migrator](container)
 	if config.Env != "production" {
-		// migrator.Down()
+		migrator.Down()
 		migrator.Up()
 		// dummyInitializer := di.Invoke[*db.DummyInitializer](container)
 		// dummyInitializer.Initialize()

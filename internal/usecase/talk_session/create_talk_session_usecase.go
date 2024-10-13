@@ -24,6 +24,8 @@ type (
 		ScheduledEndTime time.Time
 		Latitude         *float64
 		Longitude        *float64
+		City             *string
+		Prefecture       *string
 	}
 
 	CreateTalkSessionOutput struct {
@@ -50,6 +52,8 @@ func (i *createTalkSessionInteractor) Execute(ctx context.Context, input CreateT
 			time.Now(ctx),
 			input.ScheduledEndTime,
 			nil,
+			input.City,
+			input.Prefecture,
 		)
 		if err := i.TalkSessionRepository.Create(ctx, talkSession); err != nil {
 			utils.HandleError(ctx, err, "TalkSessionRepository.Create")

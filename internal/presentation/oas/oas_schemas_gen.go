@@ -77,6 +77,10 @@ type CreateTalkSessionOK struct {
 	ScheduledEndTime string `json:"scheduledEndTime"`
 	// 位置情報.
 	Location OptCreateTalkSessionOKLocation `json:"location"`
+	// 市区町村.
+	City OptNilString `json:"city"`
+	// 都道府県.
+	Prefecture OptNilString `json:"prefecture"`
 }
 
 // GetID returns the value of ID.
@@ -109,6 +113,16 @@ func (s *CreateTalkSessionOK) GetLocation() OptCreateTalkSessionOKLocation {
 	return s.Location
 }
 
+// GetCity returns the value of City.
+func (s *CreateTalkSessionOK) GetCity() OptNilString {
+	return s.City
+}
+
+// GetPrefecture returns the value of Prefecture.
+func (s *CreateTalkSessionOK) GetPrefecture() OptNilString {
+	return s.Prefecture
+}
+
 // SetID sets the value of ID.
 func (s *CreateTalkSessionOK) SetID(val string) {
 	s.ID = val
@@ -137,6 +151,16 @@ func (s *CreateTalkSessionOK) SetScheduledEndTime(val string) {
 // SetLocation sets the value of Location.
 func (s *CreateTalkSessionOK) SetLocation(val OptCreateTalkSessionOKLocation) {
 	s.Location = val
+}
+
+// SetCity sets the value of City.
+func (s *CreateTalkSessionOK) SetCity(val OptNilString) {
+	s.City = val
+}
+
+// SetPrefecture sets the value of Prefecture.
+func (s *CreateTalkSessionOK) SetPrefecture(val OptNilString) {
+	s.Prefecture = val
 }
 
 func (*CreateTalkSessionOK) createTalkSessionRes() {}
@@ -213,10 +237,6 @@ type CreateTalkSessionOKLocation0 struct {
 	Latitude float64 `json:"latitude"`
 	// 経度.
 	Longitude float64 `json:"longitude"`
-	// 都道府県.
-	Prefecture string `json:"prefecture"`
-	// 市区町村.
-	City string `json:"city"`
 }
 
 // GetLatitude returns the value of Latitude.
@@ -229,16 +249,6 @@ func (s *CreateTalkSessionOKLocation0) GetLongitude() float64 {
 	return s.Longitude
 }
 
-// GetPrefecture returns the value of Prefecture.
-func (s *CreateTalkSessionOKLocation0) GetPrefecture() string {
-	return s.Prefecture
-}
-
-// GetCity returns the value of City.
-func (s *CreateTalkSessionOKLocation0) GetCity() string {
-	return s.City
-}
-
 // SetLatitude sets the value of Latitude.
 func (s *CreateTalkSessionOKLocation0) SetLatitude(val float64) {
 	s.Latitude = val
@@ -247,16 +257,6 @@ func (s *CreateTalkSessionOKLocation0) SetLatitude(val float64) {
 // SetLongitude sets the value of Longitude.
 func (s *CreateTalkSessionOKLocation0) SetLongitude(val float64) {
 	s.Longitude = val
-}
-
-// SetPrefecture sets the value of Prefecture.
-func (s *CreateTalkSessionOKLocation0) SetPrefecture(val string) {
-	s.Prefecture = val
-}
-
-// SetCity sets the value of City.
-func (s *CreateTalkSessionOKLocation0) SetCity(val string) {
-	s.City = val
 }
 
 // 作成ユーザー.
@@ -303,6 +303,10 @@ type CreateTalkSessionReq struct {
 	Latitude OptNilFloat64 `json:"latitude"`
 	// 経度.
 	Longitude OptNilFloat64 `json:"longitude"`
+	// 市区町村.
+	City OptNilString `json:"city"`
+	// 都道府県.
+	Prefecture OptNilString `json:"prefecture"`
 }
 
 // GetTheme returns the value of Theme.
@@ -325,6 +329,16 @@ func (s *CreateTalkSessionReq) GetLongitude() OptNilFloat64 {
 	return s.Longitude
 }
 
+// GetCity returns the value of City.
+func (s *CreateTalkSessionReq) GetCity() OptNilString {
+	return s.City
+}
+
+// GetPrefecture returns the value of Prefecture.
+func (s *CreateTalkSessionReq) GetPrefecture() OptNilString {
+	return s.Prefecture
+}
+
 // SetTheme sets the value of Theme.
 func (s *CreateTalkSessionReq) SetTheme(val string) {
 	s.Theme = val
@@ -343,6 +357,16 @@ func (s *CreateTalkSessionReq) SetLatitude(val OptNilFloat64) {
 // SetLongitude sets the value of Longitude.
 func (s *CreateTalkSessionReq) SetLongitude(val OptNilFloat64) {
 	s.Longitude = val
+}
+
+// SetCity sets the value of City.
+func (s *CreateTalkSessionReq) SetCity(val OptNilString) {
+	s.City = val
+}
+
+// SetPrefecture sets the value of Prefecture.
+func (s *CreateTalkSessionReq) SetPrefecture(val OptNilString) {
+	s.Prefecture = val
 }
 
 type EditUserProfileBadRequest struct {
@@ -447,7 +471,7 @@ type EditUserProfileReq struct {
 	// 性別.
 	Gender OptNilEditUserProfileReqGender `json:"gender"`
 	// 市区町村.
-	Municipality OptNilString `json:"municipality"`
+	City OptNilString `json:"city"`
 	// 職業.
 	Occupation OptNilEditUserProfileReqOccupation `json:"occupation"`
 	// 世帯人数.
@@ -476,9 +500,9 @@ func (s *EditUserProfileReq) GetGender() OptNilEditUserProfileReqGender {
 	return s.Gender
 }
 
-// GetMunicipality returns the value of Municipality.
-func (s *EditUserProfileReq) GetMunicipality() OptNilString {
-	return s.Municipality
+// GetCity returns the value of City.
+func (s *EditUserProfileReq) GetCity() OptNilString {
+	return s.City
 }
 
 // GetOccupation returns the value of Occupation.
@@ -516,9 +540,9 @@ func (s *EditUserProfileReq) SetGender(val OptNilEditUserProfileReqGender) {
 	s.Gender = val
 }
 
-// SetMunicipality sets the value of Municipality.
-func (s *EditUserProfileReq) SetMunicipality(val OptNilString) {
-	s.Municipality = val
+// SetCity sets the value of City.
+func (s *EditUserProfileReq) SetCity(val OptNilString) {
+	s.City = val
 }
 
 // SetOccupation sets the value of Occupation.
@@ -737,6 +761,10 @@ type GetTalkSessionDetailOK struct {
 	ScheduledEndTime string `json:"scheduledEndTime"`
 	// 位置情報.
 	Location OptGetTalkSessionDetailOKLocation `json:"location"`
+	// 市区町村.
+	City OptNilString `json:"city"`
+	// 都道府県.
+	Prefecture OptNilString `json:"prefecture"`
 }
 
 // GetID returns the value of ID.
@@ -769,6 +797,16 @@ func (s *GetTalkSessionDetailOK) GetLocation() OptGetTalkSessionDetailOKLocation
 	return s.Location
 }
 
+// GetCity returns the value of City.
+func (s *GetTalkSessionDetailOK) GetCity() OptNilString {
+	return s.City
+}
+
+// GetPrefecture returns the value of Prefecture.
+func (s *GetTalkSessionDetailOK) GetPrefecture() OptNilString {
+	return s.Prefecture
+}
+
 // SetID sets the value of ID.
 func (s *GetTalkSessionDetailOK) SetID(val string) {
 	s.ID = val
@@ -797,6 +835,16 @@ func (s *GetTalkSessionDetailOK) SetScheduledEndTime(val string) {
 // SetLocation sets the value of Location.
 func (s *GetTalkSessionDetailOK) SetLocation(val OptGetTalkSessionDetailOKLocation) {
 	s.Location = val
+}
+
+// SetCity sets the value of City.
+func (s *GetTalkSessionDetailOK) SetCity(val OptNilString) {
+	s.City = val
+}
+
+// SetPrefecture sets the value of Prefecture.
+func (s *GetTalkSessionDetailOK) SetPrefecture(val OptNilString) {
+	s.Prefecture = val
 }
 
 func (*GetTalkSessionDetailOK) getTalkSessionDetailRes() {}
@@ -875,10 +923,6 @@ type GetTalkSessionDetailOKLocation0 struct {
 	Latitude float64 `json:"latitude"`
 	// 経度.
 	Longitude float64 `json:"longitude"`
-	// 都道府県.
-	Prefecture string `json:"prefecture"`
-	// 市区町村.
-	City string `json:"city"`
 }
 
 // GetLatitude returns the value of Latitude.
@@ -891,16 +935,6 @@ func (s *GetTalkSessionDetailOKLocation0) GetLongitude() float64 {
 	return s.Longitude
 }
 
-// GetPrefecture returns the value of Prefecture.
-func (s *GetTalkSessionDetailOKLocation0) GetPrefecture() string {
-	return s.Prefecture
-}
-
-// GetCity returns the value of City.
-func (s *GetTalkSessionDetailOKLocation0) GetCity() string {
-	return s.City
-}
-
 // SetLatitude sets the value of Latitude.
 func (s *GetTalkSessionDetailOKLocation0) SetLatitude(val float64) {
 	s.Latitude = val
@@ -909,16 +943,6 @@ func (s *GetTalkSessionDetailOKLocation0) SetLatitude(val float64) {
 // SetLongitude sets the value of Longitude.
 func (s *GetTalkSessionDetailOKLocation0) SetLongitude(val float64) {
 	s.Longitude = val
-}
-
-// SetPrefecture sets the value of Prefecture.
-func (s *GetTalkSessionDetailOKLocation0) SetPrefecture(val string) {
-	s.Prefecture = val
-}
-
-// SetCity sets the value of City.
-func (s *GetTalkSessionDetailOKLocation0) SetCity(val string) {
-	s.City = val
 }
 
 // 作成ユーザー.
@@ -1113,6 +1137,10 @@ type GetTalkSessionListOKTalkSessionsItemTalkSession struct {
 	ScheduledEndTime string `json:"scheduledEndTime"`
 	// 位置情報.
 	Location OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation `json:"location"`
+	// 市区町村.
+	City OptNilString `json:"city"`
+	// 都道府県.
+	Prefecture OptNilString `json:"prefecture"`
 }
 
 // GetID returns the value of ID.
@@ -1145,6 +1173,16 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetLocation() OptGetTa
 	return s.Location
 }
 
+// GetCity returns the value of City.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetCity() OptNilString {
+	return s.City
+}
+
+// GetPrefecture returns the value of Prefecture.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetPrefecture() OptNilString {
+	return s.Prefecture
+}
+
 // SetID sets the value of ID.
 func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetID(val string) {
 	s.ID = val
@@ -1173,6 +1211,16 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetScheduledEndTime(va
 // SetLocation sets the value of Location.
 func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetLocation(val OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation) {
 	s.Location = val
+}
+
+// SetCity sets the value of City.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetCity(val OptNilString) {
+	s.City = val
+}
+
+// SetPrefecture sets the value of Prefecture.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetPrefecture(val OptNilString) {
+	s.Prefecture = val
 }
 
 // 位置情報.
@@ -1249,10 +1297,6 @@ type GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0 struct {
 	Latitude float64 `json:"latitude"`
 	// 経度.
 	Longitude float64 `json:"longitude"`
-	// 都道府県.
-	Prefecture string `json:"prefecture"`
-	// 市区町村.
-	City string `json:"city"`
 }
 
 // GetLatitude returns the value of Latitude.
@@ -1265,16 +1309,6 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) GetLongitude(
 	return s.Longitude
 }
 
-// GetPrefecture returns the value of Prefecture.
-func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) GetPrefecture() string {
-	return s.Prefecture
-}
-
-// GetCity returns the value of City.
-func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) GetCity() string {
-	return s.City
-}
-
 // SetLatitude sets the value of Latitude.
 func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) SetLatitude(val float64) {
 	s.Latitude = val
@@ -1283,16 +1317,6 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) SetLatitude(v
 // SetLongitude sets the value of Longitude.
 func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) SetLongitude(val float64) {
 	s.Longitude = val
-}
-
-// SetPrefecture sets the value of Prefecture.
-func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) SetPrefecture(val string) {
-	s.Prefecture = val
-}
-
-// SetCity sets the value of City.
-func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) SetCity(val string) {
-	s.City = val
 }
 
 // 作成ユーザー.
@@ -1471,7 +1495,7 @@ type GetUserInfoOKDemographics struct {
 	// 性別.
 	Gender string `json:"gender"`
 	// 市区町村.
-	Municipality OptNilString `json:"municipality"`
+	City OptNilString `json:"city"`
 	// 世帯人数.
 	HouseholdSize OptNilInt `json:"householdSize"`
 	// 都道府県.
@@ -1493,9 +1517,9 @@ func (s *GetUserInfoOKDemographics) GetGender() string {
 	return s.Gender
 }
 
-// GetMunicipality returns the value of Municipality.
-func (s *GetUserInfoOKDemographics) GetMunicipality() OptNilString {
-	return s.Municipality
+// GetCity returns the value of City.
+func (s *GetUserInfoOKDemographics) GetCity() OptNilString {
+	return s.City
 }
 
 // GetHouseholdSize returns the value of HouseholdSize.
@@ -1523,9 +1547,9 @@ func (s *GetUserInfoOKDemographics) SetGender(val string) {
 	s.Gender = val
 }
 
-// SetMunicipality sets the value of Municipality.
-func (s *GetUserInfoOKDemographics) SetMunicipality(val OptNilString) {
-	s.Municipality = val
+// SetCity sets the value of City.
+func (s *GetUserInfoOKDemographics) SetCity(val OptNilString) {
+	s.City = val
 }
 
 // SetHouseholdSize sets the value of HouseholdSize.
@@ -2565,6 +2589,287 @@ func (s *OpinionCommentsOKRootOpinionUser) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
 
+type OpinionsHistoryBadRequest struct{}
+
+func (*OpinionsHistoryBadRequest) opinionsHistoryRes() {}
+
+type OpinionsHistoryInternalServerError struct{}
+
+func (*OpinionsHistoryInternalServerError) opinionsHistoryRes() {}
+
+type OpinionsHistoryOK struct {
+	Opinions []OpinionsHistoryOKOpinionsItem `json:"opinions"`
+}
+
+// GetOpinions returns the value of Opinions.
+func (s *OpinionsHistoryOK) GetOpinions() []OpinionsHistoryOKOpinionsItem {
+	return s.Opinions
+}
+
+// SetOpinions sets the value of Opinions.
+func (s *OpinionsHistoryOK) SetOpinions(val []OpinionsHistoryOKOpinionsItem) {
+	s.Opinions = val
+}
+
+func (*OpinionsHistoryOK) opinionsHistoryRes() {}
+
+type OpinionsHistoryOKOpinionsItem struct {
+	// 作成ユーザー.
+	User       OpinionsHistoryOKOpinionsItemUser    `json:"user"`
+	Opinion    OpinionsHistoryOKOpinionsItemOpinion `json:"opinion"`
+	ReplyCount int                                  `json:"replyCount"`
+}
+
+// GetUser returns the value of User.
+func (s *OpinionsHistoryOKOpinionsItem) GetUser() OpinionsHistoryOKOpinionsItemUser {
+	return s.User
+}
+
+// GetOpinion returns the value of Opinion.
+func (s *OpinionsHistoryOKOpinionsItem) GetOpinion() OpinionsHistoryOKOpinionsItemOpinion {
+	return s.Opinion
+}
+
+// GetReplyCount returns the value of ReplyCount.
+func (s *OpinionsHistoryOKOpinionsItem) GetReplyCount() int {
+	return s.ReplyCount
+}
+
+// SetUser sets the value of User.
+func (s *OpinionsHistoryOKOpinionsItem) SetUser(val OpinionsHistoryOKOpinionsItemUser) {
+	s.User = val
+}
+
+// SetOpinion sets the value of Opinion.
+func (s *OpinionsHistoryOKOpinionsItem) SetOpinion(val OpinionsHistoryOKOpinionsItemOpinion) {
+	s.Opinion = val
+}
+
+// SetReplyCount sets the value of ReplyCount.
+func (s *OpinionsHistoryOKOpinionsItem) SetReplyCount(val int) {
+	s.ReplyCount = val
+}
+
+type OpinionsHistoryOKOpinionsItemOpinion struct {
+	// 意見ID.
+	ID    string    `json:"id"`
+	Title OptString `json:"title"`
+	// 意見のテキスト.
+	Content string `json:"content"`
+	// 親の意見ID。ルートならば無し.
+	ParentID OptString `json:"parentID"`
+	// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+	VoteType OptOpinionsHistoryOKOpinionsItemOpinionVoteType `json:"voteType"`
+	// 画像が返る場合もある.
+	PictureURL OptString `json:"pictureURL"`
+	// 参考文献URL.
+	ReferenceURL OptString `json:"referenceURL"`
+}
+
+// GetID returns the value of ID.
+func (s *OpinionsHistoryOKOpinionsItemOpinion) GetID() string {
+	return s.ID
+}
+
+// GetTitle returns the value of Title.
+func (s *OpinionsHistoryOKOpinionsItemOpinion) GetTitle() OptString {
+	return s.Title
+}
+
+// GetContent returns the value of Content.
+func (s *OpinionsHistoryOKOpinionsItemOpinion) GetContent() string {
+	return s.Content
+}
+
+// GetParentID returns the value of ParentID.
+func (s *OpinionsHistoryOKOpinionsItemOpinion) GetParentID() OptString {
+	return s.ParentID
+}
+
+// GetVoteType returns the value of VoteType.
+func (s *OpinionsHistoryOKOpinionsItemOpinion) GetVoteType() OptOpinionsHistoryOKOpinionsItemOpinionVoteType {
+	return s.VoteType
+}
+
+// GetPictureURL returns the value of PictureURL.
+func (s *OpinionsHistoryOKOpinionsItemOpinion) GetPictureURL() OptString {
+	return s.PictureURL
+}
+
+// GetReferenceURL returns the value of ReferenceURL.
+func (s *OpinionsHistoryOKOpinionsItemOpinion) GetReferenceURL() OptString {
+	return s.ReferenceURL
+}
+
+// SetID sets the value of ID.
+func (s *OpinionsHistoryOKOpinionsItemOpinion) SetID(val string) {
+	s.ID = val
+}
+
+// SetTitle sets the value of Title.
+func (s *OpinionsHistoryOKOpinionsItemOpinion) SetTitle(val OptString) {
+	s.Title = val
+}
+
+// SetContent sets the value of Content.
+func (s *OpinionsHistoryOKOpinionsItemOpinion) SetContent(val string) {
+	s.Content = val
+}
+
+// SetParentID sets the value of ParentID.
+func (s *OpinionsHistoryOKOpinionsItemOpinion) SetParentID(val OptString) {
+	s.ParentID = val
+}
+
+// SetVoteType sets the value of VoteType.
+func (s *OpinionsHistoryOKOpinionsItemOpinion) SetVoteType(val OptOpinionsHistoryOKOpinionsItemOpinionVoteType) {
+	s.VoteType = val
+}
+
+// SetPictureURL sets the value of PictureURL.
+func (s *OpinionsHistoryOKOpinionsItemOpinion) SetPictureURL(val OptString) {
+	s.PictureURL = val
+}
+
+// SetReferenceURL sets the value of ReferenceURL.
+func (s *OpinionsHistoryOKOpinionsItemOpinion) SetReferenceURL(val OptString) {
+	s.ReferenceURL = val
+}
+
+// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+type OpinionsHistoryOKOpinionsItemOpinionVoteType string
+
+const (
+	OpinionsHistoryOKOpinionsItemOpinionVoteTypeAgree    OpinionsHistoryOKOpinionsItemOpinionVoteType = "agree"
+	OpinionsHistoryOKOpinionsItemOpinionVoteTypeDisagree OpinionsHistoryOKOpinionsItemOpinionVoteType = "disagree"
+	OpinionsHistoryOKOpinionsItemOpinionVoteTypePass     OpinionsHistoryOKOpinionsItemOpinionVoteType = "pass"
+)
+
+// AllValues returns all OpinionsHistoryOKOpinionsItemOpinionVoteType values.
+func (OpinionsHistoryOKOpinionsItemOpinionVoteType) AllValues() []OpinionsHistoryOKOpinionsItemOpinionVoteType {
+	return []OpinionsHistoryOKOpinionsItemOpinionVoteType{
+		OpinionsHistoryOKOpinionsItemOpinionVoteTypeAgree,
+		OpinionsHistoryOKOpinionsItemOpinionVoteTypeDisagree,
+		OpinionsHistoryOKOpinionsItemOpinionVoteTypePass,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s OpinionsHistoryOKOpinionsItemOpinionVoteType) MarshalText() ([]byte, error) {
+	switch s {
+	case OpinionsHistoryOKOpinionsItemOpinionVoteTypeAgree:
+		return []byte(s), nil
+	case OpinionsHistoryOKOpinionsItemOpinionVoteTypeDisagree:
+		return []byte(s), nil
+	case OpinionsHistoryOKOpinionsItemOpinionVoteTypePass:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *OpinionsHistoryOKOpinionsItemOpinionVoteType) UnmarshalText(data []byte) error {
+	switch OpinionsHistoryOKOpinionsItemOpinionVoteType(data) {
+	case OpinionsHistoryOKOpinionsItemOpinionVoteTypeAgree:
+		*s = OpinionsHistoryOKOpinionsItemOpinionVoteTypeAgree
+		return nil
+	case OpinionsHistoryOKOpinionsItemOpinionVoteTypeDisagree:
+		*s = OpinionsHistoryOKOpinionsItemOpinionVoteTypeDisagree
+		return nil
+	case OpinionsHistoryOKOpinionsItemOpinionVoteTypePass:
+		*s = OpinionsHistoryOKOpinionsItemOpinionVoteTypePass
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// 作成ユーザー.
+type OpinionsHistoryOKOpinionsItemUser struct {
+	DisplayID   string       `json:"displayID"`
+	DisplayName string       `json:"displayName"`
+	IconURL     OptNilString `json:"iconURL"`
+}
+
+// GetDisplayID returns the value of DisplayID.
+func (s *OpinionsHistoryOKOpinionsItemUser) GetDisplayID() string {
+	return s.DisplayID
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *OpinionsHistoryOKOpinionsItemUser) GetDisplayName() string {
+	return s.DisplayName
+}
+
+// GetIconURL returns the value of IconURL.
+func (s *OpinionsHistoryOKOpinionsItemUser) GetIconURL() OptNilString {
+	return s.IconURL
+}
+
+// SetDisplayID sets the value of DisplayID.
+func (s *OpinionsHistoryOKOpinionsItemUser) SetDisplayID(val string) {
+	s.DisplayID = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *OpinionsHistoryOKOpinionsItemUser) SetDisplayName(val string) {
+	s.DisplayName = val
+}
+
+// SetIconURL sets the value of IconURL.
+func (s *OpinionsHistoryOKOpinionsItemUser) SetIconURL(val OptNilString) {
+	s.IconURL = val
+}
+
+type OpinionsHistorySort string
+
+const (
+	OpinionsHistorySortLatest    OpinionsHistorySort = "latest"
+	OpinionsHistorySortMostReply OpinionsHistorySort = "mostReply"
+	OpinionsHistorySortOldest    OpinionsHistorySort = "oldest"
+)
+
+// AllValues returns all OpinionsHistorySort values.
+func (OpinionsHistorySort) AllValues() []OpinionsHistorySort {
+	return []OpinionsHistorySort{
+		OpinionsHistorySortLatest,
+		OpinionsHistorySortMostReply,
+		OpinionsHistorySortOldest,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s OpinionsHistorySort) MarshalText() ([]byte, error) {
+	switch s {
+	case OpinionsHistorySortLatest:
+		return []byte(s), nil
+	case OpinionsHistorySortMostReply:
+		return []byte(s), nil
+	case OpinionsHistorySortOldest:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *OpinionsHistorySort) UnmarshalText(data []byte) error {
+	switch OpinionsHistorySort(data) {
+	case OpinionsHistorySortLatest:
+		*s = OpinionsHistorySortLatest
+		return nil
+	case OpinionsHistorySortMostReply:
+		*s = OpinionsHistorySortMostReply
+		return nil
+	case OpinionsHistorySortOldest:
+		*s = OpinionsHistorySortOldest
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
 // NewOptBool returns new OptBool with value set to v.
 func NewOptBool(v bool) OptBool {
 	return OptBool{
@@ -3311,6 +3616,69 @@ func (o OptNilInt) Or(d int) int {
 	return d
 }
 
+// NewOptNilOpinionsHistorySort returns new OptNilOpinionsHistorySort with value set to v.
+func NewOptNilOpinionsHistorySort(v OpinionsHistorySort) OptNilOpinionsHistorySort {
+	return OptNilOpinionsHistorySort{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilOpinionsHistorySort is optional nullable OpinionsHistorySort.
+type OptNilOpinionsHistorySort struct {
+	Value OpinionsHistorySort
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilOpinionsHistorySort was set.
+func (o OptNilOpinionsHistorySort) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilOpinionsHistorySort) Reset() {
+	var v OpinionsHistorySort
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilOpinionsHistorySort) SetTo(v OpinionsHistorySort) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilOpinionsHistorySort) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilOpinionsHistorySort) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v OpinionsHistorySort
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilOpinionsHistorySort) Get() (v OpinionsHistorySort, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilOpinionsHistorySort) Or(d OpinionsHistorySort) OpinionsHistorySort {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilRegisterUserReqGender returns new OptNilRegisterUserReqGender with value set to v.
 func NewOptNilRegisterUserReqGender(v RegisterUserReqGender) OptNilRegisterUserReqGender {
 	return OptNilRegisterUserReqGender{
@@ -3678,6 +4046,52 @@ func (o OptOpinionCommentsOKRootOpinionOpinionVoteType) Get() (v OpinionComments
 
 // Or returns value if set, or given parameter if does not.
 func (o OptOpinionCommentsOKRootOpinionOpinionVoteType) Or(d OpinionCommentsOKRootOpinionOpinionVoteType) OpinionCommentsOKRootOpinionOpinionVoteType {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptOpinionsHistoryOKOpinionsItemOpinionVoteType returns new OptOpinionsHistoryOKOpinionsItemOpinionVoteType with value set to v.
+func NewOptOpinionsHistoryOKOpinionsItemOpinionVoteType(v OpinionsHistoryOKOpinionsItemOpinionVoteType) OptOpinionsHistoryOKOpinionsItemOpinionVoteType {
+	return OptOpinionsHistoryOKOpinionsItemOpinionVoteType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptOpinionsHistoryOKOpinionsItemOpinionVoteType is optional OpinionsHistoryOKOpinionsItemOpinionVoteType.
+type OptOpinionsHistoryOKOpinionsItemOpinionVoteType struct {
+	Value OpinionsHistoryOKOpinionsItemOpinionVoteType
+	Set   bool
+}
+
+// IsSet returns true if OptOpinionsHistoryOKOpinionsItemOpinionVoteType was set.
+func (o OptOpinionsHistoryOKOpinionsItemOpinionVoteType) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptOpinionsHistoryOKOpinionsItemOpinionVoteType) Reset() {
+	var v OpinionsHistoryOKOpinionsItemOpinionVoteType
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptOpinionsHistoryOKOpinionsItemOpinionVoteType) SetTo(v OpinionsHistoryOKOpinionsItemOpinionVoteType) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptOpinionsHistoryOKOpinionsItemOpinionVoteType) Get() (v OpinionsHistoryOKOpinionsItemOpinionVoteType, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptOpinionsHistoryOKOpinionsItemOpinionVoteType) Or(d OpinionsHistoryOKOpinionsItemOpinionVoteType) OpinionsHistoryOKOpinionsItemOpinionVoteType {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -4229,7 +4643,7 @@ type RegisterUserReq struct {
 	// 都道府県.
 	Prefectures OptString `json:"prefectures"`
 	// 市区町村.
-	Municipality OptNilString `json:"municipality"`
+	City OptNilString `json:"city"`
 	// ユーザーの職業.
 	Occupation OptNilRegisterUserReqOccupation `json:"occupation"`
 	// 世帯人数.
@@ -4266,9 +4680,9 @@ func (s *RegisterUserReq) GetPrefectures() OptString {
 	return s.Prefectures
 }
 
-// GetMunicipality returns the value of Municipality.
-func (s *RegisterUserReq) GetMunicipality() OptNilString {
-	return s.Municipality
+// GetCity returns the value of City.
+func (s *RegisterUserReq) GetCity() OptNilString {
+	return s.City
 }
 
 // GetOccupation returns the value of Occupation.
@@ -4311,9 +4725,9 @@ func (s *RegisterUserReq) SetPrefectures(val OptString) {
 	s.Prefectures = val
 }
 
-// SetMunicipality sets the value of Municipality.
-func (s *RegisterUserReq) SetMunicipality(val OptNilString) {
-	s.Municipality = val
+// SetCity sets the value of City.
+func (s *RegisterUserReq) SetCity(val OptNilString) {
+	s.City = val
 }
 
 // SetOccupation sets the value of Occupation.
@@ -4500,6 +4914,18 @@ func (s *SessionId) GetAPIKey() string {
 func (s *SessionId) SetAPIKey(val string) {
 	s.APIKey = val
 }
+
+type SessionsHistoryBadRequest struct{}
+
+func (*SessionsHistoryBadRequest) sessionsHistoryRes() {}
+
+type SessionsHistoryInternalServerError struct{}
+
+func (*SessionsHistoryInternalServerError) sessionsHistoryRes() {}
+
+type SessionsHistoryOK struct{}
+
+func (*SessionsHistoryOK) sessionsHistoryRes() {}
 
 type SwipeOpinionsBadRequest struct {
 	Code    string `json:"code"`

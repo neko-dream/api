@@ -193,6 +193,48 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				}
 
 				elem = origElem
+			case 'o': // Prefix: "opinions/histories"
+				origElem := elem
+				if l := len("opinions/histories"); len(elem) >= l && elem[0:l] == "opinions/histories" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch r.Method {
+					case "GET":
+						s.handleOpinionsHistoryRequest([0]string{}, elemIsEscaped, w, r)
+					default:
+						s.notAllowed(w, r, "GET")
+					}
+
+					return
+				}
+
+				elem = origElem
+			case 's': // Prefix: "sessions/histories"
+				origElem := elem
+				if l := len("sessions/histories"); len(elem) >= l && elem[0:l] == "sessions/histories" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch r.Method {
+					case "GET":
+						s.handleSessionsHistoryRequest([0]string{}, elemIsEscaped, w, r)
+					default:
+						s.notAllowed(w, r, "GET")
+					}
+
+					return
+				}
+
+				elem = origElem
 			case 't': // Prefix: "t"
 				origElem := elem
 				if l := len("t"); len(elem) >= l && elem[0:l] == "t" {
@@ -744,6 +786,56 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					}
 
 					elem = origElem
+				}
+
+				elem = origElem
+			case 'o': // Prefix: "opinions/histories"
+				origElem := elem
+				if l := len("opinions/histories"); len(elem) >= l && elem[0:l] == "opinions/histories" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch method {
+					case "GET":
+						r.name = "OpinionsHistory"
+						r.summary = "今までに投稿した異見"
+						r.operationID = "opinionsHistory"
+						r.pathPattern = "/opinions/histories"
+						r.args = args
+						r.count = 0
+						return r, true
+					default:
+						return
+					}
+				}
+
+				elem = origElem
+			case 's': // Prefix: "sessions/histories"
+				origElem := elem
+				if l := len("sessions/histories"); len(elem) >= l && elem[0:l] == "sessions/histories" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch method {
+					case "GET":
+						r.name = "SessionsHistory"
+						r.summary = "リアクション済みのセッション一覧"
+						r.operationID = "sessionsHistory"
+						r.pathPattern = "/sessions/histories"
+						r.args = args
+						r.count = 0
+						return r, true
+					default:
+						return
+					}
 				}
 
 				elem = origElem

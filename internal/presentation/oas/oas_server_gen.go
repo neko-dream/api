@@ -128,12 +128,24 @@ type UserHandler interface {
 	//
 	// GET /user
 	GetUserInfo(ctx context.Context) (GetUserInfoRes, error)
+	// OpinionsHistory implements opinionsHistory operation.
+	//
+	// 今までに投稿した異見.
+	//
+	// GET /opinions/histories
+	OpinionsHistory(ctx context.Context, params OpinionsHistoryParams) (OpinionsHistoryRes, error)
 	// RegisterUser implements registerUser operation.
 	//
 	// ユーザー作成.
 	//
 	// POST /user
 	RegisterUser(ctx context.Context, req OptRegisterUserReq) (RegisterUserRes, error)
+	// SessionsHistory implements sessionsHistory operation.
+	//
+	// リアクション済みのセッション一覧.
+	//
+	// GET /sessions/histories
+	SessionsHistory(ctx context.Context) (SessionsHistoryRes, error)
 }
 
 // VoteHandler handles operations described by OpenAPI v3 specification.

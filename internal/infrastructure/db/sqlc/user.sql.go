@@ -142,7 +142,7 @@ func (q *Queries) GetUserBySubject(ctx context.Context, subject string) (GetUser
 
 const getUserDemographicsByUserID = `-- name: GetUserDemographicsByUserID :one
 SELECT
-    user_demographics_id, user_id, year_of_birth, occupation, gender, municipality, household_size, created_at, updated_at, prefecture
+    user_demographics_id, user_id, year_of_birth, occupation, gender, city, household_size, created_at, updated_at, prefecture
 FROM
     "user_demographics"
 WHERE
@@ -158,7 +158,7 @@ func (q *Queries) GetUserDemographicsByUserID(ctx context.Context, userID uuid.U
 		&i.YearOfBirth,
 		&i.Occupation,
 		&i.Gender,
-		&i.Municipality,
+		&i.City,
 		&i.HouseholdSize,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -174,7 +174,7 @@ INSERT INTO user_demographics (
     year_of_birth,
     occupation,
     gender,
-    municipality,
+    city,
     household_size,
     prefecture,
     created_at,
@@ -185,7 +185,7 @@ DO UPDATE SET
     year_of_birth = $3,
     occupation = $4,
     gender = $5,
-    municipality = $6,
+    city = $6,
     household_size = $7,
     prefecture = $8,
     updated_at = now()
@@ -197,7 +197,7 @@ type UpdateOrCreateUserDemographicsParams struct {
 	YearOfBirth        sql.NullInt32
 	Occupation         sql.NullInt16
 	Gender             int16
-	Municipality       sql.NullString
+	City       sql.NullString
 	HouseholdSize      sql.NullInt16
 	Prefecture         sql.NullString
 }
@@ -209,7 +209,7 @@ func (q *Queries) UpdateOrCreateUserDemographics(ctx context.Context, arg Update
 		arg.YearOfBirth,
 		arg.Occupation,
 		arg.Gender,
-		arg.Municipality,
+		arg.City,
 		arg.HouseholdSize,
 		arg.Prefecture,
 	)

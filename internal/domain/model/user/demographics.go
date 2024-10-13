@@ -10,7 +10,7 @@ type (
 		yearOfBirth        *YearOfBirth                  // ユーザーの生年
 		occupation         *Occupation                   // ユーザーの職業
 		gender             *Gender                       // ユーザーの性別
-		municipality       *Municipality                 // ユーザーの居住地
+		city               *City                         // ユーザーの居住地
 		householdSize      *HouseholdSize                // ユーザーの世帯人数
 		prefecture         *string                       // ユーザーの居住地の都道府県
 	}
@@ -47,8 +47,8 @@ func (u *UserDemographics) Gender() Gender {
 	return *u.gender
 }
 
-func (u *UserDemographics) Municipality() *Municipality {
-	return u.municipality
+func (u *UserDemographics) City() *City {
+	return u.city
 }
 
 func (u *UserDemographics) HouseholdSize() *HouseholdSize {
@@ -64,7 +64,7 @@ func NewUserDemographics(
 	yearOfBirth *YearOfBirth,
 	occupation *Occupation,
 	gender *Gender,
-	municipality *Municipality,
+	city *City,
 	householdSize *HouseholdSize,
 	prefecture *string,
 ) UserDemographics {
@@ -73,7 +73,7 @@ func NewUserDemographics(
 		yearOfBirth:        yearOfBirth,
 		occupation:         occupation,
 		gender:             gender,
-		municipality:       municipality,
+		city:               city,
 		householdSize:      householdSize,
 		prefecture:         prefecture,
 	}

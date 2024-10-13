@@ -71,19 +71,19 @@ paths:
                           longitude:
                             type: number
                             description: 経度
-                          prefecture:
-                            type: string
-                            description: 都道府県
-                          city:
-                            type: string
-                            description: 市区町村
                         required:
                           - latitude
                           - longitude
-                          - prefecture
-                          - city
                       - type: 'null'
                     description: 位置情報
+                  city:
+                    type: string
+                    description: 市区町村
+                    nullable: true
+                  prefecture:
+                    type: string
+                    description: 都道府県
+                    nullable: true
                 required:
                   - id
                   - theme
@@ -124,7 +124,7 @@ paths:
       parameters: []
       requestBody:
         content:
-          application/x-www-form-urlencoded:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -146,6 +146,16 @@ paths:
                   type: number
                   description: 経度
                   example: 0
+                  nullable: true
+                city:
+                  type: string
+                  description: 市区町村
+                  example: ''
+                  nullable: true
+                prefecture:
+                  type: string
+                  description: 都道府県
+                  example: ''
                   nullable: true
               required:
                 - theme
@@ -201,19 +211,19 @@ paths:
                           longitude:
                             type: number
                             description: 経度
-                          prefecture:
-                            type: string
-                            description: 都道府県
-                          city:
-                            type: string
-                            description: 市区町村
                         required:
                           - latitude
                           - longitude
-                          - prefecture
-                          - city
                       - type: 'null'
                     description: 位置情報
+                  city:
+                    type: string
+                    description: 市区町村
+                    nullable: true
+                  prefecture:
+                    type: string
+                    description: 都道府県
+                    nullable: true
                 required:
                   - id
                   - theme
@@ -352,19 +362,19 @@ paths:
                                     longitude:
                                       type: number
                                       description: 経度
-                                    prefecture:
-                                      type: string
-                                      description: 都道府県
-                                    city:
-                                      type: string
-                                      description: 市区町村
                                   required:
                                     - latitude
                                     - longitude
-                                    - prefecture
-                                    - city
                                 - type: 'null'
                               description: 位置情報
+                            city:
+                              type: string
+                              description: 市区町村
+                              nullable: true
+                            prefecture:
+                              type: string
+                              description: 都道府県
+                              nullable: true
                           required:
                             - id
                             - theme
@@ -497,7 +507,7 @@ paths:
                   description: 都道府県
                   example: ''
                   type: string
-                municipality:
+                city:
                   type: string
                   description: 市区町村
                   example: ''
@@ -684,7 +694,7 @@ paths:
                   description: 性別
                   example: ''
                   nullable: true
-                municipality:
+                city:
                   type: string
                   description: 市区町村
                   example: ''
@@ -871,7 +881,7 @@ paths:
                         type: string
                         title: 性別
                         description: 性別
-                      municipality:
+                      city:
                         type: string
                         title: 市区町村
                         description: 市区町村
@@ -1169,7 +1179,7 @@ paths:
             type: string
       requestBody:
         content:
-          application/x-www-form-urlencoded:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -1760,6 +1770,191 @@ paths:
       security:
         - SessionId: []
       x-ogen-operation-group: Auth
+  /opinions/histories:
+    get:
+      summary: 今までに投稿した異見
+      deprecated: false
+      description: ''
+      operationId: opinionsHistory
+      tags:
+        - user
+        - user
+      parameters:
+        - name: sort
+          in: query
+          description: ソートきー
+          required: false
+          schema:
+            type: string
+            enum:
+              - latest
+              - mostReply
+              - oldest
+            x-apidog:
+              enumDescriptions:
+                latest: 最新
+                mostReply: もっともリプライされた
+                oldest: 最古
+            nullable: true
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  opinions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        user:
+                          type: object
+                          properties:
+                            displayID:
+                              type: string
+                              x-apidog-mock: '{{$string.uuid}}'
+                              pattern: ^[A-Za-z0-9]$
+                              examples:
+                                - userid
+                              minLength: 3
+                              maxLength: 25
+                            displayName:
+                              type: string
+                              x-apidog-mock: '{{$person.firstName}}'
+                            iconURL:
+                              type: string
+                              nullable: true
+                          required:
+                            - displayID
+                            - displayName
+                          description: 作成ユーザー
+                        opinion:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              faker: '1'
+                              description: 意見ID
+                            title:
+                              type: string
+                            content:
+                              type: string
+                              description: 意見のテキスト
+                              minLength: 1
+                              maxLength: 140
+                            parentID:
+                              type: string
+                              description: 親の意見ID。ルートならば無し
+                            voteType:
+                              type: string
+                              description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              enum:
+                                - agree
+                                - disagree
+                                - pass
+                              x-apidog-enum:
+                                - name: ''
+                                  value: agree
+                                  description: 良さそう
+                                - name: ''
+                                  value: disagree
+                                  description: 違うかも
+                                - name: ''
+                                  value: pass
+                                  description: 保留
+                            pictureURL:
+                              type: string
+                              description: 画像が返る場合もある
+                            referenceURL:
+                              type: string
+                              description: 参考文献URL
+                          required:
+                            - content
+                            - id
+                        replyCount:
+                          type: integer
+                      required:
+                        - user
+                        - opinion
+                        - replyCount
+                required:
+                  - opinions
+        '400':
+          description: ErrorResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+        '500':
+          description: ServerErrorResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+      security: []
+      x-ogen-operation-group: User
+  /sessions/histories:
+    get:
+      summary: リアクション済みのセッション一覧
+      deprecated: false
+      description: ''
+      operationId: sessionsHistory
+      tags:
+        - user
+        - user
+      parameters: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: ErrorResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+        '500':
+          description: ServerErrorResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+      security: []
+      x-ogen-operation-group: User
   /auth/{provider}/login:
     get:
       summary: OAuthログイン
@@ -1900,7 +2095,7 @@ components:
           type: string
           title: 性別
           description: 性別
-        municipality:
+        city:
           type: string
           title: 市区町村
           description: 市区町村
@@ -1982,17 +2177,9 @@ components:
         longitude:
           type: number
           description: 経度
-        prefecture:
-          type: string
-          description: 都道府県
-        city:
-          type: string
-          description: 市区町村
       required:
         - latitude
         - longitude
-        - prefecture
-        - city
     voteType:
       type: string
       description: 意見の3種のステータス
@@ -2142,19 +2329,19 @@ components:
                 longitude:
                   type: number
                   description: 経度
-                prefecture:
-                  type: string
-                  description: 都道府県
-                city:
-                  type: string
-                  description: 市区町村
               required:
                 - latitude
                 - longitude
-                - prefecture
-                - city
             - type: 'null'
           description: 位置情報
+        city:
+          type: string
+          description: 市区町村
+          nullable: true
+        prefecture:
+          type: string
+          description: 都道府県
+          nullable: true
       required:
         - id
         - theme

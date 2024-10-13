@@ -879,6 +879,86 @@ func decodeOpinionCommentsParams(args [2]string, argsEscaped bool, r *http.Reque
 	return params, nil
 }
 
+// OpinionsHistoryParams is parameters of opinionsHistory operation.
+type OpinionsHistoryParams struct {
+	// ソートきー.
+	Sort OptNilOpinionsHistorySort
+}
+
+func unpackOpinionsHistoryParams(packed middleware.Parameters) (params OpinionsHistoryParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "sort",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Sort = v.(OptNilOpinionsHistorySort)
+		}
+	}
+	return params
+}
+
+func decodeOpinionsHistoryParams(args [0]string, argsEscaped bool, r *http.Request) (params OpinionsHistoryParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode query: sort.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "sort",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotSortVal OpinionsHistorySort
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotSortVal = OpinionsHistorySort(c)
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Sort.SetTo(paramsDotSortVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.Sort.Get(); ok {
+					if err := func() error {
+						if err := value.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "sort",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // PostOpinionPostParams is parameters of postOpinionPost operation.
 type PostOpinionPostParams struct {
 	TalkSessionID string

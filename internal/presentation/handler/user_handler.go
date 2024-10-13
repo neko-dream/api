@@ -33,6 +33,16 @@ func NewUserHandler(
 	}
 }
 
+// OpinionsHistory implements oas.UserHandler.
+func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHistoryParams) (oas.OpinionsHistoryRes, error) {
+	panic("unimplemented")
+}
+
+// SessionsHistory implements oas.UserHandler.
+func (u *userHandler) SessionsHistory(ctx context.Context) (oas.SessionsHistoryRes, error) {
+	panic("unimplemented")
+}
+
 // GetUserInfo implements ユーザーの情報取得
 func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, error) {
 	claim := session.GetSession(ctx)
@@ -62,11 +72,11 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 	var demographicsResp oas.GetUserInfoOKDemographics
 	if res.User.Demographics() != nil {
 		demographics := res.User.Demographics()
-		var municipality oas.OptNilString
-		if demographics.Municipality() != nil {
-			municipality = oas.OptNilString{
+		var city oas.OptNilString
+		if demographics.City() != nil {
+			city = oas.OptNilString{
 				Set:   true,
-				Value: demographics.Municipality().String(),
+				Value: demographics.City().String(),
 			}
 		}
 		var yearOfBirth oas.OptNilInt
@@ -93,7 +103,7 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 
 		demographicsResp = oas.GetUserInfoOKDemographics{
 			YearOfBirth:   yearOfBirth,
-			Municipality:  municipality,
+			City:          city,
 			Occupation:    demographics.Occupation().String(),
 			Gender:        demographics.Gender().String(),
 			HouseholdSize: householdSize,
@@ -142,9 +152,9 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 		yearOfBirth = &value.YearOfBirth.Value
 	}
 
-	var municipality *string
-	if !value.Municipality.Null {
-		municipality = &value.Municipality.Value
+	var city *string
+	if !value.City.Null {
+		city = &value.City.Value
 	}
 
 	var householdSize *int
@@ -153,11 +163,11 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 	}
 
 	out, err := u.EditUserUseCase.Execute(ctx, user_usecase.EditUserInput{
-		UserID:       userID,
-		DisplayName:  utils.ToPtrIfNotNullValue(value.DisplayName.Null, value.DisplayName.Value),
-		Icon:         file,
-		YearOfBirth:  yearOfBirth,
-		Municipality: municipality,
+		UserID:      userID,
+		DisplayName: utils.ToPtrIfNotNullValue(value.DisplayName.Null, value.DisplayName.Value),
+		Icon:        file,
+		YearOfBirth: yearOfBirth,
+		City:        city,
 		Occupation: utils.ToPtrIfNotNullFunc(value.Occupation.Null, func() *string {
 			txt, err := value.Occupation.Value.MarshalText()
 			if err != nil {
@@ -222,12 +232,12 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 	}
 
 	input := user_usecase.RegisterUserInput{
-		UserID:       userID,
-		DisplayID:    value.DisplayID,
-		DisplayName:  value.DisplayName,
-		Icon:         file,
-		YearOfBirth:  utils.ToPtrIfNotNullValue(value.YearOfBirth.Null, value.YearOfBirth.Value),
-		Municipality: utils.ToPtrIfNotNullValue(value.Municipality.Null, value.Municipality.Value),
+		UserID:      userID,
+		DisplayID:   value.DisplayID,
+		DisplayName: value.DisplayName,
+		Icon:        file,
+		YearOfBirth: utils.ToPtrIfNotNullValue(value.YearOfBirth.Null, value.YearOfBirth.Value),
+		City:        utils.ToPtrIfNotNullValue(value.City.Null, value.City.Value),
 		Occupation: utils.ToPtrIfNotNullFunc(value.Occupation.Null, func() *string {
 			txt, err := value.Occupation.Value.MarshalText()
 			if err != nil {

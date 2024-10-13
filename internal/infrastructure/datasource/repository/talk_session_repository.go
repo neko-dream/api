@@ -36,8 +36,6 @@ func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talkses
 		if err := t.GetQueries(ctx).CreateTalkSessionLocation(ctx, model.CreateTalkSessionLocationParams{
 			TalkSessionID:       talkSession.TalkSessionID().UUID(),
 			StGeographyfromtext: talkSession.Location().ToGeographyText(),
-			City:                talkSession.Location().City(),
-			Prefecture:          talkSession.Location().Prefecture(),
 		}); err != nil {
 			return errtrace.Wrap(err)
 		}
@@ -64,8 +62,6 @@ func (t *talkSessionRepository) Update(ctx context.Context, talkSession *talkses
 		if err := t.GetQueries(ctx).UpdateTalkSessionLocation(ctx, model.UpdateTalkSessionLocationParams{
 			TalkSessionID:       talkSession.TalkSessionID().UUID(),
 			StGeographyfromtext: talkSession.Location().ToGeographyText(),
-			City:                talkSession.Location().City(),
-			Prefecture:          talkSession.Location().Prefecture(),
 		}); err != nil {
 			return errtrace.Wrap(err)
 		}

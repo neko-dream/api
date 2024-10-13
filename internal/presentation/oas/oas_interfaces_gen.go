@@ -37,12 +37,20 @@ type OpinionCommentsRes interface {
 	opinionCommentsRes()
 }
 
+type OpinionsHistoryRes interface {
+	opinionsHistoryRes()
+}
+
 type PostOpinionPostRes interface {
 	postOpinionPostRes()
 }
 
 type RegisterUserRes interface {
 	registerUserRes()
+}
+
+type SessionsHistoryRes interface {
+	sessionsHistoryRes()
 }
 
 type SwipeOpinionsRes interface {

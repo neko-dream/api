@@ -26,7 +26,7 @@ type (
 		Icon          *multipart.FileHeader // ユーザーのアイコン
 		YearOfBirth   *int                  // ユーザーの生年
 		Gender        *string               // ユーザーの性別
-		Municipality  *string               // ユーザーの住んでいる市町村
+		City          *string               // ユーザーの住んでいる市町村
 		Occupation    *string               // ユーザーの職業
 		HouseholdSize *int                  // ユーザーの世帯人数
 		Prefecture    *string               // ユーザーの居住地の都道府県
@@ -90,7 +90,7 @@ func (e *editUserInteractor) Execute(ctx context.Context, input EditUserInput) (
 
 		if input.YearOfBirth != nil ||
 			input.Gender != nil ||
-			input.Municipality != nil ||
+			input.City != nil ||
 			input.Occupation != nil ||
 			input.HouseholdSize != nil ||
 			input.Prefecture != nil {
@@ -107,7 +107,7 @@ func (e *editUserInteractor) Execute(ctx context.Context, input EditUserInput) (
 				user.NewYearOfBirth(input.YearOfBirth),
 				user.NewOccupation(input.Occupation),
 				lo.ToPtr(user.NewGender(input.Gender)),
-				user.NewMunicipality(input.Municipality),
+				user.NewCity(input.City),
 				user.NewHouseholdSize(input.HouseholdSize),
 				input.Prefecture,
 			))

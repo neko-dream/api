@@ -112,6 +112,15 @@ func (UnimplementedHandler) OpinionComments(ctx context.Context, params OpinionC
 	return r, ht.ErrNotImplemented
 }
 
+// OpinionsHistory implements opinionsHistory operation.
+//
+// 今までに投稿した異見.
+//
+// GET /opinions/histories
+func (UnimplementedHandler) OpinionsHistory(ctx context.Context, params OpinionsHistoryParams) (r OpinionsHistoryRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // PostOpinionPost implements postOpinionPost operation.
 //
 // ParentOpinionIDがなければルートの意見として投稿される.
@@ -127,6 +136,15 @@ func (UnimplementedHandler) PostOpinionPost(ctx context.Context, req OptPostOpin
 //
 // POST /user
 func (UnimplementedHandler) RegisterUser(ctx context.Context, req OptRegisterUserReq) (r RegisterUserRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// SessionsHistory implements sessionsHistory operation.
+//
+// リアクション済みのセッション一覧.
+//
+// GET /sessions/histories
+func (UnimplementedHandler) SessionsHistory(ctx context.Context) (r SessionsHistoryRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

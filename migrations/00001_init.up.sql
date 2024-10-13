@@ -33,7 +33,7 @@ CREATE TABLE "user_demographics" (
   "year_of_birth" int,
   "occupation" SMALLINT,
   "gender" SMALLINT NOT NULL,
-  "municipality" varchar,
+  "city" varchar,
   "household_size" SMALLINT,
   "created_at" timestamp NOT NULL DEFAULT (now()),
   "updated_at" timestamp NOT NULL DEFAULT (now())
@@ -48,13 +48,13 @@ CREATE TABLE "talk_sessions" (
   "scheduled_end_time" timestamp NOT NULL,
   "finished_at" timestamp,
   "created_at" timestamp NOT NULL DEFAULT (now())
+  "city" varchar NOT NULL,
+  "prefecture" varchar NOT NULL
 );
 
 CREATE TABLE "talk_session_locations" (
   "talk_session_id" uuid PRIMARY KEY,
-  "location" GEOGRAPHY(POINT, 4326) NOT NULL,
-  "city" varchar NOT NULL,
-  "prefecture" varchar NOT NULL
+  "location" GEOGRAPHY(POINT, 4326) NOT NULL
 );
 
 CREATE TABLE "votes" (

@@ -43,6 +43,7 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 					// 明日
 					time.Now(ctx).Add(ctx, time.Hour*24),
 					nil,
+					nil, nil,
 				)
 				ctx.Data.TsRepo = repository.NewTalkSessionRepository(dbManager)
 				return nil
@@ -79,9 +80,8 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 						talkSessionID,
 						30.0,
 						30.0,
-						"鯖江市",
-						"福井県",
 					),
+					nil, nil,
 				)
 				ctx.Data.TsRepo = repository.NewTalkSessionRepository(dbManager)
 				return nil
@@ -102,8 +102,6 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 					talkSessionID,
 					ts.Latitude.(float64),
 					ts.Longitude.(float64),
-					ts.City.String,
-					ts.Prefecture.String,
 				)
 				assert.Equal(t, location.ToGeographyText(), "POINT(30.000000 30.000000)")
 

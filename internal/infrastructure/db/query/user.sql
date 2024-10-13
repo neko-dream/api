@@ -49,7 +49,7 @@ INSERT INTO user_demographics (
     year_of_birth,
     occupation,
     gender,
-    municipality,
+    city,
     household_size,
     prefecture,
     created_at,
@@ -60,7 +60,7 @@ DO UPDATE SET
     year_of_birth = $3,
     occupation = $4,
     gender = $5,
-    municipality = $6,
+    city = $6,
     household_size = $7,
     prefecture = $8,
     updated_at = now();

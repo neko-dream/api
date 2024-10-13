@@ -351,7 +351,7 @@ func (d *DummyInitializer) User() error {
 			user.NewYearOfBirth(lo.ToPtr(1990)),
 			user.NewOccupation(lo.ToPtr("会社員")),
 			lo.ToPtr(user.NewGender(lo.ToPtr("男性"))),
-			user.NewMunicipality(lo.ToPtr("中野区")),
+			user.NewCity(lo.ToPtr("中野区")),
 			user.NewHouseholdSize(lo.ToPtr(1)),
 			lo.ToPtr("東京都"),
 		)),
@@ -377,7 +377,7 @@ func (d *DummyInitializer) User() error {
 			user.NewYearOfBirth(lo.ToPtr(1990)),
 			user.NewOccupation(lo.ToPtr("会社員")),
 			lo.ToPtr(user.NewGender(lo.ToPtr("男性"))),
-			user.NewMunicipality(lo.ToPtr("中野区")),
+			user.NewCity(lo.ToPtr("中野区")),
 			user.NewHouseholdSize(lo.ToPtr(1)),
 			lo.ToPtr("東京都"),
 		)),
@@ -403,7 +403,7 @@ func (d *DummyInitializer) User() error {
 			user.NewYearOfBirth(lo.ToPtr(1990)),
 			user.NewOccupation(lo.ToPtr("会社員")),
 			lo.ToPtr(user.NewGender(lo.ToPtr("男性"))),
-			user.NewMunicipality(lo.ToPtr("中野区")),
+			user.NewCity(lo.ToPtr("中野区")),
 			user.NewHouseholdSize(lo.ToPtr(1)),
 			lo.ToPtr("東京都"),
 		)),
@@ -453,6 +453,8 @@ func (d *DummyInitializer) TalkSession() error {
 			time.Now(ctx),
 			time.Now(ctx).Add(ctx, 3*time.Month),
 			nil,
+			lo.ToPtr("東京都"),
+			lo.ToPtr("中野区"),
 		),
 		talksession.NewTalkSession(
 			shared.NewUUID[talksession.TalkSession](),
@@ -461,6 +463,7 @@ func (d *DummyInitializer) TalkSession() error {
 			time.Now(ctx),
 			time.Now(ctx).Add(ctx, 3*time.Month),
 			nil,
+			nil, nil,
 		),
 	}
 

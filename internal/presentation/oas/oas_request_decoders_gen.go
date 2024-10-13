@@ -44,14 +44,21 @@ func (s *Server) decodeCreateTalkSessionRequest(r *http.Request) (
 		return req, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
-	case ct == "application/x-www-form-urlencoded":
+	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
 			return req, close, nil
 		}
-		form, err := ht.ParseForm(r)
-		if err != nil {
-			return req, close, errors.Wrap(err, "parse form")
+		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
+			return req, close, errors.Wrap(err, "parse multipart form")
 		}
+		// Remove all temporary files created by ParseMultipartForm when the request is done.
+		//
+		// Notice that the closers are called in reverse order, to match defer behavior, so
+		// any opened file will be closed before RemoveAll call.
+		closers = append(closers, r.MultipartForm.RemoveAll)
+		// Form values may be unused.
+		form := url.Values(r.MultipartForm.Value)
+		_ = form
 
 		var request OptCreateTalkSessionReq
 		{
@@ -218,6 +225,70 @@ func (s *Server) decodeCreateTalkSessionRequest(r *http.Request) (
 						return nil
 					}(); err != nil {
 						return req, close, errors.Wrap(err, "validate")
+					}
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "city",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotCityVal string
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToString(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotCityVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.City.SetTo(optFormDotCityVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"city\"")
+					}
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "prefecture",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotPrefectureVal string
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToString(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotPrefectureVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.Prefecture.SetTo(optFormDotPrefectureVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"prefecture\"")
 					}
 				}
 			}
@@ -393,13 +464,13 @@ func (s *Server) decodeEditUserProfileRequest(r *http.Request) (
 			}
 			{
 				cfg := uri.QueryParameterDecodingConfig{
-					Name:    "municipality",
+					Name:    "city",
 					Style:   uri.QueryStyleForm,
 					Explode: true,
 				}
 				if err := q.HasParam(cfg); err == nil {
 					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-						var optFormDotMunicipalityVal string
+						var optFormDotCityVal string
 						if err := func() error {
 							val, err := d.DecodeValue()
 							if err != nil {
@@ -411,15 +482,15 @@ func (s *Server) decodeEditUserProfileRequest(r *http.Request) (
 								return err
 							}
 
-							optFormDotMunicipalityVal = c
+							optFormDotCityVal = c
 							return nil
 						}(); err != nil {
 							return err
 						}
-						optForm.Municipality.SetTo(optFormDotMunicipalityVal)
+						optForm.City.SetTo(optFormDotCityVal)
 						return nil
 					}); err != nil {
-						return req, close, errors.Wrap(err, "decode \"municipality\"")
+						return req, close, errors.Wrap(err, "decode \"city\"")
 					}
 				}
 			}
@@ -1006,13 +1077,13 @@ func (s *Server) decodeRegisterUserRequest(r *http.Request) (
 			}
 			{
 				cfg := uri.QueryParameterDecodingConfig{
-					Name:    "municipality",
+					Name:    "city",
 					Style:   uri.QueryStyleForm,
 					Explode: true,
 				}
 				if err := q.HasParam(cfg); err == nil {
 					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-						var optFormDotMunicipalityVal string
+						var optFormDotCityVal string
 						if err := func() error {
 							val, err := d.DecodeValue()
 							if err != nil {
@@ -1024,15 +1095,15 @@ func (s *Server) decodeRegisterUserRequest(r *http.Request) (
 								return err
 							}
 
-							optFormDotMunicipalityVal = c
+							optFormDotCityVal = c
 							return nil
 						}(); err != nil {
 							return err
 						}
-						optForm.Municipality.SetTo(optFormDotMunicipalityVal)
+						optForm.City.SetTo(optFormDotCityVal)
 						return nil
 					}); err != nil {
-						return req, close, errors.Wrap(err, "decode \"municipality\"")
+						return req, close, errors.Wrap(err, "decode \"city\"")
 					}
 				}
 			}
@@ -1202,14 +1273,21 @@ func (s *Server) decodeVoteRequest(r *http.Request) (
 		return req, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
-	case ct == "application/x-www-form-urlencoded":
+	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
 			return req, close, nil
 		}
-		form, err := ht.ParseForm(r)
-		if err != nil {
-			return req, close, errors.Wrap(err, "parse form")
+		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
+			return req, close, errors.Wrap(err, "parse multipart form")
 		}
+		// Remove all temporary files created by ParseMultipartForm when the request is done.
+		//
+		// Notice that the closers are called in reverse order, to match defer behavior, so
+		// any opened file will be closed before RemoveAll call.
+		closers = append(closers, r.MultipartForm.RemoveAll)
+		// Form values may be unused.
+		form := url.Values(r.MultipartForm.Value)
+		_ = form
 
 		var request OptVoteReq
 		{

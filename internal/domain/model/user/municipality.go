@@ -2,18 +2,18 @@ package user
 
 import "github.com/samber/lo"
 
-type Municipality string
+type City string
 
-func (m Municipality) String() string {
+func (m City) String() string {
 	return string(m)
 }
 
-func NewMunicipality(municipality *string) *Municipality {
-	if municipality == nil {
+func NewCity(city *string) *City {
+	if city == nil {
 		return nil
 	}
-	if *municipality == "" {
+	if *city == "" {
 		return nil
 	}
-	return lo.ToPtr(Municipality(*municipality))
+	return lo.ToPtr(City(*city))
 }

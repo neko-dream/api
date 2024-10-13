@@ -37,6 +37,8 @@ type (
 		CreatedAt        string
 		ScheduledEndTime string
 		Location         *LocationDTO
+		City             *string
+		Prefecture       *string
 	}
 
 	UserDTO struct {
@@ -45,10 +47,8 @@ type (
 		IconURL     *string
 	}
 	LocationDTO struct {
-		City       string
-		Prefecture string
-		Latitude   float64
-		Longitude  float64
+		Latitude  float64
+		Longitude float64
 	}
 
 	listTalkSessionQueryHandler struct {
@@ -97,10 +97,8 @@ func (h *listTalkSessionQueryHandler) Execute(ctx context.Context, input ListTal
 		var locationDTO *LocationDTO
 		if row.City.Valid && row.Prefecture.Valid {
 			locationDTO = &LocationDTO{
-				City:       row.City.String,
-				Prefecture: row.Prefecture.String,
-				Latitude:   row.Latitude.(float64),
-				Longitude:  row.Longitude.(float64),
+				Latitude:  row.Latitude.(float64),
+				Longitude: row.Longitude.(float64),
 			}
 		}
 
@@ -119,6 +117,8 @@ func (h *listTalkSessionQueryHandler) Execute(ctx context.Context, input ListTal
 			CreatedAt:        time.NewTime(ctx, row.CreatedAt).Format(ctx),
 			ScheduledEndTime: time.NewTime(ctx, row.ScheduledEndTime).Format(ctx),
 			Location:         locationDTO,
+			City:             utils.ToPtrIfNotNullValue[string](row.City.Valid, row.City.String),
+			Prefecture:       utils.ToPtrIfNotNullValue[string](row.Prefecture.Valid, row.Prefecture.String),
 		})
 	}
 

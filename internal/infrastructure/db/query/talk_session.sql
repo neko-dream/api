@@ -1,11 +1,11 @@
 -- name: CreateTalkSession :exec
-INSERT INTO talk_sessions (talk_session_id, theme, owner_id, scheduled_end_time, created_at) VALUES ($1, $2, $3, $4, $5);
+INSERT INTO talk_sessions (talk_session_id, theme, owner_id, scheduled_end_time, created_at, city, prefecture) VALUES ($1, $2, $3, $4, $5, $6, $7);
 
 -- name: CreateTalkSessionLocation :exec
 INSERT INTO talk_session_locations (talk_session_id, location, city, prefecture) VALUES ($1, ST_GeographyFromText($2), $3, $4);
 
 -- name: UpdateTalkSessionLocation :exec
-UPDATE talk_session_locations SET location = ST_GeographyFromText($2), city = $3, prefecture = $4 WHERE talk_session_id = $1;
+UPDATE talk_session_locations SET location = ST_GeographyFromText($2) WHERE talk_session_id = $1;
 
 -- name: EditTalkSession :exec
 UPDATE talk_sessions
@@ -19,14 +19,14 @@ SELECT
     talk_sessions.theme,
     talk_sessions.created_at,
     talk_sessions.scheduled_end_time,
+    talk_sessions.city AS city,
+    talk_sessions.prefecture AS prefecture,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     users.display_name AS display_name,
     users.display_id AS display_id,
     users.icon_url AS icon_url,
     ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))) AS latitude,
-    ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))) AS longitude,
-    talk_session_locations.city AS city,
-    talk_session_locations.prefecture AS prefecture
+    ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))) AS longitude
 FROM talk_sessions
 LEFT JOIN users
     ON talk_sessions.owner_id = users.user_id
@@ -43,16 +43,16 @@ WHERE talk_sessions.talk_session_id = $1;
 SELECT
     talk_sessions.talk_session_id,
     talk_sessions.theme,
-    talk_sessions.created_at,
     talk_sessions.scheduled_end_time,
+    talk_sessions.city AS city,
+    talk_sessions.prefecture AS prefecture,
+    talk_sessions.created_at,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     users.display_name AS display_name,
     users.display_id AS display_id,
     users.icon_url AS icon_url,
     ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))) AS latitude,
-    ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))) AS longitude,
-    talk_session_locations.city AS city,
-    talk_session_locations.prefecture AS prefecture
+    ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))) AS longitude
 FROM talk_sessions
 LEFT JOIN (
     SELECT talk_session_id, COUNT(opinion_id) AS opinion_count

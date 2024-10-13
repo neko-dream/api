@@ -53,6 +53,8 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 		ScheduledEndTime: time.NewTime(ctx, req.Value.ScheduledEndTime),
 		Latitude:         latitude,
 		Longitude:        longitude,
+		City:             utils.ToPtrIfNotNullValue(req.Value.City.Null, req.Value.City.Value),
+		Prefecture:       utils.ToPtrIfNotNullValue(req.Value.Prefecture.Null, req.Value.Prefecture.Value),
 	})
 	if err != nil {
 		return nil, errtrace.Wrap(err)
@@ -63,8 +65,6 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 		location = oas.OptCreateTalkSessionOKLocation{}
 		location.Value.CreateTalkSessionOKLocation0.Latitude = out.Location.Latitude()
 		location.Value.CreateTalkSessionOKLocation0.Longitude = out.Location.Longitude()
-		location.Value.CreateTalkSessionOKLocation0.City = out.Location.City()
-		location.Value.CreateTalkSessionOKLocation0.Prefecture = out.Location.Prefecture()
 	}
 
 	res := &oas.CreateTalkSessionOK{
