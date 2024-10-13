@@ -173,6 +173,7 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 			return lo.ToPtr(string(txt))
 		}),
 		HouseholdSize: householdSize,
+		Prefecture:    utils.ToPtrIfNotNullValue(!value.Prefectures.IsSet(), value.Prefectures.Value),
 	})
 	if err != nil {
 		utils.HandleError(ctx, err, "EditUserUseCase.Execute")
@@ -242,6 +243,7 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 			return lo.ToPtr(string(txt))
 		}),
 		HouseholdSize: &value.HouseholdSize.Value,
+		Prefecture:    utils.ToPtrIfNotNullValue(!value.Prefectures.IsSet(), value.Prefectures.Value),
 	}
 	out, err := u.RegisterUserUseCase.Execute(ctx, input)
 	if err != nil {
