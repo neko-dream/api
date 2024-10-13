@@ -83,6 +83,7 @@ type UserDemographic struct {
 	HouseholdSize      sql.NullInt16
 	CreatedAt          time.Time
 	UpdatedAt          time.Time
+	Prefecture         sql.NullString
 }
 
 type UserGroupInfo struct {

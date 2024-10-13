@@ -31,6 +31,7 @@ type (
 		Municipality  *string               // ユーザーの住んでいる市町村
 		Occupation    *string               // ユーザーの職業
 		HouseholdSize *int                  // ユーザーの世帯人数
+		Prefecture    *string               // ユーザーの住んでいる都道府県
 	}
 
 	RegisterUserOutput struct {
@@ -120,6 +121,7 @@ func (i *registerUserInteractor) Execute(ctx context.Context, input RegisterUser
 			lo.ToPtr(user.NewGender(input.Gender)),
 			user.NewMunicipality(input.Municipality),
 			user.NewHouseholdSize(input.HouseholdSize),
+			input.Prefecture,
 		))
 
 		if err := i.userRep.Update(ctx, *foundUser); err != nil {

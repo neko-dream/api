@@ -239,6 +239,7 @@ func (u *userRepository) findUserDemographics(ctx context.Context, userID shared
 		municipality  *um.Municipality
 		householdSize *um.HouseholdSize
 		gender        *um.Gender
+		prefecture    *string
 	)
 	userDemographicsID := shared.MustParseUUID[user.UserDemographics](userDemoRow.UserDemographicsID.String())
 
@@ -255,6 +256,9 @@ func (u *userRepository) findUserDemographics(ctx context.Context, userID shared
 	if userDemoRow.HouseholdSize.Valid {
 		householdSize = um.NewHouseholdSize(lo.ToPtr(int(userDemoRow.HouseholdSize.Int16)))
 	}
+	if userDemoRow.Prefecture.Valid {
+		prefecture = lo.ToPtr(userDemoRow.Prefecture.String)
+	}
 
 	ud := user.NewUserDemographics(
 		userDemographicsID,
@@ -263,6 +267,7 @@ func (u *userRepository) findUserDemographics(ctx context.Context, userID shared
 		gender,
 		municipality,
 		householdSize,
+		prefecture,
 	)
 	return &ud, nil
 }

@@ -50,10 +50,11 @@ INSERT INTO user_demographics (
     occupation,
     gender,
     municipality,
+    prefecture,
     household_size,
     created_at,
     updated_at
-) VALUES ($1, $2, $3, $4, $5, $6, $7, now(), now())
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, now(), now())
 ON CONFLICT (user_id)
 DO UPDATE SET
     year_of_birth = $3,
@@ -61,6 +62,7 @@ DO UPDATE SET
     gender = $5,
     municipality = $6,
     household_size = $7,
+    prefecture = $8,
     updated_at = now();
 
 -- name: GetUserDemographicsByUserID :one

@@ -12,6 +12,7 @@ type (
 		gender             *Gender                       // ユーザーの性別
 		municipality       *Municipality                 // ユーザーの居住地
 		householdSize      *HouseholdSize                // ユーザーの世帯人数
+		prefecture         *string                       // ユーザーの居住地の都道府県
 	}
 )
 
@@ -21,6 +22,10 @@ func (u *UserDemographics) UserDemographicsID() shared.UUID[UserDemographics] {
 
 func (u *UserDemographics) YearOfBirth() *YearOfBirth {
 	return u.yearOfBirth
+}
+
+func (u *UserDemographics) Prefecture() *string {
+	return u.prefecture
 }
 
 // ユーザーの年齢を返す
@@ -61,6 +66,7 @@ func NewUserDemographics(
 	gender *Gender,
 	municipality *Municipality,
 	householdSize *HouseholdSize,
+	prefecture *string,
 ) UserDemographics {
 	return UserDemographics{
 		userDemographicsID: userDemographicsID,
@@ -69,5 +75,6 @@ func NewUserDemographics(
 		gender:             gender,
 		municipality:       municipality,
 		householdSize:      householdSize,
+		prefecture:         prefecture,
 	}
 }

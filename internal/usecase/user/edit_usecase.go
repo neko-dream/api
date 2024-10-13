@@ -29,6 +29,7 @@ type (
 		Municipality  *string               // ユーザーの住んでいる市町村
 		Occupation    *string               // ユーザーの職業
 		HouseholdSize *int                  // ユーザーの世帯人数
+		Prefecture    *string               // ユーザーの居住地の都道府県
 	}
 
 	EditUserOutput struct {
@@ -91,7 +92,8 @@ func (e *editUserInteractor) Execute(ctx context.Context, input EditUserInput) (
 			input.Gender != nil ||
 			input.Municipality != nil ||
 			input.Occupation != nil ||
-			input.HouseholdSize != nil {
+			input.HouseholdSize != nil ||
+			input.Prefecture != nil {
 			var demograID shared.UUID[user.UserDemographics]
 			if foundUser.Demographics() != nil {
 				demograID = foundUser.Demographics().UserDemographicsID()
@@ -107,6 +109,7 @@ func (e *editUserInteractor) Execute(ctx context.Context, input EditUserInput) (
 				lo.ToPtr(user.NewGender(input.Gender)),
 				user.NewMunicipality(input.Municipality),
 				user.NewHouseholdSize(input.HouseholdSize),
+				input.Prefecture,
 			))
 		}
 
