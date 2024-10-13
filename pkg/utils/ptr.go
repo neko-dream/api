@@ -14,12 +14,12 @@ func ToPtrIfNotNullValue[T any](nullFlag bool, value T) *T {
 	return &value
 }
 
-func ToPtrIfNotNullFunc[T any](nullFlag bool, getValue func() T) *T {
+func ToPtrIfNotNullFunc[T any](nullFlag bool, getValue func() *T) *T {
 	if nullFlag {
 		return nil
 	}
 	val := getValue()
-	return &val
+	return val
 }
 
 // 三項演算子
