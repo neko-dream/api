@@ -134,6 +134,10 @@ func (h *listTalkSessionQueryHandler) Execute(ctx context.Context, input ListTal
 		),
 		Status: sql.NullString{String: input.Status, Valid: true},
 	})
+	if err != nil {
+		utils.HandleError(ctx, err, "CountTalkSessions")
+		return nil, err
+	}
 
 	talkSessionOut.TalkSessions = talkSessionDTOList
 	talkSessionOut.TotalCount = int(talkSessionCount)
