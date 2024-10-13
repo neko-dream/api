@@ -47,7 +47,6 @@ func (i *createTalkSessionInteractor) Execute(ctx context.Context, input CreateT
 			shared.NewUUID[talksession.TalkSession](),
 			input.Theme,
 			input.OwnerID,
-			nil,
 			time.Now(ctx),
 			input.ScheduledEndTime,
 			nil,

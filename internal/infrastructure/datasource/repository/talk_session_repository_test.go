@@ -39,7 +39,6 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 					talkSessionID,
 					"test",
 					ownerUserID,
-					nil,
 					time.Now(ctx),
 					// 明日
 					time.Now(ctx).Add(ctx, time.Hour*24),
@@ -74,7 +73,6 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 					talkSessionID,
 					"test",
 					ownerUserID,
-					nil,
 					time.Now(ctx),
 					time.Now(ctx).Add(ctx, time.Hour*24),
 					talksession.NewLocation(

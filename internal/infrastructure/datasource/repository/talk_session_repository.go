@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 
 	"braces.dev/errtrace"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
@@ -51,12 +50,6 @@ func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talkses
 func (t *talkSessionRepository) Update(ctx context.Context, talkSession *talksession.TalkSession) error {
 	if talkSession == nil {
 		return nil
-	}
-
-	var finishedAt sql.NullTime
-	if talkSession.FinishedAt() != nil {
-		finishedAt.Time = talkSession.FinishedAt().Time
-		finishedAt.Valid = true
 	}
 
 	if err := t.GetQueries(ctx).EditTalkSession(ctx, model.EditTalkSessionParams{
