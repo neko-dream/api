@@ -1507,6 +1507,51 @@ func (o NilRegisterUserReqOccupation) Or(d RegisterUserReqOccupation) RegisterUs
 	return d
 }
 
+// NewNilVoteReqVoteStatus returns new NilVoteReqVoteStatus with value set to v.
+func NewNilVoteReqVoteStatus(v VoteReqVoteStatus) NilVoteReqVoteStatus {
+	return NilVoteReqVoteStatus{
+		Value: v,
+	}
+}
+
+// NilVoteReqVoteStatus is nullable VoteReqVoteStatus.
+type NilVoteReqVoteStatus struct {
+	Value VoteReqVoteStatus
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilVoteReqVoteStatus) SetTo(v VoteReqVoteStatus) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o NilVoteReqVoteStatus) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *NilVoteReqVoteStatus) SetToNull() {
+	o.Null = true
+	var v VoteReqVoteStatus
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilVoteReqVoteStatus) Get() (v VoteReqVoteStatus, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilVoteReqVoteStatus) Or(d VoteReqVoteStatus) VoteReqVoteStatus {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // OAuthCallbackFound is response for OAuthCallback operation.
 type OAuthCallbackFound struct {
 	Location  OptURI
@@ -3987,15 +4032,63 @@ func (s *VoteOKItemVoteType) UnmarshalText(data []byte) error {
 }
 
 type VoteReq struct {
-	VoteStatus string `json:"voteStatus"`
+	VoteStatus NilVoteReqVoteStatus `json:"voteStatus"`
 }
 
 // GetVoteStatus returns the value of VoteStatus.
-func (s *VoteReq) GetVoteStatus() string {
+func (s *VoteReq) GetVoteStatus() NilVoteReqVoteStatus {
 	return s.VoteStatus
 }
 
 // SetVoteStatus sets the value of VoteStatus.
-func (s *VoteReq) SetVoteStatus(val string) {
+func (s *VoteReq) SetVoteStatus(val NilVoteReqVoteStatus) {
 	s.VoteStatus = val
+}
+
+type VoteReqVoteStatus string
+
+const (
+	VoteReqVoteStatusAgree    VoteReqVoteStatus = "agree"
+	VoteReqVoteStatusDisagree VoteReqVoteStatus = "disagree"
+	VoteReqVoteStatusPass     VoteReqVoteStatus = "pass"
+)
+
+// AllValues returns all VoteReqVoteStatus values.
+func (VoteReqVoteStatus) AllValues() []VoteReqVoteStatus {
+	return []VoteReqVoteStatus{
+		VoteReqVoteStatusAgree,
+		VoteReqVoteStatusDisagree,
+		VoteReqVoteStatusPass,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s VoteReqVoteStatus) MarshalText() ([]byte, error) {
+	switch s {
+	case VoteReqVoteStatusAgree:
+		return []byte(s), nil
+	case VoteReqVoteStatusDisagree:
+		return []byte(s), nil
+	case VoteReqVoteStatusPass:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *VoteReqVoteStatus) UnmarshalText(data []byte) error {
+	switch VoteReqVoteStatus(data) {
+	case VoteReqVoteStatusAgree:
+		*s = VoteReqVoteStatusAgree
+		return nil
+	case VoteReqVoteStatusDisagree:
+		*s = VoteReqVoteStatusDisagree
+		return nil
+	case VoteReqVoteStatusPass:
+		*s = VoteReqVoteStatusPass
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }

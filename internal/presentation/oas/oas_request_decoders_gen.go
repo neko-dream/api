@@ -1163,20 +1163,42 @@ func (s *Server) decodeVoteRequest(r *http.Request) (
 				}
 				if err := q.HasParam(cfg); err == nil {
 					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-						val, err := d.DecodeValue()
-						if err != nil {
+						var optFormDotVoteStatusVal VoteReqVoteStatus
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToString(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotVoteStatusVal = VoteReqVoteStatus(c)
+							return nil
+						}(); err != nil {
 							return err
 						}
-
-						c, err := conv.ToString(val)
-						if err != nil {
-							return err
-						}
-
-						optForm.VoteStatus = c
+						optForm.VoteStatus.SetTo(optFormDotVoteStatusVal)
 						return nil
 					}); err != nil {
 						return req, close, errors.Wrap(err, "decode \"voteStatus\"")
+					}
+					if err := func() error {
+						if value, ok := optForm.VoteStatus.Get(); ok {
+							if err := func() error {
+								if err := value.Validate(); err != nil {
+									return err
+								}
+								return nil
+							}(); err != nil {
+								return err
+							}
+						}
+						return nil
+					}(); err != nil {
+						return req, close, errors.Wrap(err, "validate")
 					}
 				} else {
 					return req, close, errors.Wrap(err, "query")

@@ -1382,3 +1382,46 @@ func (s VoteOKItemVoteType) Validate() error {
 		return errors.Errorf("invalid value: %v", s)
 	}
 }
+
+func (s *VoteReq) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.VoteStatus.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "voteStatus",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s VoteReqVoteStatus) Validate() error {
+	switch s {
+	case "agree":
+		return nil
+	case "disagree":
+		return nil
+	case "pass":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}

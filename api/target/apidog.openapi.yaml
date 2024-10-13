@@ -960,8 +960,14 @@
                 "type": "object",
                 "properties": {
                   "voteStatus": {
+                    "type": "string",
+                    "enum": [
+                      "agree",
+                      "disagree",
+                      "pass"
+                    ],
                     "example": "",
-                    "type": "string"
+                    "nullable": true
                   }
                 },
                 "required": [

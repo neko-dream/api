@@ -868,8 +868,13 @@ paths:
               type: object
               properties:
                 voteStatus:
-                  example: ''
                   type: string
+                  enum:
+                    - agree
+                    - disagree
+                    - pass
+                  example: ''
+                  nullable: true
               required:
                 - voteStatus
       responses:
