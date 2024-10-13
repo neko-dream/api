@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"log"
 	"strings"
 	"time"
 
@@ -122,6 +123,7 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 		if userDemographics.HouseholdSize() != nil {
 			householdSize = sql.NullInt16{Int16: int16(*userDemographics.HouseholdSize()), Valid: true}
 		}
+		log.Println("householdSize", householdSize)
 
 		if err := u.GetQueries(ctx).
 			UpdateOrCreateUserDemographics(ctx, model.UpdateOrCreateUserDemographicsParams{

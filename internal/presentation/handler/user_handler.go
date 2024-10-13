@@ -83,12 +83,21 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 				Value: int(*demographics.HouseholdSize()),
 			}
 		}
+		var prefecture oas.OptNilString
+		if demographics.Prefecture() != nil {
+			prefecture = oas.OptNilString{
+				Set:   true,
+				Value: *demographics.Prefecture(),
+			}
+		}
+
 		demographicsResp = oas.GetUserInfoOKDemographics{
 			YearOfBirth:   yearOfBirth,
 			Municipality:  municipality,
 			Occupation:    demographics.Occupation().String(),
 			Gender:        demographics.Gender().String(),
 			HouseholdSize: householdSize,
+			Prefecture:    prefecture,
 		}
 	}
 

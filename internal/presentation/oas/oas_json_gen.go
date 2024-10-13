@@ -3150,14 +3150,21 @@ func (s *GetUserInfoOKDemographics) encodeFields(e *jx.Encoder) {
 			s.HouseholdSize.Encode(e)
 		}
 	}
+	{
+		if s.Prefecture.Set {
+			e.FieldStart("prefecture")
+			s.Prefecture.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfGetUserInfoOKDemographics = [5]string{
+var jsonFieldsNameOfGetUserInfoOKDemographics = [6]string{
 	0: "yearOfBirth",
 	1: "occupation",
 	2: "gender",
 	3: "municipality",
 	4: "householdSize",
+	5: "prefecture",
 }
 
 // Decode decodes GetUserInfoOKDemographics from json.
@@ -3222,6 +3229,16 @@ func (s *GetUserInfoOKDemographics) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"householdSize\"")
+			}
+		case "prefecture":
+			if err := func() error {
+				s.Prefecture.Reset()
+				if err := s.Prefecture.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"prefecture\"")
 			}
 		default:
 			return d.Skip()

@@ -175,8 +175,8 @@ INSERT INTO user_demographics (
     occupation,
     gender,
     municipality,
-    prefecture,
     household_size,
+    prefecture,
     created_at,
     updated_at
 ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, now(), now())
@@ -198,8 +198,8 @@ type UpdateOrCreateUserDemographicsParams struct {
 	Occupation         sql.NullInt16
 	Gender             int16
 	Municipality       sql.NullString
-	Prefecture         sql.NullString
 	HouseholdSize      sql.NullInt16
+	Prefecture         sql.NullString
 }
 
 func (q *Queries) UpdateOrCreateUserDemographics(ctx context.Context, arg UpdateOrCreateUserDemographicsParams) error {
@@ -210,8 +210,8 @@ func (q *Queries) UpdateOrCreateUserDemographics(ctx context.Context, arg Update
 		arg.Occupation,
 		arg.Gender,
 		arg.Municipality,
-		arg.Prefecture,
 		arg.HouseholdSize,
+		arg.Prefecture,
 	)
 	return err
 }

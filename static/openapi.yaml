@@ -874,7 +874,7 @@ paths:
                       municipality:
                         type: string
                         title: 市区町村
-                        description: 市町村
+                        description: 市区町村
                         nullable: true
                       householdSize:
                         type: integer
@@ -882,6 +882,10 @@ paths:
                         maximum: 5
                         title: 世帯人数
                         description: 世帯人数
+                        nullable: true
+                      prefecture:
+                        type: string
+                        description: 都道府県
                         nullable: true
                     required:
                       - occupation
@@ -1896,7 +1900,7 @@ components:
         municipality:
           type: string
           title: 市区町村
-          description: 市町村
+          description: 市区町村
           nullable: true
         householdSize:
           type: integer
@@ -1904,6 +1908,10 @@ components:
           maximum: 5
           title: 世帯人数
           description: 世帯人数
+          nullable: true
+        prefecture:
+          type: string
+          description: 都道府県
           nullable: true
       required:
         - occupation

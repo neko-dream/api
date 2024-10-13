@@ -50,8 +50,8 @@ INSERT INTO user_demographics (
     occupation,
     gender,
     municipality,
-    prefecture,
     household_size,
+    prefecture,
     created_at,
     updated_at
 ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, now(), now())

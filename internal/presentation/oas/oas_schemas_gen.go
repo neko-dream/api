@@ -1470,10 +1470,12 @@ type GetUserInfoOKDemographics struct {
 	Occupation string `json:"occupation"`
 	// 性別.
 	Gender string `json:"gender"`
-	// 市町村.
+	// 市区町村.
 	Municipality OptNilString `json:"municipality"`
 	// 世帯人数.
 	HouseholdSize OptNilInt `json:"householdSize"`
+	// 都道府県.
+	Prefecture OptNilString `json:"prefecture"`
 }
 
 // GetYearOfBirth returns the value of YearOfBirth.
@@ -1501,6 +1503,11 @@ func (s *GetUserInfoOKDemographics) GetHouseholdSize() OptNilInt {
 	return s.HouseholdSize
 }
 
+// GetPrefecture returns the value of Prefecture.
+func (s *GetUserInfoOKDemographics) GetPrefecture() OptNilString {
+	return s.Prefecture
+}
+
 // SetYearOfBirth sets the value of YearOfBirth.
 func (s *GetUserInfoOKDemographics) SetYearOfBirth(val OptNilInt) {
 	s.YearOfBirth = val
@@ -1524,6 +1531,11 @@ func (s *GetUserInfoOKDemographics) SetMunicipality(val OptNilString) {
 // SetHouseholdSize sets the value of HouseholdSize.
 func (s *GetUserInfoOKDemographics) SetHouseholdSize(val OptNilInt) {
 	s.HouseholdSize = val
+}
+
+// SetPrefecture sets the value of Prefecture.
+func (s *GetUserInfoOKDemographics) SetPrefecture(val OptNilString) {
+	s.Prefecture = val
 }
 
 // 作成ユーザー.
