@@ -122,6 +122,12 @@ type UserHandler interface {
 	//
 	// PUT /user
 	EditUserProfile(ctx context.Context, req OptEditUserProfileReq) (EditUserProfileRes, error)
+	// GetUserInfo implements get_user_info operation.
+	//
+	// ユーザー情報の取得.
+	//
+	// GET /user
+	GetUserInfo(ctx context.Context) (GetUserInfoRes, error)
 	// RegisterUser implements registerUser operation.
 	//
 	// ユーザー作成.

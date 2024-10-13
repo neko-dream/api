@@ -21,6 +21,10 @@ type GetTopOpinionsRes interface {
 	getTopOpinionsRes()
 }
 
+type GetUserInfoRes interface {
+	getUserInfoRes()
+}
+
 type OAuthRevokeRes interface {
 	oAuthRevokeRes()
 }

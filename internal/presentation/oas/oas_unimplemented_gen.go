@@ -67,6 +67,15 @@ func (UnimplementedHandler) GetTopOpinions(ctx context.Context, params GetTopOpi
 	return r, ht.ErrNotImplemented
 }
 
+// GetUserInfo implements get_user_info operation.
+//
+// ユーザー情報の取得.
+//
+// GET /user
+func (UnimplementedHandler) GetUserInfo(ctx context.Context) (r GetUserInfoRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // OAuthCallback implements oauth_callback operation.
 //
 // Auth Callback.

@@ -261,9 +261,9 @@ func (s *CreateTalkSessionOKLocation0) SetCity(val string) {
 
 // 作成ユーザー.
 type CreateTalkSessionOKOwner struct {
-	DisplayID   string    `json:"displayID"`
-	DisplayName string    `json:"displayName"`
-	IconURL     OptString `json:"iconURL"`
+	DisplayID   string       `json:"displayID"`
+	DisplayName string       `json:"displayName"`
+	IconURL     OptNilString `json:"iconURL"`
 }
 
 // GetDisplayID returns the value of DisplayID.
@@ -277,7 +277,7 @@ func (s *CreateTalkSessionOKOwner) GetDisplayName() string {
 }
 
 // GetIconURL returns the value of IconURL.
-func (s *CreateTalkSessionOKOwner) GetIconURL() OptString {
+func (s *CreateTalkSessionOKOwner) GetIconURL() OptNilString {
 	return s.IconURL
 }
 
@@ -292,7 +292,7 @@ func (s *CreateTalkSessionOKOwner) SetDisplayName(val string) {
 }
 
 // SetIconURL sets the value of IconURL.
-func (s *CreateTalkSessionOKOwner) SetIconURL(val OptString) {
+func (s *CreateTalkSessionOKOwner) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
 
@@ -400,9 +400,9 @@ func (s *EditUserProfileInternalServerError) SetMessage(val string) {
 func (*EditUserProfileInternalServerError) editUserProfileRes() {}
 
 type EditUserProfileOK struct {
-	DisplayID   string    `json:"displayID"`
-	DisplayName string    `json:"displayName"`
-	IconURL     OptString `json:"iconURL"`
+	DisplayID   string       `json:"displayID"`
+	DisplayName string       `json:"displayName"`
+	IconURL     OptNilString `json:"iconURL"`
 }
 
 // GetDisplayID returns the value of DisplayID.
@@ -416,7 +416,7 @@ func (s *EditUserProfileOK) GetDisplayName() string {
 }
 
 // GetIconURL returns the value of IconURL.
-func (s *EditUserProfileOK) GetIconURL() OptString {
+func (s *EditUserProfileOK) GetIconURL() OptNilString {
 	return s.IconURL
 }
 
@@ -431,7 +431,7 @@ func (s *EditUserProfileOK) SetDisplayName(val string) {
 }
 
 // SetIconURL sets the value of IconURL.
-func (s *EditUserProfileOK) SetIconURL(val OptString) {
+func (s *EditUserProfileOK) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
 
@@ -923,9 +923,9 @@ func (s *GetTalkSessionDetailOKLocation0) SetCity(val string) {
 
 // 作成ユーザー.
 type GetTalkSessionDetailOKOwner struct {
-	DisplayID   string    `json:"displayID"`
-	DisplayName string    `json:"displayName"`
-	IconURL     OptString `json:"iconURL"`
+	DisplayID   string       `json:"displayID"`
+	DisplayName string       `json:"displayName"`
+	IconURL     OptNilString `json:"iconURL"`
 }
 
 // GetDisplayID returns the value of DisplayID.
@@ -939,7 +939,7 @@ func (s *GetTalkSessionDetailOKOwner) GetDisplayName() string {
 }
 
 // GetIconURL returns the value of IconURL.
-func (s *GetTalkSessionDetailOKOwner) GetIconURL() OptString {
+func (s *GetTalkSessionDetailOKOwner) GetIconURL() OptNilString {
 	return s.IconURL
 }
 
@@ -954,7 +954,7 @@ func (s *GetTalkSessionDetailOKOwner) SetDisplayName(val string) {
 }
 
 // SetIconURL sets the value of IconURL.
-func (s *GetTalkSessionDetailOKOwner) SetIconURL(val OptString) {
+func (s *GetTalkSessionDetailOKOwner) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
 
@@ -1297,9 +1297,9 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) SetCity(val s
 
 // 作成ユーザー.
 type GetTalkSessionListOKTalkSessionsItemTalkSessionOwner struct {
-	DisplayID   string    `json:"displayID"`
-	DisplayName string    `json:"displayName"`
-	IconURL     OptString `json:"iconURL"`
+	DisplayID   string       `json:"displayID"`
+	DisplayName string       `json:"displayName"`
+	IconURL     OptNilString `json:"iconURL"`
 }
 
 // GetDisplayID returns the value of DisplayID.
@@ -1313,7 +1313,7 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionOwner) GetDisplayName() 
 }
 
 // GetIconURL returns the value of IconURL.
-func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionOwner) GetIconURL() OptString {
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionOwner) GetIconURL() OptNilString {
 	return s.IconURL
 }
 
@@ -1328,7 +1328,7 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionOwner) SetDisplayName(va
 }
 
 // SetIconURL sets the value of IconURL.
-func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionOwner) SetIconURL(val OptString) {
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionOwner) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
 
@@ -1430,6 +1430,204 @@ func (*GetTopOpinionsInternalServerError) getTopOpinionsRes() {}
 type GetTopOpinionsOK struct{}
 
 func (*GetTopOpinionsOK) getTopOpinionsRes() {}
+
+type GetUserInfoInternalServerError struct{}
+
+func (*GetUserInfoInternalServerError) getUserInfoRes() {}
+
+type GetUserInfoOK struct {
+	// 作成ユーザー.
+	User         GetUserInfoOKUser            `json:"user"`
+	Demographics OptGetUserInfoOKDemographics `json:"demographics"`
+}
+
+// GetUser returns the value of User.
+func (s *GetUserInfoOK) GetUser() GetUserInfoOKUser {
+	return s.User
+}
+
+// GetDemographics returns the value of Demographics.
+func (s *GetUserInfoOK) GetDemographics() OptGetUserInfoOKDemographics {
+	return s.Demographics
+}
+
+// SetUser sets the value of User.
+func (s *GetUserInfoOK) SetUser(val GetUserInfoOKUser) {
+	s.User = val
+}
+
+// SetDemographics sets the value of Demographics.
+func (s *GetUserInfoOK) SetDemographics(val OptGetUserInfoOKDemographics) {
+	s.Demographics = val
+}
+
+func (*GetUserInfoOK) getUserInfoRes() {}
+
+// GetUserInfoOKDemographics represents sum type.
+type GetUserInfoOKDemographics struct {
+	Type                       GetUserInfoOKDemographicsType // switch on this field
+	GetUserInfoOKDemographics0 GetUserInfoOKDemographics0
+	Null                       struct{}
+}
+
+// GetUserInfoOKDemographicsType is oneOf type of GetUserInfoOKDemographics.
+type GetUserInfoOKDemographicsType string
+
+// Possible values for GetUserInfoOKDemographicsType.
+const (
+	GetUserInfoOKDemographics0GetUserInfoOKDemographics GetUserInfoOKDemographicsType = "GetUserInfoOKDemographics0"
+	NullGetUserInfoOKDemographics                       GetUserInfoOKDemographicsType = "struct{}"
+)
+
+// IsGetUserInfoOKDemographics0 reports whether GetUserInfoOKDemographics is GetUserInfoOKDemographics0.
+func (s GetUserInfoOKDemographics) IsGetUserInfoOKDemographics0() bool {
+	return s.Type == GetUserInfoOKDemographics0GetUserInfoOKDemographics
+}
+
+// IsNull reports whether GetUserInfoOKDemographics is struct{}.
+func (s GetUserInfoOKDemographics) IsNull() bool { return s.Type == NullGetUserInfoOKDemographics }
+
+// SetGetUserInfoOKDemographics0 sets GetUserInfoOKDemographics to GetUserInfoOKDemographics0.
+func (s *GetUserInfoOKDemographics) SetGetUserInfoOKDemographics0(v GetUserInfoOKDemographics0) {
+	s.Type = GetUserInfoOKDemographics0GetUserInfoOKDemographics
+	s.GetUserInfoOKDemographics0 = v
+}
+
+// GetGetUserInfoOKDemographics0 returns GetUserInfoOKDemographics0 and true boolean if GetUserInfoOKDemographics is GetUserInfoOKDemographics0.
+func (s GetUserInfoOKDemographics) GetGetUserInfoOKDemographics0() (v GetUserInfoOKDemographics0, ok bool) {
+	if !s.IsGetUserInfoOKDemographics0() {
+		return v, false
+	}
+	return s.GetUserInfoOKDemographics0, true
+}
+
+// NewGetUserInfoOKDemographics0GetUserInfoOKDemographics returns new GetUserInfoOKDemographics from GetUserInfoOKDemographics0.
+func NewGetUserInfoOKDemographics0GetUserInfoOKDemographics(v GetUserInfoOKDemographics0) GetUserInfoOKDemographics {
+	var s GetUserInfoOKDemographics
+	s.SetGetUserInfoOKDemographics0(v)
+	return s
+}
+
+// SetNull sets GetUserInfoOKDemographics to struct{}.
+func (s *GetUserInfoOKDemographics) SetNull(v struct{}) {
+	s.Type = NullGetUserInfoOKDemographics
+	s.Null = v
+}
+
+// GetNull returns struct{} and true boolean if GetUserInfoOKDemographics is struct{}.
+func (s GetUserInfoOKDemographics) GetNull() (v struct{}, ok bool) {
+	if !s.IsNull() {
+		return v, false
+	}
+	return s.Null, true
+}
+
+// NewNullGetUserInfoOKDemographics returns new GetUserInfoOKDemographics from struct{}.
+func NewNullGetUserInfoOKDemographics(v struct{}) GetUserInfoOKDemographics {
+	var s GetUserInfoOKDemographics
+	s.SetNull(v)
+	return s
+}
+
+type GetUserInfoOKDemographics0 struct {
+	// 誕生年.
+	YearOfBirth OptNilInt `json:"yearOfBirth"`
+	// 職業.
+	Occupation string `json:"occupation"`
+	// 性別.
+	Gender string `json:"gender"`
+	// 市町村.
+	Municipality string `json:"municipality"`
+	// 世帯人数.
+	HouseholdSize OptNilInt `json:"householdSize"`
+}
+
+// GetYearOfBirth returns the value of YearOfBirth.
+func (s *GetUserInfoOKDemographics0) GetYearOfBirth() OptNilInt {
+	return s.YearOfBirth
+}
+
+// GetOccupation returns the value of Occupation.
+func (s *GetUserInfoOKDemographics0) GetOccupation() string {
+	return s.Occupation
+}
+
+// GetGender returns the value of Gender.
+func (s *GetUserInfoOKDemographics0) GetGender() string {
+	return s.Gender
+}
+
+// GetMunicipality returns the value of Municipality.
+func (s *GetUserInfoOKDemographics0) GetMunicipality() string {
+	return s.Municipality
+}
+
+// GetHouseholdSize returns the value of HouseholdSize.
+func (s *GetUserInfoOKDemographics0) GetHouseholdSize() OptNilInt {
+	return s.HouseholdSize
+}
+
+// SetYearOfBirth sets the value of YearOfBirth.
+func (s *GetUserInfoOKDemographics0) SetYearOfBirth(val OptNilInt) {
+	s.YearOfBirth = val
+}
+
+// SetOccupation sets the value of Occupation.
+func (s *GetUserInfoOKDemographics0) SetOccupation(val string) {
+	s.Occupation = val
+}
+
+// SetGender sets the value of Gender.
+func (s *GetUserInfoOKDemographics0) SetGender(val string) {
+	s.Gender = val
+}
+
+// SetMunicipality sets the value of Municipality.
+func (s *GetUserInfoOKDemographics0) SetMunicipality(val string) {
+	s.Municipality = val
+}
+
+// SetHouseholdSize sets the value of HouseholdSize.
+func (s *GetUserInfoOKDemographics0) SetHouseholdSize(val OptNilInt) {
+	s.HouseholdSize = val
+}
+
+// 作成ユーザー.
+type GetUserInfoOKUser struct {
+	DisplayID   string       `json:"displayID"`
+	DisplayName string       `json:"displayName"`
+	IconURL     OptNilString `json:"iconURL"`
+}
+
+// GetDisplayID returns the value of DisplayID.
+func (s *GetUserInfoOKUser) GetDisplayID() string {
+	return s.DisplayID
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *GetUserInfoOKUser) GetDisplayName() string {
+	return s.DisplayName
+}
+
+// GetIconURL returns the value of IconURL.
+func (s *GetUserInfoOKUser) GetIconURL() OptNilString {
+	return s.IconURL
+}
+
+// SetDisplayID sets the value of DisplayID.
+func (s *GetUserInfoOKUser) SetDisplayID(val string) {
+	s.DisplayID = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *GetUserInfoOKUser) SetDisplayName(val string) {
+	s.DisplayName = val
+}
+
+// SetIconURL sets the value of IconURL.
+func (s *GetUserInfoOKUser) SetIconURL(val OptNilString) {
+	s.IconURL = val
+}
 
 // NewNilVoteReqVoteStatus returns new NilVoteReqVoteStatus with value set to v.
 func NewNilVoteReqVoteStatus(v VoteReqVoteStatus) NilVoteReqVoteStatus {
@@ -2188,9 +2386,9 @@ func (s *OpinionCommentsOKOpinionsItemOpinionVoteType) UnmarshalText(data []byte
 
 // 作成ユーザー.
 type OpinionCommentsOKOpinionsItemUser struct {
-	DisplayID   string    `json:"displayID"`
-	DisplayName string    `json:"displayName"`
-	IconURL     OptString `json:"iconURL"`
+	DisplayID   string       `json:"displayID"`
+	DisplayName string       `json:"displayName"`
+	IconURL     OptNilString `json:"iconURL"`
 }
 
 // GetDisplayID returns the value of DisplayID.
@@ -2204,7 +2402,7 @@ func (s *OpinionCommentsOKOpinionsItemUser) GetDisplayName() string {
 }
 
 // GetIconURL returns the value of IconURL.
-func (s *OpinionCommentsOKOpinionsItemUser) GetIconURL() OptString {
+func (s *OpinionCommentsOKOpinionsItemUser) GetIconURL() OptNilString {
 	return s.IconURL
 }
 
@@ -2219,7 +2417,7 @@ func (s *OpinionCommentsOKOpinionsItemUser) SetDisplayName(val string) {
 }
 
 // SetIconURL sets the value of IconURL.
-func (s *OpinionCommentsOKOpinionsItemUser) SetIconURL(val OptString) {
+func (s *OpinionCommentsOKOpinionsItemUser) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
 
@@ -2386,9 +2584,9 @@ func (s *OpinionCommentsOKRootOpinionOpinionVoteType) UnmarshalText(data []byte)
 
 // 作成ユーザー.
 type OpinionCommentsOKRootOpinionUser struct {
-	DisplayID   string    `json:"displayID"`
-	DisplayName string    `json:"displayName"`
-	IconURL     OptString `json:"iconURL"`
+	DisplayID   string       `json:"displayID"`
+	DisplayName string       `json:"displayName"`
+	IconURL     OptNilString `json:"iconURL"`
 }
 
 // GetDisplayID returns the value of DisplayID.
@@ -2402,7 +2600,7 @@ func (s *OpinionCommentsOKRootOpinionUser) GetDisplayName() string {
 }
 
 // GetIconURL returns the value of IconURL.
-func (s *OpinionCommentsOKRootOpinionUser) GetIconURL() OptString {
+func (s *OpinionCommentsOKRootOpinionUser) GetIconURL() OptNilString {
 	return s.IconURL
 }
 
@@ -2417,7 +2615,7 @@ func (s *OpinionCommentsOKRootOpinionUser) SetDisplayName(val string) {
 }
 
 // SetIconURL sets the value of IconURL.
-func (s *OpinionCommentsOKRootOpinionUser) SetIconURL(val OptString) {
+func (s *OpinionCommentsOKRootOpinionUser) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
 
@@ -2691,6 +2889,52 @@ func (o OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation) Get() (v Get
 
 // Or returns value if set, or given parameter if does not.
 func (o OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation) Or(d GetTalkSessionListOKTalkSessionsItemTalkSessionLocation) GetTalkSessionListOKTalkSessionsItemTalkSessionLocation {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptGetUserInfoOKDemographics returns new OptGetUserInfoOKDemographics with value set to v.
+func NewOptGetUserInfoOKDemographics(v GetUserInfoOKDemographics) OptGetUserInfoOKDemographics {
+	return OptGetUserInfoOKDemographics{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptGetUserInfoOKDemographics is optional GetUserInfoOKDemographics.
+type OptGetUserInfoOKDemographics struct {
+	Value GetUserInfoOKDemographics
+	Set   bool
+}
+
+// IsSet returns true if OptGetUserInfoOKDemographics was set.
+func (o OptGetUserInfoOKDemographics) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptGetUserInfoOKDemographics) Reset() {
+	var v GetUserInfoOKDemographics
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptGetUserInfoOKDemographics) SetTo(v GetUserInfoOKDemographics) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptGetUserInfoOKDemographics) Get() (v GetUserInfoOKDemographics, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptGetUserInfoOKDemographics) Or(d GetUserInfoOKDemographics) GetUserInfoOKDemographics {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -4033,9 +4277,9 @@ func (s *RegisterUserInternalServerError) SetMessage(val string) {
 func (*RegisterUserInternalServerError) registerUserRes() {}
 
 type RegisterUserOK struct {
-	DisplayID   string    `json:"displayID"`
-	DisplayName string    `json:"displayName"`
-	IconURL     OptString `json:"iconURL"`
+	DisplayID   string       `json:"displayID"`
+	DisplayName string       `json:"displayName"`
+	IconURL     OptNilString `json:"iconURL"`
 }
 
 // GetDisplayID returns the value of DisplayID.
@@ -4049,7 +4293,7 @@ func (s *RegisterUserOK) GetDisplayName() string {
 }
 
 // GetIconURL returns the value of IconURL.
-func (s *RegisterUserOK) GetIconURL() OptString {
+func (s *RegisterUserOK) GetIconURL() OptNilString {
 	return s.IconURL
 }
 
@@ -4064,7 +4308,7 @@ func (s *RegisterUserOK) SetDisplayName(val string) {
 }
 
 // SetIconURL sets the value of IconURL.
-func (s *RegisterUserOK) SetIconURL(val OptString) {
+func (s *RegisterUserOK) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
 
@@ -4588,9 +4832,9 @@ func (s *SwipeOpinionsOKItemOpinionVoteType) UnmarshalText(data []byte) error {
 
 // 作成ユーザー.
 type SwipeOpinionsOKItemUser struct {
-	DisplayID   string    `json:"displayID"`
-	DisplayName string    `json:"displayName"`
-	IconURL     OptString `json:"iconURL"`
+	DisplayID   string       `json:"displayID"`
+	DisplayName string       `json:"displayName"`
+	IconURL     OptNilString `json:"iconURL"`
 }
 
 // GetDisplayID returns the value of DisplayID.
@@ -4604,7 +4848,7 @@ func (s *SwipeOpinionsOKItemUser) GetDisplayName() string {
 }
 
 // GetIconURL returns the value of IconURL.
-func (s *SwipeOpinionsOKItemUser) GetIconURL() OptString {
+func (s *SwipeOpinionsOKItemUser) GetIconURL() OptNilString {
 	return s.IconURL
 }
 
@@ -4619,7 +4863,7 @@ func (s *SwipeOpinionsOKItemUser) SetDisplayName(val string) {
 }
 
 // SetIconURL sets the value of IconURL.
-func (s *SwipeOpinionsOKItemUser) SetIconURL(val OptString) {
+func (s *SwipeOpinionsOKItemUser) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
 

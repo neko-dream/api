@@ -73,8 +73,8 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 			DisplayName: *out.OwnerUser.DisplayName(),
 			IconURL: utils.IfThenElse(
 				out.OwnerUser.ProfileIconURL() != nil,
-				oas.OptString{Value: *out.OwnerUser.ProfileIconURL()},
-				oas.OptString{},
+				oas.OptNilString{Value: *out.OwnerUser.ProfileIconURL()},
+				oas.OptNilString{},
 			),
 		},
 		Theme:            out.TalkSession.Theme(),
@@ -124,7 +124,7 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 		owner := oas.GetTalkSessionListOKTalkSessionsItemTalkSessionOwner{
 			DisplayID:   talkSession.Owner.DisplayID,
 			DisplayName: talkSession.Owner.DisplayName,
-			IconURL:     utils.StringToOptString(talkSession.Owner.IconURL),
+			IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.Owner.IconURL),
 		}
 		resultTalkSession = append(resultTalkSession, oas.GetTalkSessionListOKTalkSessionsItem{
 			TalkSession: oas.GetTalkSessionListOKTalkSessionsItemTalkSession{

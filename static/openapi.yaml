@@ -50,6 +50,7 @@ paths:
                         x-apidog-mock: '{{$person.firstName}}'
                       iconURL:
                         type: string
+                        nullable: true
                     required:
                       - displayID
                       - displayName
@@ -179,6 +180,7 @@ paths:
                         x-apidog-mock: '{{$person.firstName}}'
                       iconURL:
                         type: string
+                        nullable: true
                     required:
                       - displayID
                       - displayName
@@ -329,6 +331,7 @@ paths:
                                   x-apidog-mock: '{{$person.firstName}}'
                                 iconURL:
                                   type: string
+                                  nullable: true
                               required:
                                 - displayID
                                 - displayName
@@ -581,6 +584,7 @@ paths:
                     x-apidog-mock: '{{$person.firstName}}'
                   iconURL:
                     type: string
+                    nullable: true
                 required:
                   - displayID
                   - displayName
@@ -767,6 +771,7 @@ paths:
                     x-apidog-mock: '{{$person.firstName}}'
                   iconURL:
                     type: string
+                    nullable: true
                 required:
                   - displayID
                   - displayName
@@ -813,6 +818,93 @@ paths:
       security:
         - SessionId: []
       x-ogen-operation-group: user
+    get:
+      summary: ユーザー情報の取得
+      deprecated: false
+      description: ''
+      operationId: get_user_info
+      tags:
+        - user
+        - user
+      parameters: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      displayID:
+                        type: string
+                        x-apidog-mock: '{{$string.uuid}}'
+                        pattern: ^[A-Za-z0-9]$
+                        examples:
+                          - userid
+                        minLength: 3
+                        maxLength: 25
+                      displayName:
+                        type: string
+                        x-apidog-mock: '{{$person.firstName}}'
+                      iconURL:
+                        type: string
+                        nullable: true
+                    required:
+                      - displayID
+                      - displayName
+                    description: 作成ユーザー
+                  demographics:
+                    anyOf:
+                      - type: object
+                        properties:
+                          yearOfBirth:
+                            type: integer
+                            description: 誕生年
+                            nullable: true
+                          occupation:
+                            type: string
+                            title: 職業
+                            description: 職業
+                          gender:
+                            type: string
+                            title: 性別
+                            description: 性別
+                          municipality:
+                            type: string
+                            description: 市町村
+                            title: 市区町村
+                          householdSize:
+                            type: integer
+                            minimum: 1
+                            maximum: 5
+                            title: 世帯人数
+                            description: 世帯人数
+                            nullable: true
+                        required:
+                          - occupation
+                          - gender
+                          - municipality
+                      - type: 'null'
+                required:
+                  - user
+        '500':
+          description: ServerErrorResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+      security: []
+      x-ogen-operation-group: User
   /talksession/{talkSessionID}/swipe_opinions:
     get:
       summary: スワイプ用のエンドポイント
@@ -898,6 +990,7 @@ paths:
                           x-apidog-mock: '{{$person.firstName}}'
                         iconURL:
                           type: string
+                          nullable: true
                       required:
                         - displayID
                         - displayName
@@ -1224,6 +1317,7 @@ paths:
                             x-apidog-mock: '{{$person.firstName}}'
                           iconURL:
                             type: string
+                            nullable: true
                         required:
                           - displayID
                           - displayName
@@ -1357,6 +1451,7 @@ paths:
                               x-apidog-mock: '{{$person.firstName}}'
                             iconURL:
                               type: string
+                              nullable: true
                           required:
                             - displayID
                             - displayName
@@ -1783,6 +1878,36 @@ paths:
       x-ogen-operation-group: Auth
 components:
   schemas:
+    userDemographics:
+      type: object
+      properties:
+        yearOfBirth:
+          type: integer
+          description: 誕生年
+          nullable: true
+        occupation:
+          type: string
+          title: 職業
+          description: 職業
+        gender:
+          type: string
+          title: 性別
+          description: 性別
+        municipality:
+          type: string
+          description: 市町村
+          title: 市区町村
+        householdSize:
+          type: integer
+          minimum: 1
+          maximum: 5
+          title: 世帯人数
+          description: 世帯人数
+          nullable: true
+      required:
+        - occupation
+        - gender
+        - municipality
     offsetPagination:
       type: object
       properties:
@@ -1933,6 +2058,7 @@ components:
           x-apidog-mock: '{{$person.firstName}}'
         iconURL:
           type: string
+          nullable: true
       required:
         - displayID
         - displayName
@@ -1984,6 +2110,7 @@ components:
               x-apidog-mock: '{{$person.firstName}}'
             iconURL:
               type: string
+              nullable: true
           required:
             - displayID
             - displayName

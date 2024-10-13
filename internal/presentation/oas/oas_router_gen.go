@@ -494,12 +494,14 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				if len(elem) == 0 {
 					// Leaf node.
 					switch r.Method {
+					case "GET":
+						s.handleGetUserInfoRequest([0]string{}, elemIsEscaped, w, r)
 					case "POST":
 						s.handleRegisterUserRequest([0]string{}, elemIsEscaped, w, r)
 					case "PUT":
 						s.handleEditUserProfileRequest([0]string{}, elemIsEscaped, w, r)
 					default:
-						s.notAllowed(w, r, "POST,PUT")
+						s.notAllowed(w, r, "GET,POST,PUT")
 					}
 
 					return
@@ -1070,6 +1072,14 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 				if len(elem) == 0 {
 					// Leaf node.
 					switch method {
+					case "GET":
+						r.name = "GetUserInfo"
+						r.summary = "ユーザー情報の取得"
+						r.operationID = "get_user_info"
+						r.pathPattern = "/user"
+						r.args = args
+						r.count = 0
+						return r, true
 					case "POST":
 						r.name = "RegisterUser"
 						r.summary = "ユーザー作成"

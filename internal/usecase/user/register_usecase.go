@@ -34,8 +34,9 @@ type (
 	}
 
 	RegisterUserOutput struct {
-		DisplayID   string // ユーザーの表示用ID
-		DisplayName string // ユーザーの表示名
+		DisplayID   string  // ユーザーの表示用ID
+		DisplayName string  // ユーザーの表示名
+		IconURL     *string // ユーザーのアイコンURL
 		Cookie      *http.Cookie
 	}
 
@@ -69,6 +70,8 @@ func NewRegisterUserUseCase(
 
 func (i *registerUserInteractor) Execute(ctx context.Context, input RegisterUserInput) (*RegisterUserOutput, error) {
 	var c http.Cookie
+	var iconURL *string
+
 	err := i.ExecTx(ctx, func(ctx context.Context) error {
 		// ユーザーの存在を確認
 		foundUser, err := i.userRep.FindByID(ctx, input.UserID)
@@ -124,6 +127,10 @@ func (i *registerUserInteractor) Execute(ctx context.Context, input RegisterUser
 			return messages.UserUpdateError
 		}
 
+		if foundUser.ProfileIconURL() != nil {
+			iconURL = foundUser.ProfileIconURL()
+		}
+
 		sess, err := i.sessService.RefreshSession(ctx, input.UserID)
 		if err != nil {
 			utils.HandleError(ctx, err, "SessionService.RefreshSession")
@@ -155,6 +162,7 @@ func (i *registerUserInteractor) Execute(ctx context.Context, input RegisterUser
 	return &RegisterUserOutput{
 		DisplayID:   input.DisplayID,
 		DisplayName: input.DisplayName,
+		IconURL:     iconURL,
 		Cookie:      &c,
 	}, nil
 }

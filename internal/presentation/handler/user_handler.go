@@ -8,7 +8,7 @@ import (
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
-	"github.com/neko-dream/server/internal/infrastructure/db"
+	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	user_usecase "github.com/neko-dream/server/internal/usecase/user"
 	http_utils "github.com/neko-dream/server/pkg/http"
@@ -17,21 +17,77 @@ import (
 )
 
 type userHandler struct {
-	*db.DBManager
 	user_usecase.RegisterUserUseCase
 	user_usecase.EditUserUseCase
+	user_usecase.GetUserInformationQueryHandler
 }
 
 func NewUserHandler(
-	DBManager *db.DBManager,
 	registerUserUsecase user_usecase.RegisterUserUseCase,
 	editUserUsecase user_usecase.EditUserUseCase,
+	getUserInformationQueryHandler user_usecase.GetUserInformationQueryHandler,
 ) oas.UserHandler {
 	return &userHandler{
-		DBManager:           DBManager,
-		RegisterUserUseCase: registerUserUsecase,
-		EditUserUseCase:     editUserUsecase,
+		RegisterUserUseCase:            registerUserUsecase,
+		EditUserUseCase:                editUserUsecase,
+		GetUserInformationQueryHandler: getUserInformationQueryHandler,
 	}
+}
+
+// GetUserInfo implements ユーザーの情報取得
+func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, error) {
+	claim := session.GetSession(ctx)
+	if claim == nil {
+		return nil, messages.ForbiddenError
+	}
+
+	userID, err := claim.UserID()
+	if err != nil {
+		utils.HandleError(ctx, err, "claim.UserID")
+		return nil, messages.ForbiddenError
+	}
+
+	res, err := u.GetUserInformationQueryHandler.Execute(ctx, user_usecase.GetUserInformationQuery{
+		UserID: userID,
+	})
+	if err != nil {
+		utils.HandleError(ctx, err, "GetUserInformationQueryHandler.Execute")
+		return nil, messages.InternalServerError
+	}
+	out := oas.GetUserInfoOK{}
+	out.User = oas.GetUserInfoOKUser{
+		DisplayID:   *res.User.DisplayID(),
+		DisplayName: *res.User.DisplayName(),
+		IconURL:     utils.ToOptNil[oas.OptNilString](res.User.ProfileIconURL()),
+	}
+	if res.User.Demographics() != nil {
+		var municipality string
+		if res.User.Demographics().Municipality() != nil {
+			municipality = res.User.Demographics().Municipality().String()
+		} else {
+			municipality = ""
+		}
+		var occupation string
+		if res.User.Demographics().Occupation() != nil {
+			occupation = res.User.Demographics().Occupation().String()
+		} else {
+			occupation = user.OccupationOther.String()
+		}
+
+		out.Demographics = oas.OptGetUserInfoOKDemographics{
+			Value: oas.GetUserInfoOKDemographics{
+				GetUserInfoOKDemographics0: oas.GetUserInfoOKDemographics0{
+					YearOfBirth:   utils.ToOptNil[oas.OptNilInt](res.User.Demographics().YearOfBirth()),
+					Municipality:  municipality,
+					Occupation:    occupation,
+					Gender:        res.User.Demographics().Gender().String(),
+					HouseholdSize: utils.ToOptNil[oas.OptNilInt](res.User.Demographics().HouseholdSize()),
+				},
+			},
+		}
+	}
+
+	return &out, nil
 }
 
 // EditUserProfile ユーザープロフィールの編集
@@ -97,7 +153,7 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 	return &oas.EditUserProfileOK{
 		DisplayID:   out.DisplayID,
 		DisplayName: out.DisplayName,
-		IconURL:     utils.ToOpt[oas.OptString](claim.IconURL),
+		IconURL:     utils.ToOptNil[oas.OptNilString](claim.IconURL),
 	}, nil
 }
 
@@ -167,6 +223,6 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 	return &oas.RegisterUserOK{
 		DisplayID:   out.DisplayID,
 		DisplayName: out.DisplayName,
-		IconURL:     utils.StringToOptString(claim.IconURL),
+		IconURL:     utils.ToOptNil[oas.OptNilString](out.IconURL),
 	}, nil
 }

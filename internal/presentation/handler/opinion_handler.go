@@ -68,7 +68,7 @@ func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.Opinion
 	rootUser := &oas.OpinionCommentsOKRootOpinionUser{
 		DisplayID:   opinions.RootOpinion.User.ID,
 		DisplayName: opinions.RootOpinion.User.Name,
-		IconURL:     utils.ToOpt[oas.OptString](opinions.RootOpinion.User.Icon),
+		IconURL:     utils.ToOptNil[oas.OptNilString](opinions.RootOpinion.User.Icon),
 	}
 	rootOpinion := &oas.OpinionCommentsOKRootOpinionOpinion{
 		ID:      opinions.RootOpinion.Opinion.OpinionID,
@@ -91,7 +91,7 @@ func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.Opinion
 		user := &oas.OpinionCommentsOKOpinionsItemUser{
 			DisplayID:   reply.User.ID,
 			DisplayName: reply.User.Name,
-			IconURL:     utils.ToOpt[oas.OptString](reply.User.Icon),
+			IconURL:     utils.ToOptNil[oas.OptNilString](reply.User.Icon),
 		}
 		log.Println(reply.Opinion.VoteType)
 		opinion := &oas.OpinionCommentsOKOpinionsItemOpinion{
