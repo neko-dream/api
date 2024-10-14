@@ -26,7 +26,9 @@ func NewAnalysisService(
 
 // StartAnalysis 会話分析を開始する
 func (a *analysisService) StartAnalysis(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession], userID shared.UUID[user.User]) error {
-
+	if a.conf.Env == "production" {
+		return nil
+	}
 	// カスタムHTTPクライアントを作成
 	httpClient := &http.Client{
 		Transport: &BasicAuthTransport{
