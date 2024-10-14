@@ -1,6 +1,5 @@
 CREATE TABLE talk_session_reports (
-    talk_session_report_id uuid PRIMARY KEY,
-    talk_session_id uuid NOT NULL,
+    talk_session_id uuid PRIMARY KEY,
     report text NOT NULL,
     created_at timestamp NOT NULL DEFAULT (now()),
     updated_at timestamp NOT NULL DEFAULT (now())
