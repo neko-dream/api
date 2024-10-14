@@ -23,18 +23,66 @@ type opinionHandler struct {
 	postOpinionUsecase       opinion_usecase.PostOpinionUseCase
 	getOpinionRepliesUsecase opinion_usecase.GetOpinionRepliesUseCase
 	getSwipeOpinionsUseCase  opinion_usecase.GetSwipeOpinionsQueryHandler
+	getOpinionDetailUseCase  opinion_usecase.GetOpinionDetailUseCase
 }
 
 func NewOpinionHandler(
 	postOpinionUsecase opinion_usecase.PostOpinionUseCase,
 	getOpinionRepliesUsecase opinion_usecase.GetOpinionRepliesUseCase,
 	getSwipeOpinionsUseCase opinion_usecase.GetSwipeOpinionsQueryHandler,
+	getOpinionDetailUseCase opinion_usecase.GetOpinionDetailUseCase,
 ) oas.OpinionHandler {
 	return &opinionHandler{
 		postOpinionUsecase:       postOpinionUsecase,
 		getOpinionRepliesUsecase: getOpinionRepliesUsecase,
 		getSwipeOpinionsUseCase:  getSwipeOpinionsUseCase,
+		getOpinionDetailUseCase:  getOpinionDetailUseCase,
 	}
+}
+
+// GetOpinionDetail implements oas.OpinionHandler.
+func (o *opinionHandler) GetOpinionDetail(ctx context.Context, params oas.GetOpinionDetailParams) (oas.GetOpinionDetailRes, error) {
+	claim := session.GetSession(ctx)
+	var userID *shared.UUID[user.User]
+	if claim != nil {
+		userIDTmp, err := claim.UserID()
+		if err != nil {
+			return nil, messages.ForbiddenError
+		}
+		userID = lo.ToPtr(userIDTmp)
+	}
+
+	opinionID := shared.MustParseUUID[opinion.Opinion](params.OpinionID)
+	opinion, err := o.getOpinionDetailUseCase.Execute(ctx, opinion_usecase.GetOpinionDetailInput{
+		OpinionID: opinionID,
+		UserID:    userID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	user := &oas.GetOpinionDetailOKUser{
+		DisplayID:   opinion.Opinion.User.ID,
+		DisplayName: opinion.Opinion.User.Name,
+		IconURL:     utils.ToOptNil[oas.OptNilString](opinion.Opinion.User.Icon),
+	}
+	op := &oas.GetOpinionDetailOKOpinion{
+		ID:       opinion.Opinion.Opinion.OpinionID,
+		ParentID: utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ParentOpinionID),
+		Title:    utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.Title),
+		Content:  opinion.Opinion.Opinion.Content,
+		VoteType: oas.OptGetOpinionDetailOKOpinionVoteType{
+			Value: oas.GetOpinionDetailOKOpinionVoteType(opinion.Opinion.Opinion.VoteType),
+			Set:   true,
+		},
+		PictureURL:   utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.PictureURL),
+		ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ReferenceURL),
+	}
+
+	return &oas.GetOpinionDetailOK{
+		User:    *user,
+		Opinion: *op,
+	}, nil
 }
 
 // GetTopOpinions 代表意見取得

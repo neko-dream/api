@@ -280,26 +280,70 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							break
 						}
 						switch elem[0] {
-						case '/': // Prefix: "/swipe_opinions"
+						case '/': // Prefix: "/"
 							origElem := elem
-							if l := len("/swipe_opinions"); len(elem) >= l && elem[0:l] == "/swipe_opinions" {
+							if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 								elem = elem[l:]
 							} else {
 								break
 							}
 
 							if len(elem) == 0 {
-								// Leaf node.
-								switch r.Method {
-								case "GET":
-									s.handleSwipeOpinionsRequest([1]string{
-										args[0],
-									}, elemIsEscaped, w, r)
-								default:
-									s.notAllowed(w, r, "GET")
+								break
+							}
+							switch elem[0] {
+							case 'o': // Prefix: "opinions/"
+								origElem := elem
+								if l := len("opinions/"); len(elem) >= l && elem[0:l] == "opinions/" {
+									elem = elem[l:]
+								} else {
+									break
 								}
 
-								return
+								// Param: "opinionID"
+								// Leaf parameter
+								args[1] = elem
+								elem = ""
+
+								if len(elem) == 0 {
+									// Leaf node.
+									switch r.Method {
+									case "GET":
+										s.handleGetOpinionDetailRequest([2]string{
+											args[0],
+											args[1],
+										}, elemIsEscaped, w, r)
+									default:
+										s.notAllowed(w, r, "GET")
+									}
+
+									return
+								}
+
+								elem = origElem
+							case 's': // Prefix: "swipe_opinions"
+								origElem := elem
+								if l := len("swipe_opinions"); len(elem) >= l && elem[0:l] == "swipe_opinions" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								if len(elem) == 0 {
+									// Leaf node.
+									switch r.Method {
+									case "GET":
+										s.handleSwipeOpinionsRequest([1]string{
+											args[0],
+										}, elemIsEscaped, w, r)
+									default:
+										s.notAllowed(w, r, "GET")
+									}
+
+									return
+								}
+
+								elem = origElem
 							}
 
 							elem = origElem
@@ -884,28 +928,73 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							break
 						}
 						switch elem[0] {
-						case '/': // Prefix: "/swipe_opinions"
+						case '/': // Prefix: "/"
 							origElem := elem
-							if l := len("/swipe_opinions"); len(elem) >= l && elem[0:l] == "/swipe_opinions" {
+							if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 								elem = elem[l:]
 							} else {
 								break
 							}
 
 							if len(elem) == 0 {
-								// Leaf node.
-								switch method {
-								case "GET":
-									r.name = "SwipeOpinions"
-									r.summary = "スワイプ用のエンドポイント"
-									r.operationID = "swipe_opinions"
-									r.pathPattern = "/talksession/{talkSessionID}/swipe_opinions"
-									r.args = args
-									r.count = 1
-									return r, true
-								default:
-									return
+								break
+							}
+							switch elem[0] {
+							case 'o': // Prefix: "opinions/"
+								origElem := elem
+								if l := len("opinions/"); len(elem) >= l && elem[0:l] == "opinions/" {
+									elem = elem[l:]
+								} else {
+									break
 								}
+
+								// Param: "opinionID"
+								// Leaf parameter
+								args[1] = elem
+								elem = ""
+
+								if len(elem) == 0 {
+									// Leaf node.
+									switch method {
+									case "GET":
+										r.name = "GetOpinionDetail"
+										r.summary = "意見の詳細"
+										r.operationID = "getOpinionDetail"
+										r.pathPattern = "/talksession/{talkSessionID}/opinions/{opinionID}"
+										r.args = args
+										r.count = 2
+										return r, true
+									default:
+										return
+									}
+								}
+
+								elem = origElem
+							case 's': // Prefix: "swipe_opinions"
+								origElem := elem
+								if l := len("swipe_opinions"); len(elem) >= l && elem[0:l] == "swipe_opinions" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								if len(elem) == 0 {
+									// Leaf node.
+									switch method {
+									case "GET":
+										r.name = "SwipeOpinions"
+										r.summary = "スワイプ用のエンドポイント"
+										r.operationID = "swipe_opinions"
+										r.pathPattern = "/talksession/{talkSessionID}/swipe_opinions"
+										r.args = args
+										r.count = 1
+										return r, true
+									default:
+										return
+									}
+								}
+
+								elem = origElem
 							}
 
 							elem = origElem

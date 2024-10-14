@@ -9,6 +9,10 @@ type EditUserProfileRes interface {
 	editUserProfileRes()
 }
 
+type GetOpinionDetailRes interface {
+	getOpinionDetailRes()
+}
+
 type GetTalkSessionDetailRes interface {
 	getTalkSessionDetailRes()
 }

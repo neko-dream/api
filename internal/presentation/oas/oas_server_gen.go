@@ -50,6 +50,12 @@ type AuthHandler interface {
 //
 // x-ogen-operation-group: Opinion
 type OpinionHandler interface {
+	// GetOpinionDetail implements getOpinionDetail operation.
+	//
+	// 意見の詳細.
+	//
+	// GET /talksession/{talkSessionID}/opinions/{opinionID}
+	GetOpinionDetail(ctx context.Context, params GetOpinionDetailParams) (GetOpinionDetailRes, error)
 	// GetTopOpinions implements getTopOpinions operation.
 	//
 	// 🚧 分析に関する意見.
