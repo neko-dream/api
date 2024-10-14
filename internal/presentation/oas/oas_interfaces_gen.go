@@ -21,10 +21,6 @@ type GetTalkSessionListRes interface {
 	getTalkSessionListRes()
 }
 
-type GetTopOpinionsRes interface {
-	getTopOpinionsRes()
-}
-
 type GetUserInfoRes interface {
 	getUserInfoRes()
 }
@@ -59,6 +55,10 @@ type SessionsHistoryRes interface {
 
 type SwipeOpinionsRes interface {
 	swipeOpinionsRes()
+}
+
+type TalkSessionAnalysisRes interface {
+	talkSessionAnalysisRes()
 }
 
 type TestRes interface {

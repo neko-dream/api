@@ -13,6 +13,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/datasource/repository"
 	"github.com/neko-dream/server/internal/infrastructure/db"
 	"github.com/neko-dream/server/internal/presentation/handler"
+	analysis_usecase "github.com/neko-dream/server/internal/usecase/analysis"
 	auth_usecase "github.com/neko-dream/server/internal/usecase/auth"
 	opinion_usecase "github.com/neko-dream/server/internal/usecase/opinion"
 	talk_session_usecase "github.com/neko-dream/server/internal/usecase/talk_session"
@@ -65,6 +66,7 @@ func BuildContainer() *dig.Container {
 		{opinion_usecase.NewGetOpinionRepliesUseCase, nil},
 		{opinion_usecase.NewGetSwipeOpinionsQueryHandler, nil},
 		{opinion_usecase.NewGetOpinionDetailUseCase, nil},
+		{analysis_usecase.NewGetAnalysisResultUseCase, nil},
 		{vote_usecase.NewPostVoteUseCase, nil},
 		{client.NewAnalysisService, nil},
 		{handler.NewSecurityHandler, nil},

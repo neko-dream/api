@@ -1549,15 +1549,15 @@ paths:
                     message: INTERNAL SERVER ERROR.
       security: []
       x-ogen-operation-group: Opinion
-  /talksessions/{talkSessionId}/opinion:
+  /talksessions/{talkSessionId}/analysis:
     get:
-      summary: 🚧 分析に関する意見
+      summary: 分析結果一覧
       deprecated: false
       description: ''
-      operationId: getTopOpinions
+      operationId: talkSessionAnalysis
       tags:
-        - talk_session/opinion
-        - opinion
+        - talk_session
+        - talk_session
       parameters:
         - name: talkSessionId
           in: path
@@ -1572,9 +1572,126 @@ paths:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  myPosition:
+                    type: object
+                    properties:
+                      posX:
+                        type: number
+                      posY:
+                        type: number
+                      displayId:
+                        type: string
+                      groupId:
+                        type: integer
+                    required:
+                      - posX
+                      - posY
+                      - displayId
+                      - groupId
+                  positions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        posX:
+                          type: number
+                        posY:
+                          type: number
+                        displayId:
+                          type: string
+                        groupId:
+                          type: integer
+                      required:
+                        - posX
+                        - posY
+                        - displayId
+                        - groupId
+                  groupOpinions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        groupId:
+                          type: integer
+                        opinions:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              opinion:
+                                type: object
+                                properties:
+                                  id:
+                                    type: string
+                                    faker: '1'
+                                    description: 意見ID
+                                  title:
+                                    type: string
+                                  content:
+                                    type: string
+                                    description: 意見のテキスト
+                                    minLength: 1
+                                    maxLength: 140
+                                  parentID:
+                                    type: string
+                                    description: 親の意見ID。ルートならば無し
+                                  voteType:
+                                    type: string
+                                    description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                                    enum:
+                                      - agree
+                                      - disagree
+                                      - pass
+                                    x-apidog-enum:
+                                      - name: ''
+                                        value: agree
+                                        description: 良さそう
+                                      - name: ''
+                                        value: disagree
+                                        description: 違うかも
+                                      - name: ''
+                                        value: pass
+                                        description: 保留
+                                  pictureURL:
+                                    type: string
+                                    description: 画像が返る場合もある
+                                  referenceURL:
+                                    type: string
+                                    description: 参考文献URL
+                                required:
+                                  - content
+                                  - id
+                              user:
+                                type: object
+                                properties:
+                                  displayID:
+                                    type: string
+                                    x-apidog-mock: '{{$string.uuid}}'
+                                    pattern: ^[A-Za-z0-9]$
+                                    examples:
+                                      - userid
+                                    minLength: 3
+                                    maxLength: 25
+                                  displayName:
+                                    type: string
+                                    x-apidog-mock: '{{$person.firstName}}'
+                                  iconURL:
+                                    type: string
+                                    nullable: true
+                                required:
+                                  - displayID
+                                  - displayName
+                                description: 作成ユーザー
+                            required:
+                              - opinion
+                              - user
+                      required:
+                        - groupId
+                        - opinions
                 required:
-                  - 01J93WTW4J3ZBAAVVZV8PSWZ6R
+                  - positions
+                  - groupOpinions
         '400':
           description: ErrorResponse
           content:
@@ -1616,7 +1733,7 @@ paths:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
       security: []
-      x-ogen-operation-group: Opinion
+      x-ogen-operation-group: TalkSession
   /test:
     get:
       summary: OpenAPIテスト用
@@ -2201,6 +2318,22 @@ paths:
       x-ogen-operation-group: Auth
 components:
   schemas:
+    userGroupPosition:
+      type: object
+      properties:
+        posX:
+          type: number
+        posY:
+          type: number
+        displayId:
+          type: string
+        groupId:
+          type: integer
+      required:
+        - posX
+        - posY
+        - displayId
+        - groupId
     userDemographics:
       type: object
       properties:

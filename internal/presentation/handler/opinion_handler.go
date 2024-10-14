@@ -85,11 +85,6 @@ func (o *opinionHandler) GetOpinionDetail(ctx context.Context, params oas.GetOpi
 	}, nil
 }
 
-// GetTopOpinions 代表意見取得
-func (o *opinionHandler) GetTopOpinions(ctx context.Context, params oas.GetTopOpinionsParams) (oas.GetTopOpinionsRes, error) {
-	panic("unimplemented")
-}
-
 // SwipeOpinions スワイプ用の意見取得
 // 自分が投稿した意見は取得しない
 func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpinionsParams) (oas.SwipeOpinionsRes, error) {

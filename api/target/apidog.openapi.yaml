@@ -1644,15 +1644,15 @@
         "x-ogen-operation-group": "Opinion"
       }
     },
-    "/talksessions/{talkSessionId}/opinion": {
+    "/talksessions/{talkSessionId}/analysis": {
       "get": {
-        "summary": "🚧 分析に関する意見",
+        "summary": "分析結果一覧",
         "deprecated": false,
         "description": "",
-        "operationId": "getTopOpinions",
+        "operationId": "talkSessionAnalysis",
         "tags": [
-          "talk_session/opinion",
-          "opinion"
+          "talk_session",
+          "talk_session"
         ],
         "parameters": [
           {
@@ -1672,9 +1672,54 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": {},
+                  "properties": {
+                    "myPosition": {
+                      "$ref": "#/components/schemas/userGroupPosition"
+                    },
+                    "positions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/userGroupPosition"
+                      }
+                    },
+                    "groupOpinions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "groupId": {
+                            "type": "integer"
+                          },
+                          "opinions": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "opinion": {
+                                  "$ref": "#/components/schemas/opinion"
+                                },
+                                "user": {
+                                  "$ref": "#/components/schemas/user",
+                                  "description": "作成ユーザー"
+                                }
+                              },
+                              "required": [
+                                "opinion",
+                                "user"
+                              ]
+                            }
+                          }
+                        },
+                        "required": [
+                          "groupId",
+                          "opinions"
+                        ]
+                      }
+                    }
+                  },
                   "required": [
-                    "01J93WTW4J3ZBAAVVZV8PSWZ6R"
+                    "positions",
+                    "groupOpinions"
                   ]
                 }
               }
@@ -1744,7 +1789,7 @@
           }
         },
         "security": [],
-        "x-ogen-operation-group": "Opinion"
+        "x-ogen-operation-group": "TalkSession"
       }
     },
     "/test": {
@@ -2251,6 +2296,29 @@
   },
   "components": {
     "schemas": {
+      "userGroupPosition": {
+        "type": "object",
+        "properties": {
+          "posX": {
+            "type": "number"
+          },
+          "posY": {
+            "type": "number"
+          },
+          "displayId": {
+            "type": "string"
+          },
+          "groupId": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "posX",
+          "posY",
+          "displayId",
+          "groupId"
+        ]
+      },
       "userDemographics": {
         "type": "object",
         "properties": {

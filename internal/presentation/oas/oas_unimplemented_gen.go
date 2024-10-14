@@ -67,15 +67,6 @@ func (UnimplementedHandler) GetTalkSessionList(ctx context.Context, params GetTa
 	return r, ht.ErrNotImplemented
 }
 
-// GetTopOpinions implements getTopOpinions operation.
-//
-// 🚧 分析に関する意見.
-//
-// GET /talksessions/{talkSessionId}/opinion
-func (UnimplementedHandler) GetTopOpinions(ctx context.Context, params GetTopOpinionsParams) (r GetTopOpinionsRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // GetUserInfo implements get_user_info operation.
 //
 // ユーザー情報の取得.
@@ -163,6 +154,15 @@ func (UnimplementedHandler) SessionsHistory(ctx context.Context) (r SessionsHist
 //
 // GET /talksessions/{talkSessionID}/swipe_opinions
 func (UnimplementedHandler) SwipeOpinions(ctx context.Context, params SwipeOpinionsParams) (r SwipeOpinionsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// TalkSessionAnalysis implements talkSessionAnalysis operation.
+//
+// 分析結果一覧.
+//
+// GET /talksessions/{talkSessionId}/analysis
+func (UnimplementedHandler) TalkSessionAnalysis(ctx context.Context, params TalkSessionAnalysisParams) (r TalkSessionAnalysisRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

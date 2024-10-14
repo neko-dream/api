@@ -800,118 +800,6 @@ func (s *Server) handleGetTalkSessionListRequest(args [0]string, argsEscaped boo
 	}
 }
 
-// handleGetTopOpinionsRequest handles getTopOpinions operation.
-//
-// 🚧 分析に関する意見.
-//
-// GET /talksessions/{talkSessionId}/opinion
-func (s *Server) handleGetTopOpinionsRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("getTopOpinions"),
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/talksessions/{talkSessionId}/opinion"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "GetTopOpinions",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
-
-	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
-		err          error
-		opErrContext = ogenerrors.OperationContext{
-			Name: "GetTopOpinions",
-			ID:   "getTopOpinions",
-		}
-	)
-	params, err := decodeGetTopOpinionsParams(args, argsEscaped, r)
-	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		defer recordError("DecodeParams", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-
-	var response GetTopOpinionsRes
-	if m := s.cfg.Middleware; m != nil {
-		mreq := middleware.Request{
-			Context:          ctx,
-			OperationName:    "GetTopOpinions",
-			OperationSummary: "🚧 分析に関する意見",
-			OperationID:      "getTopOpinions",
-			Body:             nil,
-			Params: middleware.Parameters{
-				{
-					Name: "talkSessionId",
-					In:   "path",
-				}: params.TalkSessionId,
-			},
-			Raw: r,
-		}
-
-		type (
-			Request  = struct{}
-			Params   = GetTopOpinionsParams
-			Response = GetTopOpinionsRes
-		)
-		response, err = middleware.HookMiddleware[
-			Request,
-			Params,
-			Response,
-		](
-			m,
-			mreq,
-			unpackGetTopOpinionsParams,
-			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.GetTopOpinions(ctx, params)
-				return response, err
-			},
-		)
-	} else {
-		response, err = s.h.GetTopOpinions(ctx, params)
-	}
-	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-
-	if err := encodeGetTopOpinionsResponse(response, w, span); err != nil {
-		defer recordError("EncodeResponse", err)
-		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
-			s.cfg.ErrorHandler(ctx, w, r, err)
-		}
-		return
-	}
-}
-
 // handleGetUserInfoRequest handles get_user_info operation.
 //
 // ユーザー情報の取得.
@@ -2263,6 +2151,118 @@ func (s *Server) handleSwipeOpinionsRequest(args [1]string, argsEscaped bool, w 
 	}
 
 	if err := encodeSwipeOpinionsResponse(response, w, span); err != nil {
+		defer recordError("EncodeResponse", err)
+		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+		}
+		return
+	}
+}
+
+// handleTalkSessionAnalysisRequest handles talkSessionAnalysis operation.
+//
+// 分析結果一覧.
+//
+// GET /talksessions/{talkSessionId}/analysis
+func (s *Server) handleTalkSessionAnalysisRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("talkSessionAnalysis"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/talksessions/{talkSessionId}/analysis"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "TalkSessionAnalysis",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Add Labeler to context.
+	labeler := &Labeler{attrs: otelAttrs}
+	ctx = contextWithLabeler(ctx, labeler)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
+
+		// Increment request counter.
+		s.requests.Add(ctx, 1, attrOpt)
+
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
+	}()
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "TalkSessionAnalysis",
+			ID:   "talkSessionAnalysis",
+		}
+	)
+	params, err := decodeTalkSessionAnalysisParams(args, argsEscaped, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		defer recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	var response TalkSessionAnalysisRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:          ctx,
+			OperationName:    "TalkSessionAnalysis",
+			OperationSummary: "分析結果一覧",
+			OperationID:      "talkSessionAnalysis",
+			Body:             nil,
+			Params: middleware.Parameters{
+				{
+					Name: "talkSessionId",
+					In:   "path",
+				}: params.TalkSessionId,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = struct{}
+			Params   = TalkSessionAnalysisParams
+			Response = TalkSessionAnalysisRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackTalkSessionAnalysisParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.TalkSessionAnalysis(ctx, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.TalkSessionAnalysis(ctx, params)
+	}
+	if err != nil {
+		defer recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeTalkSessionAnalysisResponse(response, w, span); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)

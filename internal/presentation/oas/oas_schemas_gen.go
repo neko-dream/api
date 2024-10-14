@@ -1601,64 +1601,6 @@ func (s *GetTalkSessionListStatus) UnmarshalText(data []byte) error {
 	}
 }
 
-type GetTopOpinionsBadRequest struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-}
-
-// GetCode returns the value of Code.
-func (s *GetTopOpinionsBadRequest) GetCode() string {
-	return s.Code
-}
-
-// GetMessage returns the value of Message.
-func (s *GetTopOpinionsBadRequest) GetMessage() string {
-	return s.Message
-}
-
-// SetCode sets the value of Code.
-func (s *GetTopOpinionsBadRequest) SetCode(val string) {
-	s.Code = val
-}
-
-// SetMessage sets the value of Message.
-func (s *GetTopOpinionsBadRequest) SetMessage(val string) {
-	s.Message = val
-}
-
-func (*GetTopOpinionsBadRequest) getTopOpinionsRes() {}
-
-type GetTopOpinionsInternalServerError struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-}
-
-// GetCode returns the value of Code.
-func (s *GetTopOpinionsInternalServerError) GetCode() string {
-	return s.Code
-}
-
-// GetMessage returns the value of Message.
-func (s *GetTopOpinionsInternalServerError) GetMessage() string {
-	return s.Message
-}
-
-// SetCode sets the value of Code.
-func (s *GetTopOpinionsInternalServerError) SetCode(val string) {
-	s.Code = val
-}
-
-// SetMessage sets the value of Message.
-func (s *GetTopOpinionsInternalServerError) SetMessage(val string) {
-	s.Message = val
-}
-
-func (*GetTopOpinionsInternalServerError) getTopOpinionsRes() {}
-
-type GetTopOpinionsOK struct{}
-
-func (*GetTopOpinionsOK) getTopOpinionsRes() {}
-
 type GetUserInfoInternalServerError struct{}
 
 func (*GetUserInfoInternalServerError) getUserInfoRes() {}
@@ -4532,6 +4474,100 @@ func (o OptSwipeOpinionsOKItemOpinionVoteType) Or(d SwipeOpinionsOKItemOpinionVo
 	return d
 }
 
+// NewOptTalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType returns new OptTalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType with value set to v.
+func NewOptTalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType(v TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType) OptTalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType {
+	return OptTalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptTalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType is optional TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType.
+type OptTalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType struct {
+	Value TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType
+	Set   bool
+}
+
+// IsSet returns true if OptTalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType was set.
+func (o OptTalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType) IsSet() bool {
+	return o.Set
+}
+
+// Reset unsets value.
+func (o *OptTalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType) Reset() {
+	var v TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptTalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType) SetTo(v TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptTalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType) Get() (v TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptTalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType) Or(d TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType) TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptTalkSessionAnalysisOKMyPosition returns new OptTalkSessionAnalysisOKMyPosition with value set to v.
+func NewOptTalkSessionAnalysisOKMyPosition(v TalkSessionAnalysisOKMyPosition) OptTalkSessionAnalysisOKMyPosition {
+	return OptTalkSessionAnalysisOKMyPosition{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptTalkSessionAnalysisOKMyPosition is optional TalkSessionAnalysisOKMyPosition.
+type OptTalkSessionAnalysisOKMyPosition struct {
+	Value TalkSessionAnalysisOKMyPosition
+	Set   bool
+}
+
+// IsSet returns true if OptTalkSessionAnalysisOKMyPosition was set.
+func (o OptTalkSessionAnalysisOKMyPosition) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptTalkSessionAnalysisOKMyPosition) Reset() {
+	var v TalkSessionAnalysisOKMyPosition
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptTalkSessionAnalysisOKMyPosition) SetTo(v TalkSessionAnalysisOKMyPosition) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptTalkSessionAnalysisOKMyPosition) Get() (v TalkSessionAnalysisOKMyPosition, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptTalkSessionAnalysisOKMyPosition) Or(d TalkSessionAnalysisOKMyPosition) TalkSessionAnalysisOKMyPosition {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptURI returns new OptURI with value set to v.
 func NewOptURI(v url.URL) OptURI {
 	return OptURI{
@@ -5442,6 +5478,415 @@ func (s *SwipeOpinionsOKItemUser) SetDisplayName(val string) {
 // SetIconURL sets the value of IconURL.
 func (s *SwipeOpinionsOKItemUser) SetIconURL(val OptNilString) {
 	s.IconURL = val
+}
+
+type TalkSessionAnalysisBadRequest struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *TalkSessionAnalysisBadRequest) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *TalkSessionAnalysisBadRequest) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *TalkSessionAnalysisBadRequest) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *TalkSessionAnalysisBadRequest) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*TalkSessionAnalysisBadRequest) talkSessionAnalysisRes() {}
+
+type TalkSessionAnalysisInternalServerError struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *TalkSessionAnalysisInternalServerError) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *TalkSessionAnalysisInternalServerError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *TalkSessionAnalysisInternalServerError) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *TalkSessionAnalysisInternalServerError) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*TalkSessionAnalysisInternalServerError) talkSessionAnalysisRes() {}
+
+type TalkSessionAnalysisOK struct {
+	MyPosition    OptTalkSessionAnalysisOKMyPosition       `json:"myPosition"`
+	Positions     []TalkSessionAnalysisOKPositionsItem     `json:"positions"`
+	GroupOpinions []TalkSessionAnalysisOKGroupOpinionsItem `json:"groupOpinions"`
+}
+
+// GetMyPosition returns the value of MyPosition.
+func (s *TalkSessionAnalysisOK) GetMyPosition() OptTalkSessionAnalysisOKMyPosition {
+	return s.MyPosition
+}
+
+// GetPositions returns the value of Positions.
+func (s *TalkSessionAnalysisOK) GetPositions() []TalkSessionAnalysisOKPositionsItem {
+	return s.Positions
+}
+
+// GetGroupOpinions returns the value of GroupOpinions.
+func (s *TalkSessionAnalysisOK) GetGroupOpinions() []TalkSessionAnalysisOKGroupOpinionsItem {
+	return s.GroupOpinions
+}
+
+// SetMyPosition sets the value of MyPosition.
+func (s *TalkSessionAnalysisOK) SetMyPosition(val OptTalkSessionAnalysisOKMyPosition) {
+	s.MyPosition = val
+}
+
+// SetPositions sets the value of Positions.
+func (s *TalkSessionAnalysisOK) SetPositions(val []TalkSessionAnalysisOKPositionsItem) {
+	s.Positions = val
+}
+
+// SetGroupOpinions sets the value of GroupOpinions.
+func (s *TalkSessionAnalysisOK) SetGroupOpinions(val []TalkSessionAnalysisOKGroupOpinionsItem) {
+	s.GroupOpinions = val
+}
+
+func (*TalkSessionAnalysisOK) talkSessionAnalysisRes() {}
+
+type TalkSessionAnalysisOKGroupOpinionsItem struct {
+	GroupId  int                                                  `json:"groupId"`
+	Opinions []TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem `json:"opinions"`
+}
+
+// GetGroupId returns the value of GroupId.
+func (s *TalkSessionAnalysisOKGroupOpinionsItem) GetGroupId() int {
+	return s.GroupId
+}
+
+// GetOpinions returns the value of Opinions.
+func (s *TalkSessionAnalysisOKGroupOpinionsItem) GetOpinions() []TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem {
+	return s.Opinions
+}
+
+// SetGroupId sets the value of GroupId.
+func (s *TalkSessionAnalysisOKGroupOpinionsItem) SetGroupId(val int) {
+	s.GroupId = val
+}
+
+// SetOpinions sets the value of Opinions.
+func (s *TalkSessionAnalysisOKGroupOpinionsItem) SetOpinions(val []TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) {
+	s.Opinions = val
+}
+
+type TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem struct {
+	Opinion TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion `json:"opinion"`
+	// 作成ユーザー.
+	User TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemUser `json:"user"`
+}
+
+// GetOpinion returns the value of Opinion.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) GetOpinion() TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion {
+	return s.Opinion
+}
+
+// GetUser returns the value of User.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) GetUser() TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemUser {
+	return s.User
+}
+
+// SetOpinion sets the value of Opinion.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) SetOpinion(val TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) {
+	s.Opinion = val
+}
+
+// SetUser sets the value of User.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) SetUser(val TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemUser) {
+	s.User = val
+}
+
+type TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion struct {
+	// 意見ID.
+	ID    string    `json:"id"`
+	Title OptString `json:"title"`
+	// 意見のテキスト.
+	Content string `json:"content"`
+	// 親の意見ID。ルートならば無し.
+	ParentID OptString `json:"parentID"`
+	// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+	VoteType OptTalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType `json:"voteType"`
+	// 画像が返る場合もある.
+	PictureURL OptString `json:"pictureURL"`
+	// 参考文献URL.
+	ReferenceURL OptString `json:"referenceURL"`
+}
+
+// GetID returns the value of ID.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) GetID() string {
+	return s.ID
+}
+
+// GetTitle returns the value of Title.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) GetTitle() OptString {
+	return s.Title
+}
+
+// GetContent returns the value of Content.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) GetContent() string {
+	return s.Content
+}
+
+// GetParentID returns the value of ParentID.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) GetParentID() OptString {
+	return s.ParentID
+}
+
+// GetVoteType returns the value of VoteType.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) GetVoteType() OptTalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType {
+	return s.VoteType
+}
+
+// GetPictureURL returns the value of PictureURL.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) GetPictureURL() OptString {
+	return s.PictureURL
+}
+
+// GetReferenceURL returns the value of ReferenceURL.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) GetReferenceURL() OptString {
+	return s.ReferenceURL
+}
+
+// SetID sets the value of ID.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) SetID(val string) {
+	s.ID = val
+}
+
+// SetTitle sets the value of Title.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) SetTitle(val OptString) {
+	s.Title = val
+}
+
+// SetContent sets the value of Content.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) SetContent(val string) {
+	s.Content = val
+}
+
+// SetParentID sets the value of ParentID.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) SetParentID(val OptString) {
+	s.ParentID = val
+}
+
+// SetVoteType sets the value of VoteType.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) SetVoteType(val OptTalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType) {
+	s.VoteType = val
+}
+
+// SetPictureURL sets the value of PictureURL.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) SetPictureURL(val OptString) {
+	s.PictureURL = val
+}
+
+// SetReferenceURL sets the value of ReferenceURL.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) SetReferenceURL(val OptString) {
+	s.ReferenceURL = val
+}
+
+// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+type TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType string
+
+const (
+	TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeAgree    TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType = "agree"
+	TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeDisagree TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType = "disagree"
+	TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypePass     TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType = "pass"
+)
+
+// AllValues returns all TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType values.
+func (TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType) AllValues() []TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType {
+	return []TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType{
+		TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeAgree,
+		TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeDisagree,
+		TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypePass,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType) MarshalText() ([]byte, error) {
+	switch s {
+	case TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeAgree:
+		return []byte(s), nil
+	case TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeDisagree:
+		return []byte(s), nil
+	case TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypePass:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType) UnmarshalText(data []byte) error {
+	switch TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType(data) {
+	case TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeAgree:
+		*s = TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeAgree
+		return nil
+	case TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeDisagree:
+		*s = TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeDisagree
+		return nil
+	case TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypePass:
+		*s = TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypePass
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// 作成ユーザー.
+type TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemUser struct {
+	DisplayID   string       `json:"displayID"`
+	DisplayName string       `json:"displayName"`
+	IconURL     OptNilString `json:"iconURL"`
+}
+
+// GetDisplayID returns the value of DisplayID.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemUser) GetDisplayID() string {
+	return s.DisplayID
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemUser) GetDisplayName() string {
+	return s.DisplayName
+}
+
+// GetIconURL returns the value of IconURL.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemUser) GetIconURL() OptNilString {
+	return s.IconURL
+}
+
+// SetDisplayID sets the value of DisplayID.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemUser) SetDisplayID(val string) {
+	s.DisplayID = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemUser) SetDisplayName(val string) {
+	s.DisplayName = val
+}
+
+// SetIconURL sets the value of IconURL.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemUser) SetIconURL(val OptNilString) {
+	s.IconURL = val
+}
+
+type TalkSessionAnalysisOKMyPosition struct {
+	PosX      float64 `json:"posX"`
+	PosY      float64 `json:"posY"`
+	DisplayId string  `json:"displayId"`
+	GroupId   int     `json:"groupId"`
+}
+
+// GetPosX returns the value of PosX.
+func (s *TalkSessionAnalysisOKMyPosition) GetPosX() float64 {
+	return s.PosX
+}
+
+// GetPosY returns the value of PosY.
+func (s *TalkSessionAnalysisOKMyPosition) GetPosY() float64 {
+	return s.PosY
+}
+
+// GetDisplayId returns the value of DisplayId.
+func (s *TalkSessionAnalysisOKMyPosition) GetDisplayId() string {
+	return s.DisplayId
+}
+
+// GetGroupId returns the value of GroupId.
+func (s *TalkSessionAnalysisOKMyPosition) GetGroupId() int {
+	return s.GroupId
+}
+
+// SetPosX sets the value of PosX.
+func (s *TalkSessionAnalysisOKMyPosition) SetPosX(val float64) {
+	s.PosX = val
+}
+
+// SetPosY sets the value of PosY.
+func (s *TalkSessionAnalysisOKMyPosition) SetPosY(val float64) {
+	s.PosY = val
+}
+
+// SetDisplayId sets the value of DisplayId.
+func (s *TalkSessionAnalysisOKMyPosition) SetDisplayId(val string) {
+	s.DisplayId = val
+}
+
+// SetGroupId sets the value of GroupId.
+func (s *TalkSessionAnalysisOKMyPosition) SetGroupId(val int) {
+	s.GroupId = val
+}
+
+type TalkSessionAnalysisOKPositionsItem struct {
+	PosX      float64 `json:"posX"`
+	PosY      float64 `json:"posY"`
+	DisplayId string  `json:"displayId"`
+	GroupId   int     `json:"groupId"`
+}
+
+// GetPosX returns the value of PosX.
+func (s *TalkSessionAnalysisOKPositionsItem) GetPosX() float64 {
+	return s.PosX
+}
+
+// GetPosY returns the value of PosY.
+func (s *TalkSessionAnalysisOKPositionsItem) GetPosY() float64 {
+	return s.PosY
+}
+
+// GetDisplayId returns the value of DisplayId.
+func (s *TalkSessionAnalysisOKPositionsItem) GetDisplayId() string {
+	return s.DisplayId
+}
+
+// GetGroupId returns the value of GroupId.
+func (s *TalkSessionAnalysisOKPositionsItem) GetGroupId() int {
+	return s.GroupId
+}
+
+// SetPosX sets the value of PosX.
+func (s *TalkSessionAnalysisOKPositionsItem) SetPosX(val float64) {
+	s.PosX = val
+}
+
+// SetPosY sets the value of PosY.
+func (s *TalkSessionAnalysisOKPositionsItem) SetPosY(val float64) {
+	s.PosY = val
+}
+
+// SetDisplayId sets the value of DisplayId.
+func (s *TalkSessionAnalysisOKPositionsItem) SetDisplayId(val string) {
+	s.DisplayId = val
+}
+
+// SetGroupId sets the value of GroupId.
+func (s *TalkSessionAnalysisOKPositionsItem) SetGroupId(val int) {
+	s.GroupId = val
 }
 
 type TestBadRequest struct{}

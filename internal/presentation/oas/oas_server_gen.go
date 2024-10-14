@@ -56,12 +56,6 @@ type OpinionHandler interface {
 	//
 	// GET /talksessions/{talkSessionID}/opinions/{opinionID}
 	GetOpinionDetail(ctx context.Context, params GetOpinionDetailParams) (GetOpinionDetailRes, error)
-	// GetTopOpinions implements getTopOpinions operation.
-	//
-	// 🚧 分析に関する意見.
-	//
-	// GET /talksessions/{talkSessionId}/opinion
-	GetTopOpinions(ctx context.Context, params GetTopOpinionsParams) (GetTopOpinionsRes, error)
 	// OpinionComments implements opinionComments operation.
 	//
 	// 意見に対するコメント一覧を返す.
@@ -104,6 +98,12 @@ type TalkSessionHandler interface {
 	//
 	// GET /talksessions
 	GetTalkSessionList(ctx context.Context, params GetTalkSessionListParams) (GetTalkSessionListRes, error)
+	// TalkSessionAnalysis implements talkSessionAnalysis operation.
+	//
+	// 分析結果一覧.
+	//
+	// GET /talksessions/{talkSessionId}/analysis
+	TalkSessionAnalysis(ctx context.Context, params TalkSessionAnalysisParams) (TalkSessionAnalysisRes, error)
 }
 
 // TestHandler handles operations described by OpenAPI v3 specification.

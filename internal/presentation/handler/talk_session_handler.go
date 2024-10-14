@@ -9,7 +9,9 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/shared/time"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
+	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/presentation/oas"
+	analysis_usecase "github.com/neko-dream/server/internal/usecase/analysis"
 	talk_session_usecase "github.com/neko-dream/server/internal/usecase/talk_session"
 	"github.com/neko-dream/server/pkg/utils"
 )
@@ -18,17 +20,20 @@ type talkSessionHandler struct {
 	createTalkSessionUsecase  talk_session_usecase.CreateTalkSessionUseCase
 	listTalkSessionQuery      talk_session_usecase.ListTalkSessionQuery
 	getTalkSessionDetailQuery talk_session_usecase.GetTalkSessionDetailUseCase
+	getAnalysisResultUseCase  analysis_usecase.GetAnalysisResultUseCase
 }
 
 func NewTalkSessionHandler(
 	createTalkSessionUsecase talk_session_usecase.CreateTalkSessionUseCase,
 	listTalkSessionQuery talk_session_usecase.ListTalkSessionQuery,
 	getTalkSessionDetailQuery talk_session_usecase.GetTalkSessionDetailUseCase,
+	getAnalysisResultUseCase analysis_usecase.GetAnalysisResultUseCase,
 ) oas.TalkSessionHandler {
 	return &talkSessionHandler{
 		createTalkSessionUsecase:  createTalkSessionUsecase,
 		listTalkSessionQuery:      listTalkSessionQuery,
 		getTalkSessionDetailQuery: getTalkSessionDetailQuery,
+		getAnalysisResultUseCase:  getAnalysisResultUseCase,
 	}
 }
 
@@ -172,5 +177,79 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 
 	return &oas.GetTalkSessionListOK{
 		TalkSessions: resultTalkSession,
+	}, nil
+}
+
+// TalkSessionAnalysis 分析結果取得
+func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas.TalkSessionAnalysisParams) (oas.TalkSessionAnalysisRes, error) {
+	claim := session.GetSession(ctx)
+	var userID *shared.UUID[user.User]
+	if claim != nil {
+		id, err := claim.UserID()
+		if err == nil {
+			userID = &id
+		}
+	}
+
+	out, err := t.getAnalysisResultUseCase.Execute(ctx, analysis_usecase.GetAnalysisResultInput{
+		UserID:        userID,
+		TalkSessionID: shared.MustParseUUID[talksession.TalkSession](params.TalkSessionId),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var myPosition oas.OptTalkSessionAnalysisOKMyPosition
+	if out.MyPosition != nil {
+		myPosition = oas.OptTalkSessionAnalysisOKMyPosition{
+			Value: oas.TalkSessionAnalysisOKMyPosition{
+				PosX:      out.MyPosition.PosX,
+				PosY:      out.MyPosition.PosY,
+				DisplayId: out.MyPosition.DisplayID,
+				GroupId:   out.MyPosition.GroupID,
+			},
+		}
+	}
+
+	positions := make([]oas.TalkSessionAnalysisOKPositionsItem, 0, len(out.Positions))
+	for _, position := range out.Positions {
+		positions = append(positions, oas.TalkSessionAnalysisOKPositionsItem{
+			PosX:      position.PosX,
+			PosY:      position.PosY,
+			DisplayId: position.DisplayID,
+			GroupId:   position.GroupID,
+		})
+	}
+
+	groupOpinions := make([]oas.TalkSessionAnalysisOKGroupOpinionsItem, 0, len(out.GroupOpinions))
+	for _, groupOpinion := range out.GroupOpinions {
+		opinions := make([]oas.TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem, 0, len(groupOpinion.Opinions))
+		for _, opinion := range groupOpinion.Opinions {
+			opinions = append(opinions, oas.TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem{
+				Opinion: oas.TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion{
+					ID:           opinion.Opinion.ID,
+					Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Title),
+					Content:      opinion.Opinion.Content,
+					ParentID:     utils.ToOpt[oas.OptString](opinion.Opinion.ParentID),
+					PictureURL:   utils.ToOpt[oas.OptString](opinion.Opinion.PictureURL),
+					ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
+				},
+				User: oas.TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemUser{
+					DisplayID:   opinion.User.ID,
+					DisplayName: opinion.User.Name,
+					IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.Icon),
+				},
+			})
+		}
+		groupOpinions = append(groupOpinions, oas.TalkSessionAnalysisOKGroupOpinionsItem{
+			GroupId:  groupOpinion.GroupID,
+			Opinions: opinions,
+		})
+	}
+
+	return &oas.TalkSessionAnalysisOK{
+		MyPosition:    myPosition,
+		Positions:     positions,
+		GroupOpinions: groupOpinions,
 	}, nil
 }
