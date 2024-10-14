@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"log"
 
 	"github.com/neko-dream/server/internal/domain/model/shared/time"
 	"github.com/neko-dream/server/internal/infrastructure/db"
@@ -133,6 +134,7 @@ func (h *listTalkSessionQueryHandler) Execute(ctx context.Context, input ListTal
 		utils.HandleError(ctx, err, "CountTalkSessions")
 		return nil, err
 	}
+	log.Println("talkSessionCount", talkSessionCount)
 
 	talkSessionOut.TalkSessions = talkSessionDTOList
 	talkSessionOut.TotalCount = int(talkSessionCount)
