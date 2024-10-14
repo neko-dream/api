@@ -6,24 +6,29 @@ import (
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
+	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/shared/time"
+	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	talk_session_usecase "github.com/neko-dream/server/internal/usecase/talk_session"
 	"github.com/neko-dream/server/pkg/utils"
 )
 
 type talkSessionHandler struct {
-	createTalkSessionUsecase talk_session_usecase.CreateTalkSessionUseCase
-	listTalkSessionQuery     talk_session_usecase.ListTalkSessionQuery
+	createTalkSessionUsecase  talk_session_usecase.CreateTalkSessionUseCase
+	listTalkSessionQuery      talk_session_usecase.ListTalkSessionQuery
+	getTalkSessionDetailQuery talk_session_usecase.GetTalkSessionDetailUseCase
 }
 
 func NewTalkSessionHandler(
 	createTalkSessionUsecase talk_session_usecase.CreateTalkSessionUseCase,
 	listTalkSessionQuery talk_session_usecase.ListTalkSessionQuery,
+	getTalkSessionDetailQuery talk_session_usecase.GetTalkSessionDetailUseCase,
 ) oas.TalkSessionHandler {
 	return &talkSessionHandler{
-		createTalkSessionUsecase: createTalkSessionUsecase,
-		listTalkSessionQuery:     listTalkSessionQuery,
+		createTalkSessionUsecase:  createTalkSessionUsecase,
+		listTalkSessionQuery:      listTalkSessionQuery,
+		getTalkSessionDetailQuery: getTalkSessionDetailQuery,
 	}
 }
 
@@ -88,7 +93,35 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 
 // GetTalkSessionDetail トークセッション詳細取得
 func (t *talkSessionHandler) GetTalkSessionDetail(ctx context.Context, params oas.GetTalkSessionDetailParams) (oas.GetTalkSessionDetailRes, error) {
-	panic("unimplemented")
+	out, err := t.getTalkSessionDetailQuery.Execute(ctx, talk_session_usecase.GetTalkSessionDetailInput{
+		TalkSessionID: shared.MustParseUUID[talksession.TalkSession](params.TalkSessionId),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	owner := oas.GetTalkSessionDetailOKOwner{
+		DisplayID:   out.Owner.DisplayID,
+		DisplayName: out.Owner.DisplayName,
+		IconURL:     utils.ToOptNil[oas.OptNilString](out.Owner.IconURL),
+	}
+	var location oas.OptGetTalkSessionDetailOKLocation
+	if out.Location != nil {
+		location.Value.GetTalkSessionDetailOKLocation0.Latitude = out.Location.Latitude
+		location.Value.GetTalkSessionDetailOKLocation0.Longitude = out.Location.Longitude
+	}
+
+	return &oas.GetTalkSessionDetailOK{
+		ID:               out.ID,
+		Theme:            out.Theme,
+		Owner:            owner,
+		CreatedAt:        out.CreatedAt,
+		ScheduledEndTime: out.ScheduledEndTime,
+		Location:         location,
+		City:             utils.ToOptNil[oas.OptNilString](out.City),
+		Prefecture:       utils.ToOptNil[oas.OptNilString](out.Prefecture),
+	}, nil
+
 }
 
 // GetTalkSessionList セッション一覧取得

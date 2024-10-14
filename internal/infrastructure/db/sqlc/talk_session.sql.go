@@ -116,8 +116,14 @@ SELECT
     users.display_name AS display_name,
     users.display_id AS display_id,
     users.icon_url AS icon_url,
-    ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))) AS latitude,
-    ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))) AS longitude
+    CASE
+        WHEN talk_session_locations.location IS NULL THEN NULL
+        ELSE ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location)))
+    END AS latitude,
+    CASE
+        WHEN talk_session_locations.location IS NULL THEN NULL
+        ELSE ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location)))
+    END AS longitude
 FROM talk_sessions
 LEFT JOIN users
     ON talk_sessions.owner_id = users.user_id
@@ -178,8 +184,14 @@ SELECT
     users.display_name AS display_name,
     users.display_id AS display_id,
     users.icon_url AS icon_url,
-    ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))) AS latitude,
-    ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))) AS longitude
+    CASE
+        WHEN talk_session_locations.location IS NULL THEN NULL
+        ELSE ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location)))
+    END AS latitude,
+    CASE
+        WHEN talk_session_locations.location IS NULL THEN NULL
+        ELSE ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location)))
+    END AS longitude
 FROM talk_sessions
 LEFT JOIN (
     SELECT talk_session_id, COUNT(opinion_id) AS opinion_count
