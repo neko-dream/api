@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"slices"
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
@@ -11,6 +12,11 @@ import (
 type securityHandler struct {
 	session.TokenManager
 	session.SessionRepository
+}
+
+var skipOperations = []string{
+	"RegisterUser",
+	"OAuthTokenInfo",
 }
 
 func (s *securityHandler) HandleSessionId(ctx context.Context, operationName string, t oas.SessionId) (context.Context, error) {
@@ -23,8 +29,10 @@ func (s *securityHandler) HandleSessionId(ctx context.Context, operationName str
 	if claim.IsExpired() {
 		return ctx, messages.TokenExpiredError
 	}
-	// RegisterUser以外の操作はユーザー登録済みであることを確認
-	if !claim.IsVerify && operationName != "RegisterUser" {
+
+	// スキップするOperationの場合以外は、ユーザー登録済みか確認
+	if !claim.IsVerify &&
+		slices.Contains(skipOperations, operationName) {
 		return ctx, messages.TokenNotUserRegisteredError
 	}
 
