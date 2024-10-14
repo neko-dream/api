@@ -226,6 +226,106 @@ func (q *Queries) GetOpinionReplies(ctx context.Context, arg GetOpinionRepliesPa
 	return items, nil
 }
 
+const getOpinionsByUserID = `-- name: GetOpinionsByUserID :many
+SELECT
+    opinions.opinion_id,
+    opinions.talk_session_id,
+    opinions.user_id,
+    opinions.parent_opinion_id,
+    opinions.title,
+    opinions.content,
+    opinions.reference_url,
+    opinions.picture_url,
+    opinions.created_at,
+    users.display_name AS display_name,
+    users.display_id AS display_id,
+    users.icon_url AS icon_url,
+    COALESCE(pv.vote_type, 0) AS vote_type,
+    -- 意見に対するリプライ数（再帰）
+    COALESCE(rc.reply_count, 0) AS reply_count
+FROM opinions
+LEFT JOIN users
+    ON opinions.user_id = users.user_id
+LEFT JOIN (
+    SELECT votes.vote_type, votes.user_id, votes.opinion_id
+    FROM votes
+) pv ON opinions.parent_opinion_id = pv.opinion_id
+    AND opinions.user_id = pv.user_id
+LEFT JOIN (
+    SELECT COUNT(opinion_id) AS reply_count, parent_opinion_id
+    FROM opinions
+    GROUP BY parent_opinion_id
+) rc ON opinions.opinion_id = rc.parent_opinion_id
+WHERE opinions.user_id = $1
+ORDER BY
+    CASE
+        WHEN $2::text = 'latest' THEN opinions.created_at
+        WHEN $2::text = 'oldest' THEN opinions.created_at * -1
+        WHEN $2::text = 'mostReply' THEN reply_count
+    END ASC
+`
+
+type GetOpinionsByUserIDParams struct {
+	UserID  uuid.UUID
+	SortKey sql.NullString
+}
+
+type GetOpinionsByUserIDRow struct {
+	OpinionID       uuid.UUID
+	TalkSessionID   uuid.UUID
+	UserID          uuid.UUID
+	ParentOpinionID uuid.NullUUID
+	Title           sql.NullString
+	Content         string
+	ReferenceUrl    sql.NullString
+	PictureUrl      sql.NullString
+	CreatedAt       time.Time
+	DisplayName     sql.NullString
+	DisplayID       sql.NullString
+	IconUrl         sql.NullString
+	VoteType        int16
+	ReplyCount      int64
+}
+
+// latest, mostReply, oldestでソート
+func (q *Queries) GetOpinionsByUserID(ctx context.Context, arg GetOpinionsByUserIDParams) ([]GetOpinionsByUserIDRow, error) {
+	rows, err := q.db.QueryContext(ctx, getOpinionsByUserID, arg.UserID, arg.SortKey)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetOpinionsByUserIDRow
+	for rows.Next() {
+		var i GetOpinionsByUserIDRow
+		if err := rows.Scan(
+			&i.OpinionID,
+			&i.TalkSessionID,
+			&i.UserID,
+			&i.ParentOpinionID,
+			&i.Title,
+			&i.Content,
+			&i.ReferenceUrl,
+			&i.PictureUrl,
+			&i.CreatedAt,
+			&i.DisplayName,
+			&i.DisplayID,
+			&i.IconUrl,
+			&i.VoteType,
+			&i.ReplyCount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getRandomOpinions = `-- name: GetRandomOpinions :many
 SELECT
     opinions.opinion_id,

@@ -1,0 +1,81 @@
+package opinion_usecase
+
+import (
+	"context"
+	"database/sql"
+
+	"github.com/neko-dream/server/internal/domain/model/shared"
+	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/server/internal/infrastructure/db"
+	model "github.com/neko-dream/server/internal/infrastructure/db/sqlc"
+	"github.com/neko-dream/server/pkg/utils"
+)
+
+type (
+	GetUserOpinionListQueryHandler interface {
+		Execute(context.Context, GetUserOpinionListQuery) (*GetUserOpinionListOutput, error)
+	}
+
+	GetUserOpinionListQuery struct {
+		UserID shared.UUID[user.User]
+		// latest, mostReply, oldest
+		SortKey *string
+	}
+
+	GetUserOpinionListOutput struct {
+		Opinions []SwipeOpinionDTO
+	}
+
+	getUserOpinionListQueryHandler struct {
+		*db.DBManager
+	}
+)
+
+func NewGetUserOpinionListQueryHandler(
+	dbManager *db.DBManager,
+) GetUserOpinionListQueryHandler {
+	return &getUserOpinionListQueryHandler{
+		DBManager: dbManager,
+	}
+}
+
+func (h *getUserOpinionListQueryHandler) Execute(ctx context.Context, q GetUserOpinionListQuery) (*GetUserOpinionListOutput, error) {
+
+	sortKey := "latest"
+	if q.SortKey != nil {
+		sortKey = *q.SortKey
+	}
+
+	opinionRows, err := h.GetQueries(ctx).GetOpinionsByUserID(ctx, model.GetOpinionsByUserIDParams{
+		UserID:  q.UserID.UUID(),
+		SortKey: sql.NullString{String: sortKey, Valid: true},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	opinions := make([]SwipeOpinionDTO, 0, len(opinionRows))
+	for _, row := range opinionRows {
+		opinions = append(opinions, SwipeOpinionDTO{
+			Opinion: OpinionDTO{
+				OpinionID:       row.OpinionID.String(),
+				TalkSessionID:   row.TalkSessionID.String(),
+				UserID:          row.UserID.String(),
+				ParentOpinionID: utils.ToPtrIfNotNullValue(!row.ParentOpinionID.Valid, row.ParentOpinionID.UUID.String()),
+				Title:           utils.ToPtrIfNotNullValue(!row.Title.Valid, row.Title.String),
+				Content:         row.Content,
+				CreatedAt:       row.CreatedAt,
+			},
+			User: UserDTO{
+				ID:   row.DisplayID.String,
+				Name: row.DisplayName.String,
+				Icon: utils.ToPtrIfNotNullValue(!row.IconUrl.Valid, row.IconUrl.String),
+			},
+			ReplyCount: int(row.ReplyCount),
+		})
+	}
+
+	return &GetUserOpinionListOutput{
+		Opinions: opinions,
+	}, nil
+}

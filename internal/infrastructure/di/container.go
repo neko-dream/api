@@ -66,6 +66,7 @@ func BuildContainer() *dig.Container {
 		{opinion_usecase.NewGetOpinionRepliesUseCase, nil},
 		{opinion_usecase.NewGetSwipeOpinionsQueryHandler, nil},
 		{opinion_usecase.NewGetOpinionDetailUseCase, nil},
+		{opinion_usecase.NewGetUserOpinionListQueryHandler, nil},
 		{analysis_usecase.NewGetAnalysisResultUseCase, nil},
 		{vote_usecase.NewPostVoteUseCase, nil},
 		{client.NewAnalysisService, nil},

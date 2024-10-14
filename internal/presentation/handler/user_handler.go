@@ -9,6 +9,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/presentation/oas"
+	opinion_usecase "github.com/neko-dream/server/internal/usecase/opinion"
 	user_usecase "github.com/neko-dream/server/internal/usecase/user"
 	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/utils"
@@ -19,23 +20,82 @@ type userHandler struct {
 	user_usecase.RegisterUserUseCase
 	user_usecase.EditUserUseCase
 	user_usecase.GetUserInformationQueryHandler
+	opinion_usecase.GetUserOpinionListQueryHandler
 }
 
 func NewUserHandler(
 	registerUserUsecase user_usecase.RegisterUserUseCase,
 	editUserUsecase user_usecase.EditUserUseCase,
 	getUserInformationQueryHandler user_usecase.GetUserInformationQueryHandler,
+	getUserOpinionListQueryHandler opinion_usecase.GetUserOpinionListQueryHandler,
 ) oas.UserHandler {
 	return &userHandler{
 		RegisterUserUseCase:            registerUserUsecase,
 		EditUserUseCase:                editUserUsecase,
 		GetUserInformationQueryHandler: getUserInformationQueryHandler,
+		GetUserOpinionListQueryHandler: getUserOpinionListQueryHandler,
 	}
 }
 
 // OpinionsHistory implements oas.UserHandler.
 func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHistoryParams) (oas.OpinionsHistoryRes, error) {
-	panic("unimplemented")
+
+	claim := session.GetSession(ctx)
+	if claim == nil {
+		return nil, messages.ForbiddenError
+	}
+
+	userID, err := claim.UserID()
+	if err != nil {
+		utils.HandleError(ctx, err, "claim.UserID")
+		return nil, messages.ForbiddenError
+	}
+
+	var sortKey *string
+	if params.Sort.IsSet() {
+		txt, err := params.Sort.Value.MarshalText()
+		if err != nil {
+			utils.HandleError(ctx, err, "params.Sort.Value.MarshalText")
+			return nil, messages.InternalServerError
+		}
+		sortKey = lo.ToPtr(string(txt))
+	}
+
+	out, err := u.GetUserOpinionListQueryHandler.Execute(ctx, opinion_usecase.GetUserOpinionListQuery{
+		UserID:  userID,
+		SortKey: sortKey,
+	})
+	if err != nil {
+		utils.HandleError(ctx, err, "GetUserOpinionListQueryHandler.Execute")
+		return nil, messages.InternalServerError
+	}
+
+	opinions := make([]oas.OpinionsHistoryOKOpinionsItem, 0, len(out.Opinions))
+	for _, opinion := range out.Opinions {
+		opinions = append(opinions, oas.OpinionsHistoryOKOpinionsItem{
+			Opinion: oas.OpinionsHistoryOKOpinionsItemOpinion{
+				ID:      opinion.Opinion.OpinionID,
+				Title:   utils.ToOpt[oas.OptString](opinion.Opinion.Title),
+				Content: opinion.Opinion.Content,
+				VoteType: oas.OptOpinionsHistoryOKOpinionsItemOpinionVoteType{
+					Set:   true,
+					Value: oas.OpinionsHistoryOKOpinionsItemOpinionVoteType(opinion.Opinion.VoteType),
+				},
+				ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
+				PictureURL:   utils.ToOpt[oas.OptString](opinion.Opinion.PictureURL),
+			},
+			User: oas.OpinionsHistoryOKOpinionsItemUser{
+				DisplayID:   opinion.User.ID,
+				DisplayName: opinion.User.Name,
+				IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.Icon),
+			},
+			ReplyCount: opinion.ReplyCount,
+		})
+	}
+
+	return &oas.OpinionsHistoryOK{
+		Opinions: opinions,
+	}, nil
 }
 
 // SessionsHistory implements oas.UserHandler.
