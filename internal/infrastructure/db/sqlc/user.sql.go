@@ -197,7 +197,7 @@ type UpdateOrCreateUserDemographicsParams struct {
 	YearOfBirth        sql.NullInt32
 	Occupation         sql.NullInt16
 	Gender             int16
-	City       sql.NullString
+	City               sql.NullString
 	HouseholdSize      sql.NullInt16
 	Prefecture         sql.NullString
 }

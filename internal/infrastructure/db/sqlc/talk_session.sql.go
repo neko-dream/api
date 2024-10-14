@@ -46,7 +46,7 @@ func (q *Queries) CountTalkSessions(ctx context.Context, arg CountTalkSessionsPa
 }
 
 const createTalkSession = `-- name: CreateTalkSession :exec
-INSERT INTO talk_sessions (talk_session_id, theme, owner_id, scheduled_end_time, created_at) VALUES ($1, $2, $3, $4, $5)
+INSERT INTO talk_sessions (talk_session_id, theme, owner_id, scheduled_end_time, created_at, city, prefecture) VALUES ($1, $2, $3, $4, $5, $6, $7)
 `
 
 type CreateTalkSessionParams struct {
@@ -55,6 +55,8 @@ type CreateTalkSessionParams struct {
 	OwnerID          uuid.UUID
 	ScheduledEndTime time.Time
 	CreatedAt        time.Time
+	City             sql.NullString
+	Prefecture       sql.NullString
 }
 
 func (q *Queries) CreateTalkSession(ctx context.Context, arg CreateTalkSessionParams) error {
@@ -64,28 +66,23 @@ func (q *Queries) CreateTalkSession(ctx context.Context, arg CreateTalkSessionPa
 		arg.OwnerID,
 		arg.ScheduledEndTime,
 		arg.CreatedAt,
+		arg.City,
+		arg.Prefecture,
 	)
 	return err
 }
 
 const createTalkSessionLocation = `-- name: CreateTalkSessionLocation :exec
-INSERT INTO talk_session_locations (talk_session_id, location, city, prefecture) VALUES ($1, ST_GeographyFromText($2), $3, $4)
+INSERT INTO talk_session_locations (talk_session_id, location) VALUES ($1, ST_GeographyFromText($2))
 `
 
 type CreateTalkSessionLocationParams struct {
 	TalkSessionID       uuid.UUID
 	StGeographyfromtext interface{}
-	City                string
-	Prefecture          string
 }
 
 func (q *Queries) CreateTalkSessionLocation(ctx context.Context, arg CreateTalkSessionLocationParams) error {
-	_, err := q.db.ExecContext(ctx, createTalkSessionLocation,
-		arg.TalkSessionID,
-		arg.StGeographyfromtext,
-		arg.City,
-		arg.Prefecture,
-	)
+	_, err := q.db.ExecContext(ctx, createTalkSessionLocation, arg.TalkSessionID, arg.StGeographyfromtext)
 	return err
 }
 
@@ -113,14 +110,14 @@ SELECT
     talk_sessions.theme,
     talk_sessions.created_at,
     talk_sessions.scheduled_end_time,
+    talk_sessions.city AS city,
+    talk_sessions.prefecture AS prefecture,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     users.display_name AS display_name,
     users.display_id AS display_id,
     users.icon_url AS icon_url,
     ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))) AS latitude,
-    ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))) AS longitude,
-    talk_session_locations.city AS city,
-    talk_session_locations.prefecture AS prefecture
+    ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))) AS longitude
 FROM talk_sessions
 LEFT JOIN users
     ON talk_sessions.owner_id = users.user_id
@@ -139,14 +136,14 @@ type GetTalkSessionByIDRow struct {
 	Theme            string
 	CreatedAt        time.Time
 	ScheduledEndTime time.Time
+	City             sql.NullString
+	Prefecture       sql.NullString
 	OpinionCount     int64
 	DisplayName      sql.NullString
 	DisplayID        sql.NullString
 	IconUrl          sql.NullString
 	Latitude         interface{}
 	Longitude        interface{}
-	City             sql.NullString
-	Prefecture       sql.NullString
 }
 
 func (q *Queries) GetTalkSessionByID(ctx context.Context, talkSessionID uuid.UUID) (GetTalkSessionByIDRow, error) {
@@ -157,14 +154,14 @@ func (q *Queries) GetTalkSessionByID(ctx context.Context, talkSessionID uuid.UUI
 		&i.Theme,
 		&i.CreatedAt,
 		&i.ScheduledEndTime,
+		&i.City,
+		&i.Prefecture,
 		&i.OpinionCount,
 		&i.DisplayName,
 		&i.DisplayID,
 		&i.IconUrl,
 		&i.Latitude,
 		&i.Longitude,
-		&i.City,
-		&i.Prefecture,
 	)
 	return i, err
 }
@@ -173,16 +170,16 @@ const listTalkSessions = `-- name: ListTalkSessions :many
 SELECT
     talk_sessions.talk_session_id,
     talk_sessions.theme,
-    talk_sessions.created_at,
     talk_sessions.scheduled_end_time,
+    talk_sessions.city AS city,
+    talk_sessions.prefecture AS prefecture,
+    talk_sessions.created_at,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     users.display_name AS display_name,
     users.display_id AS display_id,
     users.icon_url AS icon_url,
     ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))) AS latitude,
-    ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))) AS longitude,
-    talk_session_locations.city AS city,
-    talk_session_locations.prefecture AS prefecture
+    ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))) AS longitude
 FROM talk_sessions
 LEFT JOIN (
     SELECT talk_session_id, COUNT(opinion_id) AS opinion_count
@@ -224,16 +221,16 @@ type ListTalkSessionsParams struct {
 type ListTalkSessionsRow struct {
 	TalkSessionID    uuid.UUID
 	Theme            string
-	CreatedAt        time.Time
 	ScheduledEndTime time.Time
+	City             sql.NullString
+	Prefecture       sql.NullString
+	CreatedAt        time.Time
 	OpinionCount     int64
 	DisplayName      sql.NullString
 	DisplayID        sql.NullString
 	IconUrl          sql.NullString
 	Latitude         interface{}
 	Longitude        interface{}
-	City             sql.NullString
-	Prefecture       sql.NullString
 }
 
 func (q *Queries) ListTalkSessions(ctx context.Context, arg ListTalkSessionsParams) ([]ListTalkSessionsRow, error) {
@@ -253,16 +250,16 @@ func (q *Queries) ListTalkSessions(ctx context.Context, arg ListTalkSessionsPara
 		if err := rows.Scan(
 			&i.TalkSessionID,
 			&i.Theme,
-			&i.CreatedAt,
 			&i.ScheduledEndTime,
+			&i.City,
+			&i.Prefecture,
+			&i.CreatedAt,
 			&i.OpinionCount,
 			&i.DisplayName,
 			&i.DisplayID,
 			&i.IconUrl,
 			&i.Latitude,
 			&i.Longitude,
-			&i.City,
-			&i.Prefecture,
 		); err != nil {
 			return nil, err
 		}
@@ -278,22 +275,15 @@ func (q *Queries) ListTalkSessions(ctx context.Context, arg ListTalkSessionsPara
 }
 
 const updateTalkSessionLocation = `-- name: UpdateTalkSessionLocation :exec
-UPDATE talk_session_locations SET location = ST_GeographyFromText($2), city = $3, prefecture = $4 WHERE talk_session_id = $1
+UPDATE talk_session_locations SET location = ST_GeographyFromText($2) WHERE talk_session_id = $1
 `
 
 type UpdateTalkSessionLocationParams struct {
 	TalkSessionID       uuid.UUID
 	StGeographyfromtext interface{}
-	City                string
-	Prefecture          string
 }
 
 func (q *Queries) UpdateTalkSessionLocation(ctx context.Context, arg UpdateTalkSessionLocationParams) error {
-	_, err := q.db.ExecContext(ctx, updateTalkSessionLocation,
-		arg.TalkSessionID,
-		arg.StGeographyfromtext,
-		arg.City,
-		arg.Prefecture,
-	)
+	_, err := q.db.ExecContext(ctx, updateTalkSessionLocation, arg.TalkSessionID, arg.StGeographyfromtext)
 	return err
 }

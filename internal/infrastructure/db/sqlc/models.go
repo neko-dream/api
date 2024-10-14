@@ -48,13 +48,13 @@ type TalkSession struct {
 	Theme            string
 	ScheduledEndTime time.Time
 	CreatedAt        time.Time
+	City             sql.NullString
+	Prefecture       sql.NullString
 }
 
 type TalkSessionLocation struct {
 	TalkSessionID uuid.UUID
 	Location      interface{}
-	City          string
-	Prefecture    string
 }
 
 type User struct {
@@ -81,7 +81,7 @@ type UserDemographic struct {
 	YearOfBirth        sql.NullInt32
 	Occupation         sql.NullInt16
 	Gender             int16
-	City       sql.NullString
+	City               sql.NullString
 	HouseholdSize      sql.NullInt16
 	CreatedAt          time.Time
 	UpdatedAt          time.Time

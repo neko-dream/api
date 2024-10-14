@@ -2,7 +2,7 @@
 INSERT INTO talk_sessions (talk_session_id, theme, owner_id, scheduled_end_time, created_at, city, prefecture) VALUES ($1, $2, $3, $4, $5, $6, $7);
 
 -- name: CreateTalkSessionLocation :exec
-INSERT INTO talk_session_locations (talk_session_id, location, city, prefecture) VALUES ($1, ST_GeographyFromText($2), $3, $4);
+INSERT INTO talk_session_locations (talk_session_id, location) VALUES ($1, ST_GeographyFromText($2));
 
 -- name: UpdateTalkSessionLocation :exec
 UPDATE talk_session_locations SET location = ST_GeographyFromText($2) WHERE talk_session_id = $1;

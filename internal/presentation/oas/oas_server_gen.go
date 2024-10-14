@@ -139,7 +139,7 @@ type UserHandler interface {
 	// ユーザー作成.
 	//
 	// POST /user
-	RegisterUser(ctx context.Context, req OptRegisterUserReq) (RegisterUserRes, error)
+	RegisterUser(ctx context.Context, req OptRegisterUserReq, params RegisterUserParams) (RegisterUserRes, error)
 	// SessionsHistory implements sessionsHistory operation.
 	//
 	// リアクション済みのセッション一覧.
