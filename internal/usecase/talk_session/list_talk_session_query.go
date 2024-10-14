@@ -33,7 +33,6 @@ type (
 		Theme            string
 		Owner            UserDTO
 		OpinionCount     int
-		FinishedAt       *string
 		CreatedAt        string
 		ScheduledEndTime string
 		Location         *LocationDTO
