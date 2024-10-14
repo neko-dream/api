@@ -6,6 +6,7 @@ import (
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/messages"
+	"github.com/neko-dream/server/internal/domain/model/analysis"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
@@ -34,6 +35,7 @@ type (
 	postVoteInteractor struct {
 		opinion.OpinionService
 		vote.VoteRepository
+		analysis.AnalysisService
 		*db.DBManager
 	}
 )
@@ -41,12 +43,14 @@ type (
 func NewPostVoteUseCase(
 	opinionService opinion.OpinionService,
 	voteRepository vote.VoteRepository,
+	analysisService analysis.AnalysisService,
 	DBManager *db.DBManager,
 ) PostVoteUseCase {
 	return &postVoteInteractor{
-		OpinionService: opinionService,
-		VoteRepository: voteRepository,
-		DBManager:      DBManager,
+		OpinionService:  opinionService,
+		VoteRepository:  voteRepository,
+		AnalysisService: analysisService,
+		DBManager:       DBManager,
 	}
 }
 
@@ -81,7 +85,11 @@ func (i *postVoteInteractor) Execute(ctx context.Context, input PostVoteInput) (
 		if err := i.VoteRepository.Create(ctx, *vote); err != nil {
 			return messages.VoteFailed
 		}
-		// TODO: 分析エンドポイントへのリクエストを追加
+
+		if err := i.AnalysisService.StartAnalysis(ctx, input.TalkSessionID, input.UserID); err != nil {
+			utils.HandleError(ctx, err, "StartAnalysis")
+			return err
+		}
 
 		return nil
 	}); err != nil {

@@ -1283,7 +1283,8 @@ paths:
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
-      security: []
+      security:
+        - SessionId: []
       x-ogen-operation-group: Vote
   /talksessions/{talkSessionID}/opinions/{opinionID}/replies:
     get:

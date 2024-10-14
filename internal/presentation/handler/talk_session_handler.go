@@ -121,7 +121,6 @@ func (t *talkSessionHandler) GetTalkSessionDetail(ctx context.Context, params oa
 		City:             utils.ToOptNil[oas.OptNilString](out.City),
 		Prefecture:       utils.ToOptNil[oas.OptNilString](out.Prefecture),
 	}, nil
-
 }
 
 // GetTalkSessionList セッション一覧取得

@@ -8,6 +8,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/infrastructure/auth"
 	"github.com/neko-dream/server/internal/infrastructure/config"
+	client "github.com/neko-dream/server/internal/infrastructure/datasource/analysis"
 	"github.com/neko-dream/server/internal/infrastructure/datasource/postgresql"
 	"github.com/neko-dream/server/internal/infrastructure/datasource/repository"
 	"github.com/neko-dream/server/internal/infrastructure/db"
@@ -65,6 +66,7 @@ func BuildContainer() *dig.Container {
 		{opinion_usecase.NewGetSwipeOpinionsQueryHandler, nil},
 		{opinion_usecase.NewGetOpinionDetailUseCase, nil},
 		{vote_usecase.NewPostVoteUseCase, nil},
+		{client.NewAnalysisService, nil},
 		{handler.NewSecurityHandler, nil},
 		{handler.NewAuthHandler, nil},
 		{handler.NewUserHandler, nil},

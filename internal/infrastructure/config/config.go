@@ -25,6 +25,7 @@ type Config struct {
 
 	ANALYSIS_USER          string `mapstructure:"ANALYSIS_USER"`
 	ANALYSIS_USER_PASSWORD string `mapstructure:"ANALYSIS_USER_PASSWORD"`
+	ANALYSIS_API_DOMAIN    string `mapstructure:"ANALYSIS_API_DOMAIN"`
 }
 
 func LoadConfig() *Config {
@@ -91,6 +92,9 @@ func LoadConfig() *Config {
 				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
 			}
 			if err := viper.BindEnv("ANALYSIS_USER_PASSWORD"); err != nil {
+				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
+			}
+			if err := viper.BindEnv("ANALYSIS_API_DOMAIN"); err != nil {
 				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
 			}
 		default:

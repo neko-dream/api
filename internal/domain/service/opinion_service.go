@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
@@ -29,6 +31,9 @@ func NewOpinionService(
 func (o *opinionService) IsVoted(ctx context.Context, opinionID shared.UUID[opinion.Opinion], userID shared.UUID[user.User]) (bool, error) {
 	v, err := o.voteRepo.FindByOpinionAndUserID(ctx, opinionID, userID)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, nil
+		}
 		return true, messages.VoteFailed
 	}
 	if v != nil {
