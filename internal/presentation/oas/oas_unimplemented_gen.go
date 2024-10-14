@@ -135,7 +135,7 @@ func (UnimplementedHandler) PostOpinionPost(ctx context.Context, req OptPostOpin
 // ユーザー作成.
 //
 // POST /user
-func (UnimplementedHandler) RegisterUser(ctx context.Context, req OptRegisterUserReq, params RegisterUserParams) (r RegisterUserRes, _ error) {
+func (UnimplementedHandler) RegisterUser(ctx context.Context, req OptRegisterUserReq) (r RegisterUserRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

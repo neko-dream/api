@@ -1838,16 +1838,6 @@ func (s *Server) handleRegisterUserRequest(args [0]string, argsEscaped bool, w h
 			return
 		}
 	}
-	params, err := decodeRegisterUserParams(args, argsEscaped, r)
-	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		defer recordError("DecodeParams", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
 	request, close, err := s.decodeRegisterUserRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
@@ -1872,18 +1862,13 @@ func (s *Server) handleRegisterUserRequest(args [0]string, argsEscaped bool, w h
 			OperationSummary: "ユーザー作成",
 			OperationID:      "registerUser",
 			Body:             request,
-			Params: middleware.Parameters{
-				{
-					Name: "SessionId",
-					In:   "cookie",
-				}: params.SessionId,
-			},
-			Raw: r,
+			Params:           middleware.Parameters{},
+			Raw:              r,
 		}
 
 		type (
 			Request  = OptRegisterUserReq
-			Params   = RegisterUserParams
+			Params   = struct{}
 			Response = RegisterUserRes
 		)
 		response, err = middleware.HookMiddleware[
@@ -1893,14 +1878,14 @@ func (s *Server) handleRegisterUserRequest(args [0]string, argsEscaped bool, w h
 		](
 			m,
 			mreq,
-			unpackRegisterUserParams,
+			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.RegisterUser(ctx, request, params)
+				response, err = s.h.RegisterUser(ctx, request)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.RegisterUser(ctx, request, params)
+		response, err = s.h.RegisterUser(ctx, request)
 	}
 	if err != nil {
 		defer recordError("Internal", err)

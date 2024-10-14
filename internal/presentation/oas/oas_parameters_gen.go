@@ -1024,68 +1024,6 @@ func decodePostOpinionPostParams(args [1]string, argsEscaped bool, r *http.Reque
 	return params, nil
 }
 
-// RegisterUserParams is parameters of registerUser operation.
-type RegisterUserParams struct {
-	SessionId OptString
-}
-
-func unpackRegisterUserParams(packed middleware.Parameters) (params RegisterUserParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "SessionId",
-			In:   "cookie",
-		}
-		if v, ok := packed[key]; ok {
-			params.SessionId = v.(OptString)
-		}
-	}
-	return params
-}
-
-func decodeRegisterUserParams(args [0]string, argsEscaped bool, r *http.Request) (params RegisterUserParams, _ error) {
-	c := uri.NewCookieDecoder(r)
-	// Decode cookie: SessionId.
-	if err := func() error {
-		cfg := uri.CookieParameterDecodingConfig{
-			Name:    "SessionId",
-			Explode: true,
-		}
-		if err := c.HasParam(cfg); err == nil {
-			if err := c.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotSessionIdVal string
-				if err := func() error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-
-					c, err := conv.ToString(val)
-					if err != nil {
-						return err
-					}
-
-					paramsDotSessionIdVal = c
-					return nil
-				}(); err != nil {
-					return err
-				}
-				params.SessionId.SetTo(paramsDotSessionIdVal)
-				return nil
-			}); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "SessionId",
-			In:   "cookie",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
 // SwipeOpinionsParams is parameters of swipe_opinions operation.
 type SwipeOpinionsParams struct {
 	TalkSessionID string
