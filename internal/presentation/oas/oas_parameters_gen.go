@@ -1145,6 +1145,7 @@ func decodePostOpinionPostParams(args [1]string, argsEscaped bool, r *http.Reque
 // SwipeOpinionsParams is parameters of swipe_opinions operation.
 type SwipeOpinionsParams struct {
 	TalkSessionID string
+	Limit         OptNilInt
 }
 
 func unpackSwipeOpinionsParams(packed middleware.Parameters) (params SwipeOpinionsParams) {
@@ -1155,10 +1156,20 @@ func unpackSwipeOpinionsParams(packed middleware.Parameters) (params SwipeOpinio
 		}
 		params.TalkSessionID = packed[key].(string)
 	}
+	{
+		key := middleware.ParameterKey{
+			Name: "limit",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Limit = v.(OptNilInt)
+		}
+	}
 	return params
 }
 
 func decodeSwipeOpinionsParams(args [1]string, argsEscaped bool, r *http.Request) (params SwipeOpinionsParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: talkSessionID.
 	if err := func() error {
 		param := args[0]
@@ -1201,6 +1212,52 @@ func decodeSwipeOpinionsParams(args [1]string, argsEscaped bool, r *http.Request
 		return params, &ogenerrors.DecodeParamError{
 			Name: "talkSessionID",
 			In:   "path",
+			Err:  err,
+		}
+	}
+	// Set default value for query: limit.
+	{
+		val := int(10)
+		params.Limit.SetTo(val)
+	}
+	// Decode query: limit.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "limit",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotLimitVal int
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToInt(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotLimitVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Limit.SetTo(paramsDotLimitVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "limit",
+			In:   "query",
 			Err:  err,
 		}
 	}

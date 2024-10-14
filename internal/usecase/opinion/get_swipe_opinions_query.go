@@ -20,6 +20,7 @@ type (
 	GetSwipeOpinionsQuery struct {
 		UserID        shared.UUID[user.User]
 		TalkSessionID shared.UUID[talksession.TalkSession]
+		Limit         int
 	}
 
 	GetSwipeOpinionsOutput struct {
@@ -49,7 +50,7 @@ func (h *getSwipeOpinionsQueryHandler) Execute(ctx context.Context, q GetSwipeOp
 	swipeRow, err := h.GetQueries(ctx).GetRandomOpinions(ctx, model.GetRandomOpinionsParams{
 		UserID:        q.UserID.UUID(),
 		TalkSessionID: q.TalkSessionID.UUID(),
-		Limit:         10,
+		Limit:         int32(q.Limit),
 	})
 	if err != nil {
 		return nil, err

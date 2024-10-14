@@ -98,10 +98,17 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 	if err != nil {
 		return nil, messages.ForbiddenError
 	}
+	var limit int
+	if params.Limit.IsSet() {
+		limit = params.Limit.Value
+	} else {
+		limit = 10
+	}
 
 	opinions, err := o.getSwipeOpinionsUseCase.Execute(ctx, opinion_usecase.GetSwipeOpinionsQuery{
 		UserID:        userID,
 		TalkSessionID: shared.MustParseUUID[talksession.TalkSession](params.TalkSessionID),
+		Limit:         limit,
 	})
 	if err != nil {
 		return nil, err

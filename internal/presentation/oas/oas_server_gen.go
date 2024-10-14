@@ -54,7 +54,7 @@ type OpinionHandler interface {
 	//
 	// 意見の詳細.
 	//
-	// GET /talksession/{talkSessionID}/opinions/{opinionID}
+	// GET /talksessions/{talkSessionID}/opinions/{opinionID}
 	GetOpinionDetail(ctx context.Context, params GetOpinionDetailParams) (GetOpinionDetailRes, error)
 	// GetTopOpinions implements getTopOpinions operation.
 	//
@@ -78,7 +78,7 @@ type OpinionHandler interface {
 	//
 	// セッションの中からまだ投票していない意見をランダムに取得する.
 	//
-	// GET /talksession/{talkSessionID}/swipe_opinions
+	// GET /talksessions/{talkSessionID}/swipe_opinions
 	SwipeOpinions(ctx context.Context, params SwipeOpinionsParams) (SwipeOpinionsRes, error)
 }
 
@@ -150,7 +150,7 @@ type UserHandler interface {
 	//
 	// リアクション済みのセッション一覧.
 	//
-	// GET /sessions/histories
+	// GET /talksessions/histories
 	SessionsHistory(ctx context.Context) (SessionsHistoryRes, error)
 }
 

@@ -44,7 +44,7 @@ func (UnimplementedHandler) EditUserProfile(ctx context.Context, req OptEditUser
 //
 // 意見の詳細.
 //
-// GET /talksession/{talkSessionID}/opinions/{opinionID}
+// GET /talksessions/{talkSessionID}/opinions/{opinionID}
 func (UnimplementedHandler) GetOpinionDetail(ctx context.Context, params GetOpinionDetailParams) (r GetOpinionDetailRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
@@ -152,7 +152,7 @@ func (UnimplementedHandler) RegisterUser(ctx context.Context, req OptRegisterUse
 //
 // リアクション済みのセッション一覧.
 //
-// GET /sessions/histories
+// GET /talksessions/histories
 func (UnimplementedHandler) SessionsHistory(ctx context.Context) (r SessionsHistoryRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
@@ -161,7 +161,7 @@ func (UnimplementedHandler) SessionsHistory(ctx context.Context) (r SessionsHist
 //
 // セッションの中からまだ投票していない意見をランダムに取得する.
 //
-// GET /talksession/{talkSessionID}/swipe_opinions
+// GET /talksessions/{talkSessionID}/swipe_opinions
 func (UnimplementedHandler) SwipeOpinions(ctx context.Context, params SwipeOpinionsParams) (r SwipeOpinionsRes, _ error) {
 	return r, ht.ErrNotImplemented
 }

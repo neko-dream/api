@@ -919,7 +919,7 @@ paths:
       security:
         - SessionId: []
       x-ogen-operation-group: User
-  /talksession/{talkSessionID}/swipe_opinions:
+  /talksessions/{talkSessionID}/swipe_opinions:
     get:
       summary: スワイプ用のエンドポイント
       deprecated: false
@@ -935,6 +935,14 @@ paths:
           required: true
           schema:
             type: string
+        - name: limit
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: integer
+            default: 10
+            nullable: true
       responses:
         '200':
           description: 成功
@@ -1910,7 +1918,7 @@ paths:
                     message: INTERNAL SERVER ERROR.
       security: []
       x-ogen-operation-group: User
-  /sessions/histories:
+  /talksessions/histories:
     get:
       summary: リアクション済みのセッション一覧
       deprecated: false
@@ -1956,7 +1964,7 @@ paths:
                     message: INTERNAL SERVER ERROR.
       security: []
       x-ogen-operation-group: User
-  /talksession/{talkSessionID}/opinions/{opinionID}:
+  /talksessions/{talkSessionID}/opinions/{opinionID}:
     get:
       summary: 意見の詳細
       deprecated: false

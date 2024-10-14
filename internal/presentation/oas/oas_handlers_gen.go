@@ -452,12 +452,12 @@ func (s *Server) handleEditUserProfileRequest(args [0]string, argsEscaped bool, 
 //
 // 意見の詳細.
 //
-// GET /talksession/{talkSessionID}/opinions/{opinionID}
+// GET /talksessions/{talkSessionID}/opinions/{opinionID}
 func (s *Server) handleGetOpinionDetailRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getOpinionDetail"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/talksession/{talkSessionID}/opinions/{opinionID}"),
+		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/opinions/{opinionID}"),
 	}
 
 	// Start a span for this request.
@@ -2022,12 +2022,12 @@ func (s *Server) handleRegisterUserRequest(args [0]string, argsEscaped bool, w h
 //
 // リアクション済みのセッション一覧.
 //
-// GET /sessions/histories
+// GET /talksessions/histories
 func (s *Server) handleSessionsHistoryRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("sessionsHistory"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/sessions/histories"),
+		semconv.HTTPRouteKey.String("/talksessions/histories"),
 	}
 
 	// Start a span for this request.
@@ -2115,12 +2115,12 @@ func (s *Server) handleSessionsHistoryRequest(args [0]string, argsEscaped bool, 
 //
 // セッションの中からまだ投票していない意見をランダムに取得する.
 //
-// GET /talksession/{talkSessionID}/swipe_opinions
+// GET /talksessions/{talkSessionID}/swipe_opinions
 func (s *Server) handleSwipeOpinionsRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("swipe_opinions"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/talksession/{talkSessionID}/swipe_opinions"),
+		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/swipe_opinions"),
 	}
 
 	// Start a span for this request.
@@ -2227,6 +2227,10 @@ func (s *Server) handleSwipeOpinionsRequest(args [1]string, argsEscaped bool, w 
 					Name: "talkSessionID",
 					In:   "path",
 				}: params.TalkSessionID,
+				{
+					Name: "limit",
+					In:   "query",
+				}: params.Limit,
 			},
 			Raw: r,
 		}
