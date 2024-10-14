@@ -22,6 +22,9 @@ type Config struct {
 	AWS_S3_ENDPOINT       string `mapstructure:"AWS_S3_ENDPOINT"`
 	AWS_S3_BUCKET         string `mapstructure:"AWS_S3_BUCKET"`
 	IMAGE_DOMAIN          string `mapstructure:"IMAGE_DOMAIN"`
+
+	ANALYSIS_USER          string `mapstructure:"ANALYSIS_USER"`
+	ANALYSIS_USER_PASSWORD string `mapstructure:"ANALYSIS_USER_PASSWORD"`
 }
 
 func LoadConfig() *Config {
@@ -82,6 +85,12 @@ func LoadConfig() *Config {
 				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
 			}
 			if err := viper.BindEnv("IMAGE_DOMAIN"); err != nil {
+				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
+			}
+			if err := viper.BindEnv("ANALYSIS_USER"); err != nil {
+				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
+			}
+			if err := viper.BindEnv("ANALYSIS_USER_PASSWORD"); err != nil {
 				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
 			}
 		default:
