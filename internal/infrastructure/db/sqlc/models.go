@@ -58,11 +58,10 @@ type TalkSessionLocation struct {
 }
 
 type TalkSessionReport struct {
-	TalkSessionReportID uuid.UUID
-	TalkSessionID       uuid.UUID
-	Report              string
-	CreatedAt           time.Time
-	UpdatedAt           time.Time
+	TalkSessionID uuid.UUID
+	Report        string
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
 }
 
 type User struct {

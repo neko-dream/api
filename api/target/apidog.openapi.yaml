@@ -511,7 +511,7 @@
                     "example": "",
                     "nullable": true
                   },
-                  "prefectures": {
+                  "prefecture": {
                     "description": "都道府県",
                     "example": "",
                     "type": "string"

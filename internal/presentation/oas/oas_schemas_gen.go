@@ -4927,7 +4927,7 @@ type RegisterUserReq struct {
 	// 性別.
 	Gender OptNilRegisterUserReqGender `json:"gender"`
 	// 都道府県.
-	Prefectures OptString `json:"prefectures"`
+	Prefecture OptString `json:"prefecture"`
 	// 市区町村.
 	City OptNilString `json:"city"`
 	// ユーザーの職業.
@@ -4961,9 +4961,9 @@ func (s *RegisterUserReq) GetGender() OptNilRegisterUserReqGender {
 	return s.Gender
 }
 
-// GetPrefectures returns the value of Prefectures.
-func (s *RegisterUserReq) GetPrefectures() OptString {
-	return s.Prefectures
+// GetPrefecture returns the value of Prefecture.
+func (s *RegisterUserReq) GetPrefecture() OptString {
+	return s.Prefecture
 }
 
 // GetCity returns the value of City.
@@ -5006,9 +5006,9 @@ func (s *RegisterUserReq) SetGender(val OptNilRegisterUserReqGender) {
 	s.Gender = val
 }
 
-// SetPrefectures sets the value of Prefectures.
-func (s *RegisterUserReq) SetPrefectures(val OptString) {
-	s.Prefectures = val
+// SetPrefecture sets the value of Prefecture.
+func (s *RegisterUserReq) SetPrefecture(val OptString) {
+	s.Prefecture = val
 }
 
 // SetCity sets the value of City.

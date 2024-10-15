@@ -313,7 +313,7 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 			return lo.ToPtr(string(txt))
 		}),
 		HouseholdSize: &value.HouseholdSize.Value,
-		Prefecture:    utils.ToPtrIfNotNullValue(!value.Prefectures.IsSet(), value.Prefectures.Value),
+		Prefecture:    utils.ToPtrIfNotNullValue(!value.Prefecture.IsSet(), value.Prefecture.Value),
 	}
 	out, err := u.RegisterUserUseCase.Execute(ctx, input)
 	if err != nil {
