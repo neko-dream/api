@@ -364,7 +364,7 @@ LEFT JOIN (
     SELECT COUNT(opinion_id) AS reply_count, parent_opinion_id
     FROM opinions
     GROUP BY parent_opinion_id
-) rc ON opinions.opinion_id = rc.parent_opinion_id
+) rc ON opinions.opinion_id = rc.vote_count.opinion_id
 WHERE opinions.talk_session_id = $2
     AND vote_count.opinion_id = opinions.opinion_id
 ORDER BY RANDOM()
