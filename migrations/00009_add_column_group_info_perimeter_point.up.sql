@@ -1,0 +1,1 @@
+ALTER TABLE "user_group_info"  ADD COLUMN is_perimeter BOOLEAN NOT NULL DEFAULT FALSE;

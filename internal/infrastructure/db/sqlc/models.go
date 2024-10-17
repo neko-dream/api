@@ -103,6 +103,7 @@ type UserGroupInfo struct {
 	PosY          float64
 	UpdatedAt     time.Time
 	CreatedAt     time.Time
+	IsPerimeter   bool
 }
 
 type Vote struct {
