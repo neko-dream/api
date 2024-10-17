@@ -1584,11 +1584,15 @@ paths:
                         type: string
                       groupId:
                         type: integer
+                      isPerimeter:
+                        type: boolean
+                        description: 境界点かどうか
                     required:
                       - posX
                       - posY
                       - displayId
                       - groupId
+                      - isPerimeter
                   positions:
                     type: array
                     items:
@@ -1602,11 +1606,15 @@ paths:
                           type: string
                         groupId:
                           type: integer
+                        isPerimeter:
+                          type: boolean
+                          description: 境界点かどうか
                       required:
                         - posX
                         - posY
                         - displayId
                         - groupId
+                        - isPerimeter
                   groupOpinions:
                     type: array
                     items:
@@ -2329,11 +2337,15 @@ components:
           type: string
         groupId:
           type: integer
+        isPerimeter:
+          type: boolean
+          description: 境界点かどうか
       required:
         - posX
         - posY
         - displayId
         - groupId
+        - isPerimeter
     userDemographics:
       type: object
       properties:

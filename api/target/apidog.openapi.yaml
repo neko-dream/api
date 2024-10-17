@@ -2310,13 +2310,18 @@
           },
           "groupId": {
             "type": "integer"
+          },
+          "isPerimeter": {
+            "type": "boolean",
+            "description": "境界点かどうか"
           }
         },
         "required": [
           "posX",
           "posY",
           "displayId",
-          "groupId"
+          "groupId",
+          "isPerimeter"
         ]
       },
       "userDemographics": {

@@ -17,6 +17,7 @@ SELECT
     user_group_info.pos_x,
     user_group_info.pos_y,
     user_group_info.group_id,
+    user_group_info.is_perimeter,
     users.display_id AS display_id,
     user_group_info.user_id
 FROM user_group_info
@@ -26,11 +27,12 @@ WHERE talk_session_id = $1
 `
 
 type GetGroupInfoByTalkSessionIdRow struct {
-	PosX      float64
-	PosY      float64
-	GroupID   int32
-	DisplayID sql.NullString
-	UserID    uuid.UUID
+	PosX        float64
+	PosY        float64
+	GroupID     int32
+	IsPerimeter bool
+	DisplayID   sql.NullString
+	UserID      uuid.UUID
 }
 
 func (q *Queries) GetGroupInfoByTalkSessionId(ctx context.Context, talkSessionID uuid.UUID) ([]GetGroupInfoByTalkSessionIdRow, error) {
@@ -46,6 +48,7 @@ func (q *Queries) GetGroupInfoByTalkSessionId(ctx context.Context, talkSessionID
 			&i.PosX,
 			&i.PosY,
 			&i.GroupID,
+			&i.IsPerimeter,
 			&i.DisplayID,
 			&i.UserID,
 		); err != nil {

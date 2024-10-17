@@ -5800,6 +5800,8 @@ type TalkSessionAnalysisOKMyPosition struct {
 	PosY      float64 `json:"posY"`
 	DisplayId string  `json:"displayId"`
 	GroupId   int     `json:"groupId"`
+	// 境界点かどうか.
+	IsPerimeter bool `json:"isPerimeter"`
 }
 
 // GetPosX returns the value of PosX.
@@ -5822,6 +5824,11 @@ func (s *TalkSessionAnalysisOKMyPosition) GetGroupId() int {
 	return s.GroupId
 }
 
+// GetIsPerimeter returns the value of IsPerimeter.
+func (s *TalkSessionAnalysisOKMyPosition) GetIsPerimeter() bool {
+	return s.IsPerimeter
+}
+
 // SetPosX sets the value of PosX.
 func (s *TalkSessionAnalysisOKMyPosition) SetPosX(val float64) {
 	s.PosX = val
@@ -5842,11 +5849,18 @@ func (s *TalkSessionAnalysisOKMyPosition) SetGroupId(val int) {
 	s.GroupId = val
 }
 
+// SetIsPerimeter sets the value of IsPerimeter.
+func (s *TalkSessionAnalysisOKMyPosition) SetIsPerimeter(val bool) {
+	s.IsPerimeter = val
+}
+
 type TalkSessionAnalysisOKPositionsItem struct {
 	PosX      float64 `json:"posX"`
 	PosY      float64 `json:"posY"`
 	DisplayId string  `json:"displayId"`
 	GroupId   int     `json:"groupId"`
+	// 境界点かどうか.
+	IsPerimeter bool `json:"isPerimeter"`
 }
 
 // GetPosX returns the value of PosX.
@@ -5869,6 +5883,11 @@ func (s *TalkSessionAnalysisOKPositionsItem) GetGroupId() int {
 	return s.GroupId
 }
 
+// GetIsPerimeter returns the value of IsPerimeter.
+func (s *TalkSessionAnalysisOKPositionsItem) GetIsPerimeter() bool {
+	return s.IsPerimeter
+}
+
 // SetPosX sets the value of PosX.
 func (s *TalkSessionAnalysisOKPositionsItem) SetPosX(val float64) {
 	s.PosX = val
@@ -5887,6 +5906,11 @@ func (s *TalkSessionAnalysisOKPositionsItem) SetDisplayId(val string) {
 // SetGroupId sets the value of GroupId.
 func (s *TalkSessionAnalysisOKPositionsItem) SetGroupId(val int) {
 	s.GroupId = val
+}
+
+// SetIsPerimeter sets the value of IsPerimeter.
+func (s *TalkSessionAnalysisOKPositionsItem) SetIsPerimeter(val bool) {
+	s.IsPerimeter = val
 }
 
 type TestBadRequest struct{}
