@@ -172,6 +172,125 @@ func (q *Queries) GetTalkSessionByID(ctx context.Context, talkSessionID uuid.UUI
 	return i, err
 }
 
+const getTalkSessionByUserID = `-- name: GetTalkSessionByUserID :many
+SELECT
+    talk_sessions.talk_session_id,
+    talk_sessions.theme,
+    talk_sessions.scheduled_end_time,
+    talk_sessions.city AS city,
+    talk_sessions.prefecture AS prefecture,
+    talk_sessions.created_at,
+    COALESCE(oc.opinion_count, 0) AS opinion_count,
+    users.display_name AS display_name,
+    users.display_id AS display_id,
+    users.icon_url AS icon_url,
+    CASE
+        WHEN talk_session_locations.location IS NULL THEN NULL
+        ELSE ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location)))
+    END AS latitude,
+    CASE
+        WHEN talk_session_locations.location IS NULL THEN NULL
+        ELSE ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location)))
+    END AS longitude
+FROM talk_sessions
+LEFT JOIN (
+    SELECT talk_session_id, COUNT(opinion_id) AS opinion_count
+    FROM opinions
+    GROUP BY talk_session_id
+) oc ON talk_sessions.talk_session_id = oc.talk_session_id
+LEFT JOIN users
+    ON talk_sessions.owner_id = users.user_id
+LEFT JOIN votes
+    ON talk_sessions.talk_session_id = votes.talk_session_id
+LEFT JOIN talk_session_locations
+    ON talk_sessions.talk_session_id = talk_session_locations.talk_session_id
+WHERE
+    votes.user_id = $3::uuid AND
+    CASE
+        WHEN $4::text = 'finished' THEN scheduled_end_time <= now()
+        WHEN $4::text = 'open' THEN scheduled_end_time > now()
+        ELSE TRUE
+    END
+    AND
+    CASE
+        WHEN $5::text IS NOT NULL
+            THEN talk_sessions.theme LIKE '%' || $5::text || '%'
+        ELSE TRUE
+    END
+ORDER BY
+    CASE
+        WHEN $4::text = 'finished' THEN scheduled_end_time <= now()
+        WHEN $4::text = 'open' THEN scheduled_end_time > now()
+        ELSE TRUE
+    END DESC
+LIMIT $1 OFFSET $2
+`
+
+type GetTalkSessionByUserIDParams struct {
+	Limit  int32
+	Offset int32
+	UserID uuid.NullUUID
+	Status sql.NullString
+	Theme  sql.NullString
+}
+
+type GetTalkSessionByUserIDRow struct {
+	TalkSessionID    uuid.UUID
+	Theme            string
+	ScheduledEndTime time.Time
+	City             sql.NullString
+	Prefecture       sql.NullString
+	CreatedAt        time.Time
+	OpinionCount     int64
+	DisplayName      sql.NullString
+	DisplayID        sql.NullString
+	IconUrl          sql.NullString
+	Latitude         interface{}
+	Longitude        interface{}
+}
+
+func (q *Queries) GetTalkSessionByUserID(ctx context.Context, arg GetTalkSessionByUserIDParams) ([]GetTalkSessionByUserIDRow, error) {
+	rows, err := q.db.QueryContext(ctx, getTalkSessionByUserID,
+		arg.Limit,
+		arg.Offset,
+		arg.UserID,
+		arg.Status,
+		arg.Theme,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetTalkSessionByUserIDRow
+	for rows.Next() {
+		var i GetTalkSessionByUserIDRow
+		if err := rows.Scan(
+			&i.TalkSessionID,
+			&i.Theme,
+			&i.ScheduledEndTime,
+			&i.City,
+			&i.Prefecture,
+			&i.CreatedAt,
+			&i.OpinionCount,
+			&i.DisplayName,
+			&i.DisplayID,
+			&i.IconUrl,
+			&i.Latitude,
+			&i.Longitude,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listTalkSessions = `-- name: ListTalkSessions :many
 SELECT
     talk_sessions.talk_session_id,

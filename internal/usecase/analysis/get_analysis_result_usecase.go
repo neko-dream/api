@@ -29,11 +29,11 @@ type (
 		GroupOpinions []GroupOpinionDTO
 	}
 	PositionDTO struct {
-		PosX        float64
-		PosY        float64
-		DisplayID   string
-		GroupID     int
-		IsPerimeter bool
+		PosX           float64
+		PosY           float64
+		DisplayID      string
+		GroupID        int
+		PerimeterIndex *int
 	}
 	GroupOpinionDTO struct {
 		GroupID  int
@@ -82,11 +82,11 @@ func (g *getAnalysisResultInteractor) Execute(ctx context.Context, input GetAnal
 	for _, row := range groupInfoRows {
 		if input.UserID != nil && row.UserID == input.UserID.UUID() {
 			myPosition = &PositionDTO{
-				PosX:        row.PosX,
-				PosY:        row.PosY,
-				DisplayID:   row.DisplayID.String,
-				GroupID:     int(row.GroupID),
-				IsPerimeter: row.IsPerimeter,
+				PosX:           row.PosX,
+				PosY:           row.PosY,
+				DisplayID:      row.DisplayID.String,
+				GroupID:        int(row.GroupID),
+				PerimeterIndex: utils.ToPtrIfNotNullValue(!row.PerimeterIndex.Valid, int(row.PerimeterIndex.Int32)),
 			}
 		}
 

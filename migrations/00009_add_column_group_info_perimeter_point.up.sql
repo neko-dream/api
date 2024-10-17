@@ -1,1 +1,1 @@
-ALTER TABLE "user_group_info"  ADD COLUMN is_perimeter BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE user_group_info ADD COLUMN perimeter_index INT;

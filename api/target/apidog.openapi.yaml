@@ -2311,17 +2311,16 @@
           "groupId": {
             "type": "integer"
           },
-          "isPerimeter": {
-            "type": "boolean",
-            "description": "境界点かどうか"
+          "perimeterIndex": {
+            "type": "integer",
+            "description": "境界ポイントのインデックス"
           }
         },
         "required": [
           "posX",
           "posY",
           "displayId",
-          "groupId",
-          "isPerimeter"
+          "groupId"
         ]
       },
       "userDemographics": {

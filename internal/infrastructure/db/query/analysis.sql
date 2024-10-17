@@ -3,7 +3,7 @@ SELECT
     user_group_info.pos_x,
     user_group_info.pos_y,
     user_group_info.group_id,
-    user_group_info.is_perimeter,
+    user_group_info.perimeter_index,
     users.display_id AS display_id,
     user_group_info.user_id
 FROM user_group_info

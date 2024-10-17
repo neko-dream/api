@@ -5800,8 +5800,8 @@ type TalkSessionAnalysisOKMyPosition struct {
 	PosY      float64 `json:"posY"`
 	DisplayId string  `json:"displayId"`
 	GroupId   int     `json:"groupId"`
-	// 境界点かどうか.
-	IsPerimeter bool `json:"isPerimeter"`
+	// 境界ポイントのインデックス.
+	PerimeterIndex OptInt `json:"perimeterIndex"`
 }
 
 // GetPosX returns the value of PosX.
@@ -5824,9 +5824,9 @@ func (s *TalkSessionAnalysisOKMyPosition) GetGroupId() int {
 	return s.GroupId
 }
 
-// GetIsPerimeter returns the value of IsPerimeter.
-func (s *TalkSessionAnalysisOKMyPosition) GetIsPerimeter() bool {
-	return s.IsPerimeter
+// GetPerimeterIndex returns the value of PerimeterIndex.
+func (s *TalkSessionAnalysisOKMyPosition) GetPerimeterIndex() OptInt {
+	return s.PerimeterIndex
 }
 
 // SetPosX sets the value of PosX.
@@ -5849,9 +5849,9 @@ func (s *TalkSessionAnalysisOKMyPosition) SetGroupId(val int) {
 	s.GroupId = val
 }
 
-// SetIsPerimeter sets the value of IsPerimeter.
-func (s *TalkSessionAnalysisOKMyPosition) SetIsPerimeter(val bool) {
-	s.IsPerimeter = val
+// SetPerimeterIndex sets the value of PerimeterIndex.
+func (s *TalkSessionAnalysisOKMyPosition) SetPerimeterIndex(val OptInt) {
+	s.PerimeterIndex = val
 }
 
 type TalkSessionAnalysisOKPositionsItem struct {
@@ -5859,8 +5859,8 @@ type TalkSessionAnalysisOKPositionsItem struct {
 	PosY      float64 `json:"posY"`
 	DisplayId string  `json:"displayId"`
 	GroupId   int     `json:"groupId"`
-	// 境界点かどうか.
-	IsPerimeter bool `json:"isPerimeter"`
+	// 境界ポイントのインデックス.
+	PerimeterIndex OptInt `json:"perimeterIndex"`
 }
 
 // GetPosX returns the value of PosX.
@@ -5883,9 +5883,9 @@ func (s *TalkSessionAnalysisOKPositionsItem) GetGroupId() int {
 	return s.GroupId
 }
 
-// GetIsPerimeter returns the value of IsPerimeter.
-func (s *TalkSessionAnalysisOKPositionsItem) GetIsPerimeter() bool {
-	return s.IsPerimeter
+// GetPerimeterIndex returns the value of PerimeterIndex.
+func (s *TalkSessionAnalysisOKPositionsItem) GetPerimeterIndex() OptInt {
+	return s.PerimeterIndex
 }
 
 // SetPosX sets the value of PosX.
@@ -5908,9 +5908,9 @@ func (s *TalkSessionAnalysisOKPositionsItem) SetGroupId(val int) {
 	s.GroupId = val
 }
 
-// SetIsPerimeter sets the value of IsPerimeter.
-func (s *TalkSessionAnalysisOKPositionsItem) SetIsPerimeter(val bool) {
-	s.IsPerimeter = val
+// SetPerimeterIndex sets the value of PerimeterIndex.
+func (s *TalkSessionAnalysisOKPositionsItem) SetPerimeterIndex(val OptInt) {
+	s.PerimeterIndex = val
 }
 
 type TestBadRequest struct{}

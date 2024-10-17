@@ -96,14 +96,14 @@ type UserDemographic struct {
 }
 
 type UserGroupInfo struct {
-	TalkSessionID uuid.UUID
-	UserID        uuid.UUID
-	GroupID       int32
-	PosX          float64
-	PosY          float64
-	UpdatedAt     time.Time
-	CreatedAt     time.Time
-	IsPerimeter   bool
+	TalkSessionID  uuid.UUID
+	UserID         uuid.UUID
+	GroupID        int32
+	PosX           float64
+	PosY           float64
+	UpdatedAt      time.Time
+	CreatedAt      time.Time
+	PerimeterIndex sql.NullInt32
 }
 
 type Vote struct {

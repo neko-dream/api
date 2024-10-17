@@ -203,11 +203,11 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 	if out.MyPosition != nil {
 		myPosition = oas.OptTalkSessionAnalysisOKMyPosition{
 			Value: oas.TalkSessionAnalysisOKMyPosition{
-				PosX:        out.MyPosition.PosX,
-				PosY:        out.MyPosition.PosY,
-				DisplayId:   out.MyPosition.DisplayID,
-				GroupId:     out.MyPosition.GroupID,
-				IsPerimeter: out.MyPosition.IsPerimeter,
+				PosX:           out.MyPosition.PosX,
+				PosY:           out.MyPosition.PosY,
+				DisplayId:      out.MyPosition.DisplayID,
+				GroupId:        out.MyPosition.GroupID,
+				PerimeterIndex: utils.ToOpt[oas.OptInt](out.MyPosition.PerimeterIndex),
 			},
 		}
 	}
@@ -215,11 +215,11 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 	positions := make([]oas.TalkSessionAnalysisOKPositionsItem, 0, len(out.Positions))
 	for _, position := range out.Positions {
 		positions = append(positions, oas.TalkSessionAnalysisOKPositionsItem{
-			PosX:        position.PosX,
-			PosY:        position.PosY,
-			DisplayId:   position.DisplayID,
-			GroupId:     position.GroupID,
-			IsPerimeter: position.IsPerimeter,
+			PosX:           position.PosX,
+			PosY:           position.PosY,
+			DisplayId:      position.DisplayID,
+			GroupId:        position.GroupID,
+			PerimeterIndex: utils.ToOpt[oas.OptInt](out.MyPosition.PerimeterIndex),
 		})
 	}
 
