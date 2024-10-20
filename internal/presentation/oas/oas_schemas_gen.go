@@ -3997,6 +3997,69 @@ func (o OptNilRegisterUserReqOccupation) Or(d RegisterUserReqOccupation) Registe
 	return d
 }
 
+// NewOptNilSessionsHistoryStatus returns new OptNilSessionsHistoryStatus with value set to v.
+func NewOptNilSessionsHistoryStatus(v SessionsHistoryStatus) OptNilSessionsHistoryStatus {
+	return OptNilSessionsHistoryStatus{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilSessionsHistoryStatus is optional nullable SessionsHistoryStatus.
+type OptNilSessionsHistoryStatus struct {
+	Value SessionsHistoryStatus
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilSessionsHistoryStatus was set.
+func (o OptNilSessionsHistoryStatus) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilSessionsHistoryStatus) Reset() {
+	var v SessionsHistoryStatus
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilSessionsHistoryStatus) SetTo(v SessionsHistoryStatus) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilSessionsHistoryStatus) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilSessionsHistoryStatus) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v SessionsHistoryStatus
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilSessionsHistoryStatus) Get() (v SessionsHistoryStatus, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilSessionsHistoryStatus) Or(d SessionsHistoryStatus) SessionsHistoryStatus {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilString returns new OptNilString with value set to v.
 func NewOptNilString(v string) OptNilString {
 	return OptNilString{
@@ -4376,6 +4439,52 @@ func (o OptRegisterUserReq) Get() (v RegisterUserReq, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptRegisterUserReq) Or(d RegisterUserReq) RegisterUserReq {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptSessionsHistoryOKTalkSessionsItemTalkSessionLocation returns new OptSessionsHistoryOKTalkSessionsItemTalkSessionLocation with value set to v.
+func NewOptSessionsHistoryOKTalkSessionsItemTalkSessionLocation(v SessionsHistoryOKTalkSessionsItemTalkSessionLocation) OptSessionsHistoryOKTalkSessionsItemTalkSessionLocation {
+	return OptSessionsHistoryOKTalkSessionsItemTalkSessionLocation{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptSessionsHistoryOKTalkSessionsItemTalkSessionLocation is optional SessionsHistoryOKTalkSessionsItemTalkSessionLocation.
+type OptSessionsHistoryOKTalkSessionsItemTalkSessionLocation struct {
+	Value SessionsHistoryOKTalkSessionsItemTalkSessionLocation
+	Set   bool
+}
+
+// IsSet returns true if OptSessionsHistoryOKTalkSessionsItemTalkSessionLocation was set.
+func (o OptSessionsHistoryOKTalkSessionsItemTalkSessionLocation) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptSessionsHistoryOKTalkSessionsItemTalkSessionLocation) Reset() {
+	var v SessionsHistoryOKTalkSessionsItemTalkSessionLocation
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptSessionsHistoryOKTalkSessionsItemTalkSessionLocation) SetTo(v SessionsHistoryOKTalkSessionsItemTalkSessionLocation) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptSessionsHistoryOKTalkSessionsItemTalkSessionLocation) Get() (v SessionsHistoryOKTalkSessionsItemTalkSessionLocation, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptSessionsHistoryOKTalkSessionsItemTalkSessionLocation) Or(d SessionsHistoryOKTalkSessionsItemTalkSessionLocation) SessionsHistoryOKTalkSessionsItemTalkSessionLocation {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -5209,9 +5318,366 @@ type SessionsHistoryInternalServerError struct{}
 
 func (*SessionsHistoryInternalServerError) sessionsHistoryRes() {}
 
-type SessionsHistoryOK struct{}
+type SessionsHistoryOK struct {
+	Pagination   SessionsHistoryOKPagination         `json:"pagination"`
+	TalkSessions []SessionsHistoryOKTalkSessionsItem `json:"talkSessions"`
+}
+
+// GetPagination returns the value of Pagination.
+func (s *SessionsHistoryOK) GetPagination() SessionsHistoryOKPagination {
+	return s.Pagination
+}
+
+// GetTalkSessions returns the value of TalkSessions.
+func (s *SessionsHistoryOK) GetTalkSessions() []SessionsHistoryOKTalkSessionsItem {
+	return s.TalkSessions
+}
+
+// SetPagination sets the value of Pagination.
+func (s *SessionsHistoryOK) SetPagination(val SessionsHistoryOKPagination) {
+	s.Pagination = val
+}
+
+// SetTalkSessions sets the value of TalkSessions.
+func (s *SessionsHistoryOK) SetTalkSessions(val []SessionsHistoryOKTalkSessionsItem) {
+	s.TalkSessions = val
+}
 
 func (*SessionsHistoryOK) sessionsHistoryRes() {}
+
+type SessionsHistoryOKPagination struct {
+	TotalCount int `json:"totalCount"`
+	Offset     int `json:"offset"`
+	Limit      int `json:"limit"`
+}
+
+// GetTotalCount returns the value of TotalCount.
+func (s *SessionsHistoryOKPagination) GetTotalCount() int {
+	return s.TotalCount
+}
+
+// GetOffset returns the value of Offset.
+func (s *SessionsHistoryOKPagination) GetOffset() int {
+	return s.Offset
+}
+
+// GetLimit returns the value of Limit.
+func (s *SessionsHistoryOKPagination) GetLimit() int {
+	return s.Limit
+}
+
+// SetTotalCount sets the value of TotalCount.
+func (s *SessionsHistoryOKPagination) SetTotalCount(val int) {
+	s.TotalCount = val
+}
+
+// SetOffset sets the value of Offset.
+func (s *SessionsHistoryOKPagination) SetOffset(val int) {
+	s.Offset = val
+}
+
+// SetLimit sets the value of Limit.
+func (s *SessionsHistoryOKPagination) SetLimit(val int) {
+	s.Limit = val
+}
+
+type SessionsHistoryOKTalkSessionsItem struct {
+	OpinionCount int                                          `json:"opinionCount"`
+	TalkSession  SessionsHistoryOKTalkSessionsItemTalkSession `json:"talkSession"`
+}
+
+// GetOpinionCount returns the value of OpinionCount.
+func (s *SessionsHistoryOKTalkSessionsItem) GetOpinionCount() int {
+	return s.OpinionCount
+}
+
+// GetTalkSession returns the value of TalkSession.
+func (s *SessionsHistoryOKTalkSessionsItem) GetTalkSession() SessionsHistoryOKTalkSessionsItemTalkSession {
+	return s.TalkSession
+}
+
+// SetOpinionCount sets the value of OpinionCount.
+func (s *SessionsHistoryOKTalkSessionsItem) SetOpinionCount(val int) {
+	s.OpinionCount = val
+}
+
+// SetTalkSession sets the value of TalkSession.
+func (s *SessionsHistoryOKTalkSessionsItem) SetTalkSession(val SessionsHistoryOKTalkSessionsItemTalkSession) {
+	s.TalkSession = val
+}
+
+type SessionsHistoryOKTalkSessionsItemTalkSession struct {
+	// トークセッションID.
+	ID string `json:"id"`
+	// テーマ.
+	Theme string `json:"theme"`
+	// 作成ユーザー.
+	Owner SessionsHistoryOKTalkSessionsItemTalkSessionOwner `json:"owner"`
+	// 作成日時.
+	CreatedAt string `json:"createdAt"`
+	// 終了予定日時.
+	ScheduledEndTime string `json:"scheduledEndTime"`
+	// 位置情報.
+	Location OptSessionsHistoryOKTalkSessionsItemTalkSessionLocation `json:"location"`
+	// 市区町村.
+	City OptNilString `json:"city"`
+	// 都道府県.
+	Prefecture OptNilString `json:"prefecture"`
+}
+
+// GetID returns the value of ID.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSession) GetID() string {
+	return s.ID
+}
+
+// GetTheme returns the value of Theme.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSession) GetTheme() string {
+	return s.Theme
+}
+
+// GetOwner returns the value of Owner.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSession) GetOwner() SessionsHistoryOKTalkSessionsItemTalkSessionOwner {
+	return s.Owner
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSession) GetCreatedAt() string {
+	return s.CreatedAt
+}
+
+// GetScheduledEndTime returns the value of ScheduledEndTime.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSession) GetScheduledEndTime() string {
+	return s.ScheduledEndTime
+}
+
+// GetLocation returns the value of Location.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSession) GetLocation() OptSessionsHistoryOKTalkSessionsItemTalkSessionLocation {
+	return s.Location
+}
+
+// GetCity returns the value of City.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSession) GetCity() OptNilString {
+	return s.City
+}
+
+// GetPrefecture returns the value of Prefecture.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSession) GetPrefecture() OptNilString {
+	return s.Prefecture
+}
+
+// SetID sets the value of ID.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetID(val string) {
+	s.ID = val
+}
+
+// SetTheme sets the value of Theme.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetTheme(val string) {
+	s.Theme = val
+}
+
+// SetOwner sets the value of Owner.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetOwner(val SessionsHistoryOKTalkSessionsItemTalkSessionOwner) {
+	s.Owner = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetCreatedAt(val string) {
+	s.CreatedAt = val
+}
+
+// SetScheduledEndTime sets the value of ScheduledEndTime.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetScheduledEndTime(val string) {
+	s.ScheduledEndTime = val
+}
+
+// SetLocation sets the value of Location.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetLocation(val OptSessionsHistoryOKTalkSessionsItemTalkSessionLocation) {
+	s.Location = val
+}
+
+// SetCity sets the value of City.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetCity(val OptNilString) {
+	s.City = val
+}
+
+// SetPrefecture sets the value of Prefecture.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetPrefecture(val OptNilString) {
+	s.Prefecture = val
+}
+
+// 位置情報.
+// SessionsHistoryOKTalkSessionsItemTalkSessionLocation represents sum type.
+type SessionsHistoryOKTalkSessionsItemTalkSessionLocation struct {
+	Type                                                  SessionsHistoryOKTalkSessionsItemTalkSessionLocationType // switch on this field
+	SessionsHistoryOKTalkSessionsItemTalkSessionLocation0 SessionsHistoryOKTalkSessionsItemTalkSessionLocation0
+	Null                                                  struct{}
+}
+
+// SessionsHistoryOKTalkSessionsItemTalkSessionLocationType is oneOf type of SessionsHistoryOKTalkSessionsItemTalkSessionLocation.
+type SessionsHistoryOKTalkSessionsItemTalkSessionLocationType string
+
+// Possible values for SessionsHistoryOKTalkSessionsItemTalkSessionLocationType.
+const (
+	SessionsHistoryOKTalkSessionsItemTalkSessionLocation0SessionsHistoryOKTalkSessionsItemTalkSessionLocation SessionsHistoryOKTalkSessionsItemTalkSessionLocationType = "SessionsHistoryOKTalkSessionsItemTalkSessionLocation0"
+	NullSessionsHistoryOKTalkSessionsItemTalkSessionLocation                                                  SessionsHistoryOKTalkSessionsItemTalkSessionLocationType = "struct{}"
+)
+
+// IsSessionsHistoryOKTalkSessionsItemTalkSessionLocation0 reports whether SessionsHistoryOKTalkSessionsItemTalkSessionLocation is SessionsHistoryOKTalkSessionsItemTalkSessionLocation0.
+func (s SessionsHistoryOKTalkSessionsItemTalkSessionLocation) IsSessionsHistoryOKTalkSessionsItemTalkSessionLocation0() bool {
+	return s.Type == SessionsHistoryOKTalkSessionsItemTalkSessionLocation0SessionsHistoryOKTalkSessionsItemTalkSessionLocation
+}
+
+// IsNull reports whether SessionsHistoryOKTalkSessionsItemTalkSessionLocation is struct{}.
+func (s SessionsHistoryOKTalkSessionsItemTalkSessionLocation) IsNull() bool {
+	return s.Type == NullSessionsHistoryOKTalkSessionsItemTalkSessionLocation
+}
+
+// SetSessionsHistoryOKTalkSessionsItemTalkSessionLocation0 sets SessionsHistoryOKTalkSessionsItemTalkSessionLocation to SessionsHistoryOKTalkSessionsItemTalkSessionLocation0.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSessionLocation) SetSessionsHistoryOKTalkSessionsItemTalkSessionLocation0(v SessionsHistoryOKTalkSessionsItemTalkSessionLocation0) {
+	s.Type = SessionsHistoryOKTalkSessionsItemTalkSessionLocation0SessionsHistoryOKTalkSessionsItemTalkSessionLocation
+	s.SessionsHistoryOKTalkSessionsItemTalkSessionLocation0 = v
+}
+
+// GetSessionsHistoryOKTalkSessionsItemTalkSessionLocation0 returns SessionsHistoryOKTalkSessionsItemTalkSessionLocation0 and true boolean if SessionsHistoryOKTalkSessionsItemTalkSessionLocation is SessionsHistoryOKTalkSessionsItemTalkSessionLocation0.
+func (s SessionsHistoryOKTalkSessionsItemTalkSessionLocation) GetSessionsHistoryOKTalkSessionsItemTalkSessionLocation0() (v SessionsHistoryOKTalkSessionsItemTalkSessionLocation0, ok bool) {
+	if !s.IsSessionsHistoryOKTalkSessionsItemTalkSessionLocation0() {
+		return v, false
+	}
+	return s.SessionsHistoryOKTalkSessionsItemTalkSessionLocation0, true
+}
+
+// NewSessionsHistoryOKTalkSessionsItemTalkSessionLocation0SessionsHistoryOKTalkSessionsItemTalkSessionLocation returns new SessionsHistoryOKTalkSessionsItemTalkSessionLocation from SessionsHistoryOKTalkSessionsItemTalkSessionLocation0.
+func NewSessionsHistoryOKTalkSessionsItemTalkSessionLocation0SessionsHistoryOKTalkSessionsItemTalkSessionLocation(v SessionsHistoryOKTalkSessionsItemTalkSessionLocation0) SessionsHistoryOKTalkSessionsItemTalkSessionLocation {
+	var s SessionsHistoryOKTalkSessionsItemTalkSessionLocation
+	s.SetSessionsHistoryOKTalkSessionsItemTalkSessionLocation0(v)
+	return s
+}
+
+// SetNull sets SessionsHistoryOKTalkSessionsItemTalkSessionLocation to struct{}.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSessionLocation) SetNull(v struct{}) {
+	s.Type = NullSessionsHistoryOKTalkSessionsItemTalkSessionLocation
+	s.Null = v
+}
+
+// GetNull returns struct{} and true boolean if SessionsHistoryOKTalkSessionsItemTalkSessionLocation is struct{}.
+func (s SessionsHistoryOKTalkSessionsItemTalkSessionLocation) GetNull() (v struct{}, ok bool) {
+	if !s.IsNull() {
+		return v, false
+	}
+	return s.Null, true
+}
+
+// NewNullSessionsHistoryOKTalkSessionsItemTalkSessionLocation returns new SessionsHistoryOKTalkSessionsItemTalkSessionLocation from struct{}.
+func NewNullSessionsHistoryOKTalkSessionsItemTalkSessionLocation(v struct{}) SessionsHistoryOKTalkSessionsItemTalkSessionLocation {
+	var s SessionsHistoryOKTalkSessionsItemTalkSessionLocation
+	s.SetNull(v)
+	return s
+}
+
+type SessionsHistoryOKTalkSessionsItemTalkSessionLocation0 struct {
+	// 緯度.
+	Latitude float64 `json:"latitude"`
+	// 経度.
+	Longitude float64 `json:"longitude"`
+}
+
+// GetLatitude returns the value of Latitude.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSessionLocation0) GetLatitude() float64 {
+	return s.Latitude
+}
+
+// GetLongitude returns the value of Longitude.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSessionLocation0) GetLongitude() float64 {
+	return s.Longitude
+}
+
+// SetLatitude sets the value of Latitude.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSessionLocation0) SetLatitude(val float64) {
+	s.Latitude = val
+}
+
+// SetLongitude sets the value of Longitude.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSessionLocation0) SetLongitude(val float64) {
+	s.Longitude = val
+}
+
+// 作成ユーザー.
+type SessionsHistoryOKTalkSessionsItemTalkSessionOwner struct {
+	DisplayID   string       `json:"displayID"`
+	DisplayName string       `json:"displayName"`
+	IconURL     OptNilString `json:"iconURL"`
+}
+
+// GetDisplayID returns the value of DisplayID.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSessionOwner) GetDisplayID() string {
+	return s.DisplayID
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSessionOwner) GetDisplayName() string {
+	return s.DisplayName
+}
+
+// GetIconURL returns the value of IconURL.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSessionOwner) GetIconURL() OptNilString {
+	return s.IconURL
+}
+
+// SetDisplayID sets the value of DisplayID.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSessionOwner) SetDisplayID(val string) {
+	s.DisplayID = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSessionOwner) SetDisplayName(val string) {
+	s.DisplayName = val
+}
+
+// SetIconURL sets the value of IconURL.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSessionOwner) SetIconURL(val OptNilString) {
+	s.IconURL = val
+}
+
+type SessionsHistoryStatus string
+
+const (
+	SessionsHistoryStatusOpen     SessionsHistoryStatus = "open"
+	SessionsHistoryStatusFinished SessionsHistoryStatus = "finished"
+)
+
+// AllValues returns all SessionsHistoryStatus values.
+func (SessionsHistoryStatus) AllValues() []SessionsHistoryStatus {
+	return []SessionsHistoryStatus{
+		SessionsHistoryStatusOpen,
+		SessionsHistoryStatusFinished,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s SessionsHistoryStatus) MarshalText() ([]byte, error) {
+	switch s {
+	case SessionsHistoryStatusOpen:
+		return []byte(s), nil
+	case SessionsHistoryStatusFinished:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *SessionsHistoryStatus) UnmarshalText(data []byte) error {
+	switch SessionsHistoryStatus(data) {
+	case SessionsHistoryStatusOpen:
+		*s = SessionsHistoryStatusOpen
+		return nil
+	case SessionsHistoryStatusFinished:
+		*s = SessionsHistoryStatusFinished
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
 
 type SwipeOpinionsBadRequest struct {
 	Code    string `json:"code"`

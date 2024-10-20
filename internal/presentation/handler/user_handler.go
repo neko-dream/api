@@ -10,6 +10,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	opinion_usecase "github.com/neko-dream/server/internal/usecase/opinion"
+	talk_session_usecase "github.com/neko-dream/server/internal/usecase/talk_session"
 	user_usecase "github.com/neko-dream/server/internal/usecase/user"
 	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/utils"
@@ -21,6 +22,7 @@ type userHandler struct {
 	user_usecase.EditUserUseCase
 	user_usecase.GetUserInformationQueryHandler
 	opinion_usecase.GetUserOpinionListQueryHandler
+	talk_session_usecase.GetTalkSessionHistoriesQuery
 }
 
 func NewUserHandler(
@@ -28,12 +30,14 @@ func NewUserHandler(
 	editUserUsecase user_usecase.EditUserUseCase,
 	getUserInformationQueryHandler user_usecase.GetUserInformationQueryHandler,
 	getUserOpinionListQueryHandler opinion_usecase.GetUserOpinionListQueryHandler,
+	getTalkSessoinHistoriesQuery talk_session_usecase.GetTalkSessionHistoriesQuery,
 ) oas.UserHandler {
 	return &userHandler{
 		RegisterUserUseCase:            registerUserUsecase,
 		EditUserUseCase:                editUserUsecase,
 		GetUserInformationQueryHandler: getUserInformationQueryHandler,
 		GetUserOpinionListQueryHandler: getUserOpinionListQueryHandler,
+		GetTalkSessionHistoriesQuery:   getTalkSessoinHistoriesQuery,
 	}
 }
 
@@ -99,8 +103,73 @@ func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHi
 }
 
 // SessionsHistory implements oas.UserHandler.
-func (u *userHandler) SessionsHistory(ctx context.Context) (oas.SessionsHistoryRes, error) {
-	panic("unimplemented")
+func (u *userHandler) SessionsHistory(ctx context.Context, params oas.SessionsHistoryParams) (oas.SessionsHistoryRes, error) {
+	claim := session.GetSession(ctx)
+	if claim == nil {
+		return nil, messages.ForbiddenError
+	}
+
+	userID, err := claim.UserID()
+	if err != nil {
+		utils.HandleError(ctx, err, "claim.UserID")
+		return nil, messages.ForbiddenError
+	}
+
+	var status string
+	if params.Status.IsSet() {
+		txt, err := params.Status.Value.MarshalText()
+		if err != nil {
+			utils.HandleError(ctx, err, "params.Status.Value.MarshalText")
+			return nil, messages.InternalServerError
+		}
+		status = string(txt)
+	}
+	var limit, offset *int
+	if params.Limit.IsSet() {
+		limit = &params.Limit.Value
+	}
+	if params.Offset.IsSet() {
+		offset = &params.Offset.Value
+	}
+
+	out, err := u.GetTalkSessionHistoriesQuery.Execute(ctx, talk_session_usecase.GetTalkSessionHistoriesInput{
+		UserID: userID,
+		Status: status,
+		Theme:  utils.ToPtrIfNotNullValue(!params.Theme.IsSet(), params.Theme.Value),
+		Limit:  limit,
+		Offset: offset,
+	})
+	if err != nil {
+		utils.HandleError(ctx, err, "GetTalkSessionHistoriesQuery.Execute")
+		return nil, messages.InternalServerError
+	}
+
+	talkSessions := make([]oas.SessionsHistoryOKTalkSessionsItem, 0, len(out.TalkSessions))
+	for _, talkSession := range out.TalkSessions {
+		talkSessions = append(talkSessions, oas.SessionsHistoryOKTalkSessionsItem{
+			TalkSession: oas.SessionsHistoryOKTalkSessionsItemTalkSession{
+				ID:    talkSession.ID,
+				Theme: talkSession.Theme,
+				Owner: oas.SessionsHistoryOKTalkSessionsItemTalkSessionOwner{
+					DisplayID:   talkSession.Owner.DisplayID,
+					DisplayName: talkSession.Owner.DisplayName,
+					IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.Owner.IconURL),
+				},
+				CreatedAt:        talkSession.CreatedAt,
+				ScheduledEndTime: talkSession.ScheduledEndTime,
+			},
+			OpinionCount: talkSession.OpinionCount,
+		})
+	}
+
+	return &oas.SessionsHistoryOK{
+		TalkSessions: talkSessions,
+		Pagination: oas.SessionsHistoryOKPagination{
+			TotalCount: out.TotalCount,
+			Limit:      out.Limit,
+			Offset:     out.Offset,
+		},
+	}, nil
 }
 
 // GetUserInfo implements ユーザーの情報取得

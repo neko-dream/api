@@ -566,7 +566,7 @@ func (s *Server) handleGetOpinionDetailRequest(args [2]string, argsEscaped bool,
 
 // handleGetTalkSessionDetailRequest handles getTalkSessionDetail operation.
 //
-// 🚧 トークセッションの詳細.
+// トークセッションの詳細.
 //
 // GET /talksessions/{talkSessionId}
 func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
@@ -628,7 +628,7 @@ func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped b
 		mreq := middleware.Request{
 			Context:          ctx,
 			OperationName:    "GetTalkSessionDetail",
-			OperationSummary: "🚧 トークセッションの詳細",
+			OperationSummary: "トークセッションの詳細",
 			OperationID:      "getTalkSessionDetail",
 			Body:             nil,
 			Params: middleware.Parameters{
@@ -1515,6 +1515,50 @@ func (s *Server) handleOpinionsHistoryRequest(args [0]string, argsEscaped bool, 
 			ID:   "opinionsHistory",
 		}
 	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securitySessionId(ctx, "OpinionsHistory", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "SessionId",
+					Err:              err,
+				}
+				defer recordError("Security:SessionId", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			defer recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
 	params, err := decodeOpinionsHistoryParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
@@ -1948,8 +1992,66 @@ func (s *Server) handleSessionsHistoryRequest(args [0]string, argsEscaped bool, 
 			span.SetStatus(codes.Error, stage)
 			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
 		}
-		err error
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "SessionsHistory",
+			ID:   "sessionsHistory",
+		}
 	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securitySessionId(ctx, "SessionsHistory", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "SessionId",
+					Err:              err,
+				}
+				defer recordError("Security:SessionId", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			defer recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
+	params, err := decodeSessionsHistoryParams(args, argsEscaped, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		defer recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
 
 	var response SessionsHistoryRes
 	if m := s.cfg.Middleware; m != nil {
@@ -1959,13 +2061,30 @@ func (s *Server) handleSessionsHistoryRequest(args [0]string, argsEscaped bool, 
 			OperationSummary: "リアクション済みのセッション一覧",
 			OperationID:      "sessionsHistory",
 			Body:             nil,
-			Params:           middleware.Parameters{},
-			Raw:              r,
+			Params: middleware.Parameters{
+				{
+					Name: "limit",
+					In:   "query",
+				}: params.Limit,
+				{
+					Name: "offset",
+					In:   "query",
+				}: params.Offset,
+				{
+					Name: "theme",
+					In:   "query",
+				}: params.Theme,
+				{
+					Name: "status",
+					In:   "query",
+				}: params.Status,
+			},
+			Raw: r,
 		}
 
 		type (
 			Request  = struct{}
-			Params   = struct{}
+			Params   = SessionsHistoryParams
 			Response = SessionsHistoryRes
 		)
 		response, err = middleware.HookMiddleware[
@@ -1975,14 +2094,14 @@ func (s *Server) handleSessionsHistoryRequest(args [0]string, argsEscaped bool, 
 		](
 			m,
 			mreq,
-			nil,
+			unpackSessionsHistoryParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.SessionsHistory(ctx)
+				response, err = s.h.SessionsHistory(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.SessionsHistory(ctx)
+		response, err = s.h.SessionsHistory(ctx, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)

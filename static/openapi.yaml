@@ -6,7 +6,7 @@ info:
 paths:
   /talksessions/{talkSessionId}:
     get:
-      summary: 🚧 トークセッションの詳細
+      summary: トークセッションの詳細
       deprecated: false
       description: ''
       operationId: getTalkSessionDetail
@@ -2039,7 +2039,8 @@ paths:
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
-      security: []
+      security:
+        - SessionId: []
       x-ogen-operation-group: User
   /talksessions/histories:
     get:
@@ -2050,7 +2051,40 @@ paths:
       tags:
         - user
         - user
-      parameters: []
+      parameters:
+        - name: limit
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: integer
+        - name: theme
+          in: query
+          description: 'テーマ '
+          required: false
+          schema:
+            type: string
+            nullable: true
+        - name: status
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+            enum:
+              - open
+              - finished
+            x-apidog:
+              enumDescriptions:
+                open: ''
+                finished: ''
+            nullable: true
       responses:
         '200':
           description: 成功
@@ -2058,7 +2092,98 @@ paths:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  pagination:
+                    type: object
+                    properties:
+                      totalCount:
+                        type: integer
+                      offset:
+                        type: integer
+                      limit:
+                        type: integer
+                    required:
+                      - totalCount
+                      - offset
+                      - limit
+                  talkSessions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        opinionCount:
+                          type: integer
+                        talkSession:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              description: トークセッションID
+                            theme:
+                              type: string
+                              description: テーマ
+                            owner:
+                              type: object
+                              properties:
+                                displayID:
+                                  type: string
+                                  x-apidog-mock: '{{$string.uuid}}'
+                                  pattern: ^[A-Za-z0-9]$
+                                  examples:
+                                    - userid
+                                  minLength: 3
+                                  maxLength: 25
+                                displayName:
+                                  type: string
+                                  x-apidog-mock: '{{$person.firstName}}'
+                                iconURL:
+                                  type: string
+                                  nullable: true
+                              required:
+                                - displayID
+                                - displayName
+                              description: 作成ユーザー
+                            createdAt:
+                              type: string
+                              description: 作成日時
+                            scheduledEndTime:
+                              type: string
+                              description: 終了予定日時
+                            location:
+                              anyOf:
+                                - type: object
+                                  properties:
+                                    latitude:
+                                      type: number
+                                      description: 緯度
+                                    longitude:
+                                      type: number
+                                      description: 経度
+                                  required:
+                                    - latitude
+                                    - longitude
+                                - type: 'null'
+                              description: 位置情報
+                            city:
+                              type: string
+                              description: 市区町村
+                              nullable: true
+                            prefecture:
+                              type: string
+                              description: 都道府県
+                              nullable: true
+                          required:
+                            - id
+                            - theme
+                            - owner
+                            - createdAt
+                            - scheduledEndTime
+                      required:
+                        - opinionCount
+                        - talkSession
+                required:
+                  - pagination
+                  - talkSessions
         '400':
           description: ErrorResponse
           content:
@@ -2085,7 +2210,8 @@ paths:
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
-      security: []
+      security:
+        - SessionId: []
       x-ogen-operation-group: User
   /talksessions/{talkSessionID}/opinions/{opinionID}:
     get:

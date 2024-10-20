@@ -95,10 +95,10 @@ func (h *listTalkSessionQueryHandler) Execute(ctx context.Context, input ListTal
 	talkSessionDTOList := make([]TalkSessionDTO, 0, len(talkSessionRow))
 	for _, row := range talkSessionRow {
 		var locationDTO *LocationDTO
-		if row.City.Valid && row.Prefecture.Valid {
+		if row.LocationID.Valid {
 			locationDTO = &LocationDTO{
-				Latitude:  row.Latitude.(float64),
-				Longitude: row.Longitude.(float64),
+				Latitude:  row.Latitude,
+				Longitude: row.Longitude,
 			}
 		}
 
@@ -117,8 +117,8 @@ func (h *listTalkSessionQueryHandler) Execute(ctx context.Context, input ListTal
 			CreatedAt:        time.NewTime(ctx, row.CreatedAt).Format(ctx),
 			ScheduledEndTime: time.NewTime(ctx, row.ScheduledEndTime).Format(ctx),
 			Location:         locationDTO,
-			City:             utils.ToPtrIfNotNullValue[string](row.City.Valid, row.City.String),
-			Prefecture:       utils.ToPtrIfNotNullValue[string](row.Prefecture.Valid, row.Prefecture.String),
+			City:             utils.ToPtrIfNotNullValue[string](!row.City.Valid, row.City.String),
+			Prefecture:       utils.ToPtrIfNotNullValue[string](!row.Prefecture.Valid, row.Prefecture.String),
 		})
 	}
 

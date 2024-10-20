@@ -49,10 +49,10 @@ func (i *getTalkSessionDetailInteractor) Execute(ctx context.Context, input GetT
 		IconURL:     utils.ToPtrIfNotNullValue(!talkSessionRow.IconUrl.Valid, talkSessionRow.IconUrl.String),
 	}
 	var location *LocationDTO
-	if talkSessionRow.City.Valid && talkSessionRow.Prefecture.Valid {
+	if talkSessionRow.LocationID.Valid {
 		location = &LocationDTO{
-			Latitude:  talkSessionRow.Latitude.(float64),
-			Longitude: talkSessionRow.Longitude.(float64),
+			Latitude:  talkSessionRow.Latitude,
+			Longitude: talkSessionRow.Longitude,
 		}
 	}
 

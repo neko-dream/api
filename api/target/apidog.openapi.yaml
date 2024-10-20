@@ -34,7 +34,7 @@
   "paths": {
     "/talksessions/{talkSessionId}": {
       "get": {
-        "summary": "🚧 トークセッションの詳細",
+        "summary": "トークセッションの詳細",
         "deprecated": false,
         "description": "",
         "operationId": "getTalkSessionDetail",
@@ -2142,7 +2142,11 @@
             }
           }
         },
-        "security": [],
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
         "x-ogen-operation-group": "User"
       }
     },
@@ -2156,7 +2160,56 @@
           "user",
           "user"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "theme",
+            "in": "query",
+            "description": "テーマ ",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "open",
+                "finished"
+              ],
+              "x-apidog": {
+                "enumDescriptions": {
+                  "open": "",
+                  "finished": ""
+                }
+              },
+              "nullable": true
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "成功",
@@ -2164,7 +2217,33 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": {}
+                  "properties": {
+                    "pagination": {
+                      "$ref": "#/components/schemas/offsetPagination"
+                    },
+                    "talkSessions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "opinionCount": {
+                            "type": "integer"
+                          },
+                          "talkSession": {
+                            "$ref": "#/components/schemas/talkSession"
+                          }
+                        },
+                        "required": [
+                          "opinionCount",
+                          "talkSession"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "pagination",
+                    "talkSessions"
+                  ]
                 }
               }
             }
@@ -2210,7 +2289,11 @@
             }
           }
         },
-        "security": [],
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
         "x-ogen-operation-group": "User"
       }
     },

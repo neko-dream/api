@@ -88,7 +88,7 @@ type TalkSessionHandler interface {
 	CreateTalkSession(ctx context.Context, req OptCreateTalkSessionReq) (CreateTalkSessionRes, error)
 	// GetTalkSessionDetail implements getTalkSessionDetail operation.
 	//
-	// 🚧 トークセッションの詳細.
+	// トークセッションの詳細.
 	//
 	// GET /talksessions/{talkSessionId}
 	GetTalkSessionDetail(ctx context.Context, params GetTalkSessionDetailParams) (GetTalkSessionDetailRes, error)
@@ -151,7 +151,7 @@ type UserHandler interface {
 	// リアクション済みのセッション一覧.
 	//
 	// GET /talksessions/histories
-	SessionsHistory(ctx context.Context) (SessionsHistoryRes, error)
+	SessionsHistory(ctx context.Context, params SessionsHistoryParams) (SessionsHistoryRes, error)
 }
 
 // VoteHandler handles operations described by OpenAPI v3 specification.

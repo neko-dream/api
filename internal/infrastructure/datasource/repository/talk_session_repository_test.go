@@ -100,8 +100,8 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 				}
 				location := talksession.NewLocation(
 					talkSessionID,
-					ts.Latitude.(float64),
-					ts.Longitude.(float64),
+					ts.Latitude,
+					ts.Longitude,
 				)
 				assert.Equal(t, location.ToGeographyText(), "POINT(30.000000 30.000000)")
 

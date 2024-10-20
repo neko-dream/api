@@ -51,7 +51,7 @@ func (UnimplementedHandler) GetOpinionDetail(ctx context.Context, params GetOpin
 
 // GetTalkSessionDetail implements getTalkSessionDetail operation.
 //
-// 🚧 トークセッションの詳細.
+// トークセッションの詳細.
 //
 // GET /talksessions/{talkSessionId}
 func (UnimplementedHandler) GetTalkSessionDetail(ctx context.Context, params GetTalkSessionDetailParams) (r GetTalkSessionDetailRes, _ error) {
@@ -144,7 +144,7 @@ func (UnimplementedHandler) RegisterUser(ctx context.Context, req OptRegisterUse
 // リアクション済みのセッション一覧.
 //
 // GET /talksessions/histories
-func (UnimplementedHandler) SessionsHistory(ctx context.Context) (r SessionsHistoryRes, _ error) {
+func (UnimplementedHandler) SessionsHistory(ctx context.Context, params SessionsHistoryParams) (r SessionsHistoryRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
