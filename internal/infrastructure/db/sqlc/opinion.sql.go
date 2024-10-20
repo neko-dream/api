@@ -365,9 +365,15 @@ LEFT JOIN (
     FROM opinions
     GROUP BY parent_opinion_id
 ) rc ON opinions.opinion_id = rc.vote_count.opinion_id
+LEFT JOIN (
+    SELECT rank, opinion_id
+    FROM representative_opinions
+) ro ON opinions.opinion_id = ro.opinion_id
 WHERE opinions.talk_session_id = $2
     AND vote_count.opinion_id = opinions.opinion_id
-ORDER BY RANDOM()
+ORDER BY
+    COALESCE(ro.rank, 0) DESC,
+    RANDOM()
 LIMIT $3
 `
 
@@ -394,7 +400,11 @@ type GetRandomOpinionsRow struct {
 	ReplyCount      int64
 }
 
+// 親意見に対するユーザーの意思を取得
 // 指定されたユーザーが投票していない意見のみを取得
+// 意見に対するリプライ数
+// グループ内のランクを取得
+// トークセッションに紐づく意見のみを取得
 func (q *Queries) GetRandomOpinions(ctx context.Context, arg GetRandomOpinionsParams) ([]GetRandomOpinionsRow, error) {
 	rows, err := q.db.QueryContext(ctx, getRandomOpinions, arg.UserID, arg.TalkSessionID, arg.Limit)
 	if err != nil {

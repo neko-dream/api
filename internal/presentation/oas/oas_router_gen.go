@@ -459,6 +459,29 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								}
 
 								elem = origElem
+							case 'r': // Prefix: "report"
+								origElem := elem
+								if l := len("report"); len(elem) >= l && elem[0:l] == "report" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								if len(elem) == 0 {
+									// Leaf node.
+									switch r.Method {
+									case "GET":
+										s.handleGetTalkSEssionReportRequest([1]string{
+											args[0],
+										}, elemIsEscaped, w, r)
+									default:
+										s.notAllowed(w, r, "GET")
+									}
+
+									return
+								}
+
+								elem = origElem
 							case 's': // Prefix: "swipe_opinions"
 								origElem := elem
 								if l := len("swipe_opinions"); len(elem) >= l && elem[0:l] == "swipe_opinions" {
@@ -1069,6 +1092,31 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									}
 
 									elem = origElem
+								}
+
+								elem = origElem
+							case 'r': // Prefix: "report"
+								origElem := elem
+								if l := len("report"); len(elem) >= l && elem[0:l] == "report" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								if len(elem) == 0 {
+									// Leaf node.
+									switch method {
+									case "GET":
+										r.name = "GetTalkSEssionReport"
+										r.summary = "🚧 トークセッションレポートを返す"
+										r.operationID = "getTalkSEssionReport"
+										r.pathPattern = "/talksessions/{talkSessionId}/report"
+										r.args = args
+										r.count = 1
+										return r, true
+									default:
+										return
+									}
 								}
 
 								elem = origElem

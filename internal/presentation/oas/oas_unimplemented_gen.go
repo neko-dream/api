@@ -49,6 +49,15 @@ func (UnimplementedHandler) GetOpinionDetail(ctx context.Context, params GetOpin
 	return r, ht.ErrNotImplemented
 }
 
+// GetTalkSEssionReport implements getTalkSEssionReport operation.
+//
+// 🚧 トークセッションレポートを返す.
+//
+// GET /talksessions/{talkSessionId}/report
+func (UnimplementedHandler) GetTalkSEssionReport(ctx context.Context, params GetTalkSEssionReportParams) (r GetTalkSEssionReportRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetTalkSessionDetail implements getTalkSessionDetail operation.
 //
 // トークセッションの詳細.

@@ -97,6 +97,7 @@ SELECT
 FROM opinions
 LEFT JOIN users
     ON opinions.user_id = users.user_id
+-- 親意見に対するユーザーの意思を取得
 LEFT JOIN (
     SELECT votes.vote_type, votes.user_id, votes.opinion_id
     FROM votes
@@ -112,14 +113,23 @@ LEFT JOIN (
     GROUP BY opinions.opinion_id
     HAVING COUNT(votes.vote_id) = 0
 ) vote_count ON opinions.opinion_id = vote_count.opinion_id
+-- 意見に対するリプライ数
 LEFT JOIN (
     SELECT COUNT(opinion_id) AS reply_count, parent_opinion_id
     FROM opinions
     GROUP BY parent_opinion_id
 ) rc ON opinions.opinion_id = rc.vote_count.opinion_id
+-- グループ内のランクを取得
+LEFT JOIN (
+    SELECT rank, opinion_id
+    FROM representative_opinions
+) ro ON opinions.opinion_id = ro.opinion_id
+-- トークセッションに紐づく意見のみを取得
 WHERE opinions.talk_session_id = $2
     AND vote_count.opinion_id = opinions.opinion_id
-ORDER BY RANDOM()
+ORDER BY
+    COALESCE(ro.rank, 0) DESC,
+    RANDOM()
 LIMIT $3;
 
 

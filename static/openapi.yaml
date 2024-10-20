@@ -2325,6 +2325,45 @@ paths:
                     message: INTERNAL SERVER ERROR.
       security: []
       x-ogen-operation-group: Opinion
+  /talksessions/{talkSessionId}/report:
+    get:
+      summary: 🚧 トークセッションレポートを返す
+      deprecated: false
+      description: ''
+      operationId: getTalkSEssionReport
+      tags:
+        - talk_session
+        - talk_session
+      parameters:
+        - name: talkSessionId
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '500':
+          description: ServerErrorResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+      security: []
+      x-ogen-operation-group: TalkSession
   /auth/{provider}/login:
     get:
       summary: OAuthログイン

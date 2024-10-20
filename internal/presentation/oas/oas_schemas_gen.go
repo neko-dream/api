@@ -925,6 +925,14 @@ func (s *GetOpinionDetailOKUser) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
 
+type GetTalkSEssionReportInternalServerError struct{}
+
+func (*GetTalkSEssionReportInternalServerError) getTalkSEssionReportRes() {}
+
+type GetTalkSEssionReportOK struct{}
+
+func (*GetTalkSEssionReportOK) getTalkSEssionReportRes() {}
+
 type GetTalkSessionDetailBadRequest struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
