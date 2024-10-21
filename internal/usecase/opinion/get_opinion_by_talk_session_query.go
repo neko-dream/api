@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/google/uuid"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/infrastructure/db"
@@ -88,7 +89,7 @@ func (i *getOpinionsByTalkSessionInteractor) Execute(ctx context.Context, input 
 	}
 
 	count, err := i.GetQueries(ctx).CountOpinions(ctx, model.CountOpinionsParams{
-		TalkSessionID: sql.NullString{String: input.TalkSessionID.UUID().String(), Valid: true},
+		TalkSessionID: uuid.NullUUID{UUID: input.TalkSessionID.UUID(), Valid: true},
 	})
 	if err != nil {
 		return nil, err
