@@ -224,7 +224,7 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 			PosY:           position.PosY,
 			DisplayId:      position.DisplayID,
 			GroupId:        position.GroupID,
-			PerimeterIndex: utils.ToOpt[oas.OptInt](out.MyPosition.PerimeterIndex),
+			PerimeterIndex: utils.ToOpt[oas.OptInt](position.PerimeterIndex),
 		})
 	}
 
