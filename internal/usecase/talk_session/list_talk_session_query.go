@@ -137,6 +137,6 @@ func (h *listTalkSessionQueryHandler) Execute(ctx context.Context, input ListTal
 	log.Println("talkSessionCount", talkSessionCount)
 
 	talkSessionOut.TalkSessions = talkSessionDTOList
-	talkSessionOut.TotalCount = int(talkSessionCount)
+	talkSessionOut.TotalCount = int(talkSessionCount.TalkSessionCount)
 	return &talkSessionOut, nil
 }

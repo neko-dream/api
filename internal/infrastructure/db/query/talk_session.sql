@@ -77,32 +77,36 @@ WHERE
         THEN talk_sessions.theme LIKE '%' || sqlc.narg('theme')::text || '%'
         ELSE TRUE
     END)
-ORDER BY
-    CASE
-        WHEN sqlc.narg('status')::text = 'finished' THEN scheduled_end_time <= now()
-        WHEN sqlc.narg('status')::text = 'open' THEN scheduled_end_time > now()
-        ELSE TRUE
-    END DESC
 LIMIT $1 OFFSET $2;
 
 -- name: CountTalkSessions :one
 SELECT
-    COUNT(talk_sessions.*) AS talk_session_count
+    COUNT(DISTINCT talk_sessions.talk_session_id) AS talk_session_count,
+    sqlc.narg('status')::text AS status
 FROM talk_sessions
+-- talk_session_locationsがない場合も考慮
 LEFT JOIN talk_session_locations
     ON talk_sessions.talk_session_id = talk_session_locations.talk_session_id
+LEFT JOIN votes
+    ON votes.talk_session_id = talk_sessions.talk_session_id
 WHERE
     CASE
-        WHEN sqlc.narg('status')::text = 'finished' THEN scheduled_end_time <= now()
-        WHEN sqlc.narg('status')::text = 'open' THEN scheduled_end_time > now()
+        WHEN sqlc.narg('user_id')::uuid IS NOT NULL
+            THEN votes.user_id = sqlc.narg('user_id')::uuid
         ELSE TRUE
     END
     AND
-    (CASE
+    CASE sqlc.narg('status')::text
+        WHEN 'open' THEN talk_sessions.scheduled_end_time > now()
+        WHEN 'finished' THEN talk_sessions.scheduled_end_time <= now()
+        ELSE TRUE
+    END
+    AND
+    CASE
         WHEN sqlc.narg('theme')::text IS NOT NULL
         THEN talk_sessions.theme LIKE '%' || sqlc.narg('theme')::text || '%'
         ELSE TRUE
-    END);
+    END;
 
 
 
@@ -130,15 +134,15 @@ LEFT JOIN (
 LEFT JOIN users
     ON talk_sessions.owner_id = users.user_id
 LEFT JOIN votes
-    ON talk_sessions.talk_session_id = votes.talk_session_id
+    ON votes.talk_session_id = talk_sessions.talk_session_id
 LEFT JOIN talk_session_locations
-    ON talk_sessions.talk_session_id = talk_session_locations.talk_session_id
+    ON talk_session_locations.talk_session_id = talk_sessions.talk_session_id
 WHERE
-    oc.talk_session_id = talk_sessions.talk_session_id AND
-    votes.user_id = sqlc.narg('user_id')::uuid AND
-    CASE
-        WHEN sqlc.narg('status')::text = 'finished' THEN scheduled_end_time <= now()
-        WHEN sqlc.narg('status')::text = 'open' THEN scheduled_end_time > now()
+    votes.user_id = sqlc.narg('user_id')::uuid
+    AND
+    CASE sqlc.narg('status')::text IS NOT NULL
+        WHEN sqlc.narg('status')::text = 'finished' THEN talk_sessions.scheduled_end_time <= now()
+        WHEN sqlc.narg('status')::text = 'open' THEN talk_sessions.scheduled_end_time > now()
         ELSE TRUE
     END
     AND
@@ -148,10 +152,4 @@ WHERE
         ELSE TRUE
     END
 GROUP BY talk_sessions.talk_session_id, oc.opinion_count, users.display_name, users.display_id, users.icon_url, talk_session_locations.talk_session_id
-ORDER BY
-    CASE
-        WHEN sqlc.narg('status')::text = 'finished' THEN scheduled_end_time <= now()
-        WHEN sqlc.narg('status')::text = 'open' THEN scheduled_end_time > now()
-        ELSE TRUE
-    END DESC
 LIMIT $1 OFFSET $2;

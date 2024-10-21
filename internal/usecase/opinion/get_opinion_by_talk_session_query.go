@@ -46,9 +46,13 @@ func (i *getOpinionsByTalkSessionInteractor) Execute(ctx context.Context, input 
 	var limit, offset int
 	if input.Limit == nil {
 		limit = 10
+	} else {
+		limit = *input.Limit
 	}
 	if input.Offset == nil {
 		offset = 0
+	} else {
+		offset = *input.Offset
 	}
 	sortKey := "latest"
 	if input.SortKey != nil {

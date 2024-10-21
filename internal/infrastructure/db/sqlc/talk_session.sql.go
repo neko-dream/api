@@ -15,34 +15,50 @@ import (
 
 const countTalkSessions = `-- name: CountTalkSessions :one
 SELECT
-    COUNT(talk_sessions.*) AS talk_session_count
+    COUNT(DISTINCT talk_sessions.talk_session_id) AS talk_session_count,
+    $1::text AS status
 FROM talk_sessions
 LEFT JOIN talk_session_locations
     ON talk_sessions.talk_session_id = talk_session_locations.talk_session_id
+LEFT JOIN votes
+    ON votes.talk_session_id = talk_sessions.talk_session_id
 WHERE
     CASE
-        WHEN $1::text = 'finished' THEN scheduled_end_time <= now()
-        WHEN $1::text = 'open' THEN scheduled_end_time > now()
+        WHEN $2::uuid IS NOT NULL
+            THEN votes.user_id = $2::uuid
         ELSE TRUE
     END
     AND
-    (CASE
-        WHEN $2::text IS NOT NULL
-        THEN talk_sessions.theme LIKE '%' || $2::text || '%'
+    CASE $1::text
+        WHEN 'open' THEN talk_sessions.scheduled_end_time > now()
+        WHEN 'finished' THEN talk_sessions.scheduled_end_time <= now()
         ELSE TRUE
-    END)
+    END
+    AND
+    CASE
+        WHEN $3::text IS NOT NULL
+        THEN talk_sessions.theme LIKE '%' || $3::text || '%'
+        ELSE TRUE
+    END
 `
 
 type CountTalkSessionsParams struct {
 	Status sql.NullString
+	UserID uuid.NullUUID
 	Theme  sql.NullString
 }
 
-func (q *Queries) CountTalkSessions(ctx context.Context, arg CountTalkSessionsParams) (int64, error) {
-	row := q.db.QueryRowContext(ctx, countTalkSessions, arg.Status, arg.Theme)
-	var talk_session_count int64
-	err := row.Scan(&talk_session_count)
-	return talk_session_count, err
+type CountTalkSessionsRow struct {
+	TalkSessionCount int64
+	Status           string
+}
+
+// talk_session_locationsがない場合も考慮
+func (q *Queries) CountTalkSessions(ctx context.Context, arg CountTalkSessionsParams) (CountTalkSessionsRow, error) {
+	row := q.db.QueryRowContext(ctx, countTalkSessions, arg.Status, arg.UserID, arg.Theme)
+	var i CountTalkSessionsRow
+	err := row.Scan(&i.TalkSessionCount, &i.Status)
+	return i, err
 }
 
 const createTalkSession = `-- name: CreateTalkSession :exec
@@ -193,15 +209,15 @@ LEFT JOIN (
 LEFT JOIN users
     ON talk_sessions.owner_id = users.user_id
 LEFT JOIN votes
-    ON talk_sessions.talk_session_id = votes.talk_session_id
+    ON votes.talk_session_id = talk_sessions.talk_session_id
 LEFT JOIN talk_session_locations
-    ON talk_sessions.talk_session_id = talk_session_locations.talk_session_id
+    ON talk_session_locations.talk_session_id = talk_sessions.talk_session_id
 WHERE
-    oc.talk_session_id = talk_sessions.talk_session_id AND
-    votes.user_id = $3::uuid AND
-    CASE
-        WHEN $4::text = 'finished' THEN scheduled_end_time <= now()
-        WHEN $4::text = 'open' THEN scheduled_end_time > now()
+    votes.user_id = $3::uuid
+    AND
+    CASE $4::text IS NOT NULL
+        WHEN $4::text = 'finished' THEN talk_sessions.scheduled_end_time <= now()
+        WHEN $4::text = 'open' THEN talk_sessions.scheduled_end_time > now()
         ELSE TRUE
     END
     AND
@@ -211,12 +227,6 @@ WHERE
         ELSE TRUE
     END
 GROUP BY talk_sessions.talk_session_id, oc.opinion_count, users.display_name, users.display_id, users.icon_url, talk_session_locations.talk_session_id
-ORDER BY
-    CASE
-        WHEN $4::text = 'finished' THEN scheduled_end_time <= now()
-        WHEN $4::text = 'open' THEN scheduled_end_time > now()
-        ELSE TRUE
-    END DESC
 LIMIT $1 OFFSET $2
 `
 
@@ -324,12 +334,6 @@ WHERE
         THEN talk_sessions.theme LIKE '%' || $4::text || '%'
         ELSE TRUE
     END)
-ORDER BY
-    CASE
-        WHEN $3::text = 'finished' THEN scheduled_end_time <= now()
-        WHEN $3::text = 'open' THEN scheduled_end_time > now()
-        ELSE TRUE
-    END DESC
 LIMIT $1 OFFSET $2
 `
 

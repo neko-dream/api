@@ -19,17 +19,17 @@ SELECT
 FROM opinions
 WHERE
     CASE
-        WHEN $1::uuid IS NOT NULL THEN opinions.user_id = $1
+        WHEN $1::uuid IS NOT NULL THEN opinions.user_id = $1::uuid
         ELSE TRUE
     END
     AND
     CASE
-        WHEN $2::uuid IS NOT NULL THEN opinions.talk_session_id = $2
+        WHEN $2::uuid IS NOT NULL THEN opinions.talk_session_id = $2::uuid
         ELSE TRUE
     END
     AND
     CASE
-        WHEN $3::uuid IS NOT NULL THEN opinions.parent_opinion_id = $3
+        WHEN $3::uuid IS NOT NULL THEN opinions.parent_opinion_id = $3::uuid
         ELSE TRUE
     END
 `
@@ -292,10 +292,10 @@ LEFT JOIN (
 ) rc ON opinions.opinion_id = rc.parent_opinion_id
 WHERE opinions.talk_session_id = $1
 ORDER BY
-    CASE
-        WHEN $4::text = 'latest' THEN opinions.created_at
-        WHEN $4::text = 'oldest' THEN opinions.created_at * -1
-        WHEN $4::text = 'mostReply' THEN reply_count
+    CASE $4::text
+        WHEN 'latest' THEN EXTRACT(EPOCH FROM opinions.created_at)
+        WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM opinions.created_at)
+        WHEN 'mostReply' THEN reply_count
     END ASC
 LIMIT $2 OFFSET $3
 `
@@ -400,10 +400,10 @@ LEFT JOIN (
 ) rc ON opinions.opinion_id = rc.parent_opinion_id
 WHERE opinions.user_id = $1
 ORDER BY
-    CASE
-        WHEN $4::text = 'latest' THEN opinions.created_at
-        WHEN $4::text = 'oldest' THEN opinions.created_at * -1
-        WHEN $4::text = 'mostReply' THEN reply_count
+    CASE $4::text
+        WHEN 'latest' THEN EXTRACT(EPOCH FROM opinions.created_at)
+        WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM opinions.created_at)
+        WHEN 'mostReply' THEN reply_count
     END ASC
 LIMIT $2 OFFSET $3
 `

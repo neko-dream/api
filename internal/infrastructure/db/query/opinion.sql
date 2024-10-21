@@ -166,10 +166,10 @@ LEFT JOIN (
 WHERE opinions.user_id = $1
 -- latest, mostReply, oldestでソート
 ORDER BY
-    CASE
-        WHEN sqlc.narg('sort_key')::text = 'latest' THEN opinions.created_at
-        WHEN sqlc.narg('sort_key')::text = 'oldest' THEN opinions.created_at * -1
-        WHEN sqlc.narg('sort_key')::text = 'mostReply' THEN reply_count
+    CASE sqlc.narg('sort_key')::text
+        WHEN 'latest' THEN EXTRACT(EPOCH FROM opinions.created_at)
+        WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM opinions.created_at)
+        WHEN 'mostReply' THEN reply_count
     END ASC
 LIMIT $2 OFFSET $3
 ;
@@ -208,10 +208,10 @@ LEFT JOIN (
 WHERE opinions.talk_session_id = $1
 -- latest, mostReply, oldestでソート
 ORDER BY
-    CASE
-        WHEN sqlc.narg('sort_key')::text = 'latest' THEN opinions.created_at
-        WHEN sqlc.narg('sort_key')::text = 'oldest' THEN opinions.created_at * -1
-        WHEN sqlc.narg('sort_key')::text = 'mostReply' THEN reply_count
+    CASE sqlc.narg('sort_key')::text
+        WHEN 'latest' THEN EXTRACT(EPOCH FROM opinions.created_at)
+        WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM opinions.created_at)
+        WHEN 'mostReply' THEN reply_count
     END ASC
 LIMIT $2 OFFSET $3;
 
@@ -221,17 +221,17 @@ SELECT
 FROM opinions
 WHERE
     CASE
-        WHEN sqlc.narg('user_id')::uuid IS NOT NULL THEN opinions.user_id = sqlc.narg('user_id')
+        WHEN sqlc.narg('user_id')::uuid IS NOT NULL THEN opinions.user_id = sqlc.narg('user_id')::uuid
         ELSE TRUE
     END
     AND
     CASE
-        WHEN sqlc.narg('talk_session_id')::uuid IS NOT NULL THEN opinions.talk_session_id = sqlc.narg('talk_session_id')
+        WHEN sqlc.narg('talk_session_id')::uuid IS NOT NULL THEN opinions.talk_session_id = sqlc.narg('talk_session_id')::uuid
         ELSE TRUE
     END
     AND
     CASE
-        WHEN sqlc.narg('parent_opinion_id')::uuid IS NOT NULL THEN opinions.parent_opinion_id = sqlc.narg('parent_opinion_id')
+        WHEN sqlc.narg('parent_opinion_id')::uuid IS NOT NULL THEN opinions.parent_opinion_id = sqlc.narg('parent_opinion_id')::uuid
         ELSE TRUE
     END
 ;

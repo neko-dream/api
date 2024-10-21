@@ -47,9 +47,13 @@ func (h *getUserOpinionListQueryHandler) Execute(ctx context.Context, q GetUserO
 	var limit, offset int
 	if q.Limit == nil {
 		limit = 10
+	} else {
+		limit = *q.Limit
 	}
 	if q.Offset == nil {
 		offset = 0
+	} else {
+		offset = *q.Offset
 	}
 	sortKey := "latest"
 	if q.SortKey != nil {
