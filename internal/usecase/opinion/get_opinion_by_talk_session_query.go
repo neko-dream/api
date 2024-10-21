@@ -5,63 +5,64 @@ import (
 	"database/sql"
 
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/user"
+	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/infrastructure/db"
 	model "github.com/neko-dream/server/internal/infrastructure/db/sqlc"
 	"github.com/neko-dream/server/pkg/utils"
 )
 
 type (
-	GetUserOpinionListQueryHandler interface {
-		Execute(context.Context, GetUserOpinionListQuery) (*GetUserOpinionListOutput, error)
+	GetOpinionsByTalkSessionUseCase interface {
+		Execute(context.Context, GetOpinionsByTalkSessionInput) (*GetOpinionsByTalkSessionOutput, error)
 	}
 
-	GetUserOpinionListQuery struct {
-		UserID shared.UUID[user.User]
-		// latest, mostReply, oldest
-		SortKey *string
-		Limit   *int
-		Offset  *int
+	GetOpinionsByTalkSessionInput struct {
+		TalkSessionID shared.UUID[talksession.TalkSession]
+		SortKey       *string
+		Limit         *int
+		Offset        *int
 	}
 
-	GetUserOpinionListOutput struct {
+	GetOpinionsByTalkSessionOutput struct {
 		Opinions   []SwipeOpinionDTO
 		TotalCount int
 	}
 
-	getUserOpinionListQueryHandler struct {
+	getOpinionsByTalkSessionInteractor struct {
 		*db.DBManager
 	}
 )
 
-func NewGetUserOpinionListQueryHandler(
+func NewGetOpinionsByTalkSessionUseCase(
 	dbManager *db.DBManager,
-) GetUserOpinionListQueryHandler {
-	return &getUserOpinionListQueryHandler{
+) GetOpinionsByTalkSessionUseCase {
+	return &getOpinionsByTalkSessionInteractor{
 		DBManager: dbManager,
 	}
 }
 
-func (h *getUserOpinionListQueryHandler) Execute(ctx context.Context, q GetUserOpinionListQuery) (*GetUserOpinionListOutput, error) {
+func (i *getOpinionsByTalkSessionInteractor) Execute(ctx context.Context, input GetOpinionsByTalkSessionInput) (*GetOpinionsByTalkSessionOutput, error) {
 	var limit, offset int
-	if q.Limit == nil {
+	if input.Limit == nil {
 		limit = 10
 	}
-	if q.Offset == nil {
+	if input.Offset == nil {
 		offset = 0
 	}
 	sortKey := "latest"
-	if q.SortKey != nil {
-		sortKey = *q.SortKey
+	if input.SortKey != nil {
+		sortKey = *input.SortKey
 	}
 
-	opinionRows, err := h.GetQueries(ctx).GetOpinionsByUserID(ctx, model.GetOpinionsByUserIDParams{
-		UserID:  q.UserID.UUID(),
-		SortKey: sql.NullString{String: sortKey, Valid: true},
-		Limit:   int32(limit),
-		Offset:  int32(offset),
+	// 親意見を取得
+	opinionRows, err := i.GetQueries(ctx).GetOpinionsByTalkSessionID(ctx, model.GetOpinionsByTalkSessionIDParams{
+		TalkSessionID: input.TalkSessionID.UUID(),
+		Limit:         int32(limit),
+		Offset:        int32(offset),
+		SortKey:       sql.NullString{String: sortKey, Valid: true},
 	})
 	if err != nil {
+		utils.HandleError(ctx, err, "GetOpinionsByTalkSessionInteractor.Execute")
 		return nil, err
 	}
 
@@ -86,14 +87,14 @@ func (h *getUserOpinionListQueryHandler) Execute(ctx context.Context, q GetUserO
 		})
 	}
 
-	count, err := h.GetQueries(ctx).CountOpinions(ctx, model.CountOpinionsParams{
-		UserID: sql.NullString{String: q.UserID.UUID().String(), Valid: true},
+	count, err := i.GetQueries(ctx).CountOpinions(ctx, model.CountOpinionsParams{
+		TalkSessionID: sql.NullString{String: input.TalkSessionID.UUID().String(), Valid: true},
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	return &GetUserOpinionListOutput{
+	return &GetOpinionsByTalkSessionOutput{
 		Opinions:   opinions,
 		TotalCount: int(count),
 	}, nil

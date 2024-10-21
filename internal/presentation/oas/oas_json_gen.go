@@ -1509,6 +1509,807 @@ func (s *GetOpinionDetailOKUser) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
+func (s *GetOpinionsForTalkSessionBadRequest) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *GetOpinionsForTalkSessionBadRequest) encodeFields(e *jx.Encoder) {
+}
+
+var jsonFieldsNameOfGetOpinionsForTalkSessionBadRequest = [0]string{}
+
+// Decode decodes GetOpinionsForTalkSessionBadRequest from json.
+func (s *GetOpinionsForTalkSessionBadRequest) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GetOpinionsForTalkSessionBadRequest to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		default:
+			return d.Skip()
+		}
+	}); err != nil {
+		return errors.Wrap(err, "decode GetOpinionsForTalkSessionBadRequest")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *GetOpinionsForTalkSessionBadRequest) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GetOpinionsForTalkSessionBadRequest) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *GetOpinionsForTalkSessionInternalServerError) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *GetOpinionsForTalkSessionInternalServerError) encodeFields(e *jx.Encoder) {
+}
+
+var jsonFieldsNameOfGetOpinionsForTalkSessionInternalServerError = [0]string{}
+
+// Decode decodes GetOpinionsForTalkSessionInternalServerError from json.
+func (s *GetOpinionsForTalkSessionInternalServerError) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GetOpinionsForTalkSessionInternalServerError to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		default:
+			return d.Skip()
+		}
+	}); err != nil {
+		return errors.Wrap(err, "decode GetOpinionsForTalkSessionInternalServerError")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *GetOpinionsForTalkSessionInternalServerError) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GetOpinionsForTalkSessionInternalServerError) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *GetOpinionsForTalkSessionOK) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *GetOpinionsForTalkSessionOK) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("opinions")
+		e.ArrStart()
+		for _, elem := range s.Opinions {
+			elem.Encode(e)
+		}
+		e.ArrEnd()
+	}
+	{
+		e.FieldStart("pagination")
+		s.Pagination.Encode(e)
+	}
+}
+
+var jsonFieldsNameOfGetOpinionsForTalkSessionOK = [2]string{
+	0: "opinions",
+	1: "pagination",
+}
+
+// Decode decodes GetOpinionsForTalkSessionOK from json.
+func (s *GetOpinionsForTalkSessionOK) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GetOpinionsForTalkSessionOK to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "opinions":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				s.Opinions = make([]GetOpinionsForTalkSessionOKOpinionsItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem GetOpinionsForTalkSessionOKOpinionsItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Opinions = append(s.Opinions, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"opinions\"")
+			}
+		case "pagination":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				if err := s.Pagination.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"pagination\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode GetOpinionsForTalkSessionOK")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000011,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfGetOpinionsForTalkSessionOK) {
+					name = jsonFieldsNameOfGetOpinionsForTalkSessionOK[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *GetOpinionsForTalkSessionOK) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GetOpinionsForTalkSessionOK) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *GetOpinionsForTalkSessionOKOpinionsItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *GetOpinionsForTalkSessionOKOpinionsItem) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("opinion")
+		s.Opinion.Encode(e)
+	}
+	{
+		e.FieldStart("user")
+		s.User.Encode(e)
+	}
+	{
+		e.FieldStart("replyCount")
+		e.Int(s.ReplyCount)
+	}
+}
+
+var jsonFieldsNameOfGetOpinionsForTalkSessionOKOpinionsItem = [3]string{
+	0: "opinion",
+	1: "user",
+	2: "replyCount",
+}
+
+// Decode decodes GetOpinionsForTalkSessionOKOpinionsItem from json.
+func (s *GetOpinionsForTalkSessionOKOpinionsItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GetOpinionsForTalkSessionOKOpinionsItem to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "opinion":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				if err := s.Opinion.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"opinion\"")
+			}
+		case "user":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				if err := s.User.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"user\"")
+			}
+		case "replyCount":
+			requiredBitSet[0] |= 1 << 2
+			if err := func() error {
+				v, err := d.Int()
+				s.ReplyCount = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"replyCount\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode GetOpinionsForTalkSessionOKOpinionsItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfGetOpinionsForTalkSessionOKOpinionsItem) {
+					name = jsonFieldsNameOfGetOpinionsForTalkSessionOKOpinionsItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *GetOpinionsForTalkSessionOKOpinionsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GetOpinionsForTalkSessionOKOpinionsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("id")
+		e.Str(s.ID)
+	}
+	{
+		if s.Title.Set {
+			e.FieldStart("title")
+			s.Title.Encode(e)
+		}
+	}
+	{
+		e.FieldStart("content")
+		e.Str(s.Content)
+	}
+	{
+		if s.ParentID.Set {
+			e.FieldStart("parentID")
+			s.ParentID.Encode(e)
+		}
+	}
+	{
+		if s.VoteType.Set {
+			e.FieldStart("voteType")
+			s.VoteType.Encode(e)
+		}
+	}
+	{
+		if s.PictureURL.Set {
+			e.FieldStart("pictureURL")
+			s.PictureURL.Encode(e)
+		}
+	}
+	{
+		if s.ReferenceURL.Set {
+			e.FieldStart("referenceURL")
+			s.ReferenceURL.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfGetOpinionsForTalkSessionOKOpinionsItemOpinion = [7]string{
+	0: "id",
+	1: "title",
+	2: "content",
+	3: "parentID",
+	4: "voteType",
+	5: "pictureURL",
+	6: "referenceURL",
+}
+
+// Decode decodes GetOpinionsForTalkSessionOKOpinionsItemOpinion from json.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GetOpinionsForTalkSessionOKOpinionsItemOpinion to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "id":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Str()
+				s.ID = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"id\"")
+			}
+		case "title":
+			if err := func() error {
+				s.Title.Reset()
+				if err := s.Title.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"title\"")
+			}
+		case "content":
+			requiredBitSet[0] |= 1 << 2
+			if err := func() error {
+				v, err := d.Str()
+				s.Content = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"content\"")
+			}
+		case "parentID":
+			if err := func() error {
+				s.ParentID.Reset()
+				if err := s.ParentID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"parentID\"")
+			}
+		case "voteType":
+			if err := func() error {
+				s.VoteType.Reset()
+				if err := s.VoteType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"voteType\"")
+			}
+		case "pictureURL":
+			if err := func() error {
+				s.PictureURL.Reset()
+				if err := s.PictureURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"pictureURL\"")
+			}
+		case "referenceURL":
+			if err := func() error {
+				s.ReferenceURL.Reset()
+				if err := s.ReferenceURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"referenceURL\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode GetOpinionsForTalkSessionOKOpinionsItemOpinion")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000101,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfGetOpinionsForTalkSessionOKOpinionsItemOpinion) {
+					name = jsonFieldsNameOfGetOpinionsForTalkSessionOKOpinionsItemOpinion[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType as json.
+func (s GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType from json.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType(v) {
+	case GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeAgree:
+		*s = GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeAgree
+	case GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeDisagree:
+		*s = GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeDisagree
+	case GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypePass:
+		*s = GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypePass
+	default:
+		*s = GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemUser) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemUser) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("displayID")
+		e.Str(s.DisplayID)
+	}
+	{
+		e.FieldStart("displayName")
+		e.Str(s.DisplayName)
+	}
+	{
+		if s.IconURL.Set {
+			e.FieldStart("iconURL")
+			s.IconURL.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfGetOpinionsForTalkSessionOKOpinionsItemUser = [3]string{
+	0: "displayID",
+	1: "displayName",
+	2: "iconURL",
+}
+
+// Decode decodes GetOpinionsForTalkSessionOKOpinionsItemUser from json.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemUser) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GetOpinionsForTalkSessionOKOpinionsItemUser to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "displayID":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Str()
+				s.DisplayID = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"displayID\"")
+			}
+		case "displayName":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := d.Str()
+				s.DisplayName = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"displayName\"")
+			}
+		case "iconURL":
+			if err := func() error {
+				s.IconURL.Reset()
+				if err := s.IconURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"iconURL\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode GetOpinionsForTalkSessionOKOpinionsItemUser")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000011,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfGetOpinionsForTalkSessionOKOpinionsItemUser) {
+					name = jsonFieldsNameOfGetOpinionsForTalkSessionOKOpinionsItemUser[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemUser) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemUser) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *GetOpinionsForTalkSessionOKPagination) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *GetOpinionsForTalkSessionOKPagination) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("totalCount")
+		e.Int(s.TotalCount)
+	}
+}
+
+var jsonFieldsNameOfGetOpinionsForTalkSessionOKPagination = [1]string{
+	0: "totalCount",
+}
+
+// Decode decodes GetOpinionsForTalkSessionOKPagination from json.
+func (s *GetOpinionsForTalkSessionOKPagination) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GetOpinionsForTalkSessionOKPagination to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "totalCount":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Int()
+				s.TotalCount = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"totalCount\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode GetOpinionsForTalkSessionOKPagination")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfGetOpinionsForTalkSessionOKPagination) {
+					name = jsonFieldsNameOfGetOpinionsForTalkSessionOKPagination[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *GetOpinionsForTalkSessionOKPagination) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GetOpinionsForTalkSessionOKPagination) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s *GetTalkSessionDetailBadRequest) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -5909,10 +6710,15 @@ func (s *OpinionsHistoryOK) encodeFields(e *jx.Encoder) {
 		}
 		e.ArrEnd()
 	}
+	{
+		e.FieldStart("pagination")
+		s.Pagination.Encode(e)
+	}
 }
 
-var jsonFieldsNameOfOpinionsHistoryOK = [1]string{
+var jsonFieldsNameOfOpinionsHistoryOK = [2]string{
 	0: "opinions",
+	1: "pagination",
 }
 
 // Decode decodes OpinionsHistoryOK from json.
@@ -5942,6 +6748,16 @@ func (s *OpinionsHistoryOK) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"opinions\"")
 			}
+		case "pagination":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				if err := s.Pagination.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"pagination\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -5952,7 +6768,7 @@ func (s *OpinionsHistoryOK) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000001,
+		0b00000011,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -6494,6 +7310,102 @@ func (s *OpinionsHistoryOKOpinionsItemUser) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode implements json.Marshaler.
+func (s *OpinionsHistoryOKPagination) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *OpinionsHistoryOKPagination) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("totalCount")
+		e.Int(s.TotalCount)
+	}
+}
+
+var jsonFieldsNameOfOpinionsHistoryOKPagination = [1]string{
+	0: "totalCount",
+}
+
+// Decode decodes OpinionsHistoryOKPagination from json.
+func (s *OpinionsHistoryOKPagination) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode OpinionsHistoryOKPagination to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "totalCount":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Int()
+				s.TotalCount = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"totalCount\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode OpinionsHistoryOKPagination")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfOpinionsHistoryOKPagination) {
+					name = jsonFieldsNameOfOpinionsHistoryOKPagination[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *OpinionsHistoryOKPagination) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OpinionsHistoryOKPagination) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes bool as json.
 func (o OptBool) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -6591,6 +7503,39 @@ func (s OptGetOpinionDetailOKOpinionVoteType) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptGetOpinionDetailOKOpinionVoteType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType as json.
+func (o OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType from json.
+func (o *OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

@@ -64,10 +64,19 @@ func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHi
 		}
 		sortKey = lo.ToPtr(string(txt))
 	}
+	var limit, offset *int
+	if params.Limit.IsSet() {
+		limit = &params.Limit.Value
+	}
+	if params.Offset.IsSet() {
+		offset = &params.Offset.Value
+	}
 
 	out, err := u.GetUserOpinionListQueryHandler.Execute(ctx, opinion_usecase.GetUserOpinionListQuery{
 		UserID:  userID,
 		SortKey: sortKey,
+		Limit:   limit,
+		Offset:  offset,
 	})
 	if err != nil {
 		utils.HandleError(ctx, err, "GetUserOpinionListQueryHandler.Execute")
@@ -99,6 +108,9 @@ func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHi
 
 	return &oas.OpinionsHistoryOK{
 		Opinions: opinions,
+		Pagination: oas.OpinionsHistoryOKPagination{
+			TotalCount: out.TotalCount,
+		},
 	}, nil
 }
 

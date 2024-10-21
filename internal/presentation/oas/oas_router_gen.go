@@ -348,12 +348,16 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 								if len(elem) == 0 {
 									switch r.Method {
+									case "GET":
+										s.handleGetOpinionsForTalkSessionRequest([1]string{
+											args[0],
+										}, elemIsEscaped, w, r)
 									case "POST":
 										s.handlePostOpinionPostRequest([1]string{
 											args[0],
 										}, elemIsEscaped, w, r)
 									default:
-										s.notAllowed(w, r, "POST")
+										s.notAllowed(w, r, "GET,POST")
 									}
 
 									return
@@ -851,7 +855,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						switch method {
 						case "GET":
 							r.name = "GetTalkSessionList"
-							r.summary = "トークセッションコレクション"
+							r.summary = "セッション一覧"
 							r.operationID = "getTalkSessionList"
 							r.pathPattern = "/talksessions"
 							r.args = args
@@ -859,7 +863,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							return r, true
 						case "POST":
 							r.name = "CreateTalkSession"
-							r.summary = "トークセッション作成"
+							r.summary = "セッション作成"
 							r.operationID = "createTalkSession"
 							r.pathPattern = "/talksessions"
 							r.args = args
@@ -979,6 +983,14 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 
 								if len(elem) == 0 {
 									switch method {
+									case "GET":
+										r.name = "GetOpinionsForTalkSession"
+										r.summary = "セッションに対する意見一覧"
+										r.operationID = "getOpinionsForTalkSession"
+										r.pathPattern = "/talksessions/{talkSessionID}/opinions"
+										r.args = args
+										r.count = 1
+										return r, true
 									case "POST":
 										r.name = "PostOpinionPost"
 										r.summary = "セッションに対して意見投稿"
@@ -1049,7 +1061,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 												switch method {
 												case "GET":
 													r.name = "OpinionComments"
-													r.summary = "意見に対するコメント一覧を返す"
+													r.summary = "意見に対するリプライ意見一覧"
 													r.operationID = "opinionComments"
 													r.pathPattern = "/talksessions/{talkSessionID}/opinions/{opinionID}/replies"
 													r.args = args
@@ -1108,7 +1120,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									switch method {
 									case "GET":
 										r.name = "GetTalkSessionReport"
-										r.summary = "🚧 トークセッションレポートを返す"
+										r.summary = "🚧 セッションレポートを返す"
 										r.operationID = "getTalkSessionReport"
 										r.pathPattern = "/talksessions/{talkSessionId}/report"
 										r.args = args

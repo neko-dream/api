@@ -102,7 +102,7 @@
     },
     "/talksessions": {
       "post": {
-        "summary": "トークセッション作成",
+        "summary": "セッション作成",
         "deprecated": false,
         "description": "",
         "operationId": "createTalkSession",
@@ -262,7 +262,7 @@
         "x-ogen-operation-group": "TalkSession"
       },
       "get": {
-        "summary": "トークセッションコレクション",
+        "summary": "セッション一覧",
         "deprecated": false,
         "description": "",
         "operationId": "getTalkSessionList",
@@ -1332,6 +1332,165 @@
           }
         ],
         "x-ogen-operation-group": "Opinion"
+      },
+      "get": {
+        "summary": "セッションに対する意見一覧",
+        "deprecated": false,
+        "description": "",
+        "operationId": "getOpinionsForTalkSession",
+        "tags": [
+          "talk_session/opinion",
+          "opinion"
+        ],
+        "parameters": [
+          {
+            "name": "talkSessionID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "latest",
+                "mostReply",
+                "oldest"
+              ],
+              "x-apidog": {
+                "enumDescriptions": {
+                  "latest": "",
+                  "mostReply": "",
+                  "oldest": ""
+                }
+              },
+              "nullable": true
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": 10,
+            "schema": {
+              "type": "integer",
+              "nullable": true
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": 0,
+            "schema": {
+              "type": "integer",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "opinions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "opinion": {
+                            "$ref": "#/components/schemas/opinion"
+                          },
+                          "user": {
+                            "$ref": "#/components/schemas/user",
+                            "description": "作成ユーザー"
+                          },
+                          "replyCount": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "opinion",
+                          "user",
+                          "replyCount"
+                        ]
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "totalCount": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "totalCount"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "opinions",
+                    "pagination"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ErrorResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "ServerErrorResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "x-ogen-operation-group": "Opinion"
       }
     },
     "/talksessions/{talkSessionID}/opinions/{opinionID}/votes": {
@@ -1475,12 +1634,12 @@
     },
     "/talksessions/{talkSessionID}/opinions/{opinionID}/replies": {
       "get": {
-        "summary": "意見に対するコメント一覧を返す",
+        "summary": "意見に対するリプライ意見一覧",
         "deprecated": false,
         "description": "",
         "operationId": "opinionComments",
         "tags": [
-          "talk_session/opinion",
+          "talk_session",
           "opinion"
         ],
         "parameters": [
@@ -2060,6 +2219,24 @@
               },
               "nullable": true
             }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
           }
         ],
         "responses": {
@@ -2092,10 +2269,22 @@
                           "replyCount"
                         ]
                       }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "totalCount": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "totalCount"
+                      ]
                     }
                   },
                   "required": [
-                    "opinions"
+                    "opinions",
+                    "pagination"
                   ]
                 }
               }
@@ -2378,7 +2567,7 @@
     },
     "/talksessions/{talkSessionId}/report": {
       "get": {
-        "summary": "🚧 トークセッションレポートを返す",
+        "summary": "🚧 セッションレポートを返す",
         "deprecated": false,
         "description": "",
         "operationId": "getTalkSessionReport",

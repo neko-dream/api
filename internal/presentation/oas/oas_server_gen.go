@@ -56,9 +56,15 @@ type OpinionHandler interface {
 	//
 	// GET /talksessions/{talkSessionID}/opinions/{opinionID}
 	GetOpinionDetail(ctx context.Context, params GetOpinionDetailParams) (GetOpinionDetailRes, error)
+	// GetOpinionsForTalkSession implements getOpinionsForTalkSession operation.
+	//
+	// セッションに対する意見一覧.
+	//
+	// GET /talksessions/{talkSessionID}/opinions
+	GetOpinionsForTalkSession(ctx context.Context, params GetOpinionsForTalkSessionParams) (GetOpinionsForTalkSessionRes, error)
 	// OpinionComments implements opinionComments operation.
 	//
-	// 意見に対するコメント一覧を返す.
+	// 意見に対するリプライ意見一覧.
 	//
 	// GET /talksessions/{talkSessionID}/opinions/{opinionID}/replies
 	OpinionComments(ctx context.Context, params OpinionCommentsParams) (OpinionCommentsRes, error)
@@ -82,7 +88,7 @@ type OpinionHandler interface {
 type TalkSessionHandler interface {
 	// CreateTalkSession implements createTalkSession operation.
 	//
-	// トークセッション作成.
+	// セッション作成.
 	//
 	// POST /talksessions
 	CreateTalkSession(ctx context.Context, req OptCreateTalkSessionReq) (CreateTalkSessionRes, error)
@@ -94,13 +100,13 @@ type TalkSessionHandler interface {
 	GetTalkSessionDetail(ctx context.Context, params GetTalkSessionDetailParams) (GetTalkSessionDetailRes, error)
 	// GetTalkSessionList implements getTalkSessionList operation.
 	//
-	// トークセッションコレクション.
+	// セッション一覧.
 	//
 	// GET /talksessions
 	GetTalkSessionList(ctx context.Context, params GetTalkSessionListParams) (GetTalkSessionListRes, error)
 	// GetTalkSessionReport implements getTalkSessionReport operation.
 	//
-	// 🚧 トークセッションレポートを返す.
+	// 🚧 セッションレポートを返す.
 	//
 	// GET /talksessions/{talkSessionId}/report
 	GetTalkSessionReport(ctx context.Context, params GetTalkSessionReportParams) (GetTalkSessionReportRes, error)

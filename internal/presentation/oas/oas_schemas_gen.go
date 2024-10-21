@@ -925,6 +925,312 @@ func (s *GetOpinionDetailOKUser) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
 
+type GetOpinionsForTalkSessionBadRequest struct{}
+
+func (*GetOpinionsForTalkSessionBadRequest) getOpinionsForTalkSessionRes() {}
+
+type GetOpinionsForTalkSessionInternalServerError struct{}
+
+func (*GetOpinionsForTalkSessionInternalServerError) getOpinionsForTalkSessionRes() {}
+
+type GetOpinionsForTalkSessionOK struct {
+	Opinions   []GetOpinionsForTalkSessionOKOpinionsItem `json:"opinions"`
+	Pagination GetOpinionsForTalkSessionOKPagination     `json:"pagination"`
+}
+
+// GetOpinions returns the value of Opinions.
+func (s *GetOpinionsForTalkSessionOK) GetOpinions() []GetOpinionsForTalkSessionOKOpinionsItem {
+	return s.Opinions
+}
+
+// GetPagination returns the value of Pagination.
+func (s *GetOpinionsForTalkSessionOK) GetPagination() GetOpinionsForTalkSessionOKPagination {
+	return s.Pagination
+}
+
+// SetOpinions sets the value of Opinions.
+func (s *GetOpinionsForTalkSessionOK) SetOpinions(val []GetOpinionsForTalkSessionOKOpinionsItem) {
+	s.Opinions = val
+}
+
+// SetPagination sets the value of Pagination.
+func (s *GetOpinionsForTalkSessionOK) SetPagination(val GetOpinionsForTalkSessionOKPagination) {
+	s.Pagination = val
+}
+
+func (*GetOpinionsForTalkSessionOK) getOpinionsForTalkSessionRes() {}
+
+type GetOpinionsForTalkSessionOKOpinionsItem struct {
+	Opinion GetOpinionsForTalkSessionOKOpinionsItemOpinion `json:"opinion"`
+	// 作成ユーザー.
+	User       GetOpinionsForTalkSessionOKOpinionsItemUser `json:"user"`
+	ReplyCount int                                         `json:"replyCount"`
+}
+
+// GetOpinion returns the value of Opinion.
+func (s *GetOpinionsForTalkSessionOKOpinionsItem) GetOpinion() GetOpinionsForTalkSessionOKOpinionsItemOpinion {
+	return s.Opinion
+}
+
+// GetUser returns the value of User.
+func (s *GetOpinionsForTalkSessionOKOpinionsItem) GetUser() GetOpinionsForTalkSessionOKOpinionsItemUser {
+	return s.User
+}
+
+// GetReplyCount returns the value of ReplyCount.
+func (s *GetOpinionsForTalkSessionOKOpinionsItem) GetReplyCount() int {
+	return s.ReplyCount
+}
+
+// SetOpinion sets the value of Opinion.
+func (s *GetOpinionsForTalkSessionOKOpinionsItem) SetOpinion(val GetOpinionsForTalkSessionOKOpinionsItemOpinion) {
+	s.Opinion = val
+}
+
+// SetUser sets the value of User.
+func (s *GetOpinionsForTalkSessionOKOpinionsItem) SetUser(val GetOpinionsForTalkSessionOKOpinionsItemUser) {
+	s.User = val
+}
+
+// SetReplyCount sets the value of ReplyCount.
+func (s *GetOpinionsForTalkSessionOKOpinionsItem) SetReplyCount(val int) {
+	s.ReplyCount = val
+}
+
+type GetOpinionsForTalkSessionOKOpinionsItemOpinion struct {
+	// 意見ID.
+	ID    string    `json:"id"`
+	Title OptString `json:"title"`
+	// 意見のテキスト.
+	Content string `json:"content"`
+	// 親の意見ID。ルートならば無し.
+	ParentID OptString `json:"parentID"`
+	// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+	VoteType OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType `json:"voteType"`
+	// 画像が返る場合もある.
+	PictureURL OptString `json:"pictureURL"`
+	// 参考文献URL.
+	ReferenceURL OptString `json:"referenceURL"`
+}
+
+// GetID returns the value of ID.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) GetID() string {
+	return s.ID
+}
+
+// GetTitle returns the value of Title.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) GetTitle() OptString {
+	return s.Title
+}
+
+// GetContent returns the value of Content.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) GetContent() string {
+	return s.Content
+}
+
+// GetParentID returns the value of ParentID.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) GetParentID() OptString {
+	return s.ParentID
+}
+
+// GetVoteType returns the value of VoteType.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) GetVoteType() OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType {
+	return s.VoteType
+}
+
+// GetPictureURL returns the value of PictureURL.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) GetPictureURL() OptString {
+	return s.PictureURL
+}
+
+// GetReferenceURL returns the value of ReferenceURL.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) GetReferenceURL() OptString {
+	return s.ReferenceURL
+}
+
+// SetID sets the value of ID.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) SetID(val string) {
+	s.ID = val
+}
+
+// SetTitle sets the value of Title.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) SetTitle(val OptString) {
+	s.Title = val
+}
+
+// SetContent sets the value of Content.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) SetContent(val string) {
+	s.Content = val
+}
+
+// SetParentID sets the value of ParentID.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) SetParentID(val OptString) {
+	s.ParentID = val
+}
+
+// SetVoteType sets the value of VoteType.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) SetVoteType(val OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) {
+	s.VoteType = val
+}
+
+// SetPictureURL sets the value of PictureURL.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) SetPictureURL(val OptString) {
+	s.PictureURL = val
+}
+
+// SetReferenceURL sets the value of ReferenceURL.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) SetReferenceURL(val OptString) {
+	s.ReferenceURL = val
+}
+
+// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+type GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType string
+
+const (
+	GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeAgree    GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType = "agree"
+	GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeDisagree GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType = "disagree"
+	GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypePass     GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType = "pass"
+)
+
+// AllValues returns all GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType values.
+func (GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) AllValues() []GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType {
+	return []GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType{
+		GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeAgree,
+		GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeDisagree,
+		GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypePass,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) MarshalText() ([]byte, error) {
+	switch s {
+	case GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeAgree:
+		return []byte(s), nil
+	case GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeDisagree:
+		return []byte(s), nil
+	case GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypePass:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) UnmarshalText(data []byte) error {
+	switch GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType(data) {
+	case GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeAgree:
+		*s = GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeAgree
+		return nil
+	case GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeDisagree:
+		*s = GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeDisagree
+		return nil
+	case GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypePass:
+		*s = GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypePass
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// 作成ユーザー.
+type GetOpinionsForTalkSessionOKOpinionsItemUser struct {
+	DisplayID   string       `json:"displayID"`
+	DisplayName string       `json:"displayName"`
+	IconURL     OptNilString `json:"iconURL"`
+}
+
+// GetDisplayID returns the value of DisplayID.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemUser) GetDisplayID() string {
+	return s.DisplayID
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemUser) GetDisplayName() string {
+	return s.DisplayName
+}
+
+// GetIconURL returns the value of IconURL.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemUser) GetIconURL() OptNilString {
+	return s.IconURL
+}
+
+// SetDisplayID sets the value of DisplayID.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemUser) SetDisplayID(val string) {
+	s.DisplayID = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemUser) SetDisplayName(val string) {
+	s.DisplayName = val
+}
+
+// SetIconURL sets the value of IconURL.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemUser) SetIconURL(val OptNilString) {
+	s.IconURL = val
+}
+
+type GetOpinionsForTalkSessionOKPagination struct {
+	TotalCount int `json:"totalCount"`
+}
+
+// GetTotalCount returns the value of TotalCount.
+func (s *GetOpinionsForTalkSessionOKPagination) GetTotalCount() int {
+	return s.TotalCount
+}
+
+// SetTotalCount sets the value of TotalCount.
+func (s *GetOpinionsForTalkSessionOKPagination) SetTotalCount(val int) {
+	s.TotalCount = val
+}
+
+type GetOpinionsForTalkSessionSort string
+
+const (
+	GetOpinionsForTalkSessionSortLatest    GetOpinionsForTalkSessionSort = "latest"
+	GetOpinionsForTalkSessionSortMostReply GetOpinionsForTalkSessionSort = "mostReply"
+	GetOpinionsForTalkSessionSortOldest    GetOpinionsForTalkSessionSort = "oldest"
+)
+
+// AllValues returns all GetOpinionsForTalkSessionSort values.
+func (GetOpinionsForTalkSessionSort) AllValues() []GetOpinionsForTalkSessionSort {
+	return []GetOpinionsForTalkSessionSort{
+		GetOpinionsForTalkSessionSortLatest,
+		GetOpinionsForTalkSessionSortMostReply,
+		GetOpinionsForTalkSessionSortOldest,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s GetOpinionsForTalkSessionSort) MarshalText() ([]byte, error) {
+	switch s {
+	case GetOpinionsForTalkSessionSortLatest:
+		return []byte(s), nil
+	case GetOpinionsForTalkSessionSortMostReply:
+		return []byte(s), nil
+	case GetOpinionsForTalkSessionSortOldest:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *GetOpinionsForTalkSessionSort) UnmarshalText(data []byte) error {
+	switch GetOpinionsForTalkSessionSort(data) {
+	case GetOpinionsForTalkSessionSortLatest:
+		*s = GetOpinionsForTalkSessionSortLatest
+		return nil
+	case GetOpinionsForTalkSessionSortMostReply:
+		*s = GetOpinionsForTalkSessionSortMostReply
+		return nil
+	case GetOpinionsForTalkSessionSortOldest:
+		*s = GetOpinionsForTalkSessionSortOldest
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
 type GetTalkSessionDetailBadRequest struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
@@ -2752,7 +3058,8 @@ type OpinionsHistoryInternalServerError struct{}
 func (*OpinionsHistoryInternalServerError) opinionsHistoryRes() {}
 
 type OpinionsHistoryOK struct {
-	Opinions []OpinionsHistoryOKOpinionsItem `json:"opinions"`
+	Opinions   []OpinionsHistoryOKOpinionsItem `json:"opinions"`
+	Pagination OpinionsHistoryOKPagination     `json:"pagination"`
 }
 
 // GetOpinions returns the value of Opinions.
@@ -2760,9 +3067,19 @@ func (s *OpinionsHistoryOK) GetOpinions() []OpinionsHistoryOKOpinionsItem {
 	return s.Opinions
 }
 
+// GetPagination returns the value of Pagination.
+func (s *OpinionsHistoryOK) GetPagination() OpinionsHistoryOKPagination {
+	return s.Pagination
+}
+
 // SetOpinions sets the value of Opinions.
 func (s *OpinionsHistoryOK) SetOpinions(val []OpinionsHistoryOKOpinionsItem) {
 	s.Opinions = val
+}
+
+// SetPagination sets the value of Pagination.
+func (s *OpinionsHistoryOK) SetPagination(val OpinionsHistoryOKPagination) {
+	s.Pagination = val
 }
 
 func (*OpinionsHistoryOK) opinionsHistoryRes() {}
@@ -2974,6 +3291,20 @@ func (s *OpinionsHistoryOKOpinionsItemUser) SetDisplayName(val string) {
 // SetIconURL sets the value of IconURL.
 func (s *OpinionsHistoryOKOpinionsItemUser) SetIconURL(val OptNilString) {
 	s.IconURL = val
+}
+
+type OpinionsHistoryOKPagination struct {
+	TotalCount int `json:"totalCount"`
+}
+
+// GetTotalCount returns the value of TotalCount.
+func (s *OpinionsHistoryOKPagination) GetTotalCount() int {
+	return s.TotalCount
+}
+
+// SetTotalCount sets the value of TotalCount.
+func (s *OpinionsHistoryOKPagination) SetTotalCount(val int) {
+	s.TotalCount = val
 }
 
 type OpinionsHistorySort string
@@ -3248,6 +3579,52 @@ func (o OptGetOpinionDetailOKOpinionVoteType) Get() (v GetOpinionDetailOKOpinion
 
 // Or returns value if set, or given parameter if does not.
 func (o OptGetOpinionDetailOKOpinionVoteType) Or(d GetOpinionDetailOKOpinionVoteType) GetOpinionDetailOKOpinionVoteType {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType returns new OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType with value set to v.
+func NewOptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType(v GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType {
+	return OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType is optional GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType.
+type OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType struct {
+	Value GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType
+	Set   bool
+}
+
+// IsSet returns true if OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType was set.
+func (o OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) Reset() {
+	var v GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) SetTo(v GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) Get() (v GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) Or(d GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -3684,6 +4061,69 @@ func (o OptNilFloat64) Get() (v float64, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilFloat64) Or(d float64) float64 {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilGetOpinionsForTalkSessionSort returns new OptNilGetOpinionsForTalkSessionSort with value set to v.
+func NewOptNilGetOpinionsForTalkSessionSort(v GetOpinionsForTalkSessionSort) OptNilGetOpinionsForTalkSessionSort {
+	return OptNilGetOpinionsForTalkSessionSort{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilGetOpinionsForTalkSessionSort is optional nullable GetOpinionsForTalkSessionSort.
+type OptNilGetOpinionsForTalkSessionSort struct {
+	Value GetOpinionsForTalkSessionSort
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilGetOpinionsForTalkSessionSort was set.
+func (o OptNilGetOpinionsForTalkSessionSort) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilGetOpinionsForTalkSessionSort) Reset() {
+	var v GetOpinionsForTalkSessionSort
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilGetOpinionsForTalkSessionSort) SetTo(v GetOpinionsForTalkSessionSort) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilGetOpinionsForTalkSessionSort) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilGetOpinionsForTalkSessionSort) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v GetOpinionsForTalkSessionSort
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilGetOpinionsForTalkSessionSort) Get() (v GetOpinionsForTalkSessionSort, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilGetOpinionsForTalkSessionSort) Or(d GetOpinionsForTalkSessionSort) GetOpinionsForTalkSessionSort {
 	if v, ok := o.Get(); ok {
 		return v
 	}

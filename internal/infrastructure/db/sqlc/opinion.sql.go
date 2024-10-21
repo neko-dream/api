@@ -13,6 +13,40 @@ import (
 	"github.com/google/uuid"
 )
 
+const countOpinions = `-- name: CountOpinions :one
+SELECT
+    COUNT(opinions.*) AS opinion_count
+FROM opinions
+WHERE
+    CASE
+        WHEN $1::uuid IS NOT NULL THEN opinions.user_id = $1
+        ELSE TRUE
+    END
+    AND
+    CASE
+        WHEN $2::uuid IS NOT NULL THEN opinions.talk_session_id = $2
+        ELSE TRUE
+    END
+    AND
+    CASE
+        WHEN $3::uuid IS NOT NULL THEN opinions.parent_opinion_id = $3
+        ELSE TRUE
+    END
+`
+
+type CountOpinionsParams struct {
+	UserID          uuid.NullUUID
+	TalkSessionID   uuid.NullUUID
+	ParentOpinionID uuid.NullUUID
+}
+
+func (q *Queries) CountOpinions(ctx context.Context, arg CountOpinionsParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countOpinions, arg.UserID, arg.TalkSessionID, arg.ParentOpinionID)
+	var opinion_count int64
+	err := row.Scan(&opinion_count)
+	return opinion_count, err
+}
+
 const createOpinion = `-- name: CreateOpinion :exec
 INSERT INTO opinions (
     opinion_id,
@@ -226,6 +260,114 @@ func (q *Queries) GetOpinionReplies(ctx context.Context, arg GetOpinionRepliesPa
 	return items, nil
 }
 
+const getOpinionsByTalkSessionID = `-- name: GetOpinionsByTalkSessionID :many
+SELECT
+    opinions.opinion_id,
+    opinions.talk_session_id,
+    opinions.user_id,
+    opinions.parent_opinion_id,
+    opinions.title,
+    opinions.content,
+    opinions.reference_url,
+    opinions.picture_url,
+    opinions.created_at,
+    users.display_name AS display_name,
+    users.display_id AS display_id,
+    users.icon_url AS icon_url,
+    COALESCE(pv.vote_type, 0) AS vote_type,
+    -- 意見に対するリプライ数（再帰）
+    COALESCE(rc.reply_count, 0) AS reply_count
+FROM opinions
+LEFT JOIN users
+    ON opinions.user_id = users.user_id
+LEFT JOIN (
+    SELECT votes.vote_type, votes.user_id, votes.opinion_id
+    FROM votes
+) pv ON opinions.parent_opinion_id = pv.opinion_id
+    AND opinions.user_id = pv.user_id
+LEFT JOIN (
+    SELECT COUNT(opinion_id) AS reply_count, parent_opinion_id
+    FROM opinions
+    GROUP BY parent_opinion_id
+) rc ON opinions.opinion_id = rc.parent_opinion_id
+WHERE opinions.talk_session_id = $1
+ORDER BY
+    CASE
+        WHEN $4::text = 'latest' THEN opinions.created_at
+        WHEN $4::text = 'oldest' THEN opinions.created_at * -1
+        WHEN $4::text = 'mostReply' THEN reply_count
+    END ASC
+LIMIT $2 OFFSET $3
+`
+
+type GetOpinionsByTalkSessionIDParams struct {
+	TalkSessionID uuid.UUID
+	Limit         int32
+	Offset        int32
+	SortKey       sql.NullString
+}
+
+type GetOpinionsByTalkSessionIDRow struct {
+	OpinionID       uuid.UUID
+	TalkSessionID   uuid.UUID
+	UserID          uuid.UUID
+	ParentOpinionID uuid.NullUUID
+	Title           sql.NullString
+	Content         string
+	ReferenceUrl    sql.NullString
+	PictureUrl      sql.NullString
+	CreatedAt       time.Time
+	DisplayName     sql.NullString
+	DisplayID       sql.NullString
+	IconUrl         sql.NullString
+	VoteType        int16
+	ReplyCount      int64
+}
+
+// latest, mostReply, oldestでソート
+func (q *Queries) GetOpinionsByTalkSessionID(ctx context.Context, arg GetOpinionsByTalkSessionIDParams) ([]GetOpinionsByTalkSessionIDRow, error) {
+	rows, err := q.db.QueryContext(ctx, getOpinionsByTalkSessionID,
+		arg.TalkSessionID,
+		arg.Limit,
+		arg.Offset,
+		arg.SortKey,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetOpinionsByTalkSessionIDRow
+	for rows.Next() {
+		var i GetOpinionsByTalkSessionIDRow
+		if err := rows.Scan(
+			&i.OpinionID,
+			&i.TalkSessionID,
+			&i.UserID,
+			&i.ParentOpinionID,
+			&i.Title,
+			&i.Content,
+			&i.ReferenceUrl,
+			&i.PictureUrl,
+			&i.CreatedAt,
+			&i.DisplayName,
+			&i.DisplayID,
+			&i.IconUrl,
+			&i.VoteType,
+			&i.ReplyCount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getOpinionsByUserID = `-- name: GetOpinionsByUserID :many
 SELECT
     opinions.opinion_id,
@@ -259,14 +401,17 @@ LEFT JOIN (
 WHERE opinions.user_id = $1
 ORDER BY
     CASE
-        WHEN $2::text = 'latest' THEN opinions.created_at
-        WHEN $2::text = 'oldest' THEN opinions.created_at * -1
-        WHEN $2::text = 'mostReply' THEN reply_count
+        WHEN $4::text = 'latest' THEN opinions.created_at
+        WHEN $4::text = 'oldest' THEN opinions.created_at * -1
+        WHEN $4::text = 'mostReply' THEN reply_count
     END ASC
+LIMIT $2 OFFSET $3
 `
 
 type GetOpinionsByUserIDParams struct {
 	UserID  uuid.UUID
+	Limit   int32
+	Offset  int32
 	SortKey sql.NullString
 }
 
@@ -289,7 +434,12 @@ type GetOpinionsByUserIDRow struct {
 
 // latest, mostReply, oldestでソート
 func (q *Queries) GetOpinionsByUserID(ctx context.Context, arg GetOpinionsByUserIDParams) ([]GetOpinionsByUserIDRow, error) {
-	rows, err := q.db.QueryContext(ctx, getOpinionsByUserID, arg.UserID, arg.SortKey)
+	rows, err := q.db.QueryContext(ctx, getOpinionsByUserID,
+		arg.UserID,
+		arg.Limit,
+		arg.Offset,
+		arg.SortKey,
+	)
 	if err != nil {
 		return nil, err
 	}

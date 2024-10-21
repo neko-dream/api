@@ -24,7 +24,7 @@ func (UnimplementedHandler) Authorize(ctx context.Context, params AuthorizeParam
 
 // CreateTalkSession implements createTalkSession operation.
 //
-// トークセッション作成.
+// セッション作成.
 //
 // POST /talksessions
 func (UnimplementedHandler) CreateTalkSession(ctx context.Context, req OptCreateTalkSessionReq) (r CreateTalkSessionRes, _ error) {
@@ -49,6 +49,15 @@ func (UnimplementedHandler) GetOpinionDetail(ctx context.Context, params GetOpin
 	return r, ht.ErrNotImplemented
 }
 
+// GetOpinionsForTalkSession implements getOpinionsForTalkSession operation.
+//
+// セッションに対する意見一覧.
+//
+// GET /talksessions/{talkSessionID}/opinions
+func (UnimplementedHandler) GetOpinionsForTalkSession(ctx context.Context, params GetOpinionsForTalkSessionParams) (r GetOpinionsForTalkSessionRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetTalkSessionDetail implements getTalkSessionDetail operation.
 //
 // トークセッションの詳細.
@@ -60,7 +69,7 @@ func (UnimplementedHandler) GetTalkSessionDetail(ctx context.Context, params Get
 
 // GetTalkSessionList implements getTalkSessionList operation.
 //
-// トークセッションコレクション.
+// セッション一覧.
 //
 // GET /talksessions
 func (UnimplementedHandler) GetTalkSessionList(ctx context.Context, params GetTalkSessionListParams) (r GetTalkSessionListRes, _ error) {
@@ -69,7 +78,7 @@ func (UnimplementedHandler) GetTalkSessionList(ctx context.Context, params GetTa
 
 // GetTalkSessionReport implements getTalkSessionReport operation.
 //
-// 🚧 トークセッションレポートを返す.
+// 🚧 セッションレポートを返す.
 //
 // GET /talksessions/{talkSessionId}/report
 func (UnimplementedHandler) GetTalkSessionReport(ctx context.Context, params GetTalkSessionReportParams) (r GetTalkSessionReportRes, _ error) {
@@ -114,7 +123,7 @@ func (UnimplementedHandler) OAuthTokenInfo(ctx context.Context) (r OAuthTokenInf
 
 // OpinionComments implements opinionComments operation.
 //
-// 意見に対するコメント一覧を返す.
+// 意見に対するリプライ意見一覧.
 //
 // GET /talksessions/{talkSessionID}/opinions/{opinionID}/replies
 func (UnimplementedHandler) OpinionComments(ctx context.Context, params OpinionCommentsParams) (r OpinionCommentsRes, _ error) {

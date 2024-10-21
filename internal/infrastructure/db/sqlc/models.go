@@ -30,6 +30,9 @@ type RepresentativeOpinion struct {
 	Rank          int32
 	UpdatedAt     time.Time
 	CreatedAt     time.Time
+	AgreeCount    int32
+	DisagreeCount int32
+	PassCount     int32
 }
 
 type Session struct {

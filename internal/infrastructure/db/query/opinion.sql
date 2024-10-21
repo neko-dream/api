@@ -171,4 +171,67 @@ ORDER BY
         WHEN sqlc.narg('sort_key')::text = 'oldest' THEN opinions.created_at * -1
         WHEN sqlc.narg('sort_key')::text = 'mostReply' THEN reply_count
     END ASC
+LIMIT $2 OFFSET $3
+;
+
+
+-- name: GetOpinionsByTalkSessionID :many
+SELECT
+    opinions.opinion_id,
+    opinions.talk_session_id,
+    opinions.user_id,
+    opinions.parent_opinion_id,
+    opinions.title,
+    opinions.content,
+    opinions.reference_url,
+    opinions.picture_url,
+    opinions.created_at,
+    users.display_name AS display_name,
+    users.display_id AS display_id,
+    users.icon_url AS icon_url,
+    COALESCE(pv.vote_type, 0) AS vote_type,
+    -- 意見に対するリプライ数（再帰）
+    COALESCE(rc.reply_count, 0) AS reply_count
+FROM opinions
+LEFT JOIN users
+    ON opinions.user_id = users.user_id
+LEFT JOIN (
+    SELECT votes.vote_type, votes.user_id, votes.opinion_id
+    FROM votes
+) pv ON opinions.parent_opinion_id = pv.opinion_id
+    AND opinions.user_id = pv.user_id
+LEFT JOIN (
+    SELECT COUNT(opinion_id) AS reply_count, parent_opinion_id
+    FROM opinions
+    GROUP BY parent_opinion_id
+) rc ON opinions.opinion_id = rc.parent_opinion_id
+WHERE opinions.talk_session_id = $1
+-- latest, mostReply, oldestでソート
+ORDER BY
+    CASE
+        WHEN sqlc.narg('sort_key')::text = 'latest' THEN opinions.created_at
+        WHEN sqlc.narg('sort_key')::text = 'oldest' THEN opinions.created_at * -1
+        WHEN sqlc.narg('sort_key')::text = 'mostReply' THEN reply_count
+    END ASC
+LIMIT $2 OFFSET $3;
+
+-- name: CountOpinions :one
+SELECT
+    COUNT(opinions.*) AS opinion_count
+FROM opinions
+WHERE
+    CASE
+        WHEN sqlc.narg('user_id')::uuid IS NOT NULL THEN opinions.user_id = sqlc.narg('user_id')
+        ELSE TRUE
+    END
+    AND
+    CASE
+        WHEN sqlc.narg('talk_session_id')::uuid IS NOT NULL THEN opinions.talk_session_id = sqlc.narg('talk_session_id')
+        ELSE TRUE
+    END
+    AND
+    CASE
+        WHEN sqlc.narg('parent_opinion_id')::uuid IS NOT NULL THEN opinions.parent_opinion_id = sqlc.narg('parent_opinion_id')
+        ELSE TRUE
+    END
 ;

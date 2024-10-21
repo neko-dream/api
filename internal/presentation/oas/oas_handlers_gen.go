@@ -138,7 +138,7 @@ func (s *Server) handleAuthorizeRequest(args [1]string, argsEscaped bool, w http
 
 // handleCreateTalkSessionRequest handles createTalkSession operation.
 //
-// トークセッション作成.
+// セッション作成.
 //
 // POST /talksessions
 func (s *Server) handleCreateTalkSessionRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
@@ -249,7 +249,7 @@ func (s *Server) handleCreateTalkSessionRequest(args [0]string, argsEscaped bool
 		mreq := middleware.Request{
 			Context:          ctx,
 			OperationName:    "CreateTalkSession",
-			OperationSummary: "トークセッション作成",
+			OperationSummary: "セッション作成",
 			OperationID:      "createTalkSession",
 			Body:             request,
 			Params:           middleware.Parameters{},
@@ -564,6 +564,130 @@ func (s *Server) handleGetOpinionDetailRequest(args [2]string, argsEscaped bool,
 	}
 }
 
+// handleGetOpinionsForTalkSessionRequest handles getOpinionsForTalkSession operation.
+//
+// セッションに対する意見一覧.
+//
+// GET /talksessions/{talkSessionID}/opinions
+func (s *Server) handleGetOpinionsForTalkSessionRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("getOpinionsForTalkSession"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/opinions"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "GetOpinionsForTalkSession",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Add Labeler to context.
+	labeler := &Labeler{attrs: otelAttrs}
+	ctx = contextWithLabeler(ctx, labeler)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
+
+		// Increment request counter.
+		s.requests.Add(ctx, 1, attrOpt)
+
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
+	}()
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "GetOpinionsForTalkSession",
+			ID:   "getOpinionsForTalkSession",
+		}
+	)
+	params, err := decodeGetOpinionsForTalkSessionParams(args, argsEscaped, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		defer recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	var response GetOpinionsForTalkSessionRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:          ctx,
+			OperationName:    "GetOpinionsForTalkSession",
+			OperationSummary: "セッションに対する意見一覧",
+			OperationID:      "getOpinionsForTalkSession",
+			Body:             nil,
+			Params: middleware.Parameters{
+				{
+					Name: "talkSessionID",
+					In:   "path",
+				}: params.TalkSessionID,
+				{
+					Name: "sort",
+					In:   "query",
+				}: params.Sort,
+				{
+					Name: "limit",
+					In:   "query",
+				}: params.Limit,
+				{
+					Name: "offset",
+					In:   "query",
+				}: params.Offset,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = struct{}
+			Params   = GetOpinionsForTalkSessionParams
+			Response = GetOpinionsForTalkSessionRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackGetOpinionsForTalkSessionParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.GetOpinionsForTalkSession(ctx, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.GetOpinionsForTalkSession(ctx, params)
+	}
+	if err != nil {
+		defer recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeGetOpinionsForTalkSessionResponse(response, w, span); err != nil {
+		defer recordError("EncodeResponse", err)
+		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+		}
+		return
+	}
+}
+
 // handleGetTalkSessionDetailRequest handles getTalkSessionDetail operation.
 //
 // トークセッションの詳細.
@@ -678,7 +802,7 @@ func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped b
 
 // handleGetTalkSessionListRequest handles getTalkSessionList operation.
 //
-// トークセッションコレクション.
+// セッション一覧.
 //
 // GET /talksessions
 func (s *Server) handleGetTalkSessionListRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
@@ -740,7 +864,7 @@ func (s *Server) handleGetTalkSessionListRequest(args [0]string, argsEscaped boo
 		mreq := middleware.Request{
 			Context:          ctx,
 			OperationName:    "GetTalkSessionList",
-			OperationSummary: "トークセッションコレクション",
+			OperationSummary: "セッション一覧",
 			OperationID:      "getTalkSessionList",
 			Body:             nil,
 			Params: middleware.Parameters{
@@ -802,7 +926,7 @@ func (s *Server) handleGetTalkSessionListRequest(args [0]string, argsEscaped boo
 
 // handleGetTalkSessionReportRequest handles getTalkSessionReport operation.
 //
-// 🚧 トークセッションレポートを返す.
+// 🚧 セッションレポートを返す.
 //
 // GET /talksessions/{talkSessionId}/report
 func (s *Server) handleGetTalkSessionReportRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
@@ -864,7 +988,7 @@ func (s *Server) handleGetTalkSessionReportRequest(args [1]string, argsEscaped b
 		mreq := middleware.Request{
 			Context:          ctx,
 			OperationName:    "GetTalkSessionReport",
-			OperationSummary: "🚧 トークセッションレポートを返す",
+			OperationSummary: "🚧 セッションレポートを返す",
 			OperationID:      "getTalkSessionReport",
 			Body:             nil,
 			Params: middleware.Parameters{
@@ -1465,7 +1589,7 @@ func (s *Server) handleOAuthTokenInfoRequest(args [0]string, argsEscaped bool, w
 
 // handleOpinionCommentsRequest handles opinionComments operation.
 //
-// 意見に対するコメント一覧を返す.
+// 意見に対するリプライ意見一覧.
 //
 // GET /talksessions/{talkSessionID}/opinions/{opinionID}/replies
 func (s *Server) handleOpinionCommentsRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
@@ -1527,7 +1651,7 @@ func (s *Server) handleOpinionCommentsRequest(args [2]string, argsEscaped bool, 
 		mreq := middleware.Request{
 			Context:          ctx,
 			OperationName:    "OpinionComments",
-			OperationSummary: "意見に対するコメント一覧を返す",
+			OperationSummary: "意見に対するリプライ意見一覧",
 			OperationID:      "opinionComments",
 			Body:             nil,
 			Params: middleware.Parameters{
@@ -1695,6 +1819,14 @@ func (s *Server) handleOpinionsHistoryRequest(args [0]string, argsEscaped bool, 
 					Name: "sort",
 					In:   "query",
 				}: params.Sort,
+				{
+					Name: "limit",
+					In:   "query",
+				}: params.Limit,
+				{
+					Name: "offset",
+					In:   "query",
+				}: params.Offset,
 			},
 			Raw: r,
 		}
