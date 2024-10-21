@@ -13,16 +13,16 @@ type GetOpinionDetailRes interface {
 	getOpinionDetailRes()
 }
 
-type GetTalkSEssionReportRes interface {
-	getTalkSEssionReportRes()
-}
-
 type GetTalkSessionDetailRes interface {
 	getTalkSessionDetailRes()
 }
 
 type GetTalkSessionListRes interface {
 	getTalkSessionListRes()
+}
+
+type GetTalkSessionReportRes interface {
+	getTalkSessionReportRes()
 }
 
 type GetUserInfoRes interface {

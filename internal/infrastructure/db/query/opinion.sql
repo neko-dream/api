@@ -115,10 +115,10 @@ LEFT JOIN (
 ) vote_count ON opinions.opinion_id = vote_count.opinion_id
 -- 意見に対するリプライ数
 LEFT JOIN (
-    SELECT COUNT(opinion_id) AS reply_count, parent_opinion_id
+    SELECT COUNT(opinion_id) AS reply_count, parent_opinion_id as opinion_id
     FROM opinions
     GROUP BY parent_opinion_id
-) rc ON opinions.opinion_id = rc.vote_count.opinion_id
+) rc ON opinions.opinion_id = rc.opinion_id
 -- グループ内のランクを取得
 LEFT JOIN (
     SELECT rank, opinion_id

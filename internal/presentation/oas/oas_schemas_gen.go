@@ -925,14 +925,6 @@ func (s *GetOpinionDetailOKUser) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
 
-type GetTalkSEssionReportInternalServerError struct{}
-
-func (*GetTalkSEssionReportInternalServerError) getTalkSEssionReportRes() {}
-
-type GetTalkSEssionReportOK struct{}
-
-func (*GetTalkSEssionReportOK) getTalkSEssionReportRes() {}
-
 type GetTalkSessionDetailBadRequest struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
@@ -1608,6 +1600,14 @@ func (s *GetTalkSessionListStatus) UnmarshalText(data []byte) error {
 		return errors.Errorf("invalid value: %q", data)
 	}
 }
+
+type GetTalkSessionReportInternalServerError struct{}
+
+func (*GetTalkSessionReportInternalServerError) getTalkSessionReportRes() {}
+
+type GetTalkSessionReportOK struct{}
+
+func (*GetTalkSessionReportOK) getTalkSessionReportRes() {}
 
 type GetUserInfoInternalServerError struct{}
 

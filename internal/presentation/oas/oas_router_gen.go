@@ -471,7 +471,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									// Leaf node.
 									switch r.Method {
 									case "GET":
-										s.handleGetTalkSEssionReportRequest([1]string{
+										s.handleGetTalkSessionReportRequest([1]string{
 											args[0],
 										}, elemIsEscaped, w, r)
 									default:
@@ -1107,9 +1107,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									// Leaf node.
 									switch method {
 									case "GET":
-										r.name = "GetTalkSEssionReport"
+										r.name = "GetTalkSessionReport"
 										r.summary = "🚧 トークセッションレポートを返す"
-										r.operationID = "getTalkSEssionReport"
+										r.operationID = "getTalkSessionReport"
 										r.pathPattern = "/talksessions/{talkSessionId}/report"
 										r.args = args
 										r.count = 1

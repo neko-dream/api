@@ -23,6 +23,11 @@ type talkSessionHandler struct {
 	getAnalysisResultUseCase  analysis_usecase.GetAnalysisResultUseCase
 }
 
+// GetTalkSessionReport implements oas.TalkSessionHandler.
+func (t *talkSessionHandler) GetTalkSessionReport(ctx context.Context, params oas.GetTalkSessionReportParams) (oas.GetTalkSessionReportRes, error) {
+	panic("unimplemented")
+}
+
 func NewTalkSessionHandler(
 	createTalkSessionUsecase talk_session_usecase.CreateTalkSessionUseCase,
 	listTalkSessionQuery talk_session_usecase.ListTalkSessionQuery,

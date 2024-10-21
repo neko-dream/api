@@ -2330,7 +2330,7 @@ paths:
       summary: 🚧 トークセッションレポートを返す
       deprecated: false
       description: ''
-      operationId: getTalkSEssionReport
+      operationId: getTalkSessionReport
       tags:
         - talk_session
         - talk_session

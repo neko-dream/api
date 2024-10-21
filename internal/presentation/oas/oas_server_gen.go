@@ -86,12 +86,6 @@ type TalkSessionHandler interface {
 	//
 	// POST /talksessions
 	CreateTalkSession(ctx context.Context, req OptCreateTalkSessionReq) (CreateTalkSessionRes, error)
-	// GetTalkSEssionReport implements getTalkSEssionReport operation.
-	//
-	// 🚧 トークセッションレポートを返す.
-	//
-	// GET /talksessions/{talkSessionId}/report
-	GetTalkSEssionReport(ctx context.Context, params GetTalkSEssionReportParams) (GetTalkSEssionReportRes, error)
 	// GetTalkSessionDetail implements getTalkSessionDetail operation.
 	//
 	// トークセッションの詳細.
@@ -104,6 +98,12 @@ type TalkSessionHandler interface {
 	//
 	// GET /talksessions
 	GetTalkSessionList(ctx context.Context, params GetTalkSessionListParams) (GetTalkSessionListRes, error)
+	// GetTalkSessionReport implements getTalkSessionReport operation.
+	//
+	// 🚧 トークセッションレポートを返す.
+	//
+	// GET /talksessions/{talkSessionId}/report
+	GetTalkSessionReport(ctx context.Context, params GetTalkSessionReportParams) (GetTalkSessionReportRes, error)
 	// TalkSessionAnalysis implements talkSessionAnalysis operation.
 	//
 	// 分析結果一覧.
