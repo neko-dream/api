@@ -46,7 +46,7 @@ WHERE opinions.opinion_id = $1;
 
 -- name: GetOpinionReplies :many
 SELECT
-    opinions.opinion_id,
+    DISTINCT opinions.opinion_id,
     opinions.talk_session_id,
     opinions.user_id,
     opinions.parent_opinion_id,
@@ -73,9 +73,10 @@ LEFT JOIN (
 LEFT JOIN (
     SELECT votes.vote_type, votes.user_id, votes.opinion_id
     FROM votes
-) cv ON opinions.user_id = COALESCE(sqlc.narg('user_id'), opinions.user_id)
+) cv ON opinions.user_id = sqlc.narg('user_id')::uuid
     AND opinions.opinion_id = cv.opinion_id
-WHERE opinions.parent_opinion_id = $1;
+WHERE opinions.parent_opinion_id = $1
+GROUP BY opinions.opinion_id, users.display_name, users.display_id, users.icon_url, pv.vote_type, cv.vote_type;
 
 -- name: GetRandomOpinions :many
 SELECT
