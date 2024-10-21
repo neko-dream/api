@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/google/uuid"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/db"
@@ -87,7 +88,7 @@ func (h *getUserOpinionListQueryHandler) Execute(ctx context.Context, q GetUserO
 	}
 
 	count, err := h.GetQueries(ctx).CountOpinions(ctx, model.CountOpinionsParams{
-		UserID: sql.NullString{String: q.UserID.UUID().String(), Valid: true},
+		UserID: uuid.NullUUID{UUID: q.UserID.UUID(), Valid: true},
 	})
 	if err != nil {
 		return nil, err
