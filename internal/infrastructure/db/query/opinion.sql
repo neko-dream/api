@@ -129,8 +129,10 @@ LEFT JOIN (
 WHERE opinions.talk_session_id = $2
     AND vote_count.opinion_id = opinions.opinion_id
 ORDER BY
-    COALESCE(ro.rank, 0) DESC,
-    RANDOM()
+    CASE sqlc.narg('sort_key')::text
+        WHEN 'top' THEN COALESCE(ro.rank, 0)
+        ELSE RANDOM()
+    END ASC
 LIMIT $3;
 
 

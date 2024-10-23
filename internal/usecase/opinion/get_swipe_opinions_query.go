@@ -47,17 +47,46 @@ func NewGetSwipeOpinionsQueryHandler(
 }
 
 func (h *getSwipeOpinionsQueryHandler) Execute(ctx context.Context, q GetSwipeOpinionsQuery) (*GetSwipeOpinionsOutput, error) {
-	swipeRow, err := h.GetQueries(ctx).GetRandomOpinions(ctx, model.GetRandomOpinionsParams{
-		UserID:        q.UserID.UUID(),
-		TalkSessionID: q.TalkSessionID.UUID(),
-		Limit:         int32(q.Limit),
-	})
-	if err != nil {
-		return nil, err
+
+	// limitが3以上の場合、2件はtop, 1件はrandomで取得する
+	// 1:2の割合を算出する
+	topLimit := q.Limit / 3
+	randomLimit := q.Limit - topLimit
+	var swipeRows []model.GetRandomOpinionsRow
+	if q.Limit >= 3 {
+		swipeRow, err := h.GetQueries(ctx).GetRandomOpinions(ctx, model.GetRandomOpinionsParams{
+			UserID:        q.UserID.UUID(),
+			TalkSessionID: q.TalkSessionID.UUID(),
+			Limit:         int32(topLimit),
+		})
+		if err != nil {
+			return nil, err
+		}
+		swipeRows = swipeRow
+
+		randomSwipeRow, err := h.GetQueries(ctx).GetRandomOpinions(ctx, model.GetRandomOpinionsParams{
+			UserID:        q.UserID.UUID(),
+			TalkSessionID: q.TalkSessionID.UUID(),
+			Limit:         int32(randomLimit),
+		})
+		if err != nil {
+			return nil, err
+		}
+		swipeRows = append(swipeRows, randomSwipeRow...)
+	} else {
+		swipeRow, err := h.GetQueries(ctx).GetRandomOpinions(ctx, model.GetRandomOpinionsParams{
+			UserID:        q.UserID.UUID(),
+			TalkSessionID: q.TalkSessionID.UUID(),
+			Limit:         int32(q.Limit),
+		})
+		if err != nil {
+			return nil, err
+		}
+		swipeRows = swipeRow
 	}
 
-	opinions := make([]SwipeOpinionDTO, 0, len(swipeRow))
-	for _, row := range swipeRow {
+	opinions := make([]SwipeOpinionDTO, 0, len(swipeRows))
+	for _, row := range swipeRows {
 		opinionDTO := OpinionDTO{
 			OpinionID:       row.OpinionID.String(),
 			TalkSessionID:   row.TalkSessionID.String(),

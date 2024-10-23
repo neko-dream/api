@@ -523,8 +523,10 @@ LEFT JOIN (
 WHERE opinions.talk_session_id = $2
     AND vote_count.opinion_id = opinions.opinion_id
 ORDER BY
-    COALESCE(ro.rank, 0) DESC,
-    RANDOM()
+    CASE $4::text
+        WHEN 'top' THEN COALESCE(ro.rank, 0)
+        ELSE RANDOM()
+    END ASC
 LIMIT $3
 `
 
@@ -532,6 +534,7 @@ type GetRandomOpinionsParams struct {
 	UserID        uuid.UUID
 	TalkSessionID uuid.UUID
 	Limit         int32
+	SortKey       sql.NullString
 }
 
 type GetRandomOpinionsRow struct {
@@ -557,7 +560,12 @@ type GetRandomOpinionsRow struct {
 // グループ内のランクを取得
 // トークセッションに紐づく意見のみを取得
 func (q *Queries) GetRandomOpinions(ctx context.Context, arg GetRandomOpinionsParams) ([]GetRandomOpinionsRow, error) {
-	rows, err := q.db.QueryContext(ctx, getRandomOpinions, arg.UserID, arg.TalkSessionID, arg.Limit)
+	rows, err := q.db.QueryContext(ctx, getRandomOpinions,
+		arg.UserID,
+		arg.TalkSessionID,
+		arg.Limit,
+		arg.SortKey,
+	)
 	if err != nil {
 		return nil, err
 	}
