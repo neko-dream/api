@@ -51,7 +51,7 @@ func (h *getSwipeOpinionsQueryHandler) Execute(ctx context.Context, q GetSwipeOp
 	// limitが3以上の場合、2件はtop, 1件はrandomで取得する
 	// 1:2の割合を算出する
 	topLimit := q.Limit / 3
-	randomLimit := q.Limit - topLimit
+
 	var swipeRows []model.GetRandomOpinionsRow
 	if q.Limit >= 3 {
 		swipeRow, err := h.GetQueries(ctx).GetRandomOpinions(ctx, model.GetRandomOpinionsParams{
@@ -63,7 +63,7 @@ func (h *getSwipeOpinionsQueryHandler) Execute(ctx context.Context, q GetSwipeOp
 			return nil, err
 		}
 		swipeRows = swipeRow
-
+		randomLimit := q.Limit - len(swipeRows)
 		randomSwipeRow, err := h.GetQueries(ctx).GetRandomOpinions(ctx, model.GetRandomOpinionsParams{
 			UserID:        q.UserID.UUID(),
 			TalkSessionID: q.TalkSessionID.UUID(),
