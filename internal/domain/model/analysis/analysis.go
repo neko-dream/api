@@ -11,5 +11,6 @@ import (
 type (
 	AnalysisService interface {
 		StartAnalysis(context.Context, shared.UUID[talksession.TalkSession], shared.UUID[user.User]) error
+		GenerateReport(context.Context, shared.UUID[talksession.TalkSession]) error
 	}
 )

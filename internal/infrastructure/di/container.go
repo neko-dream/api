@@ -70,6 +70,7 @@ func BuildContainer() *dig.Container {
 		{opinion_usecase.NewGetUserOpinionListQueryHandler, nil},
 		{opinion_usecase.NewGetOpinionsByTalkSessionUseCase, nil},
 		{analysis_usecase.NewGetAnalysisResultUseCase, nil},
+		{analysis_usecase.NewGetReportQueryHandler, nil},
 		{vote_usecase.NewPostVoteUseCase, nil},
 		{client.NewAnalysisService, nil},
 		{handler.NewSecurityHandler, nil},

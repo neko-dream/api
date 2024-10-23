@@ -95,6 +95,28 @@ func (q *Queries) GetGroupListByTalkSessionId(ctx context.Context, talkSessionID
 	return items, nil
 }
 
+const getReportByTalkSessionId = `-- name: GetReportByTalkSessionId :one
+SELECT
+    talk_session_id,
+    report,
+    created_at,
+    updated_at
+FROM talk_session_reports
+WHERE talk_session_id = $1
+`
+
+func (q *Queries) GetReportByTalkSessionId(ctx context.Context, talkSessionID uuid.UUID) (TalkSessionReport, error) {
+	row := q.db.QueryRowContext(ctx, getReportByTalkSessionId, talkSessionID)
+	var i TalkSessionReport
+	err := row.Scan(
+		&i.TalkSessionID,
+		&i.Report,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getRepresentativeOpinionsByTalkSessionId = `-- name: GetRepresentativeOpinionsByTalkSessionId :many
 SELECT
     representative_opinions.group_id,

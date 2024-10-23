@@ -24,8 +24,16 @@ type PostPredictsGroupsJSONBody struct {
 	UserId        string `json:"user_id"`
 }
 
+// PostReportsGeneratesJSONBody defines parameters for PostReportsGenerates.
+type PostReportsGeneratesJSONBody struct {
+	TalkSessionId string `json:"talk_session_id"`
+}
+
 // PostPredictsGroupsJSONRequestBody defines body for PostPredictsGroups for application/json ContentType.
 type PostPredictsGroupsJSONRequestBody PostPredictsGroupsJSONBody
+
+// PostReportsGeneratesJSONRequestBody defines body for PostReportsGenerates for application/json ContentType.
+type PostReportsGeneratesJSONRequestBody PostReportsGeneratesJSONBody
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -105,6 +113,11 @@ type ClientInterface interface {
 
 	PostPredictsGroups(ctx context.Context, body PostPredictsGroupsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// PostReportsGeneratesWithBody request with any body
+	PostReportsGeneratesWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostReportsGenerates(ctx context.Context, body PostReportsGeneratesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// GetTest request
 	GetTest(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
@@ -123,6 +136,30 @@ func (c *Client) PostPredictsGroupsWithBody(ctx context.Context, contentType str
 
 func (c *Client) PostPredictsGroups(ctx context.Context, body PostPredictsGroupsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostPredictsGroupsRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostReportsGeneratesWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostReportsGeneratesRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostReportsGenerates(ctx context.Context, body PostReportsGeneratesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostReportsGeneratesRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -166,6 +203,46 @@ func NewPostPredictsGroupsRequestWithBody(server string, contentType string, bod
 	}
 
 	operationPath := fmt.Sprintf("/predicts/groups")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewPostReportsGeneratesRequest calls the generic PostReportsGenerates builder with application/json body
+func NewPostReportsGeneratesRequest(server string, body PostReportsGeneratesJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostReportsGeneratesRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewPostReportsGeneratesRequestWithBody generates requests for PostReportsGenerates with any type of body
+func NewPostReportsGeneratesRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/reports/generates")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -260,6 +337,11 @@ type ClientWithResponsesInterface interface {
 
 	PostPredictsGroupsWithResponse(ctx context.Context, body PostPredictsGroupsJSONRequestBody, reqEditors ...RequestEditorFn) (*PostPredictsGroupsResponse, error)
 
+	// PostReportsGeneratesWithBodyWithResponse request with any body
+	PostReportsGeneratesWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostReportsGeneratesResponse, error)
+
+	PostReportsGeneratesWithResponse(ctx context.Context, body PostReportsGeneratesJSONRequestBody, reqEditors ...RequestEditorFn) (*PostReportsGeneratesResponse, error)
+
 	// GetTestWithResponse request
 	GetTestWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetTestResponse, error)
 }
@@ -280,6 +362,28 @@ func (r PostPredictsGroupsResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r PostPredictsGroupsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostReportsGeneratesResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *map[string]interface{}
+}
+
+// Status returns HTTPResponse.Status
+func (r PostReportsGeneratesResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostReportsGeneratesResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -328,6 +432,23 @@ func (c *ClientWithResponses) PostPredictsGroupsWithResponse(ctx context.Context
 	return ParsePostPredictsGroupsResponse(rsp)
 }
 
+// PostReportsGeneratesWithBodyWithResponse request with arbitrary body returning *PostReportsGeneratesResponse
+func (c *ClientWithResponses) PostReportsGeneratesWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostReportsGeneratesResponse, error) {
+	rsp, err := c.PostReportsGeneratesWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostReportsGeneratesResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostReportsGeneratesWithResponse(ctx context.Context, body PostReportsGeneratesJSONRequestBody, reqEditors ...RequestEditorFn) (*PostReportsGeneratesResponse, error) {
+	rsp, err := c.PostReportsGenerates(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostReportsGeneratesResponse(rsp)
+}
+
 // GetTestWithResponse request returning *GetTestResponse
 func (c *ClientWithResponses) GetTestWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetTestResponse, error) {
 	rsp, err := c.GetTest(ctx, reqEditors...)
@@ -346,6 +467,32 @@ func ParsePostPredictsGroupsResponse(rsp *http.Response) (*PostPredictsGroupsRes
 	}
 
 	response := &PostPredictsGroupsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest map[string]interface{}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostReportsGeneratesResponse parses an HTTP response from a PostReportsGeneratesWithResponse call
+func ParsePostReportsGeneratesResponse(rsp *http.Response) (*PostReportsGeneratesResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostReportsGeneratesResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}

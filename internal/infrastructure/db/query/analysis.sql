@@ -45,3 +45,12 @@ SELECT
     DISTINCT user_group_info.group_id
 FROM user_group_info
 WHERE talk_session_id = $1;
+
+-- name: GetReportByTalkSessionId :one
+SELECT
+    talk_session_id,
+    report,
+    created_at,
+    updated_at
+FROM talk_session_reports
+WHERE talk_session_id = $1;

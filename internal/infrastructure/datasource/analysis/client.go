@@ -24,11 +24,42 @@ func NewAnalysisService(
 	}
 }
 
+// GenerateReport implements analysis.AnalysisService.
+func (a *analysisService) GenerateReport(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession]) error {
+	// カスタムHTTPクライアントを作成
+	httpClient := &http.Client{
+		Transport: &BasicAuthTransport{
+			Username: a.conf.ANALYSIS_USER,
+			Password: a.conf.ANALYSIS_USER_PASSWORD,
+		},
+	}
+
+	// クライアントの初期化
+	c, err := NewClient(a.conf.ANALYSIS_API_DOMAIN, WithHTTPClient(httpClient))
+	if err != nil {
+		utils.HandleError(ctx, err, "NewClient")
+		return err
+	}
+
+	// APIリクエストの実行
+	resp, err := c.PostReportsGenerates(ctx, PostReportsGeneratesJSONRequestBody{
+		TalkSessionId: talkSessionID.String(),
+	})
+	if err != nil {
+		utils.HandleError(ctx, err, "PostReportsGenerates")
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		utils.HandleError(ctx, err, "PostReportsGenerates")
+		return err
+	}
+	panic("unimplemented")
+
+}
+
 // StartAnalysis 会話分析を開始する
 func (a *analysisService) StartAnalysis(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession], userID shared.UUID[user.User]) error {
-	if a.conf.Env == "production" {
-		return nil
-	}
 	// カスタムHTTPクライアントを作成
 	httpClient := &http.Client{
 		Transport: &BasicAuthTransport{

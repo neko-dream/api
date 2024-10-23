@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"bytes"
 	"context"
 
 	"braces.dev/errtrace"
@@ -21,11 +22,7 @@ type talkSessionHandler struct {
 	listTalkSessionQuery      talk_session_usecase.ListTalkSessionQuery
 	getTalkSessionDetailQuery talk_session_usecase.GetTalkSessionDetailUseCase
 	getAnalysisResultUseCase  analysis_usecase.GetAnalysisResultUseCase
-}
-
-// GetTalkSessionReport implements oas.TalkSessionHandler.
-func (t *talkSessionHandler) GetTalkSessionReport(ctx context.Context, params oas.GetTalkSessionReportParams) (oas.GetTalkSessionReportRes, error) {
-	panic("unimplemented")
+	getReportUseCase          analysis_usecase.GetReportQuery
 }
 
 func NewTalkSessionHandler(
@@ -33,13 +30,34 @@ func NewTalkSessionHandler(
 	listTalkSessionQuery talk_session_usecase.ListTalkSessionQuery,
 	getTalkSessionDetailQuery talk_session_usecase.GetTalkSessionDetailUseCase,
 	getAnalysisResultUseCase analysis_usecase.GetAnalysisResultUseCase,
+	getReportUseCase analysis_usecase.GetReportQuery,
 ) oas.TalkSessionHandler {
 	return &talkSessionHandler{
 		createTalkSessionUsecase:  createTalkSessionUsecase,
 		listTalkSessionQuery:      listTalkSessionQuery,
 		getTalkSessionDetailQuery: getTalkSessionDetailQuery,
 		getAnalysisResultUseCase:  getAnalysisResultUseCase,
+		getReportUseCase:          getReportUseCase,
 	}
+}
+
+// GetTalkSessionReport implements oas.TalkSessionHandler.
+func (t *talkSessionHandler) GetTalkSessionReport(ctx context.Context, params oas.GetTalkSessionReportParams) (oas.GetTalkSessionReportRes, error) {
+	out, err := t.getReportUseCase.Execute(ctx, analysis_usecase.GetReportInput{
+		TalkSessionID: shared.MustParseUUID[talksession.TalkSession](params.TalkSessionId),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	res := &oas.GetTalkSessionReportOKHeaders{}
+	buf := make([]byte, len(out.Report))
+	copy(buf, out.Report)
+	dt := &oas.GetTalkSessionReportOK{}
+	dt.Data = bytes.NewBuffer(buf)
+	res.SetResponse(*dt)
+	return res, nil
+
 }
 
 // CreateTalkSession トークセッション作成

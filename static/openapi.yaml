@@ -2515,10 +2515,9 @@ paths:
         '200':
           description: 成功
           content:
-            application/json:
+            '*/*':
               schema:
-                type: object
-                properties: {}
+                type: string
         '500':
           description: ServerErrorResponse
           content:
@@ -2704,6 +2703,17 @@ paths:
       x-ogen-operation-group: Auth
 components:
   schemas:
+    Report:
+      type: object
+      properties:
+        talkSessionID:
+          type: string
+        content:
+          type: string
+          description: レポート本文
+      required:
+        - talkSessionID
+        - content
     userGroupPosition:
       type: object
       properties:
