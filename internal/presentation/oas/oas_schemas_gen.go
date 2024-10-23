@@ -369,6 +369,18 @@ func (s *CreateTalkSessionReq) SetPrefecture(val OptNilString) {
 	s.Prefecture = val
 }
 
+type DummiInitBadRequest struct{}
+
+func (*DummiInitBadRequest) dummiInitRes() {}
+
+type DummiInitInternalServerError struct{}
+
+func (*DummiInitInternalServerError) dummiInitRes() {}
+
+type DummiInitOK struct{}
+
+func (*DummiInitOK) dummiInitRes() {}
+
 type EditUserProfileBadRequest struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`

@@ -19,6 +19,7 @@ func NewHandler(
 	opinionHandler oas.OpinionHandler,
 	talkSessionHandler oas.TalkSessionHandler,
 	userHandler oas.UserHandler,
+	testHandler oas.TestHandler,
 ) oas.Handler {
 	return &handlers{
 		AuthHandler:        authHandler,
@@ -26,6 +27,6 @@ func NewHandler(
 		OpinionHandler:     opinionHandler,
 		TalkSessionHandler: talkSessionHandler,
 		UserHandler:        userHandler,
-		TestHandler:        oas.UnimplementedHandler{},
+		TestHandler:        testHandler,
 	}
 }

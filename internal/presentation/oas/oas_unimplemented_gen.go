@@ -31,6 +31,15 @@ func (UnimplementedHandler) CreateTalkSession(ctx context.Context, req OptCreate
 	return r, ht.ErrNotImplemented
 }
 
+// DummiInit implements dummiInit operation.
+//
+// Mudai.
+//
+// POST /test/dummy
+func (UnimplementedHandler) DummiInit(ctx context.Context) (r DummiInitRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // EditUserProfile implements editUserProfile operation.
 //
 // ユーザー情報の変更.

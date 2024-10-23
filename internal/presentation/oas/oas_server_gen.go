@@ -122,6 +122,12 @@ type TalkSessionHandler interface {
 //
 // x-ogen-operation-group: Test
 type TestHandler interface {
+	// DummiInit implements dummiInit operation.
+	//
+	// Mudai.
+	//
+	// POST /test/dummy
+	DummiInit(ctx context.Context) (DummiInitRes, error)
 	// Test implements test operation.
 	//
 	// OpenAPIテスト用.

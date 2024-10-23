@@ -5,6 +5,10 @@ type CreateTalkSessionRes interface {
 	createTalkSessionRes()
 }
 
+type DummiInitRes interface {
+	dummiInitRes()
+}
+
 type EditUserProfileRes interface {
 	editUserProfileRes()
 }

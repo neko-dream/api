@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "polis",
+    "title": "kotohiro",
     "description": "",
     "version": "1.0.0"
   },
@@ -10,25 +10,19 @@
       "name": "talk_session"
     },
     {
-      "name": "talk_session/opinion"
-    },
-    {
-      "name": "talk_session/opinion/vote"
-    },
-    {
       "name": "user"
-    },
-    {
-      "name": "auth"
-    },
-    {
-      "name": "test"
     },
     {
       "name": "opinion"
     },
     {
       "name": "vote"
+    },
+    {
+      "name": "auth"
+    },
+    {
+      "name": "test"
     }
   ],
   "paths": {
@@ -39,7 +33,6 @@
         "description": "",
         "operationId": "getTalkSessionDetail",
         "tags": [
-          "talk_session",
           "talk_session"
         ],
         "parameters": [
@@ -107,7 +100,6 @@
         "description": "",
         "operationId": "createTalkSession",
         "tags": [
-          "talk_session",
           "talk_session"
         ],
         "parameters": [],
@@ -267,7 +259,6 @@
         "description": "",
         "operationId": "getTalkSessionList",
         "tags": [
-          "talk_session",
           "talk_session"
         ],
         "parameters": [
@@ -443,7 +434,6 @@
         "description": "",
         "operationId": "registerUser",
         "tags": [
-          "user",
           "user"
         ],
         "parameters": [],
@@ -726,7 +716,6 @@
         "description": "",
         "operationId": "editUserProfile",
         "tags": [
-          "user",
           "user"
         ],
         "parameters": [],
@@ -998,7 +987,6 @@
         "description": "",
         "operationId": "get_user_info",
         "tags": [
-          "user",
           "user"
         ],
         "parameters": [],
@@ -1062,7 +1050,6 @@
         "description": "セッションの中からまだ投票していない意見をランダムに取得する",
         "operationId": "swipe_opinions",
         "tags": [
-          "talk_session/opinion",
           "opinion"
         ],
         "parameters": [
@@ -1196,7 +1183,6 @@
         "description": "parentOpinionIDがなければルートの意見として投稿される",
         "operationId": "postOpinionPost",
         "tags": [
-          "talk_session/opinion",
           "opinion"
         ],
         "parameters": [
@@ -1339,7 +1325,6 @@
         "description": "",
         "operationId": "getOpinionsForTalkSession",
         "tags": [
-          "talk_session/opinion",
           "opinion"
         ],
         "parameters": [
@@ -1500,7 +1485,6 @@
         "description": "",
         "operationId": "vote",
         "tags": [
-          "talk_session/opinion/vote",
           "vote"
         ],
         "parameters": [
@@ -1639,7 +1623,6 @@
         "description": "",
         "operationId": "opinionComments",
         "tags": [
-          "talk_session",
           "opinion"
         ],
         "parameters": [
@@ -1810,7 +1793,6 @@
         "description": "",
         "operationId": "talkSessionAnalysis",
         "tags": [
-          "talk_session",
           "talk_session"
         ],
         "parameters": [
@@ -1958,7 +1940,6 @@
         "description": "",
         "operationId": "test",
         "tags": [
-          "test",
           "user"
         ],
         "parameters": [],
@@ -2050,7 +2031,6 @@
         "description": "",
         "operationId": "oauth_token_info",
         "tags": [
-          "auth",
           "auth"
         ],
         "parameters": [],
@@ -2194,7 +2174,6 @@
         "description": "",
         "operationId": "opinionsHistory",
         "tags": [
-          "user",
           "user"
         ],
         "parameters": [
@@ -2346,7 +2325,6 @@
         "description": "",
         "operationId": "sessionsHistory",
         "tags": [
-          "user",
           "user"
         ],
         "parameters": [
@@ -2493,7 +2471,6 @@
         "description": "",
         "operationId": "getOpinionDetail",
         "tags": [
-          "talk_session/opinion",
           "opinion"
         ],
         "parameters": [
@@ -2572,7 +2549,6 @@
         "description": "",
         "operationId": "getTalkSessionReport",
         "tags": [
-          "talk_session",
           "talk_session"
         ],
         "parameters": [
@@ -2621,6 +2597,73 @@
         },
         "security": [],
         "x-ogen-operation-group": "TalkSession"
+      }
+    },
+    "/test/dummy": {
+      "post": {
+        "summary": "mudai",
+        "deprecated": false,
+        "description": "",
+        "operationId": "dummiInit",
+        "tags": [
+          "test"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ErrorResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "ServerErrorResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "x-ogen-operation-group": "Test"
       }
     }
   },

@@ -12,7 +12,6 @@ paths:
       operationId: getTalkSessionDetail
       tags:
         - talk_session
-        - talk_session
       parameters:
         - name: talkSessionId
           in: path
@@ -119,7 +118,6 @@ paths:
       description: ''
       operationId: createTalkSession
       tags:
-        - talk_session
         - talk_session
       parameters: []
       requestBody:
@@ -259,7 +257,6 @@ paths:
       description: ''
       operationId: getTalkSessionList
       tags:
-        - talk_session
         - talk_session
       parameters:
         - name: limit
@@ -451,7 +448,6 @@ paths:
       description: ''
       operationId: registerUser
       tags:
-        - user
         - user
       parameters: []
       requestBody:
@@ -648,7 +644,6 @@ paths:
       operationId: editUserProfile
       tags:
         - user
-        - user
       parameters: []
       requestBody:
         content:
@@ -835,7 +830,6 @@ paths:
       operationId: get_user_info
       tags:
         - user
-        - user
       parameters: []
       responses:
         '200':
@@ -926,7 +920,6 @@ paths:
       description: セッションの中からまだ投票していない意見をランダムに取得する
       operationId: swipe_opinions
       tags:
-        - talk_session/opinion
         - opinion
       parameters:
         - name: talkSessionID
@@ -1073,7 +1066,6 @@ paths:
       description: parentOpinionIDがなければルートの意見として投稿される
       operationId: postOpinionPost
       tags:
-        - talk_session/opinion
         - opinion
       parameters:
         - name: talkSessionID
@@ -1169,7 +1161,6 @@ paths:
       description: ''
       operationId: getOpinionsForTalkSession
       tags:
-        - talk_session/opinion
         - opinion
       parameters:
         - name: talkSessionID
@@ -1338,7 +1329,6 @@ paths:
       description: ''
       operationId: vote
       tags:
-        - talk_session/opinion/vote
         - vote
       parameters:
         - name: talkSessionID
@@ -1469,7 +1459,6 @@ paths:
       description: ''
       operationId: opinionComments
       tags:
-        - talk_session
         - opinion
       parameters:
         - name: talkSessionID
@@ -1725,7 +1714,6 @@ paths:
       operationId: talkSessionAnalysis
       tags:
         - talk_session
-        - talk_session
       parameters:
         - name: talkSessionId
           in: path
@@ -1915,7 +1903,6 @@ paths:
       description: ''
       operationId: test
       tags:
-        - test
         - user
       parameters: []
       responses:
@@ -1978,7 +1965,6 @@ paths:
       description: ''
       operationId: oauth_token_info
       tags:
-        - auth
         - auth
       parameters: []
       responses:
@@ -2077,7 +2063,6 @@ paths:
       description: ''
       operationId: opinionsHistory
       tags:
-        - user
         - user
       parameters:
         - name: sort
@@ -2237,7 +2222,6 @@ paths:
       description: ''
       operationId: sessionsHistory
       tags:
-        - user
         - user
       parameters:
         - name: limit
@@ -2408,7 +2392,6 @@ paths:
       description: ''
       operationId: getOpinionDetail
       tags:
-        - talk_session/opinion
         - opinion
       parameters:
         - name: talkSessionID
@@ -2521,7 +2504,6 @@ paths:
       operationId: getTalkSessionReport
       tags:
         - talk_session
-        - talk_session
       parameters:
         - name: talkSessionId
           in: path
@@ -2552,6 +2534,51 @@ paths:
                     message: INTERNAL SERVER ERROR.
       security: []
       x-ogen-operation-group: TalkSession
+  /test/dummy:
+    post:
+      summary: mudai
+      deprecated: false
+      description: ''
+      operationId: dummiInit
+      tags:
+        - test
+      parameters: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: ErrorResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+        '500':
+          description: ServerErrorResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+      security: []
+      x-ogen-operation-group: Test
   /auth/{provider}/login:
     get:
       summary: OAuthログイン
