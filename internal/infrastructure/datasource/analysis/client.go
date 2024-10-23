@@ -54,8 +54,8 @@ func (a *analysisService) GenerateReport(ctx context.Context, talkSessionID shar
 		utils.HandleError(ctx, err, "PostReportsGenerates")
 		return err
 	}
-	panic("unimplemented")
 
+	return nil
 }
 
 // StartAnalysis 会話分析を開始する
