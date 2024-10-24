@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"log"
 	"net/http"
 
 	"github.com/neko-dream/server/internal/domain/model/analysis"
@@ -60,35 +61,36 @@ func (a *analysisService) GenerateReport(ctx context.Context, talkSessionID shar
 
 // StartAnalysis 会話分析を開始する
 func (a *analysisService) StartAnalysis(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession], userID shared.UUID[user.User]) error {
-	go func() error {
-		// カスタムHTTPクライアントを作成
-		httpClient := &http.Client{
-			Transport: &BasicAuthTransport{
-				Username: a.conf.ANALYSIS_USER,
-				Password: a.conf.ANALYSIS_USER_PASSWORD,
-			},
-		}
+	// カスタムHTTPクライアントを作成
+	httpClient := &http.Client{
+		Transport: &BasicAuthTransport{
+			Username: a.conf.ANALYSIS_USER,
+			Password: a.conf.ANALYSIS_USER_PASSWORD,
+		},
+	}
 
-		// クライアントの初期化
-		c, err := NewClient(a.conf.ANALYSIS_API_DOMAIN, WithHTTPClient(httpClient))
-		if err != nil {
-			return nil
-		}
-
-		// APIリクエストの実行
-		resp, err := c.PostPredictsGroups(ctx, PostPredictsGroupsJSONRequestBody{
-			TalkSessionId: talkSessionID.String(),
-			UserId:        userID.String(),
-		})
-		if err != nil {
-			return nil
-		}
-		defer resp.Body.Close()
-		if resp.StatusCode != http.StatusOK {
-			return nil
-		}
+	// クライアントの初期化
+	c, err := NewClient(a.conf.ANALYSIS_API_DOMAIN, WithHTTPClient(httpClient))
+	if err != nil {
+		log.Println("NewClient", err)
 		return nil
-	}()
+	}
+	log.Println("userID", userID.String())
+	log.Println("talkSessionID", talkSessionID.String())
+	// APIリクエストの実行
+	resp, err := c.PostPredictsGroups(ctx, PostPredictsGroupsJSONRequestBody{
+		TalkSessionId: talkSessionID.String(),
+		UserId:        userID.String(),
+	})
+	if err != nil {
+		log.Println("PostPredictsGroups", err)
+		return nil
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		log.Println("PostPredictsGroups", err)
+		return nil
+	}
 	return nil
 }
 

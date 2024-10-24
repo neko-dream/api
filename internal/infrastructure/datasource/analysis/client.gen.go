@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"log"
 	"net/url"
 	"strings"
 )
@@ -137,10 +138,12 @@ func (c *Client) PostPredictsGroupsWithBody(ctx context.Context, contentType str
 func (c *Client) PostPredictsGroups(ctx context.Context, body PostPredictsGroupsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostPredictsGroupsRequest(c.Server, body)
 	if err != nil {
+		log.Println("NewPostPredictsGroupsRequest", err)
 		return nil, err
 	}
 	req = req.WithContext(ctx)
 	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		log.Println("applyEditors", err)
 		return nil, err
 	}
 	return c.Client.Do(req)
