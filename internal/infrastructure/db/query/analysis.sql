@@ -15,6 +15,9 @@ WHERE talk_session_id = $1;
 SELECT
     representative_opinions.group_id,
     representative_opinions.rank,
+    representative_opinions.agree_count,
+    representative_opinions.disagree_count,
+    representative_opinions.pass_count,
     opinions.opinion_id,
     opinions.talk_session_id,
     opinions.parent_opinion_id,

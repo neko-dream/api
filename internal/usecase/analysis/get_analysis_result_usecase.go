@@ -40,8 +40,11 @@ type (
 		Opinions []OpinionRootDTO
 	}
 	OpinionRootDTO struct {
-		User    UserDTO
-		Opinion OpinionDTO
+		User          UserDTO
+		Opinion       OpinionDTO
+		AgreeCount    int
+		DisagreeCount int
+		PassCount     int
 	}
 	UserDTO struct {
 		ID   string
@@ -128,6 +131,9 @@ func (g *getAnalysisResultInteractor) Execute(ctx context.Context, input GetAnal
 				Name: row.DisplayName.String,
 				Icon: utils.ToPtrIfNotNullValue(!row.IconUrl.Valid, row.IconUrl.String),
 			},
+			AgreeCount:    int(row.AgreeCount),
+			DisagreeCount: int(row.DisagreeCount),
+			PassCount:     int(row.PassCount),
 		})
 	}
 

@@ -1863,9 +1863,18 @@ paths:
                                   - displayID
                                   - displayName
                                 description: 作成ユーザー
+                              agreeCount:
+                                type: integer
+                              disagreeCount:
+                                type: integer
+                              passCount:
+                                type: integer
                             required:
                               - opinion
                               - user
+                              - agreeCount
+                              - disagreeCount
+                              - passCount
                       required:
                         - groupId
                         - opinions
@@ -2516,7 +2525,7 @@ paths:
       x-ogen-operation-group: Opinion
   /talksessions/{talkSessionId}/report:
     get:
-      summary: 🚧 セッションレポートを返す
+      summary: セッションレポートを返す
       deprecated: false
       description: ''
       operationId: getTalkSessionReport

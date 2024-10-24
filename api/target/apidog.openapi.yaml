@@ -1847,11 +1847,23 @@
                                 "user": {
                                   "$ref": "#/components/schemas/user",
                                   "description": "作成ユーザー"
+                                },
+                                "agreeCount": {
+                                  "type": "integer"
+                                },
+                                "disagreeCount": {
+                                  "type": "integer"
+                                },
+                                "passCount": {
+                                  "type": "integer"
                                 }
                               },
                               "required": [
                                 "opinion",
-                                "user"
+                                "user",
+                                "agreeCount",
+                                "disagreeCount",
+                                "passCount"
                               ]
                             }
                           }
@@ -2549,7 +2561,7 @@
     },
     "/talksessions/{talkSessionId}/report": {
       "get": {
-        "summary": "🚧 セッションレポートを返す",
+        "summary": "セッションレポートを返す",
         "deprecated": false,
         "description": "",
         "operationId": "getTalkSessionReport",

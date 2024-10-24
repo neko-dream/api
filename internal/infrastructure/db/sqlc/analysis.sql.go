@@ -121,6 +121,9 @@ const getRepresentativeOpinionsByTalkSessionId = `-- name: GetRepresentativeOpin
 SELECT
     representative_opinions.group_id,
     representative_opinions.rank,
+    representative_opinions.agree_count,
+    representative_opinions.disagree_count,
+    representative_opinions.pass_count,
     opinions.opinion_id,
     opinions.talk_session_id,
     opinions.parent_opinion_id,
@@ -150,6 +153,9 @@ WHERE representative_opinions.rank < 2
 type GetRepresentativeOpinionsByTalkSessionIdRow struct {
 	GroupID         int32
 	Rank            int32
+	AgreeCount      int32
+	DisagreeCount   int32
+	PassCount       int32
 	OpinionID       uuid.NullUUID
 	TalkSessionID   uuid.NullUUID
 	ParentOpinionID uuid.NullUUID
@@ -176,6 +182,9 @@ func (q *Queries) GetRepresentativeOpinionsByTalkSessionId(ctx context.Context, 
 		if err := rows.Scan(
 			&i.GroupID,
 			&i.Rank,
+			&i.AgreeCount,
+			&i.DisagreeCount,
+			&i.PassCount,
 			&i.OpinionID,
 			&i.TalkSessionID,
 			&i.ParentOpinionID,

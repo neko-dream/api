@@ -7859,7 +7859,10 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItem) SetOpinions(val []TalkSessionAn
 type TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem struct {
 	Opinion TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion `json:"opinion"`
 	// 作成ユーザー.
-	User TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemUser `json:"user"`
+	User          TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemUser `json:"user"`
+	AgreeCount    int                                                    `json:"agreeCount"`
+	DisagreeCount int                                                    `json:"disagreeCount"`
+	PassCount     int                                                    `json:"passCount"`
 }
 
 // GetOpinion returns the value of Opinion.
@@ -7872,6 +7875,21 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) GetUser() TalkSessi
 	return s.User
 }
 
+// GetAgreeCount returns the value of AgreeCount.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) GetAgreeCount() int {
+	return s.AgreeCount
+}
+
+// GetDisagreeCount returns the value of DisagreeCount.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) GetDisagreeCount() int {
+	return s.DisagreeCount
+}
+
+// GetPassCount returns the value of PassCount.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) GetPassCount() int {
+	return s.PassCount
+}
+
 // SetOpinion sets the value of Opinion.
 func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) SetOpinion(val TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) {
 	s.Opinion = val
@@ -7880,6 +7898,21 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) SetOpinion(val Talk
 // SetUser sets the value of User.
 func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) SetUser(val TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemUser) {
 	s.User = val
+}
+
+// SetAgreeCount sets the value of AgreeCount.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) SetAgreeCount(val int) {
+	s.AgreeCount = val
+}
+
+// SetDisagreeCount sets the value of DisagreeCount.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) SetDisagreeCount(val int) {
+	s.DisagreeCount = val
+}
+
+// SetPassCount sets the value of PassCount.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) SetPassCount(val int) {
+	s.PassCount = val
 }
 
 type TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion struct {

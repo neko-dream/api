@@ -112,7 +112,7 @@ type TalkSessionHandler interface {
 	GetTalkSessionList(ctx context.Context, params GetTalkSessionListParams) (GetTalkSessionListRes, error)
 	// GetTalkSessionReport implements getTalkSessionReport operation.
 	//
-	// 🚧 セッションレポートを返す.
+	// セッションレポートを返す.
 	//
 	// GET /talksessions/{talkSessionId}/report
 	GetTalkSessionReport(ctx context.Context, params GetTalkSessionReportParams) (GetTalkSessionReportRes, error)

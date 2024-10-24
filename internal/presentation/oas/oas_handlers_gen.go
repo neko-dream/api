@@ -1019,7 +1019,7 @@ func (s *Server) handleGetTalkSessionListRequest(args [0]string, argsEscaped boo
 
 // handleGetTalkSessionReportRequest handles getTalkSessionReport operation.
 //
-// 🚧 セッションレポートを返す.
+// セッションレポートを返す.
 //
 // GET /talksessions/{talkSessionId}/report
 func (s *Server) handleGetTalkSessionReportRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
@@ -1081,7 +1081,7 @@ func (s *Server) handleGetTalkSessionReportRequest(args [1]string, argsEscaped b
 		mreq := middleware.Request{
 			Context:          ctx,
 			OperationName:    "GetTalkSessionReport",
-			OperationSummary: "🚧 セッションレポートを返す",
+			OperationSummary: "セッションレポートを返す",
 			OperationID:      "getTalkSessionReport",
 			Body:             nil,
 			Params: middleware.Parameters{

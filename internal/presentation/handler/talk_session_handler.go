@@ -264,6 +264,9 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 					DisplayName: opinion.User.Name,
 					IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.Icon),
 				},
+				AgreeCount:    opinion.AgreeCount,
+				DisagreeCount: opinion.DisagreeCount,
+				PassCount:     opinion.PassCount,
 			})
 		}
 		groupOpinions = append(groupOpinions, oas.TalkSessionAnalysisOKGroupOpinionsItem{

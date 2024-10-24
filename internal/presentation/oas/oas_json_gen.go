@@ -13451,11 +13451,26 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) encodeFields(e *jx.
 		e.FieldStart("user")
 		s.User.Encode(e)
 	}
+	{
+		e.FieldStart("agreeCount")
+		e.Int(s.AgreeCount)
+	}
+	{
+		e.FieldStart("disagreeCount")
+		e.Int(s.DisagreeCount)
+	}
+	{
+		e.FieldStart("passCount")
+		e.Int(s.PassCount)
+	}
 }
 
-var jsonFieldsNameOfTalkSessionAnalysisOKGroupOpinionsItemOpinionsItem = [2]string{
+var jsonFieldsNameOfTalkSessionAnalysisOKGroupOpinionsItemOpinionsItem = [5]string{
 	0: "opinion",
 	1: "user",
+	2: "agreeCount",
+	3: "disagreeCount",
+	4: "passCount",
 }
 
 // Decode decodes TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem from json.
@@ -13487,6 +13502,42 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) Decode(d *jx.Decode
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"user\"")
 			}
+		case "agreeCount":
+			requiredBitSet[0] |= 1 << 2
+			if err := func() error {
+				v, err := d.Int()
+				s.AgreeCount = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"agreeCount\"")
+			}
+		case "disagreeCount":
+			requiredBitSet[0] |= 1 << 3
+			if err := func() error {
+				v, err := d.Int()
+				s.DisagreeCount = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"disagreeCount\"")
+			}
+		case "passCount":
+			requiredBitSet[0] |= 1 << 4
+			if err := func() error {
+				v, err := d.Int()
+				s.PassCount = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"passCount\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -13497,7 +13548,7 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) Decode(d *jx.Decode
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000011,
+		0b00011111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

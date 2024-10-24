@@ -87,7 +87,7 @@ func (UnimplementedHandler) GetTalkSessionList(ctx context.Context, params GetTa
 
 // GetTalkSessionReport implements getTalkSessionReport operation.
 //
-// 🚧 セッションレポートを返す.
+// セッションレポートを返す.
 //
 // GET /talksessions/{talkSessionId}/report
 func (UnimplementedHandler) GetTalkSessionReport(ctx context.Context, params GetTalkSessionReportParams) (r GetTalkSessionReportRes, _ error) {
