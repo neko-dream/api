@@ -32,6 +32,8 @@ type (
 		PosX           float64
 		PosY           float64
 		DisplayID      string
+		DisplayName    string
+		IconURL        *string
 		GroupID        int
 		PerimeterIndex *int
 	}
@@ -88,15 +90,18 @@ func (g *getAnalysisResultInteractor) Execute(ctx context.Context, input GetAnal
 				PosX:           row.PosX,
 				PosY:           row.PosY,
 				DisplayID:      row.DisplayID.String,
+				DisplayName:    row.DisplayName.String,
+				IconURL:        utils.ToPtrIfNotNullValue(!row.IconUrl.Valid, row.IconUrl.String),
 				GroupID:        int(row.GroupID),
 				PerimeterIndex: utils.ToPtrIfNotNullValue(!row.PerimeterIndex.Valid, int(row.PerimeterIndex.Int32)),
 			}
 		}
-
 		positions = append(positions, PositionDTO{
 			PosX:           row.PosX,
 			PosY:           row.PosY,
 			DisplayID:      row.DisplayID.String,
+			DisplayName:    row.DisplayName.String,
+			IconURL:        utils.ToPtrIfNotNullValue(!row.IconUrl.Valid, row.IconUrl.String),
 			GroupID:        int(row.GroupID),
 			PerimeterIndex: utils.ToPtrIfNotNullValue(!row.PerimeterIndex.Valid, int(row.PerimeterIndex.Int32)),
 		})

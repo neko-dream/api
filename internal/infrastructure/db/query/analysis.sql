@@ -5,6 +5,8 @@ SELECT
     user_group_info.group_id,
     user_group_info.perimeter_index,
     users.display_id AS display_id,
+    users.display_name AS display_name,
+    users.icon_url AS icon_url,
     user_group_info.user_id
 FROM user_group_info
 LEFT JOIN users

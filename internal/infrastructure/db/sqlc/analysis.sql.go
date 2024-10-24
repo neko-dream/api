@@ -19,6 +19,8 @@ SELECT
     user_group_info.group_id,
     user_group_info.perimeter_index,
     users.display_id AS display_id,
+    users.display_name AS display_name,
+    users.icon_url AS icon_url,
     user_group_info.user_id
 FROM user_group_info
 LEFT JOIN users
@@ -32,6 +34,8 @@ type GetGroupInfoByTalkSessionIdRow struct {
 	GroupID        int32
 	PerimeterIndex sql.NullInt32
 	DisplayID      sql.NullString
+	DisplayName    sql.NullString
+	IconUrl        sql.NullString
 	UserID         uuid.UUID
 }
 
@@ -50,6 +54,8 @@ func (q *Queries) GetGroupInfoByTalkSessionId(ctx context.Context, talkSessionID
 			&i.GroupID,
 			&i.PerimeterIndex,
 			&i.DisplayID,
+			&i.DisplayName,
+			&i.IconUrl,
 			&i.UserID,
 		); err != nil {
 			return nil, err

@@ -13864,6 +13864,16 @@ func (s *TalkSessionAnalysisOKMyPosition) encodeFields(e *jx.Encoder) {
 		e.Str(s.DisplayId)
 	}
 	{
+		e.FieldStart("displayName")
+		e.Str(s.DisplayName)
+	}
+	{
+		if s.IconURL.Set {
+			e.FieldStart("iconURL")
+			s.IconURL.Encode(e)
+		}
+	}
+	{
 		e.FieldStart("groupId")
 		e.Int(s.GroupId)
 	}
@@ -13875,12 +13885,14 @@ func (s *TalkSessionAnalysisOKMyPosition) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfTalkSessionAnalysisOKMyPosition = [5]string{
+var jsonFieldsNameOfTalkSessionAnalysisOKMyPosition = [7]string{
 	0: "posX",
 	1: "posY",
 	2: "displayId",
-	3: "groupId",
-	4: "perimeterIndex",
+	3: "displayName",
+	4: "iconURL",
+	5: "groupId",
+	6: "perimeterIndex",
 }
 
 // Decode decodes TalkSessionAnalysisOKMyPosition from json.
@@ -13928,8 +13940,30 @@ func (s *TalkSessionAnalysisOKMyPosition) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"displayId\"")
 			}
-		case "groupId":
+		case "displayName":
 			requiredBitSet[0] |= 1 << 3
+			if err := func() error {
+				v, err := d.Str()
+				s.DisplayName = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"displayName\"")
+			}
+		case "iconURL":
+			if err := func() error {
+				s.IconURL.Reset()
+				if err := s.IconURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"iconURL\"")
+			}
+		case "groupId":
+			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
 				v, err := d.Int()
 				s.GroupId = int(v)
@@ -13960,7 +13994,7 @@ func (s *TalkSessionAnalysisOKMyPosition) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00001111,
+		0b00101111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -14028,6 +14062,16 @@ func (s *TalkSessionAnalysisOKPositionsItem) encodeFields(e *jx.Encoder) {
 		e.Str(s.DisplayId)
 	}
 	{
+		e.FieldStart("displayName")
+		e.Str(s.DisplayName)
+	}
+	{
+		if s.IconURL.Set {
+			e.FieldStart("iconURL")
+			s.IconURL.Encode(e)
+		}
+	}
+	{
 		e.FieldStart("groupId")
 		e.Int(s.GroupId)
 	}
@@ -14039,12 +14083,14 @@ func (s *TalkSessionAnalysisOKPositionsItem) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfTalkSessionAnalysisOKPositionsItem = [5]string{
+var jsonFieldsNameOfTalkSessionAnalysisOKPositionsItem = [7]string{
 	0: "posX",
 	1: "posY",
 	2: "displayId",
-	3: "groupId",
-	4: "perimeterIndex",
+	3: "displayName",
+	4: "iconURL",
+	5: "groupId",
+	6: "perimeterIndex",
 }
 
 // Decode decodes TalkSessionAnalysisOKPositionsItem from json.
@@ -14092,8 +14138,30 @@ func (s *TalkSessionAnalysisOKPositionsItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"displayId\"")
 			}
-		case "groupId":
+		case "displayName":
 			requiredBitSet[0] |= 1 << 3
+			if err := func() error {
+				v, err := d.Str()
+				s.DisplayName = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"displayName\"")
+			}
+		case "iconURL":
+			if err := func() error {
+				s.IconURL.Reset()
+				if err := s.IconURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"iconURL\"")
+			}
+		case "groupId":
+			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
 				v, err := d.Int()
 				s.GroupId = int(v)
@@ -14124,7 +14192,7 @@ func (s *TalkSessionAnalysisOKPositionsItem) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00001111,
+		0b00101111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

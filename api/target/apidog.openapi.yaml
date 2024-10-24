@@ -2901,6 +2901,13 @@
           "displayId": {
             "type": "string"
           },
+          "displayName": {
+            "type": "string"
+          },
+          "iconURL": {
+            "type": "string",
+            "nullable": true
+          },
           "groupId": {
             "type": "integer"
           },
@@ -2913,7 +2920,8 @@
           "posX",
           "posY",
           "displayId",
-          "groupId"
+          "groupId",
+          "displayName"
         ]
       },
       "userDemographics": {
