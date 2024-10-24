@@ -123,6 +123,19 @@ func SetSession(ctx context.Context, claim *Claim) context.Context {
 }
 
 func GetSession(ctx context.Context) *Claim {
-	claim, _ := ctx.Value(sessKey).(*Claim)
+	if ctx == nil {
+		return nil
+	}
+
+	value := ctx.Value(sessKey)
+	if value == nil {
+		return nil
+	}
+
+	claim, ok := value.(*Claim)
+	if !ok {
+		return nil
+	}
+
 	return claim
 }
