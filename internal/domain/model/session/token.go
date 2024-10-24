@@ -16,6 +16,7 @@ type (
 	TokenManager interface {
 		Generate(ctx context.Context, user user.User, sessionID shared.UUID[Session]) (string, error)
 		Parse(ctx context.Context, token string) (*Claim, error)
+		SetSession(ctx context.Context) context.Context
 	}
 
 	Claim struct {

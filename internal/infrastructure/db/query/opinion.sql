@@ -194,7 +194,8 @@ SELECT
     users.icon_url AS icon_url,
     COALESCE(pv.vote_type, 0) AS vote_type,
     -- 意見に対するリプライ数（再帰）
-    COALESCE(rc.reply_count, 0) AS reply_count
+    COALESCE(rc.reply_count, 0) AS reply_count,
+    COALESCE(cv.vote_type, 0) AS current_vote_type
 FROM opinions
 LEFT JOIN users
     ON opinions.user_id = users.user_id
@@ -208,6 +209,11 @@ LEFT JOIN (
     FROM opinions
     GROUP BY parent_opinion_id
 ) rc ON opinions.opinion_id = rc.parent_opinion_id
+LEFT JOIN (
+    SELECT votes.vote_type, votes.user_id, votes.opinion_id
+    FROM votes
+) cv ON opinions.user_id = sqlc.narg('user_id')::uuid
+    AND opinions.opinion_id = cv.opinion_id
 WHERE opinions.talk_session_id = $1
 -- latest, mostReply, oldestでソート
 ORDER BY
@@ -217,6 +223,61 @@ ORDER BY
         WHEN 'mostReply' THEN reply_count
     END ASC
 LIMIT $2 OFFSET $3;
+
+-- name: GetParentOpinions :many
+WITH RECURSIVE opinion_tree AS (
+    -- ベースケース：指定された意見から開始
+    SELECT
+        o.opinion_id,
+        o.parent_opinion_id,
+        1 as level
+    FROM opinions o
+    WHERE o.opinion_id = $1
+
+    UNION ALL
+
+    SELECT
+        p.opinion_id,
+        p.parent_opinion_id,
+        t.level + 1
+    FROM opinions p
+    INNER JOIN opinion_tree t ON t.parent_opinion_id = p.opinion_id
+)
+SELECT
+    o.opinion_id,
+    o.talk_session_id,
+    o.user_id,
+    o.parent_opinion_id,
+    o.title,
+    o.content,
+    o.reference_url,
+    o.picture_url,
+    o.created_at,
+    u.display_name AS display_name,
+    u.display_id AS display_id,
+    u.icon_url AS icon_url,
+    COALESCE(pv.vote_type, 0) AS vote_type,
+    COALESCE(rc.reply_count, 0) AS reply_count,
+    COALESCE(cv.vote_type, 0) AS current_vote_type,
+    ot.level
+FROM opinion_tree ot
+JOIN opinions o ON ot.opinion_id = o.opinion_id
+LEFT JOIN users u ON o.user_id = u.user_id
+LEFT JOIN (
+    SELECT votes.vote_type, votes.user_id, votes.opinion_id
+    FROM votes
+) pv ON o.parent_opinion_id = pv.opinion_id
+    AND o.user_id = pv.user_id
+LEFT JOIN (
+    SELECT votes.vote_type, votes.user_id, votes.opinion_id
+    FROM votes
+) cv ON opinions.user_id = sqlc.narg('user_id')::uuid
+    AND opinions.opinion_id = cv.opinion_id
+LEFT JOIN (
+    SELECT COUNT(opinion_id) AS reply_count, parent_opinion_id
+    FROM opinions
+    GROUP BY parent_opinion_id
+) rc ON o.opinion_id = rc.parent_opinion_id;
 
 -- name: CountOpinions :one
 SELECT

@@ -20,13 +20,21 @@ type (
 	}
 
 	GetOpinionRepliesInput struct {
-		OpinionID shared.UUID[opinion.Opinion]
-		UserID    *shared.UUID[user.User]
+		OpinionID  shared.UUID[opinion.Opinion]
+		UserID     *shared.UUID[user.User]
+		GetParents bool
 	}
 
 	GetOpinionRepliesOutput struct {
 		RootOpinion ReplyDTO
 		Replies     []ReplyDTO
+		Parents     []ParentsDTO
+	}
+	ParentsDTO struct {
+		Opinion    OpinionDTO
+		User       UserDTO
+		MyVoteType string
+		Level      int
 	}
 
 	// RepliesDTO 親意見に対するリプライ意見
@@ -112,6 +120,41 @@ func (i *GetOpinionRepliesInteractor) Execute(ctx context.Context, input GetOpin
 		User:       rootUser,
 		MyVoteType: vote.VoteTypeFromInt(int(opinionRow.CurrentVoteType)).String(),
 	}
+	var parents []ParentsDTO
+	if input.GetParents {
+		parensRow, err := i.GetQueries(ctx).GetParentOpinions(ctx, model.GetParentOpinionsParams{
+			OpinionID: input.OpinionID.UUID(),
+			UserID:    userID,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		parents := make([]ParentsDTO, 0, len(parensRow))
+		for _, r := range parensRow {
+			parents = append(parents, ParentsDTO{
+				Opinion: OpinionDTO{
+					OpinionID:       r.OpinionID.String(),
+					TalkSessionID:   r.TalkSessionID.String(),
+					UserID:          r.UserID.String(),
+					ParentOpinionID: utils.ToPtrIfNotNullValue(!r.ParentOpinionID.Valid, r.ParentOpinionID.UUID.String()),
+					Title:           utils.ToPtrIfNotNullValue(!r.Title.Valid, r.Title.String),
+					Content:         r.Content,
+					CreatedAt:       r.CreatedAt,
+					VoteType:        vote.VoteTypeFromInt(int(r.VoteType)).String(),
+					ReferenceURL:    utils.ToPtrIfNotNullValue(!r.ReferenceUrl.Valid, r.ReferenceUrl.String),
+					PictureURL:      utils.ToPtrIfNotNullValue(!r.PictureUrl.Valid, r.PictureUrl.String),
+				},
+				User: UserDTO{
+					ID:   r.UserID.String(),
+					Name: r.DisplayName.String,
+					Icon: utils.ToPtrIfNotNullValue(!r.IconUrl.Valid, r.IconUrl.String),
+				},
+				MyVoteType: vote.VoteTypeFromInt(int(r.CurrentVoteType)).String(),
+				Level:      int(r.Level),
+			})
+		}
+	}
 
 	row, err := i.GetQueries(ctx).GetOpinionReplies(ctx, model.GetOpinionRepliesParams{
 		OpinionID: input.OpinionID.UUID(),
@@ -147,5 +190,6 @@ func (i *GetOpinionRepliesInteractor) Execute(ctx context.Context, input GetOpin
 	return &GetOpinionRepliesOutput{
 		RootOpinion: rootOpinionDTO,
 		Replies:     replies,
+		Parents:     parents,
 	}, nil
 }

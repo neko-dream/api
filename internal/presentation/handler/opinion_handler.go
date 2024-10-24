@@ -25,6 +25,7 @@ type opinionHandler struct {
 	getSwipeOpinionsUseCase        opinion_usecase.GetSwipeOpinionsQueryHandler
 	getOpinionDetailUseCase        opinion_usecase.GetOpinionDetailUseCase
 	getOpinionByTalkSessionUseCase opinion_usecase.GetOpinionsByTalkSessionUseCase
+	session.TokenManager
 }
 
 // OpinionComments2 implements oas.OpinionHandler.
@@ -38,6 +39,7 @@ func NewOpinionHandler(
 	getSwipeOpinionsUseCase opinion_usecase.GetSwipeOpinionsQueryHandler,
 	getOpinionDetailUseCase opinion_usecase.GetOpinionDetailUseCase,
 	getOpinionByTalkSessionUseCase opinion_usecase.GetOpinionsByTalkSessionUseCase,
+	tokenManager session.TokenManager,
 ) oas.OpinionHandler {
 	return &opinionHandler{
 		postOpinionUsecase:             postOpinionUsecase,
@@ -45,11 +47,20 @@ func NewOpinionHandler(
 		getSwipeOpinionsUseCase:        getSwipeOpinionsUseCase,
 		getOpinionDetailUseCase:        getOpinionDetailUseCase,
 		getOpinionByTalkSessionUseCase: getOpinionByTalkSessionUseCase,
+		TokenManager:                   tokenManager,
 	}
 }
 
 // GetOpinionsForTalkSession implements oas.OpinionHandler.
 func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params oas.GetOpinionsForTalkSessionParams) (oas.GetOpinionsForTalkSessionRes, error) {
+	claim := session.GetSession(o.SetSession(ctx))
+	var userID *shared.UUID[user.User]
+	if claim != nil {
+		id, err := claim.UserID()
+		if err == nil {
+			userID = &id
+		}
+	}
 
 	var sortKey *string
 	if params.Sort.IsSet() {
@@ -73,6 +84,7 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 		SortKey:       sortKey,
 		Limit:         limit,
 		Offset:        offset,
+		UserID:        userID,
 	})
 	if err != nil {
 		return nil, err
@@ -110,7 +122,7 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 
 // GetOpinionDetail implements oas.OpinionHandler.
 func (o *opinionHandler) GetOpinionDetail(ctx context.Context, params oas.GetOpinionDetailParams) (oas.GetOpinionDetailRes, error) {
-	claim := session.GetSession(ctx)
+	claim := session.GetSession(o.SetSession(ctx))
 	var userID *shared.UUID[user.User]
 	if claim != nil {
 		userIDTmp, err := claim.UserID()
@@ -209,7 +221,7 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 
 // OpinionComments 意見に対するリプライ意見取得
 func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.OpinionCommentsParams) (oas.OpinionCommentsRes, error) {
-	claim := session.GetSession(ctx)
+	claim := session.GetSession(o.SetSession(ctx))
 	var userID *shared.UUID[user.User]
 	if claim != nil {
 		userIDTmp, err := claim.UserID()

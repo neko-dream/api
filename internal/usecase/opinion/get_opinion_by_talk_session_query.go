@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
+	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/db"
 	model "github.com/neko-dream/server/internal/infrastructure/db/sqlc"
 	"github.com/neko-dream/server/pkg/utils"
@@ -22,6 +23,7 @@ type (
 		SortKey       *string
 		Limit         *int
 		Offset        *int
+		UserID        *shared.UUID[user.User]
 	}
 
 	GetOpinionsByTalkSessionOutput struct {
@@ -58,6 +60,10 @@ func (i *getOpinionsByTalkSessionInteractor) Execute(ctx context.Context, input 
 	if input.SortKey != nil {
 		sortKey = *input.SortKey
 	}
+	userID := uuid.NullUUID{}
+	if input.UserID != nil {
+		userID = uuid.NullUUID{UUID: input.UserID.UUID(), Valid: true}
+	}
 
 	// 親意見を取得
 	opinionRows, err := i.GetQueries(ctx).GetOpinionsByTalkSessionID(ctx, model.GetOpinionsByTalkSessionIDParams{
@@ -65,6 +71,7 @@ func (i *getOpinionsByTalkSessionInteractor) Execute(ctx context.Context, input 
 		Limit:         int32(limit),
 		Offset:        int32(offset),
 		SortKey:       sql.NullString{String: sortKey, Valid: true},
+		UserID:        userID,
 	})
 	if err != nil {
 		utils.HandleError(ctx, err, "GetOpinionsByTalkSessionInteractor.Execute")

@@ -4,7 +4,6 @@ import (
 	"log"
 
 	"braces.dev/errtrace"
-	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/infrastructure/auth"
 	"github.com/neko-dream/server/internal/infrastructure/config"
@@ -45,10 +44,7 @@ func BuildContainer() *dig.Container {
 		{repository.NewOpinionRepository, nil},
 		{repository.NewVoteRepository, nil},
 		{db.NewDummyInitializer, nil},
-		{func() session.TokenManager {
-			return auth.NewTokenManager("")
-		}, nil},
-
+		{auth.NewTokenManager, nil},
 		{service.NewAuthService, nil},
 		{service.NewSessionService, nil},
 		{service.NewUserService, nil},
