@@ -30,7 +30,102 @@ type opinionHandler struct {
 
 // OpinionComments2 implements oas.OpinionHandler.
 func (o *opinionHandler) OpinionComments2(ctx context.Context, params oas.OpinionComments2Params) (oas.OpinionComments2Res, error) {
-	panic("unimplemented")
+	claim := session.GetSession(o.SetSession(ctx))
+	var userID *shared.UUID[user.User]
+	if claim != nil {
+		userIDTmp, err := claim.UserID()
+		if err != nil {
+			return nil, messages.ForbiddenError
+		}
+		userID = lo.ToPtr(userIDTmp)
+	}
+
+	opinions, err := o.getOpinionRepliesUsecase.Execute(ctx, opinion_usecase.GetOpinionRepliesInput{
+		OpinionID: shared.MustParseUUID[opinion.Opinion](params.OpinionID),
+		UserID:    userID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	rootUser := &oas.OpinionComments2OKRootOpinionUser{
+		DisplayID:   opinions.RootOpinion.User.ID,
+		DisplayName: opinions.RootOpinion.User.Name,
+		IconURL:     utils.ToOptNil[oas.OptNilString](opinions.RootOpinion.User.Icon),
+	}
+	rootOpinion := &oas.OpinionComments2OKRootOpinionOpinion{
+		ID:      opinions.RootOpinion.Opinion.OpinionID,
+		Title:   utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.Title),
+		Content: opinions.RootOpinion.Opinion.Content,
+		VoteType: oas.OptOpinionComments2OKRootOpinionOpinionVoteType{
+			Value: oas.OpinionComments2OKRootOpinionOpinionVoteType(opinions.RootOpinion.Opinion.VoteType),
+			Set:   true,
+		},
+		PictureURL:   utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.PictureURL),
+		ReferenceURL: utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.ReferenceURL),
+	}
+	root := oas.OpinionComments2OKRootOpinion{
+		User:    *rootUser,
+		Opinion: *rootOpinion,
+	}
+
+	var replies []oas.OpinionComments2OKReplyOpinionsItem
+	for _, reply := range opinions.Replies {
+		user := &oas.OpinionComments2OKReplyOpinionsItemUser{
+			DisplayID:   reply.User.ID,
+			DisplayName: reply.User.Name,
+			IconURL:     utils.ToOptNil[oas.OptNilString](reply.User.Icon),
+		}
+
+		opinion := &oas.OpinionComments2OKReplyOpinionsItemOpinion{
+			ID:       reply.Opinion.OpinionID,
+			ParentID: utils.ToOpt[oas.OptString](reply.Opinion.ParentOpinionID),
+			Title:    utils.ToOpt[oas.OptString](reply.Opinion.Title),
+			Content:  reply.Opinion.Content,
+			VoteType: oas.OptOpinionComments2OKReplyOpinionsItemOpinionVoteType{
+				Value: oas.OpinionComments2OKReplyOpinionsItemOpinionVoteType(reply.Opinion.VoteType),
+				Set:   true,
+			},
+			PictureURL:   utils.ToOpt[oas.OptString](reply.Opinion.PictureURL),
+			ReferenceURL: utils.ToOpt[oas.OptString](reply.Opinion.ReferenceURL),
+		}
+		replies = append(replies, oas.OpinionComments2OKReplyOpinionsItem{
+			User:    *user,
+			Opinion: *opinion,
+		})
+	}
+
+	var parents []oas.OpinionComments2OKParentOpinionsItem
+	for _, parent := range opinions.Parents {
+		var pts []oas.OpinionComments2OKParentOpinionsItem
+		pts = append(pts, oas.OpinionComments2OKParentOpinionsItem{
+			Opinion: oas.OpinionComments2OKParentOpinionsItemOpinion{
+				ID:       parent.Opinion.OpinionID,
+				ParentID: utils.ToOpt[oas.OptString](parent.Opinion.ParentOpinionID),
+				Title:    utils.ToOpt[oas.OptString](parent.Opinion.Title),
+				Content:  parent.Opinion.Content,
+				VoteType: oas.OptOpinionComments2OKParentOpinionsItemOpinionVoteType{
+					Value: oas.OpinionComments2OKParentOpinionsItemOpinionVoteType(parent.Opinion.VoteType),
+					Set:   true,
+				},
+				PictureURL:   utils.ToOpt[oas.OptString](parent.Opinion.PictureURL),
+				ReferenceURL: utils.ToOpt[oas.OptString](parent.Opinion.ReferenceURL),
+			},
+			User: oas.OpinionComments2OKParentOpinionsItemUser{
+				DisplayID:   parent.User.ID,
+				DisplayName: parent.User.Name,
+				IconURL:     utils.ToOptNil[oas.OptNilString](parent.User.Icon),
+			},
+			MyVoteType: oas.OpinionComments2OKParentOpinionsItemMyVoteType(parent.MyVoteType),
+			Level:      parent.Level,
+		})
+		parents = pts
+	}
+
+	return &oas.OpinionComments2OK{
+		RootOpinion:    root,
+		ReplyOpinions:  replies,
+		ParentOpinions: parents,
+	}, nil
 }
 
 func NewOpinionHandler(

@@ -2634,7 +2634,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  currentOpinion:
+                  rootOpinion:
                     type: object
                     properties:
                       user:
@@ -2704,25 +2704,6 @@ paths:
                     required:
                       - user
                       - opinion
-                  myVoteType:
-                    anyOf:
-                      - type: string
-                        description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                        enum:
-                          - agree
-                          - disagree
-                          - pass
-                        x-apidog-enum:
-                          - name: ''
-                            value: agree
-                            description: 良さそう
-                          - name: ''
-                            value: disagree
-                            description: 違うかも
-                          - name: ''
-                            value: pass
-                            description: 保留
-                      - type: 'null'
                   replyOpinions:
                     type: array
                     items:
@@ -2900,12 +2881,15 @@ paths:
                             - name: ''
                               value: pass
                               description: 保留
+                        level:
+                          type: integer
                       required:
                         - opinion
                         - user
                         - myVoteType
+                        - level
                 required:
-                  - currentOpinion
+                  - rootOpinion
                   - replyOpinions
                   - parentOpinions
         '400':

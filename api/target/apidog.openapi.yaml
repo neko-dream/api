@@ -2719,7 +2719,7 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "currentOpinion": {
+                    "rootOpinion": {
                       "type": "object",
                       "properties": {
                         "user": {
@@ -2733,17 +2733,6 @@
                       "required": [
                         "user",
                         "opinion"
-                      ]
-                    },
-                    "myVoteType": {
-                      "anyOf": [
-                        {
-                          "$ref": "#/components/schemas/voteType",
-                          "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
-                        },
-                        {
-                          "type": "null"
-                        }
                       ]
                     },
                     "replyOpinions": {
@@ -2791,18 +2780,22 @@
                           "myVoteType": {
                             "$ref": "#/components/schemas/voteType",
                             "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
+                          },
+                          "level": {
+                            "type": "integer"
                           }
                         },
                         "required": [
                           "opinion",
                           "user",
-                          "myVoteType"
+                          "myVoteType",
+                          "level"
                         ]
                       }
                     }
                   },
                   "required": [
-                    "currentOpinion",
+                    "rootOpinion",
                     "replyOpinions",
                     "parentOpinions"
                   ]

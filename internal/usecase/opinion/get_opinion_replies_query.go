@@ -130,9 +130,9 @@ func (i *GetOpinionRepliesInteractor) Execute(ctx context.Context, input GetOpin
 			return nil, err
 		}
 
-		parents := make([]ParentsDTO, 0, len(parensRow))
+		pts := make([]ParentsDTO, 0, len(parensRow))
 		for _, r := range parensRow {
-			parents = append(parents, ParentsDTO{
+			pts = append(pts, ParentsDTO{
 				Opinion: OpinionDTO{
 					OpinionID:       r.OpinionID.String(),
 					TalkSessionID:   r.TalkSessionID.String(),
@@ -154,6 +154,7 @@ func (i *GetOpinionRepliesInteractor) Execute(ctx context.Context, input GetOpin
 				Level:      int(r.Level),
 			})
 		}
+		parents = pts
 	}
 
 	row, err := i.GetQueries(ctx).GetOpinionReplies(ctx, model.GetOpinionRepliesParams{
