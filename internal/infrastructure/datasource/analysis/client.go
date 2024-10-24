@@ -72,7 +72,6 @@ func (a *analysisService) StartAnalysis(ctx context.Context, talkSessionID share
 		// クライアントの初期化
 		c, err := NewClient(a.conf.ANALYSIS_API_DOMAIN, WithHTTPClient(httpClient))
 		if err != nil {
-			utils.HandleError(ctx, err, "NewClient")
 			return nil
 		}
 
@@ -82,12 +81,10 @@ func (a *analysisService) StartAnalysis(ctx context.Context, talkSessionID share
 			UserId:        userID.String(),
 		})
 		if err != nil {
-			utils.HandleError(ctx, err, "PostPredictsGroups")
 			return nil
 		}
 		defer resp.Body.Close()
 		if resp.StatusCode != http.StatusOK {
-			utils.HandleError(ctx, err, "PostPredictsGroups")
 			return nil
 		}
 		return nil
