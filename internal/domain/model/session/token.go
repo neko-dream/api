@@ -35,7 +35,7 @@ func NewClaim(user user.User, sessionID shared.UUID[Session]) Claim {
 	return Claim{
 		Sub:         user.UserID().String(),
 		Iat:         time.Now().Unix(),
-		Exp:         time.Now().Add(24 * time.Hour).Unix(),
+		Exp:         time.Now().Add(time.Second * 60 * 60 * 24 * 7).Unix(),
 		Jti:         sessionID.String(),
 		IconURL:     user.ProfileIconURL(),
 		DisplayID:   user.DisplayID(),

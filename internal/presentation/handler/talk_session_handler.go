@@ -3,7 +3,6 @@ package handler
 import (
 	"bytes"
 	"context"
-	"log"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/messages"
@@ -241,7 +240,6 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 			Set: true,
 		}
 	}
-	log.Println("out.Positions", myPosition)
 
 	positions := make([]oas.TalkSessionAnalysisOKPositionsItem, 0, len(out.Positions))
 	for _, position := range out.Positions {
