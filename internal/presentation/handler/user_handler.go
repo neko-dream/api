@@ -292,15 +292,17 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 	if !value.YearOfBirth.Null {
 		yearOfBirth = &value.YearOfBirth.Value
 	}
-
 	var city *string
 	if !value.City.Null {
 		city = &value.City.Value
 	}
-
 	var householdSize *int
 	if !value.HouseholdSize.Null {
 		householdSize = &value.HouseholdSize.Value
+	}
+	var prefecture *string
+	if !value.Prefectures.Null {
+		prefecture = &value.Prefectures.Value
 	}
 
 	out, err := u.EditUserUseCase.Execute(ctx, user_usecase.EditUserInput{
@@ -324,7 +326,7 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 			return lo.ToPtr(string(txt))
 		}),
 		HouseholdSize: householdSize,
-		Prefecture:    utils.ToPtrIfNotNullValue(!value.Prefectures.IsSet(), value.Prefectures.Value),
+		Prefecture:    prefecture,
 	})
 	if err != nil {
 		utils.HandleError(ctx, err, "EditUserUseCase.Execute")
@@ -372,6 +374,11 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 		}
 	}
 
+	var prefecture *string
+	if value.Prefecture.IsSet() {
+		prefecture = &value.Prefecture.Value
+	}
+
 	input := user_usecase.RegisterUserInput{
 		UserID:      userID,
 		DisplayID:   value.DisplayID,
@@ -394,7 +401,7 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 			return lo.ToPtr(string(txt))
 		}),
 		HouseholdSize: &value.HouseholdSize.Value,
-		Prefecture:    utils.ToPtrIfNotNullValue(!value.Prefecture.IsSet(), value.Prefecture.Value),
+		Prefecture:    prefecture,
 	}
 	out, err := u.RegisterUserUseCase.Execute(ctx, input)
 	if err != nil {
