@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"net/http"
 	"slices"
 
 	"github.com/neko-dream/server/internal/domain/messages"
@@ -55,6 +56,12 @@ func (s *securityHandler) HandleSessionId(ctx context.Context, operationName str
 	}
 
 	return session.SetSession(ctx, claim), nil
+}
+
+func GetSessionFromHTTPRequest(ctx context.Context, r *http.Request) context.Context {
+	// r.Cookies()
+
+	return ctx
 }
 
 func NewSecurityHandler(

@@ -68,6 +68,12 @@ type OpinionHandler interface {
 	//
 	// GET /talksessions/{talkSessionID}/opinions/{opinionID}/replies
 	OpinionComments(ctx context.Context, params OpinionCommentsParams) (OpinionCommentsRes, error)
+	// OpinionComments2 implements opinionComments2 operation.
+	//
+	// 意見に対するリプライ意見一覧 Copy.
+	//
+	// GET /talksessions/{talkSessionID}/opinions/{opinionID}/replies2
+	OpinionComments2(ctx context.Context, params OpinionComments2Params) (OpinionComments2Res, error)
 	// PostOpinionPost implements postOpinionPost operation.
 	//
 	// ParentOpinionIDがなければルートの意見として投稿される.

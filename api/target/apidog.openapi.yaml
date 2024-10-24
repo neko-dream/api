@@ -1404,12 +1404,17 @@
                           },
                           "replyCount": {
                             "type": "integer"
+                          },
+                          "myVoteType": {
+                            "$ref": "#/components/schemas/voteType",
+                            "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
                           }
                         },
                         "required": [
                           "opinion",
                           "user",
-                          "replyCount"
+                          "replyCount",
+                          "myVoteType"
                         ]
                       }
                     },
@@ -2663,6 +2668,201 @@
         },
         "security": [],
         "x-ogen-operation-group": "Test"
+      }
+    },
+    "/talksessions/{talkSessionID}/opinions/{opinionID}/replies2": {
+      "get": {
+        "summary": "意見に対するリプライ意見一覧 Copy",
+        "deprecated": false,
+        "description": "",
+        "operationId": "opinionComments2",
+        "tags": [
+          "opinion"
+        ],
+        "parameters": [
+          {
+            "name": "talkSessionID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "opinionID",
+            "in": "path",
+            "description": "親意見のID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "currentOpinion": {
+                      "type": "object",
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/user",
+                          "description": "作成ユーザー"
+                        },
+                        "opinion": {
+                          "$ref": "#/components/schemas/opinion"
+                        }
+                      },
+                      "required": [
+                        "user",
+                        "opinion"
+                      ]
+                    },
+                    "myVoteType": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/components/schemas/voteType",
+                          "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "replyOpinions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "opinion": {
+                            "$ref": "#/components/schemas/opinion"
+                          },
+                          "user": {
+                            "$ref": "#/components/schemas/user",
+                            "description": "作成ユーザー"
+                          },
+                          "myVoteType": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/components/schemas/voteType",
+                                "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "opinion",
+                          "user"
+                        ]
+                      }
+                    },
+                    "parentOpinions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "opinion": {
+                            "$ref": "#/components/schemas/opinion"
+                          },
+                          "user": {
+                            "$ref": "#/components/schemas/user",
+                            "description": "作成ユーザー"
+                          },
+                          "myVoteType": {
+                            "$ref": "#/components/schemas/voteType",
+                            "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
+                          }
+                        },
+                        "required": [
+                          "opinion",
+                          "user",
+                          "myVoteType"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "currentOpinion",
+                    "replyOpinions",
+                    "parentOpinions"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ErrorResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "ServerErrorResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "x-ogen-operation-group": "Opinion"
       }
     }
   },

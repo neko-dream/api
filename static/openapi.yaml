@@ -1280,10 +1280,28 @@ paths:
                           description: 作成ユーザー
                         replyCount:
                           type: integer
+                        myVoteType:
+                          type: string
+                          description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                          enum:
+                            - agree
+                            - disagree
+                            - pass
+                          x-apidog-enum:
+                            - name: ''
+                              value: agree
+                              description: 良さそう
+                            - name: ''
+                              value: disagree
+                              description: 違うかも
+                            - name: ''
+                              value: pass
+                              description: 保留
                       required:
                         - opinion
                         - user
                         - replyCount
+                        - myVoteType
                   pagination:
                     type: object
                     properties:
@@ -2578,6 +2596,351 @@ paths:
                     message: INTERNAL SERVER ERROR.
       security: []
       x-ogen-operation-group: Test
+  /talksessions/{talkSessionID}/opinions/{opinionID}/replies2:
+    get:
+      summary: 意見に対するリプライ意見一覧 Copy
+      deprecated: false
+      description: ''
+      operationId: opinionComments2
+      tags:
+        - opinion
+      parameters:
+        - name: talkSessionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+        - name: opinionID
+          in: path
+          description: 親意見のID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  currentOpinion:
+                    type: object
+                    properties:
+                      user:
+                        type: object
+                        properties:
+                          displayID:
+                            type: string
+                            x-apidog-mock: '{{$string.uuid}}'
+                            pattern: ^[A-Za-z0-9]$
+                            examples:
+                              - userid
+                            minLength: 3
+                            maxLength: 25
+                          displayName:
+                            type: string
+                            x-apidog-mock: '{{$person.firstName}}'
+                          iconURL:
+                            type: string
+                            nullable: true
+                        required:
+                          - displayID
+                          - displayName
+                        description: 作成ユーザー
+                      opinion:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            faker: '1'
+                            description: 意見ID
+                          title:
+                            type: string
+                          content:
+                            type: string
+                            description: 意見のテキスト
+                            minLength: 1
+                            maxLength: 140
+                          parentID:
+                            type: string
+                            description: 親の意見ID。ルートならば無し
+                          voteType:
+                            type: string
+                            description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                            enum:
+                              - agree
+                              - disagree
+                              - pass
+                            x-apidog-enum:
+                              - name: ''
+                                value: agree
+                                description: 良さそう
+                              - name: ''
+                                value: disagree
+                                description: 違うかも
+                              - name: ''
+                                value: pass
+                                description: 保留
+                          pictureURL:
+                            type: string
+                            description: 画像が返る場合もある
+                          referenceURL:
+                            type: string
+                            description: 参考文献URL
+                        required:
+                          - content
+                          - id
+                    required:
+                      - user
+                      - opinion
+                  myVoteType:
+                    anyOf:
+                      - type: string
+                        description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                        enum:
+                          - agree
+                          - disagree
+                          - pass
+                        x-apidog-enum:
+                          - name: ''
+                            value: agree
+                            description: 良さそう
+                          - name: ''
+                            value: disagree
+                            description: 違うかも
+                          - name: ''
+                            value: pass
+                            description: 保留
+                      - type: 'null'
+                  replyOpinions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        opinion:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              faker: '1'
+                              description: 意見ID
+                            title:
+                              type: string
+                            content:
+                              type: string
+                              description: 意見のテキスト
+                              minLength: 1
+                              maxLength: 140
+                            parentID:
+                              type: string
+                              description: 親の意見ID。ルートならば無し
+                            voteType:
+                              type: string
+                              description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              enum:
+                                - agree
+                                - disagree
+                                - pass
+                              x-apidog-enum:
+                                - name: ''
+                                  value: agree
+                                  description: 良さそう
+                                - name: ''
+                                  value: disagree
+                                  description: 違うかも
+                                - name: ''
+                                  value: pass
+                                  description: 保留
+                            pictureURL:
+                              type: string
+                              description: 画像が返る場合もある
+                            referenceURL:
+                              type: string
+                              description: 参考文献URL
+                          required:
+                            - content
+                            - id
+                        user:
+                          type: object
+                          properties:
+                            displayID:
+                              type: string
+                              x-apidog-mock: '{{$string.uuid}}'
+                              pattern: ^[A-Za-z0-9]$
+                              examples:
+                                - userid
+                              minLength: 3
+                              maxLength: 25
+                            displayName:
+                              type: string
+                              x-apidog-mock: '{{$person.firstName}}'
+                            iconURL:
+                              type: string
+                              nullable: true
+                          required:
+                            - displayID
+                            - displayName
+                          description: 作成ユーザー
+                        myVoteType:
+                          anyOf:
+                            - type: string
+                              description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              enum:
+                                - agree
+                                - disagree
+                                - pass
+                              x-apidog-enum:
+                                - name: ''
+                                  value: agree
+                                  description: 良さそう
+                                - name: ''
+                                  value: disagree
+                                  description: 違うかも
+                                - name: ''
+                                  value: pass
+                                  description: 保留
+                            - type: 'null'
+                      required:
+                        - opinion
+                        - user
+                  parentOpinions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        opinion:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              faker: '1'
+                              description: 意見ID
+                            title:
+                              type: string
+                            content:
+                              type: string
+                              description: 意見のテキスト
+                              minLength: 1
+                              maxLength: 140
+                            parentID:
+                              type: string
+                              description: 親の意見ID。ルートならば無し
+                            voteType:
+                              type: string
+                              description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              enum:
+                                - agree
+                                - disagree
+                                - pass
+                              x-apidog-enum:
+                                - name: ''
+                                  value: agree
+                                  description: 良さそう
+                                - name: ''
+                                  value: disagree
+                                  description: 違うかも
+                                - name: ''
+                                  value: pass
+                                  description: 保留
+                            pictureURL:
+                              type: string
+                              description: 画像が返る場合もある
+                            referenceURL:
+                              type: string
+                              description: 参考文献URL
+                          required:
+                            - content
+                            - id
+                        user:
+                          type: object
+                          properties:
+                            displayID:
+                              type: string
+                              x-apidog-mock: '{{$string.uuid}}'
+                              pattern: ^[A-Za-z0-9]$
+                              examples:
+                                - userid
+                              minLength: 3
+                              maxLength: 25
+                            displayName:
+                              type: string
+                              x-apidog-mock: '{{$person.firstName}}'
+                            iconURL:
+                              type: string
+                              nullable: true
+                          required:
+                            - displayID
+                            - displayName
+                          description: 作成ユーザー
+                        myVoteType:
+                          type: string
+                          description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                          enum:
+                            - agree
+                            - disagree
+                            - pass
+                          x-apidog-enum:
+                            - name: ''
+                              value: agree
+                              description: 良さそう
+                            - name: ''
+                              value: disagree
+                              description: 違うかも
+                            - name: ''
+                              value: pass
+                              description: 保留
+                      required:
+                        - opinion
+                        - user
+                        - myVoteType
+                required:
+                  - currentOpinion
+                  - replyOpinions
+                  - parentOpinions
+        '400':
+          description: ErrorResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+        '500':
+          description: ServerErrorResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+      security: []
+      x-ogen-operation-group: Opinion
   /auth/{provider}/login:
     get:
       summary: OAuthログイン

@@ -139,6 +139,15 @@ func (UnimplementedHandler) OpinionComments(ctx context.Context, params OpinionC
 	return r, ht.ErrNotImplemented
 }
 
+// OpinionComments2 implements opinionComments2 operation.
+//
+// 意見に対するリプライ意見一覧 Copy.
+//
+// GET /talksessions/{talkSessionID}/opinions/{opinionID}/replies2
+func (UnimplementedHandler) OpinionComments2(ctx context.Context, params OpinionComments2Params) (r OpinionComments2Res, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // OpinionsHistory implements opinionsHistory operation.
 //
 // 今までに投稿した異見.

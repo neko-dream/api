@@ -27,6 +27,11 @@ type opinionHandler struct {
 	getOpinionByTalkSessionUseCase opinion_usecase.GetOpinionsByTalkSessionUseCase
 }
 
+// OpinionComments2 implements oas.OpinionHandler.
+func (o *opinionHandler) OpinionComments2(ctx context.Context, params oas.OpinionComments2Params) (oas.OpinionComments2Res, error) {
+	panic("unimplemented")
+}
+
 func NewOpinionHandler(
 	postOpinionUsecase opinion_usecase.PostOpinionUseCase,
 	getOpinionRepliesUsecase opinion_usecase.GetOpinionRepliesUseCase,

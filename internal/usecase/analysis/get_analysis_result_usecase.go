@@ -91,10 +91,11 @@ func (g *getAnalysisResultInteractor) Execute(ctx context.Context, input GetAnal
 		}
 
 		positions = append(positions, PositionDTO{
-			PosX:      row.PosX,
-			PosY:      row.PosY,
-			DisplayID: row.DisplayID.String,
-			GroupID:   int(row.GroupID),
+			PosX:           row.PosX,
+			PosY:           row.PosY,
+			DisplayID:      row.DisplayID.String,
+			GroupID:        int(row.GroupID),
+			PerimeterIndex: utils.ToPtrIfNotNullValue(!row.PerimeterIndex.Valid, int(row.PerimeterIndex.Int32)),
 		})
 	}
 	groupIDs, err := g.GetQueries(ctx).GetGroupListByTalkSessionId(ctx, input.TalkSessionID.UUID())

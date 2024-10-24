@@ -31,6 +31,7 @@ type (
 		Opinion    OpinionDTO
 		User       UserDTO
 		ReplyCount int
+		MyVoteType string
 	}
 
 	getSwipeOpinionsQueryHandler struct {
