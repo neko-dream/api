@@ -3,6 +3,7 @@ package handler
 import (
 	"bytes"
 	"context"
+	"log"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/messages"
@@ -23,6 +24,7 @@ type talkSessionHandler struct {
 	getTalkSessionDetailQuery talk_session_usecase.GetTalkSessionDetailUseCase
 	getAnalysisResultUseCase  analysis_usecase.GetAnalysisResultUseCase
 	getReportUseCase          analysis_usecase.GetReportQuery
+	session.TokenManager
 }
 
 func NewTalkSessionHandler(
@@ -31,6 +33,7 @@ func NewTalkSessionHandler(
 	getTalkSessionDetailQuery talk_session_usecase.GetTalkSessionDetailUseCase,
 	getAnalysisResultUseCase analysis_usecase.GetAnalysisResultUseCase,
 	getReportUseCase analysis_usecase.GetReportQuery,
+	tokenManager session.TokenManager,
 ) oas.TalkSessionHandler {
 	return &talkSessionHandler{
 		createTalkSessionUsecase:  createTalkSessionUsecase,
@@ -38,6 +41,7 @@ func NewTalkSessionHandler(
 		getTalkSessionDetailQuery: getTalkSessionDetailQuery,
 		getAnalysisResultUseCase:  getAnalysisResultUseCase,
 		getReportUseCase:          getReportUseCase,
+		TokenManager:              tokenManager,
 	}
 }
 
@@ -205,7 +209,7 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 
 // TalkSessionAnalysis 分析結果取得
 func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas.TalkSessionAnalysisParams) (oas.TalkSessionAnalysisRes, error) {
-	claim := session.GetSession(ctx)
+	claim := session.GetSession(t.SetSession(ctx))
 	var userID *shared.UUID[user.User]
 	if claim != nil {
 		id, err := claim.UserID()
@@ -232,8 +236,10 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 				GroupId:        out.MyPosition.GroupID,
 				PerimeterIndex: utils.ToOpt[oas.OptInt](out.MyPosition.PerimeterIndex),
 			},
+			Set: true,
 		}
 	}
+	log.Println("out.Positions", myPosition)
 
 	positions := make([]oas.TalkSessionAnalysisOKPositionsItem, 0, len(out.Positions))
 	for _, position := range out.Positions {
