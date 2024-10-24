@@ -60,36 +60,38 @@ func (a *analysisService) GenerateReport(ctx context.Context, talkSessionID shar
 
 // StartAnalysis 会話分析を開始する
 func (a *analysisService) StartAnalysis(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession], userID shared.UUID[user.User]) error {
-	// カスタムHTTPクライアントを作成
-	httpClient := &http.Client{
-		Transport: &BasicAuthTransport{
-			Username: a.conf.ANALYSIS_USER,
-			Password: a.conf.ANALYSIS_USER_PASSWORD,
-		},
-	}
+	go func() error {
+		// カスタムHTTPクライアントを作成
+		httpClient := &http.Client{
+			Transport: &BasicAuthTransport{
+				Username: a.conf.ANALYSIS_USER,
+				Password: a.conf.ANALYSIS_USER_PASSWORD,
+			},
+		}
 
-	// クライアントの初期化
-	c, err := NewClient(a.conf.ANALYSIS_API_DOMAIN, WithHTTPClient(httpClient))
-	if err != nil {
-		utils.HandleError(ctx, err, "NewClient")
-		return err
-	}
+		// クライアントの初期化
+		c, err := NewClient(a.conf.ANALYSIS_API_DOMAIN, WithHTTPClient(httpClient))
+		if err != nil {
+			utils.HandleError(ctx, err, "NewClient")
+			return nil
+		}
 
-	// APIリクエストの実行
-	resp, err := c.PostPredictsGroups(ctx, PostPredictsGroupsJSONRequestBody{
-		TalkSessionId: talkSessionID.String(),
-		UserId:        userID.String(),
-	})
-	if err != nil {
-		utils.HandleError(ctx, err, "PostPredictsGroups")
-		return err
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		utils.HandleError(ctx, err, "PostPredictsGroups")
-		return err
-	}
-
+		// APIリクエストの実行
+		resp, err := c.PostPredictsGroups(ctx, PostPredictsGroupsJSONRequestBody{
+			TalkSessionId: talkSessionID.String(),
+			UserId:        userID.String(),
+		})
+		if err != nil {
+			utils.HandleError(ctx, err, "PostPredictsGroups")
+			return nil
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusOK {
+			utils.HandleError(ctx, err, "PostPredictsGroups")
+			return nil
+		}
+		return nil
+	}()
 	return nil
 }
 
