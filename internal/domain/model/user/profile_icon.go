@@ -52,7 +52,7 @@ func (p *ProfileIcon) SetProfileIconImage(
 	}
 
 	img := image.NewImage(bytes)
-	imageInfo := image.NewImageInfo(fmt.Sprintf(objectPath, user.UserID().String(), time.Now().Unix()), *ext, img)
+	imageInfo := image.NewImageInfo(fmt.Sprintf(objectPath, *user.DisplayID(), time.Now().Unix()), *ext, img)
 	p.image = imageInfo
 
 	return nil
