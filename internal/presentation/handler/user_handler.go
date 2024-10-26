@@ -309,7 +309,7 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 		displayName = &value.DisplayName.Value
 	}
 	var occupation *string
-	if !value.Occupation.Null {
+	if value.Occupation.IsSet() {
 		txt, err := value.Occupation.Value.MarshalText()
 		if err != nil {
 			utils.HandleError(ctx, err, "value.Occupation.Value.MarshalText")
