@@ -262,47 +262,50 @@ func (q *Queries) GetOpinionReplies(ctx context.Context, arg GetOpinionRepliesPa
 }
 
 const getOpinionsByTalkSessionID = `-- name: GetOpinionsByTalkSessionID :many
+WITH unique_opinions AS (
+    SELECT DISTINCT ON (opinions.opinion_id)
+        opinions.opinion_id,
+        opinions.talk_session_id,
+        opinions.user_id,
+        opinions.parent_opinion_id,
+        opinions.title,
+        opinions.content,
+        opinions.reference_url,
+        opinions.picture_url,
+        opinions.created_at
+    FROM opinions
+    WHERE opinions.talk_session_id = $1
+)
 SELECT
-    opinions.opinion_id,
-    opinions.talk_session_id,
-    opinions.user_id,
-    opinions.parent_opinion_id,
-    opinions.title,
-    opinions.content,
-    opinions.reference_url,
-    opinions.picture_url,
-    opinions.created_at,
-    users.display_name AS display_name,
-    users.display_id AS display_id,
-    users.icon_url AS icon_url,
+    uo.opinion_id, uo.talk_session_id, uo.user_id, uo.parent_opinion_id, uo.title, uo.content, uo.reference_url, uo.picture_url, uo.created_at,
+    users.display_name,
+    users.display_id,
+    users.icon_url,
     COALESCE(pv.vote_type, 0) AS vote_type,
-    -- 意見に対するリプライ数（再帰）
     COALESCE(rc.reply_count, 0) AS reply_count,
     COALESCE(cv.vote_type, 0) AS current_vote_type
-FROM opinions
-LEFT JOIN users
-    ON opinions.user_id = users.user_id
+FROM unique_opinions uo
+LEFT JOIN users ON uo.user_id = users.user_id
 LEFT JOIN (
-    SELECT votes.vote_type, votes.user_id, votes.opinion_id
+    SELECT DISTINCT ON (opinion_id) vote_type, user_id, opinion_id
     FROM votes
-) pv ON opinions.parent_opinion_id = pv.opinion_id
-    AND opinions.user_id = pv.user_id
+) pv ON uo.parent_opinion_id = pv.opinion_id
+    AND uo.user_id = pv.user_id
 LEFT JOIN (
     SELECT COUNT(opinion_id) AS reply_count, parent_opinion_id
     FROM opinions
     GROUP BY parent_opinion_id
-) rc ON opinions.opinion_id = rc.parent_opinion_id
+) rc ON uo.opinion_id = rc.parent_opinion_id
 LEFT JOIN (
-    SELECT votes.vote_type, votes.user_id, votes.opinion_id
+    SELECT DISTINCT ON (opinion_id) vote_type, user_id, opinion_id
     FROM votes
-) cv ON opinions.user_id = $4::uuid
-    AND opinions.opinion_id = cv.opinion_id
-WHERE opinions.talk_session_id = $1
+    WHERE user_id = $4::uuid
+) cv ON uo.opinion_id = cv.opinion_id
 ORDER BY
     CASE $5::text
-        WHEN 'latest' THEN EXTRACT(EPOCH FROM opinions.created_at)
-        WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM opinions.created_at)
-        WHEN 'mostReply' THEN reply_count
+        WHEN 'latest' THEN EXTRACT(EPOCH FROM uo.created_at)
+        WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM uo.created_at)
+        WHEN 'mostReply' THEN COALESCE(rc.reply_count, 0)
     END ASC
 LIMIT $2 OFFSET $3
 `
@@ -333,7 +336,6 @@ type GetOpinionsByTalkSessionIDRow struct {
 	CurrentVoteType int16
 }
 
-// latest, mostReply, oldestでソート
 func (q *Queries) GetOpinionsByTalkSessionID(ctx context.Context, arg GetOpinionsByTalkSessionIDParams) ([]GetOpinionsByTalkSessionIDRow, error) {
 	rows, err := q.db.QueryContext(ctx, getOpinionsByTalkSessionID,
 		arg.TalkSessionID,
