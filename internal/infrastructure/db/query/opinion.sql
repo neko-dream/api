@@ -175,6 +175,8 @@ LEFT JOIN (
 WHERE opinions.talk_session_id = $2
     AND vote_count.opinion_id = opinions.opinion_id
     AND opinions.parent_opinion_id IS NULL
+    -- すでに取得済みのものがあったならそれを入れられるように
+    AND opinions.opinion_id NOT IN (sqlc.narg('opinion_ids')::uuid[])
 ORDER BY
     CASE sqlc.narg('sort_key')::text
         WHEN 'top' THEN COALESCE(ro.rank, 0)
