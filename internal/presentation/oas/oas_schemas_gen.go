@@ -1945,7 +1945,7 @@ type GetTalkSessionListSortKey string
 const (
 	GetTalkSessionListSortKeyLatest      GetTalkSessionListSortKey = "latest"
 	GetTalkSessionListSortKeyOldest      GetTalkSessionListSortKey = "oldest"
-	GetTalkSessionListSortKeyMostOpinion GetTalkSessionListSortKey = "mostOpinion"
+	GetTalkSessionListSortKeyMostReplies GetTalkSessionListSortKey = "mostReplies"
 )
 
 // AllValues returns all GetTalkSessionListSortKey values.
@@ -1953,7 +1953,7 @@ func (GetTalkSessionListSortKey) AllValues() []GetTalkSessionListSortKey {
 	return []GetTalkSessionListSortKey{
 		GetTalkSessionListSortKeyLatest,
 		GetTalkSessionListSortKeyOldest,
-		GetTalkSessionListSortKeyMostOpinion,
+		GetTalkSessionListSortKeyMostReplies,
 	}
 }
 
@@ -1964,7 +1964,7 @@ func (s GetTalkSessionListSortKey) MarshalText() ([]byte, error) {
 		return []byte(s), nil
 	case GetTalkSessionListSortKeyOldest:
 		return []byte(s), nil
-	case GetTalkSessionListSortKeyMostOpinion:
+	case GetTalkSessionListSortKeyMostReplies:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -1980,8 +1980,8 @@ func (s *GetTalkSessionListSortKey) UnmarshalText(data []byte) error {
 	case GetTalkSessionListSortKeyOldest:
 		*s = GetTalkSessionListSortKeyOldest
 		return nil
-	case GetTalkSessionListSortKeyMostOpinion:
-		*s = GetTalkSessionListSortKeyMostOpinion
+	case GetTalkSessionListSortKeyMostReplies:
+		*s = GetTalkSessionListSortKeyMostReplies
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)

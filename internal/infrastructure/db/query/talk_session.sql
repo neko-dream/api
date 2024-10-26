@@ -81,7 +81,7 @@ ORDER BY
     CASE sqlc.narg('sort_key')::text
         WHEN 'latest' THEN EXTRACT(EPOCH FROM talk_sessions.created_at)
         WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM talk_sessions.created_at)
-        WHEN 'mostOpinions' THEN oc.opinion_count
+        WHEN 'mostReplies' THEN -oc.opinion_count
         ELSE EXTRACT(EPOCH FROM talk_sessions.created_at)
     END ASC
 LIMIT $1 OFFSET $2;

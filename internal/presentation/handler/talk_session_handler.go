@@ -15,6 +15,7 @@ import (
 	analysis_usecase "github.com/neko-dream/server/internal/usecase/analysis"
 	talk_session_usecase "github.com/neko-dream/server/internal/usecase/talk_session"
 	"github.com/neko-dream/server/pkg/utils"
+	"github.com/samber/lo"
 )
 
 type talkSessionHandler struct {
@@ -171,12 +172,21 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 			status = string(bytes)
 		}
 	}
+	var sortKey *string
+	if params.SortKey.IsSet() {
+		bytes, err := params.SortKey.Value.MarshalText()
+		if err == nil {
+			sortKey = lo.ToPtr(string(bytes))
+		}
+	}
+
 	theme := utils.ToPtrIfNotNullValue(params.Theme.Null, params.Theme.Value)
 	out, err := t.listTalkSessionQuery.Execute(ctx, talk_session_usecase.ListTalkSessionInput{
-		Limit:  limit,
-		Offset: offset,
-		Theme:  theme,
-		Status: status,
+		Limit:   limit,
+		Offset:  offset,
+		Theme:   theme,
+		Status:  status,
+		SortKey: sortKey,
 	})
 	if err != nil {
 		return nil, err

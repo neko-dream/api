@@ -309,12 +309,12 @@ paths:
             enum:
               - latest
               - oldest
-              - mostOpinion
+              - mostReplies
             x-apidog:
               enumDescriptions:
                 latest: ''
                 oldest: ''
-                mostOpinion: ''
+                mostReplies: ''
       responses:
         '200':
           description: 成功
