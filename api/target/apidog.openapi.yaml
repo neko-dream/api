@@ -1857,6 +1857,9 @@
                           "groupName": {
                             "type": "string"
                           },
+                          "groupId": {
+                            "type": "integer"
+                          },
                           "opinions": {
                             "type": "array",
                             "items": {
@@ -1891,7 +1894,8 @@
                         },
                         "required": [
                           "groupName",
-                          "opinions"
+                          "opinions",
+                          "groupId"
                         ]
                       }
                     }
@@ -2940,6 +2944,9 @@
           "groupName": {
             "type": "string"
           },
+          "groupId": {
+            "type": "integer"
+          },
           "perimeterIndex": {
             "type": "integer",
             "description": "境界ポイントのインデックス"
@@ -2950,7 +2957,8 @@
           "posY",
           "displayId",
           "groupName",
-          "displayName"
+          "displayName",
+          "groupId"
         ]
       },
       "userDemographics": {

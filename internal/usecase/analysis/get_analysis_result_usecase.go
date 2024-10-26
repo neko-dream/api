@@ -36,10 +36,12 @@ type (
 		DisplayName    string
 		IconURL        *string
 		GroupName      string
+		GroupID        int
 		PerimeterIndex *int
 	}
 	GroupOpinionDTO struct {
 		GroupName string
+		GroupID   int
 		Opinions  []OpinionRootDTO
 	}
 	OpinionRootDTO struct {
@@ -94,6 +96,7 @@ func (g *getAnalysisResultInteractor) Execute(ctx context.Context, input GetAnal
 				DisplayName:    row.DisplayName.String,
 				IconURL:        utils.ToPtrIfNotNullValue(!row.IconUrl.Valid, row.IconUrl.String),
 				GroupName:      analysis.NewGroupIDFromInt(int(row.GroupID)).String(),
+				GroupID:        int(row.GroupID),
 				PerimeterIndex: utils.ToPtrIfNotNullValue(!row.PerimeterIndex.Valid, int(row.PerimeterIndex.Int32)),
 			}
 		}
@@ -104,6 +107,7 @@ func (g *getAnalysisResultInteractor) Execute(ctx context.Context, input GetAnal
 			DisplayName:    row.DisplayName.String,
 			IconURL:        utils.ToPtrIfNotNullValue(!row.IconUrl.Valid, row.IconUrl.String),
 			GroupName:      analysis.NewGroupIDFromInt(int(row.GroupID)).String(),
+			GroupID:        int(row.GroupID),
 			PerimeterIndex: utils.ToPtrIfNotNullValue(!row.PerimeterIndex.Valid, int(row.PerimeterIndex.Int32)),
 		})
 	}
@@ -147,6 +151,7 @@ func (g *getAnalysisResultInteractor) Execute(ctx context.Context, input GetAnal
 	for groupID, opinions := range groupOpinionsMap {
 		groupOpinions = append(groupOpinions, GroupOpinionDTO{
 			GroupName: analysis.NewGroupIDFromInt(int(groupID)).String(),
+			GroupID:   int(groupID),
 			Opinions:  opinions,
 		})
 	}

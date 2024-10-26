@@ -13299,6 +13299,10 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItem) encodeFields(e *jx.Encoder) {
 		e.Str(s.GroupName)
 	}
 	{
+		e.FieldStart("groupId")
+		e.Int(s.GroupId)
+	}
+	{
 		e.FieldStart("opinions")
 		e.ArrStart()
 		for _, elem := range s.Opinions {
@@ -13308,9 +13312,10 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItem) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfTalkSessionAnalysisOKGroupOpinionsItem = [2]string{
+var jsonFieldsNameOfTalkSessionAnalysisOKGroupOpinionsItem = [3]string{
 	0: "groupName",
-	1: "opinions",
+	1: "groupId",
+	2: "opinions",
 }
 
 // Decode decodes TalkSessionAnalysisOKGroupOpinionsItem from json.
@@ -13334,8 +13339,20 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"groupName\"")
 			}
-		case "opinions":
+		case "groupId":
 			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := d.Int()
+				s.GroupId = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"groupId\"")
+			}
+		case "opinions":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
 				s.Opinions = make([]TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
@@ -13362,7 +13379,7 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItem) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000011,
+		0b00000111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -13974,6 +13991,10 @@ func (s *TalkSessionAnalysisOKMyPosition) encodeFields(e *jx.Encoder) {
 		e.Str(s.GroupName)
 	}
 	{
+		e.FieldStart("groupId")
+		e.Int(s.GroupId)
+	}
+	{
 		if s.PerimeterIndex.Set {
 			e.FieldStart("perimeterIndex")
 			s.PerimeterIndex.Encode(e)
@@ -13981,14 +14002,15 @@ func (s *TalkSessionAnalysisOKMyPosition) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfTalkSessionAnalysisOKMyPosition = [7]string{
+var jsonFieldsNameOfTalkSessionAnalysisOKMyPosition = [8]string{
 	0: "posX",
 	1: "posY",
 	2: "displayId",
 	3: "displayName",
 	4: "iconURL",
 	5: "groupName",
-	6: "perimeterIndex",
+	6: "groupId",
+	7: "perimeterIndex",
 }
 
 // Decode decodes TalkSessionAnalysisOKMyPosition from json.
@@ -14070,6 +14092,18 @@ func (s *TalkSessionAnalysisOKMyPosition) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"groupName\"")
 			}
+		case "groupId":
+			requiredBitSet[0] |= 1 << 6
+			if err := func() error {
+				v, err := d.Int()
+				s.GroupId = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"groupId\"")
+			}
 		case "perimeterIndex":
 			if err := func() error {
 				s.PerimeterIndex.Reset()
@@ -14090,7 +14124,7 @@ func (s *TalkSessionAnalysisOKMyPosition) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00101111,
+		0b01101111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -14172,6 +14206,10 @@ func (s *TalkSessionAnalysisOKPositionsItem) encodeFields(e *jx.Encoder) {
 		e.Str(s.GroupName)
 	}
 	{
+		e.FieldStart("groupId")
+		e.Int(s.GroupId)
+	}
+	{
 		if s.PerimeterIndex.Set {
 			e.FieldStart("perimeterIndex")
 			s.PerimeterIndex.Encode(e)
@@ -14179,14 +14217,15 @@ func (s *TalkSessionAnalysisOKPositionsItem) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfTalkSessionAnalysisOKPositionsItem = [7]string{
+var jsonFieldsNameOfTalkSessionAnalysisOKPositionsItem = [8]string{
 	0: "posX",
 	1: "posY",
 	2: "displayId",
 	3: "displayName",
 	4: "iconURL",
 	5: "groupName",
-	6: "perimeterIndex",
+	6: "groupId",
+	7: "perimeterIndex",
 }
 
 // Decode decodes TalkSessionAnalysisOKPositionsItem from json.
@@ -14268,6 +14307,18 @@ func (s *TalkSessionAnalysisOKPositionsItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"groupName\"")
 			}
+		case "groupId":
+			requiredBitSet[0] |= 1 << 6
+			if err := func() error {
+				v, err := d.Int()
+				s.GroupId = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"groupId\"")
+			}
 		case "perimeterIndex":
 			if err := func() error {
 				s.PerimeterIndex.Reset()
@@ -14288,7 +14339,7 @@ func (s *TalkSessionAnalysisOKPositionsItem) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00101111,
+		0b01101111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

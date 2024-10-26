@@ -1778,6 +1778,8 @@ paths:
                         nullable: true
                       groupName:
                         type: string
+                      groupId:
+                        type: integer
                       perimeterIndex:
                         type: integer
                         description: 境界ポイントのインデックス
@@ -1787,6 +1789,7 @@ paths:
                       - displayId
                       - groupName
                       - displayName
+                      - groupId
                   positions:
                     type: array
                     items:
@@ -1805,6 +1808,8 @@ paths:
                           nullable: true
                         groupName:
                           type: string
+                        groupId:
+                          type: integer
                         perimeterIndex:
                           type: integer
                           description: 境界ポイントのインデックス
@@ -1814,6 +1819,7 @@ paths:
                         - displayId
                         - groupName
                         - displayName
+                        - groupId
                   groupOpinions:
                     type: array
                     items:
@@ -1821,6 +1827,8 @@ paths:
                       properties:
                         groupName:
                           type: string
+                        groupId:
+                          type: integer
                         opinions:
                           type: array
                           items:
@@ -1905,6 +1913,7 @@ paths:
                       required:
                         - groupName
                         - opinions
+                        - groupId
                 required:
                   - positions
                   - groupOpinions
@@ -3118,6 +3127,8 @@ components:
           nullable: true
         groupName:
           type: string
+        groupId:
+          type: integer
         perimeterIndex:
           type: integer
           description: 境界ポイントのインデックス
@@ -3127,6 +3138,7 @@ components:
         - displayId
         - groupName
         - displayName
+        - groupId
     userDemographics:
       type: object
       properties:
