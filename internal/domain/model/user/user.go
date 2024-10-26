@@ -66,6 +66,10 @@ func (u *User) SetDisplayID(id string) error {
 	return nil
 }
 
+func (u *User) SetDisplayName(name string) {
+	u.displayName = lo.ToPtr(name)
+}
+
 func (u *User) UserID() shared.UUID[User] {
 	return u.userID
 }

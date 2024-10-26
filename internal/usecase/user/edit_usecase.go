@@ -80,6 +80,11 @@ func (e *editUserInteractor) Execute(ctx context.Context, input EditUserInput) (
 			return messages.UserNotFoundError
 		}
 
+		if input.DisplayName != nil || *input.DisplayName != "" {
+			// 表示名が変更された場合は設定
+			foundUser.SetDisplayName(*input.DisplayName)
+		}
+
 		// アイコンがある場合は設定
 		if input.Icon != nil {
 			if err := foundUser.SetIconFile(ctx, input.Icon); err != nil {
