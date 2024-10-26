@@ -3,7 +3,6 @@
 package oas
 
 import (
-	"io"
 	"net/url"
 	"time"
 
@@ -2034,46 +2033,20 @@ type GetTalkSessionReportInternalServerError struct{}
 func (*GetTalkSessionReportInternalServerError) getTalkSessionReportRes() {}
 
 type GetTalkSessionReportOK struct {
-	Data io.Reader
+	Report string `json:"report"`
 }
 
-// Read reads data from the Data reader.
-//
-// Kept to satisfy the io.Reader interface.
-func (s GetTalkSessionReportOK) Read(p []byte) (n int, err error) {
-	if s.Data == nil {
-		return 0, io.EOF
-	}
-	return s.Data.Read(p)
+// GetReport returns the value of Report.
+func (s *GetTalkSessionReportOK) GetReport() string {
+	return s.Report
 }
 
-// GetTalkSessionReportOKHeaders wraps GetTalkSessionReportOK with response headers.
-type GetTalkSessionReportOKHeaders struct {
-	ContentType string
-	Response    GetTalkSessionReportOK
+// SetReport sets the value of Report.
+func (s *GetTalkSessionReportOK) SetReport(val string) {
+	s.Report = val
 }
 
-// GetContentType returns the value of ContentType.
-func (s *GetTalkSessionReportOKHeaders) GetContentType() string {
-	return s.ContentType
-}
-
-// GetResponse returns the value of Response.
-func (s *GetTalkSessionReportOKHeaders) GetResponse() GetTalkSessionReportOK {
-	return s.Response
-}
-
-// SetContentType sets the value of ContentType.
-func (s *GetTalkSessionReportOKHeaders) SetContentType(val string) {
-	s.ContentType = val
-}
-
-// SetResponse sets the value of Response.
-func (s *GetTalkSessionReportOKHeaders) SetResponse(val GetTalkSessionReportOK) {
-	s.Response = val
-}
-
-func (*GetTalkSessionReportOKHeaders) getTalkSessionReportRes() {}
+func (*GetTalkSessionReportOK) getTalkSessionReportRes() {}
 
 type GetUserInfoInternalServerError struct{}
 

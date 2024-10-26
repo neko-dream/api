@@ -3,7 +3,6 @@
 package oas
 
 import (
-	"io"
 	"net/http"
 
 	"github.com/go-faster/errors"
@@ -341,28 +340,14 @@ func encodeGetTalkSessionListResponse(response GetTalkSessionListRes, w http.Res
 
 func encodeGetTalkSessionReportResponse(response GetTalkSessionReportRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *GetTalkSessionReportOKHeaders:
-		// Encoding response headers.
-		{
-			h := uri.NewHeaderEncoder(w.Header())
-			// Encode "Content-Type" header.
-			{
-				cfg := uri.HeaderParameterEncodingConfig{
-					Name:    "Content-Type",
-					Explode: false,
-				}
-				if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
-					return e.EncodeValue(conv.StringToString(response.ContentType))
-				}); err != nil {
-					return errors.Wrap(err, "encode Content-Type header")
-				}
-			}
-		}
+	case *GetTalkSessionReportOK:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
 
-		writer := w
-		if _, err := io.Copy(writer, response.Response); err != nil {
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
 			return errors.Wrap(err, "write")
 		}
 

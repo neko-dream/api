@@ -54,13 +54,9 @@ func (t *talkSessionHandler) GetTalkSessionReport(ctx context.Context, params oa
 		return nil, err
 	}
 
-	res := &oas.GetTalkSessionReportOKHeaders{}
-	buf := make([]byte, len(out.Report))
-	copy(buf, out.Report)
-	dt := &oas.GetTalkSessionReportOK{}
-	dt.Data = bytes.NewBuffer(buf)
-	res.SetResponse(*dt)
-	return res, nil
+	return &oas.GetTalkSessionReportOK{
+		Report: bytes.NewBufferString(out.Report).String(),
+	}, nil
 
 }
 

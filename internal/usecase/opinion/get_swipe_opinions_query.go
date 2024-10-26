@@ -3,7 +3,7 @@ package opinion_usecase
 import (
 	"context"
 
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/domain/model/user"
@@ -67,7 +67,7 @@ func (h *getSwipeOpinionsQueryHandler) Execute(ctx context.Context, q GetSwipeOp
 		randomLimit := q.Limit - len(swipeRows)
 		alreadyFetchedOpinionIDs := make([]uuid.UUID, 0, len(swipeRows))
 		for _, row := range swipeRows {
-			alreadyFetchedOpinionIDs = append(alreadyFetchedOpinionIDs, row.OpinionID.UUID))
+			alreadyFetchedOpinionIDs = append(alreadyFetchedOpinionIDs, uuid.UUID(row.OpinionID))
 		}
 		randomSwipeRow, err := h.GetQueries(ctx).GetRandomOpinions(ctx, model.GetRandomOpinionsParams{
 			UserID:        q.UserID.UUID(),

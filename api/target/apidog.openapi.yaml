@@ -2604,9 +2604,17 @@
           "200": {
             "description": "成功",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "properties": {
+                    "report": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "report"
+                  ]
                 }
               }
             }
