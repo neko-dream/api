@@ -514,7 +514,7 @@ func (d *DummyInitializer) Opinion() error {
 			o1.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Agreed,
+			vote.Agree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -525,7 +525,7 @@ func (d *DummyInitializer) Opinion() error {
 			o1.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Disagreed,
+			vote.Disagree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -560,7 +560,7 @@ func (d *DummyInitializer) Opinion() error {
 			o1o1.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Disagreed,
+			vote.Disagree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -571,7 +571,7 @@ func (d *DummyInitializer) Opinion() error {
 			o1o1.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Agreed,
+			vote.Agree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -606,7 +606,7 @@ func (d *DummyInitializer) Opinion() error {
 			o2.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Agreed,
+			vote.Agree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -617,7 +617,7 @@ func (d *DummyInitializer) Opinion() error {
 			o2.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Agreed,
+			vote.Agree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -628,7 +628,7 @@ func (d *DummyInitializer) Opinion() error {
 			o2.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Disagreed,
+			vote.Disagree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -652,7 +652,7 @@ func (d *DummyInitializer) Opinion() error {
 			o2o1.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Disagreed,
+			vote.Disagree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -663,7 +663,7 @@ func (d *DummyInitializer) Opinion() error {
 			o2o1.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Agreed,
+			vote.Agree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -674,7 +674,7 @@ func (d *DummyInitializer) Opinion() error {
 			o2o1.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Agreed,
+			vote.Agree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -698,7 +698,7 @@ func (d *DummyInitializer) Opinion() error {
 			o3.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Disagreed,
+			vote.Disagree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -709,7 +709,7 @@ func (d *DummyInitializer) Opinion() error {
 			o3.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Agreed,
+			vote.Agree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -744,7 +744,7 @@ func (d *DummyInitializer) Opinion() error {
 			o4.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Agreed,
+			vote.Agree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -755,7 +755,7 @@ func (d *DummyInitializer) Opinion() error {
 			o4.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Disagreed,
+			vote.Disagree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -766,7 +766,7 @@ func (d *DummyInitializer) Opinion() error {
 			o4.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Disagreed,
+			vote.Disagree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -801,7 +801,7 @@ func (d *DummyInitializer) Opinion() error {
 			o4o1.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Agreed,
+			vote.Agree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -812,7 +812,7 @@ func (d *DummyInitializer) Opinion() error {
 			o4o1.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Agreed,
+			vote.Agree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -836,7 +836,7 @@ func (d *DummyInitializer) Opinion() error {
 			o5.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Disagreed,
+			vote.Disagree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -847,7 +847,7 @@ func (d *DummyInitializer) Opinion() error {
 			o5.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Agreed,
+			vote.Agree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -882,7 +882,7 @@ func (d *DummyInitializer) Opinion() error {
 			o6.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Disagreed,
+			vote.Disagree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -893,7 +893,7 @@ func (d *DummyInitializer) Opinion() error {
 			o6.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Agreed,
+			vote.Agree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -928,7 +928,7 @@ func (d *DummyInitializer) Opinion() error {
 			o7.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Agreed,
+			vote.Agree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -939,7 +939,7 @@ func (d *DummyInitializer) Opinion() error {
 			o7.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Disagreed,
+			vote.Disagree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -950,7 +950,7 @@ func (d *DummyInitializer) Opinion() error {
 			o7.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Disagreed,
+			vote.Disagree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -973,7 +973,7 @@ func (d *DummyInitializer) Opinion() error {
 			o7o1.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Disagreed,
+			vote.Disagree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -984,7 +984,7 @@ func (d *DummyInitializer) Opinion() error {
 			o7o1.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Agreed,
+			vote.Agree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -995,7 +995,7 @@ func (d *DummyInitializer) Opinion() error {
 			o7o1.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Agreed,
+			vote.Agree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -1018,7 +1018,7 @@ func (d *DummyInitializer) Opinion() error {
 			o8.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Disagreed,
+			vote.Disagree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -1029,7 +1029,7 @@ func (d *DummyInitializer) Opinion() error {
 			o8.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Agreed,
+			vote.Agree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -1063,7 +1063,7 @@ func (d *DummyInitializer) Opinion() error {
 			o8o1.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Agreed,
+			vote.Agree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -1074,7 +1074,7 @@ func (d *DummyInitializer) Opinion() error {
 			o8o1.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Agreed,
+			vote.Agree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -1085,7 +1085,7 @@ func (d *DummyInitializer) Opinion() error {
 			o8o1.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Disagreed,
+			vote.Disagree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -1108,7 +1108,7 @@ func (d *DummyInitializer) Opinion() error {
 			o9.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Agreed,
+			vote.Agree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -1119,7 +1119,7 @@ func (d *DummyInitializer) Opinion() error {
 			o9.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Agreed,
+			vote.Agree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -1130,7 +1130,7 @@ func (d *DummyInitializer) Opinion() error {
 			o9.OpinionID(),
 			ts.TalkSessionID(),
 			u.UserID(),
-			vote.Disagreed,
+			vote.Disagree,
 			time.Now(ctx).Time,
 		)
 		votes = append(votes, vs)
@@ -1159,7 +1159,7 @@ func (d *DummyInitializer) Opinion() error {
 			o.OpinionID(),
 			ts.TalkSessionID(),
 			o.UserID(),
-			vote.Agreed,
+			vote.Agree,
 			time.Now(ctx).Time,
 		)
 		err = d.VoteRepo.Create(ctx, *vs)

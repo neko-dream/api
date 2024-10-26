@@ -89,7 +89,7 @@ func (i *postOpinionInteractor) Execute(ctx context.Context, input PostOpinionIn
 			opinion.OpinionID(),
 			input.TalkSessionID,
 			input.OwnerID,
-			vote.Agreed,
+			vote.Agree,
 			time.Now(),
 		)
 		if err != nil {

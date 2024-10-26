@@ -4,8 +4,8 @@ type VoteType int
 
 const (
 	UnVoted VoteType = iota
-	Agreed
-	Disagreed
+	Agree
+	Disagree
 	Pass
 )
 
@@ -15,9 +15,9 @@ func (v VoteType) Int() int {
 
 func (v VoteType) String() string {
 	switch v {
-	case Agreed:
+	case Agree:
 		return "agree"
-	case Disagreed:
+	case Disagree:
 		return "disagree"
 	case Pass:
 		return "pass"
@@ -29,9 +29,9 @@ func (v VoteType) String() string {
 func VoteTypeFromInt(i int) VoteType {
 	switch i {
 	case 1:
-		return Agreed
+		return Agree
 	case 2:
-		return Disagreed
+		return Disagree
 	case 3:
 		return Pass
 	default:
@@ -45,9 +45,9 @@ func VoteFromString(s *string) VoteType {
 	}
 	switch *s {
 	case "agree":
-		return Agreed
+		return Agree
 	case "disagree":
-		return Disagreed
+		return Disagree
 	case "pass":
 		return Pass
 	default:

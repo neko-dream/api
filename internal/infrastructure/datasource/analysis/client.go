@@ -72,11 +72,8 @@ func (a *analysisService) StartAnalysis(ctx context.Context, talkSessionID share
 	// クライアントの初期化
 	c, err := NewClient(a.conf.ANALYSIS_API_DOMAIN, WithHTTPClient(httpClient))
 	if err != nil {
-		log.Println("NewClient", err)
 		return nil
 	}
-	log.Println("userID", userID.String())
-	log.Println("talkSessionID", talkSessionID.String())
 	// APIリクエストの実行
 	resp, err := c.PostPredictsGroups(ctx, PostPredictsGroupsJSONRequestBody{
 		TalkSessionId: talkSessionID.String(),

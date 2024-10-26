@@ -10,6 +10,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/db"
 	model "github.com/neko-dream/server/internal/infrastructure/db/sqlc"
 	"github.com/neko-dream/server/pkg/utils"
+	"github.com/samber/lo"
 )
 
 type (
@@ -65,20 +66,20 @@ func (h *getSwipeOpinionsQueryHandler) Execute(ctx context.Context, q GetSwipeOp
 		}
 		swipeRows = swipeRow
 		randomLimit := q.Limit - len(swipeRows)
-		alreadyFetchedOpinionIDs := make([]uuid.UUID, 0, len(swipeRows))
-		for _, row := range swipeRows {
-			alreadyFetchedOpinionIDs = append(alreadyFetchedOpinionIDs, uuid.UUID(row.OpinionID))
-		}
 		randomSwipeRow, err := h.GetQueries(ctx).GetRandomOpinions(ctx, model.GetRandomOpinionsParams{
 			UserID:        q.UserID.UUID(),
 			TalkSessionID: q.TalkSessionID.UUID(),
 			Limit:         int32(randomLimit),
-			OpinionIds:    alreadyFetchedOpinionIDs,
 		})
 		if err != nil {
 			return nil, err
 		}
 		swipeRows = append(swipeRows, randomSwipeRow...)
+		// uniqueにする
+		swipeRows = lo.UniqBy(swipeRows, func(swipe model.GetRandomOpinionsRow) uuid.UUID {
+			return swipe.OpinionID
+		})
+
 	} else {
 		swipeRow, err := h.GetQueries(ctx).GetRandomOpinions(ctx, model.GetRandomOpinionsParams{
 			UserID:        q.UserID.UUID(),

@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/lib/pq"
 )
 
 const countOpinions = `-- name: CountOpinions :one
@@ -647,10 +646,8 @@ LEFT JOIN (
 WHERE opinions.talk_session_id = $2
     AND vote_count.opinion_id = opinions.opinion_id
     AND opinions.parent_opinion_id IS NULL
-    -- すでに取得済みのものがあったならそれを入れられるように
-    AND opinions.opinion_id NOT IN ($4::uuid[])
 ORDER BY
-    CASE $5::text
+    CASE $4::text
         WHEN 'top' THEN COALESCE(ro.rank, 0)
         ELSE RANDOM()
     END ASC
@@ -661,7 +658,6 @@ type GetRandomOpinionsParams struct {
 	UserID        uuid.UUID
 	TalkSessionID uuid.UUID
 	Limit         int32
-	OpinionIds    []uuid.UUID
 	SortKey       sql.NullString
 }
 
@@ -762,7 +758,6 @@ func (q *Queries) GetRandomOpinions(ctx context.Context, arg GetRandomOpinionsPa
 		arg.UserID,
 		arg.TalkSessionID,
 		arg.Limit,
-		pq.Array(arg.OpinionIds),
 		arg.SortKey,
 	)
 	if err != nil {
