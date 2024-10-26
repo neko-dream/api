@@ -304,20 +304,27 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 	if !value.Prefectures.Null {
 		prefecture = &value.Prefectures.Value
 	}
+	var displayName *string
+	if !value.DisplayName.Null {
+		displayName = &value.DisplayName.Value
+	}
+	var occupation *string
+	if !value.Occupation.Null {
+		txt, err := value.Occupation.Value.MarshalText()
+		if err != nil {
+			utils.HandleError(ctx, err, "value.Occupation.Value.MarshalText")
+			return nil, messages.InternalServerError
+		}
+		occupation = lo.ToPtr(string(txt))
+	}
 
 	out, err := u.EditUserUseCase.Execute(ctx, user_usecase.EditUserInput{
 		UserID:      userID,
-		DisplayName: utils.ToPtrIfNotNullValue(value.DisplayName.Null, value.DisplayName.Value),
+		DisplayName: displayName,
 		Icon:        file,
 		YearOfBirth: yearOfBirth,
 		City:        city,
-		Occupation: utils.ToPtrIfNotNullFunc(value.Occupation.Null, func() *string {
-			txt, err := value.Occupation.Value.MarshalText()
-			if err != nil {
-				return nil
-			}
-			return lo.ToPtr(string(txt))
-		}),
+		Occupation:  occupation,
 		Gender: utils.ToPtrIfNotNullFunc(value.Gender.Null, func() *string {
 			txt, err := value.Gender.Value.MarshalText()
 			if err != nil {
