@@ -320,6 +320,27 @@
               ],
               "nullable": true
             }
+          },
+          {
+            "name": "sortKey",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "latest",
+                "oldest",
+                "mostOpinion"
+              ],
+              "x-apidog": {
+                "enumDescriptions": {
+                  "latest": "",
+                  "oldest": "",
+                  "mostOpinion": ""
+                }
+              }
+            }
           }
         ],
         "responses": {

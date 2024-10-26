@@ -18,10 +18,11 @@ type (
 	}
 
 	ListTalkSessionInput struct {
-		Limit  int
-		Offset int
-		Theme  *string
-		Status string
+		Limit   int
+		Offset  int
+		Theme   *string
+		Status  string
+		SortKey *string
 	}
 
 	ListTalkSessionOutput struct {
@@ -69,6 +70,12 @@ func (h *listTalkSessionQueryHandler) Execute(ctx context.Context, input ListTal
 	if input.Status == "" {
 		input.Status = "open"
 	}
+	var sortKey string
+	if input.SortKey != nil {
+		sortKey = *input.SortKey
+	} else {
+		sortKey = "latest"
+	}
 
 	talkSessionRow, err := h.GetQueries(ctx).ListTalkSessions(ctx, model.ListTalkSessionsParams{
 		Limit:  int32(input.Limit),
@@ -78,7 +85,8 @@ func (h *listTalkSessionQueryHandler) Execute(ctx context.Context, input ListTal
 			sql.NullString{String: *input.Theme, Valid: true},
 			sql.NullString{},
 		),
-		Status: sql.NullString{String: input.Status, Valid: true},
+		Status:  sql.NullString{String: input.Status, Valid: true},
+		SortKey: sql.NullString{String: sortKey, Valid: true},
 	})
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

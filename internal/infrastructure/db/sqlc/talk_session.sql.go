@@ -334,14 +334,22 @@ WHERE
         THEN talk_sessions.theme LIKE '%' || $4::text || '%'
         ELSE TRUE
     END)
+ORDER BY
+    CASE $5::text
+        WHEN 'latest' THEN EXTRACT(EPOCH FROM talk_sessions.created_at)
+        WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM talk_sessions.created_at)
+        WHEN 'mostOpinions' THEN oc.opinion_count
+        ELSE EXTRACT(EPOCH FROM talk_sessions.created_at)
+    END ASC
 LIMIT $1 OFFSET $2
 `
 
 type ListTalkSessionsParams struct {
-	Limit  int32
-	Offset int32
-	Status sql.NullString
-	Theme  sql.NullString
+	Limit   int32
+	Offset  int32
+	Status  sql.NullString
+	Theme   sql.NullString
+	SortKey sql.NullString
 }
 
 type ListTalkSessionsRow struct {
@@ -366,6 +374,7 @@ func (q *Queries) ListTalkSessions(ctx context.Context, arg ListTalkSessionsPara
 		arg.Offset,
 		arg.Status,
 		arg.Theme,
+		arg.SortKey,
 	)
 	if err != nil {
 		return nil, err

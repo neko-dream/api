@@ -621,17 +621,10 @@ SELECT
     users.display_name AS display_name,
     users.display_id AS display_id,
     users.icon_url AS icon_url,
-    COALESCE(pv.vote_type, 0) AS vote_type,
-    -- 意見に対するリプライ数（再帰）
     COALESCE(rc.reply_count, 0) AS reply_count
 FROM opinions
 LEFT JOIN users
     ON opinions.user_id = users.user_id
-LEFT JOIN (
-    SELECT votes.vote_type, votes.user_id, votes.opinion_id
-    FROM votes
-) pv ON opinions.parent_opinion_id = pv.opinion_id
-    AND opinions.user_id = pv.user_id
 LEFT JOIN (
     SELECT opinions.opinion_id
     FROM opinions
@@ -645,13 +638,14 @@ LEFT JOIN (
     SELECT COUNT(opinion_id) AS reply_count, parent_opinion_id as opinion_id
     FROM opinions
     GROUP BY parent_opinion_id
-) rc ON opinions.opinion_id = rc.opinion_id
+) rc ON rc.opinion_id = opinions.opinion_id
 LEFT JOIN (
     SELECT rank, opinion_id
     FROM representative_opinions
 ) ro ON opinions.opinion_id = ro.opinion_id
 WHERE opinions.talk_session_id = $2
     AND vote_count.opinion_id = opinions.opinion_id
+    AND opinions.parent_opinion_id IS NULL
 ORDER BY
     CASE $4::text
         WHEN 'top' THEN COALESCE(ro.rank, 0)
@@ -680,13 +674,83 @@ type GetRandomOpinionsRow struct {
 	DisplayName     sql.NullString
 	DisplayID       sql.NullString
 	IconUrl         sql.NullString
-	VoteType        int16
 	ReplyCount      int64
 }
 
-// 親意見に対するユーザーの意思を取得
+// SELECT
+//
+//	opinions.opinion_id,
+//	opinions.talk_session_id,
+//	opinions.user_id,
+//	opinions.parent_opinion_id,
+//	opinions.title,
+//	opinions.content,
+//	opinions.reference_url,
+//	opinions.picture_url,
+//	opinions.created_at,
+//	users.display_name AS display_name,
+//	users.display_id AS display_id,
+//	users.icon_url AS icon_url,
+//	COALESCE(pv.vote_type, 0) AS vote_type,
+//	COALESCE(rc.reply_count, 0) AS reply_count
+//
+// FROM opinions
+// LEFT JOIN users
+//
+//	ON opinions.user_id = users.user_id
+//
+// -- 親意見に対する意見投稿ユーザーの意思を取得
+// LEFT JOIN (
+//
+//	SELECT votes.vote_type, votes.user_id, votes.opinion_id
+//	FROM votes
+//
+// ) pv ON pv.opinion_id = opinions.parent_opinion_id
+//
+//	AND pv.user_id = opinions.user_id
+//
+// -- 指定されたユーザーが投票していない意見のみを取得
+// LEFT JOIN (
+//
+//	SELECT opinions.opinion_id
+//	FROM opinions
+//	LEFT JOIN votes
+//	    ON opinions.opinion_id = votes.opinion_id
+//	    AND votes.user_id = $1
+//	GROUP BY opinions.opinion_id
+//	HAVING COUNT(votes.vote_id) = 0
+//
+// ) vote_count ON opinions.opinion_id = vote_count.opinion_id
+// -- この意見に対するリプライ数
+// LEFT JOIN (
+//
+//	SELECT COUNT(opinion_id) AS reply_count, parent_opinion_id as opinion_id
+//	FROM opinions
+//	GROUP BY parent_opinion_id
+//
+// ) rc ON rc.opinion_id = opinions.opinion_id
+// -- グループ内のランクを取得
+// LEFT JOIN (
+//
+//	SELECT rank, opinion_id
+//	FROM representative_opinions
+//
+// ) ro ON opinions.opinion_id = ro.opinion_id
+// -- トークセッションに紐づく意見のみを取得
+// WHERE opinions.talk_session_id = $2
+//
+//	AND vote_count.opinion_id = opinions.opinion_id
+//
+// ORDER BY
+//
+//	CASE sqlc.narg('sort_key')::text
+//	    WHEN 'top' THEN COALESCE(ro.rank, 0)
+//	    ELSE RANDOM()
+//	END ASC
+//
+// LIMIT $3;
 // 指定されたユーザーが投票していない意見のみを取得
-// 意見に対するリプライ数
+// この意見に対するリプライ数
 // グループ内のランクを取得
 // トークセッションに紐づく意見のみを取得
 func (q *Queries) GetRandomOpinions(ctx context.Context, arg GetRandomOpinionsParams) ([]GetRandomOpinionsRow, error) {
@@ -716,7 +780,6 @@ func (q *Queries) GetRandomOpinions(ctx context.Context, arg GetRandomOpinionsPa
 			&i.DisplayName,
 			&i.DisplayID,
 			&i.IconUrl,
-			&i.VoteType,
 			&i.ReplyCount,
 		); err != nil {
 			return nil, err

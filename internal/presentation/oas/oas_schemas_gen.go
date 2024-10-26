@@ -1940,6 +1940,54 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionOwner) SetIconURL(val Op
 	s.IconURL = val
 }
 
+type GetTalkSessionListSortKey string
+
+const (
+	GetTalkSessionListSortKeyLatest      GetTalkSessionListSortKey = "latest"
+	GetTalkSessionListSortKeyOldest      GetTalkSessionListSortKey = "oldest"
+	GetTalkSessionListSortKeyMostOpinion GetTalkSessionListSortKey = "mostOpinion"
+)
+
+// AllValues returns all GetTalkSessionListSortKey values.
+func (GetTalkSessionListSortKey) AllValues() []GetTalkSessionListSortKey {
+	return []GetTalkSessionListSortKey{
+		GetTalkSessionListSortKeyLatest,
+		GetTalkSessionListSortKeyOldest,
+		GetTalkSessionListSortKeyMostOpinion,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s GetTalkSessionListSortKey) MarshalText() ([]byte, error) {
+	switch s {
+	case GetTalkSessionListSortKeyLatest:
+		return []byte(s), nil
+	case GetTalkSessionListSortKeyOldest:
+		return []byte(s), nil
+	case GetTalkSessionListSortKeyMostOpinion:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *GetTalkSessionListSortKey) UnmarshalText(data []byte) error {
+	switch GetTalkSessionListSortKey(data) {
+	case GetTalkSessionListSortKeyLatest:
+		*s = GetTalkSessionListSortKeyLatest
+		return nil
+	case GetTalkSessionListSortKeyOldest:
+		*s = GetTalkSessionListSortKeyOldest
+		return nil
+	case GetTalkSessionListSortKeyMostOpinion:
+		*s = GetTalkSessionListSortKeyMostOpinion
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
 type GetTalkSessionListStatus string
 
 const (
@@ -4715,6 +4763,52 @@ func (o OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation) Get() (v Get
 
 // Or returns value if set, or given parameter if does not.
 func (o OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation) Or(d GetTalkSessionListOKTalkSessionsItemTalkSessionLocation) GetTalkSessionListOKTalkSessionsItemTalkSessionLocation {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptGetTalkSessionListSortKey returns new OptGetTalkSessionListSortKey with value set to v.
+func NewOptGetTalkSessionListSortKey(v GetTalkSessionListSortKey) OptGetTalkSessionListSortKey {
+	return OptGetTalkSessionListSortKey{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptGetTalkSessionListSortKey is optional GetTalkSessionListSortKey.
+type OptGetTalkSessionListSortKey struct {
+	Value GetTalkSessionListSortKey
+	Set   bool
+}
+
+// IsSet returns true if OptGetTalkSessionListSortKey was set.
+func (o OptGetTalkSessionListSortKey) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptGetTalkSessionListSortKey) Reset() {
+	var v GetTalkSessionListSortKey
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptGetTalkSessionListSortKey) SetTo(v GetTalkSessionListSortKey) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptGetTalkSessionListSortKey) Get() (v GetTalkSessionListSortKey, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptGetTalkSessionListSortKey) Or(d GetTalkSessionListSortKey) GetTalkSessionListSortKey {
 	if v, ok := o.Get(); ok {
 		return v
 	}

@@ -954,6 +954,19 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionOwner) Validate() error 
 	return nil
 }
 
+func (s GetTalkSessionListSortKey) Validate() error {
+	switch s {
+	case "latest":
+		return nil
+	case "oldest":
+		return nil
+	case "mostOpinion":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
 func (s GetTalkSessionListStatus) Validate() error {
 	switch s {
 	case "open":

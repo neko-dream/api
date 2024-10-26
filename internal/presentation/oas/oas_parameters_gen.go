@@ -549,9 +549,10 @@ type GetTalkSessionListParams struct {
 	// 1ページあたりの要素数.
 	Limit OptNilInt
 	// どの要素から始めるか.
-	Offset OptNilInt
-	Theme  OptNilString
-	Status OptNilGetTalkSessionListStatus
+	Offset  OptNilInt
+	Theme   OptNilString
+	Status  OptNilGetTalkSessionListStatus
+	SortKey OptGetTalkSessionListSortKey
 }
 
 func unpackGetTalkSessionListParams(packed middleware.Parameters) (params GetTalkSessionListParams) {
@@ -589,6 +590,15 @@ func unpackGetTalkSessionListParams(packed middleware.Parameters) (params GetTal
 		}
 		if v, ok := packed[key]; ok {
 			params.Status = v.(OptNilGetTalkSessionListStatus)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "sortKey",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.SortKey = v.(OptGetTalkSessionListSortKey)
 		}
 	}
 	return params
@@ -776,6 +786,62 @@ func decodeGetTalkSessionListParams(args [0]string, argsEscaped bool, r *http.Re
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "status",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: sortKey.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "sortKey",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotSortKeyVal GetTalkSessionListSortKey
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotSortKeyVal = GetTalkSessionListSortKey(c)
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.SortKey.SetTo(paramsDotSortKeyVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.SortKey.Get(); ok {
+					if err := func() error {
+						if err := value.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "sortKey",
 			In:   "query",
 			Err:  err,
 		}

@@ -146,7 +146,6 @@ SELECT
     users.display_name AS display_name,
     users.display_id AS display_id,
     users.icon_url AS icon_url,
-    COALESCE(pv.vote_type, 0) AS vote_type,
     COALESCE(rc.reply_count, 0) AS reply_count
 FROM opinions
 LEFT JOIN users

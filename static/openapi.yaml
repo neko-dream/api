@@ -300,6 +300,21 @@ paths:
                 value: finished
                 description: 終了済み
             nullable: true
+        - name: sortKey
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+            enum:
+              - latest
+              - oldest
+              - mostOpinion
+            x-apidog:
+              enumDescriptions:
+                latest: ''
+                oldest: ''
+                mostOpinion: ''
       responses:
         '200':
           description: 成功

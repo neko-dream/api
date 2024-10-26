@@ -977,6 +977,10 @@ func (s *Server) handleGetTalkSessionListRequest(args [0]string, argsEscaped boo
 					Name: "status",
 					In:   "query",
 				}: params.Status,
+				{
+					Name: "sortKey",
+					In:   "query",
+				}: params.SortKey,
 			},
 			Raw: r,
 		}
