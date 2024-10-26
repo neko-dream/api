@@ -24,6 +24,7 @@ type (
 		UserID        shared.UUID[user.User]
 		DisplayName   *string               // ユーザーの表示名
 		Icon          *multipart.FileHeader // ユーザーのアイコン
+		DeleteIcon    bool                  // アイコンを削除するかどうか
 		YearOfBirth   *int                  // ユーザーの生年
 		Gender        *string               // ユーザーの性別
 		City          *string               // ユーザーの住んでいる市町村
@@ -91,6 +92,9 @@ func (e *editUserInteractor) Execute(ctx context.Context, input EditUserInput) (
 				utils.HandleError(ctx, err, "User.SetIconFile")
 				return messages.UserUpdateError
 			}
+		}
+		if input.DeleteIcon {
+			foundUser.DeleteIcon()
 		}
 
 		if input.YearOfBirth != nil ||

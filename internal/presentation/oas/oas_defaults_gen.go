@@ -3,6 +3,14 @@
 package oas
 
 // setDefaults set default value of fields.
+func (s *EditUserProfileReq) setDefaults() {
+	{
+		val := bool(false)
+		s.DeleteIcon.SetTo(val)
+	}
+}
+
+// setDefaults set default value of fields.
 func (s *RegisterUserReq) setDefaults() {
 	{
 		val := int(0)

@@ -676,6 +676,11 @@ paths:
                   format: binary
                   description: ユーザーアイコン
                   example: ''
+                deleteIcon:
+                  type: boolean
+                  default: false
+                  example: 'false'
+                  nullable: true
                 yearOfBirth:
                   type: integer
                   description: 生まれ年
@@ -1696,7 +1701,6 @@ paths:
                 required:
                   - rootOpinion
                   - opinions
-                  - 01JB4SBYE7KMJCHCEZ2Y4HB9NK
         '400':
           description: ErrorResponse
           content:

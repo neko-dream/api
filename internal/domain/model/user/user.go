@@ -111,6 +111,9 @@ func (u *User) SetIconFile(ctx context.Context, file *multipart.FileHeader) erro
 	u.profileIcon.url = nil
 	return nil
 }
+func (u *User) DeleteIcon() {
+	u.profileIcon = nil
+}
 
 func (u *User) Provider() oauth.AuthProviderName {
 	return u.provider

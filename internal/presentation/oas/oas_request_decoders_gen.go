@@ -385,6 +385,38 @@ func (s *Server) decodeEditUserProfileRequest(r *http.Request) (
 			}
 			{
 				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "deleteIcon",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotDeleteIconVal bool
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToBool(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotDeleteIconVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.DeleteIcon.SetTo(optFormDotDeleteIconVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"deleteIcon\"")
+					}
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
 					Name:    "yearOfBirth",
 					Style:   uri.QueryStyleForm,
 					Explode: true,

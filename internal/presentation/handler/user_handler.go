@@ -274,6 +274,10 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 		utils.HandleError(ctx, err, "value.Validate")
 		return nil, messages.RequiredParameterError
 	}
+	deleteIcon := false
+	if value.DeleteIcon.IsSet() {
+		deleteIcon = value.DeleteIcon.Value
+	}
 
 	var file *multipart.FileHeader
 	if value.Icon.IsSet() {
@@ -342,6 +346,7 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 		}),
 		HouseholdSize: householdSize,
 		Prefecture:    prefecture,
+		DeleteIcon:    deleteIcon,
 	})
 	if err != nil {
 		utils.HandleError(ctx, err, "EditUserUseCase.Execute")

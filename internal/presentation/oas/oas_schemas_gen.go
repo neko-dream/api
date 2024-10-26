@@ -477,7 +477,8 @@ type EditUserProfileReq struct {
 	// ユーザー名.
 	DisplayName OptNilString `json:"displayName"`
 	// ユーザーアイコン.
-	Icon OptMultipartFile `json:"icon"`
+	Icon       OptMultipartFile `json:"icon"`
+	DeleteIcon OptNilBool       `json:"deleteIcon"`
 	// 生まれ年.
 	YearOfBirth OptNilInt `json:"yearOfBirth"`
 	// 性別.
@@ -500,6 +501,11 @@ func (s *EditUserProfileReq) GetDisplayName() OptNilString {
 // GetIcon returns the value of Icon.
 func (s *EditUserProfileReq) GetIcon() OptMultipartFile {
 	return s.Icon
+}
+
+// GetDeleteIcon returns the value of DeleteIcon.
+func (s *EditUserProfileReq) GetDeleteIcon() OptNilBool {
+	return s.DeleteIcon
 }
 
 // GetYearOfBirth returns the value of YearOfBirth.
@@ -540,6 +546,11 @@ func (s *EditUserProfileReq) SetDisplayName(val OptNilString) {
 // SetIcon sets the value of Icon.
 func (s *EditUserProfileReq) SetIcon(val OptMultipartFile) {
 	s.Icon = val
+}
+
+// SetDeleteIcon sets the value of DeleteIcon.
+func (s *EditUserProfileReq) SetDeleteIcon(val OptNilBool) {
+	s.DeleteIcon = val
 }
 
 // SetYearOfBirth sets the value of YearOfBirth.
