@@ -7560,12 +7560,6 @@ func (s *OpinionCommentsOK) encodeFields(e *jx.Encoder) {
 		s.RootOpinion.Encode(e)
 	}
 	{
-		if s.MyVoteType.Set {
-			e.FieldStart("myVoteType")
-			s.MyVoteType.Encode(e)
-		}
-	}
-	{
 		e.FieldStart("opinions")
 		e.ArrStart()
 		for _, elem := range s.Opinions {
@@ -7575,10 +7569,9 @@ func (s *OpinionCommentsOK) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfOpinionCommentsOK = [3]string{
+var jsonFieldsNameOfOpinionCommentsOK = [2]string{
 	0: "rootOpinion",
-	1: "myVoteType",
-	2: "opinions",
+	1: "opinions",
 }
 
 // Decode decodes OpinionCommentsOK from json.
@@ -7600,18 +7593,8 @@ func (s *OpinionCommentsOK) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"rootOpinion\"")
 			}
-		case "myVoteType":
-			if err := func() error {
-				s.MyVoteType.Reset()
-				if err := s.MyVoteType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"myVoteType\"")
-			}
 		case "opinions":
-			requiredBitSet[0] |= 1 << 2
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
 				s.Opinions = make([]OpinionCommentsOKOpinionsItem, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
@@ -7638,7 +7621,7 @@ func (s *OpinionCommentsOK) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000101,
+		0b00000011,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -7680,95 +7663,6 @@ func (s *OpinionCommentsOK) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OpinionCommentsOK) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes OpinionCommentsOKMyVoteType as json.
-func (s OpinionCommentsOKMyVoteType) Encode(e *jx.Encoder) {
-	switch s.Type {
-	case OpinionCommentsOKMyVoteType0OpinionCommentsOKMyVoteType:
-		s.OpinionCommentsOKMyVoteType0.Encode(e)
-	case NullOpinionCommentsOKMyVoteType:
-		_ = s.Null
-		e.Null()
-	}
-}
-
-// Decode decodes OpinionCommentsOKMyVoteType from json.
-func (s *OpinionCommentsOKMyVoteType) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode OpinionCommentsOKMyVoteType to nil")
-	}
-	// Sum type type_discriminator.
-	switch t := d.Next(); t {
-	case jx.Null:
-		if err := d.Null(); err != nil {
-			return err
-		}
-		s.Type = NullOpinionCommentsOKMyVoteType
-	case jx.String:
-		if err := s.OpinionCommentsOKMyVoteType0.Decode(d); err != nil {
-			return err
-		}
-		s.Type = OpinionCommentsOKMyVoteType0OpinionCommentsOKMyVoteType
-	default:
-		return errors.Errorf("unexpected json type %q", t)
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OpinionCommentsOKMyVoteType) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OpinionCommentsOKMyVoteType) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes OpinionCommentsOKMyVoteType0 as json.
-func (s OpinionCommentsOKMyVoteType0) Encode(e *jx.Encoder) {
-	e.Str(string(s))
-}
-
-// Decode decodes OpinionCommentsOKMyVoteType0 from json.
-func (s *OpinionCommentsOKMyVoteType0) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode OpinionCommentsOKMyVoteType0 to nil")
-	}
-	v, err := d.StrBytes()
-	if err != nil {
-		return err
-	}
-	// Try to use constant string.
-	switch OpinionCommentsOKMyVoteType0(v) {
-	case OpinionCommentsOKMyVoteType0Agree:
-		*s = OpinionCommentsOKMyVoteType0Agree
-	case OpinionCommentsOKMyVoteType0Disagree:
-		*s = OpinionCommentsOKMyVoteType0Disagree
-	case OpinionCommentsOKMyVoteType0Pass:
-		*s = OpinionCommentsOKMyVoteType0Pass
-	default:
-		*s = OpinionCommentsOKMyVoteType0(v)
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OpinionCommentsOKMyVoteType0) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OpinionCommentsOKMyVoteType0) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -8372,14 +8266,19 @@ func (s *OpinionCommentsOKRootOpinion) encodeFields(e *jx.Encoder) {
 		s.User.Encode(e)
 	}
 	{
+		e.FieldStart("myVoteType")
+		s.MyVoteType.Encode(e)
+	}
+	{
 		e.FieldStart("opinion")
 		s.Opinion.Encode(e)
 	}
 }
 
-var jsonFieldsNameOfOpinionCommentsOKRootOpinion = [2]string{
+var jsonFieldsNameOfOpinionCommentsOKRootOpinion = [3]string{
 	0: "user",
-	1: "opinion",
+	1: "myVoteType",
+	2: "opinion",
 }
 
 // Decode decodes OpinionCommentsOKRootOpinion from json.
@@ -8401,8 +8300,18 @@ func (s *OpinionCommentsOKRootOpinion) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"user\"")
 			}
-		case "opinion":
+		case "myVoteType":
 			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				if err := s.MyVoteType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"myVoteType\"")
+			}
+		case "opinion":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
 				if err := s.Opinion.Decode(d); err != nil {
 					return err
@@ -8421,7 +8330,7 @@ func (s *OpinionCommentsOKRootOpinion) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000011,
+		0b00000111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -8463,6 +8372,48 @@ func (s *OpinionCommentsOKRootOpinion) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OpinionCommentsOKRootOpinion) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes OpinionCommentsOKRootOpinionMyVoteType as json.
+func (s OpinionCommentsOKRootOpinionMyVoteType) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes OpinionCommentsOKRootOpinionMyVoteType from json.
+func (s *OpinionCommentsOKRootOpinionMyVoteType) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode OpinionCommentsOKRootOpinionMyVoteType to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch OpinionCommentsOKRootOpinionMyVoteType(v) {
+	case OpinionCommentsOKRootOpinionMyVoteTypeAgree:
+		*s = OpinionCommentsOKRootOpinionMyVoteTypeAgree
+	case OpinionCommentsOKRootOpinionMyVoteTypeDisagree:
+		*s = OpinionCommentsOKRootOpinionMyVoteTypeDisagree
+	case OpinionCommentsOKRootOpinionMyVoteTypePass:
+		*s = OpinionCommentsOKRootOpinionMyVoteTypePass
+	default:
+		*s = OpinionCommentsOKRootOpinionMyVoteType(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OpinionCommentsOKRootOpinionMyVoteType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OpinionCommentsOKRootOpinionMyVoteType) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -10154,39 +10105,6 @@ func (s OptOpinionComments2OKRootOpinionOpinionVoteType) MarshalJSON() ([]byte, 
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptOpinionComments2OKRootOpinionOpinionVoteType) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes OpinionCommentsOKMyVoteType as json.
-func (o OptOpinionCommentsOKMyVoteType) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes OpinionCommentsOKMyVoteType from json.
-func (o *OptOpinionCommentsOKMyVoteType) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptOpinionCommentsOKMyVoteType to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptOpinionCommentsOKMyVoteType) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptOpinionCommentsOKMyVoteType) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

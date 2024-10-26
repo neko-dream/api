@@ -1538,6 +1538,23 @@ paths:
                           - displayID
                           - displayName
                         description: 作成ユーザー
+                      myVoteType:
+                        type: string
+                        description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                        enum:
+                          - agree
+                          - disagree
+                          - pass
+                        x-apidog-enum:
+                          - name: ''
+                            value: agree
+                            description: 良さそう
+                          - name: ''
+                            value: disagree
+                            description: 違うかも
+                          - name: ''
+                            value: pass
+                            description: 保留
                       opinion:
                         type: object
                         properties:
@@ -1584,25 +1601,7 @@ paths:
                     required:
                       - user
                       - opinion
-                  myVoteType:
-                    anyOf:
-                      - type: string
-                        description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                        enum:
-                          - agree
-                          - disagree
-                          - pass
-                        x-apidog-enum:
-                          - name: ''
-                            value: agree
-                            description: 良さそう
-                          - name: ''
-                            value: disagree
-                            description: 違うかも
-                          - name: ''
-                            value: pass
-                            description: 保留
-                      - type: 'null'
+                      - myVoteType
                   opinions:
                     type: array
                     items:
@@ -1697,6 +1696,7 @@ paths:
                 required:
                   - rootOpinion
                   - opinions
+                  - 01JB4SBYE7KMJCHCEZ2Y4HB9NK
         '400':
           description: ErrorResponse
           content:

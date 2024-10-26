@@ -1686,24 +1686,18 @@
                           "$ref": "#/components/schemas/user",
                           "description": "作成ユーザー"
                         },
+                        "myVoteType": {
+                          "$ref": "#/components/schemas/voteType",
+                          "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
+                        },
                         "opinion": {
                           "$ref": "#/components/schemas/opinion"
                         }
                       },
                       "required": [
                         "user",
-                        "opinion"
-                      ]
-                    },
-                    "myVoteType": {
-                      "anyOf": [
-                        {
-                          "$ref": "#/components/schemas/voteType",
-                          "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
-                        },
-                        {
-                          "type": "null"
-                        }
+                        "opinion",
+                        "myVoteType"
                       ]
                     },
                     "opinions": {
@@ -1739,7 +1733,8 @@
                   },
                   "required": [
                     "rootOpinion",
-                    "opinions"
+                    "opinions",
+                    "01JB4SBYE7KMJCHCEZ2Y4HB9NK"
                   ]
                 }
               }

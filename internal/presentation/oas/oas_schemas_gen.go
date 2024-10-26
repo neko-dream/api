@@ -3393,18 +3393,12 @@ func (*OpinionCommentsInternalServerError) opinionCommentsRes() {}
 
 type OpinionCommentsOK struct {
 	RootOpinion OpinionCommentsOKRootOpinion    `json:"rootOpinion"`
-	MyVoteType  OptOpinionCommentsOKMyVoteType  `json:"myVoteType"`
 	Opinions    []OpinionCommentsOKOpinionsItem `json:"opinions"`
 }
 
 // GetRootOpinion returns the value of RootOpinion.
 func (s *OpinionCommentsOK) GetRootOpinion() OpinionCommentsOKRootOpinion {
 	return s.RootOpinion
-}
-
-// GetMyVoteType returns the value of MyVoteType.
-func (s *OpinionCommentsOK) GetMyVoteType() OptOpinionCommentsOKMyVoteType {
-	return s.MyVoteType
 }
 
 // GetOpinions returns the value of Opinions.
@@ -3417,132 +3411,12 @@ func (s *OpinionCommentsOK) SetRootOpinion(val OpinionCommentsOKRootOpinion) {
 	s.RootOpinion = val
 }
 
-// SetMyVoteType sets the value of MyVoteType.
-func (s *OpinionCommentsOK) SetMyVoteType(val OptOpinionCommentsOKMyVoteType) {
-	s.MyVoteType = val
-}
-
 // SetOpinions sets the value of Opinions.
 func (s *OpinionCommentsOK) SetOpinions(val []OpinionCommentsOKOpinionsItem) {
 	s.Opinions = val
 }
 
 func (*OpinionCommentsOK) opinionCommentsRes() {}
-
-// OpinionCommentsOKMyVoteType represents sum type.
-type OpinionCommentsOKMyVoteType struct {
-	Type                         OpinionCommentsOKMyVoteTypeType // switch on this field
-	OpinionCommentsOKMyVoteType0 OpinionCommentsOKMyVoteType0
-	Null                         struct{}
-}
-
-// OpinionCommentsOKMyVoteTypeType is oneOf type of OpinionCommentsOKMyVoteType.
-type OpinionCommentsOKMyVoteTypeType string
-
-// Possible values for OpinionCommentsOKMyVoteTypeType.
-const (
-	OpinionCommentsOKMyVoteType0OpinionCommentsOKMyVoteType OpinionCommentsOKMyVoteTypeType = "OpinionCommentsOKMyVoteType0"
-	NullOpinionCommentsOKMyVoteType                         OpinionCommentsOKMyVoteTypeType = "struct{}"
-)
-
-// IsOpinionCommentsOKMyVoteType0 reports whether OpinionCommentsOKMyVoteType is OpinionCommentsOKMyVoteType0.
-func (s OpinionCommentsOKMyVoteType) IsOpinionCommentsOKMyVoteType0() bool {
-	return s.Type == OpinionCommentsOKMyVoteType0OpinionCommentsOKMyVoteType
-}
-
-// IsNull reports whether OpinionCommentsOKMyVoteType is struct{}.
-func (s OpinionCommentsOKMyVoteType) IsNull() bool { return s.Type == NullOpinionCommentsOKMyVoteType }
-
-// SetOpinionCommentsOKMyVoteType0 sets OpinionCommentsOKMyVoteType to OpinionCommentsOKMyVoteType0.
-func (s *OpinionCommentsOKMyVoteType) SetOpinionCommentsOKMyVoteType0(v OpinionCommentsOKMyVoteType0) {
-	s.Type = OpinionCommentsOKMyVoteType0OpinionCommentsOKMyVoteType
-	s.OpinionCommentsOKMyVoteType0 = v
-}
-
-// GetOpinionCommentsOKMyVoteType0 returns OpinionCommentsOKMyVoteType0 and true boolean if OpinionCommentsOKMyVoteType is OpinionCommentsOKMyVoteType0.
-func (s OpinionCommentsOKMyVoteType) GetOpinionCommentsOKMyVoteType0() (v OpinionCommentsOKMyVoteType0, ok bool) {
-	if !s.IsOpinionCommentsOKMyVoteType0() {
-		return v, false
-	}
-	return s.OpinionCommentsOKMyVoteType0, true
-}
-
-// NewOpinionCommentsOKMyVoteType0OpinionCommentsOKMyVoteType returns new OpinionCommentsOKMyVoteType from OpinionCommentsOKMyVoteType0.
-func NewOpinionCommentsOKMyVoteType0OpinionCommentsOKMyVoteType(v OpinionCommentsOKMyVoteType0) OpinionCommentsOKMyVoteType {
-	var s OpinionCommentsOKMyVoteType
-	s.SetOpinionCommentsOKMyVoteType0(v)
-	return s
-}
-
-// SetNull sets OpinionCommentsOKMyVoteType to struct{}.
-func (s *OpinionCommentsOKMyVoteType) SetNull(v struct{}) {
-	s.Type = NullOpinionCommentsOKMyVoteType
-	s.Null = v
-}
-
-// GetNull returns struct{} and true boolean if OpinionCommentsOKMyVoteType is struct{}.
-func (s OpinionCommentsOKMyVoteType) GetNull() (v struct{}, ok bool) {
-	if !s.IsNull() {
-		return v, false
-	}
-	return s.Null, true
-}
-
-// NewNullOpinionCommentsOKMyVoteType returns new OpinionCommentsOKMyVoteType from struct{}.
-func NewNullOpinionCommentsOKMyVoteType(v struct{}) OpinionCommentsOKMyVoteType {
-	var s OpinionCommentsOKMyVoteType
-	s.SetNull(v)
-	return s
-}
-
-// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
-type OpinionCommentsOKMyVoteType0 string
-
-const (
-	OpinionCommentsOKMyVoteType0Agree    OpinionCommentsOKMyVoteType0 = "agree"
-	OpinionCommentsOKMyVoteType0Disagree OpinionCommentsOKMyVoteType0 = "disagree"
-	OpinionCommentsOKMyVoteType0Pass     OpinionCommentsOKMyVoteType0 = "pass"
-)
-
-// AllValues returns all OpinionCommentsOKMyVoteType0 values.
-func (OpinionCommentsOKMyVoteType0) AllValues() []OpinionCommentsOKMyVoteType0 {
-	return []OpinionCommentsOKMyVoteType0{
-		OpinionCommentsOKMyVoteType0Agree,
-		OpinionCommentsOKMyVoteType0Disagree,
-		OpinionCommentsOKMyVoteType0Pass,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s OpinionCommentsOKMyVoteType0) MarshalText() ([]byte, error) {
-	switch s {
-	case OpinionCommentsOKMyVoteType0Agree:
-		return []byte(s), nil
-	case OpinionCommentsOKMyVoteType0Disagree:
-		return []byte(s), nil
-	case OpinionCommentsOKMyVoteType0Pass:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *OpinionCommentsOKMyVoteType0) UnmarshalText(data []byte) error {
-	switch OpinionCommentsOKMyVoteType0(data) {
-	case OpinionCommentsOKMyVoteType0Agree:
-		*s = OpinionCommentsOKMyVoteType0Agree
-		return nil
-	case OpinionCommentsOKMyVoteType0Disagree:
-		*s = OpinionCommentsOKMyVoteType0Disagree
-		return nil
-	case OpinionCommentsOKMyVoteType0Pass:
-		*s = OpinionCommentsOKMyVoteType0Pass
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
-}
 
 type OpinionCommentsOKOpinionsItem struct {
 	Opinion OpinionCommentsOKOpinionsItemOpinion `json:"opinion"`
@@ -3872,13 +3746,20 @@ func (s *OpinionCommentsOKOpinionsItemUser) SetIconURL(val OptNilString) {
 
 type OpinionCommentsOKRootOpinion struct {
 	// 作成ユーザー.
-	User    OpinionCommentsOKRootOpinionUser    `json:"user"`
-	Opinion OpinionCommentsOKRootOpinionOpinion `json:"opinion"`
+	User OpinionCommentsOKRootOpinionUser `json:"user"`
+	// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+	MyVoteType OpinionCommentsOKRootOpinionMyVoteType `json:"myVoteType"`
+	Opinion    OpinionCommentsOKRootOpinionOpinion    `json:"opinion"`
 }
 
 // GetUser returns the value of User.
 func (s *OpinionCommentsOKRootOpinion) GetUser() OpinionCommentsOKRootOpinionUser {
 	return s.User
+}
+
+// GetMyVoteType returns the value of MyVoteType.
+func (s *OpinionCommentsOKRootOpinion) GetMyVoteType() OpinionCommentsOKRootOpinionMyVoteType {
+	return s.MyVoteType
 }
 
 // GetOpinion returns the value of Opinion.
@@ -3891,9 +3772,63 @@ func (s *OpinionCommentsOKRootOpinion) SetUser(val OpinionCommentsOKRootOpinionU
 	s.User = val
 }
 
+// SetMyVoteType sets the value of MyVoteType.
+func (s *OpinionCommentsOKRootOpinion) SetMyVoteType(val OpinionCommentsOKRootOpinionMyVoteType) {
+	s.MyVoteType = val
+}
+
 // SetOpinion sets the value of Opinion.
 func (s *OpinionCommentsOKRootOpinion) SetOpinion(val OpinionCommentsOKRootOpinionOpinion) {
 	s.Opinion = val
+}
+
+// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+type OpinionCommentsOKRootOpinionMyVoteType string
+
+const (
+	OpinionCommentsOKRootOpinionMyVoteTypeAgree    OpinionCommentsOKRootOpinionMyVoteType = "agree"
+	OpinionCommentsOKRootOpinionMyVoteTypeDisagree OpinionCommentsOKRootOpinionMyVoteType = "disagree"
+	OpinionCommentsOKRootOpinionMyVoteTypePass     OpinionCommentsOKRootOpinionMyVoteType = "pass"
+)
+
+// AllValues returns all OpinionCommentsOKRootOpinionMyVoteType values.
+func (OpinionCommentsOKRootOpinionMyVoteType) AllValues() []OpinionCommentsOKRootOpinionMyVoteType {
+	return []OpinionCommentsOKRootOpinionMyVoteType{
+		OpinionCommentsOKRootOpinionMyVoteTypeAgree,
+		OpinionCommentsOKRootOpinionMyVoteTypeDisagree,
+		OpinionCommentsOKRootOpinionMyVoteTypePass,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s OpinionCommentsOKRootOpinionMyVoteType) MarshalText() ([]byte, error) {
+	switch s {
+	case OpinionCommentsOKRootOpinionMyVoteTypeAgree:
+		return []byte(s), nil
+	case OpinionCommentsOKRootOpinionMyVoteTypeDisagree:
+		return []byte(s), nil
+	case OpinionCommentsOKRootOpinionMyVoteTypePass:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *OpinionCommentsOKRootOpinionMyVoteType) UnmarshalText(data []byte) error {
+	switch OpinionCommentsOKRootOpinionMyVoteType(data) {
+	case OpinionCommentsOKRootOpinionMyVoteTypeAgree:
+		*s = OpinionCommentsOKRootOpinionMyVoteTypeAgree
+		return nil
+	case OpinionCommentsOKRootOpinionMyVoteTypeDisagree:
+		*s = OpinionCommentsOKRootOpinionMyVoteTypeDisagree
+		return nil
+	case OpinionCommentsOKRootOpinionMyVoteTypePass:
+		*s = OpinionCommentsOKRootOpinionMyVoteTypePass
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
 type OpinionCommentsOKRootOpinionOpinion struct {
@@ -5814,52 +5749,6 @@ func (o OptOpinionComments2OKRootOpinionOpinionVoteType) Get() (v OpinionComment
 
 // Or returns value if set, or given parameter if does not.
 func (o OptOpinionComments2OKRootOpinionOpinionVoteType) Or(d OpinionComments2OKRootOpinionOpinionVoteType) OpinionComments2OKRootOpinionOpinionVoteType {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptOpinionCommentsOKMyVoteType returns new OptOpinionCommentsOKMyVoteType with value set to v.
-func NewOptOpinionCommentsOKMyVoteType(v OpinionCommentsOKMyVoteType) OptOpinionCommentsOKMyVoteType {
-	return OptOpinionCommentsOKMyVoteType{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptOpinionCommentsOKMyVoteType is optional OpinionCommentsOKMyVoteType.
-type OptOpinionCommentsOKMyVoteType struct {
-	Value OpinionCommentsOKMyVoteType
-	Set   bool
-}
-
-// IsSet returns true if OptOpinionCommentsOKMyVoteType was set.
-func (o OptOpinionCommentsOKMyVoteType) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptOpinionCommentsOKMyVoteType) Reset() {
-	var v OpinionCommentsOKMyVoteType
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptOpinionCommentsOKMyVoteType) SetTo(v OpinionCommentsOKMyVoteType) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptOpinionCommentsOKMyVoteType) Get() (v OpinionCommentsOKMyVoteType, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptOpinionCommentsOKMyVoteType) Or(d OpinionCommentsOKMyVoteType) OpinionCommentsOKMyVoteType {
 	if v, ok := o.Get(); ok {
 		return v
 	}

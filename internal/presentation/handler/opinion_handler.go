@@ -350,9 +350,11 @@ func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.Opinion
 		PictureURL:   utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.PictureURL),
 		ReferenceURL: utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.ReferenceURL),
 	}
+
 	root := oas.OpinionCommentsOKRootOpinion{
-		User:    *rootUser,
-		Opinion: *rootOpinion,
+		User:       *rootUser,
+		Opinion:    *rootOpinion,
+		MyVoteType: oas.OpinionCommentsOKRootOpinionMyVoteType(opinions.RootOpinion.MyVoteType),
 	}
 
 	var replies []oas.OpinionCommentsOKOpinionsItem
@@ -387,16 +389,10 @@ func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.Opinion
 			},
 		})
 	}
-	myVote := oas.OptOpinionCommentsOKMyVoteType{
-		Value: oas.OpinionCommentsOKMyVoteType{
-			Type: oas.OpinionCommentsOKMyVoteTypeType(opinions.RootOpinion.Opinion.VoteType),
-		},
-		Set: true,
-	}
+
 	return &oas.OpinionCommentsOK{
 		RootOpinion: root,
 		Opinions:    replies,
-		MyVoteType:  myVote,
 	}, nil
 
 }
