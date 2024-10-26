@@ -362,6 +362,9 @@ func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.Opinion
 			DisplayName: reply.User.Name,
 			IconURL:     utils.ToOptNil[oas.OptNilString](reply.User.Icon),
 		}
+		voteType := oas.OpinionCommentsOKOpinionsItemMyVoteType{
+			Type: oas.OpinionCommentsOKOpinionsItemMyVoteTypeType(reply.MyVoteType),
+		}
 
 		opinion := &oas.OpinionCommentsOKOpinionsItemOpinion{
 			ID:       reply.Opinion.OpinionID,
@@ -378,12 +381,22 @@ func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.Opinion
 		replies = append(replies, oas.OpinionCommentsOKOpinionsItem{
 			User:    *user,
 			Opinion: *opinion,
+			MyVoteType: oas.OptOpinionCommentsOKOpinionsItemMyVoteType{
+				Value: voteType,
+				Set:   true,
+			},
 		})
 	}
-
+	myVote := oas.OptOpinionCommentsOKMyVoteType{
+		Value: oas.OpinionCommentsOKMyVoteType{
+			Type: oas.OpinionCommentsOKMyVoteTypeType(opinions.RootOpinion.Opinion.VoteType),
+		},
+		Set: true,
+	}
 	return &oas.OpinionCommentsOK{
 		RootOpinion: root,
 		Opinions:    replies,
+		MyVoteType:  myVote,
 	}, nil
 
 }
