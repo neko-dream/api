@@ -7736,13 +7736,13 @@ func (s *TalkSessionAnalysisOK) SetGroupOpinions(val []TalkSessionAnalysisOKGrou
 func (*TalkSessionAnalysisOK) talkSessionAnalysisRes() {}
 
 type TalkSessionAnalysisOKGroupOpinionsItem struct {
-	GroupId  int                                                  `json:"groupId"`
-	Opinions []TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem `json:"opinions"`
+	GroupName string                                               `json:"groupName"`
+	Opinions  []TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem `json:"opinions"`
 }
 
-// GetGroupId returns the value of GroupId.
-func (s *TalkSessionAnalysisOKGroupOpinionsItem) GetGroupId() int {
-	return s.GroupId
+// GetGroupName returns the value of GroupName.
+func (s *TalkSessionAnalysisOKGroupOpinionsItem) GetGroupName() string {
+	return s.GroupName
 }
 
 // GetOpinions returns the value of Opinions.
@@ -7750,9 +7750,9 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItem) GetOpinions() []TalkSessionAnal
 	return s.Opinions
 }
 
-// SetGroupId sets the value of GroupId.
-func (s *TalkSessionAnalysisOKGroupOpinionsItem) SetGroupId(val int) {
-	s.GroupId = val
+// SetGroupName sets the value of GroupName.
+func (s *TalkSessionAnalysisOKGroupOpinionsItem) SetGroupName(val string) {
+	s.GroupName = val
 }
 
 // SetOpinions sets the value of Opinions.
@@ -7997,7 +7997,7 @@ type TalkSessionAnalysisOKMyPosition struct {
 	DisplayId   string       `json:"displayId"`
 	DisplayName string       `json:"displayName"`
 	IconURL     OptNilString `json:"iconURL"`
-	GroupId     int          `json:"groupId"`
+	GroupName   string       `json:"groupName"`
 	// 境界ポイントのインデックス.
 	PerimeterIndex OptInt `json:"perimeterIndex"`
 }
@@ -8027,9 +8027,9 @@ func (s *TalkSessionAnalysisOKMyPosition) GetIconURL() OptNilString {
 	return s.IconURL
 }
 
-// GetGroupId returns the value of GroupId.
-func (s *TalkSessionAnalysisOKMyPosition) GetGroupId() int {
-	return s.GroupId
+// GetGroupName returns the value of GroupName.
+func (s *TalkSessionAnalysisOKMyPosition) GetGroupName() string {
+	return s.GroupName
 }
 
 // GetPerimeterIndex returns the value of PerimeterIndex.
@@ -8062,9 +8062,9 @@ func (s *TalkSessionAnalysisOKMyPosition) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
 
-// SetGroupId sets the value of GroupId.
-func (s *TalkSessionAnalysisOKMyPosition) SetGroupId(val int) {
-	s.GroupId = val
+// SetGroupName sets the value of GroupName.
+func (s *TalkSessionAnalysisOKMyPosition) SetGroupName(val string) {
+	s.GroupName = val
 }
 
 // SetPerimeterIndex sets the value of PerimeterIndex.
@@ -8078,7 +8078,7 @@ type TalkSessionAnalysisOKPositionsItem struct {
 	DisplayId   string       `json:"displayId"`
 	DisplayName string       `json:"displayName"`
 	IconURL     OptNilString `json:"iconURL"`
-	GroupId     int          `json:"groupId"`
+	GroupName   string       `json:"groupName"`
 	// 境界ポイントのインデックス.
 	PerimeterIndex OptInt `json:"perimeterIndex"`
 }
@@ -8108,9 +8108,9 @@ func (s *TalkSessionAnalysisOKPositionsItem) GetIconURL() OptNilString {
 	return s.IconURL
 }
 
-// GetGroupId returns the value of GroupId.
-func (s *TalkSessionAnalysisOKPositionsItem) GetGroupId() int {
-	return s.GroupId
+// GetGroupName returns the value of GroupName.
+func (s *TalkSessionAnalysisOKPositionsItem) GetGroupName() string {
+	return s.GroupName
 }
 
 // GetPerimeterIndex returns the value of PerimeterIndex.
@@ -8143,9 +8143,9 @@ func (s *TalkSessionAnalysisOKPositionsItem) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
 
-// SetGroupId sets the value of GroupId.
-func (s *TalkSessionAnalysisOKPositionsItem) SetGroupId(val int) {
-	s.GroupId = val
+// SetGroupName sets the value of GroupName.
+func (s *TalkSessionAnalysisOKPositionsItem) SetGroupName(val string) {
+	s.GroupName = val
 }
 
 // SetPerimeterIndex sets the value of PerimeterIndex.

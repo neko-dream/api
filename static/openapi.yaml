@@ -1776,8 +1776,8 @@ paths:
                       iconURL:
                         type: string
                         nullable: true
-                      groupId:
-                        type: integer
+                      groupName:
+                        type: string
                       perimeterIndex:
                         type: integer
                         description: 境界ポイントのインデックス
@@ -1785,7 +1785,7 @@ paths:
                       - posX
                       - posY
                       - displayId
-                      - groupId
+                      - groupName
                       - displayName
                   positions:
                     type: array
@@ -1803,8 +1803,8 @@ paths:
                         iconURL:
                           type: string
                           nullable: true
-                        groupId:
-                          type: integer
+                        groupName:
+                          type: string
                         perimeterIndex:
                           type: integer
                           description: 境界ポイントのインデックス
@@ -1812,15 +1812,15 @@ paths:
                         - posX
                         - posY
                         - displayId
-                        - groupId
+                        - groupName
                         - displayName
                   groupOpinions:
                     type: array
                     items:
                       type: object
                       properties:
-                        groupId:
-                          type: integer
+                        groupName:
+                          type: string
                         opinions:
                           type: array
                           items:
@@ -1903,7 +1903,7 @@ paths:
                               - disagreeCount
                               - passCount
                       required:
-                        - groupId
+                        - groupName
                         - opinions
                 required:
                   - positions
@@ -3116,8 +3116,8 @@ components:
         iconURL:
           type: string
           nullable: true
-        groupId:
-          type: integer
+        groupName:
+          type: string
         perimeterIndex:
           type: integer
           description: 境界ポイントのインデックス
@@ -3125,7 +3125,7 @@ components:
         - posX
         - posY
         - displayId
-        - groupId
+        - groupName
         - displayName
     userDemographics:
       type: object

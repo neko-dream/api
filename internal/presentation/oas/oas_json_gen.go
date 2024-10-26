@@ -13295,8 +13295,8 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItem) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *TalkSessionAnalysisOKGroupOpinionsItem) encodeFields(e *jx.Encoder) {
 	{
-		e.FieldStart("groupId")
-		e.Int(s.GroupId)
+		e.FieldStart("groupName")
+		e.Str(s.GroupName)
 	}
 	{
 		e.FieldStart("opinions")
@@ -13309,7 +13309,7 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItem) encodeFields(e *jx.Encoder) {
 }
 
 var jsonFieldsNameOfTalkSessionAnalysisOKGroupOpinionsItem = [2]string{
-	0: "groupId",
+	0: "groupName",
 	1: "opinions",
 }
 
@@ -13322,17 +13322,17 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItem) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "groupId":
+		case "groupName":
 			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				v, err := d.Int()
-				s.GroupId = int(v)
+				v, err := d.Str()
+				s.GroupName = string(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"groupId\"")
+				return errors.Wrap(err, "decode field \"groupName\"")
 			}
 		case "opinions":
 			requiredBitSet[0] |= 1 << 1
@@ -13970,8 +13970,8 @@ func (s *TalkSessionAnalysisOKMyPosition) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		e.FieldStart("groupId")
-		e.Int(s.GroupId)
+		e.FieldStart("groupName")
+		e.Str(s.GroupName)
 	}
 	{
 		if s.PerimeterIndex.Set {
@@ -13987,7 +13987,7 @@ var jsonFieldsNameOfTalkSessionAnalysisOKMyPosition = [7]string{
 	2: "displayId",
 	3: "displayName",
 	4: "iconURL",
-	5: "groupId",
+	5: "groupName",
 	6: "perimeterIndex",
 }
 
@@ -14058,17 +14058,17 @@ func (s *TalkSessionAnalysisOKMyPosition) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"iconURL\"")
 			}
-		case "groupId":
+		case "groupName":
 			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
-				v, err := d.Int()
-				s.GroupId = int(v)
+				v, err := d.Str()
+				s.GroupName = string(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"groupId\"")
+				return errors.Wrap(err, "decode field \"groupName\"")
 			}
 		case "perimeterIndex":
 			if err := func() error {
@@ -14168,8 +14168,8 @@ func (s *TalkSessionAnalysisOKPositionsItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		e.FieldStart("groupId")
-		e.Int(s.GroupId)
+		e.FieldStart("groupName")
+		e.Str(s.GroupName)
 	}
 	{
 		if s.PerimeterIndex.Set {
@@ -14185,7 +14185,7 @@ var jsonFieldsNameOfTalkSessionAnalysisOKPositionsItem = [7]string{
 	2: "displayId",
 	3: "displayName",
 	4: "iconURL",
-	5: "groupId",
+	5: "groupName",
 	6: "perimeterIndex",
 }
 
@@ -14256,17 +14256,17 @@ func (s *TalkSessionAnalysisOKPositionsItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"iconURL\"")
 			}
-		case "groupId":
+		case "groupName":
 			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
-				v, err := d.Int()
-				s.GroupId = int(v)
+				v, err := d.Str()
+				s.GroupName = string(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"groupId\"")
+				return errors.Wrap(err, "decode field \"groupName\"")
 			}
 		case "perimeterIndex":
 			if err := func() error {

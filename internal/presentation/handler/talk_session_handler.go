@@ -240,7 +240,7 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 				DisplayId:      out.MyPosition.DisplayID,
 				DisplayName:    out.MyPosition.DisplayName,
 				IconURL:        utils.ToOptNil[oas.OptNilString](out.MyPosition.IconURL),
-				GroupId:        out.MyPosition.GroupID,
+				GroupName:      out.MyPosition.GroupName,
 				PerimeterIndex: utils.ToOpt[oas.OptInt](out.MyPosition.PerimeterIndex),
 			},
 			Set: true,
@@ -255,7 +255,7 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 			DisplayId:      position.DisplayID,
 			DisplayName:    position.DisplayName,
 			IconURL:        utils.ToOptNil[oas.OptNilString](position.IconURL),
-			GroupId:        position.GroupID,
+			GroupName:      position.GroupName,
 			PerimeterIndex: utils.ToOpt[oas.OptInt](position.PerimeterIndex),
 		})
 	}
@@ -284,8 +284,8 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 			})
 		}
 		groupOpinions = append(groupOpinions, oas.TalkSessionAnalysisOKGroupOpinionsItem{
-			GroupId:  groupOpinion.GroupID,
-			Opinions: opinions,
+			GroupName: groupOpinion.GroupName,
+			Opinions:  opinions,
 		})
 	}
 

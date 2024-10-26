@@ -3,6 +3,7 @@ package analysis_usecase
 import (
 	"context"
 
+	"github.com/neko-dream/server/internal/domain/model/analysis"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/domain/model/user"
@@ -34,12 +35,12 @@ type (
 		DisplayID      string
 		DisplayName    string
 		IconURL        *string
-		GroupID        int
+		GroupName      string
 		PerimeterIndex *int
 	}
 	GroupOpinionDTO struct {
-		GroupID  int
-		Opinions []OpinionRootDTO
+		GroupName string
+		Opinions  []OpinionRootDTO
 	}
 	OpinionRootDTO struct {
 		User          UserDTO
@@ -92,7 +93,7 @@ func (g *getAnalysisResultInteractor) Execute(ctx context.Context, input GetAnal
 				DisplayID:      row.DisplayID.String,
 				DisplayName:    row.DisplayName.String,
 				IconURL:        utils.ToPtrIfNotNullValue(!row.IconUrl.Valid, row.IconUrl.String),
-				GroupID:        int(row.GroupID),
+				GroupName:      analysis.NewGroupIDFromInt(int(row.GroupID)).String(),
 				PerimeterIndex: utils.ToPtrIfNotNullValue(!row.PerimeterIndex.Valid, int(row.PerimeterIndex.Int32)),
 			}
 		}
@@ -102,7 +103,7 @@ func (g *getAnalysisResultInteractor) Execute(ctx context.Context, input GetAnal
 			DisplayID:      row.DisplayID.String,
 			DisplayName:    row.DisplayName.String,
 			IconURL:        utils.ToPtrIfNotNullValue(!row.IconUrl.Valid, row.IconUrl.String),
-			GroupID:        int(row.GroupID),
+			GroupName:      analysis.NewGroupIDFromInt(int(row.GroupID)).String(),
 			PerimeterIndex: utils.ToPtrIfNotNullValue(!row.PerimeterIndex.Valid, int(row.PerimeterIndex.Int32)),
 		})
 	}
@@ -145,8 +146,8 @@ func (g *getAnalysisResultInteractor) Execute(ctx context.Context, input GetAnal
 	groupOpinions := make([]GroupOpinionDTO, 0, len(groupOpinionsMap))
 	for groupID, opinions := range groupOpinionsMap {
 		groupOpinions = append(groupOpinions, GroupOpinionDTO{
-			GroupID:  int(groupID),
-			Opinions: opinions,
+			GroupName: analysis.NewGroupIDFromInt(int(groupID)).String(),
+			Opinions:  opinions,
 		})
 	}
 

@@ -1854,8 +1854,8 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "groupId": {
-                            "type": "integer"
+                          "groupName": {
+                            "type": "string"
                           },
                           "opinions": {
                             "type": "array",
@@ -1890,7 +1890,7 @@
                           }
                         },
                         "required": [
-                          "groupId",
+                          "groupName",
                           "opinions"
                         ]
                       }
@@ -2937,8 +2937,8 @@
             "type": "string",
             "nullable": true
           },
-          "groupId": {
-            "type": "integer"
+          "groupName": {
+            "type": "string"
           },
           "perimeterIndex": {
             "type": "integer",
@@ -2949,7 +2949,7 @@
           "posX",
           "posY",
           "displayId",
-          "groupId",
+          "groupName",
           "displayName"
         ]
       },
