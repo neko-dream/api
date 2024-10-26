@@ -44,9 +44,9 @@ func VoteFromString(s *string) VoteType {
 		return UnVoted
 	}
 	switch *s {
-	case "agreed":
+	case "agree":
 		return Agreed
-	case "disagreed":
+	case "disagree":
 		return Disagreed
 	case "pass":
 		return Pass
