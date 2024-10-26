@@ -1702,8 +1702,7 @@
                       },
                       "required": [
                         "user",
-                        "opinion",
-                        "myVoteType"
+                        "opinion"
                       ]
                     },
                     "opinions": {
@@ -1719,15 +1718,8 @@
                             "description": "作成ユーザー"
                           },
                           "myVoteType": {
-                            "anyOf": [
-                              {
-                                "$ref": "#/components/schemas/voteType",
-                                "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ]
+                            "$ref": "#/components/schemas/voteType",
+                            "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
                           }
                         },
                         "required": [
@@ -3100,7 +3092,8 @@
         "enum": [
           "agree",
           "disagree",
-          "pass"
+          "pass",
+          "unvote"
         ],
         "x-apidog-enum": [
           {
@@ -3118,7 +3111,8 @@
             "value": "pass",
             "description": "保留"
           }
-        ]
+        ],
+        "default": "unvote"
       },
       "opinion": {
         "type": "object",

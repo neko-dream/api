@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"io"
+	"log"
 
 	"mime/multipart"
 
@@ -350,11 +351,14 @@ func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.Opinion
 		PictureURL:   utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.PictureURL),
 		ReferenceURL: utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.ReferenceURL),
 	}
-
+	log.Println("rootOpinion", opinions.RootOpinion.MyVoteType)
 	root := oas.OpinionCommentsOKRootOpinion{
-		User:       *rootUser,
-		Opinion:    *rootOpinion,
-		MyVoteType: oas.OpinionCommentsOKRootOpinionMyVoteType(opinions.RootOpinion.MyVoteType),
+		User:    *rootUser,
+		Opinion: *rootOpinion,
+		MyVoteType: oas.OptOpinionCommentsOKRootOpinionMyVoteType{
+			Value: oas.OpinionCommentsOKRootOpinionMyVoteType(opinions.RootOpinion.MyVoteType),
+			Set:   true,
+		},
 	}
 
 	var replies []oas.OpinionCommentsOKOpinionsItem
@@ -363,9 +367,6 @@ func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.Opinion
 			DisplayID:   reply.User.ID,
 			DisplayName: reply.User.Name,
 			IconURL:     utils.ToOptNil[oas.OptNilString](reply.User.Icon),
-		}
-		voteType := oas.OpinionCommentsOKOpinionsItemMyVoteType{
-			Type: oas.OpinionCommentsOKOpinionsItemMyVoteTypeType(reply.MyVoteType),
 		}
 
 		opinion := &oas.OpinionCommentsOKOpinionsItemOpinion{
@@ -384,7 +385,7 @@ func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.Opinion
 			User:    *user,
 			Opinion: *opinion,
 			MyVoteType: oas.OptOpinionCommentsOKOpinionsItemMyVoteType{
-				Value: voteType,
+				Value: oas.OpinionCommentsOKOpinionsItemMyVoteType(reply.MyVoteType),
 				Set:   true,
 			},
 		})

@@ -411,6 +411,8 @@ func (s GetOpinionDetailOKOpinionVoteType) Validate() error {
 		return nil
 	case "pass":
 		return nil
+	case "unvote":
+		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
 	}
@@ -540,6 +542,8 @@ func (s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) Validate() error {
 		return nil
 	case "pass":
 		return nil
+	case "unvote":
+		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
 	}
@@ -601,6 +605,8 @@ func (s GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) Validate() error
 	case "disagree":
 		return nil
 	case "pass":
+		return nil
+	case "unvote":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
@@ -1214,6 +1220,8 @@ func (s OpinionComments2OKParentOpinionsItemMyVoteType) Validate() error {
 		return nil
 	case "pass":
 		return nil
+	case "unvote":
+		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
 	}
@@ -1275,6 +1283,8 @@ func (s OpinionComments2OKParentOpinionsItemOpinionVoteType) Validate() error {
 	case "disagree":
 		return nil
 	case "pass":
+		return nil
+	case "unvote":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
@@ -1386,6 +1396,8 @@ func (s OpinionComments2OKReplyOpinionsItemMyVoteType0) Validate() error {
 		return nil
 	case "pass":
 		return nil
+	case "unvote":
+		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
 	}
@@ -1447,6 +1459,8 @@ func (s OpinionComments2OKReplyOpinionsItemOpinionVoteType) Validate() error {
 	case "disagree":
 		return nil
 	case "pass":
+		return nil
+	case "unvote":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
@@ -1574,6 +1588,8 @@ func (s OpinionComments2OKRootOpinionOpinionVoteType) Validate() error {
 	case "disagree":
 		return nil
 	case "pass":
+		return nil
+	case "unvote":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
@@ -1715,26 +1731,14 @@ func (s *OpinionCommentsOKOpinionsItem) Validate() error {
 }
 
 func (s OpinionCommentsOKOpinionsItemMyVoteType) Validate() error {
-	switch s.Type {
-	case OpinionCommentsOKOpinionsItemMyVoteType0OpinionCommentsOKOpinionsItemMyVoteType:
-		if err := s.OpinionCommentsOKOpinionsItemMyVoteType0.Validate(); err != nil {
-			return err
-		}
-		return nil
-	case NullOpinionCommentsOKOpinionsItemMyVoteType:
-		return nil // no validation needed
-	default:
-		return errors.Errorf("invalid type %q", s.Type)
-	}
-}
-
-func (s OpinionCommentsOKOpinionsItemMyVoteType0) Validate() error {
 	switch s {
 	case "agree":
 		return nil
 	case "disagree":
 		return nil
 	case "pass":
+		return nil
+	case "unvote":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
@@ -1798,6 +1802,8 @@ func (s OpinionCommentsOKOpinionsItemOpinionVoteType) Validate() error {
 		return nil
 	case "pass":
 		return nil
+	case "unvote":
+		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
 	}
@@ -1852,8 +1858,15 @@ func (s *OpinionCommentsOKRootOpinion) Validate() error {
 		})
 	}
 	if err := func() error {
-		if err := s.MyVoteType.Validate(); err != nil {
-			return err
+		if value, ok := s.MyVoteType.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {
@@ -1886,6 +1899,8 @@ func (s OpinionCommentsOKRootOpinionMyVoteType) Validate() error {
 	case "disagree":
 		return nil
 	case "pass":
+		return nil
+	case "unvote":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
@@ -1948,6 +1963,8 @@ func (s OpinionCommentsOKRootOpinionOpinionVoteType) Validate() error {
 	case "disagree":
 		return nil
 	case "pass":
+		return nil
+	case "unvote":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
@@ -2115,6 +2132,8 @@ func (s OpinionsHistoryOKOpinionsItemOpinionVoteType) Validate() error {
 	case "disagree":
 		return nil
 	case "pass":
+		return nil
+	case "unvote":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
@@ -2656,6 +2675,8 @@ func (s SwipeOpinionsOKItemOpinionVoteType) Validate() error {
 		return nil
 	case "pass":
 		return nil
+	case "unvote":
+		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
 	}
@@ -2909,6 +2930,8 @@ func (s TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType) Valid
 		return nil
 	case "pass":
 		return nil
+	case "unvote":
+		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
 	}
@@ -3094,6 +3117,8 @@ func (s VoteOKItemVoteType) Validate() error {
 	case "disagree":
 		return nil
 	case "pass":
+		return nil
+	case "unvote":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)

@@ -1335,6 +1335,7 @@ func (s *GetOpinionDetailOKOpinion) Decode(d *jx.Decoder) error {
 		return errors.New("invalid: unable to decode GetOpinionDetailOKOpinion to nil")
 	}
 	var requiredBitSet [1]uint8
+	s.setDefaults()
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -1490,6 +1491,8 @@ func (s *GetOpinionDetailOKOpinionVoteType) Decode(d *jx.Decoder) error {
 		*s = GetOpinionDetailOKOpinionVoteTypeDisagree
 	case GetOpinionDetailOKOpinionVoteTypePass:
 		*s = GetOpinionDetailOKOpinionVoteTypePass
+	case GetOpinionDetailOKOpinionVoteTypeUnvote:
+		*s = GetOpinionDetailOKOpinionVoteTypeUnvote
 	default:
 		*s = GetOpinionDetailOKOpinionVoteType(v)
 	}
@@ -1889,6 +1892,7 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItem) Decode(d *jx.Decoder) error {
 		return errors.New("invalid: unable to decode GetOpinionsForTalkSessionOKOpinionsItem to nil")
 	}
 	var requiredBitSet [1]uint8
+	s.setDefaults()
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -2012,6 +2016,8 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) Decode(d *jx.Decoder
 		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree
 	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass:
 		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass
+	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeUnvote:
+		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeUnvote
 	default:
 		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteType(v)
 	}
@@ -2097,6 +2103,7 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) Decode(d *jx.Decoder) e
 		return errors.New("invalid: unable to decode GetOpinionsForTalkSessionOKOpinionsItemOpinion to nil")
 	}
 	var requiredBitSet [1]uint8
+	s.setDefaults()
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -2252,6 +2259,8 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) Decode(d *jx.De
 		*s = GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeDisagree
 	case GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypePass:
 		*s = GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypePass
+	case GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeUnvote:
+		*s = GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeUnvote
 	default:
 		*s = GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType(v)
 	}
@@ -5743,6 +5752,7 @@ func (s *OpinionComments2OKParentOpinionsItem) Decode(d *jx.Decoder) error {
 		return errors.New("invalid: unable to decode OpinionComments2OKParentOpinionsItem to nil")
 	}
 	var requiredBitSet [1]uint8
+	s.setDefaults()
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -5866,6 +5876,8 @@ func (s *OpinionComments2OKParentOpinionsItemMyVoteType) Decode(d *jx.Decoder) e
 		*s = OpinionComments2OKParentOpinionsItemMyVoteTypeDisagree
 	case OpinionComments2OKParentOpinionsItemMyVoteTypePass:
 		*s = OpinionComments2OKParentOpinionsItemMyVoteTypePass
+	case OpinionComments2OKParentOpinionsItemMyVoteTypeUnvote:
+		*s = OpinionComments2OKParentOpinionsItemMyVoteTypeUnvote
 	default:
 		*s = OpinionComments2OKParentOpinionsItemMyVoteType(v)
 	}
@@ -5951,6 +5963,7 @@ func (s *OpinionComments2OKParentOpinionsItemOpinion) Decode(d *jx.Decoder) erro
 		return errors.New("invalid: unable to decode OpinionComments2OKParentOpinionsItemOpinion to nil")
 	}
 	var requiredBitSet [1]uint8
+	s.setDefaults()
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -6106,6 +6119,8 @@ func (s *OpinionComments2OKParentOpinionsItemOpinionVoteType) Decode(d *jx.Decod
 		*s = OpinionComments2OKParentOpinionsItemOpinionVoteTypeDisagree
 	case OpinionComments2OKParentOpinionsItemOpinionVoteTypePass:
 		*s = OpinionComments2OKParentOpinionsItemOpinionVoteTypePass
+	case OpinionComments2OKParentOpinionsItemOpinionVoteTypeUnvote:
+		*s = OpinionComments2OKParentOpinionsItemOpinionVoteTypeUnvote
 	default:
 		*s = OpinionComments2OKParentOpinionsItemOpinionVoteType(v)
 	}
@@ -6451,6 +6466,8 @@ func (s *OpinionComments2OKReplyOpinionsItemMyVoteType0) Decode(d *jx.Decoder) e
 		*s = OpinionComments2OKReplyOpinionsItemMyVoteType0Disagree
 	case OpinionComments2OKReplyOpinionsItemMyVoteType0Pass:
 		*s = OpinionComments2OKReplyOpinionsItemMyVoteType0Pass
+	case OpinionComments2OKReplyOpinionsItemMyVoteType0Unvote:
+		*s = OpinionComments2OKReplyOpinionsItemMyVoteType0Unvote
 	default:
 		*s = OpinionComments2OKReplyOpinionsItemMyVoteType0(v)
 	}
@@ -6536,6 +6553,7 @@ func (s *OpinionComments2OKReplyOpinionsItemOpinion) Decode(d *jx.Decoder) error
 		return errors.New("invalid: unable to decode OpinionComments2OKReplyOpinionsItemOpinion to nil")
 	}
 	var requiredBitSet [1]uint8
+	s.setDefaults()
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -6691,6 +6709,8 @@ func (s *OpinionComments2OKReplyOpinionsItemOpinionVoteType) Decode(d *jx.Decode
 		*s = OpinionComments2OKReplyOpinionsItemOpinionVoteTypeDisagree
 	case OpinionComments2OKReplyOpinionsItemOpinionVoteTypePass:
 		*s = OpinionComments2OKReplyOpinionsItemOpinionVoteTypePass
+	case OpinionComments2OKReplyOpinionsItemOpinionVoteTypeUnvote:
+		*s = OpinionComments2OKReplyOpinionsItemOpinionVoteTypeUnvote
 	default:
 		*s = OpinionComments2OKReplyOpinionsItemOpinionVoteType(v)
 	}
@@ -7015,6 +7035,7 @@ func (s *OpinionComments2OKRootOpinionOpinion) Decode(d *jx.Decoder) error {
 		return errors.New("invalid: unable to decode OpinionComments2OKRootOpinionOpinion to nil")
 	}
 	var requiredBitSet [1]uint8
+	s.setDefaults()
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -7170,6 +7191,8 @@ func (s *OpinionComments2OKRootOpinionOpinionVoteType) Decode(d *jx.Decoder) err
 		*s = OpinionComments2OKRootOpinionOpinionVoteTypeDisagree
 	case OpinionComments2OKRootOpinionOpinionVoteTypePass:
 		*s = OpinionComments2OKRootOpinionOpinionVoteTypePass
+	case OpinionComments2OKRootOpinionOpinionVoteTypeUnvote:
+		*s = OpinionComments2OKRootOpinionOpinionVoteTypeUnvote
 	default:
 		*s = OpinionComments2OKRootOpinionOpinionVoteType(v)
 	}
@@ -7704,6 +7727,7 @@ func (s *OpinionCommentsOKOpinionsItem) Decode(d *jx.Decoder) error {
 		return errors.New("invalid: unable to decode OpinionCommentsOKOpinionsItem to nil")
 	}
 	var requiredBitSet [1]uint8
+	s.setDefaults()
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -7795,13 +7819,7 @@ func (s *OpinionCommentsOKOpinionsItem) UnmarshalJSON(data []byte) error {
 
 // Encode encodes OpinionCommentsOKOpinionsItemMyVoteType as json.
 func (s OpinionCommentsOKOpinionsItemMyVoteType) Encode(e *jx.Encoder) {
-	switch s.Type {
-	case OpinionCommentsOKOpinionsItemMyVoteType0OpinionCommentsOKOpinionsItemMyVoteType:
-		s.OpinionCommentsOKOpinionsItemMyVoteType0.Encode(e)
-	case NullOpinionCommentsOKOpinionsItemMyVoteType:
-		_ = s.Null
-		e.Null()
-	}
+	e.Str(string(s))
 }
 
 // Decode decodes OpinionCommentsOKOpinionsItemMyVoteType from json.
@@ -7809,21 +7827,24 @@ func (s *OpinionCommentsOKOpinionsItemMyVoteType) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode OpinionCommentsOKOpinionsItemMyVoteType to nil")
 	}
-	// Sum type type_discriminator.
-	switch t := d.Next(); t {
-	case jx.Null:
-		if err := d.Null(); err != nil {
-			return err
-		}
-		s.Type = NullOpinionCommentsOKOpinionsItemMyVoteType
-	case jx.String:
-		if err := s.OpinionCommentsOKOpinionsItemMyVoteType0.Decode(d); err != nil {
-			return err
-		}
-		s.Type = OpinionCommentsOKOpinionsItemMyVoteType0OpinionCommentsOKOpinionsItemMyVoteType
-	default:
-		return errors.Errorf("unexpected json type %q", t)
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
 	}
+	// Try to use constant string.
+	switch OpinionCommentsOKOpinionsItemMyVoteType(v) {
+	case OpinionCommentsOKOpinionsItemMyVoteTypeAgree:
+		*s = OpinionCommentsOKOpinionsItemMyVoteTypeAgree
+	case OpinionCommentsOKOpinionsItemMyVoteTypeDisagree:
+		*s = OpinionCommentsOKOpinionsItemMyVoteTypeDisagree
+	case OpinionCommentsOKOpinionsItemMyVoteTypePass:
+		*s = OpinionCommentsOKOpinionsItemMyVoteTypePass
+	case OpinionCommentsOKOpinionsItemMyVoteTypeUnvote:
+		*s = OpinionCommentsOKOpinionsItemMyVoteTypeUnvote
+	default:
+		*s = OpinionCommentsOKOpinionsItemMyVoteType(v)
+	}
+
 	return nil
 }
 
@@ -7836,48 +7857,6 @@ func (s OpinionCommentsOKOpinionsItemMyVoteType) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OpinionCommentsOKOpinionsItemMyVoteType) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes OpinionCommentsOKOpinionsItemMyVoteType0 as json.
-func (s OpinionCommentsOKOpinionsItemMyVoteType0) Encode(e *jx.Encoder) {
-	e.Str(string(s))
-}
-
-// Decode decodes OpinionCommentsOKOpinionsItemMyVoteType0 from json.
-func (s *OpinionCommentsOKOpinionsItemMyVoteType0) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode OpinionCommentsOKOpinionsItemMyVoteType0 to nil")
-	}
-	v, err := d.StrBytes()
-	if err != nil {
-		return err
-	}
-	// Try to use constant string.
-	switch OpinionCommentsOKOpinionsItemMyVoteType0(v) {
-	case OpinionCommentsOKOpinionsItemMyVoteType0Agree:
-		*s = OpinionCommentsOKOpinionsItemMyVoteType0Agree
-	case OpinionCommentsOKOpinionsItemMyVoteType0Disagree:
-		*s = OpinionCommentsOKOpinionsItemMyVoteType0Disagree
-	case OpinionCommentsOKOpinionsItemMyVoteType0Pass:
-		*s = OpinionCommentsOKOpinionsItemMyVoteType0Pass
-	default:
-		*s = OpinionCommentsOKOpinionsItemMyVoteType0(v)
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OpinionCommentsOKOpinionsItemMyVoteType0) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OpinionCommentsOKOpinionsItemMyVoteType0) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -7947,6 +7926,7 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) Decode(d *jx.Decoder) error {
 		return errors.New("invalid: unable to decode OpinionCommentsOKOpinionsItemOpinion to nil")
 	}
 	var requiredBitSet [1]uint8
+	s.setDefaults()
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -8102,6 +8082,8 @@ func (s *OpinionCommentsOKOpinionsItemOpinionVoteType) Decode(d *jx.Decoder) err
 		*s = OpinionCommentsOKOpinionsItemOpinionVoteTypeDisagree
 	case OpinionCommentsOKOpinionsItemOpinionVoteTypePass:
 		*s = OpinionCommentsOKOpinionsItemOpinionVoteTypePass
+	case OpinionCommentsOKOpinionsItemOpinionVoteTypeUnvote:
+		*s = OpinionCommentsOKOpinionsItemOpinionVoteTypeUnvote
 	default:
 		*s = OpinionCommentsOKOpinionsItemOpinionVoteType(v)
 	}
@@ -8266,8 +8248,10 @@ func (s *OpinionCommentsOKRootOpinion) encodeFields(e *jx.Encoder) {
 		s.User.Encode(e)
 	}
 	{
-		e.FieldStart("myVoteType")
-		s.MyVoteType.Encode(e)
+		if s.MyVoteType.Set {
+			e.FieldStart("myVoteType")
+			s.MyVoteType.Encode(e)
+		}
 	}
 	{
 		e.FieldStart("opinion")
@@ -8287,6 +8271,7 @@ func (s *OpinionCommentsOKRootOpinion) Decode(d *jx.Decoder) error {
 		return errors.New("invalid: unable to decode OpinionCommentsOKRootOpinion to nil")
 	}
 	var requiredBitSet [1]uint8
+	s.setDefaults()
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -8301,8 +8286,8 @@ func (s *OpinionCommentsOKRootOpinion) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"user\"")
 			}
 		case "myVoteType":
-			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
+				s.MyVoteType.Reset()
 				if err := s.MyVoteType.Decode(d); err != nil {
 					return err
 				}
@@ -8330,7 +8315,7 @@ func (s *OpinionCommentsOKRootOpinion) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000111,
+		0b00000101,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -8398,6 +8383,8 @@ func (s *OpinionCommentsOKRootOpinionMyVoteType) Decode(d *jx.Decoder) error {
 		*s = OpinionCommentsOKRootOpinionMyVoteTypeDisagree
 	case OpinionCommentsOKRootOpinionMyVoteTypePass:
 		*s = OpinionCommentsOKRootOpinionMyVoteTypePass
+	case OpinionCommentsOKRootOpinionMyVoteTypeUnvote:
+		*s = OpinionCommentsOKRootOpinionMyVoteTypeUnvote
 	default:
 		*s = OpinionCommentsOKRootOpinionMyVoteType(v)
 	}
@@ -8483,6 +8470,7 @@ func (s *OpinionCommentsOKRootOpinionOpinion) Decode(d *jx.Decoder) error {
 		return errors.New("invalid: unable to decode OpinionCommentsOKRootOpinionOpinion to nil")
 	}
 	var requiredBitSet [1]uint8
+	s.setDefaults()
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -8638,6 +8626,8 @@ func (s *OpinionCommentsOKRootOpinionOpinionVoteType) Decode(d *jx.Decoder) erro
 		*s = OpinionCommentsOKRootOpinionOpinionVoteTypeDisagree
 	case OpinionCommentsOKRootOpinionOpinionVoteTypePass:
 		*s = OpinionCommentsOKRootOpinionOpinionVoteTypePass
+	case OpinionCommentsOKRootOpinionOpinionVoteTypeUnvote:
+		*s = OpinionCommentsOKRootOpinionOpinionVoteTypeUnvote
 	default:
 		*s = OpinionCommentsOKRootOpinionOpinionVoteType(v)
 	}
@@ -9188,6 +9178,7 @@ func (s *OpinionsHistoryOKOpinionsItemOpinion) Decode(d *jx.Decoder) error {
 		return errors.New("invalid: unable to decode OpinionsHistoryOKOpinionsItemOpinion to nil")
 	}
 	var requiredBitSet [1]uint8
+	s.setDefaults()
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -9343,6 +9334,8 @@ func (s *OpinionsHistoryOKOpinionsItemOpinionVoteType) Decode(d *jx.Decoder) err
 		*s = OpinionsHistoryOKOpinionsItemOpinionVoteTypeDisagree
 	case OpinionsHistoryOKOpinionsItemOpinionVoteTypePass:
 		*s = OpinionsHistoryOKOpinionsItemOpinionVoteTypePass
+	case OpinionsHistoryOKOpinionsItemOpinionVoteTypeUnvote:
+		*s = OpinionsHistoryOKOpinionsItemOpinionVoteTypeUnvote
 	default:
 		*s = OpinionsHistoryOKOpinionsItemOpinionVoteType(v)
 	}
@@ -10114,7 +10107,7 @@ func (o OptOpinionCommentsOKOpinionsItemMyVoteType) Encode(e *jx.Encoder) {
 	if !o.Set {
 		return
 	}
-	o.Value.Encode(e)
+	e.Str(string(o.Value))
 }
 
 // Decode decodes OpinionCommentsOKOpinionsItemMyVoteType from json.
@@ -10171,6 +10164,39 @@ func (s OptOpinionCommentsOKOpinionsItemOpinionVoteType) MarshalJSON() ([]byte, 
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptOpinionCommentsOKOpinionsItemOpinionVoteType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes OpinionCommentsOKRootOpinionMyVoteType as json.
+func (o OptOpinionCommentsOKRootOpinionMyVoteType) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes OpinionCommentsOKRootOpinionMyVoteType from json.
+func (o *OptOpinionCommentsOKRootOpinionMyVoteType) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptOpinionCommentsOKRootOpinionMyVoteType to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptOpinionCommentsOKRootOpinionMyVoteType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptOpinionCommentsOKRootOpinionMyVoteType) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -12522,6 +12548,7 @@ func (s *SwipeOpinionsOKItemOpinion) Decode(d *jx.Decoder) error {
 		return errors.New("invalid: unable to decode SwipeOpinionsOKItemOpinion to nil")
 	}
 	var requiredBitSet [1]uint8
+	s.setDefaults()
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -12677,6 +12704,8 @@ func (s *SwipeOpinionsOKItemOpinionVoteType) Decode(d *jx.Decoder) error {
 		*s = SwipeOpinionsOKItemOpinionVoteTypeDisagree
 	case SwipeOpinionsOKItemOpinionVoteTypePass:
 		*s = SwipeOpinionsOKItemOpinionVoteTypePass
+	case SwipeOpinionsOKItemOpinionVoteTypeUnvote:
+		*s = SwipeOpinionsOKItemOpinionVoteTypeUnvote
 	default:
 		*s = SwipeOpinionsOKItemOpinionVoteType(v)
 	}
@@ -13568,6 +13597,7 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) Decode(d *jx
 		return errors.New("invalid: unable to decode TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion to nil")
 	}
 	var requiredBitSet [1]uint8
+	s.setDefaults()
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -13723,6 +13753,8 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType) Deco
 		*s = TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeDisagree
 	case TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypePass:
 		*s = TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypePass
+	case TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeUnvote:
+		*s = TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeUnvote
 	default:
 		*s = TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType(v)
 	}
@@ -14880,6 +14912,7 @@ func (s *VoteOKItem) Decode(d *jx.Decoder) error {
 		return errors.New("invalid: unable to decode VoteOKItem to nil")
 	}
 	var requiredBitSet [1]uint8
+	s.setDefaults()
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -15035,6 +15068,8 @@ func (s *VoteOKItemVoteType) Decode(d *jx.Decoder) error {
 		*s = VoteOKItemVoteTypeDisagree
 	case VoteOKItemVoteTypePass:
 		*s = VoteOKItemVoteTypePass
+	case VoteOKItemVoteTypeUnvote:
+		*s = VoteOKItemVoteTypeUnvote
 	default:
 		*s = VoteOKItemVoteType(v)
 	}
