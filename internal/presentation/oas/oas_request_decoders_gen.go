@@ -575,13 +575,13 @@ func (s *Server) decodeEditUserProfileRequest(r *http.Request) (
 			}
 			{
 				cfg := uri.QueryParameterDecodingConfig{
-					Name:    "prefectures",
+					Name:    "prefecture",
 					Style:   uri.QueryStyleForm,
 					Explode: true,
 				}
 				if err := q.HasParam(cfg); err == nil {
 					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-						var optFormDotPrefecturesVal string
+						var optFormDotPrefectureVal string
 						if err := func() error {
 							val, err := d.DecodeValue()
 							if err != nil {
@@ -593,15 +593,15 @@ func (s *Server) decodeEditUserProfileRequest(r *http.Request) (
 								return err
 							}
 
-							optFormDotPrefecturesVal = c
+							optFormDotPrefectureVal = c
 							return nil
 						}(); err != nil {
 							return err
 						}
-						optForm.Prefectures.SetTo(optFormDotPrefecturesVal)
+						optForm.Prefecture.SetTo(optFormDotPrefectureVal)
 						return nil
 					}); err != nil {
-						return req, close, errors.Wrap(err, "decode \"prefectures\"")
+						return req, close, errors.Wrap(err, "decode \"prefecture\"")
 					}
 				}
 			}

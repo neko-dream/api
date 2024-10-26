@@ -765,7 +765,7 @@ paths:
                   description: 世帯人数
                   example: 0
                   nullable: true
-                prefectures:
+                prefecture:
                   type: string
                   description: 都道府県
                   example: ''

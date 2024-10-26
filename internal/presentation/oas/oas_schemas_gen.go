@@ -489,7 +489,7 @@ type EditUserProfileReq struct {
 	// 世帯人数.
 	HouseholdSize OptNilInt `json:"householdSize"`
 	// 都道府県.
-	Prefectures OptNilString `json:"prefectures"`
+	Prefecture OptNilString `json:"prefecture"`
 }
 
 // GetDisplayName returns the value of DisplayName.
@@ -527,9 +527,9 @@ func (s *EditUserProfileReq) GetHouseholdSize() OptNilInt {
 	return s.HouseholdSize
 }
 
-// GetPrefectures returns the value of Prefectures.
-func (s *EditUserProfileReq) GetPrefectures() OptNilString {
-	return s.Prefectures
+// GetPrefecture returns the value of Prefecture.
+func (s *EditUserProfileReq) GetPrefecture() OptNilString {
+	return s.Prefecture
 }
 
 // SetDisplayName sets the value of DisplayName.
@@ -567,9 +567,9 @@ func (s *EditUserProfileReq) SetHouseholdSize(val OptNilInt) {
 	s.HouseholdSize = val
 }
 
-// SetPrefectures sets the value of Prefectures.
-func (s *EditUserProfileReq) SetPrefectures(val OptNilString) {
-	s.Prefectures = val
+// SetPrefecture sets the value of Prefecture.
+func (s *EditUserProfileReq) SetPrefecture(val OptNilString) {
+	s.Prefecture = val
 }
 
 // 性別.

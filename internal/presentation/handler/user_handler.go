@@ -301,11 +301,19 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 		householdSize = &value.HouseholdSize.Value
 	}
 	var prefecture *string
-	if !value.Prefectures.Null {
-		prefecture = &value.Prefectures.Value
+	if !value.Prefecture.Null {
+		prefecture = &value.Prefecture.Value
 	}
 	var displayName *string
 	if !value.DisplayName.Null {
+		if value.DisplayName.Value == "" {
+			return nil, messages.UserDisplayIDTooShort
+		}
+
+		if len(value.DisplayName.Value) > 20 || len(value.DisplayName.Value) < 4 {
+			return nil, messages.UserDisplayIDTooShort
+		}
+
 		displayName = &value.DisplayName.Value
 	}
 	var occupation *string
