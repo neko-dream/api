@@ -256,6 +256,7 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 			DisplayName:    position.DisplayName,
 			IconURL:        utils.ToOptNil[oas.OptNilString](position.IconURL),
 			GroupName:      position.GroupName,
+			GroupId:        position.GroupID,
 			PerimeterIndex: utils.ToOpt[oas.OptInt](position.PerimeterIndex),
 		})
 	}
