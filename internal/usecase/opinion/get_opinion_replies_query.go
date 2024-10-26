@@ -146,7 +146,7 @@ func (i *GetOpinionRepliesInteractor) Execute(ctx context.Context, input GetOpin
 					PictureURL:      utils.ToPtrIfNotNullValue(!r.PictureUrl.Valid, r.PictureUrl.String),
 				},
 				User: UserDTO{
-					ID:   r.UserID.String(),
+					ID:   r.DisplayID.String,
 					Name: r.DisplayName.String,
 					Icon: utils.ToPtrIfNotNullValue(!r.IconUrl.Valid, r.IconUrl.String),
 				},
@@ -180,7 +180,7 @@ func (i *GetOpinionRepliesInteractor) Execute(ctx context.Context, input GetOpin
 				PictureURL:      utils.ToPtrIfNotNullValue(!r.PictureUrl.Valid, r.PictureUrl.String),
 			},
 			User: UserDTO{
-				ID:   r.UserID.String(),
+				ID:   r.DisplayID.String,
 				Name: r.DisplayName.String,
 				Icon: utils.ToPtrIfNotNullValue(!r.IconUrl.Valid, r.IconUrl.String),
 			},
