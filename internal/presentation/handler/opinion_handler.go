@@ -195,6 +195,7 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 					Set:   true,
 					Value: oas.GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType(opinion.Opinion.VoteType),
 				},
+				ParentID:     utils.ToOpt[oas.OptString](opinion.Opinion.ParentOpinionID),
 				ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
 				PictureURL:   utils.ToOpt[oas.OptString](opinion.Opinion.PictureURL),
 			},

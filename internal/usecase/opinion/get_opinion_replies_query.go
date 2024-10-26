@@ -2,6 +2,7 @@ package opinion_usecase
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -88,6 +89,7 @@ func (i *GetOpinionRepliesInteractor) Execute(ctx context.Context, input GetOpin
 	if input.UserID != nil {
 		userID = uuid.NullUUID{Valid: true, UUID: input.UserID.UUID()}
 	}
+	log.Println("user ID ", userID)
 
 	// 親意見を取得
 	opinionRow, err := i.GetQueries(ctx).GetOpinionByID(ctx, model.GetOpinionByIDParams{
@@ -186,6 +188,7 @@ func (i *GetOpinionRepliesInteractor) Execute(ctx context.Context, input GetOpin
 			},
 			MyVoteType: vote.VoteTypeFromInt(int(r.CurrentVoteType)).String(),
 		})
+		log.Println(r.CurrentVoteType)
 	}
 
 	return &GetOpinionRepliesOutput{
