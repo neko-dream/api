@@ -42,7 +42,7 @@ LEFT JOIN (
     FROM opinions
     GROUP BY parent_opinion_id
 ) rc ON opinions.opinion_id = rc.parent_opinion_id
-WHERE representative_opinions.rank < 2
+WHERE representative_opinions.rank < 4
     AND opinions.talk_session_id = $1;
 
 -- name: GetGroupListByTalkSessionId :many
