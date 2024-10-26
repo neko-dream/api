@@ -6,7 +6,6 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/domain/model/vote"
 	"github.com/neko-dream/server/internal/infrastructure/db"
 	model "github.com/neko-dream/server/internal/infrastructure/db/sqlc"
 	"github.com/neko-dream/server/pkg/utils"
@@ -96,7 +95,6 @@ func (h *getSwipeOpinionsQueryHandler) Execute(ctx context.Context, q GetSwipeOp
 			Title:           utils.ToPtrIfNotNullValue[string](!row.Title.Valid, row.Title.String),
 			Content:         row.Content,
 			CreatedAt:       row.CreatedAt,
-			VoteType:        vote.VoteTypeFromInt(int(row.VoteType)).String(),
 			ReferenceURL:    utils.ToPtrIfNotNullValue[string](!row.ReferenceUrl.Valid, row.ReferenceUrl.String),
 			PictureURL:      utils.ToPtrIfNotNullValue[string](!row.PictureUrl.Valid, row.PictureUrl.String),
 		}
