@@ -11,6 +11,16 @@ import (
 	"github.com/google/uuid"
 )
 
+type ActionItem struct {
+	ActionItemID       uuid.UUID
+	TalkSessionID      uuid.UUID
+	ParentActionItemID uuid.NullUUID
+	Content            string
+	Status             string
+	CreatedAt          time.Time
+	UpdatedAt          time.Time
+}
+
 type Opinion struct {
 	OpinionID       uuid.UUID
 	TalkSessionID   uuid.UUID
@@ -53,6 +63,14 @@ type TalkSession struct {
 	CreatedAt        time.Time
 	City             sql.NullString
 	Prefecture       sql.NullString
+}
+
+type TalkSessionConclusion struct {
+	TalkSessionID uuid.UUID
+	Content       string
+	CreatedBy     uuid.UUID
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
 }
 
 type TalkSessionLocation struct {

@@ -19,12 +19,14 @@ import (
 )
 
 type talkSessionHandler struct {
-	createTalkSessionUsecase  talk_session_usecase.CreateTalkSessionUseCase
-	listTalkSessionQuery      talk_session_usecase.ListTalkSessionQuery
-	getTalkSessionDetailQuery talk_session_usecase.GetTalkSessionDetailUseCase
-	getAnalysisResultUseCase  analysis_usecase.GetAnalysisResultUseCase
-	getReportUseCase          analysis_usecase.GetReportQuery
-	getOwnTalkSession         talk_session_usecase.GetTalkSessionByUserQuery
+	createTalkSessionUsecase           talk_session_usecase.CreateTalkSessionUseCase
+	listTalkSessionQuery               talk_session_usecase.ListTalkSessionQuery
+	getTalkSessionDetailQuery          talk_session_usecase.GetTalkSessionDetailUseCase
+	getAnalysisResultUseCase           analysis_usecase.GetAnalysisResultUseCase
+	getReportUseCase                   analysis_usecase.GetReportQuery
+	getOwnTalkSession                  talk_session_usecase.GetTalkSessionByUserQuery
+	createTalkSessionConclusionUsecase talk_session_usecase.CreateTalkSessionConclusionUseCase
+	getTalkSessionConclusionQuery      talk_session_usecase.GetTalkSessionConclusionQuery
 	session.TokenManager
 }
 
@@ -35,17 +37,85 @@ func NewTalkSessionHandler(
 	getAnalysisResultUseCase analysis_usecase.GetAnalysisResultUseCase,
 	getReportUseCase analysis_usecase.GetReportQuery,
 	getOwnTalkSession talk_session_usecase.GetTalkSessionByUserQuery,
+	createTalkSessionConclusionUsecase talk_session_usecase.CreateTalkSessionConclusionUseCase,
+	getTalkSessionConclusionQuery talk_session_usecase.GetTalkSessionConclusionQuery,
 	tokenManager session.TokenManager,
 ) oas.TalkSessionHandler {
 	return &talkSessionHandler{
-		createTalkSessionUsecase:  createTalkSessionUsecase,
-		listTalkSessionQuery:      listTalkSessionQuery,
-		getTalkSessionDetailQuery: getTalkSessionDetailQuery,
-		getAnalysisResultUseCase:  getAnalysisResultUseCase,
-		getReportUseCase:          getReportUseCase,
-		getOwnTalkSession:         getOwnTalkSession,
-		TokenManager:              tokenManager,
+		createTalkSessionUsecase:           createTalkSessionUsecase,
+		listTalkSessionQuery:               listTalkSessionQuery,
+		getTalkSessionDetailQuery:          getTalkSessionDetailQuery,
+		getAnalysisResultUseCase:           getAnalysisResultUseCase,
+		getReportUseCase:                   getReportUseCase,
+		getOwnTalkSession:                  getOwnTalkSession,
+		createTalkSessionConclusionUsecase: createTalkSessionConclusionUsecase,
+		getTalkSessionConclusionQuery:      getTalkSessionConclusionQuery,
+		TokenManager:                       tokenManager,
 	}
+}
+
+// PostConclusion implements oas.TalkSessionHandler.
+func (t *talkSessionHandler) PostConclusion(ctx context.Context, req oas.OptPostConclusionReq, params oas.PostConclusionParams) (oas.PostConclusionRes, error) {
+	claim := session.GetSession(t.SetSession(ctx))
+	if !req.IsSet() {
+		return nil, messages.RequiredParameterError
+	}
+
+	userID, err := claim.UserID()
+	if err != nil {
+		utils.HandleError(ctx, err, "claim.UserID")
+		return nil, messages.ForbiddenError
+	}
+
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
+	out, err := t.createTalkSessionConclusionUsecase.Execute(ctx, talk_session_usecase.CreateTalkSessionConclusionInput{
+		TalkSessionID: talkSessionID,
+		UserID:        userID,
+		Conclusion:    req.Value.Content,
+	})
+	if err != nil {
+		return nil, errtrace.Wrap(err)
+	}
+
+	return &oas.PostConclusionOK{
+		User: oas.PostConclusionOKUser{
+			DisplayID:   out.User.DisplayID,
+			DisplayName: out.User.DisplayName,
+			IconURL:     utils.ToOptNil[oas.OptNilString](out.User.IconURL),
+		},
+		Content: out.Content,
+	}, nil
+}
+
+// GetConclusion implements oas.TalkSessionHandler.
+func (t *talkSessionHandler) GetConclusion(ctx context.Context, params oas.GetConclusionParams) (oas.GetConclusionRes, error) {
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
+	out, err := t.getTalkSessionConclusionQuery.Execute(ctx, talk_session_usecase.GetTalkSessionConclusionInput{
+		TalkSessionID: talkSessionID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if out == nil {
+		return nil, messages.TalkSessionConclusionNotSet
+	}
+
+	return &oas.GetConclusionOK{
+		User: oas.GetConclusionOKUser{
+			DisplayID:   out.User.DisplayID,
+			DisplayName: out.User.DisplayName,
+			IconURL:     utils.ToOptNil[oas.OptNilString](out.User.IconURL),
+		},
+		Content: out.Conclusion,
+	}, nil
 }
 
 // GetOpenedTalkSession implements oas.TalkSessionHandler.

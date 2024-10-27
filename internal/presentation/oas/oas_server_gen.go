@@ -115,6 +115,12 @@ type TalkSessionHandler interface {
 	//
 	// POST /talksessions
 	CreateTalkSession(ctx context.Context, req OptCreateTalkSessionReq) (CreateTalkSessionRes, error)
+	// GetConclusion implements getConclusion operation.
+	//
+	// 結論取得.
+	//
+	// GET /talksession/{talkSessionID}/conclusion
+	GetConclusion(ctx context.Context, params GetConclusionParams) (GetConclusionRes, error)
 	// GetOpenedTalkSession implements getOpenedTalkSession operation.
 	//
 	// 自分が開いたセッション一覧.
@@ -139,6 +145,13 @@ type TalkSessionHandler interface {
 	//
 	// GET /talksessions/{talkSessionId}/report
 	GetTalkSessionReport(ctx context.Context, params GetTalkSessionReportParams) (GetTalkSessionReportRes, error)
+	// PostConclusion implements postConclusion operation.
+	//
+	// 結論（conclusion）はセッションが終了した後にセッっションの作成者が投稿できる文章。
+	// セッションの流れやグループの分かれ方などに対するセッション作成者の感想やそれらの意見を受け、これからの方向性などを記入する。.
+	//
+	// POST /talksessions/{talkSessionID}/conclusion
+	PostConclusion(ctx context.Context, req OptPostConclusionReq, params PostConclusionParams) (PostConclusionRes, error)
 	// TalkSessionAnalysis implements talkSessionAnalysis operation.
 	//
 	// 分析結果一覧.

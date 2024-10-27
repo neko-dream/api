@@ -351,6 +351,7 @@ SELECT
     talk_sessions.city AS city,
     talk_sessions.prefecture AS prefecture,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
+    users.user_id AS user_id,
     users.display_name AS display_name,
     users.display_id AS display_id,
     users.icon_url AS icon_url,
@@ -378,6 +379,7 @@ type GetTalkSessionByIDRow struct {
 	City             sql.NullString
 	Prefecture       sql.NullString
 	OpinionCount     int64
+	UserID           uuid.NullUUID
 	DisplayName      sql.NullString
 	DisplayID        sql.NullString
 	IconUrl          sql.NullString
@@ -397,6 +399,7 @@ func (q *Queries) GetTalkSessionByID(ctx context.Context, talkSessionID uuid.UUI
 		&i.City,
 		&i.Prefecture,
 		&i.OpinionCount,
+		&i.UserID,
 		&i.DisplayName,
 		&i.DisplayID,
 		&i.IconUrl,

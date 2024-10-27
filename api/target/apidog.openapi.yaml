@@ -171,7 +171,7 @@
                     },
                     "owner": {
                       "$ref": "#/components/schemas/user",
-                      "description": "作成ユーザー"
+                      "description": "作成者"
                     },
                     "createdAt": {
                       "type": "string",
@@ -1027,7 +1027,7 @@
                   "properties": {
                     "user": {
                       "$ref": "#/components/schemas/user",
-                      "description": "作成ユーザー"
+                      "description": "作成者"
                     },
                     "demographics": {
                       "$ref": "#/components/schemas/userDemographics"
@@ -1116,7 +1116,7 @@
                       },
                       "user": {
                         "$ref": "#/components/schemas/user",
-                        "description": "作成ユーザー"
+                        "description": "作成者"
                       },
                       "replyCount": {
                         "type": "integer"
@@ -1427,7 +1427,7 @@
                           },
                           "user": {
                             "$ref": "#/components/schemas/user",
-                            "description": "作成ユーザー"
+                            "description": "作成者"
                           },
                           "replyCount": {
                             "type": "integer"
@@ -1690,7 +1690,7 @@
                       "properties": {
                         "user": {
                           "$ref": "#/components/schemas/user",
-                          "description": "作成ユーザー"
+                          "description": "作成者"
                         },
                         "myVoteType": {
                           "$ref": "#/components/schemas/voteType",
@@ -1715,7 +1715,7 @@
                           },
                           "user": {
                             "$ref": "#/components/schemas/user",
-                            "description": "作成ユーザー"
+                            "description": "作成者"
                           },
                           "myVoteType": {
                             "$ref": "#/components/schemas/voteType",
@@ -1862,7 +1862,7 @@
                                 },
                                 "user": {
                                   "$ref": "#/components/schemas/user",
-                                  "description": "作成ユーザー"
+                                  "description": "作成者"
                                 },
                                 "agreeCount": {
                                   "type": "integer"
@@ -2267,7 +2267,7 @@
                         "properties": {
                           "user": {
                             "$ref": "#/components/schemas/user",
-                            "description": "作成ユーザー"
+                            "description": "作成者"
                           },
                           "opinion": {
                             "$ref": "#/components/schemas/opinion"
@@ -2540,7 +2540,7 @@
                     },
                     "user": {
                       "$ref": "#/components/schemas/user",
-                      "description": "作成ユーザー"
+                      "description": "作成者"
                     }
                   },
                   "required": [
@@ -2749,7 +2749,7 @@
                       "properties": {
                         "user": {
                           "$ref": "#/components/schemas/user",
-                          "description": "作成ユーザー"
+                          "description": "作成者"
                         },
                         "opinion": {
                           "$ref": "#/components/schemas/opinion"
@@ -2770,7 +2770,7 @@
                           },
                           "user": {
                             "$ref": "#/components/schemas/user",
-                            "description": "作成ユーザー"
+                            "description": "作成者"
                           },
                           "myVoteType": {
                             "anyOf": [
@@ -2800,7 +2800,7 @@
                           },
                           "user": {
                             "$ref": "#/components/schemas/user",
-                            "description": "作成ユーザー"
+                            "description": "作成者"
                           },
                           "myVoteType": {
                             "$ref": "#/components/schemas/voteType",
@@ -3040,10 +3040,203 @@
         ],
         "x-ogen-operation-group": "TalkSession"
       }
+    },
+    "/talksession/{talkSessionID}/conclusion": {
+      "get": {
+        "summary": "結論取得",
+        "deprecated": false,
+        "description": "",
+        "operationId": "getConclusion",
+        "tags": [
+          "talk_session"
+        ],
+        "parameters": [
+          {
+            "name": "talkSessionID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/conclusion"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ErrorResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "ServerErrorResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "x-ogen-operation-group": "TalkSession"
+      }
+    },
+    "/talksessions/{talkSessionID}/conclusion": {
+      "post": {
+        "summary": "結論投稿",
+        "deprecated": false,
+        "description": "結論（conclusion）はセッションが終了した後にセッっションの作成者が投稿できる文章。\nセッションの流れやグループの分かれ方などに対するセッション作成者の感想やそれらの意見を受け、これからの方向性などを記入する。",
+        "operationId": "postConclusion",
+        "tags": [
+          "talk_session"
+        ],
+        "parameters": [
+          {
+            "name": "talkSessionID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "minLength": 2,
+                    "description": "結論本文。2文字以上",
+                    "example": "よかった！"
+                  }
+                },
+                "required": [
+                  "content"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/conclusion"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ErrorResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "ServerErrorResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
+        "x-ogen-operation-group": "TalkSession"
+      }
     }
   },
   "components": {
     "schemas": {
+      "conclusion": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/user",
+            "description": "作成者"
+          },
+          "content": {
+            "type": "string",
+            "description": "結論本文"
+          }
+        },
+        "required": [
+          "user",
+          "content"
+        ]
+      },
       "Report": {
         "type": "object",
         "properties": {
@@ -3371,7 +3564,7 @@
           },
           "owner": {
             "$ref": "#/components/schemas/user",
-            "description": "作成ユーザー"
+            "description": "作成者"
           },
           "createdAt": {
             "type": "string",

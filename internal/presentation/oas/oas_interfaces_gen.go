@@ -13,6 +13,10 @@ type EditUserProfileRes interface {
 	editUserProfileRes()
 }
 
+type GetConclusionRes interface {
+	getConclusionRes()
+}
+
 type GetOpenedTalkSessionRes interface {
 	getOpenedTalkSessionRes()
 }
@@ -59,6 +63,10 @@ type OpinionCommentsRes interface {
 
 type OpinionsHistoryRes interface {
 	opinionsHistoryRes()
+}
+
+type PostConclusionRes interface {
+	postConclusionRes()
 }
 
 type PostOpinionPostRes interface {
