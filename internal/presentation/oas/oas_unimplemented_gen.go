@@ -49,6 +49,15 @@ func (UnimplementedHandler) EditUserProfile(ctx context.Context, req OptEditUser
 	return r, ht.ErrNotImplemented
 }
 
+// GetOpenedTalkSession implements getOpenedTalkSession operation.
+//
+// 自分が開いたセッション一覧.
+//
+// GET /talksessions/opened
+func (UnimplementedHandler) GetOpenedTalkSession(ctx context.Context, params GetOpenedTalkSessionParams) (r GetOpenedTalkSessionRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetOpinionDetail implements getOpinionDetail operation.
 //
 // 意見の詳細.

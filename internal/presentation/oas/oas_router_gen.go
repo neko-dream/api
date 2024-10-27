@@ -280,6 +280,27 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							}
 
 							elem = origElem
+						case 'o': // Prefix: "opened"
+							origElem := elem
+							if l := len("opened"); len(elem) >= l && elem[0:l] == "opened" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch r.Method {
+								case "GET":
+									s.handleGetOpenedTalkSessionRequest([0]string{}, elemIsEscaped, w, r)
+								default:
+									s.notAllowed(w, r, "GET")
+								}
+
+								return
+							}
+
+							elem = origElem
 						}
 						// Param: "talkSessionID"
 						// Match until "/"
@@ -949,6 +970,31 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									r.summary = "リアクション済みのセッション一覧"
 									r.operationID = "sessionsHistory"
 									r.pathPattern = "/talksessions/histories"
+									r.args = args
+									r.count = 0
+									return r, true
+								default:
+									return
+								}
+							}
+
+							elem = origElem
+						case 'o': // Prefix: "opened"
+							origElem := elem
+							if l := len("opened"); len(elem) >= l && elem[0:l] == "opened" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch method {
+								case "GET":
+									r.name = "GetOpenedTalkSession"
+									r.summary = "自分が開いたセッション一覧"
+									r.operationID = "getOpenedTalkSession"
+									r.pathPattern = "/talksessions/opened"
 									r.args = args
 									r.count = 0
 									return r, true

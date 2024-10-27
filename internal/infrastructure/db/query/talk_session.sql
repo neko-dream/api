@@ -114,7 +114,49 @@ WHERE
         ELSE TRUE
     END;
 
--- name: GetTalkSessionByUserID :many
+-- name: GetOwnTalkSessionByUserID :many
+SELECT
+    talk_sessions.talk_session_id,
+    talk_sessions.theme,
+    talk_sessions.scheduled_end_time,
+    talk_sessions.city AS city,
+    talk_sessions.prefecture AS prefecture,
+    talk_sessions.created_at,
+    COALESCE(oc.opinion_count, 0) AS opinion_count,
+    users.display_name AS display_name,
+    users.display_id AS display_id,
+    users.icon_url AS icon_url,
+    talk_session_locations.talk_session_id as location_id,
+    COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
+    COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
+FROM talk_sessions
+LEFT JOIN (
+    SELECT talk_session_id, COUNT(opinion_id) AS opinion_count
+    FROM opinions
+    GROUP BY talk_session_id
+) oc ON  oc.talk_session_id = talk_sessions.talk_session_id
+LEFT JOIN users
+    ON talk_sessions.owner_id = users.user_id
+LEFT JOIN talk_session_locations
+    ON talk_session_locations.talk_session_id = talk_sessions.talk_session_id
+WHERE
+    talk_sessions.owner_id = sqlc.narg('user_id')::uuid
+    AND
+    CASE sqlc.narg('status')::text
+        WHEN 'finished' THEN talk_sessions.scheduled_end_time <= now()
+        WHEN 'open' THEN talk_sessions.scheduled_end_time > now()
+        ELSE TRUE
+    END
+    AND
+    CASE
+        WHEN sqlc.narg('theme')::text IS NOT NULL
+            THEN talk_sessions.theme LIKE '%' || sqlc.narg('theme')::text || '%'
+        ELSE TRUE
+    END
+GROUP BY talk_sessions.talk_session_id, oc.opinion_count, users.display_name, users.display_id, users.icon_url, talk_session_locations.talk_session_id
+LIMIT $1 OFFSET $2;
+
+-- name: GetRespondTalkSessionByUserID :many
 SELECT
     talk_sessions.talk_session_id,
     talk_sessions.theme,

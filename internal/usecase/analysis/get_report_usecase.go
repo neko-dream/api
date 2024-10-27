@@ -41,6 +41,7 @@ func NewGetReportQueryHandler(
 }
 
 func (h *GetReportQueryHandler) Execute(ctx context.Context, input GetReportInput) (*GetReportOutput, error) {
+
 	out, err := h.GetQueries(ctx).GetReportByTalkSessionId(ctx, input.TalkSessionID.UUID())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

@@ -70,7 +70,7 @@ func (h *getTalkSessionHistoriesQueryHandler) Execute(ctx context.Context, q Get
 		theme = sql.NullString{String: *q.Theme, Valid: true}
 	}
 
-	talkSessions, err := h.GetQueries(ctx).GetTalkSessionByUserID(ctx, model.GetTalkSessionByUserIDParams{
+	talkSessions, err := h.GetQueries(ctx).GetRespondTalkSessionByUserID(ctx, model.GetRespondTalkSessionByUserIDParams{
 		Limit:  int32(limit),
 		Offset: int32(offset),
 		UserID: uuid.NullUUID{UUID: q.UserID.UUID(), Valid: true},

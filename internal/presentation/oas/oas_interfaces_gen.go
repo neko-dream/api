@@ -13,6 +13,10 @@ type EditUserProfileRes interface {
 	editUserProfileRes()
 }
 
+type GetOpenedTalkSessionRes interface {
+	getOpenedTalkSessionRes()
+}
+
 type GetOpinionDetailRes interface {
 	getOpinionDetailRes()
 }

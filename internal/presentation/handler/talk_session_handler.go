@@ -24,6 +24,7 @@ type talkSessionHandler struct {
 	getTalkSessionDetailQuery talk_session_usecase.GetTalkSessionDetailUseCase
 	getAnalysisResultUseCase  analysis_usecase.GetAnalysisResultUseCase
 	getReportUseCase          analysis_usecase.GetReportQuery
+	getOwnTalkSession         talk_session_usecase.GetTalkSessionByUserQuery
 	session.TokenManager
 }
 
@@ -33,6 +34,7 @@ func NewTalkSessionHandler(
 	getTalkSessionDetailQuery talk_session_usecase.GetTalkSessionDetailUseCase,
 	getAnalysisResultUseCase analysis_usecase.GetAnalysisResultUseCase,
 	getReportUseCase analysis_usecase.GetReportQuery,
+	getOwnTalkSession talk_session_usecase.GetTalkSessionByUserQuery,
 	tokenManager session.TokenManager,
 ) oas.TalkSessionHandler {
 	return &talkSessionHandler{
@@ -41,8 +43,68 @@ func NewTalkSessionHandler(
 		getTalkSessionDetailQuery: getTalkSessionDetailQuery,
 		getAnalysisResultUseCase:  getAnalysisResultUseCase,
 		getReportUseCase:          getReportUseCase,
+		getOwnTalkSession:         getOwnTalkSession,
 		TokenManager:              tokenManager,
 	}
+}
+
+// GetOpenedTalkSession implements oas.TalkSessionHandler.
+func (t *talkSessionHandler) GetOpenedTalkSession(ctx context.Context, params oas.GetOpenedTalkSessionParams) (oas.GetOpenedTalkSessionRes, error) {
+	claim := session.GetSession(t.SetSession(ctx))
+	var userID *shared.UUID[user.User]
+	if claim != nil {
+		id, err := claim.UserID()
+		if err == nil {
+			userID = &id
+		}
+	}
+	limit := utils.IfThenElse[int](params.Limit.IsSet(),
+		params.Limit.Value,
+		10,
+	)
+	offset := utils.IfThenElse[int](params.Offset.IsSet(),
+		params.Offset.Value,
+		0,
+	)
+	status := ""
+	if params.Status.IsSet() {
+		bytes, err := params.Status.Value.MarshalText()
+		if err == nil {
+			status = string(bytes)
+		}
+	}
+	out, err := t.getOwnTalkSession.Execute(ctx, talk_session_usecase.GetTalkSessionByUserInput{
+		UserID: *userID,
+		Limit:  limit,
+		Offset: offset,
+		Status: status,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	resultTalkSession := make([]oas.GetOpenedTalkSessionOKTalkSessionsItem, 0, len(out.TalkSessions))
+	for _, talkSession := range out.TalkSessions {
+		owner := oas.GetOpenedTalkSessionOKTalkSessionsItemTalkSessionOwner{
+			DisplayID:   talkSession.Owner.DisplayID,
+			DisplayName: talkSession.Owner.DisplayName,
+			IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.Owner.IconURL),
+		}
+		resultTalkSession = append(resultTalkSession, oas.GetOpenedTalkSessionOKTalkSessionsItem{
+			TalkSession: oas.GetOpenedTalkSessionOKTalkSessionsItemTalkSession{
+				ID:               talkSession.ID,
+				Theme:            talkSession.Theme,
+				Owner:            owner,
+				CreatedAt:        talkSession.CreatedAt,
+				ScheduledEndTime: talkSession.ScheduledEndTime,
+			},
+			OpinionCount: talkSession.OpinionCount,
+		})
+	}
+
+	return &oas.GetOpenedTalkSessionOK{
+		TalkSessions: resultTalkSession,
+	}, nil
 }
 
 // GetTalkSessionReport implements oas.TalkSessionHandler.

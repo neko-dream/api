@@ -2894,6 +2894,152 @@
         "security": [],
         "x-ogen-operation-group": "Opinion"
       }
+    },
+    "/talksessions/opened": {
+      "get": {
+        "summary": "自分が開いたセッション一覧",
+        "deprecated": false,
+        "description": "",
+        "operationId": "getOpenedTalkSession",
+        "tags": [
+          "talk_session"
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": 0,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": 0,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "theme",
+            "in": "query",
+            "description": "テーマ ",
+            "required": false,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "finished",
+                "open"
+              ],
+              "x-apidog": {
+                "enumDescriptions": {
+                  "finished": "",
+                  "open": ""
+                }
+              },
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "talkSessions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "talkSession": {
+                            "$ref": "#/components/schemas/talkSession"
+                          },
+                          "opinionCount": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "talkSession",
+                          "opinionCount"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "talkSessions"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ErrorResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "ServerErrorResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
+        "x-ogen-operation-group": "TalkSession"
+      }
     }
   },
   "components": {
