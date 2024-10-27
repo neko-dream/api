@@ -10,6 +10,7 @@ import (
 
 func SentryProvider(conf *config.Config) *sdktrace.TracerProvider {
 	if err := sentry.Init(sentry.ClientOptions{
+		Environment:        conf.Env,
 		Dsn:                conf.SENTRY_DSN,
 		EnableTracing:      true,
 		TracesSampleRate:   1.0,
