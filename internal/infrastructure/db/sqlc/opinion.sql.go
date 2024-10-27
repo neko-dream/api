@@ -306,7 +306,7 @@ ORDER BY
         WHEN 'latest' THEN EXTRACT(EPOCH FROM uo.created_at)
         WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM uo.created_at)
         WHEN 'mostReply' THEN COALESCE(rc.reply_count, 0)
-    END ASC
+    END DESC
 LIMIT $2 OFFSET $3
 `
 
@@ -417,7 +417,7 @@ ORDER BY
         WHEN 'latest' THEN EXTRACT(EPOCH FROM opinions.created_at)
         WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM opinions.created_at)
         WHEN 'mostReply' THEN reply_count
-    END ASC
+    END DESC
 LIMIT $2 OFFSET $3
 `
 
