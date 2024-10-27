@@ -24,6 +24,7 @@ func Connect(config *config.Config, tp *sdktrace.TracerProvider) *sql.DB {
 			RecordError: func(err error) bool {
 				return err != sql.ErrNoRows
 			},
+			RowsNext: false,
 		}),
 	)
 	if err != nil {
