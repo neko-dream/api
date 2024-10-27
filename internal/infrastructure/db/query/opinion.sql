@@ -69,70 +69,16 @@ LEFT JOIN (
     FROM votes
     WHERE votes.opinion_id = $1
 ) pv ON opinions.user_id = pv.user_id
--- ユーザーIDが提供された場合、そのユーザーの投票ステータスを一緒に取得
+-- ユーザーIDが提供された場合、そのユーザーの投票ステータスを取得
 LEFT JOIN (
-    SELECT votes.vote_type, votes.user_id, votes.opinion_id
+    SELECT votes.vote_type, votes.opinion_id
     FROM votes
-) cv ON opinions.user_id = sqlc.narg('user_id')::uuid
-    AND opinions.opinion_id = cv.opinion_id
+    WHERE votes.user_id = sqlc.narg('user_id')::uuid
+) cv ON opinions.opinion_id = cv.opinion_id
 WHERE opinions.parent_opinion_id = $1
 GROUP BY opinions.opinion_id, users.display_name, users.display_id, users.icon_url, pv.vote_type, cv.vote_type;
 
 -- name: GetRandomOpinions :many
--- SELECT
---     opinions.opinion_id,
---     opinions.talk_session_id,
---     opinions.user_id,
---     opinions.parent_opinion_id,
---     opinions.title,
---     opinions.content,
---     opinions.reference_url,
---     opinions.picture_url,
---     opinions.created_at,
---     users.display_name AS display_name,
---     users.display_id AS display_id,
---     users.icon_url AS icon_url,
---     COALESCE(pv.vote_type, 0) AS vote_type,
---     COALESCE(rc.reply_count, 0) AS reply_count
--- FROM opinions
--- LEFT JOIN users
---     ON opinions.user_id = users.user_id
--- -- 親意見に対する意見投稿ユーザーの意思を取得
--- LEFT JOIN (
---     SELECT votes.vote_type, votes.user_id, votes.opinion_id
---     FROM votes
--- ) pv ON pv.opinion_id = opinions.parent_opinion_id
---     AND pv.user_id = opinions.user_id
--- -- 指定されたユーザーが投票していない意見のみを取得
--- LEFT JOIN (
---     SELECT opinions.opinion_id
---     FROM opinions
---     LEFT JOIN votes
---         ON opinions.opinion_id = votes.opinion_id
---         AND votes.user_id = $1
---     GROUP BY opinions.opinion_id
---     HAVING COUNT(votes.vote_id) = 0
--- ) vote_count ON opinions.opinion_id = vote_count.opinion_id
--- -- この意見に対するリプライ数
--- LEFT JOIN (
---     SELECT COUNT(opinion_id) AS reply_count, parent_opinion_id as opinion_id
---     FROM opinions
---     GROUP BY parent_opinion_id
--- ) rc ON rc.opinion_id = opinions.opinion_id
--- -- グループ内のランクを取得
--- LEFT JOIN (
---     SELECT rank, opinion_id
---     FROM representative_opinions
--- ) ro ON opinions.opinion_id = ro.opinion_id
--- -- トークセッションに紐づく意見のみを取得
--- WHERE opinions.talk_session_id = $2
---     AND vote_count.opinion_id = opinions.opinion_id
--- ORDER BY
---     CASE sqlc.narg('sort_key')::text
---         WHEN 'top' THEN COALESCE(ro.rank, 0)
---         ELSE RANDOM()
---     END ASC
--- LIMIT $3;
 SELECT
     opinions.opinion_id,
     opinions.talk_session_id,

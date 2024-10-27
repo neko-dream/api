@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/google/uuid"
+	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/domain/model/user"
@@ -76,7 +77,7 @@ func (i *getOpinionsByTalkSessionInteractor) Execute(ctx context.Context, input 
 	})
 	if err != nil {
 		utils.HandleError(ctx, err, "GetOpinionsByTalkSessionInteractor.Execute")
-		return nil, err
+		return nil, messages.OpinionContentBadLengthForUpdate
 	}
 
 	opinions := make([]SwipeOpinionDTO, 0, len(opinionRows))

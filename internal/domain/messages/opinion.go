@@ -28,4 +28,9 @@ var (
 		Code:       "OPINION-005",
 		Message:    "タイトルは5~50文字で入力してください",
 	}
+	OpinionContentBadLengthForUpdate = &APIError{
+		StatusCode: http.StatusBadRequest,
+		Code:       "OPINION-006",
+		Message:    "意見は5~140文字で入力してください",
+	}
 )

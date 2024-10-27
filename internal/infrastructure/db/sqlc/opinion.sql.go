@@ -191,10 +191,10 @@ LEFT JOIN (
     WHERE votes.opinion_id = $1
 ) pv ON opinions.user_id = pv.user_id
 LEFT JOIN (
-    SELECT votes.vote_type, votes.user_id, votes.opinion_id
+    SELECT votes.vote_type, votes.opinion_id
     FROM votes
-) cv ON opinions.user_id = $2::uuid
-    AND opinions.opinion_id = cv.opinion_id
+    WHERE votes.user_id = $2::uuid
+) cv ON opinions.opinion_id = cv.opinion_id
 WHERE opinions.parent_opinion_id = $1
 GROUP BY opinions.opinion_id, users.display_name, users.display_id, users.icon_url, pv.vote_type, cv.vote_type
 `
@@ -222,7 +222,7 @@ type GetOpinionRepliesRow struct {
 }
 
 // 親意見に対する子意見主の投票を取得
-// ユーザーIDが提供された場合、そのユーザーの投票ステータスを一緒に取得
+// ユーザーIDが提供された場合、そのユーザーの投票ステータスを取得
 func (q *Queries) GetOpinionReplies(ctx context.Context, arg GetOpinionRepliesParams) ([]GetOpinionRepliesRow, error) {
 	rows, err := q.db.QueryContext(ctx, getOpinionReplies, arg.OpinionID, arg.UserID)
 	if err != nil {
