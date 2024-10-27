@@ -2,6 +2,7 @@ package analysis_usecase
 
 import (
 	"context"
+	"time"
 
 	"github.com/neko-dream/server/internal/domain/model/analysis"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -63,6 +64,7 @@ type (
 		ParentID     *string
 		PictureURL   *string
 		ReferenceURL *string
+		PostedAt     string
 	}
 
 	getAnalysisResultInteractor struct {
@@ -135,6 +137,7 @@ func (g *getAnalysisResultInteractor) Execute(ctx context.Context, input GetAnal
 				ParentID:     utils.ToPtrIfNotNullValue(!row.ParentOpinionID.Valid, row.ParentOpinionID.UUID.String()),
 				PictureURL:   utils.ToPtrIfNotNullValue(!row.PictureUrl.Valid, row.PictureUrl.String),
 				ReferenceURL: utils.ToPtrIfNotNullValue(!row.ReferenceUrl.Valid, row.ReferenceUrl.String),
+				PostedAt:     row.CreatedAt.Time.Format(time.RFC3339),
 			},
 			User: UserDTO{
 				ID:   row.DisplayID.String,
