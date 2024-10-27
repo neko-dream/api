@@ -92,6 +92,8 @@ func (i *getOpinionsByTalkSessionInteractor) Execute(ctx context.Context, input 
 				Content:         row.Content,
 				CreatedAt:       row.CreatedAt,
 				VoteType:        vote.VoteTypeFromInt(int(row.VoteType)).String(),
+				PictureURL:      utils.ToPtrIfNotNullValue(!row.PictureUrl.Valid, row.PictureUrl.String),
+				ReferenceURL:    utils.ToPtrIfNotNullValue(!row.ReferenceUrl.Valid, row.ReferenceUrl.String),
 			},
 			User: UserDTO{
 				ID:   row.DisplayID.String,

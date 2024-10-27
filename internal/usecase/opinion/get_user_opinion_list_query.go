@@ -81,6 +81,8 @@ func (h *getUserOpinionListQueryHandler) Execute(ctx context.Context, q GetUserO
 				Title:           utils.ToPtrIfNotNullValue(!row.Title.Valid, row.Title.String),
 				Content:         row.Content,
 				CreatedAt:       row.CreatedAt,
+				PictureURL:      utils.ToPtrIfNotNullValue(!row.PictureUrl.Valid, row.PictureUrl.String),
+				ReferenceURL:    utils.ToPtrIfNotNullValue(!row.ReferenceUrl.Valid, row.ReferenceUrl.String),
 			},
 			User: UserDTO{
 				ID:   row.DisplayID.String,
