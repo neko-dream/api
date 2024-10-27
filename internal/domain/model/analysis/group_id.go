@@ -21,13 +21,13 @@ var (
 
 func NewGroupIDFromInt(i int) GroupID {
 	switch i {
-	case 1:
+	case 0:
 		return GroupIDStrawberry
-	case 2:
+	case 1:
 		return GroupIDLemon
-	case 3:
+	case 2:
 		return GroupIDGrape
-	case 4:
+	case 3:
 		return GroupIDWatermelon
 	default:
 		return GroupIDUnknown
