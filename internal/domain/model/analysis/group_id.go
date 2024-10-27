@@ -4,10 +4,10 @@ type GroupID int
 
 const (
 	GroupIDUnknown    GroupID = -1
-	GroupIDStrawberry GroupID = iota
-	GroupIDLemon
-	GroupIDGrape
-	GroupIDWatermelon
+	GroupIDStrawberry GroupID = 0
+	GroupIDLemon      GroupID = 1
+	GroupIDGrape      GroupID = 2
+	GroupIDWatermelon GroupID = 3
 )
 
 var (
