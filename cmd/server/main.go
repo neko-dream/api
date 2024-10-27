@@ -11,16 +11,18 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/middleware"
 	"github.com/neko-dream/server/internal/presentation/handler"
 	"github.com/neko-dream/server/internal/presentation/oas"
-
 	"github.com/rs/cors"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
 func main() {
+
 	container := di.BuildContainer()
 	srv, err := oas.NewServer(
 		di.Invoke[oas.Handler](container),
 		di.Invoke[oas.SecurityHandler](container),
 		oas.WithErrorHandler(handler.CustomErrorHandler),
+		oas.WithTracerProvider(di.Invoke[*sdktrace.TracerProvider](container)),
 	)
 	if err != nil {
 		panic(err)
@@ -44,7 +46,6 @@ func main() {
 	})
 	corsHandler := c.Handler(reqMiddleware)
 	mux := http.NewServeMux()
-
 	mux.Handle("/static/",
 		http.StripPrefix("/static/",
 			http.FileServer(http.Dir("./static")),
