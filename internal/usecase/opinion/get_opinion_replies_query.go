@@ -111,7 +111,7 @@ func (i *GetOpinionRepliesInteractor) Execute(ctx context.Context, input GetOpin
 		PictureURL:      utils.ToPtrIfNotNullValue(!opinionRow.PictureUrl.Valid, opinionRow.PictureUrl.String),
 	}
 	rootUser := UserDTO{
-		ID:   opinionRow.UserID.String(),
+		ID:   opinionRow.DisplayID.String,
 		Name: opinionRow.DisplayName.String,
 		Icon: utils.ToPtrIfNotNullValue(!opinionRow.IconUrl.Valid, opinionRow.IconUrl.String),
 	}
