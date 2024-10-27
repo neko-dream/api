@@ -3,8 +3,7 @@ package analysis
 type GroupID int
 
 const (
-	GroupIDUnknown    GroupID = iota
-	GroupIDStrawberry GroupID = iota + 1
+	GroupIDStrawberry GroupID = iota
 	GroupIDLemon
 	GroupIDGrape
 	GroupIDWatermelon
