@@ -3092,8 +3092,7 @@
         "enum": [
           "agree",
           "disagree",
-          "pass",
-          "unvote"
+          "pass"
         ],
         "x-apidog-enum": [
           {

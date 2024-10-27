@@ -869,7 +869,6 @@ const (
 	GetOpinionDetailOKOpinionVoteTypeAgree    GetOpinionDetailOKOpinionVoteType = "agree"
 	GetOpinionDetailOKOpinionVoteTypeDisagree GetOpinionDetailOKOpinionVoteType = "disagree"
 	GetOpinionDetailOKOpinionVoteTypePass     GetOpinionDetailOKOpinionVoteType = "pass"
-	GetOpinionDetailOKOpinionVoteTypeUnvote   GetOpinionDetailOKOpinionVoteType = "unvote"
 )
 
 // AllValues returns all GetOpinionDetailOKOpinionVoteType values.
@@ -878,7 +877,6 @@ func (GetOpinionDetailOKOpinionVoteType) AllValues() []GetOpinionDetailOKOpinion
 		GetOpinionDetailOKOpinionVoteTypeAgree,
 		GetOpinionDetailOKOpinionVoteTypeDisagree,
 		GetOpinionDetailOKOpinionVoteTypePass,
-		GetOpinionDetailOKOpinionVoteTypeUnvote,
 	}
 }
 
@@ -890,8 +888,6 @@ func (s GetOpinionDetailOKOpinionVoteType) MarshalText() ([]byte, error) {
 	case GetOpinionDetailOKOpinionVoteTypeDisagree:
 		return []byte(s), nil
 	case GetOpinionDetailOKOpinionVoteTypePass:
-		return []byte(s), nil
-	case GetOpinionDetailOKOpinionVoteTypeUnvote:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -909,9 +905,6 @@ func (s *GetOpinionDetailOKOpinionVoteType) UnmarshalText(data []byte) error {
 		return nil
 	case GetOpinionDetailOKOpinionVoteTypePass:
 		*s = GetOpinionDetailOKOpinionVoteTypePass
-		return nil
-	case GetOpinionDetailOKOpinionVoteTypeUnvote:
-		*s = GetOpinionDetailOKOpinionVoteTypeUnvote
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -1046,7 +1039,6 @@ const (
 	GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree    GetOpinionsForTalkSessionOKOpinionsItemMyVoteType = "agree"
 	GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree GetOpinionsForTalkSessionOKOpinionsItemMyVoteType = "disagree"
 	GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass     GetOpinionsForTalkSessionOKOpinionsItemMyVoteType = "pass"
-	GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeUnvote   GetOpinionsForTalkSessionOKOpinionsItemMyVoteType = "unvote"
 )
 
 // AllValues returns all GetOpinionsForTalkSessionOKOpinionsItemMyVoteType values.
@@ -1055,7 +1047,6 @@ func (GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) AllValues() []GetOpinio
 		GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree,
 		GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree,
 		GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass,
-		GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeUnvote,
 	}
 }
 
@@ -1067,8 +1058,6 @@ func (s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) MarshalText() ([]byte
 	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree:
 		return []byte(s), nil
 	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass:
-		return []byte(s), nil
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeUnvote:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -1086,9 +1075,6 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) UnmarshalText(data [
 		return nil
 	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass:
 		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass
-		return nil
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeUnvote:
-		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeUnvote
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -1188,7 +1174,6 @@ const (
 	GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeAgree    GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType = "agree"
 	GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeDisagree GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType = "disagree"
 	GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypePass     GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType = "pass"
-	GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeUnvote   GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType = "unvote"
 )
 
 // AllValues returns all GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType values.
@@ -1197,7 +1182,6 @@ func (GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) AllValues() []GetO
 		GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeAgree,
 		GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeDisagree,
 		GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypePass,
-		GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeUnvote,
 	}
 }
 
@@ -1209,8 +1193,6 @@ func (s GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) MarshalText() ([
 	case GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeDisagree:
 		return []byte(s), nil
 	case GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypePass:
-		return []byte(s), nil
-	case GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeUnvote:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -1228,9 +1210,6 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) UnmarshalText(d
 		return nil
 	case GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypePass:
 		*s = GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypePass
-		return nil
-	case GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeUnvote:
-		*s = GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeUnvote
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -2631,7 +2610,6 @@ const (
 	OpinionComments2OKParentOpinionsItemMyVoteTypeAgree    OpinionComments2OKParentOpinionsItemMyVoteType = "agree"
 	OpinionComments2OKParentOpinionsItemMyVoteTypeDisagree OpinionComments2OKParentOpinionsItemMyVoteType = "disagree"
 	OpinionComments2OKParentOpinionsItemMyVoteTypePass     OpinionComments2OKParentOpinionsItemMyVoteType = "pass"
-	OpinionComments2OKParentOpinionsItemMyVoteTypeUnvote   OpinionComments2OKParentOpinionsItemMyVoteType = "unvote"
 )
 
 // AllValues returns all OpinionComments2OKParentOpinionsItemMyVoteType values.
@@ -2640,7 +2618,6 @@ func (OpinionComments2OKParentOpinionsItemMyVoteType) AllValues() []OpinionComme
 		OpinionComments2OKParentOpinionsItemMyVoteTypeAgree,
 		OpinionComments2OKParentOpinionsItemMyVoteTypeDisagree,
 		OpinionComments2OKParentOpinionsItemMyVoteTypePass,
-		OpinionComments2OKParentOpinionsItemMyVoteTypeUnvote,
 	}
 }
 
@@ -2652,8 +2629,6 @@ func (s OpinionComments2OKParentOpinionsItemMyVoteType) MarshalText() ([]byte, e
 	case OpinionComments2OKParentOpinionsItemMyVoteTypeDisagree:
 		return []byte(s), nil
 	case OpinionComments2OKParentOpinionsItemMyVoteTypePass:
-		return []byte(s), nil
-	case OpinionComments2OKParentOpinionsItemMyVoteTypeUnvote:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -2671,9 +2646,6 @@ func (s *OpinionComments2OKParentOpinionsItemMyVoteType) UnmarshalText(data []by
 		return nil
 	case OpinionComments2OKParentOpinionsItemMyVoteTypePass:
 		*s = OpinionComments2OKParentOpinionsItemMyVoteTypePass
-		return nil
-	case OpinionComments2OKParentOpinionsItemMyVoteTypeUnvote:
-		*s = OpinionComments2OKParentOpinionsItemMyVoteTypeUnvote
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -2773,7 +2745,6 @@ const (
 	OpinionComments2OKParentOpinionsItemOpinionVoteTypeAgree    OpinionComments2OKParentOpinionsItemOpinionVoteType = "agree"
 	OpinionComments2OKParentOpinionsItemOpinionVoteTypeDisagree OpinionComments2OKParentOpinionsItemOpinionVoteType = "disagree"
 	OpinionComments2OKParentOpinionsItemOpinionVoteTypePass     OpinionComments2OKParentOpinionsItemOpinionVoteType = "pass"
-	OpinionComments2OKParentOpinionsItemOpinionVoteTypeUnvote   OpinionComments2OKParentOpinionsItemOpinionVoteType = "unvote"
 )
 
 // AllValues returns all OpinionComments2OKParentOpinionsItemOpinionVoteType values.
@@ -2782,7 +2753,6 @@ func (OpinionComments2OKParentOpinionsItemOpinionVoteType) AllValues() []Opinion
 		OpinionComments2OKParentOpinionsItemOpinionVoteTypeAgree,
 		OpinionComments2OKParentOpinionsItemOpinionVoteTypeDisagree,
 		OpinionComments2OKParentOpinionsItemOpinionVoteTypePass,
-		OpinionComments2OKParentOpinionsItemOpinionVoteTypeUnvote,
 	}
 }
 
@@ -2794,8 +2764,6 @@ func (s OpinionComments2OKParentOpinionsItemOpinionVoteType) MarshalText() ([]by
 	case OpinionComments2OKParentOpinionsItemOpinionVoteTypeDisagree:
 		return []byte(s), nil
 	case OpinionComments2OKParentOpinionsItemOpinionVoteTypePass:
-		return []byte(s), nil
-	case OpinionComments2OKParentOpinionsItemOpinionVoteTypeUnvote:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -2813,9 +2781,6 @@ func (s *OpinionComments2OKParentOpinionsItemOpinionVoteType) UnmarshalText(data
 		return nil
 	case OpinionComments2OKParentOpinionsItemOpinionVoteTypePass:
 		*s = OpinionComments2OKParentOpinionsItemOpinionVoteTypePass
-		return nil
-	case OpinionComments2OKParentOpinionsItemOpinionVoteTypeUnvote:
-		*s = OpinionComments2OKParentOpinionsItemOpinionVoteTypeUnvote
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -2971,7 +2936,6 @@ const (
 	OpinionComments2OKReplyOpinionsItemMyVoteType0Agree    OpinionComments2OKReplyOpinionsItemMyVoteType0 = "agree"
 	OpinionComments2OKReplyOpinionsItemMyVoteType0Disagree OpinionComments2OKReplyOpinionsItemMyVoteType0 = "disagree"
 	OpinionComments2OKReplyOpinionsItemMyVoteType0Pass     OpinionComments2OKReplyOpinionsItemMyVoteType0 = "pass"
-	OpinionComments2OKReplyOpinionsItemMyVoteType0Unvote   OpinionComments2OKReplyOpinionsItemMyVoteType0 = "unvote"
 )
 
 // AllValues returns all OpinionComments2OKReplyOpinionsItemMyVoteType0 values.
@@ -2980,7 +2944,6 @@ func (OpinionComments2OKReplyOpinionsItemMyVoteType0) AllValues() []OpinionComme
 		OpinionComments2OKReplyOpinionsItemMyVoteType0Agree,
 		OpinionComments2OKReplyOpinionsItemMyVoteType0Disagree,
 		OpinionComments2OKReplyOpinionsItemMyVoteType0Pass,
-		OpinionComments2OKReplyOpinionsItemMyVoteType0Unvote,
 	}
 }
 
@@ -2992,8 +2955,6 @@ func (s OpinionComments2OKReplyOpinionsItemMyVoteType0) MarshalText() ([]byte, e
 	case OpinionComments2OKReplyOpinionsItemMyVoteType0Disagree:
 		return []byte(s), nil
 	case OpinionComments2OKReplyOpinionsItemMyVoteType0Pass:
-		return []byte(s), nil
-	case OpinionComments2OKReplyOpinionsItemMyVoteType0Unvote:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -3011,9 +2972,6 @@ func (s *OpinionComments2OKReplyOpinionsItemMyVoteType0) UnmarshalText(data []by
 		return nil
 	case OpinionComments2OKReplyOpinionsItemMyVoteType0Pass:
 		*s = OpinionComments2OKReplyOpinionsItemMyVoteType0Pass
-		return nil
-	case OpinionComments2OKReplyOpinionsItemMyVoteType0Unvote:
-		*s = OpinionComments2OKReplyOpinionsItemMyVoteType0Unvote
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -3113,7 +3071,6 @@ const (
 	OpinionComments2OKReplyOpinionsItemOpinionVoteTypeAgree    OpinionComments2OKReplyOpinionsItemOpinionVoteType = "agree"
 	OpinionComments2OKReplyOpinionsItemOpinionVoteTypeDisagree OpinionComments2OKReplyOpinionsItemOpinionVoteType = "disagree"
 	OpinionComments2OKReplyOpinionsItemOpinionVoteTypePass     OpinionComments2OKReplyOpinionsItemOpinionVoteType = "pass"
-	OpinionComments2OKReplyOpinionsItemOpinionVoteTypeUnvote   OpinionComments2OKReplyOpinionsItemOpinionVoteType = "unvote"
 )
 
 // AllValues returns all OpinionComments2OKReplyOpinionsItemOpinionVoteType values.
@@ -3122,7 +3079,6 @@ func (OpinionComments2OKReplyOpinionsItemOpinionVoteType) AllValues() []OpinionC
 		OpinionComments2OKReplyOpinionsItemOpinionVoteTypeAgree,
 		OpinionComments2OKReplyOpinionsItemOpinionVoteTypeDisagree,
 		OpinionComments2OKReplyOpinionsItemOpinionVoteTypePass,
-		OpinionComments2OKReplyOpinionsItemOpinionVoteTypeUnvote,
 	}
 }
 
@@ -3134,8 +3090,6 @@ func (s OpinionComments2OKReplyOpinionsItemOpinionVoteType) MarshalText() ([]byt
 	case OpinionComments2OKReplyOpinionsItemOpinionVoteTypeDisagree:
 		return []byte(s), nil
 	case OpinionComments2OKReplyOpinionsItemOpinionVoteTypePass:
-		return []byte(s), nil
-	case OpinionComments2OKReplyOpinionsItemOpinionVoteTypeUnvote:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -3153,9 +3107,6 @@ func (s *OpinionComments2OKReplyOpinionsItemOpinionVoteType) UnmarshalText(data 
 		return nil
 	case OpinionComments2OKReplyOpinionsItemOpinionVoteTypePass:
 		*s = OpinionComments2OKReplyOpinionsItemOpinionVoteTypePass
-		return nil
-	case OpinionComments2OKReplyOpinionsItemOpinionVoteTypeUnvote:
-		*s = OpinionComments2OKReplyOpinionsItemOpinionVoteTypeUnvote
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -3318,7 +3269,6 @@ const (
 	OpinionComments2OKRootOpinionOpinionVoteTypeAgree    OpinionComments2OKRootOpinionOpinionVoteType = "agree"
 	OpinionComments2OKRootOpinionOpinionVoteTypeDisagree OpinionComments2OKRootOpinionOpinionVoteType = "disagree"
 	OpinionComments2OKRootOpinionOpinionVoteTypePass     OpinionComments2OKRootOpinionOpinionVoteType = "pass"
-	OpinionComments2OKRootOpinionOpinionVoteTypeUnvote   OpinionComments2OKRootOpinionOpinionVoteType = "unvote"
 )
 
 // AllValues returns all OpinionComments2OKRootOpinionOpinionVoteType values.
@@ -3327,7 +3277,6 @@ func (OpinionComments2OKRootOpinionOpinionVoteType) AllValues() []OpinionComment
 		OpinionComments2OKRootOpinionOpinionVoteTypeAgree,
 		OpinionComments2OKRootOpinionOpinionVoteTypeDisagree,
 		OpinionComments2OKRootOpinionOpinionVoteTypePass,
-		OpinionComments2OKRootOpinionOpinionVoteTypeUnvote,
 	}
 }
 
@@ -3339,8 +3288,6 @@ func (s OpinionComments2OKRootOpinionOpinionVoteType) MarshalText() ([]byte, err
 	case OpinionComments2OKRootOpinionOpinionVoteTypeDisagree:
 		return []byte(s), nil
 	case OpinionComments2OKRootOpinionOpinionVoteTypePass:
-		return []byte(s), nil
-	case OpinionComments2OKRootOpinionOpinionVoteTypeUnvote:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -3358,9 +3305,6 @@ func (s *OpinionComments2OKRootOpinionOpinionVoteType) UnmarshalText(data []byte
 		return nil
 	case OpinionComments2OKRootOpinionOpinionVoteTypePass:
 		*s = OpinionComments2OKRootOpinionOpinionVoteTypePass
-		return nil
-	case OpinionComments2OKRootOpinionOpinionVoteTypeUnvote:
-		*s = OpinionComments2OKRootOpinionOpinionVoteTypeUnvote
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -3530,7 +3474,6 @@ const (
 	OpinionCommentsOKOpinionsItemMyVoteTypeAgree    OpinionCommentsOKOpinionsItemMyVoteType = "agree"
 	OpinionCommentsOKOpinionsItemMyVoteTypeDisagree OpinionCommentsOKOpinionsItemMyVoteType = "disagree"
 	OpinionCommentsOKOpinionsItemMyVoteTypePass     OpinionCommentsOKOpinionsItemMyVoteType = "pass"
-	OpinionCommentsOKOpinionsItemMyVoteTypeUnvote   OpinionCommentsOKOpinionsItemMyVoteType = "unvote"
 )
 
 // AllValues returns all OpinionCommentsOKOpinionsItemMyVoteType values.
@@ -3539,7 +3482,6 @@ func (OpinionCommentsOKOpinionsItemMyVoteType) AllValues() []OpinionCommentsOKOp
 		OpinionCommentsOKOpinionsItemMyVoteTypeAgree,
 		OpinionCommentsOKOpinionsItemMyVoteTypeDisagree,
 		OpinionCommentsOKOpinionsItemMyVoteTypePass,
-		OpinionCommentsOKOpinionsItemMyVoteTypeUnvote,
 	}
 }
 
@@ -3551,8 +3493,6 @@ func (s OpinionCommentsOKOpinionsItemMyVoteType) MarshalText() ([]byte, error) {
 	case OpinionCommentsOKOpinionsItemMyVoteTypeDisagree:
 		return []byte(s), nil
 	case OpinionCommentsOKOpinionsItemMyVoteTypePass:
-		return []byte(s), nil
-	case OpinionCommentsOKOpinionsItemMyVoteTypeUnvote:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -3570,9 +3510,6 @@ func (s *OpinionCommentsOKOpinionsItemMyVoteType) UnmarshalText(data []byte) err
 		return nil
 	case OpinionCommentsOKOpinionsItemMyVoteTypePass:
 		*s = OpinionCommentsOKOpinionsItemMyVoteTypePass
-		return nil
-	case OpinionCommentsOKOpinionsItemMyVoteTypeUnvote:
-		*s = OpinionCommentsOKOpinionsItemMyVoteTypeUnvote
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -3672,7 +3609,6 @@ const (
 	OpinionCommentsOKOpinionsItemOpinionVoteTypeAgree    OpinionCommentsOKOpinionsItemOpinionVoteType = "agree"
 	OpinionCommentsOKOpinionsItemOpinionVoteTypeDisagree OpinionCommentsOKOpinionsItemOpinionVoteType = "disagree"
 	OpinionCommentsOKOpinionsItemOpinionVoteTypePass     OpinionCommentsOKOpinionsItemOpinionVoteType = "pass"
-	OpinionCommentsOKOpinionsItemOpinionVoteTypeUnvote   OpinionCommentsOKOpinionsItemOpinionVoteType = "unvote"
 )
 
 // AllValues returns all OpinionCommentsOKOpinionsItemOpinionVoteType values.
@@ -3681,7 +3617,6 @@ func (OpinionCommentsOKOpinionsItemOpinionVoteType) AllValues() []OpinionComment
 		OpinionCommentsOKOpinionsItemOpinionVoteTypeAgree,
 		OpinionCommentsOKOpinionsItemOpinionVoteTypeDisagree,
 		OpinionCommentsOKOpinionsItemOpinionVoteTypePass,
-		OpinionCommentsOKOpinionsItemOpinionVoteTypeUnvote,
 	}
 }
 
@@ -3693,8 +3628,6 @@ func (s OpinionCommentsOKOpinionsItemOpinionVoteType) MarshalText() ([]byte, err
 	case OpinionCommentsOKOpinionsItemOpinionVoteTypeDisagree:
 		return []byte(s), nil
 	case OpinionCommentsOKOpinionsItemOpinionVoteTypePass:
-		return []byte(s), nil
-	case OpinionCommentsOKOpinionsItemOpinionVoteTypeUnvote:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -3712,9 +3645,6 @@ func (s *OpinionCommentsOKOpinionsItemOpinionVoteType) UnmarshalText(data []byte
 		return nil
 	case OpinionCommentsOKOpinionsItemOpinionVoteTypePass:
 		*s = OpinionCommentsOKOpinionsItemOpinionVoteTypePass
-		return nil
-	case OpinionCommentsOKOpinionsItemOpinionVoteTypeUnvote:
-		*s = OpinionCommentsOKOpinionsItemOpinionVoteTypeUnvote
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -3803,7 +3733,6 @@ const (
 	OpinionCommentsOKRootOpinionMyVoteTypeAgree    OpinionCommentsOKRootOpinionMyVoteType = "agree"
 	OpinionCommentsOKRootOpinionMyVoteTypeDisagree OpinionCommentsOKRootOpinionMyVoteType = "disagree"
 	OpinionCommentsOKRootOpinionMyVoteTypePass     OpinionCommentsOKRootOpinionMyVoteType = "pass"
-	OpinionCommentsOKRootOpinionMyVoteTypeUnvote   OpinionCommentsOKRootOpinionMyVoteType = "unvote"
 )
 
 // AllValues returns all OpinionCommentsOKRootOpinionMyVoteType values.
@@ -3812,7 +3741,6 @@ func (OpinionCommentsOKRootOpinionMyVoteType) AllValues() []OpinionCommentsOKRoo
 		OpinionCommentsOKRootOpinionMyVoteTypeAgree,
 		OpinionCommentsOKRootOpinionMyVoteTypeDisagree,
 		OpinionCommentsOKRootOpinionMyVoteTypePass,
-		OpinionCommentsOKRootOpinionMyVoteTypeUnvote,
 	}
 }
 
@@ -3824,8 +3752,6 @@ func (s OpinionCommentsOKRootOpinionMyVoteType) MarshalText() ([]byte, error) {
 	case OpinionCommentsOKRootOpinionMyVoteTypeDisagree:
 		return []byte(s), nil
 	case OpinionCommentsOKRootOpinionMyVoteTypePass:
-		return []byte(s), nil
-	case OpinionCommentsOKRootOpinionMyVoteTypeUnvote:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -3843,9 +3769,6 @@ func (s *OpinionCommentsOKRootOpinionMyVoteType) UnmarshalText(data []byte) erro
 		return nil
 	case OpinionCommentsOKRootOpinionMyVoteTypePass:
 		*s = OpinionCommentsOKRootOpinionMyVoteTypePass
-		return nil
-	case OpinionCommentsOKRootOpinionMyVoteTypeUnvote:
-		*s = OpinionCommentsOKRootOpinionMyVoteTypeUnvote
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -3945,7 +3868,6 @@ const (
 	OpinionCommentsOKRootOpinionOpinionVoteTypeAgree    OpinionCommentsOKRootOpinionOpinionVoteType = "agree"
 	OpinionCommentsOKRootOpinionOpinionVoteTypeDisagree OpinionCommentsOKRootOpinionOpinionVoteType = "disagree"
 	OpinionCommentsOKRootOpinionOpinionVoteTypePass     OpinionCommentsOKRootOpinionOpinionVoteType = "pass"
-	OpinionCommentsOKRootOpinionOpinionVoteTypeUnvote   OpinionCommentsOKRootOpinionOpinionVoteType = "unvote"
 )
 
 // AllValues returns all OpinionCommentsOKRootOpinionOpinionVoteType values.
@@ -3954,7 +3876,6 @@ func (OpinionCommentsOKRootOpinionOpinionVoteType) AllValues() []OpinionComments
 		OpinionCommentsOKRootOpinionOpinionVoteTypeAgree,
 		OpinionCommentsOKRootOpinionOpinionVoteTypeDisagree,
 		OpinionCommentsOKRootOpinionOpinionVoteTypePass,
-		OpinionCommentsOKRootOpinionOpinionVoteTypeUnvote,
 	}
 }
 
@@ -3966,8 +3887,6 @@ func (s OpinionCommentsOKRootOpinionOpinionVoteType) MarshalText() ([]byte, erro
 	case OpinionCommentsOKRootOpinionOpinionVoteTypeDisagree:
 		return []byte(s), nil
 	case OpinionCommentsOKRootOpinionOpinionVoteTypePass:
-		return []byte(s), nil
-	case OpinionCommentsOKRootOpinionOpinionVoteTypeUnvote:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -3985,9 +3904,6 @@ func (s *OpinionCommentsOKRootOpinionOpinionVoteType) UnmarshalText(data []byte)
 		return nil
 	case OpinionCommentsOKRootOpinionOpinionVoteTypePass:
 		*s = OpinionCommentsOKRootOpinionOpinionVoteTypePass
-		return nil
-	case OpinionCommentsOKRootOpinionOpinionVoteTypeUnvote:
-		*s = OpinionCommentsOKRootOpinionOpinionVoteTypeUnvote
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -4196,7 +4112,6 @@ const (
 	OpinionsHistoryOKOpinionsItemOpinionVoteTypeAgree    OpinionsHistoryOKOpinionsItemOpinionVoteType = "agree"
 	OpinionsHistoryOKOpinionsItemOpinionVoteTypeDisagree OpinionsHistoryOKOpinionsItemOpinionVoteType = "disagree"
 	OpinionsHistoryOKOpinionsItemOpinionVoteTypePass     OpinionsHistoryOKOpinionsItemOpinionVoteType = "pass"
-	OpinionsHistoryOKOpinionsItemOpinionVoteTypeUnvote   OpinionsHistoryOKOpinionsItemOpinionVoteType = "unvote"
 )
 
 // AllValues returns all OpinionsHistoryOKOpinionsItemOpinionVoteType values.
@@ -4205,7 +4120,6 @@ func (OpinionsHistoryOKOpinionsItemOpinionVoteType) AllValues() []OpinionsHistor
 		OpinionsHistoryOKOpinionsItemOpinionVoteTypeAgree,
 		OpinionsHistoryOKOpinionsItemOpinionVoteTypeDisagree,
 		OpinionsHistoryOKOpinionsItemOpinionVoteTypePass,
-		OpinionsHistoryOKOpinionsItemOpinionVoteTypeUnvote,
 	}
 }
 
@@ -4217,8 +4131,6 @@ func (s OpinionsHistoryOKOpinionsItemOpinionVoteType) MarshalText() ([]byte, err
 	case OpinionsHistoryOKOpinionsItemOpinionVoteTypeDisagree:
 		return []byte(s), nil
 	case OpinionsHistoryOKOpinionsItemOpinionVoteTypePass:
-		return []byte(s), nil
-	case OpinionsHistoryOKOpinionsItemOpinionVoteTypeUnvote:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -4236,9 +4148,6 @@ func (s *OpinionsHistoryOKOpinionsItemOpinionVoteType) UnmarshalText(data []byte
 		return nil
 	case OpinionsHistoryOKOpinionsItemOpinionVoteTypePass:
 		*s = OpinionsHistoryOKOpinionsItemOpinionVoteTypePass
-		return nil
-	case OpinionsHistoryOKOpinionsItemOpinionVoteTypeUnvote:
-		*s = OpinionsHistoryOKOpinionsItemOpinionVoteTypeUnvote
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -7534,7 +7443,6 @@ const (
 	SwipeOpinionsOKItemOpinionVoteTypeAgree    SwipeOpinionsOKItemOpinionVoteType = "agree"
 	SwipeOpinionsOKItemOpinionVoteTypeDisagree SwipeOpinionsOKItemOpinionVoteType = "disagree"
 	SwipeOpinionsOKItemOpinionVoteTypePass     SwipeOpinionsOKItemOpinionVoteType = "pass"
-	SwipeOpinionsOKItemOpinionVoteTypeUnvote   SwipeOpinionsOKItemOpinionVoteType = "unvote"
 )
 
 // AllValues returns all SwipeOpinionsOKItemOpinionVoteType values.
@@ -7543,7 +7451,6 @@ func (SwipeOpinionsOKItemOpinionVoteType) AllValues() []SwipeOpinionsOKItemOpini
 		SwipeOpinionsOKItemOpinionVoteTypeAgree,
 		SwipeOpinionsOKItemOpinionVoteTypeDisagree,
 		SwipeOpinionsOKItemOpinionVoteTypePass,
-		SwipeOpinionsOKItemOpinionVoteTypeUnvote,
 	}
 }
 
@@ -7555,8 +7462,6 @@ func (s SwipeOpinionsOKItemOpinionVoteType) MarshalText() ([]byte, error) {
 	case SwipeOpinionsOKItemOpinionVoteTypeDisagree:
 		return []byte(s), nil
 	case SwipeOpinionsOKItemOpinionVoteTypePass:
-		return []byte(s), nil
-	case SwipeOpinionsOKItemOpinionVoteTypeUnvote:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -7574,9 +7479,6 @@ func (s *SwipeOpinionsOKItemOpinionVoteType) UnmarshalText(data []byte) error {
 		return nil
 	case SwipeOpinionsOKItemOpinionVoteTypePass:
 		*s = SwipeOpinionsOKItemOpinionVoteTypePass
-		return nil
-	case SwipeOpinionsOKItemOpinionVoteTypeUnvote:
-		*s = SwipeOpinionsOKItemOpinionVoteTypeUnvote
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -7900,7 +7802,6 @@ const (
 	TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeAgree    TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType = "agree"
 	TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeDisagree TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType = "disagree"
 	TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypePass     TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType = "pass"
-	TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeUnvote   TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType = "unvote"
 )
 
 // AllValues returns all TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType values.
@@ -7909,7 +7810,6 @@ func (TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType) AllValu
 		TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeAgree,
 		TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeDisagree,
 		TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypePass,
-		TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeUnvote,
 	}
 }
 
@@ -7921,8 +7821,6 @@ func (s TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType) Marsh
 	case TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeDisagree:
 		return []byte(s), nil
 	case TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypePass:
-		return []byte(s), nil
-	case TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeUnvote:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -7940,9 +7838,6 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType) Unma
 		return nil
 	case TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypePass:
 		*s = TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypePass
-		return nil
-	case TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeUnvote:
-		*s = TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeUnvote
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -8400,7 +8295,6 @@ const (
 	VoteOKItemVoteTypeAgree    VoteOKItemVoteType = "agree"
 	VoteOKItemVoteTypeDisagree VoteOKItemVoteType = "disagree"
 	VoteOKItemVoteTypePass     VoteOKItemVoteType = "pass"
-	VoteOKItemVoteTypeUnvote   VoteOKItemVoteType = "unvote"
 )
 
 // AllValues returns all VoteOKItemVoteType values.
@@ -8409,7 +8303,6 @@ func (VoteOKItemVoteType) AllValues() []VoteOKItemVoteType {
 		VoteOKItemVoteTypeAgree,
 		VoteOKItemVoteTypeDisagree,
 		VoteOKItemVoteTypePass,
-		VoteOKItemVoteTypeUnvote,
 	}
 }
 
@@ -8421,8 +8314,6 @@ func (s VoteOKItemVoteType) MarshalText() ([]byte, error) {
 	case VoteOKItemVoteTypeDisagree:
 		return []byte(s), nil
 	case VoteOKItemVoteTypePass:
-		return []byte(s), nil
-	case VoteOKItemVoteTypeUnvote:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -8440,9 +8331,6 @@ func (s *VoteOKItemVoteType) UnmarshalText(data []byte) error {
 		return nil
 	case VoteOKItemVoteTypePass:
 		*s = VoteOKItemVoteTypePass
-		return nil
-	case VoteOKItemVoteTypeUnvote:
-		*s = VoteOKItemVoteTypeUnvote
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)

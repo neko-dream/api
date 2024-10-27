@@ -8,6 +8,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/server/internal/domain/model/vote"
 	"github.com/neko-dream/server/internal/infrastructure/db"
 	model "github.com/neko-dream/server/internal/infrastructure/db/sqlc"
 	"github.com/neko-dream/server/pkg/utils"
@@ -89,6 +90,7 @@ func (i *getOpinionsByTalkSessionInteractor) Execute(ctx context.Context, input 
 				Title:           utils.ToPtrIfNotNullValue(!row.Title.Valid, row.Title.String),
 				Content:         row.Content,
 				CreatedAt:       row.CreatedAt,
+				VoteType:        vote.VoteTypeFromInt(int(row.VoteType)).String(),
 			},
 			User: UserDTO{
 				ID:   row.DisplayID.String,
@@ -96,6 +98,7 @@ func (i *getOpinionsByTalkSessionInteractor) Execute(ctx context.Context, input 
 				Icon: utils.ToPtrIfNotNullValue(!row.IconUrl.Valid, row.IconUrl.String),
 			},
 			ReplyCount: int(row.ReplyCount),
+			MyVoteType: vote.VoteTypeFromInt(int(row.CurrentVoteType)).String(),
 		})
 	}
 

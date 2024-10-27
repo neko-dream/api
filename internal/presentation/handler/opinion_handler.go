@@ -206,6 +206,7 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 				IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.Icon),
 			},
 			ReplyCount: opinion.ReplyCount,
+			MyVoteType: oas.GetOpinionsForTalkSessionOKOpinionsItemMyVoteType(opinion.MyVoteType),
 		})
 	}
 

@@ -1491,8 +1491,6 @@ func (s *GetOpinionDetailOKOpinionVoteType) Decode(d *jx.Decoder) error {
 		*s = GetOpinionDetailOKOpinionVoteTypeDisagree
 	case GetOpinionDetailOKOpinionVoteTypePass:
 		*s = GetOpinionDetailOKOpinionVoteTypePass
-	case GetOpinionDetailOKOpinionVoteTypeUnvote:
-		*s = GetOpinionDetailOKOpinionVoteTypeUnvote
 	default:
 		*s = GetOpinionDetailOKOpinionVoteType(v)
 	}
@@ -2016,8 +2014,6 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) Decode(d *jx.Decoder
 		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree
 	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass:
 		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeUnvote:
-		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeUnvote
 	default:
 		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteType(v)
 	}
@@ -2259,8 +2255,6 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) Decode(d *jx.De
 		*s = GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeDisagree
 	case GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypePass:
 		*s = GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypePass
-	case GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeUnvote:
-		*s = GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteTypeUnvote
 	default:
 		*s = GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType(v)
 	}
@@ -5876,8 +5870,6 @@ func (s *OpinionComments2OKParentOpinionsItemMyVoteType) Decode(d *jx.Decoder) e
 		*s = OpinionComments2OKParentOpinionsItemMyVoteTypeDisagree
 	case OpinionComments2OKParentOpinionsItemMyVoteTypePass:
 		*s = OpinionComments2OKParentOpinionsItemMyVoteTypePass
-	case OpinionComments2OKParentOpinionsItemMyVoteTypeUnvote:
-		*s = OpinionComments2OKParentOpinionsItemMyVoteTypeUnvote
 	default:
 		*s = OpinionComments2OKParentOpinionsItemMyVoteType(v)
 	}
@@ -6119,8 +6111,6 @@ func (s *OpinionComments2OKParentOpinionsItemOpinionVoteType) Decode(d *jx.Decod
 		*s = OpinionComments2OKParentOpinionsItemOpinionVoteTypeDisagree
 	case OpinionComments2OKParentOpinionsItemOpinionVoteTypePass:
 		*s = OpinionComments2OKParentOpinionsItemOpinionVoteTypePass
-	case OpinionComments2OKParentOpinionsItemOpinionVoteTypeUnvote:
-		*s = OpinionComments2OKParentOpinionsItemOpinionVoteTypeUnvote
 	default:
 		*s = OpinionComments2OKParentOpinionsItemOpinionVoteType(v)
 	}
@@ -6466,8 +6456,6 @@ func (s *OpinionComments2OKReplyOpinionsItemMyVoteType0) Decode(d *jx.Decoder) e
 		*s = OpinionComments2OKReplyOpinionsItemMyVoteType0Disagree
 	case OpinionComments2OKReplyOpinionsItemMyVoteType0Pass:
 		*s = OpinionComments2OKReplyOpinionsItemMyVoteType0Pass
-	case OpinionComments2OKReplyOpinionsItemMyVoteType0Unvote:
-		*s = OpinionComments2OKReplyOpinionsItemMyVoteType0Unvote
 	default:
 		*s = OpinionComments2OKReplyOpinionsItemMyVoteType0(v)
 	}
@@ -6709,8 +6697,6 @@ func (s *OpinionComments2OKReplyOpinionsItemOpinionVoteType) Decode(d *jx.Decode
 		*s = OpinionComments2OKReplyOpinionsItemOpinionVoteTypeDisagree
 	case OpinionComments2OKReplyOpinionsItemOpinionVoteTypePass:
 		*s = OpinionComments2OKReplyOpinionsItemOpinionVoteTypePass
-	case OpinionComments2OKReplyOpinionsItemOpinionVoteTypeUnvote:
-		*s = OpinionComments2OKReplyOpinionsItemOpinionVoteTypeUnvote
 	default:
 		*s = OpinionComments2OKReplyOpinionsItemOpinionVoteType(v)
 	}
@@ -7191,8 +7177,6 @@ func (s *OpinionComments2OKRootOpinionOpinionVoteType) Decode(d *jx.Decoder) err
 		*s = OpinionComments2OKRootOpinionOpinionVoteTypeDisagree
 	case OpinionComments2OKRootOpinionOpinionVoteTypePass:
 		*s = OpinionComments2OKRootOpinionOpinionVoteTypePass
-	case OpinionComments2OKRootOpinionOpinionVoteTypeUnvote:
-		*s = OpinionComments2OKRootOpinionOpinionVoteTypeUnvote
 	default:
 		*s = OpinionComments2OKRootOpinionOpinionVoteType(v)
 	}
@@ -7839,8 +7823,6 @@ func (s *OpinionCommentsOKOpinionsItemMyVoteType) Decode(d *jx.Decoder) error {
 		*s = OpinionCommentsOKOpinionsItemMyVoteTypeDisagree
 	case OpinionCommentsOKOpinionsItemMyVoteTypePass:
 		*s = OpinionCommentsOKOpinionsItemMyVoteTypePass
-	case OpinionCommentsOKOpinionsItemMyVoteTypeUnvote:
-		*s = OpinionCommentsOKOpinionsItemMyVoteTypeUnvote
 	default:
 		*s = OpinionCommentsOKOpinionsItemMyVoteType(v)
 	}
@@ -8082,8 +8064,6 @@ func (s *OpinionCommentsOKOpinionsItemOpinionVoteType) Decode(d *jx.Decoder) err
 		*s = OpinionCommentsOKOpinionsItemOpinionVoteTypeDisagree
 	case OpinionCommentsOKOpinionsItemOpinionVoteTypePass:
 		*s = OpinionCommentsOKOpinionsItemOpinionVoteTypePass
-	case OpinionCommentsOKOpinionsItemOpinionVoteTypeUnvote:
-		*s = OpinionCommentsOKOpinionsItemOpinionVoteTypeUnvote
 	default:
 		*s = OpinionCommentsOKOpinionsItemOpinionVoteType(v)
 	}
@@ -8383,8 +8363,6 @@ func (s *OpinionCommentsOKRootOpinionMyVoteType) Decode(d *jx.Decoder) error {
 		*s = OpinionCommentsOKRootOpinionMyVoteTypeDisagree
 	case OpinionCommentsOKRootOpinionMyVoteTypePass:
 		*s = OpinionCommentsOKRootOpinionMyVoteTypePass
-	case OpinionCommentsOKRootOpinionMyVoteTypeUnvote:
-		*s = OpinionCommentsOKRootOpinionMyVoteTypeUnvote
 	default:
 		*s = OpinionCommentsOKRootOpinionMyVoteType(v)
 	}
@@ -8626,8 +8604,6 @@ func (s *OpinionCommentsOKRootOpinionOpinionVoteType) Decode(d *jx.Decoder) erro
 		*s = OpinionCommentsOKRootOpinionOpinionVoteTypeDisagree
 	case OpinionCommentsOKRootOpinionOpinionVoteTypePass:
 		*s = OpinionCommentsOKRootOpinionOpinionVoteTypePass
-	case OpinionCommentsOKRootOpinionOpinionVoteTypeUnvote:
-		*s = OpinionCommentsOKRootOpinionOpinionVoteTypeUnvote
 	default:
 		*s = OpinionCommentsOKRootOpinionOpinionVoteType(v)
 	}
@@ -9334,8 +9310,6 @@ func (s *OpinionsHistoryOKOpinionsItemOpinionVoteType) Decode(d *jx.Decoder) err
 		*s = OpinionsHistoryOKOpinionsItemOpinionVoteTypeDisagree
 	case OpinionsHistoryOKOpinionsItemOpinionVoteTypePass:
 		*s = OpinionsHistoryOKOpinionsItemOpinionVoteTypePass
-	case OpinionsHistoryOKOpinionsItemOpinionVoteTypeUnvote:
-		*s = OpinionsHistoryOKOpinionsItemOpinionVoteTypeUnvote
 	default:
 		*s = OpinionsHistoryOKOpinionsItemOpinionVoteType(v)
 	}
@@ -12704,8 +12678,6 @@ func (s *SwipeOpinionsOKItemOpinionVoteType) Decode(d *jx.Decoder) error {
 		*s = SwipeOpinionsOKItemOpinionVoteTypeDisagree
 	case SwipeOpinionsOKItemOpinionVoteTypePass:
 		*s = SwipeOpinionsOKItemOpinionVoteTypePass
-	case SwipeOpinionsOKItemOpinionVoteTypeUnvote:
-		*s = SwipeOpinionsOKItemOpinionVoteTypeUnvote
 	default:
 		*s = SwipeOpinionsOKItemOpinionVoteType(v)
 	}
@@ -13753,8 +13725,6 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType) Deco
 		*s = TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeDisagree
 	case TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypePass:
 		*s = TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypePass
-	case TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeUnvote:
-		*s = TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteTypeUnvote
 	default:
 		*s = TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType(v)
 	}
@@ -15068,8 +15038,6 @@ func (s *VoteOKItemVoteType) Decode(d *jx.Decoder) error {
 		*s = VoteOKItemVoteTypeDisagree
 	case VoteOKItemVoteTypePass:
 		*s = VoteOKItemVoteTypePass
-	case VoteOKItemVoteTypeUnvote:
-		*s = VoteOKItemVoteTypeUnvote
 	default:
 		*s = VoteOKItemVoteType(v)
 	}
