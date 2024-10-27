@@ -1,0 +1,14 @@
+get:
+  operationId: manageIndex
+  tags:
+    - manage
+  responses:
+    '200':
+      description: Index page
+      content:
+        text/html:
+          schema:
+            type: string
+  security:
+    - SessionId: []
+  x-ogen-operation-group: Manage

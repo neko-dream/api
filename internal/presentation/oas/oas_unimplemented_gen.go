@@ -112,6 +112,22 @@ func (UnimplementedHandler) GetUserInfo(ctx context.Context) (r GetUserInfoRes, 
 	return r, ht.ErrNotImplemented
 }
 
+// ManageIndex implements manageIndex operation.
+//
+// GET /manage
+func (UnimplementedHandler) ManageIndex(ctx context.Context) (r ManageIndexOK, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// ManageRegenerate implements manageRegenerate operation.
+//
+// Analysisを再生成する。enum: [report, group].
+//
+// POST /manage/regenerate
+func (UnimplementedHandler) ManageRegenerate(ctx context.Context, req OptManageRegenerateReq) (r *ManageRegenerateOK, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // OAuthCallback implements oauth_callback operation.
 //
 // Auth Callback.

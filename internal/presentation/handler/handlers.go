@@ -11,6 +11,7 @@ type handlers struct {
 	oas.TalkSessionHandler
 	oas.UserHandler
 	oas.TestHandler
+	oas.ManageHandler
 }
 
 func NewHandler(
@@ -20,6 +21,7 @@ func NewHandler(
 	talkSessionHandler oas.TalkSessionHandler,
 	userHandler oas.UserHandler,
 	testHandler oas.TestHandler,
+	manageHandler oas.ManageHandler,
 ) oas.Handler {
 	return &handlers{
 		AuthHandler:        authHandler,
@@ -28,5 +30,6 @@ func NewHandler(
 		TalkSessionHandler: talkSessionHandler,
 		UserHandler:        userHandler,
 		TestHandler:        testHandler,
+		ManageHandler:      manageHandler,
 	}
 }

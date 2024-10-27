@@ -3,6 +3,7 @@
 package oas
 
 import (
+	"io"
 	"net/url"
 	"time"
 
@@ -2523,6 +2524,116 @@ func (s *GetUserInfoOKUser) SetDisplayName(val string) {
 // SetIconURL sets the value of IconURL.
 func (s *GetUserInfoOKUser) SetIconURL(val OptNilString) {
 	s.IconURL = val
+}
+
+type ManageIndexOK struct {
+	Data io.Reader
+}
+
+// Read reads data from the Data reader.
+//
+// Kept to satisfy the io.Reader interface.
+func (s ManageIndexOK) Read(p []byte) (n int, err error) {
+	if s.Data == nil {
+		return 0, io.EOF
+	}
+	return s.Data.Read(p)
+}
+
+type ManageRegenerateOK struct {
+	// ステータス.
+	Status OptString `json:"status"`
+	// メッセージ.
+	Message OptString `json:"message"`
+}
+
+// GetStatus returns the value of Status.
+func (s *ManageRegenerateOK) GetStatus() OptString {
+	return s.Status
+}
+
+// GetMessage returns the value of Message.
+func (s *ManageRegenerateOK) GetMessage() OptString {
+	return s.Message
+}
+
+// SetStatus sets the value of Status.
+func (s *ManageRegenerateOK) SetStatus(val OptString) {
+	s.Status = val
+}
+
+// SetMessage sets the value of Message.
+func (s *ManageRegenerateOK) SetMessage(val OptString) {
+	s.Message = val
+}
+
+type ManageRegenerateReq struct {
+	// Analysisの種類.
+	Type ManageRegenerateReqType `json:"type"`
+	// 再生成するTalkSessionID.
+	TalkSessionID string `json:"talkSessionID"`
+}
+
+// GetType returns the value of Type.
+func (s *ManageRegenerateReq) GetType() ManageRegenerateReqType {
+	return s.Type
+}
+
+// GetTalkSessionID returns the value of TalkSessionID.
+func (s *ManageRegenerateReq) GetTalkSessionID() string {
+	return s.TalkSessionID
+}
+
+// SetType sets the value of Type.
+func (s *ManageRegenerateReq) SetType(val ManageRegenerateReqType) {
+	s.Type = val
+}
+
+// SetTalkSessionID sets the value of TalkSessionID.
+func (s *ManageRegenerateReq) SetTalkSessionID(val string) {
+	s.TalkSessionID = val
+}
+
+// Analysisの種類.
+type ManageRegenerateReqType string
+
+const (
+	ManageRegenerateReqTypeReport ManageRegenerateReqType = "report"
+	ManageRegenerateReqTypeGroup  ManageRegenerateReqType = "group"
+)
+
+// AllValues returns all ManageRegenerateReqType values.
+func (ManageRegenerateReqType) AllValues() []ManageRegenerateReqType {
+	return []ManageRegenerateReqType{
+		ManageRegenerateReqTypeReport,
+		ManageRegenerateReqTypeGroup,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s ManageRegenerateReqType) MarshalText() ([]byte, error) {
+	switch s {
+	case ManageRegenerateReqTypeReport:
+		return []byte(s), nil
+	case ManageRegenerateReqTypeGroup:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *ManageRegenerateReqType) UnmarshalText(data []byte) error {
+	switch ManageRegenerateReqType(data) {
+	case ManageRegenerateReqTypeReport:
+		*s = ManageRegenerateReqTypeReport
+		return nil
+	case ManageRegenerateReqTypeGroup:
+		*s = ManageRegenerateReqTypeGroup
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
 // NewNilVoteReqVoteStatus returns new NilVoteReqVoteStatus with value set to v.
@@ -5075,6 +5186,52 @@ func (o OptInt) Get() (v int, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptInt) Or(d int) int {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptManageRegenerateReq returns new OptManageRegenerateReq with value set to v.
+func NewOptManageRegenerateReq(v ManageRegenerateReq) OptManageRegenerateReq {
+	return OptManageRegenerateReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptManageRegenerateReq is optional ManageRegenerateReq.
+type OptManageRegenerateReq struct {
+	Value ManageRegenerateReq
+	Set   bool
+}
+
+// IsSet returns true if OptManageRegenerateReq was set.
+func (o OptManageRegenerateReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptManageRegenerateReq) Reset() {
+	var v ManageRegenerateReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptManageRegenerateReq) SetTo(v ManageRegenerateReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptManageRegenerateReq) Get() (v ManageRegenerateReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptManageRegenerateReq) Or(d ManageRegenerateReq) ManageRegenerateReq {
 	if v, ok := o.Get(); ok {
 		return v
 	}

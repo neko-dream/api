@@ -193,6 +193,49 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				}
 
 				elem = origElem
+			case 'm': // Prefix: "manage"
+				origElem := elem
+				if l := len("manage"); len(elem) >= l && elem[0:l] == "manage" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					switch r.Method {
+					case "GET":
+						s.handleManageIndexRequest([0]string{}, elemIsEscaped, w, r)
+					default:
+						s.notAllowed(w, r, "GET")
+					}
+
+					return
+				}
+				switch elem[0] {
+				case '/': // Prefix: "/regenerate"
+					origElem := elem
+					if l := len("/regenerate"); len(elem) >= l && elem[0:l] == "/regenerate" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch r.Method {
+						case "POST":
+							s.handleManageRegenerateRequest([0]string{}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, "POST")
+						}
+
+						return
+					}
+
+					elem = origElem
+				}
+
+				elem = origElem
 			case 'o': // Prefix: "opinions/histories"
 				origElem := elem
 				if l := len("opinions/histories"); len(elem) >= l && elem[0:l] == "opinions/histories" {
@@ -868,6 +911,57 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						}
 
 						elem = origElem
+					}
+
+					elem = origElem
+				}
+
+				elem = origElem
+			case 'm': // Prefix: "manage"
+				origElem := elem
+				if l := len("manage"); len(elem) >= l && elem[0:l] == "manage" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					switch method {
+					case "GET":
+						r.name = "ManageIndex"
+						r.summary = ""
+						r.operationID = "manageIndex"
+						r.pathPattern = "/manage"
+						r.args = args
+						r.count = 0
+						return r, true
+					default:
+						return
+					}
+				}
+				switch elem[0] {
+				case '/': // Prefix: "/regenerate"
+					origElem := elem
+					if l := len("/regenerate"); len(elem) >= l && elem[0:l] == "/regenerate" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch method {
+						case "POST":
+							r.name = "ManageRegenerate"
+							r.summary = "Analysisを再生成する。enum: [report, group]"
+							r.operationID = "manageRegenerate"
+							r.pathPattern = "/manage/regenerate"
+							r.args = args
+							r.count = 0
+							return r, true
+						default:
+							return
+						}
 					}
 
 					elem = origElem

@@ -86,7 +86,7 @@ func (i *postVoteInteractor) Execute(ctx context.Context, input PostVoteInput) (
 			return messages.VoteFailed
 		}
 
-		if err := i.AnalysisService.StartAnalysis(ctx, input.TalkSessionID, input.UserID); err != nil {
+		if err := i.AnalysisService.StartAnalysis(ctx, input.TalkSessionID); err != nil {
 			utils.HandleError(ctx, err, "StartAnalysis")
 			return err
 		}

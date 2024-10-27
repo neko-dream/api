@@ -1,0 +1,42 @@
+post:
+  tags:
+   - manage
+  summary: "Analysisを再生成する。enum: [report, group]"
+  operationId: manageRegenerate
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - report
+                - group
+              description: "Analysisの種類"
+              example: "report"
+            talkSessionID:
+              type: string
+              description: "再生成するTalkSessionID"
+          required:
+            - type
+            - talkSessionID
+  responses:
+    '200':
+      description: "Analysisを再生成する"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                description: "ステータス"
+                example: "ok"
+              message:
+                type: string
+                description: "メッセージ"
+                example: "Analysisを再生成しました"
+
+  x-ogen-operation-group: Manage

@@ -9,9 +9,11 @@ paths:
     $ref: './paths/authorize.yaml'
   /auth/{provider}/callback:
     $ref: './paths/callback.yaml'
-  # /auth/token/info:
-  #   $ref: './paths/token_info.yaml'
   /auth/revoke:
     $ref: './paths/revoke.yaml'
+  /manage:
+    $ref: './paths/manage/index.yaml'
+  /manage/regenerate:
+    $ref: './paths/manage/regenerate.yaml'
 components:
   $ref: './apidog.openapi.yaml#/components'

@@ -9,6 +9,7 @@ import (
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
 	AuthHandler
+	ManageHandler
 	OpinionHandler
 	TalkSessionHandler
 	TestHandler
@@ -44,6 +45,22 @@ type AuthHandler interface {
 	//
 	// GET /auth/token/info
 	OAuthTokenInfo(ctx context.Context) (OAuthTokenInfoRes, error)
+}
+
+// ManageHandler handles operations described by OpenAPI v3 specification.
+//
+// x-ogen-operation-group: Manage
+type ManageHandler interface {
+	// ManageIndex implements manageIndex operation.
+	//
+	// GET /manage
+	ManageIndex(ctx context.Context) (ManageIndexOK, error)
+	// ManageRegenerate implements manageRegenerate operation.
+	//
+	// Analysisを再生成する。enum: [report, group].
+	//
+	// POST /manage/regenerate
+	ManageRegenerate(ctx context.Context, req OptManageRegenerateReq) (*ManageRegenerateOK, error)
 }
 
 // OpinionHandler handles operations described by OpenAPI v3 specification.

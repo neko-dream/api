@@ -8,7 +8,6 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/analysis"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
-	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/pkg/utils"
 )
@@ -27,6 +26,7 @@ func NewAnalysisService(
 
 // GenerateReport implements analysis.AnalysisService.
 func (a *analysisService) GenerateReport(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession]) error {
+	log.Println("GenerateReport", talkSessionID)
 	// カスタムHTTPクライアントを作成
 	httpClient := &http.Client{
 		Transport: &BasicAuthTransport{
@@ -60,7 +60,8 @@ func (a *analysisService) GenerateReport(ctx context.Context, talkSessionID shar
 }
 
 // StartAnalysis 会話分析を開始する
-func (a *analysisService) StartAnalysis(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession], userID shared.UUID[user.User]) error {
+func (a *analysisService) StartAnalysis(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession]) error {
+	log.Println("start analysis", talkSessionID)
 	// カスタムHTTPクライアントを作成
 	httpClient := &http.Client{
 		Transport: &BasicAuthTransport{
@@ -77,7 +78,7 @@ func (a *analysisService) StartAnalysis(ctx context.Context, talkSessionID share
 	// APIリクエストの実行
 	resp, err := c.PostPredictsGroups(ctx, PostPredictsGroupsJSONRequestBody{
 		TalkSessionId: talkSessionID.String(),
-		UserId:        userID.String(),
+		UserId:        "0",
 	})
 	if err != nil {
 		log.Println("PostPredictsGroups", err)

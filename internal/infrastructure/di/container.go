@@ -80,6 +80,7 @@ func BuildContainer() *dig.Container {
 		{handler.NewTalkSessionHandler, nil},
 		{handler.NewHandler, nil},
 		{handler.NewTestHandler, nil},
+		{handler.NewManageHandler, nil},
 	}
 
 	container := ProvideDependencies(deps)

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>適当すぎる管理画面</title>
+  </head>
+  <body>
+    <div >
+        <h1 >セッション一覧</h1>
+        <div >
+            <div >
+                {{range .Sessions}}
+                <div id="task-{{.ID}}">
+                    <div >
+                        <span>{{.Theme}}</span>
+                    </div>
+                    <button
+                        onclick="generateReport('{{.ID}}')"
+                    >
+                        レポート再生成
+                    </button>
+                    <button
+                        onclick="generateAnalysis('{{.ID}}')"
+                    >分析再実行</button>
+                </div>
+                {{end}}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function generateAnalysis(talkSessionID) {
+            try {
+                const response = await fetch(`/manage/regenerate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        type: "group",
+                        talkSessionID: talkSessionID,
+                    }),
+                });
+
+                const result = await response.json();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('エラーが発生しました');
+            }
+        }
+        async function generateReport(talkSessionID) {
+            try {
+                const response = await fetch(`/manage/regenerate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        type:"report",
+                        talkSessionID: talkSessionID,
+                    }),
+                });
+
+                const result = await response.json();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('エラーが発生しました');
+            }
+        }
+    </script>
+  </body>
+</html>

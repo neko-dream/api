@@ -1276,6 +1276,40 @@ func (s *GetUserInfoOKUser) Validate() error {
 	return nil
 }
 
+func (s *ManageRegenerateReq) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := s.Type.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "type",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s ManageRegenerateReqType) Validate() error {
+	switch s {
+	case "report":
+		return nil
+	case "group":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
 func (s *OpinionComments2OK) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
