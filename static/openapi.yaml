@@ -1007,9 +1007,12 @@ paths:
                         referenceURL:
                           type: string
                           description: 参考文献URL
+                        postedAt:
+                          type: string
                       required:
                         - content
                         - id
+                        - postedAt
                     user:
                       type: object
                       properties:
@@ -1276,9 +1279,12 @@ paths:
                             referenceURL:
                               type: string
                               description: 参考文献URL
+                            postedAt:
+                              type: string
                           required:
                             - content
                             - id
+                            - postedAt
                         user:
                           type: object
                           properties:
@@ -1448,9 +1454,12 @@ paths:
                     referenceURL:
                       type: string
                       description: 参考文献URL
+                    postedAt:
+                      type: string
                   required:
                     - content
                     - id
+                    - postedAt
         '400':
           description: ErrorResponse
           content:
@@ -1606,9 +1615,12 @@ paths:
                           referenceURL:
                             type: string
                             description: 参考文献URL
+                          postedAt:
+                            type: string
                         required:
                           - content
                           - id
+                          - postedAt
                     required:
                       - user
                       - opinion
@@ -1658,9 +1670,12 @@ paths:
                             referenceURL:
                               type: string
                               description: 参考文献URL
+                            postedAt:
+                              type: string
                           required:
                             - content
                             - id
+                            - postedAt
                         user:
                           type: object
                           properties:
@@ -1884,9 +1899,12 @@ paths:
                                   referenceURL:
                                     type: string
                                     description: 参考文献URL
+                                  postedAt:
+                                    type: string
                                 required:
                                   - content
                                   - id
+                                  - postedAt
                               user:
                                 type: object
                                 properties:
@@ -2241,9 +2259,12 @@ paths:
                             referenceURL:
                               type: string
                               description: 参考文献URL
+                            postedAt:
+                              type: string
                           required:
                             - content
                             - id
+                            - postedAt
                         replyCount:
                           type: integer
                       required:
@@ -2529,9 +2550,12 @@ paths:
                       referenceURL:
                         type: string
                         description: 参考文献URL
+                      postedAt:
+                        type: string
                     required:
                       - content
                       - id
+                      - postedAt
                   user:
                     type: object
                     properties:
@@ -2752,9 +2776,12 @@ paths:
                           referenceURL:
                             type: string
                             description: 参考文献URL
+                          postedAt:
+                            type: string
                         required:
                           - content
                           - id
+                          - postedAt
                     required:
                       - user
                       - opinion
@@ -2804,9 +2831,12 @@ paths:
                             referenceURL:
                               type: string
                               description: 参考文献URL
+                            postedAt:
+                              type: string
                           required:
                             - content
                             - id
+                            - postedAt
                         user:
                           type: object
                           properties:
@@ -2897,9 +2927,12 @@ paths:
                             referenceURL:
                               type: string
                               description: 参考文献URL
+                            postedAt:
+                              type: string
                           required:
                             - content
                             - id
+                            - postedAt
                         user:
                           type: object
                           properties:
@@ -3734,9 +3767,12 @@ components:
         referenceURL:
           type: string
           description: 参考文献URL
+        postedAt:
+          type: string
       required:
         - content
         - id
+        - postedAt
     user:
       type: object
       properties:

@@ -1187,6 +1187,7 @@ type GetOpinionDetailOKOpinion struct {
 	PictureURL OptString `json:"pictureURL"`
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
+	PostedAt     string    `json:"postedAt"`
 }
 
 // GetID returns the value of ID.
@@ -1224,6 +1225,11 @@ func (s *GetOpinionDetailOKOpinion) GetReferenceURL() OptString {
 	return s.ReferenceURL
 }
 
+// GetPostedAt returns the value of PostedAt.
+func (s *GetOpinionDetailOKOpinion) GetPostedAt() string {
+	return s.PostedAt
+}
+
 // SetID sets the value of ID.
 func (s *GetOpinionDetailOKOpinion) SetID(val string) {
 	s.ID = val
@@ -1257,6 +1263,11 @@ func (s *GetOpinionDetailOKOpinion) SetPictureURL(val OptString) {
 // SetReferenceURL sets the value of ReferenceURL.
 func (s *GetOpinionDetailOKOpinion) SetReferenceURL(val OptString) {
 	s.ReferenceURL = val
+}
+
+// SetPostedAt sets the value of PostedAt.
+func (s *GetOpinionDetailOKOpinion) SetPostedAt(val string) {
+	s.PostedAt = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -1492,6 +1503,7 @@ type GetOpinionsForTalkSessionOKOpinionsItemOpinion struct {
 	PictureURL OptString `json:"pictureURL"`
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
+	PostedAt     string    `json:"postedAt"`
 }
 
 // GetID returns the value of ID.
@@ -1529,6 +1541,11 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) GetReferenceURL() OptSt
 	return s.ReferenceURL
 }
 
+// GetPostedAt returns the value of PostedAt.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) GetPostedAt() string {
+	return s.PostedAt
+}
+
 // SetID sets the value of ID.
 func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) SetID(val string) {
 	s.ID = val
@@ -1562,6 +1579,11 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) SetPictureURL(val OptSt
 // SetReferenceURL sets the value of ReferenceURL.
 func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) SetReferenceURL(val OptString) {
 	s.ReferenceURL = val
+}
+
+// SetPostedAt sets the value of PostedAt.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) SetPostedAt(val string) {
+	s.PostedAt = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -3173,6 +3195,7 @@ type OpinionComments2OKParentOpinionsItemOpinion struct {
 	PictureURL OptString `json:"pictureURL"`
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
+	PostedAt     string    `json:"postedAt"`
 }
 
 // GetID returns the value of ID.
@@ -3210,6 +3233,11 @@ func (s *OpinionComments2OKParentOpinionsItemOpinion) GetReferenceURL() OptStrin
 	return s.ReferenceURL
 }
 
+// GetPostedAt returns the value of PostedAt.
+func (s *OpinionComments2OKParentOpinionsItemOpinion) GetPostedAt() string {
+	return s.PostedAt
+}
+
 // SetID sets the value of ID.
 func (s *OpinionComments2OKParentOpinionsItemOpinion) SetID(val string) {
 	s.ID = val
@@ -3243,6 +3271,11 @@ func (s *OpinionComments2OKParentOpinionsItemOpinion) SetPictureURL(val OptStrin
 // SetReferenceURL sets the value of ReferenceURL.
 func (s *OpinionComments2OKParentOpinionsItemOpinion) SetReferenceURL(val OptString) {
 	s.ReferenceURL = val
+}
+
+// SetPostedAt sets the value of PostedAt.
+func (s *OpinionComments2OKParentOpinionsItemOpinion) SetPostedAt(val string) {
+	s.PostedAt = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -3499,6 +3532,7 @@ type OpinionComments2OKReplyOpinionsItemOpinion struct {
 	PictureURL OptString `json:"pictureURL"`
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
+	PostedAt     string    `json:"postedAt"`
 }
 
 // GetID returns the value of ID.
@@ -3536,6 +3570,11 @@ func (s *OpinionComments2OKReplyOpinionsItemOpinion) GetReferenceURL() OptString
 	return s.ReferenceURL
 }
 
+// GetPostedAt returns the value of PostedAt.
+func (s *OpinionComments2OKReplyOpinionsItemOpinion) GetPostedAt() string {
+	return s.PostedAt
+}
+
 // SetID sets the value of ID.
 func (s *OpinionComments2OKReplyOpinionsItemOpinion) SetID(val string) {
 	s.ID = val
@@ -3569,6 +3608,11 @@ func (s *OpinionComments2OKReplyOpinionsItemOpinion) SetPictureURL(val OptString
 // SetReferenceURL sets the value of ReferenceURL.
 func (s *OpinionComments2OKReplyOpinionsItemOpinion) SetReferenceURL(val OptString) {
 	s.ReferenceURL = val
+}
+
+// SetPostedAt sets the value of PostedAt.
+func (s *OpinionComments2OKReplyOpinionsItemOpinion) SetPostedAt(val string) {
+	s.PostedAt = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -3697,6 +3741,7 @@ type OpinionComments2OKRootOpinionOpinion struct {
 	PictureURL OptString `json:"pictureURL"`
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
+	PostedAt     string    `json:"postedAt"`
 }
 
 // GetID returns the value of ID.
@@ -3734,6 +3779,11 @@ func (s *OpinionComments2OKRootOpinionOpinion) GetReferenceURL() OptString {
 	return s.ReferenceURL
 }
 
+// GetPostedAt returns the value of PostedAt.
+func (s *OpinionComments2OKRootOpinionOpinion) GetPostedAt() string {
+	return s.PostedAt
+}
+
 // SetID sets the value of ID.
 func (s *OpinionComments2OKRootOpinionOpinion) SetID(val string) {
 	s.ID = val
@@ -3767,6 +3817,11 @@ func (s *OpinionComments2OKRootOpinionOpinion) SetPictureURL(val OptString) {
 // SetReferenceURL sets the value of ReferenceURL.
 func (s *OpinionComments2OKRootOpinionOpinion) SetReferenceURL(val OptString) {
 	s.ReferenceURL = val
+}
+
+// SetPostedAt sets the value of PostedAt.
+func (s *OpinionComments2OKRootOpinionOpinion) SetPostedAt(val string) {
+	s.PostedAt = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -4037,6 +4092,7 @@ type OpinionCommentsOKOpinionsItemOpinion struct {
 	PictureURL OptString `json:"pictureURL"`
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
+	PostedAt     string    `json:"postedAt"`
 }
 
 // GetID returns the value of ID.
@@ -4074,6 +4130,11 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) GetReferenceURL() OptString {
 	return s.ReferenceURL
 }
 
+// GetPostedAt returns the value of PostedAt.
+func (s *OpinionCommentsOKOpinionsItemOpinion) GetPostedAt() string {
+	return s.PostedAt
+}
+
 // SetID sets the value of ID.
 func (s *OpinionCommentsOKOpinionsItemOpinion) SetID(val string) {
 	s.ID = val
@@ -4107,6 +4168,11 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) SetPictureURL(val OptString) {
 // SetReferenceURL sets the value of ReferenceURL.
 func (s *OpinionCommentsOKOpinionsItemOpinion) SetReferenceURL(val OptString) {
 	s.ReferenceURL = val
+}
+
+// SetPostedAt sets the value of PostedAt.
+func (s *OpinionCommentsOKOpinionsItemOpinion) SetPostedAt(val string) {
+	s.PostedAt = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -4296,6 +4362,7 @@ type OpinionCommentsOKRootOpinionOpinion struct {
 	PictureURL OptString `json:"pictureURL"`
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
+	PostedAt     string    `json:"postedAt"`
 }
 
 // GetID returns the value of ID.
@@ -4333,6 +4400,11 @@ func (s *OpinionCommentsOKRootOpinionOpinion) GetReferenceURL() OptString {
 	return s.ReferenceURL
 }
 
+// GetPostedAt returns the value of PostedAt.
+func (s *OpinionCommentsOKRootOpinionOpinion) GetPostedAt() string {
+	return s.PostedAt
+}
+
 // SetID sets the value of ID.
 func (s *OpinionCommentsOKRootOpinionOpinion) SetID(val string) {
 	s.ID = val
@@ -4366,6 +4438,11 @@ func (s *OpinionCommentsOKRootOpinionOpinion) SetPictureURL(val OptString) {
 // SetReferenceURL sets the value of ReferenceURL.
 func (s *OpinionCommentsOKRootOpinionOpinion) SetReferenceURL(val OptString) {
 	s.ReferenceURL = val
+}
+
+// SetPostedAt sets the value of PostedAt.
+func (s *OpinionCommentsOKRootOpinionOpinion) SetPostedAt(val string) {
+	s.PostedAt = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -4540,6 +4617,7 @@ type OpinionsHistoryOKOpinionsItemOpinion struct {
 	PictureURL OptString `json:"pictureURL"`
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
+	PostedAt     string    `json:"postedAt"`
 }
 
 // GetID returns the value of ID.
@@ -4577,6 +4655,11 @@ func (s *OpinionsHistoryOKOpinionsItemOpinion) GetReferenceURL() OptString {
 	return s.ReferenceURL
 }
 
+// GetPostedAt returns the value of PostedAt.
+func (s *OpinionsHistoryOKOpinionsItemOpinion) GetPostedAt() string {
+	return s.PostedAt
+}
+
 // SetID sets the value of ID.
 func (s *OpinionsHistoryOKOpinionsItemOpinion) SetID(val string) {
 	s.ID = val
@@ -4610,6 +4693,11 @@ func (s *OpinionsHistoryOKOpinionsItemOpinion) SetPictureURL(val OptString) {
 // SetReferenceURL sets the value of ReferenceURL.
 func (s *OpinionsHistoryOKOpinionsItemOpinion) SetReferenceURL(val OptString) {
 	s.ReferenceURL = val
+}
+
+// SetPostedAt sets the value of PostedAt.
+func (s *OpinionsHistoryOKOpinionsItemOpinion) SetPostedAt(val string) {
+	s.PostedAt = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -8161,6 +8249,7 @@ type SwipeOpinionsOKItemOpinion struct {
 	PictureURL OptString `json:"pictureURL"`
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
+	PostedAt     string    `json:"postedAt"`
 }
 
 // GetID returns the value of ID.
@@ -8198,6 +8287,11 @@ func (s *SwipeOpinionsOKItemOpinion) GetReferenceURL() OptString {
 	return s.ReferenceURL
 }
 
+// GetPostedAt returns the value of PostedAt.
+func (s *SwipeOpinionsOKItemOpinion) GetPostedAt() string {
+	return s.PostedAt
+}
+
 // SetID sets the value of ID.
 func (s *SwipeOpinionsOKItemOpinion) SetID(val string) {
 	s.ID = val
@@ -8231,6 +8325,11 @@ func (s *SwipeOpinionsOKItemOpinion) SetPictureURL(val OptString) {
 // SetReferenceURL sets the value of ReferenceURL.
 func (s *SwipeOpinionsOKItemOpinion) SetReferenceURL(val OptString) {
 	s.ReferenceURL = val
+}
+
+// SetPostedAt sets the value of PostedAt.
+func (s *SwipeOpinionsOKItemOpinion) SetPostedAt(val string) {
+	s.PostedAt = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -8520,6 +8619,7 @@ type TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion struct {
 	PictureURL OptString `json:"pictureURL"`
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
+	PostedAt     string    `json:"postedAt"`
 }
 
 // GetID returns the value of ID.
@@ -8557,6 +8657,11 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) GetReference
 	return s.ReferenceURL
 }
 
+// GetPostedAt returns the value of PostedAt.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) GetPostedAt() string {
+	return s.PostedAt
+}
+
 // SetID sets the value of ID.
 func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) SetID(val string) {
 	s.ID = val
@@ -8590,6 +8695,11 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) SetPictureUR
 // SetReferenceURL sets the value of ReferenceURL.
 func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) SetReferenceURL(val OptString) {
 	s.ReferenceURL = val
+}
+
+// SetPostedAt sets the value of PostedAt.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) SetPostedAt(val string) {
+	s.PostedAt = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -9013,6 +9123,7 @@ type VoteOKItem struct {
 	PictureURL OptString `json:"pictureURL"`
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
+	PostedAt     string    `json:"postedAt"`
 }
 
 // GetID returns the value of ID.
@@ -9050,6 +9161,11 @@ func (s *VoteOKItem) GetReferenceURL() OptString {
 	return s.ReferenceURL
 }
 
+// GetPostedAt returns the value of PostedAt.
+func (s *VoteOKItem) GetPostedAt() string {
+	return s.PostedAt
+}
+
 // SetID sets the value of ID.
 func (s *VoteOKItem) SetID(val string) {
 	s.ID = val
@@ -9083,6 +9199,11 @@ func (s *VoteOKItem) SetPictureURL(val OptString) {
 // SetReferenceURL sets the value of ReferenceURL.
 func (s *VoteOKItem) SetReferenceURL(val OptString) {
 	s.ReferenceURL = val
+}
+
+// SetPostedAt sets the value of PostedAt.
+func (s *VoteOKItem) SetPostedAt(val string) {
+	s.PostedAt = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.

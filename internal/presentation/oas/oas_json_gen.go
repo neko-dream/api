@@ -2454,9 +2454,13 @@ func (s *GetOpinionDetailOKOpinion) encodeFields(e *jx.Encoder) {
 			s.ReferenceURL.Encode(e)
 		}
 	}
+	{
+		e.FieldStart("postedAt")
+		e.Str(s.PostedAt)
+	}
 }
 
-var jsonFieldsNameOfGetOpinionDetailOKOpinion = [7]string{
+var jsonFieldsNameOfGetOpinionDetailOKOpinion = [8]string{
 	0: "id",
 	1: "title",
 	2: "content",
@@ -2464,6 +2468,7 @@ var jsonFieldsNameOfGetOpinionDetailOKOpinion = [7]string{
 	4: "voteType",
 	5: "pictureURL",
 	6: "referenceURL",
+	7: "postedAt",
 }
 
 // Decode decodes GetOpinionDetailOKOpinion from json.
@@ -2550,6 +2555,18 @@ func (s *GetOpinionDetailOKOpinion) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"referenceURL\"")
 			}
+		case "postedAt":
+			requiredBitSet[0] |= 1 << 7
+			if err := func() error {
+				v, err := d.Str()
+				s.PostedAt = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"postedAt\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -2560,7 +2577,7 @@ func (s *GetOpinionDetailOKOpinion) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000101,
+		0b10000101,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -3218,9 +3235,13 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) encodeFields(e *jx.Enco
 			s.ReferenceURL.Encode(e)
 		}
 	}
+	{
+		e.FieldStart("postedAt")
+		e.Str(s.PostedAt)
+	}
 }
 
-var jsonFieldsNameOfGetOpinionsForTalkSessionOKOpinionsItemOpinion = [7]string{
+var jsonFieldsNameOfGetOpinionsForTalkSessionOKOpinionsItemOpinion = [8]string{
 	0: "id",
 	1: "title",
 	2: "content",
@@ -3228,6 +3249,7 @@ var jsonFieldsNameOfGetOpinionsForTalkSessionOKOpinionsItemOpinion = [7]string{
 	4: "voteType",
 	5: "pictureURL",
 	6: "referenceURL",
+	7: "postedAt",
 }
 
 // Decode decodes GetOpinionsForTalkSessionOKOpinionsItemOpinion from json.
@@ -3314,6 +3336,18 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) Decode(d *jx.Decoder) e
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"referenceURL\"")
 			}
+		case "postedAt":
+			requiredBitSet[0] |= 1 << 7
+			if err := func() error {
+				v, err := d.Str()
+				s.PostedAt = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"postedAt\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -3324,7 +3358,7 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) Decode(d *jx.Decoder) e
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000101,
+		0b10000101,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -7305,9 +7339,13 @@ func (s *OpinionComments2OKParentOpinionsItemOpinion) encodeFields(e *jx.Encoder
 			s.ReferenceURL.Encode(e)
 		}
 	}
+	{
+		e.FieldStart("postedAt")
+		e.Str(s.PostedAt)
+	}
 }
 
-var jsonFieldsNameOfOpinionComments2OKParentOpinionsItemOpinion = [7]string{
+var jsonFieldsNameOfOpinionComments2OKParentOpinionsItemOpinion = [8]string{
 	0: "id",
 	1: "title",
 	2: "content",
@@ -7315,6 +7353,7 @@ var jsonFieldsNameOfOpinionComments2OKParentOpinionsItemOpinion = [7]string{
 	4: "voteType",
 	5: "pictureURL",
 	6: "referenceURL",
+	7: "postedAt",
 }
 
 // Decode decodes OpinionComments2OKParentOpinionsItemOpinion from json.
@@ -7401,6 +7440,18 @@ func (s *OpinionComments2OKParentOpinionsItemOpinion) Decode(d *jx.Decoder) erro
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"referenceURL\"")
 			}
+		case "postedAt":
+			requiredBitSet[0] |= 1 << 7
+			if err := func() error {
+				v, err := d.Str()
+				s.PostedAt = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"postedAt\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -7411,7 +7462,7 @@ func (s *OpinionComments2OKParentOpinionsItemOpinion) Decode(d *jx.Decoder) erro
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000101,
+		0b10000101,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -7891,9 +7942,13 @@ func (s *OpinionComments2OKReplyOpinionsItemOpinion) encodeFields(e *jx.Encoder)
 			s.ReferenceURL.Encode(e)
 		}
 	}
+	{
+		e.FieldStart("postedAt")
+		e.Str(s.PostedAt)
+	}
 }
 
-var jsonFieldsNameOfOpinionComments2OKReplyOpinionsItemOpinion = [7]string{
+var jsonFieldsNameOfOpinionComments2OKReplyOpinionsItemOpinion = [8]string{
 	0: "id",
 	1: "title",
 	2: "content",
@@ -7901,6 +7956,7 @@ var jsonFieldsNameOfOpinionComments2OKReplyOpinionsItemOpinion = [7]string{
 	4: "voteType",
 	5: "pictureURL",
 	6: "referenceURL",
+	7: "postedAt",
 }
 
 // Decode decodes OpinionComments2OKReplyOpinionsItemOpinion from json.
@@ -7987,6 +8043,18 @@ func (s *OpinionComments2OKReplyOpinionsItemOpinion) Decode(d *jx.Decoder) error
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"referenceURL\"")
 			}
+		case "postedAt":
+			requiredBitSet[0] |= 1 << 7
+			if err := func() error {
+				v, err := d.Str()
+				s.PostedAt = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"postedAt\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -7997,7 +8065,7 @@ func (s *OpinionComments2OKReplyOpinionsItemOpinion) Decode(d *jx.Decoder) error
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000101,
+		0b10000101,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -8371,9 +8439,13 @@ func (s *OpinionComments2OKRootOpinionOpinion) encodeFields(e *jx.Encoder) {
 			s.ReferenceURL.Encode(e)
 		}
 	}
+	{
+		e.FieldStart("postedAt")
+		e.Str(s.PostedAt)
+	}
 }
 
-var jsonFieldsNameOfOpinionComments2OKRootOpinionOpinion = [7]string{
+var jsonFieldsNameOfOpinionComments2OKRootOpinionOpinion = [8]string{
 	0: "id",
 	1: "title",
 	2: "content",
@@ -8381,6 +8453,7 @@ var jsonFieldsNameOfOpinionComments2OKRootOpinionOpinion = [7]string{
 	4: "voteType",
 	5: "pictureURL",
 	6: "referenceURL",
+	7: "postedAt",
 }
 
 // Decode decodes OpinionComments2OKRootOpinionOpinion from json.
@@ -8467,6 +8540,18 @@ func (s *OpinionComments2OKRootOpinionOpinion) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"referenceURL\"")
 			}
+		case "postedAt":
+			requiredBitSet[0] |= 1 << 7
+			if err := func() error {
+				v, err := d.Str()
+				s.PostedAt = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"postedAt\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -8477,7 +8562,7 @@ func (s *OpinionComments2OKRootOpinionOpinion) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000101,
+		0b10000101,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -9258,9 +9343,13 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) encodeFields(e *jx.Encoder) {
 			s.ReferenceURL.Encode(e)
 		}
 	}
+	{
+		e.FieldStart("postedAt")
+		e.Str(s.PostedAt)
+	}
 }
 
-var jsonFieldsNameOfOpinionCommentsOKOpinionsItemOpinion = [7]string{
+var jsonFieldsNameOfOpinionCommentsOKOpinionsItemOpinion = [8]string{
 	0: "id",
 	1: "title",
 	2: "content",
@@ -9268,6 +9357,7 @@ var jsonFieldsNameOfOpinionCommentsOKOpinionsItemOpinion = [7]string{
 	4: "voteType",
 	5: "pictureURL",
 	6: "referenceURL",
+	7: "postedAt",
 }
 
 // Decode decodes OpinionCommentsOKOpinionsItemOpinion from json.
@@ -9354,6 +9444,18 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"referenceURL\"")
 			}
+		case "postedAt":
+			requiredBitSet[0] |= 1 << 7
+			if err := func() error {
+				v, err := d.Str()
+				s.PostedAt = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"postedAt\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -9364,7 +9466,7 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000101,
+		0b10000101,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -9798,9 +9900,13 @@ func (s *OpinionCommentsOKRootOpinionOpinion) encodeFields(e *jx.Encoder) {
 			s.ReferenceURL.Encode(e)
 		}
 	}
+	{
+		e.FieldStart("postedAt")
+		e.Str(s.PostedAt)
+	}
 }
 
-var jsonFieldsNameOfOpinionCommentsOKRootOpinionOpinion = [7]string{
+var jsonFieldsNameOfOpinionCommentsOKRootOpinionOpinion = [8]string{
 	0: "id",
 	1: "title",
 	2: "content",
@@ -9808,6 +9914,7 @@ var jsonFieldsNameOfOpinionCommentsOKRootOpinionOpinion = [7]string{
 	4: "voteType",
 	5: "pictureURL",
 	6: "referenceURL",
+	7: "postedAt",
 }
 
 // Decode decodes OpinionCommentsOKRootOpinionOpinion from json.
@@ -9894,6 +10001,18 @@ func (s *OpinionCommentsOKRootOpinionOpinion) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"referenceURL\"")
 			}
+		case "postedAt":
+			requiredBitSet[0] |= 1 << 7
+			if err := func() error {
+				v, err := d.Str()
+				s.PostedAt = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"postedAt\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -9904,7 +10023,7 @@ func (s *OpinionCommentsOKRootOpinionOpinion) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000101,
+		0b10000101,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -10504,9 +10623,13 @@ func (s *OpinionsHistoryOKOpinionsItemOpinion) encodeFields(e *jx.Encoder) {
 			s.ReferenceURL.Encode(e)
 		}
 	}
+	{
+		e.FieldStart("postedAt")
+		e.Str(s.PostedAt)
+	}
 }
 
-var jsonFieldsNameOfOpinionsHistoryOKOpinionsItemOpinion = [7]string{
+var jsonFieldsNameOfOpinionsHistoryOKOpinionsItemOpinion = [8]string{
 	0: "id",
 	1: "title",
 	2: "content",
@@ -10514,6 +10637,7 @@ var jsonFieldsNameOfOpinionsHistoryOKOpinionsItemOpinion = [7]string{
 	4: "voteType",
 	5: "pictureURL",
 	6: "referenceURL",
+	7: "postedAt",
 }
 
 // Decode decodes OpinionsHistoryOKOpinionsItemOpinion from json.
@@ -10600,6 +10724,18 @@ func (s *OpinionsHistoryOKOpinionsItemOpinion) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"referenceURL\"")
 			}
+		case "postedAt":
+			requiredBitSet[0] |= 1 << 7
+			if err := func() error {
+				v, err := d.Str()
+				s.PostedAt = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"postedAt\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -10610,7 +10746,7 @@ func (s *OpinionsHistoryOKOpinionsItemOpinion) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000101,
+		0b10000101,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -14267,9 +14403,13 @@ func (s *SwipeOpinionsOKItemOpinion) encodeFields(e *jx.Encoder) {
 			s.ReferenceURL.Encode(e)
 		}
 	}
+	{
+		e.FieldStart("postedAt")
+		e.Str(s.PostedAt)
+	}
 }
 
-var jsonFieldsNameOfSwipeOpinionsOKItemOpinion = [7]string{
+var jsonFieldsNameOfSwipeOpinionsOKItemOpinion = [8]string{
 	0: "id",
 	1: "title",
 	2: "content",
@@ -14277,6 +14417,7 @@ var jsonFieldsNameOfSwipeOpinionsOKItemOpinion = [7]string{
 	4: "voteType",
 	5: "pictureURL",
 	6: "referenceURL",
+	7: "postedAt",
 }
 
 // Decode decodes SwipeOpinionsOKItemOpinion from json.
@@ -14363,6 +14504,18 @@ func (s *SwipeOpinionsOKItemOpinion) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"referenceURL\"")
 			}
+		case "postedAt":
+			requiredBitSet[0] |= 1 << 7
+			if err := func() error {
+				v, err := d.Str()
+				s.PostedAt = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"postedAt\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -14373,7 +14526,7 @@ func (s *SwipeOpinionsOKItemOpinion) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000101,
+		0b10000101,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -15314,9 +15467,13 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) encodeFields
 			s.ReferenceURL.Encode(e)
 		}
 	}
+	{
+		e.FieldStart("postedAt")
+		e.Str(s.PostedAt)
+	}
 }
 
-var jsonFieldsNameOfTalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion = [7]string{
+var jsonFieldsNameOfTalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion = [8]string{
 	0: "id",
 	1: "title",
 	2: "content",
@@ -15324,6 +15481,7 @@ var jsonFieldsNameOfTalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion = 
 	4: "voteType",
 	5: "pictureURL",
 	6: "referenceURL",
+	7: "postedAt",
 }
 
 // Decode decodes TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion from json.
@@ -15410,6 +15568,18 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) Decode(d *jx
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"referenceURL\"")
 			}
+		case "postedAt":
+			requiredBitSet[0] |= 1 << 7
+			if err := func() error {
+				v, err := d.Str()
+				s.PostedAt = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"postedAt\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -15420,7 +15590,7 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) Decode(d *jx
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000101,
+		0b10000101,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -16627,9 +16797,13 @@ func (s *VoteOKItem) encodeFields(e *jx.Encoder) {
 			s.ReferenceURL.Encode(e)
 		}
 	}
+	{
+		e.FieldStart("postedAt")
+		e.Str(s.PostedAt)
+	}
 }
 
-var jsonFieldsNameOfVoteOKItem = [7]string{
+var jsonFieldsNameOfVoteOKItem = [8]string{
 	0: "id",
 	1: "title",
 	2: "content",
@@ -16637,6 +16811,7 @@ var jsonFieldsNameOfVoteOKItem = [7]string{
 	4: "voteType",
 	5: "pictureURL",
 	6: "referenceURL",
+	7: "postedAt",
 }
 
 // Decode decodes VoteOKItem from json.
@@ -16723,6 +16898,18 @@ func (s *VoteOKItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"referenceURL\"")
 			}
+		case "postedAt":
+			requiredBitSet[0] |= 1 << 7
+			if err := func() error {
+				v, err := d.Str()
+				s.PostedAt = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"postedAt\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -16733,7 +16920,7 @@ func (s *VoteOKItem) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000101,
+		0b10000101,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

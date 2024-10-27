@@ -3484,11 +3484,15 @@
           "referenceURL": {
             "type": "string",
             "description": "参考文献URL"
+          },
+          "postedAt": {
+            "type": "string"
           }
         },
         "required": [
           "content",
-          "id"
+          "id",
+          "postedAt"
         ]
       },
       "user": {

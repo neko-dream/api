@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"io"
+	"time"
 
 	"mime/multipart"
 
@@ -62,6 +63,7 @@ func (o *opinionHandler) OpinionComments2(ctx context.Context, params oas.Opinio
 		},
 		PictureURL:   utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.PictureURL),
 		ReferenceURL: utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.ReferenceURL),
+		PostedAt:     opinions.RootOpinion.Opinion.CreatedAt.Format(time.RFC3339),
 	}
 	root := oas.OpinionComments2OKRootOpinion{
 		User:    *rootUser,
@@ -87,6 +89,7 @@ func (o *opinionHandler) OpinionComments2(ctx context.Context, params oas.Opinio
 			},
 			PictureURL:   utils.ToOpt[oas.OptString](reply.Opinion.PictureURL),
 			ReferenceURL: utils.ToOpt[oas.OptString](reply.Opinion.ReferenceURL),
+			PostedAt:     reply.Opinion.CreatedAt.Format(time.RFC3339),
 		}
 		replies = append(replies, oas.OpinionComments2OKReplyOpinionsItem{
 			User:    *user,
@@ -109,6 +112,7 @@ func (o *opinionHandler) OpinionComments2(ctx context.Context, params oas.Opinio
 				},
 				PictureURL:   utils.ToOpt[oas.OptString](parent.Opinion.PictureURL),
 				ReferenceURL: utils.ToOpt[oas.OptString](parent.Opinion.ReferenceURL),
+				PostedAt:     parent.Opinion.CreatedAt.Format(time.RFC3339),
 			},
 			User: oas.OpinionComments2OKParentOpinionsItemUser{
 				DisplayID:   parent.User.ID,
@@ -198,6 +202,7 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 				ParentID:     utils.ToOpt[oas.OptString](opinion.Opinion.ParentOpinionID),
 				ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
 				PictureURL:   utils.ToOpt[oas.OptString](opinion.Opinion.PictureURL),
+				PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
 			},
 			User: oas.GetOpinionsForTalkSessionOKOpinionsItemUser{
 				DisplayID:   opinion.User.ID,
@@ -254,6 +259,7 @@ func (o *opinionHandler) GetOpinionDetail(ctx context.Context, params oas.GetOpi
 		},
 		PictureURL:   utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.PictureURL),
 		ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ReferenceURL),
+		PostedAt:     opinion.Opinion.Opinion.CreatedAt.Format(time.RFC3339),
 	}
 
 	return &oas.GetOpinionDetailOK{
@@ -305,6 +311,7 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 			},
 			PictureURL:   utils.ToOpt[oas.OptString](opinion.Opinion.PictureURL),
 			ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
+			PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
 		}
 		res = append(res, oas.SwipeOpinionsOKItem{
 			User:       *user,
@@ -350,6 +357,7 @@ func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.Opinion
 		},
 		PictureURL:   utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.PictureURL),
 		ReferenceURL: utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.ReferenceURL),
+		PostedAt:     opinions.RootOpinion.Opinion.CreatedAt.Format(time.RFC3339),
 	}
 	root := oas.OpinionCommentsOKRootOpinion{
 		User:    *rootUser,
@@ -379,6 +387,7 @@ func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.Opinion
 			},
 			PictureURL:   utils.ToOpt[oas.OptString](reply.Opinion.PictureURL),
 			ReferenceURL: utils.ToOpt[oas.OptString](reply.Opinion.ReferenceURL),
+			PostedAt:     reply.Opinion.CreatedAt.Format(time.RFC3339),
 		}
 		replies = append(replies, oas.OpinionCommentsOKOpinionsItem{
 			User:    *user,
