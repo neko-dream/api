@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"io"
-	"log"
 
 	"mime/multipart"
 
@@ -352,7 +351,6 @@ func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.Opinion
 		PictureURL:   utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.PictureURL),
 		ReferenceURL: utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.ReferenceURL),
 	}
-	log.Println("rootOpinion", opinions.RootOpinion.MyVoteType)
 	root := oas.OpinionCommentsOKRootOpinion{
 		User:    *rootUser,
 		Opinion: *rootOpinion,

@@ -34,13 +34,13 @@ LEFT JOIN users
 LEFT JOIN (
     SELECT votes.vote_type, votes.user_id, votes.opinion_id
     FROM votes
-) pv ON opinions.parent_opinion_id = pv.opinion_id
-    AND opinions.user_id = pv.user_id
+) pv ON pv.opinion_id = opinions.parent_opinion_id
+    AND  pv.user_id = opinions.user_id
 -- ユーザーIDが提供された場合、そのユーザーの投票ステータスを一緒に取得
 LEFT JOIN (
     SELECT votes.vote_type, votes.user_id, votes.opinion_id
     FROM votes
-) cv ON opinions.user_id = sqlc.narg('user_id')::uuid
+) cv ON cv.user_id = sqlc.narg('user_id')::uuid
     AND opinions.opinion_id = cv.opinion_id
 WHERE opinions.opinion_id = $1;
 
