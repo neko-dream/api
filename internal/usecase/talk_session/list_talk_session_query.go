@@ -116,7 +116,7 @@ func (h *listTalkSessionQueryHandler) Execute(ctx context.Context, input ListTal
 				DisplayID:   row.DisplayID.String,
 				DisplayName: row.DisplayName.String,
 				IconURL: utils.ToPtrIfNotNullValue[string](
-					row.IconUrl.Valid,
+					!row.IconUrl.Valid,
 					row.IconUrl.String,
 				),
 			},

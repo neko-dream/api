@@ -101,7 +101,7 @@ func (h *GetTalkSessionByUserQueryHandler) Execute(ctx context.Context, input Ge
 				DisplayID:   ts.DisplayID.String,
 				DisplayName: ts.DisplayName.String,
 				IconURL: utils.ToPtrIfNotNullValue[string](
-					ts.IconUrl.Valid,
+					!ts.IconUrl.Valid,
 					ts.IconUrl.String,
 				),
 			},
