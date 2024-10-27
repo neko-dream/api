@@ -104,6 +104,7 @@ func (t *talkSessionHandler) GetConclusion(ctx context.Context, params oas.GetCo
 	if err != nil {
 		return nil, err
 	}
+	// まだ結論が出ていない場合はエラーを返す
 	if out == nil {
 		return nil, messages.TalkSessionConclusionNotSet
 	}
