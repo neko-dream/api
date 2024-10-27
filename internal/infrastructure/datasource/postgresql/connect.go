@@ -17,8 +17,9 @@ func Connect(config *config.Config, tp *sdktrace.TracerProvider) *sql.DB {
 		otelsql.WithAttributes(semconv.DBSystemPostgreSQL),
 		otelsql.WithTracerProvider(tp),
 		otelsql.WithSpanOptions(otelsql.SpanOptions{
-			Ping:     false, // Pingをトレース
-			RowsNext: true,  // Rows.Next()をトレース
+			Ping:                 false, // Pingをトレース
+			RowsNext:             false, // Rows.Next()をトレース
+			OmitConnResetSession: true,  // コネクションリセットをトレースしない
 			RecordError: func(err error) bool {
 				return err != sql.ErrNoRows
 			},
