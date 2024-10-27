@@ -110,8 +110,8 @@ func (h *getTalkSessionHistoriesQueryHandler) Execute(ctx context.Context, q Get
 					Latitude:  talkSession.Latitude,
 					Longitude: talkSession.Longitude,
 				}),
-			City:       utils.ToPtrIfNotNullValue[string](talkSession.City.Valid, talkSession.City.String),
-			Prefecture: utils.ToPtrIfNotNullValue[string](talkSession.Prefecture.Valid, talkSession.Prefecture.String),
+			City:       utils.ToPtrIfNotNullValue[string](!talkSession.City.Valid, talkSession.City.String),
+			Prefecture: utils.ToPtrIfNotNullValue[string](!talkSession.Prefecture.Valid, talkSession.Prefecture.String),
 		})
 	}
 	return &GetTalkSessionHistoriesOutput{
