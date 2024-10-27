@@ -209,6 +209,11 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 
 	return &oas.GetTalkSessionListOK{
 		TalkSessions: resultTalkSession,
+		Pagination: oas.GetTalkSessionListOKPagination{
+			TotalCount: out.TotalCount,
+			Limit:      limit,
+			Offset:     offset,
+		},
 	}, nil
 }
 
