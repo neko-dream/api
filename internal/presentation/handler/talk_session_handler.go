@@ -205,13 +205,10 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 		utils.HandleError(ctx, err, "claim.UserID")
 		return nil, messages.ForbiddenError
 	}
-	var latitude, longitude *float64
-	if req.Value.Latitude.IsSet() {
-		latitude = &req.Value.Latitude.Value
-	}
-	if req.Value.Longitude.IsSet() {
-		longitude = &req.Value.Longitude.Value
-	}
+	latitude := utils.ToPtrIfNotNullValue(!req.Value.Latitude.IsSet(), req.Value.Latitude.Value)
+	longitude := utils.ToPtrIfNotNullValue(!req.Value.Longitude.IsSet(), req.Value.Longitude.Value)
+	city := utils.ToPtrIfNotNullValue(!req.Value.City.IsSet(), req.Value.City.Value)
+	prefecture := utils.ToPtrIfNotNullValue(!req.Value.Prefecture.IsSet(), req.Value.Prefecture.Value)
 
 	out, err := t.createTalkSessionUsecase.Execute(ctx, talk_session_usecase.CreateTalkSessionInput{
 		Theme:            req.Value.Theme,
@@ -219,8 +216,8 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 		ScheduledEndTime: time.NewTime(ctx, req.Value.ScheduledEndTime),
 		Latitude:         latitude,
 		Longitude:        longitude,
-		City:             utils.ToPtrIfNotNullValue(req.Value.City.Null, req.Value.City.Value),
-		Prefecture:       utils.ToPtrIfNotNullValue(req.Value.Prefecture.Null, req.Value.Prefecture.Value),
+		City:             city,
+		Prefecture:       prefecture,
 	})
 	if err != nil {
 		return nil, errtrace.Wrap(err)

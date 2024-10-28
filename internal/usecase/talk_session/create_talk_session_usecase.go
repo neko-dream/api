@@ -45,20 +45,31 @@ func (i *createTalkSessionInteractor) Execute(ctx context.Context, input CreateT
 	var output CreateTalkSessionOutput
 
 	if err := i.ExecTx(ctx, func(ctx context.Context) error {
+		talkSessionID := shared.NewUUID[talksession.TalkSession]()
+		var location *talksession.Location
+		if input.Latitude != nil && input.Longitude != nil {
+			location = talksession.NewLocation(
+				talkSessionID,
+				*input.Latitude,
+				*input.Longitude,
+			)
+		}
 		talkSession := talksession.NewTalkSession(
-			shared.NewUUID[talksession.TalkSession](),
+			talkSessionID,
 			input.Theme,
 			input.OwnerID,
 			time.Now(ctx),
 			input.ScheduledEndTime,
-			nil,
+			location,
 			input.City,
 			input.Prefecture,
 		)
+
 		if err := i.TalkSessionRepository.Create(ctx, talkSession); err != nil {
 			utils.HandleError(ctx, err, "TalkSessionRepository.Create")
 			return messages.TalkSessionCreateFailed
 		}
+
 		output.TalkSession = *talkSession
 
 		// オーナーのユーザー情報を取得
