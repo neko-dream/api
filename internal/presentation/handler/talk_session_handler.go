@@ -237,6 +237,7 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 		location = oas.OptCreateTalkSessionOKLocation{}
 		location.Value.CreateTalkSessionOKLocation0.Latitude = out.Location.Latitude()
 		location.Value.CreateTalkSessionOKLocation0.Longitude = out.Location.Longitude()
+		location.Set = true
 	}
 
 	res := &oas.CreateTalkSessionOK{
@@ -338,6 +339,7 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 		if talkSession.Location != nil {
 			location.Value.GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0.Latitude = talkSession.Location.Latitude
 			location.Value.GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0.Longitude = talkSession.Location.Longitude
+			location.Set = true
 		}
 		resultTalkSession = append(resultTalkSession, oas.GetTalkSessionListOKTalkSessionsItem{
 			TalkSession: oas.GetTalkSessionListOKTalkSessionsItemTalkSession{
