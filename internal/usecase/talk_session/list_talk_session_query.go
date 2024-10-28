@@ -108,7 +108,6 @@ func (h *listTalkSessionQueryHandler) Execute(ctx context.Context, input ListTal
 				Longitude: row.Longitude,
 			}
 		}
-
 		talkSessionDTOList = append(talkSessionDTOList, TalkSessionDTO{
 			ID:    row.TalkSessionID.String(),
 			Theme: row.Theme,

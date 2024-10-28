@@ -41,6 +41,10 @@ type GetTalkSessionReportRes interface {
 	getTalkSessionReportRes()
 }
 
+type GetTimeLineRes interface {
+	getTimeLineRes()
+}
+
 type GetUserInfoRes interface {
 	getUserInfoRes()
 }
@@ -71,6 +75,10 @@ type PostConclusionRes interface {
 
 type PostOpinionPostRes interface {
 	postOpinionPostRes()
+}
+
+type PostTimeLineItemRes interface {
+	postTimeLineItemRes()
 }
 
 type RegisterUserRes interface {

@@ -53,7 +53,7 @@ func (UnimplementedHandler) EditUserProfile(ctx context.Context, req OptEditUser
 //
 // 結論取得.
 //
-// GET /talksession/{talkSessionID}/conclusion
+// GET /talksessions/{talkSessionID}/conclusion
 func (UnimplementedHandler) GetConclusion(ctx context.Context, params GetConclusionParams) (r GetConclusionRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
@@ -109,6 +109,15 @@ func (UnimplementedHandler) GetTalkSessionList(ctx context.Context, params GetTa
 //
 // GET /talksessions/{talkSessionId}/report
 func (UnimplementedHandler) GetTalkSessionReport(ctx context.Context, params GetTalkSessionReportParams) (r GetTalkSessionReportRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetTimeLine implements getTimeLine operation.
+//
+// タイムラインはセッション終了後にセッション作成者が設定できるその後の予定を知らせるもの.
+//
+// GET /talksessions/{talkSessionID}/timelines
+func (UnimplementedHandler) GetTimeLine(ctx context.Context, params GetTimeLineParams) (r GetTimeLineRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -207,6 +216,15 @@ func (UnimplementedHandler) PostConclusion(ctx context.Context, req OptPostConcl
 //
 // POST /talksessions/{talkSessionID}/opinions
 func (UnimplementedHandler) PostOpinionPost(ctx context.Context, req OptPostOpinionPostReq, params PostOpinionPostParams) (r PostOpinionPostRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// PostTimeLineItem implements postTimeLineItem operation.
+//
+// タイムラインアイテム追加.
+//
+// POST /talksessions/{talkSessoinID}/timeline
+func (UnimplementedHandler) PostTimeLineItem(ctx context.Context, params PostTimeLineItemParams) (r PostTimeLineItemRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

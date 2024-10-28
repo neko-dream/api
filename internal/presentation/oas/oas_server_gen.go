@@ -13,6 +13,7 @@ type Handler interface {
 	OpinionHandler
 	TalkSessionHandler
 	TestHandler
+	TimelineHandler
 	UserHandler
 	VoteHandler
 }
@@ -119,7 +120,7 @@ type TalkSessionHandler interface {
 	//
 	// 結論取得.
 	//
-	// GET /talksession/{talkSessionID}/conclusion
+	// GET /talksessions/{talkSessionID}/conclusion
 	GetConclusion(ctx context.Context, params GetConclusionParams) (GetConclusionRes, error)
 	// GetOpenedTalkSession implements getOpenedTalkSession operation.
 	//
@@ -176,6 +177,24 @@ type TestHandler interface {
 	//
 	// GET /test
 	Test(ctx context.Context) (TestRes, error)
+}
+
+// TimelineHandler handles operations described by OpenAPI v3 specification.
+//
+// x-ogen-operation-group: Timeline
+type TimelineHandler interface {
+	// GetTimeLine implements getTimeLine operation.
+	//
+	// タイムラインはセッション終了後にセッション作成者が設定できるその後の予定を知らせるもの.
+	//
+	// GET /talksessions/{talkSessionID}/timelines
+	GetTimeLine(ctx context.Context, params GetTimeLineParams) (GetTimeLineRes, error)
+	// PostTimeLineItem implements postTimeLineItem operation.
+	//
+	// タイムラインアイテム追加.
+	//
+	// POST /talksessions/{talkSessoinID}/timeline
+	PostTimeLineItem(ctx context.Context, params PostTimeLineItemParams) (PostTimeLineItemRes, error)
 }
 
 // UserHandler handles operations described by OpenAPI v3 specification.

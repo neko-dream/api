@@ -12,6 +12,7 @@ type handlers struct {
 	oas.UserHandler
 	oas.TestHandler
 	oas.ManageHandler
+	oas.TimelineHandler
 }
 
 func NewHandler(
@@ -31,5 +32,6 @@ func NewHandler(
 		UserHandler:        userHandler,
 		TestHandler:        testHandler,
 		ManageHandler:      manageHandler,
+		TimelineHandler:    oas.UnimplementedHandler{},
 	}
 }

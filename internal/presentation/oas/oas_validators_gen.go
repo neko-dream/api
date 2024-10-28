@@ -51,29 +51,22 @@ func (s *CreateTalkSessionOK) Validate() error {
 	return nil
 }
 
-func (s CreateTalkSessionOKLocation) Validate() error {
-	switch s.Type {
-	case CreateTalkSessionOKLocation0CreateTalkSessionOKLocation:
-		if err := s.CreateTalkSessionOKLocation0.Validate(); err != nil {
-			return err
-		}
-		return nil
-	case NullCreateTalkSessionOKLocation:
-		return nil // no validation needed
-	default:
-		return errors.Errorf("invalid type %q", s.Type)
-	}
-}
-
-func (s *CreateTalkSessionOKLocation0) Validate() error {
+func (s *CreateTalkSessionOKLocation) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if err := (validate.Float{}).Validate(float64(s.Latitude)); err != nil {
-			return errors.Wrap(err, "float")
+		if value, ok := s.Latitude.Get(); ok {
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {
@@ -83,8 +76,15 @@ func (s *CreateTalkSessionOKLocation0) Validate() error {
 		})
 	}
 	if err := func() error {
-		if err := (validate.Float{}).Validate(float64(s.Longitude)); err != nil {
-			return errors.Wrap(err, "float")
+		if value, ok := s.Longitude.Get(); ok {
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {
@@ -478,29 +478,22 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) Validate() error {
 	return nil
 }
 
-func (s GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation) Validate() error {
-	switch s.Type {
-	case GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation0GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation:
-		if err := s.GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation0.Validate(); err != nil {
-			return err
-		}
-		return nil
-	case NullGetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation:
-		return nil // no validation needed
-	default:
-		return errors.Errorf("invalid type %q", s.Type)
-	}
-}
-
-func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation0) Validate() error {
+func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if err := (validate.Float{}).Validate(float64(s.Latitude)); err != nil {
-			return errors.Wrap(err, "float")
+		if value, ok := s.Latitude.Get(); ok {
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {
@@ -510,8 +503,15 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation0) Validate() 
 		})
 	}
 	if err := func() error {
-		if err := (validate.Float{}).Validate(float64(s.Longitude)); err != nil {
-			return errors.Wrap(err, "float")
+		if value, ok := s.Longitude.Get(); ok {
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {
@@ -940,29 +940,22 @@ func (s *GetTalkSessionDetailOK) Validate() error {
 	return nil
 }
 
-func (s GetTalkSessionDetailOKLocation) Validate() error {
-	switch s.Type {
-	case GetTalkSessionDetailOKLocation0GetTalkSessionDetailOKLocation:
-		if err := s.GetTalkSessionDetailOKLocation0.Validate(); err != nil {
-			return err
-		}
-		return nil
-	case NullGetTalkSessionDetailOKLocation:
-		return nil // no validation needed
-	default:
-		return errors.Errorf("invalid type %q", s.Type)
-	}
-}
-
-func (s *GetTalkSessionDetailOKLocation0) Validate() error {
+func (s *GetTalkSessionDetailOKLocation) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if err := (validate.Float{}).Validate(float64(s.Latitude)); err != nil {
-			return errors.Wrap(err, "float")
+		if value, ok := s.Latitude.Get(); ok {
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {
@@ -972,8 +965,15 @@ func (s *GetTalkSessionDetailOKLocation0) Validate() error {
 		})
 	}
 	if err := func() error {
-		if err := (validate.Float{}).Validate(float64(s.Longitude)); err != nil {
-			return errors.Wrap(err, "float")
+		if value, ok := s.Longitude.Get(); ok {
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {
@@ -1123,29 +1123,22 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) Validate() error {
 	return nil
 }
 
-func (s GetTalkSessionListOKTalkSessionsItemTalkSessionLocation) Validate() error {
-	switch s.Type {
-	case GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0GetTalkSessionListOKTalkSessionsItemTalkSessionLocation:
-		if err := s.GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0.Validate(); err != nil {
-			return err
-		}
-		return nil
-	case NullGetTalkSessionListOKTalkSessionsItemTalkSessionLocation:
-		return nil // no validation needed
-	default:
-		return errors.Errorf("invalid type %q", s.Type)
-	}
-}
-
-func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) Validate() error {
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if err := (validate.Float{}).Validate(float64(s.Latitude)); err != nil {
-			return errors.Wrap(err, "float")
+		if value, ok := s.Latitude.Get(); ok {
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {
@@ -1155,8 +1148,15 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) Validate() er
 		})
 	}
 	if err := func() error {
-		if err := (validate.Float{}).Validate(float64(s.Longitude)); err != nil {
-			return errors.Wrap(err, "float")
+		if value, ok := s.Longitude.Get(); ok {
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {
@@ -2810,29 +2810,22 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) Validate() error {
 	return nil
 }
 
-func (s SessionsHistoryOKTalkSessionsItemTalkSessionLocation) Validate() error {
-	switch s.Type {
-	case SessionsHistoryOKTalkSessionsItemTalkSessionLocation0SessionsHistoryOKTalkSessionsItemTalkSessionLocation:
-		if err := s.SessionsHistoryOKTalkSessionsItemTalkSessionLocation0.Validate(); err != nil {
-			return err
-		}
-		return nil
-	case NullSessionsHistoryOKTalkSessionsItemTalkSessionLocation:
-		return nil // no validation needed
-	default:
-		return errors.Errorf("invalid type %q", s.Type)
-	}
-}
-
-func (s *SessionsHistoryOKTalkSessionsItemTalkSessionLocation0) Validate() error {
+func (s *SessionsHistoryOKTalkSessionsItemTalkSessionLocation) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if err := (validate.Float{}).Validate(float64(s.Latitude)); err != nil {
-			return errors.Wrap(err, "float")
+		if value, ok := s.Latitude.Get(); ok {
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {
@@ -2842,8 +2835,15 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSessionLocation0) Validate() error
 		})
 	}
 	if err := func() error {
-		if err := (validate.Float{}).Validate(float64(s.Longitude)); err != nil {
-			return errors.Wrap(err, "float")
+		if value, ok := s.Longitude.Get(); ok {
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {

@@ -339,15 +339,32 @@ func (s *CreateTalkSessionOK) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes CreateTalkSessionOKLocation as json.
-func (s CreateTalkSessionOKLocation) Encode(e *jx.Encoder) {
-	switch s.Type {
-	case CreateTalkSessionOKLocation0CreateTalkSessionOKLocation:
-		s.CreateTalkSessionOKLocation0.Encode(e)
-	case NullCreateTalkSessionOKLocation:
-		_ = s.Null
-		e.Null()
+// Encode implements json.Marshaler.
+func (s *CreateTalkSessionOKLocation) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *CreateTalkSessionOKLocation) encodeFields(e *jx.Encoder) {
+	{
+		if s.Latitude.Set {
+			e.FieldStart("latitude")
+			s.Latitude.Encode(e)
+		}
 	}
+	{
+		if s.Longitude.Set {
+			e.FieldStart("longitude")
+			s.Longitude.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfCreateTalkSessionOKLocation = [2]string{
+	0: "latitude",
+	1: "longitude",
 }
 
 // Decode decodes CreateTalkSessionOKLocation from json.
@@ -355,76 +372,13 @@ func (s *CreateTalkSessionOKLocation) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode CreateTalkSessionOKLocation to nil")
 	}
-	// Sum type type_discriminator.
-	switch t := d.Next(); t {
-	case jx.Null:
-		if err := d.Null(); err != nil {
-			return err
-		}
-		s.Type = NullCreateTalkSessionOKLocation
-	case jx.Object:
-		if err := s.CreateTalkSessionOKLocation0.Decode(d); err != nil {
-			return err
-		}
-		s.Type = CreateTalkSessionOKLocation0CreateTalkSessionOKLocation
-	default:
-		return errors.Errorf("unexpected json type %q", t)
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s CreateTalkSessionOKLocation) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *CreateTalkSessionOKLocation) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *CreateTalkSessionOKLocation0) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *CreateTalkSessionOKLocation0) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("latitude")
-		e.Float64(s.Latitude)
-	}
-	{
-		e.FieldStart("longitude")
-		e.Float64(s.Longitude)
-	}
-}
-
-var jsonFieldsNameOfCreateTalkSessionOKLocation0 = [2]string{
-	0: "latitude",
-	1: "longitude",
-}
-
-// Decode decodes CreateTalkSessionOKLocation0 from json.
-func (s *CreateTalkSessionOKLocation0) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode CreateTalkSessionOKLocation0 to nil")
-	}
-	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "latitude":
-			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				v, err := d.Float64()
-				s.Latitude = float64(v)
-				if err != nil {
+				s.Latitude.Reset()
+				if err := s.Latitude.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -432,11 +386,9 @@ func (s *CreateTalkSessionOKLocation0) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"latitude\"")
 			}
 		case "longitude":
-			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				v, err := d.Float64()
-				s.Longitude = float64(v)
-				if err != nil {
+				s.Longitude.Reset()
+				if err := s.Longitude.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -448,53 +400,21 @@ func (s *CreateTalkSessionOKLocation0) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode CreateTalkSessionOKLocation0")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000011,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfCreateTalkSessionOKLocation0) {
-					name = jsonFieldsNameOfCreateTalkSessionOKLocation0[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
+		return errors.Wrap(err, "decode CreateTalkSessionOKLocation")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *CreateTalkSessionOKLocation0) MarshalJSON() ([]byte, error) {
+func (s *CreateTalkSessionOKLocation) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *CreateTalkSessionOKLocation0) UnmarshalJSON(data []byte) error {
+func (s *CreateTalkSessionOKLocation) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -1964,15 +1884,32 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) UnmarshalJSON(data [
 	return s.Decode(d)
 }
 
-// Encode encodes GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation as json.
-func (s GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation) Encode(e *jx.Encoder) {
-	switch s.Type {
-	case GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation0GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation:
-		s.GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation0.Encode(e)
-	case NullGetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation:
-		_ = s.Null
-		e.Null()
+// Encode implements json.Marshaler.
+func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation) encodeFields(e *jx.Encoder) {
+	{
+		if s.Latitude.Set {
+			e.FieldStart("latitude")
+			s.Latitude.Encode(e)
+		}
 	}
+	{
+		if s.Longitude.Set {
+			e.FieldStart("longitude")
+			s.Longitude.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfGetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation = [2]string{
+	0: "latitude",
+	1: "longitude",
 }
 
 // Decode decodes GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation from json.
@@ -1980,76 +1917,13 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation) Decode(d *jx
 	if s == nil {
 		return errors.New("invalid: unable to decode GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation to nil")
 	}
-	// Sum type type_discriminator.
-	switch t := d.Next(); t {
-	case jx.Null:
-		if err := d.Null(); err != nil {
-			return err
-		}
-		s.Type = NullGetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation
-	case jx.Object:
-		if err := s.GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation0.Decode(d); err != nil {
-			return err
-		}
-		s.Type = GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation0GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation
-	default:
-		return errors.Errorf("unexpected json type %q", t)
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation0) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation0) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("latitude")
-		e.Float64(s.Latitude)
-	}
-	{
-		e.FieldStart("longitude")
-		e.Float64(s.Longitude)
-	}
-}
-
-var jsonFieldsNameOfGetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation0 = [2]string{
-	0: "latitude",
-	1: "longitude",
-}
-
-// Decode decodes GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation0 from json.
-func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation0) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation0 to nil")
-	}
-	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "latitude":
-			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				v, err := d.Float64()
-				s.Latitude = float64(v)
-				if err != nil {
+				s.Latitude.Reset()
+				if err := s.Latitude.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -2057,11 +1931,9 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation0) Decode(d *j
 				return errors.Wrap(err, "decode field \"latitude\"")
 			}
 		case "longitude":
-			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				v, err := d.Float64()
-				s.Longitude = float64(v)
-				if err != nil {
+				s.Longitude.Reset()
+				if err := s.Longitude.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -2073,53 +1945,21 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation0) Decode(d *j
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation0")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000011,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfGetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation0) {
-					name = jsonFieldsNameOfGetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation0[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
+		return errors.Wrap(err, "decode GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation0) MarshalJSON() ([]byte, error) {
+func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation0) UnmarshalJSON(data []byte) error {
+func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -3998,15 +3838,32 @@ func (s *GetTalkSessionDetailOK) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes GetTalkSessionDetailOKLocation as json.
-func (s GetTalkSessionDetailOKLocation) Encode(e *jx.Encoder) {
-	switch s.Type {
-	case GetTalkSessionDetailOKLocation0GetTalkSessionDetailOKLocation:
-		s.GetTalkSessionDetailOKLocation0.Encode(e)
-	case NullGetTalkSessionDetailOKLocation:
-		_ = s.Null
-		e.Null()
+// Encode implements json.Marshaler.
+func (s *GetTalkSessionDetailOKLocation) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *GetTalkSessionDetailOKLocation) encodeFields(e *jx.Encoder) {
+	{
+		if s.Latitude.Set {
+			e.FieldStart("latitude")
+			s.Latitude.Encode(e)
+		}
 	}
+	{
+		if s.Longitude.Set {
+			e.FieldStart("longitude")
+			s.Longitude.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfGetTalkSessionDetailOKLocation = [2]string{
+	0: "latitude",
+	1: "longitude",
 }
 
 // Decode decodes GetTalkSessionDetailOKLocation from json.
@@ -4014,76 +3871,13 @@ func (s *GetTalkSessionDetailOKLocation) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode GetTalkSessionDetailOKLocation to nil")
 	}
-	// Sum type type_discriminator.
-	switch t := d.Next(); t {
-	case jx.Null:
-		if err := d.Null(); err != nil {
-			return err
-		}
-		s.Type = NullGetTalkSessionDetailOKLocation
-	case jx.Object:
-		if err := s.GetTalkSessionDetailOKLocation0.Decode(d); err != nil {
-			return err
-		}
-		s.Type = GetTalkSessionDetailOKLocation0GetTalkSessionDetailOKLocation
-	default:
-		return errors.Errorf("unexpected json type %q", t)
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s GetTalkSessionDetailOKLocation) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *GetTalkSessionDetailOKLocation) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *GetTalkSessionDetailOKLocation0) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *GetTalkSessionDetailOKLocation0) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("latitude")
-		e.Float64(s.Latitude)
-	}
-	{
-		e.FieldStart("longitude")
-		e.Float64(s.Longitude)
-	}
-}
-
-var jsonFieldsNameOfGetTalkSessionDetailOKLocation0 = [2]string{
-	0: "latitude",
-	1: "longitude",
-}
-
-// Decode decodes GetTalkSessionDetailOKLocation0 from json.
-func (s *GetTalkSessionDetailOKLocation0) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode GetTalkSessionDetailOKLocation0 to nil")
-	}
-	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "latitude":
-			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				v, err := d.Float64()
-				s.Latitude = float64(v)
-				if err != nil {
+				s.Latitude.Reset()
+				if err := s.Latitude.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -4091,11 +3885,9 @@ func (s *GetTalkSessionDetailOKLocation0) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"latitude\"")
 			}
 		case "longitude":
-			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				v, err := d.Float64()
-				s.Longitude = float64(v)
-				if err != nil {
+				s.Longitude.Reset()
+				if err := s.Longitude.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -4107,53 +3899,21 @@ func (s *GetTalkSessionDetailOKLocation0) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode GetTalkSessionDetailOKLocation0")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000011,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfGetTalkSessionDetailOKLocation0) {
-					name = jsonFieldsNameOfGetTalkSessionDetailOKLocation0[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
+		return errors.Wrap(err, "decode GetTalkSessionDetailOKLocation")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *GetTalkSessionDetailOKLocation0) MarshalJSON() ([]byte, error) {
+func (s *GetTalkSessionDetailOKLocation) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *GetTalkSessionDetailOKLocation0) UnmarshalJSON(data []byte) error {
+func (s *GetTalkSessionDetailOKLocation) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -5089,15 +4849,32 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) UnmarshalJSON(data []b
 	return s.Decode(d)
 }
 
-// Encode encodes GetTalkSessionListOKTalkSessionsItemTalkSessionLocation as json.
-func (s GetTalkSessionListOKTalkSessionsItemTalkSessionLocation) Encode(e *jx.Encoder) {
-	switch s.Type {
-	case GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0GetTalkSessionListOKTalkSessionsItemTalkSessionLocation:
-		s.GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0.Encode(e)
-	case NullGetTalkSessionListOKTalkSessionsItemTalkSessionLocation:
-		_ = s.Null
-		e.Null()
+// Encode implements json.Marshaler.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation) encodeFields(e *jx.Encoder) {
+	{
+		if s.Latitude.Set {
+			e.FieldStart("latitude")
+			s.Latitude.Encode(e)
+		}
 	}
+	{
+		if s.Longitude.Set {
+			e.FieldStart("longitude")
+			s.Longitude.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfGetTalkSessionListOKTalkSessionsItemTalkSessionLocation = [2]string{
+	0: "latitude",
+	1: "longitude",
 }
 
 // Decode decodes GetTalkSessionListOKTalkSessionsItemTalkSessionLocation from json.
@@ -5105,76 +4882,13 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation) Decode(d *jx.D
 	if s == nil {
 		return errors.New("invalid: unable to decode GetTalkSessionListOKTalkSessionsItemTalkSessionLocation to nil")
 	}
-	// Sum type type_discriminator.
-	switch t := d.Next(); t {
-	case jx.Null:
-		if err := d.Null(); err != nil {
-			return err
-		}
-		s.Type = NullGetTalkSessionListOKTalkSessionsItemTalkSessionLocation
-	case jx.Object:
-		if err := s.GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0.Decode(d); err != nil {
-			return err
-		}
-		s.Type = GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0GetTalkSessionListOKTalkSessionsItemTalkSessionLocation
-	default:
-		return errors.Errorf("unexpected json type %q", t)
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s GetTalkSessionListOKTalkSessionsItemTalkSessionLocation) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("latitude")
-		e.Float64(s.Latitude)
-	}
-	{
-		e.FieldStart("longitude")
-		e.Float64(s.Longitude)
-	}
-}
-
-var jsonFieldsNameOfGetTalkSessionListOKTalkSessionsItemTalkSessionLocation0 = [2]string{
-	0: "latitude",
-	1: "longitude",
-}
-
-// Decode decodes GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0 from json.
-func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0 to nil")
-	}
-	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "latitude":
-			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				v, err := d.Float64()
-				s.Latitude = float64(v)
-				if err != nil {
+				s.Latitude.Reset()
+				if err := s.Latitude.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -5182,11 +4896,9 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) Decode(d *jx.
 				return errors.Wrap(err, "decode field \"latitude\"")
 			}
 		case "longitude":
-			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				v, err := d.Float64()
-				s.Longitude = float64(v)
-				if err != nil {
+				s.Longitude.Reset()
+				if err := s.Longitude.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -5198,53 +4910,21 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) Decode(d *jx.
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000011,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfGetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) {
-					name = jsonFieldsNameOfGetTalkSessionListOKTalkSessionsItemTalkSessionLocation0[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
+		return errors.Wrap(err, "decode GetTalkSessionListOKTalkSessionsItemTalkSessionLocation")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) MarshalJSON() ([]byte, error) {
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0) UnmarshalJSON(data []byte) error {
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -5515,6 +5195,138 @@ func (s *GetTalkSessionReportOK) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *GetTalkSessionReportOK) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *GetTimeLineBadRequest) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *GetTimeLineBadRequest) encodeFields(e *jx.Encoder) {
+}
+
+var jsonFieldsNameOfGetTimeLineBadRequest = [0]string{}
+
+// Decode decodes GetTimeLineBadRequest from json.
+func (s *GetTimeLineBadRequest) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GetTimeLineBadRequest to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		default:
+			return d.Skip()
+		}
+	}); err != nil {
+		return errors.Wrap(err, "decode GetTimeLineBadRequest")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *GetTimeLineBadRequest) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GetTimeLineBadRequest) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *GetTimeLineInternalServerError) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *GetTimeLineInternalServerError) encodeFields(e *jx.Encoder) {
+}
+
+var jsonFieldsNameOfGetTimeLineInternalServerError = [0]string{}
+
+// Decode decodes GetTimeLineInternalServerError from json.
+func (s *GetTimeLineInternalServerError) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GetTimeLineInternalServerError to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		default:
+			return d.Skip()
+		}
+	}); err != nil {
+		return errors.Wrap(err, "decode GetTimeLineInternalServerError")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *GetTimeLineInternalServerError) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GetTimeLineInternalServerError) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *GetTimeLineOK) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *GetTimeLineOK) encodeFields(e *jx.Encoder) {
+}
+
+var jsonFieldsNameOfGetTimeLineOK = [0]string{}
+
+// Decode decodes GetTimeLineOK from json.
+func (s *GetTimeLineOK) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GetTimeLineOK to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		default:
+			return d.Skip()
+		}
+	}); err != nil {
+		return errors.Wrap(err, "decode GetTimeLineOK")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *GetTimeLineOK) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GetTimeLineOK) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -11128,6 +10940,41 @@ func (s *OptCreateTalkSessionOKLocation) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes float64 as json.
+func (o OptFloat64) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Float64(float64(o.Value))
+}
+
+// Decode decodes float64 from json.
+func (o *OptFloat64) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptFloat64 to nil")
+	}
+	o.Set = true
+	v, err := d.Float64()
+	if err != nil {
+		return err
+	}
+	o.Value = float64(v)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptFloat64) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptFloat64) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation as json.
 func (o OptGetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -12646,6 +12493,138 @@ func (s *PostOpinionPostOK) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
+func (s *PostTimeLineItemBadRequest) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *PostTimeLineItemBadRequest) encodeFields(e *jx.Encoder) {
+}
+
+var jsonFieldsNameOfPostTimeLineItemBadRequest = [0]string{}
+
+// Decode decodes PostTimeLineItemBadRequest from json.
+func (s *PostTimeLineItemBadRequest) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode PostTimeLineItemBadRequest to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		default:
+			return d.Skip()
+		}
+	}); err != nil {
+		return errors.Wrap(err, "decode PostTimeLineItemBadRequest")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *PostTimeLineItemBadRequest) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *PostTimeLineItemBadRequest) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *PostTimeLineItemInternalServerError) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *PostTimeLineItemInternalServerError) encodeFields(e *jx.Encoder) {
+}
+
+var jsonFieldsNameOfPostTimeLineItemInternalServerError = [0]string{}
+
+// Decode decodes PostTimeLineItemInternalServerError from json.
+func (s *PostTimeLineItemInternalServerError) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode PostTimeLineItemInternalServerError to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		default:
+			return d.Skip()
+		}
+	}); err != nil {
+		return errors.Wrap(err, "decode PostTimeLineItemInternalServerError")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *PostTimeLineItemInternalServerError) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *PostTimeLineItemInternalServerError) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *PostTimeLineItemOK) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *PostTimeLineItemOK) encodeFields(e *jx.Encoder) {
+}
+
+var jsonFieldsNameOfPostTimeLineItemOK = [0]string{}
+
+// Decode decodes PostTimeLineItemOK from json.
+func (s *PostTimeLineItemOK) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode PostTimeLineItemOK to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		default:
+			return d.Skip()
+		}
+	}); err != nil {
+		return errors.Wrap(err, "decode PostTimeLineItemOK")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *PostTimeLineItemOK) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *PostTimeLineItemOK) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s *RegisterUserBadRequest) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -13664,15 +13643,32 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) UnmarshalJSON(data []byte
 	return s.Decode(d)
 }
 
-// Encode encodes SessionsHistoryOKTalkSessionsItemTalkSessionLocation as json.
-func (s SessionsHistoryOKTalkSessionsItemTalkSessionLocation) Encode(e *jx.Encoder) {
-	switch s.Type {
-	case SessionsHistoryOKTalkSessionsItemTalkSessionLocation0SessionsHistoryOKTalkSessionsItemTalkSessionLocation:
-		s.SessionsHistoryOKTalkSessionsItemTalkSessionLocation0.Encode(e)
-	case NullSessionsHistoryOKTalkSessionsItemTalkSessionLocation:
-		_ = s.Null
-		e.Null()
+// Encode implements json.Marshaler.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSessionLocation) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSessionLocation) encodeFields(e *jx.Encoder) {
+	{
+		if s.Latitude.Set {
+			e.FieldStart("latitude")
+			s.Latitude.Encode(e)
+		}
 	}
+	{
+		if s.Longitude.Set {
+			e.FieldStart("longitude")
+			s.Longitude.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfSessionsHistoryOKTalkSessionsItemTalkSessionLocation = [2]string{
+	0: "latitude",
+	1: "longitude",
 }
 
 // Decode decodes SessionsHistoryOKTalkSessionsItemTalkSessionLocation from json.
@@ -13680,76 +13676,13 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSessionLocation) Decode(d *jx.Deco
 	if s == nil {
 		return errors.New("invalid: unable to decode SessionsHistoryOKTalkSessionsItemTalkSessionLocation to nil")
 	}
-	// Sum type type_discriminator.
-	switch t := d.Next(); t {
-	case jx.Null:
-		if err := d.Null(); err != nil {
-			return err
-		}
-		s.Type = NullSessionsHistoryOKTalkSessionsItemTalkSessionLocation
-	case jx.Object:
-		if err := s.SessionsHistoryOKTalkSessionsItemTalkSessionLocation0.Decode(d); err != nil {
-			return err
-		}
-		s.Type = SessionsHistoryOKTalkSessionsItemTalkSessionLocation0SessionsHistoryOKTalkSessionsItemTalkSessionLocation
-	default:
-		return errors.Errorf("unexpected json type %q", t)
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s SessionsHistoryOKTalkSessionsItemTalkSessionLocation) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *SessionsHistoryOKTalkSessionsItemTalkSessionLocation) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *SessionsHistoryOKTalkSessionsItemTalkSessionLocation0) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *SessionsHistoryOKTalkSessionsItemTalkSessionLocation0) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("latitude")
-		e.Float64(s.Latitude)
-	}
-	{
-		e.FieldStart("longitude")
-		e.Float64(s.Longitude)
-	}
-}
-
-var jsonFieldsNameOfSessionsHistoryOKTalkSessionsItemTalkSessionLocation0 = [2]string{
-	0: "latitude",
-	1: "longitude",
-}
-
-// Decode decodes SessionsHistoryOKTalkSessionsItemTalkSessionLocation0 from json.
-func (s *SessionsHistoryOKTalkSessionsItemTalkSessionLocation0) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode SessionsHistoryOKTalkSessionsItemTalkSessionLocation0 to nil")
-	}
-	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "latitude":
-			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				v, err := d.Float64()
-				s.Latitude = float64(v)
-				if err != nil {
+				s.Latitude.Reset()
+				if err := s.Latitude.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -13757,11 +13690,9 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSessionLocation0) Decode(d *jx.Dec
 				return errors.Wrap(err, "decode field \"latitude\"")
 			}
 		case "longitude":
-			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				v, err := d.Float64()
-				s.Longitude = float64(v)
-				if err != nil {
+				s.Longitude.Reset()
+				if err := s.Longitude.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -13773,53 +13704,21 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSessionLocation0) Decode(d *jx.Dec
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode SessionsHistoryOKTalkSessionsItemTalkSessionLocation0")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000011,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfSessionsHistoryOKTalkSessionsItemTalkSessionLocation0) {
-					name = jsonFieldsNameOfSessionsHistoryOKTalkSessionsItemTalkSessionLocation0[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
+		return errors.Wrap(err, "decode SessionsHistoryOKTalkSessionsItemTalkSessionLocation")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *SessionsHistoryOKTalkSessionsItemTalkSessionLocation0) MarshalJSON() ([]byte, error) {
+func (s *SessionsHistoryOKTalkSessionsItemTalkSessionLocation) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *SessionsHistoryOKTalkSessionsItemTalkSessionLocation0) UnmarshalJSON(data []byte) error {
+func (s *SessionsHistoryOKTalkSessionsItemTalkSessionLocation) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

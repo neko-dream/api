@@ -1217,6 +1217,71 @@ func decodeGetTalkSessionReportParams(args [1]string, argsEscaped bool, r *http.
 	return params, nil
 }
 
+// GetTimeLineParams is parameters of getTimeLine operation.
+type GetTimeLineParams struct {
+	TalkSessionID string
+}
+
+func unpackGetTimeLineParams(packed middleware.Parameters) (params GetTimeLineParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "talkSessionID",
+			In:   "path",
+		}
+		params.TalkSessionID = packed[key].(string)
+	}
+	return params
+}
+
+func decodeGetTimeLineParams(args [1]string, argsEscaped bool, r *http.Request) (params GetTimeLineParams, _ error) {
+	// Decode path: talkSessionID.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "talkSessionID",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.TalkSessionID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "talkSessionID",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // OAuthCallbackParams is parameters of oauth_callback operation.
 type OAuthCallbackParams struct {
 	// OAuth2.0 State from Cookie.
@@ -2024,6 +2089,71 @@ func decodePostOpinionPostParams(args [1]string, argsEscaped bool, r *http.Reque
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "talkSessionID",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// PostTimeLineItemParams is parameters of postTimeLineItem operation.
+type PostTimeLineItemParams struct {
+	TalkSessoinID string
+}
+
+func unpackPostTimeLineItemParams(packed middleware.Parameters) (params PostTimeLineItemParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "talkSessoinID",
+			In:   "path",
+		}
+		params.TalkSessoinID = packed[key].(string)
+	}
+	return params
+}
+
+func decodePostTimeLineItemParams(args [1]string, argsEscaped bool, r *http.Request) (params PostTimeLineItemParams, _ error) {
+	// Decode path: talkSessoinID.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "talkSessoinID",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.TalkSessoinID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "talkSessoinID",
 			In:   "path",
 			Err:  err,
 		}

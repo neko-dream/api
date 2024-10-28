@@ -56,6 +56,14 @@ func ToOpt[O any](v any) O {
 		}
 	case int:
 		return any(oas.OptInt{Value: val, Set: true}).(O)
+	case float64:
+		return any(oas.OptFloat64{Value: val, Set: true}).(O)
+	case *float64:
+		if val == nil {
+			return any(oas.OptFloat64{}).(O)
+		} else {
+			return any(oas.OptFloat64{Value: *val, Set: true}).(O)
+		}
 	case *bool:
 		if val == nil {
 			return any(oas.OptBool{}).(O)
