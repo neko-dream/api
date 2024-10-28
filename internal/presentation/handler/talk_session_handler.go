@@ -161,10 +161,18 @@ func (t *talkSessionHandler) GetOpenedTalkSession(ctx context.Context, params oa
 			DisplayName: talkSession.Owner.DisplayName,
 			IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.Owner.IconURL),
 		}
-		location := oas.OptGetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation{}
+		var location oas.OptGetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation
 		if talkSession.Location != nil {
-			location.Value.GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation0.Latitude = talkSession.Location.Latitude
-			location.Value.GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation0.Longitude = talkSession.Location.Longitude
+			location = oas.OptGetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation{
+				Value: oas.GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation{
+					Latitude:  utils.ToOpt[oas.OptFloat64](talkSession.Location.Latitude),
+					Longitude: utils.ToOpt[oas.OptFloat64](talkSession.Location.Longitude),
+				},
+				Set: true,
+			}
+		} else {
+			location = oas.OptGetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation{}
+			location.Set = false
 		}
 
 		resultTalkSession = append(resultTalkSession, oas.GetOpenedTalkSessionOKTalkSessionsItem{
@@ -234,10 +242,13 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 
 	var location oas.OptCreateTalkSessionOKLocation
 	if out.Location != nil {
-		location = oas.OptCreateTalkSessionOKLocation{}
-		location.Value.CreateTalkSessionOKLocation0.Latitude = out.Location.Latitude()
-		location.Value.CreateTalkSessionOKLocation0.Longitude = out.Location.Longitude()
-		location.Set = true
+		location = oas.OptCreateTalkSessionOKLocation{
+			Value: oas.CreateTalkSessionOKLocation{
+				Latitude:  utils.ToOpt[oas.OptFloat64](out.Location.Latitude),
+				Longitude: utils.ToOpt[oas.OptFloat64](out.Location.Longitude),
+			},
+			Set: true,
+		}
 	}
 
 	res := &oas.CreateTalkSessionOK{
@@ -275,8 +286,14 @@ func (t *talkSessionHandler) GetTalkSessionDetail(ctx context.Context, params oa
 	}
 	var location oas.OptGetTalkSessionDetailOKLocation
 	if out.Location != nil {
-		location.Value.GetTalkSessionDetailOKLocation0.Latitude = out.Location.Latitude
-		location.Value.GetTalkSessionDetailOKLocation0.Longitude = out.Location.Longitude
+		location = oas.OptGetTalkSessionDetailOKLocation{
+			Value: oas.GetTalkSessionDetailOKLocation{
+				Latitude:  utils.ToOpt[oas.OptFloat64](out.Location.Latitude),
+				Longitude: utils.ToOpt[oas.OptFloat64](out.Location.Longitude),
+			},
+			Set: true,
+		}
+
 	}
 
 	return &oas.GetTalkSessionDetailOK{
@@ -335,13 +352,17 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 			DisplayName: talkSession.Owner.DisplayName,
 			IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.Owner.IconURL),
 		}
-		location := oas.OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation{}
+		var location oas.OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation
 		if talkSession.Location != nil {
-			location.Value.GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0.Latitude = talkSession.Location.Latitude
-			location.Value.GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0.Longitude = talkSession.Location.Longitude
-			location.Set = true
+			location = oas.OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation{
+				Value: oas.GetTalkSessionListOKTalkSessionsItemTalkSessionLocation{
+					Latitude:  utils.ToOpt[oas.OptFloat64](talkSession.Location.Latitude),
+					Longitude: utils.ToOpt[oas.OptFloat64](talkSession.Location.Longitude),
+				},
+				Set: true,
+			}
 		}
-		resultTalkSession = append(resultTalkSession, oas.GetTalkSessionListOKTalkSessionsItem{
+		res := oas.GetTalkSessionListOKTalkSessionsItem{
 			TalkSession: oas.GetTalkSessionListOKTalkSessionsItemTalkSession{
 				ID:               talkSession.ID,
 				Theme:            talkSession.Theme,
@@ -353,7 +374,8 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 				Prefecture:       utils.ToOptNil[oas.OptNilString](talkSession.Prefecture),
 			},
 			OpinionCount: talkSession.OpinionCount,
-		})
+		}
+		resultTalkSession = append(resultTalkSession, res)
 	}
 
 	return &oas.GetTalkSessionListOK{
