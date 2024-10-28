@@ -161,13 +161,22 @@ func (t *talkSessionHandler) GetOpenedTalkSession(ctx context.Context, params oa
 			DisplayName: talkSession.Owner.DisplayName,
 			IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.Owner.IconURL),
 		}
+		location := oas.OptGetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation{}
+		if talkSession.Location != nil {
+			location.Value.GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation0.Latitude = talkSession.Location.Latitude
+			location.Value.GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation0.Longitude = talkSession.Location.Longitude
+		}
+
 		resultTalkSession = append(resultTalkSession, oas.GetOpenedTalkSessionOKTalkSessionsItem{
 			TalkSession: oas.GetOpenedTalkSessionOKTalkSessionsItemTalkSession{
 				ID:               talkSession.ID,
 				Theme:            talkSession.Theme,
 				Owner:            owner,
+				Location:         location,
 				CreatedAt:        talkSession.CreatedAt,
 				ScheduledEndTime: talkSession.ScheduledEndTime,
+				City:             utils.ToOptNil[oas.OptNilString](talkSession.City),
+				Prefecture:       utils.ToOptNil[oas.OptNilString](talkSession.Prefecture),
 			},
 			OpinionCount: talkSession.OpinionCount,
 		})
@@ -325,6 +334,11 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 			DisplayName: talkSession.Owner.DisplayName,
 			IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.Owner.IconURL),
 		}
+		location := oas.OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation{}
+		if talkSession.Location != nil {
+			location.Value.GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0.Latitude = talkSession.Location.Latitude
+			location.Value.GetTalkSessionListOKTalkSessionsItemTalkSessionLocation0.Longitude = talkSession.Location.Longitude
+		}
 		resultTalkSession = append(resultTalkSession, oas.GetTalkSessionListOKTalkSessionsItem{
 			TalkSession: oas.GetTalkSessionListOKTalkSessionsItemTalkSession{
 				ID:               talkSession.ID,
@@ -332,6 +346,9 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 				Owner:            owner,
 				CreatedAt:        talkSession.CreatedAt,
 				ScheduledEndTime: talkSession.ScheduledEndTime,
+				Location:         location,
+				City:             utils.ToOptNil[oas.OptNilString](talkSession.City),
+				Prefecture:       utils.ToOptNil[oas.OptNilString](talkSession.Prefecture),
 			},
 			OpinionCount: talkSession.OpinionCount,
 		})
