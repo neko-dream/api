@@ -34,8 +34,10 @@ INSERT INTO action_items (
     talk_session_id,
     sequence,
     content,
-    status
-) VALUES ($1, $2, $3, $4, $5);
+    status,
+    created_at,
+    updated_at
+) VALUES ($1, $2, $3, $4, $5, $6, $7);
 
 -- name: UpdateActionItem :exec
 UPDATE action_items
@@ -59,8 +61,10 @@ SELECT
     users.display_id AS display,
     users.icon_url AS icon_url
 FROM action_items
+LEFT JOIN talk_sessions
+    ON talk_sessions.talk_session_id = action_items.talk_session_id
 LEFT JOIN users
-    ON action_items.created_by = users.user_id
+    ON talk_sessions.owner_id = users.user_id
 WHERE action_items.talk_session_id = $1
 ORDER BY action_items.sequence;
 

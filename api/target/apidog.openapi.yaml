@@ -3353,7 +3353,35 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/actionItem"
+                  "type": "object",
+                  "properties": {
+                    "ActionItemID": {
+                      "type": "string"
+                    },
+                    "Sequence": {
+                      "type": "integer"
+                    },
+                    "Content": {
+                      "type": "string"
+                    },
+                    "Status": {
+                      "type": "string"
+                    },
+                    "CreatedAt": {
+                      "type": "string"
+                    },
+                    "UpdatedAt": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "ActionItemID",
+                    "Sequence",
+                    "Content",
+                    "Status",
+                    "CreatedAt",
+                    "UpdatedAt"
+                  ]
                 }
               }
             }
@@ -3399,7 +3427,11 @@
             }
           }
         },
-        "security": [],
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
         "x-ogen-operation-group": "Timeline"
       }
     }

@@ -86,7 +86,7 @@ func (a *actionItemService) InsertActionItem(
 
 	var newSequence int
 	if parentItem != nil {
-		newSequence = parentItem.Sequence
+		newSequence = parentItem.Sequence + 1
 	} else {
 		newSequence = 0
 	}

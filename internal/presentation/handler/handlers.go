@@ -23,6 +23,7 @@ func NewHandler(
 	userHandler oas.UserHandler,
 	testHandler oas.TestHandler,
 	manageHandler oas.ManageHandler,
+	timelineHandler oas.TimelineHandler,
 ) oas.Handler {
 	return &handlers{
 		AuthHandler:        authHandler,
@@ -32,6 +33,6 @@ func NewHandler(
 		UserHandler:        userHandler,
 		TestHandler:        testHandler,
 		ManageHandler:      manageHandler,
-		TimelineHandler:    oas.UnimplementedHandler{},
+		TimelineHandler:    timelineHandler,
 	}
 }

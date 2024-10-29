@@ -73,7 +73,10 @@ func (a *actionItemRepository) FindByID(ctx context.Context, actionItemID shared
 func (a *actionItemRepository) FindLatestActionItemByTalkSessionID(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession]) ([]timelineactions.ActionItem, error) {
 	row, err := a.GetQueries(ctx).GetActionItemsByTalkSessionID(ctx, talkSessionID.UUID())
 	if err != nil {
-		utils.HandleError(ctx, err, "トークセッションIDに紐づくアクションアイテムの取得に失敗しました")
+		if errors.Is(err, sql.ErrNoRows) {
+			utils.HandleError(ctx, err, "トークセッションIDに紐づくアクションアイテムの取得に失敗しました")
+			return nil, nil
+		}
 		return nil, err
 	}
 

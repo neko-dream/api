@@ -78,7 +78,6 @@ func (t *timelineHandler) PostTimeLineItem(ctx context.Context, req oas.OptPostT
 		utils.HandleError(ctx, err, "shared.ParseUUID")
 		return nil, messages.InternalServerError
 	}
-
 	var parentActionID *shared.UUID[timelineactions.ActionItem]
 	if req.Value.ParentActionItemID.IsSet() {
 		parentActionIDIn, err := shared.ParseUUID[timelineactions.ActionItem](req.Value.ParentActionItemID.Value)
