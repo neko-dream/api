@@ -12,6 +12,7 @@ type (
 	TalkSessionRepository interface {
 		Create(ctx context.Context, talkSession *TalkSession) error
 		Update(ctx context.Context, talkSession *TalkSession) error
+		FindByID(ctx context.Context, talkSessionID shared.UUID[TalkSession]) (*TalkSession, error)
 	}
 
 	TalkSession struct {

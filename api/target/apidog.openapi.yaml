@@ -3238,7 +3238,17 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": {}
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/actionItem"
+                      }
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ]
                 }
               }
             }
@@ -3288,7 +3298,7 @@
         "x-ogen-operation-group": "Timeline"
       }
     },
-    "/talksessions/{talkSessoinID}/timeline": {
+    "/talksessions/{talkSessionID}/timeline": {
       "post": {
         "summary": "タイムラインアイテム追加",
         "deprecated": false,
@@ -3299,7 +3309,7 @@
         ],
         "parameters": [
           {
-            "name": "talkSessoinID",
+            "name": "talkSessionID",
             "in": "path",
             "description": "",
             "required": true,
@@ -3308,14 +3318,42 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "example": "",
+                    "type": "string"
+                  },
+                  "status": {
+                    "example": "",
+                    "type": "string"
+                  },
+                  "parentActionItemID": {
+                    "type": "string",
+                    "description": "親があるなら親のIDヲシテイ",
+                    "example": "",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "content",
+                  "status"
+                ]
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "成功",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {}
+                  "$ref": "#/components/schemas/actionItem"
                 }
               }
             }
@@ -3368,6 +3406,37 @@
   },
   "components": {
     "schemas": {
+      "actionItem": {
+        "type": "object",
+        "properties": {
+          "ActionItemID": {
+            "type": "string"
+          },
+          "Sequence": {
+            "type": "integer"
+          },
+          "Content": {
+            "type": "string"
+          },
+          "Status": {
+            "type": "string"
+          },
+          "CreatedAt": {
+            "type": "string"
+          },
+          "UpdatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ActionItemID",
+          "Sequence",
+          "Content",
+          "Status",
+          "CreatedAt",
+          "UpdatedAt"
+        ]
+      },
       "conclusion": {
         "type": "object",
         "properties": {

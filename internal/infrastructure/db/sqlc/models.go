@@ -12,13 +12,13 @@ import (
 )
 
 type ActionItem struct {
-	ActionItemID       uuid.UUID
-	TalkSessionID      uuid.UUID
-	ParentActionItemID uuid.NullUUID
-	Content            string
-	Status             string
-	CreatedAt          time.Time
-	UpdatedAt          time.Time
+	ActionItemID  uuid.UUID
+	TalkSessionID uuid.UUID
+	Sequence      int32
+	Content       string
+	Status        string
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
 }
 
 type Opinion struct {

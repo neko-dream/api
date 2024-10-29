@@ -3353,7 +3353,33 @@ paths:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        ActionItemID:
+                          type: string
+                        Sequence:
+                          type: integer
+                        Content:
+                          type: string
+                        Status:
+                          type: string
+                        CreatedAt:
+                          type: string
+                        UpdatedAt:
+                          type: string
+                      required:
+                        - ActionItemID
+                        - Sequence
+                        - Content
+                        - Status
+                        - CreatedAt
+                        - UpdatedAt
+                required:
+                  - items
         '400':
           description: ErrorResponse
           content:
@@ -3382,7 +3408,7 @@ paths:
                     message: INTERNAL SERVER ERROR.
       security: []
       x-ogen-operation-group: Timeline
-  /talksessions/{talkSessoinID}/timeline:
+  /talksessions/{talkSessionID}/timeline:
     post:
       summary: タイムラインアイテム追加
       deprecated: false
@@ -3391,12 +3417,32 @@ paths:
       tags:
         - timeline
       parameters:
-        - name: talkSessoinID
+        - name: talkSessionID
           in: path
           description: ''
           required: true
           schema:
             type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                content:
+                  example: ''
+                  type: string
+                status:
+                  example: ''
+                  type: string
+                parentActionItemID:
+                  type: string
+                  description: 親があるなら親のIDヲシテイ
+                  example: ''
+                  nullable: true
+              required:
+                - content
+                - status
       responses:
         '200':
           description: 成功
@@ -3404,7 +3450,26 @@ paths:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  ActionItemID:
+                    type: string
+                  Sequence:
+                    type: integer
+                  Content:
+                    type: string
+                  Status:
+                    type: string
+                  CreatedAt:
+                    type: string
+                  UpdatedAt:
+                    type: string
+                required:
+                  - ActionItemID
+                  - Sequence
+                  - Content
+                  - Status
+                  - CreatedAt
+                  - UpdatedAt
         '400':
           description: ErrorResponse
           content:
@@ -3615,6 +3680,28 @@ paths:
       x-ogen-operation-group: Manage
 components:
   schemas:
+    actionItem:
+      type: object
+      properties:
+        ActionItemID:
+          type: string
+        Sequence:
+          type: integer
+        Content:
+          type: string
+        Status:
+          type: string
+        CreatedAt:
+          type: string
+        UpdatedAt:
+          type: string
+      required:
+        - ActionItemID
+        - Sequence
+        - Content
+        - Status
+        - CreatedAt
+        - UpdatedAt
     conclusion:
       type: object
       properties:

@@ -32,7 +32,7 @@ WHERE talk_session_id = $1;
 INSERT INTO action_items (
     action_item_id,
     talk_session_id,
-    parent_action_item_id,
+    sequence,
     content,
     status
 ) VALUES ($1, $2, $3, $4, $5);
@@ -42,53 +42,52 @@ UPDATE action_items
 SET
     content = $2,
     status = $3,
+    sequence = $4,
     updated_at = CURRENT_TIMESTAMP
 WHERE action_item_id = $1;
 
 -- name: GetActionItemsByTalkSessionID :many
--- トークセッションに紐づくアクションアイテムを再起的に取得
-WITH RECURSIVE action_item_tree AS (
-    SELECT
-        action_items.action_item_id,
-        action_items.talk_session_id,
-        action_items.parent_action_item_id,
-        action_items.content,
-        action_items.status,
-        action_items.created_at,
-        action_items.updated_at,
-        1 AS depth
-    FROM action_items
-    WHERE action_items.talk_session_id = $1
-    AND action_items.parent_action_item_id IS NULL
-
-    UNION ALL
-
-    SELECT
-        action_items.action_item_id,
-        action_items.talk_session_id,
-        action_items.parent_action_item_id,
-        action_items.content,
-        action_items.status,
-        action_items.created_at,
-        action_items.updated_at,
-        action_item_tree.depth + 1
-    FROM action_items
-    JOIN action_item_tree
-        ON action_items.parent_action_item_id = action_item_tree.action_item_id
-)
 SELECT
-    action_item_tree.action_item_id,
-    action_item_tree.talk_session_id,
-    action_item_tree.parent_action_item_id,
-    action_item_tree.content,
-    action_item_tree.status,
-    action_item_tree.created_at,
-    action_item_tree.updated_at,
-    action_item_tree.depth,
+    action_items.action_item_id,
+    action_items.talk_session_id,
+    action_items.sequence,
+    action_items.content,
+    action_items.status,
+    action_items.created_at,
+    action_items.updated_at,
     users.display_name AS display_name,
     users.display_id AS display,
     users.icon_url AS icon_url
-FROM action_item_tree
+FROM action_items
 LEFT JOIN users
-    ON action_item_tree.created_by = users.user_id
-ORDER BY action_item_tree.created_at ASC;
+    ON action_items.created_by = users.user_id
+WHERE action_items.talk_session_id = $1
+ORDER BY action_items.sequence;
+
+
+-- name: GetActionItemByID :one
+SELECT
+    action_items.action_item_id,
+    action_items.talk_session_id,
+    action_items.sequence,
+    action_items.content,
+    action_items.status,
+    action_items.created_at,
+    action_items.updated_at,
+    users.display_name AS display_name,
+    users.display_id AS display_id,
+    users.icon_url AS icon_url
+FROM action_items
+LEFT JOIN users
+    ON action_items.created_by = users.user_id
+WHERE action_item_id = $1
+ORDER BY action_items.sequence;
+
+
+-- name: UpdateSequencesByActionItemID :exec
+-- 指定したActionItemいよりSequenceが大きいものをすべて+1する
+UPDATE action_items
+SET
+    sequence = sequence + 1
+WHERE talk_session_id = $1
+    AND sequence >= $2;

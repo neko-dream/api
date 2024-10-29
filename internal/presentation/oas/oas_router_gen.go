@@ -1491,7 +1491,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										r.name = "PostTimeLineItem"
 										r.summary = "タイムラインアイテム追加"
 										r.operationID = "postTimeLineItem"
-										r.pathPattern = "/talksessions/{talkSessoinID}/timeline"
+										r.pathPattern = "/talksessions/{talkSessionID}/timeline"
 										r.args = args
 										r.count = 1
 										return r, true

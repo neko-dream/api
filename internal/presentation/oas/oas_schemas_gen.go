@@ -2216,9 +2216,90 @@ type GetTimeLineInternalServerError struct{}
 
 func (*GetTimeLineInternalServerError) getTimeLineRes() {}
 
-type GetTimeLineOK struct{}
+type GetTimeLineOK struct {
+	Items []GetTimeLineOKItemsItem `json:"items"`
+}
+
+// GetItems returns the value of Items.
+func (s *GetTimeLineOK) GetItems() []GetTimeLineOKItemsItem {
+	return s.Items
+}
+
+// SetItems sets the value of Items.
+func (s *GetTimeLineOK) SetItems(val []GetTimeLineOKItemsItem) {
+	s.Items = val
+}
 
 func (*GetTimeLineOK) getTimeLineRes() {}
+
+type GetTimeLineOKItemsItem struct {
+	ActionItemID string `json:"ActionItemID"`
+	Sequence     int    `json:"Sequence"`
+	Content      string `json:"Content"`
+	Status       string `json:"Status"`
+	CreatedAt    string `json:"CreatedAt"`
+	UpdatedAt    string `json:"UpdatedAt"`
+}
+
+// GetActionItemID returns the value of ActionItemID.
+func (s *GetTimeLineOKItemsItem) GetActionItemID() string {
+	return s.ActionItemID
+}
+
+// GetSequence returns the value of Sequence.
+func (s *GetTimeLineOKItemsItem) GetSequence() int {
+	return s.Sequence
+}
+
+// GetContent returns the value of Content.
+func (s *GetTimeLineOKItemsItem) GetContent() string {
+	return s.Content
+}
+
+// GetStatus returns the value of Status.
+func (s *GetTimeLineOKItemsItem) GetStatus() string {
+	return s.Status
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *GetTimeLineOKItemsItem) GetCreatedAt() string {
+	return s.CreatedAt
+}
+
+// GetUpdatedAt returns the value of UpdatedAt.
+func (s *GetTimeLineOKItemsItem) GetUpdatedAt() string {
+	return s.UpdatedAt
+}
+
+// SetActionItemID sets the value of ActionItemID.
+func (s *GetTimeLineOKItemsItem) SetActionItemID(val string) {
+	s.ActionItemID = val
+}
+
+// SetSequence sets the value of Sequence.
+func (s *GetTimeLineOKItemsItem) SetSequence(val int) {
+	s.Sequence = val
+}
+
+// SetContent sets the value of Content.
+func (s *GetTimeLineOKItemsItem) SetContent(val string) {
+	s.Content = val
+}
+
+// SetStatus sets the value of Status.
+func (s *GetTimeLineOKItemsItem) SetStatus(val string) {
+	s.Status = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *GetTimeLineOKItemsItem) SetCreatedAt(val string) {
+	s.CreatedAt = val
+}
+
+// SetUpdatedAt sets the value of UpdatedAt.
+func (s *GetTimeLineOKItemsItem) SetUpdatedAt(val string) {
+	s.UpdatedAt = val
+}
 
 type GetUserInfoInternalServerError struct{}
 
@@ -6559,6 +6640,52 @@ func (o OptPostOpinionPostReq) Or(d PostOpinionPostReq) PostOpinionPostReq {
 	return d
 }
 
+// NewOptPostTimeLineItemReq returns new OptPostTimeLineItemReq with value set to v.
+func NewOptPostTimeLineItemReq(v PostTimeLineItemReq) OptPostTimeLineItemReq {
+	return OptPostTimeLineItemReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptPostTimeLineItemReq is optional PostTimeLineItemReq.
+type OptPostTimeLineItemReq struct {
+	Value PostTimeLineItemReq
+	Set   bool
+}
+
+// IsSet returns true if OptPostTimeLineItemReq was set.
+func (o OptPostTimeLineItemReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptPostTimeLineItemReq) Reset() {
+	var v PostTimeLineItemReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptPostTimeLineItemReq) SetTo(v PostTimeLineItemReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptPostTimeLineItemReq) Get() (v PostTimeLineItemReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptPostTimeLineItemReq) Or(d PostTimeLineItemReq) PostTimeLineItemReq {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptRegisterUserReq returns new OptRegisterUserReq with value set to v.
 func NewOptRegisterUserReq(v RegisterUserReq) OptRegisterUserReq {
 	return OptRegisterUserReq{
@@ -7189,9 +7316,113 @@ type PostTimeLineItemInternalServerError struct{}
 
 func (*PostTimeLineItemInternalServerError) postTimeLineItemRes() {}
 
-type PostTimeLineItemOK struct{}
+type PostTimeLineItemOK struct {
+	ActionItemID string `json:"ActionItemID"`
+	Sequence     int    `json:"Sequence"`
+	Content      string `json:"Content"`
+	Status       string `json:"Status"`
+	CreatedAt    string `json:"CreatedAt"`
+	UpdatedAt    string `json:"UpdatedAt"`
+}
+
+// GetActionItemID returns the value of ActionItemID.
+func (s *PostTimeLineItemOK) GetActionItemID() string {
+	return s.ActionItemID
+}
+
+// GetSequence returns the value of Sequence.
+func (s *PostTimeLineItemOK) GetSequence() int {
+	return s.Sequence
+}
+
+// GetContent returns the value of Content.
+func (s *PostTimeLineItemOK) GetContent() string {
+	return s.Content
+}
+
+// GetStatus returns the value of Status.
+func (s *PostTimeLineItemOK) GetStatus() string {
+	return s.Status
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *PostTimeLineItemOK) GetCreatedAt() string {
+	return s.CreatedAt
+}
+
+// GetUpdatedAt returns the value of UpdatedAt.
+func (s *PostTimeLineItemOK) GetUpdatedAt() string {
+	return s.UpdatedAt
+}
+
+// SetActionItemID sets the value of ActionItemID.
+func (s *PostTimeLineItemOK) SetActionItemID(val string) {
+	s.ActionItemID = val
+}
+
+// SetSequence sets the value of Sequence.
+func (s *PostTimeLineItemOK) SetSequence(val int) {
+	s.Sequence = val
+}
+
+// SetContent sets the value of Content.
+func (s *PostTimeLineItemOK) SetContent(val string) {
+	s.Content = val
+}
+
+// SetStatus sets the value of Status.
+func (s *PostTimeLineItemOK) SetStatus(val string) {
+	s.Status = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *PostTimeLineItemOK) SetCreatedAt(val string) {
+	s.CreatedAt = val
+}
+
+// SetUpdatedAt sets the value of UpdatedAt.
+func (s *PostTimeLineItemOK) SetUpdatedAt(val string) {
+	s.UpdatedAt = val
+}
 
 func (*PostTimeLineItemOK) postTimeLineItemRes() {}
+
+type PostTimeLineItemReq struct {
+	Content string `json:"content"`
+	Status  string `json:"status"`
+	// 親があるなら親のIDヲシテイ.
+	ParentActionItemID OptNilString `json:"parentActionItemID"`
+}
+
+// GetContent returns the value of Content.
+func (s *PostTimeLineItemReq) GetContent() string {
+	return s.Content
+}
+
+// GetStatus returns the value of Status.
+func (s *PostTimeLineItemReq) GetStatus() string {
+	return s.Status
+}
+
+// GetParentActionItemID returns the value of ParentActionItemID.
+func (s *PostTimeLineItemReq) GetParentActionItemID() OptNilString {
+	return s.ParentActionItemID
+}
+
+// SetContent sets the value of Content.
+func (s *PostTimeLineItemReq) SetContent(val string) {
+	s.Content = val
+}
+
+// SetStatus sets the value of Status.
+func (s *PostTimeLineItemReq) SetStatus(val string) {
+	s.Status = val
+}
+
+// SetParentActionItemID sets the value of ParentActionItemID.
+func (s *PostTimeLineItemReq) SetParentActionItemID(val OptNilString) {
+	s.ParentActionItemID = val
+}
 
 type RegisterUserBadRequest struct {
 	Code    string `json:"code"`

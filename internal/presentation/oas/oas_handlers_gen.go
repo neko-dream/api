@@ -3070,12 +3070,12 @@ func (s *Server) handlePostOpinionPostRequest(args [1]string, argsEscaped bool, 
 //
 // タイムラインアイテム追加.
 //
-// POST /talksessions/{talkSessoinID}/timeline
+// POST /talksessions/{talkSessionID}/timeline
 func (s *Server) handlePostTimeLineItemRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("postTimeLineItem"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/talksessions/{talkSessoinID}/timeline"),
+		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/timeline"),
 	}
 
 	// Start a span for this request.
@@ -3124,6 +3124,21 @@ func (s *Server) handlePostTimeLineItemRequest(args [1]string, argsEscaped bool,
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
+	request, close, err := s.decodePostTimeLineItemRequest(r)
+	if err != nil {
+		err = &ogenerrors.DecodeRequestError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		defer recordError("DecodeRequest", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+	defer func() {
+		if err := close(); err != nil {
+			recordError("CloseRequest", err)
+		}
+	}()
 
 	var response PostTimeLineItemRes
 	if m := s.cfg.Middleware; m != nil {
@@ -3132,18 +3147,18 @@ func (s *Server) handlePostTimeLineItemRequest(args [1]string, argsEscaped bool,
 			OperationName:    "PostTimeLineItem",
 			OperationSummary: "タイムラインアイテム追加",
 			OperationID:      "postTimeLineItem",
-			Body:             nil,
+			Body:             request,
 			Params: middleware.Parameters{
 				{
-					Name: "talkSessoinID",
+					Name: "talkSessionID",
 					In:   "path",
-				}: params.TalkSessoinID,
+				}: params.TalkSessionID,
 			},
 			Raw: r,
 		}
 
 		type (
-			Request  = struct{}
+			Request  = OptPostTimeLineItemReq
 			Params   = PostTimeLineItemParams
 			Response = PostTimeLineItemRes
 		)
@@ -3156,12 +3171,12 @@ func (s *Server) handlePostTimeLineItemRequest(args [1]string, argsEscaped bool,
 			mreq,
 			unpackPostTimeLineItemParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.PostTimeLineItem(ctx, params)
+				response, err = s.h.PostTimeLineItem(ctx, request, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.PostTimeLineItem(ctx, params)
+		response, err = s.h.PostTimeLineItem(ctx, request, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)

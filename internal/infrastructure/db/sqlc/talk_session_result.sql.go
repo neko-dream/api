@@ -17,25 +17,25 @@ const createActionItem = `-- name: CreateActionItem :exec
 INSERT INTO action_items (
     action_item_id,
     talk_session_id,
-    parent_action_item_id,
+    sequence,
     content,
     status
 ) VALUES ($1, $2, $3, $4, $5)
 `
 
 type CreateActionItemParams struct {
-	ActionItemID       uuid.UUID
-	TalkSessionID      uuid.UUID
-	ParentActionItemID uuid.NullUUID
-	Content            string
-	Status             string
+	ActionItemID  uuid.UUID
+	TalkSessionID uuid.UUID
+	Sequence      int32
+	Content       string
+	Status        string
 }
 
 func (q *Queries) CreateActionItem(ctx context.Context, arg CreateActionItemParams) error {
 	_, err := q.db.ExecContext(ctx, createActionItem,
 		arg.ActionItemID,
 		arg.TalkSessionID,
-		arg.ParentActionItemID,
+		arg.Sequence,
 		arg.Content,
 		arg.Status,
 	)
@@ -61,69 +61,88 @@ func (q *Queries) CreateTalkSessionConclusion(ctx context.Context, arg CreateTal
 	return err
 }
 
-const getActionItemsByTalkSessionID = `-- name: GetActionItemsByTalkSessionID :many
-WITH RECURSIVE action_item_tree AS (
-    SELECT
-        action_items.action_item_id,
-        action_items.talk_session_id,
-        action_items.parent_action_item_id,
-        action_items.content,
-        action_items.status,
-        action_items.created_at,
-        action_items.updated_at,
-        1 AS depth
-    FROM action_items
-    WHERE action_items.talk_session_id = $1
-    AND action_items.parent_action_item_id IS NULL
-
-    UNION ALL
-
-    SELECT
-        action_items.action_item_id,
-        action_items.talk_session_id,
-        action_items.parent_action_item_id,
-        action_items.content,
-        action_items.status,
-        action_items.created_at,
-        action_items.updated_at,
-        action_item_tree.depth + 1
-    FROM action_items
-    JOIN action_item_tree
-        ON action_items.parent_action_item_id = action_item_tree.action_item_id
-)
+const getActionItemByID = `-- name: GetActionItemByID :one
 SELECT
-    action_item_tree.action_item_id,
-    action_item_tree.talk_session_id,
-    action_item_tree.parent_action_item_id,
-    action_item_tree.content,
-    action_item_tree.status,
-    action_item_tree.created_at,
-    action_item_tree.updated_at,
-    action_item_tree.depth,
+    action_items.action_item_id,
+    action_items.talk_session_id,
+    action_items.sequence,
+    action_items.content,
+    action_items.status,
+    action_items.created_at,
+    action_items.updated_at,
+    users.display_name AS display_name,
+    users.display_id AS display_id,
+    users.icon_url AS icon_url
+FROM action_items
+LEFT JOIN users
+    ON action_items.created_by = users.user_id
+WHERE action_item_id = $1
+ORDER BY action_items.sequence
+`
+
+type GetActionItemByIDRow struct {
+	ActionItemID  uuid.UUID
+	TalkSessionID uuid.UUID
+	Sequence      int32
+	Content       string
+	Status        string
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	DisplayName   sql.NullString
+	DisplayID     sql.NullString
+	IconUrl       sql.NullString
+}
+
+func (q *Queries) GetActionItemByID(ctx context.Context, actionItemID uuid.UUID) (GetActionItemByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getActionItemByID, actionItemID)
+	var i GetActionItemByIDRow
+	err := row.Scan(
+		&i.ActionItemID,
+		&i.TalkSessionID,
+		&i.Sequence,
+		&i.Content,
+		&i.Status,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DisplayName,
+		&i.DisplayID,
+		&i.IconUrl,
+	)
+	return i, err
+}
+
+const getActionItemsByTalkSessionID = `-- name: GetActionItemsByTalkSessionID :many
+SELECT
+    action_items.action_item_id,
+    action_items.talk_session_id,
+    action_items.sequence,
+    action_items.content,
+    action_items.status,
+    action_items.created_at,
+    action_items.updated_at,
     users.display_name AS display_name,
     users.display_id AS display,
     users.icon_url AS icon_url
-FROM action_item_tree
+FROM action_items
 LEFT JOIN users
-    ON action_item_tree.created_by = users.user_id
-ORDER BY action_item_tree.created_at ASC
+    ON action_items.created_by = users.user_id
+WHERE action_items.talk_session_id = $1
+ORDER BY action_items.sequence
 `
 
 type GetActionItemsByTalkSessionIDRow struct {
-	ActionItemID       uuid.UUID
-	TalkSessionID      uuid.UUID
-	ParentActionItemID uuid.NullUUID
-	Content            string
-	Status             string
-	CreatedAt          time.Time
-	UpdatedAt          time.Time
-	Depth              int32
-	DisplayName        sql.NullString
-	Display            sql.NullString
-	IconUrl            sql.NullString
+	ActionItemID  uuid.UUID
+	TalkSessionID uuid.UUID
+	Sequence      int32
+	Content       string
+	Status        string
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	DisplayName   sql.NullString
+	Display       sql.NullString
+	IconUrl       sql.NullString
 }
 
-// トークセッションに紐づくアクションアイテムを再起的に取得
 func (q *Queries) GetActionItemsByTalkSessionID(ctx context.Context, talkSessionID uuid.UUID) ([]GetActionItemsByTalkSessionIDRow, error) {
 	rows, err := q.db.QueryContext(ctx, getActionItemsByTalkSessionID, talkSessionID)
 	if err != nil {
@@ -136,12 +155,11 @@ func (q *Queries) GetActionItemsByTalkSessionID(ctx context.Context, talkSession
 		if err := rows.Scan(
 			&i.ActionItemID,
 			&i.TalkSessionID,
-			&i.ParentActionItemID,
+			&i.Sequence,
 			&i.Content,
 			&i.Status,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.Depth,
 			&i.DisplayName,
 			&i.Display,
 			&i.IconUrl,
@@ -210,6 +228,7 @@ UPDATE action_items
 SET
     content = $2,
     status = $3,
+    sequence = $4,
     updated_at = CURRENT_TIMESTAMP
 WHERE action_item_id = $1
 `
@@ -218,10 +237,35 @@ type UpdateActionItemParams struct {
 	ActionItemID uuid.UUID
 	Content      string
 	Status       string
+	Sequence     int32
 }
 
 func (q *Queries) UpdateActionItem(ctx context.Context, arg UpdateActionItemParams) error {
-	_, err := q.db.ExecContext(ctx, updateActionItem, arg.ActionItemID, arg.Content, arg.Status)
+	_, err := q.db.ExecContext(ctx, updateActionItem,
+		arg.ActionItemID,
+		arg.Content,
+		arg.Status,
+		arg.Sequence,
+	)
+	return err
+}
+
+const updateSequencesByActionItemID = `-- name: UpdateSequencesByActionItemID :exec
+UPDATE action_items
+SET
+    sequence = sequence + 1
+WHERE talk_session_id = $1
+    AND sequence >= $2
+`
+
+type UpdateSequencesByActionItemIDParams struct {
+	TalkSessionID uuid.UUID
+	Sequence      int32
+}
+
+// 指定したActionItemいよりSequenceが大きいものをすべて+1する
+func (q *Queries) UpdateSequencesByActionItemID(ctx context.Context, arg UpdateSequencesByActionItemIDParams) error {
+	_, err := q.db.ExecContext(ctx, updateSequencesByActionItemID, arg.TalkSessionID, arg.Sequence)
 	return err
 }
 

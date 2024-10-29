@@ -1081,6 +1081,151 @@ func (s *Server) decodePostOpinionPostRequest(r *http.Request) (
 	}
 }
 
+func (s *Server) decodePostTimeLineItemRequest(r *http.Request) (
+	req OptPostTimeLineItemReq,
+	close func() error,
+	rerr error,
+) {
+	var closers []func() error
+	close = func() error {
+		var merr error
+		// Close in reverse order, to match defer behavior.
+		for i := len(closers) - 1; i >= 0; i-- {
+			c := closers[i]
+			merr = multierr.Append(merr, c())
+		}
+		return merr
+	}
+	defer func() {
+		if rerr != nil {
+			rerr = multierr.Append(rerr, close())
+		}
+	}()
+	if _, ok := r.Header["Content-Type"]; !ok && r.ContentLength == 0 {
+		return req, close, nil
+	}
+	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
+	if err != nil {
+		return req, close, errors.Wrap(err, "parse media type")
+	}
+	switch {
+	case ct == "multipart/form-data":
+		if r.ContentLength == 0 {
+			return req, close, nil
+		}
+		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
+			return req, close, errors.Wrap(err, "parse multipart form")
+		}
+		// Remove all temporary files created by ParseMultipartForm when the request is done.
+		//
+		// Notice that the closers are called in reverse order, to match defer behavior, so
+		// any opened file will be closed before RemoveAll call.
+		closers = append(closers, r.MultipartForm.RemoveAll)
+		// Form values may be unused.
+		form := url.Values(r.MultipartForm.Value)
+		_ = form
+
+		var request OptPostTimeLineItemReq
+		{
+			var optForm PostTimeLineItemReq
+			q := uri.NewQueryDecoder(form)
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "content",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						optForm.Content = c
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"content\"")
+					}
+				} else {
+					return req, close, errors.Wrap(err, "query")
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "status",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						optForm.Status = c
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"status\"")
+					}
+				} else {
+					return req, close, errors.Wrap(err, "query")
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "parentActionItemID",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotParentActionItemIDVal string
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToString(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotParentActionItemIDVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.ParentActionItemID.SetTo(optFormDotParentActionItemIDVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"parentActionItemID\"")
+					}
+				}
+			}
+			request = OptPostTimeLineItemReq{
+				Value: optForm,
+				Set:   true,
+			}
+		}
+		return request, close, nil
+	default:
+		return req, close, validate.InvalidContentType(ct)
+	}
+}
+
 func (s *Server) decodeRegisterUserRequest(r *http.Request) (
 	req OptRegisterUserReq,
 	close func() error,

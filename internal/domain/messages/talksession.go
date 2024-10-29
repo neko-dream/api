@@ -26,4 +26,9 @@ var (
 		Code:       "TALKSESSION-0004",
 		Message:    "結論は既に設定されています。",
 	}
+	TalkSessionNotFound = &APIError{
+		StatusCode: 404,
+		Code:       "TALKSESSION-0005",
+		Message:    "セッションが見つかりません。",
+	}
 )

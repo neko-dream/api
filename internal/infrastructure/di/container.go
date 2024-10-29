@@ -17,6 +17,7 @@ import (
 	auth_usecase "github.com/neko-dream/server/internal/usecase/auth"
 	opinion_usecase "github.com/neko-dream/server/internal/usecase/opinion"
 	talk_session_usecase "github.com/neko-dream/server/internal/usecase/talk_session"
+	timeline_usecase "github.com/neko-dream/server/internal/usecase/timeline"
 	user_usecase "github.com/neko-dream/server/internal/usecase/user"
 	vote_usecase "github.com/neko-dream/server/internal/usecase/vote"
 	"go.uber.org/dig"
@@ -46,12 +47,14 @@ func BuildContainer() *dig.Container {
 		{repository.NewOpinionRepository, nil},
 		{repository.NewVoteRepository, nil},
 		{repository.NewConclusionRepository, nil},
+		{repository.NewActionItemRepository, nil},
 		{db.NewDummyInitializer, nil},
 		{auth.NewTokenManager, nil},
 		{service.NewAuthService, nil},
 		{service.NewSessionService, nil},
 		{service.NewUserService, nil},
 		{service.NewOpinionService, nil},
+		{service.NewActionItemService, nil},
 		{auth_usecase.NewAuthLoginUseCase, nil},
 		{auth_usecase.NewAuthCallbackUseCase, nil},
 		{auth_usecase.NewRevokeUseCase, nil},
@@ -73,6 +76,8 @@ func BuildContainer() *dig.Container {
 		{opinion_usecase.NewGetOpinionsByTalkSessionUseCase, nil},
 		{analysis_usecase.NewGetAnalysisResultUseCase, nil},
 		{analysis_usecase.NewGetReportQueryHandler, nil},
+		{timeline_usecase.NewAddTimeLineUseCase, nil},
+		{timeline_usecase.NewGetTimeLineUseCase, nil},
 		{vote_usecase.NewPostVoteUseCase, nil},
 		{client.NewAnalysisService, nil},
 		{handler.NewSecurityHandler, nil},
@@ -84,6 +89,7 @@ func BuildContainer() *dig.Container {
 		{handler.NewHandler, nil},
 		{handler.NewTestHandler, nil},
 		{handler.NewManageHandler, nil},
+		{handler.NewTimelineHandler, nil},
 	}
 
 	container := ProvideDependencies(deps)

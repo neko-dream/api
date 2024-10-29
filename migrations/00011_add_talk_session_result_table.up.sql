@@ -15,16 +15,13 @@ CREATE INDEX idx_talk_session_conclusions_creator
 CREATE TABLE action_items (
     action_item_id uuid PRIMARY KEY,
     talk_session_id uuid NOT NULL,
-    parent_action_item_id uuid, -- NULL: ルート
+    sequence INT NOT NULL, -- アクションアイテムの順番
     content TEXT NOT NULL, -- フローの内容
     status TEXT NOT NULL, -- 未着手, 進行中, 完了, 保留, 中止
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT check_status
-        CHECK (status IN ('未着手', '進行中', '完了', '保留', '中止')),
-
-    CONSTRAINT check_self_reference
-        CHECK (action_item_id != parent_action_item_id)
+        CHECK (status IN ('未着手', '進行中', '完了', '保留', '中止'))
 );
 

@@ -223,8 +223,8 @@ func (UnimplementedHandler) PostOpinionPost(ctx context.Context, req OptPostOpin
 //
 // タイムラインアイテム追加.
 //
-// POST /talksessions/{talkSessoinID}/timeline
-func (UnimplementedHandler) PostTimeLineItem(ctx context.Context, params PostTimeLineItemParams) (r PostTimeLineItemRes, _ error) {
+// POST /talksessions/{talkSessionID}/timeline
+func (UnimplementedHandler) PostTimeLineItem(ctx context.Context, req OptPostTimeLineItemReq, params PostTimeLineItemParams) (r PostTimeLineItemRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

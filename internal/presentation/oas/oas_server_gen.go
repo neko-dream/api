@@ -193,8 +193,8 @@ type TimelineHandler interface {
 	//
 	// タイムラインアイテム追加.
 	//
-	// POST /talksessions/{talkSessoinID}/timeline
-	PostTimeLineItem(ctx context.Context, params PostTimeLineItemParams) (PostTimeLineItemRes, error)
+	// POST /talksessions/{talkSessionID}/timeline
+	PostTimeLineItem(ctx context.Context, req OptPostTimeLineItemReq, params PostTimeLineItemParams) (PostTimeLineItemRes, error)
 }
 
 // UserHandler handles operations described by OpenAPI v3 specification.

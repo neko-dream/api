@@ -2098,22 +2098,22 @@ func decodePostOpinionPostParams(args [1]string, argsEscaped bool, r *http.Reque
 
 // PostTimeLineItemParams is parameters of postTimeLineItem operation.
 type PostTimeLineItemParams struct {
-	TalkSessoinID string
+	TalkSessionID string
 }
 
 func unpackPostTimeLineItemParams(packed middleware.Parameters) (params PostTimeLineItemParams) {
 	{
 		key := middleware.ParameterKey{
-			Name: "talkSessoinID",
+			Name: "talkSessionID",
 			In:   "path",
 		}
-		params.TalkSessoinID = packed[key].(string)
+		params.TalkSessionID = packed[key].(string)
 	}
 	return params
 }
 
 func decodePostTimeLineItemParams(args [1]string, argsEscaped bool, r *http.Request) (params PostTimeLineItemParams, _ error) {
-	// Decode path: talkSessoinID.
+	// Decode path: talkSessionID.
 	if err := func() error {
 		param := args[0]
 		if argsEscaped {
@@ -2125,7 +2125,7 @@ func decodePostTimeLineItemParams(args [1]string, argsEscaped bool, r *http.Requ
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "talkSessoinID",
+				Param:   "talkSessionID",
 				Value:   param,
 				Style:   uri.PathStyleSimple,
 				Explode: false,
@@ -2142,7 +2142,7 @@ func decodePostTimeLineItemParams(args [1]string, argsEscaped bool, r *http.Requ
 					return err
 				}
 
-				params.TalkSessoinID = c
+				params.TalkSessionID = c
 				return nil
 			}(); err != nil {
 				return err
@@ -2153,7 +2153,7 @@ func decodePostTimeLineItemParams(args [1]string, argsEscaped bool, r *http.Requ
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "talkSessoinID",
+			Name: "talkSessionID",
 			In:   "path",
 			Err:  err,
 		}
