@@ -40,8 +40,8 @@ LEFT JOIN (
 LEFT JOIN (
     SELECT votes.vote_type, votes.user_id, votes.opinion_id
     FROM votes
-) cv ON cv.user_id = sqlc.narg('user_id')::uuid
-    AND opinions.opinion_id = cv.opinion_id
+    WHERE votes.user_id = sqlc.narg('user_id')::uuid
+) cv ON opinions.opinion_id = cv.opinion_id
 WHERE opinions.opinion_id = $1;
 
 -- name: GetOpinionReplies :many
