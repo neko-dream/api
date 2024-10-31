@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"log"
 
 	"github.com/neko-dream/server/internal/domain/model/shared/time"
 	"github.com/neko-dream/server/internal/infrastructure/db"
@@ -86,8 +85,6 @@ func (h *listTalkSessionQueryHandler) Execute(ctx context.Context, input ListTal
 	if input.Longitude != nil {
 		longitude = sql.NullFloat64{Float64: *input.Longitude, Valid: true}
 	}
-	log.Println("latitude: ", latitude)
-	log.Println("longitude: ", longitude)
 
 	talkSessionRow, err := h.GetQueries(ctx).ListTalkSessions(ctx, model.ListTalkSessionsParams{
 		Limit:  int32(input.Limit),
