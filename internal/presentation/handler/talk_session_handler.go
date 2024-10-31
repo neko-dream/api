@@ -336,14 +336,23 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 			sortKey = lo.ToPtr(string(bytes))
 		}
 	}
+	var latitude, longitude *float64
+	if params.Latitude.IsSet() {
+		latitude = utils.ToPtrIfNotNullValue(params.Latitude.Null, params.Latitude.Value)
+	}
+	if params.Longitude.IsSet() {
+		longitude = utils.ToPtrIfNotNullValue(params.Longitude.Null, params.Longitude.Value)
+	}
 
 	theme := utils.ToPtrIfNotNullValue(params.Theme.Null, params.Theme.Value)
 	out, err := t.listTalkSessionQuery.Execute(ctx, talk_session_usecase.ListTalkSessionInput{
-		Limit:   limit,
-		Offset:  offset,
-		Theme:   theme,
-		Status:  status,
-		SortKey: sortKey,
+		Limit:     limit,
+		Offset:    offset,
+		Theme:     theme,
+		Status:    status,
+		SortKey:   sortKey,
+		Latitude:  latitude,
+		Longitude: longitude,
 	})
 	if err != nil {
 		return nil, err

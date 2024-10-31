@@ -443,7 +443,16 @@ SELECT
     users.icon_url AS icon_url,
     talk_session_locations.talk_session_id as location_id,
     COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
-    COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
+    COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude,
+    CASE
+        WHEN $3::float IS NOT NULL AND $4::float IS NOT NULL AND talk_session_locations.location IS NOT NULL
+            THEN ('SRID=4326;POINT(' ||
+            ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location),4326)) || ' ' ||
+            ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location),4326)) || ')')::geometry
+            <->
+            ('SRID=4326;POINT(' || $3::float || ' ' || $4::float || ')')::geometry
+        ELSE NULL
+    END AS distance
 FROM talk_sessions
 LEFT JOIN (
     SELECT talk_session_id, COUNT(opinion_id) AS opinion_count
@@ -456,31 +465,52 @@ LEFT JOIN talk_session_locations
     ON talk_sessions.talk_session_id = talk_session_locations.talk_session_id
 WHERE
     CASE
-        WHEN $3::text = 'finished' THEN scheduled_end_time <= now()
-        WHEN $3::text = 'open' THEN scheduled_end_time > now()
+        WHEN $5::text = 'finished' THEN scheduled_end_time <= now()
+        WHEN $5::text = 'open' THEN scheduled_end_time > now()
         ELSE TRUE
     END
     AND
     (CASE
-        WHEN $4::text IS NOT NULL
-        THEN talk_sessions.theme LIKE '%' || $4::text || '%'
+        WHEN $6::text IS NOT NULL
+        THEN talk_sessions.theme LIKE '%' || $6::text || '%'
         ELSE TRUE
     END)
+    AND(
+        CASE
+            WHEN $3::float IS NOT NULL AND $4::float IS NOT NULL
+            THEN ('SRID=4326;POINT(' ||
+            ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location),4326)) || ' ' ||
+            ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location),4326)) || ')')::geometry
+            <->
+            ('SRID=4326;POINT(' || $3::float || ' ' || $4::float || ')')::geometry
+            ELSE 0.0
+        END) <= 100000
 ORDER BY
-    CASE $5::text
-        WHEN 'oldest' THEN EXTRACT(EPOCH FROM talk_sessions.created_at)
+    CASE $7::text
+        WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM talk_sessions.created_at)
         WHEN 'mostReplies' THEN -oc.opinion_count
+        WHEN 'nearest' THEN (CASE
+            WHEN $3::float IS NOT NULL AND $4::float IS NOT NULL
+                THEN ('SRID=4326;POINT(' ||
+                ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location),4326)) || ' ' ||
+                ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location),4326)) || ')')::geometry
+                <->
+                ('SRID=4326;POINT(' || $3::float || ' ' || $4::float || ')')::geometry
+            ELSE 0.0
+        END)*-1
         ELSE EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM talk_sessions.created_at)
-    END ASC
+    END DESC
 LIMIT $1 OFFSET $2
 `
 
 type ListTalkSessionsParams struct {
-	Limit   int32
-	Offset  int32
-	Status  sql.NullString
-	Theme   sql.NullString
-	SortKey sql.NullString
+	Limit     int32
+	Offset    int32
+	Latitude  sql.NullFloat64
+	Longitude sql.NullFloat64
+	Status    sql.NullString
+	Theme     sql.NullString
+	SortKey   sql.NullString
 }
 
 type ListTalkSessionsRow struct {
@@ -498,12 +528,15 @@ type ListTalkSessionsRow struct {
 	LocationID       uuid.NullUUID
 	Latitude         float64
 	Longitude        float64
+	Distance         interface{}
 }
 
 func (q *Queries) ListTalkSessions(ctx context.Context, arg ListTalkSessionsParams) ([]ListTalkSessionsRow, error) {
 	rows, err := q.db.QueryContext(ctx, listTalkSessions,
 		arg.Limit,
 		arg.Offset,
+		arg.Latitude,
+		arg.Longitude,
 		arg.Status,
 		arg.Theme,
 		arg.SortKey,
@@ -530,6 +563,7 @@ func (q *Queries) ListTalkSessions(ctx context.Context, arg ListTalkSessionsPara
 			&i.LocationID,
 			&i.Latitude,
 			&i.Longitude,
+			&i.Distance,
 		); err != nil {
 			return nil, err
 		}

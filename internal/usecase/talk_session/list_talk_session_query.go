@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"log"
 
 	"github.com/neko-dream/server/internal/domain/model/shared/time"
 	"github.com/neko-dream/server/internal/infrastructure/db"
@@ -17,11 +18,13 @@ type (
 	}
 
 	ListTalkSessionInput struct {
-		Limit   int
-		Offset  int
-		Theme   *string
-		Status  string
-		SortKey *string
+		Limit     int
+		Offset    int
+		Theme     *string
+		Status    string
+		SortKey   *string
+		Latitude  *float64
+		Longitude *float64
 	}
 
 	ListTalkSessionOutput struct {
@@ -76,6 +79,15 @@ func (h *listTalkSessionQueryHandler) Execute(ctx context.Context, input ListTal
 	} else {
 		sortKey = "latest"
 	}
+	var latitude, longitude sql.NullFloat64
+	if input.Latitude != nil {
+		latitude = sql.NullFloat64{Float64: *input.Latitude, Valid: true}
+	}
+	if input.Longitude != nil {
+		longitude = sql.NullFloat64{Float64: *input.Longitude, Valid: true}
+	}
+	log.Println("latitude: ", latitude)
+	log.Println("longitude: ", longitude)
 
 	talkSessionRow, err := h.GetQueries(ctx).ListTalkSessions(ctx, model.ListTalkSessionsParams{
 		Limit:  int32(input.Limit),
@@ -85,8 +97,10 @@ func (h *listTalkSessionQueryHandler) Execute(ctx context.Context, input ListTal
 			sql.NullString{String: *input.Theme, Valid: true},
 			sql.NullString{},
 		),
-		Status:  sql.NullString{String: input.Status, Valid: true},
-		SortKey: sql.NullString{String: sortKey, Valid: true},
+		Status:    sql.NullString{String: input.Status, Valid: true},
+		SortKey:   sql.NullString{String: sortKey, Valid: true},
+		Latitude:  latitude,
+		Longitude: longitude,
 	})
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
