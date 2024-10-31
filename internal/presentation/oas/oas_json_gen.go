@@ -144,6 +144,12 @@ func (s *CreateTalkSessionOK) encodeFields(e *jx.Encoder) {
 		e.Str(s.Theme)
 	}
 	{
+		if s.Description.Set {
+			e.FieldStart("description")
+			s.Description.Encode(e)
+		}
+	}
+	{
 		e.FieldStart("owner")
 		s.Owner.Encode(e)
 	}
@@ -175,15 +181,16 @@ func (s *CreateTalkSessionOK) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfCreateTalkSessionOK = [8]string{
+var jsonFieldsNameOfCreateTalkSessionOK = [9]string{
 	0: "id",
 	1: "theme",
-	2: "owner",
-	3: "createdAt",
-	4: "scheduledEndTime",
-	5: "location",
-	6: "city",
-	7: "prefecture",
+	2: "description",
+	3: "owner",
+	4: "createdAt",
+	5: "scheduledEndTime",
+	6: "location",
+	7: "city",
+	8: "prefecture",
 }
 
 // Decode decodes CreateTalkSessionOK from json.
@@ -191,7 +198,7 @@ func (s *CreateTalkSessionOK) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode CreateTalkSessionOK to nil")
 	}
-	var requiredBitSet [1]uint8
+	var requiredBitSet [2]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -219,8 +226,18 @@ func (s *CreateTalkSessionOK) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"theme\"")
 			}
+		case "description":
+			if err := func() error {
+				s.Description.Reset()
+				if err := s.Description.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"description\"")
+			}
 		case "owner":
-			requiredBitSet[0] |= 1 << 2
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
 				if err := s.Owner.Decode(d); err != nil {
 					return err
@@ -230,7 +247,7 @@ func (s *CreateTalkSessionOK) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"owner\"")
 			}
 		case "createdAt":
-			requiredBitSet[0] |= 1 << 3
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
 				v, err := d.Str()
 				s.CreatedAt = string(v)
@@ -242,7 +259,7 @@ func (s *CreateTalkSessionOK) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"createdAt\"")
 			}
 		case "scheduledEndTime":
-			requiredBitSet[0] |= 1 << 4
+			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
 				v, err := d.Str()
 				s.ScheduledEndTime = string(v)
@@ -292,8 +309,9 @@ func (s *CreateTalkSessionOK) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00011111,
+	for i, mask := range [2]uint8{
+		0b00111011,
+		0b00000000,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -677,6 +695,535 @@ func (s *DummiInitOK) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *DummiInitOK) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *EditTalkSessionBadRequest) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *EditTalkSessionBadRequest) encodeFields(e *jx.Encoder) {
+}
+
+var jsonFieldsNameOfEditTalkSessionBadRequest = [0]string{}
+
+// Decode decodes EditTalkSessionBadRequest from json.
+func (s *EditTalkSessionBadRequest) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode EditTalkSessionBadRequest to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		default:
+			return d.Skip()
+		}
+	}); err != nil {
+		return errors.Wrap(err, "decode EditTalkSessionBadRequest")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *EditTalkSessionBadRequest) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *EditTalkSessionBadRequest) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *EditTalkSessionInternalServerError) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *EditTalkSessionInternalServerError) encodeFields(e *jx.Encoder) {
+}
+
+var jsonFieldsNameOfEditTalkSessionInternalServerError = [0]string{}
+
+// Decode decodes EditTalkSessionInternalServerError from json.
+func (s *EditTalkSessionInternalServerError) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode EditTalkSessionInternalServerError to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		default:
+			return d.Skip()
+		}
+	}); err != nil {
+		return errors.Wrap(err, "decode EditTalkSessionInternalServerError")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *EditTalkSessionInternalServerError) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *EditTalkSessionInternalServerError) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *EditTalkSessionOK) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *EditTalkSessionOK) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("id")
+		e.Str(s.ID)
+	}
+	{
+		e.FieldStart("theme")
+		e.Str(s.Theme)
+	}
+	{
+		if s.Description.Set {
+			e.FieldStart("description")
+			s.Description.Encode(e)
+		}
+	}
+	{
+		e.FieldStart("owner")
+		s.Owner.Encode(e)
+	}
+	{
+		e.FieldStart("createdAt")
+		e.Str(s.CreatedAt)
+	}
+	{
+		e.FieldStart("scheduledEndTime")
+		e.Str(s.ScheduledEndTime)
+	}
+	{
+		if s.Location.Set {
+			e.FieldStart("location")
+			s.Location.Encode(e)
+		}
+	}
+	{
+		if s.City.Set {
+			e.FieldStart("city")
+			s.City.Encode(e)
+		}
+	}
+	{
+		if s.Prefecture.Set {
+			e.FieldStart("prefecture")
+			s.Prefecture.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfEditTalkSessionOK = [9]string{
+	0: "id",
+	1: "theme",
+	2: "description",
+	3: "owner",
+	4: "createdAt",
+	5: "scheduledEndTime",
+	6: "location",
+	7: "city",
+	8: "prefecture",
+}
+
+// Decode decodes EditTalkSessionOK from json.
+func (s *EditTalkSessionOK) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode EditTalkSessionOK to nil")
+	}
+	var requiredBitSet [2]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "id":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Str()
+				s.ID = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"id\"")
+			}
+		case "theme":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := d.Str()
+				s.Theme = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"theme\"")
+			}
+		case "description":
+			if err := func() error {
+				s.Description.Reset()
+				if err := s.Description.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"description\"")
+			}
+		case "owner":
+			requiredBitSet[0] |= 1 << 3
+			if err := func() error {
+				if err := s.Owner.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"owner\"")
+			}
+		case "createdAt":
+			requiredBitSet[0] |= 1 << 4
+			if err := func() error {
+				v, err := d.Str()
+				s.CreatedAt = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"createdAt\"")
+			}
+		case "scheduledEndTime":
+			requiredBitSet[0] |= 1 << 5
+			if err := func() error {
+				v, err := d.Str()
+				s.ScheduledEndTime = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"scheduledEndTime\"")
+			}
+		case "location":
+			if err := func() error {
+				s.Location.Reset()
+				if err := s.Location.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"location\"")
+			}
+		case "city":
+			if err := func() error {
+				s.City.Reset()
+				if err := s.City.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"city\"")
+			}
+		case "prefecture":
+			if err := func() error {
+				s.Prefecture.Reset()
+				if err := s.Prefecture.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"prefecture\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode EditTalkSessionOK")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [2]uint8{
+		0b00111011,
+		0b00000000,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfEditTalkSessionOK) {
+					name = jsonFieldsNameOfEditTalkSessionOK[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *EditTalkSessionOK) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *EditTalkSessionOK) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *EditTalkSessionOKLocation) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *EditTalkSessionOKLocation) encodeFields(e *jx.Encoder) {
+	{
+		if s.Latitude.Set {
+			e.FieldStart("latitude")
+			s.Latitude.Encode(e)
+		}
+	}
+	{
+		if s.Longitude.Set {
+			e.FieldStart("longitude")
+			s.Longitude.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfEditTalkSessionOKLocation = [2]string{
+	0: "latitude",
+	1: "longitude",
+}
+
+// Decode decodes EditTalkSessionOKLocation from json.
+func (s *EditTalkSessionOKLocation) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode EditTalkSessionOKLocation to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "latitude":
+			if err := func() error {
+				s.Latitude.Reset()
+				if err := s.Latitude.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"latitude\"")
+			}
+		case "longitude":
+			if err := func() error {
+				s.Longitude.Reset()
+				if err := s.Longitude.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"longitude\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode EditTalkSessionOKLocation")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *EditTalkSessionOKLocation) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *EditTalkSessionOKLocation) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *EditTalkSessionOKOwner) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *EditTalkSessionOKOwner) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("displayID")
+		e.Str(s.DisplayID)
+	}
+	{
+		e.FieldStart("displayName")
+		e.Str(s.DisplayName)
+	}
+	{
+		if s.IconURL.Set {
+			e.FieldStart("iconURL")
+			s.IconURL.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfEditTalkSessionOKOwner = [3]string{
+	0: "displayID",
+	1: "displayName",
+	2: "iconURL",
+}
+
+// Decode decodes EditTalkSessionOKOwner from json.
+func (s *EditTalkSessionOKOwner) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode EditTalkSessionOKOwner to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "displayID":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Str()
+				s.DisplayID = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"displayID\"")
+			}
+		case "displayName":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := d.Str()
+				s.DisplayName = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"displayName\"")
+			}
+		case "iconURL":
+			if err := func() error {
+				s.IconURL.Reset()
+				if err := s.IconURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"iconURL\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode EditTalkSessionOKOwner")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000011,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfEditTalkSessionOKOwner) {
+					name = jsonFieldsNameOfEditTalkSessionOKOwner[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *EditTalkSessionOKOwner) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *EditTalkSessionOKOwner) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -1689,6 +2236,12 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) encodeFields(e *jx.E
 		e.Str(s.Theme)
 	}
 	{
+		if s.Description.Set {
+			e.FieldStart("description")
+			s.Description.Encode(e)
+		}
+	}
+	{
 		e.FieldStart("owner")
 		s.Owner.Encode(e)
 	}
@@ -1720,15 +2273,16 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) encodeFields(e *jx.E
 	}
 }
 
-var jsonFieldsNameOfGetOpenedTalkSessionOKTalkSessionsItemTalkSession = [8]string{
+var jsonFieldsNameOfGetOpenedTalkSessionOKTalkSessionsItemTalkSession = [9]string{
 	0: "id",
 	1: "theme",
-	2: "owner",
-	3: "createdAt",
-	4: "scheduledEndTime",
-	5: "location",
-	6: "city",
-	7: "prefecture",
+	2: "description",
+	3: "owner",
+	4: "createdAt",
+	5: "scheduledEndTime",
+	6: "location",
+	7: "city",
+	8: "prefecture",
 }
 
 // Decode decodes GetOpenedTalkSessionOKTalkSessionsItemTalkSession from json.
@@ -1736,7 +2290,7 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder
 	if s == nil {
 		return errors.New("invalid: unable to decode GetOpenedTalkSessionOKTalkSessionsItemTalkSession to nil")
 	}
-	var requiredBitSet [1]uint8
+	var requiredBitSet [2]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -1764,8 +2318,18 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"theme\"")
 			}
+		case "description":
+			if err := func() error {
+				s.Description.Reset()
+				if err := s.Description.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"description\"")
+			}
 		case "owner":
-			requiredBitSet[0] |= 1 << 2
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
 				if err := s.Owner.Decode(d); err != nil {
 					return err
@@ -1775,7 +2339,7 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder
 				return errors.Wrap(err, "decode field \"owner\"")
 			}
 		case "createdAt":
-			requiredBitSet[0] |= 1 << 3
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
 				v, err := d.Str()
 				s.CreatedAt = string(v)
@@ -1787,7 +2351,7 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder
 				return errors.Wrap(err, "decode field \"createdAt\"")
 			}
 		case "scheduledEndTime":
-			requiredBitSet[0] |= 1 << 4
+			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
 				v, err := d.Str()
 				s.ScheduledEndTime = string(v)
@@ -1837,8 +2401,9 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00011111,
+	for i, mask := range [2]uint8{
+		0b00111011,
+		0b00000000,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -3643,6 +4208,12 @@ func (s *GetTalkSessionDetailOK) encodeFields(e *jx.Encoder) {
 		e.Str(s.Theme)
 	}
 	{
+		if s.Description.Set {
+			e.FieldStart("description")
+			s.Description.Encode(e)
+		}
+	}
+	{
 		e.FieldStart("owner")
 		s.Owner.Encode(e)
 	}
@@ -3674,15 +4245,16 @@ func (s *GetTalkSessionDetailOK) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfGetTalkSessionDetailOK = [8]string{
+var jsonFieldsNameOfGetTalkSessionDetailOK = [9]string{
 	0: "id",
 	1: "theme",
-	2: "owner",
-	3: "createdAt",
-	4: "scheduledEndTime",
-	5: "location",
-	6: "city",
-	7: "prefecture",
+	2: "description",
+	3: "owner",
+	4: "createdAt",
+	5: "scheduledEndTime",
+	6: "location",
+	7: "city",
+	8: "prefecture",
 }
 
 // Decode decodes GetTalkSessionDetailOK from json.
@@ -3690,7 +4262,7 @@ func (s *GetTalkSessionDetailOK) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode GetTalkSessionDetailOK to nil")
 	}
-	var requiredBitSet [1]uint8
+	var requiredBitSet [2]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -3718,8 +4290,18 @@ func (s *GetTalkSessionDetailOK) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"theme\"")
 			}
+		case "description":
+			if err := func() error {
+				s.Description.Reset()
+				if err := s.Description.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"description\"")
+			}
 		case "owner":
-			requiredBitSet[0] |= 1 << 2
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
 				if err := s.Owner.Decode(d); err != nil {
 					return err
@@ -3729,7 +4311,7 @@ func (s *GetTalkSessionDetailOK) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"owner\"")
 			}
 		case "createdAt":
-			requiredBitSet[0] |= 1 << 3
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
 				v, err := d.Str()
 				s.CreatedAt = string(v)
@@ -3741,7 +4323,7 @@ func (s *GetTalkSessionDetailOK) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"createdAt\"")
 			}
 		case "scheduledEndTime":
-			requiredBitSet[0] |= 1 << 4
+			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
 				v, err := d.Str()
 				s.ScheduledEndTime = string(v)
@@ -3791,8 +4373,9 @@ func (s *GetTalkSessionDetailOK) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00011111,
+	for i, mask := range [2]uint8{
+		0b00111011,
+		0b00000000,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -4654,6 +5237,12 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) encodeFields(e *jx.Enc
 		e.Str(s.Theme)
 	}
 	{
+		if s.Description.Set {
+			e.FieldStart("description")
+			s.Description.Encode(e)
+		}
+	}
+	{
 		e.FieldStart("owner")
 		s.Owner.Encode(e)
 	}
@@ -4685,15 +5274,16 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) encodeFields(e *jx.Enc
 	}
 }
 
-var jsonFieldsNameOfGetTalkSessionListOKTalkSessionsItemTalkSession = [8]string{
+var jsonFieldsNameOfGetTalkSessionListOKTalkSessionsItemTalkSession = [9]string{
 	0: "id",
 	1: "theme",
-	2: "owner",
-	3: "createdAt",
-	4: "scheduledEndTime",
-	5: "location",
-	6: "city",
-	7: "prefecture",
+	2: "description",
+	3: "owner",
+	4: "createdAt",
+	5: "scheduledEndTime",
+	6: "location",
+	7: "city",
+	8: "prefecture",
 }
 
 // Decode decodes GetTalkSessionListOKTalkSessionsItemTalkSession from json.
@@ -4701,7 +5291,7 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder) 
 	if s == nil {
 		return errors.New("invalid: unable to decode GetTalkSessionListOKTalkSessionsItemTalkSession to nil")
 	}
-	var requiredBitSet [1]uint8
+	var requiredBitSet [2]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -4729,8 +5319,18 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder) 
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"theme\"")
 			}
+		case "description":
+			if err := func() error {
+				s.Description.Reset()
+				if err := s.Description.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"description\"")
+			}
 		case "owner":
-			requiredBitSet[0] |= 1 << 2
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
 				if err := s.Owner.Decode(d); err != nil {
 					return err
@@ -4740,7 +5340,7 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder) 
 				return errors.Wrap(err, "decode field \"owner\"")
 			}
 		case "createdAt":
-			requiredBitSet[0] |= 1 << 3
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
 				v, err := d.Str()
 				s.CreatedAt = string(v)
@@ -4752,7 +5352,7 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder) 
 				return errors.Wrap(err, "decode field \"createdAt\"")
 			}
 		case "scheduledEndTime":
-			requiredBitSet[0] |= 1 << 4
+			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
 				v, err := d.Str()
 				s.ScheduledEndTime = string(v)
@@ -4802,8 +5402,9 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder) 
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00011111,
+	for i, mask := range [2]uint8{
+		0b00111011,
+		0b00000000,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -11183,6 +11784,39 @@ func (s *OptCreateTalkSessionOKLocation) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes EditTalkSessionOKLocation as json.
+func (o OptEditTalkSessionOKLocation) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes EditTalkSessionOKLocation from json.
+func (o *OptEditTalkSessionOKLocation) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptEditTalkSessionOKLocation to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptEditTalkSessionOKLocation) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptEditTalkSessionOKLocation) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes float64 as json.
 func (o OptFloat64) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -13828,6 +14462,12 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) encodeFields(e *jx.Encode
 		e.Str(s.Theme)
 	}
 	{
+		if s.Description.Set {
+			e.FieldStart("description")
+			s.Description.Encode(e)
+		}
+	}
+	{
 		e.FieldStart("owner")
 		s.Owner.Encode(e)
 	}
@@ -13859,15 +14499,16 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) encodeFields(e *jx.Encode
 	}
 }
 
-var jsonFieldsNameOfSessionsHistoryOKTalkSessionsItemTalkSession = [8]string{
+var jsonFieldsNameOfSessionsHistoryOKTalkSessionsItemTalkSession = [9]string{
 	0: "id",
 	1: "theme",
-	2: "owner",
-	3: "createdAt",
-	4: "scheduledEndTime",
-	5: "location",
-	6: "city",
-	7: "prefecture",
+	2: "description",
+	3: "owner",
+	4: "createdAt",
+	5: "scheduledEndTime",
+	6: "location",
+	7: "city",
+	8: "prefecture",
 }
 
 // Decode decodes SessionsHistoryOKTalkSessionsItemTalkSession from json.
@@ -13875,7 +14516,7 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder) err
 	if s == nil {
 		return errors.New("invalid: unable to decode SessionsHistoryOKTalkSessionsItemTalkSession to nil")
 	}
-	var requiredBitSet [1]uint8
+	var requiredBitSet [2]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -13903,8 +14544,18 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder) err
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"theme\"")
 			}
+		case "description":
+			if err := func() error {
+				s.Description.Reset()
+				if err := s.Description.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"description\"")
+			}
 		case "owner":
-			requiredBitSet[0] |= 1 << 2
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
 				if err := s.Owner.Decode(d); err != nil {
 					return err
@@ -13914,7 +14565,7 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"owner\"")
 			}
 		case "createdAt":
-			requiredBitSet[0] |= 1 << 3
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
 				v, err := d.Str()
 				s.CreatedAt = string(v)
@@ -13926,7 +14577,7 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"createdAt\"")
 			}
 		case "scheduledEndTime":
-			requiredBitSet[0] |= 1 << 4
+			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
 				v, err := d.Str()
 				s.ScheduledEndTime = string(v)
@@ -13976,8 +14627,9 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder) err
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00011111,
+	for i, mask := range [2]uint8{
+		0b00111011,
+		0b00000000,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

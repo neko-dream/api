@@ -94,8 +94,9 @@ func (h *getTalkSessionHistoriesQueryHandler) Execute(ctx context.Context, q Get
 	talkSessionDTOs := make([]TalkSessionDTO, 0, len(talkSessions))
 	for _, talkSession := range talkSessions {
 		talkSessionDTOs = append(talkSessionDTOs, TalkSessionDTO{
-			ID:    talkSession.TalkSessionID.String(),
-			Theme: talkSession.Theme,
+			ID:          talkSession.TalkSessionID.String(),
+			Theme:       talkSession.Theme,
+			Description: utils.ToPtrIfNotNullValue[string](!talkSession.Description.Valid, talkSession.Description.String),
 			Owner: UserDTO{
 				DisplayID:   talkSession.DisplayID.String,
 				DisplayName: talkSession.DisplayName.String,

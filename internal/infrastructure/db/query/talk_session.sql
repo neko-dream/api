@@ -1,5 +1,5 @@
 -- name: CreateTalkSession :exec
-INSERT INTO talk_sessions (talk_session_id, theme, owner_id, scheduled_end_time, created_at, city, prefecture) VALUES ($1, $2, $3, $4, $5, $6, $7);
+INSERT INTO talk_sessions (talk_session_id, theme, description, owner_id, scheduled_end_time, created_at, city, prefecture) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
 
 -- name: CreateTalkSessionLocation :exec
 INSERT INTO talk_session_locations (talk_session_id, location) VALUES ($1, ST_GeographyFromText($2));
@@ -10,13 +10,15 @@ UPDATE talk_session_locations SET location = ST_GeographyFromText($2) WHERE talk
 -- name: EditTalkSession :exec
 UPDATE talk_sessions
     SET theme = $2,
-        scheduled_end_time = $3
+        description = $3,
+        scheduled_end_time = $4
     WHERE talk_session_id = $1;
 
 -- name: GetTalkSessionByID :one
 SELECT
     talk_sessions.talk_session_id,
     talk_sessions.theme,
+    talk_sessions.description,
     talk_sessions.created_at,
     talk_sessions.scheduled_end_time,
     talk_sessions.city AS city,
@@ -45,6 +47,7 @@ WHERE talk_sessions.talk_session_id = $1;
 SELECT
     talk_sessions.talk_session_id,
     talk_sessions.theme,
+    talk_sessions.description,
     talk_sessions.scheduled_end_time,
     talk_sessions.city AS city,
     talk_sessions.prefecture AS prefecture,
@@ -119,6 +122,7 @@ WHERE
 SELECT
     talk_sessions.talk_session_id,
     talk_sessions.theme,
+    talk_sessions.description,
     talk_sessions.scheduled_end_time,
     talk_sessions.city AS city,
     talk_sessions.prefecture AS prefecture,
@@ -161,6 +165,7 @@ LIMIT $1 OFFSET $2;
 SELECT
     talk_sessions.talk_session_id,
     talk_sessions.theme,
+    talk_sessions.description,
     talk_sessions.scheduled_end_time,
     talk_sessions.city AS city,
     talk_sessions.prefecture AS prefecture,

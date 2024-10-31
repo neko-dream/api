@@ -63,6 +63,7 @@ type TalkSession struct {
 	CreatedAt        time.Time
 	City             sql.NullString
 	Prefecture       sql.NullString
+	Description      sql.NullString
 }
 
 type TalkSessionConclusion struct {

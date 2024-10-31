@@ -97,6 +97,10 @@ func (h *GetTalkSessionByUserQueryHandler) Execute(ctx context.Context, input Ge
 		talkSessions = append(talkSessions, TalkSessionDTO{
 			ID:    ts.TalkSessionID.String(),
 			Theme: ts.Theme,
+			Description: utils.ToPtrIfNotNullValue[string](
+				!ts.Description.Valid,
+				ts.Description.String,
+			),
 			Owner: UserDTO{
 				DisplayID:   ts.DisplayID.String,
 				DisplayName: ts.DisplayName.String,

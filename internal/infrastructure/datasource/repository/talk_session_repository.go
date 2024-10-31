@@ -26,7 +26,7 @@ func NewTalkSessionRepository(
 }
 
 func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talksession.TalkSession) error {
-	var city, prefecture sql.NullString
+	var description, city, prefecture sql.NullString
 	if talkSession.City() != nil {
 		city = sql.NullString{
 			String: *talkSession.City(),
@@ -39,10 +39,17 @@ func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talkses
 			Valid:  true,
 		}
 	}
+	if talkSession.Description() != nil {
+		description = sql.NullString{
+			String: *talkSession.Description(),
+			Valid:  true,
+		}
+	}
 
 	if err := t.GetQueries(ctx).CreateTalkSession(ctx, model.CreateTalkSessionParams{
 		TalkSessionID:    talkSession.TalkSessionID().UUID(),
 		Theme:            talkSession.Theme(),
+		Description:      description,
 		OwnerID:          talkSession.OwnerUserID().UUID(),
 		CreatedAt:        talkSession.CreatedAt().Time,
 		ScheduledEndTime: talkSession.ScheduledEndTime().Time,
@@ -69,11 +76,19 @@ func (t *talkSessionRepository) Update(ctx context.Context, talkSession *talkses
 	if talkSession == nil {
 		return nil
 	}
+	var description sql.NullString
+	if talkSession.Description() != nil {
+		description = sql.NullString{
+			String: *talkSession.Description(),
+			Valid:  true,
+		}
+	}
 
 	if err := t.GetQueries(ctx).EditTalkSession(ctx, model.EditTalkSessionParams{
 		TalkSessionID:    talkSession.TalkSessionID().UUID(),
 		Theme:            talkSession.Theme(),
 		ScheduledEndTime: talkSession.ScheduledEndTime().Time,
+		Description:      description,
 	}); err != nil {
 		return errtrace.Wrap(err)
 	}
@@ -104,17 +119,21 @@ func (t *talkSessionRepository) FindByID(ctx context.Context, talkSessionID shar
 			row.Longitude,
 		)
 	}
-	var city, prefecture *string
+	var description, city, prefecture *string
 	if row.City.Valid {
 		city = &row.City.String
 	}
 	if row.Prefecture.Valid {
 		prefecture = &row.Prefecture.String
 	}
+	if row.Description.Valid {
+		description = &row.Description.String
+	}
 
 	return talksession.NewTalkSession(
 		talkSessionID,
 		row.Theme,
+		description,
 		shared.UUID[user.User](row.UserID.UUID),
 		time.NewTime(ctx, row.CreatedAt),
 		time.NewTime(ctx, row.ScheduledEndTime),

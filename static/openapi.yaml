@@ -33,6 +33,10 @@ paths:
                   theme:
                     type: string
                     description: テーマ
+                  description:
+                    type: string
+                    description: 説明
+                    nullable: true
                   owner:
                     type: object
                     properties:
@@ -106,6 +110,157 @@ paths:
                     message: INTERNAL SERVER ERROR.
       security: []
       x-ogen-operation-group: TalkSession
+    put:
+      summary: セッション編集
+      deprecated: false
+      description: ''
+      operationId: editTalkSession
+      tags:
+        - talk_session
+      parameters:
+        - name: talkSessionId
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                theme:
+                  example: ''
+                  type: string
+                scheduledEndTime:
+                  example: ''
+                  type: string
+                latitude:
+                  type: number
+                  description: 緯度
+                  example: 0
+                  nullable: true
+                longitude:
+                  type: number
+                  description: 経度
+                  example: 0
+                prefecture:
+                  type: string
+                  description: 都道府県
+                  example: ''
+                  nullable: true
+                city:
+                  type: string
+                  description: 市区町村
+                  example: ''
+                  nullable: true
+                description:
+                  type: string
+                  description: 説明文
+                  example: ''
+                  nullable: true
+              required:
+                - theme
+                - scheduledEndTime
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: トークセッションID
+                  theme:
+                    type: string
+                    description: テーマ
+                  description:
+                    type: string
+                    description: 説明
+                    nullable: true
+                  owner:
+                    type: object
+                    properties:
+                      displayID:
+                        type: string
+                        x-apidog-mock: '{{$string.uuid}}'
+                        pattern: ^[A-Za-z0-9]$
+                        examples:
+                          - userid
+                        minLength: 3
+                        maxLength: 25
+                      displayName:
+                        type: string
+                        x-apidog-mock: '{{$person.firstName}}'
+                      iconURL:
+                        type: string
+                        nullable: true
+                    required:
+                      - displayID
+                      - displayName
+                    description: 作成者
+                  createdAt:
+                    type: string
+                    description: 作成日時
+                  scheduledEndTime:
+                    type: string
+                    description: 終了予定日時
+                  location:
+                    description: 位置情報
+                    type: object
+                    properties:
+                      latitude:
+                        type: number
+                        description: 緯度
+                      longitude:
+                        type: number
+                        description: 経度
+                  city:
+                    type: string
+                    description: 市区町村
+                    nullable: true
+                  prefecture:
+                    type: string
+                    description: 都道府県
+                    nullable: true
+                required:
+                  - id
+                  - theme
+                  - owner
+                  - createdAt
+                  - scheduledEndTime
+        '400':
+          description: ErrorResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+        '500':
+          description: ServerErrorResponse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+      security:
+        - SessionId: []
+      x-ogen-operation-group: TalkSession
   /talksessions:
     post:
       summary: セッション作成
@@ -150,6 +305,11 @@ paths:
                   description: 都道府県
                   example: ''
                   nullable: true
+                description:
+                  type: string
+                  description: 説明文
+                  example: ''
+                  nullable: true
               required:
                 - theme
                 - scheduledEndTime
@@ -167,6 +327,10 @@ paths:
                   theme:
                     type: string
                     description: テーマ
+                  description:
+                    type: string
+                    description: 説明
+                    nullable: true
                   owner:
                     type: object
                     properties:
@@ -300,11 +464,27 @@ paths:
               - latest
               - oldest
               - mostReplies
+              - nearest
             x-apidog:
               enumDescriptions:
                 latest: ''
                 oldest: ''
                 mostReplies: ''
+                nearest: ''
+        - name: latitude
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: number
+            nullable: true
+        - name: longitude
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: number
+            nullable: true
       responses:
         '200':
           description: 成功
@@ -327,6 +507,10 @@ paths:
                             theme:
                               type: string
                               description: テーマ
+                            description:
+                              type: string
+                              description: 説明
+                              nullable: true
                             owner:
                               type: object
                               properties:
@@ -2374,6 +2558,10 @@ paths:
                             theme:
                               type: string
                               description: テーマ
+                            description:
+                              type: string
+                              description: 説明
+                              nullable: true
                             owner:
                               type: object
                               properties:
@@ -3073,6 +3261,10 @@ paths:
                             theme:
                               type: string
                               description: テーマ
+                            description:
+                              type: string
+                              description: 説明
+                              nullable: true
                             owner:
                               type: object
                               properties:
@@ -3986,6 +4178,10 @@ components:
         theme:
           type: string
           description: テーマ
+        description:
+          type: string
+          description: 説明
+          nullable: true
         owner:
           type: object
           properties:

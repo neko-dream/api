@@ -62,12 +62,13 @@ func (q *Queries) CountTalkSessions(ctx context.Context, arg CountTalkSessionsPa
 }
 
 const createTalkSession = `-- name: CreateTalkSession :exec
-INSERT INTO talk_sessions (talk_session_id, theme, owner_id, scheduled_end_time, created_at, city, prefecture) VALUES ($1, $2, $3, $4, $5, $6, $7)
+INSERT INTO talk_sessions (talk_session_id, theme, description, owner_id, scheduled_end_time, created_at, city, prefecture) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 `
 
 type CreateTalkSessionParams struct {
 	TalkSessionID    uuid.UUID
 	Theme            string
+	Description      sql.NullString
 	OwnerID          uuid.UUID
 	ScheduledEndTime time.Time
 	CreatedAt        time.Time
@@ -79,6 +80,7 @@ func (q *Queries) CreateTalkSession(ctx context.Context, arg CreateTalkSessionPa
 	_, err := q.db.ExecContext(ctx, createTalkSession,
 		arg.TalkSessionID,
 		arg.Theme,
+		arg.Description,
 		arg.OwnerID,
 		arg.ScheduledEndTime,
 		arg.CreatedAt,
@@ -105,18 +107,25 @@ func (q *Queries) CreateTalkSessionLocation(ctx context.Context, arg CreateTalkS
 const editTalkSession = `-- name: EditTalkSession :exec
 UPDATE talk_sessions
     SET theme = $2,
-        scheduled_end_time = $3
+        description = $3,
+        scheduled_end_time = $4
     WHERE talk_session_id = $1
 `
 
 type EditTalkSessionParams struct {
 	TalkSessionID    uuid.UUID
 	Theme            string
+	Description      sql.NullString
 	ScheduledEndTime time.Time
 }
 
 func (q *Queries) EditTalkSession(ctx context.Context, arg EditTalkSessionParams) error {
-	_, err := q.db.ExecContext(ctx, editTalkSession, arg.TalkSessionID, arg.Theme, arg.ScheduledEndTime)
+	_, err := q.db.ExecContext(ctx, editTalkSession,
+		arg.TalkSessionID,
+		arg.Theme,
+		arg.Description,
+		arg.ScheduledEndTime,
+	)
 	return err
 }
 
@@ -124,6 +133,7 @@ const getOwnTalkSessionByUserID = `-- name: GetOwnTalkSessionByUserID :many
 SELECT
     talk_sessions.talk_session_id,
     talk_sessions.theme,
+    talk_sessions.description,
     talk_sessions.scheduled_end_time,
     talk_sessions.city AS city,
     talk_sessions.prefecture AS prefecture,
@@ -174,6 +184,7 @@ type GetOwnTalkSessionByUserIDParams struct {
 type GetOwnTalkSessionByUserIDRow struct {
 	TalkSessionID    uuid.UUID
 	Theme            string
+	Description      sql.NullString
 	ScheduledEndTime time.Time
 	City             sql.NullString
 	Prefecture       sql.NullString
@@ -205,6 +216,7 @@ func (q *Queries) GetOwnTalkSessionByUserID(ctx context.Context, arg GetOwnTalkS
 		if err := rows.Scan(
 			&i.TalkSessionID,
 			&i.Theme,
+			&i.Description,
 			&i.ScheduledEndTime,
 			&i.City,
 			&i.Prefecture,
@@ -234,6 +246,7 @@ const getRespondTalkSessionByUserID = `-- name: GetRespondTalkSessionByUserID :m
 SELECT
     talk_sessions.talk_session_id,
     talk_sessions.theme,
+    talk_sessions.description,
     talk_sessions.scheduled_end_time,
     talk_sessions.city AS city,
     talk_sessions.prefecture AS prefecture,
@@ -286,6 +299,7 @@ type GetRespondTalkSessionByUserIDParams struct {
 type GetRespondTalkSessionByUserIDRow struct {
 	TalkSessionID    uuid.UUID
 	Theme            string
+	Description      sql.NullString
 	ScheduledEndTime time.Time
 	City             sql.NullString
 	Prefecture       sql.NullString
@@ -317,6 +331,7 @@ func (q *Queries) GetRespondTalkSessionByUserID(ctx context.Context, arg GetResp
 		if err := rows.Scan(
 			&i.TalkSessionID,
 			&i.Theme,
+			&i.Description,
 			&i.ScheduledEndTime,
 			&i.City,
 			&i.Prefecture,
@@ -346,6 +361,7 @@ const getTalkSessionByID = `-- name: GetTalkSessionByID :one
 SELECT
     talk_sessions.talk_session_id,
     talk_sessions.theme,
+    talk_sessions.description,
     talk_sessions.created_at,
     talk_sessions.scheduled_end_time,
     talk_sessions.city AS city,
@@ -374,6 +390,7 @@ WHERE talk_sessions.talk_session_id = $1
 type GetTalkSessionByIDRow struct {
 	TalkSessionID    uuid.UUID
 	Theme            string
+	Description      sql.NullString
 	CreatedAt        time.Time
 	ScheduledEndTime time.Time
 	City             sql.NullString
@@ -394,6 +411,7 @@ func (q *Queries) GetTalkSessionByID(ctx context.Context, talkSessionID uuid.UUI
 	err := row.Scan(
 		&i.TalkSessionID,
 		&i.Theme,
+		&i.Description,
 		&i.CreatedAt,
 		&i.ScheduledEndTime,
 		&i.City,
@@ -414,6 +432,7 @@ const listTalkSessions = `-- name: ListTalkSessions :many
 SELECT
     talk_sessions.talk_session_id,
     talk_sessions.theme,
+    talk_sessions.description,
     talk_sessions.scheduled_end_time,
     talk_sessions.city AS city,
     talk_sessions.prefecture AS prefecture,
@@ -467,6 +486,7 @@ type ListTalkSessionsParams struct {
 type ListTalkSessionsRow struct {
 	TalkSessionID    uuid.UUID
 	Theme            string
+	Description      sql.NullString
 	ScheduledEndTime time.Time
 	City             sql.NullString
 	Prefecture       sql.NullString
@@ -498,6 +518,7 @@ func (q *Queries) ListTalkSessions(ctx context.Context, arg ListTalkSessionsPara
 		if err := rows.Scan(
 			&i.TalkSessionID,
 			&i.Theme,
+			&i.Description,
 			&i.ScheduledEndTime,
 			&i.City,
 			&i.Prefecture,

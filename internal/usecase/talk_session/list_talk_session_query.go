@@ -32,6 +32,7 @@ type (
 	TalkSessionDTO struct {
 		ID               string
 		Theme            string
+		Description      *string
 		Owner            UserDTO
 		OpinionCount     int
 		CreatedAt        string
@@ -111,6 +112,10 @@ func (h *listTalkSessionQueryHandler) Execute(ctx context.Context, input ListTal
 		talkSessionDTOList = append(talkSessionDTOList, TalkSessionDTO{
 			ID:    row.TalkSessionID.String(),
 			Theme: row.Theme,
+			Description: utils.ToPtrIfNotNullValue[string](
+				!row.Description.Valid,
+				row.Description.String,
+			),
 			Owner: UserDTO{
 				DisplayID:   row.DisplayID.String,
 				DisplayName: row.DisplayName.String,

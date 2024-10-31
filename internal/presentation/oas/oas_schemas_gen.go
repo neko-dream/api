@@ -70,6 +70,8 @@ type CreateTalkSessionOK struct {
 	ID string `json:"id"`
 	// テーマ.
 	Theme string `json:"theme"`
+	// 説明.
+	Description OptNilString `json:"description"`
 	// 作成者.
 	Owner CreateTalkSessionOKOwner `json:"owner"`
 	// 作成日時.
@@ -92,6 +94,11 @@ func (s *CreateTalkSessionOK) GetID() string {
 // GetTheme returns the value of Theme.
 func (s *CreateTalkSessionOK) GetTheme() string {
 	return s.Theme
+}
+
+// GetDescription returns the value of Description.
+func (s *CreateTalkSessionOK) GetDescription() OptNilString {
+	return s.Description
 }
 
 // GetOwner returns the value of Owner.
@@ -132,6 +139,11 @@ func (s *CreateTalkSessionOK) SetID(val string) {
 // SetTheme sets the value of Theme.
 func (s *CreateTalkSessionOK) SetTheme(val string) {
 	s.Theme = val
+}
+
+// SetDescription sets the value of Description.
+func (s *CreateTalkSessionOK) SetDescription(val OptNilString) {
+	s.Description = val
 }
 
 // SetOwner sets the value of Owner.
@@ -242,6 +254,8 @@ type CreateTalkSessionReq struct {
 	City OptNilString `json:"city"`
 	// 都道府県.
 	Prefecture OptNilString `json:"prefecture"`
+	// 説明文.
+	Description OptNilString `json:"description"`
 }
 
 // GetTheme returns the value of Theme.
@@ -274,6 +288,11 @@ func (s *CreateTalkSessionReq) GetPrefecture() OptNilString {
 	return s.Prefecture
 }
 
+// GetDescription returns the value of Description.
+func (s *CreateTalkSessionReq) GetDescription() OptNilString {
+	return s.Description
+}
+
 // SetTheme sets the value of Theme.
 func (s *CreateTalkSessionReq) SetTheme(val string) {
 	s.Theme = val
@@ -304,6 +323,11 @@ func (s *CreateTalkSessionReq) SetPrefecture(val OptNilString) {
 	s.Prefecture = val
 }
 
+// SetDescription sets the value of Description.
+func (s *CreateTalkSessionReq) SetDescription(val OptNilString) {
+	s.Description = val
+}
+
 type DummiInitBadRequest struct{}
 
 func (*DummiInitBadRequest) dummiInitRes() {}
@@ -315,6 +339,277 @@ func (*DummiInitInternalServerError) dummiInitRes() {}
 type DummiInitOK struct{}
 
 func (*DummiInitOK) dummiInitRes() {}
+
+type EditTalkSessionBadRequest struct{}
+
+func (*EditTalkSessionBadRequest) editTalkSessionRes() {}
+
+type EditTalkSessionInternalServerError struct{}
+
+func (*EditTalkSessionInternalServerError) editTalkSessionRes() {}
+
+type EditTalkSessionOK struct {
+	// トークセッションID.
+	ID string `json:"id"`
+	// テーマ.
+	Theme string `json:"theme"`
+	// 説明.
+	Description OptNilString `json:"description"`
+	// 作成者.
+	Owner EditTalkSessionOKOwner `json:"owner"`
+	// 作成日時.
+	CreatedAt string `json:"createdAt"`
+	// 終了予定日時.
+	ScheduledEndTime string `json:"scheduledEndTime"`
+	// 位置情報.
+	Location OptEditTalkSessionOKLocation `json:"location"`
+	// 市区町村.
+	City OptNilString `json:"city"`
+	// 都道府県.
+	Prefecture OptNilString `json:"prefecture"`
+}
+
+// GetID returns the value of ID.
+func (s *EditTalkSessionOK) GetID() string {
+	return s.ID
+}
+
+// GetTheme returns the value of Theme.
+func (s *EditTalkSessionOK) GetTheme() string {
+	return s.Theme
+}
+
+// GetDescription returns the value of Description.
+func (s *EditTalkSessionOK) GetDescription() OptNilString {
+	return s.Description
+}
+
+// GetOwner returns the value of Owner.
+func (s *EditTalkSessionOK) GetOwner() EditTalkSessionOKOwner {
+	return s.Owner
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *EditTalkSessionOK) GetCreatedAt() string {
+	return s.CreatedAt
+}
+
+// GetScheduledEndTime returns the value of ScheduledEndTime.
+func (s *EditTalkSessionOK) GetScheduledEndTime() string {
+	return s.ScheduledEndTime
+}
+
+// GetLocation returns the value of Location.
+func (s *EditTalkSessionOK) GetLocation() OptEditTalkSessionOKLocation {
+	return s.Location
+}
+
+// GetCity returns the value of City.
+func (s *EditTalkSessionOK) GetCity() OptNilString {
+	return s.City
+}
+
+// GetPrefecture returns the value of Prefecture.
+func (s *EditTalkSessionOK) GetPrefecture() OptNilString {
+	return s.Prefecture
+}
+
+// SetID sets the value of ID.
+func (s *EditTalkSessionOK) SetID(val string) {
+	s.ID = val
+}
+
+// SetTheme sets the value of Theme.
+func (s *EditTalkSessionOK) SetTheme(val string) {
+	s.Theme = val
+}
+
+// SetDescription sets the value of Description.
+func (s *EditTalkSessionOK) SetDescription(val OptNilString) {
+	s.Description = val
+}
+
+// SetOwner sets the value of Owner.
+func (s *EditTalkSessionOK) SetOwner(val EditTalkSessionOKOwner) {
+	s.Owner = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *EditTalkSessionOK) SetCreatedAt(val string) {
+	s.CreatedAt = val
+}
+
+// SetScheduledEndTime sets the value of ScheduledEndTime.
+func (s *EditTalkSessionOK) SetScheduledEndTime(val string) {
+	s.ScheduledEndTime = val
+}
+
+// SetLocation sets the value of Location.
+func (s *EditTalkSessionOK) SetLocation(val OptEditTalkSessionOKLocation) {
+	s.Location = val
+}
+
+// SetCity sets the value of City.
+func (s *EditTalkSessionOK) SetCity(val OptNilString) {
+	s.City = val
+}
+
+// SetPrefecture sets the value of Prefecture.
+func (s *EditTalkSessionOK) SetPrefecture(val OptNilString) {
+	s.Prefecture = val
+}
+
+func (*EditTalkSessionOK) editTalkSessionRes() {}
+
+// 位置情報.
+type EditTalkSessionOKLocation struct {
+	// 緯度.
+	Latitude OptFloat64 `json:"latitude"`
+	// 経度.
+	Longitude OptFloat64 `json:"longitude"`
+}
+
+// GetLatitude returns the value of Latitude.
+func (s *EditTalkSessionOKLocation) GetLatitude() OptFloat64 {
+	return s.Latitude
+}
+
+// GetLongitude returns the value of Longitude.
+func (s *EditTalkSessionOKLocation) GetLongitude() OptFloat64 {
+	return s.Longitude
+}
+
+// SetLatitude sets the value of Latitude.
+func (s *EditTalkSessionOKLocation) SetLatitude(val OptFloat64) {
+	s.Latitude = val
+}
+
+// SetLongitude sets the value of Longitude.
+func (s *EditTalkSessionOKLocation) SetLongitude(val OptFloat64) {
+	s.Longitude = val
+}
+
+// 作成者.
+type EditTalkSessionOKOwner struct {
+	DisplayID   string       `json:"displayID"`
+	DisplayName string       `json:"displayName"`
+	IconURL     OptNilString `json:"iconURL"`
+}
+
+// GetDisplayID returns the value of DisplayID.
+func (s *EditTalkSessionOKOwner) GetDisplayID() string {
+	return s.DisplayID
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *EditTalkSessionOKOwner) GetDisplayName() string {
+	return s.DisplayName
+}
+
+// GetIconURL returns the value of IconURL.
+func (s *EditTalkSessionOKOwner) GetIconURL() OptNilString {
+	return s.IconURL
+}
+
+// SetDisplayID sets the value of DisplayID.
+func (s *EditTalkSessionOKOwner) SetDisplayID(val string) {
+	s.DisplayID = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *EditTalkSessionOKOwner) SetDisplayName(val string) {
+	s.DisplayName = val
+}
+
+// SetIconURL sets the value of IconURL.
+func (s *EditTalkSessionOKOwner) SetIconURL(val OptNilString) {
+	s.IconURL = val
+}
+
+type EditTalkSessionReq struct {
+	Theme            string `json:"theme"`
+	ScheduledEndTime string `json:"scheduledEndTime"`
+	// 緯度.
+	Latitude OptNilFloat64 `json:"latitude"`
+	// 経度.
+	Longitude OptFloat64 `json:"longitude"`
+	// 都道府県.
+	Prefecture OptNilString `json:"prefecture"`
+	// 市区町村.
+	City OptNilString `json:"city"`
+	// 説明文.
+	Description OptNilString `json:"description"`
+}
+
+// GetTheme returns the value of Theme.
+func (s *EditTalkSessionReq) GetTheme() string {
+	return s.Theme
+}
+
+// GetScheduledEndTime returns the value of ScheduledEndTime.
+func (s *EditTalkSessionReq) GetScheduledEndTime() string {
+	return s.ScheduledEndTime
+}
+
+// GetLatitude returns the value of Latitude.
+func (s *EditTalkSessionReq) GetLatitude() OptNilFloat64 {
+	return s.Latitude
+}
+
+// GetLongitude returns the value of Longitude.
+func (s *EditTalkSessionReq) GetLongitude() OptFloat64 {
+	return s.Longitude
+}
+
+// GetPrefecture returns the value of Prefecture.
+func (s *EditTalkSessionReq) GetPrefecture() OptNilString {
+	return s.Prefecture
+}
+
+// GetCity returns the value of City.
+func (s *EditTalkSessionReq) GetCity() OptNilString {
+	return s.City
+}
+
+// GetDescription returns the value of Description.
+func (s *EditTalkSessionReq) GetDescription() OptNilString {
+	return s.Description
+}
+
+// SetTheme sets the value of Theme.
+func (s *EditTalkSessionReq) SetTheme(val string) {
+	s.Theme = val
+}
+
+// SetScheduledEndTime sets the value of ScheduledEndTime.
+func (s *EditTalkSessionReq) SetScheduledEndTime(val string) {
+	s.ScheduledEndTime = val
+}
+
+// SetLatitude sets the value of Latitude.
+func (s *EditTalkSessionReq) SetLatitude(val OptNilFloat64) {
+	s.Latitude = val
+}
+
+// SetLongitude sets the value of Longitude.
+func (s *EditTalkSessionReq) SetLongitude(val OptFloat64) {
+	s.Longitude = val
+}
+
+// SetPrefecture sets the value of Prefecture.
+func (s *EditTalkSessionReq) SetPrefecture(val OptNilString) {
+	s.Prefecture = val
+}
+
+// SetCity sets the value of City.
+func (s *EditTalkSessionReq) SetCity(val OptNilString) {
+	s.City = val
+}
+
+// SetDescription sets the value of Description.
+func (s *EditTalkSessionReq) SetDescription(val OptNilString) {
+	s.Description = val
+}
 
 type EditUserProfileBadRequest struct {
 	Code    string `json:"code"`
@@ -807,6 +1102,8 @@ type GetOpenedTalkSessionOKTalkSessionsItemTalkSession struct {
 	ID string `json:"id"`
 	// テーマ.
 	Theme string `json:"theme"`
+	// 説明.
+	Description OptNilString `json:"description"`
 	// 作成者.
 	Owner GetOpenedTalkSessionOKTalkSessionsItemTalkSessionOwner `json:"owner"`
 	// 作成日時.
@@ -829,6 +1126,11 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) GetID() string {
 // GetTheme returns the value of Theme.
 func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) GetTheme() string {
 	return s.Theme
+}
+
+// GetDescription returns the value of Description.
+func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) GetDescription() OptNilString {
+	return s.Description
 }
 
 // GetOwner returns the value of Owner.
@@ -869,6 +1171,11 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) SetID(val string) {
 // SetTheme sets the value of Theme.
 func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) SetTheme(val string) {
 	s.Theme = val
+}
+
+// SetDescription sets the value of Description.
+func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) SetDescription(val OptNilString) {
+	s.Description = val
 }
 
 // SetOwner sets the value of Owner.
@@ -1632,6 +1939,8 @@ type GetTalkSessionDetailOK struct {
 	ID string `json:"id"`
 	// テーマ.
 	Theme string `json:"theme"`
+	// 説明.
+	Description OptNilString `json:"description"`
 	// 作成者.
 	Owner GetTalkSessionDetailOKOwner `json:"owner"`
 	// 作成日時.
@@ -1654,6 +1963,11 @@ func (s *GetTalkSessionDetailOK) GetID() string {
 // GetTheme returns the value of Theme.
 func (s *GetTalkSessionDetailOK) GetTheme() string {
 	return s.Theme
+}
+
+// GetDescription returns the value of Description.
+func (s *GetTalkSessionDetailOK) GetDescription() OptNilString {
+	return s.Description
 }
 
 // GetOwner returns the value of Owner.
@@ -1694,6 +2008,11 @@ func (s *GetTalkSessionDetailOK) SetID(val string) {
 // SetTheme sets the value of Theme.
 func (s *GetTalkSessionDetailOK) SetTheme(val string) {
 	s.Theme = val
+}
+
+// SetDescription sets the value of Description.
+func (s *GetTalkSessionDetailOK) SetDescription(val OptNilString) {
+	s.Description = val
 }
 
 // SetOwner sets the value of Owner.
@@ -1940,6 +2259,8 @@ type GetTalkSessionListOKTalkSessionsItemTalkSession struct {
 	ID string `json:"id"`
 	// テーマ.
 	Theme string `json:"theme"`
+	// 説明.
+	Description OptNilString `json:"description"`
 	// 作成者.
 	Owner GetTalkSessionListOKTalkSessionsItemTalkSessionOwner `json:"owner"`
 	// 作成日時.
@@ -1962,6 +2283,11 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetID() string {
 // GetTheme returns the value of Theme.
 func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetTheme() string {
 	return s.Theme
+}
+
+// GetDescription returns the value of Description.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetDescription() OptNilString {
+	return s.Description
 }
 
 // GetOwner returns the value of Owner.
@@ -2002,6 +2328,11 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetID(val string) {
 // SetTheme sets the value of Theme.
 func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetTheme(val string) {
 	s.Theme = val
+}
+
+// SetDescription sets the value of Description.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetDescription(val OptNilString) {
+	s.Description = val
 }
 
 // SetOwner sets the value of Owner.
@@ -2105,6 +2436,7 @@ const (
 	GetTalkSessionListSortKeyLatest      GetTalkSessionListSortKey = "latest"
 	GetTalkSessionListSortKeyOldest      GetTalkSessionListSortKey = "oldest"
 	GetTalkSessionListSortKeyMostReplies GetTalkSessionListSortKey = "mostReplies"
+	GetTalkSessionListSortKeyNearest     GetTalkSessionListSortKey = "nearest"
 )
 
 // AllValues returns all GetTalkSessionListSortKey values.
@@ -2113,6 +2445,7 @@ func (GetTalkSessionListSortKey) AllValues() []GetTalkSessionListSortKey {
 		GetTalkSessionListSortKeyLatest,
 		GetTalkSessionListSortKeyOldest,
 		GetTalkSessionListSortKeyMostReplies,
+		GetTalkSessionListSortKeyNearest,
 	}
 }
 
@@ -2124,6 +2457,8 @@ func (s GetTalkSessionListSortKey) MarshalText() ([]byte, error) {
 	case GetTalkSessionListSortKeyOldest:
 		return []byte(s), nil
 	case GetTalkSessionListSortKeyMostReplies:
+		return []byte(s), nil
+	case GetTalkSessionListSortKeyNearest:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -2141,6 +2476,9 @@ func (s *GetTalkSessionListSortKey) UnmarshalText(data []byte) error {
 		return nil
 	case GetTalkSessionListSortKeyMostReplies:
 		*s = GetTalkSessionListSortKeyMostReplies
+		return nil
+	case GetTalkSessionListSortKeyNearest:
+		*s = GetTalkSessionListSortKeyNearest
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -4803,6 +5141,98 @@ func (o OptCreateTalkSessionReq) Get() (v CreateTalkSessionReq, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptCreateTalkSessionReq) Or(d CreateTalkSessionReq) CreateTalkSessionReq {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptEditTalkSessionOKLocation returns new OptEditTalkSessionOKLocation with value set to v.
+func NewOptEditTalkSessionOKLocation(v EditTalkSessionOKLocation) OptEditTalkSessionOKLocation {
+	return OptEditTalkSessionOKLocation{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptEditTalkSessionOKLocation is optional EditTalkSessionOKLocation.
+type OptEditTalkSessionOKLocation struct {
+	Value EditTalkSessionOKLocation
+	Set   bool
+}
+
+// IsSet returns true if OptEditTalkSessionOKLocation was set.
+func (o OptEditTalkSessionOKLocation) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptEditTalkSessionOKLocation) Reset() {
+	var v EditTalkSessionOKLocation
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptEditTalkSessionOKLocation) SetTo(v EditTalkSessionOKLocation) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptEditTalkSessionOKLocation) Get() (v EditTalkSessionOKLocation, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptEditTalkSessionOKLocation) Or(d EditTalkSessionOKLocation) EditTalkSessionOKLocation {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptEditTalkSessionReq returns new OptEditTalkSessionReq with value set to v.
+func NewOptEditTalkSessionReq(v EditTalkSessionReq) OptEditTalkSessionReq {
+	return OptEditTalkSessionReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptEditTalkSessionReq is optional EditTalkSessionReq.
+type OptEditTalkSessionReq struct {
+	Value EditTalkSessionReq
+	Set   bool
+}
+
+// IsSet returns true if OptEditTalkSessionReq was set.
+func (o OptEditTalkSessionReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptEditTalkSessionReq) Reset() {
+	var v EditTalkSessionReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptEditTalkSessionReq) SetTo(v EditTalkSessionReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptEditTalkSessionReq) Get() (v EditTalkSessionReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptEditTalkSessionReq) Or(d EditTalkSessionReq) EditTalkSessionReq {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -7903,6 +8333,8 @@ type SessionsHistoryOKTalkSessionsItemTalkSession struct {
 	ID string `json:"id"`
 	// テーマ.
 	Theme string `json:"theme"`
+	// 説明.
+	Description OptNilString `json:"description"`
 	// 作成者.
 	Owner SessionsHistoryOKTalkSessionsItemTalkSessionOwner `json:"owner"`
 	// 作成日時.
@@ -7925,6 +8357,11 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) GetID() string {
 // GetTheme returns the value of Theme.
 func (s *SessionsHistoryOKTalkSessionsItemTalkSession) GetTheme() string {
 	return s.Theme
+}
+
+// GetDescription returns the value of Description.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSession) GetDescription() OptNilString {
+	return s.Description
 }
 
 // GetOwner returns the value of Owner.
@@ -7965,6 +8402,11 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetID(val string) {
 // SetTheme sets the value of Theme.
 func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetTheme(val string) {
 	s.Theme = val
+}
+
+// SetDescription sets the value of Description.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetDescription(val OptNilString) {
+	s.Description = val
 }
 
 // SetOwner sets the value of Owner.

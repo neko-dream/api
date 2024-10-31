@@ -345,7 +345,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 							elem = origElem
 						}
-						// Param: "talkSessionID"
+						// Param: "talkSessionId"
 						// Match until "/"
 						idx := strings.IndexByte(elem, '/')
 						if idx < 0 {
@@ -360,8 +360,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								s.handleGetTalkSessionDetailRequest([1]string{
 									args[0],
 								}, elemIsEscaped, w, r)
+							case "PUT":
+								s.handleEditTalkSessionRequest([1]string{
+									args[0],
+								}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "GET")
+								s.notAllowed(w, r, "GET,PUT")
 							}
 
 							return
@@ -1173,7 +1177,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 
 							elem = origElem
 						}
-						// Param: "talkSessionID"
+						// Param: "talkSessionId"
 						// Match until "/"
 						idx := strings.IndexByte(elem, '/')
 						if idx < 0 {
@@ -1188,6 +1192,14 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = "GetTalkSessionDetail"
 								r.summary = "トークセッションの詳細"
 								r.operationID = "getTalkSessionDetail"
+								r.pathPattern = "/talksessions/{talkSessionId}"
+								r.args = args
+								r.count = 1
+								return r, true
+							case "PUT":
+								r.name = "EditTalkSession"
+								r.summary = "セッション編集"
+								r.operationID = "editTalkSession"
 								r.pathPattern = "/talksessions/{talkSessionId}"
 								r.args = args
 								r.count = 1

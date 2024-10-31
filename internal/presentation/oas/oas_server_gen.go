@@ -116,6 +116,12 @@ type TalkSessionHandler interface {
 	//
 	// POST /talksessions
 	CreateTalkSession(ctx context.Context, req OptCreateTalkSessionReq) (CreateTalkSessionRes, error)
+	// EditTalkSession implements editTalkSession operation.
+	//
+	// セッション編集.
+	//
+	// PUT /talksessions/{talkSessionId}
+	EditTalkSession(ctx context.Context, req OptEditTalkSessionReq, params EditTalkSessionParams) (EditTalkSessionRes, error)
 	// GetConclusion implements getConclusion operation.
 	//
 	// 結論取得.

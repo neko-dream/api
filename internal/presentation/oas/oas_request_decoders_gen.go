@@ -295,7 +295,342 @@ func (s *Server) decodeCreateTalkSessionRequest(r *http.Request) (
 					}
 				}
 			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "description",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotDescriptionVal string
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToString(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotDescriptionVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.Description.SetTo(optFormDotDescriptionVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"description\"")
+					}
+				}
+			}
 			request = OptCreateTalkSessionReq{
+				Value: optForm,
+				Set:   true,
+			}
+		}
+		return request, close, nil
+	default:
+		return req, close, validate.InvalidContentType(ct)
+	}
+}
+
+func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
+	req OptEditTalkSessionReq,
+	close func() error,
+	rerr error,
+) {
+	var closers []func() error
+	close = func() error {
+		var merr error
+		// Close in reverse order, to match defer behavior.
+		for i := len(closers) - 1; i >= 0; i-- {
+			c := closers[i]
+			merr = multierr.Append(merr, c())
+		}
+		return merr
+	}
+	defer func() {
+		if rerr != nil {
+			rerr = multierr.Append(rerr, close())
+		}
+	}()
+	if _, ok := r.Header["Content-Type"]; !ok && r.ContentLength == 0 {
+		return req, close, nil
+	}
+	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
+	if err != nil {
+		return req, close, errors.Wrap(err, "parse media type")
+	}
+	switch {
+	case ct == "multipart/form-data":
+		if r.ContentLength == 0 {
+			return req, close, nil
+		}
+		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
+			return req, close, errors.Wrap(err, "parse multipart form")
+		}
+		// Remove all temporary files created by ParseMultipartForm when the request is done.
+		//
+		// Notice that the closers are called in reverse order, to match defer behavior, so
+		// any opened file will be closed before RemoveAll call.
+		closers = append(closers, r.MultipartForm.RemoveAll)
+		// Form values may be unused.
+		form := url.Values(r.MultipartForm.Value)
+		_ = form
+
+		var request OptEditTalkSessionReq
+		{
+			var optForm EditTalkSessionReq
+			q := uri.NewQueryDecoder(form)
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "theme",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						optForm.Theme = c
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"theme\"")
+					}
+				} else {
+					return req, close, errors.Wrap(err, "query")
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "scheduledEndTime",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						optForm.ScheduledEndTime = c
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"scheduledEndTime\"")
+					}
+				} else {
+					return req, close, errors.Wrap(err, "query")
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "latitude",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotLatitudeVal float64
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToFloat64(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotLatitudeVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.Latitude.SetTo(optFormDotLatitudeVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"latitude\"")
+					}
+					if err := func() error {
+						if value, ok := optForm.Latitude.Get(); ok {
+							if err := func() error {
+								if err := (validate.Float{}).Validate(float64(value)); err != nil {
+									return errors.Wrap(err, "float")
+								}
+								return nil
+							}(); err != nil {
+								return err
+							}
+						}
+						return nil
+					}(); err != nil {
+						return req, close, errors.Wrap(err, "validate")
+					}
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "longitude",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotLongitudeVal float64
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToFloat64(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotLongitudeVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.Longitude.SetTo(optFormDotLongitudeVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"longitude\"")
+					}
+					if err := func() error {
+						if value, ok := optForm.Longitude.Get(); ok {
+							if err := func() error {
+								if err := (validate.Float{}).Validate(float64(value)); err != nil {
+									return errors.Wrap(err, "float")
+								}
+								return nil
+							}(); err != nil {
+								return err
+							}
+						}
+						return nil
+					}(); err != nil {
+						return req, close, errors.Wrap(err, "validate")
+					}
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "prefecture",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotPrefectureVal string
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToString(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotPrefectureVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.Prefecture.SetTo(optFormDotPrefectureVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"prefecture\"")
+					}
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "city",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotCityVal string
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToString(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotCityVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.City.SetTo(optFormDotCityVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"city\"")
+					}
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "description",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotDescriptionVal string
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToString(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotDescriptionVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.Description.SetTo(optFormDotDescriptionVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"description\"")
+					}
+				}
+			}
+			request = OptEditTalkSessionReq{
 				Value: optForm,
 				Set:   true,
 			}

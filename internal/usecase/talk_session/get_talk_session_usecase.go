@@ -60,6 +60,7 @@ func (i *getTalkSessionDetailInteractor) Execute(ctx context.Context, input GetT
 		ID:               talkSessionRow.TalkSessionID.String(),
 		Theme:            talkSessionRow.Theme,
 		Owner:            owner,
+		Description:      utils.ToPtrIfNotNullValue(!talkSessionRow.Description.Valid, talkSessionRow.Description.String),
 		ScheduledEndTime: talkSessionRow.ScheduledEndTime.Format(time.RFC3339),
 		CreatedAt:        talkSessionRow.CreatedAt.Format(time.RFC3339),
 		Location:         location,

@@ -21,6 +21,7 @@ type (
 	CreateTalkSessionInput struct {
 		OwnerID          shared.UUID[user.User]
 		Theme            string
+		Description      *string
 		ScheduledEndTime time.Time
 		Latitude         *float64
 		Longitude        *float64
@@ -57,6 +58,7 @@ func (i *createTalkSessionInteractor) Execute(ctx context.Context, input CreateT
 		talkSession := talksession.NewTalkSession(
 			talkSessionID,
 			input.Theme,
+			input.Description,
 			input.OwnerID,
 			time.Now(ctx),
 			input.ScheduledEndTime,

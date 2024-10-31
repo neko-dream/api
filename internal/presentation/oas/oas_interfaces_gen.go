@@ -9,6 +9,10 @@ type DummiInitRes interface {
 	dummiInitRes()
 }
 
+type EditTalkSessionRes interface {
+	editTalkSessionRes()
+}
+
 type EditUserProfileRes interface {
 	editUserProfileRes()
 }

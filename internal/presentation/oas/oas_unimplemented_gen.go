@@ -40,6 +40,15 @@ func (UnimplementedHandler) DummiInit(ctx context.Context) (r DummiInitRes, _ er
 	return r, ht.ErrNotImplemented
 }
 
+// EditTalkSession implements editTalkSession operation.
+//
+// セッション編集.
+//
+// PUT /talksessions/{talkSessionId}
+func (UnimplementedHandler) EditTalkSession(ctx context.Context, req OptEditTalkSessionReq, params EditTalkSessionParams) (r EditTalkSessionRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // EditUserProfile implements editUserProfile operation.
 //
 // ユーザー情報の変更.

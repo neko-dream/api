@@ -127,6 +127,71 @@ func decodeAuthorizeParams(args [1]string, argsEscaped bool, r *http.Request) (p
 	return params, nil
 }
 
+// EditTalkSessionParams is parameters of editTalkSession operation.
+type EditTalkSessionParams struct {
+	TalkSessionId string
+}
+
+func unpackEditTalkSessionParams(packed middleware.Parameters) (params EditTalkSessionParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "talkSessionId",
+			In:   "path",
+		}
+		params.TalkSessionId = packed[key].(string)
+	}
+	return params
+}
+
+func decodeEditTalkSessionParams(args [1]string, argsEscaped bool, r *http.Request) (params EditTalkSessionParams, _ error) {
+	// Decode path: talkSessionId.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "talkSessionId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.TalkSessionId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "talkSessionId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // GetConclusionParams is parameters of getConclusion operation.
 type GetConclusionParams struct {
 	TalkSessionID string
@@ -852,10 +917,12 @@ type GetTalkSessionListParams struct {
 	// 1ページあたりの要素数.
 	Limit OptNilInt
 	// どの要素から始めるか.
-	Offset  OptNilInt
-	Theme   OptNilString
-	Status  OptNilGetTalkSessionListStatus
-	SortKey OptGetTalkSessionListSortKey
+	Offset    OptNilInt
+	Theme     OptNilString
+	Status    OptNilGetTalkSessionListStatus
+	SortKey   OptGetTalkSessionListSortKey
+	Latitude  OptNilFloat64
+	Longitude OptNilFloat64
 }
 
 func unpackGetTalkSessionListParams(packed middleware.Parameters) (params GetTalkSessionListParams) {
@@ -902,6 +969,24 @@ func unpackGetTalkSessionListParams(packed middleware.Parameters) (params GetTal
 		}
 		if v, ok := packed[key]; ok {
 			params.SortKey = v.(OptGetTalkSessionListSortKey)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "latitude",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Latitude = v.(OptNilFloat64)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "longitude",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Longitude = v.(OptNilFloat64)
 		}
 	}
 	return params
@@ -1145,6 +1230,118 @@ func decodeGetTalkSessionListParams(args [0]string, argsEscaped bool, r *http.Re
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "sortKey",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: latitude.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "latitude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotLatitudeVal float64
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToFloat64(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotLatitudeVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Latitude.SetTo(paramsDotLatitudeVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.Latitude.Get(); ok {
+					if err := func() error {
+						if err := (validate.Float{}).Validate(float64(value)); err != nil {
+							return errors.Wrap(err, "float")
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "latitude",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: longitude.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "longitude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotLongitudeVal float64
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToFloat64(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotLongitudeVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Longitude.SetTo(paramsDotLongitudeVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.Longitude.Get(); ok {
+					if err := func() error {
+						if err := (validate.Float{}).Validate(float64(value)); err != nil {
+							return errors.Wrap(err, "float")
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "longitude",
 			In:   "query",
 			Err:  err,
 		}

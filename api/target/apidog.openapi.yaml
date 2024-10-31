@@ -94,6 +94,136 @@
         },
         "security": [],
         "x-ogen-operation-group": "TalkSession"
+      },
+      "put": {
+        "summary": "セッション編集",
+        "deprecated": false,
+        "description": "",
+        "operationId": "editTalkSession",
+        "tags": [
+          "talk_session"
+        ],
+        "parameters": [
+          {
+            "name": "talkSessionId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "theme": {
+                    "example": "",
+                    "type": "string"
+                  },
+                  "scheduledEndTime": {
+                    "example": "",
+                    "type": "string"
+                  },
+                  "latitude": {
+                    "type": "number",
+                    "description": "緯度",
+                    "example": 0,
+                    "nullable": true
+                  },
+                  "longitude": {
+                    "type": "number",
+                    "description": "経度",
+                    "example": 0
+                  },
+                  "prefecture": {
+                    "type": "string",
+                    "description": "都道府県",
+                    "example": "",
+                    "nullable": true
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "市区町村",
+                    "example": "",
+                    "nullable": true
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "説明文",
+                    "example": "",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "theme",
+                  "scheduledEndTime"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/talkSession"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ErrorResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "ServerErrorResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
+        "x-ogen-operation-group": "TalkSession"
       }
     },
     "/talksessions": {
@@ -146,6 +276,12 @@
                     "description": "都道府県",
                     "example": "",
                     "nullable": true
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "説明文",
+                    "example": "",
+                    "nullable": true
                   }
                 },
                 "required": [
@@ -171,6 +307,11 @@
                     "theme": {
                       "type": "string",
                       "description": "テーマ"
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "説明",
+                      "nullable": true
                     },
                     "owner": {
                       "$ref": "#/components/schemas/user",
@@ -327,15 +468,37 @@
               "enum": [
                 "latest",
                 "oldest",
-                "mostReplies"
+                "mostReplies",
+                "nearest"
               ],
               "x-apidog": {
                 "enumDescriptions": {
                   "latest": "",
                   "oldest": "",
-                  "mostReplies": ""
+                  "mostReplies": "",
+                  "nearest": ""
                 }
               }
+            }
+          },
+          {
+            "name": "latitude",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "nullable": true
+            }
+          },
+          {
+            "name": "longitude",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "nullable": true
             }
           }
         ],
@@ -3810,6 +3973,11 @@
           "theme": {
             "type": "string",
             "description": "テーマ"
+          },
+          "description": {
+            "type": "string",
+            "description": "説明",
+            "nullable": true
           },
           "owner": {
             "$ref": "#/components/schemas/user",

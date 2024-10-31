@@ -226,9 +226,11 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 	longitude := utils.ToPtrIfNotNullValue(!req.Value.Longitude.IsSet(), req.Value.Longitude.Value)
 	city := utils.ToPtrIfNotNullValue(!req.Value.City.IsSet(), req.Value.City.Value)
 	prefecture := utils.ToPtrIfNotNullValue(!req.Value.Prefecture.IsSet(), req.Value.Prefecture.Value)
+	description := utils.ToPtrIfNotNullValue(!req.Value.Description.IsSet(), req.Value.Description.Value)
 
 	out, err := t.createTalkSessionUsecase.Execute(ctx, talk_session_usecase.CreateTalkSessionInput{
 		Theme:            req.Value.Theme,
+		Description:      description,
 		OwnerID:          userID,
 		ScheduledEndTime: time.NewTime(ctx, req.Value.ScheduledEndTime),
 		Latitude:         latitude,
@@ -262,6 +264,7 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 			),
 		},
 		Theme:            out.TalkSession.Theme(),
+		Description:      utils.ToOptNil[oas.OptNilString](out.TalkSession.Description()),
 		ID:               out.TalkSession.TalkSessionID().String(),
 		CreatedAt:        time.Now(ctx).Format(ctx),
 		ScheduledEndTime: out.TalkSession.ScheduledEndTime().Format(ctx),
@@ -299,6 +302,7 @@ func (t *talkSessionHandler) GetTalkSessionDetail(ctx context.Context, params oa
 	return &oas.GetTalkSessionDetailOK{
 		ID:               out.ID,
 		Theme:            out.Theme,
+		Description:      utils.ToOptNil[oas.OptNilString](out.Description),
 		Owner:            owner,
 		CreatedAt:        out.CreatedAt,
 		ScheduledEndTime: out.ScheduledEndTime,
@@ -366,6 +370,7 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 			TalkSession: oas.GetTalkSessionListOKTalkSessionsItemTalkSession{
 				ID:               talkSession.ID,
 				Theme:            talkSession.Theme,
+				Description:      utils.ToOptNil[oas.OptNilString](talkSession.Description),
 				Owner:            owner,
 				CreatedAt:        talkSession.CreatedAt,
 				ScheduledEndTime: talkSession.ScheduledEndTime,
@@ -474,4 +479,9 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 		Positions:     positions,
 		GroupOpinions: groupOpinions,
 	}, nil
+}
+
+// EditTalkSession implements oas.TalkSessionHandler.
+func (t *talkSessionHandler) EditTalkSession(ctx context.Context, req oas.OptEditTalkSessionReq, params oas.EditTalkSessionParams) (oas.EditTalkSessionRes, error) {
+	panic("unimplemented")
 }
