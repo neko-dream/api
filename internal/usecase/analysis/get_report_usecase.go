@@ -10,6 +10,7 @@ import (
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/infrastructure/db"
 	model "github.com/neko-dream/server/internal/infrastructure/db/sqlc"
+	"github.com/neko-dream/server/pkg/utils"
 )
 
 type (
@@ -46,6 +47,7 @@ func (h *GetReportQueryHandler) Execute(ctx context.Context, input GetReportInpu
 		TalkSessionID: input.TalkSessionID.UUID(),
 	})
 	if err != nil {
+		utils.HandleError(ctx, err, "トークセッションIDに紐づく意見の取得に失敗しました")
 		return nil, err
 	}
 	if len(rows) == 0 {
@@ -59,6 +61,7 @@ func (h *GetReportQueryHandler) Execute(ctx context.Context, input GetReportInpu
 				return nil, err
 			}
 		}
+		utils.HandleError(ctx, err, "レポートの生成に失敗しました")
 		return nil, err
 	}
 
