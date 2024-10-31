@@ -154,6 +154,7 @@ LEFT JOIN (
 ) rc ON opinions.opinion_id = rc.parent_opinion_id
 WHERE representative_opinions.rank < 4
     AND opinions.talk_session_id = $1
+ORDER BY representative_opinions.rank
 `
 
 type GetRepresentativeOpinionsByTalkSessionIdRow struct {
