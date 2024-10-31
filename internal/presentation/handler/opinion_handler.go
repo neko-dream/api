@@ -355,6 +355,7 @@ func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.Opinion
 			Value: oas.OpinionCommentsOKRootOpinionOpinionVoteType(opinions.RootOpinion.Opinion.VoteType),
 			Set:   true,
 		},
+		ParentID:     utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.ParentOpinionID),
 		PictureURL:   utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.PictureURL),
 		ReferenceURL: utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.ReferenceURL),
 		PostedAt:     opinions.RootOpinion.Opinion.CreatedAt.Format(time.RFC3339),
