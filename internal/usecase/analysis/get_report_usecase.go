@@ -9,6 +9,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/infrastructure/db"
+	model "github.com/neko-dream/server/internal/infrastructure/db/sqlc"
 )
 
 type (
@@ -41,6 +42,15 @@ func NewGetReportQueryHandler(
 }
 
 func (h *GetReportQueryHandler) Execute(ctx context.Context, input GetReportInput) (*GetReportOutput, error) {
+	rows, err := h.GetQueries(ctx).GetOpinionsByTalkSessionID(ctx, model.GetOpinionsByTalkSessionIDParams{
+		TalkSessionID: input.TalkSessionID.UUID(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(rows) == 0 {
+		return nil, errors.New("opinions not found")
+	}
 
 	out, err := h.GetQueries(ctx).GetReportByTalkSessionId(ctx, input.TalkSessionID.UUID())
 	if err != nil {
