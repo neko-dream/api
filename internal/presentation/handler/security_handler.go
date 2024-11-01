@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"log"
 	"slices"
 
 	"github.com/neko-dream/server/internal/domain/messages"
@@ -23,6 +24,7 @@ func (s *securityHandler) HandleSessionId(ctx context.Context, operationName str
 	// セッションIDを取得
 	claim, err := s.TokenManager.Parse(ctx, t.GetAPIKey())
 	if err != nil {
+		log.Println("claim ", claim.Audience(), claim.IsVerify, claim.IsExpired())
 		return ctx, messages.ForbiddenError
 	}
 	// トークンの有効性を確認
