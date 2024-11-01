@@ -170,6 +170,7 @@ WHERE
         ELSE TRUE
     END
 GROUP BY talk_sessions.talk_session_id, oc.opinion_count, users.display_name, users.display_id, users.icon_url, talk_session_locations.talk_session_id
+ORDER BY talk_sessions.created_at DESC
 LIMIT $1 OFFSET $2
 `
 
@@ -285,6 +286,7 @@ WHERE
         ELSE TRUE
     END
 GROUP BY talk_sessions.talk_session_id, oc.opinion_count, users.display_name, users.display_id, users.icon_url, talk_session_locations.talk_session_id
+ORDER BY talk_sessions.created_at DESC
 LIMIT $1 OFFSET $2
 `
 
