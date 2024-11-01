@@ -44,7 +44,10 @@ func NewGetReportQueryHandler(
 
 func (h *GetReportQueryHandler) Execute(ctx context.Context, input GetReportInput) (*GetReportOutput, error) {
 	rows, err := h.GetQueries(ctx).GetOpinionsByTalkSessionID(ctx, model.GetOpinionsByTalkSessionIDParams{
+		Limit:         10000,
+		Offset:        0,
 		TalkSessionID: input.TalkSessionID.UUID(),
+		SortKey:       sql.NullString{String: "latest", Valid: true},
 	})
 	if err != nil {
 		utils.HandleError(ctx, err, "トークセッションIDに紐づく意見の取得に失敗しました")

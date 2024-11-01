@@ -272,7 +272,8 @@ LEFT JOIN (
     SELECT COUNT(opinion_id) AS reply_count, parent_opinion_id
     FROM opinions
     GROUP BY parent_opinion_id
-) rc ON o.opinion_id = rc.parent_opinion_id;
+) rc ON o.opinion_id = rc.parent_opinion_id
+ORDER BY ot.level ASC;
 
 -- name: CountOpinions :one
 SELECT
