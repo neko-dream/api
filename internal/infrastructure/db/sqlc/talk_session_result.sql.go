@@ -80,8 +80,10 @@ SELECT
     users.display_id AS display_id,
     users.icon_url AS icon_url
 FROM action_items
+LEFT JOIN talk_sessions
+    ON talk_sessions.talk_session_id = action_items.talk_session_id
 LEFT JOIN users
-    ON action_items.created_by = users.user_id
+    ON talk_sessions.owner_id = users.user_id
 WHERE action_item_id = $1
 ORDER BY action_items.sequence
 `
