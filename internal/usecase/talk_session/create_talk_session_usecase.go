@@ -2,6 +2,7 @@ package talk_session_usecase
 
 import (
 	"context"
+	"unicode/utf8"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/messages"
@@ -44,6 +45,15 @@ type (
 
 func (i *createTalkSessionInteractor) Execute(ctx context.Context, input CreateTalkSessionInput) (CreateTalkSessionOutput, error) {
 	var output CreateTalkSessionOutput
+
+	// Themeは20文字
+	if utf8.RuneCountInString(input.Theme) > 20 {
+		return output, messages.TalkSessionThemeTooLong
+	}
+	// Descriptionは400文字
+	if input.Description != nil && utf8.RuneCountInString(*input.Description) > 400 {
+		return output, messages.TalkSessionDescriptionTooLong
+	}
 
 	if err := i.ExecTx(ctx, func(ctx context.Context) error {
 		talkSessionID := shared.NewUUID[talksession.TalkSession]()

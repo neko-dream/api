@@ -31,4 +31,14 @@ var (
 		Code:       "TALKSESSION-0005",
 		Message:    "セッションが見つかりません。",
 	}
+	TalkSessionDescriptionTooLong = &APIError{
+		StatusCode: 400,
+		Code:       "TALKSESSION-0006",
+		Message:    "セッションの説明が長すぎます。400文字以内で入力してください。",
+	}
+	TalkSessionThemeTooLong = &APIError{
+		StatusCode: 400,
+		Code:       "TALKSESSION-0007",
+		Message:    "セッションのテーマが長すぎます。20文字以内で入力してください。",
+	}
 )
