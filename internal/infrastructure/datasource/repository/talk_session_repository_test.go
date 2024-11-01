@@ -2,7 +2,6 @@ package repository_test
 
 import (
 	"errors"
-	"log"
 	"testing"
 
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -61,8 +60,6 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 				if ts.TalkSessionID != talkSessionID.UUID() {
 					return errors.New("トークセッションIDが一致しません")
 				}
-
-				log.Println(ts)
 
 				return nil
 			},

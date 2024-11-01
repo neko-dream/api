@@ -2,7 +2,6 @@ package repository_test
 
 import (
 	"errors"
-	"log"
 	"testing"
 
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -63,7 +62,6 @@ func TestUserRepository_Create(t *testing.T) {
 				if usr.UserID != userID.UUID() {
 					return errors.New("ユーザーIDが一致しません")
 				}
-				log.Println(usr)
 
 				return nil
 			},

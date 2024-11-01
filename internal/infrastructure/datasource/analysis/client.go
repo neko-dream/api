@@ -26,7 +26,6 @@ func NewAnalysisService(
 
 // GenerateReport implements analysis.AnalysisService.
 func (a *analysisService) GenerateReport(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession]) error {
-	log.Println("GenerateReport", talkSessionID)
 	// カスタムHTTPクライアントを作成
 	httpClient := &http.Client{
 		Transport: &BasicAuthTransport{
@@ -61,7 +60,6 @@ func (a *analysisService) GenerateReport(ctx context.Context, talkSessionID shar
 
 // StartAnalysis 会話分析を開始する
 func (a *analysisService) StartAnalysis(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession]) error {
-	log.Println("start analysis", talkSessionID)
 	// カスタムHTTPクライアントを作成
 	httpClient := &http.Client{
 		Transport: &BasicAuthTransport{
