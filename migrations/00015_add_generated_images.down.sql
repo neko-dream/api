@@ -1,0 +1,1 @@
+DROP TABLE talk_session_generated_images;

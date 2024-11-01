@@ -29,11 +29,19 @@ type PostReportsGeneratesJSONBody struct {
 	TalkSessionId string `json:"talk_session_id"`
 }
 
+// PostReportsWordcloudsJSONBody defines parameters for PostReportsWordclouds.
+type PostReportsWordcloudsJSONBody struct {
+	TalkSessionId string `json:"talk_session_id"`
+}
+
 // PostPredictsGroupsJSONRequestBody defines body for PostPredictsGroups for application/json ContentType.
 type PostPredictsGroupsJSONRequestBody PostPredictsGroupsJSONBody
 
 // PostReportsGeneratesJSONRequestBody defines body for PostReportsGenerates for application/json ContentType.
 type PostReportsGeneratesJSONRequestBody PostReportsGeneratesJSONBody
+
+// PostReportsWordcloudsJSONRequestBody defines body for PostReportsWordclouds for application/json ContentType.
+type PostReportsWordcloudsJSONRequestBody PostReportsWordcloudsJSONBody
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -118,6 +126,11 @@ type ClientInterface interface {
 
 	PostReportsGenerates(ctx context.Context, body PostReportsGeneratesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// PostReportsWordcloudsWithBody request with any body
+	PostReportsWordcloudsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostReportsWordclouds(ctx context.Context, body PostReportsWordcloudsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// GetTest request
 	GetTest(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
@@ -160,6 +173,30 @@ func (c *Client) PostReportsGeneratesWithBody(ctx context.Context, contentType s
 
 func (c *Client) PostReportsGenerates(ctx context.Context, body PostReportsGeneratesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostReportsGeneratesRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostReportsWordcloudsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostReportsWordcloudsRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostReportsWordclouds(ctx context.Context, body PostReportsWordcloudsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostReportsWordcloudsRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -262,6 +299,46 @@ func NewPostReportsGeneratesRequestWithBody(server string, contentType string, b
 	return req, nil
 }
 
+// NewPostReportsWordcloudsRequest calls the generic PostReportsWordclouds builder with application/json body
+func NewPostReportsWordcloudsRequest(server string, body PostReportsWordcloudsJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostReportsWordcloudsRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewPostReportsWordcloudsRequestWithBody generates requests for PostReportsWordclouds with any type of body
+func NewPostReportsWordcloudsRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/reports/wordclouds")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewGetTestRequest generates requests for GetTest
 func NewGetTestRequest(server string) (*http.Request, error) {
 	var err error
@@ -342,6 +419,11 @@ type ClientWithResponsesInterface interface {
 
 	PostReportsGeneratesWithResponse(ctx context.Context, body PostReportsGeneratesJSONRequestBody, reqEditors ...RequestEditorFn) (*PostReportsGeneratesResponse, error)
 
+	// PostReportsWordcloudsWithBodyWithResponse request with any body
+	PostReportsWordcloudsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostReportsWordcloudsResponse, error)
+
+	PostReportsWordcloudsWithResponse(ctx context.Context, body PostReportsWordcloudsJSONRequestBody, reqEditors ...RequestEditorFn) (*PostReportsWordcloudsResponse, error)
+
 	// GetTestWithResponse request
 	GetTestWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetTestResponse, error)
 }
@@ -384,6 +466,31 @@ func (r PostReportsGeneratesResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r PostReportsGeneratesResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostReportsWordcloudsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *struct {
+		Tsne      string `json:"tsne"`
+		Wordcloud string `json:"wordcloud"`
+	}
+}
+
+// Status returns HTTPResponse.Status
+func (r PostReportsWordcloudsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostReportsWordcloudsResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -449,6 +556,23 @@ func (c *ClientWithResponses) PostReportsGeneratesWithResponse(ctx context.Conte
 	return ParsePostReportsGeneratesResponse(rsp)
 }
 
+// PostReportsWordcloudsWithBodyWithResponse request with arbitrary body returning *PostReportsWordcloudsResponse
+func (c *ClientWithResponses) PostReportsWordcloudsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostReportsWordcloudsResponse, error) {
+	rsp, err := c.PostReportsWordcloudsWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostReportsWordcloudsResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostReportsWordcloudsWithResponse(ctx context.Context, body PostReportsWordcloudsJSONRequestBody, reqEditors ...RequestEditorFn) (*PostReportsWordcloudsResponse, error) {
+	rsp, err := c.PostReportsWordclouds(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostReportsWordcloudsResponse(rsp)
+}
+
 // GetTestWithResponse request returning *GetTestResponse
 func (c *ClientWithResponses) GetTestWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetTestResponse, error) {
 	rsp, err := c.GetTest(ctx, reqEditors...)
@@ -500,6 +624,35 @@ func ParsePostReportsGeneratesResponse(rsp *http.Response) (*PostReportsGenerate
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest map[string]interface{}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostReportsWordcloudsResponse parses an HTTP response from a PostReportsWordcloudsWithResponse call
+func ParsePostReportsWordcloudsResponse(rsp *http.Response) (*PostReportsWordcloudsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostReportsWordcloudsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			Tsne      string `json:"tsne"`
+			Wordcloud string `json:"wordcloud"`
+		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

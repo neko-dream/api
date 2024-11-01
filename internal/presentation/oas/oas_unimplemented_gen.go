@@ -157,7 +157,7 @@ func (UnimplementedHandler) ManageIndex(ctx context.Context) (r ManageIndexOK, _
 
 // ManageRegenerate implements manageRegenerate operation.
 //
-// Analysisを再生成する。enum: [report, group].
+// Analysisを再生成する。enum: [report, group, image].
 //
 // POST /manage/regenerate
 func (UnimplementedHandler) ManageRegenerate(ctx context.Context, req OptManageRegenerateReq) (r *ManageRegenerateOK, _ error) {

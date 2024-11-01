@@ -58,7 +58,7 @@ type ManageHandler interface {
 	ManageIndex(ctx context.Context) (ManageIndexOK, error)
 	// ManageRegenerate implements manageRegenerate operation.
 	//
-	// Analysisを再生成する。enum: [report, group].
+	// Analysisを再生成する。enum: [report, group, image].
 	//
 	// POST /manage/regenerate
 	ManageRegenerate(ctx context.Context, req OptManageRegenerateReq) (*ManageRegenerateOK, error)

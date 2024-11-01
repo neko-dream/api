@@ -2961,6 +2961,7 @@ type ManageRegenerateReqType string
 const (
 	ManageRegenerateReqTypeReport ManageRegenerateReqType = "report"
 	ManageRegenerateReqTypeGroup  ManageRegenerateReqType = "group"
+	ManageRegenerateReqTypeImage  ManageRegenerateReqType = "image"
 )
 
 // AllValues returns all ManageRegenerateReqType values.
@@ -2968,6 +2969,7 @@ func (ManageRegenerateReqType) AllValues() []ManageRegenerateReqType {
 	return []ManageRegenerateReqType{
 		ManageRegenerateReqTypeReport,
 		ManageRegenerateReqTypeGroup,
+		ManageRegenerateReqTypeImage,
 	}
 }
 
@@ -2977,6 +2979,8 @@ func (s ManageRegenerateReqType) MarshalText() ([]byte, error) {
 	case ManageRegenerateReqTypeReport:
 		return []byte(s), nil
 	case ManageRegenerateReqTypeGroup:
+		return []byte(s), nil
+	case ManageRegenerateReqTypeImage:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -2991,6 +2995,9 @@ func (s *ManageRegenerateReqType) UnmarshalText(data []byte) error {
 		return nil
 	case ManageRegenerateReqTypeGroup:
 		*s = ManageRegenerateReqTypeGroup
+		return nil
+	case ManageRegenerateReqTypeImage:
+		*s = ManageRegenerateReqTypeImage
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)

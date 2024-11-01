@@ -1061,7 +1061,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						switch method {
 						case "POST":
 							r.name = "ManageRegenerate"
-							r.summary = "Analysisを再生成する。enum: [report, group]"
+							r.summary = "Analysisを再生成する。enum: [report, group, image]"
 							r.operationID = "manageRegenerate"
 							r.pathPattern = "/manage/regenerate"
 							r.args = args

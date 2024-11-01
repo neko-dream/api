@@ -2161,7 +2161,7 @@ func (s *Server) handleManageIndexRequest(args [0]string, argsEscaped bool, w ht
 
 // handleManageRegenerateRequest handles manageRegenerate operation.
 //
-// Analysisを再生成する。enum: [report, group].
+// Analysisを再生成する。enum: [report, group, image].
 //
 // POST /manage/regenerate
 func (s *Server) handleManageRegenerateRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
@@ -2228,7 +2228,7 @@ func (s *Server) handleManageRegenerateRequest(args [0]string, argsEscaped bool,
 		mreq := middleware.Request{
 			Context:          ctx,
 			OperationName:    "ManageRegenerate",
-			OperationSummary: "Analysisを再生成する。enum: [report, group]",
+			OperationSummary: "Analysisを再生成する。enum: [report, group, image]",
 			OperationID:      "manageRegenerate",
 			Body:             request,
 			Params:           middleware.Parameters{},

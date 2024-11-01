@@ -12,6 +12,45 @@ import (
 	"github.com/google/uuid"
 )
 
+const addGeneratedImages = `-- name: AddGeneratedImages :exec
+INSERT INTO talk_session_generated_images (talk_session_id, wordmap_url, tsnc_url) VALUES ($1, $2, $3)
+`
+
+type AddGeneratedImagesParams struct {
+	TalkSessionID uuid.UUID
+	WordmapUrl    string
+	TsncUrl       string
+}
+
+func (q *Queries) AddGeneratedImages(ctx context.Context, arg AddGeneratedImagesParams) error {
+	_, err := q.db.ExecContext(ctx, addGeneratedImages, arg.TalkSessionID, arg.WordmapUrl, arg.TsncUrl)
+	return err
+}
+
+const getGeneratedImages = `-- name: GetGeneratedImages :one
+SELECT
+    talk_session_id,
+    wordmap_url,
+    tsnc_url,
+    created_at,
+    updated_at
+FROM talk_session_generated_images
+WHERE talk_session_id = $1::uuid
+`
+
+func (q *Queries) GetGeneratedImages(ctx context.Context, dollar_1 uuid.UUID) (TalkSessionGeneratedImage, error) {
+	row := q.db.QueryRowContext(ctx, getGeneratedImages, dollar_1)
+	var i TalkSessionGeneratedImage
+	err := row.Scan(
+		&i.TalkSessionID,
+		&i.WordmapUrl,
+		&i.TsncUrl,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getGroupInfoByTalkSessionId = `-- name: GetGroupInfoByTalkSessionId :many
 SELECT
     user_group_info.pos_x,

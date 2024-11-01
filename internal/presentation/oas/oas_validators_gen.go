@@ -1552,6 +1552,8 @@ func (s ManageRegenerateReqType) Validate() error {
 		return nil
 	case "group":
 		return nil
+	case "image":
+		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
 	}

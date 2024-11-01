@@ -3924,7 +3924,7 @@ paths:
     post:
       tags:
         - manage
-      summary: 'Analysisを再生成する。enum: [report, group]'
+      summary: 'Analysisを再生成する。enum: [report, group, image]'
       operationId: manageRegenerate
       requestBody:
         content:
@@ -3937,6 +3937,7 @@ paths:
                   enum:
                     - report
                     - group
+                    - image
                   description: Analysisの種類
                   example: report
                 talkSessionID:

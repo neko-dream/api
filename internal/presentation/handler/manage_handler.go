@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"database/sql"
+	"log"
 	"strings"
 	"text/template"
 
@@ -39,9 +40,11 @@ func NewManageHandler(
 
 // ManageRegenerate implements oas.ManageHandler.
 func (m *manageHandler) ManageRegenerate(ctx context.Context, req oas.OptManageRegenerateReq) (*oas.ManageRegenerateOK, error) {
+	log.Println("ManageRegenerate")
 	tp := req.Value.Type
 	tpb, err := tp.MarshalText()
 	if err != nil {
+		log.Println("failed to marshal text")
 		return nil, err
 	}
 	tpt := string(tpb)
@@ -49,18 +52,29 @@ func (m *manageHandler) ManageRegenerate(ctx context.Context, req oas.OptManageR
 	talkSessionIDStr := req.Value.TalkSessionID
 	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](talkSessionIDStr)
 	if err != nil {
+		log.Println("failed to parse talk session id")
 		return nil, err
 	}
 
 	switch tpt {
 	case "group":
 		if err := m.AnalysisService.StartAnalysis(ctx, talkSessionID); err != nil {
+			log.Println("failed to start analysis", err)
 			return nil, err
 		}
 	case "report":
 		if err := m.AnalysisService.GenerateReport(ctx, talkSessionID); err != nil {
+			log.Println("failed to generate report", err)
 			return nil, err
 		}
+	case "image":
+		// 非同期で画像生成
+		go func() {
+			if _, err := m.AnalysisService.GenerateImage(context.Background(), talkSessionID); err != nil {
+				log.Println("failed to generate image", err)
+				return
+			}
+		}()
 	}
 
 	return &oas.ManageRegenerateOK{
@@ -81,10 +95,19 @@ func (m *manageHandler) ManageIndex(ctx context.Context) (oas.ManageIndexOK, err
 	}
 	var sessions []map[string]interface{}
 	for _, row := range rows {
-		sessions = append(sessions, map[string]interface{}{
+		res := map[string]interface{}{
 			"ID":    row.TalkSessionID,
 			"Theme": row.Theme,
-		})
+		}
+
+		rr, err := m.GetQueries(ctx).GetGeneratedImages(ctx, row.TalkSessionID)
+		if err == nil {
+			log.Println(rr)
+			res["WordCloud"] = rr.WordmapUrl
+			res["Tsnc"] = rr.TsncUrl
+		}
+
+		sessions = append(sessions, res)
 	}
 
 	var html strings.Builder

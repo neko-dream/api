@@ -15,12 +15,17 @@
                     </div>
                     <button
                         onclick="generateReport('{{.ID}}')"
-                    >
-                        レポート再生成
-                    </button>
+                    >レポート再生成</button>
                     <button
                         onclick="generateAnalysis('{{.ID}}')"
                     >分析再実行</button>
+                    <button
+                        onclick="generateImage('{{.ID}}')"
+                    >画像生成</button>
+                    <div>
+                        <img src="{{.WordCloud}}" />
+                        <img src="{{.Tsnc}}" />
+                    </div>
                 </div>
                 {{end}}
             </div>
@@ -56,6 +61,26 @@
                     },
                     body: JSON.stringify({
                         type:"report",
+                        talkSessionID: talkSessionID,
+                    }),
+                });
+
+                const result = await response.json();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('エラーが発生しました');
+            }
+        }
+        async function generateImage(talkSessionID) {
+            try {
+                console.log(talkSessionID);
+                const response = await fetch(`/manage/regenerate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        type:"image",
                         talkSessionID: talkSessionID,
                     }),
                 });

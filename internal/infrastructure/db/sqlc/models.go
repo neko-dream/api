@@ -74,6 +74,14 @@ type TalkSessionConclusion struct {
 	UpdatedAt     time.Time
 }
 
+type TalkSessionGeneratedImage struct {
+	TalkSessionID uuid.UUID
+	WordmapUrl    string
+	TsncUrl       string
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+}
+
 type TalkSessionLocation struct {
 	TalkSessionID uuid.UUID
 	Location      interface{}

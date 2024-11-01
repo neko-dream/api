@@ -7119,6 +7119,8 @@ func (s *ManageRegenerateReqType) Decode(d *jx.Decoder) error {
 		*s = ManageRegenerateReqTypeReport
 	case ManageRegenerateReqTypeGroup:
 		*s = ManageRegenerateReqTypeGroup
+	case ManageRegenerateReqTypeImage:
+		*s = ManageRegenerateReqTypeImage
 	default:
 		*s = ManageRegenerateReqType(v)
 	}

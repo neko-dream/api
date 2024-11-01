@@ -2,25 +2,38 @@ package client
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/neko-dream/server/internal/domain/model/analysis"
+	"github.com/neko-dream/server/internal/domain/model/image"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/infrastructure/config"
+	"github.com/neko-dream/server/internal/infrastructure/db"
+	model "github.com/neko-dream/server/internal/infrastructure/db/sqlc"
 	"github.com/neko-dream/server/pkg/utils"
 )
 
 type analysisService struct {
-	conf *config.Config
+	conf     *config.Config
+	imageRep image.ImageRepository
+	db.DBManager
 }
 
 func NewAnalysisService(
 	conf *config.Config,
+	imageRep image.ImageRepository,
+	dbm *db.DBManager,
 ) analysis.AnalysisService {
 	return &analysisService{
-		conf: conf,
+		conf:      conf,
+		imageRep:  imageRep,
+		DBManager: *dbm,
 	}
 }
 
@@ -88,6 +101,88 @@ func (a *analysisService) StartAnalysis(ctx context.Context, talkSessionID share
 		return nil
 	}
 	return nil
+}
+
+func (a *analysisService) GenerateImage(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession]) (*analysis.WordCloudResponse, error) {
+	// カスタムHTTPクライアントを作成
+	httpClient := &http.Client{
+		Transport: &BasicAuthTransport{
+			Username: a.conf.ANALYSIS_USER,
+			Password: a.conf.ANALYSIS_USER_PASSWORD,
+		},
+	}
+	println("GenerateImage")
+
+	// クライアントの初期化
+	c, err := NewClient(a.conf.ANALYSIS_API_DOMAIN, WithHTTPClient(httpClient))
+	if err != nil {
+		log.Println("NewClient", err)
+		return nil, err
+	}
+	println("request")
+
+	// APIリクエストの実行
+	resp, err := c.PostReportsWordclouds(ctx, PostReportsWordcloudsJSONRequestBody{
+		TalkSessionId: talkSessionID.UUID().String(),
+	})
+	if err != nil {
+		log.Println("PostReportsWordclouds", err)
+		return nil, err
+	}
+	println("response")
+	defer resp.Body.Close()
+
+	var wordcloud analysis.WordCloudResponse
+	if err := json.NewDecoder(resp.Body).Decode(&wordcloud); err != nil {
+		log.Println("json.NewDecoder", err)
+		return nil, err
+	}
+	println("decode end")
+	// Base64デコード
+	wcData, err := base64.StdEncoding.DecodeString(wordcloud.Wordcloud)
+	if err != nil {
+		return nil, err
+	}
+	tsneData, err := base64.StdEncoding.DecodeString(wordcloud.Tsne)
+	if err != nil {
+		return nil, err
+	}
+
+	// 種類-talkSessionID-時間.jpg
+	objectPath := "generated/%v-%v-%v.png"
+	wcImg := image.NewImage(wcData)
+	tsncImg := image.NewImage(tsneData)
+
+	wcImgInfo := image.NewImageInfo(
+		fmt.Sprintf(objectPath, "wordcloud", talkSessionID.String(), time.Now().UnixNano()),
+		"png",
+		wcImg,
+	)
+	tsnCImgInfo := image.NewImageInfo(
+		fmt.Sprintf(objectPath, "tsne", talkSessionID.String(), time.Now().UnixNano()),
+		"png",
+		tsncImg,
+	)
+
+	wc, err := a.imageRep.Create(ctx, *wcImgInfo)
+	if err != nil {
+		return nil, err
+	}
+	tsne, err := a.imageRep.Create(ctx, *tsnCImgInfo)
+	if err != nil {
+		return nil, err
+	}
+
+	// 画像情報をDBに保存
+	if err := a.DBManager.GetQueries(ctx).AddGeneratedImages(ctx, model.AddGeneratedImagesParams{
+		TalkSessionID: talkSessionID.UUID(),
+		WordmapUrl:    *wc,
+		TsncUrl:       *tsne,
+	}); err != nil {
+		return nil, err
+	}
+
+	return &wordcloud, nil
 }
 
 // Basic認証用のカスタムTransport

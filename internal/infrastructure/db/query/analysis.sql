@@ -60,3 +60,16 @@ SELECT
     updated_at
 FROM talk_session_reports
 WHERE talk_session_id = $1;
+
+-- name: AddGeneratedImages :exec
+INSERT INTO talk_session_generated_images (talk_session_id, wordmap_url, tsnc_url) VALUES ($1, $2, $3);
+
+-- name: GetGeneratedImages :one
+SELECT
+    talk_session_id,
+    wordmap_url,
+    tsnc_url,
+    created_at,
+    updated_at
+FROM talk_session_generated_images
+WHERE talk_session_id = $1::uuid;
