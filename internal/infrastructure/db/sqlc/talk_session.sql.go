@@ -489,8 +489,8 @@ WHERE
     END)
 ORDER BY
     CASE $7::text
-        WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM talk_sessions.created_at)
-        WHEN 'mostReplies' THEN oc.opinion_count
+        WHEN 'oldest' THEN (EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM talk_sessions.created_at))*-1
+        WHEN 'mostReplies' THEN -oc.opinion_count
         WHEN 'nearest' THEN (CASE
             WHEN $3::float IS NOT NULL AND $4::float IS NOT NULL
                 THEN ('SRID=4326;POINT(' ||

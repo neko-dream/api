@@ -543,6 +543,7 @@ LEFT JOIN (
     FROM opinions
     GROUP BY parent_opinion_id
 ) rc ON o.opinion_id = rc.parent_opinion_id
+ORDER BY ot.level ASC
 `
 
 type GetParentOpinionsParams struct {
