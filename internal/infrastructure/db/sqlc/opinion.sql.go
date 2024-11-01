@@ -186,7 +186,7 @@ FROM opinions
 LEFT JOIN users
     ON opinions.user_id = users.user_id
 LEFT JOIN (
-    SELECT votes.vote_type, votes.user_id
+    SELECT votes.vote_type, votes.user_id, votes.opinion_id
     FROM votes
     WHERE votes.opinion_id = $1
 ) pv ON opinions.user_id = pv.user_id
