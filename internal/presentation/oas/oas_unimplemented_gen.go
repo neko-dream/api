@@ -49,6 +49,15 @@ func (UnimplementedHandler) EditTalkSession(ctx context.Context, req OptEditTalk
 	return r, ht.ErrNotImplemented
 }
 
+// EditTimeLine implements editTimeLine operation.
+//
+// タイムライン編集.
+//
+// PUT /talksessions/{talkSessionID}/timelines/{actionItemID}
+func (UnimplementedHandler) EditTimeLine(ctx context.Context, req OptEditTimeLineReq, params EditTimeLineParams) (r EditTimeLineRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // EditUserProfile implements editUserProfile operation.
 //
 // ユーザー情報の変更.

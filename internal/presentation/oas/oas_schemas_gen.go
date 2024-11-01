@@ -611,6 +611,110 @@ func (s *EditTalkSessionReq) SetDescription(val OptNilString) {
 	s.Description = val
 }
 
+type EditTimeLineBadRequest struct{}
+
+func (*EditTimeLineBadRequest) editTimeLineRes() {}
+
+type EditTimeLineInternalServerError struct{}
+
+func (*EditTimeLineInternalServerError) editTimeLineRes() {}
+
+type EditTimeLineOK struct {
+	ActionItemID string `json:"ActionItemID"`
+	Sequence     int    `json:"Sequence"`
+	Content      string `json:"Content"`
+	Status       string `json:"Status"`
+	CreatedAt    string `json:"CreatedAt"`
+	UpdatedAt    string `json:"UpdatedAt"`
+}
+
+// GetActionItemID returns the value of ActionItemID.
+func (s *EditTimeLineOK) GetActionItemID() string {
+	return s.ActionItemID
+}
+
+// GetSequence returns the value of Sequence.
+func (s *EditTimeLineOK) GetSequence() int {
+	return s.Sequence
+}
+
+// GetContent returns the value of Content.
+func (s *EditTimeLineOK) GetContent() string {
+	return s.Content
+}
+
+// GetStatus returns the value of Status.
+func (s *EditTimeLineOK) GetStatus() string {
+	return s.Status
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *EditTimeLineOK) GetCreatedAt() string {
+	return s.CreatedAt
+}
+
+// GetUpdatedAt returns the value of UpdatedAt.
+func (s *EditTimeLineOK) GetUpdatedAt() string {
+	return s.UpdatedAt
+}
+
+// SetActionItemID sets the value of ActionItemID.
+func (s *EditTimeLineOK) SetActionItemID(val string) {
+	s.ActionItemID = val
+}
+
+// SetSequence sets the value of Sequence.
+func (s *EditTimeLineOK) SetSequence(val int) {
+	s.Sequence = val
+}
+
+// SetContent sets the value of Content.
+func (s *EditTimeLineOK) SetContent(val string) {
+	s.Content = val
+}
+
+// SetStatus sets the value of Status.
+func (s *EditTimeLineOK) SetStatus(val string) {
+	s.Status = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *EditTimeLineOK) SetCreatedAt(val string) {
+	s.CreatedAt = val
+}
+
+// SetUpdatedAt sets the value of UpdatedAt.
+func (s *EditTimeLineOK) SetUpdatedAt(val string) {
+	s.UpdatedAt = val
+}
+
+func (*EditTimeLineOK) editTimeLineRes() {}
+
+type EditTimeLineReq struct {
+	Content OptNilString `json:"content"`
+	Status  OptNilString `json:"status"`
+}
+
+// GetContent returns the value of Content.
+func (s *EditTimeLineReq) GetContent() OptNilString {
+	return s.Content
+}
+
+// GetStatus returns the value of Status.
+func (s *EditTimeLineReq) GetStatus() OptNilString {
+	return s.Status
+}
+
+// SetContent sets the value of Content.
+func (s *EditTimeLineReq) SetContent(val OptNilString) {
+	s.Content = val
+}
+
+// SetStatus sets the value of Status.
+func (s *EditTimeLineReq) SetStatus(val OptNilString) {
+	s.Status = val
+}
+
 type EditUserProfileBadRequest struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
@@ -5233,6 +5337,52 @@ func (o OptEditTalkSessionReq) Get() (v EditTalkSessionReq, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptEditTalkSessionReq) Or(d EditTalkSessionReq) EditTalkSessionReq {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptEditTimeLineReq returns new OptEditTimeLineReq with value set to v.
+func NewOptEditTimeLineReq(v EditTimeLineReq) OptEditTimeLineReq {
+	return OptEditTimeLineReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptEditTimeLineReq is optional EditTimeLineReq.
+type OptEditTimeLineReq struct {
+	Value EditTimeLineReq
+	Set   bool
+}
+
+// IsSet returns true if OptEditTimeLineReq was set.
+func (o OptEditTimeLineReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptEditTimeLineReq) Reset() {
+	var v EditTimeLineReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptEditTimeLineReq) SetTo(v EditTimeLineReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptEditTimeLineReq) Get() (v EditTimeLineReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptEditTimeLineReq) Or(d EditTimeLineReq) EditTimeLineReq {
 	if v, ok := o.Get(); ok {
 		return v
 	}

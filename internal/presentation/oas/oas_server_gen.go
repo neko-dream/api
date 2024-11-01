@@ -189,6 +189,12 @@ type TestHandler interface {
 //
 // x-ogen-operation-group: Timeline
 type TimelineHandler interface {
+	// EditTimeLine implements editTimeLine operation.
+	//
+	// タイムライン編集.
+	//
+	// PUT /talksessions/{talkSessionID}/timelines/{actionItemID}
+	EditTimeLine(ctx context.Context, req OptEditTimeLineReq, params EditTimeLineParams) (EditTimeLineRes, error)
 	// GetTimeLine implements getTimeLine operation.
 	//
 	// タイムラインはセッション終了後にセッション作成者が設定できるその後の予定を知らせるもの.

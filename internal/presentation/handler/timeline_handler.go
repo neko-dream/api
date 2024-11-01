@@ -12,20 +12,24 @@ import (
 	"github.com/neko-dream/server/internal/presentation/oas"
 	timeline_usecase "github.com/neko-dream/server/internal/usecase/timeline"
 	"github.com/neko-dream/server/pkg/utils"
+	"github.com/samber/lo"
 )
 
 type timelineHandler struct {
 	timeline_usecase.AddTimeLineUseCase
 	timeline_usecase.GetTimeLineUseCase
+	timeline_usecase.EditTimeLineUseCase
 }
 
 func NewTimelineHandler(
 	addTimeLineUseCase timeline_usecase.AddTimeLineUseCase,
 	getTimeLineUseCase timeline_usecase.GetTimeLineUseCase,
+	editTimeLineUseCase timeline_usecase.EditTimeLineUseCase,
 ) oas.TimelineHandler {
 	return &timelineHandler{
-		AddTimeLineUseCase: addTimeLineUseCase,
-		GetTimeLineUseCase: getTimeLineUseCase,
+		AddTimeLineUseCase:  addTimeLineUseCase,
+		GetTimeLineUseCase:  getTimeLineUseCase,
+		EditTimeLineUseCase: editTimeLineUseCase,
 	}
 }
 
@@ -101,6 +105,56 @@ func (t *timelineHandler) PostTimeLineItem(ctx context.Context, req oas.OptPostT
 	}
 
 	return &oas.PostTimeLineItemOK{
+		ActionItemID: output.ActionItem.ActionItemID.String(),
+		Content:      output.ActionItem.Content,
+		Status:       output.ActionItem.Status.String(),
+		CreatedAt:    output.ActionItem.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:    output.ActionItem.UpdatedAt.Format(time.RFC3339),
+	}, nil
+}
+
+// EditTimeLine implements oas.TimelineHandler.
+func (t *timelineHandler) EditTimeLine(ctx context.Context, req oas.OptEditTimeLineReq, params oas.EditTimeLineParams) (oas.EditTimeLineRes, error) {
+	claim := session.GetSession(ctx)
+	if claim == nil {
+		return nil, messages.ForbiddenError
+	}
+	userID, err := claim.UserID()
+	if err != nil {
+		utils.HandleError(ctx, err, "claim.UserID")
+		return nil, messages.InternalServerError
+	}
+	actionItemID, err := shared.ParseUUID[timelineactions.ActionItem](params.ActionItemID)
+	if err != nil {
+		utils.HandleError(ctx, err, "shared.ParseUUID")
+		return nil, messages.InternalServerError
+	}
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
+	if err != nil {
+		utils.HandleError(ctx, err, "shared.ParseUUID")
+		return nil, messages.InternalServerError
+	}
+	var content, status *string
+	if req.Value.Content.IsSet() {
+		content = lo.ToPtr(req.Value.Content.Value)
+	}
+	if req.Value.Status.IsSet() {
+		status = lo.ToPtr(req.Value.Status.Value)
+	}
+
+	output, err := t.EditTimeLineUseCase.Execute(ctx, timeline_usecase.EditTimeLineInput{
+		OwnerID:       userID,
+		TalkSessionID: talkSessionID,
+		ActionItemID:  actionItemID,
+		Content:       content,
+		Status:        status,
+	})
+	if err != nil {
+		utils.HandleError(ctx, err, "EditTimeLineUseCase.Execute")
+		return nil, err
+	}
+
+	return &oas.EditTimeLineOK{
 		ActionItemID: output.ActionItem.ActionItemID.String(),
 		Content:      output.ActionItem.Content,
 		Status:       output.ActionItem.Status.String(),

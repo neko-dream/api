@@ -67,3 +67,21 @@ func NewActionItem(
 		UpdatedAt:     updatedAt,
 	}, nil
 }
+
+func (a *ActionItem) UpdateContent(content string) error {
+	if len(content) < 1 || len(content) > 40 {
+		return messages.ActionItemInvalidContent
+	}
+
+	a.Content = content
+	return nil
+}
+
+func (a *ActionItem) UpdateStatus(status ActionStatus) error {
+	if !status.Valid() {
+		return messages.ActionItemInvalidStatus
+	}
+
+	a.Status = status
+	return nil
+}

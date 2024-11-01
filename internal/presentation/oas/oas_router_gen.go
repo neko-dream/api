@@ -659,7 +659,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									}
 
 									if len(elem) == 0 {
-										// Leaf node.
 										switch r.Method {
 										case "GET":
 											s.handleGetTimeLineRequest([1]string{
@@ -670,6 +669,37 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										}
 
 										return
+									}
+									switch elem[0] {
+									case '/': // Prefix: "/"
+										origElem := elem
+										if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+											elem = elem[l:]
+										} else {
+											break
+										}
+
+										// Param: "actionItemID"
+										// Leaf parameter
+										args[1] = elem
+										elem = ""
+
+										if len(elem) == 0 {
+											// Leaf node.
+											switch r.Method {
+											case "PUT":
+												s.handleEditTimeLineRequest([2]string{
+													args[0],
+													args[1],
+												}, elemIsEscaped, w, r)
+											default:
+												s.notAllowed(w, r, "PUT")
+											}
+
+											return
+										}
+
+										elem = origElem
 									}
 
 									elem = origElem
@@ -1521,7 +1551,6 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									}
 
 									if len(elem) == 0 {
-										// Leaf node.
 										switch method {
 										case "GET":
 											r.name = "GetTimeLine"
@@ -1534,6 +1563,38 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										default:
 											return
 										}
+									}
+									switch elem[0] {
+									case '/': // Prefix: "/"
+										origElem := elem
+										if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+											elem = elem[l:]
+										} else {
+											break
+										}
+
+										// Param: "actionItemID"
+										// Leaf parameter
+										args[1] = elem
+										elem = ""
+
+										if len(elem) == 0 {
+											// Leaf node.
+											switch method {
+											case "PUT":
+												r.name = "EditTimeLine"
+												r.summary = "タイムライン編集"
+												r.operationID = "editTimeLine"
+												r.pathPattern = "/talksessions/{talkSessionID}/timelines/{actionItemID}"
+												r.args = args
+												r.count = 2
+												return r, true
+											default:
+												return
+											}
+										}
+
+										elem = origElem
 									}
 
 									elem = origElem

@@ -3597,6 +3597,112 @@
         ],
         "x-ogen-operation-group": "Timeline"
       }
+    },
+    "/talksessions/{talkSessionID}/timelines/{actionItemID}": {
+      "put": {
+        "summary": "タイムライン編集",
+        "deprecated": false,
+        "description": "",
+        "operationId": "editTimeLine",
+        "tags": [
+          "timeline"
+        ],
+        "parameters": [
+          {
+            "name": "talkSessionID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "actionItemID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "example": "",
+                    "nullable": true
+                  },
+                  "status": {
+                    "type": "string",
+                    "example": "",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/actionItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ErrorResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "ServerErrorResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "x-ogen-operation-group": "Timeline"
+      }
     }
   },
   "components": {

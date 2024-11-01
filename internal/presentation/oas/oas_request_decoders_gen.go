@@ -641,6 +641,129 @@ func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
 	}
 }
 
+func (s *Server) decodeEditTimeLineRequest(r *http.Request) (
+	req OptEditTimeLineReq,
+	close func() error,
+	rerr error,
+) {
+	var closers []func() error
+	close = func() error {
+		var merr error
+		// Close in reverse order, to match defer behavior.
+		for i := len(closers) - 1; i >= 0; i-- {
+			c := closers[i]
+			merr = multierr.Append(merr, c())
+		}
+		return merr
+	}
+	defer func() {
+		if rerr != nil {
+			rerr = multierr.Append(rerr, close())
+		}
+	}()
+	if _, ok := r.Header["Content-Type"]; !ok && r.ContentLength == 0 {
+		return req, close, nil
+	}
+	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
+	if err != nil {
+		return req, close, errors.Wrap(err, "parse media type")
+	}
+	switch {
+	case ct == "multipart/form-data":
+		if r.ContentLength == 0 {
+			return req, close, nil
+		}
+		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
+			return req, close, errors.Wrap(err, "parse multipart form")
+		}
+		// Remove all temporary files created by ParseMultipartForm when the request is done.
+		//
+		// Notice that the closers are called in reverse order, to match defer behavior, so
+		// any opened file will be closed before RemoveAll call.
+		closers = append(closers, r.MultipartForm.RemoveAll)
+		// Form values may be unused.
+		form := url.Values(r.MultipartForm.Value)
+		_ = form
+
+		var request OptEditTimeLineReq
+		{
+			var optForm EditTimeLineReq
+			q := uri.NewQueryDecoder(form)
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "content",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotContentVal string
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToString(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotContentVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.Content.SetTo(optFormDotContentVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"content\"")
+					}
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "status",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotStatusVal string
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToString(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotStatusVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.Status.SetTo(optFormDotStatusVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"status\"")
+					}
+				}
+			}
+			request = OptEditTimeLineReq{
+				Value: optForm,
+				Set:   true,
+			}
+		}
+		return request, close, nil
+	default:
+		return req, close, validate.InvalidContentType(ct)
+	}
+}
+
 func (s *Server) decodeEditUserProfileRequest(r *http.Request) (
 	req OptEditUserProfileReq,
 	close func() error,

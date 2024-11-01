@@ -78,6 +78,7 @@ func BuildContainer() *dig.Container {
 		{analysis_usecase.NewGetReportQueryHandler, nil},
 		{timeline_usecase.NewAddTimeLineUseCase, nil},
 		{timeline_usecase.NewGetTimeLineUseCase, nil},
+		{timeline_usecase.NewEditTimeLineUseCase, nil},
 		{vote_usecase.NewPostVoteUseCase, nil},
 		{client.NewAnalysisService, nil},
 		{handler.NewSecurityHandler, nil},

@@ -13,6 +13,10 @@ type EditTalkSessionRes interface {
 	editTalkSessionRes()
 }
 
+type EditTimeLineRes interface {
+	editTimeLineRes()
+}
+
 type EditUserProfileRes interface {
 	editUserProfileRes()
 }
