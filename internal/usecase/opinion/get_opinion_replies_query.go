@@ -164,6 +164,7 @@ func (i *GetOpinionRepliesInteractor) Execute(ctx context.Context, input GetOpin
 	if err != nil {
 		return nil, err
 	}
+
 	replies := make([]ReplyDTO, 0, len(row))
 	for _, r := range row {
 		replies = append(replies, ReplyDTO{

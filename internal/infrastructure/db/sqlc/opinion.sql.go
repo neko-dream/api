@@ -190,6 +190,7 @@ LEFT JOIN (
     FROM votes
     WHERE votes.opinion_id = $1
 ) pv ON opinions.user_id = pv.user_id
+    AND opinions.opinion_id = pv.opinion_id
 LEFT JOIN (
     SELECT votes.vote_type, votes.opinion_id
     FROM votes

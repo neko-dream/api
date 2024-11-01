@@ -69,6 +69,7 @@ LEFT JOIN (
     FROM votes
     WHERE votes.opinion_id = $1
 ) pv ON opinions.user_id = pv.user_id
+    AND opinions.opinion_id = pv.opinion_id
 -- ユーザーIDが提供された場合、そのユーザーの投票ステータスを取得
 LEFT JOIN (
     SELECT votes.vote_type, votes.opinion_id
