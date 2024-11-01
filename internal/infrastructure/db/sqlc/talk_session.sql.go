@@ -475,20 +475,22 @@ WHERE
         THEN talk_sessions.theme LIKE '%' || $6::text || '%'
         ELSE TRUE
     END)
-    AND(
-        CASE
-            WHEN $3::float IS NOT NULL AND $4::float IS NOT NULL
-            THEN ('SRID=4326;POINT(' ||
-            ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location),4326)) || ' ' ||
-            ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location),4326)) || ')')::geometry
-            <->
-            ('SRID=4326;POINT(' || $3::float || ' ' || $4::float || ')')::geometry
-            ELSE 0.0
-        END) <= 100000
+    AND
+    (CASE $7::text
+            WHEN 'nearlest' THEN
+                $3::float IS NOT NULL AND $4::float IS NOT NULL
+                AND
+                ('SRID=4326;POINT(' ||
+                ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location),4326)) || ' ' ||
+                ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location),4326)) || ')')::geometry
+                <->
+                ('SRID=4326;POINT(' || $3::float || ' ' || $4::float || ')')::geometry <= 100000
+            ELSE TRUE
+    END)
 ORDER BY
     CASE $7::text
         WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM talk_sessions.created_at)
-        WHEN 'mostReplies' THEN -oc.opinion_count
+        WHEN 'mostReplies' THEN oc.opinion_count
         WHEN 'nearest' THEN (CASE
             WHEN $3::float IS NOT NULL AND $4::float IS NOT NULL
                 THEN ('SRID=4326;POINT(' ||
@@ -496,10 +498,10 @@ ORDER BY
                 ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location),4326)) || ')')::geometry
                 <->
                 ('SRID=4326;POINT(' || $3::float || ' ' || $4::float || ')')::geometry
-            ELSE 0.0
-        END)*-1
-        ELSE EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM talk_sessions.created_at)
-    END DESC
+            ELSE 1000000
+        END)
+        ELSE EXTRACT(EPOCH FROM talk_sessions.created_at)*-1
+    END ASC
 LIMIT $1 OFFSET $2
 `
 
