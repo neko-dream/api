@@ -33,6 +33,8 @@ func (a *actionItemRepository) CreateActionItem(ctx context.Context, actionItem 
 		Sequence:      int32(actionItem.Sequence),
 		Content:       actionItem.Content,
 		Status:        string(actionItem.Status),
+		CreatedAt:     actionItem.CreatedAt,
+		UpdatedAt:     actionItem.UpdatedAt,
 	})
 	if err != nil {
 		utils.HandleError(ctx, err, "ActionItemの作成に失敗しました")

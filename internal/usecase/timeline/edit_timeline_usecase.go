@@ -86,6 +86,11 @@ func (i *EditTimeLineInteractor) Execute(ctx context.Context, input EditTimeLine
 		return nil, err
 	}
 
+	actionItem, err = i.ActionItemRepository.FindByID(ctx, input.ActionItemID)
+	if err != nil {
+		return nil, err
+	}
+
 	return &EditTimeLineOutput{
 		ActionItem: actionItem,
 	}, nil
