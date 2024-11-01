@@ -3700,7 +3700,11 @@
             }
           }
         },
-        "security": [],
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
         "x-ogen-operation-group": "Timeline"
       }
     }
