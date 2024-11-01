@@ -5,6 +5,7 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"unicode/utf8"
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
@@ -314,7 +315,7 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 			return nil, messages.UserDisplayIDTooShort
 		}
 
-		if len(value.DisplayName.Value) > 20 || len(value.DisplayName.Value) < 4 {
+		if utf8.RuneCountInString(value.DisplayName.Value) > 20 || utf8.RuneCountInString(value.DisplayName.Value) < 4 {
 			return nil, messages.UserDisplayIDTooShort
 		}
 
