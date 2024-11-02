@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"log"
 
 	"github.com/neko-dream/server/internal/domain/model/shared/time"
 	"github.com/neko-dream/server/internal/infrastructure/db"
@@ -100,9 +99,7 @@ func (h *listTalkSessionQueryHandler) Execute(ctx context.Context, input ListTal
 		Latitude:  latitude,
 		Longitude: longitude,
 	})
-	for _, row := range talkSessionRow {
-		log.Println("nearest", row.Distance)
-	}
+
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			talkSessionOut.TalkSessions = make([]TalkSessionDTO, 0)
