@@ -14,6 +14,7 @@ import (
 
 const addGeneratedImages = `-- name: AddGeneratedImages :exec
 INSERT INTO talk_session_generated_images (talk_session_id, wordmap_url, tsnc_url) VALUES ($1, $2, $3)
+ON CONFLICT (talk_session_id) DO UPDATE SET wordmap_url = $2, tsnc_url = $3, updated_at = NOW()
 `
 
 type AddGeneratedImagesParams struct {

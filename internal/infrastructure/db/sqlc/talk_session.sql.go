@@ -493,15 +493,17 @@ ORDER BY
     CASE $7::text
         WHEN 'oldest' THEN (EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM talk_sessions.created_at))*-1
         WHEN 'mostReplies' THEN -oc.opinion_count
-        WHEN 'nearest' THEN (CASE
-            WHEN $3::float IS NOT NULL AND $4::float IS NOT NULL
+        WHEN 'nearest' THEN (
+        CASE
+            WHEN $3::float IS NOT NULL AND $4::float IS NOT NULL AND talk_session_locations.location IS NOT NULL
                 THEN ('SRID=4326;POINT(' ||
-                ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location),4326)) || ' ' ||
-                ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location),4326)) || ')')::geometry
+                ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location),4326)) || ' ' ||
+                ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location),4326)) || ')')::geometry
                 <->
                 ('SRID=4326;POINT(' || $3::float || ' ' || $4::float || ')')::geometry
-            ELSE 1000000
-        END)
+            ELSE NULL
+        END
+        )
         ELSE EXTRACT(EPOCH FROM talk_sessions.created_at)*-1
     END ASC
 LIMIT $1 OFFSET $2

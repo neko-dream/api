@@ -62,7 +62,8 @@ FROM talk_session_reports
 WHERE talk_session_id = $1;
 
 -- name: AddGeneratedImages :exec
-INSERT INTO talk_session_generated_images (talk_session_id, wordmap_url, tsnc_url) VALUES ($1, $2, $3);
+INSERT INTO talk_session_generated_images (talk_session_id, wordmap_url, tsnc_url) VALUES ($1, $2, $3)
+ON CONFLICT (talk_session_id) DO UPDATE SET wordmap_url = $2, tsnc_url = $3, updated_at = NOW();
 
 -- name: GetGeneratedImages :one
 SELECT
