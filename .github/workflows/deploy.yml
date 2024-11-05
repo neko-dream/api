@@ -1,0 +1,19 @@
+name: Deploy to Koyeb
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Koyeb CLI
+        uses: koyeb-community/koyeb-actions@v2
+        with:
+          api_token: "${{ secrets.KOYEB_API_KEY }}"
+
+      - name: Deploy to Koyeb
+        uses: koyeb/action-git-deploy@v1
+        with:
+          app-name: slim-fanya
+          service-name: kotohiro-server
