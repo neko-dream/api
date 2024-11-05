@@ -12,8 +12,6 @@ jobs:
         with:
           api_token: "${{ secrets.KOYEB_API_KEY }}"
 
-      - name: Deploy to Koyeb
-        uses: koyeb/action-git-deploy@v1
-        with:
-          app-name: slim-fanya
-          service-name: kotohiro-server
+      - name: Trigger Deployment
+        run: |
+          koyeb service redeploy slim-fanya/kotohiro-server
