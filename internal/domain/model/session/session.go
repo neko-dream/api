@@ -95,13 +95,13 @@ func (s *Session) Status() status {
 	return s.status
 }
 
-func (s *Session) IsActive() bool {
-	return s.expires.After(time.Now()) && s.status == SESSION_ACTIVE
+func (s *Session) IsActive(ctx context.Context) bool {
+	return s.expires.After(clock.Now(ctx)) && s.status == SESSION_ACTIVE
 }
 
-func (s *Session) Deactivate() {
+func (s *Session) Deactivate(ctx context.Context) {
 	s.status = SESSION_INACTIVE
-	s.UpdateLastActivity()
+	s.UpdateLastActivity(ctx)
 }
 
 func (s *Session) ExpiresAt() time.Time {
@@ -112,8 +112,8 @@ func (s *Session) LastActivityAt() time.Time {
 	return s.lastActivity
 }
 
-func (s *Session) UpdateLastActivity() {
-	s.lastActivity = time.Now()
+func (s *Session) UpdateLastActivity(ctx context.Context) {
+	s.lastActivity = clock.Now(ctx)
 }
 
 func SortByLastActivity(sessions []Session) []Session {

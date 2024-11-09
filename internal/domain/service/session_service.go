@@ -3,9 +3,9 @@ package service
 import (
 	"context"
 	"errors"
-	"time"
 
 	"braces.dev/errtrace"
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
@@ -28,7 +28,7 @@ func (s *sessionService) DeactivateUserSessions(ctx context.Context, userID shar
 	}
 
 	for _, sess := range sessions {
-		sess.Deactivate()
+		sess.Deactivate(ctx)
 	}
 
 	return nil
@@ -51,12 +51,12 @@ func (s *sessionService) RefreshSession(
 	sessList = session.SortByLastActivity(sessList)
 	for _, sess := range sessList {
 		// sessionが有効期限内であることを確認
-		if !sess.IsActive() {
+		if !sess.IsActive(ctx) {
 			return nil, errtrace.Wrap(SessionIsExpired)
 		}
 
 		// 最終アクティビティを更新
-		sess.Deactivate()
+		sess.Deactivate(ctx)
 		if _, err := s.sessionRepository.Update(ctx, sess); err != nil {
 			return nil, errtrace.Wrap(err)
 		}
@@ -69,7 +69,7 @@ func (s *sessionService) RefreshSession(
 		sessList[0].Provider(),
 		session.SESSION_ACTIVE,
 		*session.NewExpiresAt(ctx),
-		time.Now(),
+		clock.Now(ctx),
 	)
 	updatedSess, err := s.sessionRepository.Create(ctx, *newSess)
 	if err != nil {

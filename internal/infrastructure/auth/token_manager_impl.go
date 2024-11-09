@@ -38,7 +38,7 @@ func (j *tokenManager) SetSession(ctx context.Context) context.Context {
 		return ctx
 	}
 	// トークンの有効性を確認
-	if claim.IsExpired() {
+	if claim.IsExpired(ctx) {
 		return ctx
 	}
 
@@ -61,7 +61,7 @@ func (j *tokenManager) SetSession(ctx context.Context) context.Context {
 		return ctx
 	}
 
-	if !sess.IsActive() {
+	if !sess.IsActive(ctx) {
 		return ctx
 	}
 
@@ -69,7 +69,7 @@ func (j *tokenManager) SetSession(ctx context.Context) context.Context {
 }
 
 func (j *tokenManager) Generate(ctx context.Context, user user.User, sessionID shared.UUID[session.Session]) (string, error) {
-	claim := session.NewClaim(user, sessionID)
+	claim := session.NewClaim(ctx, user, sessionID)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim.GenMapClaim())
 	return errtrace.Wrap2(token.SignedString([]byte(j.secret)))
 }

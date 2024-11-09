@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/neko-dream/server/internal/domain/model/analysis"
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/image"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
@@ -152,14 +152,14 @@ func (a *analysisService) GenerateImage(ctx context.Context, talkSessionID share
 	objectPath := "generated/%v-%v-%v.png"
 	wcImg := image.NewImage(wcData)
 	tsncImg := image.NewImage(tsneData)
-
+	now := clock.Now(ctx)
 	wcImgInfo := image.NewImageInfo(
-		fmt.Sprintf(objectPath, "wordcloud", talkSessionID.String(), time.Now().UnixNano()),
+		fmt.Sprintf(objectPath, "wordcloud", talkSessionID.String(), now.UnixNano()),
 		"png",
 		wcImg,
 	)
 	tsnCImgInfo := image.NewImageInfo(
-		fmt.Sprintf(objectPath, "tsne", talkSessionID.String(), time.Now().UnixNano()),
+		fmt.Sprintf(objectPath, "tsne", talkSessionID.String(), now.UnixNano()),
 		"png",
 		tsncImg,
 	)

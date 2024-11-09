@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"time"
 
-	"github.com/neko-dream/server/internal/domain/model/shared/time"
 	"github.com/neko-dream/server/internal/infrastructure/db"
 	model "github.com/neko-dream/server/internal/infrastructure/db/sqlc"
 	"github.com/neko-dream/server/pkg/utils"
@@ -137,8 +137,8 @@ func (h *listTalkSessionQueryHandler) Execute(ctx context.Context, input ListTal
 				),
 			},
 			OpinionCount:     int(row.OpinionCount),
-			CreatedAt:        time.NewTime(ctx, row.CreatedAt).Format(ctx),
-			ScheduledEndTime: time.NewTime(ctx, row.ScheduledEndTime).Format(ctx),
+			CreatedAt:        row.CreatedAt.Format(time.RFC3339),
+			ScheduledEndTime: row.ScheduledEndTime.Format(time.RFC3339),
 			Location:         locationDTO,
 			City:             utils.ToPtrIfNotNullValue[string](!row.City.Valid, row.City.String),
 			Prefecture:       utils.ToPtrIfNotNullValue[string](!row.Prefecture.Valid, row.Prefecture.String),

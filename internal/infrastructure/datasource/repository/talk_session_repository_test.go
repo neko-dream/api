@@ -3,9 +3,10 @@ package repository_test
 import (
 	"errors"
 	"testing"
+	"time"
 
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/shared/time"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/datasource/repository"
@@ -39,9 +40,9 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 					"test",
 					nil,
 					ownerUserID,
-					time.Now(ctx),
+					clock.Now(ctx),
 					// 明日
-					time.Now(ctx).Add(ctx, time.Hour*24),
+					clock.Now(ctx).Add(time.Hour*24),
 					nil,
 					nil, nil,
 				)
@@ -73,8 +74,8 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 					"test",
 					nil,
 					ownerUserID,
-					time.Now(ctx),
-					time.Now(ctx).Add(ctx, time.Hour*24),
+					clock.Now(ctx),
+					clock.Now(ctx).Add(time.Hour*24),
 					talksession.NewLocation(
 						talkSessionID,
 						30.0,

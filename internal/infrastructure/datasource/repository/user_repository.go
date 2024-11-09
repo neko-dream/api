@@ -5,9 +5,9 @@ import (
 	"database/sql"
 	"errors"
 	"strings"
-	"time"
 
 	"braces.dev/errtrace"
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/image"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
@@ -156,7 +156,7 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 func (u *userRepository) Create(ctx context.Context, usr user.User) error {
 	if err := u.GetQueries(ctx).CreateUser(ctx, model.CreateUserParams{
 		UserID:    usr.UserID().UUID(),
-		CreatedAt: time.Now(),
+		CreatedAt: clock.Now(ctx),
 	}); err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
 			return errtrace.Wrap(err)
@@ -168,7 +168,7 @@ func (u *userRepository) Create(ctx context.Context, usr user.User) error {
 		UserID:     usr.UserID().UUID(),
 		Provider:   strings.ToUpper(usr.Provider().String()),
 		Subject:    usr.Subject(),
-		CreatedAt:  time.Now(),
+		CreatedAt:  clock.Now(ctx),
 	}); err != nil {
 		return errtrace.Wrap(err)
 	}

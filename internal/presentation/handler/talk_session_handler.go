@@ -3,12 +3,13 @@ package handler
 import (
 	"bytes"
 	"context"
+	"time"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/messages"
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/shared/time"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/presentation/oas"
@@ -232,7 +233,7 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 		Theme:            req.Value.Theme,
 		Description:      description,
 		OwnerID:          userID,
-		ScheduledEndTime: time.NewTime(ctx, req.Value.ScheduledEndTime),
+		ScheduledEndTime: req.Value.ScheduledEndTime,
 		Latitude:         latitude,
 		Longitude:        longitude,
 		City:             city,
@@ -266,8 +267,8 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 		Theme:            out.TalkSession.Theme(),
 		Description:      utils.ToOptNil[oas.OptNilString](out.TalkSession.Description()),
 		ID:               out.TalkSession.TalkSessionID().String(),
-		CreatedAt:        time.Now(ctx).Format(ctx),
-		ScheduledEndTime: out.TalkSession.ScheduledEndTime().Format(ctx),
+		CreatedAt:        clock.Now(ctx).Format(time.RFC3339),
+		ScheduledEndTime: out.TalkSession.ScheduledEndTime().Format(time.RFC3339),
 		Location:         location,
 	}
 	return res, nil

@@ -2,11 +2,11 @@ package vote_usecase
 
 import (
 	"context"
-	"time"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/analysis"
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
@@ -75,7 +75,7 @@ func (i *postVoteInteractor) Execute(ctx context.Context, input PostVoteInput) (
 			input.TalkSessionID,
 			input.UserID,
 			vote.VoteFromString(lo.ToPtr(input.VoteType)),
-			time.Now(),
+			clock.Now(ctx),
 		)
 		if err != nil {
 			utils.HandleError(ctx, err, "NewVote")

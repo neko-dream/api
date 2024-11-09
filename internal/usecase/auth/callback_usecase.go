@@ -3,10 +3,10 @@ package auth_usecase
 import (
 	"context"
 	"net/http"
-	"time"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/auth"
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/infrastructure/config"
@@ -78,7 +78,7 @@ func (u *authCallbackInteractor) Execute(ctx context.Context, input CallbackInpu
 			user.Provider(),
 			session.SESSION_ACTIVE,
 			*session.NewExpiresAt(ctx),
-			time.Now(),
+			clock.Now(ctx),
 		)
 
 		if _, err := u.SessionRepository.Create(ctx, *sess); err != nil {

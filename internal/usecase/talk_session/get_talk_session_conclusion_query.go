@@ -6,8 +6,8 @@ import (
 	"errors"
 
 	"github.com/neko-dream/server/internal/domain/messages"
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/shared/time"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/infrastructure/db"
 	"github.com/neko-dream/server/pkg/utils"
@@ -48,7 +48,7 @@ func (g *getTalkSessionConclusionInteractor) Execute(ctx context.Context, input 
 	}
 
 	// まだ終了していないトークセッションに対しては結論を取得できない
-	if ts.ScheduledEndTime.After(time.Now(ctx).Time) {
+	if ts.ScheduledEndTime.After(clock.Now(ctx)) {
 		return nil, messages.TalkSessionNotFinished
 	}
 

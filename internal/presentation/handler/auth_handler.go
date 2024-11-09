@@ -4,10 +4,10 @@ import (
 	"context"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
-	"github.com/neko-dream/server/internal/domain/model/shared/time"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	auth_usecase "github.com/neko-dream/server/internal/usecase/auth"
 	http_utils "github.com/neko-dream/server/pkg/http"
@@ -109,14 +109,14 @@ func (a *authHandler) OAuthTokenInfo(ctx context.Context) (oas.OAuthTokenInfoRes
 	if err != nil {
 		return nil, messages.ForbiddenError
 	}
-	if claim.IsExpired() {
+	if claim.IsExpired(ctx) {
 		return nil, messages.TokenExpiredError
 	}
 
 	return &oas.OAuthTokenInfoOK{
 		Aud:         claim.Audience(),
-		Iat:         time.NewTime(ctx, claim.IssueAt()).Format(ctx),
-		Exp:         time.NewTime(ctx, claim.ExpiresAt()).Format(ctx),
+		Iat:         claim.IssueAt().Format(time.RFC3339),
+		Exp:         claim.ExpiresAt().Format(time.RFC3339),
 		Iss:         claim.Issuer(),
 		Sub:         claim.Sub,
 		Jti:         sessID.String(),

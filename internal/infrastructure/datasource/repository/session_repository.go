@@ -4,9 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"time"
 
 	"braces.dev/errtrace"
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
@@ -28,7 +28,7 @@ func (s *sessionRepository) Create(ctx context.Context, sess session.Session) (*
 		SessionStatus:  int32(sess.Status()),
 		ExpiresAt:      sess.ExpiresAt(),
 		LastActivityAt: sess.LastActivityAt(),
-		CreatedAt:      time.Now(),
+		CreatedAt:      clock.Now(ctx),
 	}); err != nil {
 		return nil, errtrace.Wrap(err)
 	}

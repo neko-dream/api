@@ -1,6 +1,8 @@
 package user
 
 import (
+	"context"
+
 	"github.com/neko-dream/server/internal/domain/model/shared"
 )
 
@@ -29,8 +31,8 @@ func (u *UserDemographics) Prefecture() *string {
 }
 
 // ユーザーの年齢を返す
-func (u *UserDemographics) Age() int {
-	return u.yearOfBirth.Age()
+func (u *UserDemographics) Age(ctx context.Context) int {
+	return u.yearOfBirth.Age(ctx)
 }
 
 func (u *UserDemographics) Occupation() Occupation {
