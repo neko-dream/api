@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/pkg/oauth"
@@ -31,8 +32,8 @@ func NewSessionStatus(num int) *status {
 
 type expiresAt = time.Time
 
-func NewExpiresAt() *expiresAt {
-	t := time.Now().Add(2 * 24 * time.Hour * 7)
+func NewExpiresAt(ctx context.Context) *expiresAt {
+	t := clock.Now(ctx).Add(2 * 24 * time.Hour * 7)
 	e := expiresAt(t)
 	return &e
 }

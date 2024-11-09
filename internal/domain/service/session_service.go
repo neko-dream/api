@@ -68,7 +68,7 @@ func (s *sessionService) RefreshSession(
 		sessList[0].UserID(),
 		sessList[0].Provider(),
 		session.SESSION_ACTIVE,
-		*session.NewExpiresAt(),
+		*session.NewExpiresAt(ctx),
 		time.Now(),
 	)
 	updatedSess, err := s.sessionRepository.Create(ctx, *newSess)

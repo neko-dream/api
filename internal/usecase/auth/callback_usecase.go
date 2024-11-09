@@ -77,7 +77,7 @@ func (u *authCallbackInteractor) Execute(ctx context.Context, input CallbackInpu
 			user.UserID(),
 			user.Provider(),
 			session.SESSION_ACTIVE,
-			*session.NewExpiresAt(),
+			*session.NewExpiresAt(ctx),
 			time.Now(),
 		)
 
