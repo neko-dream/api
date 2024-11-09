@@ -2,9 +2,10 @@ package talksession
 
 import (
 	"context"
+	"time"
 
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/shared/time"
 	"github.com/neko-dream/server/internal/domain/model/user"
 )
 
@@ -94,5 +95,5 @@ func (t *TalkSession) ChangeTheme(theme string) {
 
 // 終了しているかを調べる
 func (t *TalkSession) IsFinished(ctx context.Context) bool {
-	return t.scheduledEndTime.Before(time.Now(ctx).Time)
+	return t.scheduledEndTime.Before(clock.Now(ctx))
 }
