@@ -66,6 +66,9 @@ func (i *createTalkSessionInteractor) Execute(ctx context.Context, input CreateT
 				*input.Longitude,
 			)
 		}
+		if input.ScheduledEndTime.Before(clock.Now(ctx)) {
+			return messages.InvalidScheduledEndTime
+		}
 		talkSession := talksession.NewTalkSession(
 			talkSessionID,
 			input.Theme,

@@ -24,5 +24,8 @@ func NewYearOfBirth(year *int) *YearOfBirth {
 }
 
 func (y YearOfBirth) Age(ctx context.Context) int {
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	return clock.Now(ctx).Year() - int(y)
 }

@@ -41,4 +41,9 @@ var (
 		Code:       "TALKSESSION-0007",
 		Message:    "セッションのテーマが長すぎます。20文字以内で入力してください。",
 	}
+	InvalidScheduledEndTime = &APIError{
+		StatusCode: 400,
+		Code:       "TALKSESSION-0008",
+		Message:    "終了予定時刻が現在時刻より前です。",
+	}
 )
