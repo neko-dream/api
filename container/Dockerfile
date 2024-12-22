@@ -1,4 +1,4 @@
-FROM golang:1.23.1-alpine3.20 AS builder
+FROM golang:1.23.4-alpine3.20 AS builder
 
 ENV CGO_ENABLED=0
 ENV GOOS=linux
@@ -21,7 +21,5 @@ EXPOSE 3000
 COPY --from=builder /app/server /server
 
 RUN chmod +x /server
-
-
 
 CMD ["./server"]

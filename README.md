@@ -11,3 +11,4 @@
 
 # ⚖️ License
 ことひろ は GNU Affero General Public License v3.0 (AGPL-3.0) の下で提供されています。詳細については[LICENSE](LICENSE)をご確認ください。
+
