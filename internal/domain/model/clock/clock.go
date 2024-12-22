@@ -23,7 +23,7 @@ func Now(ctx context.Context) time.Time {
 // SetNow 現在時刻を設定する
 func SetNow(ctx context.Context, t time.Time) context.Context {
 	if t.IsZero() {
-		return ctx
+		t = time.Now()
 	}
 	return context.WithValue(ctx, timeKey, t)
 }
