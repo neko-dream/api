@@ -22,5 +22,8 @@ func Now(ctx context.Context) time.Time {
 
 // SetNow 現在時刻を設定する
 func SetNow(ctx context.Context, t time.Time) context.Context {
+	if t.IsZero() {
+		return ctx
+	}
 	return context.WithValue(ctx, timeKey, t)
 }
