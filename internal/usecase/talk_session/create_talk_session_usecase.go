@@ -2,12 +2,13 @@ package talk_session_usecase
 
 import (
 	"context"
+	"time"
 	"unicode/utf8"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/messages"
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/shared/time"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/db"
@@ -65,12 +66,15 @@ func (i *createTalkSessionInteractor) Execute(ctx context.Context, input CreateT
 				*input.Longitude,
 			)
 		}
+		if input.ScheduledEndTime.Before(clock.Now(ctx)) {
+			return messages.InvalidScheduledEndTime
+		}
 		talkSession := talksession.NewTalkSession(
 			talkSessionID,
 			input.Theme,
 			input.Description,
 			input.OwnerID,
-			time.Now(ctx),
+			clock.Now(ctx),
 			input.ScheduledEndTime,
 			location,
 			input.City,

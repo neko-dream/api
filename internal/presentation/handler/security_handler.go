@@ -26,7 +26,7 @@ func (s *securityHandler) HandleSessionId(ctx context.Context, operationName str
 		return ctx, messages.ForbiddenError
 	}
 	// トークンの有効性を確認
-	if claim.IsExpired() {
+	if claim.IsExpired(ctx) {
 		return ctx, messages.TokenExpiredError
 	}
 
@@ -50,7 +50,7 @@ func (s *securityHandler) HandleSessionId(ctx context.Context, operationName str
 		return ctx, messages.ForbiddenError
 	}
 
-	if !sess.IsActive() {
+	if !sess.IsActive(ctx) {
 		return ctx, messages.TokenExpiredError
 	}
 

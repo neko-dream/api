@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"mime/multipart"
-	"time"
 
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/image"
 )
 
@@ -52,7 +52,7 @@ func (p *ProfileIcon) SetProfileIconImage(
 	}
 
 	img := image.NewImage(bytes)
-	imageInfo := image.NewImageInfo(fmt.Sprintf(objectPath, *user.DisplayID(), time.Now().Unix()), *ext, img)
+	imageInfo := image.NewImageInfo(fmt.Sprintf(objectPath, *user.DisplayID(), clock.Now(ctx).Unix()), *ext, img)
 	p.image = imageInfo
 
 	return nil

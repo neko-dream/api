@@ -1,8 +1,9 @@
 package user
 
 import (
-	"time"
+	"context"
 
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/samber/lo"
 )
 
@@ -22,6 +23,9 @@ func NewYearOfBirth(year *int) *YearOfBirth {
 
 }
 
-func (y YearOfBirth) Age() int {
-	return time.Now().Year() - int(y)
+func (y YearOfBirth) Age(ctx context.Context) int {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	return clock.Now(ctx).Year() - int(y)
 }

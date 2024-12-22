@@ -3,9 +3,9 @@ package opinion_usecase
 import (
 	"context"
 	"mime/multipart"
-	"time"
 
 	"github.com/neko-dream/server/internal/domain/messages"
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
@@ -64,7 +64,7 @@ func (i *postOpinionInteractor) Execute(ctx context.Context, input PostOpinionIn
 			input.ParentOpinionID,
 			input.Title,
 			input.Content,
-			time.Now(),
+			clock.Now(ctx),
 			input.ReferenceURL,
 		)
 		if err != nil {
@@ -90,7 +90,7 @@ func (i *postOpinionInteractor) Execute(ctx context.Context, input PostOpinionIn
 			input.TalkSessionID,
 			input.OwnerID,
 			vote.Agree,
-			time.Now(),
+			clock.Now(ctx),
 		)
 		if err != nil {
 			utils.HandleError(ctx, err, "NewVote")

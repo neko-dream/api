@@ -50,8 +50,8 @@ func (a *revokeInteractor) Execute(ctx context.Context, input RevokeInput) (Revo
 	}
 
 	// アクティブなセッションの場合のみ無効化
-	if sess.IsActive() {
-		sess.Deactivate()
+	if sess.IsActive(ctx) {
+		sess.Deactivate(ctx)
 		_, err = a.SessionRepository.Update(ctx, *sess)
 		if err != nil {
 			return RevokeOutput{}, errtrace.Wrap(err)

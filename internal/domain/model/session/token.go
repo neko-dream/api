@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/samber/lo"
@@ -31,11 +32,12 @@ type (
 	}
 )
 
-func NewClaim(user user.User, sessionID shared.UUID[Session]) Claim {
+func NewClaim(ctx context.Context, user user.User, sessionID shared.UUID[Session]) Claim {
+	now := clock.Now(ctx)
 	return Claim{
 		Sub:         user.UserID().String(),
-		Iat:         time.Now().Unix(),
-		Exp:         time.Now().Add(time.Second * 60 * 60 * 24 * 7).Unix(),
+		Iat:         now.Unix(),
+		Exp:         now.Add(time.Second * 60 * 60 * 24 * 7).Unix(),
 		Jti:         sessionID.String(),
 		IconURL:     user.ProfileIconURL(),
 		DisplayID:   user.DisplayID(),
@@ -83,8 +85,8 @@ func (c *Claim) Issuer() string {
 	return Issuer
 }
 
-func (c *Claim) IsExpired() bool {
-	return time.Now().Unix() > c.Exp
+func (c *Claim) IsExpired(ctx context.Context) bool {
+	return clock.Now(ctx).Unix() > c.Exp
 }
 func (c *Claim) IssueAt() time.Time {
 	return time.Unix(c.Iat, 0)

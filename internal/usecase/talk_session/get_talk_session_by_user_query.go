@@ -3,10 +3,10 @@ package talk_session_usecase
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/shared/time"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/db"
 	model "github.com/neko-dream/server/internal/infrastructure/db/sqlc"
@@ -110,8 +110,8 @@ func (h *GetTalkSessionByUserQueryHandler) Execute(ctx context.Context, input Ge
 				),
 			},
 			OpinionCount:     int(ts.OpinionCount),
-			CreatedAt:        time.NewTime(ctx, ts.CreatedAt).Format(ctx),
-			ScheduledEndTime: time.NewTime(ctx, ts.ScheduledEndTime).Format(ctx),
+			CreatedAt:        ts.CreatedAt.Format(time.RFC3339),
+			ScheduledEndTime: ts.ScheduledEndTime.Format(time.RFC3339),
 			Location:         locationDTO,
 			City:             utils.ToPtrIfNotNullValue[string](!ts.City.Valid, ts.City.String),
 			Prefecture:       utils.ToPtrIfNotNullValue[string](!ts.Prefecture.Valid, ts.Prefecture.String),

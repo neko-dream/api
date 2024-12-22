@@ -6,7 +6,6 @@ import (
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/shared/time"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/db"
@@ -51,8 +50,8 @@ func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talkses
 		Theme:            talkSession.Theme(),
 		Description:      description,
 		OwnerID:          talkSession.OwnerUserID().UUID(),
-		CreatedAt:        talkSession.CreatedAt().Time,
-		ScheduledEndTime: talkSession.ScheduledEndTime().Time,
+		CreatedAt:        talkSession.CreatedAt(),
+		ScheduledEndTime: talkSession.ScheduledEndTime(),
 		Prefecture:       prefecture,
 		City:             city,
 	}); err != nil {
@@ -87,7 +86,7 @@ func (t *talkSessionRepository) Update(ctx context.Context, talkSession *talkses
 	if err := t.GetQueries(ctx).EditTalkSession(ctx, model.EditTalkSessionParams{
 		TalkSessionID:    talkSession.TalkSessionID().UUID(),
 		Theme:            talkSession.Theme(),
-		ScheduledEndTime: talkSession.ScheduledEndTime().Time,
+		ScheduledEndTime: talkSession.ScheduledEndTime(),
 		Description:      description,
 	}); err != nil {
 		return errtrace.Wrap(err)
@@ -135,8 +134,8 @@ func (t *talkSessionRepository) FindByID(ctx context.Context, talkSessionID shar
 		row.Theme,
 		description,
 		shared.UUID[user.User](row.UserID.UUID),
-		time.NewTime(ctx, row.CreatedAt),
-		time.NewTime(ctx, row.ScheduledEndTime),
+		row.CreatedAt,
+		row.ScheduledEndTime,
 		location,
 		city,
 		prefecture,

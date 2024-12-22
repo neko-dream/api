@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"mime/multipart"
-	"time"
 
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/image"
 )
 
@@ -46,8 +46,14 @@ func (p *ReferenceImage) SetReferenceImage(
 		return err
 	}
 
+	now := clock.Now(ctx)
 	img := image.NewImage(bytes)
-	imageInfo := image.NewImageInfo(fmt.Sprintf(objectPath, time.Now().Year(), time.Now().Month(), time.Now().Day(), time.Now().UnixNano()), *ext, img)
+	imageInfo := image.NewImageInfo(fmt.Sprintf(
+		objectPath,
+		now.Year(),
+		now.Month(),
+		now.Day(),
+		now.UnixNano()), *ext, img)
 	p.image = imageInfo
 
 	return nil

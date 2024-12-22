@@ -2,9 +2,9 @@ package timeline_usecase
 
 import (
 	"context"
-	"time"
 
 	"github.com/neko-dream/server/internal/domain/messages"
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	timelineactions "github.com/neko-dream/server/internal/domain/model/timeline_actions"
@@ -69,6 +69,7 @@ func (i *addTimeLineInteractor) Execute(ctx context.Context, input AddTimeLineIn
 	if talkSession.OwnerUserID() != input.OwnerID {
 		return nil, messages.TalkSessionNotOwner
 	}
+	now := clock.Now(ctx)
 
 	newActionItem, err := timelineactions.NewActionItem(
 		shared.NewUUID[timelineactions.ActionItem](),
@@ -76,8 +77,8 @@ func (i *addTimeLineInteractor) Execute(ctx context.Context, input AddTimeLineIn
 		0,
 		input.Content,
 		timelineactions.ActionStatus(input.Status),
-		time.Now(),
-		time.Now(),
+		now,
+		now,
 	)
 	if err != nil {
 		utils.HandleError(ctx, err, "timelineactions.NewActionItem")

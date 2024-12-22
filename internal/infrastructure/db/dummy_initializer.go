@@ -4,9 +4,9 @@ import (
 	"context"
 	"log"
 
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/shared/time"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/domain/model/vote"
@@ -451,8 +451,8 @@ func (d *DummyInitializer) TalkSession() error {
 			"オブジェクト指向は悪",
 			lo.ToPtr("オブジェクト指向ってなんで悪なの？その理由を探しに我々はアマゾンのジャングルへと向かった。"),
 			d.Users[0].UserID(),
-			time.Now(ctx),
-			time.Now(ctx).Add(ctx, 3*time.Month),
+			clock.Now(ctx),
+			clock.Now(ctx).AddDate(0, 3, 0),
 			nil,
 			nil, nil,
 		),
@@ -461,8 +461,8 @@ func (d *DummyInitializer) TalkSession() error {
 			"オブジェクト指向は良",
 			nil,
 			d.Users[1].UserID(),
-			time.Now(ctx),
-			time.Now(ctx).Add(ctx, 3*time.Month),
+			clock.Now(ctx),
+			clock.Now(ctx).AddDate(0, 3, 0),
 			nil,
 			nil,
 			nil,
@@ -506,7 +506,7 @@ func (d *DummyInitializer) Opinion() error {
 		nil,
 		lo.ToPtr("オブジェクト指向は最高！"),
 		"オブジェクト指向は現実世界をモデル化できる最高の方法！効率的だし、どんな規模でも対応できる！",
-		time.Now(ctx).Time,
+		clock.Now(ctx),
 		nil,
 	)
 	opinions = append(opinions, o1)
@@ -517,7 +517,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Agree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -528,7 +528,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Disagree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -539,7 +539,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Pass,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -551,7 +551,7 @@ func (d *DummyInitializer) Opinion() error {
 		lo.ToPtr(o1.OpinionID()),
 		nil,
 		"現実をモデル化したとて複雑化するだけ。オブジェクト指向は時代遅れ。",
-		time.Now(ctx).Time,
+		clock.Now(ctx),
 		nil,
 	)
 	opinions = append(opinions, o1o1)
@@ -563,7 +563,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Disagree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -574,7 +574,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Agree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -585,7 +585,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Pass,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -597,7 +597,7 @@ func (d *DummyInitializer) Opinion() error {
 		nil,
 		lo.ToPtr("手続型よりマシ"),
 		"クラスとオブジェクトの概念がなかったら、大規模システムなんて絶対崩壊してるよ。手続き型で管理できるわけない。",
-		time.Now(ctx).Time,
+		clock.Now(ctx),
 		nil,
 	)
 	opinions = append(opinions, o2)
@@ -609,7 +609,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Agree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -620,7 +620,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Agree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -631,7 +631,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Disagree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -643,7 +643,7 @@ func (d *DummyInitializer) Opinion() error {
 		lo.ToPtr(o2.OpinionID()),
 		nil,
 		"別にオブジェクト指向がなくても、大規模システムは作れる。大規模システムでオブジェクト指向を使っても崩壊することはある。",
-		time.Now(ctx).Time,
+		clock.Now(ctx),
 		nil,
 	)
 	opinions = append(opinions, o2o1)
@@ -655,7 +655,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Disagree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -666,7 +666,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Agree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -677,7 +677,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Agree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -689,7 +689,7 @@ func (d *DummyInitializer) Opinion() error {
 		nil,
 		nil,
 		"オブジェクト指向はクラスの継承でコードがカオスになる。",
-		time.Now(ctx).Time,
+		clock.Now(ctx),
 		nil,
 	)
 	opinions = append(opinions, o3)
@@ -701,7 +701,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Disagree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -712,7 +712,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Agree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -723,7 +723,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Pass,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -735,7 +735,7 @@ func (d *DummyInitializer) Opinion() error {
 		nil,
 		nil,
 		"オブジェクト指向は分かりやすいし、チーム開発でもコミュニケーションがスムーズになるから最適。",
-		time.Now(ctx).Time,
+		clock.Now(ctx),
 		nil,
 	)
 	opinions = append(opinions, o4)
@@ -747,7 +747,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Agree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -758,7 +758,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Disagree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -769,7 +769,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Disagree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -781,7 +781,7 @@ func (d *DummyInitializer) Opinion() error {
 		lo.ToPtr(o4.OpinionID()),
 		nil,
 		"オブジェクト指向は正しく設計されていないとあまりにもわかりにくい。設計が重要。",
-		time.Now(ctx).Time,
+		clock.Now(ctx),
 		nil,
 	)
 	opinions = append(opinions, o4o1)
@@ -793,7 +793,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Pass,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -804,7 +804,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Agree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -815,7 +815,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Agree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -827,7 +827,7 @@ func (d *DummyInitializer) Opinion() error {
 		nil,
 		lo.ToPtr("オブジェクト指向は時代遅れ"),
 		"オブジェクト指向なんて時代遅れだよ。状態管理が複雑すぎるし、バグの温床。",
-		time.Now(ctx).Time,
+		clock.Now(ctx),
 		nil,
 	)
 	opinions = append(opinions, o5)
@@ -839,7 +839,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Disagree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -850,7 +850,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Agree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -861,7 +861,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Pass,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -873,7 +873,7 @@ func (d *DummyInitializer) Opinion() error {
 		nil,
 		nil,
 		"関数型だけが正義。オブジェクト指向は状態管理が難しすぎる。",
-		time.Now(ctx).Time,
+		clock.Now(ctx),
 		nil,
 	)
 	opinions = append(opinions, o6)
@@ -885,7 +885,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Disagree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -896,7 +896,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Agree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -907,7 +907,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Pass,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -919,7 +919,7 @@ func (d *DummyInitializer) Opinion() error {
 		nil,
 		nil,
 		"理論的に見ても、オブジェクト指向は現実世界のシミュレーションに最も近い。これを捨てるなんて非合理的。",
-		time.Now(ctx).Time,
+		clock.Now(ctx),
 		nil,
 	)
 	opinions = append(opinions, o7)
@@ -931,7 +931,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Agree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -942,7 +942,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Disagree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -953,7 +953,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Disagree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -965,7 +965,7 @@ func (d *DummyInitializer) Opinion() error {
 		lo.ToPtr(o7.OpinionID()),
 		nil,
 		"理想論でしかない。現実世界をシミュレーションできて何が嬉しいのか。そもそもコードが現実世界をシミュレーションする必要があるのか。",
-		time.Now(ctx).Time,
+		clock.Now(ctx),
 		nil,
 	)
 	opinions = append(opinions, o7o1)
@@ -976,7 +976,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Disagree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -987,7 +987,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Agree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -998,7 +998,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Agree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -1010,7 +1010,7 @@ func (d *DummyInitializer) Opinion() error {
 		nil,
 		nil,
 		"オブジェクト指向使ってるけど、正直メンテコストばかり増える気がする。",
-		time.Now(ctx).Time,
+		clock.Now(ctx),
 		nil,
 	)
 	opinions = append(opinions, o8)
@@ -1021,7 +1021,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Disagree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -1032,7 +1032,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Agree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -1043,7 +1043,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Pass,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -1055,7 +1055,7 @@ func (d *DummyInitializer) Opinion() error {
 		lo.ToPtr(o8.OpinionID()),
 		nil,
 		"適切に設計されていればメンテコストは増えない。設計を正しくできない人間が文句言ってるだけ。",
-		time.Now(ctx).Time,
+		clock.Now(ctx),
 		nil,
 	)
 	opinions = append(opinions, o8o1)
@@ -1066,7 +1066,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Agree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -1077,7 +1077,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Agree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -1088,7 +1088,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Disagree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -1100,7 +1100,7 @@ func (d *DummyInitializer) Opinion() error {
 		nil,
 		nil,
 		"オブジェクト指向は、継承の概念があるから、コードの再利用がしやすい。",
-		time.Now(ctx).Time,
+		clock.Now(ctx),
 		nil,
 	)
 	opinions = append(opinions, o9)
@@ -1111,7 +1111,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Agree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -1122,7 +1122,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Agree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -1133,7 +1133,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			u.UserID(),
 			vote.Disagree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		votes = append(votes, vs)
 	}
@@ -1145,7 +1145,7 @@ func (d *DummyInitializer) Opinion() error {
 		nil,
 		nil,
 		"関数型言語の方が、オブジェクト指向よりも再利用性が高い。",
-		time.Now(ctx).Time,
+		clock.Now(ctx),
 		nil,
 	)
 	opinions = append(opinions, o10)
@@ -1162,7 +1162,7 @@ func (d *DummyInitializer) Opinion() error {
 			ts.TalkSessionID(),
 			o.UserID(),
 			vote.Agree,
-			time.Now(ctx).Time,
+			clock.Now(ctx),
 		)
 		err = d.VoteRepo.Create(ctx, *vs)
 		if err != nil {
