@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"log"
-	"time"
 
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
@@ -453,7 +452,7 @@ func (d *DummyInitializer) TalkSession() error {
 			lo.ToPtr("オブジェクト指向ってなんで悪なの？その理由を探しに我々はアマゾンのジャングルへと向かった。"),
 			d.Users[0].UserID(),
 			clock.Now(ctx),
-			clock.Now(ctx).Add(3*time.Hour*24*30),
+			clock.Now(ctx).AddDate(0, 3, 0),
 			nil,
 			nil, nil,
 		),
@@ -463,7 +462,7 @@ func (d *DummyInitializer) TalkSession() error {
 			nil,
 			d.Users[1].UserID(),
 			clock.Now(ctx),
-			clock.Now(ctx).Add(3*time.Hour*24*30),
+			clock.Now(ctx).AddDate(0, 3, 0),
 			nil,
 			nil,
 			nil,
