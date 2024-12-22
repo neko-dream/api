@@ -13,7 +13,9 @@ var (
 // Now 現在時刻を取得する
 func Now(ctx context.Context) time.Time {
 	if t, ok := ctx.Value(timeKey).(time.Time); ok {
-		return t
+		if !t.IsZero() {
+			return t
+		}
 	}
 	return time.Now()
 }
