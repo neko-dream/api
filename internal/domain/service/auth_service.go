@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"crypto/rand"
 	"net/url"
 
 	"braces.dev/errtrace"
@@ -40,11 +41,7 @@ func (a *authService) Authenticate(
 		return nil, errtrace.Wrap(messages.InvalidProviderError)
 	}
 
-	provider, err := oauth.OIDCProviderFactory(
-		ctx,
-		a.config,
-		authProviderName,
-	)
+	provider, err := oauth.NewOIDCProvider(ctx, authProviderName, a.config)
 	if err != nil {
 		utils.HandleError(ctx, err, "OIDCProviderFactory")
 		return nil, errtrace.Wrap(err)
@@ -89,11 +86,7 @@ func (a *authService) GetAuthURL(
 		return nil, "", errtrace.Wrap(err)
 	}
 
-	provider, err := oauth.OIDCProviderFactory(
-		ctx,
-		a.config,
-		authProviderName,
-	)
+	provider, err := oauth.NewOIDCProvider(ctx, authProviderName, a.config)
 	if err != nil {
 		utils.HandleError(ctx, err, "OIDCProviderFactory")
 		return nil, "", errtrace.Wrap(err)
