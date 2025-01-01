@@ -51,7 +51,7 @@ jobs:
       - name: Create new PR
         if: steps.check_existing_pr.outputs.found_pr == 'false'
         run: |
-         pr create \
+          gh pr create \
             --base main \
             --head develop \
             --title "Auto merge from develop to main" \
