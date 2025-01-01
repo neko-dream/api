@@ -99,7 +99,12 @@ func (a *authService) GetAuthURL(
 		return nil, "", errtrace.Wrap(err)
 	}
 
-	state := provider.GenerateState()
+	state, err := a.GenerateState(ctx)
+	if err != nil {
+		utils.HandleError(ctx, err, "GenerateState")
+		return nil, "", errtrace.Wrap(err)
+	}
+
 	authURL := provider.GetAuthURL(ctx, state)
 	url, err := url.Parse(authURL)
 	if err != nil {
