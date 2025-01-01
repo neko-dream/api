@@ -77,6 +77,12 @@ func (j *tokenManager) Generate(ctx context.Context, user user.User, sessionID s
 func (j *tokenManager) Parse(ctx context.Context, token string) (*session.Claim, error) {
 
 	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+		// アルゴリズムの確認
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			utils.HandleError(ctx, jwt.ErrInvalidKeyType, "InvalidKeyType")
+			return nil, errtrace.Wrap(jwt.ErrInvalidKeyType)
+		}
+
 		return []byte(j.secret), nil
 	})
 	if err != nil {
@@ -87,6 +93,12 @@ func (j *tokenManager) Parse(ctx context.Context, token string) (*session.Claim,
 	if !ok {
 		return nil, errtrace.Wrap(jwt.ErrInvalidKeyType)
 	}
+
+	// issuerの検証
+	if mapClaim["iss"].(string) != session.Issuer {
+		return nil, errtrace.Wrap(errors.New("invalid issuer"))
+	}
+
 	claim := session.NewClaimFromMap(mapClaim)
 	return &claim, nil
 }
