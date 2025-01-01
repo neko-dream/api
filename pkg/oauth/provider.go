@@ -100,16 +100,11 @@ func (p *oidcProvider) Verify(ctx context.Context, token *oauth2.Token) (string,
 		return "", nil, errtrace.Wrap(errors.New("id_token not found"))
 	}
 
-	res, err := p.provider.Verifier(&oidc.Config{ClientID: p.config.ClientID}).Verify(ctx, rawToken)
+	res, err := p.provider.Verifier(&oidc.Config{
+		ClientID:             p.config.ClientID,
+		SupportedSigningAlgs: []string{"RS256", "ES256"},
+	}).Verify(ctx, rawToken)
 	return rawToken, res, errtrace.Wrap(err)
-}
-
-func (p *oidcProvider) userInfo(ctx context.Context, token *oauth2.Token) (*oidc.UserInfo, error) {
-	userInfo, err := p.provider.UserInfo(ctx, oauth2.StaticTokenSource(token))
-	if err != nil {
-		return nil, errtrace.Wrap(err)
-	}
-	return userInfo, nil
 }
 
 func (p *oidcProvider) Refresh(ctx context.Context, token *oauth2.Token) (*oauth2.Token, error) {
