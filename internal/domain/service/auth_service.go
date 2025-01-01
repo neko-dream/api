@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"crypto/rand"
 	"net/url"
 
 	"braces.dev/errtrace"
@@ -40,11 +41,7 @@ func (a *authService) Authenticate(
 		return nil, errtrace.Wrap(messages.InvalidProviderError)
 	}
 
-	provider, err := oauth.OIDCProviderFactory(
-		ctx,
-		a.config,
-		authProviderName,
-	)
+	provider, err := oauth.NewOIDCProvider(ctx, authProviderName, a.config)
 	if err != nil {
 		utils.HandleError(ctx, err, "OIDCProviderFactory")
 		return nil, errtrace.Wrap(err)
@@ -89,17 +86,18 @@ func (a *authService) GetAuthURL(
 		return nil, "", errtrace.Wrap(err)
 	}
 
-	provider, err := oauth.OIDCProviderFactory(
-		ctx,
-		a.config,
-		authProviderName,
-	)
+	provider, err := oauth.NewOIDCProvider(ctx, authProviderName, a.config)
 	if err != nil {
 		utils.HandleError(ctx, err, "OIDCProviderFactory")
 		return nil, "", errtrace.Wrap(err)
 	}
 
-	state := provider.GenerateState()
+	state, err := a.GenerateState(ctx)
+	if err != nil {
+		utils.HandleError(ctx, err, "GenerateState")
+		return nil, "", errtrace.Wrap(err)
+	}
+
 	authURL := provider.GetAuthURL(ctx, state)
 	url, err := url.Parse(authURL)
 	if err != nil {
@@ -108,4 +106,20 @@ func (a *authService) GetAuthURL(
 	}
 
 	return url, state, nil
+}
+
+var randTable = []byte("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
+
+func (a *authService) GenerateState(ctx context.Context) (string, error) {
+	b := make([]byte, 32)
+	if _, err := rand.Read(b); err != nil {
+		utils.HandleError(ctx, err, "rand.Read")
+		return "", errtrace.Wrap(err)
+	}
+
+	for i, v := range b {
+		b[i] = randTable[v%byte(len(randTable))]
+	}
+
+	return string(b), nil
 }

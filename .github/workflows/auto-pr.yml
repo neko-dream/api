@@ -1,0 +1,62 @@
+name: Auto create PR from develop to main
+
+on:
+  push:
+    branches:
+      - develop  # developブランチへのpush（＝マージ完了含む）でトリガー
+
+
+permissions:
+    pull-requests: write   # Pull Request作成・変更権限
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
+
+      - name: Install GitHub CLI
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y gh
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+      # GitHub CLI で認証してからPR作成
+      - name: Auth with GitHub CLI
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+
+      - name: Check existing PR
+        id: check_existing_pr
+        run: |
+            # gh pr view --base main --head develop でPRを確認
+            # 見つかればJSONが返り、見つからなければエラー終了する
+            set +e
+            PR_VIEW_OUTPUT=$(gh pr view --json number --base main --head develop)
+            EXIT_CODE=$?
+            set -e
+
+            if [ $EXIT_CODE -ne 0 ]; then
+              # PRが存在しない
+              echo "found_pr=false" >> $GITHUB_OUTPUT
+              echo "pr_number=" >> $GITHUB_OUTPUT
+            else
+              # PRが存在する
+              pr_number=$(echo "$PR_VIEW_OUTPUT" | jq -r '.number')
+              echo "found_pr=true" >> $GITHUB_OUTPUT
+              echo "pr_number=$pr_number" >> $GITHUB_OUTPUT
+            fi
+
+      - name: Create new PR
+        if: steps.check_existing_pr.outputs.found_pr == 'false'
+        run: |
+          gh pr create \
+            --base main \
+            --head develop \
+            --title "Auto merge from develop to main" \
+            --body "Auto merge from develop to main"
