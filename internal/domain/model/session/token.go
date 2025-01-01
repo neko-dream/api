@@ -96,8 +96,8 @@ func (c *Claim) ExpiresAt() time.Time {
 }
 
 const (
-	Issuer   = "kotohiro.com"
-	Audience = "kotohiro.com"
+	Issuer   = "https://api.kotohiro.com"
+	Audience = "https://api.kotohiro.com"
 )
 
 func (c *Claim) GenMapClaim() *jwt.MapClaims {
