@@ -7,14 +7,24 @@ import (
 )
 
 type Config struct {
-	Env                string `mapstructure:"ENV"`
-	DatabaseURL        string `mapstructure:"DATABASE_URL"`
+	Env         string `mapstructure:"ENV"`
+	DatabaseURL string `mapstructure:"DATABASE_URL"`
+
 	GoogleClientID     string `mapstructure:"GOOGLE_CLIENT_ID"`
 	GoogleClientSecret string `mapstructure:"GOOGLE_CLIENT_SECRET"`
 	GoogleCallbackURL  string `mapstructure:"GOOGLE_CALLBACK_URL"`
-	GoogleIssuer       string `mapstructure:"GOOGLE_ISSUER"`
-	DOMAIN             string `mapstructure:"DOMAIN"`
-	PORT               string `mapstructure:"PORT"`
+
+	LineClientID     string `mapstructure:"LINE_CHANNEL_ID"`
+	LineClientSecret string `mapstructure:"LINE_CHANNEL_SECRET"`
+	LineCallbackURL  string `mapstructure:"LINE_CALLBACK_URL"`
+
+	DOMAIN string `mapstructure:"DOMAIN"`
+	PORT   string `mapstructure:"PORT"`
+
+	TokenSecret string `mapstructure:"TOKEN_SECRET"`
+
+	TokenPrivateKey string `mapstructure:"TOKEN_PRIVATE"`
+	TokenPublicKey  string `mapstructure:"TOKEN_PUBLIC"`
 
 	AWS_REGION            string `mapstructure:"AWS_REGION"`
 	AWS_ACCESS_KEY_ID     string `mapstructure:"AWS_ACCESS_KEY_ID"`
@@ -65,10 +75,25 @@ func LoadConfig() *Config {
 			if err := viper.BindEnv("GOOGLE_ISSUER"); err != nil {
 				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
 			}
+
+			if err := viper.BindEnv("LINE_CHANNEL_ID"); err != nil {
+				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
+			}
+			if err := viper.BindEnv("LINE_CHANNEL_SECRET"); err != nil {
+				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
+			}
+			if err := viper.BindEnv("LINE_CALLBACK_URL"); err != nil {
+				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
+			}
+
 			if err := viper.BindEnv("DOMAIN"); err != nil {
 				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
 			}
 			if err := viper.BindEnv("PORT"); err != nil {
+				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
+			}
+
+			if err := viper.BindEnv("TOKEN_SECRET"); err != nil {
 				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
 			}
 
