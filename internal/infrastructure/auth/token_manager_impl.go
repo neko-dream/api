@@ -31,6 +31,8 @@ func (j *tokenManager) SetSession(ctx context.Context) context.Context {
 		if errors.Is(err, http.ErrNoCookie) {
 			return nil
 		}
+		utils.HandleError(ctx, err, "CookieError")
+		return nil
 	}
 	// セッションIDを取得
 	claim, err := j.Parse(ctx, sessionCookie.Value)
