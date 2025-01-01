@@ -22,6 +22,7 @@ reviews:
     - "README.md"
     - "oapi.yaml"
     - "ogen.yml"
+    - ".github/**"
   auto_review:
     enabled: true
     drafts: false
