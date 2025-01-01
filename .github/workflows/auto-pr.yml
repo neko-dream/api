@@ -5,6 +5,10 @@ on:
     branches:
       - develop  # developブランチへのpush（＝マージ完了含む）でトリガー
 
+
+permissions:
+    pull-requests: write   # Pull Request作成・変更権限
+
 jobs:
   create-pr:
     runs-on: ubuntu-latest
