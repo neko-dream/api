@@ -118,23 +118,27 @@ func (p *oidcProvider) UserInfo(ctx context.Context, code string) (*UserInfo, er
 		}
 		var rawKey any
 		if err := jwk.Export(key, &rawKey); err != nil {
+			utils.HandleError(ctx, err, "jwk.Export")
 			return nil, fmt.Errorf("failed to export JWK: %v", err)
 		}
 
 		return rawKey, nil
 	})
 	if err != nil {
+		utils.HandleError(ctx, err, "jwt.Parse")
 		return nil, fmt.Errorf("failed to parse JWT: %v", err)
 	}
 
 	claims, ok := jwtToken.Claims.(jwt.MapClaims)
 	if !ok || !jwtToken.Valid {
+		utils.HandleError(ctx, nil, "invalid token")
 		return nil, fmt.Errorf("failed to get claims")
 	}
 
 	// audienceの検証
 	aud, err := jwtToken.Claims.GetAudience()
 	if err != nil {
+		utils.HandleError(ctx, err, "GetAudience")
 		return nil, fmt.Errorf("failed to get audience")
 	}
 	if !slices.Contains(aud, p.oauthConf.ClientID) {
@@ -143,6 +147,7 @@ func (p *oidcProvider) UserInfo(ctx context.Context, code string) (*UserInfo, er
 	// issuerの検証
 	iss, err := jwtToken.Claims.GetIssuer()
 	if err != nil {
+		utils.HandleError(ctx, err, "GetIssuer")
 		return nil, fmt.Errorf("failed to get issuer")
 	}
 	if iss != provider.Issuer.String() {
