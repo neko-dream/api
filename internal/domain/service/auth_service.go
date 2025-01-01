@@ -109,3 +109,19 @@ func (a *authService) GetAuthURL(
 
 	return url, state, nil
 }
+
+var randTable = []byte("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
+
+func (a *authService) GenerateState(ctx context.Context) (string, error) {
+	b := make([]byte, 32)
+	if _, err := rand.Read(b); err != nil {
+		utils.HandleError(ctx, err, "rand.Read")
+		return "", errtrace.Wrap(err)
+	}
+
+	for i, v := range b {
+		b[i] = randTable[v%byte(len(randTable))]
+	}
+
+	return string(b), nil
+}

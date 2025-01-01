@@ -11,5 +11,6 @@ type (
 	AuthService interface {
 		Authenticate(ctx context.Context, provider, code string) (*user.User, error)
 		GetAuthURL(ctx context.Context, providerName string) (*url.URL, string, error)
+		GenerateState(ctx context.Context) (string, error)
 	}
 )
