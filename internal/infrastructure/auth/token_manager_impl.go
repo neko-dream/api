@@ -91,23 +91,12 @@ func (j *tokenManager) Parse(ctx context.Context, token string) (*session.Claim,
 	return &claim, nil
 }
 
-var (
-	secretReadOnce  sync.Once
-	secretSingleton string
-)
-
-func initSecret() {
-	secretReadOnce.Do(func() {
-		secretSingleton = os.Getenv("TOKEN_SECRET")
-	})
-}
-
 func NewTokenManager(
 	sessRepo session.SessionRepository,
+	conf *config.Config,
 ) session.TokenManager {
-	initSecret()
 	return &tokenManager{
-		secret:            secretSingleton,
+		secret:            conf.TokenSecret,
 		SessionRepository: sessRepo,
 	}
 }
