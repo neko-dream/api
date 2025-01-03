@@ -5,10 +5,10 @@ import (
 	"net/http"
 
 	"braces.dev/errtrace"
-	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
+	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	cookie_utils "github.com/neko-dream/server/pkg/cookie"
@@ -33,7 +33,7 @@ type (
 	authCallbackInteractor struct {
 		*db.DBManager
 		*config.Config
-		auth.AuthService
+		service.AuthService
 		session.SessionRepository
 		session.SessionService
 		session.TokenManager
@@ -43,7 +43,7 @@ type (
 func NewAuthCallbackUseCase(
 	tm *db.DBManager,
 	config *config.Config,
-	authService auth.AuthService,
+	authService service.AuthService,
 	sessionRepository session.SessionRepository,
 	sessionService session.SessionService,
 	tokenManager session.TokenManager,

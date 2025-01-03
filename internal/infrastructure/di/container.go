@@ -6,6 +6,7 @@ import (
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/infrastructure/auth/jwt"
+	"github.com/neko-dream/server/internal/infrastructure/auth/oauth"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	client "github.com/neko-dream/server/internal/infrastructure/external/analysis"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
@@ -37,6 +38,7 @@ func BuildContainer() *dig.Container {
 		{postgresql.Connect, nil},
 		{db.NewMigrator, nil},
 		{db.NewDBManager, nil},
+		{oauth.NewProviderFactory, nil},
 		{telemetry.SentryProvider, nil},
 		{repository.InitConfig, nil},
 		{repository.InitS3Client, nil},
@@ -55,6 +57,7 @@ func BuildContainer() *dig.Container {
 		{service.NewUserService, nil},
 		{service.NewOpinionService, nil},
 		{service.NewActionItemService, nil},
+		{service.NewStateGenerator, nil},
 		{auth_usecase.NewAuthLoginUseCase, nil},
 		{auth_usecase.NewAuthCallbackUseCase, nil},
 		{auth_usecase.NewRevokeUseCase, nil},
