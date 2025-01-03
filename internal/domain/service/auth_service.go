@@ -41,6 +41,10 @@ func (a *authService) Authenticate(
 	code string,
 ) (*user.User, error) {
 	provider, err := a.authProviderFactory.NewAuthProvider(ctx, providerName)
+	if err != nil {
+		utils.HandleError(ctx, err, "AuthProviderFactory.NewAuthProvider")
+		return nil, errtrace.Wrap(err)
+	}
 
 	subject, _, err := provider.VerifyAndIdentify(ctx, code)
 	if err != nil {
