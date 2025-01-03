@@ -19,3 +19,4 @@ jobs:
           else
             echo "Pull request from develop to main branch"
           fi
+          echo "test"
