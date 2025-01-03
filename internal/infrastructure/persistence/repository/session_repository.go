@@ -46,10 +46,14 @@ func (s *sessionRepository) FindBySessionID(ctx context.Context, sess shared.UUI
 		return nil, errtrace.Wrap(err)
 	}
 
+	providerName, err := auth.NewAuthProviderName(sessRow.Provider)
+	if err != nil {
+		return nil, errtrace.Wrap(err)
+	}
 	return session.NewSession(
 		shared.UUID[session.Session](sessRow.SessionID),
 		shared.UUID[user.User](sessRow.UserID),
-		auth.AuthProviderName(sessRow.Provider),
+		providerName,
 		*session.NewSessionStatus(int(sessRow.SessionStatus)),
 		sessRow.ExpiresAt,
 		sessRow.LastActivityAt,
@@ -68,10 +72,14 @@ func (s *sessionRepository) FindByUserID(ctx context.Context, userID shared.UUID
 
 	sessions := make([]session.Session, 0, len(sessionModels))
 	for _, sess := range sessionModels {
+		providerName, err := auth.NewAuthProviderName(sess.Provider)
+		if err != nil {
+			continue
+		}
 		sessions = append(sessions, *session.NewSession(
 			shared.UUID[session.Session](sess.SessionID),
 			shared.UUID[user.User](sess.UserID),
-			auth.AuthProviderName(sess.Provider),
+			providerName,
 			*session.NewSessionStatus(int(sess.SessionStatus)),
 			sess.ExpiresAt,
 			sess.LastActivityAt,

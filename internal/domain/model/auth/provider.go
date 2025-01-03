@@ -2,6 +2,10 @@ package auth
 
 import (
 	"context"
+	"errors"
+	"strings"
+
+	"braces.dev/errtrace"
 )
 
 type (
@@ -33,6 +37,17 @@ const (
 	ProviderGoogle AuthProviderName = "GOOGLE"
 	ProviderLine   AuthProviderName = "LINE"
 )
+
+func NewAuthProviderName(provider string) (AuthProviderName, error) {
+	switch strings.ToUpper(provider) {
+	case ProviderGoogle.String():
+		return ProviderGoogle, nil
+	case ProviderLine.String():
+		return ProviderLine, nil
+	default:
+		return "", errtrace.Wrap(errors.New("invalid auth provider"))
+	}
+}
 
 func (a AuthProviderName) IssuerURI() IssuerURI {
 	switch a {

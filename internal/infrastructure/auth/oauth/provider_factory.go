@@ -20,7 +20,7 @@ func NewProviderFactory(
 }
 
 func (p *providerFactory) NewAuthProvider(ctx context.Context, providerName string) (auth.AuthProvider, error) {
-	authProviderName, err := NewAuthProviderName(providerName)
+	authProviderName, err := auth.NewAuthProviderName(providerName)
 	if err != nil {
 		return nil, err
 	}

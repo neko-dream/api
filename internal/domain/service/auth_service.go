@@ -60,12 +60,16 @@ func (a *authService) Authenticate(
 		return existUser, nil
 	}
 
+	authProviderName, err := auth.NewAuthProviderName(providerName)
+	if err != nil {
+		return nil, errtrace.Wrap(err)
+	}
 	newUser := user.NewUser(
 		shared.NewUUID[user.User](),
 		nil,
 		nil,
 		*subject,
-		auth.AuthProviderName(providerName),
+		authProviderName,
 		nil,
 	)
 	if err := a.userRepository.Create(ctx, newUser); err != nil {

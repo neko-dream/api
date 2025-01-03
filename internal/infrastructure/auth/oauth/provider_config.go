@@ -1,25 +1,9 @@
 package oauth
 
 import (
-	"errors"
-	"strings"
-
-	"braces.dev/errtrace"
-
 	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 )
-
-func NewAuthProviderName(provider string) (auth.AuthProviderName, error) {
-	switch strings.ToUpper(provider) {
-	case auth.ProviderGoogle.String():
-		return auth.ProviderGoogle, nil
-	case auth.ProviderLine.String():
-		return auth.ProviderLine, nil
-	default:
-		return "", errtrace.Wrap(errors.New("invalid auth provider"))
-	}
-}
 
 type Provider struct {
 	Issuer                auth.IssuerURI
