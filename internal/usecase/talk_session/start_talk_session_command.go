@@ -16,7 +16,7 @@ import (
 )
 
 type (
-	CreateTalkSessionUseCase interface {
+	StartTalkSessionCommand interface {
 		Execute(context.Context, CreateTalkSessionInput) (CreateTalkSessionOutput, error)
 	}
 
@@ -104,11 +104,11 @@ func (i *createTalkSessionInteractor) Execute(ctx context.Context, input CreateT
 	return output, nil
 }
 
-func NewCreateTalkSessionUseCase(
+func NewStartTalkSessionCommand(
 	talkSessionRepository talksession.TalkSessionRepository,
 	userRepository user.UserRepository,
 	DBManager *db.DBManager,
-) CreateTalkSessionUseCase {
+) StartTalkSessionCommand {
 	return &createTalkSessionInteractor{
 		TalkSessionRepository: talkSessionRepository,
 		UserRepository:        userRepository,

@@ -14,11 +14,11 @@ import (
 )
 
 type (
-	GetTalkSessionHistoriesQuery interface {
-		Execute(context.Context, GetTalkSessionHistoriesInput) (*GetTalkSessionHistoriesOutput, error)
+	SearchTalkSessionsQuery interface {
+		Execute(context.Context, SearchTalkSessionsInput) (*SearchTalkSessionsOutput, error)
 	}
 
-	GetTalkSessionHistoriesInput struct {
+	SearchTalkSessionsInput struct {
 		UserID shared.UUID[user.User]
 		Status string
 		Theme  *string
@@ -26,27 +26,27 @@ type (
 		Offset *int
 	}
 
-	GetTalkSessionHistoriesOutput struct {
+	SearchTalkSessionsOutput struct {
 		TalkSessions []TalkSessionDTO
 		TotalCount   int
 		Limit        int
 		Offset       int
 	}
 
-	getTalkSessionHistoriesQueryHandler struct {
+	SearchTalkSessionsQueryHandler struct {
 		*db.DBManager
 	}
 )
 
-func NewGetTalkSessionHistoriesQuery(
+func NewSearchTalkSessionsQuery(
 	dbm *db.DBManager,
-) GetTalkSessionHistoriesQuery {
-	return &getTalkSessionHistoriesQueryHandler{
+) SearchTalkSessionsQuery {
+	return &SearchTalkSessionsQueryHandler{
 		DBManager: dbm,
 	}
 }
 
-func (h *getTalkSessionHistoriesQueryHandler) Execute(ctx context.Context, q GetTalkSessionHistoriesInput) (*GetTalkSessionHistoriesOutput, error) {
+func (h *SearchTalkSessionsQueryHandler) Execute(ctx context.Context, q SearchTalkSessionsInput) (*SearchTalkSessionsOutput, error) {
 	var limit, offset int
 	if q.Limit == nil {
 		limit = 10
@@ -78,7 +78,7 @@ func (h *getTalkSessionHistoriesQueryHandler) Execute(ctx context.Context, q Get
 		Theme:  theme,
 	})
 	if err != nil {
-		utils.HandleError(ctx, err, "getTalkSessionHistoriesQueryHandler.Execute")
+		utils.HandleError(ctx, err, "SearchTalkSessionsQueryHandler.Execute")
 		return nil, err
 	}
 	totalCount, err := h.GetQueries(ctx).CountTalkSessions(ctx, model.CountTalkSessionsParams{
@@ -87,7 +87,7 @@ func (h *getTalkSessionHistoriesQueryHandler) Execute(ctx context.Context, q Get
 		UserID: uuid.NullUUID{UUID: q.UserID.UUID(), Valid: true},
 	})
 	if err != nil {
-		utils.HandleError(ctx, err, "getTalkSessionHistoriesQueryHandler.Execute")
+		utils.HandleError(ctx, err, "SearchTalkSessionsQueryHandler.Execute")
 		return nil, err
 	}
 
@@ -115,7 +115,7 @@ func (h *getTalkSessionHistoriesQueryHandler) Execute(ctx context.Context, q Get
 			Prefecture: utils.ToPtrIfNotNullValue[string](!talkSession.Prefecture.Valid, talkSession.Prefecture.String),
 		})
 	}
-	return &GetTalkSessionHistoriesOutput{
+	return &SearchTalkSessionsOutput{
 		TalkSessions: talkSessionDTOs,
 		TotalCount:   int(totalCount.TalkSessionCount),
 		Limit:        limit,

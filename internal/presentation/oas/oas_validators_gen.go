@@ -1067,7 +1067,7 @@ func (s GetOpinionsForTalkSessionSort) Validate() error {
 	}
 }
 
-func (s *GetTalkSessionDetailOK) Validate() error {
+func (s *ViewTalkSessionDetailOK) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
@@ -1108,7 +1108,7 @@ func (s *GetTalkSessionDetailOK) Validate() error {
 	return nil
 }
 
-func (s *GetTalkSessionDetailOKLocation) Validate() error {
+func (s *ViewTalkSessionDetailOKLocation) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
@@ -1156,7 +1156,7 @@ func (s *GetTalkSessionDetailOKLocation) Validate() error {
 	return nil
 }
 
-func (s *GetTalkSessionDetailOKOwner) Validate() error {
+func (s *ViewTalkSessionDetailOKOwner) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}

@@ -14,11 +14,11 @@ import (
 )
 
 type (
-	GetTalkSessionByUserQuery interface {
-		Execute(context.Context, GetTalkSessionByUserInput) (*GetTalkSessionByUserOutput, error)
+	BrowseUsersTalkSessionHistoriesQuery interface {
+		Execute(context.Context, BrowseUsersTalkSessionHistoriesInput) (*BrowseUsersTalkSessionHistoriesOutput, error)
 	}
 
-	GetTalkSessionByUserInput struct {
+	BrowseUsersTalkSessionHistoriesInput struct {
 		UserID shared.UUID[user.User]
 		Limit  int
 		Offset int
@@ -26,22 +26,22 @@ type (
 		Theme  *string
 	}
 
-	GetTalkSessionByUserOutput struct {
+	BrowseUsersTalkSessionHistoriesOutput struct {
 		TalkSessions []TalkSessionDTO
 	}
 
-	GetTalkSessionByUserQueryHandler struct {
+	BrowseUsersTalkSessionHistoriesQueryHandler struct {
 		*db.DBManager
 	}
 )
 
-func NewGetTalkSessionByUserQueryHandler(tm *db.DBManager) GetTalkSessionByUserQuery {
-	return &GetTalkSessionByUserQueryHandler{
+func NewBrowseUsersTalkSessionHistoriesQueryHandler(tm *db.DBManager) BrowseUsersTalkSessionHistoriesQuery {
+	return &BrowseUsersTalkSessionHistoriesQueryHandler{
 		DBManager: tm,
 	}
 }
 
-func (h *GetTalkSessionByUserQueryHandler) Execute(ctx context.Context, input GetTalkSessionByUserInput) (*GetTalkSessionByUserOutput, error) {
+func (h *BrowseUsersTalkSessionHistoriesQueryHandler) Execute(ctx context.Context, input BrowseUsersTalkSessionHistoriesInput) (*BrowseUsersTalkSessionHistoriesOutput, error) {
 
 	var limit, offset int
 	if input.Limit == 0 {
@@ -80,7 +80,7 @@ func (h *GetTalkSessionByUserQueryHandler) Execute(ctx context.Context, input Ge
 		return nil, err
 	}
 	if len(out) <= 0 {
-		return &GetTalkSessionByUserOutput{
+		return &BrowseUsersTalkSessionHistoriesOutput{
 			TalkSessions: make([]TalkSessionDTO, 0),
 		}, nil
 	}
@@ -118,7 +118,7 @@ func (h *GetTalkSessionByUserQueryHandler) Execute(ctx context.Context, input Ge
 		})
 	}
 
-	return &GetTalkSessionByUserOutput{
+	return &BrowseUsersTalkSessionHistoriesOutput{
 		TalkSessions: talkSessions,
 	}, nil
 }
