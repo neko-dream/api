@@ -6,13 +6,25 @@ reviews:
   profile: "chill"
   request_changes_workflow: false
   high_level_summary: true
-  auto_title_placeholder: "@auto"
+  high_level_summary_placeholder: "@auto-summary"
+  auto_title_placeholder: "@auto-title"
+  review_status: false
   poem: true
-  review_status: true
-  collapse_walkthrough: false
+  collapse_walkthrough: true
   sequence_diagrams: true
+  changed_files_summary: true
   suggested_labels: true
   abort_on_close: true
+  labeling_instructions:
+    - label: "dependencies"
+      instructions: "依存関係の更新やライブラリのバージョンアップを含むPRに適用します。セキュリティアップデートも含みます"
+    - label: "performance"
+      instructions: "パフォーマンス改善や最適化を含むPRに適用します。実行速度の向上やリソース使用効率の改善が該当します"
+    - label: "testing"
+      instructions: "テストコードの追加や改善、テスト環境の設定変更を含むPRに適用します"
+    - label: "refactor"
+      instructions: "コードのリファクタリングや整理を含むPRに適用します。機能の変更を伴わない内部実装の改善が該当します"
+
   path_filters:
     - "cmd/**"
     - "container/**"
