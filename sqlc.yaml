@@ -1,9 +1,9 @@
 version: "2"
 sql:
     - engine: "postgresql"
-      queries: "./internal/infrastructure/db/query/"
+      queries: "./internal/infrastructure/persistence/sqlc/queries/"
       schema: "./migrations/*.up.sql"
       gen:
           go:
               package: "model"
-              out: "./internal/infrastructure/db/sqlc"
+              out: "./internal/infrastructure/persistence/sqlc/generated"

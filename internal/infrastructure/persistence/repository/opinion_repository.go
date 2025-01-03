@@ -10,8 +10,8 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/infrastructure/db"
-	model "github.com/neko-dream/server/internal/infrastructure/db/sqlc"
+	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
+	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/server/pkg/utils"
 )
 

@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 
-	"github.com/neko-dream/server/internal/infrastructure/db"
+	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/internal/presentation/oas"
 )
 

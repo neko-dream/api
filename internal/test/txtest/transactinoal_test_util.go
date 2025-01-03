@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/neko-dream/server/internal/infrastructure/db"
+	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 )
 
 type TransactionalTestCase[T any] struct {

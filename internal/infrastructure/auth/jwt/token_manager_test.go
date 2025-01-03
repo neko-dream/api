@@ -1,4 +1,4 @@
-package auth_test
+package jwt_test
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/infrastructure/auth"
+	"github.com/neko-dream/server/internal/infrastructure/auth/jwt"
 	"github.com/neko-dream/server/pkg/oauth"
 	"github.com/samber/lo"
 )
@@ -39,7 +39,7 @@ func TestNewTokenManagerTest(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			util := auth.NewTokenManagerWithSecret(tt.firstSecret, nil)
+			util := jwt.NewTokenManagerWithSecret(tt.firstSecret, nil)
 			token, err := util.Generate(
 				tt.ctx,
 				user.NewUser(
@@ -57,7 +57,7 @@ func TestNewTokenManagerTest(t *testing.T) {
 				t.Errorf("error: %v", err)
 			}
 
-			util = auth.NewTokenManagerWithSecret(tt.secondSecret, nil)
+			util = jwt.NewTokenManagerWithSecret(tt.secondSecret, nil)
 			_, err = util.Parse(tt.ctx, token)
 			if tt.success {
 				if err != nil {

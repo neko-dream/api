@@ -1,5 +1,5 @@
 package: client
-output: internal/infrastructure/datasource/analysis/client.gen.go
+output: internal/infrastructure/external/analysis/client.gen.go
 generate:
   models: true
   client: true
