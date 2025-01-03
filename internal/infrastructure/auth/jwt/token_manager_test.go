@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/auth/jwt"
+	"github.com/neko-dream/server/pkg/oauth"
 	"github.com/samber/lo"
 )
 
@@ -47,7 +47,7 @@ func TestNewTokenManagerTest(t *testing.T) {
 					lo.ToPtr("test"),
 					lo.ToPtr("test"),
 					"test",
-					auth.ProviderGoogle,
+					oauth.ProviderGoogle,
 					nil,
 				),
 				shared.NewUUID[session.Session](),

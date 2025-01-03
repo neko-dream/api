@@ -7,10 +7,8 @@ import (
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/auth"
-	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
-	"github.com/neko-dream/server/pkg/utils"
 )
 
 type (
@@ -31,24 +29,9 @@ type (
 	authLoginInteractor struct {
 		*db.DBManager
 		*config.Config
-		service.AuthService
-		authProviderFactory auth.AuthProviderFactory
+		auth.AuthService
 	}
 )
-
-func NewAuthLoginUseCase(
-	tm *db.DBManager,
-	config *config.Config,
-	authService service.AuthService,
-	authProviderFactory auth.AuthProviderFactory,
-) AuthLoginUseCase {
-	return &authLoginInteractor{
-		DBManager:           tm,
-		Config:              config,
-		AuthService:         authService,
-		authProviderFactory: authProviderFactory,
-	}
-}
 
 func (a *authLoginInteractor) Execute(ctx context.Context, input AuthLoginInput) (AuthLoginOutput, error) {
 	var (
@@ -57,26 +40,13 @@ func (a *authLoginInteractor) Execute(ctx context.Context, input AuthLoginInput)
 	)
 
 	if err := a.ExecTx(ctx, func(ctx context.Context) error {
-		provider, err := a.authProviderFactory.NewAuthProvider(ctx, input.Provider)
+		authURL, state, err := a.AuthService.GetAuthURL(ctx, input.Provider)
 		if err != nil {
-			utils.HandleError(ctx, err, "NewAuthProvider")
-			return errtrace.Wrap(err)
-		}
-
-		state, err := a.GenerateState(ctx)
-		if err != nil {
-			utils.HandleError(ctx, err, "GenerateState")
-			return errtrace.Wrap(err)
-		}
-
-		url, err := url.Parse(provider.GetAuthorizationURL(ctx, state))
-		if err != nil {
-			utils.HandleError(ctx, err, "url.Parse")
 			return errtrace.Wrap(err)
 		}
 
 		s = state
-		au = url
+		au = authURL
 		return nil
 	}); err != nil {
 		return AuthLoginOutput{}, errtrace.Wrap(err)
@@ -100,4 +70,16 @@ func (a *authLoginInteractor) Execute(ctx context.Context, input AuthLoginInput)
 		RedirectURL: au,
 		Cookies:     []*http.Cookie{&stateCookie, &redirectURLCookie},
 	}, nil
+}
+
+func NewAuthLoginUseCase(
+	tm *db.DBManager,
+	config *config.Config,
+	authService auth.AuthService,
+) AuthLoginUseCase {
+	return &authLoginInteractor{
+		DBManager:   tm,
+		Config:      config,
+		AuthService: authService,
+	}
 }

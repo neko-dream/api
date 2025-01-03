@@ -3,35 +3,30 @@ package service
 import (
 	"context"
 	"crypto/rand"
+	"net/url"
 
 	"braces.dev/errtrace"
+	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/config"
+	"github.com/neko-dream/server/pkg/oauth"
 	"github.com/neko-dream/server/pkg/utils"
 )
 
-type AuthService interface {
-	Authenticate(ctx context.Context, provider, code string) (*user.User, error)
-	GenerateState(ctx context.Context) (string, error)
-}
-
 type authService struct {
-	config              *config.Config
-	userRepository      user.UserRepository
-	authProviderFactory auth.AuthProviderFactory
+	config         *config.Config
+	userRepository user.UserRepository
 }
 
 func NewAuthService(
 	config *config.Config,
 	userRepository user.UserRepository,
-	authProviderFactory auth.AuthProviderFactory,
-) AuthService {
+) auth.AuthService {
 	return &authService{
-		config:              config,
-		userRepository:      userRepository,
-		authProviderFactory: authProviderFactory,
+		config:         config,
+		userRepository: userRepository,
 	}
 }
 
@@ -40,18 +35,24 @@ func (a *authService) Authenticate(
 	providerName,
 	code string,
 ) (*user.User, error) {
-	provider, err := a.authProviderFactory.NewAuthProvider(ctx, providerName)
+	authProviderName, err := oauth.NewAuthProviderName(providerName)
 	if err != nil {
-		utils.HandleError(ctx, err, "AuthProviderFactory.NewAuthProvider")
+		utils.HandleError(ctx, err, "NewAuthProviderName")
+		return nil, errtrace.Wrap(messages.InvalidProviderError)
+	}
+
+	provider, err := oauth.NewOIDCProvider(ctx, authProviderName, a.config)
+	if err != nil {
+		utils.HandleError(ctx, err, "OIDCProviderFactory")
 		return nil, errtrace.Wrap(err)
 	}
 
-	subject, _, err := provider.VerifyAndIdentify(ctx, code)
+	userInfo, err := provider.UserInfo(ctx, code)
 	if err != nil {
 		utils.HandleError(ctx, err, "OIDCProvider.UserInfo")
 		return nil, errtrace.Wrap(err)
 	}
-	existUser, err := a.userRepository.FindBySubject(ctx, user.UserSubject(*subject))
+	existUser, err := a.userRepository.FindBySubject(ctx, user.UserSubject(userInfo.Subject))
 	if err != nil {
 		utils.HandleError(ctx, err, "UserRepository.FindBySubject")
 		return nil, errtrace.Wrap(err)
@@ -60,15 +61,11 @@ func (a *authService) Authenticate(
 		return existUser, nil
 	}
 
-	authProviderName, err := auth.NewAuthProviderName(providerName)
-	if err != nil {
-		return nil, errtrace.Wrap(err)
-	}
 	newUser := user.NewUser(
 		shared.NewUUID[user.User](),
 		nil,
 		nil,
-		*subject,
+		userInfo.Subject,
 		authProviderName,
 		nil,
 	)
@@ -78,6 +75,37 @@ func (a *authService) Authenticate(
 	}
 
 	return &newUser, nil
+}
+
+func (a *authService) GetAuthURL(
+	ctx context.Context,
+	providerName string,
+) (*url.URL, string, error) {
+	authProviderName, err := oauth.NewAuthProviderName(providerName)
+	if err != nil {
+		return nil, "", errtrace.Wrap(err)
+	}
+
+	provider, err := oauth.NewOIDCProvider(ctx, authProviderName, a.config)
+	if err != nil {
+		utils.HandleError(ctx, err, "OIDCProviderFactory")
+		return nil, "", errtrace.Wrap(err)
+	}
+
+	state, err := a.GenerateState(ctx)
+	if err != nil {
+		utils.HandleError(ctx, err, "GenerateState")
+		return nil, "", errtrace.Wrap(err)
+	}
+
+	authURL := provider.GetAuthURL(ctx, state)
+	url, err := url.Parse(authURL)
+	if err != nil {
+		utils.HandleError(ctx, err, "url.Parse")
+		return nil, "", errtrace.Wrap(err)
+	}
+
+	return url, state, nil
 }
 
 var randTable = []byte("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
