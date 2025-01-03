@@ -103,12 +103,12 @@ func (UnimplementedHandler) GetOpinionsForTalkSession(ctx context.Context, param
 	return r, ht.ErrNotImplemented
 }
 
-// GetTalkSessionDetail implements getTalkSessionDetail operation.
+// ViewTalkSessionDetail implements ViewTalkSessionDetail operation.
 //
 // トークセッションの詳細.
 //
 // GET /talksessions/{talkSessionId}
-func (UnimplementedHandler) GetTalkSessionDetail(ctx context.Context, params GetTalkSessionDetailParams) (r GetTalkSessionDetailRes, _ error) {
+func (UnimplementedHandler) ViewTalkSessionDetail(ctx context.Context, params ViewTalkSessionDetailParams) (r ViewTalkSessionDetailRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

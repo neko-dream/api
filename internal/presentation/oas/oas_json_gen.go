@@ -4347,14 +4347,14 @@ func (s *GetOpinionsForTalkSessionOKPagination) UnmarshalJSON(data []byte) error
 }
 
 // Encode implements json.Marshaler.
-func (s *GetTalkSessionDetailBadRequest) Encode(e *jx.Encoder) {
+func (s *ViewTalkSessionDetailBadRequest) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *GetTalkSessionDetailBadRequest) encodeFields(e *jx.Encoder) {
+func (s *ViewTalkSessionDetailBadRequest) encodeFields(e *jx.Encoder) {
 	{
 		e.FieldStart("code")
 		e.Str(s.Code)
@@ -4365,15 +4365,15 @@ func (s *GetTalkSessionDetailBadRequest) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfGetTalkSessionDetailBadRequest = [2]string{
+var jsonFieldsNameOfViewTalkSessionDetailBadRequest = [2]string{
 	0: "code",
 	1: "message",
 }
 
-// Decode decodes GetTalkSessionDetailBadRequest from json.
-func (s *GetTalkSessionDetailBadRequest) Decode(d *jx.Decoder) error {
+// Decode decodes ViewTalkSessionDetailBadRequest from json.
+func (s *ViewTalkSessionDetailBadRequest) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode GetTalkSessionDetailBadRequest to nil")
+		return errors.New("invalid: unable to decode ViewTalkSessionDetailBadRequest to nil")
 	}
 	var requiredBitSet [1]uint8
 
@@ -4408,7 +4408,7 @@ func (s *GetTalkSessionDetailBadRequest) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode GetTalkSessionDetailBadRequest")
+		return errors.Wrap(err, "decode ViewTalkSessionDetailBadRequest")
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
@@ -4425,8 +4425,8 @@ func (s *GetTalkSessionDetailBadRequest) Decode(d *jx.Decoder) error {
 				bitIdx := bits.TrailingZeros8(result)
 				fieldIdx := i*8 + bitIdx
 				var name string
-				if fieldIdx < len(jsonFieldsNameOfGetTalkSessionDetailBadRequest) {
-					name = jsonFieldsNameOfGetTalkSessionDetailBadRequest[fieldIdx]
+				if fieldIdx < len(jsonFieldsNameOfViewTalkSessionDetailBadRequest) {
+					name = jsonFieldsNameOfViewTalkSessionDetailBadRequest[fieldIdx]
 				} else {
 					name = strconv.Itoa(fieldIdx)
 				}
@@ -4447,27 +4447,27 @@ func (s *GetTalkSessionDetailBadRequest) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *GetTalkSessionDetailBadRequest) MarshalJSON() ([]byte, error) {
+func (s *ViewTalkSessionDetailBadRequest) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *GetTalkSessionDetailBadRequest) UnmarshalJSON(data []byte) error {
+func (s *ViewTalkSessionDetailBadRequest) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
 // Encode implements json.Marshaler.
-func (s *GetTalkSessionDetailOK) Encode(e *jx.Encoder) {
+func (s *ViewTalkSessionDetailOK) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *GetTalkSessionDetailOK) encodeFields(e *jx.Encoder) {
+func (s *ViewTalkSessionDetailOK) encodeFields(e *jx.Encoder) {
 	{
 		e.FieldStart("id")
 		e.Str(s.ID)
@@ -4514,7 +4514,7 @@ func (s *GetTalkSessionDetailOK) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfGetTalkSessionDetailOK = [9]string{
+var jsonFieldsNameOfViewTalkSessionDetailOK = [9]string{
 	0: "id",
 	1: "theme",
 	2: "description",
@@ -4526,10 +4526,10 @@ var jsonFieldsNameOfGetTalkSessionDetailOK = [9]string{
 	8: "prefecture",
 }
 
-// Decode decodes GetTalkSessionDetailOK from json.
-func (s *GetTalkSessionDetailOK) Decode(d *jx.Decoder) error {
+// Decode decodes ViewTalkSessionDetailOK from json.
+func (s *ViewTalkSessionDetailOK) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode GetTalkSessionDetailOK to nil")
+		return errors.New("invalid: unable to decode ViewTalkSessionDetailOK to nil")
 	}
 	var requiredBitSet [2]uint8
 
@@ -4638,7 +4638,7 @@ func (s *GetTalkSessionDetailOK) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode GetTalkSessionDetailOK")
+		return errors.Wrap(err, "decode ViewTalkSessionDetailOK")
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
@@ -4656,8 +4656,8 @@ func (s *GetTalkSessionDetailOK) Decode(d *jx.Decoder) error {
 				bitIdx := bits.TrailingZeros8(result)
 				fieldIdx := i*8 + bitIdx
 				var name string
-				if fieldIdx < len(jsonFieldsNameOfGetTalkSessionDetailOK) {
-					name = jsonFieldsNameOfGetTalkSessionDetailOK[fieldIdx]
+				if fieldIdx < len(jsonFieldsNameOfViewTalkSessionDetailOK) {
+					name = jsonFieldsNameOfViewTalkSessionDetailOK[fieldIdx]
 				} else {
 					name = strconv.Itoa(fieldIdx)
 				}
@@ -4678,27 +4678,27 @@ func (s *GetTalkSessionDetailOK) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *GetTalkSessionDetailOK) MarshalJSON() ([]byte, error) {
+func (s *ViewTalkSessionDetailOK) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *GetTalkSessionDetailOK) UnmarshalJSON(data []byte) error {
+func (s *ViewTalkSessionDetailOK) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
 // Encode implements json.Marshaler.
-func (s *GetTalkSessionDetailOKLocation) Encode(e *jx.Encoder) {
+func (s *ViewTalkSessionDetailOKLocation) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *GetTalkSessionDetailOKLocation) encodeFields(e *jx.Encoder) {
+func (s *ViewTalkSessionDetailOKLocation) encodeFields(e *jx.Encoder) {
 	{
 		if s.Latitude.Set {
 			e.FieldStart("latitude")
@@ -4713,15 +4713,15 @@ func (s *GetTalkSessionDetailOKLocation) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfGetTalkSessionDetailOKLocation = [2]string{
+var jsonFieldsNameOfViewTalkSessionDetailOKLocation = [2]string{
 	0: "latitude",
 	1: "longitude",
 }
 
-// Decode decodes GetTalkSessionDetailOKLocation from json.
-func (s *GetTalkSessionDetailOKLocation) Decode(d *jx.Decoder) error {
+// Decode decodes ViewTalkSessionDetailOKLocation from json.
+func (s *ViewTalkSessionDetailOKLocation) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode GetTalkSessionDetailOKLocation to nil")
+		return errors.New("invalid: unable to decode ViewTalkSessionDetailOKLocation to nil")
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
@@ -4751,34 +4751,34 @@ func (s *GetTalkSessionDetailOKLocation) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode GetTalkSessionDetailOKLocation")
+		return errors.Wrap(err, "decode ViewTalkSessionDetailOKLocation")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *GetTalkSessionDetailOKLocation) MarshalJSON() ([]byte, error) {
+func (s *ViewTalkSessionDetailOKLocation) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *GetTalkSessionDetailOKLocation) UnmarshalJSON(data []byte) error {
+func (s *ViewTalkSessionDetailOKLocation) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
 // Encode implements json.Marshaler.
-func (s *GetTalkSessionDetailOKOwner) Encode(e *jx.Encoder) {
+func (s *ViewTalkSessionDetailOKOwner) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *GetTalkSessionDetailOKOwner) encodeFields(e *jx.Encoder) {
+func (s *ViewTalkSessionDetailOKOwner) encodeFields(e *jx.Encoder) {
 	{
 		e.FieldStart("displayID")
 		e.Str(s.DisplayID)
@@ -4795,16 +4795,16 @@ func (s *GetTalkSessionDetailOKOwner) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfGetTalkSessionDetailOKOwner = [3]string{
+var jsonFieldsNameOfViewTalkSessionDetailOKOwner = [3]string{
 	0: "displayID",
 	1: "displayName",
 	2: "iconURL",
 }
 
-// Decode decodes GetTalkSessionDetailOKOwner from json.
-func (s *GetTalkSessionDetailOKOwner) Decode(d *jx.Decoder) error {
+// Decode decodes ViewTalkSessionDetailOKOwner from json.
+func (s *ViewTalkSessionDetailOKOwner) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode GetTalkSessionDetailOKOwner to nil")
+		return errors.New("invalid: unable to decode ViewTalkSessionDetailOKOwner to nil")
 	}
 	var requiredBitSet [1]uint8
 
@@ -4849,7 +4849,7 @@ func (s *GetTalkSessionDetailOKOwner) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode GetTalkSessionDetailOKOwner")
+		return errors.Wrap(err, "decode ViewTalkSessionDetailOKOwner")
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
@@ -4866,8 +4866,8 @@ func (s *GetTalkSessionDetailOKOwner) Decode(d *jx.Decoder) error {
 				bitIdx := bits.TrailingZeros8(result)
 				fieldIdx := i*8 + bitIdx
 				var name string
-				if fieldIdx < len(jsonFieldsNameOfGetTalkSessionDetailOKOwner) {
-					name = jsonFieldsNameOfGetTalkSessionDetailOKOwner[fieldIdx]
+				if fieldIdx < len(jsonFieldsNameOfViewTalkSessionDetailOKOwner) {
+					name = jsonFieldsNameOfViewTalkSessionDetailOKOwner[fieldIdx]
 				} else {
 					name = strconv.Itoa(fieldIdx)
 				}
@@ -4888,14 +4888,14 @@ func (s *GetTalkSessionDetailOKOwner) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *GetTalkSessionDetailOKOwner) MarshalJSON() ([]byte, error) {
+func (s *ViewTalkSessionDetailOKOwner) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *GetTalkSessionDetailOKOwner) UnmarshalJSON(data []byte) error {
+func (s *ViewTalkSessionDetailOKOwner) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -12222,18 +12222,18 @@ func (s *OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) UnmarshalJSO
 	return s.Decode(d)
 }
 
-// Encode encodes GetTalkSessionDetailOKLocation as json.
-func (o OptGetTalkSessionDetailOKLocation) Encode(e *jx.Encoder) {
+// Encode encodes ViewTalkSessionDetailOKLocation as json.
+func (o OptViewTalkSessionDetailOKLocation) Encode(e *jx.Encoder) {
 	if !o.Set {
 		return
 	}
 	o.Value.Encode(e)
 }
 
-// Decode decodes GetTalkSessionDetailOKLocation from json.
-func (o *OptGetTalkSessionDetailOKLocation) Decode(d *jx.Decoder) error {
+// Decode decodes ViewTalkSessionDetailOKLocation from json.
+func (o *OptViewTalkSessionDetailOKLocation) Decode(d *jx.Decoder) error {
 	if o == nil {
-		return errors.New("invalid: unable to decode OptGetTalkSessionDetailOKLocation to nil")
+		return errors.New("invalid: unable to decode OptViewTalkSessionDetailOKLocation to nil")
 	}
 	o.Set = true
 	if err := o.Value.Decode(d); err != nil {
@@ -12243,14 +12243,14 @@ func (o *OptGetTalkSessionDetailOKLocation) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s OptGetTalkSessionDetailOKLocation) MarshalJSON() ([]byte, error) {
+func (s OptViewTalkSessionDetailOKLocation) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptGetTalkSessionDetailOKLocation) UnmarshalJSON(data []byte) error {
+func (s *OptViewTalkSessionDetailOKLocation) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

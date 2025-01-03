@@ -1407,20 +1407,20 @@ func (s *Server) handleGetOpinionsForTalkSessionRequest(args [1]string, argsEsca
 	}
 }
 
-// handleGetTalkSessionDetailRequest handles getTalkSessionDetail operation.
+// handleViewTalkSessionDetailRequest handles ViewTalkSessionDetail operation.
 //
 // トークセッションの詳細.
 //
 // GET /talksessions/{talkSessionId}
-func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleViewTalkSessionDetailRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("getTalkSessionDetail"),
+		otelogen.OperationID("ViewTalkSessionDetail"),
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionId}"),
 	}
 
 	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "GetTalkSessionDetail",
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "ViewTalkSessionDetail",
 		trace.WithAttributes(otelAttrs...),
 		serverSpanKind,
 	)
@@ -1451,11 +1451,11 @@ func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped b
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: "GetTalkSessionDetail",
-			ID:   "getTalkSessionDetail",
+			Name: "ViewTalkSessionDetail",
+			ID:   "ViewTalkSessionDetail",
 		}
 	)
-	params, err := decodeGetTalkSessionDetailParams(args, argsEscaped, r)
+	params, err := decodeViewTalkSessionDetailParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
 			OperationContext: opErrContext,
@@ -1466,13 +1466,13 @@ func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped b
 		return
 	}
 
-	var response GetTalkSessionDetailRes
+	var response ViewTalkSessionDetailRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
-			OperationName:    "GetTalkSessionDetail",
+			OperationName:    "ViewTalkSessionDetail",
 			OperationSummary: "トークセッションの詳細",
-			OperationID:      "getTalkSessionDetail",
+			OperationID:      "ViewTalkSessionDetail",
 			Body:             nil,
 			Params: middleware.Parameters{
 				{
@@ -1485,8 +1485,8 @@ func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped b
 
 		type (
 			Request  = struct{}
-			Params   = GetTalkSessionDetailParams
-			Response = GetTalkSessionDetailRes
+			Params   = ViewTalkSessionDetailParams
+			Response = ViewTalkSessionDetailRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -1495,14 +1495,14 @@ func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped b
 		](
 			m,
 			mreq,
-			unpackGetTalkSessionDetailParams,
+			unpackViewTalkSessionDetailParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.GetTalkSessionDetail(ctx, params)
+				response, err = s.h.ViewTalkSessionDetail(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.GetTalkSessionDetail(ctx, params)
+		response, err = s.h.ViewTalkSessionDetail(ctx, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -1510,7 +1510,7 @@ func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped b
 		return
 	}
 
-	if err := encodeGetTalkSessionDetailResponse(response, w, span); err != nil {
+	if err := encodeViewTalkSessionDetailResponse(response, w, span); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)

@@ -444,9 +444,9 @@ func encodeGetOpinionsForTalkSessionResponse(response GetOpinionsForTalkSessionR
 	}
 }
 
-func encodeGetTalkSessionDetailResponse(response GetTalkSessionDetailRes, w http.ResponseWriter, span trace.Span) error {
+func encodeViewTalkSessionDetailResponse(response ViewTalkSessionDetailRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *GetTalkSessionDetailOK:
+	case *ViewTalkSessionDetailOK:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -459,7 +459,7 @@ func encodeGetTalkSessionDetailResponse(response GetTalkSessionDetailRes, w http
 
 		return nil
 
-	case *GetTalkSessionDetailBadRequest:
+	case *ViewTalkSessionDetailBadRequest:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
