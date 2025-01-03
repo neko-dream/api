@@ -57,11 +57,17 @@ cp .env.example .env
 
 ### 4. DBセットアップ
 
-docker composeを使用します
+docker composeを使用します。
+Docker Compose V2に対応したDockerをあらかじめインストールしてください、
 
 ```sh
 docker compose up -d db
 ```
+
+もしDockerを使用せず動かす場合は以下の要件を満たしたDBを使用してください。
+
+- PostgreSQL 16
+- PostGIS
 
 ### 5. ホットリロード
 
@@ -78,7 +84,7 @@ air
 
 <!-- Go links -->
 
-[go_report_url]: https://goreportcard.com/report/github.com/neko-dream/server
+[go_report_url]: https://goreportcard.com/report/github.com/neko-dream/api
 [go_report_img]: https://img.shields.io/badge/Go_report-A+-success?style=for-the-badge&logo=none
 [go_dev_url]: https://pkg.go.dev/github.com/neko-dream/api
 [go_version_img]: https://img.shields.io/badge/Go-1.23+-00ADD8?style=for-the-badge&logo=go
