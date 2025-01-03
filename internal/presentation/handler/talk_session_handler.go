@@ -123,24 +123,21 @@ func (t *talkSessionHandler) GetConclusion(ctx context.Context, params oas.GetCo
 // GetOpenedTalkSession implements oas.TalkSessionHandler.
 func (t *talkSessionHandler) GetOpenedTalkSession(ctx context.Context, params oas.GetOpenedTalkSessionParams) (oas.GetOpenedTalkSessionRes, error) {
 	claim := session.GetSession(t.SetSession(ctx))
-	if claim == nil {
-		return nil, messages.ForbiddenError
+	var userID *shared.UUID[user.User]
+	if claim != nil {
+		id, err := claim.UserID()
+		if err == nil {
+			userID = &id
+		}
 	}
-	userID, err := claim.UserID()
-	if err != nil {
-		utils.HandleError(ctx, err, "claim.UserID")
-		return nil, messages.ForbiddenError
-	}
-
-	limit := utils.IfThenElse(params.Limit.IsSet(),
+	limit := utils.IfThenElse[int](params.Limit.IsSet(),
 		params.Limit.Value,
 		10,
 	)
-	offset := utils.IfThenElse(params.Offset.IsSet(),
+	offset := utils.IfThenElse[int](params.Offset.IsSet(),
 		params.Offset.Value,
 		0,
 	)
-
 	status := ""
 	if params.Status.IsSet() {
 		bytes, err := params.Status.Value.MarshalText()
@@ -149,7 +146,7 @@ func (t *talkSessionHandler) GetOpenedTalkSession(ctx context.Context, params oa
 		}
 	}
 	out, err := t.getOwnTalkSession.Execute(ctx, talk_session_usecase.BrowseUsersTalkSessionHistoriesInput{
-		UserID: userID,
+		UserID: *userID,
 		Limit:  limit,
 		Offset: offset,
 		Status: status,

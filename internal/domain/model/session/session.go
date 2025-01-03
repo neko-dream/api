@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/server/pkg/oauth"
 )
 
 type status int
@@ -54,7 +54,7 @@ type (
 	Session struct {
 		sessionID    shared.UUID[Session]
 		userID       shared.UUID[user.User]
-		authProvider auth.AuthProviderName
+		authProvider oauth.AuthProviderName
 		status       status
 		expires      time.Time
 		lastActivity time.Time
@@ -64,7 +64,7 @@ type (
 func NewSession(
 	sessionID shared.UUID[Session],
 	userID shared.UUID[user.User],
-	authProvider auth.AuthProviderName,
+	authProvider oauth.AuthProviderName,
 	status status,
 	expires time.Time,
 	lastActivity time.Time,
@@ -87,7 +87,7 @@ func (s *Session) SessionID() shared.UUID[Session] {
 	return s.sessionID
 }
 
-func (s *Session) Provider() auth.AuthProviderName {
+func (s *Session) Provider() oauth.AuthProviderName {
 	return s.authProvider
 }
 

@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"braces.dev/errtrace"
-	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/image"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -15,6 +14,7 @@ import (
 	um "github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
+	"github.com/neko-dream/server/pkg/oauth"
 	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
 )
@@ -55,7 +55,8 @@ func (u *userRepository) FindByDisplayID(ctx context.Context, displayID string) 
 		}
 	}
 
-	providerName, err := auth.NewAuthProviderName(userAuthRow.Provider)
+	providerName, err := oauth.
+		NewAuthProviderName(userAuthRow.Provider)
 	if err != nil {
 		return nil, errtrace.Wrap(err)
 	}
@@ -196,7 +197,7 @@ func (u *userRepository) FindByID(ctx context.Context, userID shared.UUID[user.U
 		return nil, errtrace.Wrap(err)
 	}
 
-	providerName, err := auth.NewAuthProviderName(userAuthRow.Provider)
+	providerName, err := oauth.NewAuthProviderName(userAuthRow.Provider)
 	if err != nil {
 		return nil, errtrace.Wrap(err)
 	}
@@ -282,7 +283,7 @@ func (u *userRepository) FindBySubject(ctx context.Context, subject user.UserSub
 		return nil, nil
 	}
 
-	providerName, err := auth.NewAuthProviderName(row.Provider)
+	providerName, err := oauth.NewAuthProviderName(row.Provider)
 	if err != nil {
 		return nil, errtrace.Wrap(err)
 	}
