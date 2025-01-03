@@ -4,15 +4,17 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"braces.dev/errtrace"
+	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
-	"github.com/neko-dream/server/pkg/oauth"
+	"github.com/neko-dream/server/pkg/utils"
 )
 
 type sessionRepository struct {
@@ -46,10 +48,14 @@ func (s *sessionRepository) FindBySessionID(ctx context.Context, sess shared.UUI
 		return nil, errtrace.Wrap(err)
 	}
 
+	providerName, err := auth.NewAuthProviderName(sessRow.Provider)
+	if err != nil {
+		return nil, errtrace.Wrap(err)
+	}
 	return session.NewSession(
 		shared.UUID[session.Session](sessRow.SessionID),
 		shared.UUID[user.User](sessRow.UserID),
-		oauth.AuthProviderName(sessRow.Provider),
+		providerName,
 		*session.NewSessionStatus(int(sessRow.SessionStatus)),
 		sessRow.ExpiresAt,
 		sessRow.LastActivityAt,
@@ -68,10 +74,15 @@ func (s *sessionRepository) FindByUserID(ctx context.Context, userID shared.UUID
 
 	sessions := make([]session.Session, 0, len(sessionModels))
 	for _, sess := range sessionModels {
+		providerName, err := auth.NewAuthProviderName(sess.Provider)
+		if err != nil {
+			utils.HandleError(ctx, err, fmt.Sprintf("NewAuthProviderName: %s", sess.Provider))
+			continue
+		}
 		sessions = append(sessions, *session.NewSession(
 			shared.UUID[session.Session](sess.SessionID),
 			shared.UUID[user.User](sess.UserID),
-			oauth.AuthProviderName(sess.Provider),
+			providerName,
 			*session.NewSessionStatus(int(sess.SessionStatus)),
 			sess.ExpiresAt,
 			sess.LastActivityAt,

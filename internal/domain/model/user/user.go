@@ -5,8 +5,8 @@ import (
 	"mime/multipart"
 
 	"github.com/neko-dream/server/internal/domain/messages"
+	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/pkg/oauth"
 	"github.com/samber/lo"
 )
 
@@ -43,7 +43,7 @@ type (
 		displayName  *string
 		profileIcon  *ProfileIcon
 		subject      string
-		provider     oauth.AuthProviderName
+		provider     auth.AuthProviderName
 		demographics *UserDemographics
 	}
 )
@@ -115,7 +115,7 @@ func (u *User) DeleteIcon() {
 	u.profileIcon = nil
 }
 
-func (u *User) Provider() oauth.AuthProviderName {
+func (u *User) Provider() auth.AuthProviderName {
 	return u.provider
 }
 
@@ -136,7 +136,7 @@ func NewUser(
 	displayID *string,
 	displayName *string,
 	subject string,
-	provider oauth.AuthProviderName,
+	provider auth.AuthProviderName,
 	profileIcon *ProfileIcon,
 ) User {
 	return User{

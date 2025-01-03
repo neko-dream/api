@@ -9,6 +9,7 @@ import (
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/lestrrat-go/jwx/v3/jwk"
+	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/pkg/utils"
 	"golang.org/x/exp/slices"
@@ -16,33 +17,29 @@ import (
 )
 
 type (
-	oidcProvider struct {
-		providerName AuthProviderName
+	authProvider struct {
+		providerName auth.AuthProviderName
 		oauthConf    oauth2.Config
 		conf         *config.Config
 		provider     *oidc.Provider
 	}
-	OIDCProvider interface {
-		GetAuthURL(ctx context.Context, state string) string
-		UserInfo(ctx context.Context, code string) (*UserInfo, error)
-	}
 )
 
-func NewOIDCProvider(
+func NewAuthProvider(
 	ctx context.Context,
-	providerName AuthProviderName,
+	providerName auth.AuthProviderName,
 	conf *config.Config,
-) (OIDCProvider, error) {
+) (auth.AuthProvider, error) {
 	issuer := providerName.IssuerURI()
-	provider, ok := GetProvider(issuer)
+	provider, ok := GetProvider(issuer, conf)
 	if !ok {
 		return nil, errtrace.Wrap(errors.New("provider not found"))
 	}
 
 	config := oauth2.Config{
-		ClientID:     provider.ClientID(conf),
-		ClientSecret: provider.ClientSecret(conf),
-		RedirectURL:  provider.RedirectURL(conf),
+		ClientID:     provider.ClientID(),
+		ClientSecret: provider.ClientSecret(),
+		RedirectURL:  provider.RedirectURL(),
 		Endpoint: oauth2.Endpoint{
 			AuthURL:  provider.AuthorizationEndpoint,
 			TokenURL: provider.TokenEndpoint,
@@ -54,7 +51,7 @@ func NewOIDCProvider(
 		return nil, errtrace.Wrap(err)
 	}
 
-	return &oidcProvider{
+	return &authProvider{
 		providerName: providerName,
 		oauthConf:    config,
 		conf:         conf,
@@ -62,36 +59,25 @@ func NewOIDCProvider(
 	}, nil
 }
 
-func (p *oidcProvider) GetAuthURL(ctx context.Context, state string) string {
+func (p *authProvider) GetAuthorizationURL(ctx context.Context, state string) string {
 	return p.oauthConf.AuthCodeURL(state, oauth2.AccessTypeOffline)
 }
 
-func (p *oidcProvider) GetProvider() *Provider {
-	issuer := p.providerName.IssuerURI()
-	provider, _ := GetProvider(issuer)
-	return &provider
-}
-
-type UserInfo struct {
-	Subject string `json:"sub"`
-	Picture string `json:"picture"`
-}
-
-func (p *oidcProvider) UserInfo(ctx context.Context, code string) (*UserInfo, error) {
+func (p *authProvider) VerifyAndIdentify(ctx context.Context, code string) (*string, *string, error) {
 	token, err := p.oauthConf.Exchange(ctx, code)
 	if err != nil {
-		return nil, errtrace.Wrap(err)
+		return nil, nil, errtrace.Wrap(err)
 	}
 	rawToken, ok := token.Extra("id_token").(string)
 	if !ok {
 		utils.HandleError(ctx, err, "id_token not found")
-		return nil, errtrace.Wrap(errors.New("id_token not found"))
+		return nil, nil, errtrace.Wrap(errors.New("id_token not found"))
 	}
-	provider := p.GetProvider()
+	provider := p.getProvider()
 	// Google の公開鍵を取得
 	keySet, err := jwk.Fetch(context.Background(), provider.JwksURI)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch JWK: %v", err)
+		return nil, nil, fmt.Errorf("failed to fetch JWK: %v", err)
 	}
 
 	jwtToken, err := jwt.Parse(rawToken, func(token *jwt.Token) (any, error) {
@@ -102,7 +88,7 @@ func (p *oidcProvider) UserInfo(ctx context.Context, code string) (*UserInfo, er
 		// algがES256, RS256の場合は、公開鍵を取得
 		// HS256の場合は、シークレットを返す
 		if token.Method.Alg() == jwt.SigningMethodHS256.Alg() {
-			return []byte(provider.ClientSecret(p.conf)), nil
+			return []byte(provider.ClientSecret()), nil
 		}
 
 		// キーIDを取得
@@ -126,38 +112,47 @@ func (p *oidcProvider) UserInfo(ctx context.Context, code string) (*UserInfo, er
 	})
 	if err != nil {
 		utils.HandleError(ctx, err, "jwt.Parse")
-		return nil, fmt.Errorf("failed to parse JWT: %v", err)
+		return nil, nil, fmt.Errorf("failed to parse JWT: %v", err)
 	}
 
 	claims, ok := jwtToken.Claims.(jwt.MapClaims)
 	if !ok || !jwtToken.Valid {
 		utils.HandleError(ctx, nil, "invalid token")
-		return nil, fmt.Errorf("failed to get claims")
+		return nil, nil, fmt.Errorf("failed to get claims")
 	}
 
 	// audienceの検証
 	aud, err := jwtToken.Claims.GetAudience()
 	if err != nil {
 		utils.HandleError(ctx, err, "GetAudience")
-		return nil, fmt.Errorf("failed to get audience")
+		return nil, nil, fmt.Errorf("failed to get audience")
 	}
 	if !slices.Contains(aud, p.oauthConf.ClientID) {
-		return nil, fmt.Errorf("invalid audience")
+		return nil, nil, fmt.Errorf("invalid audience")
 	}
 	// issuerの検証
 	iss, err := jwtToken.Claims.GetIssuer()
 	if err != nil {
 		utils.HandleError(ctx, err, "GetIssuer")
-		return nil, fmt.Errorf("failed to get issuer")
+		return nil, nil, fmt.Errorf("failed to get issuer")
 	}
 	if iss != provider.Issuer.String() {
-		return nil, fmt.Errorf("invalid issuer")
+		return nil, nil, fmt.Errorf("invalid issuer")
 	}
 
-	userInfo := &UserInfo{
-		Subject: claims["sub"].(string),
-		Picture: claims["picture"].(string),
+	var picture, subject *string
+	if v, ok := claims["picture"].(string); ok {
+		picture = &v
+	}
+	if v, ok := claims["sub"].(string); ok {
+		subject = &v
 	}
 
-	return userInfo, nil
+	return subject, picture, nil
+}
+
+func (p *authProvider) getProvider() *Provider {
+	issuer := p.providerName.IssuerURI()
+	provider, _ := GetProvider(issuer, p.conf)
+	return &provider
 }
