@@ -1,6 +1,6 @@
 <div align="center">
-    <img src="docs/public/assets/icon.png" width="50%" center />
 
+<img src="docs/public/assets/icon.png" width="50%" center alt="kotohiro APIのロゴ" />
 
 # kotohiro API Server
 
@@ -12,7 +12,7 @@
 
 </div>
 
-## 🚀 セットアップ
+## 🚀 開発環境
 
 ### 1. 前提パッケージのインストール
 
@@ -20,7 +20,7 @@ miseを用いてツールの管理をしています。
 
 ```sh
 # macosの場合
-brew install mize
+brew install mise
 
 # その他の環境
 curl https://mise.run | sh
@@ -55,7 +55,7 @@ cp .env.example .env
 ./scripts/gen.sh
 ```
 
-### 3. DBのセットアップ
+### 4. DBセットアップ
 
 docker composeを使用します
 
@@ -63,7 +63,7 @@ docker composeを使用します
 docker compose up -d db
 ```
 
-### 4. ホットリロード
+### 5. ホットリロード
 
 airを用いてホットリロードが可能
 
@@ -85,6 +85,6 @@ air
 
 <!-- Repository links -->
 
-[repo_license_url]: https://github.com/gowebly/gowebly/blob/main/LICENSE
+[repo_license_url]: https://github.com/neko-dream/api/blob/main/LICENSE
 [repo_license_img]: https://img.shields.io/badge/license-AGPL--v3-red?style=for-the-badge&logo=none
 
