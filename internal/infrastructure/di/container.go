@@ -5,7 +5,7 @@ import (
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/service"
-	"github.com/neko-dream/server/internal/infrastructure/auth"
+	"github.com/neko-dream/server/internal/infrastructure/auth/jwt"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	client "github.com/neko-dream/server/internal/infrastructure/datasource/analysis"
 	"github.com/neko-dream/server/internal/infrastructure/datasource/postgresql"
@@ -49,7 +49,7 @@ func BuildContainer() *dig.Container {
 		{repository.NewConclusionRepository, nil},
 		{repository.NewActionItemRepository, nil},
 		{db.NewDummyInitializer, nil},
-		{auth.NewTokenManager, nil},
+		{jwt.NewTokenManager, nil},
 		{service.NewAuthService, nil},
 		{service.NewSessionService, nil},
 		{service.NewUserService, nil},
