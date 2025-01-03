@@ -55,8 +55,6 @@ reviews:
     4. タイトルは必ず日本語で記述すること
     5. 末尾に句点や感嘆符を付けないこと
 
-  review_status: false
-  commit_status: false
   poem: true
   collapse_walkthrough: true
   sequence_diagrams: true
