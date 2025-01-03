@@ -7,14 +7,15 @@ import (
 	"strings"
 
 	"braces.dev/errtrace"
+	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/image"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	um "github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/server/internal/infrastructure/auth/oauth"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
-	"github.com/neko-dream/server/pkg/oauth"
 	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
 )
@@ -55,8 +56,8 @@ func (u *userRepository) FindByDisplayID(ctx context.Context, displayID string) 
 		}
 	}
 
-	providerName, err := oauth.
-		NewAuthProviderName(userAuthRow.Provider)
+	providerName := auth.
+		AuthProviderName(userAuthRow.Provider)
 	if err != nil {
 		return nil, errtrace.Wrap(err)
 	}
