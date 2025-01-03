@@ -64,6 +64,8 @@ Docker Compose V2に対応したDockerをあらかじめインストールして
 docker compose up -d db
 ```
 
+ユーザー名、パスワード、DB名は全て`kotohiro`です。
+
 もしDockerを使用せず動かす場合は以下の要件を満たしたDBを使用してください。
 
 - PostgreSQL 16
