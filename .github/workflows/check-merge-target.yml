@@ -7,8 +7,8 @@ on:
       - main
 
 jobs:
-  cicd_test:
-    name: cicd_to_main
+  check:
+    name: merge-target-main
     runs-on: ubuntu-latest
     steps:
       - name: Check:if PR is from develop to main branch
