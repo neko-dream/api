@@ -134,12 +134,12 @@ type TalkSessionHandler interface {
 	//
 	// GET /talksessions/opened
 	GetOpenedTalkSession(ctx context.Context, params GetOpenedTalkSessionParams) (GetOpenedTalkSessionRes, error)
-	// GetTalkSessionDetail implements getTalkSessionDetail operation.
+	// ViewTalkSessionDetail implements ViewTalkSessionDetail operation.
 	//
 	// トークセッションの詳細.
 	//
 	// GET /talksessions/{talkSessionId}
-	GetTalkSessionDetail(ctx context.Context, params GetTalkSessionDetailParams) (GetTalkSessionDetailRes, error)
+	ViewTalkSessionDetail(ctx context.Context, params ViewTalkSessionDetailParams) (ViewTalkSessionDetailRes, error)
 	// GetTalkSessionList implements getTalkSessionList operation.
 	//
 	// セッション一覧.

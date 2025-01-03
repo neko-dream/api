@@ -11,32 +11,32 @@ import (
 )
 
 type (
-	GetTalkSessionDetailUseCase interface {
-		Execute(context.Context, GetTalkSessionDetailInput) (*GetTalkSessionDetailOutput, error)
+	ViewTalkSessionDetailQuery interface {
+		Execute(context.Context, ViewTalkSessionDetailInput) (*ViewTalkSessionDetailOutput, error)
 	}
 
-	GetTalkSessionDetailInput struct {
+	ViewTalkSessionDetailInput struct {
 		TalkSessionID shared.UUID[talksession.TalkSession]
 	}
 
-	GetTalkSessionDetailOutput struct {
+	ViewTalkSessionDetailOutput struct {
 		TalkSessionDTO
 	}
 
-	getTalkSessionDetailInteractor struct {
+	ViewTalkSessionDetailInteractor struct {
 		*db.DBManager
 	}
 )
 
-func NewGetTalkSessionDetailUseCase(
+func NewViewTalkSessionDetailQuery(
 	dbManager *db.DBManager,
-) GetTalkSessionDetailUseCase {
-	return &getTalkSessionDetailInteractor{
+) ViewTalkSessionDetailQuery {
+	return &ViewTalkSessionDetailInteractor{
 		DBManager: dbManager,
 	}
 }
 
-func (i *getTalkSessionDetailInteractor) Execute(ctx context.Context, input GetTalkSessionDetailInput) (*GetTalkSessionDetailOutput, error) {
+func (i *ViewTalkSessionDetailInteractor) Execute(ctx context.Context, input ViewTalkSessionDetailInput) (*ViewTalkSessionDetailOutput, error) {
 
 	talkSessionRow, err := i.DBManager.GetQueries(ctx).GetTalkSessionByID(ctx, input.TalkSessionID.UUID())
 	if err != nil {
@@ -68,7 +68,7 @@ func (i *getTalkSessionDetailInteractor) Execute(ctx context.Context, input GetT
 		Prefecture:       utils.ToPtrIfNotNullValue(!talkSessionRow.Prefecture.Valid, talkSessionRow.Prefecture.String),
 	}
 
-	out := &GetTalkSessionDetailOutput{
+	out := &ViewTalkSessionDetailOutput{
 		TalkSessionDTO: talkSessionRes,
 	}
 	return out, nil

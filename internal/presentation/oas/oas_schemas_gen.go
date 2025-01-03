@@ -2011,34 +2011,34 @@ func (s *GetOpinionsForTalkSessionSort) UnmarshalText(data []byte) error {
 	}
 }
 
-type GetTalkSessionDetailBadRequest struct {
+type ViewTalkSessionDetailBadRequest struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
 }
 
 // GetCode returns the value of Code.
-func (s *GetTalkSessionDetailBadRequest) GetCode() string {
+func (s *ViewTalkSessionDetailBadRequest) GetCode() string {
 	return s.Code
 }
 
 // GetMessage returns the value of Message.
-func (s *GetTalkSessionDetailBadRequest) GetMessage() string {
+func (s *ViewTalkSessionDetailBadRequest) GetMessage() string {
 	return s.Message
 }
 
 // SetCode sets the value of Code.
-func (s *GetTalkSessionDetailBadRequest) SetCode(val string) {
+func (s *ViewTalkSessionDetailBadRequest) SetCode(val string) {
 	s.Code = val
 }
 
 // SetMessage sets the value of Message.
-func (s *GetTalkSessionDetailBadRequest) SetMessage(val string) {
+func (s *ViewTalkSessionDetailBadRequest) SetMessage(val string) {
 	s.Message = val
 }
 
-func (*GetTalkSessionDetailBadRequest) getTalkSessionDetailRes() {}
+func (*ViewTalkSessionDetailBadRequest) ViewTalkSessionDetailRes() {}
 
-type GetTalkSessionDetailOK struct {
+type ViewTalkSessionDetailOK struct {
 	// トークセッションID.
 	ID string `json:"id"`
 	// テーマ.
@@ -2046,13 +2046,13 @@ type GetTalkSessionDetailOK struct {
 	// 説明.
 	Description OptNilString `json:"description"`
 	// 作成者.
-	Owner GetTalkSessionDetailOKOwner `json:"owner"`
+	Owner ViewTalkSessionDetailOKOwner `json:"owner"`
 	// 作成日時.
 	CreatedAt string `json:"createdAt"`
 	// 終了予定日時.
 	ScheduledEndTime string `json:"scheduledEndTime"`
 	// 位置情報.
-	Location OptGetTalkSessionDetailOKLocation `json:"location"`
+	Location OptViewTalkSessionDetailOKLocation `json:"location"`
 	// 市区町村.
 	City OptNilString `json:"city"`
 	// 都道府県.
@@ -2060,99 +2060,99 @@ type GetTalkSessionDetailOK struct {
 }
 
 // GetID returns the value of ID.
-func (s *GetTalkSessionDetailOK) GetID() string {
+func (s *ViewTalkSessionDetailOK) GetID() string {
 	return s.ID
 }
 
 // GetTheme returns the value of Theme.
-func (s *GetTalkSessionDetailOK) GetTheme() string {
+func (s *ViewTalkSessionDetailOK) GetTheme() string {
 	return s.Theme
 }
 
 // GetDescription returns the value of Description.
-func (s *GetTalkSessionDetailOK) GetDescription() OptNilString {
+func (s *ViewTalkSessionDetailOK) GetDescription() OptNilString {
 	return s.Description
 }
 
 // GetOwner returns the value of Owner.
-func (s *GetTalkSessionDetailOK) GetOwner() GetTalkSessionDetailOKOwner {
+func (s *ViewTalkSessionDetailOK) GetOwner() ViewTalkSessionDetailOKOwner {
 	return s.Owner
 }
 
 // GetCreatedAt returns the value of CreatedAt.
-func (s *GetTalkSessionDetailOK) GetCreatedAt() string {
+func (s *ViewTalkSessionDetailOK) GetCreatedAt() string {
 	return s.CreatedAt
 }
 
 // GetScheduledEndTime returns the value of ScheduledEndTime.
-func (s *GetTalkSessionDetailOK) GetScheduledEndTime() string {
+func (s *ViewTalkSessionDetailOK) GetScheduledEndTime() string {
 	return s.ScheduledEndTime
 }
 
 // GetLocation returns the value of Location.
-func (s *GetTalkSessionDetailOK) GetLocation() OptGetTalkSessionDetailOKLocation {
+func (s *ViewTalkSessionDetailOK) GetLocation() OptViewTalkSessionDetailOKLocation {
 	return s.Location
 }
 
 // GetCity returns the value of City.
-func (s *GetTalkSessionDetailOK) GetCity() OptNilString {
+func (s *ViewTalkSessionDetailOK) GetCity() OptNilString {
 	return s.City
 }
 
 // GetPrefecture returns the value of Prefecture.
-func (s *GetTalkSessionDetailOK) GetPrefecture() OptNilString {
+func (s *ViewTalkSessionDetailOK) GetPrefecture() OptNilString {
 	return s.Prefecture
 }
 
 // SetID sets the value of ID.
-func (s *GetTalkSessionDetailOK) SetID(val string) {
+func (s *ViewTalkSessionDetailOK) SetID(val string) {
 	s.ID = val
 }
 
 // SetTheme sets the value of Theme.
-func (s *GetTalkSessionDetailOK) SetTheme(val string) {
+func (s *ViewTalkSessionDetailOK) SetTheme(val string) {
 	s.Theme = val
 }
 
 // SetDescription sets the value of Description.
-func (s *GetTalkSessionDetailOK) SetDescription(val OptNilString) {
+func (s *ViewTalkSessionDetailOK) SetDescription(val OptNilString) {
 	s.Description = val
 }
 
 // SetOwner sets the value of Owner.
-func (s *GetTalkSessionDetailOK) SetOwner(val GetTalkSessionDetailOKOwner) {
+func (s *ViewTalkSessionDetailOK) SetOwner(val ViewTalkSessionDetailOKOwner) {
 	s.Owner = val
 }
 
 // SetCreatedAt sets the value of CreatedAt.
-func (s *GetTalkSessionDetailOK) SetCreatedAt(val string) {
+func (s *ViewTalkSessionDetailOK) SetCreatedAt(val string) {
 	s.CreatedAt = val
 }
 
 // SetScheduledEndTime sets the value of ScheduledEndTime.
-func (s *GetTalkSessionDetailOK) SetScheduledEndTime(val string) {
+func (s *ViewTalkSessionDetailOK) SetScheduledEndTime(val string) {
 	s.ScheduledEndTime = val
 }
 
 // SetLocation sets the value of Location.
-func (s *GetTalkSessionDetailOK) SetLocation(val OptGetTalkSessionDetailOKLocation) {
+func (s *ViewTalkSessionDetailOK) SetLocation(val OptViewTalkSessionDetailOKLocation) {
 	s.Location = val
 }
 
 // SetCity sets the value of City.
-func (s *GetTalkSessionDetailOK) SetCity(val OptNilString) {
+func (s *ViewTalkSessionDetailOK) SetCity(val OptNilString) {
 	s.City = val
 }
 
 // SetPrefecture sets the value of Prefecture.
-func (s *GetTalkSessionDetailOK) SetPrefecture(val OptNilString) {
+func (s *ViewTalkSessionDetailOK) SetPrefecture(val OptNilString) {
 	s.Prefecture = val
 }
 
-func (*GetTalkSessionDetailOK) getTalkSessionDetailRes() {}
+func (*ViewTalkSessionDetailOK) ViewTalkSessionDetailRes() {}
 
 // 位置情報.
-type GetTalkSessionDetailOKLocation struct {
+type ViewTalkSessionDetailOKLocation struct {
 	// 緯度.
 	Latitude OptFloat64 `json:"latitude"`
 	// 経度.
@@ -2160,59 +2160,59 @@ type GetTalkSessionDetailOKLocation struct {
 }
 
 // GetLatitude returns the value of Latitude.
-func (s *GetTalkSessionDetailOKLocation) GetLatitude() OptFloat64 {
+func (s *ViewTalkSessionDetailOKLocation) GetLatitude() OptFloat64 {
 	return s.Latitude
 }
 
 // GetLongitude returns the value of Longitude.
-func (s *GetTalkSessionDetailOKLocation) GetLongitude() OptFloat64 {
+func (s *ViewTalkSessionDetailOKLocation) GetLongitude() OptFloat64 {
 	return s.Longitude
 }
 
 // SetLatitude sets the value of Latitude.
-func (s *GetTalkSessionDetailOKLocation) SetLatitude(val OptFloat64) {
+func (s *ViewTalkSessionDetailOKLocation) SetLatitude(val OptFloat64) {
 	s.Latitude = val
 }
 
 // SetLongitude sets the value of Longitude.
-func (s *GetTalkSessionDetailOKLocation) SetLongitude(val OptFloat64) {
+func (s *ViewTalkSessionDetailOKLocation) SetLongitude(val OptFloat64) {
 	s.Longitude = val
 }
 
 // 作成者.
-type GetTalkSessionDetailOKOwner struct {
+type ViewTalkSessionDetailOKOwner struct {
 	DisplayID   string       `json:"displayID"`
 	DisplayName string       `json:"displayName"`
 	IconURL     OptNilString `json:"iconURL"`
 }
 
 // GetDisplayID returns the value of DisplayID.
-func (s *GetTalkSessionDetailOKOwner) GetDisplayID() string {
+func (s *ViewTalkSessionDetailOKOwner) GetDisplayID() string {
 	return s.DisplayID
 }
 
 // GetDisplayName returns the value of DisplayName.
-func (s *GetTalkSessionDetailOKOwner) GetDisplayName() string {
+func (s *ViewTalkSessionDetailOKOwner) GetDisplayName() string {
 	return s.DisplayName
 }
 
 // GetIconURL returns the value of IconURL.
-func (s *GetTalkSessionDetailOKOwner) GetIconURL() OptNilString {
+func (s *ViewTalkSessionDetailOKOwner) GetIconURL() OptNilString {
 	return s.IconURL
 }
 
 // SetDisplayID sets the value of DisplayID.
-func (s *GetTalkSessionDetailOKOwner) SetDisplayID(val string) {
+func (s *ViewTalkSessionDetailOKOwner) SetDisplayID(val string) {
 	s.DisplayID = val
 }
 
 // SetDisplayName sets the value of DisplayName.
-func (s *GetTalkSessionDetailOKOwner) SetDisplayName(val string) {
+func (s *ViewTalkSessionDetailOKOwner) SetDisplayName(val string) {
 	s.DisplayName = val
 }
 
 // SetIconURL sets the value of IconURL.
-func (s *GetTalkSessionDetailOKOwner) SetIconURL(val OptNilString) {
+func (s *ViewTalkSessionDetailOKOwner) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
 
@@ -5626,38 +5626,38 @@ func (o OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) Or(d GetOpini
 	return d
 }
 
-// NewOptGetTalkSessionDetailOKLocation returns new OptGetTalkSessionDetailOKLocation with value set to v.
-func NewOptGetTalkSessionDetailOKLocation(v GetTalkSessionDetailOKLocation) OptGetTalkSessionDetailOKLocation {
-	return OptGetTalkSessionDetailOKLocation{
+// NewOptViewTalkSessionDetailOKLocation returns new OptViewTalkSessionDetailOKLocation with value set to v.
+func NewOptViewTalkSessionDetailOKLocation(v ViewTalkSessionDetailOKLocation) OptViewTalkSessionDetailOKLocation {
+	return OptViewTalkSessionDetailOKLocation{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptGetTalkSessionDetailOKLocation is optional GetTalkSessionDetailOKLocation.
-type OptGetTalkSessionDetailOKLocation struct {
-	Value GetTalkSessionDetailOKLocation
+// OptViewTalkSessionDetailOKLocation is optional ViewTalkSessionDetailOKLocation.
+type OptViewTalkSessionDetailOKLocation struct {
+	Value ViewTalkSessionDetailOKLocation
 	Set   bool
 }
 
-// IsSet returns true if OptGetTalkSessionDetailOKLocation was set.
-func (o OptGetTalkSessionDetailOKLocation) IsSet() bool { return o.Set }
+// IsSet returns true if OptViewTalkSessionDetailOKLocation was set.
+func (o OptViewTalkSessionDetailOKLocation) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptGetTalkSessionDetailOKLocation) Reset() {
-	var v GetTalkSessionDetailOKLocation
+func (o *OptViewTalkSessionDetailOKLocation) Reset() {
+	var v ViewTalkSessionDetailOKLocation
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptGetTalkSessionDetailOKLocation) SetTo(v GetTalkSessionDetailOKLocation) {
+func (o *OptViewTalkSessionDetailOKLocation) SetTo(v ViewTalkSessionDetailOKLocation) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptGetTalkSessionDetailOKLocation) Get() (v GetTalkSessionDetailOKLocation, ok bool) {
+func (o OptViewTalkSessionDetailOKLocation) Get() (v ViewTalkSessionDetailOKLocation, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -5665,7 +5665,7 @@ func (o OptGetTalkSessionDetailOKLocation) Get() (v GetTalkSessionDetailOKLocati
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptGetTalkSessionDetailOKLocation) Or(d GetTalkSessionDetailOKLocation) GetTalkSessionDetailOKLocation {
+func (o OptViewTalkSessionDetailOKLocation) Or(d ViewTalkSessionDetailOKLocation) ViewTalkSessionDetailOKLocation {
 	if v, ok := o.Get(); ok {
 		return v
 	}

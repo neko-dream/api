@@ -357,7 +357,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						if len(elem) == 0 {
 							switch r.Method {
 							case "GET":
-								s.handleGetTalkSessionDetailRequest([1]string{
+								s.handleViewTalkSessionDetailRequest([1]string{
 									args[0],
 								}, elemIsEscaped, w, r)
 							case "PUT":
@@ -1219,9 +1219,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						if len(elem) == 0 {
 							switch method {
 							case "GET":
-								r.name = "GetTalkSessionDetail"
+								r.name = "ViewTalkSessionDetail"
 								r.summary = "トークセッションの詳細"
-								r.operationID = "getTalkSessionDetail"
+								r.operationID = "ViewTalkSessionDetail"
 								r.pathPattern = "/talksessions/{talkSessionId}"
 								r.args = args
 								r.count = 1

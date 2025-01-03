@@ -965,12 +965,12 @@ func decodeGetOpinionsForTalkSessionParams(args [1]string, argsEscaped bool, r *
 	return params, nil
 }
 
-// GetTalkSessionDetailParams is parameters of getTalkSessionDetail operation.
-type GetTalkSessionDetailParams struct {
+// ViewTalkSessionDetailParams is parameters of ViewTalkSessionDetail operation.
+type ViewTalkSessionDetailParams struct {
 	TalkSessionId string
 }
 
-func unpackGetTalkSessionDetailParams(packed middleware.Parameters) (params GetTalkSessionDetailParams) {
+func unpackViewTalkSessionDetailParams(packed middleware.Parameters) (params ViewTalkSessionDetailParams) {
 	{
 		key := middleware.ParameterKey{
 			Name: "talkSessionId",
@@ -981,7 +981,7 @@ func unpackGetTalkSessionDetailParams(packed middleware.Parameters) (params GetT
 	return params
 }
 
-func decodeGetTalkSessionDetailParams(args [1]string, argsEscaped bool, r *http.Request) (params GetTalkSessionDetailParams, _ error) {
+func decodeViewTalkSessionDetailParams(args [1]string, argsEscaped bool, r *http.Request) (params ViewTalkSessionDetailParams, _ error) {
 	// Decode path: talkSessionId.
 	if err := func() error {
 		param := args[0]
