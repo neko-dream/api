@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/auth"
@@ -13,6 +14,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
+	"github.com/neko-dream/server/pkg/utils"
 )
 
 type sessionRepository struct {
@@ -74,6 +76,7 @@ func (s *sessionRepository) FindByUserID(ctx context.Context, userID shared.UUID
 	for _, sess := range sessionModels {
 		providerName, err := auth.NewAuthProviderName(sess.Provider)
 		if err != nil {
+			utils.HandleError(ctx, err, fmt.Sprintf("NewAuthProviderName: %s", sess.Provider))
 			continue
 		}
 		sessions = append(sessions, *session.NewSession(
