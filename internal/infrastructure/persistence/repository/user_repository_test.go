@@ -6,9 +6,9 @@ import (
 
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/infrastructure/datasource/repository"
-	"github.com/neko-dream/server/internal/infrastructure/db"
 	"github.com/neko-dream/server/internal/infrastructure/di"
+	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
+	"github.com/neko-dream/server/internal/infrastructure/persistence/repository"
 	"github.com/neko-dream/server/internal/test/txtest"
 	"github.com/samber/lo"
 )

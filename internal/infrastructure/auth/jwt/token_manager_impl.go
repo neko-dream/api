@@ -1,4 +1,4 @@
-package auth
+package jwt
 
 import (
 	"context"
@@ -24,28 +24,25 @@ type tokenManager struct {
 func (j *tokenManager) SetSession(ctx context.Context) context.Context {
 	r := http_utils.GetHTTPRequest(ctx)
 	if r == nil {
-		return nil
+		return ctx
 	}
+
 	sessionCookie, err := r.Cookie("SessionId")
 	if err != nil {
 		if errors.Is(err, http.ErrNoCookie) {
-			return nil
+			return ctx
 		}
+		// NoCookie以外の場合、エラーをハンドリング
 		utils.HandleError(ctx, err, "CookieError")
-		return nil
+		return ctx
 	}
 	// セッションIDを取得
 	claim, err := j.Parse(ctx, sessionCookie.Value)
 	if err != nil {
 		return ctx
 	}
-	// トークンの有効性を確認
-	if claim.IsExpired(ctx) {
-		return ctx
-	}
-
-	// スキップするOperationの場合以外は、ユーザー登録済みか確認
-	if !claim.IsVerify {
+	// トークンの有効性を確認 || // スキップするOperationの場合以外は、ユーザー登録済みか確認
+	if claim.IsExpired(ctx) || !claim.IsVerify {
 		return ctx
 	}
 
@@ -56,14 +53,7 @@ func (j *tokenManager) SetSession(ctx context.Context) context.Context {
 
 	// サーバー側でセッションの有効性を確認
 	sess, err := j.SessionRepository.FindBySessionID(ctx, sessID)
-	if err != nil {
-		return ctx
-	}
-	if sess == nil {
-		return ctx
-	}
-
-	if !sess.IsActive(ctx) {
+	if err != nil || sess == nil || !sess.IsActive(ctx) {
 		return ctx
 	}
 

@@ -5,13 +5,13 @@ import (
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/service"
-	"github.com/neko-dream/server/internal/infrastructure/auth"
+	"github.com/neko-dream/server/internal/infrastructure/auth/jwt"
 	"github.com/neko-dream/server/internal/infrastructure/config"
-	client "github.com/neko-dream/server/internal/infrastructure/datasource/analysis"
-	"github.com/neko-dream/server/internal/infrastructure/datasource/postgresql"
-	"github.com/neko-dream/server/internal/infrastructure/datasource/repository"
-	"github.com/neko-dream/server/internal/infrastructure/db"
-	opentelemetry "github.com/neko-dream/server/internal/infrastructure/open_telemetry"
+	client "github.com/neko-dream/server/internal/infrastructure/external/analysis"
+	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
+	"github.com/neko-dream/server/internal/infrastructure/persistence/postgresql"
+	"github.com/neko-dream/server/internal/infrastructure/persistence/repository"
+	"github.com/neko-dream/server/internal/infrastructure/telemetry"
 	"github.com/neko-dream/server/internal/presentation/handler"
 	analysis_usecase "github.com/neko-dream/server/internal/usecase/analysis"
 	auth_usecase "github.com/neko-dream/server/internal/usecase/auth"
@@ -37,7 +37,7 @@ func BuildContainer() *dig.Container {
 		{postgresql.Connect, nil},
 		{db.NewMigrator, nil},
 		{db.NewDBManager, nil},
-		{opentelemetry.SentryProvider, nil},
+		{telemetry.SentryProvider, nil},
 		{repository.InitConfig, nil},
 		{repository.InitS3Client, nil},
 		{repository.NewImageRepository, nil},
@@ -49,7 +49,7 @@ func BuildContainer() *dig.Container {
 		{repository.NewConclusionRepository, nil},
 		{repository.NewActionItemRepository, nil},
 		{db.NewDummyInitializer, nil},
-		{auth.NewTokenManager, nil},
+		{jwt.NewTokenManager, nil},
 		{service.NewAuthService, nil},
 		{service.NewSessionService, nil},
 		{service.NewUserService, nil},

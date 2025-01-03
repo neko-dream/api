@@ -6,9 +6,9 @@ import (
 
 	swMiddleware "github.com/go-openapi/runtime/middleware"
 	"github.com/neko-dream/server/internal/infrastructure/config"
-	"github.com/neko-dream/server/internal/infrastructure/db"
 	"github.com/neko-dream/server/internal/infrastructure/di"
-	"github.com/neko-dream/server/internal/infrastructure/middleware"
+	"github.com/neko-dream/server/internal/infrastructure/http/middleware"
+	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/internal/presentation/handler"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/rs/cors"
