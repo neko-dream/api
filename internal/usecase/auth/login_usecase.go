@@ -8,7 +8,7 @@ import (
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/infrastructure/config"
-	"github.com/neko-dream/server/internal/infrastructure/db"
+	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 )
 
 type (

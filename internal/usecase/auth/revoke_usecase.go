@@ -8,7 +8,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/infrastructure/config"
-	"github.com/neko-dream/server/internal/infrastructure/db"
+	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 )
 
 type (
