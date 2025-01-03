@@ -9,7 +9,7 @@ paths:
       summary: トークセッションの詳細
       deprecated: false
       description: ''
-      operationId: getTalkSessionDetail
+      operationId: ViewTalkSessionDetail
       tags:
         - talk_session
       parameters:

@@ -37,8 +37,8 @@ type GetOpinionsForTalkSessionRes interface {
 	getOpinionsForTalkSessionRes()
 }
 
-type GetTalkSessionDetailRes interface {
-	getTalkSessionDetailRes()
+type ViewTalkSessionDetailRes interface {
+	ViewTalkSessionDetailRes()
 }
 
 type GetTalkSessionListRes interface {

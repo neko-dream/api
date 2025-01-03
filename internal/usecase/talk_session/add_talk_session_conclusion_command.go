@@ -14,7 +14,7 @@ import (
 )
 
 type (
-	CreateTalkSessionConclusionUseCase interface {
+	AddTalkSessionConclusionCommand interface {
 		Execute(context.Context, CreateTalkSessionConclusionInput) (*CreateTalkSessionConclusionOutput, error)
 	}
 
@@ -34,10 +34,10 @@ type (
 	}
 )
 
-func NewCreateTalkSessionConclusionUseCase(
+func NewAddTalkSessionConclusionCommand(
 	DBManager *db.DBManager,
 	concRepo conclusion.ConclusionRepository,
-) CreateTalkSessionConclusionUseCase {
+) AddTalkSessionConclusionCommand {
 	return &createTalkSessionConclusionInteractor{
 		DBManager:            DBManager,
 		ConclusionRepository: concRepo,

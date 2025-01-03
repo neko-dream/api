@@ -23,7 +23,7 @@ type userHandler struct {
 	user_usecase.EditUserUseCase
 	user_usecase.GetUserInformationQueryHandler
 	opinion_usecase.GetUserOpinionListQueryHandler
-	talk_session_usecase.GetTalkSessionHistoriesQuery
+	talk_session_usecase.SearchTalkSessionsQuery
 }
 
 func NewUserHandler(
@@ -31,14 +31,14 @@ func NewUserHandler(
 	editUserUsecase user_usecase.EditUserUseCase,
 	getUserInformationQueryHandler user_usecase.GetUserInformationQueryHandler,
 	getUserOpinionListQueryHandler opinion_usecase.GetUserOpinionListQueryHandler,
-	getTalkSessoinHistoriesQuery talk_session_usecase.GetTalkSessionHistoriesQuery,
+	getTalkSessoinHistoriesQuery talk_session_usecase.SearchTalkSessionsQuery,
 ) oas.UserHandler {
 	return &userHandler{
 		RegisterUserUseCase:            registerUserUsecase,
 		EditUserUseCase:                editUserUsecase,
 		GetUserInformationQueryHandler: getUserInformationQueryHandler,
 		GetUserOpinionListQueryHandler: getUserOpinionListQueryHandler,
-		GetTalkSessionHistoriesQuery:   getTalkSessoinHistoriesQuery,
+		SearchTalkSessionsQuery:        getTalkSessoinHistoriesQuery,
 	}
 }
 
@@ -145,7 +145,7 @@ func (u *userHandler) SessionsHistory(ctx context.Context, params oas.SessionsHi
 		offset = &params.Offset.Value
 	}
 
-	out, err := u.GetTalkSessionHistoriesQuery.Execute(ctx, talk_session_usecase.GetTalkSessionHistoriesInput{
+	out, err := u.SearchTalkSessionsQuery.Execute(ctx, talk_session_usecase.SearchTalkSessionsInput{
 		UserID: userID,
 		Status: status,
 		Theme:  utils.ToPtrIfNotNullValue(!params.Theme.IsSet(), params.Theme.Value),
@@ -153,7 +153,7 @@ func (u *userHandler) SessionsHistory(ctx context.Context, params oas.SessionsHi
 		Offset: offset,
 	})
 	if err != nil {
-		utils.HandleError(ctx, err, "GetTalkSessionHistoriesQuery.Execute")
+		utils.HandleError(ctx, err, "SearchTalkSessionsQuery.Execute")
 		return nil, messages.InternalServerError
 	}
 
