@@ -8,10 +8,10 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/auth/jwt"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	client "github.com/neko-dream/server/internal/infrastructure/external/analysis"
-	opentelemetry "github.com/neko-dream/server/internal/infrastructure/open_telemetry"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/postgresql"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/repository"
+	"github.com/neko-dream/server/internal/infrastructure/telemetry"
 	"github.com/neko-dream/server/internal/presentation/handler"
 	analysis_usecase "github.com/neko-dream/server/internal/usecase/analysis"
 	auth_usecase "github.com/neko-dream/server/internal/usecase/auth"
@@ -37,7 +37,7 @@ func BuildContainer() *dig.Container {
 		{postgresql.Connect, nil},
 		{db.NewMigrator, nil},
 		{db.NewDBManager, nil},
-		{opentelemetry.SentryProvider, nil},
+		{telemetry.SentryProvider, nil},
 		{repository.InitConfig, nil},
 		{repository.InitS3Client, nil},
 		{repository.NewImageRepository, nil},
