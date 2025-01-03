@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
@@ -77,7 +78,7 @@ func (h *BrowseUsersTalkSessionHistoriesQueryHandler) Execute(ctx context.Contex
 		Status: status,
 	})
 	if err != nil {
-		return nil, err
+		return nil, messages.TalkSessionNotFound
 	}
 	if len(out) <= 0 {
 		return &BrowseUsersTalkSessionHistoriesOutput{
