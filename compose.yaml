@@ -1,6 +1,6 @@
 services:
   db:
-    image: imresamu/postgis-arm64:16-recent-postgis3.5-geos3.13-proj9.5-gdal3.9-cgal5.6-sfcgal1.5-bookworm-ver20240928-0cd66e4-2024w41
+    image: ghcr.io/baosystems/postgis:15-3.5
     container_name: pg
     ports:
       - "5432:5432"
