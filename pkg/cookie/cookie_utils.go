@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strings"
 )
 
-func EncodeCookies(cookies []*http.Cookie) string {
+func EncodeCookies(cookies []*http.Cookie) []string {
 	var results []string
 
 	for _, cookie := range cookies {
@@ -46,5 +45,5 @@ func EncodeCookies(cookies []*http.Cookie) string {
 		results = append(results, result)
 	}
 
-	return strings.Join(results, ", ")
+	return results
 }
