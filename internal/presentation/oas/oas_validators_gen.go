@@ -10,6 +10,29 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
+func (s *AuthorizeFoundHeaders) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if s.SetCookie == nil {
+			return errors.New("nil is invalid value")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "SetCookie",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
 func (s *CreateTalkSessionOK) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -1067,7 +1090,7 @@ func (s GetOpinionsForTalkSessionSort) Validate() error {
 	}
 }
 
-func (s *ViewTalkSessionDetailOK) Validate() error {
+func (s *GetTalkSessionDetailOK) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
@@ -1108,7 +1131,7 @@ func (s *ViewTalkSessionDetailOK) Validate() error {
 	return nil
 }
 
-func (s *ViewTalkSessionDetailOKLocation) Validate() error {
+func (s *GetTalkSessionDetailOKLocation) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
@@ -1156,7 +1179,7 @@ func (s *ViewTalkSessionDetailOKLocation) Validate() error {
 	return nil
 }
 
-func (s *ViewTalkSessionDetailOKOwner) Validate() error {
+func (s *GetTalkSessionDetailOKOwner) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
@@ -1557,6 +1580,29 @@ func (s ManageRegenerateReqType) Validate() error {
 	default:
 		return errors.Errorf("invalid value: %v", s)
 	}
+}
+
+func (s *OAuthTokenRevokeNoContentHeaders) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if s.SetCookie == nil {
+			return errors.New("nil is invalid value")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "SetCookie",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
 }
 
 func (s *OpinionComments2OK) Validate() error {

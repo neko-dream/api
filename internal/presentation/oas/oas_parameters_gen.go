@@ -17,9 +17,8 @@ import (
 
 // AuthorizeParams is parameters of authorize operation.
 type AuthorizeParams struct {
-	// OIDCプロバイダ名.
 	Provider string
-	// コールバック後のリダイレクトURL.
+	// ログイン後にリダイレクトするURL.
 	RedirectURL string
 }
 
@@ -965,12 +964,12 @@ func decodeGetOpinionsForTalkSessionParams(args [1]string, argsEscaped bool, r *
 	return params, nil
 }
 
-// ViewTalkSessionDetailParams is parameters of ViewTalkSessionDetail operation.
-type ViewTalkSessionDetailParams struct {
+// GetTalkSessionDetailParams is parameters of getTalkSessionDetail operation.
+type GetTalkSessionDetailParams struct {
 	TalkSessionId string
 }
 
-func unpackViewTalkSessionDetailParams(packed middleware.Parameters) (params ViewTalkSessionDetailParams) {
+func unpackGetTalkSessionDetailParams(packed middleware.Parameters) (params GetTalkSessionDetailParams) {
 	{
 		key := middleware.ParameterKey{
 			Name: "talkSessionId",
@@ -981,7 +980,7 @@ func unpackViewTalkSessionDetailParams(packed middleware.Parameters) (params Vie
 	return params
 }
 
-func decodeViewTalkSessionDetailParams(args [1]string, argsEscaped bool, r *http.Request) (params ViewTalkSessionDetailParams, _ error) {
+func decodeGetTalkSessionDetailParams(args [1]string, argsEscaped bool, r *http.Request) (params GetTalkSessionDetailParams, _ error) {
 	// Decode path: talkSessionId.
 	if err := func() error {
 		param := args[0]
@@ -1600,14 +1599,13 @@ func decodeGetTimeLineParams(args [1]string, argsEscaped bool, r *http.Request) 
 // OAuthCallbackParams is parameters of oauth_callback operation.
 type OAuthCallbackParams struct {
 	// OAuth2.0 State from Cookie.
-	CookieState OptString
-	// Auth Callback URL.
+	CookieState string
+	// Authorization Code.
 	RedirectURL string
-	// OAUTH Provider.
-	Provider string
-	Code     OptString
-	// OAuth2.0 State from Query.
-	QueryState OptString
+	Provider    string
+	Code        string
+	// OAuth State from Query.
+	QueryState string
 }
 
 func unpackOAuthCallbackParams(packed middleware.Parameters) (params OAuthCallbackParams) {
@@ -1616,9 +1614,7 @@ func unpackOAuthCallbackParams(packed middleware.Parameters) (params OAuthCallba
 			Name: "state",
 			In:   "cookie",
 		}
-		if v, ok := packed[key]; ok {
-			params.CookieState = v.(OptString)
-		}
+		params.CookieState = packed[key].(string)
 	}
 	{
 		key := middleware.ParameterKey{
@@ -1639,18 +1635,14 @@ func unpackOAuthCallbackParams(packed middleware.Parameters) (params OAuthCallba
 			Name: "code",
 			In:   "query",
 		}
-		if v, ok := packed[key]; ok {
-			params.Code = v.(OptString)
-		}
+		params.Code = packed[key].(string)
 	}
 	{
 		key := middleware.ParameterKey{
 			Name: "state",
 			In:   "query",
 		}
-		if v, ok := packed[key]; ok {
-			params.QueryState = v.(OptString)
-		}
+		params.QueryState = packed[key].(string)
 	}
 	return params
 }
@@ -1666,28 +1658,23 @@ func decodeOAuthCallbackParams(args [1]string, argsEscaped bool, r *http.Request
 		}
 		if err := c.HasParam(cfg); err == nil {
 			if err := c.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotCookieStateVal string
-				if err := func() error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-
-					c, err := conv.ToString(val)
-					if err != nil {
-						return err
-					}
-
-					paramsDotCookieStateVal = c
-					return nil
-				}(); err != nil {
+				val, err := d.DecodeValue()
+				if err != nil {
 					return err
 				}
-				params.CookieState.SetTo(paramsDotCookieStateVal)
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.CookieState = c
 				return nil
 			}); err != nil {
 				return err
 			}
+		} else {
+			return validate.ErrFieldRequired
 		}
 		return nil
 	}(); err != nil {
@@ -1786,28 +1773,23 @@ func decodeOAuthCallbackParams(args [1]string, argsEscaped bool, r *http.Request
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotCodeVal string
-				if err := func() error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-
-					c, err := conv.ToString(val)
-					if err != nil {
-						return err
-					}
-
-					paramsDotCodeVal = c
-					return nil
-				}(); err != nil {
+				val, err := d.DecodeValue()
+				if err != nil {
 					return err
 				}
-				params.Code.SetTo(paramsDotCodeVal)
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.Code = c
 				return nil
 			}); err != nil {
 				return err
 			}
+		} else {
+			return validate.ErrFieldRequired
 		}
 		return nil
 	}(); err != nil {
@@ -1827,28 +1809,23 @@ func decodeOAuthCallbackParams(args [1]string, argsEscaped bool, r *http.Request
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotQueryStateVal string
-				if err := func() error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-
-					c, err := conv.ToString(val)
-					if err != nil {
-						return err
-					}
-
-					paramsDotQueryStateVal = c
-					return nil
-				}(); err != nil {
+				val, err := d.DecodeValue()
+				if err != nil {
 					return err
 				}
-				params.QueryState.SetTo(paramsDotQueryStateVal)
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.QueryState = c
 				return nil
 			}); err != nil {
 				return err
 			}
+		} else {
+			return validate.ErrFieldRequired
 		}
 		return nil
 	}(); err != nil {

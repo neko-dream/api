@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"net/http"
 	"time"
 
 	"github.com/neko-dream/server/internal/domain/messages"
@@ -10,7 +9,6 @@ import (
 	"github.com/neko-dream/server/internal/presentation/oas"
 	auth_usecase "github.com/neko-dream/server/internal/usecase/auth"
 	cookie_utils "github.com/neko-dream/server/pkg/cookie"
-	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/utils"
 )
 
@@ -72,7 +70,7 @@ func (a *authHandler) OAuthCallback(ctx context.Context, params oas.OAuthCallbac
 }
 
 // OAuthRevoke implements oas.AuthHandler.
-func (a *authHandler) OAuthRevoke(ctx context.Context) (oas.OAuthRevokeRes, error) {
+func (a *authHandler) OAuthTokenRevoke(ctx context.Context) (oas.OAuthTokenRevokeRes, error) {
 	claim := session.GetSession(ctx)
 	sessID, err := claim.SessionID()
 	if err != nil {
@@ -85,14 +83,9 @@ func (a *authHandler) OAuthRevoke(ctx context.Context) (oas.OAuthRevokeRes, erro
 		return nil, err
 	}
 
-	w := http_utils.GetHTTPResponse(ctx)
-	for _, c := range out.Cookies {
-		http.SetCookie(w, c)
-	}
-
-	// 204 No Content
-	res := &oas.OAuthRevokeNoContent{}
-	return res, nil
+	headers := new(oas.OAuthTokenRevokeNoContentHeaders)
+	headers.SetSetCookie(cookie_utils.EncodeCookies(out.Cookies))
+	return headers, nil
 }
 
 // OAuthTokenInfo implements oas.AuthHandler.

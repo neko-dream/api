@@ -12,31 +12,54 @@ import (
 	ht "github.com/ogen-go/ogen/http"
 )
 
-// AuthorizeFound is response for Authorize operation.
-type AuthorizeFound struct {
-	Location  OptURI
-	SetCookie OptString
+type AuthorizeBadRequest struct{}
+
+func (*AuthorizeBadRequest) authorizeRes() {}
+
+type AuthorizeFound struct{}
+
+// AuthorizeFoundHeaders wraps AuthorizeFound with response headers.
+type AuthorizeFoundHeaders struct {
+	Location  string
+	SetCookie []string
+	Response  AuthorizeFound
 }
 
 // GetLocation returns the value of Location.
-func (s *AuthorizeFound) GetLocation() OptURI {
+func (s *AuthorizeFoundHeaders) GetLocation() string {
 	return s.Location
 }
 
 // GetSetCookie returns the value of SetCookie.
-func (s *AuthorizeFound) GetSetCookie() OptString {
+func (s *AuthorizeFoundHeaders) GetSetCookie() []string {
 	return s.SetCookie
 }
 
+// GetResponse returns the value of Response.
+func (s *AuthorizeFoundHeaders) GetResponse() AuthorizeFound {
+	return s.Response
+}
+
 // SetLocation sets the value of Location.
-func (s *AuthorizeFound) SetLocation(val OptURI) {
+func (s *AuthorizeFoundHeaders) SetLocation(val string) {
 	s.Location = val
 }
 
 // SetSetCookie sets the value of SetCookie.
-func (s *AuthorizeFound) SetSetCookie(val OptString) {
+func (s *AuthorizeFoundHeaders) SetSetCookie(val []string) {
 	s.SetCookie = val
 }
+
+// SetResponse sets the value of Response.
+func (s *AuthorizeFoundHeaders) SetResponse(val AuthorizeFound) {
+	s.Response = val
+}
+
+func (*AuthorizeFoundHeaders) authorizeRes() {}
+
+type AuthorizeInternalServerError struct{}
+
+func (*AuthorizeInternalServerError) authorizeRes() {}
 
 type CreateTalkSessionBadRequest struct {
 	Code    string `json:"code"`
@@ -72,7 +95,7 @@ type CreateTalkSessionOK struct {
 	Theme string `json:"theme"`
 	// 説明.
 	Description OptNilString `json:"description"`
-	// 作成者.
+	// 作成ユーザー.
 	Owner CreateTalkSessionOKOwner `json:"owner"`
 	// 作成日時.
 	CreatedAt string `json:"createdAt"`
@@ -206,7 +229,7 @@ func (s *CreateTalkSessionOKLocation) SetLongitude(val OptFloat64) {
 	s.Longitude = val
 }
 
-// 作成者.
+// 作成ユーザー.
 type CreateTalkSessionOKOwner struct {
 	DisplayID   string       `json:"displayID"`
 	DisplayName string       `json:"displayName"`
@@ -355,7 +378,7 @@ type EditTalkSessionOK struct {
 	Theme string `json:"theme"`
 	// 説明.
 	Description OptNilString `json:"description"`
-	// 作成者.
+	// 作成ユーザー.
 	Owner EditTalkSessionOKOwner `json:"owner"`
 	// 作成日時.
 	CreatedAt string `json:"createdAt"`
@@ -489,7 +512,7 @@ func (s *EditTalkSessionOKLocation) SetLongitude(val OptFloat64) {
 	s.Longitude = val
 }
 
-// 作成者.
+// 作成ユーザー.
 type EditTalkSessionOKOwner struct {
 	DisplayID   string       `json:"displayID"`
 	DisplayName string       `json:"displayName"`
@@ -1087,7 +1110,7 @@ type GetConclusionInternalServerError struct{}
 func (*GetConclusionInternalServerError) getConclusionRes() {}
 
 type GetConclusionOK struct {
-	// 作成者.
+	// 作成ユーザー.
 	User GetConclusionOKUser `json:"user"`
 	// 結論本文.
 	Content string `json:"content"`
@@ -1115,7 +1138,7 @@ func (s *GetConclusionOK) SetContent(val string) {
 
 func (*GetConclusionOK) getConclusionRes() {}
 
-// 作成者.
+// 作成ユーザー.
 type GetConclusionOKUser struct {
 	DisplayID   string       `json:"displayID"`
 	DisplayName string       `json:"displayName"`
@@ -1208,7 +1231,7 @@ type GetOpenedTalkSessionOKTalkSessionsItemTalkSession struct {
 	Theme string `json:"theme"`
 	// 説明.
 	Description OptNilString `json:"description"`
-	// 作成者.
+	// 作成ユーザー.
 	Owner GetOpenedTalkSessionOKTalkSessionsItemTalkSessionOwner `json:"owner"`
 	// 作成日時.
 	CreatedAt string `json:"createdAt"`
@@ -1340,7 +1363,7 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation) SetLongitude
 	s.Longitude = val
 }
 
-// 作成者.
+// 作成ユーザー.
 type GetOpenedTalkSessionOKTalkSessionsItemTalkSessionOwner struct {
 	DisplayID   string       `json:"displayID"`
 	DisplayName string       `json:"displayName"`
@@ -1424,7 +1447,7 @@ func (*GetOpinionDetailInternalServerError) getOpinionDetailRes() {}
 
 type GetOpinionDetailOK struct {
 	Opinion GetOpinionDetailOKOpinion `json:"opinion"`
-	// 作成者.
+	// 作成ユーザー.
 	User GetOpinionDetailOKUser `json:"user"`
 }
 
@@ -1596,7 +1619,7 @@ func (s *GetOpinionDetailOKOpinionVoteType) UnmarshalText(data []byte) error {
 	}
 }
 
-// 作成者.
+// 作成ユーザー.
 type GetOpinionDetailOKUser struct {
 	DisplayID   string       `json:"displayID"`
 	DisplayName string       `json:"displayName"`
@@ -1670,7 +1693,7 @@ func (*GetOpinionsForTalkSessionOK) getOpinionsForTalkSessionRes() {}
 
 type GetOpinionsForTalkSessionOKOpinionsItem struct {
 	Opinion GetOpinionsForTalkSessionOKOpinionsItemOpinion `json:"opinion"`
-	// 作成者.
+	// 作成ユーザー.
 	User       GetOpinionsForTalkSessionOKOpinionsItemUser `json:"user"`
 	ReplyCount int                                         `json:"replyCount"`
 	// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -1912,7 +1935,7 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) UnmarshalText(d
 	}
 }
 
-// 作成者.
+// 作成ユーザー.
 type GetOpinionsForTalkSessionOKOpinionsItemUser struct {
 	DisplayID   string       `json:"displayID"`
 	DisplayName string       `json:"displayName"`
@@ -2011,48 +2034,48 @@ func (s *GetOpinionsForTalkSessionSort) UnmarshalText(data []byte) error {
 	}
 }
 
-type ViewTalkSessionDetailBadRequest struct {
+type GetTalkSessionDetailBadRequest struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
 }
 
 // GetCode returns the value of Code.
-func (s *ViewTalkSessionDetailBadRequest) GetCode() string {
+func (s *GetTalkSessionDetailBadRequest) GetCode() string {
 	return s.Code
 }
 
 // GetMessage returns the value of Message.
-func (s *ViewTalkSessionDetailBadRequest) GetMessage() string {
+func (s *GetTalkSessionDetailBadRequest) GetMessage() string {
 	return s.Message
 }
 
 // SetCode sets the value of Code.
-func (s *ViewTalkSessionDetailBadRequest) SetCode(val string) {
+func (s *GetTalkSessionDetailBadRequest) SetCode(val string) {
 	s.Code = val
 }
 
 // SetMessage sets the value of Message.
-func (s *ViewTalkSessionDetailBadRequest) SetMessage(val string) {
+func (s *GetTalkSessionDetailBadRequest) SetMessage(val string) {
 	s.Message = val
 }
 
-func (*ViewTalkSessionDetailBadRequest) ViewTalkSessionDetailRes() {}
+func (*GetTalkSessionDetailBadRequest) getTalkSessionDetailRes() {}
 
-type ViewTalkSessionDetailOK struct {
+type GetTalkSessionDetailOK struct {
 	// トークセッションID.
 	ID string `json:"id"`
 	// テーマ.
 	Theme string `json:"theme"`
 	// 説明.
 	Description OptNilString `json:"description"`
-	// 作成者.
-	Owner ViewTalkSessionDetailOKOwner `json:"owner"`
+	// 作成ユーザー.
+	Owner GetTalkSessionDetailOKOwner `json:"owner"`
 	// 作成日時.
 	CreatedAt string `json:"createdAt"`
 	// 終了予定日時.
 	ScheduledEndTime string `json:"scheduledEndTime"`
 	// 位置情報.
-	Location OptViewTalkSessionDetailOKLocation `json:"location"`
+	Location OptGetTalkSessionDetailOKLocation `json:"location"`
 	// 市区町村.
 	City OptNilString `json:"city"`
 	// 都道府県.
@@ -2060,99 +2083,99 @@ type ViewTalkSessionDetailOK struct {
 }
 
 // GetID returns the value of ID.
-func (s *ViewTalkSessionDetailOK) GetID() string {
+func (s *GetTalkSessionDetailOK) GetID() string {
 	return s.ID
 }
 
 // GetTheme returns the value of Theme.
-func (s *ViewTalkSessionDetailOK) GetTheme() string {
+func (s *GetTalkSessionDetailOK) GetTheme() string {
 	return s.Theme
 }
 
 // GetDescription returns the value of Description.
-func (s *ViewTalkSessionDetailOK) GetDescription() OptNilString {
+func (s *GetTalkSessionDetailOK) GetDescription() OptNilString {
 	return s.Description
 }
 
 // GetOwner returns the value of Owner.
-func (s *ViewTalkSessionDetailOK) GetOwner() ViewTalkSessionDetailOKOwner {
+func (s *GetTalkSessionDetailOK) GetOwner() GetTalkSessionDetailOKOwner {
 	return s.Owner
 }
 
 // GetCreatedAt returns the value of CreatedAt.
-func (s *ViewTalkSessionDetailOK) GetCreatedAt() string {
+func (s *GetTalkSessionDetailOK) GetCreatedAt() string {
 	return s.CreatedAt
 }
 
 // GetScheduledEndTime returns the value of ScheduledEndTime.
-func (s *ViewTalkSessionDetailOK) GetScheduledEndTime() string {
+func (s *GetTalkSessionDetailOK) GetScheduledEndTime() string {
 	return s.ScheduledEndTime
 }
 
 // GetLocation returns the value of Location.
-func (s *ViewTalkSessionDetailOK) GetLocation() OptViewTalkSessionDetailOKLocation {
+func (s *GetTalkSessionDetailOK) GetLocation() OptGetTalkSessionDetailOKLocation {
 	return s.Location
 }
 
 // GetCity returns the value of City.
-func (s *ViewTalkSessionDetailOK) GetCity() OptNilString {
+func (s *GetTalkSessionDetailOK) GetCity() OptNilString {
 	return s.City
 }
 
 // GetPrefecture returns the value of Prefecture.
-func (s *ViewTalkSessionDetailOK) GetPrefecture() OptNilString {
+func (s *GetTalkSessionDetailOK) GetPrefecture() OptNilString {
 	return s.Prefecture
 }
 
 // SetID sets the value of ID.
-func (s *ViewTalkSessionDetailOK) SetID(val string) {
+func (s *GetTalkSessionDetailOK) SetID(val string) {
 	s.ID = val
 }
 
 // SetTheme sets the value of Theme.
-func (s *ViewTalkSessionDetailOK) SetTheme(val string) {
+func (s *GetTalkSessionDetailOK) SetTheme(val string) {
 	s.Theme = val
 }
 
 // SetDescription sets the value of Description.
-func (s *ViewTalkSessionDetailOK) SetDescription(val OptNilString) {
+func (s *GetTalkSessionDetailOK) SetDescription(val OptNilString) {
 	s.Description = val
 }
 
 // SetOwner sets the value of Owner.
-func (s *ViewTalkSessionDetailOK) SetOwner(val ViewTalkSessionDetailOKOwner) {
+func (s *GetTalkSessionDetailOK) SetOwner(val GetTalkSessionDetailOKOwner) {
 	s.Owner = val
 }
 
 // SetCreatedAt sets the value of CreatedAt.
-func (s *ViewTalkSessionDetailOK) SetCreatedAt(val string) {
+func (s *GetTalkSessionDetailOK) SetCreatedAt(val string) {
 	s.CreatedAt = val
 }
 
 // SetScheduledEndTime sets the value of ScheduledEndTime.
-func (s *ViewTalkSessionDetailOK) SetScheduledEndTime(val string) {
+func (s *GetTalkSessionDetailOK) SetScheduledEndTime(val string) {
 	s.ScheduledEndTime = val
 }
 
 // SetLocation sets the value of Location.
-func (s *ViewTalkSessionDetailOK) SetLocation(val OptViewTalkSessionDetailOKLocation) {
+func (s *GetTalkSessionDetailOK) SetLocation(val OptGetTalkSessionDetailOKLocation) {
 	s.Location = val
 }
 
 // SetCity sets the value of City.
-func (s *ViewTalkSessionDetailOK) SetCity(val OptNilString) {
+func (s *GetTalkSessionDetailOK) SetCity(val OptNilString) {
 	s.City = val
 }
 
 // SetPrefecture sets the value of Prefecture.
-func (s *ViewTalkSessionDetailOK) SetPrefecture(val OptNilString) {
+func (s *GetTalkSessionDetailOK) SetPrefecture(val OptNilString) {
 	s.Prefecture = val
 }
 
-func (*ViewTalkSessionDetailOK) ViewTalkSessionDetailRes() {}
+func (*GetTalkSessionDetailOK) getTalkSessionDetailRes() {}
 
 // 位置情報.
-type ViewTalkSessionDetailOKLocation struct {
+type GetTalkSessionDetailOKLocation struct {
 	// 緯度.
 	Latitude OptFloat64 `json:"latitude"`
 	// 経度.
@@ -2160,59 +2183,59 @@ type ViewTalkSessionDetailOKLocation struct {
 }
 
 // GetLatitude returns the value of Latitude.
-func (s *ViewTalkSessionDetailOKLocation) GetLatitude() OptFloat64 {
+func (s *GetTalkSessionDetailOKLocation) GetLatitude() OptFloat64 {
 	return s.Latitude
 }
 
 // GetLongitude returns the value of Longitude.
-func (s *ViewTalkSessionDetailOKLocation) GetLongitude() OptFloat64 {
+func (s *GetTalkSessionDetailOKLocation) GetLongitude() OptFloat64 {
 	return s.Longitude
 }
 
 // SetLatitude sets the value of Latitude.
-func (s *ViewTalkSessionDetailOKLocation) SetLatitude(val OptFloat64) {
+func (s *GetTalkSessionDetailOKLocation) SetLatitude(val OptFloat64) {
 	s.Latitude = val
 }
 
 // SetLongitude sets the value of Longitude.
-func (s *ViewTalkSessionDetailOKLocation) SetLongitude(val OptFloat64) {
+func (s *GetTalkSessionDetailOKLocation) SetLongitude(val OptFloat64) {
 	s.Longitude = val
 }
 
-// 作成者.
-type ViewTalkSessionDetailOKOwner struct {
+// 作成ユーザー.
+type GetTalkSessionDetailOKOwner struct {
 	DisplayID   string       `json:"displayID"`
 	DisplayName string       `json:"displayName"`
 	IconURL     OptNilString `json:"iconURL"`
 }
 
 // GetDisplayID returns the value of DisplayID.
-func (s *ViewTalkSessionDetailOKOwner) GetDisplayID() string {
+func (s *GetTalkSessionDetailOKOwner) GetDisplayID() string {
 	return s.DisplayID
 }
 
 // GetDisplayName returns the value of DisplayName.
-func (s *ViewTalkSessionDetailOKOwner) GetDisplayName() string {
+func (s *GetTalkSessionDetailOKOwner) GetDisplayName() string {
 	return s.DisplayName
 }
 
 // GetIconURL returns the value of IconURL.
-func (s *ViewTalkSessionDetailOKOwner) GetIconURL() OptNilString {
+func (s *GetTalkSessionDetailOKOwner) GetIconURL() OptNilString {
 	return s.IconURL
 }
 
 // SetDisplayID sets the value of DisplayID.
-func (s *ViewTalkSessionDetailOKOwner) SetDisplayID(val string) {
+func (s *GetTalkSessionDetailOKOwner) SetDisplayID(val string) {
 	s.DisplayID = val
 }
 
 // SetDisplayName sets the value of DisplayName.
-func (s *ViewTalkSessionDetailOKOwner) SetDisplayName(val string) {
+func (s *GetTalkSessionDetailOKOwner) SetDisplayName(val string) {
 	s.DisplayName = val
 }
 
 // SetIconURL sets the value of IconURL.
-func (s *ViewTalkSessionDetailOKOwner) SetIconURL(val OptNilString) {
+func (s *GetTalkSessionDetailOKOwner) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
 
@@ -2365,7 +2388,7 @@ type GetTalkSessionListOKTalkSessionsItemTalkSession struct {
 	Theme string `json:"theme"`
 	// 説明.
 	Description OptNilString `json:"description"`
-	// 作成者.
+	// 作成ユーザー.
 	Owner GetTalkSessionListOKTalkSessionsItemTalkSessionOwner `json:"owner"`
 	// 作成日時.
 	CreatedAt string `json:"createdAt"`
@@ -2497,7 +2520,7 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionLocation) SetLongitude(v
 	s.Longitude = val
 }
 
-// 作成者.
+// 作成ユーザー.
 type GetTalkSessionListOKTalkSessionsItemTalkSessionOwner struct {
 	DisplayID   string       `json:"displayID"`
 	DisplayName string       `json:"displayName"`
@@ -2748,7 +2771,7 @@ type GetUserInfoInternalServerError struct{}
 func (*GetUserInfoInternalServerError) getUserInfoRes() {}
 
 type GetUserInfoOK struct {
-	// 作成者.
+	// 作成ユーザー.
 	User         GetUserInfoOKUser         `json:"user"`
 	Demographics GetUserInfoOKDemographics `json:"demographics"`
 }
@@ -2850,7 +2873,7 @@ func (s *GetUserInfoOKDemographics) SetPrefecture(val OptNilString) {
 	s.Prefecture = val
 }
 
-// 作成者.
+// 作成ユーザー.
 type GetUserInfoOKUser struct {
 	DisplayID   string       `json:"displayID"`
 	DisplayName string       `json:"displayName"`
@@ -3049,40 +3072,54 @@ func (o NilVoteReqVoteStatus) Or(d VoteReqVoteStatus) VoteReqVoteStatus {
 	return d
 }
 
-// OAuthCallbackFound is response for OAuthCallback operation.
-type OAuthCallbackFound struct {
-	Location  OptURI
-	SetCookie OptString
+type OAuthCallbackBadRequest struct{}
+
+func (*OAuthCallbackBadRequest) oAuthCallbackRes() {}
+
+type OAuthCallbackFound struct{}
+
+// OAuthCallbackFoundHeaders wraps OAuthCallbackFound with response headers.
+type OAuthCallbackFoundHeaders struct {
+	Location  string
+	SetCookie string
+	Response  OAuthCallbackFound
 }
 
 // GetLocation returns the value of Location.
-func (s *OAuthCallbackFound) GetLocation() OptURI {
+func (s *OAuthCallbackFoundHeaders) GetLocation() string {
 	return s.Location
 }
 
 // GetSetCookie returns the value of SetCookie.
-func (s *OAuthCallbackFound) GetSetCookie() OptString {
+func (s *OAuthCallbackFoundHeaders) GetSetCookie() string {
 	return s.SetCookie
 }
 
+// GetResponse returns the value of Response.
+func (s *OAuthCallbackFoundHeaders) GetResponse() OAuthCallbackFound {
+	return s.Response
+}
+
 // SetLocation sets the value of Location.
-func (s *OAuthCallbackFound) SetLocation(val OptURI) {
+func (s *OAuthCallbackFoundHeaders) SetLocation(val string) {
 	s.Location = val
 }
 
 // SetSetCookie sets the value of SetCookie.
-func (s *OAuthCallbackFound) SetSetCookie(val OptString) {
+func (s *OAuthCallbackFoundHeaders) SetSetCookie(val string) {
 	s.SetCookie = val
 }
 
-type OAuthRevokeNoContent struct{}
+// SetResponse sets the value of Response.
+func (s *OAuthCallbackFoundHeaders) SetResponse(val OAuthCallbackFound) {
+	s.Response = val
+}
 
-func (*OAuthRevokeNoContent) oAuthRevokeRes() {}
+func (*OAuthCallbackFoundHeaders) oAuthCallbackRes() {}
 
-// OAuthRevokeUnauthorized is response for OAuthRevoke operation.
-type OAuthRevokeUnauthorized struct{}
+type OAuthCallbackInternalServerError struct{}
 
-func (*OAuthRevokeUnauthorized) oAuthRevokeRes() {}
+func (*OAuthCallbackInternalServerError) oAuthCallbackRes() {}
 
 type OAuthTokenInfoBadRequest struct {
 	Code    string `json:"code"`
@@ -3263,6 +3300,44 @@ func (s *OAuthTokenInfoOK) SetIsVerify(val bool) {
 
 func (*OAuthTokenInfoOK) oAuthTokenInfoRes() {}
 
+type OAuthTokenRevokeBadRequest struct{}
+
+func (*OAuthTokenRevokeBadRequest) oAuthTokenRevokeRes() {}
+
+type OAuthTokenRevokeInternalServerError struct{}
+
+func (*OAuthTokenRevokeInternalServerError) oAuthTokenRevokeRes() {}
+
+type OAuthTokenRevokeNoContent struct{}
+
+// OAuthTokenRevokeNoContentHeaders wraps OAuthTokenRevokeNoContent with response headers.
+type OAuthTokenRevokeNoContentHeaders struct {
+	SetCookie []string
+	Response  OAuthTokenRevokeNoContent
+}
+
+// GetSetCookie returns the value of SetCookie.
+func (s *OAuthTokenRevokeNoContentHeaders) GetSetCookie() []string {
+	return s.SetCookie
+}
+
+// GetResponse returns the value of Response.
+func (s *OAuthTokenRevokeNoContentHeaders) GetResponse() OAuthTokenRevokeNoContent {
+	return s.Response
+}
+
+// SetSetCookie sets the value of SetCookie.
+func (s *OAuthTokenRevokeNoContentHeaders) SetSetCookie(val []string) {
+	s.SetCookie = val
+}
+
+// SetResponse sets the value of Response.
+func (s *OAuthTokenRevokeNoContentHeaders) SetResponse(val OAuthTokenRevokeNoContent) {
+	s.Response = val
+}
+
+func (*OAuthTokenRevokeNoContentHeaders) oAuthTokenRevokeRes() {}
+
 type OpinionComments2BadRequest struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
@@ -3357,7 +3432,7 @@ func (*OpinionComments2OK) opinionComments2Res() {}
 
 type OpinionComments2OKParentOpinionsItem struct {
 	Opinion OpinionComments2OKParentOpinionsItemOpinion `json:"opinion"`
-	// 作成者.
+	// 作成ユーザー.
 	User OpinionComments2OKParentOpinionsItemUser `json:"user"`
 	// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
 	MyVoteType OpinionComments2OKParentOpinionsItemMyVoteType `json:"myVoteType"`
@@ -3599,7 +3674,7 @@ func (s *OpinionComments2OKParentOpinionsItemOpinionVoteType) UnmarshalText(data
 	}
 }
 
-// 作成者.
+// 作成ユーザー.
 type OpinionComments2OKParentOpinionsItemUser struct {
 	DisplayID   string       `json:"displayID"`
 	DisplayName string       `json:"displayName"`
@@ -3638,7 +3713,7 @@ func (s *OpinionComments2OKParentOpinionsItemUser) SetIconURL(val OptNilString) 
 
 type OpinionComments2OKReplyOpinionsItem struct {
 	Opinion OpinionComments2OKReplyOpinionsItemOpinion `json:"opinion"`
-	// 作成者.
+	// 作成ユーザー.
 	User       OpinionComments2OKReplyOpinionsItemUser          `json:"user"`
 	MyVoteType OptOpinionComments2OKReplyOpinionsItemMyVoteType `json:"myVoteType"`
 }
@@ -3936,7 +4011,7 @@ func (s *OpinionComments2OKReplyOpinionsItemOpinionVoteType) UnmarshalText(data 
 	}
 }
 
-// 作成者.
+// 作成ユーザー.
 type OpinionComments2OKReplyOpinionsItemUser struct {
 	DisplayID   string       `json:"displayID"`
 	DisplayName string       `json:"displayName"`
@@ -3974,7 +4049,7 @@ func (s *OpinionComments2OKReplyOpinionsItemUser) SetIconURL(val OptNilString) {
 }
 
 type OpinionComments2OKRootOpinion struct {
-	// 作成者.
+	// 作成ユーザー.
 	User    OpinionComments2OKRootOpinionUser    `json:"user"`
 	Opinion OpinionComments2OKRootOpinionOpinion `json:"opinion"`
 }
@@ -4145,7 +4220,7 @@ func (s *OpinionComments2OKRootOpinionOpinionVoteType) UnmarshalText(data []byte
 	}
 }
 
-// 作成者.
+// 作成ユーザー.
 type OpinionComments2OKRootOpinionUser struct {
 	DisplayID   string       `json:"displayID"`
 	DisplayName string       `json:"displayName"`
@@ -4265,7 +4340,7 @@ func (*OpinionCommentsOK) opinionCommentsRes() {}
 
 type OpinionCommentsOKOpinionsItem struct {
 	Opinion OpinionCommentsOKOpinionsItemOpinion `json:"opinion"`
-	// 作成者.
+	// 作成ユーザー.
 	User OpinionCommentsOKOpinionsItemUser `json:"user"`
 	// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
 	MyVoteType OptOpinionCommentsOKOpinionsItemMyVoteType `json:"myVoteType"`
@@ -4496,7 +4571,7 @@ func (s *OpinionCommentsOKOpinionsItemOpinionVoteType) UnmarshalText(data []byte
 	}
 }
 
-// 作成者.
+// 作成ユーザー.
 type OpinionCommentsOKOpinionsItemUser struct {
 	DisplayID   string       `json:"displayID"`
 	DisplayName string       `json:"displayName"`
@@ -4534,7 +4609,7 @@ func (s *OpinionCommentsOKOpinionsItemUser) SetIconURL(val OptNilString) {
 }
 
 type OpinionCommentsOKRootOpinion struct {
-	// 作成者.
+	// 作成ユーザー.
 	User OpinionCommentsOKRootOpinionUser `json:"user"`
 	// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
 	MyVoteType OptOpinionCommentsOKRootOpinionMyVoteType `json:"myVoteType"`
@@ -4766,7 +4841,7 @@ func (s *OpinionCommentsOKRootOpinionOpinionVoteType) UnmarshalText(data []byte)
 	}
 }
 
-// 作成者.
+// 作成ユーザー.
 type OpinionCommentsOKRootOpinionUser struct {
 	DisplayID   string       `json:"displayID"`
 	DisplayName string       `json:"displayName"`
@@ -4839,7 +4914,7 @@ func (s *OpinionsHistoryOK) SetPagination(val OpinionsHistoryOKPagination) {
 func (*OpinionsHistoryOK) opinionsHistoryRes() {}
 
 type OpinionsHistoryOKOpinionsItem struct {
-	// 作成者.
+	// 作成ユーザー.
 	User       OpinionsHistoryOKOpinionsItemUser    `json:"user"`
 	Opinion    OpinionsHistoryOKOpinionsItemOpinion `json:"opinion"`
 	ReplyCount int                                  `json:"replyCount"`
@@ -5021,7 +5096,7 @@ func (s *OpinionsHistoryOKOpinionsItemOpinionVoteType) UnmarshalText(data []byte
 	}
 }
 
-// 作成者.
+// 作成ユーザー.
 type OpinionsHistoryOKOpinionsItemUser struct {
 	DisplayID   string       `json:"displayID"`
 	DisplayName string       `json:"displayName"`
@@ -5626,38 +5701,38 @@ func (o OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) Or(d GetOpini
 	return d
 }
 
-// NewOptViewTalkSessionDetailOKLocation returns new OptViewTalkSessionDetailOKLocation with value set to v.
-func NewOptViewTalkSessionDetailOKLocation(v ViewTalkSessionDetailOKLocation) OptViewTalkSessionDetailOKLocation {
-	return OptViewTalkSessionDetailOKLocation{
+// NewOptGetTalkSessionDetailOKLocation returns new OptGetTalkSessionDetailOKLocation with value set to v.
+func NewOptGetTalkSessionDetailOKLocation(v GetTalkSessionDetailOKLocation) OptGetTalkSessionDetailOKLocation {
+	return OptGetTalkSessionDetailOKLocation{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptViewTalkSessionDetailOKLocation is optional ViewTalkSessionDetailOKLocation.
-type OptViewTalkSessionDetailOKLocation struct {
-	Value ViewTalkSessionDetailOKLocation
+// OptGetTalkSessionDetailOKLocation is optional GetTalkSessionDetailOKLocation.
+type OptGetTalkSessionDetailOKLocation struct {
+	Value GetTalkSessionDetailOKLocation
 	Set   bool
 }
 
-// IsSet returns true if OptViewTalkSessionDetailOKLocation was set.
-func (o OptViewTalkSessionDetailOKLocation) IsSet() bool { return o.Set }
+// IsSet returns true if OptGetTalkSessionDetailOKLocation was set.
+func (o OptGetTalkSessionDetailOKLocation) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptViewTalkSessionDetailOKLocation) Reset() {
-	var v ViewTalkSessionDetailOKLocation
+func (o *OptGetTalkSessionDetailOKLocation) Reset() {
+	var v GetTalkSessionDetailOKLocation
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptViewTalkSessionDetailOKLocation) SetTo(v ViewTalkSessionDetailOKLocation) {
+func (o *OptGetTalkSessionDetailOKLocation) SetTo(v GetTalkSessionDetailOKLocation) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptViewTalkSessionDetailOKLocation) Get() (v ViewTalkSessionDetailOKLocation, ok bool) {
+func (o OptGetTalkSessionDetailOKLocation) Get() (v GetTalkSessionDetailOKLocation, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -5665,7 +5740,7 @@ func (o OptViewTalkSessionDetailOKLocation) Get() (v ViewTalkSessionDetailOKLoca
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptViewTalkSessionDetailOKLocation) Or(d ViewTalkSessionDetailOKLocation) ViewTalkSessionDetailOKLocation {
+func (o OptGetTalkSessionDetailOKLocation) Or(d GetTalkSessionDetailOKLocation) GetTalkSessionDetailOKLocation {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -7698,7 +7773,7 @@ type PostConclusionInternalServerError struct{}
 func (*PostConclusionInternalServerError) postConclusionRes() {}
 
 type PostConclusionOK struct {
-	// 作成者.
+	// 作成ユーザー.
 	User PostConclusionOKUser `json:"user"`
 	// 結論本文.
 	Content string `json:"content"`
@@ -7726,7 +7801,7 @@ func (s *PostConclusionOK) SetContent(val string) {
 
 func (*PostConclusionOK) postConclusionRes() {}
 
-// 作成者.
+// 作成ユーザー.
 type PostConclusionOKUser struct {
 	DisplayID   string       `json:"displayID"`
 	DisplayName string       `json:"displayName"`
@@ -8492,7 +8567,7 @@ type SessionsHistoryOKTalkSessionsItemTalkSession struct {
 	Theme string `json:"theme"`
 	// 説明.
 	Description OptNilString `json:"description"`
-	// 作成者.
+	// 作成ユーザー.
 	Owner SessionsHistoryOKTalkSessionsItemTalkSessionOwner `json:"owner"`
 	// 作成日時.
 	CreatedAt string `json:"createdAt"`
@@ -8624,7 +8699,7 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSessionLocation) SetLongitude(val 
 	s.Longitude = val
 }
 
-// 作成者.
+// 作成ユーザー.
 type SessionsHistoryOKTalkSessionsItemTalkSessionOwner struct {
 	DisplayID   string       `json:"displayID"`
 	DisplayName string       `json:"displayName"`
@@ -8762,7 +8837,7 @@ func (*SwipeOpinionsOKApplicationJSON) swipeOpinionsRes() {}
 
 type SwipeOpinionsOKItem struct {
 	Opinion SwipeOpinionsOKItemOpinion `json:"opinion"`
-	// 作成者.
+	// 作成ユーザー.
 	User       SwipeOpinionsOKItemUser `json:"user"`
 	ReplyCount int                     `json:"replyCount"`
 }
@@ -8943,7 +9018,7 @@ func (s *SwipeOpinionsOKItemOpinionVoteType) UnmarshalText(data []byte) error {
 	}
 }
 
-// 作成者.
+// 作成ユーザー.
 type SwipeOpinionsOKItemUser struct {
 	DisplayID   string       `json:"displayID"`
 	DisplayName string       `json:"displayName"`
@@ -9110,7 +9185,7 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItem) SetOpinions(val []TalkSessionAn
 
 type TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem struct {
 	Opinion TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion `json:"opinion"`
-	// 作成者.
+	// 作成ユーザー.
 	User          TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemUser `json:"user"`
 	AgreeCount    int                                                    `json:"agreeCount"`
 	DisagreeCount int                                                    `json:"disagreeCount"`
@@ -9313,7 +9388,7 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType) Unma
 	}
 }
 
-// 作成者.
+// 作成ユーザー.
 type TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemUser struct {
 	DisplayID   string       `json:"displayID"`
 	DisplayName string       `json:"displayName"`

@@ -85,7 +85,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						// Leaf node.
 						switch r.Method {
 						case "POST":
-							s.handleOAuthRevokeRequest([0]string{}, elemIsEscaped, w, r)
+							s.handleOAuthTokenRevokeRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "POST")
 						}
@@ -357,7 +357,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						if len(elem) == 0 {
 							switch r.Method {
 							case "GET":
-								s.handleViewTalkSessionDetailRequest([1]string{
+								s.handleGetTalkSessionDetailRequest([1]string{
 									args[0],
 								}, elemIsEscaped, w, r)
 							case "PUT":
@@ -905,9 +905,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						// Leaf node.
 						switch method {
 						case "POST":
-							r.name = "OAuthRevoke"
-							r.summary = "アクセストークンを失効"
-							r.operationID = "oauth_revoke"
+							r.name = "OAuthTokenRevoke"
+							r.summary = "トークンを失効（ログアウト）"
+							r.operationID = "oauth_token_revoke"
 							r.pathPattern = "/auth/revoke"
 							r.args = args
 							r.count = 0
@@ -1007,7 +1007,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							switch method {
 							case "GET":
 								r.name = "Authorize"
-								r.summary = "OAuthログイン"
+								r.summary = "ログイン"
 								r.operationID = "authorize"
 								r.pathPattern = "/auth/{provider}/login"
 								r.args = args
@@ -1219,9 +1219,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						if len(elem) == 0 {
 							switch method {
 							case "GET":
-								r.name = "ViewTalkSessionDetail"
+								r.name = "GetTalkSessionDetail"
 								r.summary = "トークセッションの詳細"
-								r.operationID = "ViewTalkSessionDetail"
+								r.operationID = "getTalkSessionDetail"
 								r.pathPattern = "/talksessions/{talkSessionId}"
 								r.args = args
 								r.count = 1
