@@ -9,6 +9,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	auth_usecase "github.com/neko-dream/server/internal/usecase/auth"
+	cookie_utils "github.com/neko-dream/server/pkg/cookie"
 	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/utils"
 )
@@ -32,7 +33,7 @@ func NewAuthHandler(
 }
 
 // Authorize implements oas.AuthHandler.
-func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams) (*oas.AuthorizeFound, error) {
+func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams) (oas.AuthorizeRes, error) {
 	out, err := a.AuthLoginUseCase.Execute(ctx, auth_usecase.AuthLoginInput{
 		RedirectURL: params.RedirectURL,
 		Provider:    params.Provider,
@@ -41,14 +42,10 @@ func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams)
 		return nil, err
 	}
 
-	res := new(oas.AuthorizeFound)
-	res.SetLocation(oas.NewOptURI(*out.RedirectURL))
-	w := http_utils.GetHTTPResponse(ctx)
-	for _, c := range out.Cookies {
-		http.SetCookie(w, c)
-	}
-
-	return res, nil
+	headers := new(oas.AuthorizeFoundHeaders)
+	headers.SetLocation(out.RedirectURL)
+	headers.SetSetCookie(cookie_utils.EncodeCookies(out.Cookies))
+	return headers, nil
 }
 
 // OAuthCallback implements oas.AuthHandler.
