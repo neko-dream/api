@@ -48,4 +48,4 @@ jobs:
             --base main \
             --head develop \
             --title "🤖 自動PR develop -> main" \
-            --body "自動生成PRです。確認し、よければマージしてください。"
+            --body ""
