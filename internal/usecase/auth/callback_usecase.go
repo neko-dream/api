@@ -3,6 +3,7 @@ package auth_usecase
 import (
 	"context"
 	"net/http"
+	"strings"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/clock"
@@ -108,6 +109,6 @@ func (u *authCallbackInteractor) Execute(ctx context.Context, input CallbackInpu
 	}
 
 	return CallbackOutput{
-		Cookie: cookie_utils.EncodeCookies([]*http.Cookie{&c}),
+		Cookie: strings.Join(cookie_utils.EncodeCookies([]*http.Cookie{&c}), ","),
 	}, nil
 }

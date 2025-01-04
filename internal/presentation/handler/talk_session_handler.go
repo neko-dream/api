@@ -278,7 +278,7 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 }
 
 // ViewTalkSessionDetail トークセッション詳細取得
-func (t *talkSessionHandler) ViewTalkSessionDetail(ctx context.Context, params oas.ViewTalkSessionDetailParams) (oas.ViewTalkSessionDetailRes, error) {
+func (t *talkSessionHandler) GetTalkSessionDetail(ctx context.Context, params oas.GetTalkSessionDetailParams) (oas.GetTalkSessionDetailRes, error) {
 	out, err := t.ViewTalkSessionDetailQuery.Execute(ctx, talk_session_usecase.ViewTalkSessionDetailInput{
 		TalkSessionID: shared.MustParseUUID[talksession.TalkSession](params.TalkSessionId),
 	})
@@ -286,15 +286,15 @@ func (t *talkSessionHandler) ViewTalkSessionDetail(ctx context.Context, params o
 		return nil, err
 	}
 
-	owner := oas.ViewTalkSessionDetailOKOwner{
+	owner := oas.GetTalkSessionDetailOKOwner{
 		DisplayID:   out.Owner.DisplayID,
 		DisplayName: out.Owner.DisplayName,
 		IconURL:     utils.ToOptNil[oas.OptNilString](out.Owner.IconURL),
 	}
-	var location oas.OptViewTalkSessionDetailOKLocation
+	var location oas.OptGetTalkSessionDetailOKLocation
 	if out.Location != nil {
-		location = oas.OptViewTalkSessionDetailOKLocation{
-			Value: oas.ViewTalkSessionDetailOKLocation{
+		location = oas.OptGetTalkSessionDetailOKLocation{
+			Value: oas.GetTalkSessionDetailOKLocation{
 				Latitude:  utils.ToOpt[oas.OptFloat64](out.Location.Latitude),
 				Longitude: utils.ToOpt[oas.OptFloat64](out.Location.Longitude),
 			},
@@ -303,7 +303,7 @@ func (t *talkSessionHandler) ViewTalkSessionDetail(ctx context.Context, params o
 
 	}
 
-	return &oas.ViewTalkSessionDetailOK{
+	return &oas.GetTalkSessionDetailOK{
 		ID:               out.ID,
 		Theme:            out.Theme,
 		Description:      utils.ToOptNil[oas.OptNilString](out.Description),

@@ -2,15 +2,13 @@ package handler
 
 import (
 	"context"
-	"net/http"
-	"net/url"
 	"time"
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	auth_usecase "github.com/neko-dream/server/internal/usecase/auth"
-	http_utils "github.com/neko-dream/server/pkg/http"
+	cookie_utils "github.com/neko-dream/server/pkg/cookie"
 	"github.com/neko-dream/server/pkg/utils"
 )
 
@@ -33,7 +31,7 @@ func NewAuthHandler(
 }
 
 // Authorize implements oas.AuthHandler.
-func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams) (*oas.AuthorizeFound, error) {
+func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams) (oas.AuthorizeRes, error) {
 	out, err := a.AuthLoginUseCase.Execute(ctx, auth_usecase.AuthLoginInput{
 		RedirectURL: params.RedirectURL,
 		Provider:    params.Provider,
@@ -42,44 +40,37 @@ func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams)
 		return nil, err
 	}
 
-	res := new(oas.AuthorizeFound)
-	res.SetLocation(oas.NewOptURI(*out.RedirectURL))
-	w := http_utils.GetHTTPResponse(ctx)
-	for _, c := range out.Cookies {
-		http.SetCookie(w, c)
-	}
-
-	return res, nil
+	headers := new(oas.AuthorizeFoundHeaders)
+	headers.SetLocation(out.RedirectURL)
+	headers.SetSetCookie(cookie_utils.EncodeCookies(out.Cookies))
+	return headers, nil
 }
 
 // OAuthCallback implements oas.AuthHandler.
-func (a *authHandler) OAuthCallback(ctx context.Context, params oas.OAuthCallbackParams) (*oas.OAuthCallbackFound, error) {
-	if params.CookieState.Value != params.QueryState.Value {
-		res := new(oas.OAuthCallbackFound)
-		return res, messages.InvalidStateError
+func (a *authHandler) OAuthCallback(ctx context.Context, params oas.OAuthCallbackParams) (oas.OAuthCallbackRes, error) {
+	// CookieStateとQueryStateが一致しているか確認
+	if params.CookieState != params.QueryState {
+		return nil, messages.InvalidStateError
 	}
 
 	input := auth_usecase.CallbackInput{
 		Provider: params.Provider,
-		Code:     params.Code.Value,
+		Code:     params.Code,
 	}
-
 	output, err := a.AuthCallbackUseCase.Execute(ctx, input)
 	if err != nil {
 		return nil, err
 	}
 
-	res := new(oas.OAuthCallbackFound)
-	res.SetCookie = oas.NewOptString(output.Cookie)
+	headers := new(oas.OAuthCallbackFoundHeaders)
+	headers.SetCookie = output.Cookie
 	// LoginでRedirectURLを設定しているためエラーは発生しない
-	loc, _ := url.Parse(params.RedirectURL)
-	res.Location = oas.NewOptURI(*loc)
-
-	return res, nil
+	headers.Location = params.RedirectURL
+	return headers, nil
 }
 
 // OAuthRevoke implements oas.AuthHandler.
-func (a *authHandler) OAuthRevoke(ctx context.Context) (oas.OAuthRevokeRes, error) {
+func (a *authHandler) OAuthTokenRevoke(ctx context.Context) (oas.OAuthTokenRevokeRes, error) {
 	claim := session.GetSession(ctx)
 	sessID, err := claim.SessionID()
 	if err != nil {
@@ -92,14 +83,9 @@ func (a *authHandler) OAuthRevoke(ctx context.Context) (oas.OAuthRevokeRes, erro
 		return nil, err
 	}
 
-	w := http_utils.GetHTTPResponse(ctx)
-	for _, c := range out.Cookies {
-		http.SetCookie(w, c)
-	}
-
-	// 204 No Content
-	res := &oas.OAuthRevokeNoContent{}
-	return res, nil
+	headers := new(oas.OAuthTokenRevokeNoContentHeaders)
+	headers.SetSetCookie(cookie_utils.EncodeCookies(out.Cookies))
+	return headers, nil
 }
 
 // OAuthTokenInfo implements oas.AuthHandler.

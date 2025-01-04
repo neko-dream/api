@@ -7,61 +7,105 @@
   },
   "tags": [
     {
-      "name": "talk_session"
-    },
-    {
-      "name": "user"
+      "name": "vote"
     },
     {
       "name": "opinion"
     },
     {
-      "name": "vote"
+      "name": "talk_session"
+    },
+    {
+      "name": "timeline"
+    },
+    {
+      "name": "user"
     },
     {
       "name": "auth"
     },
     {
       "name": "test"
-    },
-    {
-      "name": "timeline"
     }
   ],
   "paths": {
-    "/talksessions/{talkSessionId}": {
-      "get": {
-        "summary": "トークセッションの詳細",
+    "/talksessions/{talkSessionID}/opinions/{opinionID}/votes": {
+      "post": {
+        "summary": "意思表明API",
         "deprecated": false,
         "description": "",
-        "operationId": "ViewTalkSessionDetail",
+        "operationId": "vote",
         "tags": [
-          "talk_session"
+          "vote"
         ],
         "parameters": [
           {
-            "name": "talkSessionId",
+            "name": "talkSessionID",
             "in": "path",
-            "description": "",
+            "description": "セッションのID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "opinionID",
+            "in": "path",
+            "description": "意見のID",
             "required": true,
             "schema": {
               "type": "string"
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "voteStatus": {
+                    "type": "string",
+                    "enum": [
+                      "agree",
+                      "disagree",
+                      "pass"
+                    ],
+                    "x-apidog": {
+                      "enumDescriptions": {
+                        "agree": "",
+                        "disagree": "",
+                        "pass": ""
+                      }
+                    },
+                    "example": "",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "voteStatus"
+                ]
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
-            "description": "成功",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/talkSession"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/opinion"
+                  }
                 }
               }
-            }
+            },
+            "headers": {}
           },
           "400": {
-            "description": "ErrorResponse",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -89,7 +133,642 @@
                   }
                 }
               }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
+        "x-ogen-operation-group": "Vote"
+      }
+    },
+    "/talksessions/{talkSessionID}/swipe_opinions": {
+      "get": {
+        "summary": "スワイプ用のエンドポイント",
+        "deprecated": false,
+        "description": "セッションの中からまだ投票していない意見をランダムに取得する",
+        "operationId": "swipe_opinions",
+        "tags": [
+          "opinion"
+        ],
+        "parameters": [
+          {
+            "name": "talkSessionID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "opinion": {
+                        "$ref": "#/components/schemas/opinion"
+                      },
+                      "user": {
+                        "$ref": "#/components/schemas/user",
+                        "description": "作成ユーザー"
+                      },
+                      "replyCount": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "opinion",
+                      "user",
+                      "replyCount"
+                    ]
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
+        "x-ogen-operation-group": "Opinion"
+      }
+    },
+    "/talksessions/{talkSessionID}/opinions": {
+      "post": {
+        "summary": "セッションに対して意見投稿",
+        "deprecated": false,
+        "description": "parentOpinionIDがなければルートの意見として投稿される",
+        "operationId": "postOpinionPost",
+        "tags": [
+          "opinion"
+        ],
+        "parameters": [
+          {
+            "name": "talkSessionID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "parentOpinionID": {
+                    "type": "string",
+                    "example": "",
+                    "nullable": true
+                  },
+                  "title": {
+                    "type": "string",
+                    "example": "",
+                    "nullable": true
+                  },
+                  "opinionContent": {
+                    "type": "string",
+                    "maxLength": 140,
+                    "example": ""
+                  },
+                  "referenceURL": {
+                    "type": "string",
+                    "format": "url",
+                    "example": "",
+                    "nullable": true
+                  },
+                  "picture": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "参考画像。4MiBまで",
+                    "example": ""
+                  }
+                },
+                "required": [
+                  "opinionContent"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
+        "x-ogen-operation-group": "Opinion"
+      },
+      "get": {
+        "summary": "セッションに対する意見一覧",
+        "deprecated": false,
+        "description": "",
+        "operationId": "getOpinionsForTalkSession",
+        "tags": [
+          "opinion"
+        ],
+        "parameters": [
+          {
+            "name": "talkSessionID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "latest",
+                "mostReply",
+                "oldest"
+              ],
+              "x-apidog": {
+                "enumDescriptions": {
+                  "latest": "",
+                  "mostReply": "",
+                  "oldest": ""
+                }
+              },
+              "nullable": true
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": 10,
+            "schema": {
+              "type": "integer",
+              "nullable": true
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": 0,
+            "schema": {
+              "type": "integer",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "opinions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "opinion": {
+                            "$ref": "#/components/schemas/opinion"
+                          },
+                          "user": {
+                            "$ref": "#/components/schemas/user",
+                            "description": "作成ユーザー"
+                          },
+                          "replyCount": {
+                            "type": "integer"
+                          },
+                          "myVoteType": {
+                            "$ref": "#/components/schemas/voteType",
+                            "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
+                          }
+                        },
+                        "required": [
+                          "opinion",
+                          "user",
+                          "replyCount",
+                          "myVoteType"
+                        ]
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "totalCount": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "totalCount"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "opinions",
+                    "pagination"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [],
+        "x-ogen-operation-group": "Opinion"
+      }
+    },
+    "/talksessions/{talkSessionID}/opinions/{opinionID}": {
+      "get": {
+        "summary": "意見の詳細",
+        "deprecated": false,
+        "description": "",
+        "operationId": "getOpinionDetail",
+        "tags": [
+          "opinion"
+        ],
+        "parameters": [
+          {
+            "name": "talkSessionID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "opinionID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "opinion": {
+                      "$ref": "#/components/schemas/opinion"
+                    },
+                    "user": {
+                      "$ref": "#/components/schemas/user",
+                      "description": "作成ユーザー"
+                    }
+                  },
+                  "required": [
+                    "opinion",
+                    "user"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [],
+        "x-ogen-operation-group": "Opinion"
+      }
+    },
+    "/talksessions/{talkSessionId}": {
+      "get": {
+        "summary": "トークセッションの詳細",
+        "deprecated": false,
+        "description": "",
+        "operationId": "getTalkSessionDetail",
+        "tags": [
+          "talk_session"
+        ],
+        "parameters": [
+          {
+            "name": "talkSessionId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/talkSession"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
           }
         },
         "security": [],
@@ -168,17 +847,18 @@
         },
         "responses": {
           "200": {
-            "description": "成功",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/talkSession"
                 }
               }
-            }
+            },
+            "headers": {}
           },
           "400": {
-            "description": "ErrorResponse",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -195,10 +875,11 @@
                   }
                 }
               }
-            }
+            },
+            "headers": {}
           },
           "500": {
-            "description": "ServerErrorResponse",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -215,7 +896,8 @@
                   }
                 }
               }
-            }
+            },
+            "headers": {}
           }
         },
         "security": [
@@ -294,7 +976,7 @@
         },
         "responses": {
           "200": {
-            "description": "成功",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -315,7 +997,7 @@
                     },
                     "owner": {
                       "$ref": "#/components/schemas/user",
-                      "description": "作成者"
+                      "description": "作成ユーザー"
                     },
                     "createdAt": {
                       "type": "string",
@@ -349,10 +1031,11 @@
                   ]
                 }
               }
-            }
+            },
+            "headers": {}
           },
           "400": {
-            "description": "ErrorResponse",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -380,7 +1063,8 @@
                   }
                 }
               }
-            }
+            },
+            "headers": {}
           }
         },
         "security": [
@@ -443,18 +1127,6 @@
                 "finished"
               ],
               "default": "open",
-              "x-apidog-enum": [
-                {
-                  "name": "",
-                  "value": "open",
-                  "description": "開催中"
-                },
-                {
-                  "name": "",
-                  "value": "finished",
-                  "description": "終了済み"
-                }
-              ],
               "nullable": true
             }
           },
@@ -504,7 +1176,7 @@
         ],
         "responses": {
           "200": {
-            "description": "成功",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -538,10 +1210,11 @@
                   ]
                 }
               }
-            }
+            },
+            "headers": {}
           },
           "400": {
-            "description": "ErrorResponse",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -569,10 +1242,11 @@
                   }
                 }
               }
-            }
+            },
+            "headers": {}
           },
           "500": {
-            "description": "ServerErrorResponse",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -597,14 +1271,1120 @@
                       "code": "GENERAL-000",
                       "message": "INTERNAL SERVER ERROR."
                     }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [],
+        "x-ogen-operation-group": "TalkSession"
+      }
+    },
+    "/talksessions/{talkSessionID}/opinions/{opinionID}/replies": {
+      "get": {
+        "summary": "意見に対するリプライ意見一覧",
+        "deprecated": false,
+        "description": "",
+        "operationId": "opinionComments",
+        "tags": [
+          "opinion"
+        ],
+        "parameters": [
+          {
+            "name": "talkSessionID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "opinionID",
+            "in": "path",
+            "description": "親意見のID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rootOpinion": {
+                      "type": "object",
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/user",
+                          "description": "作成ユーザー"
+                        },
+                        "myVoteType": {
+                          "$ref": "#/components/schemas/voteType",
+                          "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
+                        },
+                        "opinion": {
+                          "$ref": "#/components/schemas/opinion"
+                        }
+                      },
+                      "required": [
+                        "user",
+                        "opinion"
+                      ]
+                    },
+                    "opinions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "opinion": {
+                            "$ref": "#/components/schemas/opinion"
+                          },
+                          "user": {
+                            "$ref": "#/components/schemas/user",
+                            "description": "作成ユーザー"
+                          },
+                          "myVoteType": {
+                            "$ref": "#/components/schemas/voteType",
+                            "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
+                          }
+                        },
+                        "required": [
+                          "opinion",
+                          "user"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "rootOpinion",
+                    "opinions"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [],
+        "x-ogen-operation-group": "Opinion"
+      }
+    },
+    "/talksessions/{talkSessionId}/analysis": {
+      "get": {
+        "summary": "分析結果一覧",
+        "deprecated": false,
+        "description": "",
+        "operationId": "talkSessionAnalysis",
+        "tags": [
+          "talk_session"
+        ],
+        "parameters": [
+          {
+            "name": "talkSessionId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "myPosition": {
+                      "$ref": "#/components/schemas/userGroupPosition"
+                    },
+                    "positions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/userGroupPosition"
+                      }
+                    },
+                    "groupOpinions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "groupName": {
+                            "type": "string"
+                          },
+                          "groupId": {
+                            "type": "integer"
+                          },
+                          "opinions": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "opinion": {
+                                  "$ref": "#/components/schemas/opinion"
+                                },
+                                "user": {
+                                  "$ref": "#/components/schemas/user",
+                                  "description": "作成ユーザー"
+                                },
+                                "agreeCount": {
+                                  "type": "integer"
+                                },
+                                "disagreeCount": {
+                                  "type": "integer"
+                                },
+                                "passCount": {
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "opinion",
+                                "user",
+                                "agreeCount",
+                                "disagreeCount",
+                                "passCount"
+                              ]
+                            }
+                          }
+                        },
+                        "required": [
+                          "groupName",
+                          "opinions",
+                          "groupId"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "positions",
+                    "groupOpinions"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [],
+        "x-ogen-operation-group": "TalkSession"
+      }
+    },
+    "/talksessions/{talkSessionId}/report": {
+      "get": {
+        "summary": "セッションレポートを返す",
+        "deprecated": false,
+        "description": "",
+        "operationId": "getTalkSessionReport",
+        "tags": [
+          "talk_session"
+        ],
+        "parameters": [
+          {
+            "name": "talkSessionId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "report": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "report"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [],
+        "x-ogen-operation-group": "TalkSession"
+      }
+    },
+    "/talksessions/{talkSessionID}/opinions/{opinionID}/replies2": {
+      "get": {
+        "summary": "意見に対するリプライ意見一覧 Copy",
+        "deprecated": false,
+        "description": "",
+        "operationId": "opinionComments2",
+        "tags": [
+          "opinion"
+        ],
+        "parameters": [
+          {
+            "name": "talkSessionID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "opinionID",
+            "in": "path",
+            "description": "親意見のID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rootOpinion": {
+                      "type": "object",
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/user",
+                          "description": "作成ユーザー"
+                        },
+                        "opinion": {
+                          "$ref": "#/components/schemas/opinion"
+                        }
+                      },
+                      "required": [
+                        "user",
+                        "opinion"
+                      ]
+                    },
+                    "replyOpinions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "opinion": {
+                            "$ref": "#/components/schemas/opinion"
+                          },
+                          "user": {
+                            "$ref": "#/components/schemas/user",
+                            "description": "作成ユーザー"
+                          },
+                          "myVoteType": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/components/schemas/voteType",
+                                "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "opinion",
+                          "user"
+                        ]
+                      }
+                    },
+                    "parentOpinions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "opinion": {
+                            "$ref": "#/components/schemas/opinion"
+                          },
+                          "user": {
+                            "$ref": "#/components/schemas/user",
+                            "description": "作成ユーザー"
+                          },
+                          "myVoteType": {
+                            "$ref": "#/components/schemas/voteType",
+                            "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
+                          },
+                          "level": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "opinion",
+                          "user",
+                          "myVoteType",
+                          "level"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "rootOpinion",
+                    "replyOpinions",
+                    "parentOpinions"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [],
+        "x-ogen-operation-group": "Opinion"
+      }
+    },
+    "/talksessions/{talkSessionID}/conclusion": {
+      "get": {
+        "summary": "結論取得",
+        "deprecated": false,
+        "description": "",
+        "operationId": "getConclusion",
+        "tags": [
+          "talk_session"
+        ],
+        "parameters": [
+          {
+            "name": "talkSessionID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/conclusion"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [],
+        "x-ogen-operation-group": "TalkSession"
+      },
+      "post": {
+        "summary": "結論投稿",
+        "deprecated": false,
+        "description": "結論（conclusion）はセッションが終了した後にセッっションの作成者が投稿できる文章。\nセッションの流れやグループの分かれ方などに対するセッション作成者の感想やそれらの意見を受け、これからの方向性などを記入する。",
+        "operationId": "postConclusion",
+        "tags": [
+          "talk_session"
+        ],
+        "parameters": [
+          {
+            "name": "talkSessionID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "minLength": 2,
+                    "description": "結論本文。2文字以上",
+                    "example": "よかった！"
+                  }
+                },
+                "required": [
+                  "content"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/conclusion"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
+        "x-ogen-operation-group": "TalkSession"
+      }
+    },
+    "/talksessions/{talkSessionID}/timelines": {
+      "get": {
+        "summary": "タイムライン取得",
+        "deprecated": false,
+        "description": "タイムラインはセッション終了後にセッション作成者が設定できるその後の予定を知らせるもの",
+        "operationId": "getTimeLine",
+        "tags": [
+          "timeline"
+        ],
+        "parameters": [
+          {
+            "name": "talkSessionID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/actionItem"
+                      }
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [],
+        "x-ogen-operation-group": "Timeline"
+      }
+    },
+    "/talksessions/{talkSessionID}/timeline": {
+      "post": {
+        "summary": "タイムラインアイテム追加",
+        "deprecated": false,
+        "description": "",
+        "operationId": "postTimeLineItem",
+        "tags": [
+          "timeline"
+        ],
+        "parameters": [
+          {
+            "name": "talkSessionID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "example": "",
+                    "type": "string"
+                  },
+                  "status": {
+                    "example": "",
+                    "type": "string"
+                  },
+                  "parentActionItemID": {
+                    "type": "string",
+                    "description": "親があるなら親のIDヲシテイ",
+                    "example": "",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "content",
+                  "status"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ActionItemID": {
+                      "type": "string"
+                    },
+                    "Sequence": {
+                      "type": "integer"
+                    },
+                    "Content": {
+                      "type": "string"
+                    },
+                    "Status": {
+                      "type": "string"
+                    },
+                    "CreatedAt": {
+                      "type": "string"
+                    },
+                    "UpdatedAt": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "ActionItemID",
+                    "Sequence",
+                    "Content",
+                    "Status",
+                    "CreatedAt",
+                    "UpdatedAt"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
+        "x-ogen-operation-group": "Timeline"
+      }
+    },
+    "/talksessions/{talkSessionID}/timelines/{actionItemID}": {
+      "put": {
+        "summary": "タイムライン編集",
+        "deprecated": false,
+        "description": "",
+        "operationId": "editTimeLine",
+        "tags": [
+          "timeline"
+        ],
+        "parameters": [
+          {
+            "name": "talkSessionID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "actionItemID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "example": "",
+                    "nullable": true
+                  },
+                  "status": {
+                    "type": "string",
+                    "example": "",
+                    "nullable": true
                   }
                 }
               }
             }
           }
         },
-        "security": [],
-        "x-ogen-operation-group": "TalkSession"
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/actionItem"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
+        "x-ogen-operation-group": "Timeline"
       }
     },
     "/user": {
@@ -655,28 +2435,6 @@
                       "回答しない"
                     ],
                     "default": "preferNotToSay",
-                    "x-apidog-enum": [
-                      {
-                        "name": "",
-                        "value": "male",
-                        "description": "男"
-                      },
-                      {
-                        "name": "",
-                        "value": "female",
-                        "description": "女"
-                      },
-                      {
-                        "name": "",
-                        "value": "other",
-                        "description": "その他"
-                      },
-                      {
-                        "name": "",
-                        "value": "preferNotToSay",
-                        "description": "未回答"
-                      }
-                    ],
                     "description": "性別",
                     "example": "",
                     "nullable": true
@@ -708,63 +2466,21 @@
                       "回答しない"
                     ],
                     "default": "無回答",
-                    "x-apidog-enum": [
-                      {
-                        "name": "",
-                        "value": "正社員",
-                        "description": ""
-                      },
-                      {
-                        "name": "",
-                        "value": "契約社員",
-                        "description": ""
-                      },
-                      {
-                        "name": "",
-                        "value": "公務員",
-                        "description": ""
-                      },
-                      {
-                        "name": "",
-                        "value": "自営業",
-                        "description": ""
-                      },
-                      {
-                        "name": "",
-                        "value": "会社役員",
-                        "description": ""
-                      },
-                      {
-                        "name": "",
-                        "value": "パート・アルバイト",
-                        "description": ""
-                      },
-                      {
-                        "name": "",
-                        "value": "家事従事者",
-                        "description": ""
-                      },
-                      {
-                        "name": "",
-                        "value": "学生",
-                        "description": ""
-                      },
-                      {
-                        "name": "",
-                        "value": "無職",
-                        "description": ""
-                      },
-                      {
-                        "name": "",
-                        "value": "その他",
-                        "description": ""
-                      },
-                      {
-                        "name": "",
-                        "value": "無回答",
-                        "description": ""
+                    "x-apidog": {
+                      "enumDescriptions": {
+                        "正社員": "",
+                        "契約社員": "",
+                        "公務員": "",
+                        "自営業": "",
+                        "会社役員": "",
+                        "パート・アルバイト": "",
+                        "家事従事者": "",
+                        "学生": "",
+                        "無職": "",
+                        "その他": "",
+                        "回答しない": ""
                       }
-                    ],
+                    },
                     "description": "ユーザーの職業",
                     "example": "",
                     "nullable": true
@@ -787,7 +2503,7 @@
         },
         "responses": {
           "200": {
-            "description": "成功",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -795,7 +2511,6 @@
                   "properties": {
                     "displayID": {
                       "type": "string",
-                      "x-apidog-mock": "{{$string.uuid}}",
                       "pattern": "^[A-Za-z0-9]$",
                       "examples": [
                         "userid"
@@ -804,8 +2519,7 @@
                       "maxLength": 25
                     },
                     "displayName": {
-                      "type": "string",
-                      "x-apidog-mock": "{{$person.firstName}}"
+                      "type": "string"
                     },
                     "iconURL": {
                       "type": "string",
@@ -818,10 +2532,11 @@
                   ]
                 }
               }
-            }
+            },
+            "headers": {}
           },
           "400": {
-            "description": "ErrorResponse",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -849,10 +2564,11 @@
                   }
                 }
               }
-            }
+            },
+            "headers": {}
           },
           "500": {
-            "description": "ServerErrorResponse",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -880,7 +2596,8 @@
                   }
                 }
               }
-            }
+            },
+            "headers": {}
           }
         },
         "security": [
@@ -937,28 +2654,6 @@
                       "その他",
                       "回答しない"
                     ],
-                    "x-apidog-enum": [
-                      {
-                        "name": "",
-                        "value": "male",
-                        "description": "男"
-                      },
-                      {
-                        "name": "",
-                        "value": "female",
-                        "description": "女"
-                      },
-                      {
-                        "name": "",
-                        "value": "other",
-                        "description": "その他"
-                      },
-                      {
-                        "name": "",
-                        "value": "preferNotToSay",
-                        "description": "無回答"
-                      }
-                    ],
                     "description": "性別",
                     "example": "",
                     "nullable": true
@@ -984,63 +2679,21 @@
                       "その他",
                       "回答しない"
                     ],
-                    "x-apidog-enum": [
-                      {
-                        "name": "",
-                        "value": "正社員",
-                        "description": ""
-                      },
-                      {
-                        "name": "",
-                        "value": "契約社員",
-                        "description": ""
-                      },
-                      {
-                        "name": "",
-                        "value": "公務員",
-                        "description": ""
-                      },
-                      {
-                        "name": "",
-                        "value": "自営業",
-                        "description": ""
-                      },
-                      {
-                        "name": "",
-                        "value": "会社役員",
-                        "description": ""
-                      },
-                      {
-                        "name": "",
-                        "value": "パート・アルバイト",
-                        "description": ""
-                      },
-                      {
-                        "name": "",
-                        "value": "家事従事者",
-                        "description": ""
-                      },
-                      {
-                        "name": "",
-                        "value": "学生",
-                        "description": ""
-                      },
-                      {
-                        "name": "",
-                        "value": "無職",
-                        "description": ""
-                      },
-                      {
-                        "name": "",
-                        "value": "その他",
-                        "description": ""
-                      },
-                      {
-                        "name": "",
-                        "value": "無回答",
-                        "description": ""
+                    "x-apidog": {
+                      "enumDescriptions": {
+                        "正社員": "",
+                        "契約社員": "",
+                        "公務員": "",
+                        "自営業": "",
+                        "会社役員": "",
+                        "パート・アルバイト": "",
+                        "家事従事者": "",
+                        "学生": "",
+                        "無職": "",
+                        "その他": "",
+                        "回答しない": ""
                       }
-                    ],
+                    },
                     "description": "職業",
                     "example": "",
                     "nullable": true
@@ -1064,7 +2717,7 @@
         },
         "responses": {
           "200": {
-            "description": "成功",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -1072,7 +2725,6 @@
                   "properties": {
                     "displayID": {
                       "type": "string",
-                      "x-apidog-mock": "{{$string.uuid}}",
                       "pattern": "^[A-Za-z0-9]$",
                       "examples": [
                         "userid"
@@ -1081,8 +2733,7 @@
                       "maxLength": 25
                     },
                     "displayName": {
-                      "type": "string",
-                      "x-apidog-mock": "{{$person.firstName}}"
+                      "type": "string"
                     },
                     "iconURL": {
                       "type": "string",
@@ -1095,10 +2746,11 @@
                   ]
                 }
               }
-            }
+            },
+            "headers": {}
           },
           "400": {
-            "description": "ErrorResponse",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -1126,10 +2778,11 @@
                   }
                 }
               }
-            }
+            },
+            "headers": {}
           },
           "500": {
-            "description": "ServerErrorResponse",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -1157,7 +2810,8 @@
                   }
                 }
               }
-            }
+            },
+            "headers": {}
           }
         },
         "security": [
@@ -1178,7 +2832,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "成功",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -1186,7 +2840,7 @@
                   "properties": {
                     "user": {
                       "$ref": "#/components/schemas/user",
-                      "description": "作成者"
+                      "description": "作成ユーザー"
                     },
                     "demographics": {
                       "$ref": "#/components/schemas/userDemographics"
@@ -1198,10 +2852,11 @@
                   ]
                 }
               }
-            }
+            },
+            "headers": {}
           },
           "500": {
-            "description": "ServerErrorResponse",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -1218,7 +2873,8 @@
                   }
                 }
               }
-            }
+            },
+            "headers": {}
           }
         },
         "security": [
@@ -1227,1137 +2883,6 @@
           }
         ],
         "x-ogen-operation-group": "User"
-      }
-    },
-    "/talksessions/{talkSessionID}/swipe_opinions": {
-      "get": {
-        "summary": "スワイプ用のエンドポイント",
-        "deprecated": false,
-        "description": "セッションの中からまだ投票していない意見をランダムに取得する",
-        "operationId": "swipe_opinions",
-        "tags": [
-          "opinion"
-        ],
-        "parameters": [
-          {
-            "name": "talkSessionID",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 10,
-              "nullable": true
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "opinion": {
-                        "$ref": "#/components/schemas/opinion"
-                      },
-                      "user": {
-                        "$ref": "#/components/schemas/user",
-                        "description": "作成者"
-                      },
-                      "replyCount": {
-                        "type": "integer"
-                      }
-                    },
-                    "required": [
-                      "opinion",
-                      "user",
-                      "replyCount"
-                    ]
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "ErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "code": {
-                      "type": "string"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "code",
-                    "message"
-                  ]
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "ServerErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "code": {
-                      "type": "string"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "code",
-                    "message"
-                  ]
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "SessionId": []
-          }
-        ],
-        "x-ogen-operation-group": "Opinion"
-      }
-    },
-    "/talksessions/{talkSessionID}/opinions": {
-      "post": {
-        "summary": "セッションに対して意見投稿",
-        "deprecated": false,
-        "description": "parentOpinionIDがなければルートの意見として投稿される",
-        "operationId": "postOpinionPost",
-        "tags": [
-          "opinion"
-        ],
-        "parameters": [
-          {
-            "name": "talkSessionID",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "parentOpinionID": {
-                    "type": "string",
-                    "example": "",
-                    "nullable": true
-                  },
-                  "title": {
-                    "type": "string",
-                    "example": "",
-                    "nullable": true
-                  },
-                  "opinionContent": {
-                    "type": "string",
-                    "maxLength": 140,
-                    "example": ""
-                  },
-                  "referenceURL": {
-                    "type": "string",
-                    "format": "url",
-                    "example": "",
-                    "nullable": true
-                  },
-                  "picture": {
-                    "type": "string",
-                    "format": "binary",
-                    "description": "参考画像。4MiBまで",
-                    "example": ""
-                  }
-                },
-                "required": [
-                  "opinionContent"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "ErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "code": {
-                      "type": "string"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "code",
-                    "message"
-                  ]
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "ServerErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "code": {
-                      "type": "string"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "code",
-                    "message"
-                  ]
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "SessionId": []
-          }
-        ],
-        "x-ogen-operation-group": "Opinion"
-      },
-      "get": {
-        "summary": "セッションに対する意見一覧",
-        "deprecated": false,
-        "description": "",
-        "operationId": "getOpinionsForTalkSession",
-        "tags": [
-          "opinion"
-        ],
-        "parameters": [
-          {
-            "name": "talkSessionID",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sort",
-            "in": "query",
-            "description": "",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "latest",
-                "mostReply",
-                "oldest"
-              ],
-              "x-apidog": {
-                "enumDescriptions": {
-                  "latest": "",
-                  "mostReply": "",
-                  "oldest": ""
-                }
-              },
-              "nullable": true
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "",
-            "required": false,
-            "example": 10,
-            "schema": {
-              "type": "integer",
-              "nullable": true
-            }
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "description": "",
-            "required": false,
-            "example": 0,
-            "schema": {
-              "type": "integer",
-              "nullable": true
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "opinions": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "opinion": {
-                            "$ref": "#/components/schemas/opinion"
-                          },
-                          "user": {
-                            "$ref": "#/components/schemas/user",
-                            "description": "作成者"
-                          },
-                          "replyCount": {
-                            "type": "integer"
-                          },
-                          "myVoteType": {
-                            "$ref": "#/components/schemas/voteType",
-                            "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
-                          }
-                        },
-                        "required": [
-                          "opinion",
-                          "user",
-                          "replyCount",
-                          "myVoteType"
-                        ]
-                      }
-                    },
-                    "pagination": {
-                      "type": "object",
-                      "properties": {
-                        "totalCount": {
-                          "type": "integer"
-                        }
-                      },
-                      "required": [
-                        "totalCount"
-                      ]
-                    }
-                  },
-                  "required": [
-                    "opinions",
-                    "pagination"
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "ErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "ServerErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [],
-        "x-ogen-operation-group": "Opinion"
-      }
-    },
-    "/talksessions/{talkSessionID}/opinions/{opinionID}/votes": {
-      "post": {
-        "summary": "意思表明API",
-        "deprecated": false,
-        "description": "",
-        "operationId": "vote",
-        "tags": [
-          "vote"
-        ],
-        "parameters": [
-          {
-            "name": "talkSessionID",
-            "in": "path",
-            "description": "セッションのID",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "opinionID",
-            "in": "path",
-            "description": "意見のID",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "voteStatus": {
-                    "type": "string",
-                    "enum": [
-                      "agree",
-                      "disagree",
-                      "pass"
-                    ],
-                    "example": "",
-                    "nullable": true
-                  }
-                },
-                "required": [
-                  "voteStatus"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/opinion"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "ErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "code": {
-                      "type": "string"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "code",
-                    "message"
-                  ]
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "ServerErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "code": {
-                      "type": "string"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "code",
-                    "message"
-                  ]
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "SessionId": []
-          }
-        ],
-        "x-ogen-operation-group": "Vote"
-      }
-    },
-    "/talksessions/{talkSessionID}/opinions/{opinionID}/replies": {
-      "get": {
-        "summary": "意見に対するリプライ意見一覧",
-        "deprecated": false,
-        "description": "",
-        "operationId": "opinionComments",
-        "tags": [
-          "opinion"
-        ],
-        "parameters": [
-          {
-            "name": "talkSessionID",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "opinionID",
-            "in": "path",
-            "description": "親意見のID",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "rootOpinion": {
-                      "type": "object",
-                      "properties": {
-                        "user": {
-                          "$ref": "#/components/schemas/user",
-                          "description": "作成者"
-                        },
-                        "myVoteType": {
-                          "$ref": "#/components/schemas/voteType",
-                          "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
-                        },
-                        "opinion": {
-                          "$ref": "#/components/schemas/opinion"
-                        }
-                      },
-                      "required": [
-                        "user",
-                        "opinion"
-                      ]
-                    },
-                    "opinions": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "opinion": {
-                            "$ref": "#/components/schemas/opinion"
-                          },
-                          "user": {
-                            "$ref": "#/components/schemas/user",
-                            "description": "作成者"
-                          },
-                          "myVoteType": {
-                            "$ref": "#/components/schemas/voteType",
-                            "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
-                          }
-                        },
-                        "required": [
-                          "opinion",
-                          "user"
-                        ]
-                      }
-                    }
-                  },
-                  "required": [
-                    "rootOpinion",
-                    "opinions"
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "ErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "code": {
-                      "type": "string"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "code",
-                    "message"
-                  ]
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "ServerErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "code": {
-                      "type": "string"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "code",
-                    "message"
-                  ]
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [],
-        "x-ogen-operation-group": "Opinion"
-      }
-    },
-    "/talksessions/{talkSessionId}/analysis": {
-      "get": {
-        "summary": "分析結果一覧",
-        "deprecated": false,
-        "description": "",
-        "operationId": "talkSessionAnalysis",
-        "tags": [
-          "talk_session"
-        ],
-        "parameters": [
-          {
-            "name": "talkSessionId",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "myPosition": {
-                      "$ref": "#/components/schemas/userGroupPosition"
-                    },
-                    "positions": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/userGroupPosition"
-                      }
-                    },
-                    "groupOpinions": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "groupName": {
-                            "type": "string"
-                          },
-                          "groupId": {
-                            "type": "integer"
-                          },
-                          "opinions": {
-                            "type": "array",
-                            "items": {
-                              "type": "object",
-                              "properties": {
-                                "opinion": {
-                                  "$ref": "#/components/schemas/opinion"
-                                },
-                                "user": {
-                                  "$ref": "#/components/schemas/user",
-                                  "description": "作成者"
-                                },
-                                "agreeCount": {
-                                  "type": "integer"
-                                },
-                                "disagreeCount": {
-                                  "type": "integer"
-                                },
-                                "passCount": {
-                                  "type": "integer"
-                                }
-                              },
-                              "required": [
-                                "opinion",
-                                "user",
-                                "agreeCount",
-                                "disagreeCount",
-                                "passCount"
-                              ]
-                            }
-                          }
-                        },
-                        "required": [
-                          "groupName",
-                          "opinions",
-                          "groupId"
-                        ]
-                      }
-                    }
-                  },
-                  "required": [
-                    "positions",
-                    "groupOpinions"
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "ErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "code": {
-                      "type": "string"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "code",
-                    "message"
-                  ]
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "ServerErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "code": {
-                      "type": "string"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "code",
-                    "message"
-                  ]
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [],
-        "x-ogen-operation-group": "TalkSession"
-      }
-    },
-    "/test": {
-      "get": {
-        "summary": "OpenAPIテスト用",
-        "deprecated": false,
-        "description": "",
-        "operationId": "test",
-        "tags": [
-          "user"
-        ],
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "optInt": {
-                      "type": "integer",
-                      "nullable": true
-                    },
-                    "optNilInt": {
-                      "type": "integer"
-                    },
-                    "optNilBool": {
-                      "type": "boolean",
-                      "nullable": true
-                    },
-                    "optBool": {
-                      "type": "boolean"
-                    },
-                    "optUrl": {
-                      "type": "string",
-                      "format": "uri"
-                    },
-                    "optNilUrl": {
-                      "type": "string",
-                      "format": "url",
-                      "nullable": true
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "ErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "ServerErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [],
-        "x-ogen-operation-group": "test"
-      }
-    },
-    "/auth/token/info": {
-      "get": {
-        "summary": "JWTの内容を返してくれる",
-        "deprecated": false,
-        "description": "",
-        "operationId": "oauth_token_info",
-        "tags": [
-          "auth"
-        ],
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "aud": {
-                      "type": "string",
-                      "description": "Audience"
-                    },
-                    "exp": {
-                      "type": "string",
-                      "description": "有効期限"
-                    },
-                    "iat": {
-                      "type": "string",
-                      "description": "発行日時"
-                    },
-                    "iss": {
-                      "type": "string",
-                      "description": "発行者"
-                    },
-                    "sub": {
-                      "type": "string",
-                      "description": "ユーザID"
-                    },
-                    "jti": {
-                      "type": "string",
-                      "description": "JWT ID"
-                    },
-                    "displayId": {
-                      "type": "string",
-                      "description": "ユーザーID"
-                    },
-                    "displayName": {
-                      "type": "string",
-                      "description": "ユーザー名"
-                    },
-                    "iconURL": {
-                      "type": "string",
-                      "description": "アイコンURL"
-                    },
-                    "isVerify": {
-                      "type": "boolean",
-                      "description": "ユーザ登録済みか"
-                    }
-                  },
-                  "required": [
-                    "aud",
-                    "exp",
-                    "iat",
-                    "iss",
-                    "sub",
-                    "jti",
-                    "isVerify"
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "ErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "code": {
-                      "type": "string"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "code",
-                    "message"
-                  ]
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "ServerErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "code": {
-                      "type": "string"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "code",
-                    "message"
-                  ]
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "SessionId": []
-          }
-        ],
-        "x-ogen-operation-group": "Auth"
       }
     },
     "/opinions/histories": {
@@ -2413,7 +2938,7 @@
         ],
         "responses": {
           "200": {
-            "description": "成功",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -2426,7 +2951,7 @@
                         "properties": {
                           "user": {
                             "$ref": "#/components/schemas/user",
-                            "description": "作成者"
+                            "description": "作成ユーザー"
                           },
                           "opinion": {
                             "$ref": "#/components/schemas/opinion"
@@ -2460,10 +2985,11 @@
                   ]
                 }
               }
-            }
+            },
+            "headers": {}
           },
           "400": {
-            "description": "ErrorResponse",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -2480,10 +3006,11 @@
                   }
                 }
               }
-            }
+            },
+            "headers": {}
           },
           "500": {
-            "description": "ServerErrorResponse",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -2500,7 +3027,8 @@
                   }
                 }
               }
-            }
+            },
+            "headers": {}
           }
         },
         "security": [
@@ -2572,7 +3100,7 @@
         ],
         "responses": {
           "200": {
-            "description": "成功",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -2606,10 +3134,11 @@
                   ]
                 }
               }
-            }
+            },
+            "headers": {}
           },
           "400": {
-            "description": "ErrorResponse",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -2626,10 +3155,11 @@
                   }
                 }
               }
-            }
+            },
+            "headers": {}
           },
           "500": {
-            "description": "ServerErrorResponse",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -2646,7 +3176,8 @@
                   }
                 }
               }
-            }
+            },
+            "headers": {}
           }
         },
         "security": [
@@ -2655,403 +3186,6 @@
           }
         ],
         "x-ogen-operation-group": "User"
-      }
-    },
-    "/talksessions/{talkSessionID}/opinions/{opinionID}": {
-      "get": {
-        "summary": "意見の詳細",
-        "deprecated": false,
-        "description": "",
-        "operationId": "getOpinionDetail",
-        "tags": [
-          "opinion"
-        ],
-        "parameters": [
-          {
-            "name": "talkSessionID",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "opinionID",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "opinion": {
-                      "$ref": "#/components/schemas/opinion"
-                    },
-                    "user": {
-                      "$ref": "#/components/schemas/user",
-                      "description": "作成者"
-                    }
-                  },
-                  "required": [
-                    "opinion",
-                    "user"
-                  ]
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "ServerErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [],
-        "x-ogen-operation-group": "Opinion"
-      }
-    },
-    "/talksessions/{talkSessionId}/report": {
-      "get": {
-        "summary": "セッションレポートを返す",
-        "deprecated": false,
-        "description": "",
-        "operationId": "getTalkSessionReport",
-        "tags": [
-          "talk_session"
-        ],
-        "parameters": [
-          {
-            "name": "talkSessionId",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "report": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "report"
-                  ]
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "ServerErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [],
-        "x-ogen-operation-group": "TalkSession"
-      }
-    },
-    "/test/dummy": {
-      "post": {
-        "summary": "mudai",
-        "deprecated": false,
-        "description": "",
-        "operationId": "dummiInit",
-        "tags": [
-          "test"
-        ],
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "ErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "ServerErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [],
-        "x-ogen-operation-group": "Test"
-      }
-    },
-    "/talksessions/{talkSessionID}/opinions/{opinionID}/replies2": {
-      "get": {
-        "summary": "意見に対するリプライ意見一覧 Copy",
-        "deprecated": false,
-        "description": "",
-        "operationId": "opinionComments2",
-        "tags": [
-          "opinion"
-        ],
-        "parameters": [
-          {
-            "name": "talkSessionID",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "opinionID",
-            "in": "path",
-            "description": "親意見のID",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "rootOpinion": {
-                      "type": "object",
-                      "properties": {
-                        "user": {
-                          "$ref": "#/components/schemas/user",
-                          "description": "作成者"
-                        },
-                        "opinion": {
-                          "$ref": "#/components/schemas/opinion"
-                        }
-                      },
-                      "required": [
-                        "user",
-                        "opinion"
-                      ]
-                    },
-                    "replyOpinions": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "opinion": {
-                            "$ref": "#/components/schemas/opinion"
-                          },
-                          "user": {
-                            "$ref": "#/components/schemas/user",
-                            "description": "作成者"
-                          },
-                          "myVoteType": {
-                            "anyOf": [
-                              {
-                                "$ref": "#/components/schemas/voteType",
-                                "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ]
-                          }
-                        },
-                        "required": [
-                          "opinion",
-                          "user"
-                        ]
-                      }
-                    },
-                    "parentOpinions": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "opinion": {
-                            "$ref": "#/components/schemas/opinion"
-                          },
-                          "user": {
-                            "$ref": "#/components/schemas/user",
-                            "description": "作成者"
-                          },
-                          "myVoteType": {
-                            "$ref": "#/components/schemas/voteType",
-                            "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
-                          },
-                          "level": {
-                            "type": "integer"
-                          }
-                        },
-                        "required": [
-                          "opinion",
-                          "user",
-                          "myVoteType",
-                          "level"
-                        ]
-                      }
-                    }
-                  },
-                  "required": [
-                    "rootOpinion",
-                    "replyOpinions",
-                    "parentOpinions"
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "ErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "code": {
-                      "type": "string"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "code",
-                    "message"
-                  ]
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "ServerErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "code": {
-                      "type": "string"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "code",
-                    "message"
-                  ]
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [],
-        "x-ogen-operation-group": "Opinion"
       }
     },
     "/talksessions/opened": {
@@ -3119,7 +3253,7 @@
         ],
         "responses": {
           "200": {
-            "description": "成功",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -3149,10 +3283,11 @@
                   ]
                 }
               }
-            }
+            },
+            "headers": {}
           },
           "400": {
-            "description": "ErrorResponse",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -3169,10 +3304,11 @@
                   }
                 }
               }
-            }
+            },
+            "headers": {}
           },
           "500": {
-            "description": "ServerErrorResponse",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -3189,7 +3325,8 @@
                   }
                 }
               }
-            }
+            },
+            "headers": {}
           }
         },
         "security": [
@@ -3200,229 +3337,97 @@
         "x-ogen-operation-group": "TalkSession"
       }
     },
-    "/talksessions/{talkSessionID}/conclusion": {
+    "/auth/token/info": {
       "get": {
-        "summary": "結論取得",
+        "summary": "JWTの内容を返してくれる",
         "deprecated": false,
         "description": "",
-        "operationId": "getConclusion",
+        "operationId": "oauth_token_info",
         "tags": [
-          "talk_session"
+          "auth"
         ],
-        "parameters": [
-          {
-            "name": "talkSessionID",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/conclusion"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "ErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "ServerErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [],
-        "x-ogen-operation-group": "TalkSession"
-      },
-      "post": {
-        "summary": "結論投稿",
-        "deprecated": false,
-        "description": "結論（conclusion）はセッションが終了した後にセッっションの作成者が投稿できる文章。\nセッションの流れやグループの分かれ方などに対するセッション作成者の感想やそれらの意見を受け、これからの方向性などを記入する。",
-        "operationId": "postConclusion",
-        "tags": [
-          "talk_session"
-        ],
-        "parameters": [
-          {
-            "name": "talkSessionID",
-            "in": "path",
             "description": "",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "content": {
-                    "type": "string",
-                    "minLength": 2,
-                    "description": "結論本文。2文字以上",
-                    "example": "よかった！"
-                  }
-                },
-                "required": [
-                  "content"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/conclusion"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "ErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "ServerErrorResponse",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {}
-                },
-                "examples": {
-                  "1": {
-                    "summary": "internal",
-                    "value": {
-                      "code": "GENERAL-000",
-                      "message": "INTERNAL SERVER ERROR."
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "SessionId": []
-          }
-        ],
-        "x-ogen-operation-group": "TalkSession"
-      }
-    },
-    "/talksessions/{talkSessionID}/timelines": {
-      "get": {
-        "summary": "タイムライン取得",
-        "deprecated": false,
-        "description": "タイムラインはセッション終了後にセッション作成者が設定できるその後の予定を知らせるもの",
-        "operationId": "getTimeLine",
-        "tags": [
-          "timeline"
-        ],
-        "parameters": [
-          {
-            "name": "talkSessionID",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "成功",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "items": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/actionItem"
-                      }
+                    "aud": {
+                      "type": "string",
+                      "description": "Audience"
+                    },
+                    "exp": {
+                      "type": "string",
+                      "description": "有効期限"
+                    },
+                    "iat": {
+                      "type": "string",
+                      "description": "発行日時"
+                    },
+                    "iss": {
+                      "type": "string",
+                      "description": "発行者"
+                    },
+                    "sub": {
+                      "type": "string",
+                      "description": "ユーザID"
+                    },
+                    "jti": {
+                      "type": "string",
+                      "description": "JWT ID"
+                    },
+                    "displayId": {
+                      "type": "string",
+                      "description": "ユーザーID"
+                    },
+                    "displayName": {
+                      "type": "string",
+                      "description": "ユーザー名"
+                    },
+                    "iconURL": {
+                      "type": "string",
+                      "description": "アイコンURL"
+                    },
+                    "isVerify": {
+                      "type": "boolean",
+                      "description": "ユーザ登録済みか"
                     }
                   },
                   "required": [
-                    "items"
+                    "aud",
+                    "exp",
+                    "iat",
+                    "iss",
+                    "sub",
+                    "jti",
+                    "isVerify"
                   ]
                 }
               }
-            }
+            },
+            "headers": {}
           },
           "400": {
-            "description": "ErrorResponse",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": {}
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
                 },
                 "examples": {
                   "1": {
@@ -3434,15 +3439,27 @@
                   }
                 }
               }
-            }
+            },
+            "headers": {}
           },
           "500": {
-            "description": "ServerErrorResponse",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": {}
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
                 },
                 "examples": {
                   "1": {
@@ -3454,103 +3471,397 @@
                   }
                 }
               }
-            }
+            },
+            "headers": {}
           }
         },
-        "security": [],
-        "x-ogen-operation-group": "Timeline"
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
+        "x-ogen-operation-group": "Auth"
       }
     },
-    "/talksessions/{talkSessionID}/timeline": {
-      "post": {
-        "summary": "タイムラインアイテム追加",
+    "/auth/{provider}/callback": {
+      "get": {
+        "summary": "Auth Callback",
         "deprecated": false,
         "description": "",
-        "operationId": "postTimeLineItem",
+        "operationId": "oauth_callback",
         "tags": [
-          "timeline"
+          "auth"
         ],
         "parameters": [
           {
-            "name": "talkSessionID",
+            "name": "state",
+            "in": "cookie",
+            "description": "OAuth2.0 State from Cookie",
+            "required": true,
+            "example": "{{$string.uuid}}",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "redirect_url",
+            "in": "cookie",
+            "description": "Authorization Code",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "provider",
             "in": "path",
             "description": "",
             "required": true,
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "content": {
-                    "example": "",
-                    "type": "string"
-                  },
-                  "status": {
-                    "example": "",
-                    "type": "string"
-                  },
-                  "parentActionItemID": {
-                    "type": "string",
-                    "description": "親があるなら親のIDヲシテイ",
-                    "example": "",
-                    "nullable": true
-                  }
-                },
-                "required": [
-                  "content",
-                  "status"
-                ]
-              }
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "description": "OAuth State from Query",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
+        ],
+        "responses": {
+          "302": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "example": "",
+                "required": true,
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "example": "",
+                "required": true,
+                "description": "SessionID",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
         },
+        "security": [],
+        "x-ogen-operation-group": "Auth"
+      }
+    },
+    "/auth/{provider}/login": {
+      "get": {
+        "summary": "ログイン",
+        "deprecated": false,
+        "description": "",
+        "operationId": "authorize",
+        "tags": [
+          "auth"
+        ],
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "redirect_url",
+            "in": "query",
+            "description": "ログイン後にリダイレクトするURL",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "コンテンツタイプを必ず指定しなければならないため、仮の値としてapplication/jsonを入れている",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "example": "",
+                "required": true,
+                "description": "IDPのログインページ",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "example": "",
+                "required": true,
+                "description": "OAuth2.0 State",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [],
+        "x-ogen-operation-group": "Auth"
+      }
+    },
+    "/auth/revoke": {
+      "post": {
+        "summary": "トークンを失効（ログアウト）",
+        "deprecated": false,
+        "description": "",
+        "operationId": "oauth_token_revoke",
+        "tags": [
+          "auth"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {
+              "Set-Cookie": {
+                "example": "",
+                "required": true,
+                "description": "Cookie削除用のSet-Cookie",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
+        "x-ogen-operation-group": "Auth"
+      }
+    },
+    "/test": {
+      "get": {
+        "summary": "OpenAPIテスト用",
+        "deprecated": false,
+        "description": "",
+        "operationId": "test",
+        "tags": [
+          "user"
+        ],
+        "parameters": [],
         "responses": {
           "200": {
-            "description": "成功",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "ActionItemID": {
-                      "type": "string"
+                    "optInt": {
+                      "type": "integer",
+                      "nullable": true
                     },
-                    "Sequence": {
+                    "optNilInt": {
                       "type": "integer"
                     },
-                    "Content": {
-                      "type": "string"
+                    "optNilBool": {
+                      "type": "boolean",
+                      "nullable": true
                     },
-                    "Status": {
-                      "type": "string"
+                    "optBool": {
+                      "type": "boolean"
                     },
-                    "CreatedAt": {
-                      "type": "string"
+                    "optUrl": {
+                      "type": "string",
+                      "format": "uri"
                     },
-                    "UpdatedAt": {
-                      "type": "string"
+                    "optNilUrl": {
+                      "type": "string",
+                      "format": "url",
+                      "nullable": true
                     }
-                  },
-                  "required": [
-                    "ActionItemID",
-                    "Sequence",
-                    "Content",
-                    "Status",
-                    "CreatedAt",
-                    "UpdatedAt"
-                  ]
+                  }
                 }
               }
-            }
+            },
+            "headers": {}
           },
           "400": {
-            "description": "ErrorResponse",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -3567,10 +3878,11 @@
                   }
                 }
               }
-            }
+            },
+            "headers": {}
           },
           "500": {
-            "description": "ServerErrorResponse",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -3587,80 +3899,39 @@
                   }
                 }
               }
-            }
+            },
+            "headers": {}
           }
         },
-        "security": [
-          {
-            "SessionId": []
-          }
-        ],
-        "x-ogen-operation-group": "Timeline"
+        "security": [],
+        "x-ogen-operation-group": "test"
       }
     },
-    "/talksessions/{talkSessionID}/timelines/{actionItemID}": {
-      "put": {
-        "summary": "タイムライン編集",
+    "/test/dummy": {
+      "post": {
+        "summary": "mudai",
         "deprecated": false,
         "description": "",
-        "operationId": "editTimeLine",
+        "operationId": "dummiInit",
         "tags": [
-          "timeline"
+          "test"
         ],
-        "parameters": [
-          {
-            "name": "talkSessionID",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "actionItemID",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "content": {
-                    "type": "string",
-                    "example": "",
-                    "nullable": true
-                  },
-                  "status": {
-                    "type": "string",
-                    "example": "",
-                    "nullable": true
-                  }
-                }
-              }
-            }
-          }
-        },
+        "parameters": [],
         "responses": {
           "200": {
-            "description": "成功",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/actionItem"
+                  "type": "object",
+                  "properties": {}
                 }
               }
-            }
+            },
+            "headers": {}
           },
           "400": {
-            "description": "ErrorResponse",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -3677,10 +3948,11 @@
                   }
                 }
               }
-            }
+            },
+            "headers": {}
           },
           "500": {
-            "description": "ServerErrorResponse",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -3697,153 +3969,52 @@
                   }
                 }
               }
-            }
+            },
+            "headers": {}
           }
         },
-        "security": [
-          {
-            "SessionId": []
-          }
-        ],
-        "x-ogen-operation-group": "Timeline"
+        "security": [],
+        "x-ogen-operation-group": "Test"
       }
     }
   },
   "components": {
     "schemas": {
-      "actionItem": {
+      "talkSession": {
         "type": "object",
         "properties": {
-          "ActionItemID": {
-            "type": "string"
+          "id": {
+            "type": "string",
+            "description": "トークセッションID"
           },
-          "Sequence": {
-            "type": "integer"
+          "theme": {
+            "type": "string",
+            "description": "テーマ"
           },
-          "Content": {
-            "type": "string"
+          "description": {
+            "type": "string",
+            "description": "説明",
+            "nullable": true
           },
-          "Status": {
-            "type": "string"
-          },
-          "CreatedAt": {
-            "type": "string"
-          },
-          "UpdatedAt": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "ActionItemID",
-          "Sequence",
-          "Content",
-          "Status",
-          "CreatedAt",
-          "UpdatedAt"
-        ]
-      },
-      "conclusion": {
-        "type": "object",
-        "properties": {
-          "user": {
+          "owner": {
             "$ref": "#/components/schemas/user",
-            "description": "作成者"
+            "description": "作成ユーザー"
           },
-          "content": {
+          "createdAt": {
             "type": "string",
-            "description": "結論本文"
-          }
-        },
-        "required": [
-          "user",
-          "content"
-        ]
-      },
-      "Report": {
-        "type": "object",
-        "properties": {
-          "talkSessionID": {
-            "type": "string"
+            "description": "作成日時"
           },
-          "content": {
+          "scheduledEndTime": {
             "type": "string",
-            "description": "レポート本文"
-          }
-        },
-        "required": [
-          "talkSessionID",
-          "content"
-        ]
-      },
-      "userGroupPosition": {
-        "type": "object",
-        "properties": {
-          "posX": {
-            "type": "number"
+            "description": "終了予定日時"
           },
-          "posY": {
-            "type": "number"
-          },
-          "displayId": {
-            "type": "string"
-          },
-          "displayName": {
-            "type": "string"
-          },
-          "iconURL": {
-            "type": "string",
-            "nullable": true
-          },
-          "groupName": {
-            "type": "string"
-          },
-          "groupId": {
-            "type": "integer"
-          },
-          "perimeterIndex": {
-            "type": "integer",
-            "description": "境界ポイントのインデックス"
-          }
-        },
-        "required": [
-          "posX",
-          "posY",
-          "displayId",
-          "groupName",
-          "displayName",
-          "groupId"
-        ]
-      },
-      "userDemographics": {
-        "type": "object",
-        "properties": {
-          "yearOfBirth": {
-            "type": "integer",
-            "description": "誕生年",
-            "nullable": true
-          },
-          "occupation": {
-            "type": "string",
-            "title": "職業",
-            "description": "職業"
-          },
-          "gender": {
-            "type": "string",
-            "title": "性別",
-            "description": "性別"
+          "location": {
+            "description": "位置情報",
+            "$ref": "#/components/schemas/location"
           },
           "city": {
             "type": "string",
-            "title": "市区町村",
             "description": "市区町村",
-            "nullable": true
-          },
-          "householdSize": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 5,
-            "title": "世帯人数",
-            "description": "世帯人数",
             "nullable": true
           },
           "prefecture": {
@@ -3853,28 +4024,143 @@
           }
         },
         "required": [
-          "occupation",
-          "gender"
+          "id",
+          "theme",
+          "owner",
+          "createdAt",
+          "scheduledEndTime"
         ]
       },
-      "offsetPagination": {
+      "validationErrorItem": {
         "type": "object",
         "properties": {
-          "totalCount": {
-            "type": "integer"
+          "field": {
+            "type": "string",
+            "faker": "id",
+            "description": "バリデーションエラーのフィールド"
           },
-          "offset": {
-            "type": "integer"
-          },
-          "limit": {
-            "type": "integer"
+          "message": {
+            "type": "string",
+            "description": "バリデーションエラーメッセージ"
           }
         },
         "required": [
-          "totalCount",
-          "offset",
-          "limit"
+          "field",
+          "message"
         ]
+      },
+      "error": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ]
+      },
+      "user": {
+        "type": "object",
+        "properties": {
+          "displayID": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]$",
+            "examples": [
+              "userid"
+            ],
+            "minLength": 3,
+            "maxLength": 25
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "iconURL": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "displayID",
+          "displayName"
+        ]
+      },
+      "opinion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "faker": "1",
+            "description": "意見ID"
+          },
+          "title": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string",
+            "description": "意見のテキスト",
+            "minLength": 1,
+            "maxLength": 140
+          },
+          "parentID": {
+            "type": "string",
+            "description": "親の意見ID。ルートならば無し"
+          },
+          "voteType": {
+            "$ref": "#/components/schemas/voteType",
+            "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
+          },
+          "pictureURL": {
+            "type": "string",
+            "description": "画像が返る場合もある"
+          },
+          "referenceURL": {
+            "type": "string",
+            "description": "参考文献URL"
+          },
+          "postedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "content",
+          "id",
+          "postedAt"
+        ]
+      },
+      "voteType": {
+        "type": "string",
+        "description": "意見の3種のステータス",
+        "enum": [
+          "agree",
+          "disagree",
+          "pass"
+        ],
+        "x-apidog": {
+          "enumDescriptions": {
+            "agree": "",
+            "disagree": "",
+            "pass": ""
+          }
+        },
+        "default": "unvote"
+      },
+      "location": {
+        "type": "object",
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "description": "緯度"
+          },
+          "longitude": {
+            "type": "number",
+            "description": "経度"
+          }
+        }
       },
       "tokenClaim": {
         "type": "object",
@@ -3930,184 +4216,55 @@
           "isVerify"
         ]
       },
-      "location": {
+      "offsetPagination": {
         "type": "object",
         "properties": {
-          "latitude": {
-            "type": "number",
-            "description": "緯度"
+          "totalCount": {
+            "type": "integer"
           },
-          "longitude": {
-            "type": "number",
-            "description": "経度"
-          }
-        }
-      },
-      "voteType": {
-        "type": "string",
-        "description": "意見の3種のステータス",
-        "enum": [
-          "agree",
-          "disagree",
-          "pass"
-        ],
-        "x-apidog-enum": [
-          {
-            "name": "",
-            "value": "agree",
-            "description": "良さそう"
+          "offset": {
+            "type": "integer"
           },
-          {
-            "name": "",
-            "value": "disagree",
-            "description": "違うかも"
-          },
-          {
-            "name": "",
-            "value": "pass",
-            "description": "保留"
-          }
-        ],
-        "default": "unvote"
-      },
-      "opinion": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "faker": "1",
-            "description": "意見ID"
-          },
-          "title": {
-            "type": "string"
-          },
-          "content": {
-            "type": "string",
-            "description": "意見のテキスト",
-            "minLength": 1,
-            "maxLength": 140
-          },
-          "parentID": {
-            "type": "string",
-            "description": "親の意見ID。ルートならば無し"
-          },
-          "voteType": {
-            "$ref": "#/components/schemas/voteType",
-            "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
-          },
-          "pictureURL": {
-            "type": "string",
-            "description": "画像が返る場合もある"
-          },
-          "referenceURL": {
-            "type": "string",
-            "description": "参考文献URL"
-          },
-          "postedAt": {
-            "type": "string"
+          "limit": {
+            "type": "integer"
           }
         },
         "required": [
-          "content",
-          "id",
-          "postedAt"
+          "totalCount",
+          "offset",
+          "limit"
         ]
       },
-      "user": {
+      "userDemographics": {
         "type": "object",
         "properties": {
-          "displayID": {
-            "type": "string",
-            "x-apidog-mock": "{{$string.uuid}}",
-            "pattern": "^[A-Za-z0-9]$",
-            "examples": [
-              "userid"
-            ],
-            "minLength": 3,
-            "maxLength": 25
-          },
-          "displayName": {
-            "type": "string",
-            "x-apidog-mock": "{{$person.firstName}}"
-          },
-          "iconURL": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "required": [
-          "displayID",
-          "displayName"
-        ]
-      },
-      "error": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "code",
-          "message"
-        ]
-      },
-      "validationErrorItem": {
-        "type": "object",
-        "properties": {
-          "field": {
-            "type": "string",
-            "faker": "id",
-            "description": "バリデーションエラーのフィールド"
-          },
-          "message": {
-            "type": "string",
-            "description": "バリデーションエラーメッセージ"
-          }
-        },
-        "required": [
-          "field",
-          "message"
-        ]
-      },
-      "talkSession": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "トークセッションID"
-          },
-          "theme": {
-            "type": "string",
-            "description": "テーマ"
-          },
-          "description": {
-            "type": "string",
-            "description": "説明",
+          "yearOfBirth": {
+            "type": "integer",
+            "description": "誕生年",
             "nullable": true
           },
-          "owner": {
-            "$ref": "#/components/schemas/user",
-            "description": "作成者"
-          },
-          "createdAt": {
+          "occupation": {
             "type": "string",
-            "description": "作成日時"
+            "title": "職業",
+            "description": "職業"
           },
-          "scheduledEndTime": {
+          "gender": {
             "type": "string",
-            "description": "終了予定日時"
-          },
-          "location": {
-            "description": "位置情報",
-            "$ref": "#/components/schemas/location"
+            "title": "性別",
+            "description": "性別"
           },
           "city": {
             "type": "string",
+            "title": "市区町村",
             "description": "市区町村",
+            "nullable": true
+          },
+          "householdSize": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5,
+            "title": "世帯人数",
+            "description": "世帯人数",
             "nullable": true
           },
           "prefecture": {
@@ -4117,11 +4274,111 @@
           }
         },
         "required": [
-          "id",
-          "theme",
-          "owner",
-          "createdAt",
-          "scheduledEndTime"
+          "occupation",
+          "gender"
+        ]
+      },
+      "userGroupPosition": {
+        "type": "object",
+        "properties": {
+          "posX": {
+            "type": "number"
+          },
+          "posY": {
+            "type": "number"
+          },
+          "displayId": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "iconURL": {
+            "type": "string",
+            "nullable": true
+          },
+          "groupName": {
+            "type": "string"
+          },
+          "groupId": {
+            "type": "integer"
+          },
+          "perimeterIndex": {
+            "type": "integer",
+            "description": "境界ポイントのインデックス"
+          }
+        },
+        "required": [
+          "posX",
+          "posY",
+          "displayId",
+          "groupName",
+          "displayName",
+          "groupId"
+        ]
+      },
+      "Report": {
+        "type": "object",
+        "properties": {
+          "talkSessionID": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string",
+            "description": "レポート本文"
+          }
+        },
+        "required": [
+          "talkSessionID",
+          "content"
+        ]
+      },
+      "conclusion": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/user",
+            "description": "作成ユーザー"
+          },
+          "content": {
+            "type": "string",
+            "description": "結論本文"
+          }
+        },
+        "required": [
+          "user",
+          "content"
+        ]
+      },
+      "actionItem": {
+        "type": "object",
+        "properties": {
+          "ActionItemID": {
+            "type": "string"
+          },
+          "Sequence": {
+            "type": "integer"
+          },
+          "Content": {
+            "type": "string"
+          },
+          "Status": {
+            "type": "string"
+          },
+          "CreatedAt": {
+            "type": "string"
+          },
+          "UpdatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ActionItemID",
+          "Sequence",
+          "Content",
+          "Status",
+          "CreatedAt",
+          "UpdatedAt"
         ]
       }
     },
