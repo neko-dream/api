@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"net/http"
-	"net/url"
 	"time"
 
 	"github.com/neko-dream/server/internal/domain/messages"
@@ -53,29 +52,26 @@ func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams)
 }
 
 // OAuthCallback implements oas.AuthHandler.
-func (a *authHandler) OAuthCallback(ctx context.Context, params oas.OAuthCallbackParams) (*oas.OAuthCallbackFound, error) {
-	if params.CookieState.Value != params.QueryState.Value {
-		res := new(oas.OAuthCallbackFound)
-		return res, messages.InvalidStateError
+func (a *authHandler) OAuthCallback(ctx context.Context, params oas.OAuthCallbackParams) (oas.OAuthCallbackRes, error) {
+	// CookieStateとQueryStateが一致しているか確認
+	if params.CookieState != params.QueryState {
+		return nil, messages.InvalidStateError
 	}
 
 	input := auth_usecase.CallbackInput{
 		Provider: params.Provider,
-		Code:     params.Code.Value,
+		Code:     params.Code,
 	}
-
 	output, err := a.AuthCallbackUseCase.Execute(ctx, input)
 	if err != nil {
 		return nil, err
 	}
 
-	res := new(oas.OAuthCallbackFound)
-	res.SetCookie = oas.NewOptString(output.Cookie)
+	headers := new(oas.OAuthCallbackFoundHeaders)
+	headers.SetCookie = output.Cookie
 	// LoginでRedirectURLを設定しているためエラーは発生しない
-	loc, _ := url.Parse(params.RedirectURL)
-	res.Location = oas.NewOptURI(*loc)
-
-	return res, nil
+	headers.Location = params.RedirectURL
+	return headers, nil
 }
 
 // OAuthRevoke implements oas.AuthHandler.
