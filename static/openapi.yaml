@@ -4,12 +4,685 @@ info:
   description: ''
   version: 1.0.0
 paths:
+  /talksessions/{talkSessionID}/opinions/{opinionID}/votes:
+    post:
+      summary: 意思表明API
+      deprecated: false
+      description: ''
+      operationId: vote
+      tags:
+        - vote
+      parameters:
+        - name: talkSessionID
+          in: path
+          description: セッションのID
+          required: true
+          schema:
+            type: string
+        - name: opinionID
+          in: path
+          description: 意見のID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                voteStatus:
+                  type: string
+                  enum:
+                    - agree
+                    - disagree
+                    - pass
+                  x-apidog:
+                    enumDescriptions:
+                      agree: ''
+                      disagree: ''
+                      pass: ''
+                  example: ''
+                  nullable: true
+              required:
+                - voteStatus
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      faker: '1'
+                      description: 意見ID
+                    title:
+                      type: string
+                    content:
+                      type: string
+                      description: 意見のテキスト
+                      minLength: 1
+                      maxLength: 140
+                    parentID:
+                      type: string
+                      description: 親の意見ID。ルートならば無し
+                    voteType:
+                      type: string
+                      description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                      enum:
+                        - agree
+                        - disagree
+                        - pass
+                      x-apidog:
+                        enumDescriptions:
+                          agree: ''
+                          disagree: ''
+                          pass: ''
+                      default: unvote
+                    pictureURL:
+                      type: string
+                      description: 画像が返る場合もある
+                    referenceURL:
+                      type: string
+                      description: 参考文献URL
+                    postedAt:
+                      type: string
+                  required:
+                    - content
+                    - id
+                    - postedAt
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security:
+        - SessionId: []
+      x-ogen-operation-group: Vote
+  /talksessions/{talkSessionID}/swipe_opinions:
+    get:
+      summary: スワイプ用のエンドポイント
+      deprecated: false
+      description: セッションの中からまだ投票していない意見をランダムに取得する
+      operationId: swipe_opinions
+      tags:
+        - opinion
+      parameters:
+        - name: talkSessionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: integer
+            default: 10
+            nullable: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    opinion:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          faker: '1'
+                          description: 意見ID
+                        title:
+                          type: string
+                        content:
+                          type: string
+                          description: 意見のテキスト
+                          minLength: 1
+                          maxLength: 140
+                        parentID:
+                          type: string
+                          description: 親の意見ID。ルートならば無し
+                        voteType:
+                          type: string
+                          description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                          enum:
+                            - agree
+                            - disagree
+                            - pass
+                          x-apidog:
+                            enumDescriptions:
+                              agree: ''
+                              disagree: ''
+                              pass: ''
+                          default: unvote
+                        pictureURL:
+                          type: string
+                          description: 画像が返る場合もある
+                        referenceURL:
+                          type: string
+                          description: 参考文献URL
+                        postedAt:
+                          type: string
+                      required:
+                        - content
+                        - id
+                        - postedAt
+                    user:
+                      type: object
+                      properties:
+                        displayID:
+                          type: string
+                          pattern: ^[A-Za-z0-9]$
+                          examples:
+                            - userid
+                          minLength: 3
+                          maxLength: 25
+                        displayName:
+                          type: string
+                        iconURL:
+                          type: string
+                          nullable: true
+                      required:
+                        - displayID
+                        - displayName
+                      description: 作成ユーザー
+                    replyCount:
+                      type: integer
+                  required:
+                    - opinion
+                    - user
+                    - replyCount
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security:
+        - SessionId: []
+      x-ogen-operation-group: Opinion
+  /talksessions/{talkSessionID}/opinions:
+    post:
+      summary: セッションに対して意見投稿
+      deprecated: false
+      description: parentOpinionIDがなければルートの意見として投稿される
+      operationId: postOpinionPost
+      tags:
+        - opinion
+      parameters:
+        - name: talkSessionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                parentOpinionID:
+                  type: string
+                  example: ''
+                  nullable: true
+                title:
+                  type: string
+                  example: ''
+                  nullable: true
+                opinionContent:
+                  type: string
+                  maxLength: 140
+                  example: ''
+                referenceURL:
+                  type: string
+                  format: url
+                  example: ''
+                  nullable: true
+                picture:
+                  type: string
+                  format: binary
+                  description: 参考画像。4MiBまで
+                  example: ''
+              required:
+                - opinionContent
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security:
+        - SessionId: []
+      x-ogen-operation-group: Opinion
+    get:
+      summary: セッションに対する意見一覧
+      deprecated: false
+      description: ''
+      operationId: getOpinionsForTalkSession
+      tags:
+        - opinion
+      parameters:
+        - name: talkSessionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+            enum:
+              - latest
+              - mostReply
+              - oldest
+            x-apidog:
+              enumDescriptions:
+                latest: ''
+                mostReply: ''
+                oldest: ''
+            nullable: true
+        - name: limit
+          in: query
+          description: ''
+          required: false
+          example: 10
+          schema:
+            type: integer
+            nullable: true
+        - name: offset
+          in: query
+          description: ''
+          required: false
+          example: 0
+          schema:
+            type: integer
+            nullable: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  opinions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        opinion:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              faker: '1'
+                              description: 意見ID
+                            title:
+                              type: string
+                            content:
+                              type: string
+                              description: 意見のテキスト
+                              minLength: 1
+                              maxLength: 140
+                            parentID:
+                              type: string
+                              description: 親の意見ID。ルートならば無し
+                            voteType:
+                              type: string
+                              description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              enum:
+                                - agree
+                                - disagree
+                                - pass
+                              x-apidog:
+                                enumDescriptions:
+                                  agree: ''
+                                  disagree: ''
+                                  pass: ''
+                              default: unvote
+                            pictureURL:
+                              type: string
+                              description: 画像が返る場合もある
+                            referenceURL:
+                              type: string
+                              description: 参考文献URL
+                            postedAt:
+                              type: string
+                          required:
+                            - content
+                            - id
+                            - postedAt
+                        user:
+                          type: object
+                          properties:
+                            displayID:
+                              type: string
+                              pattern: ^[A-Za-z0-9]$
+                              examples:
+                                - userid
+                              minLength: 3
+                              maxLength: 25
+                            displayName:
+                              type: string
+                            iconURL:
+                              type: string
+                              nullable: true
+                          required:
+                            - displayID
+                            - displayName
+                          description: 作成ユーザー
+                        replyCount:
+                          type: integer
+                        myVoteType:
+                          type: string
+                          description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                          enum:
+                            - agree
+                            - disagree
+                            - pass
+                          x-apidog:
+                            enumDescriptions:
+                              agree: ''
+                              disagree: ''
+                              pass: ''
+                          default: unvote
+                      required:
+                        - opinion
+                        - user
+                        - replyCount
+                        - myVoteType
+                  pagination:
+                    type: object
+                    properties:
+                      totalCount:
+                        type: integer
+                    required:
+                      - totalCount
+                required:
+                  - opinions
+                  - pagination
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security: []
+      x-ogen-operation-group: Opinion
+  /talksessions/{talkSessionID}/opinions/{opinionID}:
+    get:
+      summary: 意見の詳細
+      deprecated: false
+      description: ''
+      operationId: getOpinionDetail
+      tags:
+        - opinion
+      parameters:
+        - name: talkSessionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+        - name: opinionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  opinion:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        faker: '1'
+                        description: 意見ID
+                      title:
+                        type: string
+                      content:
+                        type: string
+                        description: 意見のテキスト
+                        minLength: 1
+                        maxLength: 140
+                      parentID:
+                        type: string
+                        description: 親の意見ID。ルートならば無し
+                      voteType:
+                        type: string
+                        description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                        enum:
+                          - agree
+                          - disagree
+                          - pass
+                        x-apidog:
+                          enumDescriptions:
+                            agree: ''
+                            disagree: ''
+                            pass: ''
+                        default: unvote
+                      pictureURL:
+                        type: string
+                        description: 画像が返る場合もある
+                      referenceURL:
+                        type: string
+                        description: 参考文献URL
+                      postedAt:
+                        type: string
+                    required:
+                      - content
+                      - id
+                      - postedAt
+                  user:
+                    type: object
+                    properties:
+                      displayID:
+                        type: string
+                        pattern: ^[A-Za-z0-9]$
+                        examples:
+                          - userid
+                        minLength: 3
+                        maxLength: 25
+                      displayName:
+                        type: string
+                      iconURL:
+                        type: string
+                        nullable: true
+                    required:
+                      - displayID
+                      - displayName
+                    description: 作成ユーザー
+                required:
+                  - opinion
+                  - user
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security: []
+      x-ogen-operation-group: Opinion
   /talksessions/{talkSessionId}:
     get:
       summary: トークセッションの詳細
       deprecated: false
       description: ''
-      operationId: ViewTalkSessionDetail
+      operationId: getTalkSessionDetail
       tags:
         - talk_session
       parameters:
@@ -21,7 +694,7 @@ paths:
             type: string
       responses:
         '200':
-          description: 成功
+          description: ''
           content:
             application/json:
               schema:
@@ -42,7 +715,6 @@ paths:
                     properties:
                       displayID:
                         type: string
-                        x-apidog-mock: '{{$string.uuid}}'
                         pattern: ^[A-Za-z0-9]$
                         examples:
                           - userid
@@ -50,14 +722,13 @@ paths:
                         maxLength: 25
                       displayName:
                         type: string
-                        x-apidog-mock: '{{$person.firstName}}'
                       iconURL:
                         type: string
                         nullable: true
                     required:
                       - displayID
                       - displayName
-                    description: 作成者
+                    description: 作成ユーザー
                   createdAt:
                     type: string
                     description: 作成日時
@@ -88,8 +759,9 @@ paths:
                   - owner
                   - createdAt
                   - scheduledEndTime
+          headers: {}
         '400':
-          description: ErrorResponse
+          description: ''
           content:
             application/json:
               schema:
@@ -108,6 +780,7 @@ paths:
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
+          headers: {}
       security: []
       x-ogen-operation-group: TalkSession
     put:
@@ -165,7 +838,7 @@ paths:
                 - scheduledEndTime
       responses:
         '200':
-          description: 成功
+          description: ''
           content:
             application/json:
               schema:
@@ -186,7 +859,6 @@ paths:
                     properties:
                       displayID:
                         type: string
-                        x-apidog-mock: '{{$string.uuid}}'
                         pattern: ^[A-Za-z0-9]$
                         examples:
                           - userid
@@ -194,14 +866,13 @@ paths:
                         maxLength: 25
                       displayName:
                         type: string
-                        x-apidog-mock: '{{$person.firstName}}'
                       iconURL:
                         type: string
                         nullable: true
                     required:
                       - displayID
                       - displayName
-                    description: 作成者
+                    description: 作成ユーザー
                   createdAt:
                     type: string
                     description: 作成日時
@@ -232,8 +903,9 @@ paths:
                   - owner
                   - createdAt
                   - scheduledEndTime
+          headers: {}
         '400':
-          description: ErrorResponse
+          description: ''
           content:
             application/json:
               schema:
@@ -245,8 +917,9 @@ paths:
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
+          headers: {}
         '500':
-          description: ServerErrorResponse
+          description: ''
           content:
             application/json:
               schema:
@@ -258,6 +931,7 @@ paths:
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
+          headers: {}
       security:
         - SessionId: []
       x-ogen-operation-group: TalkSession
@@ -315,7 +989,7 @@ paths:
                 - scheduledEndTime
       responses:
         '200':
-          description: 成功
+          description: ''
           content:
             application/json:
               schema:
@@ -336,7 +1010,6 @@ paths:
                     properties:
                       displayID:
                         type: string
-                        x-apidog-mock: '{{$string.uuid}}'
                         pattern: ^[A-Za-z0-9]$
                         examples:
                           - userid
@@ -344,14 +1017,13 @@ paths:
                         maxLength: 25
                       displayName:
                         type: string
-                        x-apidog-mock: '{{$person.firstName}}'
                       iconURL:
                         type: string
                         nullable: true
                     required:
                       - displayID
                       - displayName
-                    description: 作成者
+                    description: 作成ユーザー
                   createdAt:
                     type: string
                     description: 作成日時
@@ -382,8 +1054,9 @@ paths:
                   - owner
                   - createdAt
                   - scheduledEndTime
+          headers: {}
         '400':
-          description: ErrorResponse
+          description: ''
           content:
             application/json:
               schema:
@@ -402,6 +1075,7 @@ paths:
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
+          headers: {}
       security:
         - SessionId: []
       x-ogen-operation-group: TalkSession
@@ -446,13 +1120,6 @@ paths:
               - open
               - finished
             default: open
-            x-apidog-enum:
-              - name: ''
-                value: open
-                description: 開催中
-              - name: ''
-                value: finished
-                description: 終了済み
             nullable: true
         - name: sortKey
           in: query
@@ -487,7 +1154,7 @@ paths:
             nullable: true
       responses:
         '200':
-          description: 成功
+          description: ''
           content:
             application/json:
               schema:
@@ -516,7 +1183,6 @@ paths:
                               properties:
                                 displayID:
                                   type: string
-                                  x-apidog-mock: '{{$string.uuid}}'
                                   pattern: ^[A-Za-z0-9]$
                                   examples:
                                     - userid
@@ -524,14 +1190,13 @@ paths:
                                   maxLength: 25
                                 displayName:
                                   type: string
-                                  x-apidog-mock: '{{$person.firstName}}'
                                 iconURL:
                                   type: string
                                   nullable: true
                               required:
                                 - displayID
                                 - displayName
-                              description: 作成者
+                              description: 作成ユーザー
                             createdAt:
                               type: string
                               description: 作成日時
@@ -583,8 +1248,9 @@ paths:
                 required:
                   - talkSessions
                   - pagination
+          headers: {}
         '400':
-          description: ErrorResponse
+          description: ''
           content:
             application/json:
               schema:
@@ -603,8 +1269,9 @@ paths:
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
+          headers: {}
         '500':
-          description: ServerErrorResponse
+          description: ''
           content:
             application/json:
               schema:
@@ -623,1055 +1290,9 @@ paths:
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
+          headers: {}
       security: []
       x-ogen-operation-group: TalkSession
-  /user:
-    post:
-      summary: ユーザー作成
-      deprecated: false
-      description: ''
-      operationId: registerUser
-      tags:
-        - user
-      parameters: []
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                displayName:
-                  type: string
-                  description: ユーザー名。日本語なども設定可能。
-                  example: hogesge
-                displayID:
-                  type: string
-                  description: ユーザーID。プロフィールのパスなどで使用される。DBのIDとは別。
-                  example: suge-
-                icon:
-                  format: binary
-                  type: string
-                  description: ユーザーアイコン
-                  example: ''
-                yearOfBirth:
-                  type: integer
-                  default: 0
-                  description: 生まれ年
-                  example: 0
-                  nullable: true
-                gender:
-                  type: string
-                  enum:
-                    - 男性
-                    - 女性
-                    - その他
-                    - 回答しない
-                  default: preferNotToSay
-                  x-apidog-enum:
-                    - name: ''
-                      value: male
-                      description: 男
-                    - name: ''
-                      value: female
-                      description: 女
-                    - name: ''
-                      value: other
-                      description: その他
-                    - name: ''
-                      value: preferNotToSay
-                      description: 未回答
-                  description: 性別
-                  example: ''
-                  nullable: true
-                prefecture:
-                  description: 都道府県
-                  example: ''
-                  type: string
-                city:
-                  type: string
-                  description: 市区町村
-                  example: ''
-                  nullable: true
-                occupation:
-                  type: string
-                  enum:
-                    - 正社員
-                    - 契約社員
-                    - 公務員
-                    - 自営業
-                    - 会社役員
-                    - パート・アルバイト
-                    - 家事従事者
-                    - 学生
-                    - 無職
-                    - その他
-                    - 回答しない
-                  default: 無回答
-                  x-apidog-enum:
-                    - name: ''
-                      value: 正社員
-                      description: ''
-                    - name: ''
-                      value: 契約社員
-                      description: ''
-                    - name: ''
-                      value: 公務員
-                      description: ''
-                    - name: ''
-                      value: 自営業
-                      description: ''
-                    - name: ''
-                      value: 会社役員
-                      description: ''
-                    - name: ''
-                      value: パート・アルバイト
-                      description: ''
-                    - name: ''
-                      value: 家事従事者
-                      description: ''
-                    - name: ''
-                      value: 学生
-                      description: ''
-                    - name: ''
-                      value: 無職
-                      description: ''
-                    - name: ''
-                      value: その他
-                      description: ''
-                    - name: ''
-                      value: 無回答
-                      description: ''
-                  description: ユーザーの職業
-                  example: ''
-                  nullable: true
-                householdSize:
-                  type: integer
-                  minimum: 0
-                  description: 世帯人数
-                  example: 0
-                  nullable: true
-              required:
-                - displayName
-                - displayID
-      responses:
-        '200':
-          description: 成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  displayID:
-                    type: string
-                    x-apidog-mock: '{{$string.uuid}}'
-                    pattern: ^[A-Za-z0-9]$
-                    examples:
-                      - userid
-                    minLength: 3
-                    maxLength: 25
-                  displayName:
-                    type: string
-                    x-apidog-mock: '{{$person.firstName}}'
-                  iconURL:
-                    type: string
-                    nullable: true
-                required:
-                  - displayID
-                  - displayName
-        '400':
-          description: ErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
-                required:
-                  - code
-                  - message
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-        '500':
-          description: ServerErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
-                required:
-                  - code
-                  - message
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-      security:
-        - SessionId: []
-      x-ogen-operation-group: user
-    put:
-      summary: ユーザー情報の変更
-      deprecated: false
-      description: ''
-      operationId: editUserProfile
-      tags:
-        - user
-      parameters: []
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                displayName:
-                  type: string
-                  description: ユーザー名
-                  example: ''
-                  nullable: true
-                icon:
-                  type: string
-                  format: binary
-                  description: ユーザーアイコン
-                  example: ''
-                deleteIcon:
-                  type: boolean
-                  default: false
-                  example: 'false'
-                  nullable: true
-                yearOfBirth:
-                  type: integer
-                  description: 生まれ年
-                  example: 0
-                  nullable: true
-                gender:
-                  type: string
-                  enum:
-                    - 男性
-                    - 女性
-                    - その他
-                    - 回答しない
-                  x-apidog-enum:
-                    - name: ''
-                      value: male
-                      description: 男
-                    - name: ''
-                      value: female
-                      description: 女
-                    - name: ''
-                      value: other
-                      description: その他
-                    - name: ''
-                      value: preferNotToSay
-                      description: 無回答
-                  description: 性別
-                  example: ''
-                  nullable: true
-                city:
-                  type: string
-                  description: 市区町村
-                  example: ''
-                  nullable: true
-                occupation:
-                  type: string
-                  enum:
-                    - 正社員
-                    - 契約社員
-                    - 公務員
-                    - 自営業
-                    - 会社役員
-                    - パート・アルバイト
-                    - 家事従事者
-                    - 学生
-                    - 無職
-                    - その他
-                    - 回答しない
-                  x-apidog-enum:
-                    - name: ''
-                      value: 正社員
-                      description: ''
-                    - name: ''
-                      value: 契約社員
-                      description: ''
-                    - name: ''
-                      value: 公務員
-                      description: ''
-                    - name: ''
-                      value: 自営業
-                      description: ''
-                    - name: ''
-                      value: 会社役員
-                      description: ''
-                    - name: ''
-                      value: パート・アルバイト
-                      description: ''
-                    - name: ''
-                      value: 家事従事者
-                      description: ''
-                    - name: ''
-                      value: 学生
-                      description: ''
-                    - name: ''
-                      value: 無職
-                      description: ''
-                    - name: ''
-                      value: その他
-                      description: ''
-                    - name: ''
-                      value: 無回答
-                      description: ''
-                  description: 職業
-                  example: ''
-                  nullable: true
-                householdSize:
-                  type: integer
-                  description: 世帯人数
-                  example: 0
-                  nullable: true
-                prefecture:
-                  type: string
-                  description: 都道府県
-                  example: ''
-                  nullable: true
-      responses:
-        '200':
-          description: 成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  displayID:
-                    type: string
-                    x-apidog-mock: '{{$string.uuid}}'
-                    pattern: ^[A-Za-z0-9]$
-                    examples:
-                      - userid
-                    minLength: 3
-                    maxLength: 25
-                  displayName:
-                    type: string
-                    x-apidog-mock: '{{$person.firstName}}'
-                  iconURL:
-                    type: string
-                    nullable: true
-                required:
-                  - displayID
-                  - displayName
-        '400':
-          description: ErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
-                required:
-                  - code
-                  - message
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-        '500':
-          description: ServerErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
-                required:
-                  - code
-                  - message
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-      security:
-        - SessionId: []
-      x-ogen-operation-group: user
-    get:
-      summary: ユーザー情報の取得
-      deprecated: false
-      description: ''
-      operationId: get_user_info
-      tags:
-        - user
-      parameters: []
-      responses:
-        '200':
-          description: 成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  user:
-                    type: object
-                    properties:
-                      displayID:
-                        type: string
-                        x-apidog-mock: '{{$string.uuid}}'
-                        pattern: ^[A-Za-z0-9]$
-                        examples:
-                          - userid
-                        minLength: 3
-                        maxLength: 25
-                      displayName:
-                        type: string
-                        x-apidog-mock: '{{$person.firstName}}'
-                      iconURL:
-                        type: string
-                        nullable: true
-                    required:
-                      - displayID
-                      - displayName
-                    description: 作成者
-                  demographics:
-                    type: object
-                    properties:
-                      yearOfBirth:
-                        type: integer
-                        description: 誕生年
-                        nullable: true
-                      occupation:
-                        type: string
-                        title: 職業
-                        description: 職業
-                      gender:
-                        type: string
-                        title: 性別
-                        description: 性別
-                      city:
-                        type: string
-                        title: 市区町村
-                        description: 市区町村
-                        nullable: true
-                      householdSize:
-                        type: integer
-                        minimum: 1
-                        maximum: 5
-                        title: 世帯人数
-                        description: 世帯人数
-                        nullable: true
-                      prefecture:
-                        type: string
-                        description: 都道府県
-                        nullable: true
-                    required:
-                      - occupation
-                      - gender
-                required:
-                  - user
-                  - demographics
-        '500':
-          description: ServerErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-      security:
-        - SessionId: []
-      x-ogen-operation-group: User
-  /talksessions/{talkSessionID}/swipe_opinions:
-    get:
-      summary: スワイプ用のエンドポイント
-      deprecated: false
-      description: セッションの中からまだ投票していない意見をランダムに取得する
-      operationId: swipe_opinions
-      tags:
-        - opinion
-      parameters:
-        - name: talkSessionID
-          in: path
-          description: ''
-          required: true
-          schema:
-            type: string
-        - name: limit
-          in: query
-          description: ''
-          required: false
-          schema:
-            type: integer
-            default: 10
-            nullable: true
-      responses:
-        '200':
-          description: 成功
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    opinion:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                          faker: '1'
-                          description: 意見ID
-                        title:
-                          type: string
-                        content:
-                          type: string
-                          description: 意見のテキスト
-                          minLength: 1
-                          maxLength: 140
-                        parentID:
-                          type: string
-                          description: 親の意見ID。ルートならば無し
-                        voteType:
-                          type: string
-                          description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                          enum:
-                            - agree
-                            - disagree
-                            - pass
-                          x-apidog-enum:
-                            - name: ''
-                              value: agree
-                              description: 良さそう
-                            - name: ''
-                              value: disagree
-                              description: 違うかも
-                            - name: ''
-                              value: pass
-                              description: 保留
-                          default: unvote
-                        pictureURL:
-                          type: string
-                          description: 画像が返る場合もある
-                        referenceURL:
-                          type: string
-                          description: 参考文献URL
-                        postedAt:
-                          type: string
-                      required:
-                        - content
-                        - id
-                        - postedAt
-                    user:
-                      type: object
-                      properties:
-                        displayID:
-                          type: string
-                          x-apidog-mock: '{{$string.uuid}}'
-                          pattern: ^[A-Za-z0-9]$
-                          examples:
-                            - userid
-                          minLength: 3
-                          maxLength: 25
-                        displayName:
-                          type: string
-                          x-apidog-mock: '{{$person.firstName}}'
-                        iconURL:
-                          type: string
-                          nullable: true
-                      required:
-                        - displayID
-                        - displayName
-                      description: 作成者
-                    replyCount:
-                      type: integer
-                  required:
-                    - opinion
-                    - user
-                    - replyCount
-        '400':
-          description: ErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
-                required:
-                  - code
-                  - message
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-        '500':
-          description: ServerErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
-                required:
-                  - code
-                  - message
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-      security:
-        - SessionId: []
-      x-ogen-operation-group: Opinion
-  /talksessions/{talkSessionID}/opinions:
-    post:
-      summary: セッションに対して意見投稿
-      deprecated: false
-      description: parentOpinionIDがなければルートの意見として投稿される
-      operationId: postOpinionPost
-      tags:
-        - opinion
-      parameters:
-        - name: talkSessionID
-          in: path
-          description: ''
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                parentOpinionID:
-                  type: string
-                  example: ''
-                  nullable: true
-                title:
-                  type: string
-                  example: ''
-                  nullable: true
-                opinionContent:
-                  type: string
-                  maxLength: 140
-                  example: ''
-                referenceURL:
-                  type: string
-                  format: url
-                  example: ''
-                  nullable: true
-                picture:
-                  type: string
-                  format: binary
-                  description: 参考画像。4MiBまで
-                  example: ''
-              required:
-                - opinionContent
-      responses:
-        '200':
-          description: 成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-        '400':
-          description: ErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
-                required:
-                  - code
-                  - message
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-        '500':
-          description: ServerErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
-                required:
-                  - code
-                  - message
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-      security:
-        - SessionId: []
-      x-ogen-operation-group: Opinion
-    get:
-      summary: セッションに対する意見一覧
-      deprecated: false
-      description: ''
-      operationId: getOpinionsForTalkSession
-      tags:
-        - opinion
-      parameters:
-        - name: talkSessionID
-          in: path
-          description: ''
-          required: true
-          schema:
-            type: string
-        - name: sort
-          in: query
-          description: ''
-          required: false
-          schema:
-            type: string
-            enum:
-              - latest
-              - mostReply
-              - oldest
-            x-apidog:
-              enumDescriptions:
-                latest: ''
-                mostReply: ''
-                oldest: ''
-            nullable: true
-        - name: limit
-          in: query
-          description: ''
-          required: false
-          example: 10
-          schema:
-            type: integer
-            nullable: true
-        - name: offset
-          in: query
-          description: ''
-          required: false
-          example: 0
-          schema:
-            type: integer
-            nullable: true
-      responses:
-        '200':
-          description: 成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  opinions:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        opinion:
-                          type: object
-                          properties:
-                            id:
-                              type: string
-                              faker: '1'
-                              description: 意見ID
-                            title:
-                              type: string
-                            content:
-                              type: string
-                              description: 意見のテキスト
-                              minLength: 1
-                              maxLength: 140
-                            parentID:
-                              type: string
-                              description: 親の意見ID。ルートならば無し
-                            voteType:
-                              type: string
-                              description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                              enum:
-                                - agree
-                                - disagree
-                                - pass
-                              x-apidog-enum:
-                                - name: ''
-                                  value: agree
-                                  description: 良さそう
-                                - name: ''
-                                  value: disagree
-                                  description: 違うかも
-                                - name: ''
-                                  value: pass
-                                  description: 保留
-                              default: unvote
-                            pictureURL:
-                              type: string
-                              description: 画像が返る場合もある
-                            referenceURL:
-                              type: string
-                              description: 参考文献URL
-                            postedAt:
-                              type: string
-                          required:
-                            - content
-                            - id
-                            - postedAt
-                        user:
-                          type: object
-                          properties:
-                            displayID:
-                              type: string
-                              x-apidog-mock: '{{$string.uuid}}'
-                              pattern: ^[A-Za-z0-9]$
-                              examples:
-                                - userid
-                              minLength: 3
-                              maxLength: 25
-                            displayName:
-                              type: string
-                              x-apidog-mock: '{{$person.firstName}}'
-                            iconURL:
-                              type: string
-                              nullable: true
-                          required:
-                            - displayID
-                            - displayName
-                          description: 作成者
-                        replyCount:
-                          type: integer
-                        myVoteType:
-                          type: string
-                          description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                          enum:
-                            - agree
-                            - disagree
-                            - pass
-                          x-apidog-enum:
-                            - name: ''
-                              value: agree
-                              description: 良さそう
-                            - name: ''
-                              value: disagree
-                              description: 違うかも
-                            - name: ''
-                              value: pass
-                              description: 保留
-                          default: unvote
-                      required:
-                        - opinion
-                        - user
-                        - replyCount
-                        - myVoteType
-                  pagination:
-                    type: object
-                    properties:
-                      totalCount:
-                        type: integer
-                    required:
-                      - totalCount
-                required:
-                  - opinions
-                  - pagination
-        '400':
-          description: ErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-        '500':
-          description: ServerErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-      security: []
-      x-ogen-operation-group: Opinion
-  /talksessions/{talkSessionID}/opinions/{opinionID}/votes:
-    post:
-      summary: 意思表明API
-      deprecated: false
-      description: ''
-      operationId: vote
-      tags:
-        - vote
-      parameters:
-        - name: talkSessionID
-          in: path
-          description: セッションのID
-          required: true
-          schema:
-            type: string
-        - name: opinionID
-          in: path
-          description: 意見のID
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                voteStatus:
-                  type: string
-                  enum:
-                    - agree
-                    - disagree
-                    - pass
-                  example: ''
-                  nullable: true
-              required:
-                - voteStatus
-      responses:
-        '200':
-          description: 成功
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                      faker: '1'
-                      description: 意見ID
-                    title:
-                      type: string
-                    content:
-                      type: string
-                      description: 意見のテキスト
-                      minLength: 1
-                      maxLength: 140
-                    parentID:
-                      type: string
-                      description: 親の意見ID。ルートならば無し
-                    voteType:
-                      type: string
-                      description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                      enum:
-                        - agree
-                        - disagree
-                        - pass
-                      x-apidog-enum:
-                        - name: ''
-                          value: agree
-                          description: 良さそう
-                        - name: ''
-                          value: disagree
-                          description: 違うかも
-                        - name: ''
-                          value: pass
-                          description: 保留
-                      default: unvote
-                    pictureURL:
-                      type: string
-                      description: 画像が返る場合もある
-                    referenceURL:
-                      type: string
-                      description: 参考文献URL
-                    postedAt:
-                      type: string
-                  required:
-                    - content
-                    - id
-                    - postedAt
-        '400':
-          description: ErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
-                required:
-                  - code
-                  - message
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-        '500':
-          description: ServerErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
-                required:
-                  - code
-                  - message
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-      security:
-        - SessionId: []
-      x-ogen-operation-group: Vote
   /talksessions/{talkSessionID}/opinions/{opinionID}/replies:
     get:
       summary: 意見に対するリプライ意見一覧
@@ -1695,7 +1316,7 @@ paths:
             type: string
       responses:
         '200':
-          description: 成功
+          description: ''
           content:
             application/json:
               schema:
@@ -1709,7 +1330,6 @@ paths:
                         properties:
                           displayID:
                             type: string
-                            x-apidog-mock: '{{$string.uuid}}'
                             pattern: ^[A-Za-z0-9]$
                             examples:
                               - userid
@@ -1717,14 +1337,13 @@ paths:
                             maxLength: 25
                           displayName:
                             type: string
-                            x-apidog-mock: '{{$person.firstName}}'
                           iconURL:
                             type: string
                             nullable: true
                         required:
                           - displayID
                           - displayName
-                        description: 作成者
+                        description: 作成ユーザー
                       myVoteType:
                         type: string
                         description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
@@ -1732,16 +1351,11 @@ paths:
                           - agree
                           - disagree
                           - pass
-                        x-apidog-enum:
-                          - name: ''
-                            value: agree
-                            description: 良さそう
-                          - name: ''
-                            value: disagree
-                            description: 違うかも
-                          - name: ''
-                            value: pass
-                            description: 保留
+                        x-apidog:
+                          enumDescriptions:
+                            agree: ''
+                            disagree: ''
+                            pass: ''
                         default: unvote
                       opinion:
                         type: object
@@ -1767,16 +1381,11 @@ paths:
                               - agree
                               - disagree
                               - pass
-                            x-apidog-enum:
-                              - name: ''
-                                value: agree
-                                description: 良さそう
-                              - name: ''
-                                value: disagree
-                                description: 違うかも
-                              - name: ''
-                                value: pass
-                                description: 保留
+                            x-apidog:
+                              enumDescriptions:
+                                agree: ''
+                                disagree: ''
+                                pass: ''
                             default: unvote
                           pictureURL:
                             type: string
@@ -1822,16 +1431,11 @@ paths:
                                 - agree
                                 - disagree
                                 - pass
-                              x-apidog-enum:
-                                - name: ''
-                                  value: agree
-                                  description: 良さそう
-                                - name: ''
-                                  value: disagree
-                                  description: 違うかも
-                                - name: ''
-                                  value: pass
-                                  description: 保留
+                              x-apidog:
+                                enumDescriptions:
+                                  agree: ''
+                                  disagree: ''
+                                  pass: ''
                               default: unvote
                             pictureURL:
                               type: string
@@ -1850,7 +1454,6 @@ paths:
                           properties:
                             displayID:
                               type: string
-                              x-apidog-mock: '{{$string.uuid}}'
                               pattern: ^[A-Za-z0-9]$
                               examples:
                                 - userid
@@ -1858,14 +1461,13 @@ paths:
                               maxLength: 25
                             displayName:
                               type: string
-                              x-apidog-mock: '{{$person.firstName}}'
                             iconURL:
                               type: string
                               nullable: true
                           required:
                             - displayID
                             - displayName
-                          description: 作成者
+                          description: 作成ユーザー
                         myVoteType:
                           type: string
                           description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
@@ -1873,16 +1475,11 @@ paths:
                             - agree
                             - disagree
                             - pass
-                          x-apidog-enum:
-                            - name: ''
-                              value: agree
-                              description: 良さそう
-                            - name: ''
-                              value: disagree
-                              description: 違うかも
-                            - name: ''
-                              value: pass
-                              description: 保留
+                          x-apidog:
+                            enumDescriptions:
+                              agree: ''
+                              disagree: ''
+                              pass: ''
                           default: unvote
                       required:
                         - opinion
@@ -1890,8 +1487,9 @@ paths:
                 required:
                   - rootOpinion
                   - opinions
+          headers: {}
         '400':
-          description: ErrorResponse
+          description: ''
           content:
             application/json:
               schema:
@@ -1910,8 +1508,9 @@ paths:
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
+          headers: {}
         '500':
-          description: ServerErrorResponse
+          description: ''
           content:
             application/json:
               schema:
@@ -1930,6 +1529,7 @@ paths:
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
+          headers: {}
       security: []
       x-ogen-operation-group: Opinion
   /talksessions/{talkSessionId}/analysis:
@@ -1949,7 +1549,7 @@ paths:
             type: string
       responses:
         '200':
-          description: 成功
+          description: ''
           content:
             application/json:
               schema:
@@ -2051,16 +1651,11 @@ paths:
                                       - agree
                                       - disagree
                                       - pass
-                                    x-apidog-enum:
-                                      - name: ''
-                                        value: agree
-                                        description: 良さそう
-                                      - name: ''
-                                        value: disagree
-                                        description: 違うかも
-                                      - name: ''
-                                        value: pass
-                                        description: 保留
+                                    x-apidog:
+                                      enumDescriptions:
+                                        agree: ''
+                                        disagree: ''
+                                        pass: ''
                                     default: unvote
                                   pictureURL:
                                     type: string
@@ -2079,7 +1674,6 @@ paths:
                                 properties:
                                   displayID:
                                     type: string
-                                    x-apidog-mock: '{{$string.uuid}}'
                                     pattern: ^[A-Za-z0-9]$
                                     examples:
                                       - userid
@@ -2087,14 +1681,13 @@ paths:
                                     maxLength: 25
                                   displayName:
                                     type: string
-                                    x-apidog-mock: '{{$person.firstName}}'
                                   iconURL:
                                     type: string
                                     nullable: true
                                 required:
                                   - displayID
                                   - displayName
-                                description: 作成者
+                                description: 作成ユーザー
                               agreeCount:
                                 type: integer
                               disagreeCount:
@@ -2114,8 +1707,9 @@ paths:
                 required:
                   - positions
                   - groupOpinions
+          headers: {}
         '400':
-          description: ErrorResponse
+          description: ''
           content:
             application/json:
               schema:
@@ -2134,8 +1728,9 @@ paths:
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
+          headers: {}
         '500':
-          description: ServerErrorResponse
+          description: ''
           content:
             application/json:
               schema:
@@ -2154,44 +1749,1205 @@ paths:
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
+          headers: {}
       security: []
       x-ogen-operation-group: TalkSession
-  /test:
+  /talksessions/{talkSessionId}/report:
     get:
-      summary: OpenAPIテスト用
+      summary: セッションレポートを返す
       deprecated: false
       description: ''
-      operationId: test
+      operationId: getTalkSessionReport
+      tags:
+        - talk_session
+      parameters:
+        - name: talkSessionId
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  report:
+                    type: string
+                required:
+                  - report
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security: []
+      x-ogen-operation-group: TalkSession
+  /talksessions/{talkSessionID}/opinions/{opinionID}/replies2:
+    get:
+      summary: 意見に対するリプライ意見一覧 Copy
+      deprecated: false
+      description: ''
+      operationId: opinionComments2
+      tags:
+        - opinion
+      parameters:
+        - name: talkSessionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+        - name: opinionID
+          in: path
+          description: 親意見のID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rootOpinion:
+                    type: object
+                    properties:
+                      user:
+                        type: object
+                        properties:
+                          displayID:
+                            type: string
+                            pattern: ^[A-Za-z0-9]$
+                            examples:
+                              - userid
+                            minLength: 3
+                            maxLength: 25
+                          displayName:
+                            type: string
+                          iconURL:
+                            type: string
+                            nullable: true
+                        required:
+                          - displayID
+                          - displayName
+                        description: 作成ユーザー
+                      opinion:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            faker: '1'
+                            description: 意見ID
+                          title:
+                            type: string
+                          content:
+                            type: string
+                            description: 意見のテキスト
+                            minLength: 1
+                            maxLength: 140
+                          parentID:
+                            type: string
+                            description: 親の意見ID。ルートならば無し
+                          voteType:
+                            type: string
+                            description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                            enum:
+                              - agree
+                              - disagree
+                              - pass
+                            x-apidog:
+                              enumDescriptions:
+                                agree: ''
+                                disagree: ''
+                                pass: ''
+                            default: unvote
+                          pictureURL:
+                            type: string
+                            description: 画像が返る場合もある
+                          referenceURL:
+                            type: string
+                            description: 参考文献URL
+                          postedAt:
+                            type: string
+                        required:
+                          - content
+                          - id
+                          - postedAt
+                    required:
+                      - user
+                      - opinion
+                  replyOpinions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        opinion:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              faker: '1'
+                              description: 意見ID
+                            title:
+                              type: string
+                            content:
+                              type: string
+                              description: 意見のテキスト
+                              minLength: 1
+                              maxLength: 140
+                            parentID:
+                              type: string
+                              description: 親の意見ID。ルートならば無し
+                            voteType:
+                              type: string
+                              description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              enum:
+                                - agree
+                                - disagree
+                                - pass
+                              x-apidog:
+                                enumDescriptions:
+                                  agree: ''
+                                  disagree: ''
+                                  pass: ''
+                              default: unvote
+                            pictureURL:
+                              type: string
+                              description: 画像が返る場合もある
+                            referenceURL:
+                              type: string
+                              description: 参考文献URL
+                            postedAt:
+                              type: string
+                          required:
+                            - content
+                            - id
+                            - postedAt
+                        user:
+                          type: object
+                          properties:
+                            displayID:
+                              type: string
+                              pattern: ^[A-Za-z0-9]$
+                              examples:
+                                - userid
+                              minLength: 3
+                              maxLength: 25
+                            displayName:
+                              type: string
+                            iconURL:
+                              type: string
+                              nullable: true
+                          required:
+                            - displayID
+                            - displayName
+                          description: 作成ユーザー
+                        myVoteType:
+                          anyOf:
+                            - type: string
+                              description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              enum:
+                                - agree
+                                - disagree
+                                - pass
+                              x-apidog:
+                                enumDescriptions:
+                                  agree: ''
+                                  disagree: ''
+                                  pass: ''
+                              default: unvote
+                            - type: 'null'
+                      required:
+                        - opinion
+                        - user
+                  parentOpinions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        opinion:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              faker: '1'
+                              description: 意見ID
+                            title:
+                              type: string
+                            content:
+                              type: string
+                              description: 意見のテキスト
+                              minLength: 1
+                              maxLength: 140
+                            parentID:
+                              type: string
+                              description: 親の意見ID。ルートならば無し
+                            voteType:
+                              type: string
+                              description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              enum:
+                                - agree
+                                - disagree
+                                - pass
+                              x-apidog:
+                                enumDescriptions:
+                                  agree: ''
+                                  disagree: ''
+                                  pass: ''
+                              default: unvote
+                            pictureURL:
+                              type: string
+                              description: 画像が返る場合もある
+                            referenceURL:
+                              type: string
+                              description: 参考文献URL
+                            postedAt:
+                              type: string
+                          required:
+                            - content
+                            - id
+                            - postedAt
+                        user:
+                          type: object
+                          properties:
+                            displayID:
+                              type: string
+                              pattern: ^[A-Za-z0-9]$
+                              examples:
+                                - userid
+                              minLength: 3
+                              maxLength: 25
+                            displayName:
+                              type: string
+                            iconURL:
+                              type: string
+                              nullable: true
+                          required:
+                            - displayID
+                            - displayName
+                          description: 作成ユーザー
+                        myVoteType:
+                          type: string
+                          description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                          enum:
+                            - agree
+                            - disagree
+                            - pass
+                          x-apidog:
+                            enumDescriptions:
+                              agree: ''
+                              disagree: ''
+                              pass: ''
+                          default: unvote
+                        level:
+                          type: integer
+                      required:
+                        - opinion
+                        - user
+                        - myVoteType
+                        - level
+                required:
+                  - rootOpinion
+                  - replyOpinions
+                  - parentOpinions
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security: []
+      x-ogen-operation-group: Opinion
+  /talksessions/{talkSessionID}/conclusion:
+    get:
+      summary: 結論取得
+      deprecated: false
+      description: ''
+      operationId: getConclusion
+      tags:
+        - talk_session
+      parameters:
+        - name: talkSessionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      displayID:
+                        type: string
+                        pattern: ^[A-Za-z0-9]$
+                        examples:
+                          - userid
+                        minLength: 3
+                        maxLength: 25
+                      displayName:
+                        type: string
+                      iconURL:
+                        type: string
+                        nullable: true
+                    required:
+                      - displayID
+                      - displayName
+                    description: 作成ユーザー
+                  content:
+                    type: string
+                    description: 結論本文
+                required:
+                  - user
+                  - content
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security: []
+      x-ogen-operation-group: TalkSession
+    post:
+      summary: 結論投稿
+      deprecated: false
+      description: |-
+        結論（conclusion）はセッションが終了した後にセッっションの作成者が投稿できる文章。
+        セッションの流れやグループの分かれ方などに対するセッション作成者の感想やそれらの意見を受け、これからの方向性などを記入する。
+      operationId: postConclusion
+      tags:
+        - talk_session
+      parameters:
+        - name: talkSessionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  minLength: 2
+                  description: 結論本文。2文字以上
+                  example: よかった！
+              required:
+                - content
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      displayID:
+                        type: string
+                        pattern: ^[A-Za-z0-9]$
+                        examples:
+                          - userid
+                        minLength: 3
+                        maxLength: 25
+                      displayName:
+                        type: string
+                      iconURL:
+                        type: string
+                        nullable: true
+                    required:
+                      - displayID
+                      - displayName
+                    description: 作成ユーザー
+                  content:
+                    type: string
+                    description: 結論本文
+                required:
+                  - user
+                  - content
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security:
+        - SessionId: []
+      x-ogen-operation-group: TalkSession
+  /talksessions/{talkSessionID}/timelines:
+    get:
+      summary: タイムライン取得
+      deprecated: false
+      description: タイムラインはセッション終了後にセッション作成者が設定できるその後の予定を知らせるもの
+      operationId: getTimeLine
+      tags:
+        - timeline
+      parameters:
+        - name: talkSessionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        ActionItemID:
+                          type: string
+                        Sequence:
+                          type: integer
+                        Content:
+                          type: string
+                        Status:
+                          type: string
+                        CreatedAt:
+                          type: string
+                        UpdatedAt:
+                          type: string
+                      required:
+                        - ActionItemID
+                        - Sequence
+                        - Content
+                        - Status
+                        - CreatedAt
+                        - UpdatedAt
+                required:
+                  - items
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security: []
+      x-ogen-operation-group: Timeline
+  /talksessions/{talkSessionID}/timeline:
+    post:
+      summary: タイムラインアイテム追加
+      deprecated: false
+      description: ''
+      operationId: postTimeLineItem
+      tags:
+        - timeline
+      parameters:
+        - name: talkSessionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                content:
+                  example: ''
+                  type: string
+                status:
+                  example: ''
+                  type: string
+                parentActionItemID:
+                  type: string
+                  description: 親があるなら親のIDヲシテイ
+                  example: ''
+                  nullable: true
+              required:
+                - content
+                - status
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ActionItemID:
+                    type: string
+                  Sequence:
+                    type: integer
+                  Content:
+                    type: string
+                  Status:
+                    type: string
+                  CreatedAt:
+                    type: string
+                  UpdatedAt:
+                    type: string
+                required:
+                  - ActionItemID
+                  - Sequence
+                  - Content
+                  - Status
+                  - CreatedAt
+                  - UpdatedAt
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security:
+        - SessionId: []
+      x-ogen-operation-group: Timeline
+  /talksessions/{talkSessionID}/timelines/{actionItemID}:
+    put:
+      summary: タイムライン編集
+      deprecated: false
+      description: ''
+      operationId: editTimeLine
+      tags:
+        - timeline
+      parameters:
+        - name: talkSessionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+        - name: actionItemID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  example: ''
+                  nullable: true
+                status:
+                  type: string
+                  example: ''
+                  nullable: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ActionItemID:
+                    type: string
+                  Sequence:
+                    type: integer
+                  Content:
+                    type: string
+                  Status:
+                    type: string
+                  CreatedAt:
+                    type: string
+                  UpdatedAt:
+                    type: string
+                required:
+                  - ActionItemID
+                  - Sequence
+                  - Content
+                  - Status
+                  - CreatedAt
+                  - UpdatedAt
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security:
+        - SessionId: []
+      x-ogen-operation-group: Timeline
+  /user:
+    post:
+      summary: ユーザー作成
+      deprecated: false
+      description: ''
+      operationId: registerUser
+      tags:
+        - user
+      parameters: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                displayName:
+                  type: string
+                  description: ユーザー名。日本語なども設定可能。
+                  example: hogesge
+                displayID:
+                  type: string
+                  description: ユーザーID。プロフィールのパスなどで使用される。DBのIDとは別。
+                  example: suge-
+                icon:
+                  format: binary
+                  type: string
+                  description: ユーザーアイコン
+                  example: ''
+                yearOfBirth:
+                  type: integer
+                  default: 0
+                  description: 生まれ年
+                  example: 0
+                  nullable: true
+                gender:
+                  type: string
+                  enum:
+                    - 男性
+                    - 女性
+                    - その他
+                    - 回答しない
+                  default: preferNotToSay
+                  description: 性別
+                  example: ''
+                  nullable: true
+                prefecture:
+                  description: 都道府県
+                  example: ''
+                  type: string
+                city:
+                  type: string
+                  description: 市区町村
+                  example: ''
+                  nullable: true
+                occupation:
+                  type: string
+                  enum:
+                    - 正社員
+                    - 契約社員
+                    - 公務員
+                    - 自営業
+                    - 会社役員
+                    - パート・アルバイト
+                    - 家事従事者
+                    - 学生
+                    - 無職
+                    - その他
+                    - 回答しない
+                  default: 無回答
+                  x-apidog:
+                    enumDescriptions:
+                      正社員: ''
+                      契約社員: ''
+                      公務員: ''
+                      自営業: ''
+                      会社役員: ''
+                      パート・アルバイト: ''
+                      家事従事者: ''
+                      学生: ''
+                      無職: ''
+                      その他: ''
+                      回答しない: ''
+                  description: ユーザーの職業
+                  example: ''
+                  nullable: true
+                householdSize:
+                  type: integer
+                  minimum: 0
+                  description: 世帯人数
+                  example: 0
+                  nullable: true
+              required:
+                - displayName
+                - displayID
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  displayID:
+                    type: string
+                    pattern: ^[A-Za-z0-9]$
+                    examples:
+                      - userid
+                    minLength: 3
+                    maxLength: 25
+                  displayName:
+                    type: string
+                  iconURL:
+                    type: string
+                    nullable: true
+                required:
+                  - displayID
+                  - displayName
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security:
+        - SessionId: []
+      x-ogen-operation-group: user
+    put:
+      summary: ユーザー情報の変更
+      deprecated: false
+      description: ''
+      operationId: editUserProfile
+      tags:
+        - user
+      parameters: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                displayName:
+                  type: string
+                  description: ユーザー名
+                  example: ''
+                  nullable: true
+                icon:
+                  type: string
+                  format: binary
+                  description: ユーザーアイコン
+                  example: ''
+                deleteIcon:
+                  type: boolean
+                  default: false
+                  example: 'false'
+                  nullable: true
+                yearOfBirth:
+                  type: integer
+                  description: 生まれ年
+                  example: 0
+                  nullable: true
+                gender:
+                  type: string
+                  enum:
+                    - 男性
+                    - 女性
+                    - その他
+                    - 回答しない
+                  description: 性別
+                  example: ''
+                  nullable: true
+                city:
+                  type: string
+                  description: 市区町村
+                  example: ''
+                  nullable: true
+                occupation:
+                  type: string
+                  enum:
+                    - 正社員
+                    - 契約社員
+                    - 公務員
+                    - 自営業
+                    - 会社役員
+                    - パート・アルバイト
+                    - 家事従事者
+                    - 学生
+                    - 無職
+                    - その他
+                    - 回答しない
+                  x-apidog:
+                    enumDescriptions:
+                      正社員: ''
+                      契約社員: ''
+                      公務員: ''
+                      自営業: ''
+                      会社役員: ''
+                      パート・アルバイト: ''
+                      家事従事者: ''
+                      学生: ''
+                      無職: ''
+                      その他: ''
+                      回答しない: ''
+                  description: 職業
+                  example: ''
+                  nullable: true
+                householdSize:
+                  type: integer
+                  description: 世帯人数
+                  example: 0
+                  nullable: true
+                prefecture:
+                  type: string
+                  description: 都道府県
+                  example: ''
+                  nullable: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  displayID:
+                    type: string
+                    pattern: ^[A-Za-z0-9]$
+                    examples:
+                      - userid
+                    minLength: 3
+                    maxLength: 25
+                  displayName:
+                    type: string
+                  iconURL:
+                    type: string
+                    nullable: true
+                required:
+                  - displayID
+                  - displayName
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security:
+        - SessionId: []
+      x-ogen-operation-group: user
+    get:
+      summary: ユーザー情報の取得
+      deprecated: false
+      description: ''
+      operationId: get_user_info
       tags:
         - user
       parameters: []
       responses:
         '200':
-          description: 成功
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  optInt:
-                    type: integer
-                    nullable: true
-                  optNilInt:
-                    type: integer
-                  optNilBool:
-                    type: boolean
-                    nullable: true
-                  optBool:
-                    type: boolean
-                  optUrl:
-                    type: string
-                    format: uri
-                  optNilUrl:
-                    type: string
-                    format: url
-                    nullable: true
-        '400':
-          description: ErrorResponse
+                  user:
+                    type: object
+                    properties:
+                      displayID:
+                        type: string
+                        pattern: ^[A-Za-z0-9]$
+                        examples:
+                          - userid
+                        minLength: 3
+                        maxLength: 25
+                      displayName:
+                        type: string
+                      iconURL:
+                        type: string
+                        nullable: true
+                    required:
+                      - displayID
+                      - displayName
+                    description: 作成ユーザー
+                  demographics:
+                    type: object
+                    properties:
+                      yearOfBirth:
+                        type: integer
+                        description: 誕生年
+                        nullable: true
+                      occupation:
+                        type: string
+                        title: 職業
+                        description: 職業
+                      gender:
+                        type: string
+                        title: 性別
+                        description: 性別
+                      city:
+                        type: string
+                        title: 市区町村
+                        description: 市区町村
+                        nullable: true
+                      householdSize:
+                        type: integer
+                        minimum: 1
+                        maximum: 5
+                        title: 世帯人数
+                        description: 世帯人数
+                        nullable: true
+                      prefecture:
+                        type: string
+                        description: 都道府県
+                        nullable: true
+                    required:
+                      - occupation
+                      - gender
+                required:
+                  - user
+                  - demographics
+          headers: {}
+        '500':
+          description: ''
           content:
             application/json:
               schema:
@@ -2203,119 +2959,10 @@ paths:
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
-        '500':
-          description: ServerErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-      security: []
-      x-ogen-operation-group: test
-  /auth/token/info:
-    get:
-      summary: JWTの内容を返してくれる
-      deprecated: false
-      description: ''
-      operationId: oauth_token_info
-      tags:
-        - auth
-      parameters: []
-      responses:
-        '200':
-          description: 成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  aud:
-                    type: string
-                    description: Audience
-                  exp:
-                    type: string
-                    description: 有効期限
-                  iat:
-                    type: string
-                    description: 発行日時
-                  iss:
-                    type: string
-                    description: 発行者
-                  sub:
-                    type: string
-                    description: ユーザID
-                  jti:
-                    type: string
-                    description: JWT ID
-                  displayId:
-                    type: string
-                    description: ユーザーID
-                  displayName:
-                    type: string
-                    description: ユーザー名
-                  iconURL:
-                    type: string
-                    description: アイコンURL
-                  isVerify:
-                    type: boolean
-                    description: ユーザ登録済みか
-                required:
-                  - aud
-                  - exp
-                  - iat
-                  - iss
-                  - sub
-                  - jti
-                  - isVerify
-        '400':
-          description: ErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
-                required:
-                  - code
-                  - message
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-        '500':
-          description: ServerErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
-                required:
-                  - code
-                  - message
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
+          headers: {}
       security:
         - SessionId: []
-      x-ogen-operation-group: Auth
+      x-ogen-operation-group: User
   /opinions/histories:
     get:
       summary: 今までに投稿した異見
@@ -2355,7 +3002,7 @@ paths:
             type: integer
       responses:
         '200':
-          description: 成功
+          description: ''
           content:
             application/json:
               schema:
@@ -2371,7 +3018,6 @@ paths:
                           properties:
                             displayID:
                               type: string
-                              x-apidog-mock: '{{$string.uuid}}'
                               pattern: ^[A-Za-z0-9]$
                               examples:
                                 - userid
@@ -2379,14 +3025,13 @@ paths:
                               maxLength: 25
                             displayName:
                               type: string
-                              x-apidog-mock: '{{$person.firstName}}'
                             iconURL:
                               type: string
                               nullable: true
                           required:
                             - displayID
                             - displayName
-                          description: 作成者
+                          description: 作成ユーザー
                         opinion:
                           type: object
                           properties:
@@ -2411,16 +3056,11 @@ paths:
                                 - agree
                                 - disagree
                                 - pass
-                              x-apidog-enum:
-                                - name: ''
-                                  value: agree
-                                  description: 良さそう
-                                - name: ''
-                                  value: disagree
-                                  description: 違うかも
-                                - name: ''
-                                  value: pass
-                                  description: 保留
+                              x-apidog:
+                                enumDescriptions:
+                                  agree: ''
+                                  disagree: ''
+                                  pass: ''
                               default: unvote
                             pictureURL:
                               type: string
@@ -2450,8 +3090,9 @@ paths:
                 required:
                   - opinions
                   - pagination
+          headers: {}
         '400':
-          description: ErrorResponse
+          description: ''
           content:
             application/json:
               schema:
@@ -2463,8 +3104,9 @@ paths:
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
+          headers: {}
         '500':
-          description: ServerErrorResponse
+          description: ''
           content:
             application/json:
               schema:
@@ -2476,6 +3118,7 @@ paths:
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
+          headers: {}
       security:
         - SessionId: []
       x-ogen-operation-group: User
@@ -2523,7 +3166,7 @@ paths:
             nullable: true
       responses:
         '200':
-          description: 成功
+          description: ''
           content:
             application/json:
               schema:
@@ -2567,7 +3210,6 @@ paths:
                               properties:
                                 displayID:
                                   type: string
-                                  x-apidog-mock: '{{$string.uuid}}'
                                   pattern: ^[A-Za-z0-9]$
                                   examples:
                                     - userid
@@ -2575,14 +3217,13 @@ paths:
                                   maxLength: 25
                                 displayName:
                                   type: string
-                                  x-apidog-mock: '{{$person.firstName}}'
                                 iconURL:
                                   type: string
                                   nullable: true
                               required:
                                 - displayID
                                 - displayName
-                              description: 作成者
+                              description: 作成ユーザー
                             createdAt:
                               type: string
                               description: 作成日時
@@ -2619,8 +3260,9 @@ paths:
                 required:
                   - pagination
                   - talkSessions
+          headers: {}
         '400':
-          description: ErrorResponse
+          description: ''
           content:
             application/json:
               schema:
@@ -2632,8 +3274,9 @@ paths:
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
+          headers: {}
         '500':
-          description: ServerErrorResponse
+          description: ''
           content:
             application/json:
               schema:
@@ -2645,554 +3288,10 @@ paths:
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
+          headers: {}
       security:
         - SessionId: []
       x-ogen-operation-group: User
-  /talksessions/{talkSessionID}/opinions/{opinionID}:
-    get:
-      summary: 意見の詳細
-      deprecated: false
-      description: ''
-      operationId: getOpinionDetail
-      tags:
-        - opinion
-      parameters:
-        - name: talkSessionID
-          in: path
-          description: ''
-          required: true
-          schema:
-            type: string
-        - name: opinionID
-          in: path
-          description: ''
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: 成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  opinion:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                        faker: '1'
-                        description: 意見ID
-                      title:
-                        type: string
-                      content:
-                        type: string
-                        description: 意見のテキスト
-                        minLength: 1
-                        maxLength: 140
-                      parentID:
-                        type: string
-                        description: 親の意見ID。ルートならば無し
-                      voteType:
-                        type: string
-                        description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                        enum:
-                          - agree
-                          - disagree
-                          - pass
-                        x-apidog-enum:
-                          - name: ''
-                            value: agree
-                            description: 良さそう
-                          - name: ''
-                            value: disagree
-                            description: 違うかも
-                          - name: ''
-                            value: pass
-                            description: 保留
-                        default: unvote
-                      pictureURL:
-                        type: string
-                        description: 画像が返る場合もある
-                      referenceURL:
-                        type: string
-                        description: 参考文献URL
-                      postedAt:
-                        type: string
-                    required:
-                      - content
-                      - id
-                      - postedAt
-                  user:
-                    type: object
-                    properties:
-                      displayID:
-                        type: string
-                        x-apidog-mock: '{{$string.uuid}}'
-                        pattern: ^[A-Za-z0-9]$
-                        examples:
-                          - userid
-                        minLength: 3
-                        maxLength: 25
-                      displayName:
-                        type: string
-                        x-apidog-mock: '{{$person.firstName}}'
-                      iconURL:
-                        type: string
-                        nullable: true
-                    required:
-                      - displayID
-                      - displayName
-                    description: 作成者
-                required:
-                  - opinion
-                  - user
-        '500':
-          description: ServerErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-      security: []
-      x-ogen-operation-group: Opinion
-  /talksessions/{talkSessionId}/report:
-    get:
-      summary: セッションレポートを返す
-      deprecated: false
-      description: ''
-      operationId: getTalkSessionReport
-      tags:
-        - talk_session
-      parameters:
-        - name: talkSessionId
-          in: path
-          description: ''
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: 成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  report:
-                    type: string
-                required:
-                  - report
-        '500':
-          description: ServerErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-      security: []
-      x-ogen-operation-group: TalkSession
-  /test/dummy:
-    post:
-      summary: mudai
-      deprecated: false
-      description: ''
-      operationId: dummiInit
-      tags:
-        - test
-      parameters: []
-      responses:
-        '200':
-          description: 成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-        '400':
-          description: ErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-        '500':
-          description: ServerErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-      security: []
-      x-ogen-operation-group: Test
-  /talksessions/{talkSessionID}/opinions/{opinionID}/replies2:
-    get:
-      summary: 意見に対するリプライ意見一覧 Copy
-      deprecated: false
-      description: ''
-      operationId: opinionComments2
-      tags:
-        - opinion
-      parameters:
-        - name: talkSessionID
-          in: path
-          description: ''
-          required: true
-          schema:
-            type: string
-        - name: opinionID
-          in: path
-          description: 親意見のID
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: 成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  rootOpinion:
-                    type: object
-                    properties:
-                      user:
-                        type: object
-                        properties:
-                          displayID:
-                            type: string
-                            x-apidog-mock: '{{$string.uuid}}'
-                            pattern: ^[A-Za-z0-9]$
-                            examples:
-                              - userid
-                            minLength: 3
-                            maxLength: 25
-                          displayName:
-                            type: string
-                            x-apidog-mock: '{{$person.firstName}}'
-                          iconURL:
-                            type: string
-                            nullable: true
-                        required:
-                          - displayID
-                          - displayName
-                        description: 作成者
-                      opinion:
-                        type: object
-                        properties:
-                          id:
-                            type: string
-                            faker: '1'
-                            description: 意見ID
-                          title:
-                            type: string
-                          content:
-                            type: string
-                            description: 意見のテキスト
-                            minLength: 1
-                            maxLength: 140
-                          parentID:
-                            type: string
-                            description: 親の意見ID。ルートならば無し
-                          voteType:
-                            type: string
-                            description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                            enum:
-                              - agree
-                              - disagree
-                              - pass
-                            x-apidog-enum:
-                              - name: ''
-                                value: agree
-                                description: 良さそう
-                              - name: ''
-                                value: disagree
-                                description: 違うかも
-                              - name: ''
-                                value: pass
-                                description: 保留
-                            default: unvote
-                          pictureURL:
-                            type: string
-                            description: 画像が返る場合もある
-                          referenceURL:
-                            type: string
-                            description: 参考文献URL
-                          postedAt:
-                            type: string
-                        required:
-                          - content
-                          - id
-                          - postedAt
-                    required:
-                      - user
-                      - opinion
-                  replyOpinions:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        opinion:
-                          type: object
-                          properties:
-                            id:
-                              type: string
-                              faker: '1'
-                              description: 意見ID
-                            title:
-                              type: string
-                            content:
-                              type: string
-                              description: 意見のテキスト
-                              minLength: 1
-                              maxLength: 140
-                            parentID:
-                              type: string
-                              description: 親の意見ID。ルートならば無し
-                            voteType:
-                              type: string
-                              description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                              enum:
-                                - agree
-                                - disagree
-                                - pass
-                              x-apidog-enum:
-                                - name: ''
-                                  value: agree
-                                  description: 良さそう
-                                - name: ''
-                                  value: disagree
-                                  description: 違うかも
-                                - name: ''
-                                  value: pass
-                                  description: 保留
-                              default: unvote
-                            pictureURL:
-                              type: string
-                              description: 画像が返る場合もある
-                            referenceURL:
-                              type: string
-                              description: 参考文献URL
-                            postedAt:
-                              type: string
-                          required:
-                            - content
-                            - id
-                            - postedAt
-                        user:
-                          type: object
-                          properties:
-                            displayID:
-                              type: string
-                              x-apidog-mock: '{{$string.uuid}}'
-                              pattern: ^[A-Za-z0-9]$
-                              examples:
-                                - userid
-                              minLength: 3
-                              maxLength: 25
-                            displayName:
-                              type: string
-                              x-apidog-mock: '{{$person.firstName}}'
-                            iconURL:
-                              type: string
-                              nullable: true
-                          required:
-                            - displayID
-                            - displayName
-                          description: 作成者
-                        myVoteType:
-                          anyOf:
-                            - type: string
-                              description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                              enum:
-                                - agree
-                                - disagree
-                                - pass
-                              x-apidog-enum:
-                                - name: ''
-                                  value: agree
-                                  description: 良さそう
-                                - name: ''
-                                  value: disagree
-                                  description: 違うかも
-                                - name: ''
-                                  value: pass
-                                  description: 保留
-                              default: unvote
-                            - type: 'null'
-                      required:
-                        - opinion
-                        - user
-                  parentOpinions:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        opinion:
-                          type: object
-                          properties:
-                            id:
-                              type: string
-                              faker: '1'
-                              description: 意見ID
-                            title:
-                              type: string
-                            content:
-                              type: string
-                              description: 意見のテキスト
-                              minLength: 1
-                              maxLength: 140
-                            parentID:
-                              type: string
-                              description: 親の意見ID。ルートならば無し
-                            voteType:
-                              type: string
-                              description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                              enum:
-                                - agree
-                                - disagree
-                                - pass
-                              x-apidog-enum:
-                                - name: ''
-                                  value: agree
-                                  description: 良さそう
-                                - name: ''
-                                  value: disagree
-                                  description: 違うかも
-                                - name: ''
-                                  value: pass
-                                  description: 保留
-                              default: unvote
-                            pictureURL:
-                              type: string
-                              description: 画像が返る場合もある
-                            referenceURL:
-                              type: string
-                              description: 参考文献URL
-                            postedAt:
-                              type: string
-                          required:
-                            - content
-                            - id
-                            - postedAt
-                        user:
-                          type: object
-                          properties:
-                            displayID:
-                              type: string
-                              x-apidog-mock: '{{$string.uuid}}'
-                              pattern: ^[A-Za-z0-9]$
-                              examples:
-                                - userid
-                              minLength: 3
-                              maxLength: 25
-                            displayName:
-                              type: string
-                              x-apidog-mock: '{{$person.firstName}}'
-                            iconURL:
-                              type: string
-                              nullable: true
-                          required:
-                            - displayID
-                            - displayName
-                          description: 作成者
-                        myVoteType:
-                          type: string
-                          description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                          enum:
-                            - agree
-                            - disagree
-                            - pass
-                          x-apidog-enum:
-                            - name: ''
-                              value: agree
-                              description: 良さそう
-                            - name: ''
-                              value: disagree
-                              description: 違うかも
-                            - name: ''
-                              value: pass
-                              description: 保留
-                          default: unvote
-                        level:
-                          type: integer
-                      required:
-                        - opinion
-                        - user
-                        - myVoteType
-                        - level
-                required:
-                  - rootOpinion
-                  - replyOpinions
-                  - parentOpinions
-        '400':
-          description: ErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
-                required:
-                  - code
-                  - message
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-        '500':
-          description: ServerErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
-                required:
-                  - code
-                  - message
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-      security: []
-      x-ogen-operation-group: Opinion
   /talksessions/opened:
     get:
       summary: 自分が開いたセッション一覧
@@ -3241,7 +3340,7 @@ paths:
             nullable: true
       responses:
         '200':
-          description: 成功
+          description: ''
           content:
             application/json:
               schema:
@@ -3270,7 +3369,6 @@ paths:
                               properties:
                                 displayID:
                                   type: string
-                                  x-apidog-mock: '{{$string.uuid}}'
                                   pattern: ^[A-Za-z0-9]$
                                   examples:
                                     - userid
@@ -3278,14 +3376,13 @@ paths:
                                   maxLength: 25
                                 displayName:
                                   type: string
-                                  x-apidog-mock: '{{$person.firstName}}'
                                 iconURL:
                                   type: string
                                   nullable: true
                               required:
                                 - displayID
                                 - displayName
-                              description: 作成者
+                              description: 作成ユーザー
                             createdAt:
                               type: string
                               description: 作成日時
@@ -3323,8 +3420,9 @@ paths:
                         - opinionCount
                 required:
                   - talkSessions
+          headers: {}
         '400':
-          description: ErrorResponse
+          description: ''
           content:
             application/json:
               schema:
@@ -3336,8 +3434,9 @@ paths:
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
+          headers: {}
         '500':
-          description: ServerErrorResponse
+          description: ''
           content:
             application/json:
               schema:
@@ -3349,479 +3448,110 @@ paths:
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
+          headers: {}
       security:
         - SessionId: []
       x-ogen-operation-group: TalkSession
-  /talksessions/{talkSessionID}/conclusion:
+  /auth/token/info:
     get:
-      summary: 結論取得
+      summary: JWTの内容を返してくれる
       deprecated: false
       description: ''
-      operationId: getConclusion
-      tags:
-        - talk_session
-      parameters:
-        - name: talkSessionID
-          in: path
-          description: ''
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: 成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  user:
-                    type: object
-                    properties:
-                      displayID:
-                        type: string
-                        x-apidog-mock: '{{$string.uuid}}'
-                        pattern: ^[A-Za-z0-9]$
-                        examples:
-                          - userid
-                        minLength: 3
-                        maxLength: 25
-                      displayName:
-                        type: string
-                        x-apidog-mock: '{{$person.firstName}}'
-                      iconURL:
-                        type: string
-                        nullable: true
-                    required:
-                      - displayID
-                      - displayName
-                    description: 作成者
-                  content:
-                    type: string
-                    description: 結論本文
-                required:
-                  - user
-                  - content
-        '400':
-          description: ErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-        '500':
-          description: ServerErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-      security: []
-      x-ogen-operation-group: TalkSession
-    post:
-      summary: 結論投稿
-      deprecated: false
-      description: |-
-        結論（conclusion）はセッションが終了した後にセッっションの作成者が投稿できる文章。
-        セッションの流れやグループの分かれ方などに対するセッション作成者の感想やそれらの意見を受け、これからの方向性などを記入する。
-      operationId: postConclusion
-      tags:
-        - talk_session
-      parameters:
-        - name: talkSessionID
-          in: path
-          description: ''
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                content:
-                  type: string
-                  minLength: 2
-                  description: 結論本文。2文字以上
-                  example: よかった！
-              required:
-                - content
-      responses:
-        '200':
-          description: 成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  user:
-                    type: object
-                    properties:
-                      displayID:
-                        type: string
-                        x-apidog-mock: '{{$string.uuid}}'
-                        pattern: ^[A-Za-z0-9]$
-                        examples:
-                          - userid
-                        minLength: 3
-                        maxLength: 25
-                      displayName:
-                        type: string
-                        x-apidog-mock: '{{$person.firstName}}'
-                      iconURL:
-                        type: string
-                        nullable: true
-                    required:
-                      - displayID
-                      - displayName
-                    description: 作成者
-                  content:
-                    type: string
-                    description: 結論本文
-                required:
-                  - user
-                  - content
-        '400':
-          description: ErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-        '500':
-          description: ServerErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-      security:
-        - SessionId: []
-      x-ogen-operation-group: TalkSession
-  /talksessions/{talkSessionID}/timelines:
-    get:
-      summary: タイムライン取得
-      deprecated: false
-      description: タイムラインはセッション終了後にセッション作成者が設定できるその後の予定を知らせるもの
-      operationId: getTimeLine
-      tags:
-        - timeline
-      parameters:
-        - name: talkSessionID
-          in: path
-          description: ''
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: 成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        ActionItemID:
-                          type: string
-                        Sequence:
-                          type: integer
-                        Content:
-                          type: string
-                        Status:
-                          type: string
-                        CreatedAt:
-                          type: string
-                        UpdatedAt:
-                          type: string
-                      required:
-                        - ActionItemID
-                        - Sequence
-                        - Content
-                        - Status
-                        - CreatedAt
-                        - UpdatedAt
-                required:
-                  - items
-        '400':
-          description: ErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-        '500':
-          description: ServerErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-      security: []
-      x-ogen-operation-group: Timeline
-  /talksessions/{talkSessionID}/timeline:
-    post:
-      summary: タイムラインアイテム追加
-      deprecated: false
-      description: ''
-      operationId: postTimeLineItem
-      tags:
-        - timeline
-      parameters:
-        - name: talkSessionID
-          in: path
-          description: ''
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                content:
-                  example: ''
-                  type: string
-                status:
-                  example: ''
-                  type: string
-                parentActionItemID:
-                  type: string
-                  description: 親があるなら親のIDヲシテイ
-                  example: ''
-                  nullable: true
-              required:
-                - content
-                - status
-      responses:
-        '200':
-          description: 成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  ActionItemID:
-                    type: string
-                  Sequence:
-                    type: integer
-                  Content:
-                    type: string
-                  Status:
-                    type: string
-                  CreatedAt:
-                    type: string
-                  UpdatedAt:
-                    type: string
-                required:
-                  - ActionItemID
-                  - Sequence
-                  - Content
-                  - Status
-                  - CreatedAt
-                  - UpdatedAt
-        '400':
-          description: ErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-        '500':
-          description: ServerErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-      security:
-        - SessionId: []
-      x-ogen-operation-group: Timeline
-  /talksessions/{talkSessionID}/timelines/{actionItemID}:
-    put:
-      summary: タイムライン編集
-      deprecated: false
-      description: ''
-      operationId: editTimeLine
-      tags:
-        - timeline
-      parameters:
-        - name: talkSessionID
-          in: path
-          description: ''
-          required: true
-          schema:
-            type: string
-        - name: actionItemID
-          in: path
-          description: ''
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                content:
-                  type: string
-                  example: ''
-                  nullable: true
-                status:
-                  type: string
-                  example: ''
-                  nullable: true
-      responses:
-        '200':
-          description: 成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  ActionItemID:
-                    type: string
-                  Sequence:
-                    type: integer
-                  Content:
-                    type: string
-                  Status:
-                    type: string
-                  CreatedAt:
-                    type: string
-                  UpdatedAt:
-                    type: string
-                required:
-                  - ActionItemID
-                  - Sequence
-                  - Content
-                  - Status
-                  - CreatedAt
-                  - UpdatedAt
-        '400':
-          description: ErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-        '500':
-          description: ServerErrorResponse
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-      security:
-        - SessionId: []
-      x-ogen-operation-group: Timeline
-  /auth/{provider}/login:
-    get:
-      summary: OAuthログイン
-      deprecated: false
-      description: 認証画面を表示する
-      operationId: authorize
+      operationId: oauth_token_info
       tags:
         - auth
-      parameters:
-        - in: path
-          name: provider
-          schema:
-            type: string
-          required: true
-          description: OIDCプロバイダ名
-        - in: query
-          name: redirect_url
-          schema:
-            type: string
-          required: true
-          description: コールバック後のリダイレクトURL
+      parameters: []
       responses:
-        '302':
-          description: ログインページへリダイレクト
-          headers:
-            Location:
-              description: ログインページのURL
+        '200':
+          description: ''
+          content:
+            application/json:
               schema:
-                type: string
-                format: uri
-              example: https://example.com/login
-            Set-Cookie:
-              description: OAuth2.0 State
+                type: object
+                properties:
+                  aud:
+                    type: string
+                    description: Audience
+                  exp:
+                    type: string
+                    description: 有効期限
+                  iat:
+                    type: string
+                    description: 発行日時
+                  iss:
+                    type: string
+                    description: 発行者
+                  sub:
+                    type: string
+                    description: ユーザID
+                  jti:
+                    type: string
+                    description: JWT ID
+                  displayId:
+                    type: string
+                    description: ユーザーID
+                  displayName:
+                    type: string
+                    description: ユーザー名
+                  iconURL:
+                    type: string
+                    description: アイコンURL
+                  isVerify:
+                    type: boolean
+                    description: ユーザ登録済みか
+                required:
+                  - aud
+                  - exp
+                  - iat
+                  - iss
+                  - sub
+                  - jti
+                  - isVerify
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
               schema:
-                type: string
-                format: cookie
-              example: >-
-                state=1234567890; Path=/; Secure; HttpOnly,
-                redirect_url=https://example.com/login; Path=/; Secure; HttpOnly
-      security: []
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security:
+        - SessionId: []
       x-ogen-operation-group: Auth
   /auth/{provider}/callback:
     get:
@@ -3835,76 +3565,330 @@ paths:
         - name: state
           in: cookie
           description: OAuth2.0 State from Cookie
-          required: false
-          example: uuid
+          required: true
+          example: '{{$string.uuid}}'
           schema:
             type: string
         - name: redirect_url
           in: cookie
-          description: Auth Callback URL
+          description: Authorization Code
           required: true
-          example: https://example.com/login
+          example: ''
           schema:
             type: string
         - name: provider
           in: path
-          description: OAUTH Provider
+          description: ''
           required: true
           schema:
             type: string
         - name: code
           in: query
           description: ''
-          required: false
-          example: '{% faker datatype.uuid %}'
+          required: true
           schema:
             type: string
         - name: state
           in: query
-          description: OAuth2.0 State from Query
-          required: false
-          example: '{% faker datatype.uuid %}'
+          description: OAuth State from Query
+          required: true
           schema:
             type: string
       responses:
         '302':
-          description: リダイレクト先へリダイレクト
-          headers:
-            Location:
-              description: 指定されたリダイレクトURL
-              schema:
-                type: string
-                format: uri
-              example: https://example.com/login
-            Set-Cookie:
-              description: OAuth2.0 State
-              schema:
-                type: string
-                format: cookie
-              example: state=1234567890; Path=/; Secure; HttpOnly
-      security: []
-      x-ogen-operation-group: Auth
-  /auth/revoke:
-    post:
-      summary: アクセストークンを失効
-      deprecated: false
-      description: アクセストークンを失効
-      operationId: oauth_revoke
-      tags:
-        - auth
-      responses:
-        '204':
-          description: 失効できていれば204
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
-        '401':
-          description: 認証エラー
+          headers:
+            Location:
+              example: ''
+              required: true
+              description: ''
+              schema:
+                type: string
+            Set-Cookie:
+              example: ''
+              required: true
+              description: SessionID
+              schema:
+                type: string
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security: []
+      x-ogen-operation-group: Auth
+  /auth/{provider}/login:
+    get:
+      summary: ログイン
+      deprecated: false
+      description: ''
+      operationId: authorize
+      tags:
+        - auth
+      parameters:
+        - name: provider
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+        - name: redirect_url
+          in: query
+          description: ログイン後にリダイレクトするURL
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: コンテンツタイプを必ず指定しなければならないため、仮の値としてapplication/jsonを入れている
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers:
+            Location:
+              example: ''
+              required: true
+              description: IDPのログインページ
+              schema:
+                type: string
+            Set-Cookie:
+              example: ''
+              required: true
+              description: OAuth2.0 State
+              schema:
+                type: array
+                items:
+                  type: string
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security: []
+      x-ogen-operation-group: Auth
+  /auth/revoke:
+    post:
+      summary: トークンを失効（ログアウト）
+      deprecated: false
+      description: ''
+      operationId: oauth_token_revoke
+      tags:
+        - auth
+      parameters: []
+      responses:
+        '204':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers:
+            Set-Cookie:
+              example: ''
+              required: true
+              description: Cookie削除用のSet-Cookie
+              schema:
+                type: array
+                items:
+                  type: string
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
       security:
         - SessionId: []
       x-ogen-operation-group: Auth
+  /test:
+    get:
+      summary: OpenAPIテスト用
+      deprecated: false
+      description: ''
+      operationId: test
+      tags:
+        - user
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  optInt:
+                    type: integer
+                    nullable: true
+                  optNilInt:
+                    type: integer
+                  optNilBool:
+                    type: boolean
+                    nullable: true
+                  optBool:
+                    type: boolean
+                  optUrl:
+                    type: string
+                    format: uri
+                  optNilUrl:
+                    type: string
+                    format: url
+                    nullable: true
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security: []
+      x-ogen-operation-group: test
+  /test/dummy:
+    post:
+      summary: mudai
+      deprecated: false
+      description: ''
+      operationId: dummiInit
+      tags:
+        - test
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security: []
+      x-ogen-operation-group: Test
   /manage:
     get:
       operationId: manageIndex
@@ -3965,37 +3949,24 @@ paths:
       x-ogen-operation-group: Manage
 components:
   schemas:
-    actionItem:
+    talkSession:
       type: object
       properties:
-        ActionItemID:
+        id:
           type: string
-        Sequence:
-          type: integer
-        Content:
+          description: トークセッションID
+        theme:
           type: string
-        Status:
+          description: テーマ
+        description:
           type: string
-        CreatedAt:
-          type: string
-        UpdatedAt:
-          type: string
-      required:
-        - ActionItemID
-        - Sequence
-        - Content
-        - Status
-        - CreatedAt
-        - UpdatedAt
-    conclusion:
-      type: object
-      properties:
-        user:
+          description: 説明
+          nullable: true
+        owner:
           type: object
           properties:
             displayID:
               type: string
-              x-apidog-mock: '{{$string.uuid}}'
               pattern: ^[A-Za-z0-9]$
               examples:
                 - userid
@@ -4003,106 +3974,148 @@ components:
               maxLength: 25
             displayName:
               type: string
-              x-apidog-mock: '{{$person.firstName}}'
             iconURL:
               type: string
               nullable: true
           required:
             - displayID
             - displayName
-          description: 作成者
-        content:
+          description: 作成ユーザー
+        createdAt:
           type: string
-          description: 結論本文
-      required:
-        - user
-        - content
-    Report:
-      type: object
-      properties:
-        talkSessionID:
+          description: 作成日時
+        scheduledEndTime:
           type: string
-        content:
-          type: string
-          description: レポート本文
-      required:
-        - talkSessionID
-        - content
-    userGroupPosition:
-      type: object
-      properties:
-        posX:
-          type: number
-        posY:
-          type: number
-        displayId:
-          type: string
-        displayName:
-          type: string
-        iconURL:
-          type: string
-          nullable: true
-        groupName:
-          type: string
-        groupId:
-          type: integer
-        perimeterIndex:
-          type: integer
-          description: 境界ポイントのインデックス
-      required:
-        - posX
-        - posY
-        - displayId
-        - groupName
-        - displayName
-        - groupId
-    userDemographics:
-      type: object
-      properties:
-        yearOfBirth:
-          type: integer
-          description: 誕生年
-          nullable: true
-        occupation:
-          type: string
-          title: 職業
-          description: 職業
-        gender:
-          type: string
-          title: 性別
-          description: 性別
+          description: 終了予定日時
+        location:
+          description: 位置情報
+          type: object
+          properties:
+            latitude:
+              type: number
+              description: 緯度
+            longitude:
+              type: number
+              description: 経度
         city:
           type: string
-          title: 市区町村
           description: 市区町村
-          nullable: true
-        householdSize:
-          type: integer
-          minimum: 1
-          maximum: 5
-          title: 世帯人数
-          description: 世帯人数
           nullable: true
         prefecture:
           type: string
           description: 都道府県
           nullable: true
       required:
-        - occupation
-        - gender
-    offsetPagination:
+        - id
+        - theme
+        - owner
+        - createdAt
+        - scheduledEndTime
+    validationErrorItem:
       type: object
       properties:
-        totalCount:
-          type: integer
-        offset:
-          type: integer
-        limit:
-          type: integer
+        field:
+          type: string
+          faker: id
+          description: バリデーションエラーのフィールド
+        message:
+          type: string
+          description: バリデーションエラーメッセージ
       required:
-        - totalCount
-        - offset
-        - limit
+        - field
+        - message
+    error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+    user:
+      type: object
+      properties:
+        displayID:
+          type: string
+          pattern: ^[A-Za-z0-9]$
+          examples:
+            - userid
+          minLength: 3
+          maxLength: 25
+        displayName:
+          type: string
+        iconURL:
+          type: string
+          nullable: true
+      required:
+        - displayID
+        - displayName
+    opinion:
+      type: object
+      properties:
+        id:
+          type: string
+          faker: '1'
+          description: 意見ID
+        title:
+          type: string
+        content:
+          type: string
+          description: 意見のテキスト
+          minLength: 1
+          maxLength: 140
+        parentID:
+          type: string
+          description: 親の意見ID。ルートならば無し
+        voteType:
+          type: string
+          description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+          enum:
+            - agree
+            - disagree
+            - pass
+          x-apidog:
+            enumDescriptions:
+              agree: ''
+              disagree: ''
+              pass: ''
+          default: unvote
+        pictureURL:
+          type: string
+          description: 画像が返る場合もある
+        referenceURL:
+          type: string
+          description: 参考文献URL
+        postedAt:
+          type: string
+      required:
+        - content
+        - id
+        - postedAt
+    voteType:
+      type: string
+      description: 意見の3種のステータス
+      enum:
+        - agree
+        - disagree
+        - pass
+      x-apidog:
+        enumDescriptions:
+          agree: ''
+          disagree: ''
+          pass: ''
+      default: unvote
+    location:
+      type: object
+      properties:
+        latitude:
+          type: number
+          description: 緯度
+        longitude:
+          type: number
+          description: 経度
     tokenClaim:
       type: object
       properties:
@@ -4144,142 +4157,100 @@ components:
         - sub
         - jti
         - isVerify
-    location:
+    offsetPagination:
       type: object
       properties:
-        latitude:
-          type: number
-          description: 緯度
-        longitude:
-          type: number
-          description: 経度
-    voteType:
-      type: string
-      description: 意見の3種のステータス
-      enum:
-        - agree
-        - disagree
-        - pass
-      x-apidog-enum:
-        - name: ''
-          value: agree
-          description: 良さそう
-        - name: ''
-          value: disagree
-          description: 違うかも
-        - name: ''
-          value: pass
-          description: 保留
-      default: unvote
-    opinion:
-      type: object
-      properties:
-        id:
-          type: string
-          faker: '1'
-          description: 意見ID
-        title:
-          type: string
-        content:
-          type: string
-          description: 意見のテキスト
-          minLength: 1
-          maxLength: 140
-        parentID:
-          type: string
-          description: 親の意見ID。ルートならば無し
-        voteType:
-          type: string
-          description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-          enum:
-            - agree
-            - disagree
-            - pass
-          x-apidog-enum:
-            - name: ''
-              value: agree
-              description: 良さそう
-            - name: ''
-              value: disagree
-              description: 違うかも
-            - name: ''
-              value: pass
-              description: 保留
-          default: unvote
-        pictureURL:
-          type: string
-          description: 画像が返る場合もある
-        referenceURL:
-          type: string
-          description: 参考文献URL
-        postedAt:
-          type: string
+        totalCount:
+          type: integer
+        offset:
+          type: integer
+        limit:
+          type: integer
       required:
-        - content
-        - id
-        - postedAt
-    user:
+        - totalCount
+        - offset
+        - limit
+    userDemographics:
       type: object
       properties:
-        displayID:
+        yearOfBirth:
+          type: integer
+          description: 誕生年
+          nullable: true
+        occupation:
           type: string
-          x-apidog-mock: '{{$string.uuid}}'
-          pattern: ^[A-Za-z0-9]$
-          examples:
-            - userid
-          minLength: 3
-          maxLength: 25
+          title: 職業
+          description: 職業
+        gender:
+          type: string
+          title: 性別
+          description: 性別
+        city:
+          type: string
+          title: 市区町村
+          description: 市区町村
+          nullable: true
+        householdSize:
+          type: integer
+          minimum: 1
+          maximum: 5
+          title: 世帯人数
+          description: 世帯人数
+          nullable: true
+        prefecture:
+          type: string
+          description: 都道府県
+          nullable: true
+      required:
+        - occupation
+        - gender
+    userGroupPosition:
+      type: object
+      properties:
+        posX:
+          type: number
+        posY:
+          type: number
+        displayId:
+          type: string
         displayName:
           type: string
-          x-apidog-mock: '{{$person.firstName}}'
         iconURL:
           type: string
           nullable: true
+        groupName:
+          type: string
+        groupId:
+          type: integer
+        perimeterIndex:
+          type: integer
+          description: 境界ポイントのインデックス
       required:
-        - displayID
+        - posX
+        - posY
+        - displayId
+        - groupName
         - displayName
-    error:
+        - groupId
+    Report:
       type: object
       properties:
-        code:
+        talkSessionID:
           type: string
-        message:
+        content:
           type: string
+          description: レポート本文
       required:
-        - code
-        - message
-    validationErrorItem:
+        - talkSessionID
+        - content
+    conclusion:
       type: object
       properties:
-        field:
-          type: string
-          faker: id
-          description: バリデーションエラーのフィールド
-        message:
-          type: string
-          description: バリデーションエラーメッセージ
-      required:
-        - field
-        - message
-    talkSession:
-      type: object
-      properties:
-        id:
-          type: string
-          description: トークセッションID
-        theme:
-          type: string
-          description: テーマ
-        description:
-          type: string
-          description: 説明
-          nullable: true
-        owner:
+        user:
           type: object
           properties:
             displayID:
               type: string
-              x-apidog-mock: '{{$string.uuid}}'
               pattern: ^[A-Za-z0-9]$
               examples:
                 - userid
@@ -4287,44 +4258,41 @@ components:
               maxLength: 25
             displayName:
               type: string
-              x-apidog-mock: '{{$person.firstName}}'
             iconURL:
               type: string
               nullable: true
           required:
             - displayID
             - displayName
-          description: 作成者
-        createdAt:
+          description: 作成ユーザー
+        content:
           type: string
-          description: 作成日時
-        scheduledEndTime:
-          type: string
-          description: 終了予定日時
-        location:
-          description: 位置情報
-          type: object
-          properties:
-            latitude:
-              type: number
-              description: 緯度
-            longitude:
-              type: number
-              description: 経度
-        city:
-          type: string
-          description: 市区町村
-          nullable: true
-        prefecture:
-          type: string
-          description: 都道府県
-          nullable: true
+          description: 結論本文
       required:
-        - id
-        - theme
-        - owner
-        - createdAt
-        - scheduledEndTime
+        - user
+        - content
+    actionItem:
+      type: object
+      properties:
+        ActionItemID:
+          type: string
+        Sequence:
+          type: integer
+        Content:
+          type: string
+        Status:
+          type: string
+        CreatedAt:
+          type: string
+        UpdatedAt:
+          type: string
+      required:
+        - ActionItemID
+        - Sequence
+        - Content
+        - Status
+        - CreatedAt
+        - UpdatedAt
   securitySchemes:
     SessionId:
       type: apiKey

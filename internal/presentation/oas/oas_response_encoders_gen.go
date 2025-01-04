@@ -15,45 +15,87 @@ import (
 	"github.com/ogen-go/ogen/uri"
 )
 
-func encodeAuthorizeResponse(response *AuthorizeFound, w http.ResponseWriter, span trace.Span) error {
-	// Encoding response headers.
-	{
-		h := uri.NewHeaderEncoder(w.Header())
-		// Encode "Location" header.
+func encodeAuthorizeResponse(response AuthorizeRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *AuthorizeFoundHeaders:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		// Encoding response headers.
 		{
-			cfg := uri.HeaderParameterEncodingConfig{
-				Name:    "Location",
-				Explode: false,
-			}
-			if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
-				if val, ok := response.Location.Get(); ok {
-					return e.EncodeValue(conv.URLToString(val))
+			h := uri.NewHeaderEncoder(w.Header())
+			// Encode "Location" header.
+			{
+				cfg := uri.HeaderParameterEncodingConfig{
+					Name:    "Location",
+					Explode: false,
 				}
-				return nil
-			}); err != nil {
-				return errors.Wrap(err, "encode Location header")
+				if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+					return e.EncodeValue(conv.StringToString(response.Location))
+				}); err != nil {
+					return errors.Wrap(err, "encode Location header")
+				}
+			}
+			// Encode "Set-Cookie" header.
+			{
+				cfg := uri.HeaderParameterEncodingConfig{
+					Name:    "Set-Cookie",
+					Explode: false,
+				}
+				if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+					return e.EncodeArray(func(e uri.Encoder) error {
+						for i, item := range response.SetCookie {
+							if err := func() error {
+								return e.EncodeValue(conv.StringToString(item))
+							}(); err != nil {
+								return errors.Wrapf(err, "[%d]", i)
+							}
+						}
+						return nil
+					})
+				}); err != nil {
+					return errors.Wrap(err, "encode Set-Cookie header")
+				}
 			}
 		}
-		// Encode "Set-Cookie" header.
-		{
-			cfg := uri.HeaderParameterEncodingConfig{
-				Name:    "Set-Cookie",
-				Explode: false,
-			}
-			if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
-				if val, ok := response.SetCookie.Get(); ok {
-					return e.EncodeValue(conv.StringToString(val))
-				}
-				return nil
-			}); err != nil {
-				return errors.Wrap(err, "encode Set-Cookie header")
-			}
-		}
-	}
-	w.WriteHeader(302)
-	span.SetStatus(codes.Ok, http.StatusText(302))
+		w.WriteHeader(302)
+		span.SetStatus(codes.Ok, http.StatusText(302))
 
-	return nil
+		e := new(jx.Encoder)
+		response.Response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *AuthorizeBadRequest:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(400)
+		span.SetStatus(codes.Error, http.StatusText(400))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *AuthorizeInternalServerError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(500)
+		span.SetStatus(codes.Error, http.StatusText(500))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
 }
 
 func encodeCreateTalkSessionResponse(response CreateTalkSessionRes, w http.ResponseWriter, span trace.Span) error {
@@ -444,9 +486,9 @@ func encodeGetOpinionsForTalkSessionResponse(response GetOpinionsForTalkSessionR
 	}
 }
 
-func encodeViewTalkSessionDetailResponse(response ViewTalkSessionDetailRes, w http.ResponseWriter, span trace.Span) error {
+func encodeGetTalkSessionDetailResponse(response GetTalkSessionDetailRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *ViewTalkSessionDetailOK:
+	case *GetTalkSessionDetailOK:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -459,7 +501,7 @@ func encodeViewTalkSessionDetailResponse(response ViewTalkSessionDetailRes, w ht
 
 		return nil
 
-	case *ViewTalkSessionDetailBadRequest:
+	case *GetTalkSessionDetailBadRequest:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
@@ -662,53 +704,53 @@ func encodeManageRegenerateResponse(response *ManageRegenerateOK, w http.Respons
 	return nil
 }
 
-func encodeOAuthCallbackResponse(response *OAuthCallbackFound, w http.ResponseWriter, span trace.Span) error {
-	// Encoding response headers.
-	{
-		h := uri.NewHeaderEncoder(w.Header())
-		// Encode "Location" header.
-		{
-			cfg := uri.HeaderParameterEncodingConfig{
-				Name:    "Location",
-				Explode: false,
-			}
-			if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
-				if val, ok := response.Location.Get(); ok {
-					return e.EncodeValue(conv.URLToString(val))
-				}
-				return nil
-			}); err != nil {
-				return errors.Wrap(err, "encode Location header")
-			}
-		}
-		// Encode "Set-Cookie" header.
-		{
-			cfg := uri.HeaderParameterEncodingConfig{
-				Name:    "Set-Cookie",
-				Explode: false,
-			}
-			if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
-				if val, ok := response.SetCookie.Get(); ok {
-					return e.EncodeValue(conv.StringToString(val))
-				}
-				return nil
-			}); err != nil {
-				return errors.Wrap(err, "encode Set-Cookie header")
-			}
-		}
-	}
-	w.WriteHeader(302)
-	span.SetStatus(codes.Ok, http.StatusText(302))
-
-	return nil
-}
-
-func encodeOAuthRevokeResponse(response OAuthRevokeRes, w http.ResponseWriter, span trace.Span) error {
+func encodeOAuthCallbackResponse(response OAuthCallbackRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *OAuthRevokeNoContent:
+	case *OAuthCallbackFoundHeaders:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(204)
-		span.SetStatus(codes.Ok, http.StatusText(204))
+		// Encoding response headers.
+		{
+			h := uri.NewHeaderEncoder(w.Header())
+			// Encode "Location" header.
+			{
+				cfg := uri.HeaderParameterEncodingConfig{
+					Name:    "Location",
+					Explode: false,
+				}
+				if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+					return e.EncodeValue(conv.StringToString(response.Location))
+				}); err != nil {
+					return errors.Wrap(err, "encode Location header")
+				}
+			}
+			// Encode "Set-Cookie" header.
+			{
+				cfg := uri.HeaderParameterEncodingConfig{
+					Name:    "Set-Cookie",
+					Explode: false,
+				}
+				if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+					return e.EncodeValue(conv.StringToString(response.SetCookie))
+				}); err != nil {
+					return errors.Wrap(err, "encode Set-Cookie header")
+				}
+			}
+		}
+		w.WriteHeader(302)
+		span.SetStatus(codes.Ok, http.StatusText(302))
+
+		e := new(jx.Encoder)
+		response.Response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *OAuthCallbackBadRequest:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(400)
+		span.SetStatus(codes.Error, http.StatusText(400))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -718,9 +760,16 @@ func encodeOAuthRevokeResponse(response OAuthRevokeRes, w http.ResponseWriter, s
 
 		return nil
 
-	case *OAuthRevokeUnauthorized:
-		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
+	case *OAuthCallbackInternalServerError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(500)
+		span.SetStatus(codes.Error, http.StatusText(500))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
 
 		return nil
 
@@ -758,6 +807,77 @@ func encodeOAuthTokenInfoResponse(response OAuthTokenInfoRes, w http.ResponseWri
 		return nil
 
 	case *OAuthTokenInfoInternalServerError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(500)
+		span.SetStatus(codes.Error, http.StatusText(500))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
+func encodeOAuthTokenRevokeResponse(response OAuthTokenRevokeRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *OAuthTokenRevokeNoContentHeaders:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		// Encoding response headers.
+		{
+			h := uri.NewHeaderEncoder(w.Header())
+			// Encode "Set-Cookie" header.
+			{
+				cfg := uri.HeaderParameterEncodingConfig{
+					Name:    "Set-Cookie",
+					Explode: false,
+				}
+				if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+					return e.EncodeArray(func(e uri.Encoder) error {
+						for i, item := range response.SetCookie {
+							if err := func() error {
+								return e.EncodeValue(conv.StringToString(item))
+							}(); err != nil {
+								return errors.Wrapf(err, "[%d]", i)
+							}
+						}
+						return nil
+					})
+				}); err != nil {
+					return errors.Wrap(err, "encode Set-Cookie header")
+				}
+			}
+		}
+		w.WriteHeader(204)
+		span.SetStatus(codes.Ok, http.StatusText(204))
+
+		e := new(jx.Encoder)
+		response.Response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *OAuthTokenRevokeBadRequest:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(400)
+		span.SetStatus(codes.Error, http.StatusText(400))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *OAuthTokenRevokeInternalServerError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))

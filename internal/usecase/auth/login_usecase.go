@@ -3,7 +3,6 @@ package auth_usecase
 import (
 	"context"
 	"net/http"
-	"net/url"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/auth"
@@ -24,7 +23,7 @@ type (
 	}
 
 	AuthLoginOutput struct {
-		RedirectURL *url.URL
+		RedirectURL string
 		Cookies     []*http.Cookie
 	}
 
@@ -53,7 +52,7 @@ func NewAuthLoginUseCase(
 func (a *authLoginInteractor) Execute(ctx context.Context, input AuthLoginInput) (AuthLoginOutput, error) {
 	var (
 		s  string
-		au *url.URL
+		au string
 	)
 
 	if err := a.ExecTx(ctx, func(ctx context.Context) error {
@@ -69,14 +68,8 @@ func (a *authLoginInteractor) Execute(ctx context.Context, input AuthLoginInput)
 			return errtrace.Wrap(err)
 		}
 
-		url, err := url.Parse(provider.GetAuthorizationURL(ctx, state))
-		if err != nil {
-			utils.HandleError(ctx, err, "url.Parse")
-			return errtrace.Wrap(err)
-		}
-
 		s = state
-		au = url
+		au = provider.GetAuthorizationURL(ctx, state)
 		return nil
 	}); err != nil {
 		return AuthLoginOutput{}, errtrace.Wrap(err)

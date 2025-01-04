@@ -24,28 +24,28 @@ type Handler interface {
 type AuthHandler interface {
 	// Authorize implements authorize operation.
 	//
-	// 認証画面を表示する.
+	// ログイン.
 	//
 	// GET /auth/{provider}/login
-	Authorize(ctx context.Context, params AuthorizeParams) (*AuthorizeFound, error)
+	Authorize(ctx context.Context, params AuthorizeParams) (AuthorizeRes, error)
 	// OAuthCallback implements oauth_callback operation.
 	//
 	// Auth Callback.
 	//
 	// GET /auth/{provider}/callback
-	OAuthCallback(ctx context.Context, params OAuthCallbackParams) (*OAuthCallbackFound, error)
-	// OAuthRevoke implements oauth_revoke operation.
-	//
-	// アクセストークンを失効.
-	//
-	// POST /auth/revoke
-	OAuthRevoke(ctx context.Context) (OAuthRevokeRes, error)
+	OAuthCallback(ctx context.Context, params OAuthCallbackParams) (OAuthCallbackRes, error)
 	// OAuthTokenInfo implements oauth_token_info operation.
 	//
 	// JWTの内容を返してくれる.
 	//
 	// GET /auth/token/info
 	OAuthTokenInfo(ctx context.Context) (OAuthTokenInfoRes, error)
+	// OAuthTokenRevoke implements oauth_token_revoke operation.
+	//
+	// トークンを失効（ログアウト）.
+	//
+	// POST /auth/revoke
+	OAuthTokenRevoke(ctx context.Context) (OAuthTokenRevokeRes, error)
 }
 
 // ManageHandler handles operations described by OpenAPI v3 specification.
@@ -134,12 +134,12 @@ type TalkSessionHandler interface {
 	//
 	// GET /talksessions/opened
 	GetOpenedTalkSession(ctx context.Context, params GetOpenedTalkSessionParams) (GetOpenedTalkSessionRes, error)
-	// ViewTalkSessionDetail implements ViewTalkSessionDetail operation.
+	// GetTalkSessionDetail implements getTalkSessionDetail operation.
 	//
 	// トークセッションの詳細.
 	//
 	// GET /talksessions/{talkSessionId}
-	ViewTalkSessionDetail(ctx context.Context, params ViewTalkSessionDetailParams) (ViewTalkSessionDetailRes, error)
+	GetTalkSessionDetail(ctx context.Context, params GetTalkSessionDetailParams) (GetTalkSessionDetailRes, error)
 	// GetTalkSessionList implements getTalkSessionList operation.
 	//
 	// セッション一覧.

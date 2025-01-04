@@ -15,10 +15,10 @@ var _ Handler = UnimplementedHandler{}
 
 // Authorize implements authorize operation.
 //
-// 認証画面を表示する.
+// ログイン.
 //
 // GET /auth/{provider}/login
-func (UnimplementedHandler) Authorize(ctx context.Context, params AuthorizeParams) (r *AuthorizeFound, _ error) {
+func (UnimplementedHandler) Authorize(ctx context.Context, params AuthorizeParams) (r AuthorizeRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -103,12 +103,12 @@ func (UnimplementedHandler) GetOpinionsForTalkSession(ctx context.Context, param
 	return r, ht.ErrNotImplemented
 }
 
-// ViewTalkSessionDetail implements ViewTalkSessionDetail operation.
+// GetTalkSessionDetail implements getTalkSessionDetail operation.
 //
 // トークセッションの詳細.
 //
 // GET /talksessions/{talkSessionId}
-func (UnimplementedHandler) ViewTalkSessionDetail(ctx context.Context, params ViewTalkSessionDetailParams) (r ViewTalkSessionDetailRes, _ error) {
+func (UnimplementedHandler) GetTalkSessionDetail(ctx context.Context, params GetTalkSessionDetailParams) (r GetTalkSessionDetailRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -169,16 +169,7 @@ func (UnimplementedHandler) ManageRegenerate(ctx context.Context, req OptManageR
 // Auth Callback.
 //
 // GET /auth/{provider}/callback
-func (UnimplementedHandler) OAuthCallback(ctx context.Context, params OAuthCallbackParams) (r *OAuthCallbackFound, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// OAuthRevoke implements oauth_revoke operation.
-//
-// アクセストークンを失効.
-//
-// POST /auth/revoke
-func (UnimplementedHandler) OAuthRevoke(ctx context.Context) (r OAuthRevokeRes, _ error) {
+func (UnimplementedHandler) OAuthCallback(ctx context.Context, params OAuthCallbackParams) (r OAuthCallbackRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -188,6 +179,15 @@ func (UnimplementedHandler) OAuthRevoke(ctx context.Context) (r OAuthRevokeRes, 
 //
 // GET /auth/token/info
 func (UnimplementedHandler) OAuthTokenInfo(ctx context.Context) (r OAuthTokenInfoRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// OAuthTokenRevoke implements oauth_token_revoke operation.
+//
+// トークンを失効（ログアウト）.
+//
+// POST /auth/revoke
+func (UnimplementedHandler) OAuthTokenRevoke(ctx context.Context) (r OAuthTokenRevokeRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
