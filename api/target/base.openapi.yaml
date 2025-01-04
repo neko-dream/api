@@ -1,16 +1,10 @@
 openapi: 3.0.1
 info:
-  title: cats-dream
+  title: neko-dream
   description: ''
   version: 1.0.0
 paths:
   $ref: './apidog.openapi.yaml#/paths'
-  /auth/{provider}/login:
-    $ref: './paths/authorize.yaml'
-  /auth/{provider}/callback:
-    $ref: './paths/callback.yaml'
-  /auth/revoke:
-    $ref: './paths/revoke.yaml'
   /manage:
     $ref: './paths/manage/index.yaml'
   /manage/regenerate:
