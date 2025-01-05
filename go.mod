@@ -10,6 +10,7 @@ require (
 	github.com/getsentry/sentry-go v0.30.0
 	github.com/go-openapi/runtime v0.28.0
 	github.com/jackc/pgx/v5 v5.7.2
+	github.com/jinzhu/copier v0.4.0
 	github.com/joho/godotenv v1.5.1
 	github.com/stretchr/testify v1.10.0
 	go.uber.org/dig v1.18.0
