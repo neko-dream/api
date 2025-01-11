@@ -24,29 +24,29 @@ import (
 
 type opinionHandler struct {
 	postOpinionUsecase           opinion_usecase.PostOpinionUseCase
-	getSwipeOpinionsUseCase      opinion_usecase.GetSwipeOpinionsQueryHandler
 	getOpinionByTalkSessionQuery opinion_query.GetOpinionsByTalkSessionQuery
 	getOpinionDetailByIDQuery    opinion_query.GetOpinionDetailByIDQuery
 	getOpinionRepliesQuery       opinion_query.GetOpinionRepliesQuery
+	getSwipeOpinionQuery         opinion_query.GetSwipeOpinionsQuery
 
 	session.TokenManager
 }
 
 func NewOpinionHandler(
 	postOpinionUsecase opinion_usecase.PostOpinionUseCase,
-	getSwipeOpinionsUseCase opinion_usecase.GetSwipeOpinionsQueryHandler,
 	getOpinionByTalkSessionUseCase opinion_query.GetOpinionsByTalkSessionQuery,
 	getOpinionDetailUseCase opinion_query.GetOpinionDetailByIDQuery,
 	getOpinionRepliesQuery opinion_query.GetOpinionRepliesQuery,
+	getSwipeOpinionsQuery opinion_query.GetSwipeOpinionsQuery,
 
 	tokenManager session.TokenManager,
 ) oas.OpinionHandler {
 	return &opinionHandler{
 		postOpinionUsecase:           postOpinionUsecase,
-		getSwipeOpinionsUseCase:      getSwipeOpinionsUseCase,
 		getOpinionByTalkSessionQuery: getOpinionByTalkSessionUseCase,
 		getOpinionDetailByIDQuery:    getOpinionDetailUseCase,
 		getOpinionRepliesQuery:       getOpinionRepliesQuery,
+		getSwipeOpinionQuery:         getSwipeOpinionsQuery,
 
 		TokenManager: tokenManager,
 	}
@@ -185,7 +185,7 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 		limit = 10
 	}
 
-	opinions, err := o.getSwipeOpinionsUseCase.Execute(ctx, opinion_usecase.GetSwipeOpinionsQuery{
+	opinions, err := o.getSwipeOpinionQuery.Execute(ctx, opinion_query.GetSwipeOpinionsQueryInput{
 		UserID:        userID,
 		TalkSessionID: shared.MustParseUUID[talksession.TalkSession](params.TalkSessionID),
 		Limit:         limit,
@@ -197,18 +197,18 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 	var res oas.SwipeOpinionsOKApplicationJSON
 	for _, opinion := range opinions.Opinions {
 		user := &oas.SwipeOpinionsOKItemUser{
-			DisplayID:   opinion.User.ID,
-			DisplayName: opinion.User.Name,
-			IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.Icon),
+			DisplayID:   opinion.User.DisplayID,
+			DisplayName: opinion.User.DisplayName,
+			IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.IconURL),
 		}
 
 		ops := &oas.SwipeOpinionsOKItemOpinion{
-			ID:       opinion.Opinion.OpinionID,
+			ID:       opinion.Opinion.OpinionID.String(),
 			ParentID: utils.ToOpt[oas.OptString](opinion.Opinion.ParentOpinionID),
 			Title:    utils.ToOpt[oas.OptString](opinion.Opinion.Title),
 			Content:  opinion.Opinion.Content,
 			VoteType: oas.OptSwipeOpinionsOKItemOpinionVoteType{
-				Value: oas.SwipeOpinionsOKItemOpinionVoteType(opinion.Opinion.VoteType),
+				Value: oas.SwipeOpinionsOKItemOpinionVoteType(opinion.GetParentVoteType()),
 				Set:   true,
 			},
 			PictureURL:   utils.ToOpt[oas.OptString](opinion.Opinion.PictureURL),

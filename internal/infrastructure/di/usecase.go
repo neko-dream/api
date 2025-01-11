@@ -3,10 +3,10 @@ package di
 import (
 	opinion_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/opinion"
 	talksession_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/talksession"
-	"github.com/neko-dream/server/internal/usecase/command"
 
 	analysis_usecase "github.com/neko-dream/server/internal/usecase/analysis"
 	auth_usecase "github.com/neko-dream/server/internal/usecase/auth"
+	"github.com/neko-dream/server/internal/usecase/command"
 	opinion_usecase "github.com/neko-dream/server/internal/usecase/opinion"
 	timeline_usecase "github.com/neko-dream/server/internal/usecase/timeline"
 	user_usecase "github.com/neko-dream/server/internal/usecase/user"
@@ -22,7 +22,6 @@ func useCaseDeps() []ProvideArg {
 		{user_usecase.NewEditUserUseCase, nil},
 		{user_usecase.NewGetUserInformationQueryHandler, nil},
 		{opinion_usecase.NewPostOpinionUseCase, nil},
-		{opinion_usecase.NewGetSwipeOpinionsQueryHandler, nil},
 		{opinion_usecase.NewGetUserOpinionListQueryHandler, nil},
 		{analysis_usecase.NewGetAnalysisResultUseCase, nil},
 		{analysis_usecase.NewGetReportQueryHandler, nil},
@@ -40,5 +39,6 @@ func useCaseDeps() []ProvideArg {
 		{opinion_query.NewGetOpinionsByTalkSessionIDQueryHandler, nil},
 		{opinion_query.NewGetOpinionDetailByIDQueryHandler, nil},
 		{opinion_query.NewGetOpinionRepliesQueryHandler, nil},
+		{opinion_query.NewSwipeOpinionsQueryHandler, nil},
 	}
 }
