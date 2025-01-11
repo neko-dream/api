@@ -16,15 +16,13 @@
 │   └── persistence
 │       ├── db
 │       ├── postgresql
-│       ├── command
-│       │   └── repository
+│       ├── repository
 │       └── query
 ├── presentation
 │   ├── middleware
 │   └── handler
 └── usecase
     ├── command
-    │   ├── handler
     |   └── hoge_command.go
     └── query
         ├── hoge_query.go
@@ -97,9 +95,7 @@ Entity自体で表すことに違和感があるものについてはDomainServi
 ```tree
 usecase
  ├─ command
- │   ├─ handler
- |   │  └─ edit_user_profile_command.go
- │   └─ value
+ │   └─ edit_user_profile_command.go
  └─ query
      ├─ dto
      │  └─ user
