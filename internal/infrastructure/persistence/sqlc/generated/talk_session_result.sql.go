@@ -35,6 +35,17 @@ type CreateActionItemParams struct {
 	UpdatedAt     time.Time
 }
 
+// CreateActionItem
+//
+//	INSERT INTO action_items (
+//	    action_item_id,
+//	    talk_session_id,
+//	    sequence,
+//	    content,
+//	    status,
+//	    created_at,
+//	    updated_at
+//	) VALUES ($1, $2, $3, $4, $5, $6, $7)
 func (q *Queries) CreateActionItem(ctx context.Context, arg CreateActionItemParams) error {
 	_, err := q.db.ExecContext(ctx, createActionItem,
 		arg.ActionItemID,
@@ -62,6 +73,13 @@ type CreateTalkSessionConclusionParams struct {
 	CreatedBy     uuid.UUID
 }
 
+// CreateTalkSessionConclusion
+//
+//	INSERT INTO talk_session_conclusions (
+//	    talk_session_id,
+//	    content,
+//	    created_by
+//	) VALUES ($1, $2, $3)
 func (q *Queries) CreateTalkSessionConclusion(ctx context.Context, arg CreateTalkSessionConclusionParams) error {
 	_, err := q.db.ExecContext(ctx, createTalkSessionConclusion, arg.TalkSessionID, arg.Content, arg.CreatedBy)
 	return err
@@ -101,6 +119,26 @@ type GetActionItemByIDRow struct {
 	IconUrl       sql.NullString
 }
 
+// GetActionItemByID
+//
+//	SELECT
+//	    action_items.action_item_id,
+//	    action_items.talk_session_id,
+//	    action_items.sequence,
+//	    action_items.content,
+//	    action_items.status,
+//	    action_items.created_at,
+//	    action_items.updated_at,
+//	    users.display_name AS display_name,
+//	    users.display_id AS display_id,
+//	    users.icon_url AS icon_url
+//	FROM action_items
+//	LEFT JOIN talk_sessions
+//	    ON talk_sessions.talk_session_id = action_items.talk_session_id
+//	LEFT JOIN users
+//	    ON talk_sessions.owner_id = users.user_id
+//	WHERE action_item_id = $1
+//	ORDER BY action_items.sequence
 func (q *Queries) GetActionItemByID(ctx context.Context, actionItemID uuid.UUID) (GetActionItemByIDRow, error) {
 	row := q.db.QueryRowContext(ctx, getActionItemByID, actionItemID)
 	var i GetActionItemByIDRow
@@ -153,6 +191,26 @@ type GetActionItemsByTalkSessionIDRow struct {
 	IconUrl       sql.NullString
 }
 
+// GetActionItemsByTalkSessionID
+//
+//	SELECT
+//	    action_items.action_item_id,
+//	    action_items.talk_session_id,
+//	    action_items.sequence,
+//	    action_items.content,
+//	    action_items.status,
+//	    action_items.created_at,
+//	    action_items.updated_at,
+//	    users.display_name AS display_name,
+//	    users.display_id AS display,
+//	    users.icon_url AS icon_url
+//	FROM action_items
+//	LEFT JOIN talk_sessions
+//	    ON talk_sessions.talk_session_id = action_items.talk_session_id
+//	LEFT JOIN users
+//	    ON talk_sessions.owner_id = users.user_id
+//	WHERE action_items.talk_session_id = $1
+//	ORDER BY action_items.sequence
 func (q *Queries) GetActionItemsByTalkSessionID(ctx context.Context, talkSessionID uuid.UUID) ([]GetActionItemsByTalkSessionIDRow, error) {
 	rows, err := q.db.QueryContext(ctx, getActionItemsByTalkSessionID, talkSessionID)
 	if err != nil {
@@ -187,6 +245,49 @@ func (q *Queries) GetActionItemsByTalkSessionID(ctx context.Context, talkSession
 	return items, nil
 }
 
+const getConclusionByID = `-- name: GetConclusionByID :one
+SELECT
+    conclusion.talk_session_id, conclusion.content, conclusion.created_by, conclusion.created_at, conclusion.updated_at,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at
+FROM talk_session_conclusions as conclusion
+LEFT JOIN users
+    ON conclusion.created_by = users.user_id
+WHERE talk_session_id = $1
+`
+
+type GetConclusionByIDRow struct {
+	TalkSessionConclusion TalkSessionConclusion
+	User                  User
+}
+
+// GetConclusionByID
+//
+//	SELECT
+//	    conclusion.talk_session_id, conclusion.content, conclusion.created_by, conclusion.created_at, conclusion.updated_at,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at
+//	FROM talk_session_conclusions as conclusion
+//	LEFT JOIN users
+//	    ON conclusion.created_by = users.user_id
+//	WHERE talk_session_id = $1
+func (q *Queries) GetConclusionByID(ctx context.Context, talkSessionID uuid.UUID) (GetConclusionByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getConclusionByID, talkSessionID)
+	var i GetConclusionByIDRow
+	err := row.Scan(
+		&i.TalkSessionConclusion.TalkSessionID,
+		&i.TalkSessionConclusion.Content,
+		&i.TalkSessionConclusion.CreatedBy,
+		&i.TalkSessionConclusion.CreatedAt,
+		&i.TalkSessionConclusion.UpdatedAt,
+		&i.User.UserID,
+		&i.User.DisplayID,
+		&i.User.DisplayName,
+		&i.User.IconUrl,
+		&i.User.CreatedAt,
+		&i.User.UpdatedAt,
+	)
+	return i, err
+}
+
 const getTalkSessionConclusionByID = `-- name: GetTalkSessionConclusionByID :one
 SELECT
     talk_session_conclusions.talk_session_id,
@@ -216,6 +317,22 @@ type GetTalkSessionConclusionByIDRow struct {
 	IconUrl       sql.NullString
 }
 
+// GetTalkSessionConclusionByID
+//
+//	SELECT
+//	    talk_session_conclusions.talk_session_id,
+//	    talk_session_conclusions.content,
+//	    talk_session_conclusions.created_by,
+//	    talk_session_conclusions.created_at,
+//	    talk_session_conclusions.updated_at,
+//	    users.user_id AS user_id,
+//	    users.display_name AS display_name,
+//	    users.display_id AS display_id,
+//	    users.icon_url AS icon_url
+//	FROM talk_session_conclusions
+//	LEFT JOIN users
+//	    ON talk_session_conclusions.created_by = users.user_id
+//	WHERE talk_session_id = $1
 func (q *Queries) GetTalkSessionConclusionByID(ctx context.Context, talkSessionID uuid.UUID) (GetTalkSessionConclusionByIDRow, error) {
 	row := q.db.QueryRowContext(ctx, getTalkSessionConclusionByID, talkSessionID)
 	var i GetTalkSessionConclusionByIDRow
@@ -250,6 +367,15 @@ type UpdateActionItemParams struct {
 	Sequence     int32
 }
 
+// UpdateActionItem
+//
+//	UPDATE action_items
+//	SET
+//	    content = $2,
+//	    status = $3,
+//	    sequence = $4,
+//	    updated_at = CURRENT_TIMESTAMP
+//	WHERE action_item_id = $1
 func (q *Queries) UpdateActionItem(ctx context.Context, arg UpdateActionItemParams) error {
 	_, err := q.db.ExecContext(ctx, updateActionItem,
 		arg.ActionItemID,
@@ -274,6 +400,12 @@ type UpdateSequencesByActionItemIDParams struct {
 }
 
 // 指定したActionItemいよりSequenceが大きいものをすべて+1する
+//
+//	UPDATE action_items
+//	SET
+//	    sequence = sequence + 1
+//	WHERE talk_session_id = $1
+//	    AND sequence >= $2
 func (q *Queries) UpdateSequencesByActionItemID(ctx context.Context, arg UpdateSequencesByActionItemIDParams) error {
 	_, err := q.db.ExecContext(ctx, updateSequencesByActionItemID, arg.TalkSessionID, arg.Sequence)
 	return err
@@ -292,6 +424,13 @@ type UpdateTalkSessionConclusionParams struct {
 	Content       string
 }
 
+// UpdateTalkSessionConclusion
+//
+//	UPDATE talk_session_conclusions
+//	SET
+//	    content = $2,
+//	    updated_at = CURRENT_TIMESTAMP
+//	WHERE talk_session_id = $1
 func (q *Queries) UpdateTalkSessionConclusion(ctx context.Context, arg UpdateTalkSessionConclusionParams) error {
 	_, err := q.db.ExecContext(ctx, updateTalkSessionConclusion, arg.TalkSessionID, arg.Content)
 	return err

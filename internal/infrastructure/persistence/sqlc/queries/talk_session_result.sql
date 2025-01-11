@@ -28,6 +28,15 @@ LEFT JOIN users
     ON talk_session_conclusions.created_by = users.user_id
 WHERE talk_session_id = $1;
 
+-- name: GetConclusionByID :one
+SELECT
+    sqlc.embed(conclusion),
+    sqlc.embed(users)
+FROM talk_session_conclusions as conclusion
+LEFT JOIN users
+    ON conclusion.created_by = users.user_id
+WHERE talk_session_id = $1;
+
 -- name: CreateActionItem :exec
 INSERT INTO action_items (
     action_item_id,

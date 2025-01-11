@@ -7,3 +7,4 @@ sql:
           go:
               package: "model"
               out: "./internal/infrastructure/persistence/sqlc/generated"
+              emit_sql_as_comment: true

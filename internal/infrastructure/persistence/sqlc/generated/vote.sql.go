@@ -32,6 +32,16 @@ type CreateVoteParams struct {
 	CreatedAt     time.Time
 }
 
+// CreateVote
+//
+//	INSERT INTO votes (
+//	    vote_id,
+//	    opinion_id,
+//	    talk_session_id,
+//	    user_id,
+//	    vote_type,
+//	    created_at
+//	) VALUES ($1, $2, $3, $4, $5, $6)
 func (q *Queries) CreateVote(ctx context.Context, arg CreateVoteParams) error {
 	_, err := q.db.ExecContext(ctx, createVote,
 		arg.VoteID,
@@ -53,6 +63,9 @@ type FindVoteByUserIDAndOpinionIDParams struct {
 	OpinionID uuid.UUID
 }
 
+// FindVoteByUserIDAndOpinionID
+//
+//	SELECT vote_id, opinion_id, user_id, vote_type, created_at, talk_session_id FROM votes WHERE user_id = $1 AND opinion_id = $2
 func (q *Queries) FindVoteByUserIDAndOpinionID(ctx context.Context, arg FindVoteByUserIDAndOpinionIDParams) (Vote, error) {
 	row := q.db.QueryRowContext(ctx, findVoteByUserIDAndOpinionID, arg.UserID, arg.OpinionID)
 	var i Vote

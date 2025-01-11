@@ -5,13 +5,14 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"time"
 	"unicode/utf8"
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	opinion_usecase "github.com/neko-dream/server/internal/usecase/opinion"
-	talk_session_usecase "github.com/neko-dream/server/internal/usecase/talk_session"
+	talksession_query "github.com/neko-dream/server/internal/usecase/query/talksession"
 	user_usecase "github.com/neko-dream/server/internal/usecase/user"
 	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/utils"
@@ -23,7 +24,7 @@ type userHandler struct {
 	user_usecase.EditUserUseCase
 	user_usecase.GetUserInformationQueryHandler
 	opinion_usecase.GetUserOpinionListQueryHandler
-	talk_session_usecase.SearchTalkSessionsQuery
+	browseJoinedTalkSessionQuery talksession_query.BrowseJoinedTalkSessionsQuery
 }
 
 func NewUserHandler(
@@ -31,14 +32,14 @@ func NewUserHandler(
 	editUserUsecase user_usecase.EditUserUseCase,
 	getUserInformationQueryHandler user_usecase.GetUserInformationQueryHandler,
 	getUserOpinionListQueryHandler opinion_usecase.GetUserOpinionListQueryHandler,
-	getTalkSessoinHistoriesQuery talk_session_usecase.SearchTalkSessionsQuery,
+	browseJoinedTalkSessionQuery talksession_query.BrowseJoinedTalkSessionsQuery,
 ) oas.UserHandler {
 	return &userHandler{
 		RegisterUserUseCase:            registerUserUsecase,
 		EditUserUseCase:                editUserUsecase,
 		GetUserInformationQueryHandler: getUserInformationQueryHandler,
 		GetUserOpinionListQueryHandler: getUserOpinionListQueryHandler,
-		SearchTalkSessionsQuery:        getTalkSessoinHistoriesQuery,
+		browseJoinedTalkSessionQuery:   browseJoinedTalkSessionQuery,
 	}
 }
 
@@ -145,9 +146,9 @@ func (u *userHandler) SessionsHistory(ctx context.Context, params oas.SessionsHi
 		offset = &params.Offset.Value
 	}
 
-	out, err := u.SearchTalkSessionsQuery.Execute(ctx, talk_session_usecase.SearchTalkSessionsInput{
+	out, err := u.browseJoinedTalkSessionQuery.Execute(ctx, talksession_query.BrowseJoinedTalkSessionsQueryInput{
 		UserID: userID,
-		Status: status,
+		Status: talksession_query.Status(status),
 		Theme:  utils.ToPtrIfNotNullValue(!params.Theme.IsSet(), params.Theme.Value),
 		Limit:  limit,
 		Offset: offset,
@@ -161,15 +162,15 @@ func (u *userHandler) SessionsHistory(ctx context.Context, params oas.SessionsHi
 	for _, talkSession := range out.TalkSessions {
 		talkSessions = append(talkSessions, oas.SessionsHistoryOKTalkSessionsItem{
 			TalkSession: oas.SessionsHistoryOKTalkSessionsItemTalkSession{
-				ID:    talkSession.ID,
+				ID:    talkSession.TalkSessionID.String(),
 				Theme: talkSession.Theme,
 				Owner: oas.SessionsHistoryOKTalkSessionsItemTalkSessionOwner{
-					DisplayID:   talkSession.Owner.DisplayID,
-					DisplayName: talkSession.Owner.DisplayName,
-					IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.Owner.IconURL),
+					DisplayID:   talkSession.User.DisplayID,
+					DisplayName: talkSession.User.DisplayName,
+					IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.User.IconURL),
 				},
-				CreatedAt:        talkSession.CreatedAt,
-				ScheduledEndTime: talkSession.ScheduledEndTime,
+				CreatedAt:        talkSession.CreatedAt.Format(time.RFC3339),
+				ScheduledEndTime: talkSession.ScheduledEndTime.Format(time.RFC3339),
 			},
 			OpinionCount: talkSession.OpinionCount,
 		})
@@ -179,8 +180,6 @@ func (u *userHandler) SessionsHistory(ctx context.Context, params oas.SessionsHi
 		TalkSessions: talkSessions,
 		Pagination: oas.SessionsHistoryOKPagination{
 			TotalCount: out.TotalCount,
-			Limit:      out.Limit,
-			Offset:     out.Offset,
 		},
 	}, nil
 }
