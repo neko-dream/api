@@ -26,8 +26,8 @@ type opinionHandler struct {
 	postOpinionUsecase           opinion_usecase.PostOpinionUseCase
 	getOpinionRepliesUsecase     opinion_usecase.GetOpinionRepliesUseCase
 	getSwipeOpinionsUseCase      opinion_usecase.GetSwipeOpinionsQueryHandler
-	getOpinionDetailUseCase      opinion_usecase.GetOpinionDetailUseCase
 	getOpinionByTalkSessionQuery opinion_query.GetOpinionsByTalkSessionQuery
+	getOpinionDetailByIDQuery    opinion_query.GetOpinionDetailByIDQuery
 
 	session.TokenManager
 }
@@ -36,8 +36,8 @@ func NewOpinionHandler(
 	postOpinionUsecase opinion_usecase.PostOpinionUseCase,
 	getOpinionRepliesUsecase opinion_usecase.GetOpinionRepliesUseCase,
 	getSwipeOpinionsUseCase opinion_usecase.GetSwipeOpinionsQueryHandler,
-	getOpinionDetailUseCase opinion_usecase.GetOpinionDetailUseCase,
 	getOpinionByTalkSessionUseCase opinion_query.GetOpinionsByTalkSessionQuery,
+	getOpinionDetailUseCase opinion_query.GetOpinionDetailByIDQuery,
 
 	tokenManager session.TokenManager,
 ) oas.OpinionHandler {
@@ -45,8 +45,8 @@ func NewOpinionHandler(
 		postOpinionUsecase:           postOpinionUsecase,
 		getOpinionRepliesUsecase:     getOpinionRepliesUsecase,
 		getSwipeOpinionsUseCase:      getSwipeOpinionsUseCase,
-		getOpinionDetailUseCase:      getOpinionDetailUseCase,
 		getOpinionByTalkSessionQuery: getOpinionByTalkSessionUseCase,
+		getOpinionDetailByIDQuery:    getOpinionDetailUseCase,
 		TokenManager:                 tokenManager,
 	}
 }
@@ -239,7 +239,7 @@ func (o *opinionHandler) GetOpinionDetail(ctx context.Context, params oas.GetOpi
 	}
 
 	opinionID := shared.MustParseUUID[opinion.Opinion](params.OpinionID)
-	opinion, err := o.getOpinionDetailUseCase.Execute(ctx, opinion_usecase.GetOpinionDetailInput{
+	opinion, err := o.getOpinionDetailByIDQuery.Execute(ctx, opinion_query.GetOpinionDetailByIDInput{
 		OpinionID: opinionID,
 		UserID:    userID,
 	})
@@ -248,17 +248,17 @@ func (o *opinionHandler) GetOpinionDetail(ctx context.Context, params oas.GetOpi
 	}
 
 	user := &oas.GetOpinionDetailOKUser{
-		DisplayID:   opinion.Opinion.User.ID,
-		DisplayName: opinion.Opinion.User.Name,
-		IconURL:     utils.ToOptNil[oas.OptNilString](opinion.Opinion.User.Icon),
+		DisplayID:   opinion.Opinion.User.DisplayID,
+		DisplayName: opinion.Opinion.User.DisplayName,
+		IconURL:     utils.ToOptNil[oas.OptNilString](opinion.Opinion.User.IconURL),
 	}
 	op := &oas.GetOpinionDetailOKOpinion{
-		ID:       opinion.Opinion.Opinion.OpinionID,
+		ID:       opinion.Opinion.Opinion.OpinionID.String(),
 		ParentID: utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ParentOpinionID),
 		Title:    utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.Title),
 		Content:  opinion.Opinion.Opinion.Content,
 		VoteType: oas.OptGetOpinionDetailOKOpinionVoteType{
-			Value: oas.GetOpinionDetailOKOpinionVoteType(opinion.Opinion.Opinion.VoteType),
+			Value: oas.GetOpinionDetailOKOpinionVoteType(opinion.Opinion.GetParentVoteType()),
 			Set:   true,
 		},
 		PictureURL:   utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.PictureURL),

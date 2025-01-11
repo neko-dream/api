@@ -24,7 +24,6 @@ func useCaseDeps() []ProvideArg {
 		{opinion_usecase.NewPostOpinionUseCase, nil},
 		{opinion_usecase.NewGetOpinionRepliesUseCase, nil},
 		{opinion_usecase.NewGetSwipeOpinionsQueryHandler, nil},
-		{opinion_usecase.NewGetOpinionDetailUseCase, nil},
 		{opinion_usecase.NewGetUserOpinionListQueryHandler, nil},
 		{analysis_usecase.NewGetAnalysisResultUseCase, nil},
 		{analysis_usecase.NewGetReportQueryHandler, nil},
@@ -40,5 +39,6 @@ func useCaseDeps() []ProvideArg {
 		{talksession_query.NewGetTalkSessionDetailByIDQueryHandler, nil},
 		{talksession_query.NewGetConclusionByIDQueryHandler, nil},
 		{opinion_query.NewGetOpinionsByTalkSessionIDQueryHandler, nil},
+		{opinion_query.NewGetOpinionDetailByIDQueryHandler, nil},
 	}
 }
