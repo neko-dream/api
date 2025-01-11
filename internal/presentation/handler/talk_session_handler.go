@@ -14,20 +14,24 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	analysis_usecase "github.com/neko-dream/server/internal/usecase/analysis"
+	"github.com/neko-dream/server/internal/usecase/command"
+	talksession_query "github.com/neko-dream/server/internal/usecase/query/talksession"
 	talk_session_usecase "github.com/neko-dream/server/internal/usecase/talk_session"
 	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
 )
 
 type talkSessionHandler struct {
-	StartTalkSessionCommand         talk_session_usecase.StartTalkSessionCommand
-	listTalkSessionQuery            talk_session_usecase.ListTalkSessionQuery
-	ViewTalkSessionDetailQuery      talk_session_usecase.ViewTalkSessionDetailQuery
-	getAnalysisResultUseCase        analysis_usecase.GetAnalysisResultUseCase
-	getReportUseCase                analysis_usecase.GetReportQuery
-	getOwnTalkSession               talk_session_usecase.BrowseUsersTalkSessionHistoriesQuery
-	AddTalkSessionConclusionCommand talk_session_usecase.AddTalkSessionConclusionCommand
-	getTalkSessionConclusionQuery   talk_session_usecase.GetTalkSessionConclusionQuery
+	StartTalkSessionCommand    talk_session_usecase.StartTalkSessionCommand
+	listTalkSessionQuery       talk_session_usecase.ListTalkSessionQuery
+	ViewTalkSessionDetailQuery talk_session_usecase.ViewTalkSessionDetailQuery
+	getAnalysisResultUseCase   analysis_usecase.GetAnalysisResultUseCase
+	getReportUseCase           analysis_usecase.GetReportQuery
+	getOwnTalkSession          talk_session_usecase.BrowseUsersTalkSessionHistoriesQuery
+
+	AddConclusionCommand   command.AddConclusionCommand
+	GetConclusionByIDQuery talksession_query.GetConclusionByIDQuery
+
 	session.TokenManager
 }
 
@@ -38,20 +42,24 @@ func NewTalkSessionHandler(
 	getAnalysisResultUseCase analysis_usecase.GetAnalysisResultUseCase,
 	getReportUseCase analysis_usecase.GetReportQuery,
 	getOwnTalkSession talk_session_usecase.BrowseUsersTalkSessionHistoriesQuery,
-	AddTalkSessionConclusionCommand talk_session_usecase.AddTalkSessionConclusionCommand,
-	getTalkSessionConclusionQuery talk_session_usecase.GetTalkSessionConclusionQuery,
+
+	AddConclusionCommand command.AddConclusionCommand,
+	GetConclusionByIDQuery talksession_query.GetConclusionByIDQuery,
+
 	tokenManager session.TokenManager,
 ) oas.TalkSessionHandler {
 	return &talkSessionHandler{
-		StartTalkSessionCommand:         StartTalkSessionCommand,
-		listTalkSessionQuery:            listTalkSessionQuery,
-		ViewTalkSessionDetailQuery:      ViewTalkSessionDetailQuery,
-		getAnalysisResultUseCase:        getAnalysisResultUseCase,
-		getReportUseCase:                getReportUseCase,
-		getOwnTalkSession:               getOwnTalkSession,
-		AddTalkSessionConclusionCommand: AddTalkSessionConclusionCommand,
-		getTalkSessionConclusionQuery:   getTalkSessionConclusionQuery,
-		TokenManager:                    tokenManager,
+		StartTalkSessionCommand:    StartTalkSessionCommand,
+		listTalkSessionQuery:       listTalkSessionQuery,
+		ViewTalkSessionDetailQuery: ViewTalkSessionDetailQuery,
+		getAnalysisResultUseCase:   getAnalysisResultUseCase,
+		getReportUseCase:           getReportUseCase,
+		getOwnTalkSession:          getOwnTalkSession,
+
+		AddConclusionCommand:   AddConclusionCommand,
+		GetConclusionByIDQuery: GetConclusionByIDQuery,
+
+		TokenManager: tokenManager,
 	}
 }
 
@@ -73,22 +81,28 @@ func (t *talkSessionHandler) PostConclusion(ctx context.Context, req oas.OptPost
 		return nil, messages.BadRequestError
 	}
 
-	out, err := t.AddTalkSessionConclusionCommand.Execute(ctx, talk_session_usecase.CreateTalkSessionConclusionInput{
+	if err := t.AddConclusionCommand.Execute(ctx, command.AddConclusionCommandInput{
 		TalkSessionID: talkSessionID,
 		UserID:        userID,
 		Conclusion:    req.Value.Content,
+	}); err != nil {
+		return nil, errtrace.Wrap(err)
+	}
+
+	res, err := t.GetConclusionByIDQuery.Execute(ctx, talksession_query.GetConclusionByIDQueryRequest{
+		TalkSessionID: talkSessionID,
 	})
 	if err != nil {
-		return nil, errtrace.Wrap(err)
+		return nil, err
 	}
 
 	return &oas.PostConclusionOK{
 		User: oas.PostConclusionOKUser{
-			DisplayID:   out.User.DisplayID,
-			DisplayName: out.User.DisplayName,
-			IconURL:     utils.ToOptNil[oas.OptNilString](out.User.IconURL),
+			DisplayID:   res.DisplayID,
+			DisplayName: res.DisplayName,
+			IconURL:     utils.ToOptNil[oas.OptNilString](res.IconURL),
 		},
-		Content: out.Content,
+		Content: res.Content,
 	}, nil
 }
 
@@ -99,24 +113,24 @@ func (t *talkSessionHandler) GetConclusion(ctx context.Context, params oas.GetCo
 		return nil, messages.BadRequestError
 	}
 
-	out, err := t.getTalkSessionConclusionQuery.Execute(ctx, talk_session_usecase.GetTalkSessionConclusionInput{
+	res, err := t.GetConclusionByIDQuery.Execute(ctx, talksession_query.GetConclusionByIDQueryRequest{
 		TalkSessionID: talkSessionID,
 	})
 	if err != nil {
 		return nil, err
 	}
 	// まだ結論が出ていない場合はエラーを返す
-	if out == nil {
+	if res == nil {
 		return nil, messages.TalkSessionConclusionNotSet
 	}
 
 	return &oas.GetConclusionOK{
 		User: oas.GetConclusionOKUser{
-			DisplayID:   out.User.DisplayID,
-			DisplayName: out.User.DisplayName,
-			IconURL:     utils.ToOptNil[oas.OptNilString](out.User.IconURL),
+			DisplayID:   res.DisplayID,
+			DisplayName: res.DisplayName,
+			IconURL:     utils.ToOptNil[oas.OptNilString](res.IconURL),
 		},
-		Content: out.Conclusion,
+		Content: res.Content,
 	}, nil
 }
 

@@ -22,6 +22,9 @@ type CreateUserParams struct {
 	CreatedAt time.Time
 }
 
+// CreateUser
+//
+//	INSERT INTO users (user_id, created_at) VALUES ($1, $2)
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
 	_, err := q.db.ExecContext(ctx, createUser, arg.UserID, arg.CreatedAt)
 	return err
@@ -39,6 +42,9 @@ type CreateUserAuthParams struct {
 	CreatedAt  time.Time
 }
 
+// CreateUserAuth
+//
+//	INSERT INTO user_auths (user_auth_id, user_id, provider, subject, created_at, is_verified) VALUES ($1, $2, $3, $4, $5, false)
 func (q *Queries) CreateUserAuth(ctx context.Context, arg CreateUserAuthParams) error {
 	_, err := q.db.ExecContext(ctx, createUserAuth,
 		arg.UserAuthID,
@@ -59,6 +65,14 @@ WHERE
     user_id = $1
 `
 
+// GetUserAuthByUserID
+//
+//	SELECT
+//	    user_auth_id, user_id, provider, subject, is_verified, created_at
+//	FROM
+//	    "user_auths"
+//	WHERE
+//	    user_id = $1
 func (q *Queries) GetUserAuthByUserID(ctx context.Context, userID uuid.UUID) (UserAuth, error) {
 	row := q.db.QueryRowContext(ctx, getUserAuthByUserID, userID)
 	var i UserAuth
@@ -82,6 +96,14 @@ WHERE
     users.user_id = $1
 `
 
+// GetUserByID
+//
+//	SELECT
+//	    user_id, display_id, display_name, icon_url, created_at, updated_at
+//	FROM
+//	    "users"
+//	WHERE
+//	    users.user_id = $1
 func (q *Queries) GetUserByID(ctx context.Context, userID uuid.UUID) (User, error) {
 	row := q.db.QueryRowContext(ctx, getUserByID, userID)
 	var i User
@@ -124,6 +146,22 @@ type GetUserBySubjectRow struct {
 	IsVerified  bool
 }
 
+// GetUserBySubject
+//
+//	SELECT
+//	    "users".user_id,
+//	    "users".display_id,
+//	    "users".display_name,
+//	    "user_auths".provider,
+//	    "user_auths".subject,
+//	    "user_auths".created_at,
+//	    "users".icon_url,
+//	    "user_auths".is_verified
+//	FROM
+//	    "users"
+//	    JOIN "user_auths" ON "users".user_id = "user_auths".user_id
+//	WHERE
+//	    "user_auths".subject = $1
 func (q *Queries) GetUserBySubject(ctx context.Context, subject string) (GetUserBySubjectRow, error) {
 	row := q.db.QueryRowContext(ctx, getUserBySubject, subject)
 	var i GetUserBySubjectRow
@@ -149,6 +187,14 @@ WHERE
     user_id = $1
 `
 
+// GetUserDemographicsByUserID
+//
+//	SELECT
+//	    user_demographics_id, user_id, year_of_birth, occupation, gender, city, household_size, created_at, updated_at, prefecture
+//	FROM
+//	    "user_demographics"
+//	WHERE
+//	    user_id = $1
 func (q *Queries) GetUserDemographicsByUserID(ctx context.Context, userID uuid.UUID) (UserDemographic, error) {
 	row := q.db.QueryRowContext(ctx, getUserDemographicsByUserID, userID)
 	var i UserDemographic
@@ -202,6 +248,29 @@ type UpdateOrCreateUserDemographicsParams struct {
 	Prefecture         sql.NullString
 }
 
+// UpdateOrCreateUserDemographics
+//
+//	INSERT INTO user_demographics (
+//	    user_demographics_id,
+//	    user_id,
+//	    year_of_birth,
+//	    occupation,
+//	    gender,
+//	    city,
+//	    household_size,
+//	    prefecture,
+//	    created_at,
+//	    updated_at
+//	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, now(), now())
+//	ON CONFLICT (user_id)
+//	DO UPDATE SET
+//	    year_of_birth = $3,
+//	    occupation = $4,
+//	    gender = $5,
+//	    city = $6,
+//	    household_size = $7,
+//	    prefecture = $8,
+//	    updated_at = now()
 func (q *Queries) UpdateOrCreateUserDemographics(ctx context.Context, arg UpdateOrCreateUserDemographicsParams) error {
 	_, err := q.db.ExecContext(ctx, updateOrCreateUserDemographics,
 		arg.UserDemographicsID,
@@ -227,6 +296,9 @@ type UpdateUserParams struct {
 	IconUrl     sql.NullString
 }
 
+// UpdateUser
+//
+//	UPDATE "users" SET display_id = $2, display_name = $3, icon_url = $4 WHERE user_id = $1
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
 	_, err := q.db.ExecContext(ctx, updateUser,
 		arg.UserID,
@@ -246,6 +318,14 @@ WHERE
     display_id = $1
 `
 
+// UserFindByDisplayID
+//
+//	SELECT
+//	    user_id, display_id, display_name, icon_url, created_at, updated_at
+//	FROM
+//	    "users"
+//	WHERE
+//	    display_id = $1
 func (q *Queries) UserFindByDisplayID(ctx context.Context, displayID sql.NullString) (User, error) {
 	row := q.db.QueryRowContext(ctx, userFindByDisplayID, displayID)
 	var i User
@@ -264,6 +344,9 @@ const verifyUser = `-- name: VerifyUser :exec
 UPDATE "user_auths" SET is_verified = true WHERE user_id = $1
 `
 
+// VerifyUser
+//
+//	UPDATE "user_auths" SET is_verified = true WHERE user_id = $1
 func (q *Queries) VerifyUser(ctx context.Context, userID uuid.UUID) error {
 	_, err := q.db.ExecContext(ctx, verifyUser, userID)
 	return err
