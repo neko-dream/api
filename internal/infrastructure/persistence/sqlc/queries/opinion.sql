@@ -13,19 +13,9 @@ INSERT INTO opinions (
 
 -- name: GetOpinionByID :one
 SELECT
-    opinions.opinion_id,
-    opinions.talk_session_id,
-    opinions.user_id,
-    opinions.parent_opinion_id,
-    opinions.title,
-    opinions.content,
-    opinions.reference_url,
-    opinions.picture_url,
-    opinions.created_at,
-    users.display_name AS display_name,
-    users.display_id AS display_id,
-    users.icon_url AS icon_url,
-    COALESCE(pv.vote_type, 0) AS vote_type,
+    sqlc.embed(opinions),
+    sqlc.embed(users),
+    COALESCE(pv.vote_type, 0) AS parent_vote_type,
     COALESCE(cv.vote_type, 0) AS current_vote_type
 FROM opinions
 LEFT JOIN users
@@ -47,18 +37,9 @@ WHERE opinions.opinion_id = $1;
 -- name: GetOpinionReplies :many
 SELECT
     DISTINCT opinions.opinion_id,
-    opinions.talk_session_id,
-    opinions.user_id,
-    opinions.parent_opinion_id,
-    opinions.title,
-    opinions.content,
-    opinions.reference_url,
-    opinions.picture_url,
-    opinions.created_at,
-    users.display_name AS display_name,
-    users.display_id AS display_id,
-    users.icon_url AS icon_url,
-    COALESCE(pv.vote_type, 0) AS vote_type,
+    sqlc.embed(opinions),
+    sqlc.embed(users),
+    COALESCE(pv.vote_type, 0) AS parent_vote_type,
     COALESCE(cv.vote_type, 0) AS current_vote_type
 FROM opinions
 LEFT JOIN users
@@ -145,7 +126,7 @@ SELECT
     users.display_name AS display_name,
     users.display_id AS display_id,
     users.icon_url AS icon_url,
-    COALESCE(pv.vote_type, 0) AS vote_type,
+    COALESCE(pv.vote_type, 0) AS parent_vote_type,
     -- 意見に対するリプライ数（再帰）
     COALESCE(rc.reply_count, 0) AS reply_count
 FROM opinions
@@ -191,7 +172,7 @@ WITH unique_opinions AS (
 SELECT
     sqlc.embed(opinions),
     sqlc.embed(users),
-    COALESCE(pv.vote_type, 0) AS vote_type,
+    COALESCE(pv.vote_type, 0) AS parent_vote_type,
     COALESCE(rc.reply_count, 0) AS reply_count,
     COALESCE(cv.vote_type, 0) AS current_vote_type
 FROM unique_opinions opinions
@@ -251,7 +232,7 @@ SELECT
     u.display_name AS display_name,
     u.display_id AS display_id,
     u.icon_url AS icon_url,
-    COALESCE(pv.vote_type, 0) AS vote_type,
+    COALESCE(pv.vote_type, 0) AS parent_vote_type,
     COALESCE(rc.reply_count, 0) AS reply_count,
     COALESCE(cv.vote_type, 0) AS current_vote_type,
     ot.level

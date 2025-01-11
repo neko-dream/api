@@ -123,19 +123,9 @@ func (q *Queries) CreateOpinion(ctx context.Context, arg CreateOpinionParams) er
 
 const getOpinionByID = `-- name: GetOpinionByID :one
 SELECT
-    opinions.opinion_id,
-    opinions.talk_session_id,
-    opinions.user_id,
-    opinions.parent_opinion_id,
-    opinions.title,
-    opinions.content,
-    opinions.reference_url,
-    opinions.picture_url,
-    opinions.created_at,
-    users.display_name AS display_name,
-    users.display_id AS display_id,
-    users.icon_url AS icon_url,
-    COALESCE(pv.vote_type, 0) AS vote_type,
+    opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
+    COALESCE(pv.vote_type, 0) AS parent_vote_type,
     COALESCE(cv.vote_type, 0) AS current_vote_type
 FROM opinions
 LEFT JOIN users
@@ -159,19 +149,9 @@ type GetOpinionByIDParams struct {
 }
 
 type GetOpinionByIDRow struct {
-	OpinionID       uuid.UUID
-	TalkSessionID   uuid.UUID
-	UserID          uuid.UUID
-	ParentOpinionID uuid.NullUUID
-	Title           sql.NullString
-	Content         string
-	ReferenceUrl    sql.NullString
-	PictureUrl      sql.NullString
-	CreatedAt       time.Time
-	DisplayName     sql.NullString
-	DisplayID       sql.NullString
-	IconUrl         sql.NullString
-	VoteType        int16
+	Opinion         Opinion
+	User            User
+	ParentVoteType  int16
 	CurrentVoteType int16
 }
 
@@ -179,19 +159,9 @@ type GetOpinionByIDRow struct {
 // ユーザーIDが提供された場合、そのユーザーの投票ステータスを一緒に取得
 //
 //	SELECT
-//	    opinions.opinion_id,
-//	    opinions.talk_session_id,
-//	    opinions.user_id,
-//	    opinions.parent_opinion_id,
-//	    opinions.title,
-//	    opinions.content,
-//	    opinions.reference_url,
-//	    opinions.picture_url,
-//	    opinions.created_at,
-//	    users.display_name AS display_name,
-//	    users.display_id AS display_id,
-//	    users.icon_url AS icon_url,
-//	    COALESCE(pv.vote_type, 0) AS vote_type,
+//	    opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
+//	    COALESCE(pv.vote_type, 0) AS parent_vote_type,
 //	    COALESCE(cv.vote_type, 0) AS current_vote_type
 //	FROM opinions
 //	LEFT JOIN users
@@ -211,19 +181,22 @@ func (q *Queries) GetOpinionByID(ctx context.Context, arg GetOpinionByIDParams) 
 	row := q.db.QueryRowContext(ctx, getOpinionByID, arg.OpinionID, arg.UserID)
 	var i GetOpinionByIDRow
 	err := row.Scan(
-		&i.OpinionID,
-		&i.TalkSessionID,
-		&i.UserID,
-		&i.ParentOpinionID,
-		&i.Title,
-		&i.Content,
-		&i.ReferenceUrl,
-		&i.PictureUrl,
-		&i.CreatedAt,
-		&i.DisplayName,
-		&i.DisplayID,
-		&i.IconUrl,
-		&i.VoteType,
+		&i.Opinion.OpinionID,
+		&i.Opinion.TalkSessionID,
+		&i.Opinion.UserID,
+		&i.Opinion.ParentOpinionID,
+		&i.Opinion.Title,
+		&i.Opinion.Content,
+		&i.Opinion.CreatedAt,
+		&i.Opinion.PictureUrl,
+		&i.Opinion.ReferenceUrl,
+		&i.User.UserID,
+		&i.User.DisplayID,
+		&i.User.DisplayName,
+		&i.User.IconUrl,
+		&i.User.CreatedAt,
+		&i.User.UpdatedAt,
+		&i.ParentVoteType,
 		&i.CurrentVoteType,
 	)
 	return i, err
@@ -232,18 +205,9 @@ func (q *Queries) GetOpinionByID(ctx context.Context, arg GetOpinionByIDParams) 
 const getOpinionReplies = `-- name: GetOpinionReplies :many
 SELECT
     DISTINCT opinions.opinion_id,
-    opinions.talk_session_id,
-    opinions.user_id,
-    opinions.parent_opinion_id,
-    opinions.title,
-    opinions.content,
-    opinions.reference_url,
-    opinions.picture_url,
-    opinions.created_at,
-    users.display_name AS display_name,
-    users.display_id AS display_id,
-    users.icon_url AS icon_url,
-    COALESCE(pv.vote_type, 0) AS vote_type,
+    opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
+    COALESCE(pv.vote_type, 0) AS parent_vote_type,
     COALESCE(cv.vote_type, 0) AS current_vote_type
 FROM opinions
 LEFT JOIN users
@@ -271,18 +235,9 @@ type GetOpinionRepliesParams struct {
 
 type GetOpinionRepliesRow struct {
 	OpinionID       uuid.UUID
-	TalkSessionID   uuid.UUID
-	UserID          uuid.UUID
-	ParentOpinionID uuid.NullUUID
-	Title           sql.NullString
-	Content         string
-	ReferenceUrl    sql.NullString
-	PictureUrl      sql.NullString
-	CreatedAt       time.Time
-	DisplayName     sql.NullString
-	DisplayID       sql.NullString
-	IconUrl         sql.NullString
-	VoteType        int16
+	Opinion         Opinion
+	User            User
+	ParentVoteType  int16
 	CurrentVoteType int16
 }
 
@@ -291,18 +246,9 @@ type GetOpinionRepliesRow struct {
 //
 //	SELECT
 //	    DISTINCT opinions.opinion_id,
-//	    opinions.talk_session_id,
-//	    opinions.user_id,
-//	    opinions.parent_opinion_id,
-//	    opinions.title,
-//	    opinions.content,
-//	    opinions.reference_url,
-//	    opinions.picture_url,
-//	    opinions.created_at,
-//	    users.display_name AS display_name,
-//	    users.display_id AS display_id,
-//	    users.icon_url AS icon_url,
-//	    COALESCE(pv.vote_type, 0) AS vote_type,
+//	    opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
+//	    COALESCE(pv.vote_type, 0) AS parent_vote_type,
 //	    COALESCE(cv.vote_type, 0) AS current_vote_type
 //	FROM opinions
 //	LEFT JOIN users
@@ -332,18 +278,22 @@ func (q *Queries) GetOpinionReplies(ctx context.Context, arg GetOpinionRepliesPa
 		var i GetOpinionRepliesRow
 		if err := rows.Scan(
 			&i.OpinionID,
-			&i.TalkSessionID,
-			&i.UserID,
-			&i.ParentOpinionID,
-			&i.Title,
-			&i.Content,
-			&i.ReferenceUrl,
-			&i.PictureUrl,
-			&i.CreatedAt,
-			&i.DisplayName,
-			&i.DisplayID,
-			&i.IconUrl,
-			&i.VoteType,
+			&i.Opinion.OpinionID,
+			&i.Opinion.TalkSessionID,
+			&i.Opinion.UserID,
+			&i.Opinion.ParentOpinionID,
+			&i.Opinion.Title,
+			&i.Opinion.Content,
+			&i.Opinion.CreatedAt,
+			&i.Opinion.PictureUrl,
+			&i.Opinion.ReferenceUrl,
+			&i.User.UserID,
+			&i.User.DisplayID,
+			&i.User.DisplayName,
+			&i.User.IconUrl,
+			&i.User.CreatedAt,
+			&i.User.UpdatedAt,
+			&i.ParentVoteType,
 			&i.CurrentVoteType,
 		); err != nil {
 			return nil, err
@@ -377,7 +327,7 @@ WITH unique_opinions AS (
 SELECT
     opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.reference_url, opinions.picture_url, opinions.created_at,
     users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
-    COALESCE(pv.vote_type, 0) AS vote_type,
+    COALESCE(pv.vote_type, 0) AS parent_vote_type,
     COALESCE(rc.reply_count, 0) AS reply_count,
     COALESCE(cv.vote_type, 0) AS current_vote_type
 FROM unique_opinions opinions
@@ -417,7 +367,7 @@ type GetOpinionsByTalkSessionIDParams struct {
 type GetOpinionsByTalkSessionIDRow struct {
 	Opinion         Opinion
 	User            User
-	VoteType        int16
+	ParentVoteType  int16
 	ReplyCount      int64
 	CurrentVoteType int16
 }
@@ -441,7 +391,7 @@ type GetOpinionsByTalkSessionIDRow struct {
 //	SELECT
 //	    opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.reference_url, opinions.picture_url, opinions.created_at,
 //	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
-//	    COALESCE(pv.vote_type, 0) AS vote_type,
+//	    COALESCE(pv.vote_type, 0) AS parent_vote_type,
 //	    COALESCE(rc.reply_count, 0) AS reply_count,
 //	    COALESCE(cv.vote_type, 0) AS current_vote_type
 //	FROM unique_opinions opinions
@@ -499,7 +449,7 @@ func (q *Queries) GetOpinionsByTalkSessionID(ctx context.Context, arg GetOpinion
 			&i.User.IconUrl,
 			&i.User.CreatedAt,
 			&i.User.UpdatedAt,
-			&i.VoteType,
+			&i.ParentVoteType,
 			&i.ReplyCount,
 			&i.CurrentVoteType,
 		); err != nil {
@@ -530,7 +480,7 @@ SELECT
     users.display_name AS display_name,
     users.display_id AS display_id,
     users.icon_url AS icon_url,
-    COALESCE(pv.vote_type, 0) AS vote_type,
+    COALESCE(pv.vote_type, 0) AS parent_vote_type,
     -- 意見に対するリプライ数（再帰）
     COALESCE(rc.reply_count, 0) AS reply_count
 FROM opinions
@@ -576,7 +526,7 @@ type GetOpinionsByUserIDRow struct {
 	DisplayName     sql.NullString
 	DisplayID       sql.NullString
 	IconUrl         sql.NullString
-	VoteType        int16
+	ParentVoteType  int16
 	ReplyCount      int64
 }
 
@@ -595,7 +545,7 @@ type GetOpinionsByUserIDRow struct {
 //	    users.display_name AS display_name,
 //	    users.display_id AS display_id,
 //	    users.icon_url AS icon_url,
-//	    COALESCE(pv.vote_type, 0) AS vote_type,
+//	    COALESCE(pv.vote_type, 0) AS parent_vote_type,
 //	    -- 意見に対するリプライ数（再帰）
 //	    COALESCE(rc.reply_count, 0) AS reply_count
 //	FROM opinions
@@ -646,7 +596,7 @@ func (q *Queries) GetOpinionsByUserID(ctx context.Context, arg GetOpinionsByUser
 			&i.DisplayName,
 			&i.DisplayID,
 			&i.IconUrl,
-			&i.VoteType,
+			&i.ParentVoteType,
 			&i.ReplyCount,
 		); err != nil {
 			return nil, err
@@ -694,7 +644,7 @@ SELECT
     u.display_name AS display_name,
     u.display_id AS display_id,
     u.icon_url AS icon_url,
-    COALESCE(pv.vote_type, 0) AS vote_type,
+    COALESCE(pv.vote_type, 0) AS parent_vote_type,
     COALESCE(rc.reply_count, 0) AS reply_count,
     COALESCE(cv.vote_type, 0) AS current_vote_type,
     ot.level
@@ -737,7 +687,7 @@ type GetParentOpinionsRow struct {
 	DisplayName     sql.NullString
 	DisplayID       sql.NullString
 	IconUrl         sql.NullString
-	VoteType        int16
+	ParentVoteType  int16
 	ReplyCount      int64
 	CurrentVoteType int16
 	Level           int32
@@ -776,7 +726,7 @@ type GetParentOpinionsRow struct {
 //	    u.display_name AS display_name,
 //	    u.display_id AS display_id,
 //	    u.icon_url AS icon_url,
-//	    COALESCE(pv.vote_type, 0) AS vote_type,
+//	    COALESCE(pv.vote_type, 0) AS parent_vote_type,
 //	    COALESCE(rc.reply_count, 0) AS reply_count,
 //	    COALESCE(cv.vote_type, 0) AS current_vote_type,
 //	    ot.level
@@ -821,7 +771,7 @@ func (q *Queries) GetParentOpinions(ctx context.Context, arg GetParentOpinionsPa
 			&i.DisplayName,
 			&i.DisplayID,
 			&i.IconUrl,
-			&i.VoteType,
+			&i.ParentVoteType,
 			&i.ReplyCount,
 			&i.CurrentVoteType,
 			&i.Level,

@@ -27,7 +27,7 @@ type SwipeOpinion struct {
 	User            User
 	CurrentVoteType int
 	ReplyCount      int
-	VoteType        int
+	ParentVoteType  int
 }
 
 func (s *SwipeOpinion) GetMyVoteType() string {
@@ -35,5 +35,5 @@ func (s *SwipeOpinion) GetMyVoteType() string {
 }
 
 func (s *SwipeOpinion) GetParentVoteType() string {
-	return vote.VoteTypeFromInt(s.VoteType).String()
+	return vote.VoteTypeFromInt(s.ParentVoteType).String()
 }
