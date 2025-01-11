@@ -42,7 +42,6 @@ func (h *getConclusionByIDQuery) Execute(ctx context.Context, input talksession.
 	}
 
 	var result talksession.GetConclusionByIDQueryResponse
-
 	if err := copier.CopyWithOption(&result, res, copier.Option{
 		DeepCopy: true,
 	}); err != nil {
