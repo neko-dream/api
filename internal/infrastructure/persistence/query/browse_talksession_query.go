@@ -17,7 +17,7 @@ type BrowseTalkSessionQueryImpl struct {
 	*db.DBManager
 }
 
-func NewBrowseTalkSessionQuery(
+func NewBrowseTalkSessionQueryHandler(
 	tm *db.DBManager,
 ) talksession.BrowseTalkSessionQuery {
 	return &BrowseTalkSessionQueryImpl{

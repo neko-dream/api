@@ -171,17 +171,9 @@ func (q *Queries) EditTalkSession(ctx context.Context, arg EditTalkSessionParams
 
 const getOwnTalkSessionByUserID = `-- name: GetOwnTalkSessionByUserID :many
 SELECT
-    talk_sessions.talk_session_id,
-    talk_sessions.theme,
-    talk_sessions.description,
-    talk_sessions.scheduled_end_time,
-    talk_sessions.city AS city,
-    talk_sessions.prefecture AS prefecture,
-    talk_sessions.created_at,
+    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
-    users.display_name AS display_name,
-    users.display_id AS display_id,
-    users.icon_url AS icon_url,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
     talk_session_locations.talk_session_id as location_id,
     COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
     COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
@@ -223,36 +215,20 @@ type GetOwnTalkSessionByUserIDParams struct {
 }
 
 type GetOwnTalkSessionByUserIDRow struct {
-	TalkSessionID    uuid.UUID
-	Theme            string
-	Description      sql.NullString
-	ScheduledEndTime time.Time
-	City             sql.NullString
-	Prefecture       sql.NullString
-	CreatedAt        time.Time
-	OpinionCount     int64
-	DisplayName      sql.NullString
-	DisplayID        sql.NullString
-	IconUrl          sql.NullString
-	LocationID       uuid.NullUUID
-	Latitude         float64
-	Longitude        float64
+	TalkSession  TalkSession
+	OpinionCount int64
+	User         User
+	LocationID   uuid.NullUUID
+	Latitude     float64
+	Longitude    float64
 }
 
 // GetOwnTalkSessionByUserID
 //
 //	SELECT
-//	    talk_sessions.talk_session_id,
-//	    talk_sessions.theme,
-//	    talk_sessions.description,
-//	    talk_sessions.scheduled_end_time,
-//	    talk_sessions.city AS city,
-//	    talk_sessions.prefecture AS prefecture,
-//	    talk_sessions.created_at,
+//	    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
-//	    users.display_name AS display_name,
-//	    users.display_id AS display_id,
-//	    users.icon_url AS icon_url,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
 //	    talk_session_locations.talk_session_id as location_id,
 //	    COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
 //	    COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
@@ -299,17 +275,21 @@ func (q *Queries) GetOwnTalkSessionByUserID(ctx context.Context, arg GetOwnTalkS
 	for rows.Next() {
 		var i GetOwnTalkSessionByUserIDRow
 		if err := rows.Scan(
-			&i.TalkSessionID,
-			&i.Theme,
-			&i.Description,
-			&i.ScheduledEndTime,
-			&i.City,
-			&i.Prefecture,
-			&i.CreatedAt,
+			&i.TalkSession.TalkSessionID,
+			&i.TalkSession.OwnerID,
+			&i.TalkSession.Theme,
+			&i.TalkSession.ScheduledEndTime,
+			&i.TalkSession.CreatedAt,
+			&i.TalkSession.City,
+			&i.TalkSession.Prefecture,
+			&i.TalkSession.Description,
 			&i.OpinionCount,
-			&i.DisplayName,
-			&i.DisplayID,
-			&i.IconUrl,
+			&i.User.UserID,
+			&i.User.DisplayID,
+			&i.User.DisplayName,
+			&i.User.IconUrl,
+			&i.User.CreatedAt,
+			&i.User.UpdatedAt,
 			&i.LocationID,
 			&i.Latitude,
 			&i.Longitude,

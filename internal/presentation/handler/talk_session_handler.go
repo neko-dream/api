@@ -24,10 +24,10 @@ import (
 type talkSessionHandler struct {
 	StartTalkSessionCommand    talk_session_usecase.StartTalkSessionCommand
 	browseTalkSessionsQuery    talksession_query.BrowseTalkSessionQuery
+	browseOpenedByUserQuery    talksession_query.BrowseOpenedByUserQuery
 	ViewTalkSessionDetailQuery talk_session_usecase.ViewTalkSessionDetailQuery
 	getAnalysisResultUseCase   analysis_usecase.GetAnalysisResultUseCase
 	getReportUseCase           analysis_usecase.GetReportQuery
-	getOwnTalkSession          talk_session_usecase.BrowseUsersTalkSessionHistoriesQuery
 
 	AddConclusionCommand   command.AddConclusionCommand
 	GetConclusionByIDQuery talksession_query.GetConclusionByIDQuery
@@ -38,10 +38,10 @@ type talkSessionHandler struct {
 func NewTalkSessionHandler(
 	StartTalkSessionCommand talk_session_usecase.StartTalkSessionCommand,
 	browseTalkSessionsQuery talksession_query.BrowseTalkSessionQuery,
+	browseOpenedByUserQuery talksession_query.BrowseOpenedByUserQuery,
 	ViewTalkSessionDetailQuery talk_session_usecase.ViewTalkSessionDetailQuery,
 	getAnalysisResultUseCase analysis_usecase.GetAnalysisResultUseCase,
 	getReportUseCase analysis_usecase.GetReportQuery,
-	getOwnTalkSession talk_session_usecase.BrowseUsersTalkSessionHistoriesQuery,
 
 	AddConclusionCommand command.AddConclusionCommand,
 	GetConclusionByIDQuery talksession_query.GetConclusionByIDQuery,
@@ -51,10 +51,10 @@ func NewTalkSessionHandler(
 	return &talkSessionHandler{
 		StartTalkSessionCommand:    StartTalkSessionCommand,
 		browseTalkSessionsQuery:    browseTalkSessionsQuery,
+		browseOpenedByUserQuery:    browseOpenedByUserQuery,
 		ViewTalkSessionDetailQuery: ViewTalkSessionDetailQuery,
 		getAnalysisResultUseCase:   getAnalysisResultUseCase,
 		getReportUseCase:           getReportUseCase,
-		getOwnTalkSession:          getOwnTalkSession,
 
 		AddConclusionCommand:   AddConclusionCommand,
 		GetConclusionByIDQuery: GetConclusionByIDQuery,
@@ -162,11 +162,11 @@ func (t *talkSessionHandler) GetOpenedTalkSession(ctx context.Context, params oa
 			status = string(bytes)
 		}
 	}
-	out, err := t.getOwnTalkSession.Execute(ctx, talk_session_usecase.BrowseUsersTalkSessionHistoriesInput{
+	out, err := t.browseOpenedByUserQuery.Execute(ctx, talksession_query.BrowseOpenedByUserInput{
 		UserID: userID,
 		Limit:  limit,
 		Offset: offset,
-		Status: status,
+		Status: talksession_query.Status(status),
 	})
 	if err != nil {
 		return nil, err
@@ -175,16 +175,16 @@ func (t *talkSessionHandler) GetOpenedTalkSession(ctx context.Context, params oa
 	resultTalkSession := make([]oas.GetOpenedTalkSessionOKTalkSessionsItem, 0, len(out.TalkSessions))
 	for _, talkSession := range out.TalkSessions {
 		owner := oas.GetOpenedTalkSessionOKTalkSessionsItemTalkSessionOwner{
-			DisplayID:   talkSession.Owner.DisplayID,
-			DisplayName: talkSession.Owner.DisplayName,
-			IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.Owner.IconURL),
+			DisplayID:   talkSession.User.DisplayID,
+			DisplayName: talkSession.User.DisplayName,
+			IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.User.IconURL),
 		}
 		var location oas.OptGetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation
-		if talkSession.Location != nil {
+		if talkSession.Latitude != nil {
 			location = oas.OptGetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation{
 				Value: oas.GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation{
-					Latitude:  utils.ToOpt[oas.OptFloat64](talkSession.Location.Latitude),
-					Longitude: utils.ToOpt[oas.OptFloat64](talkSession.Location.Longitude),
+					Latitude:  utils.ToOpt[oas.OptFloat64](talkSession.Latitude),
+					Longitude: utils.ToOpt[oas.OptFloat64](talkSession.Longitude),
 				},
 				Set: true,
 			}
@@ -195,12 +195,12 @@ func (t *talkSessionHandler) GetOpenedTalkSession(ctx context.Context, params oa
 
 		resultTalkSession = append(resultTalkSession, oas.GetOpenedTalkSessionOKTalkSessionsItem{
 			TalkSession: oas.GetOpenedTalkSessionOKTalkSessionsItemTalkSession{
-				ID:               talkSession.ID,
+				ID:               talkSession.TalkSessionID.String(),
 				Theme:            talkSession.Theme,
 				Owner:            owner,
 				Location:         location,
-				CreatedAt:        talkSession.CreatedAt,
-				ScheduledEndTime: talkSession.ScheduledEndTime,
+				CreatedAt:        talkSession.CreatedAt.Format(time.RFC3339),
+				ScheduledEndTime: talkSession.ScheduledEndTime.Format(time.RFC3339),
 				City:             utils.ToOptNil[oas.OptNilString](talkSession.City),
 				Prefecture:       utils.ToOptNil[oas.OptNilString](talkSession.Prefecture),
 			},
