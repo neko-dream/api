@@ -26,3 +26,8 @@ type TalkSessionWithDetail struct {
 	Latitude     *float64
 	Longitude    *float64
 }
+
+// Latitude, Longitudeはnull, または0の場合はfalseを返す
+func (t *TalkSessionWithDetail) HasLocation() bool {
+	return t.Latitude != nil && t.Longitude != nil && *t.Latitude != 0 && *t.Longitude != 0
+}

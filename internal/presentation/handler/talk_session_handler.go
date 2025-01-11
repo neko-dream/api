@@ -179,7 +179,7 @@ func (t *talkSessionHandler) GetOpenedTalkSession(ctx context.Context, params oa
 			IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.User.IconURL),
 		}
 		var location oas.OptGetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation
-		if talkSession.Latitude != nil {
+		if talkSession.HasLocation() {
 			location = oas.OptGetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation{
 				Value: oas.GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation{
 					Latitude:  utils.ToOpt[oas.OptFloat64](talkSession.Latitude),
@@ -260,7 +260,7 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 	}
 
 	var location oas.OptCreateTalkSessionOKLocation
-	if out.Latitude != nil {
+	if out.HasLocation() {
 		location = oas.OptCreateTalkSessionOKLocation{
 			Value: oas.CreateTalkSessionOKLocation{
 				Latitude:  utils.ToOpt[oas.OptFloat64](out.Latitude),
@@ -301,7 +301,7 @@ func (t *talkSessionHandler) GetTalkSessionDetail(ctx context.Context, params oa
 		IconURL:     utils.ToOptNil[oas.OptNilString](out.User.IconURL),
 	}
 	var location oas.OptGetTalkSessionDetailOKLocation
-	if out.Latitude != nil {
+	if out.HasLocation() {
 		location = oas.OptGetTalkSessionDetailOKLocation{
 			Value: oas.GetTalkSessionDetailOKLocation{
 				Latitude:  utils.ToOpt[oas.OptFloat64](out.Latitude),
@@ -342,11 +342,11 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 			status = string(bytes)
 		}
 	}
-	var sortKey *string
+	var sortKey *talksession_query.SortKey
 	if params.SortKey.IsSet() {
 		bytes, err := params.SortKey.Value.MarshalText()
 		if err == nil {
-			sortKey = lo.ToPtr(string(bytes))
+			sortKey = lo.ToPtr(talksession_query.SortKey(string(bytes)))
 		}
 	}
 	var latitude, longitude *float64
@@ -363,7 +363,7 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 		Offset:    offset,
 		Theme:     theme,
 		Status:    status,
-		SortKey:   lo.ToPtr(talksession_query.SortKey(*sortKey)),
+		SortKey:   sortKey,
 		Latitude:  latitude,
 		Longitude: longitude,
 	})
@@ -379,7 +379,7 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 			IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.User.IconURL),
 		}
 		var location oas.OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation
-		if talkSession.Latitude != nil {
+		if talkSession.HasLocation() {
 			location = oas.OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation{
 				Value: oas.GetTalkSessionListOKTalkSessionsItemTalkSessionLocation{
 					Latitude:  utils.ToOpt[oas.OptFloat64](talkSession.Latitude),
