@@ -35,5 +35,15 @@ func (h *BrowseOpenedByUserInput) Validate() error {
 		return messages.TalkSessionValidationFailed
 	}
 
+	// limitがnilの場合は10にする
+	if h.Limit == 0 {
+		h.Limit = 10
+	}
+
+	// limitは最大100
+	if h.Limit > 100 {
+		h.Limit = 100
+	}
+
 	return nil
 }
