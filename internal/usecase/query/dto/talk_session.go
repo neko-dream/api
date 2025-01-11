@@ -1,11 +1,11 @@
 package dto
 
 import (
-	"os/user"
 	"time"
 
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
+	"github.com/neko-dream/server/internal/domain/model/user"
 )
 
 type TalkSession struct {
@@ -21,8 +21,8 @@ type TalkSession struct {
 
 type TalkSessionWithDetail struct {
 	TalkSession
-	OpinionCount int
 	User         User
+	OpinionCount int
 	Latitude     *float64
 	Longitude    *float64
 }

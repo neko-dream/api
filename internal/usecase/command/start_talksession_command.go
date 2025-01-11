@@ -1,4 +1,4 @@
-package talk_session_usecase
+package command
 
 import (
 	"context"
@@ -12,15 +12,16 @@ import (
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
+	"github.com/neko-dream/server/internal/usecase/query/dto"
 	"github.com/neko-dream/server/pkg/utils"
 )
 
 type (
 	StartTalkSessionCommand interface {
-		Execute(context.Context, CreateTalkSessionInput) (CreateTalkSessionOutput, error)
+		Execute(context.Context, StartTalkSessionCommandInput) (StartTalkSessionCommandOutput, error)
 	}
 
-	CreateTalkSessionInput struct {
+	StartTalkSessionCommandInput struct {
 		OwnerID          shared.UUID[user.User]
 		Theme            string
 		Description      *string
@@ -31,29 +32,47 @@ type (
 		Prefecture       *string
 	}
 
-	CreateTalkSessionOutput struct {
-		TalkSession talksession.TalkSession
-		OwnerUser   *user.User
-		Location    *talksession.Location
+	StartTalkSessionCommandOutput struct {
+		dto.TalkSessionWithDetail
 	}
 
-	createTalkSessionInteractor struct {
+	startTalkSessionCommandHandler struct {
 		talksession.TalkSessionRepository
 		user.UserRepository
 		*db.DBManager
 	}
 )
 
-func (i *createTalkSessionInteractor) Execute(ctx context.Context, input CreateTalkSessionInput) (CreateTalkSessionOutput, error) {
-	var output CreateTalkSessionOutput
-
+func (in *StartTalkSessionCommandInput) Validate() error {
 	// Themeは20文字
-	if utf8.RuneCountInString(input.Theme) > 20 {
-		return output, messages.TalkSessionThemeTooLong
+	if utf8.RuneCountInString(in.Theme) > 20 {
+		return messages.TalkSessionThemeTooLong
 	}
 	// Descriptionは400文字
-	if input.Description != nil && utf8.RuneCountInString(*input.Description) > 400 {
-		return output, messages.TalkSessionDescriptionTooLong
+	if in.Description != nil && utf8.RuneCountInString(*in.Description) > 400 {
+		return messages.TalkSessionDescriptionTooLong
+	}
+
+	return nil
+}
+
+func NewStartTalkSessionCommand(
+	talkSessionRepository talksession.TalkSessionRepository,
+	userRepository user.UserRepository,
+	DBManager *db.DBManager,
+) StartTalkSessionCommand {
+	return &startTalkSessionCommandHandler{
+		TalkSessionRepository: talkSessionRepository,
+		UserRepository:        userRepository,
+		DBManager:             DBManager,
+	}
+}
+
+func (i *startTalkSessionCommandHandler) Execute(ctx context.Context, input StartTalkSessionCommandInput) (StartTalkSessionCommandOutput, error) {
+	var output StartTalkSessionCommandOutput
+
+	if err := input.Validate(); err != nil {
+		return output, errtrace.Wrap(err)
 	}
 
 	if err := i.ExecTx(ctx, func(ctx context.Context) error {
@@ -86,7 +105,18 @@ func (i *createTalkSessionInteractor) Execute(ctx context.Context, input CreateT
 			return messages.TalkSessionCreateFailed
 		}
 
-		output.TalkSession = *talkSession
+		output.TalkSession = dto.TalkSession{
+			TalkSessionID:    talkSessionID,
+			Theme:            input.Theme,
+			ScheduledEndTime: input.ScheduledEndTime,
+			OwnerID:          talkSession.OwnerUserID(),
+			CreatedAt:        talkSession.CreatedAt(),
+			Description:      input.Description,
+			City:             input.City,
+			Prefecture:       input.Prefecture,
+		}
+		output.Latitude = input.Latitude
+		output.Longitude = input.Longitude
 
 		// オーナーのユーザー情報を取得
 		ownerUser, err := i.UserRepository.FindByID(ctx, input.OwnerID)
@@ -94,7 +124,11 @@ func (i *createTalkSessionInteractor) Execute(ctx context.Context, input CreateT
 			utils.HandleError(ctx, err, "UserRepository.FindByID")
 			return messages.ForbiddenError
 		}
-		output.OwnerUser = ownerUser
+		output.User = dto.User{
+			DisplayID:   *ownerUser.DisplayID(),
+			DisplayName: *ownerUser.DisplayName(),
+			IconURL:     ownerUser.ProfileIconURL(),
+		}
 
 		return nil
 	}); err != nil {
@@ -102,16 +136,4 @@ func (i *createTalkSessionInteractor) Execute(ctx context.Context, input CreateT
 	}
 
 	return output, nil
-}
-
-func NewStartTalkSessionCommand(
-	talkSessionRepository talksession.TalkSessionRepository,
-	userRepository user.UserRepository,
-	DBManager *db.DBManager,
-) StartTalkSessionCommand {
-	return &createTalkSessionInteractor{
-		TalkSessionRepository: talkSessionRepository,
-		UserRepository:        userRepository,
-		DBManager:             DBManager,
-	}
 }

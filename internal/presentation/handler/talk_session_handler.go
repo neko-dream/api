@@ -22,7 +22,6 @@ import (
 )
 
 type talkSessionHandler struct {
-	StartTalkSessionCommand    talk_session_usecase.StartTalkSessionCommand
 	browseTalkSessionsQuery    talksession_query.BrowseTalkSessionQuery
 	browseOpenedByUserQuery    talksession_query.BrowseOpenedByUserQuery
 	getConclusionByIDQuery     talksession_query.GetConclusionByIDQuery
@@ -30,34 +29,35 @@ type talkSessionHandler struct {
 	getAnalysisResultUseCase   analysis_usecase.GetAnalysisResultUseCase
 	getReportUseCase           analysis_usecase.GetReportQuery
 
-	AddConclusionCommand command.AddConclusionCommand
+	addConclusionCommand    command.AddConclusionCommand
+	startTalkSessionCommand command.StartTalkSessionCommand
 
 	session.TokenManager
 }
 
 func NewTalkSessionHandler(
-	StartTalkSessionCommand talk_session_usecase.StartTalkSessionCommand,
 	browseTalkSessionsQuery talksession_query.BrowseTalkSessionQuery,
 	browseOpenedByUserQuery talksession_query.BrowseOpenedByUserQuery,
+	getConclusionByIDQuery talksession_query.GetConclusionByIDQuery,
 	ViewTalkSessionDetailQuery talk_session_usecase.ViewTalkSessionDetailQuery,
 	getAnalysisResultUseCase analysis_usecase.GetAnalysisResultUseCase,
 	getReportUseCase analysis_usecase.GetReportQuery,
 
 	AddConclusionCommand command.AddConclusionCommand,
-	getConclusionByIDQuery talksession_query.GetConclusionByIDQuery,
+	startTalkSessionCommand command.StartTalkSessionCommand,
 
 	tokenManager session.TokenManager,
 ) oas.TalkSessionHandler {
 	return &talkSessionHandler{
-		StartTalkSessionCommand:    StartTalkSessionCommand,
 		browseTalkSessionsQuery:    browseTalkSessionsQuery,
 		browseOpenedByUserQuery:    browseOpenedByUserQuery,
+		getConclusionByIDQuery:     getConclusionByIDQuery,
 		ViewTalkSessionDetailQuery: ViewTalkSessionDetailQuery,
 		getAnalysisResultUseCase:   getAnalysisResultUseCase,
 		getReportUseCase:           getReportUseCase,
 
-		AddConclusionCommand:   AddConclusionCommand,
-		getConclusionByIDQuery: getConclusionByIDQuery,
+		addConclusionCommand:    AddConclusionCommand,
+		startTalkSessionCommand: startTalkSessionCommand,
 
 		TokenManager: tokenManager,
 	}
@@ -81,7 +81,7 @@ func (t *talkSessionHandler) PostConclusion(ctx context.Context, req oas.OptPost
 		return nil, messages.BadRequestError
 	}
 
-	if err := t.AddConclusionCommand.Execute(ctx, command.AddConclusionCommandInput{
+	if err := t.addConclusionCommand.Execute(ctx, command.AddConclusionCommandInput{
 		TalkSessionID: talkSessionID,
 		UserID:        userID,
 		Conclusion:    req.Value.Content,
@@ -246,7 +246,7 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 	prefecture := utils.ToPtrIfNotNullValue(!req.Value.Prefecture.IsSet(), req.Value.Prefecture.Value)
 	description := utils.ToPtrIfNotNullValue(!req.Value.Description.IsSet(), req.Value.Description.Value)
 
-	out, err := t.StartTalkSessionCommand.Execute(ctx, talk_session_usecase.CreateTalkSessionInput{
+	out, err := t.startTalkSessionCommand.Execute(ctx, command.StartTalkSessionCommandInput{
 		Theme:            req.Value.Theme,
 		Description:      description,
 		OwnerID:          userID,
@@ -261,11 +261,11 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 	}
 
 	var location oas.OptCreateTalkSessionOKLocation
-	if out.Location != nil {
+	if out.Latitude != nil {
 		location = oas.OptCreateTalkSessionOKLocation{
 			Value: oas.CreateTalkSessionOKLocation{
-				Latitude:  utils.ToOpt[oas.OptFloat64](out.Location.Latitude),
-				Longitude: utils.ToOpt[oas.OptFloat64](out.Location.Longitude),
+				Latitude:  utils.ToOpt[oas.OptFloat64](out.Latitude),
+				Longitude: utils.ToOpt[oas.OptFloat64](out.Longitude),
 			},
 			Set: true,
 		}
@@ -273,19 +273,15 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 
 	res := &oas.CreateTalkSessionOK{
 		Owner: oas.CreateTalkSessionOKOwner{
-			DisplayID:   *out.OwnerUser.DisplayID(),
-			DisplayName: *out.OwnerUser.DisplayName(),
-			IconURL: utils.IfThenElse(
-				out.OwnerUser.ProfileIconURL() != nil,
-				oas.OptNilString{Value: *out.OwnerUser.ProfileIconURL()},
-				oas.OptNilString{},
-			),
+			DisplayID:   out.User.DisplayID,
+			DisplayName: out.User.DisplayName,
+			IconURL:     utils.ToOptNil[oas.OptNilString](out.User.IconURL),
 		},
-		Theme:            out.TalkSession.Theme(),
-		Description:      utils.ToOptNil[oas.OptNilString](out.TalkSession.Description()),
-		ID:               out.TalkSession.TalkSessionID().String(),
+		Theme:            out.TalkSession.Theme,
+		Description:      utils.ToOptNil[oas.OptNilString](out.TalkSession.Description),
+		ID:               out.TalkSession.TalkSessionID.String(),
 		CreatedAt:        clock.Now(ctx).Format(time.RFC3339),
-		ScheduledEndTime: out.TalkSession.ScheduledEndTime().Format(time.RFC3339),
+		ScheduledEndTime: out.TalkSession.ScheduledEndTime.Format(time.RFC3339),
 		Location:         location,
 	}
 	return res, nil
