@@ -24,7 +24,6 @@ func useCaseDeps() []ProvideArg {
 		{talk_session_usecase.NewStartTalkSessionCommand, nil},
 		{talk_session_usecase.NewViewTalkSessionDetailQuery, nil},
 		{talk_session_usecase.NewSearchTalkSessionsQuery, nil},
-		{talk_session_usecase.NewBrowseUsersTalkSessionHistoriesQueryHandler, nil},
 		{opinion_usecase.NewPostOpinionUseCase, nil},
 		{opinion_usecase.NewGetOpinionRepliesUseCase, nil},
 		{opinion_usecase.NewGetSwipeOpinionsQueryHandler, nil},
@@ -40,5 +39,6 @@ func useCaseDeps() []ProvideArg {
 		{command.NewAddConclusionCommandHandler, nil},
 		{queryimpl.NewBrowseTalkSessionQueryHandler, nil},
 		{queryimpl.NewBrowseOpenedByUserQueryHandler, nil},
+		{queryimpl.NewBrowseJoinedTalkSessionQueryHandler, nil},
 	}
 }

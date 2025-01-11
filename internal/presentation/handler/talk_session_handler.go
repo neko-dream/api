@@ -25,12 +25,12 @@ type talkSessionHandler struct {
 	StartTalkSessionCommand    talk_session_usecase.StartTalkSessionCommand
 	browseTalkSessionsQuery    talksession_query.BrowseTalkSessionQuery
 	browseOpenedByUserQuery    talksession_query.BrowseOpenedByUserQuery
+	getConclusionByIDQuery     talksession_query.GetConclusionByIDQuery
 	ViewTalkSessionDetailQuery talk_session_usecase.ViewTalkSessionDetailQuery
 	getAnalysisResultUseCase   analysis_usecase.GetAnalysisResultUseCase
 	getReportUseCase           analysis_usecase.GetReportQuery
 
-	AddConclusionCommand   command.AddConclusionCommand
-	GetConclusionByIDQuery talksession_query.GetConclusionByIDQuery
+	AddConclusionCommand command.AddConclusionCommand
 
 	session.TokenManager
 }
@@ -44,7 +44,7 @@ func NewTalkSessionHandler(
 	getReportUseCase analysis_usecase.GetReportQuery,
 
 	AddConclusionCommand command.AddConclusionCommand,
-	GetConclusionByIDQuery talksession_query.GetConclusionByIDQuery,
+	getConclusionByIDQuery talksession_query.GetConclusionByIDQuery,
 
 	tokenManager session.TokenManager,
 ) oas.TalkSessionHandler {
@@ -57,7 +57,7 @@ func NewTalkSessionHandler(
 		getReportUseCase:           getReportUseCase,
 
 		AddConclusionCommand:   AddConclusionCommand,
-		GetConclusionByIDQuery: GetConclusionByIDQuery,
+		getConclusionByIDQuery: getConclusionByIDQuery,
 
 		TokenManager: tokenManager,
 	}
@@ -89,7 +89,7 @@ func (t *talkSessionHandler) PostConclusion(ctx context.Context, req oas.OptPost
 		return nil, errtrace.Wrap(err)
 	}
 
-	res, err := t.GetConclusionByIDQuery.Execute(ctx, talksession_query.GetConclusionByIDQueryRequest{
+	res, err := t.getConclusionByIDQuery.Execute(ctx, talksession_query.GetConclusionByIDQueryRequest{
 		TalkSessionID: talkSessionID,
 	})
 	if err != nil {
@@ -113,7 +113,7 @@ func (t *talkSessionHandler) GetConclusion(ctx context.Context, params oas.GetCo
 		return nil, messages.BadRequestError
 	}
 
-	res, err := t.GetConclusionByIDQuery.Execute(ctx, talksession_query.GetConclusionByIDQueryRequest{
+	res, err := t.getConclusionByIDQuery.Execute(ctx, talksession_query.GetConclusionByIDQueryRequest{
 		TalkSessionID: talkSessionID,
 	})
 	if err != nil {

@@ -25,6 +25,11 @@ func NewBrowseOpenedByUserQueryHandler(tm *db.DBManager) talksession.BrowseOpene
 
 // Execute ユーザーが開いているトークセッションを検索する
 func (h *BrowseOpenedByUserQueryImpl) Execute(ctx context.Context, input talksession.BrowseOpenedByUserInput) (*talksession.BrowseOpenedByUserOutput, error) {
+
+	if err := input.Validate(); err != nil {
+		return nil, err
+	}
+
 	var out talksession.BrowseOpenedByUserOutput
 
 	status := sql.NullString{String: string(input.Status), Valid: input.Status != ""}

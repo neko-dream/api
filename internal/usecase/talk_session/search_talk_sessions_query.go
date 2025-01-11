@@ -29,8 +29,8 @@ type (
 	SearchTalkSessionsOutput struct {
 		TalkSessions []TalkSessionDTO
 		TotalCount   int
-		Limit        int
-		Offset       int
+		Limit        *int
+		Offset       *int
 	}
 
 	SearchTalkSessionsQueryHandler struct {
