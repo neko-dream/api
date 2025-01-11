@@ -1,4 +1,4 @@
-package queryimpl
+package talksession_query
 
 import (
 	"context"

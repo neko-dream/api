@@ -1,7 +1,8 @@
 package di
 
 import (
-	queryimpl "github.com/neko-dream/server/internal/infrastructure/persistence/query"
+	opinion_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/opinion"
+	talksession_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/talksession"
 	"github.com/neko-dream/server/internal/usecase/command"
 
 	analysis_usecase "github.com/neko-dream/server/internal/usecase/analysis"
@@ -25,7 +26,6 @@ func useCaseDeps() []ProvideArg {
 		{opinion_usecase.NewGetSwipeOpinionsQueryHandler, nil},
 		{opinion_usecase.NewGetOpinionDetailUseCase, nil},
 		{opinion_usecase.NewGetUserOpinionListQueryHandler, nil},
-		{opinion_usecase.NewGetOpinionsByTalkSessionUseCase, nil},
 		{analysis_usecase.NewGetAnalysisResultUseCase, nil},
 		{analysis_usecase.NewGetReportQueryHandler, nil},
 		{timeline_usecase.NewAddTimeLineUseCase, nil},
@@ -34,9 +34,11 @@ func useCaseDeps() []ProvideArg {
 		{vote_usecase.NewPostVoteUseCase, nil},
 		{command.NewAddConclusionCommandHandler, nil},
 		{command.NewStartTalkSessionCommand, nil},
-		{queryimpl.NewBrowseTalkSessionQueryHandler, nil},
-		{queryimpl.NewBrowseOpenedByUserQueryHandler, nil},
-		{queryimpl.NewBrowseJoinedTalkSessionQueryHandler, nil},
-		{queryimpl.NewGetTalkSessionDetailByIDQueryHandler, nil},
+		{talksession_query.NewBrowseTalkSessionQueryHandler, nil},
+		{talksession_query.NewBrowseOpenedByUserQueryHandler, nil},
+		{talksession_query.NewBrowseJoinedTalkSessionQueryHandler, nil},
+		{talksession_query.NewGetTalkSessionDetailByIDQueryHandler, nil},
+		{talksession_query.NewGetConclusionByIDQueryHandler, nil},
+		{opinion_query.NewGetOpinionsByTalkSessionIDQueryHandler, nil},
 	}
 }

@@ -15,18 +15,40 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	opinion_usecase "github.com/neko-dream/server/internal/usecase/opinion"
+	opinion_query "github.com/neko-dream/server/internal/usecase/query/opinion"
 	http_utils "github.com/neko-dream/server/pkg/http"
+	"github.com/neko-dream/server/pkg/sort"
 	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
 )
 
 type opinionHandler struct {
-	postOpinionUsecase             opinion_usecase.PostOpinionUseCase
-	getOpinionRepliesUsecase       opinion_usecase.GetOpinionRepliesUseCase
-	getSwipeOpinionsUseCase        opinion_usecase.GetSwipeOpinionsQueryHandler
-	getOpinionDetailUseCase        opinion_usecase.GetOpinionDetailUseCase
-	getOpinionByTalkSessionUseCase opinion_usecase.GetOpinionsByTalkSessionUseCase
+	postOpinionUsecase           opinion_usecase.PostOpinionUseCase
+	getOpinionRepliesUsecase     opinion_usecase.GetOpinionRepliesUseCase
+	getSwipeOpinionsUseCase      opinion_usecase.GetSwipeOpinionsQueryHandler
+	getOpinionDetailUseCase      opinion_usecase.GetOpinionDetailUseCase
+	getOpinionByTalkSessionQuery opinion_query.GetOpinionsByTalkSessionQuery
+
 	session.TokenManager
+}
+
+func NewOpinionHandler(
+	postOpinionUsecase opinion_usecase.PostOpinionUseCase,
+	getOpinionRepliesUsecase opinion_usecase.GetOpinionRepliesUseCase,
+	getSwipeOpinionsUseCase opinion_usecase.GetSwipeOpinionsQueryHandler,
+	getOpinionDetailUseCase opinion_usecase.GetOpinionDetailUseCase,
+	getOpinionByTalkSessionUseCase opinion_query.GetOpinionsByTalkSessionQuery,
+
+	tokenManager session.TokenManager,
+) oas.OpinionHandler {
+	return &opinionHandler{
+		postOpinionUsecase:           postOpinionUsecase,
+		getOpinionRepliesUsecase:     getOpinionRepliesUsecase,
+		getSwipeOpinionsUseCase:      getSwipeOpinionsUseCase,
+		getOpinionDetailUseCase:      getOpinionDetailUseCase,
+		getOpinionByTalkSessionQuery: getOpinionByTalkSessionUseCase,
+		TokenManager:                 tokenManager,
+	}
 }
 
 // OpinionComments2 implements oas.OpinionHandler.
@@ -132,24 +154,6 @@ func (o *opinionHandler) OpinionComments2(ctx context.Context, params oas.Opinio
 	}, nil
 }
 
-func NewOpinionHandler(
-	postOpinionUsecase opinion_usecase.PostOpinionUseCase,
-	getOpinionRepliesUsecase opinion_usecase.GetOpinionRepliesUseCase,
-	getSwipeOpinionsUseCase opinion_usecase.GetSwipeOpinionsQueryHandler,
-	getOpinionDetailUseCase opinion_usecase.GetOpinionDetailUseCase,
-	getOpinionByTalkSessionUseCase opinion_usecase.GetOpinionsByTalkSessionUseCase,
-	tokenManager session.TokenManager,
-) oas.OpinionHandler {
-	return &opinionHandler{
-		postOpinionUsecase:             postOpinionUsecase,
-		getOpinionRepliesUsecase:       getOpinionRepliesUsecase,
-		getSwipeOpinionsUseCase:        getSwipeOpinionsUseCase,
-		getOpinionDetailUseCase:        getOpinionDetailUseCase,
-		getOpinionByTalkSessionUseCase: getOpinionByTalkSessionUseCase,
-		TokenManager:                   tokenManager,
-	}
-}
-
 // GetOpinionsForTalkSession implements oas.OpinionHandler.
 func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params oas.GetOpinionsForTalkSessionParams) (oas.GetOpinionsForTalkSessionRes, error) {
 	claim := session.GetSession(o.SetSession(ctx))
@@ -161,14 +165,14 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 		}
 	}
 
-	var sortKey *string
+	var sortKey sort.SortKey
 	if params.Sort.IsSet() {
 		txt, err := params.Sort.Value.MarshalText()
 		if err != nil {
 			utils.HandleError(ctx, err, "params.Sort.Value.MarshalText")
 			return nil, messages.InternalServerError
 		}
-		sortKey = lo.ToPtr(string(txt))
+		sortKey = sort.SortKey(txt)
 	}
 	var limit, offset *int
 	if params.Limit.IsSet() {
@@ -178,7 +182,7 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 		offset = &params.Offset.Value
 	}
 
-	out, err := o.getOpinionByTalkSessionUseCase.Execute(ctx, opinion_usecase.GetOpinionsByTalkSessionInput{
+	out, err := o.getOpinionByTalkSessionQuery.Execute(ctx, opinion_query.GetOpinionsByTalkSessionInput{
 		TalkSessionID: shared.MustParseUUID[talksession.TalkSession](params.TalkSessionID),
 		SortKey:       sortKey,
 		Limit:         limit,
@@ -192,12 +196,12 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 	for _, opinion := range out.Opinions {
 		opinions = append(opinions, oas.GetOpinionsForTalkSessionOKOpinionsItem{
 			Opinion: oas.GetOpinionsForTalkSessionOKOpinionsItemOpinion{
-				ID:      opinion.Opinion.OpinionID,
+				ID:      opinion.Opinion.OpinionID.String(),
 				Title:   utils.ToOpt[oas.OptString](opinion.Opinion.Title),
 				Content: opinion.Opinion.Content,
 				VoteType: oas.OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType{
 					Set:   true,
-					Value: oas.GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType(opinion.Opinion.VoteType),
+					Value: oas.GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType(opinion.GetParentVoteType()),
 				},
 				ParentID:     utils.ToOpt[oas.OptString](opinion.Opinion.ParentOpinionID),
 				ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
@@ -205,12 +209,12 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 				PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
 			},
 			User: oas.GetOpinionsForTalkSessionOKOpinionsItemUser{
-				DisplayID:   opinion.User.ID,
-				DisplayName: opinion.User.Name,
-				IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.Icon),
+				DisplayID:   opinion.User.DisplayID,
+				DisplayName: opinion.User.DisplayName,
+				IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.IconURL),
 			},
 			ReplyCount: opinion.ReplyCount,
-			MyVoteType: oas.GetOpinionsForTalkSessionOKOpinionsItemMyVoteType(opinion.MyVoteType),
+			MyVoteType: oas.GetOpinionsForTalkSessionOKOpinionsItemMyVoteType(opinion.GetMyVoteType()),
 		})
 	}
 

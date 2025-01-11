@@ -375,34 +375,32 @@ WITH unique_opinions AS (
     WHERE opinions.talk_session_id = $1
 )
 SELECT
-    uo.opinion_id, uo.talk_session_id, uo.user_id, uo.parent_opinion_id, uo.title, uo.content, uo.reference_url, uo.picture_url, uo.created_at,
-    users.display_name,
-    users.display_id,
-    users.icon_url,
+    opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.reference_url, opinions.picture_url, opinions.created_at,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
     COALESCE(pv.vote_type, 0) AS vote_type,
     COALESCE(rc.reply_count, 0) AS reply_count,
     COALESCE(cv.vote_type, 0) AS current_vote_type
-FROM unique_opinions uo
-LEFT JOIN users ON uo.user_id = users.user_id
+FROM unique_opinions opinions
+LEFT JOIN users ON opinions.user_id = users.user_id
 LEFT JOIN (
     SELECT DISTINCT ON (opinion_id) vote_type, user_id, opinion_id
     FROM votes
-) pv ON uo.parent_opinion_id = pv.opinion_id
-    AND uo.user_id = pv.user_id
+) pv ON opinions.parent_opinion_id = pv.opinion_id
+    AND opinions.user_id = pv.user_id
 LEFT JOIN (
     SELECT COUNT(opinion_id) AS reply_count, parent_opinion_id
     FROM opinions
     GROUP BY parent_opinion_id
-) rc ON uo.opinion_id = rc.parent_opinion_id
+) rc ON opinions.opinion_id = rc.parent_opinion_id
 LEFT JOIN (
     SELECT DISTINCT ON (opinion_id) vote_type, user_id, opinion_id
     FROM votes
     WHERE user_id = $4::uuid
-) cv ON uo.opinion_id = cv.opinion_id
+) cv ON opinions.opinion_id = cv.opinion_id
 ORDER BY
     CASE $5::text
-        WHEN 'latest' THEN EXTRACT(EPOCH FROM uo.created_at)
-        WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM uo.created_at)
+        WHEN 'latest' THEN EXTRACT(EPOCH FROM opinions.created_at)
+        WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM opinions.created_at)
         WHEN 'mostReply' THEN COALESCE(rc.reply_count, 0)
     END DESC
 LIMIT $2 OFFSET $3
@@ -417,18 +415,8 @@ type GetOpinionsByTalkSessionIDParams struct {
 }
 
 type GetOpinionsByTalkSessionIDRow struct {
-	OpinionID       uuid.UUID
-	TalkSessionID   uuid.UUID
-	UserID          uuid.UUID
-	ParentOpinionID uuid.NullUUID
-	Title           sql.NullString
-	Content         string
-	ReferenceUrl    sql.NullString
-	PictureUrl      sql.NullString
-	CreatedAt       time.Time
-	DisplayName     sql.NullString
-	DisplayID       sql.NullString
-	IconUrl         sql.NullString
+	Opinion         Opinion
+	User            User
 	VoteType        int16
 	ReplyCount      int64
 	CurrentVoteType int16
@@ -451,34 +439,32 @@ type GetOpinionsByTalkSessionIDRow struct {
 //	    WHERE opinions.talk_session_id = $1
 //	)
 //	SELECT
-//	    uo.opinion_id, uo.talk_session_id, uo.user_id, uo.parent_opinion_id, uo.title, uo.content, uo.reference_url, uo.picture_url, uo.created_at,
-//	    users.display_name,
-//	    users.display_id,
-//	    users.icon_url,
+//	    opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.reference_url, opinions.picture_url, opinions.created_at,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
 //	    COALESCE(pv.vote_type, 0) AS vote_type,
 //	    COALESCE(rc.reply_count, 0) AS reply_count,
 //	    COALESCE(cv.vote_type, 0) AS current_vote_type
-//	FROM unique_opinions uo
-//	LEFT JOIN users ON uo.user_id = users.user_id
+//	FROM unique_opinions opinions
+//	LEFT JOIN users ON opinions.user_id = users.user_id
 //	LEFT JOIN (
 //	    SELECT DISTINCT ON (opinion_id) vote_type, user_id, opinion_id
 //	    FROM votes
-//	) pv ON uo.parent_opinion_id = pv.opinion_id
-//	    AND uo.user_id = pv.user_id
+//	) pv ON opinions.parent_opinion_id = pv.opinion_id
+//	    AND opinions.user_id = pv.user_id
 //	LEFT JOIN (
 //	    SELECT COUNT(opinion_id) AS reply_count, parent_opinion_id
 //	    FROM opinions
 //	    GROUP BY parent_opinion_id
-//	) rc ON uo.opinion_id = rc.parent_opinion_id
+//	) rc ON opinions.opinion_id = rc.parent_opinion_id
 //	LEFT JOIN (
 //	    SELECT DISTINCT ON (opinion_id) vote_type, user_id, opinion_id
 //	    FROM votes
 //	    WHERE user_id = $4::uuid
-//	) cv ON uo.opinion_id = cv.opinion_id
+//	) cv ON opinions.opinion_id = cv.opinion_id
 //	ORDER BY
 //	    CASE $5::text
-//	        WHEN 'latest' THEN EXTRACT(EPOCH FROM uo.created_at)
-//	        WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM uo.created_at)
+//	        WHEN 'latest' THEN EXTRACT(EPOCH FROM opinions.created_at)
+//	        WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM opinions.created_at)
 //	        WHEN 'mostReply' THEN COALESCE(rc.reply_count, 0)
 //	    END DESC
 //	LIMIT $2 OFFSET $3
@@ -498,18 +484,21 @@ func (q *Queries) GetOpinionsByTalkSessionID(ctx context.Context, arg GetOpinion
 	for rows.Next() {
 		var i GetOpinionsByTalkSessionIDRow
 		if err := rows.Scan(
-			&i.OpinionID,
-			&i.TalkSessionID,
-			&i.UserID,
-			&i.ParentOpinionID,
-			&i.Title,
-			&i.Content,
-			&i.ReferenceUrl,
-			&i.PictureUrl,
-			&i.CreatedAt,
-			&i.DisplayName,
-			&i.DisplayID,
-			&i.IconUrl,
+			&i.Opinion.OpinionID,
+			&i.Opinion.TalkSessionID,
+			&i.Opinion.UserID,
+			&i.Opinion.ParentOpinionID,
+			&i.Opinion.Title,
+			&i.Opinion.Content,
+			&i.Opinion.CreatedAt,
+			&i.Opinion.PictureUrl,
+			&i.Opinion.ReferenceUrl,
+			&i.User.UserID,
+			&i.User.DisplayID,
+			&i.User.DisplayName,
+			&i.User.IconUrl,
+			&i.User.CreatedAt,
+			&i.User.UpdatedAt,
 			&i.VoteType,
 			&i.ReplyCount,
 			&i.CurrentVoteType,

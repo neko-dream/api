@@ -189,34 +189,32 @@ WITH unique_opinions AS (
     WHERE opinions.talk_session_id = $1
 )
 SELECT
-    uo.*,
-    users.display_name,
-    users.display_id,
-    users.icon_url,
+    sqlc.embed(opinions),
+    sqlc.embed(users),
     COALESCE(pv.vote_type, 0) AS vote_type,
     COALESCE(rc.reply_count, 0) AS reply_count,
     COALESCE(cv.vote_type, 0) AS current_vote_type
-FROM unique_opinions uo
-LEFT JOIN users ON uo.user_id = users.user_id
+FROM unique_opinions opinions
+LEFT JOIN users ON opinions.user_id = users.user_id
 LEFT JOIN (
     SELECT DISTINCT ON (opinion_id) vote_type, user_id, opinion_id
     FROM votes
-) pv ON uo.parent_opinion_id = pv.opinion_id
-    AND uo.user_id = pv.user_id
+) pv ON opinions.parent_opinion_id = pv.opinion_id
+    AND opinions.user_id = pv.user_id
 LEFT JOIN (
     SELECT COUNT(opinion_id) AS reply_count, parent_opinion_id
     FROM opinions
     GROUP BY parent_opinion_id
-) rc ON uo.opinion_id = rc.parent_opinion_id
+) rc ON opinions.opinion_id = rc.parent_opinion_id
 LEFT JOIN (
     SELECT DISTINCT ON (opinion_id) vote_type, user_id, opinion_id
     FROM votes
     WHERE user_id = sqlc.narg('user_id')::uuid
-) cv ON uo.opinion_id = cv.opinion_id
+) cv ON opinions.opinion_id = cv.opinion_id
 ORDER BY
     CASE sqlc.narg('sort_key')::text
-        WHEN 'latest' THEN EXTRACT(EPOCH FROM uo.created_at)
-        WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM uo.created_at)
+        WHEN 'latest' THEN EXTRACT(EPOCH FROM opinions.created_at)
+        WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM opinions.created_at)
         WHEN 'mostReply' THEN COALESCE(rc.reply_count, 0)
     END DESC
 LIMIT $2 OFFSET $3;

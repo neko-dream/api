@@ -16,8 +16,8 @@ import (
 	analysis_usecase "github.com/neko-dream/server/internal/usecase/analysis"
 	"github.com/neko-dream/server/internal/usecase/command"
 	talksession_query "github.com/neko-dream/server/internal/usecase/query/talksession"
+	"github.com/neko-dream/server/pkg/sort"
 	"github.com/neko-dream/server/pkg/utils"
-	"github.com/samber/lo"
 )
 
 type talkSessionHandler struct {
@@ -341,11 +341,10 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 			status = talksession_query.Status(string(bytes))
 		}
 	}
-	var sortKey *talksession_query.SortKey
+	var sortKey sort.SortKey
 	if params.SortKey.IsSet() {
-		bytes, err := params.SortKey.Value.MarshalText()
-		if err == nil {
-			sortKey = lo.ToPtr(talksession_query.SortKey(string(bytes)))
+		if bytes, err := params.SortKey.Value.MarshalText(); err == nil {
+			sortKey = sort.SortKey(string(bytes))
 		}
 	}
 	var latitude, longitude *float64
