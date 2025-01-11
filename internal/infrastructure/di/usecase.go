@@ -23,7 +23,6 @@ func useCaseDeps() []ProvideArg {
 		{user_usecase.NewGetUserInformationQueryHandler, nil},
 		{talk_session_usecase.NewStartTalkSessionCommand, nil},
 		{talk_session_usecase.NewViewTalkSessionDetailQuery, nil},
-		{talk_session_usecase.NewSearchTalkSessionsQuery, nil},
 		{opinion_usecase.NewPostOpinionUseCase, nil},
 		{opinion_usecase.NewGetOpinionRepliesUseCase, nil},
 		{opinion_usecase.NewGetSwipeOpinionsQueryHandler, nil},
