@@ -2,11 +2,13 @@ package talksession
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
-	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/usecase/query/dto"
+	"github.com/samber/lo"
 )
 
 type (
@@ -16,8 +18,8 @@ type (
 
 	BrowseOpenedByUserInput struct {
 		UserID shared.UUID[user.User]
-		Limit  int
-		Offset int
+		Limit  *int
+		Offset *int
 		Status Status
 		Theme  *string
 	}
@@ -28,21 +30,24 @@ type (
 )
 
 func (h *BrowseOpenedByUserInput) Validate() error {
+	var err error
+
 	if h.Status == "" {
 		h.Status = StatusOpen
 	}
 	if h.Status != StatusOpen && h.Status != StatusClosed {
-		return messages.TalkSessionValidationFailed
+		err = errors.Join(err, fmt.Errorf("無効なステータスです。: %s", h.Status))
+	}
+	if h.Limit == nil {
+		h.Limit = lo.ToPtr(10)
+	} else if *h.Limit <= 0 || *h.Limit > 100 {
+		err = errors.Join(err, fmt.Errorf("Limitは1から100の間で指定してください"))
 	}
 
-	// limitがnilの場合は10にする
-	if h.Limit == 0 {
-		h.Limit = 10
-	}
-
-	// limitは最大100
-	if h.Limit > 100 {
-		h.Limit = 100
+	if h.Offset == nil {
+		h.Offset = lo.ToPtr(0)
+	} else if *h.Offset < 0 {
+		err = errors.Join(err, fmt.Errorf("Offsetは0以上の値を指定してください"))
 	}
 
 	return nil

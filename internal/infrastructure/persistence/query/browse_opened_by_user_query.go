@@ -11,6 +11,7 @@ import (
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/server/internal/usecase/query/dto"
 	"github.com/neko-dream/server/internal/usecase/query/talksession"
+	"github.com/neko-dream/server/pkg/utils"
 )
 
 type BrowseOpenedByUserQueryImpl struct {
@@ -42,12 +43,13 @@ func (h *BrowseOpenedByUserQueryImpl) Execute(ctx context.Context, input talkses
 
 	talkSessionRow, err := h.GetQueries(ctx).GetOwnTalkSessionByUserID(ctx, model.GetOwnTalkSessionByUserIDParams{
 		UserID: uuid.NullUUID{UUID: input.UserID.UUID(), Valid: true},
-		Limit:  int32(input.Limit),
-		Offset: int32(input.Offset),
+		Limit:  int32(*input.Limit),
+		Offset: int32(*input.Offset),
 		Theme:  theme,
 		Status: status,
 	})
 	if err != nil {
+		utils.HandleError(ctx, err, "GetOwnTalkSessionByIDでエラー")
 		return nil, messages.TalkSessionNotFound
 	}
 	if len(talkSessionRow) <= 0 {
@@ -58,6 +60,7 @@ func (h *BrowseOpenedByUserQueryImpl) Execute(ctx context.Context, input talkses
 	if err := copier.CopyWithOption(&talkSessions, talkSessionRow, copier.Option{
 		DeepCopy: true,
 	}); err != nil {
+		utils.HandleError(ctx, err, "copier.CopyWithOptionでエラー")
 		return nil, err
 	}
 	out.TalkSessions = talkSessions

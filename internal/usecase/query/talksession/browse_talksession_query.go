@@ -2,9 +2,12 @@ package talksession
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/usecase/query/dto"
+	"github.com/samber/lo"
 )
 
 type (
@@ -13,10 +16,10 @@ type (
 	}
 
 	BrowseTalkSessionQueryInput struct {
-		Limit     int
-		Offset    int
+		Limit     *int
+		Offset    *int
 		Theme     *string
-		Status    string
+		Status    Status
 		SortKey   *SortKey // デフォルト: latest
 		Latitude  *float64
 		Longitude *float64
@@ -25,6 +28,8 @@ type (
 	BrowseTalkSessionQueryOutput struct {
 		TalkSessions []dto.TalkSessionWithDetail
 		TotalCount   int
+		Limit        int
+		Offset       int
 	}
 )
 
@@ -44,25 +49,37 @@ const (
 	StatusClosed Status = "finished"
 )
 
-func (b *BrowseTalkSessionQueryInput) Validate() error {
-	if b.SortKey != nil {
-		switch *b.SortKey {
+func (h *BrowseTalkSessionQueryInput) Validate() error {
+	if h.SortKey != nil {
+		switch *h.SortKey {
 		case SortKeyLatest, SortKeyNearest, SortKeyMostReplies, SortKeyOldest:
 		default:
 			return messages.TalkSessionValidationFailed
 		}
 	}
 	// SortKeyがnilの場合はlatestにする
-	if b.SortKey == nil {
-		b.SortKey = new(SortKey)
-		*b.SortKey = SortKeyLatest
+	if h.SortKey == nil {
+		h.SortKey = new(SortKey)
+		*h.SortKey = SortKeyLatest
 	}
-	// statusが空の場合はopenにする
-	if b.Status == "" {
-		b.Status = string(StatusOpen)
+	var err error
+
+	if h.Status == "" {
+		h.Status = StatusOpen
 	}
-	if b.Status != string(StatusOpen) && b.Status != string(StatusClosed) {
-		return messages.TalkSessionValidationFailed
+	if h.Status != StatusOpen && h.Status != StatusClosed {
+		err = errors.Join(err, fmt.Errorf("無効なステータスです。: %s", h.Status))
+	}
+	if h.Limit == nil {
+		h.Limit = lo.ToPtr(10)
+	} else if *h.Limit <= 0 || *h.Limit > 100 {
+		err = errors.Join(err, fmt.Errorf("Limitは1から100の間で指定してください"))
+	}
+
+	if h.Offset == nil {
+		h.Offset = lo.ToPtr(0)
+	} else if *h.Offset < 0 {
+		err = errors.Join(err, fmt.Errorf("Offsetは0以上の値を指定してください"))
 	}
 
 	return nil

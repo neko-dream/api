@@ -145,14 +145,13 @@ func (t *talkSessionHandler) GetOpenedTalkSession(ctx context.Context, params oa
 		return nil, messages.ForbiddenError
 	}
 
-	limit := utils.IfThenElse(params.Limit.IsSet(),
-		params.Limit.Value,
-		10,
-	)
-	offset := utils.IfThenElse(params.Offset.IsSet(),
-		params.Offset.Value,
-		0,
-	)
+	var limit, offset *int
+	if params.Limit.IsSet() {
+		limit = &params.Limit.Value
+	}
+	if params.Offset.IsSet() {
+		offset = &params.Offset.Value
+	}
 
 	status := ""
 	if params.Status.IsSet() {
@@ -327,19 +326,19 @@ func (t *talkSessionHandler) GetTalkSessionDetail(ctx context.Context, params oa
 
 // GetTalkSessionList セッション一覧取得
 func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.GetTalkSessionListParams) (oas.GetTalkSessionListRes, error) {
-	limit := utils.IfThenElse[int](params.Limit.IsSet(),
-		params.Limit.Value,
-		10,
-	)
-	offset := utils.IfThenElse[int](params.Offset.IsSet(),
-		params.Offset.Value,
-		0,
-	)
-	status := ""
+	var limit, offset *int
+	if params.Limit.IsSet() {
+		limit = &params.Limit.Value
+	}
+	if params.Offset.IsSet() {
+		offset = &params.Offset.Value
+	}
+
+	var status talksession_query.Status
 	if params.Status.IsSet() {
 		bytes, err := params.Status.Value.MarshalText()
 		if err == nil {
-			status = string(bytes)
+			status = talksession_query.Status(string(bytes))
 		}
 	}
 	var sortKey *talksession_query.SortKey
@@ -409,8 +408,8 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 		TalkSessions: resultTalkSession,
 		Pagination: oas.GetTalkSessionListOKPagination{
 			TotalCount: out.TotalCount,
-			Limit:      limit,
-			Offset:     offset,
+			Limit:      out.Limit,
+			Offset:     out.Offset,
 		},
 	}, nil
 }
