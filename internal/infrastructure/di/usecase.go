@@ -7,7 +7,6 @@ import (
 	analysis_usecase "github.com/neko-dream/server/internal/usecase/analysis"
 	auth_usecase "github.com/neko-dream/server/internal/usecase/auth"
 	"github.com/neko-dream/server/internal/usecase/command"
-	opinion_usecase "github.com/neko-dream/server/internal/usecase/opinion"
 	timeline_usecase "github.com/neko-dream/server/internal/usecase/timeline"
 	user_usecase "github.com/neko-dream/server/internal/usecase/user"
 	vote_usecase "github.com/neko-dream/server/internal/usecase/vote"
@@ -21,7 +20,6 @@ func useCaseDeps() []ProvideArg {
 		{user_usecase.NewRegisterUserUseCase, nil},
 		{user_usecase.NewEditUserUseCase, nil},
 		{user_usecase.NewGetUserInformationQueryHandler, nil},
-		{opinion_usecase.NewPostOpinionUseCase, nil},
 		{analysis_usecase.NewGetAnalysisResultUseCase, nil},
 		{analysis_usecase.NewGetReportQueryHandler, nil},
 		{timeline_usecase.NewAddTimeLineUseCase, nil},
@@ -30,6 +28,7 @@ func useCaseDeps() []ProvideArg {
 		{vote_usecase.NewPostVoteUseCase, nil},
 		{command.NewAddConclusionCommandHandler, nil},
 		{command.NewStartTalkSessionCommand, nil},
+		{command.NewSubmitOpinionCommandHandler, nil},
 		{talksession_query.NewBrowseTalkSessionQueryHandler, nil},
 		{talksession_query.NewBrowseOpenedByUserQueryHandler, nil},
 		{talksession_query.NewBrowseJoinedTalkSessionQueryHandler, nil},

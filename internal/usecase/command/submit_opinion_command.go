@@ -1,4 +1,4 @@
-package opinion_usecase
+package command
 
 import (
 	"context"
@@ -16,11 +16,11 @@ import (
 )
 
 type (
-	PostOpinionUseCase interface {
-		Execute(context.Context, PostOpinionInput) (*PostOpinionOutput, error)
+	SubmitOpinionCommand interface {
+		Execute(context.Context, SubmitOpinionCommandInput) error
 	}
 
-	PostOpinionInput struct {
+	SubmitOpinionCommandInput struct {
 		TalkSessionID   shared.UUID[talksession.TalkSession]
 		OwnerID         shared.UUID[user.User]
 		ParentOpinionID *shared.UUID[opinion.Opinion]
@@ -30,10 +30,7 @@ type (
 		Picture         *multipart.FileHeader
 	}
 
-	PostOpinionOutput struct {
-	}
-
-	postOpinionInteractor struct {
+	submitOpinionCommandHandler struct {
 		opinion.OpinionRepository
 		opinion.OpinionService
 		vote.VoteRepository
@@ -41,13 +38,13 @@ type (
 	}
 )
 
-func NewPostOpinionUseCase(
+func NewSubmitOpinionCommandHandler(
 	opinionRepository opinion.OpinionRepository,
 	opinionService opinion.OpinionService,
 	voteRepository vote.VoteRepository,
 	dbManager *db.DBManager,
-) PostOpinionUseCase {
-	return &postOpinionInteractor{
+) SubmitOpinionCommand {
+	return &submitOpinionCommandHandler{
 		DBManager:         dbManager,
 		OpinionService:    opinionService,
 		OpinionRepository: opinionRepository,
@@ -55,8 +52,8 @@ func NewPostOpinionUseCase(
 	}
 }
 
-func (i *postOpinionInteractor) Execute(ctx context.Context, input PostOpinionInput) (*PostOpinionOutput, error) {
-	if err := i.ExecTx(ctx, func(ctx context.Context) error {
+func (h *submitOpinionCommandHandler) Execute(ctx context.Context, input SubmitOpinionCommandInput) error {
+	if err := h.ExecTx(ctx, func(ctx context.Context) error {
 		opinion, err := opinion.NewOpinion(
 			shared.NewUUID[opinion.Opinion](),
 			input.TalkSessionID,
@@ -78,7 +75,7 @@ func (i *postOpinionInteractor) Execute(ctx context.Context, input PostOpinionIn
 			}
 		}
 
-		if err := i.OpinionRepository.Create(ctx, *opinion); err != nil {
+		if err := h.OpinionRepository.Create(ctx, *opinion); err != nil {
 			utils.HandleError(ctx, err, "OpinionRepository.Create")
 			return messages.OpinionCreateFailed
 		}
@@ -96,16 +93,14 @@ func (i *postOpinionInteractor) Execute(ctx context.Context, input PostOpinionIn
 			utils.HandleError(ctx, err, "NewVote")
 			return err
 		}
-		if err := i.VoteRepository.Create(ctx, *v); err != nil {
+		if err := h.VoteRepository.Create(ctx, *v); err != nil {
 			return messages.VoteFailed
 		}
 
 		return nil
 	}); err != nil {
-		return nil, err
-
+		return err
 	}
 
-	out := &PostOpinionOutput{}
-	return out, nil
+	return nil
 }

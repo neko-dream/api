@@ -14,7 +14,7 @@ import (
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/presentation/oas"
-	opinion_usecase "github.com/neko-dream/server/internal/usecase/opinion"
+	"github.com/neko-dream/server/internal/usecase/command"
 	opinion_query "github.com/neko-dream/server/internal/usecase/query/opinion"
 	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/sort"
@@ -23,30 +23,33 @@ import (
 )
 
 type opinionHandler struct {
-	postOpinionUsecase           opinion_usecase.PostOpinionUseCase
 	getOpinionByTalkSessionQuery opinion_query.GetOpinionsByTalkSessionQuery
 	getOpinionDetailByIDQuery    opinion_query.GetOpinionDetailByIDQuery
 	getOpinionRepliesQuery       opinion_query.GetOpinionRepliesQuery
 	getSwipeOpinionQuery         opinion_query.GetSwipeOpinionsQuery
 
+	submitOpinionCommand command.SubmitOpinionCommand
+
 	session.TokenManager
 }
 
 func NewOpinionHandler(
-	postOpinionUsecase opinion_usecase.PostOpinionUseCase,
 	getOpinionByTalkSessionUseCase opinion_query.GetOpinionsByTalkSessionQuery,
 	getOpinionDetailUseCase opinion_query.GetOpinionDetailByIDQuery,
 	getOpinionRepliesQuery opinion_query.GetOpinionRepliesQuery,
 	getSwipeOpinionsQuery opinion_query.GetSwipeOpinionsQuery,
 
+	submitOpinionCommand command.SubmitOpinionCommand,
+
 	tokenManager session.TokenManager,
 ) oas.OpinionHandler {
 	return &opinionHandler{
-		postOpinionUsecase:           postOpinionUsecase,
 		getOpinionByTalkSessionQuery: getOpinionByTalkSessionUseCase,
 		getOpinionDetailByIDQuery:    getOpinionDetailUseCase,
 		getOpinionRepliesQuery:       getOpinionRepliesQuery,
 		getSwipeOpinionQuery:         getSwipeOpinionsQuery,
+
+		submitOpinionCommand: submitOpinionCommand,
 
 		TokenManager: tokenManager,
 	}
@@ -345,7 +348,7 @@ func (o *opinionHandler) PostOpinionPost(ctx context.Context, req oas.OptPostOpi
 		parentOpinionID = lo.ToPtr(shared.MustParseUUID[opinion.Opinion](value.ParentOpinionID.Value))
 	}
 
-	_, err = o.postOpinionUsecase.Execute(ctx, opinion_usecase.PostOpinionInput{
+	if err = o.submitOpinionCommand.Execute(ctx, command.SubmitOpinionCommandInput{
 		TalkSessionID:   talkSessionID,
 		OwnerID:         userID,
 		ParentOpinionID: parentOpinionID,
@@ -353,8 +356,7 @@ func (o *opinionHandler) PostOpinionPost(ctx context.Context, req oas.OptPostOpi
 		Content:         req.Value.OpinionContent,
 		ReferenceURL:    utils.ToPtrIfNotNullValue(!req.Value.ReferenceURL.IsSet(), value.ReferenceURL.Value),
 		Picture:         file,
-	})
-	if err != nil {
+	}); err != nil {
 		return nil, err
 	}
 
