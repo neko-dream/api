@@ -50,5 +50,5 @@ func (h *BrowseOpenedByUserInput) Validate() error {
 		err = errors.Join(err, fmt.Errorf("Offsetは0以上の値を指定してください"))
 	}
 
-	return nil
+	return err
 }
