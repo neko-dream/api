@@ -23,7 +23,7 @@ import (
 
 type talkSessionHandler struct {
 	StartTalkSessionCommand    talk_session_usecase.StartTalkSessionCommand
-	listTalkSessionQuery       talk_session_usecase.ListTalkSessionQuery
+	browseTalkSessionsQuery    talksession_query.BrowseTalkSessionQuery
 	ViewTalkSessionDetailQuery talk_session_usecase.ViewTalkSessionDetailQuery
 	getAnalysisResultUseCase   analysis_usecase.GetAnalysisResultUseCase
 	getReportUseCase           analysis_usecase.GetReportQuery
@@ -37,7 +37,7 @@ type talkSessionHandler struct {
 
 func NewTalkSessionHandler(
 	StartTalkSessionCommand talk_session_usecase.StartTalkSessionCommand,
-	listTalkSessionQuery talk_session_usecase.ListTalkSessionQuery,
+	browseTalkSessionsQuery talksession_query.BrowseTalkSessionQuery,
 	ViewTalkSessionDetailQuery talk_session_usecase.ViewTalkSessionDetailQuery,
 	getAnalysisResultUseCase analysis_usecase.GetAnalysisResultUseCase,
 	getReportUseCase analysis_usecase.GetReportQuery,
@@ -50,7 +50,7 @@ func NewTalkSessionHandler(
 ) oas.TalkSessionHandler {
 	return &talkSessionHandler{
 		StartTalkSessionCommand:    StartTalkSessionCommand,
-		listTalkSessionQuery:       listTalkSessionQuery,
+		browseTalkSessionsQuery:    browseTalkSessionsQuery,
 		ViewTalkSessionDetailQuery: ViewTalkSessionDetailQuery,
 		getAnalysisResultUseCase:   getAnalysisResultUseCase,
 		getReportUseCase:           getReportUseCase,
@@ -363,12 +363,12 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 	}
 
 	theme := utils.ToPtrIfNotNullValue(params.Theme.Null, params.Theme.Value)
-	out, err := t.listTalkSessionQuery.Execute(ctx, talk_session_usecase.ListTalkSessionInput{
+	out, err := t.browseTalkSessionsQuery.Execute(ctx, talksession_query.BrowseTalkSessionQueryInput{
 		Limit:     limit,
 		Offset:    offset,
 		Theme:     theme,
 		Status:    status,
-		SortKey:   sortKey,
+		SortKey:   lo.ToPtr(talksession_query.SortKey(*sortKey)),
 		Latitude:  latitude,
 		Longitude: longitude,
 	})
@@ -379,28 +379,28 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 	resultTalkSession := make([]oas.GetTalkSessionListOKTalkSessionsItem, 0, len(out.TalkSessions))
 	for _, talkSession := range out.TalkSessions {
 		owner := oas.GetTalkSessionListOKTalkSessionsItemTalkSessionOwner{
-			DisplayID:   talkSession.Owner.DisplayID,
-			DisplayName: talkSession.Owner.DisplayName,
-			IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.Owner.IconURL),
+			DisplayID:   talkSession.User.DisplayID,
+			DisplayName: talkSession.User.DisplayName,
+			IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.User.IconURL),
 		}
 		var location oas.OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation
-		if talkSession.Location != nil {
+		if talkSession.Latitude != nil {
 			location = oas.OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation{
 				Value: oas.GetTalkSessionListOKTalkSessionsItemTalkSessionLocation{
-					Latitude:  utils.ToOpt[oas.OptFloat64](talkSession.Location.Latitude),
-					Longitude: utils.ToOpt[oas.OptFloat64](talkSession.Location.Longitude),
+					Latitude:  utils.ToOpt[oas.OptFloat64](talkSession.Latitude),
+					Longitude: utils.ToOpt[oas.OptFloat64](talkSession.Longitude),
 				},
 				Set: true,
 			}
 		}
 		res := oas.GetTalkSessionListOKTalkSessionsItem{
 			TalkSession: oas.GetTalkSessionListOKTalkSessionsItemTalkSession{
-				ID:               talkSession.ID,
+				ID:               talkSession.TalkSessionID.String(),
 				Theme:            talkSession.Theme,
 				Description:      utils.ToOptNil[oas.OptNilString](talkSession.Description),
 				Owner:            owner,
-				CreatedAt:        talkSession.CreatedAt,
-				ScheduledEndTime: talkSession.ScheduledEndTime,
+				CreatedAt:        talkSession.CreatedAt.Format(time.RFC3339),
+				ScheduledEndTime: talkSession.ScheduledEndTime.Format(time.RFC3339),
 				Location:         location,
 				City:             utils.ToOptNil[oas.OptNilString](talkSession.City),
 				Prefecture:       utils.ToOptNil[oas.OptNilString](talkSession.Prefecture),

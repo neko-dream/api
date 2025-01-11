@@ -1,6 +1,7 @@
 package di
 
 import (
+	queryimpl "github.com/neko-dream/server/internal/infrastructure/persistence/query"
 	"github.com/neko-dream/server/internal/usecase/command"
 
 	analysis_usecase "github.com/neko-dream/server/internal/usecase/analysis"
@@ -21,7 +22,6 @@ func useCaseDeps() []ProvideArg {
 		{user_usecase.NewEditUserUseCase, nil},
 		{user_usecase.NewGetUserInformationQueryHandler, nil},
 		{talk_session_usecase.NewStartTalkSessionCommand, nil},
-		{talk_session_usecase.NewListTalkSessionQueryHandler, nil},
 		{talk_session_usecase.NewViewTalkSessionDetailQuery, nil},
 		{talk_session_usecase.NewSearchTalkSessionsQuery, nil},
 		{talk_session_usecase.NewBrowseUsersTalkSessionHistoriesQueryHandler, nil},
@@ -39,5 +39,6 @@ func useCaseDeps() []ProvideArg {
 		{timeline_usecase.NewEditTimeLineUseCase, nil},
 		{vote_usecase.NewPostVoteUseCase, nil},
 		{command.NewAddConclusionCommandHandler, nil},
+		{queryimpl.NewBrowseTalkSessionQuery, nil},
 	}
 }

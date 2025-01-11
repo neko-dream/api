@@ -46,4 +46,9 @@ var (
 		Code:       "TALKSESSION-0008",
 		Message:    "終了予定時刻が現在時刻より前です。",
 	}
+	TalkSessionValidationFailed = &APIError{
+		StatusCode: 400,
+		Code:       "TALKSESSION-0009",
+		Message:    "セッションのバリデーションに失敗しました。",
+	}
 )
