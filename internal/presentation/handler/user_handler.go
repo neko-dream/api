@@ -11,6 +11,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/presentation/oas"
+	"github.com/neko-dream/server/internal/usecase/command/user_command"
 	opinion_query "github.com/neko-dream/server/internal/usecase/query/opinion"
 	talksession_query "github.com/neko-dream/server/internal/usecase/query/talksession"
 	user_usecase "github.com/neko-dream/server/internal/usecase/user"
@@ -22,26 +23,28 @@ import (
 
 type userHandler struct {
 	user_usecase.RegisterUserUseCase
-	user_usecase.EditUserUseCase
 	user_usecase.GetUserInformationQueryHandler
 	getMyOpinionsQuery           opinion_query.GetMyOpinionsQuery
 	browseJoinedTalkSessionQuery talksession_query.BrowseJoinedTalkSessionsQuery
+
+	editUser user_command.EditUser
 }
 
 func NewUserHandler(
 	registerUserUsecase user_usecase.RegisterUserUseCase,
-	editUserUsecase user_usecase.EditUserUseCase,
 	getUserInformationQueryHandler user_usecase.GetUserInformationQueryHandler,
 	getMyOpinionsQuery opinion_query.GetMyOpinionsQuery,
 	browseJoinedTalkSessionQuery talksession_query.BrowseJoinedTalkSessionsQuery,
 
+	editUser user_command.EditUser,
+
 ) oas.UserHandler {
 	return &userHandler{
 		RegisterUserUseCase:            registerUserUsecase,
-		EditUserUseCase:                editUserUsecase,
 		GetUserInformationQueryHandler: getUserInformationQueryHandler,
 		getMyOpinionsQuery:             getMyOpinionsQuery,
 		browseJoinedTalkSessionQuery:   browseJoinedTalkSessionQuery,
+		editUser:                       editUser,
 	}
 }
 
@@ -332,7 +335,7 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 		occupation = lo.ToPtr(string(txt))
 	}
 
-	out, err := u.EditUserUseCase.Execute(ctx, user_usecase.EditUserInput{
+	out, err := u.editUser.Execute(ctx, user_command.EditUserInput{
 		UserID:      userID,
 		DisplayName: displayName,
 		Icon:        file,

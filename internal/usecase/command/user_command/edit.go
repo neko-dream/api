@@ -1,4 +1,4 @@
-package user
+package user_command
 
 import (
 	"context"
@@ -16,8 +16,8 @@ import (
 )
 
 type (
-	EditUserUseCase interface {
-		Execute(ctx context.Context, input EditUserInput) (*EditUserOutput, error)
+	EditUser interface {
+		Execute(context.Context, EditUserInput) (*EditUserOutput, error)
 	}
 
 	EditUserInput struct {
@@ -39,7 +39,7 @@ type (
 		Cookie      *http.Cookie
 	}
 
-	editUserInteractor struct {
+	editUserHandler struct {
 		*db.DBManager
 		session.TokenManager
 		conf        *config.Config
@@ -49,15 +49,15 @@ type (
 	}
 )
 
-func NewEditUserUseCase(
+func NewEditUserHandler(
 	dm *db.DBManager,
 	tm session.TokenManager,
 	conf *config.Config,
 	userRep user.UserRepository,
 	userService user.UserService,
 	sessService session.SessionService,
-) EditUserUseCase {
-	return &editUserInteractor{
+) EditUser {
+	return &editUserHandler{
 		DBManager:    dm,
 		TokenManager: tm,
 		conf:         conf,
@@ -67,7 +67,7 @@ func NewEditUserUseCase(
 	}
 }
 
-func (e *editUserInteractor) Execute(ctx context.Context, input EditUserInput) (*EditUserOutput, error) {
+func (e *editUserHandler) Execute(ctx context.Context, input EditUserInput) (*EditUserOutput, error) {
 	var c http.Cookie
 	var u *user.User
 	err := e.ExecTx(ctx, func(ctx context.Context) error {
