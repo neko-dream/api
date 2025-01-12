@@ -7,6 +7,7 @@ import (
 	analysis_usecase "github.com/neko-dream/server/internal/usecase/analysis"
 	auth_usecase "github.com/neko-dream/server/internal/usecase/auth"
 	"github.com/neko-dream/server/internal/usecase/command"
+	"github.com/neko-dream/server/internal/usecase/command/talksession_command"
 	timeline_usecase "github.com/neko-dream/server/internal/usecase/timeline"
 	user_usecase "github.com/neko-dream/server/internal/usecase/user"
 	vote_usecase "github.com/neko-dream/server/internal/usecase/vote"
@@ -26,8 +27,8 @@ func useCaseDeps() []ProvideArg {
 		{timeline_usecase.NewGetTimeLineUseCase, nil},
 		{timeline_usecase.NewEditTimeLineUseCase, nil},
 		{vote_usecase.NewPostVoteUseCase, nil},
-		{command.NewAddConclusionCommandHandler, nil},
-		{command.NewStartTalkSessionCommand, nil},
+		{talksession_command.NewAddConclusionCommandHandler, nil},
+		{talksession_command.NewStartTalkSessionCommand, nil},
 		{command.NewSubmitOpinionCommandHandler, nil},
 		{talksession_query.NewBrowseTalkSessionQueryHandler, nil},
 		{talksession_query.NewBrowseOpenedByUserQueryHandler, nil},
