@@ -16,7 +16,7 @@ const (
 	OccupationHomemaker                              // 専業主婦
 	OccupationStudent                                // 学生
 	OccupationUnemployed                             // 無職
-	OccupationOther                                  // 未回答
+	OccupationOther                                  // 回答しない
 )
 
 var (
@@ -30,14 +30,14 @@ var (
 		OccupationHomemaker:        "家事従事者",
 		OccupationStudent:          "学生",
 		OccupationUnemployed:       "無職",
-		OccupationOther:            "未回答",
+		OccupationOther:            "回答しない",
 	}
 )
 
 func (o Occupation) String() string {
 	str, ok := OccupationMap[o]
 	if !ok {
-		return "未回答"
+		return "回答しない"
 	}
 	return str
 }
