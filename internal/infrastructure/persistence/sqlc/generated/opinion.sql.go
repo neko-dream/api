@@ -351,7 +351,7 @@ ORDER BY
     CASE $5::text
         WHEN 'latest' THEN EXTRACT(EPOCH FROM opinions.created_at)
         WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM opinions.created_at)
-        WHEN 'mostReply' THEN COALESCE(rc.reply_count, 0)
+        WHEN 'mostReplies' THEN COALESCE(rc.reply_count, 0)
     END DESC
 LIMIT $2 OFFSET $3
 `
@@ -415,7 +415,7 @@ type GetOpinionsByTalkSessionIDRow struct {
 //	    CASE $5::text
 //	        WHEN 'latest' THEN EXTRACT(EPOCH FROM opinions.created_at)
 //	        WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM opinions.created_at)
-//	        WHEN 'mostReply' THEN COALESCE(rc.reply_count, 0)
+//	        WHEN 'mostReplies' THEN COALESCE(rc.reply_count, 0)
 //	    END DESC
 //	LIMIT $2 OFFSET $3
 func (q *Queries) GetOpinionsByTalkSessionID(ctx context.Context, arg GetOpinionsByTalkSessionIDParams) ([]GetOpinionsByTalkSessionIDRow, error) {
@@ -501,7 +501,7 @@ ORDER BY
     CASE $4::text
         WHEN 'latest' THEN EXTRACT(EPOCH FROM opinions.created_at)
         WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM opinions.created_at)
-        WHEN 'mostReply' THEN reply_count
+        WHEN 'mostReplies' THEN reply_count
     END DESC
 LIMIT $2 OFFSET $3
 `
@@ -566,7 +566,7 @@ type GetOpinionsByUserIDRow struct {
 //	    CASE $4::text
 //	        WHEN 'latest' THEN EXTRACT(EPOCH FROM opinions.created_at)
 //	        WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM opinions.created_at)
-//	        WHEN 'mostReply' THEN reply_count
+//	        WHEN 'mostReplies' THEN reply_count
 //	    END DESC
 //	LIMIT $2 OFFSET $3
 func (q *Queries) GetOpinionsByUserID(ctx context.Context, arg GetOpinionsByUserIDParams) ([]GetOpinionsByUserIDRow, error) {
