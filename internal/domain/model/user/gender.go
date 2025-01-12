@@ -14,14 +14,14 @@ var (
 		GenderMale:           "男性",
 		GenderFemale:         "女性",
 		GenderOther:          "その他",
-		GenderPreferNotToSay: "未回答",
+		GenderPreferNotToSay: "回答しない",
 	}
 )
 
 func (g Gender) String() string {
 	str, ok := GenderMap[g]
 	if !ok {
-		return "未回答"
+		return "回答しない"
 	}
 	return str
 }
@@ -40,7 +40,7 @@ func NewGender(s *string) Gender {
 		return GenderFemale
 	case "その他":
 		return GenderOther
-	case "未回答":
+	case "回答しない":
 		return GenderPreferNotToSay
 	default:
 		return GenderPreferNotToSay
