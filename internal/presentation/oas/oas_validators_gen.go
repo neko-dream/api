@@ -1081,7 +1081,7 @@ func (s GetOpinionsForTalkSessionSort) Validate() error {
 	switch s {
 	case "latest":
 		return nil
-	case "mostReply":
+	case "mostReplies":
 		return nil
 	case "oldest":
 		return nil
@@ -2143,7 +2143,7 @@ func (s OpinionsHistorySort) Validate() error {
 	switch s {
 	case "latest":
 		return nil
-	case "mostReply":
+	case "mostReplies":
 		return nil
 	case "oldest":
 		return nil
