@@ -28,7 +28,7 @@ func useCaseDeps() []ProvideArg {
 		{vote_usecase.NewPostVoteUseCase, nil},
 		{talksession_command.NewAddConclusionCommandHandler, nil},
 		{talksession_command.NewStartTalkSessionCommand, nil},
-		{opinion_command.NewSubmitOpinionCommandHandler, nil},
+		{opinion_command.NewSubmitOpinionHandler, nil},
 		{talksession_query.NewBrowseTalkSessionQueryHandler, nil},
 		{talksession_query.NewBrowseOpenedByUserQueryHandler, nil},
 		{talksession_query.NewBrowseJoinedTalkSessionQueryHandler, nil},

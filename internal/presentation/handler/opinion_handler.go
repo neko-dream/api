@@ -28,7 +28,7 @@ type opinionHandler struct {
 	getOpinionRepliesQuery       opinion_query.GetOpinionRepliesQuery
 	getSwipeOpinionQuery         opinion_query.GetSwipeOpinionsQuery
 
-	submitOpinionCommand opinion_command.SubmitOpinionCommand
+	submitOpinionCommand opinion_command.SubmitOpinion
 
 	session.TokenManager
 }
@@ -39,7 +39,7 @@ func NewOpinionHandler(
 	getOpinionRepliesQuery opinion_query.GetOpinionRepliesQuery,
 	getSwipeOpinionsQuery opinion_query.GetSwipeOpinionsQuery,
 
-	submitOpinionCommand opinion_command.SubmitOpinionCommand,
+	submitOpinionCommand opinion_command.SubmitOpinion,
 
 	tokenManager session.TokenManager,
 ) oas.OpinionHandler {
@@ -348,7 +348,7 @@ func (o *opinionHandler) PostOpinionPost(ctx context.Context, req oas.OptPostOpi
 		parentOpinionID = lo.ToPtr(shared.MustParseUUID[opinion.Opinion](value.ParentOpinionID.Value))
 	}
 
-	if err = o.submitOpinionCommand.Execute(ctx, opinion_command.SubmitOpinionCommandInput{
+	if err = o.submitOpinionCommand.Execute(ctx, opinion_command.SubmitOpinionInput{
 		TalkSessionID:   talkSessionID,
 		OwnerID:         userID,
 		ParentOpinionID: parentOpinionID,
