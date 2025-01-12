@@ -19,7 +19,6 @@ func useCaseDeps() []ProvideArg {
 		{auth_usecase.NewAuthLoginUseCase, nil},
 		{auth_usecase.NewAuthCallbackUseCase, nil},
 		{auth_usecase.NewRevokeUseCase, nil},
-		{user_usecase.NewRegisterUserUseCase, nil},
 		{user_usecase.NewGetUserInformationQueryHandler, nil},
 		{analysis_usecase.NewGetAnalysisResultUseCase, nil},
 		{analysis_usecase.NewGetReportQueryHandler, nil},

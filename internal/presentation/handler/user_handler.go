@@ -22,29 +22,29 @@ import (
 )
 
 type userHandler struct {
-	user_usecase.RegisterUserUseCase
 	user_usecase.GetUserInformationQueryHandler
 	getMyOpinionsQuery           opinion_query.GetMyOpinionsQuery
 	browseJoinedTalkSessionQuery talksession_query.BrowseJoinedTalkSessionsQuery
 
-	editUser user_command.EditUser
+	editUser     user_command.EditUser
+	registerUser user_command.Register
 }
 
 func NewUserHandler(
-	registerUserUsecase user_usecase.RegisterUserUseCase,
 	getUserInformationQueryHandler user_usecase.GetUserInformationQueryHandler,
 	getMyOpinionsQuery opinion_query.GetMyOpinionsQuery,
 	browseJoinedTalkSessionQuery talksession_query.BrowseJoinedTalkSessionsQuery,
 
 	editUser user_command.EditUser,
+	registerUser user_command.Register,
 
 ) oas.UserHandler {
 	return &userHandler{
-		RegisterUserUseCase:            registerUserUsecase,
 		GetUserInformationQueryHandler: getUserInformationQueryHandler,
 		getMyOpinionsQuery:             getMyOpinionsQuery,
 		browseJoinedTalkSessionQuery:   browseJoinedTalkSessionQuery,
 		editUser:                       editUser,
+		registerUser:                   registerUser,
 	}
 }
 
@@ -404,7 +404,7 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 		prefecture = &value.Prefecture.Value
 	}
 
-	input := user_usecase.RegisterUserInput{
+	input := user_command.RegisterInput{
 		UserID:      userID,
 		DisplayID:   value.DisplayID,
 		DisplayName: value.DisplayName,
@@ -428,7 +428,7 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 		HouseholdSize: &value.HouseholdSize.Value,
 		Prefecture:    prefecture,
 	}
-	out, err := u.RegisterUserUseCase.Execute(ctx, input)
+	out, err := u.registerUser.Execute(ctx, input)
 	if err != nil {
 		utils.HandleError(ctx, err, "RegisterUserUseCase.Execute")
 		return nil, err
