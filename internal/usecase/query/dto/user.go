@@ -38,7 +38,7 @@ func (u *UserDemographics) GenderString() string {
 
 func (u *UserDemographics) OccupationString() string {
 	if u.Occupation == nil {
-		u.Occupation = lo.ToPtr(10)
+		return user.OccupationOther.String()
 	}
 	return user.Occupation(*u.Occupation).String()
 }
