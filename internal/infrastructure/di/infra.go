@@ -7,7 +7,6 @@ import (
 	client "github.com/neko-dream/server/internal/infrastructure/external/analysis"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/postgresql"
-	queryimpl "github.com/neko-dream/server/internal/infrastructure/persistence/query"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/repository"
 	"github.com/neko-dream/server/internal/infrastructure/telemetry"
 )
@@ -33,7 +32,5 @@ func infraDeps() []ProvideArg {
 		{jwt.NewTokenManager, nil},
 		{db.NewDummyInitializer, nil},
 		{client.NewAnalysisService, nil},
-
-		{queryimpl.NewGetConclusionByIDQueryHandler, nil},
 	}
 }

@@ -1,4 +1,4 @@
-package queryimpl
+package talksession_query
 
 import (
 	"context"
@@ -48,7 +48,7 @@ func (b *BrowseTalkSessionQueryImpl) Execute(ctx context.Context, in talksession
 		Offset:    int32(*in.Offset),
 		Theme:     theme,
 		Status:    sql.NullString{String: string(in.Status), Valid: true},
-		SortKey:   sql.NullString{String: string(*in.SortKey), Valid: true},
+		SortKey:   sql.NullString{String: in.SortKey.String(), Valid: true},
 		Latitude:  latitude,
 		Longitude: longitude,
 	})

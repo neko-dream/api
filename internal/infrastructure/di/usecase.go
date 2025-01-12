@@ -1,12 +1,12 @@
 package di
 
 import (
-	queryimpl "github.com/neko-dream/server/internal/infrastructure/persistence/query"
-	"github.com/neko-dream/server/internal/usecase/command"
+	opinion_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/opinion"
+	talksession_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/talksession"
 
 	analysis_usecase "github.com/neko-dream/server/internal/usecase/analysis"
 	auth_usecase "github.com/neko-dream/server/internal/usecase/auth"
-	opinion_usecase "github.com/neko-dream/server/internal/usecase/opinion"
+	"github.com/neko-dream/server/internal/usecase/command"
 	timeline_usecase "github.com/neko-dream/server/internal/usecase/timeline"
 	user_usecase "github.com/neko-dream/server/internal/usecase/user"
 	vote_usecase "github.com/neko-dream/server/internal/usecase/vote"
@@ -20,12 +20,6 @@ func useCaseDeps() []ProvideArg {
 		{user_usecase.NewRegisterUserUseCase, nil},
 		{user_usecase.NewEditUserUseCase, nil},
 		{user_usecase.NewGetUserInformationQueryHandler, nil},
-		{opinion_usecase.NewPostOpinionUseCase, nil},
-		{opinion_usecase.NewGetOpinionRepliesUseCase, nil},
-		{opinion_usecase.NewGetSwipeOpinionsQueryHandler, nil},
-		{opinion_usecase.NewGetOpinionDetailUseCase, nil},
-		{opinion_usecase.NewGetUserOpinionListQueryHandler, nil},
-		{opinion_usecase.NewGetOpinionsByTalkSessionUseCase, nil},
 		{analysis_usecase.NewGetAnalysisResultUseCase, nil},
 		{analysis_usecase.NewGetReportQueryHandler, nil},
 		{timeline_usecase.NewAddTimeLineUseCase, nil},
@@ -34,9 +28,16 @@ func useCaseDeps() []ProvideArg {
 		{vote_usecase.NewPostVoteUseCase, nil},
 		{command.NewAddConclusionCommandHandler, nil},
 		{command.NewStartTalkSessionCommand, nil},
-		{queryimpl.NewBrowseTalkSessionQueryHandler, nil},
-		{queryimpl.NewBrowseOpenedByUserQueryHandler, nil},
-		{queryimpl.NewBrowseJoinedTalkSessionQueryHandler, nil},
-		{queryimpl.NewGetTalkSessionDetailByIDQueryHandler, nil},
+		{command.NewSubmitOpinionCommandHandler, nil},
+		{talksession_query.NewBrowseTalkSessionQueryHandler, nil},
+		{talksession_query.NewBrowseOpenedByUserQueryHandler, nil},
+		{talksession_query.NewBrowseJoinedTalkSessionQueryHandler, nil},
+		{talksession_query.NewGetTalkSessionDetailByIDQueryHandler, nil},
+		{talksession_query.NewGetConclusionByIDQueryHandler, nil},
+		{opinion_query.NewGetOpinionsByTalkSessionIDQueryHandler, nil},
+		{opinion_query.NewGetOpinionDetailByIDQueryHandler, nil},
+		{opinion_query.NewGetOpinionRepliesQueryHandler, nil},
+		{opinion_query.NewSwipeOpinionsQueryHandler, nil},
+		{opinion_query.NewGetMyOpinionsQueryHandler, nil},
 	}
 }

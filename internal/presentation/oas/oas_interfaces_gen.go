@@ -73,10 +73,6 @@ type OAuthTokenRevokeRes interface {
 	oAuthTokenRevokeRes()
 }
 
-type OpinionComments2Res interface {
-	opinionComments2Res()
-}
-
 type OpinionCommentsRes interface {
 	opinionCommentsRes()
 }

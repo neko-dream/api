@@ -13,19 +13,9 @@ INSERT INTO opinions (
 
 -- name: GetOpinionByID :one
 SELECT
-    opinions.opinion_id,
-    opinions.talk_session_id,
-    opinions.user_id,
-    opinions.parent_opinion_id,
-    opinions.title,
-    opinions.content,
-    opinions.reference_url,
-    opinions.picture_url,
-    opinions.created_at,
-    users.display_name AS display_name,
-    users.display_id AS display_id,
-    users.icon_url AS icon_url,
-    COALESCE(pv.vote_type, 0) AS vote_type,
+    sqlc.embed(opinions),
+    sqlc.embed(users),
+    COALESCE(pv.vote_type, 0) AS parent_vote_type,
     COALESCE(cv.vote_type, 0) AS current_vote_type
 FROM opinions
 LEFT JOIN users
@@ -47,18 +37,9 @@ WHERE opinions.opinion_id = $1;
 -- name: GetOpinionReplies :many
 SELECT
     DISTINCT opinions.opinion_id,
-    opinions.talk_session_id,
-    opinions.user_id,
-    opinions.parent_opinion_id,
-    opinions.title,
-    opinions.content,
-    opinions.reference_url,
-    opinions.picture_url,
-    opinions.created_at,
-    users.display_name AS display_name,
-    users.display_id AS display_id,
-    users.icon_url AS icon_url,
-    COALESCE(pv.vote_type, 0) AS vote_type,
+    sqlc.embed(opinions),
+    sqlc.embed(users),
+    COALESCE(pv.vote_type, 0) AS parent_vote_type,
     COALESCE(cv.vote_type, 0) AS current_vote_type
 FROM opinions
 LEFT JOIN users
@@ -145,7 +126,7 @@ SELECT
     users.display_name AS display_name,
     users.display_id AS display_id,
     users.icon_url AS icon_url,
-    COALESCE(pv.vote_type, 0) AS vote_type,
+    COALESCE(pv.vote_type, 0) AS parent_vote_type,
     -- 意見に対するリプライ数（再帰）
     COALESCE(rc.reply_count, 0) AS reply_count
 FROM opinions
@@ -189,34 +170,32 @@ WITH unique_opinions AS (
     WHERE opinions.talk_session_id = $1
 )
 SELECT
-    uo.*,
-    users.display_name,
-    users.display_id,
-    users.icon_url,
-    COALESCE(pv.vote_type, 0) AS vote_type,
+    sqlc.embed(opinions),
+    sqlc.embed(users),
+    COALESCE(pv.vote_type, 0) AS parent_vote_type,
     COALESCE(rc.reply_count, 0) AS reply_count,
     COALESCE(cv.vote_type, 0) AS current_vote_type
-FROM unique_opinions uo
-LEFT JOIN users ON uo.user_id = users.user_id
+FROM unique_opinions opinions
+LEFT JOIN users ON opinions.user_id = users.user_id
 LEFT JOIN (
     SELECT DISTINCT ON (opinion_id) vote_type, user_id, opinion_id
     FROM votes
-) pv ON uo.parent_opinion_id = pv.opinion_id
-    AND uo.user_id = pv.user_id
+) pv ON opinions.parent_opinion_id = pv.opinion_id
+    AND opinions.user_id = pv.user_id
 LEFT JOIN (
     SELECT COUNT(opinion_id) AS reply_count, parent_opinion_id
     FROM opinions
     GROUP BY parent_opinion_id
-) rc ON uo.opinion_id = rc.parent_opinion_id
+) rc ON opinions.opinion_id = rc.parent_opinion_id
 LEFT JOIN (
     SELECT DISTINCT ON (opinion_id) vote_type, user_id, opinion_id
     FROM votes
     WHERE user_id = sqlc.narg('user_id')::uuid
-) cv ON uo.opinion_id = cv.opinion_id
+) cv ON opinions.opinion_id = cv.opinion_id
 ORDER BY
     CASE sqlc.narg('sort_key')::text
-        WHEN 'latest' THEN EXTRACT(EPOCH FROM uo.created_at)
-        WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM uo.created_at)
+        WHEN 'latest' THEN EXTRACT(EPOCH FROM opinions.created_at)
+        WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM opinions.created_at)
         WHEN 'mostReply' THEN COALESCE(rc.reply_count, 0)
     END DESC
 LIMIT $2 OFFSET $3;
@@ -253,7 +232,7 @@ SELECT
     u.display_name AS display_name,
     u.display_id AS display_id,
     u.icon_url AS icon_url,
-    COALESCE(pv.vote_type, 0) AS vote_type,
+    COALESCE(pv.vote_type, 0) AS parent_vote_type,
     COALESCE(rc.reply_count, 0) AS reply_count,
     COALESCE(cv.vote_type, 0) AS current_vote_type,
     ot.level

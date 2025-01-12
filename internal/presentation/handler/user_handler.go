@@ -11,10 +11,11 @@ import (
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/presentation/oas"
-	opinion_usecase "github.com/neko-dream/server/internal/usecase/opinion"
+	opinion_query "github.com/neko-dream/server/internal/usecase/query/opinion"
 	talksession_query "github.com/neko-dream/server/internal/usecase/query/talksession"
 	user_usecase "github.com/neko-dream/server/internal/usecase/user"
 	http_utils "github.com/neko-dream/server/pkg/http"
+	"github.com/neko-dream/server/pkg/sort"
 	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
 )
@@ -23,7 +24,7 @@ type userHandler struct {
 	user_usecase.RegisterUserUseCase
 	user_usecase.EditUserUseCase
 	user_usecase.GetUserInformationQueryHandler
-	opinion_usecase.GetUserOpinionListQueryHandler
+	getMyOpinionsQuery           opinion_query.GetMyOpinionsQuery
 	browseJoinedTalkSessionQuery talksession_query.BrowseJoinedTalkSessionsQuery
 }
 
@@ -31,14 +32,15 @@ func NewUserHandler(
 	registerUserUsecase user_usecase.RegisterUserUseCase,
 	editUserUsecase user_usecase.EditUserUseCase,
 	getUserInformationQueryHandler user_usecase.GetUserInformationQueryHandler,
-	getUserOpinionListQueryHandler opinion_usecase.GetUserOpinionListQueryHandler,
+	getMyOpinionsQuery opinion_query.GetMyOpinionsQuery,
 	browseJoinedTalkSessionQuery talksession_query.BrowseJoinedTalkSessionsQuery,
+
 ) oas.UserHandler {
 	return &userHandler{
 		RegisterUserUseCase:            registerUserUsecase,
 		EditUserUseCase:                editUserUsecase,
 		GetUserInformationQueryHandler: getUserInformationQueryHandler,
-		GetUserOpinionListQueryHandler: getUserOpinionListQueryHandler,
+		getMyOpinionsQuery:             getMyOpinionsQuery,
 		browseJoinedTalkSessionQuery:   browseJoinedTalkSessionQuery,
 	}
 }
@@ -57,14 +59,14 @@ func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHi
 		return nil, messages.ForbiddenError
 	}
 
-	var sortKey *string
+	var sortKey sort.SortKey
 	if params.Sort.IsSet() {
 		txt, err := params.Sort.Value.MarshalText()
 		if err != nil {
 			utils.HandleError(ctx, err, "params.Sort.Value.MarshalText")
 			return nil, messages.InternalServerError
 		}
-		sortKey = lo.ToPtr(string(txt))
+		sortKey = sort.SortKey(txt)
 	}
 	var limit, offset *int
 	if params.Limit.IsSet() {
@@ -74,7 +76,7 @@ func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHi
 		offset = &params.Offset.Value
 	}
 
-	out, err := u.GetUserOpinionListQueryHandler.Execute(ctx, opinion_usecase.GetUserOpinionListQuery{
+	out, err := u.getMyOpinionsQuery.Execute(ctx, opinion_query.GetMyOpinionsQueryInput{
 		UserID:  userID,
 		SortKey: sortKey,
 		Limit:   limit,
@@ -89,20 +91,20 @@ func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHi
 	for _, opinion := range out.Opinions {
 		opinions = append(opinions, oas.OpinionsHistoryOKOpinionsItem{
 			Opinion: oas.OpinionsHistoryOKOpinionsItemOpinion{
-				ID:      opinion.Opinion.OpinionID,
+				ID:      opinion.Opinion.OpinionID.String(),
 				Title:   utils.ToOpt[oas.OptString](opinion.Opinion.Title),
 				Content: opinion.Opinion.Content,
 				VoteType: oas.OptOpinionsHistoryOKOpinionsItemOpinionVoteType{
 					Set:   true,
-					Value: oas.OpinionsHistoryOKOpinionsItemOpinionVoteType(opinion.Opinion.VoteType),
+					Value: oas.OpinionsHistoryOKOpinionsItemOpinionVoteType(opinion.GetParentVoteType()),
 				},
 				ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
 				PictureURL:   utils.ToOpt[oas.OptString](opinion.Opinion.PictureURL),
 			},
 			User: oas.OpinionsHistoryOKOpinionsItemUser{
-				DisplayID:   opinion.User.ID,
-				DisplayName: opinion.User.Name,
-				IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.Icon),
+				DisplayID:   opinion.User.DisplayID,
+				DisplayName: opinion.User.DisplayName,
+				IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.IconURL),
 			},
 			ReplyCount: opinion.ReplyCount,
 		})
