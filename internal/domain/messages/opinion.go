@@ -33,4 +33,9 @@ var (
 		Code:       "OPINION-006",
 		Message:    "意見は5~140文字で入力してください",
 	}
+	OpinionContentFailedToFetch = &APIError{
+		StatusCode: http.StatusInternalServerError,
+		Code:       "OPINION-007",
+		Message:    "意見の取得に失敗しました。時間をおいて再度お試しください",
+	}
 )

@@ -45,7 +45,7 @@ func (g *GetOpinionsByTalkSessionIDQueryHandler) Execute(ctx context.Context, in
 	})
 	if err != nil {
 		utils.HandleError(ctx, err, "意見の取得に失敗")
-		return nil, messages.OpinionContentBadLengthForUpdate
+		return nil, messages.OpinionContentFailedToFetch
 	}
 
 	var opinions []dto.SwipeOpinion
@@ -54,7 +54,7 @@ func (g *GetOpinionsByTalkSessionIDQueryHandler) Execute(ctx context.Context, in
 		IgnoreEmpty: true,
 	}); err != nil {
 		utils.HandleError(ctx, err, "マッピングに失敗")
-		return nil, messages.OpinionContentBadLengthForUpdate
+		return nil, messages.OpinionContentFailedToFetch
 	}
 
 	count, err := g.GetQueries(ctx).CountOpinions(ctx, model.CountOpinionsParams{
