@@ -26,7 +26,7 @@ type userHandler struct {
 	getMyOpinionsQuery           opinion_query.GetMyOpinionsQuery
 	browseJoinedTalkSessionQuery talksession_query.BrowseJoinedTalkSessionsQuery
 
-	editUser     user_command.EditUser
+	editUser     user_command.Edit
 	registerUser user_command.Register
 }
 
@@ -35,7 +35,7 @@ func NewUserHandler(
 	getMyOpinionsQuery opinion_query.GetMyOpinionsQuery,
 	browseJoinedTalkSessionQuery talksession_query.BrowseJoinedTalkSessionsQuery,
 
-	editUser user_command.EditUser,
+	editUser user_command.Edit,
 	registerUser user_command.Register,
 
 ) oas.UserHandler {
@@ -335,7 +335,7 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 		occupation = lo.ToPtr(string(txt))
 	}
 
-	out, err := u.editUser.Execute(ctx, user_command.EditUserInput{
+	out, err := u.editUser.Execute(ctx, user_command.EditInput{
 		UserID:      userID,
 		DisplayName: displayName,
 		Icon:        file,

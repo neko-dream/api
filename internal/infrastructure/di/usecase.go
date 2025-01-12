@@ -39,6 +39,6 @@ func useCaseDeps() []ProvideArg {
 		{opinion_query.NewGetOpinionRepliesQueryHandler, nil},
 		{opinion_query.NewSwipeOpinionsQueryHandler, nil},
 		{opinion_query.NewGetMyOpinionsQueryHandler, nil},
-		{user_command.NewEditUserHandler, nil},
+		{user_command.NewEditHandler, nil},
 	}
 }
