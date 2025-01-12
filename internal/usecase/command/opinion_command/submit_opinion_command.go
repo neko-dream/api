@@ -1,4 +1,4 @@
-package command
+package opinion_command
 
 import (
 	"context"
