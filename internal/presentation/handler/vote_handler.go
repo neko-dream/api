@@ -9,20 +9,20 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/presentation/oas"
-	vote_usecase "github.com/neko-dream/server/internal/usecase/vote"
+	"github.com/neko-dream/server/internal/usecase/command/vote_command"
 	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
 type voteHandler struct {
-	postVoteUseCase vote_usecase.PostVoteUseCase
+	voteCommand vote_command.Vote
 }
 
 func NewVoteHandler(
-	postVoteUseCase vote_usecase.PostVoteUseCase,
+	voteCommand vote_command.Vote,
 ) oas.VoteHandler {
 	return &voteHandler{
-		postVoteUseCase: postVoteUseCase,
+		voteCommand: voteCommand,
 	}
 }
 
@@ -41,7 +41,7 @@ func (v *voteHandler) Vote(ctx context.Context, req oas.OptVoteReq, params oas.V
 	}
 
 	value := req.Value
-	_, err = v.postVoteUseCase.Execute(ctx, vote_usecase.PostVoteInput{
+	err = v.voteCommand.Execute(ctx, vote_command.VoteInput{
 		TalkSessionID:   shared.MustParseUUID[talksession.TalkSession](params.TalkSessionID),
 		TargetOpinionID: shared.MustParseUUID[opinion.Opinion](params.OpinionID),
 		UserID:          userID,
