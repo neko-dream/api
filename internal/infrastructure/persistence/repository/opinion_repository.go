@@ -13,6 +13,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 type opinionRepository struct {
@@ -32,6 +33,9 @@ func NewOpinionRepository(
 
 // Create Opinion作成
 func (o *opinionRepository) Create(ctx context.Context, op opinion.Opinion) error {
+	ctx, span := otel.Tracer("repository").Start(ctx, "opinionRepository.Create")
+	defer span.End()
+
 	var parentOpinionID uuid.NullUUID
 	if op.ParentOpinionID() != nil {
 		parentOpinionID = uuid.NullUUID{UUID: op.ParentOpinionID().UUID(), Valid: true}
@@ -74,15 +78,30 @@ func (o *opinionRepository) Create(ctx context.Context, op opinion.Opinion) erro
 
 // FindByParentID implements opinion.OpinionRepository.
 func (o *opinionRepository) FindByParentID(ctx context.Context, opinionID shared.UUID[opinion.Opinion]) ([]opinion.Opinion, error) {
+	ctx, span := otel.Tracer("repository").Start(ctx, "opinionRepository.FindByParentID")
+	defer span.End()
+
+	_ = ctx
+
 	panic("unimplemented")
 }
 
 // FindByTalkSessionID implements opinion.OpinionRepository.
 func (o *opinionRepository) FindByTalkSessionID(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession]) ([]opinion.Opinion, error) {
+	ctx, span := otel.Tracer("repository").Start(ctx, "opinionRepository.FindByTalkSessionID")
+	defer span.End()
+
+	_ = ctx
+
 	panic("unimplemented")
 }
 
 // FindByTalkSessionWithoutVote implements opinion.OpinionRepository.
 func (o *opinionRepository) FindByTalkSessionWithoutVote(ctx context.Context, userID shared.UUID[user.User], talkSessionID shared.UUID[talksession.TalkSession], limit int) ([]opinion.Opinion, error) {
+	ctx, span := otel.Tracer("repository").Start(ctx, "opinionRepository.FindByTalkSessionWithoutVote")
+	defer span.End()
+
+	_ = ctx
+
 	panic("unimplemented")
 }

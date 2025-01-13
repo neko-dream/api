@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/neko-dream/server/internal/domain/model/shared"
+	"go.opentelemetry.io/otel"
 )
 
 type (
@@ -32,6 +33,9 @@ func (u *UserDemographics) Prefecture() *string {
 
 // ユーザーの年齢を返す
 func (u *UserDemographics) Age(ctx context.Context) int {
+	ctx, span := otel.Tracer("user").Start(ctx, "UserDemographics.Age")
+	defer span.End()
+
 	return u.yearOfBirth.Age(ctx)
 }
 

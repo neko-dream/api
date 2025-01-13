@@ -13,6 +13,7 @@ import (
 	timeline_usecase "github.com/neko-dream/server/internal/usecase/timeline"
 	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel"
 )
 
 type timelineHandler struct {
@@ -35,6 +36,9 @@ func NewTimelineHandler(
 
 // GetTimeLine implements oas.TimelineHandler.
 func (t *timelineHandler) GetTimeLine(ctx context.Context, params oas.GetTimeLineParams) (oas.GetTimeLineRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "timelineHandler.GetTimeLine")
+	defer span.End()
+
 	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
 	if err != nil {
 		utils.HandleError(ctx, err, "shared.ParseUUID")
@@ -68,6 +72,9 @@ func (t *timelineHandler) GetTimeLine(ctx context.Context, params oas.GetTimeLin
 
 // PostTimeLineItem implements oas.TimelineHandler.
 func (t *timelineHandler) PostTimeLineItem(ctx context.Context, req oas.OptPostTimeLineItemReq, params oas.PostTimeLineItemParams) (oas.PostTimeLineItemRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "timelineHandler.PostTimeLineItem")
+	defer span.End()
+
 	claim := session.GetSession(ctx)
 	if claim == nil {
 		return nil, messages.ForbiddenError
@@ -115,6 +122,9 @@ func (t *timelineHandler) PostTimeLineItem(ctx context.Context, req oas.OptPostT
 
 // EditTimeLine implements oas.TimelineHandler.
 func (t *timelineHandler) EditTimeLine(ctx context.Context, req oas.OptEditTimeLineReq, params oas.EditTimeLineParams) (oas.EditTimeLineRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "timelineHandler.EditTimeLine")
+	defer span.End()
+
 	claim := session.GetSession(ctx)
 	if claim == nil {
 		return nil, messages.ForbiddenError

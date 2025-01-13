@@ -15,6 +15,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 type sessionRepository struct {
@@ -23,6 +24,9 @@ type sessionRepository struct {
 
 // Create implements session.SessionRepository.
 func (s *sessionRepository) Create(ctx context.Context, sess session.Session) (*session.Session, error) {
+	ctx, span := otel.Tracer("repository").Start(ctx, "sessionRepository.Create")
+	defer span.End()
+
 	if err := s.GetQueries(ctx).CreateSession(ctx, model.CreateSessionParams{
 		SessionID:      sess.SessionID().UUID(),
 		UserID:         sess.UserID().UUID(),
@@ -40,6 +44,9 @@ func (s *sessionRepository) Create(ctx context.Context, sess session.Session) (*
 
 // FindBySessionID セッションIDを元にセッションを取得する
 func (s *sessionRepository) FindBySessionID(ctx context.Context, sess shared.UUID[session.Session]) (*session.Session, error) {
+	ctx, span := otel.Tracer("repository").Start(ctx, "sessionRepository.FindBySessionID")
+	defer span.End()
+
 	sessRow, err := s.GetQueries(ctx).FindSessionBySessionID(ctx, sess.UUID())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -64,6 +71,9 @@ func (s *sessionRepository) FindBySessionID(ctx context.Context, sess shared.UUI
 
 // FindByUserID implements session.SessionRepository.
 func (s *sessionRepository) FindByUserID(ctx context.Context, userID shared.UUID[user.User]) ([]session.Session, error) {
+	ctx, span := otel.Tracer("repository").Start(ctx, "sessionRepository.FindByUserID")
+	defer span.End()
+
 	sessionModels, err := s.GetQueries(ctx).FindActiveSessionsByUserID(ctx, userID.UUID())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -94,6 +104,9 @@ func (s *sessionRepository) FindByUserID(ctx context.Context, userID shared.UUID
 
 // Update セッションの状態と最終アクティビティ時間を更新する
 func (s *sessionRepository) Update(ctx context.Context, sess session.Session) (*session.Session, error) {
+	ctx, span := otel.Tracer("repository").Start(ctx, "sessionRepository.Update")
+	defer span.End()
+
 	if err := s.GetQueries(ctx).UpdateSession(ctx, model.UpdateSessionParams{
 		SessionID:      sess.SessionID().UUID(),
 		SessionStatus:  int32(sess.Status()),

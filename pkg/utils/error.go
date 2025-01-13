@@ -30,6 +30,7 @@ func HandleErrorWithCaller(ctx context.Context, err error, message string, calle
 	// エラーメッセージを出力
 	log.Printf("%s: %s\n", message, err.Error())
 	log.Printf("file: %s:%d, function: %s\n", file, line, function)
+	log.Println("----------------------------------------")
 
 	// スパンに情報を追加
 	span := trace.SpanFromContext(ctx)
@@ -39,5 +40,6 @@ func HandleErrorWithCaller(ctx context.Context, err error, message string, calle
 		attribute.Int("error.line", line),
 		attribute.String("error.function", function),
 		attribute.String("error.message", message),
+		attribute.String("error.detail", err.Error()),
 	))
 }

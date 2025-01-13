@@ -8,6 +8,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel"
 )
 
 type UserName string
@@ -103,6 +104,9 @@ func (u *User) IsIconUpdateRequired() bool {
 }
 
 func (u *User) SetIconFile(ctx context.Context, file *multipart.FileHeader) error {
+	ctx, span := otel.Tracer("user").Start(ctx, "User.SetIconFile")
+	defer span.End()
+
 	profileIcon := NewProfileIcon(nil)
 	if err := profileIcon.SetProfileIconImage(ctx, file, *u); err != nil {
 		return err

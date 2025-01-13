@@ -11,6 +11,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 type actionItemRepository struct {
@@ -27,6 +28,9 @@ func NewActionItemRepository(
 
 // CreateActionItem implements timelineactions.ActionItemRepository.
 func (a *actionItemRepository) CreateActionItem(ctx context.Context, actionItem timelineactions.ActionItem) error {
+	ctx, span := otel.Tracer("repository").Start(ctx, "actionItemRepository.CreateActionItem")
+	defer span.End()
+
 	err := a.GetQueries(ctx).CreateActionItem(ctx, model.CreateActionItemParams{
 		ActionItemID:  actionItem.ActionItemID.UUID(),
 		TalkSessionID: actionItem.TalkSessionID.UUID(),
@@ -46,11 +50,19 @@ func (a *actionItemRepository) CreateActionItem(ctx context.Context, actionItem 
 
 // UpdateActionItem implements timelineactions.ActionItemRepository.
 func (a *actionItemRepository) UpdateActionItem(ctx context.Context, actionItem timelineactions.ActionItem) error {
+	ctx, span := otel.Tracer("repository").Start(ctx, "actionItemRepository.UpdateActionItem")
+	defer span.End()
+
+	_ = ctx
+
 	panic("unimplemented")
 }
 
 // FindActionItemByActionItemID implements timelineactions.ActionItemRepository.
 func (a *actionItemRepository) FindByID(ctx context.Context, actionItemID shared.UUID[timelineactions.ActionItem]) (*timelineactions.ActionItem, error) {
+	ctx, span := otel.Tracer("repository").Start(ctx, "actionItemRepository.FindByID")
+	defer span.End()
+
 	row, err := a.GetQueries(ctx).GetActionItemByID(ctx, actionItemID.UUID())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -73,6 +85,9 @@ func (a *actionItemRepository) FindByID(ctx context.Context, actionItemID shared
 
 // FindLatestActionItemByTalkSessionID implements timelineactions.ActionItemRepository.
 func (a *actionItemRepository) FindLatestActionItemByTalkSessionID(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession]) ([]timelineactions.ActionItem, error) {
+	ctx, span := otel.Tracer("repository").Start(ctx, "actionItemRepository.FindLatestActionItemByTalkSessionID")
+	defer span.End()
+
 	row, err := a.GetQueries(ctx).GetActionItemsByTalkSessionID(ctx, talkSessionID.UUID())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

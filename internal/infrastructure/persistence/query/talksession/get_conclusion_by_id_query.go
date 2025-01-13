@@ -10,6 +10,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/internal/usecase/query/talksession"
+	"go.opentelemetry.io/otel"
 )
 
 type getConclusionByIDQuery struct {
@@ -23,6 +24,9 @@ func NewGetConclusionByIDQueryHandler(tm *db.DBManager) talksession.GetConclusio
 }
 
 func (h *getConclusionByIDQuery) Execute(ctx context.Context, input talksession.GetConclusionByIDQueryRequest) (*talksession.GetConclusionByIDQueryResponse, error) {
+	ctx, span := otel.Tracer("talksession_query").Start(ctx, "getConclusionByIDQuery.Execute")
+	defer span.End()
+
 	ts, err := h.GetQueries(ctx).GetTalkSessionByID(ctx, input.TalkSessionID.UUID())
 	if err != nil {
 		return nil, err

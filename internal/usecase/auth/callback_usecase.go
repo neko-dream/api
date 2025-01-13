@@ -14,6 +14,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	cookie_utils "github.com/neko-dream/server/pkg/cookie"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 type (
@@ -60,6 +61,9 @@ func NewAuthCallbackUseCase(
 }
 
 func (u *authCallbackInteractor) Execute(ctx context.Context, input CallbackInput) (CallbackOutput, error) {
+	ctx, span := otel.Tracer("auth_usecase").Start(ctx, "authCallbackInteractor.Execute")
+	defer span.End()
+
 	var c http.Cookie
 	if err := u.ExecTx(ctx, func(ctx context.Context) error {
 		user, err := u.AuthService.Authenticate(ctx, input.Provider, input.Code)

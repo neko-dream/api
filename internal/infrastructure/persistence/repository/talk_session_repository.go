@@ -10,6 +10,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
+	"go.opentelemetry.io/otel"
 )
 
 type talkSessionRepository struct {
@@ -25,6 +26,9 @@ func NewTalkSessionRepository(
 }
 
 func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talksession.TalkSession) error {
+	ctx, span := otel.Tracer("repository").Start(ctx, "talkSessionRepository.Create")
+	defer span.End()
+
 	var description, city, prefecture sql.NullString
 	if talkSession.City() != nil {
 		city = sql.NullString{
@@ -72,6 +76,9 @@ func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talkses
 
 // Update implements talksession.TalkSessionRepository.
 func (t *talkSessionRepository) Update(ctx context.Context, talkSession *talksession.TalkSession) error {
+	ctx, span := otel.Tracer("repository").Start(ctx, "talkSessionRepository.Update")
+	defer span.End()
+
 	if talkSession == nil {
 		return nil
 	}
@@ -106,6 +113,9 @@ func (t *talkSessionRepository) Update(ctx context.Context, talkSession *talkses
 
 // FindByID implements talksession.TalkSessionRepository.
 func (t *talkSessionRepository) FindByID(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession]) (*talksession.TalkSession, error) {
+	ctx, span := otel.Tracer("repository").Start(ctx, "talkSessionRepository.FindByID")
+	defer span.End()
+
 	row, err := t.GetQueries(ctx).GetTalkSessionByID(ctx, talkSessionID.UUID())
 	if err != nil {
 		return nil, errtrace.Wrap(err)

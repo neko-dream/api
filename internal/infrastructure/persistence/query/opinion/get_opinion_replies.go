@@ -10,6 +10,7 @@ import (
 	"github.com/neko-dream/server/internal/usecase/query/dto"
 	opinion_query "github.com/neko-dream/server/internal/usecase/query/opinion"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 type GetOpinionRepliesQueryHandler struct {
@@ -25,6 +26,8 @@ func NewGetOpinionRepliesQueryHandler(
 }
 
 func (g *GetOpinionRepliesQueryHandler) Execute(ctx context.Context, in opinion_query.GetOpinionRepliesQueryInput) (*opinion_query.GetOpinionRepliesQueryOutput, error) {
+	ctx, span := otel.Tracer("opinion_query").Start(ctx, "GetOpinionRepliesQueryHandler.Execute")
+	defer span.End()
 
 	var userID uuid.NullUUID
 	if in.UserID != nil {

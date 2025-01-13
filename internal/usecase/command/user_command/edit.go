@@ -13,6 +13,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel"
 )
 
 type (
@@ -68,6 +69,9 @@ func NewEditHandler(
 }
 
 func (e *EditHandler) Execute(ctx context.Context, input EditInput) (*EditOutput, error) {
+	ctx, span := otel.Tracer("user_command").Start(ctx, "EditHandler.Execute")
+	defer span.End()
+
 	var c http.Cookie
 	var u *user.User
 	err := e.ExecTx(ctx, func(ctx context.Context) error {

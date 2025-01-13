@@ -9,6 +9,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"go.opentelemetry.io/otel"
 )
 
 type (
@@ -141,6 +142,9 @@ func (o *Opinion) IsReferenceImageUpdateRequired() bool {
 
 // SetReferenceImage 画像をアップロード
 func (o *Opinion) SetReferenceImage(ctx context.Context, file *multipart.FileHeader) error {
+	ctx, span := otel.Tracer("opinion").Start(ctx, "Opinion.SetReferenceImage")
+	defer span.End()
+
 	referenceImage := NewReferenceImage(nil)
 	if err := referenceImage.SetReferenceImage(ctx, file); err != nil {
 		return err

@@ -12,6 +12,7 @@ import (
 	"github.com/neko-dream/server/internal/usecase/query/dto"
 	"github.com/neko-dream/server/internal/usecase/query/talksession"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 type BrowseOpenedByUserQueryImpl struct {
@@ -26,6 +27,9 @@ func NewBrowseOpenedByUserQueryHandler(tm *db.DBManager) talksession.BrowseOpene
 
 // Execute ユーザーが開いているトークセッションを検索する
 func (h *BrowseOpenedByUserQueryImpl) Execute(ctx context.Context, input talksession.BrowseOpenedByUserInput) (*talksession.BrowseOpenedByUserOutput, error) {
+	ctx, span := otel.Tracer("talksession_query").Start(ctx, "BrowseOpenedByUserQueryImpl.Execute")
+	defer span.End()
+
 	if err := input.Validate(); err != nil {
 		return nil, err
 	}

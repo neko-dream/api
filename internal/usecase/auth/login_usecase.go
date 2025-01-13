@@ -10,6 +10,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 type (
@@ -50,6 +51,9 @@ func NewAuthLoginUseCase(
 }
 
 func (a *authLoginInteractor) Execute(ctx context.Context, input AuthLoginInput) (AuthLoginOutput, error) {
+	ctx, span := otel.Tracer("auth_usecase").Start(ctx, "authLoginInteractor.Execute")
+	defer span.End()
+
 	var (
 		s  string
 		au string

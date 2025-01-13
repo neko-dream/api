@@ -11,6 +11,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
+	"go.opentelemetry.io/otel"
 )
 
 type conclusionRepository struct {
@@ -26,6 +27,9 @@ func NewConclusionRepository(
 }
 
 func (r *conclusionRepository) Create(ctx context.Context, conclusion conclusion.Conclusion) error {
+	ctx, span := otel.Tracer("repository").Start(ctx, "conclusionRepository.Create")
+	defer span.End()
+
 	r.GetQueries(ctx).CreateTalkSessionConclusion(ctx, model.CreateTalkSessionConclusionParams{
 		TalkSessionID: conclusion.TalkSessionID().UUID(),
 		CreatedBy:     conclusion.CreatedBy().UUID(),
@@ -35,6 +39,9 @@ func (r *conclusionRepository) Create(ctx context.Context, conclusion conclusion
 }
 
 func (r *conclusionRepository) FindByTalkSessionID(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession]) (*conclusion.Conclusion, error) {
+	ctx, span := otel.Tracer("repository").Start(ctx, "conclusionRepository.FindByTalkSessionID")
+	defer span.End()
+
 	res, err := r.GetQueries(ctx).GetTalkSessionConclusionByID(ctx, talkSessionID.UUID())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

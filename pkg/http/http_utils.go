@@ -2,6 +2,7 @@ package http_utils
 
 import (
 	"context"
+	"go.opentelemetry.io/otel"
 	"net/http"
 )
 
@@ -13,6 +14,9 @@ var (
 )
 
 func WithHTTPResReqContext(ctx context.Context, req *http.Request, res http.ResponseWriter) context.Context {
+	ctx, span := otel.Tracer("http_utils").Start(ctx, "WithHTTPResReqContext")
+	defer span.End()
+
 	ctx = context.WithValue(ctx, HTTPRequestContextKey, req)
 	ctx = context.WithValue(ctx, HTTPResponseContextKey, res)
 
@@ -20,9 +24,15 @@ func WithHTTPResReqContext(ctx context.Context, req *http.Request, res http.Resp
 }
 
 func GetHTTPRequest(ctx context.Context) *http.Request {
+	ctx, span := otel.Tracer("http_utils").Start(ctx, "GetHTTPRequest")
+	defer span.End()
+
 	return ctx.Value(HTTPRequestContextKey).(*http.Request)
 }
 
 func GetHTTPResponse(ctx context.Context) http.ResponseWriter {
+	ctx, span := otel.Tracer("http_utils").Start(ctx, "GetHTTPResponse")
+	defer span.End()
+
 	return ctx.Value(HTTPResponseContextKey).(http.ResponseWriter)
 }

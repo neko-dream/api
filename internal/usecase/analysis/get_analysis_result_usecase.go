@@ -10,6 +10,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 type (
@@ -82,6 +83,9 @@ func NewGetAnalysisResultUseCase(
 
 // Execute implements GetAnalysisResultUseCase.
 func (g *getAnalysisResultInteractor) Execute(ctx context.Context, input GetAnalysisResultInput) (*GetAnalysisResultOutput, error) {
+	ctx, span := otel.Tracer("analysis_usecase").Start(ctx, "getAnalysisResultInteractor.Execute")
+	defer span.End()
+
 	groupInfoRows, err := g.GetQueries(ctx).GetGroupInfoByTalkSessionId(ctx, input.TalkSessionID.UUID())
 	if err != nil {
 		return nil, err

@@ -11,6 +11,7 @@ import (
 	"github.com/neko-dream/server/internal/usecase/query/dto"
 	"github.com/neko-dream/server/internal/usecase/query/talksession"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 type BrowseTalkSessionQueryImpl struct {
@@ -26,6 +27,9 @@ func NewBrowseTalkSessionQueryHandler(
 }
 
 func (b *BrowseTalkSessionQueryImpl) Execute(ctx context.Context, in talksession.BrowseTalkSessionQueryInput) (*talksession.BrowseTalkSessionQueryOutput, error) {
+	ctx, span := otel.Tracer("talksession_query").Start(ctx, "BrowseTalkSessionQueryImpl.Execute")
+	defer span.End()
+
 	if err := in.Validate(); err != nil {
 		return nil, err
 	}

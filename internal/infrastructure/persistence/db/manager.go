@@ -8,6 +8,7 @@ import (
 	"braces.dev/errtrace"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 type txKey struct{}
@@ -51,6 +52,9 @@ func (s *DBManager) TestTx(ctx context.Context, fn func(ctx context.Context) err
 }
 
 func (s *DBManager) ExecTx(ctx context.Context, fn func(context.Context) error) error {
+	ctx, span := otel.Tracer("db").Start(ctx, "Transaction")
+	defer span.End()
+
 	var tx *sql.Tx
 
 	if tmpTx := getTx(ctx); tmpTx != nil {
@@ -92,6 +96,9 @@ func (s *DBManager) ExecTx(ctx context.Context, fn func(context.Context) error) 
 
 // GetQueries トランザクションが開始されている場合はトラトランザクションを返す。そうでない場合はDBコネクションを返す。
 func (s *DBManager) GetQueries(ctx context.Context) *model.Queries {
+	ctx, span := otel.Tracer("db").Start(ctx, "GetQueries")
+	defer span.End()
+
 	// トランザクションが開始されている場合はトランザクションを返す
 	if tx := getTx(ctx); tx != nil {
 		return model.New(tx)

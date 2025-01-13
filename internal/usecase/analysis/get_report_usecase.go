@@ -11,6 +11,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 type (
@@ -43,6 +44,9 @@ func NewGetReportQueryHandler(
 }
 
 func (h *GetReportQueryHandler) Execute(ctx context.Context, input GetReportInput) (*GetReportOutput, error) {
+	ctx, span := otel.Tracer("analysis_usecase").Start(ctx, "GetReportQueryHandler.Execute")
+	defer span.End()
+
 	rows, err := h.GetQueries(ctx).GetOpinionsByTalkSessionID(ctx, model.GetOpinionsByTalkSessionIDParams{
 		Limit:         10000,
 		Offset:        0,

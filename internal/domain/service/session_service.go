@@ -9,6 +9,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"go.opentelemetry.io/otel"
 )
 
 type sessionService struct {
@@ -22,6 +23,9 @@ var (
 )
 
 func (s *sessionService) DeactivateUserSessions(ctx context.Context, userID shared.UUID[user.User]) error {
+	ctx, span := otel.Tracer("service").Start(ctx, "sessionService.DeactivateUserSessions")
+	defer span.End()
+
 	sessions, err := s.sessionRepository.FindByUserID(ctx, userID)
 	if err != nil {
 		return errtrace.Wrap(err)
@@ -39,6 +43,9 @@ func (s *sessionService) RefreshSession(
 	ctx context.Context,
 	userID shared.UUID[user.User],
 ) (*session.Session, error) {
+	ctx, span := otel.Tracer("service").Start(ctx, "sessionService.RefreshSession")
+	defer span.End()
+
 	// sessionを取得
 	sessList, err := s.sessionRepository.FindByUserID(ctx, userID)
 	if err != nil {

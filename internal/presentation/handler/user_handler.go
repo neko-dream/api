@@ -19,6 +19,7 @@ import (
 	"github.com/neko-dream/server/pkg/sort"
 	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel"
 )
 
 type userHandler struct {
@@ -52,6 +53,8 @@ func NewUserHandler(
 
 // OpinionsHistory implements oas.UserHandler.
 func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHistoryParams) (oas.OpinionsHistoryRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "userHandler.OpinionsHistory")
+	defer span.End()
 
 	claim := session.GetSession(ctx)
 	if claim == nil {
@@ -125,6 +128,9 @@ func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHi
 
 // SessionsHistory implements oas.UserHandler.
 func (u *userHandler) SessionsHistory(ctx context.Context, params oas.SessionsHistoryParams) (oas.SessionsHistoryRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "userHandler.SessionsHistory")
+	defer span.End()
+
 	claim := session.GetSession(ctx)
 	if claim == nil {
 		return nil, messages.ForbiddenError
@@ -193,6 +199,9 @@ func (u *userHandler) SessionsHistory(ctx context.Context, params oas.SessionsHi
 
 // GetUserInfo implements ユーザーの情報取得
 func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "userHandler.GetUserInfo")
+	defer span.End()
+
 	claim := session.GetSession(ctx)
 	if claim == nil {
 		return nil, messages.ForbiddenError
@@ -267,6 +276,9 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 
 // EditUserProfile ユーザープロフィールの編集
 func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUserProfileReq) (oas.EditUserProfileRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "userHandler.EditUserProfile")
+	defer span.End()
+
 	claim := session.GetSession(ctx)
 	if !params.IsSet() {
 		return nil, messages.RequiredParameterError
@@ -372,6 +384,9 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 
 // RegisterUser ユーザー登録
 func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUserReq) (oas.RegisterUserRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "userHandler.RegisterUser")
+	defer span.End()
+
 	claim := session.GetSession(ctx)
 	if !params.IsSet() {
 		return nil, messages.RequiredParameterError
