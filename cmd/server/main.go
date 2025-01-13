@@ -18,11 +18,12 @@ import (
 func main() {
 
 	container := di.BuildContainer()
+
 	srv, err := oas.NewServer(
 		di.Invoke[oas.Handler](container),
 		di.Invoke[oas.SecurityHandler](container),
 		oas.WithErrorHandler(handler.CustomErrorHandler),
-		oas.WithTracerProvider(di.Invoke[*sdktrace.TracerProvider](container)),
+		// provider,
 	)
 	if err != nil {
 		panic(err)
@@ -36,14 +37,18 @@ func main() {
 		// di.Invoke[*db.DummyInitializer](container).Initialize()
 	}
 
-	reqMiddleware := middleware.ReqMiddleware(srv)
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*", "localhost:*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "OPTIONS"},
 		AllowedHeaders:   []string{"*"},
 		AllowCredentials: true,
 	})
-	corsHandler := c.Handler(reqMiddleware)
+	routeFinder := middleware.MakeRouteFinder(srv)
+	corsHandler := c.Handler(middleware.Wrap(
+		srv,
+		middleware.Instrument("kotohiro-api", routeFinder, di.Invoke[*sdktrace.TracerProvider](container)),
+		middleware.Labeler(routeFinder),
+	))
 	mux := http.NewServeMux()
 	mux.Handle("/static/",
 		http.StripPrefix("/static/",
