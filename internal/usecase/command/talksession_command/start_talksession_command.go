@@ -1,4 +1,4 @@
-package command
+package talksession_command
 
 import (
 	"context"

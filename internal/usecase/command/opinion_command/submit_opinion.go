@@ -1,4 +1,4 @@
-package command
+package opinion_command
 
 import (
 	"context"
@@ -16,11 +16,11 @@ import (
 )
 
 type (
-	SubmitOpinionCommand interface {
-		Execute(context.Context, SubmitOpinionCommandInput) error
+	SubmitOpinion interface {
+		Execute(context.Context, SubmitOpinionInput) error
 	}
 
-	SubmitOpinionCommandInput struct {
+	SubmitOpinionInput struct {
 		TalkSessionID   shared.UUID[talksession.TalkSession]
 		OwnerID         shared.UUID[user.User]
 		ParentOpinionID *shared.UUID[opinion.Opinion]
@@ -30,7 +30,7 @@ type (
 		Picture         *multipart.FileHeader
 	}
 
-	submitOpinionCommandHandler struct {
+	submitOpinionHandler struct {
 		opinion.OpinionRepository
 		opinion.OpinionService
 		vote.VoteRepository
@@ -38,13 +38,13 @@ type (
 	}
 )
 
-func NewSubmitOpinionCommandHandler(
+func NewSubmitOpinionHandler(
 	opinionRepository opinion.OpinionRepository,
 	opinionService opinion.OpinionService,
 	voteRepository vote.VoteRepository,
 	dbManager *db.DBManager,
-) SubmitOpinionCommand {
-	return &submitOpinionCommandHandler{
+) SubmitOpinion {
+	return &submitOpinionHandler{
 		DBManager:         dbManager,
 		OpinionService:    opinionService,
 		OpinionRepository: opinionRepository,
@@ -52,7 +52,7 @@ func NewSubmitOpinionCommandHandler(
 	}
 }
 
-func (h *submitOpinionCommandHandler) Execute(ctx context.Context, input SubmitOpinionCommandInput) error {
+func (h *submitOpinionHandler) Execute(ctx context.Context, input SubmitOpinionInput) error {
 	if err := h.ExecTx(ctx, func(ctx context.Context) error {
 		opinion, err := opinion.NewOpinion(
 			shared.NewUUID[opinion.Opinion](),

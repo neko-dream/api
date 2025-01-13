@@ -11,9 +11,10 @@ import (
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/presentation/oas"
+	"github.com/neko-dream/server/internal/usecase/command/user_command"
 	opinion_query "github.com/neko-dream/server/internal/usecase/query/opinion"
 	talksession_query "github.com/neko-dream/server/internal/usecase/query/talksession"
-	user_usecase "github.com/neko-dream/server/internal/usecase/user"
+	user_query "github.com/neko-dream/server/internal/usecase/query/user"
 	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/sort"
 	"github.com/neko-dream/server/pkg/utils"
@@ -21,27 +22,31 @@ import (
 )
 
 type userHandler struct {
-	user_usecase.RegisterUserUseCase
-	user_usecase.EditUserUseCase
-	user_usecase.GetUserInformationQueryHandler
 	getMyOpinionsQuery           opinion_query.GetMyOpinionsQuery
 	browseJoinedTalkSessionQuery talksession_query.BrowseJoinedTalkSessionsQuery
+
+	editUser     user_command.Edit
+	registerUser user_command.Register
+
+	userDetail user_query.Detail
 }
 
 func NewUserHandler(
-	registerUserUsecase user_usecase.RegisterUserUseCase,
-	editUserUsecase user_usecase.EditUserUseCase,
-	getUserInformationQueryHandler user_usecase.GetUserInformationQueryHandler,
 	getMyOpinionsQuery opinion_query.GetMyOpinionsQuery,
 	browseJoinedTalkSessionQuery talksession_query.BrowseJoinedTalkSessionsQuery,
 
+	editUser user_command.Edit,
+	registerUser user_command.Register,
+
+	userDetail user_query.Detail,
+
 ) oas.UserHandler {
 	return &userHandler{
-		RegisterUserUseCase:            registerUserUsecase,
-		EditUserUseCase:                editUserUsecase,
-		GetUserInformationQueryHandler: getUserInformationQueryHandler,
-		getMyOpinionsQuery:             getMyOpinionsQuery,
-		browseJoinedTalkSessionQuery:   browseJoinedTalkSessionQuery,
+		getMyOpinionsQuery:           getMyOpinionsQuery,
+		browseJoinedTalkSessionQuery: browseJoinedTalkSessionQuery,
+		editUser:                     editUser,
+		registerUser:                 registerUser,
+		userDetail:                   userDetail,
 	}
 }
 
@@ -199,7 +204,7 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 		return nil, messages.ForbiddenError
 	}
 
-	res, err := u.GetUserInformationQueryHandler.Execute(ctx, user_usecase.GetUserInformationQuery{
+	res, err := u.userDetail.Execute(ctx, user_query.DetailInput{
 		UserID: userID,
 	})
 	if err != nil {
@@ -208,49 +213,49 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 	}
 
 	userResp := oas.GetUserInfoOKUser{
-		DisplayID:   *res.User.DisplayID(),
-		DisplayName: *res.User.DisplayName(),
-		IconURL:     utils.ToOptNil[oas.OptNilString](res.User.ProfileIconURL()),
+		DisplayID:   res.User.DisplayID,
+		DisplayName: res.User.DisplayName,
+		IconURL:     utils.ToOptNil[oas.OptNilString](res.User.IconURL),
 	}
 	var demographicsResp oas.GetUserInfoOKDemographics
-	if res.User.Demographics() != nil {
-		demographics := res.User.Demographics()
+	if res.User.UserDemographics != nil {
+		demographics := res.User.UserDemographics
 		var city oas.OptNilString
-		if demographics.City() != nil {
+		if demographics.City != nil {
 			city = oas.OptNilString{
 				Set:   true,
-				Value: demographics.City().String(),
+				Value: *demographics.City,
 			}
 		}
 		var yearOfBirth oas.OptNilInt
-		if demographics.YearOfBirth() != nil {
+		if demographics.YearOfBirth != nil {
 			yearOfBirth = oas.OptNilInt{
 				Set:   true,
-				Value: int(*demographics.YearOfBirth()),
+				Value: *demographics.YearOfBirth,
 			}
 		}
 		var householdSize oas.OptNilInt
-		if demographics.HouseholdSize() != nil {
+		if demographics.HouseholdSize != nil {
 			householdSize = oas.OptNilInt{
 				Set:   true,
-				Value: int(*demographics.HouseholdSize()),
+				Value: *demographics.HouseholdSize,
 			}
 		}
 		var prefecture oas.OptNilString
-		if demographics.Prefecture() != nil {
+		if demographics.Prefecture != nil {
 			prefecture = oas.OptNilString{
 				Set:   true,
-				Value: *demographics.Prefecture(),
+				Value: *demographics.Prefecture,
 			}
 		}
 
 		demographicsResp = oas.GetUserInfoOKDemographics{
 			YearOfBirth:   yearOfBirth,
-			City:          city,
-			Occupation:    demographics.Occupation().String(),
-			Gender:        demographics.Gender().String(),
+			Occupation:    demographics.OccupationString(),
+			Gender:        demographics.GenderString(),
 			HouseholdSize: householdSize,
 			Prefecture:    prefecture,
+			City:          city,
 		}
 	}
 
@@ -332,7 +337,7 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 		occupation = lo.ToPtr(string(txt))
 	}
 
-	out, err := u.EditUserUseCase.Execute(ctx, user_usecase.EditUserInput{
+	out, err := u.editUser.Execute(ctx, user_command.EditInput{
 		UserID:      userID,
 		DisplayName: displayName,
 		Icon:        file,
@@ -401,7 +406,7 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 		prefecture = &value.Prefecture.Value
 	}
 
-	input := user_usecase.RegisterUserInput{
+	input := user_command.RegisterInput{
 		UserID:      userID,
 		DisplayID:   value.DisplayID,
 		DisplayName: value.DisplayName,
@@ -425,7 +430,7 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 		HouseholdSize: &value.HouseholdSize.Value,
 		Prefecture:    prefecture,
 	}
-	out, err := u.RegisterUserUseCase.Execute(ctx, input)
+	out, err := u.registerUser.Execute(ctx, input)
 	if err != nil {
 		utils.HandleError(ctx, err, "RegisterUserUseCase.Execute")
 		return nil, err

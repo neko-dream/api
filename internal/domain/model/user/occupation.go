@@ -37,7 +37,7 @@ var (
 func (o Occupation) String() string {
 	str, ok := OccupationMap[o]
 	if !ok {
-		return ""
+		return "回答しない"
 	}
 	return str
 }

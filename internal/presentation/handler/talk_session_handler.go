@@ -14,7 +14,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	analysis_usecase "github.com/neko-dream/server/internal/usecase/analysis"
-	"github.com/neko-dream/server/internal/usecase/command"
+	"github.com/neko-dream/server/internal/usecase/command/talksession_command"
 	talksession_query "github.com/neko-dream/server/internal/usecase/query/talksession"
 	"github.com/neko-dream/server/pkg/sort"
 	"github.com/neko-dream/server/pkg/utils"
@@ -28,8 +28,8 @@ type talkSessionHandler struct {
 	getAnalysisResultUseCase      analysis_usecase.GetAnalysisResultUseCase
 	getReportUseCase              analysis_usecase.GetReportQuery
 
-	addConclusionCommand    command.AddConclusionCommand
-	startTalkSessionCommand command.StartTalkSessionCommand
+	addConclusionCommand    talksession_command.AddConclusionCommand
+	startTalkSessionCommand talksession_command.StartTalkSessionCommand
 
 	session.TokenManager
 }
@@ -42,8 +42,8 @@ func NewTalkSessionHandler(
 	getAnalysisResultUseCase analysis_usecase.GetAnalysisResultUseCase,
 	getReportUseCase analysis_usecase.GetReportQuery,
 
-	AddConclusionCommand command.AddConclusionCommand,
-	startTalkSessionCommand command.StartTalkSessionCommand,
+	AddConclusionCommand talksession_command.AddConclusionCommand,
+	startTalkSessionCommand talksession_command.StartTalkSessionCommand,
 
 	tokenManager session.TokenManager,
 ) oas.TalkSessionHandler {
@@ -80,7 +80,7 @@ func (t *talkSessionHandler) PostConclusion(ctx context.Context, req oas.OptPost
 		return nil, messages.BadRequestError
 	}
 
-	if err := t.addConclusionCommand.Execute(ctx, command.AddConclusionCommandInput{
+	if err := t.addConclusionCommand.Execute(ctx, talksession_command.AddConclusionCommandInput{
 		TalkSessionID: talkSessionID,
 		UserID:        userID,
 		Conclusion:    req.Value.Content,
@@ -244,7 +244,7 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 	prefecture := utils.ToPtrIfNotNullValue(!req.Value.Prefecture.IsSet(), req.Value.Prefecture.Value)
 	description := utils.ToPtrIfNotNullValue(!req.Value.Description.IsSet(), req.Value.Description.Value)
 
-	out, err := t.startTalkSessionCommand.Execute(ctx, command.StartTalkSessionCommandInput{
+	out, err := t.startTalkSessionCommand.Execute(ctx, talksession_command.StartTalkSessionCommandInput{
 		Theme:            req.Value.Theme,
 		Description:      description,
 		OwnerID:          userID,

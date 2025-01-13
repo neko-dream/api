@@ -408,13 +408,8 @@ paths:
             type: string
             enum:
               - latest
-              - mostReply
+              - mostReplies
               - oldest
-            x-apidog:
-              enumDescriptions:
-                latest: ''
-                mostReply: ''
-                oldest: ''
             nullable: true
         - name: limit
           in: query
@@ -2665,13 +2660,8 @@ paths:
             type: string
             enum:
               - latest
-              - mostReply
+              - mostReplies
               - oldest
-            x-apidog:
-              enumDescriptions:
-                latest: 最新
-                mostReply: もっともリプライされた
-                oldest: 最古
             nullable: true
         - name: limit
           in: query

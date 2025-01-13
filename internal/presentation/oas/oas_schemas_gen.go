@@ -1989,16 +1989,16 @@ func (s *GetOpinionsForTalkSessionOKPagination) SetTotalCount(val int) {
 type GetOpinionsForTalkSessionSort string
 
 const (
-	GetOpinionsForTalkSessionSortLatest    GetOpinionsForTalkSessionSort = "latest"
-	GetOpinionsForTalkSessionSortMostReply GetOpinionsForTalkSessionSort = "mostReply"
-	GetOpinionsForTalkSessionSortOldest    GetOpinionsForTalkSessionSort = "oldest"
+	GetOpinionsForTalkSessionSortLatest      GetOpinionsForTalkSessionSort = "latest"
+	GetOpinionsForTalkSessionSortMostReplies GetOpinionsForTalkSessionSort = "mostReplies"
+	GetOpinionsForTalkSessionSortOldest      GetOpinionsForTalkSessionSort = "oldest"
 )
 
 // AllValues returns all GetOpinionsForTalkSessionSort values.
 func (GetOpinionsForTalkSessionSort) AllValues() []GetOpinionsForTalkSessionSort {
 	return []GetOpinionsForTalkSessionSort{
 		GetOpinionsForTalkSessionSortLatest,
-		GetOpinionsForTalkSessionSortMostReply,
+		GetOpinionsForTalkSessionSortMostReplies,
 		GetOpinionsForTalkSessionSortOldest,
 	}
 }
@@ -2008,7 +2008,7 @@ func (s GetOpinionsForTalkSessionSort) MarshalText() ([]byte, error) {
 	switch s {
 	case GetOpinionsForTalkSessionSortLatest:
 		return []byte(s), nil
-	case GetOpinionsForTalkSessionSortMostReply:
+	case GetOpinionsForTalkSessionSortMostReplies:
 		return []byte(s), nil
 	case GetOpinionsForTalkSessionSortOldest:
 		return []byte(s), nil
@@ -2023,8 +2023,8 @@ func (s *GetOpinionsForTalkSessionSort) UnmarshalText(data []byte) error {
 	case GetOpinionsForTalkSessionSortLatest:
 		*s = GetOpinionsForTalkSessionSortLatest
 		return nil
-	case GetOpinionsForTalkSessionSortMostReply:
-		*s = GetOpinionsForTalkSessionSortMostReply
+	case GetOpinionsForTalkSessionSortMostReplies:
+		*s = GetOpinionsForTalkSessionSortMostReplies
 		return nil
 	case GetOpinionsForTalkSessionSortOldest:
 		*s = GetOpinionsForTalkSessionSortOldest
@@ -4231,16 +4231,16 @@ func (s *OpinionsHistoryOKPagination) SetTotalCount(val int) {
 type OpinionsHistorySort string
 
 const (
-	OpinionsHistorySortLatest    OpinionsHistorySort = "latest"
-	OpinionsHistorySortMostReply OpinionsHistorySort = "mostReply"
-	OpinionsHistorySortOldest    OpinionsHistorySort = "oldest"
+	OpinionsHistorySortLatest      OpinionsHistorySort = "latest"
+	OpinionsHistorySortMostReplies OpinionsHistorySort = "mostReplies"
+	OpinionsHistorySortOldest      OpinionsHistorySort = "oldest"
 )
 
 // AllValues returns all OpinionsHistorySort values.
 func (OpinionsHistorySort) AllValues() []OpinionsHistorySort {
 	return []OpinionsHistorySort{
 		OpinionsHistorySortLatest,
-		OpinionsHistorySortMostReply,
+		OpinionsHistorySortMostReplies,
 		OpinionsHistorySortOldest,
 	}
 }
@@ -4250,7 +4250,7 @@ func (s OpinionsHistorySort) MarshalText() ([]byte, error) {
 	switch s {
 	case OpinionsHistorySortLatest:
 		return []byte(s), nil
-	case OpinionsHistorySortMostReply:
+	case OpinionsHistorySortMostReplies:
 		return []byte(s), nil
 	case OpinionsHistorySortOldest:
 		return []byte(s), nil
@@ -4265,8 +4265,8 @@ func (s *OpinionsHistorySort) UnmarshalText(data []byte) error {
 	case OpinionsHistorySortLatest:
 		*s = OpinionsHistorySortLatest
 		return nil
-	case OpinionsHistorySortMostReply:
-		*s = OpinionsHistorySortMostReply
+	case OpinionsHistorySortMostReplies:
+		*s = OpinionsHistorySortMostReplies
 		return nil
 	case OpinionsHistorySortOldest:
 		*s = OpinionsHistorySortOldest

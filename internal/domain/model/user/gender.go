@@ -21,7 +21,7 @@ var (
 func (g Gender) String() string {
 	str, ok := GenderMap[g]
 	if !ok {
-		return ""
+		return "回答しない"
 	}
 	return str
 }

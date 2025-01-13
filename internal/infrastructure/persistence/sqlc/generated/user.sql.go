@@ -213,6 +213,67 @@ func (q *Queries) GetUserDemographicsByUserID(ctx context.Context, userID uuid.U
 	return i, err
 }
 
+const getUserDetailByID = `-- name: GetUserDetailByID :one
+SELECT
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
+    user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at,
+    user_demographics.user_demographics_id, user_demographics.user_id, user_demographics.year_of_birth, user_demographics.occupation, user_demographics.gender, user_demographics.city, user_demographics.household_size, user_demographics.created_at, user_demographics.updated_at, user_demographics.prefecture
+FROM
+    users
+LEFT JOIN user_auths ON users.user_id = user_auths.user_id
+LEFT JOIN user_demographics ON users.user_id = user_demographics.user_id
+WHERE
+    users.user_id = $1
+`
+
+type GetUserDetailByIDRow struct {
+	User            User
+	UserAuth        UserAuth
+	UserDemographic UserDemographic
+}
+
+// GetUserDetailByID
+//
+//	SELECT
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
+//	    user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at,
+//	    user_demographics.user_demographics_id, user_demographics.user_id, user_demographics.year_of_birth, user_demographics.occupation, user_demographics.gender, user_demographics.city, user_demographics.household_size, user_demographics.created_at, user_demographics.updated_at, user_demographics.prefecture
+//	FROM
+//	    users
+//	LEFT JOIN user_auths ON users.user_id = user_auths.user_id
+//	LEFT JOIN user_demographics ON users.user_id = user_demographics.user_id
+//	WHERE
+//	    users.user_id = $1
+func (q *Queries) GetUserDetailByID(ctx context.Context, userID uuid.UUID) (GetUserDetailByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserDetailByID, userID)
+	var i GetUserDetailByIDRow
+	err := row.Scan(
+		&i.User.UserID,
+		&i.User.DisplayID,
+		&i.User.DisplayName,
+		&i.User.IconUrl,
+		&i.User.CreatedAt,
+		&i.User.UpdatedAt,
+		&i.UserAuth.UserAuthID,
+		&i.UserAuth.UserID,
+		&i.UserAuth.Provider,
+		&i.UserAuth.Subject,
+		&i.UserAuth.IsVerified,
+		&i.UserAuth.CreatedAt,
+		&i.UserDemographic.UserDemographicsID,
+		&i.UserDemographic.UserID,
+		&i.UserDemographic.YearOfBirth,
+		&i.UserDemographic.Occupation,
+		&i.UserDemographic.Gender,
+		&i.UserDemographic.City,
+		&i.UserDemographic.HouseholdSize,
+		&i.UserDemographic.CreatedAt,
+		&i.UserDemographic.UpdatedAt,
+		&i.UserDemographic.Prefecture,
+	)
+	return i, err
+}
+
 const updateOrCreateUserDemographics = `-- name: UpdateOrCreateUserDemographics :exec
 INSERT INTO user_demographics (
     user_demographics_id,

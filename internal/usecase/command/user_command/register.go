@@ -1,4 +1,4 @@
-package user
+package user_command
 
 import (
 	"context"
@@ -17,11 +17,11 @@ import (
 )
 
 type (
-	RegisterUserUseCase interface {
-		Execute(ctx context.Context, input RegisterUserInput) (*RegisterUserOutput, error)
+	Register interface {
+		Execute(ctx context.Context, input RegisterInput) (*RegisterOutput, error)
 	}
 
-	RegisterUserInput struct {
+	RegisterInput struct {
 		UserID        shared.UUID[user.User]
 		DisplayID     string                // ユーザーの表示用ID
 		DisplayName   string                // ユーザーの表示名
@@ -34,14 +34,14 @@ type (
 		Prefecture    *string               // ユーザーの住んでいる都道府県
 	}
 
-	RegisterUserOutput struct {
+	RegisterOutput struct {
 		DisplayID   string  // ユーザーの表示用ID
 		DisplayName string  // ユーザーの表示名
 		IconURL     *string // ユーザーのアイコンURL
 		Cookie      *http.Cookie
 	}
 
-	registerUserInteractor struct {
+	registerHandler struct {
 		*db.DBManager
 		session.TokenManager
 		conf        *config.Config
@@ -51,15 +51,15 @@ type (
 	}
 )
 
-func NewRegisterUserUseCase(
+func NewRegisterHandler(
 	dm *db.DBManager,
 	tm session.TokenManager,
 	conf *config.Config,
 	userRep user.UserRepository,
 	userService user.UserService,
 	sessService session.SessionService,
-) RegisterUserUseCase {
-	return &registerUserInteractor{
+) Register {
+	return &registerHandler{
 		DBManager:    dm,
 		TokenManager: tm,
 		conf:         conf,
@@ -69,7 +69,7 @@ func NewRegisterUserUseCase(
 	}
 }
 
-func (i *registerUserInteractor) Execute(ctx context.Context, input RegisterUserInput) (*RegisterUserOutput, error) {
+func (i *registerHandler) Execute(ctx context.Context, input RegisterInput) (*RegisterOutput, error) {
 	var c http.Cookie
 	var iconURL *string
 
@@ -161,7 +161,7 @@ func (i *registerUserInteractor) Execute(ctx context.Context, input RegisterUser
 		return nil, err
 	}
 
-	return &RegisterUserOutput{
+	return &RegisterOutput{
 		DisplayID:   input.DisplayID,
 		DisplayName: input.DisplayName,
 		IconURL:     iconURL,
