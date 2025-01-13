@@ -32,9 +32,6 @@ func NewDBManager(db *sql.DB) *DBManager {
 }
 
 func (s *DBManager) TestTx(ctx context.Context, fn func(ctx context.Context) error) error {
-	ctx, span := otel.Tracer("db").Start(ctx, "DBManager.TestTx")
-	defer span.End()
-
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
 		utils.HandleError(ctx, err, "トランザクションの開始に失敗")
@@ -55,7 +52,7 @@ func (s *DBManager) TestTx(ctx context.Context, fn func(ctx context.Context) err
 }
 
 func (s *DBManager) ExecTx(ctx context.Context, fn func(context.Context) error) error {
-	ctx, span := otel.Tracer("db").Start(ctx, "DBManager.ExecTx")
+	ctx, span := otel.Tracer("db").Start(ctx, "Transaction")
 	defer span.End()
 
 	var tx *sql.Tx
@@ -99,7 +96,7 @@ func (s *DBManager) ExecTx(ctx context.Context, fn func(context.Context) error) 
 
 // GetQueries トランザクションが開始されている場合はトラトランザクションを返す。そうでない場合はDBコネクションを返す。
 func (s *DBManager) GetQueries(ctx context.Context) *model.Queries {
-	ctx, span := otel.Tracer("db").Start(ctx, "DBManager.GetQueries")
+	ctx, span := otel.Tracer("db").Start(ctx, "GetQueries")
 	defer span.End()
 
 	// トランザクションが開始されている場合はトランザクションを返す
