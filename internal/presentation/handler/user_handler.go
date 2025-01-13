@@ -5,40 +5,48 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"time"
 	"unicode/utf8"
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/presentation/oas"
-	opinion_usecase "github.com/neko-dream/server/internal/usecase/opinion"
-	talk_session_usecase "github.com/neko-dream/server/internal/usecase/talk_session"
-	user_usecase "github.com/neko-dream/server/internal/usecase/user"
+	"github.com/neko-dream/server/internal/usecase/command/user_command"
+	opinion_query "github.com/neko-dream/server/internal/usecase/query/opinion"
+	talksession_query "github.com/neko-dream/server/internal/usecase/query/talksession"
+	user_query "github.com/neko-dream/server/internal/usecase/query/user"
 	http_utils "github.com/neko-dream/server/pkg/http"
+	"github.com/neko-dream/server/pkg/sort"
 	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
 )
 
 type userHandler struct {
-	user_usecase.RegisterUserUseCase
-	user_usecase.EditUserUseCase
-	user_usecase.GetUserInformationQueryHandler
-	opinion_usecase.GetUserOpinionListQueryHandler
-	talk_session_usecase.SearchTalkSessionsQuery
+	getMyOpinionsQuery           opinion_query.GetMyOpinionsQuery
+	browseJoinedTalkSessionQuery talksession_query.BrowseJoinedTalkSessionsQuery
+
+	editUser     user_command.Edit
+	registerUser user_command.Register
+
+	userDetail user_query.Detail
 }
 
 func NewUserHandler(
-	registerUserUsecase user_usecase.RegisterUserUseCase,
-	editUserUsecase user_usecase.EditUserUseCase,
-	getUserInformationQueryHandler user_usecase.GetUserInformationQueryHandler,
-	getUserOpinionListQueryHandler opinion_usecase.GetUserOpinionListQueryHandler,
-	getTalkSessoinHistoriesQuery talk_session_usecase.SearchTalkSessionsQuery,
+	getMyOpinionsQuery opinion_query.GetMyOpinionsQuery,
+	browseJoinedTalkSessionQuery talksession_query.BrowseJoinedTalkSessionsQuery,
+
+	editUser user_command.Edit,
+	registerUser user_command.Register,
+
+	userDetail user_query.Detail,
+
 ) oas.UserHandler {
 	return &userHandler{
-		RegisterUserUseCase:            registerUserUsecase,
-		EditUserUseCase:                editUserUsecase,
-		GetUserInformationQueryHandler: getUserInformationQueryHandler,
-		GetUserOpinionListQueryHandler: getUserOpinionListQueryHandler,
-		SearchTalkSessionsQuery:        getTalkSessoinHistoriesQuery,
+		getMyOpinionsQuery:           getMyOpinionsQuery,
+		browseJoinedTalkSessionQuery: browseJoinedTalkSessionQuery,
+		editUser:                     editUser,
+		registerUser:                 registerUser,
+		userDetail:                   userDetail,
 	}
 }
 
@@ -56,14 +64,14 @@ func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHi
 		return nil, messages.ForbiddenError
 	}
 
-	var sortKey *string
+	var sortKey sort.SortKey
 	if params.Sort.IsSet() {
 		txt, err := params.Sort.Value.MarshalText()
 		if err != nil {
 			utils.HandleError(ctx, err, "params.Sort.Value.MarshalText")
 			return nil, messages.InternalServerError
 		}
-		sortKey = lo.ToPtr(string(txt))
+		sortKey = sort.SortKey(txt)
 	}
 	var limit, offset *int
 	if params.Limit.IsSet() {
@@ -73,7 +81,7 @@ func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHi
 		offset = &params.Offset.Value
 	}
 
-	out, err := u.GetUserOpinionListQueryHandler.Execute(ctx, opinion_usecase.GetUserOpinionListQuery{
+	out, err := u.getMyOpinionsQuery.Execute(ctx, opinion_query.GetMyOpinionsQueryInput{
 		UserID:  userID,
 		SortKey: sortKey,
 		Limit:   limit,
@@ -88,20 +96,20 @@ func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHi
 	for _, opinion := range out.Opinions {
 		opinions = append(opinions, oas.OpinionsHistoryOKOpinionsItem{
 			Opinion: oas.OpinionsHistoryOKOpinionsItemOpinion{
-				ID:      opinion.Opinion.OpinionID,
+				ID:      opinion.Opinion.OpinionID.String(),
 				Title:   utils.ToOpt[oas.OptString](opinion.Opinion.Title),
 				Content: opinion.Opinion.Content,
 				VoteType: oas.OptOpinionsHistoryOKOpinionsItemOpinionVoteType{
 					Set:   true,
-					Value: oas.OpinionsHistoryOKOpinionsItemOpinionVoteType(opinion.Opinion.VoteType),
+					Value: oas.OpinionsHistoryOKOpinionsItemOpinionVoteType(opinion.GetParentVoteType()),
 				},
 				ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
 				PictureURL:   utils.ToOpt[oas.OptString](opinion.Opinion.PictureURL),
 			},
 			User: oas.OpinionsHistoryOKOpinionsItemUser{
-				DisplayID:   opinion.User.ID,
-				DisplayName: opinion.User.Name,
-				IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.Icon),
+				DisplayID:   opinion.User.DisplayID,
+				DisplayName: opinion.User.DisplayName,
+				IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.IconURL),
 			},
 			ReplyCount: opinion.ReplyCount,
 		})
@@ -145,9 +153,9 @@ func (u *userHandler) SessionsHistory(ctx context.Context, params oas.SessionsHi
 		offset = &params.Offset.Value
 	}
 
-	out, err := u.SearchTalkSessionsQuery.Execute(ctx, talk_session_usecase.SearchTalkSessionsInput{
+	out, err := u.browseJoinedTalkSessionQuery.Execute(ctx, talksession_query.BrowseJoinedTalkSessionsQueryInput{
 		UserID: userID,
-		Status: status,
+		Status: talksession_query.Status(status),
 		Theme:  utils.ToPtrIfNotNullValue(!params.Theme.IsSet(), params.Theme.Value),
 		Limit:  limit,
 		Offset: offset,
@@ -161,15 +169,15 @@ func (u *userHandler) SessionsHistory(ctx context.Context, params oas.SessionsHi
 	for _, talkSession := range out.TalkSessions {
 		talkSessions = append(talkSessions, oas.SessionsHistoryOKTalkSessionsItem{
 			TalkSession: oas.SessionsHistoryOKTalkSessionsItemTalkSession{
-				ID:    talkSession.ID,
+				ID:    talkSession.TalkSessionID.String(),
 				Theme: talkSession.Theme,
 				Owner: oas.SessionsHistoryOKTalkSessionsItemTalkSessionOwner{
-					DisplayID:   talkSession.Owner.DisplayID,
-					DisplayName: talkSession.Owner.DisplayName,
-					IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.Owner.IconURL),
+					DisplayID:   talkSession.User.DisplayID,
+					DisplayName: talkSession.User.DisplayName,
+					IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.User.IconURL),
 				},
-				CreatedAt:        talkSession.CreatedAt,
-				ScheduledEndTime: talkSession.ScheduledEndTime,
+				CreatedAt:        talkSession.CreatedAt.Format(time.RFC3339),
+				ScheduledEndTime: talkSession.ScheduledEndTime.Format(time.RFC3339),
 			},
 			OpinionCount: talkSession.OpinionCount,
 		})
@@ -179,8 +187,6 @@ func (u *userHandler) SessionsHistory(ctx context.Context, params oas.SessionsHi
 		TalkSessions: talkSessions,
 		Pagination: oas.SessionsHistoryOKPagination{
 			TotalCount: out.TotalCount,
-			Limit:      out.Limit,
-			Offset:     out.Offset,
 		},
 	}, nil
 }
@@ -198,7 +204,7 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 		return nil, messages.ForbiddenError
 	}
 
-	res, err := u.GetUserInformationQueryHandler.Execute(ctx, user_usecase.GetUserInformationQuery{
+	res, err := u.userDetail.Execute(ctx, user_query.DetailInput{
 		UserID: userID,
 	})
 	if err != nil {
@@ -207,49 +213,49 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 	}
 
 	userResp := oas.GetUserInfoOKUser{
-		DisplayID:   *res.User.DisplayID(),
-		DisplayName: *res.User.DisplayName(),
-		IconURL:     utils.ToOptNil[oas.OptNilString](res.User.ProfileIconURL()),
+		DisplayID:   res.User.DisplayID,
+		DisplayName: res.User.DisplayName,
+		IconURL:     utils.ToOptNil[oas.OptNilString](res.User.IconURL),
 	}
 	var demographicsResp oas.GetUserInfoOKDemographics
-	if res.User.Demographics() != nil {
-		demographics := res.User.Demographics()
+	if res.User.UserDemographics != nil {
+		demographics := res.User.UserDemographics
 		var city oas.OptNilString
-		if demographics.City() != nil {
+		if demographics.City != nil {
 			city = oas.OptNilString{
 				Set:   true,
-				Value: demographics.City().String(),
+				Value: *demographics.City,
 			}
 		}
 		var yearOfBirth oas.OptNilInt
-		if demographics.YearOfBirth() != nil {
+		if demographics.YearOfBirth != nil {
 			yearOfBirth = oas.OptNilInt{
 				Set:   true,
-				Value: int(*demographics.YearOfBirth()),
+				Value: *demographics.YearOfBirth,
 			}
 		}
 		var householdSize oas.OptNilInt
-		if demographics.HouseholdSize() != nil {
+		if demographics.HouseholdSize != nil {
 			householdSize = oas.OptNilInt{
 				Set:   true,
-				Value: int(*demographics.HouseholdSize()),
+				Value: *demographics.HouseholdSize,
 			}
 		}
 		var prefecture oas.OptNilString
-		if demographics.Prefecture() != nil {
+		if demographics.Prefecture != nil {
 			prefecture = oas.OptNilString{
 				Set:   true,
-				Value: *demographics.Prefecture(),
+				Value: *demographics.Prefecture,
 			}
 		}
 
 		demographicsResp = oas.GetUserInfoOKDemographics{
 			YearOfBirth:   yearOfBirth,
-			City:          city,
-			Occupation:    demographics.Occupation().String(),
-			Gender:        demographics.Gender().String(),
+			Occupation:    demographics.OccupationString(),
+			Gender:        demographics.GenderString(),
 			HouseholdSize: householdSize,
 			Prefecture:    prefecture,
+			City:          city,
 		}
 	}
 
@@ -331,7 +337,7 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 		occupation = lo.ToPtr(string(txt))
 	}
 
-	out, err := u.EditUserUseCase.Execute(ctx, user_usecase.EditUserInput{
+	out, err := u.editUser.Execute(ctx, user_command.EditInput{
 		UserID:      userID,
 		DisplayName: displayName,
 		Icon:        file,
@@ -400,7 +406,7 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 		prefecture = &value.Prefecture.Value
 	}
 
-	input := user_usecase.RegisterUserInput{
+	input := user_command.RegisterInput{
 		UserID:      userID,
 		DisplayID:   value.DisplayID,
 		DisplayName: value.DisplayName,
@@ -424,7 +430,7 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 		HouseholdSize: &value.HouseholdSize.Value,
 		Prefecture:    prefecture,
 	}
-	out, err := u.RegisterUserUseCase.Execute(ctx, input)
+	out, err := u.registerUser.Execute(ctx, input)
 	if err != nil {
 		utils.HandleError(ctx, err, "RegisterUserUseCase.Execute")
 		return nil, err

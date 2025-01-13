@@ -23,6 +23,10 @@ type AddGeneratedImagesParams struct {
 	TsncUrl       string
 }
 
+// AddGeneratedImages
+//
+//	INSERT INTO talk_session_generated_images (talk_session_id, wordmap_url, tsnc_url) VALUES ($1, $2, $3)
+//	ON CONFLICT (talk_session_id) DO UPDATE SET wordmap_url = $2, tsnc_url = $3, updated_at = NOW()
 func (q *Queries) AddGeneratedImages(ctx context.Context, arg AddGeneratedImagesParams) error {
 	_, err := q.db.ExecContext(ctx, addGeneratedImages, arg.TalkSessionID, arg.WordmapUrl, arg.TsncUrl)
 	return err
@@ -39,6 +43,16 @@ FROM talk_session_generated_images
 WHERE talk_session_id = $1::uuid
 `
 
+// GetGeneratedImages
+//
+//	SELECT
+//	    talk_session_id,
+//	    wordmap_url,
+//	    tsnc_url,
+//	    created_at,
+//	    updated_at
+//	FROM talk_session_generated_images
+//	WHERE talk_session_id = $1::uuid
 func (q *Queries) GetGeneratedImages(ctx context.Context, dollar_1 uuid.UUID) (TalkSessionGeneratedImage, error) {
 	row := q.db.QueryRowContext(ctx, getGeneratedImages, dollar_1)
 	var i TalkSessionGeneratedImage
@@ -79,6 +93,21 @@ type GetGroupInfoByTalkSessionIdRow struct {
 	UserID         uuid.UUID
 }
 
+// GetGroupInfoByTalkSessionId
+//
+//	SELECT
+//	    user_group_info.pos_x,
+//	    user_group_info.pos_y,
+//	    user_group_info.group_id,
+//	    user_group_info.perimeter_index,
+//	    users.display_id AS display_id,
+//	    users.display_name AS display_name,
+//	    users.icon_url AS icon_url,
+//	    user_group_info.user_id
+//	FROM user_group_info
+//	LEFT JOIN users
+//	    ON user_group_info.user_id = users.user_id
+//	WHERE talk_session_id = $1
 func (q *Queries) GetGroupInfoByTalkSessionId(ctx context.Context, talkSessionID uuid.UUID) ([]GetGroupInfoByTalkSessionIdRow, error) {
 	rows, err := q.db.QueryContext(ctx, getGroupInfoByTalkSessionId, talkSessionID)
 	if err != nil {
@@ -118,6 +147,12 @@ FROM user_group_info
 WHERE talk_session_id = $1
 `
 
+// GetGroupListByTalkSessionId
+//
+//	SELECT
+//	    DISTINCT user_group_info.group_id
+//	FROM user_group_info
+//	WHERE talk_session_id = $1
 func (q *Queries) GetGroupListByTalkSessionId(ctx context.Context, talkSessionID uuid.UUID) ([]int32, error) {
 	rows, err := q.db.QueryContext(ctx, getGroupListByTalkSessionId, talkSessionID)
 	if err != nil {
@@ -151,6 +186,15 @@ FROM talk_session_reports
 WHERE talk_session_id = $1
 `
 
+// GetReportByTalkSessionId
+//
+//	SELECT
+//	    talk_session_id,
+//	    report,
+//	    created_at,
+//	    updated_at
+//	FROM talk_session_reports
+//	WHERE talk_session_id = $1
 func (q *Queries) GetReportByTalkSessionId(ctx context.Context, talkSessionID uuid.UUID) (TalkSessionReport, error) {
 	row := q.db.QueryRowContext(ctx, getReportByTalkSessionId, talkSessionID)
 	var i TalkSessionReport
@@ -217,6 +261,39 @@ type GetRepresentativeOpinionsByTalkSessionIdRow struct {
 	ReplyCount      int64
 }
 
+// GetRepresentativeOpinionsByTalkSessionId
+//
+//	SELECT
+//	    representative_opinions.group_id,
+//	    representative_opinions.rank,
+//	    representative_opinions.agree_count,
+//	    representative_opinions.disagree_count,
+//	    representative_opinions.pass_count,
+//	    opinions.opinion_id,
+//	    opinions.talk_session_id,
+//	    opinions.parent_opinion_id,
+//	    opinions.title,
+//	    opinions.content,
+//	    opinions.reference_url,
+//	    opinions.picture_url,
+//	    opinions.created_at,
+//	    users.display_name AS display_name,
+//	    users.display_id AS display_id,
+//	    users.icon_url AS icon_url,
+//	    COALESCE(rc.reply_count, 0) AS reply_count
+//	FROM representative_opinions
+//	LEFT JOIN opinions
+//	    ON representative_opinions.opinion_id = opinions.opinion_id
+//	LEFT JOIN users
+//	    ON opinions.user_id = users.user_id
+//	LEFT JOIN (
+//	    SELECT COUNT(opinion_id) AS reply_count, parent_opinion_id
+//	    FROM opinions
+//	    GROUP BY parent_opinion_id
+//	) rc ON opinions.opinion_id = rc.parent_opinion_id
+//	WHERE representative_opinions.rank < 4
+//	    AND opinions.talk_session_id = $1
+//	ORDER BY representative_opinions.rank
 func (q *Queries) GetRepresentativeOpinionsByTalkSessionId(ctx context.Context, talkSessionID uuid.UUID) ([]GetRepresentativeOpinionsByTalkSessionIdRow, error) {
 	rows, err := q.db.QueryContext(ctx, getRepresentativeOpinionsByTalkSessionId, talkSessionID)
 	if err != nil {

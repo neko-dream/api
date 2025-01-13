@@ -26,6 +26,9 @@ type CreateSessionParams struct {
 	LastActivityAt time.Time
 }
 
+// CreateSession
+//
+//	INSERT INTO sessions (session_id, user_id, provider, session_status, created_at, expires_at, last_activity_at) VALUES ($1, $2, $3, $4, $5, $6, $7)
 func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) error {
 	_, err := q.db.ExecContext(ctx, createSession,
 		arg.SessionID,
@@ -46,6 +49,12 @@ FROM sessions
     AND session_status = 0
 `
 
+// FindActiveSessionsByUserID
+//
+//	SELECT session_id, user_id, provider, session_status, expires_at, created_at, last_activity_at
+//	FROM sessions
+//	    WHERE user_id = $1
+//	    AND session_status = 0
 func (q *Queries) FindActiveSessionsByUserID(ctx context.Context, userID uuid.UUID) ([]Session, error) {
 	rows, err := q.db.QueryContext(ctx, findActiveSessionsByUserID, userID)
 	if err != nil {
@@ -83,6 +92,11 @@ FROM sessions
 WHERE session_id = $1
 `
 
+// FindSessionBySessionID
+//
+//	SELECT session_id, user_id, provider, session_status, expires_at, created_at, last_activity_at
+//	FROM sessions
+//	WHERE session_id = $1
 func (q *Queries) FindSessionBySessionID(ctx context.Context, sessionID uuid.UUID) (Session, error) {
 	row := q.db.QueryRowContext(ctx, findSessionBySessionID, sessionID)
 	var i Session
@@ -110,6 +124,11 @@ type UpdateSessionParams struct {
 	LastActivityAt time.Time
 }
 
+// UpdateSession
+//
+//	UPDATE sessions
+//	SET session_status = $2, last_activity_at = $3
+//	WHERE session_id = $1
 func (q *Queries) UpdateSession(ctx context.Context, arg UpdateSessionParams) error {
 	_, err := q.db.ExecContext(ctx, updateSession, arg.SessionID, arg.SessionStatus, arg.LastActivityAt)
 	return err

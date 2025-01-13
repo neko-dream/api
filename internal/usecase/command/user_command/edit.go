@@ -1,4 +1,4 @@
-package user
+package user_command
 
 import (
 	"context"
@@ -16,11 +16,11 @@ import (
 )
 
 type (
-	EditUserUseCase interface {
-		Execute(ctx context.Context, input EditUserInput) (*EditUserOutput, error)
+	Edit interface {
+		Execute(context.Context, EditInput) (*EditOutput, error)
 	}
 
-	EditUserInput struct {
+	EditInput struct {
 		UserID        shared.UUID[user.User]
 		DisplayName   *string               // ユーザーの表示名
 		Icon          *multipart.FileHeader // ユーザーのアイコン
@@ -33,13 +33,13 @@ type (
 		Prefecture    *string               // ユーザーの居住地の都道府県
 	}
 
-	EditUserOutput struct {
+	EditOutput struct {
 		DisplayID   string // ユーザーの表示用ID
 		DisplayName string // ユーザーの表示名
 		Cookie      *http.Cookie
 	}
 
-	editUserInteractor struct {
+	EditHandler struct {
 		*db.DBManager
 		session.TokenManager
 		conf        *config.Config
@@ -49,15 +49,15 @@ type (
 	}
 )
 
-func NewEditUserUseCase(
+func NewEditHandler(
 	dm *db.DBManager,
 	tm session.TokenManager,
 	conf *config.Config,
 	userRep user.UserRepository,
 	userService user.UserService,
 	sessService session.SessionService,
-) EditUserUseCase {
-	return &editUserInteractor{
+) Edit {
+	return &EditHandler{
 		DBManager:    dm,
 		TokenManager: tm,
 		conf:         conf,
@@ -67,7 +67,7 @@ func NewEditUserUseCase(
 	}
 }
 
-func (e *editUserInteractor) Execute(ctx context.Context, input EditUserInput) (*EditUserOutput, error) {
+func (e *EditHandler) Execute(ctx context.Context, input EditInput) (*EditOutput, error) {
 	var c http.Cookie
 	var u *user.User
 	err := e.ExecTx(ctx, func(ctx context.Context) error {
@@ -162,7 +162,7 @@ func (e *editUserInteractor) Execute(ctx context.Context, input EditUserInput) (
 		return nil, err
 	}
 
-	return &EditUserOutput{
+	return &EditOutput{
 		DisplayID:   *u.DisplayID(),
 		DisplayName: *u.DisplayName(),
 		Cookie:      &c,

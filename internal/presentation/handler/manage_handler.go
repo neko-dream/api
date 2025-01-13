@@ -96,13 +96,12 @@ func (m *manageHandler) ManageIndex(ctx context.Context) (oas.ManageIndexOK, err
 	var sessions []map[string]interface{}
 	for _, row := range rows {
 		res := map[string]interface{}{
-			"ID":    row.TalkSessionID,
-			"Theme": row.Theme,
+			"ID":    row.TalkSession.TalkSessionID,
+			"Theme": row.TalkSession.Theme,
 		}
 
-		rr, err := m.GetQueries(ctx).GetGeneratedImages(ctx, row.TalkSessionID)
+		rr, err := m.GetQueries(ctx).GetGeneratedImages(ctx, row.TalkSession.TalkSessionID)
 		if err == nil {
-			log.Println(rr)
 			res["WordCloud"] = rr.WordmapUrl
 			res["Tsnc"] = rr.TsncUrl
 		}

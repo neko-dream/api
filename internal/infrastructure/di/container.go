@@ -4,23 +4,7 @@ import (
 	"log"
 
 	"braces.dev/errtrace"
-	"github.com/neko-dream/server/internal/domain/service"
-	"github.com/neko-dream/server/internal/infrastructure/auth/jwt"
-	"github.com/neko-dream/server/internal/infrastructure/auth/oauth"
-	"github.com/neko-dream/server/internal/infrastructure/config"
-	client "github.com/neko-dream/server/internal/infrastructure/external/analysis"
-	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
-	"github.com/neko-dream/server/internal/infrastructure/persistence/postgresql"
-	"github.com/neko-dream/server/internal/infrastructure/persistence/repository"
-	"github.com/neko-dream/server/internal/infrastructure/telemetry"
-	"github.com/neko-dream/server/internal/presentation/handler"
-	analysis_usecase "github.com/neko-dream/server/internal/usecase/analysis"
-	auth_usecase "github.com/neko-dream/server/internal/usecase/auth"
-	opinion_usecase "github.com/neko-dream/server/internal/usecase/opinion"
-	talk_session_usecase "github.com/neko-dream/server/internal/usecase/talk_session"
-	timeline_usecase "github.com/neko-dream/server/internal/usecase/timeline"
-	user_usecase "github.com/neko-dream/server/internal/usecase/user"
-	vote_usecase "github.com/neko-dream/server/internal/usecase/vote"
+
 	"go.uber.org/dig"
 )
 
@@ -33,70 +17,12 @@ func AddProvider(arg ProvideArg) {
 }
 
 func BuildContainer() *dig.Container {
-	deps := []ProvideArg{
-		{config.LoadConfig, nil},
-		{postgresql.Connect, nil},
-		{db.NewMigrator, nil},
-		{db.NewDBManager, nil},
-		{oauth.NewProviderFactory, nil},
-		{telemetry.SentryProvider, nil},
-		{repository.InitConfig, nil},
-		{repository.InitS3Client, nil},
-		{repository.NewImageRepository, nil},
-		{repository.NewSessionRepository, nil},
-		{repository.NewUserRepository, nil},
-		{repository.NewTalkSessionRepository, nil},
-		{repository.NewOpinionRepository, nil},
-		{repository.NewVoteRepository, nil},
-		{repository.NewConclusionRepository, nil},
-		{repository.NewActionItemRepository, nil},
-		{db.NewDummyInitializer, nil},
-		{jwt.NewTokenManager, nil},
-		{service.NewAuthService, nil},
-		{service.NewSessionService, nil},
-		{service.NewUserService, nil},
-		{service.NewOpinionService, nil},
-		{service.NewActionItemService, nil},
-		{service.NewStateGenerator, nil},
-		{auth_usecase.NewAuthLoginUseCase, nil},
-		{auth_usecase.NewAuthCallbackUseCase, nil},
-		{auth_usecase.NewRevokeUseCase, nil},
-		{user_usecase.NewRegisterUserUseCase, nil},
-		{user_usecase.NewEditUserUseCase, nil},
-		{user_usecase.NewGetUserInformationQueryHandler, nil},
-		{talk_session_usecase.NewStartTalkSessionCommand, nil},
-		{talk_session_usecase.NewListTalkSessionQueryHandler, nil},
-		{talk_session_usecase.NewViewTalkSessionDetailQuery, nil},
-		{talk_session_usecase.NewSearchTalkSessionsQuery, nil},
-		{talk_session_usecase.NewBrowseUsersTalkSessionHistoriesQueryHandler, nil},
-		{talk_session_usecase.NewAddTalkSessionConclusionCommand, nil},
-		{talk_session_usecase.NewGetTalkSessionConclusionQuery, nil},
-		{opinion_usecase.NewPostOpinionUseCase, nil},
-		{opinion_usecase.NewGetOpinionRepliesUseCase, nil},
-		{opinion_usecase.NewGetSwipeOpinionsQueryHandler, nil},
-		{opinion_usecase.NewGetOpinionDetailUseCase, nil},
-		{opinion_usecase.NewGetUserOpinionListQueryHandler, nil},
-		{opinion_usecase.NewGetOpinionsByTalkSessionUseCase, nil},
-		{analysis_usecase.NewGetAnalysisResultUseCase, nil},
-		{analysis_usecase.NewGetReportQueryHandler, nil},
-		{timeline_usecase.NewAddTimeLineUseCase, nil},
-		{timeline_usecase.NewGetTimeLineUseCase, nil},
-		{timeline_usecase.NewEditTimeLineUseCase, nil},
-		{vote_usecase.NewPostVoteUseCase, nil},
-		{client.NewAnalysisService, nil},
-		{handler.NewSecurityHandler, nil},
-		{handler.NewAuthHandler, nil},
-		{handler.NewUserHandler, nil},
-		{handler.NewVoteHandler, nil},
-		{handler.NewOpinionHandler, nil},
-		{handler.NewTalkSessionHandler, nil},
-		{handler.NewHandler, nil},
-		{handler.NewTestHandler, nil},
-		{handler.NewManageHandler, nil},
-		{handler.NewTimelineHandler, nil},
-	}
-
-	container := ProvideDependencies(deps)
+	container := ProvideDependencies(
+		infraDeps(),
+		domainDeps(),
+		useCaseDeps(),
+		presentationDeps(),
+	)
 	return container
 }
 
