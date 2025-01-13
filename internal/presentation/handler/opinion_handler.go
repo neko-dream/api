@@ -20,6 +20,7 @@ import (
 	"github.com/neko-dream/server/pkg/sort"
 	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel"
 )
 
 type opinionHandler struct {
@@ -57,6 +58,9 @@ func NewOpinionHandler(
 
 // GetOpinionsForTalkSession implements oas.OpinionHandler.
 func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params oas.GetOpinionsForTalkSessionParams) (oas.GetOpinionsForTalkSessionRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.GetOpinionsForTalkSession")
+	defer span.End()
+
 	claim := session.GetSession(o.SetSession(ctx))
 	var userID *shared.UUID[user.User]
 	if claim != nil {
@@ -129,6 +133,9 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 
 // GetOpinionDetail implements oas.OpinionHandler.
 func (o *opinionHandler) GetOpinionDetail(ctx context.Context, params oas.GetOpinionDetailParams) (oas.GetOpinionDetailRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.GetOpinionDetail")
+	defer span.End()
+
 	claim := session.GetSession(o.SetSession(ctx))
 	var userID *shared.UUID[user.User]
 	if claim != nil {
@@ -176,6 +183,9 @@ func (o *opinionHandler) GetOpinionDetail(ctx context.Context, params oas.GetOpi
 // SwipeOpinions スワイプ用の意見取得
 // 自分が投稿した意見は取得しない
 func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpinionsParams) (oas.SwipeOpinionsRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.SwipeOpinions")
+	defer span.End()
+
 	claim := session.GetSession(ctx)
 	userID, err := claim.UserID()
 	if err != nil {
@@ -230,6 +240,9 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 
 // OpinionComments 意見に対するリプライ意見取得
 func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.OpinionCommentsParams) (oas.OpinionCommentsRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.OpinionComments")
+	defer span.End()
+
 	claim := session.GetSession(o.SetSession(ctx))
 	var userID *shared.UUID[user.User]
 	if claim != nil {
@@ -314,6 +327,9 @@ func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.Opinion
 
 // PostOpinionPost implements oas.OpinionHandler.
 func (o *opinionHandler) PostOpinionPost(ctx context.Context, req oas.OptPostOpinionPostReq, params oas.PostOpinionPostParams) (oas.PostOpinionPostRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.PostOpinionPost")
+	defer span.End()
+
 	claim := session.GetSession(ctx)
 	userID, err := claim.UserID()
 	if err != nil {

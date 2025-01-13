@@ -11,6 +11,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 type (
@@ -53,6 +54,9 @@ func NewAddTimeLineUseCase(
 }
 
 func (i *addTimeLineInteractor) Execute(ctx context.Context, input AddTimeLineInput) (*AddTimeLineOutput, error) {
+	ctx, span := otel.Tracer("timeline_usecase").Start(ctx, "addTimeLineInteractor.Execute")
+	defer span.End()
+
 	talkSession, err := i.TalkSessionRepository.FindByID(ctx, input.TalkSessionID)
 	if err != nil {
 		return nil, err

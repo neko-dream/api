@@ -8,6 +8,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/internal/usecase/query/dto"
 	"github.com/neko-dream/server/internal/usecase/query/talksession"
+	"go.opentelemetry.io/otel"
 )
 
 type getTalkSessionDetailByIDQuery struct {
@@ -22,6 +23,9 @@ func NewGetTalkSessionDetailByIDQueryHandler(tm *db.DBManager) talksession.GetTa
 
 // Execute トークセッションの詳細を取得する
 func (h *getTalkSessionDetailByIDQuery) Execute(ctx context.Context, input talksession.GetTalkSessionDetailInput) (*talksession.GetTalkSessionDetailOutput, error) {
+	ctx, span := otel.Tracer("talksession_query").Start(ctx, "getTalkSessionDetailByIDQuery.Execute")
+	defer span.End()
+
 	talkSessionRow, err := h.GetQueries(ctx).GetTalkSessionByID(ctx, input.TalkSessionID.UUID())
 	if err != nil {
 		return nil, messages.TalkSessionNotFound

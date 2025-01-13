@@ -7,6 +7,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"go.opentelemetry.io/otel"
 )
 
 type (
@@ -95,5 +96,8 @@ func (t *TalkSession) ChangeTheme(theme string) {
 
 // 終了しているかを調べる
 func (t *TalkSession) IsFinished(ctx context.Context) bool {
+	ctx, span := otel.Tracer("talksession").Start(ctx, "TalkSession.IsFinished")
+	defer span.End()
+
 	return t.scheduledEndTime.Before(clock.Now(ctx))
 }

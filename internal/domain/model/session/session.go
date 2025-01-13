@@ -8,6 +8,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"go.opentelemetry.io/otel"
 )
 
 type status int
@@ -33,6 +34,9 @@ func NewSessionStatus(num int) *status {
 type expiresAt = time.Time
 
 func NewExpiresAt(ctx context.Context) *expiresAt {
+	ctx, span := otel.Tracer("session").Start(ctx, "NewExpiresAt")
+	defer span.End()
+
 	t := clock.Now(ctx).Add(2 * 24 * time.Hour * 7)
 	e := expiresAt(t)
 	return &e
@@ -96,10 +100,16 @@ func (s *Session) Status() status {
 }
 
 func (s *Session) IsActive(ctx context.Context) bool {
+	ctx, span := otel.Tracer("session").Start(ctx, "Session.IsActive")
+	defer span.End()
+
 	return s.expires.After(clock.Now(ctx)) && s.status == SESSION_ACTIVE
 }
 
 func (s *Session) Deactivate(ctx context.Context) {
+	ctx, span := otel.Tracer("session").Start(ctx, "Session.Deactivate")
+	defer span.End()
+
 	s.status = SESSION_INACTIVE
 	s.UpdateLastActivity(ctx)
 }
@@ -113,6 +123,9 @@ func (s *Session) LastActivityAt() time.Time {
 }
 
 func (s *Session) UpdateLastActivity(ctx context.Context) {
+	ctx, span := otel.Tracer("session").Start(ctx, "Session.UpdateLastActivity")
+	defer span.End()
+
 	s.lastActivity = clock.Now(ctx)
 }
 

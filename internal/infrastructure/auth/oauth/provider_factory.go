@@ -5,6 +5,7 @@ import (
 
 	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/infrastructure/config"
+	"go.opentelemetry.io/otel"
 )
 
 type providerFactory struct {
@@ -20,6 +21,9 @@ func NewProviderFactory(
 }
 
 func (p *providerFactory) NewAuthProvider(ctx context.Context, providerName string) (auth.AuthProvider, error) {
+	ctx, span := otel.Tracer("oauth").Start(ctx, "providerFactory.NewAuthProvider")
+	defer span.End()
+
 	authProviderName, err := auth.NewAuthProviderName(providerName)
 	if err != nil {
 		return nil, err

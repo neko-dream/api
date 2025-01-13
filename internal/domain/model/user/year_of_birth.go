@@ -5,6 +5,7 @@ import (
 
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel"
 )
 
 type YearOfBirth int
@@ -24,6 +25,9 @@ func NewYearOfBirth(year *int) *YearOfBirth {
 }
 
 func (y YearOfBirth) Age(ctx context.Context) int {
+	ctx, span := otel.Tracer("user").Start(ctx, "YearOfBirth.Age")
+	defer span.End()
+
 	if ctx == nil {
 		ctx = context.Background()
 	}

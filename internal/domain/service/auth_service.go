@@ -10,6 +10,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 type AuthService interface {
@@ -40,6 +41,9 @@ func (a *authService) Authenticate(
 	providerName,
 	code string,
 ) (*user.User, error) {
+	ctx, span := otel.Tracer("service").Start(ctx, "authService.Authenticate")
+	defer span.End()
+
 	provider, err := a.authProviderFactory.NewAuthProvider(ctx, providerName)
 	if err != nil {
 		utils.HandleError(ctx, err, "AuthProviderFactory.NewAuthProvider")
@@ -83,6 +87,9 @@ func (a *authService) Authenticate(
 var randTable = []byte("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
 
 func (a *authService) GenerateState(ctx context.Context) (string, error) {
+	ctx, span := otel.Tracer("service").Start(ctx, "authService.GenerateState")
+	defer span.End()
+
 	b := make([]byte, 32)
 	if _, err := rand.Read(b); err != nil {
 		utils.HandleError(ctx, err, "rand.Read")

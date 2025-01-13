@@ -9,9 +9,13 @@ import (
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/pkg/utils"
 	onerror "github.com/ogen-go/ogen/ogenerrors"
+	"go.opentelemetry.io/otel"
 )
 
 func CustomErrorHandler(ctx context.Context, w http.ResponseWriter, r *http.Request, err error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "CustomErrorHandler")
+	defer span.End()
+
 	apiErr := &messages.APIError{}
 
 	switch {

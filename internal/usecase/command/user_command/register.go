@@ -14,6 +14,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel"
 )
 
 type (
@@ -70,6 +71,9 @@ func NewRegisterHandler(
 }
 
 func (i *registerHandler) Execute(ctx context.Context, input RegisterInput) (*RegisterOutput, error) {
+	ctx, span := otel.Tracer("user_command").Start(ctx, "registerHandler.Execute")
+	defer span.End()
+
 	var c http.Cookie
 	var iconURL *string
 

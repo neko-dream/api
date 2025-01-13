@@ -8,6 +8,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"go.opentelemetry.io/otel"
 )
 
 type (
@@ -38,6 +39,9 @@ func NewAddConclusionCommandHandler(
 }
 
 func (i *addConclusionCommandHandler) Execute(ctx context.Context, input AddConclusionCommandInput) error {
+	ctx, span := otel.Tracer("talksession_command").Start(ctx, "addConclusionCommandHandler.Execute")
+	defer span.End()
+
 	// TalkSessionのドメインロジックのような気もする。
 	res, err := i.TalkSessionRepository.FindByID(ctx, input.TalkSessionID)
 	if err != nil {

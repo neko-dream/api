@@ -7,6 +7,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel"
 )
 
 type User struct {
@@ -44,6 +45,9 @@ func (u *UserDemographics) OccupationString() string {
 }
 
 func (u *UserDemographics) Age(ctx context.Context) *int {
+	ctx, span := otel.Tracer("dto").Start(ctx, "UserDemographics.Age")
+	defer span.End()
+
 	if u.YearOfBirth == nil {
 		return nil
 	}

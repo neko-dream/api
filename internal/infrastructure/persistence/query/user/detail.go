@@ -7,6 +7,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/internal/usecase/query/dto"
 	user_query "github.com/neko-dream/server/internal/usecase/query/user"
+	"go.opentelemetry.io/otel"
 )
 
 type DetailHandler struct {
@@ -20,6 +21,9 @@ func NewDetailHandler(dbManager *db.DBManager) user_query.Detail {
 }
 
 func (d *DetailHandler) Execute(ctx context.Context, input user_query.DetailInput) (*user_query.DetailOutput, error) {
+	ctx, span := otel.Tracer("user_query").Start(ctx, "DetailHandler.Execute")
+	defer span.End()
+
 	userRow, err := d.GetQueries(ctx).GetUserDetailByID(ctx, input.UserID.UUID())
 	if err != nil {
 		return nil, err

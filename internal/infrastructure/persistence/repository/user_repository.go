@@ -17,6 +17,7 @@ import (
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel"
 )
 
 type userRepository struct {
@@ -36,6 +37,9 @@ func NewUserRepository(
 
 // FindByDisplayID ユーザーのDisplayIDを元にユーザーを取得する
 func (u *userRepository) FindByDisplayID(ctx context.Context, displayID string) (*um.User, error) {
+	ctx, span := otel.Tracer("repository").Start(ctx, "userRepository.FindByDisplayID")
+	defer span.End()
+
 	userRow, err := u.
 		GetQueries(ctx).
 		UserFindByDisplayID(ctx, sql.NullString{String: displayID, Valid: true})
@@ -78,6 +82,9 @@ func (u *userRepository) FindByDisplayID(ctx context.Context, displayID string) 
 
 // Update ユーザー情報を更新する
 func (u *userRepository) Update(ctx context.Context, user um.User) error {
+	ctx, span := otel.Tracer("repository").Start(ctx, "userRepository.Update")
+	defer span.End()
+
 	var iconURL sql.NullString
 	if user.IsIconUpdateRequired() {
 		url, err := u.imageRepository.Create(ctx, *user.ProfileIcon().ImageInfo())
@@ -153,6 +160,9 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 // Create 初回登録時は必ずDisplayID, DisplayName, Pictureが空文字列で登録される
 // また、UserAuthはIsVerifyがfalseで登録される
 func (u *userRepository) Create(ctx context.Context, usr user.User) error {
+	ctx, span := otel.Tracer("repository").Start(ctx, "userRepository.Create")
+	defer span.End()
+
 	if err := u.GetQueries(ctx).CreateUser(ctx, model.CreateUserParams{
 		UserID:    usr.UserID().UUID(),
 		CreatedAt: clock.Now(ctx),
@@ -177,6 +187,9 @@ func (u *userRepository) Create(ctx context.Context, usr user.User) error {
 
 // FindByID ユーザーIDを元にユーザーを取得する
 func (u *userRepository) FindByID(ctx context.Context, userID shared.UUID[user.User]) (*user.User, error) {
+	ctx, span := otel.Tracer("repository").Start(ctx, "userRepository.FindByID")
+	defer span.End()
+
 	userRow, err := u.GetQueries(ctx).GetUserByID(ctx, userID.UUID())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -277,6 +290,9 @@ func (u *userRepository) findUserDemographics(ctx context.Context, userID shared
 }
 
 func (u *userRepository) FindBySubject(ctx context.Context, subject user.UserSubject) (*user.User, error) {
+	ctx, span := otel.Tracer("repository").Start(ctx, "userRepository.FindBySubject")
+	defer span.End()
+
 	row, err := u.GetQueries(ctx).GetUserBySubject(ctx, subject.String())
 	if err != nil {
 		return nil, nil

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"go.opentelemetry.io/otel"
 )
 
 type userService struct {
@@ -12,6 +13,9 @@ type userService struct {
 
 // DisplayIDCheckDuplicate ユーザーの表示用IDが重複していないかチェック
 func (s *userService) DisplayIDCheckDuplicate(ctx context.Context, displayID string) (bool, error) {
+	ctx, span := otel.Tracer("service").Start(ctx, "userService.DisplayIDCheckDuplicate")
+	defer span.End()
+
 	foundUser, err := s.userRepo.FindByDisplayID(ctx, displayID)
 	if err != nil {
 		return true, err

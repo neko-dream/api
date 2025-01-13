@@ -11,6 +11,7 @@ import (
 	"github.com/neko-dream/server/internal/presentation/oas"
 	vote_usecase "github.com/neko-dream/server/internal/usecase/vote"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 type voteHandler struct {
@@ -27,6 +28,9 @@ func NewVoteHandler(
 
 // Vote implements oas.VoteHandler.
 func (v *voteHandler) Vote(ctx context.Context, req oas.OptVoteReq, params oas.VoteParams) (oas.VoteRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "voteHandler.Vote")
+	defer span.End()
+
 	claim := session.GetSession(ctx)
 	userID, err := claim.UserID()
 	if err != nil {

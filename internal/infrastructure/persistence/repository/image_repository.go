@@ -13,6 +13,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"go.opentelemetry.io/otel"
 )
 
 type imageRepository struct {
@@ -31,6 +32,9 @@ func NewImageRepository(
 }
 
 func (i *imageRepository) Create(ctx context.Context, imageInfo image.ImageInfo) (*string, error) {
+	ctx, span := otel.Tracer("repository").Start(ctx, "imageRepository.Create")
+	defer span.End()
+
 	if imageInfo.FilePath() == "" {
 		return nil, errtrace.Wrap(messages.ImageFilePathEmptyError)
 	}
