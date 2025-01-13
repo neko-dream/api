@@ -12,6 +12,7 @@ import (
 	opinion_query "github.com/neko-dream/server/internal/usecase/query/opinion"
 	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel"
 )
 
 type GetSwipeOpinionsQueryHandler struct {
@@ -27,6 +28,9 @@ func NewSwipeOpinionsQueryHandler(
 }
 
 func (g *GetSwipeOpinionsQueryHandler) Execute(ctx context.Context, in opinion_query.GetSwipeOpinionsQueryInput) (*opinion_query.GetSwipeOpinionsQueryOutput, error) {
+	ctx, span := otel.Tracer("opinion_query").Start(ctx, "GetSwipeOpinionsQueryHandler.Execute")
+	defer span.End()
+
 	// top,randomを1:2の比率で取得する
 	// limitが3以上の場合、2件はtop, 1件はrandomで取得する
 	topLimit := in.Limit / 3

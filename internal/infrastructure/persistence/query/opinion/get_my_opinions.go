@@ -10,6 +10,7 @@ import (
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/server/internal/usecase/query/dto"
 	opinion_query "github.com/neko-dream/server/internal/usecase/query/opinion"
+	"go.opentelemetry.io/otel"
 )
 
 type GetMyOpinionsQueryHandler struct {
@@ -25,6 +26,9 @@ func NewGetMyOpinionsQueryHandler(
 }
 
 func (g *GetMyOpinionsQueryHandler) Execute(ctx context.Context, in opinion_query.GetMyOpinionsQueryInput) (*opinion_query.GetMyOpinionsQueryOutput, error) {
+	ctx, span := otel.Tracer("opinion_query").Start(ctx, "GetMyOpinionsQueryHandler.Execute")
+	defer span.End()
+
 	if err := in.Validate(); err != nil {
 		return nil, err
 	}

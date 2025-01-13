@@ -7,6 +7,7 @@ import (
 
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/image"
+	"go.opentelemetry.io/otel"
 )
 
 type ProfileIcon struct {
@@ -39,6 +40,9 @@ func (p *ProfileIcon) SetProfileIconImage(
 	file *multipart.FileHeader,
 	user User,
 ) error {
+	ctx, span := otel.Tracer("user").Start(ctx, "ProfileIcon.SetProfileIconImage")
+	defer span.End()
+
 	if file == nil {
 		return nil
 	}

@@ -14,6 +14,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/internal/usecase/query/dto"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 type (
@@ -69,6 +70,9 @@ func NewStartTalkSessionCommand(
 }
 
 func (i *startTalkSessionCommandHandler) Execute(ctx context.Context, input StartTalkSessionCommandInput) (StartTalkSessionCommandOutput, error) {
+	ctx, span := otel.Tracer("talksession_command").Start(ctx, "startTalkSessionCommandHandler.Execute")
+	defer span.End()
+
 	var output StartTalkSessionCommandOutput
 
 	if err := input.Validate(); err != nil {

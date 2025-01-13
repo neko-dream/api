@@ -9,6 +9,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
+	"go.opentelemetry.io/otel"
 )
 
 type (
@@ -44,6 +45,9 @@ func NewRevokeUseCase(
 }
 
 func (a *revokeInteractor) Execute(ctx context.Context, input RevokeInput) (RevokeOutput, error) {
+	ctx, span := otel.Tracer("auth_usecase").Start(ctx, "revokeInteractor.Execute")
+	defer span.End()
+
 	sess, err := a.SessionRepository.FindBySessionID(ctx, input.SessID)
 	if err != nil {
 		return RevokeOutput{}, errtrace.Wrap(err)

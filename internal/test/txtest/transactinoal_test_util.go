@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
+	"go.opentelemetry.io/otel"
 )
 
 type TransactionalTestCase[T any] struct {
@@ -41,6 +42,9 @@ type TestContext[T any] struct {
 }
 
 func NewTestContext[T any](ctx context.Context, data T) *TestContext[T] {
+	ctx, span := otel.Tracer("txtest").Start(ctx, "NewTestContext")
+	defer span.End()
+
 	return &TestContext[T]{
 		Context: ctx,
 		Data:    data,

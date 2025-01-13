@@ -13,6 +13,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/vote"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 type (
@@ -53,6 +54,9 @@ func NewSubmitOpinionHandler(
 }
 
 func (h *submitOpinionHandler) Execute(ctx context.Context, input SubmitOpinionInput) error {
+	ctx, span := otel.Tracer("opinion_command").Start(ctx, "submitOpinionHandler.Execute")
+	defer span.End()
+
 	if err := h.ExecTx(ctx, func(ctx context.Context) error {
 		opinion, err := opinion.NewOpinion(
 			shared.NewUUID[opinion.Opinion](),

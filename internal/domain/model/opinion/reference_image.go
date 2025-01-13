@@ -7,6 +7,7 @@ import (
 
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/image"
+	"go.opentelemetry.io/otel"
 )
 
 type ReferenceImage struct {
@@ -38,6 +39,9 @@ func (p *ReferenceImage) SetReferenceImage(
 	ctx context.Context,
 	file *multipart.FileHeader,
 ) error {
+	ctx, span := otel.Tracer("opinion").Start(ctx, "ReferenceImage.SetReferenceImage")
+	defer span.End()
+
 	if file == nil {
 		return nil
 	}

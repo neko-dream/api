@@ -14,6 +14,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/server/internal/presentation/oas"
+	"go.opentelemetry.io/otel"
 )
 
 type manageHandler struct {
@@ -40,6 +41,9 @@ func NewManageHandler(
 
 // ManageRegenerate implements oas.ManageHandler.
 func (m *manageHandler) ManageRegenerate(ctx context.Context, req oas.OptManageRegenerateReq) (*oas.ManageRegenerateOK, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.ManageRegenerate")
+	defer span.End()
+
 	log.Println("ManageRegenerate")
 	tp := req.Value.Type
 	tpb, err := tp.MarshalText()
@@ -84,6 +88,8 @@ func (m *manageHandler) ManageRegenerate(ctx context.Context, req oas.OptManageR
 
 // ManageIndex implements oas.ManageHandler.
 func (m *manageHandler) ManageIndex(ctx context.Context) (oas.ManageIndexOK, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.ManageIndex")
+	defer span.End()
 
 	rows, err := m.GetQueries(ctx).ListTalkSessions(ctx, model.ListTalkSessionsParams{
 		Limit:   1000,

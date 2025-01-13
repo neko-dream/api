@@ -15,6 +15,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel"
 )
 
 type (
@@ -55,6 +56,9 @@ func NewPostVoteUseCase(
 }
 
 func (i *postVoteInteractor) Execute(ctx context.Context, input PostVoteInput) (*PostVoteOutput, error) {
+	ctx, span := otel.Tracer("vote_usecase").Start(ctx, "postVoteInteractor.Execute")
+	defer span.End()
+
 	output := PostVoteOutput{}
 	// Opinionに対して投票を行っているか確認
 	voted, err := i.OpinionService.IsVoted(ctx, input.TargetOpinionID, input.UserID)

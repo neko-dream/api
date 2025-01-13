@@ -7,6 +7,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/presentation/oas"
+	"go.opentelemetry.io/otel"
 )
 
 type securityHandler struct {
@@ -20,6 +21,9 @@ var skipOperations = []string{
 }
 
 func (s *securityHandler) HandleSessionId(ctx context.Context, operationName string, t oas.SessionId) (context.Context, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "securityHandler.HandleSessionId")
+	defer span.End()
+
 	// セッションIDを取得
 	claim, err := s.TokenManager.Parse(ctx, t.GetAPIKey())
 	if err != nil {

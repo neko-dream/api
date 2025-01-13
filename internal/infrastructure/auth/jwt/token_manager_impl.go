@@ -13,6 +13,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 type tokenManager struct {
@@ -22,6 +23,9 @@ type tokenManager struct {
 
 // SetSession implements session.TokenManager.
 func (j *tokenManager) SetSession(ctx context.Context) context.Context {
+	ctx, span := otel.Tracer("jwt").Start(ctx, "tokenManager.SetSession")
+	defer span.End()
+
 	r := http_utils.GetHTTPRequest(ctx)
 	if r == nil {
 		return ctx
@@ -61,12 +65,17 @@ func (j *tokenManager) SetSession(ctx context.Context) context.Context {
 }
 
 func (j *tokenManager) Generate(ctx context.Context, user user.User, sessionID shared.UUID[session.Session]) (string, error) {
+	ctx, span := otel.Tracer("jwt").Start(ctx, "tokenManager.Generate")
+	defer span.End()
+
 	claim := session.NewClaim(ctx, user, sessionID)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim.GenMapClaim())
 	return errtrace.Wrap2(token.SignedString([]byte(j.secret)))
 }
 
 func (j *tokenManager) Parse(ctx context.Context, token string) (*session.Claim, error) {
+	ctx, span := otel.Tracer("jwt").Start(ctx, "tokenManager.Parse")
+	defer span.End()
 
 	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		// アルゴリズムの確認

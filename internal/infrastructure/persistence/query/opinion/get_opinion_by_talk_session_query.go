@@ -12,6 +12,7 @@ import (
 	"github.com/neko-dream/server/internal/usecase/query/dto"
 	opinion_query "github.com/neko-dream/server/internal/usecase/query/opinion"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 type GetOpinionsByTalkSessionIDQueryHandler struct {
@@ -27,6 +28,9 @@ func NewGetOpinionsByTalkSessionIDQueryHandler(
 }
 
 func (g *GetOpinionsByTalkSessionIDQueryHandler) Execute(ctx context.Context, in opinion_query.GetOpinionsByTalkSessionInput) (*opinion_query.GetOpinionsByTalkSessionOutput, error) {
+	ctx, span := otel.Tracer("opinion_query").Start(ctx, "GetOpinionsByTalkSessionIDQueryHandler.Execute")
+	defer span.End()
+
 	if err := in.Validate(); err != nil {
 		return nil, err
 	}

@@ -11,6 +11,7 @@ import (
 	"github.com/neko-dream/server/internal/usecase/query/dto"
 	"github.com/neko-dream/server/internal/usecase/query/talksession"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 type BrowseJoinedTalkSessionQueryHandler struct {
@@ -25,6 +26,9 @@ func NewBrowseJoinedTalkSessionQueryHandler(tm *db.DBManager) talksession.Browse
 
 // Execute ユーザーが参加しているトークセッションを検索する
 func (h *BrowseJoinedTalkSessionQueryHandler) Execute(ctx context.Context, input talksession.BrowseJoinedTalkSessionsQueryInput) (*talksession.BrowseJoinedTalkSessionsQueryOutput, error) {
+	ctx, span := otel.Tracer("talksession_query").Start(ctx, "BrowseJoinedTalkSessionQueryHandler.Execute")
+	defer span.End()
+
 	if err := input.Validate(); err != nil {
 		return nil, err
 	}

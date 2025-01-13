@@ -12,6 +12,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 	"golang.org/x/exp/slices"
 	"golang.org/x/oauth2"
 )
@@ -30,6 +31,9 @@ func NewAuthProvider(
 	providerName auth.AuthProviderName,
 	conf *config.Config,
 ) (auth.AuthProvider, error) {
+	ctx, span := otel.Tracer("oauth").Start(ctx, "NewAuthProvider")
+	defer span.End()
+
 	issuer := providerName.IssuerURI()
 	provider, ok := GetProvider(issuer, conf)
 	if !ok {
@@ -60,10 +64,18 @@ func NewAuthProvider(
 }
 
 func (p *authProvider) GetAuthorizationURL(ctx context.Context, state string) string {
+	ctx, span := otel.Tracer("oauth").Start(ctx, "authProvider.GetAuthorizationURL")
+	defer span.End()
+
+	_ = ctx
+
 	return p.oauthConf.AuthCodeURL(state, oauth2.AccessTypeOffline)
 }
 
 func (p *authProvider) VerifyAndIdentify(ctx context.Context, code string) (*string, *string, error) {
+	ctx, span := otel.Tracer("oauth").Start(ctx, "authProvider.VerifyAndIdentify")
+	defer span.End()
+
 	token, err := p.oauthConf.Exchange(ctx, code)
 	if err != nil {
 		return nil, nil, errtrace.Wrap(err)

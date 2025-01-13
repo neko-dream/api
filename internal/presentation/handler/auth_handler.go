@@ -10,6 +10,7 @@ import (
 	auth_usecase "github.com/neko-dream/server/internal/usecase/auth"
 	cookie_utils "github.com/neko-dream/server/pkg/cookie"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 type authHandler struct {
@@ -32,6 +33,9 @@ func NewAuthHandler(
 
 // Authorize implements oas.AuthHandler.
 func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams) (oas.AuthorizeRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.Authorize")
+	defer span.End()
+
 	out, err := a.AuthLoginUseCase.Execute(ctx, auth_usecase.AuthLoginInput{
 		RedirectURL: params.RedirectURL,
 		Provider:    params.Provider,
@@ -48,6 +52,9 @@ func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams)
 
 // OAuthCallback implements oas.AuthHandler.
 func (a *authHandler) OAuthCallback(ctx context.Context, params oas.OAuthCallbackParams) (oas.OAuthCallbackRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.OAuthCallback")
+	defer span.End()
+
 	// CookieStateとQueryStateが一致しているか確認
 	if params.CookieState != params.QueryState {
 		return nil, messages.InvalidStateError
@@ -71,6 +78,9 @@ func (a *authHandler) OAuthCallback(ctx context.Context, params oas.OAuthCallbac
 
 // OAuthRevoke implements oas.AuthHandler.
 func (a *authHandler) OAuthTokenRevoke(ctx context.Context) (oas.OAuthTokenRevokeRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.OAuthTokenRevoke")
+	defer span.End()
+
 	claim := session.GetSession(ctx)
 	sessID, err := claim.SessionID()
 	if err != nil {
@@ -90,6 +100,9 @@ func (a *authHandler) OAuthTokenRevoke(ctx context.Context) (oas.OAuthTokenRevok
 
 // OAuthTokenInfo implements oas.AuthHandler.
 func (a *authHandler) OAuthTokenInfo(ctx context.Context) (oas.OAuthTokenInfoRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.OAuthTokenInfo")
+	defer span.End()
+
 	claim := session.GetSession(ctx)
 	sessID, err := claim.SessionID()
 	if err != nil {

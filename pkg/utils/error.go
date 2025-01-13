@@ -5,6 +5,7 @@ import (
 	"log"
 	"runtime"
 
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
@@ -20,10 +21,16 @@ type ErrorInfo struct {
 
 // HandleError はエラーを処理し、追加情報を記録する関数です
 func HandleError(ctx context.Context, err error, message string) {
+	ctx, span := otel.Tracer("utils").Start(ctx, "HandleError")
+	defer span.End()
+
 	HandleErrorWithCaller(ctx, err, message, 2)
 }
 
 func HandleErrorWithCaller(ctx context.Context, err error, message string, caller int) {
+	ctx, span := otel.Tracer("utils").Start(ctx, "HandleErrorWithCaller")
+	defer span.End()
+
 	pc, file, line, _ := runtime.Caller(caller)
 	function := runtime.FuncForPC(pc).Name()
 

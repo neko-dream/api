@@ -5,6 +5,7 @@ import (
 
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/internal/presentation/oas"
+	"go.opentelemetry.io/otel"
 )
 
 type testHandler struct {
@@ -21,6 +22,11 @@ func NewTestHandler(
 
 // DummiInit implements oas.TestHandler.
 func (t *testHandler) DummiInit(ctx context.Context) (oas.DummiInitRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "testHandler.DummiInit")
+	defer span.End()
+
+	_ = ctx
+
 	t.DummyInitializer.Initialize()
 
 	return &oas.DummiInitOK{}, nil
@@ -28,5 +34,10 @@ func (t *testHandler) DummiInit(ctx context.Context) (oas.DummiInitRes, error) {
 
 // Test implements oas.TestHandler.
 func (t *testHandler) Test(ctx context.Context) (oas.TestRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "testHandler.Test")
+	defer span.End()
+
+	_ = ctx
+
 	panic("unimplemented")
 }

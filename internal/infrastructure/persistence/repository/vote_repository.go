@@ -10,6 +10,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/vote"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
+	"go.opentelemetry.io/otel"
 )
 
 type voteRepository struct {
@@ -21,6 +22,9 @@ func NewVoteRepository(dbManager *db.DBManager) vote.VoteRepository {
 }
 
 func (o *voteRepository) Create(ctx context.Context, vote vote.Vote) error {
+	ctx, span := otel.Tracer("repository").Start(ctx, "voteRepository.Create")
+	defer span.End()
+
 	if err := o.GetQueries(ctx).CreateVote(ctx, model.CreateVoteParams{
 		VoteID:        vote.VoteID.UUID(),
 		OpinionID:     vote.OpinionID.UUID(),
@@ -36,6 +40,9 @@ func (o *voteRepository) Create(ctx context.Context, vote vote.Vote) error {
 }
 
 func (o *voteRepository) FindByOpinionAndUserID(ctx context.Context, opinionID shared.UUID[opinion.Opinion], userID shared.UUID[user.User]) (*vote.Vote, error) {
+	ctx, span := otel.Tracer("repository").Start(ctx, "voteRepository.FindByOpinionAndUserID")
+	defer span.End()
+
 	voteRow, err := o.GetQueries(ctx).FindVoteByUserIDAndOpinionID(ctx, model.FindVoteByUserIDAndOpinionIDParams{
 		OpinionID: opinionID.UUID(),
 		UserID:    userID.UUID(),

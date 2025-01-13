@@ -18,6 +18,7 @@ import (
 	talksession_query "github.com/neko-dream/server/internal/usecase/query/talksession"
 	"github.com/neko-dream/server/pkg/sort"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 type talkSessionHandler struct {
@@ -64,6 +65,9 @@ func NewTalkSessionHandler(
 
 // PostConclusion implements oas.TalkSessionHandler.
 func (t *talkSessionHandler) PostConclusion(ctx context.Context, req oas.OptPostConclusionReq, params oas.PostConclusionParams) (oas.PostConclusionRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.PostConclusion")
+	defer span.End()
+
 	claim := session.GetSession(t.SetSession(ctx))
 	if !req.IsSet() {
 		return nil, messages.RequiredParameterError
@@ -107,6 +111,9 @@ func (t *talkSessionHandler) PostConclusion(ctx context.Context, req oas.OptPost
 
 // GetConclusion implements oas.TalkSessionHandler.
 func (t *talkSessionHandler) GetConclusion(ctx context.Context, params oas.GetConclusionParams) (oas.GetConclusionRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetConclusion")
+	defer span.End()
+
 	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
 	if err != nil {
 		return nil, messages.BadRequestError
@@ -135,6 +142,9 @@ func (t *talkSessionHandler) GetConclusion(ctx context.Context, params oas.GetCo
 
 // GetOpenedTalkSession implements oas.TalkSessionHandler.
 func (t *talkSessionHandler) GetOpenedTalkSession(ctx context.Context, params oas.GetOpenedTalkSessionParams) (oas.GetOpenedTalkSessionRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetOpenedTalkSession")
+	defer span.End()
+
 	claim := session.GetSession(t.SetSession(ctx))
 	if claim == nil {
 		return nil, messages.ForbiddenError
@@ -213,6 +223,9 @@ func (t *talkSessionHandler) GetOpenedTalkSession(ctx context.Context, params oa
 
 // GetTalkSessionReport implements oas.TalkSessionHandler.
 func (t *talkSessionHandler) GetTalkSessionReport(ctx context.Context, params oas.GetTalkSessionReportParams) (oas.GetTalkSessionReportRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetTalkSessionReport")
+	defer span.End()
+
 	out, err := t.getReportUseCase.Execute(ctx, analysis_usecase.GetReportInput{
 		TalkSessionID: shared.MustParseUUID[talksession.TalkSession](params.TalkSessionId),
 	})
@@ -228,6 +241,9 @@ func (t *talkSessionHandler) GetTalkSessionReport(ctx context.Context, params oa
 
 // CreateTalkSession トークセッション作成
 func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptCreateTalkSessionReq) (oas.CreateTalkSessionRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.CreateTalkSession")
+	defer span.End()
+
 	claim := session.GetSession(ctx)
 	if !req.IsSet() {
 		return nil, messages.RequiredParameterError
@@ -287,6 +303,9 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 
 // ViewTalkSessionDetail トークセッション詳細取得
 func (t *talkSessionHandler) GetTalkSessionDetail(ctx context.Context, params oas.GetTalkSessionDetailParams) (oas.GetTalkSessionDetailRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetTalkSessionDetail")
+	defer span.End()
+
 	out, err := t.getTalkSessionDetailByIDQuery.Execute(ctx, talksession_query.GetTalkSessionDetailInput{
 		TalkSessionID: shared.MustParseUUID[talksession.TalkSession](params.TalkSessionId),
 	})
@@ -326,6 +345,9 @@ func (t *talkSessionHandler) GetTalkSessionDetail(ctx context.Context, params oa
 
 // GetTalkSessionList セッション一覧取得
 func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.GetTalkSessionListParams) (oas.GetTalkSessionListRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetTalkSessionList")
+	defer span.End()
+
 	var limit, offset *int
 	if params.Limit.IsSet() {
 		limit = &params.Limit.Value
@@ -415,6 +437,9 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 
 // TalkSessionAnalysis 分析結果取得
 func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas.TalkSessionAnalysisParams) (oas.TalkSessionAnalysisRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.TalkSessionAnalysis")
+	defer span.End()
+
 	claim := session.GetSession(t.SetSession(ctx))
 	var userID *shared.UUID[user.User]
 	if claim != nil {
@@ -503,5 +528,10 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 
 // EditTalkSession implements oas.TalkSessionHandler.
 func (t *talkSessionHandler) EditTalkSession(ctx context.Context, req oas.OptEditTalkSessionReq, params oas.EditTalkSessionParams) (oas.EditTalkSessionRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.EditTalkSession")
+	defer span.End()
+
+	_ = ctx
+
 	panic("unimplemented")
 }

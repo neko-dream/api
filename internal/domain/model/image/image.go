@@ -16,6 +16,7 @@ import (
 
 	"github.com/h2non/filetype"
 	"github.com/h2non/filetype/types"
+	"go.opentelemetry.io/otel"
 )
 
 type (
@@ -52,6 +53,11 @@ var supportedExtension = "png jpg"
 
 // ValidateImage 拡張子やファイルサイズなどの画像のバリデーションを行う
 func ValidateImage(ctx context.Context, file *multipart.FileHeader, maxSize int) ([]byte, *string, error) {
+	ctx, span := otel.Tracer("image").Start(ctx, "ValidateImage")
+	defer span.End()
+
+	_ = ctx
+
 	img, err := file.Open()
 	if err != nil {
 		return nil, nil, messages.ImageOpenFailedError

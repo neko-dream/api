@@ -9,6 +9,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel"
 )
 
 type (
@@ -33,6 +34,9 @@ type (
 )
 
 func NewClaim(ctx context.Context, user user.User, sessionID shared.UUID[Session]) Claim {
+	ctx, span := otel.Tracer("session").Start(ctx, "NewClaim")
+	defer span.End()
+
 	now := clock.Now(ctx)
 	return Claim{
 		Sub:         user.UserID().String(),
@@ -86,6 +90,9 @@ func (c *Claim) Issuer() string {
 }
 
 func (c *Claim) IsExpired(ctx context.Context) bool {
+	ctx, span := otel.Tracer("session").Start(ctx, "Claim.IsExpired")
+	defer span.End()
+
 	return clock.Now(ctx).Unix() > c.Exp
 }
 func (c *Claim) IssueAt() time.Time {
@@ -121,10 +128,16 @@ var (
 )
 
 func SetSession(ctx context.Context, claim *Claim) context.Context {
+	ctx, span := otel.Tracer("session").Start(ctx, "SetSession")
+	defer span.End()
+
 	return context.WithValue(ctx, sessKey, claim)
 }
 
 func GetSession(ctx context.Context) *Claim {
+	ctx, span := otel.Tracer("session").Start(ctx, "GetSession")
+	defer span.End()
+
 	if ctx == nil {
 		return nil
 	}

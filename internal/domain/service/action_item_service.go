@@ -7,6 +7,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	timelineactions "github.com/neko-dream/server/internal/domain/model/timeline_actions"
+	"go.opentelemetry.io/otel"
 )
 
 type actionItemService struct {
@@ -26,6 +27,9 @@ func NewActionItemService(
 
 // CanCreateActionItem
 func (a *actionItemService) CanCreateActionItem(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession]) (*timelineactions.ActionItem, error) {
+	ctx, span := otel.Tracer("service").Start(ctx, "actionItemService.CanCreateActionItem")
+	defer span.End()
+
 	// TalkSessionが存在するか確認
 	talkSession, err := a.TalkSessionRepository.FindByID(ctx, talkSessionID)
 	if err != nil {
@@ -60,6 +64,9 @@ func (a *actionItemService) InsertActionItem(
 	parentItemID *shared.UUID[timelineactions.ActionItem],
 	actionItem timelineactions.ActionItem,
 ) error {
+	ctx, span := otel.Tracer("service").Start(ctx, "actionItemService.InsertActionItem")
+	defer span.End()
+
 	// 親アクションアイテムが存在する場合、親アクションアイテムを取得
 	var parentItem *timelineactions.ActionItem
 	if parentItemID != nil {

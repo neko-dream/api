@@ -17,6 +17,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 type analysisService struct {
@@ -39,6 +40,9 @@ func NewAnalysisService(
 
 // GenerateReport implements analysis.AnalysisService.
 func (a *analysisService) GenerateReport(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession]) error {
+	ctx, span := otel.Tracer("client").Start(ctx, "analysisService.GenerateReport")
+	defer span.End()
+
 	// カスタムHTTPクライアントを作成
 	httpClient := &http.Client{
 		Transport: &BasicAuthTransport{
@@ -73,6 +77,9 @@ func (a *analysisService) GenerateReport(ctx context.Context, talkSessionID shar
 
 // StartAnalysis 会話分析を開始する
 func (a *analysisService) StartAnalysis(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession]) error {
+	ctx, span := otel.Tracer("client").Start(ctx, "analysisService.StartAnalysis")
+	defer span.End()
+
 	// カスタムHTTPクライアントを作成
 	httpClient := &http.Client{
 		Transport: &BasicAuthTransport{
@@ -104,6 +111,9 @@ func (a *analysisService) StartAnalysis(ctx context.Context, talkSessionID share
 }
 
 func (a *analysisService) GenerateImage(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession]) (*analysis.WordCloudResponse, error) {
+	ctx, span := otel.Tracer("client").Start(ctx, "analysisService.GenerateImage")
+	defer span.End()
+
 	// カスタムHTTPクライアントを作成
 	httpClient := &http.Client{
 		Transport: &BasicAuthTransport{
