@@ -3844,7 +3844,7 @@ components:
         - totalCount
         - offset
         - limit
-    UserDemographic:
+    userDemographics:
       type: object
       properties:
         yearOfBirth:

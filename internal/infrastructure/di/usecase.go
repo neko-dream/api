@@ -1,11 +1,11 @@
 package di
 
 import (
+	analysis_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/analysis"
 	opinion_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/opinion"
 	talksession_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/talksession"
 	user_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/user"
 
-	analysis_usecase "github.com/neko-dream/server/internal/usecase/analysis"
 	"github.com/neko-dream/server/internal/usecase/command/auth_command"
 	"github.com/neko-dream/server/internal/usecase/command/opinion_command"
 	"github.com/neko-dream/server/internal/usecase/command/talksession_command"
@@ -17,8 +17,6 @@ import (
 
 func useCaseDeps() []ProvideArg {
 	return []ProvideArg{
-		{analysis_usecase.NewGetAnalysisResultUseCase, nil},
-		{analysis_usecase.NewGetReportQueryHandler, nil},
 		{talksession_command.NewAddConclusionCommandHandler, nil},
 		{talksession_command.NewStartTalkSessionCommand, nil},
 		{opinion_command.NewSubmitOpinionHandler, nil},
@@ -42,5 +40,7 @@ func useCaseDeps() []ProvideArg {
 		{timeline_command.NewAddTimeLine, nil},
 		{timeline_command.NewEditTimeLine, nil},
 		{timeline_query.NewGetTimeLine, nil},
+		{analysis_query.NewGetAnalysisResultHandler, nil},
+		{analysis_query.NewGetReportQueryHandler, nil},
 	}
 }

@@ -86,9 +86,11 @@ func (e *EditHandler) Execute(ctx context.Context, input EditInput) (*EditOutput
 		foundUser.ChangeName(ctx, input.DisplayName)
 
 		// アイコンがある場合は設定
-		if err := foundUser.SetIconFile(ctx, input.Icon); err != nil {
-			utils.HandleError(ctx, err, "User.SetIconFile")
-			return messages.UserUpdateError
+		if input.Icon != nil {
+			if err := foundUser.SetIconFile(ctx, input.Icon); err != nil {
+				utils.HandleError(ctx, err, "User.SetIconFile")
+				return messages.UserUpdateError
+			}
 		}
 		if input.DeleteIcon {
 			foundUser.DeleteIcon()
