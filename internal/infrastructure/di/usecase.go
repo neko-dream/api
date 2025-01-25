@@ -7,6 +7,7 @@ import (
 
 	analysis_usecase "github.com/neko-dream/server/internal/usecase/analysis"
 	auth_usecase "github.com/neko-dream/server/internal/usecase/auth"
+	"github.com/neko-dream/server/internal/usecase/command/auth_command"
 	"github.com/neko-dream/server/internal/usecase/command/opinion_command"
 	"github.com/neko-dream/server/internal/usecase/command/talksession_command"
 	"github.com/neko-dream/server/internal/usecase/command/user_command"
@@ -41,5 +42,8 @@ func useCaseDeps() []ProvideArg {
 		{user_command.NewRegisterHandler, nil},
 		{user_query.NewDetailHandler, nil},
 		{vote_command.NewVoteHandler, nil},
+		{auth_command.NewAuthLogin, nil},
+		{auth_command.NewRevoke, nil},
+		{auth_command.NewAuthCallback, nil},
 	}
 }
