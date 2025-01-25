@@ -15,6 +15,10 @@ import (
 	"github.com/neko-dream/server/internal/usecase/query/timeline_query"
 )
 
+// useCaseDeps returns a slice of dependency injection arguments for various use case handlers and query handlers across different domains of the application.
+// The function constructs a comprehensive list of constructors for commands and queries related to analysis, talk sessions, opinions, users, voting, authentication, and timelines.
+// Each constructor is paired with a nil argument, indicating no additional configuration is required during initialization.
+// The returned slice can be used to register and configure use case dependencies in the application's dependency injection container.
 func useCaseDeps() []ProvideArg {
 	return []ProvideArg{
 		{analysis_usecase.NewGetAnalysisResultUseCase, nil},

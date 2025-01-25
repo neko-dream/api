@@ -37,6 +37,7 @@ type (
 	}
 )
 
+// Returns an implementation of the AddTimeLine interface configured with the provided dependencies.
 func NewAddTimeLine(
 	actionItemRepository timelineactions.ActionItemRepository,
 	talkSessionRepository talksession.TalkSessionRepository,

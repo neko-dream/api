@@ -39,6 +39,7 @@ type (
 	}
 )
 
+// The returned interactor can be used to execute timeline queries for a specific talk session.
 func NewGetTimeLine(
 	actionItemRepository timelineactions.ActionItemRepository,
 	talkSessionRepository talksession.TalkSessionRepository,

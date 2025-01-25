@@ -37,6 +37,7 @@ type (
 	}
 )
 
+// NewEditTimeLine creates a new EditTimeLine interactor with the provided repositories, service, and database manager. It initializes and returns an implementation of the EditTimeLine interface configured with the necessary dependencies for editing timeline action items.
 func NewEditTimeLine(
 	actionItemRepository timelineactions.ActionItemRepository,
 	talkSessionRepository talksession.TalkSessionRepository,

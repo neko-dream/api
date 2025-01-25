@@ -23,6 +23,7 @@ type timelineHandler struct {
 	gt timeline_query.GetTimeLine
 }
 
+// The returned handler allows performing timeline-related operations such as adding, editing, and retrieving timeline items.
 func NewTimelineHandler(
 	addTimeLine timeline_command.AddTimeLine,
 	editTimeLine timeline_command.EditTimeLine,
