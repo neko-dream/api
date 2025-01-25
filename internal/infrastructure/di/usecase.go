@@ -1,6 +1,7 @@
 package di
 
 import (
+	analysis_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/analysis"
 	opinion_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/opinion"
 	talksession_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/talksession"
 	user_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/user"
@@ -17,7 +18,6 @@ import (
 
 func useCaseDeps() []ProvideArg {
 	return []ProvideArg{
-		{analysis_usecase.NewGetAnalysisResultUseCase, nil},
 		{analysis_usecase.NewGetReportQueryHandler, nil},
 		{talksession_command.NewAddConclusionCommandHandler, nil},
 		{talksession_command.NewStartTalkSessionCommand, nil},
@@ -42,5 +42,6 @@ func useCaseDeps() []ProvideArg {
 		{timeline_command.NewAddTimeLine, nil},
 		{timeline_command.NewEditTimeLine, nil},
 		{timeline_query.NewGetTimeLine, nil},
+		{analysis_query.NewGetAnalysisResultHandler, nil},
 	}
 }

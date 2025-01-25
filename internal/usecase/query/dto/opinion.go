@@ -42,6 +42,7 @@ type OpinionWithRepresentative struct {
 	Opinion
 	User
 	RepresentativeOpinion
+	ReplyCount int
 }
 
 type RepresentativeOpinion struct {

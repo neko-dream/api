@@ -38,18 +38,15 @@ func (g *GetAnalysisResultHandler) Execute(ctx context.Context, input analysis_q
 	var myPosition *dto.UserPosition
 	positions := make([]dto.UserPosition, 0, len(groupInfoRows))
 	for _, row := range groupInfoRows {
-		if input.UserID != nil && row.UserID == input.UserID.UUID() {
-			err = errors.Join(err, copier.CopyWithOption(myPosition, row, copier.Option{
-				DeepCopy:    true,
-				IgnoreEmpty: true,
-			}))
-		}
 		var position dto.UserPosition
 		err = errors.Join(err, copier.CopyWithOption(&position, row, copier.Option{
 			DeepCopy:    true,
 			IgnoreEmpty: true,
 		}))
 		positions = append(positions, position)
+		if input.UserID != nil && row.UserID == input.UserID.UUID() {
+			myPosition = &position
+		}
 	}
 	if err != nil {
 		utils.HandleError(ctx, err, "copier.CopyWithOptionでエラー")
@@ -72,29 +69,13 @@ func (g *GetAnalysisResultHandler) Execute(ctx context.Context, input analysis_q
 	}
 
 	for _, row := range representativeRows {
-		var (
-			resOpinion               dto.Opinion
-			resUser                  dto.User
-			resRepresentativeOpinion dto.RepresentativeOpinion
-		)
+		res := dto.OpinionWithRepresentative{}
 
-		err = copier.CopyWithOption(&resOpinion, row, copier.Option{
+		err = copier.CopyWithOption(&res, row, copier.Option{
 			DeepCopy:    true,
 			IgnoreEmpty: true,
 		})
-		err = errors.Join(err, copier.CopyWithOption(&resUser, row, copier.Option{
-			DeepCopy:    true,
-			IgnoreEmpty: true,
-		}))
-		err = errors.Join(err, copier.CopyWithOption(&resRepresentativeOpinion, row, copier.Option{
-			DeepCopy:    true,
-			IgnoreEmpty: true,
-		}))
-		groupOpinionsMap[row.GroupID] = append(groupOpinionsMap[row.GroupID], dto.OpinionWithRepresentative{
-			Opinion:               resOpinion,
-			User:                  resUser,
-			RepresentativeOpinion: resRepresentativeOpinion,
-		})
+		groupOpinionsMap[row.RepresentativeOpinion.GroupID] = append(groupOpinionsMap[row.RepresentativeOpinion.GroupID], res)
 	}
 	if err != nil {
 		utils.HandleError(ctx, err, "copier.CopyWithOptionでエラー")

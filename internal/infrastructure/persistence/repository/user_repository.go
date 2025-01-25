@@ -143,14 +143,14 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 
 		if err := u.GetQueries(ctx).
 			UpdateOrCreateUserDemographic(ctx, model.UpdateOrCreateUserDemographicParams{
-				UserDemographicID: UserDemographic.ID().UUID(),
-				UserID:            user.UserID().UUID(),
-				YearOfBirth:       yearOfBirth,
-				Occupation:        occupation,
-				City:              city,
-				HouseholdSize:     householdSize,
-				Gender:            gender,
-				Prefecture:        prefecture,
+				UserDemographicsID: UserDemographic.ID().UUID(),
+				UserID:             user.UserID().UUID(),
+				YearOfBirth:        yearOfBirth,
+				Occupation:         occupation,
+				City:               city,
+				HouseholdSize:      householdSize,
+				Gender:             gender,
+				Prefecture:         prefecture,
 			}); err != nil {
 			utils.HandleError(ctx, err, "UpdateOrCreateUserDemographic")
 			return errtrace.Wrap(err)
@@ -266,7 +266,7 @@ func (u *userRepository) findUserDemographic(ctx context.Context, userID shared.
 		gender        *string
 		prefecture    *string
 	)
-	UserDemographicID := shared.MustParseUUID[user.UserDemographic](userDemoRow.UserDemographicID.String())
+	UserDemographicID := shared.MustParseUUID[user.UserDemographic](userDemoRow.UserDemographicsID.String())
 
 	if userDemoRow.YearOfBirth.Valid {
 		yearOfBirth = lo.ToPtr(int(userDemoRow.YearOfBirth.Int32))

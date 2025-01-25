@@ -15,6 +15,7 @@ import (
 	"github.com/neko-dream/server/internal/presentation/oas"
 	analysis_usecase "github.com/neko-dream/server/internal/usecase/analysis"
 	"github.com/neko-dream/server/internal/usecase/command/talksession_command"
+	"github.com/neko-dream/server/internal/usecase/query/analysis_query"
 	talksession_query "github.com/neko-dream/server/internal/usecase/query/talksession"
 	"github.com/neko-dream/server/pkg/sort"
 	"github.com/neko-dream/server/pkg/utils"
@@ -26,7 +27,7 @@ type talkSessionHandler struct {
 	browseOpenedByUserQuery       talksession_query.BrowseOpenedByUserQuery
 	getConclusionByIDQuery        talksession_query.GetConclusionByIDQuery
 	getTalkSessionDetailByIDQuery talksession_query.GetTalkSessionDetailByIDQuery
-	getAnalysisResultUseCase      analysis_usecase.GetAnalysisResultUseCase
+	getAnalysisResultQuery        analysis_query.GetAnalysisResult
 	getReportUseCase              analysis_usecase.GetReportQuery
 
 	addConclusionCommand    talksession_command.AddConclusionCommand
@@ -40,7 +41,7 @@ func NewTalkSessionHandler(
 	browseOpenedByUserQuery talksession_query.BrowseOpenedByUserQuery,
 	getConclusionByIDQuery talksession_query.GetConclusionByIDQuery,
 	getTalkSessionDetailByIDQuery talksession_query.GetTalkSessionDetailByIDQuery,
-	getAnalysisResultUseCase analysis_usecase.GetAnalysisResultUseCase,
+	getAnalysisQuery analysis_query.GetAnalysisResult,
 	getReportUseCase analysis_usecase.GetReportQuery,
 
 	AddConclusionCommand talksession_command.AddConclusionCommand,
@@ -53,7 +54,7 @@ func NewTalkSessionHandler(
 		browseOpenedByUserQuery:       browseOpenedByUserQuery,
 		getConclusionByIDQuery:        getConclusionByIDQuery,
 		getTalkSessionDetailByIDQuery: getTalkSessionDetailByIDQuery,
-		getAnalysisResultUseCase:      getAnalysisResultUseCase,
+		getAnalysisResultQuery:        getAnalysisQuery,
 		getReportUseCase:              getReportUseCase,
 
 		addConclusionCommand:    AddConclusionCommand,
@@ -449,7 +450,7 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 		}
 	}
 
-	out, err := t.getAnalysisResultUseCase.Execute(ctx, analysis_usecase.GetAnalysisResultInput{
+	out, err := t.getAnalysisResultQuery.Execute(ctx, analysis_query.GetAnalysisResultInput{
 		UserID:        userID,
 		TalkSessionID: shared.MustParseUUID[talksession.TalkSession](params.TalkSessionId),
 	})
@@ -494,18 +495,18 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 		for _, opinion := range groupOpinion.Opinions {
 			opinions = append(opinions, oas.TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem{
 				Opinion: oas.TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion{
-					ID:           opinion.Opinion.ID,
+					ID:           opinion.Opinion.OpinionID.String(),
 					Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Title),
 					Content:      opinion.Opinion.Content,
-					ParentID:     utils.ToOpt[oas.OptString](opinion.Opinion.ParentID),
+					ParentID:     utils.ToOpt[oas.OptString](opinion.Opinion.ParentOpinionID),
 					PictureURL:   utils.ToOpt[oas.OptString](opinion.Opinion.PictureURL),
 					ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
-					PostedAt:     opinion.Opinion.PostedAt,
+					PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
 				},
 				User: oas.TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemUser{
-					DisplayID:   opinion.User.ID,
-					DisplayName: opinion.User.Name,
-					IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.Icon),
+					DisplayID:   opinion.User.DisplayID,
+					DisplayName: opinion.User.DisplayName,
+					IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.IconURL),
 				},
 				AgreeCount:    opinion.AgreeCount,
 				DisagreeCount: opinion.DisagreeCount,

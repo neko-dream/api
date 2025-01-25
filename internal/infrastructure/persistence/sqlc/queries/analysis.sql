@@ -15,7 +15,7 @@ WHERE talk_session_id = $1;
 
 -- name: GetRepresentativeOpinionsByTalkSessionId :many
 SELECT
-    sqlc.embed(representative_opinions)
+    sqlc.embed(representative_opinions),
     sqlc.embed(opinions),
     sqlc.embed(users),
     COALESCE(rc.reply_count, 0) AS reply_count

@@ -209,22 +209,9 @@ func (q *Queries) GetReportByTalkSessionId(ctx context.Context, talkSessionID uu
 
 const getRepresentativeOpinionsByTalkSessionId = `-- name: GetRepresentativeOpinionsByTalkSessionId :many
 SELECT
-    representative_opinions.group_id,
-    representative_opinions.rank,
-    representative_opinions.agree_count,
-    representative_opinions.disagree_count,
-    representative_opinions.pass_count,
-    opinions.opinion_id,
-    opinions.talk_session_id,
-    opinions.parent_opinion_id,
-    opinions.title,
-    opinions.content,
-    opinions.reference_url,
-    opinions.picture_url,
-    opinions.created_at,
-    users.display_name AS display_name,
-    users.display_id AS display_id,
-    users.icon_url AS icon_url,
+    representative_opinions.talk_session_id, representative_opinions.opinion_id, representative_opinions.group_id, representative_opinions.rank, representative_opinions.updated_at, representative_opinions.created_at, representative_opinions.agree_count, representative_opinions.disagree_count, representative_opinions.pass_count,
+    opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
     COALESCE(rc.reply_count, 0) AS reply_count
 FROM representative_opinions
 LEFT JOIN opinions
@@ -242,44 +229,18 @@ ORDER BY representative_opinions.rank
 `
 
 type GetRepresentativeOpinionsByTalkSessionIdRow struct {
-	GroupID         int32
-	Rank            int32
-	AgreeCount      int32
-	DisagreeCount   int32
-	PassCount       int32
-	OpinionID       uuid.NullUUID
-	TalkSessionID   uuid.NullUUID
-	ParentOpinionID uuid.NullUUID
-	Title           sql.NullString
-	Content         sql.NullString
-	ReferenceUrl    sql.NullString
-	PictureUrl      sql.NullString
-	CreatedAt       sql.NullTime
-	DisplayName     sql.NullString
-	DisplayID       sql.NullString
-	IconUrl         sql.NullString
-	ReplyCount      int64
+	RepresentativeOpinion RepresentativeOpinion
+	Opinion               Opinion
+	User                  User
+	ReplyCount            int64
 }
 
 // GetRepresentativeOpinionsByTalkSessionId
 //
 //	SELECT
-//	    representative_opinions.group_id,
-//	    representative_opinions.rank,
-//	    representative_opinions.agree_count,
-//	    representative_opinions.disagree_count,
-//	    representative_opinions.pass_count,
-//	    opinions.opinion_id,
-//	    opinions.talk_session_id,
-//	    opinions.parent_opinion_id,
-//	    opinions.title,
-//	    opinions.content,
-//	    opinions.reference_url,
-//	    opinions.picture_url,
-//	    opinions.created_at,
-//	    users.display_name AS display_name,
-//	    users.display_id AS display_id,
-//	    users.icon_url AS icon_url,
+//	    representative_opinions.talk_session_id, representative_opinions.opinion_id, representative_opinions.group_id, representative_opinions.rank, representative_opinions.updated_at, representative_opinions.created_at, representative_opinions.agree_count, representative_opinions.disagree_count, representative_opinions.pass_count,
+//	    opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
 //	    COALESCE(rc.reply_count, 0) AS reply_count
 //	FROM representative_opinions
 //	LEFT JOIN opinions
@@ -304,22 +265,30 @@ func (q *Queries) GetRepresentativeOpinionsByTalkSessionId(ctx context.Context, 
 	for rows.Next() {
 		var i GetRepresentativeOpinionsByTalkSessionIdRow
 		if err := rows.Scan(
-			&i.GroupID,
-			&i.Rank,
-			&i.AgreeCount,
-			&i.DisagreeCount,
-			&i.PassCount,
-			&i.OpinionID,
-			&i.TalkSessionID,
-			&i.ParentOpinionID,
-			&i.Title,
-			&i.Content,
-			&i.ReferenceUrl,
-			&i.PictureUrl,
-			&i.CreatedAt,
-			&i.DisplayName,
-			&i.DisplayID,
-			&i.IconUrl,
+			&i.RepresentativeOpinion.TalkSessionID,
+			&i.RepresentativeOpinion.OpinionID,
+			&i.RepresentativeOpinion.GroupID,
+			&i.RepresentativeOpinion.Rank,
+			&i.RepresentativeOpinion.UpdatedAt,
+			&i.RepresentativeOpinion.CreatedAt,
+			&i.RepresentativeOpinion.AgreeCount,
+			&i.RepresentativeOpinion.DisagreeCount,
+			&i.RepresentativeOpinion.PassCount,
+			&i.Opinion.OpinionID,
+			&i.Opinion.TalkSessionID,
+			&i.Opinion.UserID,
+			&i.Opinion.ParentOpinionID,
+			&i.Opinion.Title,
+			&i.Opinion.Content,
+			&i.Opinion.CreatedAt,
+			&i.Opinion.PictureUrl,
+			&i.Opinion.ReferenceUrl,
+			&i.User.UserID,
+			&i.User.DisplayID,
+			&i.User.DisplayName,
+			&i.User.IconUrl,
+			&i.User.CreatedAt,
+			&i.User.UpdatedAt,
 			&i.ReplyCount,
 		); err != nil {
 			return nil, err
