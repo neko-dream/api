@@ -13,7 +13,6 @@ import (
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/presentation/oas"
-	analysis_usecase "github.com/neko-dream/server/internal/usecase/analysis"
 	"github.com/neko-dream/server/internal/usecase/command/talksession_command"
 	"github.com/neko-dream/server/internal/usecase/query/analysis_query"
 	talksession_query "github.com/neko-dream/server/internal/usecase/query/talksession"
@@ -28,7 +27,7 @@ type talkSessionHandler struct {
 	getConclusionByIDQuery        talksession_query.GetConclusionByIDQuery
 	getTalkSessionDetailByIDQuery talksession_query.GetTalkSessionDetailByIDQuery
 	getAnalysisResultQuery        analysis_query.GetAnalysisResult
-	getReportUseCase              analysis_usecase.GetReportQuery
+	getReportQuery                analysis_query.GetReportQuery
 
 	addConclusionCommand    talksession_command.AddConclusionCommand
 	startTalkSessionCommand talksession_command.StartTalkSessionCommand
@@ -42,7 +41,7 @@ func NewTalkSessionHandler(
 	getConclusionByIDQuery talksession_query.GetConclusionByIDQuery,
 	getTalkSessionDetailByIDQuery talksession_query.GetTalkSessionDetailByIDQuery,
 	getAnalysisQuery analysis_query.GetAnalysisResult,
-	getReportUseCase analysis_usecase.GetReportQuery,
+	getReportQuery analysis_query.GetReportQuery,
 
 	AddConclusionCommand talksession_command.AddConclusionCommand,
 	startTalkSessionCommand talksession_command.StartTalkSessionCommand,
@@ -55,7 +54,7 @@ func NewTalkSessionHandler(
 		getConclusionByIDQuery:        getConclusionByIDQuery,
 		getTalkSessionDetailByIDQuery: getTalkSessionDetailByIDQuery,
 		getAnalysisResultQuery:        getAnalysisQuery,
-		getReportUseCase:              getReportUseCase,
+		getReportQuery:                getReportQuery,
 
 		addConclusionCommand:    AddConclusionCommand,
 		startTalkSessionCommand: startTalkSessionCommand,
@@ -227,7 +226,7 @@ func (t *talkSessionHandler) GetTalkSessionReport(ctx context.Context, params oa
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetTalkSessionReport")
 	defer span.End()
 
-	out, err := t.getReportUseCase.Execute(ctx, analysis_usecase.GetReportInput{
+	out, err := t.getReportQuery.Execute(ctx, analysis_query.GetReportInput{
 		TalkSessionID: shared.MustParseUUID[talksession.TalkSession](params.TalkSessionId),
 	})
 	if err != nil {

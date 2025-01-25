@@ -1,4 +1,4 @@
-package analysis_usecase
+package analysis
 
 import (
 	"context"
@@ -6,44 +6,29 @@ import (
 	"errors"
 
 	"github.com/neko-dream/server/internal/domain/model/analysis"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
+	"github.com/neko-dream/server/internal/usecase/query/analysis_query"
 	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
-type (
-	GetReportQuery interface {
-		Execute(context.Context, GetReportInput) (*GetReportOutput, error)
-	}
-
-	GetReportInput struct {
-		TalkSessionID shared.UUID[talksession.TalkSession]
-	}
-
-	GetReportOutput struct {
-		Report string
-	}
-
-	GetReportQueryHandler struct {
-		*db.DBManager
-		analysis.AnalysisService
-	}
-)
+type GetReportQueryHandler struct {
+	*db.DBManager
+	analysis.AnalysisService
+}
 
 func NewGetReportQueryHandler(
 	tm *db.DBManager,
 	as analysis.AnalysisService,
-) GetReportQuery {
+) analysis_query.GetReportQuery {
 	return &GetReportQueryHandler{
 		DBManager:       tm,
 		AnalysisService: as,
 	}
 }
 
-func (h *GetReportQueryHandler) Execute(ctx context.Context, input GetReportInput) (*GetReportOutput, error) {
+func (h *GetReportQueryHandler) Execute(ctx context.Context, input analysis_query.GetReportInput) (*analysis_query.GetReportOutput, error) {
 	ctx, span := otel.Tracer("analysis_usecase").Start(ctx, "GetReportQueryHandler.Execute")
 	defer span.End()
 
@@ -72,7 +57,7 @@ func (h *GetReportQueryHandler) Execute(ctx context.Context, input GetReportInpu
 		return nil, err
 	}
 
-	return &GetReportOutput{
+	return &analysis_query.GetReportOutput{
 		Report: out.Report,
 	}, nil
 }
