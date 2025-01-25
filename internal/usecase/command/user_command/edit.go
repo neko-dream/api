@@ -100,15 +100,15 @@ func (e *EditHandler) Execute(ctx context.Context, input EditInput) (*EditOutput
 			input.Occupation != nil ||
 			input.HouseholdSize != nil ||
 			input.Prefecture != nil {
-			var demograID shared.UUID[user.UserDemographics]
+			var demograID shared.UUID[user.UserDemographic]
 			if foundUser.Demographics() != nil {
-				demograID = foundUser.Demographics().UserDemographicsID()
+				demograID = foundUser.Demographics().ID()
 			} else {
-				demograID = shared.NewUUID[user.UserDemographics]()
+				demograID = shared.NewUUID[user.UserDemographic]()
 			}
 
 			// デモグラ情報を設定
-			foundUser.SetDemographics(user.NewUserDemographics(
+			foundUser.SetDemographics(user.NewUserDemographic(
 				ctx,
 				demograID,
 				input.YearOfBirth,

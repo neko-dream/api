@@ -339,11 +339,11 @@ func (d *DummyInitializer) User() error {
 		),
 	}
 
-	userDemographics := []*user.UserDemographics{
+	UserDemographic := []*user.UserDemographic{
 		nil,
-		lo.ToPtr(user.NewUserDemographics(
+		lo.ToPtr(user.NewUserDemographic(
 			ctx,
-			shared.NewUUID[user.UserDemographics](),
+			shared.NewUUID[user.UserDemographic](),
 			nil,
 			nil,
 			nil,
@@ -351,9 +351,9 @@ func (d *DummyInitializer) User() error {
 			nil,
 			nil,
 		)),
-		lo.ToPtr(user.NewUserDemographics(
+		lo.ToPtr(user.NewUserDemographic(
 			ctx,
-			shared.NewUUID[user.UserDemographics](),
+			shared.NewUUID[user.UserDemographic](),
 			lo.ToPtr(1990),
 			lo.ToPtr("会社員"),
 			lo.ToPtr("男性"),
@@ -369,9 +369,9 @@ func (d *DummyInitializer) User() error {
 		nil,
 		nil,
 		nil,
-		lo.ToPtr(user.NewUserDemographics(
+		lo.ToPtr(user.NewUserDemographic(
 			ctx,
-			shared.NewUUID[user.UserDemographics](),
+			shared.NewUUID[user.UserDemographic](),
 			nil,
 			nil,
 			nil,
@@ -379,9 +379,9 @@ func (d *DummyInitializer) User() error {
 			nil,
 			nil,
 		)),
-		lo.ToPtr(user.NewUserDemographics(
+		lo.ToPtr(user.NewUserDemographic(
 			ctx,
-			shared.NewUUID[user.UserDemographics](),
+			shared.NewUUID[user.UserDemographic](),
 			lo.ToPtr(1990),
 			lo.ToPtr("会社員"),
 			lo.ToPtr("男性"),
@@ -397,9 +397,9 @@ func (d *DummyInitializer) User() error {
 		nil,
 		nil,
 		nil,
-		lo.ToPtr(user.NewUserDemographics(
+		lo.ToPtr(user.NewUserDemographic(
 			ctx,
-			shared.NewUUID[user.UserDemographics](),
+			shared.NewUUID[user.UserDemographic](),
 			nil,
 			nil,
 			nil,
@@ -407,9 +407,9 @@ func (d *DummyInitializer) User() error {
 			nil,
 			nil,
 		)),
-		lo.ToPtr(user.NewUserDemographics(
+		lo.ToPtr(user.NewUserDemographic(
 			ctx,
-			shared.NewUUID[user.UserDemographics](),
+			shared.NewUUID[user.UserDemographic](),
 			lo.ToPtr(1990),
 			lo.ToPtr("会社員"),
 			lo.ToPtr("男性"),
@@ -437,7 +437,7 @@ func (d *DummyInitializer) User() error {
 		if err != nil {
 			return err
 		}
-		demographics := userDemographics[i]
+		demographics := UserDemographic[i]
 		if demographics != nil {
 			u.SetDemographics(*demographics)
 		}

@@ -227,8 +227,8 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 		IconURL:     utils.ToOptNil[oas.OptNilString](res.User.IconURL),
 	}
 	var demographicsResp oas.GetUserInfoOKDemographics
-	if res.User.UserDemographics != nil {
-		demographics := res.User.UserDemographics
+	if res.User.UserDemographic != nil {
+		demographics := res.User.UserDemographic
 		var city oas.OptNilString
 		if demographics.City != nil {
 			city = oas.OptNilString{
@@ -262,7 +262,7 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 		if demographics.Occupation != nil {
 			occupation = oas.OptNilString{
 				Set:   true,
-				Value: *demographics.GenderString(),
+				Value: demographics.OccupationString(),
 			}
 		}
 
@@ -328,23 +328,23 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 		}
 	}
 	var yearOfBirth *int
-	if !value.YearOfBirth.Null || value.YearOfBirth.Value != 0 {
+	if !value.YearOfBirth.Null && value.YearOfBirth.Value != 0 {
 		yearOfBirth = &value.YearOfBirth.Value
 	}
 	var city *string
-	if !value.City.Null || value.City.Value != "" {
+	if !value.City.Null && value.City.Value != "" {
 		city = &value.City.Value
 	}
 	var householdSize *int
-	if !value.HouseholdSize.Null || value.HouseholdSize.Value != 0 {
+	if !value.HouseholdSize.Null && value.HouseholdSize.Value != 0 {
 		householdSize = &value.HouseholdSize.Value
 	}
 	var prefecture *string
-	if !value.Prefecture.Null || value.Prefecture.Value != "" {
+	if !value.Prefecture.Null && value.Prefecture.Value != "" {
 		prefecture = &value.Prefecture.Value
 	}
 	var displayName *string
-	if !value.DisplayName.Null || value.DisplayName.Value != "" {
+	if !value.DisplayName.Null && value.DisplayName.Value != "" {
 		if value.DisplayName.Value == "" {
 			return nil, messages.UserDisplayIDTooShort
 		}

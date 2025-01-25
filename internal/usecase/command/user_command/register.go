@@ -119,9 +119,9 @@ func (i *registerHandler) Execute(ctx context.Context, input RegisterInput) (*Re
 		}
 
 		// デモグラ情報を設定
-		foundUser.SetDemographics(user.NewUserDemographics(
+		foundUser.SetDemographics(user.NewUserDemographic(
 			ctx,
-			shared.NewUUID[user.UserDemographics](),
+			shared.NewUUID[user.UserDemographic](),
 			input.YearOfBirth,
 			input.Occupation,
 			input.Gender,

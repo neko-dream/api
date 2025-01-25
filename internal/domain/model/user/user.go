@@ -45,7 +45,7 @@ type (
 		profileIcon  *ProfileIcon
 		subject      string
 		provider     auth.AuthProviderName
-		demographics *UserDemographics
+		demographics *UserDemographic
 	}
 )
 
@@ -134,11 +134,11 @@ func (u *User) Verify() bool {
 	return u.displayID != nil && u.displayName != nil
 }
 
-func (u *User) Demographics() *UserDemographics {
+func (u *User) Demographics() *UserDemographic {
 	return u.demographics
 }
 
-func (u *User) SetDemographics(demographics UserDemographics) {
+func (u *User) SetDemographics(demographics UserDemographic) {
 	u.demographics = lo.ToPtr(demographics)
 }
 

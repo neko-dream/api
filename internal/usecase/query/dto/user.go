@@ -22,18 +22,18 @@ type UserAuth struct {
 	IsVerified bool
 }
 
-type UserDemographics struct {
-	UserDemographicsID uuid.UUID
-	UserID             shared.UUID[user.User]
-	YearOfBirth        *int
-	Occupation         *int
-	Gender             *int
-	City               *string
-	Prefecture         *string
-	HouseholdSize      *int
+type UserDemographic struct {
+	UserDemographicID uuid.UUID
+	UserID            shared.UUID[user.User]
+	YearOfBirth       *int
+	Occupation        *int
+	Gender            *int
+	City              *string
+	Prefecture        *string
+	HouseholdSize     *int
 }
 
-func (u *UserDemographics) GenderString() *string {
+func (u *UserDemographic) GenderString() *string {
 	if u.Gender == nil {
 		return nil
 	}
@@ -45,15 +45,15 @@ func (u *UserDemographics) GenderString() *string {
 	return &str
 }
 
-func (u *UserDemographics) OccupationString() string {
+func (u *UserDemographic) OccupationString() string {
 	if u.Occupation == nil {
 		return user.OccupationOther.String()
 	}
 	return user.Occupation(*u.Occupation).String()
 }
 
-func (u *UserDemographics) Age(ctx context.Context) *int {
-	ctx, span := otel.Tracer("dto").Start(ctx, "UserDemographics.Age")
+func (u *UserDemographic) Age(ctx context.Context) *int {
+	ctx, span := otel.Tracer("dto").Start(ctx, "UserDemographic.Age")
 	defer span.End()
 
 	if u.YearOfBirth == nil {
@@ -65,5 +65,5 @@ func (u *UserDemographics) Age(ctx context.Context) *int {
 type UserDetail struct {
 	User
 	UserAuth
-	*UserDemographics
+	*UserDemographic
 }

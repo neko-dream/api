@@ -114,45 +114,45 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 	}
 
 	if user.Demographics() != nil {
-		userDemographics := *user.Demographics()
+		UserDemographic := *user.Demographics()
 
 		var city sql.NullString
-		if userDemographics.City() != nil {
-			city = sql.NullString{String: (*userDemographics.City()).String(), Valid: true}
+		if UserDemographic.City() != nil {
+			city = sql.NullString{String: (*UserDemographic.City()).String(), Valid: true}
 		}
 		var yearOfBirth sql.NullInt32
-		if userDemographics.YearOfBirth() != nil {
-			yearOfBirth = sql.NullInt32{Int32: int32(*userDemographics.YearOfBirth()), Valid: true}
+		if UserDemographic.YearOfBirth() != nil {
+			yearOfBirth = sql.NullInt32{Int32: int32(*UserDemographic.YearOfBirth()), Valid: true}
 		}
 		var householdSize sql.NullInt16
-		if userDemographics.HouseholdSize() != nil {
-			householdSize = sql.NullInt16{Int16: int16(*userDemographics.HouseholdSize()), Valid: true}
+		if UserDemographic.HouseholdSize() != nil {
+			householdSize = sql.NullInt16{Int16: int16(*UserDemographic.HouseholdSize()), Valid: true}
 		}
 		var prefecture sql.NullString
-		if userDemographics.Prefecture() != nil {
-			prefecture = sql.NullString{String: *userDemographics.Prefecture(), Valid: true}
+		if UserDemographic.Prefecture() != nil {
+			prefecture = sql.NullString{String: *UserDemographic.Prefecture(), Valid: true}
 		}
 		var occupation sql.NullInt16
-		if userDemographics.Occupation() != nil {
-			occupation = sql.NullInt16{Int16: int16(*userDemographics.Occupation()), Valid: true}
+		if UserDemographic.Occupation() != nil {
+			occupation = sql.NullInt16{Int16: int16(*UserDemographic.Occupation()), Valid: true}
 		}
 		var gender sql.NullInt16
-		if userDemographics.Gender() != nil {
-			gender = sql.NullInt16{Int16: int16(*userDemographics.Gender()), Valid: true}
+		if UserDemographic.Gender() != nil {
+			gender = sql.NullInt16{Int16: int16(*UserDemographic.Gender()), Valid: true}
 		}
 
 		if err := u.GetQueries(ctx).
-			UpdateOrCreateUserDemographics(ctx, model.UpdateOrCreateUserDemographicsParams{
-				UserDemographicsID: userDemographics.UserDemographicsID().UUID(),
-				UserID:             user.UserID().UUID(),
-				YearOfBirth:        yearOfBirth,
-				Occupation:         occupation,
-				City:               city,
-				HouseholdSize:      householdSize,
-				Gender:             gender,
-				Prefecture:         prefecture,
+			UpdateOrCreateUserDemographic(ctx, model.UpdateOrCreateUserDemographicParams{
+				UserDemographicID: UserDemographic.ID().UUID(),
+				UserID:            user.UserID().UUID(),
+				YearOfBirth:       yearOfBirth,
+				Occupation:        occupation,
+				City:              city,
+				HouseholdSize:     householdSize,
+				Gender:            gender,
+				Prefecture:        prefecture,
 			}); err != nil {
-			utils.HandleError(ctx, err, "UpdateOrCreateUserDemographics")
+			utils.HandleError(ctx, err, "UpdateOrCreateUserDemographic")
 			return errtrace.Wrap(err)
 		}
 	}
@@ -212,7 +212,7 @@ func (u *userRepository) FindByID(ctx context.Context, userID shared.UUID[user.U
 			return nil, nil
 		}
 	}
-	userDemographics, err := u.findUserDemographics(ctx, userID)
+	UserDemographic, err := u.findUserDemographic(ctx, userID)
 	if err != nil {
 		return nil, errtrace.Wrap(err)
 	}
@@ -241,20 +241,20 @@ func (u *userRepository) FindByID(ctx context.Context, userID shared.UUID[user.U
 		providerName,
 		profIcon,
 	)
-	if userDemographics != nil {
-		user.SetDemographics(*userDemographics)
+	if UserDemographic != nil {
+		user.SetDemographics(*UserDemographic)
 	}
 
 	return &user, nil
 }
 
-func (u *userRepository) findUserDemographics(ctx context.Context, userID shared.UUID[user.User]) (*user.UserDemographics, error) {
-	userDemoRow, err := u.GetQueries(ctx).GetUserDemographicsByUserID(ctx, userID.UUID())
+func (u *userRepository) findUserDemographic(ctx context.Context, userID shared.UUID[user.User]) (*user.UserDemographic, error) {
+	userDemoRow, err := u.GetQueries(ctx).GetUserDemographicByUserID(ctx, userID.UUID())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
 		}
-		utils.HandleError(ctx, err, "GetUserDemographicsByUserID")
+		utils.HandleError(ctx, err, "GetUserDemographicByUserID")
 		return nil, errtrace.Wrap(err)
 	}
 
@@ -266,7 +266,7 @@ func (u *userRepository) findUserDemographics(ctx context.Context, userID shared
 		gender        *string
 		prefecture    *string
 	)
-	userDemographicsID := shared.MustParseUUID[user.UserDemographics](userDemoRow.UserDemographicsID.String())
+	UserDemographicID := shared.MustParseUUID[user.UserDemographic](userDemoRow.UserDemographicID.String())
 
 	if userDemoRow.YearOfBirth.Valid {
 		yearOfBirth = lo.ToPtr(int(userDemoRow.YearOfBirth.Int32))
@@ -287,9 +287,9 @@ func (u *userRepository) findUserDemographics(ctx context.Context, userID shared
 		prefecture = lo.ToPtr(userDemoRow.Prefecture.String)
 	}
 
-	ud := user.NewUserDemographics(
+	ud := user.NewUserDemographic(
 		ctx,
-		userDemographicsID,
+		UserDemographicID,
 		yearOfBirth,
 		occupation,
 		gender,

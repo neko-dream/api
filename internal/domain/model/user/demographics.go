@@ -9,68 +9,68 @@ import (
 )
 
 type (
-	UserDemographics struct {
-		userDemographicsID shared.UUID[UserDemographics] // ユーザーのデモグラフィックスID
-		yearOfBirth        *YearOfBirth                  // ユーザーの生年
-		occupation         *Occupation                   // ユーザーの職業
-		gender             *Gender                       // ユーザーの性別
-		city               *City                         // ユーザーの居住地
-		householdSize      *HouseholdSize                // ユーザーの世帯人数
-		prefecture         *string                       // ユーザーの居住地の都道府県
+	UserDemographic struct {
+		UserDemographicID shared.UUID[UserDemographic] // ユーザーのデモグラフィックスID
+		yearOfBirth       *YearOfBirth                 // ユーザーの生年
+		occupation        *Occupation                  // ユーザーの職業
+		gender            *Gender                      // ユーザーの性別
+		city              *City                        // ユーザーの居住地
+		householdSize     *HouseholdSize               // ユーザーの世帯人数
+		prefecture        *string                      // ユーザーの居住地の都道府県
 	}
 )
 
-func (u *UserDemographics) UserDemographicsID() shared.UUID[UserDemographics] {
-	return u.userDemographicsID
+func (u *UserDemographic) ID() shared.UUID[UserDemographic] {
+	return u.UserDemographicID
 }
 
-func (u *UserDemographics) YearOfBirth() *YearOfBirth {
+func (u *UserDemographic) YearOfBirth() *YearOfBirth {
 	return u.yearOfBirth
 }
 
-func (u *UserDemographics) Prefecture() *string {
+func (u *UserDemographic) Prefecture() *string {
 	return u.prefecture
 }
 
 // ユーザーの年齢を返す
-func (u *UserDemographics) Age(ctx context.Context) int {
-	ctx, span := otel.Tracer("user").Start(ctx, "UserDemographics.Age")
+func (u *UserDemographic) Age(ctx context.Context) int {
+	ctx, span := otel.Tracer("user").Start(ctx, "UserDemographic.Age")
 	defer span.End()
 
 	return u.yearOfBirth.Age(ctx)
 }
 
-func (u *UserDemographics) Occupation() *Occupation {
+func (u *UserDemographic) Occupation() *Occupation {
 	return u.occupation
 }
 
-func (u *UserDemographics) Gender() *Gender {
+func (u *UserDemographic) Gender() *Gender {
 	return u.gender
 }
 
-func (u *UserDemographics) City() *City {
+func (u *UserDemographic) City() *City {
 	return u.city
 }
 
-func (u *UserDemographics) HouseholdSize() *HouseholdSize {
+func (u *UserDemographic) HouseholdSize() *HouseholdSize {
 	return u.householdSize
 }
 
-func (u *UserDemographics) ChangeYearOfBirth(yearOfBirth *YearOfBirth) {
+func (u *UserDemographic) ChangeYearOfBirth(yearOfBirth *YearOfBirth) {
 	u.yearOfBirth = yearOfBirth
 }
 
-func NewUserDemographics(
+func NewUserDemographic(
 	ctx context.Context,
-	userDemographicsID shared.UUID[UserDemographics],
+	UserDemographicID shared.UUID[UserDemographic],
 	yearOfBirth *int,
 	occupation *string,
 	gender *string,
 	city *string,
 	householdSize *int,
 	prefecture *string,
-) UserDemographics {
-	ctx, span := otel.Tracer("user").Start(ctx, "NewUserDemographics")
+) UserDemographic {
+	ctx, span := otel.Tracer("user").Start(ctx, "NewUserDemographic")
 	defer span.End()
 
 	var (
@@ -109,13 +109,13 @@ func NewUserDemographics(
 		householdSizeOut = NewHouseholdSize(householdSize)
 	}
 
-	return UserDemographics{
-		userDemographicsID: userDemographicsID,
-		yearOfBirth:        yearOfBirthOut,
-		occupation:         occupationOut,
-		gender:             genderOut,
-		city:               cityOut,
-		householdSize:      householdSizeOut,
-		prefecture:         prefecture,
+	return UserDemographic{
+		UserDemographicID: UserDemographicID,
+		yearOfBirth:       yearOfBirthOut,
+		occupation:        occupationOut,
+		gender:            genderOut,
+		city:              cityOut,
+		householdSize:     householdSizeOut,
+		prefecture:        prefecture,
 	}
 }
