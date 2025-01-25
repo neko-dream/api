@@ -55,16 +55,13 @@ func NewOpinion(
 	createdAt time.Time,
 	referenceURL *string,
 ) (*Opinion, error) {
-	if content == "" {
-		return nil, messages.OpinionContentBadLength
-	}
 	if utf8.RuneCountInString(content) > 140 || utf8.RuneCountInString(content) < 5 {
 		return nil, messages.OpinionContentBadLength
 	}
 	if parentOpinionID != nil && opinionID == *parentOpinionID {
 		return nil, messages.OpinionParentOpinionIDIsSame
 	}
-	if title != nil && utf8.RuneCountInString(*title) > 50 || utf8.RuneCountInString(*title) < 5 {
+	if title != nil && (utf8.RuneCountInString(*title) > 50 || utf8.RuneCountInString(*title) < 5) {
 		return nil, messages.OpinionTitleBadLength
 	}
 
