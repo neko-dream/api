@@ -113,11 +113,11 @@ type UserAuth struct {
 }
 
 type UserDemographic struct {
-	UserDemographicsID uuid.UUID
+	UserDemographicID uuid.UUID
 	UserID             uuid.UUID
 	YearOfBirth        sql.NullInt32
 	Occupation         sql.NullInt16
-	Gender             int16
+	Gender             sql.NullInt16
 	City               sql.NullString
 	HouseholdSize      sql.NullInt16
 	CreatedAt          time.Time

@@ -13,7 +13,6 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/pkg/utils"
-	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
@@ -103,7 +102,9 @@ func (i *registerHandler) Execute(ctx context.Context, input RegisterInput) (*Re
 			utils.HandleError(ctx, err, "User.SetDisplayID")
 			return messages.UserDisplayIDAlreadyExistsError
 		}
-		foundUser.ChangeName(input.DisplayName)
+
+		foundUser.ChangeName(ctx, &input.DisplayName)
+
 		if err := foundUser.SetIconFile(ctx, input.Icon); err != nil {
 			utils.HandleError(ctx, err, "User.SetIconFile")
 			return messages.UserUpdateError
@@ -118,13 +119,14 @@ func (i *registerHandler) Execute(ctx context.Context, input RegisterInput) (*Re
 		}
 
 		// デモグラ情報を設定
-		foundUser.SetDemographics(user.NewUserDemographics(
-			shared.NewUUID[user.UserDemographics](),
-			user.NewYearOfBirth(input.YearOfBirth),
-			user.NewOccupation(input.Occupation),
-			lo.ToPtr(user.NewGender(input.Gender)),
-			user.NewCity(input.City),
-			user.NewHouseholdSize(input.HouseholdSize),
+		foundUser.SetDemographics(user.NewUserDemographic(
+			ctx,
+			shared.NewUUID[user.UserDemographic](),
+			input.YearOfBirth,
+			input.Occupation,
+			input.Gender,
+			input.City,
+			input.HouseholdSize,
 			input.Prefecture,
 		))
 

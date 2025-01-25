@@ -45,12 +45,20 @@ type (
 		profileIcon  *ProfileIcon
 		subject      string
 		provider     auth.AuthProviderName
-		demographics *UserDemographics
+		demographics *UserDemographic
 	}
 )
 
-func (u *User) ChangeName(name string) {
-	u.displayName = lo.ToPtr(name)
+func (u *User) ChangeName(ctx context.Context, name *string) {
+	ctx, span := otel.Tracer("user").Start(ctx, "User.ChangeName")
+	defer span.End()
+
+	_ = ctx
+
+	if name == nil || *name == "" {
+		return
+	}
+	u.displayName = name
 }
 
 func (u *User) SetDisplayID(id string) error {
@@ -65,10 +73,6 @@ func (u *User) SetDisplayID(id string) error {
 	}
 	u.displayID = lo.ToPtr(id)
 	return nil
-}
-
-func (u *User) SetDisplayName(name string) {
-	u.displayName = lo.ToPtr(name)
 }
 
 func (u *User) UserID() shared.UUID[User] {
@@ -106,6 +110,9 @@ func (u *User) IsIconUpdateRequired() bool {
 func (u *User) SetIconFile(ctx context.Context, file *multipart.FileHeader) error {
 	ctx, span := otel.Tracer("user").Start(ctx, "User.SetIconFile")
 	defer span.End()
+	if file == nil {
+		return nil
+	}
 
 	profileIcon := NewProfileIcon(nil)
 	if err := profileIcon.SetProfileIconImage(ctx, file, *u); err != nil {
@@ -127,11 +134,11 @@ func (u *User) Verify() bool {
 	return u.displayID != nil && u.displayName != nil
 }
 
-func (u *User) Demographics() *UserDemographics {
+func (u *User) Demographics() *UserDemographic {
 	return u.demographics
 }
 
-func (u *User) SetDemographics(demographics UserDemographics) {
+func (u *User) SetDemographics(demographics UserDemographic) {
 	u.demographics = lo.ToPtr(demographics)
 }
 

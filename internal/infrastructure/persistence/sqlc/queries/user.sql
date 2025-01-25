@@ -54,7 +54,7 @@ UPDATE "user_auths" SET is_verified = true WHERE user_id = $1;
 -- name: UpdateUser :exec
 UPDATE "users" SET display_id = $2, display_name = $3, icon_url = $4 WHERE user_id = $1;
 
--- name: UpdateOrCreateUserDemographics :exec
+-- name: UpdateOrCreateUserDemographic :exec
 INSERT INTO user_demographics (
     user_demographics_id,
     user_id,
@@ -77,7 +77,7 @@ DO UPDATE SET
     prefecture = $8,
     updated_at = now();
 
--- name: GetUserDemographicsByUserID :one
+-- name: GetUserDemographicByUserID :one
 SELECT
     *
 FROM

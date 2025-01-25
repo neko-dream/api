@@ -227,8 +227,8 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 		IconURL:     utils.ToOptNil[oas.OptNilString](res.User.IconURL),
 	}
 	var demographicsResp oas.GetUserInfoOKDemographics
-	if res.User.UserDemographics != nil {
-		demographics := res.User.UserDemographics
+	if res.User.UserDemographic != nil {
+		demographics := res.User.UserDemographic
 		var city oas.OptNilString
 		if demographics.City != nil {
 			city = oas.OptNilString{
@@ -258,10 +258,26 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 			}
 		}
 
+		var occupation oas.OptNilString
+		if demographics.Occupation != nil {
+			occupation = oas.OptNilString{
+				Set:   true,
+				Value: demographics.OccupationString(),
+			}
+		}
+
+		var gender oas.OptNilString
+		if demographics.Gender != nil {
+			gender = oas.OptNilString{
+				Set:   true,
+				Value: *demographics.GenderString(),
+			}
+		}
+
 		demographicsResp = oas.GetUserInfoOKDemographics{
 			YearOfBirth:   yearOfBirth,
-			Occupation:    demographics.OccupationString(),
-			Gender:        demographics.GenderString(),
+			Occupation:    occupation,
+			Gender:        gender,
 			HouseholdSize: householdSize,
 			Prefecture:    prefecture,
 			City:          city,
@@ -312,31 +328,29 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 		}
 	}
 	var yearOfBirth *int
-	if !value.YearOfBirth.Null {
+	if !value.YearOfBirth.Null && value.YearOfBirth.Value != 0 {
 		yearOfBirth = &value.YearOfBirth.Value
 	}
 	var city *string
-	if !value.City.Null {
+	if !value.City.Null && value.City.Value != "" {
 		city = &value.City.Value
 	}
 	var householdSize *int
-	if !value.HouseholdSize.Null {
+	if !value.HouseholdSize.Null && value.HouseholdSize.Value != 0 {
 		householdSize = &value.HouseholdSize.Value
 	}
 	var prefecture *string
-	if !value.Prefecture.Null {
+	if !value.Prefecture.Null && value.Prefecture.Value != "" {
 		prefecture = &value.Prefecture.Value
 	}
 	var displayName *string
-	if !value.DisplayName.Null {
+	if !value.DisplayName.Null && value.DisplayName.Value != "" {
 		if value.DisplayName.Value == "" {
 			return nil, messages.UserDisplayIDTooShort
 		}
-
 		if utf8.RuneCountInString(value.DisplayName.Value) > 20 || utf8.RuneCountInString(value.DisplayName.Value) < 4 {
 			return nil, messages.UserDisplayIDTooShort
 		}
-
 		displayName = &value.DisplayName.Value
 	}
 	var occupation *string
@@ -346,7 +360,9 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 			utils.HandleError(ctx, err, "value.Occupation.Value.MarshalText")
 			return nil, messages.InternalServerError
 		}
-		occupation = lo.ToPtr(string(txt))
+		if string(txt) != "" {
+			occupation = lo.ToPtr(string(txt))
+		}
 	}
 
 	out, err := u.editUser.Execute(ctx, user_command.EditInput{

@@ -6745,12 +6745,16 @@ func (s *GetUserInfoOKDemographics) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		e.FieldStart("occupation")
-		e.Str(s.Occupation)
+		if s.Occupation.Set {
+			e.FieldStart("occupation")
+			s.Occupation.Encode(e)
+		}
 	}
 	{
-		e.FieldStart("gender")
-		e.Str(s.Gender)
+		if s.Gender.Set {
+			e.FieldStart("gender")
+			s.Gender.Encode(e)
+		}
 	}
 	{
 		if s.City.Set {
@@ -6786,7 +6790,6 @@ func (s *GetUserInfoOKDemographics) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode GetUserInfoOKDemographics to nil")
 	}
-	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -6801,11 +6804,9 @@ func (s *GetUserInfoOKDemographics) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"yearOfBirth\"")
 			}
 		case "occupation":
-			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				v, err := d.Str()
-				s.Occupation = string(v)
-				if err != nil {
+				s.Occupation.Reset()
+				if err := s.Occupation.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -6813,11 +6814,9 @@ func (s *GetUserInfoOKDemographics) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"occupation\"")
 			}
 		case "gender":
-			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				v, err := d.Str()
-				s.Gender = string(v)
-				if err != nil {
+				s.Gender.Reset()
+				if err := s.Gender.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -6860,38 +6859,6 @@ func (s *GetUserInfoOKDemographics) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode GetUserInfoOKDemographics")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000110,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfGetUserInfoOKDemographics) {
-					name = jsonFieldsNameOfGetUserInfoOKDemographics[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
 	}
 
 	return nil

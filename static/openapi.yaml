@@ -2599,10 +2599,12 @@ paths:
                         type: string
                         title: 職業
                         description: 職業
+                        nullable: true
                       gender:
                         type: string
                         title: 性別
                         description: 性別
+                        nullable: true
                       city:
                         type: string
                         title: 市区町村
@@ -2619,9 +2621,6 @@ paths:
                         type: string
                         description: 都道府県
                         nullable: true
-                    required:
-                      - occupation
-                      - gender
                 required:
                   - user
                   - demographics
@@ -3845,7 +3844,7 @@ components:
         - totalCount
         - offset
         - limit
-    userDemographics:
+    UserDemographic:
       type: object
       properties:
         yearOfBirth:
@@ -3856,10 +3855,12 @@ components:
           type: string
           title: 職業
           description: 職業
+          nullable: true
         gender:
           type: string
           title: 性別
           description: 性別
+          nullable: true
         city:
           type: string
           title: 市区町村
@@ -3876,9 +3877,6 @@ components:
           type: string
           description: 都道府県
           nullable: true
-      required:
-        - occupation
-        - gender
     userGroupPosition:
       type: object
       properties:

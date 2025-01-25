@@ -50,6 +50,10 @@ func (i *DummyInitializer) Initialize() {
 	log.Println("-------- End DummyInitializer Initialize --------")
 }
 
+var (
+	ctx = context.Background()
+)
+
 func (d *DummyInitializer) User() error {
 	users := []user.User{
 		// 否定派閥
@@ -335,10 +339,11 @@ func (d *DummyInitializer) User() error {
 		),
 	}
 
-	userDemographics := []*user.UserDemographics{
+	UserDemographic := []*user.UserDemographic{
 		nil,
-		lo.ToPtr(user.NewUserDemographics(
-			shared.NewUUID[user.UserDemographics](),
+		lo.ToPtr(user.NewUserDemographic(
+			ctx,
+			shared.NewUUID[user.UserDemographic](),
 			nil,
 			nil,
 			nil,
@@ -346,13 +351,14 @@ func (d *DummyInitializer) User() error {
 			nil,
 			nil,
 		)),
-		lo.ToPtr(user.NewUserDemographics(
-			shared.NewUUID[user.UserDemographics](),
-			user.NewYearOfBirth(lo.ToPtr(1990)),
-			user.NewOccupation(lo.ToPtr("会社員")),
-			lo.ToPtr(user.NewGender(lo.ToPtr("男性"))),
-			user.NewCity(lo.ToPtr("中野区")),
-			user.NewHouseholdSize(lo.ToPtr(1)),
+		lo.ToPtr(user.NewUserDemographic(
+			ctx,
+			shared.NewUUID[user.UserDemographic](),
+			lo.ToPtr(1990),
+			lo.ToPtr("会社員"),
+			lo.ToPtr("男性"),
+			lo.ToPtr("中野区"),
+			lo.ToPtr(1),
 			lo.ToPtr("東京都"),
 		)),
 		nil,
@@ -363,8 +369,9 @@ func (d *DummyInitializer) User() error {
 		nil,
 		nil,
 		nil,
-		lo.ToPtr(user.NewUserDemographics(
-			shared.NewUUID[user.UserDemographics](),
+		lo.ToPtr(user.NewUserDemographic(
+			ctx,
+			shared.NewUUID[user.UserDemographic](),
 			nil,
 			nil,
 			nil,
@@ -372,13 +379,14 @@ func (d *DummyInitializer) User() error {
 			nil,
 			nil,
 		)),
-		lo.ToPtr(user.NewUserDemographics(
-			shared.NewUUID[user.UserDemographics](),
-			user.NewYearOfBirth(lo.ToPtr(1990)),
-			user.NewOccupation(lo.ToPtr("会社員")),
-			lo.ToPtr(user.NewGender(lo.ToPtr("男性"))),
-			user.NewCity(lo.ToPtr("中野区")),
-			user.NewHouseholdSize(lo.ToPtr(1)),
+		lo.ToPtr(user.NewUserDemographic(
+			ctx,
+			shared.NewUUID[user.UserDemographic](),
+			lo.ToPtr(1990),
+			lo.ToPtr("会社員"),
+			lo.ToPtr("男性"),
+			lo.ToPtr("中野区"),
+			lo.ToPtr(1),
 			lo.ToPtr("東京都"),
 		)),
 		nil,
@@ -389,8 +397,9 @@ func (d *DummyInitializer) User() error {
 		nil,
 		nil,
 		nil,
-		lo.ToPtr(user.NewUserDemographics(
-			shared.NewUUID[user.UserDemographics](),
+		lo.ToPtr(user.NewUserDemographic(
+			ctx,
+			shared.NewUUID[user.UserDemographic](),
 			nil,
 			nil,
 			nil,
@@ -398,13 +407,14 @@ func (d *DummyInitializer) User() error {
 			nil,
 			nil,
 		)),
-		lo.ToPtr(user.NewUserDemographics(
-			shared.NewUUID[user.UserDemographics](),
-			user.NewYearOfBirth(lo.ToPtr(1990)),
-			user.NewOccupation(lo.ToPtr("会社員")),
-			lo.ToPtr(user.NewGender(lo.ToPtr("男性"))),
-			user.NewCity(lo.ToPtr("中野区")),
-			user.NewHouseholdSize(lo.ToPtr(1)),
+		lo.ToPtr(user.NewUserDemographic(
+			ctx,
+			shared.NewUUID[user.UserDemographic](),
+			lo.ToPtr(1990),
+			lo.ToPtr("会社員"),
+			lo.ToPtr("男性"),
+			lo.ToPtr("中野区"),
+			lo.ToPtr(1),
 			lo.ToPtr("東京都"),
 		)),
 		nil,
@@ -422,13 +432,12 @@ func (d *DummyInitializer) User() error {
 		nil,
 	}
 	var resultUsers []*user.User
-	ctx := context.Background()
 	for i, u := range users {
 		err := d.UserRepo.Create(ctx, u)
 		if err != nil {
 			return err
 		}
-		demographics := userDemographics[i]
+		demographics := UserDemographic[i]
 		if demographics != nil {
 			u.SetDemographics(*demographics)
 		}

@@ -1,4 +1,4 @@
-package vote_usecase
+package vote_command
 
 import (
 	"context"
@@ -19,21 +19,18 @@ import (
 )
 
 type (
-	PostVoteUseCase interface {
-		Execute(context.Context, PostVoteInput) (*PostVoteOutput, error)
+	Vote interface {
+		Execute(context.Context, VoteInput) error
 	}
 
-	PostVoteInput struct {
+	VoteInput struct {
 		TalkSessionID   shared.UUID[talksession.TalkSession]
 		TargetOpinionID shared.UUID[opinion.Opinion]
 		UserID          shared.UUID[user.User]
 		VoteType        string
 	}
 
-	PostVoteOutput struct {
-	}
-
-	postVoteInteractor struct {
+	voteHandler struct {
 		opinion.OpinionService
 		vote.VoteRepository
 		analysis.AnalysisService
@@ -41,13 +38,13 @@ type (
 	}
 )
 
-func NewPostVoteUseCase(
+func NewVoteHandler(
 	opinionService opinion.OpinionService,
 	voteRepository vote.VoteRepository,
 	analysisService analysis.AnalysisService,
 	DBManager *db.DBManager,
-) PostVoteUseCase {
-	return &postVoteInteractor{
+) Vote {
+	return &voteHandler{
 		OpinionService:  opinionService,
 		VoteRepository:  voteRepository,
 		AnalysisService: analysisService,
@@ -55,20 +52,19 @@ func NewPostVoteUseCase(
 	}
 }
 
-func (i *postVoteInteractor) Execute(ctx context.Context, input PostVoteInput) (*PostVoteOutput, error) {
-	ctx, span := otel.Tracer("vote_usecase").Start(ctx, "postVoteInteractor.Execute")
+func (i *voteHandler) Execute(ctx context.Context, input VoteInput) error {
+	ctx, span := otel.Tracer("vote_command").Start(ctx, "voteHandler.Execute")
 	defer span.End()
 
-	output := PostVoteOutput{}
 	// Opinionに対して投票を行っているか確認
 	voted, err := i.OpinionService.IsVoted(ctx, input.TargetOpinionID, input.UserID)
 	if err != nil {
 		utils.HandleError(ctx, err, "IsVoted")
-		return nil, errtrace.Wrap(err)
+		return errtrace.Wrap(err)
 	}
 	// 投票を行っている場合、エラーを返す
 	if voted {
-		return nil, messages.OpinionAlreadyVoted
+		return messages.OpinionAlreadyVoted
 	}
 
 	if err := i.ExecTx(ctx, func(ctx context.Context) error {
@@ -97,8 +93,8 @@ func (i *postVoteInteractor) Execute(ctx context.Context, input PostVoteInput) (
 
 		return nil
 	}); err != nil {
-		return nil, errtrace.Wrap(err)
+		return errtrace.Wrap(err)
 	}
 
-	return &output, nil
+	return nil
 }

@@ -178,7 +178,7 @@ func (q *Queries) GetUserBySubject(ctx context.Context, subject string) (GetUser
 	return i, err
 }
 
-const getUserDemographicsByUserID = `-- name: GetUserDemographicsByUserID :one
+const getUserDemographicByUserID = `-- name: GetUserDemographicByUserID :one
 SELECT
     user_demographics_id, user_id, year_of_birth, occupation, gender, city, household_size, created_at, updated_at, prefecture
 FROM
@@ -187,7 +187,7 @@ WHERE
     user_id = $1
 `
 
-// GetUserDemographicsByUserID
+// GetUserDemographicByUserID
 //
 //	SELECT
 //	    user_demographics_id, user_id, year_of_birth, occupation, gender, city, household_size, created_at, updated_at, prefecture
@@ -195,11 +195,11 @@ WHERE
 //	    "user_demographics"
 //	WHERE
 //	    user_id = $1
-func (q *Queries) GetUserDemographicsByUserID(ctx context.Context, userID uuid.UUID) (UserDemographic, error) {
-	row := q.db.QueryRowContext(ctx, getUserDemographicsByUserID, userID)
+func (q *Queries) GetUserDemographicByUserID(ctx context.Context, userID uuid.UUID) (UserDemographic, error) {
+	row := q.db.QueryRowContext(ctx, getUserDemographicByUserID, userID)
 	var i UserDemographic
 	err := row.Scan(
-		&i.UserDemographicsID,
+		&i.UserDemographicID,
 		&i.UserID,
 		&i.YearOfBirth,
 		&i.Occupation,
@@ -260,7 +260,7 @@ func (q *Queries) GetUserDetailByID(ctx context.Context, userID uuid.UUID) (GetU
 		&i.UserAuth.Subject,
 		&i.UserAuth.IsVerified,
 		&i.UserAuth.CreatedAt,
-		&i.UserDemographic.UserDemographicsID,
+		&i.UserDemographic.UserDemographicID,
 		&i.UserDemographic.UserID,
 		&i.UserDemographic.YearOfBirth,
 		&i.UserDemographic.Occupation,
@@ -274,7 +274,7 @@ func (q *Queries) GetUserDetailByID(ctx context.Context, userID uuid.UUID) (GetU
 	return i, err
 }
 
-const updateOrCreateUserDemographics = `-- name: UpdateOrCreateUserDemographics :exec
+const updateOrCreateUserDemographic = `-- name: UpdateOrCreateUserDemographic :exec
 INSERT INTO user_demographics (
     user_demographics_id,
     user_id,
@@ -298,18 +298,18 @@ DO UPDATE SET
     updated_at = now()
 `
 
-type UpdateOrCreateUserDemographicsParams struct {
-	UserDemographicsID uuid.UUID
+type UpdateOrCreateUserDemographicParams struct {
+	UserDemographicID uuid.UUID
 	UserID             uuid.UUID
 	YearOfBirth        sql.NullInt32
 	Occupation         sql.NullInt16
-	Gender             int16
+	Gender             sql.NullInt16
 	City               sql.NullString
 	HouseholdSize      sql.NullInt16
 	Prefecture         sql.NullString
 }
 
-// UpdateOrCreateUserDemographics
+// UpdateOrCreateUserDemographic
 //
 //	INSERT INTO user_demographics (
 //	    user_demographics_id,
@@ -332,9 +332,9 @@ type UpdateOrCreateUserDemographicsParams struct {
 //	    household_size = $7,
 //	    prefecture = $8,
 //	    updated_at = now()
-func (q *Queries) UpdateOrCreateUserDemographics(ctx context.Context, arg UpdateOrCreateUserDemographicsParams) error {
-	_, err := q.db.ExecContext(ctx, updateOrCreateUserDemographics,
-		arg.UserDemographicsID,
+func (q *Queries) UpdateOrCreateUserDemographic(ctx context.Context, arg UpdateOrCreateUserDemographicParams) error {
+	_, err := q.db.ExecContext(ctx, updateOrCreateUserDemographic,
+		arg.UserDemographicID,
 		arg.UserID,
 		arg.YearOfBirth,
 		arg.Occupation,
