@@ -1,4 +1,4 @@
-package timeline_usecase
+package timeline_command
 
 import (
 	"context"
@@ -9,13 +9,12 @@ import (
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	timelineactions "github.com/neko-dream/server/internal/domain/model/timeline_actions"
 	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
 type (
-	AddTimeLineUseCase interface {
+	AddTimeLine interface {
 		Execute(context.Context, AddTimeLineInput) (*AddTimeLineOutput, error)
 	}
 
@@ -35,26 +34,23 @@ type (
 		timelineactions.ActionItemRepository
 		talksession.TalkSessionRepository
 		timelineactions.ActionItemService
-		*db.DBManager
 	}
 )
 
-func NewAddTimeLineUseCase(
+func NewAddTimeLine(
 	actionItemRepository timelineactions.ActionItemRepository,
 	talkSessionRepository talksession.TalkSessionRepository,
 	actionItemService timelineactions.ActionItemService,
-	dbManager *db.DBManager,
-) AddTimeLineUseCase {
+) AddTimeLine {
 	return &addTimeLineInteractor{
 		ActionItemRepository:  actionItemRepository,
 		TalkSessionRepository: talkSessionRepository,
 		ActionItemService:     actionItemService,
-		DBManager:             dbManager,
 	}
 }
 
 func (i *addTimeLineInteractor) Execute(ctx context.Context, input AddTimeLineInput) (*AddTimeLineOutput, error) {
-	ctx, span := otel.Tracer("timeline_usecase").Start(ctx, "addTimeLineInteractor.Execute")
+	ctx, span := otel.Tracer("timeline_").Start(ctx, "addTimeLineInteractor.Execute")
 	defer span.End()
 
 	talkSession, err := i.TalkSessionRepository.FindByID(ctx, input.TalkSessionID)

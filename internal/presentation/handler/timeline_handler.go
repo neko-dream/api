@@ -10,6 +10,7 @@ import (
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	timelineactions "github.com/neko-dream/server/internal/domain/model/timeline_actions"
 	"github.com/neko-dream/server/internal/presentation/oas"
+	"github.com/neko-dream/server/internal/usecase/command/timeline_command"
 	timeline_usecase "github.com/neko-dream/server/internal/usecase/timeline"
 	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
@@ -17,18 +18,18 @@ import (
 )
 
 type timelineHandler struct {
-	timeline_usecase.AddTimeLineUseCase
+	timeline_command.AddTimeLine
 	timeline_usecase.GetTimeLineUseCase
 	timeline_usecase.EditTimeLineUseCase
 }
 
 func NewTimelineHandler(
-	addTimeLineUseCase timeline_usecase.AddTimeLineUseCase,
+	addTimeLine timeline_command.AddTimeLine,
 	getTimeLineUseCase timeline_usecase.GetTimeLineUseCase,
 	editTimeLineUseCase timeline_usecase.EditTimeLineUseCase,
 ) oas.TimelineHandler {
 	return &timelineHandler{
-		AddTimeLineUseCase:  addTimeLineUseCase,
+		AddTimeLine:         addTimeLine,
 		GetTimeLineUseCase:  getTimeLineUseCase,
 		EditTimeLineUseCase: editTimeLineUseCase,
 	}
@@ -99,7 +100,7 @@ func (t *timelineHandler) PostTimeLineItem(ctx context.Context, req oas.OptPostT
 		parentActionID = &parentActionIDIn
 	}
 
-	output, err := t.AddTimeLineUseCase.Execute(ctx, timeline_usecase.AddTimeLineInput{
+	output, err := t.AddTimeLine.Execute(ctx, timeline_command.AddTimeLineInput{
 		OwnerID:        userID,
 		TalkSessionID:  talkSessionID,
 		ParentActionID: parentActionID,
