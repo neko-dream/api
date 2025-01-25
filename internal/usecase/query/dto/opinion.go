@@ -37,3 +37,18 @@ func (s *SwipeOpinion) GetMyVoteType() string {
 func (s *SwipeOpinion) GetParentVoteType() string {
 	return vote.VoteTypeFromInt(s.ParentVoteType).String()
 }
+
+type OpinionWithRepresentative struct {
+	Opinion
+	User
+	RepresentativeOpinion
+}
+
+type RepresentativeOpinion struct {
+	TalkSessionID shared.UUID[talksession.TalkSession]
+	OpinionID     shared.UUID[opinion.Opinion]
+	GroupID       int
+	AgreeCount    int
+	DisagreeCount int
+	PassCount     int
+}

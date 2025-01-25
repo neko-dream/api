@@ -15,22 +15,9 @@ WHERE talk_session_id = $1;
 
 -- name: GetRepresentativeOpinionsByTalkSessionId :many
 SELECT
-    representative_opinions.group_id,
-    representative_opinions.rank,
-    representative_opinions.agree_count,
-    representative_opinions.disagree_count,
-    representative_opinions.pass_count,
-    opinions.opinion_id,
-    opinions.talk_session_id,
-    opinions.parent_opinion_id,
-    opinions.title,
-    opinions.content,
-    opinions.reference_url,
-    opinions.picture_url,
-    opinions.created_at,
-    users.display_name AS display_name,
-    users.display_id AS display_id,
-    users.icon_url AS icon_url,
+    sqlc.embed(representative_opinions)
+    sqlc.embed(opinions),
+    sqlc.embed(users),
     COALESCE(rc.reply_count, 0) AS reply_count
 FROM representative_opinions
 LEFT JOIN opinions
