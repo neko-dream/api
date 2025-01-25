@@ -5,6 +5,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/auth/oauth"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	client "github.com/neko-dream/server/internal/infrastructure/external/analysis"
+	"github.com/neko-dream/server/internal/infrastructure/http/cookie"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/postgresql"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/repository"
@@ -33,5 +34,6 @@ func infraDeps() []ProvideArg {
 		{jwt.NewTokenManager, nil},
 		{db.NewDummyInitializer, nil},
 		{client.NewAnalysisService, nil},
+		{cookie.NewCookieManager, nil},
 	}
 }
