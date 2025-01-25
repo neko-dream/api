@@ -1,4 +1,4 @@
-package auth_usecase
+package auth_command
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 )
 
 type (
-	AuthLoginUseCase interface {
+	AuthLogin interface {
 		Execute(context.Context, AuthLoginInput) (AuthLoginOutput, error)
 	}
 
@@ -36,12 +36,12 @@ type (
 	}
 )
 
-func NewAuthLoginUseCase(
+func NewAuthLogin(
 	tm *db.DBManager,
 	config *config.Config,
 	authService service.AuthService,
 	authProviderFactory auth.AuthProviderFactory,
-) AuthLoginUseCase {
+) AuthLogin {
 	return &authLoginInteractor{
 		DBManager:           tm,
 		Config:              config,

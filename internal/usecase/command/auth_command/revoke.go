@@ -1,4 +1,4 @@
-package auth_usecase
+package auth_command
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 )
 
 type (
-	RevokeUseCase interface {
+	Revoke interface {
 		Execute(context.Context, RevokeInput) (RevokeOutput, error)
 	}
 
@@ -32,11 +32,11 @@ type (
 	}
 )
 
-func NewRevokeUseCase(
+func NewRevoke(
 	tm *db.DBManager,
 	config *config.Config,
 	sessRepository session.SessionRepository,
-) RevokeUseCase {
+) Revoke {
 	return &revokeInteractor{
 		DBManager:         tm,
 		Config:            config,

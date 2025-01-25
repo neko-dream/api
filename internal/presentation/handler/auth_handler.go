@@ -7,27 +7,27 @@ import (
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/presentation/oas"
-	auth_usecase "github.com/neko-dream/server/internal/usecase/auth"
+	"github.com/neko-dream/server/internal/usecase/command/auth_command"
 	cookie_utils "github.com/neko-dream/server/pkg/cookie"
 	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
 type authHandler struct {
-	auth_usecase.AuthCallbackUseCase
-	auth_usecase.AuthLoginUseCase
-	auth_usecase.RevokeUseCase
+	auth_command.AuthCallback
+	auth_command.AuthLogin
+	auth_command.Revoke
 }
 
 func NewAuthHandler(
-	authCallbackUseCase auth_usecase.AuthCallbackUseCase,
-	authLoginUseCase auth_usecase.AuthLoginUseCase,
-	authRevokeUseCase auth_usecase.RevokeUseCase,
+	authLogin auth_command.AuthLogin,
+	authCallback auth_command.AuthCallback,
+	revoke auth_command.Revoke,
 ) oas.AuthHandler {
 	return &authHandler{
-		AuthCallbackUseCase: authCallbackUseCase,
-		AuthLoginUseCase:    authLoginUseCase,
-		RevokeUseCase:       authRevokeUseCase,
+		AuthLogin:    authLogin,
+		AuthCallback: authCallback,
+		Revoke:       revoke,
 	}
 }
 
@@ -36,7 +36,7 @@ func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams)
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.Authorize")
 	defer span.End()
 
-	out, err := a.AuthLoginUseCase.Execute(ctx, auth_usecase.AuthLoginInput{
+	out, err := a.AuthLogin.Execute(ctx, auth_command.AuthLoginInput{
 		RedirectURL: params.RedirectURL,
 		Provider:    params.Provider,
 	})
@@ -60,11 +60,10 @@ func (a *authHandler) OAuthCallback(ctx context.Context, params oas.OAuthCallbac
 		return nil, messages.InvalidStateError
 	}
 
-	input := auth_usecase.CallbackInput{
+	output, err := a.AuthCallback.Execute(ctx, auth_command.CallbackInput{
 		Provider: params.Provider,
 		Code:     params.Code,
-	}
-	output, err := a.AuthCallbackUseCase.Execute(ctx, input)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +85,7 @@ func (a *authHandler) OAuthTokenRevoke(ctx context.Context) (oas.OAuthTokenRevok
 	if err != nil {
 		return nil, messages.ForbiddenError
 	}
-	out, err := a.RevokeUseCase.Execute(ctx, auth_usecase.RevokeInput{
+	out, err := a.Revoke.Execute(ctx, auth_command.RevokeInput{
 		SessID: sessID,
 	})
 	if err != nil {

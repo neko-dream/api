@@ -1,4 +1,4 @@
-package auth_usecase
+package auth_command
 
 import (
 	"context"
@@ -18,7 +18,7 @@ import (
 )
 
 type (
-	AuthCallbackUseCase interface {
+	AuthCallback interface {
 		Execute(ctx context.Context, input CallbackInput) (CallbackOutput, error)
 	}
 
@@ -42,14 +42,14 @@ type (
 	}
 )
 
-func NewAuthCallbackUseCase(
+func NewAuthCallback(
 	tm *db.DBManager,
 	config *config.Config,
 	authService service.AuthService,
 	sessionRepository session.SessionRepository,
 	sessionService session.SessionService,
 	tokenManager session.TokenManager,
-) AuthCallbackUseCase {
+) AuthCallback {
 	return &authCallbackInteractor{
 		DBManager:         tm,
 		Config:            config,
