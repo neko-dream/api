@@ -12,14 +12,13 @@ import (
 	"github.com/neko-dream/server/internal/usecase/command/timeline_command"
 	"github.com/neko-dream/server/internal/usecase/command/user_command"
 	"github.com/neko-dream/server/internal/usecase/command/vote_command"
-	timeline_usecase "github.com/neko-dream/server/internal/usecase/timeline"
+	"github.com/neko-dream/server/internal/usecase/query/timeline_query"
 )
 
 func useCaseDeps() []ProvideArg {
 	return []ProvideArg{
 		{analysis_usecase.NewGetAnalysisResultUseCase, nil},
 		{analysis_usecase.NewGetReportQueryHandler, nil},
-		{timeline_usecase.NewGetTimeLineUseCase, nil},
 		{talksession_command.NewAddConclusionCommandHandler, nil},
 		{talksession_command.NewStartTalkSessionCommand, nil},
 		{opinion_command.NewSubmitOpinionHandler, nil},
@@ -42,5 +41,6 @@ func useCaseDeps() []ProvideArg {
 		{auth_command.NewAuthCallback, nil},
 		{timeline_command.NewAddTimeLine, nil},
 		{timeline_command.NewEditTimeLine, nil},
+		{timeline_query.NewGetTimeLine, nil},
 	}
 }

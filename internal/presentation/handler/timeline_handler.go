@@ -11,7 +11,7 @@ import (
 	timelineactions "github.com/neko-dream/server/internal/domain/model/timeline_actions"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/internal/usecase/command/timeline_command"
-	timeline_usecase "github.com/neko-dream/server/internal/usecase/timeline"
+	"github.com/neko-dream/server/internal/usecase/query/timeline_query"
 	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
@@ -20,18 +20,18 @@ import (
 type timelineHandler struct {
 	timeline_command.AddTimeLine
 	et timeline_command.EditTimeLine
-	timeline_usecase.GetTimeLineUseCase
+	gt timeline_query.GetTimeLine
 }
 
 func NewTimelineHandler(
 	addTimeLine timeline_command.AddTimeLine,
 	editTimeLine timeline_command.EditTimeLine,
-	getTimeLineUseCase timeline_usecase.GetTimeLineUseCase,
+	getTimeLine timeline_query.GetTimeLine,
 ) oas.TimelineHandler {
 	return &timelineHandler{
-		AddTimeLine:        addTimeLine,
-		et:                 editTimeLine,
-		GetTimeLineUseCase: getTimeLineUseCase,
+		AddTimeLine: addTimeLine,
+		et:          editTimeLine,
+		gt:          getTimeLine,
 	}
 }
 
@@ -46,7 +46,7 @@ func (t *timelineHandler) GetTimeLine(ctx context.Context, params oas.GetTimeLin
 		return nil, messages.InternalServerError
 	}
 
-	output, err := t.GetTimeLineUseCase.Execute(ctx, timeline_usecase.GetTimeLineInput{
+	output, err := t.gt.Execute(ctx, timeline_query.GetTimeLineInput{
 		TalkSessionID: talkSessionID,
 	})
 	if err != nil {
