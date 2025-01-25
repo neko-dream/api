@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"mime/multipart"
+	"unicode/utf8"
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/auth"
@@ -65,10 +66,10 @@ func (u *User) SetDisplayID(id string) error {
 	if id == "" {
 		return messages.UserDisplayIDInvalidError
 	}
-	if len([]rune(id)) > 30 {
+	if utf8.RuneCountInString(id) > 30 {
 		return messages.UserDisplayIDTooLong
 	}
-	if len([]rune(id)) < 4 {
+	if utf8.RuneCountInString(id) < 4 {
 		return messages.UserDisplayIDTooShort
 	}
 	u.displayID = lo.ToPtr(id)
