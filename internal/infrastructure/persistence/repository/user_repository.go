@@ -251,33 +251,34 @@ func (u *userRepository) findUserDemographics(ctx context.Context, userID shared
 	}
 
 	var (
-		yearOfBirth   *um.YearOfBirth
-		occupation    *um.Occupation
-		city          *um.City
-		householdSize *um.HouseholdSize
-		gender        *um.Gender
+		yearOfBirth   *int
+		occupation    *string
+		city          *string
+		householdSize *int
+		gender        *string
 		prefecture    *string
 	)
 	userDemographicsID := shared.MustParseUUID[user.UserDemographics](userDemoRow.UserDemographicsID.String())
 
 	if userDemoRow.YearOfBirth.Valid {
-		yearOfBirth = um.NewYearOfBirth(lo.ToPtr(int(userDemoRow.YearOfBirth.Int32)))
+		yearOfBirth = lo.ToPtr(int(userDemoRow.YearOfBirth.Int32))
 	}
 	if userDemoRow.Occupation.Valid {
-		occupation = lo.ToPtr(um.Occupation(int(userDemoRow.Occupation.Int16)))
+		occupation = lo.ToPtr(um.Occupation(int(userDemoRow.Occupation.Int16)).String())
 	}
-	gender = lo.ToPtr(um.Gender(int(userDemoRow.Gender)))
+	gender = lo.ToPtr(um.Gender(int(userDemoRow.Gender)).String())
 	if userDemoRow.City.Valid {
-		city = um.NewCity(lo.ToPtr(userDemoRow.City.String))
+		city = lo.ToPtr(userDemoRow.City.String)
 	}
 	if userDemoRow.HouseholdSize.Valid {
-		householdSize = um.NewHouseholdSize(lo.ToPtr(int(userDemoRow.HouseholdSize.Int16)))
+		householdSize = lo.ToPtr(int(userDemoRow.HouseholdSize.Int16))
 	}
 	if userDemoRow.Prefecture.Valid {
 		prefecture = lo.ToPtr(userDemoRow.Prefecture.String)
 	}
 
 	ud := user.NewUserDemographics(
+		ctx,
 		userDemographicsID,
 		yearOfBirth,
 		occupation,

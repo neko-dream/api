@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"go.opentelemetry.io/otel"
 )
@@ -66,21 +67,58 @@ func (u *UserDemographics) ChangeYearOfBirth(yearOfBirth *YearOfBirth) {
 }
 
 func NewUserDemographics(
+	ctx context.Context,
 	userDemographicsID shared.UUID[UserDemographics],
-	yearOfBirth *YearOfBirth,
-	occupation *Occupation,
-	gender *Gender,
-	city *City,
-	householdSize *HouseholdSize,
+	yearOfBirth *int,
+	occupation *string,
+	gender *string,
+	city *string,
+	householdSize *int,
 	prefecture *string,
 ) UserDemographics {
+	var (
+		yearOfBirthOut   *YearOfBirth
+		occupationOut    *Occupation
+		genderOut        Gender
+		cityOut          *City
+		householdSizeOut *HouseholdSize
+	)
+
+	// 誕生日のバリデーション
+	if yearOfBirth != nil &&
+		*yearOfBirth >= 1900 &&
+		*yearOfBirth < clock.Now(ctx).Year() {
+		yearOfBirthOut = NewYearOfBirth(yearOfBirth)
+	}
+
+	// 職業のバリデーション
+	if occupation != nil &&
+		*occupation != "" {
+		occupationOut = NewOccupation(occupation)
+	}
+
+	// 性別のバリデーション
+	if gender != nil && *gender != "" {
+		genderOut = NewGender(gender)
+	}
+
+	// 居住地のバリデーション
+	if city != nil && *city != "" {
+		cityOut = NewCity(city)
+	}
+
+	// 世帯人数のバリデーション
+	if householdSize != nil && *householdSize > 0 {
+		householdSizeOut = NewHouseholdSize(householdSize)
+	}
+
 	return UserDemographics{
 		userDemographicsID: userDemographicsID,
-		yearOfBirth:        yearOfBirth,
-		occupation:         occupation,
-		gender:             gender,
-		city:               city,
-		householdSize:      householdSize,
+		yearOfBirth:        yearOfBirthOut,
+		occupation:         occupationOut,
+		gender:             &genderOut,
+		city:               cityOut,
+		householdSize:      householdSizeOut,
 		prefecture:         prefecture,
 	}
 }

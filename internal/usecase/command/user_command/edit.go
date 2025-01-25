@@ -12,7 +12,6 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/pkg/utils"
-	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
@@ -84,18 +83,12 @@ func (e *EditHandler) Execute(ctx context.Context, input EditInput) (*EditOutput
 		if foundUser == nil {
 			return messages.UserNotFoundError
 		}
-
-		if input.DisplayName != nil || *input.DisplayName != "" {
-			// 表示名が変更された場合は設定
-			foundUser.SetDisplayName(*input.DisplayName)
-		}
+		foundUser.ChangeName(ctx, input.DisplayName)
 
 		// アイコンがある場合は設定
-		if input.Icon != nil {
-			if err := foundUser.SetIconFile(ctx, input.Icon); err != nil {
-				utils.HandleError(ctx, err, "User.SetIconFile")
-				return messages.UserUpdateError
-			}
+		if err := foundUser.SetIconFile(ctx, input.Icon); err != nil {
+			utils.HandleError(ctx, err, "User.SetIconFile")
+			return messages.UserUpdateError
 		}
 		if input.DeleteIcon {
 			foundUser.DeleteIcon()
@@ -116,12 +109,13 @@ func (e *EditHandler) Execute(ctx context.Context, input EditInput) (*EditOutput
 
 			// デモグラ情報を設定
 			foundUser.SetDemographics(user.NewUserDemographics(
+				ctx,
 				demograID,
-				user.NewYearOfBirth(input.YearOfBirth),
-				user.NewOccupation(input.Occupation),
-				lo.ToPtr(user.NewGender(input.Gender)),
-				user.NewCity(input.City),
-				user.NewHouseholdSize(input.HouseholdSize),
+				input.YearOfBirth,
+				input.Occupation,
+				input.Gender,
+				input.City,
+				input.HouseholdSize,
 				input.Prefecture,
 			))
 		}
