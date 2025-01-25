@@ -354,7 +354,7 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 		displayName = &value.DisplayName.Value
 	}
 	var occupation *string
-	if value.Occupation.IsSet() && !value.Occupation.Null {
+	if value.Occupation.IsSet() && !value.Occupation.IsNull() {
 		txt, err := value.Occupation.Value.MarshalText()
 		if err != nil {
 			utils.HandleError(ctx, err, "value.Occupation.Value.MarshalText")
@@ -364,21 +364,25 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 			occupation = lo.ToPtr(string(txt))
 		}
 	}
+	var gender *string
+	if value.Gender.IsSet() && !value.Gender.IsNull() {
+		txt, err := value.Gender.Value.MarshalText()
+		if err != nil {
+			return nil, messages.InternalServerError
+		}
+		if string(txt) != "" {
+			gender = lo.ToPtr(string(txt))
+		}
+	}
 
 	out, err := u.editUser.Execute(ctx, user_command.EditInput{
-		UserID:      userID,
-		DisplayName: displayName,
-		Icon:        file,
-		YearOfBirth: yearOfBirth,
-		City:        city,
-		Occupation:  occupation,
-		Gender: utils.ToPtrIfNotNullFunc(value.Gender.Null, func() *string {
-			txt, err := value.Gender.Value.MarshalText()
-			if err != nil {
-				return nil
-			}
-			return lo.ToPtr(string(txt))
-		}),
+		UserID:        userID,
+		DisplayName:   displayName,
+		Icon:          file,
+		YearOfBirth:   yearOfBirth,
+		City:          city,
+		Occupation:    occupation,
+		Gender:        gender,
 		HouseholdSize: householdSize,
 		Prefecture:    prefecture,
 		DeleteIcon:    deleteIcon,
