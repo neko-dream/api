@@ -1,37 +1,35 @@
-package timeline_usecase
+package timeline_command
 
 import (
 	"context"
 
 	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	timelineactions "github.com/neko-dream/server/internal/domain/model/timeline_actions"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
-	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
 type (
-	AddTimeLineUseCase interface {
-		Execute(context.Context, AddTimeLineInput) (*AddTimeLineOutput, error)
+	EditTimeLine interface {
+		Execute(context.Context, EditTimeLineInput) (*EditTimeLineOutput, error)
 	}
 
-	AddTimeLineInput struct {
-		OwnerID        shared.UUID[user.User]
-		TalkSessionID  shared.UUID[talksession.TalkSession]
-		ParentActionID *shared.UUID[timelineactions.ActionItem]
-		Content        string
-		Status         string
+	EditTimeLineInput struct {
+		OwnerID       shared.UUID[user.User]
+		TalkSessionID shared.UUID[talksession.TalkSession]
+		ActionItemID  shared.UUID[timelineactions.ActionItem]
+		Content       *string
+		Status        *string
 	}
 
-	AddTimeLineOutput struct {
+	EditTimeLineOutput struct {
 		ActionItem *timelineactions.ActionItem
 	}
 
-	addTimeLineInteractor struct {
+	EditTimeLineInteractor struct {
 		timelineactions.ActionItemRepository
 		talksession.TalkSessionRepository
 		timelineactions.ActionItemService
@@ -39,13 +37,13 @@ type (
 	}
 )
 
-func NewAddTimeLineUseCase(
+func NewEditTimeLine(
 	actionItemRepository timelineactions.ActionItemRepository,
 	talkSessionRepository talksession.TalkSessionRepository,
 	actionItemService timelineactions.ActionItemService,
 	dbManager *db.DBManager,
-) AddTimeLineUseCase {
-	return &addTimeLineInteractor{
+) EditTimeLine {
+	return &EditTimeLineInteractor{
 		ActionItemRepository:  actionItemRepository,
 		TalkSessionRepository: talkSessionRepository,
 		ActionItemService:     actionItemService,
@@ -53,8 +51,8 @@ func NewAddTimeLineUseCase(
 	}
 }
 
-func (i *addTimeLineInteractor) Execute(ctx context.Context, input AddTimeLineInput) (*AddTimeLineOutput, error) {
-	ctx, span := otel.Tracer("timeline_usecase").Start(ctx, "addTimeLineInteractor.Execute")
+func (i *EditTimeLineInteractor) Execute(ctx context.Context, input EditTimeLineInput) (*EditTimeLineOutput, error) {
+	ctx, span := otel.Tracer("timeline_").Start(ctx, "EditTimeLineInteractor.Execute")
 	defer span.End()
 
 	talkSession, err := i.TalkSessionRepository.FindByID(ctx, input.TalkSessionID)
@@ -73,28 +71,31 @@ func (i *addTimeLineInteractor) Execute(ctx context.Context, input AddTimeLineIn
 	if talkSession.OwnerUserID() != input.OwnerID {
 		return nil, messages.TalkSessionNotOwner
 	}
-	now := clock.Now(ctx)
 
-	newActionItem, err := timelineactions.NewActionItem(
-		shared.NewUUID[timelineactions.ActionItem](),
-		input.TalkSessionID,
-		0,
-		input.Content,
-		timelineactions.ActionStatus(input.Status),
-		now,
-		now,
-	)
+	actionItem, err := i.ActionItemRepository.FindByID(ctx, input.ActionItemID)
 	if err != nil {
-		utils.HandleError(ctx, err, "timelineactions.NewActionItem")
+		return nil, err
+	}
+	if actionItem == nil {
+		return nil, messages.ActionItemNotFound
+	}
+	if input.Content != nil {
+		actionItem.Content = *input.Content
+	}
+	if input.Status != nil {
+		actionItem.UpdateStatus(timelineactions.ActionStatus(*input.Status))
+	}
+
+	if err := i.ActionItemRepository.UpdateActionItem(ctx, *actionItem); err != nil {
 		return nil, err
 	}
 
-	if err := i.ActionItemService.InsertActionItem(ctx, input.ParentActionID, *newActionItem); err != nil {
-		utils.HandleError(ctx, err, "ActionItemService.InsertActionItem")
+	actionItem, err = i.ActionItemRepository.FindByID(ctx, input.ActionItemID)
+	if err != nil {
 		return nil, err
 	}
 
-	return &AddTimeLineOutput{
-		ActionItem: newActionItem,
+	return &EditTimeLineOutput{
+		ActionItem: actionItem,
 	}, nil
 }
