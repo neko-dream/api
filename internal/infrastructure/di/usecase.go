@@ -1,29 +1,22 @@
 package di
 
 import (
+	analysis_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/analysis"
 	opinion_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/opinion"
 	talksession_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/talksession"
 	user_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/user"
 
-	analysis_usecase "github.com/neko-dream/server/internal/usecase/analysis"
-	auth_usecase "github.com/neko-dream/server/internal/usecase/auth"
+	"github.com/neko-dream/server/internal/usecase/command/auth_command"
 	"github.com/neko-dream/server/internal/usecase/command/opinion_command"
 	"github.com/neko-dream/server/internal/usecase/command/talksession_command"
+	"github.com/neko-dream/server/internal/usecase/command/timeline_command"
 	"github.com/neko-dream/server/internal/usecase/command/user_command"
 	"github.com/neko-dream/server/internal/usecase/command/vote_command"
-	timeline_usecase "github.com/neko-dream/server/internal/usecase/timeline"
+	"github.com/neko-dream/server/internal/usecase/query/timeline_query"
 )
 
 func useCaseDeps() []ProvideArg {
 	return []ProvideArg{
-		{auth_usecase.NewAuthLoginUseCase, nil},
-		{auth_usecase.NewAuthCallbackUseCase, nil},
-		{auth_usecase.NewRevokeUseCase, nil},
-		{analysis_usecase.NewGetAnalysisResultUseCase, nil},
-		{analysis_usecase.NewGetReportQueryHandler, nil},
-		{timeline_usecase.NewAddTimeLineUseCase, nil},
-		{timeline_usecase.NewGetTimeLineUseCase, nil},
-		{timeline_usecase.NewEditTimeLineUseCase, nil},
 		{talksession_command.NewAddConclusionCommandHandler, nil},
 		{talksession_command.NewStartTalkSessionCommand, nil},
 		{opinion_command.NewSubmitOpinionHandler, nil},
@@ -41,5 +34,13 @@ func useCaseDeps() []ProvideArg {
 		{user_command.NewRegisterHandler, nil},
 		{user_query.NewDetailHandler, nil},
 		{vote_command.NewVoteHandler, nil},
+		{auth_command.NewAuthLogin, nil},
+		{auth_command.NewRevoke, nil},
+		{auth_command.NewAuthCallback, nil},
+		{timeline_command.NewAddTimeLine, nil},
+		{timeline_command.NewEditTimeLine, nil},
+		{timeline_query.NewGetTimeLine, nil},
+		{analysis_query.NewGetAnalysisResultHandler, nil},
+		{analysis_query.NewGetReportQueryHandler, nil},
 	}
 }

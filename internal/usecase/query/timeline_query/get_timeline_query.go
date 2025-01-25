@@ -1,4 +1,4 @@
-package timeline_usecase
+package timeline_query
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 )
 
 type (
-	GetTimeLineUseCase interface {
+	GetTimeLine interface {
 		Execute(context.Context, GetTimeLineInput) (*GetTimeLineOutput, error)
 	}
 
@@ -39,19 +39,19 @@ type (
 	}
 )
 
-func NewGetTimeLineUseCase(
+func NewGetTimeLine(
 	actionItemRepository timelineactions.ActionItemRepository,
 	talkSessionRepository talksession.TalkSessionRepository,
-) GetTimeLineUseCase {
+) GetTimeLine {
 	return &getTimeLineInteractor{
 		ActionItemRepository:  actionItemRepository,
 		TalkSessionRepository: talkSessionRepository,
 	}
 }
 
-// Execute implements GetTimeLineUseCase.
+// Execute implements GetTimeLine.
 func (g *getTimeLineInteractor) Execute(ctx context.Context, input GetTimeLineInput) (*GetTimeLineOutput, error) {
-	ctx, span := otel.Tracer("timeline_usecase").Start(ctx, "getTimeLineInteractor.Execute")
+	ctx, span := otel.Tracer("timeline_").Start(ctx, "getTimeLineInteractor.Execute")
 	defer span.End()
 
 	talkSession, err := g.TalkSessionRepository.FindByID(ctx, input.TalkSessionID)

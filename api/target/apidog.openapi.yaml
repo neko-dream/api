@@ -2645,7 +2645,7 @@
                       "description": "作成ユーザー"
                     },
                     "demographics": {
-                      "$ref": "#/components/schemas/UserDemographic"
+                      "$ref": "#/components/schemas/userDemographics"
                     }
                   },
                   "required": [
@@ -4030,7 +4030,7 @@
           "limit"
         ]
       },
-      "UserDemographic": {
+      "userDemographics": {
         "type": "object",
         "properties": {
           "yearOfBirth": {

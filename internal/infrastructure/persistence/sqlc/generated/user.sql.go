@@ -199,7 +199,7 @@ func (q *Queries) GetUserDemographicByUserID(ctx context.Context, userID uuid.UU
 	row := q.db.QueryRowContext(ctx, getUserDemographicByUserID, userID)
 	var i UserDemographic
 	err := row.Scan(
-		&i.UserDemographicID,
+		&i.UserDemographicsID,
 		&i.UserID,
 		&i.YearOfBirth,
 		&i.Occupation,
@@ -260,7 +260,7 @@ func (q *Queries) GetUserDetailByID(ctx context.Context, userID uuid.UUID) (GetU
 		&i.UserAuth.Subject,
 		&i.UserAuth.IsVerified,
 		&i.UserAuth.CreatedAt,
-		&i.UserDemographic.UserDemographicID,
+		&i.UserDemographic.UserDemographicsID,
 		&i.UserDemographic.UserID,
 		&i.UserDemographic.YearOfBirth,
 		&i.UserDemographic.Occupation,
@@ -299,7 +299,7 @@ DO UPDATE SET
 `
 
 type UpdateOrCreateUserDemographicParams struct {
-	UserDemographicID uuid.UUID
+	UserDemographicsID uuid.UUID
 	UserID             uuid.UUID
 	YearOfBirth        sql.NullInt32
 	Occupation         sql.NullInt16
@@ -334,7 +334,7 @@ type UpdateOrCreateUserDemographicParams struct {
 //	    updated_at = now()
 func (q *Queries) UpdateOrCreateUserDemographic(ctx context.Context, arg UpdateOrCreateUserDemographicParams) error {
 	_, err := q.db.ExecContext(ctx, updateOrCreateUserDemographic,
-		arg.UserDemographicID,
+		arg.UserDemographicsID,
 		arg.UserID,
 		arg.YearOfBirth,
 		arg.Occupation,

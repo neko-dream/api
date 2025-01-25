@@ -3,6 +3,7 @@ package timelineactions
 import (
 	"context"
 	"time"
+	"unicode/utf8"
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -53,7 +54,7 @@ func NewActionItem(
 		return nil, messages.ActionItemInvalidStatus
 	}
 
-	if len(content) < 1 || len(content) > 40 {
+	if utf8.RuneCountInString(content) < 1 || utf8.RuneCountInString(content) > 40 {
 		return nil, messages.ActionItemInvalidContent
 	}
 
@@ -69,7 +70,7 @@ func NewActionItem(
 }
 
 func (a *ActionItem) UpdateContent(content string) error {
-	if len(content) < 1 || len(content) > 40 {
+	if utf8.RuneCountInString(content) < 1 || utf8.RuneCountInString(content) > 40 {
 		return messages.ActionItemInvalidContent
 	}
 

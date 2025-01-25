@@ -1,58 +1,56 @@
-package timeline_usecase
+package timeline_command
 
 import (
 	"context"
 
 	"github.com/neko-dream/server/internal/domain/messages"
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	timelineactions "github.com/neko-dream/server/internal/domain/model/timeline_actions"
 	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
+	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
 type (
-	EditTimeLineUseCase interface {
-		Execute(context.Context, EditTimeLineInput) (*EditTimeLineOutput, error)
+	AddTimeLine interface {
+		Execute(context.Context, AddTimeLineInput) (*AddTimeLineOutput, error)
 	}
 
-	EditTimeLineInput struct {
-		OwnerID       shared.UUID[user.User]
-		TalkSessionID shared.UUID[talksession.TalkSession]
-		ActionItemID  shared.UUID[timelineactions.ActionItem]
-		Content       *string
-		Status        *string
+	AddTimeLineInput struct {
+		OwnerID        shared.UUID[user.User]
+		TalkSessionID  shared.UUID[talksession.TalkSession]
+		ParentActionID *shared.UUID[timelineactions.ActionItem]
+		Content        string
+		Status         string
 	}
 
-	EditTimeLineOutput struct {
+	AddTimeLineOutput struct {
 		ActionItem *timelineactions.ActionItem
 	}
 
-	EditTimeLineInteractor struct {
+	addTimeLineInteractor struct {
 		timelineactions.ActionItemRepository
 		talksession.TalkSessionRepository
 		timelineactions.ActionItemService
-		*db.DBManager
 	}
 )
 
-func NewEditTimeLineUseCase(
+func NewAddTimeLine(
 	actionItemRepository timelineactions.ActionItemRepository,
 	talkSessionRepository talksession.TalkSessionRepository,
 	actionItemService timelineactions.ActionItemService,
-	dbManager *db.DBManager,
-) EditTimeLineUseCase {
-	return &EditTimeLineInteractor{
+) AddTimeLine {
+	return &addTimeLineInteractor{
 		ActionItemRepository:  actionItemRepository,
 		TalkSessionRepository: talkSessionRepository,
 		ActionItemService:     actionItemService,
-		DBManager:             dbManager,
 	}
 }
 
-func (i *EditTimeLineInteractor) Execute(ctx context.Context, input EditTimeLineInput) (*EditTimeLineOutput, error) {
-	ctx, span := otel.Tracer("timeline_usecase").Start(ctx, "EditTimeLineInteractor.Execute")
+func (i *addTimeLineInteractor) Execute(ctx context.Context, input AddTimeLineInput) (*AddTimeLineOutput, error) {
+	ctx, span := otel.Tracer("timeline_").Start(ctx, "addTimeLineInteractor.Execute")
 	defer span.End()
 
 	talkSession, err := i.TalkSessionRepository.FindByID(ctx, input.TalkSessionID)
@@ -71,31 +69,28 @@ func (i *EditTimeLineInteractor) Execute(ctx context.Context, input EditTimeLine
 	if talkSession.OwnerUserID() != input.OwnerID {
 		return nil, messages.TalkSessionNotOwner
 	}
+	now := clock.Now(ctx)
 
-	actionItem, err := i.ActionItemRepository.FindByID(ctx, input.ActionItemID)
+	newActionItem, err := timelineactions.NewActionItem(
+		shared.NewUUID[timelineactions.ActionItem](),
+		input.TalkSessionID,
+		0,
+		input.Content,
+		timelineactions.ActionStatus(input.Status),
+		now,
+		now,
+	)
 	if err != nil {
-		return nil, err
-	}
-	if actionItem == nil {
-		return nil, messages.ActionItemNotFound
-	}
-	if input.Content != nil {
-		actionItem.Content = *input.Content
-	}
-	if input.Status != nil {
-		actionItem.UpdateStatus(timelineactions.ActionStatus(*input.Status))
-	}
-
-	if err := i.ActionItemRepository.UpdateActionItem(ctx, *actionItem); err != nil {
+		utils.HandleError(ctx, err, "timelineactions.NewActionItem")
 		return nil, err
 	}
 
-	actionItem, err = i.ActionItemRepository.FindByID(ctx, input.ActionItemID)
-	if err != nil {
+	if err := i.ActionItemService.InsertActionItem(ctx, input.ParentActionID, *newActionItem); err != nil {
+		utils.HandleError(ctx, err, "ActionItemService.InsertActionItem")
 		return nil, err
 	}
 
-	return &EditTimeLineOutput{
-		ActionItem: actionItem,
+	return &AddTimeLineOutput{
+		ActionItem: newActionItem,
 	}, nil
 }

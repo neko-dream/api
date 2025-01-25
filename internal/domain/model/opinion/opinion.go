@@ -4,6 +4,7 @@ import (
 	"context"
 	"mime/multipart"
 	"time"
+	"unicode/utf8"
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -54,16 +55,13 @@ func NewOpinion(
 	createdAt time.Time,
 	referenceURL *string,
 ) (*Opinion, error) {
-	if content == "" {
-		return nil, messages.OpinionContentBadLength
-	}
-	if len(content) > 140 && len(content) < 5 {
+	if utf8.RuneCountInString(content) > 140 || utf8.RuneCountInString(content) < 5 {
 		return nil, messages.OpinionContentBadLength
 	}
 	if parentOpinionID != nil && opinionID == *parentOpinionID {
 		return nil, messages.OpinionParentOpinionIDIsSame
 	}
-	if title != nil && len(*title) > 50 && len(*title) < 5 {
+	if title != nil && (utf8.RuneCountInString(*title) > 50 || utf8.RuneCountInString(*title) < 5) {
 		return nil, messages.OpinionTitleBadLength
 	}
 
