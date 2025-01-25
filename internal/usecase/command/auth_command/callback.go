@@ -2,8 +2,6 @@ package auth_command
 
 import (
 	"context"
-	"net/http"
-	"strings"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/clock"
@@ -12,7 +10,6 @@ import (
 	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
-	cookie_utils "github.com/neko-dream/server/pkg/cookie"
 	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
@@ -29,7 +26,7 @@ type (
 	}
 
 	CallbackOutput struct {
-		Cookie string
+		Token string
 	}
 
 	authCallbackInteractor struct {
@@ -64,7 +61,7 @@ func (u *authCallbackInteractor) Execute(ctx context.Context, input CallbackInpu
 	ctx, span := otel.Tracer("auth_usecase").Start(ctx, "authCallbackInteractor.Execute")
 	defer span.End()
 
-	var c http.Cookie
+	var tokenRes string
 	if err := u.ExecTx(ctx, func(ctx context.Context) error {
 		user, err := u.AuthService.Authenticate(ctx, input.Provider, input.Code)
 		if err != nil {
@@ -96,23 +93,15 @@ func (u *authCallbackInteractor) Execute(ctx context.Context, input CallbackInpu
 			utils.HandleError(ctx, err, "failed to generate token")
 			return errtrace.Wrap(err)
 		}
-		cookie := http.Cookie{
-			Name:     "SessionId",
-			Value:    token,
-			HttpOnly: true,
-			Path:     "/",
-			SameSite: http.SameSiteLaxMode,
-			Domain:   u.DOMAIN,
-			MaxAge:   60 * 60 * 24 * 7,
-		}
 
-		c = cookie
+		tokenRes = token
+
 		return nil
 	}); err != nil {
 		return CallbackOutput{}, err
 	}
 
 	return CallbackOutput{
-		Cookie: strings.Join(cookie_utils.EncodeCookies([]*http.Cookie{&c}), ","),
+		Token: tokenRes,
 	}, nil
 }
