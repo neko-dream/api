@@ -6,6 +6,14 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/config"
 )
 
+const (
+	SessionCookieName  = "SessionId"
+	StateCookieName    = "state"
+	RedirectCookieName = "redirect_url"
+	SessionMaxAge      = 86400 // 24 hours
+	AuthCookieMaxAge   = 300   // 5 minutes
+)
+
 type CookieManager struct {
 	config   *config.Config
 	secure   bool
@@ -24,43 +32,45 @@ func NewCookieManager(
 
 func (cm *CookieManager) CreateSessionCookie(token string) *http.Cookie {
 	return &http.Cookie{
-		Name:     "SessionId",
+		Name:     SessionCookieName,
 		Value:    token,
 		HttpOnly: true,
 		Secure:   cm.secure,
 		Path:     "/",
 		SameSite: cm.someSite,
 		Domain:   cm.config.DOMAIN,
-		MaxAge:   60 * 60 * 24,
+		MaxAge:   SessionMaxAge,
 	}
 }
 
 func (cm *CookieManager) CreateAuthCookies(state, redirectURL string) []*http.Cookie {
 	return []*http.Cookie{
 		{
-			Name:     "state",
+			Name:     StateCookieName,
 			Value:    state,
 			HttpOnly: true,
 			Secure:   cm.secure,
 			Path:     "/",
 			SameSite: cm.someSite,
 			Domain:   cm.config.DOMAIN,
+			MaxAge:   AuthCookieMaxAge,
 		},
 		{
-			Name:     "redirect_url",
+			Name:     RedirectCookieName,
 			Value:    redirectURL,
 			HttpOnly: true,
 			Secure:   cm.secure,
 			Path:     "/",
 			SameSite: cm.someSite,
 			Domain:   cm.config.DOMAIN,
+			MaxAge:   AuthCookieMaxAge,
 		},
 	}
 }
 
 func (cm *CookieManager) CreateRevokeCookie() *http.Cookie {
 	return &http.Cookie{
-		Name:     "SessionId",
+		Name:     SessionCookieName,
 		Value:    "",
 		HttpOnly: true,
 		Secure:   cm.secure,
