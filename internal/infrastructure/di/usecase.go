@@ -20,7 +20,6 @@ func useCaseDeps() []ProvideArg {
 		{analysis_usecase.NewGetAnalysisResultUseCase, nil},
 		{analysis_usecase.NewGetReportQueryHandler, nil},
 		{timeline_usecase.NewGetTimeLineUseCase, nil},
-		{timeline_usecase.NewEditTimeLineUseCase, nil},
 		{talksession_command.NewAddConclusionCommandHandler, nil},
 		{talksession_command.NewStartTalkSessionCommand, nil},
 		{opinion_command.NewSubmitOpinionHandler, nil},
@@ -42,5 +41,6 @@ func useCaseDeps() []ProvideArg {
 		{auth_command.NewRevoke, nil},
 		{auth_command.NewAuthCallback, nil},
 		{timeline_command.NewAddTimeLine, nil},
+		{timeline_command.NewEditTimeLine, nil},
 	}
 }

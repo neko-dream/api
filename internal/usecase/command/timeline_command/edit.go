@@ -1,4 +1,4 @@
-package timeline_usecase
+package timeline_command
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 )
 
 type (
-	EditTimeLineUseCase interface {
+	EditTimeLine interface {
 		Execute(context.Context, EditTimeLineInput) (*EditTimeLineOutput, error)
 	}
 
@@ -37,12 +37,12 @@ type (
 	}
 )
 
-func NewEditTimeLineUseCase(
+func NewEditTimeLine(
 	actionItemRepository timelineactions.ActionItemRepository,
 	talkSessionRepository talksession.TalkSessionRepository,
 	actionItemService timelineactions.ActionItemService,
 	dbManager *db.DBManager,
-) EditTimeLineUseCase {
+) EditTimeLine {
 	return &EditTimeLineInteractor{
 		ActionItemRepository:  actionItemRepository,
 		TalkSessionRepository: talkSessionRepository,
@@ -52,7 +52,7 @@ func NewEditTimeLineUseCase(
 }
 
 func (i *EditTimeLineInteractor) Execute(ctx context.Context, input EditTimeLineInput) (*EditTimeLineOutput, error) {
-	ctx, span := otel.Tracer("timeline_usecase").Start(ctx, "EditTimeLineInteractor.Execute")
+	ctx, span := otel.Tracer("timeline_").Start(ctx, "EditTimeLineInteractor.Execute")
 	defer span.End()
 
 	talkSession, err := i.TalkSessionRepository.FindByID(ctx, input.TalkSessionID)

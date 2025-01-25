@@ -19,19 +19,19 @@ import (
 
 type timelineHandler struct {
 	timeline_command.AddTimeLine
+	et timeline_command.EditTimeLine
 	timeline_usecase.GetTimeLineUseCase
-	timeline_usecase.EditTimeLineUseCase
 }
 
 func NewTimelineHandler(
 	addTimeLine timeline_command.AddTimeLine,
+	editTimeLine timeline_command.EditTimeLine,
 	getTimeLineUseCase timeline_usecase.GetTimeLineUseCase,
-	editTimeLineUseCase timeline_usecase.EditTimeLineUseCase,
 ) oas.TimelineHandler {
 	return &timelineHandler{
-		AddTimeLine:         addTimeLine,
-		GetTimeLineUseCase:  getTimeLineUseCase,
-		EditTimeLineUseCase: editTimeLineUseCase,
+		AddTimeLine:        addTimeLine,
+		et:                 editTimeLine,
+		GetTimeLineUseCase: getTimeLineUseCase,
 	}
 }
 
@@ -153,7 +153,7 @@ func (t *timelineHandler) EditTimeLine(ctx context.Context, req oas.OptEditTimeL
 		status = lo.ToPtr(req.Value.Status.Value)
 	}
 
-	output, err := t.EditTimeLineUseCase.Execute(ctx, timeline_usecase.EditTimeLineInput{
+	output, err := t.et.Execute(ctx, timeline_command.EditTimeLineInput{
 		OwnerID:       userID,
 		TalkSessionID: talkSessionID,
 		ActionItemID:  actionItemID,
