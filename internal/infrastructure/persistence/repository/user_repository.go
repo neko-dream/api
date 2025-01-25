@@ -132,16 +132,24 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 		if userDemographics.Prefecture() != nil {
 			prefecture = sql.NullString{String: *userDemographics.Prefecture(), Valid: true}
 		}
+		var occupation sql.NullInt16
+		if userDemographics.Occupation() != nil {
+			occupation = sql.NullInt16{Int16: int16(*userDemographics.Occupation()), Valid: true}
+		}
+		var gender sql.NullInt16
+		if userDemographics.Gender() != nil {
+			gender = sql.NullInt16{Int16: int16(*userDemographics.Gender()), Valid: true}
+		}
 
 		if err := u.GetQueries(ctx).
 			UpdateOrCreateUserDemographics(ctx, model.UpdateOrCreateUserDemographicsParams{
 				UserDemographicsID: userDemographics.UserDemographicsID().UUID(),
 				UserID:             user.UserID().UUID(),
 				YearOfBirth:        yearOfBirth,
-				Occupation:         sql.NullInt16{Int16: int16(userDemographics.Occupation()), Valid: true},
+				Occupation:         occupation,
 				City:               city,
 				HouseholdSize:      householdSize,
-				Gender:             int16(userDemographics.Gender()),
+				Gender:             gender,
 				Prefecture:         prefecture,
 			}); err != nil {
 			utils.HandleError(ctx, err, "UpdateOrCreateUserDemographics")
@@ -266,7 +274,9 @@ func (u *userRepository) findUserDemographics(ctx context.Context, userID shared
 	if userDemoRow.Occupation.Valid {
 		occupation = lo.ToPtr(um.Occupation(int(userDemoRow.Occupation.Int16)).String())
 	}
-	gender = lo.ToPtr(um.Gender(int(userDemoRow.Gender)).String())
+	if userDemoRow.Gender.Valid {
+		gender = lo.ToPtr(um.Gender(int(userDemoRow.Gender.Int16)).String())
+	}
 	if userDemoRow.City.Valid {
 		city = lo.ToPtr(userDemoRow.City.String)
 	}

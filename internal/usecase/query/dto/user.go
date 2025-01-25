@@ -27,14 +27,22 @@ type UserDemographics struct {
 	UserID             shared.UUID[user.User]
 	YearOfBirth        *int
 	Occupation         *int
-	Gender             int
+	Gender             *int
 	City               *string
 	Prefecture         *string
 	HouseholdSize      *int
 }
 
-func (u *UserDemographics) GenderString() string {
-	return user.Gender(u.Gender).String()
+func (u *UserDemographics) GenderString() *string {
+	if u.Gender == nil {
+		return nil
+	}
+
+	str := user.Gender(*u.Gender).String()
+	if str == "" {
+		return nil
+	}
+	return &str
 }
 
 func (u *UserDemographics) OccupationString() string {

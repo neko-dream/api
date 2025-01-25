@@ -258,10 +258,26 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 			}
 		}
 
+		var occupation oas.OptNilString
+		if demographics.Occupation != nil {
+			occupation = oas.OptNilString{
+				Set:   true,
+				Value: *demographics.GenderString(),
+			}
+		}
+
+		var gender oas.OptNilString
+		if demographics.Gender != nil {
+			gender = oas.OptNilString{
+				Set:   true,
+				Value: *demographics.GenderString(),
+			}
+		}
+
 		demographicsResp = oas.GetUserInfoOKDemographics{
 			YearOfBirth:   yearOfBirth,
-			Occupation:    demographics.OccupationString(),
-			Gender:        demographics.GenderString(),
+			Occupation:    occupation,
+			Gender:        gender,
 			HouseholdSize: householdSize,
 			Prefecture:    prefecture,
 			City:          city,

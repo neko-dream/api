@@ -40,18 +40,12 @@ func (u *UserDemographics) Age(ctx context.Context) int {
 	return u.yearOfBirth.Age(ctx)
 }
 
-func (u *UserDemographics) Occupation() Occupation {
-	if u.occupation == nil {
-		return OccupationOther
-	}
-	return *u.occupation
+func (u *UserDemographics) Occupation() *Occupation {
+	return u.occupation
 }
 
-func (u *UserDemographics) Gender() Gender {
-	if u.gender == nil {
-		return GenderPreferNotToSay
-	}
-	return *u.gender
+func (u *UserDemographics) Gender() *Gender {
+	return u.gender
 }
 
 func (u *UserDemographics) City() *City {
@@ -76,10 +70,13 @@ func NewUserDemographics(
 	householdSize *int,
 	prefecture *string,
 ) UserDemographics {
+	ctx, span := otel.Tracer("user").Start(ctx, "NewUserDemographics")
+	defer span.End()
+
 	var (
 		yearOfBirthOut   *YearOfBirth
 		occupationOut    *Occupation
-		genderOut        Gender
+		genderOut        *Gender
 		cityOut          *City
 		householdSizeOut *HouseholdSize
 	)
@@ -116,7 +113,7 @@ func NewUserDemographics(
 		userDemographicsID: userDemographicsID,
 		yearOfBirth:        yearOfBirthOut,
 		occupation:         occupationOut,
-		gender:             &genderOut,
+		gender:             genderOut,
 		city:               cityOut,
 		householdSize:      householdSizeOut,
 		prefecture:         prefecture,

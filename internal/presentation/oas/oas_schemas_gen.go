@@ -2802,9 +2802,9 @@ type GetUserInfoOKDemographics struct {
 	// 誕生年.
 	YearOfBirth OptNilInt `json:"yearOfBirth"`
 	// 職業.
-	Occupation string `json:"occupation"`
+	Occupation OptNilString `json:"occupation"`
 	// 性別.
-	Gender string `json:"gender"`
+	Gender OptNilString `json:"gender"`
 	// 市区町村.
 	City OptNilString `json:"city"`
 	// 世帯人数.
@@ -2819,12 +2819,12 @@ func (s *GetUserInfoOKDemographics) GetYearOfBirth() OptNilInt {
 }
 
 // GetOccupation returns the value of Occupation.
-func (s *GetUserInfoOKDemographics) GetOccupation() string {
+func (s *GetUserInfoOKDemographics) GetOccupation() OptNilString {
 	return s.Occupation
 }
 
 // GetGender returns the value of Gender.
-func (s *GetUserInfoOKDemographics) GetGender() string {
+func (s *GetUserInfoOKDemographics) GetGender() OptNilString {
 	return s.Gender
 }
 
@@ -2849,12 +2849,12 @@ func (s *GetUserInfoOKDemographics) SetYearOfBirth(val OptNilInt) {
 }
 
 // SetOccupation sets the value of Occupation.
-func (s *GetUserInfoOKDemographics) SetOccupation(val string) {
+func (s *GetUserInfoOKDemographics) SetOccupation(val OptNilString) {
 	s.Occupation = val
 }
 
 // SetGender sets the value of Gender.
-func (s *GetUserInfoOKDemographics) SetGender(val string) {
+func (s *GetUserInfoOKDemographics) SetGender(val OptNilString) {
 	s.Gender = val
 }
 

@@ -303,7 +303,7 @@ type UpdateOrCreateUserDemographicsParams struct {
 	UserID             uuid.UUID
 	YearOfBirth        sql.NullInt32
 	Occupation         sql.NullInt16
-	Gender             int16
+	Gender             sql.NullInt16
 	City               sql.NullString
 	HouseholdSize      sql.NullInt16
 	Prefecture         sql.NullString

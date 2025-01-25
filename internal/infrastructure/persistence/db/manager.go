@@ -32,6 +32,9 @@ func NewDBManager(db *sql.DB) *DBManager {
 }
 
 func (s *DBManager) TestTx(ctx context.Context, fn func(ctx context.Context) error) error {
+	ctx, span := otel.Tracer("db").Start(ctx, "DBManager.TestTx")
+	defer span.End()
+
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
 		utils.HandleError(ctx, err, "トランザクションの開始に失敗")

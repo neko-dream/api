@@ -4041,12 +4041,14 @@
           "occupation": {
             "type": "string",
             "title": "職業",
-            "description": "職業"
+            "description": "職業",
+            "nullable": true
           },
           "gender": {
             "type": "string",
             "title": "性別",
-            "description": "性別"
+            "description": "性別",
+            "nullable": true
           },
           "city": {
             "type": "string",
@@ -4067,11 +4069,7 @@
             "description": "都道府県",
             "nullable": true
           }
-        },
-        "required": [
-          "occupation",
-          "gender"
-        ]
+        }
       },
       "userGroupPosition": {
         "type": "object",

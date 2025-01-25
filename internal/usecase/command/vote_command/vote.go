@@ -15,6 +15,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel"
 )
 
 type (
@@ -52,6 +53,8 @@ func NewVoteHandler(
 }
 
 func (i *voteHandler) Execute(ctx context.Context, input VoteInput) error {
+	ctx, span := otel.Tracer("vote_command").Start(ctx, "voteHandler.Execute")
+	defer span.End()
 
 	// Opinionに対して投票を行っているか確認
 	voted, err := i.OpinionService.IsVoted(ctx, input.TargetOpinionID, input.UserID)
