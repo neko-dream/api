@@ -35,9 +35,9 @@ type (
 func (i *GetOpinionsByTalkSessionInput) Validate() error {
 	var err error
 
-	if !i.SortKey.IsValid() {
-		err = errors.Join(err, fmt.Errorf("ソートキーが不正です: %s", i.SortKey))
-	}
+	// if !i.SortKey.IsValid() {
+	// 	err = errors.Join(err, fmt.Errorf("ソートキーが不正です: %s", i.SortKey))
+	// }
 
 	if i.Limit != nil {
 		if *i.Limit < 0 {
