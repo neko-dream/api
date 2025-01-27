@@ -17,16 +17,16 @@ const (
 type CookieManager struct {
 	config   *config.Config
 	secure   bool
-	someSite http.SameSite
+	sameSite http.SameSite
 }
 
 func NewCookieManager(
 	config *config.Config,
-) *CookieManager {
-	return &CookieManager{
+) CookieManager {
+	return CookieManager{
 		config:   config,
 		secure:   true,
-		someSite: http.SameSiteLaxMode,
+		sameSite: http.SameSiteLaxMode,
 	}
 }
 
@@ -37,7 +37,7 @@ func (cm *CookieManager) CreateSessionCookie(token string) *http.Cookie {
 		HttpOnly: true,
 		Secure:   cm.secure,
 		Path:     "/",
-		SameSite: cm.someSite,
+		SameSite: cm.sameSite,
 		Domain:   cm.config.DOMAIN,
 		MaxAge:   SessionMaxAge,
 	}
@@ -51,7 +51,7 @@ func (cm *CookieManager) CreateAuthCookies(state, redirectURL string) []*http.Co
 			HttpOnly: true,
 			Secure:   cm.secure,
 			Path:     "/",
-			SameSite: cm.someSite,
+			SameSite: cm.sameSite,
 			Domain:   cm.config.DOMAIN,
 			MaxAge:   AuthCookieMaxAge,
 		},
@@ -61,7 +61,7 @@ func (cm *CookieManager) CreateAuthCookies(state, redirectURL string) []*http.Co
 			HttpOnly: true,
 			Secure:   cm.secure,
 			Path:     "/",
-			SameSite: cm.someSite,
+			SameSite: cm.sameSite,
 			Domain:   cm.config.DOMAIN,
 			MaxAge:   AuthCookieMaxAge,
 		},
