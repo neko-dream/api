@@ -2,7 +2,6 @@ package auth_command
 
 import (
 	"context"
-	"net/http"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/auth"
@@ -25,7 +24,7 @@ type (
 
 	AuthLoginOutput struct {
 		RedirectURL string
-		Cookies     []*http.Cookie
+		State       string
 	}
 
 	authLoginInteractor struct {
@@ -78,23 +77,9 @@ func (a *authLoginInteractor) Execute(ctx context.Context, input AuthLoginInput)
 	}); err != nil {
 		return AuthLoginOutput{}, errtrace.Wrap(err)
 	}
-	stateCookie := http.Cookie{
-		Name:     "state",
-		Value:    s,
-		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
-		Domain:   a.DOMAIN,
-	}
-	redirectURLCookie := http.Cookie{
-		Name:     "redirect_url",
-		Value:    input.RedirectURL,
-		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
-		Domain:   a.DOMAIN,
-	}
 
 	return AuthLoginOutput{
 		RedirectURL: au,
-		Cookies:     []*http.Cookie{&stateCookie, &redirectURLCookie},
+		State:       s,
 	}, nil
 }

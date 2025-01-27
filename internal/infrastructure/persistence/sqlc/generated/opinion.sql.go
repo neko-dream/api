@@ -312,20 +312,12 @@ func (q *Queries) GetOpinionReplies(ctx context.Context, arg GetOpinionRepliesPa
 const getOpinionsByTalkSessionID = `-- name: GetOpinionsByTalkSessionID :many
 WITH unique_opinions AS (
     SELECT DISTINCT ON (opinions.opinion_id)
-        opinions.opinion_id,
-        opinions.talk_session_id,
-        opinions.user_id,
-        opinions.parent_opinion_id,
-        opinions.title,
-        opinions.content,
-        opinions.reference_url,
-        opinions.picture_url,
-        opinions.created_at
+        opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url
     FROM opinions
     WHERE opinions.talk_session_id = $1
 )
 SELECT
-    opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.reference_url, opinions.picture_url, opinions.created_at,
+    opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
     users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
     COALESCE(pv.vote_type, 0) AS parent_vote_type,
     COALESCE(rc.reply_count, 0) AS reply_count,
@@ -376,20 +368,12 @@ type GetOpinionsByTalkSessionIDRow struct {
 //
 //	WITH unique_opinions AS (
 //	    SELECT DISTINCT ON (opinions.opinion_id)
-//	        opinions.opinion_id,
-//	        opinions.talk_session_id,
-//	        opinions.user_id,
-//	        opinions.parent_opinion_id,
-//	        opinions.title,
-//	        opinions.content,
-//	        opinions.reference_url,
-//	        opinions.picture_url,
-//	        opinions.created_at
+//	        opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url
 //	    FROM opinions
 //	    WHERE opinions.talk_session_id = $1
 //	)
 //	SELECT
-//	    opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.reference_url, opinions.picture_url, opinions.created_at,
+//	    opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
 //	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
 //	    COALESCE(pv.vote_type, 0) AS parent_vote_type,
 //	    COALESCE(rc.reply_count, 0) AS reply_count,

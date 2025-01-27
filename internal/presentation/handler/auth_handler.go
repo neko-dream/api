@@ -2,10 +2,12 @@ package handler
 
 import (
 	"context"
+	"net/http"
 	"time"
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
+	"github.com/neko-dream/server/internal/infrastructure/http/cookie"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/internal/usecase/command/auth_command"
 	cookie_utils "github.com/neko-dream/server/pkg/cookie"
@@ -17,17 +19,21 @@ type authHandler struct {
 	auth_command.AuthCallback
 	auth_command.AuthLogin
 	auth_command.Revoke
+
+	cookie.CookieManager
 }
 
 func NewAuthHandler(
 	authLogin auth_command.AuthLogin,
 	authCallback auth_command.AuthCallback,
 	revoke auth_command.Revoke,
+	cookieManger cookie.CookieManager,
 ) oas.AuthHandler {
 	return &authHandler{
-		AuthLogin:    authLogin,
-		AuthCallback: authCallback,
-		Revoke:       revoke,
+		AuthLogin:     authLogin,
+		AuthCallback:  authCallback,
+		Revoke:        revoke,
+		CookieManager: cookieManger,
 	}
 }
 
@@ -46,7 +52,7 @@ func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams)
 
 	headers := new(oas.AuthorizeFoundHeaders)
 	headers.SetLocation(out.RedirectURL)
-	headers.SetSetCookie(cookie_utils.EncodeCookies(out.Cookies))
+	headers.SetSetCookie(cookie_utils.EncodeCookies(a.CookieManager.CreateAuthCookies(out.State, out.RedirectURL)))
 	return headers, nil
 }
 
@@ -69,7 +75,9 @@ func (a *authHandler) OAuthCallback(ctx context.Context, params oas.OAuthCallbac
 	}
 
 	headers := new(oas.OAuthCallbackFoundHeaders)
-	headers.SetCookie = output.Cookie
+	headers.SetSetCookie(
+		cookie_utils.EncodeCookies([]*http.Cookie{a.CookieManager.CreateSessionCookie(output.Token)})[0],
+	)
 	// LoginでRedirectURLを設定しているためエラーは発生しない
 	headers.Location = params.RedirectURL
 	return headers, nil
@@ -85,7 +93,7 @@ func (a *authHandler) OAuthTokenRevoke(ctx context.Context) (oas.OAuthTokenRevok
 	if err != nil {
 		return nil, messages.ForbiddenError
 	}
-	out, err := a.Revoke.Execute(ctx, auth_command.RevokeInput{
+	_, err = a.Revoke.Execute(ctx, auth_command.RevokeInput{
 		SessID: sessID,
 	})
 	if err != nil {
@@ -93,7 +101,7 @@ func (a *authHandler) OAuthTokenRevoke(ctx context.Context) (oas.OAuthTokenRevok
 	}
 
 	headers := new(oas.OAuthTokenRevokeNoContentHeaders)
-	headers.SetSetCookie(cookie_utils.EncodeCookies(out.Cookies))
+	headers.SetSetCookie(cookie_utils.EncodeCookies([]*http.Cookie{a.CookieManager.CreateRevokeCookie()}))
 	return headers, nil
 }
 

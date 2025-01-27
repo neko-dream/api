@@ -157,15 +157,7 @@ LIMIT $2 OFFSET $3
 -- name: GetOpinionsByTalkSessionID :many
 WITH unique_opinions AS (
     SELECT DISTINCT ON (opinions.opinion_id)
-        opinions.opinion_id,
-        opinions.talk_session_id,
-        opinions.user_id,
-        opinions.parent_opinion_id,
-        opinions.title,
-        opinions.content,
-        opinions.reference_url,
-        opinions.picture_url,
-        opinions.created_at
+        opinions.*
     FROM opinions
     WHERE opinions.talk_session_id = $1
 )

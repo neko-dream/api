@@ -40,8 +40,6 @@ func EncodeCookies(cookies []*http.Cookie) []string {
 			result += fmt.Sprintf("; SameSite=%v", "Lax")
 		}
 
-		result += "; Secure"
-
 		results = append(results, result)
 	}
 

@@ -2,7 +2,6 @@ package auth_command
 
 import (
 	"context"
-	"net/http"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/session"
@@ -22,7 +21,6 @@ type (
 	}
 
 	RevokeOutput struct {
-		Cookies []*http.Cookie
 	}
 
 	revokeInteractor struct {
@@ -62,16 +60,5 @@ func (a *revokeInteractor) Execute(ctx context.Context, input RevokeInput) (Revo
 		}
 	}
 
-	// Revoke session cookie
-	sessionCookie := http.Cookie{
-		Name:     "SessionId",
-		Value:    "",
-		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
-		Domain:   a.DOMAIN,
-		MaxAge:   -1,
-	}
-	return RevokeOutput{
-		Cookies: []*http.Cookie{&sessionCookie},
-	}, nil
+	return RevokeOutput{}, nil
 }
