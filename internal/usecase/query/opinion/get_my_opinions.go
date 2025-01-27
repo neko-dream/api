@@ -41,9 +41,9 @@ func (i *GetMyOpinionsQueryInput) Validate() error {
 		if *i.Limit < 0 {
 			err = errors.Join(err, fmt.Errorf("limitは0以上である必要があります: %d", *i.Limit))
 		}
-		if *i.Limit > 100 {
-			err = errors.Join(err, fmt.Errorf("limitは100以下である必要があります: %d", *i.Limit))
-		}
+		// if *i.Limit >= 100000 {
+		// 	err = errors.Join(err, fmt.Errorf("limitは100以下である必要があります: %d", *i.Limit))
+		// }
 	} else {
 		i.Limit = lo.ToPtr(10)
 	}
