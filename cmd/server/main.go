@@ -29,9 +29,9 @@ func main() {
 		panic(err)
 	}
 
-	config := di.Invoke[*config.Config](container)
+	conf := di.Invoke[*config.Config](container)
 	migrator := di.Invoke[*db.Migrator](container)
-	if config.Env != "production" {
+	if conf.Env != config.PROD {
 		// migrator.Down()
 		migrator.Up()
 		// di.Invoke[*db.DummyInitializer](container).Initialize()
@@ -56,12 +56,11 @@ func main() {
 		),
 	)
 
-	opts := swMiddleware.SwaggerUIOpts{SpecURL: "/static/openapi.yaml"}
-	sh := swMiddleware.SwaggerUI(opts, nil)
-	mux.Handle("/docs/", sh)
+	mux.Handle("/docs/",
+		swMiddleware.SwaggerUI(swMiddleware.SwaggerUIOpts{SpecURL: "/static/openapi.yaml"}, nil))
 	mux.Handle("/", corsHandler)
 
-	if err := http.ListenAndServe(fmt.Sprintf(":%s", config.PORT), mux); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf(":%s", conf.PORT), mux); err != nil {
 		panic(err)
 	}
 }

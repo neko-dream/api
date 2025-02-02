@@ -36,6 +36,7 @@ func (i IssuerURI) String() string {
 const (
 	ProviderGoogle AuthProviderName = "GOOGLE"
 	ProviderLine   AuthProviderName = "LINE"
+	ProviderDEV    AuthProviderName = "DEV"
 )
 
 func NewAuthProviderName(provider string) (AuthProviderName, error) {
@@ -44,6 +45,8 @@ func NewAuthProviderName(provider string) (AuthProviderName, error) {
 		return ProviderGoogle, nil
 	case ProviderLine.String():
 		return ProviderLine, nil
+	case ProviderDEV.String():
+		return ProviderDEV, nil
 	default:
 		return "", errtrace.Wrap(errors.New("invalid auth provider"))
 	}

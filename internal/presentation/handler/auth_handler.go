@@ -19,6 +19,7 @@ type authHandler struct {
 	auth_command.AuthCallback
 	auth_command.AuthLogin
 	auth_command.Revoke
+	auth_command.LoginForDev
 
 	cookie.CookieManager
 }
@@ -27,12 +28,14 @@ func NewAuthHandler(
 	authLogin auth_command.AuthLogin,
 	authCallback auth_command.AuthCallback,
 	revoke auth_command.Revoke,
+	devLogin auth_command.LoginForDev,
 	cookieManger cookie.CookieManager,
 ) oas.AuthHandler {
 	return &authHandler{
 		AuthLogin:     authLogin,
 		AuthCallback:  authCallback,
 		Revoke:        revoke,
+		LoginForDev:   devLogin,
 		CookieManager: cookieManger,
 	}
 }
@@ -42,9 +45,14 @@ func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams)
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.Authorize")
 	defer span.End()
 
+	provider, err := params.Provider.MarshalText()
+	if err != nil {
+		return nil, err
+	}
+
 	out, err := a.AuthLogin.Execute(ctx, auth_command.AuthLoginInput{
 		RedirectURL: params.RedirectURL,
-		Provider:    params.Provider,
+		Provider:    string(provider),
 	})
 	if err != nil {
 		return nil, err
@@ -53,6 +61,23 @@ func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams)
 	headers := new(oas.AuthorizeFoundHeaders)
 	headers.SetLocation(out.RedirectURL)
 	headers.SetSetCookie(cookie_utils.EncodeCookies(a.CookieManager.CreateAuthCookies(out.State, out.RedirectURL)))
+	return headers, nil
+}
+
+func (a *authHandler) DevAuthorize(ctx context.Context, params oas.DevAuthorizeParams) (oas.DevAuthorizeRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.DevAuthorize")
+	defer span.End()
+
+	output, err := a.LoginForDev.Execute(ctx, auth_command.LoginForDevInput{
+		Subject: params.ID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	headers := new(oas.DevAuthorizeFoundHeaders)
+	headers.SetSetCookie(cookie_utils.EncodeCookies([]*http.Cookie{a.CookieManager.CreateSessionCookie(output.Token)}))
+	headers.SetLocation(oas.NewOptString(params.RedirectURL))
 	return headers, nil
 }
 

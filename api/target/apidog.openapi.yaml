@@ -3429,7 +3429,11 @@
             "description": "",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "google",
+                "line"
+              ]
             }
           },
           {
@@ -3605,6 +3609,115 @@
             "SessionId": []
           }
         ],
+        "x-ogen-operation-group": "Auth"
+      }
+    },
+    "/auth/dev/login": {
+      "get": {
+        "summary": "開発用登録/ログイン",
+        "deprecated": false,
+        "description": "",
+        "operationId": "devAuthorize",
+        "tags": [
+          "auth"
+        ],
+        "parameters": [
+          {
+            "name": "redirect_url",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "description": "devのみで使用するsubjectです。ここで指定した値はログインした後も確認できないため覚えておいてください。同じ値を指定すると同じアカウントにログインできます。",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "example": "",
+                "required": false,
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "example": "",
+                "required": false,
+                "description": "OAuth2.0 State",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [],
         "x-ogen-operation-group": "Auth"
       }
     },

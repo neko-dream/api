@@ -7,7 +7,7 @@ import (
 )
 
 type Config struct {
-	Env         string `mapstructure:"ENV"`
+	Env         ENV    `mapstructure:"ENV"`
 	DatabaseURL string `mapstructure:"DATABASE_URL"`
 
 	GoogleClientID     string `mapstructure:"GOOGLE_CLIENT_ID"`
@@ -39,6 +39,18 @@ type Config struct {
 
 	SENTRY_DSN       string `mapstructure:"SENTRY_DSN"`
 	BASELIME_API_KEY string `mapstructure:"BASELIME_API_KEY"`
+}
+
+type ENV string
+
+const (
+	PROD  ENV = "production"
+	DEV   ENV = "development"
+	LOCAL ENV = "local"
+)
+
+func (e ENV) String() string {
+	return string(e)
 }
 
 func LoadConfig() *Config {
