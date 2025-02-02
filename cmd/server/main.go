@@ -29,9 +29,9 @@ func main() {
 		panic(err)
 	}
 
-	config := di.Invoke[*config.Config](container)
+	conf := di.Invoke[*config.Config](container)
 	migrator := di.Invoke[*db.Migrator](container)
-	if config.Env != "production" {
+	if conf.Env != config.PROD {
 		// migrator.Down()
 		migrator.Up()
 		// di.Invoke[*db.DummyInitializer](container).Initialize()

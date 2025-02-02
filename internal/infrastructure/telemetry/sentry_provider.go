@@ -15,7 +15,7 @@ import (
 
 func SentryProvider(conf *config.Config) *sdktrace.TracerProvider {
 	if err := sentry.Init(sentry.ClientOptions{
-		Environment:        conf.Env,
+		Environment:        conf.Env.String(),
 		Dsn:                conf.SENTRY_DSN,
 		EnableTracing:      true,
 		TracesSampleRate:   1.0,
@@ -29,7 +29,7 @@ func SentryProvider(conf *config.Config) *sdktrace.TracerProvider {
 		context.Background(),
 		resource.WithAttributes(
 			semconv.ServiceNameKey.String("kotohiro-server"),
-			attribute.String("environment", conf.Env),
+			attribute.String("environment", conf.Env.String()),
 		),
 	)
 	if err != nil {
