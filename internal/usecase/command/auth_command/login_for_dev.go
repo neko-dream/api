@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"braces.dev/errtrace"
-	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -42,7 +41,6 @@ func NewLoginForDev(
 	tm *db.DBManager,
 	config *config.Config,
 	authService service.AuthService,
-	authProviderFactory auth.AuthProviderFactory,
 	sessionRepository session.SessionRepository,
 	sessionService session.SessionService,
 	tokenManager session.TokenManager,
@@ -62,6 +60,7 @@ func (a *loginForDevInteractor) Execute(ctx context.Context, input LoginForDevIn
 	defer span.End()
 
 	if a.Config.Env == config.PROD {
+		utils.HandleError(ctx, errtrace.New("このエンドポイントは開発でのみ有効です。"), "failed to login for dev")
 		return LoginForDevOutput{}, errtrace.New("このエンドポイントは開発でのみ有効です。")
 	}
 
