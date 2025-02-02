@@ -61,7 +61,7 @@ func main() {
 	mux.Handle("/docs/", sh)
 	mux.Handle("/", corsHandler)
 
-	if err := http.ListenAndServe(fmt.Sprintf(":%s", config.PORT), mux); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf(":%s", conf.PORT), mux); err != nil {
 		panic(err)
 	}
 }
