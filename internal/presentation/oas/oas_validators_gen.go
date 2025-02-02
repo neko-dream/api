@@ -33,6 +33,17 @@ func (s *AuthorizeFoundHeaders) Validate() error {
 	return nil
 }
 
+func (s AuthorizeProvider) Validate() error {
+	switch s {
+	case "google":
+		return nil
+	case "line":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
 func (s *CreateTalkSessionOK) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer

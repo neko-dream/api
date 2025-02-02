@@ -32,11 +32,21 @@ func NewDevAuthProvider(
 
 // GetAuthorizationURL implements auth.AuthProvider.
 func (d *devAuthProvider) GetAuthorizationURL(ctx context.Context, state string) string {
+	ctx, span := otel.Tracer("oauth").Start(ctx, "devAuthProvider.GetAuthorizationURL")
+	defer span.End()
+
+	_ = ctx
+
 	panic("呼ばれないやつ")
 }
 
 // VerifyAndIdentify Auth処理を挟まないため、codeをそのままsubjectとして使用する
 func (d *devAuthProvider) VerifyAndIdentify(ctx context.Context, code string) (*string, *string, error) {
+	ctx, span := otel.Tracer("oauth").Start(ctx, "devAuthProvider.VerifyAndIdentify")
+	defer span.End()
+
+	_ = ctx
+
 	// codeをそのままsubjectとして使用する
 	return lo.ToPtr(code), nil, nil
 }

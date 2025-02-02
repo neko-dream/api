@@ -28,6 +28,12 @@ type AuthHandler interface {
 	//
 	// GET /auth/{provider}/login
 	Authorize(ctx context.Context, params AuthorizeParams) (AuthorizeRes, error)
+	// DevAuthorize implements devAuthorize operation.
+	//
+	// 開発用登録/ログイン.
+	//
+	// GET /auth/dev/login
+	DevAuthorize(ctx context.Context, params DevAuthorizeParams) (DevAuthorizeRes, error)
 	// OAuthCallback implements oauth_callback operation.
 	//
 	// Auth Callback.

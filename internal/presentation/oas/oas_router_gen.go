@@ -73,6 +73,27 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					break
 				}
 				switch elem[0] {
+				case 'd': // Prefix: "dev/login"
+					origElem := elem
+					if l := len("dev/login"); len(elem) >= l && elem[0:l] == "dev/login" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch r.Method {
+						case "GET":
+							s.handleDevAuthorizeRequest([0]string{}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, "GET")
+						}
+
+						return
+					}
+
+					elem = origElem
 				case 'r': // Prefix: "revoke"
 					origElem := elem
 					if l := len("revoke"); len(elem) >= l && elem[0:l] == "revoke" {
@@ -868,6 +889,31 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					break
 				}
 				switch elem[0] {
+				case 'd': // Prefix: "dev/login"
+					origElem := elem
+					if l := len("dev/login"); len(elem) >= l && elem[0:l] == "dev/login" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch method {
+						case "GET":
+							r.name = "DevAuthorize"
+							r.summary = "開発用登録/ログイン"
+							r.operationID = "devAuthorize"
+							r.pathPattern = "/auth/dev/login"
+							r.args = args
+							r.count = 0
+							return r, true
+						default:
+							return
+						}
+					}
+
+					elem = origElem
 				case 'r': // Prefix: "revoke"
 					origElem := elem
 					if l := len("revoke"); len(elem) >= l && elem[0:l] == "revoke" {

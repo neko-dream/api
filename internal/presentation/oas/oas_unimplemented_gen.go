@@ -31,6 +31,15 @@ func (UnimplementedHandler) CreateTalkSession(ctx context.Context, req OptCreate
 	return r, ht.ErrNotImplemented
 }
 
+// DevAuthorize implements devAuthorize operation.
+//
+// 開発用登録/ログイン.
+//
+// GET /auth/dev/login
+func (UnimplementedHandler) DevAuthorize(ctx context.Context, params DevAuthorizeParams) (r DevAuthorizeRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // DummiInit implements dummiInit operation.
 //
 // Mudai.

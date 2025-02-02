@@ -56,9 +56,8 @@ func main() {
 		),
 	)
 
-	opts := swMiddleware.SwaggerUIOpts{SpecURL: "/static/openapi.yaml"}
-	sh := swMiddleware.SwaggerUI(opts, nil)
-	mux.Handle("/docs/", sh)
+	mux.Handle("/docs/",
+		swMiddleware.SwaggerUI(swMiddleware.SwaggerUIOpts{SpecURL: "/static/openapi.yaml"}, nil))
 	mux.Handle("/", corsHandler)
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%s", conf.PORT), mux); err != nil {

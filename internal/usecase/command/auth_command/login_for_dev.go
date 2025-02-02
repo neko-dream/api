@@ -48,6 +48,7 @@ func NewLoginForDev(
 	tokenManager session.TokenManager,
 ) LoginForDev {
 	return &loginForDevInteractor{
+		DBManager:         tm,
 		Config:            config,
 		AuthService:       authService,
 		SessionRepository: sessionRepository,

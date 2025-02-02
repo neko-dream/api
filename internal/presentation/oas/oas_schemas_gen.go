@@ -61,6 +61,47 @@ type AuthorizeInternalServerError struct{}
 
 func (*AuthorizeInternalServerError) authorizeRes() {}
 
+type AuthorizeProvider string
+
+const (
+	AuthorizeProviderGoogle AuthorizeProvider = "google"
+	AuthorizeProviderLine   AuthorizeProvider = "line"
+)
+
+// AllValues returns all AuthorizeProvider values.
+func (AuthorizeProvider) AllValues() []AuthorizeProvider {
+	return []AuthorizeProvider{
+		AuthorizeProviderGoogle,
+		AuthorizeProviderLine,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s AuthorizeProvider) MarshalText() ([]byte, error) {
+	switch s {
+	case AuthorizeProviderGoogle:
+		return []byte(s), nil
+	case AuthorizeProviderLine:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *AuthorizeProvider) UnmarshalText(data []byte) error {
+	switch AuthorizeProvider(data) {
+	case AuthorizeProviderGoogle:
+		*s = AuthorizeProviderGoogle
+		return nil
+	case AuthorizeProviderLine:
+		*s = AuthorizeProviderLine
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
 type CreateTalkSessionBadRequest struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
@@ -350,6 +391,55 @@ func (s *CreateTalkSessionReq) SetPrefecture(val OptNilString) {
 func (s *CreateTalkSessionReq) SetDescription(val OptNilString) {
 	s.Description = val
 }
+
+type DevAuthorizeBadRequest struct{}
+
+func (*DevAuthorizeBadRequest) devAuthorizeRes() {}
+
+type DevAuthorizeFound struct{}
+
+// DevAuthorizeFoundHeaders wraps DevAuthorizeFound with response headers.
+type DevAuthorizeFoundHeaders struct {
+	Location  OptString
+	SetCookie []string
+	Response  DevAuthorizeFound
+}
+
+// GetLocation returns the value of Location.
+func (s *DevAuthorizeFoundHeaders) GetLocation() OptString {
+	return s.Location
+}
+
+// GetSetCookie returns the value of SetCookie.
+func (s *DevAuthorizeFoundHeaders) GetSetCookie() []string {
+	return s.SetCookie
+}
+
+// GetResponse returns the value of Response.
+func (s *DevAuthorizeFoundHeaders) GetResponse() DevAuthorizeFound {
+	return s.Response
+}
+
+// SetLocation sets the value of Location.
+func (s *DevAuthorizeFoundHeaders) SetLocation(val OptString) {
+	s.Location = val
+}
+
+// SetSetCookie sets the value of SetCookie.
+func (s *DevAuthorizeFoundHeaders) SetSetCookie(val []string) {
+	s.SetCookie = val
+}
+
+// SetResponse sets the value of Response.
+func (s *DevAuthorizeFoundHeaders) SetResponse(val DevAuthorizeFound) {
+	s.Response = val
+}
+
+func (*DevAuthorizeFoundHeaders) devAuthorizeRes() {}
+
+type DevAuthorizeInternalServerError struct{}
+
+func (*DevAuthorizeInternalServerError) devAuthorizeRes() {}
 
 type DummiInitBadRequest struct{}
 
