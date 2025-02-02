@@ -9,6 +9,7 @@ import (
 	"go.opentelemetry.io/otel"
 )
 
+// devAuthProvider 開発環境専用の認証プロバイダーです。本番環境では使用しないでください。
 type (
 	devAuthProvider struct {
 		providerName auth.AuthProviderName
@@ -21,7 +22,7 @@ func NewDevAuthProvider(
 	providerName auth.AuthProviderName,
 	conf *config.Config,
 ) (auth.AuthProvider, error) {
-	ctx, span := otel.Tracer("oauth").Start(ctx, "NewDevAuthProvider")
+	_, span := otel.Tracer("oauth").Start(ctx, "NewDevAuthProvider")
 	defer span.End()
 
 	return &devAuthProvider{
