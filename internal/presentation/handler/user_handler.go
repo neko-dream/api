@@ -10,6 +10,7 @@ import (
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
+	"github.com/neko-dream/server/internal/infrastructure/http/cookie"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/internal/usecase/command/user_command"
 	opinion_query "github.com/neko-dream/server/internal/usecase/query/opinion"
@@ -30,6 +31,7 @@ type userHandler struct {
 	registerUser user_command.Register
 
 	userDetail user_query.Detail
+	cookie.CookieManager
 }
 
 func NewUserHandler(
@@ -40,7 +42,7 @@ func NewUserHandler(
 	registerUser user_command.Register,
 
 	userDetail user_query.Detail,
-
+	cookieManager cookie.CookieManager,
 ) oas.UserHandler {
 	return &userHandler{
 		getMyOpinionsQuery:           getMyOpinionsQuery,
@@ -48,6 +50,7 @@ func NewUserHandler(
 		editUser:                     editUser,
 		registerUser:                 registerUser,
 		userDetail:                   userDetail,
+		CookieManager:                cookieManager,
 	}
 }
 
@@ -393,7 +396,7 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 	}
 
 	w := http_utils.GetHTTPResponse(ctx)
-	http.SetCookie(w, out.Cookie)
+	http.SetCookie(w, u.CookieManager.CreateSessionCookie(out.Token))
 
 	return &oas.EditUserProfileOK{
 		DisplayID:   out.DisplayID,
@@ -472,7 +475,7 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 	}
 
 	w := http_utils.GetHTTPResponse(ctx)
-	http.SetCookie(w, out.Cookie)
+	http.SetCookie(w, u.CookieManager.CreateSessionCookie(out.Token))
 
 	return &oas.RegisterUserOK{
 		DisplayID:   out.DisplayID,
