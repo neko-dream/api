@@ -1,0 +1,48 @@
+desc: Loginテスト
+runners:
+  req:
+    endpoint: http://localhost:3000
+    useCookie: true
+    notFollowRedirect: true
+  dev: postgres://kotohiro:kotohiro@localhost:5432/kotohiro
+
+vars:
+  id: test
+  name: test
+
+steps:
+  - desc: ユーザー削除
+    dev:
+      query:
+        DELETE FROM user_demographics WHERE (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}') = user_id;
+        DELETE FROM user_auths WHERE subject = '{{ vars.id }}';
+        DELETE FROM users WHERE display_id = '{{ vars.id }}';
+  - desc: ログイン
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.id }}:
+        get:
+          headers: null
+    test: len(current.res.headers['Set-Cookie']) > 0
+  - desc: Tokenが設定されている
+    req:
+      /auth/token/info:
+        get:
+          headers: null
+    test: current.res.body.aud == "https://api.kotohiro.com" && current.res.body.isVerify == false
+  - desc: ユーザー作成
+    req:
+      /user:
+        post:
+          body:
+            multipart/form-data:
+              displayName: "{{ vars.name }}"
+              displayID: "{{ vars.id }}"
+    test: current.res.body.displayID == vars.id
+  - desc: ユーザーが作成されている
+    req:
+      /auth/token/info:
+        get:
+          headers:
+            Content-Type: application/json
+    test: current.res.body.aud == "https://api.kotohiro.com" && current.res.body.isVerify == true
+
