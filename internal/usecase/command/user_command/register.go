@@ -3,7 +3,6 @@ package user_command
 import (
 	"context"
 	"mime/multipart"
-	"net/http"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/messages"
@@ -38,7 +37,7 @@ type (
 		DisplayID   string  // ユーザーの表示用ID
 		DisplayName string  // ユーザーの表示名
 		IconURL     *string // ユーザーのアイコンURL
-		Cookie      *http.Cookie
+		Token       string  // ユーザーのトークン
 	}
 
 	registerHandler struct {
@@ -73,8 +72,10 @@ func (i *registerHandler) Execute(ctx context.Context, input RegisterInput) (*Re
 	ctx, span := otel.Tracer("user_command").Start(ctx, "registerHandler.Execute")
 	defer span.End()
 
-	var c http.Cookie
-	var iconURL *string
+	var (
+		iconURL *string
+		token   string
+	)
 
 	err := i.ExecTx(ctx, func(ctx context.Context) error {
 		// ユーザーの存在を確認
@@ -145,22 +146,12 @@ func (i *registerHandler) Execute(ctx context.Context, input RegisterInput) (*Re
 			return messages.UserUpdateError
 		}
 
-		token, err := i.TokenManager.Generate(ctx, *foundUser, sess.SessionID())
+		tokenTmp, err := i.TokenManager.Generate(ctx, *foundUser, sess.SessionID())
 		if err != nil {
 			utils.HandleError(ctx, err, "failed to generate token")
 			return errtrace.Wrap(err)
 		}
-		cookie := http.Cookie{
-			Name:     "SessionId",
-			Value:    token,
-			HttpOnly: true,
-			Path:     "/",
-			SameSite: http.SameSiteLaxMode,
-			Domain:   i.conf.DOMAIN,
-			MaxAge:   60 * 60 * 24 * 7,
-		}
-
-		c = cookie
+		token = tokenTmp
 		return nil
 	})
 	if err != nil {
@@ -171,6 +162,6 @@ func (i *registerHandler) Execute(ctx context.Context, input RegisterInput) (*Re
 		DisplayID:   input.DisplayID,
 		DisplayName: input.DisplayName,
 		IconURL:     iconURL,
-		Cookie:      &c,
+		Token:       token,
 	}, nil
 }

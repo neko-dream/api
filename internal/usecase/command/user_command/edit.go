@@ -3,7 +3,6 @@ package user_command
 import (
 	"context"
 	"mime/multipart"
-	"net/http"
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
@@ -36,7 +35,7 @@ type (
 	EditOutput struct {
 		DisplayID   string // ユーザーの表示用ID
 		DisplayName string // ユーザーの表示名
-		Cookie      *http.Cookie
+		Token       string // ユーザーのトークン
 	}
 
 	EditHandler struct {
@@ -71,8 +70,11 @@ func (e *EditHandler) Execute(ctx context.Context, input EditInput) (*EditOutput
 	ctx, span := otel.Tracer("user_command").Start(ctx, "EditHandler.Execute")
 	defer span.End()
 
-	var c http.Cookie
-	var u *user.User
+	var (
+		u     *user.User
+		token string
+	)
+
 	err := e.ExecTx(ctx, func(ctx context.Context) error {
 		// ユーザーの存在を確認
 		foundUser, err := e.userRep.FindByID(ctx, input.UserID)
@@ -140,22 +142,13 @@ func (e *EditHandler) Execute(ctx context.Context, input EditInput) (*EditOutput
 			return messages.UserUpdateError
 		}
 
-		token, err := e.TokenManager.Generate(ctx, *foundUser, sess.SessionID())
+		tokenTmp, err := e.TokenManager.Generate(ctx, *foundUser, sess.SessionID())
 		if err != nil {
 			utils.HandleError(ctx, err, "failed to generate token")
 			return messages.TokenGenerateError
 		}
-		cookie := http.Cookie{
-			Name:     "SessionId",
-			Value:    token,
-			HttpOnly: true,
-			Path:     "/",
-			SameSite: http.SameSiteLaxMode,
-			Domain:   e.conf.DOMAIN,
-			MaxAge:   60 * 60 * 24 * 7,
-		}
 
-		c = cookie
+		token = tokenTmp
 		return nil
 	})
 	if err != nil {
@@ -165,6 +158,6 @@ func (e *EditHandler) Execute(ctx context.Context, input EditInput) (*EditOutput
 	return &EditOutput{
 		DisplayID:   *u.DisplayID(),
 		DisplayName: *u.DisplayName(),
-		Cookie:      &c,
+		Token:       token,
 	}, nil
 }
