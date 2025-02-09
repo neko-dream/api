@@ -1,0 +1,80 @@
+desc: ユーザー編集
+runners:
+  req:
+    endpoint: http://localhost:3000
+    useCookie: true
+    notFollowRedirect: true
+  dev: postgres://kotohiro:kotohiro@localhost:5432/kotohiro
+
+vars:
+  id: edit
+  name: edit
+
+steps:
+  deleteUser:
+    desc: ユーザー削除
+    dev:
+      query:
+        DELETE FROM user_demographics WHERE (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}') = user_id;
+        DELETE FROM user_auths WHERE subject = '{{ vars.id }}';
+        DELETE FROM users WHERE display_id = '{{ vars.id }}';
+  loginUser:
+    desc: ログイン
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.id }}:
+        get:
+          headers: null
+    test: len(current.res.headers['Set-Cookie']) > 0
+  checkToken:
+    desc: Tokenが設定されている
+    req:
+      /auth/token/info:
+        get:
+          headers: null
+    test: current.res.body.aud == "https://api.kotohiro.com" && current.res.body.isVerify == false
+  createUser:
+    desc: ユーザー作成
+    req:
+      /user:
+        post:
+          body:
+            multipart/form-data:
+              displayName: "{{ vars.name }}"
+              displayID: "{{ vars.id }}"
+  editUser:
+    desc: ユーザー編集
+    req:
+      /user:
+        put:
+          body:
+            multipart/form-data:
+              displayName: "edited"
+              yearOfBirth: 1999
+              gender: "男性"
+              prefecture: "福井県"
+              city: "鯖江市"
+              occupation: "学生"
+              householdSize: 1
+  checkUserName:
+    desc: ユーザー名が変更されている
+    req:
+      /user:
+        get:
+          headers: null
+    test: |
+      current.res.body.user.displayID == vars.id &&
+      current.res.body.user.displayName == "edited" &&
+      current.res.body.demographics.city == "鯖江市" &&
+      current.res.body.demographics.occupation == "学生" &&
+      current.res.body.demographics.householdSize == 1 &&
+      current.res.body.demographics.yearOfBirth == 1999
+  reEditUser:
+    desc: ユーザー名が戻っているか
+    req:
+      /user:
+        put:
+          body:
+            multipart/form-data:
+              displayName: "{{ vars.name }}"
+              yearOfBirth: 1999
+    test: current.res.body.displayName == vars.name
