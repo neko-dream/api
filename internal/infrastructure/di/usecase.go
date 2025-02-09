@@ -37,6 +37,7 @@ func useCaseDeps() []ProvideArg {
 		{auth_command.NewAuthLogin, nil},
 		{auth_command.NewRevoke, nil},
 		{auth_command.NewAuthCallback, nil},
+		{auth_command.NewLoginForDev, nil},
 		{timeline_command.NewAddTimeLine, nil},
 		{timeline_command.NewEditTimeLine, nil},
 		{timeline_query.NewGetTimeLine, nil},

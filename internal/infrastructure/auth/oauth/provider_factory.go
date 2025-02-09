@@ -24,6 +24,11 @@ func (p *providerFactory) NewAuthProvider(ctx context.Context, providerName stri
 	ctx, span := otel.Tracer("oauth").Start(ctx, "providerFactory.NewAuthProvider")
 	defer span.End()
 
+	// 本番以外の場合のみDevAuthProviderを返す
+	if p.conf.Env != config.PROD && providerName == "dev" {
+		return NewDevAuthProvider(ctx, auth.AuthProviderName(providerName), p.conf)
+	}
+
 	authProviderName, err := auth.NewAuthProviderName(providerName)
 	if err != nil {
 		return nil, err

@@ -17,7 +17,7 @@ import (
 
 // AuthorizeParams is parameters of authorize operation.
 type AuthorizeParams struct {
-	Provider string
+	Provider AuthorizeProvider
 	// ログイン後にリダイレクトするURL.
 	RedirectURL string
 }
@@ -28,7 +28,7 @@ func unpackAuthorizeParams(packed middleware.Parameters) (params AuthorizeParams
 			Name: "provider",
 			In:   "path",
 		}
-		params.Provider = packed[key].(string)
+		params.Provider = packed[key].(AuthorizeProvider)
 	}
 	{
 		key := middleware.ParameterKey{
@@ -71,7 +71,15 @@ func decodeAuthorizeParams(args [1]string, argsEscaped bool, r *http.Request) (p
 					return err
 				}
 
-				params.Provider = c
+				params.Provider = AuthorizeProvider(c)
+				return nil
+			}(); err != nil {
+				return err
+			}
+			if err := func() error {
+				if err := params.Provider.Validate(); err != nil {
+					return err
+				}
 				return nil
 			}(); err != nil {
 				return err
@@ -119,6 +127,108 @@ func decodeAuthorizeParams(args [1]string, argsEscaped bool, r *http.Request) (p
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "redirect_url",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// DevAuthorizeParams is parameters of devAuthorize operation.
+type DevAuthorizeParams struct {
+	RedirectURL string
+	// Devのみで使用するsubjectです。ここで指定した値はログインした後も確認できないため覚えておいてください。同じ値を指定すると同じアカウントにログインできます。.
+	ID string
+}
+
+func unpackDevAuthorizeParams(packed middleware.Parameters) (params DevAuthorizeParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "redirect_url",
+			In:   "query",
+		}
+		params.RedirectURL = packed[key].(string)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "id",
+			In:   "query",
+		}
+		params.ID = packed[key].(string)
+	}
+	return params
+}
+
+func decodeDevAuthorizeParams(args [0]string, argsEscaped bool, r *http.Request) (params DevAuthorizeParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode query: redirect_url.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "redirect_url",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.RedirectURL = c
+				return nil
+			}); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "redirect_url",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: id.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "id",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.ID = c
+				return nil
+			}); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "id",
 			In:   "query",
 			Err:  err,
 		}

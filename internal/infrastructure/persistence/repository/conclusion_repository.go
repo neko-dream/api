@@ -30,11 +30,13 @@ func (r *conclusionRepository) Create(ctx context.Context, conclusion conclusion
 	ctx, span := otel.Tracer("repository").Start(ctx, "conclusionRepository.Create")
 	defer span.End()
 
-	r.GetQueries(ctx).CreateTalkSessionConclusion(ctx, model.CreateTalkSessionConclusionParams{
+	if err := r.GetQueries(ctx).CreateTalkSessionConclusion(ctx, model.CreateTalkSessionConclusionParams{
 		TalkSessionID: conclusion.TalkSessionID().UUID(),
 		CreatedBy:     conclusion.CreatedBy().UUID(),
 		Content:       conclusion.Conclusion(),
-	})
+	}); err != nil {
+		return err
+	}
 	return nil
 }
 

@@ -9,6 +9,10 @@ type CreateTalkSessionRes interface {
 	createTalkSessionRes()
 }
 
+type DevAuthorizeRes interface {
+	devAuthorizeRes()
+}
+
 type DummiInitRes interface {
 	dummiInitRes()
 }
