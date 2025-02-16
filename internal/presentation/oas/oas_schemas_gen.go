@@ -6912,16 +6912,16 @@ func (s *PostImageOK) SetURL(val string) {
 func (*PostImageOK) postImageRes() {}
 
 type PostImageReq struct {
-	Image OptMultipartFile `json:"image"`
+	Image ht.MultipartFile `json:"image"`
 }
 
 // GetImage returns the value of Image.
-func (s *PostImageReq) GetImage() OptMultipartFile {
+func (s *PostImageReq) GetImage() ht.MultipartFile {
 	return s.Image
 }
 
 // SetImage sets the value of Image.
-func (s *PostImageReq) SetImage(val OptMultipartFile) {
+func (s *PostImageReq) SetImage(val ht.MultipartFile) {
 	s.Image = val
 }
 

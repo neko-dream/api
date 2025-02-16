@@ -3660,6 +3660,8 @@ paths:
                   format: binary
                   type: string
                   example: ''
+              required:
+                - image
       responses:
         '200':
           description: ''
@@ -3702,7 +3704,8 @@ paths:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-      security: []
+      security:
+        - SessionId: []
       x-ogen-operation-group: Image
   /manage:
     get:

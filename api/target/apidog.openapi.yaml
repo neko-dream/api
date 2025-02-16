@@ -3909,7 +3909,10 @@
                     "type": "string",
                     "example": ""
                   }
-                }
+                },
+                "required": [
+                  "image"
+                ]
               }
             }
           }
@@ -3978,7 +3981,11 @@
             "headers": {}
           }
         },
-        "security": [],
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
         "x-ogen-operation-group": "Image"
       }
     }

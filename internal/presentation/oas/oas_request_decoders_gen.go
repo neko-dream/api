@@ -1368,7 +1368,7 @@ func (s *Server) decodePostImageRequest(r *http.Request) (
 				if err := func() error {
 					files, ok := r.MultipartForm.File["image"]
 					if !ok || len(files) < 1 {
-						return nil
+						return validate.ErrFieldRequired
 					}
 					fh := files[0]
 
@@ -1377,12 +1377,12 @@ func (s *Server) decodePostImageRequest(r *http.Request) (
 						return errors.Wrap(err, "open")
 					}
 					closers = append(closers, f.Close)
-					optForm.Image.SetTo(ht.MultipartFile{
+					optForm.Image = ht.MultipartFile{
 						Name:   fh.Filename,
 						File:   f,
 						Size:   fh.Size,
 						Header: fh.Header,
-					})
+					}
 					return nil
 				}(); err != nil {
 					return req, close, errors.Wrap(err, "decode \"image\"")
