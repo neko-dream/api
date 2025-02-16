@@ -38,6 +38,7 @@ type (
 		opinion.OpinionService
 		vote.VoteRepository
 		image.ImageStorage
+		image.ImageRepository
 		*db.DBManager
 	}
 )
@@ -47,6 +48,7 @@ func NewSubmitOpinionHandler(
 	opinionService opinion.OpinionService,
 	voteRepository vote.VoteRepository,
 	dbManager *db.DBManager,
+	imageRepository image.ImageRepository,
 	imageStorage image.ImageStorage,
 ) SubmitOpinion {
 	return &submitOpinionHandler{
@@ -55,6 +57,7 @@ func NewSubmitOpinionHandler(
 		OpinionRepository: opinionRepository,
 		VoteRepository:    voteRepository,
 		ImageStorage:      imageStorage,
+		ImageRepository:   imageRepository,
 	}
 }
 
@@ -101,6 +104,16 @@ func (h *submitOpinionHandler) Execute(ctx context.Context, input SubmitOpinionI
 			url, err := h.ImageStorage.Upload(ctx, *imageMeta, file)
 			if err != nil {
 				utils.HandleError(ctx, err, "ImageRepository.Upload")
+				return messages.OpinionReferenceImageUploadFailed
+			}
+			if err := h.ImageRepository.Create(ctx, image.NewUserImage(
+				ctx,
+				shared.NewUUID[image.UserImage](),
+				input.OwnerID,
+				*imageMeta,
+				*url,
+			)); err != nil {
+				utils.HandleError(ctx, err, "ImageRepository.Create")
 				return messages.OpinionReferenceImageUploadFailed
 			}
 
