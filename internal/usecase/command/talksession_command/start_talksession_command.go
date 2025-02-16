@@ -131,7 +131,7 @@ func (i *startTalkSessionCommandHandler) Execute(ctx context.Context, input Star
 		output.User = dto.User{
 			DisplayID:   *ownerUser.DisplayID(),
 			DisplayName: *ownerUser.DisplayName(),
-			IconURL:     ownerUser.ProfileIconURL(),
+			IconURL:     ownerUser.IconURL(),
 		}
 
 		return nil
