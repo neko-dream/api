@@ -18,8 +18,7 @@ type (
 	}
 
 	AuthLoginInput struct {
-		RedirectURL string
-		Provider    string
+		Provider string
 	}
 
 	AuthLoginOutput struct {
