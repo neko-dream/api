@@ -7,6 +7,8 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
+	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
+	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
@@ -35,13 +37,30 @@ func (i *imageRepository) FindByUserID(ctx context.Context, _ shared.UUID[user.U
 }
 
 // Save implements image.ImageRepository.
-func (i *imageRepository) Save(ctx context.Context, _ *image.UserImage) error {
+func (i *imageRepository) Create(ctx context.Context, img *image.UserImage) error {
 	ctx, span := otel.Tracer("repository").Start(ctx, "imageRepository.Save")
 	defer span.End()
 
 	_ = ctx
 
-	panic("unimplemented")
+	if err := i.DBManager.GetQueries(ctx).CreateUserImage(
+		ctx,
+		model.CreateUserImageParams{
+			UserImagesID: img.UserImageID.UUID(),
+			UserID:       img.UserID.UUID(),
+			ImageUrl:     img.Metadata.Key,
+			Width:        int32(img.Metadata.Width),
+			Height:       int32(img.Metadata.Height),
+			Extension:    img.Metadata.Extension.Value,
+			Archived:     img.Metadata.Archived,
+			Url:          img.URL,
+		},
+	); err != nil {
+		utils.HandleError(ctx, err, "CreateUserImage")
+		return err
+	}
+
+	return nil
 }
 
 func NewImageRepository(DBManager *db.DBManager) image.ImageRepository {

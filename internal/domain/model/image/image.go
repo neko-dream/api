@@ -16,7 +16,7 @@ type (
 		Upload(context.Context, meta.ImageMeta, io.Reader) (*string, error)
 	}
 	ImageRepository interface {
-		Save(context.Context, *UserImage) error
+		Create(context.Context, *UserImage) error
 		FindByID(context.Context, shared.UUID[UserImage]) (*UserImage, error)
 		FindByUserID(context.Context, shared.UUID[user.User]) ([]*UserImage, error)
 	}
@@ -25,6 +25,7 @@ type (
 		UserImageID shared.UUID[UserImage]
 		UserID      shared.UUID[user.User]
 		Metadata    meta.ImageMeta
+		URL         string
 	}
 )
 
@@ -33,6 +34,7 @@ func NewUserImage(
 	userImageID shared.UUID[UserImage],
 	userID shared.UUID[user.User],
 	metadata meta.ImageMeta,
+	url string,
 ) *UserImage {
 	ctx, span := otel.Tracer("image").Start(ctx, "NewUserImage")
 	defer span.End()
@@ -43,5 +45,6 @@ func NewUserImage(
 		UserImageID: userImageID,
 		UserID:      userID,
 		Metadata:    metadata,
+		URL:         url,
 	}
 }

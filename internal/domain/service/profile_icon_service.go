@@ -64,11 +64,12 @@ func (i *profileIconService) UploadProfileIcon(ctx context.Context, userID share
 		return nil, messages.UserUpdateError
 	}
 
-	if err := i.imageRep.Save(ctx, image.NewUserImage(
+	if err := i.imageRep.Create(ctx, image.NewUserImage(
 		ctx,
 		shared.NewUUID[image.UserImage](),
 		userID,
 		*imageMeta,
+		*url,
 	)); err != nil {
 		utils.HandleError(ctx, err, "ImageRepository.Create")
 		return nil, messages.UserUpdateError
