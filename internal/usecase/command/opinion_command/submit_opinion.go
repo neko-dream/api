@@ -6,6 +6,8 @@ import (
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/clock"
+	"github.com/neko-dream/server/internal/domain/model/image"
+	"github.com/neko-dream/server/internal/domain/model/image/meta"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
@@ -35,6 +37,7 @@ type (
 		opinion.OpinionRepository
 		opinion.OpinionService
 		vote.VoteRepository
+		image.ImageStorage
 		*db.DBManager
 	}
 )
@@ -44,12 +47,14 @@ func NewSubmitOpinionHandler(
 	opinionService opinion.OpinionService,
 	voteRepository vote.VoteRepository,
 	dbManager *db.DBManager,
+	imageStorage image.ImageStorage,
 ) SubmitOpinion {
 	return &submitOpinionHandler{
 		DBManager:         dbManager,
 		OpinionService:    opinionService,
 		OpinionRepository: opinionRepository,
 		VoteRepository:    voteRepository,
+		ImageStorage:      imageStorage,
 	}
 }
 
@@ -73,10 +78,33 @@ func (h *submitOpinionHandler) Execute(ctx context.Context, input SubmitOpinionI
 			return err
 		}
 		if input.Picture != nil {
-			if err := opinion.SetReferenceImage(ctx, input.Picture); err != nil {
-				utils.HandleError(ctx, err, "SetReferenceImage")
-				return err
+			file, err := input.Picture.Open()
+			if err != nil {
+				utils.HandleError(ctx, err, "input.Icon.Open")
+				return messages.OpinionReferenceImageUploadFailed
 			}
+			defer file.Close()
+
+			imageMeta, err := meta.NewImageForReference(ctx, opinion.OpinionID(), file)
+			if err != nil {
+				utils.HandleError(ctx, err, "meta.NewImageForProfile")
+				return messages.OpinionReferenceImageUploadFailed
+			}
+			if err := imageMeta.Validate(ctx, meta.ReferenceImageValidationRule); err != nil {
+				utils.HandleError(ctx, err, "ImageMeta.Validate")
+				msg := messages.OpinionReferenceImageUploadFailed
+				msg.Message = err.Error()
+				return msg
+			}
+
+			// 画像をアップロード
+			url, err := h.ImageStorage.Upload(ctx, *imageMeta, file)
+			if err != nil {
+				utils.HandleError(ctx, err, "ImageRepository.Upload")
+				return messages.OpinionReferenceImageUploadFailed
+			}
+
+			opinion.ChangeReferenceImageURL(url)
 		}
 
 		if err := h.OpinionRepository.Create(ctx, *opinion); err != nil {
