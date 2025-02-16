@@ -58,7 +58,7 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				if ts.TalkSessionID != talkSessionID.UUID() {
+				if ts.TalkSession.TalkSessionID != talkSessionID.UUID() {
 					return errors.New("トークセッションIDが一致しません")
 				}
 
@@ -95,7 +95,7 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				if ts.TalkSessionID != talkSessionID.UUID() {
+				if ts.TalkSession.TalkSessionID != talkSessionID.UUID() {
 					return errors.New("トークセッションIDが一致しません")
 				}
 				location := talksession.NewLocation(
