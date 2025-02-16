@@ -33,7 +33,7 @@ func (h *getConclusionByIDQuery) Execute(ctx context.Context, input talksession.
 	}
 
 	// まだ終了していないトークセッションに対しては結論を取得できない
-	if ts.ScheduledEndTime.After(clock.Now(ctx)) {
+	if ts.TalkSession.ScheduledEndTime.After(clock.Now(ctx)) {
 		return nil, messages.TalkSessionNotFinished
 	}
 
