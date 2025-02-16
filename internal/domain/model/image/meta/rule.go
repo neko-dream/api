@@ -12,9 +12,10 @@ import (
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/samber/lo"
 
-	"go.opentelemetry.io/otel"
 	_ "image/jpeg"
 	_ "image/png"
+
+	"go.opentelemetry.io/otel"
 )
 
 type ImageValidationRule struct {
@@ -78,10 +79,10 @@ func (r *ImageValidationRule) ValidBounds(ctx context.Context, meta ImageMeta) b
 		return true
 	}
 
-	if r.width != nil && meta.width > *r.width {
+	if r.width != nil && meta.Width > *r.width {
 		return false
 	}
-	if r.height != nil && meta.height > *r.height {
+	if r.height != nil && meta.Height > *r.height {
 		return false
 	}
 
@@ -98,7 +99,7 @@ func (r *ImageValidationRule) ValidAspectRatio(ctx context.Context, meta ImageMe
 		return true
 	}
 
-	ratio := float64(meta.width) / float64(meta.height)
+	ratio := float64(meta.Width) / float64(meta.Height)
 	if r.minAspectRatio != nil && r.maxAspectRatio != nil {
 		if ratio < *r.minAspectRatio || ratio > *r.maxAspectRatio {
 			return false

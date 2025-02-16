@@ -18,8 +18,8 @@ type ImageMeta struct {
 	Key       string
 	Size      int
 	Extension types.MIME
-	width     int
-	height    int
+	Width     int
+	Height    int
 	Archived  bool
 }
 
@@ -60,8 +60,8 @@ func NewImageForProfile(
 		Key:       key,
 		Size:      size,
 		Extension: ext,
-		width:     x,
-		height:    y,
+		Width:     x,
+		Height:    y,
 	}, nil
 }
 
@@ -101,8 +101,8 @@ func NewImageForReference(
 		Key:       key,
 		Size:      size,
 		Extension: ext,
-		width:     x,
-		height:    y,
+		Width:     x,
+		Height:    y,
 	}, nil
 }
 
@@ -138,8 +138,8 @@ func NewImageForAnalysis(
 		Key:       key,
 		Size:      size,
 		Extension: ext,
-		width:     x,
-		height:    y,
+		Width:     x,
+		Height:    y,
 	}, nil
 }
 
