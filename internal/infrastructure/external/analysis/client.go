@@ -1,16 +1,16 @@
 package client
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/neko-dream/server/internal/domain/model/analysis"
-	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/image"
+	"github.com/neko-dream/server/internal/domain/model/image/meta"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/infrastructure/config"
@@ -22,13 +22,13 @@ import (
 
 type analysisService struct {
 	conf     *config.Config
-	imageRep image.ImageRepository
+	imageRep image.ImageStorage
 	db.DBManager
 }
 
 func NewAnalysisService(
 	conf *config.Config,
-	imageRep image.ImageRepository,
+	imageRep image.ImageStorage,
 	dbm *db.DBManager,
 ) analysis.AnalysisService {
 	return &analysisService{
@@ -139,47 +139,45 @@ func (a *analysisService) GenerateImage(ctx context.Context, talkSessionID share
 		log.Println("PostReportsWordclouds", err)
 		return nil, err
 	}
-	println("response")
 	defer resp.Body.Close()
 
 	var wordcloud analysis.WordCloudResponse
 	if err := json.NewDecoder(resp.Body).Decode(&wordcloud); err != nil {
-		log.Println("json.NewDecoder", err)
+		utils.HandleError(ctx, err, "json.NewDecoder.Decode")
 		return nil, err
 	}
-	println("decode end")
+
 	// Base64デコード
 	wcData, err := base64.StdEncoding.DecodeString(wordcloud.Wordcloud)
 	if err != nil {
+		utils.HandleError(ctx, err, "base64.StdEncoding.DecodeString")
 		return nil, err
 	}
 	tsneData, err := base64.StdEncoding.DecodeString(wordcloud.Tsne)
 	if err != nil {
+		utils.HandleError(ctx, err, "base64.StdEncoding.DecodeString")
 		return nil, err
 	}
-
-	// 種類-talkSessionID-時間.jpg
-	objectPath := "generated/%v-%v-%v.png"
-	wcImg := image.NewImage(wcData)
-	tsncImg := image.NewImage(tsneData)
-	now := clock.Now(ctx)
-	wcImgInfo := image.NewImageInfo(
-		fmt.Sprintf(objectPath, "wordcloud", talkSessionID.String(), now.UnixNano()),
-		"png",
-		wcImg,
-	)
-	tsnCImgInfo := image.NewImageInfo(
-		fmt.Sprintf(objectPath, "tsne", talkSessionID.String(), now.UnixNano()),
-		"png",
-		tsncImg,
-	)
-
-	wc, err := a.imageRep.Create(ctx, *wcImgInfo)
+	wcBuf := bytes.NewBuffer(wcData)
+	wcImgInfo, err := meta.NewImageForAnalysis(ctx, wcBuf)
 	if err != nil {
+		utils.HandleError(ctx, err, "meta.NewImageForAnalysis")
 		return nil, err
 	}
-	tsne, err := a.imageRep.Create(ctx, *tsnCImgInfo)
+	tsncBuf := bytes.NewBuffer(tsneData)
+	tsnCImgInfo, err := meta.NewImageForAnalysis(ctx, tsncBuf)
 	if err != nil {
+		utils.HandleError(ctx, err, "meta.NewImageForAnalysis")
+		return nil, err
+	}
+	wc, err := a.imageRep.Upload(ctx, *wcImgInfo, wcBuf)
+	if err != nil {
+		utils.HandleError(ctx, err, "imageRep.Upload")
+		return nil, err
+	}
+	tsne, err := a.imageRep.Upload(ctx, *tsnCImgInfo, tsncBuf)
+	if err != nil {
+		utils.HandleError(ctx, err, "imageRep.Upload")
 		return nil, err
 	}
 
