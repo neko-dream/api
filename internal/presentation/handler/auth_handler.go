@@ -51,8 +51,7 @@ func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams)
 	}
 
 	out, err := a.AuthLogin.Execute(ctx, auth_command.AuthLoginInput{
-		RedirectURL: params.RedirectURL,
-		Provider:    string(provider),
+		Provider: string(provider),
 	})
 	if err != nil {
 		return nil, err
@@ -60,7 +59,7 @@ func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams)
 
 	headers := new(oas.AuthorizeFoundHeaders)
 	headers.SetLocation(out.RedirectURL)
-	headers.SetSetCookie(cookie_utils.EncodeCookies(a.CookieManager.CreateAuthCookies(out.State, out.RedirectURL)))
+	headers.SetSetCookie(cookie_utils.EncodeCookies(a.CookieManager.CreateAuthCookies(out.State, params.RedirectURL)))
 	return headers, nil
 }
 
@@ -85,7 +84,6 @@ func (a *authHandler) DevAuthorize(ctx context.Context, params oas.DevAuthorizeP
 func (a *authHandler) OAuthCallback(ctx context.Context, params oas.OAuthCallbackParams) (oas.OAuthCallbackRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.OAuthCallback")
 	defer span.End()
-
 	// CookieStateとQueryStateが一致しているか確認
 	if params.CookieState != params.QueryState {
 		return nil, messages.InvalidStateError
@@ -104,7 +102,7 @@ func (a *authHandler) OAuthCallback(ctx context.Context, params oas.OAuthCallbac
 		cookie_utils.EncodeCookies([]*http.Cookie{a.CookieManager.CreateSessionCookie(output.Token)})[0],
 	)
 	// LoginでRedirectURLを設定しているためエラーは発生しない
-	headers.Location = params.RedirectURL
+	headers.SetLocation(params.RedirectURL)
 	return headers, nil
 }
 
