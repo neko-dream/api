@@ -6243,6 +6243,52 @@ func (o OptPostConclusionReq) Or(d PostConclusionReq) PostConclusionReq {
 	return d
 }
 
+// NewOptPostImageReq returns new OptPostImageReq with value set to v.
+func NewOptPostImageReq(v PostImageReq) OptPostImageReq {
+	return OptPostImageReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptPostImageReq is optional PostImageReq.
+type OptPostImageReq struct {
+	Value PostImageReq
+	Set   bool
+}
+
+// IsSet returns true if OptPostImageReq was set.
+func (o OptPostImageReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptPostImageReq) Reset() {
+	var v PostImageReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptPostImageReq) SetTo(v PostImageReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptPostImageReq) Get() (v PostImageReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptPostImageReq) Or(d PostImageReq) PostImageReq {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptPostOpinionPostReq returns new OptPostOpinionPostReq with value set to v.
 func NewOptPostOpinionPostReq(v PostOpinionPostReq) OptPostOpinionPostReq {
 	return OptPostOpinionPostReq{
@@ -6838,6 +6884,45 @@ func (s *PostConclusionReq) GetContent() string {
 // SetContent sets the value of Content.
 func (s *PostConclusionReq) SetContent(val string) {
 	s.Content = val
+}
+
+type PostImageBadRequest struct{}
+
+func (*PostImageBadRequest) postImageRes() {}
+
+type PostImageInternalServerError struct{}
+
+func (*PostImageInternalServerError) postImageRes() {}
+
+type PostImageOK struct {
+	// 画像のURL.
+	URL string `json:"url"`
+}
+
+// GetURL returns the value of URL.
+func (s *PostImageOK) GetURL() string {
+	return s.URL
+}
+
+// SetURL sets the value of URL.
+func (s *PostImageOK) SetURL(val string) {
+	s.URL = val
+}
+
+func (*PostImageOK) postImageRes() {}
+
+type PostImageReq struct {
+	Image OptMultipartFile `json:"image"`
+}
+
+// GetImage returns the value of Image.
+func (s *PostImageReq) GetImage() OptMultipartFile {
+	return s.Image
+}
+
+// SetImage sets the value of Image.
+func (s *PostImageReq) SetImage(val OptMultipartFile) {
+	s.Image = val
 }
 
 type PostOpinionPostBadRequest struct {

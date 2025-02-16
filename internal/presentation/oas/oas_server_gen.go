@@ -9,6 +9,7 @@ import (
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
 	AuthHandler
+	ImageHandler
 	ManageHandler
 	OpinionHandler
 	TalkSessionHandler
@@ -52,6 +53,18 @@ type AuthHandler interface {
 	//
 	// POST /auth/revoke
 	OAuthTokenRevoke(ctx context.Context) (OAuthTokenRevokeRes, error)
+}
+
+// ImageHandler handles operations described by OpenAPI v3 specification.
+//
+// x-ogen-operation-group: Image
+type ImageHandler interface {
+	// PostImage implements postImage operation.
+	//
+	// 画像を投稿してURLを返すAPI.
+	//
+	// POST /images
+	PostImage(ctx context.Context, req OptPostImageReq) (PostImageRes, error)
 }
 
 // ManageHandler handles operations described by OpenAPI v3 specification.

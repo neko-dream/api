@@ -3641,6 +3641,69 @@ paths:
           headers: {}
       security: []
       x-ogen-operation-group: Test
+  /images:
+    post:
+      summary: 画像投稿
+      deprecated: false
+      description: 画像を投稿してURLを返すAPI
+      operationId: postImage
+      tags:
+        - image
+      parameters: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  format: binary
+                  type: string
+                  example: ''
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    description: 画像のURL
+                required:
+                  - url
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security: []
+      x-ogen-operation-group: Image
   /manage:
     get:
       operationId: manageIndex
