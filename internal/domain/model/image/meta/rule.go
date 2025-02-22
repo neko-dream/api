@@ -137,8 +137,8 @@ func GetImageSize(ctx context.Context, file io.Reader) (int, error) {
 	_ = ctx
 
 	imageByte := new(bytes.Buffer)
-	if _, err := imageByte.ReadFrom(file); err != nil {
-		return 0, messages.ImageOpenFailedError
+	if _, err := io.Copy(imageByte, file); err != nil {
+		return 0, err
 	}
 
 	return imageByte.Len(), nil
@@ -154,7 +154,6 @@ func GetExtension(ctx context.Context, file io.Reader) (types.MIME, error) {
 	if _, err := file.Read(header); err != nil {
 		return types.Unknown.MIME, err
 	}
-
 	t, _ := filetype.Match(header)
 
 	return t.MIME, nil
@@ -165,12 +164,7 @@ func GetBounds(ctx context.Context, file io.Reader) (int, int, error) {
 	defer span.End()
 
 	_ = ctx
-
-	imageByte := new(bytes.Buffer)
-	if _, err := imageByte.ReadFrom(file); err != nil {
-		return 0, 0, messages.ImageOpenFailedError
-	}
-	img, _, err := image.Decode(imageByte)
+	img, _, err := image.Decode(file)
 	if err != nil {
 		return 0, 0, messages.ImageDecodeFailedError
 	}

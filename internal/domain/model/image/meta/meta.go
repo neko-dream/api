@@ -1,6 +1,7 @@
 package meta
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -11,6 +12,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
@@ -41,18 +43,30 @@ func NewImageForProfile(
 	defer span.End()
 
 	key := fmt.Sprintf(ProfileImageKeyPattern, userID.String())
-
-	size, err := GetImageSize(ctx, file)
+	// bytes[]に変換
+	imageBytes, err := io.ReadAll(file)
 	if err != nil {
-		return nil, err
-	}
-	ext, err := GetExtension(ctx, file)
-	if err != nil {
+		utils.HandleError(ctx, err, "io.ReadAll")
 		return nil, err
 	}
 
-	x, y, err := GetBounds(ctx, file)
+	// 複製したデータを再利用
+	x, y, err := GetBounds(ctx, bytes.NewReader(imageBytes))
 	if err != nil {
+		utils.HandleError(ctx, err, "GetBounds")
+		return nil, err
+	}
+
+	size, err := GetImageSize(ctx, bytes.NewReader(imageBytes))
+	if err != nil {
+		utils.HandleError(ctx, err, "GetImageSize")
+		return nil, err
+	}
+
+	// 複製したデータを再利用
+	ext, err := GetExtension(ctx, bytes.NewReader(imageBytes))
+	if err != nil {
+		utils.HandleError(ctx, err, "GetExtension")
 		return nil, err
 	}
 
@@ -82,17 +96,23 @@ func NewImageForReference(
 		now.Day(),
 		opinionID.String(),
 	)
-
-	size, err := GetImageSize(ctx, file)
+	// bytes[]に変換
+	imageBytes, err := io.ReadAll(file)
 	if err != nil {
-		return nil, err
-	}
-	ext, err := GetExtension(ctx, file)
-	if err != nil {
+		utils.HandleError(ctx, err, "io.ReadAll")
 		return nil, err
 	}
 
-	x, y, err := GetBounds(ctx, file)
+	size, err := GetImageSize(ctx, bytes.NewReader(imageBytes))
+	if err != nil {
+		return nil, err
+	}
+	ext, err := GetExtension(ctx, bytes.NewReader(imageBytes))
+	if err != nil {
+		return nil, err
+	}
+
+	x, y, err := GetBounds(ctx, bytes.NewReader(imageBytes))
 	if err != nil {
 		return nil, err
 	}
@@ -119,17 +139,23 @@ func NewImageForAnalysis(
 		"analysis",
 		now.Format("20060102150405"),
 	)
-
-	size, err := GetImageSize(ctx, file)
+	// bytes[]に変換
+	imageBytes, err := io.ReadAll(file)
 	if err != nil {
-		return nil, err
-	}
-	ext, err := GetExtension(ctx, file)
-	if err != nil {
+		utils.HandleError(ctx, err, "io.ReadAll")
 		return nil, err
 	}
 
-	x, y, err := GetBounds(ctx, file)
+	size, err := GetImageSize(ctx, bytes.NewReader(imageBytes))
+	if err != nil {
+		return nil, err
+	}
+	ext, err := GetExtension(ctx, bytes.NewReader(imageBytes))
+	if err != nil {
+		return nil, err
+	}
+
+	x, y, err := GetBounds(ctx, bytes.NewReader(imageBytes))
 	if err != nil {
 		return nil, err
 	}
