@@ -121,22 +121,18 @@ func (a *analysisService) GenerateImage(ctx context.Context, talkSessionID share
 			Password: a.conf.ANALYSIS_USER_PASSWORD,
 		},
 	}
-	println("GenerateImage")
 
 	// クライアントの初期化
 	c, err := NewClient(a.conf.ANALYSIS_API_DOMAIN, WithHTTPClient(httpClient))
 	if err != nil {
-		log.Println("NewClient", err)
 		return nil, err
 	}
-	println("request")
 
 	// APIリクエストの実行
 	resp, err := c.PostReportsWordclouds(ctx, PostReportsWordcloudsJSONRequestBody{
 		TalkSessionId: talkSessionID.UUID().String(),
 	})
 	if err != nil {
-		log.Println("PostReportsWordclouds", err)
 		return nil, err
 	}
 	defer resp.Body.Close()
