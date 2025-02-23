@@ -139,7 +139,7 @@ type UserGroupInfo struct {
 type UserImage struct {
 	UserImagesID uuid.UUID
 	UserID       uuid.UUID
-	ImageUrl     string
+	Key          string
 	Width        int32
 	Height       int32
 	Extension    string

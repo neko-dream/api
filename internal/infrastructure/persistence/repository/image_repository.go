@@ -48,7 +48,7 @@ func (i *imageRepository) Create(ctx context.Context, img *image.UserImage) erro
 		model.CreateUserImageParams{
 			UserImagesID: img.UserImageID.UUID(),
 			UserID:       img.UserID.UUID(),
-			ImageUrl:     img.Metadata.Key,
+			Key:          img.Metadata.Key,
 			Width:        int32(img.Metadata.Width),
 			Height:       int32(img.Metadata.Height),
 			Extension:    img.Metadata.Extension.Value,

@@ -15,7 +15,7 @@ const createUserImage = `-- name: CreateUserImage :exec
 INSERT INTO user_images (
     user_images_id,
     user_id,
-    image_url,
+    key,
     width,
     height,
     extension,
@@ -27,7 +27,7 @@ INSERT INTO user_images (
 type CreateUserImageParams struct {
 	UserImagesID uuid.UUID
 	UserID       uuid.UUID
-	ImageUrl     string
+	Key          string
 	Width        int32
 	Height       int32
 	Extension    string
@@ -40,7 +40,7 @@ type CreateUserImageParams struct {
 //	INSERT INTO user_images (
 //	    user_images_id,
 //	    user_id,
-//	    image_url,
+//	    key,
 //	    width,
 //	    height,
 //	    extension,
@@ -51,7 +51,7 @@ func (q *Queries) CreateUserImage(ctx context.Context, arg CreateUserImageParams
 	_, err := q.db.ExecContext(ctx, createUserImage,
 		arg.UserImagesID,
 		arg.UserID,
-		arg.ImageUrl,
+		arg.Key,
 		arg.Width,
 		arg.Height,
 		arg.Extension,

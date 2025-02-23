@@ -1,7 +1,7 @@
 CREATE TABLE user_images (
     user_images_id uuid PRIMARY KEY,
     user_id uuid NOT NULL,
-    image_url TEXT NOT NULL,
+    key varchar(255) NOT NULL,
     width INT NOT NULL,
     height INT NOT NULL,
     extension varchar(20) NOT NULL,

@@ -2,7 +2,7 @@
 INSERT INTO user_images (
     user_images_id,
     user_id,
-    image_url,
+    key,
     width,
     height,
     extension,
