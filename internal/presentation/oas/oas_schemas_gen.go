@@ -320,6 +320,8 @@ type CreateTalkSessionReq struct {
 	Prefecture OptNilString `json:"prefecture"`
 	// 説明文.
 	Description OptNilString `json:"description"`
+	// サムネイルURL。文中から一番最初の画像URLをサムネとする。.
+	ThumbnailURL OptString `json:"thumbnailURL"`
 }
 
 // GetTheme returns the value of Theme.
@@ -357,6 +359,11 @@ func (s *CreateTalkSessionReq) GetDescription() OptNilString {
 	return s.Description
 }
 
+// GetThumbnailURL returns the value of ThumbnailURL.
+func (s *CreateTalkSessionReq) GetThumbnailURL() OptString {
+	return s.ThumbnailURL
+}
+
 // SetTheme sets the value of Theme.
 func (s *CreateTalkSessionReq) SetTheme(val string) {
 	s.Theme = val
@@ -390,6 +397,11 @@ func (s *CreateTalkSessionReq) SetPrefecture(val OptNilString) {
 // SetDescription sets the value of Description.
 func (s *CreateTalkSessionReq) SetDescription(val OptNilString) {
 	s.Description = val
+}
+
+// SetThumbnailURL sets the value of ThumbnailURL.
+func (s *CreateTalkSessionReq) SetThumbnailURL(val OptString) {
+	s.ThumbnailURL = val
 }
 
 type DevAuthorizeBadRequest struct{}

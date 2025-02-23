@@ -47,21 +47,14 @@ func (s *Server) decodeCreateTalkSessionRequest(r *http.Request) (
 		return req, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
-	case ct == "multipart/form-data":
+	case ct == "application/x-www-form-urlencoded":
 		if r.ContentLength == 0 {
 			return req, close, nil
 		}
-		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+		form, err := ht.ParseForm(r)
+		if err != nil {
+			return req, close, errors.Wrap(err, "parse form")
 		}
-		// Remove all temporary files created by ParseMultipartForm when the request is done.
-		//
-		// Notice that the closers are called in reverse order, to match defer behavior, so
-		// any opened file will be closed before RemoveAll call.
-		closers = append(closers, r.MultipartForm.RemoveAll)
-		// Form values may be unused.
-		form := url.Values(r.MultipartForm.Value)
-		_ = form
 
 		var request OptCreateTalkSessionReq
 		{
@@ -324,6 +317,38 @@ func (s *Server) decodeCreateTalkSessionRequest(r *http.Request) (
 						return nil
 					}); err != nil {
 						return req, close, errors.Wrap(err, "decode \"description\"")
+					}
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "thumbnailURL",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotThumbnailURLVal string
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToString(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotThumbnailURLVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.ThumbnailURL.SetTo(optFormDotThumbnailURLVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"thumbnailURL\"")
 					}
 				}
 			}

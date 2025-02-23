@@ -916,7 +916,7 @@
         "parameters": [],
         "requestBody": {
           "content": {
-            "multipart/form-data": {
+            "application/x-www-form-urlencoded": {
               "schema": {
                 "type": "object",
                 "properties": {
@@ -924,7 +924,7 @@
                     "type": "string",
                     "maxLength": 50,
                     "minLength": 5,
-                    "example": "オブジェクト指向は悪"
+                    "example": "いい感じのテーマ"
                   },
                   "scheduledEndTime": {
                     "type": "string",
@@ -960,6 +960,11 @@
                     "description": "説明文",
                     "example": "",
                     "nullable": true
+                  },
+                  "thumbnailURL": {
+                    "description": "サムネイルURL。文中から一番最初の画像URLをサムネとする。",
+                    "example": "",
+                    "type": "string"
                   }
                 },
                 "required": [

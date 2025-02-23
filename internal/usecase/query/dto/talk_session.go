@@ -14,6 +14,7 @@ type TalkSession struct {
 	Theme            string
 	ScheduledEndTime time.Time
 	CreatedAt        time.Time
+	ThumbnailURL     *string
 	Description      *string
 	City             *string
 	Prefecture       *string

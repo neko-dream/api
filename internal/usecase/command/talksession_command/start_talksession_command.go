@@ -26,6 +26,7 @@ type (
 		OwnerID          shared.UUID[user.User]
 		Theme            string
 		Description      *string
+		ThumbnailURL     *string
 		ScheduledEndTime time.Time
 		Latitude         *float64
 		Longitude        *float64
@@ -96,6 +97,7 @@ func (i *startTalkSessionCommandHandler) Execute(ctx context.Context, input Star
 			talkSessionID,
 			input.Theme,
 			input.Description,
+			input.ThumbnailURL,
 			input.OwnerID,
 			clock.Now(ctx),
 			input.ScheduledEndTime,
@@ -112,6 +114,7 @@ func (i *startTalkSessionCommandHandler) Execute(ctx context.Context, input Star
 		output.TalkSession = dto.TalkSession{
 			TalkSessionID:    talkSessionID,
 			Theme:            input.Theme,
+			ThumbnailURL:     talkSession.ThumbnailURL(),
 			ScheduledEndTime: input.ScheduledEndTime,
 			OwnerID:          talkSession.OwnerUserID(),
 			CreatedAt:        talkSession.CreatedAt(),

@@ -419,6 +419,7 @@ func (d *DummyInitializer) TalkSession() error {
 			shared.NewUUID[talksession.TalkSession](),
 			"オブジェクト指向は悪",
 			lo.ToPtr("オブジェクト指向ってなんで悪なの？その理由を探しに我々はアマゾンのジャングルへと向かった。"),
+			nil,
 			d.Users[0].UserID(),
 			clock.Now(ctx),
 			clock.Now(ctx).AddDate(0, 3, 0),
@@ -428,6 +429,7 @@ func (d *DummyInitializer) TalkSession() error {
 		talksession.NewTalkSession(
 			shared.NewUUID[talksession.TalkSession](),
 			"オブジェクト指向は良",
+			nil,
 			nil,
 			d.Users[1].UserID(),
 			clock.Now(ctx),
