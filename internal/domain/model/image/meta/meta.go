@@ -26,11 +26,11 @@ type ImageMeta struct {
 }
 
 var (
-	ProfileImageKeyPattern = "u/%s.jpg"
+	ProfileImageKeyPattern = "u/%s.%v"
 	// ReferenceImageKeyPattern Year/Month/Day/opinionID.jpg
-	ReferenceImageKeyPattern = "ref/%v/%v/%v/%v.jpg"
+	ReferenceImageKeyPattern = "ref/%v/%v/%v/%v.%v"
 	// 種類-talkSessionID-時間.jpg
-	AnalysisImageKeyPattern = "gen/%v-%v-%v.png"
+	AnalysisImageKeyPattern = "gen/%v-%v-%v.%v"
 )
 
 // ProfileIcon用の画像メタデータを生成
@@ -42,15 +42,12 @@ func NewImageForProfile(
 	ctx, span := otel.Tracer("meta").Start(ctx, "NewImageForProfile")
 	defer span.End()
 
-	key := fmt.Sprintf(ProfileImageKeyPattern, userID.String())
-	// bytes[]に変換
 	imageBytes, err := io.ReadAll(file)
 	if err != nil {
 		utils.HandleError(ctx, err, "io.ReadAll")
 		return nil, err
 	}
 
-	// 複製したデータを再利用
 	x, y, err := GetBounds(ctx, bytes.NewReader(imageBytes))
 	if err != nil {
 		utils.HandleError(ctx, err, "GetBounds")
@@ -63,12 +60,13 @@ func NewImageForProfile(
 		return nil, err
 	}
 
-	// 複製したデータを再利用
 	ext, err := GetExtension(ctx, bytes.NewReader(imageBytes))
 	if err != nil {
 		utils.HandleError(ctx, err, "GetExtension")
 		return nil, err
 	}
+
+	key := fmt.Sprintf(ProfileImageKeyPattern, userID.String(), ext.Subtype)
 
 	return &ImageMeta{
 		Key:       key,
@@ -89,14 +87,7 @@ func NewImageForReference(
 	defer span.End()
 
 	now := clock.Now(ctx)
-	key := fmt.Sprintf(
-		ReferenceImageKeyPattern,
-		now.Year(),
-		int(now.Month()),
-		now.Day(),
-		opinionID.String(),
-	)
-	// bytes[]に変換
+
 	imageBytes, err := io.ReadAll(file)
 	if err != nil {
 		utils.HandleError(ctx, err, "io.ReadAll")
@@ -107,6 +98,7 @@ func NewImageForReference(
 	if err != nil {
 		return nil, err
 	}
+
 	ext, err := GetExtension(ctx, bytes.NewReader(imageBytes))
 	if err != nil {
 		return nil, err
@@ -116,6 +108,15 @@ func NewImageForReference(
 	if err != nil {
 		return nil, err
 	}
+
+	key := fmt.Sprintf(
+		ReferenceImageKeyPattern,
+		now.Year(),
+		int(now.Month()),
+		now.Day(),
+		opinionID.String(),
+		ext.Subtype,
+	)
 
 	return &ImageMeta{
 		Key:       key,
@@ -133,12 +134,6 @@ func NewImageForAnalysis(
 	ctx, span := otel.Tracer("meta").Start(ctx, "NewImageForAnalysis")
 	defer span.End()
 
-	now := clock.Now(ctx)
-	key := fmt.Sprintf(
-		AnalysisImageKeyPattern,
-		"analysis",
-		now.Format("20060102150405"),
-	)
 	// bytes[]に変換
 	imageBytes, err := io.ReadAll(file)
 	if err != nil {
@@ -159,6 +154,14 @@ func NewImageForAnalysis(
 	if err != nil {
 		return nil, err
 	}
+
+	now := clock.Now(ctx)
+	key := fmt.Sprintf(
+		AnalysisImageKeyPattern,
+		"analysis",
+		now.Format("20060102150405"),
+		ext.Subtype,
+	)
 
 	return &ImageMeta{
 		Key:       key,
