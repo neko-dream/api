@@ -68,8 +68,13 @@ func (u *userRepository) FindByDisplayID(ctx context.Context, displayID string) 
 		iconURL = &userRow.IconUrl.String
 	}
 
+	userID, err := shared.ParseUUID[user.User](userRow.UserID.String())
+	if err != nil {
+		return nil, err
+	}
+
 	user := user.NewUser(
-		shared.MustParseUUID[user.User](userRow.UserID.String()),
+		userID,
 		lo.ToPtr(displayID),
 		lo.ToPtr(userRow.DisplayName.String),
 		userAuthRow.Subject,
@@ -226,7 +231,7 @@ func (u *userRepository) FindByID(ctx context.Context, userID shared.UUID[user.U
 	}
 
 	user := user.NewUser(
-		shared.MustParseUUID[user.User](userRow.UserID.String()),
+		userID,
 		displayID,
 		displayName,
 		userAuthRow.Subject,
@@ -258,7 +263,10 @@ func (u *userRepository) findUserDemographic(ctx context.Context, userID shared.
 		gender        *string
 		prefecture    *string
 	)
-	UserDemographicID := shared.MustParseUUID[user.UserDemographic](userDemoRow.UserDemographicsID.String())
+	UserDemographicID, err := shared.ParseUUID[user.UserDemographic](userDemoRow.UserDemographicsID.String())
+	if err != nil {
+		return nil, err
+	}
 
 	if userDemoRow.YearOfBirth.Valid {
 		yearOfBirth = lo.ToPtr(int(userDemoRow.YearOfBirth.Int32))

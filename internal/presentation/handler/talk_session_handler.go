@@ -226,8 +226,13 @@ func (t *talkSessionHandler) GetTalkSessionReport(ctx context.Context, params oa
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetTalkSessionReport")
 	defer span.End()
 
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionId)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
 	out, err := t.getReportQuery.Execute(ctx, analysis_query.GetReportInput{
-		TalkSessionID: shared.MustParseUUID[talksession.TalkSession](params.TalkSessionId),
+		TalkSessionID: talkSessionID,
 	})
 	if err != nil {
 		return nil, err
@@ -236,7 +241,6 @@ func (t *talkSessionHandler) GetTalkSessionReport(ctx context.Context, params oa
 	return &oas.GetTalkSessionReportOK{
 		Report: bytes.NewBufferString(out.Report).String(),
 	}, nil
-
 }
 
 // CreateTalkSession トークセッション作成
@@ -306,8 +310,13 @@ func (t *talkSessionHandler) GetTalkSessionDetail(ctx context.Context, params oa
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetTalkSessionDetail")
 	defer span.End()
 
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionId)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
 	out, err := t.getTalkSessionDetailByIDQuery.Execute(ctx, talksession_query.GetTalkSessionDetailInput{
-		TalkSessionID: shared.MustParseUUID[talksession.TalkSession](params.TalkSessionId),
+		TalkSessionID: talkSessionID,
 	})
 	if err != nil {
 		return nil, err
@@ -449,9 +458,14 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 		}
 	}
 
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionId)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
 	out, err := t.getAnalysisResultQuery.Execute(ctx, analysis_query.GetAnalysisResultInput{
 		UserID:        userID,
-		TalkSessionID: shared.MustParseUUID[talksession.TalkSession](params.TalkSessionId),
+		TalkSessionID: talkSessionID,
 	})
 	if err != nil {
 		return nil, err

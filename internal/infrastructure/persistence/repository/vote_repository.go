@@ -51,11 +51,28 @@ func (o *voteRepository) FindByOpinionAndUserID(ctx context.Context, opinionID s
 		return nil, err
 	}
 
+	voteID, err := shared.ParseUUID[vote.Vote](voteRow.VoteID.String())
+	if err != nil {
+		return nil, err
+	}
+	opID, err := shared.ParseUUID[opinion.Opinion](voteRow.OpinionID.String())
+	if err != nil {
+		return nil, err
+	}
+	tsID, err := shared.ParseUUID[talksession.TalkSession](voteRow.TalkSessionID.String())
+	if err != nil {
+		return nil, err
+	}
+	uID, err := shared.ParseUUID[user.User](voteRow.UserID.String())
+	if err != nil {
+		return nil, err
+	}
+
 	vote, err := vote.NewVote(
-		shared.MustParseUUID[vote.Vote](voteRow.VoteID.String()),
-		shared.MustParseUUID[opinion.Opinion](voteRow.OpinionID.String()),
-		shared.MustParseUUID[talksession.TalkSession](voteRow.TalkSessionID.String()),
-		shared.MustParseUUID[user.User](voteRow.UserID.String()),
+		voteID,
+		opID,
+		tsID,
+		uID,
 		vote.VoteTypeFromInt(int(voteRow.VoteType)),
 		voteRow.CreatedAt,
 	)

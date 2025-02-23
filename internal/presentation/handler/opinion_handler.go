@@ -149,7 +149,11 @@ func (o *opinionHandler) GetOpinionDetail(ctx context.Context, params oas.GetOpi
 		userID = lo.ToPtr(userIDTmp)
 	}
 
-	opinionID := shared.MustParseUUID[opinion.Opinion](params.OpinionID)
+	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
 	opinion, err := o.getOpinionDetailByIDQuery.Execute(ctx, opinion_query.GetOpinionDetailByIDInput{
 		OpinionID: opinionID,
 		UserID:    userID,
@@ -201,9 +205,14 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 		limit = 10
 	}
 
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
 	opinions, err := o.getSwipeOpinionQuery.Execute(ctx, opinion_query.GetSwipeOpinionsQueryInput{
 		UserID:        userID,
-		TalkSessionID: shared.MustParseUUID[talksession.TalkSession](params.TalkSessionID),
+		TalkSessionID: talkSessionID,
 		Limit:         limit,
 	})
 	if err != nil {
@@ -256,8 +265,13 @@ func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.Opinion
 		userID = lo.ToPtr(userIDTmp)
 	}
 
+	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
 	opinions, err := o.getOpinionRepliesQuery.Execute(ctx, opinion_query.GetOpinionRepliesQueryInput{
-		OpinionID: shared.MustParseUUID[opinion.Opinion](params.OpinionID),
+		OpinionID: opinionID,
 		UserID:    userID,
 	})
 	if err != nil {
@@ -343,7 +357,11 @@ func (o *opinionHandler) PostOpinionPost(ctx context.Context, req oas.OptPostOpi
 		return nil, messages.RequiredParameterError
 	}
 
-	talkSessionID := shared.MustParseUUID[talksession.TalkSession](params.TalkSessionID)
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
 	if err := req.Value.Validate(); err != nil {
 		return nil, err
 	}
@@ -359,7 +377,11 @@ func (o *opinionHandler) PostOpinionPost(ctx context.Context, req oas.OptPostOpi
 	}
 	var parentOpinionID *shared.UUID[opinion.Opinion]
 	if value.ParentOpinionID.IsSet() {
-		parentOpinionID = lo.ToPtr(shared.MustParseUUID[opinion.Opinion](value.ParentOpinionID.Value))
+		id, err := shared.ParseUUID[opinion.Opinion](value.ParentOpinionID.Value)
+		if err != nil {
+			return nil, messages.BadRequestError
+		}
+		parentOpinionID = &id
 	}
 
 	if err = o.submitOpinionCommand.Execute(ctx, opinion_command.SubmitOpinionInput{
