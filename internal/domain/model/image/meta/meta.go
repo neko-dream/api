@@ -26,11 +26,11 @@ type ImageMeta struct {
 }
 
 var (
-	ProfileImageKeyPattern = "users/%s.jpg"
+	ProfileImageKeyPattern = "u/%s.jpg"
 	// ReferenceImageKeyPattern Year/Month/Day/opinionID.jpg
-	ReferenceImageKeyPattern = "reference_images/%v/%v/%v/%v.jpg"
+	ReferenceImageKeyPattern = "ref/%v/%v/%v/%v.jpg"
 	// 種類-talkSessionID-時間.jpg
-	AnalysisImageKeyPattern = "generated/%v-%v-%v.png"
+	AnalysisImageKeyPattern = "gen/%v-%v-%v.png"
 )
 
 // ProfileIcon用の画像メタデータを生成
