@@ -2,8 +2,9 @@ package utils
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"runtime"
+	"time"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -34,18 +35,28 @@ func HandleErrorWithCaller(ctx context.Context, err error, message string, calle
 	pc, file, line, _ := runtime.Caller(caller)
 	function := runtime.FuncForPC(pc).Name()
 
-	// エラーメッセージを出力
-	log.Printf("%s: %s\n", message, err.Error())
-	log.Printf("file: %s:%d, function: %s\n", file, line, function)
-	log.Println("----------------------------------------")
-
-	// スパンに情報を追加
-	span.SetStatus(codes.Error, err.Error())
-	span.RecordError(err, trace.WithAttributes(
+	attrs := []attribute.KeyValue{
 		attribute.String("error.file", file),
 		attribute.Int("error.line", line),
 		attribute.String("error.function", function),
 		attribute.String("error.message", message),
-		attribute.String("error.detail", err.Error()),
+	}
+
+	// エラーメッセージを出力
+	fmt.Println("+----------------------------------------")
+	fmt.Printf("time: %s\n", time.Now().Format("2006-01-02 15:04:05"))
+	if err != nil {
+		fmt.Printf("mesg: %s: %s\n", message, err.Error())
+		attrs = append(attrs, attribute.String("error", err.Error()))
+	} else {
+		fmt.Printf("mesg: %s\n", message)
+	}
+	fmt.Printf("file: %s:%d\n", file, line)
+	fmt.Printf("func: %s\n", function)
+	fmt.Println("+----------------------------------------")
+
+	span.SetStatus(codes.Error, message)
+	span.RecordError(err, trace.WithAttributes(
+		attrs...,
 	))
 }
