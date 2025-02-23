@@ -92,7 +92,7 @@ func NewImageForReference(
 	key := fmt.Sprintf(
 		ReferenceImageKeyPattern,
 		now.Year(),
-		now.Month(),
+		int(now.Month()),
 		now.Day(),
 		opinionID.String(),
 	)
