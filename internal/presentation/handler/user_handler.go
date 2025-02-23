@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"io"
 	"mime/multipart"
 	"net/http"
 	"time"

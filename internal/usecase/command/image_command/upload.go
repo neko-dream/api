@@ -68,7 +68,7 @@ func (h *uploadImageHandler) Execute(ctx context.Context, input UploadImageInput
 	}
 
 	// 画像をアップロード
-	url, err := h.imageStorage.Upload(ctx, *imageMeta, file)
+	url, err := h.imageStorage.Upload(ctx, *imageMeta, input.Image)
 	if err != nil {
 		utils.HandleError(ctx, err, "ImageRepository.Upload")
 		return nil, messages.ImageUploadFailedError

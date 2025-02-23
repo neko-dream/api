@@ -58,7 +58,7 @@ func (i *profileIconService) UploadProfileIcon(ctx context.Context, userID share
 	}
 
 	// 画像をアップロード
-	url, err := i.imageStorage.Upload(ctx, *imageMeta, file)
+	url, err := i.imageStorage.Upload(ctx, *imageMeta, input)
 	if err != nil {
 		utils.HandleError(ctx, err, "ImageRepository.Upload")
 		return nil, messages.UserUpdateError

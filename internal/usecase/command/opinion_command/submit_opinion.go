@@ -101,7 +101,7 @@ func (h *submitOpinionHandler) Execute(ctx context.Context, input SubmitOpinionI
 			}
 
 			// 画像をアップロード
-			url, err := h.ImageStorage.Upload(ctx, *imageMeta, file)
+			url, err := h.ImageStorage.Upload(ctx, *imageMeta, input.Picture)
 			if err != nil {
 				utils.HandleError(ctx, err, "ImageRepository.Upload")
 				return messages.OpinionReferenceImageUploadFailed

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"io"
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"

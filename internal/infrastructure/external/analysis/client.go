@@ -16,6 +16,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
+	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
@@ -166,12 +167,25 @@ func (a *analysisService) GenerateImage(ctx context.Context, talkSessionID share
 		utils.HandleError(ctx, err, "meta.NewImageForAnalysis")
 		return nil, err
 	}
-	wc, err := a.imageRep.Upload(ctx, *wcImgInfo, wcBuf)
+
+	// *multipart.FileHeaderを作成
+	wcFile, err := http_utils.CreateFileHeader(ctx, wcBuf, "wordcloud.png")
+	if err != nil {
+		utils.HandleError(ctx, err, "http_utils.CreateFileHeader")
+		return nil, err
+	}
+	tsneFile, err := http_utils.CreateFileHeader(ctx, tsncBuf, "tsne.png")
+	if err != nil {
+		utils.HandleError(ctx, err, "http_utils.CreateFileHeader")
+		return nil, err
+	}
+
+	wc, err := a.imageRep.Upload(ctx, *wcImgInfo, wcFile)
 	if err != nil {
 		utils.HandleError(ctx, err, "imageRep.Upload")
 		return nil, err
 	}
-	tsne, err := a.imageRep.Upload(ctx, *tsnCImgInfo, tsncBuf)
+	tsne, err := a.imageRep.Upload(ctx, *tsnCImgInfo, tsneFile)
 	if err != nil {
 		utils.HandleError(ctx, err, "imageRep.Upload")
 		return nil, err
