@@ -86,9 +86,13 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 	if params.Offset.IsSet() {
 		offset = &params.Offset.Value
 	}
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
 
 	out, err := o.getOpinionByTalkSessionQuery.Execute(ctx, opinion_query.GetOpinionsByTalkSessionInput{
-		TalkSessionID: shared.MustParseUUID[talksession.TalkSession](params.TalkSessionID),
+		TalkSessionID: talkSessionID,
 		SortKey:       sortKey,
 		Limit:         limit,
 		Offset:        offset,
