@@ -28,7 +28,7 @@ func HandleError(ctx context.Context, err error, message string) {
 }
 
 func HandleErrorWithCaller(ctx context.Context, err error, message string, caller int) {
-	ctx, span := otel.Tracer("utils").Start(ctx, "HandleErrorWithCaller")
+	_, span := otel.Tracer("utils").Start(ctx, "HandleErrorWithCaller")
 	defer span.End()
 
 	pc, file, line, _ := runtime.Caller(caller)

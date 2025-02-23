@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/neko-dream/server/internal/domain/model/analysis"
@@ -100,12 +99,10 @@ func (a *analysisService) StartAnalysis(ctx context.Context, talkSessionID share
 		UserId:        "0",
 	})
 	if err != nil {
-		log.Println("PostPredictsGroups", err)
 		return nil
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		log.Println("PostPredictsGroups", err)
 		return nil
 	}
 	return nil

@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"log"
 	"mime/multipart"
 
 	"braces.dev/errtrace"
@@ -47,7 +46,7 @@ func (i *imageStorage) Upload(ctx context.Context, meta meta.ImageMeta, file *mu
 	uploader := manager.NewUploader(i.s3Client, func(u *manager.Uploader) {
 		u.BufferProvider = manager.NewBufferedReadSeekerWriteToPool(25 * 1024 * 1024)
 	})
-	out, err := uploader.Upload(ctx, &s3.PutObjectInput{
+	_, err = uploader.Upload(ctx, &s3.PutObjectInput{
 		Bucket:      aws.String(i.conf.AWS_S3_BUCKET),
 		Key:         aws.String(meta.Key),
 		Body:        reader,
@@ -57,7 +56,6 @@ func (i *imageStorage) Upload(ctx context.Context, meta meta.ImageMeta, file *mu
 		utils.HandleError(ctx, err, "画像のアップロードに失敗")
 		return nil, errtrace.Wrap(err)
 	}
-	log.Println("アップロード成功", out)
 
 	url := i.conf.IMAGE_DOMAIN + "/" + meta.Key
 	return lo.ToPtr(url), nil
