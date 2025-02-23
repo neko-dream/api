@@ -40,12 +40,8 @@ func (i *imageHandler) PostImage(ctx context.Context, req oas.OptPostImageReq) (
 		utils.HandleError(ctx, err, "claim.UserID")
 		return nil, messages.ForbiddenError
 	}
-	content, err := io.ReadAll(req.Value.GetImage().File)
-	if err != nil {
-		utils.HandleError(ctx, err, "io.ReadAll")
-		return nil, messages.InternalServerError
-	}
-	file, err := http_utils.MakeFileHeader(req.Value.GetImage().Name, content)
+
+	file, err := http_utils.CreateFileHeader(ctx, req.Value.GetImage().File, req.Value.GetImage().Name)
 	if err != nil {
 		utils.HandleError(ctx, err, "MakeFileHeader")
 		return nil, messages.InternalServerError
