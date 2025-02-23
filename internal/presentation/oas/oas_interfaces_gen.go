@@ -89,6 +89,10 @@ type PostConclusionRes interface {
 	postConclusionRes()
 }
 
+type PostImageRes interface {
+	postImageRes()
+}
+
 type PostOpinionPostRes interface {
 	postOpinionPostRes()
 }

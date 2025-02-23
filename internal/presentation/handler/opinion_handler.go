@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"io"
 	"time"
 
 	"mime/multipart"
@@ -86,9 +85,13 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 	if params.Offset.IsSet() {
 		offset = &params.Offset.Value
 	}
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
 
 	out, err := o.getOpinionByTalkSessionQuery.Execute(ctx, opinion_query.GetOpinionsByTalkSessionInput{
-		TalkSessionID: shared.MustParseUUID[talksession.TalkSession](params.TalkSessionID),
+		TalkSessionID: talkSessionID,
 		SortKey:       sortKey,
 		Limit:         limit,
 		Offset:        offset,
@@ -348,12 +351,7 @@ func (o *opinionHandler) PostOpinionPost(ctx context.Context, req oas.OptPostOpi
 
 	var file *multipart.FileHeader
 	if value.Picture.IsSet() {
-		content, err := io.ReadAll(value.Picture.Value.File)
-		if err != nil {
-			utils.HandleError(ctx, err, "io.ReadAll")
-			return nil, messages.InternalServerError
-		}
-		file, err = http_utils.MakeFileHeader(value.Picture.Value.Name, content)
+		file, err = http_utils.CreateFileHeader(ctx, value.Picture.Value.File, value.Picture.Value.Name)
 		if err != nil {
 			utils.HandleError(ctx, err, "MakeFileHeader")
 			return nil, messages.InternalServerError

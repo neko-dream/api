@@ -18,16 +18,16 @@ import (
 
 type opinionRepository struct {
 	*db.DBManager
-	image.ImageRepository
+	image.ImageStorage
 }
 
 func NewOpinionRepository(
 	dbManager *db.DBManager,
-	imageRepo image.ImageRepository,
+	imageRepo image.ImageStorage,
 ) opinion.OpinionRepository {
 	return &opinionRepository{
-		DBManager:       dbManager,
-		ImageRepository: imageRepo,
+		DBManager:    dbManager,
+		ImageStorage: imageRepo,
 	}
 }
 
@@ -41,13 +41,8 @@ func (o *opinionRepository) Create(ctx context.Context, op opinion.Opinion) erro
 		parentOpinionID = uuid.NullUUID{UUID: op.ParentOpinionID().UUID(), Valid: true}
 	}
 	var referenceImageURL sql.NullString
-	if op.IsReferenceImageUpdateRequired() {
-		res, err := o.ImageRepository.Create(ctx, *op.ReferenceImage().ImageInfo())
-		if err != nil {
-			utils.HandleError(ctx, err, "opinionRepository.Create")
-			return err
-		}
-		referenceImageURL = sql.NullString{String: *res, Valid: true}
+	if op.ReferenceImageURL() != nil {
+		referenceImageURL = sql.NullString{String: *op.ReferenceImageURL(), Valid: true}
 	}
 
 	var title sql.NullString

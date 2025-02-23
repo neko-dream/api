@@ -228,6 +228,15 @@ func (UnimplementedHandler) PostConclusion(ctx context.Context, req OptPostConcl
 	return r, ht.ErrNotImplemented
 }
 
+// PostImage implements postImage operation.
+//
+// 画像を投稿してURLを返すAPI.
+//
+// POST /images
+func (UnimplementedHandler) PostImage(ctx context.Context, req OptPostImageReq) (r PostImageRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // PostOpinionPost implements postOpinionPost operation.
 //
 // ParentOpinionIDがなければルートの意見として投稿される.

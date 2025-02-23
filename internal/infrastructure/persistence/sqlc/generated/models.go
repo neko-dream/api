@@ -136,6 +136,19 @@ type UserGroupInfo struct {
 	PerimeterIndex sql.NullInt32
 }
 
+type UserImage struct {
+	UserImagesID uuid.UUID
+	UserID       uuid.UUID
+	Key          string
+	Width        int32
+	Height       int32
+	Extension    string
+	Archived     bool
+	Url          string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+}
+
 type Vote struct {
 	VoteID        uuid.UUID
 	OpinionID     uuid.UUID

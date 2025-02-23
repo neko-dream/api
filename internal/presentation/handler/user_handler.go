@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"io"
 	"mime/multipart"
 	"net/http"
 	"time"
@@ -319,12 +318,7 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 
 	var file *multipart.FileHeader
 	if value.Icon.IsSet() {
-		content, err := io.ReadAll(value.Icon.Value.File)
-		if err != nil {
-			utils.HandleError(ctx, err, "io.ReadAll")
-			return nil, messages.InternalServerError
-		}
-		file, err = http_utils.MakeFileHeader(value.Icon.Value.Name, content)
+		file, err = http_utils.CreateFileHeader(ctx, value.Icon.Value.File, value.Icon.Value.Name)
 		if err != nil {
 			utils.HandleError(ctx, err, "MakeFileHeader")
 			return nil, messages.InternalServerError
@@ -427,12 +421,7 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 
 	var file *multipart.FileHeader
 	if value.Icon.IsSet() {
-		content, err := io.ReadAll(value.Icon.Value.File)
-		if err != nil {
-			utils.HandleError(ctx, err, "io.ReadAll")
-			return nil, messages.InternalServerError
-		}
-		file, err = http_utils.MakeFileHeader(value.Icon.Value.Name, content)
+		file, err = http_utils.CreateFileHeader(ctx, value.Icon.Value.File, value.Icon.Value.Name)
 		if err != nil {
 			utils.HandleError(ctx, err, "MakeFileHeader")
 			return nil, messages.InternalServerError

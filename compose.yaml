@@ -1,6 +1,6 @@
 services:
   db:
-    image: ghcr.io/baosystems/postgis:15-3.5
+    image: ghcr.io/baosystems/postgis:16-3.5
     container_name: pg
     ports:
       - "5432:5432"
@@ -8,6 +8,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./container/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./container/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
     environment:
       POSTGRES_DB: kotohiro
       POSTGRES_USER: kotohiro
