@@ -311,9 +311,15 @@ func (s *CreateTalkSessionOK) encodeFields(e *jx.Encoder) {
 			s.Prefecture.Encode(e)
 		}
 	}
+	{
+		if s.ThumbnailURL.Set {
+			e.FieldStart("thumbnailURL")
+			s.ThumbnailURL.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfCreateTalkSessionOK = [9]string{
+var jsonFieldsNameOfCreateTalkSessionOK = [10]string{
 	0: "id",
 	1: "theme",
 	2: "description",
@@ -323,6 +329,7 @@ var jsonFieldsNameOfCreateTalkSessionOK = [9]string{
 	6: "location",
 	7: "city",
 	8: "prefecture",
+	9: "thumbnailURL",
 }
 
 // Decode decodes CreateTalkSessionOK from json.
@@ -431,6 +438,16 @@ func (s *CreateTalkSessionOK) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"prefecture\"")
+			}
+		case "thumbnailURL":
+			if err := func() error {
+				s.ThumbnailURL.Reset()
+				if err := s.ThumbnailURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"thumbnailURL\"")
 			}
 		default:
 			return d.Skip()
@@ -1104,9 +1121,15 @@ func (s *EditTalkSessionOK) encodeFields(e *jx.Encoder) {
 			s.Prefecture.Encode(e)
 		}
 	}
+	{
+		if s.ThumbnailURL.Set {
+			e.FieldStart("thumbnailURL")
+			s.ThumbnailURL.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfEditTalkSessionOK = [9]string{
+var jsonFieldsNameOfEditTalkSessionOK = [10]string{
 	0: "id",
 	1: "theme",
 	2: "description",
@@ -1116,6 +1139,7 @@ var jsonFieldsNameOfEditTalkSessionOK = [9]string{
 	6: "location",
 	7: "city",
 	8: "prefecture",
+	9: "thumbnailURL",
 }
 
 // Decode decodes EditTalkSessionOK from json.
@@ -1224,6 +1248,16 @@ func (s *EditTalkSessionOK) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"prefecture\"")
+			}
+		case "thumbnailURL":
+			if err := func() error {
+				s.ThumbnailURL.Reset()
+				if err := s.ThumbnailURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"thumbnailURL\"")
 			}
 		default:
 			return d.Skip()
@@ -2804,9 +2838,15 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) encodeFields(e *jx.E
 			s.Prefecture.Encode(e)
 		}
 	}
+	{
+		if s.ThumbnailURL.Set {
+			e.FieldStart("thumbnailURL")
+			s.ThumbnailURL.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfGetOpenedTalkSessionOKTalkSessionsItemTalkSession = [9]string{
+var jsonFieldsNameOfGetOpenedTalkSessionOKTalkSessionsItemTalkSession = [10]string{
 	0: "id",
 	1: "theme",
 	2: "description",
@@ -2816,6 +2856,7 @@ var jsonFieldsNameOfGetOpenedTalkSessionOKTalkSessionsItemTalkSession = [9]strin
 	6: "location",
 	7: "city",
 	8: "prefecture",
+	9: "thumbnailURL",
 }
 
 // Decode decodes GetOpenedTalkSessionOKTalkSessionsItemTalkSession from json.
@@ -2924,6 +2965,16 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"prefecture\"")
+			}
+		case "thumbnailURL":
+			if err := func() error {
+				s.ThumbnailURL.Reset()
+				if err := s.ThumbnailURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"thumbnailURL\"")
 			}
 		default:
 			return d.Skip()
@@ -4776,9 +4827,15 @@ func (s *GetTalkSessionDetailOK) encodeFields(e *jx.Encoder) {
 			s.Prefecture.Encode(e)
 		}
 	}
+	{
+		if s.ThumbnailURL.Set {
+			e.FieldStart("thumbnailURL")
+			s.ThumbnailURL.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfGetTalkSessionDetailOK = [9]string{
+var jsonFieldsNameOfGetTalkSessionDetailOK = [10]string{
 	0: "id",
 	1: "theme",
 	2: "description",
@@ -4788,6 +4845,7 @@ var jsonFieldsNameOfGetTalkSessionDetailOK = [9]string{
 	6: "location",
 	7: "city",
 	8: "prefecture",
+	9: "thumbnailURL",
 }
 
 // Decode decodes GetTalkSessionDetailOK from json.
@@ -4896,6 +4954,16 @@ func (s *GetTalkSessionDetailOK) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"prefecture\"")
+			}
+		case "thumbnailURL":
+			if err := func() error {
+				s.ThumbnailURL.Reset()
+				if err := s.ThumbnailURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"thumbnailURL\"")
 			}
 		default:
 			return d.Skip()
@@ -5805,9 +5873,15 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) encodeFields(e *jx.Enc
 			s.Prefecture.Encode(e)
 		}
 	}
+	{
+		if s.ThumbnailURL.Set {
+			e.FieldStart("thumbnailURL")
+			s.ThumbnailURL.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfGetTalkSessionListOKTalkSessionsItemTalkSession = [9]string{
+var jsonFieldsNameOfGetTalkSessionListOKTalkSessionsItemTalkSession = [10]string{
 	0: "id",
 	1: "theme",
 	2: "description",
@@ -5817,6 +5891,7 @@ var jsonFieldsNameOfGetTalkSessionListOKTalkSessionsItemTalkSession = [9]string{
 	6: "location",
 	7: "city",
 	8: "prefecture",
+	9: "thumbnailURL",
 }
 
 // Decode decodes GetTalkSessionListOKTalkSessionsItemTalkSession from json.
@@ -5925,6 +6000,16 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder) 
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"prefecture\"")
+			}
+		case "thumbnailURL":
+			if err := func() error {
+				s.ThumbnailURL.Reset()
+				if err := s.ThumbnailURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"thumbnailURL\"")
 			}
 		default:
 			return d.Skip()
@@ -13071,18 +13156,18 @@ func (s *SessionsHistoryOKTalkSessionsItem) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *SessionsHistoryOKTalkSessionsItem) encodeFields(e *jx.Encoder) {
 	{
-		e.FieldStart("opinionCount")
-		e.Int(s.OpinionCount)
-	}
-	{
 		e.FieldStart("talkSession")
 		s.TalkSession.Encode(e)
+	}
+	{
+		e.FieldStart("opinionCount")
+		e.Int(s.OpinionCount)
 	}
 }
 
 var jsonFieldsNameOfSessionsHistoryOKTalkSessionsItem = [2]string{
-	0: "opinionCount",
-	1: "talkSession",
+	0: "talkSession",
+	1: "opinionCount",
 }
 
 // Decode decodes SessionsHistoryOKTalkSessionsItem from json.
@@ -13094,8 +13179,18 @@ func (s *SessionsHistoryOKTalkSessionsItem) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "opinionCount":
+		case "talkSession":
 			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				if err := s.TalkSession.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"talkSession\"")
+			}
+		case "opinionCount":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
 				v, err := d.Int()
 				s.OpinionCount = int(v)
@@ -13105,16 +13200,6 @@ func (s *SessionsHistoryOKTalkSessionsItem) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"opinionCount\"")
-			}
-		case "talkSession":
-			requiredBitSet[0] |= 1 << 1
-			if err := func() error {
-				if err := s.TalkSession.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"talkSession\"")
 			}
 		default:
 			return d.Skip()
@@ -13225,9 +13310,15 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) encodeFields(e *jx.Encode
 			s.Prefecture.Encode(e)
 		}
 	}
+	{
+		if s.ThumbnailURL.Set {
+			e.FieldStart("thumbnailURL")
+			s.ThumbnailURL.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfSessionsHistoryOKTalkSessionsItemTalkSession = [9]string{
+var jsonFieldsNameOfSessionsHistoryOKTalkSessionsItemTalkSession = [10]string{
 	0: "id",
 	1: "theme",
 	2: "description",
@@ -13237,6 +13328,7 @@ var jsonFieldsNameOfSessionsHistoryOKTalkSessionsItemTalkSession = [9]string{
 	6: "location",
 	7: "city",
 	8: "prefecture",
+	9: "thumbnailURL",
 }
 
 // Decode decodes SessionsHistoryOKTalkSessionsItemTalkSession from json.
@@ -13345,6 +13437,16 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder) err
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"prefecture\"")
+			}
+		case "thumbnailURL":
+			if err := func() error {
+				s.ThumbnailURL.Reset()
+				if err := s.ThumbnailURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"thumbnailURL\"")
 			}
 		default:
 			return d.Skip()
