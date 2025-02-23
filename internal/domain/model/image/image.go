@@ -2,8 +2,7 @@ package image
 
 import (
 	"context"
-
-	"io"
+	"mime/multipart"
 
 	"github.com/neko-dream/server/internal/domain/model/image/meta"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -13,7 +12,7 @@ import (
 
 type (
 	ImageStorage interface {
-		Upload(context.Context, meta.ImageMeta, io.Reader) (*string, error)
+		Upload(context.Context, meta.ImageMeta, *multipart.FileHeader) (*string, error)
 	}
 	ImageRepository interface {
 		Create(context.Context, *UserImage) error

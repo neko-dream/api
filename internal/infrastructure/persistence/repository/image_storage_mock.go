@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"io"
+	"mime/multipart"
 
 	"github.com/neko-dream/server/internal/domain/model/image"
 	"github.com/neko-dream/server/internal/domain/model/image/meta"
@@ -14,7 +14,7 @@ type ImageRepositoryMock struct {
 }
 
 // Upload implements image.ImageRepository.
-func (i *ImageRepositoryMock) Upload(ctx context.Context, _ meta.ImageMeta, _ io.Reader) (*string, error) {
+func (i *ImageRepositoryMock) Upload(ctx context.Context, _ meta.ImageMeta, _ *multipart.FileHeader) (*string, error) {
 	ctx, span := otel.Tracer("repository").Start(ctx, "ImageRepositoryMock.Upload")
 	defer span.End()
 
