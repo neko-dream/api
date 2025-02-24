@@ -64,6 +64,7 @@ type TalkSession struct {
 	City             sql.NullString
 	Prefecture       sql.NullString
 	Description      sql.NullString
+	ThumbnailUrl     sql.NullString
 }
 
 type TalkSessionConclusion struct {

@@ -7,9 +7,13 @@ import (
 	"mime/multipart"
 
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 func CreateFileHeader(ctx context.Context, reader io.Reader, filename string) (*multipart.FileHeader, error) {
+	ctx, span := otel.Tracer("http_utils").Start(ctx, "CreateFileHeader")
+	defer span.End()
+
 	var b bytes.Buffer
 	w := multipart.NewWriter(&b)
 

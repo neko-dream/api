@@ -138,7 +138,9 @@ func (s *Server) handleAuthorizeRequest(args [1]string, argsEscaped bool, w http
 
 // handleCreateTalkSessionRequest handles createTalkSession operation.
 //
-// セッション作成.
+// ## サムネイル画像について
+// - `Description中に出てくる画像で一番最初のものを使用`。
+// - 画像自体は`POST /images`でサーバにポストしたものを使用してください。.
 //
 // POST /talksessions
 func (s *Server) handleCreateTalkSessionRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
