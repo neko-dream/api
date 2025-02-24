@@ -8,10 +8,10 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./container/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./container/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
     environment:
       POSTGRES_DB: kotohiro
       POSTGRES_USER: kotohiro
       POSTGRES_PASSWORD: kotohiro
+
 volumes:
   pgdata:

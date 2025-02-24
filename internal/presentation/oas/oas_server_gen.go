@@ -125,7 +125,9 @@ type OpinionHandler interface {
 type TalkSessionHandler interface {
 	// CreateTalkSession implements createTalkSession operation.
 	//
-	// セッション作成.
+	// ## サムネイル画像について
+	// - `Description中に出てくる画像で一番最初のものを使用`。
+	// - 画像自体は`POST /images`でサーバにポストしたものを使用してください。.
 	//
 	// POST /talksessions
 	CreateTalkSession(ctx context.Context, req OptCreateTalkSessionReq) (CreateTalkSessionRes, error)

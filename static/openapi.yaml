@@ -748,6 +748,10 @@ paths:
                     type: string
                     description: 都道府県
                     nullable: true
+                  thumbnailURL:
+                    type: string
+                    description: サムネ画像
+                    nullable: true
                 required:
                   - id
                   - theme
@@ -892,6 +896,10 @@ paths:
                     type: string
                     description: 都道府県
                     nullable: true
+                  thumbnailURL:
+                    type: string
+                    description: サムネ画像
+                    nullable: true
                 required:
                   - id
                   - theme
@@ -934,14 +942,17 @@ paths:
     post:
       summary: セッション作成
       deprecated: false
-      description: ''
+      description: |
+        ## サムネイル画像について
+        - `Description中に出てくる画像で一番最初のものを使用`。
+        - 画像自体は`POST /images`でサーバにポストしたものを使用してください。
       operationId: createTalkSession
       tags:
         - talk_session
       parameters: []
       requestBody:
         content:
-          multipart/form-data:
+          application/x-www-form-urlencoded:
             schema:
               type: object
               properties:
@@ -949,7 +960,7 @@ paths:
                   type: string
                   maxLength: 50
                   minLength: 5
-                  example: オブジェクト指向は悪
+                  example: いい感じのテーマ
                 scheduledEndTime:
                   type: string
                   format: date-time
@@ -977,6 +988,11 @@ paths:
                 description:
                   type: string
                   description: 説明文
+                  example: ''
+                  nullable: true
+                thumbnailURL:
+                  type: string
+                  description: サムネイルURL。文中から一番最初の画像URLをサムネとする。
                   example: ''
                   nullable: true
               required:
@@ -1042,6 +1058,10 @@ paths:
                   prefecture:
                     type: string
                     description: 都道府県
+                    nullable: true
+                  thumbnailURL:
+                    type: string
+                    description: サムネ画像
                     nullable: true
                 required:
                   - id
@@ -1215,6 +1235,10 @@ paths:
                             prefecture:
                               type: string
                               description: 都道府県
+                              nullable: true
+                            thumbnailURL:
+                              type: string
+                              description: サムネ画像
                               nullable: true
                           required:
                             - id
@@ -2833,10 +2857,6 @@ paths:
             enum:
               - open
               - finished
-            x-apidog:
-              enumDescriptions:
-                open: ''
-                finished: ''
             nullable: true
       responses:
         '200':
@@ -2864,8 +2884,6 @@ paths:
                     items:
                       type: object
                       properties:
-                        opinionCount:
-                          type: integer
                         talkSession:
                           type: object
                           properties:
@@ -2922,12 +2940,18 @@ paths:
                               type: string
                               description: 都道府県
                               nullable: true
+                            thumbnailURL:
+                              type: string
+                              description: サムネ画像
+                              nullable: true
                           required:
                             - id
                             - theme
                             - owner
                             - createdAt
                             - scheduledEndTime
+                        opinionCount:
+                          type: integer
                       required:
                         - opinionCount
                         - talkSession
@@ -3080,6 +3104,10 @@ paths:
                             prefecture:
                               type: string
                               description: 都道府県
+                              nullable: true
+                            thumbnailURL:
+                              type: string
+                              description: サムネ画像
                               nullable: true
                           required:
                             - id
@@ -3822,6 +3850,10 @@ components:
         prefecture:
           type: string
           description: 都道府県
+          nullable: true
+        thumbnailURL:
+          type: string
+          description: サムネ画像
           nullable: true
       required:
         - id

@@ -89,13 +89,14 @@ func (q *Queries) CountTalkSessions(ctx context.Context, arg CountTalkSessionsPa
 }
 
 const createTalkSession = `-- name: CreateTalkSession :exec
-INSERT INTO talk_sessions (talk_session_id, theme, description, owner_id, scheduled_end_time, created_at, city, prefecture) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+INSERT INTO talk_sessions (talk_session_id, theme, description, thumbnail_url, owner_id, scheduled_end_time, created_at, city, prefecture) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 `
 
 type CreateTalkSessionParams struct {
 	TalkSessionID    uuid.UUID
 	Theme            string
 	Description      sql.NullString
+	ThumbnailUrl     sql.NullString
 	OwnerID          uuid.UUID
 	ScheduledEndTime time.Time
 	CreatedAt        time.Time
@@ -105,12 +106,13 @@ type CreateTalkSessionParams struct {
 
 // CreateTalkSession
 //
-//	INSERT INTO talk_sessions (talk_session_id, theme, description, owner_id, scheduled_end_time, created_at, city, prefecture) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+//	INSERT INTO talk_sessions (talk_session_id, theme, description, thumbnail_url, owner_id, scheduled_end_time, created_at, city, prefecture) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 func (q *Queries) CreateTalkSession(ctx context.Context, arg CreateTalkSessionParams) error {
 	_, err := q.db.ExecContext(ctx, createTalkSession,
 		arg.TalkSessionID,
 		arg.Theme,
 		arg.Description,
+		arg.ThumbnailUrl,
 		arg.OwnerID,
 		arg.ScheduledEndTime,
 		arg.CreatedAt,
@@ -171,7 +173,7 @@ func (q *Queries) EditTalkSession(ctx context.Context, arg EditTalkSessionParams
 
 const getOwnTalkSessionByUserID = `-- name: GetOwnTalkSessionByUserID :many
 SELECT
-    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description,
+    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
     talk_session_locations.talk_session_id as location_id,
@@ -226,7 +228,7 @@ type GetOwnTalkSessionByUserIDRow struct {
 // GetOwnTalkSessionByUserID
 //
 //	SELECT
-//	    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description,
+//	    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
 //	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
 //	    talk_session_locations.talk_session_id as location_id,
@@ -283,6 +285,7 @@ func (q *Queries) GetOwnTalkSessionByUserID(ctx context.Context, arg GetOwnTalkS
 			&i.TalkSession.City,
 			&i.TalkSession.Prefecture,
 			&i.TalkSession.Description,
+			&i.TalkSession.ThumbnailUrl,
 			&i.OpinionCount,
 			&i.User.UserID,
 			&i.User.DisplayID,
@@ -309,7 +312,7 @@ func (q *Queries) GetOwnTalkSessionByUserID(ctx context.Context, arg GetOwnTalkS
 
 const getRespondTalkSessionByUserID = `-- name: GetRespondTalkSessionByUserID :many
 SELECT
-    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description,
+    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
     talk_session_locations.talk_session_id as location_id,
@@ -366,7 +369,7 @@ type GetRespondTalkSessionByUserIDRow struct {
 // GetRespondTalkSessionByUserID
 //
 //	SELECT
-//	    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description,
+//	    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
 //	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
 //	    talk_session_locations.talk_session_id as location_id,
@@ -425,6 +428,7 @@ func (q *Queries) GetRespondTalkSessionByUserID(ctx context.Context, arg GetResp
 			&i.TalkSession.City,
 			&i.TalkSession.Prefecture,
 			&i.TalkSession.Description,
+			&i.TalkSession.ThumbnailUrl,
 			&i.OpinionCount,
 			&i.User.UserID,
 			&i.User.DisplayID,
@@ -451,7 +455,7 @@ func (q *Queries) GetRespondTalkSessionByUserID(ctx context.Context, arg GetResp
 
 const getTalkSessionByID = `-- name: GetTalkSessionByID :one
 SELECT
-    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description,
+    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
     talk_session_locations.talk_session_id as location_id,
@@ -482,7 +486,7 @@ type GetTalkSessionByIDRow struct {
 // GetTalkSessionByID
 //
 //	SELECT
-//	    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description,
+//	    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
 //	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
 //	    talk_session_locations.talk_session_id as location_id,
@@ -511,6 +515,7 @@ func (q *Queries) GetTalkSessionByID(ctx context.Context, talkSessionID uuid.UUI
 		&i.TalkSession.City,
 		&i.TalkSession.Prefecture,
 		&i.TalkSession.Description,
+		&i.TalkSession.ThumbnailUrl,
 		&i.OpinionCount,
 		&i.User.UserID,
 		&i.User.DisplayID,
@@ -527,7 +532,7 @@ func (q *Queries) GetTalkSessionByID(ctx context.Context, talkSessionID uuid.UUI
 
 const listTalkSessions = `-- name: ListTalkSessions :many
 SELECT
-    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description,
+    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
     talk_session_locations.talk_session_id as location_id,
@@ -619,7 +624,7 @@ type ListTalkSessionsRow struct {
 // ListTalkSessions
 //
 //	SELECT
-//	    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description,
+//	    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
 //	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
 //	    talk_session_locations.talk_session_id as location_id,
@@ -712,6 +717,7 @@ func (q *Queries) ListTalkSessions(ctx context.Context, arg ListTalkSessionsPara
 			&i.TalkSession.City,
 			&i.TalkSession.Prefecture,
 			&i.TalkSession.Description,
+			&i.TalkSession.ThumbnailUrl,
 			&i.OpinionCount,
 			&i.User.UserID,
 			&i.User.DisplayID,

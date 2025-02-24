@@ -206,6 +206,8 @@ func (t *talkSessionHandler) GetOpenedTalkSession(ctx context.Context, params oa
 				ID:               talkSession.TalkSessionID.String(),
 				Theme:            talkSession.Theme,
 				Owner:            owner,
+				Description:      utils.ToOptNil[oas.OptNilString](talkSession.Description),
+				ThumbnailURL:     utils.ToOptNil[oas.OptNilString](talkSession.ThumbnailURL),
 				Location:         location,
 				CreatedAt:        talkSession.CreatedAt.Format(time.RFC3339),
 				ScheduledEndTime: talkSession.ScheduledEndTime.Format(time.RFC3339),
@@ -258,21 +260,17 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 		utils.HandleError(ctx, err, "claim.UserID")
 		return nil, messages.ForbiddenError
 	}
-	latitude := utils.ToPtrIfNotNullValue(!req.Value.Latitude.IsSet(), req.Value.Latitude.Value)
-	longitude := utils.ToPtrIfNotNullValue(!req.Value.Longitude.IsSet(), req.Value.Longitude.Value)
-	city := utils.ToPtrIfNotNullValue(!req.Value.City.IsSet(), req.Value.City.Value)
-	prefecture := utils.ToPtrIfNotNullValue(!req.Value.Prefecture.IsSet(), req.Value.Prefecture.Value)
-	description := utils.ToPtrIfNotNullValue(!req.Value.Description.IsSet(), req.Value.Description.Value)
 
 	out, err := t.startTalkSessionCommand.Execute(ctx, talksession_command.StartTalkSessionCommandInput{
 		Theme:            req.Value.Theme,
-		Description:      description,
+		Description:      utils.ToPtrIfNotNullValue(!req.Value.Description.IsSet(), req.Value.Description.Value),
+		ThumbnailURL:     utils.ToPtrIfNotNullValue(!req.Value.ThumbnailURL.IsSet(), req.Value.ThumbnailURL.Value),
 		OwnerID:          userID,
 		ScheduledEndTime: req.Value.ScheduledEndTime,
-		Latitude:         latitude,
-		Longitude:        longitude,
-		City:             city,
-		Prefecture:       prefecture,
+		Latitude:         utils.ToPtrIfNotNullValue(!req.Value.Latitude.IsSet(), req.Value.Latitude.Value),
+		Longitude:        utils.ToPtrIfNotNullValue(!req.Value.Longitude.IsSet(), req.Value.Longitude.Value),
+		City:             utils.ToPtrIfNotNullValue(!req.Value.City.IsSet(), req.Value.City.Value),
+		Prefecture:       utils.ToPtrIfNotNullValue(!req.Value.Prefecture.IsSet(), req.Value.Prefecture.Value),
 	})
 	if err != nil {
 		return nil, errtrace.Wrap(err)
@@ -290,6 +288,7 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 	}
 
 	res := &oas.CreateTalkSessionOK{
+		ID: out.TalkSession.TalkSessionID.String(),
 		Owner: oas.CreateTalkSessionOKOwner{
 			DisplayID:   out.User.DisplayID,
 			DisplayName: out.User.DisplayName,
@@ -297,7 +296,7 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 		},
 		Theme:            out.TalkSession.Theme,
 		Description:      utils.ToOptNil[oas.OptNilString](out.TalkSession.Description),
-		ID:               out.TalkSession.TalkSessionID.String(),
+		ThumbnailURL:     utils.ToOptNil[oas.OptNilString](out.TalkSession.ThumbnailURL),
 		CreatedAt:        clock.Now(ctx).Format(time.RFC3339),
 		ScheduledEndTime: out.TalkSession.ScheduledEndTime.Format(time.RFC3339),
 		Location:         location,
@@ -343,6 +342,7 @@ func (t *talkSessionHandler) GetTalkSessionDetail(ctx context.Context, params oa
 		ID:               out.TalkSessionID.String(),
 		Theme:            out.Theme,
 		Description:      utils.ToOptNil[oas.OptNilString](out.Description),
+		ThumbnailURL:     utils.ToOptNil[oas.OptNilString](out.ThumbnailURL),
 		Owner:            owner,
 		CreatedAt:        out.CreatedAt.Format(time.RFC3339),
 		ScheduledEndTime: out.ScheduledEndTime.Format(time.RFC3339),
@@ -422,6 +422,7 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 				ID:               talkSession.TalkSessionID.String(),
 				Theme:            talkSession.Theme,
 				Description:      utils.ToOptNil[oas.OptNilString](talkSession.Description),
+				ThumbnailURL:     utils.ToOptNil[oas.OptNilString](talkSession.ThumbnailURL),
 				Owner:            owner,
 				CreatedAt:        talkSession.CreatedAt.Format(time.RFC3339),
 				ScheduledEndTime: talkSession.ScheduledEndTime.Format(time.RFC3339),

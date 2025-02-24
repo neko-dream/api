@@ -908,7 +908,7 @@
       "post": {
         "summary": "セッション作成",
         "deprecated": false,
-        "description": "",
+        "description": "## サムネイル画像について\n- `Description中に出てくる画像で一番最初のものを使用`。\n- 画像自体は`POST /images`でサーバにポストしたものを使用してください。\n",
         "operationId": "createTalkSession",
         "tags": [
           "talk_session"
@@ -916,7 +916,7 @@
         "parameters": [],
         "requestBody": {
           "content": {
-            "multipart/form-data": {
+            "application/x-www-form-urlencoded": {
               "schema": {
                 "type": "object",
                 "properties": {
@@ -924,7 +924,7 @@
                     "type": "string",
                     "maxLength": 50,
                     "minLength": 5,
-                    "example": "オブジェクト指向は悪"
+                    "example": "いい感じのテーマ"
                   },
                   "scheduledEndTime": {
                     "type": "string",
@@ -958,6 +958,12 @@
                   "description": {
                     "type": "string",
                     "description": "説明文",
+                    "example": "",
+                    "nullable": true
+                  },
+                  "thumbnailURL": {
+                    "type": "string",
+                    "description": "サムネイルURL。文中から一番最初の画像URLをサムネとする。",
                     "example": "",
                     "nullable": true
                   }
@@ -1015,6 +1021,11 @@
                     "prefecture": {
                       "type": "string",
                       "description": "都道府県",
+                      "nullable": true
+                    },
+                    "thumbnailURL": {
+                      "type": "string",
+                      "description": "サムネ画像",
                       "nullable": true
                     }
                   },
@@ -2886,12 +2897,6 @@
                 "open",
                 "finished"
               ],
-              "x-apidog": {
-                "enumDescriptions": {
-                  "open": "",
-                  "finished": ""
-                }
-              },
               "nullable": true
             }
           }
@@ -2912,11 +2917,11 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "opinionCount": {
-                            "type": "integer"
-                          },
                           "talkSession": {
                             "$ref": "#/components/schemas/talkSession"
+                          },
+                          "opinionCount": {
+                            "type": "integer"
                           }
                         },
                         "required": [
@@ -4032,6 +4037,11 @@
           "prefecture": {
             "type": "string",
             "description": "都道府県",
+            "nullable": true
+          },
+          "thumbnailURL": {
+            "type": "string",
+            "description": "サムネ画像",
             "nullable": true
           }
         },
