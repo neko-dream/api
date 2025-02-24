@@ -6,11 +6,18 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 	"strings"
+)
 
-	"github.com/pkg/errors"
+var (
+	ErrUnsupportedVersion = errors.New("対応していない暗号化バージョンです")
+	ErrInvalidFormat      = errors.New("不正な暗号文フォーマットです")
+	ErrInvalidInteger     = errors.New("不正な整数フォーマットです")
+	ErrEncryption         = errors.New("暗号化エラー")
+	ErrDecryption         = errors.New("復号化エラー")
 )
 
 type Version string
@@ -19,18 +26,12 @@ const (
 	Version1 Version = "v1"
 )
 
-var (
-	ErrUnsupportedVersion = errors.New("対応していない暗号化バージョンです")
-	ErrInvalidFormat      = errors.New("不正な暗号文フォーマットです")
-	ErrInvalidInteger     = errors.New("不正な整数フォーマットです")
-)
-
 func (v Version) Validate() error {
 	switch v {
 	case Version1:
 		return nil
 	default:
-		return errors.Wrapf(ErrUnsupportedVersion, "バージョン: %s", v)
+		return fmt.Errorf("%w: バージョン: %s", ErrUnsupportedVersion, v)
 	}
 }
 
@@ -52,7 +53,7 @@ func NewEncrypter(version Version, key []byte) (Encrypter, error) {
 	case Version1:
 		return NewCBCEncrypter(key), nil
 	default:
-		return nil, errors.Wrapf(ErrUnsupportedVersion, "version: %s", version)
+		return nil, fmt.Errorf("%w: バージョン: %s", ErrUnsupportedVersion, version)
 	}
 }
 
@@ -80,13 +81,13 @@ func NewCBCEncrypter(key []byte) *CBCEncrypter {
 func (e *CBCEncrypter) EncryptBytes(plaintext []byte) (string, error) {
 	block, err := aes.NewCipher(e.key)
 	if err != nil {
-		return "", errors.Wrap(err, "暗号化ブロックの作成に失敗しました")
+		return "", fmt.Errorf("%w: 暗号化ブロックの作成に失敗しました: %v", ErrEncryption, err)
 	}
 
 	// IVを生成
 	iv := make([]byte, aes.BlockSize)
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
-		return "", errors.Wrap(err, "初期化ベクトルの生成に失敗しました")
+		return "", fmt.Errorf("%w: 初期化ベクトルの生成に失敗しました: %v", ErrEncryption, err)
 	}
 
 	// パディング
@@ -116,23 +117,23 @@ func (e *CBCEncrypter) DecryptBytes(ciphertext string) ([]byte, error) {
 
 	version := Version(parts[0])
 	if version != Version1 {
-		return nil, errors.Wrapf(ErrUnsupportedVersion, "version: %s", version)
+		return nil, fmt.Errorf("%w: バージョン: %s", ErrUnsupportedVersion, version)
 	}
 
 	// Base64デコード
 	encryptedData, iv := parts[1], parts[2]
 	encrypted, err := base64.StdEncoding.DecodeString(encryptedData)
 	if err != nil {
-		return nil, errors.Wrap(err, "暗号文のデコードに失敗しました")
+		return nil, fmt.Errorf("%w: 暗号文のデコードに失敗しました: %v", ErrDecryption, err)
 	}
 	ivBytes, err := base64.StdEncoding.DecodeString(iv)
 	if err != nil {
-		return nil, errors.Wrap(err, "初期化ベクトルのデコードに失敗しました")
+		return nil, fmt.Errorf("%w: 初期化ベクトルのデコードに失敗しました: %v", ErrDecryption, err)
 	}
 
 	block, err := aes.NewCipher(e.key)
 	if err != nil {
-		return nil, errors.Wrap(err, "暗号化ブロックの作成に失敗しました")
+		return nil, fmt.Errorf("%w: 暗号化ブロックの作成に失敗しました: %v", ErrDecryption, err)
 	}
 
 	// 復号化
