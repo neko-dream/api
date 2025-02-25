@@ -127,7 +127,12 @@ type TalkSessionHandler interface {
 	//
 	// ## サムネイル画像について
 	// - `Description中に出てくる画像で一番最初のものを使用`。
-	// - 画像自体は`POST /images`でサーバにポストしたものを使用してください。.
+	// - 画像自体は`POST /images`でサーバにポストしたものを使用してください。
+	// ## 投稿制限のキーについて
+	// restrictionsに値を入れると一定のデモグラ情報を登録していない限り、セッションへの投稿が制限されるようにできる。
+	// restrictionsには [GET /talksessions/restrictions](https://app.apidog.
+	// com/link/project/674502/apis/api-14271260)
+	// より取れるkeyをカンマ区切りで入力してください。.
 	//
 	// POST /talksessions
 	CreateTalkSession(ctx context.Context, req OptCreateTalkSessionReq) (CreateTalkSessionRes, error)
@@ -167,6 +172,12 @@ type TalkSessionHandler interface {
 	//
 	// GET /talksessions/{talkSessionId}/report
 	GetTalkSessionReport(ctx context.Context, params GetTalkSessionReportParams) (GetTalkSessionReportRes, error)
+	// GetTalkSessionRestrictionKeys implements getTalkSessionRestrictionKeys operation.
+	//
+	// セッションの投稿制限に使用できるキーの一覧を返す.
+	//
+	// GET /talksessions/restrictions
+	GetTalkSessionRestrictionKeys(ctx context.Context) (GetTalkSessionRestrictionKeysRes, error)
 	// PostConclusion implements postConclusion operation.
 	//
 	// 結論（conclusion）はセッションが終了した後にセッっションの作成者が投稿できる文章。

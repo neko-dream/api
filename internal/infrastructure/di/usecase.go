@@ -45,5 +45,6 @@ func useCaseDeps() []ProvideArg {
 		{analysis_query.NewGetAnalysisResultHandler, nil},
 		{analysis_query.NewGetReportQueryHandler, nil},
 		{image_command.NewUploadImageHandler, nil},
+		{talksession_query.NewGetRestrictionsQuery, nil},
 	}
 }

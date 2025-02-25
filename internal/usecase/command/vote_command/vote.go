@@ -9,9 +9,10 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
+	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/domain/model/vote"
+	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
@@ -34,6 +35,7 @@ type (
 		opinion.OpinionService
 		vote.VoteRepository
 		analysis.AnalysisService
+		service.TalkSessionAccessControl
 		*db.DBManager
 	}
 )
@@ -42,19 +44,27 @@ func NewVoteHandler(
 	opinionService opinion.OpinionService,
 	voteRepository vote.VoteRepository,
 	analysisService analysis.AnalysisService,
+	talkSessionAccessControl service.TalkSessionAccessControl,
 	DBManager *db.DBManager,
 ) Vote {
 	return &voteHandler{
-		OpinionService:  opinionService,
-		VoteRepository:  voteRepository,
-		AnalysisService: analysisService,
-		DBManager:       DBManager,
+		OpinionService:           opinionService,
+		VoteRepository:           voteRepository,
+		AnalysisService:          analysisService,
+		TalkSessionAccessControl: talkSessionAccessControl,
+		DBManager:                DBManager,
 	}
 }
 
 func (i *voteHandler) Execute(ctx context.Context, input VoteInput) error {
 	ctx, span := otel.Tracer("vote_command").Start(ctx, "voteHandler.Execute")
 	defer span.End()
+
+	// 参加制限を満たしているか確認。満たしていない場合はエラーを返す
+	if _, err := i.TalkSessionAccessControl.CanUserJoin(ctx, input.TalkSessionID, lo.ToPtr(input.UserID)); err != nil {
+		utils.HandleError(ctx, err, "TalkSessionAccessControl.CanUserJoin")
+		return err
+	}
 
 	// Opinionに対して投票を行っているか確認
 	voted, err := i.OpinionService.IsVoted(ctx, input.TargetOpinionID, input.UserID)

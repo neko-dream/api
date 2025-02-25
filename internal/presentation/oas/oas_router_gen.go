@@ -386,6 +386,27 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							}
 
 							elem = origElem
+						case 'r': // Prefix: "restrictions"
+							origElem := elem
+							if l := len("restrictions"); len(elem) >= l && elem[0:l] == "restrictions" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch r.Method {
+								case "GET":
+									s.handleGetTalkSessionRestrictionKeysRequest([0]string{}, elemIsEscaped, w, r)
+								default:
+									s.notAllowed(w, r, "GET")
+								}
+
+								return
+							}
+
+							elem = origElem
 						}
 						// Param: "talkSessionId"
 						// Match until "/"
@@ -1264,6 +1285,31 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									r.summary = "自分が開いたセッション一覧"
 									r.operationID = "getOpenedTalkSession"
 									r.pathPattern = "/talksessions/opened"
+									r.args = args
+									r.count = 0
+									return r, true
+								default:
+									return
+								}
+							}
+
+							elem = origElem
+						case 'r': // Prefix: "restrictions"
+							origElem := elem
+							if l := len("restrictions"); len(elem) >= l && elem[0:l] == "restrictions" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch method {
+								case "GET":
+									r.name = "GetTalkSessionRestrictionKeys"
+									r.summary = "セッションで指定可能な制限一覧"
+									r.operationID = "getTalkSessionRestrictionKeys"
+									r.pathPattern = "/talksessions/restrictions"
 									r.args = args
 									r.count = 0
 									return r, true

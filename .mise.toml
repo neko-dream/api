@@ -11,21 +11,11 @@ go = "1.23.0"
 "go:github.com/hedhyw/otelinji/cmd/otelinji" = "latest"
 "go:github.com/k1LoW/runn/cmd/runn" = "latest"
 task = "latest"
+"go:github.com/dmarkham/enumer" = "latest"
 
 [tasks.migrate-create]
 description = "Create a new migration file"
-run = """
-#!/usr/bin/env bash
-if [ -z "{{arg(name="name")}}" ]; then
-  echo "マイグレーション名を指定してください"
-  echo "使用方法: mise run migrate-create <マイグレーション名>"
-  exit 1
-fi
-MIGRATION_DIR="migrations"
-mkdir -p $MIGRATION_DIR
-MIGRATION_NAME=$(echo "{{arg(name="name")}}" | tr '[:upper:]' '[:lower:]' | tr ' ' '_')
-migrate create -ext sql -dir $MIGRATION_DIR -seq $MIGRATION_NAME
-"""
+run = "./scripts/migrate-create.sh "
 
 [tasks.migrate-up]
 description = "Run all migrations"

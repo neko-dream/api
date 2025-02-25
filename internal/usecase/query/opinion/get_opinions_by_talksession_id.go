@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
+	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/usecase/query/dto"
 	"github.com/neko-dream/server/pkg/sort"

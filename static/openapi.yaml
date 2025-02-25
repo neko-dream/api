@@ -752,12 +752,26 @@ paths:
                     type: string
                     description: サムネ画像
                     nullable: true
+                  restrictions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: string
+                        description:
+                          type: string
+                      required:
+                        - key
+                        - description
+                    description: セッションの参加制限
                 required:
                   - id
                   - theme
                   - owner
                   - createdAt
                   - scheduledEndTime
+                  - restrictions
           headers: {}
         '400':
           description: ''
@@ -900,12 +914,26 @@ paths:
                     type: string
                     description: サムネ画像
                     nullable: true
+                  restrictions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: string
+                        description:
+                          type: string
+                      required:
+                        - key
+                        - description
+                    description: セッションの参加制限
                 required:
                   - id
                   - theme
                   - owner
                   - createdAt
                   - scheduledEndTime
+                  - restrictions
           headers: {}
         '400':
           description: ''
@@ -942,10 +970,21 @@ paths:
     post:
       summary: セッション作成
       deprecated: false
-      description: |
+      description: >-
         ## サムネイル画像について
+
         - `Description中に出てくる画像で一番最初のものを使用`。
+
         - 画像自体は`POST /images`でサーバにポストしたものを使用してください。
+
+
+        ## 投稿制限のキーについて
+
+        restrictionsに値を入れると一定のデモグラ情報を登録していない限り、セッションへの投稿が制限されるようにできる。
+
+        restrictionsには [GET
+        /talksessions/restrictions](https://app.apidog.com/link/project/674502/apis/api-14271260)
+        より取れるkeyをカンマ区切りで入力してください。
       operationId: createTalkSession
       tags:
         - talk_session
@@ -995,6 +1034,14 @@ paths:
                   description: サムネイルURL。文中から一番最初の画像URLをサムネとする。
                   example: ''
                   nullable: true
+                restrictions:
+                  type: array
+                  items:
+                    type: string
+                  uniqueItems: true
+                  description: 投稿制限のキー
+                  example:
+                    - demographics.city
               required:
                 - theme
                 - scheduledEndTime
@@ -1063,12 +1110,26 @@ paths:
                     type: string
                     description: サムネ画像
                     nullable: true
+                  restrictions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: string
+                        description:
+                          type: string
+                      required:
+                        - key
+                        - description
+                    description: セッションの参加制限
                 required:
                   - id
                   - theme
                   - owner
                   - createdAt
                   - scheduledEndTime
+                  - restrictions
           headers: {}
         '400':
           description: ''
@@ -1240,12 +1301,26 @@ paths:
                               type: string
                               description: サムネ画像
                               nullable: true
+                            restrictions:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  key:
+                                    type: string
+                                  description:
+                                    type: string
+                                required:
+                                  - key
+                                  - description
+                              description: セッションの参加制限
                           required:
                             - id
                             - theme
                             - owner
                             - createdAt
                             - scheduledEndTime
+                            - restrictions
                         opinionCount:
                           type: integer
                       required:
@@ -2256,6 +2331,63 @@ paths:
       security:
         - SessionId: []
       x-ogen-operation-group: Timeline
+  /talksessions/restrictions:
+    get:
+      summary: セッションで指定可能な制限一覧
+      deprecated: false
+      description: セッションの投稿制限に使用できるキーの一覧を返す
+      operationId: getTalkSessionRestrictionKeys
+      tags:
+        - talk_session
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    key:
+                      type: string
+                    description:
+                      type: string
+                  required:
+                    - key
+                    - description
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security: []
+      x-ogen-operation-group: TalkSession
   /user:
     post:
       summary: ユーザー作成
@@ -2944,12 +3076,26 @@ paths:
                               type: string
                               description: サムネ画像
                               nullable: true
+                            restrictions:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  key:
+                                    type: string
+                                  description:
+                                    type: string
+                                required:
+                                  - key
+                                  - description
+                              description: セッションの参加制限
                           required:
                             - id
                             - theme
                             - owner
                             - createdAt
                             - scheduledEndTime
+                            - restrictions
                         opinionCount:
                           type: integer
                       required:
@@ -3109,12 +3255,26 @@ paths:
                               type: string
                               description: サムネ画像
                               nullable: true
+                            restrictions:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  key:
+                                    type: string
+                                  description:
+                                    type: string
+                                required:
+                                  - key
+                                  - description
+                              description: セッションの参加制限
                           required:
                             - id
                             - theme
                             - owner
                             - createdAt
                             - scheduledEndTime
+                            - restrictions
                         opinionCount:
                           type: integer
                       required:
@@ -3855,12 +4015,26 @@ components:
           type: string
           description: サムネ画像
           nullable: true
+        restrictions:
+          type: array
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+              description:
+                type: string
+            required:
+              - key
+              - description
+          description: セッションの参加制限
       required:
         - id
         - theme
         - owner
         - createdAt
         - scheduledEndTime
+        - restrictions
     validationErrorItem:
       type: object
       properties:
@@ -4142,6 +4316,16 @@ components:
         - Status
         - CreatedAt
         - UpdatedAt
+    restriction:
+      type: object
+      properties:
+        key:
+          type: string
+        description:
+          type: string
+      required:
+        - key
+        - description
   securitySchemes:
     SessionId:
       type: apiKey

@@ -7,6 +7,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
@@ -28,6 +29,7 @@ type (
 		location         *Location
 		city             *string
 		prefecture       *string
+		restrictions     []*RestrictionAttribute // 参加制限
 	}
 )
 
@@ -101,10 +103,35 @@ func (t *TalkSession) ChangeTheme(theme string) {
 	t.theme = theme
 }
 
+func (t *TalkSession) Restrictions() []*RestrictionAttribute {
+	return t.restrictions
+}
+
 // 終了しているかを調べる
 func (t *TalkSession) IsFinished(ctx context.Context) bool {
 	ctx, span := otel.Tracer("talksession").Start(ctx, "TalkSession.IsFinished")
 	defer span.End()
 
 	return t.scheduledEndTime.Before(clock.Now(ctx))
+}
+
+// 参加制限を全てアップデートする
+func (t *TalkSession) UpdateRestrictions(ctx context.Context, restrictions []string) error {
+	ctx, span := otel.Tracer("talksession").Start(ctx, "TalkSession.UpdateRestrictions")
+	defer span.End()
+
+	_ = ctx
+
+	var attrs []*RestrictionAttribute
+	for _, restriction := range restrictions {
+		attribute := RestrictionAttributeKey(restriction)
+		if !attribute.IsValid() {
+			return &ErrInvalidRestrictionAttribute
+		}
+
+		attrs = append(attrs, lo.ToPtr(attribute.RestrictionAttribute()))
+	}
+
+	t.restrictions = attrs
+	return nil
 }

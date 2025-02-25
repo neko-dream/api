@@ -1,5 +1,5 @@
 -- name: CreateTalkSession :exec
-INSERT INTO talk_sessions (talk_session_id, theme, description, thumbnail_url, owner_id, scheduled_end_time, created_at, city, prefecture) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);
+INSERT INTO talk_sessions (talk_session_id, theme, description, thumbnail_url, owner_id, scheduled_end_time, created_at, city, prefecture, restrictions) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);
 
 -- name: CreateTalkSessionLocation :exec
 INSERT INTO talk_session_locations (talk_session_id, location) VALUES ($1, ST_GeographyFromText($2));
@@ -11,7 +11,12 @@ UPDATE talk_session_locations SET location = ST_GeographyFromText($2) WHERE talk
 UPDATE talk_sessions
     SET theme = $2,
         description = $3,
-        scheduled_end_time = $4
+        scheduled_end_time = $4,
+        thumbnail_url = $5,
+        city = $6,
+        prefecture = $7,
+        restrictions = $8,
+        updated_at = NOW()
     WHERE talk_session_id = $1;
 
 -- name: GetTalkSessionByID :one
