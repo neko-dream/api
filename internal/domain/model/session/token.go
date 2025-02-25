@@ -43,7 +43,7 @@ func NewClaim(ctx context.Context, user user.User, sessionID shared.UUID[Session
 		Iat:         now.Unix(),
 		Exp:         now.Add(time.Second * 60 * 60 * 24 * 7).Unix(),
 		Jti:         sessionID.String(),
-		IconURL:     user.ProfileIconURL(),
+		IconURL:     user.IconURL(),
 		DisplayID:   user.DisplayID(),
 		DisplayName: user.DisplayName(),
 		IsVerify:    user.Verify(),

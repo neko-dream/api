@@ -38,4 +38,9 @@ var (
 		Code:       "OPINION-007",
 		Message:    "意見の取得に失敗しました。時間をおいて再度お試しください",
 	}
+	OpinionReferenceImageUploadFailed = &APIError{
+		StatusCode: http.StatusInternalServerError,
+		Code:       "OPINION-008",
+		Message:    "参考画像のアップロードに失敗しました。時間をおいて再度お試しください",
+	}
 )

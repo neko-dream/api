@@ -148,6 +148,8 @@ type CreateTalkSessionOK struct {
 	City OptNilString `json:"city"`
 	// 都道府県.
 	Prefecture OptNilString `json:"prefecture"`
+	// サムネ画像.
+	ThumbnailURL OptNilString `json:"thumbnailURL"`
 }
 
 // GetID returns the value of ID.
@@ -195,6 +197,11 @@ func (s *CreateTalkSessionOK) GetPrefecture() OptNilString {
 	return s.Prefecture
 }
 
+// GetThumbnailURL returns the value of ThumbnailURL.
+func (s *CreateTalkSessionOK) GetThumbnailURL() OptNilString {
+	return s.ThumbnailURL
+}
+
 // SetID sets the value of ID.
 func (s *CreateTalkSessionOK) SetID(val string) {
 	s.ID = val
@@ -238,6 +245,11 @@ func (s *CreateTalkSessionOK) SetCity(val OptNilString) {
 // SetPrefecture sets the value of Prefecture.
 func (s *CreateTalkSessionOK) SetPrefecture(val OptNilString) {
 	s.Prefecture = val
+}
+
+// SetThumbnailURL sets the value of ThumbnailURL.
+func (s *CreateTalkSessionOK) SetThumbnailURL(val OptNilString) {
+	s.ThumbnailURL = val
 }
 
 func (*CreateTalkSessionOK) createTalkSessionRes() {}
@@ -320,6 +332,8 @@ type CreateTalkSessionReq struct {
 	Prefecture OptNilString `json:"prefecture"`
 	// 説明文.
 	Description OptNilString `json:"description"`
+	// サムネイルURL。文中から一番最初の画像URLをサムネとする。.
+	ThumbnailURL OptNilString `json:"thumbnailURL"`
 }
 
 // GetTheme returns the value of Theme.
@@ -357,6 +371,11 @@ func (s *CreateTalkSessionReq) GetDescription() OptNilString {
 	return s.Description
 }
 
+// GetThumbnailURL returns the value of ThumbnailURL.
+func (s *CreateTalkSessionReq) GetThumbnailURL() OptNilString {
+	return s.ThumbnailURL
+}
+
 // SetTheme sets the value of Theme.
 func (s *CreateTalkSessionReq) SetTheme(val string) {
 	s.Theme = val
@@ -390,6 +409,11 @@ func (s *CreateTalkSessionReq) SetPrefecture(val OptNilString) {
 // SetDescription sets the value of Description.
 func (s *CreateTalkSessionReq) SetDescription(val OptNilString) {
 	s.Description = val
+}
+
+// SetThumbnailURL sets the value of ThumbnailURL.
+func (s *CreateTalkSessionReq) SetThumbnailURL(val OptNilString) {
+	s.ThumbnailURL = val
 }
 
 type DevAuthorizeBadRequest struct{}
@@ -480,6 +504,8 @@ type EditTalkSessionOK struct {
 	City OptNilString `json:"city"`
 	// 都道府県.
 	Prefecture OptNilString `json:"prefecture"`
+	// サムネ画像.
+	ThumbnailURL OptNilString `json:"thumbnailURL"`
 }
 
 // GetID returns the value of ID.
@@ -527,6 +553,11 @@ func (s *EditTalkSessionOK) GetPrefecture() OptNilString {
 	return s.Prefecture
 }
 
+// GetThumbnailURL returns the value of ThumbnailURL.
+func (s *EditTalkSessionOK) GetThumbnailURL() OptNilString {
+	return s.ThumbnailURL
+}
+
 // SetID sets the value of ID.
 func (s *EditTalkSessionOK) SetID(val string) {
 	s.ID = val
@@ -570,6 +601,11 @@ func (s *EditTalkSessionOK) SetCity(val OptNilString) {
 // SetPrefecture sets the value of Prefecture.
 func (s *EditTalkSessionOK) SetPrefecture(val OptNilString) {
 	s.Prefecture = val
+}
+
+// SetThumbnailURL sets the value of ThumbnailURL.
+func (s *EditTalkSessionOK) SetThumbnailURL(val OptNilString) {
+	s.ThumbnailURL = val
 }
 
 func (*EditTalkSessionOK) editTalkSessionRes() {}
@@ -1333,6 +1369,8 @@ type GetOpenedTalkSessionOKTalkSessionsItemTalkSession struct {
 	City OptNilString `json:"city"`
 	// 都道府県.
 	Prefecture OptNilString `json:"prefecture"`
+	// サムネ画像.
+	ThumbnailURL OptNilString `json:"thumbnailURL"`
 }
 
 // GetID returns the value of ID.
@@ -1380,6 +1418,11 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) GetPrefecture() OptN
 	return s.Prefecture
 }
 
+// GetThumbnailURL returns the value of ThumbnailURL.
+func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) GetThumbnailURL() OptNilString {
+	return s.ThumbnailURL
+}
+
 // SetID sets the value of ID.
 func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) SetID(val string) {
 	s.ID = val
@@ -1423,6 +1466,11 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) SetCity(val OptNilSt
 // SetPrefecture sets the value of Prefecture.
 func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) SetPrefecture(val OptNilString) {
 	s.Prefecture = val
+}
+
+// SetThumbnailURL sets the value of ThumbnailURL.
+func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) SetThumbnailURL(val OptNilString) {
+	s.ThumbnailURL = val
 }
 
 // 位置情報.
@@ -2170,6 +2218,8 @@ type GetTalkSessionDetailOK struct {
 	City OptNilString `json:"city"`
 	// 都道府県.
 	Prefecture OptNilString `json:"prefecture"`
+	// サムネ画像.
+	ThumbnailURL OptNilString `json:"thumbnailURL"`
 }
 
 // GetID returns the value of ID.
@@ -2217,6 +2267,11 @@ func (s *GetTalkSessionDetailOK) GetPrefecture() OptNilString {
 	return s.Prefecture
 }
 
+// GetThumbnailURL returns the value of ThumbnailURL.
+func (s *GetTalkSessionDetailOK) GetThumbnailURL() OptNilString {
+	return s.ThumbnailURL
+}
+
 // SetID sets the value of ID.
 func (s *GetTalkSessionDetailOK) SetID(val string) {
 	s.ID = val
@@ -2260,6 +2315,11 @@ func (s *GetTalkSessionDetailOK) SetCity(val OptNilString) {
 // SetPrefecture sets the value of Prefecture.
 func (s *GetTalkSessionDetailOK) SetPrefecture(val OptNilString) {
 	s.Prefecture = val
+}
+
+// SetThumbnailURL sets the value of ThumbnailURL.
+func (s *GetTalkSessionDetailOK) SetThumbnailURL(val OptNilString) {
+	s.ThumbnailURL = val
 }
 
 func (*GetTalkSessionDetailOK) getTalkSessionDetailRes() {}
@@ -2490,6 +2550,8 @@ type GetTalkSessionListOKTalkSessionsItemTalkSession struct {
 	City OptNilString `json:"city"`
 	// 都道府県.
 	Prefecture OptNilString `json:"prefecture"`
+	// サムネ画像.
+	ThumbnailURL OptNilString `json:"thumbnailURL"`
 }
 
 // GetID returns the value of ID.
@@ -2537,6 +2599,11 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetPrefecture() OptNil
 	return s.Prefecture
 }
 
+// GetThumbnailURL returns the value of ThumbnailURL.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetThumbnailURL() OptNilString {
+	return s.ThumbnailURL
+}
+
 // SetID sets the value of ID.
 func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetID(val string) {
 	s.ID = val
@@ -2580,6 +2647,11 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetCity(val OptNilStri
 // SetPrefecture sets the value of Prefecture.
 func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetPrefecture(val OptNilString) {
 	s.Prefecture = val
+}
+
+// SetThumbnailURL sets the value of ThumbnailURL.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetThumbnailURL(val OptNilString) {
+	s.ThumbnailURL = val
 }
 
 // 位置情報.
@@ -6243,6 +6315,52 @@ func (o OptPostConclusionReq) Or(d PostConclusionReq) PostConclusionReq {
 	return d
 }
 
+// NewOptPostImageReq returns new OptPostImageReq with value set to v.
+func NewOptPostImageReq(v PostImageReq) OptPostImageReq {
+	return OptPostImageReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptPostImageReq is optional PostImageReq.
+type OptPostImageReq struct {
+	Value PostImageReq
+	Set   bool
+}
+
+// IsSet returns true if OptPostImageReq was set.
+func (o OptPostImageReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptPostImageReq) Reset() {
+	var v PostImageReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptPostImageReq) SetTo(v PostImageReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptPostImageReq) Get() (v PostImageReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptPostImageReq) Or(d PostImageReq) PostImageReq {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptPostOpinionPostReq returns new OptPostOpinionPostReq with value set to v.
 func NewOptPostOpinionPostReq(v PostOpinionPostReq) OptPostOpinionPostReq {
 	return OptPostOpinionPostReq{
@@ -6838,6 +6956,45 @@ func (s *PostConclusionReq) GetContent() string {
 // SetContent sets the value of Content.
 func (s *PostConclusionReq) SetContent(val string) {
 	s.Content = val
+}
+
+type PostImageBadRequest struct{}
+
+func (*PostImageBadRequest) postImageRes() {}
+
+type PostImageInternalServerError struct{}
+
+func (*PostImageInternalServerError) postImageRes() {}
+
+type PostImageOK struct {
+	// 画像のURL.
+	URL string `json:"url"`
+}
+
+// GetURL returns the value of URL.
+func (s *PostImageOK) GetURL() string {
+	return s.URL
+}
+
+// SetURL sets the value of URL.
+func (s *PostImageOK) SetURL(val string) {
+	s.URL = val
+}
+
+func (*PostImageOK) postImageRes() {}
+
+type PostImageReq struct {
+	Image ht.MultipartFile `json:"image"`
+}
+
+// GetImage returns the value of Image.
+func (s *PostImageReq) GetImage() ht.MultipartFile {
+	return s.Image
+}
+
+// SetImage sets the value of Image.
+func (s *PostImageReq) SetImage(val ht.MultipartFile) {
+	s.Image = val
 }
 
 type PostOpinionPostBadRequest struct {
@@ -7523,13 +7680,8 @@ func (s *SessionsHistoryOKPagination) SetLimit(val int) {
 }
 
 type SessionsHistoryOKTalkSessionsItem struct {
-	OpinionCount int                                          `json:"opinionCount"`
 	TalkSession  SessionsHistoryOKTalkSessionsItemTalkSession `json:"talkSession"`
-}
-
-// GetOpinionCount returns the value of OpinionCount.
-func (s *SessionsHistoryOKTalkSessionsItem) GetOpinionCount() int {
-	return s.OpinionCount
+	OpinionCount int                                          `json:"opinionCount"`
 }
 
 // GetTalkSession returns the value of TalkSession.
@@ -7537,14 +7689,19 @@ func (s *SessionsHistoryOKTalkSessionsItem) GetTalkSession() SessionsHistoryOKTa
 	return s.TalkSession
 }
 
-// SetOpinionCount sets the value of OpinionCount.
-func (s *SessionsHistoryOKTalkSessionsItem) SetOpinionCount(val int) {
-	s.OpinionCount = val
+// GetOpinionCount returns the value of OpinionCount.
+func (s *SessionsHistoryOKTalkSessionsItem) GetOpinionCount() int {
+	return s.OpinionCount
 }
 
 // SetTalkSession sets the value of TalkSession.
 func (s *SessionsHistoryOKTalkSessionsItem) SetTalkSession(val SessionsHistoryOKTalkSessionsItemTalkSession) {
 	s.TalkSession = val
+}
+
+// SetOpinionCount sets the value of OpinionCount.
+func (s *SessionsHistoryOKTalkSessionsItem) SetOpinionCount(val int) {
+	s.OpinionCount = val
 }
 
 type SessionsHistoryOKTalkSessionsItemTalkSession struct {
@@ -7566,6 +7723,8 @@ type SessionsHistoryOKTalkSessionsItemTalkSession struct {
 	City OptNilString `json:"city"`
 	// 都道府県.
 	Prefecture OptNilString `json:"prefecture"`
+	// サムネ画像.
+	ThumbnailURL OptNilString `json:"thumbnailURL"`
 }
 
 // GetID returns the value of ID.
@@ -7613,6 +7772,11 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) GetPrefecture() OptNilStr
 	return s.Prefecture
 }
 
+// GetThumbnailURL returns the value of ThumbnailURL.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSession) GetThumbnailURL() OptNilString {
+	return s.ThumbnailURL
+}
+
 // SetID sets the value of ID.
 func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetID(val string) {
 	s.ID = val
@@ -7656,6 +7820,11 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetCity(val OptNilString)
 // SetPrefecture sets the value of Prefecture.
 func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetPrefecture(val OptNilString) {
 	s.Prefecture = val
+}
+
+// SetThumbnailURL sets the value of ThumbnailURL.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetThumbnailURL(val OptNilString) {
+	s.ThumbnailURL = val
 }
 
 // 位置情報.

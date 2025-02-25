@@ -19,9 +19,10 @@ type (
 
 	TalkSession struct {
 		talkSessionID    shared.UUID[TalkSession]
+		ownerUserID      shared.UUID[user.User]
 		theme            string
 		description      *string
-		ownerUserID      shared.UUID[user.User]
+		thumbnailURL     *string
 		scheduledEndTime time.Time // 予定終了時間
 		createdAt        time.Time // 作成日時
 		location         *Location
@@ -34,6 +35,7 @@ func NewTalkSession(
 	talkSessionID shared.UUID[TalkSession],
 	theme string,
 	description *string,
+	thumbnailURL *string,
 	ownerUserID shared.UUID[user.User],
 	createdAt time.Time,
 	scheduledEndTime time.Time,
@@ -45,6 +47,7 @@ func NewTalkSession(
 		talkSessionID:    talkSessionID,
 		theme:            theme,
 		description:      description,
+		thumbnailURL:     thumbnailURL,
 		ownerUserID:      ownerUserID,
 		createdAt:        createdAt,
 		scheduledEndTime: scheduledEndTime,
@@ -68,6 +71,10 @@ func (t *TalkSession) Theme() string {
 
 func (t *TalkSession) Description() *string {
 	return t.description
+}
+
+func (t *TalkSession) ThumbnailURL() *string {
+	return t.thumbnailURL
 }
 
 func (t *TalkSession) ScheduledEndTime() time.Time {

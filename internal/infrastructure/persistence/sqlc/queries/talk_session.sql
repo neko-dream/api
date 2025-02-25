@@ -1,5 +1,5 @@
 -- name: CreateTalkSession :exec
-INSERT INTO talk_sessions (talk_session_id, theme, description, owner_id, scheduled_end_time, created_at, city, prefecture) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
+INSERT INTO talk_sessions (talk_session_id, theme, description, thumbnail_url, owner_id, scheduled_end_time, created_at, city, prefecture) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);
 
 -- name: CreateTalkSessionLocation :exec
 INSERT INTO talk_session_locations (talk_session_id, location) VALUES ($1, ST_GeographyFromText($2));
@@ -16,18 +16,9 @@ UPDATE talk_sessions
 
 -- name: GetTalkSessionByID :one
 SELECT
-    talk_sessions.talk_session_id,
-    talk_sessions.theme,
-    talk_sessions.description,
-    talk_sessions.created_at,
-    talk_sessions.scheduled_end_time,
-    talk_sessions.city AS city,
-    talk_sessions.prefecture AS prefecture,
+    sqlc.embed(talk_sessions),
     COALESCE(oc.opinion_count, 0) AS opinion_count,
-    users.user_id AS user_id,
-    users.display_name AS display_name,
-    users.display_id AS display_id,
-    users.icon_url AS icon_url,
+    sqlc.embed(users),
     talk_session_locations.talk_session_id as location_id,
     COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
     COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude

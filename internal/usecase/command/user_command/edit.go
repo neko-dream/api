@@ -8,6 +8,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/pkg/utils"
@@ -38,13 +39,14 @@ type (
 		Token       string // ユーザーのトークン
 	}
 
-	EditHandler struct {
+	editHandler struct {
 		*db.DBManager
 		session.TokenManager
-		conf        *config.Config
-		userRep     user.UserRepository
-		userService user.UserService
-		sessService session.SessionService
+		conf               *config.Config
+		userRep            user.UserRepository
+		userService        user.UserService
+		sessService        session.SessionService
+		profileIconService service.ProfileIconService
 	}
 )
 
@@ -55,18 +57,20 @@ func NewEditHandler(
 	userRep user.UserRepository,
 	userService user.UserService,
 	sessService session.SessionService,
+	profileIconService service.ProfileIconService,
 ) Edit {
-	return &EditHandler{
-		DBManager:    dm,
-		TokenManager: tm,
-		conf:         conf,
-		userRep:      userRep,
-		userService:  userService,
-		sessService:  sessService,
+	return &editHandler{
+		DBManager:          dm,
+		TokenManager:       tm,
+		conf:               conf,
+		userRep:            userRep,
+		userService:        userService,
+		sessService:        sessService,
+		profileIconService: profileIconService,
 	}
 }
 
-func (e *EditHandler) Execute(ctx context.Context, input EditInput) (*EditOutput, error) {
+func (e *editHandler) Execute(ctx context.Context, input EditInput) (*EditOutput, error) {
 	ctx, span := otel.Tracer("user_command").Start(ctx, "EditHandler.Execute")
 	defer span.End()
 
@@ -78,21 +82,21 @@ func (e *EditHandler) Execute(ctx context.Context, input EditInput) (*EditOutput
 	err := e.ExecTx(ctx, func(ctx context.Context) error {
 		// ユーザーの存在を確認
 		foundUser, err := e.userRep.FindByID(ctx, input.UserID)
-		if err != nil {
+		if err != nil || foundUser == nil {
 			utils.HandleError(ctx, err, "UserRepository.FindByID")
 			return messages.UserNotFoundError
 		}
-		if foundUser == nil {
-			return messages.UserNotFoundError
-		}
+		// ユーザーの表示名を変更
 		foundUser.ChangeName(ctx, input.DisplayName)
 
-		// アイコンがある場合は設定
+		// アイコンがある場合はアップロード
 		if input.Icon != nil {
-			if err := foundUser.SetIconFile(ctx, input.Icon); err != nil {
-				utils.HandleError(ctx, err, "User.SetIconFile")
-				return messages.UserUpdateError
+			url, err := e.profileIconService.UploadProfileIcon(ctx, foundUser.UserID(), input.Icon)
+			if err != nil {
+				utils.HandleError(ctx, err, "SetIcon")
+				return err
 			}
+			foundUser.ChangeIconURL(url)
 		}
 		if input.DeleteIcon {
 			foundUser.DeleteIcon()

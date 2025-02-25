@@ -1,6 +1,6 @@
 services:
   db:
-    image: ghcr.io/baosystems/postgis:15-3.5
+    image: ghcr.io/baosystems/postgis:16-3.5
     container_name: pg
     ports:
       - "5432:5432"
@@ -12,5 +12,6 @@ services:
       POSTGRES_DB: kotohiro
       POSTGRES_USER: kotohiro
       POSTGRES_PASSWORD: kotohiro
+
 volumes:
   pgdata:

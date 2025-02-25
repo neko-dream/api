@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"database/sql"
-	"log"
 	"strings"
 	"text/template"
 
@@ -14,6 +13,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/server/internal/presentation/oas"
+	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
@@ -44,11 +44,9 @@ func (m *manageHandler) ManageRegenerate(ctx context.Context, req oas.OptManageR
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.ManageRegenerate")
 	defer span.End()
 
-	log.Println("ManageRegenerate")
 	tp := req.Value.Type
 	tpb, err := tp.MarshalText()
 	if err != nil {
-		log.Println("failed to marshal text")
 		return nil, err
 	}
 	tpt := string(tpb)
@@ -56,26 +54,26 @@ func (m *manageHandler) ManageRegenerate(ctx context.Context, req oas.OptManageR
 	talkSessionIDStr := req.Value.TalkSessionID
 	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](talkSessionIDStr)
 	if err != nil {
-		log.Println("failed to parse talk session id")
+		utils.HandleError(ctx, err, "shared.ParseUUID")
 		return nil, err
 	}
 
 	switch tpt {
 	case "group":
 		if err := m.AnalysisService.StartAnalysis(ctx, talkSessionID); err != nil {
-			log.Println("failed to start analysis", err)
+			utils.HandleError(ctx, err, "AnalysisService.StartAnalysis")
 			return nil, err
 		}
 	case "report":
 		if err := m.AnalysisService.GenerateReport(ctx, talkSessionID); err != nil {
-			log.Println("failed to generate report", err)
+			utils.HandleError(ctx, err, "AnalysisService.GenerateReport")
 			return nil, err
 		}
 	case "image":
 		// 非同期で画像生成
 		go func() {
-			if _, err := m.AnalysisService.GenerateImage(context.Background(), talkSessionID); err != nil {
-				log.Println("failed to generate image", err)
+			if _, err := m.AnalysisService.GenerateImage(ctx, talkSessionID); err != nil {
+				utils.HandleError(ctx, err, "AnalysisService.GenerateImage")
 				return
 			}
 		}()
@@ -97,6 +95,7 @@ func (m *manageHandler) ManageIndex(ctx context.Context) (oas.ManageIndexOK, err
 		SortKey: sql.NullString{String: "latest", Valid: true},
 	})
 	if err != nil {
+		utils.HandleError(ctx, err, "GetQueries.ListTalkSessions")
 		return oas.ManageIndexOK{}, err
 	}
 	var sessions []map[string]interface{}
@@ -121,6 +120,7 @@ func (m *manageHandler) ManageIndex(ctx context.Context) (oas.ManageIndexOK, err
 	}
 
 	if err := m.templates.ExecuteTemplate(&html, "index.html", data); err != nil {
+		utils.HandleError(ctx, err, "templates.ExecuteTemplate")
 		return oas.ManageIndexOK{}, err
 	}
 

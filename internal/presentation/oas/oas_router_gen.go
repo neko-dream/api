@@ -214,6 +214,27 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				}
 
 				elem = origElem
+			case 'i': // Prefix: "images"
+				origElem := elem
+				if l := len("images"); len(elem) >= l && elem[0:l] == "images" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch r.Method {
+					case "POST":
+						s.handlePostImageRequest([0]string{}, elemIsEscaped, w, r)
+					default:
+						s.notAllowed(w, r, "POST")
+					}
+
+					return
+				}
+
+				elem = origElem
 			case 'm': // Prefix: "manage"
 				origElem := elem
 				if l := len("manage"); len(elem) >= l && elem[0:l] == "manage" {
@@ -1043,6 +1064,31 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					}
 
 					elem = origElem
+				}
+
+				elem = origElem
+			case 'i': // Prefix: "images"
+				origElem := elem
+				if l := len("images"); len(elem) >= l && elem[0:l] == "images" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch method {
+					case "POST":
+						r.name = "PostImage"
+						r.summary = "画像投稿"
+						r.operationID = "postImage"
+						r.pathPattern = "/images"
+						r.args = args
+						r.count = 0
+						return r, true
+					default:
+						return
+					}
 				}
 
 				elem = origElem

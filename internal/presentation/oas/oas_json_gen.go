@@ -311,9 +311,15 @@ func (s *CreateTalkSessionOK) encodeFields(e *jx.Encoder) {
 			s.Prefecture.Encode(e)
 		}
 	}
+	{
+		if s.ThumbnailURL.Set {
+			e.FieldStart("thumbnailURL")
+			s.ThumbnailURL.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfCreateTalkSessionOK = [9]string{
+var jsonFieldsNameOfCreateTalkSessionOK = [10]string{
 	0: "id",
 	1: "theme",
 	2: "description",
@@ -323,6 +329,7 @@ var jsonFieldsNameOfCreateTalkSessionOK = [9]string{
 	6: "location",
 	7: "city",
 	8: "prefecture",
+	9: "thumbnailURL",
 }
 
 // Decode decodes CreateTalkSessionOK from json.
@@ -431,6 +438,16 @@ func (s *CreateTalkSessionOK) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"prefecture\"")
+			}
+		case "thumbnailURL":
+			if err := func() error {
+				s.ThumbnailURL.Reset()
+				if err := s.ThumbnailURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"thumbnailURL\"")
 			}
 		default:
 			return d.Skip()
@@ -1104,9 +1121,15 @@ func (s *EditTalkSessionOK) encodeFields(e *jx.Encoder) {
 			s.Prefecture.Encode(e)
 		}
 	}
+	{
+		if s.ThumbnailURL.Set {
+			e.FieldStart("thumbnailURL")
+			s.ThumbnailURL.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfEditTalkSessionOK = [9]string{
+var jsonFieldsNameOfEditTalkSessionOK = [10]string{
 	0: "id",
 	1: "theme",
 	2: "description",
@@ -1116,6 +1139,7 @@ var jsonFieldsNameOfEditTalkSessionOK = [9]string{
 	6: "location",
 	7: "city",
 	8: "prefecture",
+	9: "thumbnailURL",
 }
 
 // Decode decodes EditTalkSessionOK from json.
@@ -1224,6 +1248,16 @@ func (s *EditTalkSessionOK) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"prefecture\"")
+			}
+		case "thumbnailURL":
+			if err := func() error {
+				s.ThumbnailURL.Reset()
+				if err := s.ThumbnailURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"thumbnailURL\"")
 			}
 		default:
 			return d.Skip()
@@ -2804,9 +2838,15 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) encodeFields(e *jx.E
 			s.Prefecture.Encode(e)
 		}
 	}
+	{
+		if s.ThumbnailURL.Set {
+			e.FieldStart("thumbnailURL")
+			s.ThumbnailURL.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfGetOpenedTalkSessionOKTalkSessionsItemTalkSession = [9]string{
+var jsonFieldsNameOfGetOpenedTalkSessionOKTalkSessionsItemTalkSession = [10]string{
 	0: "id",
 	1: "theme",
 	2: "description",
@@ -2816,6 +2856,7 @@ var jsonFieldsNameOfGetOpenedTalkSessionOKTalkSessionsItemTalkSession = [9]strin
 	6: "location",
 	7: "city",
 	8: "prefecture",
+	9: "thumbnailURL",
 }
 
 // Decode decodes GetOpenedTalkSessionOKTalkSessionsItemTalkSession from json.
@@ -2924,6 +2965,16 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"prefecture\"")
+			}
+		case "thumbnailURL":
+			if err := func() error {
+				s.ThumbnailURL.Reset()
+				if err := s.ThumbnailURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"thumbnailURL\"")
 			}
 		default:
 			return d.Skip()
@@ -4776,9 +4827,15 @@ func (s *GetTalkSessionDetailOK) encodeFields(e *jx.Encoder) {
 			s.Prefecture.Encode(e)
 		}
 	}
+	{
+		if s.ThumbnailURL.Set {
+			e.FieldStart("thumbnailURL")
+			s.ThumbnailURL.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfGetTalkSessionDetailOK = [9]string{
+var jsonFieldsNameOfGetTalkSessionDetailOK = [10]string{
 	0: "id",
 	1: "theme",
 	2: "description",
@@ -4788,6 +4845,7 @@ var jsonFieldsNameOfGetTalkSessionDetailOK = [9]string{
 	6: "location",
 	7: "city",
 	8: "prefecture",
+	9: "thumbnailURL",
 }
 
 // Decode decodes GetTalkSessionDetailOK from json.
@@ -4896,6 +4954,16 @@ func (s *GetTalkSessionDetailOK) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"prefecture\"")
+			}
+		case "thumbnailURL":
+			if err := func() error {
+				s.ThumbnailURL.Reset()
+				if err := s.ThumbnailURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"thumbnailURL\"")
 			}
 		default:
 			return d.Skip()
@@ -5805,9 +5873,15 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) encodeFields(e *jx.Enc
 			s.Prefecture.Encode(e)
 		}
 	}
+	{
+		if s.ThumbnailURL.Set {
+			e.FieldStart("thumbnailURL")
+			s.ThumbnailURL.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfGetTalkSessionListOKTalkSessionsItemTalkSession = [9]string{
+var jsonFieldsNameOfGetTalkSessionListOKTalkSessionsItemTalkSession = [10]string{
 	0: "id",
 	1: "theme",
 	2: "description",
@@ -5817,6 +5891,7 @@ var jsonFieldsNameOfGetTalkSessionListOKTalkSessionsItemTalkSession = [9]string{
 	6: "location",
 	7: "city",
 	8: "prefecture",
+	9: "thumbnailURL",
 }
 
 // Decode decodes GetTalkSessionListOKTalkSessionsItemTalkSession from json.
@@ -5925,6 +6000,16 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder) 
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"prefecture\"")
+			}
+		case "thumbnailURL":
+			if err := func() error {
+				s.ThumbnailURL.Reset()
+				if err := s.ThumbnailURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"thumbnailURL\"")
 			}
 		default:
 			return d.Skip()
@@ -11644,6 +11729,190 @@ func (s *PostConclusionOKUser) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
+func (s *PostImageBadRequest) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *PostImageBadRequest) encodeFields(e *jx.Encoder) {
+}
+
+var jsonFieldsNameOfPostImageBadRequest = [0]string{}
+
+// Decode decodes PostImageBadRequest from json.
+func (s *PostImageBadRequest) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode PostImageBadRequest to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		default:
+			return d.Skip()
+		}
+	}); err != nil {
+		return errors.Wrap(err, "decode PostImageBadRequest")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *PostImageBadRequest) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *PostImageBadRequest) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *PostImageInternalServerError) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *PostImageInternalServerError) encodeFields(e *jx.Encoder) {
+}
+
+var jsonFieldsNameOfPostImageInternalServerError = [0]string{}
+
+// Decode decodes PostImageInternalServerError from json.
+func (s *PostImageInternalServerError) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode PostImageInternalServerError to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		default:
+			return d.Skip()
+		}
+	}); err != nil {
+		return errors.Wrap(err, "decode PostImageInternalServerError")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *PostImageInternalServerError) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *PostImageInternalServerError) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *PostImageOK) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *PostImageOK) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("url")
+		e.Str(s.URL)
+	}
+}
+
+var jsonFieldsNameOfPostImageOK = [1]string{
+	0: "url",
+}
+
+// Decode decodes PostImageOK from json.
+func (s *PostImageOK) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode PostImageOK to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "url":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Str()
+				s.URL = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"url\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode PostImageOK")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfPostImageOK) {
+					name = jsonFieldsNameOfPostImageOK[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *PostImageOK) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *PostImageOK) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s *PostOpinionPostBadRequest) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -12887,18 +13156,18 @@ func (s *SessionsHistoryOKTalkSessionsItem) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *SessionsHistoryOKTalkSessionsItem) encodeFields(e *jx.Encoder) {
 	{
-		e.FieldStart("opinionCount")
-		e.Int(s.OpinionCount)
-	}
-	{
 		e.FieldStart("talkSession")
 		s.TalkSession.Encode(e)
+	}
+	{
+		e.FieldStart("opinionCount")
+		e.Int(s.OpinionCount)
 	}
 }
 
 var jsonFieldsNameOfSessionsHistoryOKTalkSessionsItem = [2]string{
-	0: "opinionCount",
-	1: "talkSession",
+	0: "talkSession",
+	1: "opinionCount",
 }
 
 // Decode decodes SessionsHistoryOKTalkSessionsItem from json.
@@ -12910,8 +13179,18 @@ func (s *SessionsHistoryOKTalkSessionsItem) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "opinionCount":
+		case "talkSession":
 			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				if err := s.TalkSession.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"talkSession\"")
+			}
+		case "opinionCount":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
 				v, err := d.Int()
 				s.OpinionCount = int(v)
@@ -12921,16 +13200,6 @@ func (s *SessionsHistoryOKTalkSessionsItem) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"opinionCount\"")
-			}
-		case "talkSession":
-			requiredBitSet[0] |= 1 << 1
-			if err := func() error {
-				if err := s.TalkSession.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"talkSession\"")
 			}
 		default:
 			return d.Skip()
@@ -13041,9 +13310,15 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) encodeFields(e *jx.Encode
 			s.Prefecture.Encode(e)
 		}
 	}
+	{
+		if s.ThumbnailURL.Set {
+			e.FieldStart("thumbnailURL")
+			s.ThumbnailURL.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfSessionsHistoryOKTalkSessionsItemTalkSession = [9]string{
+var jsonFieldsNameOfSessionsHistoryOKTalkSessionsItemTalkSession = [10]string{
 	0: "id",
 	1: "theme",
 	2: "description",
@@ -13053,6 +13328,7 @@ var jsonFieldsNameOfSessionsHistoryOKTalkSessionsItemTalkSession = [9]string{
 	6: "location",
 	7: "city",
 	8: "prefecture",
+	9: "thumbnailURL",
 }
 
 // Decode decodes SessionsHistoryOKTalkSessionsItemTalkSession from json.
@@ -13161,6 +13437,16 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder) err
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"prefecture\"")
+			}
+		case "thumbnailURL":
+			if err := func() error {
+				s.ThumbnailURL.Reset()
+				if err := s.ThumbnailURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"thumbnailURL\"")
 			}
 		default:
 			return d.Skip()

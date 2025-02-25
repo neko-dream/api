@@ -64,6 +64,7 @@ type TalkSession struct {
 	City             sql.NullString
 	Prefecture       sql.NullString
 	Description      sql.NullString
+	ThumbnailUrl     sql.NullString
 }
 
 type TalkSessionConclusion struct {
@@ -134,6 +135,19 @@ type UserGroupInfo struct {
 	UpdatedAt      time.Time
 	CreatedAt      time.Time
 	PerimeterIndex sql.NullInt32
+}
+
+type UserImage struct {
+	UserImagesID uuid.UUID
+	UserID       uuid.UUID
+	Key          string
+	Width        int32
+	Height       int32
+	Extension    string
+	Archived     bool
+	Url          string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
 
 type Vote struct {

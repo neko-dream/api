@@ -128,24 +128,28 @@ func (t *talkSessionRepository) FindByID(ctx context.Context, talkSessionID shar
 			row.Longitude,
 		)
 	}
-	var description, city, prefecture *string
-	if row.City.Valid {
-		city = &row.City.String
+	var description, city, prefecture, thumbnailURL *string
+	if row.TalkSession.City.Valid {
+		city = &row.TalkSession.City.String
 	}
-	if row.Prefecture.Valid {
-		prefecture = &row.Prefecture.String
+	if row.TalkSession.Prefecture.Valid {
+		prefecture = &row.TalkSession.Prefecture.String
 	}
-	if row.Description.Valid {
-		description = &row.Description.String
+	if row.TalkSession.Description.Valid {
+		description = &row.TalkSession.Description.String
+	}
+	if row.TalkSession.ThumbnailUrl.Valid {
+		thumbnailURL = &row.TalkSession.ThumbnailUrl.String
 	}
 
 	return talksession.NewTalkSession(
 		talkSessionID,
-		row.Theme,
+		row.TalkSession.Theme,
 		description,
-		shared.UUID[user.User](row.UserID.UUID),
-		row.CreatedAt,
-		row.ScheduledEndTime,
+		thumbnailURL,
+		shared.UUID[user.User](row.User.UserID),
+		row.TalkSession.CreatedAt,
+		row.TalkSession.ScheduledEndTime,
 		location,
 		city,
 		prefecture,

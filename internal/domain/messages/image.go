@@ -12,19 +12,24 @@ var (
 		Message:    "対応していない画像形式です。",
 	}
 	ImageOpenFailedError = &APIError{
-		StatusCode: 500,
+		StatusCode: 400,
 		Code:       "IMG-0003",
-		Message:    "画像の読み込みに失敗しました。しばらくしてから再度お試しください。",
+		Message:    "画像の読み込みに失敗しました。画像が壊れている可能性があります。",
 	}
 	ImageDecodeFailedError = &APIError{
-		StatusCode: 500,
+		StatusCode: 400,
 		Code:       "IMG-0004",
-		Message:    "画像のデコードに失敗しました。しばらくしてから再度お試しください。",
+		Message:    "画像のデコードに失敗しました。画像が壊れている可能性があります。",
 	}
 
 	ImageFilePathEmptyError = &APIError{
 		StatusCode: 500,
 		Code:       "IMG-0005",
 		Message:    "画像のファイルパスが空です。",
+	}
+	ImageUploadFailedError = &APIError{
+		StatusCode: 500,
+		Code:       "IMG-0006",
+		Message:    "画像のアップロードに失敗しました。",
 	}
 )

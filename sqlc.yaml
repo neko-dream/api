@@ -1,7 +1,7 @@
 version: "2"
 sql:
     - engine: "postgresql"
-      queries: "./internal/infrastructure/persistence/sqlc/queries/"
+      queries: "./internal/infrastructure/persistence/sqlc/queries/**"
       schema: "./migrations/*.up.sql"
       gen:
           go:

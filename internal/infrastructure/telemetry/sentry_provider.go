@@ -15,13 +15,12 @@ import (
 
 func SentryProvider(conf *config.Config) *sdktrace.TracerProvider {
 	if err := sentry.Init(sentry.ClientOptions{
-		Environment:        conf.Env.String(),
-		Dsn:                conf.SENTRY_DSN,
-		EnableTracing:      true,
-		TracesSampleRate:   1.0,
-		ProfilesSampleRate: 0.1,
-		Debug:              false,
-		ServerName:         "kotohiro-server",
+		Environment:      conf.Env.String(),
+		Dsn:              conf.SENTRY_DSN,
+		EnableTracing:    true,
+		TracesSampleRate: 1.0,
+		Debug:            false,
+		ServerName:       "kotohiro-server",
 	}); err != nil {
 		panic(err)
 	}

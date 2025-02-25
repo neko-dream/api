@@ -22,16 +22,16 @@ import (
 
 type userRepository struct {
 	*db.DBManager
-	imageRepository image.ImageRepository
+	imageStorage image.ImageStorage
 }
 
 func NewUserRepository(
 	DBManager *db.DBManager,
-	imageRepository image.ImageRepository,
+	imageStorage image.ImageStorage,
 ) user.UserRepository {
 	return &userRepository{
-		DBManager:       DBManager,
-		imageRepository: imageRepository,
+		DBManager:    DBManager,
+		imageStorage: imageStorage,
 	}
 }
 
@@ -63,18 +63,23 @@ func (u *userRepository) FindByDisplayID(ctx context.Context, displayID string) 
 	if err != nil {
 		return nil, errtrace.Wrap(err)
 	}
-	var profileIcon *user.ProfileIcon
+	var iconURL *string
 	if userRow.IconUrl.Valid {
-		profileIcon = user.NewProfileIcon(lo.ToPtr(userRow.IconUrl.String))
+		iconURL = &userRow.IconUrl.String
+	}
+
+	userID, err := shared.ParseUUID[user.User](userRow.UserID.String())
+	if err != nil {
+		return nil, err
 	}
 
 	user := user.NewUser(
-		shared.MustParseUUID[user.User](userRow.UserID.String()),
+		userID,
 		lo.ToPtr(displayID),
 		lo.ToPtr(userRow.DisplayName.String),
 		userAuthRow.Subject,
 		providerName,
-		profileIcon,
+		iconURL,
 	)
 
 	return &user, nil
@@ -84,17 +89,6 @@ func (u *userRepository) FindByDisplayID(ctx context.Context, displayID string) 
 func (u *userRepository) Update(ctx context.Context, user um.User) error {
 	ctx, span := otel.Tracer("repository").Start(ctx, "userRepository.Update")
 	defer span.End()
-
-	var iconURL sql.NullString
-	if user.IsIconUpdateRequired() {
-		url, err := u.imageRepository.Create(ctx, *user.ProfileIcon().ImageInfo())
-		if err != nil {
-			utils.HandleError(ctx, err, "ImageRepository.Create")
-			return errtrace.Wrap(err)
-		}
-		iconURL = sql.NullString{String: *url, Valid: true}
-	}
-
 	if err := u.GetQueries(ctx).UpdateUser(ctx, model.UpdateUserParams{
 		UserID: user.UserID().UUID(),
 		DisplayName: utils.IfThenElse(
@@ -107,7 +101,11 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 			sql.NullString{String: *user.DisplayID(), Valid: true},
 			sql.NullString{},
 		),
-		IconUrl: iconURL,
+		IconUrl: utils.IfThenElse(
+			user.IconURL() != nil,
+			sql.NullString{String: *user.IconURL(), Valid: true},
+			sql.NullString{},
+		),
 	}); err != nil {
 		utils.HandleError(ctx, err, "UpdateUser")
 		return errtrace.Wrap(err)
@@ -221,25 +219,24 @@ func (u *userRepository) FindByID(ctx context.Context, userID shared.UUID[user.U
 	if err != nil {
 		return nil, errtrace.Wrap(err)
 	}
-	var displayID, displayName *string
+	var displayID, displayName, iconURL *string
 	if userRow.DisplayID.Valid {
 		displayID = &userRow.DisplayID.String
 	}
 	if userRow.DisplayName.Valid {
 		displayName = &userRow.DisplayName.String
 	}
-	var profIcon *user.ProfileIcon
 	if userRow.IconUrl.Valid {
-		profIcon = user.NewProfileIcon(lo.ToPtr(userRow.IconUrl.String))
+		iconURL = &userRow.IconUrl.String
 	}
 
 	user := user.NewUser(
-		shared.MustParseUUID[user.User](userRow.UserID.String()),
+		userID,
 		displayID,
 		displayName,
 		userAuthRow.Subject,
 		providerName,
-		profIcon,
+		iconURL,
 	)
 	if UserDemographic != nil {
 		user.SetDemographics(*UserDemographic)
@@ -266,7 +263,10 @@ func (u *userRepository) findUserDemographic(ctx context.Context, userID shared.
 		gender        *string
 		prefecture    *string
 	)
-	UserDemographicID := shared.MustParseUUID[user.UserDemographic](userDemoRow.UserDemographicsID.String())
+	UserDemographicID, err := shared.ParseUUID[user.UserDemographic](userDemoRow.UserDemographicsID.String())
+	if err != nil {
+		return nil, err
+	}
 
 	if userDemoRow.YearOfBirth.Valid {
 		yearOfBirth = lo.ToPtr(int(userDemoRow.YearOfBirth.Int32))
@@ -313,16 +313,15 @@ func (u *userRepository) FindBySubject(ctx context.Context, subject user.UserSub
 	if err != nil {
 		return nil, errtrace.Wrap(err)
 	}
-	var displayID, displayName *string
+	var displayID, displayName, iconURL *string
 	if row.DisplayID.Valid {
 		displayID = &row.DisplayID.String
 	}
 	if row.DisplayName.Valid {
 		displayName = &row.DisplayName.String
 	}
-	var profileIcon *user.ProfileIcon
 	if row.IconUrl.Valid {
-		profileIcon = user.NewProfileIcon(lo.ToPtr(row.IconUrl.String))
+		iconURL = &row.IconUrl.String
 	}
 
 	user := user.NewUser(
@@ -331,7 +330,7 @@ func (u *userRepository) FindBySubject(ctx context.Context, subject user.UserSub
 		displayName,
 		row.Subject,
 		providerName,
-		profileIcon,
+		iconURL,
 	)
 
 	return &user, nil

@@ -9,6 +9,7 @@ import (
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
 	AuthHandler
+	ImageHandler
 	ManageHandler
 	OpinionHandler
 	TalkSessionHandler
@@ -52,6 +53,18 @@ type AuthHandler interface {
 	//
 	// POST /auth/revoke
 	OAuthTokenRevoke(ctx context.Context) (OAuthTokenRevokeRes, error)
+}
+
+// ImageHandler handles operations described by OpenAPI v3 specification.
+//
+// x-ogen-operation-group: Image
+type ImageHandler interface {
+	// PostImage implements postImage operation.
+	//
+	// 画像を投稿してURLを返すAPI.
+	//
+	// POST /images
+	PostImage(ctx context.Context, req OptPostImageReq) (PostImageRes, error)
 }
 
 // ManageHandler handles operations described by OpenAPI v3 specification.
@@ -112,7 +125,9 @@ type OpinionHandler interface {
 type TalkSessionHandler interface {
 	// CreateTalkSession implements createTalkSession operation.
 	//
-	// セッション作成.
+	// ## サムネイル画像について
+	// - `Description中に出てくる画像で一番最初のものを使用`。
+	// - 画像自体は`POST /images`でサーバにポストしたものを使用してください。.
 	//
 	// POST /talksessions
 	CreateTalkSession(ctx context.Context, req OptCreateTalkSessionReq) (CreateTalkSessionRes, error)

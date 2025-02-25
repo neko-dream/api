@@ -9,6 +9,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/pkg/utils"
@@ -43,10 +44,11 @@ type (
 	registerHandler struct {
 		*db.DBManager
 		session.TokenManager
-		conf        *config.Config
-		userRep     user.UserRepository
-		userService user.UserService
-		sessService session.SessionService
+		conf               *config.Config
+		userRep            user.UserRepository
+		userService        user.UserService
+		sessService        session.SessionService
+		profileIconService service.ProfileIconService
 	}
 )
 
@@ -57,14 +59,16 @@ func NewRegisterHandler(
 	userRep user.UserRepository,
 	userService user.UserService,
 	sessService session.SessionService,
+	profileIconService service.ProfileIconService,
 ) Register {
 	return &registerHandler{
-		DBManager:    dm,
-		TokenManager: tm,
-		conf:         conf,
-		userRep:      userRep,
-		userService:  userService,
-		sessService:  sessService,
+		DBManager:          dm,
+		TokenManager:       tm,
+		conf:               conf,
+		userRep:            userRep,
+		userService:        userService,
+		sessService:        sessService,
+		profileIconService: profileIconService,
 	}
 }
 
@@ -106,17 +110,12 @@ func (i *registerHandler) Execute(ctx context.Context, input RegisterInput) (*Re
 
 		foundUser.ChangeName(ctx, &input.DisplayName)
 
-		if err := foundUser.SetIconFile(ctx, input.Icon); err != nil {
-			utils.HandleError(ctx, err, "User.SetIconFile")
-			return messages.UserUpdateError
-		}
-
-		// アイコンが指定されていればアイコンを設定
 		if input.Icon != nil {
-			if err := foundUser.SetIconFile(ctx, input.Icon); err != nil {
-				utils.HandleError(ctx, err, "User.SetIconFile")
-				return messages.UserUpdateError
+			url, err := i.profileIconService.UploadProfileIcon(ctx, foundUser.UserID(), input.Icon)
+			if err != nil {
+				return err
 			}
+			foundUser.ChangeIconURL(url)
 		}
 
 		// デモグラ情報を設定
@@ -136,8 +135,8 @@ func (i *registerHandler) Execute(ctx context.Context, input RegisterInput) (*Re
 			return messages.UserUpdateError
 		}
 
-		if foundUser.ProfileIconURL() != nil {
-			iconURL = foundUser.ProfileIconURL()
+		if foundUser.IconURL() != nil {
+			iconURL = foundUser.IconURL()
 		}
 
 		sess, err := i.sessService.RefreshSession(ctx, input.UserID)

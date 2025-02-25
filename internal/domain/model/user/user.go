@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"mime/multipart"
 	"unicode/utf8"
 
 	"github.com/neko-dream/server/internal/domain/messages"
@@ -43,7 +42,7 @@ type (
 		userID       shared.UUID[User]
 		displayID    *string
 		displayName  *string
-		profileIcon  *ProfileIcon
+		iconURL      *string
 		subject      string
 		provider     auth.AuthProviderName
 		demographics *UserDemographic
@@ -92,39 +91,15 @@ func (u *User) Subject() string {
 	return u.subject
 }
 
-func (u *User) ProfileIconURL() *string {
-	if u.profileIcon == nil {
-		return nil
-	} else {
-		return u.profileIcon.url
-	}
+func (u *User) IconURL() *string {
+	return u.iconURL
+}
+func (u *User) ChangeIconURL(url *string) {
+	u.iconURL = url
 }
 
-func (u *User) ProfileIcon() *ProfileIcon {
-	return u.profileIcon
-}
-
-func (u *User) IsIconUpdateRequired() bool {
-	return u.profileIcon != nil && u.profileIcon.url == nil && u.profileIcon.ImageInfo() != nil
-}
-
-func (u *User) SetIconFile(ctx context.Context, file *multipart.FileHeader) error {
-	ctx, span := otel.Tracer("user").Start(ctx, "User.SetIconFile")
-	defer span.End()
-	if file == nil {
-		return nil
-	}
-
-	profileIcon := NewProfileIcon(nil)
-	if err := profileIcon.SetProfileIconImage(ctx, file, *u); err != nil {
-		return err
-	}
-	u.profileIcon = profileIcon
-	u.profileIcon.url = nil
-	return nil
-}
 func (u *User) DeleteIcon() {
-	u.profileIcon = nil
+	u.iconURL = nil
 }
 
 func (u *User) Provider() auth.AuthProviderName {
@@ -149,7 +124,7 @@ func NewUser(
 	displayName *string,
 	subject string,
 	provider auth.AuthProviderName,
-	profileIcon *ProfileIcon,
+	iconURL *string,
 ) User {
 	return User{
 		userID:      userID,
@@ -157,6 +132,6 @@ func NewUser(
 		displayName: displayName,
 		subject:     subject,
 		provider:    provider,
-		profileIcon: profileIcon,
+		iconURL:     iconURL,
 	}
 }

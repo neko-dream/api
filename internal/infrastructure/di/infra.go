@@ -24,6 +24,7 @@ func infraDeps() []ProvideArg {
 		{repository.InitConfig, nil},
 		{repository.InitS3Client, nil},
 		{repository.NewImageRepository, nil},
+		{repository.NewImageStorage, nil},
 		{repository.NewSessionRepository, nil},
 		{repository.NewUserRepository, nil},
 		{repository.NewTalkSessionRepository, nil},
