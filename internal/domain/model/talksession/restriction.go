@@ -25,21 +25,39 @@ const (
 var (
 	RestrictionAttributeKeyMap = map[RestrictionAttributeKey]RestrictionAttribute{
 		DemographicsCity: {Key: DemographicsCity, Description: "市区町村", Fn: func(user user.User) bool {
+			if user.Demographics() == nil {
+				return false
+			}
 			return user.Demographics().City() != nil
 		}},
 		DemographicsPrefecture: {Key: DemographicsPrefecture, Description: "都道府県", Fn: func(user user.User) bool {
+			if user.Demographics() == nil {
+				return false
+			}
 			return user.Demographics().Prefecture() != nil
 		}},
 		DemographicsGender: {Key: DemographicsGender, Description: "性別", Fn: func(user user.User) bool {
+			if user.Demographics() == nil {
+				return false
+			}
 			return user.Demographics().Gender() != nil
 		}},
 		DemographicsHouseholdSize: {Key: DemographicsHouseholdSize, Description: "世帯人数", Fn: func(user user.User) bool {
+			if user.Demographics() == nil {
+				return false
+			}
 			return user.Demographics().HouseholdSize() != nil
 		}},
 		DemographicsOccupation: {Key: DemographicsOccupation, Description: "職業", Fn: func(user user.User) bool {
+			if user.Demographics() == nil {
+				return false
+			}
 			return user.Demographics().Occupation() != nil
 		}},
 		DemographicsBirth: {Key: DemographicsBirth, Description: "誕生年", Fn: func(user user.User) bool {
+			if user.Demographics() == nil {
+				return false
+			}
 			return user.Demographics().YearOfBirth() != nil
 		}},
 	}
