@@ -41,6 +41,7 @@ func NewTalkSessionHandler(
 	browseOpenedByUserQuery talksession_query.BrowseOpenedByUserQuery,
 	getConclusionByIDQuery talksession_query.GetConclusionByIDQuery,
 	getTalkSessionDetailByIDQuery talksession_query.GetTalkSessionDetailByIDQuery,
+	getRestrictionsQuery talksession_query.GetRestrictionsQuery,
 	getAnalysisQuery analysis_query.GetAnalysisResult,
 	getReportQuery analysis_query.GetReportQuery,
 
@@ -54,6 +55,7 @@ func NewTalkSessionHandler(
 		browseOpenedByUserQuery:       browseOpenedByUserQuery,
 		getConclusionByIDQuery:        getConclusionByIDQuery,
 		getTalkSessionDetailByIDQuery: getTalkSessionDetailByIDQuery,
+		getRestrictions:               getRestrictionsQuery,
 		getAnalysisResultQuery:        getAnalysisQuery,
 		getReportQuery:                getReportQuery,
 
