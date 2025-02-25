@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -10,6 +11,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
+	"github.com/sqlc-dev/pqtype"
 	"go.opentelemetry.io/otel"
 )
 
@@ -49,6 +51,18 @@ func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talkses
 		}
 	}
 
+	restrictionRaw := pqtype.NullRawMessage{}
+	if len(talkSession.Restrictions()) > 0 {
+		restrictions, err := json.Marshal(talkSession.Restrictions())
+		if err != nil {
+			return err
+		}
+		restrictionRaw = pqtype.NullRawMessage{
+			RawMessage: json.RawMessage(restrictions),
+			Valid:      true,
+		}
+	}
+
 	if err := t.GetQueries(ctx).CreateTalkSession(ctx, model.CreateTalkSessionParams{
 		TalkSessionID:    talkSession.TalkSessionID().UUID(),
 		Theme:            talkSession.Theme(),
@@ -58,6 +72,7 @@ func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talkses
 		ScheduledEndTime: talkSession.ScheduledEndTime(),
 		Prefecture:       prefecture,
 		City:             city,
+		Restrictions:     restrictionRaw,
 	}); err != nil {
 		return errtrace.Wrap(err)
 	}
@@ -82,11 +97,41 @@ func (t *talkSessionRepository) Update(ctx context.Context, talkSession *talkses
 	if talkSession == nil {
 		return nil
 	}
-	var description sql.NullString
+	var description, thumbnailURL, city, preference sql.NullString
 	if talkSession.Description() != nil {
 		description = sql.NullString{
 			String: *talkSession.Description(),
 			Valid:  true,
+		}
+	}
+	if talkSession.ThumbnailURL() != nil {
+		thumbnailURL = sql.NullString{
+			String: *talkSession.ThumbnailURL(),
+			Valid:  true,
+		}
+	}
+	if talkSession.City() != nil {
+		city = sql.NullString{
+			String: *talkSession.City(),
+			Valid:  true,
+		}
+	}
+	if talkSession.Prefecture() != nil {
+		preference = sql.NullString{
+			String: *talkSession.Prefecture(),
+			Valid:  true,
+		}
+	}
+
+	restrictionRaw := pqtype.NullRawMessage{}
+	if len(talkSession.Restrictions()) > 0 {
+		restrictions, err := json.Marshal(talkSession.Restrictions())
+		if err != nil {
+			return err
+		}
+		restrictionRaw = pqtype.NullRawMessage{
+			RawMessage: json.RawMessage(restrictions),
+			Valid:      true,
 		}
 	}
 
@@ -95,6 +140,10 @@ func (t *talkSessionRepository) Update(ctx context.Context, talkSession *talkses
 		Theme:            talkSession.Theme(),
 		ScheduledEndTime: talkSession.ScheduledEndTime(),
 		Description:      description,
+		ThumbnailUrl:     thumbnailURL,
+		City:             city,
+		Prefecture:       preference,
+		Restrictions:     restrictionRaw,
 	}); err != nil {
 		return errtrace.Wrap(err)
 	}
@@ -142,7 +191,7 @@ func (t *talkSessionRepository) FindByID(ctx context.Context, talkSessionID shar
 		thumbnailURL = &row.TalkSession.ThumbnailUrl.String
 	}
 
-	return talksession.NewTalkSession(
+	ts := talksession.NewTalkSession(
 		talkSessionID,
 		row.TalkSession.Theme,
 		description,
@@ -153,6 +202,20 @@ func (t *talkSessionRepository) FindByID(ctx context.Context, talkSessionID shar
 		location,
 		city,
 		prefecture,
-	), nil
+	)
 
+	restrictionRaw := row.TalkSession.Restrictions
+	if restrictionRaw.Valid {
+		// stringの配列になっているはず
+		var restrictions []string
+		if err := json.Unmarshal([]byte(restrictionRaw.RawMessage), &restrictions); err != nil {
+			return nil, errtrace.Wrap(err)
+		}
+
+		if err := ts.UpdateRestrictions(ctx, restrictions); err != nil {
+			return nil, errtrace.Wrap(err)
+		}
+	}
+
+	return ts, nil
 }
