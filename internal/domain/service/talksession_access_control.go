@@ -5,20 +5,30 @@ import (
 	"strings"
 
 	"github.com/neko-dream/server/internal/domain/messages"
+	"github.com/neko-dream/server/internal/domain/model/shared"
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/server/pkg/utils"
 )
 
 type TalkSessionAccessControl interface {
 	// CanUserJoin はユーザーがトークセッションに参加できるかを判定する
-	CanUserJoin(ctx context.Context, talkSession *talksession.TalkSession, user *user.User) (bool, error)
+	CanUserJoin(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession], userID *shared.UUID[user.User]) (bool, error)
 }
 
 type talkSessionAccessControl struct {
+	talksession.TalkSessionRepository
+	user.UserRepository
 }
 
-func NewTalkSessionAccessControl() TalkSessionAccessControl {
-	return &talkSessionAccessControl{}
+func NewTalkSessionAccessControl(
+	talkSessionRepository talksession.TalkSessionRepository,
+	userRepository user.UserRepository,
+) TalkSessionAccessControl {
+	return &talkSessionAccessControl{
+		TalkSessionRepository: talkSessionRepository,
+		UserRepository:        userRepository,
+	}
 }
 
 var (
@@ -30,14 +40,22 @@ var (
 	}
 )
 
-func (t *talkSessionAccessControl) CanUserJoin(ctx context.Context, talkSession *talksession.TalkSession, user *user.User) (bool, error) {
-	if talkSession == nil {
-		return false, &ErrRestrictionNotSatisfied
+func (t *talkSessionAccessControl) CanUserJoin(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession], userID *shared.UUID[user.User]) (bool, error) {
+	// talksessionが存在するか確認
+	talkSession, err := t.TalkSessionRepository.FindByID(ctx, talkSessionID)
+	if err != nil || talkSession == nil {
+		utils.HandleError(ctx, err, "TalkSessionRepository.FindByID")
+		return false, messages.TalkSessionNotFound
 	}
 
-	// あとあとユーザーが設定されていなくても参加できるような仕様になるかもしれないが、現状はユーザーが設定されていない場合は参加不可とする
-	if user == nil {
-		return false, &ErrRestrictionNotSatisfied
+	// userの存在確認
+	var user *user.User
+	if userID != nil {
+		user, err = t.UserRepository.FindByID(ctx, *userID)
+		if err != nil || user == nil {
+			utils.HandleError(ctx, err, "UserRepository.FindByID")
+			return false, messages.UserNotFoundError
+		}
 	}
 
 	// 参加制限がない場合は参加可能
