@@ -334,6 +334,8 @@ type CreateTalkSessionReq struct {
 	Description OptNilString `json:"description"`
 	// サムネイルURL。文中から一番最初の画像URLをサムネとする。.
 	ThumbnailURL OptNilString `json:"thumbnailURL"`
+	// 投稿制限のキー.
+	Restrictions []string `json:"restrictions"`
 }
 
 // GetTheme returns the value of Theme.
@@ -376,6 +378,11 @@ func (s *CreateTalkSessionReq) GetThumbnailURL() OptNilString {
 	return s.ThumbnailURL
 }
 
+// GetRestrictions returns the value of Restrictions.
+func (s *CreateTalkSessionReq) GetRestrictions() []string {
+	return s.Restrictions
+}
+
 // SetTheme sets the value of Theme.
 func (s *CreateTalkSessionReq) SetTheme(val string) {
 	s.Theme = val
@@ -414,6 +421,11 @@ func (s *CreateTalkSessionReq) SetDescription(val OptNilString) {
 // SetThumbnailURL sets the value of ThumbnailURL.
 func (s *CreateTalkSessionReq) SetThumbnailURL(val OptNilString) {
 	s.ThumbnailURL = val
+}
+
+// SetRestrictions sets the value of Restrictions.
+func (s *CreateTalkSessionReq) SetRestrictions(val []string) {
+	s.Restrictions = val
 }
 
 type DevAuthorizeBadRequest struct{}
@@ -2834,6 +2846,43 @@ func (s *GetTalkSessionReportOK) SetReport(val string) {
 }
 
 func (*GetTalkSessionReportOK) getTalkSessionReportRes() {}
+
+type GetTalkSessionRestrictionKeysBadRequest struct{}
+
+func (*GetTalkSessionRestrictionKeysBadRequest) getTalkSessionRestrictionKeysRes() {}
+
+type GetTalkSessionRestrictionKeysInternalServerError struct{}
+
+func (*GetTalkSessionRestrictionKeysInternalServerError) getTalkSessionRestrictionKeysRes() {}
+
+type GetTalkSessionRestrictionKeysOKApplicationJSON []GetTalkSessionRestrictionKeysOKItem
+
+func (*GetTalkSessionRestrictionKeysOKApplicationJSON) getTalkSessionRestrictionKeysRes() {}
+
+type GetTalkSessionRestrictionKeysOKItem struct {
+	Key         string `json:"key"`
+	Description string `json:"description"`
+}
+
+// GetKey returns the value of Key.
+func (s *GetTalkSessionRestrictionKeysOKItem) GetKey() string {
+	return s.Key
+}
+
+// GetDescription returns the value of Description.
+func (s *GetTalkSessionRestrictionKeysOKItem) GetDescription() string {
+	return s.Description
+}
+
+// SetKey sets the value of Key.
+func (s *GetTalkSessionRestrictionKeysOKItem) SetKey(val string) {
+	s.Key = val
+}
+
+// SetDescription sets the value of Description.
+func (s *GetTalkSessionRestrictionKeysOKItem) SetDescription(val string) {
+	s.Description = val
+}
 
 type GetTimeLineBadRequest struct{}
 

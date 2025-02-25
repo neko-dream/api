@@ -26,6 +26,7 @@ type talkSessionHandler struct {
 	browseOpenedByUserQuery       talksession_query.BrowseOpenedByUserQuery
 	getConclusionByIDQuery        talksession_query.GetConclusionByIDQuery
 	getTalkSessionDetailByIDQuery talksession_query.GetTalkSessionDetailByIDQuery
+	getRestrictions               talksession_query.GetRestrictionsQuery
 	getAnalysisResultQuery        analysis_query.GetAnalysisResult
 	getReportQuery                analysis_query.GetReportQuery
 
@@ -549,4 +550,26 @@ func (t *talkSessionHandler) EditTalkSession(ctx context.Context, req oas.OptEdi
 	_ = ctx
 
 	panic("unimplemented")
+}
+
+// GetTalkSessionRestrictionKeys implements oas.TalkSessionHandler.
+func (t *talkSessionHandler) GetTalkSessionRestrictionKeys(ctx context.Context) (oas.GetTalkSessionRestrictionKeysRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetTalkSessionRestrictionKeys")
+	defer span.End()
+
+	out, err := t.getRestrictions.Execute(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	keys := make([]oas.GetTalkSessionRestrictionKeysOKItem, 0, len(out.Restrictions))
+	for _, restriction := range out.Restrictions {
+		keys = append(keys, oas.GetTalkSessionRestrictionKeysOKItem{
+			Key:         string(restriction.Key),
+			Description: restriction.Description,
+		})
+	}
+
+	res := oas.GetTalkSessionRestrictionKeysOKApplicationJSON(keys)
+	return &res, nil
 }

@@ -9,6 +9,7 @@ import (
 	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 type TalkSessionAccessControl interface {
@@ -41,6 +42,9 @@ var (
 )
 
 func (t *talkSessionAccessControl) CanUserJoin(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession], userID *shared.UUID[user.User]) (bool, error) {
+	ctx, span := otel.Tracer("service").Start(ctx, "talkSessionAccessControl.CanUserJoin")
+	defer span.End()
+
 	// talksessionが存在するか確認
 	talkSession, err := t.TalkSessionRepository.FindByID(ctx, talkSessionID)
 	if err != nil || talkSession == nil {

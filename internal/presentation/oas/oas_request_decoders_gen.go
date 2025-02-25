@@ -352,6 +352,56 @@ func (s *Server) decodeCreateTalkSessionRequest(r *http.Request) (
 					}
 				}
 			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "restrictions",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						return d.DecodeArray(func(d uri.Decoder) error {
+							var optFormDotRestrictionsVal string
+							if err := func() error {
+								val, err := d.DecodeValue()
+								if err != nil {
+									return err
+								}
+
+								c, err := conv.ToString(val)
+								if err != nil {
+									return err
+								}
+
+								optFormDotRestrictionsVal = c
+								return nil
+							}(); err != nil {
+								return err
+							}
+							optForm.Restrictions = append(optForm.Restrictions, optFormDotRestrictionsVal)
+							return nil
+						})
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"restrictions\"")
+					}
+					if err := func() error {
+						if err := (validate.Array{
+							MinLength:    0,
+							MinLengthSet: false,
+							MaxLength:    0,
+							MaxLengthSet: false,
+						}).ValidateLength(len(optForm.Restrictions)); err != nil {
+							return errors.Wrap(err, "array")
+						}
+						if err := validate.UniqueItems(optForm.Restrictions); err != nil {
+							return errors.Wrap(err, "array")
+						}
+						return nil
+					}(); err != nil {
+						return req, close, errors.Wrap(err, "validate")
+					}
+				}
+			}
 			request = OptCreateTalkSessionReq{
 				Value: optForm,
 				Set:   true,
