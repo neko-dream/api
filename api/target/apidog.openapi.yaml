@@ -1038,6 +1038,13 @@
                       "type": "string",
                       "description": "サムネ画像",
                       "nullable": true
+                    },
+                    "restrictions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/restriction"
+                      },
+                      "description": "セッションの参加制限"
                     }
                   },
                   "required": [
@@ -1045,7 +1052,8 @@
                     "theme",
                     "owner",
                     "createdAt",
-                    "scheduledEndTime"
+                    "scheduledEndTime",
+                    "restrictions"
                   ]
                 }
               }
@@ -4126,6 +4134,13 @@
             "type": "string",
             "description": "サムネ画像",
             "nullable": true
+          },
+          "restrictions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/restriction"
+            },
+            "description": "セッションの参加制限"
           }
         },
         "required": [
@@ -4133,7 +4148,8 @@
           "theme",
           "owner",
           "createdAt",
-          "scheduledEndTime"
+          "scheduledEndTime",
+          "restrictions"
         ]
       },
       "validationErrorItem": {

@@ -752,12 +752,26 @@ paths:
                     type: string
                     description: サムネ画像
                     nullable: true
+                  restrictions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: string
+                        description:
+                          type: string
+                      required:
+                        - key
+                        - description
+                    description: セッションの参加制限
                 required:
                   - id
                   - theme
                   - owner
                   - createdAt
                   - scheduledEndTime
+                  - restrictions
           headers: {}
         '400':
           description: ''
@@ -900,12 +914,26 @@ paths:
                     type: string
                     description: サムネ画像
                     nullable: true
+                  restrictions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: string
+                        description:
+                          type: string
+                      required:
+                        - key
+                        - description
+                    description: セッションの参加制限
                 required:
                   - id
                   - theme
                   - owner
                   - createdAt
                   - scheduledEndTime
+                  - restrictions
           headers: {}
         '400':
           description: ''
@@ -1082,12 +1110,26 @@ paths:
                     type: string
                     description: サムネ画像
                     nullable: true
+                  restrictions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: string
+                        description:
+                          type: string
+                      required:
+                        - key
+                        - description
+                    description: セッションの参加制限
                 required:
                   - id
                   - theme
                   - owner
                   - createdAt
                   - scheduledEndTime
+                  - restrictions
           headers: {}
         '400':
           description: ''
@@ -1259,12 +1301,26 @@ paths:
                               type: string
                               description: サムネ画像
                               nullable: true
+                            restrictions:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  key:
+                                    type: string
+                                  description:
+                                    type: string
+                                required:
+                                  - key
+                                  - description
+                              description: セッションの参加制限
                           required:
                             - id
                             - theme
                             - owner
                             - createdAt
                             - scheduledEndTime
+                            - restrictions
                         opinionCount:
                           type: integer
                       required:
@@ -3020,12 +3076,26 @@ paths:
                               type: string
                               description: サムネ画像
                               nullable: true
+                            restrictions:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  key:
+                                    type: string
+                                  description:
+                                    type: string
+                                required:
+                                  - key
+                                  - description
+                              description: セッションの参加制限
                           required:
                             - id
                             - theme
                             - owner
                             - createdAt
                             - scheduledEndTime
+                            - restrictions
                         opinionCount:
                           type: integer
                       required:
@@ -3185,12 +3255,26 @@ paths:
                               type: string
                               description: サムネ画像
                               nullable: true
+                            restrictions:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  key:
+                                    type: string
+                                  description:
+                                    type: string
+                                required:
+                                  - key
+                                  - description
+                              description: セッションの参加制限
                           required:
                             - id
                             - theme
                             - owner
                             - createdAt
                             - scheduledEndTime
+                            - restrictions
                         opinionCount:
                           type: integer
                       required:
@@ -3931,12 +4015,26 @@ components:
           type: string
           description: サムネ画像
           nullable: true
+        restrictions:
+          type: array
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+              description:
+                type: string
+            required:
+              - key
+              - description
+          description: セッションの参加制限
       required:
         - id
         - theme
         - owner
         - createdAt
         - scheduledEndTime
+        - restrictions
     validationErrorItem:
       type: object
       properties:

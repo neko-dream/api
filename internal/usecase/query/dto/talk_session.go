@@ -18,6 +18,7 @@ type TalkSession struct {
 	Description      *string
 	City             *string
 	Prefecture       *string
+	Restrictions     []string
 }
 
 type TalkSessionWithDetail struct {

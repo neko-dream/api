@@ -150,6 +150,8 @@ type CreateTalkSessionOK struct {
 	Prefecture OptNilString `json:"prefecture"`
 	// サムネ画像.
 	ThumbnailURL OptNilString `json:"thumbnailURL"`
+	// セッションの参加制限.
+	Restrictions []CreateTalkSessionOKRestrictionsItem `json:"restrictions"`
 }
 
 // GetID returns the value of ID.
@@ -202,6 +204,11 @@ func (s *CreateTalkSessionOK) GetThumbnailURL() OptNilString {
 	return s.ThumbnailURL
 }
 
+// GetRestrictions returns the value of Restrictions.
+func (s *CreateTalkSessionOK) GetRestrictions() []CreateTalkSessionOKRestrictionsItem {
+	return s.Restrictions
+}
+
 // SetID sets the value of ID.
 func (s *CreateTalkSessionOK) SetID(val string) {
 	s.ID = val
@@ -250,6 +257,11 @@ func (s *CreateTalkSessionOK) SetPrefecture(val OptNilString) {
 // SetThumbnailURL sets the value of ThumbnailURL.
 func (s *CreateTalkSessionOK) SetThumbnailURL(val OptNilString) {
 	s.ThumbnailURL = val
+}
+
+// SetRestrictions sets the value of Restrictions.
+func (s *CreateTalkSessionOK) SetRestrictions(val []CreateTalkSessionOKRestrictionsItem) {
+	s.Restrictions = val
 }
 
 func (*CreateTalkSessionOK) createTalkSessionRes() {}
@@ -317,6 +329,31 @@ func (s *CreateTalkSessionOKOwner) SetDisplayName(val string) {
 // SetIconURL sets the value of IconURL.
 func (s *CreateTalkSessionOKOwner) SetIconURL(val OptNilString) {
 	s.IconURL = val
+}
+
+type CreateTalkSessionOKRestrictionsItem struct {
+	Key         string `json:"key"`
+	Description string `json:"description"`
+}
+
+// GetKey returns the value of Key.
+func (s *CreateTalkSessionOKRestrictionsItem) GetKey() string {
+	return s.Key
+}
+
+// GetDescription returns the value of Description.
+func (s *CreateTalkSessionOKRestrictionsItem) GetDescription() string {
+	return s.Description
+}
+
+// SetKey sets the value of Key.
+func (s *CreateTalkSessionOKRestrictionsItem) SetKey(val string) {
+	s.Key = val
+}
+
+// SetDescription sets the value of Description.
+func (s *CreateTalkSessionOKRestrictionsItem) SetDescription(val string) {
+	s.Description = val
 }
 
 type CreateTalkSessionReq struct {
@@ -518,6 +555,8 @@ type EditTalkSessionOK struct {
 	Prefecture OptNilString `json:"prefecture"`
 	// サムネ画像.
 	ThumbnailURL OptNilString `json:"thumbnailURL"`
+	// セッションの参加制限.
+	Restrictions []EditTalkSessionOKRestrictionsItem `json:"restrictions"`
 }
 
 // GetID returns the value of ID.
@@ -570,6 +609,11 @@ func (s *EditTalkSessionOK) GetThumbnailURL() OptNilString {
 	return s.ThumbnailURL
 }
 
+// GetRestrictions returns the value of Restrictions.
+func (s *EditTalkSessionOK) GetRestrictions() []EditTalkSessionOKRestrictionsItem {
+	return s.Restrictions
+}
+
 // SetID sets the value of ID.
 func (s *EditTalkSessionOK) SetID(val string) {
 	s.ID = val
@@ -618,6 +662,11 @@ func (s *EditTalkSessionOK) SetPrefecture(val OptNilString) {
 // SetThumbnailURL sets the value of ThumbnailURL.
 func (s *EditTalkSessionOK) SetThumbnailURL(val OptNilString) {
 	s.ThumbnailURL = val
+}
+
+// SetRestrictions sets the value of Restrictions.
+func (s *EditTalkSessionOK) SetRestrictions(val []EditTalkSessionOKRestrictionsItem) {
+	s.Restrictions = val
 }
 
 func (*EditTalkSessionOK) editTalkSessionRes() {}
@@ -685,6 +734,31 @@ func (s *EditTalkSessionOKOwner) SetDisplayName(val string) {
 // SetIconURL sets the value of IconURL.
 func (s *EditTalkSessionOKOwner) SetIconURL(val OptNilString) {
 	s.IconURL = val
+}
+
+type EditTalkSessionOKRestrictionsItem struct {
+	Key         string `json:"key"`
+	Description string `json:"description"`
+}
+
+// GetKey returns the value of Key.
+func (s *EditTalkSessionOKRestrictionsItem) GetKey() string {
+	return s.Key
+}
+
+// GetDescription returns the value of Description.
+func (s *EditTalkSessionOKRestrictionsItem) GetDescription() string {
+	return s.Description
+}
+
+// SetKey sets the value of Key.
+func (s *EditTalkSessionOKRestrictionsItem) SetKey(val string) {
+	s.Key = val
+}
+
+// SetDescription sets the value of Description.
+func (s *EditTalkSessionOKRestrictionsItem) SetDescription(val string) {
+	s.Description = val
 }
 
 type EditTalkSessionReq struct {
@@ -1383,6 +1457,8 @@ type GetOpenedTalkSessionOKTalkSessionsItemTalkSession struct {
 	Prefecture OptNilString `json:"prefecture"`
 	// サムネ画像.
 	ThumbnailURL OptNilString `json:"thumbnailURL"`
+	// セッションの参加制限.
+	Restrictions []GetOpenedTalkSessionOKTalkSessionsItemTalkSessionRestrictionsItem `json:"restrictions"`
 }
 
 // GetID returns the value of ID.
@@ -1435,6 +1511,11 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) GetThumbnailURL() Op
 	return s.ThumbnailURL
 }
 
+// GetRestrictions returns the value of Restrictions.
+func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) GetRestrictions() []GetOpenedTalkSessionOKTalkSessionsItemTalkSessionRestrictionsItem {
+	return s.Restrictions
+}
+
 // SetID sets the value of ID.
 func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) SetID(val string) {
 	s.ID = val
@@ -1483,6 +1564,11 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) SetPrefecture(val Op
 // SetThumbnailURL sets the value of ThumbnailURL.
 func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) SetThumbnailURL(val OptNilString) {
 	s.ThumbnailURL = val
+}
+
+// SetRestrictions sets the value of Restrictions.
+func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) SetRestrictions(val []GetOpenedTalkSessionOKTalkSessionsItemTalkSessionRestrictionsItem) {
+	s.Restrictions = val
 }
 
 // 位置情報.
@@ -1548,6 +1634,31 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSessionOwner) SetDisplayName(
 // SetIconURL sets the value of IconURL.
 func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSessionOwner) SetIconURL(val OptNilString) {
 	s.IconURL = val
+}
+
+type GetOpenedTalkSessionOKTalkSessionsItemTalkSessionRestrictionsItem struct {
+	Key         string `json:"key"`
+	Description string `json:"description"`
+}
+
+// GetKey returns the value of Key.
+func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSessionRestrictionsItem) GetKey() string {
+	return s.Key
+}
+
+// GetDescription returns the value of Description.
+func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSessionRestrictionsItem) GetDescription() string {
+	return s.Description
+}
+
+// SetKey sets the value of Key.
+func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSessionRestrictionsItem) SetKey(val string) {
+	s.Key = val
+}
+
+// SetDescription sets the value of Description.
+func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSessionRestrictionsItem) SetDescription(val string) {
+	s.Description = val
 }
 
 type GetOpenedTalkSessionStatus string
@@ -2232,6 +2343,8 @@ type GetTalkSessionDetailOK struct {
 	Prefecture OptNilString `json:"prefecture"`
 	// サムネ画像.
 	ThumbnailURL OptNilString `json:"thumbnailURL"`
+	// セッションの参加制限.
+	Restrictions []GetTalkSessionDetailOKRestrictionsItem `json:"restrictions"`
 }
 
 // GetID returns the value of ID.
@@ -2284,6 +2397,11 @@ func (s *GetTalkSessionDetailOK) GetThumbnailURL() OptNilString {
 	return s.ThumbnailURL
 }
 
+// GetRestrictions returns the value of Restrictions.
+func (s *GetTalkSessionDetailOK) GetRestrictions() []GetTalkSessionDetailOKRestrictionsItem {
+	return s.Restrictions
+}
+
 // SetID sets the value of ID.
 func (s *GetTalkSessionDetailOK) SetID(val string) {
 	s.ID = val
@@ -2332,6 +2450,11 @@ func (s *GetTalkSessionDetailOK) SetPrefecture(val OptNilString) {
 // SetThumbnailURL sets the value of ThumbnailURL.
 func (s *GetTalkSessionDetailOK) SetThumbnailURL(val OptNilString) {
 	s.ThumbnailURL = val
+}
+
+// SetRestrictions sets the value of Restrictions.
+func (s *GetTalkSessionDetailOK) SetRestrictions(val []GetTalkSessionDetailOKRestrictionsItem) {
+	s.Restrictions = val
 }
 
 func (*GetTalkSessionDetailOK) getTalkSessionDetailRes() {}
@@ -2399,6 +2522,31 @@ func (s *GetTalkSessionDetailOKOwner) SetDisplayName(val string) {
 // SetIconURL sets the value of IconURL.
 func (s *GetTalkSessionDetailOKOwner) SetIconURL(val OptNilString) {
 	s.IconURL = val
+}
+
+type GetTalkSessionDetailOKRestrictionsItem struct {
+	Key         string `json:"key"`
+	Description string `json:"description"`
+}
+
+// GetKey returns the value of Key.
+func (s *GetTalkSessionDetailOKRestrictionsItem) GetKey() string {
+	return s.Key
+}
+
+// GetDescription returns the value of Description.
+func (s *GetTalkSessionDetailOKRestrictionsItem) GetDescription() string {
+	return s.Description
+}
+
+// SetKey sets the value of Key.
+func (s *GetTalkSessionDetailOKRestrictionsItem) SetKey(val string) {
+	s.Key = val
+}
+
+// SetDescription sets the value of Description.
+func (s *GetTalkSessionDetailOKRestrictionsItem) SetDescription(val string) {
+	s.Description = val
 }
 
 type GetTalkSessionListBadRequest struct {
@@ -2564,6 +2712,8 @@ type GetTalkSessionListOKTalkSessionsItemTalkSession struct {
 	Prefecture OptNilString `json:"prefecture"`
 	// サムネ画像.
 	ThumbnailURL OptNilString `json:"thumbnailURL"`
+	// セッションの参加制限.
+	Restrictions []GetTalkSessionListOKTalkSessionsItemTalkSessionRestrictionsItem `json:"restrictions"`
 }
 
 // GetID returns the value of ID.
@@ -2616,6 +2766,11 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetThumbnailURL() OptN
 	return s.ThumbnailURL
 }
 
+// GetRestrictions returns the value of Restrictions.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetRestrictions() []GetTalkSessionListOKTalkSessionsItemTalkSessionRestrictionsItem {
+	return s.Restrictions
+}
+
 // SetID sets the value of ID.
 func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetID(val string) {
 	s.ID = val
@@ -2664,6 +2819,11 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetPrefecture(val OptN
 // SetThumbnailURL sets the value of ThumbnailURL.
 func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetThumbnailURL(val OptNilString) {
 	s.ThumbnailURL = val
+}
+
+// SetRestrictions sets the value of Restrictions.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetRestrictions(val []GetTalkSessionListOKTalkSessionsItemTalkSessionRestrictionsItem) {
+	s.Restrictions = val
 }
 
 // 位置情報.
@@ -2729,6 +2889,31 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionOwner) SetDisplayName(va
 // SetIconURL sets the value of IconURL.
 func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionOwner) SetIconURL(val OptNilString) {
 	s.IconURL = val
+}
+
+type GetTalkSessionListOKTalkSessionsItemTalkSessionRestrictionsItem struct {
+	Key         string `json:"key"`
+	Description string `json:"description"`
+}
+
+// GetKey returns the value of Key.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionRestrictionsItem) GetKey() string {
+	return s.Key
+}
+
+// GetDescription returns the value of Description.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionRestrictionsItem) GetDescription() string {
+	return s.Description
+}
+
+// SetKey sets the value of Key.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionRestrictionsItem) SetKey(val string) {
+	s.Key = val
+}
+
+// SetDescription sets the value of Description.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSessionRestrictionsItem) SetDescription(val string) {
+	s.Description = val
 }
 
 type GetTalkSessionListSortKey string
@@ -7774,6 +7959,8 @@ type SessionsHistoryOKTalkSessionsItemTalkSession struct {
 	Prefecture OptNilString `json:"prefecture"`
 	// サムネ画像.
 	ThumbnailURL OptNilString `json:"thumbnailURL"`
+	// セッションの参加制限.
+	Restrictions []SessionsHistoryOKTalkSessionsItemTalkSessionRestrictionsItem `json:"restrictions"`
 }
 
 // GetID returns the value of ID.
@@ -7826,6 +8013,11 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) GetThumbnailURL() OptNilS
 	return s.ThumbnailURL
 }
 
+// GetRestrictions returns the value of Restrictions.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSession) GetRestrictions() []SessionsHistoryOKTalkSessionsItemTalkSessionRestrictionsItem {
+	return s.Restrictions
+}
+
 // SetID sets the value of ID.
 func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetID(val string) {
 	s.ID = val
@@ -7874,6 +8066,11 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetPrefecture(val OptNilS
 // SetThumbnailURL sets the value of ThumbnailURL.
 func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetThumbnailURL(val OptNilString) {
 	s.ThumbnailURL = val
+}
+
+// SetRestrictions sets the value of Restrictions.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetRestrictions(val []SessionsHistoryOKTalkSessionsItemTalkSessionRestrictionsItem) {
+	s.Restrictions = val
 }
 
 // 位置情報.
@@ -7939,6 +8136,31 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSessionOwner) SetDisplayName(val s
 // SetIconURL sets the value of IconURL.
 func (s *SessionsHistoryOKTalkSessionsItemTalkSessionOwner) SetIconURL(val OptNilString) {
 	s.IconURL = val
+}
+
+type SessionsHistoryOKTalkSessionsItemTalkSessionRestrictionsItem struct {
+	Key         string `json:"key"`
+	Description string `json:"description"`
+}
+
+// GetKey returns the value of Key.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSessionRestrictionsItem) GetKey() string {
+	return s.Key
+}
+
+// GetDescription returns the value of Description.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSessionRestrictionsItem) GetDescription() string {
+	return s.Description
+}
+
+// SetKey sets the value of Key.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSessionRestrictionsItem) SetKey(val string) {
+	s.Key = val
+}
+
+// SetDescription sets the value of Description.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSessionRestrictionsItem) SetDescription(val string) {
+	s.Description = val
 }
 
 type SessionsHistoryStatus string

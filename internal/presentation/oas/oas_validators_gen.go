@@ -79,6 +79,17 @@ func (s *CreateTalkSessionOK) Validate() error {
 			Error: err,
 		})
 	}
+	if err := func() error {
+		if s.Restrictions == nil {
+			return errors.New("nil is invalid value")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "restrictions",
+			Error: err,
+		})
+	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
@@ -282,6 +293,17 @@ func (s *EditTalkSessionOK) Validate() error {
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
 			Name:  "location",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if s.Restrictions == nil {
+			return errors.New("nil is invalid value")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "restrictions",
 			Error: err,
 		})
 	}
@@ -690,6 +712,17 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) Validate() error {
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
 			Name:  "location",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if s.Restrictions == nil {
+			return errors.New("nil is invalid value")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "restrictions",
 			Error: err,
 		})
 	}
@@ -1155,6 +1188,17 @@ func (s *GetTalkSessionDetailOK) Validate() error {
 			Error: err,
 		})
 	}
+	if err := func() error {
+		if s.Restrictions == nil {
+			return errors.New("nil is invalid value")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "restrictions",
+			Error: err,
+		})
+	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
@@ -1335,6 +1379,17 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) Validate() error {
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
 			Name:  "location",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if s.Restrictions == nil {
+			return errors.New("nil is invalid value")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "restrictions",
 			Error: err,
 		})
 	}
@@ -2551,6 +2606,17 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) Validate() error {
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
 			Name:  "location",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if s.Restrictions == nil {
+			return errors.New("nil is invalid value")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "restrictions",
 			Error: err,
 		})
 	}

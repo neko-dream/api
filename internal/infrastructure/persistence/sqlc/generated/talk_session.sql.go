@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/sqlc-dev/pqtype"
+	"github.com/neko-dream/server/internal/domain/model/talksession"
 )
 
 const countTalkSessions = `-- name: CountTalkSessions :one
@@ -103,7 +103,7 @@ type CreateTalkSessionParams struct {
 	CreatedAt        time.Time
 	City             sql.NullString
 	Prefecture       sql.NullString
-	Restrictions     pqtype.NullRawMessage
+	Restrictions     talksession.Restrictions
 }
 
 // CreateTalkSession
@@ -163,7 +163,7 @@ type EditTalkSessionParams struct {
 	ThumbnailUrl     sql.NullString
 	City             sql.NullString
 	Prefecture       sql.NullString
-	Restrictions     pqtype.NullRawMessage
+	Restrictions     talksession.Restrictions
 }
 
 // EditTalkSession

@@ -61,3 +61,5 @@ var (
 		Message:    "不正な値です。",
 	}
 )
+
+type Restrictions []string

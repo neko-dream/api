@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/sqlc-dev/pqtype"
+	"github.com/neko-dream/server/internal/domain/model/talksession"
 )
 
 type ActionItem struct {
@@ -66,7 +66,7 @@ type TalkSession struct {
 	Prefecture       sql.NullString
 	Description      sql.NullString
 	ThumbnailUrl     sql.NullString
-	Restrictions     pqtype.NullRawMessage
+	Restrictions     talksession.Restrictions
 	UpdatedAt        time.Time
 }
 
