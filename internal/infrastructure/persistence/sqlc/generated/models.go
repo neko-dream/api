@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/sqlc-dev/pqtype"
 )
 
 type ActionItem struct {
@@ -65,6 +66,8 @@ type TalkSession struct {
 	Prefecture       sql.NullString
 	Description      sql.NullString
 	ThumbnailUrl     sql.NullString
+	Restrictions     pqtype.NullRawMessage
+	UpdatedAt        time.Time
 }
 
 type TalkSessionConclusion struct {
