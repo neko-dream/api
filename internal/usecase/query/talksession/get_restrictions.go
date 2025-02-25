@@ -3,7 +3,7 @@ package talksession
 import (
 	"context"
 
-	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
+	"github.com/neko-dream/server/internal/domain/model/talksession"
 )
 
 type (

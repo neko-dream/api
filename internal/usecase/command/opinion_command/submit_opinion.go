@@ -10,7 +10,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/image/meta"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
+	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/domain/model/vote"
 	"github.com/neko-dream/server/internal/domain/service"

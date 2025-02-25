@@ -10,7 +10,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
+	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/internal/usecase/command/talksession_command"

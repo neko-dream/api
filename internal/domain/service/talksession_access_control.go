@@ -6,7 +6,7 @@ import (
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
+	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
