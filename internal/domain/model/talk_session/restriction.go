@@ -1,10 +1,14 @@
 package talksession
 
-import "github.com/neko-dream/server/internal/domain/messages"
+import (
+	"github.com/neko-dream/server/internal/domain/messages"
+	"github.com/neko-dream/server/internal/domain/model/user"
+)
 
 type RestrictionAttribute struct {
 	Key         RestrictionAttributeKey
 	Description string
+	Fn          func(user user.User) bool
 }
 
 type RestrictionAttributeKey string
@@ -16,18 +20,28 @@ const (
 	DemographicsHouseholdSize RestrictionAttributeKey = "demographics.household_size"
 	DemographicsOccupation    RestrictionAttributeKey = "demographics.occupation"
 	DemographicsBirth         RestrictionAttributeKey = "demographics.birth"
-	AuthRegister              RestrictionAttributeKey = "auth.register"
 )
 
 var (
 	RestrictionAttributeKeyMap = map[RestrictionAttributeKey]RestrictionAttribute{
-		DemographicsCity:          {Key: DemographicsCity, Description: "市区町村"},
-		DemographicsPrefecture:    {Key: DemographicsPrefecture, Description: "都道府県"},
-		DemographicsGender:        {Key: DemographicsGender, Description: "性別"},
-		DemographicsHouseholdSize: {Key: DemographicsHouseholdSize, Description: "世帯人数"},
-		DemographicsOccupation:    {Key: DemographicsOccupation, Description: "職業"},
-		DemographicsBirth:         {Key: DemographicsBirth, Description: "誕生年"},
-		AuthRegister:              {Key: AuthRegister, Description: "ユーザー登録"},
+		DemographicsCity: {Key: DemographicsCity, Description: "市区町村", Fn: func(user user.User) bool {
+			return user.Demographics().City() != nil
+		}},
+		DemographicsPrefecture: {Key: DemographicsPrefecture, Description: "都道府県", Fn: func(user user.User) bool {
+			return user.Demographics().Prefecture() != nil
+		}},
+		DemographicsGender: {Key: DemographicsGender, Description: "性別", Fn: func(user user.User) bool {
+			return user.Demographics().Gender() != nil
+		}},
+		DemographicsHouseholdSize: {Key: DemographicsHouseholdSize, Description: "世帯人数", Fn: func(user user.User) bool {
+			return user.Demographics().HouseholdSize() != nil
+		}},
+		DemographicsOccupation: {Key: DemographicsOccupation, Description: "職業", Fn: func(user user.User) bool {
+			return user.Demographics().Occupation() != nil
+		}},
+		DemographicsBirth: {Key: DemographicsBirth, Description: "誕生年", Fn: func(user user.User) bool {
+			return user.Demographics().YearOfBirth() != nil
+		}},
 	}
 )
 
