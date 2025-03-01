@@ -10,11 +10,13 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/image/meta"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
+	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/domain/model/vote"
+	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/pkg/utils"
+	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
@@ -26,6 +28,7 @@ type (
 	SubmitOpinionInput struct {
 		TalkSessionID   shared.UUID[talksession.TalkSession]
 		OwnerID         shared.UUID[user.User]
+		UserID          shared.UUID[user.User]
 		ParentOpinionID *shared.UUID[opinion.Opinion]
 		Title           *string
 		Content         string
@@ -37,6 +40,7 @@ type (
 		opinion.OpinionRepository
 		opinion.OpinionService
 		vote.VoteRepository
+		service.TalkSessionAccessControl
 		image.ImageStorage
 		image.ImageRepository
 		*db.DBManager
@@ -47,23 +51,31 @@ func NewSubmitOpinionHandler(
 	opinionRepository opinion.OpinionRepository,
 	opinionService opinion.OpinionService,
 	voteRepository vote.VoteRepository,
+	talkSessionAccessControl service.TalkSessionAccessControl,
 	dbManager *db.DBManager,
 	imageRepository image.ImageRepository,
 	imageStorage image.ImageStorage,
 ) SubmitOpinion {
 	return &submitOpinionHandler{
-		DBManager:         dbManager,
-		OpinionService:    opinionService,
-		OpinionRepository: opinionRepository,
-		VoteRepository:    voteRepository,
-		ImageStorage:      imageStorage,
-		ImageRepository:   imageRepository,
+		DBManager:                dbManager,
+		OpinionService:           opinionService,
+		OpinionRepository:        opinionRepository,
+		VoteRepository:           voteRepository,
+		TalkSessionAccessControl: talkSessionAccessControl,
+		ImageStorage:             imageStorage,
+		ImageRepository:          imageRepository,
 	}
 }
 
 func (h *submitOpinionHandler) Execute(ctx context.Context, input SubmitOpinionInput) error {
 	ctx, span := otel.Tracer("opinion_command").Start(ctx, "submitOpinionHandler.Execute")
 	defer span.End()
+
+	// 参加制限を満たしているか確認。満たしていない場合はエラーを返す
+	if _, err := h.TalkSessionAccessControl.CanUserJoin(ctx, input.TalkSessionID, lo.ToPtr(input.UserID)); err != nil {
+		utils.HandleError(ctx, err, "TalkSessionAccessControl.CanUserJoin")
+		return err
+	}
 
 	if err := h.ExecTx(ctx, func(ctx context.Context) error {
 		opinion, err := opinion.NewOpinion(

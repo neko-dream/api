@@ -6,7 +6,7 @@ import (
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
+	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
@@ -48,6 +48,12 @@ func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talkses
 			Valid:  true,
 		}
 	}
+	var restrictions []string
+	if len(talkSession.Restrictions()) > 0 {
+		for _, restriction := range talkSession.Restrictions() {
+			restrictions = append(restrictions, string(restriction.Key))
+		}
+	}
 
 	if err := t.GetQueries(ctx).CreateTalkSession(ctx, model.CreateTalkSessionParams{
 		TalkSessionID:    talkSession.TalkSessionID().UUID(),
@@ -58,6 +64,7 @@ func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talkses
 		ScheduledEndTime: talkSession.ScheduledEndTime(),
 		Prefecture:       prefecture,
 		City:             city,
+		Restrictions:     restrictions,
 	}); err != nil {
 		return errtrace.Wrap(err)
 	}
@@ -82,11 +89,35 @@ func (t *talkSessionRepository) Update(ctx context.Context, talkSession *talkses
 	if talkSession == nil {
 		return nil
 	}
-	var description sql.NullString
+	var description, thumbnailURL, city, preference sql.NullString
 	if talkSession.Description() != nil {
 		description = sql.NullString{
 			String: *talkSession.Description(),
 			Valid:  true,
+		}
+	}
+	if talkSession.ThumbnailURL() != nil {
+		thumbnailURL = sql.NullString{
+			String: *talkSession.ThumbnailURL(),
+			Valid:  true,
+		}
+	}
+	if talkSession.City() != nil {
+		city = sql.NullString{
+			String: *talkSession.City(),
+			Valid:  true,
+		}
+	}
+	if talkSession.Prefecture() != nil {
+		preference = sql.NullString{
+			String: *talkSession.Prefecture(),
+			Valid:  true,
+		}
+	}
+	var restrictions []string
+	if len(talkSession.Restrictions()) > 0 {
+		for _, restriction := range talkSession.Restrictions() {
+			restrictions = append(restrictions, string(restriction.Key))
 		}
 	}
 
@@ -95,6 +126,10 @@ func (t *talkSessionRepository) Update(ctx context.Context, talkSession *talkses
 		Theme:            talkSession.Theme(),
 		ScheduledEndTime: talkSession.ScheduledEndTime(),
 		Description:      description,
+		ThumbnailUrl:     thumbnailURL,
+		City:             city,
+		Prefecture:       preference,
+		Restrictions:     talksession.Restrictions(restrictions),
 	}); err != nil {
 		return errtrace.Wrap(err)
 	}
@@ -142,7 +177,7 @@ func (t *talkSessionRepository) FindByID(ctx context.Context, talkSessionID shar
 		thumbnailURL = &row.TalkSession.ThumbnailUrl.String
 	}
 
-	return talksession.NewTalkSession(
+	ts := talksession.NewTalkSession(
 		talkSessionID,
 		row.TalkSession.Theme,
 		description,
@@ -153,6 +188,13 @@ func (t *talkSessionRepository) FindByID(ctx context.Context, talkSessionID shar
 		location,
 		city,
 		prefecture,
-	), nil
+	)
 
+	if len(row.TalkSession.Restrictions) > 0 {
+		if err := ts.UpdateRestrictions(ctx, row.TalkSession.Restrictions); err != nil {
+			return nil, errtrace.Wrap(err)
+		}
+	}
+
+	return ts, nil
 }

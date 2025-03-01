@@ -10,7 +10,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
+	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/internal/usecase/command/opinion_command"
@@ -352,7 +352,6 @@ func (o *opinionHandler) PostOpinionPost(ctx context.Context, req oas.OptPostOpi
 	if err != nil {
 		return nil, messages.ForbiddenError
 	}
-
 	if !req.IsSet() {
 		return nil, messages.RequiredParameterError
 	}
@@ -387,6 +386,7 @@ func (o *opinionHandler) PostOpinionPost(ctx context.Context, req oas.OptPostOpi
 	if err = o.submitOpinionCommand.Execute(ctx, opinion_command.SubmitOpinionInput{
 		TalkSessionID:   talkSessionID,
 		OwnerID:         userID,
+		UserID:          userID,
 		ParentOpinionID: parentOpinionID,
 		Title:           utils.ToPtrIfNotNullValue(!req.Value.Title.IsSet(), value.Title.Value),
 		Content:         req.Value.OpinionContent,

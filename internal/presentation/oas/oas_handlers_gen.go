@@ -140,7 +140,12 @@ func (s *Server) handleAuthorizeRequest(args [1]string, argsEscaped bool, w http
 //
 // ## サムネイル画像について
 // - `Description中に出てくる画像で一番最初のものを使用`。
-// - 画像自体は`POST /images`でサーバにポストしたものを使用してください。.
+// - 画像自体は`POST /images`でサーバにポストしたものを使用してください。
+// ## 投稿制限のキーについて
+// restrictionsに値を入れると一定のデモグラ情報を登録していない限り、セッションへの投稿が制限されるようにできる。
+// restrictionsには [GET /talksessions/restrictions](https://app.apidog.
+// com/link/project/674502/apis/api-14271260)
+// より取れるkeyをカンマ区切りで入力してください。.
 //
 // POST /talksessions
 func (s *Server) handleCreateTalkSessionRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
@@ -1877,6 +1882,99 @@ func (s *Server) handleGetTalkSessionReportRequest(args [1]string, argsEscaped b
 	}
 
 	if err := encodeGetTalkSessionReportResponse(response, w, span); err != nil {
+		defer recordError("EncodeResponse", err)
+		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+		}
+		return
+	}
+}
+
+// handleGetTalkSessionRestrictionKeysRequest handles getTalkSessionRestrictionKeys operation.
+//
+// セッションの投稿制限に使用できるキーの一覧を返す.
+//
+// GET /talksessions/restrictions
+func (s *Server) handleGetTalkSessionRestrictionKeysRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("getTalkSessionRestrictionKeys"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/talksessions/restrictions"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "GetTalkSessionRestrictionKeys",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Add Labeler to context.
+	labeler := &Labeler{attrs: otelAttrs}
+	ctx = contextWithLabeler(ctx, labeler)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
+
+		// Increment request counter.
+		s.requests.Add(ctx, 1, attrOpt)
+
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
+	}()
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
+		}
+		err error
+	)
+
+	var response GetTalkSessionRestrictionKeysRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:          ctx,
+			OperationName:    "GetTalkSessionRestrictionKeys",
+			OperationSummary: "セッションで指定可能な制限一覧",
+			OperationID:      "getTalkSessionRestrictionKeys",
+			Body:             nil,
+			Params:           middleware.Parameters{},
+			Raw:              r,
+		}
+
+		type (
+			Request  = struct{}
+			Params   = struct{}
+			Response = GetTalkSessionRestrictionKeysRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			nil,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.GetTalkSessionRestrictionKeys(ctx)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.GetTalkSessionRestrictionKeys(ctx)
+	}
+	if err != nil {
+		defer recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeGetTalkSessionRestrictionKeysResponse(response, w, span); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
