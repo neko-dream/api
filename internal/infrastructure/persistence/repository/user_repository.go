@@ -9,10 +9,12 @@ import (
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/clock"
+	"github.com/neko-dream/server/internal/domain/model/crypto"
 	"github.com/neko-dream/server/internal/domain/model/image"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	um "github.com/neko-dream/server/internal/domain/model/user"
+	ci "github.com/neko-dream/server/internal/infrastructure/crypto"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/server/pkg/utils"
@@ -23,15 +25,18 @@ import (
 type userRepository struct {
 	*db.DBManager
 	imageStorage image.ImageStorage
+	encryptor    crypto.Encryptor
 }
 
 func NewUserRepository(
 	DBManager *db.DBManager,
 	imageStorage image.ImageStorage,
+	encryptor crypto.Encryptor,
 ) user.UserRepository {
 	return &userRepository{
 		DBManager:    DBManager,
 		imageStorage: imageStorage,
+		encryptor:    encryptor,
 	}
 }
 
@@ -112,44 +117,21 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 	}
 
 	if user.Demographics() != nil {
-		UserDemographic := *user.Demographics()
-
-		var city sql.NullString
-		if UserDemographic.City() != nil {
-			city = sql.NullString{String: (*UserDemographic.City()).String(), Valid: true}
-		}
-		var yearOfBirth sql.NullInt32
-		if UserDemographic.YearOfBirth() != nil {
-			yearOfBirth = sql.NullInt32{Int32: int32(*UserDemographic.YearOfBirth()), Valid: true}
-		}
-		var householdSize sql.NullInt16
-		if UserDemographic.HouseholdSize() != nil {
-			householdSize = sql.NullInt16{Int16: int16(*UserDemographic.HouseholdSize()), Valid: true}
-		}
-		var prefecture sql.NullString
-		if UserDemographic.Prefecture() != nil {
-			prefecture = sql.NullString{String: *UserDemographic.Prefecture(), Valid: true}
-		}
-		var occupation sql.NullInt16
-		if UserDemographic.Occupation() != nil {
-			occupation = sql.NullInt16{Int16: int16(*UserDemographic.Occupation()), Valid: true}
-		}
-		var gender sql.NullInt16
-		if UserDemographic.Gender() != nil {
-			gender = sql.NullInt16{Int16: int16(*UserDemographic.Gender()), Valid: true}
+		encryptedDemo, err := ci.EncryptUserDemographics(ctx, u.encryptor, user.UserID(), user.Demographics())
+		if err != nil {
+			return errtrace.Wrap(err)
 		}
 
-		if err := u.GetQueries(ctx).
-			UpdateOrCreateUserDemographic(ctx, model.UpdateOrCreateUserDemographicParams{
-				UserDemographicsID: UserDemographic.ID().UUID(),
-				UserID:             user.UserID().UUID(),
-				YearOfBirth:        yearOfBirth,
-				Occupation:         occupation,
-				City:               city,
-				HouseholdSize:      householdSize,
-				Gender:             gender,
-				Prefecture:         prefecture,
-			}); err != nil {
+		if err := u.GetQueries(ctx).UpdateOrCreateUserDemographic(ctx, model.UpdateOrCreateUserDemographicParams{
+			UserDemographicsID: encryptedDemo.UserDemographicsID,
+			UserID:             encryptedDemo.UserID,
+			YearOfBirth:        encryptedDemo.YearOfBirth,
+			Occupation:         encryptedDemo.Occupation,
+			City:               encryptedDemo.City,
+			HouseholdSize:      encryptedDemo.HouseholdSize,
+			Gender:             encryptedDemo.Gender,
+			Prefecture:         encryptedDemo.Prefecture,
+		}); err != nil {
 			utils.HandleError(ctx, err, "UpdateOrCreateUserDemographic")
 			return errtrace.Wrap(err)
 		}
@@ -210,7 +192,7 @@ func (u *userRepository) FindByID(ctx context.Context, userID shared.UUID[user.U
 			return nil, nil
 		}
 	}
-	UserDemographic, err := u.findUserDemographic(ctx, userID)
+	userDemographic, err := u.findUserDemographic(ctx, userID)
 	if err != nil {
 		return nil, errtrace.Wrap(err)
 	}
@@ -238,8 +220,8 @@ func (u *userRepository) FindByID(ctx context.Context, userID shared.UUID[user.U
 		providerName,
 		iconURL,
 	)
-	if UserDemographic != nil {
-		user.SetDemographics(*UserDemographic)
+	if userDemographic != nil {
+		user.SetDemographics(*userDemographic)
 	}
 
 	return &user, nil
@@ -255,49 +237,12 @@ func (u *userRepository) findUserDemographic(ctx context.Context, userID shared.
 		return nil, errtrace.Wrap(err)
 	}
 
-	var (
-		yearOfBirth   *int
-		occupation    *string
-		city          *string
-		householdSize *int
-		gender        *string
-		prefecture    *string
-	)
-	UserDemographicID, err := shared.ParseUUID[user.UserDemographic](userDemoRow.UserDemographicsID.String())
+	decrypted, err := ci.DecryptUserDemographics(ctx, u.encryptor, &userDemoRow)
 	if err != nil {
-		return nil, err
+		return nil, errtrace.Wrap(err)
 	}
 
-	if userDemoRow.YearOfBirth.Valid {
-		yearOfBirth = lo.ToPtr(int(userDemoRow.YearOfBirth.Int32))
-	}
-	if userDemoRow.Occupation.Valid {
-		occupation = lo.ToPtr(um.Occupation(int(userDemoRow.Occupation.Int16)).String())
-	}
-	if userDemoRow.Gender.Valid {
-		gender = lo.ToPtr(um.Gender(int(userDemoRow.Gender.Int16)).String())
-	}
-	if userDemoRow.City.Valid {
-		city = lo.ToPtr(userDemoRow.City.String)
-	}
-	if userDemoRow.HouseholdSize.Valid {
-		householdSize = lo.ToPtr(int(userDemoRow.HouseholdSize.Int16))
-	}
-	if userDemoRow.Prefecture.Valid {
-		prefecture = lo.ToPtr(userDemoRow.Prefecture.String)
-	}
-
-	ud := user.NewUserDemographic(
-		ctx,
-		UserDemographicID,
-		yearOfBirth,
-		occupation,
-		gender,
-		city,
-		householdSize,
-		prefecture,
-	)
-	return &ud, nil
+	return decrypted, nil
 }
 
 func (u *userRepository) FindBySubject(ctx context.Context, subject user.UserSubject) (*user.User, error) {

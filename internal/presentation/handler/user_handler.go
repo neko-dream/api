@@ -269,7 +269,7 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 		}
 
 		var gender oas.OptNilString
-		if demographics.Gender != nil {
+		if demographics.GenderString() != nil {
 			gender = oas.OptNilString{
 				Set:   true,
 				Value: *demographics.GenderString(),

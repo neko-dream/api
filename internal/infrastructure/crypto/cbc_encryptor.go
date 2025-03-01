@@ -1,84 +1,36 @@
 package crypto
 
 import (
+	"context"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/binary"
-	"errors"
 	"fmt"
+	"go.opentelemetry.io/otel"
 	"io"
 	"strings"
 )
 
-var (
-	ErrUnsupportedVersion = errors.New("対応していない暗号化バージョンです")
-	ErrInvalidFormat      = errors.New("不正な暗号文フォーマットです")
-	ErrInvalidInteger     = errors.New("不正な整数フォーマットです")
-	ErrEncryption         = errors.New("暗号化エラー")
-	ErrDecryption         = errors.New("復号化エラー")
-)
-
-type Version string
-
-const (
-	Version1 Version = "v1"
-)
-
-func (v Version) Validate() error {
-	switch v {
-	case Version1:
-		return nil
-	default:
-		return fmt.Errorf("%w: バージョン: %s", ErrUnsupportedVersion, v)
-	}
-}
-
-type Encrypter interface {
-	EncryptBytes(plaintext []byte) (string, error)
-	DecryptBytes(ciphertext string) ([]byte, error)
-	EncryptString(value string) (string, error)
-	DecryptString(ciphertext string) (string, error)
-	EncryptInt(value int64) (string, error)
-	DecryptInt(ciphertext string) (int64, error)
-}
-
-func NewEncrypter(version Version, key []byte) (Encrypter, error) {
-	if err := version.Validate(); err != nil {
-		return nil, err
-	}
-
-	switch version {
-	case Version1:
-		return NewCBCEncrypter(key), nil
-	default:
-		return nil, fmt.Errorf("%w: バージョン: %s", ErrUnsupportedVersion, version)
-	}
-}
-
-func GetEncrypterFromCiphertext(ciphertext string, key []byte) (Encrypter, error) {
-	parts := strings.Split(ciphertext, ".")
-	if len(parts) != 3 {
-		return nil, ErrInvalidFormat
-	}
-
-	version := Version(parts[0])
-	return NewEncrypter(version, key)
-}
-
-type CBCEncrypter struct {
+// Deprecated: CBCEncryptorは非推奨です。代わりにGCMEncryptorを使用してください。
+type CBCEncryptor struct {
 	key []byte
 }
 
-func NewCBCEncrypter(key []byte) *CBCEncrypter {
-	return &CBCEncrypter{
+func NewCBCEncryptor(key []byte) *CBCEncryptor {
+	return &CBCEncryptor{
 		key: key,
 	}
 }
 
-// EncryptBytes バイト列を暗号化する基本関数
-func (e *CBCEncrypter) EncryptBytes(plaintext []byte) (string, error) {
+// EncryptBytes
+func (e *CBCEncryptor) EncryptBytes(ctx context.Context, plaintext []byte) (string, error) {
+	ctx, span := otel.Tracer("crypto").Start(ctx, "CBCEncryptor.EncryptBytes")
+	defer span.End()
+
+	_ = ctx
+
 	block, err := aes.NewCipher(e.key)
 	if err != nil {
 		return "", fmt.Errorf("%w: 暗号化ブロックの作成に失敗しました: %v", ErrEncryption, err)
@@ -90,10 +42,8 @@ func (e *CBCEncrypter) EncryptBytes(plaintext []byte) (string, error) {
 		return "", fmt.Errorf("%w: 初期化ベクトルの生成に失敗しました: %v", ErrEncryption, err)
 	}
 
-	// パディング
 	plaintext = pkcs7Pad(plaintext, aes.BlockSize)
 
-	// 暗号化
 	ciphertext := make([]byte, len(plaintext))
 	mode := cipher.NewCBCEncrypter(block, iv)
 	mode.CryptBlocks(ciphertext, plaintext)
@@ -109,13 +59,18 @@ func (e *CBCEncrypter) EncryptBytes(plaintext []byte) (string, error) {
 }
 
 // DecryptBytes 暗号文をバイト列に復号化する基本関数
-func (e *CBCEncrypter) DecryptBytes(ciphertext string) ([]byte, error) {
+func (e *CBCEncryptor) DecryptBytes(ctx context.Context, ciphertext string) ([]byte, error) {
+	ctx, span := otel.Tracer("crypto").Start(ctx, "CBCEncryptor.DecryptBytes")
+	defer span.End()
+
+	_ = ctx
+
 	parts := strings.Split(ciphertext, ".")
 	if len(parts) != 3 {
 		return nil, ErrInvalidFormat
 	}
 
-	version := Version(parts[0])
+	version := parts[0]
 	if version != Version1 {
 		return nil, fmt.Errorf("%w: バージョン: %s", ErrUnsupportedVersion, version)
 	}
@@ -146,13 +101,19 @@ func (e *CBCEncrypter) DecryptBytes(ciphertext string) ([]byte, error) {
 }
 
 // EncryptString 文字列を暗号化
-func (e *CBCEncrypter) EncryptString(value string) (string, error) {
-	return e.EncryptBytes([]byte(value))
+func (e *CBCEncryptor) EncryptString(ctx context.Context, value string) (string, error) {
+	ctx, span := otel.Tracer("crypto").Start(ctx, "CBCEncryptor.EncryptString")
+	defer span.End()
+
+	return e.EncryptBytes(ctx, []byte(value))
 }
 
 // DecryptString 文字列を復号化
-func (e *CBCEncrypter) DecryptString(ciphertext string) (string, error) {
-	plaintext, err := e.DecryptBytes(ciphertext)
+func (e *CBCEncryptor) DecryptString(ctx context.Context, ciphertext string) (string, error) {
+	ctx, span := otel.Tracer("crypto").Start(ctx, "CBCEncryptor.DecryptString")
+	defer span.End()
+
+	plaintext, err := e.DecryptBytes(ctx, ciphertext)
 	if err != nil {
 		return "", err
 	}
@@ -160,15 +121,21 @@ func (e *CBCEncrypter) DecryptString(ciphertext string) (string, error) {
 }
 
 // EncryptInt 整数を暗号化
-func (e *CBCEncrypter) EncryptInt(value int64) (string, error) {
+func (e *CBCEncryptor) EncryptInt(ctx context.Context, value int64) (string, error) {
+	ctx, span := otel.Tracer("crypto").Start(ctx, "CBCEncryptor.EncryptInt")
+	defer span.End()
+
 	buf := make([]byte, 8)
 	binary.BigEndian.PutUint64(buf, uint64(value))
-	return e.EncryptBytes(buf)
+	return e.EncryptBytes(ctx, buf)
 }
 
 // DecryptInt 整数を復号化
-func (e *CBCEncrypter) DecryptInt(ciphertext string) (int64, error) {
-	plaintext, err := e.DecryptBytes(ciphertext)
+func (e *CBCEncryptor) DecryptInt(ctx context.Context, ciphertext string) (int64, error) {
+	ctx, span := otel.Tracer("crypto").Start(ctx, "CBCEncryptor.DecryptInt")
+	defer span.End()
+
+	plaintext, err := e.DecryptBytes(ctx, ciphertext)
 	if err != nil {
 		return 0, err
 	}
