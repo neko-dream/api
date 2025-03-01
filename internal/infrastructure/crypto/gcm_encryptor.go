@@ -16,14 +16,14 @@ type GCMEncryptor struct {
 	key []byte
 }
 
-func NewGCMEncryptor(key []byte) *GCMEncryptor {
+func NewGCMEncryptor(key []byte) (*GCMEncryptor, error) {
 	// 鍵長の検証
 	if len(key) != 16 && len(key) != 24 && len(key) != 32 {
-		panic(fmt.Errorf("%w: %d バイト (16, 24, または 32 バイトである必要があります)", ErrInvalidKeyLength, len(key)))
+		return nil, fmt.Errorf("%w: %d バイト (16, 24, または 32 バイトである必要があります)", ErrInvalidKeyLength, len(key))
 	}
 	return &GCMEncryptor{
 		key: key,
-	}
+	}, nil
 }
 
 // EncryptBytes

@@ -25,7 +25,7 @@ const (
 func NewEncryptor(config *config.Config) (crypto.Encryptor, error) {
 	switch config.ENCRYPTION_VERSION {
 	case Version1:
-		return NewGCMEncryptor([]byte(config.ENCRYPTION_SECRET)), nil
+		return NewGCMEncryptor([]byte(config.ENCRYPTION_SECRET))
 	default:
 		return nil, fmt.Errorf("%w: バージョン: %s", ErrUnsupportedVersion, config.ENCRYPTION_VERSION)
 	}
