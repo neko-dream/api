@@ -31,9 +31,8 @@ func (d *DetailHandler) Execute(ctx context.Context, input user_query.DetailInpu
 
 	var userDetail dto.UserDetail
 	if err := copier.CopyWithOption(&userDetail, userRow, copier.Option{
-		IgnoreEmpty:   true,
-		DeepCopy:      true,
-		CaseSensitive: true,
+		IgnoreEmpty: true,
+		DeepCopy:    true,
 	}); err != nil {
 		return nil, err
 	}

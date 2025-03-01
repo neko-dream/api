@@ -7,12 +7,13 @@ import (
 
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
+	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/di"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/repository"
 	"github.com/neko-dream/server/internal/test/txtest"
+	"github.com/samber/lo"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -39,6 +40,7 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 					talkSessionID,
 					"test",
 					nil,
+					lo.ToPtr("https://example.com/test.jpg"),
 					ownerUserID,
 					clock.Now(ctx),
 					// 明日
@@ -58,7 +60,7 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				if ts.TalkSessionID != talkSessionID.UUID() {
+				if ts.TalkSession.TalkSessionID != talkSessionID.UUID() {
 					return errors.New("トークセッションIDが一致しません")
 				}
 
@@ -73,6 +75,7 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 					talkSessionID,
 					"test",
 					nil,
+					lo.ToPtr("https://example.com/test.jpg"),
 					ownerUserID,
 					clock.Now(ctx),
 					clock.Now(ctx).Add(time.Hour*24),
@@ -95,7 +98,7 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				if ts.TalkSessionID != talkSessionID.UUID() {
+				if ts.TalkSession.TalkSessionID != talkSessionID.UUID() {
 					return errors.New("トークセッションIDが一致しません")
 				}
 				location := talksession.NewLocation(

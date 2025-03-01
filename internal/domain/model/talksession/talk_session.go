@@ -7,6 +7,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
@@ -19,14 +20,16 @@ type (
 
 	TalkSession struct {
 		talkSessionID    shared.UUID[TalkSession]
+		ownerUserID      shared.UUID[user.User]
 		theme            string
 		description      *string
-		ownerUserID      shared.UUID[user.User]
+		thumbnailURL     *string
 		scheduledEndTime time.Time // 予定終了時間
 		createdAt        time.Time // 作成日時
 		location         *Location
 		city             *string
 		prefecture       *string
+		restrictions     []*RestrictionAttribute // 参加制限
 	}
 )
 
@@ -34,6 +37,7 @@ func NewTalkSession(
 	talkSessionID shared.UUID[TalkSession],
 	theme string,
 	description *string,
+	thumbnailURL *string,
 	ownerUserID shared.UUID[user.User],
 	createdAt time.Time,
 	scheduledEndTime time.Time,
@@ -45,6 +49,7 @@ func NewTalkSession(
 		talkSessionID:    talkSessionID,
 		theme:            theme,
 		description:      description,
+		thumbnailURL:     thumbnailURL,
 		ownerUserID:      ownerUserID,
 		createdAt:        createdAt,
 		scheduledEndTime: scheduledEndTime,
@@ -68,6 +73,10 @@ func (t *TalkSession) Theme() string {
 
 func (t *TalkSession) Description() *string {
 	return t.description
+}
+
+func (t *TalkSession) ThumbnailURL() *string {
+	return t.thumbnailURL
 }
 
 func (t *TalkSession) ScheduledEndTime() time.Time {
@@ -94,10 +103,35 @@ func (t *TalkSession) ChangeTheme(theme string) {
 	t.theme = theme
 }
 
+func (t *TalkSession) Restrictions() []*RestrictionAttribute {
+	return t.restrictions
+}
+
 // 終了しているかを調べる
 func (t *TalkSession) IsFinished(ctx context.Context) bool {
 	ctx, span := otel.Tracer("talksession").Start(ctx, "TalkSession.IsFinished")
 	defer span.End()
 
 	return t.scheduledEndTime.Before(clock.Now(ctx))
+}
+
+// 参加制限を全てアップデートする
+func (t *TalkSession) UpdateRestrictions(ctx context.Context, restrictions []string) error {
+	ctx, span := otel.Tracer("talksession").Start(ctx, "TalkSession.UpdateRestrictions")
+	defer span.End()
+
+	_ = ctx
+
+	var attrs []*RestrictionAttribute
+	for _, restriction := range restrictions {
+		attribute := RestrictionAttributeKey(restriction)
+		if !attribute.IsValid() {
+			return &ErrInvalidRestrictionAttribute
+		}
+
+		attrs = append(attrs, lo.ToPtr(attribute.RestrictionAttribute()))
+	}
+
+	t.restrictions = attrs
+	return nil
 }

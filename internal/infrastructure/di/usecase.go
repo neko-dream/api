@@ -7,6 +7,7 @@ import (
 	user_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/user"
 
 	"github.com/neko-dream/server/internal/usecase/command/auth_command"
+	"github.com/neko-dream/server/internal/usecase/command/image_command"
 	"github.com/neko-dream/server/internal/usecase/command/opinion_command"
 	"github.com/neko-dream/server/internal/usecase/command/talksession_command"
 	"github.com/neko-dream/server/internal/usecase/command/timeline_command"
@@ -43,5 +44,7 @@ func useCaseDeps() []ProvideArg {
 		{timeline_query.NewGetTimeLine, nil},
 		{analysis_query.NewGetAnalysisResultHandler, nil},
 		{analysis_query.NewGetReportQueryHandler, nil},
+		{image_command.NewUploadImageHandler, nil},
+		{talksession_query.NewGetRestrictionsQuery, nil},
 	}
 }

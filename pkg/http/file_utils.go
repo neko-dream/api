@@ -2,32 +2,40 @@ package http_utils
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"mime/multipart"
+
+	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
-func MakeFileHeader(name string, dateBytes []byte) (*multipart.FileHeader, error) {
-	body := new(bytes.Buffer)
-	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile("file", name)
+func CreateFileHeader(ctx context.Context, reader io.Reader, filename string) (*multipart.FileHeader, error) {
+	ctx, span := otel.Tracer("http_utils").Start(ctx, "CreateFileHeader")
+	defer span.End()
+
+	var b bytes.Buffer
+	w := multipart.NewWriter(&b)
+
+	fw, err := w.CreateFormFile("file", filename)
 	if err != nil {
-		return nil, err
-	}
-	if _, err := io.Copy(part, bytes.NewReader(dateBytes)); err != nil {
-		return nil, err
-	}
-	if err := writer.Close(); err != nil {
+		utils.HandleError(ctx, err, "CreateFormFile")
 		return nil, err
 	}
 
-	// ダミーファイルをパースして、multipart.FileHeaderを取得する
-	reader := multipart.NewReader(body, writer.Boundary())
-	// 2M
-	form, err := reader.ReadForm(2 * 1_000_000)
-	if err != nil {
+	if _, err := io.Copy(fw, reader); err != nil {
+		utils.HandleError(ctx, err, "Copy")
 		return nil, err
 	}
-	fh := form.File["file"]
 
-	return fh[0], nil
+	w.Close()
+
+	r := multipart.NewReader(&b, w.Boundary())
+	form, err := r.ReadForm(2 << 20) // 2MBのメモリ制限
+	if err != nil {
+		utils.HandleError(ctx, err, "ReadForm")
+		return nil, err
+	}
+
+	return form.File["file"][0], nil
 }

@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
+	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
 )
 
@@ -14,9 +14,11 @@ type TalkSession struct {
 	Theme            string
 	ScheduledEndTime time.Time
 	CreatedAt        time.Time
+	ThumbnailURL     *string
 	Description      *string
 	City             *string
 	Prefecture       *string
+	Restrictions     []string
 }
 
 type TalkSessionWithDetail struct {

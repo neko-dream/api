@@ -748,12 +748,30 @@ paths:
                     type: string
                     description: 都道府県
                     nullable: true
+                  thumbnailURL:
+                    type: string
+                    description: サムネ画像
+                    nullable: true
+                  restrictions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: string
+                        description:
+                          type: string
+                      required:
+                        - key
+                        - description
+                    description: セッションの参加制限
                 required:
                   - id
                   - theme
                   - owner
                   - createdAt
                   - scheduledEndTime
+                  - restrictions
           headers: {}
         '400':
           description: ''
@@ -892,12 +910,30 @@ paths:
                     type: string
                     description: 都道府県
                     nullable: true
+                  thumbnailURL:
+                    type: string
+                    description: サムネ画像
+                    nullable: true
+                  restrictions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: string
+                        description:
+                          type: string
+                      required:
+                        - key
+                        - description
+                    description: セッションの参加制限
                 required:
                   - id
                   - theme
                   - owner
                   - createdAt
                   - scheduledEndTime
+                  - restrictions
           headers: {}
         '400':
           description: ''
@@ -934,14 +970,28 @@ paths:
     post:
       summary: セッション作成
       deprecated: false
-      description: ''
+      description: >-
+        ## サムネイル画像について
+
+        - `Description中に出てくる画像で一番最初のものを使用`。
+
+        - 画像自体は`POST /images`でサーバにポストしたものを使用してください。
+
+
+        ## 投稿制限のキーについて
+
+        restrictionsに値を入れると一定のデモグラ情報を登録していない限り、セッションへの投稿が制限されるようにできる。
+
+        restrictionsには [GET
+        /talksessions/restrictions](https://app.apidog.com/link/project/674502/apis/api-14271260)
+        より取れるkeyをカンマ区切りで入力してください。
       operationId: createTalkSession
       tags:
         - talk_session
       parameters: []
       requestBody:
         content:
-          multipart/form-data:
+          application/x-www-form-urlencoded:
             schema:
               type: object
               properties:
@@ -949,7 +999,7 @@ paths:
                   type: string
                   maxLength: 50
                   minLength: 5
-                  example: オブジェクト指向は悪
+                  example: いい感じのテーマ
                 scheduledEndTime:
                   type: string
                   format: date-time
@@ -979,6 +1029,19 @@ paths:
                   description: 説明文
                   example: ''
                   nullable: true
+                thumbnailURL:
+                  type: string
+                  description: サムネイルURL。文中から一番最初の画像URLをサムネとする。
+                  example: ''
+                  nullable: true
+                restrictions:
+                  type: array
+                  items:
+                    type: string
+                  uniqueItems: true
+                  description: 投稿制限のキー
+                  example:
+                    - demographics.city
               required:
                 - theme
                 - scheduledEndTime
@@ -1043,12 +1106,30 @@ paths:
                     type: string
                     description: 都道府県
                     nullable: true
+                  thumbnailURL:
+                    type: string
+                    description: サムネ画像
+                    nullable: true
+                  restrictions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: string
+                        description:
+                          type: string
+                      required:
+                        - key
+                        - description
+                    description: セッションの参加制限
                 required:
                   - id
                   - theme
                   - owner
                   - createdAt
                   - scheduledEndTime
+                  - restrictions
           headers: {}
         '400':
           description: ''
@@ -1216,12 +1297,30 @@ paths:
                               type: string
                               description: 都道府県
                               nullable: true
+                            thumbnailURL:
+                              type: string
+                              description: サムネ画像
+                              nullable: true
+                            restrictions:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  key:
+                                    type: string
+                                  description:
+                                    type: string
+                                required:
+                                  - key
+                                  - description
+                              description: セッションの参加制限
                           required:
                             - id
                             - theme
                             - owner
                             - createdAt
                             - scheduledEndTime
+                            - restrictions
                         opinionCount:
                           type: integer
                       required:
@@ -2232,6 +2331,63 @@ paths:
       security:
         - SessionId: []
       x-ogen-operation-group: Timeline
+  /talksessions/restrictions:
+    get:
+      summary: セッションで指定可能な制限一覧
+      deprecated: false
+      description: セッションの投稿制限に使用できるキーの一覧を返す
+      operationId: getTalkSessionRestrictionKeys
+      tags:
+        - talk_session
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    key:
+                      type: string
+                    description:
+                      type: string
+                  required:
+                    - key
+                    - description
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security: []
+      x-ogen-operation-group: TalkSession
   /user:
     post:
       summary: ユーザー作成
@@ -2833,10 +2989,6 @@ paths:
             enum:
               - open
               - finished
-            x-apidog:
-              enumDescriptions:
-                open: ''
-                finished: ''
             nullable: true
       responses:
         '200':
@@ -2864,8 +3016,6 @@ paths:
                     items:
                       type: object
                       properties:
-                        opinionCount:
-                          type: integer
                         talkSession:
                           type: object
                           properties:
@@ -2922,12 +3072,32 @@ paths:
                               type: string
                               description: 都道府県
                               nullable: true
+                            thumbnailURL:
+                              type: string
+                              description: サムネ画像
+                              nullable: true
+                            restrictions:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  key:
+                                    type: string
+                                  description:
+                                    type: string
+                                required:
+                                  - key
+                                  - description
+                              description: セッションの参加制限
                           required:
                             - id
                             - theme
                             - owner
                             - createdAt
                             - scheduledEndTime
+                            - restrictions
+                        opinionCount:
+                          type: integer
                       required:
                         - opinionCount
                         - talkSession
@@ -3081,12 +3251,30 @@ paths:
                               type: string
                               description: 都道府県
                               nullable: true
+                            thumbnailURL:
+                              type: string
+                              description: サムネ画像
+                              nullable: true
+                            restrictions:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  key:
+                                    type: string
+                                  description:
+                                    type: string
+                                required:
+                                  - key
+                                  - description
+                              description: セッションの参加制限
                           required:
                             - id
                             - theme
                             - owner
                             - createdAt
                             - scheduledEndTime
+                            - restrictions
                         opinionCount:
                           type: integer
                       required:
@@ -3641,6 +3829,72 @@ paths:
           headers: {}
       security: []
       x-ogen-operation-group: Test
+  /images:
+    post:
+      summary: 画像投稿
+      deprecated: false
+      description: 画像を投稿してURLを返すAPI
+      operationId: postImage
+      tags:
+        - image
+      parameters: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  format: binary
+                  type: string
+                  example: ''
+              required:
+                - image
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    description: 画像のURL
+                required:
+                  - url
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security:
+        - SessionId: []
+      x-ogen-operation-group: Image
   /manage:
     get:
       operationId: manageIndex
@@ -3757,12 +4011,30 @@ components:
           type: string
           description: 都道府県
           nullable: true
+        thumbnailURL:
+          type: string
+          description: サムネ画像
+          nullable: true
+        restrictions:
+          type: array
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+              description:
+                type: string
+            required:
+              - key
+              - description
+          description: セッションの参加制限
       required:
         - id
         - theme
         - owner
         - createdAt
         - scheduledEndTime
+        - restrictions
     validationErrorItem:
       type: object
       properties:
@@ -4044,6 +4316,16 @@ components:
         - Status
         - CreatedAt
         - UpdatedAt
+    restriction:
+      type: object
+      properties:
+        key:
+          type: string
+        description:
+          type: string
+      required:
+        - key
+        - description
   securitySchemes:
     SessionId:
       type: apiKey

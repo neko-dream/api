@@ -2,15 +2,13 @@ package opinion
 
 import (
 	"context"
-	"mime/multipart"
 	"time"
 	"unicode/utf8"
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
+	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
-	"go.opentelemetry.io/otel"
 )
 
 type (
@@ -32,16 +30,16 @@ type (
 	}
 
 	Opinion struct {
-		opinionID       shared.UUID[Opinion]
-		talkSessionID   shared.UUID[talksession.TalkSession]
-		userID          shared.UUID[user.User]
-		parentOpinionID *shared.UUID[Opinion]
-		title           *string
-		content         string
-		createdAt       time.Time
-		opinions        []Opinion
-		referenceURL    *string
-		referenceImage  *ReferenceImage
+		opinionID         shared.UUID[Opinion]
+		talkSessionID     shared.UUID[talksession.TalkSession]
+		userID            shared.UUID[user.User]
+		parentOpinionID   *shared.UUID[Opinion]
+		title             *string
+		content           string
+		createdAt         time.Time
+		opinions          []Opinion
+		referenceURL      *string
+		referenceImageURL *string
 	}
 )
 
@@ -122,32 +120,9 @@ func (o *Opinion) ReferenceURL() *string {
 }
 
 func (o *Opinion) ReferenceImageURL() *string {
-	if o.referenceImage == nil {
-		return nil
-	} else {
-		return o.referenceImage.URL()
-	}
+	return o.referenceImageURL
 }
 
-func (o *Opinion) ReferenceImage() *ReferenceImage {
-	return o.referenceImage
-}
-
-// IsReferenceImageUpdateRequired 画像がアップロードされているかどうかを判定
-func (o *Opinion) IsReferenceImageUpdateRequired() bool {
-	return o.referenceImage != nil && o.referenceImage.url == nil && o.referenceImage.ImageInfo() != nil
-}
-
-// SetReferenceImage 画像をアップロード
-func (o *Opinion) SetReferenceImage(ctx context.Context, file *multipart.FileHeader) error {
-	ctx, span := otel.Tracer("opinion").Start(ctx, "Opinion.SetReferenceImage")
-	defer span.End()
-
-	referenceImage := NewReferenceImage(nil)
-	if err := referenceImage.SetReferenceImage(ctx, file); err != nil {
-		return err
-	}
-	o.referenceImage = referenceImage
-	o.referenceImage.url = nil
-	return nil
+func (o *Opinion) ChangeReferenceImageURL(url *string) {
+	o.referenceImageURL = url
 }

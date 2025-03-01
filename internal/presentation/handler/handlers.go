@@ -13,6 +13,7 @@ type handlers struct {
 	oas.TestHandler
 	oas.ManageHandler
 	oas.TimelineHandler
+	oas.ImageHandler
 }
 
 func NewHandler(
@@ -24,6 +25,7 @@ func NewHandler(
 	testHandler oas.TestHandler,
 	manageHandler oas.ManageHandler,
 	timelineHandler oas.TimelineHandler,
+	imageHandler oas.ImageHandler,
 ) oas.Handler {
 	return &handlers{
 		AuthHandler:        authHandler,
@@ -34,5 +36,6 @@ func NewHandler(
 		TestHandler:        testHandler,
 		ManageHandler:      manageHandler,
 		TimelineHandler:    timelineHandler,
+		ImageHandler:       imageHandler,
 	}
 }

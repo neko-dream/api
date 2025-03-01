@@ -57,6 +57,10 @@ type GetTalkSessionReportRes interface {
 	getTalkSessionReportRes()
 }
 
+type GetTalkSessionRestrictionKeysRes interface {
+	getTalkSessionRestrictionKeysRes()
+}
+
 type GetTimeLineRes interface {
 	getTimeLineRes()
 }
@@ -87,6 +91,10 @@ type OpinionsHistoryRes interface {
 
 type PostConclusionRes interface {
 	postConclusionRes()
+}
+
+type PostImageRes interface {
+	postImageRes()
 }
 
 type PostOpinionPostRes interface {

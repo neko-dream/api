@@ -7,7 +7,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
+	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/internal/usecase/command/vote_command"
 	"github.com/neko-dream/server/pkg/utils"
@@ -41,9 +41,19 @@ func (v *voteHandler) Vote(ctx context.Context, req oas.OptVoteReq, params oas.V
 	}
 
 	value := req.Value
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
+	targetOpinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
 	err = v.voteCommand.Execute(ctx, vote_command.VoteInput{
-		TalkSessionID:   shared.MustParseUUID[talksession.TalkSession](params.TalkSessionID),
-		TargetOpinionID: shared.MustParseUUID[opinion.Opinion](params.OpinionID),
+		TalkSessionID:   talkSessionID,
+		TargetOpinionID: targetOpinionID,
 		UserID:          userID,
 		VoteType:        string(value.VoteStatus.Value),
 	})

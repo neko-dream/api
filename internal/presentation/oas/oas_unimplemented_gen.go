@@ -24,7 +24,14 @@ func (UnimplementedHandler) Authorize(ctx context.Context, params AuthorizeParam
 
 // CreateTalkSession implements createTalkSession operation.
 //
-// セッション作成.
+// ## サムネイル画像について
+// - `Description中に出てくる画像で一番最初のものを使用`。
+// - 画像自体は`POST /images`でサーバにポストしたものを使用してください。
+// ## 投稿制限のキーについて
+// restrictionsに値を入れると一定のデモグラ情報を登録していない限り、セッションへの投稿が制限されるようにできる。
+// restrictionsには [GET /talksessions/restrictions](https://app.apidog.
+// com/link/project/674502/apis/api-14271260)
+// より取れるkeyをカンマ区切りで入力してください。.
 //
 // POST /talksessions
 func (UnimplementedHandler) CreateTalkSession(ctx context.Context, req OptCreateTalkSessionReq) (r CreateTalkSessionRes, _ error) {
@@ -139,6 +146,15 @@ func (UnimplementedHandler) GetTalkSessionReport(ctx context.Context, params Get
 	return r, ht.ErrNotImplemented
 }
 
+// GetTalkSessionRestrictionKeys implements getTalkSessionRestrictionKeys operation.
+//
+// セッションの投稿制限に使用できるキーの一覧を返す.
+//
+// GET /talksessions/restrictions
+func (UnimplementedHandler) GetTalkSessionRestrictionKeys(ctx context.Context) (r GetTalkSessionRestrictionKeysRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetTimeLine implements getTimeLine operation.
 //
 // タイムラインはセッション終了後にセッション作成者が設定できるその後の予定を知らせるもの.
@@ -225,6 +241,15 @@ func (UnimplementedHandler) OpinionsHistory(ctx context.Context, params Opinions
 //
 // POST /talksessions/{talkSessionID}/conclusion
 func (UnimplementedHandler) PostConclusion(ctx context.Context, req OptPostConclusionReq, params PostConclusionParams) (r PostConclusionRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// PostImage implements postImage operation.
+//
+// 画像を投稿してURLを返すAPI.
+//
+// POST /images
+func (UnimplementedHandler) PostImage(ctx context.Context, req OptPostImageReq) (r PostImageRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

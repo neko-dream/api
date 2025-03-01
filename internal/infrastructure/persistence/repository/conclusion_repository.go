@@ -7,7 +7,7 @@ import (
 
 	"github.com/neko-dream/server/internal/domain/model/conclusion"
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
+	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
@@ -52,10 +52,19 @@ func (r *conclusionRepository) FindByTalkSessionID(ctx context.Context, talkSess
 		return nil, err
 	}
 
+	tsID, err := shared.ParseUUID[talksession.TalkSession](res.TalkSessionID.String())
+	if err != nil {
+		return nil, err
+	}
+	uID, err := shared.ParseUUID[user.User](res.UserID.UUID.String())
+	if err != nil {
+		return nil, err
+	}
+
 	conc := conclusion.NewConclusion(
-		shared.MustParseUUID[talksession.TalkSession](res.TalkSessionID.String()),
+		tsID,
 		res.Content,
-		shared.MustParseUUID[user.User](res.UserID.UUID.String()),
+		uID,
 	)
 	return conc, nil
 }

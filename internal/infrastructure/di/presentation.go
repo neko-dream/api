@@ -14,5 +14,6 @@ func presentationDeps() []ProvideArg {
 		{handler.NewTestHandler, nil},
 		{handler.NewManageHandler, nil},
 		{handler.NewTimelineHandler, nil},
+		{handler.NewImageHandler, nil},
 	}
 }

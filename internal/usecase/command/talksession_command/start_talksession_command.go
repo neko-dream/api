@@ -9,7 +9,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
+	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/internal/usecase/query/dto"
@@ -26,6 +26,7 @@ type (
 		OwnerID          shared.UUID[user.User]
 		Theme            string
 		Description      *string
+		ThumbnailURL     *string
 		ScheduledEndTime time.Time
 		Latitude         *float64
 		Longitude        *float64
@@ -96,6 +97,7 @@ func (i *startTalkSessionCommandHandler) Execute(ctx context.Context, input Star
 			talkSessionID,
 			input.Theme,
 			input.Description,
+			input.ThumbnailURL,
 			input.OwnerID,
 			clock.Now(ctx),
 			input.ScheduledEndTime,
@@ -112,6 +114,7 @@ func (i *startTalkSessionCommandHandler) Execute(ctx context.Context, input Star
 		output.TalkSession = dto.TalkSession{
 			TalkSessionID:    talkSessionID,
 			Theme:            input.Theme,
+			ThumbnailURL:     talkSession.ThumbnailURL(),
 			ScheduledEndTime: input.ScheduledEndTime,
 			OwnerID:          talkSession.OwnerUserID(),
 			CreatedAt:        talkSession.CreatedAt(),
@@ -131,7 +134,7 @@ func (i *startTalkSessionCommandHandler) Execute(ctx context.Context, input Star
 		output.User = dto.User{
 			DisplayID:   *ownerUser.DisplayID(),
 			DisplayName: *ownerUser.DisplayName(),
-			IconURL:     ownerUser.ProfileIconURL(),
+			IconURL:     ownerUser.IconURL(),
 		}
 
 		return nil

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"io"
 	"time"
 
 	"mime/multipart"
@@ -11,7 +10,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
+	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/internal/usecase/command/opinion_command"
@@ -86,9 +85,13 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 	if params.Offset.IsSet() {
 		offset = &params.Offset.Value
 	}
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
 
 	out, err := o.getOpinionByTalkSessionQuery.Execute(ctx, opinion_query.GetOpinionsByTalkSessionInput{
-		TalkSessionID: shared.MustParseUUID[talksession.TalkSession](params.TalkSessionID),
+		TalkSessionID: talkSessionID,
 		SortKey:       sortKey,
 		Limit:         limit,
 		Offset:        offset,
@@ -146,7 +149,11 @@ func (o *opinionHandler) GetOpinionDetail(ctx context.Context, params oas.GetOpi
 		userID = lo.ToPtr(userIDTmp)
 	}
 
-	opinionID := shared.MustParseUUID[opinion.Opinion](params.OpinionID)
+	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
 	opinion, err := o.getOpinionDetailByIDQuery.Execute(ctx, opinion_query.GetOpinionDetailByIDInput{
 		OpinionID: opinionID,
 		UserID:    userID,
@@ -198,9 +205,14 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 		limit = 10
 	}
 
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
 	opinions, err := o.getSwipeOpinionQuery.Execute(ctx, opinion_query.GetSwipeOpinionsQueryInput{
 		UserID:        userID,
-		TalkSessionID: shared.MustParseUUID[talksession.TalkSession](params.TalkSessionID),
+		TalkSessionID: talkSessionID,
 		Limit:         limit,
 	})
 	if err != nil {
@@ -253,8 +265,13 @@ func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.Opinion
 		userID = lo.ToPtr(userIDTmp)
 	}
 
+	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
 	opinions, err := o.getOpinionRepliesQuery.Execute(ctx, opinion_query.GetOpinionRepliesQueryInput{
-		OpinionID: shared.MustParseUUID[opinion.Opinion](params.OpinionID),
+		OpinionID: opinionID,
 		UserID:    userID,
 	})
 	if err != nil {
@@ -335,12 +352,15 @@ func (o *opinionHandler) PostOpinionPost(ctx context.Context, req oas.OptPostOpi
 	if err != nil {
 		return nil, messages.ForbiddenError
 	}
-
 	if !req.IsSet() {
 		return nil, messages.RequiredParameterError
 	}
 
-	talkSessionID := shared.MustParseUUID[talksession.TalkSession](params.TalkSessionID)
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
 	if err := req.Value.Validate(); err != nil {
 		return nil, err
 	}
@@ -348,12 +368,7 @@ func (o *opinionHandler) PostOpinionPost(ctx context.Context, req oas.OptPostOpi
 
 	var file *multipart.FileHeader
 	if value.Picture.IsSet() {
-		content, err := io.ReadAll(value.Picture.Value.File)
-		if err != nil {
-			utils.HandleError(ctx, err, "io.ReadAll")
-			return nil, messages.InternalServerError
-		}
-		file, err = http_utils.MakeFileHeader(value.Picture.Value.Name, content)
+		file, err = http_utils.CreateFileHeader(ctx, value.Picture.Value.File, value.Picture.Value.Name)
 		if err != nil {
 			utils.HandleError(ctx, err, "MakeFileHeader")
 			return nil, messages.InternalServerError
@@ -361,12 +376,17 @@ func (o *opinionHandler) PostOpinionPost(ctx context.Context, req oas.OptPostOpi
 	}
 	var parentOpinionID *shared.UUID[opinion.Opinion]
 	if value.ParentOpinionID.IsSet() {
-		parentOpinionID = lo.ToPtr(shared.MustParseUUID[opinion.Opinion](value.ParentOpinionID.Value))
+		id, err := shared.ParseUUID[opinion.Opinion](value.ParentOpinionID.Value)
+		if err != nil {
+			return nil, messages.BadRequestError
+		}
+		parentOpinionID = &id
 	}
 
 	if err = o.submitOpinionCommand.Execute(ctx, opinion_command.SubmitOpinionInput{
 		TalkSessionID:   talkSessionID,
 		OwnerID:         userID,
+		UserID:          userID,
 		ParentOpinionID: parentOpinionID,
 		Title:           utils.ToPtrIfNotNullValue(!req.Value.Title.IsSet(), value.Title.Value),
 		Content:         req.Value.OpinionContent,

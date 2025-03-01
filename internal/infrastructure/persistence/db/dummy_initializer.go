@@ -7,7 +7,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	talksession "github.com/neko-dream/server/internal/domain/model/talk_session"
+	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/domain/model/vote"
 	"github.com/samber/lo"
@@ -63,9 +63,7 @@ func (d *DummyInitializer) User() error {
 			lo.ToPtr("オブジェクト指向大好きマン"),
 			"user1",
 			"GOOGLE",
-			user.NewProfileIcon(
-				lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
-			),
+			lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
 		),
 		user.NewUser(
 			shared.NewUUID[user.User](),
@@ -73,9 +71,7 @@ func (d *DummyInitializer) User() error {
 			lo.ToPtr("手続き型よかまし"),
 			"user2",
 			"GOOGLE",
-			user.NewProfileIcon(
-				lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
-			),
+			lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
 		),
 		user.NewUser(
 			shared.NewUUID[user.User](),
@@ -83,9 +79,7 @@ func (d *DummyInitializer) User() error {
 			lo.ToPtr("<script>alert('test')</script>"),
 			"user3",
 			"GOOGLE",
-			user.NewProfileIcon(
-				lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
-			),
+			lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
 		),
 		user.NewUser(
 			shared.NewUUID[user.User](),
@@ -93,9 +87,7 @@ func (d *DummyInitializer) User() error {
 			lo.ToPtr("hogehoge' SELECT * FROM users; --"),
 			"user4",
 			"GOOGLE",
-			user.NewProfileIcon(
-				lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
-			),
+			lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
 		),
 		user.NewUser(
 			shared.NewUUID[user.User](),
@@ -103,9 +95,7 @@ func (d *DummyInitializer) User() error {
 			lo.ToPtr("関数型至上主義"),
 			"user5",
 			"GOOGLE",
-			user.NewProfileIcon(
-				lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
-			),
+			lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
 		),
 		user.NewUser(
 			shared.NewUUID[user.User](),
@@ -113,9 +103,7 @@ func (d *DummyInitializer) User() error {
 			lo.ToPtr("user6"),
 			"user6",
 			"GOOGLE",
-			user.NewProfileIcon(
-				lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
-			),
+			lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
 		),
 		user.NewUser(
 			shared.NewUUID[user.User](),
@@ -123,9 +111,7 @@ func (d *DummyInitializer) User() error {
 			lo.ToPtr("user7"),
 			"user7",
 			"GOOGLE",
-			user.NewProfileIcon(
-				lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
-			),
+			lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
 		),
 		user.NewUser(
 			shared.NewUUID[user.User](),
@@ -133,9 +119,7 @@ func (d *DummyInitializer) User() error {
 			lo.ToPtr("user8"),
 			"user8",
 			"GOOGLE",
-			user.NewProfileIcon(
-				lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
-			),
+			lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
 		),
 		user.NewUser(
 			shared.NewUUID[user.User](),
@@ -159,9 +143,7 @@ func (d *DummyInitializer) User() error {
 			lo.ToPtr("user11"),
 			"user11",
 			"GOOGLE",
-			user.NewProfileIcon(
-				lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
-			),
+			lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
 		),
 		user.NewUser(
 			shared.NewUUID[user.User](),
@@ -169,9 +151,7 @@ func (d *DummyInitializer) User() error {
 			lo.ToPtr("user12"),
 			"user12",
 			"GOOGLE",
-			user.NewProfileIcon(
-				lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
-			),
+			lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
 		),
 		user.NewUser(
 			shared.NewUUID[user.User](),
@@ -179,9 +159,7 @@ func (d *DummyInitializer) User() error {
 			lo.ToPtr("user13"),
 			"user13",
 			"GOOGLE",
-			user.NewProfileIcon(
-				lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
-			),
+			lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
 		),
 		user.NewUser(
 			shared.NewUUID[user.User](),
@@ -205,9 +183,7 @@ func (d *DummyInitializer) User() error {
 			lo.ToPtr("user16"),
 			"user16",
 			"GOOGLE",
-			user.NewProfileIcon(
-				lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
-			),
+			lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
 		),
 		user.NewUser(
 			shared.NewUUID[user.User](),
@@ -215,9 +191,7 @@ func (d *DummyInitializer) User() error {
 			lo.ToPtr("user17"),
 			"user17",
 			"GOOGLE",
-			user.NewProfileIcon(
-				lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
-			),
+			lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
 		),
 		user.NewUser(
 			shared.NewUUID[user.User](),
@@ -225,9 +199,7 @@ func (d *DummyInitializer) User() error {
 			lo.ToPtr("user18"),
 			"user18",
 			"GOOGLE",
-			user.NewProfileIcon(
-				lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
-			),
+			lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
 		),
 		user.NewUser(
 			shared.NewUUID[user.User](),
@@ -251,9 +223,7 @@ func (d *DummyInitializer) User() error {
 			lo.ToPtr("user21"),
 			"user21",
 			"GOOGLE",
-			user.NewProfileIcon(
-				lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
-			),
+			lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
 		),
 		user.NewUser(
 			shared.NewUUID[user.User](),
@@ -261,9 +231,7 @@ func (d *DummyInitializer) User() error {
 			lo.ToPtr("user22"),
 			"user22",
 			"GOOGLE",
-			user.NewProfileIcon(
-				lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
-			),
+			lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
 		),
 		user.NewUser(
 			shared.NewUUID[user.User](),
@@ -271,9 +239,7 @@ func (d *DummyInitializer) User() error {
 			lo.ToPtr("user23"),
 			"user23",
 			"GOOGLE",
-			user.NewProfileIcon(
-				lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
-			),
+			lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
 		),
 		user.NewUser(
 			shared.NewUUID[user.User](),
@@ -297,9 +263,7 @@ func (d *DummyInitializer) User() error {
 			lo.ToPtr("user126"),
 			"user126",
 			"GOOGLE",
-			user.NewProfileIcon(
-				lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
-			),
+			lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
 		),
 		user.NewUser(
 			shared.NewUUID[user.User](),
@@ -307,9 +271,7 @@ func (d *DummyInitializer) User() error {
 			lo.ToPtr("user127"),
 			"user127",
 			"GOOGLE",
-			user.NewProfileIcon(
-				lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
-			),
+			lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
 		),
 		user.NewUser(
 			shared.NewUUID[user.User](),
@@ -317,9 +279,7 @@ func (d *DummyInitializer) User() error {
 			lo.ToPtr("user128"),
 			"user128",
 			"GOOGLE",
-			user.NewProfileIcon(
-				lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
-			),
+			lo.ToPtr("https://images.kotohiro.com/users/0192521b-136d-7543-81f9-fc38cd16023f/profile_icon/1728037600.jpg"),
 		),
 		user.NewUser(
 			shared.NewUUID[user.User](),
@@ -459,6 +419,7 @@ func (d *DummyInitializer) TalkSession() error {
 			shared.NewUUID[talksession.TalkSession](),
 			"オブジェクト指向は悪",
 			lo.ToPtr("オブジェクト指向ってなんで悪なの？その理由を探しに我々はアマゾンのジャングルへと向かった。"),
+			nil,
 			d.Users[0].UserID(),
 			clock.Now(ctx),
 			clock.Now(ctx).AddDate(0, 3, 0),
@@ -468,6 +429,7 @@ func (d *DummyInitializer) TalkSession() error {
 		talksession.NewTalkSession(
 			shared.NewUUID[talksession.TalkSession](),
 			"オブジェクト指向は良",
+			nil,
 			nil,
 			d.Users[1].UserID(),
 			clock.Now(ctx),
