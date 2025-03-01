@@ -89,7 +89,7 @@ air
 [go_report_url]: https://goreportcard.com/report/github.com/neko-dream/api
 [go_report_img]: https://img.shields.io/badge/Go_report-A+-success?style=for-the-badge&logo=none
 [go_dev_url]: https://pkg.go.dev/github.com/neko-dream/api
-[go_version_img]: https://img.shields.io/badge/Go-1.23+-00ADD8?style=for-the-badge&logo=go
+[go_version_img]: https://img.shields.io/badge/Go-1.24+-00ADD8?style=for-the-badge&logo=go
 
 <!-- Repository links -->
 
