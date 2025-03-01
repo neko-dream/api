@@ -45,7 +45,7 @@ func main() {
 		log.Fatal("Failed to add encrypted columns:", err)
 	}
 
-	encryptor := crypto.NewCBCEncryptor([]byte("32-byte-key-32-byte-key"))
+	encryptor := crypto.NewCBCEncryptor([]byte(os.Getenv("ENCRYPTION_SECRET")))
 
 	// 2. 既存データの暗号化と移行
 	rows, err := tx.QueryContext(ctx, `
