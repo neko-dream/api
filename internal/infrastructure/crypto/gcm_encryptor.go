@@ -1,6 +1,7 @@
 package crypto
 
 import (
+	"context"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
@@ -27,7 +28,7 @@ func NewGCMEncryptor(key []byte) (*GCMEncryptor, error) {
 }
 
 // EncryptBytes
-func (e *GCMEncryptor) EncryptBytes(plaintext []byte) (string, error) {
+func (e *GCMEncryptor) EncryptBytes(ctx context.Context, plaintext []byte) (string, error) {
 	block, err := aes.NewCipher(e.key)
 	if err != nil {
 		return "", fmt.Errorf("%w: 暗号化ブロックの作成に失敗しました: %v", ErrEncryption, err)
@@ -58,7 +59,7 @@ func (e *GCMEncryptor) EncryptBytes(plaintext []byte) (string, error) {
 }
 
 // DecryptBytes
-func (e *GCMEncryptor) DecryptBytes(ciphertext string) ([]byte, error) {
+func (e *GCMEncryptor) DecryptBytes(ctx context.Context, ciphertext string) ([]byte, error) {
 	parts := strings.Split(ciphertext, ".")
 	if len(parts) != 3 {
 		return nil, ErrInvalidFormat
@@ -104,13 +105,13 @@ func (e *GCMEncryptor) DecryptBytes(ciphertext string) ([]byte, error) {
 }
 
 // EncryptString 文字列を暗号化
-func (e *GCMEncryptor) EncryptString(value string) (string, error) {
-	return e.EncryptBytes([]byte(value))
+func (e *GCMEncryptor) EncryptString(ctx context.Context, value string) (string, error) {
+	return e.EncryptBytes(ctx, []byte(value))
 }
 
 // DecryptString 文字列を復号化
-func (e *GCMEncryptor) DecryptString(ciphertext string) (string, error) {
-	plaintext, err := e.DecryptBytes(ciphertext)
+func (e *GCMEncryptor) DecryptString(ctx context.Context, ciphertext string) (string, error) {
+	plaintext, err := e.DecryptBytes(ctx, ciphertext)
 	if err != nil {
 		return "", err
 	}
@@ -118,15 +119,15 @@ func (e *GCMEncryptor) DecryptString(ciphertext string) (string, error) {
 }
 
 // EncryptInt 整数を暗号化
-func (e *GCMEncryptor) EncryptInt(value int64) (string, error) {
+func (e *GCMEncryptor) EncryptInt(ctx context.Context, value int64) (string, error) {
 	buf := make([]byte, 8)
 	binary.BigEndian.PutUint64(buf, uint64(value))
-	return e.EncryptBytes(buf)
+	return e.EncryptBytes(ctx, buf)
 }
 
 // DecryptInt 整数を復号化
-func (e *GCMEncryptor) DecryptInt(ciphertext string) (int64, error) {
-	plaintext, err := e.DecryptBytes(ciphertext)
+func (e *GCMEncryptor) DecryptInt(ctx context.Context, ciphertext string) (int64, error) {
+	plaintext, err := e.DecryptBytes(ctx, ciphertext)
 	if err != nil {
 		return 0, err
 	}

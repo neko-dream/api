@@ -1,9 +1,9 @@
 package crypto
 
 import (
-	"testing"
-
+	"context"
 	"strings"
+	"testing"
 
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/stretchr/testify/assert"
@@ -53,6 +53,7 @@ func TestNewEncryptor(t *testing.T) {
 func TestGCMEncryptor_String(t *testing.T) {
 	enc, err := NewEncryptor(&testConfig)
 	require.NoError(t, err)
+	ctx := context.Background()
 
 	tests := []struct {
 		name     string
@@ -89,7 +90,7 @@ func TestGCMEncryptor_String(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// 暗号化
-			encrypted, err := enc.EncryptString(tt.input)
+			encrypted, err := enc.EncryptString(ctx, tt.input)
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
@@ -98,7 +99,7 @@ func TestGCMEncryptor_String(t *testing.T) {
 			assert.NotEmpty(t, encrypted)
 
 			// 復号化
-			decrypted, err := enc.DecryptString(encrypted)
+			decrypted, err := enc.DecryptString(ctx, encrypted)
 			require.NoError(t, err)
 
 			if tt.wantSame {
@@ -113,6 +114,7 @@ func TestGCMEncryptor_String(t *testing.T) {
 func TestCBCEncryptor_Int(t *testing.T) {
 	enc, err := NewEncryptor(&testConfig)
 	require.NoError(t, err)
+	ctx := context.Background()
 
 	tests := []struct {
 		name  string
@@ -143,12 +145,12 @@ func TestCBCEncryptor_Int(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// 暗号化
-			encrypted, err := enc.EncryptInt(tt.input)
+			encrypted, err := enc.EncryptInt(ctx, tt.input)
 			require.NoError(t, err)
 			assert.NotEmpty(t, encrypted)
 
 			// 復号化
-			decrypted, err := enc.DecryptInt(encrypted)
+			decrypted, err := enc.DecryptInt(ctx, encrypted)
 			require.NoError(t, err)
 			assert.Equal(t, tt.input, decrypted)
 		})
@@ -158,6 +160,7 @@ func TestCBCEncryptor_Int(t *testing.T) {
 func TestCBCEncryptor_InvalidFormat(t *testing.T) {
 	enc, err := NewEncryptor(&testConfig)
 	require.NoError(t, err)
+	ctx := context.Background()
 
 	tests := []struct {
 		name      string
@@ -188,7 +191,7 @@ func TestCBCEncryptor_InvalidFormat(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := enc.DecryptString(tt.input)
+			_, err := enc.DecryptString(ctx, tt.input)
 			assert.Error(t, err)
 			if tt.wantError != nil {
 				assert.ErrorIs(t, err, tt.wantError)
@@ -202,7 +205,7 @@ func TestGetEncryptorFromCiphertext(t *testing.T) {
 	enc, err := NewEncryptor(&testConfig)
 	require.NoError(t, err)
 
-	encrypted, err := enc.EncryptString("test")
+	encrypted, err := enc.EncryptString(context.Background(), "test")
 	require.NoError(t, err)
 
 	decrypter, err := GetEncryptorFromCiphertext(encrypted, []byte(testConfig.ENCRYPTION_SECRET))
@@ -217,6 +220,7 @@ func TestGetEncryptorFromCiphertext(t *testing.T) {
 func BenchmarkEncryptor_String(b *testing.B) {
 	enc, err := NewEncryptor(&testConfig)
 	require.NoError(b, err)
+	ctx := context.Background()
 
 	benchmarks := []struct {
 		name  string
@@ -231,7 +235,7 @@ func BenchmarkEncryptor_String(b *testing.B) {
 	for _, bm := range benchmarks {
 		b.Run("暗号化_"+bm.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				_, err := enc.EncryptString(bm.input)
+				_, err := enc.EncryptString(ctx, bm.input)
 				if err != nil {
 					b.Fatal(err)
 				}
@@ -239,12 +243,12 @@ func BenchmarkEncryptor_String(b *testing.B) {
 		})
 
 		// 復号のベンチマーク用に事前に暗号化しておく
-		encrypted, err := enc.EncryptString(bm.input)
+		encrypted, err := enc.EncryptString(ctx, bm.input)
 		require.NoError(b, err)
 
 		b.Run("復号_"+bm.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				_, err := enc.DecryptString(encrypted)
+				_, err := enc.DecryptString(ctx, encrypted)
 				if err != nil {
 					b.Fatal(err)
 				}
@@ -256,6 +260,7 @@ func BenchmarkEncryptor_String(b *testing.B) {
 func BenchmarkEncryptor_Int(b *testing.B) {
 	enc, err := NewEncryptor(&testConfig)
 	require.NoError(b, err)
+	ctx := context.Background()
 
 	benchmarks := []struct {
 		name  string
@@ -270,20 +275,19 @@ func BenchmarkEncryptor_Int(b *testing.B) {
 	for _, bm := range benchmarks {
 		b.Run("暗号化_"+bm.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				_, err := enc.EncryptInt(bm.input)
+				_, err := enc.EncryptInt(ctx, bm.input)
 				if err != nil {
 					b.Fatal(err)
 				}
 			}
 		})
 
-		// 復号のベンチマーク用に事前に暗号化しておく
-		encrypted, err := enc.EncryptInt(bm.input)
+		encrypted, err := enc.EncryptInt(ctx, bm.input)
 		require.NoError(b, err)
 
 		b.Run("復号_"+bm.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				_, err := enc.DecryptInt(encrypted)
+				_, err := enc.DecryptInt(ctx, encrypted)
 				if err != nil {
 					b.Fatal(err)
 				}

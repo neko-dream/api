@@ -9,14 +9,12 @@ import (
 
 	"github.com/gofrs/uuid"
 	_ "github.com/jackc/pgx/v5/stdlib"
-	"github.com/joho/godotenv"
 	"github.com/neko-dream/server/internal/infrastructure/crypto"
+	"github.com/neko-dream/server/pkg/utils"
 )
 
 func init() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	utils.LoadEnv()
 }
 
 func main() {
@@ -74,7 +72,7 @@ func main() {
 
 		// gender暗号化
 		if gender.Valid {
-			if encryptedGender, err := encryptor.EncryptString(fmt.Sprintf("%d", gender.Int16)); err == nil {
+			if encryptedGender, err := encryptor.EncryptString(ctx, fmt.Sprintf("%d", gender.Int16)); err == nil {
 				_, err = tx.ExecContext(ctx, `
 					UPDATE user_demographics
 					SET gender_encrypted = $1
@@ -88,7 +86,7 @@ func main() {
 
 		// year_of_birth暗号化
 		if yearOfBirth.Valid {
-			if encryptedYear, err := encryptor.EncryptString(fmt.Sprintf("%d", yearOfBirth.Int32)); err == nil {
+			if encryptedYear, err := encryptor.EncryptString(ctx, fmt.Sprintf("%d", yearOfBirth.Int32)); err == nil {
 				_, err = tx.ExecContext(ctx, `
 					UPDATE user_demographics
 					SET year_of_birth_encrypted = $1
@@ -102,7 +100,7 @@ func main() {
 
 		// city暗号化
 		if city.Valid {
-			if encryptedCity, err := encryptor.EncryptString(city.String); err == nil {
+			if encryptedCity, err := encryptor.EncryptString(ctx, city.String); err == nil {
 				_, err = tx.ExecContext(ctx, `
 					UPDATE user_demographics
 					SET city_encrypted = $1
@@ -116,7 +114,7 @@ func main() {
 
 		// prefecture暗号化
 		if prefecture.Valid {
-			if encryptedPrefecture, err := encryptor.EncryptString(prefecture.String); err == nil {
+			if encryptedPrefecture, err := encryptor.EncryptString(ctx, prefecture.String); err == nil {
 				_, err = tx.ExecContext(ctx, `
 					UPDATE user_demographics
 					SET prefecture_encrypted = $1

@@ -29,7 +29,7 @@ func EncryptUserDemographics(
 
 	var city, prefecture, yearOfBirth, gender sql.NullString
 	if userDemographic.City() != nil {
-		encryptedCity, err := encryptor.EncryptString(userDemographic.City().String())
+		encryptedCity, err := encryptor.EncryptString(ctx, userDemographic.City().String())
 		if err != nil {
 			utils.HandleError(ctx, err, "encryptor.EncryptString City")
 			return nil, err
@@ -38,7 +38,7 @@ func EncryptUserDemographics(
 	}
 
 	if userDemographic.Prefecture() != nil {
-		encryptedPrefecture, err := encryptor.EncryptString(*userDemographic.Prefecture())
+		encryptedPrefecture, err := encryptor.EncryptString(ctx, *userDemographic.Prefecture())
 		if err != nil {
 			utils.HandleError(ctx, err, "encryptor.EncryptString Prefecture")
 			return nil, err
@@ -47,7 +47,7 @@ func EncryptUserDemographics(
 	}
 
 	if userDemographic.YearOfBirth() != nil {
-		encryptedYear, err := encryptor.EncryptInt(int64(*userDemographic.YearOfBirth()))
+		encryptedYear, err := encryptor.EncryptInt(ctx, int64(*userDemographic.YearOfBirth()))
 		if err != nil {
 			utils.HandleError(ctx, err, "encryptor.EncryptInt YearOfBirth")
 			return nil, err
@@ -56,7 +56,7 @@ func EncryptUserDemographics(
 	}
 
 	if userDemographic.Gender() != nil {
-		encryptedGender, err := encryptor.EncryptInt(int64(*userDemographic.Gender()))
+		encryptedGender, err := encryptor.EncryptInt(ctx, int64(*userDemographic.Gender()))
 		if err != nil {
 			utils.HandleError(ctx, err, "encrypt.EncryptInt Gender")
 			return nil, err
@@ -99,7 +99,7 @@ func DecryptUserDemographics(
 	var household, yearOfBirth, occupation *int
 
 	if userDemographic.City.Valid {
-		decryptedCity, err := decryptor.DecryptString(userDemographic.City.String)
+		decryptedCity, err := decryptor.DecryptString(ctx, userDemographic.City.String)
 		if err != nil {
 			utils.HandleError(ctx, err, "decryptor.DecryptString City")
 			return nil, err
@@ -107,7 +107,7 @@ func DecryptUserDemographics(
 		city = &decryptedCity
 	}
 	if userDemographic.Prefecture.Valid {
-		decryptedPrefecture, err := decryptor.DecryptString(userDemographic.Prefecture.String)
+		decryptedPrefecture, err := decryptor.DecryptString(ctx, userDemographic.Prefecture.String)
 		if err != nil {
 			utils.HandleError(ctx, err, "decryptor.DecryptString Prefecture")
 			return nil, err
@@ -115,7 +115,7 @@ func DecryptUserDemographics(
 		prefecture = &decryptedPrefecture
 	}
 	if userDemographic.YearOfBirth.Valid {
-		decryptedYear, err := decryptor.DecryptInt(userDemographic.YearOfBirth.String)
+		decryptedYear, err := decryptor.DecryptInt(ctx, userDemographic.YearOfBirth.String)
 		if err != nil {
 			utils.HandleError(ctx, err, "decryptor.DecryptInt YearOfBirth")
 			return nil, err
@@ -123,7 +123,7 @@ func DecryptUserDemographics(
 		yearOfBirth = lo.ToPtr(int(decryptedYear))
 	}
 	if userDemographic.Gender.Valid {
-		decryptedGender, err := decryptor.DecryptInt(userDemographic.Gender.String)
+		decryptedGender, err := decryptor.DecryptInt(ctx, userDemographic.Gender.String)
 		if err != nil {
 			utils.HandleError(ctx, err, "decrypt.DecryptInt Gender")
 			return nil, err
