@@ -8,9 +8,11 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"fmt"
-	"go.opentelemetry.io/otel"
 	"io"
 	"strings"
+
+	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 // GCMEncryptor AES-GCMを使用した暗号化用の構造体
@@ -37,18 +39,21 @@ func (e *GCMEncryptor) EncryptBytes(ctx context.Context, plaintext []byte) (stri
 
 	block, err := aes.NewCipher(e.key)
 	if err != nil {
+		utils.HandleError(ctx, err, "aes.NewCipher")
 		return "", fmt.Errorf("%w: 暗号化ブロックの作成に失敗しました: %v", ErrEncryption, err)
 	}
 
 	// GCMモードを初期化
 	aesGCM, err := cipher.NewGCM(block)
 	if err != nil {
+		utils.HandleError(ctx, err, "cipher.NewGCM")
 		return "", fmt.Errorf("%w: GCMモードの初期化に失敗しました: %v", ErrEncryption, err)
 	}
 
 	// Nonceを生成 rand.Readerを使用しているため衝突確率はあるが、一旦考慮しない。本当はカウントアップすべき？
 	nonce := make([]byte, aesGCM.NonceSize())
 	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
+		utils.HandleError(ctx, err, "io.ReadFull")
 		return "", fmt.Errorf("%w: Nonceの生成に失敗しました: %v", ErrEncryption, err)
 	}
 
@@ -78,27 +83,32 @@ func (e *GCMEncryptor) DecryptBytes(ctx context.Context, ciphertext string) ([]b
 
 	version := parts[0]
 	if version != Version1 {
+		utils.HandleError(ctx, fmt.Errorf("%w: バージョン: %s", ErrUnsupportedVersion, version), "GCMEncryptor.DecryptBytes")
 		return nil, fmt.Errorf("%w: バージョン: %s", ErrUnsupportedVersion, version)
 	}
 
 	block, err := aes.NewCipher(e.key)
 	if err != nil {
+		utils.HandleError(ctx, err, "aes.NewCipher")
 		return nil, fmt.Errorf("%w: 暗号化ブロックの作成に失敗しました: %v", ErrDecryption, err)
 	}
 
 	// GCMモードを初期化
 	aesGCM, err := cipher.NewGCM(block)
 	if err != nil {
+		utils.HandleError(ctx, err, "cipher.NewGCM")
 		return nil, fmt.Errorf("%w: GCMモードの初期化に失敗しました: %v", ErrDecryption, err)
 	}
 	// Base64デコード
 	encryptedData, nonceStr := parts[1], parts[2]
 	encrypted, err := base64.StdEncoding.DecodeString(encryptedData)
 	if err != nil {
+		utils.HandleError(ctx, err, "base64.StdEncoding.DecodeString")
 		return nil, fmt.Errorf("%w: 暗号文のデコードに失敗しました: %v", ErrDecryption, err)
 	}
 	nonce, err := base64.StdEncoding.DecodeString(nonceStr)
 	if err != nil {
+		utils.HandleError(ctx, err, "base64.StdEncoding.DecodeString")
 		return nil, fmt.Errorf("%w: Nonceのデコードに失敗しました: %v", ErrDecryption, err)
 	}
 	// Nonceのサイズを検証
@@ -109,6 +119,7 @@ func (e *GCMEncryptor) DecryptBytes(ctx context.Context, ciphertext string) ([]b
 	// 復号
 	plaintext, err := aesGCM.Open(nil, nonce, encrypted, nil)
 	if err != nil {
+		utils.HandleError(ctx, err, "aesGCM.Open")
 		return nil, fmt.Errorf("%w: 復号化に失敗しました: %v", ErrDecryption, err)
 	}
 
