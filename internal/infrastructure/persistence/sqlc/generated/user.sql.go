@@ -301,9 +301,9 @@ DO UPDATE SET
 type UpdateOrCreateUserDemographicParams struct {
 	UserDemographicsID uuid.UUID
 	UserID             uuid.UUID
-	YearOfBirth        sql.NullInt32
+	YearOfBirth        sql.NullString
 	Occupation         sql.NullInt16
-	Gender             sql.NullInt16
+	Gender             sql.NullString
 	City               sql.NullString
 	HouseholdSize      sql.NullInt16
 	Prefecture         sql.NullString

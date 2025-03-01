@@ -39,6 +39,11 @@ type Config struct {
 
 	SENTRY_DSN       string `mapstructure:"SENTRY_DSN"`
 	BASELIME_API_KEY string `mapstructure:"BASELIME_API_KEY"`
+
+	// 暗号化バージョン (v1, etc..)
+	ENCRYPTION_VERSION string `env:"ENCRYPTION_VERSION"`
+	// 暗号化キー (16バイトの文字列) コマンド: openssl rand -base64 16
+	ENCRYPTION_SECRET string `env:"ENCRYPTION_SECRET,required"`
 }
 
 type ENV string
@@ -141,6 +146,12 @@ func LoadConfig() *Config {
 				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
 			}
 			if err := viper.BindEnv("BASELIME_API_KEY"); err != nil {
+				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
+			}
+			if err := viper.BindEnv("ENCRYPTION_VERSION"); err != nil {
+				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
+			}
+			if err := viper.BindEnv("ENCRYPTION_SECRET"); err != nil {
 				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
 			}
 		default:
