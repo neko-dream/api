@@ -1,6 +1,6 @@
 module github.com/neko-dream/server
 
-go 1.23.0
+go 1.24.0
 
 require (
 	braces.dev/errtrace v0.3.0
