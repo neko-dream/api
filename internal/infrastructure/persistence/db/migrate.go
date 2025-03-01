@@ -6,9 +6,10 @@ import (
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/golang-migrate/migrate/v4/source/iofs"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/neko-dream/server/internal/infrastructure/config"
+	"github.com/neko-dream/server/migrations"
 )
 
 type Migrator struct {
@@ -20,6 +21,11 @@ func NewMigrator(config *config.Config) *Migrator {
 }
 
 func (m *Migrator) Up() {
+	d, err := iofs.New(migrations.MigrationFiles, ".")
+	if err != nil {
+		panic(err)
+	}
+
 	pgx, err := sql.Open("pgx", m.config.DatabaseURL)
 	if err != nil {
 		panic(err)
@@ -28,8 +34,9 @@ func (m *Migrator) Up() {
 	if err != nil {
 		panic(err)
 	}
-	mi, err := migrate.NewWithDatabaseInstance(
-		"file://migrations",
+	mi, err := migrate.NewWithInstance(
+		"iofs",
+		d,
 		"postgres",
 		driver,
 	)
@@ -44,6 +51,11 @@ func (m *Migrator) Up() {
 }
 
 func (m *Migrator) Down() {
+	d, err := iofs.New(migrations.MigrationFiles, ".")
+	if err != nil {
+		panic(err)
+	}
+
 	pgx, err := sql.Open("pgx", m.config.DatabaseURL)
 	if err != nil {
 		panic(err)
@@ -52,8 +64,9 @@ func (m *Migrator) Down() {
 	if err != nil {
 		panic(err)
 	}
-	mi, err := migrate.NewWithDatabaseInstance(
-		"file://migrations",
+	mi, err := migrate.NewWithInstance(
+		"iofs",
+		d,
 		"postgres",
 		driver,
 	)
