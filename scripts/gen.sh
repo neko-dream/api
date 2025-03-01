@@ -12,4 +12,4 @@ ogen --package oas --target internal/presentation/oas --clean ./static/openapi.y
 sqlc generate
 oapi-codegen -config oapi.yaml ./api/analysis.openapi.json
 
-# find . -name "*.go" | grep -v "vendor/\|.git/\|_test.go" | xargs -n 1 -t otelinji -template "./internal/infrastructure/telemetry/otelinji.template" -w -filename
+find . -name "*.go" | grep -v "vendor/\|.git/\|_test.go" | xargs -n 1 -t otelinji -template "./internal/infrastructure/telemetry/otelinji.template" -w -filename
