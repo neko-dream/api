@@ -8,6 +8,7 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"fmt"
+	"go.opentelemetry.io/otel"
 	"io"
 	"strings"
 )
@@ -25,6 +26,11 @@ func NewCBCEncryptor(key []byte) *CBCEncryptor {
 
 // EncryptBytes
 func (e *CBCEncryptor) EncryptBytes(ctx context.Context, plaintext []byte) (string, error) {
+	ctx, span := otel.Tracer("crypto").Start(ctx, "CBCEncryptor.EncryptBytes")
+	defer span.End()
+
+	_ = ctx
+
 	block, err := aes.NewCipher(e.key)
 	if err != nil {
 		return "", fmt.Errorf("%w: 暗号化ブロックの作成に失敗しました: %v", ErrEncryption, err)
@@ -54,6 +60,11 @@ func (e *CBCEncryptor) EncryptBytes(ctx context.Context, plaintext []byte) (stri
 
 // DecryptBytes 暗号文をバイト列に復号化する基本関数
 func (e *CBCEncryptor) DecryptBytes(ctx context.Context, ciphertext string) ([]byte, error) {
+	ctx, span := otel.Tracer("crypto").Start(ctx, "CBCEncryptor.DecryptBytes")
+	defer span.End()
+
+	_ = ctx
+
 	parts := strings.Split(ciphertext, ".")
 	if len(parts) != 3 {
 		return nil, ErrInvalidFormat
@@ -91,11 +102,17 @@ func (e *CBCEncryptor) DecryptBytes(ctx context.Context, ciphertext string) ([]b
 
 // EncryptString 文字列を暗号化
 func (e *CBCEncryptor) EncryptString(ctx context.Context, value string) (string, error) {
+	ctx, span := otel.Tracer("crypto").Start(ctx, "CBCEncryptor.EncryptString")
+	defer span.End()
+
 	return e.EncryptBytes(ctx, []byte(value))
 }
 
 // DecryptString 文字列を復号化
 func (e *CBCEncryptor) DecryptString(ctx context.Context, ciphertext string) (string, error) {
+	ctx, span := otel.Tracer("crypto").Start(ctx, "CBCEncryptor.DecryptString")
+	defer span.End()
+
 	plaintext, err := e.DecryptBytes(ctx, ciphertext)
 	if err != nil {
 		return "", err
@@ -105,6 +122,9 @@ func (e *CBCEncryptor) DecryptString(ctx context.Context, ciphertext string) (st
 
 // EncryptInt 整数を暗号化
 func (e *CBCEncryptor) EncryptInt(ctx context.Context, value int64) (string, error) {
+	ctx, span := otel.Tracer("crypto").Start(ctx, "CBCEncryptor.EncryptInt")
+	defer span.End()
+
 	buf := make([]byte, 8)
 	binary.BigEndian.PutUint64(buf, uint64(value))
 	return e.EncryptBytes(ctx, buf)
@@ -112,6 +132,9 @@ func (e *CBCEncryptor) EncryptInt(ctx context.Context, value int64) (string, err
 
 // DecryptInt 整数を復号化
 func (e *CBCEncryptor) DecryptInt(ctx context.Context, ciphertext string) (int64, error) {
+	ctx, span := otel.Tracer("crypto").Start(ctx, "CBCEncryptor.DecryptInt")
+	defer span.End()
+
 	plaintext, err := e.DecryptBytes(ctx, ciphertext)
 	if err != nil {
 		return 0, err
