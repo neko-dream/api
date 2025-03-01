@@ -9,7 +9,9 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/user"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/server/internal/usecase/query/dto"
+	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel"
 )
 
 // Encrypt時はuser.UserDemographicの各フィールドを暗号化し、model.UserDemographicの各フィールドにセットする
@@ -20,11 +22,16 @@ func EncryptUserDemographics(
 	userID shared.UUID[user.User],
 	userDemographic *user.UserDemographic,
 ) (*model.UserDemographic, error) {
+	ctx, span := otel.Tracer("crypto").Start(ctx, "EncryptUserDemographics")
+	defer span.End()
+
+	_ = ctx
 
 	var city, prefecture, yearOfBirth, gender sql.NullString
 	if userDemographic.City() != nil {
 		encryptedCity, err := encryptor.EncryptString(userDemographic.City().String())
 		if err != nil {
+			utils.HandleError(ctx, err, "encryptor.EncryptString City")
 			return nil, err
 		}
 		city = sql.NullString{String: encryptedCity, Valid: true}
@@ -33,6 +40,7 @@ func EncryptUserDemographics(
 	if userDemographic.Prefecture() != nil {
 		encryptedPrefecture, err := encryptor.EncryptString(*userDemographic.Prefecture())
 		if err != nil {
+			utils.HandleError(ctx, err, "encryptor.EncryptString Prefecture")
 			return nil, err
 		}
 		prefecture = sql.NullString{String: encryptedPrefecture, Valid: true}
@@ -41,6 +49,7 @@ func EncryptUserDemographics(
 	if userDemographic.YearOfBirth() != nil {
 		encryptedYear, err := encryptor.EncryptInt(int64(*userDemographic.YearOfBirth()))
 		if err != nil {
+			utils.HandleError(ctx, err, "encryptor.EncryptInt YearOfBirth")
 			return nil, err
 		}
 		yearOfBirth = sql.NullString{String: encryptedYear, Valid: true}
@@ -49,6 +58,7 @@ func EncryptUserDemographics(
 	if userDemographic.Gender() != nil {
 		encryptedGender, err := encryptor.EncryptInt(int64(*userDemographic.Gender()))
 		if err != nil {
+			utils.HandleError(ctx, err, "encrypt.EncryptInt Gender")
 			return nil, err
 		}
 		gender = sql.NullString{String: encryptedGender, Valid: true}
@@ -82,12 +92,16 @@ func DecryptUserDemographics(
 	decryptor crypto.Encryptor,
 	userDemographic *model.UserDemographic,
 ) (*user.UserDemographic, error) {
+	ctx, span := otel.Tracer("crypto").Start(ctx, "DecryptUserDemographics")
+	defer span.End()
+
 	var city, prefecture, gender *string
 	var household, yearOfBirth, occupation *int
 
 	if userDemographic.City.Valid {
 		decryptedCity, err := decryptor.DecryptString(userDemographic.City.String)
 		if err != nil {
+			utils.HandleError(ctx, err, "decryptor.DecryptString City")
 			return nil, err
 		}
 		city = &decryptedCity
@@ -95,6 +109,7 @@ func DecryptUserDemographics(
 	if userDemographic.Prefecture.Valid {
 		decryptedPrefecture, err := decryptor.DecryptString(userDemographic.Prefecture.String)
 		if err != nil {
+			utils.HandleError(ctx, err, "decryptor.DecryptString Prefecture")
 			return nil, err
 		}
 		prefecture = &decryptedPrefecture
@@ -102,6 +117,7 @@ func DecryptUserDemographics(
 	if userDemographic.YearOfBirth.Valid {
 		decryptedYear, err := decryptor.DecryptInt(userDemographic.YearOfBirth.String)
 		if err != nil {
+			utils.HandleError(ctx, err, "decryptor.DecryptInt YearOfBirth")
 			return nil, err
 		}
 		yearOfBirth = lo.ToPtr(int(decryptedYear))
@@ -109,6 +125,7 @@ func DecryptUserDemographics(
 	if userDemographic.Gender.Valid {
 		decryptedGender, err := decryptor.DecryptInt(userDemographic.Gender.String)
 		if err != nil {
+			utils.HandleError(ctx, err, "decrypt.DecryptInt Gender")
 			return nil, err
 		}
 
@@ -151,6 +168,9 @@ func DecryptUserDemographicsDTO(
 	decryptor crypto.Encryptor,
 	userDemographic *model.UserDemographic,
 ) (*dto.UserDemographic, error) {
+	ctx, span := otel.Tracer("crypto").Start(ctx, "DecryptUserDemographicsDTO")
+	defer span.End()
+
 	decrypted, err := DecryptUserDemographics(ctx, decryptor, userDemographic)
 	if err != nil {
 		return nil, err
