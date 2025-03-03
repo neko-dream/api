@@ -59,7 +59,7 @@ func TestEncryptUserDemographics(t *testing.T) {
 				demoID,
 				nil,              // 生年
 				nil,              // 職業
-				lo.ToPtr(""),     // 性別
+				lo.ToPtr("男性"),   // 性別
 				lo.ToPtr("世田谷区"), // 都市
 				nil,              // 世帯人数
 				nil,              // 都道府県

@@ -32,6 +32,7 @@ type (
 		Longitude        *float64
 		City             *string
 		Prefecture       *string
+		Restrictions     []string
 	}
 
 	StartTalkSessionCommandOutput struct {
@@ -105,6 +106,11 @@ func (i *startTalkSessionCommandHandler) Execute(ctx context.Context, input Star
 			input.City,
 			input.Prefecture,
 		)
+		if input.Restrictions != nil {
+			if err := talkSession.UpdateRestrictions(ctx, input.Restrictions); err != nil {
+				return errtrace.Wrap(err)
+			}
+		}
 
 		if err := i.TalkSessionRepository.Create(ctx, talkSession); err != nil {
 			utils.HandleError(ctx, err, "TalkSessionRepository.Create")
@@ -124,6 +130,9 @@ func (i *startTalkSessionCommandHandler) Execute(ctx context.Context, input Star
 		}
 		output.Latitude = input.Latitude
 		output.Longitude = input.Longitude
+		if input.Restrictions != nil {
+			output.Restrictions = input.Restrictions
+		}
 
 		// オーナーのユーザー情報を取得
 		ownerUser, err := i.UserRepository.FindByID(ctx, input.OwnerID)

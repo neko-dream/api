@@ -3,6 +3,7 @@ package handler
 import (
 	"bytes"
 	"context"
+	"strings"
 	"time"
 
 	"braces.dev/errtrace"
@@ -205,7 +206,8 @@ func (t *talkSessionHandler) GetOpenedTalkSession(ctx context.Context, params oa
 		}
 		var restrictions []oas.GetOpenedTalkSessionOKTalkSessionsItemTalkSessionRestrictionsItem
 		for _, restriction := range talkSession.TalkSession.Restrictions {
-			attr := talksession.RestrictionAttributeKey(restriction).RestrictionAttribute()
+			res := talksession.RestrictionAttributeKey(restriction)
+			attr := res.RestrictionAttribute()
 			restrictions = append(restrictions, oas.GetOpenedTalkSessionOKTalkSessionsItemTalkSessionRestrictionsItem{
 				Key:         string(attr.Key),
 				Description: attr.Description,
@@ -272,6 +274,12 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 		utils.HandleError(ctx, err, "claim.UserID")
 		return nil, messages.ForbiddenError
 	}
+	var restrictionStrings []string
+	if req.Value.Restrictions != nil {
+		if sl := strings.Split(strings.Join(req.Value.Restrictions, ","), ","); len(sl) > 0 {
+			restrictionStrings = sl
+		}
+	}
 
 	out, err := t.startTalkSessionCommand.Execute(ctx, talksession_command.StartTalkSessionCommandInput{
 		Theme:            req.Value.Theme,
@@ -283,6 +291,7 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 		Longitude:        utils.ToPtrIfNotNullValue(!req.Value.Longitude.IsSet(), req.Value.Longitude.Value),
 		City:             utils.ToPtrIfNotNullValue(!req.Value.City.IsSet(), req.Value.City.Value),
 		Prefecture:       utils.ToPtrIfNotNullValue(!req.Value.Prefecture.IsSet(), req.Value.Prefecture.Value),
+		Restrictions:     restrictionStrings,
 	})
 	if err != nil {
 		return nil, errtrace.Wrap(err)
@@ -300,7 +309,8 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 	}
 	var restrictions []oas.CreateTalkSessionOKRestrictionsItem
 	for _, restriction := range out.TalkSession.Restrictions {
-		attr := talksession.RestrictionAttributeKey(restriction).RestrictionAttribute()
+		res := talksession.RestrictionAttributeKey(restriction)
+		attr := res.RestrictionAttribute()
 		restrictions = append(restrictions, oas.CreateTalkSessionOKRestrictionsItem{
 			Key:         string(attr.Key),
 			Description: attr.Description,
@@ -359,7 +369,8 @@ func (t *talkSessionHandler) GetTalkSessionDetail(ctx context.Context, params oa
 	}
 	var restrictions []oas.GetTalkSessionDetailOKRestrictionsItem
 	for _, restriction := range out.TalkSession.Restrictions {
-		attr := talksession.RestrictionAttributeKey(restriction).RestrictionAttribute()
+		res := talksession.RestrictionAttributeKey(restriction)
+		attr := res.RestrictionAttribute()
 		restrictions = append(restrictions, oas.GetTalkSessionDetailOKRestrictionsItem{
 			Key:         string(attr.Key),
 			Description: attr.Description,
@@ -448,7 +459,8 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 		}
 		var restrictions []oas.GetTalkSessionListOKTalkSessionsItemTalkSessionRestrictionsItem
 		for _, restriction := range talkSession.TalkSession.Restrictions {
-			attr := talksession.RestrictionAttributeKey(restriction).RestrictionAttribute()
+			res := talksession.RestrictionAttributeKey(restriction)
+			attr := res.RestrictionAttribute()
 			restrictions = append(restrictions, oas.GetTalkSessionListOKTalkSessionsItemTalkSessionRestrictionsItem{
 				Key:         string(attr.Key),
 				Description: attr.Description,
