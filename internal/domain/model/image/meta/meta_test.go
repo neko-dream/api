@@ -213,7 +213,7 @@ func TestNewImageForProfile(t *testing.T) {
 	meta, err := NewImageForProfile(ctx, userID, f)
 	assert.NoError(t, err)
 	assert.NotNil(t, meta)
-	assert.Equal(t, "users/"+userID.String()+".jpg", meta.Key)
+	assert.Equal(t, "u/"+userID.String()+".jpg", meta.Key)
 	assert.Equal(t, 100, meta.Width)
 	assert.Equal(t, 50, meta.Height)
 	assert.Equal(t, "image/png", meta.Extension.Value)
