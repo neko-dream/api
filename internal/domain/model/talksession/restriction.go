@@ -1,6 +1,9 @@
 package talksession
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/user"
 )
@@ -63,12 +66,12 @@ var (
 	}
 )
 
-func (k RestrictionAttributeKey) RestrictionAttribute() RestrictionAttribute {
-	return RestrictionAttributeKeyMap[k]
+func (k *RestrictionAttributeKey) RestrictionAttribute() RestrictionAttribute {
+	return RestrictionAttributeKeyMap[*k]
 }
 
-func (k RestrictionAttributeKey) IsValid() bool {
-	_, ok := RestrictionAttributeKeyMap[k]
+func (k *RestrictionAttributeKey) IsValid() bool {
+	_, ok := RestrictionAttributeKeyMap[*k]
 	return ok
 }
 
@@ -81,3 +84,26 @@ var (
 )
 
 type Restrictions []string
+
+func (s *Restrictions) Scan(src interface{}) error {
+	if src == nil {
+		*s = nil
+		return nil
+	}
+
+	switch v := src.(type) {
+	case []byte:
+		return json.Unmarshal(v, s)
+	case string:
+		return json.Unmarshal([]byte(v), s)
+	default:
+		return fmt.Errorf("unsupported type for StringSlice: %T", src)
+	}
+}
+
+func (s Restrictions) Value() (interface{}, error) {
+	if s == nil {
+		return nil, nil
+	}
+	return json.Marshal(s)
+}
