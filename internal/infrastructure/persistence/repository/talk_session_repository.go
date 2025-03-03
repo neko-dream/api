@@ -64,7 +64,7 @@ func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talkses
 		ScheduledEndTime: talkSession.ScheduledEndTime(),
 		Prefecture:       prefecture,
 		City:             city,
-		Restrictions:     restrictions,
+		Restrictions:     talksession.Restrictions(restrictions),
 	}); err != nil {
 		return errtrace.Wrap(err)
 	}
