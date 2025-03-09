@@ -31,6 +31,13 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
+    env:
+      DATABASE_URL: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
+      ENCRYPTION_VERSION: v1
+      ENCRYPTION_SECRET: UkadNiT1rGQa3dgBgCgF4rMo7sPhZTzE
+      ENV: local
+      PORT: 3000
+
     steps:
       - uses: actions/checkout@v4
 
@@ -39,24 +46,19 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: Install golang-migrate
+        run: go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
+      - name: Run migrations
+        run: migrate -path migrations -database "$DATABASE_URL" up
+
       - name: Install dependencies
         run: go mod download
 
       - name: Run unit tests with coverage
-        env:
-          ENV: local
-          DATABASE_URL: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
-          ENCRYPTION_VERSION: v1
-          ENCRYPTION_SECRET: UkadNiT1rGQa3dgBgCgF4rMo7sPhZTzE
         run: go test -parallel 2 -v -coverprofile=coverage.out ./...
 
       - name: Run E2E tests
-        env:
-          ENV: local
-          DATABASE_URL: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
-          PORT: 3000
-          ENCRYPTION_VERSION: v1
-          ENCRYPTION_SECRET: UkadNiT1rGQa3dgBgCgF4rMo7sPhZTzE
         run: |
           go install github.com/k1LoW/runn@latest
           chmod +x ./scripts/test.sh
