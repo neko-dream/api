@@ -1,0 +1,61 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:15-3.3
+        env:
+          POSTGRES_USER: kotohiro
+          POSTGRES_PASSWORD: kotohiro
+          POSTGRES_DB: kotohiro
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Run unit tests with coverage
+        env:
+          ENV: local
+          DATABASE_URL: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
+          ENCRYPTION_VERSION: v1
+          ENCRYPTION_SECRET: UkadNiT1rGQa3dgBgCgF4rMo7sPhZTzE
+        run: go test -parallel 4 -cpu 4 -v -coverprofile=coverage.out ./...
+
+      - name: Run E2E tests
+        env:
+          ENV: local
+          DATABASE_URL: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
+          PORT: 3000
+          ENCRYPTION_VERSION: v1
+          ENCRYPTION_SECRET: UkadNiT1rGQa3dgBgCgF4rMo7sPhZTzE
+        run: |
+          go install github.com/k1LoW/runn@latest
+          chmod +x ./scripts/test.sh
+          go run cmd/server/main.go &
+          sleep 5
+          ./scripts/test.sh
+
+      - name: Coverage Report
+        uses: k1LoW/octocov-action@v1
