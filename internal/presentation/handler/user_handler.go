@@ -245,13 +245,6 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 				Value: *demographics.YearOfBirth,
 			}
 		}
-		var householdSize oas.OptNilInt
-		if demographics.HouseholdSize != nil {
-			householdSize = oas.OptNilInt{
-				Set:   true,
-				Value: *demographics.HouseholdSize,
-			}
-		}
 		var prefecture oas.OptNilString
 		if demographics.Prefecture != nil {
 			prefecture = oas.OptNilString{
@@ -259,15 +252,6 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 				Value: *demographics.Prefecture,
 			}
 		}
-
-		var occupation oas.OptNilString
-		if demographics.Occupation != nil {
-			occupation = oas.OptNilString{
-				Set:   true,
-				Value: demographics.OccupationString(),
-			}
-		}
-
 		var gender oas.OptNilString
 		if demographics.GenderString() != nil {
 			gender = oas.OptNilString{
@@ -277,12 +261,10 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 		}
 
 		demographicsResp = oas.GetUserInfoOKDemographics{
-			YearOfBirth:   yearOfBirth,
-			Occupation:    occupation,
-			Gender:        gender,
-			HouseholdSize: householdSize,
-			Prefecture:    prefecture,
-			City:          city,
+			YearOfBirth: yearOfBirth,
+			Gender:      gender,
+			Prefecture:  prefecture,
+			City:        city,
 		}
 	}
 
@@ -332,10 +314,7 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 	if !value.City.Null && value.City.Value != "" {
 		city = &value.City.Value
 	}
-	var householdSize *int
-	if !value.HouseholdSize.Null && value.HouseholdSize.Value != 0 {
-		householdSize = &value.HouseholdSize.Value
-	}
+
 	var prefecture *string
 	if !value.Prefecture.Null && value.Prefecture.Value != "" {
 		prefecture = &value.Prefecture.Value
@@ -350,17 +329,6 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 		}
 		displayName = &value.DisplayName.Value
 	}
-	var occupation *string
-	if value.Occupation.IsSet() && !value.Occupation.IsNull() {
-		txt, err := value.Occupation.Value.MarshalText()
-		if err != nil {
-			utils.HandleError(ctx, err, "value.Occupation.Value.MarshalText")
-			return nil, messages.InternalServerError
-		}
-		if string(txt) != "" {
-			occupation = lo.ToPtr(string(txt))
-		}
-	}
 	var gender *string
 	if value.Gender.IsSet() && !value.Gender.IsNull() {
 		txt, err := value.Gender.Value.MarshalText()
@@ -373,16 +341,14 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 	}
 
 	out, err := u.editUser.Execute(ctx, user_command.EditInput{
-		UserID:        userID,
-		DisplayName:   displayName,
-		Icon:          file,
-		YearOfBirth:   yearOfBirth,
-		City:          city,
-		Occupation:    occupation,
-		Gender:        gender,
-		HouseholdSize: householdSize,
-		Prefecture:    prefecture,
-		DeleteIcon:    deleteIcon,
+		UserID:      userID,
+		DisplayName: displayName,
+		Icon:        file,
+		YearOfBirth: yearOfBirth,
+		City:        city,
+		Gender:      gender,
+		Prefecture:  prefecture,
+		DeleteIcon:  deleteIcon,
 	})
 	if err != nil {
 		utils.HandleError(ctx, err, "EditUserUseCase.Execute")
@@ -440,13 +406,6 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 		Icon:        file,
 		YearOfBirth: utils.ToPtrIfNotNullValue(value.YearOfBirth.Null, value.YearOfBirth.Value),
 		City:        utils.ToPtrIfNotNullValue(value.City.Null, value.City.Value),
-		Occupation: utils.ToPtrIfNotNullFunc(value.Occupation.Null, func() *string {
-			txt, err := value.Occupation.Value.MarshalText()
-			if err != nil {
-				return nil
-			}
-			return lo.ToPtr(string(txt))
-		}),
 		Gender: utils.ToPtrIfNotNullFunc(value.Gender.Null, func() *string {
 			txt, err := value.Gender.Value.MarshalText()
 			if err != nil {
@@ -454,8 +413,7 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 			}
 			return lo.ToPtr(string(txt))
 		}),
-		HouseholdSize: &value.HouseholdSize.Value,
-		Prefecture:    prefecture,
+		Prefecture: prefecture,
 	}
 	out, err := u.registerUser.Execute(ctx, input)
 	if err != nil {

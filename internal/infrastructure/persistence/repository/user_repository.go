@@ -126,9 +126,7 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 			UserDemographicsID: encryptedDemo.UserDemographicsID,
 			UserID:             encryptedDemo.UserID,
 			YearOfBirth:        encryptedDemo.YearOfBirth,
-			Occupation:         encryptedDemo.Occupation,
 			City:               encryptedDemo.City,
-			HouseholdSize:      encryptedDemo.HouseholdSize,
 			Gender:             encryptedDemo.Gender,
 			Prefecture:         encryptedDemo.Prefecture,
 		}); err != nil {

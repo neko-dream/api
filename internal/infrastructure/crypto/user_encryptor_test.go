@@ -36,10 +36,8 @@ func TestEncryptUserDemographics(t *testing.T) {
 				ctx,
 				demoID,
 				lo.ToPtr(1990),
-				lo.ToPtr("正社員"),
 				lo.ToPtr("男性"),
 				lo.ToPtr("世田谷区"),
-				lo.ToPtr(1),
 				lo.ToPtr("東京都"),
 			),
 			wantErr: false,
@@ -48,8 +46,6 @@ func TestEncryptUserDemographics(t *testing.T) {
 				assert.True(t, got.Prefecture.Valid)
 				assert.True(t, got.YearOfBirth.Valid)
 				assert.True(t, got.Gender.Valid)
-				assert.True(t, got.HouseholdSize.Valid)
-				assert.Equal(t, int16(1), got.HouseholdSize.Int16)
 			},
 		},
 		{
@@ -58,10 +54,8 @@ func TestEncryptUserDemographics(t *testing.T) {
 				ctx,
 				demoID,
 				nil,              // 生年
-				nil,              // 職業
 				lo.ToPtr("男性"),   // 性別
 				lo.ToPtr("世田谷区"), // 都市
-				nil,              // 世帯人数
 				nil,              // 都道府県
 			),
 			wantErr: false,
@@ -70,7 +64,6 @@ func TestEncryptUserDemographics(t *testing.T) {
 				assert.False(t, got.Prefecture.Valid)
 				assert.False(t, got.YearOfBirth.Valid)
 				assert.True(t, got.Gender.Valid)
-				assert.False(t, got.HouseholdSize.Valid)
 			},
 		},
 	}
@@ -102,10 +95,8 @@ func TestDecryptUserDemographics(t *testing.T) {
 		ctx,
 		shared.NewUUID[user.UserDemographic](),
 		lo.ToPtr(1990),
-		lo.ToPtr("正社員"),
 		lo.ToPtr("男性"),
 		lo.ToPtr("世田谷区"),
-		lo.ToPtr(4),
 		lo.ToPtr("回答しない"),
 	)
 
@@ -124,7 +115,6 @@ func TestDecryptUserDemographics(t *testing.T) {
 		assert.Equal(t, original.Gender(), decrypted.Gender())
 		assert.Equal(t, original.City().String(), decrypted.City().String())
 		assert.Equal(t, original.Prefecture(), decrypted.Prefecture())
-		assert.Equal(t, original.HouseholdSize(), decrypted.HouseholdSize())
 	})
 
 	t.Run("異常系: 不正な暗号文", func(t *testing.T) {
