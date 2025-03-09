@@ -495,24 +495,6 @@ func (s *EditUserProfileReq) Validate() error {
 			Error: err,
 		})
 	}
-	if err := func() error {
-		if value, ok := s.Occupation.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "occupation",
-			Error: err,
-		})
-	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
@@ -524,35 +506,6 @@ func (s EditUserProfileReqGender) Validate() error {
 	case "男性":
 		return nil
 	case "女性":
-		return nil
-	case "その他":
-		return nil
-	case "回答しない":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
-}
-
-func (s EditUserProfileReqOccupation) Validate() error {
-	switch s {
-	case "正社員":
-		return nil
-	case "契約社員":
-		return nil
-	case "公務員":
-		return nil
-	case "自営業":
-		return nil
-	case "会社役員":
-		return nil
-	case "パート・アルバイト":
-		return nil
-	case "家事従事者":
-		return nil
-	case "学生":
-		return nil
-	case "無職":
 		return nil
 	case "その他":
 		return nil
@@ -1552,56 +1505,6 @@ func (s *GetUserInfoOK) Validate() error {
 			Error: err,
 		})
 	}
-	if err := func() error {
-		if err := s.Demographics.Validate(); err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "demographics",
-			Error: err,
-		})
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *GetUserInfoOKDemographics) Validate() error {
-	if s == nil {
-		return validate.ErrNilPointer
-	}
-
-	var failures []validate.FieldError
-	if err := func() error {
-		if value, ok := s.HouseholdSize.Get(); ok {
-			if err := func() error {
-				if err := (validate.Int{
-					MinSet:        true,
-					Min:           1,
-					MaxSet:        true,
-					Max:           5,
-					MinExclusive:  false,
-					MaxExclusive:  false,
-					MultipleOfSet: false,
-					MultipleOf:    0,
-				}).Validate(int64(value)); err != nil {
-					return errors.Wrap(err, "int")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "householdSize",
-			Error: err,
-		})
-	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
@@ -2416,51 +2319,6 @@ func (s *RegisterUserReq) Validate() error {
 			Error: err,
 		})
 	}
-	if err := func() error {
-		if value, ok := s.Occupation.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "occupation",
-			Error: err,
-		})
-	}
-	if err := func() error {
-		if value, ok := s.HouseholdSize.Get(); ok {
-			if err := func() error {
-				if err := (validate.Int{
-					MinSet:        true,
-					Min:           0,
-					MaxSet:        false,
-					Max:           0,
-					MinExclusive:  false,
-					MaxExclusive:  false,
-					MultipleOfSet: false,
-					MultipleOf:    0,
-				}).Validate(int64(value)); err != nil {
-					return errors.Wrap(err, "int")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "householdSize",
-			Error: err,
-		})
-	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
@@ -2472,35 +2330,6 @@ func (s RegisterUserReqGender) Validate() error {
 	case "男性":
 		return nil
 	case "女性":
-		return nil
-	case "その他":
-		return nil
-	case "回答しない":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
-}
-
-func (s RegisterUserReqOccupation) Validate() error {
-	switch s {
-	case "正社員":
-		return nil
-	case "契約社員":
-		return nil
-	case "公務員":
-		return nil
-	case "自営業":
-		return nil
-	case "会社役員":
-		return nil
-	case "パート・アルバイト":
-		return nil
-	case "家事従事者":
-		return nil
-	case "学生":
-		return nil
-	case "無職":
 		return nil
 	case "その他":
 		return nil
