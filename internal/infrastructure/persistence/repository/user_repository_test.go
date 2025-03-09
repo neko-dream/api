@@ -61,10 +61,8 @@ func TestUserRepository_Create(t *testing.T) {
 					ctx.Context,
 					shared.NewUUID[user.UserDemographic](),
 					lo.ToPtr(1990),   // 生年
-					lo.ToPtr("正社員"),  // 職業
 					lo.ToPtr("男性"),   // 性別
 					lo.ToPtr("世田谷区"), // 都市
-					lo.ToPtr(2),      // 世帯人数
 					lo.ToPtr("東京都"),  // 都道府県
 				)
 				usr.SetDemographics(demographics)
@@ -119,13 +117,6 @@ func TestUserRepository_Create(t *testing.T) {
 					return errors.New("生年が見つかりません")
 				}
 
-				if demo.Occupation() == nil {
-					return errors.New("職業が見つかりません")
-				}
-				if *demo.Occupation() != user.OccupationFullTimeEmployee {
-					return errors.New("職業が一致しません")
-				}
-
 				if demo.City() == nil {
 					return errors.New("市区町村が見つかりません")
 				}
@@ -138,13 +129,6 @@ func TestUserRepository_Create(t *testing.T) {
 				}
 				if *demo.Prefecture() != "東京都" {
 					return errors.New("都道府県が一致しません")
-				}
-
-				if demo.HouseholdSize() == nil {
-					return errors.New("世帯人数が見つかりません")
-				}
-				if *demo.HouseholdSize() != 2 {
-					return errors.New("世帯人数が一致しません")
 				}
 
 				if demo.Gender() == nil {

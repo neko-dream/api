@@ -17,12 +17,10 @@ type RestrictionAttribute struct {
 type RestrictionAttributeKey string
 
 const (
-	DemographicsCity          RestrictionAttributeKey = "demographics.city"
-	DemographicsPrefecture    RestrictionAttributeKey = "demographics.prefecture"
-	DemographicsGender        RestrictionAttributeKey = "demographics.gender"
-	DemographicsHouseholdSize RestrictionAttributeKey = "demographics.household_size"
-	DemographicsOccupation    RestrictionAttributeKey = "demographics.occupation"
-	DemographicsBirth         RestrictionAttributeKey = "demographics.birth"
+	DemographicsCity       RestrictionAttributeKey = "demographics.city"
+	DemographicsPrefecture RestrictionAttributeKey = "demographics.prefecture"
+	DemographicsGender     RestrictionAttributeKey = "demographics.gender"
+	DemographicsBirth      RestrictionAttributeKey = "demographics.birth"
 )
 
 var (
@@ -44,18 +42,6 @@ var (
 				return false
 			}
 			return user.Demographics().Gender() != nil
-		}},
-		DemographicsHouseholdSize: {Key: DemographicsHouseholdSize, Description: "世帯人数", Fn: func(user user.User) bool {
-			if user.Demographics() == nil {
-				return false
-			}
-			return user.Demographics().HouseholdSize() != nil
-		}},
-		DemographicsOccupation: {Key: DemographicsOccupation, Description: "職業", Fn: func(user user.User) bool {
-			if user.Demographics() == nil {
-				return false
-			}
-			return user.Demographics().Occupation() != nil
 		}},
 		DemographicsBirth: {Key: DemographicsBirth, Description: "誕生年", Fn: func(user user.User) bool {
 			if user.Demographics() == nil {

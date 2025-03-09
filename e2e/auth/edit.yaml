@@ -4,7 +4,7 @@ runners:
     endpoint: http://localhost:3000
     useCookie: true
     notFollowRedirect: true
-  dev: postgres://kotohiro:kotohiro@localhost:5432/kotohiro
+  dev: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
 
 vars:
   id: edit
@@ -53,8 +53,6 @@ steps:
               gender: "男性"
               prefecture: "福井県"
               city: "鯖江市"
-              occupation: "学生"
-              householdSize: 1
   checkUserName:
     desc: ユーザー名が変更されている
     req:
@@ -65,8 +63,6 @@ steps:
       current.res.body.user.displayID == vars.id &&
       current.res.body.user.displayName == "edited" &&
       current.res.body.demographics.city == "鯖江市" &&
-      current.res.body.demographics.occupation == "学生" &&
-      current.res.body.demographics.householdSize == 1 &&
       current.res.body.demographics.yearOfBirth == 1999
   reEditUser:
     desc: ユーザー名が戻っているか
