@@ -1,0 +1,69 @@
+name: Test
+
+on:
+  push:
+  workflow_call:
+    inputs:
+      concurrency-group:
+        required: true
+        type: string
+
+concurrency:
+  group: ${ inputs.concurrency-group || test-${{ github.workflow }}-${{ github.ref || github.run_id  }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:15-3.3
+        env:
+          POSTGRES_USER: kotohiro
+          POSTGRES_PASSWORD: kotohiro
+          POSTGRES_DB: kotohiro
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
+      ENCRYPTION_VERSION: v1
+      ENCRYPTION_SECRET: UkadNiT1rGQa3dgBgCgF4rMo7sPhZTzE
+      ENV: local
+      PORT: 3000
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Install golang-migrate
+        run: go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
+      - name: Run migrations
+        run: migrate -path migrations -database "$DATABASE_URL" up
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Run unit tests with coverage
+        run: go test -parallel 2 -v -coverprofile=coverage.out ./...
+
+      - name: Run E2E tests
+        run: |
+          go install github.com/k1LoW/runn/cmd/runn@latest
+          go run cmd/server/main.go &
+          sleep 5
+          runn run ./e2e/**/* --verbose
+
+      - name: Coverage Report
+        uses: k1LoW/octocov-action@v1

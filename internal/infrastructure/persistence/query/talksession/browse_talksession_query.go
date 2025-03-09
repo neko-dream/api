@@ -41,11 +41,10 @@ func (b *BrowseTalkSessionQueryImpl) Execute(ctx context.Context, in talksession
 	if in.Longitude != nil {
 		longitude = sql.NullFloat64{Float64: *in.Longitude, Valid: true}
 	}
-	theme := utils.IfThenElse(
-		in.Theme != nil,
-		sql.NullString{String: *in.Theme, Valid: true},
-		sql.NullString{},
-	)
+	var theme sql.NullString
+	if in.Theme != nil {
+		theme = sql.NullString{String: *in.Theme, Valid: true}
+	}
 
 	talkSessionRow, err := b.GetQueries(ctx).ListTalkSessions(ctx, model.ListTalkSessionsParams{
 		Limit:     int32(*in.Limit),

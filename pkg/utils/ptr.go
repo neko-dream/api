@@ -4,7 +4,6 @@ import (
 	"net/url"
 
 	"github.com/neko-dream/server/internal/presentation/oas"
-	"github.com/samber/lo"
 )
 
 func ToPtrIfNotNullValue[T any](nullFlag bool, value T) *T {
@@ -20,22 +19,6 @@ func ToPtrIfNotNullFunc[T any](nullFlag bool, getValue func() *T) *T {
 	}
 	val := getValue()
 	return val
-}
-
-// 三項演算子
-func IfThenElse[T any](condition bool, thenValue T, elseValue T) T {
-	return lo.If(condition, thenValue).Else(elseValue)
-}
-
-// ogen用のユーティリティ関数
-func StringToOptString(s *string) oas.OptString {
-	if s == nil {
-		return oas.OptString{Set: false}
-	}
-	return oas.OptString{
-		Value: *s,
-		Set:   true,
-	}
 }
 
 func ToOpt[O any](v any) O {
