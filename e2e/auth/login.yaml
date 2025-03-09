@@ -4,7 +4,7 @@ runners:
     endpoint: http://localhost:3000
     useCookie: true
     notFollowRedirect: true
-  dev: postgres://kotohiro:kotohiro@localhost:5432/kotohiro
+  dev: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
 
 vars:
   id: test

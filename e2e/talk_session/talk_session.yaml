@@ -4,7 +4,7 @@ runners:
     endpoint: http://localhost:3000
     useCookie: true
     notFollowRedirect: true
-  dev: postgres://kotohiro:kotohiro@localhost:5432/kotohiro
+  dev: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
 
 vars:
   id: talk_session_test
@@ -20,7 +20,7 @@ steps:
     dev:
       query: |
         DELETE FROM user_demographics WHERE (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}') = user_id;
-        DELETE FROM talk_sessions WHERE owner_user_id = (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}');
+        DELETE FROM talk_sessions WHERE owner_id = (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}');
         DELETE FROM user_auths WHERE subject = '{{ vars.id }}';
         DELETE FROM users WHERE display_id = '{{ vars.id }}';
   loginUser:
@@ -44,25 +44,28 @@ steps:
   createTalkSession:
     desc: トークセッション作成
     req:
-      /talk-session:
+      /talksessions:
         post:
           body:
-            application/json:
+            application/x-www-form-urlencoded:
               theme: "{{ vars.theme }}"
               description: "{{ vars.desc }}"
-              scheduledEndTime: "2024-12-31T23:59:59Z"
+              scheduledEndTime: "2100-12-31T23:59:59Z"
               prefecture: "{{ vars.prefecture }}"
               city: "{{ vars.city }}"
-              restrictions: ["demographics.prefecture", "demographics.city"]
+              restrictions: "demographics.prefecture,demographics.city"
+
     test: |
       current.res.status == 200 &&
-      current.res.body.theme == vars.theme &&
-      current.res.body.description == vars.desc &&
-      current.res.body.owner.displayID == vars.id
+      current.res.body.theme == 'テストセッション' &&
+      current.res.body.description == 'テストの説明文です' &&
+      current.res.body.owner.displayID == 'talk_session_test'
+    bind:
+      createTalkSession: current.res.body
   getTalkSessionList:
     desc: トークセッション一覧取得
     req:
-      /talk-sessions:
+      /talksessions:
         get:
           query:
             theme: "{{ vars.theme }}"
@@ -73,7 +76,7 @@ steps:
   getTalkSessionDetail:
     desc: トークセッション詳細取得
     req:
-      /talk-session/{{ bind.createTalkSession.res.body.id }}:
+      /talksessions/{{ createTalkSession.id }}:
         get:
           headers: null
     test: |
