@@ -1,6 +1,7 @@
 package repository_test
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -39,15 +40,15 @@ func TestUserRepository_Create(t *testing.T) {
 	testCases := []*txtest.TransactionalTestCase[TestData]{
 		{
 			Name: "ユーザー作成と暗号化された情報の検証",
-			SetupFn: func(ctx *txtest.TestContext[TestData]) error {
-				ctx.Data.UserRepo = repository.NewUserRepository(
+			SetupFn: func(ctx context.Context, data *TestData) error {
+				data.UserRepo = repository.NewUserRepository(
 					dbManager,
 					repository.NewImageRepositoryMock(),
 					encryptor,
 				)
 				return nil
 			},
-			TestFn: func(ctx *txtest.TestContext[TestData]) error {
+			TestFn: func(ctx context.Context, data *TestData) error {
 				usr := user.NewUser(
 					userID,
 					lo.ToPtr("test"),
@@ -58,27 +59,27 @@ func TestUserRepository_Create(t *testing.T) {
 				)
 				// 人口統計情報を設定
 				demographics := user.NewUserDemographic(
-					ctx.Context,
+					ctx,
 					shared.NewUUID[user.UserDemographic](),
-					lo.ToPtr(1990),   // 生年
-					lo.ToPtr("男性"),   // 性別
-					lo.ToPtr("世田谷区"), // 都市
-					lo.ToPtr("東京都"),  // 都道府県
+					lo.ToPtr(1990),
+					lo.ToPtr("男性"),
+					lo.ToPtr("世田谷区"),
+					lo.ToPtr("東京都"),
 				)
 				usr.SetDemographics(demographics)
 
 				// ユーザー作成
-				err := ctx.Data.UserRepo.Create(ctx.Context, usr)
+				err := data.UserRepo.Create(ctx, usr)
 				if err != nil {
 					return err
 				}
-				err = ctx.Data.UserRepo.Update(ctx.Context, usr)
+				err = data.UserRepo.Update(ctx, usr)
 				if err != nil {
 					return err
 				}
 
 				// ユーザー情報の取得と検証
-				foundUser, err := ctx.Data.UserRepo.FindByID(ctx.Context, userID)
+				foundUser, err := data.UserRepo.FindByID(ctx, userID)
 				if err != nil {
 					return err
 				}
@@ -144,5 +145,5 @@ func TestUserRepository_Create(t *testing.T) {
 		},
 	}
 
-	txtest.RunTransactionalTests(t, dbManager, initData, testCases)
+	txtest.RunTransactionalTests(t, dbManager, &initData, testCases)
 }

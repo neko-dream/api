@@ -54,8 +54,8 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 	testCases := []*txtest.TransactionalTestCase[TestData]{
 		{
 			Name: "トークセッション作成ができる",
-			SetupFn: func(ctx *txtest.TestContext[TestData]) error {
-				ctx.Data.TalkSession = talksession.NewTalkSession(
+			SetupFn: func(ctx context.Context, data *TestData) error {
+				data.TalkSession = talksession.NewTalkSession(
 					talkSessionID,
 					"test",
 					nil,
@@ -67,11 +67,11 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 					nil,
 					nil,
 				)
-				ctx.Data.TsRepo = repository.NewTalkSessionRepository(dbManager)
+				data.TsRepo = repository.NewTalkSessionRepository(dbManager)
 				return nil
 			},
-			TestFn: func(ctx *txtest.TestContext[TestData]) error {
-				if err := ctx.Data.TsRepo.Create(ctx, ctx.Data.TalkSession); err != nil {
+			TestFn: func(ctx context.Context, data *TestData) error {
+				if err := data.TsRepo.Create(ctx, data.TalkSession); err != nil {
 					return err
 				}
 
@@ -89,8 +89,8 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 		},
 		{
 			Name: "トークセッション作成ができ、Locationも保存される",
-			SetupFn: func(ctx *txtest.TestContext[TestData]) error {
-				ctx.Data.TalkSession = talksession.NewTalkSession(
+			SetupFn: func(ctx context.Context, data *TestData) error {
+				data.TalkSession = talksession.NewTalkSession(
 					talkSessionID,
 					"test",
 					nil,
@@ -105,11 +105,11 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 					),
 					nil, nil,
 				)
-				ctx.Data.TsRepo = repository.NewTalkSessionRepository(dbManager)
+				data.TsRepo = repository.NewTalkSessionRepository(dbManager)
 				return nil
 			},
-			TestFn: func(ctx *txtest.TestContext[TestData]) error {
-				if err := ctx.Data.TsRepo.Create(ctx, ctx.Data.TalkSession); err != nil {
+			TestFn: func(ctx context.Context, data *TestData) error {
+				if err := data.TsRepo.Create(ctx, data.TalkSession); err != nil {
 					return err
 				}
 
@@ -133,5 +133,5 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 		},
 	}
 
-	txtest.RunTransactionalTests(t, dbManager, initData, testCases)
+	txtest.RunTransactionalTests(t, dbManager, &initData, testCases)
 }
