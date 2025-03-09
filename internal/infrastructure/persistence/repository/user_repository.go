@@ -94,23 +94,23 @@ func (u *userRepository) FindByDisplayID(ctx context.Context, displayID string) 
 func (u *userRepository) Update(ctx context.Context, user um.User) error {
 	ctx, span := otel.Tracer("repository").Start(ctx, "userRepository.Update")
 	defer span.End()
+
+	var displayID, displayName, iconURL sql.NullString
+	if user.DisplayID() != nil {
+		displayID = sql.NullString{String: *user.DisplayID(), Valid: true}
+	}
+	if user.DisplayName() != nil {
+		displayName = sql.NullString{String: *user.DisplayName(), Valid: true}
+	}
+	if user.IconURL() != nil {
+		iconURL = sql.NullString{String: *user.IconURL(), Valid: true}
+	}
+
 	if err := u.GetQueries(ctx).UpdateUser(ctx, model.UpdateUserParams{
-		UserID: user.UserID().UUID(),
-		DisplayName: utils.IfThenElse(
-			user.DisplayName() != nil,
-			sql.NullString{String: *user.DisplayName(), Valid: true},
-			sql.NullString{},
-		),
-		DisplayID: utils.IfThenElse(
-			user.DisplayID() != nil,
-			sql.NullString{String: *user.DisplayID(), Valid: true},
-			sql.NullString{},
-		),
-		IconUrl: utils.IfThenElse(
-			user.IconURL() != nil,
-			sql.NullString{String: *user.IconURL(), Valid: true},
-			sql.NullString{},
-		),
+		UserID:      user.UserID().UUID(),
+		DisplayName: displayName,
+		DisplayID:   displayID,
+		IconUrl:     iconURL,
 	}); err != nil {
 		utils.HandleError(ctx, err, "UpdateUser")
 		return errtrace.Wrap(err)
