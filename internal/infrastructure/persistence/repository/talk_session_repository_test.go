@@ -34,7 +34,9 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 		TalkSession *talksession.TalkSession
 	}
 
-	initData := TestData{}
+	initData := TestData{
+		TsRepo: repository.NewTalkSessionRepository(dbManager),
+	}
 	talkSessionID := shared.NewUUID[talksession.TalkSession]()
 	ownerUserID := shared.NewUUID[user.User]()
 	userRepo := repository.NewUserRepository(
@@ -67,7 +69,6 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 					nil,
 					nil,
 				)
-				data.TsRepo = repository.NewTalkSessionRepository(dbManager)
 				return nil
 			},
 			TestFn: func(ctx context.Context, data *TestData) error {
@@ -105,7 +106,6 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 					),
 					nil, nil,
 				)
-				data.TsRepo = repository.NewTalkSessionRepository(dbManager)
 				return nil
 			},
 			TestFn: func(ctx context.Context, data *TestData) error {
