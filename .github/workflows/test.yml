@@ -60,11 +60,10 @@ jobs:
 
       - name: Run E2E tests
         run: |
-          go install github.com/k1LoW/runn@latest
-          chmod +x ./scripts/test.sh
+          go install github.com/k1LoW/runn/cmd/runn@latest
           go run cmd/server/main.go &
           sleep 5
-          ./scripts/test.sh
+          runn run ./e2e/**/* --verbose
 
       - name: Coverage Report
         uses: k1LoW/octocov-action@v1
