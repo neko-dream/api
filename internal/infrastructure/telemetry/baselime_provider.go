@@ -3,7 +3,6 @@ package telemetry
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/neko-dream/server/internal/infrastructure/config"
@@ -17,11 +16,6 @@ import (
 
 func BaselimeProvider(conf *config.Config) *sdktrace.TracerProvider {
 	ctx := context.Background()
-	if conf.BASELIME_API_KEY == "" {
-		log.Printf("BASELIME_API_KEY not set, not configuring OpenTelemetry")
-		return nil
-	}
-
 	var exporter sdktrace.SpanExporter
 	var err error
 	serviceName := fmt.Sprintf("kotohiro-api-%s", conf.Env)
