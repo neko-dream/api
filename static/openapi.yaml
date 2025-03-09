@@ -2442,43 +2442,6 @@ paths:
                   description: 市区町村
                   example: ''
                   nullable: true
-                occupation:
-                  type: string
-                  enum:
-                    - 正社員
-                    - 契約社員
-                    - 公務員
-                    - 自営業
-                    - 会社役員
-                    - パート・アルバイト
-                    - 家事従事者
-                    - 学生
-                    - 無職
-                    - その他
-                    - 回答しない
-                  default: 無回答
-                  x-apidog:
-                    enumDescriptions:
-                      正社員: ''
-                      契約社員: ''
-                      公務員: ''
-                      自営業: ''
-                      会社役員: ''
-                      パート・アルバイト: ''
-                      家事従事者: ''
-                      学生: ''
-                      無職: ''
-                      その他: ''
-                      回答しない: ''
-                  description: ユーザーの職業
-                  example: ''
-                  nullable: true
-                householdSize:
-                  type: integer
-                  minimum: 0
-                  description: 世帯人数
-                  example: 0
-                  nullable: true
               required:
                 - displayName
                 - displayID
@@ -2600,41 +2563,6 @@ paths:
                   description: 市区町村
                   example: ''
                   nullable: true
-                occupation:
-                  type: string
-                  enum:
-                    - 正社員
-                    - 契約社員
-                    - 公務員
-                    - 自営業
-                    - 会社役員
-                    - パート・アルバイト
-                    - 家事従事者
-                    - 学生
-                    - 無職
-                    - その他
-                    - 回答しない
-                  x-apidog:
-                    enumDescriptions:
-                      正社員: ''
-                      契約社員: ''
-                      公務員: ''
-                      自営業: ''
-                      会社役員: ''
-                      パート・アルバイト: ''
-                      家事従事者: ''
-                      学生: ''
-                      無職: ''
-                      その他: ''
-                      回答しない: ''
-                  description: 職業
-                  example: ''
-                  nullable: true
-                householdSize:
-                  type: integer
-                  description: 世帯人数
-                  example: 0
-                  nullable: true
                 prefecture:
                   type: string
                   description: 都道府県
@@ -2751,11 +2679,6 @@ paths:
                         type: integer
                         description: 誕生年
                         nullable: true
-                      occupation:
-                        type: string
-                        title: 職業
-                        description: 職業
-                        nullable: true
                       gender:
                         type: string
                         title: 性別
@@ -2765,13 +2688,6 @@ paths:
                         type: string
                         title: 市区町村
                         description: 市区町村
-                        nullable: true
-                      householdSize:
-                        type: integer
-                        minimum: 1
-                        maximum: 5
-                        title: 世帯人数
-                        description: 世帯人数
                         nullable: true
                       prefecture:
                         type: string
@@ -4201,11 +4117,6 @@ components:
           type: integer
           description: 誕生年
           nullable: true
-        occupation:
-          type: string
-          title: 職業
-          description: 職業
-          nullable: true
         gender:
           type: string
           title: 性別
@@ -4215,13 +4126,6 @@ components:
           type: string
           title: 市区町村
           description: 市区町村
-          nullable: true
-        householdSize:
-          type: integer
-          minimum: 1
-          maximum: 5
-          title: 世帯人数
-          description: 世帯人数
           nullable: true
         prefecture:
           type: string

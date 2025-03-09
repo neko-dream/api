@@ -1,1 +1,1 @@
-runn ./e2e/**/* --verbose
+runn run ./e2e/**/* --verbose

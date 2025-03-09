@@ -180,7 +180,7 @@ func (q *Queries) GetUserBySubject(ctx context.Context, subject string) (GetUser
 
 const getUserDemographicByUserID = `-- name: GetUserDemographicByUserID :one
 SELECT
-    user_demographics_id, user_id, year_of_birth, occupation, gender, city, household_size, created_at, updated_at, prefecture
+    user_demographics_id, user_id, year_of_birth, gender, city, created_at, updated_at, prefecture
 FROM
     "user_demographics"
 WHERE
@@ -190,7 +190,7 @@ WHERE
 // GetUserDemographicByUserID
 //
 //	SELECT
-//	    user_demographics_id, user_id, year_of_birth, occupation, gender, city, household_size, created_at, updated_at, prefecture
+//	    user_demographics_id, user_id, year_of_birth, gender, city, created_at, updated_at, prefecture
 //	FROM
 //	    "user_demographics"
 //	WHERE
@@ -202,10 +202,8 @@ func (q *Queries) GetUserDemographicByUserID(ctx context.Context, userID uuid.UU
 		&i.UserDemographicsID,
 		&i.UserID,
 		&i.YearOfBirth,
-		&i.Occupation,
 		&i.Gender,
 		&i.City,
-		&i.HouseholdSize,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Prefecture,
@@ -217,7 +215,7 @@ const getUserDetailByID = `-- name: GetUserDetailByID :one
 SELECT
     users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
     user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at,
-    user_demographics.user_demographics_id, user_demographics.user_id, user_demographics.year_of_birth, user_demographics.occupation, user_demographics.gender, user_demographics.city, user_demographics.household_size, user_demographics.created_at, user_demographics.updated_at, user_demographics.prefecture
+    user_demographics.user_demographics_id, user_demographics.user_id, user_demographics.year_of_birth, user_demographics.gender, user_demographics.city, user_demographics.created_at, user_demographics.updated_at, user_demographics.prefecture
 FROM
     users
 LEFT JOIN user_auths ON users.user_id = user_auths.user_id
@@ -237,7 +235,7 @@ type GetUserDetailByIDRow struct {
 //	SELECT
 //	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
 //	    user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at,
-//	    user_demographics.user_demographics_id, user_demographics.user_id, user_demographics.year_of_birth, user_demographics.occupation, user_demographics.gender, user_demographics.city, user_demographics.household_size, user_demographics.created_at, user_demographics.updated_at, user_demographics.prefecture
+//	    user_demographics.user_demographics_id, user_demographics.user_id, user_demographics.year_of_birth, user_demographics.gender, user_demographics.city, user_demographics.created_at, user_demographics.updated_at, user_demographics.prefecture
 //	FROM
 //	    users
 //	LEFT JOIN user_auths ON users.user_id = user_auths.user_id
@@ -263,10 +261,8 @@ func (q *Queries) GetUserDetailByID(ctx context.Context, userID uuid.UUID) (GetU
 		&i.UserDemographic.UserDemographicsID,
 		&i.UserDemographic.UserID,
 		&i.UserDemographic.YearOfBirth,
-		&i.UserDemographic.Occupation,
 		&i.UserDemographic.Gender,
 		&i.UserDemographic.City,
-		&i.UserDemographic.HouseholdSize,
 		&i.UserDemographic.CreatedAt,
 		&i.UserDemographic.UpdatedAt,
 		&i.UserDemographic.Prefecture,
@@ -279,22 +275,18 @@ INSERT INTO user_demographics (
     user_demographics_id,
     user_id,
     year_of_birth,
-    occupation,
     gender,
     city,
-    household_size,
     prefecture,
     created_at,
     updated_at
-) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, now(), now())
+) VALUES ($1, $2, $3, $4, $5, $6,  now(), now())
 ON CONFLICT (user_id)
 DO UPDATE SET
     year_of_birth = $3,
-    occupation = $4,
-    gender = $5,
-    city = $6,
-    household_size = $7,
-    prefecture = $8,
+    gender = $4,
+    city = $5,
+    prefecture = $6,
     updated_at = now()
 `
 
@@ -302,10 +294,8 @@ type UpdateOrCreateUserDemographicParams struct {
 	UserDemographicsID uuid.UUID
 	UserID             uuid.UUID
 	YearOfBirth        sql.NullString
-	Occupation         sql.NullInt16
 	Gender             sql.NullString
 	City               sql.NullString
-	HouseholdSize      sql.NullInt16
 	Prefecture         sql.NullString
 }
 
@@ -315,32 +305,26 @@ type UpdateOrCreateUserDemographicParams struct {
 //	    user_demographics_id,
 //	    user_id,
 //	    year_of_birth,
-//	    occupation,
 //	    gender,
 //	    city,
-//	    household_size,
 //	    prefecture,
 //	    created_at,
 //	    updated_at
-//	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, now(), now())
+//	) VALUES ($1, $2, $3, $4, $5, $6,  now(), now())
 //	ON CONFLICT (user_id)
 //	DO UPDATE SET
 //	    year_of_birth = $3,
-//	    occupation = $4,
-//	    gender = $5,
-//	    city = $6,
-//	    household_size = $7,
-//	    prefecture = $8,
+//	    gender = $4,
+//	    city = $5,
+//	    prefecture = $6,
 //	    updated_at = now()
 func (q *Queries) UpdateOrCreateUserDemographic(ctx context.Context, arg UpdateOrCreateUserDemographicParams) error {
 	_, err := q.db.ExecContext(ctx, updateOrCreateUserDemographic,
 		arg.UserDemographicsID,
 		arg.UserID,
 		arg.YearOfBirth,
-		arg.Occupation,
 		arg.Gender,
 		arg.City,
-		arg.HouseholdSize,
 		arg.Prefecture,
 	)
 	return err

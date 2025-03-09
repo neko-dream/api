@@ -7913,12 +7913,6 @@ func (s *GetUserInfoOKDemographics) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Occupation.Set {
-			e.FieldStart("occupation")
-			s.Occupation.Encode(e)
-		}
-	}
-	{
 		if s.Gender.Set {
 			e.FieldStart("gender")
 			s.Gender.Encode(e)
@@ -7931,12 +7925,6 @@ func (s *GetUserInfoOKDemographics) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.HouseholdSize.Set {
-			e.FieldStart("householdSize")
-			s.HouseholdSize.Encode(e)
-		}
-	}
-	{
 		if s.Prefecture.Set {
 			e.FieldStart("prefecture")
 			s.Prefecture.Encode(e)
@@ -7944,13 +7932,11 @@ func (s *GetUserInfoOKDemographics) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfGetUserInfoOKDemographics = [6]string{
+var jsonFieldsNameOfGetUserInfoOKDemographics = [4]string{
 	0: "yearOfBirth",
-	1: "occupation",
-	2: "gender",
-	3: "city",
-	4: "householdSize",
-	5: "prefecture",
+	1: "gender",
+	2: "city",
+	3: "prefecture",
 }
 
 // Decode decodes GetUserInfoOKDemographics from json.
@@ -7971,16 +7957,6 @@ func (s *GetUserInfoOKDemographics) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"yearOfBirth\"")
 			}
-		case "occupation":
-			if err := func() error {
-				s.Occupation.Reset()
-				if err := s.Occupation.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"occupation\"")
-			}
 		case "gender":
 			if err := func() error {
 				s.Gender.Reset()
@@ -8000,16 +7976,6 @@ func (s *GetUserInfoOKDemographics) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"city\"")
-			}
-		case "householdSize":
-			if err := func() error {
-				s.HouseholdSize.Reset()
-				if err := s.HouseholdSize.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"householdSize\"")
 			}
 		case "prefecture":
 			if err := func() error {

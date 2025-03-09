@@ -96,7 +96,7 @@ func TestCanUserJoin(t *testing.T) {
 		demographics := user.NewUserDemographic(
 			ctx, shared.NewUUID[user.UserDemographic](),
 			lo.ToPtr(2020),
-			nil, nil, nil, nil, nil,
+			nil, nil, nil,
 		)
 		u := user.NewUser(
 			userID, lo.ToPtr("u"), lo.ToPtr("u"), "u", auth.AuthProviderName("u"), nil,
@@ -132,7 +132,7 @@ func TestCanUserJoin(t *testing.T) {
 		demographics := user.NewUserDemographic(
 			ctx, shared.NewUUID[user.UserDemographic](),
 			nil,
-			nil, nil, nil, nil, nil,
+			nil, nil, nil,
 		)
 		u := user.NewUser(
 			userID, lo.ToPtr("u"), lo.ToPtr("u"), "u", auth.AuthProviderName("u"), nil,

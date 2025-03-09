@@ -1,0 +1,88 @@
+desc: トークセッションのテスト
+runners:
+  req:
+    endpoint: http://localhost:3000
+    useCookie: true
+    notFollowRedirect: true
+  dev: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
+
+vars:
+  id: talk_session_test
+  name: talk_session_test
+  theme: テストセッション
+  desc: テストの説明文です
+  prefecture: 東京都
+  city: 渋谷区
+
+steps:
+  deleteUser:
+    desc: ユーザー削除
+    dev:
+      query: |
+        DELETE FROM user_demographics WHERE (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}') = user_id;
+        DELETE FROM talk_sessions WHERE owner_id = (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}');
+        DELETE FROM user_auths WHERE subject = '{{ vars.id }}';
+        DELETE FROM users WHERE display_id = '{{ vars.id }}';
+  loginUser:
+    desc: ログイン
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.id }}:
+        get:
+          headers: null
+    test: len(current.res.headers['Set-Cookie']) > 0
+  createUser:
+    desc: ユーザー作成
+    req:
+      /user:
+        post:
+          body:
+            multipart/form-data:
+              displayName: "{{ vars.name }}"
+              displayID: "{{ vars.id }}"
+              prefecture: "{{ vars.prefecture }}"
+              city: "{{ vars.city }}"
+  createTalkSession:
+    desc: トークセッション作成
+    req:
+      /talksessions:
+        post:
+          body:
+            application/x-www-form-urlencoded:
+              theme: "{{ vars.theme }}"
+              description: "{{ vars.desc }}"
+              scheduledEndTime: "2100-12-31T23:59:59Z"
+              prefecture: "{{ vars.prefecture }}"
+              city: "{{ vars.city }}"
+              restrictions: "demographics.prefecture,demographics.city"
+
+    test: |
+      current.res.status == 200 &&
+      current.res.body.theme == 'テストセッション' &&
+      current.res.body.description == 'テストの説明文です' &&
+      current.res.body.owner.displayID == 'talk_session_test'
+    bind:
+      createTalkSession: current.res.body
+  getTalkSessionList:
+    desc: トークセッション一覧取得
+    req:
+      /talksessions:
+        get:
+          query:
+            theme: "{{ vars.theme }}"
+    test: |
+      current.res.status == 200 &&
+      len(current.res.body.talkSessions) > 0 &&
+      current.res.body.talkSessions[0].talkSession.theme == vars.theme
+  getTalkSessionDetail:
+    desc: トークセッション詳細取得
+    req:
+      /talksessions/{{ createTalkSession.id }}:
+        get:
+          headers: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.theme == vars.theme &&
+      current.res.body.description == vars.desc &&
+      current.res.body.owner.displayID == vars.id &&
+      current.res.body.prefecture == vars.prefecture &&
+      current.res.body.city == vars.city

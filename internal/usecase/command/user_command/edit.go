@@ -120,10 +120,8 @@ func (e *editHandler) Execute(ctx context.Context, input EditInput) (*EditOutput
 				ctx,
 				demograID,
 				input.YearOfBirth,
-				input.Occupation,
 				input.Gender,
 				input.City,
-				input.HouseholdSize,
 				input.Prefecture,
 			))
 		}

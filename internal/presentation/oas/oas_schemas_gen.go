@@ -1054,10 +1054,6 @@ type EditUserProfileReq struct {
 	Gender OptNilEditUserProfileReqGender `json:"gender"`
 	// 市区町村.
 	City OptNilString `json:"city"`
-	// 職業.
-	Occupation OptNilEditUserProfileReqOccupation `json:"occupation"`
-	// 世帯人数.
-	HouseholdSize OptNilInt `json:"householdSize"`
 	// 都道府県.
 	Prefecture OptNilString `json:"prefecture"`
 }
@@ -1090,16 +1086,6 @@ func (s *EditUserProfileReq) GetGender() OptNilEditUserProfileReqGender {
 // GetCity returns the value of City.
 func (s *EditUserProfileReq) GetCity() OptNilString {
 	return s.City
-}
-
-// GetOccupation returns the value of Occupation.
-func (s *EditUserProfileReq) GetOccupation() OptNilEditUserProfileReqOccupation {
-	return s.Occupation
-}
-
-// GetHouseholdSize returns the value of HouseholdSize.
-func (s *EditUserProfileReq) GetHouseholdSize() OptNilInt {
-	return s.HouseholdSize
 }
 
 // GetPrefecture returns the value of Prefecture.
@@ -1135,16 +1121,6 @@ func (s *EditUserProfileReq) SetGender(val OptNilEditUserProfileReqGender) {
 // SetCity sets the value of City.
 func (s *EditUserProfileReq) SetCity(val OptNilString) {
 	s.City = val
-}
-
-// SetOccupation sets the value of Occupation.
-func (s *EditUserProfileReq) SetOccupation(val OptNilEditUserProfileReqOccupation) {
-	s.Occupation = val
-}
-
-// SetHouseholdSize sets the value of HouseholdSize.
-func (s *EditUserProfileReq) SetHouseholdSize(val OptNilInt) {
-	s.HouseholdSize = val
 }
 
 // SetPrefecture sets the value of Prefecture.
@@ -1202,111 +1178,6 @@ func (s *EditUserProfileReqGender) UnmarshalText(data []byte) error {
 		return nil
 	case EditUserProfileReqGender_3:
 		*s = EditUserProfileReqGender_3
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
-}
-
-// 職業.
-type EditUserProfileReqOccupation string
-
-const (
-	EditUserProfileReqOccupation_0  EditUserProfileReqOccupation = "正社員"
-	EditUserProfileReqOccupation_1  EditUserProfileReqOccupation = "契約社員"
-	EditUserProfileReqOccupation_2  EditUserProfileReqOccupation = "公務員"
-	EditUserProfileReqOccupation_3  EditUserProfileReqOccupation = "自営業"
-	EditUserProfileReqOccupation_4  EditUserProfileReqOccupation = "会社役員"
-	EditUserProfileReqOccupation_5  EditUserProfileReqOccupation = "パート・アルバイト"
-	EditUserProfileReqOccupation_6  EditUserProfileReqOccupation = "家事従事者"
-	EditUserProfileReqOccupation_7  EditUserProfileReqOccupation = "学生"
-	EditUserProfileReqOccupation_8  EditUserProfileReqOccupation = "無職"
-	EditUserProfileReqOccupation_9  EditUserProfileReqOccupation = "その他"
-	EditUserProfileReqOccupation_10 EditUserProfileReqOccupation = "回答しない"
-)
-
-// AllValues returns all EditUserProfileReqOccupation values.
-func (EditUserProfileReqOccupation) AllValues() []EditUserProfileReqOccupation {
-	return []EditUserProfileReqOccupation{
-		EditUserProfileReqOccupation_0,
-		EditUserProfileReqOccupation_1,
-		EditUserProfileReqOccupation_2,
-		EditUserProfileReqOccupation_3,
-		EditUserProfileReqOccupation_4,
-		EditUserProfileReqOccupation_5,
-		EditUserProfileReqOccupation_6,
-		EditUserProfileReqOccupation_7,
-		EditUserProfileReqOccupation_8,
-		EditUserProfileReqOccupation_9,
-		EditUserProfileReqOccupation_10,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s EditUserProfileReqOccupation) MarshalText() ([]byte, error) {
-	switch s {
-	case EditUserProfileReqOccupation_0:
-		return []byte(s), nil
-	case EditUserProfileReqOccupation_1:
-		return []byte(s), nil
-	case EditUserProfileReqOccupation_2:
-		return []byte(s), nil
-	case EditUserProfileReqOccupation_3:
-		return []byte(s), nil
-	case EditUserProfileReqOccupation_4:
-		return []byte(s), nil
-	case EditUserProfileReqOccupation_5:
-		return []byte(s), nil
-	case EditUserProfileReqOccupation_6:
-		return []byte(s), nil
-	case EditUserProfileReqOccupation_7:
-		return []byte(s), nil
-	case EditUserProfileReqOccupation_8:
-		return []byte(s), nil
-	case EditUserProfileReqOccupation_9:
-		return []byte(s), nil
-	case EditUserProfileReqOccupation_10:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *EditUserProfileReqOccupation) UnmarshalText(data []byte) error {
-	switch EditUserProfileReqOccupation(data) {
-	case EditUserProfileReqOccupation_0:
-		*s = EditUserProfileReqOccupation_0
-		return nil
-	case EditUserProfileReqOccupation_1:
-		*s = EditUserProfileReqOccupation_1
-		return nil
-	case EditUserProfileReqOccupation_2:
-		*s = EditUserProfileReqOccupation_2
-		return nil
-	case EditUserProfileReqOccupation_3:
-		*s = EditUserProfileReqOccupation_3
-		return nil
-	case EditUserProfileReqOccupation_4:
-		*s = EditUserProfileReqOccupation_4
-		return nil
-	case EditUserProfileReqOccupation_5:
-		*s = EditUserProfileReqOccupation_5
-		return nil
-	case EditUserProfileReqOccupation_6:
-		*s = EditUserProfileReqOccupation_6
-		return nil
-	case EditUserProfileReqOccupation_7:
-		*s = EditUserProfileReqOccupation_7
-		return nil
-	case EditUserProfileReqOccupation_8:
-		*s = EditUserProfileReqOccupation_8
-		return nil
-	case EditUserProfileReqOccupation_9:
-		*s = EditUserProfileReqOccupation_9
-		return nil
-	case EditUserProfileReqOccupation_10:
-		*s = EditUserProfileReqOccupation_10
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -3197,14 +3068,10 @@ func (*GetUserInfoOK) getUserInfoRes() {}
 type GetUserInfoOKDemographics struct {
 	// 誕生年.
 	YearOfBirth OptNilInt `json:"yearOfBirth"`
-	// 職業.
-	Occupation OptNilString `json:"occupation"`
 	// 性別.
 	Gender OptNilString `json:"gender"`
 	// 市区町村.
 	City OptNilString `json:"city"`
-	// 世帯人数.
-	HouseholdSize OptNilInt `json:"householdSize"`
 	// 都道府県.
 	Prefecture OptNilString `json:"prefecture"`
 }
@@ -3212,11 +3079,6 @@ type GetUserInfoOKDemographics struct {
 // GetYearOfBirth returns the value of YearOfBirth.
 func (s *GetUserInfoOKDemographics) GetYearOfBirth() OptNilInt {
 	return s.YearOfBirth
-}
-
-// GetOccupation returns the value of Occupation.
-func (s *GetUserInfoOKDemographics) GetOccupation() OptNilString {
-	return s.Occupation
 }
 
 // GetGender returns the value of Gender.
@@ -3229,11 +3091,6 @@ func (s *GetUserInfoOKDemographics) GetCity() OptNilString {
 	return s.City
 }
 
-// GetHouseholdSize returns the value of HouseholdSize.
-func (s *GetUserInfoOKDemographics) GetHouseholdSize() OptNilInt {
-	return s.HouseholdSize
-}
-
 // GetPrefecture returns the value of Prefecture.
 func (s *GetUserInfoOKDemographics) GetPrefecture() OptNilString {
 	return s.Prefecture
@@ -3244,11 +3101,6 @@ func (s *GetUserInfoOKDemographics) SetYearOfBirth(val OptNilInt) {
 	s.YearOfBirth = val
 }
 
-// SetOccupation sets the value of Occupation.
-func (s *GetUserInfoOKDemographics) SetOccupation(val OptNilString) {
-	s.Occupation = val
-}
-
 // SetGender sets the value of Gender.
 func (s *GetUserInfoOKDemographics) SetGender(val OptNilString) {
 	s.Gender = val
@@ -3257,11 +3109,6 @@ func (s *GetUserInfoOKDemographics) SetGender(val OptNilString) {
 // SetCity sets the value of City.
 func (s *GetUserInfoOKDemographics) SetCity(val OptNilString) {
 	s.City = val
-}
-
-// SetHouseholdSize sets the value of HouseholdSize.
-func (s *GetUserInfoOKDemographics) SetHouseholdSize(val OptNilInt) {
-	s.HouseholdSize = val
 }
 
 // SetPrefecture sets the value of Prefecture.
@@ -5580,69 +5427,6 @@ func (o OptNilEditUserProfileReqGender) Or(d EditUserProfileReqGender) EditUserP
 	return d
 }
 
-// NewOptNilEditUserProfileReqOccupation returns new OptNilEditUserProfileReqOccupation with value set to v.
-func NewOptNilEditUserProfileReqOccupation(v EditUserProfileReqOccupation) OptNilEditUserProfileReqOccupation {
-	return OptNilEditUserProfileReqOccupation{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilEditUserProfileReqOccupation is optional nullable EditUserProfileReqOccupation.
-type OptNilEditUserProfileReqOccupation struct {
-	Value EditUserProfileReqOccupation
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilEditUserProfileReqOccupation was set.
-func (o OptNilEditUserProfileReqOccupation) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilEditUserProfileReqOccupation) Reset() {
-	var v EditUserProfileReqOccupation
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilEditUserProfileReqOccupation) SetTo(v EditUserProfileReqOccupation) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsSet returns true if value is Null.
-func (o OptNilEditUserProfileReqOccupation) IsNull() bool { return o.Null }
-
-// SetNull sets value to null.
-func (o *OptNilEditUserProfileReqOccupation) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v EditUserProfileReqOccupation
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilEditUserProfileReqOccupation) Get() (v EditUserProfileReqOccupation, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilEditUserProfileReqOccupation) Or(d EditUserProfileReqOccupation) EditUserProfileReqOccupation {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptNilFloat64 returns new OptNilFloat64 with value set to v.
 func NewOptNilFloat64(v float64) OptNilFloat64 {
 	return OptNilFloat64{
@@ -6078,69 +5862,6 @@ func (o OptNilRegisterUserReqGender) Get() (v RegisterUserReqGender, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilRegisterUserReqGender) Or(d RegisterUserReqGender) RegisterUserReqGender {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilRegisterUserReqOccupation returns new OptNilRegisterUserReqOccupation with value set to v.
-func NewOptNilRegisterUserReqOccupation(v RegisterUserReqOccupation) OptNilRegisterUserReqOccupation {
-	return OptNilRegisterUserReqOccupation{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilRegisterUserReqOccupation is optional nullable RegisterUserReqOccupation.
-type OptNilRegisterUserReqOccupation struct {
-	Value RegisterUserReqOccupation
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilRegisterUserReqOccupation was set.
-func (o OptNilRegisterUserReqOccupation) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilRegisterUserReqOccupation) Reset() {
-	var v RegisterUserReqOccupation
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilRegisterUserReqOccupation) SetTo(v RegisterUserReqOccupation) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsSet returns true if value is Null.
-func (o OptNilRegisterUserReqOccupation) IsNull() bool { return o.Null }
-
-// SetNull sets value to null.
-func (o *OptNilRegisterUserReqOccupation) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v RegisterUserReqOccupation
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilRegisterUserReqOccupation) Get() (v RegisterUserReqOccupation, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilRegisterUserReqOccupation) Or(d RegisterUserReqOccupation) RegisterUserReqOccupation {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -7571,10 +7292,6 @@ type RegisterUserReq struct {
 	Prefecture OptString `json:"prefecture"`
 	// 市区町村.
 	City OptNilString `json:"city"`
-	// ユーザーの職業.
-	Occupation OptNilRegisterUserReqOccupation `json:"occupation"`
-	// 世帯人数.
-	HouseholdSize OptNilInt `json:"householdSize"`
 }
 
 // GetDisplayName returns the value of DisplayName.
@@ -7612,16 +7329,6 @@ func (s *RegisterUserReq) GetCity() OptNilString {
 	return s.City
 }
 
-// GetOccupation returns the value of Occupation.
-func (s *RegisterUserReq) GetOccupation() OptNilRegisterUserReqOccupation {
-	return s.Occupation
-}
-
-// GetHouseholdSize returns the value of HouseholdSize.
-func (s *RegisterUserReq) GetHouseholdSize() OptNilInt {
-	return s.HouseholdSize
-}
-
 // SetDisplayName sets the value of DisplayName.
 func (s *RegisterUserReq) SetDisplayName(val string) {
 	s.DisplayName = val
@@ -7655,16 +7362,6 @@ func (s *RegisterUserReq) SetPrefecture(val OptString) {
 // SetCity sets the value of City.
 func (s *RegisterUserReq) SetCity(val OptNilString) {
 	s.City = val
-}
-
-// SetOccupation sets the value of Occupation.
-func (s *RegisterUserReq) SetOccupation(val OptNilRegisterUserReqOccupation) {
-	s.Occupation = val
-}
-
-// SetHouseholdSize sets the value of HouseholdSize.
-func (s *RegisterUserReq) SetHouseholdSize(val OptNilInt) {
-	s.HouseholdSize = val
 }
 
 // 性別.
@@ -7717,111 +7414,6 @@ func (s *RegisterUserReqGender) UnmarshalText(data []byte) error {
 		return nil
 	case RegisterUserReqGender_3:
 		*s = RegisterUserReqGender_3
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
-}
-
-// ユーザーの職業.
-type RegisterUserReqOccupation string
-
-const (
-	RegisterUserReqOccupation_0  RegisterUserReqOccupation = "正社員"
-	RegisterUserReqOccupation_1  RegisterUserReqOccupation = "契約社員"
-	RegisterUserReqOccupation_2  RegisterUserReqOccupation = "公務員"
-	RegisterUserReqOccupation_3  RegisterUserReqOccupation = "自営業"
-	RegisterUserReqOccupation_4  RegisterUserReqOccupation = "会社役員"
-	RegisterUserReqOccupation_5  RegisterUserReqOccupation = "パート・アルバイト"
-	RegisterUserReqOccupation_6  RegisterUserReqOccupation = "家事従事者"
-	RegisterUserReqOccupation_7  RegisterUserReqOccupation = "学生"
-	RegisterUserReqOccupation_8  RegisterUserReqOccupation = "無職"
-	RegisterUserReqOccupation_9  RegisterUserReqOccupation = "その他"
-	RegisterUserReqOccupation_10 RegisterUserReqOccupation = "回答しない"
-)
-
-// AllValues returns all RegisterUserReqOccupation values.
-func (RegisterUserReqOccupation) AllValues() []RegisterUserReqOccupation {
-	return []RegisterUserReqOccupation{
-		RegisterUserReqOccupation_0,
-		RegisterUserReqOccupation_1,
-		RegisterUserReqOccupation_2,
-		RegisterUserReqOccupation_3,
-		RegisterUserReqOccupation_4,
-		RegisterUserReqOccupation_5,
-		RegisterUserReqOccupation_6,
-		RegisterUserReqOccupation_7,
-		RegisterUserReqOccupation_8,
-		RegisterUserReqOccupation_9,
-		RegisterUserReqOccupation_10,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s RegisterUserReqOccupation) MarshalText() ([]byte, error) {
-	switch s {
-	case RegisterUserReqOccupation_0:
-		return []byte(s), nil
-	case RegisterUserReqOccupation_1:
-		return []byte(s), nil
-	case RegisterUserReqOccupation_2:
-		return []byte(s), nil
-	case RegisterUserReqOccupation_3:
-		return []byte(s), nil
-	case RegisterUserReqOccupation_4:
-		return []byte(s), nil
-	case RegisterUserReqOccupation_5:
-		return []byte(s), nil
-	case RegisterUserReqOccupation_6:
-		return []byte(s), nil
-	case RegisterUserReqOccupation_7:
-		return []byte(s), nil
-	case RegisterUserReqOccupation_8:
-		return []byte(s), nil
-	case RegisterUserReqOccupation_9:
-		return []byte(s), nil
-	case RegisterUserReqOccupation_10:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *RegisterUserReqOccupation) UnmarshalText(data []byte) error {
-	switch RegisterUserReqOccupation(data) {
-	case RegisterUserReqOccupation_0:
-		*s = RegisterUserReqOccupation_0
-		return nil
-	case RegisterUserReqOccupation_1:
-		*s = RegisterUserReqOccupation_1
-		return nil
-	case RegisterUserReqOccupation_2:
-		*s = RegisterUserReqOccupation_2
-		return nil
-	case RegisterUserReqOccupation_3:
-		*s = RegisterUserReqOccupation_3
-		return nil
-	case RegisterUserReqOccupation_4:
-		*s = RegisterUserReqOccupation_4
-		return nil
-	case RegisterUserReqOccupation_5:
-		*s = RegisterUserReqOccupation_5
-		return nil
-	case RegisterUserReqOccupation_6:
-		*s = RegisterUserReqOccupation_6
-		return nil
-	case RegisterUserReqOccupation_7:
-		*s = RegisterUserReqOccupation_7
-		return nil
-	case RegisterUserReqOccupation_8:
-		*s = RegisterUserReqOccupation_8
-		return nil
-	case RegisterUserReqOccupation_9:
-		*s = RegisterUserReqOccupation_9
-		return nil
-	case RegisterUserReqOccupation_10:
-		*s = RegisterUserReqOccupation_10
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)

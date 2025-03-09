@@ -64,24 +64,12 @@ func EncryptUserDemographics(
 		gender = sql.NullString{String: encryptedGender, Valid: true}
 	}
 
-	// 2つには消えてもらうので一旦暗号化しない
-	var householdSize sql.NullInt16
-	if userDemographic.HouseholdSize() != nil {
-		householdSize = sql.NullInt16{Int16: int16(*userDemographic.HouseholdSize()), Valid: true}
-	}
-	var occupation sql.NullInt16
-	if userDemographic.Occupation() != nil {
-		occupation = sql.NullInt16{Int16: int16(*userDemographic.Occupation()), Valid: true}
-	}
-
 	return &model.UserDemographic{
 		UserID:             userID.UUID(),
 		UserDemographicsID: userDemographic.ID().UUID(),
 		City:               city,
 		YearOfBirth:        yearOfBirth,
-		HouseholdSize:      householdSize,
 		Prefecture:         prefecture,
-		Occupation:         occupation,
 		Gender:             gender,
 	}, nil
 }
@@ -96,7 +84,7 @@ func DecryptUserDemographics(
 	defer span.End()
 
 	var city, prefecture, gender *string
-	var household, yearOfBirth, occupation *int
+	var yearOfBirth *int
 
 	if userDemographic.City.Valid {
 		decryptedCity, err := decryptor.DecryptString(ctx, userDemographic.City.String)
@@ -130,32 +118,14 @@ func DecryptUserDemographics(
 		}
 
 		gender = lo.ToPtr(user.Gender(decryptedGender).String())
-
-	}
-
-	if userDemographic.Occupation.Valid {
-		occupationInt := int(userDemographic.Occupation.Int16)
-		occupation = &occupationInt
-	}
-
-	var occupationStr *string
-	if occupation != nil {
-		str := user.Occupation(*occupation).String()
-		occupationStr = &str
-	}
-	if userDemographic.HouseholdSize.Valid {
-		householdSize := int(userDemographic.HouseholdSize.Int16)
-		household = &householdSize
 	}
 
 	demo := user.NewUserDemographic(
 		ctx,
 		shared.UUID[user.UserDemographic](userDemographic.UserDemographicsID),
 		yearOfBirth,
-		occupationStr,
 		gender,
 		city,
-		household,
 		prefecture,
 	)
 
@@ -183,9 +153,6 @@ func DecryptUserDemographicsDTO(
 	if decrypted.YearOfBirth() != nil {
 		udDTO.YearOfBirth = lo.ToPtr(int(*decrypted.YearOfBirth()))
 	}
-	if decrypted.Occupation() != nil {
-		udDTO.Occupation = lo.ToPtr(int(*decrypted.Occupation()))
-	}
 	if decrypted.Gender() != nil {
 		udDTO.Gender = lo.ToPtr(int(*decrypted.Gender()))
 	}
@@ -194,9 +161,6 @@ func DecryptUserDemographicsDTO(
 	}
 	if decrypted.Prefecture() != nil {
 		udDTO.Prefecture = lo.ToPtr(*decrypted.Prefecture())
-	}
-	if decrypted.HouseholdSize() != nil {
-		udDTO.HouseholdSize = lo.ToPtr(int(*decrypted.HouseholdSize()))
 	}
 
 	return &udDTO, nil

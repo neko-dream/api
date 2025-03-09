@@ -120,10 +120,8 @@ type UserDemographic struct {
 	UserDemographicsID uuid.UUID
 	UserID             uuid.UUID
 	YearOfBirth        sql.NullString
-	Occupation         sql.NullInt16
 	Gender             sql.NullString
 	City               sql.NullString
-	HouseholdSize      sql.NullInt16
 	CreatedAt          time.Time
 	UpdatedAt          time.Time
 	Prefecture         sql.NullString

@@ -84,10 +84,6 @@ func (s *RegisterUserReq) setDefaults() {
 		val := RegisterUserReqGender("preferNotToSay")
 		s.Gender.SetTo(val)
 	}
-	{
-		val := RegisterUserReqOccupation("無回答")
-		s.Occupation.SetTo(val)
-	}
 }
 
 // setDefaults set default value of fields.

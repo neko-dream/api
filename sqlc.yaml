@@ -10,8 +10,6 @@ sql:
               emit_sql_as_comment: true
               overrides:
                 - column: "talk_sessions.restrictions"
-                  db_type: "jsonb"
                   go_type:
                     import: "github.com/neko-dream/server/internal/domain/model/talksession"
                     type: "Restrictions"
-
