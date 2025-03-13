@@ -110,6 +110,15 @@ func (UnimplementedHandler) GetOpinionDetail(ctx context.Context, params GetOpin
 	return r, ht.ErrNotImplemented
 }
 
+// GetOpinionDetail2 implements getOpinionDetail2 operation.
+//
+// 意見詳細.
+//
+// GET /opinions/{opinionID}
+func (UnimplementedHandler) GetOpinionDetail2(ctx context.Context, params GetOpinionDetail2Params) (r GetOpinionDetail2Res, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetOpinionsForTalkSession implements getOpinionsForTalkSession operation.
 //
 // セッションに対する意見一覧.

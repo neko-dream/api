@@ -55,6 +55,59 @@ func NewOpinionHandler(
 	}
 }
 
+// GetOpinionDetail2 GetOpinionDetailは/talksessions/{talkSessionID}/opinions/{opinionID}だが、長いので `/opinion/{opinionID}` なGetOpinionDetail2を作成
+func (o *opinionHandler) GetOpinionDetail2(ctx context.Context, params oas.GetOpinionDetail2Params) (oas.GetOpinionDetail2Res, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.GetOpinionDetail")
+	defer span.End()
+
+	claim := session.GetSession(o.SetSession(ctx))
+	var userID *shared.UUID[user.User]
+	if claim != nil {
+		userIDTmp, err := claim.UserID()
+		if err != nil {
+			return nil, messages.ForbiddenError
+		}
+		userID = lo.ToPtr(userIDTmp)
+	}
+
+	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
+	opinion, err := o.getOpinionDetailByIDQuery.Execute(ctx, opinion_query.GetOpinionDetailByIDInput{
+		OpinionID: opinionID,
+		UserID:    userID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	user := &oas.GetOpinionDetail2OKUser{
+		DisplayID:   opinion.Opinion.User.DisplayID,
+		DisplayName: opinion.Opinion.User.DisplayName,
+		IconURL:     utils.ToOptNil[oas.OptNilString](opinion.Opinion.User.IconURL),
+	}
+	op := &oas.GetOpinionDetail2OKOpinion{
+		ID:       opinion.Opinion.Opinion.OpinionID.String(),
+		ParentID: utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ParentOpinionID),
+		Title:    utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.Title),
+		Content:  opinion.Opinion.Opinion.Content,
+		VoteType: oas.OptGetOpinionDetail2OKOpinionVoteType{
+			Value: oas.GetOpinionDetail2OKOpinionVoteType(opinion.Opinion.GetParentVoteType()),
+			Set:   true,
+		},
+		PictureURL:   utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.PictureURL),
+		ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ReferenceURL),
+		PostedAt:     opinion.Opinion.Opinion.CreatedAt.Format(time.RFC3339),
+	}
+
+	return &oas.GetOpinionDetail2OK{
+		User:    *user,
+		Opinion: *op,
+	}, nil
+}
+
 // GetOpinionsForTalkSession implements oas.OpinionHandler.
 func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params oas.GetOpinionsForTalkSessionParams) (oas.GetOpinionsForTalkSessionRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.GetOpinionsForTalkSession")

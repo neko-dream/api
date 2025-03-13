@@ -1573,6 +1573,221 @@ func (s *GetOpenedTalkSessionStatus) UnmarshalText(data []byte) error {
 	}
 }
 
+type GetOpinionDetail2InternalServerError struct{}
+
+func (*GetOpinionDetail2InternalServerError) getOpinionDetail2Res() {}
+
+type GetOpinionDetail2OK struct {
+	Opinion GetOpinionDetail2OKOpinion `json:"opinion"`
+	// 作成ユーザー.
+	User GetOpinionDetail2OKUser `json:"user"`
+}
+
+// GetOpinion returns the value of Opinion.
+func (s *GetOpinionDetail2OK) GetOpinion() GetOpinionDetail2OKOpinion {
+	return s.Opinion
+}
+
+// GetUser returns the value of User.
+func (s *GetOpinionDetail2OK) GetUser() GetOpinionDetail2OKUser {
+	return s.User
+}
+
+// SetOpinion sets the value of Opinion.
+func (s *GetOpinionDetail2OK) SetOpinion(val GetOpinionDetail2OKOpinion) {
+	s.Opinion = val
+}
+
+// SetUser sets the value of User.
+func (s *GetOpinionDetail2OK) SetUser(val GetOpinionDetail2OKUser) {
+	s.User = val
+}
+
+func (*GetOpinionDetail2OK) getOpinionDetail2Res() {}
+
+type GetOpinionDetail2OKOpinion struct {
+	// 意見ID.
+	ID    string    `json:"id"`
+	Title OptString `json:"title"`
+	// 意見のテキスト.
+	Content string `json:"content"`
+	// 親の意見ID。ルートならば無し.
+	ParentID OptString `json:"parentID"`
+	// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+	VoteType OptGetOpinionDetail2OKOpinionVoteType `json:"voteType"`
+	// 画像が返る場合もある.
+	PictureURL OptString `json:"pictureURL"`
+	// 参考文献URL.
+	ReferenceURL OptString `json:"referenceURL"`
+	PostedAt     string    `json:"postedAt"`
+}
+
+// GetID returns the value of ID.
+func (s *GetOpinionDetail2OKOpinion) GetID() string {
+	return s.ID
+}
+
+// GetTitle returns the value of Title.
+func (s *GetOpinionDetail2OKOpinion) GetTitle() OptString {
+	return s.Title
+}
+
+// GetContent returns the value of Content.
+func (s *GetOpinionDetail2OKOpinion) GetContent() string {
+	return s.Content
+}
+
+// GetParentID returns the value of ParentID.
+func (s *GetOpinionDetail2OKOpinion) GetParentID() OptString {
+	return s.ParentID
+}
+
+// GetVoteType returns the value of VoteType.
+func (s *GetOpinionDetail2OKOpinion) GetVoteType() OptGetOpinionDetail2OKOpinionVoteType {
+	return s.VoteType
+}
+
+// GetPictureURL returns the value of PictureURL.
+func (s *GetOpinionDetail2OKOpinion) GetPictureURL() OptString {
+	return s.PictureURL
+}
+
+// GetReferenceURL returns the value of ReferenceURL.
+func (s *GetOpinionDetail2OKOpinion) GetReferenceURL() OptString {
+	return s.ReferenceURL
+}
+
+// GetPostedAt returns the value of PostedAt.
+func (s *GetOpinionDetail2OKOpinion) GetPostedAt() string {
+	return s.PostedAt
+}
+
+// SetID sets the value of ID.
+func (s *GetOpinionDetail2OKOpinion) SetID(val string) {
+	s.ID = val
+}
+
+// SetTitle sets the value of Title.
+func (s *GetOpinionDetail2OKOpinion) SetTitle(val OptString) {
+	s.Title = val
+}
+
+// SetContent sets the value of Content.
+func (s *GetOpinionDetail2OKOpinion) SetContent(val string) {
+	s.Content = val
+}
+
+// SetParentID sets the value of ParentID.
+func (s *GetOpinionDetail2OKOpinion) SetParentID(val OptString) {
+	s.ParentID = val
+}
+
+// SetVoteType sets the value of VoteType.
+func (s *GetOpinionDetail2OKOpinion) SetVoteType(val OptGetOpinionDetail2OKOpinionVoteType) {
+	s.VoteType = val
+}
+
+// SetPictureURL sets the value of PictureURL.
+func (s *GetOpinionDetail2OKOpinion) SetPictureURL(val OptString) {
+	s.PictureURL = val
+}
+
+// SetReferenceURL sets the value of ReferenceURL.
+func (s *GetOpinionDetail2OKOpinion) SetReferenceURL(val OptString) {
+	s.ReferenceURL = val
+}
+
+// SetPostedAt sets the value of PostedAt.
+func (s *GetOpinionDetail2OKOpinion) SetPostedAt(val string) {
+	s.PostedAt = val
+}
+
+// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+type GetOpinionDetail2OKOpinionVoteType string
+
+const (
+	GetOpinionDetail2OKOpinionVoteTypeAgree    GetOpinionDetail2OKOpinionVoteType = "agree"
+	GetOpinionDetail2OKOpinionVoteTypeDisagree GetOpinionDetail2OKOpinionVoteType = "disagree"
+	GetOpinionDetail2OKOpinionVoteTypePass     GetOpinionDetail2OKOpinionVoteType = "pass"
+)
+
+// AllValues returns all GetOpinionDetail2OKOpinionVoteType values.
+func (GetOpinionDetail2OKOpinionVoteType) AllValues() []GetOpinionDetail2OKOpinionVoteType {
+	return []GetOpinionDetail2OKOpinionVoteType{
+		GetOpinionDetail2OKOpinionVoteTypeAgree,
+		GetOpinionDetail2OKOpinionVoteTypeDisagree,
+		GetOpinionDetail2OKOpinionVoteTypePass,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s GetOpinionDetail2OKOpinionVoteType) MarshalText() ([]byte, error) {
+	switch s {
+	case GetOpinionDetail2OKOpinionVoteTypeAgree:
+		return []byte(s), nil
+	case GetOpinionDetail2OKOpinionVoteTypeDisagree:
+		return []byte(s), nil
+	case GetOpinionDetail2OKOpinionVoteTypePass:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *GetOpinionDetail2OKOpinionVoteType) UnmarshalText(data []byte) error {
+	switch GetOpinionDetail2OKOpinionVoteType(data) {
+	case GetOpinionDetail2OKOpinionVoteTypeAgree:
+		*s = GetOpinionDetail2OKOpinionVoteTypeAgree
+		return nil
+	case GetOpinionDetail2OKOpinionVoteTypeDisagree:
+		*s = GetOpinionDetail2OKOpinionVoteTypeDisagree
+		return nil
+	case GetOpinionDetail2OKOpinionVoteTypePass:
+		*s = GetOpinionDetail2OKOpinionVoteTypePass
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// 作成ユーザー.
+type GetOpinionDetail2OKUser struct {
+	DisplayID   string       `json:"displayID"`
+	DisplayName string       `json:"displayName"`
+	IconURL     OptNilString `json:"iconURL"`
+}
+
+// GetDisplayID returns the value of DisplayID.
+func (s *GetOpinionDetail2OKUser) GetDisplayID() string {
+	return s.DisplayID
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *GetOpinionDetail2OKUser) GetDisplayName() string {
+	return s.DisplayName
+}
+
+// GetIconURL returns the value of IconURL.
+func (s *GetOpinionDetail2OKUser) GetIconURL() OptNilString {
+	return s.IconURL
+}
+
+// SetDisplayID sets the value of DisplayID.
+func (s *GetOpinionDetail2OKUser) SetDisplayID(val string) {
+	s.DisplayID = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *GetOpinionDetail2OKUser) SetDisplayName(val string) {
+	s.DisplayName = val
+}
+
+// SetIconURL sets the value of IconURL.
+func (s *GetOpinionDetail2OKUser) SetIconURL(val OptNilString) {
+	s.IconURL = val
+}
+
 type GetOpinionDetailInternalServerError struct{}
 
 func (*GetOpinionDetailInternalServerError) getOpinionDetailRes() {}
@@ -4927,6 +5142,52 @@ func (o OptGetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation) Get() (v G
 
 // Or returns value if set, or given parameter if does not.
 func (o OptGetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation) Or(d GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation) GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptGetOpinionDetail2OKOpinionVoteType returns new OptGetOpinionDetail2OKOpinionVoteType with value set to v.
+func NewOptGetOpinionDetail2OKOpinionVoteType(v GetOpinionDetail2OKOpinionVoteType) OptGetOpinionDetail2OKOpinionVoteType {
+	return OptGetOpinionDetail2OKOpinionVoteType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptGetOpinionDetail2OKOpinionVoteType is optional GetOpinionDetail2OKOpinionVoteType.
+type OptGetOpinionDetail2OKOpinionVoteType struct {
+	Value GetOpinionDetail2OKOpinionVoteType
+	Set   bool
+}
+
+// IsSet returns true if OptGetOpinionDetail2OKOpinionVoteType was set.
+func (o OptGetOpinionDetail2OKOpinionVoteType) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptGetOpinionDetail2OKOpinionVoteType) Reset() {
+	var v GetOpinionDetail2OKOpinionVoteType
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptGetOpinionDetail2OKOpinionVoteType) SetTo(v GetOpinionDetail2OKOpinionVoteType) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptGetOpinionDetail2OKOpinionVoteType) Get() (v GetOpinionDetail2OKOpinionVoteType, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptGetOpinionDetail2OKOpinionVoteType) Or(d GetOpinionDetail2OKOpinionVoteType) GetOpinionDetail2OKOpinionVoteType {
 	if v, ok := o.Get(); ok {
 		return v
 	}

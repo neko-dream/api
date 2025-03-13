@@ -278,19 +278,52 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				}
 
 				elem = origElem
-			case 'o': // Prefix: "opinions/histories"
+			case 'o': // Prefix: "opinions/"
 				origElem := elem
-				if l := len("opinions/histories"); len(elem) >= l && elem[0:l] == "opinions/histories" {
+				if l := len("opinions/"); len(elem) >= l && elem[0:l] == "opinions/" {
 					elem = elem[l:]
 				} else {
 					break
 				}
 
 				if len(elem) == 0 {
+					break
+				}
+				switch elem[0] {
+				case 'h': // Prefix: "histories"
+					origElem := elem
+					if l := len("histories"); len(elem) >= l && elem[0:l] == "histories" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch r.Method {
+						case "GET":
+							s.handleOpinionsHistoryRequest([0]string{}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, "GET")
+						}
+
+						return
+					}
+
+					elem = origElem
+				}
+				// Param: "opinionID"
+				// Leaf parameter
+				args[0] = elem
+				elem = ""
+
+				if len(elem) == 0 {
 					// Leaf node.
 					switch r.Method {
 					case "GET":
-						s.handleOpinionsHistoryRequest([0]string{}, elemIsEscaped, w, r)
+						s.handleGetOpinionDetail2Request([1]string{
+							args[0],
+						}, elemIsEscaped, w, r)
 					default:
 						s.notAllowed(w, r, "GET")
 					}
@@ -1164,24 +1197,59 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 				}
 
 				elem = origElem
-			case 'o': // Prefix: "opinions/histories"
+			case 'o': // Prefix: "opinions/"
 				origElem := elem
-				if l := len("opinions/histories"); len(elem) >= l && elem[0:l] == "opinions/histories" {
+				if l := len("opinions/"); len(elem) >= l && elem[0:l] == "opinions/" {
 					elem = elem[l:]
 				} else {
 					break
 				}
 
 				if len(elem) == 0 {
+					break
+				}
+				switch elem[0] {
+				case 'h': // Prefix: "histories"
+					origElem := elem
+					if l := len("histories"); len(elem) >= l && elem[0:l] == "histories" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch method {
+						case "GET":
+							r.name = "OpinionsHistory"
+							r.summary = "今までに投稿した異見"
+							r.operationID = "opinionsHistory"
+							r.pathPattern = "/opinions/histories"
+							r.args = args
+							r.count = 0
+							return r, true
+						default:
+							return
+						}
+					}
+
+					elem = origElem
+				}
+				// Param: "opinionID"
+				// Leaf parameter
+				args[0] = elem
+				elem = ""
+
+				if len(elem) == 0 {
 					// Leaf node.
 					switch method {
 					case "GET":
-						r.name = "OpinionsHistory"
-						r.summary = "今までに投稿した異見"
-						r.operationID = "opinionsHistory"
-						r.pathPattern = "/opinions/histories"
+						r.name = "GetOpinionDetail2"
+						r.summary = "意見詳細"
+						r.operationID = "getOpinionDetail2"
+						r.pathPattern = "/opinions/{opinionID}"
 						r.args = args
-						r.count = 0
+						r.count = 1
 						return r, true
 					default:
 						return

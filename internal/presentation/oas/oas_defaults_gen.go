@@ -11,6 +11,14 @@ func (s *EditUserProfileReq) setDefaults() {
 }
 
 // setDefaults set default value of fields.
+func (s *GetOpinionDetail2OKOpinion) setDefaults() {
+	{
+		val := GetOpinionDetail2OKOpinionVoteType("unvote")
+		s.VoteType.SetTo(val)
+	}
+}
+
+// setDefaults set default value of fields.
 func (s *GetOpinionDetailOKOpinion) setDefaults() {
 	{
 		val := GetOpinionDetailOKOpinionVoteType("unvote")
