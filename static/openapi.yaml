@@ -4,6 +4,110 @@ info:
   description: ''
   version: 1.0.0
 paths:
+  /opinions/{opinionID}:
+    get:
+      summary: 意見詳細
+      deprecated: false
+      description: ''
+      operationId: getOpinionDetail2
+      tags:
+        - opinion
+      parameters:
+        - name: opinionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  opinion:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        faker: '1'
+                        description: 意見ID
+                      title:
+                        type: string
+                      content:
+                        type: string
+                        description: 意見のテキスト
+                        minLength: 1
+                        maxLength: 140
+                      parentID:
+                        type: string
+                        description: 親の意見ID。ルートならば無し
+                      voteType:
+                        type: string
+                        description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                        enum:
+                          - agree
+                          - disagree
+                          - pass
+                        x-apidog:
+                          enumDescriptions:
+                            agree: ''
+                            disagree: ''
+                            pass: ''
+                        default: unvote
+                      pictureURL:
+                        type: string
+                        description: 画像が返る場合もある
+                      referenceURL:
+                        type: string
+                        description: 参考文献URL
+                      postedAt:
+                        type: string
+                    required:
+                      - content
+                      - id
+                      - postedAt
+                  user:
+                    type: object
+                    properties:
+                      displayID:
+                        type: string
+                        pattern: ^[A-Za-z0-9]$
+                        examples:
+                          - userid
+                        minLength: 3
+                        maxLength: 25
+                      displayName:
+                        type: string
+                      iconURL:
+                        type: string
+                        nullable: true
+                    required:
+                      - displayID
+                      - displayName
+                    description: 作成ユーザー
+                required:
+                  - opinion
+                  - user
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security: []
+      x-ogen-operation-group: Opinion
   /talksessions/{talkSessionID}/opinions/{opinionID}/votes:
     post:
       summary: 意思表明API
