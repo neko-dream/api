@@ -7,11 +7,14 @@ import (
 	"github.com/google/uuid"
 	"github.com/jinzhu/copier"
 	"github.com/neko-dream/server/internal/domain/messages"
+	"github.com/neko-dream/server/internal/domain/model/opinion"
+	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/server/internal/usecase/query/dto"
 	opinion_query "github.com/neko-dream/server/internal/usecase/query/opinion"
 	"github.com/neko-dream/server/pkg/utils"
+	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
@@ -54,16 +57,19 @@ func (g *GetOpinionsByTalkSessionIDQueryHandler) Execute(ctx context.Context, in
 
 	var opinions []dto.SwipeOpinion
 	for _, opinionRow := range opinionRows {
-		var opinion dto.SwipeOpinion
-		if err := copier.CopyWithOption(&opinion, &opinionRow, copier.Option{
+		var op dto.SwipeOpinion
+		if err := copier.CopyWithOption(&op, &opinionRow, copier.Option{
 			DeepCopy: true,
 		}); err != nil {
 			utils.HandleError(ctx, err, "マッピングに失敗")
 			return nil, messages.OpinionContentFailedToFetch
 		}
 
-		opinion.Opinion.ParentOpinionID = opinionRow.Opinion.ParentOpinionID
-		opinions = append(opinions, opinion)
+		if opinionRow.Opinion.ParentOpinionID.Valid {
+			op.Opinion.ParentOpinionID = lo.ToPtr(shared.UUID[opinion.Opinion](opinionRow.Opinion.ParentOpinionID.UUID))
+		}
+
+		opinions = append(opinions, op)
 	}
 
 	count, err := g.GetQueries(ctx).CountOpinions(ctx, model.CountOpinionsParams{

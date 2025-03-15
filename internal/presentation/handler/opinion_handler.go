@@ -91,7 +91,7 @@ func (o *opinionHandler) GetOpinionDetail2(ctx context.Context, params oas.GetOp
 
 	op := &oas.GetOpinionDetail2OKOpinion{
 		ID:           opinion.Opinion.Opinion.OpinionID.String(),
-		ParentID:     utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ParentOpinionID.UUID.String()),
+		ParentID:     utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ParentOpinionID.String()),
 		Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.Title),
 		Content:      opinion.Opinion.Opinion.Content,
 		VoteType:     utils.ToOptNil[oas.OptNilString](opinion.Opinion.GetParentVoteType()),
@@ -141,10 +141,14 @@ func (o *opinionHandler) OpinionComments2(ctx context.Context, params oas.Opinio
 			DisplayName: reply.User.DisplayName,
 			IconURL:     utils.ToOptNil[oas.OptNilString](reply.User.IconURL),
 		}
+		var parentOpinionID oas.OptString
+		if reply.Opinion.ParentOpinionID != nil {
+			parentOpinionID = utils.ToOpt[oas.OptString](reply.Opinion.ParentOpinionID.String())
+		}
 
 		opinion := &oas.OpinionComments2OKOpinionsItemOpinion{
 			ID:           reply.Opinion.OpinionID.String(),
-			ParentID:     utils.ToOpt[oas.OptString](reply.Opinion.ParentOpinionID.UUID.String()),
+			ParentID:     parentOpinionID,
 			Title:        utils.ToOpt[oas.OptString](reply.Opinion.Title),
 			Content:      reply.Opinion.Content,
 			VoteType:     utils.ToOptNil[oas.OptNilString](reply.GetParentVoteType()),
@@ -212,6 +216,10 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 	}
 	opinions := make([]oas.GetOpinionsForTalkSessionOKOpinionsItem, 0, len(out.Opinions))
 	for _, opinion := range out.Opinions {
+		var parentOpinionID oas.OptString
+		if opinion.Opinion.ParentOpinionID != nil {
+			parentOpinionID = utils.ToOpt[oas.OptString](opinion.Opinion.ParentOpinionID.String())
+		}
 
 		opinions = append(opinions, oas.GetOpinionsForTalkSessionOKOpinionsItem{
 			Opinion: oas.GetOpinionsForTalkSessionOKOpinionsItemOpinion{
@@ -219,7 +227,7 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 				Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Title),
 				Content:      opinion.Opinion.Content,
 				VoteType:     utils.ToOptNil[oas.OptNilString](opinion.GetParentVoteType()),
-				ParentID:     utils.ToOpt[oas.OptString](opinion.Opinion.ParentOpinionID.UUID.String()),
+				ParentID:     parentOpinionID,
 				ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
 				PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.PictureURL),
 				PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
@@ -332,10 +340,13 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 			DisplayName: opinion.User.DisplayName,
 			IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.IconURL),
 		}
-
+		var parentOpinionID oas.OptString
+		if opinion.Opinion.ParentOpinionID != nil {
+			parentOpinionID = utils.ToOpt[oas.OptString](opinion.Opinion.ParentOpinionID.String())
+		}
 		ops := &oas.SwipeOpinionsOKItemOpinion{
 			ID:           opinion.Opinion.OpinionID.String(),
-			ParentID:     utils.ToOpt[oas.OptString](opinion.Opinion.ParentOpinionID.UUID.String()),
+			ParentID:     parentOpinionID,
 			Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Title),
 			Content:      opinion.Opinion.Content,
 			VoteType:     utils.ToOptNil[oas.OptNilString](opinion.GetParentVoteType()),
@@ -388,9 +399,13 @@ func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.Opinion
 			DisplayName: reply.User.DisplayName,
 			IconURL:     utils.ToOptNil[oas.OptNilString](reply.User.IconURL),
 		}
+		var parentOpinionID oas.OptString
+		if reply.Opinion.ParentOpinionID != nil {
+			parentOpinionID = utils.ToOpt[oas.OptString](reply.Opinion.ParentOpinionID.String())
+		}
 		opinion := &oas.OpinionCommentsOKOpinionsItemOpinion{
 			ID:           reply.Opinion.OpinionID.String(),
-			ParentID:     utils.ToOpt[oas.OptString](reply.Opinion.ParentOpinionID.UUID.String()),
+			ParentID:     parentOpinionID,
 			Title:        utils.ToOpt[oas.OptString](reply.Opinion.Title),
 			Content:      reply.Opinion.Content,
 			VoteType:     utils.ToOptNil[oas.OptNilString](reply.GetParentVoteType()),

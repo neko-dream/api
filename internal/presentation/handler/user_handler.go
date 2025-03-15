@@ -104,7 +104,7 @@ func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHi
 				ID:           opinion.Opinion.OpinionID.String(),
 				Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Title),
 				Content:      opinion.Opinion.Content,
-				ParentID:     utils.ToOpt[oas.OptString](opinion.Opinion.ParentOpinionID.UUID.String()),
+				ParentID:     utils.ToOpt[oas.OptString](opinion.Opinion.ParentOpinionID.String()),
 				VoteType:     utils.ToOptNil[oas.OptNilString](opinion.GetParentVoteType()),
 				ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
 				PictureURL:   utils.ToOpt[oas.OptNilString](opinion.Opinion.PictureURL),
