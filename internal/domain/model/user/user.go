@@ -39,13 +39,15 @@ type (
 	}
 
 	User struct {
-		userID       shared.UUID[User]
-		displayID    *string
-		displayName  *string
-		iconURL      *string
-		subject      string
-		provider     auth.AuthProviderName
-		demographics *UserDemographic
+		userID        shared.UUID[User]
+		displayID     *string
+		displayName   *string
+		iconURL       *string
+		subject       string
+		provider      auth.AuthProviderName
+		demographics  *UserDemographic
+		email         *string
+		emailVerified bool
 	}
 )
 
@@ -106,6 +108,10 @@ func (u *User) Provider() auth.AuthProviderName {
 	return u.provider
 }
 
+func (u *User) Email() *string {
+	return u.email
+}
+
 func (u *User) Verify() bool {
 	return u.displayID != nil && u.displayName != nil
 }
@@ -116,6 +122,20 @@ func (u *User) Demographics() *UserDemographic {
 
 func (u *User) SetDemographics(demographics UserDemographic) {
 	u.demographics = lo.ToPtr(demographics)
+}
+
+// SetEmail メールアドレスをセットする
+func (u *User) SetEmail(email string) {
+	u.email = lo.ToPtr(email)
+}
+
+// VerifyEmail メールアドレスを確認済みにする
+func (u *User) VerifyEmail() {
+	u.emailVerified = true
+}
+
+func (u *User) IsEmailVerified() bool {
+	return u.emailVerified
 }
 
 func NewUser(
