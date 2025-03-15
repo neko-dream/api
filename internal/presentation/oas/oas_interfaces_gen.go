@@ -37,6 +37,10 @@ type GetOpenedTalkSessionRes interface {
 	getOpenedTalkSessionRes()
 }
 
+type GetOpinionDetail2Res interface {
+	getOpinionDetail2Res()
+}
+
 type GetOpinionDetailRes interface {
 	getOpinionDetailRes()
 }

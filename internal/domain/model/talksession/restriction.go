@@ -11,7 +11,9 @@ import (
 type RestrictionAttribute struct {
 	Key         RestrictionAttributeKey
 	Description string
-	Fn          func(user user.User) bool
+	Order       int
+	// IsSatisfied ユーザーが条件を満たしているかを判定する
+	IsSatisfied func(user user.User) bool
 }
 
 type RestrictionAttributeKey string
@@ -25,30 +27,46 @@ const (
 
 var (
 	RestrictionAttributeKeyMap = map[RestrictionAttributeKey]RestrictionAttribute{
-		DemographicsCity: {Key: DemographicsCity, Description: "市区町村", Fn: func(user user.User) bool {
-			if user.Demographics() == nil {
-				return false
-			}
-			return user.Demographics().City() != nil
-		}},
-		DemographicsPrefecture: {Key: DemographicsPrefecture, Description: "都道府県", Fn: func(user user.User) bool {
-			if user.Demographics() == nil {
-				return false
-			}
-			return user.Demographics().Prefecture() != nil
-		}},
-		DemographicsGender: {Key: DemographicsGender, Description: "性別", Fn: func(user user.User) bool {
-			if user.Demographics() == nil {
-				return false
-			}
-			return user.Demographics().Gender() != nil
-		}},
-		DemographicsBirth: {Key: DemographicsBirth, Description: "誕生年", Fn: func(user user.User) bool {
-			if user.Demographics() == nil {
-				return false
-			}
-			return user.Demographics().YearOfBirth() != nil
-		}},
+		DemographicsGender: {
+			Key:         DemographicsGender,
+			Description: "性別",
+			Order:       0,
+			IsSatisfied: func(user user.User) bool {
+				if user.Demographics() == nil {
+					return false
+				}
+				return user.Demographics().Gender() != nil
+			}},
+		DemographicsBirth: {
+			Key:         DemographicsBirth,
+			Description: "誕生年",
+			Order:       1,
+			IsSatisfied: func(user user.User) bool {
+				if user.Demographics() == nil {
+					return false
+				}
+				return user.Demographics().YearOfBirth() != nil
+			}},
+		DemographicsCity: {
+			Key:         DemographicsCity,
+			Description: "市区町村",
+			Order:       2,
+			IsSatisfied: func(user user.User) bool {
+				if user.Demographics() == nil {
+					return false
+				}
+				return user.Demographics().City() != nil
+			}},
+		DemographicsPrefecture: {
+			Key:         DemographicsPrefecture,
+			Description: "都道府県",
+			Order:       3,
+			IsSatisfied: func(user user.User) bool {
+				if user.Demographics() == nil {
+					return false
+				}
+				return user.Demographics().Prefecture() != nil
+			}},
 	}
 )
 

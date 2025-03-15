@@ -2,6 +2,7 @@ package talksession_query
 
 import (
 	"context"
+	"sort"
 
 	ts "github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/usecase/query/talksession"
@@ -27,6 +28,11 @@ func (q *getRestrictionsQuery) Execute(ctx context.Context) (*talksession.GetRes
 	for _, restriction := range restrictionAttributeMap {
 		restrictions = append(restrictions, restriction)
 	}
+
+	// sort
+	sort.Slice(restrictions, func(i, j int) bool {
+		return restrictions[i].Order < restrictions[j].Order
+	})
 
 	return &talksession.GetRestrictionsOutput{
 		Restrictions: restrictions,
