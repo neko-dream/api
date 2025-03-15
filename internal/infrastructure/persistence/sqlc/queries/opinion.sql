@@ -15,8 +15,9 @@ INSERT INTO opinions (
 SELECT
     sqlc.embed(opinions),
     sqlc.embed(users),
+    COALESCE(cv.vote_type, 0) AS current_vote_type,
     COALESCE(pv.vote_type, 0) AS parent_vote_type,
-    COALESCE(cv.vote_type, 0) AS current_vote_type
+    COALESCE(rc.reply_count, 0) AS reply_count
 FROM opinions
 LEFT JOIN users
     ON opinions.user_id = users.user_id
@@ -26,6 +27,12 @@ LEFT JOIN (
     FROM votes
 ) pv ON pv.opinion_id = opinions.parent_opinion_id
     AND  pv.user_id = opinions.user_id
+-- この意見に対するリプライ数
+LEFT JOIN (
+    SELECT COUNT(opinion_id) AS reply_count, parent_opinion_id as opinion_id
+    FROM opinions
+    GROUP BY parent_opinion_id
+) rc ON rc.opinion_id = opinions.opinion_id
 -- ユーザーIDが提供された場合、そのユーザーの投票ステータスを一緒に取得
 LEFT JOIN (
     SELECT votes.vote_type, votes.user_id, votes.opinion_id
@@ -63,18 +70,8 @@ ORDER BY opinions.created_at DESC;
 
 -- name: GetRandomOpinions :many
 SELECT
-    opinions.opinion_id,
-    opinions.talk_session_id,
-    opinions.user_id,
-    opinions.parent_opinion_id,
-    opinions.title,
-    opinions.content,
-    opinions.reference_url,
-    opinions.picture_url,
-    opinions.created_at,
-    users.display_name AS display_name,
-    users.display_id AS display_id,
-    users.icon_url AS icon_url,
+    sqlc.embed(opinions),
+    sqlc.embed(users),
     COALESCE(rc.reply_count, 0) AS reply_count
 FROM opinions
 LEFT JOIN users
@@ -114,18 +111,8 @@ LIMIT $3;
 
 -- name: GetOpinionsByUserID :many
 SELECT
-    opinions.opinion_id,
-    opinions.talk_session_id,
-    opinions.user_id,
-    opinions.parent_opinion_id,
-    opinions.title,
-    opinions.content,
-    opinions.reference_url,
-    opinions.picture_url,
-    opinions.created_at,
-    users.display_name AS display_name,
-    users.display_id AS display_id,
-    users.icon_url AS icon_url,
+    sqlc.embed(opinions),
+    sqlc.embed(users),
     COALESCE(pv.vote_type, 0) AS parent_vote_type,
     -- 意見に対するリプライ数（再帰）
     COALESCE(rc.reply_count, 0) AS reply_count
@@ -212,18 +199,8 @@ WITH RECURSIVE opinion_tree AS (
     INNER JOIN opinion_tree t ON t.parent_opinion_id = p.opinion_id
 )
 SELECT
-    o.opinion_id,
-    o.talk_session_id,
-    o.user_id,
-    o.parent_opinion_id,
-    o.title,
-    o.content,
-    o.reference_url,
-    o.picture_url,
-    o.created_at,
-    u.display_name AS display_name,
-    u.display_id AS display_id,
-    u.icon_url AS icon_url,
+    sqlc.embed(o),
+    sqlc.embed(u),
     COALESCE(pv.vote_type, 0) AS parent_vote_type,
     COALESCE(rc.reply_count, 0) AS reply_count,
     COALESCE(cv.vote_type, 0) AS current_vote_type,
@@ -239,8 +216,8 @@ LEFT JOIN (
 LEFT JOIN (
     SELECT votes.vote_type, votes.user_id, votes.opinion_id
     FROM votes
-) cv ON opinions.user_id = sqlc.narg('user_id')::uuid
-    AND opinions.opinion_id = cv.opinion_id
+) cv ON o.opinion_id = cv.opinion_id
+    AND cv.user_id = sqlc.narg('user_id')::uuid
 LEFT JOIN (
     SELECT COUNT(opinion_id) AS reply_count, parent_opinion_id
     FROM opinions

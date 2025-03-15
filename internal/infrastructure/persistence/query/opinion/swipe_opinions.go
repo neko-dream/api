@@ -67,7 +67,7 @@ func (g *GetSwipeOpinionsQueryHandler) Execute(ctx context.Context, in opinion_q
 
 		// 同様の意見を除外する
 		swipeRows = lo.UniqBy(swipeRows, func(swipe model.GetRandomOpinionsRow) uuid.UUID {
-			return swipe.OpinionID
+			return swipe.Opinion.OpinionID
 		})
 	} else {
 		// randomのみ
@@ -84,12 +84,16 @@ func (g *GetSwipeOpinionsQueryHandler) Execute(ctx context.Context, in opinion_q
 	}
 
 	var swipeOpinions []dto.SwipeOpinion
-	if err := copier.CopyWithOption(&swipeOpinions, &swipeRows, copier.Option{
-		DeepCopy:    true,
-		IgnoreEmpty: true,
-	}); err != nil {
-		utils.HandleError(ctx, err, "マッピングに失敗")
-		return nil, err
+	for _, swipeRow := range swipeRows {
+		var swipeOpinion dto.SwipeOpinion
+		if err := copier.CopyWithOption(&swipeOpinion, &swipeRow, copier.Option{
+			DeepCopy:    true,
+			IgnoreEmpty: true,
+		}); err != nil {
+			utils.HandleError(ctx, err, "マッピングに失敗")
+			return nil, err
+		}
+		swipeOpinions = append(swipeOpinions, swipeOpinion)
 	}
 
 	return &opinion_query.GetSwipeOpinionsQueryOutput{
