@@ -1,19 +1,13 @@
 -- name: CreateUser :exec
-INSERT INTO users (user_id, created_at) VALUES ($1, $2);
+INSERT INTO users (user_id, created_at, email, email_verified) VALUES ($1, $2, $3, $4);
 
 -- name: CreateUserAuth :exec
 INSERT INTO user_auths (user_auth_id, user_id, provider, subject, created_at, is_verified) VALUES ($1, $2, $3, $4, $5, false);
 
 -- name: GetUserBySubject :one
 SELECT
-    "users".user_id,
-    "users".display_id,
-    "users".display_name,
-    "user_auths".provider,
-    "user_auths".subject,
-    "user_auths".created_at,
-    "users".icon_url,
-    "user_auths".is_verified
+    sqlc.embed(users),
+    sqlc.embed(user_auths)
 FROM
     "users"
     JOIN "user_auths" ON "users".user_id = "user_auths".user_id
@@ -22,7 +16,7 @@ WHERE
 
 -- name: GetUserByID :one
 SELECT
-    *
+    sqlc.embed(users)
 FROM
     "users"
 WHERE
@@ -42,7 +36,7 @@ WHERE
 
 -- name: GetUserAuthByUserID :one
 SELECT
-    *
+    sqlc.embed(user_auths)
 FROM
     "user_auths"
 WHERE
@@ -83,7 +77,7 @@ WHERE
 
 -- name: UserFindByDisplayID :one
 SELECT
-    *
+    sqlc.embed(users)
 FROM
     "users"
 WHERE
