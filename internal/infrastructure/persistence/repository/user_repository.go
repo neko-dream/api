@@ -18,7 +18,6 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/server/pkg/utils"
-	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
@@ -40,6 +39,52 @@ func NewUserRepository(
 	}
 }
 
+// NewUserFromModel SQLCのモデルからドメインモデルのユーザーを生成する
+func (u *userRepository) newUserFromModel(ctx context.Context, modelUser *model.User, modelAuth *model.UserAuth) (*um.User, error) {
+	providerName, err := auth.NewAuthProviderName(modelAuth.Provider)
+	if err != nil {
+		return nil, errtrace.Wrap(err)
+	}
+
+	var displayID, displayName, iconURL *string
+	if modelUser.DisplayID.Valid {
+		displayID = &modelUser.DisplayID.String
+	}
+	if modelUser.DisplayName.Valid {
+		displayName = &modelUser.DisplayName.String
+	}
+	if modelUser.IconUrl.Valid {
+		iconURL = &modelUser.IconUrl.String
+	}
+
+	userID, err := shared.ParseUUID[user.User](modelUser.UserID.String())
+	if err != nil {
+		return nil, errtrace.Wrap(err)
+	}
+
+	user := user.NewUser(
+		userID,
+		displayID,
+		displayName,
+		modelAuth.Subject,
+		providerName,
+		iconURL,
+	)
+
+	if modelUser.Email.Valid {
+		email, err := u.encryptor.DecryptString(ctx, modelUser.Email.String)
+		if err != nil {
+			return nil, errtrace.Wrap(err)
+		}
+		user.SetEmail(email)
+		if modelUser.EmailVerified {
+			user.VerifyEmail()
+		}
+	}
+
+	return &user, nil
+}
+
 // FindByDisplayID ユーザーのDisplayIDを元にユーザーを取得する
 func (u *userRepository) FindByDisplayID(ctx context.Context, displayID string) (*um.User, error) {
 	ctx, span := otel.Tracer("repository").Start(ctx, "userRepository.FindByDisplayID")
@@ -57,37 +102,14 @@ func (u *userRepository) FindByDisplayID(ctx context.Context, displayID string) 
 
 	userAuthRow, err := u.
 		GetQueries(ctx).
-		GetUserAuthByUserID(ctx, userRow.UserID)
+		GetUserAuthByUserID(ctx, userRow.User.UserID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
 		}
 	}
 
-	providerName, err := auth.NewAuthProviderName(userAuthRow.Provider)
-	if err != nil {
-		return nil, errtrace.Wrap(err)
-	}
-	var iconURL *string
-	if userRow.IconUrl.Valid {
-		iconURL = &userRow.IconUrl.String
-	}
-
-	userID, err := shared.ParseUUID[user.User](userRow.UserID.String())
-	if err != nil {
-		return nil, err
-	}
-
-	user := user.NewUser(
-		userID,
-		lo.ToPtr(displayID),
-		lo.ToPtr(userRow.DisplayName.String),
-		userAuthRow.Subject,
-		providerName,
-		iconURL,
-	)
-
-	return &user, nil
+	return u.newUserFromModel(ctx, &userRow.User, &userAuthRow.UserAuth)
 }
 
 // Update ユーザー情報を更新する
@@ -149,9 +171,21 @@ func (u *userRepository) Create(ctx context.Context, usr user.User) error {
 	ctx, span := otel.Tracer("repository").Start(ctx, "userRepository.Create")
 	defer span.End()
 
+	var email sql.NullString
+	if usr.Email() != nil {
+		emailEncrypted, err := u.encryptor.EncryptString(ctx, *usr.Email())
+		if err != nil {
+			utils.HandleError(ctx, err, "encryptor.DecryptString")
+			return err
+		}
+		email = sql.NullString{String: emailEncrypted, Valid: true}
+	}
+
 	if err := u.GetQueries(ctx).CreateUser(ctx, model.CreateUserParams{
-		UserID:    usr.UserID().UUID(),
-		CreatedAt: clock.Now(ctx),
+		UserID:        usr.UserID().UUID(),
+		CreatedAt:     clock.Now(ctx),
+		Email:         email,
+		EmailVerified: usr.IsEmailVerified(),
 	}); err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
 			return errtrace.Wrap(err)
@@ -181,48 +215,31 @@ func (u *userRepository) FindByID(ctx context.Context, userID shared.UUID[user.U
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
 		}
-
 		return nil, errtrace.Wrap(err)
 	}
+
 	userAuthRow, err := u.GetQueries(ctx).GetUserAuthByUserID(ctx, userID.UUID())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
 		}
 	}
+
+	user, err := u.newUserFromModel(ctx, &userRow.User, &userAuthRow.UserAuth)
+	if err != nil {
+		return nil, errtrace.Wrap(err)
+	}
+
 	userDemographic, err := u.findUserDemographic(ctx, userID)
 	if err != nil {
 		return nil, errtrace.Wrap(err)
 	}
 
-	providerName, err := auth.NewAuthProviderName(userAuthRow.Provider)
-	if err != nil {
-		return nil, errtrace.Wrap(err)
-	}
-	var displayID, displayName, iconURL *string
-	if userRow.DisplayID.Valid {
-		displayID = &userRow.DisplayID.String
-	}
-	if userRow.DisplayName.Valid {
-		displayName = &userRow.DisplayName.String
-	}
-	if userRow.IconUrl.Valid {
-		iconURL = &userRow.IconUrl.String
-	}
-
-	user := user.NewUser(
-		userID,
-		displayID,
-		displayName,
-		userAuthRow.Subject,
-		providerName,
-		iconURL,
-	)
 	if userDemographic != nil {
 		user.SetDemographics(*userDemographic)
 	}
 
-	return &user, nil
+	return user, nil
 }
 
 func (u *userRepository) findUserDemographic(ctx context.Context, userID shared.UUID[user.User]) (*user.UserDemographic, error) {
@@ -252,29 +269,5 @@ func (u *userRepository) FindBySubject(ctx context.Context, subject user.UserSub
 		return nil, nil
 	}
 
-	providerName, err := auth.NewAuthProviderName(row.Provider)
-	if err != nil {
-		return nil, errtrace.Wrap(err)
-	}
-	var displayID, displayName, iconURL *string
-	if row.DisplayID.Valid {
-		displayID = &row.DisplayID.String
-	}
-	if row.DisplayName.Valid {
-		displayName = &row.DisplayName.String
-	}
-	if row.IconUrl.Valid {
-		iconURL = &row.IconUrl.String
-	}
-
-	user := user.NewUser(
-		shared.MustParseUUID[user.User](row.UserID.String()),
-		displayID,
-		displayName,
-		row.Subject,
-		providerName,
-		iconURL,
-	)
-
-	return &user, nil
+	return u.newUserFromModel(ctx, &row.User, &row.UserAuth)
 }

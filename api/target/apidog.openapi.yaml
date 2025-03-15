@@ -3517,6 +3517,9 @@
                     "isVerify": {
                       "type": "boolean",
                       "description": "ユーザ登録済みか"
+                    },
+                    "isEmailVerify": {
+                      "type": "boolean"
                     }
                   },
                   "required": [
@@ -3526,7 +3529,8 @@
                     "iss",
                     "sub",
                     "jti",
-                    "isVerify"
+                    "isVerify",
+                    "isEmailVerify"
                   ]
                 }
               }
@@ -4554,6 +4558,9 @@
           "isVerify": {
             "type": "boolean",
             "description": "ユーザ登録済みか"
+          },
+          "isEmailVerify": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -4563,7 +4570,8 @@
           "iss",
           "sub",
           "jti",
-          "isVerify"
+          "isVerify",
+          "isEmailVerify"
         ]
       },
       "offsetPagination": {

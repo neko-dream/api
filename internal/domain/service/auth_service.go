@@ -50,11 +50,12 @@ func (a *authService) Authenticate(
 		return nil, errtrace.Wrap(err)
 	}
 
-	subject, _, err := provider.VerifyAndIdentify(ctx, code)
+	subject, email, err := provider.VerifyAndIdentify(ctx, code)
 	if err != nil {
 		utils.HandleError(ctx, err, "OIDCProvider.UserInfo")
 		return nil, errtrace.Wrap(err)
 	}
+
 	existUser, err := a.userRepository.FindBySubject(ctx, user.UserSubject(*subject))
 	if err != nil {
 		utils.HandleError(ctx, err, "UserRepository.FindBySubject")
@@ -76,6 +77,12 @@ func (a *authService) Authenticate(
 		authProviderName,
 		nil,
 	)
+	if email != nil {
+		newUser.SetEmail(*email)
+		// Auth時点でemailが確認済みの場合はVerifyEmailを実行
+		newUser.VerifyEmail()
+	}
+
 	if err := a.userRepository.Create(ctx, newUser); err != nil {
 		utils.HandleError(ctx, err, "UserRepository.Create")
 		return nil, errtrace.Wrap(err)

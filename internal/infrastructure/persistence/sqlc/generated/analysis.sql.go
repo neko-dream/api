@@ -211,7 +211,7 @@ const getRepresentativeOpinionsByTalkSessionId = `-- name: GetRepresentativeOpin
 SELECT
     representative_opinions.talk_session_id, representative_opinions.opinion_id, representative_opinions.group_id, representative_opinions.rank, representative_opinions.updated_at, representative_opinions.created_at, representative_opinions.agree_count, representative_opinions.disagree_count, representative_opinions.pass_count,
     opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
     COALESCE(rc.reply_count, 0) AS reply_count
 FROM representative_opinions
 LEFT JOIN opinions
@@ -240,7 +240,7 @@ type GetRepresentativeOpinionsByTalkSessionIdRow struct {
 //	SELECT
 //	    representative_opinions.talk_session_id, representative_opinions.opinion_id, representative_opinions.group_id, representative_opinions.rank, representative_opinions.updated_at, representative_opinions.created_at, representative_opinions.agree_count, representative_opinions.disagree_count, representative_opinions.pass_count,
 //	    opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
 //	    COALESCE(rc.reply_count, 0) AS reply_count
 //	FROM representative_opinions
 //	LEFT JOIN opinions
@@ -289,6 +289,8 @@ func (q *Queries) GetRepresentativeOpinionsByTalkSessionId(ctx context.Context, 
 			&i.User.IconUrl,
 			&i.User.CreatedAt,
 			&i.User.UpdatedAt,
+			&i.User.Email,
+			&i.User.EmailVerified,
 			&i.ReplyCount,
 		); err != nil {
 			return nil, err

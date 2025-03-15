@@ -143,15 +143,16 @@ func (a *authHandler) OAuthTokenInfo(ctx context.Context) (oas.OAuthTokenInfoRes
 	}
 
 	return &oas.OAuthTokenInfoOK{
-		Aud:         claim.Audience(),
-		Iat:         claim.IssueAt().Format(time.RFC3339),
-		Exp:         claim.ExpiresAt().Format(time.RFC3339),
-		Iss:         claim.Issuer(),
-		Sub:         claim.Sub,
-		Jti:         sessID.String(),
-		IsVerify:    claim.IsVerify,
-		DisplayId:   utils.ToOpt[oas.OptString](claim.DisplayID),
-		DisplayName: utils.ToOpt[oas.OptString](claim.DisplayName),
-		IconURL:     utils.ToOpt[oas.OptString](claim.IconURL),
+		Aud:           claim.Audience(),
+		Iat:           claim.IssueAt().Format(time.RFC3339),
+		Exp:           claim.ExpiresAt().Format(time.RFC3339),
+		Iss:           claim.Issuer(),
+		Sub:           claim.Sub,
+		Jti:           sessID.String(),
+		IsVerify:      claim.IsVerify,
+		IsEmailVerify: claim.IsEmailVerify,
+		DisplayId:     utils.ToOpt[oas.OptString](claim.DisplayID),
+		DisplayName:   utils.ToOpt[oas.OptString](claim.DisplayName),
+		IconURL:       utils.ToOpt[oas.OptString](claim.IconURL),
 	}, nil
 }

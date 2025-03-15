@@ -196,7 +196,7 @@ const getOwnTalkSessionByUserID = `-- name: GetOwnTalkSessionByUserID :many
 SELECT
     talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url, talk_sessions.restrictions, talk_sessions.updated_at,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
     talk_session_locations.talk_session_id as location_id,
     COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
     COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
@@ -251,7 +251,7 @@ type GetOwnTalkSessionByUserIDRow struct {
 //	SELECT
 //	    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url, talk_sessions.restrictions, talk_sessions.updated_at,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
 //	    talk_session_locations.talk_session_id as location_id,
 //	    COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
 //	    COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
@@ -316,6 +316,8 @@ func (q *Queries) GetOwnTalkSessionByUserID(ctx context.Context, arg GetOwnTalkS
 			&i.User.IconUrl,
 			&i.User.CreatedAt,
 			&i.User.UpdatedAt,
+			&i.User.Email,
+			&i.User.EmailVerified,
 			&i.LocationID,
 			&i.Latitude,
 			&i.Longitude,
@@ -337,7 +339,7 @@ const getRespondTalkSessionByUserID = `-- name: GetRespondTalkSessionByUserID :m
 SELECT
     talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url, talk_sessions.restrictions, talk_sessions.updated_at,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
     talk_session_locations.talk_session_id as location_id,
     COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
     COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
@@ -394,7 +396,7 @@ type GetRespondTalkSessionByUserIDRow struct {
 //	SELECT
 //	    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url, talk_sessions.restrictions, talk_sessions.updated_at,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
 //	    talk_session_locations.talk_session_id as location_id,
 //	    COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
 //	    COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
@@ -461,6 +463,8 @@ func (q *Queries) GetRespondTalkSessionByUserID(ctx context.Context, arg GetResp
 			&i.User.IconUrl,
 			&i.User.CreatedAt,
 			&i.User.UpdatedAt,
+			&i.User.Email,
+			&i.User.EmailVerified,
 			&i.LocationID,
 			&i.Latitude,
 			&i.Longitude,
@@ -482,7 +486,7 @@ const getTalkSessionByID = `-- name: GetTalkSessionByID :one
 SELECT
     talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url, talk_sessions.restrictions, talk_sessions.updated_at,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
     talk_session_locations.talk_session_id as location_id,
     COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
     COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
@@ -513,7 +517,7 @@ type GetTalkSessionByIDRow struct {
 //	SELECT
 //	    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url, talk_sessions.restrictions, talk_sessions.updated_at,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
 //	    talk_session_locations.talk_session_id as location_id,
 //	    COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
 //	    COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
@@ -550,6 +554,8 @@ func (q *Queries) GetTalkSessionByID(ctx context.Context, talkSessionID uuid.UUI
 		&i.User.IconUrl,
 		&i.User.CreatedAt,
 		&i.User.UpdatedAt,
+		&i.User.Email,
+		&i.User.EmailVerified,
 		&i.LocationID,
 		&i.Latitude,
 		&i.Longitude,
@@ -561,7 +567,7 @@ const listTalkSessions = `-- name: ListTalkSessions :many
 SELECT
     talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url, talk_sessions.restrictions, talk_sessions.updated_at,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
     talk_session_locations.talk_session_id as location_id,
     COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
     COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude,
@@ -653,7 +659,7 @@ type ListTalkSessionsRow struct {
 //	SELECT
 //	    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url, talk_sessions.restrictions, talk_sessions.updated_at,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
 //	    talk_session_locations.talk_session_id as location_id,
 //	    COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
 //	    COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude,
@@ -754,6 +760,8 @@ func (q *Queries) ListTalkSessions(ctx context.Context, arg ListTalkSessionsPara
 			&i.User.IconUrl,
 			&i.User.CreatedAt,
 			&i.User.UpdatedAt,
+			&i.User.Email,
+			&i.User.EmailVerified,
 			&i.LocationID,
 			&i.Latitude,
 			&i.Longitude,

@@ -3578,6 +3578,8 @@ paths:
                   isVerify:
                     type: boolean
                     description: ユーザ登録済みか
+                  isEmailVerify:
+                    type: boolean
                 required:
                   - aud
                   - exp
@@ -3586,6 +3588,7 @@ paths:
                   - sub
                   - jti
                   - isVerify
+                  - isEmailVerify
           headers: {}
         '400':
           description: ''
@@ -4390,6 +4393,8 @@ components:
         isVerify:
           type: boolean
           description: ユーザ登録済みか
+        isEmailVerify:
+          type: boolean
       required:
         - aud
         - exp
@@ -4398,6 +4403,7 @@ components:
         - sub
         - jti
         - isVerify
+        - isEmailVerify
     offsetPagination:
       type: object
       properties:
