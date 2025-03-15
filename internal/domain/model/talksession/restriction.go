@@ -11,7 +11,8 @@ import (
 type RestrictionAttribute struct {
 	Key         RestrictionAttributeKey
 	Description string
-	Fn          func(user user.User) bool
+	// IsSatisfied ユーザーが条件を満たしているかを判定する
+	IsSatisfied func(user user.User) bool
 }
 
 type RestrictionAttributeKey string
@@ -25,25 +26,25 @@ const (
 
 var (
 	RestrictionAttributeKeyMap = map[RestrictionAttributeKey]RestrictionAttribute{
-		DemographicsCity: {Key: DemographicsCity, Description: "市区町村", Fn: func(user user.User) bool {
+		DemographicsCity: {Key: DemographicsCity, Description: "市区町村", IsSatisfied: func(user user.User) bool {
 			if user.Demographics() == nil {
 				return false
 			}
 			return user.Demographics().City() != nil
 		}},
-		DemographicsPrefecture: {Key: DemographicsPrefecture, Description: "都道府県", Fn: func(user user.User) bool {
+		DemographicsPrefecture: {Key: DemographicsPrefecture, Description: "都道府県", IsSatisfied: func(user user.User) bool {
 			if user.Demographics() == nil {
 				return false
 			}
 			return user.Demographics().Prefecture() != nil
 		}},
-		DemographicsGender: {Key: DemographicsGender, Description: "性別", Fn: func(user user.User) bool {
+		DemographicsGender: {Key: DemographicsGender, Description: "性別", IsSatisfied: func(user user.User) bool {
 			if user.Demographics() == nil {
 				return false
 			}
 			return user.Demographics().Gender() != nil
 		}},
-		DemographicsBirth: {Key: DemographicsBirth, Description: "誕生年", Fn: func(user user.User) bool {
+		DemographicsBirth: {Key: DemographicsBirth, Description: "誕生年", IsSatisfied: func(user user.User) bool {
 			if user.Demographics() == nil {
 				return false
 			}
