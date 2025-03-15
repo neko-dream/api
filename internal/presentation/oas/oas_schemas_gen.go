@@ -1056,6 +1056,8 @@ type EditUserProfileReq struct {
 	City OptNilString `json:"city"`
 	// 都道府県.
 	Prefecture OptNilString `json:"prefecture"`
+	// メールアドレス.
+	Email OptNilString `json:"email"`
 }
 
 // GetDisplayName returns the value of DisplayName.
@@ -1093,6 +1095,11 @@ func (s *EditUserProfileReq) GetPrefecture() OptNilString {
 	return s.Prefecture
 }
 
+// GetEmail returns the value of Email.
+func (s *EditUserProfileReq) GetEmail() OptNilString {
+	return s.Email
+}
+
 // SetDisplayName sets the value of DisplayName.
 func (s *EditUserProfileReq) SetDisplayName(val OptNilString) {
 	s.DisplayName = val
@@ -1126,6 +1133,11 @@ func (s *EditUserProfileReq) SetCity(val OptNilString) {
 // SetPrefecture sets the value of Prefecture.
 func (s *EditUserProfileReq) SetPrefecture(val OptNilString) {
 	s.Prefecture = val
+}
+
+// SetEmail sets the value of Email.
+func (s *EditUserProfileReq) SetEmail(val OptNilString) {
+	s.Email = val
 }
 
 // 性別.
@@ -3256,6 +3268,7 @@ type GetUserInfoOK struct {
 	// 作成ユーザー.
 	User         GetUserInfoOKUser         `json:"user"`
 	Demographics GetUserInfoOKDemographics `json:"demographics"`
+	Email        OptNilString              `json:"email"`
 }
 
 // GetUser returns the value of User.
@@ -3268,6 +3281,11 @@ func (s *GetUserInfoOK) GetDemographics() GetUserInfoOKDemographics {
 	return s.Demographics
 }
 
+// GetEmail returns the value of Email.
+func (s *GetUserInfoOK) GetEmail() OptNilString {
+	return s.Email
+}
+
 // SetUser sets the value of User.
 func (s *GetUserInfoOK) SetUser(val GetUserInfoOKUser) {
 	s.User = val
@@ -3276,6 +3294,11 @@ func (s *GetUserInfoOK) SetUser(val GetUserInfoOKUser) {
 // SetDemographics sets the value of Demographics.
 func (s *GetUserInfoOK) SetDemographics(val GetUserInfoOKDemographics) {
 	s.Demographics = val
+}
+
+// SetEmail sets the value of Email.
+func (s *GetUserInfoOK) SetEmail(val OptNilString) {
+	s.Email = val
 }
 
 func (*GetUserInfoOK) getUserInfoRes() {}
@@ -3698,8 +3721,8 @@ type OAuthTokenInfoOK struct {
 	// アイコンURL.
 	IconURL OptString `json:"iconURL"`
 	// ユーザ登録済みか.
-	IsVerify      bool `json:"isVerify"`
-	IsEmailVerify bool `json:"isEmailVerify"`
+	IsVerify        bool `json:"isVerify"`
+	IsEmailVerified bool `json:"isEmailVerified"`
 }
 
 // GetAud returns the value of Aud.
@@ -3752,9 +3775,9 @@ func (s *OAuthTokenInfoOK) GetIsVerify() bool {
 	return s.IsVerify
 }
 
-// GetIsEmailVerify returns the value of IsEmailVerify.
-func (s *OAuthTokenInfoOK) GetIsEmailVerify() bool {
-	return s.IsEmailVerify
+// GetIsEmailVerified returns the value of IsEmailVerified.
+func (s *OAuthTokenInfoOK) GetIsEmailVerified() bool {
+	return s.IsEmailVerified
 }
 
 // SetAud sets the value of Aud.
@@ -3807,9 +3830,9 @@ func (s *OAuthTokenInfoOK) SetIsVerify(val bool) {
 	s.IsVerify = val
 }
 
-// SetIsEmailVerify sets the value of IsEmailVerify.
-func (s *OAuthTokenInfoOK) SetIsEmailVerify(val bool) {
-	s.IsEmailVerify = val
+// SetIsEmailVerified sets the value of IsEmailVerified.
+func (s *OAuthTokenInfoOK) SetIsEmailVerified(val bool) {
+	s.IsEmailVerified = val
 }
 
 func (*OAuthTokenInfoOK) oAuthTokenInfoRes() {}
@@ -7760,6 +7783,8 @@ type RegisterUserReq struct {
 	Prefecture OptString `json:"prefecture"`
 	// 市区町村.
 	City OptNilString `json:"city"`
+	// メアド.
+	Email OptNilString `json:"email"`
 }
 
 // GetDisplayName returns the value of DisplayName.
@@ -7797,6 +7822,11 @@ func (s *RegisterUserReq) GetCity() OptNilString {
 	return s.City
 }
 
+// GetEmail returns the value of Email.
+func (s *RegisterUserReq) GetEmail() OptNilString {
+	return s.Email
+}
+
 // SetDisplayName sets the value of DisplayName.
 func (s *RegisterUserReq) SetDisplayName(val string) {
 	s.DisplayName = val
@@ -7830,6 +7860,11 @@ func (s *RegisterUserReq) SetPrefecture(val OptString) {
 // SetCity sets the value of City.
 func (s *RegisterUserReq) SetCity(val OptNilString) {
 	s.City = val
+}
+
+// SetEmail sets the value of Email.
+func (s *RegisterUserReq) SetEmail(val OptNilString) {
+	s.Email = val
 }
 
 // 性別.

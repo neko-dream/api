@@ -1102,6 +1102,38 @@ func (s *Server) decodeEditUserProfileRequest(r *http.Request) (
 				}
 			}
 			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "email",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotEmailVal string
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToString(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotEmailVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.Email.SetTo(optFormDotEmailVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"email\"")
+					}
+				}
+			}
+			{
 				if err := func() error {
 					files, ok := r.MultipartForm.File["icon"]
 					if !ok || len(files) < 1 {
@@ -2011,6 +2043,61 @@ func (s *Server) decodeRegisterUserRequest(r *http.Request) (
 						return nil
 					}); err != nil {
 						return req, close, errors.Wrap(err, "decode \"city\"")
+					}
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "email",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotEmailVal string
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToString(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotEmailVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.Email.SetTo(optFormDotEmailVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"email\"")
+					}
+					if err := func() error {
+						if value, ok := optForm.Email.Get(); ok {
+							if err := func() error {
+								if err := (validate.String{
+									MinLength:    0,
+									MinLengthSet: false,
+									MaxLength:    0,
+									MaxLengthSet: false,
+									Email:        true,
+									Hostname:     false,
+									Regex:        nil,
+								}).Validate(string(value)); err != nil {
+									return errors.Wrap(err, "string")
+								}
+								return nil
+							}(); err != nil {
+								return err
+							}
+						}
+						return nil
+					}(); err != nil {
+						return req, close, errors.Wrap(err, "validate")
 					}
 				}
 			}
