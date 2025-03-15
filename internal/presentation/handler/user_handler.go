@@ -228,6 +228,7 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 		DisplayName: res.User.DisplayName,
 		IconURL:     utils.ToOptNil[oas.OptNilString](res.User.IconURL),
 	}
+
 	var demographicsResp oas.GetUserInfoOKDemographics
 	if res.User.UserDemographic != nil {
 		demographics := res.User.UserDemographic
@@ -268,9 +269,18 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 		}
 	}
 
+	var email oas.OptNilString
+	if res.User.UserAuth.Email != nil {
+		email = oas.OptNilString{
+			Set:   true,
+			Value: *res.User.UserAuth.Email,
+		}
+	}
+
 	return &oas.GetUserInfoOK{
 		User:         userResp,
 		Demographics: demographicsResp,
+		Email:        email,
 	}, nil
 }
 
@@ -296,6 +306,10 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 	deleteIcon := false
 	if value.DeleteIcon.IsSet() {
 		deleteIcon = value.DeleteIcon.Value
+	}
+	var email *string
+	if value.Email.IsSet() {
+		email = &value.Email.Value
 	}
 
 	var file *multipart.FileHeader
@@ -344,6 +358,7 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 		UserID:      userID,
 		DisplayName: displayName,
 		Icon:        file,
+		Email:       email,
 		YearOfBirth: yearOfBirth,
 		City:        city,
 		Gender:      gender,
