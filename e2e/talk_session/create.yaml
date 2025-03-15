@@ -47,7 +47,7 @@ steps:
       /talksessions:
         post:
           body:
-            application/x-www-form-urlencoded:
+            multipart/form-data:
               theme: "{{ vars.theme }}"
               description: "{{ vars.desc }}"
               scheduledEndTime: "2100-12-31T23:59:59Z"
