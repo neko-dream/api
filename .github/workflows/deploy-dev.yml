@@ -1,0 +1,17 @@
+name: Deploy to Koyeb Dev
+on:
+  push:
+    branches:
+      - develop
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Koyeb CLI
+        uses: koyeb-community/koyeb-actions@v2
+        with:
+          api_token: "${{ secrets.KOYEB_API_KEY }}"
+
+      - name: Trigger Deployment
+        run: |
+          koyeb service redeploy kotohiro-api-dev/kotohiro-api-dev
