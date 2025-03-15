@@ -6715,6 +6715,52 @@ func (o OptPostImageReq) Or(d PostImageReq) PostImageReq {
 	return d
 }
 
+// NewOptPostOpinionPost2Req returns new OptPostOpinionPost2Req with value set to v.
+func NewOptPostOpinionPost2Req(v PostOpinionPost2Req) OptPostOpinionPost2Req {
+	return OptPostOpinionPost2Req{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptPostOpinionPost2Req is optional PostOpinionPost2Req.
+type OptPostOpinionPost2Req struct {
+	Value PostOpinionPost2Req
+	Set   bool
+}
+
+// IsSet returns true if OptPostOpinionPost2Req was set.
+func (o OptPostOpinionPost2Req) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptPostOpinionPost2Req) Reset() {
+	var v PostOpinionPost2Req
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptPostOpinionPost2Req) SetTo(v PostOpinionPost2Req) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptPostOpinionPost2Req) Get() (v PostOpinionPost2Req, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptPostOpinionPost2Req) Or(d PostOpinionPost2Req) PostOpinionPost2Req {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptPostOpinionPostReq returns new OptPostOpinionPostReq with value set to v.
 func NewOptPostOpinionPostReq(v PostOpinionPostReq) OptPostOpinionPostReq {
 	return OptPostOpinionPostReq{
@@ -7441,6 +7487,135 @@ func (s *PostImageReq) GetImage() ht.MultipartFile {
 // SetImage sets the value of Image.
 func (s *PostImageReq) SetImage(val ht.MultipartFile) {
 	s.Image = val
+}
+
+type PostOpinionPost2BadRequest struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *PostOpinionPost2BadRequest) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *PostOpinionPost2BadRequest) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *PostOpinionPost2BadRequest) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *PostOpinionPost2BadRequest) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*PostOpinionPost2BadRequest) postOpinionPost2Res() {}
+
+type PostOpinionPost2InternalServerError struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *PostOpinionPost2InternalServerError) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *PostOpinionPost2InternalServerError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *PostOpinionPost2InternalServerError) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *PostOpinionPost2InternalServerError) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*PostOpinionPost2InternalServerError) postOpinionPost2Res() {}
+
+type PostOpinionPost2OK struct{}
+
+func (*PostOpinionPost2OK) postOpinionPost2Res() {}
+
+type PostOpinionPost2Req struct {
+	TalkSessionID OptNilString `json:"talkSessionID"`
+	// これがある場合はリプライとみなす。これがない場合はTalkSessionIDが必須。.
+	ParentOpinionID OptNilString `json:"parentOpinionID"`
+	Title           OptNilString `json:"title"`
+	OpinionContent  string       `json:"opinionContent"`
+	ReferenceURL    OptNilString `json:"referenceURL"`
+	// 参考画像。4MiBまで.
+	Picture OptMultipartFile `json:"picture"`
+}
+
+// GetTalkSessionID returns the value of TalkSessionID.
+func (s *PostOpinionPost2Req) GetTalkSessionID() OptNilString {
+	return s.TalkSessionID
+}
+
+// GetParentOpinionID returns the value of ParentOpinionID.
+func (s *PostOpinionPost2Req) GetParentOpinionID() OptNilString {
+	return s.ParentOpinionID
+}
+
+// GetTitle returns the value of Title.
+func (s *PostOpinionPost2Req) GetTitle() OptNilString {
+	return s.Title
+}
+
+// GetOpinionContent returns the value of OpinionContent.
+func (s *PostOpinionPost2Req) GetOpinionContent() string {
+	return s.OpinionContent
+}
+
+// GetReferenceURL returns the value of ReferenceURL.
+func (s *PostOpinionPost2Req) GetReferenceURL() OptNilString {
+	return s.ReferenceURL
+}
+
+// GetPicture returns the value of Picture.
+func (s *PostOpinionPost2Req) GetPicture() OptMultipartFile {
+	return s.Picture
+}
+
+// SetTalkSessionID sets the value of TalkSessionID.
+func (s *PostOpinionPost2Req) SetTalkSessionID(val OptNilString) {
+	s.TalkSessionID = val
+}
+
+// SetParentOpinionID sets the value of ParentOpinionID.
+func (s *PostOpinionPost2Req) SetParentOpinionID(val OptNilString) {
+	s.ParentOpinionID = val
+}
+
+// SetTitle sets the value of Title.
+func (s *PostOpinionPost2Req) SetTitle(val OptNilString) {
+	s.Title = val
+}
+
+// SetOpinionContent sets the value of OpinionContent.
+func (s *PostOpinionPost2Req) SetOpinionContent(val string) {
+	s.OpinionContent = val
+}
+
+// SetReferenceURL sets the value of ReferenceURL.
+func (s *PostOpinionPost2Req) SetReferenceURL(val OptNilString) {
+	s.ReferenceURL = val
+}
+
+// SetPicture sets the value of Picture.
+func (s *PostOpinionPost2Req) SetPicture(val OptMultipartFile) {
+	s.Picture = val
 }
 
 type PostOpinionPostBadRequest struct {

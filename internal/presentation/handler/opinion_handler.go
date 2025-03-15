@@ -474,7 +474,7 @@ func (o *opinionHandler) PostOpinionPost(ctx context.Context, req oas.OptPostOpi
 	}
 
 	if err = o.submitOpinionCommand.Execute(ctx, opinion_command.SubmitOpinionInput{
-		TalkSessionID:   talkSessionID,
+		TalkSessionID:   &talkSessionID,
 		OwnerID:         userID,
 		UserID:          userID,
 		ParentOpinionID: parentOpinionID,
@@ -487,5 +487,64 @@ func (o *opinionHandler) PostOpinionPost(ctx context.Context, req oas.OptPostOpi
 	}
 
 	res := &oas.PostOpinionPostOK{}
+	return res, nil
+}
+
+// PostOpinionPost2 TalkSessionIDをBodyで受け取るタイプのやつ
+func (o *opinionHandler) PostOpinionPost2(ctx context.Context, req oas.OptPostOpinionPost2Req) (oas.PostOpinionPost2Res, error) {
+	claim := session.GetSession(ctx)
+	userID, err := claim.UserID()
+	if err != nil {
+		return nil, messages.ForbiddenError
+	}
+	if !req.IsSet() {
+		return nil, messages.RequiredParameterError
+	}
+
+	if err := req.Value.Validate(); err != nil {
+		return nil, err
+	}
+	value := req.Value
+
+	var talkSessionID *shared.UUID[talksession.TalkSession]
+	if value.TalkSessionID.IsSet() {
+		id, err := shared.ParseUUID[talksession.TalkSession](value.TalkSessionID.Value)
+		if err != nil {
+			return nil, messages.BadRequestError
+		}
+		talkSessionID = &id
+	}
+
+	var file *multipart.FileHeader
+	if value.Picture.IsSet() {
+		file, err = http_utils.CreateFileHeader(ctx, value.Picture.Value.File, value.Picture.Value.Name)
+		if err != nil {
+			utils.HandleError(ctx, err, "MakeFileHeader")
+			return nil, messages.InternalServerError
+		}
+	}
+	var parentOpinionID *shared.UUID[opinion.Opinion]
+	if value.ParentOpinionID.IsSet() {
+		id, err := shared.ParseUUID[opinion.Opinion](value.ParentOpinionID.Value)
+		if err != nil {
+			return nil, messages.BadRequestError
+		}
+		parentOpinionID = &id
+	}
+
+	if err = o.submitOpinionCommand.Execute(ctx, opinion_command.SubmitOpinionInput{
+		TalkSessionID:   talkSessionID,
+		OwnerID:         userID,
+		UserID:          userID,
+		ParentOpinionID: parentOpinionID,
+		Title:           utils.ToPtrIfNotNullValue(!req.Value.Title.IsSet(), value.Title.Value),
+		Content:         req.Value.OpinionContent,
+		ReferenceURL:    utils.ToPtrIfNotNullValue(!req.Value.ReferenceURL.IsSet(), value.ReferenceURL.Value),
+		Picture:         file,
+	}); err != nil {
+		return nil, err
+	}
+
+	res := &oas.PostOpinionPost2OK{}
 	return res, nil
 }

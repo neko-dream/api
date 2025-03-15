@@ -105,6 +105,10 @@ type PostImageRes interface {
 	postImageRes()
 }
 
+type PostOpinionPost2Res interface {
+	postOpinionPost2Res()
+}
+
 type PostOpinionPostRes interface {
 	postOpinionPostRes()
 }

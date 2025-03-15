@@ -280,6 +280,16 @@ func (UnimplementedHandler) PostOpinionPost(ctx context.Context, req OptPostOpin
 	return r, ht.ErrNotImplemented
 }
 
+// PostOpinionPost2 implements postOpinionPost2 operation.
+//
+// ParentOpinionIDがなければルートの意見として投稿される
+// parentOpinionIDがない場合はtalkSessionIDが必須.
+//
+// POST /opinions
+func (UnimplementedHandler) PostOpinionPost2(ctx context.Context, req OptPostOpinionPost2Req) (r PostOpinionPost2Res, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // PostTimeLineItem implements postTimeLineItem operation.
 //
 // タイムラインアイテム追加.

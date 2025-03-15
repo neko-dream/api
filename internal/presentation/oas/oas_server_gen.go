@@ -123,6 +123,13 @@ type OpinionHandler interface {
 	//
 	// POST /talksessions/{talkSessionID}/opinions
 	PostOpinionPost(ctx context.Context, req OptPostOpinionPostReq, params PostOpinionPostParams) (PostOpinionPostRes, error)
+	// PostOpinionPost2 implements postOpinionPost2 operation.
+	//
+	// ParentOpinionIDがなければルートの意見として投稿される
+	// parentOpinionIDがない場合はtalkSessionIDが必須.
+	//
+	// POST /opinions
+	PostOpinionPost2(ctx context.Context, req OptPostOpinionPost2Req) (PostOpinionPost2Res, error)
 	// SwipeOpinions implements swipe_opinions operation.
 	//
 	// セッションの中からまだ投票していない意見をランダムに取得する.
