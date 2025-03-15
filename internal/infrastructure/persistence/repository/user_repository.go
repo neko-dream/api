@@ -71,6 +71,17 @@ func (u *userRepository) newUserFromModel(ctx context.Context, modelUser *model.
 		iconURL,
 	)
 
+	if modelUser.Email.Valid {
+		email, err := u.encryptor.DecryptString(ctx, modelUser.Email.String)
+		if err != nil {
+			return nil, errtrace.Wrap(err)
+		}
+		user.SetEmail(email)
+		if modelUser.EmailVerified {
+			user.VerifyEmail()
+		}
+	}
+
 	return &user, nil
 }
 
