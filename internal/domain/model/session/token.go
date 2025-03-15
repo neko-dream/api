@@ -22,15 +22,15 @@ type (
 	}
 
 	Claim struct {
-		Sub           string  `json:"sub"` // subject (user)
-		Iat           int64   `json:"iat"` // issued at (seconds)
-		Exp           int64   `json:"exp"` // expiration time (seconds)
-		Jti           string  `json:"jti"` // JWT ID（SessionID）
-		IconURL       *string `json:"iconURL,omitempty"`
-		DisplayName   *string `json:"displayName,omitempty"`
-		DisplayID     *string `json:"displayId,omitempty"`
-		IsVerify      bool    `json:"isVerify"`
-		IsEmailVerify bool    `json:"isEmailVerify"`
+		Sub             string  `json:"sub"` // subject (user)
+		Iat             int64   `json:"iat"` // issued at (seconds)
+		Exp             int64   `json:"exp"` // expiration time (seconds)
+		Jti             string  `json:"jti"` // JWT ID（SessionID）
+		IconURL         *string `json:"iconURL,omitempty"`
+		DisplayName     *string `json:"displayName,omitempty"`
+		DisplayID       *string `json:"displayId,omitempty"`
+		IsVerify        bool    `json:"isVerify"`
+		IsEmailVerified bool    `json:"isEmailVerified"`
 	}
 )
 
@@ -40,15 +40,15 @@ func NewClaim(ctx context.Context, user user.User, sessionID shared.UUID[Session
 
 	now := clock.Now(ctx)
 	return Claim{
-		Sub:           user.UserID().String(),
-		Iat:           now.Unix(),
-		Exp:           now.Add(time.Second * 60 * 60 * 24 * 7).Unix(),
-		Jti:           sessionID.String(),
-		IconURL:       user.IconURL(),
-		DisplayID:     user.DisplayID(),
-		DisplayName:   user.DisplayName(),
-		IsVerify:      user.Verify(),
-		IsEmailVerify: user.IsEmailVerified(),
+		Sub:             user.UserID().String(),
+		Iat:             now.Unix(),
+		Exp:             now.Add(time.Second * 60 * 60 * 24 * 7).Unix(),
+		Jti:             sessionID.String(),
+		IconURL:         user.IconURL(),
+		DisplayID:       user.DisplayID(),
+		DisplayName:     user.DisplayName(),
+		IsVerify:        user.Verify(),
+		IsEmailVerified: user.IsEmailVerified(),
 	}
 }
 
@@ -64,21 +64,21 @@ func NewClaimFromMap(claims jwt.MapClaims) Claim {
 	if claims["displayId"] != nil {
 		displayID = lo.ToPtr(claims["displayId"].(string))
 	}
-	var isEmailVerify bool
-	if claims["isEmailVerify"] != nil {
-		isEmailVerify = claims["isEmailVerify"].(bool)
+	var isEmailVerified bool
+	if claims["isEmailVerified"] != nil {
+		isEmailVerified = claims["isEmailVerified"].(bool)
 	}
 
 	return Claim{
-		Sub:           claims["sub"].(string),
-		Iat:           int64(claims["iat"].(float64)),
-		Exp:           int64(claims["exp"].(float64)),
-		Jti:           claims["jti"].(string),
-		IconURL:       picture,
-		DisplayName:   displayName,
-		DisplayID:     displayID,
-		IsVerify:      claims["isVerify"].(bool),
-		IsEmailVerify: isEmailVerify,
+		Sub:             claims["sub"].(string),
+		Iat:             int64(claims["iat"].(float64)),
+		Exp:             int64(claims["exp"].(float64)),
+		Jti:             claims["jti"].(string),
+		IconURL:         picture,
+		DisplayName:     displayName,
+		DisplayID:       displayID,
+		IsVerify:        claims["isVerify"].(bool),
+		IsEmailVerified: isEmailVerified,
 	}
 }
 
@@ -116,17 +116,17 @@ const (
 
 func (c *Claim) GenMapClaim() *jwt.MapClaims {
 	return &jwt.MapClaims{
-		"exp":           c.Exp,
-		"iat":           c.Iat,
-		"jti":           c.Jti,
-		"sub":           c.Sub,
-		"iss":           Issuer,
-		"aud":           Audience,
-		"iconURL":       c.IconURL,
-		"displayName":   c.DisplayName,
-		"displayId":     c.DisplayID,
-		"isVerify":      c.IsVerify,
-		"isEmailVerify": c.IsEmailVerify,
+		"exp":             c.Exp,
+		"iat":             c.Iat,
+		"jti":             c.Jti,
+		"sub":             c.Sub,
+		"iss":             Issuer,
+		"aud":             Audience,
+		"iconURL":         c.IconURL,
+		"displayName":     c.DisplayName,
+		"displayId":       c.DisplayID,
+		"isVerify":        c.IsVerify,
+		"isEmailVerified": c.IsEmailVerified,
 	}
 }
 
