@@ -9,6 +9,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/internal/usecase/query/dto"
 	user_query "github.com/neko-dream/server/internal/usecase/query/user"
+	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
@@ -46,6 +47,14 @@ func (d *DetailHandler) Execute(ctx context.Context, input user_query.DetailInpu
 	}
 	if userDemographic != nil {
 		userDetail.UserDemographic = userDemographic
+	}
+	if userRow.User.Email.Valid {
+		decrypted, err := d.encryptor.DecryptString(ctx, userRow.User.Email.String)
+		if err != nil {
+			return nil, err
+		}
+		userDetail.UserAuth.Email = lo.ToPtr(decrypted)
+		userDetail.UserAuth.EmailVerified = userRow.User.EmailVerified
 	}
 
 	return &user_query.DetailOutput{
