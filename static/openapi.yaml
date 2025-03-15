@@ -1095,7 +1095,7 @@ paths:
       parameters: []
       requestBody:
         content:
-          application/x-www-form-urlencoded:
+          multipart/form-data:
             schema:
               type: object
               properties:
