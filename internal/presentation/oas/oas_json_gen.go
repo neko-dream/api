@@ -9328,19 +9328,24 @@ func (s *OAuthTokenInfoOK) encodeFields(e *jx.Encoder) {
 		e.FieldStart("isVerify")
 		e.Bool(s.IsVerify)
 	}
+	{
+		e.FieldStart("isEmailVerify")
+		e.Bool(s.IsEmailVerify)
+	}
 }
 
-var jsonFieldsNameOfOAuthTokenInfoOK = [10]string{
-	0: "aud",
-	1: "exp",
-	2: "iat",
-	3: "iss",
-	4: "sub",
-	5: "jti",
-	6: "displayId",
-	7: "displayName",
-	8: "iconURL",
-	9: "isVerify",
+var jsonFieldsNameOfOAuthTokenInfoOK = [11]string{
+	0:  "aud",
+	1:  "exp",
+	2:  "iat",
+	3:  "iss",
+	4:  "sub",
+	5:  "jti",
+	6:  "displayId",
+	7:  "displayName",
+	8:  "iconURL",
+	9:  "isVerify",
+	10: "isEmailVerify",
 }
 
 // Decode decodes OAuthTokenInfoOK from json.
@@ -9466,6 +9471,18 @@ func (s *OAuthTokenInfoOK) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"isVerify\"")
 			}
+		case "isEmailVerify":
+			requiredBitSet[1] |= 1 << 2
+			if err := func() error {
+				v, err := d.Bool()
+				s.IsEmailVerify = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"isEmailVerify\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -9477,7 +9494,7 @@ func (s *OAuthTokenInfoOK) Decode(d *jx.Decoder) error {
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
 		0b00111111,
-		0b00000010,
+		0b00000110,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

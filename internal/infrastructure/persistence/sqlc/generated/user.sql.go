@@ -14,19 +14,26 @@ import (
 )
 
 const createUser = `-- name: CreateUser :exec
-INSERT INTO users (user_id, created_at) VALUES ($1, $2)
+INSERT INTO users (user_id, created_at, email, email_verified) VALUES ($1, $2, $3, $4)
 `
 
 type CreateUserParams struct {
-	UserID    uuid.UUID
-	CreatedAt time.Time
+	UserID        uuid.UUID
+	CreatedAt     time.Time
+	Email         sql.NullString
+	EmailVerified bool
 }
 
 // CreateUser
 //
-//	INSERT INTO users (user_id, created_at) VALUES ($1, $2)
+//	INSERT INTO users (user_id, created_at, email, email_verified) VALUES ($1, $2, $3, $4)
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
-	_, err := q.db.ExecContext(ctx, createUser, arg.UserID, arg.CreatedAt)
+	_, err := q.db.ExecContext(ctx, createUser,
+		arg.UserID,
+		arg.CreatedAt,
+		arg.Email,
+		arg.EmailVerified,
+	)
 	return err
 }
 
@@ -58,76 +65,80 @@ func (q *Queries) CreateUserAuth(ctx context.Context, arg CreateUserAuthParams) 
 
 const getUserAuthByUserID = `-- name: GetUserAuthByUserID :one
 SELECT
-    user_auth_id, user_id, provider, subject, is_verified, created_at
+    user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at
 FROM
     "user_auths"
 WHERE
     user_id = $1
 `
 
+type GetUserAuthByUserIDRow struct {
+	UserAuth UserAuth
+}
+
 // GetUserAuthByUserID
 //
 //	SELECT
-//	    user_auth_id, user_id, provider, subject, is_verified, created_at
+//	    user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at
 //	FROM
 //	    "user_auths"
 //	WHERE
 //	    user_id = $1
-func (q *Queries) GetUserAuthByUserID(ctx context.Context, userID uuid.UUID) (UserAuth, error) {
+func (q *Queries) GetUserAuthByUserID(ctx context.Context, userID uuid.UUID) (GetUserAuthByUserIDRow, error) {
 	row := q.db.QueryRowContext(ctx, getUserAuthByUserID, userID)
-	var i UserAuth
+	var i GetUserAuthByUserIDRow
 	err := row.Scan(
-		&i.UserAuthID,
-		&i.UserID,
-		&i.Provider,
-		&i.Subject,
-		&i.IsVerified,
-		&i.CreatedAt,
+		&i.UserAuth.UserAuthID,
+		&i.UserAuth.UserID,
+		&i.UserAuth.Provider,
+		&i.UserAuth.Subject,
+		&i.UserAuth.IsVerified,
+		&i.UserAuth.CreatedAt,
 	)
 	return i, err
 }
 
 const getUserByID = `-- name: GetUserByID :one
 SELECT
-    user_id, display_id, display_name, icon_url, created_at, updated_at
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified
 FROM
     "users"
 WHERE
     users.user_id = $1
 `
 
+type GetUserByIDRow struct {
+	User User
+}
+
 // GetUserByID
 //
 //	SELECT
-//	    user_id, display_id, display_name, icon_url, created_at, updated_at
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified
 //	FROM
 //	    "users"
 //	WHERE
 //	    users.user_id = $1
-func (q *Queries) GetUserByID(ctx context.Context, userID uuid.UUID) (User, error) {
+func (q *Queries) GetUserByID(ctx context.Context, userID uuid.UUID) (GetUserByIDRow, error) {
 	row := q.db.QueryRowContext(ctx, getUserByID, userID)
-	var i User
+	var i GetUserByIDRow
 	err := row.Scan(
-		&i.UserID,
-		&i.DisplayID,
-		&i.DisplayName,
-		&i.IconUrl,
-		&i.CreatedAt,
-		&i.UpdatedAt,
+		&i.User.UserID,
+		&i.User.DisplayID,
+		&i.User.DisplayName,
+		&i.User.IconUrl,
+		&i.User.CreatedAt,
+		&i.User.UpdatedAt,
+		&i.User.Email,
+		&i.User.EmailVerified,
 	)
 	return i, err
 }
 
 const getUserBySubject = `-- name: GetUserBySubject :one
 SELECT
-    "users".user_id,
-    "users".display_id,
-    "users".display_name,
-    "user_auths".provider,
-    "user_auths".subject,
-    "user_auths".created_at,
-    "users".icon_url,
-    "user_auths".is_verified
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
+    user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at
 FROM
     "users"
     JOIN "user_auths" ON "users".user_id = "user_auths".user_id
@@ -136,27 +147,15 @@ WHERE
 `
 
 type GetUserBySubjectRow struct {
-	UserID      uuid.UUID
-	DisplayID   sql.NullString
-	DisplayName sql.NullString
-	Provider    string
-	Subject     string
-	CreatedAt   time.Time
-	IconUrl     sql.NullString
-	IsVerified  bool
+	User     User
+	UserAuth UserAuth
 }
 
 // GetUserBySubject
 //
 //	SELECT
-//	    "users".user_id,
-//	    "users".display_id,
-//	    "users".display_name,
-//	    "user_auths".provider,
-//	    "user_auths".subject,
-//	    "user_auths".created_at,
-//	    "users".icon_url,
-//	    "user_auths".is_verified
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
+//	    user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at
 //	FROM
 //	    "users"
 //	    JOIN "user_auths" ON "users".user_id = "user_auths".user_id
@@ -166,14 +165,20 @@ func (q *Queries) GetUserBySubject(ctx context.Context, subject string) (GetUser
 	row := q.db.QueryRowContext(ctx, getUserBySubject, subject)
 	var i GetUserBySubjectRow
 	err := row.Scan(
-		&i.UserID,
-		&i.DisplayID,
-		&i.DisplayName,
-		&i.Provider,
-		&i.Subject,
-		&i.CreatedAt,
-		&i.IconUrl,
-		&i.IsVerified,
+		&i.User.UserID,
+		&i.User.DisplayID,
+		&i.User.DisplayName,
+		&i.User.IconUrl,
+		&i.User.CreatedAt,
+		&i.User.UpdatedAt,
+		&i.User.Email,
+		&i.User.EmailVerified,
+		&i.UserAuth.UserAuthID,
+		&i.UserAuth.UserID,
+		&i.UserAuth.Provider,
+		&i.UserAuth.Subject,
+		&i.UserAuth.IsVerified,
+		&i.UserAuth.CreatedAt,
 	)
 	return i, err
 }
@@ -213,7 +218,7 @@ func (q *Queries) GetUserDemographicByUserID(ctx context.Context, userID uuid.UU
 
 const getUserDetailByID = `-- name: GetUserDetailByID :one
 SELECT
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
     user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at,
     user_demographics.user_demographics_id, user_demographics.user_id, user_demographics.year_of_birth, user_demographics.gender, user_demographics.city, user_demographics.created_at, user_demographics.updated_at, user_demographics.prefecture
 FROM
@@ -233,7 +238,7 @@ type GetUserDetailByIDRow struct {
 // GetUserDetailByID
 //
 //	SELECT
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
 //	    user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at,
 //	    user_demographics.user_demographics_id, user_demographics.user_id, user_demographics.year_of_birth, user_demographics.gender, user_demographics.city, user_demographics.created_at, user_demographics.updated_at, user_demographics.prefecture
 //	FROM
@@ -252,6 +257,8 @@ func (q *Queries) GetUserDetailByID(ctx context.Context, userID uuid.UUID) (GetU
 		&i.User.IconUrl,
 		&i.User.CreatedAt,
 		&i.User.UpdatedAt,
+		&i.User.Email,
+		&i.User.EmailVerified,
 		&i.UserAuth.UserAuthID,
 		&i.UserAuth.UserID,
 		&i.UserAuth.Provider,
@@ -356,31 +363,37 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
 
 const userFindByDisplayID = `-- name: UserFindByDisplayID :one
 SELECT
-    user_id, display_id, display_name, icon_url, created_at, updated_at
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified
 FROM
     "users"
 WHERE
     display_id = $1
 `
 
+type UserFindByDisplayIDRow struct {
+	User User
+}
+
 // UserFindByDisplayID
 //
 //	SELECT
-//	    user_id, display_id, display_name, icon_url, created_at, updated_at
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified
 //	FROM
 //	    "users"
 //	WHERE
 //	    display_id = $1
-func (q *Queries) UserFindByDisplayID(ctx context.Context, displayID sql.NullString) (User, error) {
+func (q *Queries) UserFindByDisplayID(ctx context.Context, displayID sql.NullString) (UserFindByDisplayIDRow, error) {
 	row := q.db.QueryRowContext(ctx, userFindByDisplayID, displayID)
-	var i User
+	var i UserFindByDisplayIDRow
 	err := row.Scan(
-		&i.UserID,
-		&i.DisplayID,
-		&i.DisplayName,
-		&i.IconUrl,
-		&i.CreatedAt,
-		&i.UpdatedAt,
+		&i.User.UserID,
+		&i.User.DisplayID,
+		&i.User.DisplayName,
+		&i.User.IconUrl,
+		&i.User.CreatedAt,
+		&i.User.UpdatedAt,
+		&i.User.Email,
+		&i.User.EmailVerified,
 	)
 	return i, err
 }

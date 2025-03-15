@@ -248,7 +248,7 @@ func (q *Queries) GetActionItemsByTalkSessionID(ctx context.Context, talkSession
 const getConclusionByID = `-- name: GetConclusionByID :one
 SELECT
     conclusion.talk_session_id, conclusion.content, conclusion.created_by, conclusion.created_at, conclusion.updated_at,
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified
 FROM talk_session_conclusions as conclusion
 LEFT JOIN users
     ON conclusion.created_by = users.user_id
@@ -264,7 +264,7 @@ type GetConclusionByIDRow struct {
 //
 //	SELECT
 //	    conclusion.talk_session_id, conclusion.content, conclusion.created_by, conclusion.created_at, conclusion.updated_at,
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified
 //	FROM talk_session_conclusions as conclusion
 //	LEFT JOIN users
 //	    ON conclusion.created_by = users.user_id
@@ -284,6 +284,8 @@ func (q *Queries) GetConclusionByID(ctx context.Context, talkSessionID uuid.UUID
 		&i.User.IconUrl,
 		&i.User.CreatedAt,
 		&i.User.UpdatedAt,
+		&i.User.Email,
+		&i.User.EmailVerified,
 	)
 	return i, err
 }

@@ -3698,7 +3698,8 @@ type OAuthTokenInfoOK struct {
 	// アイコンURL.
 	IconURL OptString `json:"iconURL"`
 	// ユーザ登録済みか.
-	IsVerify bool `json:"isVerify"`
+	IsVerify      bool `json:"isVerify"`
+	IsEmailVerify bool `json:"isEmailVerify"`
 }
 
 // GetAud returns the value of Aud.
@@ -3751,6 +3752,11 @@ func (s *OAuthTokenInfoOK) GetIsVerify() bool {
 	return s.IsVerify
 }
 
+// GetIsEmailVerify returns the value of IsEmailVerify.
+func (s *OAuthTokenInfoOK) GetIsEmailVerify() bool {
+	return s.IsEmailVerify
+}
+
 // SetAud sets the value of Aud.
 func (s *OAuthTokenInfoOK) SetAud(val string) {
 	s.Aud = val
@@ -3799,6 +3805,11 @@ func (s *OAuthTokenInfoOK) SetIconURL(val OptString) {
 // SetIsVerify sets the value of IsVerify.
 func (s *OAuthTokenInfoOK) SetIsVerify(val bool) {
 	s.IsVerify = val
+}
+
+// SetIsEmailVerify sets the value of IsEmailVerify.
+func (s *OAuthTokenInfoOK) SetIsEmailVerify(val bool) {
+	s.IsEmailVerify = val
 }
 
 func (*OAuthTokenInfoOK) oAuthTokenInfoRes() {}
