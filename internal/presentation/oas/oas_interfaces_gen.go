@@ -85,6 +85,10 @@ type OAuthTokenRevokeRes interface {
 	oAuthTokenRevokeRes()
 }
 
+type OpinionComments2Res interface {
+	opinionComments2Res()
+}
+
 type OpinionCommentsRes interface {
 	opinionCommentsRes()
 }
@@ -127,6 +131,10 @@ type TalkSessionAnalysisRes interface {
 
 type TestRes interface {
 	testRes()
+}
+
+type Vote2Res interface {
+	vote2Res()
 }
 
 type VoteRes interface {

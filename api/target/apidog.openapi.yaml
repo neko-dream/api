@@ -103,6 +103,288 @@
         "x-ogen-operation-group": "Opinion"
       }
     },
+    "/opinions/{opinionID}/replies": {
+      "get": {
+        "summary": "意見に対するリプライ意見一覧",
+        "deprecated": false,
+        "description": "",
+        "operationId": "opinionComments2",
+        "tags": [
+          "opinion"
+        ],
+        "parameters": [
+          {
+            "name": "opinionID",
+            "in": "path",
+            "description": "親意見のID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rootOpinion": {
+                      "type": "object",
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/user",
+                          "description": "作成ユーザー"
+                        },
+                        "myVoteType": {
+                          "$ref": "#/components/schemas/voteType",
+                          "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
+                        },
+                        "opinion": {
+                          "$ref": "#/components/schemas/opinion"
+                        }
+                      },
+                      "required": [
+                        "user",
+                        "opinion"
+                      ]
+                    },
+                    "opinions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "opinion": {
+                            "$ref": "#/components/schemas/opinion"
+                          },
+                          "user": {
+                            "$ref": "#/components/schemas/user",
+                            "description": "作成ユーザー"
+                          },
+                          "myVoteType": {
+                            "$ref": "#/components/schemas/voteType",
+                            "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
+                          }
+                        },
+                        "required": [
+                          "opinion",
+                          "user"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "rootOpinion",
+                    "opinions"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [],
+        "x-ogen-operation-group": "Opinion"
+      }
+    },
+    "/opinions/{opinionID}/votes": {
+      "post": {
+        "summary": "意思表明API",
+        "deprecated": false,
+        "description": "",
+        "operationId": "vote2",
+        "tags": [
+          "vote"
+        ],
+        "parameters": [
+          {
+            "name": "opinionID",
+            "in": "path",
+            "description": "意見のID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "voteStatus": {
+                    "type": "string",
+                    "enum": [
+                      "agree",
+                      "disagree",
+                      "pass"
+                    ],
+                    "example": "",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "voteStatus"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/opinion"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
+        "x-ogen-operation-group": "Vote"
+      }
+    },
     "/talksessions/{talkSessionID}/opinions/{opinionID}/votes": {
       "post": {
         "summary": "意思表明API",
