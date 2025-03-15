@@ -492,6 +492,9 @@ func (o *opinionHandler) PostOpinionPost(ctx context.Context, req oas.OptPostOpi
 
 // PostOpinionPost2 TalkSessionIDをBodyで受け取るタイプのやつ
 func (o *opinionHandler) PostOpinionPost2(ctx context.Context, req oas.OptPostOpinionPost2Req) (oas.PostOpinionPost2Res, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.PostOpinionPost2")
+	defer span.End()
+
 	claim := session.GetSession(ctx)
 	userID, err := claim.UserID()
 	if err != nil {
