@@ -20,7 +20,6 @@ type (
 	}
 
 	GetOpinionRepliesQueryOutput struct {
-		RootOpinion dto.SwipeOpinion
-		Replies     []dto.SwipeOpinion
+		Replies []dto.SwipeOpinion
 	}
 )

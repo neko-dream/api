@@ -13,6 +13,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/server/pkg/utils"
+	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
@@ -69,6 +70,40 @@ func (o *opinionRepository) Create(ctx context.Context, op opinion.Opinion) erro
 		return err
 	}
 	return nil
+}
+
+func (o *opinionRepository) FindByID(ctx context.Context, opinionID shared.UUID[opinion.Opinion]) (*opinion.Opinion, error) {
+	ctx, span := otel.Tracer("repository").Start(ctx, "opinionRepository.FindByID")
+	defer span.End()
+
+	op, err := o.GetQueries(ctx).GetOpinionByID(ctx, model.GetOpinionByIDParams{
+		OpinionID: opinionID.UUID(),
+	})
+	if err != nil {
+		utils.HandleError(ctx, err, "opinionRepository.FindByID")
+		return nil, err
+	}
+	var parentOpinionID *shared.UUID[opinion.Opinion]
+	if op.Opinion.ParentOpinionID.Valid {
+		parentOpinionID = lo.ToPtr(shared.UUID[opinion.Opinion](op.Opinion.ParentOpinionID.UUID))
+	}
+
+	opEntity, err := opinion.NewOpinion(
+		opinionID,
+		shared.UUID[talksession.TalkSession](op.Opinion.TalkSessionID),
+		shared.UUID[user.User](op.Opinion.UserID),
+		parentOpinionID,
+		lo.ToPtr(op.Opinion.Title.String),
+		op.Opinion.Content,
+		op.Opinion.CreatedAt,
+		lo.ToPtr(op.Opinion.ReferenceUrl.String),
+	)
+	if err != nil {
+		utils.HandleError(ctx, err, "opinionRepository.FindByID")
+		return nil, err
+	}
+
+	return opEntity, nil
 }
 
 // FindByParentID implements opinion.OpinionRepository.

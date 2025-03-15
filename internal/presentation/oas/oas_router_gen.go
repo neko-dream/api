@@ -313,12 +313,15 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					elem = origElem
 				}
 				// Param: "opinionID"
-				// Leaf parameter
-				args[0] = elem
-				elem = ""
+				// Match until "/"
+				idx := strings.IndexByte(elem, '/')
+				if idx < 0 {
+					idx = len(elem)
+				}
+				args[0] = elem[:idx]
+				elem = elem[idx:]
 
 				if len(elem) == 0 {
-					// Leaf node.
 					switch r.Method {
 					case "GET":
 						s.handleGetOpinionDetail2Request([1]string{
@@ -329,6 +332,69 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					}
 
 					return
+				}
+				switch elem[0] {
+				case '/': // Prefix: "/"
+					origElem := elem
+					if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						break
+					}
+					switch elem[0] {
+					case 'r': // Prefix: "replies"
+						origElem := elem
+						if l := len("replies"); len(elem) >= l && elem[0:l] == "replies" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch r.Method {
+							case "GET":
+								s.handleOpinionComments2Request([1]string{
+									args[0],
+								}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "GET")
+							}
+
+							return
+						}
+
+						elem = origElem
+					case 'v': // Prefix: "votes"
+						origElem := elem
+						if l := len("votes"); len(elem) >= l && elem[0:l] == "votes" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch r.Method {
+							case "POST":
+								s.handleVote2Request([1]string{
+									args[0],
+								}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "POST")
+							}
+
+							return
+						}
+
+						elem = origElem
+					}
+
+					elem = origElem
 				}
 
 				elem = origElem
@@ -1236,12 +1302,15 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					elem = origElem
 				}
 				// Param: "opinionID"
-				// Leaf parameter
-				args[0] = elem
-				elem = ""
+				// Match until "/"
+				idx := strings.IndexByte(elem, '/')
+				if idx < 0 {
+					idx = len(elem)
+				}
+				args[0] = elem[:idx]
+				elem = elem[idx:]
 
 				if len(elem) == 0 {
-					// Leaf node.
 					switch method {
 					case "GET":
 						r.name = "GetOpinionDetail2"
@@ -1254,6 +1323,73 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					default:
 						return
 					}
+				}
+				switch elem[0] {
+				case '/': // Prefix: "/"
+					origElem := elem
+					if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						break
+					}
+					switch elem[0] {
+					case 'r': // Prefix: "replies"
+						origElem := elem
+						if l := len("replies"); len(elem) >= l && elem[0:l] == "replies" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch method {
+							case "GET":
+								r.name = "OpinionComments2"
+								r.summary = "意見に対するリプライ意見一覧"
+								r.operationID = "opinionComments2"
+								r.pathPattern = "/opinions/{opinionID}/replies"
+								r.args = args
+								r.count = 1
+								return r, true
+							default:
+								return
+							}
+						}
+
+						elem = origElem
+					case 'v': // Prefix: "votes"
+						origElem := elem
+						if l := len("votes"); len(elem) >= l && elem[0:l] == "votes" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch method {
+							case "POST":
+								r.name = "Vote2"
+								r.summary = "意思表明API"
+								r.operationID = "vote2"
+								r.pathPattern = "/opinions/{opinionID}/votes"
+								r.args = args
+								r.count = 1
+								return r, true
+							default:
+								return
+							}
+						}
+
+						elem = origElem
+					}
+
+					elem = origElem
 				}
 
 				elem = origElem

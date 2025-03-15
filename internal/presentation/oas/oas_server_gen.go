@@ -111,6 +111,12 @@ type OpinionHandler interface {
 	//
 	// GET /talksessions/{talkSessionID}/opinions/{opinionID}/replies
 	OpinionComments(ctx context.Context, params OpinionCommentsParams) (OpinionCommentsRes, error)
+	// OpinionComments2 implements opinionComments2 operation.
+	//
+	// 意見に対するリプライ意見一覧.
+	//
+	// GET /opinions/{opinionID}/replies
+	OpinionComments2(ctx context.Context, params OpinionComments2Params) (OpinionComments2Res, error)
 	// PostOpinionPost implements postOpinionPost operation.
 	//
 	// ParentOpinionIDがなければルートの意見として投稿される.
@@ -287,6 +293,12 @@ type VoteHandler interface {
 	//
 	// POST /talksessions/{talkSessionID}/opinions/{opinionID}/votes
 	Vote(ctx context.Context, req OptVoteReq, params VoteParams) (VoteRes, error)
+	// Vote2 implements vote2 operation.
+	//
+	// 意思表明API.
+	//
+	// POST /opinions/{opinionID}/votes
+	Vote2(ctx context.Context, req OptVote2Req, params Vote2Params) (Vote2Res, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and

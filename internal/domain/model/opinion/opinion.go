@@ -14,6 +14,7 @@ import (
 type (
 	OpinionRepository interface {
 		Create(context.Context, Opinion) error
+		FindByID(context.Context, shared.UUID[Opinion]) (*Opinion, error)
 		FindByParentID(context.Context, shared.UUID[Opinion]) ([]Opinion, error)
 		// FindByTalkSessionWithoutVote まだユーザーが投票していない意見をランダムに取得
 		FindByTalkSessionWithoutVote(
