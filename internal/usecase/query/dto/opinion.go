@@ -8,6 +8,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/domain/model/vote"
+	"github.com/samber/lo"
 )
 
 type Opinion struct {
@@ -30,12 +31,18 @@ type SwipeOpinion struct {
 	ParentVoteType  int
 }
 
-func (s *SwipeOpinion) GetMyVoteType() string {
-	return vote.VoteTypeFromInt(s.CurrentVoteType).String()
+func (s *SwipeOpinion) GetMyVoteType() *string {
+	if s.CurrentVoteType == 0 {
+		return nil
+	}
+	return lo.ToPtr(vote.VoteTypeFromInt(s.ParentVoteType).String())
 }
 
-func (s *SwipeOpinion) GetParentVoteType() string {
-	return vote.VoteTypeFromInt(s.ParentVoteType).String()
+func (s *SwipeOpinion) GetParentVoteType() *string {
+	if s.ParentVoteType == 0 {
+		return nil
+	}
+	return lo.ToPtr(vote.VoteTypeFromInt(s.ParentVoteType).String())
 }
 
 type OpinionWithRepresentative struct {

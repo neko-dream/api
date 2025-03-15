@@ -32,7 +32,6 @@ paths:
                     properties:
                       id:
                         type: string
-                        faker: '1'
                         description: 意見ID
                       title:
                         type: string
@@ -47,19 +46,11 @@ paths:
                       voteType:
                         type: string
                         description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                        enum:
-                          - agree
-                          - disagree
-                          - pass
-                        x-apidog:
-                          enumDescriptions:
-                            agree: ''
-                            disagree: ''
-                            pass: ''
-                        default: unvote
+                        nullable: true
                       pictureURL:
                         type: string
                         description: 画像が返る場合もある
+                        nullable: true
                       referenceURL:
                         type: string
                         description: 参考文献URL
@@ -88,6 +79,9 @@ paths:
                       - displayID
                       - displayName
                     description: 作成ユーザー
+                  myVoteType:
+                    type: string
+                    nullable: true
                 required:
                   - opinion
                   - user
@@ -141,7 +135,6 @@ paths:
                           properties:
                             id:
                               type: string
-                              faker: '1'
                               description: 意見ID
                             title:
                               type: string
@@ -156,19 +149,11 @@ paths:
                             voteType:
                               type: string
                               description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                              enum:
-                                - agree
-                                - disagree
-                                - pass
-                              x-apidog:
-                                enumDescriptions:
-                                  agree: ''
-                                  disagree: ''
-                                  pass: ''
-                              default: unvote
+                              nullable: true
                             pictureURL:
                               type: string
                               description: 画像が返る場合もある
+                              nullable: true
                             referenceURL:
                               type: string
                               description: 参考文献URL
@@ -199,17 +184,7 @@ paths:
                           description: 作成ユーザー
                         myVoteType:
                           type: string
-                          description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                          enum:
-                            - agree
-                            - disagree
-                            - pass
-                          x-apidog:
-                            enumDescriptions:
-                              agree: ''
-                              disagree: ''
-                              pass: ''
-                          default: unvote
+                          nullable: true
                       required:
                         - opinion
                         - user
@@ -303,7 +278,6 @@ paths:
                   properties:
                     id:
                       type: string
-                      faker: '1'
                       description: 意見ID
                     title:
                       type: string
@@ -318,19 +292,11 @@ paths:
                     voteType:
                       type: string
                       description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                      enum:
-                        - agree
-                        - disagree
-                        - pass
-                      x-apidog:
-                        enumDescriptions:
-                          agree: ''
-                          disagree: ''
-                          pass: ''
-                      default: unvote
+                      nullable: true
                     pictureURL:
                       type: string
                       description: 画像が返る場合もある
+                      nullable: true
                     referenceURL:
                       type: string
                       description: 参考文献URL
@@ -540,7 +506,6 @@ paths:
                   properties:
                     id:
                       type: string
-                      faker: '1'
                       description: 意見ID
                     title:
                       type: string
@@ -555,19 +520,11 @@ paths:
                     voteType:
                       type: string
                       description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                      enum:
-                        - agree
-                        - disagree
-                        - pass
-                      x-apidog:
-                        enumDescriptions:
-                          agree: ''
-                          disagree: ''
-                          pass: ''
-                      default: unvote
+                      nullable: true
                     pictureURL:
                       type: string
                       description: 画像が返る場合もある
+                      nullable: true
                     referenceURL:
                       type: string
                       description: 参考文献URL
@@ -661,7 +618,6 @@ paths:
                       properties:
                         id:
                           type: string
-                          faker: '1'
                           description: 意見ID
                         title:
                           type: string
@@ -676,19 +632,11 @@ paths:
                         voteType:
                           type: string
                           description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                          enum:
-                            - agree
-                            - disagree
-                            - pass
-                          x-apidog:
-                            enumDescriptions:
-                              agree: ''
-                              disagree: ''
-                              pass: ''
-                          default: unvote
+                          nullable: true
                         pictureURL:
                           type: string
                           description: 画像が返る場合もある
+                          nullable: true
                         referenceURL:
                           type: string
                           description: 参考文献URL
@@ -927,7 +875,6 @@ paths:
                           properties:
                             id:
                               type: string
-                              faker: '1'
                               description: 意見ID
                             title:
                               type: string
@@ -942,19 +889,11 @@ paths:
                             voteType:
                               type: string
                               description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                              enum:
-                                - agree
-                                - disagree
-                                - pass
-                              x-apidog:
-                                enumDescriptions:
-                                  agree: ''
-                                  disagree: ''
-                                  pass: ''
-                              default: unvote
+                              nullable: true
                             pictureURL:
                               type: string
                               description: 画像が返る場合もある
+                              nullable: true
                             referenceURL:
                               type: string
                               description: 参考文献URL
@@ -987,22 +926,11 @@ paths:
                           type: integer
                         myVoteType:
                           type: string
-                          description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                          enum:
-                            - agree
-                            - disagree
-                            - pass
-                          x-apidog:
-                            enumDescriptions:
-                              agree: ''
-                              disagree: ''
-                              pass: ''
-                          default: unvote
+                          nullable: true
                       required:
                         - opinion
                         - user
                         - replyCount
-                        - myVoteType
                   pagination:
                     type: object
                     properties:
@@ -1078,7 +1006,6 @@ paths:
                     properties:
                       id:
                         type: string
-                        faker: '1'
                         description: 意見ID
                       title:
                         type: string
@@ -1093,19 +1020,11 @@ paths:
                       voteType:
                         type: string
                         description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                        enum:
-                          - agree
-                          - disagree
-                          - pass
-                        x-apidog:
-                          enumDescriptions:
-                            agree: ''
-                            disagree: ''
-                            pass: ''
-                        default: unvote
+                        nullable: true
                       pictureURL:
                         type: string
                         description: 画像が返る場合もある
+                        nullable: true
                       referenceURL:
                         type: string
                         description: 参考文献URL
@@ -1908,7 +1827,6 @@ paths:
                           properties:
                             id:
                               type: string
-                              faker: '1'
                               description: 意見ID
                             title:
                               type: string
@@ -1923,19 +1841,11 @@ paths:
                             voteType:
                               type: string
                               description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                              enum:
-                                - agree
-                                - disagree
-                                - pass
-                              x-apidog:
-                                enumDescriptions:
-                                  agree: ''
-                                  disagree: ''
-                                  pass: ''
-                              default: unvote
+                              nullable: true
                             pictureURL:
                               type: string
                               description: 画像が返る場合もある
+                              nullable: true
                             referenceURL:
                               type: string
                               description: 参考文献URL
@@ -1966,17 +1876,7 @@ paths:
                           description: 作成ユーザー
                         myVoteType:
                           type: string
-                          description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                          enum:
-                            - agree
-                            - disagree
-                            - pass
-                          x-apidog:
-                            enumDescriptions:
-                              agree: ''
-                              disagree: ''
-                              pass: ''
-                          default: unvote
+                          nullable: true
                       required:
                         - opinion
                         - user
@@ -2127,7 +2027,6 @@ paths:
                                 properties:
                                   id:
                                     type: string
-                                    faker: '1'
                                     description: 意見ID
                                   title:
                                     type: string
@@ -2142,19 +2041,11 @@ paths:
                                   voteType:
                                     type: string
                                     description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                                    enum:
-                                      - agree
-                                      - disagree
-                                      - pass
-                                    x-apidog:
-                                      enumDescriptions:
-                                        agree: ''
-                                        disagree: ''
-                                        pass: ''
-                                    default: unvote
+                                    nullable: true
                                   pictureURL:
                                     type: string
                                     description: 画像が返る場合もある
+                                    nullable: true
                                   referenceURL:
                                     type: string
                                     description: 参考文献URL
@@ -3202,7 +3093,6 @@ paths:
                           properties:
                             id:
                               type: string
-                              faker: '1'
                               description: 意見ID
                             title:
                               type: string
@@ -3217,19 +3107,11 @@ paths:
                             voteType:
                               type: string
                               description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                              enum:
-                                - agree
-                                - disagree
-                                - pass
-                              x-apidog:
-                                enumDescriptions:
-                                  agree: ''
-                                  disagree: ''
-                                  pass: ''
-                              default: unvote
+                              nullable: true
                             pictureURL:
                               type: string
                               description: 画像が返る場合もある
+                              nullable: true
                             referenceURL:
                               type: string
                               description: 参考文献URL
@@ -4419,7 +4301,6 @@ components:
       properties:
         id:
           type: string
-          faker: '1'
           description: 意見ID
         title:
           type: string
@@ -4434,19 +4315,11 @@ components:
         voteType:
           type: string
           description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-          enum:
-            - agree
-            - disagree
-            - pass
-          x-apidog:
-            enumDescriptions:
-              agree: ''
-              disagree: ''
-              pass: ''
-          default: unvote
+          nullable: true
         pictureURL:
           type: string
           description: 画像が返る場合もある
+          nullable: true
         referenceURL:
           type: string
           description: 参考文献URL
@@ -4456,19 +4329,6 @@ components:
         - content
         - id
         - postedAt
-    voteType:
-      type: string
-      description: 意見の3種のステータス
-      enum:
-        - agree
-        - disagree
-        - pass
-      x-apidog:
-        enumDescriptions:
-          agree: ''
-          disagree: ''
-          pass: ''
-      default: unvote
     location:
       type: object
       properties:

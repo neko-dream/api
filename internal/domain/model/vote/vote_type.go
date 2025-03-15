@@ -22,7 +22,7 @@ func (v VoteType) String() string {
 	case Pass:
 		return "pass"
 	default:
-		return "unvote"
+		return ""
 	}
 }
 

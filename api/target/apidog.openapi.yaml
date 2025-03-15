@@ -66,6 +66,10 @@
                     "user": {
                       "$ref": "#/components/schemas/user",
                       "description": "作成ユーザー"
+                    },
+                    "myVoteType": {
+                      "type": "string",
+                      "nullable": true
                     }
                   },
                   "required": [
@@ -144,8 +148,8 @@
                             "description": "作成ユーザー"
                           },
                           "myVoteType": {
-                            "$ref": "#/components/schemas/voteType",
-                            "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
+                            "type": "string",
+                            "nullable": true
                           }
                         },
                         "required": [
@@ -1017,15 +1021,14 @@
                             "type": "integer"
                           },
                           "myVoteType": {
-                            "$ref": "#/components/schemas/voteType",
-                            "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
+                            "type": "string",
+                            "nullable": true
                           }
                         },
                         "required": [
                           "opinion",
                           "user",
-                          "replyCount",
-                          "myVoteType"
+                          "replyCount"
                         ]
                       }
                     },
@@ -1833,8 +1836,8 @@
                             "description": "作成ユーザー"
                           },
                           "myVoteType": {
-                            "$ref": "#/components/schemas/voteType",
-                            "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
+                            "type": "string",
+                            "nullable": true
                           }
                         },
                         "required": [
@@ -4614,7 +4617,6 @@
         "properties": {
           "id": {
             "type": "string",
-            "faker": "1",
             "description": "意見ID"
           },
           "title": {
@@ -4631,12 +4633,14 @@
             "description": "親の意見ID。ルートならば無し"
           },
           "voteType": {
-            "$ref": "#/components/schemas/voteType",
-            "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
+            "type": "string",
+            "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない",
+            "nullable": true
           },
           "pictureURL": {
             "type": "string",
-            "description": "画像が返る場合もある"
+            "description": "画像が返る場合もある",
+            "nullable": true
           },
           "referenceURL": {
             "type": "string",
@@ -4651,23 +4655,6 @@
           "id",
           "postedAt"
         ]
-      },
-      "voteType": {
-        "type": "string",
-        "description": "意見の3種のステータス",
-        "enum": [
-          "agree",
-          "disagree",
-          "pass"
-        ],
-        "x-apidog": {
-          "enumDescriptions": {
-            "agree": "",
-            "disagree": "",
-            "pass": ""
-          }
-        },
-        "default": "unvote"
       },
       "location": {
         "type": "object",
