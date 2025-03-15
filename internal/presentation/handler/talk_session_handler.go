@@ -564,7 +564,7 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 					Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Title),
 					Content:      opinion.Opinion.Content,
 					ParentID:     utils.ToOpt[oas.OptString](opinion.Opinion.ParentOpinionID),
-					PictureURL:   utils.ToOpt[oas.OptString](opinion.Opinion.PictureURL),
+					PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.PictureURL),
 					ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
 					PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
 				},

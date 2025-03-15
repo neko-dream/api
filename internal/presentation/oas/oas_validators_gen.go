@@ -834,41 +834,10 @@ func (s *GetOpinionDetail2OKOpinion) Validate() error {
 			Error: err,
 		})
 	}
-	if err := func() error {
-		if value, ok := s.VoteType.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "voteType",
-			Error: err,
-		})
-	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
-}
-
-func (s GetOpinionDetail2OKOpinionVoteType) Validate() error {
-	switch s {
-	case "agree":
-		return nil
-	case "disagree":
-		return nil
-	case "pass":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
 }
 
 func (s *GetOpinionDetail2OKUser) Validate() error {
@@ -961,41 +930,10 @@ func (s *GetOpinionDetailOKOpinion) Validate() error {
 			Error: err,
 		})
 	}
-	if err := func() error {
-		if value, ok := s.VoteType.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "voteType",
-			Error: err,
-		})
-	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
-}
-
-func (s GetOpinionDetailOKOpinionVoteType) Validate() error {
-	switch s {
-	case "agree":
-		return nil
-	case "disagree":
-		return nil
-	case "pass":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
 }
 
 func (s *GetOpinionDetailOKUser) Validate() error {
@@ -1097,55 +1035,10 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItem) Validate() error {
 			Error: err,
 		})
 	}
-	if err := func() error {
-		if value, ok := s.MyVoteType.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "myVoteType",
-			Error: err,
-		})
-	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
-}
-
-func (s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) Validate() error {
-	switch s.Type {
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0GetOpinionsForTalkSessionOKOpinionsItemMyVoteType:
-		if err := s.GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0.Validate(); err != nil {
-			return err
-		}
-		return nil
-	case NullGetOpinionsForTalkSessionOKOpinionsItemMyVoteType:
-		return nil // no validation needed
-	default:
-		return errors.Errorf("invalid type %q", s.Type)
-	}
-}
-
-func (s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0) Validate() error {
-	switch s {
-	case "agree":
-		return nil
-	case "disagree":
-		return nil
-	case "pass":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
 }
 
 func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) Validate() error {
@@ -1173,41 +1066,10 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) Validate() error {
 			Error: err,
 		})
 	}
-	if err := func() error {
-		if value, ok := s.VoteType.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "voteType",
-			Error: err,
-		})
-	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
-}
-
-func (s GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) Validate() error {
-	switch s {
-	case "agree":
-		return nil
-	case "disagree":
-		return nil
-	case "pass":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
 }
 
 func (s *GetOpinionsForTalkSessionOKOpinionsItemUser) Validate() error {
@@ -1817,55 +1679,10 @@ func (s *OpinionComments2OKOpinionsItem) Validate() error {
 			Error: err,
 		})
 	}
-	if err := func() error {
-		if value, ok := s.MyVoteType.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "myVoteType",
-			Error: err,
-		})
-	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
-}
-
-func (s OpinionComments2OKOpinionsItemMyVoteType) Validate() error {
-	switch s.Type {
-	case OpinionComments2OKOpinionsItemMyVoteType0OpinionComments2OKOpinionsItemMyVoteType:
-		if err := s.OpinionComments2OKOpinionsItemMyVoteType0.Validate(); err != nil {
-			return err
-		}
-		return nil
-	case NullOpinionComments2OKOpinionsItemMyVoteType:
-		return nil // no validation needed
-	default:
-		return errors.Errorf("invalid type %q", s.Type)
-	}
-}
-
-func (s OpinionComments2OKOpinionsItemMyVoteType0) Validate() error {
-	switch s {
-	case "agree":
-		return nil
-	case "disagree":
-		return nil
-	case "pass":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
 }
 
 func (s *OpinionComments2OKOpinionsItemOpinion) Validate() error {
@@ -1893,41 +1710,10 @@ func (s *OpinionComments2OKOpinionsItemOpinion) Validate() error {
 			Error: err,
 		})
 	}
-	if err := func() error {
-		if value, ok := s.VoteType.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "voteType",
-			Error: err,
-		})
-	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
-}
-
-func (s OpinionComments2OKOpinionsItemOpinionVoteType) Validate() error {
-	switch s {
-	case "agree":
-		return nil
-	case "disagree":
-		return nil
-	case "pass":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
 }
 
 func (s *OpinionComments2OKOpinionsItemUser) Validate() error {
@@ -2029,55 +1815,10 @@ func (s *OpinionCommentsOKOpinionsItem) Validate() error {
 			Error: err,
 		})
 	}
-	if err := func() error {
-		if value, ok := s.MyVoteType.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "myVoteType",
-			Error: err,
-		})
-	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
-}
-
-func (s OpinionCommentsOKOpinionsItemMyVoteType) Validate() error {
-	switch s.Type {
-	case OpinionCommentsOKOpinionsItemMyVoteType0OpinionCommentsOKOpinionsItemMyVoteType:
-		if err := s.OpinionCommentsOKOpinionsItemMyVoteType0.Validate(); err != nil {
-			return err
-		}
-		return nil
-	case NullOpinionCommentsOKOpinionsItemMyVoteType:
-		return nil // no validation needed
-	default:
-		return errors.Errorf("invalid type %q", s.Type)
-	}
-}
-
-func (s OpinionCommentsOKOpinionsItemMyVoteType0) Validate() error {
-	switch s {
-	case "agree":
-		return nil
-	case "disagree":
-		return nil
-	case "pass":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
 }
 
 func (s *OpinionCommentsOKOpinionsItemOpinion) Validate() error {
@@ -2105,41 +1846,10 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) Validate() error {
 			Error: err,
 		})
 	}
-	if err := func() error {
-		if value, ok := s.VoteType.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "voteType",
-			Error: err,
-		})
-	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
-}
-
-func (s OpinionCommentsOKOpinionsItemOpinionVoteType) Validate() error {
-	switch s {
-	case "agree":
-		return nil
-	case "disagree":
-		return nil
-	case "pass":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
 }
 
 func (s *OpinionCommentsOKOpinionsItemUser) Validate() error {
@@ -2272,41 +1982,10 @@ func (s *OpinionsHistoryOKOpinionsItemOpinion) Validate() error {
 			Error: err,
 		})
 	}
-	if err := func() error {
-		if value, ok := s.VoteType.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "voteType",
-			Error: err,
-		})
-	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
-}
-
-func (s OpinionsHistoryOKOpinionsItemOpinionVoteType) Validate() error {
-	switch s {
-	case "agree":
-		return nil
-	case "disagree":
-		return nil
-	case "pass":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
 }
 
 func (s *OpinionsHistoryOKOpinionsItemUser) Validate() error {
@@ -2891,41 +2570,10 @@ func (s *SwipeOpinionsOKItemOpinion) Validate() error {
 			Error: err,
 		})
 	}
-	if err := func() error {
-		if value, ok := s.VoteType.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "voteType",
-			Error: err,
-		})
-	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
-}
-
-func (s SwipeOpinionsOKItemOpinionVoteType) Validate() error {
-	switch s {
-	case "agree":
-		return nil
-	case "disagree":
-		return nil
-	case "pass":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
 }
 
 func (s *SwipeOpinionsOKItemUser) Validate() error {
@@ -3144,41 +2792,10 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) Validate() e
 			Error: err,
 		})
 	}
-	if err := func() error {
-		if value, ok := s.VoteType.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "voteType",
-			Error: err,
-		})
-	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
-}
-
-func (s TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType) Validate() error {
-	switch s {
-	case "agree":
-		return nil
-	case "disagree":
-		return nil
-	case "pass":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
 }
 
 func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemUser) Validate() error {
@@ -3330,41 +2947,10 @@ func (s *Vote2OKItem) Validate() error {
 			Error: err,
 		})
 	}
-	if err := func() error {
-		if value, ok := s.VoteType.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "voteType",
-			Error: err,
-		})
-	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
-}
-
-func (s Vote2OKItemVoteType) Validate() error {
-	switch s {
-	case "agree":
-		return nil
-	case "disagree":
-		return nil
-	case "pass":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
 }
 
 func (s *Vote2Req) Validate() error {
@@ -3460,41 +3046,10 @@ func (s *VoteOKItem) Validate() error {
 			Error: err,
 		})
 	}
-	if err := func() error {
-		if value, ok := s.VoteType.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "voteType",
-			Error: err,
-		})
-	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
-}
-
-func (s VoteOKItemVoteType) Validate() error {
-	switch s {
-	case "agree":
-		return nil
-	case "disagree":
-		return nil
-	case "pass":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
 }
 
 func (s *VoteReq) Validate() error {

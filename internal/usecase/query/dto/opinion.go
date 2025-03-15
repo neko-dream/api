@@ -3,6 +3,7 @@ package dto
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
@@ -15,7 +16,7 @@ type Opinion struct {
 	OpinionID       shared.UUID[opinion.Opinion]
 	TalkSessionID   shared.UUID[talksession.TalkSession]
 	UserID          shared.UUID[user.User]
-	ParentOpinionID *shared.UUID[opinion.Opinion]
+	ParentOpinionID uuid.NullUUID
 	Title           *string
 	Content         string
 	CreatedAt       time.Time

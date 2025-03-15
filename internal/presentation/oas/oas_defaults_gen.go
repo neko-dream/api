@@ -11,54 +11,6 @@ func (s *EditUserProfileReq) setDefaults() {
 }
 
 // setDefaults set default value of fields.
-func (s *GetOpinionDetail2OKOpinion) setDefaults() {
-	{
-		val := GetOpinionDetail2OKOpinionVoteType("unvote")
-		s.VoteType.SetTo(val)
-	}
-}
-
-// setDefaults set default value of fields.
-func (s *GetOpinionDetailOKOpinion) setDefaults() {
-	{
-		val := GetOpinionDetailOKOpinionVoteType("unvote")
-		s.VoteType.SetTo(val)
-	}
-}
-
-// setDefaults set default value of fields.
-func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) setDefaults() {
-	{
-		val := GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType("unvote")
-		s.VoteType.SetTo(val)
-	}
-}
-
-// setDefaults set default value of fields.
-func (s *OpinionComments2OKOpinionsItemOpinion) setDefaults() {
-	{
-		val := OpinionComments2OKOpinionsItemOpinionVoteType("unvote")
-		s.VoteType.SetTo(val)
-	}
-}
-
-// setDefaults set default value of fields.
-func (s *OpinionCommentsOKOpinionsItemOpinion) setDefaults() {
-	{
-		val := OpinionCommentsOKOpinionsItemOpinionVoteType("unvote")
-		s.VoteType.SetTo(val)
-	}
-}
-
-// setDefaults set default value of fields.
-func (s *OpinionsHistoryOKOpinionsItemOpinion) setDefaults() {
-	{
-		val := OpinionsHistoryOKOpinionsItemOpinionVoteType("unvote")
-		s.VoteType.SetTo(val)
-	}
-}
-
-// setDefaults set default value of fields.
 func (s *RegisterUserReq) setDefaults() {
 	{
 		val := int(0)
@@ -67,37 +19,5 @@ func (s *RegisterUserReq) setDefaults() {
 	{
 		val := RegisterUserReqGender("preferNotToSay")
 		s.Gender.SetTo(val)
-	}
-}
-
-// setDefaults set default value of fields.
-func (s *SwipeOpinionsOKItemOpinion) setDefaults() {
-	{
-		val := SwipeOpinionsOKItemOpinionVoteType("unvote")
-		s.VoteType.SetTo(val)
-	}
-}
-
-// setDefaults set default value of fields.
-func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) setDefaults() {
-	{
-		val := TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinionVoteType("unvote")
-		s.VoteType.SetTo(val)
-	}
-}
-
-// setDefaults set default value of fields.
-func (s *Vote2OKItem) setDefaults() {
-	{
-		val := Vote2OKItemVoteType("unvote")
-		s.VoteType.SetTo(val)
-	}
-}
-
-// setDefaults set default value of fields.
-func (s *VoteOKItem) setDefaults() {
-	{
-		val := VoteOKItemVoteType("unvote")
-		s.VoteType.SetTo(val)
 	}
 }

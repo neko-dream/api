@@ -53,12 +53,17 @@ func (g *GetOpinionsByTalkSessionIDQueryHandler) Execute(ctx context.Context, in
 	}
 
 	var opinions []dto.SwipeOpinion
-	if err := copier.CopyWithOption(&opinions, &opinionRows, copier.Option{
-		DeepCopy:    true,
-		IgnoreEmpty: true,
-	}); err != nil {
-		utils.HandleError(ctx, err, "マッピングに失敗")
-		return nil, messages.OpinionContentFailedToFetch
+	for _, opinionRow := range opinionRows {
+		var opinion dto.SwipeOpinion
+		if err := copier.CopyWithOption(&opinion, &opinionRow, copier.Option{
+			DeepCopy: true,
+		}); err != nil {
+			utils.HandleError(ctx, err, "マッピングに失敗")
+			return nil, messages.OpinionContentFailedToFetch
+		}
+
+		opinion.Opinion.ParentOpinionID = opinionRow.Opinion.ParentOpinionID
+		opinions = append(opinions, opinion)
 	}
 
 	count, err := g.GetQueries(ctx).CountOpinions(ctx, model.CountOpinionsParams{
