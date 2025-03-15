@@ -1,4 +1,3 @@
 -- userにemailを追加
 ALTER TABLE users ADD COLUMN email VARCHAR(255);
-ALTER TABLE users ADD COLUMN email_hash VARCHAR(255);
 ALTER TABLE users ADD COLUMN email_verified BOOLEAN NOT NULL DEFAULT FALSE;
