@@ -87,13 +87,17 @@ func (o *opinionRepository) FindByID(ctx context.Context, opinionID shared.UUID[
 	if op.Opinion.ParentOpinionID.Valid {
 		parentOpinionID = lo.ToPtr(shared.UUID[opinion.Opinion](op.Opinion.ParentOpinionID.UUID))
 	}
+	var title *string
+	if op.Opinion.Title.Valid {
+		title = lo.ToPtr(op.Opinion.Title.String)
+	}
 
 	opEntity, err := opinion.NewOpinion(
 		opinionID,
 		shared.UUID[talksession.TalkSession](op.Opinion.TalkSessionID),
 		shared.UUID[user.User](op.Opinion.UserID),
 		parentOpinionID,
-		lo.ToPtr(op.Opinion.Title.String),
+		title,
 		op.Opinion.Content,
 		op.Opinion.CreatedAt,
 		lo.ToPtr(op.Opinion.ReferenceUrl.String),
