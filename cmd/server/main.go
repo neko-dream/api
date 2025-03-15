@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	swMiddleware "github.com/go-openapi/runtime/middleware"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/di"
 	"github.com/neko-dream/server/internal/infrastructure/http/middleware"
@@ -13,6 +12,8 @@ import (
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/rs/cors"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+
+	"github.com/swaggest/swgui/v5emb"
 )
 
 func main() {
@@ -38,8 +39,8 @@ func main() {
 	}
 
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"https://*", "http://*", "localhost:*"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "OPTIONS"},
+		AllowedOrigins:   []string{"https://*.kotohiro.com", "http://localhost:*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
 		AllowedHeaders:   []string{"*"},
 		AllowCredentials: true,
 	})
@@ -49,16 +50,20 @@ func main() {
 		middleware.Instrument("kotohiro-api", routeFinder, di.Invoke[*sdktrace.TracerProvider](container)),
 		middleware.Labeler(routeFinder),
 	))
-	mux := http.NewServeMux()
-	mux.Handle("/static/",
-		http.StripPrefix("/static/",
-			handler.NewStaticHandler(),
-		),
-	)
 
-	mux.Handle("/docs/",
-		swMiddleware.SwaggerUI(swMiddleware.SwaggerUIOpts{SpecURL: "/static/openapi.yaml"}, nil))
+	mux := http.NewServeMux()
 	mux.Handle("/", corsHandler)
+	mux.Handle("/static/", http.StripPrefix("/static/", handler.NewStaticHandler()))
+
+	if conf.Env != config.PROD {
+		var domain string
+		if conf.Env == config.DEV {
+			domain = "https://api-dev.kotohiro.com/static/openapi.json"
+		} else {
+			domain = "http://localhost:" + conf.PORT + "/static/openapi.yaml"
+		}
+		mux.Handle("/docs/", v5emb.New("kotohiro", domain, "/docs/"))
+	}
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%s", conf.PORT), mux); err != nil {
 		panic(err)
