@@ -39,7 +39,7 @@ func main() {
 	}
 
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"https://*.kotohiro.com", "http://localhost:*"},
+		AllowedOrigins:   []string{"https://*", "http://localhost:3000"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"*"},
 		AllowCredentials: true,
@@ -58,7 +58,7 @@ func main() {
 	if conf.Env != config.PROD {
 		var domain string
 		if conf.Env == config.DEV {
-			domain = "https://api-dev.kotohiro.com/static/openapi.json"
+			domain = "https://api-dev.kotohiro.com/static/openapi.yaml"
 		} else {
 			domain = "http://localhost:" + conf.PORT + "/static/openapi.yaml"
 		}
