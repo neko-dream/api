@@ -2743,6 +2743,14 @@ paths:
                   description: 市区町村
                   example: ''
                   nullable: true
+                email:
+                  type: string
+                  format: email
+                  examples:
+                    - example@example.com
+                  description: メアド
+                  example: ''
+                  nullable: true
               required:
                 - displayName
                 - displayID
@@ -2867,6 +2875,13 @@ paths:
                 prefecture:
                   type: string
                   description: 都道府県
+                  example: ''
+                  nullable: true
+                email:
+                  type: string
+                  examples:
+                    - example@example.com
+                  description: メールアドレス
                   example: ''
                   nullable: true
       responses:
@@ -2994,9 +3009,12 @@ paths:
                         type: string
                         description: 都道府県
                         nullable: true
+                  email:
+                    type: string
+                    nullable: true
                 required:
-                  - user
                   - demographics
+                  - user
           headers: {}
         '500':
           description: ''
@@ -3578,7 +3596,7 @@ paths:
                   isVerify:
                     type: boolean
                     description: ユーザ登録済みか
-                  isEmailVerify:
+                  isEmailVerified:
                     type: boolean
                 required:
                   - aud
@@ -3588,7 +3606,7 @@ paths:
                   - sub
                   - jti
                   - isVerify
-                  - isEmailVerify
+                  - isEmailVerified
           headers: {}
         '400':
           description: ''
@@ -4393,7 +4411,7 @@ components:
         isVerify:
           type: boolean
           description: ユーザ登録済みか
-        isEmailVerify:
+        isEmailVerified:
           type: boolean
       required:
         - aud
@@ -4403,7 +4421,7 @@ components:
         - sub
         - jti
         - isVerify
-        - isEmailVerify
+        - isEmailVerified
     offsetPagination:
       type: object
       properties:

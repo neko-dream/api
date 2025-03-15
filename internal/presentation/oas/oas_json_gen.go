@@ -8346,11 +8346,18 @@ func (s *GetUserInfoOK) encodeFields(e *jx.Encoder) {
 		e.FieldStart("demographics")
 		s.Demographics.Encode(e)
 	}
+	{
+		if s.Email.Set {
+			e.FieldStart("email")
+			s.Email.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfGetUserInfoOK = [2]string{
+var jsonFieldsNameOfGetUserInfoOK = [3]string{
 	0: "user",
 	1: "demographics",
+	2: "email",
 }
 
 // Decode decodes GetUserInfoOK from json.
@@ -8381,6 +8388,16 @@ func (s *GetUserInfoOK) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"demographics\"")
+			}
+		case "email":
+			if err := func() error {
+				s.Email.Reset()
+				if err := s.Email.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"email\"")
 			}
 		default:
 			return d.Skip()
@@ -9329,8 +9346,8 @@ func (s *OAuthTokenInfoOK) encodeFields(e *jx.Encoder) {
 		e.Bool(s.IsVerify)
 	}
 	{
-		e.FieldStart("isEmailVerify")
-		e.Bool(s.IsEmailVerify)
+		e.FieldStart("isEmailVerified")
+		e.Bool(s.IsEmailVerified)
 	}
 }
 
@@ -9345,7 +9362,7 @@ var jsonFieldsNameOfOAuthTokenInfoOK = [11]string{
 	7:  "displayName",
 	8:  "iconURL",
 	9:  "isVerify",
-	10: "isEmailVerify",
+	10: "isEmailVerified",
 }
 
 // Decode decodes OAuthTokenInfoOK from json.
@@ -9471,17 +9488,17 @@ func (s *OAuthTokenInfoOK) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"isVerify\"")
 			}
-		case "isEmailVerify":
+		case "isEmailVerified":
 			requiredBitSet[1] |= 1 << 2
 			if err := func() error {
 				v, err := d.Bool()
-				s.IsEmailVerify = bool(v)
+				s.IsEmailVerified = bool(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"isEmailVerify\"")
+				return errors.Wrap(err, "decode field \"isEmailVerified\"")
 			}
 		default:
 			return d.Skip()

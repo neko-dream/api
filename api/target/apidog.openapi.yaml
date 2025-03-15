@@ -2667,6 +2667,16 @@
                     "description": "市区町村",
                     "example": "",
                     "nullable": true
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "examples": [
+                      "example@example.com"
+                    ],
+                    "description": "メアド",
+                    "example": "",
+                    "nullable": true
                   }
                 },
                 "required": [
@@ -2845,6 +2855,15 @@
                     "description": "都道府県",
                     "example": "",
                     "nullable": true
+                  },
+                  "email": {
+                    "type": "string",
+                    "examples": [
+                      "example@example.com"
+                    ],
+                    "description": "メールアドレス",
+                    "example": "",
+                    "nullable": true
                   }
                 }
               }
@@ -2980,11 +2999,15 @@
                     },
                     "demographics": {
                       "$ref": "#/components/schemas/userDemographics"
+                    },
+                    "email": {
+                      "type": "string",
+                      "nullable": true
                     }
                   },
                   "required": [
-                    "user",
-                    "demographics"
+                    "demographics",
+                    "user"
                   ]
                 }
               }
@@ -3518,7 +3541,7 @@
                       "type": "boolean",
                       "description": "ユーザ登録済みか"
                     },
-                    "isEmailVerify": {
+                    "isEmailVerified": {
                       "type": "boolean"
                     }
                   },
@@ -3530,7 +3553,7 @@
                     "sub",
                     "jti",
                     "isVerify",
-                    "isEmailVerify"
+                    "isEmailVerified"
                   ]
                 }
               }
@@ -4559,7 +4582,7 @@
             "type": "boolean",
             "description": "ユーザ登録済みか"
           },
-          "isEmailVerify": {
+          "isEmailVerified": {
             "type": "boolean"
           }
         },
@@ -4571,7 +4594,7 @@
           "sub",
           "jti",
           "isVerify",
-          "isEmailVerify"
+          "isEmailVerified"
         ]
       },
       "offsetPagination": {

@@ -46,7 +46,7 @@ WHERE
 UPDATE "user_auths" SET is_verified = true WHERE user_id = $1;
 
 -- name: UpdateUser :exec
-UPDATE "users" SET display_id = $2, display_name = $3, icon_url = $4 WHERE user_id = $1;
+UPDATE "users" SET display_id = $2, display_name = $3, icon_url = $4, email = $5, email_verified = $6 WHERE user_id = $1;
 
 -- name: UpdateOrCreateUserDemographic :exec
 INSERT INTO user_demographics (
