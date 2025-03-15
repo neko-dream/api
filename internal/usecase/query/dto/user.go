@@ -17,9 +17,11 @@ type User struct {
 }
 
 type UserAuth struct {
-	UserAuthID uuid.UUID
-	Provider   string
-	IsVerified bool
+	UserAuthID    uuid.UUID
+	Provider      string
+	IsVerified    bool
+	Email         *string
+	EmailVerified bool
 }
 
 type UserDemographic struct {

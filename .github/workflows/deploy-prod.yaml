@@ -1,8 +1,8 @@
-name: Deploy to Koyeb
+name: Deploy to Koyeb Prod
 on:
   push:
     branches:
-      - develop
+      - main
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -14,4 +14,4 @@ jobs:
 
       - name: Trigger Deployment
         run: |
-          koyeb service redeploy kotohiro-api-dev/kotohiro-api-dev
+          koyeb service redeploy slim-fanya/kotohiro-api-prod

@@ -386,6 +386,106 @@ paths:
       security:
         - SessionId: []
       x-ogen-operation-group: Vote
+  /opinions:
+    post:
+      summary: セッションに対して意見投稿 or 意見に対するリプライ
+      deprecated: false
+      description: |-
+        parentOpinionIDがなければルートの意見として投稿される
+        parentOpinionIDがない場合はtalkSessionIDが必須
+      operationId: postOpinionPost2
+      tags:
+        - opinion
+      parameters: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                talkSessionID:
+                  type: string
+                  example: ''
+                  nullable: true
+                parentOpinionID:
+                  type: string
+                  description: これがある場合はリプライとみなす。これがない場合はTalkSessionIDが必須。
+                  example: ''
+                  nullable: true
+                title:
+                  type: string
+                  example: ''
+                  nullable: true
+                opinionContent:
+                  type: string
+                  maxLength: 140
+                  example: ''
+                referenceURL:
+                  type: string
+                  format: url
+                  example: ''
+                  nullable: true
+                picture:
+                  type: string
+                  format: binary
+                  description: 参考画像。4MiBまで
+                  example: ''
+              required:
+                - opinionContent
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security:
+        - SessionId: []
+      x-ogen-operation-group: Opinion
   /talksessions/{talkSessionID}/opinions/{opinionID}/votes:
     post:
       summary: 意思表明API
@@ -2743,6 +2843,14 @@ paths:
                   description: 市区町村
                   example: ''
                   nullable: true
+                email:
+                  type: string
+                  format: email
+                  examples:
+                    - example@example.com
+                  description: メアド
+                  example: ''
+                  nullable: true
               required:
                 - displayName
                 - displayID
@@ -2867,6 +2975,13 @@ paths:
                 prefecture:
                   type: string
                   description: 都道府県
+                  example: ''
+                  nullable: true
+                email:
+                  type: string
+                  examples:
+                    - example@example.com
+                  description: メールアドレス
                   example: ''
                   nullable: true
       responses:
@@ -2994,9 +3109,12 @@ paths:
                         type: string
                         description: 都道府県
                         nullable: true
+                  email:
+                    type: string
+                    nullable: true
                 required:
-                  - user
                   - demographics
+                  - user
           headers: {}
         '500':
           description: ''
@@ -3578,7 +3696,7 @@ paths:
                   isVerify:
                     type: boolean
                     description: ユーザ登録済みか
-                  isEmailVerify:
+                  isEmailVerified:
                     type: boolean
                 required:
                   - aud
@@ -3588,7 +3706,7 @@ paths:
                   - sub
                   - jti
                   - isVerify
-                  - isEmailVerify
+                  - isEmailVerified
           headers: {}
         '400':
           description: ''
@@ -4393,7 +4511,7 @@ components:
         isVerify:
           type: boolean
           description: ユーザ登録済みか
-        isEmailVerify:
+        isEmailVerified:
           type: boolean
       required:
         - aud
@@ -4403,7 +4521,7 @@ components:
         - sub
         - jti
         - isVerify
-        - isEmailVerify
+        - isEmailVerified
     offsetPagination:
       type: object
       properties:

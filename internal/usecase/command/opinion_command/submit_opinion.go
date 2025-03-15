@@ -26,10 +26,12 @@ type (
 	}
 
 	SubmitOpinionInput struct {
-		TalkSessionID   shared.UUID[talksession.TalkSession]
+		// TalkSessionID
+		TalkSessionID *shared.UUID[talksession.TalkSession]
+		// ParentOpinionID 親意見IDがない場合はTalkSessionIDが必須
+		ParentOpinionID *shared.UUID[opinion.Opinion]
 		OwnerID         shared.UUID[user.User]
 		UserID          shared.UUID[user.User]
-		ParentOpinionID *shared.UUID[opinion.Opinion]
 		Title           *string
 		Content         string
 		ReferenceURL    *string
@@ -71,8 +73,25 @@ func (h *submitOpinionHandler) Execute(ctx context.Context, input SubmitOpinionI
 	ctx, span := otel.Tracer("opinion_command").Start(ctx, "submitOpinionHandler.Execute")
 	defer span.End()
 
+	// TalkSessionIDが指定されているのならば、そのTalkSessionを取得する
+	// ParentOpinionIDが指定されている場合は、その意見のTalkSessionを取得する
+	// どちらも指定されていない場合はエラーを返す
+	var talkSessionID shared.UUID[talksession.TalkSession]
+	if input.TalkSessionID != nil {
+		talkSessionID = *input.TalkSessionID
+	} else if input.ParentOpinionID != nil {
+		parentOpinion, err := h.OpinionRepository.FindByID(ctx, *input.ParentOpinionID)
+		if err != nil {
+			utils.HandleError(ctx, err, "OpinionRepository.FindByID")
+			return messages.OpinionCreateFailed
+		}
+		talkSessionID = parentOpinion.TalkSessionID()
+	} else {
+		return messages.OpinionCreateFailed
+	}
+
 	// 参加制限を満たしているか確認。満たしていない場合はエラーを返す
-	if _, err := h.TalkSessionAccessControl.CanUserJoin(ctx, input.TalkSessionID, lo.ToPtr(input.UserID)); err != nil {
+	if _, err := h.TalkSessionAccessControl.CanUserJoin(ctx, talkSessionID, lo.ToPtr(input.UserID)); err != nil {
 		utils.HandleError(ctx, err, "TalkSessionAccessControl.CanUserJoin")
 		return err
 	}
@@ -80,7 +99,7 @@ func (h *submitOpinionHandler) Execute(ctx context.Context, input SubmitOpinionI
 	if err := h.ExecTx(ctx, func(ctx context.Context) error {
 		opinion, err := opinion.NewOpinion(
 			shared.NewUUID[opinion.Opinion](),
-			input.TalkSessionID,
+			talkSessionID,
 			input.OwnerID,
 			input.ParentOpinionID,
 			input.Title,
@@ -141,7 +160,7 @@ func (h *submitOpinionHandler) Execute(ctx context.Context, input SubmitOpinionI
 		v, err := vote.NewVote(
 			shared.NewUUID[vote.Vote](),
 			opinion.OpinionID(),
-			input.TalkSessionID,
+			talkSessionID,
 			input.OwnerID,
 			vote.Agree,
 			clock.Now(ctx),

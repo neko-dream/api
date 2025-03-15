@@ -76,10 +76,8 @@ func (u *userRepository) newUserFromModel(ctx context.Context, modelUser *model.
 		if err != nil {
 			return nil, errtrace.Wrap(err)
 		}
-		user.SetEmail(email)
-		if modelUser.EmailVerified {
-			user.VerifyEmail()
-		}
+		user.ChangeEmail(email)
+		user.SetEmailVerified(modelUser.EmailVerified)
 	}
 
 	return &user, nil
@@ -117,7 +115,7 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 	ctx, span := otel.Tracer("repository").Start(ctx, "userRepository.Update")
 	defer span.End()
 
-	var displayID, displayName, iconURL sql.NullString
+	var displayID, displayName, iconURL, email sql.NullString
 	if user.DisplayID() != nil {
 		displayID = sql.NullString{String: *user.DisplayID(), Valid: true}
 	}
@@ -127,12 +125,22 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 	if user.IconURL() != nil {
 		iconURL = sql.NullString{String: *user.IconURL(), Valid: true}
 	}
+	if user.Email() != nil {
+		emailEncrypted, err := u.encryptor.EncryptString(ctx, *user.Email())
+		if err != nil {
+			utils.HandleError(ctx, err, "encryptor.EncryptString")
+			return err
+		}
+		email = sql.NullString{String: emailEncrypted, Valid: true}
+	}
 
 	if err := u.GetQueries(ctx).UpdateUser(ctx, model.UpdateUserParams{
-		UserID:      user.UserID().UUID(),
-		DisplayName: displayName,
-		DisplayID:   displayID,
-		IconUrl:     iconURL,
+		UserID:        user.UserID().UUID(),
+		DisplayName:   displayName,
+		DisplayID:     displayID,
+		IconUrl:       iconURL,
+		Email:         email,
+		EmailVerified: user.IsEmailVerified(),
 	}); err != nil {
 		utils.HandleError(ctx, err, "UpdateUser")
 		return errtrace.Wrap(err)

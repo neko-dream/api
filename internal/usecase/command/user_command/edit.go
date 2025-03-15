@@ -24,6 +24,7 @@ type (
 		UserID        shared.UUID[user.User]
 		DisplayName   *string               // ユーザーの表示名
 		Icon          *multipart.FileHeader // ユーザーのアイコン
+		Email         *string               // ユーザーのメールアドレス
 		DeleteIcon    bool                  // アイコンを削除するかどうか
 		YearOfBirth   *int                  // ユーザーの生年
 		Gender        *string               // ユーザーの性別
@@ -100,6 +101,12 @@ func (e *editHandler) Execute(ctx context.Context, input EditInput) (*EditOutput
 		}
 		if input.DeleteIcon {
 			foundUser.DeleteIcon()
+		}
+
+		if input.Email != nil {
+			// メールアドレスを変更
+			foundUser.ChangeEmail(*input.Email)
+			foundUser.SetEmailVerified(false)
 		}
 
 		if input.YearOfBirth != nil ||

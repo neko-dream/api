@@ -278,57 +278,20 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				}
 
 				elem = origElem
-			case 'o': // Prefix: "opinions/"
+			case 'o': // Prefix: "opinions"
 				origElem := elem
-				if l := len("opinions/"); len(elem) >= l && elem[0:l] == "opinions/" {
+				if l := len("opinions"); len(elem) >= l && elem[0:l] == "opinions" {
 					elem = elem[l:]
 				} else {
 					break
 				}
 
 				if len(elem) == 0 {
-					break
-				}
-				switch elem[0] {
-				case 'h': // Prefix: "histories"
-					origElem := elem
-					if l := len("histories"); len(elem) >= l && elem[0:l] == "histories" {
-						elem = elem[l:]
-					} else {
-						break
-					}
-
-					if len(elem) == 0 {
-						// Leaf node.
-						switch r.Method {
-						case "GET":
-							s.handleOpinionsHistoryRequest([0]string{}, elemIsEscaped, w, r)
-						default:
-							s.notAllowed(w, r, "GET")
-						}
-
-						return
-					}
-
-					elem = origElem
-				}
-				// Param: "opinionID"
-				// Match until "/"
-				idx := strings.IndexByte(elem, '/')
-				if idx < 0 {
-					idx = len(elem)
-				}
-				args[0] = elem[:idx]
-				elem = elem[idx:]
-
-				if len(elem) == 0 {
 					switch r.Method {
-					case "GET":
-						s.handleGetOpinionDetail2Request([1]string{
-							args[0],
-						}, elemIsEscaped, w, r)
+					case "POST":
+						s.handlePostOpinionPost2Request([0]string{}, elemIsEscaped, w, r)
 					default:
-						s.notAllowed(w, r, "GET")
+						s.notAllowed(w, r, "POST")
 					}
 
 					return
@@ -346,9 +309,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						break
 					}
 					switch elem[0] {
-					case 'r': // Prefix: "replies"
+					case 'h': // Prefix: "histories"
 						origElem := elem
-						if l := len("replies"); len(elem) >= l && elem[0:l] == "replies" {
+						if l := len("histories"); len(elem) >= l && elem[0:l] == "histories" {
 							elem = elem[l:]
 						} else {
 							break
@@ -358,9 +321,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							// Leaf node.
 							switch r.Method {
 							case "GET":
-								s.handleOpinionComments2Request([1]string{
-									args[0],
-								}, elemIsEscaped, w, r)
+								s.handleOpinionsHistoryRequest([0]string{}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "GET")
 							}
@@ -369,26 +330,87 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						}
 
 						elem = origElem
-					case 'v': // Prefix: "votes"
+					}
+					// Param: "opinionID"
+					// Match until "/"
+					idx := strings.IndexByte(elem, '/')
+					if idx < 0 {
+						idx = len(elem)
+					}
+					args[0] = elem[:idx]
+					elem = elem[idx:]
+
+					if len(elem) == 0 {
+						switch r.Method {
+						case "GET":
+							s.handleGetOpinionDetail2Request([1]string{
+								args[0],
+							}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, "GET")
+						}
+
+						return
+					}
+					switch elem[0] {
+					case '/': // Prefix: "/"
 						origElem := elem
-						if l := len("votes"); len(elem) >= l && elem[0:l] == "votes" {
+						if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 							elem = elem[l:]
 						} else {
 							break
 						}
 
 						if len(elem) == 0 {
-							// Leaf node.
-							switch r.Method {
-							case "POST":
-								s.handleVote2Request([1]string{
-									args[0],
-								}, elemIsEscaped, w, r)
-							default:
-								s.notAllowed(w, r, "POST")
+							break
+						}
+						switch elem[0] {
+						case 'r': // Prefix: "replies"
+							origElem := elem
+							if l := len("replies"); len(elem) >= l && elem[0:l] == "replies" {
+								elem = elem[l:]
+							} else {
+								break
 							}
 
-							return
+							if len(elem) == 0 {
+								// Leaf node.
+								switch r.Method {
+								case "GET":
+									s.handleOpinionComments2Request([1]string{
+										args[0],
+									}, elemIsEscaped, w, r)
+								default:
+									s.notAllowed(w, r, "GET")
+								}
+
+								return
+							}
+
+							elem = origElem
+						case 'v': // Prefix: "votes"
+							origElem := elem
+							if l := len("votes"); len(elem) >= l && elem[0:l] == "votes" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch r.Method {
+								case "POST":
+									s.handleVote2Request([1]string{
+										args[0],
+									}, elemIsEscaped, w, r)
+								default:
+									s.notAllowed(w, r, "POST")
+								}
+
+								return
+							}
+
+							elem = origElem
 						}
 
 						elem = origElem
@@ -1263,62 +1285,23 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 				}
 
 				elem = origElem
-			case 'o': // Prefix: "opinions/"
+			case 'o': // Prefix: "opinions"
 				origElem := elem
-				if l := len("opinions/"); len(elem) >= l && elem[0:l] == "opinions/" {
+				if l := len("opinions"); len(elem) >= l && elem[0:l] == "opinions" {
 					elem = elem[l:]
 				} else {
 					break
 				}
 
 				if len(elem) == 0 {
-					break
-				}
-				switch elem[0] {
-				case 'h': // Prefix: "histories"
-					origElem := elem
-					if l := len("histories"); len(elem) >= l && elem[0:l] == "histories" {
-						elem = elem[l:]
-					} else {
-						break
-					}
-
-					if len(elem) == 0 {
-						// Leaf node.
-						switch method {
-						case "GET":
-							r.name = "OpinionsHistory"
-							r.summary = "今までに投稿した異見"
-							r.operationID = "opinionsHistory"
-							r.pathPattern = "/opinions/histories"
-							r.args = args
-							r.count = 0
-							return r, true
-						default:
-							return
-						}
-					}
-
-					elem = origElem
-				}
-				// Param: "opinionID"
-				// Match until "/"
-				idx := strings.IndexByte(elem, '/')
-				if idx < 0 {
-					idx = len(elem)
-				}
-				args[0] = elem[:idx]
-				elem = elem[idx:]
-
-				if len(elem) == 0 {
 					switch method {
-					case "GET":
-						r.name = "GetOpinionDetail2"
-						r.summary = "意見詳細"
-						r.operationID = "getOpinionDetail2"
-						r.pathPattern = "/opinions/{opinionID}"
+					case "POST":
+						r.name = "PostOpinionPost2"
+						r.summary = "セッションに対して意見投稿 or 意見に対するリプライ"
+						r.operationID = "postOpinionPost2"
+						r.pathPattern = "/opinions"
 						r.args = args
-						r.count = 1
+						r.count = 0
 						return r, true
 					default:
 						return
@@ -1337,9 +1320,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						break
 					}
 					switch elem[0] {
-					case 'r': // Prefix: "replies"
+					case 'h': // Prefix: "histories"
 						origElem := elem
-						if l := len("replies"); len(elem) >= l && elem[0:l] == "replies" {
+						if l := len("histories"); len(elem) >= l && elem[0:l] == "histories" {
 							elem = elem[l:]
 						} else {
 							break
@@ -1349,12 +1332,12 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							// Leaf node.
 							switch method {
 							case "GET":
-								r.name = "OpinionComments2"
-								r.summary = "意見に対するリプライ意見一覧"
-								r.operationID = "opinionComments2"
-								r.pathPattern = "/opinions/{opinionID}/replies"
+								r.name = "OpinionsHistory"
+								r.summary = "今までに投稿した異見"
+								r.operationID = "opinionsHistory"
+								r.pathPattern = "/opinions/histories"
 								r.args = args
-								r.count = 1
+								r.count = 0
 								return r, true
 							default:
 								return
@@ -1362,28 +1345,93 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						}
 
 						elem = origElem
-					case 'v': // Prefix: "votes"
+					}
+					// Param: "opinionID"
+					// Match until "/"
+					idx := strings.IndexByte(elem, '/')
+					if idx < 0 {
+						idx = len(elem)
+					}
+					args[0] = elem[:idx]
+					elem = elem[idx:]
+
+					if len(elem) == 0 {
+						switch method {
+						case "GET":
+							r.name = "GetOpinionDetail2"
+							r.summary = "意見詳細"
+							r.operationID = "getOpinionDetail2"
+							r.pathPattern = "/opinions/{opinionID}"
+							r.args = args
+							r.count = 1
+							return r, true
+						default:
+							return
+						}
+					}
+					switch elem[0] {
+					case '/': // Prefix: "/"
 						origElem := elem
-						if l := len("votes"); len(elem) >= l && elem[0:l] == "votes" {
+						if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 							elem = elem[l:]
 						} else {
 							break
 						}
 
 						if len(elem) == 0 {
-							// Leaf node.
-							switch method {
-							case "POST":
-								r.name = "Vote2"
-								r.summary = "意思表明API"
-								r.operationID = "vote2"
-								r.pathPattern = "/opinions/{opinionID}/votes"
-								r.args = args
-								r.count = 1
-								return r, true
-							default:
-								return
+							break
+						}
+						switch elem[0] {
+						case 'r': // Prefix: "replies"
+							origElem := elem
+							if l := len("replies"); len(elem) >= l && elem[0:l] == "replies" {
+								elem = elem[l:]
+							} else {
+								break
 							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch method {
+								case "GET":
+									r.name = "OpinionComments2"
+									r.summary = "意見に対するリプライ意見一覧"
+									r.operationID = "opinionComments2"
+									r.pathPattern = "/opinions/{opinionID}/replies"
+									r.args = args
+									r.count = 1
+									return r, true
+								default:
+									return
+								}
+							}
+
+							elem = origElem
+						case 'v': // Prefix: "votes"
+							origElem := elem
+							if l := len("votes"); len(elem) >= l && elem[0:l] == "votes" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch method {
+								case "POST":
+									r.name = "Vote2"
+									r.summary = "意思表明API"
+									r.operationID = "vote2"
+									r.pathPattern = "/opinions/{opinionID}/votes"
+									r.args = args
+									r.count = 1
+									return r, true
+								default:
+									return
+								}
+							}
+
+							elem = origElem
 						}
 
 						elem = origElem
