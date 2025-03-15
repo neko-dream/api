@@ -99,15 +99,20 @@ func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHi
 
 	opinions := make([]oas.OpinionsHistoryOKOpinionsItem, 0, len(out.Opinions))
 	for _, opinion := range out.Opinions {
+		vt := oas.OptOpinionsHistoryOKOpinionsItemOpinionVoteType{}
+		if opinion.GetParentVoteType() != nil {
+			vt = oas.OptOpinionsHistoryOKOpinionsItemOpinionVoteType{
+				Set:   true,
+				Value: oas.OpinionsHistoryOKOpinionsItemOpinionVoteType(*opinion.GetParentVoteType()),
+			}
+		}
+
 		opinions = append(opinions, oas.OpinionsHistoryOKOpinionsItem{
 			Opinion: oas.OpinionsHistoryOKOpinionsItemOpinion{
-				ID:      opinion.Opinion.OpinionID.String(),
-				Title:   utils.ToOpt[oas.OptString](opinion.Opinion.Title),
-				Content: opinion.Opinion.Content,
-				VoteType: oas.OptOpinionsHistoryOKOpinionsItemOpinionVoteType{
-					Set:   true,
-					Value: oas.OpinionsHistoryOKOpinionsItemOpinionVoteType(opinion.GetParentVoteType()),
-				},
+				ID:           opinion.Opinion.OpinionID.String(),
+				Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Title),
+				Content:      opinion.Opinion.Content,
+				VoteType:     vt,
 				ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
 				PictureURL:   utils.ToOpt[oas.OptString](opinion.Opinion.PictureURL),
 			},

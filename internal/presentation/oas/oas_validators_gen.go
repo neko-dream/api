@@ -1098,8 +1098,15 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItem) Validate() error {
 		})
 	}
 	if err := func() error {
-		if err := s.MyVoteType.Validate(); err != nil {
-			return err
+		if value, ok := s.MyVoteType.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {
@@ -1115,6 +1122,20 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItem) Validate() error {
 }
 
 func (s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) Validate() error {
+	switch s.Type {
+	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0GetOpinionsForTalkSessionOKOpinionsItemMyVoteType:
+		if err := s.GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0.Validate(); err != nil {
+			return err
+		}
+		return nil
+	case NullGetOpinionsForTalkSessionOKOpinionsItemMyVoteType:
+		return nil // no validation needed
+	default:
+		return errors.Errorf("invalid type %q", s.Type)
+	}
+}
+
+func (s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0) Validate() error {
 	switch s {
 	case "agree":
 		return nil
@@ -1821,6 +1842,20 @@ func (s *OpinionComments2OKOpinionsItem) Validate() error {
 }
 
 func (s OpinionComments2OKOpinionsItemMyVoteType) Validate() error {
+	switch s.Type {
+	case OpinionComments2OKOpinionsItemMyVoteType0OpinionComments2OKOpinionsItemMyVoteType:
+		if err := s.OpinionComments2OKOpinionsItemMyVoteType0.Validate(); err != nil {
+			return err
+		}
+		return nil
+	case NullOpinionComments2OKOpinionsItemMyVoteType:
+		return nil // no validation needed
+	default:
+		return errors.Errorf("invalid type %q", s.Type)
+	}
+}
+
+func (s OpinionComments2OKOpinionsItemMyVoteType0) Validate() error {
 	switch s {
 	case "agree":
 		return nil
@@ -2019,6 +2054,20 @@ func (s *OpinionCommentsOKOpinionsItem) Validate() error {
 }
 
 func (s OpinionCommentsOKOpinionsItemMyVoteType) Validate() error {
+	switch s.Type {
+	case OpinionCommentsOKOpinionsItemMyVoteType0OpinionCommentsOKOpinionsItemMyVoteType:
+		if err := s.OpinionCommentsOKOpinionsItemMyVoteType0.Validate(); err != nil {
+			return err
+		}
+		return nil
+	case NullOpinionCommentsOKOpinionsItemMyVoteType:
+		return nil // no validation needed
+	default:
+		return errors.Errorf("invalid type %q", s.Type)
+	}
+}
+
+func (s OpinionCommentsOKOpinionsItemMyVoteType0) Validate() error {
 	switch s {
 	case "agree":
 		return nil

@@ -88,6 +88,9 @@ paths:
                       - displayID
                       - displayName
                     description: 作成ユーザー
+                  myVoteType:
+                    type: string
+                    nullable: true
                 required:
                   - opinion
                   - user
@@ -198,18 +201,20 @@ paths:
                             - displayName
                           description: 作成ユーザー
                         myVoteType:
-                          type: string
-                          description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                          enum:
-                            - agree
-                            - disagree
-                            - pass
-                          x-apidog:
-                            enumDescriptions:
-                              agree: ''
-                              disagree: ''
-                              pass: ''
-                          default: unvote
+                          anyOf:
+                            - type: string
+                              description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              enum:
+                                - agree
+                                - disagree
+                                - pass
+                              x-apidog:
+                                enumDescriptions:
+                                  agree: ''
+                                  disagree: ''
+                                  pass: ''
+                              default: unvote
+                            - type: 'null'
                       required:
                         - opinion
                         - user
@@ -986,23 +991,24 @@ paths:
                         replyCount:
                           type: integer
                         myVoteType:
-                          type: string
-                          description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                          enum:
-                            - agree
-                            - disagree
-                            - pass
-                          x-apidog:
-                            enumDescriptions:
-                              agree: ''
-                              disagree: ''
-                              pass: ''
-                          default: unvote
+                          anyOf:
+                            - type: string
+                              description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              enum:
+                                - agree
+                                - disagree
+                                - pass
+                              x-apidog:
+                                enumDescriptions:
+                                  agree: ''
+                                  disagree: ''
+                                  pass: ''
+                              default: unvote
+                            - type: 'null'
                       required:
                         - opinion
                         - user
                         - replyCount
-                        - myVoteType
                   pagination:
                     type: object
                     properties:
@@ -1965,18 +1971,20 @@ paths:
                             - displayName
                           description: 作成ユーザー
                         myVoteType:
-                          type: string
-                          description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                          enum:
-                            - agree
-                            - disagree
-                            - pass
-                          x-apidog:
-                            enumDescriptions:
-                              agree: ''
-                              disagree: ''
-                              pass: ''
-                          default: unvote
+                          anyOf:
+                            - type: string
+                              description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              enum:
+                                - agree
+                                - disagree
+                                - pass
+                              x-apidog:
+                                enumDescriptions:
+                                  agree: ''
+                                  disagree: ''
+                                  pass: ''
+                              default: unvote
+                            - type: 'null'
                       required:
                         - opinion
                         - user

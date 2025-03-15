@@ -27,14 +27,6 @@ func (s *GetOpinionDetailOKOpinion) setDefaults() {
 }
 
 // setDefaults set default value of fields.
-func (s *GetOpinionsForTalkSessionOKOpinionsItem) setDefaults() {
-	{
-		val := GetOpinionsForTalkSessionOKOpinionsItemMyVoteType("unvote")
-		s.MyVoteType = val
-	}
-}
-
-// setDefaults set default value of fields.
 func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) setDefaults() {
 	{
 		val := GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType("unvote")
@@ -43,26 +35,10 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) setDefaults() {
 }
 
 // setDefaults set default value of fields.
-func (s *OpinionComments2OKOpinionsItem) setDefaults() {
-	{
-		val := OpinionComments2OKOpinionsItemMyVoteType("unvote")
-		s.MyVoteType.SetTo(val)
-	}
-}
-
-// setDefaults set default value of fields.
 func (s *OpinionComments2OKOpinionsItemOpinion) setDefaults() {
 	{
 		val := OpinionComments2OKOpinionsItemOpinionVoteType("unvote")
 		s.VoteType.SetTo(val)
-	}
-}
-
-// setDefaults set default value of fields.
-func (s *OpinionCommentsOKOpinionsItem) setDefaults() {
-	{
-		val := OpinionCommentsOKOpinionsItemMyVoteType("unvote")
-		s.MyVoteType.SetTo(val)
 	}
 }
 

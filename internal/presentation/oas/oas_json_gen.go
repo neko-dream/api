@@ -3724,11 +3724,18 @@ func (s *GetOpinionDetail2OK) encodeFields(e *jx.Encoder) {
 		e.FieldStart("user")
 		s.User.Encode(e)
 	}
+	{
+		if s.MyVoteType.Set {
+			e.FieldStart("myVoteType")
+			s.MyVoteType.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfGetOpinionDetail2OK = [2]string{
+var jsonFieldsNameOfGetOpinionDetail2OK = [3]string{
 	0: "opinion",
 	1: "user",
+	2: "myVoteType",
 }
 
 // Decode decodes GetOpinionDetail2OK from json.
@@ -3759,6 +3766,16 @@ func (s *GetOpinionDetail2OK) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"user\"")
+			}
+		case "myVoteType":
+			if err := func() error {
+				s.MyVoteType.Reset()
+				if err := s.MyVoteType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"myVoteType\"")
 			}
 		default:
 			return d.Skip()
@@ -4976,8 +4993,10 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItem) encodeFields(e *jx.Encoder) {
 		e.Int(s.ReplyCount)
 	}
 	{
-		e.FieldStart("myVoteType")
-		s.MyVoteType.Encode(e)
+		if s.MyVoteType.Set {
+			e.FieldStart("myVoteType")
+			s.MyVoteType.Encode(e)
+		}
 	}
 }
 
@@ -4994,7 +5013,6 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItem) Decode(d *jx.Decoder) error {
 		return errors.New("invalid: unable to decode GetOpinionsForTalkSessionOKOpinionsItem to nil")
 	}
 	var requiredBitSet [1]uint8
-	s.setDefaults()
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -5031,8 +5049,8 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"replyCount\"")
 			}
 		case "myVoteType":
-			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
+				s.MyVoteType.Reset()
 				if err := s.MyVoteType.Decode(d); err != nil {
 					return err
 				}
@@ -5050,7 +5068,7 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItem) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00001111,
+		0b00000111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -5098,7 +5116,13 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItem) UnmarshalJSON(data []byte) err
 
 // Encode encodes GetOpinionsForTalkSessionOKOpinionsItemMyVoteType as json.
 func (s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) Encode(e *jx.Encoder) {
-	e.Str(string(s))
+	switch s.Type {
+	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0GetOpinionsForTalkSessionOKOpinionsItemMyVoteType:
+		s.GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0.Encode(e)
+	case NullGetOpinionsForTalkSessionOKOpinionsItemMyVoteType:
+		_ = s.Null
+		e.Null()
+	}
 }
 
 // Decode decodes GetOpinionsForTalkSessionOKOpinionsItemMyVoteType from json.
@@ -5106,22 +5130,21 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) Decode(d *jx.Decoder
 	if s == nil {
 		return errors.New("invalid: unable to decode GetOpinionsForTalkSessionOKOpinionsItemMyVoteType to nil")
 	}
-	v, err := d.StrBytes()
-	if err != nil {
-		return err
-	}
-	// Try to use constant string.
-	switch GetOpinionsForTalkSessionOKOpinionsItemMyVoteType(v) {
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree:
-		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree:
-		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass:
-		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass
+	// Sum type type_discriminator.
+	switch t := d.Next(); t {
+	case jx.Null:
+		if err := d.Null(); err != nil {
+			return err
+		}
+		s.Type = NullGetOpinionsForTalkSessionOKOpinionsItemMyVoteType
+	case jx.String:
+		if err := s.GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0.Decode(d); err != nil {
+			return err
+		}
+		s.Type = GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0GetOpinionsForTalkSessionOKOpinionsItemMyVoteType
 	default:
-		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteType(v)
+		return errors.Errorf("unexpected json type %q", t)
 	}
-
 	return nil
 }
 
@@ -5134,6 +5157,48 @@ func (s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) MarshalJSON() ([]byte
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0 as json.
+func (s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0 from json.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0 to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0(v) {
+	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0Agree:
+		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0Agree
+	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0Disagree:
+		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0Disagree
+	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0Pass:
+		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0Pass
+	default:
+		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -10058,7 +10123,6 @@ func (s *OpinionComments2OKOpinionsItem) Decode(d *jx.Decoder) error {
 		return errors.New("invalid: unable to decode OpinionComments2OKOpinionsItem to nil")
 	}
 	var requiredBitSet [1]uint8
-	s.setDefaults()
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -10150,7 +10214,13 @@ func (s *OpinionComments2OKOpinionsItem) UnmarshalJSON(data []byte) error {
 
 // Encode encodes OpinionComments2OKOpinionsItemMyVoteType as json.
 func (s OpinionComments2OKOpinionsItemMyVoteType) Encode(e *jx.Encoder) {
-	e.Str(string(s))
+	switch s.Type {
+	case OpinionComments2OKOpinionsItemMyVoteType0OpinionComments2OKOpinionsItemMyVoteType:
+		s.OpinionComments2OKOpinionsItemMyVoteType0.Encode(e)
+	case NullOpinionComments2OKOpinionsItemMyVoteType:
+		_ = s.Null
+		e.Null()
+	}
 }
 
 // Decode decodes OpinionComments2OKOpinionsItemMyVoteType from json.
@@ -10158,22 +10228,21 @@ func (s *OpinionComments2OKOpinionsItemMyVoteType) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode OpinionComments2OKOpinionsItemMyVoteType to nil")
 	}
-	v, err := d.StrBytes()
-	if err != nil {
-		return err
-	}
-	// Try to use constant string.
-	switch OpinionComments2OKOpinionsItemMyVoteType(v) {
-	case OpinionComments2OKOpinionsItemMyVoteTypeAgree:
-		*s = OpinionComments2OKOpinionsItemMyVoteTypeAgree
-	case OpinionComments2OKOpinionsItemMyVoteTypeDisagree:
-		*s = OpinionComments2OKOpinionsItemMyVoteTypeDisagree
-	case OpinionComments2OKOpinionsItemMyVoteTypePass:
-		*s = OpinionComments2OKOpinionsItemMyVoteTypePass
+	// Sum type type_discriminator.
+	switch t := d.Next(); t {
+	case jx.Null:
+		if err := d.Null(); err != nil {
+			return err
+		}
+		s.Type = NullOpinionComments2OKOpinionsItemMyVoteType
+	case jx.String:
+		if err := s.OpinionComments2OKOpinionsItemMyVoteType0.Decode(d); err != nil {
+			return err
+		}
+		s.Type = OpinionComments2OKOpinionsItemMyVoteType0OpinionComments2OKOpinionsItemMyVoteType
 	default:
-		*s = OpinionComments2OKOpinionsItemMyVoteType(v)
+		return errors.Errorf("unexpected json type %q", t)
 	}
-
 	return nil
 }
 
@@ -10186,6 +10255,48 @@ func (s OpinionComments2OKOpinionsItemMyVoteType) MarshalJSON() ([]byte, error) 
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OpinionComments2OKOpinionsItemMyVoteType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes OpinionComments2OKOpinionsItemMyVoteType0 as json.
+func (s OpinionComments2OKOpinionsItemMyVoteType0) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes OpinionComments2OKOpinionsItemMyVoteType0 from json.
+func (s *OpinionComments2OKOpinionsItemMyVoteType0) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode OpinionComments2OKOpinionsItemMyVoteType0 to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch OpinionComments2OKOpinionsItemMyVoteType0(v) {
+	case OpinionComments2OKOpinionsItemMyVoteType0Agree:
+		*s = OpinionComments2OKOpinionsItemMyVoteType0Agree
+	case OpinionComments2OKOpinionsItemMyVoteType0Disagree:
+		*s = OpinionComments2OKOpinionsItemMyVoteType0Disagree
+	case OpinionComments2OKOpinionsItemMyVoteType0Pass:
+		*s = OpinionComments2OKOpinionsItemMyVoteType0Pass
+	default:
+		*s = OpinionComments2OKOpinionsItemMyVoteType0(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OpinionComments2OKOpinionsItemMyVoteType0) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OpinionComments2OKOpinionsItemMyVoteType0) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -10947,7 +11058,6 @@ func (s *OpinionCommentsOKOpinionsItem) Decode(d *jx.Decoder) error {
 		return errors.New("invalid: unable to decode OpinionCommentsOKOpinionsItem to nil")
 	}
 	var requiredBitSet [1]uint8
-	s.setDefaults()
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -11039,7 +11149,13 @@ func (s *OpinionCommentsOKOpinionsItem) UnmarshalJSON(data []byte) error {
 
 // Encode encodes OpinionCommentsOKOpinionsItemMyVoteType as json.
 func (s OpinionCommentsOKOpinionsItemMyVoteType) Encode(e *jx.Encoder) {
-	e.Str(string(s))
+	switch s.Type {
+	case OpinionCommentsOKOpinionsItemMyVoteType0OpinionCommentsOKOpinionsItemMyVoteType:
+		s.OpinionCommentsOKOpinionsItemMyVoteType0.Encode(e)
+	case NullOpinionCommentsOKOpinionsItemMyVoteType:
+		_ = s.Null
+		e.Null()
+	}
 }
 
 // Decode decodes OpinionCommentsOKOpinionsItemMyVoteType from json.
@@ -11047,22 +11163,21 @@ func (s *OpinionCommentsOKOpinionsItemMyVoteType) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode OpinionCommentsOKOpinionsItemMyVoteType to nil")
 	}
-	v, err := d.StrBytes()
-	if err != nil {
-		return err
-	}
-	// Try to use constant string.
-	switch OpinionCommentsOKOpinionsItemMyVoteType(v) {
-	case OpinionCommentsOKOpinionsItemMyVoteTypeAgree:
-		*s = OpinionCommentsOKOpinionsItemMyVoteTypeAgree
-	case OpinionCommentsOKOpinionsItemMyVoteTypeDisagree:
-		*s = OpinionCommentsOKOpinionsItemMyVoteTypeDisagree
-	case OpinionCommentsOKOpinionsItemMyVoteTypePass:
-		*s = OpinionCommentsOKOpinionsItemMyVoteTypePass
+	// Sum type type_discriminator.
+	switch t := d.Next(); t {
+	case jx.Null:
+		if err := d.Null(); err != nil {
+			return err
+		}
+		s.Type = NullOpinionCommentsOKOpinionsItemMyVoteType
+	case jx.String:
+		if err := s.OpinionCommentsOKOpinionsItemMyVoteType0.Decode(d); err != nil {
+			return err
+		}
+		s.Type = OpinionCommentsOKOpinionsItemMyVoteType0OpinionCommentsOKOpinionsItemMyVoteType
 	default:
-		*s = OpinionCommentsOKOpinionsItemMyVoteType(v)
+		return errors.Errorf("unexpected json type %q", t)
 	}
-
 	return nil
 }
 
@@ -11075,6 +11190,48 @@ func (s OpinionCommentsOKOpinionsItemMyVoteType) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OpinionCommentsOKOpinionsItemMyVoteType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes OpinionCommentsOKOpinionsItemMyVoteType0 as json.
+func (s OpinionCommentsOKOpinionsItemMyVoteType0) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes OpinionCommentsOKOpinionsItemMyVoteType0 from json.
+func (s *OpinionCommentsOKOpinionsItemMyVoteType0) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode OpinionCommentsOKOpinionsItemMyVoteType0 to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch OpinionCommentsOKOpinionsItemMyVoteType0(v) {
+	case OpinionCommentsOKOpinionsItemMyVoteType0Agree:
+		*s = OpinionCommentsOKOpinionsItemMyVoteType0Agree
+	case OpinionCommentsOKOpinionsItemMyVoteType0Disagree:
+		*s = OpinionCommentsOKOpinionsItemMyVoteType0Disagree
+	case OpinionCommentsOKOpinionsItemMyVoteType0Pass:
+		*s = OpinionCommentsOKOpinionsItemMyVoteType0Pass
+	default:
+		*s = OpinionCommentsOKOpinionsItemMyVoteType0(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OpinionCommentsOKOpinionsItemMyVoteType0) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OpinionCommentsOKOpinionsItemMyVoteType0) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -12521,6 +12678,39 @@ func (s *OptGetOpinionDetailOKOpinionVoteType) UnmarshalJSON(data []byte) error 
 	return s.Decode(d)
 }
 
+// Encode encodes GetOpinionsForTalkSessionOKOpinionsItemMyVoteType as json.
+func (o OptGetOpinionsForTalkSessionOKOpinionsItemMyVoteType) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes GetOpinionsForTalkSessionOKOpinionsItemMyVoteType from json.
+func (o *OptGetOpinionsForTalkSessionOKOpinionsItemMyVoteType) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptGetOpinionsForTalkSessionOKOpinionsItemMyVoteType to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptGetOpinionsForTalkSessionOKOpinionsItemMyVoteType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptGetOpinionsForTalkSessionOKOpinionsItemMyVoteType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType as json.
 func (o OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -12846,7 +13036,7 @@ func (o OptOpinionComments2OKOpinionsItemMyVoteType) Encode(e *jx.Encoder) {
 	if !o.Set {
 		return
 	}
-	e.Str(string(o.Value))
+	o.Value.Encode(e)
 }
 
 // Decode decodes OpinionComments2OKOpinionsItemMyVoteType from json.
@@ -12912,7 +13102,7 @@ func (o OptOpinionCommentsOKOpinionsItemMyVoteType) Encode(e *jx.Encoder) {
 	if !o.Set {
 		return
 	}
-	e.Str(string(o.Value))
+	o.Value.Encode(e)
 }
 
 // Decode decodes OpinionCommentsOKOpinionsItemMyVoteType from json.

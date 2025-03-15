@@ -1592,7 +1592,8 @@ func (*GetOpinionDetail2InternalServerError) getOpinionDetail2Res() {}
 type GetOpinionDetail2OK struct {
 	Opinion GetOpinionDetail2OKOpinion `json:"opinion"`
 	// 作成ユーザー.
-	User GetOpinionDetail2OKUser `json:"user"`
+	User       GetOpinionDetail2OKUser `json:"user"`
+	MyVoteType OptNilString            `json:"myVoteType"`
 }
 
 // GetOpinion returns the value of Opinion.
@@ -1605,6 +1606,11 @@ func (s *GetOpinionDetail2OK) GetUser() GetOpinionDetail2OKUser {
 	return s.User
 }
 
+// GetMyVoteType returns the value of MyVoteType.
+func (s *GetOpinionDetail2OK) GetMyVoteType() OptNilString {
+	return s.MyVoteType
+}
+
 // SetOpinion sets the value of Opinion.
 func (s *GetOpinionDetail2OK) SetOpinion(val GetOpinionDetail2OKOpinion) {
 	s.Opinion = val
@@ -1613,6 +1619,11 @@ func (s *GetOpinionDetail2OK) SetOpinion(val GetOpinionDetail2OKOpinion) {
 // SetUser sets the value of User.
 func (s *GetOpinionDetail2OK) SetUser(val GetOpinionDetail2OKUser) {
 	s.User = val
+}
+
+// SetMyVoteType sets the value of MyVoteType.
+func (s *GetOpinionDetail2OK) SetMyVoteType(val OptNilString) {
+	s.MyVoteType = val
 }
 
 func (*GetOpinionDetail2OK) getOpinionDetail2Res() {}
@@ -2053,10 +2064,9 @@ func (*GetOpinionsForTalkSessionOK) getOpinionsForTalkSessionRes() {}
 type GetOpinionsForTalkSessionOKOpinionsItem struct {
 	Opinion GetOpinionsForTalkSessionOKOpinionsItemOpinion `json:"opinion"`
 	// 作成ユーザー.
-	User       GetOpinionsForTalkSessionOKOpinionsItemUser `json:"user"`
-	ReplyCount int                                         `json:"replyCount"`
-	// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
-	MyVoteType GetOpinionsForTalkSessionOKOpinionsItemMyVoteType `json:"myVoteType"`
+	User       GetOpinionsForTalkSessionOKOpinionsItemUser          `json:"user"`
+	ReplyCount int                                                  `json:"replyCount"`
+	MyVoteType OptGetOpinionsForTalkSessionOKOpinionsItemMyVoteType `json:"myVoteType"`
 }
 
 // GetOpinion returns the value of Opinion.
@@ -2075,7 +2085,7 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItem) GetReplyCount() int {
 }
 
 // GetMyVoteType returns the value of MyVoteType.
-func (s *GetOpinionsForTalkSessionOKOpinionsItem) GetMyVoteType() GetOpinionsForTalkSessionOKOpinionsItemMyVoteType {
+func (s *GetOpinionsForTalkSessionOKOpinionsItem) GetMyVoteType() OptGetOpinionsForTalkSessionOKOpinionsItemMyVoteType {
 	return s.MyVoteType
 }
 
@@ -2095,36 +2105,104 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItem) SetReplyCount(val int) {
 }
 
 // SetMyVoteType sets the value of MyVoteType.
-func (s *GetOpinionsForTalkSessionOKOpinionsItem) SetMyVoteType(val GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) {
+func (s *GetOpinionsForTalkSessionOKOpinionsItem) SetMyVoteType(val OptGetOpinionsForTalkSessionOKOpinionsItemMyVoteType) {
 	s.MyVoteType = val
 }
 
-// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
-type GetOpinionsForTalkSessionOKOpinionsItemMyVoteType string
+// GetOpinionsForTalkSessionOKOpinionsItemMyVoteType represents sum type.
+type GetOpinionsForTalkSessionOKOpinionsItemMyVoteType struct {
+	Type                                               GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeType // switch on this field
+	GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0 GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0
+	Null                                               struct{}
+}
 
+// GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeType is oneOf type of GetOpinionsForTalkSessionOKOpinionsItemMyVoteType.
+type GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeType string
+
+// Possible values for GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeType.
 const (
-	GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree    GetOpinionsForTalkSessionOKOpinionsItemMyVoteType = "agree"
-	GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree GetOpinionsForTalkSessionOKOpinionsItemMyVoteType = "disagree"
-	GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass     GetOpinionsForTalkSessionOKOpinionsItemMyVoteType = "pass"
+	GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0GetOpinionsForTalkSessionOKOpinionsItemMyVoteType GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeType = "GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0"
+	NullGetOpinionsForTalkSessionOKOpinionsItemMyVoteType                                               GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeType = "struct{}"
 )
 
-// AllValues returns all GetOpinionsForTalkSessionOKOpinionsItemMyVoteType values.
-func (GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) AllValues() []GetOpinionsForTalkSessionOKOpinionsItemMyVoteType {
-	return []GetOpinionsForTalkSessionOKOpinionsItemMyVoteType{
-		GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree,
-		GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree,
-		GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass,
+// IsGetOpinionsForTalkSessionOKOpinionsItemMyVoteType0 reports whether GetOpinionsForTalkSessionOKOpinionsItemMyVoteType is GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0.
+func (s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) IsGetOpinionsForTalkSessionOKOpinionsItemMyVoteType0() bool {
+	return s.Type == GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0GetOpinionsForTalkSessionOKOpinionsItemMyVoteType
+}
+
+// IsNull reports whether GetOpinionsForTalkSessionOKOpinionsItemMyVoteType is struct{}.
+func (s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) IsNull() bool {
+	return s.Type == NullGetOpinionsForTalkSessionOKOpinionsItemMyVoteType
+}
+
+// SetGetOpinionsForTalkSessionOKOpinionsItemMyVoteType0 sets GetOpinionsForTalkSessionOKOpinionsItemMyVoteType to GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) SetGetOpinionsForTalkSessionOKOpinionsItemMyVoteType0(v GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0) {
+	s.Type = GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0GetOpinionsForTalkSessionOKOpinionsItemMyVoteType
+	s.GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0 = v
+}
+
+// GetGetOpinionsForTalkSessionOKOpinionsItemMyVoteType0 returns GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0 and true boolean if GetOpinionsForTalkSessionOKOpinionsItemMyVoteType is GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0.
+func (s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) GetGetOpinionsForTalkSessionOKOpinionsItemMyVoteType0() (v GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0, ok bool) {
+	if !s.IsGetOpinionsForTalkSessionOKOpinionsItemMyVoteType0() {
+		return v, false
+	}
+	return s.GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0, true
+}
+
+// NewGetOpinionsForTalkSessionOKOpinionsItemMyVoteType0GetOpinionsForTalkSessionOKOpinionsItemMyVoteType returns new GetOpinionsForTalkSessionOKOpinionsItemMyVoteType from GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0.
+func NewGetOpinionsForTalkSessionOKOpinionsItemMyVoteType0GetOpinionsForTalkSessionOKOpinionsItemMyVoteType(v GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0) GetOpinionsForTalkSessionOKOpinionsItemMyVoteType {
+	var s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType
+	s.SetGetOpinionsForTalkSessionOKOpinionsItemMyVoteType0(v)
+	return s
+}
+
+// SetNull sets GetOpinionsForTalkSessionOKOpinionsItemMyVoteType to struct{}.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) SetNull(v struct{}) {
+	s.Type = NullGetOpinionsForTalkSessionOKOpinionsItemMyVoteType
+	s.Null = v
+}
+
+// GetNull returns struct{} and true boolean if GetOpinionsForTalkSessionOKOpinionsItemMyVoteType is struct{}.
+func (s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) GetNull() (v struct{}, ok bool) {
+	if !s.IsNull() {
+		return v, false
+	}
+	return s.Null, true
+}
+
+// NewNullGetOpinionsForTalkSessionOKOpinionsItemMyVoteType returns new GetOpinionsForTalkSessionOKOpinionsItemMyVoteType from struct{}.
+func NewNullGetOpinionsForTalkSessionOKOpinionsItemMyVoteType(v struct{}) GetOpinionsForTalkSessionOKOpinionsItemMyVoteType {
+	var s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType
+	s.SetNull(v)
+	return s
+}
+
+// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+type GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0 string
+
+const (
+	GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0Agree    GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0 = "agree"
+	GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0Disagree GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0 = "disagree"
+	GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0Pass     GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0 = "pass"
+)
+
+// AllValues returns all GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0 values.
+func (GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0) AllValues() []GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0 {
+	return []GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0{
+		GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0Agree,
+		GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0Disagree,
+		GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0Pass,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) MarshalText() ([]byte, error) {
+func (s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0) MarshalText() ([]byte, error) {
 	switch s {
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree:
+	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0Agree:
 		return []byte(s), nil
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree:
+	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0Disagree:
 		return []byte(s), nil
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass:
+	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0Pass:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -2132,16 +2210,16 @@ func (s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) MarshalText() ([]byte
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) UnmarshalText(data []byte) error {
-	switch GetOpinionsForTalkSessionOKOpinionsItemMyVoteType(data) {
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree:
-		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree
+func (s *GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0) UnmarshalText(data []byte) error {
+	switch GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0(data) {
+	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0Agree:
+		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0Agree
 		return nil
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree:
-		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree
+	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0Disagree:
+		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0Disagree
 		return nil
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass:
-		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass
+	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0Pass:
+		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteType0Pass
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -3948,8 +4026,7 @@ func (*OpinionComments2OK) opinionComments2Res() {}
 type OpinionComments2OKOpinionsItem struct {
 	Opinion OpinionComments2OKOpinionsItemOpinion `json:"opinion"`
 	// 作成ユーザー.
-	User OpinionComments2OKOpinionsItemUser `json:"user"`
-	// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+	User       OpinionComments2OKOpinionsItemUser          `json:"user"`
 	MyVoteType OptOpinionComments2OKOpinionsItemMyVoteType `json:"myVoteType"`
 }
 
@@ -3983,32 +4060,100 @@ func (s *OpinionComments2OKOpinionsItem) SetMyVoteType(val OptOpinionComments2OK
 	s.MyVoteType = val
 }
 
-// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
-type OpinionComments2OKOpinionsItemMyVoteType string
+// OpinionComments2OKOpinionsItemMyVoteType represents sum type.
+type OpinionComments2OKOpinionsItemMyVoteType struct {
+	Type                                      OpinionComments2OKOpinionsItemMyVoteTypeType // switch on this field
+	OpinionComments2OKOpinionsItemMyVoteType0 OpinionComments2OKOpinionsItemMyVoteType0
+	Null                                      struct{}
+}
 
+// OpinionComments2OKOpinionsItemMyVoteTypeType is oneOf type of OpinionComments2OKOpinionsItemMyVoteType.
+type OpinionComments2OKOpinionsItemMyVoteTypeType string
+
+// Possible values for OpinionComments2OKOpinionsItemMyVoteTypeType.
 const (
-	OpinionComments2OKOpinionsItemMyVoteTypeAgree    OpinionComments2OKOpinionsItemMyVoteType = "agree"
-	OpinionComments2OKOpinionsItemMyVoteTypeDisagree OpinionComments2OKOpinionsItemMyVoteType = "disagree"
-	OpinionComments2OKOpinionsItemMyVoteTypePass     OpinionComments2OKOpinionsItemMyVoteType = "pass"
+	OpinionComments2OKOpinionsItemMyVoteType0OpinionComments2OKOpinionsItemMyVoteType OpinionComments2OKOpinionsItemMyVoteTypeType = "OpinionComments2OKOpinionsItemMyVoteType0"
+	NullOpinionComments2OKOpinionsItemMyVoteType                                      OpinionComments2OKOpinionsItemMyVoteTypeType = "struct{}"
 )
 
-// AllValues returns all OpinionComments2OKOpinionsItemMyVoteType values.
-func (OpinionComments2OKOpinionsItemMyVoteType) AllValues() []OpinionComments2OKOpinionsItemMyVoteType {
-	return []OpinionComments2OKOpinionsItemMyVoteType{
-		OpinionComments2OKOpinionsItemMyVoteTypeAgree,
-		OpinionComments2OKOpinionsItemMyVoteTypeDisagree,
-		OpinionComments2OKOpinionsItemMyVoteTypePass,
+// IsOpinionComments2OKOpinionsItemMyVoteType0 reports whether OpinionComments2OKOpinionsItemMyVoteType is OpinionComments2OKOpinionsItemMyVoteType0.
+func (s OpinionComments2OKOpinionsItemMyVoteType) IsOpinionComments2OKOpinionsItemMyVoteType0() bool {
+	return s.Type == OpinionComments2OKOpinionsItemMyVoteType0OpinionComments2OKOpinionsItemMyVoteType
+}
+
+// IsNull reports whether OpinionComments2OKOpinionsItemMyVoteType is struct{}.
+func (s OpinionComments2OKOpinionsItemMyVoteType) IsNull() bool {
+	return s.Type == NullOpinionComments2OKOpinionsItemMyVoteType
+}
+
+// SetOpinionComments2OKOpinionsItemMyVoteType0 sets OpinionComments2OKOpinionsItemMyVoteType to OpinionComments2OKOpinionsItemMyVoteType0.
+func (s *OpinionComments2OKOpinionsItemMyVoteType) SetOpinionComments2OKOpinionsItemMyVoteType0(v OpinionComments2OKOpinionsItemMyVoteType0) {
+	s.Type = OpinionComments2OKOpinionsItemMyVoteType0OpinionComments2OKOpinionsItemMyVoteType
+	s.OpinionComments2OKOpinionsItemMyVoteType0 = v
+}
+
+// GetOpinionComments2OKOpinionsItemMyVoteType0 returns OpinionComments2OKOpinionsItemMyVoteType0 and true boolean if OpinionComments2OKOpinionsItemMyVoteType is OpinionComments2OKOpinionsItemMyVoteType0.
+func (s OpinionComments2OKOpinionsItemMyVoteType) GetOpinionComments2OKOpinionsItemMyVoteType0() (v OpinionComments2OKOpinionsItemMyVoteType0, ok bool) {
+	if !s.IsOpinionComments2OKOpinionsItemMyVoteType0() {
+		return v, false
+	}
+	return s.OpinionComments2OKOpinionsItemMyVoteType0, true
+}
+
+// NewOpinionComments2OKOpinionsItemMyVoteType0OpinionComments2OKOpinionsItemMyVoteType returns new OpinionComments2OKOpinionsItemMyVoteType from OpinionComments2OKOpinionsItemMyVoteType0.
+func NewOpinionComments2OKOpinionsItemMyVoteType0OpinionComments2OKOpinionsItemMyVoteType(v OpinionComments2OKOpinionsItemMyVoteType0) OpinionComments2OKOpinionsItemMyVoteType {
+	var s OpinionComments2OKOpinionsItemMyVoteType
+	s.SetOpinionComments2OKOpinionsItemMyVoteType0(v)
+	return s
+}
+
+// SetNull sets OpinionComments2OKOpinionsItemMyVoteType to struct{}.
+func (s *OpinionComments2OKOpinionsItemMyVoteType) SetNull(v struct{}) {
+	s.Type = NullOpinionComments2OKOpinionsItemMyVoteType
+	s.Null = v
+}
+
+// GetNull returns struct{} and true boolean if OpinionComments2OKOpinionsItemMyVoteType is struct{}.
+func (s OpinionComments2OKOpinionsItemMyVoteType) GetNull() (v struct{}, ok bool) {
+	if !s.IsNull() {
+		return v, false
+	}
+	return s.Null, true
+}
+
+// NewNullOpinionComments2OKOpinionsItemMyVoteType returns new OpinionComments2OKOpinionsItemMyVoteType from struct{}.
+func NewNullOpinionComments2OKOpinionsItemMyVoteType(v struct{}) OpinionComments2OKOpinionsItemMyVoteType {
+	var s OpinionComments2OKOpinionsItemMyVoteType
+	s.SetNull(v)
+	return s
+}
+
+// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+type OpinionComments2OKOpinionsItemMyVoteType0 string
+
+const (
+	OpinionComments2OKOpinionsItemMyVoteType0Agree    OpinionComments2OKOpinionsItemMyVoteType0 = "agree"
+	OpinionComments2OKOpinionsItemMyVoteType0Disagree OpinionComments2OKOpinionsItemMyVoteType0 = "disagree"
+	OpinionComments2OKOpinionsItemMyVoteType0Pass     OpinionComments2OKOpinionsItemMyVoteType0 = "pass"
+)
+
+// AllValues returns all OpinionComments2OKOpinionsItemMyVoteType0 values.
+func (OpinionComments2OKOpinionsItemMyVoteType0) AllValues() []OpinionComments2OKOpinionsItemMyVoteType0 {
+	return []OpinionComments2OKOpinionsItemMyVoteType0{
+		OpinionComments2OKOpinionsItemMyVoteType0Agree,
+		OpinionComments2OKOpinionsItemMyVoteType0Disagree,
+		OpinionComments2OKOpinionsItemMyVoteType0Pass,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s OpinionComments2OKOpinionsItemMyVoteType) MarshalText() ([]byte, error) {
+func (s OpinionComments2OKOpinionsItemMyVoteType0) MarshalText() ([]byte, error) {
 	switch s {
-	case OpinionComments2OKOpinionsItemMyVoteTypeAgree:
+	case OpinionComments2OKOpinionsItemMyVoteType0Agree:
 		return []byte(s), nil
-	case OpinionComments2OKOpinionsItemMyVoteTypeDisagree:
+	case OpinionComments2OKOpinionsItemMyVoteType0Disagree:
 		return []byte(s), nil
-	case OpinionComments2OKOpinionsItemMyVoteTypePass:
+	case OpinionComments2OKOpinionsItemMyVoteType0Pass:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -4016,16 +4161,16 @@ func (s OpinionComments2OKOpinionsItemMyVoteType) MarshalText() ([]byte, error) 
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *OpinionComments2OKOpinionsItemMyVoteType) UnmarshalText(data []byte) error {
-	switch OpinionComments2OKOpinionsItemMyVoteType(data) {
-	case OpinionComments2OKOpinionsItemMyVoteTypeAgree:
-		*s = OpinionComments2OKOpinionsItemMyVoteTypeAgree
+func (s *OpinionComments2OKOpinionsItemMyVoteType0) UnmarshalText(data []byte) error {
+	switch OpinionComments2OKOpinionsItemMyVoteType0(data) {
+	case OpinionComments2OKOpinionsItemMyVoteType0Agree:
+		*s = OpinionComments2OKOpinionsItemMyVoteType0Agree
 		return nil
-	case OpinionComments2OKOpinionsItemMyVoteTypeDisagree:
-		*s = OpinionComments2OKOpinionsItemMyVoteTypeDisagree
+	case OpinionComments2OKOpinionsItemMyVoteType0Disagree:
+		*s = OpinionComments2OKOpinionsItemMyVoteType0Disagree
 		return nil
-	case OpinionComments2OKOpinionsItemMyVoteTypePass:
-		*s = OpinionComments2OKOpinionsItemMyVoteTypePass
+	case OpinionComments2OKOpinionsItemMyVoteType0Pass:
+		*s = OpinionComments2OKOpinionsItemMyVoteType0Pass
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -4288,8 +4433,7 @@ func (*OpinionCommentsOK) opinionCommentsRes() {}
 type OpinionCommentsOKOpinionsItem struct {
 	Opinion OpinionCommentsOKOpinionsItemOpinion `json:"opinion"`
 	// 作成ユーザー.
-	User OpinionCommentsOKOpinionsItemUser `json:"user"`
-	// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+	User       OpinionCommentsOKOpinionsItemUser          `json:"user"`
 	MyVoteType OptOpinionCommentsOKOpinionsItemMyVoteType `json:"myVoteType"`
 }
 
@@ -4323,32 +4467,100 @@ func (s *OpinionCommentsOKOpinionsItem) SetMyVoteType(val OptOpinionCommentsOKOp
 	s.MyVoteType = val
 }
 
-// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
-type OpinionCommentsOKOpinionsItemMyVoteType string
+// OpinionCommentsOKOpinionsItemMyVoteType represents sum type.
+type OpinionCommentsOKOpinionsItemMyVoteType struct {
+	Type                                     OpinionCommentsOKOpinionsItemMyVoteTypeType // switch on this field
+	OpinionCommentsOKOpinionsItemMyVoteType0 OpinionCommentsOKOpinionsItemMyVoteType0
+	Null                                     struct{}
+}
 
+// OpinionCommentsOKOpinionsItemMyVoteTypeType is oneOf type of OpinionCommentsOKOpinionsItemMyVoteType.
+type OpinionCommentsOKOpinionsItemMyVoteTypeType string
+
+// Possible values for OpinionCommentsOKOpinionsItemMyVoteTypeType.
 const (
-	OpinionCommentsOKOpinionsItemMyVoteTypeAgree    OpinionCommentsOKOpinionsItemMyVoteType = "agree"
-	OpinionCommentsOKOpinionsItemMyVoteTypeDisagree OpinionCommentsOKOpinionsItemMyVoteType = "disagree"
-	OpinionCommentsOKOpinionsItemMyVoteTypePass     OpinionCommentsOKOpinionsItemMyVoteType = "pass"
+	OpinionCommentsOKOpinionsItemMyVoteType0OpinionCommentsOKOpinionsItemMyVoteType OpinionCommentsOKOpinionsItemMyVoteTypeType = "OpinionCommentsOKOpinionsItemMyVoteType0"
+	NullOpinionCommentsOKOpinionsItemMyVoteType                                     OpinionCommentsOKOpinionsItemMyVoteTypeType = "struct{}"
 )
 
-// AllValues returns all OpinionCommentsOKOpinionsItemMyVoteType values.
-func (OpinionCommentsOKOpinionsItemMyVoteType) AllValues() []OpinionCommentsOKOpinionsItemMyVoteType {
-	return []OpinionCommentsOKOpinionsItemMyVoteType{
-		OpinionCommentsOKOpinionsItemMyVoteTypeAgree,
-		OpinionCommentsOKOpinionsItemMyVoteTypeDisagree,
-		OpinionCommentsOKOpinionsItemMyVoteTypePass,
+// IsOpinionCommentsOKOpinionsItemMyVoteType0 reports whether OpinionCommentsOKOpinionsItemMyVoteType is OpinionCommentsOKOpinionsItemMyVoteType0.
+func (s OpinionCommentsOKOpinionsItemMyVoteType) IsOpinionCommentsOKOpinionsItemMyVoteType0() bool {
+	return s.Type == OpinionCommentsOKOpinionsItemMyVoteType0OpinionCommentsOKOpinionsItemMyVoteType
+}
+
+// IsNull reports whether OpinionCommentsOKOpinionsItemMyVoteType is struct{}.
+func (s OpinionCommentsOKOpinionsItemMyVoteType) IsNull() bool {
+	return s.Type == NullOpinionCommentsOKOpinionsItemMyVoteType
+}
+
+// SetOpinionCommentsOKOpinionsItemMyVoteType0 sets OpinionCommentsOKOpinionsItemMyVoteType to OpinionCommentsOKOpinionsItemMyVoteType0.
+func (s *OpinionCommentsOKOpinionsItemMyVoteType) SetOpinionCommentsOKOpinionsItemMyVoteType0(v OpinionCommentsOKOpinionsItemMyVoteType0) {
+	s.Type = OpinionCommentsOKOpinionsItemMyVoteType0OpinionCommentsOKOpinionsItemMyVoteType
+	s.OpinionCommentsOKOpinionsItemMyVoteType0 = v
+}
+
+// GetOpinionCommentsOKOpinionsItemMyVoteType0 returns OpinionCommentsOKOpinionsItemMyVoteType0 and true boolean if OpinionCommentsOKOpinionsItemMyVoteType is OpinionCommentsOKOpinionsItemMyVoteType0.
+func (s OpinionCommentsOKOpinionsItemMyVoteType) GetOpinionCommentsOKOpinionsItemMyVoteType0() (v OpinionCommentsOKOpinionsItemMyVoteType0, ok bool) {
+	if !s.IsOpinionCommentsOKOpinionsItemMyVoteType0() {
+		return v, false
+	}
+	return s.OpinionCommentsOKOpinionsItemMyVoteType0, true
+}
+
+// NewOpinionCommentsOKOpinionsItemMyVoteType0OpinionCommentsOKOpinionsItemMyVoteType returns new OpinionCommentsOKOpinionsItemMyVoteType from OpinionCommentsOKOpinionsItemMyVoteType0.
+func NewOpinionCommentsOKOpinionsItemMyVoteType0OpinionCommentsOKOpinionsItemMyVoteType(v OpinionCommentsOKOpinionsItemMyVoteType0) OpinionCommentsOKOpinionsItemMyVoteType {
+	var s OpinionCommentsOKOpinionsItemMyVoteType
+	s.SetOpinionCommentsOKOpinionsItemMyVoteType0(v)
+	return s
+}
+
+// SetNull sets OpinionCommentsOKOpinionsItemMyVoteType to struct{}.
+func (s *OpinionCommentsOKOpinionsItemMyVoteType) SetNull(v struct{}) {
+	s.Type = NullOpinionCommentsOKOpinionsItemMyVoteType
+	s.Null = v
+}
+
+// GetNull returns struct{} and true boolean if OpinionCommentsOKOpinionsItemMyVoteType is struct{}.
+func (s OpinionCommentsOKOpinionsItemMyVoteType) GetNull() (v struct{}, ok bool) {
+	if !s.IsNull() {
+		return v, false
+	}
+	return s.Null, true
+}
+
+// NewNullOpinionCommentsOKOpinionsItemMyVoteType returns new OpinionCommentsOKOpinionsItemMyVoteType from struct{}.
+func NewNullOpinionCommentsOKOpinionsItemMyVoteType(v struct{}) OpinionCommentsOKOpinionsItemMyVoteType {
+	var s OpinionCommentsOKOpinionsItemMyVoteType
+	s.SetNull(v)
+	return s
+}
+
+// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+type OpinionCommentsOKOpinionsItemMyVoteType0 string
+
+const (
+	OpinionCommentsOKOpinionsItemMyVoteType0Agree    OpinionCommentsOKOpinionsItemMyVoteType0 = "agree"
+	OpinionCommentsOKOpinionsItemMyVoteType0Disagree OpinionCommentsOKOpinionsItemMyVoteType0 = "disagree"
+	OpinionCommentsOKOpinionsItemMyVoteType0Pass     OpinionCommentsOKOpinionsItemMyVoteType0 = "pass"
+)
+
+// AllValues returns all OpinionCommentsOKOpinionsItemMyVoteType0 values.
+func (OpinionCommentsOKOpinionsItemMyVoteType0) AllValues() []OpinionCommentsOKOpinionsItemMyVoteType0 {
+	return []OpinionCommentsOKOpinionsItemMyVoteType0{
+		OpinionCommentsOKOpinionsItemMyVoteType0Agree,
+		OpinionCommentsOKOpinionsItemMyVoteType0Disagree,
+		OpinionCommentsOKOpinionsItemMyVoteType0Pass,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s OpinionCommentsOKOpinionsItemMyVoteType) MarshalText() ([]byte, error) {
+func (s OpinionCommentsOKOpinionsItemMyVoteType0) MarshalText() ([]byte, error) {
 	switch s {
-	case OpinionCommentsOKOpinionsItemMyVoteTypeAgree:
+	case OpinionCommentsOKOpinionsItemMyVoteType0Agree:
 		return []byte(s), nil
-	case OpinionCommentsOKOpinionsItemMyVoteTypeDisagree:
+	case OpinionCommentsOKOpinionsItemMyVoteType0Disagree:
 		return []byte(s), nil
-	case OpinionCommentsOKOpinionsItemMyVoteTypePass:
+	case OpinionCommentsOKOpinionsItemMyVoteType0Pass:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -4356,16 +4568,16 @@ func (s OpinionCommentsOKOpinionsItemMyVoteType) MarshalText() ([]byte, error) {
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *OpinionCommentsOKOpinionsItemMyVoteType) UnmarshalText(data []byte) error {
-	switch OpinionCommentsOKOpinionsItemMyVoteType(data) {
-	case OpinionCommentsOKOpinionsItemMyVoteTypeAgree:
-		*s = OpinionCommentsOKOpinionsItemMyVoteTypeAgree
+func (s *OpinionCommentsOKOpinionsItemMyVoteType0) UnmarshalText(data []byte) error {
+	switch OpinionCommentsOKOpinionsItemMyVoteType0(data) {
+	case OpinionCommentsOKOpinionsItemMyVoteType0Agree:
+		*s = OpinionCommentsOKOpinionsItemMyVoteType0Agree
 		return nil
-	case OpinionCommentsOKOpinionsItemMyVoteTypeDisagree:
-		*s = OpinionCommentsOKOpinionsItemMyVoteTypeDisagree
+	case OpinionCommentsOKOpinionsItemMyVoteType0Disagree:
+		*s = OpinionCommentsOKOpinionsItemMyVoteType0Disagree
 		return nil
-	case OpinionCommentsOKOpinionsItemMyVoteTypePass:
-		*s = OpinionCommentsOKOpinionsItemMyVoteTypePass
+	case OpinionCommentsOKOpinionsItemMyVoteType0Pass:
+		*s = OpinionCommentsOKOpinionsItemMyVoteType0Pass
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -5372,6 +5584,52 @@ func (o OptGetOpinionDetailOKOpinionVoteType) Get() (v GetOpinionDetailOKOpinion
 
 // Or returns value if set, or given parameter if does not.
 func (o OptGetOpinionDetailOKOpinionVoteType) Or(d GetOpinionDetailOKOpinionVoteType) GetOpinionDetailOKOpinionVoteType {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptGetOpinionsForTalkSessionOKOpinionsItemMyVoteType returns new OptGetOpinionsForTalkSessionOKOpinionsItemMyVoteType with value set to v.
+func NewOptGetOpinionsForTalkSessionOKOpinionsItemMyVoteType(v GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) OptGetOpinionsForTalkSessionOKOpinionsItemMyVoteType {
+	return OptGetOpinionsForTalkSessionOKOpinionsItemMyVoteType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptGetOpinionsForTalkSessionOKOpinionsItemMyVoteType is optional GetOpinionsForTalkSessionOKOpinionsItemMyVoteType.
+type OptGetOpinionsForTalkSessionOKOpinionsItemMyVoteType struct {
+	Value GetOpinionsForTalkSessionOKOpinionsItemMyVoteType
+	Set   bool
+}
+
+// IsSet returns true if OptGetOpinionsForTalkSessionOKOpinionsItemMyVoteType was set.
+func (o OptGetOpinionsForTalkSessionOKOpinionsItemMyVoteType) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptGetOpinionsForTalkSessionOKOpinionsItemMyVoteType) Reset() {
+	var v GetOpinionsForTalkSessionOKOpinionsItemMyVoteType
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptGetOpinionsForTalkSessionOKOpinionsItemMyVoteType) SetTo(v GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptGetOpinionsForTalkSessionOKOpinionsItemMyVoteType) Get() (v GetOpinionsForTalkSessionOKOpinionsItemMyVoteType, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptGetOpinionsForTalkSessionOKOpinionsItemMyVoteType) Or(d GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) GetOpinionsForTalkSessionOKOpinionsItemMyVoteType {
 	if v, ok := o.Get(); ok {
 		return v
 	}

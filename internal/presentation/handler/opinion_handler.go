@@ -88,15 +88,19 @@ func (o *opinionHandler) GetOpinionDetail2(ctx context.Context, params oas.GetOp
 		DisplayName: opinion.Opinion.User.DisplayName,
 		IconURL:     utils.ToOptNil[oas.OptNilString](opinion.Opinion.User.IconURL),
 	}
-	op := &oas.GetOpinionDetail2OKOpinion{
-		ID:       opinion.Opinion.Opinion.OpinionID.String(),
-		ParentID: utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ParentOpinionID),
-		Title:    utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.Title),
-		Content:  opinion.Opinion.Opinion.Content,
-		VoteType: oas.OptGetOpinionDetail2OKOpinionVoteType{
-			Value: oas.GetOpinionDetail2OKOpinionVoteType(opinion.Opinion.GetParentVoteType()),
+	vt := oas.OptGetOpinionDetail2OKOpinionVoteType{}
+	if opinion.Opinion.GetParentVoteType() != nil {
+		vt = oas.OptGetOpinionDetail2OKOpinionVoteType{
+			Value: oas.GetOpinionDetail2OKOpinionVoteType(*opinion.Opinion.GetParentVoteType()),
 			Set:   true,
-		},
+		}
+	}
+	op := &oas.GetOpinionDetail2OKOpinion{
+		ID:           opinion.Opinion.Opinion.OpinionID.String(),
+		ParentID:     utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ParentOpinionID),
+		Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.Title),
+		Content:      opinion.Opinion.Opinion.Content,
+		VoteType:     vt,
 		PictureURL:   utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.PictureURL),
 		ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ReferenceURL),
 		PostedAt:     opinion.Opinion.Opinion.CreatedAt.Format(time.RFC3339),
@@ -144,26 +148,38 @@ func (o *opinionHandler) OpinionComments2(ctx context.Context, params oas.Opinio
 			IconURL:     utils.ToOptNil[oas.OptNilString](reply.User.IconURL),
 		}
 
-		opinion := &oas.OpinionComments2OKOpinionsItemOpinion{
-			ID:       reply.Opinion.OpinionID.String(),
-			ParentID: utils.ToOpt[oas.OptString](reply.Opinion.ParentOpinionID),
-			Title:    utils.ToOpt[oas.OptString](reply.Opinion.Title),
-			Content:  reply.Opinion.Content,
-			VoteType: oas.OptOpinionComments2OKOpinionsItemOpinionVoteType{
-				Value: oas.OpinionComments2OKOpinionsItemOpinionVoteType(reply.GetParentVoteType()),
+		vt := oas.OptOpinionComments2OKOpinionsItemOpinionVoteType{}
+		if reply.GetParentVoteType() != nil {
+			vt = oas.OptOpinionComments2OKOpinionsItemOpinionVoteType{
+				Value: oas.OpinionComments2OKOpinionsItemOpinionVoteType(*reply.GetParentVoteType()),
 				Set:   true,
-			},
+			}
+		}
+
+		opinion := &oas.OpinionComments2OKOpinionsItemOpinion{
+			ID:           reply.Opinion.OpinionID.String(),
+			ParentID:     utils.ToOpt[oas.OptString](reply.Opinion.ParentOpinionID),
+			Title:        utils.ToOpt[oas.OptString](reply.Opinion.Title),
+			Content:      reply.Opinion.Content,
+			VoteType:     vt,
 			PictureURL:   utils.ToOpt[oas.OptString](reply.Opinion.PictureURL),
 			ReferenceURL: utils.ToOpt[oas.OptString](reply.Opinion.ReferenceURL),
 			PostedAt:     reply.Opinion.CreatedAt.Format(time.RFC3339),
 		}
+
+		mvt := oas.OptOpinionComments2OKOpinionsItemMyVoteType{}
+		if reply.GetMyVoteType() != nil {
+			mvt = oas.OptOpinionComments2OKOpinionsItemMyVoteType{
+				Value: oas.OpinionComments2OKOpinionsItemMyVoteType{
+					Type: oas.OpinionComments2OKOpinionsItemMyVoteTypeType(*reply.GetMyVoteType()),
+				},
+				Set: true,
+			}
+		}
 		replies = append(replies, oas.OpinionComments2OKOpinionsItem{
-			User:    *user,
-			Opinion: *opinion,
-			MyVoteType: oas.OptOpinionComments2OKOpinionsItemMyVoteType{
-				Value: oas.OpinionComments2OKOpinionsItemMyVoteType(reply.GetMyVoteType()),
-				Set:   true,
-			},
+			User:       *user,
+			Opinion:    *opinion,
+			MyVoteType: mvt,
 		})
 	}
 
@@ -219,15 +235,29 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 	}
 	opinions := make([]oas.GetOpinionsForTalkSessionOKOpinionsItem, 0, len(out.Opinions))
 	for _, opinion := range out.Opinions {
+		vt := oas.OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType{}
+		if opinion.GetParentVoteType() != nil {
+			vt = oas.OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType{
+				Value: oas.GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType(*opinion.GetParentVoteType()),
+				Set:   true,
+			}
+		}
+		mvt := oas.OptGetOpinionsForTalkSessionOKOpinionsItemMyVoteType{}
+		if opinion.GetMyVoteType() != nil {
+			mvt = oas.OptGetOpinionsForTalkSessionOKOpinionsItemMyVoteType{
+				Value: oas.GetOpinionsForTalkSessionOKOpinionsItemMyVoteType{
+					Type: oas.GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeType(*opinion.GetMyVoteType()),
+				},
+				Set: true,
+			}
+		}
+
 		opinions = append(opinions, oas.GetOpinionsForTalkSessionOKOpinionsItem{
 			Opinion: oas.GetOpinionsForTalkSessionOKOpinionsItemOpinion{
-				ID:      opinion.Opinion.OpinionID.String(),
-				Title:   utils.ToOpt[oas.OptString](opinion.Opinion.Title),
-				Content: opinion.Opinion.Content,
-				VoteType: oas.OptGetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType{
-					Set:   true,
-					Value: oas.GetOpinionsForTalkSessionOKOpinionsItemOpinionVoteType(opinion.GetParentVoteType()),
-				},
+				ID:           opinion.Opinion.OpinionID.String(),
+				Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Title),
+				Content:      opinion.Opinion.Content,
+				VoteType:     vt,
 				ParentID:     utils.ToOpt[oas.OptString](opinion.Opinion.ParentOpinionID),
 				ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
 				PictureURL:   utils.ToOpt[oas.OptString](opinion.Opinion.PictureURL),
@@ -239,7 +269,7 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 				IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.IconURL),
 			},
 			ReplyCount: opinion.ReplyCount,
-			MyVoteType: oas.GetOpinionsForTalkSessionOKOpinionsItemMyVoteType(opinion.GetMyVoteType()),
+			MyVoteType: mvt,
 		})
 	}
 
@@ -284,15 +314,19 @@ func (o *opinionHandler) GetOpinionDetail(ctx context.Context, params oas.GetOpi
 		DisplayName: opinion.Opinion.User.DisplayName,
 		IconURL:     utils.ToOptNil[oas.OptNilString](opinion.Opinion.User.IconURL),
 	}
-	op := &oas.GetOpinionDetailOKOpinion{
-		ID:       opinion.Opinion.Opinion.OpinionID.String(),
-		ParentID: utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ParentOpinionID),
-		Title:    utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.Title),
-		Content:  opinion.Opinion.Opinion.Content,
-		VoteType: oas.OptGetOpinionDetailOKOpinionVoteType{
-			Value: oas.GetOpinionDetailOKOpinionVoteType(opinion.Opinion.GetParentVoteType()),
+	vt := oas.OptGetOpinionDetailOKOpinionVoteType{}
+	if opinion.Opinion.GetParentVoteType() != nil {
+		vt = oas.OptGetOpinionDetailOKOpinionVoteType{
+			Value: oas.GetOpinionDetailOKOpinionVoteType(*opinion.Opinion.GetParentVoteType()),
 			Set:   true,
-		},
+		}
+	}
+	op := &oas.GetOpinionDetailOKOpinion{
+		ID:           opinion.Opinion.Opinion.OpinionID.String(),
+		ParentID:     utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ParentOpinionID),
+		Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.Title),
+		Content:      opinion.Opinion.Opinion.Content,
+		VoteType:     vt,
 		PictureURL:   utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.PictureURL),
 		ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ReferenceURL),
 		PostedAt:     opinion.Opinion.Opinion.CreatedAt.Format(time.RFC3339),
@@ -343,16 +377,20 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 			DisplayName: opinion.User.DisplayName,
 			IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.IconURL),
 		}
+		vt := oas.OptSwipeOpinionsOKItemOpinionVoteType{}
+		if opinion.GetParentVoteType() != nil {
+			vt = oas.OptSwipeOpinionsOKItemOpinionVoteType{
+				Value: oas.SwipeOpinionsOKItemOpinionVoteType(*opinion.GetParentVoteType()),
+				Set:   true,
+			}
+		}
 
 		ops := &oas.SwipeOpinionsOKItemOpinion{
-			ID:       opinion.Opinion.OpinionID.String(),
-			ParentID: utils.ToOpt[oas.OptString](opinion.Opinion.ParentOpinionID),
-			Title:    utils.ToOpt[oas.OptString](opinion.Opinion.Title),
-			Content:  opinion.Opinion.Content,
-			VoteType: oas.OptSwipeOpinionsOKItemOpinionVoteType{
-				Value: oas.SwipeOpinionsOKItemOpinionVoteType(opinion.GetParentVoteType()),
-				Set:   true,
-			},
+			ID:           opinion.Opinion.OpinionID.String(),
+			ParentID:     utils.ToOpt[oas.OptString](opinion.Opinion.ParentOpinionID),
+			Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Title),
+			Content:      opinion.Opinion.Content,
+			VoteType:     vt,
 			PictureURL:   utils.ToOpt[oas.OptString](opinion.Opinion.PictureURL),
 			ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
 			PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
@@ -402,27 +440,37 @@ func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.Opinion
 			DisplayName: reply.User.DisplayName,
 			IconURL:     utils.ToOptNil[oas.OptNilString](reply.User.IconURL),
 		}
+		vt := oas.OptOpinionCommentsOKOpinionsItemOpinionVoteType{}
+		if reply.GetParentVoteType() != nil {
+			vt = oas.OptOpinionCommentsOKOpinionsItemOpinionVoteType{
+				Value: oas.OpinionCommentsOKOpinionsItemOpinionVoteType(*reply.GetParentVoteType()),
+				Set:   true,
+			}
+		}
 
 		opinion := &oas.OpinionCommentsOKOpinionsItemOpinion{
-			ID:       reply.Opinion.OpinionID.String(),
-			ParentID: utils.ToOpt[oas.OptString](reply.Opinion.ParentOpinionID),
-			Title:    utils.ToOpt[oas.OptString](reply.Opinion.Title),
-			Content:  reply.Opinion.Content,
-			VoteType: oas.OptOpinionCommentsOKOpinionsItemOpinionVoteType{
-				Value: oas.OpinionCommentsOKOpinionsItemOpinionVoteType(reply.GetParentVoteType()),
-				Set:   true,
-			},
+			ID:           reply.Opinion.OpinionID.String(),
+			ParentID:     utils.ToOpt[oas.OptString](reply.Opinion.ParentOpinionID),
+			Title:        utils.ToOpt[oas.OptString](reply.Opinion.Title),
+			Content:      reply.Opinion.Content,
+			VoteType:     vt,
 			PictureURL:   utils.ToOpt[oas.OptString](reply.Opinion.PictureURL),
 			ReferenceURL: utils.ToOpt[oas.OptString](reply.Opinion.ReferenceURL),
 			PostedAt:     reply.Opinion.CreatedAt.Format(time.RFC3339),
 		}
+		mvt := oas.OptOpinionCommentsOKOpinionsItemMyVoteType{}
+		if reply.GetMyVoteType() != nil {
+			mvt = oas.OptOpinionCommentsOKOpinionsItemMyVoteType{
+				Value: oas.OpinionCommentsOKOpinionsItemMyVoteType{
+					Type: oas.OpinionCommentsOKOpinionsItemMyVoteTypeType(*reply.GetMyVoteType()),
+				},
+				Set: true,
+			}
+		}
 		replies = append(replies, oas.OpinionCommentsOKOpinionsItem{
-			User:    *user,
-			Opinion: *opinion,
-			MyVoteType: oas.OptOpinionCommentsOKOpinionsItemMyVoteType{
-				Value: oas.OpinionCommentsOKOpinionsItemMyVoteType(reply.GetMyVoteType()),
-				Set:   true,
-			},
+			User:       *user,
+			Opinion:    *opinion,
+			MyVoteType: mvt,
 		})
 	}
 
