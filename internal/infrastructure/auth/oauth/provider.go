@@ -87,7 +87,7 @@ func (p *authProvider) VerifyAndIdentify(ctx context.Context, code string) (*str
 	}
 	provider := p.getProvider()
 	// Google の公開鍵を取得
-	keySet, err := jwk.Fetch(context.Background(), provider.JwksURI)
+	keySet, err := jwk.Fetch(ctx, provider.JwksURI)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to fetch JWK: %v", err)
 	}
@@ -152,15 +152,15 @@ func (p *authProvider) VerifyAndIdentify(ctx context.Context, code string) (*str
 		return nil, nil, fmt.Errorf("invalid issuer")
 	}
 
-	var picture, subject *string
-	if v, ok := claims["picture"].(string); ok {
-		picture = &v
+	var email, subject *string
+	if v, ok := claims["email"].(string); ok {
+		email = &v
 	}
 	if v, ok := claims["sub"].(string); ok {
 		subject = &v
 	}
 
-	return subject, picture, nil
+	return subject, email, nil
 }
 
 func (p *authProvider) getProvider() *Provider {

@@ -34,24 +34,6 @@ func (g *GetOpinionRepliesQueryHandler) Execute(ctx context.Context, in opinion_
 		userID = uuid.NullUUID{UUID: in.UserID.UUID(), Valid: true}
 	}
 
-	opinionRow, err := g.GetQueries(ctx).GetOpinionByID(ctx, model.GetOpinionByIDParams{
-		OpinionID: in.OpinionID.UUID(),
-		UserID:    userID,
-	})
-	if err != nil {
-		utils.HandleError(ctx, err, "意見の取得に失敗")
-		return nil, err
-	}
-
-	var opinion dto.SwipeOpinion
-	if err := copier.CopyWithOption(&opinion, &opinionRow, copier.Option{
-		DeepCopy:    true,
-		IgnoreEmpty: true,
-	}); err != nil {
-		utils.HandleError(ctx, err, "マッピングに失敗")
-		return nil, err
-	}
-
 	replyRows, err := g.GetQueries(ctx).GetOpinionReplies(ctx, model.GetOpinionRepliesParams{
 		OpinionID: in.OpinionID.UUID(),
 		UserID:    userID,
@@ -71,7 +53,6 @@ func (g *GetOpinionRepliesQueryHandler) Execute(ctx context.Context, in opinion_
 	}
 
 	return &opinion_query.GetOpinionRepliesQueryOutput{
-		RootOpinion: opinion,
-		Replies:     replies,
+		Replies: replies,
 	}, nil
 }

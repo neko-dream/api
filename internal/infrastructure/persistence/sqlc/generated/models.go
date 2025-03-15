@@ -99,12 +99,14 @@ type TalkSessionReport struct {
 }
 
 type User struct {
-	UserID      uuid.UUID
-	DisplayID   sql.NullString
-	DisplayName sql.NullString
-	IconUrl     sql.NullString
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	UserID        uuid.UUID
+	DisplayID     sql.NullString
+	DisplayName   sql.NullString
+	IconUrl       sql.NullString
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	Email         sql.NullString
+	EmailVerified bool
 }
 
 type UserAuth struct {

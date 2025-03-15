@@ -67,9 +67,9 @@ func (p Provider) ClientSecret() string {
 func (p Provider) Scopes() []string {
 	switch p.Issuer {
 	case auth.LineIssuerURI:
-		return []string{"openid", "profile"}
+		return []string{"openid", "email"}
 	case auth.GoogleIssuerURI:
-		return []string{"openid", "profile"}
+		return []string{"openid", "email"}
 	default:
 		return []string{}
 	}

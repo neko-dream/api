@@ -9,7 +9,6 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/domain/model/vote"
 	"github.com/neko-dream/server/internal/domain/service"
@@ -25,7 +24,6 @@ type (
 	}
 
 	VoteInput struct {
-		TalkSessionID   shared.UUID[talksession.TalkSession]
 		TargetOpinionID shared.UUID[opinion.Opinion]
 		UserID          shared.UUID[user.User]
 		VoteType        string
@@ -33,6 +31,7 @@ type (
 
 	voteHandler struct {
 		opinion.OpinionService
+		opinion.OpinionRepository
 		vote.VoteRepository
 		analysis.AnalysisService
 		service.TalkSessionAccessControl
@@ -42,6 +41,7 @@ type (
 
 func NewVoteHandler(
 	opinionService opinion.OpinionService,
+	opinionRepository opinion.OpinionRepository,
 	voteRepository vote.VoteRepository,
 	analysisService analysis.AnalysisService,
 	talkSessionAccessControl service.TalkSessionAccessControl,
@@ -49,6 +49,7 @@ func NewVoteHandler(
 ) Vote {
 	return &voteHandler{
 		OpinionService:           opinionService,
+		OpinionRepository:        opinionRepository,
 		VoteRepository:           voteRepository,
 		AnalysisService:          analysisService,
 		TalkSessionAccessControl: talkSessionAccessControl,
@@ -60,8 +61,15 @@ func (i *voteHandler) Execute(ctx context.Context, input VoteInput) error {
 	ctx, span := otel.Tracer("vote_command").Start(ctx, "voteHandler.Execute")
 	defer span.End()
 
+	// opinionを探す
+	op, err := i.OpinionRepository.FindByID(ctx, input.TargetOpinionID)
+	if err != nil {
+		utils.HandleError(ctx, err, "OpinionRepository.FindByID")
+		return err
+	}
+
 	// 参加制限を満たしているか確認。満たしていない場合はエラーを返す
-	if _, err := i.TalkSessionAccessControl.CanUserJoin(ctx, input.TalkSessionID, lo.ToPtr(input.UserID)); err != nil {
+	if _, err := i.TalkSessionAccessControl.CanUserJoin(ctx, op.TalkSessionID(), lo.ToPtr(input.UserID)); err != nil {
 		utils.HandleError(ctx, err, "TalkSessionAccessControl.CanUserJoin")
 		return err
 	}
@@ -82,7 +90,7 @@ func (i *voteHandler) Execute(ctx context.Context, input VoteInput) error {
 		vote, err := vote.NewVote(
 			shared.NewUUID[vote.Vote](),
 			input.TargetOpinionID,
-			input.TalkSessionID,
+			op.TalkSessionID(),
 			input.UserID,
 			vote.VoteFromString(lo.ToPtr(input.VoteType)),
 			clock.Now(ctx),
@@ -96,7 +104,7 @@ func (i *voteHandler) Execute(ctx context.Context, input VoteInput) error {
 			return messages.VoteFailed
 		}
 
-		if err := i.AnalysisService.StartAnalysis(ctx, input.TalkSessionID); err != nil {
+		if err := i.AnalysisService.StartAnalysis(ctx, op.TalkSessionID()); err != nil {
 			utils.HandleError(ctx, err, "StartAnalysis")
 			return err
 		}

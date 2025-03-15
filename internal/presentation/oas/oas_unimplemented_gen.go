@@ -234,6 +234,15 @@ func (UnimplementedHandler) OpinionComments(ctx context.Context, params OpinionC
 	return r, ht.ErrNotImplemented
 }
 
+// OpinionComments2 implements opinionComments2 operation.
+//
+// 意見に対するリプライ意見一覧.
+//
+// GET /opinions/{opinionID}/replies
+func (UnimplementedHandler) OpinionComments2(ctx context.Context, params OpinionComments2Params) (r OpinionComments2Res, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // OpinionsHistory implements opinionsHistory operation.
 //
 // 今までに投稿した異見.
@@ -331,5 +340,14 @@ func (UnimplementedHandler) Test(ctx context.Context) (r TestRes, _ error) {
 //
 // POST /talksessions/{talkSessionID}/opinions/{opinionID}/votes
 func (UnimplementedHandler) Vote(ctx context.Context, req OptVoteReq, params VoteParams) (r VoteRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// Vote2 implements vote2 operation.
+//
+// 意思表明API.
+//
+// POST /opinions/{opinionID}/votes
+func (UnimplementedHandler) Vote2(ctx context.Context, req OptVote2Req, params Vote2Params) (r Vote2Res, _ error) {
 	return r, ht.ErrNotImplemented
 }

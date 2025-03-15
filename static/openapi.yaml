@@ -108,6 +108,284 @@ paths:
           headers: {}
       security: []
       x-ogen-operation-group: Opinion
+  /opinions/{opinionID}/replies:
+    get:
+      summary: 意見に対するリプライ意見一覧
+      deprecated: false
+      description: ''
+      operationId: opinionComments2
+      tags:
+        - opinion
+      parameters:
+        - name: opinionID
+          in: path
+          description: 親意見のID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  opinions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        opinion:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              faker: '1'
+                              description: 意見ID
+                            title:
+                              type: string
+                            content:
+                              type: string
+                              description: 意見のテキスト
+                              minLength: 1
+                              maxLength: 140
+                            parentID:
+                              type: string
+                              description: 親の意見ID。ルートならば無し
+                            voteType:
+                              type: string
+                              description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              enum:
+                                - agree
+                                - disagree
+                                - pass
+                              x-apidog:
+                                enumDescriptions:
+                                  agree: ''
+                                  disagree: ''
+                                  pass: ''
+                              default: unvote
+                            pictureURL:
+                              type: string
+                              description: 画像が返る場合もある
+                            referenceURL:
+                              type: string
+                              description: 参考文献URL
+                            postedAt:
+                              type: string
+                          required:
+                            - content
+                            - id
+                            - postedAt
+                        user:
+                          type: object
+                          properties:
+                            displayID:
+                              type: string
+                              pattern: ^[A-Za-z0-9]$
+                              examples:
+                                - userid
+                              minLength: 3
+                              maxLength: 25
+                            displayName:
+                              type: string
+                            iconURL:
+                              type: string
+                              nullable: true
+                          required:
+                            - displayID
+                            - displayName
+                          description: 作成ユーザー
+                        myVoteType:
+                          type: string
+                          description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                          enum:
+                            - agree
+                            - disagree
+                            - pass
+                          x-apidog:
+                            enumDescriptions:
+                              agree: ''
+                              disagree: ''
+                              pass: ''
+                          default: unvote
+                      required:
+                        - opinion
+                        - user
+                required:
+                  - opinions
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security: []
+      x-ogen-operation-group: Opinion
+  /opinions/{opinionID}/votes:
+    post:
+      summary: 意思表明API
+      deprecated: false
+      description: ''
+      operationId: vote2
+      tags:
+        - vote
+      parameters:
+        - name: opinionID
+          in: path
+          description: 意見のID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                voteStatus:
+                  type: string
+                  enum:
+                    - agree
+                    - disagree
+                    - pass
+                  example: ''
+                  nullable: true
+              required:
+                - voteStatus
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      faker: '1'
+                      description: 意見ID
+                    title:
+                      type: string
+                    content:
+                      type: string
+                      description: 意見のテキスト
+                      minLength: 1
+                      maxLength: 140
+                    parentID:
+                      type: string
+                      description: 親の意見ID。ルートならば無し
+                    voteType:
+                      type: string
+                      description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                      enum:
+                        - agree
+                        - disagree
+                        - pass
+                      x-apidog:
+                        enumDescriptions:
+                          agree: ''
+                          disagree: ''
+                          pass: ''
+                      default: unvote
+                    pictureURL:
+                      type: string
+                      description: 画像が返る場合もある
+                    referenceURL:
+                      type: string
+                      description: 参考文献URL
+                    postedAt:
+                      type: string
+                  required:
+                    - content
+                    - id
+                    - postedAt
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security:
+        - SessionId: []
+      x-ogen-operation-group: Vote
   /talksessions/{talkSessionID}/opinions/{opinionID}/votes:
     post:
       summary: 意思表明API
@@ -1520,86 +1798,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  rootOpinion:
-                    type: object
-                    properties:
-                      user:
-                        type: object
-                        properties:
-                          displayID:
-                            type: string
-                            pattern: ^[A-Za-z0-9]$
-                            examples:
-                              - userid
-                            minLength: 3
-                            maxLength: 25
-                          displayName:
-                            type: string
-                          iconURL:
-                            type: string
-                            nullable: true
-                        required:
-                          - displayID
-                          - displayName
-                        description: 作成ユーザー
-                      myVoteType:
-                        type: string
-                        description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                        enum:
-                          - agree
-                          - disagree
-                          - pass
-                        x-apidog:
-                          enumDescriptions:
-                            agree: ''
-                            disagree: ''
-                            pass: ''
-                        default: unvote
-                      opinion:
-                        type: object
-                        properties:
-                          id:
-                            type: string
-                            faker: '1'
-                            description: 意見ID
-                          title:
-                            type: string
-                          content:
-                            type: string
-                            description: 意見のテキスト
-                            minLength: 1
-                            maxLength: 140
-                          parentID:
-                            type: string
-                            description: 親の意見ID。ルートならば無し
-                          voteType:
-                            type: string
-                            description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                            enum:
-                              - agree
-                              - disagree
-                              - pass
-                            x-apidog:
-                              enumDescriptions:
-                                agree: ''
-                                disagree: ''
-                                pass: ''
-                            default: unvote
-                          pictureURL:
-                            type: string
-                            description: 画像が返る場合もある
-                          referenceURL:
-                            type: string
-                            description: 参考文献URL
-                          postedAt:
-                            type: string
-                        required:
-                          - content
-                          - id
-                          - postedAt
-                    required:
-                      - user
-                      - opinion
                   opinions:
                     type: array
                     items:
@@ -1683,7 +1881,6 @@ paths:
                         - opinion
                         - user
                 required:
-                  - rootOpinion
                   - opinions
           headers: {}
         '400':
@@ -3381,6 +3578,8 @@ paths:
                   isVerify:
                     type: boolean
                     description: ユーザ登録済みか
+                  isEmailVerify:
+                    type: boolean
                 required:
                   - aud
                   - exp
@@ -3389,6 +3588,7 @@ paths:
                   - sub
                   - jti
                   - isVerify
+                  - isEmailVerify
           headers: {}
         '400':
           description: ''
@@ -4193,6 +4393,8 @@ components:
         isVerify:
           type: boolean
           description: ユーザ登録済みか
+        isEmailVerify:
+          type: boolean
       required:
         - aud
         - exp
@@ -4201,6 +4403,7 @@ components:
         - sub
         - jti
         - isVerify
+        - isEmailVerify
     offsetPagination:
       type: object
       properties:
