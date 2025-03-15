@@ -1,3 +1,3 @@
 -- userからemailを削除
-ALTER TABLE user DROP COLUMN IF EXISTS email;
-ALTER TABLE user DROP COLUMN IF EXISTS email_verified;
+ALTER TABLE users DROP COLUMN IF EXISTS email;
+ALTER TABLE users DROP COLUMN IF EXISTS email_verified;
