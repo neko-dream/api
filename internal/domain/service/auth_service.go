@@ -78,9 +78,9 @@ func (a *authService) Authenticate(
 		nil,
 	)
 	if email != nil {
-		newUser.SetEmail(*email)
+		newUser.ChangeEmail(*email)
 		// Auth時点でemailが確認済みの場合はVerifyEmailを実行
-		newUser.VerifyEmail()
+		newUser.SetEmailVerified(true)
 	}
 
 	if err := a.userRepository.Create(ctx, newUser); err != nil {
