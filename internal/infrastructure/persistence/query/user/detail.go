@@ -9,6 +9,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/internal/usecase/query/dto"
 	user_query "github.com/neko-dream/server/internal/usecase/query/user"
+	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
@@ -51,7 +52,12 @@ func (d *DetailHandler) Execute(ctx context.Context, input user_query.DetailInpu
 	if userRow.User.Email.Valid {
 		decrypted, err := d.encryptor.DecryptString(ctx, userRow.User.Email.String)
 		if err != nil {
-			return nil, err
+			utils.HandleError(ctx, err, "メアドの復号に失敗しました。")
+			userDetail.UserAuth.Email = nil
+			userDetail.UserAuth.EmailVerified = false
+			return &user_query.DetailOutput{
+				User: userDetail,
+			}, nil
 		}
 		userDetail.UserAuth.Email = lo.ToPtr(decrypted)
 		userDetail.UserAuth.EmailVerified = userRow.User.EmailVerified
