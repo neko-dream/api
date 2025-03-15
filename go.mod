@@ -84,6 +84,7 @@ require (
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
+	github.com/vearutop/statigz v1.4.0 // indirect
 	go.mongodb.org/mongo-driver v1.17.2 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.5.0 // indirect
@@ -124,6 +125,7 @@ require (
 	github.com/samber/lo v1.49.1
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/spf13/viper v1.19.0
+	github.com/swaggest/swgui v1.8.2
 	go.opentelemetry.io/otel v1.34.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.34.0
 	go.opentelemetry.io/otel/metric v1.34.0
