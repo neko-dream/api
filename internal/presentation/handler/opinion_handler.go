@@ -135,32 +135,6 @@ func (o *opinionHandler) OpinionComments2(ctx context.Context, params oas.Opinio
 	if err != nil {
 		return nil, err
 	}
-	rootUser := &oas.OpinionComments2OKRootOpinionUser{
-		DisplayID:   opinions.RootOpinion.User.DisplayID,
-		DisplayName: opinions.RootOpinion.User.DisplayName,
-		IconURL:     utils.ToOptNil[oas.OptNilString](opinions.RootOpinion.User.IconURL),
-	}
-	rootOpinion := &oas.OpinionComments2OKRootOpinionOpinion{
-		ID:      opinions.RootOpinion.Opinion.OpinionID.String(),
-		Title:   utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.Title),
-		Content: opinions.RootOpinion.Opinion.Content,
-		VoteType: oas.OptOpinionComments2OKRootOpinionOpinionVoteType{
-			Value: oas.OpinionComments2OKRootOpinionOpinionVoteType(opinions.RootOpinion.GetParentVoteType()),
-			Set:   true,
-		},
-		ParentID:     utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.ParentOpinionID),
-		PictureURL:   utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.PictureURL),
-		ReferenceURL: utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.ReferenceURL),
-		PostedAt:     opinions.RootOpinion.Opinion.CreatedAt.Format(time.RFC3339),
-	}
-	root := oas.OpinionComments2OKRootOpinion{
-		User:    *rootUser,
-		Opinion: *rootOpinion,
-		MyVoteType: oas.OptOpinionComments2OKRootOpinionMyVoteType{
-			Value: oas.OpinionComments2OKRootOpinionMyVoteType(opinions.RootOpinion.GetMyVoteType()),
-			Set:   true,
-		},
-	}
 
 	var replies []oas.OpinionComments2OKOpinionsItem
 	for _, reply := range opinions.Replies {
@@ -194,8 +168,7 @@ func (o *opinionHandler) OpinionComments2(ctx context.Context, params oas.Opinio
 	}
 
 	return &oas.OpinionComments2OK{
-		RootOpinion: root,
-		Opinions:    replies,
+		Opinions: replies,
 	}, nil
 }
 
@@ -421,32 +394,6 @@ func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.Opinion
 	if err != nil {
 		return nil, err
 	}
-	rootUser := &oas.OpinionCommentsOKRootOpinionUser{
-		DisplayID:   opinions.RootOpinion.User.DisplayID,
-		DisplayName: opinions.RootOpinion.User.DisplayName,
-		IconURL:     utils.ToOptNil[oas.OptNilString](opinions.RootOpinion.User.IconURL),
-	}
-	rootOpinion := &oas.OpinionCommentsOKRootOpinionOpinion{
-		ID:      opinions.RootOpinion.Opinion.OpinionID.String(),
-		Title:   utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.Title),
-		Content: opinions.RootOpinion.Opinion.Content,
-		VoteType: oas.OptOpinionCommentsOKRootOpinionOpinionVoteType{
-			Value: oas.OpinionCommentsOKRootOpinionOpinionVoteType(opinions.RootOpinion.GetParentVoteType()),
-			Set:   true,
-		},
-		ParentID:     utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.ParentOpinionID),
-		PictureURL:   utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.PictureURL),
-		ReferenceURL: utils.ToOpt[oas.OptString](opinions.RootOpinion.Opinion.ReferenceURL),
-		PostedAt:     opinions.RootOpinion.Opinion.CreatedAt.Format(time.RFC3339),
-	}
-	root := oas.OpinionCommentsOKRootOpinion{
-		User:    *rootUser,
-		Opinion: *rootOpinion,
-		MyVoteType: oas.OptOpinionCommentsOKRootOpinionMyVoteType{
-			Value: oas.OpinionCommentsOKRootOpinionMyVoteType(opinions.RootOpinion.GetMyVoteType()),
-			Set:   true,
-		},
-	}
 
 	var replies []oas.OpinionCommentsOKOpinionsItem
 	for _, reply := range opinions.Replies {
@@ -480,8 +427,7 @@ func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.Opinion
 	}
 
 	return &oas.OpinionCommentsOK{
-		RootOpinion: root,
-		Opinions:    replies,
+		Opinions: replies,
 	}, nil
 
 }

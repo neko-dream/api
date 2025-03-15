@@ -131,86 +131,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  rootOpinion:
-                    type: object
-                    properties:
-                      user:
-                        type: object
-                        properties:
-                          displayID:
-                            type: string
-                            pattern: ^[A-Za-z0-9]$
-                            examples:
-                              - userid
-                            minLength: 3
-                            maxLength: 25
-                          displayName:
-                            type: string
-                          iconURL:
-                            type: string
-                            nullable: true
-                        required:
-                          - displayID
-                          - displayName
-                        description: 作成ユーザー
-                      myVoteType:
-                        type: string
-                        description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                        enum:
-                          - agree
-                          - disagree
-                          - pass
-                        x-apidog:
-                          enumDescriptions:
-                            agree: ''
-                            disagree: ''
-                            pass: ''
-                        default: unvote
-                      opinion:
-                        type: object
-                        properties:
-                          id:
-                            type: string
-                            faker: '1'
-                            description: 意見ID
-                          title:
-                            type: string
-                          content:
-                            type: string
-                            description: 意見のテキスト
-                            minLength: 1
-                            maxLength: 140
-                          parentID:
-                            type: string
-                            description: 親の意見ID。ルートならば無し
-                          voteType:
-                            type: string
-                            description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                            enum:
-                              - agree
-                              - disagree
-                              - pass
-                            x-apidog:
-                              enumDescriptions:
-                                agree: ''
-                                disagree: ''
-                                pass: ''
-                            default: unvote
-                          pictureURL:
-                            type: string
-                            description: 画像が返る場合もある
-                          referenceURL:
-                            type: string
-                            description: 参考文献URL
-                          postedAt:
-                            type: string
-                        required:
-                          - content
-                          - id
-                          - postedAt
-                    required:
-                      - user
-                      - opinion
                   opinions:
                     type: array
                     items:
@@ -294,7 +214,6 @@ paths:
                         - opinion
                         - user
                 required:
-                  - rootOpinion
                   - opinions
           headers: {}
         '400':
@@ -1879,86 +1798,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  rootOpinion:
-                    type: object
-                    properties:
-                      user:
-                        type: object
-                        properties:
-                          displayID:
-                            type: string
-                            pattern: ^[A-Za-z0-9]$
-                            examples:
-                              - userid
-                            minLength: 3
-                            maxLength: 25
-                          displayName:
-                            type: string
-                          iconURL:
-                            type: string
-                            nullable: true
-                        required:
-                          - displayID
-                          - displayName
-                        description: 作成ユーザー
-                      myVoteType:
-                        type: string
-                        description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                        enum:
-                          - agree
-                          - disagree
-                          - pass
-                        x-apidog:
-                          enumDescriptions:
-                            agree: ''
-                            disagree: ''
-                            pass: ''
-                        default: unvote
-                      opinion:
-                        type: object
-                        properties:
-                          id:
-                            type: string
-                            faker: '1'
-                            description: 意見ID
-                          title:
-                            type: string
-                          content:
-                            type: string
-                            description: 意見のテキスト
-                            minLength: 1
-                            maxLength: 140
-                          parentID:
-                            type: string
-                            description: 親の意見ID。ルートならば無し
-                          voteType:
-                            type: string
-                            description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                            enum:
-                              - agree
-                              - disagree
-                              - pass
-                            x-apidog:
-                              enumDescriptions:
-                                agree: ''
-                                disagree: ''
-                                pass: ''
-                            default: unvote
-                          pictureURL:
-                            type: string
-                            description: 画像が返る場合もある
-                          referenceURL:
-                            type: string
-                            description: 参考文献URL
-                          postedAt:
-                            type: string
-                        required:
-                          - content
-                          - id
-                          - postedAt
-                    required:
-                      - user
-                      - opinion
                   opinions:
                     type: array
                     items:
@@ -2042,7 +1881,6 @@ paths:
                         - opinion
                         - user
                 required:
-                  - rootOpinion
                   - opinions
           headers: {}
         '400':

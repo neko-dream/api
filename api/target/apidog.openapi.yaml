@@ -131,26 +131,6 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "rootOpinion": {
-                      "type": "object",
-                      "properties": {
-                        "user": {
-                          "$ref": "#/components/schemas/user",
-                          "description": "作成ユーザー"
-                        },
-                        "myVoteType": {
-                          "$ref": "#/components/schemas/voteType",
-                          "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
-                        },
-                        "opinion": {
-                          "$ref": "#/components/schemas/opinion"
-                        }
-                      },
-                      "required": [
-                        "user",
-                        "opinion"
-                      ]
-                    },
                     "opinions": {
                       "type": "array",
                       "items": {
@@ -176,7 +156,6 @@
                     }
                   },
                   "required": [
-                    "rootOpinion",
                     "opinions"
                   ]
                 }
@@ -1698,26 +1677,6 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "rootOpinion": {
-                      "type": "object",
-                      "properties": {
-                        "user": {
-                          "$ref": "#/components/schemas/user",
-                          "description": "作成ユーザー"
-                        },
-                        "myVoteType": {
-                          "$ref": "#/components/schemas/voteType",
-                          "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない"
-                        },
-                        "opinion": {
-                          "$ref": "#/components/schemas/opinion"
-                        }
-                      },
-                      "required": [
-                        "user",
-                        "opinion"
-                      ]
-                    },
                     "opinions": {
                       "type": "array",
                       "items": {
@@ -1743,7 +1702,6 @@
                     }
                   },
                   "required": [
-                    "rootOpinion",
                     "opinions"
                   ]
                 }

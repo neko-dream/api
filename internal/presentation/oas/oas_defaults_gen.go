@@ -59,22 +59,6 @@ func (s *OpinionComments2OKOpinionsItemOpinion) setDefaults() {
 }
 
 // setDefaults set default value of fields.
-func (s *OpinionComments2OKRootOpinion) setDefaults() {
-	{
-		val := OpinionComments2OKRootOpinionMyVoteType("unvote")
-		s.MyVoteType.SetTo(val)
-	}
-}
-
-// setDefaults set default value of fields.
-func (s *OpinionComments2OKRootOpinionOpinion) setDefaults() {
-	{
-		val := OpinionComments2OKRootOpinionOpinionVoteType("unvote")
-		s.VoteType.SetTo(val)
-	}
-}
-
-// setDefaults set default value of fields.
 func (s *OpinionCommentsOKOpinionsItem) setDefaults() {
 	{
 		val := OpinionCommentsOKOpinionsItemMyVoteType("unvote")
@@ -86,22 +70,6 @@ func (s *OpinionCommentsOKOpinionsItem) setDefaults() {
 func (s *OpinionCommentsOKOpinionsItemOpinion) setDefaults() {
 	{
 		val := OpinionCommentsOKOpinionsItemOpinionVoteType("unvote")
-		s.VoteType.SetTo(val)
-	}
-}
-
-// setDefaults set default value of fields.
-func (s *OpinionCommentsOKRootOpinion) setDefaults() {
-	{
-		val := OpinionCommentsOKRootOpinionMyVoteType("unvote")
-		s.MyVoteType.SetTo(val)
-	}
-}
-
-// setDefaults set default value of fields.
-func (s *OpinionCommentsOKRootOpinionOpinion) setDefaults() {
-	{
-		val := OpinionCommentsOKRootOpinionOpinionVoteType("unvote")
 		s.VoteType.SetTo(val)
 	}
 }
