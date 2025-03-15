@@ -124,14 +124,13 @@ func (u *User) SetDemographics(demographics UserDemographic) {
 	u.demographics = lo.ToPtr(demographics)
 }
 
-// SetEmail メールアドレスをセットする
-func (u *User) SetEmail(email string) {
+// ChangeEmail メールアドレスをセットする
+func (u *User) ChangeEmail(email string) {
 	u.email = lo.ToPtr(email)
 }
 
-// VerifyEmail メールアドレスを確認済みにする
-func (u *User) VerifyEmail() {
-	u.emailVerified = true
+func (u *User) SetEmailVerified(v bool) {
+	u.emailVerified = v
 }
 
 func (u *User) IsEmailVerified() bool {
