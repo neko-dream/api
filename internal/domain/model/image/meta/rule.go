@@ -12,6 +12,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/samber/lo"
 
+	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
 
@@ -46,7 +47,8 @@ var (
 		allowedFormats: []string{"jpeg", "png"},
 	}
 	NoValidationRule = ImageValidationRule{
-		maxFileSize: 0,
+		maxFileSize:    4194304,
+		allowedFormats: []string{"jpeg", "png", "gif"},
 	}
 )
 

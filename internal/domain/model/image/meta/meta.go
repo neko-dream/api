@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/google/uuid"
 	"github.com/h2non/filetype/types"
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
@@ -31,6 +32,8 @@ var (
 	ReferenceImageKeyPattern = "ref/%v/%v/%v/%v.%v"
 	// 種類-talkSessionID-時間.jpg
 	AnalysisImageKeyPattern = "gen/%v-%v-%v.%v"
+	// 画像ID.jpg
+	CommonImageKeyPattern = "i/%v.%v"
 )
 
 // ProfileIcon用の画像メタデータを生成
@@ -160,6 +163,49 @@ func NewImageForAnalysis(
 		AnalysisImageKeyPattern,
 		"analysis",
 		now.Format("20060102150405"),
+		ext.Subtype,
+	)
+
+	return &ImageMeta{
+		Key:       key,
+		Size:      size,
+		Extension: ext,
+		Width:     x,
+		Height:    y,
+	}, nil
+}
+
+func NewImageForCommon(
+	ctx context.Context,
+	imageID uuid.UUID,
+	file io.Reader,
+) (*ImageMeta, error) {
+	ctx, span := otel.Tracer("meta").Start(ctx, "NewImageForCommon")
+	defer span.End()
+
+	imageBytes, err := io.ReadAll(file)
+	if err != nil {
+		utils.HandleError(ctx, err, "io.ReadAll")
+		return nil, err
+	}
+
+	size, err := GetImageSize(ctx, bytes.NewReader(imageBytes))
+	if err != nil {
+		return nil, err
+	}
+	ext, err := GetExtension(ctx, bytes.NewReader(imageBytes))
+	if err != nil {
+		return nil, err
+	}
+
+	x, y, err := GetBounds(ctx, bytes.NewReader(imageBytes))
+	if err != nil {
+		return nil, err
+	}
+
+	key := fmt.Sprintf(
+		CommonImageKeyPattern,
+		imageID.String(),
 		ext.Subtype,
 	)
 
