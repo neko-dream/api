@@ -12,5 +12,6 @@ func domainDeps() []ProvideArg {
 		{service.NewStateGenerator, nil},
 		{service.NewProfileIconService, nil},
 		{service.NewTalkSessionAccessControl, nil},
+		{service.NewConsentService, nil},
 	}
 }
