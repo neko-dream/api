@@ -10,6 +10,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/consent"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 type consentService struct {
@@ -29,6 +30,8 @@ func NewConsentService(
 
 // IsConsentValid ユーザーが最新のポリシーに同意済みかどうかを取得する
 func (c *consentService) IsConsentValid(ctx context.Context, userID shared.UUID[user.User]) (bool, error) {
+	ctx, span := otel.Tracer("service").Start(ctx, "consentService.IsConsentValid")
+	defer span.End()
 
 	policy, err := c.policyRepository.FetchLatestPolicy(ctx)
 	if err != nil {
@@ -49,6 +52,8 @@ func (c *consentService) IsConsentValid(ctx context.Context, userID shared.UUID[
 
 // RecordConsent ユーザーの同意を記録する
 func (c *consentService) RecordConsent(ctx context.Context, userID shared.UUID[user.User], version string, ipAddress string, userAgent string) (*consent.ConsentRecord, error) {
+	ctx, span := otel.Tracer("service").Start(ctx, "consentService.RecordConsent")
+	defer span.End()
 
 	// ポリシーが存在するかどうかを確認
 	_, err := c.policyRepository.FindByVersion(ctx, version)
@@ -75,7 +80,7 @@ func (c *consentService) RecordConsent(ctx context.Context, userID shared.UUID[u
 		clock.Now(ctx),
 	)
 
-	if err := c.consentRecordRepository.Save(ctx, record); err != nil {
+	if err := c.consentRecordRepository.Create(ctx, record); err != nil {
 		utils.HandleError(ctx, err, "同意を記録できませんでした。")
 		return nil, err
 	}
