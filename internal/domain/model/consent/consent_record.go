@@ -2,16 +2,16 @@ package consent
 
 import (
 	"context"
-	"os/user"
 	"time"
 
 	"github.com/neko-dream/server/internal/domain/model/shared"
+	"github.com/neko-dream/server/internal/domain/model/user"
+	"go.opentelemetry.io/otel"
 )
 
 type ConsentRecordRepository interface {
-	FindByID(ctx context.Context, id string) (*ConsentRecord, error)
-	FindByUserAndVersion(ctx context.Context, userID string, version string) (*ConsentRecord, error)
-	Save(ctx context.Context, record *ConsentRecord) error
+	FindByUserAndVersion(ctx context.Context, userID shared.UUID[user.User], version string) (*ConsentRecord, error)
+	Create(ctx context.Context, record *ConsentRecord) error
 }
 
 type ConsentService interface {
@@ -20,12 +20,12 @@ type ConsentService interface {
 }
 
 type ConsentRecord struct {
-	Id        shared.UUID[ConsentRecord]
-	UserID    shared.UUID[user.User]
-	Version   string
-	IP        string
-	UA        string
-	CreatedAt time.Time
+	ID          shared.UUID[ConsentRecord]
+	UserID      shared.UUID[user.User]
+	Version     string
+	IP          string
+	UA          string
+	ConsentedAt time.Time
 }
 
 func NewConsentRecord(
@@ -37,12 +37,17 @@ func NewConsentRecord(
 	ua string,
 	createdAt time.Time,
 ) *ConsentRecord {
+	ctx, span := otel.Tracer("consent").Start(ctx, "NewConsentRecord")
+	defer span.End()
+
+	_ = ctx
+
 	return &ConsentRecord{
-		Id:        id,
-		UserID:    userID,
-		Version:   version,
-		IP:        ip,
-		UA:        ua,
-		CreatedAt: createdAt,
+		ID:          id,
+		UserID:      userID,
+		Version:     version,
+		IP:          ip,
+		UA:          ua,
+		ConsentedAt: createdAt,
 	}
 }
