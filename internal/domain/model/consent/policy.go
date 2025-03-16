@@ -3,8 +3,6 @@ package consent
 import (
 	"context"
 	"time"
-
-	"github.com/neko-dream/server/internal/domain/model/shared"
 )
 
 type PolicyRepository interface {
@@ -14,7 +12,6 @@ type PolicyRepository interface {
 }
 
 type Policy struct {
-	ID        shared.UUID[Policy]
 	Version   string
 	CreatedAt time.Time
 }
