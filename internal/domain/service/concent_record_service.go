@@ -4,11 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"os/user"
 
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/consent"
 	"github.com/neko-dream/server/internal/domain/model/shared"
+	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
@@ -38,7 +38,7 @@ func (c *consentService) IsConsentValid(ctx context.Context, userID shared.UUID[
 		return false, err
 	}
 
-	record, err := c.consentRecordRepository.FindByUserAndVersion(ctx, userID.String(), policy.Version)
+	record, err := c.consentRecordRepository.FindByUserAndVersion(ctx, userID, policy.Version)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return false, nil
@@ -63,7 +63,7 @@ func (c *consentService) RecordConsent(ctx context.Context, userID shared.UUID[u
 	}
 
 	// ユーザーが同意済みかどうかを確認
-	_, err = c.consentRecordRepository.FindByUserAndVersion(ctx, userID.String(), version)
+	_, err = c.consentRecordRepository.FindByUserAndVersion(ctx, userID, version)
 	// ユーザーがすでに同意しているのなら、エラーを返す
 	if !errors.Is(err, sql.ErrNoRows) {
 		return nil, err
