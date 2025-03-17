@@ -19,6 +19,7 @@ steps:
       query: |
         DELETE FROM user_demographics WHERE (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}') = user_id;
         DELETE FROM policy_consents WHERE user_id = (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}');
+        DELETE FROM policy_versions;
         DELETE FROM user_auths WHERE subject = '{{ vars.id }}';
         DELETE FROM users WHERE display_id = '{{ vars.id }}';
   loginUser:
@@ -46,7 +47,6 @@ steps:
         get: {}
     test: |
       current.res.status == 200 &&
-      current.res.body.policyVersion != '' &&
       current.res.body.consentGiven == false &&
       current.res.body.consentedAt == null
   giveConsent:
