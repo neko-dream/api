@@ -3590,16 +3590,65 @@ func (s *Server) handlePolicyConsentRequest(args [0]string, argsEscaped bool, w 
 			ID:   "policyConsent",
 		}
 	)
-	params, err := decodePolicyConsentParams(args, argsEscaped, r)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securitySessionId(ctx, "PolicyConsent", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "SessionId",
+					Err:              err,
+				}
+				defer recordError("Security:SessionId", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			defer recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
+	request, close, err := s.decodePolicyConsentRequest(r)
 	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
+		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
 			Err:              err,
 		}
-		defer recordError("DecodeParams", err)
+		defer recordError("DecodeRequest", err)
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
+	defer func() {
+		if err := close(); err != nil {
+			recordError("CloseRequest", err)
+		}
+	}()
 
 	var response PolicyConsentRes
 	if m := s.cfg.Middleware; m != nil {
@@ -3608,27 +3657,14 @@ func (s *Server) handlePolicyConsentRequest(args [0]string, argsEscaped bool, w 
 			OperationName:    "PolicyConsent",
 			OperationSummary: "最新のポリシーに同意する",
 			OperationID:      "policyConsent",
-			Body:             nil,
-			Params: middleware.Parameters{
-				{
-					Name: "policyVersion",
-					In:   "query",
-				}: params.PolicyVersion,
-				{
-					Name: "X-Fowarderd-For",
-					In:   "header",
-				}: params.XFowarderdFor,
-				{
-					Name: "User-Agent",
-					In:   "header",
-				}: params.UserAgent,
-			},
-			Raw: r,
+			Body:             request,
+			Params:           middleware.Parameters{},
+			Raw:              r,
 		}
 
 		type (
-			Request  = struct{}
-			Params   = PolicyConsentParams
+			Request  = OptPolicyConsentReq
+			Params   = struct{}
 			Response = PolicyConsentRes
 		)
 		response, err = middleware.HookMiddleware[
@@ -3638,14 +3674,14 @@ func (s *Server) handlePolicyConsentRequest(args [0]string, argsEscaped bool, w 
 		](
 			m,
 			mreq,
-			unpackPolicyConsentParams,
+			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.PolicyConsent(ctx, params)
+				response, err = s.h.PolicyConsent(ctx, request)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.PolicyConsent(ctx, params)
+		response, err = s.h.PolicyConsent(ctx, request)
 	}
 	if err != nil {
 		defer recordError("Internal", err)

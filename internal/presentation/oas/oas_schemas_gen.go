@@ -5871,6 +5871,52 @@ func (o OptNilString) Or(d string) string {
 	return d
 }
 
+// NewOptPolicyConsentReq returns new OptPolicyConsentReq with value set to v.
+func NewOptPolicyConsentReq(v PolicyConsentReq) OptPolicyConsentReq {
+	return OptPolicyConsentReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptPolicyConsentReq is optional PolicyConsentReq.
+type OptPolicyConsentReq struct {
+	Value PolicyConsentReq
+	Set   bool
+}
+
+// IsSet returns true if OptPolicyConsentReq was set.
+func (o OptPolicyConsentReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptPolicyConsentReq) Reset() {
+	var v PolicyConsentReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptPolicyConsentReq) SetTo(v PolicyConsentReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptPolicyConsentReq) Get() (v PolicyConsentReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptPolicyConsentReq) Or(d PolicyConsentReq) PolicyConsentReq {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptPostConclusionReq returns new OptPostConclusionReq with value set to v.
 func NewOptPostConclusionReq(v PostConclusionReq) OptPostConclusionReq {
 	return OptPostConclusionReq{
@@ -6471,6 +6517,21 @@ func (s *PolicyConsentOK) SetConsentGiven(val bool) {
 }
 
 func (*PolicyConsentOK) policyConsentRes() {}
+
+type PolicyConsentReq struct {
+	// ポリシーバージョン.
+	PolicyVersion string `json:"policyVersion"`
+}
+
+// GetPolicyVersion returns the value of PolicyVersion.
+func (s *PolicyConsentReq) GetPolicyVersion() string {
+	return s.PolicyVersion
+}
+
+// SetPolicyVersion sets the value of PolicyVersion.
+func (s *PolicyConsentReq) SetPolicyVersion(val string) {
+	s.PolicyVersion = val
+}
 
 type PostConclusionBadRequest struct{}
 

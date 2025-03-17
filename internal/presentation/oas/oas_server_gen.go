@@ -154,7 +154,7 @@ type PolicyHandler interface {
 	// 最新のポリシーに同意する.
 	//
 	// POST /policy/consent
-	PolicyConsent(ctx context.Context, params PolicyConsentParams) (PolicyConsentRes, error)
+	PolicyConsent(ctx context.Context, req OptPolicyConsentReq) (PolicyConsentRes, error)
 }
 
 // TalkSessionHandler handles operations described by OpenAPI v3 specification.

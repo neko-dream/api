@@ -4570,37 +4570,26 @@
         "tags": [
           "policy"
         ],
-        "parameters": [
-          {
-            "name": "policyVersion",
-            "in": "query",
-            "description": "",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Fowarderd-For",
-            "in": "header",
-            "description": "",
-            "required": false,
-            "example": "",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "User-Agent",
-            "in": "header",
-            "description": "",
-            "required": false,
-            "example": "",
-            "schema": {
-              "type": "string"
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "policyVersion": {
+                    "description": "ポリシーバージョン",
+                    "example": "",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "policyVersion"
+                ]
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "",
@@ -4656,7 +4645,11 @@
             "headers": {}
           }
         },
-        "security": [],
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
         "x-ogen-operation-group": "Policy"
       }
     }

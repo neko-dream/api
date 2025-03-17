@@ -266,7 +266,7 @@ func (UnimplementedHandler) OpinionsHistory(ctx context.Context, params Opinions
 // 最新のポリシーに同意する.
 //
 // POST /policy/consent
-func (UnimplementedHandler) PolicyConsent(ctx context.Context, params PolicyConsentParams) (r PolicyConsentRes, _ error) {
+func (UnimplementedHandler) PolicyConsent(ctx context.Context, req OptPolicyConsentReq) (r PolicyConsentRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
