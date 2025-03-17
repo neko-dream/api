@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 
+	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/consent"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -59,14 +60,14 @@ func (c *consentService) RecordConsent(ctx context.Context, userID shared.UUID[u
 	_, err := c.policyRepository.FindByVersion(ctx, version)
 	if err != nil {
 		utils.HandleError(ctx, err, "バージョンを取得できませんでした。")
-		return nil, err
+		return nil, messages.PolicyNotFound
 	}
 
 	// ユーザーが同意済みかどうかを確認
-	_, err = c.consentRecordRepository.FindByUserAndVersion(ctx, userID, version)
+	rec, err := c.consentRecordRepository.FindByUserAndVersion(ctx, userID, version)
 	// ユーザーがすでに同意しているのなら、エラーを返す
-	if !errors.Is(err, sql.ErrNoRows) {
-		return nil, err
+	if !errors.Is(err, sql.ErrNoRows) || rec != nil {
+		return nil, messages.PolicyAlreadyConsented
 	}
 
 	// 同意を記録
