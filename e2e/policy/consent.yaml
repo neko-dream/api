@@ -1,0 +1,96 @@
+desc: ポリシー同意のテスト
+runners:
+  req:
+    endpoint: http://localhost:3000
+    useCookie: true
+    notFollowRedirect: true
+  dev: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
+
+vars:
+  id: policy_test_user
+  name: policy_test_user
+  prefecture: 東京都
+  city: 渋谷区
+
+steps:
+  deleteUser:
+    desc: ユーザー削除
+    dev:
+      query: |
+        DELETE FROM user_demographics WHERE (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}') = user_id;
+        DELETE FROM policy_consents WHERE user_id = (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}');
+        DELETE FROM user_auths WHERE subject = '{{ vars.id }}';
+        DELETE FROM users WHERE display_id = '{{ vars.id }}';
+  loginUser:
+    desc: ログイン
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.id }}:
+        get:
+          headers: null
+    test: len(current.res.headers['Set-Cookie']) > 0
+  createUser:
+    desc: ユーザー作成
+    req:
+      /user:
+        post:
+          body:
+            multipart/form-data:
+              displayName: "{{ vars.name }}"
+              displayID: "{{ vars.id }}"
+              prefecture: "{{ vars.prefecture }}"
+              city: "{{ vars.city }}"
+  checkConsentInitial:
+    desc: 初期状態での同意確認
+    req:
+      /policy/consent:
+        get: {}
+    test: |
+      current.res.status == 200 &&
+      current.res.body.policyVersion != '' &&
+      current.res.body.consentGiven == false &&
+      current.res.body.consentedAt == null
+  giveConsent:
+    desc: ポリシーへの同意
+    req:
+      /policy/consent:
+        post:
+          body:
+            multipart/form-data:
+              policyVersion: "{{ steps.checkConsentInitial.res.body.policyVersion }}"
+    test: |
+      current.res.status == 200 &&
+      current.res.body.policyVersion == steps.checkConsentInitial.res.body.policyVersion &&
+      current.res.body.consentGiven == true &&
+      current.res.body.consentedAt != null
+  checkConsentAfter:
+    desc: 同意後の状態確認
+    req:
+      /policy/consent:
+        get: {}
+    test: |
+      current.res.status == 200 &&
+      current.res.body.policyVersion == steps.checkConsentInitial.res.body.policyVersion &&
+      current.res.body.consentGiven == true &&
+      current.res.body.consentedAt != null
+  giveConsentDuplicate:
+    desc: 重複した同意のテスト
+    req:
+      /policy/consent:
+        post:
+          body:
+            multipart/form-data:
+              policyVersion: "{{ steps.checkConsentInitial.res.body.policyVersion }}"
+    test: |
+      current.res.status == 400 &&
+      current.res.body.code == 'POLICY-001'
+  giveConsentInvalidVersion:
+    desc: 無効なバージョンでの同意テスト
+    req:
+      /policy/consent:
+        post:
+          body:
+            multipart/form-data:
+              policyVersion: "invalid-version"
+    test: |
+      current.res.status == 404 &&
+      current.res.body.code == 'POLICY-002'

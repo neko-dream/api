@@ -37,6 +37,7 @@ jobs:
       ENCRYPTION_SECRET: UkadNiT1rGQa3dgBgCgF4rMo7sPhZTzE
       ENV: local
       PORT: 3000
+      POLICY_VERSION: 1.0.0
 
     steps:
       - uses: actions/checkout@v4
