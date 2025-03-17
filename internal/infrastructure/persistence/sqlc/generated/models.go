@@ -41,13 +41,11 @@ type PolicyConsent struct {
 	ConsentedAt     time.Time
 	IpAddress       string
 	UserAgent       string
-	Index           interface{}
 }
 
 type PolicyVersion struct {
 	Version   string
 	CreatedAt time.Time
-	Index     interface{}
 }
 
 type RepresentativeOpinion struct {

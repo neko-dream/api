@@ -13,7 +13,7 @@ import (
 
 const findConsentByUserAndVersion = `-- name: FindConsentByUserAndVersion :one
 SELECT
-    policy_consents.policy_consent_id, policy_consents.user_id, policy_consents.policy_version, policy_consents.consented_at, policy_consents.ip_address, policy_consents.user_agent, policy_consents.index
+    policy_consents.policy_consent_id, policy_consents.user_id, policy_consents.policy_version, policy_consents.consented_at, policy_consents.ip_address, policy_consents.user_agent
 FROM
     policy_consents
 WHERE
@@ -33,7 +33,7 @@ type FindConsentByUserAndVersionRow struct {
 // FindConsentByUserAndVersion
 //
 //	SELECT
-//	    policy_consents.policy_consent_id, policy_consents.user_id, policy_consents.policy_version, policy_consents.consented_at, policy_consents.ip_address, policy_consents.user_agent, policy_consents.index
+//	    policy_consents.policy_consent_id, policy_consents.user_id, policy_consents.policy_version, policy_consents.consented_at, policy_consents.ip_address, policy_consents.user_agent
 //	FROM
 //	    policy_consents
 //	WHERE
@@ -49,7 +49,6 @@ func (q *Queries) FindConsentByUserAndVersion(ctx context.Context, arg FindConse
 		&i.PolicyConsent.ConsentedAt,
 		&i.PolicyConsent.IpAddress,
 		&i.PolicyConsent.UserAgent,
-		&i.PolicyConsent.Index,
 	)
 	return i, err
 }

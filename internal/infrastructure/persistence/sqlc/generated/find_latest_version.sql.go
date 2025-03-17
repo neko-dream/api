@@ -11,7 +11,7 @@ import (
 
 const getLatestPolicyVersion = `-- name: GetLatestPolicyVersion :one
 SELECT
-    policy_versions.version, policy_versions.created_at, policy_versions.index
+    policy_versions.version, policy_versions.created_at
 FROM
     policy_versions
 ORDER BY created_at DESC
@@ -25,7 +25,7 @@ type GetLatestPolicyVersionRow struct {
 // GetLatestPolicyVersion
 //
 //	SELECT
-//	    policy_versions.version, policy_versions.created_at, policy_versions.index
+//	    policy_versions.version, policy_versions.created_at
 //	FROM
 //	    policy_versions
 //	ORDER BY created_at DESC
@@ -33,6 +33,6 @@ type GetLatestPolicyVersionRow struct {
 func (q *Queries) GetLatestPolicyVersion(ctx context.Context) (GetLatestPolicyVersionRow, error) {
 	row := q.db.QueryRowContext(ctx, getLatestPolicyVersion)
 	var i GetLatestPolicyVersionRow
-	err := row.Scan(&i.PolicyVersion.Version, &i.PolicyVersion.CreatedAt, &i.PolicyVersion.Index)
+	err := row.Scan(&i.PolicyVersion.Version, &i.PolicyVersion.CreatedAt)
 	return i, err
 }

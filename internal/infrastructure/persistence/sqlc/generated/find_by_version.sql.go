@@ -11,7 +11,7 @@ import (
 
 const findPolicyByVersion = `-- name: FindPolicyByVersion :one
 SELECT
-    policy_versions.version, policy_versions.created_at, policy_versions.index
+    policy_versions.version, policy_versions.created_at
 FROM
     policy_versions
 WHERE
@@ -26,7 +26,7 @@ type FindPolicyByVersionRow struct {
 // FindPolicyByVersion
 //
 //	SELECT
-//	    policy_versions.version, policy_versions.created_at, policy_versions.index
+//	    policy_versions.version, policy_versions.created_at
 //	FROM
 //	    policy_versions
 //	WHERE
@@ -35,6 +35,6 @@ type FindPolicyByVersionRow struct {
 func (q *Queries) FindPolicyByVersion(ctx context.Context, version string) (FindPolicyByVersionRow, error) {
 	row := q.db.QueryRowContext(ctx, findPolicyByVersion, version)
 	var i FindPolicyByVersionRow
-	err := row.Scan(&i.PolicyVersion.Version, &i.PolicyVersion.CreatedAt, &i.PolicyVersion.Index)
+	err := row.Scan(&i.PolicyVersion.Version, &i.PolicyVersion.CreatedAt)
 	return i, err
 }
