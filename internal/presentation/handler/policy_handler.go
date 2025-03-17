@@ -11,7 +11,9 @@ import (
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/internal/usecase/command/policy_command"
 	"github.com/neko-dream/server/internal/usecase/query/policy_query"
+	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/utils"
+	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
@@ -51,50 +53,59 @@ func (h *policyHandler) GetPolicyConsentStatus(ctx context.Context) (oas.GetPoli
 	if err != nil {
 		return nil, err
 	}
+	var consentedAt *string
+	if output.ConsentedAt != nil {
+		consentedAt = lo.ToPtr(output.ConsentedAt.Format(time.RFC3339))
+	}
 
-	return &oas.GetPolicyConsentStatusOK{
+	res := &oas.GetPolicyConsentStatusOK{
 		PolicyVersion: output.PolicyVersion,
 		ConsentGiven:  output.ConsentGiven,
-		ConsentedAt:   utils.ToOptNil[oas.OptNilString](output.ConsentedAt.Format(time.RFC3339)),
-	}, nil
+		ConsentedAt:   utils.ToOptNil[oas.OptNilString](consentedAt),
+	}
+
+	return res, nil
 }
 
-func (h *policyHandler) PolicyConsent(ctx context.Context, params oas.PolicyConsentParams) (oas.PolicyConsentRes, error) {
+func (h *policyHandler) PolicyConsent(ctx context.Context, req oas.OptPolicyConsentReq) (oas.PolicyConsentRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "PolicyHandler.AcceptPolicy")
 	defer span.End()
-
 	claim := session.GetSession(ctx)
 	if claim == nil {
 		return nil, messages.ForbiddenError
 	}
-
 	userID, err := claim.UserID()
 	if err != nil {
 		utils.HandleError(ctx, err, "claim.UserID")
 		return nil, messages.ForbiddenError
 	}
 
-	var ip, ua string
-	if v, ok := params.XFowarderdFor.Get(); ok {
-		ip = v
+	if !req.IsSet() {
+		return nil, messages.BadRequestError
 	}
-	if v, ok := params.UserAgent.Get(); ok {
-		ua = v
-	}
+
+	request := http_utils.GetHTTPRequest(ctx)
+	ipAddress := request.Header.Get("X-Forwarded-For")
+	userAgent := request.Header.Get("User-Agent")
 
 	output, err := h.acceptPolicy.Execute(ctx, policy_command.AcceptPolicyInput{
 		UserID:    shared.UUID[user.User](userID),
-		Version:   params.PolicyVersion,
-		IPAddress: ip,
-		UserAgent: ua,
+		Version:   req.Value.PolicyVersion,
+		IPAddress: ipAddress,
+		UserAgent: userAgent,
 	})
 	if err != nil {
 		return nil, err
 	}
 
+	var consentedAt *string
+	if output.ConsentedAt != nil {
+		consentedAt = lo.ToPtr(output.ConsentedAt.Format(time.RFC3339))
+	}
+
 	return &oas.PolicyConsentOK{
-		PolicyVersion: params.PolicyVersion,
-		ConsentedAt:   utils.ToOptNil[oas.OptNilString](output.ConsentedAt.Format(time.RFC3339)),
+		PolicyVersion: req.Value.PolicyVersion,
+		ConsentedAt:   utils.ToOptNil[oas.OptNilString](consentedAt),
 		ConsentGiven:  output.Success,
 	}, nil
 }
