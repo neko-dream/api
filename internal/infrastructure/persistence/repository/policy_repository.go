@@ -31,6 +31,7 @@ func NewPolicyRepository(
 func (p *policyRepository) FetchLatestPolicy(ctx context.Context) (*consent.Policy, error) {
 	ctx, span := otel.Tracer("repository").Start(ctx, "policyRepository.FetchLatestPolicy")
 	defer span.End()
+	_ = ctx
 
 	return &consent.Policy{
 		Version:   p.Config.POLICY_VERSION,
