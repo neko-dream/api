@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 
 	"github.com/neko-dream/server/internal/domain/model/consent"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -34,6 +36,9 @@ func (c *consentRecordRepository) FindByUserAndVersion(ctx context.Context, user
 		PolicyVersion: version,
 	})
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, err
+		}
 		utils.HandleError(ctx, err, "同意情報を取得できませんでした。")
 		return nil, err
 	}
