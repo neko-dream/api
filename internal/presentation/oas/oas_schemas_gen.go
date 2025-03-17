@@ -2207,6 +2207,55 @@ func (s *GetOpinionsForTalkSessionSort) UnmarshalText(data []byte) error {
 	}
 }
 
+type GetPolicyConsentStatusBadRequest struct{}
+
+func (*GetPolicyConsentStatusBadRequest) getPolicyConsentStatusRes() {}
+
+type GetPolicyConsentStatusInternalServerError struct{}
+
+func (*GetPolicyConsentStatusInternalServerError) getPolicyConsentStatusRes() {}
+
+type GetPolicyConsentStatusOK struct {
+	// 最新ポリシーのバージョン.
+	PolicyVersion string `json:"policyVersion"`
+	// 同意した日時.
+	ConsentedAt OptNilString `json:"consentedAt"`
+	// 同意したか.
+	ConsentGiven bool `json:"consentGiven"`
+}
+
+// GetPolicyVersion returns the value of PolicyVersion.
+func (s *GetPolicyConsentStatusOK) GetPolicyVersion() string {
+	return s.PolicyVersion
+}
+
+// GetConsentedAt returns the value of ConsentedAt.
+func (s *GetPolicyConsentStatusOK) GetConsentedAt() OptNilString {
+	return s.ConsentedAt
+}
+
+// GetConsentGiven returns the value of ConsentGiven.
+func (s *GetPolicyConsentStatusOK) GetConsentGiven() bool {
+	return s.ConsentGiven
+}
+
+// SetPolicyVersion sets the value of PolicyVersion.
+func (s *GetPolicyConsentStatusOK) SetPolicyVersion(val string) {
+	s.PolicyVersion = val
+}
+
+// SetConsentedAt sets the value of ConsentedAt.
+func (s *GetPolicyConsentStatusOK) SetConsentedAt(val OptNilString) {
+	s.ConsentedAt = val
+}
+
+// SetConsentGiven sets the value of ConsentGiven.
+func (s *GetPolicyConsentStatusOK) SetConsentGiven(val bool) {
+	s.ConsentGiven = val
+}
+
+func (*GetPolicyConsentStatusOK) getPolicyConsentStatusRes() {}
+
 type GetTalkSessionDetailBadRequest struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
@@ -6373,6 +6422,55 @@ func (o OptVoteReq) Or(d VoteReq) VoteReq {
 	}
 	return d
 }
+
+type PolicyConsentBadRequest struct{}
+
+func (*PolicyConsentBadRequest) policyConsentRes() {}
+
+type PolicyConsentInternalServerError struct{}
+
+func (*PolicyConsentInternalServerError) policyConsentRes() {}
+
+type PolicyConsentOK struct {
+	// 最新ポリシーのバージョン.
+	PolicyVersion string `json:"policyVersion"`
+	// 同意した日時.
+	ConsentedAt OptNilString `json:"consentedAt"`
+	// 同意したか.
+	ConsentGiven bool `json:"consentGiven"`
+}
+
+// GetPolicyVersion returns the value of PolicyVersion.
+func (s *PolicyConsentOK) GetPolicyVersion() string {
+	return s.PolicyVersion
+}
+
+// GetConsentedAt returns the value of ConsentedAt.
+func (s *PolicyConsentOK) GetConsentedAt() OptNilString {
+	return s.ConsentedAt
+}
+
+// GetConsentGiven returns the value of ConsentGiven.
+func (s *PolicyConsentOK) GetConsentGiven() bool {
+	return s.ConsentGiven
+}
+
+// SetPolicyVersion sets the value of PolicyVersion.
+func (s *PolicyConsentOK) SetPolicyVersion(val string) {
+	s.PolicyVersion = val
+}
+
+// SetConsentedAt sets the value of ConsentedAt.
+func (s *PolicyConsentOK) SetConsentedAt(val OptNilString) {
+	s.ConsentedAt = val
+}
+
+// SetConsentGiven sets the value of ConsentGiven.
+func (s *PolicyConsentOK) SetConsentGiven(val bool) {
+	s.ConsentGiven = val
+}
+
+func (*PolicyConsentOK) policyConsentRes() {}
 
 type PostConclusionBadRequest struct{}
 

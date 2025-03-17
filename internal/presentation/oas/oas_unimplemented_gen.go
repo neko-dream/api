@@ -128,6 +128,15 @@ func (UnimplementedHandler) GetOpinionsForTalkSession(ctx context.Context, param
 	return r, ht.ErrNotImplemented
 }
 
+// GetPolicyConsentStatus implements getPolicyConsentStatus operation.
+//
+// 最新のポリシーに同意したかを取得.
+//
+// GET /policy/consent
+func (UnimplementedHandler) GetPolicyConsentStatus(ctx context.Context) (r GetPolicyConsentStatusRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetTalkSessionDetail implements getTalkSessionDetail operation.
 //
 // トークセッションの詳細.
@@ -249,6 +258,15 @@ func (UnimplementedHandler) OpinionComments2(ctx context.Context, params Opinion
 //
 // GET /opinions/histories
 func (UnimplementedHandler) OpinionsHistory(ctx context.Context, params OpinionsHistoryParams) (r OpinionsHistoryRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// PolicyConsent implements policyConsent operation.
+//
+// 最新のポリシーに同意する.
+//
+// POST /policy/consent
+func (UnimplementedHandler) PolicyConsent(ctx context.Context, params PolicyConsentParams) (r PolicyConsentRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

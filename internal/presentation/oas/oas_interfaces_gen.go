@@ -49,6 +49,10 @@ type GetOpinionsForTalkSessionRes interface {
 	getOpinionsForTalkSessionRes()
 }
 
+type GetPolicyConsentStatusRes interface {
+	getPolicyConsentStatusRes()
+}
+
 type GetTalkSessionDetailRes interface {
 	getTalkSessionDetailRes()
 }
@@ -95,6 +99,10 @@ type OpinionCommentsRes interface {
 
 type OpinionsHistoryRes interface {
 	opinionsHistoryRes()
+}
+
+type PolicyConsentRes interface {
+	policyConsentRes()
 }
 
 type PostConclusionRes interface {

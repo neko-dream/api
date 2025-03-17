@@ -12,6 +12,7 @@ type Handler interface {
 	ImageHandler
 	ManageHandler
 	OpinionHandler
+	PolicyHandler
 	TalkSessionHandler
 	TestHandler
 	TimelineHandler
@@ -136,6 +137,24 @@ type OpinionHandler interface {
 	//
 	// GET /talksessions/{talkSessionID}/swipe_opinions
 	SwipeOpinions(ctx context.Context, params SwipeOpinionsParams) (SwipeOpinionsRes, error)
+}
+
+// PolicyHandler handles operations described by OpenAPI v3 specification.
+//
+// x-ogen-operation-group: Policy
+type PolicyHandler interface {
+	// GetPolicyConsentStatus implements getPolicyConsentStatus operation.
+	//
+	// 最新のポリシーに同意したかを取得.
+	//
+	// GET /policy/consent
+	GetPolicyConsentStatus(ctx context.Context) (GetPolicyConsentStatusRes, error)
+	// PolicyConsent implements policyConsent operation.
+	//
+	// 最新のポリシーに同意する.
+	//
+	// POST /policy/consent
+	PolicyConsent(ctx context.Context, params PolicyConsentParams) (PolicyConsentRes, error)
 }
 
 // TalkSessionHandler handles operations described by OpenAPI v3 specification.
