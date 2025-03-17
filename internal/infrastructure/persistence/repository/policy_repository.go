@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/neko-dream/server/internal/domain/model/consent"
@@ -31,7 +33,18 @@ func NewPolicyRepository(
 func (p *policyRepository) FetchLatestPolicy(ctx context.Context) (*consent.Policy, error) {
 	ctx, span := otel.Tracer("repository").Start(ctx, "policyRepository.FetchLatestPolicy")
 	defer span.End()
-	_ = ctx
+
+	_, err := p.DBManager.GetQueries(ctx).FindPolicyByVersion(ctx, p.Config.POLICY_VERSION)
+	if errors.Is(err, sql.ErrNoRows) {
+		// なかったら作る
+		if err := p.Save(ctx, &consent.Policy{
+			Version:   p.Config.POLICY_VERSION,
+			CreatedAt: time.Now(),
+		}); err != nil {
+			utils.HandleError(ctx, err, "ポリシーを作成できませんでした。")
+			return nil, err
+		}
+	}
 
 	return &consent.Policy{
 		Version:   p.Config.POLICY_VERSION,
