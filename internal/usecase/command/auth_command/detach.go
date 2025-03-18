@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"go.opentelemetry.io/otel"
@@ -23,15 +24,18 @@ type DetachAccountInput struct {
 type detachAccountInteractor struct {
 	userService user.UserService
 	dbm         *db.DBManager
+	conf        *config.Config
 }
 
 func NewDetachAccount(
 	userService user.UserService,
 	dbm *db.DBManager,
+	conf *config.Config,
 ) DetachAccount {
 	return &detachAccountInteractor{
 		userService: userService,
 		dbm:         dbm,
+		conf:        conf,
 	}
 }
 
@@ -39,6 +43,11 @@ func NewDetachAccount(
 func (d *detachAccountInteractor) Execute(ctx context.Context, input DetachAccountInput) error {
 	ctx, span := otel.Tracer("auth_command").Start(ctx, "detachAccountInteractor.Execute")
 	defer span.End()
+
+	// 本番環境では何もしない
+	if d.conf.Env == config.PROD {
+		return nil
+	}
 
 	d.dbm.GetQueries(ctx).ChangeSubject(ctx, model.ChangeSubjectParams{
 		UserID:  input.UserID.UUID(),
