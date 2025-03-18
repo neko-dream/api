@@ -13,6 +13,23 @@ import (
 	"github.com/google/uuid"
 )
 
+const changeSubject = `-- name: ChangeSubject :exec
+UPDATE "user_auths" SET subject = $2 WHERE user_id = $1
+`
+
+type ChangeSubjectParams struct {
+	UserID  uuid.UUID
+	Subject string
+}
+
+// ChangeSubject
+//
+//	UPDATE "user_auths" SET subject = $2 WHERE user_id = $1
+func (q *Queries) ChangeSubject(ctx context.Context, arg ChangeSubjectParams) error {
+	_, err := q.db.ExecContext(ctx, changeSubject, arg.UserID, arg.Subject)
+	return err
+}
+
 const createUser = `-- name: CreateUser :exec
 INSERT INTO users (user_id, created_at, email, email_verified) VALUES ($1, $2, $3, $4)
 `

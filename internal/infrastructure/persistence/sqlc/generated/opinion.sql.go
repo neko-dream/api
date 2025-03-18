@@ -358,6 +358,7 @@ LEFT JOIN (
     FROM votes
     WHERE user_id = $4::uuid
 ) cv ON opinions.opinion_id = cv.opinion_id
+WHERE opinions.parent_opinion_id IS NULL
 ORDER BY
     CASE $5::text
         WHEN 'latest' THEN EXTRACT(EPOCH FROM opinions.created_at)
@@ -414,6 +415,7 @@ type GetOpinionsByTalkSessionIDRow struct {
 //	    FROM votes
 //	    WHERE user_id = $4::uuid
 //	) cv ON opinions.opinion_id = cv.opinion_id
+//	WHERE opinions.parent_opinion_id IS NULL
 //	ORDER BY
 //	    CASE $5::text
 //	        WHEN 'latest' THEN EXTRACT(EPOCH FROM opinions.created_at)

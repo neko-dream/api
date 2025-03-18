@@ -171,6 +171,7 @@ LEFT JOIN (
     FROM votes
     WHERE user_id = sqlc.narg('user_id')::uuid
 ) cv ON opinions.opinion_id = cv.opinion_id
+WHERE opinions.parent_opinion_id IS NULL
 ORDER BY
     CASE sqlc.narg('sort_key')::text
         WHEN 'latest' THEN EXTRACT(EPOCH FROM opinions.created_at)

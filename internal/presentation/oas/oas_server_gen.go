@@ -12,6 +12,7 @@ type Handler interface {
 	ImageHandler
 	ManageHandler
 	OpinionHandler
+	PolicyHandler
 	TalkSessionHandler
 	TestHandler
 	TimelineHandler
@@ -23,6 +24,12 @@ type Handler interface {
 //
 // x-ogen-operation-group: Auth
 type AuthHandler interface {
+	// AuthAccountDetach implements authAccountDetach operation.
+	//
+	// そのアカウントには再度ログインできなくなります。ログインしたければ言ってね！.
+	//
+	// DELETE /auth/dev/detach
+	AuthAccountDetach(ctx context.Context) (AuthAccountDetachRes, error)
 	// Authorize implements authorize operation.
 	//
 	// ログイン.
@@ -136,6 +143,24 @@ type OpinionHandler interface {
 	//
 	// GET /talksessions/{talkSessionID}/swipe_opinions
 	SwipeOpinions(ctx context.Context, params SwipeOpinionsParams) (SwipeOpinionsRes, error)
+}
+
+// PolicyHandler handles operations described by OpenAPI v3 specification.
+//
+// x-ogen-operation-group: Policy
+type PolicyHandler interface {
+	// GetPolicyConsentStatus implements getPolicyConsentStatus operation.
+	//
+	// 最新のポリシーに同意したかを取得.
+	//
+	// GET /policy/consent
+	GetPolicyConsentStatus(ctx context.Context) (GetPolicyConsentStatusRes, error)
+	// PolicyConsent implements policyConsent operation.
+	//
+	// 最新のポリシーに同意する.
+	//
+	// POST /policy/consent
+	PolicyConsent(ctx context.Context, req OptPolicyConsentReq) (PolicyConsentRes, error)
 }
 
 // TalkSessionHandler handles operations described by OpenAPI v3 specification.

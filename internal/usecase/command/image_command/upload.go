@@ -54,15 +54,16 @@ func (h *uploadImageHandler) Execute(ctx context.Context, input UploadImageInput
 	}
 	defer file.Close()
 
-	imageMeta, err := meta.NewImageForProfile(ctx, input.OwnerID, file)
+	imageID := shared.NewUUID[image.UserImage]()
+	imageMeta, err := meta.NewImageForCommon(ctx, imageID.UUID(), file)
 	if err != nil {
 		utils.HandleError(ctx, err, "meta.NewImageForProfile")
 		return nil, messages.ImageOpenFailedError
 	}
 
-	if err := imageMeta.Validate(ctx, meta.ProfileImageValidationRule); err != nil {
+	if err := imageMeta.Validate(ctx, meta.NoValidationRule); err != nil {
 		utils.HandleError(ctx, err, "ImageMeta.Validate")
-		msg := messages.UserUpdateError
+		msg := messages.ImageUploadFailedError
 		msg.Message = err.Error()
 		return nil, msg
 	}
@@ -76,7 +77,7 @@ func (h *uploadImageHandler) Execute(ctx context.Context, input UploadImageInput
 
 	if err := h.imageRepository.Create(ctx, image.NewUserImage(
 		ctx,
-		shared.NewUUID[image.UserImage](),
+		imageID,
 		input.OwnerID,
 		*imageMeta,
 		*url,

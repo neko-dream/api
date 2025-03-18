@@ -131,6 +131,41 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 			},
 			WantErr: false,
 		},
+		{
+			Name: "トークセッション作成ができ、ThumbnailURLも保存される",
+			SetupFn: func(ctx context.Context, data *TestData) error {
+				data.TalkSession = talksession.NewTalkSession(
+					talkSessionID,
+					"test",
+					nil,
+					lo.ToPtr("https://example.com/thumbnail.jpg"),
+					ownerUserID,
+					clock.Now(ctx),
+					clock.Now(ctx).Add(time.Hour*24),
+					nil,
+					nil,
+					nil,
+				)
+				return nil
+			},
+			TestFn: func(ctx context.Context, data *TestData) error {
+				if err := data.TsRepo.Create(ctx, data.TalkSession); err != nil {
+					return err
+				}
+
+				ts, err := dbManager.GetQueries(ctx).GetTalkSessionByID(ctx, talkSessionID.UUID())
+				if err != nil {
+					return err
+				}
+				if ts.TalkSession.TalkSessionID != talkSessionID.UUID() {
+					return errors.New("トークセッションIDが一致しません")
+				}
+				assert.Equal(t, *data.TalkSession.ThumbnailURL(), ts.TalkSession.ThumbnailUrl.String)
+
+				return nil
+			},
+			WantErr: false,
+		},
 	}
 
 	txtest.RunTransactionalTests(t, dbManager, &initData, testCases)

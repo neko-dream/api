@@ -9,10 +9,12 @@ import (
 	"github.com/neko-dream/server/internal/usecase/command/auth_command"
 	"github.com/neko-dream/server/internal/usecase/command/image_command"
 	"github.com/neko-dream/server/internal/usecase/command/opinion_command"
+	"github.com/neko-dream/server/internal/usecase/command/policy_command"
 	"github.com/neko-dream/server/internal/usecase/command/talksession_command"
 	"github.com/neko-dream/server/internal/usecase/command/timeline_command"
 	"github.com/neko-dream/server/internal/usecase/command/user_command"
 	"github.com/neko-dream/server/internal/usecase/command/vote_command"
+	"github.com/neko-dream/server/internal/usecase/query/policy_query"
 	"github.com/neko-dream/server/internal/usecase/query/timeline_query"
 )
 
@@ -46,5 +48,8 @@ func useCaseDeps() []ProvideArg {
 		{analysis_query.NewGetReportQueryHandler, nil},
 		{image_command.NewUploadImageHandler, nil},
 		{talksession_query.NewGetRestrictionsQuery, nil},
+		{policy_command.NewAcceptPolicy, nil},
+		{policy_query.NewCheckConsent, nil},
+		{auth_command.NewDetachAccount, nil},
 	}
 }

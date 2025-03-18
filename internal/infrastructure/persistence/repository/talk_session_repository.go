@@ -29,7 +29,7 @@ func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talkses
 	ctx, span := otel.Tracer("repository").Start(ctx, "talkSessionRepository.Create")
 	defer span.End()
 
-	var description, city, prefecture sql.NullString
+	var description, city, prefecture, thumbnailURL sql.NullString
 	if talkSession.City() != nil {
 		city = sql.NullString{
 			String: *talkSession.City(),
@@ -48,6 +48,14 @@ func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talkses
 			Valid:  true,
 		}
 	}
+
+	if talkSession.ThumbnailURL() != nil {
+		thumbnailURL = sql.NullString{
+			String: *talkSession.ThumbnailURL(),
+			Valid:  true,
+		}
+	}
+
 	var restrictions []string
 	if len(talkSession.Restrictions()) > 0 {
 		for _, restriction := range talkSession.Restrictions() {
@@ -62,6 +70,7 @@ func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talkses
 		OwnerID:          talkSession.OwnerUserID().UUID(),
 		CreatedAt:        talkSession.CreatedAt(),
 		ScheduledEndTime: talkSession.ScheduledEndTime(),
+		ThumbnailUrl:     thumbnailURL,
 		Prefecture:       prefecture,
 		City:             city,
 		Restrictions:     talksession.Restrictions(restrictions),

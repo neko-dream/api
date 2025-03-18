@@ -14,6 +14,9 @@ FROM
 WHERE
     "user_auths".subject = $1;
 
+-- name: ChangeSubject :exec
+UPDATE "user_auths" SET subject = $2 WHERE user_id = $1;
+
 -- name: GetUserByID :one
 SELECT
     sqlc.embed(users)

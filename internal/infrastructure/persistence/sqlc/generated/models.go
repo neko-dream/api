@@ -34,6 +34,20 @@ type Opinion struct {
 	ReferenceUrl    sql.NullString
 }
 
+type PolicyConsent struct {
+	PolicyConsentID uuid.UUID
+	UserID          uuid.UUID
+	PolicyVersion   string
+	ConsentedAt     time.Time
+	IpAddress       string
+	UserAgent       string
+}
+
+type PolicyVersion struct {
+	Version   string
+	CreatedAt time.Time
+}
+
 type RepresentativeOpinion struct {
 	TalkSessionID uuid.UUID
 	OpinionID     uuid.UUID

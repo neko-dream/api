@@ -13,6 +13,15 @@ type UnimplementedHandler struct{}
 
 var _ Handler = UnimplementedHandler{}
 
+// AuthAccountDetach implements authAccountDetach operation.
+//
+// そのアカウントには再度ログインできなくなります。ログインしたければ言ってね！.
+//
+// DELETE /auth/dev/detach
+func (UnimplementedHandler) AuthAccountDetach(ctx context.Context) (r AuthAccountDetachRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // Authorize implements authorize operation.
 //
 // ログイン.
@@ -125,6 +134,15 @@ func (UnimplementedHandler) GetOpinionDetail2(ctx context.Context, params GetOpi
 //
 // GET /talksessions/{talkSessionID}/opinions
 func (UnimplementedHandler) GetOpinionsForTalkSession(ctx context.Context, params GetOpinionsForTalkSessionParams) (r GetOpinionsForTalkSessionRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetPolicyConsentStatus implements getPolicyConsentStatus operation.
+//
+// 最新のポリシーに同意したかを取得.
+//
+// GET /policy/consent
+func (UnimplementedHandler) GetPolicyConsentStatus(ctx context.Context) (r GetPolicyConsentStatusRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -249,6 +267,15 @@ func (UnimplementedHandler) OpinionComments2(ctx context.Context, params Opinion
 //
 // GET /opinions/histories
 func (UnimplementedHandler) OpinionsHistory(ctx context.Context, params OpinionsHistoryParams) (r OpinionsHistoryRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// PolicyConsent implements policyConsent operation.
+//
+// 最新のポリシーに同意する.
+//
+// POST /policy/consent
+func (UnimplementedHandler) PolicyConsent(ctx context.Context, req OptPolicyConsentReq) (r PolicyConsentRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
