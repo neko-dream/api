@@ -50,5 +50,6 @@ func useCaseDeps() []ProvideArg {
 		{talksession_query.NewGetRestrictionsQuery, nil},
 		{policy_command.NewAcceptPolicy, nil},
 		{policy_query.NewCheckConsent, nil},
+		{auth_command.NewDetachAccount, nil},
 	}
 }

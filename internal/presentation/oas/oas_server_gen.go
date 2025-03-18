@@ -24,6 +24,12 @@ type Handler interface {
 //
 // x-ogen-operation-group: Auth
 type AuthHandler interface {
+	// AuthAccountDetach implements authAccountDetach operation.
+	//
+	// そのアカウントには再度ログインできなくなります。ログインしたければ言ってね！.
+	//
+	// DELETE /auth/dev/detach
+	AuthAccountDetach(ctx context.Context) (AuthAccountDetachRes, error)
 	// Authorize implements authorize operation.
 	//
 	// ログイン.

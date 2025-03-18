@@ -3936,6 +3936,63 @@ paths:
           headers: {}
       security: []
       x-ogen-operation-group: Auth
+  /auth/dev/detach:
+    delete:
+      summary: '**開発用** 現在のアカウントを切り離す'
+      deprecated: false
+      description: そのアカウントには再度ログインできなくなります。ログインしたければ言ってね！
+      operationId: authAccountDetach
+      tags:
+        - auth
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers:
+            Set-Cookie:
+              example: ''
+              required: false
+              description: ''
+              schema:
+                type: array
+                items:
+                  type: string
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security:
+        - SessionId: []
+      x-ogen-operation-group: Auth
   /test:
     get:
       summary: OpenAPIテスト用

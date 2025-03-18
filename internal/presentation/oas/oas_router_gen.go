@@ -73,24 +73,60 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					break
 				}
 				switch elem[0] {
-				case 'd': // Prefix: "dev/login"
+				case 'd': // Prefix: "dev/"
 					origElem := elem
-					if l := len("dev/login"); len(elem) >= l && elem[0:l] == "dev/login" {
+					if l := len("dev/"); len(elem) >= l && elem[0:l] == "dev/" {
 						elem = elem[l:]
 					} else {
 						break
 					}
 
 					if len(elem) == 0 {
-						// Leaf node.
-						switch r.Method {
-						case "GET":
-							s.handleDevAuthorizeRequest([0]string{}, elemIsEscaped, w, r)
-						default:
-							s.notAllowed(w, r, "GET")
+						break
+					}
+					switch elem[0] {
+					case 'd': // Prefix: "detach"
+						origElem := elem
+						if l := len("detach"); len(elem) >= l && elem[0:l] == "detach" {
+							elem = elem[l:]
+						} else {
+							break
 						}
 
-						return
+						if len(elem) == 0 {
+							// Leaf node.
+							switch r.Method {
+							case "DELETE":
+								s.handleAuthAccountDetachRequest([0]string{}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "DELETE")
+							}
+
+							return
+						}
+
+						elem = origElem
+					case 'l': // Prefix: "login"
+						origElem := elem
+						if l := len("login"); len(elem) >= l && elem[0:l] == "login" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch r.Method {
+							case "GET":
+								s.handleDevAuthorizeRequest([0]string{}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "GET")
+							}
+
+							return
+						}
+
+						elem = origElem
 					}
 
 					elem = origElem
@@ -1075,28 +1111,68 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					break
 				}
 				switch elem[0] {
-				case 'd': // Prefix: "dev/login"
+				case 'd': // Prefix: "dev/"
 					origElem := elem
-					if l := len("dev/login"); len(elem) >= l && elem[0:l] == "dev/login" {
+					if l := len("dev/"); len(elem) >= l && elem[0:l] == "dev/" {
 						elem = elem[l:]
 					} else {
 						break
 					}
 
 					if len(elem) == 0 {
-						// Leaf node.
-						switch method {
-						case "GET":
-							r.name = "DevAuthorize"
-							r.summary = "開発用登録/ログイン"
-							r.operationID = "devAuthorize"
-							r.pathPattern = "/auth/dev/login"
-							r.args = args
-							r.count = 0
-							return r, true
-						default:
-							return
+						break
+					}
+					switch elem[0] {
+					case 'd': // Prefix: "detach"
+						origElem := elem
+						if l := len("detach"); len(elem) >= l && elem[0:l] == "detach" {
+							elem = elem[l:]
+						} else {
+							break
 						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch method {
+							case "DELETE":
+								r.name = "AuthAccountDetach"
+								r.summary = "**開発用** 現在のアカウントを切り離す"
+								r.operationID = "authAccountDetach"
+								r.pathPattern = "/auth/dev/detach"
+								r.args = args
+								r.count = 0
+								return r, true
+							default:
+								return
+							}
+						}
+
+						elem = origElem
+					case 'l': // Prefix: "login"
+						origElem := elem
+						if l := len("login"); len(elem) >= l && elem[0:l] == "login" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch method {
+							case "GET":
+								r.name = "DevAuthorize"
+								r.summary = "開発用登録/ログイン"
+								r.operationID = "devAuthorize"
+								r.pathPattern = "/auth/dev/login"
+								r.args = args
+								r.count = 0
+								return r, true
+							default:
+								return
+							}
+						}
+
+						elem = origElem
 					}
 
 					elem = origElem
