@@ -7,9 +7,75 @@ package model
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 )
+
+const createPolicy = `-- name: CreatePolicy :exec
+INSERT INTO policy_versions (
+    version,
+    created_at
+) VALUES ($1, $2)
+`
+
+type CreatePolicyParams struct {
+	Version   string
+	CreatedAt time.Time
+}
+
+// CreatePolicy
+//
+//	INSERT INTO policy_versions (
+//	    version,
+//	    created_at
+//	) VALUES ($1, $2)
+func (q *Queries) CreatePolicy(ctx context.Context, arg CreatePolicyParams) error {
+	_, err := q.db.ExecContext(ctx, createPolicy, arg.Version, arg.CreatedAt)
+	return err
+}
+
+const createPolicyConsent = `-- name: CreatePolicyConsent :exec
+INSERT INTO policy_consents (
+    policy_consent_id,
+    user_id,
+    policy_version,
+    consented_at,
+    ip_address,
+    user_agent
+) VALUES ($1, $2, $3, $4, $5, $6)
+`
+
+type CreatePolicyConsentParams struct {
+	PolicyConsentID uuid.UUID
+	UserID          uuid.UUID
+	PolicyVersion   string
+	ConsentedAt     time.Time
+	IpAddress       string
+	UserAgent       string
+}
+
+// CreatePolicyConsent
+//
+//	INSERT INTO policy_consents (
+//	    policy_consent_id,
+//	    user_id,
+//	    policy_version,
+//	    consented_at,
+//	    ip_address,
+//	    user_agent
+//	) VALUES ($1, $2, $3, $4, $5, $6)
+func (q *Queries) CreatePolicyConsent(ctx context.Context, arg CreatePolicyConsentParams) error {
+	_, err := q.db.ExecContext(ctx, createPolicyConsent,
+		arg.PolicyConsentID,
+		arg.UserID,
+		arg.PolicyVersion,
+		arg.ConsentedAt,
+		arg.IpAddress,
+		arg.UserAgent,
+	)
+	return err
+}
 
 const createUserImage = `-- name: CreateUserImage :exec
 INSERT INTO user_images (

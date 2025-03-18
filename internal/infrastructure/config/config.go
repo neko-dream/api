@@ -44,6 +44,11 @@ type Config struct {
 	ENCRYPTION_VERSION string `env:"ENCRYPTION_VERSION"`
 	// 暗号化キー (16バイトの文字列) コマンド: openssl rand -base64 16
 	ENCRYPTION_SECRET string `env:"ENCRYPTION_SECRET,required"`
+
+	// ポリシーバージョン 現状は固定。API生えたら別途取得する
+	POLICY_VERSION string `env:"POLICY_VERSION"`
+	// ポリシー作成日 現状は固定。API生えたら別途取得する
+	POLICY_CREATED_AT string `env:"POLICY_CREATED_AT"`
 }
 
 type ENV string

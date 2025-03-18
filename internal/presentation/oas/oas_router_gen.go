@@ -420,6 +420,29 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				}
 
 				elem = origElem
+			case 'p': // Prefix: "policy/consent"
+				origElem := elem
+				if l := len("policy/consent"); len(elem) >= l && elem[0:l] == "policy/consent" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch r.Method {
+					case "GET":
+						s.handleGetPolicyConsentStatusRequest([0]string{}, elemIsEscaped, w, r)
+					case "POST":
+						s.handlePolicyConsentRequest([0]string{}, elemIsEscaped, w, r)
+					default:
+						s.notAllowed(w, r, "GET,POST")
+					}
+
+					return
+				}
+
+				elem = origElem
 			case 't': // Prefix: "t"
 				origElem := elem
 				if l := len("t"); len(elem) >= l && elem[0:l] == "t" {
@@ -1438,6 +1461,39 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					}
 
 					elem = origElem
+				}
+
+				elem = origElem
+			case 'p': // Prefix: "policy/consent"
+				origElem := elem
+				if l := len("policy/consent"); len(elem) >= l && elem[0:l] == "policy/consent" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch method {
+					case "GET":
+						r.name = "GetPolicyConsentStatus"
+						r.summary = "最新のポリシーに同意したかを取得"
+						r.operationID = "getPolicyConsentStatus"
+						r.pathPattern = "/policy/consent"
+						r.args = args
+						r.count = 0
+						return r, true
+					case "POST":
+						r.name = "PolicyConsent"
+						r.summary = "最新のポリシーに同意する"
+						r.operationID = "policyConsent"
+						r.pathPattern = "/policy/consent"
+						r.args = args
+						r.count = 0
+						return r, true
+					default:
+						return
+					}
 				}
 
 				elem = origElem

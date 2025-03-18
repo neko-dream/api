@@ -29,6 +29,9 @@
     },
     {
       "name": "image"
+    },
+    {
+      "name": "policy"
     }
   ],
   "paths": {
@@ -4486,6 +4489,169 @@
         ],
         "x-ogen-operation-group": "Image"
       }
+    },
+    "/policy/consent": {
+      "get": {
+        "summary": "最新のポリシーに同意したかを取得",
+        "deprecated": false,
+        "description": "",
+        "operationId": "getPolicyConsentStatus",
+        "tags": [
+          "policy"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/policyConsentStatus"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
+        "x-ogen-operation-group": "Policy"
+      },
+      "post": {
+        "summary": "最新のポリシーに同意する",
+        "deprecated": false,
+        "description": "",
+        "operationId": "policyConsent",
+        "tags": [
+          "policy"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "policyVersion": {
+                    "description": "ポリシーバージョン",
+                    "example": "",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "policyVersion"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/policyConsentStatus"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
+        "x-ogen-operation-group": "Policy"
+      }
     }
   },
   "components": {
@@ -4889,6 +5055,28 @@
         "required": [
           "key",
           "description"
+        ]
+      },
+      "policyConsentStatus": {
+        "type": "object",
+        "properties": {
+          "policyVersion": {
+            "type": "string",
+            "description": "最新ポリシーのバージョン"
+          },
+          "consentedAt": {
+            "type": "string",
+            "description": "同意した日時",
+            "nullable": true
+          },
+          "consentGiven": {
+            "type": "boolean",
+            "description": "同意したか"
+          }
+        },
+        "required": [
+          "policyVersion",
+          "consentGiven"
         ]
       }
     },
