@@ -62,7 +62,7 @@ jobs:
       - name: Run E2E tests
         run: |
           go install github.com/k1LoW/runn/cmd/runn@latest
-          export POLICY_VERSION: "1.0.0"
+          export POLICY_VERSION="1.0.0"
           go run cmd/server/main.go & sleep 5
           runn run ./e2e/**/* --verbose
 
