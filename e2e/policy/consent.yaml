@@ -47,6 +47,7 @@ steps:
         get: {}
     test: |
       current.res.status == 200 &&
+      current.res.body.policyVersion != null &&
       current.res.body.consentGiven == false &&
       current.res.body.consentedAt == null
   giveConsent:
