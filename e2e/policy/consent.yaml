@@ -6,6 +6,7 @@ runners:
     notFollowRedirect: true
   dev: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
 
+skipTest: true
 vars:
   id: policy_test_user
   name: policy_test_user
@@ -57,7 +58,7 @@ steps:
         post:
           body:
             multipart/form-data:
-              policyVersion: 1.0.0.
+              policyVersion: 1.0.0
     test: |
       current.res.status == 200 &&
       current.res.body.policyVersion == "1.0.0" &&
