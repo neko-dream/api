@@ -13,6 +13,15 @@ type UnimplementedHandler struct{}
 
 var _ Handler = UnimplementedHandler{}
 
+// AuthAccountDetach implements authAccountDetach operation.
+//
+// そのアカウントには再度ログインできなくなります。ログインしたければ言ってね！.
+//
+// DELETE /auth/dev/detach
+func (UnimplementedHandler) AuthAccountDetach(ctx context.Context) (r AuthAccountDetachRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // Authorize implements authorize operation.
 //
 // ログイン.

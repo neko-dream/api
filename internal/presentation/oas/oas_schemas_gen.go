@@ -12,6 +12,44 @@ import (
 	ht "github.com/ogen-go/ogen/http"
 )
 
+type AuthAccountDetachBadRequest struct{}
+
+func (*AuthAccountDetachBadRequest) authAccountDetachRes() {}
+
+type AuthAccountDetachInternalServerError struct{}
+
+func (*AuthAccountDetachInternalServerError) authAccountDetachRes() {}
+
+type AuthAccountDetachOK struct{}
+
+// AuthAccountDetachOKHeaders wraps AuthAccountDetachOK with response headers.
+type AuthAccountDetachOKHeaders struct {
+	SetCookie []string
+	Response  AuthAccountDetachOK
+}
+
+// GetSetCookie returns the value of SetCookie.
+func (s *AuthAccountDetachOKHeaders) GetSetCookie() []string {
+	return s.SetCookie
+}
+
+// GetResponse returns the value of Response.
+func (s *AuthAccountDetachOKHeaders) GetResponse() AuthAccountDetachOK {
+	return s.Response
+}
+
+// SetSetCookie sets the value of SetCookie.
+func (s *AuthAccountDetachOKHeaders) SetSetCookie(val []string) {
+	s.SetCookie = val
+}
+
+// SetResponse sets the value of Response.
+func (s *AuthAccountDetachOKHeaders) SetResponse(val AuthAccountDetachOK) {
+	s.Response = val
+}
+
+func (*AuthAccountDetachOKHeaders) authAccountDetachRes() {}
+
 type AuthorizeBadRequest struct{}
 
 func (*AuthorizeBadRequest) authorizeRes() {}

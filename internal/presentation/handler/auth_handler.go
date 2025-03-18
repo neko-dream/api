@@ -7,6 +7,8 @@ import (
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
+	"github.com/neko-dream/server/internal/domain/model/shared"
+	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/http/cookie"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/internal/usecase/command/auth_command"
@@ -20,6 +22,7 @@ type authHandler struct {
 	auth_command.AuthLogin
 	auth_command.Revoke
 	auth_command.LoginForDev
+	auth_command.DetachAccount
 
 	cookie.CookieManager
 }
@@ -29,6 +32,8 @@ func NewAuthHandler(
 	authCallback auth_command.AuthCallback,
 	revoke auth_command.Revoke,
 	devLogin auth_command.LoginForDev,
+	detachAccount auth_command.DetachAccount,
+
 	cookieManger cookie.CookieManager,
 ) oas.AuthHandler {
 	return &authHandler{
@@ -36,6 +41,7 @@ func NewAuthHandler(
 		AuthCallback:  authCallback,
 		Revoke:        revoke,
 		LoginForDev:   devLogin,
+		DetachAccount: detachAccount,
 		CookieManager: cookieManger,
 	}
 }
@@ -155,4 +161,39 @@ func (a *authHandler) OAuthTokenInfo(ctx context.Context) (oas.OAuthTokenInfoRes
 		DisplayName:     utils.ToOpt[oas.OptString](claim.DisplayName),
 		IconURL:         utils.ToOpt[oas.OptString](claim.IconURL),
 	}, nil
+}
+
+// AuthAccountDetach 開発向け。退会処理を作るまでの代替。Subjectを付け替えることで、一度SSOしても再度SSOさせることができるやつ。
+func (a *authHandler) AuthAccountDetach(ctx context.Context) (oas.AuthAccountDetachRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.AuthAccountDetach")
+	defer span.End()
+
+	claim := session.GetSession(ctx)
+	sessID, err := claim.SessionID()
+	if err != nil {
+		return nil, messages.ForbiddenError
+	}
+
+	userID, err := claim.UserID()
+	if err != nil {
+		return nil, messages.ForbiddenError
+	}
+
+	if err = a.DetachAccount.Execute(ctx, auth_command.DetachAccountInput{
+		UserID: shared.UUID[user.User](userID),
+	}); err != nil {
+		return nil, err
+	}
+
+	// revoke
+	_, err = a.Revoke.Execute(ctx, auth_command.RevokeInput{
+		SessID: sessID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	res := new(oas.AuthAccountDetachOKHeaders)
+	res.SetSetCookie(cookie_utils.EncodeCookies([]*http.Cookie{a.CookieManager.CreateRevokeCookie()}))
+	return res, nil
 }
