@@ -47,7 +47,7 @@ steps:
         get: {}
     test: |
       current.res.status == 200 &&
-      current.res.body.policyVersion != null &&
+      current.res.body.policyVersion == "1.0.0" &&
       current.res.body.consentGiven == false &&
       current.res.body.consentedAt == null
   giveConsent:
@@ -57,10 +57,10 @@ steps:
         post:
           body:
             multipart/form-data:
-              policyVersion: "{{ steps.checkConsentInitial.res.body.policyVersion }}"
+              policyVersion: 1.0.0.
     test: |
       current.res.status == 200 &&
-      current.res.body.policyVersion == steps.checkConsentInitial.res.body.policyVersion &&
+      current.res.body.policyVersion == "1.0.0" &&
       current.res.body.consentGiven == true &&
       current.res.body.consentedAt != null
   checkConsentAfter:
@@ -70,7 +70,7 @@ steps:
         get: {}
     test: |
       current.res.status == 200 &&
-      current.res.body.policyVersion == steps.checkConsentInitial.res.body.policyVersion &&
+      current.res.body.policyVersion == "1.0.0" &&
       current.res.body.consentGiven == true &&
       current.res.body.consentedAt != null
   giveConsentDuplicate:
@@ -80,7 +80,7 @@ steps:
         post:
           body:
             multipart/form-data:
-              policyVersion: "{{ steps.checkConsentInitial.res.body.policyVersion }}"
+              policyVersion: "1.0.0"
     test: |
       current.res.status == 400 &&
       current.res.body.code == 'POLICY-001'
