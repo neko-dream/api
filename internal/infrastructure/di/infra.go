@@ -35,6 +35,7 @@ func infraDeps() []ProvideArg {
 		{repository.NewActionItemRepository, nil},
 		{repository.NewPolicyRepository, nil},
 		{repository.NewConsentRecordRepository, nil},
+		{repository.NewReportRepository, nil},
 		{jwt.NewTokenManager, nil},
 		{db.NewDummyInitializer, nil},
 		{client.NewAnalysisService, nil},

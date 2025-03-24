@@ -344,6 +344,15 @@ func (UnimplementedHandler) RegisterUser(ctx context.Context, req OptRegisterUse
 	return r, ht.ErrNotImplemented
 }
 
+// ReportOpinion implements reportOpinion operation.
+//
+// 意見通報API.
+//
+// POST /opinions/{opinionID}/report
+func (UnimplementedHandler) ReportOpinion(ctx context.Context, req OptReportOpinionReq, params ReportOpinionParams) (r ReportOpinionRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // SessionsHistory implements sessionsHistory operation.
 //
 // リアクション済みのセッション一覧.

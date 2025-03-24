@@ -401,26 +401,64 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							break
 						}
 						switch elem[0] {
-						case 'r': // Prefix: "replies"
+						case 'r': // Prefix: "rep"
 							origElem := elem
-							if l := len("replies"); len(elem) >= l && elem[0:l] == "replies" {
+							if l := len("rep"); len(elem) >= l && elem[0:l] == "rep" {
 								elem = elem[l:]
 							} else {
 								break
 							}
 
 							if len(elem) == 0 {
-								// Leaf node.
-								switch r.Method {
-								case "GET":
-									s.handleOpinionComments2Request([1]string{
-										args[0],
-									}, elemIsEscaped, w, r)
-								default:
-									s.notAllowed(w, r, "GET")
+								break
+							}
+							switch elem[0] {
+							case 'l': // Prefix: "lies"
+								origElem := elem
+								if l := len("lies"); len(elem) >= l && elem[0:l] == "lies" {
+									elem = elem[l:]
+								} else {
+									break
 								}
 
-								return
+								if len(elem) == 0 {
+									// Leaf node.
+									switch r.Method {
+									case "GET":
+										s.handleOpinionComments2Request([1]string{
+											args[0],
+										}, elemIsEscaped, w, r)
+									default:
+										s.notAllowed(w, r, "GET")
+									}
+
+									return
+								}
+
+								elem = origElem
+							case 'o': // Prefix: "ort"
+								origElem := elem
+								if l := len("ort"); len(elem) >= l && elem[0:l] == "ort" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								if len(elem) == 0 {
+									// Leaf node.
+									switch r.Method {
+									case "POST":
+										s.handleReportOpinionRequest([1]string{
+											args[0],
+										}, elemIsEscaped, w, r)
+									default:
+										s.notAllowed(w, r, "POST")
+									}
+
+									return
+								}
+
+								elem = origElem
 							}
 
 							elem = origElem
@@ -1519,28 +1557,68 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							break
 						}
 						switch elem[0] {
-						case 'r': // Prefix: "replies"
+						case 'r': // Prefix: "rep"
 							origElem := elem
-							if l := len("replies"); len(elem) >= l && elem[0:l] == "replies" {
+							if l := len("rep"); len(elem) >= l && elem[0:l] == "rep" {
 								elem = elem[l:]
 							} else {
 								break
 							}
 
 							if len(elem) == 0 {
-								// Leaf node.
-								switch method {
-								case "GET":
-									r.name = "OpinionComments2"
-									r.summary = "意見に対するリプライ意見一覧"
-									r.operationID = "opinionComments2"
-									r.pathPattern = "/opinions/{opinionID}/replies"
-									r.args = args
-									r.count = 1
-									return r, true
-								default:
-									return
+								break
+							}
+							switch elem[0] {
+							case 'l': // Prefix: "lies"
+								origElem := elem
+								if l := len("lies"); len(elem) >= l && elem[0:l] == "lies" {
+									elem = elem[l:]
+								} else {
+									break
 								}
+
+								if len(elem) == 0 {
+									// Leaf node.
+									switch method {
+									case "GET":
+										r.name = "OpinionComments2"
+										r.summary = "意見に対するリプライ意見一覧"
+										r.operationID = "opinionComments2"
+										r.pathPattern = "/opinions/{opinionID}/replies"
+										r.args = args
+										r.count = 1
+										return r, true
+									default:
+										return
+									}
+								}
+
+								elem = origElem
+							case 'o': // Prefix: "ort"
+								origElem := elem
+								if l := len("ort"); len(elem) >= l && elem[0:l] == "ort" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								if len(elem) == 0 {
+									// Leaf node.
+									switch method {
+									case "POST":
+										r.name = "ReportOpinion"
+										r.summary = "意見通報API"
+										r.operationID = "reportOpinion"
+										r.pathPattern = "/opinions/{opinionID}/report"
+										r.args = args
+										r.count = 1
+										return r, true
+									default:
+										return
+									}
+								}
+
+								elem = origElem
 							}
 
 							elem = origElem

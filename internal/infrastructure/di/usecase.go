@@ -53,5 +53,6 @@ func useCaseDeps() []ProvideArg {
 		{policy_query.NewCheckConsent, nil},
 		{auth_command.NewDetachAccount, nil},
 		{talksession.NewIsTalkSessionSatisfiedInteractor, nil},
+		{opinion_command.NewReportOpinion, nil},
 	}
 }

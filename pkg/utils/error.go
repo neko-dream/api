@@ -59,4 +59,5 @@ func HandleErrorWithCaller(ctx context.Context, err error, message string, calle
 	span.RecordError(err, trace.WithAttributes(
 		attrs...,
 	))
+	span.SetAttributes(attrs...)
 }

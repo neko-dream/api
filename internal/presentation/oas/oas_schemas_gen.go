@@ -6269,6 +6269,52 @@ func (o OptRegisterUserReq) Or(d RegisterUserReq) RegisterUserReq {
 	return d
 }
 
+// NewOptReportOpinionReq returns new OptReportOpinionReq with value set to v.
+func NewOptReportOpinionReq(v ReportOpinionReq) OptReportOpinionReq {
+	return OptReportOpinionReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptReportOpinionReq is optional ReportOpinionReq.
+type OptReportOpinionReq struct {
+	Value ReportOpinionReq
+	Set   bool
+}
+
+// IsSet returns true if OptReportOpinionReq was set.
+func (o OptReportOpinionReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptReportOpinionReq) Reset() {
+	var v ReportOpinionReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptReportOpinionReq) SetTo(v ReportOpinionReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptReportOpinionReq) Get() (v ReportOpinionReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptReportOpinionReq) Or(d ReportOpinionReq) ReportOpinionReq {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptSessionsHistoryOKTalkSessionsItemTalkSessionLocation returns new OptSessionsHistoryOKTalkSessionsItemTalkSessionLocation with value set to v.
 func NewOptSessionsHistoryOKTalkSessionsItemTalkSessionLocation(v SessionsHistoryOKTalkSessionsItemTalkSessionLocation) OptSessionsHistoryOKTalkSessionsItemTalkSessionLocation {
 	return OptSessionsHistoryOKTalkSessionsItemTalkSessionLocation{
@@ -7344,6 +7390,32 @@ func (s *RegisterUserReqGender) UnmarshalText(data []byte) error {
 	default:
 		return errors.Errorf("invalid value: %q", data)
 	}
+}
+
+type ReportOpinionBadRequest struct{}
+
+func (*ReportOpinionBadRequest) reportOpinionRes() {}
+
+type ReportOpinionInternalServerError struct{}
+
+func (*ReportOpinionInternalServerError) reportOpinionRes() {}
+
+type ReportOpinionOK struct{}
+
+func (*ReportOpinionOK) reportOpinionRes() {}
+
+type ReportOpinionReq struct {
+	Reason OptInt `json:"reason"`
+}
+
+// GetReason returns the value of Reason.
+func (s *ReportOpinionReq) GetReason() OptInt {
+	return s.Reason
+}
+
+// SetReason sets the value of Reason.
+func (s *ReportOpinionReq) SetReason(val OptInt) {
+	s.Reason = val
 }
 
 type SessionId struct {
