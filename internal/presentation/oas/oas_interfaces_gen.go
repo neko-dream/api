@@ -73,6 +73,10 @@ type GetTalkSessionRestrictionKeysRes interface {
 	getTalkSessionRestrictionKeysRes()
 }
 
+type GetTalkSessionRestrictionSatisfiedRes interface {
+	getTalkSessionRestrictionSatisfiedRes()
+}
+
 type GetTimeLineRes interface {
 	getTimeLineRes()
 }
