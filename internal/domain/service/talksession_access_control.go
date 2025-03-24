@@ -15,6 +15,7 @@ import (
 type TalkSessionAccessControl interface {
 	// CanUserJoin はユーザーがトークセッションに参加できるかを判定する
 	CanUserJoin(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession], userID *shared.UUID[user.User]) (bool, error)
+	UserSatisfiesRestriction(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession], userID shared.UUID[user.User]) ([]talksession.RestrictionAttribute, error)
 }
 
 type talkSessionAccessControl struct {
@@ -88,4 +89,39 @@ func (t *talkSessionAccessControl) CanUserJoin(ctx context.Context, talkSessionI
 	}
 
 	return true, nil
+}
+
+// UserSatisfiesRestriction implements TalkSessionAccessControl.
+func (t *talkSessionAccessControl) UserSatisfiesRestriction(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession], userID shared.UUID[user.User]) ([]talksession.RestrictionAttribute, error) {
+	ctx, span := otel.Tracer("service").Start(ctx, "talkSessionAccessControl.UserSatisfiesRestriction")
+	defer span.End()
+
+	// talksessionが存在するか確認
+	talkSession, err := t.TalkSessionRepository.FindByID(ctx, talkSessionID)
+	if err != nil || talkSession == nil {
+		utils.HandleError(ctx, err, "TalkSessionRepository.FindByID")
+		return nil, messages.TalkSessionNotFound
+	}
+
+	// userの存在確認
+	u, err := t.UserRepository.FindByID(ctx, userID)
+	if err != nil || u == nil {
+		utils.HandleError(ctx, err, "UserRepository.FindByID")
+		return nil, messages.UserNotFoundError
+	}
+
+	// 参加制限がない場合は参加可能
+	if len(talkSession.Restrictions()) == 0 {
+		return nil, nil
+	}
+
+	// 参加制限がある場合は、ユーザーが参加可能かを判定し、もし参加制限に引っかかる場合はエラーを返す
+	var restrictions []talksession.RestrictionAttribute
+	for _, restriction := range talkSession.Restrictions() {
+		if !restriction.IsSatisfied(*u) {
+			restrictions = append(restrictions, *restriction)
+		}
+	}
+
+	return restrictions, nil
 }
