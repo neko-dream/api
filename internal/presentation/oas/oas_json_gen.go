@@ -8108,6 +8108,257 @@ func (s *GetTalkSessionRestrictionKeysOKItem) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
+func (s *GetTalkSessionRestrictionSatisfiedBadRequest) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *GetTalkSessionRestrictionSatisfiedBadRequest) encodeFields(e *jx.Encoder) {
+}
+
+var jsonFieldsNameOfGetTalkSessionRestrictionSatisfiedBadRequest = [0]string{}
+
+// Decode decodes GetTalkSessionRestrictionSatisfiedBadRequest from json.
+func (s *GetTalkSessionRestrictionSatisfiedBadRequest) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GetTalkSessionRestrictionSatisfiedBadRequest to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		default:
+			return d.Skip()
+		}
+	}); err != nil {
+		return errors.Wrap(err, "decode GetTalkSessionRestrictionSatisfiedBadRequest")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *GetTalkSessionRestrictionSatisfiedBadRequest) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GetTalkSessionRestrictionSatisfiedBadRequest) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *GetTalkSessionRestrictionSatisfiedInternalServerError) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *GetTalkSessionRestrictionSatisfiedInternalServerError) encodeFields(e *jx.Encoder) {
+}
+
+var jsonFieldsNameOfGetTalkSessionRestrictionSatisfiedInternalServerError = [0]string{}
+
+// Decode decodes GetTalkSessionRestrictionSatisfiedInternalServerError from json.
+func (s *GetTalkSessionRestrictionSatisfiedInternalServerError) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GetTalkSessionRestrictionSatisfiedInternalServerError to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		default:
+			return d.Skip()
+		}
+	}); err != nil {
+		return errors.Wrap(err, "decode GetTalkSessionRestrictionSatisfiedInternalServerError")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *GetTalkSessionRestrictionSatisfiedInternalServerError) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GetTalkSessionRestrictionSatisfiedInternalServerError) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes GetTalkSessionRestrictionSatisfiedOKApplicationJSON as json.
+func (s GetTalkSessionRestrictionSatisfiedOKApplicationJSON) Encode(e *jx.Encoder) {
+	unwrapped := []GetTalkSessionRestrictionSatisfiedOKItem(s)
+
+	e.ArrStart()
+	for _, elem := range unwrapped {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes GetTalkSessionRestrictionSatisfiedOKApplicationJSON from json.
+func (s *GetTalkSessionRestrictionSatisfiedOKApplicationJSON) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GetTalkSessionRestrictionSatisfiedOKApplicationJSON to nil")
+	}
+	var unwrapped []GetTalkSessionRestrictionSatisfiedOKItem
+	if err := func() error {
+		unwrapped = make([]GetTalkSessionRestrictionSatisfiedOKItem, 0)
+		if err := d.Arr(func(d *jx.Decoder) error {
+			var elem GetTalkSessionRestrictionSatisfiedOKItem
+			if err := elem.Decode(d); err != nil {
+				return err
+			}
+			unwrapped = append(unwrapped, elem)
+			return nil
+		}); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = GetTalkSessionRestrictionSatisfiedOKApplicationJSON(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s GetTalkSessionRestrictionSatisfiedOKApplicationJSON) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GetTalkSessionRestrictionSatisfiedOKApplicationJSON) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *GetTalkSessionRestrictionSatisfiedOKItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *GetTalkSessionRestrictionSatisfiedOKItem) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("key")
+		e.Str(s.Key)
+	}
+	{
+		e.FieldStart("description")
+		e.Str(s.Description)
+	}
+}
+
+var jsonFieldsNameOfGetTalkSessionRestrictionSatisfiedOKItem = [2]string{
+	0: "key",
+	1: "description",
+}
+
+// Decode decodes GetTalkSessionRestrictionSatisfiedOKItem from json.
+func (s *GetTalkSessionRestrictionSatisfiedOKItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GetTalkSessionRestrictionSatisfiedOKItem to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "key":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Str()
+				s.Key = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"key\"")
+			}
+		case "description":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := d.Str()
+				s.Description = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"description\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode GetTalkSessionRestrictionSatisfiedOKItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000011,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfGetTalkSessionRestrictionSatisfiedOKItem) {
+					name = jsonFieldsNameOfGetTalkSessionRestrictionSatisfiedOKItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *GetTalkSessionRestrictionSatisfiedOKItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GetTalkSessionRestrictionSatisfiedOKItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s *GetTimeLineBadRequest) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)

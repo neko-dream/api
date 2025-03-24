@@ -801,26 +801,64 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								}
 
 								elem = origElem
-							case 'r': // Prefix: "report"
+							case 'r': // Prefix: "re"
 								origElem := elem
-								if l := len("report"); len(elem) >= l && elem[0:l] == "report" {
+								if l := len("re"); len(elem) >= l && elem[0:l] == "re" {
 									elem = elem[l:]
 								} else {
 									break
 								}
 
 								if len(elem) == 0 {
-									// Leaf node.
-									switch r.Method {
-									case "GET":
-										s.handleGetTalkSessionReportRequest([1]string{
-											args[0],
-										}, elemIsEscaped, w, r)
-									default:
-										s.notAllowed(w, r, "GET")
+									break
+								}
+								switch elem[0] {
+								case 'p': // Prefix: "port"
+									origElem := elem
+									if l := len("port"); len(elem) >= l && elem[0:l] == "port" {
+										elem = elem[l:]
+									} else {
+										break
 									}
 
-									return
+									if len(elem) == 0 {
+										// Leaf node.
+										switch r.Method {
+										case "GET":
+											s.handleGetTalkSessionReportRequest([1]string{
+												args[0],
+											}, elemIsEscaped, w, r)
+										default:
+											s.notAllowed(w, r, "GET")
+										}
+
+										return
+									}
+
+									elem = origElem
+								case 's': // Prefix: "strictions"
+									origElem := elem
+									if l := len("strictions"); len(elem) >= l && elem[0:l] == "strictions" {
+										elem = elem[l:]
+									} else {
+										break
+									}
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch r.Method {
+										case "GET":
+											s.handleGetTalkSessionRestrictionSatisfiedRequest([1]string{
+												args[0],
+											}, elemIsEscaped, w, r)
+										default:
+											s.notAllowed(w, r, "GET")
+										}
+
+										return
+									}
+
+									elem = origElem
 								}
 
 								elem = origElem
@@ -1940,28 +1978,68 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								}
 
 								elem = origElem
-							case 'r': // Prefix: "report"
+							case 'r': // Prefix: "re"
 								origElem := elem
-								if l := len("report"); len(elem) >= l && elem[0:l] == "report" {
+								if l := len("re"); len(elem) >= l && elem[0:l] == "re" {
 									elem = elem[l:]
 								} else {
 									break
 								}
 
 								if len(elem) == 0 {
-									// Leaf node.
-									switch method {
-									case "GET":
-										r.name = "GetTalkSessionReport"
-										r.summary = "セッションレポートを返す"
-										r.operationID = "getTalkSessionReport"
-										r.pathPattern = "/talksessions/{talkSessionId}/report"
-										r.args = args
-										r.count = 1
-										return r, true
-									default:
-										return
+									break
+								}
+								switch elem[0] {
+								case 'p': // Prefix: "port"
+									origElem := elem
+									if l := len("port"); len(elem) >= l && elem[0:l] == "port" {
+										elem = elem[l:]
+									} else {
+										break
 									}
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch method {
+										case "GET":
+											r.name = "GetTalkSessionReport"
+											r.summary = "セッションレポートを返す"
+											r.operationID = "getTalkSessionReport"
+											r.pathPattern = "/talksessions/{talkSessionId}/report"
+											r.args = args
+											r.count = 1
+											return r, true
+										default:
+											return
+										}
+									}
+
+									elem = origElem
+								case 's': // Prefix: "strictions"
+									origElem := elem
+									if l := len("strictions"); len(elem) >= l && elem[0:l] == "strictions" {
+										elem = elem[l:]
+									} else {
+										break
+									}
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch method {
+										case "GET":
+											r.name = "GetTalkSessionRestrictionSatisfied"
+											r.summary = "セッションで満たしていない制限"
+											r.operationID = "getTalkSessionRestrictionSatisfied"
+											r.pathPattern = "/talksessions/{talkSessionID}/restrictions"
+											r.args = args
+											r.count = 1
+											return r, true
+										default:
+											return
+										}
+									}
+
+									elem = origElem
 								}
 
 								elem = origElem

@@ -182,6 +182,15 @@ func (UnimplementedHandler) GetTalkSessionRestrictionKeys(ctx context.Context) (
 	return r, ht.ErrNotImplemented
 }
 
+// GetTalkSessionRestrictionSatisfied implements getTalkSessionRestrictionSatisfied operation.
+//
+// 特定のセッションで満たしていない条件があれば返す.
+//
+// GET /talksessions/{talkSessionID}/restrictions
+func (UnimplementedHandler) GetTalkSessionRestrictionSatisfied(ctx context.Context, params GetTalkSessionRestrictionSatisfiedParams) (r GetTalkSessionRestrictionSatisfiedRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetTimeLine implements getTimeLine operation.
 //
 // タイムラインはセッション終了後にセッション作成者が設定できるその後の予定を知らせるもの.
