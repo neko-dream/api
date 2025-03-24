@@ -640,6 +640,9 @@ func (t *talkSessionHandler) GetTalkSessionRestrictionSatisfied(ctx context.Cont
 			userID = &id
 		}
 	}
+	if userID == nil {
+		return nil, messages.ForbiddenError
+	}
 
 	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
 	if err != nil {
