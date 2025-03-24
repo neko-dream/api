@@ -3,6 +3,7 @@ package opinion_command
 import (
 	"context"
 
+	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
@@ -42,14 +43,19 @@ func (r *reportOpinionInteractor) Execute(ctx context.Context, input ReportOpini
 	opinion, err := r.opinionRep.FindByID(ctx, input.OpinionID)
 	if err != nil {
 		utils.HandleError(ctx, err, "opinionRep.FindByID")
-		return err
+		return messages.OpinionNotFound
 	}
 
 	report, err := opinion.Report(ctx, input.ReporterID, int(input.Reason))
 	if err != nil {
 		utils.HandleError(ctx, err, "opinion.Report")
-		return err
+		return messages.OpinionReportFailed
 	}
 
-	return r.reportRep.Create(ctx, *report)
+	if err := r.reportRep.Create(ctx, *report); err != nil {
+		utils.HandleError(ctx, err, "reportRep.Create")
+		return messages.OpinionReportFailed
+	}
+
+	return nil
 }
