@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/neko-dream/server/internal/infrastructure/crypto"
 	"github.com/neko-dream/server/pkg/utils"
