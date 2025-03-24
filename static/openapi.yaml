@@ -2680,6 +2680,70 @@ paths:
           headers: {}
       security: []
       x-ogen-operation-group: TalkSession
+  /talksessions/{talkSessionID}/restrictions:
+    get:
+      summary: セッションで満たしていない制限
+      deprecated: false
+      description: 特定のセッションで満たしていない条件があれば返す
+      operationId: getTalkSessionRestrictionSatisfied
+      tags:
+        - talk_session
+      parameters:
+        - name: talkSessionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    key:
+                      type: string
+                    description:
+                      type: string
+                  required:
+                    - key
+                    - description
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security:
+        - SessionId: []
+      x-ogen-operation-group: TalkSession
   /user:
     post:
       summary: ユーザー作成

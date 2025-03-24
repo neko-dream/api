@@ -15,6 +15,7 @@ import (
 	"github.com/neko-dream/server/internal/usecase/command/user_command"
 	"github.com/neko-dream/server/internal/usecase/command/vote_command"
 	"github.com/neko-dream/server/internal/usecase/query/policy_query"
+	"github.com/neko-dream/server/internal/usecase/query/talksession"
 	"github.com/neko-dream/server/internal/usecase/query/timeline_query"
 )
 
@@ -51,5 +52,6 @@ func useCaseDeps() []ProvideArg {
 		{policy_command.NewAcceptPolicy, nil},
 		{policy_query.NewCheckConsent, nil},
 		{auth_command.NewDetachAccount, nil},
+		{talksession.NewIsTalkSessionSatisfiedInteractor, nil},
 	}
 }

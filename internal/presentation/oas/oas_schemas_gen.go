@@ -3068,6 +3068,44 @@ func (s *GetTalkSessionRestrictionKeysOKItem) SetDescription(val string) {
 	s.Description = val
 }
 
+type GetTalkSessionRestrictionSatisfiedBadRequest struct{}
+
+func (*GetTalkSessionRestrictionSatisfiedBadRequest) getTalkSessionRestrictionSatisfiedRes() {}
+
+type GetTalkSessionRestrictionSatisfiedInternalServerError struct{}
+
+func (*GetTalkSessionRestrictionSatisfiedInternalServerError) getTalkSessionRestrictionSatisfiedRes() {
+}
+
+type GetTalkSessionRestrictionSatisfiedOKApplicationJSON []GetTalkSessionRestrictionSatisfiedOKItem
+
+func (*GetTalkSessionRestrictionSatisfiedOKApplicationJSON) getTalkSessionRestrictionSatisfiedRes() {}
+
+type GetTalkSessionRestrictionSatisfiedOKItem struct {
+	Key         string `json:"key"`
+	Description string `json:"description"`
+}
+
+// GetKey returns the value of Key.
+func (s *GetTalkSessionRestrictionSatisfiedOKItem) GetKey() string {
+	return s.Key
+}
+
+// GetDescription returns the value of Description.
+func (s *GetTalkSessionRestrictionSatisfiedOKItem) GetDescription() string {
+	return s.Description
+}
+
+// SetKey sets the value of Key.
+func (s *GetTalkSessionRestrictionSatisfiedOKItem) SetKey(val string) {
+	s.Key = val
+}
+
+// SetDescription sets the value of Description.
+func (s *GetTalkSessionRestrictionSatisfiedOKItem) SetDescription(val string) {
+	s.Description = val
+}
+
 type GetTimeLineBadRequest struct{}
 
 func (*GetTimeLineBadRequest) getTimeLineRes() {}

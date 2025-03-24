@@ -1475,6 +1475,14 @@ func (s GetTalkSessionRestrictionKeysOKApplicationJSON) Validate() error {
 	return nil
 }
 
+func (s GetTalkSessionRestrictionSatisfiedOKApplicationJSON) Validate() error {
+	alias := ([]GetTalkSessionRestrictionSatisfiedOKItem)(s)
+	if alias == nil {
+		return errors.New("nil is invalid value")
+	}
+	return nil
+}
+
 func (s *GetTimeLineOK) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer

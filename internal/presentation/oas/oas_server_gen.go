@@ -222,6 +222,12 @@ type TalkSessionHandler interface {
 	//
 	// GET /talksessions/restrictions
 	GetTalkSessionRestrictionKeys(ctx context.Context) (GetTalkSessionRestrictionKeysRes, error)
+	// GetTalkSessionRestrictionSatisfied implements getTalkSessionRestrictionSatisfied operation.
+	//
+	// 特定のセッションで満たしていない条件があれば返す.
+	//
+	// GET /talksessions/{talkSessionID}/restrictions
+	GetTalkSessionRestrictionSatisfied(ctx context.Context, params GetTalkSessionRestrictionSatisfiedParams) (GetTalkSessionRestrictionSatisfiedRes, error)
 	// PostConclusion implements postConclusion operation.
 	//
 	// 結論（conclusion）はセッションが終了した後にセッっションの作成者が投稿できる文章。
