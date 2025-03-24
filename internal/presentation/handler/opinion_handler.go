@@ -88,10 +88,14 @@ func (o *opinionHandler) GetOpinionDetail2(ctx context.Context, params oas.GetOp
 		DisplayName: opinion.Opinion.User.DisplayName,
 		IconURL:     utils.ToOptNil[oas.OptNilString](opinion.Opinion.User.IconURL),
 	}
+	var parentOpinionID oas.OptString
+	if opinion.Opinion.Opinion.ParentOpinionID != nil {
+		parentOpinionID = utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ParentOpinionID.String())
+	}
 
 	op := &oas.GetOpinionDetail2OKOpinion{
 		ID:           opinion.Opinion.Opinion.OpinionID.String(),
-		ParentID:     utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ParentOpinionID.String()),
+		ParentID:     parentOpinionID,
 		Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.Title),
 		Content:      opinion.Opinion.Opinion.Content,
 		VoteType:     utils.ToOptNil[oas.OptNilString](opinion.Opinion.GetParentVoteType()),
@@ -284,9 +288,14 @@ func (o *opinionHandler) GetOpinionDetail(ctx context.Context, params oas.GetOpi
 		IconURL:     utils.ToOptNil[oas.OptNilString](opinion.Opinion.User.IconURL),
 	}
 
+	var parentOpinionID oas.OptString
+	if opinion.Opinion.Opinion.ParentOpinionID != nil {
+		parentOpinionID = utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ParentOpinionID.String())
+	}
+
 	op := &oas.GetOpinionDetailOKOpinion{
 		ID:           opinion.Opinion.Opinion.OpinionID.String(),
-		ParentID:     utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ParentOpinionID),
+		ParentID:     parentOpinionID,
 		Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.Title),
 		Content:      opinion.Opinion.Opinion.Content,
 		VoteType:     utils.ToOptNil[oas.OptNilString](opinion.Opinion.GetParentVoteType()),

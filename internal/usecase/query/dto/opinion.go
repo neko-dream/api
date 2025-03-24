@@ -35,7 +35,7 @@ func (s *SwipeOpinion) GetMyVoteType() *string {
 	if s.CurrentVoteType == 0 {
 		return nil
 	}
-	return lo.ToPtr(vote.VoteTypeFromInt(s.ParentVoteType).String())
+	return lo.ToPtr(vote.VoteTypeFromInt(s.CurrentVoteType).String())
 }
 
 func (s *SwipeOpinion) GetParentVoteType() *string {
