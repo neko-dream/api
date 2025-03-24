@@ -30,6 +30,7 @@ type talkSessionHandler struct {
 	getRestrictions               talksession_query.GetRestrictionsQuery
 	getAnalysisResultQuery        analysis_query.GetAnalysisResult
 	getReportQuery                analysis_query.GetReportQuery
+	isSatisfied                   talksession_query.IsTalkSessionSatisfiedQuery
 
 	addConclusionCommand    talksession_command.AddConclusionCommand
 	startTalkSessionCommand talksession_command.StartTalkSessionCommand
@@ -45,6 +46,7 @@ func NewTalkSessionHandler(
 	getRestrictionsQuery talksession_query.GetRestrictionsQuery,
 	getAnalysisQuery analysis_query.GetAnalysisResult,
 	getReportQuery analysis_query.GetReportQuery,
+	isSatisfied talksession_query.IsTalkSessionSatisfiedQuery,
 
 	AddConclusionCommand talksession_command.AddConclusionCommand,
 	startTalkSessionCommand talksession_command.StartTalkSessionCommand,
@@ -59,6 +61,7 @@ func NewTalkSessionHandler(
 		getRestrictions:               getRestrictionsQuery,
 		getAnalysisResultQuery:        getAnalysisQuery,
 		getReportQuery:                getReportQuery,
+		isSatisfied:                   isSatisfied,
 
 		addConclusionCommand:    AddConclusionCommand,
 		startTalkSessionCommand: startTalkSessionCommand,
@@ -621,5 +624,44 @@ func (t *talkSessionHandler) GetTalkSessionRestrictionKeys(ctx context.Context) 
 	}
 
 	res := oas.GetTalkSessionRestrictionKeysOKApplicationJSON(keys)
+	return &res, nil
+}
+
+// GetTalkSessionRestrictionSatisfied implements oas.TalkSessionHandler.
+func (t *talkSessionHandler) GetTalkSessionRestrictionSatisfied(ctx context.Context, params oas.GetTalkSessionRestrictionSatisfiedParams) (oas.GetTalkSessionRestrictionSatisfiedRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetTalkSessionRestrictionSatisfied")
+	defer span.End()
+
+	claim := session.GetSession(t.SetSession(ctx))
+	var userID *shared.UUID[user.User]
+	if claim != nil {
+		id, err := claim.UserID()
+		if err == nil {
+			userID = &id
+		}
+	}
+
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
+	out, err := t.isSatisfied.Execute(ctx, talksession_query.IsTalkSessionSatisfiedInput{
+		TalkSessionID: talkSessionID,
+		UserID:        *userID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	attributes := make([]oas.GetTalkSessionRestrictionSatisfiedOKItem, 0, len(out.Attributes))
+	for _, attribute := range out.Attributes {
+		attributes = append(attributes, oas.GetTalkSessionRestrictionSatisfiedOKItem{
+			Key:         string(attribute.Key),
+			Description: attribute.Description,
+		})
+	}
+
+	res := oas.GetTalkSessionRestrictionSatisfiedOKApplicationJSON(attributes)
 	return &res, nil
 }
