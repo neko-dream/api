@@ -43,4 +43,14 @@ var (
 		Code:       "OPINION-008",
 		Message:    "参考画像のアップロードに失敗しました。時間をおいて再度お試しください",
 	}
+	OpinionNotFound = &APIError{
+		StatusCode: http.StatusNotFound,
+		Code:       "OPINION-009",
+		Message:    "意見が見つかりません",
+	}
+	OpinionReportFailed = &APIError{
+		StatusCode: http.StatusInternalServerError,
+		Code:       "OPINION-010",
+		Message:    "意見の通報に失敗しました。時間をおいて再度お試しください",
+	}
 )

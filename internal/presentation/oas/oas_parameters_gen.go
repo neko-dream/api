@@ -2640,6 +2640,71 @@ func decodePostTimeLineItemParams(args [1]string, argsEscaped bool, r *http.Requ
 	return params, nil
 }
 
+// ReportOpinionParams is parameters of reportOpinion operation.
+type ReportOpinionParams struct {
+	OpinionID string
+}
+
+func unpackReportOpinionParams(packed middleware.Parameters) (params ReportOpinionParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "opinionID",
+			In:   "path",
+		}
+		params.OpinionID = packed[key].(string)
+	}
+	return params
+}
+
+func decodeReportOpinionParams(args [1]string, argsEscaped bool, r *http.Request) (params ReportOpinionParams, _ error) {
+	// Decode path: opinionID.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "opinionID",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.OpinionID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "opinionID",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // SessionsHistoryParams is parameters of sessionsHistory operation.
 type SessionsHistoryParams struct {
 	Limit  OptInt

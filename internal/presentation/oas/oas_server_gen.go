@@ -137,6 +137,12 @@ type OpinionHandler interface {
 	//
 	// POST /opinions
 	PostOpinionPost2(ctx context.Context, req OptPostOpinionPost2Req) (PostOpinionPost2Res, error)
+	// ReportOpinion implements reportOpinion operation.
+	//
+	// 意見通報API.
+	//
+	// POST /opinions/{opinionID}/report
+	ReportOpinion(ctx context.Context, req OptReportOpinionReq, params ReportOpinionParams) (ReportOpinionRes, error)
 	// SwipeOpinions implements swipe_opinions operation.
 	//
 	// セッションの中からまだ投票していない意見をランダムに取得する.
