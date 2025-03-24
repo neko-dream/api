@@ -137,6 +137,10 @@ type RegisterUserRes interface {
 	registerUserRes()
 }
 
+type ReportOpinionRes interface {
+	reportOpinionRes()
+}
+
 type SessionsHistoryRes interface {
 	sessionsHistoryRes()
 }

@@ -15008,6 +15008,138 @@ func (s *RegisterUserOK) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
+func (s *ReportOpinionBadRequest) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *ReportOpinionBadRequest) encodeFields(e *jx.Encoder) {
+}
+
+var jsonFieldsNameOfReportOpinionBadRequest = [0]string{}
+
+// Decode decodes ReportOpinionBadRequest from json.
+func (s *ReportOpinionBadRequest) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ReportOpinionBadRequest to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		default:
+			return d.Skip()
+		}
+	}); err != nil {
+		return errors.Wrap(err, "decode ReportOpinionBadRequest")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *ReportOpinionBadRequest) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ReportOpinionBadRequest) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *ReportOpinionInternalServerError) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *ReportOpinionInternalServerError) encodeFields(e *jx.Encoder) {
+}
+
+var jsonFieldsNameOfReportOpinionInternalServerError = [0]string{}
+
+// Decode decodes ReportOpinionInternalServerError from json.
+func (s *ReportOpinionInternalServerError) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ReportOpinionInternalServerError to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		default:
+			return d.Skip()
+		}
+	}); err != nil {
+		return errors.Wrap(err, "decode ReportOpinionInternalServerError")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *ReportOpinionInternalServerError) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ReportOpinionInternalServerError) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *ReportOpinionOK) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *ReportOpinionOK) encodeFields(e *jx.Encoder) {
+}
+
+var jsonFieldsNameOfReportOpinionOK = [0]string{}
+
+// Decode decodes ReportOpinionOK from json.
+func (s *ReportOpinionOK) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ReportOpinionOK to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		default:
+			return d.Skip()
+		}
+	}); err != nil {
+		return errors.Wrap(err, "decode ReportOpinionOK")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *ReportOpinionOK) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ReportOpinionOK) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s *SessionsHistoryBadRequest) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)

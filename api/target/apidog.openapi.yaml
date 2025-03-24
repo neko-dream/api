@@ -4824,6 +4824,101 @@
         ],
         "x-ogen-operation-group": "Policy"
       }
+    },
+    "/opinions/{opinionID}/report": {
+      "post": {
+        "summary": "意見通報API",
+        "deprecated": false,
+        "description": "",
+        "operationId": "reportOpinion",
+        "tags": [
+          "opinion"
+        ],
+        "parameters": [
+          {
+            "name": "opinionID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [],
+        "x-ogen-operation-group": "Opinion"
+      }
     }
   },
   "components": {

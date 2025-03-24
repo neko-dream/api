@@ -34,6 +34,17 @@ type Opinion struct {
 	ReferenceUrl    sql.NullString
 }
 
+type OpinionReport struct {
+	OpinionReportID uuid.UUID
+	OpinionID       uuid.UUID
+	TalkSessionID   uuid.UUID
+	ReporterID      uuid.UUID
+	Reason          int32
+	Status          string
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+}
+
 type PolicyConsent struct {
 	PolicyConsentID uuid.UUID
 	UserID          uuid.UUID
