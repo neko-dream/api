@@ -29,6 +29,7 @@ type opinionHandler struct {
 	getSwipeOpinionQuery         opinion_query.GetSwipeOpinionsQuery
 
 	submitOpinionCommand opinion_command.SubmitOpinion
+	reportOpinionCommand opinion_command.ReportOpinion
 
 	session.TokenManager
 }
@@ -40,6 +41,7 @@ func NewOpinionHandler(
 	getSwipeOpinionsQuery opinion_query.GetSwipeOpinionsQuery,
 
 	submitOpinionCommand opinion_command.SubmitOpinion,
+	reportOpinionCommand opinion_command.ReportOpinion,
 
 	tokenManager session.TokenManager,
 ) oas.OpinionHandler {
@@ -50,6 +52,7 @@ func NewOpinionHandler(
 		getSwipeOpinionQuery:         getSwipeOpinionsQuery,
 
 		submitOpinionCommand: submitOpinionCommand,
+		reportOpinionCommand: reportOpinionCommand,
 
 		TokenManager: tokenManager,
 	}
@@ -553,5 +556,37 @@ func (o *opinionHandler) PostOpinionPost2(ctx context.Context, req oas.OptPostOp
 	}
 
 	res := &oas.PostOpinionPost2OK{}
+	return res, nil
+}
+
+// ReportOpinion 意見を通報する
+func (o *opinionHandler) ReportOpinion(ctx context.Context, req oas.OptReportOpinionReq, params oas.ReportOpinionParams) (oas.ReportOpinionRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.ReportOpinion")
+	defer span.End()
+
+	claim := session.GetSession(ctx)
+	userID, err := claim.UserID()
+	if err != nil {
+		return nil, messages.ForbiddenError
+	}
+	if !req.IsSet() {
+		return nil, messages.RequiredParameterError
+	}
+
+	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
+	if err := o.reportOpinionCommand.Execute(ctx, opinion_command.ReportOpinionInput{
+		ReporterID: userID,
+		OpinionID:  opinionID,
+		Reason:     int32(req.Value.Reason.Value),
+	}); err != nil {
+		utils.HandleError(ctx, err, "reportOpinionCommand.Execute")
+		return nil, err
+	}
+
+	res := &oas.ReportOpinionOK{}
 	return res, nil
 }
