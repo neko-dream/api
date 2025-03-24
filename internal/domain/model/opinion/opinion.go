@@ -9,6 +9,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"go.opentelemetry.io/otel"
 )
 
 type (
@@ -126,4 +127,19 @@ func (o *Opinion) ReferenceImageURL() *string {
 
 func (o *Opinion) ChangeReferenceImageURL(url *string) {
 	o.referenceImageURL = url
+}
+
+func (o *Opinion) Report(ctx context.Context, reporterID shared.UUID[user.User], reason int) (*Report, error) {
+	ctx, span := otel.Tracer("opinion").Start(ctx, "Opinion.Report")
+	defer span.End()
+
+	return NewReport(
+		shared.NewUUID[Report](),
+		o.opinionID,
+		o.talkSessionID,
+		reporterID,
+		reason,
+		string(StatusUnconfirmed),
+		time.Now(),
+	)
 }
