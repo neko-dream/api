@@ -366,6 +366,27 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						}
 
 						elem = origElem
+					case 'r': // Prefix: "report_reasons"
+						origElem := elem
+						if l := len("report_reasons"); len(elem) >= l && elem[0:l] == "report_reasons" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch r.Method {
+							case "GET":
+								s.handleGetOpinionReportReasonsRequest([0]string{}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "GET")
+							}
+
+							return
+						}
+
+						elem = origElem
 					}
 					// Param: "opinionID"
 					// Match until "/"
@@ -1511,6 +1532,31 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.summary = "今までに投稿した異見"
 								r.operationID = "opinionsHistory"
 								r.pathPattern = "/opinions/histories"
+								r.args = args
+								r.count = 0
+								return r, true
+							default:
+								return
+							}
+						}
+
+						elem = origElem
+					case 'r': // Prefix: "report_reasons"
+						origElem := elem
+						if l := len("report_reasons"); len(elem) >= l && elem[0:l] == "report_reasons" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch method {
+							case "GET":
+								r.name = "GetOpinionReportReasons"
+								r.summary = "意見への通報理由一覧"
+								r.operationID = "getOpinionReportReasons"
+								r.pathPattern = "/opinions/report_reasons"
 								r.args = args
 								r.count = 0
 								return r, true

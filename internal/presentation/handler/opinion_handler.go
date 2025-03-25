@@ -27,6 +27,7 @@ type opinionHandler struct {
 	getOpinionDetailByIDQuery    opinion_query.GetOpinionDetailByIDQuery
 	getOpinionRepliesQuery       opinion_query.GetOpinionRepliesQuery
 	getSwipeOpinionQuery         opinion_query.GetSwipeOpinionsQuery
+	getReportReasons             opinion_query.GetReportReasons
 
 	submitOpinionCommand opinion_command.SubmitOpinion
 	reportOpinionCommand opinion_command.ReportOpinion
@@ -39,6 +40,7 @@ func NewOpinionHandler(
 	getOpinionDetailUseCase opinion_query.GetOpinionDetailByIDQuery,
 	getOpinionRepliesQuery opinion_query.GetOpinionRepliesQuery,
 	getSwipeOpinionsQuery opinion_query.GetSwipeOpinionsQuery,
+	getReportReasons opinion_query.GetReportReasons,
 
 	submitOpinionCommand opinion_command.SubmitOpinion,
 	reportOpinionCommand opinion_command.ReportOpinion,
@@ -50,6 +52,7 @@ func NewOpinionHandler(
 		getOpinionDetailByIDQuery:    getOpinionDetailUseCase,
 		getOpinionRepliesQuery:       getOpinionRepliesQuery,
 		getSwipeOpinionQuery:         getSwipeOpinionsQuery,
+		getReportReasons:             getReportReasons,
 
 		submitOpinionCommand: submitOpinionCommand,
 		reportOpinionCommand: reportOpinionCommand,
@@ -589,4 +592,22 @@ func (o *opinionHandler) ReportOpinion(ctx context.Context, req oas.OptReportOpi
 
 	res := &oas.ReportOpinionOK{}
 	return res, nil
+}
+
+// GetOpinionReportReasons 通報理由一覧取得
+func (o *opinionHandler) GetOpinionReportReasons(ctx context.Context) (oas.GetOpinionReportReasonsRes, error) {
+	reasons, err := o.getReportReasons.Execute(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var res oas.GetOpinionReportReasonsOKApplicationJSON
+	for _, reason := range reasons {
+		res = append(res, oas.GetOpinionReportReasonsOKItem{
+			ReasonID: reason.ReasonID,
+			Reason:   reason.Reason,
+		})
+	}
+
+	return &res, nil
 }

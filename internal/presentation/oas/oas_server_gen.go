@@ -106,6 +106,12 @@ type OpinionHandler interface {
 	//
 	// GET /opinions/{opinionID}
 	GetOpinionDetail2(ctx context.Context, params GetOpinionDetail2Params) (GetOpinionDetail2Res, error)
+	// GetOpinionReportReasons implements getOpinionReportReasons operation.
+	//
+	// 意見への通報理由一覧.
+	//
+	// GET /opinions/report_reasons
+	GetOpinionReportReasons(ctx context.Context) (GetOpinionReportReasonsRes, error)
 	// GetOpinionsForTalkSession implements getOpinionsForTalkSession operation.
 	//
 	// セッションに対する意見一覧.

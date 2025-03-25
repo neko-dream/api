@@ -128,6 +128,15 @@ func (UnimplementedHandler) GetOpinionDetail2(ctx context.Context, params GetOpi
 	return r, ht.ErrNotImplemented
 }
 
+// GetOpinionReportReasons implements getOpinionReportReasons operation.
+//
+// 意見への通報理由一覧.
+//
+// GET /opinions/report_reasons
+func (UnimplementedHandler) GetOpinionReportReasons(ctx context.Context) (r GetOpinionReportReasonsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetOpinionsForTalkSession implements getOpinionsForTalkSession operation.
 //
 // セッションに対する意見一覧.
