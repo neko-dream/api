@@ -94,6 +94,12 @@ type ManageHandler interface {
 //
 // x-ogen-operation-group: Opinion
 type OpinionHandler interface {
+	// GetOpinionAnalysis implements getOpinionAnalysis operation.
+	//
+	// 意見に投票したグループごとの割合.
+	//
+	// GET /opinions/{opinionID}/analysis
+	GetOpinionAnalysis(ctx context.Context, params GetOpinionAnalysisParams) (GetOpinionAnalysisRes, error)
 	// GetOpinionDetail implements getOpinionDetail operation.
 	//
 	// 意見の詳細.
