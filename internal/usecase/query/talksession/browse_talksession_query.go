@@ -19,7 +19,7 @@ type (
 		Limit     *int
 		Offset    *int
 		Theme     *string
-		Status    Status
+		Status    *Status
 		SortKey   sort.SortKey
 		Latitude  *float64
 		Longitude *float64
@@ -47,10 +47,7 @@ func (h *BrowseTalkSessionQueryInput) Validate() error {
 		err = errors.Join(err, fmt.Errorf("無効なSortKeyです。: %s", h.SortKey))
 	}
 
-	if h.Status == "" {
-		h.Status = StatusOpen
-	}
-	if h.Status != StatusOpen && h.Status != StatusClosed {
+	if h.Status != nil && *h.Status == "" && *h.Status != StatusOpen && *h.Status != StatusClosed {
 		err = errors.Join(err, fmt.Errorf("無効なステータスです。: %s", h.Status))
 	}
 	if h.Limit == nil {

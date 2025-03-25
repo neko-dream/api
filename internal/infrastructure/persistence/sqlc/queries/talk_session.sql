@@ -67,9 +67,9 @@ LEFT JOIN users
 LEFT JOIN talk_session_locations
     ON talk_sessions.talk_session_id = talk_session_locations.talk_session_id
 WHERE
-    CASE
-        WHEN sqlc.narg('status')::text = 'finished' THEN scheduled_end_time <= now()
-        WHEN sqlc.narg('status')::text = 'open' THEN scheduled_end_time > now()
+    CASE sqlc.narg('status')::text
+        WHEN 'finished' THEN scheduled_end_time <= now()
+        WHEN 'open' THEN scheduled_end_time > now()
         ELSE TRUE
     END
     AND
