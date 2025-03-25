@@ -681,6 +681,88 @@
         "x-ogen-operation-group": "Opinion"
       }
     },
+    "/opinions/{opinionID}/analysis": {
+      "get": {
+        "summary": "意見に投票したグループごとの割合",
+        "deprecated": false,
+        "description": "",
+        "operationId": "getOpinionAnalysis",
+        "tags": [
+          "opinion"
+        ],
+        "parameters": [
+          {
+            "name": "opinionID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/opinionGroupRatio"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [],
+        "x-ogen-operation-group": "Opinion"
+      }
+    },
     "/talksessions/{talkSessionID}/opinions/{opinionID}/votes": {
       "post": {
         "summary": "意思表明API",
@@ -5433,6 +5515,33 @@
         "required": [
           "reason_id",
           "reason"
+        ]
+      },
+      "opinionGroupRatio": {
+        "type": "object",
+        "properties": {
+          "agreeCount": {
+            "type": "integer"
+          },
+          "disagreeCount": {
+            "type": "integer"
+          },
+          "passCount": {
+            "type": "integer"
+          },
+          "groupId": {
+            "type": "integer"
+          },
+          "groupName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "groupName",
+          "groupId",
+          "passCount",
+          "disagreeCount",
+          "agreeCount"
         ]
       }
     },
