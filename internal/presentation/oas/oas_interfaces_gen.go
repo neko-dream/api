@@ -49,6 +49,10 @@ type GetOpinionDetailRes interface {
 	getOpinionDetailRes()
 }
 
+type GetOpinionReportReasonsRes interface {
+	getOpinionReportReasonsRes()
+}
+
 type GetOpinionsForTalkSessionRes interface {
 	getOpinionsForTalkSessionRes()
 }

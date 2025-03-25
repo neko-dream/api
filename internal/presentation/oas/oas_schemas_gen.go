@@ -1966,6 +1966,45 @@ func (s *GetOpinionDetailOKUser) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
 
+type GetOpinionReportReasonsBadRequest struct{}
+
+func (*GetOpinionReportReasonsBadRequest) getOpinionReportReasonsRes() {}
+
+type GetOpinionReportReasonsInternalServerError struct{}
+
+func (*GetOpinionReportReasonsInternalServerError) getOpinionReportReasonsRes() {}
+
+type GetOpinionReportReasonsOKApplicationJSON []GetOpinionReportReasonsOKItem
+
+func (*GetOpinionReportReasonsOKApplicationJSON) getOpinionReportReasonsRes() {}
+
+type GetOpinionReportReasonsOKItem struct {
+	// 1.
+	ReasonID int `json:"reason_id"`
+	// 不適切な内容.
+	Reason string `json:"reason"`
+}
+
+// GetReasonID returns the value of ReasonID.
+func (s *GetOpinionReportReasonsOKItem) GetReasonID() int {
+	return s.ReasonID
+}
+
+// GetReason returns the value of Reason.
+func (s *GetOpinionReportReasonsOKItem) GetReason() string {
+	return s.Reason
+}
+
+// SetReasonID sets the value of ReasonID.
+func (s *GetOpinionReportReasonsOKItem) SetReasonID(val int) {
+	s.ReasonID = val
+}
+
+// SetReason sets the value of Reason.
+func (s *GetOpinionReportReasonsOKItem) SetReason(val string) {
+	s.Reason = val
+}
+
 type GetOpinionsForTalkSessionBadRequest struct{}
 
 func (*GetOpinionsForTalkSessionBadRequest) getOpinionsForTalkSessionRes() {}
