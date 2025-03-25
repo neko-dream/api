@@ -30,3 +30,11 @@ type OpinionGroup struct {
 	GroupID   int
 	Opinions  []OpinionWithRepresentative
 }
+
+type OpinionGroupRatio struct {
+	GroupName     string
+	GroupID       int
+	AgreeCount    int
+	DisagreeCount int
+	PassCount     int
+}
