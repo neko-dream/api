@@ -14,6 +14,7 @@ import (
 	"github.com/neko-dream/server/internal/usecase/command/timeline_command"
 	"github.com/neko-dream/server/internal/usecase/command/user_command"
 	"github.com/neko-dream/server/internal/usecase/command/vote_command"
+	opinion_q "github.com/neko-dream/server/internal/usecase/query/opinion"
 	"github.com/neko-dream/server/internal/usecase/query/policy_query"
 	"github.com/neko-dream/server/internal/usecase/query/talksession"
 	"github.com/neko-dream/server/internal/usecase/query/timeline_query"
@@ -54,5 +55,6 @@ func useCaseDeps() []ProvideArg {
 		{auth_command.NewDetachAccount, nil},
 		{talksession.NewIsTalkSessionSatisfiedInteractor, nil},
 		{opinion_command.NewReportOpinion, nil},
+		{opinion_q.NewGetReportReasons, nil},
 	}
 }
