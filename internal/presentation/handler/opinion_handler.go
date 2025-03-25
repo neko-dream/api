@@ -623,8 +623,13 @@ func (o *opinionHandler) GetOpinionAnalysis(ctx context.Context, params oas.GetO
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.GetOpinionAnalysis")
 	defer span.End()
 
+	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
 	out, err := o.getOpinionGroupRatio.Execute(ctx, opinion_query.GetOpinionGroupRatioInput{
-		OpinionID: shared.MustParseUUID[opinion.Opinion](params.OpinionID),
+		OpinionID: opinionID,
 	})
 	if err != nil {
 		return nil, err
