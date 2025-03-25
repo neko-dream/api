@@ -110,6 +110,15 @@ func (UnimplementedHandler) GetOpenedTalkSession(ctx context.Context, params Get
 	return r, ht.ErrNotImplemented
 }
 
+// GetOpinionAnalysis implements getOpinionAnalysis operation.
+//
+// 意見に投票したグループごとの割合.
+//
+// GET /opinions/{opinionID}/analysis
+func (UnimplementedHandler) GetOpinionAnalysis(ctx context.Context, params GetOpinionAnalysisParams) (r GetOpinionAnalysisRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetOpinionDetail implements getOpinionDetail operation.
 //
 // 意見の詳細.
@@ -125,6 +134,15 @@ func (UnimplementedHandler) GetOpinionDetail(ctx context.Context, params GetOpin
 //
 // GET /opinions/{opinionID}
 func (UnimplementedHandler) GetOpinionDetail2(ctx context.Context, params GetOpinionDetail2Params) (r GetOpinionDetail2Res, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetOpinionReportReasons implements getOpinionReportReasons operation.
+//
+// 意見への通報理由一覧.
+//
+// GET /opinions/report_reasons
+func (UnimplementedHandler) GetOpinionReportReasons(ctx context.Context) (r GetOpinionReportReasonsRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

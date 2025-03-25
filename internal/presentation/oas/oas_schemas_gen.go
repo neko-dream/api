@@ -1623,6 +1623,76 @@ func (s *GetOpenedTalkSessionStatus) UnmarshalText(data []byte) error {
 	}
 }
 
+type GetOpinionAnalysisBadRequest struct{}
+
+func (*GetOpinionAnalysisBadRequest) getOpinionAnalysisRes() {}
+
+type GetOpinionAnalysisInternalServerError struct{}
+
+func (*GetOpinionAnalysisInternalServerError) getOpinionAnalysisRes() {}
+
+type GetOpinionAnalysisOKApplicationJSON []GetOpinionAnalysisOKItem
+
+func (*GetOpinionAnalysisOKApplicationJSON) getOpinionAnalysisRes() {}
+
+type GetOpinionAnalysisOKItem struct {
+	AgreeCount    int    `json:"agreeCount"`
+	DisagreeCount int    `json:"disagreeCount"`
+	PassCount     int    `json:"passCount"`
+	GroupId       int    `json:"groupId"`
+	GroupName     string `json:"groupName"`
+}
+
+// GetAgreeCount returns the value of AgreeCount.
+func (s *GetOpinionAnalysisOKItem) GetAgreeCount() int {
+	return s.AgreeCount
+}
+
+// GetDisagreeCount returns the value of DisagreeCount.
+func (s *GetOpinionAnalysisOKItem) GetDisagreeCount() int {
+	return s.DisagreeCount
+}
+
+// GetPassCount returns the value of PassCount.
+func (s *GetOpinionAnalysisOKItem) GetPassCount() int {
+	return s.PassCount
+}
+
+// GetGroupId returns the value of GroupId.
+func (s *GetOpinionAnalysisOKItem) GetGroupId() int {
+	return s.GroupId
+}
+
+// GetGroupName returns the value of GroupName.
+func (s *GetOpinionAnalysisOKItem) GetGroupName() string {
+	return s.GroupName
+}
+
+// SetAgreeCount sets the value of AgreeCount.
+func (s *GetOpinionAnalysisOKItem) SetAgreeCount(val int) {
+	s.AgreeCount = val
+}
+
+// SetDisagreeCount sets the value of DisagreeCount.
+func (s *GetOpinionAnalysisOKItem) SetDisagreeCount(val int) {
+	s.DisagreeCount = val
+}
+
+// SetPassCount sets the value of PassCount.
+func (s *GetOpinionAnalysisOKItem) SetPassCount(val int) {
+	s.PassCount = val
+}
+
+// SetGroupId sets the value of GroupId.
+func (s *GetOpinionAnalysisOKItem) SetGroupId(val int) {
+	s.GroupId = val
+}
+
+// SetGroupName sets the value of GroupName.
+func (s *GetOpinionAnalysisOKItem) SetGroupName(val string) {
+	s.GroupName = val
+}
+
 type GetOpinionDetail2InternalServerError struct{}
 
 func (*GetOpinionDetail2InternalServerError) getOpinionDetail2Res() {}
@@ -1964,6 +2034,45 @@ func (s *GetOpinionDetailOKUser) SetDisplayName(val string) {
 // SetIconURL sets the value of IconURL.
 func (s *GetOpinionDetailOKUser) SetIconURL(val OptNilString) {
 	s.IconURL = val
+}
+
+type GetOpinionReportReasonsBadRequest struct{}
+
+func (*GetOpinionReportReasonsBadRequest) getOpinionReportReasonsRes() {}
+
+type GetOpinionReportReasonsInternalServerError struct{}
+
+func (*GetOpinionReportReasonsInternalServerError) getOpinionReportReasonsRes() {}
+
+type GetOpinionReportReasonsOKApplicationJSON []GetOpinionReportReasonsOKItem
+
+func (*GetOpinionReportReasonsOKApplicationJSON) getOpinionReportReasonsRes() {}
+
+type GetOpinionReportReasonsOKItem struct {
+	// 1.
+	ReasonID int `json:"reason_id"`
+	// 不適切な内容.
+	Reason string `json:"reason"`
+}
+
+// GetReasonID returns the value of ReasonID.
+func (s *GetOpinionReportReasonsOKItem) GetReasonID() int {
+	return s.ReasonID
+}
+
+// GetReason returns the value of Reason.
+func (s *GetOpinionReportReasonsOKItem) GetReason() string {
+	return s.Reason
+}
+
+// SetReasonID sets the value of ReasonID.
+func (s *GetOpinionReportReasonsOKItem) SetReasonID(val int) {
+	s.ReasonID = val
+}
+
+// SetReason sets the value of Reason.
+func (s *GetOpinionReportReasonsOKItem) SetReason(val string) {
+	s.Reason = val
 }
 
 type GetOpinionsForTalkSessionBadRequest struct{}

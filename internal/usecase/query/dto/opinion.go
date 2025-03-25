@@ -60,3 +60,8 @@ type RepresentativeOpinion struct {
 	DisagreeCount int
 	PassCount     int
 }
+
+type ReportReason struct {
+	ReasonID int
+	Reason   string
+}

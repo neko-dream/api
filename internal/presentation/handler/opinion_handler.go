@@ -27,6 +27,8 @@ type opinionHandler struct {
 	getOpinionDetailByIDQuery    opinion_query.GetOpinionDetailByIDQuery
 	getOpinionRepliesQuery       opinion_query.GetOpinionRepliesQuery
 	getSwipeOpinionQuery         opinion_query.GetSwipeOpinionsQuery
+	getReportReasons             opinion_query.GetReportReasons
+	getOpinionGroupRatio         opinion_query.GetOpinionGroupRatioQuery
 
 	submitOpinionCommand opinion_command.SubmitOpinion
 	reportOpinionCommand opinion_command.ReportOpinion
@@ -39,6 +41,8 @@ func NewOpinionHandler(
 	getOpinionDetailUseCase opinion_query.GetOpinionDetailByIDQuery,
 	getOpinionRepliesQuery opinion_query.GetOpinionRepliesQuery,
 	getSwipeOpinionsQuery opinion_query.GetSwipeOpinionsQuery,
+	getReportReasons opinion_query.GetReportReasons,
+	getOpinionGroupRatio opinion_query.GetOpinionGroupRatioQuery,
 
 	submitOpinionCommand opinion_command.SubmitOpinion,
 	reportOpinionCommand opinion_command.ReportOpinion,
@@ -50,6 +54,8 @@ func NewOpinionHandler(
 		getOpinionDetailByIDQuery:    getOpinionDetailUseCase,
 		getOpinionRepliesQuery:       getOpinionRepliesQuery,
 		getSwipeOpinionQuery:         getSwipeOpinionsQuery,
+		getReportReasons:             getReportReasons,
+		getOpinionGroupRatio:         getOpinionGroupRatio,
 
 		submitOpinionCommand: submitOpinionCommand,
 		reportOpinionCommand: reportOpinionCommand,
@@ -589,4 +595,56 @@ func (o *opinionHandler) ReportOpinion(ctx context.Context, req oas.OptReportOpi
 
 	res := &oas.ReportOpinionOK{}
 	return res, nil
+}
+
+// GetOpinionReportReasons 通報理由一覧取得
+func (o *opinionHandler) GetOpinionReportReasons(ctx context.Context) (oas.GetOpinionReportReasonsRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.GetOpinionReportReasons")
+	defer span.End()
+
+	reasons, err := o.getReportReasons.Execute(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var res oas.GetOpinionReportReasonsOKApplicationJSON
+	for _, reason := range reasons {
+		res = append(res, oas.GetOpinionReportReasonsOKItem{
+			ReasonID: reason.ReasonID,
+			Reason:   reason.Reason,
+		})
+	}
+
+	return &res, nil
+}
+
+// GetOpinionAnalysis 意見の集計結果取得
+func (o *opinionHandler) GetOpinionAnalysis(ctx context.Context, params oas.GetOpinionAnalysisParams) (oas.GetOpinionAnalysisRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.GetOpinionAnalysis")
+	defer span.End()
+
+	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
+	out, err := o.getOpinionGroupRatio.Execute(ctx, opinion_query.GetOpinionGroupRatioInput{
+		OpinionID: opinionID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var res oas.GetOpinionAnalysisOKApplicationJSON
+	for _, r := range out {
+		res = append(res, oas.GetOpinionAnalysisOKItem{
+			GroupName:     r.GroupName,
+			GroupId:       r.GroupID,
+			AgreeCount:    r.AgreeCount,
+			DisagreeCount: r.DisagreeCount,
+			PassCount:     r.PassCount,
+		})
+	}
+
+	return &res, nil
 }

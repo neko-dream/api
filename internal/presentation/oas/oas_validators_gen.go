@@ -775,6 +775,14 @@ func (s GetOpenedTalkSessionStatus) Validate() error {
 	}
 }
 
+func (s GetOpinionAnalysisOKApplicationJSON) Validate() error {
+	alias := ([]GetOpinionAnalysisOKItem)(s)
+	if alias == nil {
+		return errors.New("nil is invalid value")
+	}
+	return nil
+}
+
 func (s *GetOpinionDetail2OK) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -963,6 +971,14 @@ func (s *GetOpinionDetailOKUser) Validate() error {
 	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s GetOpinionReportReasonsOKApplicationJSON) Validate() error {
+	alias := ([]GetOpinionReportReasonsOKItem)(s)
+	if alias == nil {
+		return errors.New("nil is invalid value")
 	}
 	return nil
 }
