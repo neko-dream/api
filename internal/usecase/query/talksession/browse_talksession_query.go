@@ -47,13 +47,13 @@ func (h *BrowseTalkSessionQueryInput) Validate() error {
 		err = errors.Join(err, fmt.Errorf("無効なSortKeyです。: %s", h.SortKey))
 	}
 
-	if h.Status != nil && *h.Status == "" && *h.Status != StatusOpen && *h.Status != StatusClosed {
-		err = errors.Join(err, fmt.Errorf("無効なステータスです。: %s", h.Status))
+	if h.Status != nil && (*h.Status == "" || (*h.Status != StatusOpen && *h.Status != StatusClosed)) {
+		err = errors.Join(err, fmt.Errorf("無効なステータスです。: %s", *h.Status))
 	}
 	if h.Limit == nil {
 		h.Limit = lo.ToPtr(10)
-	} else if *h.Limit <= 0 || *h.Limit > 100 {
-		err = errors.Join(err, fmt.Errorf("Limitは1から100の間で指定してください"))
+	} else if *h.Limit <= 0 {
+		err = errors.Join(err, fmt.Errorf("Limitは1以上で指定してください"))
 	}
 
 	if h.Offset == nil {
@@ -62,5 +62,5 @@ func (h *BrowseTalkSessionQueryInput) Validate() error {
 		err = errors.Join(err, fmt.Errorf("Offsetは0以上の値を指定してください"))
 	}
 
-	return nil
+	return err
 }
