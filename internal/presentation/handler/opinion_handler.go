@@ -351,9 +351,9 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 		return nil, err
 	}
 
-	var res oas.SwipeOpinionsOKApplicationJSON
+	var ress []oas.SwipeOpinionsOKOpinionsItem
 	for _, opinion := range opinions.Opinions {
-		user := &oas.SwipeOpinionsOKItemUser{
+		user := &oas.SwipeOpinionsOKOpinionsItemUser{
 			DisplayID:   opinion.User.DisplayID,
 			DisplayName: opinion.User.DisplayName,
 			IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.IconURL),
@@ -362,7 +362,7 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 		if opinion.Opinion.ParentOpinionID != nil {
 			parentOpinionID = utils.ToOpt[oas.OptString](opinion.Opinion.ParentOpinionID.String())
 		}
-		ops := &oas.SwipeOpinionsOKItemOpinion{
+		ops := &oas.SwipeOpinionsOKOpinionsItemOpinion{
 			ID:           opinion.Opinion.OpinionID.String(),
 			ParentID:     parentOpinionID,
 			Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Title),
@@ -372,14 +372,17 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 			ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
 			PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
 		}
-		res = append(res, oas.SwipeOpinionsOKItem{
+		ress = append(ress, oas.SwipeOpinionsOKOpinionsItem{
 			User:       *user,
 			Opinion:    *ops,
 			ReplyCount: opinion.ReplyCount,
 		})
 	}
 
-	return &res, nil
+	return &oas.SwipeOpinionsOK{
+		Opinions:       ress,
+		RemainingCount: opinions.RemainingOpinions,
+	}, nil
 }
 
 // OpinionComments 意見に対するリプライ意見取得

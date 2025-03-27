@@ -19,6 +19,7 @@ import (
 	talksession_query "github.com/neko-dream/server/internal/usecase/query/talksession"
 	"github.com/neko-dream/server/pkg/sort"
 	"github.com/neko-dream/server/pkg/utils"
+	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
@@ -408,11 +409,11 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 		offset = &params.Offset.Value
 	}
 
-	var status talksession_query.Status
+	var status *talksession_query.Status
 	if params.Status.IsSet() {
 		bytes, err := params.Status.Value.MarshalText()
 		if err == nil {
-			status = talksession_query.Status(string(bytes))
+			status = lo.ToPtr(talksession_query.Status(string(bytes)))
 		}
 	}
 	var sortKey sort.SortKey

@@ -2510,24 +2510,39 @@ func (s SessionsHistoryStatus) Validate() error {
 	}
 }
 
-func (s SwipeOpinionsOKApplicationJSON) Validate() error {
-	alias := ([]SwipeOpinionsOKItem)(s)
-	if alias == nil {
-		return errors.New("nil is invalid value")
+func (s *SwipeOpinionsOK) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
 	}
+
 	var failures []validate.FieldError
-	for i, elem := range alias {
-		if err := func() error {
-			if err := elem.Validate(); err != nil {
-				return err
-			}
-			return nil
-		}(); err != nil {
-			failures = append(failures, validate.FieldError{
-				Name:  fmt.Sprintf("[%d]", i),
-				Error: err,
-			})
+	if err := func() error {
+		if s.Opinions == nil {
+			return errors.New("nil is invalid value")
 		}
+		var failures []validate.FieldError
+		for i, elem := range s.Opinions {
+			if err := func() error {
+				if err := elem.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
+			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "opinions",
+			Error: err,
+		})
 	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
@@ -2535,7 +2550,7 @@ func (s SwipeOpinionsOKApplicationJSON) Validate() error {
 	return nil
 }
 
-func (s *SwipeOpinionsOKItem) Validate() error {
+func (s *SwipeOpinionsOKOpinionsItem) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
@@ -2569,7 +2584,7 @@ func (s *SwipeOpinionsOKItem) Validate() error {
 	return nil
 }
 
-func (s *SwipeOpinionsOKItemOpinion) Validate() error {
+func (s *SwipeOpinionsOKOpinionsItemOpinion) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
@@ -2600,7 +2615,7 @@ func (s *SwipeOpinionsOKItemOpinion) Validate() error {
 	return nil
 }
 
-func (s *SwipeOpinionsOKItemUser) Validate() error {
+func (s *SwipeOpinionsOKOpinionsItemUser) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}

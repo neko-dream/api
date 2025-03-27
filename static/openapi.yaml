@@ -778,7 +778,9 @@ paths:
     get:
       summary: スワイプ用のエンドポイント
       deprecated: false
-      description: セッションの中からまだ投票していない意見をランダムに取得する
+      description: |-
+        セッションの中からまだ投票していない意見をランダムに取得する
+        remainingCountは取得した意見を含めてスワイプできる意見の総数を返す
       operationId: swipe_opinions
       tags:
         - opinion
@@ -803,68 +805,76 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    opinion:
+                type: object
+                properties:
+                  opinions:
+                    type: array
+                    items:
                       type: object
                       properties:
-                        id:
-                          type: string
-                          description: 意見ID
-                        title:
-                          type: string
-                        content:
-                          type: string
-                          description: 意見のテキスト
-                          minLength: 1
-                          maxLength: 140
-                        parentID:
-                          type: string
-                          description: 親の意見ID。ルートならば無し
-                        voteType:
-                          type: string
-                          description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                          nullable: true
-                        pictureURL:
-                          type: string
-                          description: 画像が返る場合もある
-                          nullable: true
-                        referenceURL:
-                          type: string
-                          description: 参考文献URL
-                        postedAt:
-                          type: string
+                        replyCount:
+                          type: integer
+                        opinion:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              description: 意見ID
+                            title:
+                              type: string
+                            content:
+                              type: string
+                              description: 意見のテキスト
+                              minLength: 1
+                              maxLength: 140
+                            parentID:
+                              type: string
+                              description: 親の意見ID。ルートならば無し
+                            voteType:
+                              type: string
+                              description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              nullable: true
+                            pictureURL:
+                              type: string
+                              description: 画像が返る場合もある
+                              nullable: true
+                            referenceURL:
+                              type: string
+                              description: 参考文献URL
+                            postedAt:
+                              type: string
+                          required:
+                            - content
+                            - id
+                            - postedAt
+                        user:
+                          type: object
+                          properties:
+                            displayID:
+                              type: string
+                              pattern: ^[A-Za-z0-9]$
+                              examples:
+                                - userid
+                              minLength: 3
+                              maxLength: 25
+                            displayName:
+                              type: string
+                            iconURL:
+                              type: string
+                              nullable: true
+                          required:
+                            - displayID
+                            - displayName
+                          description: 作成ユーザー
                       required:
-                        - content
-                        - id
-                        - postedAt
-                    user:
-                      type: object
-                      properties:
-                        displayID:
-                          type: string
-                          pattern: ^[A-Za-z0-9]$
-                          examples:
-                            - userid
-                          minLength: 3
-                          maxLength: 25
-                        displayName:
-                          type: string
-                        iconURL:
-                          type: string
-                          nullable: true
-                      required:
-                        - displayID
-                        - displayName
-                      description: 作成ユーザー
-                    replyCount:
-                      type: integer
-                  required:
-                    - opinion
-                    - user
-                    - replyCount
+                        - replyCount
+                        - opinion
+                        - user
+                  remainingCount:
+                    type: integer
+                required:
+                  - opinions
+                  - remainingCount
           headers: {}
         '400':
           description: ''

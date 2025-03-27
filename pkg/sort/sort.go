@@ -11,15 +11,10 @@ var (
 
 func (s SortKey) IsValid() bool {
 	if s == "" {
-		return false
-	}
-
-	switch string(s) {
-	case "latest", "nearest", "mostReplies", "oldest":
 		return true
 	}
 
-	return false
+	return s == SortKeyLatest || s == SortKeyNearest || s == SortKeyMostReplies || s == SortKeyOldest
 }
 
 func (s SortKey) String() string {

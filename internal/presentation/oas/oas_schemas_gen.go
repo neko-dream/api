@@ -7957,48 +7957,71 @@ func (s *SwipeOpinionsInternalServerError) SetMessage(val string) {
 
 func (*SwipeOpinionsInternalServerError) swipeOpinionsRes() {}
 
-type SwipeOpinionsOKApplicationJSON []SwipeOpinionsOKItem
+type SwipeOpinionsOK struct {
+	Opinions       []SwipeOpinionsOKOpinionsItem `json:"opinions"`
+	RemainingCount int                           `json:"remainingCount"`
+}
 
-func (*SwipeOpinionsOKApplicationJSON) swipeOpinionsRes() {}
+// GetOpinions returns the value of Opinions.
+func (s *SwipeOpinionsOK) GetOpinions() []SwipeOpinionsOKOpinionsItem {
+	return s.Opinions
+}
 
-type SwipeOpinionsOKItem struct {
-	Opinion SwipeOpinionsOKItemOpinion `json:"opinion"`
+// GetRemainingCount returns the value of RemainingCount.
+func (s *SwipeOpinionsOK) GetRemainingCount() int {
+	return s.RemainingCount
+}
+
+// SetOpinions sets the value of Opinions.
+func (s *SwipeOpinionsOK) SetOpinions(val []SwipeOpinionsOKOpinionsItem) {
+	s.Opinions = val
+}
+
+// SetRemainingCount sets the value of RemainingCount.
+func (s *SwipeOpinionsOK) SetRemainingCount(val int) {
+	s.RemainingCount = val
+}
+
+func (*SwipeOpinionsOK) swipeOpinionsRes() {}
+
+type SwipeOpinionsOKOpinionsItem struct {
+	ReplyCount int                                `json:"replyCount"`
+	Opinion    SwipeOpinionsOKOpinionsItemOpinion `json:"opinion"`
 	// 作成ユーザー.
-	User       SwipeOpinionsOKItemUser `json:"user"`
-	ReplyCount int                     `json:"replyCount"`
+	User SwipeOpinionsOKOpinionsItemUser `json:"user"`
+}
+
+// GetReplyCount returns the value of ReplyCount.
+func (s *SwipeOpinionsOKOpinionsItem) GetReplyCount() int {
+	return s.ReplyCount
 }
 
 // GetOpinion returns the value of Opinion.
-func (s *SwipeOpinionsOKItem) GetOpinion() SwipeOpinionsOKItemOpinion {
+func (s *SwipeOpinionsOKOpinionsItem) GetOpinion() SwipeOpinionsOKOpinionsItemOpinion {
 	return s.Opinion
 }
 
 // GetUser returns the value of User.
-func (s *SwipeOpinionsOKItem) GetUser() SwipeOpinionsOKItemUser {
+func (s *SwipeOpinionsOKOpinionsItem) GetUser() SwipeOpinionsOKOpinionsItemUser {
 	return s.User
 }
 
-// GetReplyCount returns the value of ReplyCount.
-func (s *SwipeOpinionsOKItem) GetReplyCount() int {
-	return s.ReplyCount
+// SetReplyCount sets the value of ReplyCount.
+func (s *SwipeOpinionsOKOpinionsItem) SetReplyCount(val int) {
+	s.ReplyCount = val
 }
 
 // SetOpinion sets the value of Opinion.
-func (s *SwipeOpinionsOKItem) SetOpinion(val SwipeOpinionsOKItemOpinion) {
+func (s *SwipeOpinionsOKOpinionsItem) SetOpinion(val SwipeOpinionsOKOpinionsItemOpinion) {
 	s.Opinion = val
 }
 
 // SetUser sets the value of User.
-func (s *SwipeOpinionsOKItem) SetUser(val SwipeOpinionsOKItemUser) {
+func (s *SwipeOpinionsOKOpinionsItem) SetUser(val SwipeOpinionsOKOpinionsItemUser) {
 	s.User = val
 }
 
-// SetReplyCount sets the value of ReplyCount.
-func (s *SwipeOpinionsOKItem) SetReplyCount(val int) {
-	s.ReplyCount = val
-}
-
-type SwipeOpinionsOKItemOpinion struct {
+type SwipeOpinionsOKOpinionsItemOpinion struct {
 	// 意見ID.
 	ID    string    `json:"id"`
 	Title OptString `json:"title"`
@@ -8016,119 +8039,119 @@ type SwipeOpinionsOKItemOpinion struct {
 }
 
 // GetID returns the value of ID.
-func (s *SwipeOpinionsOKItemOpinion) GetID() string {
+func (s *SwipeOpinionsOKOpinionsItemOpinion) GetID() string {
 	return s.ID
 }
 
 // GetTitle returns the value of Title.
-func (s *SwipeOpinionsOKItemOpinion) GetTitle() OptString {
+func (s *SwipeOpinionsOKOpinionsItemOpinion) GetTitle() OptString {
 	return s.Title
 }
 
 // GetContent returns the value of Content.
-func (s *SwipeOpinionsOKItemOpinion) GetContent() string {
+func (s *SwipeOpinionsOKOpinionsItemOpinion) GetContent() string {
 	return s.Content
 }
 
 // GetParentID returns the value of ParentID.
-func (s *SwipeOpinionsOKItemOpinion) GetParentID() OptString {
+func (s *SwipeOpinionsOKOpinionsItemOpinion) GetParentID() OptString {
 	return s.ParentID
 }
 
 // GetVoteType returns the value of VoteType.
-func (s *SwipeOpinionsOKItemOpinion) GetVoteType() OptNilString {
+func (s *SwipeOpinionsOKOpinionsItemOpinion) GetVoteType() OptNilString {
 	return s.VoteType
 }
 
 // GetPictureURL returns the value of PictureURL.
-func (s *SwipeOpinionsOKItemOpinion) GetPictureURL() OptNilString {
+func (s *SwipeOpinionsOKOpinionsItemOpinion) GetPictureURL() OptNilString {
 	return s.PictureURL
 }
 
 // GetReferenceURL returns the value of ReferenceURL.
-func (s *SwipeOpinionsOKItemOpinion) GetReferenceURL() OptString {
+func (s *SwipeOpinionsOKOpinionsItemOpinion) GetReferenceURL() OptString {
 	return s.ReferenceURL
 }
 
 // GetPostedAt returns the value of PostedAt.
-func (s *SwipeOpinionsOKItemOpinion) GetPostedAt() string {
+func (s *SwipeOpinionsOKOpinionsItemOpinion) GetPostedAt() string {
 	return s.PostedAt
 }
 
 // SetID sets the value of ID.
-func (s *SwipeOpinionsOKItemOpinion) SetID(val string) {
+func (s *SwipeOpinionsOKOpinionsItemOpinion) SetID(val string) {
 	s.ID = val
 }
 
 // SetTitle sets the value of Title.
-func (s *SwipeOpinionsOKItemOpinion) SetTitle(val OptString) {
+func (s *SwipeOpinionsOKOpinionsItemOpinion) SetTitle(val OptString) {
 	s.Title = val
 }
 
 // SetContent sets the value of Content.
-func (s *SwipeOpinionsOKItemOpinion) SetContent(val string) {
+func (s *SwipeOpinionsOKOpinionsItemOpinion) SetContent(val string) {
 	s.Content = val
 }
 
 // SetParentID sets the value of ParentID.
-func (s *SwipeOpinionsOKItemOpinion) SetParentID(val OptString) {
+func (s *SwipeOpinionsOKOpinionsItemOpinion) SetParentID(val OptString) {
 	s.ParentID = val
 }
 
 // SetVoteType sets the value of VoteType.
-func (s *SwipeOpinionsOKItemOpinion) SetVoteType(val OptNilString) {
+func (s *SwipeOpinionsOKOpinionsItemOpinion) SetVoteType(val OptNilString) {
 	s.VoteType = val
 }
 
 // SetPictureURL sets the value of PictureURL.
-func (s *SwipeOpinionsOKItemOpinion) SetPictureURL(val OptNilString) {
+func (s *SwipeOpinionsOKOpinionsItemOpinion) SetPictureURL(val OptNilString) {
 	s.PictureURL = val
 }
 
 // SetReferenceURL sets the value of ReferenceURL.
-func (s *SwipeOpinionsOKItemOpinion) SetReferenceURL(val OptString) {
+func (s *SwipeOpinionsOKOpinionsItemOpinion) SetReferenceURL(val OptString) {
 	s.ReferenceURL = val
 }
 
 // SetPostedAt sets the value of PostedAt.
-func (s *SwipeOpinionsOKItemOpinion) SetPostedAt(val string) {
+func (s *SwipeOpinionsOKOpinionsItemOpinion) SetPostedAt(val string) {
 	s.PostedAt = val
 }
 
 // 作成ユーザー.
-type SwipeOpinionsOKItemUser struct {
+type SwipeOpinionsOKOpinionsItemUser struct {
 	DisplayID   string       `json:"displayID"`
 	DisplayName string       `json:"displayName"`
 	IconURL     OptNilString `json:"iconURL"`
 }
 
 // GetDisplayID returns the value of DisplayID.
-func (s *SwipeOpinionsOKItemUser) GetDisplayID() string {
+func (s *SwipeOpinionsOKOpinionsItemUser) GetDisplayID() string {
 	return s.DisplayID
 }
 
 // GetDisplayName returns the value of DisplayName.
-func (s *SwipeOpinionsOKItemUser) GetDisplayName() string {
+func (s *SwipeOpinionsOKOpinionsItemUser) GetDisplayName() string {
 	return s.DisplayName
 }
 
 // GetIconURL returns the value of IconURL.
-func (s *SwipeOpinionsOKItemUser) GetIconURL() OptNilString {
+func (s *SwipeOpinionsOKOpinionsItemUser) GetIconURL() OptNilString {
 	return s.IconURL
 }
 
 // SetDisplayID sets the value of DisplayID.
-func (s *SwipeOpinionsOKItemUser) SetDisplayID(val string) {
+func (s *SwipeOpinionsOKOpinionsItemUser) SetDisplayID(val string) {
 	s.DisplayID = val
 }
 
 // SetDisplayName sets the value of DisplayName.
-func (s *SwipeOpinionsOKItemUser) SetDisplayName(val string) {
+func (s *SwipeOpinionsOKOpinionsItemUser) SetDisplayName(val string) {
 	s.DisplayName = val
 }
 
 // SetIconURL sets the value of IconURL.
-func (s *SwipeOpinionsOKItemUser) SetIconURL(val OptNilString) {
+func (s *SwipeOpinionsOKOpinionsItemUser) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
 

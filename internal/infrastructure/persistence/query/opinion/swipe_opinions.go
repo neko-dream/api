@@ -31,6 +31,21 @@ func (g *GetSwipeOpinionsQueryHandler) Execute(ctx context.Context, in opinion_q
 	ctx, span := otel.Tracer("opinion_query").Start(ctx, "GetSwipeOpinionsQueryHandler.Execute")
 	defer span.End()
 
+	swipeableOpinionCount, err := g.GetQueries(ctx).CountSwipeableOpinions(ctx, model.CountSwipeableOpinionsParams{
+		UserID:        in.UserID.UUID(),
+		TalkSessionID: in.TalkSessionID.UUID(),
+	})
+	if err != nil {
+		utils.HandleError(ctx, err, "SwipeableOpinionのカウントに失敗")
+		return nil, err
+	}
+	if swipeableOpinionCount == 0 {
+		return &opinion_query.GetSwipeOpinionsQueryOutput{
+			Opinions:          []dto.SwipeOpinion{},
+			RemainingOpinions: 0,
+		}, nil
+	}
+
 	// top,randomを1:2の比率で取得する
 	// limitが3以上の場合、2件はtop, 1件はrandomで取得する
 	topLimit := in.Limit / 3
@@ -97,6 +112,7 @@ func (g *GetSwipeOpinionsQueryHandler) Execute(ctx context.Context, in opinion_q
 	}
 
 	return &opinion_query.GetSwipeOpinionsQueryOutput{
-		Opinions: swipeOpinions,
+		Opinions:          swipeOpinions,
+		RemainingOpinions: int(swipeableOpinionCount),
 	}, nil
 }

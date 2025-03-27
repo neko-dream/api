@@ -67,6 +67,52 @@ func (q *Queries) CountOpinions(ctx context.Context, arg CountOpinionsParams) (i
 	return opinion_count, err
 }
 
+const countSwipeableOpinions = `-- name: CountSwipeableOpinions :one
+SELECT COUNT(vote_count.opinion_id) AS random_opinion_count
+FROM opinions
+LEFT JOIN (
+    SELECT opinions.opinion_id
+    FROM opinions
+    LEFT JOIN votes
+        ON opinions.opinion_id = votes.opinion_id
+        AND votes.user_id = $1
+    GROUP BY opinions.opinion_id
+    HAVING COUNT(votes.vote_id) = 0
+) vote_count ON opinions.opinion_id = vote_count.opinion_id
+WHERE opinions.talk_session_id = $2
+    AND vote_count.opinion_id = opinions.opinion_id
+    AND opinions.parent_opinion_id IS NULL
+`
+
+type CountSwipeableOpinionsParams struct {
+	UserID        uuid.UUID
+	TalkSessionID uuid.UUID
+}
+
+// 指定されたユーザーが投票していない意見のみを取得
+// トークセッションに紐づく意見のみを取得
+//
+//	SELECT COUNT(vote_count.opinion_id) AS random_opinion_count
+//	FROM opinions
+//	LEFT JOIN (
+//	    SELECT opinions.opinion_id
+//	    FROM opinions
+//	    LEFT JOIN votes
+//	        ON opinions.opinion_id = votes.opinion_id
+//	        AND votes.user_id = $1
+//	    GROUP BY opinions.opinion_id
+//	    HAVING COUNT(votes.vote_id) = 0
+//	) vote_count ON opinions.opinion_id = vote_count.opinion_id
+//	WHERE opinions.talk_session_id = $2
+//	    AND vote_count.opinion_id = opinions.opinion_id
+//	    AND opinions.parent_opinion_id IS NULL
+func (q *Queries) CountSwipeableOpinions(ctx context.Context, arg CountSwipeableOpinionsParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countSwipeableOpinions, arg.UserID, arg.TalkSessionID)
+	var random_opinion_count int64
+	err := row.Scan(&random_opinion_count)
+	return random_opinion_count, err
+}
+
 const createOpinion = `-- name: CreateOpinion :exec
 INSERT INTO opinions (
     opinion_id,

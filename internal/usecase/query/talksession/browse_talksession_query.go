@@ -19,7 +19,7 @@ type (
 		Limit     *int
 		Offset    *int
 		Theme     *string
-		Status    Status
+		Status    *Status
 		SortKey   sort.SortKey
 		Latitude  *float64
 		Longitude *float64
@@ -41,29 +41,26 @@ const (
 )
 
 func (h *BrowseTalkSessionQueryInput) Validate() error {
-	var err error
+	var errs []error
 
 	if !h.SortKey.IsValid() {
-		err = errors.Join(err, fmt.Errorf("無効なSortKeyです。: %s", h.SortKey))
+		errs = append(errs, fmt.Errorf("無効なSortKeyです。: %s", h.SortKey))
 	}
 
-	if h.Status == "" {
-		h.Status = StatusOpen
-	}
-	if h.Status != StatusOpen && h.Status != StatusClosed {
-		err = errors.Join(err, fmt.Errorf("無効なステータスです。: %s", h.Status))
+	if h.Status != nil && (*h.Status == "" || (*h.Status != StatusOpen && *h.Status != StatusClosed)) {
+		errs = append(errs, fmt.Errorf("無効なステータスです。: %s", *h.Status))
 	}
 	if h.Limit == nil {
 		h.Limit = lo.ToPtr(10)
-	} else if *h.Limit <= 0 || *h.Limit > 100 {
-		err = errors.Join(err, fmt.Errorf("Limitは1から100の間で指定してください"))
+	} else if *h.Limit <= 0 {
+		errs = append(errs, fmt.Errorf("Limitは1以上で指定してください"))
 	}
 
 	if h.Offset == nil {
 		h.Offset = lo.ToPtr(0)
 	} else if *h.Offset < 0 {
-		err = errors.Join(err, fmt.Errorf("Offsetは0以上の値を指定してください"))
+		errs = append(errs, fmt.Errorf("Offsetは0以上の値を指定してください"))
 	}
 
-	return nil
+	return errors.Join(errs...)
 }

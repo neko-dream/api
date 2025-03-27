@@ -45,4 +45,10 @@ steps:
           headers:
             Content-Type: application/json
     test: current.res.body.aud == "https://api.kotohiro.com" && current.res.body.isVerify == true
-
+  - desc: ポリシーに同意している
+    req:
+      /policy/consent:
+        get:
+          headers:
+            Content-Type: application/json
+    test: current.res.body.consentGiven == true

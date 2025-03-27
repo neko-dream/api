@@ -1875,7 +1875,7 @@ func encodeSessionsHistoryResponse(response SessionsHistoryRes, w http.ResponseW
 
 func encodeSwipeOpinionsResponse(response SwipeOpinionsRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *SwipeOpinionsOKApplicationJSON:
+	case *SwipeOpinionsOK:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
