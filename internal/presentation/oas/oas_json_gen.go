@@ -16966,137 +16966,84 @@ func (s *SwipeOpinionsInternalServerError) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes SwipeOpinionsOKApplicationJSON as json.
-func (s SwipeOpinionsOKApplicationJSON) Encode(e *jx.Encoder) {
-	unwrapped := []SwipeOpinionsOKItem(s)
-
-	e.ArrStart()
-	for _, elem := range unwrapped {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes SwipeOpinionsOKApplicationJSON from json.
-func (s *SwipeOpinionsOKApplicationJSON) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode SwipeOpinionsOKApplicationJSON to nil")
-	}
-	var unwrapped []SwipeOpinionsOKItem
-	if err := func() error {
-		unwrapped = make([]SwipeOpinionsOKItem, 0)
-		if err := d.Arr(func(d *jx.Decoder) error {
-			var elem SwipeOpinionsOKItem
-			if err := elem.Decode(d); err != nil {
-				return err
-			}
-			unwrapped = append(unwrapped, elem)
-			return nil
-		}); err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		return errors.Wrap(err, "alias")
-	}
-	*s = SwipeOpinionsOKApplicationJSON(unwrapped)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s SwipeOpinionsOKApplicationJSON) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *SwipeOpinionsOKApplicationJSON) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode implements json.Marshaler.
-func (s *SwipeOpinionsOKItem) Encode(e *jx.Encoder) {
+func (s *SwipeOpinionsOK) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *SwipeOpinionsOKItem) encodeFields(e *jx.Encoder) {
+func (s *SwipeOpinionsOK) encodeFields(e *jx.Encoder) {
 	{
-		e.FieldStart("opinion")
-		s.Opinion.Encode(e)
+		e.FieldStart("opinions")
+		e.ArrStart()
+		for _, elem := range s.Opinions {
+			elem.Encode(e)
+		}
+		e.ArrEnd()
 	}
 	{
-		e.FieldStart("user")
-		s.User.Encode(e)
-	}
-	{
-		e.FieldStart("replyCount")
-		e.Int(s.ReplyCount)
+		e.FieldStart("remainingCount")
+		e.Int(s.RemainingCount)
 	}
 }
 
-var jsonFieldsNameOfSwipeOpinionsOKItem = [3]string{
-	0: "opinion",
-	1: "user",
-	2: "replyCount",
+var jsonFieldsNameOfSwipeOpinionsOK = [2]string{
+	0: "opinions",
+	1: "remainingCount",
 }
 
-// Decode decodes SwipeOpinionsOKItem from json.
-func (s *SwipeOpinionsOKItem) Decode(d *jx.Decoder) error {
+// Decode decodes SwipeOpinionsOK from json.
+func (s *SwipeOpinionsOK) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode SwipeOpinionsOKItem to nil")
+		return errors.New("invalid: unable to decode SwipeOpinionsOK to nil")
 	}
 	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "opinion":
+		case "opinions":
 			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				if err := s.Opinion.Decode(d); err != nil {
+				s.Opinions = make([]SwipeOpinionsOKOpinionsItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem SwipeOpinionsOKOpinionsItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Opinions = append(s.Opinions, elem)
+					return nil
+				}); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"opinion\"")
+				return errors.Wrap(err, "decode field \"opinions\"")
 			}
-		case "user":
+		case "remainingCount":
 			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				if err := s.User.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"user\"")
-			}
-		case "replyCount":
-			requiredBitSet[0] |= 1 << 2
-			if err := func() error {
 				v, err := d.Int()
-				s.ReplyCount = int(v)
+				s.RemainingCount = int(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"replyCount\"")
+				return errors.Wrap(err, "decode field \"remainingCount\"")
 			}
 		default:
 			return d.Skip()
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode SwipeOpinionsOKItem")
+		return errors.Wrap(err, "decode SwipeOpinionsOK")
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000111,
+		0b00000011,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -17108,8 +17055,8 @@ func (s *SwipeOpinionsOKItem) Decode(d *jx.Decoder) error {
 				bitIdx := bits.TrailingZeros8(result)
 				fieldIdx := i*8 + bitIdx
 				var name string
-				if fieldIdx < len(jsonFieldsNameOfSwipeOpinionsOKItem) {
-					name = jsonFieldsNameOfSwipeOpinionsOKItem[fieldIdx]
+				if fieldIdx < len(jsonFieldsNameOfSwipeOpinionsOK) {
+					name = jsonFieldsNameOfSwipeOpinionsOK[fieldIdx]
 				} else {
 					name = strconv.Itoa(fieldIdx)
 				}
@@ -17130,27 +17077,153 @@ func (s *SwipeOpinionsOKItem) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *SwipeOpinionsOKItem) MarshalJSON() ([]byte, error) {
+func (s *SwipeOpinionsOK) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *SwipeOpinionsOKItem) UnmarshalJSON(data []byte) error {
+func (s *SwipeOpinionsOK) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
 // Encode implements json.Marshaler.
-func (s *SwipeOpinionsOKItemOpinion) Encode(e *jx.Encoder) {
+func (s *SwipeOpinionsOKOpinionsItem) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *SwipeOpinionsOKItemOpinion) encodeFields(e *jx.Encoder) {
+func (s *SwipeOpinionsOKOpinionsItem) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("replyCount")
+		e.Int(s.ReplyCount)
+	}
+	{
+		e.FieldStart("opinion")
+		s.Opinion.Encode(e)
+	}
+	{
+		e.FieldStart("user")
+		s.User.Encode(e)
+	}
+}
+
+var jsonFieldsNameOfSwipeOpinionsOKOpinionsItem = [3]string{
+	0: "replyCount",
+	1: "opinion",
+	2: "user",
+}
+
+// Decode decodes SwipeOpinionsOKOpinionsItem from json.
+func (s *SwipeOpinionsOKOpinionsItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode SwipeOpinionsOKOpinionsItem to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "replyCount":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Int()
+				s.ReplyCount = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"replyCount\"")
+			}
+		case "opinion":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				if err := s.Opinion.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"opinion\"")
+			}
+		case "user":
+			requiredBitSet[0] |= 1 << 2
+			if err := func() error {
+				if err := s.User.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"user\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode SwipeOpinionsOKOpinionsItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfSwipeOpinionsOKOpinionsItem) {
+					name = jsonFieldsNameOfSwipeOpinionsOKOpinionsItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *SwipeOpinionsOKOpinionsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *SwipeOpinionsOKOpinionsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *SwipeOpinionsOKOpinionsItemOpinion) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *SwipeOpinionsOKOpinionsItemOpinion) encodeFields(e *jx.Encoder) {
 	{
 		e.FieldStart("id")
 		e.Str(s.ID)
@@ -17195,7 +17268,7 @@ func (s *SwipeOpinionsOKItemOpinion) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfSwipeOpinionsOKItemOpinion = [8]string{
+var jsonFieldsNameOfSwipeOpinionsOKOpinionsItemOpinion = [8]string{
 	0: "id",
 	1: "title",
 	2: "content",
@@ -17206,10 +17279,10 @@ var jsonFieldsNameOfSwipeOpinionsOKItemOpinion = [8]string{
 	7: "postedAt",
 }
 
-// Decode decodes SwipeOpinionsOKItemOpinion from json.
-func (s *SwipeOpinionsOKItemOpinion) Decode(d *jx.Decoder) error {
+// Decode decodes SwipeOpinionsOKOpinionsItemOpinion from json.
+func (s *SwipeOpinionsOKOpinionsItemOpinion) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode SwipeOpinionsOKItemOpinion to nil")
+		return errors.New("invalid: unable to decode SwipeOpinionsOKOpinionsItemOpinion to nil")
 	}
 	var requiredBitSet [1]uint8
 
@@ -17306,7 +17379,7 @@ func (s *SwipeOpinionsOKItemOpinion) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode SwipeOpinionsOKItemOpinion")
+		return errors.Wrap(err, "decode SwipeOpinionsOKOpinionsItemOpinion")
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
@@ -17323,8 +17396,8 @@ func (s *SwipeOpinionsOKItemOpinion) Decode(d *jx.Decoder) error {
 				bitIdx := bits.TrailingZeros8(result)
 				fieldIdx := i*8 + bitIdx
 				var name string
-				if fieldIdx < len(jsonFieldsNameOfSwipeOpinionsOKItemOpinion) {
-					name = jsonFieldsNameOfSwipeOpinionsOKItemOpinion[fieldIdx]
+				if fieldIdx < len(jsonFieldsNameOfSwipeOpinionsOKOpinionsItemOpinion) {
+					name = jsonFieldsNameOfSwipeOpinionsOKOpinionsItemOpinion[fieldIdx]
 				} else {
 					name = strconv.Itoa(fieldIdx)
 				}
@@ -17345,27 +17418,27 @@ func (s *SwipeOpinionsOKItemOpinion) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *SwipeOpinionsOKItemOpinion) MarshalJSON() ([]byte, error) {
+func (s *SwipeOpinionsOKOpinionsItemOpinion) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *SwipeOpinionsOKItemOpinion) UnmarshalJSON(data []byte) error {
+func (s *SwipeOpinionsOKOpinionsItemOpinion) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
 // Encode implements json.Marshaler.
-func (s *SwipeOpinionsOKItemUser) Encode(e *jx.Encoder) {
+func (s *SwipeOpinionsOKOpinionsItemUser) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *SwipeOpinionsOKItemUser) encodeFields(e *jx.Encoder) {
+func (s *SwipeOpinionsOKOpinionsItemUser) encodeFields(e *jx.Encoder) {
 	{
 		e.FieldStart("displayID")
 		e.Str(s.DisplayID)
@@ -17382,16 +17455,16 @@ func (s *SwipeOpinionsOKItemUser) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfSwipeOpinionsOKItemUser = [3]string{
+var jsonFieldsNameOfSwipeOpinionsOKOpinionsItemUser = [3]string{
 	0: "displayID",
 	1: "displayName",
 	2: "iconURL",
 }
 
-// Decode decodes SwipeOpinionsOKItemUser from json.
-func (s *SwipeOpinionsOKItemUser) Decode(d *jx.Decoder) error {
+// Decode decodes SwipeOpinionsOKOpinionsItemUser from json.
+func (s *SwipeOpinionsOKOpinionsItemUser) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode SwipeOpinionsOKItemUser to nil")
+		return errors.New("invalid: unable to decode SwipeOpinionsOKOpinionsItemUser to nil")
 	}
 	var requiredBitSet [1]uint8
 
@@ -17436,7 +17509,7 @@ func (s *SwipeOpinionsOKItemUser) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode SwipeOpinionsOKItemUser")
+		return errors.Wrap(err, "decode SwipeOpinionsOKOpinionsItemUser")
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
@@ -17453,8 +17526,8 @@ func (s *SwipeOpinionsOKItemUser) Decode(d *jx.Decoder) error {
 				bitIdx := bits.TrailingZeros8(result)
 				fieldIdx := i*8 + bitIdx
 				var name string
-				if fieldIdx < len(jsonFieldsNameOfSwipeOpinionsOKItemUser) {
-					name = jsonFieldsNameOfSwipeOpinionsOKItemUser[fieldIdx]
+				if fieldIdx < len(jsonFieldsNameOfSwipeOpinionsOKOpinionsItemUser) {
+					name = jsonFieldsNameOfSwipeOpinionsOKOpinionsItemUser[fieldIdx]
 				} else {
 					name = strconv.Itoa(fieldIdx)
 				}
@@ -17475,14 +17548,14 @@ func (s *SwipeOpinionsOKItemUser) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *SwipeOpinionsOKItemUser) MarshalJSON() ([]byte, error) {
+func (s *SwipeOpinionsOKOpinionsItemUser) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *SwipeOpinionsOKItemUser) UnmarshalJSON(data []byte) error {
+func (s *SwipeOpinionsOKOpinionsItemUser) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

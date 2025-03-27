@@ -157,7 +157,8 @@ type OpinionHandler interface {
 	ReportOpinion(ctx context.Context, req OptReportOpinionReq, params ReportOpinionParams) (ReportOpinionRes, error)
 	// SwipeOpinions implements swipe_opinions operation.
 	//
-	// セッションの中からまだ投票していない意見をランダムに取得する.
+	// セッションの中からまだ投票していない意見をランダムに取得する
+	// remainingCountは取得した意見を含めてスワイプできる意見の総数を返す.
 	//
 	// GET /talksessions/{talkSessionID}/swipe_opinions
 	SwipeOpinions(ctx context.Context, params SwipeOpinionsParams) (SwipeOpinionsRes, error)

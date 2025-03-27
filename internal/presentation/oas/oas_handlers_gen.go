@@ -5480,7 +5480,8 @@ func (s *Server) handleSessionsHistoryRequest(args [0]string, argsEscaped bool, 
 
 // handleSwipeOpinionsRequest handles swipe_opinions operation.
 //
-// セッションの中からまだ投票していない意見をランダムに取得する.
+// セッションの中からまだ投票していない意見をランダムに取得する
+// remainingCountは取得した意見を含めてスワイプできる意見の総数を返す.
 //
 // GET /talksessions/{talkSessionID}/swipe_opinions
 func (s *Server) handleSwipeOpinionsRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
