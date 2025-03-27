@@ -46,11 +46,16 @@ func (b *BrowseTalkSessionQueryImpl) Execute(ctx context.Context, in talksession
 		theme = sql.NullString{String: *in.Theme, Valid: true}
 	}
 
+	var status sql.NullString
+	if in.Status != nil {
+		status = sql.NullString{String: string(*in.Status), Valid: true}
+	}
+
 	talkSessionRow, err := b.GetQueries(ctx).ListTalkSessions(ctx, model.ListTalkSessionsParams{
 		Limit:     int32(*in.Limit),
 		Offset:    int32(*in.Offset),
 		Theme:     theme,
-		Status:    sql.NullString{String: string(in.Status), Valid: true},
+		Status:    status,
 		SortKey:   sql.NullString{String: in.SortKey.String(), Valid: true},
 		Latitude:  latitude,
 		Longitude: longitude,
@@ -80,7 +85,7 @@ func (b *BrowseTalkSessionQueryImpl) Execute(ctx context.Context, in talksession
 
 	talkSessionCount, err := b.GetQueries(ctx).CountTalkSessions(ctx, model.CountTalkSessionsParams{
 		Theme:  theme,
-		Status: sql.NullString{String: string(in.Status), Valid: true},
+		Status: status,
 	})
 	if err != nil {
 		utils.HandleError(ctx, err, "failed to count talk sessions")

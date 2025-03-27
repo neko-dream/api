@@ -591,9 +591,9 @@ LEFT JOIN users
 LEFT JOIN talk_session_locations
     ON talk_sessions.talk_session_id = talk_session_locations.talk_session_id
 WHERE
-    CASE
-        WHEN $5::text = 'finished' THEN scheduled_end_time <= now()
-        WHEN $5::text = 'open' THEN scheduled_end_time > now()
+    CASE $5::text
+        WHEN 'finished' THEN scheduled_end_time <= now()
+        WHEN 'open' THEN scheduled_end_time > now()
         ELSE TRUE
     END
     AND
@@ -683,9 +683,9 @@ type ListTalkSessionsRow struct {
 //	LEFT JOIN talk_session_locations
 //	    ON talk_sessions.talk_session_id = talk_session_locations.talk_session_id
 //	WHERE
-//	    CASE
-//	        WHEN $5::text = 'finished' THEN scheduled_end_time <= now()
-//	        WHEN $5::text = 'open' THEN scheduled_end_time > now()
+//	    CASE $5::text
+//	        WHEN 'finished' THEN scheduled_end_time <= now()
+//	        WHEN 'open' THEN scheduled_end_time > now()
 //	        ELSE TRUE
 //	    END
 //	    AND
