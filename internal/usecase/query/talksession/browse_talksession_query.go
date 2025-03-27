@@ -41,26 +41,26 @@ const (
 )
 
 func (h *BrowseTalkSessionQueryInput) Validate() error {
-	var err error
+	var errs []error
 
 	if !h.SortKey.IsValid() {
-		err = errors.Join(err, fmt.Errorf("無効なSortKeyです。: %s", h.SortKey))
+		errs = append(errs, fmt.Errorf("無効なSortKeyです。: %s", h.SortKey))
 	}
 
 	if h.Status != nil && (*h.Status == "" || (*h.Status != StatusOpen && *h.Status != StatusClosed)) {
-		err = errors.Join(err, fmt.Errorf("無効なステータスです。: %s", *h.Status))
+		errs = append(errs, fmt.Errorf("無効なステータスです。: %s", *h.Status))
 	}
 	if h.Limit == nil {
 		h.Limit = lo.ToPtr(10)
 	} else if *h.Limit <= 0 {
-		err = errors.Join(err, fmt.Errorf("Limitは1以上で指定してください"))
+		errs = append(errs, fmt.Errorf("Limitは1以上で指定してください"))
 	}
 
 	if h.Offset == nil {
 		h.Offset = lo.ToPtr(0)
 	} else if *h.Offset < 0 {
-		err = errors.Join(err, fmt.Errorf("Offsetは0以上の値を指定してください"))
+		errs = append(errs, fmt.Errorf("Offsetは0以上の値を指定してください"))
 	}
 
-	return err
+	return errors.Join(errs...)
 }
