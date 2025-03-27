@@ -21,6 +21,7 @@ type (
 	}
 
 	GetSwipeOpinionsQueryOutput struct {
-		Opinions []dto.SwipeOpinion
+		Opinions          []dto.SwipeOpinion
+		RemainingOpinions int
 	}
 )
