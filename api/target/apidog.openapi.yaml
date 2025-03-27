@@ -915,7 +915,7 @@
       "get": {
         "summary": "スワイプ用のエンドポイント",
         "deprecated": false,
-        "description": "セッションの中からまだ投票していない意見をランダムに取得する",
+        "description": "セッションの中からまだ投票していない意見をランダムに取得する\nremainingCountは取得した意見を含めてスワイプできる意見の総数を返す",
         "operationId": "swipe_opinions",
         "tags": [
           "opinion"
@@ -948,27 +948,39 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "opinion": {
-                        "$ref": "#/components/schemas/opinion"
-                      },
-                      "user": {
-                        "$ref": "#/components/schemas/user",
-                        "description": "作成ユーザー"
-                      },
-                      "replyCount": {
-                        "type": "integer"
+                  "type": "object",
+                  "properties": {
+                    "opinions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "replyCount": {
+                            "type": "integer"
+                          },
+                          "opinion": {
+                            "$ref": "#/components/schemas/opinion"
+                          },
+                          "user": {
+                            "$ref": "#/components/schemas/user",
+                            "description": "作成ユーザー"
+                          }
+                        },
+                        "required": [
+                          "replyCount",
+                          "opinion",
+                          "user"
+                        ]
                       }
                     },
-                    "required": [
-                      "opinion",
-                      "user",
-                      "replyCount"
-                    ]
-                  }
+                    "remainingCount": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "opinions",
+                    "remainingCount"
+                  ]
                 }
               }
             },

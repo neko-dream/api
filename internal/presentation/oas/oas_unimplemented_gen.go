@@ -382,7 +382,8 @@ func (UnimplementedHandler) SessionsHistory(ctx context.Context, params Sessions
 
 // SwipeOpinions implements swipe_opinions operation.
 //
-// セッションの中からまだ投票していない意見をランダムに取得する.
+// セッションの中からまだ投票していない意見をランダムに取得する
+// remainingCountは取得した意見を含めてスワイプできる意見の総数を返す.
 //
 // GET /talksessions/{talkSessionID}/swipe_opinions
 func (UnimplementedHandler) SwipeOpinions(ctx context.Context, params SwipeOpinionsParams) (r SwipeOpinionsRes, _ error) {

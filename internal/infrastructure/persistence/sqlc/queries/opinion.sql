@@ -108,6 +108,23 @@ ORDER BY
     END ASC
 LIMIT $3;
 
+-- name: CountSwipeableOpinions :one
+SELECT COUNT(vote_count.opinion_id) AS random_opinion_count
+FROM opinions
+-- 指定されたユーザーが投票していない意見のみを取得
+LEFT JOIN (
+    SELECT opinions.opinion_id
+    FROM opinions
+    LEFT JOIN votes
+        ON opinions.opinion_id = votes.opinion_id
+        AND votes.user_id = $1
+    GROUP BY opinions.opinion_id
+    HAVING COUNT(votes.vote_id) = 0
+) vote_count ON opinions.opinion_id = vote_count.opinion_id
+-- トークセッションに紐づく意見のみを取得
+WHERE opinions.talk_session_id = $2
+    AND vote_count.opinion_id = opinions.opinion_id
+    AND opinions.parent_opinion_id IS NULL;
 
 -- name: GetOpinionsByUserID :many
 SELECT
@@ -139,7 +156,6 @@ ORDER BY
     END DESC
 LIMIT $2 OFFSET $3
 ;
-
 
 -- name: GetOpinionsByTalkSessionID :many
 WITH unique_opinions AS (

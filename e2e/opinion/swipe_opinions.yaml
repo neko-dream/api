@@ -1,0 +1,148 @@
+desc: スワイプ機能のテスト
+runners:
+  req:
+    endpoint: http://localhost:3000
+    useCookie: true
+    notFollowRedirect: true
+  dev: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
+
+vars:
+  id: swipe_test
+  name: swipe_test
+  theme: スワイプテストセッション
+  desc: スワイプテストの説明文です
+  prefecture: 東京都
+  city: 渋谷区
+  other_id: swipe_test_other
+  other_name: swipe_test_other
+
+steps:
+  deleteUser:
+    desc: ユーザー削除
+    dev:
+      query: |
+        DELETE FROM user_demographics WHERE (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}') = user_id;
+        DELETE FROM talk_sessions WHERE owner_id = (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}');
+        DELETE FROM user_auths WHERE subject = '{{ vars.id }}';
+        DELETE FROM users WHERE display_id = '{{ vars.id }}';
+
+  deleteOtherUser:
+    desc: 他のユーザー削除
+    dev:
+      query: |
+        DELETE FROM user_demographics WHERE (SELECT user_id FROM users WHERE display_id = '{{ vars.other_id }}') = user_id;
+        DELETE FROM talk_sessions WHERE owner_id = (SELECT user_id FROM users WHERE display_id = '{{ vars.other_id }}');
+        DELETE FROM user_auths WHERE subject = '{{ vars.other_id }}';
+        DELETE FROM users WHERE display_id = '{{ vars.other_id }}';
+
+  loginUser:
+    desc: ログイン
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.id }}:
+        get:
+          headers: null
+    test: len(current.res.headers['Set-Cookie']) > 0
+
+  createUser:
+    desc: ユーザー作成
+    req:
+      /user:
+        post:
+          body:
+            multipart/form-data:
+              displayName: "{{ vars.name }}"
+              displayID: "{{ vars.id }}"
+              prefecture: "{{ vars.prefecture }}"
+              city: "{{ vars.city }}"
+
+  otherLoginUser:
+    desc: ログイン
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.other_id }}:
+        get:
+          headers: null
+    test: len(current.res.headers['Set-Cookie']) > 0
+
+  createOtherUser:
+    desc: 他のユーザー作成
+    req:
+      /user:
+        post:
+          body:
+            multipart/form-data:
+              displayName: "{{ vars.other_name }}"
+              displayID: "{{ vars.other_id }}"
+              prefecture: "{{ vars.prefecture }}"
+              city: "{{ vars.city }}"
+
+  createTalkSession:
+    desc: トークセッション作成
+    req:
+      /talksessions:
+        post:
+          body:
+            multipart/form-data:
+              theme: "{{ vars.theme }}"
+              description: "{{ vars.desc }}"
+              scheduledEndTime: "2100-12-31T23:59:59Z"
+              prefecture: "{{ vars.prefecture }}"
+              city: "{{ vars.city }}"
+    bind:
+      talkSession: current.res.body
+
+  createOtherOpinions:
+    desc: 他のユーザーで意見を投稿
+    loop:
+      count: 5
+    req:
+      /talksessions/{{ talkSession.id }}/opinions:
+        post:
+          body:
+            multipart/form-data:
+              opinionContent: "他のユーザーの意見 {{ i }}"
+              title: "他のユーザーのタイトル {{ i }}"
+
+  getSwipeOpinionsNotResult:
+    desc: スワイプ用の意見を取得
+    req:
+      /talksessions/{{ talkSession.id }}/swipe_opinions:
+        get:
+          query:
+            limit: 3
+    test: |
+      current.res.status == 200 &&
+      len(current.res.body.opinions) == 0 &&
+      current.res.body.remainingCount == 0
+
+  reLoginUser:
+    desc: 元のユーザーに戻る
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.id }}:
+        get:
+          headers: null
+    test: len(current.res.headers['Set-Cookie']) > 0
+
+  createOpinions:
+    desc: 自分の意見を投稿
+    loop:
+      count: 5
+    req:
+      /opinions:
+        post:
+          body:
+            multipart/form-data:
+              talkSessionID: "{{ talkSession.id }}"
+              content: "自分の意見 {{ i }}"
+              title: "自分のタイトル {{ i }}"
+
+  getSwipeOpinions:
+    desc: スワイプ用の意見を取得
+    req:
+      /talksessions/{{ talkSession.id }}/swipe_opinions:
+        get:
+          query:
+            limit: 3
+    test: |
+      current.res.status == 200 &&
+      len(current.res.body.opinions) > 0 &&
+      current.res.body.remainingCount > 0
