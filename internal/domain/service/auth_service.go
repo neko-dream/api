@@ -6,6 +6,7 @@ import (
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/auth"
+	"github.com/neko-dream/server/internal/domain/model/consent"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/config"
@@ -22,17 +23,23 @@ type authService struct {
 	config              *config.Config
 	userRepository      user.UserRepository
 	authProviderFactory auth.AuthProviderFactory
+	consentService      consent.ConsentService
+	policyRepository    consent.PolicyRepository
 }
 
 func NewAuthService(
 	config *config.Config,
 	userRepository user.UserRepository,
 	authProviderFactory auth.AuthProviderFactory,
+	consentService consent.ConsentService,
+	policyRepository consent.PolicyRepository,
 ) AuthService {
 	return &authService{
 		config:              config,
 		userRepository:      userRepository,
 		authProviderFactory: authProviderFactory,
+		consentService:      consentService,
+		policyRepository:    policyRepository,
 	}
 }
 
@@ -81,6 +88,22 @@ func (a *authService) Authenticate(
 		newUser.ChangeEmail(*email)
 		// Auth時点でemailが確認済みの場合はVerifyEmailを実行
 		newUser.SetEmailVerified(true)
+	}
+	version, err := a.policyRepository.FetchLatestPolicy(ctx)
+	if err != nil {
+		utils.HandleError(ctx, err, "PolicyRepository.GetLatestVersion")
+		return nil, errtrace.Wrap(err)
+	}
+	_, err = a.consentService.RecordConsent(
+		ctx,
+		newUser.UserID(),
+		version.Version,
+		"",
+		"",
+	)
+	if err != nil {
+		utils.HandleError(ctx, err, "ConsentService.RecordConsent")
+		return nil, errtrace.Wrap(err)
 	}
 
 	if err := a.userRepository.Create(ctx, newUser); err != nil {
