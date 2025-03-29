@@ -53,6 +53,11 @@ func (t *talkSessionAccessControl) CanUserJoin(ctx context.Context, talkSessionI
 		return false, messages.TalkSessionNotFound
 	}
 
+	// セッション作成者なら参加可能
+	if userID != nil && talkSession.OwnerUserID() == *userID {
+		return true, nil
+	}
+
 	// userの存在確認
 	var user *user.User
 	if userID != nil {

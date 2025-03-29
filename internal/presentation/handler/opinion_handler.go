@@ -491,7 +491,6 @@ func (o *opinionHandler) PostOpinionPost(ctx context.Context, req oas.OptPostOpi
 
 	if err = o.submitOpinionCommand.Execute(ctx, opinion_command.SubmitOpinionInput{
 		TalkSessionID:   &talkSessionID,
-		OwnerID:         userID,
 		UserID:          userID,
 		ParentOpinionID: parentOpinionID,
 		Title:           utils.ToPtrIfNotNullValue(!req.Value.Title.IsSet(), value.Title.Value),
@@ -553,7 +552,6 @@ func (o *opinionHandler) PostOpinionPost2(ctx context.Context, req oas.OptPostOp
 
 	if err = o.submitOpinionCommand.Execute(ctx, opinion_command.SubmitOpinionInput{
 		TalkSessionID:   talkSessionID,
-		OwnerID:         userID,
 		UserID:          userID,
 		ParentOpinionID: parentOpinionID,
 		Title:           utils.ToPtrIfNotNullValue(!req.Value.Title.IsSet(), value.Title.Value),
