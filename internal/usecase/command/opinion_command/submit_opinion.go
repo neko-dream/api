@@ -30,7 +30,6 @@ type (
 		TalkSessionID *shared.UUID[talksession.TalkSession]
 		// ParentOpinionID 親意見IDがない場合はTalkSessionIDが必須
 		ParentOpinionID *shared.UUID[opinion.Opinion]
-		OwnerID         shared.UUID[user.User]
 		UserID          shared.UUID[user.User]
 		Title           *string
 		Content         string
@@ -100,7 +99,7 @@ func (h *submitOpinionHandler) Execute(ctx context.Context, input SubmitOpinionI
 		opinion, err := opinion.NewOpinion(
 			shared.NewUUID[opinion.Opinion](),
 			talkSessionID,
-			input.OwnerID,
+			input.UserID,
 			input.ParentOpinionID,
 			input.Title,
 			input.Content,
@@ -140,7 +139,7 @@ func (h *submitOpinionHandler) Execute(ctx context.Context, input SubmitOpinionI
 			if err := h.ImageRepository.Create(ctx, image.NewUserImage(
 				ctx,
 				shared.NewUUID[image.UserImage](),
-				input.OwnerID,
+				input.UserID,
 				*imageMeta,
 				*url,
 			)); err != nil {
@@ -161,7 +160,7 @@ func (h *submitOpinionHandler) Execute(ctx context.Context, input SubmitOpinionI
 			shared.NewUUID[vote.Vote](),
 			opinion.OpinionID(),
 			talkSessionID,
-			input.OwnerID,
+			input.UserID,
 			vote.Agree,
 			clock.Now(ctx),
 		)
