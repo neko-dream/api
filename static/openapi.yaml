@@ -559,14 +559,14 @@ paths:
                 items:
                   type: object
                   properties:
-                    reason_id:
+                    reasonID:
                       type: integer
                       description: '1'
                     reason:
                       type: string
                       description: 不適切な内容
                   required:
-                    - reason_id
+                    - reasonID
                     - reason
           headers: {}
         '400':
@@ -630,13 +630,13 @@ paths:
                       type: integer
                     passCount:
                       type: integer
-                    groupId:
+                    groupID:
                       type: integer
                     groupName:
                       type: string
                   required:
                     - groupName
-                    - groupId
+                    - groupID
                     - passCount
                     - disagreeCount
                     - agreeCount
@@ -1322,7 +1322,7 @@ paths:
           headers: {}
       security: []
       x-ogen-operation-group: Opinion
-  /talksessions/{talkSessionId}:
+  /talksessions/{talkSessionID}:
     get:
       summary: トークセッションの詳細
       deprecated: false
@@ -1331,7 +1331,7 @@ paths:
       tags:
         - talk_session
       parameters:
-        - name: talkSessionId
+        - name: talkSessionID
           in: path
           description: ''
           required: true
@@ -1454,7 +1454,7 @@ paths:
       tags:
         - talk_session
       parameters:
-        - name: talkSessionId
+        - name: talkSessionID
           in: path
           description: ''
           required: true
@@ -2184,7 +2184,7 @@ paths:
           headers: {}
       security: []
       x-ogen-operation-group: Opinion
-  /talksessions/{talkSessionId}/analysis:
+  /talksessions/{talkSessionID}/analysis:
     get:
       summary: 分析結果一覧
       deprecated: false
@@ -2193,7 +2193,7 @@ paths:
       tags:
         - talk_session
       parameters:
-        - name: talkSessionId
+        - name: talkSessionID
           in: path
           description: ''
           required: true
@@ -2399,7 +2399,7 @@ paths:
           headers: {}
       security: []
       x-ogen-operation-group: TalkSession
-  /talksessions/{talkSessionId}/report:
+  /talksessions/{talkSessionID}/report:
     get:
       summary: セッションレポートを返す
       deprecated: false
@@ -2408,7 +2408,7 @@ paths:
       tags:
         - talk_session
       parameters:
-        - name: talkSessionId
+        - name: talkSessionID
           in: path
           description: ''
           required: true
@@ -3895,7 +3895,7 @@ paths:
                   jti:
                     type: string
                     description: JWT ID
-                  displayId:
+                  displayID:
                     type: string
                     description: ユーザーID
                   displayName:
@@ -4884,7 +4884,7 @@ components:
         jti:
           type: string
           description: JWT ID
-        displayId:
+        displayID:
           type: string
           description: ユーザーID
         displayName:
@@ -5059,14 +5059,14 @@ components:
     reportReason:
       type: object
       properties:
-        reason_id:
+        reasonID:
           type: integer
           description: '1'
         reason:
           type: string
           description: 不適切な内容
       required:
-        - reason_id
+        - reasonID
         - reason
     opinionGroupRatio:
       type: object
@@ -5077,13 +5077,13 @@ components:
           type: integer
         passCount:
           type: integer
-        groupId:
+        groupID:
           type: integer
         groupName:
           type: string
       required:
         - groupName
-        - groupId
+        - groupID
         - passCount
         - disagreeCount
         - agreeCount

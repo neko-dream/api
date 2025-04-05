@@ -1639,7 +1639,7 @@ type GetOpinionAnalysisOKItem struct {
 	AgreeCount    int    `json:"agreeCount"`
 	DisagreeCount int    `json:"disagreeCount"`
 	PassCount     int    `json:"passCount"`
-	GroupId       int    `json:"groupId"`
+	GroupID       int    `json:"groupID"`
 	GroupName     string `json:"groupName"`
 }
 
@@ -1658,9 +1658,9 @@ func (s *GetOpinionAnalysisOKItem) GetPassCount() int {
 	return s.PassCount
 }
 
-// GetGroupId returns the value of GroupId.
-func (s *GetOpinionAnalysisOKItem) GetGroupId() int {
-	return s.GroupId
+// GetGroupID returns the value of GroupID.
+func (s *GetOpinionAnalysisOKItem) GetGroupID() int {
+	return s.GroupID
 }
 
 // GetGroupName returns the value of GroupName.
@@ -1683,9 +1683,9 @@ func (s *GetOpinionAnalysisOKItem) SetPassCount(val int) {
 	s.PassCount = val
 }
 
-// SetGroupId sets the value of GroupId.
-func (s *GetOpinionAnalysisOKItem) SetGroupId(val int) {
-	s.GroupId = val
+// SetGroupID sets the value of GroupID.
+func (s *GetOpinionAnalysisOKItem) SetGroupID(val int) {
+	s.GroupID = val
 }
 
 // SetGroupName sets the value of GroupName.
@@ -2196,7 +2196,7 @@ func (*GetOpinionReportReasonsOKApplicationJSON) getOpinionReportReasonsRes() {}
 
 type GetOpinionReportReasonsOKItem struct {
 	// 1.
-	ReasonID int `json:"reason_id"`
+	ReasonID int `json:"reasonID"`
 	// 不適切な内容.
 	Reason string `json:"reason"`
 }
@@ -4006,7 +4006,7 @@ type OAuthTokenInfoOK struct {
 	// JWT ID.
 	Jti string `json:"jti"`
 	// ユーザーID.
-	DisplayId OptString `json:"displayId"`
+	DisplayID OptString `json:"displayID"`
 	// ユーザー名.
 	DisplayName OptString `json:"displayName"`
 	// アイコンURL.
@@ -4046,9 +4046,9 @@ func (s *OAuthTokenInfoOK) GetJti() string {
 	return s.Jti
 }
 
-// GetDisplayId returns the value of DisplayId.
-func (s *OAuthTokenInfoOK) GetDisplayId() OptString {
-	return s.DisplayId
+// GetDisplayID returns the value of DisplayID.
+func (s *OAuthTokenInfoOK) GetDisplayID() OptString {
+	return s.DisplayID
 }
 
 // GetDisplayName returns the value of DisplayName.
@@ -4101,9 +4101,9 @@ func (s *OAuthTokenInfoOK) SetJti(val string) {
 	s.Jti = val
 }
 
-// SetDisplayId sets the value of DisplayId.
-func (s *OAuthTokenInfoOK) SetDisplayId(val OptString) {
-	s.DisplayId = val
+// SetDisplayID sets the value of DisplayID.
+func (s *OAuthTokenInfoOK) SetDisplayID(val OptString) {
+	s.DisplayID = val
 }
 
 // SetDisplayName sets the value of DisplayName.

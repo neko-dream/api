@@ -3955,8 +3955,8 @@ func (s *GetOpinionAnalysisOKItem) encodeFields(e *jx.Encoder) {
 		e.Int(s.PassCount)
 	}
 	{
-		e.FieldStart("groupId")
-		e.Int(s.GroupId)
+		e.FieldStart("groupID")
+		e.Int(s.GroupID)
 	}
 	{
 		e.FieldStart("groupName")
@@ -3968,7 +3968,7 @@ var jsonFieldsNameOfGetOpinionAnalysisOKItem = [5]string{
 	0: "agreeCount",
 	1: "disagreeCount",
 	2: "passCount",
-	3: "groupId",
+	3: "groupID",
 	4: "groupName",
 }
 
@@ -4017,17 +4017,17 @@ func (s *GetOpinionAnalysisOKItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"passCount\"")
 			}
-		case "groupId":
+		case "groupID":
 			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
 				v, err := d.Int()
-				s.GroupId = int(v)
+				s.GroupID = int(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"groupId\"")
+				return errors.Wrap(err, "decode field \"groupID\"")
 			}
 		case "groupName":
 			requiredBitSet[0] |= 1 << 4
@@ -5384,7 +5384,7 @@ func (s *GetOpinionReportReasonsOKItem) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *GetOpinionReportReasonsOKItem) encodeFields(e *jx.Encoder) {
 	{
-		e.FieldStart("reason_id")
+		e.FieldStart("reasonID")
 		e.Int(s.ReasonID)
 	}
 	{
@@ -5394,7 +5394,7 @@ func (s *GetOpinionReportReasonsOKItem) encodeFields(e *jx.Encoder) {
 }
 
 var jsonFieldsNameOfGetOpinionReportReasonsOKItem = [2]string{
-	0: "reason_id",
+	0: "reasonID",
 	1: "reason",
 }
 
@@ -5407,7 +5407,7 @@ func (s *GetOpinionReportReasonsOKItem) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "reason_id":
+		case "reasonID":
 			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
 				v, err := d.Int()
@@ -5417,7 +5417,7 @@ func (s *GetOpinionReportReasonsOKItem) Decode(d *jx.Decoder) error {
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"reason_id\"")
+				return errors.Wrap(err, "decode field \"reasonID\"")
 			}
 		case "reason":
 			requiredBitSet[0] |= 1 << 1
@@ -10535,9 +10535,9 @@ func (s *OAuthTokenInfoOK) encodeFields(e *jx.Encoder) {
 		e.Str(s.Jti)
 	}
 	{
-		if s.DisplayId.Set {
-			e.FieldStart("displayId")
-			s.DisplayId.Encode(e)
+		if s.DisplayID.Set {
+			e.FieldStart("displayID")
+			s.DisplayID.Encode(e)
 		}
 	}
 	{
@@ -10569,7 +10569,7 @@ var jsonFieldsNameOfOAuthTokenInfoOK = [11]string{
 	3:  "iss",
 	4:  "sub",
 	5:  "jti",
-	6:  "displayId",
+	6:  "displayID",
 	7:  "displayName",
 	8:  "iconURL",
 	9:  "isVerify",
@@ -10657,15 +10657,15 @@ func (s *OAuthTokenInfoOK) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"jti\"")
 			}
-		case "displayId":
+		case "displayID":
 			if err := func() error {
-				s.DisplayId.Reset()
-				if err := s.DisplayId.Decode(d); err != nil {
+				s.DisplayID.Reset()
+				if err := s.DisplayID.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"displayId\"")
+				return errors.Wrap(err, "decode field \"displayID\"")
 			}
 		case "displayName":
 			if err := func() error {

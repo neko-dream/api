@@ -69,7 +69,7 @@ func (UnimplementedHandler) DummiInit(ctx context.Context) (r DummiInitRes, _ er
 //
 // セッション編集.
 //
-// PUT /talksessions/{talkSessionId}
+// PUT /talksessions/{talkSessionID}
 func (UnimplementedHandler) EditTalkSession(ctx context.Context, req OptEditTalkSessionReq, params EditTalkSessionParams) (r EditTalkSessionRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
@@ -168,7 +168,7 @@ func (UnimplementedHandler) GetPolicyConsentStatus(ctx context.Context) (r GetPo
 //
 // トークセッションの詳細.
 //
-// GET /talksessions/{talkSessionId}
+// GET /talksessions/{talkSessionID}
 func (UnimplementedHandler) GetTalkSessionDetail(ctx context.Context, params GetTalkSessionDetailParams) (r GetTalkSessionDetailRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
@@ -186,7 +186,7 @@ func (UnimplementedHandler) GetTalkSessionList(ctx context.Context, params GetTa
 //
 // セッションレポートを返す.
 //
-// GET /talksessions/{talkSessionId}/report
+// GET /talksessions/{talkSessionID}/report
 func (UnimplementedHandler) GetTalkSessionReport(ctx context.Context, params GetTalkSessionReportParams) (r GetTalkSessionReportRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
@@ -394,7 +394,7 @@ func (UnimplementedHandler) SwipeOpinions(ctx context.Context, params SwipeOpini
 //
 // 分析結果一覧.
 //
-// GET /talksessions/{talkSessionId}/analysis
+// GET /talksessions/{talkSessionID}/analysis
 func (UnimplementedHandler) TalkSessionAnalysis(ctx context.Context, params TalkSessionAnalysisParams) (r TalkSessionAnalysisRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
