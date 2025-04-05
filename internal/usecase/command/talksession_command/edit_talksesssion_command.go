@@ -22,18 +22,19 @@ type (
 		Execute(context.Context, EditCommandInput) (*EditCommandOutput, error)
 	}
 
+	// EditCommandInput セッション編集に必要な入力データ
 	EditCommandInput struct {
-		TalkSessionID    shared.UUID[talksession.TalkSession] // 編集するトークセッションのID
+		TalkSessionID    shared.UUID[talksession.TalkSession] // セッションのID
 		UserID           shared.UUID[user.User]               // 編集するユーザーのID
-		Theme            string
-		Description      *string
-		ThumbnailURL     *string
-		ScheduledEndTime time.Time
-		Latitude         *float64
-		Longitude        *float64
-		City             *string
-		Prefecture       *string
-		Restrictions     []string
+		Theme            string                               // セッションのテーマ
+		Description      *string                              // セッションの説明文
+		ThumbnailURL     *string                              // サムネイル画像のURL
+		ScheduledEndTime time.Time                            // 予定終了時刻
+		Latitude         *float64                             // 緯度
+		Longitude        *float64                             // 経度
+		City             *string                              // 市区町村
+		Prefecture       *string                              // 都道府県
+		Restrictions     []string                             // 制限事項
 	}
 
 	EditCommandOutput struct {
@@ -47,12 +48,15 @@ type (
 	}
 )
 
+// Validate 入力データのバリデーションを行う
+// - テーマは20文字以内
+// - 説明文は400文字以内
 func (in *EditCommandInput) Validate() error {
-	// Themeは20文字
+	// テーマは20文字まで
 	if utf8.RuneCountInString(in.Theme) > 20 {
 		return messages.TalkSessionThemeTooLong
 	}
-	// Descriptionは400文字
+	// 説明文は400文字まで
 	if in.Description != nil && utf8.RuneCountInString(*in.Description) > 400 {
 		return messages.TalkSessionDescriptionTooLong
 	}
