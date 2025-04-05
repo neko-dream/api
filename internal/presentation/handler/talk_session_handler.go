@@ -35,6 +35,7 @@ type talkSessionHandler struct {
 
 	addConclusionCommand    talksession_command.AddConclusionCommand
 	startTalkSessionCommand talksession_command.StartTalkSessionCommand
+	editTalkSessionCommand  talksession_command.EditCommand
 
 	session.TokenManager
 }
@@ -51,6 +52,7 @@ func NewTalkSessionHandler(
 
 	AddConclusionCommand talksession_command.AddConclusionCommand,
 	startTalkSessionCommand talksession_command.StartTalkSessionCommand,
+	editTalkSessionCommand talksession_command.EditCommand,
 
 	tokenManager session.TokenManager,
 ) oas.TalkSessionHandler {
@@ -66,6 +68,7 @@ func NewTalkSessionHandler(
 
 		addConclusionCommand:    AddConclusionCommand,
 		startTalkSessionCommand: startTalkSessionCommand,
+		editTalkSessionCommand:  editTalkSessionCommand,
 
 		TokenManager: tokenManager,
 	}
@@ -601,9 +604,93 @@ func (t *talkSessionHandler) EditTalkSession(ctx context.Context, req oas.OptEdi
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.EditTalkSession")
 	defer span.End()
 
-	_ = ctx
+	claim := session.GetSession(t.SetSession(ctx))
+	if claim == nil {
+		return nil, messages.ForbiddenError
+	}
+	userID, err := claim.UserID()
+	if err != nil {
+		utils.HandleError(ctx, err, "claim.UserID")
+		return nil, messages.ForbiddenError
+	}
 
-	panic("unimplemented")
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
+	if !req.IsSet() {
+		return nil, messages.RequiredParameterError
+	}
+
+	var restrictionStrings []string
+	if req.Value.Restrictions != nil {
+		if sl := strings.Split(strings.Join(req.Value.Restrictions, ","), ","); len(sl) > 0 {
+			restrictionStrings = sl
+		}
+	}
+
+	out, err := t.editTalkSessionCommand.Execute(ctx, talksession_command.EditCommandInput{
+		TalkSessionID:    talkSessionID,
+		UserID:           userID,
+		Theme:            req.Value.Theme,
+		Description:      utils.ToPtrIfNotNullValue(!req.Value.Description.IsSet(), req.Value.Description.Value),
+		ThumbnailURL:     utils.ToPtrIfNotNullValue(!req.Value.ThumbnailURL.IsSet(), req.Value.ThumbnailURL.Value),
+		ScheduledEndTime: req.Value.ScheduledEndTime,
+		Latitude:         utils.ToPtrIfNotNullValue(!req.Value.Latitude.IsSet(), req.Value.Latitude.Value),
+		Longitude:        utils.ToPtrIfNotNullValue(!req.Value.Longitude.IsSet(), req.Value.Longitude.Value),
+		City:             utils.ToPtrIfNotNullValue(!req.Value.City.IsSet(), req.Value.City.Value),
+		Prefecture:       utils.ToPtrIfNotNullValue(!req.Value.Prefecture.IsSet(), req.Value.Prefecture.Value),
+		Restrictions:     restrictionStrings,
+	})
+	if err != nil {
+		return nil, err
+	}
+	talkSessionDetail, err := t.getTalkSessionDetailByIDQuery.Execute(ctx, talksession_query.GetTalkSessionDetailInput{
+		TalkSessionID: talkSessionID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	owner := oas.EditTalkSessionOKOwner{
+		DisplayID:   out.User.DisplayID,
+		DisplayName: out.User.DisplayName,
+		IconURL:     utils.ToOptNil[oas.OptNilString](talkSessionDetail.User.IconURL),
+	}
+
+	var location oas.OptEditTalkSessionOKLocation
+	if out.HasLocation() {
+		location = oas.OptEditTalkSessionOKLocation{
+			Value: oas.EditTalkSessionOKLocation{
+				Latitude:  utils.ToOpt[oas.OptFloat64](talkSessionDetail.Latitude),
+				Longitude: utils.ToOpt[oas.OptFloat64](talkSessionDetail.Longitude),
+			},
+			Set: true,
+		}
+	}
+	var restrictions []oas.EditTalkSessionOKRestrictionsItem
+	for _, restriction := range out.TalkSession.Restrictions {
+		res := talksession.RestrictionAttributeKey(restriction)
+		attr := res.RestrictionAttribute()
+		restrictions = append(restrictions, oas.EditTalkSessionOKRestrictionsItem{
+			Key:         string(attr.Key),
+			Description: attr.Description,
+		})
+	}
+	res := &oas.EditTalkSessionOK{
+		ID:               out.TalkSession.TalkSessionID.String(),
+		Theme:            out.TalkSession.Theme,
+		Description:      utils.ToOptNil[oas.OptNilString](out.TalkSession.Description),
+		ThumbnailURL:     utils.ToOptNil[oas.OptNilString](out.TalkSession.ThumbnailURL),
+		Owner:            owner,
+		CreatedAt:        out.CreatedAt.Format(time.RFC3339),
+		ScheduledEndTime: out.TalkSession.ScheduledEndTime.Format(time.RFC3339),
+		Location:         location,
+		City:             utils.ToOptNil[oas.OptNilString](out.City),
+		Prefecture:       utils.ToOptNil[oas.OptNilString](out.Prefecture),
+		Restrictions:     restrictions,
+	}
+	return res, nil
 }
 
 // GetTalkSessionRestrictionKeys implements oas.TalkSessionHandler.
