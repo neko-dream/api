@@ -269,6 +269,14 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 				Null:  false,
 			}
 		}
+		var myVoteType oas.OptNilGetOpinionsForTalkSessionOKOpinionsItemMyVoteType
+		if opinion.GetMyVoteType() != nil {
+			myVoteType = oas.OptNilGetOpinionsForTalkSessionOKOpinionsItemMyVoteType{
+				Value: oas.GetOpinionsForTalkSessionOKOpinionsItemMyVoteType(*opinion.GetMyVoteType()),
+				Set:   true,
+				Null:  false,
+			}
+		}
 
 		opinions = append(opinions, oas.GetOpinionsForTalkSessionOKOpinionsItem{
 			Opinion: oas.GetOpinionsForTalkSessionOKOpinionsItemOpinion{
@@ -287,7 +295,7 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 				IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.IconURL),
 			},
 			ReplyCount: opinion.ReplyCount,
-			MyVoteType: utils.ToOptNil[oas.OptNilGetOpinionsForTalkSessionOKOpinionsItemMyVoteType](opinion.GetMyVoteType()),
+			MyVoteType: myVoteType,
 		})
 	}
 
