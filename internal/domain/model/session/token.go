@@ -61,7 +61,7 @@ func NewClaimFromMap(claims jwt.MapClaims) Claim {
 	if claims["displayName"] != nil {
 		displayName = lo.ToPtr(claims["displayName"].(string))
 	}
-	if claims["displayId"] != nil {
+	if claims["displayID"] != nil {
 		displayID = lo.ToPtr(claims["displayID"].(string))
 	}
 	var isEmailVerified bool
