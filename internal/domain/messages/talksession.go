@@ -51,4 +51,9 @@ var (
 		Code:       "TALKSESSION-0009",
 		Message:    "セッションのバリデーションに失敗しました。",
 	}
+	TalkSessionUpdateFailed = &APIError{
+		StatusCode: 500,
+		Code:       "TALKSESSION-0010",
+		Message:    "セッションの更新に失敗しました。",
+	}
 )
