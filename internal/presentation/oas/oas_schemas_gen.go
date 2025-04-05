@@ -800,8 +800,8 @@ func (s *EditTalkSessionOKRestrictionsItem) SetDescription(val string) {
 }
 
 type EditTalkSessionReq struct {
-	Theme            string `json:"theme"`
-	ScheduledEndTime string `json:"scheduledEndTime"`
+	Theme            string    `json:"theme"`
+	ScheduledEndTime time.Time `json:"scheduledEndTime"`
 	// 緯度.
 	Latitude OptNilFloat64 `json:"latitude"`
 	// 経度.
@@ -824,7 +824,7 @@ func (s *EditTalkSessionReq) GetTheme() string {
 }
 
 // GetScheduledEndTime returns the value of ScheduledEndTime.
-func (s *EditTalkSessionReq) GetScheduledEndTime() string {
+func (s *EditTalkSessionReq) GetScheduledEndTime() time.Time {
 	return s.ScheduledEndTime
 }
 
@@ -869,7 +869,7 @@ func (s *EditTalkSessionReq) SetTheme(val string) {
 }
 
 // SetScheduledEndTime sets the value of ScheduledEndTime.
-func (s *EditTalkSessionReq) SetScheduledEndTime(val string) {
+func (s *EditTalkSessionReq) SetScheduledEndTime(val time.Time) {
 	s.ScheduledEndTime = val
 }
 

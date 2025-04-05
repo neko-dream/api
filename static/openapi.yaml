@@ -1470,8 +1470,9 @@ paths:
                   example: ''
                   type: string
                 scheduledEndTime:
-                  example: ''
                   type: string
+                  format: time
+                  example: ''
                 latitude:
                   type: number
                   description: 緯度

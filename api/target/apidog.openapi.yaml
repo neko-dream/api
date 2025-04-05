@@ -1563,8 +1563,9 @@
                     "type": "string"
                   },
                   "scheduledEndTime": {
-                    "example": "",
-                    "type": "string"
+                    "type": "string",
+                    "format": "time",
+                    "example": ""
                   },
                   "latitude": {
                     "type": "number",
