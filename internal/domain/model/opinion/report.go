@@ -20,6 +20,7 @@ type Report struct {
 	TalkSessionID   shared.UUID[talksession.TalkSession]
 	ReporterID      shared.UUID[user.User]
 	Reason          Reason
+	ReasonText      *string
 	Status          Status
 	CreatedAt       time.Time
 }
@@ -30,6 +31,7 @@ func NewReport(
 	talkSessionID shared.UUID[talksession.TalkSession],
 	reporterID shared.UUID[user.User],
 	reason int,
+	reasonText *string,
 	status string,
 	createdAt time.Time,
 ) (*Report, error) {
@@ -44,6 +46,7 @@ func NewReport(
 		TalkSessionID:   talkSessionID,
 		ReporterID:      reporterID,
 		Reason:          Reason(reason),
+		ReasonText:      reasonText,
 		Status:          statusType,
 		CreatedAt:       createdAt,
 	}, nil

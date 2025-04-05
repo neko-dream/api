@@ -7515,6 +7515,8 @@ func (*ReportOpinionOK) reportOpinionRes() {}
 
 type ReportOpinionReq struct {
 	Reason OptInt `json:"reason"`
+	// その他の場合のみ理由のテキスト.
+	Content OptNilString `json:"content"`
 }
 
 // GetReason returns the value of Reason.
@@ -7522,9 +7524,19 @@ func (s *ReportOpinionReq) GetReason() OptInt {
 	return s.Reason
 }
 
+// GetContent returns the value of Content.
+func (s *ReportOpinionReq) GetContent() OptNilString {
+	return s.Content
+}
+
 // SetReason sets the value of Reason.
 func (s *ReportOpinionReq) SetReason(val OptInt) {
 	s.Reason = val
+}
+
+// SetContent sets the value of Content.
+func (s *ReportOpinionReq) SetContent(val OptNilString) {
+	s.Content = val
 }
 
 type SessionId struct {
