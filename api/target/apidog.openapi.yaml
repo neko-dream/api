@@ -4076,7 +4076,7 @@
                       "type": "string",
                       "description": "アイコンURL"
                     },
-                    "isVerify": {
+                    "isRegistered": {
                       "type": "boolean",
                       "description": "ユーザ登録済みか"
                     },
@@ -4091,7 +4091,7 @@
                     "iss",
                     "sub",
                     "jti",
-                    "isVerify",
+                    "isRegistered",
                     "isEmailVerified"
                   ]
                 }
@@ -5355,7 +5355,7 @@
             "type": "string",
             "description": "アイコンURL"
           },
-          "isVerify": {
+          "isRegistered": {
             "type": "boolean",
             "description": "ユーザ登録済みか"
           },
@@ -5370,7 +5370,7 @@
           "iss",
           "sub",
           "jti",
-          "isVerify",
+          "isRegistered",
           "isEmailVerified"
         ]
       },

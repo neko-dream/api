@@ -3917,7 +3917,7 @@ paths:
                   iconURL:
                     type: string
                     description: アイコンURL
-                  isVerify:
+                  isRegistered:
                     type: boolean
                     description: ユーザ登録済みか
                   isEmailVerified:
@@ -3929,7 +3929,7 @@ paths:
                   - iss
                   - sub
                   - jti
-                  - isVerify
+                  - isRegistered
                   - isEmailVerified
           headers: {}
         '400':
@@ -4906,7 +4906,7 @@ components:
         iconURL:
           type: string
           description: アイコンURL
-        isVerify:
+        isRegistered:
           type: boolean
           description: ユーザ登録済みか
         isEmailVerified:
@@ -4918,7 +4918,7 @@ components:
         - iss
         - sub
         - jti
-        - isVerify
+        - isRegistered
         - isEmailVerified
     offsetPagination:
       type: object

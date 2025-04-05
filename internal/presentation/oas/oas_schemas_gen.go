@@ -4036,7 +4036,7 @@ type OAuthTokenInfoOK struct {
 	// アイコンURL.
 	IconURL OptString `json:"iconURL"`
 	// ユーザ登録済みか.
-	IsVerify        bool `json:"isVerify"`
+	IsRegistered    bool `json:"isRegistered"`
 	IsEmailVerified bool `json:"isEmailVerified"`
 }
 
@@ -4085,9 +4085,9 @@ func (s *OAuthTokenInfoOK) GetIconURL() OptString {
 	return s.IconURL
 }
 
-// GetIsVerify returns the value of IsVerify.
-func (s *OAuthTokenInfoOK) GetIsVerify() bool {
-	return s.IsVerify
+// GetIsRegistered returns the value of IsRegistered.
+func (s *OAuthTokenInfoOK) GetIsRegistered() bool {
+	return s.IsRegistered
 }
 
 // GetIsEmailVerified returns the value of IsEmailVerified.
@@ -4140,9 +4140,9 @@ func (s *OAuthTokenInfoOK) SetIconURL(val OptString) {
 	s.IconURL = val
 }
 
-// SetIsVerify sets the value of IsVerify.
-func (s *OAuthTokenInfoOK) SetIsVerify(val bool) {
-	s.IsVerify = val
+// SetIsRegistered sets the value of IsRegistered.
+func (s *OAuthTokenInfoOK) SetIsRegistered(val bool) {
+	s.IsRegistered = val
 }
 
 // SetIsEmailVerified sets the value of IsEmailVerified.
