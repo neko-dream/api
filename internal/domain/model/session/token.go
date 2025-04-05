@@ -28,7 +28,7 @@ type (
 		Jti             string  `json:"jti"` // JWT ID（SessionID）
 		IconURL         *string `json:"iconURL,omitempty"`
 		DisplayName     *string `json:"displayName,omitempty"`
-		DisplayID       *string `json:"displayId,omitempty"`
+		DisplayID       *string `json:"displayID,omitempty"`
 		IsVerify        bool    `json:"isVerify"`
 		IsEmailVerified bool    `json:"isEmailVerified"`
 	}
@@ -62,7 +62,7 @@ func NewClaimFromMap(claims jwt.MapClaims) Claim {
 		displayName = lo.ToPtr(claims["displayName"].(string))
 	}
 	if claims["displayId"] != nil {
-		displayID = lo.ToPtr(claims["displayId"].(string))
+		displayID = lo.ToPtr(claims["displayID"].(string))
 	}
 	var isEmailVerified bool
 	if claims["isEmailVerified"] != nil {
@@ -124,7 +124,7 @@ func (c *Claim) GenMapClaim() *jwt.MapClaims {
 		"aud":             Audience,
 		"iconURL":         c.IconURL,
 		"displayName":     c.DisplayName,
-		"displayId":       c.DisplayID,
+		"displayID":       c.DisplayID,
 		"isVerify":        c.IsVerify,
 		"isEmailVerified": c.IsEmailVerified,
 	}

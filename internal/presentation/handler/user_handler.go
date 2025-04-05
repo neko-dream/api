@@ -99,15 +99,24 @@ func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHi
 
 	opinions := make([]oas.OpinionsHistoryOKOpinionsItem, 0, len(out.Opinions))
 	for _, opinion := range out.Opinions {
+		var parentVoteType oas.OptNilOpinionsHistoryOKOpinionsItemOpinionVoteType
+		if opinion.GetParentVoteType() != nil {
+			parentVoteType = oas.OptNilOpinionsHistoryOKOpinionsItemOpinionVoteType{
+				Value: oas.OpinionsHistoryOKOpinionsItemOpinionVoteType(*opinion.GetParentVoteType()),
+				Set:   true,
+				Null:  false,
+			}
+		}
+
 		opinions = append(opinions, oas.OpinionsHistoryOKOpinionsItem{
 			Opinion: oas.OpinionsHistoryOKOpinionsItemOpinion{
 				ID:           opinion.Opinion.OpinionID.String(),
 				Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Title),
 				Content:      opinion.Opinion.Content,
 				ParentID:     utils.ToOpt[oas.OptString](opinion.Opinion.ParentOpinionID.String()),
-				VoteType:     utils.ToOptNil[oas.OptNilString](opinion.GetParentVoteType()),
+				VoteType:     parentVoteType,
 				ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
-				PictureURL:   utils.ToOpt[oas.OptNilString](opinion.Opinion.PictureURL),
+				PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.PictureURL),
 				PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
 			},
 			User: oas.OpinionsHistoryOKOpinionsItemUser{
