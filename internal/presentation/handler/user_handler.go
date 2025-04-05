@@ -398,9 +398,14 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 	if !params.IsSet() {
 		return nil, messages.RequiredParameterError
 	}
+	var err error
 	var sessionID shared.UUID[session.Session]
 	if claim != nil {
-		sessionID, _ = claim.SessionID()
+		sessionID, err = claim.SessionID()
+		if err != nil {
+			utils.HandleError(ctx, err, "claim.SessionID")
+			return nil, messages.InternalServerError
+		}
 		if claim.IsExpired(ctx) {
 			return nil, messages.TokenExpiredError
 		}
