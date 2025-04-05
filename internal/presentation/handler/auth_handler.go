@@ -157,7 +157,7 @@ func (a *authHandler) OAuthTokenInfo(ctx context.Context) (oas.OAuthTokenInfoRes
 		Jti:             sessID.String(),
 		IsVerify:        claim.IsVerify,
 		IsEmailVerified: claim.IsEmailVerified,
-		DisplayId:       utils.ToOpt[oas.OptString](claim.DisplayID),
+		DisplayID:       utils.ToOpt[oas.OptString](claim.DisplayID),
 		DisplayName:     utils.ToOpt[oas.OptString](claim.DisplayName),
 		IconURL:         utils.ToOpt[oas.OptString](claim.IconURL),
 	}, nil

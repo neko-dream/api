@@ -723,7 +723,7 @@ func (o *opinionHandler) GetOpinionAnalysis(ctx context.Context, params oas.GetO
 	for _, r := range out {
 		res = append(res, oas.GetOpinionAnalysisOKItem{
 			GroupName:     r.GroupName,
-			GroupId:       r.GroupID,
+			GroupID:       r.GroupID,
 			AgreeCount:    r.AgreeCount,
 			DisagreeCount: r.DisagreeCount,
 			PassCount:     r.PassCount,
