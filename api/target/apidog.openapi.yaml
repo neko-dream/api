@@ -72,6 +72,11 @@
                     },
                     "myVoteType": {
                       "type": "string",
+                      "enum": [
+                        "agree",
+                        "disagree",
+                        "pass"
+                      ],
                       "nullable": true
                     }
                   },
@@ -152,6 +157,11 @@
                           },
                           "myVoteType": {
                             "type": "string",
+                            "enum": [
+                              "agree",
+                              "disagree",
+                              "pass"
+                            ],
                             "nullable": true
                           }
                         },
@@ -1292,6 +1302,11 @@
                           },
                           "myVoteType": {
                             "type": "string",
+                            "enum": [
+                              "pass",
+                              "disagree",
+                              "agree"
+                            ],
                             "nullable": true
                           }
                         },
@@ -2107,6 +2122,11 @@
                           },
                           "myVoteType": {
                             "type": "string",
+                            "enum": [
+                              "agree",
+                              "disagree",
+                              "pass"
+                            ],
                             "nullable": true
                           }
                         },
@@ -5240,6 +5260,11 @@
           "voteType": {
             "type": "string",
             "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない",
+            "enum": [
+              "disagree",
+              "agree",
+              "pass"
+            ],
             "nullable": true
           },
           "pictureURL": {

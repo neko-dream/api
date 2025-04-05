@@ -46,6 +46,10 @@ paths:
                       voteType:
                         type: string
                         description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                        enum:
+                          - disagree
+                          - agree
+                          - pass
                         nullable: true
                       pictureURL:
                         type: string
@@ -81,6 +85,10 @@ paths:
                     description: 作成ユーザー
                   myVoteType:
                     type: string
+                    enum:
+                      - agree
+                      - disagree
+                      - pass
                     nullable: true
                 required:
                   - opinion
@@ -149,6 +157,10 @@ paths:
                             voteType:
                               type: string
                               description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              enum:
+                                - disagree
+                                - agree
+                                - pass
                               nullable: true
                             pictureURL:
                               type: string
@@ -184,6 +196,10 @@ paths:
                           description: 作成ユーザー
                         myVoteType:
                           type: string
+                          enum:
+                            - agree
+                            - disagree
+                            - pass
                           nullable: true
                       required:
                         - opinion
@@ -292,6 +308,10 @@ paths:
                     voteType:
                       type: string
                       description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                      enum:
+                        - disagree
+                        - agree
+                        - pass
                       nullable: true
                     pictureURL:
                       type: string
@@ -719,6 +739,10 @@ paths:
                     voteType:
                       type: string
                       description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                      enum:
+                        - disagree
+                        - agree
+                        - pass
                       nullable: true
                     pictureURL:
                       type: string
@@ -838,6 +862,10 @@ paths:
                             voteType:
                               type: string
                               description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              enum:
+                                - disagree
+                                - agree
+                                - pass
                               nullable: true
                             pictureURL:
                               type: string
@@ -1098,6 +1126,10 @@ paths:
                             voteType:
                               type: string
                               description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              enum:
+                                - disagree
+                                - agree
+                                - pass
                               nullable: true
                             pictureURL:
                               type: string
@@ -1135,6 +1167,10 @@ paths:
                           type: integer
                         myVoteType:
                           type: string
+                          enum:
+                            - pass
+                            - disagree
+                            - agree
                           nullable: true
                       required:
                         - opinion
@@ -1229,6 +1265,10 @@ paths:
                       voteType:
                         type: string
                         description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                        enum:
+                          - disagree
+                          - agree
+                          - pass
                         nullable: true
                       pictureURL:
                         type: string
@@ -2050,6 +2090,10 @@ paths:
                             voteType:
                               type: string
                               description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              enum:
+                                - disagree
+                                - agree
+                                - pass
                               nullable: true
                             pictureURL:
                               type: string
@@ -2085,6 +2129,10 @@ paths:
                           description: 作成ユーザー
                         myVoteType:
                           type: string
+                          enum:
+                            - agree
+                            - disagree
+                            - pass
                           nullable: true
                       required:
                         - opinion
@@ -2250,6 +2298,10 @@ paths:
                                   voteType:
                                     type: string
                                     description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                                    enum:
+                                      - disagree
+                                      - agree
+                                      - pass
                                     nullable: true
                                   pictureURL:
                                     type: string
@@ -3380,6 +3432,10 @@ paths:
                             voteType:
                               type: string
                               description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              enum:
+                                - disagree
+                                - agree
+                                - pass
                               nullable: true
                             pictureURL:
                               type: string
@@ -4780,6 +4836,10 @@ components:
         voteType:
           type: string
           description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+          enum:
+            - disagree
+            - agree
+            - pass
           nullable: true
         pictureURL:
           type: string
