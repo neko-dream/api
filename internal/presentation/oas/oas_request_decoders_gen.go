@@ -2556,6 +2556,38 @@ func (s *Server) decodeReportOpinionRequest(r *http.Request) (
 					}
 				}
 			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "content",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotContentVal string
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToString(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotContentVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.Content.SetTo(optFormDotContentVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"content\"")
+					}
+				}
+			}
 			request = OptReportOpinionReq{
 				Value: optForm,
 				Set:   true,

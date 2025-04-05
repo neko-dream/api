@@ -543,6 +543,12 @@
                   "reason": {
                     "type": "integer",
                     "example": 1
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "その他の場合のみ理由のテキスト",
+                    "example": "",
+                    "nullable": true
                   }
                 }
               }
