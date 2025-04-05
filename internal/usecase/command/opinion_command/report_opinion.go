@@ -19,6 +19,7 @@ type ReportOpinionInput struct {
 	ReporterID shared.UUID[user.User]
 	OpinionID  shared.UUID[opinion.Opinion]
 	Reason     int32
+	ReasonText *string
 }
 
 type reportOpinionInteractor struct {
@@ -46,7 +47,7 @@ func (r *reportOpinionInteractor) Execute(ctx context.Context, input ReportOpini
 		return messages.OpinionNotFound
 	}
 
-	report, err := opinion.Report(ctx, input.ReporterID, int(input.Reason))
+	report, err := opinion.Report(ctx, input.ReporterID, int(input.Reason), input.ReasonText)
 	if err != nil {
 		utils.HandleError(ctx, err, "opinion.Report")
 		return messages.OpinionReportFailed

@@ -28,7 +28,7 @@ steps:
       /auth/token/info:
         get:
           headers: null
-    test: current.res.body.aud == "https://api.kotohiro.com" && current.res.body.isVerify == false
+    test: current.res.body.aud == "https://api.kotohiro.com" && current.res.body.isRegistered == false
   - desc: ユーザー作成
     req:
       /user:
@@ -44,7 +44,7 @@ steps:
         get:
           headers:
             Content-Type: application/json
-    test: current.res.body.aud == "https://api.kotohiro.com" && current.res.body.isVerify == true
+    test: current.res.body.aud == "https://api.kotohiro.com" && current.res.body.isRegistered == true
   - desc: ポリシーに同意している
     req:
       /policy/consent:

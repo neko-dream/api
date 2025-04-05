@@ -670,7 +670,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 							elem = origElem
 						}
-						// Param: "talkSessionId"
+						// Param: "talkSessionID"
 						// Match until "/"
 						idx := strings.IndexByte(elem, '/')
 						if idx < 0 {
@@ -1914,7 +1914,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 
 							elem = origElem
 						}
-						// Param: "talkSessionId"
+						// Param: "talkSessionID"
 						// Match until "/"
 						idx := strings.IndexByte(elem, '/')
 						if idx < 0 {
@@ -1929,7 +1929,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = "GetTalkSessionDetail"
 								r.summary = "トークセッションの詳細"
 								r.operationID = "getTalkSessionDetail"
-								r.pathPattern = "/talksessions/{talkSessionId}"
+								r.pathPattern = "/talksessions/{talkSessionID}"
 								r.args = args
 								r.count = 1
 								return r, true
@@ -1937,7 +1937,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = "EditTalkSession"
 								r.summary = "セッション編集"
 								r.operationID = "editTalkSession"
-								r.pathPattern = "/talksessions/{talkSessionId}"
+								r.pathPattern = "/talksessions/{talkSessionID}"
 								r.args = args
 								r.count = 1
 								return r, true
@@ -1973,7 +1973,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										r.name = "TalkSessionAnalysis"
 										r.summary = "分析結果一覧"
 										r.operationID = "talkSessionAnalysis"
-										r.pathPattern = "/talksessions/{talkSessionId}/analysis"
+										r.pathPattern = "/talksessions/{talkSessionID}/analysis"
 										r.args = args
 										r.count = 1
 										return r, true
@@ -2177,7 +2177,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = "GetTalkSessionReport"
 											r.summary = "セッションレポートを返す"
 											r.operationID = "getTalkSessionReport"
-											r.pathPattern = "/talksessions/{talkSessionId}/report"
+											r.pathPattern = "/talksessions/{talkSessionID}/report"
 											r.args = args
 											r.count = 1
 											return r, true

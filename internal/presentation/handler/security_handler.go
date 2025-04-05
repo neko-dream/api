@@ -35,7 +35,7 @@ func (s *securityHandler) HandleSessionId(ctx context.Context, operationName str
 	}
 
 	// スキップするOperationの場合以外は、ユーザー登録済みか確認
-	if !claim.IsVerify &&
+	if !claim.IsRegistered &&
 		!slices.Contains(skipOperations, operationName) {
 		return ctx, messages.TokenNotUserRegisteredError
 	}

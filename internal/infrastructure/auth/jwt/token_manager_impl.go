@@ -46,7 +46,7 @@ func (j *tokenManager) SetSession(ctx context.Context) context.Context {
 		return ctx
 	}
 	// トークンの有効性を確認 || // スキップするOperationの場合以外は、ユーザー登録済みか確認
-	if claim.IsExpired(ctx) || !claim.IsVerify {
+	if claim.IsExpired(ctx) || !claim.IsRegistered {
 		return ctx
 	}
 

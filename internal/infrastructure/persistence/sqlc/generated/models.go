@@ -43,6 +43,7 @@ type OpinionReport struct {
 	Status          string
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
+	ReasonText      sql.NullString
 }
 
 type PolicyConsent struct {

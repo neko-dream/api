@@ -174,7 +174,7 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 }
 
 // Create 初回登録時は必ずDisplayID, DisplayName, Pictureが空文字列で登録される
-// また、UserAuthはIsVerifyがfalseで登録される
+// また、UserAuthはIsRegisteredがfalseで登録される
 func (u *userRepository) Create(ctx context.Context, usr user.User) error {
 	ctx, span := otel.Tracer("repository").Start(ctx, "userRepository.Create")
 	defer span.End()

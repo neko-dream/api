@@ -102,6 +102,24 @@ func (t *TalkSession) Prefecture() *string {
 func (t *TalkSession) ChangeTheme(theme string) {
 	t.theme = theme
 }
+func (t *TalkSession) ChangeDescription(description *string) {
+	t.description = description
+}
+func (t *TalkSession) ChangeThumbnailURL(thumbnailURL *string) {
+	t.thumbnailURL = thumbnailURL
+}
+func (t *TalkSession) ChangeScheduledEndTime(scheduledEndTime time.Time) {
+	t.scheduledEndTime = scheduledEndTime
+}
+func (t *TalkSession) ChangeLocation(location *Location) {
+	t.location = location
+}
+func (t *TalkSession) ChangeCity(city *string) {
+	t.city = city
+}
+func (t *TalkSession) ChangePrefecture(prefecture *string) {
+	t.prefecture = prefecture
+}
 
 func (t *TalkSession) Restrictions() []*RestrictionAttribute {
 	return t.restrictions

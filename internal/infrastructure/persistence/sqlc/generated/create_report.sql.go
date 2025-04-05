@@ -30,7 +30,7 @@ INSERT INTO opinion_reports (
     $6,
     NOW(),
     NOW()
-) RETURNING opinion_report_id, opinion_id, talk_session_id, reporter_id, reason, status, created_at, updated_at
+) RETURNING opinion_report_id, opinion_id, talk_session_id, reporter_id, reason, status, created_at, updated_at, reason_text
 `
 
 type CreateReportParams struct {
@@ -62,7 +62,7 @@ type CreateReportParams struct {
 //	    $6,
 //	    NOW(),
 //	    NOW()
-//	) RETURNING opinion_report_id, opinion_id, talk_session_id, reporter_id, reason, status, created_at, updated_at
+//	) RETURNING opinion_report_id, opinion_id, talk_session_id, reporter_id, reason, status, created_at, updated_at, reason_text
 func (q *Queries) CreateReport(ctx context.Context, arg CreateReportParams) error {
 	_, err := q.db.ExecContext(ctx, createReport,
 		arg.OpinionReportID,

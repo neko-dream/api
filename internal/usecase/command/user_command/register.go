@@ -22,6 +22,7 @@ type (
 	}
 
 	RegisterInput struct {
+		SessionID   shared.UUID[session.Session] // セッションID
 		UserID      shared.UUID[user.User]
 		DisplayID   string                // ユーザーの表示用ID
 		DisplayName string                // ユーザーの表示名
@@ -135,13 +136,7 @@ func (i *registerHandler) Execute(ctx context.Context, input RegisterInput) (*Re
 			iconURL = foundUser.IconURL()
 		}
 
-		sess, err := i.sessService.RefreshSession(ctx, input.UserID)
-		if err != nil {
-			utils.HandleError(ctx, err, "SessionService.RefreshSession")
-			return messages.UserUpdateError
-		}
-
-		tokenTmp, err := i.TokenManager.Generate(ctx, *foundUser, sess.SessionID())
+		tokenTmp, err := i.TokenManager.Generate(ctx, *foundUser, input.SessionID)
 		if err != nil {
 			utils.HandleError(ctx, err, "failed to generate token")
 			return errtrace.Wrap(err)

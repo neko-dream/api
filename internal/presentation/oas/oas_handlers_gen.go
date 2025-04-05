@@ -653,12 +653,12 @@ func (s *Server) handleDummiInitRequest(args [0]string, argsEscaped bool, w http
 //
 // セッション編集.
 //
-// PUT /talksessions/{talkSessionId}
+// PUT /talksessions/{talkSessionID}
 func (s *Server) handleEditTalkSessionRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("editTalkSession"),
 		semconv.HTTPRequestMethodKey.String("PUT"),
-		semconv.HTTPRouteKey.String("/talksessions/{talkSessionId}"),
+		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}"),
 	}
 
 	// Start a span for this request.
@@ -777,9 +777,9 @@ func (s *Server) handleEditTalkSessionRequest(args [1]string, argsEscaped bool, 
 			Body:             request,
 			Params: middleware.Parameters{
 				{
-					Name: "talkSessionId",
+					Name: "talkSessionID",
 					In:   "path",
-				}: params.TalkSessionId,
+				}: params.TalkSessionID,
 			},
 			Raw: r,
 		}
@@ -2133,12 +2133,12 @@ func (s *Server) handleGetPolicyConsentStatusRequest(args [0]string, argsEscaped
 //
 // トークセッションの詳細.
 //
-// GET /talksessions/{talkSessionId}
+// GET /talksessions/{talkSessionID}
 func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getTalkSessionDetail"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/talksessions/{talkSessionId}"),
+		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}"),
 	}
 
 	// Start a span for this request.
@@ -2198,9 +2198,9 @@ func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped b
 			Body:             nil,
 			Params: middleware.Parameters{
 				{
-					Name: "talkSessionId",
+					Name: "talkSessionID",
 					In:   "path",
-				}: params.TalkSessionId,
+				}: params.TalkSessionID,
 			},
 			Raw: r,
 		}
@@ -2381,12 +2381,12 @@ func (s *Server) handleGetTalkSessionListRequest(args [0]string, argsEscaped boo
 //
 // セッションレポートを返す.
 //
-// GET /talksessions/{talkSessionId}/report
+// GET /talksessions/{talkSessionID}/report
 func (s *Server) handleGetTalkSessionReportRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getTalkSessionReport"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/talksessions/{talkSessionId}/report"),
+		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/report"),
 	}
 
 	// Start a span for this request.
@@ -2446,9 +2446,9 @@ func (s *Server) handleGetTalkSessionReportRequest(args [1]string, argsEscaped b
 			Body:             nil,
 			Params: middleware.Parameters{
 				{
-					Name: "talkSessionId",
+					Name: "talkSessionID",
 					In:   "path",
-				}: params.TalkSessionId,
+				}: params.TalkSessionID,
 			},
 			Raw: r,
 		}
@@ -5643,12 +5643,12 @@ func (s *Server) handleSwipeOpinionsRequest(args [1]string, argsEscaped bool, w 
 //
 // 分析結果一覧.
 //
-// GET /talksessions/{talkSessionId}/analysis
+// GET /talksessions/{talkSessionID}/analysis
 func (s *Server) handleTalkSessionAnalysisRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("talkSessionAnalysis"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/talksessions/{talkSessionId}/analysis"),
+		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/analysis"),
 	}
 
 	// Start a span for this request.
@@ -5708,9 +5708,9 @@ func (s *Server) handleTalkSessionAnalysisRequest(args [1]string, argsEscaped bo
 			Body:             nil,
 			Params: middleware.Parameters{
 				{
-					Name: "talkSessionId",
+					Name: "talkSessionID",
 					In:   "path",
-				}: params.TalkSessionId,
+				}: params.TalkSessionID,
 			},
 			Raw: r,
 		}

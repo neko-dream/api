@@ -57,5 +57,6 @@ func useCaseDeps() []ProvideArg {
 		{opinion_command.NewReportOpinion, nil},
 		{opinion_q.NewGetReportReasons, nil},
 		{opinion_query.NewGetOpinionGroupRatioInteractor, nil},
+		{talksession_command.NewEditCommand, nil},
 	}
 }

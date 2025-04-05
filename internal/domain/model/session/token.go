@@ -28,8 +28,8 @@ type (
 		Jti             string  `json:"jti"` // JWT ID（SessionID）
 		IconURL         *string `json:"iconURL,omitempty"`
 		DisplayName     *string `json:"displayName,omitempty"`
-		DisplayID       *string `json:"displayId,omitempty"`
-		IsVerify        bool    `json:"isVerify"`
+		DisplayID       *string `json:"displayID,omitempty"`
+		IsRegistered    bool    `json:"isRegistered"`
 		IsEmailVerified bool    `json:"isEmailVerified"`
 	}
 )
@@ -47,7 +47,7 @@ func NewClaim(ctx context.Context, user user.User, sessionID shared.UUID[Session
 		IconURL:         user.IconURL(),
 		DisplayID:       user.DisplayID(),
 		DisplayName:     user.DisplayName(),
-		IsVerify:        user.Verify(),
+		IsRegistered:    user.Verify(),
 		IsEmailVerified: user.IsEmailVerified(),
 	}
 }
@@ -61,8 +61,8 @@ func NewClaimFromMap(claims jwt.MapClaims) Claim {
 	if claims["displayName"] != nil {
 		displayName = lo.ToPtr(claims["displayName"].(string))
 	}
-	if claims["displayId"] != nil {
-		displayID = lo.ToPtr(claims["displayId"].(string))
+	if claims["displayID"] != nil {
+		displayID = lo.ToPtr(claims["displayID"].(string))
 	}
 	var isEmailVerified bool
 	if claims["isEmailVerified"] != nil {
@@ -77,7 +77,7 @@ func NewClaimFromMap(claims jwt.MapClaims) Claim {
 		IconURL:         picture,
 		DisplayName:     displayName,
 		DisplayID:       displayID,
-		IsVerify:        claims["isVerify"].(bool),
+		IsRegistered:    claims["isRegistered"].(bool),
 		IsEmailVerified: isEmailVerified,
 	}
 }
@@ -124,8 +124,8 @@ func (c *Claim) GenMapClaim() *jwt.MapClaims {
 		"aud":             Audience,
 		"iconURL":         c.IconURL,
 		"displayName":     c.DisplayName,
-		"displayId":       c.DisplayID,
-		"isVerify":        c.IsVerify,
+		"displayID":       c.DisplayID,
+		"isRegistered":    c.IsRegistered,
 		"isEmailVerified": c.IsEmailVerified,
 	}
 }

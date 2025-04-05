@@ -72,6 +72,11 @@
                     },
                     "myVoteType": {
                       "type": "string",
+                      "enum": [
+                        "agree",
+                        "disagree",
+                        "pass"
+                      ],
                       "nullable": true
                     }
                   },
@@ -152,6 +157,11 @@
                           },
                           "myVoteType": {
                             "type": "string",
+                            "enum": [
+                              "agree",
+                              "disagree",
+                              "pass"
+                            ],
                             "nullable": true
                           }
                         },
@@ -543,6 +553,12 @@
                   "reason": {
                     "type": "integer",
                     "example": 1
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "その他の場合のみ理由のテキスト",
+                    "example": "",
+                    "nullable": true
                   }
                 }
               }
@@ -1286,6 +1302,11 @@
                           },
                           "myVoteType": {
                             "type": "string",
+                            "enum": [
+                              "pass",
+                              "disagree",
+                              "agree"
+                            ],
                             "nullable": true
                           }
                         },
@@ -1444,7 +1465,7 @@
         "x-ogen-operation-group": "Opinion"
       }
     },
-    "/talksessions/{talkSessionId}": {
+    "/talksessions/{talkSessionID}": {
       "get": {
         "summary": "トークセッションの詳細",
         "deprecated": false,
@@ -1455,7 +1476,7 @@
         ],
         "parameters": [
           {
-            "name": "talkSessionId",
+            "name": "talkSessionID",
             "in": "path",
             "description": "",
             "required": true,
@@ -1522,7 +1543,7 @@
         ],
         "parameters": [
           {
-            "name": "talkSessionId",
+            "name": "talkSessionID",
             "in": "path",
             "description": "",
             "required": true,
@@ -1542,8 +1563,9 @@
                     "type": "string"
                   },
                   "scheduledEndTime": {
-                    "example": "",
-                    "type": "string"
+                    "type": "string",
+                    "format": "date-time",
+                    "example": ""
                   },
                   "latitude": {
                     "type": "number",
@@ -1573,6 +1595,22 @@
                     "description": "説明文",
                     "example": "",
                     "nullable": true
+                  },
+                  "thumbnailURL": {
+                    "description": "サムネイルURL。文中から一番最初の画像URLをサムネとする。",
+                    "example": "",
+                    "type": "string"
+                  },
+                  "restrictions": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "uniqueItems": true,
+                    "description": "投稿制限のキー",
+                    "example": [
+                      "demographics.city"
+                    ]
                   }
                 },
                 "required": [
@@ -2101,6 +2139,11 @@
                           },
                           "myVoteType": {
                             "type": "string",
+                            "enum": [
+                              "agree",
+                              "disagree",
+                              "pass"
+                            ],
                             "nullable": true
                           }
                         },
@@ -2188,7 +2231,7 @@
         "x-ogen-operation-group": "Opinion"
       }
     },
-    "/talksessions/{talkSessionId}/analysis": {
+    "/talksessions/{talkSessionID}/analysis": {
       "get": {
         "summary": "分析結果一覧",
         "deprecated": false,
@@ -2199,7 +2242,7 @@
         ],
         "parameters": [
           {
-            "name": "talkSessionId",
+            "name": "talkSessionID",
             "in": "path",
             "description": "",
             "required": true,
@@ -2354,7 +2397,7 @@
         "x-ogen-operation-group": "TalkSession"
       }
     },
-    "/talksessions/{talkSessionId}/report": {
+    "/talksessions/{talkSessionID}/report": {
       "get": {
         "summary": "セッションレポートを返す",
         "deprecated": false,
@@ -2365,7 +2408,7 @@
         ],
         "parameters": [
           {
-            "name": "talkSessionId",
+            "name": "talkSessionID",
             "in": "path",
             "description": "",
             "required": true,
@@ -4021,7 +4064,7 @@
                       "type": "string",
                       "description": "JWT ID"
                     },
-                    "displayId": {
+                    "displayID": {
                       "type": "string",
                       "description": "ユーザーID"
                     },
@@ -4033,7 +4076,7 @@
                       "type": "string",
                       "description": "アイコンURL"
                     },
-                    "isVerify": {
+                    "isRegistered": {
                       "type": "boolean",
                       "description": "ユーザ登録済みか"
                     },
@@ -4048,7 +4091,7 @@
                     "iss",
                     "sub",
                     "jti",
-                    "isVerify",
+                    "isRegistered",
                     "isEmailVerified"
                   ]
                 }
@@ -5234,6 +5277,11 @@
           "voteType": {
             "type": "string",
             "description": "意見投稿主の意見。ルート意見の場合はここには何も入らない",
+            "enum": [
+              "disagree",
+              "agree",
+              "pass"
+            ],
             "nullable": true
           },
           "pictureURL": {
@@ -5295,7 +5343,7 @@
             "type": "string",
             "description": "JWT ID"
           },
-          "displayId": {
+          "displayID": {
             "type": "string",
             "description": "ユーザーID"
           },
@@ -5307,7 +5355,7 @@
             "type": "string",
             "description": "アイコンURL"
           },
-          "isVerify": {
+          "isRegistered": {
             "type": "boolean",
             "description": "ユーザ登録済みか"
           },
@@ -5322,7 +5370,7 @@
           "iss",
           "sub",
           "jti",
-          "isVerify",
+          "isRegistered",
           "isEmailVerified"
         ]
       },
@@ -5515,7 +5563,7 @@
       "reportReason": {
         "type": "object",
         "properties": {
-          "reason_id": {
+          "reasonID": {
             "type": "integer",
             "description": "1"
           },
@@ -5525,7 +5573,7 @@
           }
         },
         "required": [
-          "reason_id",
+          "reasonID",
           "reason"
         ]
       },
@@ -5541,7 +5589,7 @@
           "passCount": {
             "type": "integer"
           },
-          "groupId": {
+          "groupID": {
             "type": "integer"
           },
           "groupName": {
@@ -5550,7 +5598,7 @@
         },
         "required": [
           "groupName",
-          "groupId",
+          "groupID",
           "passCount",
           "disagreeCount",
           "agreeCount"

@@ -46,6 +46,10 @@ paths:
                       voteType:
                         type: string
                         description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                        enum:
+                          - disagree
+                          - agree
+                          - pass
                         nullable: true
                       pictureURL:
                         type: string
@@ -81,6 +85,10 @@ paths:
                     description: 作成ユーザー
                   myVoteType:
                     type: string
+                    enum:
+                      - agree
+                      - disagree
+                      - pass
                     nullable: true
                 required:
                   - opinion
@@ -149,6 +157,10 @@ paths:
                             voteType:
                               type: string
                               description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              enum:
+                                - disagree
+                                - agree
+                                - pass
                               nullable: true
                             pictureURL:
                               type: string
@@ -184,6 +196,10 @@ paths:
                           description: 作成ユーザー
                         myVoteType:
                           type: string
+                          enum:
+                            - agree
+                            - disagree
+                            - pass
                           nullable: true
                       required:
                         - opinion
@@ -292,6 +308,10 @@ paths:
                     voteType:
                       type: string
                       description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                      enum:
+                        - disagree
+                        - agree
+                        - pass
                       nullable: true
                     pictureURL:
                       type: string
@@ -476,6 +496,11 @@ paths:
                 reason:
                   type: integer
                   example: 1
+                content:
+                  type: string
+                  description: その他の場合のみ理由のテキスト
+                  example: ''
+                  nullable: true
       responses:
         '200':
           description: ''
@@ -534,14 +559,14 @@ paths:
                 items:
                   type: object
                   properties:
-                    reason_id:
+                    reasonID:
                       type: integer
                       description: '1'
                     reason:
                       type: string
                       description: 不適切な内容
                   required:
-                    - reason_id
+                    - reasonID
                     - reason
           headers: {}
         '400':
@@ -605,13 +630,13 @@ paths:
                       type: integer
                     passCount:
                       type: integer
-                    groupId:
+                    groupID:
                       type: integer
                     groupName:
                       type: string
                   required:
                     - groupName
-                    - groupId
+                    - groupID
                     - passCount
                     - disagreeCount
                     - agreeCount
@@ -714,6 +739,10 @@ paths:
                     voteType:
                       type: string
                       description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                      enum:
+                        - disagree
+                        - agree
+                        - pass
                       nullable: true
                     pictureURL:
                       type: string
@@ -833,6 +862,10 @@ paths:
                             voteType:
                               type: string
                               description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              enum:
+                                - disagree
+                                - agree
+                                - pass
                               nullable: true
                             pictureURL:
                               type: string
@@ -1093,6 +1126,10 @@ paths:
                             voteType:
                               type: string
                               description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              enum:
+                                - disagree
+                                - agree
+                                - pass
                               nullable: true
                             pictureURL:
                               type: string
@@ -1130,6 +1167,10 @@ paths:
                           type: integer
                         myVoteType:
                           type: string
+                          enum:
+                            - pass
+                            - disagree
+                            - agree
                           nullable: true
                       required:
                         - opinion
@@ -1224,6 +1265,10 @@ paths:
                       voteType:
                         type: string
                         description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                        enum:
+                          - disagree
+                          - agree
+                          - pass
                         nullable: true
                       pictureURL:
                         type: string
@@ -1277,7 +1322,7 @@ paths:
           headers: {}
       security: []
       x-ogen-operation-group: Opinion
-  /talksessions/{talkSessionId}:
+  /talksessions/{talkSessionID}:
     get:
       summary: トークセッションの詳細
       deprecated: false
@@ -1286,7 +1331,7 @@ paths:
       tags:
         - talk_session
       parameters:
-        - name: talkSessionId
+        - name: talkSessionID
           in: path
           description: ''
           required: true
@@ -1409,7 +1454,7 @@ paths:
       tags:
         - talk_session
       parameters:
-        - name: talkSessionId
+        - name: talkSessionID
           in: path
           description: ''
           required: true
@@ -1425,8 +1470,9 @@ paths:
                   example: ''
                   type: string
                 scheduledEndTime:
-                  example: ''
                   type: string
+                  format: date-time
+                  example: ''
                 latitude:
                   type: number
                   description: 緯度
@@ -1451,6 +1497,18 @@ paths:
                   description: 説明文
                   example: ''
                   nullable: true
+                thumbnailURL:
+                  description: サムネイルURL。文中から一番最初の画像URLをサムネとする。
+                  example: ''
+                  type: string
+                restrictions:
+                  type: array
+                  items:
+                    type: string
+                  uniqueItems: true
+                  description: 投稿制限のキー
+                  example:
+                    - demographics.city
               required:
                 - theme
                 - scheduledEndTime
@@ -2045,6 +2103,10 @@ paths:
                             voteType:
                               type: string
                               description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              enum:
+                                - disagree
+                                - agree
+                                - pass
                               nullable: true
                             pictureURL:
                               type: string
@@ -2080,6 +2142,10 @@ paths:
                           description: 作成ユーザー
                         myVoteType:
                           type: string
+                          enum:
+                            - agree
+                            - disagree
+                            - pass
                           nullable: true
                       required:
                         - opinion
@@ -2131,7 +2197,7 @@ paths:
           headers: {}
       security: []
       x-ogen-operation-group: Opinion
-  /talksessions/{talkSessionId}/analysis:
+  /talksessions/{talkSessionID}/analysis:
     get:
       summary: 分析結果一覧
       deprecated: false
@@ -2140,7 +2206,7 @@ paths:
       tags:
         - talk_session
       parameters:
-        - name: talkSessionId
+        - name: talkSessionID
           in: path
           description: ''
           required: true
@@ -2245,6 +2311,10 @@ paths:
                                   voteType:
                                     type: string
                                     description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                                    enum:
+                                      - disagree
+                                      - agree
+                                      - pass
                                     nullable: true
                                   pictureURL:
                                     type: string
@@ -2342,7 +2412,7 @@ paths:
           headers: {}
       security: []
       x-ogen-operation-group: TalkSession
-  /talksessions/{talkSessionId}/report:
+  /talksessions/{talkSessionID}/report:
     get:
       summary: セッションレポートを返す
       deprecated: false
@@ -2351,7 +2421,7 @@ paths:
       tags:
         - talk_session
       parameters:
-        - name: talkSessionId
+        - name: talkSessionID
           in: path
           description: ''
           required: true
@@ -3375,6 +3445,10 @@ paths:
                             voteType:
                               type: string
                               description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              enum:
+                                - disagree
+                                - agree
+                                - pass
                               nullable: true
                             pictureURL:
                               type: string
@@ -3834,7 +3908,7 @@ paths:
                   jti:
                     type: string
                     description: JWT ID
-                  displayId:
+                  displayID:
                     type: string
                     description: ユーザーID
                   displayName:
@@ -3843,7 +3917,7 @@ paths:
                   iconURL:
                     type: string
                     description: アイコンURL
-                  isVerify:
+                  isRegistered:
                     type: boolean
                     description: ユーザ登録済みか
                   isEmailVerified:
@@ -3855,7 +3929,7 @@ paths:
                   - iss
                   - sub
                   - jti
-                  - isVerify
+                  - isRegistered
                   - isEmailVerified
           headers: {}
         '400':
@@ -4775,6 +4849,10 @@ components:
         voteType:
           type: string
           description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+          enum:
+            - disagree
+            - agree
+            - pass
           nullable: true
         pictureURL:
           type: string
@@ -4819,7 +4897,7 @@ components:
         jti:
           type: string
           description: JWT ID
-        displayId:
+        displayID:
           type: string
           description: ユーザーID
         displayName:
@@ -4828,7 +4906,7 @@ components:
         iconURL:
           type: string
           description: アイコンURL
-        isVerify:
+        isRegistered:
           type: boolean
           description: ユーザ登録済みか
         isEmailVerified:
@@ -4840,7 +4918,7 @@ components:
         - iss
         - sub
         - jti
-        - isVerify
+        - isRegistered
         - isEmailVerified
     offsetPagination:
       type: object
@@ -4994,14 +5072,14 @@ components:
     reportReason:
       type: object
       properties:
-        reason_id:
+        reasonID:
           type: integer
           description: '1'
         reason:
           type: string
           description: 不適切な内容
       required:
-        - reason_id
+        - reasonID
         - reason
     opinionGroupRatio:
       type: object
@@ -5012,13 +5090,13 @@ components:
           type: integer
         passCount:
           type: integer
-        groupId:
+        groupID:
           type: integer
         groupName:
           type: string
       required:
         - groupName
-        - groupId
+        - groupID
         - passCount
         - disagreeCount
         - agreeCount

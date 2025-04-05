@@ -203,7 +203,7 @@ type TalkSessionHandler interface {
 	//
 	// セッション編集.
 	//
-	// PUT /talksessions/{talkSessionId}
+	// PUT /talksessions/{talkSessionID}
 	EditTalkSession(ctx context.Context, req OptEditTalkSessionReq, params EditTalkSessionParams) (EditTalkSessionRes, error)
 	// GetConclusion implements getConclusion operation.
 	//
@@ -221,7 +221,7 @@ type TalkSessionHandler interface {
 	//
 	// トークセッションの詳細.
 	//
-	// GET /talksessions/{talkSessionId}
+	// GET /talksessions/{talkSessionID}
 	GetTalkSessionDetail(ctx context.Context, params GetTalkSessionDetailParams) (GetTalkSessionDetailRes, error)
 	// GetTalkSessionList implements getTalkSessionList operation.
 	//
@@ -233,7 +233,7 @@ type TalkSessionHandler interface {
 	//
 	// セッションレポートを返す.
 	//
-	// GET /talksessions/{talkSessionId}/report
+	// GET /talksessions/{talkSessionID}/report
 	GetTalkSessionReport(ctx context.Context, params GetTalkSessionReportParams) (GetTalkSessionReportRes, error)
 	// GetTalkSessionRestrictionKeys implements getTalkSessionRestrictionKeys operation.
 	//
@@ -258,7 +258,7 @@ type TalkSessionHandler interface {
 	//
 	// 分析結果一覧.
 	//
-	// GET /talksessions/{talkSessionId}/analysis
+	// GET /talksessions/{talkSessionID}/analysis
 	TalkSessionAnalysis(ctx context.Context, params TalkSessionAnalysisParams) (TalkSessionAnalysisRes, error)
 }
 
