@@ -584,11 +584,16 @@ func (o *opinionHandler) ReportOpinion(ctx context.Context, req oas.OptReportOpi
 	if err != nil {
 		return nil, messages.BadRequestError
 	}
+	var reasonText *string
+	if !req.Value.Content.IsNull() {
+		reasonText = lo.ToPtr(req.Value.Content.Value)
+	}
 
 	if err := o.reportOpinionCommand.Execute(ctx, opinion_command.ReportOpinionInput{
 		ReporterID: userID,
 		OpinionID:  opinionID,
 		Reason:     int32(req.Value.Reason.Value),
+		ReasonText: reasonText,
 	}); err != nil {
 		utils.HandleError(ctx, err, "reportOpinionCommand.Execute")
 		return nil, err
