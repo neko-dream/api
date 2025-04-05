@@ -508,7 +508,7 @@ func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
 							return err
 						}
 
-						c, err := conv.ToTime(val)
+						c, err := conv.ToDateTime(val)
 						if err != nil {
 							return err
 						}

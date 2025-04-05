@@ -1564,7 +1564,7 @@
                   },
                   "scheduledEndTime": {
                     "type": "string",
-                    "format": "time",
+                    "format": "date-time",
                     "example": ""
                   },
                   "latitude": {
