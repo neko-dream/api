@@ -246,7 +246,7 @@ func (t *talkSessionHandler) GetTalkSessionReport(ctx context.Context, params oa
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetTalkSessionReport")
 	defer span.End()
 
-	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionId)
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
 	if err != nil {
 		return nil, messages.BadRequestError
 	}
@@ -344,7 +344,7 @@ func (t *talkSessionHandler) GetTalkSessionDetail(ctx context.Context, params oa
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetTalkSessionDetail")
 	defer span.End()
 
-	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionId)
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
 	if err != nil {
 		return nil, messages.BadRequestError
 	}
@@ -514,7 +514,7 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 		}
 	}
 
-	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionId)
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
 	if err != nil {
 		return nil, messages.BadRequestError
 	}
