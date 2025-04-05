@@ -15,7 +15,7 @@ const updateReportStatus = `-- name: UpdateReportStatus :exec
 UPDATE opinion_reports
 SET status = $1
 WHERE opinion_report_id = $2
-RETURNING opinion_report_id, opinion_id, talk_session_id, reporter_id, reason, status, created_at, updated_at
+RETURNING opinion_report_id, opinion_id, talk_session_id, reporter_id, reason, status, created_at, updated_at, reason_text
 `
 
 type UpdateReportStatusParams struct {
@@ -28,7 +28,7 @@ type UpdateReportStatusParams struct {
 //	UPDATE opinion_reports
 //	SET status = $1
 //	WHERE opinion_report_id = $2
-//	RETURNING opinion_report_id, opinion_id, talk_session_id, reporter_id, reason, status, created_at, updated_at
+//	RETURNING opinion_report_id, opinion_id, talk_session_id, reporter_id, reason, status, created_at, updated_at, reason_text
 func (q *Queries) UpdateReportStatus(ctx context.Context, arg UpdateReportStatusParams) error {
 	_, err := q.db.ExecContext(ctx, updateReportStatus, arg.Status, arg.OpinionReportID)
 	return err
