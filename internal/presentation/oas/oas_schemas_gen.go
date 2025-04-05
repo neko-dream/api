@@ -812,6 +812,10 @@ type EditTalkSessionReq struct {
 	City OptNilString `json:"city"`
 	// 説明文.
 	Description OptNilString `json:"description"`
+	// サムネイルURL。文中から一番最初の画像URLをサムネとする。.
+	ThumbnailURL OptString `json:"thumbnailURL"`
+	// 投稿制限のキー.
+	Restrictions []string `json:"restrictions"`
 }
 
 // GetTheme returns the value of Theme.
@@ -849,6 +853,16 @@ func (s *EditTalkSessionReq) GetDescription() OptNilString {
 	return s.Description
 }
 
+// GetThumbnailURL returns the value of ThumbnailURL.
+func (s *EditTalkSessionReq) GetThumbnailURL() OptString {
+	return s.ThumbnailURL
+}
+
+// GetRestrictions returns the value of Restrictions.
+func (s *EditTalkSessionReq) GetRestrictions() []string {
+	return s.Restrictions
+}
+
 // SetTheme sets the value of Theme.
 func (s *EditTalkSessionReq) SetTheme(val string) {
 	s.Theme = val
@@ -882,6 +896,16 @@ func (s *EditTalkSessionReq) SetCity(val OptNilString) {
 // SetDescription sets the value of Description.
 func (s *EditTalkSessionReq) SetDescription(val OptNilString) {
 	s.Description = val
+}
+
+// SetThumbnailURL sets the value of ThumbnailURL.
+func (s *EditTalkSessionReq) SetThumbnailURL(val OptString) {
+	s.ThumbnailURL = val
+}
+
+// SetRestrictions sets the value of Restrictions.
+func (s *EditTalkSessionReq) SetRestrictions(val []string) {
+	s.Restrictions = val
 }
 
 type EditTimeLineBadRequest struct{}
