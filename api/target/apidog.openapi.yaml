@@ -1563,8 +1563,9 @@
                     "type": "string"
                   },
                   "scheduledEndTime": {
-                    "example": "",
-                    "type": "string"
+                    "type": "string",
+                    "format": "date-time",
+                    "example": ""
                   },
                   "latitude": {
                     "type": "number",
@@ -1594,6 +1595,22 @@
                     "description": "説明文",
                     "example": "",
                     "nullable": true
+                  },
+                  "thumbnailURL": {
+                    "description": "サムネイルURL。文中から一番最初の画像URLをサムネとする。",
+                    "example": "",
+                    "type": "string"
+                  },
+                  "restrictions": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "uniqueItems": true,
+                    "description": "投稿制限のキー",
+                    "example": [
+                      "demographics.city"
+                    ]
                   }
                 },
                 "required": [
@@ -4059,7 +4076,7 @@
                       "type": "string",
                       "description": "アイコンURL"
                     },
-                    "isVerify": {
+                    "isRegistered": {
                       "type": "boolean",
                       "description": "ユーザ登録済みか"
                     },
@@ -4074,7 +4091,7 @@
                     "iss",
                     "sub",
                     "jti",
-                    "isVerify",
+                    "isRegistered",
                     "isEmailVerified"
                   ]
                 }
@@ -5338,7 +5355,7 @@
             "type": "string",
             "description": "アイコンURL"
           },
-          "isVerify": {
+          "isRegistered": {
             "type": "boolean",
             "description": "ユーザ登録済みか"
           },
@@ -5353,7 +5370,7 @@
           "iss",
           "sub",
           "jti",
-          "isVerify",
+          "isRegistered",
           "isEmailVerified"
         ]
       },

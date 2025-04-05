@@ -9,6 +9,7 @@ import (
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
+	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/infrastructure/http/cookie"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/internal/usecase/command/user_command"
@@ -397,6 +398,19 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 	if !params.IsSet() {
 		return nil, messages.RequiredParameterError
 	}
+	var err error
+	var sessionID shared.UUID[session.Session]
+	if claim != nil {
+		sessionID, err = claim.SessionID()
+		if err != nil {
+			utils.HandleError(ctx, err, "claim.SessionID")
+			return nil, messages.InternalServerError
+		}
+		if claim.IsExpired(ctx) {
+			return nil, messages.TokenExpiredError
+		}
+	}
+
 	userID, err := claim.UserID()
 	if err != nil {
 		utils.HandleError(ctx, err, "claim.UserID")
@@ -423,6 +437,7 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 	}
 
 	input := user_command.RegisterInput{
+		SessionID:   sessionID,
 		UserID:      userID,
 		DisplayID:   value.DisplayID,
 		DisplayName: value.DisplayName,

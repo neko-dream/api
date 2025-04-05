@@ -800,8 +800,8 @@ func (s *EditTalkSessionOKRestrictionsItem) SetDescription(val string) {
 }
 
 type EditTalkSessionReq struct {
-	Theme            string `json:"theme"`
-	ScheduledEndTime string `json:"scheduledEndTime"`
+	Theme            string    `json:"theme"`
+	ScheduledEndTime time.Time `json:"scheduledEndTime"`
 	// 緯度.
 	Latitude OptNilFloat64 `json:"latitude"`
 	// 経度.
@@ -812,6 +812,10 @@ type EditTalkSessionReq struct {
 	City OptNilString `json:"city"`
 	// 説明文.
 	Description OptNilString `json:"description"`
+	// サムネイルURL。文中から一番最初の画像URLをサムネとする。.
+	ThumbnailURL OptString `json:"thumbnailURL"`
+	// 投稿制限のキー.
+	Restrictions []string `json:"restrictions"`
 }
 
 // GetTheme returns the value of Theme.
@@ -820,7 +824,7 @@ func (s *EditTalkSessionReq) GetTheme() string {
 }
 
 // GetScheduledEndTime returns the value of ScheduledEndTime.
-func (s *EditTalkSessionReq) GetScheduledEndTime() string {
+func (s *EditTalkSessionReq) GetScheduledEndTime() time.Time {
 	return s.ScheduledEndTime
 }
 
@@ -849,13 +853,23 @@ func (s *EditTalkSessionReq) GetDescription() OptNilString {
 	return s.Description
 }
 
+// GetThumbnailURL returns the value of ThumbnailURL.
+func (s *EditTalkSessionReq) GetThumbnailURL() OptString {
+	return s.ThumbnailURL
+}
+
+// GetRestrictions returns the value of Restrictions.
+func (s *EditTalkSessionReq) GetRestrictions() []string {
+	return s.Restrictions
+}
+
 // SetTheme sets the value of Theme.
 func (s *EditTalkSessionReq) SetTheme(val string) {
 	s.Theme = val
 }
 
 // SetScheduledEndTime sets the value of ScheduledEndTime.
-func (s *EditTalkSessionReq) SetScheduledEndTime(val string) {
+func (s *EditTalkSessionReq) SetScheduledEndTime(val time.Time) {
 	s.ScheduledEndTime = val
 }
 
@@ -882,6 +896,16 @@ func (s *EditTalkSessionReq) SetCity(val OptNilString) {
 // SetDescription sets the value of Description.
 func (s *EditTalkSessionReq) SetDescription(val OptNilString) {
 	s.Description = val
+}
+
+// SetThumbnailURL sets the value of ThumbnailURL.
+func (s *EditTalkSessionReq) SetThumbnailURL(val OptString) {
+	s.ThumbnailURL = val
+}
+
+// SetRestrictions sets the value of Restrictions.
+func (s *EditTalkSessionReq) SetRestrictions(val []string) {
+	s.Restrictions = val
 }
 
 type EditTimeLineBadRequest struct{}
@@ -4012,7 +4036,7 @@ type OAuthTokenInfoOK struct {
 	// アイコンURL.
 	IconURL OptString `json:"iconURL"`
 	// ユーザ登録済みか.
-	IsVerify        bool `json:"isVerify"`
+	IsRegistered    bool `json:"isRegistered"`
 	IsEmailVerified bool `json:"isEmailVerified"`
 }
 
@@ -4061,9 +4085,9 @@ func (s *OAuthTokenInfoOK) GetIconURL() OptString {
 	return s.IconURL
 }
 
-// GetIsVerify returns the value of IsVerify.
-func (s *OAuthTokenInfoOK) GetIsVerify() bool {
-	return s.IsVerify
+// GetIsRegistered returns the value of IsRegistered.
+func (s *OAuthTokenInfoOK) GetIsRegistered() bool {
+	return s.IsRegistered
 }
 
 // GetIsEmailVerified returns the value of IsEmailVerified.
@@ -4116,9 +4140,9 @@ func (s *OAuthTokenInfoOK) SetIconURL(val OptString) {
 	s.IconURL = val
 }
 
-// SetIsVerify sets the value of IsVerify.
-func (s *OAuthTokenInfoOK) SetIsVerify(val bool) {
-	s.IsVerify = val
+// SetIsRegistered sets the value of IsRegistered.
+func (s *OAuthTokenInfoOK) SetIsRegistered(val bool) {
+	s.IsRegistered = val
 }
 
 // SetIsEmailVerified sets the value of IsEmailVerified.

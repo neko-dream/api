@@ -10553,8 +10553,8 @@ func (s *OAuthTokenInfoOK) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		e.FieldStart("isVerify")
-		e.Bool(s.IsVerify)
+		e.FieldStart("isRegistered")
+		e.Bool(s.IsRegistered)
 	}
 	{
 		e.FieldStart("isEmailVerified")
@@ -10572,7 +10572,7 @@ var jsonFieldsNameOfOAuthTokenInfoOK = [11]string{
 	6:  "displayID",
 	7:  "displayName",
 	8:  "iconURL",
-	9:  "isVerify",
+	9:  "isRegistered",
 	10: "isEmailVerified",
 }
 
@@ -10687,17 +10687,17 @@ func (s *OAuthTokenInfoOK) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"iconURL\"")
 			}
-		case "isVerify":
+		case "isRegistered":
 			requiredBitSet[1] |= 1 << 1
 			if err := func() error {
 				v, err := d.Bool()
-				s.IsVerify = bool(v)
+				s.IsRegistered = bool(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"isVerify\"")
+				return errors.Wrap(err, "decode field \"isRegistered\"")
 			}
 		case "isEmailVerified":
 			requiredBitSet[1] |= 1 << 2
