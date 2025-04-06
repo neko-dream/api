@@ -164,6 +164,15 @@ func (UnimplementedHandler) GetPolicyConsentStatus(ctx context.Context) (r GetPo
 	return r, ht.ErrNotImplemented
 }
 
+// GetReportsForTalkSession implements getReportsForTalkSession operation.
+//
+// 通報一覧.
+//
+// GET /talksessions/{talkSessionID}/reports
+func (UnimplementedHandler) GetReportsForTalkSession(ctx context.Context, params GetReportsForTalkSessionParams) (r GetReportsForTalkSessionRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetTalkSessionDetail implements getTalkSessionDetail operation.
 //
 // トークセッションの詳細.

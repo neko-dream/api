@@ -650,6 +650,9 @@ func (o *opinionHandler) ReportOpinion(ctx context.Context, req oas.OptReportOpi
 	defer span.End()
 
 	claim := session.GetSession(ctx)
+	if claim == nil {
+		return nil, messages.ForbiddenError
+	}
 	userID, err := claim.UserID()
 	if err != nil {
 		return nil, messages.ForbiddenError

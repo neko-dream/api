@@ -16,6 +16,7 @@ import (
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/internal/usecase/command/talksession_command"
 	"github.com/neko-dream/server/internal/usecase/query/analysis_query"
+	"github.com/neko-dream/server/internal/usecase/query/report_query"
 	talksession_query "github.com/neko-dream/server/internal/usecase/query/talksession"
 	"github.com/neko-dream/server/pkg/sort"
 	"github.com/neko-dream/server/pkg/utils"
@@ -32,6 +33,7 @@ type talkSessionHandler struct {
 	getAnalysisResultQuery        analysis_query.GetAnalysisResult
 	getReportQuery                analysis_query.GetReportQuery
 	isSatisfied                   talksession_query.IsTalkSessionSatisfiedQuery
+	getReports                    report_query.GetByTalkSessionQuery
 
 	addConclusionCommand    talksession_command.AddConclusionCommand
 	startTalkSessionCommand talksession_command.StartTalkSessionCommand
@@ -49,6 +51,7 @@ func NewTalkSessionHandler(
 	getAnalysisQuery analysis_query.GetAnalysisResult,
 	getReportQuery analysis_query.GetReportQuery,
 	isSatisfied talksession_query.IsTalkSessionSatisfiedQuery,
+	getReports report_query.GetByTalkSessionQuery,
 
 	AddConclusionCommand talksession_command.AddConclusionCommand,
 	startTalkSessionCommand talksession_command.StartTalkSessionCommand,
@@ -65,6 +68,7 @@ func NewTalkSessionHandler(
 		getAnalysisResultQuery:        getAnalysisQuery,
 		getReportQuery:                getReportQuery,
 		isSatisfied:                   isSatisfied,
+		getReports:                    getReports,
 
 		addConclusionCommand:    AddConclusionCommand,
 		startTalkSessionCommand: startTalkSessionCommand,
@@ -755,4 +759,88 @@ func (t *talkSessionHandler) GetTalkSessionRestrictionSatisfied(ctx context.Cont
 
 	res := oas.GetTalkSessionRestrictionSatisfiedOKApplicationJSON(attributes)
 	return &res, nil
+}
+
+// GetReportsForTalkSession implements oas.TalkSessionHandler.
+func (t *talkSessionHandler) GetReportsForTalkSession(ctx context.Context, params oas.GetReportsForTalkSessionParams) (oas.GetReportsForTalkSessionRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetReportsForTalkSession")
+	defer span.End()
+
+	claim := session.GetSession(t.SetSession(ctx))
+	var userID *shared.UUID[user.User]
+	if claim != nil {
+		id, err := claim.UserID()
+		if err == nil {
+			userID = &id
+		}
+	}
+	if userID == nil {
+		return nil, messages.ForbiddenError
+	}
+
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+	var status string
+	if params.Status.IsSet() {
+		bytes, err := params.Status.Value.MarshalText()
+		if err == nil {
+			status = string(bytes)
+		}
+	} else {
+		status = "unsolved"
+	}
+
+	out, err := t.getReports.Execute(ctx, report_query.GetByTalkSessionInput{
+		TalkSessionID: talkSessionID,
+		UserID:        *userID,
+		Status:        status,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	reports := make([]oas.GetReportsForTalkSessionOKReportsItem, 0, len(out.Reports))
+	for _, report := range out.Reports {
+		var parentOpinionID oas.OptString
+		if report.Opinion.ParentOpinionID != nil {
+			parentOpinionID = oas.OptString{
+				Value: report.Opinion.ParentOpinionID.String(),
+				Set:   true,
+			}
+		}
+
+		reasons := make([]oas.GetReportsForTalkSessionOKReportsItemReasonsItem, 0, len(report.Reasons))
+		for _, reason := range report.Reasons {
+			reasons = append(reasons, oas.GetReportsForTalkSessionOKReportsItemReasonsItem{
+				Reason:  reason.Reason,
+				Content: utils.ToOptNil[oas.OptNilString](reason.Content),
+			})
+		}
+
+		reports = append(reports, oas.GetReportsForTalkSessionOKReportsItem{
+			Opinion: oas.GetReportsForTalkSessionOKReportsItemOpinion{
+				ID:           report.Opinion.OpinionID.String(),
+				Title:        utils.ToOpt[oas.OptString](report.Opinion.Title),
+				Content:      report.Opinion.Content,
+				ParentID:     parentOpinionID,
+				PictureURL:   utils.ToOptNil[oas.OptNilString](report.Opinion.PictureURL),
+				ReferenceURL: utils.ToOpt[oas.OptString](report.Opinion.ReferenceURL),
+				PostedAt:     report.Opinion.CreatedAt.Format(time.RFC3339),
+			},
+			User: oas.GetReportsForTalkSessionOKReportsItemUser{
+				DisplayID:   report.User.DisplayID,
+				DisplayName: report.User.DisplayName,
+				IconURL:     utils.ToOptNil[oas.OptNilString](report.User.IconURL),
+			},
+			Status:      oas.GetReportsForTalkSessionOKReportsItemStatus(report.Status),
+			Reasons:     reasons,
+			ReportCount: report.ReportCount,
+		})
+	}
+
+	return &oas.GetReportsForTalkSessionOK{
+		Reports: reports,
+	}, nil
 }

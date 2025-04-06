@@ -3,6 +3,7 @@ package di
 import (
 	analysis_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/analysis"
 	opinion_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/opinion"
+	report_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/report"
 	talksession_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/talksession"
 	user_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/user"
 
@@ -58,5 +59,6 @@ func useCaseDeps() []ProvideArg {
 		{opinion_q.NewGetReportReasons, nil},
 		{opinion_query.NewGetOpinionGroupRatioInteractor, nil},
 		{talksession_command.NewEditCommand, nil},
+		{report_query.NewGetByTalkSessionQueryInteractor, nil},
 	}
 }

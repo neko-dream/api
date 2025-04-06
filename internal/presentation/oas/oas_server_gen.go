@@ -217,6 +217,12 @@ type TalkSessionHandler interface {
 	//
 	// GET /talksessions/opened
 	GetOpenedTalkSession(ctx context.Context, params GetOpenedTalkSessionParams) (GetOpenedTalkSessionRes, error)
+	// GetReportsForTalkSession implements getReportsForTalkSession operation.
+	//
+	// 通報一覧.
+	//
+	// GET /talksessions/{talkSessionID}/reports
+	GetReportsForTalkSession(ctx context.Context, params GetReportsForTalkSessionParams) (GetReportsForTalkSessionRes, error)
 	// GetTalkSessionDetail implements getTalkSessionDetail operation.
 	//
 	// トークセッションの詳細.

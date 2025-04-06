@@ -65,6 +65,10 @@ type GetPolicyConsentStatusRes interface {
 	getPolicyConsentStatusRes()
 }
 
+type GetReportsForTalkSessionRes interface {
+	getReportsForTalkSessionRes()
+}
+
 type GetTalkSessionDetailRes interface {
 	getTalkSessionDetailRes()
 }
