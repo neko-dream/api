@@ -1204,6 +1204,71 @@ func decodeGetOpinionsForTalkSessionParams(args [1]string, argsEscaped bool, r *
 	return params, nil
 }
 
+// GetReportsForTalkSessionParams is parameters of getReportsForTalkSession operation.
+type GetReportsForTalkSessionParams struct {
+	TalkSessionID string
+}
+
+func unpackGetReportsForTalkSessionParams(packed middleware.Parameters) (params GetReportsForTalkSessionParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "talkSessionID",
+			In:   "path",
+		}
+		params.TalkSessionID = packed[key].(string)
+	}
+	return params
+}
+
+func decodeGetReportsForTalkSessionParams(args [1]string, argsEscaped bool, r *http.Request) (params GetReportsForTalkSessionParams, _ error) {
+	// Decode path: talkSessionID.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "talkSessionID",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.TalkSessionID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "talkSessionID",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // GetTalkSessionDetailParams is parameters of getTalkSessionDetail operation.
 type GetTalkSessionDetailParams struct {
 	TalkSessionID string

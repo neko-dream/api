@@ -2129,6 +2129,118 @@ func (s *Server) handleGetPolicyConsentStatusRequest(args [0]string, argsEscaped
 	}
 }
 
+// handleGetReportsForTalkSessionRequest handles getReportsForTalkSession operation.
+//
+// 通報一覧.
+//
+// GET /talksessions/{talkSessionID}/reports
+func (s *Server) handleGetReportsForTalkSessionRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("getReportsForTalkSession"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/reports"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "GetReportsForTalkSession",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Add Labeler to context.
+	labeler := &Labeler{attrs: otelAttrs}
+	ctx = contextWithLabeler(ctx, labeler)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
+
+		// Increment request counter.
+		s.requests.Add(ctx, 1, attrOpt)
+
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
+	}()
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "GetReportsForTalkSession",
+			ID:   "getReportsForTalkSession",
+		}
+	)
+	params, err := decodeGetReportsForTalkSessionParams(args, argsEscaped, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		defer recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	var response GetReportsForTalkSessionRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:          ctx,
+			OperationName:    "GetReportsForTalkSession",
+			OperationSummary: "通報一覧",
+			OperationID:      "getReportsForTalkSession",
+			Body:             nil,
+			Params: middleware.Parameters{
+				{
+					Name: "talkSessionID",
+					In:   "path",
+				}: params.TalkSessionID,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = struct{}
+			Params   = GetReportsForTalkSessionParams
+			Response = GetReportsForTalkSessionRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackGetReportsForTalkSessionParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.GetReportsForTalkSession(ctx, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.GetReportsForTalkSession(ctx, params)
+	}
+	if err != nil {
+		defer recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeGetReportsForTalkSessionResponse(response, w, span); err != nil {
+		defer recordError("EncodeResponse", err)
+		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+		}
+		return
+	}
+}
+
 // handleGetTalkSessionDetailRequest handles getTalkSessionDetail operation.
 //
 // トークセッションの詳細.

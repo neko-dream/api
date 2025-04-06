@@ -3018,6 +3018,150 @@ paths:
       security:
         - SessionId: []
       x-ogen-operation-group: TalkSession
+  /talksessions/{talkSessionID}/reports:
+    get:
+      summary: 通報一覧
+      deprecated: false
+      description: ''
+      operationId: getReportsForTalkSession
+      tags:
+        - talk_session
+      parameters:
+        - name: talkSessionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reports:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        opinion:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              description: 意見ID
+                            title:
+                              type: string
+                            content:
+                              type: string
+                              description: 意見のテキスト
+                              minLength: 1
+                              maxLength: 140
+                            parentID:
+                              type: string
+                              description: 親の意見ID。ルートならば無し
+                            voteType:
+                              type: string
+                              description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              enum:
+                                - disagree
+                                - agree
+                                - pass
+                              nullable: true
+                            pictureURL:
+                              type: string
+                              description: 画像が返る場合もある
+                              nullable: true
+                            referenceURL:
+                              type: string
+                              description: 参考文献URL
+                            postedAt:
+                              type: string
+                          required:
+                            - content
+                            - id
+                            - postedAt
+                        user:
+                          type: object
+                          properties:
+                            displayID:
+                              type: string
+                              pattern: ^[A-Za-z0-9]$
+                              examples:
+                                - userid
+                              minLength: 3
+                              maxLength: 25
+                            displayName:
+                              type: string
+                            iconURL:
+                              type: string
+                              nullable: true
+                          required:
+                            - displayID
+                            - displayName
+                          description: 作成ユーザー
+                        status:
+                          type: string
+                          enum:
+                            - unsolved
+                            - deleted
+                            - hold
+                        reasons:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              reason:
+                                type: string
+                              content:
+                                type: string
+                                nullable: true
+                            required:
+                              - reason
+                        reportCount:
+                          type: integer
+                          description: この意見が通報を受けた回数
+                      required:
+                        - opinion
+                        - user
+                        - reasons
+                        - reportCount
+                        - status
+                required:
+                  - reports
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security: []
+      x-ogen-operation-group: TalkSession
   /user:
     post:
       summary: ユーザー作成
@@ -5100,6 +5244,92 @@ components:
         - passCount
         - disagreeCount
         - agreeCount
+    reportDetail:
+      type: object
+      properties:
+        opinion:
+          type: object
+          properties:
+            id:
+              type: string
+              description: 意見ID
+            title:
+              type: string
+            content:
+              type: string
+              description: 意見のテキスト
+              minLength: 1
+              maxLength: 140
+            parentID:
+              type: string
+              description: 親の意見ID。ルートならば無し
+            voteType:
+              type: string
+              description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+              enum:
+                - disagree
+                - agree
+                - pass
+              nullable: true
+            pictureURL:
+              type: string
+              description: 画像が返る場合もある
+              nullable: true
+            referenceURL:
+              type: string
+              description: 参考文献URL
+            postedAt:
+              type: string
+          required:
+            - content
+            - id
+            - postedAt
+        user:
+          type: object
+          properties:
+            displayID:
+              type: string
+              pattern: ^[A-Za-z0-9]$
+              examples:
+                - userid
+              minLength: 3
+              maxLength: 25
+            displayName:
+              type: string
+            iconURL:
+              type: string
+              nullable: true
+          required:
+            - displayID
+            - displayName
+          description: 作成ユーザー
+        status:
+          type: string
+          enum:
+            - unsolved
+            - deleted
+            - hold
+        reasons:
+          type: array
+          items:
+            type: object
+            properties:
+              reason:
+                type: string
+              content:
+                type: string
+                nullable: true
+            required:
+              - reason
+        reportCount:
+          type: integer
+          description: この意見が通報を受けた回数
+      required:
+        - opinion
+        - user
+        - reasons
+        - reportCount
+        - status
   securitySchemes:
     SessionId:
       type: apiKey

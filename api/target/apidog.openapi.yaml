@@ -3144,6 +3144,96 @@
         "x-ogen-operation-group": "TalkSession"
       }
     },
+    "/talksessions/{talkSessionID}/reports": {
+      "get": {
+        "summary": "通報一覧",
+        "deprecated": false,
+        "description": "",
+        "operationId": "getReportsForTalkSession",
+        "tags": [
+          "talk_session"
+        ],
+        "parameters": [
+          {
+            "name": "talkSessionID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "reports": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/reportDetail"
+                      }
+                    }
+                  },
+                  "required": [
+                    "reports"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [],
+        "x-ogen-operation-group": "TalkSession"
+      }
+    },
     "/user": {
       "post": {
         "summary": "ユーザー作成",
@@ -5602,6 +5692,55 @@
           "passCount",
           "disagreeCount",
           "agreeCount"
+        ]
+      },
+      "reportDetail": {
+        "type": "object",
+        "properties": {
+          "opinion": {
+            "$ref": "#/components/schemas/opinion"
+          },
+          "user": {
+            "$ref": "#/components/schemas/user",
+            "description": "作成ユーザー"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "unsolved",
+              "deleted",
+              "hold"
+            ]
+          },
+          "reasons": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string"
+                },
+                "content": {
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": [
+                "reason"
+              ]
+            }
+          },
+          "reportCount": {
+            "type": "integer",
+            "description": "この意見が通報を受けた回数"
+          }
+        },
+        "required": [
+          "opinion",
+          "user",
+          "reasons",
+          "reportCount",
+          "status"
         ]
       }
     },

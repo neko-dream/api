@@ -2670,6 +2670,346 @@ func (s *GetPolicyConsentStatusOK) SetConsentGiven(val bool) {
 
 func (*GetPolicyConsentStatusOK) getPolicyConsentStatusRes() {}
 
+type GetReportsForTalkSessionBadRequest struct{}
+
+func (*GetReportsForTalkSessionBadRequest) getReportsForTalkSessionRes() {}
+
+type GetReportsForTalkSessionInternalServerError struct{}
+
+func (*GetReportsForTalkSessionInternalServerError) getReportsForTalkSessionRes() {}
+
+type GetReportsForTalkSessionOK struct {
+	Reports []GetReportsForTalkSessionOKReportsItem `json:"reports"`
+}
+
+// GetReports returns the value of Reports.
+func (s *GetReportsForTalkSessionOK) GetReports() []GetReportsForTalkSessionOKReportsItem {
+	return s.Reports
+}
+
+// SetReports sets the value of Reports.
+func (s *GetReportsForTalkSessionOK) SetReports(val []GetReportsForTalkSessionOKReportsItem) {
+	s.Reports = val
+}
+
+func (*GetReportsForTalkSessionOK) getReportsForTalkSessionRes() {}
+
+type GetReportsForTalkSessionOKReportsItem struct {
+	Opinion GetReportsForTalkSessionOKReportsItemOpinion `json:"opinion"`
+	// 作成ユーザー.
+	User    GetReportsForTalkSessionOKReportsItemUser          `json:"user"`
+	Status  GetReportsForTalkSessionOKReportsItemStatus        `json:"status"`
+	Reasons []GetReportsForTalkSessionOKReportsItemReasonsItem `json:"reasons"`
+	// この意見が通報を受けた回数.
+	ReportCount int `json:"reportCount"`
+}
+
+// GetOpinion returns the value of Opinion.
+func (s *GetReportsForTalkSessionOKReportsItem) GetOpinion() GetReportsForTalkSessionOKReportsItemOpinion {
+	return s.Opinion
+}
+
+// GetUser returns the value of User.
+func (s *GetReportsForTalkSessionOKReportsItem) GetUser() GetReportsForTalkSessionOKReportsItemUser {
+	return s.User
+}
+
+// GetStatus returns the value of Status.
+func (s *GetReportsForTalkSessionOKReportsItem) GetStatus() GetReportsForTalkSessionOKReportsItemStatus {
+	return s.Status
+}
+
+// GetReasons returns the value of Reasons.
+func (s *GetReportsForTalkSessionOKReportsItem) GetReasons() []GetReportsForTalkSessionOKReportsItemReasonsItem {
+	return s.Reasons
+}
+
+// GetReportCount returns the value of ReportCount.
+func (s *GetReportsForTalkSessionOKReportsItem) GetReportCount() int {
+	return s.ReportCount
+}
+
+// SetOpinion sets the value of Opinion.
+func (s *GetReportsForTalkSessionOKReportsItem) SetOpinion(val GetReportsForTalkSessionOKReportsItemOpinion) {
+	s.Opinion = val
+}
+
+// SetUser sets the value of User.
+func (s *GetReportsForTalkSessionOKReportsItem) SetUser(val GetReportsForTalkSessionOKReportsItemUser) {
+	s.User = val
+}
+
+// SetStatus sets the value of Status.
+func (s *GetReportsForTalkSessionOKReportsItem) SetStatus(val GetReportsForTalkSessionOKReportsItemStatus) {
+	s.Status = val
+}
+
+// SetReasons sets the value of Reasons.
+func (s *GetReportsForTalkSessionOKReportsItem) SetReasons(val []GetReportsForTalkSessionOKReportsItemReasonsItem) {
+	s.Reasons = val
+}
+
+// SetReportCount sets the value of ReportCount.
+func (s *GetReportsForTalkSessionOKReportsItem) SetReportCount(val int) {
+	s.ReportCount = val
+}
+
+type GetReportsForTalkSessionOKReportsItemOpinion struct {
+	// 意見ID.
+	ID    string    `json:"id"`
+	Title OptString `json:"title"`
+	// 意見のテキスト.
+	Content string `json:"content"`
+	// 親の意見ID。ルートならば無し.
+	ParentID OptString `json:"parentID"`
+	// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+	VoteType OptNilGetReportsForTalkSessionOKReportsItemOpinionVoteType `json:"voteType"`
+	// 画像が返る場合もある.
+	PictureURL OptNilString `json:"pictureURL"`
+	// 参考文献URL.
+	ReferenceURL OptString `json:"referenceURL"`
+	PostedAt     string    `json:"postedAt"`
+}
+
+// GetID returns the value of ID.
+func (s *GetReportsForTalkSessionOKReportsItemOpinion) GetID() string {
+	return s.ID
+}
+
+// GetTitle returns the value of Title.
+func (s *GetReportsForTalkSessionOKReportsItemOpinion) GetTitle() OptString {
+	return s.Title
+}
+
+// GetContent returns the value of Content.
+func (s *GetReportsForTalkSessionOKReportsItemOpinion) GetContent() string {
+	return s.Content
+}
+
+// GetParentID returns the value of ParentID.
+func (s *GetReportsForTalkSessionOKReportsItemOpinion) GetParentID() OptString {
+	return s.ParentID
+}
+
+// GetVoteType returns the value of VoteType.
+func (s *GetReportsForTalkSessionOKReportsItemOpinion) GetVoteType() OptNilGetReportsForTalkSessionOKReportsItemOpinionVoteType {
+	return s.VoteType
+}
+
+// GetPictureURL returns the value of PictureURL.
+func (s *GetReportsForTalkSessionOKReportsItemOpinion) GetPictureURL() OptNilString {
+	return s.PictureURL
+}
+
+// GetReferenceURL returns the value of ReferenceURL.
+func (s *GetReportsForTalkSessionOKReportsItemOpinion) GetReferenceURL() OptString {
+	return s.ReferenceURL
+}
+
+// GetPostedAt returns the value of PostedAt.
+func (s *GetReportsForTalkSessionOKReportsItemOpinion) GetPostedAt() string {
+	return s.PostedAt
+}
+
+// SetID sets the value of ID.
+func (s *GetReportsForTalkSessionOKReportsItemOpinion) SetID(val string) {
+	s.ID = val
+}
+
+// SetTitle sets the value of Title.
+func (s *GetReportsForTalkSessionOKReportsItemOpinion) SetTitle(val OptString) {
+	s.Title = val
+}
+
+// SetContent sets the value of Content.
+func (s *GetReportsForTalkSessionOKReportsItemOpinion) SetContent(val string) {
+	s.Content = val
+}
+
+// SetParentID sets the value of ParentID.
+func (s *GetReportsForTalkSessionOKReportsItemOpinion) SetParentID(val OptString) {
+	s.ParentID = val
+}
+
+// SetVoteType sets the value of VoteType.
+func (s *GetReportsForTalkSessionOKReportsItemOpinion) SetVoteType(val OptNilGetReportsForTalkSessionOKReportsItemOpinionVoteType) {
+	s.VoteType = val
+}
+
+// SetPictureURL sets the value of PictureURL.
+func (s *GetReportsForTalkSessionOKReportsItemOpinion) SetPictureURL(val OptNilString) {
+	s.PictureURL = val
+}
+
+// SetReferenceURL sets the value of ReferenceURL.
+func (s *GetReportsForTalkSessionOKReportsItemOpinion) SetReferenceURL(val OptString) {
+	s.ReferenceURL = val
+}
+
+// SetPostedAt sets the value of PostedAt.
+func (s *GetReportsForTalkSessionOKReportsItemOpinion) SetPostedAt(val string) {
+	s.PostedAt = val
+}
+
+// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+type GetReportsForTalkSessionOKReportsItemOpinionVoteType string
+
+const (
+	GetReportsForTalkSessionOKReportsItemOpinionVoteTypeDisagree GetReportsForTalkSessionOKReportsItemOpinionVoteType = "disagree"
+	GetReportsForTalkSessionOKReportsItemOpinionVoteTypeAgree    GetReportsForTalkSessionOKReportsItemOpinionVoteType = "agree"
+	GetReportsForTalkSessionOKReportsItemOpinionVoteTypePass     GetReportsForTalkSessionOKReportsItemOpinionVoteType = "pass"
+)
+
+// AllValues returns all GetReportsForTalkSessionOKReportsItemOpinionVoteType values.
+func (GetReportsForTalkSessionOKReportsItemOpinionVoteType) AllValues() []GetReportsForTalkSessionOKReportsItemOpinionVoteType {
+	return []GetReportsForTalkSessionOKReportsItemOpinionVoteType{
+		GetReportsForTalkSessionOKReportsItemOpinionVoteTypeDisagree,
+		GetReportsForTalkSessionOKReportsItemOpinionVoteTypeAgree,
+		GetReportsForTalkSessionOKReportsItemOpinionVoteTypePass,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s GetReportsForTalkSessionOKReportsItemOpinionVoteType) MarshalText() ([]byte, error) {
+	switch s {
+	case GetReportsForTalkSessionOKReportsItemOpinionVoteTypeDisagree:
+		return []byte(s), nil
+	case GetReportsForTalkSessionOKReportsItemOpinionVoteTypeAgree:
+		return []byte(s), nil
+	case GetReportsForTalkSessionOKReportsItemOpinionVoteTypePass:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *GetReportsForTalkSessionOKReportsItemOpinionVoteType) UnmarshalText(data []byte) error {
+	switch GetReportsForTalkSessionOKReportsItemOpinionVoteType(data) {
+	case GetReportsForTalkSessionOKReportsItemOpinionVoteTypeDisagree:
+		*s = GetReportsForTalkSessionOKReportsItemOpinionVoteTypeDisagree
+		return nil
+	case GetReportsForTalkSessionOKReportsItemOpinionVoteTypeAgree:
+		*s = GetReportsForTalkSessionOKReportsItemOpinionVoteTypeAgree
+		return nil
+	case GetReportsForTalkSessionOKReportsItemOpinionVoteTypePass:
+		*s = GetReportsForTalkSessionOKReportsItemOpinionVoteTypePass
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type GetReportsForTalkSessionOKReportsItemReasonsItem struct {
+	Reason  string       `json:"reason"`
+	Content OptNilString `json:"content"`
+}
+
+// GetReason returns the value of Reason.
+func (s *GetReportsForTalkSessionOKReportsItemReasonsItem) GetReason() string {
+	return s.Reason
+}
+
+// GetContent returns the value of Content.
+func (s *GetReportsForTalkSessionOKReportsItemReasonsItem) GetContent() OptNilString {
+	return s.Content
+}
+
+// SetReason sets the value of Reason.
+func (s *GetReportsForTalkSessionOKReportsItemReasonsItem) SetReason(val string) {
+	s.Reason = val
+}
+
+// SetContent sets the value of Content.
+func (s *GetReportsForTalkSessionOKReportsItemReasonsItem) SetContent(val OptNilString) {
+	s.Content = val
+}
+
+type GetReportsForTalkSessionOKReportsItemStatus string
+
+const (
+	GetReportsForTalkSessionOKReportsItemStatusUnsolved GetReportsForTalkSessionOKReportsItemStatus = "unsolved"
+	GetReportsForTalkSessionOKReportsItemStatusDeleted  GetReportsForTalkSessionOKReportsItemStatus = "deleted"
+	GetReportsForTalkSessionOKReportsItemStatusHold     GetReportsForTalkSessionOKReportsItemStatus = "hold"
+)
+
+// AllValues returns all GetReportsForTalkSessionOKReportsItemStatus values.
+func (GetReportsForTalkSessionOKReportsItemStatus) AllValues() []GetReportsForTalkSessionOKReportsItemStatus {
+	return []GetReportsForTalkSessionOKReportsItemStatus{
+		GetReportsForTalkSessionOKReportsItemStatusUnsolved,
+		GetReportsForTalkSessionOKReportsItemStatusDeleted,
+		GetReportsForTalkSessionOKReportsItemStatusHold,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s GetReportsForTalkSessionOKReportsItemStatus) MarshalText() ([]byte, error) {
+	switch s {
+	case GetReportsForTalkSessionOKReportsItemStatusUnsolved:
+		return []byte(s), nil
+	case GetReportsForTalkSessionOKReportsItemStatusDeleted:
+		return []byte(s), nil
+	case GetReportsForTalkSessionOKReportsItemStatusHold:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *GetReportsForTalkSessionOKReportsItemStatus) UnmarshalText(data []byte) error {
+	switch GetReportsForTalkSessionOKReportsItemStatus(data) {
+	case GetReportsForTalkSessionOKReportsItemStatusUnsolved:
+		*s = GetReportsForTalkSessionOKReportsItemStatusUnsolved
+		return nil
+	case GetReportsForTalkSessionOKReportsItemStatusDeleted:
+		*s = GetReportsForTalkSessionOKReportsItemStatusDeleted
+		return nil
+	case GetReportsForTalkSessionOKReportsItemStatusHold:
+		*s = GetReportsForTalkSessionOKReportsItemStatusHold
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// 作成ユーザー.
+type GetReportsForTalkSessionOKReportsItemUser struct {
+	DisplayID   string       `json:"displayID"`
+	DisplayName string       `json:"displayName"`
+	IconURL     OptNilString `json:"iconURL"`
+}
+
+// GetDisplayID returns the value of DisplayID.
+func (s *GetReportsForTalkSessionOKReportsItemUser) GetDisplayID() string {
+	return s.DisplayID
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *GetReportsForTalkSessionOKReportsItemUser) GetDisplayName() string {
+	return s.DisplayName
+}
+
+// GetIconURL returns the value of IconURL.
+func (s *GetReportsForTalkSessionOKReportsItemUser) GetIconURL() OptNilString {
+	return s.IconURL
+}
+
+// SetDisplayID sets the value of DisplayID.
+func (s *GetReportsForTalkSessionOKReportsItemUser) SetDisplayID(val string) {
+	s.DisplayID = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *GetReportsForTalkSessionOKReportsItemUser) SetDisplayName(val string) {
+	s.DisplayName = val
+}
+
+// SetIconURL sets the value of IconURL.
+func (s *GetReportsForTalkSessionOKReportsItemUser) SetIconURL(val OptNilString) {
+	s.IconURL = val
+}
+
 type GetTalkSessionDetailBadRequest struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
@@ -6497,6 +6837,69 @@ func (o OptNilGetOpinionsForTalkSessionSort) Get() (v GetOpinionsForTalkSessionS
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilGetOpinionsForTalkSessionSort) Or(d GetOpinionsForTalkSessionSort) GetOpinionsForTalkSessionSort {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilGetReportsForTalkSessionOKReportsItemOpinionVoteType returns new OptNilGetReportsForTalkSessionOKReportsItemOpinionVoteType with value set to v.
+func NewOptNilGetReportsForTalkSessionOKReportsItemOpinionVoteType(v GetReportsForTalkSessionOKReportsItemOpinionVoteType) OptNilGetReportsForTalkSessionOKReportsItemOpinionVoteType {
+	return OptNilGetReportsForTalkSessionOKReportsItemOpinionVoteType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilGetReportsForTalkSessionOKReportsItemOpinionVoteType is optional nullable GetReportsForTalkSessionOKReportsItemOpinionVoteType.
+type OptNilGetReportsForTalkSessionOKReportsItemOpinionVoteType struct {
+	Value GetReportsForTalkSessionOKReportsItemOpinionVoteType
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilGetReportsForTalkSessionOKReportsItemOpinionVoteType was set.
+func (o OptNilGetReportsForTalkSessionOKReportsItemOpinionVoteType) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilGetReportsForTalkSessionOKReportsItemOpinionVoteType) Reset() {
+	var v GetReportsForTalkSessionOKReportsItemOpinionVoteType
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilGetReportsForTalkSessionOKReportsItemOpinionVoteType) SetTo(v GetReportsForTalkSessionOKReportsItemOpinionVoteType) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilGetReportsForTalkSessionOKReportsItemOpinionVoteType) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilGetReportsForTalkSessionOKReportsItemOpinionVoteType) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v GetReportsForTalkSessionOKReportsItemOpinionVoteType
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilGetReportsForTalkSessionOKReportsItemOpinionVoteType) Get() (v GetReportsForTalkSessionOKReportsItemOpinionVoteType, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilGetReportsForTalkSessionOKReportsItemOpinionVoteType) Or(d GetReportsForTalkSessionOKReportsItemOpinionVoteType) GetReportsForTalkSessionOKReportsItemOpinionVoteType {
 	if v, ok := o.Get(); ok {
 		return v
 	}
