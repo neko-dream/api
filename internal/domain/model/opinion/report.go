@@ -12,6 +12,7 @@ import (
 type ReportRepository interface {
 	Create(context.Context, Report) error
 	UpdateStatus(context.Context, shared.UUID[Report], Status) error
+	FindByOpinionID(context.Context, shared.UUID[Opinion]) ([]Report, error)
 }
 
 type Report struct {

@@ -10,4 +10,5 @@ WHERE
     WHEN sqlc.narg('status')::text IS NOT NULL THEN opinion_reports.status = sqlc.narg('status')::text
     ELSE TRUE
   END
+  ORDER BY created_at DESC
 ;

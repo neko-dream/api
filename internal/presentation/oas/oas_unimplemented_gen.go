@@ -123,6 +123,8 @@ func (UnimplementedHandler) GetOpinionAnalysis(ctx context.Context, params GetOp
 //
 // 意見の詳細.
 //
+// Deprecated: schema marks this operation as deprecated.
+//
 // GET /talksessions/{talkSessionID}/opinions/{opinionID}
 func (UnimplementedHandler) GetOpinionDetail(ctx context.Context, params GetOpinionDetailParams) (r GetOpinionDetailRes, _ error) {
 	return r, ht.ErrNotImplemented
@@ -143,6 +145,15 @@ func (UnimplementedHandler) GetOpinionDetail2(ctx context.Context, params GetOpi
 //
 // GET /opinions/report_reasons
 func (UnimplementedHandler) GetOpinionReportReasons(ctx context.Context) (r GetOpinionReportReasonsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetOpinionReports implements getOpinionReports operation.
+//
+// セッション作成者しか取得できない.
+//
+// GET /opinions/{opinionID}/reports
+func (UnimplementedHandler) GetOpinionReports(ctx context.Context, params GetOpinionReportsParams) (r GetOpinionReportsRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -338,6 +349,8 @@ func (UnimplementedHandler) PostImage(ctx context.Context, req OptPostImageReq) 
 //
 // ParentOpinionIDがなければルートの意見として投稿される.
 //
+// Deprecated: schema marks this operation as deprecated.
+//
 // POST /talksessions/{talkSessionID}/opinions
 func (UnimplementedHandler) PostOpinionPost(ctx context.Context, req OptPostOpinionPostReq, params PostOpinionPostParams) (r PostOpinionPostRes, _ error) {
 	return r, ht.ErrNotImplemented
@@ -389,10 +402,21 @@ func (UnimplementedHandler) SessionsHistory(ctx context.Context, params Sessions
 	return r, ht.ErrNotImplemented
 }
 
+// SolveOpinionReport implements solveOpinionReport operation.
+//
+// 通報を解決.
+//
+// POST /opinions/{opinionID}/reports/solve
+func (UnimplementedHandler) SolveOpinionReport(ctx context.Context, req OptSolveOpinionReportReq, params SolveOpinionReportParams) (r SolveOpinionReportRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // SwipeOpinions implements swipe_opinions operation.
 //
 // セッションの中からまだ投票していない意見をランダムに取得する
 // remainingCountは取得した意見を含めてスワイプできる意見の総数を返す.
+//
+// Deprecated: schema marks this operation as deprecated.
 //
 // GET /talksessions/{talkSessionID}/swipe_opinions
 func (UnimplementedHandler) SwipeOpinions(ctx context.Context, params SwipeOpinionsParams) (r SwipeOpinionsRes, _ error) {
@@ -420,6 +444,8 @@ func (UnimplementedHandler) Test(ctx context.Context) (r TestRes, _ error) {
 // Vote implements vote operation.
 //
 // 意思表明API.
+//
+// Deprecated: schema marks this operation as deprecated.
 //
 // POST /talksessions/{talkSessionID}/opinions/{opinionID}/votes
 func (UnimplementedHandler) Vote(ctx context.Context, req OptVoteReq, params VoteParams) (r VoteRes, _ error) {

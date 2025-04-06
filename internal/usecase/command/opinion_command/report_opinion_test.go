@@ -61,6 +61,11 @@ func (m *mockReportRepository) UpdateStatus(ctx context.Context, id shared.UUID[
 	return args.Error(0)
 }
 
+func (m *mockReportRepository) FindByOpinionID(ctx context.Context, id shared.UUID[opinion.Opinion]) ([]opinion.Report, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).([]opinion.Report), args.Error(1)
+}
+
 func TestReportOpinion_Execute(t *testing.T) {
 	ctx := context.Background()
 

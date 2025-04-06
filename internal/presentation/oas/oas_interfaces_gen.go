@@ -57,6 +57,10 @@ type GetOpinionReportReasonsRes interface {
 	getOpinionReportReasonsRes()
 }
 
+type GetOpinionReportsRes interface {
+	getOpinionReportsRes()
+}
+
 type GetOpinionsForTalkSessionRes interface {
 	getOpinionsForTalkSessionRes()
 }
@@ -155,6 +159,10 @@ type ReportOpinionRes interface {
 
 type SessionsHistoryRes interface {
 	sessionsHistoryRes()
+}
+
+type SolveOpinionReportRes interface {
+	solveOpinionReportRes()
 }
 
 type SwipeOpinionsRes interface {

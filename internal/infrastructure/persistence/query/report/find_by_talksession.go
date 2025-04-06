@@ -78,21 +78,21 @@ func (i *getByTalkSessionQueryInteractor) Execute(ctx context.Context, input rep
 	}
 
 	var reportDetails []dto.ReportDetail
-	for _, report := range opinions {
+	for _, opRow := range opinions {
 		var op dto.Opinion
-		if err := copier.CopyWithOption(&op, report.Opinion, copier.Option{IgnoreEmpty: true, DeepCopy: true}); err != nil {
+		if err := copier.CopyWithOption(&op, opRow.Opinion, copier.Option{IgnoreEmpty: true, DeepCopy: true}); err != nil {
 			utils.HandleError(ctx, err, "copier.CopyWithOption for Opinion")
 			return nil, err
 		}
 		var usr dto.User
-		if err := copier.CopyWithOption(&usr, report.User, copier.Option{IgnoreEmpty: true, DeepCopy: true}); err != nil {
+		if err := copier.CopyWithOption(&usr, opRow.User, copier.Option{IgnoreEmpty: true, DeepCopy: true}); err != nil {
 			utils.HandleError(ctx, err, "copier.CopyWithOption for User")
 			return nil, err
 		}
 
 		// reportMapより、reportの情報を取得
 		var reportDetailReasons []dto.ReportDetailReason
-		for _, reportDetail := range reportMap[shared.UUID[opinion.Opinion](report.Opinion.OpinionID)] {
+		for _, reportDetail := range reportMap[shared.UUID[opinion.Opinion](opRow.Opinion.OpinionID)] {
 			detailDTO := dto.ReportDetailReason{
 				ReportID: shared.UUID[opinion.Report](reportDetail.OpinionReportID),
 				Reason:   opinion.Reason(reportDetail.Reason).StringJP(),
