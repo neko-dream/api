@@ -858,7 +858,11 @@
             "headers": {}
           }
         },
-        "security": [],
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
         "x-ogen-operation-group": "Opinion"
       }
     },
@@ -3327,7 +3331,11 @@
             "headers": {}
           }
         },
-        "security": [],
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
         "x-ogen-operation-group": "TalkSession"
       }
     },
