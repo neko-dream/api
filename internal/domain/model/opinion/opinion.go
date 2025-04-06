@@ -6,6 +6,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/neko-dream/server/internal/domain/messages"
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
@@ -140,7 +141,7 @@ func (o *Opinion) Report(ctx context.Context, reporterID shared.UUID[user.User],
 		reporterID,
 		reason,
 		reasonText,
-		string(StatusUnconfirmed),
-		time.Now(),
+		string(StatusUnsolved),
+		clock.Now(ctx),
 	)
 }
