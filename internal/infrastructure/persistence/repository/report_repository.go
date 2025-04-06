@@ -76,7 +76,7 @@ func (r *reportRepository) FindByOpinionID(ctx context.Context, opinionID shared
 		return nil, err
 	}
 
-	var result []opinion.Report
+	result := make([]opinion.Report, 0, len(reports))
 	for _, report := range reports {
 		var reasonText *string
 		if report.OpinionReport.ReasonText.Valid {
