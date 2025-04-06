@@ -970,6 +970,71 @@ func decodeGetOpinionDetail2Params(args [1]string, argsEscaped bool, r *http.Req
 	return params, nil
 }
 
+// GetOpinionReportsParams is parameters of getOpinionReports operation.
+type GetOpinionReportsParams struct {
+	OpinionID string
+}
+
+func unpackGetOpinionReportsParams(packed middleware.Parameters) (params GetOpinionReportsParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "opinionID",
+			In:   "path",
+		}
+		params.OpinionID = packed[key].(string)
+	}
+	return params
+}
+
+func decodeGetOpinionReportsParams(args [1]string, argsEscaped bool, r *http.Request) (params GetOpinionReportsParams, _ error) {
+	// Decode path: opinionID.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "opinionID",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.OpinionID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "opinionID",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // GetOpinionsForTalkSessionParams is parameters of getOpinionsForTalkSession operation.
 type GetOpinionsForTalkSessionParams struct {
 	TalkSessionID string

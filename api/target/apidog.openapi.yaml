@@ -783,6 +783,85 @@
         "x-ogen-operation-group": "Opinion"
       }
     },
+    "/opinions/{opinionID}/reports": {
+      "get": {
+        "summary": "意見に対する通報取得",
+        "deprecated": false,
+        "description": "セッション作成者しか取得できない",
+        "operationId": "getOpinionReports",
+        "tags": [
+          "opinion"
+        ],
+        "parameters": [
+          {
+            "name": "opinionID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/reportDetail"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [],
+        "x-ogen-operation-group": "Opinion"
+      }
+    },
     "/talksessions/{talkSessionID}/opinions/{opinionID}/votes": {
       "post": {
         "summary": "意思表明API",
