@@ -5,12 +5,12 @@ import "errors"
 type Status string
 
 const (
-	// StatusUnconfirmed 未確認
-	StatusUnconfirmed Status = "unconfirmed"
-	// StatusConfirmed 確認済み
-	StatusConfirmed Status = "confirmed"
-	// StatusIgnored 無視
-	StatusIgnored Status = "ignored"
+	// StatusUnsolved 未解決
+	StatusUnsolved Status = "unsolved"
+	// StatusDeleted 削除済み
+	StatusDeleted Status = "deleted"
+	// StatusHold 保留
+	StatusHold Status = "hold"
 )
 
 var (
@@ -19,12 +19,12 @@ var (
 
 func NewStatus(status string) (Status, error) {
 	switch status {
-	case "unconfirmed":
-		return StatusUnconfirmed, nil
-	case "confirmed":
-		return StatusConfirmed, nil
-	case "ignored":
-		return StatusIgnored, nil
+	case "unsolved":
+		return StatusUnsolved, nil
+	case "deleted":
+		return StatusDeleted, nil
+	case "hold":
+		return StatusHold, nil
 	default:
 		return "", ErrInvalidStatus
 	}
