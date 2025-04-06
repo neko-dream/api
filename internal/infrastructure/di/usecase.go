@@ -11,6 +11,7 @@ import (
 	"github.com/neko-dream/server/internal/usecase/command/image_command"
 	"github.com/neko-dream/server/internal/usecase/command/opinion_command"
 	"github.com/neko-dream/server/internal/usecase/command/policy_command"
+	"github.com/neko-dream/server/internal/usecase/command/report_command"
 	"github.com/neko-dream/server/internal/usecase/command/talksession_command"
 	"github.com/neko-dream/server/internal/usecase/command/timeline_command"
 	"github.com/neko-dream/server/internal/usecase/command/user_command"
@@ -60,5 +61,7 @@ func useCaseDeps() []ProvideArg {
 		{opinion_query.NewGetOpinionGroupRatioInteractor, nil},
 		{talksession_command.NewEditCommand, nil},
 		{report_query.NewGetByTalkSessionQueryInteractor, nil},
+		{report_query.NewGetOpinionReportQueryInteractor, nil},
+		{report_command.NewSolveReportCommandInteractor, nil},
 	}
 }
