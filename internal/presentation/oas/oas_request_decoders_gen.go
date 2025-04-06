@@ -2731,33 +2731,6 @@ func (s *Server) decodeSolveOpinionReportRequest(r *http.Request) (
 			q := uri.NewQueryDecoder(form)
 			{
 				cfg := uri.QueryParameterDecodingConfig{
-					Name:    "opinionID",
-					Style:   uri.QueryStyleForm,
-					Explode: true,
-				}
-				if err := q.HasParam(cfg); err == nil {
-					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-						val, err := d.DecodeValue()
-						if err != nil {
-							return err
-						}
-
-						c, err := conv.ToString(val)
-						if err != nil {
-							return err
-						}
-
-						optForm.OpinionID = c
-						return nil
-					}); err != nil {
-						return req, close, errors.Wrap(err, "decode \"opinionID\"")
-					}
-				} else {
-					return req, close, errors.Wrap(err, "query")
-				}
-			}
-			{
-				cfg := uri.QueryParameterDecodingConfig{
 					Name:    "action",
 					Style:   uri.QueryStyleForm,
 					Explode: true,

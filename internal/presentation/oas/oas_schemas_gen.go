@@ -10256,23 +10256,12 @@ type SolveOpinionReportOK struct{}
 func (*SolveOpinionReportOK) solveOpinionReportRes() {}
 
 type SolveOpinionReportReq struct {
-	OpinionID string                      `json:"opinionID"`
-	Action    SolveOpinionReportReqAction `json:"action"`
-}
-
-// GetOpinionID returns the value of OpinionID.
-func (s *SolveOpinionReportReq) GetOpinionID() string {
-	return s.OpinionID
+	Action SolveOpinionReportReqAction `json:"action"`
 }
 
 // GetAction returns the value of Action.
 func (s *SolveOpinionReportReq) GetAction() SolveOpinionReportReqAction {
 	return s.Action
-}
-
-// SetOpinionID sets the value of OpinionID.
-func (s *SolveOpinionReportReq) SetOpinionID(val string) {
-	s.OpinionID = val
 }
 
 // SetAction sets the value of Action.

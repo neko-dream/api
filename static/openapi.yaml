@@ -831,9 +831,6 @@ paths:
             schema:
               type: object
               properties:
-                opinionID:
-                  example: ''
-                  type: string
                 action:
                   type: string
                   enum:
@@ -841,7 +838,6 @@ paths:
                     - hold
                   example: ''
               required:
-                - opinionID
                 - action
       responses:
         '200':
