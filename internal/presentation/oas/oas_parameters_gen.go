@@ -1207,6 +1207,7 @@ func decodeGetOpinionsForTalkSessionParams(args [1]string, argsEscaped bool, r *
 // GetReportsForTalkSessionParams is parameters of getReportsForTalkSession operation.
 type GetReportsForTalkSessionParams struct {
 	TalkSessionID string
+	Status        OptGetReportsForTalkSessionStatus
 }
 
 func unpackGetReportsForTalkSessionParams(packed middleware.Parameters) (params GetReportsForTalkSessionParams) {
@@ -1217,10 +1218,20 @@ func unpackGetReportsForTalkSessionParams(packed middleware.Parameters) (params 
 		}
 		params.TalkSessionID = packed[key].(string)
 	}
+	{
+		key := middleware.ParameterKey{
+			Name: "status",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Status = v.(OptGetReportsForTalkSessionStatus)
+		}
+	}
 	return params
 }
 
 func decodeGetReportsForTalkSessionParams(args [1]string, argsEscaped bool, r *http.Request) (params GetReportsForTalkSessionParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: talkSessionID.
 	if err := func() error {
 		param := args[0]
@@ -1263,6 +1274,62 @@ func decodeGetReportsForTalkSessionParams(args [1]string, argsEscaped bool, r *h
 		return params, &ogenerrors.DecodeParamError{
 			Name: "talkSessionID",
 			In:   "path",
+			Err:  err,
+		}
+	}
+	// Decode query: status.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "status",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotStatusVal GetReportsForTalkSessionStatus
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotStatusVal = GetReportsForTalkSessionStatus(c)
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Status.SetTo(paramsDotStatusVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.Status.Get(); ok {
+					if err := func() error {
+						if err := value.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "status",
+			In:   "query",
 			Err:  err,
 		}
 	}

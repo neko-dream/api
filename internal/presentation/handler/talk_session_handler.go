@@ -782,10 +782,20 @@ func (t *talkSessionHandler) GetReportsForTalkSession(ctx context.Context, param
 	if err != nil {
 		return nil, messages.BadRequestError
 	}
+	var status string
+	if params.Status.IsSet() {
+		bytes, err := params.Status.Value.MarshalText()
+		if err == nil {
+			status = string(bytes)
+		}
+	} else {
+		status = "unsolved"
+	}
 
 	out, err := t.getReports.Execute(ctx, report_query.GetByTalkSessionInput{
 		TalkSessionID: talkSessionID,
 		UserID:        *userID,
+		Status:        status,
 	})
 	if err != nil {
 		return nil, err
@@ -824,8 +834,9 @@ func (t *talkSessionHandler) GetReportsForTalkSession(ctx context.Context, param
 				DisplayName: report.User.DisplayName,
 				IconURL:     utils.ToOptNil[oas.OptNilString](report.User.IconURL),
 			},
-			Status:  oas.GetReportsForTalkSessionOKReportsItemStatus(report.Status),
-			Reasons: reasons,
+			Status:      oas.GetReportsForTalkSessionOKReportsItemStatus(report.Status),
+			Reasons:     reasons,
+			ReportCount: report.ReportCount,
 		})
 	}
 

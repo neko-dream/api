@@ -1508,6 +1508,19 @@ func (s *GetReportsForTalkSessionOKReportsItemUser) Validate() error {
 	return nil
 }
 
+func (s GetReportsForTalkSessionStatus) Validate() error {
+	switch s {
+	case "unsolved":
+		return nil
+	case "deleted":
+		return nil
+	case "hold":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
 func (s *GetTalkSessionDetailOK) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer

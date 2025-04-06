@@ -538,7 +538,8 @@ paths:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-      security: []
+      security:
+        - SessionId: []
       x-ogen-operation-group: Opinion
   /opinions/report_reasons:
     get:
@@ -3033,6 +3034,16 @@ paths:
           required: true
           schema:
             type: string
+        - name: status
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: string
+            enum:
+              - unsolved
+              - deleted
+              - hold
       responses:
         '200':
           description: ''

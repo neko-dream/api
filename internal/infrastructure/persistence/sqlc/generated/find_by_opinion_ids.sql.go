@@ -7,9 +7,9 @@ package model
 
 import (
 	"context"
+	"strings"
 
 	"github.com/google/uuid"
-	"github.com/lib/pq"
 )
 
 const findOpinionsByOpinionIDs = `-- name: FindOpinionsByOpinionIDs :many
@@ -21,7 +21,7 @@ FROM
 LEFT JOIN users
     ON opinions.user_id = users.user_id
 WHERE
-    opinions.opinion_id IN ($1::uuid[])
+    opinions.opinion_id IN($1)
 `
 
 type FindOpinionsByOpinionIDsRow struct {
@@ -39,9 +39,19 @@ type FindOpinionsByOpinionIDsRow struct {
 //	LEFT JOIN users
 //	    ON opinions.user_id = users.user_id
 //	WHERE
-//	    opinions.opinion_id IN ($1::uuid[])
-func (q *Queries) FindOpinionsByOpinionIDs(ctx context.Context, opinionID []uuid.UUID) ([]FindOpinionsByOpinionIDsRow, error) {
-	rows, err := q.db.QueryContext(ctx, findOpinionsByOpinionIDs, pq.Array(opinionID))
+//	    opinions.opinion_id IN($1)
+func (q *Queries) FindOpinionsByOpinionIDs(ctx context.Context, opinionIds []uuid.UUID) ([]FindOpinionsByOpinionIDsRow, error) {
+	query := findOpinionsByOpinionIDs
+	var queryParams []interface{}
+	if len(opinionIds) > 0 {
+		for _, v := range opinionIds {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:opinion_ids*/?", strings.Repeat(",?", len(opinionIds))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:opinion_ids*/?", "NULL", 1)
+	}
+	rows, err := q.db.QueryContext(ctx, query, queryParams...)
 	if err != nil {
 		return nil, err
 	}

@@ -3010,6 +3010,54 @@ func (s *GetReportsForTalkSessionOKReportsItemUser) SetIconURL(val OptNilString)
 	s.IconURL = val
 }
 
+type GetReportsForTalkSessionStatus string
+
+const (
+	GetReportsForTalkSessionStatusUnsolved GetReportsForTalkSessionStatus = "unsolved"
+	GetReportsForTalkSessionStatusDeleted  GetReportsForTalkSessionStatus = "deleted"
+	GetReportsForTalkSessionStatusHold     GetReportsForTalkSessionStatus = "hold"
+)
+
+// AllValues returns all GetReportsForTalkSessionStatus values.
+func (GetReportsForTalkSessionStatus) AllValues() []GetReportsForTalkSessionStatus {
+	return []GetReportsForTalkSessionStatus{
+		GetReportsForTalkSessionStatusUnsolved,
+		GetReportsForTalkSessionStatusDeleted,
+		GetReportsForTalkSessionStatusHold,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s GetReportsForTalkSessionStatus) MarshalText() ([]byte, error) {
+	switch s {
+	case GetReportsForTalkSessionStatusUnsolved:
+		return []byte(s), nil
+	case GetReportsForTalkSessionStatusDeleted:
+		return []byte(s), nil
+	case GetReportsForTalkSessionStatusHold:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *GetReportsForTalkSessionStatus) UnmarshalText(data []byte) error {
+	switch GetReportsForTalkSessionStatus(data) {
+	case GetReportsForTalkSessionStatusUnsolved:
+		*s = GetReportsForTalkSessionStatusUnsolved
+		return nil
+	case GetReportsForTalkSessionStatusDeleted:
+		*s = GetReportsForTalkSessionStatusDeleted
+		return nil
+	case GetReportsForTalkSessionStatusHold:
+		*s = GetReportsForTalkSessionStatusHold
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
 type GetTalkSessionDetailBadRequest struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
@@ -5931,6 +5979,52 @@ func (o OptGetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation) Get() (v G
 
 // Or returns value if set, or given parameter if does not.
 func (o OptGetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation) Or(d GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation) GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptGetReportsForTalkSessionStatus returns new OptGetReportsForTalkSessionStatus with value set to v.
+func NewOptGetReportsForTalkSessionStatus(v GetReportsForTalkSessionStatus) OptGetReportsForTalkSessionStatus {
+	return OptGetReportsForTalkSessionStatus{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptGetReportsForTalkSessionStatus is optional GetReportsForTalkSessionStatus.
+type OptGetReportsForTalkSessionStatus struct {
+	Value GetReportsForTalkSessionStatus
+	Set   bool
+}
+
+// IsSet returns true if OptGetReportsForTalkSessionStatus was set.
+func (o OptGetReportsForTalkSessionStatus) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptGetReportsForTalkSessionStatus) Reset() {
+	var v GetReportsForTalkSessionStatus
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptGetReportsForTalkSessionStatus) SetTo(v GetReportsForTalkSessionStatus) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptGetReportsForTalkSessionStatus) Get() (v GetReportsForTalkSessionStatus, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptGetReportsForTalkSessionStatus) Or(d GetReportsForTalkSessionStatus) GetReportsForTalkSessionStatus {
 	if v, ok := o.Get(); ok {
 		return v
 	}
