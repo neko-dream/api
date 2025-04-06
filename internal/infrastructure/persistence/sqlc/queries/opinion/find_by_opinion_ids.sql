@@ -7,5 +7,5 @@ FROM
 LEFT JOIN users
     ON opinions.user_id = users.user_id
 WHERE
-    opinions.opinion_id IN (sqlc.narg('opinion_id')::uuid[])
+    opinions.opinion_id IN(sqlc.slice('opinion_ids'))
 ;
