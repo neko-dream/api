@@ -161,6 +161,10 @@ type SessionsHistoryRes interface {
 	sessionsHistoryRes()
 }
 
+type SolveOpinionReportRes interface {
+	solveOpinionReportRes()
+}
+
 type SwipeOpinionsRes interface {
 	swipeOpinionsRes()
 }

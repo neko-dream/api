@@ -810,10 +810,82 @@ paths:
       security:
         - SessionId: []
       x-ogen-operation-group: Opinion
+  /opinions/{opinionID}/reports/solve:
+    post:
+      summary: 通報を解決
+      deprecated: false
+      description: ''
+      operationId: solveOpinionReport
+      tags:
+        - opinion
+      parameters:
+        - name: opinionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                opinionID:
+                  example: ''
+                  type: string
+                action:
+                  type: string
+                  enum:
+                    - deleted
+                    - hold
+                  example: ''
+              required:
+                - opinionID
+                - action
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security: []
+      x-ogen-operation-group: Opinion
   /talksessions/{talkSessionID}/opinions/{opinionID}/votes:
     post:
       summary: 意思表明API
-      deprecated: false
+      deprecated: true
       description: ''
       operationId: vote
       tags:
@@ -843,11 +915,6 @@ paths:
                     - agree
                     - disagree
                     - pass
-                  x-apidog:
-                    enumDescriptions:
-                      agree: ''
-                      disagree: ''
-                      pass: ''
                   example: ''
                   nullable: true
               required:
@@ -945,7 +1012,7 @@ paths:
   /talksessions/{talkSessionID}/swipe_opinions:
     get:
       summary: スワイプ用のエンドポイント
-      deprecated: false
+      deprecated: true
       description: |-
         セッションの中からまだ投票していない意見をランダムに取得する
         remainingCountは取得した意見を含めてスワイプできる意見の総数を返す
@@ -1096,7 +1163,7 @@ paths:
   /talksessions/{talkSessionID}/opinions:
     post:
       summary: セッションに対して意見投稿
-      deprecated: false
+      deprecated: true
       description: parentOpinionIDがなければルートの意見として投稿される
       operationId: postOpinionPost
       tags:
@@ -1359,7 +1426,7 @@ paths:
   /talksessions/{talkSessionID}/opinions/{opinionID}:
     get:
       summary: 意見の詳細
-      deprecated: false
+      deprecated: true
       description: ''
       operationId: getOpinionDetail
       tags:

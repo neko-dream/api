@@ -104,6 +104,8 @@ type OpinionHandler interface {
 	//
 	// 意見の詳細.
 	//
+	// Deprecated: schema marks this operation as deprecated.
+	//
 	// GET /talksessions/{talkSessionID}/opinions/{opinionID}
 	GetOpinionDetail(ctx context.Context, params GetOpinionDetailParams) (GetOpinionDetailRes, error)
 	// GetOpinionDetail2 implements getOpinionDetail2 operation.
@@ -146,6 +148,8 @@ type OpinionHandler interface {
 	//
 	// ParentOpinionIDがなければルートの意見として投稿される.
 	//
+	// Deprecated: schema marks this operation as deprecated.
+	//
 	// POST /talksessions/{talkSessionID}/opinions
 	PostOpinionPost(ctx context.Context, req OptPostOpinionPostReq, params PostOpinionPostParams) (PostOpinionPostRes, error)
 	// PostOpinionPost2 implements postOpinionPost2 operation.
@@ -161,10 +165,18 @@ type OpinionHandler interface {
 	//
 	// POST /opinions/{opinionID}/report
 	ReportOpinion(ctx context.Context, req OptReportOpinionReq, params ReportOpinionParams) (ReportOpinionRes, error)
+	// SolveOpinionReport implements solveOpinionReport operation.
+	//
+	// 通報を解決.
+	//
+	// POST /opinions/{opinionID}/reports/solve
+	SolveOpinionReport(ctx context.Context, req OptSolveOpinionReportReq, params SolveOpinionReportParams) (SolveOpinionReportRes, error)
 	// SwipeOpinions implements swipe_opinions operation.
 	//
 	// セッションの中からまだ投票していない意見をランダムに取得する
 	// remainingCountは取得した意見を含めてスワイプできる意見の総数を返す.
+	//
+	// Deprecated: schema marks this operation as deprecated.
 	//
 	// GET /talksessions/{talkSessionID}/swipe_opinions
 	SwipeOpinions(ctx context.Context, params SwipeOpinionsParams) (SwipeOpinionsRes, error)
@@ -359,6 +371,8 @@ type VoteHandler interface {
 	// Vote implements vote operation.
 	//
 	// 意思表明API.
+	//
+	// Deprecated: schema marks this operation as deprecated.
 	//
 	// POST /talksessions/{talkSessionID}/opinions/{opinionID}/votes
 	Vote(ctx context.Context, req OptVoteReq, params VoteParams) (VoteRes, error)

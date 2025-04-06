@@ -8752,6 +8752,52 @@ func (o OptSessionsHistoryOKTalkSessionsItemTalkSessionLocation) Or(d SessionsHi
 	return d
 }
 
+// NewOptSolveOpinionReportReq returns new OptSolveOpinionReportReq with value set to v.
+func NewOptSolveOpinionReportReq(v SolveOpinionReportReq) OptSolveOpinionReportReq {
+	return OptSolveOpinionReportReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptSolveOpinionReportReq is optional SolveOpinionReportReq.
+type OptSolveOpinionReportReq struct {
+	Value SolveOpinionReportReq
+	Set   bool
+}
+
+// IsSet returns true if OptSolveOpinionReportReq was set.
+func (o OptSolveOpinionReportReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptSolveOpinionReportReq) Reset() {
+	var v SolveOpinionReportReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptSolveOpinionReportReq) SetTo(v SolveOpinionReportReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptSolveOpinionReportReq) Get() (v SolveOpinionReportReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptSolveOpinionReportReq) Or(d SolveOpinionReportReq) SolveOpinionReportReq {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptString returns new OptString with value set to v.
 func NewOptString(v string) OptString {
 	return OptString{
@@ -10191,6 +10237,84 @@ func (s *SessionsHistoryStatus) UnmarshalText(data []byte) error {
 		return nil
 	case SessionsHistoryStatusFinished:
 		*s = SessionsHistoryStatusFinished
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type SolveOpinionReportBadRequest struct{}
+
+func (*SolveOpinionReportBadRequest) solveOpinionReportRes() {}
+
+type SolveOpinionReportInternalServerError struct{}
+
+func (*SolveOpinionReportInternalServerError) solveOpinionReportRes() {}
+
+type SolveOpinionReportOK struct{}
+
+func (*SolveOpinionReportOK) solveOpinionReportRes() {}
+
+type SolveOpinionReportReq struct {
+	OpinionID string                      `json:"opinionID"`
+	Action    SolveOpinionReportReqAction `json:"action"`
+}
+
+// GetOpinionID returns the value of OpinionID.
+func (s *SolveOpinionReportReq) GetOpinionID() string {
+	return s.OpinionID
+}
+
+// GetAction returns the value of Action.
+func (s *SolveOpinionReportReq) GetAction() SolveOpinionReportReqAction {
+	return s.Action
+}
+
+// SetOpinionID sets the value of OpinionID.
+func (s *SolveOpinionReportReq) SetOpinionID(val string) {
+	s.OpinionID = val
+}
+
+// SetAction sets the value of Action.
+func (s *SolveOpinionReportReq) SetAction(val SolveOpinionReportReqAction) {
+	s.Action = val
+}
+
+type SolveOpinionReportReqAction string
+
+const (
+	SolveOpinionReportReqActionDeleted SolveOpinionReportReqAction = "deleted"
+	SolveOpinionReportReqActionHold    SolveOpinionReportReqAction = "hold"
+)
+
+// AllValues returns all SolveOpinionReportReqAction values.
+func (SolveOpinionReportReqAction) AllValues() []SolveOpinionReportReqAction {
+	return []SolveOpinionReportReqAction{
+		SolveOpinionReportReqActionDeleted,
+		SolveOpinionReportReqActionHold,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s SolveOpinionReportReqAction) MarshalText() ([]byte, error) {
+	switch s {
+	case SolveOpinionReportReqActionDeleted:
+		return []byte(s), nil
+	case SolveOpinionReportReqActionHold:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *SolveOpinionReportReqAction) UnmarshalText(data []byte) error {
+	switch SolveOpinionReportReqAction(data) {
+	case SolveOpinionReportReqActionDeleted:
+		*s = SolveOpinionReportReqActionDeleted
+		return nil
+	case SolveOpinionReportReqActionHold:
+		*s = SolveOpinionReportReqActionHold
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
