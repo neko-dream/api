@@ -15,6 +15,7 @@ import (
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/internal/usecase/command/opinion_command"
 	opinion_query "github.com/neko-dream/server/internal/usecase/query/opinion"
+	"github.com/neko-dream/server/internal/usecase/query/report_query"
 	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/sort"
 	"github.com/neko-dream/server/pkg/utils"
@@ -29,6 +30,7 @@ type opinionHandler struct {
 	getSwipeOpinionQuery         opinion_query.GetSwipeOpinionsQuery
 	getReportReasons             opinion_query.GetReportReasons
 	getOpinionGroupRatio         opinion_query.GetOpinionGroupRatioQuery
+	getReportByOpinionID         report_query.GetOpinionReportQuery
 
 	submitOpinionCommand opinion_command.SubmitOpinion
 	reportOpinionCommand opinion_command.ReportOpinion
@@ -43,6 +45,7 @@ func NewOpinionHandler(
 	getSwipeOpinionsQuery opinion_query.GetSwipeOpinionsQuery,
 	getReportReasons opinion_query.GetReportReasons,
 	getOpinionGroupRatio opinion_query.GetOpinionGroupRatioQuery,
+	getReportByOpinionID report_query.GetOpinionReportQuery,
 
 	submitOpinionCommand opinion_command.SubmitOpinion,
 	reportOpinionCommand opinion_command.ReportOpinion,
@@ -56,6 +59,7 @@ func NewOpinionHandler(
 		getSwipeOpinionQuery:         getSwipeOpinionsQuery,
 		getReportReasons:             getReportReasons,
 		getOpinionGroupRatio:         getOpinionGroupRatio,
+		getReportByOpinionID:         getReportByOpinionID,
 
 		submitOpinionCommand: submitOpinionCommand,
 		reportOpinionCommand: reportOpinionCommand,
@@ -734,4 +738,64 @@ func (o *opinionHandler) GetOpinionAnalysis(ctx context.Context, params oas.GetO
 	}
 
 	return &res, nil
+}
+
+// GetOpinionReports implements oas.OpinionHandler.
+func (o *opinionHandler) GetOpinionReports(ctx context.Context, params oas.GetOpinionReportsParams) (oas.GetOpinionReportsRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.GetOpinionReports")
+	defer span.End()
+
+	claim := session.GetSession(ctx)
+	if claim == nil {
+		return nil, messages.ForbiddenError
+	}
+	userID, err := claim.UserID()
+	if err != nil {
+		return nil, messages.ForbiddenError
+	}
+
+	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
+	reports, err := o.getReportByOpinionID.Execute(ctx, report_query.GetOpinionReportInput{
+		OpinionID: opinionID,
+		UserID:    userID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	var parentOpinionID oas.OptString
+	if reports.Report.Opinion.ParentOpinionID != nil {
+		parentOpinionID = utils.ToOpt[oas.OptString](reports.Report.Opinion.ParentOpinionID.String())
+	}
+
+	res := &oas.GetOpinionReportsOK{
+		Opinion: oas.GetOpinionReportsOKOpinion{
+			ID:           reports.Report.Opinion.OpinionID.String(),
+			ParentID:     parentOpinionID,
+			Title:        utils.ToOpt[oas.OptString](reports.Report.Opinion.Title),
+			Content:      reports.Report.Opinion.Content,
+			PictureURL:   utils.ToOptNil[oas.OptNilString](reports.Report.Opinion.PictureURL),
+			ReferenceURL: utils.ToOpt[oas.OptString](reports.Report.Opinion.ReferenceURL),
+			PostedAt:     reports.Report.Opinion.CreatedAt.Format(time.RFC3339),
+		},
+		User: oas.GetOpinionReportsOKUser{
+			DisplayID:   reports.Report.User.DisplayID,
+			DisplayName: reports.Report.User.DisplayName,
+			IconURL:     utils.ToOptNil[oas.OptNilString](reports.Report.User.IconURL),
+		},
+		ReportCount: reports.Report.ReportCount,
+		Reasons:     make([]oas.GetOpinionReportsOKReasonsItem, 0, len(reports.Report.Reasons)),
+	}
+
+	for _, reason := range reports.Report.Reasons {
+		res.Reasons = append(res.Reasons, oas.GetOpinionReportsOKReasonsItem{
+			Reason:  reason.Reason,
+			Content: utils.ToOptNil[oas.OptNilString](reason.Content),
+		})
+	}
+
+	return res, nil
 }
