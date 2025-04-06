@@ -2,7 +2,6 @@ package report_query
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/google/uuid"
 	"github.com/jinzhu/copier"
@@ -59,10 +58,7 @@ func (g *getOpinionReportQueryInteractor) Execute(ctx context.Context, input rep
 	}
 
 	// report取得
-	reports, err := g.DBManager.GetQueries(ctx).FindReportByOpinionID(ctx, model.FindReportByOpinionIDParams{
-		OpinionID: uuid.NullUUID{UUID: opr.Opinion.OpinionID, Valid: true},
-		Status:    sql.NullString{String: input.Status, Valid: true},
-	})
+	reports, err := g.DBManager.GetQueries(ctx).FindReportByOpinionID(ctx, uuid.NullUUID{UUID: opr.Opinion.OpinionID, Valid: true})
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +97,7 @@ func (g *getOpinionReportQueryInteractor) Execute(ctx context.Context, input rep
 			User:        usr,
 			Reasons:     reportDetailReasons,
 			ReportCount: len(reportDetailReasons),
-			Status:      input.Status,
+			Status:      reports[0].OpinionReport.Status,
 		},
 	}, nil
 }

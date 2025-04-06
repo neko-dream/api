@@ -16,7 +16,6 @@ type GetOpinionReportQuery interface {
 type GetOpinionReportInput struct {
 	OpinionID shared.UUID[opinion.Opinion]
 	UserID    shared.UUID[user.User]
-	Status    string
 }
 
 type GetOpinionReportOutput struct {
