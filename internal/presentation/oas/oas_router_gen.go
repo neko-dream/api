@@ -670,7 +670,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 							elem = origElem
 						}
-						// Param: "talkSessionId"
+						// Param: "talkSessionID"
 						// Match until "/"
 						idx := strings.IndexByte(elem, '/')
 						if idx < 0 {
@@ -904,7 +904,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									}
 
 									if len(elem) == 0 {
-										// Leaf node.
 										switch r.Method {
 										case "GET":
 											s.handleGetTalkSessionReportRequest([1]string{
@@ -915,6 +914,31 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										}
 
 										return
+									}
+									switch elem[0] {
+									case 's': // Prefix: "s"
+										origElem := elem
+										if l := len("s"); len(elem) >= l && elem[0:l] == "s" {
+											elem = elem[l:]
+										} else {
+											break
+										}
+
+										if len(elem) == 0 {
+											// Leaf node.
+											switch r.Method {
+											case "GET":
+												s.handleGetReportsForTalkSessionRequest([1]string{
+													args[0],
+												}, elemIsEscaped, w, r)
+											default:
+												s.notAllowed(w, r, "GET")
+											}
+
+											return
+										}
+
+										elem = origElem
 									}
 
 									elem = origElem
@@ -1914,7 +1938,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 
 							elem = origElem
 						}
-						// Param: "talkSessionId"
+						// Param: "talkSessionID"
 						// Match until "/"
 						idx := strings.IndexByte(elem, '/')
 						if idx < 0 {
@@ -1929,7 +1953,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = "GetTalkSessionDetail"
 								r.summary = "トークセッションの詳細"
 								r.operationID = "getTalkSessionDetail"
-								r.pathPattern = "/talksessions/{talkSessionId}"
+								r.pathPattern = "/talksessions/{talkSessionID}"
 								r.args = args
 								r.count = 1
 								return r, true
@@ -1937,7 +1961,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = "EditTalkSession"
 								r.summary = "セッション編集"
 								r.operationID = "editTalkSession"
-								r.pathPattern = "/talksessions/{talkSessionId}"
+								r.pathPattern = "/talksessions/{talkSessionID}"
 								r.args = args
 								r.count = 1
 								return r, true
@@ -1973,7 +1997,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										r.name = "TalkSessionAnalysis"
 										r.summary = "分析結果一覧"
 										r.operationID = "talkSessionAnalysis"
-										r.pathPattern = "/talksessions/{talkSessionId}/analysis"
+										r.pathPattern = "/talksessions/{talkSessionID}/analysis"
 										r.args = args
 										r.count = 1
 										return r, true
@@ -2171,19 +2195,45 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									}
 
 									if len(elem) == 0 {
-										// Leaf node.
 										switch method {
 										case "GET":
 											r.name = "GetTalkSessionReport"
 											r.summary = "セッションレポートを返す"
 											r.operationID = "getTalkSessionReport"
-											r.pathPattern = "/talksessions/{talkSessionId}/report"
+											r.pathPattern = "/talksessions/{talkSessionID}/report"
 											r.args = args
 											r.count = 1
 											return r, true
 										default:
 											return
 										}
+									}
+									switch elem[0] {
+									case 's': // Prefix: "s"
+										origElem := elem
+										if l := len("s"); len(elem) >= l && elem[0:l] == "s" {
+											elem = elem[l:]
+										} else {
+											break
+										}
+
+										if len(elem) == 0 {
+											// Leaf node.
+											switch method {
+											case "GET":
+												r.name = "GetReportsForTalkSession"
+												r.summary = "通報一覧"
+												r.operationID = "getReportsForTalkSession"
+												r.pathPattern = "/talksessions/{talkSessionID}/reports"
+												r.args = args
+												r.count = 1
+												return r, true
+											default:
+												return
+											}
+										}
+
+										elem = origElem
 									}
 
 									elem = origElem

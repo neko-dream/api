@@ -16,6 +16,7 @@ import (
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/internal/usecase/command/talksession_command"
 	"github.com/neko-dream/server/internal/usecase/query/analysis_query"
+	"github.com/neko-dream/server/internal/usecase/query/report_query"
 	talksession_query "github.com/neko-dream/server/internal/usecase/query/talksession"
 	"github.com/neko-dream/server/pkg/sort"
 	"github.com/neko-dream/server/pkg/utils"
@@ -32,9 +33,11 @@ type talkSessionHandler struct {
 	getAnalysisResultQuery        analysis_query.GetAnalysisResult
 	getReportQuery                analysis_query.GetReportQuery
 	isSatisfied                   talksession_query.IsTalkSessionSatisfiedQuery
+	getReports                    report_query.GetByTalkSessionQuery
 
 	addConclusionCommand    talksession_command.AddConclusionCommand
 	startTalkSessionCommand talksession_command.StartTalkSessionCommand
+	editTalkSessionCommand  talksession_command.EditCommand
 
 	session.TokenManager
 }
@@ -48,9 +51,11 @@ func NewTalkSessionHandler(
 	getAnalysisQuery analysis_query.GetAnalysisResult,
 	getReportQuery analysis_query.GetReportQuery,
 	isSatisfied talksession_query.IsTalkSessionSatisfiedQuery,
+	getReports report_query.GetByTalkSessionQuery,
 
 	AddConclusionCommand talksession_command.AddConclusionCommand,
 	startTalkSessionCommand talksession_command.StartTalkSessionCommand,
+	editTalkSessionCommand talksession_command.EditCommand,
 
 	tokenManager session.TokenManager,
 ) oas.TalkSessionHandler {
@@ -63,9 +68,11 @@ func NewTalkSessionHandler(
 		getAnalysisResultQuery:        getAnalysisQuery,
 		getReportQuery:                getReportQuery,
 		isSatisfied:                   isSatisfied,
+		getReports:                    getReports,
 
 		addConclusionCommand:    AddConclusionCommand,
 		startTalkSessionCommand: startTalkSessionCommand,
+		editTalkSessionCommand:  editTalkSessionCommand,
 
 		TokenManager: tokenManager,
 	}
@@ -246,7 +253,7 @@ func (t *talkSessionHandler) GetTalkSessionReport(ctx context.Context, params oa
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetTalkSessionReport")
 	defer span.End()
 
-	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionId)
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
 	if err != nil {
 		return nil, messages.BadRequestError
 	}
@@ -344,7 +351,7 @@ func (t *talkSessionHandler) GetTalkSessionDetail(ctx context.Context, params oa
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetTalkSessionDetail")
 	defer span.End()
 
-	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionId)
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
 	if err != nil {
 		return nil, messages.BadRequestError
 	}
@@ -514,7 +521,7 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 		}
 	}
 
-	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionId)
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
 	if err != nil {
 		return nil, messages.BadRequestError
 	}
@@ -601,9 +608,93 @@ func (t *talkSessionHandler) EditTalkSession(ctx context.Context, req oas.OptEdi
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.EditTalkSession")
 	defer span.End()
 
-	_ = ctx
+	claim := session.GetSession(t.SetSession(ctx))
+	if claim == nil {
+		return nil, messages.ForbiddenError
+	}
+	userID, err := claim.UserID()
+	if err != nil {
+		utils.HandleError(ctx, err, "claim.UserID")
+		return nil, messages.ForbiddenError
+	}
 
-	panic("unimplemented")
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
+	if !req.IsSet() {
+		return nil, messages.RequiredParameterError
+	}
+
+	var restrictionStrings []string
+	if req.Value.Restrictions != nil {
+		if sl := strings.Split(strings.Join(req.Value.Restrictions, ","), ","); len(sl) > 0 {
+			restrictionStrings = sl
+		}
+	}
+
+	out, err := t.editTalkSessionCommand.Execute(ctx, talksession_command.EditCommandInput{
+		TalkSessionID:    talkSessionID,
+		UserID:           userID,
+		Theme:            req.Value.Theme,
+		Description:      utils.ToPtrIfNotNullValue(!req.Value.Description.IsSet(), req.Value.Description.Value),
+		ThumbnailURL:     utils.ToPtrIfNotNullValue(!req.Value.ThumbnailURL.IsSet(), req.Value.ThumbnailURL.Value),
+		ScheduledEndTime: req.Value.ScheduledEndTime,
+		Latitude:         utils.ToPtrIfNotNullValue(!req.Value.Latitude.IsSet(), req.Value.Latitude.Value),
+		Longitude:        utils.ToPtrIfNotNullValue(!req.Value.Longitude.IsSet(), req.Value.Longitude.Value),
+		City:             utils.ToPtrIfNotNullValue(!req.Value.City.IsSet(), req.Value.City.Value),
+		Prefecture:       utils.ToPtrIfNotNullValue(!req.Value.Prefecture.IsSet(), req.Value.Prefecture.Value),
+		Restrictions:     restrictionStrings,
+	})
+	if err != nil {
+		return nil, err
+	}
+	talkSessionDetail, err := t.getTalkSessionDetailByIDQuery.Execute(ctx, talksession_query.GetTalkSessionDetailInput{
+		TalkSessionID: talkSessionID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	owner := oas.EditTalkSessionOKOwner{
+		DisplayID:   out.User.DisplayID,
+		DisplayName: out.User.DisplayName,
+		IconURL:     utils.ToOptNil[oas.OptNilString](talkSessionDetail.User.IconURL),
+	}
+
+	var location oas.OptEditTalkSessionOKLocation
+	if out.HasLocation() {
+		location = oas.OptEditTalkSessionOKLocation{
+			Value: oas.EditTalkSessionOKLocation{
+				Latitude:  utils.ToOpt[oas.OptFloat64](talkSessionDetail.Latitude),
+				Longitude: utils.ToOpt[oas.OptFloat64](talkSessionDetail.Longitude),
+			},
+			Set: true,
+		}
+	}
+	var restrictions []oas.EditTalkSessionOKRestrictionsItem
+	for _, restriction := range out.TalkSession.Restrictions {
+		res := talksession.RestrictionAttributeKey(restriction)
+		attr := res.RestrictionAttribute()
+		restrictions = append(restrictions, oas.EditTalkSessionOKRestrictionsItem{
+			Key:         string(attr.Key),
+			Description: attr.Description,
+		})
+	}
+	res := &oas.EditTalkSessionOK{
+		ID:               out.TalkSession.TalkSessionID.String(),
+		Theme:            out.TalkSession.Theme,
+		Description:      utils.ToOptNil[oas.OptNilString](out.TalkSession.Description),
+		ThumbnailURL:     utils.ToOptNil[oas.OptNilString](out.TalkSession.ThumbnailURL),
+		Owner:            owner,
+		CreatedAt:        out.CreatedAt.Format(time.RFC3339),
+		ScheduledEndTime: out.TalkSession.ScheduledEndTime.Format(time.RFC3339),
+		Location:         location,
+		City:             utils.ToOptNil[oas.OptNilString](out.City),
+		Prefecture:       utils.ToOptNil[oas.OptNilString](out.Prefecture),
+		Restrictions:     restrictions,
+	}
+	return res, nil
 }
 
 // GetTalkSessionRestrictionKeys implements oas.TalkSessionHandler.
@@ -668,4 +759,88 @@ func (t *talkSessionHandler) GetTalkSessionRestrictionSatisfied(ctx context.Cont
 
 	res := oas.GetTalkSessionRestrictionSatisfiedOKApplicationJSON(attributes)
 	return &res, nil
+}
+
+// GetReportsForTalkSession implements oas.TalkSessionHandler.
+func (t *talkSessionHandler) GetReportsForTalkSession(ctx context.Context, params oas.GetReportsForTalkSessionParams) (oas.GetReportsForTalkSessionRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetReportsForTalkSession")
+	defer span.End()
+
+	claim := session.GetSession(t.SetSession(ctx))
+	var userID *shared.UUID[user.User]
+	if claim != nil {
+		id, err := claim.UserID()
+		if err == nil {
+			userID = &id
+		}
+	}
+	if userID == nil {
+		return nil, messages.ForbiddenError
+	}
+
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+	var status string
+	if params.Status.IsSet() {
+		bytes, err := params.Status.Value.MarshalText()
+		if err == nil {
+			status = string(bytes)
+		}
+	} else {
+		status = "unsolved"
+	}
+
+	out, err := t.getReports.Execute(ctx, report_query.GetByTalkSessionInput{
+		TalkSessionID: talkSessionID,
+		UserID:        *userID,
+		Status:        status,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	reports := make([]oas.GetReportsForTalkSessionOKReportsItem, 0, len(out.Reports))
+	for _, report := range out.Reports {
+		var parentOpinionID oas.OptString
+		if report.Opinion.ParentOpinionID != nil {
+			parentOpinionID = oas.OptString{
+				Value: report.Opinion.ParentOpinionID.String(),
+				Set:   true,
+			}
+		}
+
+		reasons := make([]oas.GetReportsForTalkSessionOKReportsItemReasonsItem, 0, len(report.Reasons))
+		for _, reason := range report.Reasons {
+			reasons = append(reasons, oas.GetReportsForTalkSessionOKReportsItemReasonsItem{
+				Reason:  reason.Reason,
+				Content: utils.ToOptNil[oas.OptNilString](reason.Content),
+			})
+		}
+
+		reports = append(reports, oas.GetReportsForTalkSessionOKReportsItem{
+			Opinion: oas.GetReportsForTalkSessionOKReportsItemOpinion{
+				ID:           report.Opinion.OpinionID.String(),
+				Title:        utils.ToOpt[oas.OptString](report.Opinion.Title),
+				Content:      report.Opinion.Content,
+				ParentID:     parentOpinionID,
+				PictureURL:   utils.ToOptNil[oas.OptNilString](report.Opinion.PictureURL),
+				ReferenceURL: utils.ToOpt[oas.OptString](report.Opinion.ReferenceURL),
+				PostedAt:     report.Opinion.CreatedAt.Format(time.RFC3339),
+			},
+			User: oas.GetReportsForTalkSessionOKReportsItemUser{
+				DisplayID:   report.User.DisplayID,
+				DisplayName: report.User.DisplayName,
+				IconURL:     utils.ToOptNil[oas.OptNilString](report.User.IconURL),
+			},
+			Status:      oas.GetReportsForTalkSessionOKReportsItemStatus(report.Status),
+			Reasons:     reasons,
+			ReportCount: report.ReportCount,
+		})
+	}
+
+	return &oas.GetReportsForTalkSessionOK{
+		Reports: reports,
+	}, nil
 }

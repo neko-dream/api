@@ -6,6 +6,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/neko-dream/server/internal/domain/messages"
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
@@ -129,7 +130,7 @@ func (o *Opinion) ChangeReferenceImageURL(url *string) {
 	o.referenceImageURL = url
 }
 
-func (o *Opinion) Report(ctx context.Context, reporterID shared.UUID[user.User], reason int) (*Report, error) {
+func (o *Opinion) Report(ctx context.Context, reporterID shared.UUID[user.User], reason int, reasonText *string) (*Report, error) {
 	ctx, span := otel.Tracer("opinion").Start(ctx, "Opinion.Report")
 	defer span.End()
 
@@ -139,7 +140,8 @@ func (o *Opinion) Report(ctx context.Context, reporterID shared.UUID[user.User],
 		o.talkSessionID,
 		reporterID,
 		reason,
-		string(StatusUnconfirmed),
-		time.Now(),
+		reasonText,
+		string(StatusUnsolved),
+		clock.Now(ctx),
 	)
 }

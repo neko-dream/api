@@ -238,22 +238,22 @@ func decodeDevAuthorizeParams(args [0]string, argsEscaped bool, r *http.Request)
 
 // EditTalkSessionParams is parameters of editTalkSession operation.
 type EditTalkSessionParams struct {
-	TalkSessionId string
+	TalkSessionID string
 }
 
 func unpackEditTalkSessionParams(packed middleware.Parameters) (params EditTalkSessionParams) {
 	{
 		key := middleware.ParameterKey{
-			Name: "talkSessionId",
+			Name: "talkSessionID",
 			In:   "path",
 		}
-		params.TalkSessionId = packed[key].(string)
+		params.TalkSessionID = packed[key].(string)
 	}
 	return params
 }
 
 func decodeEditTalkSessionParams(args [1]string, argsEscaped bool, r *http.Request) (params EditTalkSessionParams, _ error) {
-	// Decode path: talkSessionId.
+	// Decode path: talkSessionID.
 	if err := func() error {
 		param := args[0]
 		if argsEscaped {
@@ -265,7 +265,7 @@ func decodeEditTalkSessionParams(args [1]string, argsEscaped bool, r *http.Reque
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "talkSessionId",
+				Param:   "talkSessionID",
 				Value:   param,
 				Style:   uri.PathStyleSimple,
 				Explode: false,
@@ -282,7 +282,7 @@ func decodeEditTalkSessionParams(args [1]string, argsEscaped bool, r *http.Reque
 					return err
 				}
 
-				params.TalkSessionId = c
+				params.TalkSessionID = c
 				return nil
 			}(); err != nil {
 				return err
@@ -293,7 +293,7 @@ func decodeEditTalkSessionParams(args [1]string, argsEscaped bool, r *http.Reque
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "talkSessionId",
+			Name: "talkSessionID",
 			In:   "path",
 			Err:  err,
 		}
@@ -1204,24 +1204,35 @@ func decodeGetOpinionsForTalkSessionParams(args [1]string, argsEscaped bool, r *
 	return params, nil
 }
 
-// GetTalkSessionDetailParams is parameters of getTalkSessionDetail operation.
-type GetTalkSessionDetailParams struct {
-	TalkSessionId string
+// GetReportsForTalkSessionParams is parameters of getReportsForTalkSession operation.
+type GetReportsForTalkSessionParams struct {
+	TalkSessionID string
+	Status        OptGetReportsForTalkSessionStatus
 }
 
-func unpackGetTalkSessionDetailParams(packed middleware.Parameters) (params GetTalkSessionDetailParams) {
+func unpackGetReportsForTalkSessionParams(packed middleware.Parameters) (params GetReportsForTalkSessionParams) {
 	{
 		key := middleware.ParameterKey{
-			Name: "talkSessionId",
+			Name: "talkSessionID",
 			In:   "path",
 		}
-		params.TalkSessionId = packed[key].(string)
+		params.TalkSessionID = packed[key].(string)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "status",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Status = v.(OptGetReportsForTalkSessionStatus)
+		}
 	}
 	return params
 }
 
-func decodeGetTalkSessionDetailParams(args [1]string, argsEscaped bool, r *http.Request) (params GetTalkSessionDetailParams, _ error) {
-	// Decode path: talkSessionId.
+func decodeGetReportsForTalkSessionParams(args [1]string, argsEscaped bool, r *http.Request) (params GetReportsForTalkSessionParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode path: talkSessionID.
 	if err := func() error {
 		param := args[0]
 		if argsEscaped {
@@ -1233,7 +1244,7 @@ func decodeGetTalkSessionDetailParams(args [1]string, argsEscaped bool, r *http.
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "talkSessionId",
+				Param:   "talkSessionID",
 				Value:   param,
 				Style:   uri.PathStyleSimple,
 				Explode: false,
@@ -1250,7 +1261,7 @@ func decodeGetTalkSessionDetailParams(args [1]string, argsEscaped bool, r *http.
 					return err
 				}
 
-				params.TalkSessionId = c
+				params.TalkSessionID = c
 				return nil
 			}(); err != nil {
 				return err
@@ -1261,7 +1272,128 @@ func decodeGetTalkSessionDetailParams(args [1]string, argsEscaped bool, r *http.
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "talkSessionId",
+			Name: "talkSessionID",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	// Decode query: status.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "status",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotStatusVal GetReportsForTalkSessionStatus
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotStatusVal = GetReportsForTalkSessionStatus(c)
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Status.SetTo(paramsDotStatusVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.Status.Get(); ok {
+					if err := func() error {
+						if err := value.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "status",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// GetTalkSessionDetailParams is parameters of getTalkSessionDetail operation.
+type GetTalkSessionDetailParams struct {
+	TalkSessionID string
+}
+
+func unpackGetTalkSessionDetailParams(packed middleware.Parameters) (params GetTalkSessionDetailParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "talkSessionID",
+			In:   "path",
+		}
+		params.TalkSessionID = packed[key].(string)
+	}
+	return params
+}
+
+func decodeGetTalkSessionDetailParams(args [1]string, argsEscaped bool, r *http.Request) (params GetTalkSessionDetailParams, _ error) {
+	// Decode path: talkSessionID.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "talkSessionID",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.TalkSessionID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "talkSessionID",
 			In:   "path",
 			Err:  err,
 		}
@@ -1708,22 +1840,22 @@ func decodeGetTalkSessionListParams(args [0]string, argsEscaped bool, r *http.Re
 
 // GetTalkSessionReportParams is parameters of getTalkSessionReport operation.
 type GetTalkSessionReportParams struct {
-	TalkSessionId string
+	TalkSessionID string
 }
 
 func unpackGetTalkSessionReportParams(packed middleware.Parameters) (params GetTalkSessionReportParams) {
 	{
 		key := middleware.ParameterKey{
-			Name: "talkSessionId",
+			Name: "talkSessionID",
 			In:   "path",
 		}
-		params.TalkSessionId = packed[key].(string)
+		params.TalkSessionID = packed[key].(string)
 	}
 	return params
 }
 
 func decodeGetTalkSessionReportParams(args [1]string, argsEscaped bool, r *http.Request) (params GetTalkSessionReportParams, _ error) {
-	// Decode path: talkSessionId.
+	// Decode path: talkSessionID.
 	if err := func() error {
 		param := args[0]
 		if argsEscaped {
@@ -1735,7 +1867,7 @@ func decodeGetTalkSessionReportParams(args [1]string, argsEscaped bool, r *http.
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "talkSessionId",
+				Param:   "talkSessionID",
 				Value:   param,
 				Style:   uri.PathStyleSimple,
 				Explode: false,
@@ -1752,7 +1884,7 @@ func decodeGetTalkSessionReportParams(args [1]string, argsEscaped bool, r *http.
 					return err
 				}
 
-				params.TalkSessionId = c
+				params.TalkSessionID = c
 				return nil
 			}(); err != nil {
 				return err
@@ -1763,7 +1895,7 @@ func decodeGetTalkSessionReportParams(args [1]string, argsEscaped bool, r *http.
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "talkSessionId",
+			Name: "talkSessionID",
 			In:   "path",
 			Err:  err,
 		}
@@ -3127,22 +3259,22 @@ func decodeSwipeOpinionsParams(args [1]string, argsEscaped bool, r *http.Request
 
 // TalkSessionAnalysisParams is parameters of talkSessionAnalysis operation.
 type TalkSessionAnalysisParams struct {
-	TalkSessionId string
+	TalkSessionID string
 }
 
 func unpackTalkSessionAnalysisParams(packed middleware.Parameters) (params TalkSessionAnalysisParams) {
 	{
 		key := middleware.ParameterKey{
-			Name: "talkSessionId",
+			Name: "talkSessionID",
 			In:   "path",
 		}
-		params.TalkSessionId = packed[key].(string)
+		params.TalkSessionID = packed[key].(string)
 	}
 	return params
 }
 
 func decodeTalkSessionAnalysisParams(args [1]string, argsEscaped bool, r *http.Request) (params TalkSessionAnalysisParams, _ error) {
-	// Decode path: talkSessionId.
+	// Decode path: talkSessionID.
 	if err := func() error {
 		param := args[0]
 		if argsEscaped {
@@ -3154,7 +3286,7 @@ func decodeTalkSessionAnalysisParams(args [1]string, argsEscaped bool, r *http.R
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "talkSessionId",
+				Param:   "talkSessionID",
 				Value:   param,
 				Style:   uri.PathStyleSimple,
 				Explode: false,
@@ -3171,7 +3303,7 @@ func decodeTalkSessionAnalysisParams(args [1]string, argsEscaped bool, r *http.R
 					return err
 				}
 
-				params.TalkSessionId = c
+				params.TalkSessionID = c
 				return nil
 			}(); err != nil {
 				return err
@@ -3182,7 +3314,7 @@ func decodeTalkSessionAnalysisParams(args [1]string, argsEscaped bool, r *http.R
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "talkSessionId",
+			Name: "talkSessionID",
 			In:   "path",
 			Err:  err,
 		}

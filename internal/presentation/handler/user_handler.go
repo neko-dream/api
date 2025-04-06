@@ -9,6 +9,7 @@ import (
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
+	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/infrastructure/http/cookie"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/internal/usecase/command/user_command"
@@ -99,15 +100,24 @@ func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHi
 
 	opinions := make([]oas.OpinionsHistoryOKOpinionsItem, 0, len(out.Opinions))
 	for _, opinion := range out.Opinions {
+		var parentVoteType oas.OptNilOpinionsHistoryOKOpinionsItemOpinionVoteType
+		if opinion.GetParentVoteType() != nil {
+			parentVoteType = oas.OptNilOpinionsHistoryOKOpinionsItemOpinionVoteType{
+				Value: oas.OpinionsHistoryOKOpinionsItemOpinionVoteType(*opinion.GetParentVoteType()),
+				Set:   true,
+				Null:  false,
+			}
+		}
+
 		opinions = append(opinions, oas.OpinionsHistoryOKOpinionsItem{
 			Opinion: oas.OpinionsHistoryOKOpinionsItemOpinion{
 				ID:           opinion.Opinion.OpinionID.String(),
 				Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Title),
 				Content:      opinion.Opinion.Content,
 				ParentID:     utils.ToOpt[oas.OptString](opinion.Opinion.ParentOpinionID.String()),
-				VoteType:     utils.ToOptNil[oas.OptNilString](opinion.GetParentVoteType()),
+				VoteType:     parentVoteType,
 				ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
-				PictureURL:   utils.ToOpt[oas.OptNilString](opinion.Opinion.PictureURL),
+				PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.PictureURL),
 				PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
 			},
 			User: oas.OpinionsHistoryOKOpinionsItemUser{
@@ -388,6 +398,19 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 	if !params.IsSet() {
 		return nil, messages.RequiredParameterError
 	}
+	var err error
+	var sessionID shared.UUID[session.Session]
+	if claim != nil {
+		sessionID, err = claim.SessionID()
+		if err != nil {
+			utils.HandleError(ctx, err, "claim.SessionID")
+			return nil, messages.InternalServerError
+		}
+		if claim.IsExpired(ctx) {
+			return nil, messages.TokenExpiredError
+		}
+	}
+
 	userID, err := claim.UserID()
 	if err != nil {
 		utils.HandleError(ctx, err, "claim.UserID")
@@ -414,6 +437,7 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 	}
 
 	input := user_command.RegisterInput{
+		SessionID:   sessionID,
 		UserID:      userID,
 		DisplayID:   value.DisplayID,
 		DisplayName: value.DisplayName,
