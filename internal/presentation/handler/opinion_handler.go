@@ -14,6 +14,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/internal/usecase/command/opinion_command"
+	"github.com/neko-dream/server/internal/usecase/command/report_command"
 	opinion_query "github.com/neko-dream/server/internal/usecase/query/opinion"
 	"github.com/neko-dream/server/internal/usecase/query/report_query"
 	http_utils "github.com/neko-dream/server/pkg/http"
@@ -34,6 +35,7 @@ type opinionHandler struct {
 
 	submitOpinionCommand opinion_command.SubmitOpinion
 	reportOpinionCommand opinion_command.ReportOpinion
+	solveReportCommand   report_command.SolveReportCommand
 
 	session.TokenManager
 }
@@ -49,6 +51,7 @@ func NewOpinionHandler(
 
 	submitOpinionCommand opinion_command.SubmitOpinion,
 	reportOpinionCommand opinion_command.ReportOpinion,
+	solveReportCommand report_command.SolveReportCommand,
 
 	tokenManager session.TokenManager,
 ) oas.OpinionHandler {
@@ -63,6 +66,7 @@ func NewOpinionHandler(
 
 		submitOpinionCommand: submitOpinionCommand,
 		reportOpinionCommand: reportOpinionCommand,
+		solveReportCommand:   solveReportCommand,
 
 		TokenManager: tokenManager,
 	}
@@ -798,5 +802,47 @@ func (o *opinionHandler) GetOpinionReports(ctx context.Context, params oas.GetOp
 		})
 	}
 
+	return res, nil
+}
+
+// SolveOpinionReport 通報を解決する
+func (o *opinionHandler) SolveOpinionReport(ctx context.Context, req oas.OptSolveOpinionReportReq, params oas.SolveOpinionReportParams) (oas.SolveOpinionReportRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.SolveOpinionReport")
+	defer span.End()
+
+	claim := session.GetSession(ctx)
+	if claim == nil {
+		return nil, messages.ForbiddenError
+	}
+	userID, err := claim.UserID()
+	if err != nil {
+		return nil, messages.ForbiddenError
+	}
+
+	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
+	if !req.IsSet() {
+		return nil, messages.RequiredParameterError
+	}
+	if err := req.Value.Validate(); err != nil {
+		return nil, err
+	}
+	status, err := opinion.NewStatus(string(req.Value.GetAction()))
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
+	if err := o.solveReportCommand.Execute(ctx, report_command.SolveReportInput{
+		OpinionID: opinionID,
+		UserID:    userID,
+		Status:    status,
+	}); err != nil {
+		return nil, err
+	}
+
+	res := &oas.SolveOpinionReportOK{}
 	return res, nil
 }
