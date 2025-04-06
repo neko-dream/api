@@ -56,6 +56,11 @@ func (i *getByTalkSessionQueryInteractor) Execute(ctx context.Context, input rep
 	if err != nil {
 		return nil, err
 	}
+	if len(reports) == 0 {
+		return &report_query.GetByTalkSessionOutput{
+			Reports: []dto.ReportDetail{},
+		}, nil
+	}
 
 	var reportIDs []uuid.UUID
 	for _, report := range reports {
@@ -75,7 +80,7 @@ func (i *getByTalkSessionQueryInteractor) Execute(ctx context.Context, input rep
 	var reportDetails []dto.ReportDetail
 	for _, report := range opinions {
 		var op dto.Opinion
-		if err := copier.CopyWithOption(&op, report, copier.Option{IgnoreEmpty: true, DeepCopy: true}); err != nil {
+		if err := copier.CopyWithOption(&op, report.Opinion, copier.Option{IgnoreEmpty: true, DeepCopy: true}); err != nil {
 			utils.HandleError(ctx, err, "copier.CopyWithOption for Opinion")
 			return nil, err
 		}
