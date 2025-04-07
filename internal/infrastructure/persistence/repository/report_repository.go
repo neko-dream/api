@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/google/uuid"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
@@ -96,4 +97,26 @@ func (r *reportRepository) FindByOpinionID(ctx context.Context, opinionID shared
 	}
 
 	return result, nil
+}
+
+// CountByTalkSessionIDAndStatus
+func (r *reportRepository) CountByTalkSessionIDAndStatus(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession], status opinion.Status) (int, error) {
+	ctx, span := otel.Tracer("repository").Start(ctx, "reportRepository.CountByTalkSessionIDAndStatus")
+	defer span.End()
+	count, err := r.DBManager.GetQueries(ctx).CountReportsByTalkSession(ctx, model.CountReportsByTalkSessionParams{
+		TalkSessionID: uuid.NullUUID{
+			UUID:  talkSessionID.UUID(),
+			Valid: true,
+		},
+		Status: sql.NullString{
+			String: string(status),
+			Valid:  true,
+		},
+	})
+	if err != nil {
+		utils.HandleError(ctx, err, "CountReportByTalkSessionIDAndStatus")
+		return 0, err
+	}
+
+	return int(count), nil
 }
