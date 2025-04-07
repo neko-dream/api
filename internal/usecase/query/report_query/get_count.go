@@ -27,18 +27,15 @@ type GetCountOutput struct {
 
 type getCountQueryInteractor struct {
 	reportRep      opinion.ReportRepository
-	opinionRep     opinion.OpinionRepository
 	talkSessionRep talksession.TalkSessionRepository
 }
 
 func NewGetCountQueryInteractor(
 	reportRepository opinion.ReportRepository,
-	opinionRepository opinion.OpinionRepository,
 	talkSessionRepository talksession.TalkSessionRepository,
 ) GetCountQuery {
 	return &getCountQueryInteractor{
 		reportRep:      reportRepository,
-		opinionRep:     opinionRepository,
 		talkSessionRep: talkSessionRepository,
 	}
 }

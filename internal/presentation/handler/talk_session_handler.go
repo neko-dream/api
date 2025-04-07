@@ -873,6 +873,7 @@ func (t *talkSessionHandler) GetTalkSessionReportCount(ctx context.Context, para
 	out, err := t.getReportCount.Execute(ctx, report_query.GetCountInput{
 		TalkSessionID: talkSessionID,
 		UserID:        *userID,
+		Status:        string(params.Status),
 	})
 	if err != nil {
 		return nil, err
