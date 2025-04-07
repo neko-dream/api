@@ -2034,6 +2034,19 @@ func (s GetTalkSessionListStatus) Validate() error {
 	}
 }
 
+func (s GetTalkSessionReportCountStatus) Validate() error {
+	switch s {
+	case "unsolved":
+		return nil
+	case "deleted":
+		return nil
+	case "hold":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
 func (s GetTalkSessionRestrictionKeysOKApplicationJSON) Validate() error {
 	alias := ([]GetTalkSessionRestrictionKeysOKItem)(s)
 	if alias == nil {

@@ -24,6 +24,7 @@ WHERE
     WHEN $2::text IS NOT NULL THEN opinion_reports.status = $2::text
     ELSE TRUE
   END
+  ORDER BY created_at DESC
 `
 
 type FindReportsByTalkSessionParams struct {
@@ -48,6 +49,7 @@ type FindReportsByTalkSessionRow struct {
 //	    WHEN $2::text IS NOT NULL THEN opinion_reports.status = $2::text
 //	    ELSE TRUE
 //	  END
+//	  ORDER BY created_at DESC
 func (q *Queries) FindReportsByTalkSession(ctx context.Context, arg FindReportsByTalkSessionParams) ([]FindReportsByTalkSessionRow, error) {
 	rows, err := q.db.QueryContext(ctx, findReportsByTalkSession, arg.TalkSessionID, arg.Status)
 	if err != nil {

@@ -131,7 +131,7 @@ INSERT INTO talk_session_locations (talk_session_id, location) VALUES ($1, ST_Ge
 
 type CreateTalkSessionLocationParams struct {
 	TalkSessionID       uuid.UUID
-	StGeographyfromtext interface{}
+	StGeographyfromtext any
 }
 
 // CreateTalkSessionLocation
@@ -651,7 +651,7 @@ type ListTalkSessionsRow struct {
 	LocationID   uuid.NullUUID
 	Latitude     float64
 	Longitude    float64
-	Distance     interface{}
+	Distance     any
 }
 
 // ListTalkSessions
@@ -786,7 +786,7 @@ UPDATE talk_session_locations SET location = ST_GeographyFromText($2) WHERE talk
 
 type UpdateTalkSessionLocationParams struct {
 	TalkSessionID       uuid.UUID
-	StGeographyfromtext interface{}
+	StGeographyfromtext any
 }
 
 // UpdateTalkSessionLocation

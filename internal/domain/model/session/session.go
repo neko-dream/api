@@ -133,10 +133,11 @@ func SortByLastActivity(sessions []Session) []Session {
 	sortedSession := make([]Session, len(sessions))
 	copy(sortedSession, sessions)
 
-	for i := 0; i < len(sortedSession); i++ {
-		for j := i + 1; j < len(sortedSession); j++ {
-			if sortedSession[i].lastActivity.Before(sortedSession[j].lastActivity) {
-				sortedSession[i], sortedSession[j] = sortedSession[j], sortedSession[i]
+	for i := range sortedSession {
+		for j := range sortedSession[i+1:] {
+			actualJ := i + 1 + j
+			if sortedSession[i].lastActivity.Before(sortedSession[actualJ].lastActivity) {
+				sortedSession[i], sortedSession[actualJ] = sortedSession[actualJ], sortedSession[i]
 			}
 		}
 	}

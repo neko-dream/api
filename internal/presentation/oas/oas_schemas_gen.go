@@ -4101,6 +4101,78 @@ func (s *GetTalkSessionListStatus) UnmarshalText(data []byte) error {
 	}
 }
 
+type GetTalkSessionReportCountBadRequest struct{}
+
+func (*GetTalkSessionReportCountBadRequest) getTalkSessionReportCountRes() {}
+
+type GetTalkSessionReportCountInternalServerError struct{}
+
+func (*GetTalkSessionReportCountInternalServerError) getTalkSessionReportCountRes() {}
+
+type GetTalkSessionReportCountOK struct {
+	Count int `json:"count"`
+}
+
+// GetCount returns the value of Count.
+func (s *GetTalkSessionReportCountOK) GetCount() int {
+	return s.Count
+}
+
+// SetCount sets the value of Count.
+func (s *GetTalkSessionReportCountOK) SetCount(val int) {
+	s.Count = val
+}
+
+func (*GetTalkSessionReportCountOK) getTalkSessionReportCountRes() {}
+
+type GetTalkSessionReportCountStatus string
+
+const (
+	GetTalkSessionReportCountStatusUnsolved GetTalkSessionReportCountStatus = "unsolved"
+	GetTalkSessionReportCountStatusDeleted  GetTalkSessionReportCountStatus = "deleted"
+	GetTalkSessionReportCountStatusHold     GetTalkSessionReportCountStatus = "hold"
+)
+
+// AllValues returns all GetTalkSessionReportCountStatus values.
+func (GetTalkSessionReportCountStatus) AllValues() []GetTalkSessionReportCountStatus {
+	return []GetTalkSessionReportCountStatus{
+		GetTalkSessionReportCountStatusUnsolved,
+		GetTalkSessionReportCountStatusDeleted,
+		GetTalkSessionReportCountStatusHold,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s GetTalkSessionReportCountStatus) MarshalText() ([]byte, error) {
+	switch s {
+	case GetTalkSessionReportCountStatusUnsolved:
+		return []byte(s), nil
+	case GetTalkSessionReportCountStatusDeleted:
+		return []byte(s), nil
+	case GetTalkSessionReportCountStatusHold:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *GetTalkSessionReportCountStatus) UnmarshalText(data []byte) error {
+	switch GetTalkSessionReportCountStatus(data) {
+	case GetTalkSessionReportCountStatusUnsolved:
+		*s = GetTalkSessionReportCountStatusUnsolved
+		return nil
+	case GetTalkSessionReportCountStatusDeleted:
+		*s = GetTalkSessionReportCountStatusDeleted
+		return nil
+	case GetTalkSessionReportCountStatusHold:
+		*s = GetTalkSessionReportCountStatusHold
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
 type GetTalkSessionReportInternalServerError struct{}
 
 func (*GetTalkSessionReportInternalServerError) getTalkSessionReportRes() {}

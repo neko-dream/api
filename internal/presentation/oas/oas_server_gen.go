@@ -259,6 +259,12 @@ type TalkSessionHandler interface {
 	//
 	// GET /talksessions/{talkSessionID}/report
 	GetTalkSessionReport(ctx context.Context, params GetTalkSessionReportParams) (GetTalkSessionReportRes, error)
+	// GetTalkSessionReportCount implements getTalkSessionReportCount operation.
+	//
+	// 通報件数.
+	//
+	// GET /talksessions/{talkSessionID}/reports/count
+	GetTalkSessionReportCount(ctx context.Context, params GetTalkSessionReportCountParams) (GetTalkSessionReportCountRes, error)
 	// GetTalkSessionRestrictionKeys implements getTalkSessionRestrictionKeys operation.
 	//
 	// セッションの投稿制限に使用できるキーの一覧を返す.
