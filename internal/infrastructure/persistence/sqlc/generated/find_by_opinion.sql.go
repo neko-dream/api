@@ -18,6 +18,7 @@ FROM
     opinion_reports
 WHERE
     opinion_id = $1::uuid
+ORDER BY created_at DESC
 `
 
 type FindReportByOpinionIDRow struct {
@@ -32,6 +33,7 @@ type FindReportByOpinionIDRow struct {
 //	    opinion_reports
 //	WHERE
 //	    opinion_id = $1::uuid
+//	ORDER BY created_at DESC
 func (q *Queries) FindReportByOpinionID(ctx context.Context, opinionID uuid.NullUUID) ([]FindReportByOpinionIDRow, error) {
 	rows, err := q.db.QueryContext(ctx, findReportByOpinionID, opinionID)
 	if err != nil {

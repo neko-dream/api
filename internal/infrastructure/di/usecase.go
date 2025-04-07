@@ -18,6 +18,7 @@ import (
 	"github.com/neko-dream/server/internal/usecase/command/vote_command"
 	opinion_q "github.com/neko-dream/server/internal/usecase/query/opinion"
 	"github.com/neko-dream/server/internal/usecase/query/policy_query"
+	report_q "github.com/neko-dream/server/internal/usecase/query/report_query"
 	"github.com/neko-dream/server/internal/usecase/query/talksession"
 	"github.com/neko-dream/server/internal/usecase/query/timeline_query"
 )
@@ -63,5 +64,6 @@ func useCaseDeps() []ProvideArg {
 		{report_query.NewGetByTalkSessionQueryInteractor, nil},
 		{report_query.NewGetOpinionReportQueryInteractor, nil},
 		{report_command.NewSolveReportCommandInteractor, nil},
+		{report_q.NewGetCountQueryInteractor, nil},
 	}
 }
