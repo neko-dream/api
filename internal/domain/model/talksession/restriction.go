@@ -89,7 +89,7 @@ var (
 
 type Restrictions []string
 
-func (s *Restrictions) Scan(src interface{}) error {
+func (s *Restrictions) Scan(src any) error {
 	if src == nil {
 		*s = nil
 		return nil
@@ -105,7 +105,7 @@ func (s *Restrictions) Scan(src interface{}) error {
 	}
 }
 
-func (s Restrictions) Value() (interface{}, error) {
+func (s Restrictions) Value() (any, error) {
 	if s == nil {
 		return nil, nil
 	}

@@ -431,7 +431,7 @@ type ClientWithResponsesInterface interface {
 type PostPredictsGroupsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *map[string]interface{}
+	JSON200      *map[string]any
 }
 
 // Status returns HTTPResponse.Status
@@ -453,7 +453,7 @@ func (r PostPredictsGroupsResponse) StatusCode() int {
 type PostReportsGeneratesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *map[string]interface{}
+	JSON200      *map[string]any
 }
 
 // Status returns HTTPResponse.Status
@@ -597,7 +597,7 @@ func ParsePostPredictsGroupsResponse(rsp *http.Response) (*PostPredictsGroupsRes
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest map[string]interface{}
+		var dest map[string]any
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -623,7 +623,7 @@ func ParsePostReportsGeneratesResponse(rsp *http.Response) (*PostReportsGenerate
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest map[string]interface{}
+		var dest map[string]any
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
