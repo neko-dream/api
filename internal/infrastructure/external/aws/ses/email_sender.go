@@ -3,6 +3,7 @@ package ses
 import (
 	"bytes"
 	"context"
+	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/service/sesv2"
 	"github.com/aws/aws-sdk-go-v2/service/sesv2/types"
@@ -34,6 +35,10 @@ func (s *SESEmailSender) Send(
 	tmpl email_template.EmailTemplateType,
 	data map[string]any,
 ) error {
+	if to == "" {
+		return fmt.Errorf("メール送信先アドレスが指定されていません")
+	}
+
 	dataWithCommon := email_template.DataWithCommonFields(
 		s.Config,
 		data,
