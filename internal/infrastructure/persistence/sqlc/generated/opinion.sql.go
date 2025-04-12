@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 )
 
 const countOpinions = `-- name: CountOpinions :one
@@ -79,11 +80,15 @@ LEFT JOIN (
     GROUP BY opinions.opinion_id
     HAVING COUNT(votes.vote_id) = 0
 ) vote_count ON opinions.opinion_id = vote_count.opinion_id
-LEFT JOIN opinion_reports ON opinions.opinion_id = opinion_reports.opinion_id
+LEFT JOIN (
+	SELECT DISTINCT opinion_reports.opinion_id, opinion_reports.status
+	FROM opinion_reports
+	WHERE opinion_reports.talk_session_id = $2
+) opr ON opr.opinion_id = opinions.opinion_id
 WHERE opinions.talk_session_id = $2
     AND vote_count.opinion_id = opinions.opinion_id
     AND opinions.parent_opinion_id IS NULL
-    AND (opinion_reports.opinion_id IS NULL OR opinion_reports.status != 'deleted')
+    AND (opr.opinion_id IS NULL OR opr.status != 'deleted')
 `
 
 type CountSwipeableOpinionsParams struct {
@@ -106,11 +111,15 @@ type CountSwipeableOpinionsParams struct {
 //	    GROUP BY opinions.opinion_id
 //	    HAVING COUNT(votes.vote_id) = 0
 //	) vote_count ON opinions.opinion_id = vote_count.opinion_id
-//	LEFT JOIN opinion_reports ON opinions.opinion_id = opinion_reports.opinion_id
+//	LEFT JOIN (
+//		SELECT DISTINCT opinion_reports.opinion_id, opinion_reports.status
+//		FROM opinion_reports
+//		WHERE opinion_reports.talk_session_id = $2
+//	) opr ON opr.opinion_id = opinions.opinion_id
 //	WHERE opinions.talk_session_id = $2
 //	    AND vote_count.opinion_id = opinions.opinion_id
 //	    AND opinions.parent_opinion_id IS NULL
-//	    AND (opinion_reports.opinion_id IS NULL OR opinion_reports.status != 'deleted')
+//	    AND (opr.opinion_id IS NULL OR opr.status != 'deleted')
 func (q *Queries) CountSwipeableOpinions(ctx context.Context, arg CountSwipeableOpinionsParams) (int64, error) {
 	row := q.db.QueryRowContext(ctx, countSwipeableOpinions, arg.UserID, arg.TalkSessionID)
 	var random_opinion_count int64
@@ -365,6 +374,152 @@ func (q *Queries) GetOpinionReplies(ctx context.Context, arg GetOpinionRepliesPa
 			&i.User.EmailVerified,
 			&i.ParentVoteType,
 			&i.CurrentVoteType,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getOpinionsByRank = `-- name: GetOpinionsByRank :many
+SELECT
+    opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
+    COALESCE(rc.reply_count, 0) AS reply_count
+FROM opinions
+LEFT JOIN users
+    ON opinions.user_id = users.user_id
+LEFT JOIN (
+    SELECT opinions.opinion_id
+    FROM opinions
+    LEFT JOIN votes
+        ON opinions.opinion_id = votes.opinion_id
+        AND votes.user_id = $1::uuid
+    GROUP BY opinions.opinion_id
+    HAVING COUNT(votes.vote_id) = 0
+) vote_count ON opinions.opinion_id = vote_count.opinion_id
+LEFT JOIN (
+    SELECT votes.vote_type, votes.user_id, votes.opinion_id
+    FROM votes
+) pv ON opinions.parent_opinion_id = pv.opinion_id
+    AND  pv.user_id = opinions.user_id
+LEFT JOIN (
+    SELECT COUNT(opinion_id) AS reply_count, parent_opinion_id as opinion_id
+    FROM opinions
+    GROUP BY parent_opinion_id
+) rc ON rc.opinion_id = opinions.opinion_id
+LEFT JOIN (
+	SELECT DISTINCT opinion_reports.opinion_id, opinion_reports.status
+	FROM opinion_reports
+	WHERE opinion_reports.talk_session_id = $2::uuid
+) opr ON opr.opinion_id = opinions.opinion_id
+LEFT JOIN representative_opinions ON opinions.opinion_id = representative_opinions.opinion_id
+WHERE opinions.talk_session_id = $2::uuid
+    AND vote_count.opinion_id = opinions.opinion_id
+    AND opinions.parent_opinion_id IS NULL
+    -- 削除されたものはスワイプ意見から除外
+    AND (opr.opinion_id IS NULL OR opr.status != 'deleted')
+    AND representative_opinions.rank = $3::int
+LIMIT $4::int
+`
+
+type GetOpinionsByRankParams struct {
+	UserID        uuid.UUID
+	TalkSessionID uuid.UUID
+	Rank          int32
+	Limit         int32
+}
+
+type GetOpinionsByRankRow struct {
+	Opinion    Opinion
+	User       User
+	ReplyCount int64
+}
+
+// 指定されたユーザーが投票していない意見のみを取得
+// 親意見に対するユーザーの投票を取得
+// この意見に対するリプライ数
+// 通報された意見を除外
+//
+//	SELECT
+//	    opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
+//	    COALESCE(rc.reply_count, 0) AS reply_count
+//	FROM opinions
+//	LEFT JOIN users
+//	    ON opinions.user_id = users.user_id
+//	LEFT JOIN (
+//	    SELECT opinions.opinion_id
+//	    FROM opinions
+//	    LEFT JOIN votes
+//	        ON opinions.opinion_id = votes.opinion_id
+//	        AND votes.user_id = $1::uuid
+//	    GROUP BY opinions.opinion_id
+//	    HAVING COUNT(votes.vote_id) = 0
+//	) vote_count ON opinions.opinion_id = vote_count.opinion_id
+//	LEFT JOIN (
+//	    SELECT votes.vote_type, votes.user_id, votes.opinion_id
+//	    FROM votes
+//	) pv ON opinions.parent_opinion_id = pv.opinion_id
+//	    AND  pv.user_id = opinions.user_id
+//	LEFT JOIN (
+//	    SELECT COUNT(opinion_id) AS reply_count, parent_opinion_id as opinion_id
+//	    FROM opinions
+//	    GROUP BY parent_opinion_id
+//	) rc ON rc.opinion_id = opinions.opinion_id
+//	LEFT JOIN (
+//		SELECT DISTINCT opinion_reports.opinion_id, opinion_reports.status
+//		FROM opinion_reports
+//		WHERE opinion_reports.talk_session_id = $2::uuid
+//	) opr ON opr.opinion_id = opinions.opinion_id
+//	LEFT JOIN representative_opinions ON opinions.opinion_id = representative_opinions.opinion_id
+//	WHERE opinions.talk_session_id = $2::uuid
+//	    AND vote_count.opinion_id = opinions.opinion_id
+//	    AND opinions.parent_opinion_id IS NULL
+//	    -- 削除されたものはスワイプ意見から除外
+//	    AND (opr.opinion_id IS NULL OR opr.status != 'deleted')
+//	    AND representative_opinions.rank = $3::int
+//	LIMIT $4::int
+func (q *Queries) GetOpinionsByRank(ctx context.Context, arg GetOpinionsByRankParams) ([]GetOpinionsByRankRow, error) {
+	rows, err := q.db.QueryContext(ctx, getOpinionsByRank,
+		arg.UserID,
+		arg.TalkSessionID,
+		arg.Rank,
+		arg.Limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetOpinionsByRankRow
+	for rows.Next() {
+		var i GetOpinionsByRankRow
+		if err := rows.Scan(
+			&i.Opinion.OpinionID,
+			&i.Opinion.TalkSessionID,
+			&i.Opinion.UserID,
+			&i.Opinion.ParentOpinionID,
+			&i.Opinion.Title,
+			&i.Opinion.Content,
+			&i.Opinion.CreatedAt,
+			&i.Opinion.PictureUrl,
+			&i.Opinion.ReferenceUrl,
+			&i.User.UserID,
+			&i.User.DisplayID,
+			&i.User.DisplayName,
+			&i.User.IconUrl,
+			&i.User.CreatedAt,
+			&i.User.UpdatedAt,
+			&i.User.Email,
+			&i.User.EmailVerified,
+			&i.ReplyCount,
 		); err != nil {
 			return nil, err
 		}
@@ -820,28 +975,25 @@ LEFT JOIN (
     GROUP BY parent_opinion_id
 ) rc ON rc.opinion_id = opinions.opinion_id
 LEFT JOIN (
-    SELECT rank, opinion_id
-    FROM representative_opinions
-) ro ON opinions.opinion_id = ro.opinion_id
-LEFT JOIN opinion_reports ON opinions.opinion_id = opinion_reports.opinion_id
+	SELECT DISTINCT opinion_reports.opinion_id, opinion_reports.status
+	FROM opinion_reports
+	WHERE opinion_reports.talk_session_id = $2
+) opr ON opr.opinion_id = opinions.opinion_id
 WHERE opinions.talk_session_id = $2
     AND vote_count.opinion_id = opinions.opinion_id
+    AND opinions.opinion_id != ANY($4::uuid[])
     AND opinions.parent_opinion_id IS NULL
     -- 削除されたものはスワイプ意見から除外
-    AND (opinion_reports.opinion_id IS NULL OR opinion_reports.status != 'deleted')
-ORDER BY
-    CASE $4::text
-        WHEN 'top' THEN COALESCE(ro.rank, 0)
-        ELSE RANDOM()
-    END ASC
+    AND (opr.opinion_id IS NULL OR opr.status != 'deleted')
+ORDER BY RANDOM()
 LIMIT $3
 `
 
 type GetRandomOpinionsParams struct {
-	UserID        uuid.UUID
-	TalkSessionID uuid.UUID
-	Limit         int32
-	SortKey       sql.NullString
+	UserID            uuid.UUID
+	TalkSessionID     uuid.UUID
+	Limit             int32
+	ExcludeOpinionIds []uuid.UUID
 }
 
 type GetRandomOpinionsRow struct {
@@ -852,7 +1004,6 @@ type GetRandomOpinionsRow struct {
 
 // 指定されたユーザーが投票していない意見のみを取得
 // この意見に対するリプライ数
-// グループ内のランクを取得
 // 通報された意見を除外
 // トークセッションに紐づく意見のみを取得
 //
@@ -878,27 +1029,24 @@ type GetRandomOpinionsRow struct {
 //	    GROUP BY parent_opinion_id
 //	) rc ON rc.opinion_id = opinions.opinion_id
 //	LEFT JOIN (
-//	    SELECT rank, opinion_id
-//	    FROM representative_opinions
-//	) ro ON opinions.opinion_id = ro.opinion_id
-//	LEFT JOIN opinion_reports ON opinions.opinion_id = opinion_reports.opinion_id
+//		SELECT DISTINCT opinion_reports.opinion_id, opinion_reports.status
+//		FROM opinion_reports
+//		WHERE opinion_reports.talk_session_id = $2
+//	) opr ON opr.opinion_id = opinions.opinion_id
 //	WHERE opinions.talk_session_id = $2
 //	    AND vote_count.opinion_id = opinions.opinion_id
+//	    AND opinions.opinion_id != ANY($4::uuid[])
 //	    AND opinions.parent_opinion_id IS NULL
 //	    -- 削除されたものはスワイプ意見から除外
-//	    AND (opinion_reports.opinion_id IS NULL OR opinion_reports.status != 'deleted')
-//	ORDER BY
-//	    CASE $4::text
-//	        WHEN 'top' THEN COALESCE(ro.rank, 0)
-//	        ELSE RANDOM()
-//	    END ASC
+//	    AND (opr.opinion_id IS NULL OR opr.status != 'deleted')
+//	ORDER BY RANDOM()
 //	LIMIT $3
 func (q *Queries) GetRandomOpinions(ctx context.Context, arg GetRandomOpinionsParams) ([]GetRandomOpinionsRow, error) {
 	rows, err := q.db.QueryContext(ctx, getRandomOpinions,
 		arg.UserID,
 		arg.TalkSessionID,
 		arg.Limit,
-		arg.SortKey,
+		pq.Array(arg.ExcludeOpinionIds),
 	)
 	if err != nil {
 		return nil, err
