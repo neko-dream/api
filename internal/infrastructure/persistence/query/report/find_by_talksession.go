@@ -3,7 +3,6 @@ package report_query
 import (
 	"context"
 	"database/sql"
-	"os/user"
 
 	"github.com/google/uuid"
 	"github.com/jinzhu/copier"
@@ -11,6 +10,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
+	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/server/internal/usecase/query/dto"
