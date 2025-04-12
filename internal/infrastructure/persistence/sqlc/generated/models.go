@@ -46,6 +46,32 @@ type OpinionReport struct {
 	ReasonText      sql.NullString
 }
 
+type Organization struct {
+	OrganizationID   uuid.UUID
+	OrganizationType int32
+	Name             string
+	OwnerID          uuid.UUID
+}
+
+type OrganizationUser struct {
+	OrganizationUserID uuid.UUID
+	UserID             uuid.UUID
+	OrganizationID     uuid.UUID
+	Role               int32
+	CreatedAt          time.Time
+	UpdatedAt          time.Time
+}
+
+type PasswordAuth struct {
+	PasswordAuthID uuid.UUID
+	UserID         uuid.UUID
+	PasswordHash   string
+	Salt           sql.NullString
+	LastChanged    time.Time
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+}
+
 type PolicyConsent struct {
 	PolicyConsentID uuid.UUID
 	UserID          uuid.UUID

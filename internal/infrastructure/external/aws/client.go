@@ -12,7 +12,7 @@ import (
 
 var (
 	once sync.Once
-	s aws.Config
+	s    aws.Config
 )
 
 func NewAWSConfig() aws.Config {
