@@ -7,6 +7,7 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/neko-dream/server/internal/domain/model/analysis"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
+	dto_mapper "github.com/neko-dream/server/internal/infrastructure/persistence/utils"
 	"github.com/neko-dream/server/internal/usecase/query/analysis_query"
 	"github.com/neko-dream/server/internal/usecase/query/dto"
 	"github.com/neko-dream/server/pkg/utils"
@@ -68,6 +69,8 @@ func (g *GetAnalysisResultHandler) Execute(ctx context.Context, input analysis_q
 		return nil, err
 	}
 
+
+	representatives := make([]dto.OpinionWithRepresentative, 0, len(representativeRows))
 	for _, row := range representativeRows {
 		res := dto.OpinionWithRepresentative{}
 
@@ -75,11 +78,22 @@ func (g *GetAnalysisResultHandler) Execute(ctx context.Context, input analysis_q
 			DeepCopy:    true,
 			IgnoreEmpty: true,
 		})
-		groupOpinionsMap[row.RepresentativeOpinion.GroupID] = append(groupOpinionsMap[row.RepresentativeOpinion.GroupID], res)
+		if err != nil {
+			utils.HandleError(ctx, err, "copier.CopyWithOptionでエラー")
+			return nil, err
+		}
+		representatives = append(representatives, res)
 	}
+
+	opinionIDs := dto_mapper.ExtractOpinionIDsWithRepresentative(representatives)
+	reports, err := g.GetQueries(ctx).FindReportByOpinionIDs(ctx, opinionIDs)
 	if err != nil {
-		utils.HandleError(ctx, err, "copier.CopyWithOptionでエラー")
+		utils.HandleError(ctx, err, "通報情報の取得に失敗")
 		return nil, err
+	}
+	representatives = dto_mapper.ProcessReportedOpinionsWithRepresentative(representatives, reports)
+	for _, row := range representatives {
+		groupOpinionsMap[int32(row.GroupID)] = append(groupOpinionsMap[int32(row.GroupID)], row)
 	}
 
 	groupOpinions := make([]dto.OpinionGroup, 0, len(groupOpinionsMap))
