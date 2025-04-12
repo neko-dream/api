@@ -6,6 +6,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/crypto"
 	client "github.com/neko-dream/server/internal/infrastructure/external/analysis"
+	"github.com/neko-dream/server/internal/infrastructure/external/aws"
 	"github.com/neko-dream/server/internal/infrastructure/http/cookie"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/postgresql"
@@ -22,7 +23,6 @@ func infraDeps() []ProvideArg {
 		{oauth.NewProviderFactory, nil},
 		// {telemetry.SentryProvider, nil},
 		{telemetry.BaselimeProvider, nil},
-		{repository.InitConfig, nil},
 		{repository.InitS3Client, nil},
 		{repository.NewImageRepository, nil},
 		{repository.NewImageStorage, nil},
@@ -41,5 +41,7 @@ func infraDeps() []ProvideArg {
 		{client.NewAnalysisService, nil},
 		{cookie.NewCookieManager, nil},
 		{crypto.NewEncryptor, nil},
+		{aws.NewAWSConfig, nil},
+		{aws.NewSESClient, nil},
 	}
 }

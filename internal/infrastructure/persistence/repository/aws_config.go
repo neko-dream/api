@@ -21,11 +21,11 @@ func InitConfig(appConf *config.Config) aws.Config {
 	once.Do(func() {
 		c, err := awsConfig.LoadDefaultConfig(
 			context.TODO(),
-			awsConfig.WithRegion(appConf.AWS_REGION),
+			awsConfig.WithRegion(appConf.R2_REGION),
 			awsConfig.WithCredentialsProvider(
 				credentials.NewStaticCredentialsProvider(
-					appConf.AWS_ACCESS_KEY_ID,
-					appConf.AWS_SECRET_ACCESS_KEY,
+					appConf.R2_ACCESS_KEY_ID,
+					appConf.R2_SECRET_ACCESS_KEY,
 					"",
 				),
 			),
@@ -40,8 +40,8 @@ func InitConfig(appConf *config.Config) aws.Config {
 	return conf
 }
 
-func InitS3Client(appConf *config.Config, awsConf aws.Config) *s3.Client {
-	client := s3.NewFromConfig(awsConf, func(o *s3.Options) {
+func InitS3Client(appConf *config.Config) *s3.Client {
+	client := s3.NewFromConfig(InitConfig(appConf), func(o *s3.Options) {
 		o.BaseEndpoint = aws.String(appConf.AWS_S3_ENDPOINT)
 	})
 	return client

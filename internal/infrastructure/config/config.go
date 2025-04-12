@@ -26,12 +26,15 @@ type Config struct {
 	TokenPrivateKey string `mapstructure:"TOKEN_PRIVATE"`
 	TokenPublicKey  string `mapstructure:"TOKEN_PUBLIC"`
 
-	AWS_REGION            string `mapstructure:"AWS_REGION"`
-	AWS_ACCESS_KEY_ID     string `mapstructure:"AWS_ACCESS_KEY_ID"`
-	AWS_SECRET_ACCESS_KEY string `mapstructure:"AWS_SECRET_ACCESS_KEY"`
-	AWS_S3_ENDPOINT       string `mapstructure:"AWS_S3_ENDPOINT"`
-	AWS_S3_BUCKET         string `mapstructure:"AWS_S3_BUCKET"`
-	IMAGE_DOMAIN          string `mapstructure:"IMAGE_DOMAIN"`
+	R2_REGION            string `env:"R2_REGION"`
+	R2_ACCESS_KEY_ID     string `env:"R2_ACCESS_KEY_ID"`
+	R2_SECRET_ACCESS_KEY string `env:"R2_SECRET_ACCESS_KEY"`
+	AWS_S3_ENDPOINT      string `env:"AWS_S3_ENDPOINT"`
+	AWS_S3_BUCKET        string `env:"AWS_S3_BUCKET"`
+	IMAGE_DOMAIN         string `env:"IMAGE_DOMAIN"`
+
+	AWS_ACCESS_KEY_ID     string `env:"AWS_ACCESS_KEY_ID"`
+	AWS_SECRET_ACCESS_KEY string `env:"AWS_SECRET_ACCESS_KEY"`
 
 	ANALYSIS_USER          string `mapstructure:"ANALYSIS_USER"`
 	ANALYSIS_USER_PASSWORD string `mapstructure:"ANALYSIS_USER_PASSWORD"`
@@ -49,6 +52,10 @@ type Config struct {
 	POLICY_VERSION string `env:"POLICY_VERSION"`
 	// ポリシー作成日 現状は固定。API生えたら別途取得する
 	POLICY_CREATED_AT string `env:"POLICY_CREATED_AT"`
+
+	EMAIL_FROM  string `env:"EMAIL_FROM"`
+	APP_NAME    string `env:"APP_NAME"`
+	WEBSITE_URL string `env:"WEBSITE_URL"`
 }
 
 type ENV string

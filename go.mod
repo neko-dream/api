@@ -7,6 +7,7 @@ require (
 	github.com/XSAM/otelsql v0.38.0
 	github.com/aws/aws-sdk-go-v2 v1.36.3
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.67
+	github.com/aws/aws-sdk-go-v2/service/sesv2 v1.45.0
 	github.com/getsentry/sentry-go v0.32.0
 	github.com/jackc/pgx/v5 v5.7.4
 	github.com/jinzhu/copier v0.4.0
