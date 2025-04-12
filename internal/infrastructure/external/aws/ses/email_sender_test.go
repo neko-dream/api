@@ -37,4 +37,3 @@ func TestSESEmailSender_Send(t *testing.T) {
 		t.Fatalf("failed to send email: %v", err)
 	}
 }
-// aws sts get-caller-identity --profile admin &>/dev/null || aws sso login --profile admin &>/dev/null
