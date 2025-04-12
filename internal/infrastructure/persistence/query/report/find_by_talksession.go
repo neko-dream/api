@@ -10,6 +10,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
+	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/server/internal/usecase/query/dto"
@@ -78,21 +79,22 @@ func (i *getByTalkSessionQueryInteractor) Execute(ctx context.Context, input rep
 	}
 
 	var reportDetails []dto.ReportDetail
-	for _, report := range opinions {
+	for _, opRow := range opinions {
 		var op dto.Opinion
-		if err := copier.CopyWithOption(&op, report.Opinion, copier.Option{IgnoreEmpty: true, DeepCopy: true}); err != nil {
+		if err := copier.CopyWithOption(&op, opRow.Opinion, copier.Option{IgnoreEmpty: true, DeepCopy: true}); err != nil {
 			utils.HandleError(ctx, err, "copier.CopyWithOption for Opinion")
 			return nil, err
 		}
 		var usr dto.User
-		if err := copier.CopyWithOption(&usr, report.User, copier.Option{IgnoreEmpty: true, DeepCopy: true}); err != nil {
+		if err := copier.CopyWithOption(&usr, opRow.User, copier.Option{IgnoreEmpty: true, DeepCopy: true}); err != nil {
 			utils.HandleError(ctx, err, "copier.CopyWithOption for User")
 			return nil, err
 		}
 
 		// reportMapより、reportの情報を取得
 		var reportDetailReasons []dto.ReportDetailReason
-		for _, reportDetail := range reportMap[shared.UUID[opinion.Opinion](report.Opinion.OpinionID)] {
+		reportUsers := make(map[shared.UUID[user.User]]any)
+		for _, reportDetail := range reportMap[shared.UUID[opinion.Opinion](opRow.Opinion.OpinionID)] {
 			detailDTO := dto.ReportDetailReason{
 				ReportID: shared.UUID[opinion.Report](reportDetail.OpinionReportID),
 				Reason:   opinion.Reason(reportDetail.Reason).StringJP(),
@@ -100,7 +102,7 @@ func (i *getByTalkSessionQueryInteractor) Execute(ctx context.Context, input rep
 			if reportDetail.ReasonText.Valid {
 				detailDTO.Content = lo.ToPtr(reportDetail.ReasonText.String)
 			}
-
+			reportUsers[shared.UUID[user.User](reportDetail.ReporterID)] = struct{}{}
 			reportDetailReasons = append(reportDetailReasons, detailDTO)
 		}
 
@@ -108,7 +110,7 @@ func (i *getByTalkSessionQueryInteractor) Execute(ctx context.Context, input rep
 			Opinion:     op,
 			User:        usr,
 			Reasons:     reportDetailReasons,
-			ReportCount: len(reportDetailReasons),
+			ReportCount: len(reportUsers),
 			Status:      input.Status,
 		})
 	}

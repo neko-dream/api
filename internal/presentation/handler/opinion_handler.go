@@ -14,7 +14,9 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/internal/usecase/command/opinion_command"
+	"github.com/neko-dream/server/internal/usecase/command/report_command"
 	opinion_query "github.com/neko-dream/server/internal/usecase/query/opinion"
+	"github.com/neko-dream/server/internal/usecase/query/report_query"
 	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/sort"
 	"github.com/neko-dream/server/pkg/utils"
@@ -29,9 +31,11 @@ type opinionHandler struct {
 	getSwipeOpinionQuery         opinion_query.GetSwipeOpinionsQuery
 	getReportReasons             opinion_query.GetReportReasons
 	getOpinionGroupRatio         opinion_query.GetOpinionGroupRatioQuery
+	getReportByOpinionID         report_query.GetOpinionReportQuery
 
 	submitOpinionCommand opinion_command.SubmitOpinion
 	reportOpinionCommand opinion_command.ReportOpinion
+	solveReportCommand   report_command.SolveReportCommand
 
 	session.TokenManager
 }
@@ -43,9 +47,11 @@ func NewOpinionHandler(
 	getSwipeOpinionsQuery opinion_query.GetSwipeOpinionsQuery,
 	getReportReasons opinion_query.GetReportReasons,
 	getOpinionGroupRatio opinion_query.GetOpinionGroupRatioQuery,
+	getReportByOpinionID report_query.GetOpinionReportQuery,
 
 	submitOpinionCommand opinion_command.SubmitOpinion,
 	reportOpinionCommand opinion_command.ReportOpinion,
+	solveReportCommand report_command.SolveReportCommand,
 
 	tokenManager session.TokenManager,
 ) oas.OpinionHandler {
@@ -56,9 +62,11 @@ func NewOpinionHandler(
 		getSwipeOpinionQuery:         getSwipeOpinionsQuery,
 		getReportReasons:             getReportReasons,
 		getOpinionGroupRatio:         getOpinionGroupRatio,
+		getReportByOpinionID:         getReportByOpinionID,
 
 		submitOpinionCommand: submitOpinionCommand,
 		reportOpinionCommand: reportOpinionCommand,
+		solveReportCommand:   solveReportCommand,
 
 		TokenManager: tokenManager,
 	}
@@ -120,6 +128,7 @@ func (o *opinionHandler) GetOpinionDetail2(ctx context.Context, params oas.GetOp
 		PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.Opinion.PictureURL),
 		ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ReferenceURL),
 		PostedAt:     opinion.Opinion.Opinion.CreatedAt.Format(time.RFC3339),
+		IsDeleted:    opinion.Opinion.Opinion.IsDeleted,
 	}
 
 	return &oas.GetOpinionDetail2OK{
@@ -186,6 +195,7 @@ func (o *opinionHandler) OpinionComments2(ctx context.Context, params oas.Opinio
 			PictureURL:   utils.ToOptNil[oas.OptNilString](reply.Opinion.PictureURL),
 			ReferenceURL: utils.ToOpt[oas.OptString](reply.Opinion.ReferenceURL),
 			PostedAt:     reply.Opinion.CreatedAt.Format(time.RFC3339),
+			IsDeleted:    reply.Opinion.IsDeleted,
 		}
 
 		var myVoteType oas.OptNilOpinionComments2OKOpinionsItemMyVoteType
@@ -288,6 +298,7 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 				ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
 				PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.PictureURL),
 				PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
+				IsDeleted:    opinion.Opinion.IsDeleted,
 			},
 			User: oas.GetOpinionsForTalkSessionOKOpinionsItemUser{
 				DisplayID:   opinion.User.DisplayID,
@@ -364,6 +375,7 @@ func (o *opinionHandler) GetOpinionDetail(ctx context.Context, params oas.GetOpi
 		PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.Opinion.PictureURL),
 		ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ReferenceURL),
 		PostedAt:     opinion.Opinion.Opinion.CreatedAt.Format(time.RFC3339),
+		IsDeleted:    opinion.Opinion.Opinion.IsDeleted,
 	}
 
 	return &oas.GetOpinionDetailOK{
@@ -432,6 +444,7 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 			PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.PictureURL),
 			ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
 			PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
+			IsDeleted:    opinion.Opinion.IsDeleted,
 		}
 		ress = append(ress, oas.SwipeOpinionsOKOpinionsItem{
 			User:       *user,
@@ -503,6 +516,7 @@ func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.Opinion
 			PictureURL:   utils.ToOptNil[oas.OptNilString](reply.Opinion.PictureURL),
 			ReferenceURL: utils.ToOpt[oas.OptString](reply.Opinion.ReferenceURL),
 			PostedAt:     reply.Opinion.CreatedAt.Format(time.RFC3339),
+			IsDeleted:    reply.Opinion.IsDeleted,
 		}
 
 		var myVoteType oas.OptNilOpinionCommentsOKOpinionsItemMyVoteType
@@ -734,4 +748,108 @@ func (o *opinionHandler) GetOpinionAnalysis(ctx context.Context, params oas.GetO
 	}
 
 	return &res, nil
+}
+
+// GetOpinionReports implements oas.OpinionHandler.
+func (o *opinionHandler) GetOpinionReports(ctx context.Context, params oas.GetOpinionReportsParams) (oas.GetOpinionReportsRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.GetOpinionReports")
+	defer span.End()
+
+	claim := session.GetSession(ctx)
+	if claim == nil {
+		return nil, messages.ForbiddenError
+	}
+	userID, err := claim.UserID()
+	if err != nil {
+		return nil, messages.ForbiddenError
+	}
+
+	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
+	reports, err := o.getReportByOpinionID.Execute(ctx, report_query.GetOpinionReportInput{
+		OpinionID: opinionID,
+		UserID:    userID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	var parentOpinionID oas.OptString
+	if reports.Report.Opinion.ParentOpinionID != nil {
+		parentOpinionID = utils.ToOpt[oas.OptString](reports.Report.Opinion.ParentOpinionID.String())
+	}
+
+	res := &oas.GetOpinionReportsOK{
+		Opinion: oas.GetOpinionReportsOKOpinion{
+			ID:           reports.Report.Opinion.OpinionID.String(),
+			ParentID:     parentOpinionID,
+			Title:        utils.ToOpt[oas.OptString](reports.Report.Opinion.Title),
+			Content:      reports.Report.Opinion.Content,
+			PictureURL:   utils.ToOptNil[oas.OptNilString](reports.Report.Opinion.PictureURL),
+			ReferenceURL: utils.ToOpt[oas.OptString](reports.Report.Opinion.ReferenceURL),
+			PostedAt:     reports.Report.Opinion.CreatedAt.Format(time.RFC3339),
+			IsDeleted:    reports.Report.Opinion.IsDeleted,
+		},
+		User: oas.GetOpinionReportsOKUser{
+			DisplayID:   reports.Report.User.DisplayID,
+			DisplayName: reports.Report.User.DisplayName,
+			IconURL:     utils.ToOptNil[oas.OptNilString](reports.Report.User.IconURL),
+		},
+		ReportCount: reports.Report.ReportCount,
+		Status:      oas.GetOpinionReportsOKStatus(reports.Report.Status),
+		Reasons:     make([]oas.GetOpinionReportsOKReasonsItem, 0, len(reports.Report.Reasons)),
+	}
+
+	for _, reason := range reports.Report.Reasons {
+		res.Reasons = append(res.Reasons, oas.GetOpinionReportsOKReasonsItem{
+			Reason:  reason.Reason,
+			Content: utils.ToOptNil[oas.OptNilString](reason.Content),
+		})
+	}
+
+	return res, nil
+}
+
+// SolveOpinionReport 通報を解決する
+func (o *opinionHandler) SolveOpinionReport(ctx context.Context, req oas.OptSolveOpinionReportReq, params oas.SolveOpinionReportParams) (oas.SolveOpinionReportRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.SolveOpinionReport")
+	defer span.End()
+
+	claim := session.GetSession(ctx)
+	if claim == nil {
+		return nil, messages.ForbiddenError
+	}
+	userID, err := claim.UserID()
+	if err != nil {
+		return nil, messages.ForbiddenError
+	}
+
+	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
+	if !req.IsSet() {
+		return nil, messages.RequiredParameterError
+	}
+	if err := req.Value.Validate(); err != nil {
+		return nil, err
+	}
+	status, err := opinion.NewStatus(string(req.Value.GetAction()))
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
+	if err := o.solveReportCommand.Execute(ctx, report_command.SolveReportInput{
+		OpinionID: opinionID,
+		UserID:    userID,
+		Status:    status,
+	}); err != nil {
+		return nil, err
+	}
+
+	res := &oas.SolveOpinionReportOK{}
+	return res, nil
 }

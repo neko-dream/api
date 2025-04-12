@@ -7,6 +7,7 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
+	dto_mapper "github.com/neko-dream/server/internal/infrastructure/persistence/utils"
 	"github.com/neko-dream/server/internal/usecase/query/dto"
 	opinion_query "github.com/neko-dream/server/internal/usecase/query/opinion"
 	"github.com/neko-dream/server/pkg/utils"
@@ -43,8 +44,8 @@ func (g *GetOpinionDetailByIDQueryHandler) Execute(ctx context.Context, in opini
 		return nil, err
 	}
 
-	var opinion dto.SwipeOpinion
-	if err := copier.CopyWithOption(&opinion, &opinionRow, copier.Option{
+	var op dto.SwipeOpinion
+	if err := copier.CopyWithOption(&op, &opinionRow, copier.Option{
 		DeepCopy:    true,
 		IgnoreEmpty: true,
 	}); err != nil {
@@ -52,7 +53,17 @@ func (g *GetOpinionDetailByIDQueryHandler) Execute(ctx context.Context, in opini
 		return nil, err
 	}
 
+	// 通報された意見を処理
+	opinionIDs := []uuid.UUID{op.Opinion.OpinionID.UUID()}
+	reports, err := g.GetQueries(ctx).FindReportByOpinionIDs(ctx, opinionIDs)
+	if err != nil {
+		utils.HandleError(ctx, err, "通報情報の取得に失敗")
+		return nil, err
+	}
+
+	dto_mapper.ProcessSingleReportedOpinion(&op, reports)
+
 	return &opinion_query.GetOpinionDetailByIDOutput{
-		Opinion: opinion,
+		Opinion: op,
 	}, nil
 }

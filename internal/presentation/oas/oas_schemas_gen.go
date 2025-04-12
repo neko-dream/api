@@ -1823,6 +1823,7 @@ type GetOpinionDetail2OKOpinion struct {
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
 	PostedAt     string    `json:"postedAt"`
+	IsDeleted    bool      `json:"isDeleted"`
 }
 
 // GetID returns the value of ID.
@@ -1865,6 +1866,11 @@ func (s *GetOpinionDetail2OKOpinion) GetPostedAt() string {
 	return s.PostedAt
 }
 
+// GetIsDeleted returns the value of IsDeleted.
+func (s *GetOpinionDetail2OKOpinion) GetIsDeleted() bool {
+	return s.IsDeleted
+}
+
 // SetID sets the value of ID.
 func (s *GetOpinionDetail2OKOpinion) SetID(val string) {
 	s.ID = val
@@ -1903,6 +1909,11 @@ func (s *GetOpinionDetail2OKOpinion) SetReferenceURL(val OptString) {
 // SetPostedAt sets the value of PostedAt.
 func (s *GetOpinionDetail2OKOpinion) SetPostedAt(val string) {
 	s.PostedAt = val
+}
+
+// SetIsDeleted sets the value of IsDeleted.
+func (s *GetOpinionDetail2OKOpinion) SetIsDeleted(val bool) {
+	s.IsDeleted = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -2038,6 +2049,7 @@ type GetOpinionDetailOKOpinion struct {
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
 	PostedAt     string    `json:"postedAt"`
+	IsDeleted    bool      `json:"isDeleted"`
 }
 
 // GetID returns the value of ID.
@@ -2080,6 +2092,11 @@ func (s *GetOpinionDetailOKOpinion) GetPostedAt() string {
 	return s.PostedAt
 }
 
+// GetIsDeleted returns the value of IsDeleted.
+func (s *GetOpinionDetailOKOpinion) GetIsDeleted() bool {
+	return s.IsDeleted
+}
+
 // SetID sets the value of ID.
 func (s *GetOpinionDetailOKOpinion) SetID(val string) {
 	s.ID = val
@@ -2118,6 +2135,11 @@ func (s *GetOpinionDetailOKOpinion) SetReferenceURL(val OptString) {
 // SetPostedAt sets the value of PostedAt.
 func (s *GetOpinionDetailOKOpinion) SetPostedAt(val string) {
 	s.PostedAt = val
+}
+
+// SetIsDeleted sets the value of IsDeleted.
+func (s *GetOpinionDetailOKOpinion) SetIsDeleted(val bool) {
+	s.IsDeleted = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -2243,6 +2265,343 @@ func (s *GetOpinionReportReasonsOKItem) SetReasonID(val int) {
 // SetReason sets the value of Reason.
 func (s *GetOpinionReportReasonsOKItem) SetReason(val string) {
 	s.Reason = val
+}
+
+type GetOpinionReportsBadRequest struct{}
+
+func (*GetOpinionReportsBadRequest) getOpinionReportsRes() {}
+
+type GetOpinionReportsInternalServerError struct{}
+
+func (*GetOpinionReportsInternalServerError) getOpinionReportsRes() {}
+
+type GetOpinionReportsOK struct {
+	Opinion GetOpinionReportsOKOpinion `json:"opinion"`
+	// 作成ユーザー.
+	User    GetOpinionReportsOKUser          `json:"user"`
+	Status  GetOpinionReportsOKStatus        `json:"status"`
+	Reasons []GetOpinionReportsOKReasonsItem `json:"reasons"`
+	// この意見が通報を受けた回数.
+	ReportCount int `json:"reportCount"`
+}
+
+// GetOpinion returns the value of Opinion.
+func (s *GetOpinionReportsOK) GetOpinion() GetOpinionReportsOKOpinion {
+	return s.Opinion
+}
+
+// GetUser returns the value of User.
+func (s *GetOpinionReportsOK) GetUser() GetOpinionReportsOKUser {
+	return s.User
+}
+
+// GetStatus returns the value of Status.
+func (s *GetOpinionReportsOK) GetStatus() GetOpinionReportsOKStatus {
+	return s.Status
+}
+
+// GetReasons returns the value of Reasons.
+func (s *GetOpinionReportsOK) GetReasons() []GetOpinionReportsOKReasonsItem {
+	return s.Reasons
+}
+
+// GetReportCount returns the value of ReportCount.
+func (s *GetOpinionReportsOK) GetReportCount() int {
+	return s.ReportCount
+}
+
+// SetOpinion sets the value of Opinion.
+func (s *GetOpinionReportsOK) SetOpinion(val GetOpinionReportsOKOpinion) {
+	s.Opinion = val
+}
+
+// SetUser sets the value of User.
+func (s *GetOpinionReportsOK) SetUser(val GetOpinionReportsOKUser) {
+	s.User = val
+}
+
+// SetStatus sets the value of Status.
+func (s *GetOpinionReportsOK) SetStatus(val GetOpinionReportsOKStatus) {
+	s.Status = val
+}
+
+// SetReasons sets the value of Reasons.
+func (s *GetOpinionReportsOK) SetReasons(val []GetOpinionReportsOKReasonsItem) {
+	s.Reasons = val
+}
+
+// SetReportCount sets the value of ReportCount.
+func (s *GetOpinionReportsOK) SetReportCount(val int) {
+	s.ReportCount = val
+}
+
+func (*GetOpinionReportsOK) getOpinionReportsRes() {}
+
+type GetOpinionReportsOKOpinion struct {
+	// 意見ID.
+	ID    string    `json:"id"`
+	Title OptString `json:"title"`
+	// 意見のテキスト.
+	Content string `json:"content"`
+	// 親の意見ID。ルートならば無し.
+	ParentID OptString `json:"parentID"`
+	// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+	VoteType OptNilGetOpinionReportsOKOpinionVoteType `json:"voteType"`
+	// 画像が返る場合もある.
+	PictureURL OptNilString `json:"pictureURL"`
+	// 参考文献URL.
+	ReferenceURL OptString `json:"referenceURL"`
+	PostedAt     string    `json:"postedAt"`
+	IsDeleted    bool      `json:"isDeleted"`
+}
+
+// GetID returns the value of ID.
+func (s *GetOpinionReportsOKOpinion) GetID() string {
+	return s.ID
+}
+
+// GetTitle returns the value of Title.
+func (s *GetOpinionReportsOKOpinion) GetTitle() OptString {
+	return s.Title
+}
+
+// GetContent returns the value of Content.
+func (s *GetOpinionReportsOKOpinion) GetContent() string {
+	return s.Content
+}
+
+// GetParentID returns the value of ParentID.
+func (s *GetOpinionReportsOKOpinion) GetParentID() OptString {
+	return s.ParentID
+}
+
+// GetVoteType returns the value of VoteType.
+func (s *GetOpinionReportsOKOpinion) GetVoteType() OptNilGetOpinionReportsOKOpinionVoteType {
+	return s.VoteType
+}
+
+// GetPictureURL returns the value of PictureURL.
+func (s *GetOpinionReportsOKOpinion) GetPictureURL() OptNilString {
+	return s.PictureURL
+}
+
+// GetReferenceURL returns the value of ReferenceURL.
+func (s *GetOpinionReportsOKOpinion) GetReferenceURL() OptString {
+	return s.ReferenceURL
+}
+
+// GetPostedAt returns the value of PostedAt.
+func (s *GetOpinionReportsOKOpinion) GetPostedAt() string {
+	return s.PostedAt
+}
+
+// GetIsDeleted returns the value of IsDeleted.
+func (s *GetOpinionReportsOKOpinion) GetIsDeleted() bool {
+	return s.IsDeleted
+}
+
+// SetID sets the value of ID.
+func (s *GetOpinionReportsOKOpinion) SetID(val string) {
+	s.ID = val
+}
+
+// SetTitle sets the value of Title.
+func (s *GetOpinionReportsOKOpinion) SetTitle(val OptString) {
+	s.Title = val
+}
+
+// SetContent sets the value of Content.
+func (s *GetOpinionReportsOKOpinion) SetContent(val string) {
+	s.Content = val
+}
+
+// SetParentID sets the value of ParentID.
+func (s *GetOpinionReportsOKOpinion) SetParentID(val OptString) {
+	s.ParentID = val
+}
+
+// SetVoteType sets the value of VoteType.
+func (s *GetOpinionReportsOKOpinion) SetVoteType(val OptNilGetOpinionReportsOKOpinionVoteType) {
+	s.VoteType = val
+}
+
+// SetPictureURL sets the value of PictureURL.
+func (s *GetOpinionReportsOKOpinion) SetPictureURL(val OptNilString) {
+	s.PictureURL = val
+}
+
+// SetReferenceURL sets the value of ReferenceURL.
+func (s *GetOpinionReportsOKOpinion) SetReferenceURL(val OptString) {
+	s.ReferenceURL = val
+}
+
+// SetPostedAt sets the value of PostedAt.
+func (s *GetOpinionReportsOKOpinion) SetPostedAt(val string) {
+	s.PostedAt = val
+}
+
+// SetIsDeleted sets the value of IsDeleted.
+func (s *GetOpinionReportsOKOpinion) SetIsDeleted(val bool) {
+	s.IsDeleted = val
+}
+
+// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+type GetOpinionReportsOKOpinionVoteType string
+
+const (
+	GetOpinionReportsOKOpinionVoteTypeDisagree GetOpinionReportsOKOpinionVoteType = "disagree"
+	GetOpinionReportsOKOpinionVoteTypeAgree    GetOpinionReportsOKOpinionVoteType = "agree"
+	GetOpinionReportsOKOpinionVoteTypePass     GetOpinionReportsOKOpinionVoteType = "pass"
+)
+
+// AllValues returns all GetOpinionReportsOKOpinionVoteType values.
+func (GetOpinionReportsOKOpinionVoteType) AllValues() []GetOpinionReportsOKOpinionVoteType {
+	return []GetOpinionReportsOKOpinionVoteType{
+		GetOpinionReportsOKOpinionVoteTypeDisagree,
+		GetOpinionReportsOKOpinionVoteTypeAgree,
+		GetOpinionReportsOKOpinionVoteTypePass,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s GetOpinionReportsOKOpinionVoteType) MarshalText() ([]byte, error) {
+	switch s {
+	case GetOpinionReportsOKOpinionVoteTypeDisagree:
+		return []byte(s), nil
+	case GetOpinionReportsOKOpinionVoteTypeAgree:
+		return []byte(s), nil
+	case GetOpinionReportsOKOpinionVoteTypePass:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *GetOpinionReportsOKOpinionVoteType) UnmarshalText(data []byte) error {
+	switch GetOpinionReportsOKOpinionVoteType(data) {
+	case GetOpinionReportsOKOpinionVoteTypeDisagree:
+		*s = GetOpinionReportsOKOpinionVoteTypeDisagree
+		return nil
+	case GetOpinionReportsOKOpinionVoteTypeAgree:
+		*s = GetOpinionReportsOKOpinionVoteTypeAgree
+		return nil
+	case GetOpinionReportsOKOpinionVoteTypePass:
+		*s = GetOpinionReportsOKOpinionVoteTypePass
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type GetOpinionReportsOKReasonsItem struct {
+	Reason  string       `json:"reason"`
+	Content OptNilString `json:"content"`
+}
+
+// GetReason returns the value of Reason.
+func (s *GetOpinionReportsOKReasonsItem) GetReason() string {
+	return s.Reason
+}
+
+// GetContent returns the value of Content.
+func (s *GetOpinionReportsOKReasonsItem) GetContent() OptNilString {
+	return s.Content
+}
+
+// SetReason sets the value of Reason.
+func (s *GetOpinionReportsOKReasonsItem) SetReason(val string) {
+	s.Reason = val
+}
+
+// SetContent sets the value of Content.
+func (s *GetOpinionReportsOKReasonsItem) SetContent(val OptNilString) {
+	s.Content = val
+}
+
+type GetOpinionReportsOKStatus string
+
+const (
+	GetOpinionReportsOKStatusUnsolved GetOpinionReportsOKStatus = "unsolved"
+	GetOpinionReportsOKStatusDeleted  GetOpinionReportsOKStatus = "deleted"
+	GetOpinionReportsOKStatusHold     GetOpinionReportsOKStatus = "hold"
+)
+
+// AllValues returns all GetOpinionReportsOKStatus values.
+func (GetOpinionReportsOKStatus) AllValues() []GetOpinionReportsOKStatus {
+	return []GetOpinionReportsOKStatus{
+		GetOpinionReportsOKStatusUnsolved,
+		GetOpinionReportsOKStatusDeleted,
+		GetOpinionReportsOKStatusHold,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s GetOpinionReportsOKStatus) MarshalText() ([]byte, error) {
+	switch s {
+	case GetOpinionReportsOKStatusUnsolved:
+		return []byte(s), nil
+	case GetOpinionReportsOKStatusDeleted:
+		return []byte(s), nil
+	case GetOpinionReportsOKStatusHold:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *GetOpinionReportsOKStatus) UnmarshalText(data []byte) error {
+	switch GetOpinionReportsOKStatus(data) {
+	case GetOpinionReportsOKStatusUnsolved:
+		*s = GetOpinionReportsOKStatusUnsolved
+		return nil
+	case GetOpinionReportsOKStatusDeleted:
+		*s = GetOpinionReportsOKStatusDeleted
+		return nil
+	case GetOpinionReportsOKStatusHold:
+		*s = GetOpinionReportsOKStatusHold
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// 作成ユーザー.
+type GetOpinionReportsOKUser struct {
+	DisplayID   string       `json:"displayID"`
+	DisplayName string       `json:"displayName"`
+	IconURL     OptNilString `json:"iconURL"`
+}
+
+// GetDisplayID returns the value of DisplayID.
+func (s *GetOpinionReportsOKUser) GetDisplayID() string {
+	return s.DisplayID
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *GetOpinionReportsOKUser) GetDisplayName() string {
+	return s.DisplayName
+}
+
+// GetIconURL returns the value of IconURL.
+func (s *GetOpinionReportsOKUser) GetIconURL() OptNilString {
+	return s.IconURL
+}
+
+// SetDisplayID sets the value of DisplayID.
+func (s *GetOpinionReportsOKUser) SetDisplayID(val string) {
+	s.DisplayID = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *GetOpinionReportsOKUser) SetDisplayName(val string) {
+	s.DisplayName = val
+}
+
+// SetIconURL sets the value of IconURL.
+func (s *GetOpinionReportsOKUser) SetIconURL(val OptNilString) {
+	s.IconURL = val
 }
 
 type GetOpinionsForTalkSessionBadRequest struct{}
@@ -2391,6 +2750,7 @@ type GetOpinionsForTalkSessionOKOpinionsItemOpinion struct {
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
 	PostedAt     string    `json:"postedAt"`
+	IsDeleted    bool      `json:"isDeleted"`
 }
 
 // GetID returns the value of ID.
@@ -2433,6 +2793,11 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) GetPostedAt() string {
 	return s.PostedAt
 }
 
+// GetIsDeleted returns the value of IsDeleted.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) GetIsDeleted() bool {
+	return s.IsDeleted
+}
+
 // SetID sets the value of ID.
 func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) SetID(val string) {
 	s.ID = val
@@ -2471,6 +2836,11 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) SetReferenceURL(val Opt
 // SetPostedAt sets the value of PostedAt.
 func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) SetPostedAt(val string) {
 	s.PostedAt = val
+}
+
+// SetIsDeleted sets the value of IsDeleted.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) SetIsDeleted(val bool) {
+	s.IsDeleted = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -2769,6 +3139,7 @@ type GetReportsForTalkSessionOKReportsItemOpinion struct {
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
 	PostedAt     string    `json:"postedAt"`
+	IsDeleted    bool      `json:"isDeleted"`
 }
 
 // GetID returns the value of ID.
@@ -2811,6 +3182,11 @@ func (s *GetReportsForTalkSessionOKReportsItemOpinion) GetPostedAt() string {
 	return s.PostedAt
 }
 
+// GetIsDeleted returns the value of IsDeleted.
+func (s *GetReportsForTalkSessionOKReportsItemOpinion) GetIsDeleted() bool {
+	return s.IsDeleted
+}
+
 // SetID sets the value of ID.
 func (s *GetReportsForTalkSessionOKReportsItemOpinion) SetID(val string) {
 	s.ID = val
@@ -2849,6 +3225,11 @@ func (s *GetReportsForTalkSessionOKReportsItemOpinion) SetReferenceURL(val OptSt
 // SetPostedAt sets the value of PostedAt.
 func (s *GetReportsForTalkSessionOKReportsItemOpinion) SetPostedAt(val string) {
 	s.PostedAt = val
+}
+
+// SetIsDeleted sets the value of IsDeleted.
+func (s *GetReportsForTalkSessionOKReportsItemOpinion) SetIsDeleted(val bool) {
+	s.IsDeleted = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -3769,6 +4150,78 @@ func (s *GetTalkSessionListStatus) UnmarshalText(data []byte) error {
 		return nil
 	case GetTalkSessionListStatusFinished:
 		*s = GetTalkSessionListStatusFinished
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type GetTalkSessionReportCountBadRequest struct{}
+
+func (*GetTalkSessionReportCountBadRequest) getTalkSessionReportCountRes() {}
+
+type GetTalkSessionReportCountInternalServerError struct{}
+
+func (*GetTalkSessionReportCountInternalServerError) getTalkSessionReportCountRes() {}
+
+type GetTalkSessionReportCountOK struct {
+	Count int `json:"count"`
+}
+
+// GetCount returns the value of Count.
+func (s *GetTalkSessionReportCountOK) GetCount() int {
+	return s.Count
+}
+
+// SetCount sets the value of Count.
+func (s *GetTalkSessionReportCountOK) SetCount(val int) {
+	s.Count = val
+}
+
+func (*GetTalkSessionReportCountOK) getTalkSessionReportCountRes() {}
+
+type GetTalkSessionReportCountStatus string
+
+const (
+	GetTalkSessionReportCountStatusUnsolved GetTalkSessionReportCountStatus = "unsolved"
+	GetTalkSessionReportCountStatusDeleted  GetTalkSessionReportCountStatus = "deleted"
+	GetTalkSessionReportCountStatusHold     GetTalkSessionReportCountStatus = "hold"
+)
+
+// AllValues returns all GetTalkSessionReportCountStatus values.
+func (GetTalkSessionReportCountStatus) AllValues() []GetTalkSessionReportCountStatus {
+	return []GetTalkSessionReportCountStatus{
+		GetTalkSessionReportCountStatusUnsolved,
+		GetTalkSessionReportCountStatusDeleted,
+		GetTalkSessionReportCountStatusHold,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s GetTalkSessionReportCountStatus) MarshalText() ([]byte, error) {
+	switch s {
+	case GetTalkSessionReportCountStatusUnsolved:
+		return []byte(s), nil
+	case GetTalkSessionReportCountStatusDeleted:
+		return []byte(s), nil
+	case GetTalkSessionReportCountStatusHold:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *GetTalkSessionReportCountStatus) UnmarshalText(data []byte) error {
+	switch GetTalkSessionReportCountStatus(data) {
+	case GetTalkSessionReportCountStatusUnsolved:
+		*s = GetTalkSessionReportCountStatusUnsolved
+		return nil
+	case GetTalkSessionReportCountStatusDeleted:
+		*s = GetTalkSessionReportCountStatusDeleted
+		return nil
+	case GetTalkSessionReportCountStatusHold:
+		*s = GetTalkSessionReportCountStatusHold
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -4748,6 +5201,7 @@ type OpinionComments2OKOpinionsItemOpinion struct {
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
 	PostedAt     string    `json:"postedAt"`
+	IsDeleted    bool      `json:"isDeleted"`
 }
 
 // GetID returns the value of ID.
@@ -4790,6 +5244,11 @@ func (s *OpinionComments2OKOpinionsItemOpinion) GetPostedAt() string {
 	return s.PostedAt
 }
 
+// GetIsDeleted returns the value of IsDeleted.
+func (s *OpinionComments2OKOpinionsItemOpinion) GetIsDeleted() bool {
+	return s.IsDeleted
+}
+
 // SetID sets the value of ID.
 func (s *OpinionComments2OKOpinionsItemOpinion) SetID(val string) {
 	s.ID = val
@@ -4828,6 +5287,11 @@ func (s *OpinionComments2OKOpinionsItemOpinion) SetReferenceURL(val OptString) {
 // SetPostedAt sets the value of PostedAt.
 func (s *OpinionComments2OKOpinionsItemOpinion) SetPostedAt(val string) {
 	s.PostedAt = val
+}
+
+// SetIsDeleted sets the value of IsDeleted.
+func (s *OpinionComments2OKOpinionsItemOpinion) SetIsDeleted(val bool) {
+	s.IsDeleted = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -5086,6 +5550,7 @@ type OpinionCommentsOKOpinionsItemOpinion struct {
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
 	PostedAt     string    `json:"postedAt"`
+	IsDeleted    bool      `json:"isDeleted"`
 }
 
 // GetID returns the value of ID.
@@ -5128,6 +5593,11 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) GetPostedAt() string {
 	return s.PostedAt
 }
 
+// GetIsDeleted returns the value of IsDeleted.
+func (s *OpinionCommentsOKOpinionsItemOpinion) GetIsDeleted() bool {
+	return s.IsDeleted
+}
+
 // SetID sets the value of ID.
 func (s *OpinionCommentsOKOpinionsItemOpinion) SetID(val string) {
 	s.ID = val
@@ -5166,6 +5636,11 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) SetReferenceURL(val OptString) {
 // SetPostedAt sets the value of PostedAt.
 func (s *OpinionCommentsOKOpinionsItemOpinion) SetPostedAt(val string) {
 	s.PostedAt = val
+}
+
+// SetIsDeleted sets the value of IsDeleted.
+func (s *OpinionCommentsOKOpinionsItemOpinion) SetIsDeleted(val bool) {
+	s.IsDeleted = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -5341,6 +5816,7 @@ type OpinionsHistoryOKOpinionsItemOpinion struct {
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
 	PostedAt     string    `json:"postedAt"`
+	IsDeleted    bool      `json:"isDeleted"`
 }
 
 // GetID returns the value of ID.
@@ -5383,6 +5859,11 @@ func (s *OpinionsHistoryOKOpinionsItemOpinion) GetPostedAt() string {
 	return s.PostedAt
 }
 
+// GetIsDeleted returns the value of IsDeleted.
+func (s *OpinionsHistoryOKOpinionsItemOpinion) GetIsDeleted() bool {
+	return s.IsDeleted
+}
+
 // SetID sets the value of ID.
 func (s *OpinionsHistoryOKOpinionsItemOpinion) SetID(val string) {
 	s.ID = val
@@ -5421,6 +5902,11 @@ func (s *OpinionsHistoryOKOpinionsItemOpinion) SetReferenceURL(val OptString) {
 // SetPostedAt sets the value of PostedAt.
 func (s *OpinionsHistoryOKOpinionsItemOpinion) SetPostedAt(val string) {
 	s.PostedAt = val
+}
+
+// SetIsDeleted sets the value of IsDeleted.
+func (s *OpinionsHistoryOKOpinionsItemOpinion) SetIsDeleted(val bool) {
+	s.IsDeleted = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -6742,6 +7228,69 @@ func (o OptNilGetOpinionDetailOKOpinionVoteType) Get() (v GetOpinionDetailOKOpin
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilGetOpinionDetailOKOpinionVoteType) Or(d GetOpinionDetailOKOpinionVoteType) GetOpinionDetailOKOpinionVoteType {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilGetOpinionReportsOKOpinionVoteType returns new OptNilGetOpinionReportsOKOpinionVoteType with value set to v.
+func NewOptNilGetOpinionReportsOKOpinionVoteType(v GetOpinionReportsOKOpinionVoteType) OptNilGetOpinionReportsOKOpinionVoteType {
+	return OptNilGetOpinionReportsOKOpinionVoteType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilGetOpinionReportsOKOpinionVoteType is optional nullable GetOpinionReportsOKOpinionVoteType.
+type OptNilGetOpinionReportsOKOpinionVoteType struct {
+	Value GetOpinionReportsOKOpinionVoteType
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilGetOpinionReportsOKOpinionVoteType was set.
+func (o OptNilGetOpinionReportsOKOpinionVoteType) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilGetOpinionReportsOKOpinionVoteType) Reset() {
+	var v GetOpinionReportsOKOpinionVoteType
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilGetOpinionReportsOKOpinionVoteType) SetTo(v GetOpinionReportsOKOpinionVoteType) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilGetOpinionReportsOKOpinionVoteType) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilGetOpinionReportsOKOpinionVoteType) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v GetOpinionReportsOKOpinionVoteType
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilGetOpinionReportsOKOpinionVoteType) Get() (v GetOpinionReportsOKOpinionVoteType, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilGetOpinionReportsOKOpinionVoteType) Or(d GetOpinionReportsOKOpinionVoteType) GetOpinionReportsOKOpinionVoteType {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -8363,6 +8912,52 @@ func (o OptSessionsHistoryOKTalkSessionsItemTalkSessionLocation) Or(d SessionsHi
 	return d
 }
 
+// NewOptSolveOpinionReportReq returns new OptSolveOpinionReportReq with value set to v.
+func NewOptSolveOpinionReportReq(v SolveOpinionReportReq) OptSolveOpinionReportReq {
+	return OptSolveOpinionReportReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptSolveOpinionReportReq is optional SolveOpinionReportReq.
+type OptSolveOpinionReportReq struct {
+	Value SolveOpinionReportReq
+	Set   bool
+}
+
+// IsSet returns true if OptSolveOpinionReportReq was set.
+func (o OptSolveOpinionReportReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptSolveOpinionReportReq) Reset() {
+	var v SolveOpinionReportReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptSolveOpinionReportReq) SetTo(v SolveOpinionReportReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptSolveOpinionReportReq) Get() (v SolveOpinionReportReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptSolveOpinionReportReq) Or(d SolveOpinionReportReq) SolveOpinionReportReq {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptString returns new OptString with value set to v.
 func NewOptString(v string) OptString {
 	return OptString{
@@ -9808,6 +10403,73 @@ func (s *SessionsHistoryStatus) UnmarshalText(data []byte) error {
 	}
 }
 
+type SolveOpinionReportBadRequest struct{}
+
+func (*SolveOpinionReportBadRequest) solveOpinionReportRes() {}
+
+type SolveOpinionReportInternalServerError struct{}
+
+func (*SolveOpinionReportInternalServerError) solveOpinionReportRes() {}
+
+type SolveOpinionReportOK struct{}
+
+func (*SolveOpinionReportOK) solveOpinionReportRes() {}
+
+type SolveOpinionReportReq struct {
+	Action SolveOpinionReportReqAction `json:"action"`
+}
+
+// GetAction returns the value of Action.
+func (s *SolveOpinionReportReq) GetAction() SolveOpinionReportReqAction {
+	return s.Action
+}
+
+// SetAction sets the value of Action.
+func (s *SolveOpinionReportReq) SetAction(val SolveOpinionReportReqAction) {
+	s.Action = val
+}
+
+type SolveOpinionReportReqAction string
+
+const (
+	SolveOpinionReportReqActionDeleted SolveOpinionReportReqAction = "deleted"
+	SolveOpinionReportReqActionHold    SolveOpinionReportReqAction = "hold"
+)
+
+// AllValues returns all SolveOpinionReportReqAction values.
+func (SolveOpinionReportReqAction) AllValues() []SolveOpinionReportReqAction {
+	return []SolveOpinionReportReqAction{
+		SolveOpinionReportReqActionDeleted,
+		SolveOpinionReportReqActionHold,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s SolveOpinionReportReqAction) MarshalText() ([]byte, error) {
+	switch s {
+	case SolveOpinionReportReqActionDeleted:
+		return []byte(s), nil
+	case SolveOpinionReportReqActionHold:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *SolveOpinionReportReqAction) UnmarshalText(data []byte) error {
+	switch SolveOpinionReportReqAction(data) {
+	case SolveOpinionReportReqActionDeleted:
+		*s = SolveOpinionReportReqActionDeleted
+		return nil
+	case SolveOpinionReportReqActionHold:
+		*s = SolveOpinionReportReqActionHold
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
 type SwipeOpinionsBadRequest struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
@@ -9941,6 +10603,7 @@ type SwipeOpinionsOKOpinionsItemOpinion struct {
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
 	PostedAt     string    `json:"postedAt"`
+	IsDeleted    bool      `json:"isDeleted"`
 }
 
 // GetID returns the value of ID.
@@ -9983,6 +10646,11 @@ func (s *SwipeOpinionsOKOpinionsItemOpinion) GetPostedAt() string {
 	return s.PostedAt
 }
 
+// GetIsDeleted returns the value of IsDeleted.
+func (s *SwipeOpinionsOKOpinionsItemOpinion) GetIsDeleted() bool {
+	return s.IsDeleted
+}
+
 // SetID sets the value of ID.
 func (s *SwipeOpinionsOKOpinionsItemOpinion) SetID(val string) {
 	s.ID = val
@@ -10021,6 +10689,11 @@ func (s *SwipeOpinionsOKOpinionsItemOpinion) SetReferenceURL(val OptString) {
 // SetPostedAt sets the value of PostedAt.
 func (s *SwipeOpinionsOKOpinionsItemOpinion) SetPostedAt(val string) {
 	s.PostedAt = val
+}
+
+// SetIsDeleted sets the value of IsDeleted.
+func (s *SwipeOpinionsOKOpinionsItemOpinion) SetIsDeleted(val bool) {
+	s.IsDeleted = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -10311,6 +10984,7 @@ type TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion struct {
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
 	PostedAt     string    `json:"postedAt"`
+	IsDeleted    bool      `json:"isDeleted"`
 }
 
 // GetID returns the value of ID.
@@ -10353,6 +11027,11 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) GetPostedAt(
 	return s.PostedAt
 }
 
+// GetIsDeleted returns the value of IsDeleted.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) GetIsDeleted() bool {
+	return s.IsDeleted
+}
+
 // SetID sets the value of ID.
 func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) SetID(val string) {
 	s.ID = val
@@ -10391,6 +11070,11 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) SetReference
 // SetPostedAt sets the value of PostedAt.
 func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) SetPostedAt(val string) {
 	s.PostedAt = val
+}
+
+// SetIsDeleted sets the value of IsDeleted.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) SetIsDeleted(val bool) {
+	s.IsDeleted = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -10815,6 +11499,7 @@ type Vote2OKItem struct {
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
 	PostedAt     string    `json:"postedAt"`
+	IsDeleted    bool      `json:"isDeleted"`
 }
 
 // GetID returns the value of ID.
@@ -10857,6 +11542,11 @@ func (s *Vote2OKItem) GetPostedAt() string {
 	return s.PostedAt
 }
 
+// GetIsDeleted returns the value of IsDeleted.
+func (s *Vote2OKItem) GetIsDeleted() bool {
+	return s.IsDeleted
+}
+
 // SetID sets the value of ID.
 func (s *Vote2OKItem) SetID(val string) {
 	s.ID = val
@@ -10895,6 +11585,11 @@ func (s *Vote2OKItem) SetReferenceURL(val OptString) {
 // SetPostedAt sets the value of PostedAt.
 func (s *Vote2OKItem) SetPostedAt(val string) {
 	s.PostedAt = val
+}
+
+// SetIsDeleted sets the value of IsDeleted.
+func (s *Vote2OKItem) SetIsDeleted(val bool) {
+	s.IsDeleted = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -11081,6 +11776,7 @@ type VoteOKItem struct {
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
 	PostedAt     string    `json:"postedAt"`
+	IsDeleted    bool      `json:"isDeleted"`
 }
 
 // GetID returns the value of ID.
@@ -11123,6 +11819,11 @@ func (s *VoteOKItem) GetPostedAt() string {
 	return s.PostedAt
 }
 
+// GetIsDeleted returns the value of IsDeleted.
+func (s *VoteOKItem) GetIsDeleted() bool {
+	return s.IsDeleted
+}
+
 // SetID sets the value of ID.
 func (s *VoteOKItem) SetID(val string) {
 	s.ID = val
@@ -11161,6 +11862,11 @@ func (s *VoteOKItem) SetReferenceURL(val OptString) {
 // SetPostedAt sets the value of PostedAt.
 func (s *VoteOKItem) SetPostedAt(val string) {
 	s.PostedAt = val
+}
+
+// SetIsDeleted sets the value of IsDeleted.
+func (s *VoteOKItem) SetIsDeleted(val bool) {
+	s.IsDeleted = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.

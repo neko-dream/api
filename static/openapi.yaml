@@ -60,10 +60,13 @@ paths:
                         description: 参考文献URL
                       postedAt:
                         type: string
+                      isDeleted:
+                        type: boolean
                     required:
                       - content
                       - id
                       - postedAt
+                      - isDeleted
                   user:
                     type: object
                     properties:
@@ -171,10 +174,13 @@ paths:
                               description: 参考文献URL
                             postedAt:
                               type: string
+                            isDeleted:
+                              type: boolean
                           required:
                             - content
                             - id
                             - postedAt
+                            - isDeleted
                         user:
                           type: object
                           properties:
@@ -322,10 +328,13 @@ paths:
                       description: 参考文献URL
                     postedAt:
                       type: string
+                    isDeleted:
+                      type: boolean
                   required:
                     - content
                     - id
                     - postedAt
+                    - isDeleted
           headers: {}
         '400':
           description: ''
@@ -672,10 +681,220 @@ paths:
           headers: {}
       security: []
       x-ogen-operation-group: Opinion
+  /opinions/{opinionID}/reports:
+    get:
+      summary: 意見に対する通報取得
+      deprecated: false
+      description: セッション作成者しか取得できない
+      operationId: getOpinionReports
+      tags:
+        - opinion
+      parameters:
+        - name: opinionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  opinion:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: 意見ID
+                      title:
+                        type: string
+                      content:
+                        type: string
+                        description: 意見のテキスト
+                        minLength: 1
+                        maxLength: 140
+                      parentID:
+                        type: string
+                        description: 親の意見ID。ルートならば無し
+                      voteType:
+                        type: string
+                        description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                        enum:
+                          - disagree
+                          - agree
+                          - pass
+                        nullable: true
+                      pictureURL:
+                        type: string
+                        description: 画像が返る場合もある
+                        nullable: true
+                      referenceURL:
+                        type: string
+                        description: 参考文献URL
+                      postedAt:
+                        type: string
+                      isDeleted:
+                        type: boolean
+                    required:
+                      - content
+                      - id
+                      - postedAt
+                      - isDeleted
+                  user:
+                    type: object
+                    properties:
+                      displayID:
+                        type: string
+                        pattern: ^[A-Za-z0-9]$
+                        examples:
+                          - userid
+                        minLength: 3
+                        maxLength: 25
+                      displayName:
+                        type: string
+                      iconURL:
+                        type: string
+                        nullable: true
+                    required:
+                      - displayID
+                      - displayName
+                    description: 作成ユーザー
+                  status:
+                    type: string
+                    enum:
+                      - unsolved
+                      - deleted
+                      - hold
+                  reasons:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        reason:
+                          type: string
+                        content:
+                          type: string
+                          nullable: true
+                      required:
+                        - reason
+                  reportCount:
+                    type: integer
+                    description: この意見が通報を受けた回数
+                required:
+                  - opinion
+                  - user
+                  - reasons
+                  - reportCount
+                  - status
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security:
+        - SessionId: []
+      x-ogen-operation-group: Opinion
+  /opinions/{opinionID}/reports/solve:
+    post:
+      summary: 通報を解決
+      deprecated: false
+      description: ''
+      operationId: solveOpinionReport
+      tags:
+        - opinion
+      parameters:
+        - name: opinionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum:
+                    - deleted
+                    - hold
+                  example: ''
+              required:
+                - action
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security:
+        - SessionId: []
+      x-ogen-operation-group: Opinion
   /talksessions/{talkSessionID}/opinions/{opinionID}/votes:
     post:
       summary: 意思表明API
-      deprecated: false
+      deprecated: true
       description: ''
       operationId: vote
       tags:
@@ -705,11 +924,6 @@ paths:
                     - agree
                     - disagree
                     - pass
-                  x-apidog:
-                    enumDescriptions:
-                      agree: ''
-                      disagree: ''
-                      pass: ''
                   example: ''
                   nullable: true
               required:
@@ -754,10 +968,13 @@ paths:
                       description: 参考文献URL
                     postedAt:
                       type: string
+                    isDeleted:
+                      type: boolean
                   required:
                     - content
                     - id
                     - postedAt
+                    - isDeleted
           headers: {}
         '400':
           description: ''
@@ -804,161 +1021,10 @@ paths:
       security:
         - SessionId: []
       x-ogen-operation-group: Vote
-  /talksessions/{talkSessionID}/swipe_opinions:
-    get:
-      summary: スワイプ用のエンドポイント
-      deprecated: false
-      description: |-
-        セッションの中からまだ投票していない意見をランダムに取得する
-        remainingCountは取得した意見を含めてスワイプできる意見の総数を返す
-      operationId: swipe_opinions
-      tags:
-        - opinion
-      parameters:
-        - name: talkSessionID
-          in: path
-          description: ''
-          required: true
-          schema:
-            type: string
-        - name: limit
-          in: query
-          description: ''
-          required: false
-          schema:
-            type: integer
-            default: 10
-            nullable: true
-      responses:
-        '200':
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  opinions:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        replyCount:
-                          type: integer
-                        opinion:
-                          type: object
-                          properties:
-                            id:
-                              type: string
-                              description: 意見ID
-                            title:
-                              type: string
-                            content:
-                              type: string
-                              description: 意見のテキスト
-                              minLength: 1
-                              maxLength: 140
-                            parentID:
-                              type: string
-                              description: 親の意見ID。ルートならば無し
-                            voteType:
-                              type: string
-                              description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-                              enum:
-                                - disagree
-                                - agree
-                                - pass
-                              nullable: true
-                            pictureURL:
-                              type: string
-                              description: 画像が返る場合もある
-                              nullable: true
-                            referenceURL:
-                              type: string
-                              description: 参考文献URL
-                            postedAt:
-                              type: string
-                          required:
-                            - content
-                            - id
-                            - postedAt
-                        user:
-                          type: object
-                          properties:
-                            displayID:
-                              type: string
-                              pattern: ^[A-Za-z0-9]$
-                              examples:
-                                - userid
-                              minLength: 3
-                              maxLength: 25
-                            displayName:
-                              type: string
-                            iconURL:
-                              type: string
-                              nullable: true
-                          required:
-                            - displayID
-                            - displayName
-                          description: 作成ユーザー
-                      required:
-                        - replyCount
-                        - opinion
-                        - user
-                  remainingCount:
-                    type: integer
-                required:
-                  - opinions
-                  - remainingCount
-          headers: {}
-        '400':
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
-                required:
-                  - code
-                  - message
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-          headers: {}
-        '500':
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
-                required:
-                  - code
-                  - message
-              examples:
-                '1':
-                  summary: internal
-                  value:
-                    code: GENERAL-000
-                    message: INTERNAL SERVER ERROR.
-          headers: {}
-      security:
-        - SessionId: []
-      x-ogen-operation-group: Opinion
   /talksessions/{talkSessionID}/opinions:
     post:
       summary: セッションに対して意見投稿
-      deprecated: false
+      deprecated: true
       description: parentOpinionIDがなければルートの意見として投稿される
       operationId: postOpinionPost
       tags:
@@ -1141,10 +1207,13 @@ paths:
                               description: 参考文献URL
                             postedAt:
                               type: string
+                            isDeleted:
+                              type: boolean
                           required:
                             - content
                             - id
                             - postedAt
+                            - isDeleted
                         user:
                           type: object
                           properties:
@@ -1221,7 +1290,7 @@ paths:
   /talksessions/{talkSessionID}/opinions/{opinionID}:
     get:
       summary: 意見の詳細
-      deprecated: false
+      deprecated: true
       description: ''
       operationId: getOpinionDetail
       tags:
@@ -1280,10 +1349,13 @@ paths:
                         description: 参考文献URL
                       postedAt:
                         type: string
+                      isDeleted:
+                        type: boolean
                     required:
                       - content
                       - id
                       - postedAt
+                      - isDeleted
                   user:
                     type: object
                     properties:
@@ -2051,10 +2123,164 @@ paths:
           headers: {}
       security: []
       x-ogen-operation-group: TalkSession
+  /talksessions/{talkSessionID}/swipe_opinions:
+    get:
+      summary: スワイプ用のエンドポイント
+      deprecated: false
+      description: |-
+        セッションの中からまだ投票していない意見をランダムに取得する
+        remainingCountは取得した意見を含めてスワイプできる意見の総数を返す
+      operationId: swipe_opinions
+      tags:
+        - opinion
+      parameters:
+        - name: talkSessionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: integer
+            default: 10
+            nullable: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  opinions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        replyCount:
+                          type: integer
+                        opinion:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              description: 意見ID
+                            title:
+                              type: string
+                            content:
+                              type: string
+                              description: 意見のテキスト
+                              minLength: 1
+                              maxLength: 140
+                            parentID:
+                              type: string
+                              description: 親の意見ID。ルートならば無し
+                            voteType:
+                              type: string
+                              description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+                              enum:
+                                - disagree
+                                - agree
+                                - pass
+                              nullable: true
+                            pictureURL:
+                              type: string
+                              description: 画像が返る場合もある
+                              nullable: true
+                            referenceURL:
+                              type: string
+                              description: 参考文献URL
+                            postedAt:
+                              type: string
+                            isDeleted:
+                              type: boolean
+                          required:
+                            - content
+                            - id
+                            - postedAt
+                            - isDeleted
+                        user:
+                          type: object
+                          properties:
+                            displayID:
+                              type: string
+                              pattern: ^[A-Za-z0-9]$
+                              examples:
+                                - userid
+                              minLength: 3
+                              maxLength: 25
+                            displayName:
+                              type: string
+                            iconURL:
+                              type: string
+                              nullable: true
+                          required:
+                            - displayID
+                            - displayName
+                          description: 作成ユーザー
+                      required:
+                        - replyCount
+                        - opinion
+                        - user
+                  remainingCount:
+                    type: integer
+                required:
+                  - opinions
+                  - remainingCount
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security:
+        - SessionId: []
+      x-ogen-operation-group: Opinion
   /talksessions/{talkSessionID}/opinions/{opinionID}/replies:
     get:
       summary: 意見に対するリプライ意見一覧
-      deprecated: false
+      deprecated: true
       description: ''
       operationId: opinionComments
       tags:
@@ -2118,10 +2344,13 @@ paths:
                               description: 参考文献URL
                             postedAt:
                               type: string
+                            isDeleted:
+                              type: boolean
                           required:
                             - content
                             - id
                             - postedAt
+                            - isDeleted
                         user:
                           type: object
                           properties:
@@ -2326,10 +2555,13 @@ paths:
                                     description: 参考文献URL
                                   postedAt:
                                     type: string
+                                  isDeleted:
+                                    type: boolean
                                 required:
                                   - content
                                   - id
                                   - postedAt
+                                  - isDeleted
                               user:
                                 type: object
                                 properties:
@@ -3090,10 +3322,13 @@ paths:
                               description: 参考文献URL
                             postedAt:
                               type: string
+                            isDeleted:
+                              type: boolean
                           required:
                             - content
                             - id
                             - postedAt
+                            - isDeleted
                         user:
                           type: object
                           properties:
@@ -3171,7 +3406,77 @@ paths:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-      security: []
+      security:
+        - SessionId: []
+      x-ogen-operation-group: TalkSession
+  /talksessions/{talkSessionID}/reports/count:
+    get:
+      summary: 通報件数
+      deprecated: false
+      description: ''
+      operationId: getTalkSessionReportCount
+      tags:
+        - talk_session
+      parameters:
+        - name: talkSessionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: ''
+          required: true
+          schema:
+            type: string
+            enum:
+              - unsolved
+              - deleted
+              - hold
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                required:
+                  - count
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security:
+        - SessionId: []
       x-ogen-operation-group: TalkSession
   /user:
     post:
@@ -3614,10 +3919,13 @@ paths:
                               description: 参考文献URL
                             postedAt:
                               type: string
+                            isDeleted:
+                              type: boolean
                           required:
                             - content
                             - id
                             - postedAt
+                            - isDeleted
                         replyCount:
                           type: integer
                       required:
@@ -5018,10 +5326,13 @@ components:
           description: 参考文献URL
         postedAt:
           type: string
+        isDeleted:
+          type: boolean
       required:
         - content
         - id
         - postedAt
+        - isDeleted
     location:
       type: object
       properties:
@@ -5291,10 +5602,13 @@ components:
               description: 参考文献URL
             postedAt:
               type: string
+            isDeleted:
+              type: boolean
           required:
             - content
             - id
             - postedAt
+            - isDeleted
         user:
           type: object
           properties:

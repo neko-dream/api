@@ -104,6 +104,8 @@ type OpinionHandler interface {
 	//
 	// 意見の詳細.
 	//
+	// Deprecated: schema marks this operation as deprecated.
+	//
 	// GET /talksessions/{talkSessionID}/opinions/{opinionID}
 	GetOpinionDetail(ctx context.Context, params GetOpinionDetailParams) (GetOpinionDetailRes, error)
 	// GetOpinionDetail2 implements getOpinionDetail2 operation.
@@ -118,6 +120,12 @@ type OpinionHandler interface {
 	//
 	// GET /opinions/report_reasons
 	GetOpinionReportReasons(ctx context.Context) (GetOpinionReportReasonsRes, error)
+	// GetOpinionReports implements getOpinionReports operation.
+	//
+	// セッション作成者しか取得できない.
+	//
+	// GET /opinions/{opinionID}/reports
+	GetOpinionReports(ctx context.Context, params GetOpinionReportsParams) (GetOpinionReportsRes, error)
 	// GetOpinionsForTalkSession implements getOpinionsForTalkSession operation.
 	//
 	// セッションに対する意見一覧.
@@ -127,6 +135,8 @@ type OpinionHandler interface {
 	// OpinionComments implements opinionComments operation.
 	//
 	// 意見に対するリプライ意見一覧.
+	//
+	// Deprecated: schema marks this operation as deprecated.
 	//
 	// GET /talksessions/{talkSessionID}/opinions/{opinionID}/replies
 	OpinionComments(ctx context.Context, params OpinionCommentsParams) (OpinionCommentsRes, error)
@@ -139,6 +149,8 @@ type OpinionHandler interface {
 	// PostOpinionPost implements postOpinionPost operation.
 	//
 	// ParentOpinionIDがなければルートの意見として投稿される.
+	//
+	// Deprecated: schema marks this operation as deprecated.
 	//
 	// POST /talksessions/{talkSessionID}/opinions
 	PostOpinionPost(ctx context.Context, req OptPostOpinionPostReq, params PostOpinionPostParams) (PostOpinionPostRes, error)
@@ -155,6 +167,12 @@ type OpinionHandler interface {
 	//
 	// POST /opinions/{opinionID}/report
 	ReportOpinion(ctx context.Context, req OptReportOpinionReq, params ReportOpinionParams) (ReportOpinionRes, error)
+	// SolveOpinionReport implements solveOpinionReport operation.
+	//
+	// 通報を解決.
+	//
+	// POST /opinions/{opinionID}/reports/solve
+	SolveOpinionReport(ctx context.Context, req OptSolveOpinionReportReq, params SolveOpinionReportParams) (SolveOpinionReportRes, error)
 	// SwipeOpinions implements swipe_opinions operation.
 	//
 	// セッションの中からまだ投票していない意見をランダムに取得する
@@ -241,6 +259,12 @@ type TalkSessionHandler interface {
 	//
 	// GET /talksessions/{talkSessionID}/report
 	GetTalkSessionReport(ctx context.Context, params GetTalkSessionReportParams) (GetTalkSessionReportRes, error)
+	// GetTalkSessionReportCount implements getTalkSessionReportCount operation.
+	//
+	// 通報件数.
+	//
+	// GET /talksessions/{talkSessionID}/reports/count
+	GetTalkSessionReportCount(ctx context.Context, params GetTalkSessionReportCountParams) (GetTalkSessionReportCountRes, error)
 	// GetTalkSessionRestrictionKeys implements getTalkSessionRestrictionKeys operation.
 	//
 	// セッションの投稿制限に使用できるキーの一覧を返す.
@@ -353,6 +377,8 @@ type VoteHandler interface {
 	// Vote implements vote operation.
 	//
 	// 意思表明API.
+	//
+	// Deprecated: schema marks this operation as deprecated.
 	//
 	// POST /talksessions/{talkSessionID}/opinions/{opinionID}/votes
 	Vote(ctx context.Context, req OptVoteReq, params VoteParams) (VoteRes, error)

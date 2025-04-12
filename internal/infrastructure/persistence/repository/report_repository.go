@@ -2,9 +2,13 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 
+	"github.com/google/uuid"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/shared"
+	"github.com/neko-dream/server/internal/domain/model/talksession"
+	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/server/pkg/utils"
@@ -59,4 +63,60 @@ func (r *reportRepository) UpdateStatus(ctx context.Context, reportID shared.UUI
 	}
 
 	return nil
+}
+
+// FindByOpinionID 意見IDから通報を取得する
+func (r *reportRepository) FindByOpinionID(ctx context.Context, opinionID shared.UUID[opinion.Opinion]) ([]opinion.Report, error) {
+
+	ctx, span := otel.Tracer("repository").Start(ctx, "reportRepository.FindByOpinionID")
+	defer span.End()
+
+	reports, err := r.DBManager.GetQueries(ctx).FindReportByOpinionID(ctx, uuid.NullUUID{UUID: opinionID.UUID(), Valid: true})
+	if err != nil {
+		utils.HandleError(ctx, err, "FindReportByOpinionID")
+		return nil, err
+	}
+
+	result := make([]opinion.Report, 0, len(reports))
+	for _, report := range reports {
+		var reasonText *string
+		if report.OpinionReport.ReasonText.Valid {
+			reasonText = &report.OpinionReport.ReasonText.String
+		}
+		rep := opinion.Report{
+			OpinionReportID: shared.UUID[opinion.Report](report.OpinionReport.OpinionReportID),
+			OpinionID:       shared.UUID[opinion.Opinion](report.OpinionReport.OpinionID),
+			TalkSessionID:   shared.UUID[talksession.TalkSession](report.OpinionReport.TalkSessionID),
+			ReporterID:      shared.UUID[user.User](report.OpinionReport.ReporterID),
+			Reason:          opinion.Reason(report.OpinionReport.Reason),
+			Status:          opinion.Status(report.OpinionReport.Status),
+			ReasonText:      reasonText,
+			CreatedAt:       report.OpinionReport.CreatedAt,
+		}
+		result = append(result, rep)
+	}
+
+	return result, nil
+}
+
+// CountByTalkSessionIDAndStatus
+func (r *reportRepository) CountByTalkSessionIDAndStatus(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession], status opinion.Status) (int, error) {
+	ctx, span := otel.Tracer("repository").Start(ctx, "reportRepository.CountByTalkSessionIDAndStatus")
+	defer span.End()
+	count, err := r.DBManager.GetQueries(ctx).CountReportsByTalkSession(ctx, model.CountReportsByTalkSessionParams{
+		TalkSessionID: uuid.NullUUID{
+			UUID:  talkSessionID.UUID(),
+			Valid: true,
+		},
+		Status: sql.NullString{
+			String: string(status),
+			Valid:  true,
+		},
+	})
+	if err != nil {
+		utils.HandleError(ctx, err, "CountReportByTalkSessionIDAndStatus")
+		return 0, err
+	}
+
+	return int(count), nil
 }

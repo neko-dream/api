@@ -11,6 +11,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
+	dto_mapper "github.com/neko-dream/server/internal/infrastructure/persistence/utils"
 	"github.com/neko-dream/server/internal/usecase/query/dto"
 	opinion_query "github.com/neko-dream/server/internal/usecase/query/opinion"
 	"github.com/neko-dream/server/pkg/utils"
@@ -70,6 +71,18 @@ func (g *GetOpinionsByTalkSessionIDQueryHandler) Execute(ctx context.Context, in
 		}
 
 		opinions = append(opinions, op)
+	}
+
+	// 通報された意見を処理
+	if len(opinions) > 0 {
+		opinionIDs := dto_mapper.ExtractOpinionIDs(opinions)
+		reports, err := g.GetQueries(ctx).FindReportByOpinionIDs(ctx, opinionIDs)
+		if err != nil {
+			utils.HandleError(ctx, err, "通報情報の取得に失敗")
+			return nil, err
+		}
+
+		opinions = dto_mapper.ProcessReportedOpinions(opinions, reports)
 	}
 
 	count, err := g.GetQueries(ctx).CountOpinions(ctx, model.CountOpinionsParams{

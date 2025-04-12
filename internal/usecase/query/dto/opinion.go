@@ -8,6 +8,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/domain/model/vote"
+	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/samber/lo"
 )
 
@@ -21,6 +22,7 @@ type Opinion struct {
 	CreatedAt       time.Time
 	PictureURL      *string
 	ReferenceURL    *string
+	IsDeleted       bool
 }
 
 type SwipeOpinion struct {
@@ -45,11 +47,50 @@ func (s *SwipeOpinion) GetParentVoteType() *string {
 	return lo.ToPtr(vote.VoteTypeFromInt(s.ParentVoteType).String())
 }
 
+// SwipeOpinionも、Replaceされる
+func (s *SwipeOpinion) Mask(reports []model.OpinionReport) {
+	s.User = User{
+		DisplayID:   "",
+		DisplayName: "",
+		IconURL:     nil,
+	}
+	s.ParentVoteType = 0
+	s.CurrentVoteType = 0
+	s.Opinion.Mask(reports)
+}
+func (s *Opinion) Mask(reports []model.OpinionReport) {
+	if len(reports) == 0 {
+		return
+	}
+	report := "この意見は運営により削除されました。\n削除理由:\n"
+	for _, r := range reports {
+		reason := opinion.Reason(r.Reason)
+		report += "・" + reason.StringJP() + "\n"
+	}
+	s.UserID = shared.UUID[user.User](shared.NilUUID)
+	s.Content = report
+	s.PictureURL = nil
+	s.ReferenceURL = nil
+	s.Title = nil
+	s.IsDeleted = true
+}
+
 type OpinionWithRepresentative struct {
 	Opinion
 	User
 	RepresentativeOpinion
 	ReplyCount int
+}
+
+func (o *OpinionWithRepresentative) Mask(reports []model.OpinionReport) {
+	o.User = User{
+		DisplayID:   "",
+		DisplayName: "",
+		IconURL:     nil,
+	}
+	o.RepresentativeOpinion = RepresentativeOpinion{}
+	o.ReplyCount = 0
+	o.Opinion.Mask(reports)
 }
 
 type RepresentativeOpinion struct {

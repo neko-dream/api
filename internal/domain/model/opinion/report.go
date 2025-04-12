@@ -12,6 +12,8 @@ import (
 type ReportRepository interface {
 	Create(context.Context, Report) error
 	UpdateStatus(context.Context, shared.UUID[Report], Status) error
+	FindByOpinionID(context.Context, shared.UUID[Opinion]) ([]Report, error)
+	CountByTalkSessionIDAndStatus(context.Context, shared.UUID[talksession.TalkSession], Status) (int, error)
 }
 
 type Report struct {

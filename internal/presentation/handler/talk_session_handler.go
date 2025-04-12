@@ -34,6 +34,7 @@ type talkSessionHandler struct {
 	getReportQuery                analysis_query.GetReportQuery
 	isSatisfied                   talksession_query.IsTalkSessionSatisfiedQuery
 	getReports                    report_query.GetByTalkSessionQuery
+	getReportCount                report_query.GetCountQuery
 
 	addConclusionCommand    talksession_command.AddConclusionCommand
 	startTalkSessionCommand talksession_command.StartTalkSessionCommand
@@ -52,6 +53,7 @@ func NewTalkSessionHandler(
 	getReportQuery analysis_query.GetReportQuery,
 	isSatisfied talksession_query.IsTalkSessionSatisfiedQuery,
 	getReports report_query.GetByTalkSessionQuery,
+	getReportCount report_query.GetCountQuery,
 
 	AddConclusionCommand talksession_command.AddConclusionCommand,
 	startTalkSessionCommand talksession_command.StartTalkSessionCommand,
@@ -69,6 +71,7 @@ func NewTalkSessionHandler(
 		getReportQuery:                getReportQuery,
 		isSatisfied:                   isSatisfied,
 		getReports:                    getReports,
+		getReportCount:                getReportCount,
 
 		addConclusionCommand:    AddConclusionCommand,
 		startTalkSessionCommand: startTalkSessionCommand,
@@ -578,6 +581,7 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 					PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.PictureURL),
 					ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
 					PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
+					IsDeleted:    opinion.Opinion.IsDeleted,
 				},
 				User: oas.TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemUser{
 					DisplayID:   opinion.User.DisplayID,
@@ -828,6 +832,7 @@ func (t *talkSessionHandler) GetReportsForTalkSession(ctx context.Context, param
 				PictureURL:   utils.ToOptNil[oas.OptNilString](report.Opinion.PictureURL),
 				ReferenceURL: utils.ToOpt[oas.OptString](report.Opinion.ReferenceURL),
 				PostedAt:     report.Opinion.CreatedAt.Format(time.RFC3339),
+				IsDeleted:    report.Opinion.IsDeleted,
 			},
 			User: oas.GetReportsForTalkSessionOKReportsItemUser{
 				DisplayID:   report.User.DisplayID,
@@ -842,5 +847,41 @@ func (t *talkSessionHandler) GetReportsForTalkSession(ctx context.Context, param
 
 	return &oas.GetReportsForTalkSessionOK{
 		Reports: reports,
+	}, nil
+}
+
+// GetTalkSessionReportCount implements oas.TalkSessionHandler.
+func (t *talkSessionHandler) GetTalkSessionReportCount(ctx context.Context, params oas.GetTalkSessionReportCountParams) (oas.GetTalkSessionReportCountRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetTalkSessionReportCount")
+	defer span.End()
+
+	claim := session.GetSession(t.SetSession(ctx))
+	var userID *shared.UUID[user.User]
+	if claim != nil {
+		id, err := claim.UserID()
+		if err == nil {
+			userID = &id
+		}
+	}
+	if userID == nil {
+		return nil, messages.ForbiddenError
+	}
+
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
+	out, err := t.getReportCount.Execute(ctx, report_query.GetCountInput{
+		TalkSessionID: talkSessionID,
+		UserID:        *userID,
+		Status:        string(params.Status),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &oas.GetTalkSessionReportCountOK{
+		Count: out.Count,
 	}, nil
 }

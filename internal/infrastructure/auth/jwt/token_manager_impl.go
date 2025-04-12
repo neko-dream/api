@@ -77,7 +77,7 @@ func (j *tokenManager) Parse(ctx context.Context, token string) (*session.Claim,
 	ctx, span := otel.Tracer("jwt").Start(ctx, "tokenManager.Parse")
 	defer span.End()
 
-	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (any, error) {
 		// アルゴリズムの確認
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			utils.HandleError(ctx, jwt.ErrInvalidKeyType, "InvalidKeyType")

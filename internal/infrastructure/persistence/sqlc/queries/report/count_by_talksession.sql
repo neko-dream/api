@@ -1,6 +1,6 @@
--- name: FindReportsByTalkSession :many
+-- name: CountReportsByTalkSession :one
 SELECT
-  sqlc.embed(opinion_reports)
+  COUNT(*) AS count
 FROM
   opinion_reports
 WHERE
@@ -10,5 +10,4 @@ WHERE
     WHEN sqlc.narg('status')::text IS NOT NULL THEN opinion_reports.status = sqlc.narg('status')::text
     ELSE TRUE
   END
-  ORDER BY created_at DESC
 ;

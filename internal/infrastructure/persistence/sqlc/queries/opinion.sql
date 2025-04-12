@@ -97,10 +97,14 @@ LEFT JOIN (
     SELECT rank, opinion_id
     FROM representative_opinions
 ) ro ON opinions.opinion_id = ro.opinion_id
+-- 通報された意見を除外
+LEFT JOIN opinion_reports ON opinions.opinion_id = opinion_reports.opinion_id
 -- トークセッションに紐づく意見のみを取得
 WHERE opinions.talk_session_id = $2
     AND vote_count.opinion_id = opinions.opinion_id
     AND opinions.parent_opinion_id IS NULL
+    -- 削除されたものはスワイプ意見から除外
+    AND (opinion_reports.opinion_id IS NULL OR opinion_reports.status != 'deleted')
 ORDER BY
     CASE sqlc.narg('sort_key')::text
         WHEN 'top' THEN COALESCE(ro.rank, 0)
@@ -121,10 +125,13 @@ LEFT JOIN (
     GROUP BY opinions.opinion_id
     HAVING COUNT(votes.vote_id) = 0
 ) vote_count ON opinions.opinion_id = vote_count.opinion_id
+-- 通報された意見を除外
+LEFT JOIN opinion_reports ON opinions.opinion_id = opinion_reports.opinion_id
 -- トークセッションに紐づく意見のみを取得
 WHERE opinions.talk_session_id = $2
     AND vote_count.opinion_id = opinions.opinion_id
-    AND opinions.parent_opinion_id IS NULL;
+    AND opinions.parent_opinion_id IS NULL
+    AND (opinion_reports.opinion_id IS NULL OR opinion_reports.status != 'deleted');
 
 -- name: GetOpinionsByUserID :many
 SELECT

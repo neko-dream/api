@@ -98,9 +98,9 @@ func (m *manageHandler) ManageIndex(ctx context.Context) (oas.ManageIndexOK, err
 		utils.HandleError(ctx, err, "GetQueries.ListTalkSessions")
 		return oas.ManageIndexOK{}, err
 	}
-	var sessions []map[string]interface{}
+	var sessions []map[string]any
 	for _, row := range rows {
-		res := map[string]interface{}{
+		res := map[string]any{
 			"ID":    row.TalkSession.TalkSessionID,
 			"Theme": row.TalkSession.Theme,
 		}
@@ -115,7 +115,7 @@ func (m *manageHandler) ManageIndex(ctx context.Context) (oas.ManageIndexOK, err
 	}
 
 	var html strings.Builder
-	data := map[string]interface{}{
+	data := map[string]any{
 		"Sessions": sessions,
 	}
 
