@@ -16,8 +16,12 @@ var (
 
 func NewAWSConfig() aws.Config {
 	once.Do(func() {
+		region := os.Getenv("AWS_REGION")
+		if region == "" {
+			region = "ap-northeast-1" // Default region
+		}
 		c, err := awsConfig.LoadDefaultConfig(context.TODO(),
-			awsConfig.WithRegion("ap-northeast-1"),
+			awsConfig.WithRegion(region),
 		)
 		if err != nil {
 			return
