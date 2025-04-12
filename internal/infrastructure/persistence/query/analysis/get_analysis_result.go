@@ -68,8 +68,6 @@ func (g *GetAnalysisResultHandler) Execute(ctx context.Context, input analysis_q
 	if err != nil {
 		return nil, err
 	}
-
-
 	representatives := make([]dto.OpinionWithRepresentative, 0, len(representativeRows))
 	for _, row := range representativeRows {
 		res := dto.OpinionWithRepresentative{}

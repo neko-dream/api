@@ -69,4 +69,3 @@ func (g *GetOpinionRepliesQueryHandler) Execute(ctx context.Context, in opinion_
 		Replies: replies,
 	}, nil
 }
-

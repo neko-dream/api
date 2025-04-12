@@ -114,7 +114,7 @@ type TalkSessionGeneratedImage struct {
 
 type TalkSessionLocation struct {
 	TalkSessionID uuid.UUID
-	Location      any
+	Location      interface{}
 }
 
 type TalkSessionReport struct {

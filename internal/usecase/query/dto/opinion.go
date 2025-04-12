@@ -22,7 +22,7 @@ type Opinion struct {
 	CreatedAt       time.Time
 	PictureURL      *string
 	ReferenceURL    *string
-	IsDeleted	  bool
+	IsDeleted       bool
 }
 
 type SwipeOpinion struct {
@@ -50,16 +50,14 @@ func (s *SwipeOpinion) GetParentVoteType() *string {
 // SwipeOpinionも、Replaceされる
 func (s *SwipeOpinion) Mask(reports []model.OpinionReport) {
 	s.User = User{
-		DisplayID: "",
+		DisplayID:   "",
 		DisplayName: "",
-		IconURL: nil,
+		IconURL:     nil,
 	}
 	s.ParentVoteType = 0
 	s.CurrentVoteType = 0
 	s.Opinion.Mask(reports)
 }
-
-
 func (s *Opinion) Mask(reports []model.OpinionReport) {
 	if len(reports) == 0 {
 		return
@@ -86,9 +84,9 @@ type OpinionWithRepresentative struct {
 
 func (o *OpinionWithRepresentative) Mask(reports []model.OpinionReport) {
 	o.User = User{
-		DisplayID: "",
+		DisplayID:   "",
 		DisplayName: "",
-		IconURL: nil,
+		IconURL:     nil,
 	}
 	o.RepresentativeOpinion = RepresentativeOpinion{}
 	o.ReplyCount = 0

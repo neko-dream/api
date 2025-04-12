@@ -19,7 +19,7 @@ func ProcessReportedOpinions(opinions []dto.SwipeOpinion, reports []model.FindRe
 	// 意見を処理
 	for i, opinion := range opinions {
 		if reportedList, ok := reportMap[opinion.Opinion.OpinionID]; ok {
-            opinions[i].Mask(reportedList)
+			opinions[i].Mask(reportedList)
 		}
 	}
 
@@ -35,7 +35,7 @@ func ProcessSingleReportedOpinion(opinion *dto.SwipeOpinion, reports []model.Fin
 	reportMap := makeReportMap(reports)
 
 	if reportedList, ok := reportMap[opinion.Opinion.OpinionID]; ok {
-        opinion.Mask(reportedList)
+		opinion.Mask(reportedList)
 	}
 }
 
@@ -50,7 +50,7 @@ func ProcessReportedOpinionsWithRepresentative(opinions []dto.OpinionWithReprese
 	// 意見を処理
 	for i, opinion := range opinions {
 		if reportedList, ok := reportMap[opinion.Opinion.OpinionID]; ok {
-            opinions[i].Mask(reportedList)
+			opinions[i].Mask(reportedList)
 		}
 	}
 
