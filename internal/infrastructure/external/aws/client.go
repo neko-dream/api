@@ -2,6 +2,7 @@ package aws
 
 import (
 	"context"
+	"os"
 	"sync"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
