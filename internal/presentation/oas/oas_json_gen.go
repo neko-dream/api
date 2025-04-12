@@ -4360,9 +4360,13 @@ func (s *GetOpinionDetail2OKOpinion) encodeFields(e *jx.Encoder) {
 		e.FieldStart("postedAt")
 		e.Str(s.PostedAt)
 	}
+	{
+		e.FieldStart("isDeleted")
+		e.Bool(s.IsDeleted)
+	}
 }
 
-var jsonFieldsNameOfGetOpinionDetail2OKOpinion = [8]string{
+var jsonFieldsNameOfGetOpinionDetail2OKOpinion = [9]string{
 	0: "id",
 	1: "title",
 	2: "content",
@@ -4371,6 +4375,7 @@ var jsonFieldsNameOfGetOpinionDetail2OKOpinion = [8]string{
 	5: "pictureURL",
 	6: "referenceURL",
 	7: "postedAt",
+	8: "isDeleted",
 }
 
 // Decode decodes GetOpinionDetail2OKOpinion from json.
@@ -4378,7 +4383,7 @@ func (s *GetOpinionDetail2OKOpinion) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode GetOpinionDetail2OKOpinion to nil")
 	}
-	var requiredBitSet [1]uint8
+	var requiredBitSet [2]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -4468,6 +4473,18 @@ func (s *GetOpinionDetail2OKOpinion) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"postedAt\"")
 			}
+		case "isDeleted":
+			requiredBitSet[1] |= 1 << 0
+			if err := func() error {
+				v, err := d.Bool()
+				s.IsDeleted = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"isDeleted\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -4477,8 +4494,9 @@ func (s *GetOpinionDetail2OKOpinion) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
+	for i, mask := range [2]uint8{
 		0b10000101,
+		0b00000001,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -4900,9 +4918,13 @@ func (s *GetOpinionDetailOKOpinion) encodeFields(e *jx.Encoder) {
 		e.FieldStart("postedAt")
 		e.Str(s.PostedAt)
 	}
+	{
+		e.FieldStart("isDeleted")
+		e.Bool(s.IsDeleted)
+	}
 }
 
-var jsonFieldsNameOfGetOpinionDetailOKOpinion = [8]string{
+var jsonFieldsNameOfGetOpinionDetailOKOpinion = [9]string{
 	0: "id",
 	1: "title",
 	2: "content",
@@ -4911,6 +4933,7 @@ var jsonFieldsNameOfGetOpinionDetailOKOpinion = [8]string{
 	5: "pictureURL",
 	6: "referenceURL",
 	7: "postedAt",
+	8: "isDeleted",
 }
 
 // Decode decodes GetOpinionDetailOKOpinion from json.
@@ -4918,7 +4941,7 @@ func (s *GetOpinionDetailOKOpinion) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode GetOpinionDetailOKOpinion to nil")
 	}
-	var requiredBitSet [1]uint8
+	var requiredBitSet [2]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -5008,6 +5031,18 @@ func (s *GetOpinionDetailOKOpinion) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"postedAt\"")
 			}
+		case "isDeleted":
+			requiredBitSet[1] |= 1 << 0
+			if err := func() error {
+				v, err := d.Bool()
+				s.IsDeleted = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"isDeleted\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -5017,8 +5052,9 @@ func (s *GetOpinionDetailOKOpinion) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
+	for i, mask := range [2]uint8{
 		0b10000101,
+		0b00000001,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -5794,9 +5830,13 @@ func (s *GetOpinionReportsOKOpinion) encodeFields(e *jx.Encoder) {
 		e.FieldStart("postedAt")
 		e.Str(s.PostedAt)
 	}
+	{
+		e.FieldStart("isDeleted")
+		e.Bool(s.IsDeleted)
+	}
 }
 
-var jsonFieldsNameOfGetOpinionReportsOKOpinion = [8]string{
+var jsonFieldsNameOfGetOpinionReportsOKOpinion = [9]string{
 	0: "id",
 	1: "title",
 	2: "content",
@@ -5805,6 +5845,7 @@ var jsonFieldsNameOfGetOpinionReportsOKOpinion = [8]string{
 	5: "pictureURL",
 	6: "referenceURL",
 	7: "postedAt",
+	8: "isDeleted",
 }
 
 // Decode decodes GetOpinionReportsOKOpinion from json.
@@ -5812,7 +5853,7 @@ func (s *GetOpinionReportsOKOpinion) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode GetOpinionReportsOKOpinion to nil")
 	}
-	var requiredBitSet [1]uint8
+	var requiredBitSet [2]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -5902,6 +5943,18 @@ func (s *GetOpinionReportsOKOpinion) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"postedAt\"")
 			}
+		case "isDeleted":
+			requiredBitSet[1] |= 1 << 0
+			if err := func() error {
+				v, err := d.Bool()
+				s.IsDeleted = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"isDeleted\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -5911,8 +5964,9 @@ func (s *GetOpinionReportsOKOpinion) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
+	for i, mask := range [2]uint8{
 		0b10000101,
+		0b00000001,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -6730,9 +6784,13 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) encodeFields(e *jx.Enco
 		e.FieldStart("postedAt")
 		e.Str(s.PostedAt)
 	}
+	{
+		e.FieldStart("isDeleted")
+		e.Bool(s.IsDeleted)
+	}
 }
 
-var jsonFieldsNameOfGetOpinionsForTalkSessionOKOpinionsItemOpinion = [8]string{
+var jsonFieldsNameOfGetOpinionsForTalkSessionOKOpinionsItemOpinion = [9]string{
 	0: "id",
 	1: "title",
 	2: "content",
@@ -6741,6 +6799,7 @@ var jsonFieldsNameOfGetOpinionsForTalkSessionOKOpinionsItemOpinion = [8]string{
 	5: "pictureURL",
 	6: "referenceURL",
 	7: "postedAt",
+	8: "isDeleted",
 }
 
 // Decode decodes GetOpinionsForTalkSessionOKOpinionsItemOpinion from json.
@@ -6748,7 +6807,7 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) Decode(d *jx.Decoder) e
 	if s == nil {
 		return errors.New("invalid: unable to decode GetOpinionsForTalkSessionOKOpinionsItemOpinion to nil")
 	}
-	var requiredBitSet [1]uint8
+	var requiredBitSet [2]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -6838,6 +6897,18 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) Decode(d *jx.Decoder) e
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"postedAt\"")
 			}
+		case "isDeleted":
+			requiredBitSet[1] |= 1 << 0
+			if err := func() error {
+				v, err := d.Bool()
+				s.IsDeleted = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"isDeleted\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -6847,8 +6918,9 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) Decode(d *jx.Decoder) e
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
+	for i, mask := range [2]uint8{
 		0b10000101,
+		0b00000001,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -7793,9 +7865,13 @@ func (s *GetReportsForTalkSessionOKReportsItemOpinion) encodeFields(e *jx.Encode
 		e.FieldStart("postedAt")
 		e.Str(s.PostedAt)
 	}
+	{
+		e.FieldStart("isDeleted")
+		e.Bool(s.IsDeleted)
+	}
 }
 
-var jsonFieldsNameOfGetReportsForTalkSessionOKReportsItemOpinion = [8]string{
+var jsonFieldsNameOfGetReportsForTalkSessionOKReportsItemOpinion = [9]string{
 	0: "id",
 	1: "title",
 	2: "content",
@@ -7804,6 +7880,7 @@ var jsonFieldsNameOfGetReportsForTalkSessionOKReportsItemOpinion = [8]string{
 	5: "pictureURL",
 	6: "referenceURL",
 	7: "postedAt",
+	8: "isDeleted",
 }
 
 // Decode decodes GetReportsForTalkSessionOKReportsItemOpinion from json.
@@ -7811,7 +7888,7 @@ func (s *GetReportsForTalkSessionOKReportsItemOpinion) Decode(d *jx.Decoder) err
 	if s == nil {
 		return errors.New("invalid: unable to decode GetReportsForTalkSessionOKReportsItemOpinion to nil")
 	}
-	var requiredBitSet [1]uint8
+	var requiredBitSet [2]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -7901,6 +7978,18 @@ func (s *GetReportsForTalkSessionOKReportsItemOpinion) Decode(d *jx.Decoder) err
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"postedAt\"")
 			}
+		case "isDeleted":
+			requiredBitSet[1] |= 1 << 0
+			if err := func() error {
+				v, err := d.Bool()
+				s.IsDeleted = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"isDeleted\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -7910,8 +7999,9 @@ func (s *GetReportsForTalkSessionOKReportsItemOpinion) Decode(d *jx.Decoder) err
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
+	for i, mask := range [2]uint8{
 		0b10000101,
+		0b00000001,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -13337,9 +13427,13 @@ func (s *OpinionComments2OKOpinionsItemOpinion) encodeFields(e *jx.Encoder) {
 		e.FieldStart("postedAt")
 		e.Str(s.PostedAt)
 	}
+	{
+		e.FieldStart("isDeleted")
+		e.Bool(s.IsDeleted)
+	}
 }
 
-var jsonFieldsNameOfOpinionComments2OKOpinionsItemOpinion = [8]string{
+var jsonFieldsNameOfOpinionComments2OKOpinionsItemOpinion = [9]string{
 	0: "id",
 	1: "title",
 	2: "content",
@@ -13348,6 +13442,7 @@ var jsonFieldsNameOfOpinionComments2OKOpinionsItemOpinion = [8]string{
 	5: "pictureURL",
 	6: "referenceURL",
 	7: "postedAt",
+	8: "isDeleted",
 }
 
 // Decode decodes OpinionComments2OKOpinionsItemOpinion from json.
@@ -13355,7 +13450,7 @@ func (s *OpinionComments2OKOpinionsItemOpinion) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode OpinionComments2OKOpinionsItemOpinion to nil")
 	}
-	var requiredBitSet [1]uint8
+	var requiredBitSet [2]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -13445,6 +13540,18 @@ func (s *OpinionComments2OKOpinionsItemOpinion) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"postedAt\"")
 			}
+		case "isDeleted":
+			requiredBitSet[1] |= 1 << 0
+			if err := func() error {
+				v, err := d.Bool()
+				s.IsDeleted = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"isDeleted\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -13454,8 +13561,9 @@ func (s *OpinionComments2OKOpinionsItemOpinion) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
+	for i, mask := range [2]uint8{
 		0b10000101,
+		0b00000001,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -14224,9 +14332,13 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) encodeFields(e *jx.Encoder) {
 		e.FieldStart("postedAt")
 		e.Str(s.PostedAt)
 	}
+	{
+		e.FieldStart("isDeleted")
+		e.Bool(s.IsDeleted)
+	}
 }
 
-var jsonFieldsNameOfOpinionCommentsOKOpinionsItemOpinion = [8]string{
+var jsonFieldsNameOfOpinionCommentsOKOpinionsItemOpinion = [9]string{
 	0: "id",
 	1: "title",
 	2: "content",
@@ -14235,6 +14347,7 @@ var jsonFieldsNameOfOpinionCommentsOKOpinionsItemOpinion = [8]string{
 	5: "pictureURL",
 	6: "referenceURL",
 	7: "postedAt",
+	8: "isDeleted",
 }
 
 // Decode decodes OpinionCommentsOKOpinionsItemOpinion from json.
@@ -14242,7 +14355,7 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode OpinionCommentsOKOpinionsItemOpinion to nil")
 	}
-	var requiredBitSet [1]uint8
+	var requiredBitSet [2]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -14332,6 +14445,18 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"postedAt\"")
 			}
+		case "isDeleted":
+			requiredBitSet[1] |= 1 << 0
+			if err := func() error {
+				v, err := d.Bool()
+				s.IsDeleted = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"isDeleted\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -14341,8 +14466,9 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
+	for i, mask := range [2]uint8{
 		0b10000101,
+		0b00000001,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -14946,9 +15072,13 @@ func (s *OpinionsHistoryOKOpinionsItemOpinion) encodeFields(e *jx.Encoder) {
 		e.FieldStart("postedAt")
 		e.Str(s.PostedAt)
 	}
+	{
+		e.FieldStart("isDeleted")
+		e.Bool(s.IsDeleted)
+	}
 }
 
-var jsonFieldsNameOfOpinionsHistoryOKOpinionsItemOpinion = [8]string{
+var jsonFieldsNameOfOpinionsHistoryOKOpinionsItemOpinion = [9]string{
 	0: "id",
 	1: "title",
 	2: "content",
@@ -14957,6 +15087,7 @@ var jsonFieldsNameOfOpinionsHistoryOKOpinionsItemOpinion = [8]string{
 	5: "pictureURL",
 	6: "referenceURL",
 	7: "postedAt",
+	8: "isDeleted",
 }
 
 // Decode decodes OpinionsHistoryOKOpinionsItemOpinion from json.
@@ -14964,7 +15095,7 @@ func (s *OpinionsHistoryOKOpinionsItemOpinion) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode OpinionsHistoryOKOpinionsItemOpinion to nil")
 	}
-	var requiredBitSet [1]uint8
+	var requiredBitSet [2]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -15054,6 +15185,18 @@ func (s *OpinionsHistoryOKOpinionsItemOpinion) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"postedAt\"")
 			}
+		case "isDeleted":
+			requiredBitSet[1] |= 1 << 0
+			if err := func() error {
+				v, err := d.Bool()
+				s.IsDeleted = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"isDeleted\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -15063,8 +15206,9 @@ func (s *OpinionsHistoryOKOpinionsItemOpinion) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
+	for i, mask := range [2]uint8{
 		0b10000101,
+		0b00000001,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -20488,9 +20632,13 @@ func (s *SwipeOpinionsOKOpinionsItemOpinion) encodeFields(e *jx.Encoder) {
 		e.FieldStart("postedAt")
 		e.Str(s.PostedAt)
 	}
+	{
+		e.FieldStart("isDeleted")
+		e.Bool(s.IsDeleted)
+	}
 }
 
-var jsonFieldsNameOfSwipeOpinionsOKOpinionsItemOpinion = [8]string{
+var jsonFieldsNameOfSwipeOpinionsOKOpinionsItemOpinion = [9]string{
 	0: "id",
 	1: "title",
 	2: "content",
@@ -20499,6 +20647,7 @@ var jsonFieldsNameOfSwipeOpinionsOKOpinionsItemOpinion = [8]string{
 	5: "pictureURL",
 	6: "referenceURL",
 	7: "postedAt",
+	8: "isDeleted",
 }
 
 // Decode decodes SwipeOpinionsOKOpinionsItemOpinion from json.
@@ -20506,7 +20655,7 @@ func (s *SwipeOpinionsOKOpinionsItemOpinion) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode SwipeOpinionsOKOpinionsItemOpinion to nil")
 	}
-	var requiredBitSet [1]uint8
+	var requiredBitSet [2]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -20596,6 +20745,18 @@ func (s *SwipeOpinionsOKOpinionsItemOpinion) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"postedAt\"")
 			}
+		case "isDeleted":
+			requiredBitSet[1] |= 1 << 0
+			if err := func() error {
+				v, err := d.Bool()
+				s.IsDeleted = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"isDeleted\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -20605,8 +20766,9 @@ func (s *SwipeOpinionsOKOpinionsItemOpinion) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
+	for i, mask := range [2]uint8{
 		0b10000101,
+		0b00000001,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -21551,9 +21713,13 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) encodeFields
 		e.FieldStart("postedAt")
 		e.Str(s.PostedAt)
 	}
+	{
+		e.FieldStart("isDeleted")
+		e.Bool(s.IsDeleted)
+	}
 }
 
-var jsonFieldsNameOfTalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion = [8]string{
+var jsonFieldsNameOfTalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion = [9]string{
 	0: "id",
 	1: "title",
 	2: "content",
@@ -21562,6 +21728,7 @@ var jsonFieldsNameOfTalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion = 
 	5: "pictureURL",
 	6: "referenceURL",
 	7: "postedAt",
+	8: "isDeleted",
 }
 
 // Decode decodes TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion from json.
@@ -21569,7 +21736,7 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) Decode(d *jx
 	if s == nil {
 		return errors.New("invalid: unable to decode TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion to nil")
 	}
-	var requiredBitSet [1]uint8
+	var requiredBitSet [2]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -21659,6 +21826,18 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) Decode(d *jx
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"postedAt\"")
 			}
+		case "isDeleted":
+			requiredBitSet[1] |= 1 << 0
+			if err := func() error {
+				v, err := d.Bool()
+				s.IsDeleted = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"isDeleted\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -21668,8 +21847,9 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) Decode(d *jx
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
+	for i, mask := range [2]uint8{
 		0b10000101,
+		0b00000001,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -22880,9 +23060,13 @@ func (s *Vote2OKItem) encodeFields(e *jx.Encoder) {
 		e.FieldStart("postedAt")
 		e.Str(s.PostedAt)
 	}
+	{
+		e.FieldStart("isDeleted")
+		e.Bool(s.IsDeleted)
+	}
 }
 
-var jsonFieldsNameOfVote2OKItem = [8]string{
+var jsonFieldsNameOfVote2OKItem = [9]string{
 	0: "id",
 	1: "title",
 	2: "content",
@@ -22891,6 +23075,7 @@ var jsonFieldsNameOfVote2OKItem = [8]string{
 	5: "pictureURL",
 	6: "referenceURL",
 	7: "postedAt",
+	8: "isDeleted",
 }
 
 // Decode decodes Vote2OKItem from json.
@@ -22898,7 +23083,7 @@ func (s *Vote2OKItem) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode Vote2OKItem to nil")
 	}
-	var requiredBitSet [1]uint8
+	var requiredBitSet [2]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -22988,6 +23173,18 @@ func (s *Vote2OKItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"postedAt\"")
 			}
+		case "isDeleted":
+			requiredBitSet[1] |= 1 << 0
+			if err := func() error {
+				v, err := d.Bool()
+				s.IsDeleted = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"isDeleted\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -22997,8 +23194,9 @@ func (s *Vote2OKItem) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
+	for i, mask := range [2]uint8{
 		0b10000101,
+		0b00000001,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -23413,9 +23611,13 @@ func (s *VoteOKItem) encodeFields(e *jx.Encoder) {
 		e.FieldStart("postedAt")
 		e.Str(s.PostedAt)
 	}
+	{
+		e.FieldStart("isDeleted")
+		e.Bool(s.IsDeleted)
+	}
 }
 
-var jsonFieldsNameOfVoteOKItem = [8]string{
+var jsonFieldsNameOfVoteOKItem = [9]string{
 	0: "id",
 	1: "title",
 	2: "content",
@@ -23424,6 +23626,7 @@ var jsonFieldsNameOfVoteOKItem = [8]string{
 	5: "pictureURL",
 	6: "referenceURL",
 	7: "postedAt",
+	8: "isDeleted",
 }
 
 // Decode decodes VoteOKItem from json.
@@ -23431,7 +23634,7 @@ func (s *VoteOKItem) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode VoteOKItem to nil")
 	}
-	var requiredBitSet [1]uint8
+	var requiredBitSet [2]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -23521,6 +23724,18 @@ func (s *VoteOKItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"postedAt\"")
 			}
+		case "isDeleted":
+			requiredBitSet[1] |= 1 << 0
+			if err := func() error {
+				v, err := d.Bool()
+				s.IsDeleted = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"isDeleted\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -23530,8 +23745,9 @@ func (s *VoteOKItem) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
+	for i, mask := range [2]uint8{
 		0b10000101,
+		0b00000001,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

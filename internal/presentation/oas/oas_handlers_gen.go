@@ -4134,6 +4134,8 @@ func (s *Server) handleOAuthTokenRevokeRequest(args [0]string, argsEscaped bool,
 //
 // 意見に対するリプライ意見一覧.
 //
+// Deprecated: schema marks this operation as deprecated.
+//
 // GET /talksessions/{talkSessionID}/opinions/{opinionID}/replies
 func (s *Server) handleOpinionCommentsRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
@@ -6177,8 +6179,6 @@ func (s *Server) handleSolveOpinionReportRequest(args [1]string, argsEscaped boo
 //
 // セッションの中からまだ投票していない意見をランダムに取得する
 // remainingCountは取得した意見を含めてスワイプできる意見の総数を返す.
-//
-// Deprecated: schema marks this operation as deprecated.
 //
 // GET /talksessions/{talkSessionID}/swipe_opinions
 func (s *Server) handleSwipeOpinionsRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {

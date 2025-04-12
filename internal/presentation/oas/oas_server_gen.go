@@ -136,6 +136,8 @@ type OpinionHandler interface {
 	//
 	// 意見に対するリプライ意見一覧.
 	//
+	// Deprecated: schema marks this operation as deprecated.
+	//
 	// GET /talksessions/{talkSessionID}/opinions/{opinionID}/replies
 	OpinionComments(ctx context.Context, params OpinionCommentsParams) (OpinionCommentsRes, error)
 	// OpinionComments2 implements opinionComments2 operation.
@@ -175,8 +177,6 @@ type OpinionHandler interface {
 	//
 	// セッションの中からまだ投票していない意見をランダムに取得する
 	// remainingCountは取得した意見を含めてスワイプできる意見の総数を返す.
-	//
-	// Deprecated: schema marks this operation as deprecated.
 	//
 	// GET /talksessions/{talkSessionID}/swipe_opinions
 	SwipeOpinions(ctx context.Context, params SwipeOpinionsParams) (SwipeOpinionsRes, error)

@@ -1823,6 +1823,7 @@ type GetOpinionDetail2OKOpinion struct {
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
 	PostedAt     string    `json:"postedAt"`
+	IsDeleted    bool      `json:"isDeleted"`
 }
 
 // GetID returns the value of ID.
@@ -1865,6 +1866,11 @@ func (s *GetOpinionDetail2OKOpinion) GetPostedAt() string {
 	return s.PostedAt
 }
 
+// GetIsDeleted returns the value of IsDeleted.
+func (s *GetOpinionDetail2OKOpinion) GetIsDeleted() bool {
+	return s.IsDeleted
+}
+
 // SetID sets the value of ID.
 func (s *GetOpinionDetail2OKOpinion) SetID(val string) {
 	s.ID = val
@@ -1903,6 +1909,11 @@ func (s *GetOpinionDetail2OKOpinion) SetReferenceURL(val OptString) {
 // SetPostedAt sets the value of PostedAt.
 func (s *GetOpinionDetail2OKOpinion) SetPostedAt(val string) {
 	s.PostedAt = val
+}
+
+// SetIsDeleted sets the value of IsDeleted.
+func (s *GetOpinionDetail2OKOpinion) SetIsDeleted(val bool) {
+	s.IsDeleted = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -2038,6 +2049,7 @@ type GetOpinionDetailOKOpinion struct {
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
 	PostedAt     string    `json:"postedAt"`
+	IsDeleted    bool      `json:"isDeleted"`
 }
 
 // GetID returns the value of ID.
@@ -2080,6 +2092,11 @@ func (s *GetOpinionDetailOKOpinion) GetPostedAt() string {
 	return s.PostedAt
 }
 
+// GetIsDeleted returns the value of IsDeleted.
+func (s *GetOpinionDetailOKOpinion) GetIsDeleted() bool {
+	return s.IsDeleted
+}
+
 // SetID sets the value of ID.
 func (s *GetOpinionDetailOKOpinion) SetID(val string) {
 	s.ID = val
@@ -2118,6 +2135,11 @@ func (s *GetOpinionDetailOKOpinion) SetReferenceURL(val OptString) {
 // SetPostedAt sets the value of PostedAt.
 func (s *GetOpinionDetailOKOpinion) SetPostedAt(val string) {
 	s.PostedAt = val
+}
+
+// SetIsDeleted sets the value of IsDeleted.
+func (s *GetOpinionDetailOKOpinion) SetIsDeleted(val bool) {
+	s.IsDeleted = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -2330,6 +2352,7 @@ type GetOpinionReportsOKOpinion struct {
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
 	PostedAt     string    `json:"postedAt"`
+	IsDeleted    bool      `json:"isDeleted"`
 }
 
 // GetID returns the value of ID.
@@ -2372,6 +2395,11 @@ func (s *GetOpinionReportsOKOpinion) GetPostedAt() string {
 	return s.PostedAt
 }
 
+// GetIsDeleted returns the value of IsDeleted.
+func (s *GetOpinionReportsOKOpinion) GetIsDeleted() bool {
+	return s.IsDeleted
+}
+
 // SetID sets the value of ID.
 func (s *GetOpinionReportsOKOpinion) SetID(val string) {
 	s.ID = val
@@ -2410,6 +2438,11 @@ func (s *GetOpinionReportsOKOpinion) SetReferenceURL(val OptString) {
 // SetPostedAt sets the value of PostedAt.
 func (s *GetOpinionReportsOKOpinion) SetPostedAt(val string) {
 	s.PostedAt = val
+}
+
+// SetIsDeleted sets the value of IsDeleted.
+func (s *GetOpinionReportsOKOpinion) SetIsDeleted(val bool) {
+	s.IsDeleted = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -2717,6 +2750,7 @@ type GetOpinionsForTalkSessionOKOpinionsItemOpinion struct {
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
 	PostedAt     string    `json:"postedAt"`
+	IsDeleted    bool      `json:"isDeleted"`
 }
 
 // GetID returns the value of ID.
@@ -2759,6 +2793,11 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) GetPostedAt() string {
 	return s.PostedAt
 }
 
+// GetIsDeleted returns the value of IsDeleted.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) GetIsDeleted() bool {
+	return s.IsDeleted
+}
+
 // SetID sets the value of ID.
 func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) SetID(val string) {
 	s.ID = val
@@ -2797,6 +2836,11 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) SetReferenceURL(val Opt
 // SetPostedAt sets the value of PostedAt.
 func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) SetPostedAt(val string) {
 	s.PostedAt = val
+}
+
+// SetIsDeleted sets the value of IsDeleted.
+func (s *GetOpinionsForTalkSessionOKOpinionsItemOpinion) SetIsDeleted(val bool) {
+	s.IsDeleted = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -3095,6 +3139,7 @@ type GetReportsForTalkSessionOKReportsItemOpinion struct {
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
 	PostedAt     string    `json:"postedAt"`
+	IsDeleted    bool      `json:"isDeleted"`
 }
 
 // GetID returns the value of ID.
@@ -3137,6 +3182,11 @@ func (s *GetReportsForTalkSessionOKReportsItemOpinion) GetPostedAt() string {
 	return s.PostedAt
 }
 
+// GetIsDeleted returns the value of IsDeleted.
+func (s *GetReportsForTalkSessionOKReportsItemOpinion) GetIsDeleted() bool {
+	return s.IsDeleted
+}
+
 // SetID sets the value of ID.
 func (s *GetReportsForTalkSessionOKReportsItemOpinion) SetID(val string) {
 	s.ID = val
@@ -3175,6 +3225,11 @@ func (s *GetReportsForTalkSessionOKReportsItemOpinion) SetReferenceURL(val OptSt
 // SetPostedAt sets the value of PostedAt.
 func (s *GetReportsForTalkSessionOKReportsItemOpinion) SetPostedAt(val string) {
 	s.PostedAt = val
+}
+
+// SetIsDeleted sets the value of IsDeleted.
+func (s *GetReportsForTalkSessionOKReportsItemOpinion) SetIsDeleted(val bool) {
+	s.IsDeleted = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -5146,6 +5201,7 @@ type OpinionComments2OKOpinionsItemOpinion struct {
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
 	PostedAt     string    `json:"postedAt"`
+	IsDeleted    bool      `json:"isDeleted"`
 }
 
 // GetID returns the value of ID.
@@ -5188,6 +5244,11 @@ func (s *OpinionComments2OKOpinionsItemOpinion) GetPostedAt() string {
 	return s.PostedAt
 }
 
+// GetIsDeleted returns the value of IsDeleted.
+func (s *OpinionComments2OKOpinionsItemOpinion) GetIsDeleted() bool {
+	return s.IsDeleted
+}
+
 // SetID sets the value of ID.
 func (s *OpinionComments2OKOpinionsItemOpinion) SetID(val string) {
 	s.ID = val
@@ -5226,6 +5287,11 @@ func (s *OpinionComments2OKOpinionsItemOpinion) SetReferenceURL(val OptString) {
 // SetPostedAt sets the value of PostedAt.
 func (s *OpinionComments2OKOpinionsItemOpinion) SetPostedAt(val string) {
 	s.PostedAt = val
+}
+
+// SetIsDeleted sets the value of IsDeleted.
+func (s *OpinionComments2OKOpinionsItemOpinion) SetIsDeleted(val bool) {
+	s.IsDeleted = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -5484,6 +5550,7 @@ type OpinionCommentsOKOpinionsItemOpinion struct {
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
 	PostedAt     string    `json:"postedAt"`
+	IsDeleted    bool      `json:"isDeleted"`
 }
 
 // GetID returns the value of ID.
@@ -5526,6 +5593,11 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) GetPostedAt() string {
 	return s.PostedAt
 }
 
+// GetIsDeleted returns the value of IsDeleted.
+func (s *OpinionCommentsOKOpinionsItemOpinion) GetIsDeleted() bool {
+	return s.IsDeleted
+}
+
 // SetID sets the value of ID.
 func (s *OpinionCommentsOKOpinionsItemOpinion) SetID(val string) {
 	s.ID = val
@@ -5564,6 +5636,11 @@ func (s *OpinionCommentsOKOpinionsItemOpinion) SetReferenceURL(val OptString) {
 // SetPostedAt sets the value of PostedAt.
 func (s *OpinionCommentsOKOpinionsItemOpinion) SetPostedAt(val string) {
 	s.PostedAt = val
+}
+
+// SetIsDeleted sets the value of IsDeleted.
+func (s *OpinionCommentsOKOpinionsItemOpinion) SetIsDeleted(val bool) {
+	s.IsDeleted = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -5739,6 +5816,7 @@ type OpinionsHistoryOKOpinionsItemOpinion struct {
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
 	PostedAt     string    `json:"postedAt"`
+	IsDeleted    bool      `json:"isDeleted"`
 }
 
 // GetID returns the value of ID.
@@ -5781,6 +5859,11 @@ func (s *OpinionsHistoryOKOpinionsItemOpinion) GetPostedAt() string {
 	return s.PostedAt
 }
 
+// GetIsDeleted returns the value of IsDeleted.
+func (s *OpinionsHistoryOKOpinionsItemOpinion) GetIsDeleted() bool {
+	return s.IsDeleted
+}
+
 // SetID sets the value of ID.
 func (s *OpinionsHistoryOKOpinionsItemOpinion) SetID(val string) {
 	s.ID = val
@@ -5819,6 +5902,11 @@ func (s *OpinionsHistoryOKOpinionsItemOpinion) SetReferenceURL(val OptString) {
 // SetPostedAt sets the value of PostedAt.
 func (s *OpinionsHistoryOKOpinionsItemOpinion) SetPostedAt(val string) {
 	s.PostedAt = val
+}
+
+// SetIsDeleted sets the value of IsDeleted.
+func (s *OpinionsHistoryOKOpinionsItemOpinion) SetIsDeleted(val bool) {
+	s.IsDeleted = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -10515,6 +10603,7 @@ type SwipeOpinionsOKOpinionsItemOpinion struct {
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
 	PostedAt     string    `json:"postedAt"`
+	IsDeleted    bool      `json:"isDeleted"`
 }
 
 // GetID returns the value of ID.
@@ -10557,6 +10646,11 @@ func (s *SwipeOpinionsOKOpinionsItemOpinion) GetPostedAt() string {
 	return s.PostedAt
 }
 
+// GetIsDeleted returns the value of IsDeleted.
+func (s *SwipeOpinionsOKOpinionsItemOpinion) GetIsDeleted() bool {
+	return s.IsDeleted
+}
+
 // SetID sets the value of ID.
 func (s *SwipeOpinionsOKOpinionsItemOpinion) SetID(val string) {
 	s.ID = val
@@ -10595,6 +10689,11 @@ func (s *SwipeOpinionsOKOpinionsItemOpinion) SetReferenceURL(val OptString) {
 // SetPostedAt sets the value of PostedAt.
 func (s *SwipeOpinionsOKOpinionsItemOpinion) SetPostedAt(val string) {
 	s.PostedAt = val
+}
+
+// SetIsDeleted sets the value of IsDeleted.
+func (s *SwipeOpinionsOKOpinionsItemOpinion) SetIsDeleted(val bool) {
+	s.IsDeleted = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -10885,6 +10984,7 @@ type TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion struct {
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
 	PostedAt     string    `json:"postedAt"`
+	IsDeleted    bool      `json:"isDeleted"`
 }
 
 // GetID returns the value of ID.
@@ -10927,6 +11027,11 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) GetPostedAt(
 	return s.PostedAt
 }
 
+// GetIsDeleted returns the value of IsDeleted.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) GetIsDeleted() bool {
+	return s.IsDeleted
+}
+
 // SetID sets the value of ID.
 func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) SetID(val string) {
 	s.ID = val
@@ -10965,6 +11070,11 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) SetReference
 // SetPostedAt sets the value of PostedAt.
 func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) SetPostedAt(val string) {
 	s.PostedAt = val
+}
+
+// SetIsDeleted sets the value of IsDeleted.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion) SetIsDeleted(val bool) {
+	s.IsDeleted = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -11389,6 +11499,7 @@ type Vote2OKItem struct {
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
 	PostedAt     string    `json:"postedAt"`
+	IsDeleted    bool      `json:"isDeleted"`
 }
 
 // GetID returns the value of ID.
@@ -11431,6 +11542,11 @@ func (s *Vote2OKItem) GetPostedAt() string {
 	return s.PostedAt
 }
 
+// GetIsDeleted returns the value of IsDeleted.
+func (s *Vote2OKItem) GetIsDeleted() bool {
+	return s.IsDeleted
+}
+
 // SetID sets the value of ID.
 func (s *Vote2OKItem) SetID(val string) {
 	s.ID = val
@@ -11469,6 +11585,11 @@ func (s *Vote2OKItem) SetReferenceURL(val OptString) {
 // SetPostedAt sets the value of PostedAt.
 func (s *Vote2OKItem) SetPostedAt(val string) {
 	s.PostedAt = val
+}
+
+// SetIsDeleted sets the value of IsDeleted.
+func (s *Vote2OKItem) SetIsDeleted(val bool) {
+	s.IsDeleted = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.
@@ -11655,6 +11776,7 @@ type VoteOKItem struct {
 	// 参考文献URL.
 	ReferenceURL OptString `json:"referenceURL"`
 	PostedAt     string    `json:"postedAt"`
+	IsDeleted    bool      `json:"isDeleted"`
 }
 
 // GetID returns the value of ID.
@@ -11697,6 +11819,11 @@ func (s *VoteOKItem) GetPostedAt() string {
 	return s.PostedAt
 }
 
+// GetIsDeleted returns the value of IsDeleted.
+func (s *VoteOKItem) GetIsDeleted() bool {
+	return s.IsDeleted
+}
+
 // SetID sets the value of ID.
 func (s *VoteOKItem) SetID(val string) {
 	s.ID = val
@@ -11735,6 +11862,11 @@ func (s *VoteOKItem) SetReferenceURL(val OptString) {
 // SetPostedAt sets the value of PostedAt.
 func (s *VoteOKItem) SetPostedAt(val string) {
 	s.PostedAt = val
+}
+
+// SetIsDeleted sets the value of IsDeleted.
+func (s *VoteOKItem) SetIsDeleted(val bool) {
+	s.IsDeleted = val
 }
 
 // 意見投稿主の意見。ルート意見の場合はここには何も入らない.

@@ -9,6 +9,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
+	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/server/internal/usecase/query/dto"
@@ -30,7 +31,6 @@ func NewGetOpinionReportQueryInteractor(
 		DBManager:      dbManager,
 		talkSessionRep: talkSessionRep,
 	}
-
 }
 
 // Execute implements report_query.GetOpinionReportQuery.
@@ -79,6 +79,7 @@ func (g *getOpinionReportQueryInteractor) Execute(ctx context.Context, input rep
 
 	// reportMapより、reportの情報を取得
 	var reportDetailReasons []dto.ReportDetailReason
+	reportedUser :=  make(map[shared.UUID[user.User]]any)
 	for _, reportDetail := range reports {
 		detailDTO := dto.ReportDetailReason{
 			ReportID: shared.UUID[opinion.Report](reportDetail.OpinionReport.OpinionReportID),
@@ -87,7 +88,7 @@ func (g *getOpinionReportQueryInteractor) Execute(ctx context.Context, input rep
 		if reportDetail.OpinionReport.ReasonText.Valid {
 			detailDTO.Content = &reportDetail.OpinionReport.ReasonText.String
 		}
-
+		reportedUser[shared.UUID[user.User](reportDetail.OpinionReport.ReporterID)] = struct{}{}
 		reportDetailReasons = append(reportDetailReasons, detailDTO)
 	}
 
@@ -96,7 +97,7 @@ func (g *getOpinionReportQueryInteractor) Execute(ctx context.Context, input rep
 			Opinion:     op,
 			User:        usr,
 			Reasons:     reportDetailReasons,
-			ReportCount: len(reportDetailReasons),
+			ReportCount: len(reportedUser),
 			Status:      reports[0].OpinionReport.Status,
 		},
 	}, nil

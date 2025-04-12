@@ -303,6 +303,8 @@ func (UnimplementedHandler) OAuthTokenRevoke(ctx context.Context) (r OAuthTokenR
 //
 // 意見に対するリプライ意見一覧.
 //
+// Deprecated: schema marks this operation as deprecated.
+//
 // GET /talksessions/{talkSessionID}/opinions/{opinionID}/replies
 func (UnimplementedHandler) OpinionComments(ctx context.Context, params OpinionCommentsParams) (r OpinionCommentsRes, _ error) {
 	return r, ht.ErrNotImplemented
@@ -424,8 +426,6 @@ func (UnimplementedHandler) SolveOpinionReport(ctx context.Context, req OptSolve
 //
 // セッションの中からまだ投票していない意見をランダムに取得する
 // remainingCountは取得した意見を含めてスワイプできる意見の総数を返す.
-//
-// Deprecated: schema marks this operation as deprecated.
 //
 // GET /talksessions/{talkSessionID}/swipe_opinions
 func (UnimplementedHandler) SwipeOpinions(ctx context.Context, params SwipeOpinionsParams) (r SwipeOpinionsRes, _ error) {

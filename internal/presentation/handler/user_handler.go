@@ -119,6 +119,7 @@ func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHi
 				ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
 				PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.PictureURL),
 				PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
+				IsDeleted:    opinion.Opinion.IsDeleted,
 			},
 			User: oas.OpinionsHistoryOKOpinionsItemUser{
 				DisplayID:   opinion.User.DisplayID,

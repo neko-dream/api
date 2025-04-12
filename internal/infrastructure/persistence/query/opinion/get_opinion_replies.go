@@ -7,6 +7,7 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
+	dto_mapper "github.com/neko-dream/server/internal/infrastructure/persistence/utils"
 	"github.com/neko-dream/server/internal/usecase/query/dto"
 	opinion_query "github.com/neko-dream/server/internal/usecase/query/opinion"
 	"github.com/neko-dream/server/pkg/utils"
@@ -50,6 +51,18 @@ func (g *GetOpinionRepliesQueryHandler) Execute(ctx context.Context, in opinion_
 	}); err != nil {
 		utils.HandleError(ctx, err, "マッピングに失敗")
 		return nil, err
+	}
+
+	// 通報された意見を処理
+	if len(replies) > 0 {
+		opinionIDs := dto_mapper.ExtractOpinionIDs(replies)
+		reports, err := g.GetQueries(ctx).FindReportByOpinionIDs(ctx, opinionIDs)
+		if err != nil {
+			utils.HandleError(ctx, err, "通報情報の取得に失敗")
+			return nil, err
+		}
+
+		replies = dto_mapper.ProcessReportedOpinions(replies, reports)
 	}
 
 	return &opinion_query.GetOpinionRepliesQueryOutput{

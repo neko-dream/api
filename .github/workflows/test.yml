@@ -63,7 +63,7 @@ jobs:
         run: |
           go install github.com/k1LoW/runn/cmd/runn@latest
           POLICY_VERSION="1.0.0" go run cmd/server/main.go & sleep 5
-          runn run ./e2e/**/* --verbose
+          ./scripts/test.sh
 
       - name: Coverage Report
         uses: k1LoW/octocov-action@v1

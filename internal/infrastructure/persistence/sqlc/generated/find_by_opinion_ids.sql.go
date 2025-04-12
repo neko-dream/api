@@ -44,7 +44,7 @@ type FindOpinionsByOpinionIDsRow struct {
 //	ORDER BY opinions.created_at DESC
 func (q *Queries) FindOpinionsByOpinionIDs(ctx context.Context, opinionIds []uuid.UUID) ([]FindOpinionsByOpinionIDsRow, error) {
 	query := findOpinionsByOpinionIDs
-	var queryParams []any
+	var queryParams []interface{}
 	if len(opinionIds) > 0 {
 		for _, v := range opinionIds {
 			queryParams = append(queryParams, v)
