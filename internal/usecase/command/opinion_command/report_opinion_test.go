@@ -51,6 +51,11 @@ type mockReportRepository struct {
 	mock.Mock
 }
 
+// CountByTalkSessionIDAndStatus implements opinion.ReportRepository.
+func (m *mockReportRepository) CountByTalkSessionIDAndStatus(context.Context, shared.UUID[talksession.TalkSession], opinion.Status) (int, error) {
+	panic("unimplemented")
+}
+
 func (m *mockReportRepository) Create(ctx context.Context, report opinion.Report) error {
 	args := m.Called(ctx, report)
 	return args.Error(0)

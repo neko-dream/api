@@ -81,6 +81,10 @@ type GetTalkSessionListRes interface {
 	getTalkSessionListRes()
 }
 
+type GetTalkSessionReportCountRes interface {
+	getTalkSessionReportCountRes()
+}
+
 type GetTalkSessionReportRes interface {
 	getTalkSessionReportRes()
 }

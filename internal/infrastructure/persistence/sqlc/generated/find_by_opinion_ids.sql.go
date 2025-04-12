@@ -22,6 +22,7 @@ LEFT JOIN users
     ON opinions.user_id = users.user_id
 WHERE
     opinions.opinion_id IN($1)
+ORDER BY opinions.created_at DESC
 `
 
 type FindOpinionsByOpinionIDsRow struct {
@@ -40,9 +41,10 @@ type FindOpinionsByOpinionIDsRow struct {
 //	    ON opinions.user_id = users.user_id
 //	WHERE
 //	    opinions.opinion_id IN($1)
+//	ORDER BY opinions.created_at DESC
 func (q *Queries) FindOpinionsByOpinionIDs(ctx context.Context, opinionIds []uuid.UUID) ([]FindOpinionsByOpinionIDsRow, error) {
 	query := findOpinionsByOpinionIDs
-	var queryParams []interface{}
+	var queryParams []any
 	if len(opinionIds) > 0 {
 		for _, v := range opinionIds {
 			queryParams = append(queryParams, v)

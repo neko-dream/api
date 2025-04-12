@@ -1968,6 +1968,124 @@ func decodeGetTalkSessionReportParams(args [1]string, argsEscaped bool, r *http.
 	return params, nil
 }
 
+// GetTalkSessionReportCountParams is parameters of getTalkSessionReportCount operation.
+type GetTalkSessionReportCountParams struct {
+	TalkSessionID string
+	Status        GetTalkSessionReportCountStatus
+}
+
+func unpackGetTalkSessionReportCountParams(packed middleware.Parameters) (params GetTalkSessionReportCountParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "talkSessionID",
+			In:   "path",
+		}
+		params.TalkSessionID = packed[key].(string)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "status",
+			In:   "query",
+		}
+		params.Status = packed[key].(GetTalkSessionReportCountStatus)
+	}
+	return params
+}
+
+func decodeGetTalkSessionReportCountParams(args [1]string, argsEscaped bool, r *http.Request) (params GetTalkSessionReportCountParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode path: talkSessionID.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "talkSessionID",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.TalkSessionID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "talkSessionID",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	// Decode query: status.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "status",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.Status = GetTalkSessionReportCountStatus(c)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if err := params.Status.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "status",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // GetTalkSessionRestrictionSatisfiedParams is parameters of getTalkSessionRestrictionSatisfied operation.
 type GetTalkSessionRestrictionSatisfiedParams struct {
 	TalkSessionID string

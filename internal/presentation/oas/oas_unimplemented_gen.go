@@ -211,6 +211,15 @@ func (UnimplementedHandler) GetTalkSessionReport(ctx context.Context, params Get
 	return r, ht.ErrNotImplemented
 }
 
+// GetTalkSessionReportCount implements getTalkSessionReportCount operation.
+//
+// 通報件数.
+//
+// GET /talksessions/{talkSessionID}/reports/count
+func (UnimplementedHandler) GetTalkSessionReportCount(ctx context.Context, params GetTalkSessionReportCountParams) (r GetTalkSessionReportCountRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetTalkSessionRestrictionKeys implements getTalkSessionRestrictionKeys operation.
 //
 // セッションの投稿制限に使用できるキーの一覧を返す.
