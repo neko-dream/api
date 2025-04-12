@@ -128,6 +128,7 @@ func (o *opinionHandler) GetOpinionDetail2(ctx context.Context, params oas.GetOp
 		PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.Opinion.PictureURL),
 		ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ReferenceURL),
 		PostedAt:     opinion.Opinion.Opinion.CreatedAt.Format(time.RFC3339),
+		IsDeleted:    opinion.Opinion.Opinion.IsDeleted,
 	}
 
 	return &oas.GetOpinionDetail2OK{
@@ -194,6 +195,7 @@ func (o *opinionHandler) OpinionComments2(ctx context.Context, params oas.Opinio
 			PictureURL:   utils.ToOptNil[oas.OptNilString](reply.Opinion.PictureURL),
 			ReferenceURL: utils.ToOpt[oas.OptString](reply.Opinion.ReferenceURL),
 			PostedAt:     reply.Opinion.CreatedAt.Format(time.RFC3339),
+			IsDeleted:    reply.Opinion.IsDeleted,
 		}
 
 		var myVoteType oas.OptNilOpinionComments2OKOpinionsItemMyVoteType
@@ -296,6 +298,7 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 				ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
 				PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.PictureURL),
 				PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
+				IsDeleted:    opinion.Opinion.IsDeleted,
 			},
 			User: oas.GetOpinionsForTalkSessionOKOpinionsItemUser{
 				DisplayID:   opinion.User.DisplayID,
@@ -372,6 +375,7 @@ func (o *opinionHandler) GetOpinionDetail(ctx context.Context, params oas.GetOpi
 		PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.Opinion.PictureURL),
 		ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ReferenceURL),
 		PostedAt:     opinion.Opinion.Opinion.CreatedAt.Format(time.RFC3339),
+		IsDeleted:    opinion.Opinion.Opinion.IsDeleted,
 	}
 
 	return &oas.GetOpinionDetailOK{
@@ -440,6 +444,7 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 			PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.PictureURL),
 			ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
 			PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
+			IsDeleted:    opinion.Opinion.IsDeleted,
 		}
 		ress = append(ress, oas.SwipeOpinionsOKOpinionsItem{
 			User:       *user,
@@ -511,6 +516,7 @@ func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.Opinion
 			PictureURL:   utils.ToOptNil[oas.OptNilString](reply.Opinion.PictureURL),
 			ReferenceURL: utils.ToOpt[oas.OptString](reply.Opinion.ReferenceURL),
 			PostedAt:     reply.Opinion.CreatedAt.Format(time.RFC3339),
+			IsDeleted:    reply.Opinion.IsDeleted,
 		}
 
 		var myVoteType oas.OptNilOpinionCommentsOKOpinionsItemMyVoteType
@@ -784,6 +790,7 @@ func (o *opinionHandler) GetOpinionReports(ctx context.Context, params oas.GetOp
 			PictureURL:   utils.ToOptNil[oas.OptNilString](reports.Report.Opinion.PictureURL),
 			ReferenceURL: utils.ToOpt[oas.OptString](reports.Report.Opinion.ReferenceURL),
 			PostedAt:     reports.Report.Opinion.CreatedAt.Format(time.RFC3339),
+			IsDeleted:    reports.Report.Opinion.IsDeleted,
 		},
 		User: oas.GetOpinionReportsOKUser{
 			DisplayID:   reports.Report.User.DisplayID,

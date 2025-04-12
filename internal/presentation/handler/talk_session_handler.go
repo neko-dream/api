@@ -581,6 +581,7 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 					PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.PictureURL),
 					ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
 					PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
+					IsDeleted:    opinion.Opinion.IsDeleted,
 				},
 				User: oas.TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemUser{
 					DisplayID:   opinion.User.DisplayID,
@@ -831,6 +832,7 @@ func (t *talkSessionHandler) GetReportsForTalkSession(ctx context.Context, param
 				PictureURL:   utils.ToOptNil[oas.OptNilString](report.Opinion.PictureURL),
 				ReferenceURL: utils.ToOpt[oas.OptString](report.Opinion.ReferenceURL),
 				PostedAt:     report.Opinion.CreatedAt.Format(time.RFC3339),
+				IsDeleted:    report.Opinion.IsDeleted,
 			},
 			User: oas.GetReportsForTalkSessionOKReportsItemUser{
 				DisplayID:   report.User.DisplayID,
