@@ -8,6 +8,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/domain/model/vote"
+	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/samber/lo"
 )
 
@@ -43,6 +44,21 @@ func (s *SwipeOpinion) GetParentVoteType() *string {
 		return nil
 	}
 	return lo.ToPtr(vote.VoteTypeFromInt(s.ParentVoteType).String())
+}
+
+func (s *Opinion) ReplaceReported(reports []model.OpinionReport) {
+	if len(reports) == 0 {
+		return
+	}
+	report := "この意見は運営により削除されました。\n削除理由:\n"
+	for _, r := range reports {
+		reason := opinion.Reason(r.Reason)
+		report += "・" + reason.StringJP() + "\n"
+	}
+	s.Content = report
+	s.PictureURL = nil
+	s.ReferenceURL = nil
+	s.Title = nil
 }
 
 type OpinionWithRepresentative struct {
