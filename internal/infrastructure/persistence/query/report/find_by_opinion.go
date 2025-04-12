@@ -31,7 +31,6 @@ func NewGetOpinionReportQueryInteractor(
 		DBManager:      dbManager,
 		talkSessionRep: talkSessionRep,
 	}
-
 }
 
 // Execute implements report_query.GetOpinionReportQuery.
