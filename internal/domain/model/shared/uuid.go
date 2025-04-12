@@ -1,7 +1,9 @@
 package shared
 
-import "github.com/google/uuid"
-import "braces.dev/errtrace"
+import (
+	"braces.dev/errtrace"
+	"github.com/google/uuid"
+)
 
 type UUID[T any] uuid.UUID
 
@@ -26,3 +28,5 @@ func ParseUUID[T any](s string) (UUID[T], error) {
 	u, err := uuid.Parse(s)
 	return UUID[T](u), errtrace.Wrap(err)
 }
+
+var NilUUID = uuid.MustParse("00000000-0000-0000-0000-000000000000")
