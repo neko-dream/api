@@ -7,10 +7,12 @@ import (
 
 	"braces.dev/errtrace"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/config"
+	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
@@ -18,6 +20,7 @@ import (
 
 type tokenManager struct {
 	secret string
+	*db.DBManager
 	session.SessionRepository
 }
 
@@ -68,7 +71,17 @@ func (j *tokenManager) Generate(ctx context.Context, user user.User, sessionID s
 	ctx, span := otel.Tracer("jwt").Start(ctx, "tokenManager.Generate")
 	defer span.End()
 
-	claim := session.NewClaim(ctx, user, sessionID)
+	requiredPasswordChange := false
+	if user.Provider() == auth.ProviderPassword {
+		auths, err := j.DBManager.GetQueries(ctx).GetPasswordAuthByUserId(ctx, user.UserID().UUID())
+		if err != nil {
+			utils.HandleError(ctx, err, "GetPasswordAuthByUserId")
+			return "", err
+		}
+		requiredPasswordChange = auths.PasswordAuth.RequiredPasswordChange
+	}
+
+	claim := session.NewClaim(ctx, user, sessionID, requiredPasswordChange)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim.GenMapClaim())
 	return errtrace.Wrap2(token.SignedString([]byte(j.secret)))
 }

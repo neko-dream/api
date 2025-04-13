@@ -67,5 +67,6 @@ func useCaseDeps() []ProvideArg {
 		{report_q.NewGetCountQueryInteractor, nil},
 		{auth_command.NewPasswordRegister, nil},
 		{auth_command.NewPasswordLogin, nil},
+		{auth_command.NewChangePassword, nil},
 	}
 }

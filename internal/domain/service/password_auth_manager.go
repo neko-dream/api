@@ -29,7 +29,7 @@ func NewPasswordAuthManager(
 }
 
 // RegisterPassword 新しいパスワードを登録
-func (u *passwordAuthManager) RegisterPassword(ctx context.Context, userID shared.UUID[user.User], plainPassword string) error {
+func (u *passwordAuthManager) RegisterPassword(ctx context.Context, userID shared.UUID[user.User], plainPassword string, requiredChange bool) error {
 	ctx, span := otel.Tracer("usecase").Start(ctx, "passwordAuthUseCase.RegisterPassword")
 	defer span.End()
 
@@ -43,7 +43,7 @@ func (u *passwordAuthManager) RegisterPassword(ctx context.Context, userID share
 		return err
 	}
 
-	return u.passwordAuthRepo.CreatePasswordAuth(ctx, userID, hashedPassword, salt)
+	return u.passwordAuthRepo.CreatePasswordAuth(ctx, userID, hashedPassword, salt, requiredChange)
 }
 
 // VerifyPassword パスワードを検証
@@ -79,5 +79,5 @@ func (u *passwordAuthManager) UpdatePassword(ctx context.Context, userID shared.
 		return err
 	}
 
-	return u.passwordAuthRepo.UpdatePasswordAuth(ctx, userID, hashedPassword, salt)
+	return u.passwordAuthRepo.UpdatePasswordAuth(ctx, userID, hashedPassword, salt, false)
 }

@@ -122,7 +122,7 @@ func (p *passwordRegisterInteractor) Execute(ctx context.Context, input Password
 			utils.HandleError(ctx, err, "UserRepository.Create")
 			return errtrace.Wrap(err)
 		}
-		if err := p.passwordAuthManager.RegisterPassword(ctx, newUser.UserID(), input.Password); err != nil {
+		if err := p.passwordAuthManager.RegisterPassword(ctx, newUser.UserID(), input.Password, false); err != nil {
 			utils.HandleError(ctx, err, "PasswordAuthManager.RegisterPassword")
 			return errtrace.Wrap(err)
 		}

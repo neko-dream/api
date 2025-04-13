@@ -22,33 +22,34 @@ type (
 	}
 
 	Claim struct {
-		Sub             string  `json:"sub"` // subject (user)
-		Iat             int64   `json:"iat"` // issued at (seconds)
-		Exp             int64   `json:"exp"` // expiration time (seconds)
-		Jti             string  `json:"jti"` // JWT ID（SessionID）
-		IconURL         *string `json:"iconURL,omitempty"`
-		DisplayName     *string `json:"displayName,omitempty"`
-		DisplayID       *string `json:"displayID,omitempty"`
-		IsRegistered    bool    `json:"isRegistered"`
-		IsEmailVerified bool    `json:"isEmailVerified"`
+		Sub                    string  `json:"sub"` // subject (user)
+		Iat                    int64   `json:"iat"` // issued at (seconds)
+		Exp                    int64   `json:"exp"` // expiration time (seconds)
+		Jti                    string  `json:"jti"` // JWT ID（SessionID）
+		IconURL                *string `json:"iconURL,omitempty"`
+		DisplayName            *string `json:"displayName,omitempty"`
+		DisplayID              *string `json:"displayID,omitempty"`
+		IsRegistered           bool    `json:"isRegistered"`
+		IsEmailVerified        bool    `json:"isEmailVerified"`
+		RequiredPasswordChange bool    `json:"requiredPasswordChange"`
 	}
 )
 
-func NewClaim(ctx context.Context, user user.User, sessionID shared.UUID[Session]) Claim {
+func NewClaim(ctx context.Context, user user.User, sessionID shared.UUID[Session], requiredPasswordChange bool) Claim {
 	ctx, span := otel.Tracer("session").Start(ctx, "NewClaim")
 	defer span.End()
-
 	now := clock.Now(ctx)
 	return Claim{
-		Sub:             user.UserID().String(),
-		Iat:             now.Unix(),
-		Exp:             now.Add(time.Second * 60 * 60 * 24 * 7).Unix(),
-		Jti:             sessionID.String(),
-		IconURL:         user.IconURL(),
-		DisplayID:       user.DisplayID(),
-		DisplayName:     user.DisplayName(),
-		IsRegistered:    user.Verify(),
-		IsEmailVerified: user.IsEmailVerified(),
+		Sub:                    user.UserID().String(),
+		Iat:                    now.Unix(),
+		Exp:                    now.Add(time.Second * 60 * 60 * 24 * 7).Unix(),
+		Jti:                    sessionID.String(),
+		IconURL:                user.IconURL(),
+		DisplayID:              user.DisplayID(),
+		DisplayName:            user.DisplayName(),
+		IsRegistered:           user.Verify(),
+		IsEmailVerified:        user.IsEmailVerified(),
+		RequiredPasswordChange: requiredPasswordChange,
 	}
 }
 
@@ -68,17 +69,22 @@ func NewClaimFromMap(claims jwt.MapClaims) Claim {
 	if claims["isEmailVerified"] != nil {
 		isEmailVerified = claims["isEmailVerified"].(bool)
 	}
+	var requiredPasswordChange bool
+	if claims["requiredPasswordChange"] != nil {
+		requiredPasswordChange = claims["requiredPasswordChange"].(bool)
+	}
 
 	return Claim{
-		Sub:             claims["sub"].(string),
-		Iat:             int64(claims["iat"].(float64)),
-		Exp:             int64(claims["exp"].(float64)),
-		Jti:             claims["jti"].(string),
-		IconURL:         picture,
-		DisplayName:     displayName,
-		DisplayID:       displayID,
-		IsRegistered:    claims["isRegistered"].(bool),
-		IsEmailVerified: isEmailVerified,
+		Sub:                    claims["sub"].(string),
+		Iat:                    int64(claims["iat"].(float64)),
+		Exp:                    int64(claims["exp"].(float64)),
+		Jti:                    claims["jti"].(string),
+		IconURL:                picture,
+		DisplayName:            displayName,
+		DisplayID:              displayID,
+		IsRegistered:           claims["isRegistered"].(bool),
+		IsEmailVerified:        isEmailVerified,
+		RequiredPasswordChange: requiredPasswordChange,
 	}
 }
 
@@ -116,17 +122,18 @@ const (
 
 func (c *Claim) GenMapClaim() *jwt.MapClaims {
 	return &jwt.MapClaims{
-		"exp":             c.Exp,
-		"iat":             c.Iat,
-		"jti":             c.Jti,
-		"sub":             c.Sub,
-		"iss":             Issuer,
-		"aud":             Audience,
-		"iconURL":         c.IconURL,
-		"displayName":     c.DisplayName,
-		"displayID":       c.DisplayID,
-		"isRegistered":    c.IsRegistered,
-		"isEmailVerified": c.IsEmailVerified,
+		"exp":                    c.Exp,
+		"iat":                    c.Iat,
+		"jti":                    c.Jti,
+		"sub":                    c.Sub,
+		"iss":                    Issuer,
+		"aud":                    Audience,
+		"iconURL":                c.IconURL,
+		"displayName":            c.DisplayName,
+		"displayID":              c.DisplayID,
+		"isRegistered":           c.IsRegistered,
+		"isEmailVerified":        c.IsEmailVerified,
+		"requiredPasswordChange": c.RequiredPasswordChange,
 	}
 }
 
