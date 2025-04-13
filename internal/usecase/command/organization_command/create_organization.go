@@ -8,6 +8,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	organization_svc "github.com/neko-dream/server/internal/domain/service/organization"
+	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
@@ -47,6 +48,7 @@ func (c *createOrganizationInteractor) Execute(ctx context.Context, input Create
 	// 組織を作成
 	org, err := c.organizationService.CreateOrganization(ctx, input.Name, orgType, ownerID)
 	if err != nil {
+		utils.HandleError(ctx, err, "CreateOrganization")
 		return nil, err
 	}
 	log.Println("Organization created:", org)
