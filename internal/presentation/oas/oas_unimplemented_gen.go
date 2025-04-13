@@ -31,6 +31,29 @@ func (UnimplementedHandler) Authorize(ctx context.Context, params AuthorizeParam
 	return r, ht.ErrNotImplemented
 }
 
+// ChangePassword implements changePassword operation.
+//
+// パスワード変更.
+//
+// PUT /auth/password/change
+func (UnimplementedHandler) ChangePassword(ctx context.Context, params ChangePasswordParams) (r ChangePasswordRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// CreateOrganizations implements createOrganizations operation.
+//
+// 組織を作成できる。
+// これを作れるユーザーはDBを直接叩いて作るしかない。
+// OrgType
+// - 1: 通常
+// - 2: 自治体
+// - 3: 議員.
+//
+// POST /organizations
+func (UnimplementedHandler) CreateOrganizations(ctx context.Context, req OptCreateOrganizationsReq) (r CreateOrganizationsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // CreateTalkSession implements createTalkSession operation.
 //
 // ## サムネイル画像について
@@ -253,6 +276,18 @@ func (UnimplementedHandler) GetTimeLine(ctx context.Context, params GetTimeLineP
 //
 // GET /user
 func (UnimplementedHandler) GetUserInfo(ctx context.Context) (r GetUserInfoRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// InviteOrganization implements inviteOrganization operation.
+//
+// Role
+// - 1: Member
+// - 2: Admin
+// - 3: Owner.
+//
+// POST /organizations/{organizationID}/invite
+func (UnimplementedHandler) InviteOrganization(ctx context.Context, req OptInviteOrganizationReq, params InviteOrganizationParams) (r InviteOrganizationRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

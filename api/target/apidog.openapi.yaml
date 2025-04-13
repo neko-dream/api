@@ -19,10 +19,10 @@
       "name": "timeline"
     },
     {
-      "name": "user"
+      "name": "auth"
     },
     {
-      "name": "auth"
+      "name": "user"
     },
     {
       "name": "test"
@@ -32,6 +32,9 @@
     },
     {
       "name": "policy"
+    },
+    {
+      "name": "organization"
     }
   ],
   "paths": {
@@ -3543,6 +3546,108 @@
         "x-ogen-operation-group": "TalkSession"
       }
     },
+    "/auth/password/change": {
+      "put": {
+        "summary": "パスワード変更",
+        "deprecated": false,
+        "description": "",
+        "operationId": "changePassword",
+        "tags": [
+          "auth"
+        ],
+        "parameters": [
+          {
+            "name": "id_or_email",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "old_password",
+            "in": "query",
+            "description": "古いパスワード",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "new_password",
+            "in": "query",
+            "description": "新たなパスワード",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
+        "x-ogen-operation-group": "Auth"
+      }
+    },
     "/user": {
       "post": {
         "summary": "ユーザー作成",
@@ -4481,6 +4586,15 @@
                     },
                     "isEmailVerified": {
                       "type": "boolean"
+                    },
+                    "orgType": {
+                      "type": "string",
+                      "description": "アカウントの種類。組織がなければ空",
+                      "nullable": true
+                    },
+                    "requiredPasswordChange": {
+                      "type": "boolean",
+                      "description": "パスワードの更新が必要かどうか"
                     }
                   },
                   "required": [
@@ -4491,7 +4605,8 @@
                     "sub",
                     "jti",
                     "isRegistered",
-                    "isEmailVerified"
+                    "isEmailVerified",
+                    "requiredPasswordChange"
                   ]
                 }
               }
@@ -5718,6 +5833,205 @@
         ],
         "x-ogen-operation-group": "Policy"
       }
+    },
+    "/organizations": {
+      "post": {
+        "summary": "組織作成（運営ユーザーのみ）",
+        "deprecated": false,
+        "description": "組織を作成できる。\nこれを作れるユーザーはDBを直接叩いて作るしかない。\n\nOrgType\n- 1: 通常\n- 2: 自治体\n- 3: 議員",
+        "operationId": "createOrganizations",
+        "tags": [
+          "organization"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "example": "",
+                    "type": "string"
+                  },
+                  "orgType": {
+                    "type": "integer",
+                    "example": 0
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
+        "x-ogen-operation-group": "Organization"
+      }
+    },
+    "/organizations/{organizationID}/invite": {
+      "post": {
+        "summary": "組織ユーザー招待（運営ユーザーのみ）",
+        "deprecated": false,
+        "description": "Role\n- 1: Member\n- 2: Admin\n- 3: Owner",
+        "operationId": "inviteOrganization",
+        "tags": [
+          "organization"
+        ],
+        "parameters": [
+          {
+            "name": "organizationID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "role": {
+                    "type": "integer",
+                    "example": 0
+                  },
+                  "email": {
+                    "example": "",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "role",
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [],
+        "x-ogen-operation-group": "Organization"
+      }
     }
   },
   "components": {
@@ -5955,6 +6269,15 @@
           },
           "isEmailVerified": {
             "type": "boolean"
+          },
+          "orgType": {
+            "type": "string",
+            "description": "アカウントの種類。組織がなければ空",
+            "nullable": true
+          },
+          "requiredPasswordChange": {
+            "type": "boolean",
+            "description": "パスワードの更新が必要かどうか"
           }
         },
         "required": [
@@ -5965,7 +6288,8 @@
           "sub",
           "jti",
           "isRegistered",
-          "isEmailVerified"
+          "isEmailVerified",
+          "requiredPasswordChange"
         ]
       },
       "offsetPagination": {

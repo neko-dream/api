@@ -13,7 +13,7 @@ import (
 
 const getPasswordAuthByUserId = `-- name: GetPasswordAuthByUserId :one
 SELECT
-  password_auth.password_auth_id, password_auth.user_id, password_auth.password_hash, password_auth.salt, password_auth.last_changed, password_auth.created_at, password_auth.updated_at
+  password_auth.password_auth_id, password_auth.user_id, password_auth.password_hash, password_auth.salt, password_auth.required_password_change, password_auth.last_changed, password_auth.created_at, password_auth.updated_at
 FROM password_auth
 WHERE user_id = $1
 `
@@ -25,7 +25,7 @@ type GetPasswordAuthByUserIdRow struct {
 // GetPasswordAuthByUserId
 //
 //	SELECT
-//	  password_auth.password_auth_id, password_auth.user_id, password_auth.password_hash, password_auth.salt, password_auth.last_changed, password_auth.created_at, password_auth.updated_at
+//	  password_auth.password_auth_id, password_auth.user_id, password_auth.password_hash, password_auth.salt, password_auth.required_password_change, password_auth.last_changed, password_auth.created_at, password_auth.updated_at
 //	FROM password_auth
 //	WHERE user_id = $1
 func (q *Queries) GetPasswordAuthByUserId(ctx context.Context, userID uuid.UUID) (GetPasswordAuthByUserIdRow, error) {
@@ -36,6 +36,7 @@ func (q *Queries) GetPasswordAuthByUserId(ctx context.Context, userID uuid.UUID)
 		&i.PasswordAuth.UserID,
 		&i.PasswordAuth.PasswordHash,
 		&i.PasswordAuth.Salt,
+		&i.PasswordAuth.RequiredPasswordChange,
 		&i.PasswordAuth.LastChanged,
 		&i.PasswordAuth.CreatedAt,
 		&i.PasswordAuth.UpdatedAt,

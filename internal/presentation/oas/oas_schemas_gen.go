@@ -140,6 +140,55 @@ func (s *AuthorizeProvider) UnmarshalText(data []byte) error {
 	}
 }
 
+type ChangePasswordBadRequest struct{}
+
+func (*ChangePasswordBadRequest) changePasswordRes() {}
+
+type ChangePasswordInternalServerError struct{}
+
+func (*ChangePasswordInternalServerError) changePasswordRes() {}
+
+type ChangePasswordOK struct{}
+
+func (*ChangePasswordOK) changePasswordRes() {}
+
+type CreateOrganizationsBadRequest struct{}
+
+func (*CreateOrganizationsBadRequest) createOrganizationsRes() {}
+
+type CreateOrganizationsInternalServerError struct{}
+
+func (*CreateOrganizationsInternalServerError) createOrganizationsRes() {}
+
+type CreateOrganizationsOK struct{}
+
+func (*CreateOrganizationsOK) createOrganizationsRes() {}
+
+type CreateOrganizationsReq struct {
+	Name    string `json:"name"`
+	OrgType OptInt `json:"orgType"`
+}
+
+// GetName returns the value of Name.
+func (s *CreateOrganizationsReq) GetName() string {
+	return s.Name
+}
+
+// GetOrgType returns the value of OrgType.
+func (s *CreateOrganizationsReq) GetOrgType() OptInt {
+	return s.OrgType
+}
+
+// SetName sets the value of Name.
+func (s *CreateOrganizationsReq) SetName(val string) {
+	s.Name = val
+}
+
+// SetOrgType sets the value of OrgType.
+func (s *CreateOrganizationsReq) SetOrgType(val OptInt) {
+	s.OrgType = val
+}
+
 type CreateTalkSessionBadRequest struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
@@ -4547,6 +4596,43 @@ func (s *GetUserInfoOKUser) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
 
+type InviteOrganizationBadRequest struct{}
+
+func (*InviteOrganizationBadRequest) inviteOrganizationRes() {}
+
+type InviteOrganizationInternalServerError struct{}
+
+func (*InviteOrganizationInternalServerError) inviteOrganizationRes() {}
+
+type InviteOrganizationOK struct{}
+
+func (*InviteOrganizationOK) inviteOrganizationRes() {}
+
+type InviteOrganizationReq struct {
+	Role  int    `json:"role"`
+	Email string `json:"email"`
+}
+
+// GetRole returns the value of Role.
+func (s *InviteOrganizationReq) GetRole() int {
+	return s.Role
+}
+
+// GetEmail returns the value of Email.
+func (s *InviteOrganizationReq) GetEmail() string {
+	return s.Email
+}
+
+// SetRole sets the value of Role.
+func (s *InviteOrganizationReq) SetRole(val int) {
+	s.Role = val
+}
+
+// SetEmail sets the value of Email.
+func (s *InviteOrganizationReq) SetEmail(val string) {
+	s.Email = val
+}
+
 type ManageIndexOK struct {
 	Data io.Reader
 }
@@ -4879,6 +4965,10 @@ type OAuthTokenInfoOK struct {
 	// ユーザ登録済みか.
 	IsRegistered    bool `json:"isRegistered"`
 	IsEmailVerified bool `json:"isEmailVerified"`
+	// アカウントの種類。組織がなければ空.
+	OrgType OptNilString `json:"orgType"`
+	// パスワードの更新が必要かどうか.
+	RequiredPasswordChange bool `json:"requiredPasswordChange"`
 }
 
 // GetAud returns the value of Aud.
@@ -4936,6 +5026,16 @@ func (s *OAuthTokenInfoOK) GetIsEmailVerified() bool {
 	return s.IsEmailVerified
 }
 
+// GetOrgType returns the value of OrgType.
+func (s *OAuthTokenInfoOK) GetOrgType() OptNilString {
+	return s.OrgType
+}
+
+// GetRequiredPasswordChange returns the value of RequiredPasswordChange.
+func (s *OAuthTokenInfoOK) GetRequiredPasswordChange() bool {
+	return s.RequiredPasswordChange
+}
+
 // SetAud sets the value of Aud.
 func (s *OAuthTokenInfoOK) SetAud(val string) {
 	s.Aud = val
@@ -4989,6 +5089,16 @@ func (s *OAuthTokenInfoOK) SetIsRegistered(val bool) {
 // SetIsEmailVerified sets the value of IsEmailVerified.
 func (s *OAuthTokenInfoOK) SetIsEmailVerified(val bool) {
 	s.IsEmailVerified = val
+}
+
+// SetOrgType sets the value of OrgType.
+func (s *OAuthTokenInfoOK) SetOrgType(val OptNilString) {
+	s.OrgType = val
+}
+
+// SetRequiredPasswordChange sets the value of RequiredPasswordChange.
+func (s *OAuthTokenInfoOK) SetRequiredPasswordChange(val bool) {
+	s.RequiredPasswordChange = val
 }
 
 func (*OAuthTokenInfoOK) oAuthTokenInfoRes() {}
@@ -6103,6 +6213,52 @@ func (o OptBool) Or(d bool) bool {
 	return d
 }
 
+// NewOptCreateOrganizationsReq returns new OptCreateOrganizationsReq with value set to v.
+func NewOptCreateOrganizationsReq(v CreateOrganizationsReq) OptCreateOrganizationsReq {
+	return OptCreateOrganizationsReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptCreateOrganizationsReq is optional CreateOrganizationsReq.
+type OptCreateOrganizationsReq struct {
+	Value CreateOrganizationsReq
+	Set   bool
+}
+
+// IsSet returns true if OptCreateOrganizationsReq was set.
+func (o OptCreateOrganizationsReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptCreateOrganizationsReq) Reset() {
+	var v CreateOrganizationsReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptCreateOrganizationsReq) SetTo(v CreateOrganizationsReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptCreateOrganizationsReq) Get() (v CreateOrganizationsReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptCreateOrganizationsReq) Or(d CreateOrganizationsReq) CreateOrganizationsReq {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptCreateTalkSessionOKLocation returns new OptCreateTalkSessionOKLocation with value set to v.
 func NewOptCreateTalkSessionOKLocation(v CreateTalkSessionOKLocation) OptCreateTalkSessionOKLocation {
 	return OptCreateTalkSessionOKLocation{
@@ -6695,6 +6851,52 @@ func (o OptInt) Get() (v int, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptInt) Or(d int) int {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptInviteOrganizationReq returns new OptInviteOrganizationReq with value set to v.
+func NewOptInviteOrganizationReq(v InviteOrganizationReq) OptInviteOrganizationReq {
+	return OptInviteOrganizationReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptInviteOrganizationReq is optional InviteOrganizationReq.
+type OptInviteOrganizationReq struct {
+	Value InviteOrganizationReq
+	Set   bool
+}
+
+// IsSet returns true if OptInviteOrganizationReq was set.
+func (o OptInviteOrganizationReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptInviteOrganizationReq) Reset() {
+	var v InviteOrganizationReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptInviteOrganizationReq) SetTo(v InviteOrganizationReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptInviteOrganizationReq) Get() (v InviteOrganizationReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptInviteOrganizationReq) Or(d InviteOrganizationReq) InviteOrganizationReq {
 	if v, ok := o.Get(); ok {
 		return v
 	}

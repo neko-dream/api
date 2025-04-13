@@ -109,6 +109,7 @@ require (
 	github.com/rs/cors v1.11.1
 	github.com/samber/lo v1.49.1
 	github.com/segmentio/asm v1.2.0 // indirect
+	github.com/sethvargo/go-password v0.3.1
 	github.com/spf13/viper v1.20.1
 	github.com/swaggest/swgui v1.8.3
 	go.opentelemetry.io/otel v1.35.0
