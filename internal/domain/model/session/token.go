@@ -32,10 +32,11 @@ type (
 		IsRegistered           bool    `json:"isRegistered"`
 		IsEmailVerified        bool    `json:"isEmailVerified"`
 		RequiredPasswordChange bool    `json:"requiredPasswordChange"`
+		OrgType                *int    `json:"orgType,omitempty"` // 組織の種類
 	}
 )
 
-func NewClaim(ctx context.Context, user user.User, sessionID shared.UUID[Session], requiredPasswordChange bool) Claim {
+func NewClaim(ctx context.Context, user user.User, sessionID shared.UUID[Session], requiredPasswordChange bool, orgType *int) Claim {
 	ctx, span := otel.Tracer("session").Start(ctx, "NewClaim")
 	defer span.End()
 	now := clock.Now(ctx)
@@ -50,6 +51,7 @@ func NewClaim(ctx context.Context, user user.User, sessionID shared.UUID[Session
 		IsRegistered:           user.Verify(),
 		IsEmailVerified:        user.IsEmailVerified(),
 		RequiredPasswordChange: requiredPasswordChange,
+		OrgType: 			  orgType,
 	}
 }
 
@@ -73,6 +75,11 @@ func NewClaimFromMap(claims jwt.MapClaims) Claim {
 	if claims["requiredPasswordChange"] != nil {
 		requiredPasswordChange = claims["requiredPasswordChange"].(bool)
 	}
+	var orgType *int
+	if claims["orgType"] != nil {
+		orgType = lo.ToPtr(int(claims["orgType"].(float64)))
+	}
+
 
 	return Claim{
 		Sub:                    claims["sub"].(string),
@@ -85,6 +92,7 @@ func NewClaimFromMap(claims jwt.MapClaims) Claim {
 		IsRegistered:           claims["isRegistered"].(bool),
 		IsEmailVerified:        isEmailVerified,
 		RequiredPasswordChange: requiredPasswordChange,
+		OrgType:                orgType,
 	}
 }
 
@@ -121,7 +129,7 @@ const (
 )
 
 func (c *Claim) GenMapClaim() *jwt.MapClaims {
-	return &jwt.MapClaims{
+	cl := &jwt.MapClaims{
 		"exp":                    c.Exp,
 		"iat":                    c.Iat,
 		"jti":                    c.Jti,
@@ -135,6 +143,13 @@ func (c *Claim) GenMapClaim() *jwt.MapClaims {
 		"isEmailVerified":        c.IsEmailVerified,
 		"requiredPasswordChange": c.RequiredPasswordChange,
 	}
+
+	if c.OrgType != nil {
+		(*cl)["orgType"] = *c.OrgType
+	} else {
+		(*cl)["orgType"] = nil
+	}
+	return cl
 }
 
 // SessionContextKey
