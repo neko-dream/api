@@ -15,6 +15,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/email"
 	email_template "github.com/neko-dream/server/internal/infrastructure/email/template"
+	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/pkg/hash"
 	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
@@ -43,6 +44,7 @@ type organizationMemberManager struct {
 	consentService       consent.ConsentService
 	passwordAuthManager  password_auth.PasswordAuthManager
 	emailSender          email.EmailSender
+	*db.DBManager
 }
 
 func NewOrganizationMemberManager(
@@ -54,6 +56,7 @@ func NewOrganizationMemberManager(
 	consentService consent.ConsentService,
 	passwordAuthManager password_auth.PasswordAuthManager,
 	emailSender email.EmailSender,
+	dbManager *db.DBManager,
 ) OrganizationMemberManager {
 	return &organizationMemberManager{
 		organizationRepo:     organizationRepo,
@@ -64,6 +67,7 @@ func NewOrganizationMemberManager(
 		consentService:       consentService,
 		passwordAuthManager:  passwordAuthManager,
 		emailSender:          emailSender,
+		DBManager:            dbManager,
 	}
 }
 
@@ -96,98 +100,110 @@ func (s *organizationMemberManager) InviteUser(ctx context.Context, input Invite
 	// SuperAdminのみがユーザーを作成できる
 	isSuperAdmin, err := s.IsSuperAdmin(ctx, input.UserID)
 	if err != nil {
+		utils.HandleError(ctx, err, "OrganizationMemberManager.IsSuperAdmin")
 		return nil, err
 	}
 	if !isSuperAdmin {
 		return nil, messages.OrganizationForbidden
 	}
 
-	// 組織取得
-	org, err := s.organizationRepo.FindByID(ctx, input.OrganizationID)
-	if err != nil {
-		utils.HandleError(ctx, err, "OrganizationRepository.FindByID")
-		return nil, messages.OrganizationForbidden
-	}
+	var orgUser *organization.OrganizationUser
+	if err := s.DBManager.ExecTx(ctx, func(ctx context.Context) error {
 
-	// 単純にユーザーを作成
-	authProviderName, err := auth.NewAuthProviderName("password")
-	if err != nil {
-		utils.HandleError(ctx, err, "AuthProviderName")
-		return nil, errtrace.Wrap(err)
-	}
-	subject, err := hash.HashEmail(input.Email, s.cfg.HASH_PEPPER)
-	if err != nil {
-		utils.HandleError(ctx, err, "HashEmail")
-		return nil, messages.InvalidPasswordOrEmailError
-	}
-	existUser, err := s.userRep.FindBySubject(ctx, user.UserSubject(subject))
-	if err != nil {
-		utils.HandleError(ctx, err, "UserRepository.FindBySubject")
-		return nil, errtrace.Wrap(err)
-	}
-	if existUser != nil {
-		return nil, errors.New("既に登録済みです。")
-	}
+		// 組織取得
+		org, err := s.organizationRepo.FindByID(ctx, input.OrganizationID)
+		if err != nil {
+			utils.HandleError(ctx, err, "OrganizationRepository.FindByID")
+			return messages.OrganizationForbidden
+		}
 
-	newUser := user.NewUser(
-		shared.NewUUID[user.User](),
-		nil,
-		nil,
-		subject,
-		authProviderName,
-		nil,
-	)
-	newUser.ChangeEmail(input.Email)
-	version, err := s.policyRep.FetchLatestPolicy(ctx)
-	if err != nil {
-		utils.HandleError(ctx, err, "PolicyRepository.GetLatestVersion")
-		return nil, errtrace.Wrap(err)
-	}
-	_, err = s.consentService.RecordConsent(
-		ctx,
-		newUser.UserID(),
-		version.Version,
-		"",
-		"",
-	)
-	if err != nil {
-		utils.HandleError(ctx, err, "ConsentService.RecordConsent")
-		return nil, errtrace.Wrap(err)
-	}
-	if err := s.userRep.Create(ctx, newUser); err != nil {
-		utils.HandleError(ctx, err, "UserRepository.Create")
-		return nil, errtrace.Wrap(err)
-	}
-	pass, err := password_auth.GeneratePassword(16)
-	if err != nil {
-		utils.HandleError(ctx, err, "GeneratePassword")
-		return nil, errtrace.Wrap(err)
-	}
-	if err := s.passwordAuthManager.RegisterPassword(ctx, newUser.UserID(), pass, true); err != nil {
-		utils.HandleError(ctx, err, "PasswordAuthManager.RegisterPassword")
-		return nil, errtrace.Wrap(err)
-	}
-	// 組織アカウントを作成
-	orgUser := &organization.OrganizationUser{
-		OrganizationID: input.OrganizationID,
-		UserID:         newUser.UserID(),
-		Role:           input.Role,
-	}
-	if err := s.organizationUserRepo.Create(ctx, orgUser); err != nil {
-		utils.HandleError(ctx, err, "OrganizationUserRepository.Create")
-		return nil, errtrace.Wrap(err)
-	}
+		// 単純にユーザーを作成
+		authProviderName, err := auth.NewAuthProviderName("password")
+		if err != nil {
+			utils.HandleError(ctx, err, "AuthProviderName")
+			return errtrace.Wrap(err)
+		}
+		subject, err := hash.HashEmail(input.Email, s.cfg.HASH_PEPPER)
+		if err != nil {
+			utils.HandleError(ctx, err, "HashEmail")
+			return messages.InvalidPasswordOrEmailError
+		}
+		existUser, err := s.userRep.FindBySubject(ctx, user.UserSubject(subject))
+		if err != nil {
+			utils.HandleError(ctx, err, "UserRepository.FindBySubject")
+			return errtrace.Wrap(err)
+		}
+		if existUser != nil {
+			return errors.New("既に登録済みです。")
+		}
 
-	// メールにIDとパスワード、組織IDを送信
-	s.emailSender.Send(ctx, input.Email, email_template.OrganizationInvitationEmailTemplate, map[string]any{
-		"CompanyLogo":      "https://github.com/neko-dream/api/raw/develop/docs/public/assets/icon.png",
-		"AppName":          s.cfg.APP_NAME,
-		"WebsiteURL":       s.cfg.WEBSITE_URL,
-		"OrganizationName": org.Name,
-		"Email":            input.Email,
-		"Password":         pass,
-		"InvitationURL":    s.cfg.WEBSITE_URL,
-	})
+		newUser := user.NewUser(
+			shared.NewUUID[user.User](),
+			nil,
+			nil,
+			subject,
+			authProviderName,
+			nil,
+		)
+		newUser.ChangeEmail(input.Email)
+
+		version, err := s.policyRep.FetchLatestPolicy(ctx)
+		if err != nil {
+			utils.HandleError(ctx, err, "PolicyRepository.GetLatestVersion")
+			return errtrace.Wrap(err)
+		}
+		_, err = s.consentService.RecordConsent(
+			ctx,
+			newUser.UserID(),
+			version.Version,
+			"",
+			"",
+		)
+		if err != nil {
+			utils.HandleError(ctx, err, "ConsentService.RecordConsent")
+			return errtrace.Wrap(err)
+		}
+		if err := s.userRep.Create(ctx, newUser); err != nil {
+			utils.HandleError(ctx, err, "UserRepository.Create")
+			return errtrace.Wrap(err)
+		}
+		pass := password_auth.GeneratePassword(16)
+		if err := s.passwordAuthManager.RegisterPassword(ctx, newUser.UserID(), pass, true); err != nil {
+			utils.HandleError(ctx, err, "PasswordAuthManager.RegisterPassword")
+			return errtrace.Wrap(err)
+		}
+		// 組織アカウントを作成
+		orgUsr := organization.OrganizationUser{
+			OrganizationUserID: shared.NewUUID[organization.OrganizationUser](),
+			OrganizationID:     input.OrganizationID,
+			UserID:             newUser.UserID(),
+			Role:               input.Role,
+		}
+		if err := s.organizationUserRepo.Create(ctx, orgUsr); err != nil {
+			utils.HandleError(ctx, err, "OrganizationUserRepository.Create")
+			return errtrace.Wrap(err)
+		}
+		orgUser = &orgUsr
+		// メールにIDとパスワード、組織IDを送信
+		if err := s.emailSender.Send(ctx, input.Email, email_template.OrganizationInvitationEmailTemplate, map[string]any{
+			"Title":            "【ことひろ】招待が届いています",
+			"CompanyLogo":      "https://github.com/neko-dream/api/raw/develop/docs/public/assets/icon.png",
+			"AppName":          s.cfg.APP_NAME,
+			"WebsiteURL":       s.cfg.WEBSITE_URL,
+			"OrganizationName": org.Name,
+			"Email":            input.Email,
+			"Password":         pass,
+			"InvitationURL":    s.cfg.WEBSITE_URL,
+		}); err != nil {
+			utils.HandleError(ctx, err, "EmailSender.Send")
+			return errtrace.Wrap(err)
+		}
+
+		return nil
+	}); err != nil {
+		utils.HandleError(ctx, err, "DBManager.ExecTx")
+		return nil, err
+	}
 
 	return orgUser, nil
 }
