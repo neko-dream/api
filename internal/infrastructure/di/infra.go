@@ -43,5 +43,6 @@ func infraDeps() []ProvideArg {
 		{crypto.NewEncryptor, nil},
 		{aws.NewAWSConfig, nil},
 		{aws.NewSESClient, nil},
+		{repository.NewPasswordAuthRepository, nil},
 	}
 }

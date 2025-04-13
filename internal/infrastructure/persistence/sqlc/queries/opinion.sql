@@ -92,25 +92,67 @@ LEFT JOIN (
     FROM opinions
     GROUP BY parent_opinion_id
 ) rc ON rc.opinion_id = opinions.opinion_id
--- グループ内のランクを取得
-LEFT JOIN (
-    SELECT rank, opinion_id
-    FROM representative_opinions
-) ro ON opinions.opinion_id = ro.opinion_id
 -- 通報された意見を除外
-LEFT JOIN opinion_reports ON opinions.opinion_id = opinion_reports.opinion_id
+LEFT JOIN (
+	SELECT DISTINCT opinion_reports.opinion_id, opinion_reports.status
+	FROM opinion_reports
+	WHERE opinion_reports.talk_session_id = $2
+) opr ON opr.opinion_id = opinions.opinion_id
 -- トークセッションに紐づく意見のみを取得
 WHERE opinions.talk_session_id = $2
     AND vote_count.opinion_id = opinions.opinion_id
+    AND opinions.opinion_id != ANY(sqlc.arg('exclude_opinion_ids')::uuid[])
     AND opinions.parent_opinion_id IS NULL
     -- 削除されたものはスワイプ意見から除外
-    AND (opinion_reports.opinion_id IS NULL OR opinion_reports.status != 'deleted')
-ORDER BY
-    CASE sqlc.narg('sort_key')::text
-        WHEN 'top' THEN COALESCE(ro.rank, 0)
-        ELSE RANDOM()
-    END ASC
+    AND (opr.opinion_id IS NULL OR opr.status != 'deleted')
+ORDER BY RANDOM()
 LIMIT $3;
+
+-- name: GetOpinionsByRank :many
+SELECT
+    sqlc.embed(opinions),
+    sqlc.embed(users),
+    COALESCE(rc.reply_count, 0) AS reply_count
+FROM opinions
+LEFT JOIN users
+    ON opinions.user_id = users.user_id
+-- 指定されたユーザーが投票していない意見のみを取得
+LEFT JOIN (
+    SELECT opinions.opinion_id
+    FROM opinions
+    LEFT JOIN votes
+        ON opinions.opinion_id = votes.opinion_id
+        AND votes.user_id = sqlc.arg('user_id')::uuid
+    GROUP BY opinions.opinion_id
+    HAVING COUNT(votes.vote_id) = 0
+) vote_count ON opinions.opinion_id = vote_count.opinion_id
+-- 親意見に対するユーザーの投票を取得
+LEFT JOIN (
+    SELECT votes.vote_type, votes.user_id, votes.opinion_id
+    FROM votes
+) pv ON opinions.parent_opinion_id = pv.opinion_id
+    AND  pv.user_id = opinions.user_id
+-- この意見に対するリプライ数
+LEFT JOIN (
+    SELECT COUNT(opinion_id) AS reply_count, parent_opinion_id as opinion_id
+    FROM opinions
+    GROUP BY parent_opinion_id
+) rc ON rc.opinion_id = opinions.opinion_id
+-- 通報された意見を除外
+LEFT JOIN (
+	SELECT DISTINCT opinion_reports.opinion_id, opinion_reports.status
+	FROM opinion_reports
+	WHERE opinion_reports.talk_session_id = sqlc.arg('talk_session_id')::uuid
+) opr ON opr.opinion_id = opinions.opinion_id
+LEFT JOIN representative_opinions ON opinions.opinion_id = representative_opinions.opinion_id
+WHERE opinions.talk_session_id = sqlc.arg('talk_session_id')::uuid
+    AND vote_count.opinion_id = opinions.opinion_id
+    AND opinions.parent_opinion_id IS NULL
+    -- 削除されたものはスワイプ意見から除外
+    AND (opr.opinion_id IS NULL OR opr.status != 'deleted')
+    AND representative_opinions.rank = sqlc.arg('rank')::int
+LIMIT sqlc.arg('limit')::int
+;
 
 -- name: CountSwipeableOpinions :one
 SELECT COUNT(vote_count.opinion_id) AS random_opinion_count
@@ -126,12 +168,16 @@ LEFT JOIN (
     HAVING COUNT(votes.vote_id) = 0
 ) vote_count ON opinions.opinion_id = vote_count.opinion_id
 -- 通報された意見を除外
-LEFT JOIN opinion_reports ON opinions.opinion_id = opinion_reports.opinion_id
+LEFT JOIN (
+	SELECT DISTINCT opinion_reports.opinion_id, opinion_reports.status
+	FROM opinion_reports
+	WHERE opinion_reports.talk_session_id = $2
+) opr ON opr.opinion_id = opinions.opinion_id
 -- トークセッションに紐づく意見のみを取得
 WHERE opinions.talk_session_id = $2
     AND vote_count.opinion_id = opinions.opinion_id
     AND opinions.parent_opinion_id IS NULL
-    AND (opinion_reports.opinion_id IS NULL OR opinion_reports.status != 'deleted');
+    AND (opr.opinion_id IS NULL OR opr.status != 'deleted');
 
 -- name: GetOpinionsByUserID :many
 SELECT

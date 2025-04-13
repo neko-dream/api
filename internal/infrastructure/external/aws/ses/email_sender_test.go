@@ -13,9 +13,9 @@ func TestSESEmailSender_Send(t *testing.T) {
 	t.Skip("送信を伴うテストなのでスキップ")
 	ctx := context.Background()
 	cfg := &config.Config{
-		EMAIL_FROM:            "noreply@kotohiro.com",
-		APP_NAME:              "ことひろ",
-		WEBSITE_URL:           "https://kotohiro.com",
+		EMAIL_FROM:  "noreply@kotohiro.com",
+		APP_NAME:    "ことひろ",
+		WEBSITE_URL: "https://kotohiro.com",
 	}
 	sesClient := aws.NewSESClient()
 	emailSender := NewSESEmailSender(cfg, sesClient)
@@ -25,7 +25,7 @@ func TestSESEmailSender_Send(t *testing.T) {
 		"info@kotohiro.com",
 		email_template.VerificationEmailTemplate,
 		map[string]any{
-			"CompanyLogo": "https://github.com/neko-dream/api/raw/develop/docs/public/assets/icon.png",
+			"CompanyLogo":     "https://github.com/neko-dream/api/raw/develop/docs/public/assets/icon.png",
 			"Title":           "タイトル",
 			"RecipientName":   "ユーザー名",
 			"VerificationURL": "https://example.com/verify?code=123456",

@@ -8498,6 +8498,98 @@ func (o OptNilVoteOKItemVoteType) Or(d VoteOKItemVoteType) VoteOKItemVoteType {
 	return d
 }
 
+// NewOptPasswordLoginReq returns new OptPasswordLoginReq with value set to v.
+func NewOptPasswordLoginReq(v PasswordLoginReq) OptPasswordLoginReq {
+	return OptPasswordLoginReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptPasswordLoginReq is optional PasswordLoginReq.
+type OptPasswordLoginReq struct {
+	Value PasswordLoginReq
+	Set   bool
+}
+
+// IsSet returns true if OptPasswordLoginReq was set.
+func (o OptPasswordLoginReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptPasswordLoginReq) Reset() {
+	var v PasswordLoginReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptPasswordLoginReq) SetTo(v PasswordLoginReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptPasswordLoginReq) Get() (v PasswordLoginReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptPasswordLoginReq) Or(d PasswordLoginReq) PasswordLoginReq {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptPasswordRegisterReq returns new OptPasswordRegisterReq with value set to v.
+func NewOptPasswordRegisterReq(v PasswordRegisterReq) OptPasswordRegisterReq {
+	return OptPasswordRegisterReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptPasswordRegisterReq is optional PasswordRegisterReq.
+type OptPasswordRegisterReq struct {
+	Value PasswordRegisterReq
+	Set   bool
+}
+
+// IsSet returns true if OptPasswordRegisterReq was set.
+func (o OptPasswordRegisterReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptPasswordRegisterReq) Reset() {
+	var v PasswordRegisterReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptPasswordRegisterReq) SetTo(v PasswordRegisterReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptPasswordRegisterReq) Get() (v PasswordRegisterReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptPasswordRegisterReq) Or(d PasswordRegisterReq) PasswordRegisterReq {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptPolicyConsentReq returns new OptPolicyConsentReq with value set to v.
 func NewOptPolicyConsentReq(v PolicyConsentReq) OptPolicyConsentReq {
 	return OptPolicyConsentReq{
@@ -9186,6 +9278,91 @@ func (o OptVoteReq) Or(d VoteReq) VoteReq {
 		return v
 	}
 	return d
+}
+
+type PasswordLoginBadRequest struct{}
+
+func (*PasswordLoginBadRequest) passwordLoginRes() {}
+
+type PasswordLoginInternalServerError struct{}
+
+func (*PasswordLoginInternalServerError) passwordLoginRes() {}
+
+type PasswordLoginOK struct{}
+
+func (*PasswordLoginOK) passwordLoginRes() {}
+
+type PasswordLoginReq struct {
+	IDOrEmail string `json:"id_or_email"`
+	Password  string `json:"password"`
+}
+
+// GetIDOrEmail returns the value of IDOrEmail.
+func (s *PasswordLoginReq) GetIDOrEmail() string {
+	return s.IDOrEmail
+}
+
+// GetPassword returns the value of Password.
+func (s *PasswordLoginReq) GetPassword() string {
+	return s.Password
+}
+
+// SetIDOrEmail sets the value of IDOrEmail.
+func (s *PasswordLoginReq) SetIDOrEmail(val string) {
+	s.IDOrEmail = val
+}
+
+// SetPassword sets the value of Password.
+func (s *PasswordLoginReq) SetPassword(val string) {
+	s.Password = val
+}
+
+type PasswordRegisterBadRequest struct{}
+
+func (*PasswordRegisterBadRequest) passwordRegisterRes() {}
+
+type PasswordRegisterInternalServerError struct{}
+
+func (*PasswordRegisterInternalServerError) passwordRegisterRes() {}
+
+type PasswordRegisterOK struct{}
+
+func (*PasswordRegisterOK) passwordRegisterRes() {}
+
+type PasswordRegisterReq struct {
+	ID       string `json:"id"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
+}
+
+// GetID returns the value of ID.
+func (s *PasswordRegisterReq) GetID() string {
+	return s.ID
+}
+
+// GetPassword returns the value of Password.
+func (s *PasswordRegisterReq) GetPassword() string {
+	return s.Password
+}
+
+// GetEmail returns the value of Email.
+func (s *PasswordRegisterReq) GetEmail() string {
+	return s.Email
+}
+
+// SetID sets the value of ID.
+func (s *PasswordRegisterReq) SetID(val string) {
+	s.ID = val
+}
+
+// SetPassword sets the value of Password.
+func (s *PasswordRegisterReq) SetPassword(val string) {
+	s.Password = val
+}
+
+// SetEmail sets the value of Email.
+func (s *PasswordRegisterReq) SetEmail(val string) {
+	s.Email = val
 }
 
 type PolicyConsentBadRequest struct{}
