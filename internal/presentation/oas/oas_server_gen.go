@@ -60,6 +60,18 @@ type AuthHandler interface {
 	//
 	// POST /auth/revoke
 	OAuthTokenRevoke(ctx context.Context) (OAuthTokenRevokeRes, error)
+	// PasswordLogin implements passwordLogin operation.
+	//
+	// パスワードによるログイン.
+	//
+	// POST /auth/password/login
+	PasswordLogin(ctx context.Context, req OptPasswordLoginReq) (PasswordLoginRes, error)
+	// PasswordRegister implements passwordRegister operation.
+	//
+	// パスワードによる登録（devのみ）.
+	//
+	// POST /auth/password/register
+	PasswordRegister(ctx context.Context, req OptPasswordRegisterReq) (PasswordRegisterRes, error)
 }
 
 // ImageHandler handles operations described by OpenAPI v3 specification.

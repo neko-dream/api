@@ -4798,6 +4798,136 @@ paths:
       security:
         - SessionId: []
       x-ogen-operation-group: Auth
+  /auth/password/login:
+    post:
+      summary: パスワードによるログイン
+      deprecated: false
+      description: ''
+      operationId: passwordLogin
+      tags:
+        - auth
+      parameters: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                id_or_email:
+                  example: ''
+                  type: string
+                password:
+                  type: string
+                  example: ''
+              required:
+                - id_or_email
+                - password
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security: []
+      x-ogen-operation-group: Auth
+  /auth/password/register:
+    post:
+      summary: パスワードによる登録（devのみ）
+      deprecated: false
+      description: ''
+      operationId: passwordRegister
+      tags:
+        - auth
+      parameters: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                id:
+                  example: ''
+                  type: string
+                password:
+                  example: ''
+                  type: string
+                email:
+                  example: ''
+                  type: string
+              required:
+                - id
+                - password
+                - email
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security: []
+      x-ogen-operation-group: Auth
   /test:
     get:
       summary: OpenAPIテスト用

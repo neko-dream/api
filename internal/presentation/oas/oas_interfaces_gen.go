@@ -129,6 +129,14 @@ type OpinionsHistoryRes interface {
 	opinionsHistoryRes()
 }
 
+type PasswordLoginRes interface {
+	passwordLoginRes()
+}
+
+type PasswordRegisterRes interface {
+	passwordRegisterRes()
+}
+
 type PolicyConsentRes interface {
 	policyConsentRes()
 }
