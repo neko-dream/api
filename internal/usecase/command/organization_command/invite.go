@@ -3,7 +3,6 @@ package organization_command
 import (
 	"context"
 	"errors"
-	"log"
 
 	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -11,6 +10,7 @@ import (
 	organization_svc "github.com/neko-dream/server/internal/domain/service/organization"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/email"
+	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
@@ -76,16 +76,16 @@ func (i *inviteOrganizationInteractor) Execute(ctx context.Context, input Invite
 	}
 
 	// 組織の招待を送信
-	ou, err := i.OrganizationMemberManager.InviteUser(ctx, organization_svc.InviteUserParams{
+	_, err = i.OrganizationMemberManager.InviteUser(ctx, organization_svc.InviteUserParams{
 		OrganizationID: input.OrganizationID,
 		Role:           organization.OrganizationUserRole(input.Role),
 		UserID:         input.UserID,
 		Email:          input.Email,
 	})
 	if err != nil {
+		utils.HandleError(ctx, err, "InviteUser")
 		return nil, err
 	}
-	log.Println("ou", ou)
 
 	return &InviteOrganizationOutput{
 		Success: true,
