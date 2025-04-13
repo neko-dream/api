@@ -1,7 +1,9 @@
 package hash
 
 import (
+	"crypto/hmac"
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
 
@@ -36,18 +38,23 @@ func VerifyPassword(password string, salt, pepper, hashedPassword string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(saltedPepperedPassword))
 	return err == nil
 }
+func getBinaryBySHA256(s string) []byte {
+	r := sha256.Sum256([]byte(s))
+	return r[:]
+}
 
 func HashEmail(email, pepper string) (string, error) {
-	saltedPepperedEmail := email + pepper
-	hash, err := bcrypt.GenerateFromPassword([]byte(saltedPepperedEmail), bcrypt.MinCost)
-	if err != nil {
-		return "", fmt.Errorf("failed to hash email: %w", err)
-	}
-	return string(hash), nil
+	mac := hmac.New(sha256.New, getBinaryBySHA256(pepper))
+	_, err := mac.Write([]byte(email))
+	return string(mac.Sum(nil)), err
 }
 
 func VerifyEmail(email, pepper, hashedEmail string) bool {
-	saltedPepperedEmail := email + pepper
-	err := bcrypt.CompareHashAndPassword([]byte(hashedEmail), []byte(saltedPepperedEmail))
-	return err == nil
+	mac := hmac.New(sha256.New, getBinaryBySHA256(pepper))
+	_, err := mac.Write([]byte(email))
+	if err != nil {
+		return false
+	}
+	expectedMAC := mac.Sum(nil)
+	return hmac.Equal([]byte(hashedEmail), expectedMAC)
 }
