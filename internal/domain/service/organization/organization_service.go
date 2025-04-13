@@ -104,9 +104,9 @@ func (s *organizationService) CreateOrganization(ctx context.Context, name strin
 	// オーナーをメンバーとして追加
 	orgUser := organization.OrganizationUser{
 		OrganizationUserID: shared.NewUUID[organization.OrganizationUser](),
-		OrganizationID: orgID,
-		UserID:         ownerID,
-		Role:           organization.OrganizationUserRoleOwner,
+		OrganizationID:     orgID,
+		UserID:             ownerID,
+		Role:               organization.OrganizationUserRoleOwner,
 	}
 	if err := s.organizationUserRepo.Create(ctx, orgUser); err != nil {
 		return nil, err
