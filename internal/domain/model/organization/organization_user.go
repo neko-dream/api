@@ -14,7 +14,7 @@ type OrganizationUserRepository interface {
 	FindByUserID(ctx context.Context, userID shared.UUID[user.User]) ([]*OrganizationUser, error)
 
 	// OrganizationUserの作成・更新・削除
-	Create(ctx context.Context, orgUser *OrganizationUser) error
+	Create(ctx context.Context, orgUser OrganizationUser) error
 }
 
 type OrganizationUserRole int
@@ -27,7 +27,8 @@ const (
 )
 
 type OrganizationUser struct {
-	OrganizationID shared.UUID[Organization]
-	UserID         shared.UUID[user.User]
-	Role           OrganizationUserRole
+	OrganizationUserID shared.UUID[OrganizationUser]
+	OrganizationID     shared.UUID[Organization]
+	UserID             shared.UUID[user.User]
+	Role               OrganizationUserRole
 }
