@@ -7,6 +7,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/crypto"
 	client "github.com/neko-dream/server/internal/infrastructure/external/analysis"
 	"github.com/neko-dream/server/internal/infrastructure/external/aws"
+	"github.com/neko-dream/server/internal/infrastructure/external/aws/ses"
 	"github.com/neko-dream/server/internal/infrastructure/http/cookie"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/postgresql"
@@ -46,5 +47,6 @@ func infraDeps() []ProvideArg {
 		{repository.NewPasswordAuthRepository, nil},
 		{repository.NewOrganizationUserRepository, nil},
 		{repository.NewOrganizationRepository, nil},
+		{ses.NewSESEmailSender, nil},
 	}
 }

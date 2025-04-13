@@ -1,6 +1,9 @@
 package di
 
-import "github.com/neko-dream/server/internal/domain/service"
+import (
+	"github.com/neko-dream/server/internal/domain/service"
+	organization_svc "github.com/neko-dream/server/internal/domain/service/organization"
+)
 
 func domainDeps() []ProvideArg {
 	return []ProvideArg{
@@ -14,5 +17,7 @@ func domainDeps() []ProvideArg {
 		{service.NewTalkSessionAccessControl, nil},
 		{service.NewConsentService, nil},
 		{service.NewPasswordAuthManager, nil},
+		{organization_svc.NewOrganizationService, nil},
+		{organization_svc.NewOrganizationMemberManager, nil},
 	}
 }
