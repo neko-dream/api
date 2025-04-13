@@ -2,6 +2,7 @@ package auth_command
 
 import (
 	"context"
+	"errors"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/messages"
@@ -89,7 +90,7 @@ func (p *passwordRegisterInteractor) Execute(ctx context.Context, input Password
 			return errtrace.Wrap(err)
 		}
 		if existUser != nil {
-			return errtrace.Wrap(err)
+			return errors.New("既に登録済みです。")
 		}
 
 		newUser := user.NewUser(
