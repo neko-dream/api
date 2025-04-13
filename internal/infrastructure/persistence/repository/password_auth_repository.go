@@ -28,15 +28,15 @@ func NewPasswordAuthRepository(dbManager *db.DBManager) password_auth.PasswordAu
 func (p *passwordAuthRepository) CreatePasswordAuth(ctx context.Context, userID shared.UUID[user.User], passwordHash string, salt string) error {
 	ctx, span := otel.Tracer("repository").Start(ctx, "passwordAuthRepository.CreatePasswordAuth")
 	defer span.End()
-
+	now := clock.Now(ctx)
 	if err := p.DBManager.GetQueries(ctx).CreatePasswordAuth(ctx, model.CreatePasswordAuthParams{
 		PasswordAuthID: shared.NewUUID[password_auth.PasswordAuth]().UUID(),
 		UserID:         userID.UUID(),
 		PasswordHash:   passwordHash,
 		Salt:           sql.NullString{String: salt, Valid: true},
-		LastChanged:    clock.Now(ctx),
-		CreatedAt:      clock.Now(ctx),
-		UpdatedAt:      clock.Now(ctx),
+		LastChanged:    now,
+		CreatedAt:      now,
+		UpdatedAt:      now,
 	}); err != nil {
 		utils.HandleError(ctx, err, "CreatePasswordAuth")
 		return err
