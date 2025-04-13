@@ -36,4 +36,9 @@ var (
 		Code:       "AUTH-0006",
 		Message:    "ユーザー登録が完了していません。登録を完了してください。",
 	}
+	InvalidPasswordOrEmailError = &APIError{
+		StatusCode: 401,
+		Code:       "AUTH-0007",
+		Message:    "メールアドレス,IDまたはパスワードが不正です。",
+	}
 )
