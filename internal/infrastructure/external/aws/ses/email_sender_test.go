@@ -6,7 +6,6 @@ import (
 
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	email_template "github.com/neko-dream/server/internal/infrastructure/email/template"
-	"github.com/neko-dream/server/internal/infrastructure/external/aws"
 )
 
 func TestSESEmailSender_Send(t *testing.T) {
@@ -17,8 +16,7 @@ func TestSESEmailSender_Send(t *testing.T) {
 		APP_NAME:    "ことひろ",
 		WEBSITE_URL: "https://kotohiro.com",
 	}
-	sesClient := aws.NewSESClient()
-	emailSender := NewSESEmailSender(cfg, sesClient)
+	emailSender := NewSESEmailSender(cfg)
 
 	err := emailSender.Send(
 		ctx,
