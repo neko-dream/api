@@ -7,18 +7,25 @@ import (
 
 	"braces.dev/errtrace"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/neko-dream/server/internal/domain/model/auth"
+	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/config"
+	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/utils"
+	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
 type tokenManager struct {
 	secret string
+	*db.DBManager
 	session.SessionRepository
+	organization.OrganizationUserRepository
+	organization.OrganizationRepository
 }
 
 // SetSession implements session.TokenManager.
@@ -68,7 +75,33 @@ func (j *tokenManager) Generate(ctx context.Context, user user.User, sessionID s
 	ctx, span := otel.Tracer("jwt").Start(ctx, "tokenManager.Generate")
 	defer span.End()
 
-	claim := session.NewClaim(ctx, user, sessionID)
+	requiredPasswordChange := false
+	if user.Provider() == auth.ProviderPassword {
+		auths, err := j.DBManager.GetQueries(ctx).GetPasswordAuthByUserId(ctx, user.UserID().UUID())
+		if err != nil {
+			utils.HandleError(ctx, err, "GetPasswordAuthByUserId")
+			return "", err
+		}
+		requiredPasswordChange = auths.PasswordAuth.RequiredPasswordChange
+	}
+	var orgType *int
+	orgUsers, _ :=j.OrganizationUserRepository.FindByUserID(ctx, user.UserID())
+	if len(orgUsers) > 0 {
+		orgUser := orgUsers[0]
+		// organizationをとる
+		org, err := j.OrganizationRepository.FindByID(ctx, orgUser.OrganizationID)
+		if err != nil {
+			utils.HandleError(ctx, err, "GetOrganizationByID")
+			return "", err
+		}
+		if org == nil {
+			return "", errtrace.Wrap(errors.New("organization not found"))
+		}
+		// organizationのroleを取得
+		orgType = lo.ToPtr(int(org.OrganizationType))
+	}
+
+	claim := session.NewClaim(ctx, user, sessionID, requiredPasswordChange, orgType)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim.GenMapClaim())
 	return errtrace.Wrap2(token.SignedString([]byte(j.secret)))
 }
@@ -107,10 +140,17 @@ func (j *tokenManager) Parse(ctx context.Context, token string) (*session.Claim,
 func NewTokenManager(
 	sessRepo session.SessionRepository,
 	conf *config.Config,
+	dbm *db.DBManager,
+	orgUserRep organization.OrganizationUserRepository,
+	orgRep organization.OrganizationRepository,
 ) session.TokenManager {
 	return &tokenManager{
 		secret:            conf.TokenSecret,
 		SessionRepository: sessRepo,
+		DBManager:         dbm,
+		OrganizationUserRepository: orgUserRep,
+		OrganizationRepository:    orgRep,
+
 	}
 }
 

@@ -19,6 +19,124 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
+func (s *Server) decodeCreateOrganizationsRequest(r *http.Request) (
+	req OptCreateOrganizationsReq,
+	close func() error,
+	rerr error,
+) {
+	var closers []func() error
+	close = func() error {
+		var merr error
+		// Close in reverse order, to match defer behavior.
+		for i := len(closers) - 1; i >= 0; i-- {
+			c := closers[i]
+			merr = multierr.Append(merr, c())
+		}
+		return merr
+	}
+	defer func() {
+		if rerr != nil {
+			rerr = multierr.Append(rerr, close())
+		}
+	}()
+	if _, ok := r.Header["Content-Type"]; !ok && r.ContentLength == 0 {
+		return req, close, nil
+	}
+	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
+	if err != nil {
+		return req, close, errors.Wrap(err, "parse media type")
+	}
+	switch {
+	case ct == "multipart/form-data":
+		if r.ContentLength == 0 {
+			return req, close, nil
+		}
+		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
+			return req, close, errors.Wrap(err, "parse multipart form")
+		}
+		// Remove all temporary files created by ParseMultipartForm when the request is done.
+		//
+		// Notice that the closers are called in reverse order, to match defer behavior, so
+		// any opened file will be closed before RemoveAll call.
+		closers = append(closers, r.MultipartForm.RemoveAll)
+		// Form values may be unused.
+		form := url.Values(r.MultipartForm.Value)
+		_ = form
+
+		var request OptCreateOrganizationsReq
+		{
+			var optForm CreateOrganizationsReq
+			q := uri.NewQueryDecoder(form)
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "name",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						optForm.Name = c
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"name\"")
+					}
+				} else {
+					return req, close, errors.Wrap(err, "query")
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "orgType",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotOrgTypeVal int
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToInt(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotOrgTypeVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.OrgType.SetTo(optFormDotOrgTypeVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"orgType\"")
+					}
+				}
+			}
+			request = OptCreateOrganizationsReq{
+				Value: optForm,
+				Set:   true,
+			}
+		}
+		return request, close, nil
+	default:
+		return req, close, validate.InvalidContentType(ct)
+	}
+}
+
 func (s *Server) decodeCreateTalkSessionRequest(r *http.Request) (
 	req OptCreateTalkSessionReq,
 	close func() error,
@@ -1240,6 +1358,119 @@ func (s *Server) decodeEditUserProfileRequest(r *http.Request) (
 				}
 			}
 			request = OptEditUserProfileReq{
+				Value: optForm,
+				Set:   true,
+			}
+		}
+		return request, close, nil
+	default:
+		return req, close, validate.InvalidContentType(ct)
+	}
+}
+
+func (s *Server) decodeInviteOrganizationRequest(r *http.Request) (
+	req OptInviteOrganizationReq,
+	close func() error,
+	rerr error,
+) {
+	var closers []func() error
+	close = func() error {
+		var merr error
+		// Close in reverse order, to match defer behavior.
+		for i := len(closers) - 1; i >= 0; i-- {
+			c := closers[i]
+			merr = multierr.Append(merr, c())
+		}
+		return merr
+	}
+	defer func() {
+		if rerr != nil {
+			rerr = multierr.Append(rerr, close())
+		}
+	}()
+	if _, ok := r.Header["Content-Type"]; !ok && r.ContentLength == 0 {
+		return req, close, nil
+	}
+	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
+	if err != nil {
+		return req, close, errors.Wrap(err, "parse media type")
+	}
+	switch {
+	case ct == "multipart/form-data":
+		if r.ContentLength == 0 {
+			return req, close, nil
+		}
+		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
+			return req, close, errors.Wrap(err, "parse multipart form")
+		}
+		// Remove all temporary files created by ParseMultipartForm when the request is done.
+		//
+		// Notice that the closers are called in reverse order, to match defer behavior, so
+		// any opened file will be closed before RemoveAll call.
+		closers = append(closers, r.MultipartForm.RemoveAll)
+		// Form values may be unused.
+		form := url.Values(r.MultipartForm.Value)
+		_ = form
+
+		var request OptInviteOrganizationReq
+		{
+			var optForm InviteOrganizationReq
+			q := uri.NewQueryDecoder(form)
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "role",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToInt(val)
+						if err != nil {
+							return err
+						}
+
+						optForm.Role = c
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"role\"")
+					}
+				} else {
+					return req, close, errors.Wrap(err, "query")
+				}
+			}
+			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "email",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						optForm.Email = c
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"email\"")
+					}
+				} else {
+					return req, close, errors.Wrap(err, "query")
+				}
+			}
+			request = OptInviteOrganizationReq{
 				Value: optForm,
 				Set:   true,
 			}

@@ -10,6 +10,7 @@ import (
 	"github.com/neko-dream/server/internal/usecase/command/auth_command"
 	"github.com/neko-dream/server/internal/usecase/command/image_command"
 	"github.com/neko-dream/server/internal/usecase/command/opinion_command"
+	"github.com/neko-dream/server/internal/usecase/command/organization_command"
 	"github.com/neko-dream/server/internal/usecase/command/policy_command"
 	"github.com/neko-dream/server/internal/usecase/command/report_command"
 	"github.com/neko-dream/server/internal/usecase/command/talksession_command"
@@ -67,5 +68,8 @@ func useCaseDeps() []ProvideArg {
 		{report_q.NewGetCountQueryInteractor, nil},
 		{auth_command.NewPasswordRegister, nil},
 		{auth_command.NewPasswordLogin, nil},
+		{auth_command.NewChangePassword, nil},
+		{organization_command.NewCreateOrganizationInteractor, nil},
+		{organization_command.NewInviteOrganizationInteractor, nil},
 	}
 }

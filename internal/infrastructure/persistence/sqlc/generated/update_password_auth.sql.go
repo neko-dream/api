@@ -18,17 +18,19 @@ UPDATE password_auth
 SET
   password_hash = $2,
   salt = $3,
-  last_changed = $4,
-  updated_at = $5
+  required_password_change = $4,
+  last_changed = $5,
+  updated_at = $6
 WHERE user_id = $1
 `
 
 type UpdatePasswordAuthParams struct {
-	UserID       uuid.UUID
-	PasswordHash string
-	Salt         sql.NullString
-	LastChanged  time.Time
-	UpdatedAt    time.Time
+	UserID                 uuid.UUID
+	PasswordHash           string
+	Salt                   sql.NullString
+	RequiredPasswordChange bool
+	LastChanged            time.Time
+	UpdatedAt              time.Time
 }
 
 // UpdatePasswordAuth
@@ -37,14 +39,16 @@ type UpdatePasswordAuthParams struct {
 //	SET
 //	  password_hash = $2,
 //	  salt = $3,
-//	  last_changed = $4,
-//	  updated_at = $5
+//	  required_password_change = $4,
+//	  last_changed = $5,
+//	  updated_at = $6
 //	WHERE user_id = $1
 func (q *Queries) UpdatePasswordAuth(ctx context.Context, arg UpdatePasswordAuthParams) error {
 	_, err := q.db.ExecContext(ctx, updatePasswordAuth,
 		arg.UserID,
 		arg.PasswordHash,
 		arg.Salt,
+		arg.RequiredPasswordChange,
 		arg.LastChanged,
 		arg.UpdatedAt,
 	)

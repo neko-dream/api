@@ -41,4 +41,9 @@ var (
 		Code:       "AUTH-0007",
 		Message:    "メールアドレス,IDまたはパスワードが不正です。",
 	}
+	InvalidPasswordError = &APIError{
+		StatusCode: 401,
+		Code:       "AUTH-0008",
+		Message:    "パスワードが不正です。",
+	}
 )
