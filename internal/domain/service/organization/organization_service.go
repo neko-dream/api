@@ -2,6 +2,8 @@ package organization
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/organization"
@@ -79,7 +81,9 @@ func (s *organizationService) CreateOrganization(ctx context.Context, name strin
 	// 名前が重複していないか確認
 	existingOrg, err := s.organizationRepo.FindByName(ctx, name)
 	if err != nil {
-		return nil, err
+		if !errors.Is(err, sql.ErrNoRows) {
+			return nil, err
+		}
 	}
 	if existingOrg != nil {
 		return nil, messages.OrganizationAlreadyExists
@@ -98,7 +102,8 @@ func (s *organizationService) CreateOrganization(ctx context.Context, name strin
 	}
 
 	// オーナーをメンバーとして追加
-	orgUser := &organization.OrganizationUser{
+	orgUser := organization.OrganizationUser{
+		OrganizationUserID: shared.NewUUID[organization.OrganizationUser](),
 		OrganizationID: orgID,
 		UserID:         ownerID,
 		Role:           organization.OrganizationUserRoleOwner,
