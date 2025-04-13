@@ -1,4 +1,4 @@
--- name: FindOrgUserByUserID :one
+-- name: FindOrgUserByUserID :many
 SELECT
     sqlc.embed(organization_users)
 FROM organization_users
