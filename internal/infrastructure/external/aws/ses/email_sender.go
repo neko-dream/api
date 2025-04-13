@@ -10,6 +10,8 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/email"
 	email_template "github.com/neko-dream/server/internal/infrastructure/email/template"
+	"github.com/neko-dream/server/internal/infrastructure/external/aws"
+	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
@@ -21,11 +23,10 @@ type SESEmailSender struct {
 
 func NewSESEmailSender(
 	cfg *config.Config,
-	sesClient *sesv2.Client,
 ) email.EmailSender {
 	return &SESEmailSender{
 		Config:    cfg,
-		sesClient: sesClient,
+		sesClient: aws.NewSESClient(),
 	}
 }
 
@@ -49,11 +50,13 @@ func (s *SESEmailSender) Send(
 	)
 	t, err := email_template.LoadMailTemplate(tmpl)
 	if err != nil {
+		utils.HandleError(ctx, err, "LoadMailTemplate")
 		return err
 	}
 
 	resultBuf := new(bytes.Buffer)
 	if err = t.ExecuteTemplate(resultBuf, string(tmpl), dataWithCommon); err != nil {
+		utils.HandleError(ctx, err, "ExecuteTemplate")
 		return err
 	}
 
@@ -80,6 +83,7 @@ func (s *SESEmailSender) Send(
 
 	_, err = s.sesClient.SendEmail(ctx, &input)
 	if err != nil {
+		utils.HandleError(ctx, err, "SESEmailSender.SendEmail")
 		return err
 	}
 
