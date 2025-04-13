@@ -9,6 +9,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/config"
+	"github.com/neko-dream/server/pkg/hash"
 	"go.opentelemetry.io/otel"
 )
 
@@ -32,12 +33,12 @@ func (u *passwordAuthManager) RegisterPassword(ctx context.Context, userID share
 	ctx, span := otel.Tracer("usecase").Start(ctx, "passwordAuthUseCase.RegisterPassword")
 	defer span.End()
 
-	salt, err := password_auth.GenerateSalt(16)
+	salt, err := hash.GenerateSalt(16)
 	if err != nil {
 		return err
 	}
 
-	hashedPassword, err := password_auth.HashPassword(plainPassword, salt, u.cfg.HASH_PEPPER, u.cfg.HASH_ITERATIONS)
+	hashedPassword, err := hash.HashPassword(plainPassword, salt, u.cfg.HASH_PEPPER, u.cfg.HASH_ITERATIONS)
 	if err != nil {
 		return err
 	}
@@ -60,7 +61,7 @@ func (u *passwordAuthManager) VerifyPassword(ctx context.Context, userID shared.
 	}
 
 	// パスワードを検証
-	return password_auth.VerifyPassword(plainPassword, auth.Salt, u.cfg.HASH_PEPPER, auth.PasswordHash), nil
+	return hash.VerifyPassword(plainPassword, auth.Salt, u.cfg.HASH_PEPPER, auth.PasswordHash), nil
 }
 
 // UpdatePassword パスワードを更新
@@ -68,12 +69,12 @@ func (u *passwordAuthManager) UpdatePassword(ctx context.Context, userID shared.
 	ctx, span := otel.Tracer("usecase").Start(ctx, "passwordAuthUseCase.UpdatePassword")
 	defer span.End()
 
-	salt, err := password_auth.GenerateSalt(16)
+	salt, err := hash.GenerateSalt(16)
 	if err != nil {
 		return err
 	}
 
-	hashedPassword, err := password_auth.HashPassword(plainPassword, salt, u.cfg.HASH_PEPPER, u.cfg.HASH_ITERATIONS)
+	hashedPassword, err := hash.HashPassword(plainPassword, salt, u.cfg.HASH_PEPPER, u.cfg.HASH_ITERATIONS)
 	if err != nil {
 		return err
 	}

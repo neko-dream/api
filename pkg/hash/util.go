@@ -1,4 +1,4 @@
-package password_auth
+package hash
 
 import (
 	"crypto/rand"
@@ -32,8 +32,22 @@ func HashPassword(password, salt, pepper string, cost int) (string, error) {
 }
 
 func VerifyPassword(password string, salt, pepper, hashedPassword string) bool {
-	// 検証時もペッパーを使うのじゃ
 	saltedPepperedPassword := password + salt + pepper
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(saltedPepperedPassword))
+	return err == nil
+}
+
+func HashEmail(email, pepper string) (string, error) {
+	saltedPepperedEmail := email + pepper
+	hash, err := bcrypt.GenerateFromPassword([]byte(saltedPepperedEmail), bcrypt.MinCost)
+	if err != nil {
+		return "", fmt.Errorf("failed to hash email: %w", err)
+	}
+	return string(hash), nil
+}
+
+func VerifyEmail(email, pepper, hashedEmail string) bool {
+	saltedPepperedEmail := email + pepper
+	err := bcrypt.CompareHashAndPassword([]byte(hashedEmail), []byte(saltedPepperedEmail))
 	return err == nil
 }
