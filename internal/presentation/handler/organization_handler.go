@@ -84,4 +84,3 @@ func (o *organizationHandler) InviteOrganization(ctx context.Context, req oas.Op
 	res := &oas.InviteOrganizationOK{}
 	return res, nil
 }
-

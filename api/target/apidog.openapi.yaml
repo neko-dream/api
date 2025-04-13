@@ -6029,7 +6029,11 @@
             "headers": {}
           }
         },
-        "security": [],
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
         "x-ogen-operation-group": "Organization"
       }
     }
