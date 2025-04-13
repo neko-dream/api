@@ -27,11 +27,10 @@ type authHandler struct {
 
 	passwordLogin    auth_command.PasswordLogin
 	passwordRegister auth_command.PasswordRegister
-	changePassword auth_command.ChangePassword
+	changePassword   auth_command.ChangePassword
 
 	cookie.CookieManager
 }
-
 
 func NewAuthHandler(
 	authLogin auth_command.AuthLogin,
