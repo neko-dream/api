@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
@@ -22,17 +23,21 @@ func NewOrganizationUserRepository(dbManager *db.DBManager) organization.Organiz
 }
 
 // Create implements organization.OrganizationUserRepository.
-func (o *organizationUserRepository) Create(ctx context.Context, orgUser *organization.OrganizationUser) error {
+func (o *organizationUserRepository) Create(ctx context.Context, orgUser organization.OrganizationUser) error {
 	ctx, span := otel.Tracer("repository").Start(ctx, "organizationUserRepository.Create")
 	defer span.End()
 
 	if err := o.GetQueries(ctx).CreateOrgUser(ctx, model.CreateOrgUserParams{
-		OrganizationID: orgUser.OrganizationID.UUID(),
-		UserID:         orgUser.UserID.UUID(),
-		Role:           int32(orgUser.Role),
+		OrganizationUserID: orgUser.OrganizationUserID.UUID(),
+		OrganizationID:     orgUser.OrganizationID.UUID(),
+		UserID:             orgUser.UserID.UUID(),
+		Role:               int32(orgUser.Role),
+		UpdatedAt:          clock.Now(ctx),
+		CreatedAt:          clock.Now(ctx),
 	}); err != nil {
 		return err
 	}
+
 	return nil
 }
 
