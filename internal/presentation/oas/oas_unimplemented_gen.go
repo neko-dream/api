@@ -328,6 +328,24 @@ func (UnimplementedHandler) OpinionsHistory(ctx context.Context, params Opinions
 	return r, ht.ErrNotImplemented
 }
 
+// PasswordLogin implements passwordLogin operation.
+//
+// パスワードによるログイン.
+//
+// POST /auth/password/login
+func (UnimplementedHandler) PasswordLogin(ctx context.Context, req OptPasswordLoginReq) (r PasswordLoginRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// PasswordRegister implements passwordRegister operation.
+//
+// パスワードによる登録（devのみ）.
+//
+// POST /auth/password/register
+func (UnimplementedHandler) PasswordRegister(ctx context.Context, req OptPasswordRegisterReq) (r PasswordRegisterRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // PolicyConsent implements policyConsent operation.
 //
 // 最新のポリシーに同意する.

@@ -79,7 +79,7 @@ func (g *getOpinionReportQueryInteractor) Execute(ctx context.Context, input rep
 
 	// reportMapより、reportの情報を取得
 	var reportDetailReasons []dto.ReportDetailReason
-	reportedUser :=  make(map[shared.UUID[user.User]]any)
+	reportedUser := make(map[shared.UUID[user.User]]any)
 	for _, reportDetail := range reports {
 		detailDTO := dto.ReportDetailReason{
 			ReportID: shared.UUID[opinion.Report](reportDetail.OpinionReport.OpinionReportID),

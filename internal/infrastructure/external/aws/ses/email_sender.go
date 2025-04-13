@@ -11,6 +11,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/email"
 	email_template "github.com/neko-dream/server/internal/infrastructure/email/template"
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel"
 )
 
 type SESEmailSender struct {
@@ -35,6 +36,9 @@ func (s *SESEmailSender) Send(
 	tmpl email_template.EmailTemplateType,
 	data map[string]any,
 ) error {
+	ctx, span := otel.Tracer("ses").Start(ctx, "SESEmailSender.Send")
+	defer span.End()
+
 	if to == "" {
 		return fmt.Errorf("メール送信先アドレスが指定されていません")
 	}

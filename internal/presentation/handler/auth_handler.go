@@ -13,6 +13,7 @@ import (
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/internal/usecase/command/auth_command"
 	cookie_utils "github.com/neko-dream/server/pkg/cookie"
+	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
@@ -24,6 +25,9 @@ type authHandler struct {
 	auth_command.LoginForDev
 	auth_command.DetachAccount
 
+	passwordLogin    auth_command.PasswordLogin
+	passwordRegister auth_command.PasswordRegister
+
 	cookie.CookieManager
 }
 
@@ -34,15 +38,20 @@ func NewAuthHandler(
 	devLogin auth_command.LoginForDev,
 	detachAccount auth_command.DetachAccount,
 
+	login auth_command.PasswordLogin,
+	register auth_command.PasswordRegister,
+
 	cookieManger cookie.CookieManager,
 ) oas.AuthHandler {
 	return &authHandler{
-		AuthLogin:     authLogin,
-		AuthCallback:  authCallback,
-		Revoke:        revoke,
-		LoginForDev:   devLogin,
-		DetachAccount: detachAccount,
-		CookieManager: cookieManger,
+		AuthLogin:        authLogin,
+		AuthCallback:     authCallback,
+		Revoke:           revoke,
+		LoginForDev:      devLogin,
+		DetachAccount:    detachAccount,
+		CookieManager:    cookieManger,
+		passwordLogin:    login,
+		passwordRegister: register,
 	}
 }
 
@@ -196,4 +205,40 @@ func (a *authHandler) AuthAccountDetach(ctx context.Context) (oas.AuthAccountDet
 	res := new(oas.AuthAccountDetachOKHeaders)
 	res.SetSetCookie(cookie_utils.EncodeCookies([]*http.Cookie{a.CookieManager.CreateRevokeCookie()}))
 	return res, nil
+}
+
+// PasswordLogin
+func (a *authHandler) PasswordLogin(ctx context.Context, req oas.OptPasswordLoginReq) (oas.PasswordLoginRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.PasswordLogin")
+	defer span.End()
+
+	out, err := a.passwordLogin.Execute(ctx, auth_command.PasswordLoginInput{
+		IDorEmail: req.Value.IDOrEmail,
+		Password:  req.Value.Password,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	res := http_utils.GetHTTPResponse(ctx)
+	res.Header().Set("Set-Cookie", cookie_utils.EncodeCookies([]*http.Cookie{a.CookieManager.CreateSessionCookie(out.Token)})[0])
+	return &oas.PasswordLoginOK{}, nil
+}
+
+// PasswordRegister
+func (a *authHandler) PasswordRegister(ctx context.Context, req oas.OptPasswordRegisterReq) (oas.PasswordRegisterRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.PasswordRegister")
+	defer span.End()
+
+	out, err := a.passwordRegister.Execute(ctx, auth_command.PasswordRegisterInput{
+		Email:    req.Value.Email,
+		Password: req.Value.Password,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	res := http_utils.GetHTTPResponse(ctx)
+	res.Header().Set("Set-Cookie", cookie_utils.EncodeCookies([]*http.Cookie{a.CookieManager.CreateSessionCookie(out.Token)})[0])
+	return &oas.PasswordRegisterOK{}, nil
 }

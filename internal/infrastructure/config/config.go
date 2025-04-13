@@ -56,6 +56,9 @@ type Config struct {
 	EMAIL_FROM  string `env:"EMAIL_FROM"`
 	APP_NAME    string `env:"APP_NAME"`
 	WEBSITE_URL string `env:"WEBSITE_URL"`
+
+	HASH_PEPPER     string `env:"HASH_PEPPER"`
+	HASH_ITERATIONS int    `env:"HASH_ITERATIONS"`
 }
 
 type ENV string
