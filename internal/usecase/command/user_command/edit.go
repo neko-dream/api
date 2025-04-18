@@ -26,7 +26,7 @@ type (
 		Icon          *multipart.FileHeader // ユーザーのアイコン
 		Email         *string               // ユーザーのメールアドレス
 		DeleteIcon    bool                  // アイコンを削除するかどうか
-		YearOfBirth   *int                  // ユーザーの生年
+		DateOfBirth   *int                  // ユーザーの生年
 		Gender        *string               // ユーザーの性別
 		City          *string               // ユーザーの住んでいる市町村
 		Occupation    *string               // ユーザーの職業
@@ -109,7 +109,7 @@ func (e *editHandler) Execute(ctx context.Context, input EditInput) (*EditOutput
 			foundUser.SetEmailVerified(false)
 		}
 
-		if input.YearOfBirth != nil ||
+		if input.DateOfBirth != nil ||
 			input.Gender != nil ||
 			input.City != nil ||
 			input.Occupation != nil ||
@@ -126,7 +126,7 @@ func (e *editHandler) Execute(ctx context.Context, input EditInput) (*EditOutput
 			foundUser.SetDemographics(user.NewUserDemographic(
 				ctx,
 				demograID,
-				input.YearOfBirth,
+				input.DateOfBirth,
 				input.Gender,
 				input.City,
 				input.Prefecture,

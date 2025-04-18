@@ -63,13 +63,14 @@ type OrganizationUser struct {
 }
 
 type PasswordAuth struct {
-	PasswordAuthID uuid.UUID
-	UserID         uuid.UUID
-	PasswordHash   string
-	Salt           sql.NullString
-	LastChanged    time.Time
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
+	PasswordAuthID         uuid.UUID
+	UserID                 uuid.UUID
+	PasswordHash           string
+	Salt                   sql.NullString
+	RequiredPasswordChange bool
+	LastChanged            time.Time
+	CreatedAt              time.Time
+	UpdatedAt              time.Time
 }
 
 type PolicyConsent struct {
@@ -173,7 +174,7 @@ type UserAuth struct {
 type UserDemographic struct {
 	UserDemographicsID uuid.UUID
 	UserID             uuid.UUID
-	YearOfBirth        sql.NullString
+	DateOfBirth        sql.NullString
 	Gender             sql.NullString
 	City               sql.NullString
 	CreatedAt          time.Time

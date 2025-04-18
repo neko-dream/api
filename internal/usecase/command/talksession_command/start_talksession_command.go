@@ -8,6 +8,7 @@ import (
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/clock"
+	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
@@ -42,6 +43,7 @@ type (
 	startTalkSessionCommandHandler struct {
 		talksession.TalkSessionRepository
 		user.UserRepository
+		organization.OrganizationUserRepository
 		*db.DBManager
 	}
 )
@@ -62,18 +64,29 @@ func (in *StartTalkSessionCommandInput) Validate() error {
 func NewStartTalkSessionCommand(
 	talkSessionRepository talksession.TalkSessionRepository,
 	userRepository user.UserRepository,
+	organizationUserRepository organization.OrganizationUserRepository,
 	DBManager *db.DBManager,
 ) StartTalkSessionCommand {
 	return &startTalkSessionCommandHandler{
-		TalkSessionRepository: talkSessionRepository,
-		UserRepository:        userRepository,
-		DBManager:             DBManager,
+		TalkSessionRepository:      talkSessionRepository,
+		UserRepository:             userRepository,
+		OrganizationUserRepository: organizationUserRepository,
+		DBManager:                  DBManager,
 	}
 }
 
 func (i *startTalkSessionCommandHandler) Execute(ctx context.Context, input StartTalkSessionCommandInput) (StartTalkSessionCommandOutput, error) {
 	ctx, span := otel.Tracer("talksession_command").Start(ctx, "startTalkSessionCommandHandler.Execute")
 	defer span.End()
+	// Organizationに所属していないとセッションを開始できない
+	orgs, err := i.OrganizationUserRepository.FindByUserID(ctx, input.OwnerID)
+	if err != nil {
+		utils.HandleError(ctx, err, "OrganizationUserRepository.FindByUserID")
+		return StartTalkSessionCommandOutput{}, messages.ForbiddenError
+	}
+	if len(orgs) == 0 {
+		return StartTalkSessionCommandOutput{}, messages.ForbiddenError
+	}
 
 	var output StartTalkSessionCommandOutput
 

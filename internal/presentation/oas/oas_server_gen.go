@@ -12,6 +12,7 @@ type Handler interface {
 	ImageHandler
 	ManageHandler
 	OpinionHandler
+	OrganizationHandler
 	PolicyHandler
 	TalkSessionHandler
 	TestHandler
@@ -36,6 +37,12 @@ type AuthHandler interface {
 	//
 	// GET /auth/{provider}/login
 	Authorize(ctx context.Context, params AuthorizeParams) (AuthorizeRes, error)
+	// ChangePassword implements changePassword operation.
+	//
+	// パスワード変更.
+	//
+	// PUT /auth/password/change
+	ChangePassword(ctx context.Context, params ChangePasswordParams) (ChangePasswordRes, error)
 	// DevAuthorize implements devAuthorize operation.
 	//
 	// 開発用登録/ログイン.
@@ -192,6 +199,44 @@ type OpinionHandler interface {
 	//
 	// GET /talksessions/{talkSessionID}/swipe_opinions
 	SwipeOpinions(ctx context.Context, params SwipeOpinionsParams) (SwipeOpinionsRes, error)
+}
+
+// OrganizationHandler handles operations described by OpenAPI v3 specification.
+//
+// x-ogen-operation-group: Organization
+type OrganizationHandler interface {
+	// CreateOrganizations implements createOrganizations operation.
+	//
+	// 組織を作成できる。
+	// これを作れるユーザーはDBを直接叩いて作るしかない。
+	// OrgType
+	// - 1: 通常
+	// - 2: 自治体
+	// - 3: 議員.
+	//
+	// POST /organizations
+	CreateOrganizations(ctx context.Context, req OptCreateOrganizationsReq) (CreateOrganizationsRes, error)
+	// GetOrganizations implements getOrganizations operation.
+	//
+	// 所属組織一覧.
+	//
+	// GET /organizations
+	GetOrganizations(ctx context.Context) (GetOrganizationsRes, error)
+	// InviteOrganization implements inviteOrganization operation.
+	//
+	// Role
+	// - 1: Member
+	// - 2: Admin
+	// - 3: Owner.
+	//
+	// POST /organizations/{organizationID}/invite
+	InviteOrganization(ctx context.Context, req OptInviteOrganizationReq, params InviteOrganizationParams) (InviteOrganizationRes, error)
+	// InviteOrganizationForUser implements inviteOrganizationForUser operation.
+	//
+	// 組織にユーザーを追加.
+	//
+	// POST /organizations/{organizationID}/invite_user
+	InviteOrganizationForUser(ctx context.Context, req OptInviteOrganizationForUserReq, params InviteOrganizationForUserParams) (InviteOrganizationForUserRes, error)
 }
 
 // PolicyHandler handles operations described by OpenAPI v3 specification.

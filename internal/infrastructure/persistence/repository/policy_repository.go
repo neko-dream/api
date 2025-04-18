@@ -57,15 +57,15 @@ func (p *policyRepository) FindByVersion(ctx context.Context, version string) (*
 	ctx, span := otel.Tracer("repository").Start(ctx, "policyRepository.FindByVersion")
 	defer span.End()
 
-	resRow, err := p.DBManager.GetQueries(ctx).FindPolicyByVersion(ctx, version)
-	if err != nil {
-		utils.HandleError(ctx, err, "ポリシーを取得できませんでした。")
-		return nil, err
-	}
+	// resRow, err := p.DBManager.GetQueries(ctx).FindPolicyByVersion(ctx, version)
+	// if err != nil {
+	// 	utils.HandleError(ctx, err, "ポリシーを取得できませんでした。")
+	// 	return nil, err
+	// }
 
 	return &consent.Policy{
-		Version:   resRow.PolicyVersion.Version,
-		CreatedAt: resRow.PolicyVersion.CreatedAt,
+		Version:   p.POLICY_VERSION,
+		CreatedAt: time.Date(2025, 2, 1, 0, 0, 0, 0, time.UTC),
 	}, nil
 }
 

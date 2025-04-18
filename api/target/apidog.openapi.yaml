@@ -19,10 +19,10 @@
       "name": "timeline"
     },
     {
-      "name": "user"
+      "name": "auth"
     },
     {
-      "name": "auth"
+      "name": "user"
     },
     {
       "name": "test"
@@ -32,6 +32,9 @@
     },
     {
       "name": "policy"
+    },
+    {
+      "name": "organization"
     }
   ],
   "paths": {
@@ -3543,6 +3546,108 @@
         "x-ogen-operation-group": "TalkSession"
       }
     },
+    "/auth/password/change": {
+      "put": {
+        "summary": "パスワード変更",
+        "deprecated": false,
+        "description": "",
+        "operationId": "changePassword",
+        "tags": [
+          "auth"
+        ],
+        "parameters": [
+          {
+            "name": "id_or_email",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "old_password",
+            "in": "query",
+            "description": "古いパスワード",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "new_password",
+            "in": "query",
+            "description": "新たなパスワード",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
+        "x-ogen-operation-group": "Auth"
+      }
+    },
     "/user": {
       "post": {
         "summary": "ユーザー作成",
@@ -3575,10 +3680,10 @@
                     "description": "ユーザーアイコン",
                     "example": ""
                   },
-                  "yearOfBirth": {
+                  "dateOfBirth": {
                     "type": "integer",
                     "default": 0,
-                    "description": "生まれ年",
+                    "description": "生年月日",
                     "example": 0,
                     "nullable": true
                   },
@@ -3764,9 +3869,9 @@
                     "example": "false",
                     "nullable": true
                   },
-                  "yearOfBirth": {
+                  "dateOfBirth": {
                     "type": "integer",
-                    "description": "生まれ年",
+                    "description": "生年月日",
                     "example": 0,
                     "nullable": true
                   },
@@ -3784,7 +3889,7 @@
                   },
                   "city": {
                     "type": "string",
-                    "description": "市区町村",
+                    "description": "市町村",
                     "example": "",
                     "nullable": true
                   },
@@ -4481,6 +4586,15 @@
                     },
                     "isEmailVerified": {
                       "type": "boolean"
+                    },
+                    "orgType": {
+                      "type": "integer",
+                      "description": "アカウントの種類。組織がなければ空",
+                      "nullable": true
+                    },
+                    "requiredPasswordChange": {
+                      "type": "boolean",
+                      "description": "パスワードの更新が必要かどうか"
                     }
                   },
                   "required": [
@@ -4491,7 +4605,8 @@
                     "sub",
                     "jti",
                     "isRegistered",
-                    "isEmailVerified"
+                    "isEmailVerified",
+                    "requiredPasswordChange"
                   ]
                 }
               }
@@ -5718,6 +5833,406 @@
         ],
         "x-ogen-operation-group": "Policy"
       }
+    },
+    "/organizations": {
+      "post": {
+        "summary": "組織作成（運営ユーザーのみ）",
+        "deprecated": false,
+        "description": "組織を作成できる。\nこれを作れるユーザーはDBを直接叩いて作るしかない。\n\nOrgType\n- 1: 通常\n- 2: 自治体\n- 3: 議員",
+        "operationId": "createOrganizations",
+        "tags": [
+          "organization"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "example": "",
+                    "type": "string"
+                  },
+                  "orgType": {
+                    "type": "integer",
+                    "example": 0
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
+        "x-ogen-operation-group": "Organization"
+      },
+      "get": {
+        "summary": "所属組織一覧",
+        "deprecated": false,
+        "description": "",
+        "operationId": "getOrganizations",
+        "tags": [
+          "organization"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "organizations": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/organization"
+                      },
+                      "description": "所属組織"
+                    }
+                  },
+                  "required": [
+                    "organizations"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
+        "x-ogen-operation-group": "Organization"
+      }
+    },
+    "/organizations/{organizationID}/invite": {
+      "post": {
+        "summary": "組織ユーザー招待（運営ユーザーのみ）",
+        "deprecated": false,
+        "description": "Role\n- 1: Member\n- 2: Admin\n- 3: Owner",
+        "operationId": "inviteOrganization",
+        "tags": [
+          "organization"
+        ],
+        "parameters": [
+          {
+            "name": "organizationID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "role": {
+                    "type": "integer",
+                    "example": 0
+                  },
+                  "email": {
+                    "example": "",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "role",
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
+        "x-ogen-operation-group": "Organization"
+      }
+    },
+    "/organizations/{organizationID}/invite_user": {
+      "post": {
+        "summary": "組織にユーザーを追加",
+        "deprecated": false,
+        "description": "",
+        "operationId": "inviteOrganizationForUser",
+        "tags": [
+          "organization"
+        ],
+        "parameters": [
+          {
+            "name": "organizationID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "role": {
+                    "type": "number",
+                    "example": 0
+                  },
+                  "displayID": {
+                    "type": "string",
+                    "example": ""
+                  }
+                },
+                "required": [
+                  "role",
+                  "displayID"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
+        "x-ogen-operation-group": "Organization"
+      }
     }
   },
   "components": {
@@ -5955,6 +6470,15 @@
           },
           "isEmailVerified": {
             "type": "boolean"
+          },
+          "orgType": {
+            "type": "integer",
+            "description": "アカウントの種類。組織がなければ空",
+            "nullable": true
+          },
+          "requiredPasswordChange": {
+            "type": "boolean",
+            "description": "パスワードの更新が必要かどうか"
           }
         },
         "required": [
@@ -5965,7 +6489,8 @@
           "sub",
           "jti",
           "isRegistered",
-          "isEmailVerified"
+          "isEmailVerified",
+          "requiredPasswordChange"
         ]
       },
       "offsetPagination": {
@@ -5990,9 +6515,10 @@
       "userDemographics": {
         "type": "object",
         "properties": {
-          "yearOfBirth": {
+          "dateOfBirth": {
             "type": "integer",
-            "description": "誕生年",
+            "description": "生年月日",
+            "title": "20001010",
             "nullable": true
           },
           "gender": {
@@ -6003,13 +6529,14 @@
           },
           "city": {
             "type": "string",
-            "title": "市区町村",
-            "description": "市区町村",
+            "title": "市町村",
+            "description": "市町村",
             "nullable": true
           },
           "prefecture": {
             "type": "string",
             "description": "都道府県",
+            "title": "都道府県",
             "nullable": true
           }
         }
@@ -6245,6 +6772,33 @@
           "reasons",
           "reportCount",
           "status"
+        ]
+      },
+      "organization": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "description": "組織ID"
+          },
+          "Name": {
+            "type": "string",
+            "description": "組織名"
+          },
+          "Type": {
+            "type": "integer",
+            "description": "組織のタイプ"
+          },
+          "Role": {
+            "type": "integer",
+            "description": "ロール"
+          }
+        },
+        "required": [
+          "ID",
+          "Name",
+          "Type",
+          "Role"
         ]
       }
     },

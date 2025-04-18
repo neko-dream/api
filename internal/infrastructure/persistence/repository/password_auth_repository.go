@@ -25,18 +25,20 @@ func NewPasswordAuthRepository(dbManager *db.DBManager) password_auth.PasswordAu
 }
 
 // CreatePasswordAuth
-func (p *passwordAuthRepository) CreatePasswordAuth(ctx context.Context, userID shared.UUID[user.User], passwordHash string, salt string) error {
+func (p *passwordAuthRepository) CreatePasswordAuth(ctx context.Context, userID shared.UUID[user.User], passwordHash string, salt string, requiredChange bool) error {
 	ctx, span := otel.Tracer("repository").Start(ctx, "passwordAuthRepository.CreatePasswordAuth")
 	defer span.End()
+
 	now := clock.Now(ctx)
 	if err := p.DBManager.GetQueries(ctx).CreatePasswordAuth(ctx, model.CreatePasswordAuthParams{
-		PasswordAuthID: shared.NewUUID[password_auth.PasswordAuth]().UUID(),
-		UserID:         userID.UUID(),
-		PasswordHash:   passwordHash,
-		Salt:           sql.NullString{String: salt, Valid: true},
-		LastChanged:    now,
-		CreatedAt:      now,
-		UpdatedAt:      now,
+		PasswordAuthID:         shared.NewUUID[password_auth.PasswordAuth]().UUID(),
+		UserID:                 userID.UUID(),
+		PasswordHash:           passwordHash,
+		Salt:                   sql.NullString{String: salt, Valid: true},
+		RequiredPasswordChange: requiredChange,
+		LastChanged:            now,
+		CreatedAt:              now,
+		UpdatedAt:              now,
 	}); err != nil {
 		utils.HandleError(ctx, err, "CreatePasswordAuth")
 		return err
@@ -68,27 +70,30 @@ func (p *passwordAuthRepository) GetPasswordAuthByUserID(ctx context.Context, us
 		utils.HandleError(ctx, err, "GetPasswordAuthByUserID")
 		return password_auth.PasswordAuth{}, err
 	}
+
 	return password_auth.PasswordAuth{
-		PasswordAuthID: shared.UUID[password_auth.PasswordAuth](passwordAuth.PasswordAuth.PasswordAuthID),
-		UserID:         shared.UUID[user.User](passwordAuth.PasswordAuth.UserID),
-		PasswordHash:   passwordAuth.PasswordAuth.PasswordHash,
-		Salt:           passwordAuth.PasswordAuth.Salt.String,
-		LastChanged:    passwordAuth.PasswordAuth.LastChanged,
-		CreatedAt:      passwordAuth.PasswordAuth.CreatedAt,
-		UpdatedAt:      passwordAuth.PasswordAuth.UpdatedAt,
+		PasswordAuthID:         shared.UUID[password_auth.PasswordAuth](passwordAuth.PasswordAuth.PasswordAuthID),
+		UserID:                 shared.UUID[user.User](passwordAuth.PasswordAuth.UserID),
+		PasswordHash:           passwordAuth.PasswordAuth.PasswordHash,
+		Salt:                   passwordAuth.PasswordAuth.Salt.String,
+		RequiredPasswordChange: passwordAuth.PasswordAuth.RequiredPasswordChange,
+		LastChanged:            passwordAuth.PasswordAuth.LastChanged,
+		CreatedAt:              passwordAuth.PasswordAuth.CreatedAt,
+		UpdatedAt:              passwordAuth.PasswordAuth.UpdatedAt,
 	}, nil
 }
 
 // UpdatePasswordAuth
-func (p *passwordAuthRepository) UpdatePasswordAuth(ctx context.Context, userID shared.UUID[user.User], passwordHash string, salt string) error {
+func (p *passwordAuthRepository) UpdatePasswordAuth(ctx context.Context, userID shared.UUID[user.User], passwordHash string, salt string, requiredChange bool) error {
 	ctx, span := otel.Tracer("repository").Start(ctx, "passwordAuthRepository.UpdatePasswordAuth")
 	defer span.End()
 
 	if err := p.DBManager.GetQueries(ctx).UpdatePasswordAuth(ctx, model.UpdatePasswordAuthParams{
-		UserID:       userID.UUID(),
-		PasswordHash: passwordHash,
-		Salt:         sql.NullString{String: salt, Valid: true},
-		LastChanged:  clock.Now(ctx),
+		UserID:                 userID.UUID(),
+		PasswordHash:           passwordHash,
+		Salt:                   sql.NullString{String: salt, Valid: true},
+		RequiredPasswordChange: requiredChange,
+		LastChanged:            clock.Now(ctx),
 	}); err != nil {
 		utils.HandleError(ctx, err, "UpdatePasswordAuth")
 		return err

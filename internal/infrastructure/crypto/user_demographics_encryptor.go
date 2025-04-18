@@ -27,7 +27,7 @@ func EncryptUserDemographics(
 
 	_ = ctx
 
-	var city, prefecture, yearOfBirth, gender sql.NullString
+	var city, prefecture, dateOfBirth, gender sql.NullString
 	if userDemographic.City() != nil {
 		encryptedCity, err := encryptor.EncryptString(ctx, userDemographic.City().String())
 		if err != nil {
@@ -46,13 +46,13 @@ func EncryptUserDemographics(
 		prefecture = sql.NullString{String: encryptedPrefecture, Valid: true}
 	}
 
-	if userDemographic.YearOfBirth() != nil {
-		encryptedYear, err := encryptor.EncryptInt(ctx, int64(*userDemographic.YearOfBirth()))
+	if userDemographic.DateOfBirth() != nil {
+		encryptedDateOfBirth, err := encryptor.EncryptInt(ctx, int64(*userDemographic.DateOfBirth()))
 		if err != nil {
-			utils.HandleError(ctx, err, "encryptor.EncryptInt YearOfBirth")
+			utils.HandleError(ctx, err, "encryptor.EncryptInt DateOfBirth")
 			return nil, err
 		}
-		yearOfBirth = sql.NullString{String: encryptedYear, Valid: true}
+		dateOfBirth = sql.NullString{String: encryptedDateOfBirth, Valid: true}
 	}
 
 	if userDemographic.Gender() != nil {
@@ -68,7 +68,7 @@ func EncryptUserDemographics(
 		UserID:             userID.UUID(),
 		UserDemographicsID: userDemographic.ID().UUID(),
 		City:               city,
-		YearOfBirth:        yearOfBirth,
+		DateOfBirth:        dateOfBirth,
 		Prefecture:         prefecture,
 		Gender:             gender,
 	}, nil
@@ -84,7 +84,7 @@ func DecryptUserDemographics(
 	defer span.End()
 
 	var city, prefecture, gender *string
-	var yearOfBirth *int
+	var dateOfBirth *int
 
 	if userDemographic.City.Valid {
 		decryptedCity, err := decryptor.DecryptString(ctx, userDemographic.City.String)
@@ -102,13 +102,13 @@ func DecryptUserDemographics(
 		}
 		prefecture = &decryptedPrefecture
 	}
-	if userDemographic.YearOfBirth.Valid {
-		decryptedYear, err := decryptor.DecryptInt(ctx, userDemographic.YearOfBirth.String)
+	if userDemographic.DateOfBirth.Valid {
+		decryptedYear, err := decryptor.DecryptInt(ctx, userDemographic.DateOfBirth.String)
 		if err != nil {
-			utils.HandleError(ctx, err, "decryptor.DecryptInt YearOfBirth")
+			utils.HandleError(ctx, err, "decryptor.DecryptInt DateOfBirth")
 			return nil, err
 		}
-		yearOfBirth = lo.ToPtr(int(decryptedYear))
+		dateOfBirth = lo.ToPtr(int(decryptedYear))
 	}
 	if userDemographic.Gender.Valid {
 		decryptedGender, err := decryptor.DecryptInt(ctx, userDemographic.Gender.String)
@@ -123,7 +123,7 @@ func DecryptUserDemographics(
 	demo := user.NewUserDemographic(
 		ctx,
 		shared.UUID[user.UserDemographic](userDemographic.UserDemographicsID),
-		yearOfBirth,
+		dateOfBirth,
 		gender,
 		city,
 		prefecture,
@@ -150,8 +150,8 @@ func DecryptUserDemographicsDTO(
 		UserID:            shared.UUID[user.User](userDemographic.UserID),
 	}
 
-	if decrypted.YearOfBirth() != nil {
-		udDTO.YearOfBirth = lo.ToPtr(int(*decrypted.YearOfBirth()))
+	if decrypted.DateOfBirth() != nil {
+		udDTO.DateOfBirth = lo.ToPtr(int(*decrypted.DateOfBirth()))
 	}
 	if decrypted.Gender() != nil {
 		udDTO.Gender = lo.ToPtr(int(*decrypted.Gender()))

@@ -155,7 +155,7 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 		if err := u.GetQueries(ctx).UpdateOrCreateUserDemographic(ctx, model.UpdateOrCreateUserDemographicParams{
 			UserDemographicsID: encryptedDemo.UserDemographicsID,
 			UserID:             encryptedDemo.UserID,
-			YearOfBirth:        encryptedDemo.YearOfBirth,
+			DateOfBirth:        encryptedDemo.DateOfBirth,
 			City:               encryptedDemo.City,
 			Gender:             encryptedDemo.Gender,
 			Prefecture:         encryptedDemo.Prefecture,
@@ -274,7 +274,7 @@ func (u *userRepository) FindBySubject(ctx context.Context, subject user.UserSub
 
 	row, err := u.GetQueries(ctx).GetUserBySubject(ctx, subject.String())
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	return u.newUserFromModel(ctx, &row.User, &row.UserAuth)

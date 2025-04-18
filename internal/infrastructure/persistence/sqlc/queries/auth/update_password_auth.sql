@@ -3,6 +3,7 @@ UPDATE password_auth
 SET
   password_hash = $2,
   salt = $3,
-  last_changed = $4,
-  updated_at = $5
+  required_password_change = $4,
+  last_changed = $5,
+  updated_at = $6
 WHERE user_id = $1;

@@ -27,7 +27,7 @@ type (
 		DisplayID   string                // ユーザーの表示用ID
 		DisplayName string                // ユーザーの表示名
 		Icon        *multipart.FileHeader // ユーザーのアイコン
-		YearOfBirth *int                  // ユーザーの生年
+		DateOfBirth *int                  // ユーザーの生年
 		Gender      *string               // ユーザーの性別
 		City        *string               // ユーザーの住んでいる市町村
 		Prefecture  *string               // ユーザーの住んでいる都道府県
@@ -121,7 +121,7 @@ func (i *registerHandler) Execute(ctx context.Context, input RegisterInput) (*Re
 		foundUser.SetDemographics(user.NewUserDemographic(
 			ctx,
 			shared.NewUUID[user.UserDemographic](),
-			input.YearOfBirth,
+			input.DateOfBirth,
 			input.Gender,
 			input.City,
 			input.Prefecture,

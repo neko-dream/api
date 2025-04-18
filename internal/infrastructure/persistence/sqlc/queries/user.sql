@@ -55,7 +55,7 @@ UPDATE "users" SET display_id = $2, display_name = $3, icon_url = $4, email = $5
 INSERT INTO user_demographics (
     user_demographics_id,
     user_id,
-    year_of_birth,
+    date_of_birth,
     gender,
     city,
     prefecture,
@@ -64,7 +64,7 @@ INSERT INTO user_demographics (
 ) VALUES ($1, $2, $3, $4, $5, $6,  now(), now())
 ON CONFLICT (user_id)
 DO UPDATE SET
-    year_of_birth = $3,
+    date_of_birth = $3,
     gender = $4,
     city = $5,
     prefecture = $6,

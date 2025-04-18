@@ -15,6 +15,7 @@ import (
 	cookie_utils "github.com/neko-dream/server/pkg/cookie"
 	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/utils"
+	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
@@ -27,6 +28,7 @@ type authHandler struct {
 
 	passwordLogin    auth_command.PasswordLogin
 	passwordRegister auth_command.PasswordRegister
+	changePassword   auth_command.ChangePassword
 
 	cookie.CookieManager
 }
@@ -40,6 +42,7 @@ func NewAuthHandler(
 
 	login auth_command.PasswordLogin,
 	register auth_command.PasswordRegister,
+	changePassword auth_command.ChangePassword,
 
 	cookieManger cookie.CookieManager,
 ) oas.AuthHandler {
@@ -52,6 +55,7 @@ func NewAuthHandler(
 		CookieManager:    cookieManger,
 		passwordLogin:    login,
 		passwordRegister: register,
+		changePassword:   changePassword,
 	}
 }
 
@@ -156,6 +160,10 @@ func (a *authHandler) OAuthTokenInfo(ctx context.Context) (oas.OAuthTokenInfoRes
 	if claim.IsExpired(ctx) {
 		return nil, messages.TokenExpiredError
 	}
+	var orgType *int
+	if claim.OrgType != nil {
+		orgType = lo.ToPtr(*claim.OrgType)
+	}
 
 	return &oas.OAuthTokenInfoOK{
 		Aud:             claim.Audience(),
@@ -169,6 +177,7 @@ func (a *authHandler) OAuthTokenInfo(ctx context.Context) (oas.OAuthTokenInfoRes
 		DisplayID:       utils.ToOpt[oas.OptString](claim.DisplayID),
 		DisplayName:     utils.ToOpt[oas.OptString](claim.DisplayName),
 		IconURL:         utils.ToOpt[oas.OptString](claim.IconURL),
+		OrgType:         utils.ToOptNil[oas.OptNilInt](orgType),
 	}, nil
 }
 
@@ -241,4 +250,34 @@ func (a *authHandler) PasswordRegister(ctx context.Context, req oas.OptPasswordR
 	res := http_utils.GetHTTPResponse(ctx)
 	res.Header().Set("Set-Cookie", cookie_utils.EncodeCookies([]*http.Cookie{a.CookieManager.CreateSessionCookie(out.Token)})[0])
 	return &oas.PasswordRegisterOK{}, nil
+}
+
+// ChangePassword implements oas.AuthHandler.
+func (a *authHandler) ChangePassword(ctx context.Context, params oas.ChangePasswordParams) (oas.ChangePasswordRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.ChangePassword")
+	defer span.End()
+
+	claim := session.GetSession(ctx)
+	if claim == nil {
+		return nil, messages.ForbiddenError
+	}
+	userID, err := claim.UserID()
+	if err != nil {
+		return nil, messages.ForbiddenError
+	}
+
+	out, err := a.changePassword.Execute(ctx, auth_command.ChangePasswordInput{
+		UserID:      shared.UUID[user.User](userID),
+		OldPassword: params.OldPassword,
+		NewPassword: params.NewPassword,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if !out.Success {
+		return nil, messages.InternalServerError
+	}
+
+	res := &oas.ChangePasswordOK{}
+	return res, nil
 }

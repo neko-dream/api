@@ -4,7 +4,8 @@ INSERT INTO password_auth (
   user_id,
   password_hash,
   salt,
+  required_password_change,
   last_changed,
   created_at,
   updated_at
-) VALUES ($1, $2, $3, $4, $5, $6, $7);
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);

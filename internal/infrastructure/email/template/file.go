@@ -17,6 +17,8 @@ const (
 	footerTemplate EmailTemplateType = "footer.tpl"
 	// VerificationEmailTemplate
 	VerificationEmailTemplate EmailTemplateType = "verification_email.tpl"
+	// OrganizationInvitationEmailTemplate
+	OrganizationInvitationEmailTemplate EmailTemplateType = "organization_invitation.tpl"
 )
 
 func LoadMailTemplate(templateType EmailTemplateType) (*template.Template, error) {

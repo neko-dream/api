@@ -1,7 +1,9 @@
 package hash
 
 import (
+	"crypto/hmac"
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
 
@@ -18,12 +20,11 @@ func GenerateSalt(length int) (string, error) {
 }
 
 func HashPassword(password, salt, pepper string, cost int) (string, error) {
-	saltedPepperedPassword := password + salt + pepper
 	if cost < bcrypt.MinCost || cost > bcrypt.MaxCost {
 		return "", fmt.Errorf("cost must be between %d and %d", bcrypt.MinCost, bcrypt.MaxCost)
 	}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(saltedPepperedPassword), cost)
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), cost)
 	if err != nil {
 		return "", fmt.Errorf("failed to hash password: %w", err)
 	}
@@ -31,23 +32,34 @@ func HashPassword(password, salt, pepper string, cost int) (string, error) {
 	return string(hash), nil
 }
 
-func VerifyPassword(password string, salt, pepper, hashedPassword string) bool {
-	saltedPepperedPassword := password + salt + pepper
-	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(saltedPepperedPassword))
-	return err == nil
+func VerifyPassword(password string, hashedPassword string) bool {
+	res := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+	return res == nil
+}
+
+func getBinaryBySHA256(s string) []byte {
+	r := sha256.Sum256([]byte(s))
+	return r[:]
 }
 
 func HashEmail(email, pepper string) (string, error) {
-	saltedPepperedEmail := email + pepper
-	hash, err := bcrypt.GenerateFromPassword([]byte(saltedPepperedEmail), bcrypt.MinCost)
+	mac := hmac.New(sha256.New, getBinaryBySHA256(pepper))
+	_, err := mac.Write([]byte(email))
 	if err != nil {
-		return "", fmt.Errorf("failed to hash email: %w", err)
+		return "", err
 	}
-	return string(hash), nil
+
+	hashedEmail := mac.Sum(nil)
+	return base64.StdEncoding.EncodeToString(hashedEmail), err
 }
 
 func VerifyEmail(email, pepper, hashedEmail string) bool {
-	saltedPepperedEmail := email + pepper
-	err := bcrypt.CompareHashAndPassword([]byte(hashedEmail), []byte(saltedPepperedEmail))
-	return err == nil
+	mac := hmac.New(sha256.New, getBinaryBySHA256(pepper))
+	_, err := mac.Write([]byte(email))
+	if err != nil {
+		return false
+	}
+	expectedMAC := mac.Sum(nil)
+	expected := base64.StdEncoding.EncodeToString(expectedMAC)
+	return hmac.Equal([]byte(hashedEmail), []byte(expected))
 }

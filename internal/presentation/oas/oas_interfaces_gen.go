@@ -9,6 +9,14 @@ type AuthorizeRes interface {
 	authorizeRes()
 }
 
+type ChangePasswordRes interface {
+	changePasswordRes()
+}
+
+type CreateOrganizationsRes interface {
+	createOrganizationsRes()
+}
+
 type CreateTalkSessionRes interface {
 	createTalkSessionRes()
 }
@@ -65,6 +73,10 @@ type GetOpinionsForTalkSessionRes interface {
 	getOpinionsForTalkSessionRes()
 }
 
+type GetOrganizationsRes interface {
+	getOrganizationsRes()
+}
+
 type GetPolicyConsentStatusRes interface {
 	getPolicyConsentStatusRes()
 }
@@ -103,6 +115,14 @@ type GetTimeLineRes interface {
 
 type GetUserInfoRes interface {
 	getUserInfoRes()
+}
+
+type InviteOrganizationForUserRes interface {
+	inviteOrganizationForUserRes()
+}
+
+type InviteOrganizationRes interface {
+	inviteOrganizationRes()
 }
 
 type OAuthCallbackRes interface {

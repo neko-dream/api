@@ -39,17 +39,17 @@ var (
 			}},
 		DemographicsBirth: {
 			Key:         DemographicsBirth,
-			Description: "誕生年",
+			Description: "生年月日",
 			Order:       1,
 			IsSatisfied: func(user user.User) bool {
 				if user.Demographics() == nil {
 					return false
 				}
-				return user.Demographics().YearOfBirth() != nil
+				return user.Demographics().DateOfBirth() != nil
 			}},
 		DemographicsCity: {
 			Key:         DemographicsCity,
-			Description: "市区町村",
+			Description: "市町村",
 			Order:       2,
 			IsSatisfied: func(user user.User) bool {
 				if user.Demographics() == nil {

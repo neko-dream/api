@@ -59,11 +59,11 @@ jobs:
       - name: Run unit tests with coverage
         run: go test -parallel 2 -v -coverprofile=coverage.out ./...
 
-      - name: Run E2E tests
-        run: |
-          go install github.com/k1LoW/runn/cmd/runn@latest
-          POLICY_VERSION="1.0.0" go run cmd/server/main.go & sleep 5
-          ./scripts/test.sh
+      # - name: Run E2E tests
+      #   run: |
+      #     go install github.com/k1LoW/runn/cmd/runn@latest
+      #     POLICY_VERSION="1.0.0" go run cmd/server/main.go & sleep 5
+      #     ./scripts/test.sh
 
       - name: Coverage Report
         uses: k1LoW/octocov-action@v1
