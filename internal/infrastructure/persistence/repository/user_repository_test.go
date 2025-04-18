@@ -61,7 +61,7 @@ func TestUserRepository_Create(t *testing.T) {
 				demographics := user.NewUserDemographic(
 					ctx,
 					shared.NewUUID[user.UserDemographic](),
-					lo.ToPtr(1990),
+					lo.ToPtr(19900101),
 					lo.ToPtr("男性"),
 					lo.ToPtr("世田谷区"),
 					lo.ToPtr("東京都"),
