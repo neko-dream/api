@@ -68,7 +68,7 @@ func (i *inviteOrganizationForUserInteractor) Execute(ctx context.Context, input
 	}
 
 	// ドメインロジックを使用して権限チェックを行うのじゃ
-	targetRole := organization.OrganizationUserRole(input.Role)
+	targetRole := organization.NewOrganizationUserRole(input.Role)
 	if !orgUser.HasPermissionToChangeRoleTo(targetRole) {
 		return nil, messages.OrganizationPermissionDenied
 	}

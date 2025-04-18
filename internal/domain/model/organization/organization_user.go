@@ -20,6 +20,17 @@ type OrganizationUserRepository interface {
 
 type OrganizationUserRole int
 
+func NewOrganizationUserRole(role int) OrganizationUserRole {
+	if role < int(OrganizationUserRoleMember) || role > int(OrganizationUserRoleSuperAdmin) {
+		return OrganizationUserRoleMember
+	}
+	if role == 0 {
+		return OrganizationUserRoleMember
+	}
+
+	return OrganizationUserRole(role)
+}
+
 const (
 	OrganizationUserRoleMember OrganizationUserRole = iota + 1
 	OrganizationUserRoleAdmin
