@@ -51,7 +51,7 @@ func NewClaim(ctx context.Context, user user.User, sessionID shared.UUID[Session
 		IsRegistered:           user.Verify(),
 		IsEmailVerified:        user.IsEmailVerified(),
 		RequiredPasswordChange: requiredPasswordChange,
-		OrgType: 			  orgType,
+		OrgType:                orgType,
 	}
 }
 
@@ -79,7 +79,6 @@ func NewClaimFromMap(claims jwt.MapClaims) Claim {
 	if claims["orgType"] != nil {
 		orgType = lo.ToPtr(int(claims["orgType"].(float64)))
 	}
-
 
 	return Claim{
 		Sub:                    claims["sub"].(string),
@@ -149,6 +148,7 @@ func (c *Claim) GenMapClaim() *jwt.MapClaims {
 	} else {
 		(*cl)["orgType"] = nil
 	}
+
 	return cl
 }
 

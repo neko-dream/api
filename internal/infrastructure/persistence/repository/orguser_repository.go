@@ -54,9 +54,10 @@ func (o *organizationUserRepository) FindByOrganizationID(ctx context.Context, o
 	result := make([]*organization.OrganizationUser, len(orgUsers))
 	for i, orgUser := range orgUsers {
 		result[i] = &organization.OrganizationUser{
-			OrganizationID: shared.NewUUID[organization.Organization](),
-			UserID:         shared.UUID[user.User](orgUser.OrganizationUser.UserID),
-			Role:           organization.OrganizationUserRole(orgUser.OrganizationUser.Role),
+			OrganizationUserID: shared.UUID[organization.OrganizationUser](orgUser.OrganizationUser.OrganizationUserID),
+			OrganizationID:     shared.UUID[organization.Organization](orgUser.OrganizationUser.OrganizationID),
+			UserID:             shared.UUID[user.User](orgUser.OrganizationUser.UserID),
+			Role:               organization.OrganizationUserRole(orgUser.OrganizationUser.Role),
 		}
 	}
 	return result, nil
@@ -76,9 +77,10 @@ func (o *organizationUserRepository) FindByOrganizationIDAndUserID(ctx context.C
 	}
 
 	return &organization.OrganizationUser{
-		OrganizationID: shared.NewUUID[organization.Organization](),
-		UserID:         shared.UUID[user.User](orgUser.OrganizationUser.UserID),
-		Role:           organization.OrganizationUserRole(orgUser.OrganizationUser.Role),
+		OrganizationUserID: shared.UUID[organization.OrganizationUser](orgUser.OrganizationUser.OrganizationUserID),
+		OrganizationID:     shared.UUID[organization.Organization](orgUser.OrganizationUser.OrganizationID),
+		UserID:             shared.UUID[user.User](orgUser.OrganizationUser.UserID),
+		Role:               organization.OrganizationUserRole(orgUser.OrganizationUser.Role),
 	}, nil
 }
 
@@ -95,9 +97,10 @@ func (o *organizationUserRepository) FindByUserID(ctx context.Context, userID sh
 	result := make([]*organization.OrganizationUser, len(orgUsers))
 	for i, orgUser := range orgUsers {
 		result[i] = &organization.OrganizationUser{
-			OrganizationID: shared.NewUUID[organization.Organization](),
-			UserID:         shared.UUID[user.User](orgUser.OrganizationUser.UserID),
-			Role:           organization.OrganizationUserRole(orgUser.OrganizationUser.Role),
+			OrganizationUserID: shared.UUID[organization.OrganizationUser](orgUser.OrganizationUser.OrganizationUserID),
+			OrganizationID:     shared.UUID[organization.Organization](orgUser.OrganizationUser.OrganizationID),
+			UserID:             shared.UUID[user.User](orgUser.OrganizationUser.UserID),
+			Role:               organization.OrganizationUserRole(orgUser.OrganizationUser.Role),
 		}
 	}
 	return result, nil

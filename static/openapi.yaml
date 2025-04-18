@@ -4453,7 +4453,7 @@ paths:
                   isEmailVerified:
                     type: boolean
                   orgType:
-                    type: string
+                    type: integer
                     description: アカウントの種類。組織がなければ空
                     nullable: true
                   requiredPasswordChange:
@@ -5727,7 +5727,7 @@ components:
         isEmailVerified:
           type: boolean
         orgType:
-          type: string
+          type: integer
           description: アカウントの種類。組織がなければ空
           nullable: true
         requiredPasswordChange:

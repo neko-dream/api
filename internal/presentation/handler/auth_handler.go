@@ -15,6 +15,7 @@ import (
 	cookie_utils "github.com/neko-dream/server/pkg/cookie"
 	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/utils"
+	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
@@ -159,6 +160,10 @@ func (a *authHandler) OAuthTokenInfo(ctx context.Context) (oas.OAuthTokenInfoRes
 	if claim.IsExpired(ctx) {
 		return nil, messages.TokenExpiredError
 	}
+	var orgType *int
+	if claim.OrgType != nil {
+		orgType = lo.ToPtr(*claim.OrgType)
+	}
 
 	return &oas.OAuthTokenInfoOK{
 		Aud:             claim.Audience(),
@@ -172,6 +177,7 @@ func (a *authHandler) OAuthTokenInfo(ctx context.Context) (oas.OAuthTokenInfoRes
 		DisplayID:       utils.ToOpt[oas.OptString](claim.DisplayID),
 		DisplayName:     utils.ToOpt[oas.OptString](claim.DisplayName),
 		IconURL:         utils.ToOpt[oas.OptString](claim.IconURL),
+		OrgType:         utils.ToOptNil[oas.OptNilInt](orgType),
 	}, nil
 }
 

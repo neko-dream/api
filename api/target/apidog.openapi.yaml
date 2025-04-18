@@ -4588,7 +4588,7 @@
                       "type": "boolean"
                     },
                     "orgType": {
-                      "type": "string",
+                      "type": "integer",
                       "description": "アカウントの種類。組織がなければ空",
                       "nullable": true
                     },
@@ -6275,7 +6275,7 @@
             "type": "boolean"
           },
           "orgType": {
-            "type": "string",
+            "type": "integer",
             "description": "アカウントの種類。組織がなければ空",
             "nullable": true
           },

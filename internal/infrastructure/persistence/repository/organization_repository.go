@@ -49,7 +49,7 @@ func (o *organizationRepository) FindByID(ctx context.Context, id shared.UUID[or
 	}
 
 	return organization.NewOrganization(
-		shared.NewUUID[organization.Organization](),
+		shared.UUID[organization.Organization](org.Organization.OrganizationID),
 		organization.OrganizationType(org.Organization.OrganizationType),
 		org.Organization.Name,
 		shared.UUID[user.User](org.Organization.OwnerID),

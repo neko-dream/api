@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"sort"
 
 	"braces.dev/errtrace"
 	"github.com/golang-jwt/jwt/v5"
@@ -15,6 +16,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	http_utils "github.com/neko-dream/server/pkg/http"
+
 	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
@@ -85,7 +87,11 @@ func (j *tokenManager) Generate(ctx context.Context, user user.User, sessionID s
 		requiredPasswordChange = auths.PasswordAuth.RequiredPasswordChange
 	}
 	var orgType *int
-	orgUsers, _ :=j.OrganizationUserRepository.FindByUserID(ctx, user.UserID())
+	orgUsers, _ := j.OrganizationUserRepository.FindByUserID(ctx, user.UserID())
+	// orgTypeでソート
+	sort.SliceStable(orgUsers, func(i, j int) bool {
+		return orgUsers[i].Role < orgUsers[j].Role
+	})
 	if len(orgUsers) > 0 {
 		orgUser := orgUsers[0]
 		// organizationをとる
@@ -145,12 +151,11 @@ func NewTokenManager(
 	orgRep organization.OrganizationRepository,
 ) session.TokenManager {
 	return &tokenManager{
-		secret:            conf.TokenSecret,
-		SessionRepository: sessRepo,
-		DBManager:         dbm,
+		secret:                     conf.TokenSecret,
+		SessionRepository:          sessRepo,
+		DBManager:                  dbm,
 		OrganizationUserRepository: orgUserRep,
-		OrganizationRepository:    orgRep,
-
+		OrganizationRepository:     orgRep,
 	}
 }
 

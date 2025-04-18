@@ -2,6 +2,7 @@ package organization
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 
 	"braces.dev/errtrace"
@@ -130,11 +131,19 @@ func (s *organizationMemberManager) InviteUser(ctx context.Context, input Invite
 		}
 		existUser, err := s.userRep.FindBySubject(ctx, user.UserSubject(subject))
 		if err != nil {
-			utils.HandleError(ctx, err, "UserRepository.FindBySubject")
-			return errtrace.Wrap(err)
+			if !errors.Is(err, sql.ErrNoRows) {
+				utils.HandleError(ctx, err, "UserRepository.FindBySubject")
+				return errtrace.Wrap(err)
+			}
 		}
+		pass := password_auth.GeneratePassword(16)
 		if existUser != nil {
-			return errors.New("既に登録済みです。")
+			// 登録済みなので、一旦OK
+			if err := s.passwordAuthManager.UpdatePassword(ctx, existUser.UserID(), pass); err != nil {
+				utils.HandleError(ctx, err, "PasswordAuthManager.RegisterPassword")
+				return errtrace.Wrap(err)
+			}
+			return s.SendMail(ctx, input.Email, pass, org)
 		}
 
 		newUser := user.NewUser(
@@ -160,14 +169,15 @@ func (s *organizationMemberManager) InviteUser(ctx context.Context, input Invite
 			"",
 		)
 		if err != nil {
-			utils.HandleError(ctx, err, "ConsentService.RecordConsent")
-			return errtrace.Wrap(err)
+			if !errors.Is(err, messages.PolicyAlreadyConsented) {
+				utils.HandleError(ctx, err, "ConsentService.RecordConsent")
+				return errtrace.Wrap(err)
+			}
 		}
 		if err := s.userRep.Create(ctx, newUser); err != nil {
 			utils.HandleError(ctx, err, "UserRepository.Create")
 			return errtrace.Wrap(err)
 		}
-		pass := password_auth.GeneratePassword(16)
 		if err := s.passwordAuthManager.RegisterPassword(ctx, newUser.UserID(), pass, true); err != nil {
 			utils.HandleError(ctx, err, "PasswordAuthManager.RegisterPassword")
 			return errtrace.Wrap(err)
@@ -184,26 +194,30 @@ func (s *organizationMemberManager) InviteUser(ctx context.Context, input Invite
 			return errtrace.Wrap(err)
 		}
 		orgUser = &orgUsr
-		// メールにIDとパスワード、組織IDを送信
-		if err := s.emailSender.Send(ctx, input.Email, email_template.OrganizationInvitationEmailTemplate, map[string]any{
-			"Title":            "【ことひろ】招待が届いています",
-			"CompanyLogo":      "https://github.com/neko-dream/api/raw/develop/docs/public/assets/icon.png",
-			"AppName":          s.cfg.APP_NAME,
-			"WebsiteURL":       s.cfg.WEBSITE_URL,
-			"OrganizationName": org.Name,
-			"Email":            input.Email,
-			"Password":         pass,
-			"InvitationURL":    s.cfg.WEBSITE_URL,
-		}); err != nil {
-			utils.HandleError(ctx, err, "EmailSender.Send")
-			return errtrace.Wrap(err)
-		}
 
-		return nil
+		return s.SendMail(ctx, input.Email, pass, org)
 	}); err != nil {
 		utils.HandleError(ctx, err, "DBManager.ExecTx")
 		return nil, err
 	}
 
 	return orgUser, nil
+}
+
+func (s *organizationMemberManager) SendMail(ctx context.Context, email string, pass string, org *organization.Organization) error {
+	// メールにIDとパスワード、組織IDを送信
+	if err := s.emailSender.Send(ctx, email, email_template.OrganizationInvitationEmailTemplate, map[string]any{
+		"Title":            "【ことひろ】招待が届いています",
+		"CompanyLogo":      "https://github.com/neko-dream/api/raw/develop/docs/public/assets/icon.png",
+		"AppName":          s.cfg.APP_NAME,
+		"WebsiteURL":       s.cfg.WEBSITE_URL,
+		"OrganizationName": org.Name,
+		"Email":            email,
+		"Password":         pass,
+		"InvitationURL":    s.cfg.WEBSITE_URL,
+	}); err != nil {
+		utils.HandleError(ctx, err, "EmailSender.Send")
+		return errtrace.Wrap(err)
+	}
+	return nil
 }

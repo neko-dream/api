@@ -20,12 +20,11 @@ func GenerateSalt(length int) (string, error) {
 }
 
 func HashPassword(password, salt, pepper string, cost int) (string, error) {
-	saltedPepperedPassword := password + salt + pepper
 	if cost < bcrypt.MinCost || cost > bcrypt.MaxCost {
 		return "", fmt.Errorf("cost must be between %d and %d", bcrypt.MinCost, bcrypt.MaxCost)
 	}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(saltedPepperedPassword), cost)
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), cost)
 	if err != nil {
 		return "", fmt.Errorf("failed to hash password: %w", err)
 	}
@@ -33,11 +32,11 @@ func HashPassword(password, salt, pepper string, cost int) (string, error) {
 	return string(hash), nil
 }
 
-func VerifyPassword(password string, salt, pepper, hashedPassword string) bool {
-	saltedPepperedPassword := password + salt + pepper
-	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(saltedPepperedPassword))
-	return err == nil
+func VerifyPassword(password string, hashedPassword string) bool {
+	res := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+	return res == nil
 }
+
 func getBinaryBySHA256(s string) []byte {
 	r := sha256.Sum256([]byte(s))
 	return r[:]
@@ -46,7 +45,12 @@ func getBinaryBySHA256(s string) []byte {
 func HashEmail(email, pepper string) (string, error) {
 	mac := hmac.New(sha256.New, getBinaryBySHA256(pepper))
 	_, err := mac.Write([]byte(email))
-	return string(mac.Sum(nil)), err
+	if err != nil {
+		return "", err
+	}
+
+	hashedEmail := mac.Sum(nil)
+	return base64.StdEncoding.EncodeToString(hashedEmail), err
 }
 
 func VerifyEmail(email, pepper, hashedEmail string) bool {
@@ -56,5 +60,6 @@ func VerifyEmail(email, pepper, hashedEmail string) bool {
 		return false
 	}
 	expectedMAC := mac.Sum(nil)
-	return hmac.Equal([]byte(hashedEmail), expectedMAC)
+	expected:= base64.StdEncoding.EncodeToString(expectedMAC)
+	return hmac.Equal([]byte(hashedEmail), []byte(expected))
 }

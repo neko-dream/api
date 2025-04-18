@@ -23,6 +23,7 @@ func NewAWSConfig() aws.Config {
 		}
 		c, err := awsConfig.LoadDefaultConfig(context.TODO(),
 			awsConfig.WithRegion(region),
+			awsConfig.WithSharedConfigProfile("admin"),
 		)
 		if err != nil {
 			return

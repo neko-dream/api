@@ -274,7 +274,7 @@ func (u *userRepository) FindBySubject(ctx context.Context, subject user.UserSub
 
 	row, err := u.GetQueries(ctx).GetUserBySubject(ctx, subject.String())
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	return u.newUserFromModel(ctx, &row.User, &row.UserAuth)

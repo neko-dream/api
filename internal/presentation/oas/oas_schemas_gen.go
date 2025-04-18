@@ -4966,7 +4966,7 @@ type OAuthTokenInfoOK struct {
 	IsRegistered    bool `json:"isRegistered"`
 	IsEmailVerified bool `json:"isEmailVerified"`
 	// アカウントの種類。組織がなければ空.
-	OrgType OptNilString `json:"orgType"`
+	OrgType OptNilInt `json:"orgType"`
 	// パスワードの更新が必要かどうか.
 	RequiredPasswordChange bool `json:"requiredPasswordChange"`
 }
@@ -5027,7 +5027,7 @@ func (s *OAuthTokenInfoOK) GetIsEmailVerified() bool {
 }
 
 // GetOrgType returns the value of OrgType.
-func (s *OAuthTokenInfoOK) GetOrgType() OptNilString {
+func (s *OAuthTokenInfoOK) GetOrgType() OptNilInt {
 	return s.OrgType
 }
 
@@ -5092,7 +5092,7 @@ func (s *OAuthTokenInfoOK) SetIsEmailVerified(val bool) {
 }
 
 // SetOrgType sets the value of OrgType.
-func (s *OAuthTokenInfoOK) SetOrgType(val OptNilString) {
+func (s *OAuthTokenInfoOK) SetOrgType(val OptNilInt) {
 	s.OrgType = val
 }
 
