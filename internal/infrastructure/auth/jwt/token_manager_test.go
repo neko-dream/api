@@ -46,8 +46,7 @@ func TestNewTokenManagerTest(t *testing.T) {
 			orgUserRepo := di.Invoke[organization.OrganizationUserRepository](cont)
 			orgRepo := di.Invoke[organization.OrganizationRepository](cont)
 
-
-			util := jwt.NewTokenManagerWithSecret(tt.firstSecret, dbm, sessRepo, orgUserRepo, orgRepo )
+			util := jwt.NewTokenManagerWithSecret(tt.firstSecret, dbm, sessRepo, orgUserRepo, orgRepo)
 			token, err := util.Generate(
 				tt.ctx,
 				user.NewUser(

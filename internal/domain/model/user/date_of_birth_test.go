@@ -13,7 +13,7 @@ import (
 // コンテキストにモッククロックを設定する関数
 func withMockClock(t *testing.T, now time.Time) context.Context {
 	ctx := context.Background()
-    return clock.SetNow(ctx, now)
+	return clock.SetNow(ctx, now)
 }
 
 func TestIsValidDateFormat(t *testing.T) {
@@ -71,45 +71,45 @@ func TestNewDateOfBirth(t *testing.T) {
 
 func TestDateOfBirth_Age(t *testing.T) {
 	tests := []struct {
-		name      string
-		dob       user.DateOfBirth
-		mockNow   time.Time
+		name        string
+		dob         user.DateOfBirth
+		mockNow     time.Time
 		expectedAge int
 	}{
 		{
-			name:      "誕生日前",
-			dob:       user.DateOfBirth(19900616),
-			mockNow:   time.Date(2023, 6, 15, 0, 0, 0, 0, time.UTC),
+			name:        "誕生日前",
+			dob:         user.DateOfBirth(19900616),
+			mockNow:     time.Date(2023, 6, 15, 0, 0, 0, 0, time.UTC),
 			expectedAge: 32,
 		},
 		{
-			name:      "誕生日当日",
-			dob:       user.DateOfBirth(19900616),
-			mockNow:   time.Date(2023, 6, 16, 0, 0, 0, 0, time.UTC),
+			name:        "誕生日当日",
+			dob:         user.DateOfBirth(19900616),
+			mockNow:     time.Date(2023, 6, 16, 0, 0, 0, 0, time.UTC),
 			expectedAge: 33,
 		},
 		{
-			name:      "誕生日後",
-			dob:       user.DateOfBirth(19900616),
-			mockNow:   time.Date(2023, 6, 17, 0, 0, 0, 0, time.UTC),
+			name:        "誕生日後",
+			dob:         user.DateOfBirth(19900616),
+			mockNow:     time.Date(2023, 6, 17, 0, 0, 0, 0, time.UTC),
 			expectedAge: 33,
 		},
 		{
-			name:      "生まれ年の年末",
-			dob:       user.DateOfBirth(19901231),
-			mockNow:   time.Date(1990, 12, 31, 0, 0, 0, 0, time.UTC),
+			name:        "生まれ年の年末",
+			dob:         user.DateOfBirth(19901231),
+			mockNow:     time.Date(1990, 12, 31, 0, 0, 0, 0, time.UTC),
 			expectedAge: 0,
 		},
 		{
-			name:      "うるう年の誕生日 (2月29日)",
-			dob:       user.DateOfBirth(20000229),
-			mockNow:   time.Date(2023, 2, 28, 0, 0, 0, 0, time.UTC),
+			name:        "うるう年の誕生日 (2月29日)",
+			dob:         user.DateOfBirth(20000229),
+			mockNow:     time.Date(2023, 2, 28, 0, 0, 0, 0, time.UTC),
 			expectedAge: 22, // うるう年でない場合、2/28を誕生日の前日と見なす
 		},
 		{
-			name:      "うるう年の誕生日 (2月29日) - 翌日",
-			dob:       user.DateOfBirth(20000229),
-			mockNow:   time.Date(2023, 3, 1, 0, 0, 0, 0, time.UTC),
+			name:        "うるう年の誕生日 (2月29日) - 翌日",
+			dob:         user.DateOfBirth(20000229),
+			mockNow:     time.Date(2023, 3, 1, 0, 0, 0, 0, time.UTC),
 			expectedAge: 23,
 		},
 	}
