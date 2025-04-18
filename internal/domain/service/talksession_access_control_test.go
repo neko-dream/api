@@ -95,7 +95,7 @@ func TestCanUserJoin(t *testing.T) {
 		ts := &talksession.TalkSession{}
 		demographics := user.NewUserDemographic(
 			ctx, shared.NewUUID[user.UserDemographic](),
-			lo.ToPtr(2020),
+			lo.ToPtr(20200101),
 			nil, nil, nil,
 		)
 		u := user.NewUser(
