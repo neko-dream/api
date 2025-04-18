@@ -49,7 +49,7 @@ steps:
           body:
             multipart/form-data:
               displayName: "edited"
-              dateOfBirth: 1999
+              dateOfBirth: 19990101
               gender: "男性"
               prefecture: "福井県"
               city: "鯖江市"
@@ -63,7 +63,7 @@ steps:
       current.res.body.user.displayID == vars.id &&
       current.res.body.user.displayName == "edited" &&
       current.res.body.demographics.city == "鯖江市" &&
-      current.res.body.demographics.dateOfBirth == 1999
+      current.res.body.demographics.dateOfBirth == 19990101
   reEditUser:
     desc: ユーザー名が戻っているか
     req:
@@ -72,5 +72,5 @@ steps:
           body:
             multipart/form-data:
               displayName: "{{ vars.name }}"
-              dateOfBirth: 1999
+              dateOfBirth: 19990101
     test: current.res.body.displayName == vars.name

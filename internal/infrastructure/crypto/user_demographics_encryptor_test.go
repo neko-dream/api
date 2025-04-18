@@ -35,7 +35,7 @@ func TestEncryptUserDemographics(t *testing.T) {
 			demo: user.NewUserDemographic(
 				ctx,
 				demoID,
-				lo.ToPtr(1990),
+				lo.ToPtr(19900101),
 				lo.ToPtr("男性"),
 				lo.ToPtr("世田谷区"),
 				lo.ToPtr("東京都"),
@@ -94,7 +94,7 @@ func TestDecryptUserDemographics(t *testing.T) {
 	original := user.NewUserDemographic(
 		ctx,
 		shared.NewUUID[user.UserDemographic](),
-		lo.ToPtr(1990),
+		lo.ToPtr(19900101),
 		lo.ToPtr("男性"),
 		lo.ToPtr("世田谷区"),
 		lo.ToPtr("回答しない"),
