@@ -63,12 +63,13 @@ func IsValidDateFormat(date int) bool {
 }
 
 func (y DateOfBirth) Age(ctx context.Context) int {
-	ctx, span := otel.Tracer("user").Start(ctx, "DateOfBirth.Age")
-	defer span.End()
-
 	if ctx == nil {
 		ctx = context.Background()
 	}
+
+	ctx, span := otel.Tracer("user").Start(ctx, "DateOfBirth.Age")
+	defer span.End()
+
 
 	// 年月日を分解
 	birthYear := int(y) / 10000
