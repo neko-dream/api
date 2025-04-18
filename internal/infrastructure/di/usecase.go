@@ -71,5 +71,6 @@ func useCaseDeps() []ProvideArg {
 		{auth_command.NewChangePassword, nil},
 		{organization_command.NewCreateOrganizationInteractor, nil},
 		{organization_command.NewInviteOrganizationInteractor, nil},
+		{organization_command.NewInviteOrganizationForUserInteractor, nil},
 	}
 }
