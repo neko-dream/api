@@ -45,3 +45,9 @@ func NewOrganization(
 		OwnerID:          ownerID,
 	}
 }
+
+// CanChangeRole はユーザーが他のユーザーのロールを変更できるかを判断するのじゃ
+func (o *Organization) CanChangeRole(currentUserRole OrganizationUserRole, targetRole OrganizationUserRole) bool {
+	// 上位のロールにのみロールを割り当てることができるのじゃ
+	return currentUserRole >= OrganizationUserRoleAdmin && int(currentUserRole) >= int(targetRole)
+}
