@@ -291,6 +291,15 @@ func (UnimplementedHandler) InviteOrganization(ctx context.Context, req OptInvit
 	return r, ht.ErrNotImplemented
 }
 
+// InviteOrganizationForUser implements inviteOrganizationForUser operation.
+//
+// 組織にユーザーを追加.
+//
+// POST /organizations/{organizationID}/invite_user
+func (UnimplementedHandler) InviteOrganizationForUser(ctx context.Context, req OptInviteOrganizationForUserReq, params InviteOrganizationForUserParams) (r InviteOrganizationForUserRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // ManageIndex implements manageIndex operation.
 //
 // GET /manage

@@ -3576,7 +3576,7 @@ paths:
                 yearOfBirth:
                   type: integer
                   default: 0
-                  description: 生まれ年
+                  description: 生年月日
                   example: 0
                   nullable: true
                 gender:
@@ -5460,6 +5460,79 @@ paths:
           headers: {}
       security:
         - SessionId: []
+      x-ogen-operation-group: Organization
+  /organizations/{organizationID}/invite_user:
+    post:
+      summary: 組織にユーザーを追加
+      deprecated: false
+      description: ''
+      operationId: inviteOrganizationForUser
+      tags:
+        - organization
+      parameters:
+        - name: organizationID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: number
+                  example: 0
+                displayID:
+                  type: string
+                  example: ''
+              required:
+                - role
+                - displayID
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                required:
+                  - success
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security: []
       x-ogen-operation-group: Organization
   /manage:
     get:

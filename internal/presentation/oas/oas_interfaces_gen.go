@@ -113,6 +113,10 @@ type GetUserInfoRes interface {
 	getUserInfoRes()
 }
 
+type InviteOrganizationForUserRes interface {
+	inviteOrganizationForUserRes()
+}
+
 type InviteOrganizationRes interface {
 	inviteOrganizationRes()
 }

@@ -4600,6 +4600,55 @@ type InviteOrganizationBadRequest struct{}
 
 func (*InviteOrganizationBadRequest) inviteOrganizationRes() {}
 
+type InviteOrganizationForUserBadRequest struct{}
+
+func (*InviteOrganizationForUserBadRequest) inviteOrganizationForUserRes() {}
+
+type InviteOrganizationForUserInternalServerError struct{}
+
+func (*InviteOrganizationForUserInternalServerError) inviteOrganizationForUserRes() {}
+
+type InviteOrganizationForUserOK struct {
+	Success bool `json:"success"`
+}
+
+// GetSuccess returns the value of Success.
+func (s *InviteOrganizationForUserOK) GetSuccess() bool {
+	return s.Success
+}
+
+// SetSuccess sets the value of Success.
+func (s *InviteOrganizationForUserOK) SetSuccess(val bool) {
+	s.Success = val
+}
+
+func (*InviteOrganizationForUserOK) inviteOrganizationForUserRes() {}
+
+type InviteOrganizationForUserReq struct {
+	Role      float64 `json:"role"`
+	DisplayID string  `json:"displayID"`
+}
+
+// GetRole returns the value of Role.
+func (s *InviteOrganizationForUserReq) GetRole() float64 {
+	return s.Role
+}
+
+// GetDisplayID returns the value of DisplayID.
+func (s *InviteOrganizationForUserReq) GetDisplayID() string {
+	return s.DisplayID
+}
+
+// SetRole sets the value of Role.
+func (s *InviteOrganizationForUserReq) SetRole(val float64) {
+	s.Role = val
+}
+
+// SetDisplayID sets the value of DisplayID.
+func (s *InviteOrganizationForUserReq) SetDisplayID(val string) {
+	s.DisplayID = val
+}
+
 type InviteOrganizationInternalServerError struct{}
 
 func (*InviteOrganizationInternalServerError) inviteOrganizationRes() {}
@@ -6851,6 +6900,52 @@ func (o OptInt) Get() (v int, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptInt) Or(d int) int {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptInviteOrganizationForUserReq returns new OptInviteOrganizationForUserReq with value set to v.
+func NewOptInviteOrganizationForUserReq(v InviteOrganizationForUserReq) OptInviteOrganizationForUserReq {
+	return OptInviteOrganizationForUserReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptInviteOrganizationForUserReq is optional InviteOrganizationForUserReq.
+type OptInviteOrganizationForUserReq struct {
+	Value InviteOrganizationForUserReq
+	Set   bool
+}
+
+// IsSet returns true if OptInviteOrganizationForUserReq was set.
+func (o OptInviteOrganizationForUserReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptInviteOrganizationForUserReq) Reset() {
+	var v InviteOrganizationForUserReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptInviteOrganizationForUserReq) SetTo(v InviteOrganizationForUserReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptInviteOrganizationForUserReq) Get() (v InviteOrganizationForUserReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptInviteOrganizationForUserReq) Or(d InviteOrganizationForUserReq) InviteOrganizationForUserReq {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -10220,7 +10315,7 @@ type RegisterUserReq struct {
 	DisplayID string `json:"displayID"`
 	// ユーザーアイコン.
 	Icon OptMultipartFile `json:"icon"`
-	// 生まれ年.
+	// 生年月日.
 	YearOfBirth OptNilInt `json:"yearOfBirth"`
 	// 性別.
 	Gender OptNilRegisterUserReqGender `json:"gender"`

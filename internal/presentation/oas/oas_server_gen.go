@@ -225,6 +225,12 @@ type OrganizationHandler interface {
 	//
 	// POST /organizations/{organizationID}/invite
 	InviteOrganization(ctx context.Context, req OptInviteOrganizationReq, params InviteOrganizationParams) (InviteOrganizationRes, error)
+	// InviteOrganizationForUser implements inviteOrganizationForUser operation.
+	//
+	// 組織にユーザーを追加.
+	//
+	// POST /organizations/{organizationID}/invite_user
+	InviteOrganizationForUser(ctx context.Context, req OptInviteOrganizationForUserReq, params InviteOrganizationForUserParams) (InviteOrganizationForUserRes, error)
 }
 
 // PolicyHandler handles operations described by OpenAPI v3 specification.
