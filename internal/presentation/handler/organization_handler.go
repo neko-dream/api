@@ -128,7 +128,9 @@ func (o *organizationHandler) GetOrganizations(ctx context.Context) (oas.GetOrga
 	defer span.End()
 
 	_ = ctx
-
-	// 気が向いたら実装する
-	panic("unimplemented")
+	return nil, &messages.APIError{
+		StatusCode: 501,
+		Code:       "ORG-0001",
+		Message:    "この機能はまだ実装されていません",
+	}
 }
