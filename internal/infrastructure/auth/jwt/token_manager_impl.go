@@ -159,9 +159,18 @@ func NewTokenManager(
 	}
 }
 
-func NewTokenManagerWithSecret(secret string, sessRepo session.SessionRepository) session.TokenManager {
+func NewTokenManagerWithSecret(
+	secret string,
+	dbm *db.DBManager,
+	sessRepo session.SessionRepository,
+	orgUserRep organization.OrganizationUserRepository,
+	orgRep organization.OrganizationRepository,
+) session.TokenManager {
 	return &tokenManager{
 		secret:            secret,
 		SessionRepository: sessRepo,
+		DBManager:         dbm,
+		OrganizationUserRepository: orgUserRep,
+		OrganizationRepository:     orgRep,
 	}
 }
