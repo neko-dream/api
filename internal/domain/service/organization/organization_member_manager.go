@@ -32,7 +32,8 @@ type InviteUserParams struct {
 type OrganizationMemberManager interface {
 	// ユーザーの発行
 	InviteUser(ctx context.Context, params InviteUserParams) (*organization.OrganizationUser, error)
-
+	// ユーザーの招待
+	AddUser(ctx context.Context, params InviteUserParams) error
 	IsSuperAdmin(ctx context.Context, userID shared.UUID[user.User]) (bool, error)
 }
 
@@ -72,6 +73,45 @@ func NewOrganizationMemberManager(
 	}
 }
 
+// AddUser 組織にユーザーを追加する
+// ユーザーが既に組織に所属している場合はエラーを返す
+func (s *organizationMemberManager) AddUser(ctx context.Context, params InviteUserParams) error {
+	ctx, span := otel.Tracer("organization").Start(ctx, "organizationMemberManager.AddUser")
+	defer span.End()
+
+	// ユーザーの組織ユーザーを取得。既に所属している場合はエラー
+	orgUser, err := s.organizationUserRepo.FindByOrganizationIDAndUserID(ctx, params.OrganizationID, params.UserID)
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			utils.HandleError(ctx, err, "OrganizationUserRepository.FindByOrganizationIDAndUserID")
+			return errtrace.Wrap(err)
+		}
+	}
+	if orgUser != nil {
+		return messages.UserAlreadyInOrganization
+	}
+
+	// ユーザーの組織を取得
+	org, err := s.organizationRepo.FindByID(ctx, params.OrganizationID)
+	if err != nil {
+		return messages.OrganizationNotFound
+	}
+
+	// ユーザーの組織ユーザーを作成
+	orgUser = &organization.OrganizationUser{
+		OrganizationUserID: shared.NewUUID[organization.OrganizationUser](),
+		OrganizationID:     org.OrganizationID,
+		UserID:             params.UserID,
+		Role:               params.Role,
+	}
+	if err := s.organizationUserRepo.Create(ctx, *orgUser); err != nil {
+		utils.HandleError(ctx, err, "OrganizationUserRepository.Create")
+		return messages.OrganizationInternalServerError
+	}
+
+	return nil
+}
+
 // IsSuperAdmin implements OrganizationService.
 func (s *organizationMemberManager) IsSuperAdmin(ctx context.Context, userID shared.UUID[user.User]) (bool, error) {
 	ctx, span := otel.Tracer("organization").Start(ctx, "organizationMemberManager.IsSuperAdmin")
@@ -93,7 +133,7 @@ func (s *organizationMemberManager) IsSuperAdmin(ctx context.Context, userID sha
 	return false, nil
 }
 
-// CreateOrganizationUser implements OrganizationMemberManager.
+// InviteUser ユーザーを組織に招待する。こちらはユーザーを作成してメアドに招待メールを送信する。
 func (s *organizationMemberManager) InviteUser(ctx context.Context, input InviteUserParams) (*organization.OrganizationUser, error) {
 	ctx, span := otel.Tracer("organization").Start(ctx, "organizationMemberManager.CreateOrganizationUser")
 	defer span.End()
@@ -205,6 +245,9 @@ func (s *organizationMemberManager) InviteUser(ctx context.Context, input Invite
 }
 
 func (s *organizationMemberManager) SendMail(ctx context.Context, email string, pass string, org *organization.Organization) error {
+	ctx, span := otel.Tracer("organization").Start(ctx, "organizationMemberManager.SendMail")
+	defer span.End()
+
 	// メールにIDとパスワード、組織IDを送信
 	if err := s.emailSender.Send(ctx, email, email_template.OrganizationInvitationEmailTemplate, map[string]any{
 		"Title":            "【ことひろ】招待が届いています",

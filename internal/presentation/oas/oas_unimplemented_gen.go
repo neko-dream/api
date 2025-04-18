@@ -189,6 +189,15 @@ func (UnimplementedHandler) GetOpinionsForTalkSession(ctx context.Context, param
 	return r, ht.ErrNotImplemented
 }
 
+// GetOrganizations implements getOrganizations operation.
+//
+// 所属組織一覧.
+//
+// GET /organizations
+func (UnimplementedHandler) GetOrganizations(ctx context.Context) (r GetOrganizationsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetPolicyConsentStatus implements getPolicyConsentStatus operation.
 //
 // 最新のポリシーに同意したかを取得.
@@ -288,6 +297,15 @@ func (UnimplementedHandler) GetUserInfo(ctx context.Context) (r GetUserInfoRes, 
 //
 // POST /organizations/{organizationID}/invite
 func (UnimplementedHandler) InviteOrganization(ctx context.Context, req OptInviteOrganizationReq, params InviteOrganizationParams) (r InviteOrganizationRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// InviteOrganizationForUser implements inviteOrganizationForUser operation.
+//
+// 組織にユーザーを追加.
+//
+// POST /organizations/{organizationID}/invite_user
+func (UnimplementedHandler) InviteOrganizationForUser(ctx context.Context, req OptInviteOrganizationForUserReq, params InviteOrganizationForUserParams) (r InviteOrganizationForUserRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

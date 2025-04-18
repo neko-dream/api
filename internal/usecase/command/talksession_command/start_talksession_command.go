@@ -68,10 +68,10 @@ func NewStartTalkSessionCommand(
 	DBManager *db.DBManager,
 ) StartTalkSessionCommand {
 	return &startTalkSessionCommandHandler{
-		TalkSessionRepository: talkSessionRepository,
-		UserRepository:        userRepository,
+		TalkSessionRepository:      talkSessionRepository,
+		UserRepository:             userRepository,
 		OrganizationUserRepository: organizationUserRepository,
-		DBManager:             DBManager,
+		DBManager:                  DBManager,
 	}
 }
 
@@ -79,7 +79,7 @@ func (i *startTalkSessionCommandHandler) Execute(ctx context.Context, input Star
 	ctx, span := otel.Tracer("talksession_command").Start(ctx, "startTalkSessionCommandHandler.Execute")
 	defer span.End()
 	// Organizationに所属していないとセッションを開始できない
-	orgs,err:=i.OrganizationUserRepository.FindByUserID(ctx, input.OwnerID)
+	orgs, err := i.OrganizationUserRepository.FindByUserID(ctx, input.OwnerID)
 	if err != nil {
 		utils.HandleError(ctx, err, "OrganizationUserRepository.FindByUserID")
 		return StartTalkSessionCommandOutput{}, messages.ForbiddenError

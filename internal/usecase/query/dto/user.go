@@ -27,7 +27,7 @@ type UserAuth struct {
 type UserDemographic struct {
 	UserDemographicID uuid.UUID
 	UserID            shared.UUID[user.User]
-	YearOfBirth       *int
+	DateOfBirth       *int
 	Gender            *int
 	City              *string
 	Prefecture        *string
@@ -49,10 +49,10 @@ func (u *UserDemographic) Age(ctx context.Context) *int {
 	ctx, span := otel.Tracer("dto").Start(ctx, "UserDemographic.Age")
 	defer span.End()
 
-	if u.YearOfBirth == nil {
+	if u.DateOfBirth == nil {
 		return nil
 	}
-	return lo.ToPtr(user.NewYearOfBirth(u.YearOfBirth).Age(ctx))
+	return lo.ToPtr(user.NewDateOfBirth(u.DateOfBirth).Age(ctx))
 }
 
 type UserDetail struct {

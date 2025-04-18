@@ -174,7 +174,7 @@ type UserAuth struct {
 type UserDemographic struct {
 	UserDemographicsID uuid.UUID
 	UserID             uuid.UUID
-	YearOfBirth        sql.NullString
+	DateOfBirth        sql.NullString
 	Gender             sql.NullString
 	City               sql.NullString
 	CreatedAt          time.Time

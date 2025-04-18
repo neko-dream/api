@@ -2,8 +2,9 @@ package clock
 
 import (
 	"context"
-	"go.opentelemetry.io/otel"
 	"time"
+
+	"go.opentelemetry.io/otel"
 )
 
 var (
@@ -26,6 +27,9 @@ func Now(ctx context.Context) time.Time {
 
 // SetNow 現在時刻を設定する
 func SetNow(ctx context.Context, t time.Time) context.Context {
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	ctx, span := otel.Tracer("clock").Start(ctx, "SetNow")
 	defer span.End()
 

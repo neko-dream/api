@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"log"
 
 	password_auth "github.com/neko-dream/server/internal/domain/model/auth/password"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -60,13 +59,10 @@ func (u *passwordAuthManager) VerifyPassword(ctx context.Context, userID shared.
 		}
 		return false, err
 	}
-	log.Println("auth", auth.PasswordHash)
+
 	// パスワードを検証
-	bs,err := hash.VerifyPassword(plainPassword, auth.PasswordHash), nil
-	log.Println("err", bs, err)
-	if err != nil {
-		return false, err
-	}
+	bs := hash.VerifyPassword(plainPassword, auth.PasswordHash)
+
 	return bs, err
 }
 

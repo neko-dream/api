@@ -14,7 +14,7 @@ func (s *EditUserProfileReq) setDefaults() {
 func (s *RegisterUserReq) setDefaults() {
 	{
 		val := int(0)
-		s.YearOfBirth.SetTo(val)
+		s.DateOfBirth.SetTo(val)
 	}
 	{
 		val := RegisterUserReqGender("preferNotToSay")

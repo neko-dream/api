@@ -1159,11 +1159,11 @@ type EditUserProfileReq struct {
 	// ユーザーアイコン.
 	Icon       OptMultipartFile `json:"icon"`
 	DeleteIcon OptNilBool       `json:"deleteIcon"`
-	// 生まれ年.
-	YearOfBirth OptNilInt `json:"yearOfBirth"`
+	// 生年月日.
+	DateOfBirth OptNilInt `json:"dateOfBirth"`
 	// 性別.
 	Gender OptNilEditUserProfileReqGender `json:"gender"`
-	// 市区町村.
+	// 市町村.
 	City OptNilString `json:"city"`
 	// 都道府県.
 	Prefecture OptNilString `json:"prefecture"`
@@ -1186,9 +1186,9 @@ func (s *EditUserProfileReq) GetDeleteIcon() OptNilBool {
 	return s.DeleteIcon
 }
 
-// GetYearOfBirth returns the value of YearOfBirth.
-func (s *EditUserProfileReq) GetYearOfBirth() OptNilInt {
-	return s.YearOfBirth
+// GetDateOfBirth returns the value of DateOfBirth.
+func (s *EditUserProfileReq) GetDateOfBirth() OptNilInt {
+	return s.DateOfBirth
 }
 
 // GetGender returns the value of Gender.
@@ -1226,9 +1226,9 @@ func (s *EditUserProfileReq) SetDeleteIcon(val OptNilBool) {
 	s.DeleteIcon = val
 }
 
-// SetYearOfBirth sets the value of YearOfBirth.
-func (s *EditUserProfileReq) SetYearOfBirth(val OptNilInt) {
-	s.YearOfBirth = val
+// SetDateOfBirth sets the value of DateOfBirth.
+func (s *EditUserProfileReq) SetDateOfBirth(val OptNilInt) {
+	s.DateOfBirth = val
 }
 
 // SetGender sets the value of Gender.
@@ -3040,6 +3040,82 @@ func (s *GetOpinionsForTalkSessionSort) UnmarshalText(data []byte) error {
 	}
 }
 
+type GetOrganizationsBadRequest struct{}
+
+func (*GetOrganizationsBadRequest) getOrganizationsRes() {}
+
+type GetOrganizationsInternalServerError struct{}
+
+func (*GetOrganizationsInternalServerError) getOrganizationsRes() {}
+
+type GetOrganizationsOK struct {
+	// 所属組織.
+	Organizations []GetOrganizationsOKOrganizationsItem `json:"organizations"`
+}
+
+// GetOrganizations returns the value of Organizations.
+func (s *GetOrganizationsOK) GetOrganizations() []GetOrganizationsOKOrganizationsItem {
+	return s.Organizations
+}
+
+// SetOrganizations sets the value of Organizations.
+func (s *GetOrganizationsOK) SetOrganizations(val []GetOrganizationsOKOrganizationsItem) {
+	s.Organizations = val
+}
+
+func (*GetOrganizationsOK) getOrganizationsRes() {}
+
+type GetOrganizationsOKOrganizationsItem struct {
+	// 組織ID.
+	ID string `json:"ID"`
+	// 組織名.
+	Name string `json:"Name"`
+	// 組織のタイプ.
+	Type int `json:"Type"`
+	// ロール.
+	Role int `json:"Role"`
+}
+
+// GetID returns the value of ID.
+func (s *GetOrganizationsOKOrganizationsItem) GetID() string {
+	return s.ID
+}
+
+// GetName returns the value of Name.
+func (s *GetOrganizationsOKOrganizationsItem) GetName() string {
+	return s.Name
+}
+
+// GetType returns the value of Type.
+func (s *GetOrganizationsOKOrganizationsItem) GetType() int {
+	return s.Type
+}
+
+// GetRole returns the value of Role.
+func (s *GetOrganizationsOKOrganizationsItem) GetRole() int {
+	return s.Role
+}
+
+// SetID sets the value of ID.
+func (s *GetOrganizationsOKOrganizationsItem) SetID(val string) {
+	s.ID = val
+}
+
+// SetName sets the value of Name.
+func (s *GetOrganizationsOKOrganizationsItem) SetName(val string) {
+	s.Name = val
+}
+
+// SetType sets the value of Type.
+func (s *GetOrganizationsOKOrganizationsItem) SetType(val int) {
+	s.Type = val
+}
+
+// SetRole sets the value of Role.
+func (s *GetOrganizationsOKOrganizationsItem) SetRole(val int) {
+	s.Role = val
+}
+
 type GetPolicyConsentStatusBadRequest struct{}
 
 func (*GetPolicyConsentStatusBadRequest) getPolicyConsentStatusRes() {}
@@ -4509,19 +4585,19 @@ func (s *GetUserInfoOK) SetEmail(val OptNilString) {
 func (*GetUserInfoOK) getUserInfoRes() {}
 
 type GetUserInfoOKDemographics struct {
-	// 誕生年.
-	YearOfBirth OptNilInt `json:"yearOfBirth"`
+	// 生年月日.
+	DateOfBirth OptNilInt `json:"dateOfBirth"`
 	// 性別.
 	Gender OptNilString `json:"gender"`
-	// 市区町村.
+	// 市町村.
 	City OptNilString `json:"city"`
 	// 都道府県.
 	Prefecture OptNilString `json:"prefecture"`
 }
 
-// GetYearOfBirth returns the value of YearOfBirth.
-func (s *GetUserInfoOKDemographics) GetYearOfBirth() OptNilInt {
-	return s.YearOfBirth
+// GetDateOfBirth returns the value of DateOfBirth.
+func (s *GetUserInfoOKDemographics) GetDateOfBirth() OptNilInt {
+	return s.DateOfBirth
 }
 
 // GetGender returns the value of Gender.
@@ -4539,9 +4615,9 @@ func (s *GetUserInfoOKDemographics) GetPrefecture() OptNilString {
 	return s.Prefecture
 }
 
-// SetYearOfBirth sets the value of YearOfBirth.
-func (s *GetUserInfoOKDemographics) SetYearOfBirth(val OptNilInt) {
-	s.YearOfBirth = val
+// SetDateOfBirth sets the value of DateOfBirth.
+func (s *GetUserInfoOKDemographics) SetDateOfBirth(val OptNilInt) {
+	s.DateOfBirth = val
 }
 
 // SetGender sets the value of Gender.
@@ -4599,6 +4675,55 @@ func (s *GetUserInfoOKUser) SetIconURL(val OptNilString) {
 type InviteOrganizationBadRequest struct{}
 
 func (*InviteOrganizationBadRequest) inviteOrganizationRes() {}
+
+type InviteOrganizationForUserBadRequest struct{}
+
+func (*InviteOrganizationForUserBadRequest) inviteOrganizationForUserRes() {}
+
+type InviteOrganizationForUserInternalServerError struct{}
+
+func (*InviteOrganizationForUserInternalServerError) inviteOrganizationForUserRes() {}
+
+type InviteOrganizationForUserOK struct {
+	Success bool `json:"success"`
+}
+
+// GetSuccess returns the value of Success.
+func (s *InviteOrganizationForUserOK) GetSuccess() bool {
+	return s.Success
+}
+
+// SetSuccess sets the value of Success.
+func (s *InviteOrganizationForUserOK) SetSuccess(val bool) {
+	s.Success = val
+}
+
+func (*InviteOrganizationForUserOK) inviteOrganizationForUserRes() {}
+
+type InviteOrganizationForUserReq struct {
+	Role      float64 `json:"role"`
+	DisplayID string  `json:"displayID"`
+}
+
+// GetRole returns the value of Role.
+func (s *InviteOrganizationForUserReq) GetRole() float64 {
+	return s.Role
+}
+
+// GetDisplayID returns the value of DisplayID.
+func (s *InviteOrganizationForUserReq) GetDisplayID() string {
+	return s.DisplayID
+}
+
+// SetRole sets the value of Role.
+func (s *InviteOrganizationForUserReq) SetRole(val float64) {
+	s.Role = val
+}
+
+// SetDisplayID sets the value of DisplayID.
+func (s *InviteOrganizationForUserReq) SetDisplayID(val string) {
+	s.DisplayID = val
+}
 
 type InviteOrganizationInternalServerError struct{}
 
@@ -6851,6 +6976,52 @@ func (o OptInt) Get() (v int, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptInt) Or(d int) int {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptInviteOrganizationForUserReq returns new OptInviteOrganizationForUserReq with value set to v.
+func NewOptInviteOrganizationForUserReq(v InviteOrganizationForUserReq) OptInviteOrganizationForUserReq {
+	return OptInviteOrganizationForUserReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptInviteOrganizationForUserReq is optional InviteOrganizationForUserReq.
+type OptInviteOrganizationForUserReq struct {
+	Value InviteOrganizationForUserReq
+	Set   bool
+}
+
+// IsSet returns true if OptInviteOrganizationForUserReq was set.
+func (o OptInviteOrganizationForUserReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptInviteOrganizationForUserReq) Reset() {
+	var v InviteOrganizationForUserReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptInviteOrganizationForUserReq) SetTo(v InviteOrganizationForUserReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptInviteOrganizationForUserReq) Get() (v InviteOrganizationForUserReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptInviteOrganizationForUserReq) Or(d InviteOrganizationForUserReq) InviteOrganizationForUserReq {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -10220,8 +10391,8 @@ type RegisterUserReq struct {
 	DisplayID string `json:"displayID"`
 	// ユーザーアイコン.
 	Icon OptMultipartFile `json:"icon"`
-	// 生まれ年.
-	YearOfBirth OptNilInt `json:"yearOfBirth"`
+	// 生年月日.
+	DateOfBirth OptNilInt `json:"dateOfBirth"`
 	// 性別.
 	Gender OptNilRegisterUserReqGender `json:"gender"`
 	// 都道府県.
@@ -10247,9 +10418,9 @@ func (s *RegisterUserReq) GetIcon() OptMultipartFile {
 	return s.Icon
 }
 
-// GetYearOfBirth returns the value of YearOfBirth.
-func (s *RegisterUserReq) GetYearOfBirth() OptNilInt {
-	return s.YearOfBirth
+// GetDateOfBirth returns the value of DateOfBirth.
+func (s *RegisterUserReq) GetDateOfBirth() OptNilInt {
+	return s.DateOfBirth
 }
 
 // GetGender returns the value of Gender.
@@ -10287,9 +10458,9 @@ func (s *RegisterUserReq) SetIcon(val OptMultipartFile) {
 	s.Icon = val
 }
 
-// SetYearOfBirth sets the value of YearOfBirth.
-func (s *RegisterUserReq) SetYearOfBirth(val OptNilInt) {
-	s.YearOfBirth = val
+// SetDateOfBirth sets the value of DateOfBirth.
+func (s *RegisterUserReq) SetDateOfBirth(val OptNilInt) {
+	s.DateOfBirth = val
 }
 
 // SetGender sets the value of Gender.

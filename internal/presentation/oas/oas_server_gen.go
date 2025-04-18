@@ -216,6 +216,12 @@ type OrganizationHandler interface {
 	//
 	// POST /organizations
 	CreateOrganizations(ctx context.Context, req OptCreateOrganizationsReq) (CreateOrganizationsRes, error)
+	// GetOrganizations implements getOrganizations operation.
+	//
+	// 所属組織一覧.
+	//
+	// GET /organizations
+	GetOrganizations(ctx context.Context) (GetOrganizationsRes, error)
 	// InviteOrganization implements inviteOrganization operation.
 	//
 	// Role
@@ -225,6 +231,12 @@ type OrganizationHandler interface {
 	//
 	// POST /organizations/{organizationID}/invite
 	InviteOrganization(ctx context.Context, req OptInviteOrganizationReq, params InviteOrganizationParams) (InviteOrganizationRes, error)
+	// InviteOrganizationForUser implements inviteOrganizationForUser operation.
+	//
+	// 組織にユーザーを追加.
+	//
+	// POST /organizations/{organizationID}/invite_user
+	InviteOrganizationForUser(ctx context.Context, req OptInviteOrganizationForUserReq, params InviteOrganizationForUserParams) (InviteOrganizationForUserRes, error)
 }
 
 // PolicyHandler handles operations described by OpenAPI v3 specification.

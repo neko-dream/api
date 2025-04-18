@@ -3573,10 +3573,10 @@ paths:
                   type: string
                   description: ユーザーアイコン
                   example: ''
-                yearOfBirth:
+                dateOfBirth:
                   type: integer
                   default: 0
-                  description: 生まれ年
+                  description: 生年月日
                   example: 0
                   nullable: true
                 gender:
@@ -3708,9 +3708,9 @@ paths:
                   default: false
                   example: 'false'
                   nullable: true
-                yearOfBirth:
+                dateOfBirth:
                   type: integer
-                  description: 生まれ年
+                  description: 生年月日
                   example: 0
                   nullable: true
                 gender:
@@ -3725,7 +3725,7 @@ paths:
                   nullable: true
                 city:
                   type: string
-                  description: 市区町村
+                  description: 市町村
                   example: ''
                   nullable: true
                 prefecture:
@@ -3847,9 +3847,10 @@ paths:
                   demographics:
                     type: object
                     properties:
-                      yearOfBirth:
+                      dateOfBirth:
                         type: integer
-                        description: 誕生年
+                        description: 生年月日
+                        title: '20001010'
                         nullable: true
                       gender:
                         type: string
@@ -3858,12 +3859,13 @@ paths:
                         nullable: true
                       city:
                         type: string
-                        title: 市区町村
-                        description: 市区町村
+                        title: 市町村
+                        description: 市町村
                         nullable: true
                       prefecture:
                         type: string
                         description: 都道府県
+                        title: 都道府県
                         nullable: true
                   email:
                     type: string
@@ -5387,6 +5389,79 @@ paths:
       security:
         - SessionId: []
       x-ogen-operation-group: Organization
+    get:
+      summary: 所属組織一覧
+      deprecated: false
+      description: ''
+      operationId: getOrganizations
+      tags:
+        - organization
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  organizations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        ID:
+                          type: string
+                          description: 組織ID
+                        Name:
+                          type: string
+                          description: 組織名
+                        Type:
+                          type: integer
+                          description: 組織のタイプ
+                        Role:
+                          type: integer
+                          description: ロール
+                      required:
+                        - ID
+                        - Name
+                        - Type
+                        - Role
+                    description: 所属組織
+                required:
+                  - organizations
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security:
+        - SessionId: []
+      x-ogen-operation-group: Organization
   /organizations/{organizationID}/invite:
     post:
       summary: 組織ユーザー招待（運営ユーザーのみ）
@@ -5429,6 +5504,80 @@ paths:
               schema:
                 type: object
                 properties: {}
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security:
+        - SessionId: []
+      x-ogen-operation-group: Organization
+  /organizations/{organizationID}/invite_user:
+    post:
+      summary: 組織にユーザーを追加
+      deprecated: false
+      description: ''
+      operationId: inviteOrganizationForUser
+      tags:
+        - organization
+      parameters:
+        - name: organizationID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: number
+                  example: 0
+                displayID:
+                  type: string
+                  example: ''
+              required:
+                - role
+                - displayID
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                required:
+                  - success
           headers: {}
         '400':
           description: ''
@@ -5759,9 +5908,10 @@ components:
     userDemographics:
       type: object
       properties:
-        yearOfBirth:
+        dateOfBirth:
           type: integer
-          description: 誕生年
+          description: 生年月日
+          title: '20001010'
           nullable: true
         gender:
           type: string
@@ -5770,12 +5920,13 @@ components:
           nullable: true
         city:
           type: string
-          title: 市区町村
-          description: 市区町村
+          title: 市町村
+          description: 市町村
           nullable: true
         prefecture:
           type: string
           description: 都道府県
+          title: 都道府県
           nullable: true
     userGroupPosition:
       type: object
@@ -6012,6 +6163,26 @@ components:
         - reasons
         - reportCount
         - status
+    organization:
+      type: object
+      properties:
+        ID:
+          type: string
+          description: 組織ID
+        Name:
+          type: string
+          description: 組織名
+        Type:
+          type: integer
+          description: 組織のタイプ
+        Role:
+          type: integer
+          description: ロール
+      required:
+        - ID
+        - Name
+        - Type
+        - Role
   securitySchemes:
     SessionId:
       type: apiKey

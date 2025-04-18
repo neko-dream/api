@@ -15,15 +15,18 @@ import (
 type organizationHandler struct {
 	create organization_command.CreateOrganizationCommand
 	invite organization_command.InviteOrganizationCommand
+	add    organization_command.InviteOrganizationForUserCommand
 }
 
 func NewOrganizationHandler(
 	create organization_command.CreateOrganizationCommand,
 	invite organization_command.InviteOrganizationCommand,
+	add organization_command.InviteOrganizationForUserCommand,
 ) oas.OrganizationHandler {
 	return &organizationHandler{
 		create: create,
 		invite: invite,
+		add:    add,
 	}
 }
 
@@ -83,4 +86,51 @@ func (o *organizationHandler) InviteOrganization(ctx context.Context, req oas.Op
 
 	res := &oas.InviteOrganizationOK{}
 	return res, nil
+}
+
+// InviteOrganizationForUser implements oas.OrganizationHandler.
+func (o *organizationHandler) InviteOrganizationForUser(ctx context.Context, req oas.OptInviteOrganizationForUserReq, params oas.InviteOrganizationForUserParams) (oas.InviteOrganizationForUserRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.InviteOrganizationForUser")
+	defer span.End()
+
+	claim := session.GetSession(ctx)
+	if claim == nil {
+		return nil, messages.ForbiddenError
+	}
+	userID, err := claim.UserID()
+	if err != nil {
+		return nil, messages.ForbiddenError
+	}
+	organizationID, err := shared.ParseUUID[organization.Organization](params.OrganizationID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
+	_, err = o.add.Execute(ctx, organization_command.InviteOrganizationForUserInput{
+		UserID:         userID,
+		OrganizationID: organizationID,
+		DisplayID:      req.Value.DisplayID,
+		Role:           int(req.Value.Role),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	res := &oas.InviteOrganizationForUserOK{
+		Success: true,
+	}
+	return res, nil
+}
+
+// GetOrganizations 所属組織一覧
+func (o *organizationHandler) GetOrganizations(ctx context.Context) (oas.GetOrganizationsRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.GetOrganizations")
+	defer span.End()
+
+	_ = ctx
+	return nil, &messages.APIError{
+		StatusCode: 501,
+		Code:       "ORG-0001",
+		Message:    "この機能はまだ実装されていません",
+	}
 }

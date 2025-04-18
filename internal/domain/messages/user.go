@@ -32,4 +32,9 @@ var (
 		Code:       "USER-0005",
 		Message:    "ユーザ情報の更新に失敗しました。",
 	}
+	UserNotFound = &APIError{
+		StatusCode: 404,
+		Code:       "USER-0006",
+		Message:    "ユーザが見つかりません。",
+	}
 )

@@ -202,7 +202,7 @@ func (q *Queries) GetUserBySubject(ctx context.Context, subject string) (GetUser
 
 const getUserDemographicByUserID = `-- name: GetUserDemographicByUserID :one
 SELECT
-    user_demographics_id, user_id, year_of_birth, gender, city, created_at, updated_at, prefecture
+    user_demographics_id, user_id, date_of_birth, gender, city, created_at, updated_at, prefecture
 FROM
     "user_demographics"
 WHERE
@@ -212,7 +212,7 @@ WHERE
 // GetUserDemographicByUserID
 //
 //	SELECT
-//	    user_demographics_id, user_id, year_of_birth, gender, city, created_at, updated_at, prefecture
+//	    user_demographics_id, user_id, date_of_birth, gender, city, created_at, updated_at, prefecture
 //	FROM
 //	    "user_demographics"
 //	WHERE
@@ -223,7 +223,7 @@ func (q *Queries) GetUserDemographicByUserID(ctx context.Context, userID uuid.UU
 	err := row.Scan(
 		&i.UserDemographicsID,
 		&i.UserID,
-		&i.YearOfBirth,
+		&i.DateOfBirth,
 		&i.Gender,
 		&i.City,
 		&i.CreatedAt,
@@ -237,7 +237,7 @@ const getUserDetailByID = `-- name: GetUserDetailByID :one
 SELECT
     users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
     user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at,
-    user_demographics.user_demographics_id, user_demographics.user_id, user_demographics.year_of_birth, user_demographics.gender, user_demographics.city, user_demographics.created_at, user_demographics.updated_at, user_demographics.prefecture
+    user_demographics.user_demographics_id, user_demographics.user_id, user_demographics.date_of_birth, user_demographics.gender, user_demographics.city, user_demographics.created_at, user_demographics.updated_at, user_demographics.prefecture
 FROM
     users
 LEFT JOIN user_auths ON users.user_id = user_auths.user_id
@@ -257,7 +257,7 @@ type GetUserDetailByIDRow struct {
 //	SELECT
 //	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
 //	    user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at,
-//	    user_demographics.user_demographics_id, user_demographics.user_id, user_demographics.year_of_birth, user_demographics.gender, user_demographics.city, user_demographics.created_at, user_demographics.updated_at, user_demographics.prefecture
+//	    user_demographics.user_demographics_id, user_demographics.user_id, user_demographics.date_of_birth, user_demographics.gender, user_demographics.city, user_demographics.created_at, user_demographics.updated_at, user_demographics.prefecture
 //	FROM
 //	    users
 //	LEFT JOIN user_auths ON users.user_id = user_auths.user_id
@@ -284,7 +284,7 @@ func (q *Queries) GetUserDetailByID(ctx context.Context, userID uuid.UUID) (GetU
 		&i.UserAuth.CreatedAt,
 		&i.UserDemographic.UserDemographicsID,
 		&i.UserDemographic.UserID,
-		&i.UserDemographic.YearOfBirth,
+		&i.UserDemographic.DateOfBirth,
 		&i.UserDemographic.Gender,
 		&i.UserDemographic.City,
 		&i.UserDemographic.CreatedAt,
@@ -298,7 +298,7 @@ const updateOrCreateUserDemographic = `-- name: UpdateOrCreateUserDemographic :e
 INSERT INTO user_demographics (
     user_demographics_id,
     user_id,
-    year_of_birth,
+    date_of_birth,
     gender,
     city,
     prefecture,
@@ -307,7 +307,7 @@ INSERT INTO user_demographics (
 ) VALUES ($1, $2, $3, $4, $5, $6,  now(), now())
 ON CONFLICT (user_id)
 DO UPDATE SET
-    year_of_birth = $3,
+    date_of_birth = $3,
     gender = $4,
     city = $5,
     prefecture = $6,
@@ -317,7 +317,7 @@ DO UPDATE SET
 type UpdateOrCreateUserDemographicParams struct {
 	UserDemographicsID uuid.UUID
 	UserID             uuid.UUID
-	YearOfBirth        sql.NullString
+	DateOfBirth        sql.NullString
 	Gender             sql.NullString
 	City               sql.NullString
 	Prefecture         sql.NullString
@@ -328,7 +328,7 @@ type UpdateOrCreateUserDemographicParams struct {
 //	INSERT INTO user_demographics (
 //	    user_demographics_id,
 //	    user_id,
-//	    year_of_birth,
+//	    date_of_birth,
 //	    gender,
 //	    city,
 //	    prefecture,
@@ -337,7 +337,7 @@ type UpdateOrCreateUserDemographicParams struct {
 //	) VALUES ($1, $2, $3, $4, $5, $6,  now(), now())
 //	ON CONFLICT (user_id)
 //	DO UPDATE SET
-//	    year_of_birth = $3,
+//	    date_of_birth = $3,
 //	    gender = $4,
 //	    city = $5,
 //	    prefecture = $6,
@@ -346,7 +346,7 @@ func (q *Queries) UpdateOrCreateUserDemographic(ctx context.Context, arg UpdateO
 	_, err := q.db.ExecContext(ctx, updateOrCreateUserDemographic,
 		arg.UserDemographicsID,
 		arg.UserID,
-		arg.YearOfBirth,
+		arg.DateOfBirth,
 		arg.Gender,
 		arg.City,
 		arg.Prefecture,

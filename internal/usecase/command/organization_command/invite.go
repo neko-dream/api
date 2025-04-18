@@ -64,7 +64,6 @@ func (i *inviteOrganizationInteractor) Execute(ctx context.Context, input Invite
 	if err != nil {
 		return nil, err
 	}
-
 	// 組織ユーザーが存在しない場合はエラー
 	if orgUser == nil {
 		return nil, errors.New("organization user not found")

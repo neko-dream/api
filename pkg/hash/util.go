@@ -60,6 +60,6 @@ func VerifyEmail(email, pepper, hashedEmail string) bool {
 		return false
 	}
 	expectedMAC := mac.Sum(nil)
-	expected:= base64.StdEncoding.EncodeToString(expectedMAC)
+	expected := base64.StdEncoding.EncodeToString(expectedMAC)
 	return hmac.Equal([]byte(hashedEmail), []byte(expected))
 }

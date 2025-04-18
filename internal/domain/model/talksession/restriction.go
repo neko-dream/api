@@ -45,7 +45,7 @@ var (
 				if user.Demographics() == nil {
 					return false
 				}
-				return user.Demographics().YearOfBirth() != nil
+				return user.Demographics().DateOfBirth() != nil
 			}},
 		DemographicsCity: {
 			Key:         DemographicsCity,

@@ -249,11 +249,11 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 				Value: *demographics.City,
 			}
 		}
-		var yearOfBirth oas.OptNilInt
-		if demographics.YearOfBirth != nil {
-			yearOfBirth = oas.OptNilInt{
+		var dateOfBirth oas.OptNilInt
+		if demographics.DateOfBirth != nil {
+			dateOfBirth = oas.OptNilInt{
 				Set:   true,
-				Value: *demographics.YearOfBirth,
+				Value: *demographics.DateOfBirth,
 			}
 		}
 		var prefecture oas.OptNilString
@@ -272,7 +272,7 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 		}
 
 		demographicsResp = oas.GetUserInfoOKDemographics{
-			YearOfBirth: yearOfBirth,
+			DateOfBirth: dateOfBirth,
 			Gender:      gender,
 			Prefecture:  prefecture,
 			City:        city,
@@ -330,9 +330,9 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 			return nil, messages.InternalServerError
 		}
 	}
-	var yearOfBirth *int
-	if !value.YearOfBirth.Null && value.YearOfBirth.Value != 0 {
-		yearOfBirth = &value.YearOfBirth.Value
+	var dateOfBirth *int
+	if !value.DateOfBirth.Null && value.DateOfBirth.Value != 0 {
+		dateOfBirth = &value.DateOfBirth.Value
 	}
 	var city *string
 	if !value.City.Null && value.City.Value != "" {
@@ -369,7 +369,7 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 		DisplayName: displayName,
 		Icon:        file,
 		Email:       email,
-		YearOfBirth: yearOfBirth,
+		DateOfBirth: dateOfBirth,
 		City:        city,
 		Gender:      gender,
 		Prefecture:  prefecture,
@@ -443,7 +443,7 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 		DisplayID:   value.DisplayID,
 		DisplayName: value.DisplayName,
 		Icon:        file,
-		YearOfBirth: utils.ToPtrIfNotNullValue(value.YearOfBirth.Null, value.YearOfBirth.Value),
+		DateOfBirth: utils.ToPtrIfNotNullValue(value.DateOfBirth.Null, value.DateOfBirth.Value),
 		City:        utils.ToPtrIfNotNullValue(value.City.Null, value.City.Value),
 		Gender: utils.ToPtrIfNotNullFunc(value.Gender.Null, func() *string {
 			txt, err := value.Gender.Value.MarshalText()

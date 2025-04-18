@@ -61,7 +61,7 @@ func TestUserRepository_Create(t *testing.T) {
 				demographics := user.NewUserDemographic(
 					ctx,
 					shared.NewUUID[user.UserDemographic](),
-					lo.ToPtr(1990),
+					lo.ToPtr(19900101),
 					lo.ToPtr("男性"),
 					lo.ToPtr("世田谷区"),
 					lo.ToPtr("東京都"),
@@ -111,11 +111,11 @@ func TestUserRepository_Create(t *testing.T) {
 				}
 
 				demo := *foundUser.Demographics()
-				if *demo.YearOfBirth() != 1990 {
-					return errors.New("生年が一致しません")
-				}
-				if demo.YearOfBirth() == nil {
+				if demo.DateOfBirth() == nil {
 					return errors.New("生年が見つかりません")
+				}
+				if *demo.DateOfBirth() != 19900101 {
+					return errors.New("生年が一致しません")
 				}
 
 				if demo.City() == nil {
