@@ -33,7 +33,7 @@ type OrganizationMemberManager interface {
 	// ユーザーの発行
 	InviteUser(ctx context.Context, params InviteUserParams) (*organization.OrganizationUser, error)
 	// ユーザーの招待
-	AddUser(ctx context.Context,  params InviteUserParams) error
+	AddUser(ctx context.Context, params InviteUserParams) error
 	IsSuperAdmin(ctx context.Context, userID shared.UUID[user.User]) (bool, error)
 }
 
@@ -73,8 +73,6 @@ func NewOrganizationMemberManager(
 	}
 }
 
-
-
 // AddUser 組織にユーザーを追加する
 // ユーザーが既に組織に所属している場合はエラーを返す
 func (s *organizationMemberManager) AddUser(ctx context.Context, params InviteUserParams) error {
@@ -113,7 +111,6 @@ func (s *organizationMemberManager) AddUser(ctx context.Context, params InviteUs
 
 	return nil
 }
-
 
 // IsSuperAdmin implements OrganizationService.
 func (s *organizationMemberManager) IsSuperAdmin(ctx context.Context, userID shared.UUID[user.User]) (bool, error) {
@@ -248,6 +245,9 @@ func (s *organizationMemberManager) InviteUser(ctx context.Context, input Invite
 }
 
 func (s *organizationMemberManager) SendMail(ctx context.Context, email string, pass string, org *organization.Organization) error {
+	ctx, span := otel.Tracer("organization").Start(ctx, "organizationMemberManager.SendMail")
+	defer span.End()
+
 	// メールにIDとパスワード、組織IDを送信
 	if err := s.emailSender.Send(ctx, email, email_template.OrganizationInvitationEmailTemplate, map[string]any{
 		"Title":            "【ことひろ】招待が届いています",

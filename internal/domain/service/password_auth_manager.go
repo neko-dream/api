@@ -62,7 +62,7 @@ func (u *passwordAuthManager) VerifyPassword(ctx context.Context, userID shared.
 	}
 	log.Println("auth", auth.PasswordHash)
 	// パスワードを検証
-	bs,err := hash.VerifyPassword(plainPassword, auth.PasswordHash), nil
+	bs, err := hash.VerifyPassword(plainPassword, auth.PasswordHash), nil
 	log.Println("err", bs, err)
 	if err != nil {
 		return false, err
