@@ -47,12 +47,12 @@ func EncryptUserDemographics(
 	}
 
 	if userDemographic.DateOfBirth() != nil {
-		encryptedYear, err := encryptor.EncryptInt(ctx, int64(*userDemographic.DateOfBirth()))
+		encryptedDateOfBirth, err := encryptor.EncryptInt(ctx, int64(*userDemographic.DateOfBirth()))
 		if err != nil {
 			utils.HandleError(ctx, err, "encryptor.EncryptInt DateOfBirth")
 			return nil, err
 		}
-		dateOfBirth = sql.NullString{String: encryptedYear, Valid: true}
+		dateOfBirth = sql.NullString{String: encryptedDateOfBirth, Valid: true}
 	}
 
 	if userDemographic.Gender() != nil {
