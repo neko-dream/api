@@ -28,4 +28,9 @@ var (
 		Code:       "ORGANIZATION-005",
 		Message:    "組織の操作中にエラーが発生しました。時間をおいて再度お試しください",
 	}
+	OrganizationPermissionDenied = &APIError{
+		StatusCode: http.StatusForbidden,
+		Code:       "ORGANIZATION-006",
+		Message:    "操作に必要な権限がありません",
+	}
 )
