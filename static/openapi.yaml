@@ -5459,7 +5459,8 @@ paths:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-      security: []
+      security:
+        - SessionId: []
       x-ogen-operation-group: Organization
   /organizations/{organizationID}/invite:
     post:
@@ -5606,7 +5607,8 @@ paths:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-      security: []
+      security:
+        - SessionId: []
       x-ogen-operation-group: Organization
   /manage:
     get:

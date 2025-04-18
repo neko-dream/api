@@ -69,8 +69,6 @@ func (y DateOfBirth) Age(ctx context.Context) int {
 
 	ctx, span := otel.Tracer("user").Start(ctx, "DateOfBirth.Age")
 	defer span.End()
-
-
 	// 年月日を分解
 	birthYear := int(y) / 10000
 	birthMonth := (int(y) % 10000) / 100
@@ -89,4 +87,5 @@ func (y DateOfBirth) Age(ctx context.Context) int {
 	}
 
 	return age
+}
 }
