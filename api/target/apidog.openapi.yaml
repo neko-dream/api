@@ -5928,6 +5928,85 @@
           }
         ],
         "x-ogen-operation-group": "Organization"
+      },
+      "get": {
+        "summary": "所属組織一覧",
+        "deprecated": false,
+        "description": "",
+        "operationId": "getOrganizations",
+        "tags": [
+          "organization"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "organizations": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/organization"
+                      },
+                      "description": "所属組織"
+                    }
+                  },
+                  "required": [
+                    "organizations"
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [],
+        "x-ogen-operation-group": "Organization"
       }
     },
     "/organizations/{organizationID}/invite": {
@@ -6683,6 +6762,33 @@
           "reasons",
           "reportCount",
           "status"
+        ]
+      },
+      "organization": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "description": "組織ID"
+          },
+          "Name": {
+            "type": "string",
+            "description": "組織名"
+          },
+          "Type": {
+            "type": "integer",
+            "description": "組織のタイプ"
+          },
+          "Role": {
+            "type": "integer",
+            "description": "ロール"
+          }
+        },
+        "required": [
+          "ID",
+          "Name",
+          "Type",
+          "Role"
         ]
       }
     },

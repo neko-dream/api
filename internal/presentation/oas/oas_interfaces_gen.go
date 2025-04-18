@@ -73,6 +73,10 @@ type GetOpinionsForTalkSessionRes interface {
 	getOpinionsForTalkSessionRes()
 }
 
+type GetOrganizationsRes interface {
+	getOrganizationsRes()
+}
+
 type GetPolicyConsentStatusRes interface {
 	getPolicyConsentStatusRes()
 }

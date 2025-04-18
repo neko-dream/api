@@ -686,10 +686,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 					if len(elem) == 0 {
 						switch r.Method {
+						case "GET":
+							s.handleGetOrganizationsRequest([0]string{}, elemIsEscaped, w, r)
 						case "POST":
 							s.handleCreateOrganizationsRequest([0]string{}, elemIsEscaped, w, r)
 						default:
-							s.notAllowed(w, r, "POST")
+							s.notAllowed(w, r, "GET,POST")
 						}
 
 						return
@@ -2196,6 +2198,14 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 
 					if len(elem) == 0 {
 						switch method {
+						case "GET":
+							r.name = "GetOrganizations"
+							r.summary = "所属組織一覧"
+							r.operationID = "getOrganizations"
+							r.pathPattern = "/organizations"
+							r.args = args
+							r.count = 0
+							return r, true
 						case "POST":
 							r.name = "CreateOrganizations"
 							r.summary = "組織作成（運営ユーザーのみ）"

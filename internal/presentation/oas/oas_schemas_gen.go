@@ -3040,6 +3040,82 @@ func (s *GetOpinionsForTalkSessionSort) UnmarshalText(data []byte) error {
 	}
 }
 
+type GetOrganizationsBadRequest struct{}
+
+func (*GetOrganizationsBadRequest) getOrganizationsRes() {}
+
+type GetOrganizationsInternalServerError struct{}
+
+func (*GetOrganizationsInternalServerError) getOrganizationsRes() {}
+
+type GetOrganizationsOK struct {
+	// 所属組織.
+	Organizations []GetOrganizationsOKOrganizationsItem `json:"organizations"`
+}
+
+// GetOrganizations returns the value of Organizations.
+func (s *GetOrganizationsOK) GetOrganizations() []GetOrganizationsOKOrganizationsItem {
+	return s.Organizations
+}
+
+// SetOrganizations sets the value of Organizations.
+func (s *GetOrganizationsOK) SetOrganizations(val []GetOrganizationsOKOrganizationsItem) {
+	s.Organizations = val
+}
+
+func (*GetOrganizationsOK) getOrganizationsRes() {}
+
+type GetOrganizationsOKOrganizationsItem struct {
+	// 組織ID.
+	ID string `json:"ID"`
+	// 組織名.
+	Name string `json:"Name"`
+	// 組織のタイプ.
+	Type int `json:"Type"`
+	// ロール.
+	Role int `json:"Role"`
+}
+
+// GetID returns the value of ID.
+func (s *GetOrganizationsOKOrganizationsItem) GetID() string {
+	return s.ID
+}
+
+// GetName returns the value of Name.
+func (s *GetOrganizationsOKOrganizationsItem) GetName() string {
+	return s.Name
+}
+
+// GetType returns the value of Type.
+func (s *GetOrganizationsOKOrganizationsItem) GetType() int {
+	return s.Type
+}
+
+// GetRole returns the value of Role.
+func (s *GetOrganizationsOKOrganizationsItem) GetRole() int {
+	return s.Role
+}
+
+// SetID sets the value of ID.
+func (s *GetOrganizationsOKOrganizationsItem) SetID(val string) {
+	s.ID = val
+}
+
+// SetName sets the value of Name.
+func (s *GetOrganizationsOKOrganizationsItem) SetName(val string) {
+	s.Name = val
+}
+
+// SetType sets the value of Type.
+func (s *GetOrganizationsOKOrganizationsItem) SetType(val int) {
+	s.Type = val
+}
+
+// SetRole sets the value of Role.
+func (s *GetOrganizationsOKOrganizationsItem) SetRole(val int) {
+	s.Role = val
+}
+
 type GetPolicyConsentStatusBadRequest struct{}
 
 func (*GetPolicyConsentStatusBadRequest) getPolicyConsentStatusRes() {}

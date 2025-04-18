@@ -216,6 +216,12 @@ type OrganizationHandler interface {
 	//
 	// POST /organizations
 	CreateOrganizations(ctx context.Context, req OptCreateOrganizationsReq) (CreateOrganizationsRes, error)
+	// GetOrganizations implements getOrganizations operation.
+	//
+	// 所属組織一覧.
+	//
+	// GET /organizations
+	GetOrganizations(ctx context.Context) (GetOrganizationsRes, error)
 	// InviteOrganization implements inviteOrganization operation.
 	//
 	// Role

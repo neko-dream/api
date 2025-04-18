@@ -15,7 +15,7 @@ import (
 type organizationHandler struct {
 	create organization_command.CreateOrganizationCommand
 	invite organization_command.InviteOrganizationCommand
-	add   organization_command.InviteOrganizationForUserCommand
+	add    organization_command.InviteOrganizationForUserCommand
 }
 
 func NewOrganizationHandler(
@@ -120,4 +120,15 @@ func (o *organizationHandler) InviteOrganizationForUser(ctx context.Context, req
 		Success: true,
 	}
 	return res, nil
+}
+
+// GetOrganizations 所属組織一覧
+func (o *organizationHandler) GetOrganizations(ctx context.Context) (oas.GetOrganizationsRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.GetOrganizations")
+	defer span.End()
+
+	_ = ctx
+
+	// 気が向いたら実装する
+	panic("unimplemented")
 }
