@@ -111,10 +111,10 @@ func TestUserRepository_Create(t *testing.T) {
 				}
 
 				demo := *foundUser.Demographics()
-				if *demo.YearOfBirth() != 1990 {
+				if *demo.DateOfBirth() != 1990 {
 					return errors.New("生年が一致しません")
 				}
-				if demo.YearOfBirth() == nil {
+				if demo.DateOfBirth() == nil {
 					return errors.New("生年が見つかりません")
 				}
 

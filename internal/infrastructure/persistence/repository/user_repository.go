@@ -155,7 +155,7 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 		if err := u.GetQueries(ctx).UpdateOrCreateUserDemographic(ctx, model.UpdateOrCreateUserDemographicParams{
 			UserDemographicsID: encryptedDemo.UserDemographicsID,
 			UserID:             encryptedDemo.UserID,
-			YearOfBirth:        encryptedDemo.YearOfBirth,
+			DateOfBirth:        encryptedDemo.DateOfBirth,
 			City:               encryptedDemo.City,
 			Gender:             encryptedDemo.Gender,
 			Prefecture:         encryptedDemo.Prefecture,

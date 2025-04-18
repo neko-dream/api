@@ -3573,7 +3573,7 @@ paths:
                   type: string
                   description: ユーザーアイコン
                   example: ''
-                yearOfBirth:
+                dateOfBirth:
                   type: integer
                   default: 0
                   description: 生年月日
@@ -3708,9 +3708,9 @@ paths:
                   default: false
                   example: 'false'
                   nullable: true
-                yearOfBirth:
+                dateOfBirth:
                   type: integer
-                  description: 生まれ年
+                  description: 生年月日
                   example: 0
                   nullable: true
                 gender:
@@ -3725,7 +3725,7 @@ paths:
                   nullable: true
                 city:
                   type: string
-                  description: 市区町村
+                  description: 市町村
                   example: ''
                   nullable: true
                 prefecture:
@@ -3847,9 +3847,9 @@ paths:
                   demographics:
                     type: object
                     properties:
-                      yearOfBirth:
+                      dateOfBirth:
                         type: integer
-                        description: 誕生年
+                        description: 生年月日
                         nullable: true
                       gender:
                         type: string
@@ -5904,9 +5904,9 @@ components:
     userDemographics:
       type: object
       properties:
-        yearOfBirth:
+        dateOfBirth:
           type: integer
-          description: 誕生年
+          description: 生年月日
           nullable: true
         gender:
           type: string

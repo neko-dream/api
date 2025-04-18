@@ -44,7 +44,7 @@ func TestEncryptUserDemographics(t *testing.T) {
 			validate: func(t *testing.T, got *model.UserDemographic) {
 				assert.True(t, got.City.Valid)
 				assert.True(t, got.Prefecture.Valid)
-				assert.True(t, got.YearOfBirth.Valid)
+				assert.True(t, got.DateOfBirth.Valid)
 				assert.True(t, got.Gender.Valid)
 			},
 		},
@@ -62,7 +62,7 @@ func TestEncryptUserDemographics(t *testing.T) {
 			validate: func(t *testing.T, got *model.UserDemographic) {
 				assert.True(t, got.City.Valid)
 				assert.False(t, got.Prefecture.Valid)
-				assert.False(t, got.YearOfBirth.Valid)
+				assert.False(t, got.DateOfBirth.Valid)
 				assert.True(t, got.Gender.Valid)
 			},
 		},
@@ -111,7 +111,7 @@ func TestDecryptUserDemographics(t *testing.T) {
 		assert.NotNil(t, decrypted)
 
 		// 元のデータと一致することを確認
-		assert.Equal(t, original.YearOfBirth(), decrypted.YearOfBirth())
+		assert.Equal(t, original.DateOfBirth(), decrypted.DateOfBirth())
 		assert.Equal(t, original.Gender(), decrypted.Gender())
 		assert.Equal(t, original.City().String(), decrypted.City().String())
 		assert.Equal(t, original.Prefecture(), decrypted.Prefecture())

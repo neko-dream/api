@@ -1159,11 +1159,11 @@ type EditUserProfileReq struct {
 	// ユーザーアイコン.
 	Icon       OptMultipartFile `json:"icon"`
 	DeleteIcon OptNilBool       `json:"deleteIcon"`
-	// 生まれ年.
-	YearOfBirth OptNilInt `json:"yearOfBirth"`
+	// 生年月日.
+	DateOfBirth OptNilInt `json:"dateOfBirth"`
 	// 性別.
 	Gender OptNilEditUserProfileReqGender `json:"gender"`
-	// 市区町村.
+	// 市町村.
 	City OptNilString `json:"city"`
 	// 都道府県.
 	Prefecture OptNilString `json:"prefecture"`
@@ -1186,9 +1186,9 @@ func (s *EditUserProfileReq) GetDeleteIcon() OptNilBool {
 	return s.DeleteIcon
 }
 
-// GetYearOfBirth returns the value of YearOfBirth.
-func (s *EditUserProfileReq) GetYearOfBirth() OptNilInt {
-	return s.YearOfBirth
+// GetDateOfBirth returns the value of DateOfBirth.
+func (s *EditUserProfileReq) GetDateOfBirth() OptNilInt {
+	return s.DateOfBirth
 }
 
 // GetGender returns the value of Gender.
@@ -1226,9 +1226,9 @@ func (s *EditUserProfileReq) SetDeleteIcon(val OptNilBool) {
 	s.DeleteIcon = val
 }
 
-// SetYearOfBirth sets the value of YearOfBirth.
-func (s *EditUserProfileReq) SetYearOfBirth(val OptNilInt) {
-	s.YearOfBirth = val
+// SetDateOfBirth sets the value of DateOfBirth.
+func (s *EditUserProfileReq) SetDateOfBirth(val OptNilInt) {
+	s.DateOfBirth = val
 }
 
 // SetGender sets the value of Gender.
@@ -4585,8 +4585,8 @@ func (s *GetUserInfoOK) SetEmail(val OptNilString) {
 func (*GetUserInfoOK) getUserInfoRes() {}
 
 type GetUserInfoOKDemographics struct {
-	// 誕生年.
-	YearOfBirth OptNilInt `json:"yearOfBirth"`
+	// 生年月日.
+	DateOfBirth OptNilInt `json:"dateOfBirth"`
 	// 性別.
 	Gender OptNilString `json:"gender"`
 	// 市区町村.
@@ -4595,9 +4595,9 @@ type GetUserInfoOKDemographics struct {
 	Prefecture OptNilString `json:"prefecture"`
 }
 
-// GetYearOfBirth returns the value of YearOfBirth.
-func (s *GetUserInfoOKDemographics) GetYearOfBirth() OptNilInt {
-	return s.YearOfBirth
+// GetDateOfBirth returns the value of DateOfBirth.
+func (s *GetUserInfoOKDemographics) GetDateOfBirth() OptNilInt {
+	return s.DateOfBirth
 }
 
 // GetGender returns the value of Gender.
@@ -4615,9 +4615,9 @@ func (s *GetUserInfoOKDemographics) GetPrefecture() OptNilString {
 	return s.Prefecture
 }
 
-// SetYearOfBirth sets the value of YearOfBirth.
-func (s *GetUserInfoOKDemographics) SetYearOfBirth(val OptNilInt) {
-	s.YearOfBirth = val
+// SetDateOfBirth sets the value of DateOfBirth.
+func (s *GetUserInfoOKDemographics) SetDateOfBirth(val OptNilInt) {
+	s.DateOfBirth = val
 }
 
 // SetGender sets the value of Gender.
@@ -10392,7 +10392,7 @@ type RegisterUserReq struct {
 	// ユーザーアイコン.
 	Icon OptMultipartFile `json:"icon"`
 	// 生年月日.
-	YearOfBirth OptNilInt `json:"yearOfBirth"`
+	DateOfBirth OptNilInt `json:"dateOfBirth"`
 	// 性別.
 	Gender OptNilRegisterUserReqGender `json:"gender"`
 	// 都道府県.
@@ -10418,9 +10418,9 @@ func (s *RegisterUserReq) GetIcon() OptMultipartFile {
 	return s.Icon
 }
 
-// GetYearOfBirth returns the value of YearOfBirth.
-func (s *RegisterUserReq) GetYearOfBirth() OptNilInt {
-	return s.YearOfBirth
+// GetDateOfBirth returns the value of DateOfBirth.
+func (s *RegisterUserReq) GetDateOfBirth() OptNilInt {
+	return s.DateOfBirth
 }
 
 // GetGender returns the value of Gender.
@@ -10458,9 +10458,9 @@ func (s *RegisterUserReq) SetIcon(val OptMultipartFile) {
 	s.Icon = val
 }
 
-// SetYearOfBirth sets the value of YearOfBirth.
-func (s *RegisterUserReq) SetYearOfBirth(val OptNilInt) {
-	s.YearOfBirth = val
+// SetDateOfBirth sets the value of DateOfBirth.
+func (s *RegisterUserReq) SetDateOfBirth(val OptNilInt) {
+	s.DateOfBirth = val
 }
 
 // SetGender sets the value of Gender.

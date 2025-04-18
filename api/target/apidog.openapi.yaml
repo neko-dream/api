@@ -3680,7 +3680,7 @@
                     "description": "ユーザーアイコン",
                     "example": ""
                   },
-                  "yearOfBirth": {
+                  "dateOfBirth": {
                     "type": "integer",
                     "default": 0,
                     "description": "生年月日",
@@ -3869,9 +3869,9 @@
                     "example": "false",
                     "nullable": true
                   },
-                  "yearOfBirth": {
+                  "dateOfBirth": {
                     "type": "integer",
-                    "description": "生まれ年",
+                    "description": "生年月日",
                     "example": 0,
                     "nullable": true
                   },
@@ -3889,7 +3889,7 @@
                   },
                   "city": {
                     "type": "string",
-                    "description": "市区町村",
+                    "description": "市町村",
                     "example": "",
                     "nullable": true
                   },
@@ -6507,9 +6507,9 @@
       "userDemographics": {
         "type": "object",
         "properties": {
-          "yearOfBirth": {
+          "dateOfBirth": {
             "type": "integer",
-            "description": "誕生年",
+            "description": "生年月日",
             "nullable": true
           },
           "gender": {

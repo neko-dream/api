@@ -12257,9 +12257,9 @@ func (s *GetUserInfoOKDemographics) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *GetUserInfoOKDemographics) encodeFields(e *jx.Encoder) {
 	{
-		if s.YearOfBirth.Set {
-			e.FieldStart("yearOfBirth")
-			s.YearOfBirth.Encode(e)
+		if s.DateOfBirth.Set {
+			e.FieldStart("dateOfBirth")
+			s.DateOfBirth.Encode(e)
 		}
 	}
 	{
@@ -12283,7 +12283,7 @@ func (s *GetUserInfoOKDemographics) encodeFields(e *jx.Encoder) {
 }
 
 var jsonFieldsNameOfGetUserInfoOKDemographics = [4]string{
-	0: "yearOfBirth",
+	0: "dateOfBirth",
 	1: "gender",
 	2: "city",
 	3: "prefecture",
@@ -12297,15 +12297,15 @@ func (s *GetUserInfoOKDemographics) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "yearOfBirth":
+		case "dateOfBirth":
 			if err := func() error {
-				s.YearOfBirth.Reset()
-				if err := s.YearOfBirth.Decode(d); err != nil {
+				s.DateOfBirth.Reset()
+				if err := s.DateOfBirth.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"yearOfBirth\"")
+				return errors.Wrap(err, "decode field \"dateOfBirth\"")
 			}
 		case "gender":
 			if err := func() error {

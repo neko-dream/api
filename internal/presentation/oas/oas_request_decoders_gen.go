@@ -1160,13 +1160,13 @@ func (s *Server) decodeEditUserProfileRequest(r *http.Request) (
 			}
 			{
 				cfg := uri.QueryParameterDecodingConfig{
-					Name:    "yearOfBirth",
+					Name:    "dateOfBirth",
 					Style:   uri.QueryStyleForm,
 					Explode: true,
 				}
 				if err := q.HasParam(cfg); err == nil {
 					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-						var optFormDotYearOfBirthVal int
+						var optFormDotDateOfBirthVal int
 						if err := func() error {
 							val, err := d.DecodeValue()
 							if err != nil {
@@ -1178,15 +1178,15 @@ func (s *Server) decodeEditUserProfileRequest(r *http.Request) (
 								return err
 							}
 
-							optFormDotYearOfBirthVal = c
+							optFormDotDateOfBirthVal = c
 							return nil
 						}(); err != nil {
 							return err
 						}
-						optForm.YearOfBirth.SetTo(optFormDotYearOfBirthVal)
+						optForm.DateOfBirth.SetTo(optFormDotDateOfBirthVal)
 						return nil
 					}); err != nil {
-						return req, close, errors.Wrap(err, "decode \"yearOfBirth\"")
+						return req, close, errors.Wrap(err, "decode \"dateOfBirth\"")
 					}
 				}
 			}
@@ -2932,13 +2932,13 @@ func (s *Server) decodeRegisterUserRequest(r *http.Request) (
 			}
 			{
 				cfg := uri.QueryParameterDecodingConfig{
-					Name:    "yearOfBirth",
+					Name:    "dateOfBirth",
 					Style:   uri.QueryStyleForm,
 					Explode: true,
 				}
 				if err := q.HasParam(cfg); err == nil {
 					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-						var optFormDotYearOfBirthVal int
+						var optFormDotDateOfBirthVal int
 						if err := func() error {
 							val, err := d.DecodeValue()
 							if err != nil {
@@ -2950,15 +2950,15 @@ func (s *Server) decodeRegisterUserRequest(r *http.Request) (
 								return err
 							}
 
-							optFormDotYearOfBirthVal = c
+							optFormDotDateOfBirthVal = c
 							return nil
 						}(); err != nil {
 							return err
 						}
-						optForm.YearOfBirth.SetTo(optFormDotYearOfBirthVal)
+						optForm.DateOfBirth.SetTo(optFormDotDateOfBirthVal)
 						return nil
 					}); err != nil {
-						return req, close, errors.Wrap(err, "decode \"yearOfBirth\"")
+						return req, close, errors.Wrap(err, "decode \"dateOfBirth\"")
 					}
 				}
 			}
