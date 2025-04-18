@@ -61,13 +61,10 @@ func (i *inviteOrganizationForUserInteractor) Execute(ctx context.Context, input
 	// ログインユーザーが組織の管理者であることを確認
 	orgUser, err := i.organizationUserRepository.FindByOrganizationIDAndUserID(ctx, input.OrganizationID, input.UserID)
 	if err != nil {
-		if !errors.Is(err, sql.ErrNoRows) {
-			return nil, messages.OrganizationInternalServerError
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, messages.OrganizationPermissionDenied
 		}
-		return nil, messages.OrganizationForbidden
-	}
-	if orgUser == nil {
-		return nil, messages.OrganizationPermissionDenied
+		return nil, messages.OrganizationInternalServerError
 	}
 
 	// ドメインロジックを使用して権限チェックを行うのじゃ
