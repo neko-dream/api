@@ -6510,6 +6510,7 @@
           "dateOfBirth": {
             "type": "integer",
             "description": "生年月日",
+            "title": "20001010",
             "nullable": true
           },
           "gender": {
@@ -6520,13 +6521,14 @@
           },
           "city": {
             "type": "string",
-            "title": "市区町村",
-            "description": "市区町村",
+            "title": "市町村",
+            "description": "市町村",
             "nullable": true
           },
           "prefecture": {
             "type": "string",
             "description": "都道府県",
+            "title": "都道府県",
             "nullable": true
           }
         }
