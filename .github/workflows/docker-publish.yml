@@ -2,12 +2,12 @@ name: Create and publish a container image
 
 on:
   push:
-    # branches:
-    #   - "develop"
-    #   - "main"
+    branches:
+      - "develop"
+      - "main"
 
 env:
-  REGISTRY: kotokotoapi.sakuracr.jp
+  REGISTRY: ${{ secrets.SAKURA_REGISTRY }}
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
