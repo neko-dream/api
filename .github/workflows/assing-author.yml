@@ -1,9 +1,11 @@
 name: Assign Author
+
 on:
   issues:
     types: [opened]
   pull_request:
     types: [opened]
+
 jobs:
   assign-author:
     if: ${{ ! contains(fromJson('["renovate[bot]", "dependabot[bot]"]'), github.actor) }}
