@@ -5610,6 +5610,54 @@ paths:
       security:
         - SessionId: []
       x-ogen-operation-group: Organization
+  /health:
+    get:
+      summary: ヘルスチェック
+      deprecated: false
+      description: ''
+      operationId: health
+      tags:
+        - health
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security: []
+      x-ogen-operation-group: Health
   /manage:
     get:
       operationId: manageIndex

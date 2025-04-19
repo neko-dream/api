@@ -117,6 +117,10 @@ type GetUserInfoRes interface {
 	getUserInfoRes()
 }
 
+type HealthRes interface {
+	healthRes()
+}
+
 type InviteOrganizationForUserRes interface {
 	inviteOrganizationForUserRes()
 }

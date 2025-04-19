@@ -9,6 +9,7 @@ import (
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
 	AuthHandler
+	HealthHandler
 	ImageHandler
 	ManageHandler
 	OpinionHandler
@@ -79,6 +80,18 @@ type AuthHandler interface {
 	//
 	// POST /auth/password/register
 	PasswordRegister(ctx context.Context, req OptPasswordRegisterReq) (PasswordRegisterRes, error)
+}
+
+// HealthHandler handles operations described by OpenAPI v3 specification.
+//
+// x-ogen-operation-group: Health
+type HealthHandler interface {
+	// Health implements health operation.
+	//
+	// ヘルスチェック.
+	//
+	// GET /health
+	Health(ctx context.Context) (HealthRes, error)
 }
 
 // ImageHandler handles operations described by OpenAPI v3 specification.

@@ -288,6 +288,15 @@ func (UnimplementedHandler) GetUserInfo(ctx context.Context) (r GetUserInfoRes, 
 	return r, ht.ErrNotImplemented
 }
 
+// Health implements health operation.
+//
+// ヘルスチェック.
+//
+// GET /health
+func (UnimplementedHandler) Health(ctx context.Context) (r HealthRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // InviteOrganization implements inviteOrganization operation.
 //
 // Role
