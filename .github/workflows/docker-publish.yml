@@ -2,9 +2,9 @@ name: Create and publish a container image
 
 on:
   push:
-    branches:
-      - "develop"
-      - "main"
+    # branches:
+    #   - "develop"
+    #   - "main"
 
 env:
   REGISTRY: nomadscafe.sakuracr.jp
