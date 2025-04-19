@@ -45,8 +45,8 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,value=${{ github.ref_name == 'main' && 'production' || (github.ref_name == 'develop' && 'develop' || '') }}
-            type=raw,value=${{ github.ref_name == 'main' && 'production' || (github.ref_name == 'develop' && 'develop' || '') }}-${{ github.sha }}
+            type=raw,value=${{ github.ref_name == 'main' && 'production' || (github.ref_name == 'develop' && 'develop' || 'r') }}
+            type=raw,value=${{ github.ref_name == 'main' && 'production' || (github.ref_name == 'develop' && 'develop' || 'r') }}-${{ github.sha }}
             type=semver,pattern={{version}}
 
       - name: Build and push Docker image
