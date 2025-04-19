@@ -7,7 +7,7 @@ on:
     #   - "main"
 
 env:
-  REGISTRY: nomadscafe.sakuracr.jp
+  REGISTRY: kotokotoapi.sakuracr.jp
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
