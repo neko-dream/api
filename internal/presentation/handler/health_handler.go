@@ -14,7 +14,7 @@ func NewHealthHandler() oas.HealthHandler {
 }
 
 
-// Health ヘルスチェック！
+// Health ヘルスチェック
 func (h *healthHandler) Health(ctx context.Context) (oas.HealthRes, error) {
 	return &oas.HealthOK{}, nil
 }
