@@ -4672,6 +4672,18 @@ func (s *GetUserInfoOKUser) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
 
+type HealthBadRequest struct{}
+
+func (*HealthBadRequest) healthRes() {}
+
+type HealthInternalServerError struct{}
+
+func (*HealthInternalServerError) healthRes() {}
+
+type HealthOK struct{}
+
+func (*HealthOK) healthRes() {}
+
 type InviteOrganizationBadRequest struct{}
 
 func (*InviteOrganizationBadRequest) inviteOrganizationRes() {}
