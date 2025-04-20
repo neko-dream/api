@@ -20,13 +20,16 @@ type TalkSessionConsentService interface {
 }
 type talkSessionConsentService struct {
 	talkSessionConsentRepository TalkSessionConsentRepository
+	talkSessionRep               talksession.TalkSessionRepository
 }
 
 func NewTalkSessionConsentService(
 	talkSessionConsentRepository TalkSessionConsentRepository,
+	talkSessionRep talksession.TalkSessionRepository,
 ) TalkSessionConsentService {
 	return &talkSessionConsentService{
 		talkSessionConsentRepository: talkSessionConsentRepository,
+		talkSessionRep:               talkSessionRep,
 	}
 }
 
@@ -64,13 +67,28 @@ func (s *talkSessionConsentService) HasConsented(
 	ctx, span := otel.Tracer("talksession_consent").Start(ctx, "talkSessionConsentService.HasConsented")
 	defer span.End()
 
+	// トークセッションが存在するか確認
+	talkSession, err := s.talkSessionRep.FindByID(ctx, talkSessionID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, messages.TalkSessionNotFound
+		}
+		utils.HandleError(ctx, err, "セッション取得に失敗。")
+		return false, messages.InternalServerError
+	}
+
+	// restrictionsがない場合は常にtrueを返す
+	if talkSession.Restrictions() == nil || len(talkSession.Restrictions()) == 0 {
+		return true, nil
+	}
+
 	consents, err := s.talkSessionConsentRepository.FindByTalkSessionIDAndUserID(ctx, talkSessionID, userID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return false, nil
 		}
-        utils.HandleError(ctx, err, "Consentの取得に失敗しました。")
-        return false, messages.TalkSessionGetConsentFailed
+		utils.HandleError(ctx, err, "Consentの取得に失敗しました。")
+		return false, messages.TalkSessionGetConsentFailed
 	}
 	if consents != nil {
 		return true, nil
