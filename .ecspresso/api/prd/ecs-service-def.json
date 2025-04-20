@@ -27,7 +27,7 @@
 		{
 			"containerName": "api",
 			"containerPort": 3000,
-			"targetGroupArn": "{{ ssm `/kotohiro-prd-api/arn` }}"
+			"targetGroupArn": "{{ ssm `/kotohiro-prd-api-tg/arn` }}"
 		}
 	],
 	"networkConfiguration": {
