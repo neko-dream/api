@@ -31,12 +31,10 @@ func main() {
 
 	conf := di.Invoke[*config.Config](container)
 	migrator := di.Invoke[*db.Migrator](container)
-	// if conf.Env != config.PROD {
-		// migrator.Down()
-		migrator.Up()
-		// di.Invoke[*db.DummyInitializer](container).Initialize()
-	// }
-	log.Println("Database migration completed")
+
+	// migrator.Down()
+	migrator.Up()
+	// di.Invoke[*db.DummyInitializer](container).Initialize()
 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://localhost:3000"},
@@ -54,7 +52,6 @@ func main() {
 	mux := http.NewServeMux()
 	mux.Handle("/", corsHandler)
 	mux.Handle("/static/", http.StripPrefix("/static/", handler.NewStaticHandler()))
-	log.Println("Static file handler registered")
 	if conf.Env != config.PROD {
 		var domain string
 		if conf.Env == config.DEV {
