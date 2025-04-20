@@ -124,6 +124,13 @@ func (t *TalkSession) ChangePrefecture(prefecture *string) {
 func (t *TalkSession) Restrictions() []*RestrictionAttribute {
 	return t.restrictions
 }
+func (t *TalkSession) RestrictionList() Restrictions {
+	var restrictions []string
+	for _, restriction := range t.restrictions {
+		restrictions = append(restrictions, string(restriction.Key))
+	}
+	return restrictions
+}
 
 // 終了しているかを調べる
 func (t *TalkSession) IsFinished(ctx context.Context) bool {

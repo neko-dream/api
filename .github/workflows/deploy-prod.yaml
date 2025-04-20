@@ -1,17 +1,104 @@
-name: Deploy to Koyeb Prod
-on:
-  push:
-    branches:
-      - main
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install Koyeb CLI
-        uses: koyeb-community/koyeb-actions@v2
-        with:
-          api_token: "${{ secrets.KOYEB_API_KEY }}"
+name: Deploy to Production
 
-      - name: Trigger Deployment
-        run: |
-          koyeb service redeploy slim-fanya/kotohiro-api-prod
+on:
+  workflow_dispatch:
+
+env:
+  ECR_REPOSITORY: kotohiro-prd-api
+  AWS_REGION: ap-northeast-1
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        if: github.ref == 'refs/heads/main'
+        permissions:
+          id-token: write
+          contents: read
+        steps:
+          - name: Checkout
+            uses: actions/checkout@v4
+          - name: Setup Go
+            uses: actions/setup-go@v5
+            id: setup-go
+            with:
+              go-version: '^1.24.x'
+              cache: true
+              cache-dependency-path: |
+                go.mod
+
+          - name: Download Go Modules
+            if: ${{ steps.setup-go.outputs.cache-hit != 'true' }}
+            run: |
+                go mod download
+
+          - name: Build Go
+            run: |
+                CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -tags timetzdata -ldflags="-s -w" -trimpath -o server ./cmd/server
+
+          - name: Set up QEMU
+            uses: docker/setup-qemu-action@v3
+
+          - name: Set up Docker Buildx
+            uses: docker/setup-buildx-action@v3
+
+          - uses: aws-actions/configure-aws-credentials@v4
+            with:
+              aws-region: ${{ env.AWS_REGION }}
+              role-to-assume: ${{ secrets.AWS_PROD_DEPLOY_ROLE }}
+
+          - name: Login Amazon ECR
+            id: login-ecr
+            uses: aws-actions/amazon-ecr-login@v2
+
+          - name: Generate Image Tag
+            id: image_tag
+            run: |
+                COMMIT_HASH=${{ github.sha }}
+                TIMESTAMP=$(date '+%s%3N')
+                export IMAGE_TAG=$COMMIT_HASH-$TIMESTAMP
+                echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+          - name: Extract Metadata
+            id: meta
+            uses: docker/metadata-action@v5
+            env:
+                ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+            with:
+              images:  ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}
+              tags: |
+                type=raw,value=${{ steps.image_tag.outputs.IMAGE_TAG }}
+                type=edge,branch=main
+              labels: |
+                org.opencontainers.image.title=${{ github.event.repository.name }}
+
+          - name: Build Container
+            uses: docker/build-push-action@v6
+            with:
+              context: .
+              push: false
+              platforms: linux/arm64
+              file: ./container/Dockerfile.gh
+              tags: ${{ steps.meta.outputs.tags }}
+              labels: ${{ steps.meta.outputs.labels }}
+              cache-from: type=local,src=/tmp/.buildx-cache
+              cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+              build-args: |
+                "ENV=prod"
+              outputs: type=docker
+
+          - name: Push Container
+            env:
+                ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+            run: docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.image_tag.outputs.IMAGE_TAG }}
+
+          - name: Move Cache
+            run: |
+                rm -rf /tmp/.buildx-cache
+                mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+          - name: Setup ecspresso
+            uses: kayac/ecspresso@v2
+            with:
+              version: v2.3.2
+          - run: |
+              IMAGE_TAG=${{ steps.image_tag.outputs.IMAGE_TAG }} ecspresso deploy --config ./.ecspresso/api/prd/ecspresso.yml --no-wait

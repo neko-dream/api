@@ -1,15 +1,19 @@
 version: "2"
 sql:
-    - engine: "postgresql"
-      queries: "./internal/infrastructure/persistence/sqlc/queries/**"
-      schema: "./migrations/*.up.sql"
-      gen:
-          go:
-              package: "model"
-              out: "./internal/infrastructure/persistence/sqlc/generated"
-              emit_sql_as_comment: true
-              overrides:
-                - column: "talk_sessions.restrictions"
-                  go_type:
-                    import: "github.com/neko-dream/server/internal/domain/model/talksession"
-                    type: "Restrictions"
+  - engine: "postgresql"
+    queries: "./internal/infrastructure/persistence/sqlc/queries/**"
+    schema: "./migrations/*.up.sql"
+    gen:
+      go:
+        package: "model"
+        out: "./internal/infrastructure/persistence/sqlc/generated"
+        emit_sql_as_comment: true
+        overrides:
+          - column: "talk_sessions.restrictions"
+            go_type:
+              import: "github.com/neko-dream/server/internal/domain/model/talksession"
+              type: "Restrictions"
+          - column: "talksession_consents.restrictions"
+            go_type:
+              import: "github.com/neko-dream/server/internal/domain/model/talksession"
+              type: "Restrictions"

@@ -2,6 +2,14 @@ name: Test
 
 on:
   push:
+    paths-ignore:
+      - '.vscode/**'
+      - 'static/**'
+      - 'api/**' # OpenAPIのスキーマファイルなど
+      - 'internal/presentation/oas/**'
+      - 'internal/infrastructure/persistence/sqlc/generated/**'
+
+
   workflow_call:
     inputs:
       concurrency-group:

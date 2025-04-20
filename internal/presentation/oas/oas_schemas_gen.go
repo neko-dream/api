@@ -152,6 +152,18 @@ type ChangePasswordOK struct{}
 
 func (*ChangePasswordOK) changePasswordRes() {}
 
+type ConsentTalkSessionBadRequest struct{}
+
+func (*ConsentTalkSessionBadRequest) consentTalkSessionRes() {}
+
+type ConsentTalkSessionInternalServerError struct{}
+
+func (*ConsentTalkSessionInternalServerError) consentTalkSessionRes() {}
+
+type ConsentTalkSessionOK struct{}
+
+func (*ConsentTalkSessionOK) consentTalkSessionRes() {}
+
 type CreateOrganizationsBadRequest struct{}
 
 func (*CreateOrganizationsBadRequest) createOrganizationsRes() {}
@@ -4671,6 +4683,42 @@ func (s *GetUserInfoOKUser) SetDisplayName(val string) {
 func (s *GetUserInfoOKUser) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
+
+type HasConsentBadRequest struct{}
+
+func (*HasConsentBadRequest) hasConsentRes() {}
+
+type HasConsentInternalServerError struct{}
+
+func (*HasConsentInternalServerError) hasConsentRes() {}
+
+type HasConsentOK struct {
+	HasConsent bool `json:"hasConsent"`
+}
+
+// GetHasConsent returns the value of HasConsent.
+func (s *HasConsentOK) GetHasConsent() bool {
+	return s.HasConsent
+}
+
+// SetHasConsent sets the value of HasConsent.
+func (s *HasConsentOK) SetHasConsent(val bool) {
+	s.HasConsent = val
+}
+
+func (*HasConsentOK) hasConsentRes() {}
+
+type HealthBadRequest struct{}
+
+func (*HealthBadRequest) healthRes() {}
+
+type HealthInternalServerError struct{}
+
+func (*HealthInternalServerError) healthRes() {}
+
+type HealthOK struct{}
+
+func (*HealthOK) healthRes() {}
 
 type InviteOrganizationBadRequest struct{}
 

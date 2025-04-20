@@ -12,6 +12,7 @@ go = "1.24.2"
 "go:github.com/k1LoW/runn/cmd/runn" = "latest"
 task = "latest"
 "go:github.com/dmarkham/enumer" = "latest"
+ecspresso = "latest"
 
 [tasks.migrate-create]
 description = "Create a new migration file"

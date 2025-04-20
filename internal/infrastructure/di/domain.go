@@ -1,6 +1,7 @@
 package di
 
 import (
+	"github.com/neko-dream/server/internal/domain/model/talksession/talksession_consent"
 	"github.com/neko-dream/server/internal/domain/service"
 	organization_svc "github.com/neko-dream/server/internal/domain/service/organization"
 )
@@ -19,5 +20,6 @@ func domainDeps() []ProvideArg {
 		{service.NewPasswordAuthManager, nil},
 		{organization_svc.NewOrganizationService, nil},
 		{organization_svc.NewOrganizationMemberManager, nil},
+		{talksession_consent.NewTalkSessionConsentService, nil},
 	}
 }

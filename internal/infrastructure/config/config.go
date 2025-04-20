@@ -1,30 +1,29 @@
 package config
 
 import (
-	"fmt"
-
-	"github.com/spf13/viper"
+	"github.com/caarlos0/env/v11"
+	"github.com/neko-dream/server/pkg/utils"
 )
 
 type Config struct {
-	Env         ENV    `mapstructure:"ENV"`
-	DatabaseURL string `mapstructure:"DATABASE_URL"`
+	Env         ENV    `env:"ENV"`
+	DatabaseURL string `env:"DATABASE_URL"`
 
-	GoogleClientID     string `mapstructure:"GOOGLE_CLIENT_ID"`
-	GoogleClientSecret string `mapstructure:"GOOGLE_CLIENT_SECRET"`
-	GoogleCallbackURL  string `mapstructure:"GOOGLE_CALLBACK_URL"`
+	GoogleClientID     string `env:"GOOGLE_CLIENT_ID"`
+	GoogleClientSecret string `env:"GOOGLE_CLIENT_SECRET"`
+	GoogleCallbackURL  string `env:"GOOGLE_CALLBACK_URL"`
 
-	LineClientID     string `mapstructure:"LINE_CHANNEL_ID"`
-	LineClientSecret string `mapstructure:"LINE_CHANNEL_SECRET"`
-	LineCallbackURL  string `mapstructure:"LINE_CALLBACK_URL"`
+	LineClientID     string `env:"LINE_CHANNEL_ID"`
+	LineClientSecret string `env:"LINE_CHANNEL_SECRET"`
+	LineCallbackURL  string `env:"LINE_CALLBACK_URL"`
 
-	DOMAIN string `mapstructure:"DOMAIN"`
-	PORT   string `mapstructure:"PORT"`
+	DOMAIN string `env:"DOMAIN"`
+	PORT   string `env:"PORT"`
 
-	TokenSecret string `mapstructure:"TOKEN_SECRET"`
+	TokenSecret string `env:"TOKEN_SECRET"`
 
-	TokenPrivateKey string `mapstructure:"TOKEN_PRIVATE"`
-	TokenPublicKey  string `mapstructure:"TOKEN_PUBLIC"`
+	TokenPrivateKey string `env:"TOKEN_PRIVATE"`
+	TokenPublicKey  string `env:"TOKEN_PUBLIC"`
 
 	R2_REGION            string `env:"R2_REGION"`
 	R2_ACCESS_KEY_ID     string `env:"R2_ACCESS_KEY_ID"`
@@ -36,12 +35,12 @@ type Config struct {
 	AWS_ACCESS_KEY_ID     string `env:"AWS_ACCESS_KEY_ID"`
 	AWS_SECRET_ACCESS_KEY string `env:"AWS_SECRET_ACCESS_KEY"`
 
-	ANALYSIS_USER          string `mapstructure:"ANALYSIS_USER"`
-	ANALYSIS_USER_PASSWORD string `mapstructure:"ANALYSIS_USER_PASSWORD"`
-	ANALYSIS_API_DOMAIN    string `mapstructure:"ANALYSIS_API_DOMAIN"`
+	ANALYSIS_USER          string `env:"ANALYSIS_USER"`
+	ANALYSIS_USER_PASSWORD string `env:"ANALYSIS_USER_PASSWORD"`
+	ANALYSIS_API_DOMAIN    string `env:"ANALYSIS_API_DOMAIN"`
 
-	SENTRY_DSN       string `mapstructure:"SENTRY_DSN"`
-	BASELIME_API_KEY string `mapstructure:"BASELIME_API_KEY"`
+	SENTRY_DSN       string `env:"SENTRY_DSN"`
+	BASELIME_API_KEY string `env:"BASELIME_API_KEY"`
 
 	// 暗号化バージョン (v1, etc..)
 	ENCRYPTION_VERSION string `env:"ENCRYPTION_VERSION"`
@@ -74,110 +73,11 @@ func (e ENV) String() string {
 }
 
 func LoadConfig() *Config {
-	// .envファイルを読み込む
-	viper.AddConfigPath(".")
-	viper.AddConfigPath(".")
-	viper.AddConfigPath("../")
-	viper.AddConfigPath("../../")
-	viper.AddConfigPath("../../../")
-	viper.AddConfigPath("../../../../")
-	viper.SetConfigName(".env")
-	viper.SetConfigType("env")
+	utils.LoadEnv()
 
-	// 環境変数を読み込む
-	viper.AutomaticEnv()
-
-	if err := viper.ReadInConfig(); err != nil {
-		switch err.(type) {
-		case viper.ConfigFileNotFoundError:
-			if err := viper.BindEnv("ENV"); err != nil {
-				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
-			}
-			if err := viper.BindEnv("DATABASE_URL"); err != nil {
-				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
-			}
-			if err := viper.BindEnv("GOOGLE_CLIENT_ID"); err != nil {
-				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
-			}
-			if err := viper.BindEnv("GOOGLE_CLIENT_SECRET"); err != nil {
-				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
-			}
-			if err := viper.BindEnv("GOOGLE_CALLBACK_URL"); err != nil {
-				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
-			}
-			if err := viper.BindEnv("GOOGLE_ISSUER"); err != nil {
-				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
-			}
-
-			if err := viper.BindEnv("LINE_CHANNEL_ID"); err != nil {
-				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
-			}
-			if err := viper.BindEnv("LINE_CHANNEL_SECRET"); err != nil {
-				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
-			}
-			if err := viper.BindEnv("LINE_CALLBACK_URL"); err != nil {
-				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
-			}
-
-			if err := viper.BindEnv("DOMAIN"); err != nil {
-				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
-			}
-			if err := viper.BindEnv("PORT"); err != nil {
-				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
-			}
-
-			if err := viper.BindEnv("TOKEN_SECRET"); err != nil {
-				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
-			}
-
-			if err := viper.BindEnv("AWS_REGION"); err != nil {
-				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
-			}
-			if err := viper.BindEnv("AWS_ACCESS_KEY_ID"); err != nil {
-				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
-			}
-			if err := viper.BindEnv("AWS_SECRET_ACCESS_KEY"); err != nil {
-				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
-			}
-			if err := viper.BindEnv("AWS_S3_ENDPOINT"); err != nil {
-				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
-			}
-			if err := viper.BindEnv("AWS_S3_BUCKET"); err != nil {
-				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
-			}
-			if err := viper.BindEnv("IMAGE_DOMAIN"); err != nil {
-				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
-			}
-			if err := viper.BindEnv("ANALYSIS_USER"); err != nil {
-				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
-			}
-			if err := viper.BindEnv("ANALYSIS_USER_PASSWORD"); err != nil {
-				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
-			}
-			if err := viper.BindEnv("ANALYSIS_API_DOMAIN"); err != nil {
-				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
-			}
-			if err := viper.BindEnv("SENTRY_DSN"); err != nil {
-				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
-			}
-			if err := viper.BindEnv("BASELIME_API_KEY"); err != nil {
-				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
-			}
-			if err := viper.BindEnv("ENCRYPTION_VERSION"); err != nil {
-				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
-			}
-			if err := viper.BindEnv("ENCRYPTION_SECRET"); err != nil {
-				panic(fmt.Errorf("環境変数のバインドエラー: %w", err))
-			}
-		default:
-			panic(fmt.Errorf("設定ファイルの読み込みエラー: %w", err))
-		}
-	}
-
-	var config Config
-	err := viper.Unmarshal(&config)
+	config, err := env.ParseAs[Config]()
 	if err != nil {
-		panic(fmt.Errorf("設定ファイルの読み込みエラー: %w", err))
+		panic(err)
 	}
 
 	return &config

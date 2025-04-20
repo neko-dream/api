@@ -7,6 +7,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
+	"github.com/neko-dream/server/internal/domain/model/talksession/talksession_consent"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
@@ -21,15 +22,18 @@ type TalkSessionAccessControl interface {
 type talkSessionAccessControl struct {
 	talksession.TalkSessionRepository
 	user.UserRepository
+	talksession_consent.TalkSessionConsentService
 }
 
 func NewTalkSessionAccessControl(
 	talkSessionRepository talksession.TalkSessionRepository,
 	userRepository user.UserRepository,
+	talkSessionConsentService talksession_consent.TalkSessionConsentService,
 ) TalkSessionAccessControl {
 	return &talkSessionAccessControl{
 		TalkSessionRepository: talkSessionRepository,
 		UserRepository:        userRepository,
+		TalkSessionConsentService: talkSessionConsentService,
 	}
 }
 
@@ -90,6 +94,19 @@ func (t *talkSessionAccessControl) CanUserJoin(ctx context.Context, talkSessionI
 
 		e := ErrRestrictionNotSatisfied
 		e.Message = "このセッションでは、" + strings.Join(restrictionKeys, ",") + "が必要です。"
+		return false, &e
+	}
+
+	// 同意ししていなければ参加できない
+	consent, err := t.TalkSessionConsentService.HasConsented(ctx, talkSessionID, *userID)
+	if err != nil {
+		utils.HandleError(ctx, err, "TalkSessionConsentService.HasConsented")
+		return false, err
+	}
+
+	if !consent {
+		e := ErrRestrictionNotSatisfied
+		e.Message = "このセッションでは、参加するために同意が必要です。"
 		return false, &e
 	}
 

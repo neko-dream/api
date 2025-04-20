@@ -1,6 +1,7 @@
 parser:
 generator:
   ignore_not_implemented:
+    # 以下を有効にしろというエラーが出た場合、POSTのbodyに何も指定していない可能性があるしていない可能性がある。
     # - "complex form schema"
   features:
     disable:
