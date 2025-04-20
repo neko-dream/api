@@ -25,16 +25,16 @@ type TakeConsentUseCaseInput struct {
 
 type takeConsentUseCase struct {
 	talkSessionConsentService talksession_consent.TalkSessionConsentService
-    talkSessionRep talksession.TalkSessionRepository
+	talkSessionRep            talksession.TalkSessionRepository
 }
 
 func NewTakeConsentUseCase(
 	talkSessionConsentService talksession_consent.TalkSessionConsentService,
-    talkSessionRep talksession.TalkSessionRepository,
+	talkSessionRep talksession.TalkSessionRepository,
 ) TakeConsentUseCase {
 	return &takeConsentUseCase{
 		talkSessionConsentService: talkSessionConsentService,
-        talkSessionRep: talkSessionRep,
+		talkSessionRep:            talkSessionRep,
 	}
 }
 
@@ -42,24 +42,22 @@ func (uc *takeConsentUseCase) Execute(ctx context.Context, input TakeConsentUseC
 	ctx, span := otel.Tracer("talksession_command").Start(ctx, "takeConsentUseCase.Execute")
 	defer span.End()
 
-    // トークセッションが存在するか確認
-    _, err := uc.talkSessionRep.FindByID(ctx, input.TalkSessionID)
-    if err != nil {
-        if errors.Is(err, sql.ErrNoRows) {
-            return messages.TalkSessionNotFound
-        }
-        utils.HandleError(ctx, err, "セッション取得に失敗。")
-        return messages.InternalServerError
-    }
-
-
+	// トークセッションが存在するか確認
+	_, err := uc.talkSessionRep.FindByID(ctx, input.TalkSessionID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return messages.TalkSessionNotFound
+		}
+		utils.HandleError(ctx, err, "セッション取得に失敗。")
+		return messages.InternalServerError
+	}
 	if err := uc.talkSessionConsentService.TakeConsent(
 		ctx,
 		input.TalkSessionID,
 		input.UserID,
 		[]string{},
 	); err != nil {
-        utils.HandleError(ctx, err, "Consentの保存に失敗しました。")
+		utils.HandleError(ctx, err, "Consentの保存に失敗しました。")
 		return err
 	}
 
