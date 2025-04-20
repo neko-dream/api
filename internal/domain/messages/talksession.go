@@ -66,4 +66,24 @@ var (
 		Code:       "TALKSESSION-0012",
 		Message:    "セッションの同意取得に失敗しました。",
 	}
+	InvalidConsentTime = &APIError{
+		StatusCode: 400,
+		Code:       "TALKSESSION-0013",
+		Message:    "同意の時間が不正です。",
+	}
+	RestrictionIsZero = &APIError{
+		StatusCode: 400,
+		Code:       "TALKSESSION-0014",
+		Message:    "制限が空です。運営にお問い合わせください。",
+	}
+	InvalidTalkSessionID = &APIError{
+		StatusCode: 400,
+		Code:       "TALKSESSION-0015",
+		Message:    "トークセッションIDが不正です。",
+	}
+	InvalidUserID = &APIError{
+		StatusCode: 400,
+		Code:       "TALKSESSION-0016",
+		Message:    "ユーザーIDが不正です。",
+	}
 )

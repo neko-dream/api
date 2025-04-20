@@ -50,12 +50,15 @@ func (s *talkSessionConsentService) TakeConsent(
 	if hasConsented {
 		return messages.TalkSessionAlreadyConsented
 	}
-	consent := NewTalkSessionConsent(
+	consent,err := NewTalkSessionConsent(
 		talkSessionID,
 		userID,
 		time.Now(),
 		restrictions,
 	)
+    if err != nil {
+        return err
+    }
 	return s.talkSessionConsentRepository.Store(ctx, consent)
 }
 
