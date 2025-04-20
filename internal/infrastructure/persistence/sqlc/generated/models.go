@@ -151,6 +151,13 @@ type TalkSessionReport struct {
 	UpdatedAt     time.Time
 }
 
+type TalksessionConsent struct {
+	TalksessionID uuid.UUID
+	UserID        uuid.UUID
+	Restrictions  talksession.Restrictions
+	ConsentedAt   time.Time
+}
+
 type User struct {
 	UserID        uuid.UUID
 	DisplayID     sql.NullString

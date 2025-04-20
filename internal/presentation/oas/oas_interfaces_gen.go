@@ -13,6 +13,10 @@ type ChangePasswordRes interface {
 	changePasswordRes()
 }
 
+type ConsentTalkSessionRes interface {
+	consentTalkSessionRes()
+}
+
 type CreateOrganizationsRes interface {
 	createOrganizationsRes()
 }
@@ -115,6 +119,10 @@ type GetTimeLineRes interface {
 
 type GetUserInfoRes interface {
 	getUserInfoRes()
+}
+
+type HasConsentRes interface {
+	hasConsentRes()
 }
 
 type HealthRes interface {

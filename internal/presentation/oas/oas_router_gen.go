@@ -988,30 +988,72 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								}
 
 								elem = origElem
-							case 'c': // Prefix: "conclusion"
+							case 'c': // Prefix: "con"
 								origElem := elem
-								if l := len("conclusion"); len(elem) >= l && elem[0:l] == "conclusion" {
+								if l := len("con"); len(elem) >= l && elem[0:l] == "con" {
 									elem = elem[l:]
 								} else {
 									break
 								}
 
 								if len(elem) == 0 {
-									// Leaf node.
-									switch r.Method {
-									case "GET":
-										s.handleGetConclusionRequest([1]string{
-											args[0],
-										}, elemIsEscaped, w, r)
-									case "POST":
-										s.handlePostConclusionRequest([1]string{
-											args[0],
-										}, elemIsEscaped, w, r)
-									default:
-										s.notAllowed(w, r, "GET,POST")
+									break
+								}
+								switch elem[0] {
+								case 'c': // Prefix: "clusion"
+									origElem := elem
+									if l := len("clusion"); len(elem) >= l && elem[0:l] == "clusion" {
+										elem = elem[l:]
+									} else {
+										break
 									}
 
-									return
+									if len(elem) == 0 {
+										// Leaf node.
+										switch r.Method {
+										case "GET":
+											s.handleGetConclusionRequest([1]string{
+												args[0],
+											}, elemIsEscaped, w, r)
+										case "POST":
+											s.handlePostConclusionRequest([1]string{
+												args[0],
+											}, elemIsEscaped, w, r)
+										default:
+											s.notAllowed(w, r, "GET,POST")
+										}
+
+										return
+									}
+
+									elem = origElem
+								case 's': // Prefix: "sent"
+									origElem := elem
+									if l := len("sent"); len(elem) >= l && elem[0:l] == "sent" {
+										elem = elem[l:]
+									} else {
+										break
+									}
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch r.Method {
+										case "GET":
+											s.handleHasConsentRequest([1]string{
+												args[0],
+											}, elemIsEscaped, w, r)
+										case "POST":
+											s.handleConsentTalkSessionRequest([1]string{
+												args[0],
+											}, elemIsEscaped, w, r)
+										default:
+											s.notAllowed(w, r, "GET,POST")
+										}
+
+										return
+									}
+
+									elem = origElem
 								}
 
 								elem = origElem
@@ -2579,36 +2621,84 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								}
 
 								elem = origElem
-							case 'c': // Prefix: "conclusion"
+							case 'c': // Prefix: "con"
 								origElem := elem
-								if l := len("conclusion"); len(elem) >= l && elem[0:l] == "conclusion" {
+								if l := len("con"); len(elem) >= l && elem[0:l] == "con" {
 									elem = elem[l:]
 								} else {
 									break
 								}
 
 								if len(elem) == 0 {
-									// Leaf node.
-									switch method {
-									case "GET":
-										r.name = "GetConclusion"
-										r.summary = "結論取得"
-										r.operationID = "getConclusion"
-										r.pathPattern = "/talksessions/{talkSessionID}/conclusion"
-										r.args = args
-										r.count = 1
-										return r, true
-									case "POST":
-										r.name = "PostConclusion"
-										r.summary = "結論投稿"
-										r.operationID = "postConclusion"
-										r.pathPattern = "/talksessions/{talkSessionID}/conclusion"
-										r.args = args
-										r.count = 1
-										return r, true
-									default:
-										return
+									break
+								}
+								switch elem[0] {
+								case 'c': // Prefix: "clusion"
+									origElem := elem
+									if l := len("clusion"); len(elem) >= l && elem[0:l] == "clusion" {
+										elem = elem[l:]
+									} else {
+										break
 									}
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch method {
+										case "GET":
+											r.name = "GetConclusion"
+											r.summary = "結論取得"
+											r.operationID = "getConclusion"
+											r.pathPattern = "/talksessions/{talkSessionID}/conclusion"
+											r.args = args
+											r.count = 1
+											return r, true
+										case "POST":
+											r.name = "PostConclusion"
+											r.summary = "結論投稿"
+											r.operationID = "postConclusion"
+											r.pathPattern = "/talksessions/{talkSessionID}/conclusion"
+											r.args = args
+											r.count = 1
+											return r, true
+										default:
+											return
+										}
+									}
+
+									elem = origElem
+								case 's': // Prefix: "sent"
+									origElem := elem
+									if l := len("sent"); len(elem) >= l && elem[0:l] == "sent" {
+										elem = elem[l:]
+									} else {
+										break
+									}
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch method {
+										case "GET":
+											r.name = "HasConsent"
+											r.summary = "セッションに同意しているか"
+											r.operationID = "hasConsent"
+											r.pathPattern = "/talksessions/{talkSessionID}/consent"
+											r.args = args
+											r.count = 1
+											return r, true
+										case "POST":
+											r.name = "ConsentTalkSession"
+											r.summary = "セッションへの同意"
+											r.operationID = "consentTalkSession"
+											r.pathPattern = "/talksessions/{talkSessionID}/consent"
+											r.args = args
+											r.count = 1
+											return r, true
+										default:
+											return
+										}
+									}
+
+									elem = origElem
 								}
 
 								elem = origElem

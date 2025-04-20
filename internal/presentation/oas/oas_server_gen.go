@@ -274,6 +274,12 @@ type PolicyHandler interface {
 //
 // x-ogen-operation-group: TalkSession
 type TalkSessionHandler interface {
+	// ConsentTalkSession implements consentTalkSession operation.
+	//
+	// セッションへの同意.
+	//
+	// POST /talksessions/{talkSessionID}/consent
+	ConsentTalkSession(ctx context.Context, params ConsentTalkSessionParams) (ConsentTalkSessionRes, error)
 	// CreateTalkSession implements createTalkSession operation.
 	//
 	// ## サムネイル画像について
@@ -347,6 +353,12 @@ type TalkSessionHandler interface {
 	//
 	// GET /talksessions/{talkSessionID}/restrictions
 	GetTalkSessionRestrictionSatisfied(ctx context.Context, params GetTalkSessionRestrictionSatisfiedParams) (GetTalkSessionRestrictionSatisfiedRes, error)
+	// HasConsent implements hasConsent operation.
+	//
+	// セッションに同意しているか.
+	//
+	// GET /talksessions/{talkSessionID}/consent
+	HasConsent(ctx context.Context, params HasConsentParams) (HasConsentRes, error)
 	// PostConclusion implements postConclusion operation.
 	//
 	// 結論（conclusion）はセッションが終了した後にセッっションの作成者が投稿できる文章。

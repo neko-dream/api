@@ -40,6 +40,15 @@ func (UnimplementedHandler) ChangePassword(ctx context.Context, params ChangePas
 	return r, ht.ErrNotImplemented
 }
 
+// ConsentTalkSession implements consentTalkSession operation.
+//
+// セッションへの同意.
+//
+// POST /talksessions/{talkSessionID}/consent
+func (UnimplementedHandler) ConsentTalkSession(ctx context.Context, params ConsentTalkSessionParams) (r ConsentTalkSessionRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // CreateOrganizations implements createOrganizations operation.
 //
 // 組織を作成できる。
@@ -285,6 +294,15 @@ func (UnimplementedHandler) GetTimeLine(ctx context.Context, params GetTimeLineP
 //
 // GET /user
 func (UnimplementedHandler) GetUserInfo(ctx context.Context) (r GetUserInfoRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// HasConsent implements hasConsent operation.
+//
+// セッションに同意しているか.
+//
+// GET /talksessions/{talkSessionID}/consent
+func (UnimplementedHandler) HasConsent(ctx context.Context, params HasConsentParams) (r HasConsentRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
