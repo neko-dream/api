@@ -8,6 +8,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
+	"github.com/neko-dream/server/internal/domain/model/talksession/talksession_consent"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
@@ -40,6 +41,23 @@ func (m *mockUserRepository) FindByID(ctx context.Context, id shared.UUID[user.U
 	return args.Get(0).(*user.User), args.Error(1)
 }
 
+type mockTalkSessionConsentService struct {
+	mock.Mock
+	talksession_consent.TalkSessionConsentService
+}
+func (m *mockTalkSessionConsentService) TakeConsent(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession], userID shared.UUID[user.User], attributes []string) error {
+	args := m.Called(ctx, talkSessionID, userID, attributes)
+	return args.Error(0)
+}
+func (m *mockTalkSessionConsentService) HasConsented(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession], userID shared.UUID[user.User]) (bool, error) {
+	args := m.Called(ctx, talkSessionID, userID)
+	if args.Get(0) == nil {
+		return false, args.Error(1)
+	}
+	return args.Get(0).(bool), args.Error(1)
+}
+
+
 func TestCanUserJoin(t *testing.T) {
 	ctx := context.Background()
 
@@ -47,12 +65,14 @@ func TestCanUserJoin(t *testing.T) {
 		// Arrange
 		mockTS := &mockTalkSessionRepository{}
 		mockUser := &mockUserRepository{}
+		mockTSConsent := &mockTalkSessionConsentService{}
 		talkSessionID := shared.NewUUID[talksession.TalkSession]()
 		userID := shared.NewUUID[user.User]()
-		svc := NewTalkSessionAccessControl(mockTS, mockUser)
+		svc := NewTalkSessionAccessControl(mockTS, mockUser, mockTSConsent)
 
 		mockTS.On("FindByID", mock.Anything, talkSessionID).Return(&talksession.TalkSession{}, nil)
 		mockUser.On("FindByID", mock.Anything, userID).Return(&user.User{}, nil)
+		mockTSConsent.On("HasConsented", mock.Anything, talkSessionID, userID).Return(true, nil)
 
 		// Act
 		result, err := svc.CanUserJoin(ctx, talkSessionID, &userID)
@@ -68,9 +88,10 @@ func TestCanUserJoin(t *testing.T) {
 		// Arrange
 		mockTS := &mockTalkSessionRepository{}
 		mockUser := &mockUserRepository{}
+		mockTSConsent := &mockTalkSessionConsentService{}
 		talkSessionID := shared.NewUUID[talksession.TalkSession]()
 		userID := shared.NewUUID[user.User]()
-		svc := NewTalkSessionAccessControl(mockTS, mockUser)
+		svc := NewTalkSessionAccessControl(mockTS, mockUser, mockTSConsent)
 
 		mockTS.On("FindByID", mock.Anything, talkSessionID).Return(nil, messages.TalkSessionNotFound)
 
@@ -88,9 +109,10 @@ func TestCanUserJoin(t *testing.T) {
 		// Arrange
 		mockTS := &mockTalkSessionRepository{}
 		mockUser := &mockUserRepository{}
+		mockTSConsent := &mockTalkSessionConsentService{}
 		talkSessionID := shared.NewUUID[talksession.TalkSession]()
 		userID := shared.NewUUID[user.User]()
-		svc := NewTalkSessionAccessControl(mockTS, mockUser)
+		svc := NewTalkSessionAccessControl(mockTS, mockUser, mockTSConsent)
 
 		ts := &talksession.TalkSession{}
 		demographics := user.NewUserDemographic(
@@ -109,6 +131,7 @@ func TestCanUserJoin(t *testing.T) {
 
 		mockTS.On("FindByID", mock.Anything, talkSessionID).Return(ts, nil)
 		mockUser.On("FindByID", mock.Anything, userID).Return(lo.ToPtr(u), nil)
+		mockTSConsent.On("HasConsented", mock.Anything, talkSessionID, userID).Return(true, nil)
 
 		// Act
 		result, err := svc.CanUserJoin(ctx, talkSessionID, &userID)
@@ -124,9 +147,10 @@ func TestCanUserJoin(t *testing.T) {
 		// Arrange
 		mockTS := &mockTalkSessionRepository{}
 		mockUser := &mockUserRepository{}
+		mockTSConsent := &mockTalkSessionConsentService{}
 		talkSessionID := shared.NewUUID[talksession.TalkSession]()
 		userID := shared.NewUUID[user.User]()
-		svc := NewTalkSessionAccessControl(mockTS, mockUser)
+		svc := NewTalkSessionAccessControl(mockTS, mockUser, mockTSConsent)
 
 		ts := &talksession.TalkSession{}
 		demographics := user.NewUserDemographic(
@@ -145,6 +169,46 @@ func TestCanUserJoin(t *testing.T) {
 
 		mockTS.On("FindByID", mock.Anything, talkSessionID).Return(ts, nil)
 		mockUser.On("FindByID", mock.Anything, userID).Return(lo.ToPtr(u), nil)
+		mockTSConsent.On("HasConsented", mock.Anything, talkSessionID, userID).Return(true, nil)
+
+		// Act
+		result, err := svc.CanUserJoin(ctx, talkSessionID, &userID)
+
+		// Assert
+		assert.Error(t, err)
+		assert.False(t, result)
+		assert.IsType(t, &messages.APIError{}, err)
+		mockTS.AssertExpectations(t)
+		mockUser.AssertExpectations(t)
+	})
+
+	t.Run("参加制限に同意していない場合は参加不可", func(t *testing.T) {
+		// Arrange
+		mockTS := &mockTalkSessionRepository{}
+		mockUser := &mockUserRepository{}
+		mockTSConsent := &mockTalkSessionConsentService{}
+		talkSessionID := shared.NewUUID[talksession.TalkSession]()
+		userID := shared.NewUUID[user.User]()
+		svc := NewTalkSessionAccessControl(mockTS, mockUser, mockTSConsent)
+
+		ts := &talksession.TalkSession{}
+		demographics := user.NewUserDemographic(
+			ctx, shared.NewUUID[user.UserDemographic](),
+			nil,
+			nil, nil, nil,
+		)
+		u := user.NewUser(
+			userID, lo.ToPtr("u"), lo.ToPtr("u"), "u", auth.AuthProviderName("u"), nil,
+		)
+		u.SetDemographics(demographics)
+
+		if err := ts.UpdateRestrictions(ctx, []string{string(talksession.DemographicsBirth)}); err != nil {
+			t.Fatal("Failed to update restrictions:", err)
+		}
+
+		mockTS.On("FindByID", mock.Anything, talkSessionID).Return(ts, nil)
+		mockUser.On("FindByID", mock.Anything, userID).Return(lo.ToPtr(u), nil)
+		mockTSConsent.On("HasConsented", mock.Anything, talkSessionID, userID).Return(false, nil)
 
 		// Act
 		result, err := svc.CanUserJoin(ctx, talkSessionID, &userID)
