@@ -56,4 +56,14 @@ var (
 		Code:       "TALKSESSION-0010",
 		Message:    "セッションの更新に失敗しました。",
 	}
+	TalkSessionAlreadyConsented = &APIError{
+		StatusCode: 400,
+		Code:       "TALKSESSION-0011",
+		Message:    "セッションに既に同意しています。",
+	}
+	TalkSessionGetConsentFailed = &APIError{
+		StatusCode: 500,
+		Code:       "TALKSESSION-0012",
+		Message:    "セッションの同意取得に失敗しました。",
+	}
 )
