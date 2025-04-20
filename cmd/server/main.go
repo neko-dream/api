@@ -51,7 +51,6 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.Handle("/", corsHandler)
-	mux.Handle("/static/", http.StripPrefix("/static/", handler.NewStaticHandler()))
 	if conf.Env != config.PROD {
 		var domain string
 		if conf.Env == config.DEV {
@@ -59,6 +58,7 @@ func main() {
 		} else {
 			domain = "http://localhost:" + conf.PORT + "/static/openapi.yaml"
 		}
+		mux.Handle("/static/", http.StripPrefix("/static/", handler.NewStaticHandler()))
 		mux.Handle("/docs/", v5emb.New("kotohiro", domain, "/docs/"))
 	}
 

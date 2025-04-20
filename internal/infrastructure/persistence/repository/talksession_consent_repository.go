@@ -52,15 +52,15 @@ func (r *talkSessionConsentRepository) FindByTalkSessionIDAndUserID(ctx context.
 		return nil, err
 	}
 
-	tc,err := talksession_consent.NewTalkSessionConsent(
+	tc, err := talksession_consent.NewTalkSessionConsent(
 		shared.UUID[talksession.TalkSession](row.TalksessionConsent.TalksessionID),
 		shared.UUID[user.User](row.TalksessionConsent.UserID),
 		row.TalksessionConsent.ConsentedAt,
 		row.TalksessionConsent.Restrictions,
 	)
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
 	return &tc, nil
 }
