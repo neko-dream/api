@@ -79,7 +79,7 @@ jobs:
               context: .
               push: false
               platforms: linux/arm64
-              file: ./docker/app/Dockerfile.gh
+              file: ./container/Dockerfile.gh
               tags: ${{ steps.meta.outputs.tags }}
               labels: ${{ steps.meta.outputs.labels }}
               cache-from: type=local,src=/tmp/.buildx-cache
