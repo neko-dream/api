@@ -3,7 +3,7 @@
 		{
 			"essential": true,
 			"name": "api",
-			"image": "{{ ssm `/kotohiro-prd-api/uri` }}:{{ must_env `IMAGE_TAG` }}",
+			"image": "{{ ssm `/kotohiro-prd-api-rep/uri` }}:{{ must_env `IMAGE_TAG` }}",
 			"environment": [
 				{
 					"name": "ENV",
@@ -19,7 +19,7 @@
 				},
 				{
 					"name": "GOOGLE_CALLBACK_URL",
-					"value": "https://api.prd.kotohiro.com/auth/google/callback"
+					"value": "https://api.kotohiro.com/auth/google/callback"
 				},
 				{
 					"name": "R2_REGION",

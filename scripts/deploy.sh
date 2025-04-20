@@ -27,4 +27,5 @@ docker push $TAG
 
 rm -rf ./server
 
+
 ecspresso deploy --config ./.ecspresso/api/prd/ecspresso.yml --force-new-deployment
