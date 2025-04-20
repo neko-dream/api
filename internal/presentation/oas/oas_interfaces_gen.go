@@ -13,6 +13,10 @@ type ChangePasswordRes interface {
 	changePasswordRes()
 }
 
+type ConsentTalkSessionRes interface {
+	consentTalkSessionRes()
+}
+
 type CreateOrganizationsRes interface {
 	createOrganizationsRes()
 }

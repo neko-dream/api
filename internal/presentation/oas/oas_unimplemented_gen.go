@@ -40,6 +40,15 @@ func (UnimplementedHandler) ChangePassword(ctx context.Context, params ChangePas
 	return r, ht.ErrNotImplemented
 }
 
+// ConsentTalkSession implements consentTalkSession operation.
+//
+// セッションへの同意.
+//
+// POST /talksessions/{talkSessionID}/consent
+func (UnimplementedHandler) ConsentTalkSession(ctx context.Context, params ConsentTalkSessionParams) (r ConsentTalkSessionRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // CreateOrganizations implements createOrganizations operation.
 //
 // 組織を作成できる。

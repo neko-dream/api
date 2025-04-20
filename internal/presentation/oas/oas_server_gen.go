@@ -274,6 +274,12 @@ type PolicyHandler interface {
 //
 // x-ogen-operation-group: TalkSession
 type TalkSessionHandler interface {
+	// ConsentTalkSession implements consentTalkSession operation.
+	//
+	// セッションへの同意.
+	//
+	// POST /talksessions/{talkSessionID}/consent
+	ConsentTalkSession(ctx context.Context, params ConsentTalkSessionParams) (ConsentTalkSessionRes, error)
 	// CreateTalkSession implements createTalkSession operation.
 	//
 	// ## サムネイル画像について

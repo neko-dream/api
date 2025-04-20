@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/neko-dream/server/internal/domain/model/talksession"
 )
 
 const createPolicy = `-- name: CreatePolicy :exec
@@ -73,6 +74,50 @@ func (q *Queries) CreatePolicyConsent(ctx context.Context, arg CreatePolicyConse
 		arg.ConsentedAt,
 		arg.IpAddress,
 		arg.UserAgent,
+	)
+	return err
+}
+
+const createTSConsent = `-- name: CreateTSConsent :exec
+INSERT INTO talksession_consents (
+    talksession_id,
+    user_id,
+    consented_at,
+    restrictions
+) VALUES (
+    $1,
+    $2,
+    $3,
+    $4
+)
+`
+
+type CreateTSConsentParams struct {
+	TalksessionID uuid.UUID
+	UserID        uuid.UUID
+	ConsentedAt   time.Time
+	Restrictions  talksession.Restrictions
+}
+
+// CreateTSConsent
+//
+//	INSERT INTO talksession_consents (
+//	    talksession_id,
+//	    user_id,
+//	    consented_at,
+//	    restrictions
+//	) VALUES (
+//	    $1,
+//	    $2,
+//	    $3,
+//	    $4
+//	)
+func (q *Queries) CreateTSConsent(ctx context.Context, arg CreateTSConsentParams) error {
+	_, err := q.db.ExecContext(ctx, createTSConsent,
+		arg.TalksessionID,
+		arg.UserID,
+		arg.ConsentedAt,
+		arg.Restrictions,
 	)
 	return err
 }

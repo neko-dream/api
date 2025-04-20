@@ -39,6 +39,7 @@ type talkSessionHandler struct {
 	addConclusionCommand    talksession_command.AddConclusionCommand
 	startTalkSessionCommand talksession_command.StartTalkSessionCommand
 	editTalkSessionCommand  talksession_command.EditCommand
+	takeConsentCommand talksession_command.TakeConsentUseCase
 
 	session.TokenManager
 }
@@ -58,6 +59,7 @@ func NewTalkSessionHandler(
 	AddConclusionCommand talksession_command.AddConclusionCommand,
 	startTalkSessionCommand talksession_command.StartTalkSessionCommand,
 	editTalkSessionCommand talksession_command.EditCommand,
+	takeConsentCommand talksession_command.TakeConsentUseCase,
 
 	tokenManager session.TokenManager,
 ) oas.TalkSessionHandler {
@@ -76,6 +78,7 @@ func NewTalkSessionHandler(
 		addConclusionCommand:    AddConclusionCommand,
 		startTalkSessionCommand: startTalkSessionCommand,
 		editTalkSessionCommand:  editTalkSessionCommand,
+		takeConsentCommand: takeConsentCommand,
 
 		TokenManager: tokenManager,
 	}
@@ -884,4 +887,37 @@ func (t *talkSessionHandler) GetTalkSessionReportCount(ctx context.Context, para
 	return &oas.GetTalkSessionReportCountOK{
 		Count: out.Count,
 	}, nil
+}
+
+// ConsentTalkSession implements oas.TalkSessionHandler.
+func (t *talkSessionHandler) ConsentTalkSession(ctx context.Context, params oas.ConsentTalkSessionParams) (oas.ConsentTalkSessionRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.ConsentTalkSession")
+	defer span.End()
+
+	claim := session.GetSession(t.SetSession(ctx))
+	var userID *shared.UUID[user.User]
+	if claim != nil {
+		id, err := claim.UserID()
+		if err == nil {
+			userID = &id
+		}
+	}
+	if userID == nil {
+		return nil, messages.ForbiddenError
+	}
+
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
+	if err := t.takeConsentCommand.Execute(ctx, talksession_command.TakeConsentUseCaseInput{
+		TalkSessionID: talkSessionID,
+		UserID:        *userID,
+	}); err != nil {
+		return nil, errtrace.Wrap(err)
+	}
+
+	res := &oas.ConsentTalkSessionOK{}
+	return res, nil
 }

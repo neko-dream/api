@@ -1863,6 +1863,10 @@
                       "description": "サムネ画像",
                       "nullable": true
                     },
+                    "consented": {
+                      "type": "boolean",
+                      "description": "restrictionがなければ常にtrue"
+                    },
                     "restrictions": {
                       "type": "array",
                       "items": {
@@ -1877,6 +1881,7 @@
                     "owner",
                     "createdAt",
                     "scheduledEndTime",
+                    "consented",
                     "restrictions"
                   ]
                 }
@@ -3649,6 +3654,90 @@
           }
         ],
         "x-ogen-operation-group": "Auth"
+      }
+    },
+    "/talksessions/{talkSessionID}/consent": {
+      "post": {
+        "summary": "セッションへの同意",
+        "deprecated": false,
+        "description": "",
+        "operationId": "consentTalkSession",
+        "tags": [
+          "talk_session"
+        ],
+        "parameters": [
+          {
+            "name": "talkSessionID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
+        "x-ogen-operation-group": "TalkSession"
       }
     },
     "/user": {
@@ -6357,6 +6446,10 @@
             "description": "サムネ画像",
             "nullable": true
           },
+          "consented": {
+            "type": "boolean",
+            "description": "restrictionがなければ常にtrue"
+          },
           "restrictions": {
             "type": "array",
             "items": {
@@ -6371,7 +6464,8 @@
           "owner",
           "createdAt",
           "scheduledEndTime",
-          "restrictions"
+          "restrictions",
+          "consented"
         ]
       },
       "validationErrorItem": {
