@@ -42,8 +42,8 @@ func (uc *takeConsentUseCase) Execute(ctx context.Context, input TakeConsentUseC
 	ctx, span := otel.Tracer("talksession_command").Start(ctx, "takeConsentUseCase.Execute")
 	defer span.End()
 
-	// トークセッションが存在するか確認
-	_, err := uc.talkSessionRep.FindByID(ctx, input.TalkSessionID)
+	// セッションが存在するか確認
+	talkSession, err := uc.talkSessionRep.FindByID(ctx, input.TalkSessionID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return messages.TalkSessionNotFound
@@ -55,7 +55,7 @@ func (uc *takeConsentUseCase) Execute(ctx context.Context, input TakeConsentUseC
 		ctx,
 		input.TalkSessionID,
 		input.UserID,
-		[]string{},
+		talkSession.RestrictionList(),
 	); err != nil {
 		utils.HandleError(ctx, err, "Consentの保存に失敗しました。")
 		return err

@@ -15,7 +15,7 @@ import (
 )
 
 type TalkSessionConsentService interface {
-	TakeConsent(context.Context, shared.UUID[talksession.TalkSession], shared.UUID[user.User], []string) error
+	TakeConsent(context.Context, shared.UUID[talksession.TalkSession], shared.UUID[user.User], talksession.Restrictions) error
 	HasConsented(context.Context, shared.UUID[talksession.TalkSession], shared.UUID[user.User]) (bool, error)
 }
 type talkSessionConsentService struct {
@@ -37,7 +37,7 @@ func (s *talkSessionConsentService) TakeConsent(
 	ctx context.Context,
 	talkSessionID shared.UUID[talksession.TalkSession],
 	userID shared.UUID[user.User],
-	restrictions []string,
+	restrictions talksession.Restrictions,
 ) error {
 	ctx, span := otel.Tracer("talksession_consent").Start(ctx, "talkSessionConsentService.TakeConsent")
 	defer span.End()
