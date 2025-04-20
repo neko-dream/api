@@ -33,11 +33,11 @@ func (r *talkSessionConsentRepository) Store(ctx context.Context, consent talkse
 		ConsentedAt:   consent.ConsentedAt,
 		Restrictions:  talksession.Restrictions(consent.Restrictions),
 	}); err != nil {
-        utils.HandleError(ctx, err, "Consentの保存に失敗しました。")
-        return err
-    }
+		utils.HandleError(ctx, err, "Consentの保存に失敗しました。")
+		return err
+	}
 
-    return nil
+	return nil
 }
 
 func (r *talkSessionConsentRepository) FindByTalkSessionIDAndUserID(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession], userID shared.UUID[user.User]) (*talksession_consent.TalkSessionConsent, error) {
@@ -48,8 +48,8 @@ func (r *talkSessionConsentRepository) FindByTalkSessionIDAndUserID(ctx context.
 		UserID:        userID.UUID(),
 	})
 	if err != nil {
-        utils.HandleError(ctx, err, "Consentの取得に失敗しました。")
-        return nil, err
+		utils.HandleError(ctx, err, "Consentの取得に失敗しました。")
+		return nil, err
 	}
 
 	tc := talksession_consent.NewTalkSessionConsent(

@@ -40,10 +40,10 @@ func (s *talkSessionConsentService) TakeConsent(
 	defer span.End()
 
 	hasConsented, err := s.HasConsented(ctx, talkSessionID, userID)
-    if err != nil {
-        utils.HandleError(ctx, err, "TakeConsentできなかった。")
-        return messages.TalkSessionGetConsentFailed
-    }
+	if err != nil {
+		utils.HandleError(ctx, err, "TakeConsentできなかった。")
+		return messages.TalkSessionGetConsentFailed
+	}
 	if hasConsented {
 		return messages.TalkSessionAlreadyConsented
 	}
@@ -67,12 +67,12 @@ func (s *talkSessionConsentService) HasConsented(
 	consents, err := s.talkSessionConsentRepository.FindByTalkSessionIDAndUserID(ctx, talkSessionID, userID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-            return false, nil
-        }
+			return false, nil
+		}
 	}
 	if consents != nil {
-        return true, nil
-    }
+		return true, nil
+	}
 
 	return false, nil
 }
