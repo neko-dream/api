@@ -45,6 +45,7 @@ type mockTalkSessionConsentService struct {
 	mock.Mock
 	talksession_consent.TalkSessionConsentService
 }
+
 func (m *mockTalkSessionConsentService) TakeConsent(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession], userID shared.UUID[user.User], attributes talksession.Restrictions) error {
 	args := m.Called(ctx, talkSessionID, userID, attributes)
 	return args.Error(0)
@@ -56,7 +57,6 @@ func (m *mockTalkSessionConsentService) HasConsented(ctx context.Context, talkSe
 	}
 	return args.Get(0).(bool), args.Error(1)
 }
-
 
 func TestCanUserJoin(t *testing.T) {
 	ctx := context.Background()

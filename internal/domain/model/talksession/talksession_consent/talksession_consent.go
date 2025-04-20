@@ -22,19 +22,19 @@ func NewTalkSessionConsent(
 	consentedAt time.Time,
 	restrictions []string,
 ) (TalkSessionConsent, error) {
-    if consentedAt.IsZero() {
-        return TalkSessionConsent{}, messages.InvalidConsentTime
-    }
+	if consentedAt.IsZero() {
+		return TalkSessionConsent{}, messages.InvalidConsentTime
+	}
 	if len(restrictions) == 0 {
 		return TalkSessionConsent{}, messages.RestrictionIsZero
 	}
 
-    if talkSessionID.IsZero() {
-        return TalkSessionConsent{}, messages.InvalidTalkSessionID
-    }
-    if userID.IsZero() {
-        return TalkSessionConsent{}, messages.InvalidUserID
-    }
+	if talkSessionID.IsZero() {
+		return TalkSessionConsent{}, messages.InvalidTalkSessionID
+	}
+	if userID.IsZero() {
+		return TalkSessionConsent{}, messages.InvalidUserID
+	}
 
 	return TalkSessionConsent{
 		TalkSessionID: talkSessionID,
@@ -43,4 +43,3 @@ func NewTalkSessionConsent(
 		Restrictions:  restrictions,
 	}, nil
 }
-

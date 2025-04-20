@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 	"crypto/rand"
+	"database/sql"
+	"errors"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/auth"
@@ -65,8 +67,10 @@ func (a *authService) Authenticate(
 
 	existUser, err := a.userRepository.FindBySubject(ctx, user.UserSubject(*subject))
 	if err != nil {
-		utils.HandleError(ctx, err, "UserRepository.FindBySubject")
-		return nil, errtrace.Wrap(err)
+		if !errors.Is(err, sql.ErrNoRows) {
+			utils.HandleError(ctx, err, "UserRepository.FindBySubject")
+			return nil, errtrace.Wrap(err)
+		}
 	}
 	if existUser != nil {
 		return existUser, nil
@@ -74,6 +78,7 @@ func (a *authService) Authenticate(
 
 	authProviderName, err := auth.NewAuthProviderName(providerName)
 	if err != nil {
+		utils.HandleError(ctx, err, "AuthProviderName.NewAuthProviderName")
 		return nil, errtrace.Wrap(err)
 	}
 	newUser := user.NewUser(

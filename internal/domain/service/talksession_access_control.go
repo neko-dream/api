@@ -31,8 +31,8 @@ func NewTalkSessionAccessControl(
 	talkSessionConsentService talksession_consent.TalkSessionConsentService,
 ) TalkSessionAccessControl {
 	return &talkSessionAccessControl{
-		TalkSessionRepository: talkSessionRepository,
-		UserRepository:        userRepository,
+		TalkSessionRepository:     talkSessionRepository,
+		UserRepository:            userRepository,
 		TalkSessionConsentService: talkSessionConsentService,
 	}
 }
