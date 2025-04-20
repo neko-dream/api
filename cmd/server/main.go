@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/neko-dream/server/internal/infrastructure/config"
@@ -17,14 +18,12 @@ import (
 )
 
 func main() {
-
 	container := di.BuildContainer()
 
 	srv, err := oas.NewServer(
 		di.Invoke[oas.Handler](container),
 		di.Invoke[oas.SecurityHandler](container),
 		oas.WithErrorHandler(handler.CustomErrorHandler),
-		// provider,
 	)
 	if err != nil {
 		panic(err)
@@ -32,11 +31,10 @@ func main() {
 
 	conf := di.Invoke[*config.Config](container)
 	migrator := di.Invoke[*db.Migrator](container)
-	if conf.Env != config.PROD {
-		// migrator.Down()
-		migrator.Up()
-		// di.Invoke[*db.DummyInitializer](container).Initialize()
-	}
+
+	// migrator.Down()
+	migrator.Up()
+	// di.Invoke[*db.DummyInitializer](container).Initialize()
 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://localhost:3000"},
@@ -54,7 +52,6 @@ func main() {
 	mux := http.NewServeMux()
 	mux.Handle("/", corsHandler)
 	mux.Handle("/static/", http.StripPrefix("/static/", handler.NewStaticHandler()))
-
 	if conf.Env != config.PROD {
 		var domain string
 		if conf.Env == config.DEV {
@@ -66,6 +63,6 @@ func main() {
 	}
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%s", conf.PORT), mux); err != nil {
-		panic(err)
+		log.Println("Error starting server:", err)
 	}
 }
