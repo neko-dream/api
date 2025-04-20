@@ -72,5 +72,6 @@ func useCaseDeps() []ProvideArg {
 		{organization_command.NewCreateOrganizationInteractor, nil},
 		{organization_command.NewInviteOrganizationInteractor, nil},
 		{organization_command.NewInviteOrganizationForUserInteractor, nil},
+		{talksession_command.NewTakeConsentUseCase, nil},
 	}
 }
