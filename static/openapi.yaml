@@ -1475,9 +1475,6 @@ paths:
                     type: string
                     description: サムネ画像
                     nullable: true
-                  consented:
-                    type: boolean
-                    description: restrictionがなければ常にtrue
                   restrictions:
                     type: array
                     items:
@@ -1498,7 +1495,6 @@ paths:
                   - createdAt
                   - scheduledEndTime
                   - restrictions
-                  - consented
           headers: {}
         '400':
           description: ''
@@ -1654,9 +1650,6 @@ paths:
                     type: string
                     description: サムネ画像
                     nullable: true
-                  consented:
-                    type: boolean
-                    description: restrictionがなければ常にtrue
                   restrictions:
                     type: array
                     items:
@@ -1677,7 +1670,6 @@ paths:
                   - createdAt
                   - scheduledEndTime
                   - restrictions
-                  - consented
           headers: {}
         '400':
           description: ''
@@ -1854,9 +1846,6 @@ paths:
                     type: string
                     description: サムネ画像
                     nullable: true
-                  consented:
-                    type: boolean
-                    description: restrictionがなければ常にtrue
                   restrictions:
                     type: array
                     items:
@@ -1876,7 +1865,6 @@ paths:
                   - owner
                   - createdAt
                   - scheduledEndTime
-                  - consented
                   - restrictions
           headers: {}
         '400':
@@ -2049,9 +2037,6 @@ paths:
                               type: string
                               description: サムネ画像
                               nullable: true
-                            consented:
-                              type: boolean
-                              description: restrictionがなければ常にtrue
                             restrictions:
                               type: array
                               items:
@@ -2072,7 +2057,6 @@ paths:
                             - createdAt
                             - scheduledEndTime
                             - restrictions
-                            - consented
                         opinionCount:
                           type: integer
                       required:
@@ -3616,6 +3600,64 @@ paths:
       security:
         - SessionId: []
       x-ogen-operation-group: TalkSession
+    get:
+      summary: セッションに同意しているか
+      deprecated: false
+      description: ''
+      operationId: hasConsent
+      tags:
+        - talk_session
+      parameters:
+        - name: talkSessionID
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hasConsent:
+                    type: boolean
+                required:
+                  - hasConsent
+          headers: {}
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                '1':
+                  summary: internal
+                  value:
+                    code: GENERAL-000
+                    message: INTERNAL SERVER ERROR.
+          headers: {}
+      security:
+        - SessionId: []
+      x-ogen-operation-group: TalkSession
   /user:
     post:
       summary: ユーザー作成
@@ -4238,9 +4280,6 @@ paths:
                               type: string
                               description: サムネ画像
                               nullable: true
-                            consented:
-                              type: boolean
-                              description: restrictionがなければ常にtrue
                             restrictions:
                               type: array
                               items:
@@ -4261,7 +4300,6 @@ paths:
                             - createdAt
                             - scheduledEndTime
                             - restrictions
-                            - consented
                         opinionCount:
                           type: integer
                       required:
@@ -4421,9 +4459,6 @@ paths:
                               type: string
                               description: サムネ画像
                               nullable: true
-                            consented:
-                              type: boolean
-                              description: restrictionがなければ常にtrue
                             restrictions:
                               type: array
                               items:
@@ -4444,7 +4479,6 @@ paths:
                             - createdAt
                             - scheduledEndTime
                             - restrictions
-                            - consented
                         opinionCount:
                           type: integer
                       required:
@@ -5857,9 +5891,6 @@ components:
           type: string
           description: サムネ画像
           nullable: true
-        consented:
-          type: boolean
-          description: restrictionがなければ常にtrue
         restrictions:
           type: array
           items:
@@ -5880,7 +5911,6 @@ components:
         - createdAt
         - scheduledEndTime
         - restrictions
-        - consented
     validationErrorItem:
       type: object
       properties:
@@ -6314,6 +6344,13 @@ components:
         - Name
         - Type
         - Role
+    success:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
   securitySchemes:
     SessionId:
       type: apiKey

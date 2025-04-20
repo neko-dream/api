@@ -1863,10 +1863,6 @@
                       "description": "サムネ画像",
                       "nullable": true
                     },
-                    "consented": {
-                      "type": "boolean",
-                      "description": "restrictionがなければ常にtrue"
-                    },
                     "restrictions": {
                       "type": "array",
                       "items": {
@@ -1881,7 +1877,6 @@
                     "owner",
                     "createdAt",
                     "scheduledEndTime",
-                    "consented",
                     "restrictions"
                   ]
                 }
@@ -3684,6 +3679,95 @@
                 "schema": {
                   "type": "object",
                   "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "examples": {
+                  "1": {
+                    "summary": "internal",
+                    "value": {
+                      "code": "GENERAL-000",
+                      "message": "INTERNAL SERVER ERROR."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "SessionId": []
+          }
+        ],
+        "x-ogen-operation-group": "TalkSession"
+      },
+      "get": {
+        "summary": "セッションに同意しているか",
+        "deprecated": false,
+        "description": "",
+        "operationId": "hasConsent",
+        "tags": [
+          "talk_session"
+        ],
+        "parameters": [
+          {
+            "name": "talkSessionID",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "hasConsent": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "hasConsent"
+                  ]
                 }
               }
             },
@@ -6446,10 +6530,6 @@
             "description": "サムネ画像",
             "nullable": true
           },
-          "consented": {
-            "type": "boolean",
-            "description": "restrictionがなければ常にtrue"
-          },
           "restrictions": {
             "type": "array",
             "items": {
@@ -6464,8 +6544,7 @@
           "owner",
           "createdAt",
           "scheduledEndTime",
-          "restrictions",
-          "consented"
+          "restrictions"
         ]
       },
       "validationErrorItem": {
@@ -6966,6 +7045,17 @@
           "Name",
           "Type",
           "Role"
+        ]
+      },
+      "success": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
         ]
       }
     },

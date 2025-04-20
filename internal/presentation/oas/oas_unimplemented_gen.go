@@ -297,6 +297,15 @@ func (UnimplementedHandler) GetUserInfo(ctx context.Context) (r GetUserInfoRes, 
 	return r, ht.ErrNotImplemented
 }
 
+// HasConsent implements hasConsent operation.
+//
+// セッションに同意しているか.
+//
+// GET /talksessions/{talkSessionID}/consent
+func (UnimplementedHandler) HasConsent(ctx context.Context, params HasConsentParams) (r HasConsentRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // Health implements health operation.
 //
 // ヘルスチェック.

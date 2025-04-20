@@ -249,8 +249,6 @@ type CreateTalkSessionOK struct {
 	Prefecture OptNilString `json:"prefecture"`
 	// サムネ画像.
 	ThumbnailURL OptNilString `json:"thumbnailURL"`
-	// Restrictionがなければ常にtrue.
-	Consented bool `json:"consented"`
 	// セッションの参加制限.
 	Restrictions []CreateTalkSessionOKRestrictionsItem `json:"restrictions"`
 }
@@ -303,11 +301,6 @@ func (s *CreateTalkSessionOK) GetPrefecture() OptNilString {
 // GetThumbnailURL returns the value of ThumbnailURL.
 func (s *CreateTalkSessionOK) GetThumbnailURL() OptNilString {
 	return s.ThumbnailURL
-}
-
-// GetConsented returns the value of Consented.
-func (s *CreateTalkSessionOK) GetConsented() bool {
-	return s.Consented
 }
 
 // GetRestrictions returns the value of Restrictions.
@@ -363,11 +356,6 @@ func (s *CreateTalkSessionOK) SetPrefecture(val OptNilString) {
 // SetThumbnailURL sets the value of ThumbnailURL.
 func (s *CreateTalkSessionOK) SetThumbnailURL(val OptNilString) {
 	s.ThumbnailURL = val
-}
-
-// SetConsented sets the value of Consented.
-func (s *CreateTalkSessionOK) SetConsented(val bool) {
-	s.Consented = val
 }
 
 // SetRestrictions sets the value of Restrictions.
@@ -666,8 +654,6 @@ type EditTalkSessionOK struct {
 	Prefecture OptNilString `json:"prefecture"`
 	// サムネ画像.
 	ThumbnailURL OptNilString `json:"thumbnailURL"`
-	// Restrictionがなければ常にtrue.
-	Consented bool `json:"consented"`
 	// セッションの参加制限.
 	Restrictions []EditTalkSessionOKRestrictionsItem `json:"restrictions"`
 }
@@ -720,11 +706,6 @@ func (s *EditTalkSessionOK) GetPrefecture() OptNilString {
 // GetThumbnailURL returns the value of ThumbnailURL.
 func (s *EditTalkSessionOK) GetThumbnailURL() OptNilString {
 	return s.ThumbnailURL
-}
-
-// GetConsented returns the value of Consented.
-func (s *EditTalkSessionOK) GetConsented() bool {
-	return s.Consented
 }
 
 // GetRestrictions returns the value of Restrictions.
@@ -780,11 +761,6 @@ func (s *EditTalkSessionOK) SetPrefecture(val OptNilString) {
 // SetThumbnailURL sets the value of ThumbnailURL.
 func (s *EditTalkSessionOK) SetThumbnailURL(val OptNilString) {
 	s.ThumbnailURL = val
-}
-
-// SetConsented sets the value of Consented.
-func (s *EditTalkSessionOK) SetConsented(val bool) {
-	s.Consented = val
 }
 
 // SetRestrictions sets the value of Restrictions.
@@ -1487,8 +1463,6 @@ type GetOpenedTalkSessionOKTalkSessionsItemTalkSession struct {
 	Prefecture OptNilString `json:"prefecture"`
 	// サムネ画像.
 	ThumbnailURL OptNilString `json:"thumbnailURL"`
-	// Restrictionがなければ常にtrue.
-	Consented bool `json:"consented"`
 	// セッションの参加制限.
 	Restrictions []GetOpenedTalkSessionOKTalkSessionsItemTalkSessionRestrictionsItem `json:"restrictions"`
 }
@@ -1541,11 +1515,6 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) GetPrefecture() OptN
 // GetThumbnailURL returns the value of ThumbnailURL.
 func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) GetThumbnailURL() OptNilString {
 	return s.ThumbnailURL
-}
-
-// GetConsented returns the value of Consented.
-func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) GetConsented() bool {
-	return s.Consented
 }
 
 // GetRestrictions returns the value of Restrictions.
@@ -1601,11 +1570,6 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) SetPrefecture(val Op
 // SetThumbnailURL sets the value of ThumbnailURL.
 func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) SetThumbnailURL(val OptNilString) {
 	s.ThumbnailURL = val
-}
-
-// SetConsented sets the value of Consented.
-func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) SetConsented(val bool) {
-	s.Consented = val
 }
 
 // SetRestrictions sets the value of Restrictions.
@@ -3660,8 +3624,6 @@ type GetTalkSessionDetailOK struct {
 	Prefecture OptNilString `json:"prefecture"`
 	// サムネ画像.
 	ThumbnailURL OptNilString `json:"thumbnailURL"`
-	// Restrictionがなければ常にtrue.
-	Consented bool `json:"consented"`
 	// セッションの参加制限.
 	Restrictions []GetTalkSessionDetailOKRestrictionsItem `json:"restrictions"`
 }
@@ -3714,11 +3676,6 @@ func (s *GetTalkSessionDetailOK) GetPrefecture() OptNilString {
 // GetThumbnailURL returns the value of ThumbnailURL.
 func (s *GetTalkSessionDetailOK) GetThumbnailURL() OptNilString {
 	return s.ThumbnailURL
-}
-
-// GetConsented returns the value of Consented.
-func (s *GetTalkSessionDetailOK) GetConsented() bool {
-	return s.Consented
 }
 
 // GetRestrictions returns the value of Restrictions.
@@ -3774,11 +3731,6 @@ func (s *GetTalkSessionDetailOK) SetPrefecture(val OptNilString) {
 // SetThumbnailURL sets the value of ThumbnailURL.
 func (s *GetTalkSessionDetailOK) SetThumbnailURL(val OptNilString) {
 	s.ThumbnailURL = val
-}
-
-// SetConsented sets the value of Consented.
-func (s *GetTalkSessionDetailOK) SetConsented(val bool) {
-	s.Consented = val
 }
 
 // SetRestrictions sets the value of Restrictions.
@@ -4041,8 +3993,6 @@ type GetTalkSessionListOKTalkSessionsItemTalkSession struct {
 	Prefecture OptNilString `json:"prefecture"`
 	// サムネ画像.
 	ThumbnailURL OptNilString `json:"thumbnailURL"`
-	// Restrictionがなければ常にtrue.
-	Consented bool `json:"consented"`
 	// セッションの参加制限.
 	Restrictions []GetTalkSessionListOKTalkSessionsItemTalkSessionRestrictionsItem `json:"restrictions"`
 }
@@ -4095,11 +4045,6 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetPrefecture() OptNil
 // GetThumbnailURL returns the value of ThumbnailURL.
 func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetThumbnailURL() OptNilString {
 	return s.ThumbnailURL
-}
-
-// GetConsented returns the value of Consented.
-func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetConsented() bool {
-	return s.Consented
 }
 
 // GetRestrictions returns the value of Restrictions.
@@ -4155,11 +4100,6 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetPrefecture(val OptN
 // SetThumbnailURL sets the value of ThumbnailURL.
 func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetThumbnailURL(val OptNilString) {
 	s.ThumbnailURL = val
-}
-
-// SetConsented sets the value of Consented.
-func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetConsented(val bool) {
-	s.Consented = val
 }
 
 // SetRestrictions sets the value of Restrictions.
@@ -4743,6 +4683,30 @@ func (s *GetUserInfoOKUser) SetDisplayName(val string) {
 func (s *GetUserInfoOKUser) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
+
+type HasConsentBadRequest struct{}
+
+func (*HasConsentBadRequest) hasConsentRes() {}
+
+type HasConsentInternalServerError struct{}
+
+func (*HasConsentInternalServerError) hasConsentRes() {}
+
+type HasConsentOK struct {
+	HasConsent bool `json:"hasConsent"`
+}
+
+// GetHasConsent returns the value of HasConsent.
+func (s *HasConsentOK) GetHasConsent() bool {
+	return s.HasConsent
+}
+
+// SetHasConsent sets the value of HasConsent.
+func (s *HasConsentOK) SetHasConsent(val bool) {
+	s.HasConsent = val
+}
+
+func (*HasConsentOK) hasConsentRes() {}
 
 type HealthBadRequest struct{}
 
@@ -10792,8 +10756,6 @@ type SessionsHistoryOKTalkSessionsItemTalkSession struct {
 	Prefecture OptNilString `json:"prefecture"`
 	// サムネ画像.
 	ThumbnailURL OptNilString `json:"thumbnailURL"`
-	// Restrictionがなければ常にtrue.
-	Consented bool `json:"consented"`
 	// セッションの参加制限.
 	Restrictions []SessionsHistoryOKTalkSessionsItemTalkSessionRestrictionsItem `json:"restrictions"`
 }
@@ -10846,11 +10808,6 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) GetPrefecture() OptNilStr
 // GetThumbnailURL returns the value of ThumbnailURL.
 func (s *SessionsHistoryOKTalkSessionsItemTalkSession) GetThumbnailURL() OptNilString {
 	return s.ThumbnailURL
-}
-
-// GetConsented returns the value of Consented.
-func (s *SessionsHistoryOKTalkSessionsItemTalkSession) GetConsented() bool {
-	return s.Consented
 }
 
 // GetRestrictions returns the value of Restrictions.
@@ -10906,11 +10863,6 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetPrefecture(val OptNilS
 // SetThumbnailURL sets the value of ThumbnailURL.
 func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetThumbnailURL(val OptNilString) {
 	s.ThumbnailURL = val
-}
-
-// SetConsented sets the value of Consented.
-func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetConsented(val bool) {
-	s.Consented = val
 }
 
 // SetRestrictions sets the value of Restrictions.

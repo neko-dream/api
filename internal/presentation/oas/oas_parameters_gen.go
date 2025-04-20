@@ -2428,6 +2428,71 @@ func decodeGetTimeLineParams(args [1]string, argsEscaped bool, r *http.Request) 
 	return params, nil
 }
 
+// HasConsentParams is parameters of hasConsent operation.
+type HasConsentParams struct {
+	TalkSessionID string
+}
+
+func unpackHasConsentParams(packed middleware.Parameters) (params HasConsentParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "talkSessionID",
+			In:   "path",
+		}
+		params.TalkSessionID = packed[key].(string)
+	}
+	return params
+}
+
+func decodeHasConsentParams(args [1]string, argsEscaped bool, r *http.Request) (params HasConsentParams, _ error) {
+	// Decode path: talkSessionID.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "talkSessionID",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.TalkSessionID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "talkSessionID",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // InviteOrganizationParams is parameters of inviteOrganization operation.
 type InviteOrganizationParams struct {
 	OrganizationID string

@@ -121,6 +121,10 @@ type GetUserInfoRes interface {
 	getUserInfoRes()
 }
 
+type HasConsentRes interface {
+	hasConsentRes()
+}
+
 type HealthRes interface {
 	healthRes()
 }

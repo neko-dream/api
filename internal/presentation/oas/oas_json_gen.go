@@ -846,10 +846,6 @@ func (s *CreateTalkSessionOK) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		e.FieldStart("consented")
-		e.Bool(s.Consented)
-	}
-	{
 		e.FieldStart("restrictions")
 		e.ArrStart()
 		for _, elem := range s.Restrictions {
@@ -859,7 +855,7 @@ func (s *CreateTalkSessionOK) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfCreateTalkSessionOK = [12]string{
+var jsonFieldsNameOfCreateTalkSessionOK = [11]string{
 	0:  "id",
 	1:  "theme",
 	2:  "description",
@@ -870,8 +866,7 @@ var jsonFieldsNameOfCreateTalkSessionOK = [12]string{
 	7:  "city",
 	8:  "prefecture",
 	9:  "thumbnailURL",
-	10: "consented",
-	11: "restrictions",
+	10: "restrictions",
 }
 
 // Decode decodes CreateTalkSessionOK from json.
@@ -991,20 +986,8 @@ func (s *CreateTalkSessionOK) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"thumbnailURL\"")
 			}
-		case "consented":
-			requiredBitSet[1] |= 1 << 2
-			if err := func() error {
-				v, err := d.Bool()
-				s.Consented = bool(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"consented\"")
-			}
 		case "restrictions":
-			requiredBitSet[1] |= 1 << 3
+			requiredBitSet[1] |= 1 << 2
 			if err := func() error {
 				s.Restrictions = make([]CreateTalkSessionOKRestrictionsItem, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
@@ -1032,7 +1015,7 @@ func (s *CreateTalkSessionOK) Decode(d *jx.Decoder) error {
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
 		0b00111011,
-		0b00001100,
+		0b00000100,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -1813,10 +1796,6 @@ func (s *EditTalkSessionOK) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		e.FieldStart("consented")
-		e.Bool(s.Consented)
-	}
-	{
 		e.FieldStart("restrictions")
 		e.ArrStart()
 		for _, elem := range s.Restrictions {
@@ -1826,7 +1805,7 @@ func (s *EditTalkSessionOK) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfEditTalkSessionOK = [12]string{
+var jsonFieldsNameOfEditTalkSessionOK = [11]string{
 	0:  "id",
 	1:  "theme",
 	2:  "description",
@@ -1837,8 +1816,7 @@ var jsonFieldsNameOfEditTalkSessionOK = [12]string{
 	7:  "city",
 	8:  "prefecture",
 	9:  "thumbnailURL",
-	10: "consented",
-	11: "restrictions",
+	10: "restrictions",
 }
 
 // Decode decodes EditTalkSessionOK from json.
@@ -1958,20 +1936,8 @@ func (s *EditTalkSessionOK) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"thumbnailURL\"")
 			}
-		case "consented":
-			requiredBitSet[1] |= 1 << 2
-			if err := func() error {
-				v, err := d.Bool()
-				s.Consented = bool(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"consented\"")
-			}
 		case "restrictions":
-			requiredBitSet[1] |= 1 << 3
+			requiredBitSet[1] |= 1 << 2
 			if err := func() error {
 				s.Restrictions = make([]EditTalkSessionOKRestrictionsItem, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
@@ -1999,7 +1965,7 @@ func (s *EditTalkSessionOK) Decode(d *jx.Decoder) error {
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
 		0b00111011,
-		0b00001100,
+		0b00000100,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -3687,10 +3653,6 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) encodeFields(e *jx.E
 		}
 	}
 	{
-		e.FieldStart("consented")
-		e.Bool(s.Consented)
-	}
-	{
 		e.FieldStart("restrictions")
 		e.ArrStart()
 		for _, elem := range s.Restrictions {
@@ -3700,7 +3662,7 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) encodeFields(e *jx.E
 	}
 }
 
-var jsonFieldsNameOfGetOpenedTalkSessionOKTalkSessionsItemTalkSession = [12]string{
+var jsonFieldsNameOfGetOpenedTalkSessionOKTalkSessionsItemTalkSession = [11]string{
 	0:  "id",
 	1:  "theme",
 	2:  "description",
@@ -3711,8 +3673,7 @@ var jsonFieldsNameOfGetOpenedTalkSessionOKTalkSessionsItemTalkSession = [12]stri
 	7:  "city",
 	8:  "prefecture",
 	9:  "thumbnailURL",
-	10: "consented",
-	11: "restrictions",
+	10: "restrictions",
 }
 
 // Decode decodes GetOpenedTalkSessionOKTalkSessionsItemTalkSession from json.
@@ -3832,20 +3793,8 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"thumbnailURL\"")
 			}
-		case "consented":
-			requiredBitSet[1] |= 1 << 2
-			if err := func() error {
-				v, err := d.Bool()
-				s.Consented = bool(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"consented\"")
-			}
 		case "restrictions":
-			requiredBitSet[1] |= 1 << 3
+			requiredBitSet[1] |= 1 << 2
 			if err := func() error {
 				s.Restrictions = make([]GetOpenedTalkSessionOKTalkSessionsItemTalkSessionRestrictionsItem, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
@@ -3873,7 +3822,7 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
 		0b00111011,
-		0b00001100,
+		0b00000100,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -9335,10 +9284,6 @@ func (s *GetTalkSessionDetailOK) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		e.FieldStart("consented")
-		e.Bool(s.Consented)
-	}
-	{
 		e.FieldStart("restrictions")
 		e.ArrStart()
 		for _, elem := range s.Restrictions {
@@ -9348,7 +9293,7 @@ func (s *GetTalkSessionDetailOK) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfGetTalkSessionDetailOK = [12]string{
+var jsonFieldsNameOfGetTalkSessionDetailOK = [11]string{
 	0:  "id",
 	1:  "theme",
 	2:  "description",
@@ -9359,8 +9304,7 @@ var jsonFieldsNameOfGetTalkSessionDetailOK = [12]string{
 	7:  "city",
 	8:  "prefecture",
 	9:  "thumbnailURL",
-	10: "consented",
-	11: "restrictions",
+	10: "restrictions",
 }
 
 // Decode decodes GetTalkSessionDetailOK from json.
@@ -9480,20 +9424,8 @@ func (s *GetTalkSessionDetailOK) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"thumbnailURL\"")
 			}
-		case "consented":
-			requiredBitSet[1] |= 1 << 2
-			if err := func() error {
-				v, err := d.Bool()
-				s.Consented = bool(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"consented\"")
-			}
 		case "restrictions":
-			requiredBitSet[1] |= 1 << 3
+			requiredBitSet[1] |= 1 << 2
 			if err := func() error {
 				s.Restrictions = make([]GetTalkSessionDetailOKRestrictionsItem, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
@@ -9521,7 +9453,7 @@ func (s *GetTalkSessionDetailOK) Decode(d *jx.Decoder) error {
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
 		0b00111011,
-		0b00001100,
+		0b00000100,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -10538,10 +10470,6 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) encodeFields(e *jx.Enc
 		}
 	}
 	{
-		e.FieldStart("consented")
-		e.Bool(s.Consented)
-	}
-	{
 		e.FieldStart("restrictions")
 		e.ArrStart()
 		for _, elem := range s.Restrictions {
@@ -10551,7 +10479,7 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) encodeFields(e *jx.Enc
 	}
 }
 
-var jsonFieldsNameOfGetTalkSessionListOKTalkSessionsItemTalkSession = [12]string{
+var jsonFieldsNameOfGetTalkSessionListOKTalkSessionsItemTalkSession = [11]string{
 	0:  "id",
 	1:  "theme",
 	2:  "description",
@@ -10562,8 +10490,7 @@ var jsonFieldsNameOfGetTalkSessionListOKTalkSessionsItemTalkSession = [12]string
 	7:  "city",
 	8:  "prefecture",
 	9:  "thumbnailURL",
-	10: "consented",
-	11: "restrictions",
+	10: "restrictions",
 }
 
 // Decode decodes GetTalkSessionListOKTalkSessionsItemTalkSession from json.
@@ -10683,20 +10610,8 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder) 
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"thumbnailURL\"")
 			}
-		case "consented":
-			requiredBitSet[1] |= 1 << 2
-			if err := func() error {
-				v, err := d.Bool()
-				s.Consented = bool(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"consented\"")
-			}
 		case "restrictions":
-			requiredBitSet[1] |= 1 << 3
+			requiredBitSet[1] |= 1 << 2
 			if err := func() error {
 				s.Restrictions = make([]GetTalkSessionListOKTalkSessionsItemTalkSessionRestrictionsItem, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
@@ -10724,7 +10639,7 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder) 
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
 		0b00111011,
-		0b00001100,
+		0b00000100,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -12704,6 +12619,190 @@ func (s *GetUserInfoOKUser) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *GetUserInfoOKUser) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *HasConsentBadRequest) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *HasConsentBadRequest) encodeFields(e *jx.Encoder) {
+}
+
+var jsonFieldsNameOfHasConsentBadRequest = [0]string{}
+
+// Decode decodes HasConsentBadRequest from json.
+func (s *HasConsentBadRequest) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode HasConsentBadRequest to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		default:
+			return d.Skip()
+		}
+	}); err != nil {
+		return errors.Wrap(err, "decode HasConsentBadRequest")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *HasConsentBadRequest) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *HasConsentBadRequest) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *HasConsentInternalServerError) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *HasConsentInternalServerError) encodeFields(e *jx.Encoder) {
+}
+
+var jsonFieldsNameOfHasConsentInternalServerError = [0]string{}
+
+// Decode decodes HasConsentInternalServerError from json.
+func (s *HasConsentInternalServerError) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode HasConsentInternalServerError to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		default:
+			return d.Skip()
+		}
+	}); err != nil {
+		return errors.Wrap(err, "decode HasConsentInternalServerError")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *HasConsentInternalServerError) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *HasConsentInternalServerError) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *HasConsentOK) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *HasConsentOK) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("hasConsent")
+		e.Bool(s.HasConsent)
+	}
+}
+
+var jsonFieldsNameOfHasConsentOK = [1]string{
+	0: "hasConsent",
+}
+
+// Decode decodes HasConsentOK from json.
+func (s *HasConsentOK) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode HasConsentOK to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "hasConsent":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Bool()
+				s.HasConsent = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hasConsent\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode HasConsentOK")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfHasConsentOK) {
+					name = jsonFieldsNameOfHasConsentOK[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *HasConsentOK) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *HasConsentOK) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -21004,10 +21103,6 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) encodeFields(e *jx.Encode
 		}
 	}
 	{
-		e.FieldStart("consented")
-		e.Bool(s.Consented)
-	}
-	{
 		e.FieldStart("restrictions")
 		e.ArrStart()
 		for _, elem := range s.Restrictions {
@@ -21017,7 +21112,7 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) encodeFields(e *jx.Encode
 	}
 }
 
-var jsonFieldsNameOfSessionsHistoryOKTalkSessionsItemTalkSession = [12]string{
+var jsonFieldsNameOfSessionsHistoryOKTalkSessionsItemTalkSession = [11]string{
 	0:  "id",
 	1:  "theme",
 	2:  "description",
@@ -21028,8 +21123,7 @@ var jsonFieldsNameOfSessionsHistoryOKTalkSessionsItemTalkSession = [12]string{
 	7:  "city",
 	8:  "prefecture",
 	9:  "thumbnailURL",
-	10: "consented",
-	11: "restrictions",
+	10: "restrictions",
 }
 
 // Decode decodes SessionsHistoryOKTalkSessionsItemTalkSession from json.
@@ -21149,20 +21243,8 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder) err
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"thumbnailURL\"")
 			}
-		case "consented":
-			requiredBitSet[1] |= 1 << 2
-			if err := func() error {
-				v, err := d.Bool()
-				s.Consented = bool(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"consented\"")
-			}
 		case "restrictions":
-			requiredBitSet[1] |= 1 << 3
+			requiredBitSet[1] |= 1 << 2
 			if err := func() error {
 				s.Restrictions = make([]SessionsHistoryOKTalkSessionsItemTalkSessionRestrictionsItem, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
@@ -21190,7 +21272,7 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) Decode(d *jx.Decoder) err
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
 		0b00111011,
-		0b00001100,
+		0b00000100,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
