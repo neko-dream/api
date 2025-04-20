@@ -20,6 +20,11 @@ func (a UUID[T]) UUID() uuid.UUID {
 	return uuid.UUID(a)
 }
 
+func (a UUID[T]) IsZero() bool {
+	return uuid.UUID(a) == NilUUID
+}
+
+
 func MustParseUUID[T any](s string) UUID[T] {
 	return UUID[T](uuid.MustParse(s))
 }
