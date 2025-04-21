@@ -2649,6 +2649,38 @@ func (s *Server) decodePostOpinionPost2Request(r *http.Request) (
 				}
 			}
 			{
+				cfg := uri.QueryParameterDecodingConfig{
+					Name:    "isSeed",
+					Style:   uri.QueryStyleForm,
+					Explode: true,
+				}
+				if err := q.HasParam(cfg); err == nil {
+					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+						var optFormDotIsSeedVal bool
+						if err := func() error {
+							val, err := d.DecodeValue()
+							if err != nil {
+								return err
+							}
+
+							c, err := conv.ToBool(val)
+							if err != nil {
+								return err
+							}
+
+							optFormDotIsSeedVal = c
+							return nil
+						}(); err != nil {
+							return err
+						}
+						optForm.IsSeed.SetTo(optFormDotIsSeedVal)
+						return nil
+					}); err != nil {
+						return req, close, errors.Wrap(err, "decode \"isSeed\"")
+					}
+				}
+			}
+			{
 				if err := func() error {
 					files, ok := r.MultipartForm.File["picture"]
 					if !ok || len(files) < 1 {
