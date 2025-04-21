@@ -35,6 +35,7 @@ type (
 		Content         string
 		ReferenceURL    *string
 		Picture         *multipart.FileHeader
+		IsSeed          bool
 	}
 
 	submitOpinionHandler struct {
@@ -42,6 +43,7 @@ type (
 		opinion.OpinionService
 		vote.VoteRepository
 		service.TalkSessionAccessControl
+		talksession.TalkSessionRepository
 		image.ImageStorage
 		image.ImageRepository
 		*db.DBManager
@@ -53,6 +55,7 @@ func NewSubmitOpinionHandler(
 	opinionService opinion.OpinionService,
 	voteRepository vote.VoteRepository,
 	talkSessionAccessControl service.TalkSessionAccessControl,
+	talkSessionRepository talksession.TalkSessionRepository,
 	dbManager *db.DBManager,
 	imageRepository image.ImageRepository,
 	imageStorage image.ImageStorage,
@@ -63,6 +66,7 @@ func NewSubmitOpinionHandler(
 		OpinionRepository:        opinionRepository,
 		VoteRepository:           voteRepository,
 		TalkSessionAccessControl: talkSessionAccessControl,
+		TalkSessionRepository:    talkSessionRepository,
 		ImageStorage:             imageStorage,
 		ImageRepository:          imageRepository,
 	}
@@ -88,6 +92,17 @@ func (h *submitOpinionHandler) Execute(ctx context.Context, input SubmitOpinionI
 	} else {
 		return messages.OpinionCreateFailed
 	}
+	// talksessionが存在するか確認
+	talkSession, err := h.TalkSessionRepository.FindByID(ctx, talkSessionID)
+	if err != nil || talkSession == nil {
+		utils.HandleError(ctx, err, "TalkSessionRepository.FindByID")
+		return messages.TalkSessionNotFound
+	}
+
+	// オーナーではない場合、IsSeedがtrueの場合はエラーを返す
+	if talkSession.OwnerUserID() != input.UserID && input.IsSeed {
+		return messages.OpinionCreateFailed
+	}
 
 	// 参加制限を満たしているか確認。満たしていない場合はエラーを返す
 	if _, err := h.TalkSessionAccessControl.CanUserJoin(ctx, talkSessionID, lo.ToPtr(input.UserID)); err != nil {
@@ -110,6 +125,11 @@ func (h *submitOpinionHandler) Execute(ctx context.Context, input SubmitOpinionI
 			utils.HandleError(ctx, err, "NewOpinion")
 			return err
 		}
+		// シード意見なら、シードフラグを立てる
+		if input.IsSeed {
+			opinion.SetSeed()
+		}
+
 		if input.Picture != nil {
 			file, err := input.Picture.Open()
 			if err != nil {
@@ -153,6 +173,11 @@ func (h *submitOpinionHandler) Execute(ctx context.Context, input SubmitOpinionI
 		if err := h.OpinionRepository.Create(ctx, *opinion); err != nil {
 			utils.HandleError(ctx, err, "OpinionRepository.Create")
 			return messages.OpinionCreateFailed
+		}
+
+		// シード意見の場合はvoteしない
+		if input.IsSeed {
+			return nil
 		}
 
 		// 自分の意見には必ず投票を紐付ける
