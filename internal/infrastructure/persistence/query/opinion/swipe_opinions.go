@@ -47,6 +47,7 @@ func (g *GetSwipeOpinionsQueryHandler) Execute(ctx context.Context, in opinion_q
 		}, nil
 	}
 
+	var swipeOpinions []dto.SwipeOpinion
 	// 一旦seed意見を取得する
 	rows, err := g.GetQueries(ctx).GetRandomSeedOpinions(ctx, model.GetRandomSeedOpinionsParams{
 		UserID:        in.UserID.UUID(),
@@ -59,14 +60,6 @@ func (g *GetSwipeOpinionsQueryHandler) Execute(ctx context.Context, in opinion_q
 			return nil, err
 		}
 	}
-	if len(rows) == 0 {
-		return &opinion_query.GetSwipeOpinionsQueryOutput{
-			Opinions:          []dto.SwipeOpinion{},
-			RemainingOpinions: int(swipeableOpinionCount),
-		}, nil
-	}
-
-	var swipeOpinions []dto.SwipeOpinion
 
 	// seedでlimitを満たしたらそれを返す
 	for _, swipeRow := range rows {
