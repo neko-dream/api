@@ -241,6 +241,13 @@ LEFT JOIN (
     WHERE user_id = sqlc.narg('user_id')::uuid
 ) cv ON opinions.opinion_id = cv.opinion_id
 WHERE opinions.parent_opinion_id IS NULL
+    -- IsSeedがtrueの場合、ユーザーIDが00000000-0000-0000-0000-000000000001の意見のみを取得
+    AND (
+        CASE
+            WHEN sqlc.narg('is_seed')::boolean IS TRUE THEN opinions.user_id = '00000000-0000-0000-0000-000000000001'::uuid
+            ELSE TRUE
+        END
+    )
 ORDER BY
     CASE sqlc.narg('sort_key')::text
         WHEN 'latest' THEN EXTRACT(EPOCH FROM opinions.created_at)

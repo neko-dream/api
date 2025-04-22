@@ -53,4 +53,9 @@ var (
 		Code:       "OPINION-010",
 		Message:    "意見の通報に失敗しました。時間をおいて再度お試しください",
 	}
+	OpinionSeedIsOwnerOnly = &APIError{
+		StatusCode: http.StatusBadRequest,
+		Code:       "OPINION-011",
+		Message:    "シード意見はセッション成者のみが投票できます",
+	}
 )

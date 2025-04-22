@@ -388,6 +388,8 @@ paths:
       description: |-
         parentOpinionIDがなければルートの意見として投稿される
         parentOpinionIDがない場合はtalkSessionIDが必須
+
+        セッション管理者はisSeedをtrueにするとシード意見として投稿できる
       operationId: postOpinionPost2
       tags:
         - opinion
@@ -424,6 +426,10 @@ paths:
                   type: string
                   format: binary
                   description: 参考画像。4MiBまで
+                  example: ''
+                isSeed:
+                  type: boolean
+                  description: シード意見かどうか
                   example: ''
               required:
                 - opinionContent
@@ -1160,6 +1166,13 @@ paths:
           example: 0
           schema:
             type: integer
+            nullable: true
+        - name: seed
+          in: query
+          description: ''
+          required: false
+          schema:
+            type: boolean
             nullable: true
       responses:
         '200':

@@ -565,8 +565,15 @@ LEFT JOIN (
     WHERE user_id = $4::uuid
 ) cv ON opinions.opinion_id = cv.opinion_id
 WHERE opinions.parent_opinion_id IS NULL
+    -- IsSeedがtrueの場合、ユーザーIDが00000000-0000-0000-0000-000000000001の意見のみを取得
+    AND (
+        CASE
+            WHEN $5::boolean IS TRUE THEN opinions.user_id = '00000000-0000-0000-0000-000000000001'::uuid
+            ELSE TRUE
+        END
+    )
 ORDER BY
-    CASE $5::text
+    CASE $6::text
         WHEN 'latest' THEN EXTRACT(EPOCH FROM opinions.created_at)
         WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM opinions.created_at)
         WHEN 'mostReplies' THEN COALESCE(rc.reply_count, 0)
@@ -579,6 +586,7 @@ type GetOpinionsByTalkSessionIDParams struct {
 	Limit         int32
 	Offset        int32
 	UserID        uuid.NullUUID
+	IsSeed        sql.NullBool
 	SortKey       sql.NullString
 }
 
@@ -622,8 +630,15 @@ type GetOpinionsByTalkSessionIDRow struct {
 //	    WHERE user_id = $4::uuid
 //	) cv ON opinions.opinion_id = cv.opinion_id
 //	WHERE opinions.parent_opinion_id IS NULL
+//	    -- IsSeedがtrueの場合、ユーザーIDが00000000-0000-0000-0000-000000000001の意見のみを取得
+//	    AND (
+//	        CASE
+//	            WHEN $5::boolean IS TRUE THEN opinions.user_id = '00000000-0000-0000-0000-000000000001'::uuid
+//	            ELSE TRUE
+//	        END
+//	    )
 //	ORDER BY
-//	    CASE $5::text
+//	    CASE $6::text
 //	        WHEN 'latest' THEN EXTRACT(EPOCH FROM opinions.created_at)
 //	        WHEN 'oldest' THEN EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM opinions.created_at)
 //	        WHEN 'mostReplies' THEN COALESCE(rc.reply_count, 0)
@@ -635,6 +650,7 @@ func (q *Queries) GetOpinionsByTalkSessionID(ctx context.Context, arg GetOpinion
 		arg.Limit,
 		arg.Offset,
 		arg.UserID,
+		arg.IsSeed,
 		arg.SortKey,
 	)
 	if err != nil {

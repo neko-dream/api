@@ -10045,6 +10045,8 @@ type PostOpinionPost2Req struct {
 	ReferenceURL    OptNilString `json:"referenceURL"`
 	// 参考画像。4MiBまで.
 	Picture OptMultipartFile `json:"picture"`
+	// シード意見かどうか.
+	IsSeed OptBool `json:"isSeed"`
 }
 
 // GetTalkSessionID returns the value of TalkSessionID.
@@ -10077,6 +10079,11 @@ func (s *PostOpinionPost2Req) GetPicture() OptMultipartFile {
 	return s.Picture
 }
 
+// GetIsSeed returns the value of IsSeed.
+func (s *PostOpinionPost2Req) GetIsSeed() OptBool {
+	return s.IsSeed
+}
+
 // SetTalkSessionID sets the value of TalkSessionID.
 func (s *PostOpinionPost2Req) SetTalkSessionID(val OptNilString) {
 	s.TalkSessionID = val
@@ -10105,6 +10112,11 @@ func (s *PostOpinionPost2Req) SetReferenceURL(val OptNilString) {
 // SetPicture sets the value of Picture.
 func (s *PostOpinionPost2Req) SetPicture(val OptMultipartFile) {
 	s.Picture = val
+}
+
+// SetIsSeed sets the value of IsSeed.
+func (s *PostOpinionPost2Req) SetIsSeed(val OptBool) {
+	s.IsSeed = val
 }
 
 type PostOpinionPostBadRequest struct {

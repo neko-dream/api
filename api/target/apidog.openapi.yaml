@@ -391,7 +391,7 @@
       "post": {
         "summary": "セッションに対して意見投稿 or 意見に対するリプライ",
         "deprecated": false,
-        "description": "parentOpinionIDがなければルートの意見として投稿される\nparentOpinionIDがない場合はtalkSessionIDが必須",
+        "description": "parentOpinionIDがなければルートの意見として投稿される\nparentOpinionIDがない場合はtalkSessionIDが必須\n\nセッション管理者はisSeedをtrueにするとシード意見として投稿できる",
         "operationId": "postOpinionPost2",
         "tags": [
           "opinion"
@@ -434,6 +434,11 @@
                     "type": "string",
                     "format": "binary",
                     "description": "参考画像。4MiBまで",
+                    "example": ""
+                  },
+                  "isSeed": {
+                    "type": "boolean",
+                    "description": "シード意見かどうか",
                     "example": ""
                   }
                 },
@@ -1317,6 +1322,16 @@
             "example": 0,
             "schema": {
               "type": "integer",
+              "nullable": true
+            }
+          },
+          {
+            "name": "seed",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "boolean",
               "nullable": true
             }
           }

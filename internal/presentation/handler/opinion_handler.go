@@ -253,6 +253,12 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 	if err != nil {
 		return nil, messages.BadRequestError
 	}
+	var seed bool
+	if params.Seed.IsSet() {
+		seed = params.Seed.Value
+	} else {
+		seed = false
+	}
 
 	out, err := o.getOpinionByTalkSessionQuery.Execute(ctx, opinion_query.GetOpinionsByTalkSessionInput{
 		TalkSessionID: talkSessionID,
@@ -260,6 +266,7 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 		Limit:         limit,
 		Offset:        offset,
 		UserID:        userID,
+		IsSeed:        seed,
 	})
 	if err != nil {
 		return nil, err
@@ -641,6 +648,12 @@ func (o *opinionHandler) PostOpinionPost2(ctx context.Context, req oas.OptPostOp
 		}
 		parentOpinionID = &id
 	}
+	var isSeed bool
+	if value.IsSeed.IsSet() {
+		isSeed = value.IsSeed.Value
+	} else {
+		isSeed = false
+	}
 
 	if err = o.submitOpinionCommand.Execute(ctx, opinion_command.SubmitOpinionInput{
 		TalkSessionID:   talkSessionID,
@@ -650,6 +663,7 @@ func (o *opinionHandler) PostOpinionPost2(ctx context.Context, req oas.OptPostOp
 		Content:         req.Value.OpinionContent,
 		ReferenceURL:    utils.ToPtrIfNotNullValue(!req.Value.ReferenceURL.IsSet(), value.ReferenceURL.Value),
 		Picture:         file,
+		IsSeed:          isSeed,
 	}); err != nil {
 		return nil, err
 	}

@@ -5,6 +5,7 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"github.com/google/uuid"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -130,6 +131,10 @@ func (o *Opinion) ChangeReferenceImageURL(url *string) {
 	o.referenceImageURL = url
 }
 
+func (o *Opinion) SetSeed() {
+	o.userID = SeedUserID
+}
+
 func (o *Opinion) Report(ctx context.Context, reporterID shared.UUID[user.User], reason int, reasonText *string) (*Report, error) {
 	ctx, span := otel.Tracer("opinion").Start(ctx, "Opinion.Report")
 	defer span.End()
@@ -145,3 +150,5 @@ func (o *Opinion) Report(ctx context.Context, reporterID shared.UUID[user.User],
 		clock.Now(ctx),
 	)
 }
+
+var SeedUserID = shared.UUID[user.User](uuid.MustParse("00000000-0000-0000-0000-000000000001"))

@@ -2,6 +2,8 @@ package opinion_query
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 
 	"github.com/google/uuid"
 	"github.com/jinzhu/copier"
@@ -45,16 +47,55 @@ func (g *GetSwipeOpinionsQueryHandler) Execute(ctx context.Context, in opinion_q
 		}, nil
 	}
 
+	var swipeOpinions []dto.SwipeOpinion
+	// 一旦seed意見を取得する
+	rows, err := g.GetQueries(ctx).GetSeedOpinions(ctx, model.GetSeedOpinionsParams{
+		UserID:        in.UserID.UUID(),
+		TalkSessionID: in.TalkSessionID.UUID(),
+		Limit:         int32(in.Limit),
+	})
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			utils.HandleError(ctx, err, "Seed意見の取得に失敗")
+			return nil, err
+		}
+	}
+
+	// seedでlimitを満たしたらそれを返す
+	for _, swipeRow := range rows {
+		var swipeOpinion dto.SwipeOpinion
+		if err := copier.CopyWithOption(&swipeOpinion, &swipeRow, copier.Option{
+			DeepCopy:    true,
+			IgnoreEmpty: true,
+		}); err != nil {
+			utils.HandleError(ctx, err, "マッピングに失敗")
+			return nil, err
+		}
+		swipeOpinions = append(swipeOpinions, swipeOpinion)
+	}
+	if len(rows) >= in.Limit {
+		return &opinion_query.GetSwipeOpinionsQueryOutput{
+			Opinions:          swipeOpinions,
+			RemainingOpinions: int(swipeableOpinionCount),
+		}, nil
+	}
+	seedOpinionIDs := lo.Map(rows, func(swipe model.GetSeedOpinionsRow, _ int) uuid.UUID {
+		return swipe.Opinion.OpinionID
+	})
+
+	// 超えなかったら、seedを除いた残りの意見を取得する
+	remainingLimit := in.Limit - len(rows)
+
 	// top,randomを1:2の比率で取得する
 	// limitが3以上の場合、2件はtop, 1件はrandomで取得する
-	topLimit := in.Limit / 3
+	// シード意見取得後の残りで、1/3をトップ意見に割り当てる
+	topLimit := remainingLimit / 3
 
-	var swipeOpinions []dto.SwipeOpinion
 	// top
 	topRows, err := g.GetQueries(ctx).GetOpinionsByRank(ctx, model.GetOpinionsByRankParams{
 		UserID:        in.UserID.UUID(),
 		TalkSessionID: in.TalkSessionID.UUID(),
-		Rank:          int32(topLimit),
+		Rank:          1,
 		Limit:         int32(topLimit),
 	})
 	if err != nil {
@@ -84,7 +125,7 @@ func (g *GetSwipeOpinionsQueryHandler) Execute(ctx context.Context, in opinion_q
 			UserID:            in.UserID.UUID(),
 			TalkSessionID:     in.TalkSessionID.UUID(),
 			Limit:             int32(randomLimit),
-			ExcludeOpinionIds: topOpinionIDs,
+			ExcludeOpinionIds: append(topOpinionIDs, seedOpinionIDs...),
 		})
 		if err != nil {
 			utils.HandleError(ctx, err, "ランダムな意見の取得に失敗")

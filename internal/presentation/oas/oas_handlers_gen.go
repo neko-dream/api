@@ -2587,6 +2587,10 @@ func (s *Server) handleGetOpinionsForTalkSessionRequest(args [1]string, argsEsca
 					Name: "offset",
 					In:   "query",
 				}: params.Offset,
+				{
+					Name: "seed",
+					In:   "query",
+				}: params.Seed,
 			},
 			Raw: r,
 		}
@@ -6624,7 +6628,8 @@ func (s *Server) handlePostOpinionPostRequest(args [1]string, argsEscaped bool, 
 // handlePostOpinionPost2Request handles postOpinionPost2 operation.
 //
 // ParentOpinionIDがなければルートの意見として投稿される
-// parentOpinionIDがない場合はtalkSessionIDが必須.
+// parentOpinionIDがない場合はtalkSessionIDが必須
+// セッション管理者はisSeedをtrueにするとシード意見として投稿できる.
 //
 // POST /opinions
 func (s *Server) handlePostOpinionPost2Request(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {

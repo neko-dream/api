@@ -50,6 +50,7 @@ func (g *GetOpinionsByTalkSessionIDQueryHandler) Execute(ctx context.Context, in
 		Offset:        int32(*in.Offset),
 		SortKey:       sql.NullString{String: in.SortKey.String(), Valid: true},
 		UserID:        userID,
+		IsSeed:        sql.NullBool{Bool: in.IsSeed, Valid: true},
 	})
 	if err != nil {
 		utils.HandleError(ctx, err, "意見の取得に失敗")
@@ -60,7 +61,8 @@ func (g *GetOpinionsByTalkSessionIDQueryHandler) Execute(ctx context.Context, in
 	for _, opinionRow := range opinionRows {
 		var op dto.SwipeOpinion
 		if err := copier.CopyWithOption(&op, &opinionRow, copier.Option{
-			DeepCopy: true,
+			DeepCopy:    true,
+			IgnoreEmpty: true,
 		}); err != nil {
 			utils.HandleError(ctx, err, "マッピングに失敗")
 			return nil, messages.OpinionContentFailedToFetch
