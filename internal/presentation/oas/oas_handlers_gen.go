@@ -2587,6 +2587,10 @@ func (s *Server) handleGetOpinionsForTalkSessionRequest(args [1]string, argsEsca
 					Name: "offset",
 					In:   "query",
 				}: params.Offset,
+				{
+					Name: "seed",
+					In:   "query",
+				}: params.Seed,
 			},
 			Raw: r,
 		}

@@ -1324,6 +1324,16 @@
               "type": "integer",
               "nullable": true
             }
+          },
+          {
+            "name": "seed",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            }
           }
         ],
         "responses": {
