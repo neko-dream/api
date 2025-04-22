@@ -61,7 +61,7 @@ func (g *GetOpinionsByTalkSessionIDQueryHandler) Execute(ctx context.Context, in
 	for _, opinionRow := range opinionRows {
 		var op dto.SwipeOpinion
 		if err := copier.CopyWithOption(&op, &opinionRow, copier.Option{
-			DeepCopy: true,
+			DeepCopy:    true,
 			IgnoreEmpty: true,
 		}); err != nil {
 			utils.HandleError(ctx, err, "マッピングに失敗")
