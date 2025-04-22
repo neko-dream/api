@@ -1253,6 +1253,7 @@ type GetOpinionsForTalkSessionParams struct {
 	Sort          OptNilGetOpinionsForTalkSessionSort
 	Limit         OptNilInt
 	Offset        OptNilInt
+	Seed          OptNilBool
 }
 
 func unpackGetOpinionsForTalkSessionParams(packed middleware.Parameters) (params GetOpinionsForTalkSessionParams) {
@@ -1288,6 +1289,15 @@ func unpackGetOpinionsForTalkSessionParams(packed middleware.Parameters) (params
 		}
 		if v, ok := packed[key]; ok {
 			params.Offset = v.(OptNilInt)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "seed",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Seed = v.(OptNilBool)
 		}
 	}
 	return params
@@ -1474,6 +1484,47 @@ func decodeGetOpinionsForTalkSessionParams(args [1]string, argsEscaped bool, r *
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "offset",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: seed.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "seed",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotSeedVal bool
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToBool(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotSeedVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Seed.SetTo(paramsDotSeedVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "seed",
 			In:   "query",
 			Err:  err,
 		}

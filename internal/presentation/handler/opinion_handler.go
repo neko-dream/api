@@ -253,6 +253,12 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 	if err != nil {
 		return nil, messages.BadRequestError
 	}
+	var seed bool
+	if params.Seed.IsSet() {
+		seed = params.Seed.Value
+	} else {
+		seed = false
+	}
 
 	out, err := o.getOpinionByTalkSessionQuery.Execute(ctx, opinion_query.GetOpinionsByTalkSessionInput{
 		TalkSessionID: talkSessionID,
@@ -260,6 +266,7 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 		Limit:         limit,
 		Offset:        offset,
 		UserID:        userID,
+		IsSeed:        seed,
 	})
 	if err != nil {
 		return nil, err

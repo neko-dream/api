@@ -38,6 +38,7 @@ func (h *GetReportQueryHandler) Execute(ctx context.Context, input analysis_quer
 		Offset:        0,
 		TalkSessionID: input.TalkSessionID.UUID(),
 		SortKey:       sql.NullString{String: "latest", Valid: true},
+		IsSeed:        sql.NullBool{Bool: false, Valid: true},
 	})
 	if err != nil || len(rows) == 0 {
 		utils.HandleError(ctx, err, "トークセッションIDに紐づく意見の取得に失敗しました")
