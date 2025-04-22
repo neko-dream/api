@@ -24,6 +24,7 @@ type (
 		SortKey       sort.SortKey
 		Limit         *int
 		Offset        *int
+		IsSeed        bool
 	}
 
 	GetOpinionsByTalkSessionOutput struct {
