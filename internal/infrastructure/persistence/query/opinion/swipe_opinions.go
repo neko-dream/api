@@ -49,7 +49,7 @@ func (g *GetSwipeOpinionsQueryHandler) Execute(ctx context.Context, in opinion_q
 
 	var swipeOpinions []dto.SwipeOpinion
 	// 一旦seed意見を取得する
-	rows, err := g.GetQueries(ctx).GetRandomSeedOpinions(ctx, model.GetRandomSeedOpinionsParams{
+	rows, err := g.GetQueries(ctx).GetSeedOpinions(ctx, model.GetSeedOpinionsParams{
 		UserID:        in.UserID.UUID(),
 		TalkSessionID: in.TalkSessionID.UUID(),
 		Limit:         int32(in.Limit),
@@ -79,7 +79,7 @@ func (g *GetSwipeOpinionsQueryHandler) Execute(ctx context.Context, in opinion_q
 			RemainingOpinions: int(swipeableOpinionCount),
 		}, nil
 	}
-	seedOpinionIDs := lo.Map(rows, func(swipe model.GetRandomSeedOpinionsRow, _ int) uuid.UUID {
+	seedOpinionIDs := lo.Map(rows, func(swipe model.GetSeedOpinionsRow, _ int) uuid.UUID {
 		return swipe.Opinion.OpinionID
 	})
 

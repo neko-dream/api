@@ -11,7 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
-const getRandomSeedOpinions = `-- name: GetRandomSeedOpinions :many
+const getSeedOpinions = `-- name: GetSeedOpinions :many
 SELECT
     opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
     users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
@@ -40,13 +40,13 @@ WHERE opinions.talk_session_id = $1
 LIMIT $3
 `
 
-type GetRandomSeedOpinionsParams struct {
+type GetSeedOpinionsParams struct {
 	TalkSessionID uuid.UUID
 	UserID        uuid.UUID
 	Limit         int32
 }
 
-type GetRandomSeedOpinionsRow struct {
+type GetSeedOpinionsRow struct {
 	Opinion    Opinion
 	User       User
 	ReplyCount int64
@@ -82,15 +82,15 @@ type GetRandomSeedOpinionsRow struct {
 //	    AND opinions.parent_opinion_id IS NULL
 //	    AND opinions.user_id = '00000000-0000-0000-0000-000000000001'::uuid
 //	LIMIT $3
-func (q *Queries) GetRandomSeedOpinions(ctx context.Context, arg GetRandomSeedOpinionsParams) ([]GetRandomSeedOpinionsRow, error) {
-	rows, err := q.db.QueryContext(ctx, getRandomSeedOpinions, arg.TalkSessionID, arg.UserID, arg.Limit)
+func (q *Queries) GetSeedOpinions(ctx context.Context, arg GetSeedOpinionsParams) ([]GetSeedOpinionsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getSeedOpinions, arg.TalkSessionID, arg.UserID, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetRandomSeedOpinionsRow
+	var items []GetSeedOpinionsRow
 	for rows.Next() {
-		var i GetRandomSeedOpinionsRow
+		var i GetSeedOpinionsRow
 		if err := rows.Scan(
 			&i.Opinion.OpinionID,
 			&i.Opinion.TalkSessionID,

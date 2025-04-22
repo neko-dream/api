@@ -1,4 +1,4 @@
--- name: GetRandomSeedOpinions :many
+-- name: GetSeedOpinions :many
 SELECT
     sqlc.embed(opinions),
     sqlc.embed(users),
