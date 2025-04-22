@@ -468,7 +468,8 @@ func (UnimplementedHandler) PostOpinionPost(ctx context.Context, req OptPostOpin
 // PostOpinionPost2 implements postOpinionPost2 operation.
 //
 // ParentOpinionIDがなければルートの意見として投稿される
-// parentOpinionIDがない場合はtalkSessionIDが必須.
+// parentOpinionIDがない場合はtalkSessionIDが必須
+// セッション管理者はisSeedをtrueにするとシード意見として投稿できる.
 //
 // POST /opinions
 func (UnimplementedHandler) PostOpinionPost2(ctx context.Context, req OptPostOpinionPost2Req) (r PostOpinionPost2Res, _ error) {

@@ -388,6 +388,8 @@ paths:
       description: |-
         parentOpinionIDがなければルートの意見として投稿される
         parentOpinionIDがない場合はtalkSessionIDが必須
+
+        セッション管理者はisSeedをtrueにするとシード意見として投稿できる
       operationId: postOpinionPost2
       tags:
         - opinion
