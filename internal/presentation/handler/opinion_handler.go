@@ -641,6 +641,12 @@ func (o *opinionHandler) PostOpinionPost2(ctx context.Context, req oas.OptPostOp
 		}
 		parentOpinionID = &id
 	}
+	var isSeed bool
+	if value.IsSeed.IsSet() {
+		isSeed = value.IsSeed.Value
+	} else {
+		isSeed = false
+	}
 
 	if err = o.submitOpinionCommand.Execute(ctx, opinion_command.SubmitOpinionInput{
 		TalkSessionID:   talkSessionID,
@@ -650,6 +656,7 @@ func (o *opinionHandler) PostOpinionPost2(ctx context.Context, req oas.OptPostOp
 		Content:         req.Value.OpinionContent,
 		ReferenceURL:    utils.ToPtrIfNotNullValue(!req.Value.ReferenceURL.IsSet(), value.ReferenceURL.Value),
 		Picture:         file,
+		IsSeed:          isSeed,
 	}); err != nil {
 		return nil, err
 	}

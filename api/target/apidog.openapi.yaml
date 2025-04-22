@@ -435,6 +435,11 @@
                     "format": "binary",
                     "description": "参考画像。4MiBまで",
                     "example": ""
+                  },
+                  "isSeed": {
+                    "type": "boolean",
+                    "description": "シード意見かどうか",
+                    "example": ""
                   }
                 },
                 "required": [
