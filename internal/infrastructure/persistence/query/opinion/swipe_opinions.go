@@ -101,7 +101,7 @@ func (g *GetSwipeOpinionsQueryHandler) Execute(ctx context.Context, in opinion_q
 	topRows, err := g.GetQueries(ctx).GetOpinionsByRank(ctx, model.GetOpinionsByRankParams{
 		UserID:        in.UserID.UUID(),
 		TalkSessionID: in.TalkSessionID.UUID(),
-		Rank:          int32(topLimit),
+		Rank:          1,
 		Limit:         int32(topLimit),
 	})
 	if err != nil {
