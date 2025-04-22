@@ -88,6 +88,7 @@ func (g *GetSwipeOpinionsQueryHandler) Execute(ctx context.Context, in opinion_q
 
 	// top,randomを1:2の比率で取得する
 	// limitが3以上の場合、2件はtop, 1件はrandomで取得する
+	// シード意見取得後の残りで、1/3をトップ意見に割り当てる
 	topLimit := remainingLimit / 3
 
 	// top
