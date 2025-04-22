@@ -152,4 +152,3 @@ func (o *Opinion) Report(ctx context.Context, reporterID shared.UUID[user.User],
 }
 
 var SeedUserID = shared.UUID[user.User](uuid.MustParse("00000000-0000-0000-0000-000000000001"))
-
