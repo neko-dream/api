@@ -101,7 +101,7 @@ func (h *submitOpinionHandler) Execute(ctx context.Context, input SubmitOpinionI
 
 	// オーナーではない場合、IsSeedがtrueの場合はエラーを返す
 	if talkSession.OwnerUserID() != input.UserID && input.IsSeed {
-		return messages.OpinionCreateFailed
+		return messages.OpinionSeedIsOwnerOnly
 	}
 
 	// 参加制限を満たしているか確認。満たしていない場合はエラーを返す
