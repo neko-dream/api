@@ -120,12 +120,14 @@ func (g *GetSwipeOpinionsQueryHandler) Execute(ctx context.Context, in opinion_q
 	// random
 	// randomはlimitより取得できたtopの数を引いた数だけ取得する
 	randomLimit := in.Limit - len(swipeOpinions)
-	if randomLimit > 0 && (swipeableOpinionCount-int64(topLimit)) > 0 {
+	if randomLimit > 0 && (swipeableOpinionCount-int64(len(topRows))) > 0 {
+		excludes := append(topOpinionIDs, seedOpinionIDs...)
 		randomSwipeRow, err := g.GetQueries(ctx).GetRandomOpinions(ctx, model.GetRandomOpinionsParams{
 			UserID:            in.UserID.UUID(),
 			TalkSessionID:     in.TalkSessionID.UUID(),
 			Limit:             int32(randomLimit),
-			ExcludeOpinionIds: append(topOpinionIDs, seedOpinionIDs...),
+			ExcludeOpinionIds: excludes,
+			ExcludesLen:       int32(len(excludes)),
 		})
 		if err != nil {
 			utils.HandleError(ctx, err, "ランダムな意見の取得に失敗")
