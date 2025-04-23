@@ -108,8 +108,6 @@ func (e *editHandler) Execute(ctx context.Context, input EditInput) (*EditOutput
 			foundUser.ChangeEmail(*input.Email)
 			foundUser.SetEmailVerified(false)
 		}
-
-
 		var demograID shared.UUID[user.UserDemographic]
 		if foundUser.Demographics() != nil {
 			demograID = foundUser.Demographics().ID()
