@@ -84,7 +84,6 @@ func (s *talkSessionConsentService) HasConsented(
 	if talkSession.Restrictions() == nil || len(talkSession.Restrictions()) == 0 {
 		return true, nil
 	}
-
 	consents, err := s.talkSessionConsentRepository.FindByTalkSessionIDAndUserID(ctx, talkSessionID, userID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

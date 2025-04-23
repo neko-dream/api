@@ -48,7 +48,6 @@ func (r *talkSessionConsentRepository) FindByTalkSessionIDAndUserID(ctx context.
 		UserID:        userID.UUID(),
 	})
 	if err != nil {
-		utils.HandleError(ctx, err, "Consentの取得に失敗しました。")
 		return nil, err
 	}
 

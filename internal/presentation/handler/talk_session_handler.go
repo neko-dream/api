@@ -76,6 +76,7 @@ func NewTalkSessionHandler(
 		isSatisfied:                   isSatisfied,
 		getReports:                    getReports,
 		getReportCount:                getReportCount,
+		hasConsent:                    hasConsent,
 
 		addConclusionCommand:    AddConclusionCommand,
 		startTalkSessionCommand: startTalkSessionCommand,
