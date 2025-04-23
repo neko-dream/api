@@ -997,7 +997,14 @@ LEFT JOIN (
 ) opr ON opr.opinion_id = opinions.opinion_id
 WHERE opinions.talk_session_id = $2
     AND vote_count.opinion_id = opinions.opinion_id
-    AND opinions.opinion_id != ANY($4::uuid[])
+    -- exclude_opinion_idsが空でない場合、除外する意見を指定
+    AND (
+        CASE
+            WHEN $4::int = 0 THEN TRUE
+            ELSE opinions.opinion_id != ANY($5::uuid[])
+        END
+    )
+    -- 親意見がないものを取得
     AND opinions.parent_opinion_id IS NULL
     -- 削除されたものはスワイプ意見から除外
     AND (opr.opinion_id IS NULL OR opr.status != 'deleted')
@@ -1009,6 +1016,7 @@ type GetRandomOpinionsParams struct {
 	UserID            uuid.UUID
 	TalkSessionID     uuid.UUID
 	Limit             int32
+	ExcludesLen       int32
 	ExcludeOpinionIds []uuid.UUID
 }
 
@@ -1051,7 +1059,14 @@ type GetRandomOpinionsRow struct {
 //	) opr ON opr.opinion_id = opinions.opinion_id
 //	WHERE opinions.talk_session_id = $2
 //	    AND vote_count.opinion_id = opinions.opinion_id
-//	    AND opinions.opinion_id != ANY($4::uuid[])
+//	    -- exclude_opinion_idsが空でない場合、除外する意見を指定
+//	    AND (
+//	        CASE
+//	            WHEN $4::int = 0 THEN TRUE
+//	            ELSE opinions.opinion_id != ANY($5::uuid[])
+//	        END
+//	    )
+//	    -- 親意見がないものを取得
 //	    AND opinions.parent_opinion_id IS NULL
 //	    -- 削除されたものはスワイプ意見から除外
 //	    AND (opr.opinion_id IS NULL OR opr.status != 'deleted')
@@ -1062,6 +1077,7 @@ func (q *Queries) GetRandomOpinions(ctx context.Context, arg GetRandomOpinionsPa
 		arg.UserID,
 		arg.TalkSessionID,
 		arg.Limit,
+		arg.ExcludesLen,
 		pq.Array(arg.ExcludeOpinionIds),
 	)
 	if err != nil {
