@@ -109,29 +109,23 @@ func (e *editHandler) Execute(ctx context.Context, input EditInput) (*EditOutput
 			foundUser.SetEmailVerified(false)
 		}
 
-		if input.DateOfBirth != nil ||
-			input.Gender != nil ||
-			input.City != nil ||
-			input.Occupation != nil ||
-			input.HouseholdSize != nil ||
-			input.Prefecture != nil {
-			var demograID shared.UUID[user.UserDemographic]
-			if foundUser.Demographics() != nil {
-				demograID = foundUser.Demographics().ID()
-			} else {
-				demograID = shared.NewUUID[user.UserDemographic]()
-			}
 
-			// デモグラ情報を設定
-			foundUser.SetDemographics(user.NewUserDemographic(
-				ctx,
-				demograID,
-				input.DateOfBirth,
-				input.Gender,
-				input.City,
-				input.Prefecture,
-			))
+		var demograID shared.UUID[user.UserDemographic]
+		if foundUser.Demographics() != nil {
+			demograID = foundUser.Demographics().ID()
+		} else {
+			demograID = shared.NewUUID[user.UserDemographic]()
 		}
+
+		// デモグラ情報を設定
+		foundUser.SetDemographics(user.NewUserDemographic(
+			ctx,
+			demograID,
+			input.DateOfBirth,
+			input.Gender,
+			input.City,
+			input.Prefecture,
+		))
 
 		if err := e.userRep.Update(ctx, *foundUser); err != nil {
 			utils.HandleError(ctx, err, "UserRepository.Update")
