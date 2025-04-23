@@ -108,13 +108,20 @@ func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHi
 				Null:  false,
 			}
 		}
+		var parentOpinionID oas.OptNilString
+		if opinion.Opinion.ParentOpinionID != nil {
+			parentOpinionID = oas.OptNilString{
+				Set:   true,
+				Value: opinion.Opinion.ParentOpinionID.String(),
+			}
+		}
 
 		opinions = append(opinions, oas.OpinionsHistoryOKOpinionsItem{
 			Opinion: oas.OpinionsHistoryOKOpinionsItemOpinion{
 				ID:           opinion.Opinion.OpinionID.String(),
 				Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Title),
 				Content:      opinion.Opinion.Content,
-				ParentID:     utils.ToOpt[oas.OptString](opinion.Opinion.ParentOpinionID.String()),
+				ParentID:     utils.ToOpt[oas.OptString](parentOpinionID),
 				VoteType:     parentVoteType,
 				ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
 				PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.PictureURL),
