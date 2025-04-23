@@ -47,6 +47,11 @@ func (g *GetSwipeOpinionsQueryHandler) Execute(ctx context.Context, in opinion_q
 		}, nil
 	}
 
+	// swipeAbleOpinionCountよりlimitの方が大きい場合、limitを上書きする
+	if int64(in.Limit) > swipeableOpinionCount {
+		in.Limit = int(swipeableOpinionCount)
+	}
+
 	var swipeOpinions []dto.SwipeOpinion
 	// 一旦seed意見を取得する
 	rows, err := g.GetQueries(ctx).GetSeedOpinions(ctx, model.GetSeedOpinionsParams{
