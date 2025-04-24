@@ -295,7 +295,7 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 		return nil, messages.ForbiddenError
 	}
 	var restrictionStrings []string
-	if req.Value.Restrictions != nil {
+	if req.Value.Restrictions != nil && req.Value.Restrictions[0] != "" {
 		if sl := strings.Split(strings.Join(req.Value.Restrictions, ","), ","); len(sl) > 0 {
 			restrictionStrings = sl
 		}
