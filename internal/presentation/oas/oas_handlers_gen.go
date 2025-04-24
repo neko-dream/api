@@ -390,10 +390,6 @@ func (s *Server) handleChangePasswordRequest(args [0]string, argsEscaped bool, w
 			Body:             nil,
 			Params: middleware.Parameters{
 				{
-					Name: "id_or_email",
-					In:   "query",
-				}: params.IDOrEmail,
-				{
 					Name: "old_password",
 					In:   "query",
 				}: params.OldPassword,

@@ -3575,15 +3575,6 @@
         ],
         "parameters": [
           {
-            "name": "id_or_email",
-            "in": "query",
-            "description": "",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "old_password",
             "in": "query",
             "description": "古いパスワード",

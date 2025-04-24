@@ -136,7 +136,6 @@ func decodeAuthorizeParams(args [1]string, argsEscaped bool, r *http.Request) (p
 
 // ChangePasswordParams is parameters of changePassword operation.
 type ChangePasswordParams struct {
-	IDOrEmail string
 	// 古いパスワード.
 	OldPassword string
 	// 新たなパスワード.
@@ -144,13 +143,6 @@ type ChangePasswordParams struct {
 }
 
 func unpackChangePasswordParams(packed middleware.Parameters) (params ChangePasswordParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "id_or_email",
-			In:   "query",
-		}
-		params.IDOrEmail = packed[key].(string)
-	}
 	{
 		key := middleware.ParameterKey{
 			Name: "old_password",
@@ -170,42 +162,6 @@ func unpackChangePasswordParams(packed middleware.Parameters) (params ChangePass
 
 func decodeChangePasswordParams(args [0]string, argsEscaped bool, r *http.Request) (params ChangePasswordParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
-	// Decode query: id_or_email.
-	if err := func() error {
-		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "id_or_email",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.HasParam(cfg); err == nil {
-			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.IDOrEmail = c
-				return nil
-			}); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "id_or_email",
-			In:   "query",
-			Err:  err,
-		}
-	}
 	// Decode query: old_password.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
