@@ -2,6 +2,7 @@ package talksession
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/neko-dream/server/internal/domain/messages"
@@ -74,9 +75,12 @@ func (k *RestrictionAttributeKey) RestrictionAttribute() RestrictionAttribute {
 	return RestrictionAttributeKeyMap[*k]
 }
 
-func (k *RestrictionAttributeKey) IsValid() bool {
-	_, ok := RestrictionAttributeKeyMap[*k]
-	return ok
+func (k *RestrictionAttributeKey) IsValid() error {
+	attr, ok := RestrictionAttributeKeyMap[*k]
+	if !ok {
+		return errors.New(attr.Description + "が不正な値です")
+	}
+	return nil
 }
 
 var (
