@@ -151,6 +151,9 @@ func (t *TalkSession) UpdateRestrictions(ctx context.Context, restrictions []str
 	var attrs []*RestrictionAttribute
 	var errs error
 	for _, restriction := range restrictions {
+		if restriction == "" {
+			continue
+		}
 		attribute := RestrictionAttributeKey(restriction)
 		if err := attribute.IsValid(); err != nil{
 			errs = errors.Join(errs, err)
