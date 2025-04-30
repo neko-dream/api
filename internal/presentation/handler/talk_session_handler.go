@@ -549,10 +549,10 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 			Value: oas.TalkSessionAnalysisOKMyPosition{
 				PosX:           out.MyPosition.PosX,
 				PosY:           out.MyPosition.PosY,
-				DisplayId:      out.MyPosition.DisplayID,
+				DisplayID:      out.MyPosition.DisplayID,
 				DisplayName:    out.MyPosition.DisplayName,
 				IconURL:        utils.ToOptNil[oas.OptNilString](out.MyPosition.IconURL),
-				GroupId:        out.MyPosition.GroupID,
+				GroupID:        out.MyPosition.GroupID,
 				GroupName:      out.MyPosition.GroupName,
 				PerimeterIndex: utils.ToOpt[oas.OptInt](out.MyPosition.PerimeterIndex),
 			},
@@ -565,11 +565,11 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 		positions = append(positions, oas.TalkSessionAnalysisOKPositionsItem{
 			PosX:           position.PosX,
 			PosY:           position.PosY,
-			DisplayId:      position.DisplayID,
+			DisplayID:      position.DisplayID,
 			DisplayName:    position.DisplayName,
 			IconURL:        utils.ToOptNil[oas.OptNilString](position.IconURL),
 			GroupName:      position.GroupName,
-			GroupId:        position.GroupID,
+			GroupID:        position.GroupID,
 			PerimeterIndex: utils.ToOpt[oas.OptInt](position.PerimeterIndex),
 		})
 	}
