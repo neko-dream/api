@@ -2518,7 +2518,7 @@ paths:
                       properties:
                         groupName:
                           type: string
-                        groupId:
+                        groupID:
                           type: integer
                         opinions:
                           type: array
@@ -2599,7 +2599,7 @@ paths:
                       required:
                         - groupName
                         - opinions
-                        - groupId
+                        - groupID
                 required:
                   - positions
                   - groupOpinions

@@ -601,7 +601,7 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 		}
 		groupOpinions = append(groupOpinions, oas.TalkSessionAnalysisOKGroupOpinionsItem{
 			GroupName: groupOpinion.GroupName,
-			GroupId:   groupOpinion.GroupID,
+			GroupID:   groupOpinion.GroupID,
 			Opinions:  opinions,
 		})
 	}

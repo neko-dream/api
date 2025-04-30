@@ -23043,8 +23043,8 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItem) encodeFields(e *jx.Encoder) {
 		e.Str(s.GroupName)
 	}
 	{
-		e.FieldStart("groupId")
-		e.Int(s.GroupId)
+		e.FieldStart("groupID")
+		e.Int(s.GroupID)
 	}
 	{
 		e.FieldStart("opinions")
@@ -23058,7 +23058,7 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItem) encodeFields(e *jx.Encoder) {
 
 var jsonFieldsNameOfTalkSessionAnalysisOKGroupOpinionsItem = [3]string{
 	0: "groupName",
-	1: "groupId",
+	1: "groupID",
 	2: "opinions",
 }
 
@@ -23083,17 +23083,17 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"groupName\"")
 			}
-		case "groupId":
+		case "groupID":
 			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
 				v, err := d.Int()
-				s.GroupId = int(v)
+				s.GroupID = int(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"groupId\"")
+				return errors.Wrap(err, "decode field \"groupID\"")
 			}
 		case "opinions":
 			requiredBitSet[0] |= 1 << 2

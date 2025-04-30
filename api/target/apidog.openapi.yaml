@@ -2470,7 +2470,7 @@
                           "groupName": {
                             "type": "string"
                           },
-                          "groupId": {
+                          "groupID": {
                             "type": "integer"
                           },
                           "opinions": {
@@ -2508,7 +2508,7 @@
                         "required": [
                           "groupName",
                           "opinions",
-                          "groupId"
+                          "groupID"
                         ]
                       }
                     }

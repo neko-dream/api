@@ -11473,7 +11473,7 @@ func (*TalkSessionAnalysisOK) talkSessionAnalysisRes() {}
 
 type TalkSessionAnalysisOKGroupOpinionsItem struct {
 	GroupName string                                               `json:"groupName"`
-	GroupId   int                                                  `json:"groupId"`
+	GroupID   int                                                  `json:"groupID"`
 	Opinions  []TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem `json:"opinions"`
 }
 
@@ -11482,9 +11482,9 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItem) GetGroupName() string {
 	return s.GroupName
 }
 
-// GetGroupId returns the value of GroupId.
-func (s *TalkSessionAnalysisOKGroupOpinionsItem) GetGroupId() int {
-	return s.GroupId
+// GetGroupID returns the value of GroupID.
+func (s *TalkSessionAnalysisOKGroupOpinionsItem) GetGroupID() int {
+	return s.GroupID
 }
 
 // GetOpinions returns the value of Opinions.
@@ -11497,9 +11497,9 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItem) SetGroupName(val string) {
 	s.GroupName = val
 }
 
-// SetGroupId sets the value of GroupId.
-func (s *TalkSessionAnalysisOKGroupOpinionsItem) SetGroupId(val int) {
-	s.GroupId = val
+// SetGroupID sets the value of GroupID.
+func (s *TalkSessionAnalysisOKGroupOpinionsItem) SetGroupID(val int) {
+	s.GroupID = val
 }
 
 // SetOpinions sets the value of Opinions.
