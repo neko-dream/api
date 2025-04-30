@@ -1659,17 +1659,6 @@
                     "description": "サムネイルURL。文中から一番最初の画像URLをサムネとする。",
                     "example": "",
                     "type": "string"
-                  },
-                  "restrictions": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    },
-                    "uniqueItems": true,
-                    "description": "投稿制限のキー",
-                    "example": [
-                      "demographics.city"
-                    ]
                   }
                 },
                 "required": [
@@ -1811,8 +1800,6 @@
                     "items": {
                       "type": "string"
                     },
-                    "uniqueItems": true,
-                    "description": "投稿制限のキー",
                     "example": [
                       "demographics.city"
                     ]
@@ -2483,7 +2470,7 @@
                           "groupName": {
                             "type": "string"
                           },
-                          "groupId": {
+                          "groupID": {
                             "type": "integer"
                           },
                           "opinions": {
@@ -2521,7 +2508,7 @@
                         "required": [
                           "groupName",
                           "opinions",
-                          "groupId"
+                          "groupID"
                         ]
                       }
                     }
@@ -6802,7 +6789,7 @@
           "posY": {
             "type": "number"
           },
-          "displayId": {
+          "displayID": {
             "type": "string"
           },
           "displayName": {
@@ -6815,7 +6802,7 @@
           "groupName": {
             "type": "string"
           },
-          "groupId": {
+          "groupID": {
             "type": "integer"
           },
           "perimeterIndex": {
@@ -6826,10 +6813,10 @@
         "required": [
           "posX",
           "posY",
-          "displayId",
+          "displayID",
           "groupName",
           "displayName",
-          "groupId"
+          "groupID"
         ]
       },
       "Report": {

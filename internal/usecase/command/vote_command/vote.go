@@ -104,15 +104,14 @@ func (i *voteHandler) Execute(ctx context.Context, input VoteInput) error {
 			return messages.VoteFailed
 		}
 
-		if err := i.AnalysisService.StartAnalysis(ctx, op.TalkSessionID()); err != nil {
-			utils.HandleError(ctx, err, "StartAnalysis")
-			return err
-		}
-
 		return nil
 	}); err != nil {
 		return errtrace.Wrap(err)
 	}
 
+	if err := i.AnalysisService.StartAnalysis(ctx, op.TalkSessionID()); err != nil {
+		utils.HandleError(ctx, err, "StartAnalysis")
+		return err
+	}
 	return nil
 }

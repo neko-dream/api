@@ -120,7 +120,7 @@ func (i *startTalkSessionCommandHandler) Execute(ctx context.Context, input Star
 			input.Prefecture,
 		)
 
-		if  len(input.Restrictions) > 0 {
+		if len(input.Restrictions) > 0 {
 			if err := talkSession.UpdateRestrictions(ctx, input.Restrictions); err != nil {
 				return errtrace.Wrap(err)
 			}
@@ -167,3 +167,4 @@ func (i *startTalkSessionCommandHandler) Execute(ctx context.Context, input Star
 
 	return output, nil
 }
+

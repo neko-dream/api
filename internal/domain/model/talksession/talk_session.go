@@ -2,6 +2,7 @@ package talksession
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/neko-dream/server/internal/domain/model/clock"
@@ -148,13 +149,23 @@ func (t *TalkSession) UpdateRestrictions(ctx context.Context, restrictions []str
 	_ = ctx
 
 	var attrs []*RestrictionAttribute
+	var errs error
 	for _, restriction := range restrictions {
+		if restriction == "" {
+			continue
+		}
 		attribute := RestrictionAttributeKey(restriction)
-		if !attribute.IsValid() {
-			return &ErrInvalidRestrictionAttribute
+		if err := attribute.IsValid(); err != nil {
+			errs = errors.Join(errs, err)
+			continue
 		}
 
 		attrs = append(attrs, lo.ToPtr(attribute.RestrictionAttribute()))
+	}
+	if errs != nil {
+		err := &ErrInvalidRestrictionAttribute
+		err.Message = errs.Error()
+		return err
 	}
 
 	t.restrictions = attrs

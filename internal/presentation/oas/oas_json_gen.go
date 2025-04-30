@@ -23043,8 +23043,8 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItem) encodeFields(e *jx.Encoder) {
 		e.Str(s.GroupName)
 	}
 	{
-		e.FieldStart("groupId")
-		e.Int(s.GroupId)
+		e.FieldStart("groupID")
+		e.Int(s.GroupID)
 	}
 	{
 		e.FieldStart("opinions")
@@ -23058,7 +23058,7 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItem) encodeFields(e *jx.Encoder) {
 
 var jsonFieldsNameOfTalkSessionAnalysisOKGroupOpinionsItem = [3]string{
 	0: "groupName",
-	1: "groupId",
+	1: "groupID",
 	2: "opinions",
 }
 
@@ -23083,17 +23083,17 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"groupName\"")
 			}
-		case "groupId":
+		case "groupID":
 			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
 				v, err := d.Int()
-				s.GroupId = int(v)
+				s.GroupID = int(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"groupId\"")
+				return errors.Wrap(err, "decode field \"groupID\"")
 			}
 		case "opinions":
 			requiredBitSet[0] |= 1 << 2
@@ -23752,8 +23752,8 @@ func (s *TalkSessionAnalysisOKMyPosition) encodeFields(e *jx.Encoder) {
 		e.Float64(s.PosY)
 	}
 	{
-		e.FieldStart("displayId")
-		e.Str(s.DisplayId)
+		e.FieldStart("displayID")
+		e.Str(s.DisplayID)
 	}
 	{
 		e.FieldStart("displayName")
@@ -23770,8 +23770,8 @@ func (s *TalkSessionAnalysisOKMyPosition) encodeFields(e *jx.Encoder) {
 		e.Str(s.GroupName)
 	}
 	{
-		e.FieldStart("groupId")
-		e.Int(s.GroupId)
+		e.FieldStart("groupID")
+		e.Int(s.GroupID)
 	}
 	{
 		if s.PerimeterIndex.Set {
@@ -23784,11 +23784,11 @@ func (s *TalkSessionAnalysisOKMyPosition) encodeFields(e *jx.Encoder) {
 var jsonFieldsNameOfTalkSessionAnalysisOKMyPosition = [8]string{
 	0: "posX",
 	1: "posY",
-	2: "displayId",
+	2: "displayID",
 	3: "displayName",
 	4: "iconURL",
 	5: "groupName",
-	6: "groupId",
+	6: "groupID",
 	7: "perimeterIndex",
 }
 
@@ -23825,17 +23825,17 @@ func (s *TalkSessionAnalysisOKMyPosition) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"posY\"")
 			}
-		case "displayId":
+		case "displayID":
 			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
 				v, err := d.Str()
-				s.DisplayId = string(v)
+				s.DisplayID = string(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"displayId\"")
+				return errors.Wrap(err, "decode field \"displayID\"")
 			}
 		case "displayName":
 			requiredBitSet[0] |= 1 << 3
@@ -23871,17 +23871,17 @@ func (s *TalkSessionAnalysisOKMyPosition) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"groupName\"")
 			}
-		case "groupId":
+		case "groupID":
 			requiredBitSet[0] |= 1 << 6
 			if err := func() error {
 				v, err := d.Int()
-				s.GroupId = int(v)
+				s.GroupID = int(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"groupId\"")
+				return errors.Wrap(err, "decode field \"groupID\"")
 			}
 		case "perimeterIndex":
 			if err := func() error {
@@ -23967,8 +23967,8 @@ func (s *TalkSessionAnalysisOKPositionsItem) encodeFields(e *jx.Encoder) {
 		e.Float64(s.PosY)
 	}
 	{
-		e.FieldStart("displayId")
-		e.Str(s.DisplayId)
+		e.FieldStart("displayID")
+		e.Str(s.DisplayID)
 	}
 	{
 		e.FieldStart("displayName")
@@ -23985,8 +23985,8 @@ func (s *TalkSessionAnalysisOKPositionsItem) encodeFields(e *jx.Encoder) {
 		e.Str(s.GroupName)
 	}
 	{
-		e.FieldStart("groupId")
-		e.Int(s.GroupId)
+		e.FieldStart("groupID")
+		e.Int(s.GroupID)
 	}
 	{
 		if s.PerimeterIndex.Set {
@@ -23999,11 +23999,11 @@ func (s *TalkSessionAnalysisOKPositionsItem) encodeFields(e *jx.Encoder) {
 var jsonFieldsNameOfTalkSessionAnalysisOKPositionsItem = [8]string{
 	0: "posX",
 	1: "posY",
-	2: "displayId",
+	2: "displayID",
 	3: "displayName",
 	4: "iconURL",
 	5: "groupName",
-	6: "groupId",
+	6: "groupID",
 	7: "perimeterIndex",
 }
 
@@ -24040,17 +24040,17 @@ func (s *TalkSessionAnalysisOKPositionsItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"posY\"")
 			}
-		case "displayId":
+		case "displayID":
 			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
 				v, err := d.Str()
-				s.DisplayId = string(v)
+				s.DisplayID = string(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"displayId\"")
+				return errors.Wrap(err, "decode field \"displayID\"")
 			}
 		case "displayName":
 			requiredBitSet[0] |= 1 << 3
@@ -24086,17 +24086,17 @@ func (s *TalkSessionAnalysisOKPositionsItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"groupName\"")
 			}
-		case "groupId":
+		case "groupID":
 			requiredBitSet[0] |= 1 << 6
 			if err := func() error {
 				v, err := d.Int()
-				s.GroupId = int(v)
+				s.GroupID = int(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"groupId\"")
+				return errors.Wrap(err, "decode field \"groupID\"")
 			}
 		case "perimeterIndex":
 			if err := func() error {
