@@ -29,7 +29,7 @@ type (
 		Icon        *multipart.FileHeader // ユーザーのアイコン
 		DateOfBirth *int                  // ユーザーの生年
 		Gender      *string               // ユーザーの性別
-		City        *string               // ユーザーの住んでいる市町村
+		City        *string               // ユーザーの住んでいる市区町村
 		Prefecture  *string               // ユーザーの住んでいる都道府県
 	}
 

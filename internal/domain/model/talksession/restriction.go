@@ -50,7 +50,7 @@ var (
 			}},
 		DemographicsCity: {
 			Key:         DemographicsCity,
-			Description: "市町村",
+			Description: "市区町村",
 			Order:       2,
 			IsSatisfied: func(user user.User) bool {
 				if user.Demographics() == nil {
