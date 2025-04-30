@@ -69,7 +69,7 @@ func (i *voteHandler) Execute(ctx context.Context, input VoteInput) error {
 	op, err := i.OpinionRepository.FindByID(ctx, input.TargetOpinionID)
 	if err != nil {
 		utils.HandleError(ctx, err, "OpinionRepository.FindByID")
-		return err
+		return messages.OpinionNotFound
 	}
 
 	// セッションを探す
