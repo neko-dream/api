@@ -470,8 +470,7 @@ type CreateTalkSessionReq struct {
 	Description OptNilString `json:"description"`
 	// サムネイルURL。文中から一番最初の画像URLをサムネとする。.
 	ThumbnailURL OptNilString `json:"thumbnailURL"`
-	// 投稿制限のキー.
-	Restrictions []string `json:"restrictions"`
+	Restrictions []string     `json:"restrictions"`
 }
 
 // GetTheme returns the value of Theme.
@@ -875,8 +874,6 @@ type EditTalkSessionReq struct {
 	Description OptNilString `json:"description"`
 	// サムネイルURL。文中から一番最初の画像URLをサムネとする。.
 	ThumbnailURL OptString `json:"thumbnailURL"`
-	// 投稿制限のキー.
-	Restrictions []string `json:"restrictions"`
 }
 
 // GetTheme returns the value of Theme.
@@ -919,11 +916,6 @@ func (s *EditTalkSessionReq) GetThumbnailURL() OptString {
 	return s.ThumbnailURL
 }
 
-// GetRestrictions returns the value of Restrictions.
-func (s *EditTalkSessionReq) GetRestrictions() []string {
-	return s.Restrictions
-}
-
 // SetTheme sets the value of Theme.
 func (s *EditTalkSessionReq) SetTheme(val string) {
 	s.Theme = val
@@ -962,11 +954,6 @@ func (s *EditTalkSessionReq) SetDescription(val OptNilString) {
 // SetThumbnailURL sets the value of ThumbnailURL.
 func (s *EditTalkSessionReq) SetThumbnailURL(val OptString) {
 	s.ThumbnailURL = val
-}
-
-// SetRestrictions sets the value of Restrictions.
-func (s *EditTalkSessionReq) SetRestrictions(val []string) {
-	s.Restrictions = val
 }
 
 type EditTimeLineBadRequest struct{}

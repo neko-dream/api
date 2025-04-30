@@ -115,11 +115,7 @@ func (i *editCommandHandler) Execute(ctx context.Context, input EditCommandInput
 				*input.Longitude,
 			))
 		}
-		if input.Restrictions != nil {
-			if err := talkSession.UpdateRestrictions(ctx, input.Restrictions); err != nil {
-				return errtrace.Wrap(err)
-			}
-		}
+
 		if err := i.TalkSessionRepository.Update(ctx, talkSession); err != nil {
 			utils.HandleError(ctx, err, "TalkSessionRepository.Update")
 			return messages.TalkSessionUpdateFailed

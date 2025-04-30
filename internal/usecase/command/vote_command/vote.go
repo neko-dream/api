@@ -113,7 +113,5 @@ func (i *voteHandler) Execute(ctx context.Context, input VoteInput) error {
 		utils.HandleError(ctx, err, "StartAnalysis")
 		return err
 	}
-
-
 	return nil
 }

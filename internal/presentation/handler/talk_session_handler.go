@@ -637,13 +637,6 @@ func (t *talkSessionHandler) EditTalkSession(ctx context.Context, req oas.OptEdi
 		return nil, messages.RequiredParameterError
 	}
 
-	var restrictionStrings []string
-	if req.Value.Restrictions != nil {
-		if sl := strings.Split(strings.Join(req.Value.Restrictions, ","), ","); len(sl) > 0 {
-			restrictionStrings = sl
-		}
-	}
-
 	out, err := t.editTalkSessionCommand.Execute(ctx, talksession_command.EditCommandInput{
 		TalkSessionID:    talkSessionID,
 		UserID:           userID,
@@ -655,7 +648,6 @@ func (t *talkSessionHandler) EditTalkSession(ctx context.Context, req oas.OptEdi
 		Longitude:        utils.ToPtrIfNotNullValue(!req.Value.Longitude.IsSet(), req.Value.Longitude.Value),
 		City:             utils.ToPtrIfNotNullValue(!req.Value.City.IsSet(), req.Value.City.Value),
 		Prefecture:       utils.ToPtrIfNotNullValue(!req.Value.Prefecture.IsSet(), req.Value.Prefecture.Value),
-		Restrictions:     restrictionStrings,
 	})
 	if err != nil {
 		return nil, err
