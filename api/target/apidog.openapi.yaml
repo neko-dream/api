@@ -6802,7 +6802,7 @@
           "posY": {
             "type": "number"
           },
-          "displayId": {
+          "displayID": {
             "type": "string"
           },
           "displayName": {
@@ -6815,7 +6815,7 @@
           "groupName": {
             "type": "string"
           },
-          "groupId": {
+          "groupID": {
             "type": "integer"
           },
           "perimeterIndex": {
@@ -6826,10 +6826,10 @@
         "required": [
           "posX",
           "posY",
-          "displayId",
+          "displayID",
           "groupName",
           "displayName",
-          "groupId"
+          "groupID"
         ]
       },
       "Report": {

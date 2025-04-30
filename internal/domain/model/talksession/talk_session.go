@@ -155,7 +155,7 @@ func (t *TalkSession) UpdateRestrictions(ctx context.Context, restrictions []str
 			continue
 		}
 		attribute := RestrictionAttributeKey(restriction)
-		if err := attribute.IsValid(); err != nil{
+		if err := attribute.IsValid(); err != nil {
 			errs = errors.Join(errs, err)
 			continue
 		}
