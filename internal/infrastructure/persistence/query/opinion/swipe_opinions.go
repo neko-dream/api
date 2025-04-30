@@ -173,10 +173,10 @@ func (g *GetSwipeOpinionsQueryHandler) fetchTopOpinions(
 	excludeOpinionIDs []uuid.UUID,
 ) ([]dto.SwipeOpinion, []uuid.UUID, error) {
 	topRows, err := g.GetQueries(ctx).GetOpinionsByRank(ctx, model.GetOpinionsByRankParams{
-		UserID:        userID,
-		TalkSessionID: talkSessionID,
-		Rank:          1, // ランク1のトップ意見
-		Limit:         int32(limit),
+		UserID:            userID,
+		TalkSessionID:     talkSessionID,
+		Rank:              1, // ランク1のトップ意見
+		Limit:             int32(limit),
 		ExcludeOpinionIds: excludeOpinionIDs,
 		ExcludesLen:       int32(len(excludeOpinionIDs)),
 	})
