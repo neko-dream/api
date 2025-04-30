@@ -423,18 +423,26 @@ LEFT JOIN (
 LEFT JOIN representative_opinions ON opinions.opinion_id = representative_opinions.opinion_id
 WHERE opinions.talk_session_id = $2::uuid
     AND vote_count.opinion_id = opinions.opinion_id
+    AND (
+        CASE
+            WHEN $3::int = 0 THEN TRUE
+            ELSE opinions.opinion_id != ANY($4::uuid[])
+        END
+    )
     AND opinions.parent_opinion_id IS NULL
     -- 削除されたものはスワイプ意見から除外
     AND (opr.opinion_id IS NULL OR opr.status != 'deleted')
-    AND representative_opinions.rank = $3::int
-LIMIT $4::int
+    AND representative_opinions.rank = $5::int
+LIMIT $6::int
 `
 
 type GetOpinionsByRankParams struct {
-	UserID        uuid.UUID
-	TalkSessionID uuid.UUID
-	Rank          int32
-	Limit         int32
+	UserID            uuid.UUID
+	TalkSessionID     uuid.UUID
+	ExcludesLen       int32
+	ExcludeOpinionIds []uuid.UUID
+	Rank              int32
+	Limit             int32
 }
 
 type GetOpinionsByRankRow struct {
@@ -482,15 +490,23 @@ type GetOpinionsByRankRow struct {
 //	LEFT JOIN representative_opinions ON opinions.opinion_id = representative_opinions.opinion_id
 //	WHERE opinions.talk_session_id = $2::uuid
 //	    AND vote_count.opinion_id = opinions.opinion_id
+//	    AND (
+//	        CASE
+//	            WHEN $3::int = 0 THEN TRUE
+//	            ELSE opinions.opinion_id != ANY($4::uuid[])
+//	        END
+//	    )
 //	    AND opinions.parent_opinion_id IS NULL
 //	    -- 削除されたものはスワイプ意見から除外
 //	    AND (opr.opinion_id IS NULL OR opr.status != 'deleted')
-//	    AND representative_opinions.rank = $3::int
-//	LIMIT $4::int
+//	    AND representative_opinions.rank = $5::int
+//	LIMIT $6::int
 func (q *Queries) GetOpinionsByRank(ctx context.Context, arg GetOpinionsByRankParams) ([]GetOpinionsByRankRow, error) {
 	rows, err := q.db.QueryContext(ctx, getOpinionsByRank,
 		arg.UserID,
 		arg.TalkSessionID,
+		arg.ExcludesLen,
+		pq.Array(arg.ExcludeOpinionIds),
 		arg.Rank,
 		arg.Limit,
 	)

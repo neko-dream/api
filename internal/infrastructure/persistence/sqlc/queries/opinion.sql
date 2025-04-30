@@ -154,6 +154,12 @@ LEFT JOIN (
 LEFT JOIN representative_opinions ON opinions.opinion_id = representative_opinions.opinion_id
 WHERE opinions.talk_session_id = sqlc.arg('talk_session_id')::uuid
     AND vote_count.opinion_id = opinions.opinion_id
+    AND (
+        CASE
+            WHEN sqlc.arg('excludes_len')::int = 0 THEN TRUE
+            ELSE opinions.opinion_id != ANY(sqlc.narg('exclude_opinion_ids')::uuid[])
+        END
+    )
     AND opinions.parent_opinion_id IS NULL
     -- 削除されたものはスワイプ意見から除外
     AND (opr.opinion_id IS NULL OR opr.status != 'deleted')
