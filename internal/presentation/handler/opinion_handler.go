@@ -131,9 +131,19 @@ func (o *opinionHandler) GetOpinionDetail2(ctx context.Context, params oas.GetOp
 		IsDeleted:    opinion.Opinion.Opinion.IsDeleted,
 	}
 
+	var myVoteType oas.OptNilGetOpinionDetail2OKMyVoteType
+	if opinion.Opinion.GetMyVoteType() != nil {
+		myVoteType = oas.OptNilGetOpinionDetail2OKMyVoteType{
+			Value: oas.GetOpinionDetail2OKMyVoteType(*opinion.Opinion.GetMyVoteType()),
+			Set:   true,
+			Null:  false,
+		}
+	}
+
 	return &oas.GetOpinionDetail2OK{
 		User:    *user,
 		Opinion: *op,
+		MyVoteType: myVoteType,
 	}, nil
 }
 
