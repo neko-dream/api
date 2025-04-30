@@ -86,4 +86,9 @@ var (
 		Code:       "TALKSESSION-0016",
 		Message:    "ユーザーIDが不正です。",
 	}
+	TalkSessionIsFinished = &APIError{
+		StatusCode: 400,
+		Code:       "TALKSESSION-0017",
+		Message:    "セッションは終了しています。",
+	}
 )

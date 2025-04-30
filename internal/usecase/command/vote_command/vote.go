@@ -9,6 +9,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/shared"
+	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/domain/model/vote"
 	"github.com/neko-dream/server/internal/domain/service"
@@ -32,6 +33,7 @@ type (
 	voteHandler struct {
 		opinion.OpinionService
 		opinion.OpinionRepository
+		talksession.TalkSessionRepository
 		vote.VoteRepository
 		analysis.AnalysisService
 		service.TalkSessionAccessControl
@@ -42,6 +44,7 @@ type (
 func NewVoteHandler(
 	opinionService opinion.OpinionService,
 	opinionRepository opinion.OpinionRepository,
+	talkSessionRepository talksession.TalkSessionRepository,
 	voteRepository vote.VoteRepository,
 	analysisService analysis.AnalysisService,
 	talkSessionAccessControl service.TalkSessionAccessControl,
@@ -51,6 +54,7 @@ func NewVoteHandler(
 		OpinionService:           opinionService,
 		OpinionRepository:        opinionRepository,
 		VoteRepository:           voteRepository,
+		TalkSessionRepository:    talkSessionRepository,
 		AnalysisService:          analysisService,
 		TalkSessionAccessControl: talkSessionAccessControl,
 		DBManager:                DBManager,
@@ -66,6 +70,18 @@ func (i *voteHandler) Execute(ctx context.Context, input VoteInput) error {
 	if err != nil {
 		utils.HandleError(ctx, err, "OpinionRepository.FindByID")
 		return err
+	}
+
+	// セッションを探す
+	session, err := i.TalkSessionRepository.FindByID(ctx, op.TalkSessionID())
+	if err != nil {
+		utils.HandleError(ctx, err, "TalkSessionRepository.FindByID")
+		return messages.TalkSessionNotFound
+	}
+
+	// 終了していればエラー
+	if session.IsFinished(ctx) {
+		return messages.TalkSessionIsFinished
 	}
 
 	// 参加制限を満たしているか確認。満たしていない場合はエラーを返す
