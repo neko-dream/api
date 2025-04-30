@@ -28,7 +28,7 @@ type (
 		DeleteIcon    bool                  // アイコンを削除するかどうか
 		DateOfBirth   *int                  // ユーザーの生年
 		Gender        *string               // ユーザーの性別
-		City          *string               // ユーザーの住んでいる市町村
+		City          *string               // ユーザーの住んでいる市区町村
 		Occupation    *string               // ユーザーの職業
 		HouseholdSize *int                  // ユーザーの世帯人数
 		Prefecture    *string               // ユーザーの居住地の都道府県
