@@ -12,7 +12,6 @@ import (
 	"github.com/neko-dream/server/internal/usecase/query/dto"
 	opinion_query "github.com/neko-dream/server/internal/usecase/query/opinion"
 	"github.com/neko-dream/server/pkg/utils"
-	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
@@ -28,18 +27,32 @@ func NewSwipeOpinionsQueryHandler(
 	}
 }
 
+func convertToSwipeOpinion(source any) (dto.SwipeOpinion, error) {
+	var swipeOpinion dto.SwipeOpinion
+	if err := copier.CopyWithOption(&swipeOpinion, source, copier.Option{
+		DeepCopy:    true,
+		IgnoreEmpty: true,
+	}); err != nil {
+		return dto.SwipeOpinion{}, err
+	}
+	return swipeOpinion, nil
+}
+
 func (g *GetSwipeOpinionsQueryHandler) Execute(ctx context.Context, in opinion_query.GetSwipeOpinionsQueryInput) (*opinion_query.GetSwipeOpinionsQueryOutput, error) {
 	ctx, span := otel.Tracer("opinion_query").Start(ctx, "GetSwipeOpinionsQueryHandler.Execute")
 	defer span.End()
 
+	// スワイプ可能な意見の総数を取得
 	swipeableOpinionCount, err := g.GetQueries(ctx).CountSwipeableOpinions(ctx, model.CountSwipeableOpinionsParams{
 		UserID:        in.UserID.UUID(),
 		TalkSessionID: in.TalkSessionID.UUID(),
 	})
 	if err != nil {
-		utils.HandleError(ctx, err, "SwipeableOpinionのカウントに失敗")
+		utils.HandleError(ctx, err, "スワイプ可能な意見のカウントに失敗")
 		return nil, err
 	}
+
+	// スワイプ可能な意見がない場合は空の結果を返す
 	if swipeableOpinionCount == 0 {
 		return &opinion_query.GetSwipeOpinionsQueryOutput{
 			Opinions:          []dto.SwipeOpinion{},
@@ -47,112 +60,177 @@ func (g *GetSwipeOpinionsQueryHandler) Execute(ctx context.Context, in opinion_q
 		}, nil
 	}
 
-	// swipeAbleOpinionCountよりlimitの方が大きい場合、limitを上書きする
-	if int64(in.Limit) > swipeableOpinionCount {
-		in.Limit = int(swipeableOpinionCount)
+	// 取得限度数の調整：要求limitが利用可能な意見数より多い場合は調整
+	requestLimit := in.Limit
+	if int64(requestLimit) > swipeableOpinionCount {
+		requestLimit = int(swipeableOpinionCount)
 	}
 
-	var swipeOpinions []dto.SwipeOpinion
-	// 一旦seed意見を取得する
-	rows, err := g.GetQueries(ctx).GetSeedOpinions(ctx, model.GetSeedOpinionsParams{
-		UserID:        in.UserID.UUID(),
-		TalkSessionID: in.TalkSessionID.UUID(),
-		Limit:         int32(in.Limit),
-	})
+	var allSwipeOpinions []dto.SwipeOpinion
+	var collectedOpinionIDs []uuid.UUID
+
+	// シード意見の取得（初期データとなる意見）
+	seedOpinions, seedOpinionIDs, err := g.fetchSeedOpinions(ctx, in.UserID.UUID(), in.TalkSessionID.UUID(), requestLimit)
 	if err != nil {
-		if !errors.Is(err, sql.ErrNoRows) {
-			utils.HandleError(ctx, err, "Seed意見の取得に失敗")
-			return nil, err
-		}
+		return nil, err // エラーは内部関数で既にログ記録されている
 	}
+	allSwipeOpinions = append(allSwipeOpinions, seedOpinions...)
+	collectedOpinionIDs = append(collectedOpinionIDs, seedOpinionIDs...)
 
-	// seedでlimitを満たしたらそれを返す
-	for _, swipeRow := range rows {
-		var swipeOpinion dto.SwipeOpinion
-		if err := copier.CopyWithOption(&swipeOpinion, &swipeRow, copier.Option{
-			DeepCopy:    true,
-			IgnoreEmpty: true,
-		}); err != nil {
-			utils.HandleError(ctx, err, "マッピングに失敗")
-			return nil, err
-		}
-		swipeOpinions = append(swipeOpinions, swipeOpinion)
-	}
-	if len(rows) >= in.Limit {
+	// シード意見だけで要求数を満たした場合はそのまま返す
+	if len(allSwipeOpinions) >= requestLimit {
 		return &opinion_query.GetSwipeOpinionsQueryOutput{
-			Opinions:          swipeOpinions,
+			Opinions:          allSwipeOpinions[:requestLimit],
 			RemainingOpinions: int(swipeableOpinionCount),
 		}, nil
 	}
-	seedOpinionIDs := lo.Map(rows, func(swipe model.GetSeedOpinionsRow, _ int) uuid.UUID {
-		return swipe.Opinion.OpinionID
-	})
 
-	// 超えなかったら、seedを除いた残りの意見を取得する
-	remainingLimit := in.Limit - len(rows)
+	// 残りの枠を埋めるためにトップ意見とランダム意見を取得
+	remainingLimit := requestLimit - len(allSwipeOpinions)
 
-	// top,randomを1:2の比率で取得する
-	// limitが3以上の場合、2件はtop, 1件はrandomで取得する
-	// シード意見取得後の残りで、1/3をトップ意見に割り当てる
+	// トップ意見は残りの1/3を割り当て
 	topLimit := remainingLimit / 3
-
-	// top
-	topRows, err := g.GetQueries(ctx).GetOpinionsByRank(ctx, model.GetOpinionsByRankParams{
-		UserID:        in.UserID.UUID(),
-		TalkSessionID: in.TalkSessionID.UUID(),
-		Rank:          1,
-		Limit:         int32(topLimit),
-	})
-	if err != nil {
-		utils.HandleError(ctx, err, "TopN意見の取得に失敗")
-		return nil, err
-	}
-	for _, swipeRow := range topRows {
-		var swipeOpinion dto.SwipeOpinion
-		if err := copier.CopyWithOption(&swipeOpinion, &swipeRow, copier.Option{
-			DeepCopy:    true,
-			IgnoreEmpty: true,
-		}); err != nil {
-			utils.HandleError(ctx, err, "マッピングに失敗")
-			return nil, err
-		}
-		swipeOpinions = append(swipeOpinions, swipeOpinion)
-	}
-	topOpinionIDs := lo.Map(topRows, func(swipe model.GetOpinionsByRankRow, _ int) uuid.UUID {
-		return swipe.Opinion.OpinionID
-	})
-
-	// random
-	// randomはlimitより取得できたtopの数を引いた数だけ取得する
-	randomLimit := in.Limit - len(swipeOpinions)
-	if randomLimit > 0 && (swipeableOpinionCount-int64(len(topRows))) > 0 {
-		excludes := append(topOpinionIDs, seedOpinionIDs...)
-		randomSwipeRow, err := g.GetQueries(ctx).GetRandomOpinions(ctx, model.GetRandomOpinionsParams{
-			UserID:            in.UserID.UUID(),
-			TalkSessionID:     in.TalkSessionID.UUID(),
-			Limit:             int32(randomLimit),
-			ExcludeOpinionIds: excludes,
-			ExcludesLen:       int32(len(excludes)),
-		})
+	if topLimit > 0 {
+		topOpinions, topOpinionIDs, err := g.fetchTopOpinions(
+			ctx,
+			in.UserID.UUID(),
+			in.TalkSessionID.UUID(),
+			topLimit,
+			collectedOpinionIDs,
+		)
 		if err != nil {
-			utils.HandleError(ctx, err, "ランダムな意見の取得に失敗")
 			return nil, err
 		}
-		for _, swipeRow := range randomSwipeRow {
-			var swipeOpinion dto.SwipeOpinion
-			if err := copier.CopyWithOption(&swipeOpinion, &swipeRow, copier.Option{
-				DeepCopy:    true,
-				IgnoreEmpty: true,
-			}); err != nil {
-				utils.HandleError(ctx, err, "マッピングに失敗")
-				return nil, err
-			}
-			swipeOpinions = append(swipeOpinions, swipeOpinion)
+		allSwipeOpinions = append(allSwipeOpinions, topOpinions...)
+		collectedOpinionIDs = append(collectedOpinionIDs, topOpinionIDs...)
+	}
+
+	// ランダム意見を取得して残りを埋める
+	randomLimit := requestLimit - len(allSwipeOpinions)
+	if randomLimit > 0 && (swipeableOpinionCount-int64(len(allSwipeOpinions))) > 0 {
+		randomOpinions, err := g.fetchRandomOpinions(
+			ctx,
+			in.UserID.UUID(),
+			in.TalkSessionID.UUID(),
+			randomLimit,
+			collectedOpinionIDs,
+		)
+		if err != nil {
+			return nil, err
 		}
+		allSwipeOpinions = append(allSwipeOpinions, randomOpinions...)
 	}
 
 	return &opinion_query.GetSwipeOpinionsQueryOutput{
-		Opinions:          swipeOpinions,
+		Opinions:          allSwipeOpinions,
 		RemainingOpinions: int(swipeableOpinionCount),
 	}, nil
+}
+
+// シード意見を取得する
+func (g *GetSwipeOpinionsQueryHandler) fetchSeedOpinions(
+	ctx context.Context,
+	userID uuid.UUID,
+	talkSessionID uuid.UUID,
+	limit int,
+) ([]dto.SwipeOpinion, []uuid.UUID, error) {
+	seedRows, err := g.GetQueries(ctx).GetSeedOpinions(ctx, model.GetSeedOpinionsParams{
+		UserID:        userID,
+		TalkSessionID: talkSessionID,
+		Limit:         int32(limit),
+	})
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			// 結果がない場合は空のスライスを返す
+			return []dto.SwipeOpinion{}, []uuid.UUID{}, nil
+		}
+		utils.HandleError(ctx, err, "シード意見の取得に失敗")
+		return nil, nil, err
+	}
+
+	seedOpinions := make([]dto.SwipeOpinion, 0, len(seedRows))
+	seedOpinionIDs := make([]uuid.UUID, 0, len(seedRows))
+
+	for _, row := range seedRows {
+		swipeOpinion, err := convertToSwipeOpinion(row)
+		if err != nil {
+			utils.HandleError(ctx, err, "シード意見のマッピングに失敗")
+			return nil, nil, err
+		}
+		seedOpinions = append(seedOpinions, swipeOpinion)
+		seedOpinionIDs = append(seedOpinionIDs, row.Opinion.OpinionID)
+	}
+
+	return seedOpinions, seedOpinionIDs, nil
+}
+
+// トップランクの意見を取得する
+func (g *GetSwipeOpinionsQueryHandler) fetchTopOpinions(
+	ctx context.Context,
+	userID uuid.UUID,
+	talkSessionID uuid.UUID,
+	limit int,
+	excludeOpinionIDs []uuid.UUID,
+) ([]dto.SwipeOpinion, []uuid.UUID, error) {
+	topRows, err := g.GetQueries(ctx).GetOpinionsByRank(ctx, model.GetOpinionsByRankParams{
+		UserID:        userID,
+		TalkSessionID: talkSessionID,
+		Rank:          1, // ランク1のトップ意見
+		Limit:         int32(limit),
+		ExcludeOpinionIds: excludeOpinionIDs,
+		ExcludesLen:       int32(len(excludeOpinionIDs)),
+	})
+	if err != nil {
+		utils.HandleError(ctx, err, "トップ意見の取得に失敗")
+		return nil, nil, err
+	}
+
+	topOpinions := make([]dto.SwipeOpinion, 0, len(topRows))
+	topOpinionIDs := make([]uuid.UUID, 0, len(topRows))
+
+	for _, row := range topRows {
+		swipeOpinion, err := convertToSwipeOpinion(row)
+		if err != nil {
+			utils.HandleError(ctx, err, "トップ意見のマッピングに失敗")
+			return nil, nil, err
+		}
+		topOpinions = append(topOpinions, swipeOpinion)
+		topOpinionIDs = append(topOpinionIDs, row.Opinion.OpinionID)
+	}
+
+	return topOpinions, topOpinionIDs, nil
+}
+
+// ランダム意見を取得する
+func (g *GetSwipeOpinionsQueryHandler) fetchRandomOpinions(
+	ctx context.Context,
+	userID uuid.UUID,
+	talkSessionID uuid.UUID,
+	limit int,
+	excludeOpinionIDs []uuid.UUID,
+) ([]dto.SwipeOpinion, error) {
+	randomRows, err := g.GetQueries(ctx).GetRandomOpinions(ctx, model.GetRandomOpinionsParams{
+		UserID:            userID,
+		TalkSessionID:     talkSessionID,
+		Limit:             int32(limit),
+		ExcludeOpinionIds: excludeOpinionIDs,
+		ExcludesLen:       int32(len(excludeOpinionIDs)),
+	})
+	if err != nil {
+		utils.HandleError(ctx, err, "ランダム意見の取得に失敗")
+		return nil, err
+	}
+
+	randomOpinions := make([]dto.SwipeOpinion, 0, len(randomRows))
+
+	for _, row := range randomRows {
+		swipeOpinion, err := convertToSwipeOpinion(row)
+		if err != nil {
+			utils.HandleError(ctx, err, "ランダム意見のマッピングに失敗")
+			return nil, err
+		}
+		randomOpinions = append(randomOpinions, swipeOpinion)
+	}
+
+	return randomOpinions, nil
 }
