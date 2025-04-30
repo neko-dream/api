@@ -338,7 +338,7 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 		}
 	}
 	var dateOfBirth *int
-	if !value.DateOfBirth.Null && value.DateOfBirth.Value != 0 {
+	if !value.DateOfBirth.IsNull() && value.DateOfBirth.IsSet() {
 		dateOfBirth = &value.DateOfBirth.Value
 	}
 	var city *string
