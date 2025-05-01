@@ -42,6 +42,34 @@ func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) er
 	return err
 }
 
+const deactivateSessions = `-- name: DeactivateSessions :exec
+UPDATE sessions
+SET session_status = 1, last_activity_at = NOW()
+WHERE session_id IN (
+    SELECT
+        session_id
+    FROM sessions
+    WHERE sessions.user_id = $1
+    AND session_status = 0
+)
+`
+
+// DeactivateSessions
+//
+//	UPDATE sessions
+//	SET session_status = 1, last_activity_at = NOW()
+//	WHERE session_id IN (
+//	    SELECT
+//	        session_id
+//	    FROM sessions
+//	    WHERE sessions.user_id = $1
+//	    AND session_status = 0
+//	)
+func (q *Queries) DeactivateSessions(ctx context.Context, userID uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deactivateSessions, userID)
+	return err
+}
+
 const findActiveSessionsByUserID = `-- name: FindActiveSessionsByUserID :many
 SELECT session_id, user_id, provider, session_status, expires_at, created_at, last_activity_at
 FROM sessions

@@ -1100,14 +1100,14 @@ func (s *Server) decodeEditUserProfileRequest(r *http.Request) (
 				}
 				if err := q.HasParam(cfg); err == nil {
 					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-						var optFormDotDateOfBirthVal int
+						var optFormDotDateOfBirthVal string
 						if err := func() error {
 							val, err := d.DecodeValue()
 							if err != nil {
 								return err
 							}
 
-							c, err := conv.ToInt(val)
+							c, err := conv.ToString(val)
 							if err != nil {
 								return err
 							}
@@ -2904,14 +2904,14 @@ func (s *Server) decodeRegisterUserRequest(r *http.Request) (
 				}
 				if err := q.HasParam(cfg); err == nil {
 					if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-						var optFormDotDateOfBirthVal int
+						var optFormDotDateOfBirthVal string
 						if err := func() error {
 							val, err := d.DecodeValue()
 							if err != nil {
 								return err
 							}
 
-							c, err := conv.ToInt(val)
+							c, err := conv.ToString(val)
 							if err != nil {
 								return err
 							}

@@ -3852,11 +3852,9 @@
                     "example": ""
                   },
                   "dateOfBirth": {
-                    "type": "integer",
-                    "default": 0,
+                    "type": "string",
                     "description": "生年月日",
-                    "example": 0,
-                    "nullable": true
+                    "example": ""
                   },
                   "gender": {
                     "type": "string",
@@ -4041,10 +4039,9 @@
                     "nullable": true
                   },
                   "dateOfBirth": {
-                    "type": "integer",
+                    "type": "string",
                     "description": "生年月日",
-                    "example": 0,
-                    "nullable": true
+                    "example": ""
                   },
                   "gender": {
                     "type": "string",

@@ -9,6 +9,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
@@ -49,24 +50,22 @@ func (s *sessionService) RefreshSession(
 	// sessionを取得
 	sessList, err := s.sessionRepository.FindByUserID(ctx, userID)
 	if err != nil {
+		utils.HandleError(ctx, err, "sessionRepository.FindByUserID")
 		return nil, errtrace.Wrap(err)
 	}
 	if len(sessList) == 0 {
 		return nil, errtrace.Wrap(FailedToDeactivateSessionStatus)
 	}
 
-	sessList = session.SortByLastActivity(sessList)
+	sessList = session.FilterActiveSessions(ctx, session.SortByLastActivity(sessList))
 	for _, sess := range sessList {
-		// sessionが有効期限内であることを確認
-		if !sess.IsActive(ctx) {
-			return nil, errtrace.Wrap(SessionIsExpired)
-		}
-
 		// 最終アクティビティを更新
 		sess.Deactivate(ctx)
-		if _, err := s.sessionRepository.Update(ctx, sess); err != nil {
-			return nil, errtrace.Wrap(err)
-		}
+		sess.UpdateLastActivity(ctx)
+	}
+	if err := s.sessionRepository.DeactivateAllByUserID(ctx, userID); err != nil {
+		utils.HandleError(ctx, err, "sessionRepository.Update")
+		return nil, errtrace.Wrap(err)
 	}
 
 	// sessionを更新
@@ -80,6 +79,7 @@ func (s *sessionService) RefreshSession(
 	)
 	updatedSess, err := s.sessionRepository.Create(ctx, *newSess)
 	if err != nil {
+		utils.HandleError(ctx, err, "sessionRepository.Create")
 		return nil, errtrace.Wrap(SessionRefreshFailed)
 	}
 
