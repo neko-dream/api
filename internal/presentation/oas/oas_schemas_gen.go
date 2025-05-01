@@ -1162,7 +1162,7 @@ type EditUserProfileReq struct {
 	DateOfBirth OptNilInt `json:"dateOfBirth"`
 	// 性別.
 	Gender OptNilEditUserProfileReqGender `json:"gender"`
-	// 市区町村.
+	// 市町村.
 	City OptNilString `json:"city"`
 	// 都道府県.
 	Prefecture OptNilString `json:"prefecture"`
@@ -4588,7 +4588,7 @@ type GetUserInfoOKDemographics struct {
 	DateOfBirth OptNilInt `json:"dateOfBirth"`
 	// 性別.
 	Gender OptNilString `json:"gender"`
-	// 市区町村.
+	// 市町村.
 	City OptNilString `json:"city"`
 	// 都道府県.
 	Prefecture OptNilString `json:"prefecture"`

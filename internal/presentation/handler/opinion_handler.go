@@ -141,8 +141,8 @@ func (o *opinionHandler) GetOpinionDetail2(ctx context.Context, params oas.GetOp
 	}
 
 	return &oas.GetOpinionDetail2OK{
-		User:    *user,
-		Opinion: *op,
+		User:       *user,
+		Opinion:    *op,
 		MyVoteType: myVoteType,
 	}, nil
 }
