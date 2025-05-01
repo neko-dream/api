@@ -251,6 +251,7 @@ type CreateTalkSessionOK struct {
 	ThumbnailURL OptNilString `json:"thumbnailURL"`
 	// セッションの参加制限.
 	Restrictions []CreateTalkSessionOKRestrictionsItem `json:"restrictions"`
+	HideReport   bool                                  `json:"hideReport"`
 }
 
 // GetID returns the value of ID.
@@ -308,6 +309,11 @@ func (s *CreateTalkSessionOK) GetRestrictions() []CreateTalkSessionOKRestriction
 	return s.Restrictions
 }
 
+// GetHideReport returns the value of HideReport.
+func (s *CreateTalkSessionOK) GetHideReport() bool {
+	return s.HideReport
+}
+
 // SetID sets the value of ID.
 func (s *CreateTalkSessionOK) SetID(val string) {
 	s.ID = val
@@ -361,6 +367,11 @@ func (s *CreateTalkSessionOK) SetThumbnailURL(val OptNilString) {
 // SetRestrictions sets the value of Restrictions.
 func (s *CreateTalkSessionOK) SetRestrictions(val []CreateTalkSessionOKRestrictionsItem) {
 	s.Restrictions = val
+}
+
+// SetHideReport sets the value of HideReport.
+func (s *CreateTalkSessionOK) SetHideReport(val bool) {
+	s.HideReport = val
 }
 
 func (*CreateTalkSessionOK) createTalkSessionRes() {}
@@ -655,6 +666,7 @@ type EditTalkSessionOK struct {
 	ThumbnailURL OptNilString `json:"thumbnailURL"`
 	// セッションの参加制限.
 	Restrictions []EditTalkSessionOKRestrictionsItem `json:"restrictions"`
+	HideReport   bool                                `json:"hideReport"`
 }
 
 // GetID returns the value of ID.
@@ -712,6 +724,11 @@ func (s *EditTalkSessionOK) GetRestrictions() []EditTalkSessionOKRestrictionsIte
 	return s.Restrictions
 }
 
+// GetHideReport returns the value of HideReport.
+func (s *EditTalkSessionOK) GetHideReport() bool {
+	return s.HideReport
+}
+
 // SetID sets the value of ID.
 func (s *EditTalkSessionOK) SetID(val string) {
 	s.ID = val
@@ -765,6 +782,11 @@ func (s *EditTalkSessionOK) SetThumbnailURL(val OptNilString) {
 // SetRestrictions sets the value of Restrictions.
 func (s *EditTalkSessionOK) SetRestrictions(val []EditTalkSessionOKRestrictionsItem) {
 	s.Restrictions = val
+}
+
+// SetHideReport sets the value of HideReport.
+func (s *EditTalkSessionOK) SetHideReport(val bool) {
+	s.HideReport = val
 }
 
 func (*EditTalkSessionOK) editTalkSessionRes() {}
@@ -1452,6 +1474,7 @@ type GetOpenedTalkSessionOKTalkSessionsItemTalkSession struct {
 	ThumbnailURL OptNilString `json:"thumbnailURL"`
 	// セッションの参加制限.
 	Restrictions []GetOpenedTalkSessionOKTalkSessionsItemTalkSessionRestrictionsItem `json:"restrictions"`
+	HideReport   bool                                                                `json:"hideReport"`
 }
 
 // GetID returns the value of ID.
@@ -1509,6 +1532,11 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) GetRestrictions() []
 	return s.Restrictions
 }
 
+// GetHideReport returns the value of HideReport.
+func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) GetHideReport() bool {
+	return s.HideReport
+}
+
 // SetID sets the value of ID.
 func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) SetID(val string) {
 	s.ID = val
@@ -1562,6 +1590,11 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) SetThumbnailURL(val 
 // SetRestrictions sets the value of Restrictions.
 func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) SetRestrictions(val []GetOpenedTalkSessionOKTalkSessionsItemTalkSessionRestrictionsItem) {
 	s.Restrictions = val
+}
+
+// SetHideReport sets the value of HideReport.
+func (s *GetOpenedTalkSessionOKTalkSessionsItemTalkSession) SetHideReport(val bool) {
+	s.HideReport = val
 }
 
 // 位置情報.
@@ -3613,6 +3646,7 @@ type GetTalkSessionDetailOK struct {
 	ThumbnailURL OptNilString `json:"thumbnailURL"`
 	// セッションの参加制限.
 	Restrictions []GetTalkSessionDetailOKRestrictionsItem `json:"restrictions"`
+	HideReport   bool                                     `json:"hideReport"`
 }
 
 // GetID returns the value of ID.
@@ -3670,6 +3704,11 @@ func (s *GetTalkSessionDetailOK) GetRestrictions() []GetTalkSessionDetailOKRestr
 	return s.Restrictions
 }
 
+// GetHideReport returns the value of HideReport.
+func (s *GetTalkSessionDetailOK) GetHideReport() bool {
+	return s.HideReport
+}
+
 // SetID sets the value of ID.
 func (s *GetTalkSessionDetailOK) SetID(val string) {
 	s.ID = val
@@ -3723,6 +3762,11 @@ func (s *GetTalkSessionDetailOK) SetThumbnailURL(val OptNilString) {
 // SetRestrictions sets the value of Restrictions.
 func (s *GetTalkSessionDetailOK) SetRestrictions(val []GetTalkSessionDetailOKRestrictionsItem) {
 	s.Restrictions = val
+}
+
+// SetHideReport sets the value of HideReport.
+func (s *GetTalkSessionDetailOK) SetHideReport(val bool) {
+	s.HideReport = val
 }
 
 func (*GetTalkSessionDetailOK) getTalkSessionDetailRes() {}
@@ -3982,6 +4026,7 @@ type GetTalkSessionListOKTalkSessionsItemTalkSession struct {
 	ThumbnailURL OptNilString `json:"thumbnailURL"`
 	// セッションの参加制限.
 	Restrictions []GetTalkSessionListOKTalkSessionsItemTalkSessionRestrictionsItem `json:"restrictions"`
+	HideReport   bool                                                              `json:"hideReport"`
 }
 
 // GetID returns the value of ID.
@@ -4039,6 +4084,11 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetRestrictions() []Ge
 	return s.Restrictions
 }
 
+// GetHideReport returns the value of HideReport.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) GetHideReport() bool {
+	return s.HideReport
+}
+
 // SetID sets the value of ID.
 func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetID(val string) {
 	s.ID = val
@@ -4092,6 +4142,11 @@ func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetThumbnailURL(val Op
 // SetRestrictions sets the value of Restrictions.
 func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetRestrictions(val []GetTalkSessionListOKTalkSessionsItemTalkSessionRestrictionsItem) {
 	s.Restrictions = val
+}
+
+// SetHideReport sets the value of HideReport.
+func (s *GetTalkSessionListOKTalkSessionsItemTalkSession) SetHideReport(val bool) {
+	s.HideReport = val
 }
 
 // 位置情報.
@@ -9550,6 +9605,52 @@ func (o OptTalkSessionAnalysisOKMyPosition) Or(d TalkSessionAnalysisOKMyPosition
 	return d
 }
 
+// NewOptTalkSessionHideToggleReq returns new OptTalkSessionHideToggleReq with value set to v.
+func NewOptTalkSessionHideToggleReq(v TalkSessionHideToggleReq) OptTalkSessionHideToggleReq {
+	return OptTalkSessionHideToggleReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptTalkSessionHideToggleReq is optional TalkSessionHideToggleReq.
+type OptTalkSessionHideToggleReq struct {
+	Value TalkSessionHideToggleReq
+	Set   bool
+}
+
+// IsSet returns true if OptTalkSessionHideToggleReq was set.
+func (o OptTalkSessionHideToggleReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptTalkSessionHideToggleReq) Reset() {
+	var v TalkSessionHideToggleReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptTalkSessionHideToggleReq) SetTo(v TalkSessionHideToggleReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptTalkSessionHideToggleReq) Get() (v TalkSessionHideToggleReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptTalkSessionHideToggleReq) Or(d TalkSessionHideToggleReq) TalkSessionHideToggleReq {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptURI returns new OptURI with value set to v.
 func NewOptURI(v url.URL) OptURI {
 	return OptURI{
@@ -10757,6 +10858,7 @@ type SessionsHistoryOKTalkSessionsItemTalkSession struct {
 	ThumbnailURL OptNilString `json:"thumbnailURL"`
 	// セッションの参加制限.
 	Restrictions []SessionsHistoryOKTalkSessionsItemTalkSessionRestrictionsItem `json:"restrictions"`
+	HideReport   bool                                                           `json:"hideReport"`
 }
 
 // GetID returns the value of ID.
@@ -10814,6 +10916,11 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) GetRestrictions() []Sessi
 	return s.Restrictions
 }
 
+// GetHideReport returns the value of HideReport.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSession) GetHideReport() bool {
+	return s.HideReport
+}
+
 // SetID sets the value of ID.
 func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetID(val string) {
 	s.ID = val
@@ -10867,6 +10974,11 @@ func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetThumbnailURL(val OptNi
 // SetRestrictions sets the value of Restrictions.
 func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetRestrictions(val []SessionsHistoryOKTalkSessionsItemTalkSessionRestrictionsItem) {
 	s.Restrictions = val
+}
+
+// SetHideReport sets the value of HideReport.
+func (s *SessionsHistoryOKTalkSessionsItemTalkSession) SetHideReport(val bool) {
+	s.HideReport = val
 }
 
 // 位置情報.
@@ -11942,6 +12054,60 @@ func (s *TalkSessionAnalysisOKPositionsItem) SetGroupID(val int) {
 // SetPerimeterIndex sets the value of PerimeterIndex.
 func (s *TalkSessionAnalysisOKPositionsItem) SetPerimeterIndex(val OptInt) {
 	s.PerimeterIndex = val
+}
+
+type TalkSessionHideToggleOK struct {
+	// ステータス.
+	Status OptString `json:"status"`
+	// 非表示にしたかどうか.
+	Hide OptBool `json:"hide"`
+}
+
+// GetStatus returns the value of Status.
+func (s *TalkSessionHideToggleOK) GetStatus() OptString {
+	return s.Status
+}
+
+// GetHide returns the value of Hide.
+func (s *TalkSessionHideToggleOK) GetHide() OptBool {
+	return s.Hide
+}
+
+// SetStatus sets the value of Status.
+func (s *TalkSessionHideToggleOK) SetStatus(val OptString) {
+	s.Status = val
+}
+
+// SetHide sets the value of Hide.
+func (s *TalkSessionHideToggleOK) SetHide(val OptBool) {
+	s.Hide = val
+}
+
+type TalkSessionHideToggleReq struct {
+	// 非表示にするかどうか.
+	Hide bool `json:"hide"`
+	// トグルするTalkSessionID.
+	TalkSessionID string `json:"talkSessionID"`
+}
+
+// GetHide returns the value of Hide.
+func (s *TalkSessionHideToggleReq) GetHide() bool {
+	return s.Hide
+}
+
+// GetTalkSessionID returns the value of TalkSessionID.
+func (s *TalkSessionHideToggleReq) GetTalkSessionID() string {
+	return s.TalkSessionID
+}
+
+// SetHide sets the value of Hide.
+func (s *TalkSessionHideToggleReq) SetHide(val bool) {
+	s.Hide = val
+}
+
+// SetTalkSessionID sets the value of TalkSessionID.
+func (s *TalkSessionHideToggleReq) SetTalkSessionID(val string) {
+	s.TalkSessionID = val
 }
 
 type TestBadRequest struct{}

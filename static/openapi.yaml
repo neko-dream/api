@@ -1501,6 +1501,8 @@ paths:
                         - key
                         - description
                     description: セッションの参加制限
+                  hideReport:
+                    type: boolean
                 required:
                   - id
                   - theme
@@ -1508,6 +1510,7 @@ paths:
                   - createdAt
                   - scheduledEndTime
                   - restrictions
+                  - hideReport
           headers: {}
         '400':
           description: ''
@@ -1668,6 +1671,8 @@ paths:
                         - key
                         - description
                     description: セッションの参加制限
+                  hideReport:
+                    type: boolean
                 required:
                   - id
                   - theme
@@ -1675,6 +1680,7 @@ paths:
                   - createdAt
                   - scheduledEndTime
                   - restrictions
+                  - hideReport
           headers: {}
         '400':
           description: ''
@@ -1862,6 +1868,8 @@ paths:
                         - key
                         - description
                     description: セッションの参加制限
+                  hideReport:
+                    type: boolean
                 required:
                   - id
                   - theme
@@ -1869,6 +1877,7 @@ paths:
                   - createdAt
                   - scheduledEndTime
                   - restrictions
+                  - hideReport
           headers: {}
         '400':
           description: ''
@@ -2053,6 +2062,8 @@ paths:
                                   - key
                                   - description
                               description: セッションの参加制限
+                            hideReport:
+                              type: boolean
                           required:
                             - id
                             - theme
@@ -2060,6 +2071,7 @@ paths:
                             - createdAt
                             - scheduledEndTime
                             - restrictions
+                            - hideReport
                         opinionCount:
                           type: integer
                       required:
@@ -4289,6 +4301,8 @@ paths:
                                   - key
                                   - description
                               description: セッションの参加制限
+                            hideReport:
+                              type: boolean
                           required:
                             - id
                             - theme
@@ -4296,6 +4310,7 @@ paths:
                             - createdAt
                             - scheduledEndTime
                             - restrictions
+                            - hideReport
                         opinionCount:
                           type: integer
                       required:
@@ -4468,6 +4483,8 @@ paths:
                                   - key
                                   - description
                               description: セッションの参加制限
+                            hideReport:
+                              type: boolean
                           required:
                             - id
                             - theme
@@ -4475,6 +4492,7 @@ paths:
                             - createdAt
                             - scheduledEndTime
                             - restrictions
+                            - hideReport
                         opinionCount:
                           type: integer
                       required:
@@ -5825,6 +5843,47 @@ paths:
                     description: メッセージ
                     example: Analysisを再生成しました
       x-ogen-operation-group: Manage
+  /manage/hideTalkSession:
+    post:
+      tags:
+        - manage
+      summary: reportの表示をトグルする
+      operationId: talkSessionHideToggle
+      security:
+        - SessionId: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                hide:
+                  type: boolean
+                  description: 非表示にするかどうか
+                  example: 'true'
+                talkSessionID:
+                  type: string
+                  description: トグルするTalkSessionID
+              required:
+                - hide
+                - talkSessionID
+      responses:
+        '200':
+          description: Analysisを再生成する
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: ステータス
+                    example: ok
+                  hide:
+                    type: boolean
+                    description: 非表示にしたかどうか
+                    example: 'true'
+      x-ogen-operation-group: Manage
 components:
   schemas:
     talkSession:
@@ -5900,6 +5959,8 @@ components:
               - key
               - description
           description: セッションの参加制限
+        hideReport:
+          type: boolean
       required:
         - id
         - theme
@@ -5907,6 +5968,7 @@ components:
         - createdAt
         - scheduledEndTime
         - restrictions
+        - hideReport
     validationErrorItem:
       type: object
       properties:
