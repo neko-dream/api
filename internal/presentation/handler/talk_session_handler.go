@@ -359,6 +359,7 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 		ScheduledEndTime: out.TalkSession.ScheduledEndTime.Format(time.RFC3339),
 		Location:         location,
 		Restrictions:     restrictions,
+		HideReport:       out.TalkSession.HideReport,
 	}
 	return res, nil
 }
@@ -417,6 +418,7 @@ func (t *talkSessionHandler) GetTalkSessionDetail(ctx context.Context, params oa
 		City:             utils.ToOptNil[oas.OptNilString](out.City),
 		Prefecture:       utils.ToOptNil[oas.OptNilString](out.Prefecture),
 		Restrictions:     restrictions,
+		HideReport:       out.TalkSession.HideReport,
 	}, nil
 }
 
@@ -508,6 +510,7 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 				City:             utils.ToOptNil[oas.OptNilString](talkSession.City),
 				Prefecture:       utils.ToOptNil[oas.OptNilString](talkSession.Prefecture),
 				Restrictions:     restrictions,
+				HideReport:       talkSession.HideReport,
 			},
 			OpinionCount: talkSession.OpinionCount,
 		}
@@ -703,6 +706,7 @@ func (t *talkSessionHandler) EditTalkSession(ctx context.Context, req oas.OptEdi
 		City:             utils.ToOptNil[oas.OptNilString](out.City),
 		Prefecture:       utils.ToOptNil[oas.OptNilString](out.Prefecture),
 		Restrictions:     restrictions,
+		HideReport:       out.TalkSession.HideReport,
 	}
 	return res, nil
 }
