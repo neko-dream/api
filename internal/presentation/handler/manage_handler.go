@@ -127,7 +127,7 @@ func (m *manageHandler) ManageIndex(ctx context.Context) (oas.ManageIndexOK, err
 		res := map[string]any{
 			"ID":           row.TalkSession.TalkSessionID,
 			"Theme":        row.TalkSession.Theme,
-			"HideReport":   row.TalkSession.HideReport,
+			"HideReport":   row.TalkSession.HideReport.Bool,
 			"CreatedAt":    row.TalkSession.CreatedAt.Format(time.RFC3339),
 			"EndTime":      row.TalkSession.ScheduledEndTime.Format(time.RFC3339),
 			"OpinionCount": row.OpinionCount,
