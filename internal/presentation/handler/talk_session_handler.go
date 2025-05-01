@@ -274,8 +274,16 @@ func (t *talkSessionHandler) GetTalkSessionReport(ctx context.Context, params oa
 		return nil, err
 	}
 
+	var report oas.OptNilString
+	if out.Report != nil {
+		report = oas.OptNilString{
+			Value: bytes.NewBufferString(*out.Report).String(),
+			Set:   true,
+		}
+	}
+
 	return &oas.GetTalkSessionReportOK{
-		Report: bytes.NewBufferString(out.Report).String(),
+		Report: report,
 	}, nil
 }
 

@@ -17,6 +17,6 @@ type (
 	}
 
 	GetReportOutput struct {
-		Report string
+		Report *string
 	}
 )
