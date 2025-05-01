@@ -46,6 +46,7 @@ type (
 	SessionRepository interface {
 		Create(context.Context, Session) (*Session, error)
 		Update(context.Context, Session) (*Session, error)
+		DeactivateAllByUserID(context.Context, shared.UUID[user.User]) error
 		FindBySessionID(context.Context, shared.UUID[Session]) (*Session, error)
 		FindByUserID(context.Context, shared.UUID[user.User]) ([]Session, error)
 	}
@@ -102,7 +103,6 @@ func (s *Session) Status() status {
 func (s *Session) IsActive(ctx context.Context) bool {
 	ctx, span := otel.Tracer("session").Start(ctx, "Session.IsActive")
 	defer span.End()
-
 	return s.expires.After(clock.Now(ctx)) && s.status == SESSION_ACTIVE
 }
 
@@ -143,4 +143,19 @@ func SortByLastActivity(sessions []Session) []Session {
 	}
 
 	return sessions
+}
+
+func FilterActiveSessions(ctx context.Context, sessions []Session) []Session {
+	ctx, span := otel.Tracer("session").Start(ctx, "FilterActiveSessions")
+	defer span.End()
+
+	_ = ctx
+
+	activeSessions := make([]Session, 0)
+	for _, sess := range sessions {
+		if sess.IsActive(context.Background()) {
+			activeSessions = append(activeSessions, sess)
+		}
+	}
+	return activeSessions
 }

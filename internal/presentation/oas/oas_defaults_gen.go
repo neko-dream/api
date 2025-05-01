@@ -13,10 +13,6 @@ func (s *EditUserProfileReq) setDefaults() {
 // setDefaults set default value of fields.
 func (s *RegisterUserReq) setDefaults() {
 	{
-		val := int(0)
-		s.DateOfBirth.SetTo(val)
-	}
-	{
 		val := RegisterUserReqGender("preferNotToSay")
 		s.Gender.SetTo(val)
 	}

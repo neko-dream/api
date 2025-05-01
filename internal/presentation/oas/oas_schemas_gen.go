@@ -1181,7 +1181,7 @@ type EditUserProfileReq struct {
 	Icon       OptMultipartFile `json:"icon"`
 	DeleteIcon OptNilBool       `json:"deleteIcon"`
 	// 生年月日.
-	DateOfBirth OptNilInt `json:"dateOfBirth"`
+	DateOfBirth OptString `json:"dateOfBirth"`
 	// 性別.
 	Gender OptNilEditUserProfileReqGender `json:"gender"`
 	// 市町村.
@@ -1208,7 +1208,7 @@ func (s *EditUserProfileReq) GetDeleteIcon() OptNilBool {
 }
 
 // GetDateOfBirth returns the value of DateOfBirth.
-func (s *EditUserProfileReq) GetDateOfBirth() OptNilInt {
+func (s *EditUserProfileReq) GetDateOfBirth() OptString {
 	return s.DateOfBirth
 }
 
@@ -1248,7 +1248,7 @@ func (s *EditUserProfileReq) SetDeleteIcon(val OptNilBool) {
 }
 
 // SetDateOfBirth sets the value of DateOfBirth.
-func (s *EditUserProfileReq) SetDateOfBirth(val OptNilInt) {
+func (s *EditUserProfileReq) SetDateOfBirth(val OptString) {
 	s.DateOfBirth = val
 }
 
@@ -10540,7 +10540,7 @@ type RegisterUserReq struct {
 	// ユーザーアイコン.
 	Icon OptMultipartFile `json:"icon"`
 	// 生年月日.
-	DateOfBirth OptNilInt `json:"dateOfBirth"`
+	DateOfBirth OptString `json:"dateOfBirth"`
 	// 性別.
 	Gender OptNilRegisterUserReqGender `json:"gender"`
 	// 都道府県.
@@ -10567,7 +10567,7 @@ func (s *RegisterUserReq) GetIcon() OptMultipartFile {
 }
 
 // GetDateOfBirth returns the value of DateOfBirth.
-func (s *RegisterUserReq) GetDateOfBirth() OptNilInt {
+func (s *RegisterUserReq) GetDateOfBirth() OptString {
 	return s.DateOfBirth
 }
 
@@ -10607,7 +10607,7 @@ func (s *RegisterUserReq) SetIcon(val OptMultipartFile) {
 }
 
 // SetDateOfBirth sets the value of DateOfBirth.
-func (s *RegisterUserReq) SetDateOfBirth(val OptNilInt) {
+func (s *RegisterUserReq) SetDateOfBirth(val OptString) {
 	s.DateOfBirth = val
 }
 

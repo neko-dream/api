@@ -60,6 +60,8 @@ func NewUserDemographic(
 	ctx, span := otel.Tracer("user").Start(ctx, "NewUserDemographic")
 	defer span.End()
 
+	_ = ctx
+
 	var (
 		dateOfBirthOut *DateOfBirth
 		genderOut      *Gender
