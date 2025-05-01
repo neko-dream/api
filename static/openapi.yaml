@@ -2673,8 +2673,7 @@ paths:
                 properties:
                   report:
                     type: string
-                required:
-                  - report
+                    nullable: true
           headers: {}
         '500':
           description: ''

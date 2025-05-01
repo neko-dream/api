@@ -4357,16 +4357,16 @@ type GetTalkSessionReportInternalServerError struct{}
 func (*GetTalkSessionReportInternalServerError) getTalkSessionReportRes() {}
 
 type GetTalkSessionReportOK struct {
-	Report string `json:"report"`
+	Report OptNilString `json:"report"`
 }
 
 // GetReport returns the value of Report.
-func (s *GetTalkSessionReportOK) GetReport() string {
+func (s *GetTalkSessionReportOK) GetReport() OptNilString {
 	return s.Report
 }
 
 // SetReport sets the value of Report.
-func (s *GetTalkSessionReportOK) SetReport(val string) {
+func (s *GetTalkSessionReportOK) SetReport(val OptNilString) {
 	s.Report = val
 }
 
