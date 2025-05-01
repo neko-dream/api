@@ -74,6 +74,10 @@ func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talkses
 		Prefecture:       prefecture,
 		City:             city,
 		Restrictions:     talksession.Restrictions(restrictions),
+		HideReport: sql.NullBool{
+			Bool:  talkSession.HideReport(),
+			Valid: true,
+		},
 	}); err != nil {
 		return errtrace.Wrap(err)
 	}
@@ -130,7 +134,7 @@ func (t *talkSessionRepository) Update(ctx context.Context, talkSession *talkses
 		}
 	}
 
-	if err := t.GetQueries(ctx).EditTalkSession(ctx, model.EditTalkSessionParams{
+	if err := t.DBManager.GetQueries(ctx).EditTalkSession(ctx, model.EditTalkSessionParams{
 		TalkSessionID:    talkSession.TalkSessionID().UUID(),
 		Theme:            talkSession.Theme(),
 		ScheduledEndTime: talkSession.ScheduledEndTime(),
@@ -139,12 +143,16 @@ func (t *talkSessionRepository) Update(ctx context.Context, talkSession *talkses
 		City:             city,
 		Prefecture:       preference,
 		Restrictions:     talksession.Restrictions(restrictions),
+		HideReport: sql.NullBool{
+			Bool:  talkSession.HideReport(),
+			Valid: true,
+		},
 	}); err != nil {
 		return errtrace.Wrap(err)
 	}
 
 	if talkSession.Location() != nil {
-		if err := t.GetQueries(ctx).UpdateTalkSessionLocation(ctx, model.UpdateTalkSessionLocationParams{
+		if err := t.DBManager.GetQueries(ctx).UpdateTalkSessionLocation(ctx, model.UpdateTalkSessionLocationParams{
 			TalkSessionID:       talkSession.TalkSessionID().UUID(),
 			StGeographyfromtext: talkSession.Location().ToGeographyText(),
 		}); err != nil {
@@ -160,7 +168,7 @@ func (t *talkSessionRepository) FindByID(ctx context.Context, talkSessionID shar
 	ctx, span := otel.Tracer("repository").Start(ctx, "talkSessionRepository.FindByID")
 	defer span.End()
 
-	row, err := t.GetQueries(ctx).GetTalkSessionByID(ctx, talkSessionID.UUID())
+	row, err := t.DBManager.GetQueries(ctx).GetTalkSessionByID(ctx, talkSessionID.UUID())
 	if err != nil {
 		return nil, errtrace.Wrap(err)
 	}

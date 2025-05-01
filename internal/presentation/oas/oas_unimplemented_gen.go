@@ -540,6 +540,15 @@ func (UnimplementedHandler) TalkSessionAnalysis(ctx context.Context, params Talk
 	return r, ht.ErrNotImplemented
 }
 
+// TalkSessionHideToggle implements talkSessionHideToggle operation.
+//
+// Reportの表示をトグルする.
+//
+// POST /manage/hideTalkSession
+func (UnimplementedHandler) TalkSessionHideToggle(ctx context.Context, req OptTalkSessionHideToggleReq) (r *TalkSessionHideToggleOK, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // Test implements test operation.
 //
 // OpenAPIテスト用.

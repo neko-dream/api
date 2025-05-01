@@ -120,6 +120,12 @@ type ManageHandler interface {
 	//
 	// POST /manage/regenerate
 	ManageRegenerate(ctx context.Context, req OptManageRegenerateReq) (*ManageRegenerateOK, error)
+	// TalkSessionHideToggle implements talkSessionHideToggle operation.
+	//
+	// Reportの表示をトグルする.
+	//
+	// POST /manage/hideTalkSession
+	TalkSessionHideToggle(ctx context.Context, req OptTalkSessionHideToggleReq) (*TalkSessionHideToggleOK, error)
 }
 
 // OpinionHandler handles operations described by OpenAPI v3 specification.

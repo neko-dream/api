@@ -31,6 +31,7 @@ type (
 		city             *string
 		prefecture       *string
 		restrictions     []*RestrictionAttribute // 参加制限
+		hideReport       bool
 	}
 )
 
@@ -57,6 +58,7 @@ func NewTalkSession(
 		location:         location,
 		city:             city,
 		prefecture:       prefecture,
+		hideReport:       false,
 	}
 }
 
@@ -170,4 +172,12 @@ func (t *TalkSession) UpdateRestrictions(ctx context.Context, restrictions []str
 
 	t.restrictions = attrs
 	return nil
+}
+
+func (t *TalkSession) HideReport() bool {
+	return t.hideReport
+}
+
+func (t *TalkSession) SetReportVisibility(hideReport bool) {
+	t.hideReport = hideReport
 }

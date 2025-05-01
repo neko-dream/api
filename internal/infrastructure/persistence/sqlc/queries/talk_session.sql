@@ -1,11 +1,14 @@
 -- name: CreateTalkSession :exec
-INSERT INTO talk_sessions (talk_session_id, theme, description, thumbnail_url, owner_id, scheduled_end_time, created_at, city, prefecture, restrictions) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);
+INSERT INTO talk_sessions (talk_session_id, theme, description, thumbnail_url, owner_id, scheduled_end_time, created_at, city, prefecture, restrictions, hide_report) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);
 
 -- name: CreateTalkSessionLocation :exec
 INSERT INTO talk_session_locations (talk_session_id, location) VALUES ($1, ST_GeographyFromText($2));
 
 -- name: UpdateTalkSessionLocation :exec
 UPDATE talk_session_locations SET location = ST_GeographyFromText($2) WHERE talk_session_id = $1;
+
+-- name: UpdateTalkSessionHideReport :exec
+UPDATE talk_sessions SET hide_report = $2 WHERE talk_session_id = $1;
 
 -- name: EditTalkSession :exec
 UPDATE talk_sessions
@@ -16,6 +19,7 @@ UPDATE talk_sessions
         city = $6,
         prefecture = $7,
         restrictions = $8,
+        hide_report = $9,
         updated_at = NOW()
     WHERE talk_session_id = $1;
 

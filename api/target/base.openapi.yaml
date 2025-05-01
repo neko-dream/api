@@ -1,13 +1,15 @@
 openapi: 3.0.1
 info:
   title: neko-dream
-  description: ''
+  description: ""
   version: 1.0.0
 paths:
-  $ref: './apidog.openapi.yaml#/paths'
+  $ref: "./apidog.openapi.yaml#/paths"
   /manage:
-    $ref: './paths/manage/index.yaml'
+    $ref: "./paths/manage/index.yaml"
   /manage/regenerate:
-    $ref: './paths/manage/regenerate.yaml'
+    $ref: "./paths/manage/regenerate.yaml"
+  /manage/hideTalkSession:
+    $ref: "./paths/manage/hideTalkSession.yaml"
 components:
-  $ref: './apidog.openapi.yaml#/components'
+  $ref: "./apidog.openapi.yaml#/components"

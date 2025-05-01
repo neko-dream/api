@@ -1,27 +1,27 @@
 openapi: 3.0.1
 info:
   title: neko-dream
-  description: ""
+  description: ''
   version: 1.0.0
 paths:
   /opinions/{opinionID}:
     get:
       summary: 意見詳細
       deprecated: false
-      description: ""
+      description: ''
       operationId: getOpinionDetail2
       tags:
         - opinion
       parameters:
         - name: opinionID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -97,15 +97,15 @@ paths:
                   - opinion
                   - user
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -117,7 +117,7 @@ paths:
     get:
       summary: 意見に対するリプライ意見一覧
       deprecated: false
-      description: ""
+      description: ''
       operationId: opinionComments2
       tags:
         - opinion
@@ -129,8 +129,8 @@ paths:
           schema:
             type: string
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -213,8 +213,8 @@ paths:
                 required:
                   - opinions
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
@@ -228,14 +228,14 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
@@ -249,7 +249,7 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -261,7 +261,7 @@ paths:
     post:
       summary: 意思表明API
       deprecated: false
-      description: ""
+      description: ''
       operationId: vote2
       tags:
         - vote
@@ -284,13 +284,13 @@ paths:
                     - agree
                     - disagree
                     - pass
-                  example: ""
+                  example: ''
                   nullable: true
               required:
                 - voteStatus
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -336,8 +336,8 @@ paths:
                     - postedAt
                     - isDeleted
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
@@ -351,14 +351,14 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
@@ -372,7 +372,7 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -402,48 +402,48 @@ paths:
               properties:
                 talkSessionID:
                   type: string
-                  example: ""
+                  example: ''
                   nullable: true
                 parentOpinionID:
                   type: string
                   description: これがある場合はリプライとみなす。これがない場合はTalkSessionIDが必須。
-                  example: ""
+                  example: ''
                   nullable: true
                 title:
                   type: string
-                  example: ""
+                  example: ''
                   nullable: true
                 opinionContent:
                   type: string
                   maxLength: 140
-                  example: ""
+                  example: ''
                 referenceURL:
                   type: string
                   format: url
-                  example: ""
+                  example: ''
                   nullable: true
                 picture:
                   type: string
                   format: binary
                   description: 参考画像。4MiBまで
-                  example: ""
+                  example: ''
                 isSeed:
                   type: boolean
                   description: シード意見かどうか
-                  example: ""
+                  example: ''
               required:
                 - opinionContent
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
@@ -457,14 +457,14 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
@@ -478,7 +478,7 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -491,14 +491,14 @@ paths:
     post:
       summary: 意見通報API
       deprecated: false
-      description: ""
+      description: ''
       operationId: reportOpinion
       tags:
         - opinion
       parameters:
         - name: opinionID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
@@ -514,40 +514,40 @@ paths:
                 content:
                   type: string
                   description: その他の場合のみ理由のテキスト
-                  example: ""
+                  example: ''
                   nullable: true
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -560,14 +560,14 @@ paths:
     get:
       summary: 意見への通報理由一覧
       deprecated: false
-      description: ""
+      description: ''
       operationId: getOpinionReportReasons
       tags:
         - opinion
       parameters: []
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -577,7 +577,7 @@ paths:
                   properties:
                     reasonID:
                       type: integer
-                      description: "1"
+                      description: '1'
                     reason:
                       type: string
                       description: 不適切な内容
@@ -585,29 +585,29 @@ paths:
                     - reasonID
                     - reason
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -619,20 +619,20 @@ paths:
     get:
       summary: 意見に投票したグループごとの割合
       deprecated: false
-      description: ""
+      description: ''
       operationId: getOpinionAnalysis
       tags:
         - opinion
       parameters:
         - name: opinionID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -657,29 +657,29 @@ paths:
                     - disagreeCount
                     - agreeCount
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -698,13 +698,13 @@ paths:
       parameters:
         - name: opinionID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -797,29 +797,29 @@ paths:
                   - reportCount
                   - status
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -832,14 +832,14 @@ paths:
     post:
       summary: 通報を解決
       deprecated: false
-      description: ""
+      description: ''
       operationId: solveOpinionReport
       tags:
         - opinion
       parameters:
         - name: opinionID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
@@ -854,41 +854,41 @@ paths:
                   enum:
                     - deleted
                     - hold
-                  example: ""
+                  example: ''
               required:
                 - action
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -901,7 +901,7 @@ paths:
     post:
       summary: 意思表明API
       deprecated: true
-      description: ""
+      description: ''
       operationId: vote
       tags:
         - vote
@@ -930,13 +930,13 @@ paths:
                     - agree
                     - disagree
                     - pass
-                  example: ""
+                  example: ''
                   nullable: true
               required:
                 - voteStatus
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -982,8 +982,8 @@ paths:
                     - postedAt
                     - isDeleted
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
@@ -997,14 +997,14 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
@@ -1018,7 +1018,7 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -1038,7 +1038,7 @@ paths:
       parameters:
         - name: talkSessionID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
@@ -1050,39 +1050,39 @@ paths:
               properties:
                 parentOpinionID:
                   type: string
-                  example: ""
+                  example: ''
                   nullable: true
                 title:
                   type: string
-                  example: ""
+                  example: ''
                   nullable: true
                 opinionContent:
                   type: string
                   maxLength: 140
-                  example: ""
+                  example: ''
                 referenceURL:
                   type: string
                   format: url
-                  example: ""
+                  example: ''
                   nullable: true
                 picture:
                   type: string
                   format: binary
                   description: 参考画像。4MiBまで
-                  example: ""
+                  example: ''
               required:
                 - opinionContent
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
@@ -1096,14 +1096,14 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
@@ -1117,7 +1117,7 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -1129,20 +1129,20 @@ paths:
     get:
       summary: セッションに対する意見一覧
       deprecated: false
-      description: ""
+      description: ''
       operationId: getOpinionsForTalkSession
       tags:
         - opinion
       parameters:
         - name: talkSessionID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
         - name: sort
           in: query
-          description: ""
+          description: ''
           required: false
           schema:
             type: string
@@ -1153,7 +1153,7 @@ paths:
             nullable: true
         - name: limit
           in: query
-          description: ""
+          description: ''
           required: false
           example: 10
           schema:
@@ -1161,7 +1161,7 @@ paths:
             nullable: true
         - name: offset
           in: query
-          description: ""
+          description: ''
           required: false
           example: 0
           schema:
@@ -1169,21 +1169,14 @@ paths:
             nullable: true
         - name: seed
           in: query
-          description: ""
-          required: false
-          schema:
-            type: boolean
-            nullable: true
-        - name: seed
-          in: query
-          description: ""
+          description: ''
           required: false
           schema:
             type: boolean
             nullable: true
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -1277,29 +1270,29 @@ paths:
                   - opinions
                   - pagination
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -1311,26 +1304,26 @@ paths:
     get:
       summary: 意見の詳細
       deprecated: true
-      description: ""
+      description: ''
       operationId: getOpinionDetail
       tags:
         - opinion
       parameters:
         - name: talkSessionID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
         - name: opinionID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -1399,15 +1392,15 @@ paths:
                   - opinion
                   - user
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -1419,20 +1412,20 @@ paths:
     get:
       summary: トークセッションの詳細
       deprecated: false
-      description: ""
+      description: ''
       operationId: getTalkSessionDetail
       tags:
         - talk_session
       parameters:
         - name: talkSessionID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -1508,6 +1501,8 @@ paths:
                         - key
                         - description
                     description: セッションの参加制限
+                  hideReport:
+                    type: boolean
                 required:
                   - id
                   - theme
@@ -1515,9 +1510,10 @@ paths:
                   - createdAt
                   - scheduledEndTime
                   - restrictions
+                  - hideReport
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
@@ -1531,7 +1527,7 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -1542,14 +1538,14 @@ paths:
     put:
       summary: セッション編集
       deprecated: false
-      description: ""
+      description: ''
       operationId: editTalkSession
       tags:
         - talk_session
       parameters:
         - name: talkSessionID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
@@ -1560,12 +1556,12 @@ paths:
               type: object
               properties:
                 theme:
-                  example: ""
+                  example: ''
                   type: string
                 scheduledEndTime:
                   type: string
                   format: date-time
-                  example: ""
+                  example: ''
                 latitude:
                   type: number
                   description: 緯度
@@ -1578,28 +1574,28 @@ paths:
                 prefecture:
                   type: string
                   description: 都道府県
-                  example: ""
+                  example: ''
                   nullable: true
                 city:
                   type: string
                   description: 市区町村
-                  example: ""
+                  example: ''
                   nullable: true
                 description:
                   type: string
                   description: 説明文
-                  example: ""
+                  example: ''
                   nullable: true
                 thumbnailURL:
                   description: サムネイルURL。文中から一番最初の画像URLをサムネとする。
-                  example: ""
+                  example: ''
                   type: string
               required:
                 - theme
                 - scheduledEndTime
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -1675,6 +1671,8 @@ paths:
                         - key
                         - description
                     description: セッションの参加制限
+                  hideReport:
+                    type: boolean
                 required:
                   - id
                   - theme
@@ -1682,30 +1680,31 @@ paths:
                   - createdAt
                   - scheduledEndTime
                   - restrictions
+                  - hideReport
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -1751,7 +1750,7 @@ paths:
                 scheduledEndTime:
                   type: string
                   format: date-time
-                  example: "2024-12-17T03:24:00Z"
+                  example: '2024-12-17T03:24:00Z'
                 latitude:
                   type: number
                   description: 緯度
@@ -1765,22 +1764,22 @@ paths:
                 city:
                   type: string
                   description: 市区町村
-                  example: ""
+                  example: ''
                   nullable: true
                 prefecture:
                   type: string
                   description: 都道府県
-                  example: ""
+                  example: ''
                   nullable: true
                 description:
                   type: string
                   description: 説明文
-                  example: ""
+                  example: ''
                   nullable: true
                 thumbnailURL:
                   type: string
                   description: サムネイルURL。文中から一番最初の画像URLをサムネとする。
-                  example: ""
+                  example: ''
                   nullable: true
                 restrictions:
                   type: array
@@ -1792,8 +1791,8 @@ paths:
                 - theme
                 - scheduledEndTime
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -1869,6 +1868,8 @@ paths:
                         - key
                         - description
                     description: セッションの参加制限
+                  hideReport:
+                    type: boolean
                 required:
                   - id
                   - theme
@@ -1876,9 +1877,10 @@ paths:
                   - createdAt
                   - scheduledEndTime
                   - restrictions
+                  - hideReport
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
@@ -1892,7 +1894,7 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -1904,7 +1906,7 @@ paths:
     get:
       summary: セッション一覧
       deprecated: false
-      description: ""
+      description: ''
       operationId: getTalkSessionList
       tags:
         - talk_session
@@ -1927,14 +1929,14 @@ paths:
             nullable: true
         - name: theme
           in: query
-          description: ""
+          description: ''
           required: false
           schema:
             type: string
             nullable: true
         - name: status
           in: query
-          description: ""
+          description: ''
           required: false
           schema:
             type: string
@@ -1945,7 +1947,7 @@ paths:
             nullable: true
         - name: sortKey
           in: query
-          description: ""
+          description: ''
           required: false
           schema:
             type: string
@@ -1956,27 +1958,27 @@ paths:
               - nearest
             x-apidog:
               enumDescriptions:
-                latest: ""
-                oldest: ""
-                mostReplies: ""
-                nearest: ""
+                latest: ''
+                oldest: ''
+                mostReplies: ''
+                nearest: ''
         - name: latitude
           in: query
-          description: ""
+          description: ''
           required: false
           schema:
             type: number
             nullable: true
         - name: longitude
           in: query
-          description: ""
+          description: ''
           required: false
           schema:
             type: number
             nullable: true
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -2060,6 +2062,8 @@ paths:
                                   - key
                                   - description
                               description: セッションの参加制限
+                            hideReport:
+                              type: boolean
                           required:
                             - id
                             - theme
@@ -2067,6 +2071,7 @@ paths:
                             - createdAt
                             - scheduledEndTime
                             - restrictions
+                            - hideReport
                         opinionCount:
                           type: integer
                       required:
@@ -2089,8 +2094,8 @@ paths:
                   - talkSessions
                   - pagination
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
@@ -2104,14 +2109,14 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
@@ -2125,7 +2130,7 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -2146,21 +2151,21 @@ paths:
       parameters:
         - name: talkSessionID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
         - name: limit
           in: query
-          description: ""
+          description: ''
           required: false
           schema:
             type: integer
             default: 10
             nullable: true
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -2242,8 +2247,8 @@ paths:
                   - opinions
                   - remainingCount
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
@@ -2257,14 +2262,14 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
@@ -2278,7 +2283,7 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -2291,14 +2296,14 @@ paths:
     get:
       summary: 意見に対するリプライ意見一覧
       deprecated: true
-      description: ""
+      description: ''
       operationId: opinionComments
       tags:
         - opinion
       parameters:
         - name: talkSessionID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
@@ -2309,8 +2314,8 @@ paths:
           schema:
             type: string
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -2393,8 +2398,8 @@ paths:
                 required:
                   - opinions
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
@@ -2408,14 +2413,14 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
@@ -2429,7 +2434,7 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -2441,20 +2446,20 @@ paths:
     get:
       summary: 分析結果一覧
       deprecated: false
-      description: ""
+      description: ''
       operationId: talkSessionAnalysis
       tags:
         - talk_session
       parameters:
         - name: talkSessionID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -2611,8 +2616,8 @@ paths:
                   - positions
                   - groupOpinions
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
@@ -2626,14 +2631,14 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
@@ -2647,7 +2652,7 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -2659,20 +2664,20 @@ paths:
     get:
       summary: セッションレポートを返す
       deprecated: false
-      description: ""
+      description: ''
       operationId: getTalkSessionReport
       tags:
         - talk_session
       parameters:
         - name: talkSessionID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -2680,18 +2685,17 @@ paths:
                 properties:
                   report:
                     type: string
-                required:
-                  - report
+                    nullable: true
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -2703,20 +2707,20 @@ paths:
     get:
       summary: 結論取得
       deprecated: false
-      description: ""
+      description: ''
       operationId: getConclusion
       tags:
         - talk_session
       parameters:
         - name: talkSessionID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -2748,29 +2752,29 @@ paths:
                   - user
                   - content
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -2790,7 +2794,7 @@ paths:
       parameters:
         - name: talkSessionID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
@@ -2808,8 +2812,8 @@ paths:
               required:
                 - content
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -2841,29 +2845,29 @@ paths:
                   - user
                   - content
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -2883,13 +2887,13 @@ paths:
       parameters:
         - name: talkSessionID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -2922,29 +2926,29 @@ paths:
                 required:
                   - items
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -2956,14 +2960,14 @@ paths:
     post:
       summary: タイムラインアイテム追加
       deprecated: false
-      description: ""
+      description: ''
       operationId: postTimeLineItem
       tags:
         - timeline
       parameters:
         - name: talkSessionID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
@@ -2974,22 +2978,22 @@ paths:
               type: object
               properties:
                 content:
-                  example: ""
+                  example: ''
                   type: string
                 status:
-                  example: ""
+                  example: ''
                   type: string
                 parentActionItemID:
                   type: string
                   description: 親があるなら親のIDヲシテイ
-                  example: ""
+                  example: ''
                   nullable: true
               required:
                 - content
                 - status
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -3015,29 +3019,29 @@ paths:
                   - CreatedAt
                   - UpdatedAt
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -3050,20 +3054,20 @@ paths:
     put:
       summary: タイムライン編集
       deprecated: false
-      description: ""
+      description: ''
       operationId: editTimeLine
       tags:
         - timeline
       parameters:
         - name: talkSessionID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
         - name: actionItemID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
@@ -3075,15 +3079,15 @@ paths:
               properties:
                 content:
                   type: string
-                  example: ""
+                  example: ''
                   nullable: true
                 status:
                   type: string
-                  example: ""
+                  example: ''
                   nullable: true
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -3109,29 +3113,29 @@ paths:
                   - CreatedAt
                   - UpdatedAt
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -3150,8 +3154,8 @@ paths:
         - talk_session
       parameters: []
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -3167,29 +3171,29 @@ paths:
                     - key
                     - description
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -3208,13 +3212,13 @@ paths:
       parameters:
         - name: talkSessionID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -3230,29 +3234,29 @@ paths:
                     - key
                     - description
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -3265,20 +3269,20 @@ paths:
     get:
       summary: 通報一覧
       deprecated: false
-      description: ""
+      description: ''
       operationId: getReportsForTalkSession
       tags:
         - talk_session
       parameters:
         - name: talkSessionID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
         - name: status
           in: query
-          description: ""
+          description: ''
           required: false
           schema:
             type: string
@@ -3287,8 +3291,8 @@ paths:
               - deleted
               - hold
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -3388,29 +3392,29 @@ paths:
                 required:
                   - reports
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -3423,20 +3427,20 @@ paths:
     get:
       summary: 通報件数
       deprecated: false
-      description: ""
+      description: ''
       operationId: getTalkSessionReportCount
       tags:
         - talk_session
       parameters:
         - name: talkSessionID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
         - name: status
           in: query
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
@@ -3445,8 +3449,8 @@ paths:
               - deleted
               - hold
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -3457,29 +3461,29 @@ paths:
                 required:
                   - count
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -3492,7 +3496,7 @@ paths:
     put:
       summary: パスワード変更
       deprecated: false
-      description: ""
+      description: ''
       operationId: changePassword
       tags:
         - auth
@@ -3510,37 +3514,37 @@ paths:
           schema:
             type: string
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -3553,49 +3557,49 @@ paths:
     post:
       summary: セッションへの同意
       deprecated: false
-      description: ""
+      description: ''
       operationId: consentTalkSession
       tags:
         - talk_session
       parameters:
         - name: talkSessionID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -3607,20 +3611,20 @@ paths:
     get:
       summary: セッションに同意しているか
       deprecated: false
-      description: ""
+      description: ''
       operationId: hasConsent
       tags:
         - talk_session
       parameters:
         - name: talkSessionID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -3631,29 +3635,29 @@ paths:
                 required:
                   - hasConsent
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -3666,7 +3670,7 @@ paths:
     post:
       summary: ユーザー作成
       deprecated: false
-      description: ""
+      description: ''
       operationId: registerUser
       tags:
         - user
@@ -3689,7 +3693,7 @@ paths:
                   format: binary
                   type: string
                   description: ユーザーアイコン
-                  example: ""
+                  example: ''
                 dateOfBirth:
                   type: integer
                   default: 0
@@ -3705,16 +3709,16 @@ paths:
                     - 回答しない
                   default: preferNotToSay
                   description: 性別
-                  example: ""
+                  example: ''
                   nullable: true
                 prefecture:
                   description: 都道府県
-                  example: ""
+                  example: ''
                   type: string
                 city:
                   type: string
                   description: 市区町村
-                  example: ""
+                  example: ''
                   nullable: true
                 email:
                   type: string
@@ -3722,14 +3726,14 @@ paths:
                   examples:
                     - example@example.com
                   description: メアド
-                  example: ""
+                  example: ''
                   nullable: true
               required:
                 - displayName
                 - displayID
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -3751,8 +3755,8 @@ paths:
                   - displayID
                   - displayName
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
@@ -3766,14 +3770,14 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
@@ -3787,7 +3791,7 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -3799,7 +3803,7 @@ paths:
     put:
       summary: ユーザー情報の変更
       deprecated: false
-      description: ""
+      description: ''
       operationId: editUserProfile
       tags:
         - user
@@ -3813,17 +3817,17 @@ paths:
                 displayName:
                   type: string
                   description: ユーザー名
-                  example: ""
+                  example: ''
                   nullable: true
                 icon:
                   type: string
                   format: binary
                   description: ユーザーアイコン
-                  example: ""
+                  example: ''
                 deleteIcon:
                   type: boolean
                   default: false
-                  example: "false"
+                  example: 'false'
                   nullable: true
                 dateOfBirth:
                   type: integer
@@ -3838,28 +3842,28 @@ paths:
                     - その他
                     - 回答しない
                   description: 性別
-                  example: ""
+                  example: ''
                   nullable: true
                 city:
                   type: string
-                  description: 市区町村
-                  example: ""
+                  description: 市町村
+                  example: ''
                   nullable: true
                 prefecture:
                   type: string
                   description: 都道府県
-                  example: ""
+                  example: ''
                   nullable: true
                 email:
                   type: string
                   examples:
                     - example@example.com
                   description: メールアドレス
-                  example: ""
+                  example: ''
                   nullable: true
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -3881,8 +3885,8 @@ paths:
                   - displayID
                   - displayName
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
@@ -3896,14 +3900,14 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
@@ -3917,7 +3921,7 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -3929,14 +3933,14 @@ paths:
     get:
       summary: ユーザー情報の取得
       deprecated: false
-      description: ""
+      description: ''
       operationId: get_user_info
       tags:
         - user
       parameters: []
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -3967,7 +3971,7 @@ paths:
                       dateOfBirth:
                         type: integer
                         description: 生年月日
-                        title: "20001010"
+                        title: '20001010'
                         nullable: true
                       gender:
                         type: string
@@ -3976,8 +3980,8 @@ paths:
                         nullable: true
                       city:
                         type: string
-                        title: 市区町村
-                        description: 市区町村
+                        title: 市町村
+                        description: 市町村
                         nullable: true
                       prefecture:
                         type: string
@@ -3991,15 +3995,15 @@ paths:
                   - demographics
                   - user
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -4012,7 +4016,7 @@ paths:
     get:
       summary: 今までに投稿した異見
       deprecated: false
-      description: ""
+      description: ''
       operationId: opinionsHistory
       tags:
         - user
@@ -4030,19 +4034,19 @@ paths:
             nullable: true
         - name: limit
           in: query
-          description: ""
+          description: ''
           required: false
           schema:
             type: integer
         - name: offset
           in: query
-          description: ""
+          description: ''
           required: false
           schema:
             type: integer
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -4129,29 +4133,29 @@ paths:
                   - opinions
                   - pagination
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -4164,33 +4168,33 @@ paths:
     get:
       summary: リアクション済みのセッション一覧
       deprecated: false
-      description: ""
+      description: ''
       operationId: sessionsHistory
       tags:
         - user
       parameters:
         - name: limit
           in: query
-          description: ""
+          description: ''
           required: false
           schema:
             type: integer
         - name: offset
           in: query
-          description: ""
+          description: ''
           required: false
           schema:
             type: integer
         - name: theme
           in: query
-          description: "テーマ "
+          description: 'テーマ '
           required: false
           schema:
             type: string
             nullable: true
         - name: status
           in: query
-          description: ""
+          description: ''
           required: false
           schema:
             type: string
@@ -4199,8 +4203,8 @@ paths:
               - finished
             nullable: true
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -4297,6 +4301,8 @@ paths:
                                   - key
                                   - description
                               description: セッションの参加制限
+                            hideReport:
+                              type: boolean
                           required:
                             - id
                             - theme
@@ -4304,6 +4310,7 @@ paths:
                             - createdAt
                             - scheduledEndTime
                             - restrictions
+                            - hideReport
                         opinionCount:
                           type: integer
                       required:
@@ -4313,29 +4320,29 @@ paths:
                   - pagination
                   - talkSessions
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -4348,14 +4355,14 @@ paths:
     get:
       summary: 自分が開いたセッション一覧
       deprecated: false
-      description: ""
+      description: ''
       operationId: getOpenedTalkSession
       tags:
         - talk_session
       parameters:
         - name: limit
           in: query
-          description: ""
+          description: ''
           required: false
           example: 0
           schema:
@@ -4363,23 +4370,23 @@ paths:
             default: 10
         - name: offset
           in: query
-          description: ""
+          description: ''
           required: false
           example: 0
           schema:
             type: integer
         - name: theme
           in: query
-          description: "テーマ "
+          description: 'テーマ '
           required: false
-          example: ""
+          example: ''
           schema:
             type: string
         - name: status
           in: query
-          description: ""
+          description: ''
           required: false
-          example: ""
+          example: ''
           schema:
             type: string
             enum:
@@ -4387,12 +4394,12 @@ paths:
               - open
             x-apidog:
               enumDescriptions:
-                finished: ""
-                open: ""
+                finished: ''
+                open: ''
             nullable: true
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -4476,6 +4483,8 @@ paths:
                                   - key
                                   - description
                               description: セッションの参加制限
+                            hideReport:
+                              type: boolean
                           required:
                             - id
                             - theme
@@ -4483,6 +4492,7 @@ paths:
                             - createdAt
                             - scheduledEndTime
                             - restrictions
+                            - hideReport
                         opinionCount:
                           type: integer
                       required:
@@ -4491,29 +4501,29 @@ paths:
                 required:
                   - talkSessions
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -4526,14 +4536,14 @@ paths:
     get:
       summary: JWTの内容を返してくれる
       deprecated: false
-      description: ""
+      description: ''
       operationId: oauth_token_info
       tags:
         - auth
       parameters: []
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -4589,8 +4599,8 @@ paths:
                   - isEmailVerified
                   - requiredPasswordChange
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
@@ -4604,14 +4614,14 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
@@ -4625,7 +4635,7 @@ paths:
                   - code
                   - message
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -4638,7 +4648,7 @@ paths:
     get:
       summary: Auth Callback
       deprecated: false
-      description: ""
+      description: ''
       operationId: oauth_callback
       tags:
         - auth
@@ -4647,25 +4657,25 @@ paths:
           in: cookie
           description: OAuth2.0 State from Cookie
           required: true
-          example: "{{$string.uuid}}"
+          example: '{{$string.uuid}}'
           schema:
             type: string
         - name: redirect_url
           in: cookie
           description: Authorization Code
           required: true
-          example: ""
+          example: ''
           schema:
             type: string
         - name: provider
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
         - name: code
           in: query
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
@@ -4676,8 +4686,8 @@ paths:
           schema:
             type: string
       responses:
-        "302":
-          description: ""
+        '302':
+          description: ''
           content:
             application/json:
               schema:
@@ -4685,40 +4695,40 @@ paths:
                 properties: {}
           headers:
             Location:
-              example: ""
+              example: ''
               required: true
-              description: ""
+              description: ''
               schema:
                 type: string
             Set-Cookie:
-              example: ""
+              example: ''
               required: true
               description: SessionID
               schema:
                 type: string
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -4730,14 +4740,14 @@ paths:
     get:
       summary: ログイン
       deprecated: false
-      description: ""
+      description: ''
       operationId: authorize
       tags:
         - auth
       parameters:
         - name: provider
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
@@ -4751,7 +4761,7 @@ paths:
           schema:
             type: string
       responses:
-        "302":
+        '302':
           description: コンテンツタイプを必ず指定しなければならないため、仮の値としてapplication/jsonを入れている
           content:
             application/json:
@@ -4760,42 +4770,42 @@ paths:
                 properties: {}
           headers:
             Location:
-              example: ""
+              example: ''
               required: true
               description: IDPのログインページ
               schema:
                 type: string
             Set-Cookie:
-              example: ""
+              example: ''
               required: true
               description: OAuth2.0 State
               schema:
                 type: array
                 items:
                   type: string
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -4807,14 +4817,14 @@ paths:
     post:
       summary: トークンを失効（ログアウト）
       deprecated: false
-      description: ""
+      description: ''
       operationId: oauth_token_revoke
       tags:
         - auth
       parameters: []
       responses:
-        "204":
-          description: ""
+        '204':
+          description: ''
           content:
             application/json:
               schema:
@@ -4822,36 +4832,36 @@ paths:
                 properties: {}
           headers:
             Set-Cookie:
-              example: ""
+              example: ''
               required: true
               description: Cookie削除用のSet-Cookie
               schema:
                 type: array
                 items:
                   type: string
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -4864,14 +4874,14 @@ paths:
     get:
       summary: 開発用登録/ログイン
       deprecated: false
-      description: ""
+      description: ''
       operationId: devAuthorize
       tags:
         - auth
       parameters:
         - name: redirect_url
           in: query
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
@@ -4883,8 +4893,8 @@ paths:
           schema:
             type: string
       responses:
-        "302":
-          description: ""
+        '302':
+          description: ''
           content:
             application/json:
               schema:
@@ -4892,42 +4902,42 @@ paths:
                 properties: {}
           headers:
             Location:
-              example: ""
+              example: ''
               required: false
-              description: ""
+              description: ''
               schema:
                 type: string
             Set-Cookie:
-              example: ""
+              example: ''
               required: false
               description: OAuth2.0 State
               schema:
                 type: array
                 items:
                   type: string
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -4937,7 +4947,7 @@ paths:
       x-ogen-operation-group: Auth
   /auth/dev/detach:
     delete:
-      summary: "**開発用** 現在のアカウントを切り離す"
+      summary: '**開発用** 現在のアカウントを切り離す'
       deprecated: false
       description: そのアカウントには再度ログインできなくなります。ログインしたければ言ってね！
       operationId: authAccountDetach
@@ -4945,8 +4955,8 @@ paths:
         - auth
       parameters: []
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -4954,36 +4964,36 @@ paths:
                 properties: {}
           headers:
             Set-Cookie:
-              example: ""
+              example: ''
               required: false
-              description: ""
+              description: ''
               schema:
                 type: array
                 items:
                   type: string
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -4996,7 +5006,7 @@ paths:
     post:
       summary: パスワードによるログイン
       deprecated: false
-      description: ""
+      description: ''
       operationId: passwordLogin
       tags:
         - auth
@@ -5008,46 +5018,46 @@ paths:
               type: object
               properties:
                 id_or_email:
-                  example: ""
+                  example: ''
                   type: string
                 password:
                   type: string
-                  example: ""
+                  example: ''
               required:
                 - id_or_email
                 - password
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -5059,7 +5069,7 @@ paths:
     post:
       summary: パスワードによる登録（devのみ）
       deprecated: false
-      description: ""
+      description: ''
       operationId: passwordRegister
       tags:
         - auth
@@ -5071,50 +5081,50 @@ paths:
               type: object
               properties:
                 id:
-                  example: ""
+                  example: ''
                   type: string
                 password:
-                  example: ""
+                  example: ''
                   type: string
                 email:
-                  example: ""
+                  example: ''
                   type: string
               required:
                 - id
                 - password
                 - email
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -5126,14 +5136,14 @@ paths:
     get:
       summary: OpenAPIテスト用
       deprecated: false
-      description: ""
+      description: ''
       operationId: test
       tags:
         - user
       parameters: []
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -5157,29 +5167,29 @@ paths:
                     format: url
                     nullable: true
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -5191,43 +5201,43 @@ paths:
     post:
       summary: mudai
       deprecated: false
-      description: ""
+      description: ''
       operationId: dummiInit
       tags:
         - test
       parameters: []
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -5253,12 +5263,12 @@ paths:
                 image:
                   format: binary
                   type: string
-                  example: ""
+                  example: ''
               required:
                 - image
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -5270,29 +5280,29 @@ paths:
                 required:
                   - url
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -5305,14 +5315,14 @@ paths:
     get:
       summary: 最新のポリシーに同意したかを取得
       deprecated: false
-      description: ""
+      description: ''
       operationId: getPolicyConsentStatus
       tags:
         - policy
       parameters: []
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -5332,29 +5342,29 @@ paths:
                   - policyVersion
                   - consentGiven
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -5366,7 +5376,7 @@ paths:
     post:
       summary: 最新のポリシーに同意する
       deprecated: false
-      description: ""
+      description: ''
       operationId: policyConsent
       tags:
         - policy
@@ -5379,13 +5389,13 @@ paths:
               properties:
                 policyVersion:
                   description: ポリシーバージョン
-                  example: ""
+                  example: ''
                   type: string
               required:
                 - policyVersion
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -5405,29 +5415,29 @@ paths:
                   - policyVersion
                   - consentGiven
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -5459,7 +5469,7 @@ paths:
               type: object
               properties:
                 name:
-                  example: ""
+                  example: ''
                   type: string
                 orgType:
                   type: integer
@@ -5467,37 +5477,37 @@ paths:
               required:
                 - name
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -5509,14 +5519,14 @@ paths:
     get:
       summary: 所属組織一覧
       deprecated: false
-      description: ""
+      description: ''
       operationId: getOrganizations
       tags:
         - organization
       parameters: []
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -5548,29 +5558,29 @@ paths:
                 required:
                   - organizations
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -5594,7 +5604,7 @@ paths:
       parameters:
         - name: organizationID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
@@ -5608,43 +5618,43 @@ paths:
                   type: integer
                   example: 0
                 email:
-                  example: ""
+                  example: ''
                   type: string
               required:
                 - role
                 - email
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -5657,14 +5667,14 @@ paths:
     post:
       summary: 組織にユーザーを追加
       deprecated: false
-      description: ""
+      description: ''
       operationId: inviteOrganizationForUser
       tags:
         - organization
       parameters:
         - name: organizationID
           in: path
-          description: ""
+          description: ''
           required: true
           schema:
             type: string
@@ -5679,13 +5689,13 @@ paths:
                   example: 0
                 displayID:
                   type: string
-                  example: ""
+                  example: ''
               required:
                 - role
                 - displayID
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
@@ -5696,29 +5706,29 @@ paths:
                 required:
                   - success
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -5731,43 +5741,43 @@ paths:
     get:
       summary: ヘルスチェック
       deprecated: false
-      description: ""
+      description: ''
       operationId: health
       tags:
         - health
       parameters: []
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
           headers: {}
-        "400":
-          description: ""
+        '400':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
                     message: INTERNAL SERVER ERROR.
           headers: {}
-        "500":
-          description: ""
+        '500':
+          description: ''
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
               examples:
-                "1":
+                '1':
                   summary: internal
                   value:
                     code: GENERAL-000
@@ -5781,7 +5791,7 @@ paths:
       tags:
         - manage
       responses:
-        "200":
+        '200':
           description: Index page
           content:
             text/html:
@@ -5794,7 +5804,7 @@ paths:
     post:
       tags:
         - manage
-      summary: "Analysisを再生成する。enum: [report, group, image]"
+      summary: 'Analysisを再生成する。enum: [report, group, image]'
       operationId: manageRegenerate
       requestBody:
         content:
@@ -5817,7 +5827,7 @@ paths:
                 - type
                 - talkSessionID
       responses:
-        "200":
+        '200':
           description: Analysisを再生成する
           content:
             application/json:
@@ -5832,6 +5842,47 @@ paths:
                     type: string
                     description: メッセージ
                     example: Analysisを再生成しました
+      x-ogen-operation-group: Manage
+  /manage/hideTalkSession:
+    post:
+      tags:
+        - manage
+      summary: reportの表示をトグルする
+      operationId: talkSessionHideToggle
+      security:
+        - SessionId: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                hide:
+                  type: boolean
+                  description: 非表示にするかどうか
+                  example: 'true'
+                talkSessionID:
+                  type: string
+                  description: トグルするTalkSessionID
+              required:
+                - hide
+                - talkSessionID
+      responses:
+        '200':
+          description: Analysisを再生成する
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: ステータス
+                    example: ok
+                  hide:
+                    type: boolean
+                    description: 非表示にしたかどうか
+                    example: 'true'
       x-ogen-operation-group: Manage
 components:
   schemas:
@@ -5908,6 +5959,8 @@ components:
               - key
               - description
           description: セッションの参加制限
+        hideReport:
+          type: boolean
       required:
         - id
         - theme
@@ -5915,6 +5968,7 @@ components:
         - createdAt
         - scheduledEndTime
         - restrictions
+        - hideReport
     validationErrorItem:
       type: object
       properties:
@@ -6076,7 +6130,7 @@ components:
         dateOfBirth:
           type: integer
           description: 生年月日
-          title: "20001010"
+          title: '20001010'
           nullable: true
         gender:
           type: string
@@ -6085,8 +6139,8 @@ components:
           nullable: true
         city:
           type: string
-          title: 市区町村
-          description: 市区町村
+          title: 市町村
+          description: 市町村
           nullable: true
         prefecture:
           type: string
@@ -6213,7 +6267,7 @@ components:
       properties:
         reasonID:
           type: integer
-          description: "1"
+          description: '1'
         reason:
           type: string
           description: 不適切な内容
