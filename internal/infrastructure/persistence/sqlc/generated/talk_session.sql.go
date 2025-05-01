@@ -790,6 +790,23 @@ func (q *Queries) ListTalkSessions(ctx context.Context, arg ListTalkSessionsPara
 	return items, nil
 }
 
+const updateTalkSessionHideReport = `-- name: UpdateTalkSessionHideReport :exec
+UPDATE talk_sessions SET hide_report = $2 WHERE talk_session_id = $1
+`
+
+type UpdateTalkSessionHideReportParams struct {
+	TalkSessionID uuid.UUID
+	HideReport    sql.NullBool
+}
+
+// UpdateTalkSessionHideReport
+//
+//	UPDATE talk_sessions SET hide_report = $2 WHERE talk_session_id = $1
+func (q *Queries) UpdateTalkSessionHideReport(ctx context.Context, arg UpdateTalkSessionHideReportParams) error {
+	_, err := q.db.ExecContext(ctx, updateTalkSessionHideReport, arg.TalkSessionID, arg.HideReport)
+	return err
+}
+
 const updateTalkSessionLocation = `-- name: UpdateTalkSessionLocation :exec
 UPDATE talk_session_locations SET location = ST_GeographyFromText($2) WHERE talk_session_id = $1
 `

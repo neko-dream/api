@@ -7,6 +7,9 @@ INSERT INTO talk_session_locations (talk_session_id, location) VALUES ($1, ST_Ge
 -- name: UpdateTalkSessionLocation :exec
 UPDATE talk_session_locations SET location = ST_GeographyFromText($2) WHERE talk_session_id = $1;
 
+-- name: UpdateTalkSessionHideReport :exec
+UPDATE talk_sessions SET hide_report = $2 WHERE talk_session_id = $1;
+
 -- name: EditTalkSession :exec
 UPDATE talk_sessions
     SET theme = $2,
