@@ -34,9 +34,12 @@
                         </span>
                     </div>
                     <div>
-                        <div>開始日時: {{.CreatedAt}}</div>
-                        <div>終了日時: {{.EndTime}}</div>
-                        <div>意見数: {{.OpinionCount}}</div>
+                        <ul>
+                        <li><div>セッションID: {{.ID}}</div></li>
+                        <li><div>開始日時: {{.CreatedAt}}</div></li>
+                        <li><div>終了日時: {{.EndTime}}</div></li>
+                        <li><div>意見数: {{.OpinionCount}}</div></li>
+                        </ul>
                     </div>
                     <button
                         onclick="generateReport('{{.ID}}')"
