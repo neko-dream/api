@@ -10,8 +10,8 @@ const (
 	SessionCookieName  = "SessionId"
 	StateCookieName    = "state"
 	RedirectCookieName = "redirect_url"
-	SessionMaxAge      = 86400 // 24 hours
-	AuthCookieMaxAge   = 300   // 5 minutes
+	SessionMaxAge      = 86400 * 5 // 24 hours
+	AuthCookieMaxAge   = 300       // 5 minutes
 )
 
 type CookieManager struct {
