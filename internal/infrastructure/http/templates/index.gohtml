@@ -204,7 +204,7 @@
             }
         }
 
-        async function generateAnalysis(talkSessionID) {
+        async function generateAnalysis(talkSessionID, event) {
             try {
                 const buttonElement = event.target;
                 const originalContent = buttonElement.innerHTML;
@@ -240,6 +240,7 @@
 
         async function generateReport(talkSessionID) {
             try {
+                await generateAnalysis(talkSessionID);
                 const buttonElement = event.target;
                 const originalContent = buttonElement.innerHTML;
                 buttonElement.disabled = true;
