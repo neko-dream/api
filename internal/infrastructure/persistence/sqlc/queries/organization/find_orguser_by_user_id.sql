@@ -2,4 +2,4 @@
 SELECT
     sqlc.embed(organization_users)
 FROM organization_users
-WHERE user_id = $1;
+WHERE organization_users.user_id = $1;

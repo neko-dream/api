@@ -69,7 +69,7 @@ func (q *Queries) CountOpinions(ctx context.Context, arg CountOpinionsParams) (i
 }
 
 const countSwipeableOpinions = `-- name: CountSwipeableOpinions :one
-SELECT COUNT(vote_count.opinion_id) AS random_opinion_count
+SELECT COUNT(opinions.opinion_id) AS random_opinion_count
 FROM opinions
 LEFT JOIN (
     SELECT opinions.opinion_id
@@ -100,7 +100,7 @@ type CountSwipeableOpinionsParams struct {
 // 通報された意見を除外
 // トークセッションに紐づく意見のみを取得
 //
-//	SELECT COUNT(vote_count.opinion_id) AS random_opinion_count
+//	SELECT COUNT(opinions.opinion_id) AS random_opinion_count
 //	FROM opinions
 //	LEFT JOIN (
 //	    SELECT opinions.opinion_id
@@ -423,23 +423,21 @@ LEFT JOIN (
 LEFT JOIN representative_opinions ON opinions.opinion_id = representative_opinions.opinion_id
 WHERE opinions.talk_session_id = $2::uuid
     AND vote_count.opinion_id = opinions.opinion_id
-    AND (
-        CASE
-            WHEN $3::int = 0 THEN TRUE
-            ELSE opinions.opinion_id != ANY($4::uuid[])
-        END
+    AND opinions.opinion_id NOT IN (
+        SELECT opinions.opinion_id
+        FROM opinions
+        WHERE opinions.opinion_id = ANY($3::uuid[])
     )
     AND opinions.parent_opinion_id IS NULL
     -- 削除されたものはスワイプ意見から除外
     AND (opr.opinion_id IS NULL OR opr.status != 'deleted')
-    AND representative_opinions.rank = $5::int
-LIMIT $6::int
+    AND representative_opinions.rank = $4::int
+LIMIT $5::int
 `
 
 type GetOpinionsByRankParams struct {
 	UserID            uuid.UUID
 	TalkSessionID     uuid.UUID
-	ExcludesLen       int32
 	ExcludeOpinionIds []uuid.UUID
 	Rank              int32
 	Limit             int32
@@ -490,22 +488,20 @@ type GetOpinionsByRankRow struct {
 //	LEFT JOIN representative_opinions ON opinions.opinion_id = representative_opinions.opinion_id
 //	WHERE opinions.talk_session_id = $2::uuid
 //	    AND vote_count.opinion_id = opinions.opinion_id
-//	    AND (
-//	        CASE
-//	            WHEN $3::int = 0 THEN TRUE
-//	            ELSE opinions.opinion_id != ANY($4::uuid[])
-//	        END
+//	    AND opinions.opinion_id NOT IN (
+//	        SELECT opinions.opinion_id
+//	        FROM opinions
+//	        WHERE opinions.opinion_id = ANY($3::uuid[])
 //	    )
 //	    AND opinions.parent_opinion_id IS NULL
 //	    -- 削除されたものはスワイプ意見から除外
 //	    AND (opr.opinion_id IS NULL OR opr.status != 'deleted')
-//	    AND representative_opinions.rank = $5::int
-//	LIMIT $6::int
+//	    AND representative_opinions.rank = $4::int
+//	LIMIT $5::int
 func (q *Queries) GetOpinionsByRank(ctx context.Context, arg GetOpinionsByRankParams) ([]GetOpinionsByRankRow, error) {
 	rows, err := q.db.QueryContext(ctx, getOpinionsByRank,
 		arg.UserID,
 		arg.TalkSessionID,
-		arg.ExcludesLen,
 		pq.Array(arg.ExcludeOpinionIds),
 		arg.Rank,
 		arg.Limit,
@@ -1014,11 +1010,10 @@ LEFT JOIN (
 WHERE opinions.talk_session_id = $2
     AND vote_count.opinion_id = opinions.opinion_id
     -- exclude_opinion_idsが空でない場合、除外する意見を指定
-    AND (
-        CASE
-            WHEN $4::int = 0 THEN TRUE
-            ELSE opinions.opinion_id != ANY($5::uuid[])
-        END
+    AND opinions.opinion_id NOT IN (
+        SELECT opinions.opinion_id
+        FROM opinions
+        WHERE opinions.opinion_id = ANY($4::uuid[])
     )
     -- 親意見がないものを取得
     AND opinions.parent_opinion_id IS NULL
@@ -1032,7 +1027,6 @@ type GetRandomOpinionsParams struct {
 	UserID            uuid.UUID
 	TalkSessionID     uuid.UUID
 	Limit             int32
-	ExcludesLen       int32
 	ExcludeOpinionIds []uuid.UUID
 }
 
@@ -1076,11 +1070,10 @@ type GetRandomOpinionsRow struct {
 //	WHERE opinions.talk_session_id = $2
 //	    AND vote_count.opinion_id = opinions.opinion_id
 //	    -- exclude_opinion_idsが空でない場合、除外する意見を指定
-//	    AND (
-//	        CASE
-//	            WHEN $4::int = 0 THEN TRUE
-//	            ELSE opinions.opinion_id != ANY($5::uuid[])
-//	        END
+//	    AND opinions.opinion_id NOT IN (
+//	        SELECT opinions.opinion_id
+//	        FROM opinions
+//	        WHERE opinions.opinion_id = ANY($4::uuid[])
 //	    )
 //	    -- 親意見がないものを取得
 //	    AND opinions.parent_opinion_id IS NULL
@@ -1093,7 +1086,6 @@ func (q *Queries) GetRandomOpinions(ctx context.Context, arg GetRandomOpinionsPa
 		arg.UserID,
 		arg.TalkSessionID,
 		arg.Limit,
-		arg.ExcludesLen,
 		pq.Array(arg.ExcludeOpinionIds),
 	)
 	if err != nil {

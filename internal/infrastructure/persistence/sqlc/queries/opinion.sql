@@ -102,11 +102,10 @@ LEFT JOIN (
 WHERE opinions.talk_session_id = $2
     AND vote_count.opinion_id = opinions.opinion_id
     -- exclude_opinion_idsが空でない場合、除外する意見を指定
-    AND (
-        CASE
-            WHEN sqlc.arg('excludes_len')::int = 0 THEN TRUE
-            ELSE opinions.opinion_id != ANY(sqlc.narg('exclude_opinion_ids')::uuid[])
-        END
+    AND opinions.opinion_id NOT IN (
+        SELECT opinions.opinion_id
+        FROM opinions
+        WHERE opinions.opinion_id = ANY(sqlc.arg('exclude_opinion_ids')::uuid[])
     )
     -- 親意見がないものを取得
     AND opinions.parent_opinion_id IS NULL
@@ -154,11 +153,10 @@ LEFT JOIN (
 LEFT JOIN representative_opinions ON opinions.opinion_id = representative_opinions.opinion_id
 WHERE opinions.talk_session_id = sqlc.arg('talk_session_id')::uuid
     AND vote_count.opinion_id = opinions.opinion_id
-    AND (
-        CASE
-            WHEN sqlc.arg('excludes_len')::int = 0 THEN TRUE
-            ELSE opinions.opinion_id != ANY(sqlc.narg('exclude_opinion_ids')::uuid[])
-        END
+    AND opinions.opinion_id NOT IN (
+        SELECT opinions.opinion_id
+        FROM opinions
+        WHERE opinions.opinion_id = ANY(sqlc.arg('exclude_opinion_ids')::uuid[])
     )
     AND opinions.parent_opinion_id IS NULL
     -- 削除されたものはスワイプ意見から除外
@@ -168,7 +166,7 @@ LIMIT sqlc.arg('limit')::int
 ;
 
 -- name: CountSwipeableOpinions :one
-SELECT COUNT(vote_count.opinion_id) AS random_opinion_count
+SELECT COUNT(opinions.opinion_id) AS random_opinion_count
 FROM opinions
 -- 指定されたユーザーが投票していない意見のみを取得
 LEFT JOIN (
