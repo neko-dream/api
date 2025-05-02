@@ -422,24 +422,60 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						}
 
 						elem = origElem
-					case 'r': // Prefix: "regenerate"
+					case 'r': // Prefix: "re"
 						origElem := elem
-						if l := len("regenerate"); len(elem) >= l && elem[0:l] == "regenerate" {
+						if l := len("re"); len(elem) >= l && elem[0:l] == "re" {
 							elem = elem[l:]
 						} else {
 							break
 						}
 
 						if len(elem) == 0 {
-							// Leaf node.
-							switch r.Method {
-							case "POST":
-								s.handleManageRegenerateRequest([0]string{}, elemIsEscaped, w, r)
-							default:
-								s.notAllowed(w, r, "POST")
+							break
+						}
+						switch elem[0] {
+						case 'g': // Prefix: "generate"
+							origElem := elem
+							if l := len("generate"); len(elem) >= l && elem[0:l] == "generate" {
+								elem = elem[l:]
+							} else {
+								break
 							}
 
-							return
+							if len(elem) == 0 {
+								// Leaf node.
+								switch r.Method {
+								case "POST":
+									s.handleManageRegenerateRequest([0]string{}, elemIsEscaped, w, r)
+								default:
+									s.notAllowed(w, r, "POST")
+								}
+
+								return
+							}
+
+							elem = origElem
+						case 'p': // Prefix: "port"
+							origElem := elem
+							if l := len("port"); len(elem) >= l && elem[0:l] == "port" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch r.Method {
+								case "GET":
+									s.handleGetReportBySessionIdRequest([0]string{}, elemIsEscaped, w, r)
+								default:
+									s.notAllowed(w, r, "GET")
+								}
+
+								return
+							}
+
+							elem = origElem
 						}
 
 						elem = origElem
@@ -2011,28 +2047,68 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						}
 
 						elem = origElem
-					case 'r': // Prefix: "regenerate"
+					case 'r': // Prefix: "re"
 						origElem := elem
-						if l := len("regenerate"); len(elem) >= l && elem[0:l] == "regenerate" {
+						if l := len("re"); len(elem) >= l && elem[0:l] == "re" {
 							elem = elem[l:]
 						} else {
 							break
 						}
 
 						if len(elem) == 0 {
-							// Leaf node.
-							switch method {
-							case "POST":
-								r.name = "ManageRegenerate"
-								r.summary = "Analysisを再生成する。enum: [report, group, image]"
-								r.operationID = "manageRegenerate"
-								r.pathPattern = "/manage/regenerate"
-								r.args = args
-								r.count = 0
-								return r, true
-							default:
-								return
+							break
+						}
+						switch elem[0] {
+						case 'g': // Prefix: "generate"
+							origElem := elem
+							if l := len("generate"); len(elem) >= l && elem[0:l] == "generate" {
+								elem = elem[l:]
+							} else {
+								break
 							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch method {
+								case "POST":
+									r.name = "ManageRegenerate"
+									r.summary = "Analysisを再生成する。enum: [report, group, image]"
+									r.operationID = "manageRegenerate"
+									r.pathPattern = "/manage/regenerate"
+									r.args = args
+									r.count = 0
+									return r, true
+								default:
+									return
+								}
+							}
+
+							elem = origElem
+						case 'p': // Prefix: "port"
+							origElem := elem
+							if l := len("port"); len(elem) >= l && elem[0:l] == "port" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch method {
+								case "GET":
+									r.name = "GetReportBySessionId"
+									r.summary = ""
+									r.operationID = "getReportBySessionId"
+									r.pathPattern = "/manage/report"
+									r.args = args
+									r.count = 0
+									return r, true
+								default:
+									return
+								}
+							}
+
+							elem = origElem
 						}
 
 						elem = origElem

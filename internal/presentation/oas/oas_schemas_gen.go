@@ -3197,6 +3197,21 @@ func (s *GetPolicyConsentStatusOK) SetConsentGiven(val bool) {
 
 func (*GetPolicyConsentStatusOK) getPolicyConsentStatusRes() {}
 
+type GetReportBySessionIdOK struct {
+	// レポートの内容.
+	Report OptString `json:"report"`
+}
+
+// GetReport returns the value of Report.
+func (s *GetReportBySessionIdOK) GetReport() OptString {
+	return s.Report
+}
+
+// SetReport sets the value of Report.
+func (s *GetReportBySessionIdOK) SetReport(val OptString) {
+	s.Report = val
+}
+
 type GetReportsForTalkSessionBadRequest struct{}
 
 func (*GetReportsForTalkSessionBadRequest) getReportsForTalkSessionRes() {}
