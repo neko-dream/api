@@ -71,7 +71,7 @@ func (s *talkSessionConsentService) HasConsented(
 	defer span.End()
 
 	// トークセッションが存在するか確認
-	talkSession, err := s.talkSessionRep.FindByID(ctx, talkSessionID)
+	_, err := s.talkSessionRep.FindByID(ctx, talkSessionID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return false, messages.TalkSessionNotFound
@@ -80,10 +80,6 @@ func (s *talkSessionConsentService) HasConsented(
 		return false, messages.InternalServerError
 	}
 
-	// restrictionsがない場合は常にtrueを返す
-	if talkSession.Restrictions() == nil || len(talkSession.Restrictions()) == 0 {
-		return true, nil
-	}
 	consents, err := s.talkSessionConsentRepository.FindByTalkSessionIDAndUserID(ctx, talkSessionID, userID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
