@@ -69,7 +69,10 @@ func (g *GetMyOpinionsQueryHandler) Execute(ctx context.Context, in opinion_quer
 	// 通報された意見を処理
 	if len(opinions) > 0 {
 		opinionIDs := dto_mapper.ExtractOpinionIDs(opinions)
-		reports, err := g.GetQueries(ctx).FindReportByOpinionIDs(ctx, opinionIDs)
+		reports, err := g.GetQueries(ctx).FindReportByOpinionIDs(ctx, model.FindReportByOpinionIDsParams{
+			OpinionIds: opinionIDs,
+			Status:     "deleted",
+		})
 		if err != nil {
 			utils.HandleError(ctx, err, "通報情報の取得に失敗")
 			return nil, err

@@ -1,0 +1,1 @@
+ALTER TABLE talk_sessions ADD COLUMN hide_report BOOLEAN DEFAULT FALSE;

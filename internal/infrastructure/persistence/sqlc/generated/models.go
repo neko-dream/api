@@ -121,6 +121,7 @@ type TalkSession struct {
 	ThumbnailUrl     sql.NullString
 	Restrictions     talksession.Restrictions
 	UpdatedAt        time.Time
+	HideReport       sql.NullBool
 }
 
 type TalkSessionConclusion struct {

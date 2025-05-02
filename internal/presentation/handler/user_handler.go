@@ -4,6 +4,7 @@ import (
 	"context"
 	"mime/multipart"
 	"net/http"
+	"strconv"
 	"time"
 	"unicode/utf8"
 
@@ -338,8 +339,20 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 		}
 	}
 	var dateOfBirth *int
-	if !value.DateOfBirth.Null && value.DateOfBirth.Value != 0 {
-		dateOfBirth = &value.DateOfBirth.Value
+	if birthStr, ok := value.DateOfBirth.Get(); ok && birthStr != "" {
+		if len(birthStr) != 8 {
+			err := messages.BadRequestError
+			err.Message = "誕生日の形式が不正です"
+			return nil, err
+		}
+		dateOfBirthRes, err := strconv.Atoi(birthStr)
+		if err != nil {
+			utils.HandleError(ctx, err, "strconv.Atoi")
+			err := messages.BadRequestError
+			err.Message = "誕生日の形式が不正です"
+			return nil, err
+		}
+		dateOfBirth = &dateOfBirthRes
 	}
 	var city *string
 	if !value.City.Null && value.City.Value != "" {
@@ -443,6 +456,23 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 	if value.Prefecture.IsSet() {
 		prefecture = &value.Prefecture.Value
 	}
+	var dateOfBirth *int
+	if birthStr, ok := value.DateOfBirth.Get(); ok && birthStr != "" {
+		if len(birthStr) != 8 {
+			err := messages.BadRequestError
+			err.Message = "誕生日の形式が不正です"
+			return nil, err
+		}
+		dateOfBirthRes, err := strconv.Atoi(birthStr)
+		if err != nil {
+			utils.HandleError(ctx, err, "strconv.Atoi")
+			err := messages.BadRequestError
+			err.Message = "誕生日の形式が不正です"
+			return nil, err
+		}
+		dateOfBirth = &dateOfBirthRes
+
+	}
 
 	input := user_command.RegisterInput{
 		SessionID:   sessionID,
@@ -450,7 +480,7 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 		DisplayID:   value.DisplayID,
 		DisplayName: value.DisplayName,
 		Icon:        file,
-		DateOfBirth: utils.ToPtrIfNotNullValue(value.DateOfBirth.Null, value.DateOfBirth.Value),
+		DateOfBirth: dateOfBirth,
 		City:        utils.ToPtrIfNotNullValue(value.City.Null, value.City.Value),
 		Gender: utils.ToPtrIfNotNullFunc(value.Gender.Null, func() *string {
 			txt, err := value.Gender.Value.MarshalText()

@@ -22,6 +22,18 @@ type sessionRepository struct {
 	*db.DBManager
 }
 
+// DeactivateAllByUserID implements session.SessionRepository.
+func (s *sessionRepository) DeactivateAllByUserID(ctx context.Context, userID shared.UUID[user.User]) error {
+	ctx, span := otel.Tracer("repository").Start(ctx, "sessionRepository.DeactivateAllByUserID")
+	defer span.End()
+
+	if err := s.GetQueries(ctx).DeactivateSessions(ctx, userID.UUID()); err != nil {
+		return errtrace.Wrap(err)
+	}
+
+	return nil
+}
+
 // Create implements session.SessionRepository.
 func (s *sessionRepository) Create(ctx context.Context, sess session.Session) (*session.Session, error) {
 	ctx, span := otel.Tracer("repository").Start(ctx, "sessionRepository.Create")

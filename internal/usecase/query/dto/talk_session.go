@@ -19,6 +19,7 @@ type TalkSession struct {
 	City             *string
 	Prefecture       *string
 	Restrictions     []string
+	HideReport       bool
 }
 
 type TalkSessionWithDetail struct {

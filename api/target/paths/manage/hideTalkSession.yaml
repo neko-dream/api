@@ -1,0 +1,41 @@
+post:
+  tags:
+    - manage
+  summary: "reportの表示をトグルする"
+  operationId: talkSessionHideToggle
+  security:
+    - SessionId: []
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            hide:
+              type: boolean
+              description: "非表示にするかどうか"
+              example: "true"
+            talkSessionID:
+              type: string
+              description: "トグルするTalkSessionID"
+          required:
+            - hide
+            - talkSessionID
+  responses:
+    "200":
+      description: "Analysisを再生成する"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                description: "ステータス"
+                example: "ok"
+              hide:
+                type: boolean
+                description: "非表示にしたかどうか"
+                example: "true"
+
+  x-ogen-operation-group: Manage

@@ -7,6 +7,7 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/neko-dream/server/internal/domain/model/analysis"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
+	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	dto_mapper "github.com/neko-dream/server/internal/infrastructure/persistence/utils"
 	"github.com/neko-dream/server/internal/usecase/query/analysis_query"
 	"github.com/neko-dream/server/internal/usecase/query/dto"
@@ -84,7 +85,10 @@ func (g *GetAnalysisResultHandler) Execute(ctx context.Context, input analysis_q
 	}
 
 	opinionIDs := dto_mapper.ExtractOpinionIDsWithRepresentative(representatives)
-	reports, err := g.GetQueries(ctx).FindReportByOpinionIDs(ctx, opinionIDs)
+	reports, err := g.GetQueries(ctx).FindReportByOpinionIDs(ctx, model.FindReportByOpinionIDsParams{
+		OpinionIds: opinionIDs,
+		Status:     "deleted",
+	})
 	if err != nil {
 		utils.HandleError(ctx, err, "通報情報の取得に失敗")
 		return nil, err

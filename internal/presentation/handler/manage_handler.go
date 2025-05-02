@@ -5,10 +5,14 @@ import (
 	"database/sql"
 	"strings"
 	"text/template"
+	"time"
 
+	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/analysis"
+	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
+	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/http/templates"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
@@ -21,13 +25,15 @@ type manageHandler struct {
 	templates *template.Template
 	analysis.AnalysisService
 	*db.DBManager
+	session.TokenManager
 }
 
 func NewManageHandler(
 	dbm *db.DBManager,
 	ansv analysis.AnalysisService,
+	tokenManager session.TokenManager,
 ) oas.ManageHandler {
-	tmpl, err := template.ParseFS(templates.TemplateFS, "*.html")
+	tmpl, err := template.ParseFS(templates.TemplateFS, "*html")
 	if err != nil {
 		panic(err)
 	}
@@ -36,6 +42,7 @@ func NewManageHandler(
 		templates:       tmpl,
 		DBManager:       dbm,
 		AnalysisService: ansv,
+		TokenManager:    tokenManager,
 	}
 }
 
@@ -89,6 +96,22 @@ func (m *manageHandler) ManageIndex(ctx context.Context) (oas.ManageIndexOK, err
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.ManageIndex")
 	defer span.End()
 
+	claim := session.GetSession(m.SetSession(ctx))
+	var userID *shared.UUID[user.User]
+	if claim != nil {
+		id, err := claim.UserID()
+		if err == nil {
+			userID = &id
+		}
+	}
+	if userID == nil {
+		return oas.ManageIndexOK{}, messages.ForbiddenError
+	}
+	// org所属のユーザであることを確認
+	if claim.OrgType == nil {
+		return oas.ManageIndexOK{}, messages.ForbiddenError
+	}
+
 	rows, err := m.GetQueries(ctx).ListTalkSessions(ctx, model.ListTalkSessionsParams{
 		Limit:   1000,
 		Offset:  0,
@@ -98,11 +121,16 @@ func (m *manageHandler) ManageIndex(ctx context.Context) (oas.ManageIndexOK, err
 		utils.HandleError(ctx, err, "GetQueries.ListTalkSessions")
 		return oas.ManageIndexOK{}, err
 	}
+
 	var sessions []map[string]any
 	for _, row := range rows {
 		res := map[string]any{
-			"ID":    row.TalkSession.TalkSessionID,
-			"Theme": row.TalkSession.Theme,
+			"ID":           row.TalkSession.TalkSessionID,
+			"Theme":        row.TalkSession.Theme,
+			"HideReport":   row.TalkSession.HideReport.Bool,
+			"CreatedAt":    row.TalkSession.CreatedAt.Format(time.RFC3339),
+			"EndTime":      row.TalkSession.ScheduledEndTime.Format(time.RFC3339),
+			"OpinionCount": row.OpinionCount,
 		}
 
 		rr, err := m.GetQueries(ctx).GetGeneratedImages(ctx, row.TalkSession.TalkSessionID)
@@ -119,12 +147,38 @@ func (m *manageHandler) ManageIndex(ctx context.Context) (oas.ManageIndexOK, err
 		"Sessions": sessions,
 	}
 
-	if err := m.templates.ExecuteTemplate(&html, "index.html", data); err != nil {
+	if err := m.templates.ExecuteTemplate(&html, "index.gohtml", data); err != nil {
 		utils.HandleError(ctx, err, "templates.ExecuteTemplate")
 		return oas.ManageIndexOK{}, err
 	}
 
 	return oas.ManageIndexOK{
 		Data: strings.NewReader(html.String()),
+	}, nil
+}
+
+// TalkSessionHideToggle implements oas.ManageHandler.
+func (m *manageHandler) TalkSessionHideToggle(ctx context.Context, req oas.OptTalkSessionHideToggleReq) (*oas.TalkSessionHideToggleOK, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.TalkSessionHideToggle")
+	defer span.End()
+
+	talkSessionIDStr := req.Value.TalkSessionID
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](talkSessionIDStr)
+	if err != nil {
+		utils.HandleError(ctx, err, "shared.ParseUUID")
+		return nil, err
+	}
+
+	hide := req.Value.Hide
+	if err := m.GetQueries(ctx).UpdateTalkSessionHideReport(ctx, model.UpdateTalkSessionHideReportParams{
+		TalkSessionID: talkSessionID.UUID(),
+		HideReport:    sql.NullBool{Bool: hide, Valid: true},
+	}); err != nil {
+		utils.HandleError(ctx, err, "GetQueries.UpdateTalkSessionHideReport")
+		return nil, err
+	}
+
+	return &oas.TalkSessionHideToggleOK{
+		Status: oas.OptString{Value: "success", Set: true},
 	}, nil
 }

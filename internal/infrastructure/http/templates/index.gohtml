@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>適当すぎる管理画面</title>
+    <style>
+      .status-hidden {
+        color: red;
+      }
+      .status-visible {
+        color: green;
+      }
+      .session {
+        margin-bottom: 20px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+        <h1>セッション一覧</h1>
+        <div>
+            <span>ログイン中ユーザー <p id="user"></p></span>
+        </div>
+        <div>
+            <div>
+                {{range .Sessions}}
+                <div id="task-{{.ID}}" class="session">
+                    <div>
+                        <h3>{{.Theme}}</h3>
+                        <span class="status-{{if .HideReport}}hidden{{else}}visible{{end}}" id="report-status-{{.ID}}">
+                            レポート: {{if .HideReport}}非表示{{else}}表示{{end}}
+                        </span>
+                    </div>
+                    <div>
+                        <ul>
+                        <li><div>セッションID: {{.ID}}</div></li>
+                        <li><div>開始日時: {{.CreatedAt}}</div></li>
+                        <li><div>終了日時: {{.EndTime}}</div></li>
+                        <li><div>意見数: {{.OpinionCount}}</div></li>
+                        </ul>
+                    </div>
+                    <button
+                        onclick="generateReport('{{.ID}}')"
+                    >レポート再生成</button>
+                    <button
+                        onclick="generateAnalysis('{{.ID}}')"
+                    >分析再実行</button>
+                    <button
+                        onclick="toggleHideReport('{{.ID}}', {{if .HideReport}}false{{else}}true{{end}})"
+                        id="toggle-button-{{.ID}}"
+                    >
+                        レポート{{if .HideReport}}表示する{{else}}非表示にする{{end}}
+                    </button>
+                </div>
+                {{end}}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function getReport(talkSessionID) {
+            try {
+                const response = await fetch(`/talksessions/${talkSessionID}/report`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const result = await response.json();
+                if (!!result.code) {
+                    return;
+                }
+                const report = result.report;
+            } catch (error) {
+                console.error('Error:', error);
+                alert('エラーが発生しました');
+            }
+        }
+
+        async function generateAnalysis(talkSessionID) {
+            try {
+                const response = await fetch(`/manage/regenerate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        type: "group",
+                        talkSessionID: talkSessionID,
+                    }),
+                });
+
+                const result = await response.json();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('エラーが発生しました');
+            }
+        }
+        async function generateReport(talkSessionID) {
+            try {
+                const response = await fetch(`/manage/regenerate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        type:"report",
+                        talkSessionID: talkSessionID,
+                    }),
+                });
+
+                const result = await response.json();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('エラーが発生しました');
+            }
+        }
+
+        async function toggleHideReport(talkSessionID, hideStatus) {
+            try {
+                const response = await fetch(`/manage/hideTalkSession`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        hide: hideStatus,
+                        talkSessionID: talkSessionID,
+                    }),
+                });
+
+                const result = await response.json();
+                if (result.status === "success" || result.status === "ok") {
+                    const statusElement = document.getElementById(`report-status-${talkSessionID}`);
+                    const toggleButton = document.getElementById(`toggle-button-${talkSessionID}`);
+
+                    if (hideStatus) {
+                        statusElement.textContent = "レポート: 非表示";
+                        statusElement.className = "status-hidden";
+                        toggleButton.textContent = "レポート表示する";
+                    } else {
+                        statusElement.textContent = "レポート: 表示";
+                        statusElement.className = "status-visible";
+                        toggleButton.textContent = "レポート非表示にする";
+                    }
+
+                    toggleButton.onclick = () => toggleHideReport(talkSessionID, !hideStatus);
+
+                } else {
+                    alert('更新に失敗しました');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('エラーが発生しました');
+            }
+        }
+
+        window.onload = async function() {
+            const user = await me();
+            if (user) {
+                document.getElementById("user").innerText = user.displayName;
+                document.getElementById("user").style.display = "block";
+            } else {
+                document.getElementById("user").style.display = "none";
+            }
+        }
+
+        async function me() {
+            try {
+                const response = await fetch(`/auth/token/info`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const result = await response.json();
+                if (result.code) {
+                    return;
+                }
+                return result;
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+    </script>
+  </body>
+</html>
