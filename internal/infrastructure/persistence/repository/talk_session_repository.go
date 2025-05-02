@@ -206,6 +206,7 @@ func (t *talkSessionRepository) FindByID(ctx context.Context, talkSessionID shar
 		city,
 		prefecture,
 	)
+	ts.SetReportVisibility(row.TalkSession.HideReport.Bool)
 
 	if len(row.TalkSession.Restrictions) > 0 {
 		if err := ts.UpdateRestrictions(ctx, row.TalkSession.Restrictions); err != nil {
