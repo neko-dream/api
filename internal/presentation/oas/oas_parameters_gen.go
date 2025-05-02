@@ -1488,6 +1488,64 @@ func decodeGetOpinionsForTalkSessionParams(args [1]string, argsEscaped bool, r *
 	return params, nil
 }
 
+// GetReportBySessionIdParams is parameters of getReportBySessionId operation.
+type GetReportBySessionIdParams struct {
+	// セッションID.
+	TalkSessionId string
+}
+
+func unpackGetReportBySessionIdParams(packed middleware.Parameters) (params GetReportBySessionIdParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "talkSessionId",
+			In:   "query",
+		}
+		params.TalkSessionId = packed[key].(string)
+	}
+	return params
+}
+
+func decodeGetReportBySessionIdParams(args [0]string, argsEscaped bool, r *http.Request) (params GetReportBySessionIdParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode query: talkSessionId.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "talkSessionId",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.TalkSessionId = c
+				return nil
+			}); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "talkSessionId",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // GetReportsForTalkSessionParams is parameters of getReportsForTalkSession operation.
 type GetReportsForTalkSessionParams struct {
 	TalkSessionID string

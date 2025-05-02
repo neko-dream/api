@@ -10,6 +10,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Alpine.js for simple interactions -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Marked.js for Markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Highlight.js for syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
     <style>
       [x-cloak] { display: none !important; }
       .animate-pulse-custom {
@@ -22,6 +27,71 @@
         50% {
           opacity: 0.7;
         }
+      }
+
+      /* レポート表示のアニメーション用スタイル */
+      .report-content {
+        transition: height 0.3s ease-in-out;
+      }
+
+      .report-button-icon {
+        transition: transform 0.3s ease;
+      }
+
+      /* Markdown styles */
+      .markdown-content {
+        line-height: 1.6;
+      }
+      .markdown-content h1 {
+        font-size: 1.8em;
+        font-weight: bold;
+        margin: 1em 0 0.5em;
+        padding-bottom: 0.3em;
+        border-bottom: 1px solid #eaecef;
+      }
+      .markdown-content h2 {
+        font-size: 1.5em;
+        font-weight: bold;
+        margin: 1em 0 0.5em;
+        padding-bottom: 0.3em;
+        border-bottom: 1px solid #eaecef;
+      }
+      .markdown-content h3 {
+        font-size: 1.25em;
+        font-weight: bold;
+        margin: 1em 0 0.5em;
+      }
+      .markdown-content p {
+        margin: 0.5em 0;
+      }
+      .markdown-content ul, .markdown-content ol {
+        margin: 0.25em 0;
+        padding-left: 1.5em;
+        list-style: initial;
+      }
+      .markdown-content ol {
+        list-style: decimal;
+      }
+      .markdown-content li {
+        margin: 0.1em 0;
+        display: list-item;
+      }
+      .markdown-content code {
+        background-color: rgba(27,31,35,0.05);
+        padding: 0.2em 0.4em;
+        border-radius: 3px;
+        font-family: monospace;
+      }
+      .markdown-content pre code {
+        display: block;
+        padding: 1em;
+        overflow-x: auto;
+      }
+      .markdown-content blockquote {
+        margin: 0.5em 0;
+        padding: 0 1em;
+        color: #6a737d;
+        border-left: 0.25em solid #dfe2e5;
       }
     </style>
   </head>
@@ -83,16 +153,35 @@
             </div>
           </div>
 
+          <div class="border-t border-gray-200">
+            <button
+              onclick="toggleReport('{{.ID}}')"
+              class="w-full px-4 py-3 text-sm font-medium {{if eq .OpinionCount 0}}text-gray-400 cursor-not-allowed{{else}}text-gray-700 hover:bg-gray-50{{end}} transition-colors duration-200 flex items-center justify-center"
+              {{if eq .OpinionCount 0}}disabled title="意見が投稿されていないため、レポートをプレビューできません"{{end}}
+            >
+              <i class="fas fa-file-alt mr-2"></i>
+              <span class="report-button-text">レポートをプレビュー</span>
+              <i class="fas fa-chevron-down ml-2 transform transition-transform duration-300 report-button-icon"></i>
+            </button>
+            <div class="report-content hidden overflow-hidden transition-all duration-300 ease-in-out" style="height: 0" id="report-content-{{.ID}}">
+              <div class="p-5 bg-gray-50 border-t border-gray-200">
+                <pre id="report-text-{{.ID}}" class="whitespace-pre-wrap text-sm text-gray-700"></pre>
+              </div>
+            </div>
+          </div>
+
           <div class="p-4 bg-gray-100 flex flex-wrap gap-2">
             <button
               onclick="generateReport('{{.ID}}')"
-              class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+              class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white {{if eq .OpinionCount 0}}bg-gray-400 cursor-not-allowed{{else}}bg-indigo-600 hover:bg-indigo-700{{end}} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+              {{if eq .OpinionCount 0}}disabled title="意見が投稿されていないため、レポートを生成できません"{{end}}
             >
               <i class="fas fa-sync-alt mr-2"></i> レポート再生成
             </button>
             <button
               onclick="generateAnalysis('{{.ID}}')"
-              class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-200"
+              class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white {{if eq .OpinionCount 0}}bg-gray-400 cursor-not-allowed{{else}}bg-purple-600 hover:bg-purple-700{{end}} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-200"
+              {{if eq .OpinionCount 0}}disabled title="意見が投稿されていないため、分析を実行できません"{{end}}
             >
               <i class="fas fa-chart-pie mr-2"></i> 分析再実行
             </button>
@@ -186,7 +275,7 @@
 
         async function getReport(talkSessionID) {
             try {
-                const response = await fetch(`/talksessions/${talkSessionID}/report`, {
+                const response = await fetch(`/manage/report?talkSessionId=${talkSessionID}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -195,12 +284,61 @@
 
                 const result = await response.json();
                 if (!!result.code) {
-                    return;
+                    showNotification('レポートの取得に失敗しました', 'error');
+                    return null;
                 }
-                const report = result.report;
+                return result.report;
             } catch (error) {
                 console.error('Error:', error);
                 showNotification('エラーが発生しました', 'error');
+                return null;
+            }
+        }
+
+        async function toggleReport(talkSessionID) {
+            const contentElement = document.getElementById(`report-content-${talkSessionID}`);
+            const textElement = document.getElementById(`report-text-${talkSessionID}`);
+            const button = event.target.closest('button');
+            const buttonText = button.querySelector('.report-button-text');
+            const buttonIcon = button.querySelector('.report-button-icon');
+
+            if (contentElement.classList.contains('hidden')) {
+                // レポートをプレビュー
+                contentElement.classList.remove('hidden');
+                buttonText.textContent = 'レポートを隠す';
+                buttonIcon.style.transform = 'rotate(180deg)';
+
+                // ローディング表示
+                textElement.innerHTML = '<div class="flex justify-center py-4"><i class="fas fa-spinner fa-spin text-gray-400 text-2xl"></i></div>';
+
+                // レポートを取得
+                const report = await getReport(talkSessionID);
+                if (report) {
+                    // マークダウンをHTMLに変換してクラスを付与
+                    const htmlContent = marked.parse(report);
+                    textElement.innerHTML = `<div class="markdown-content">${htmlContent}</div>`;
+
+                    // シンタックスハイライトを適用（もしコードブロックがある場合）
+                    if (typeof hljs !== 'undefined') {
+                        textElement.querySelectorAll('pre code').forEach((block) => {
+                            hljs.highlightElement(block);
+                        });
+                    }
+
+                    // アニメーションでコンテンツの高さを設定
+                    contentElement.style.height = textElement.scrollHeight + 40 + 'px';
+                } else {
+                    textElement.textContent = 'レポートを取得できませんでした。';
+                    contentElement.style.height = 'auto';
+                }
+            } else {
+                // レポートを隠す
+                buttonText.textContent = 'レポートをプレビュー';
+                buttonIcon.style.transform = 'rotate(0deg)';
+                contentElement.style.height = '0';
+                setTimeout(() => {
+                    contentElement.classList.add('hidden');
+                }, 300);
             }
         }
 
@@ -314,7 +452,7 @@
                         toggleButton.className = "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200";
                         toggleButton.innerHTML = '<i class="fas fa-eye-slash mr-2"></i> レポート非表示';
 
-                        showNotification('レポートを表示にしました');
+                        showNotification('レポートをプレビューにしました');
                     }
 
                     toggleButton.disabled = false;

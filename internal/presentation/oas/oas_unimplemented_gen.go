@@ -216,6 +216,13 @@ func (UnimplementedHandler) GetPolicyConsentStatus(ctx context.Context) (r GetPo
 	return r, ht.ErrNotImplemented
 }
 
+// GetReportBySessionId implements getReportBySessionId operation.
+//
+// GET /manage/report
+func (UnimplementedHandler) GetReportBySessionId(ctx context.Context, params GetReportBySessionIdParams) (r *GetReportBySessionIdOK, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetReportsForTalkSession implements getReportsForTalkSession operation.
 //
 // 通報一覧.
