@@ -240,7 +240,6 @@
 
         async function generateReport(talkSessionID) {
             try {
-                await generateAnalysis(talkSessionID);
                 const buttonElement = event.target;
                 const originalContent = buttonElement.innerHTML;
                 buttonElement.disabled = true;
