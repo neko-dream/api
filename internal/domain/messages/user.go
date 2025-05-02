@@ -37,4 +37,9 @@ var (
 		Code:       "USER-0006",
 		Message:    "ユーザが見つかりません。",
 	}
+	UserDisplayNameTooShort = &APIError{
+		StatusCode: 400,
+		Code:       "USER-0007",
+		Message:    "ユーザ名は1文字以上で入力してください。",
+	}
 )

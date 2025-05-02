@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-	"unicode/utf8"
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
@@ -364,15 +363,13 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 		prefecture = &value.Prefecture.Value
 	}
 	var displayName *string
-	if !value.DisplayName.Null && value.DisplayName.Value != "" {
+	if !value.DisplayName.Null {
 		if value.DisplayName.Value == "" {
-			return nil, messages.UserDisplayIDTooShort
-		}
-		if utf8.RuneCountInString(value.DisplayName.Value) > 20 || utf8.RuneCountInString(value.DisplayName.Value) < 4 {
-			return nil, messages.UserDisplayIDTooShort
+			return nil, messages.UserDisplayNameTooShort
 		}
 		displayName = &value.DisplayName.Value
 	}
+
 	var gender *string
 	if value.Gender.IsSet() && !value.Gender.IsNull() {
 		txt, err := value.Gender.Value.MarshalText()
@@ -471,7 +468,12 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 			return nil, err
 		}
 		dateOfBirth = &dateOfBirthRes
-
+	}
+	if value.DisplayID == "" {
+		return nil, messages.UserDisplayIDTooShort
+	}
+	if value.DisplayName == "" {
+		return nil, messages.UserDisplayNameTooShort
 	}
 
 	input := user_command.RegisterInput{
