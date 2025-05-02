@@ -21,9 +21,15 @@ FROM
 LEFT JOIN opinions
     ON opinion_reports.opinion_id = opinions.opinion_id
 WHERE
-    opinions.opinion_id = ANY($1::uuid[])
+    opinion_reports.opinion_id = ANY($1::uuid[])
+    AND opinion_reports.status = $2
 ORDER BY opinion_reports.created_at DESC
 `
+
+type FindReportByOpinionIDsParams struct {
+	OpinionIds []uuid.UUID
+	Status     string
+}
 
 type FindReportByOpinionIDsRow struct {
 	OpinionReport OpinionReport
@@ -40,10 +46,11 @@ type FindReportByOpinionIDsRow struct {
 //	LEFT JOIN opinions
 //	    ON opinion_reports.opinion_id = opinions.opinion_id
 //	WHERE
-//	    opinions.opinion_id = ANY($1::uuid[])
+//	    opinion_reports.opinion_id = ANY($1::uuid[])
+//	    AND opinion_reports.status = $2
 //	ORDER BY opinion_reports.created_at DESC
-func (q *Queries) FindReportByOpinionIDs(ctx context.Context, dollar_1 []uuid.UUID) ([]FindReportByOpinionIDsRow, error) {
-	rows, err := q.db.QueryContext(ctx, findReportByOpinionIDs, pq.Array(dollar_1))
+func (q *Queries) FindReportByOpinionIDs(ctx context.Context, arg FindReportByOpinionIDsParams) ([]FindReportByOpinionIDsRow, error) {
+	rows, err := q.db.QueryContext(ctx, findReportByOpinionIDs, pq.Array(arg.OpinionIds), arg.Status)
 	if err != nil {
 		return nil, err
 	}
