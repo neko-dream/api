@@ -72,11 +72,6 @@ func (t *talkSessionAccessControl) CanUserJoin(ctx context.Context, talkSessionI
 		}
 	}
 
-	// 参加制限がない場合は参加可能
-	if len(talkSession.Restrictions()) == 0 {
-		return true, nil
-	}
-
 	// 参加制限がある場合は、ユーザーが参加可能かを判定し、もし参加制限に引っかかる場合はエラーを返す
 	var restrictions []talksession.RestrictionAttribute
 	for _, restriction := range talkSession.Restrictions() {
