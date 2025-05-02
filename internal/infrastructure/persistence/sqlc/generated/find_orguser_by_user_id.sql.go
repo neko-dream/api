@@ -15,7 +15,7 @@ const findOrgUserByUserID = `-- name: FindOrgUserByUserID :many
 SELECT
     organization_users.organization_user_id, organization_users.user_id, organization_users.organization_id, organization_users.role, organization_users.created_at, organization_users.updated_at
 FROM organization_users
-WHERE user_id = $1
+WHERE organization_users.user_id = $1
 `
 
 type FindOrgUserByUserIDRow struct {
@@ -27,7 +27,7 @@ type FindOrgUserByUserIDRow struct {
 //	SELECT
 //	    organization_users.organization_user_id, organization_users.user_id, organization_users.organization_id, organization_users.role, organization_users.created_at, organization_users.updated_at
 //	FROM organization_users
-//	WHERE user_id = $1
+//	WHERE organization_users.user_id = $1
 func (q *Queries) FindOrgUserByUserID(ctx context.Context, userID uuid.UUID) ([]FindOrgUserByUserIDRow, error) {
 	rows, err := q.db.QueryContext(ctx, findOrgUserByUserID, userID)
 	if err != nil {

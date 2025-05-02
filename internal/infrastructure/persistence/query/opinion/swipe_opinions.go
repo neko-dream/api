@@ -178,7 +178,6 @@ func (g *GetSwipeOpinionsQueryHandler) fetchTopOpinions(
 		Rank:              1, // ランク1のトップ意見
 		Limit:             int32(limit),
 		ExcludeOpinionIds: excludeOpinionIDs,
-		ExcludesLen:       int32(len(excludeOpinionIDs)),
 	})
 	if err != nil {
 		utils.HandleError(ctx, err, "トップ意見の取得に失敗")
@@ -214,7 +213,6 @@ func (g *GetSwipeOpinionsQueryHandler) fetchRandomOpinions(
 		TalkSessionID:     talkSessionID,
 		Limit:             int32(limit),
 		ExcludeOpinionIds: excludeOpinionIDs,
-		ExcludesLen:       int32(len(excludeOpinionIDs)),
 	})
 	if err != nil {
 		utils.HandleError(ctx, err, "ランダム意見の取得に失敗")
