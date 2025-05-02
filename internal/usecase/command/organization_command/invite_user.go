@@ -70,7 +70,6 @@ func (i *inviteOrganizationForUserInteractor) Execute(ctx context.Context, input
 		return nil, messages.OrganizationInternalServerError
 	}
 
-	// ドメインロジックを使用して権限チェックを行うのじゃ
 	targetRole := organization.NewOrganizationUserRole(input.Role)
 	if !orgUser.HasPermissionToChangeRoleTo(targetRole) {
 		return nil, messages.OrganizationPermissionDenied
