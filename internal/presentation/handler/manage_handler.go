@@ -131,6 +131,8 @@ func (m *manageHandler) ManageIndex(ctx context.Context) (oas.ManageIndexOK, err
 			"CreatedAt":    row.TalkSession.CreatedAt.Format(time.RFC3339),
 			"EndTime":      row.TalkSession.ScheduledEndTime.Format(time.RFC3339),
 			"OpinionCount": row.OpinionCount,
+			"DisplayName":  row.User.DisplayName.String,
+			"IsOwner":      row.TalkSession.OwnerID == userID.UUID(),
 		}
 
 		rr, err := m.GetQueries(ctx).GetGeneratedImages(ctx, row.TalkSession.TalkSessionID)
