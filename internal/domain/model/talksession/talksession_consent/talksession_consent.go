@@ -25,9 +25,6 @@ func NewTalkSessionConsent(
 	if consentedAt.IsZero() {
 		return TalkSessionConsent{}, messages.InvalidConsentTime
 	}
-	if len(restrictions) == 0 {
-		return TalkSessionConsent{}, messages.RestrictionIsZero
-	}
 
 	if talkSessionID.IsZero() {
 		return TalkSessionConsent{}, messages.InvalidTalkSessionID
