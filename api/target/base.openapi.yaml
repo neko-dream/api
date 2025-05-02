@@ -11,5 +11,7 @@ paths:
     $ref: "./paths/manage/regenerate.yaml"
   /manage/hideTalkSession:
     $ref: "./paths/manage/hideTalkSession.yaml"
+  /manage/report:
+    $ref: "./paths/manage/report.yaml"
 components:
   $ref: "./apidog.openapi.yaml#/components"

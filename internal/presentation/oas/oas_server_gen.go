@@ -110,6 +110,10 @@ type ImageHandler interface {
 //
 // x-ogen-operation-group: Manage
 type ManageHandler interface {
+	// GetReportBySessionId implements getReportBySessionId operation.
+	//
+	// GET /manage/report
+	GetReportBySessionId(ctx context.Context, params GetReportBySessionIdParams) (*GetReportBySessionIdOK, error)
 	// ManageIndex implements manageIndex operation.
 	//
 	// GET /manage

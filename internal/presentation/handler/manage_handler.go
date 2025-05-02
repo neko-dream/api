@@ -164,6 +164,22 @@ func (m *manageHandler) TalkSessionHideToggle(ctx context.Context, req oas.OptTa
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.TalkSessionHideToggle")
 	defer span.End()
 
+	claim := session.GetSession(m.SetSession(ctx))
+	var userID *shared.UUID[user.User]
+	if claim != nil {
+		id, err := claim.UserID()
+		if err == nil {
+			userID = &id
+		}
+	}
+	if userID == nil {
+		return nil, messages.ForbiddenError
+	}
+	// org所属のユーザであることを確認
+	if claim.OrgType == nil {
+		return nil, messages.ForbiddenError
+	}
+
 	talkSessionIDStr := req.Value.TalkSessionID
 	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](talkSessionIDStr)
 	if err != nil {
@@ -182,5 +198,41 @@ func (m *manageHandler) TalkSessionHideToggle(ctx context.Context, req oas.OptTa
 
 	return &oas.TalkSessionHideToggleOK{
 		Status: oas.OptString{Value: "success", Set: true},
+	}, nil
+}
+
+// GetReportBySessionId implements oas.ManageHandler.
+func (m *manageHandler) GetReportBySessionId(ctx context.Context, params oas.GetReportBySessionIdParams) (*oas.GetReportBySessionIdOK, error) {
+	claim := session.GetSession(m.SetSession(ctx))
+	var userID *shared.UUID[user.User]
+	if claim != nil {
+		id, err := claim.UserID()
+		if err == nil {
+			userID = &id
+		}
+	}
+	if userID == nil {
+		return nil, messages.ForbiddenError
+	}
+	// org所属のユーザであることを確認
+	if claim.OrgType == nil {
+		return nil, messages.ForbiddenError
+	}
+
+	talkSessionIDStr := params.TalkSessionId
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](talkSessionIDStr)
+	if err != nil {
+		utils.HandleError(ctx, err, "shared.ParseUUID")
+		return nil, err
+	}
+
+	res, err := m.GetQueries(ctx).GetReportByTalkSessionId(ctx, talkSessionID.UUID())
+	if err != nil {
+		utils.HandleError(ctx, err, "GetQueries.GetReportByTalkSessionId")
+		return nil, err
+	}
+
+	return &oas.GetReportBySessionIdOK{
+		Report: oas.OptString{Value: res.Report, Set: true},
 	}, nil
 }

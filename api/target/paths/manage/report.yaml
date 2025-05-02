@@ -1,0 +1,25 @@
+get:
+  operationId: getReportBySessionId
+  tags:
+    - manage
+  parameters:
+    - name: talkSessionId
+      in: query
+      description: セッションID
+      required: true
+      schema:
+        type: string
+  responses:
+    "200":
+      description: レポート取得
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              report:
+                type: string
+                description: レポートの内容
+  security:
+    - SessionId: []
+  x-ogen-operation-group: Manage
