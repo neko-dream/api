@@ -57,6 +57,9 @@ func (i *inviteOrganizationForUserInteractor) Execute(ctx context.Context, input
 		utils.HandleError(ctx, err, "userRepository.FindByDisplayID")
 		return nil, messages.UserNotFound
 	}
+	if user == nil {
+		return nil, messages.UserNotFound
+	}
 
 	// ログインユーザーが組織の管理者であることを確認
 	orgUser, err := i.organizationUserRepository.FindByOrganizationIDAndUserID(ctx, input.OrganizationID, input.UserID)
