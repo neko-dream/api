@@ -53,7 +53,7 @@ type (
 // - 説明文は400文字以内
 func (in *EditCommandInput) Validate() error {
 	// テーマは20文字まで
-	if utf8.RuneCountInString(in.Theme) > 20 {
+	if utf8.RuneCountInString(in.Theme) > 100 {
 		return messages.TalkSessionThemeTooLong
 	}
 	// 説明文は400文字まで

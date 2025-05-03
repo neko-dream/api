@@ -50,7 +50,7 @@ type (
 
 func (in *StartTalkSessionCommandInput) Validate() error {
 	// Themeは20文字
-	if utf8.RuneCountInString(in.Theme) > 20 {
+	if utf8.RuneCountInString(in.Theme) > 100 {
 		return messages.TalkSessionThemeTooLong
 	}
 	// Descriptionは400文字
@@ -167,4 +167,3 @@ func (i *startTalkSessionCommandHandler) Execute(ctx context.Context, input Star
 
 	return output, nil
 }
-
