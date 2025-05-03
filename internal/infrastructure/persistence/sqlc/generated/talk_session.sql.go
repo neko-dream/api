@@ -577,6 +577,7 @@ SELECT
     talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url, talk_sessions.restrictions, talk_sessions.updated_at, talk_sessions.hide_report,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
+    COALESCE(votes.vote_count, 0) AS vote_count,
     talk_session_locations.talk_session_id as location_id,
     COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
     COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude,
@@ -597,6 +598,11 @@ LEFT JOIN (
 ) oc ON talk_sessions.talk_session_id = oc.talk_session_id
 LEFT JOIN users
     ON talk_sessions.owner_id = users.user_id
+LEFT JOIN (
+    SELECT talk_session_id, COUNT(vote_id) AS vote_count
+    FROM votes
+    GROUP BY talk_session_id
+) votes ON talk_sessions.talk_session_id = votes.talk_session_id
 LEFT JOIN talk_session_locations
     ON talk_sessions.talk_session_id = talk_session_locations.talk_session_id
 WHERE
@@ -657,6 +663,7 @@ type ListTalkSessionsRow struct {
 	TalkSession  TalkSession
 	OpinionCount int64
 	User         User
+	VoteCount    int64
 	LocationID   uuid.NullUUID
 	Latitude     float64
 	Longitude    float64
@@ -669,6 +676,7 @@ type ListTalkSessionsRow struct {
 //	    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url, talk_sessions.restrictions, talk_sessions.updated_at, talk_sessions.hide_report,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
 //	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
+//	    COALESCE(votes.vote_count, 0) AS vote_count,
 //	    talk_session_locations.talk_session_id as location_id,
 //	    COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
 //	    COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude,
@@ -689,6 +697,11 @@ type ListTalkSessionsRow struct {
 //	) oc ON talk_sessions.talk_session_id = oc.talk_session_id
 //	LEFT JOIN users
 //	    ON talk_sessions.owner_id = users.user_id
+//	LEFT JOIN (
+//	    SELECT talk_session_id, COUNT(vote_id) AS vote_count
+//	    FROM votes
+//	    GROUP BY talk_session_id
+//	) votes ON talk_sessions.talk_session_id = votes.talk_session_id
 //	LEFT JOIN talk_session_locations
 //	    ON talk_sessions.talk_session_id = talk_session_locations.talk_session_id
 //	WHERE
@@ -772,6 +785,7 @@ func (q *Queries) ListTalkSessions(ctx context.Context, arg ListTalkSessionsPara
 			&i.User.UpdatedAt,
 			&i.User.Email,
 			&i.User.EmailVerified,
+			&i.VoteCount,
 			&i.LocationID,
 			&i.Latitude,
 			&i.Longitude,
