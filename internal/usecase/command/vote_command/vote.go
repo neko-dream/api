@@ -19,6 +19,7 @@ import (
 	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type (
@@ -139,8 +140,11 @@ func (i *voteHandler) StartAnalysisIfNeeded(ctx context.Context, talkSessionID s
 	ctx, span := otel.Tracer("vote_command").Start(ctx, "voteHandler.StartAnalysisIfNeeded")
 	defer span.End()
 
+	bg := context.Background()
+	span = trace.SpanFromContext(ctx)
+	bg = trace.ContextWithSpan(bg, span)
 	go func() {
-		_ = i.AnalysisService.StartAnalysis(ctx, talkSessionID)
+		_ = i.AnalysisService.StartAnalysis(bg, talkSessionID)
 	}()
 
 	report, err := i.AnalysisRepository.FindByTalkSessionID(ctx, talkSessionID)
@@ -150,8 +154,11 @@ func (i *voteHandler) StartAnalysisIfNeeded(ctx context.Context, talkSessionID s
 	}
 
 	if report.ShouldReGenerateReport() {
+		bg := context.Background()
+		span = trace.SpanFromContext(ctx)
+		bg = trace.ContextWithSpan(bg, span)
 		go func() {
-			_ = i.AnalysisService.GenerateReport(ctx, talkSessionID)
+			_ = i.AnalysisService.GenerateReport(bg, talkSessionID)
 		}()
 	}
 
