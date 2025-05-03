@@ -148,7 +148,7 @@ func (i *voteHandler) StartAnalysisIfNeeded(ctx context.Context, talkSessionID s
 		_ = i.AnalysisService.StartAnalysis(bg, talkSessionID)
 
 		// 分析レポートを取得
-		report, err := i.AnalysisRepository.FindByTalkSessionID(ctx, talkSessionID)
+		report, err := i.AnalysisRepository.FindByTalkSessionID(bg, talkSessionID)
 		if err != nil && !errors.Is(err, sql.ErrNoRows) {
 			utils.HandleError(ctx, err, "AnalysisRepository.FindByTalkSessionID")
 			return
