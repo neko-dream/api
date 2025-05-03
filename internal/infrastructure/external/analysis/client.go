@@ -18,6 +18,7 @@ import (
 	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type analysisService struct {
@@ -39,8 +40,12 @@ func NewAnalysisService(
 }
 
 // GenerateReport implements analysis.AnalysisService.
-func (a *analysisService) GenerateReport(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession]) error {
-	ctx, span := otel.Tracer("client").Start(ctx, "analysisService.GenerateReport")
+func (a *analysisService) GenerateReport(ctxp context.Context, talkSessionID shared.UUID[talksession.TalkSession]) error {
+	ctx := context.Background()
+	span := trace.SpanFromContext(ctxp)
+	ctx = trace.ContextWithSpan(ctx, span)
+
+	ctx, span = otel.Tracer("client").Start(ctx, "analysisService.GenerateReport")
 	defer span.End()
 
 	// カスタムHTTPクライアントを作成
@@ -76,8 +81,12 @@ func (a *analysisService) GenerateReport(ctx context.Context, talkSessionID shar
 }
 
 // StartAnalysis 会話分析を開始する
-func (a *analysisService) StartAnalysis(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession]) error {
-	ctx, span := otel.Tracer("client").Start(ctx, "analysisService.StartAnalysis")
+func (a *analysisService) StartAnalysis(ctxp context.Context, talkSessionID shared.UUID[talksession.TalkSession]) error {
+	ctx := context.Background()
+	span := trace.SpanFromContext(ctxp)
+	ctx = trace.ContextWithSpan(ctx, span)
+
+	ctx, span = otel.Tracer("client").Start(ctx, "analysisService.StartAnalysis")
 	defer span.End()
 
 	// カスタムHTTPクライアントを作成
