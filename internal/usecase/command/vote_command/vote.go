@@ -131,6 +131,7 @@ func (i *voteHandler) Execute(ctx context.Context, input VoteInput) error {
 		return errtrace.Wrap(err)
 	}
 
+	// 非同期で分析を開始
 	i.StartAnalysisIfNeeded(ctx, op.TalkSessionID())
 
 	return nil
@@ -145,22 +146,15 @@ func (i *voteHandler) StartAnalysisIfNeeded(ctx context.Context, talkSessionID s
 	bg = trace.ContextWithSpan(bg, span)
 	go func() {
 		_ = i.AnalysisService.StartAnalysis(bg, talkSessionID)
-	}()
 
-	report, err := i.AnalysisRepository.FindByTalkSessionID(ctx, talkSessionID)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		utils.HandleError(ctx, err, "AnalysisRepository.FindByTalkSessionID")
-		return
-	}
-
-	if report.ShouldReGenerateReport() {
-		bg := context.Background()
-		span = trace.SpanFromContext(ctx)
-		bg = trace.ContextWithSpan(bg, span)
-		go func() {
+		// 分析レポートを取得
+		report, err := i.AnalysisRepository.FindByTalkSessionID(ctx, talkSessionID)
+		if err != nil && !errors.Is(err, sql.ErrNoRows) {
+			utils.HandleError(ctx, err, "AnalysisRepository.FindByTalkSessionID")
+			return
+		}
+		if report.ShouldReGenerateReport() {
 			_ = i.AnalysisService.GenerateReport(bg, talkSessionID)
-		}()
-	}
-
-	return
+		}
+	}()
 }
