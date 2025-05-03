@@ -24,6 +24,7 @@ import (
 type manageHandler struct {
 	templates *template.Template
 	analysis.AnalysisService
+	analysis.AnalysisRepository
 	*db.DBManager
 	session.TokenManager
 }
@@ -31,6 +32,7 @@ type manageHandler struct {
 func NewManageHandler(
 	dbm *db.DBManager,
 	ansv analysis.AnalysisService,
+	arep analysis.AnalysisRepository,
 	tokenManager session.TokenManager,
 ) oas.ManageHandler {
 	tmpl, err := template.ParseFS(templates.TemplateFS, "*html")
@@ -39,10 +41,11 @@ func NewManageHandler(
 	}
 
 	return &manageHandler{
-		templates:       tmpl,
-		DBManager:       dbm,
-		AnalysisService: ansv,
-		TokenManager:    tokenManager,
+		templates:          tmpl,
+		DBManager:          dbm,
+		AnalysisService:    ansv,
+		AnalysisRepository: arep,
+		TokenManager:       tokenManager,
 	}
 }
 
@@ -231,13 +234,16 @@ func (m *manageHandler) GetReportBySessionId(ctx context.Context, params oas.Get
 		return nil, err
 	}
 
-	res, err := m.GetQueries(ctx).GetReportByTalkSessionId(ctx, talkSessionID.UUID())
+	res, err := m.AnalysisRepository.FindByTalkSessionID(ctx, talkSessionID)
 	if err != nil {
 		utils.HandleError(ctx, err, "GetQueries.GetReportByTalkSessionId")
 		return nil, err
 	}
+	if res.Report == nil {
+		return &oas.GetReportBySessionIdOK{}, nil
+	}
 
 	return &oas.GetReportBySessionIdOK{
-		Report: oas.OptString{Value: res.Report, Set: true},
+		Report: oas.OptString{Value: *res.Report, Set: true},
 	}, nil
 }
