@@ -30,7 +30,7 @@ func (r *analysisRepository) FindByTalkSessionID(ctx context.Context, talkSessio
 	analysisReport, err := r.GetQueries(ctx).GetReportByTalkSessionId(ctx, talkSessionID.UUID())
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
-			utils.HandleError(ctx, err, "analysis report not found")
+			utils.HandleError(ctx, err, "failed to retrieve analysis report")
 		}
 		return nil, err
 	}
