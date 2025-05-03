@@ -48,6 +48,8 @@ SELECT
     sqlc.embed(talk_sessions),
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     sqlc.embed(users),
+    COALESCE(votes.vote_count, 0) AS vote_count,
+    COALESCE(vote_users.vote_count, 0) AS vote_user_count,
     talk_session_locations.talk_session_id as location_id,
     COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
     COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude,
@@ -68,6 +70,16 @@ LEFT JOIN (
 ) oc ON talk_sessions.talk_session_id = oc.talk_session_id
 LEFT JOIN users
     ON talk_sessions.owner_id = users.user_id
+LEFT JOIN (
+    SELECT talk_session_id, COUNT(vote_id) AS vote_count
+    FROM votes
+    GROUP BY talk_session_id
+) votes ON talk_sessions.talk_session_id = votes.talk_session_id
+LEFT JOIN (
+    SELECT talk_session_id, COUNT(DISTINCT user_id) AS vote_count
+    FROM votes
+    GROUP BY talk_session_id
+) vote_users ON talk_sessions.talk_session_id = vote_users.talk_session_id
 LEFT JOIN talk_session_locations
     ON talk_sessions.talk_session_id = talk_session_locations.talk_session_id
 WHERE

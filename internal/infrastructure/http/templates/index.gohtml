@@ -135,6 +135,10 @@
                 <span class="ml-2">セッションID: <span class="font-mono text-xs bg-gray-200 px-2 py-0.5 rounded">{{.ID}}</span></span>
               </div>
               <div class="flex items-center">
+                <i class="fas fa-user w-5 text-gray-400"></i>
+                <span class="ml-2" >作成者: <span class="font-semibold">{{.DisplayName}}</span></span>
+              </div>
+              <div class="flex items-center">
                 <i class="far fa-calendar-plus w-5 text-gray-400"></i>
                 <span class="ml-2">開始日時: {{.CreatedAt}}</span>
               </div>
@@ -146,10 +150,15 @@
                 <i class="far fa-comment-dots w-5 text-gray-400"></i>
                 <span class="ml-2">意見数: <span class="font-semibold">{{.OpinionCount}}</span></span>
               </div>
-              <div class="flex items-center">
-                <i class="fas fa-user w-5 text-gray-400"></i>
-                <span class="ml-2" >作成者: <span class="font-semibold">{{.DisplayName}}</span></span>
+              <div>
+                <i class="fas fa-thumbs-up w-5 text-gray-400"></i>
+                <span class="ml-2">投票数: <span class="font-semibold">{{.VoteCount}}</span></span>
               </div>
+              <div>
+                <i class="fas fa-user-friends w-5 text-gray-400"></i>
+                <span class="ml-2">投票ユーザー数: <span class="font-semibold">{{.VoteUserCount}}</span></span>
+              </div>
+
             </div>
           </div>
 

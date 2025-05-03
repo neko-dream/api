@@ -125,14 +125,16 @@ func (m *manageHandler) ManageIndex(ctx context.Context) (oas.ManageIndexOK, err
 	var sessions []map[string]any
 	for _, row := range rows {
 		res := map[string]any{
-			"ID":           row.TalkSession.TalkSessionID,
-			"Theme":        row.TalkSession.Theme,
-			"HideReport":   row.TalkSession.HideReport.Bool,
-			"CreatedAt":    row.TalkSession.CreatedAt.Format(time.RFC3339),
-			"EndTime":      row.TalkSession.ScheduledEndTime.Format(time.RFC3339),
-			"OpinionCount": row.OpinionCount,
-			"DisplayName":  row.User.DisplayName.String,
-			"IsOwner":      row.TalkSession.OwnerID == userID.UUID(),
+			"ID":            row.TalkSession.TalkSessionID,
+			"Theme":         row.TalkSession.Theme,
+			"HideReport":    row.TalkSession.HideReport.Bool,
+			"CreatedAt":     row.TalkSession.CreatedAt.Format(time.RFC3339),
+			"EndTime":       row.TalkSession.ScheduledEndTime.Format(time.RFC3339),
+			"OpinionCount":  row.OpinionCount,
+			"DisplayName":   row.User.DisplayName.String,
+			"IsOwner":       row.TalkSession.OwnerID == userID.UUID(),
+			"VoteCount":     row.VoteCount,
+			"VoteUserCount": row.VoteUserCount,
 		}
 
 		rr, err := m.GetQueries(ctx).GetGeneratedImages(ctx, row.TalkSession.TalkSessionID)
@@ -203,6 +205,9 @@ func (m *manageHandler) TalkSessionHideToggle(ctx context.Context, req oas.OptTa
 
 // GetReportBySessionId implements oas.ManageHandler.
 func (m *manageHandler) GetReportBySessionId(ctx context.Context, params oas.GetReportBySessionIdParams) (*oas.GetReportBySessionIdOK, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetReportBySessionId")
+	defer span.End()
+
 	claim := session.GetSession(m.SetSession(ctx))
 	var userID *shared.UUID[user.User]
 	if claim != nil {
