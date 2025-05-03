@@ -71,7 +71,7 @@ LEFT JOIN (
 LEFT JOIN users
     ON talk_sessions.owner_id = users.user_id
 LEFT JOIN (
-    SELECT talk_session_id, COUNT(vote_id) AS vote_count
+    SELECT talk_session_id, COUNT(DISTINCT vote_id) AS vote_count
     FROM votes
     GROUP BY talk_session_id
 ) votes ON talk_sessions.talk_session_id = votes.talk_session_id

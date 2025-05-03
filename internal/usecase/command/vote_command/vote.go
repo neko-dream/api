@@ -2,6 +2,8 @@ package vote_command
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/messages"
@@ -17,6 +19,7 @@ import (
 	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type (
@@ -36,6 +39,7 @@ type (
 		talksession.TalkSessionRepository
 		vote.VoteRepository
 		analysis.AnalysisService
+		analysis.AnalysisRepository
 		service.TalkSessionAccessControl
 		*db.DBManager
 	}
@@ -47,6 +51,7 @@ func NewVoteHandler(
 	talkSessionRepository talksession.TalkSessionRepository,
 	voteRepository vote.VoteRepository,
 	analysisService analysis.AnalysisService,
+	analysisRepository analysis.AnalysisRepository,
 	talkSessionAccessControl service.TalkSessionAccessControl,
 	DBManager *db.DBManager,
 ) Vote {
@@ -56,6 +61,7 @@ func NewVoteHandler(
 		VoteRepository:           voteRepository,
 		TalkSessionRepository:    talkSessionRepository,
 		AnalysisService:          analysisService,
+		AnalysisRepository:       analysisRepository,
 		TalkSessionAccessControl: talkSessionAccessControl,
 		DBManager:                DBManager,
 	}
@@ -125,9 +131,36 @@ func (i *voteHandler) Execute(ctx context.Context, input VoteInput) error {
 		return errtrace.Wrap(err)
 	}
 
-	if err := i.AnalysisService.StartAnalysis(ctx, op.TalkSessionID()); err != nil {
-		utils.HandleError(ctx, err, "StartAnalysis")
-		return err
-	}
+	i.StartAnalysisIfNeeded(ctx, op.TalkSessionID())
+
 	return nil
+}
+
+func (i *voteHandler) StartAnalysisIfNeeded(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession]) {
+	ctx, span := otel.Tracer("vote_command").Start(ctx, "voteHandler.StartAnalysisIfNeeded")
+	defer span.End()
+
+	bg := context.Background()
+	span = trace.SpanFromContext(ctx)
+	bg = trace.ContextWithSpan(bg, span)
+	go func() {
+		_ = i.AnalysisService.StartAnalysis(bg, talkSessionID)
+	}()
+
+	report, err := i.AnalysisRepository.FindByTalkSessionID(ctx, talkSessionID)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		utils.HandleError(ctx, err, "AnalysisRepository.FindByTalkSessionID")
+		return
+	}
+
+	if report.ShouldReGenerateReport() {
+		bg := context.Background()
+		span = trace.SpanFromContext(ctx)
+		bg = trace.ContextWithSpan(bg, span)
+		go func() {
+			_ = i.AnalysisService.GenerateReport(bg, talkSessionID)
+		}()
+	}
+
+	return
 }
