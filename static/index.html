@@ -112,116 +112,14 @@
       </header>
 
       <!-- Session list -->
-      <div class="grid grid-cols-1 gap-6">
-        {{range .Sessions}}
-        <div id="task-{{.ID}}" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-          <div class="p-5 border-b border-gray-200">
-            <div class="flex justify-between items-start">
-              <h3 class="text-xl font-bold text-gray-800">{{.Theme}}</h3>
-              <span
-                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{if .HideReport}}bg-red-100 text-red-700{{else}}bg-green-100 text-green-700{{end}}"
-                id="report-status-{{.ID}}"
-              >
-                <i class="{{if .HideReport}}fas fa-eye-slash mr-1{{else}}fas fa-eye mr-1{{end}}"></i>
-                レポート: {{if .HideReport}}非表示{{else}}表示{{end}}
-              </span>
-            </div>
-          </div>
-
-          <div class="p-5 bg-gray-50">
-            <div class="grid grid-cols-2 gap-3 text-sm text-gray-600">
-              <div class="flex items-center">
-                <i class="fas fa-fingerprint w-5 text-gray-400"></i>
-                <span class="ml-2">セッションID: <span class="font-mono text-xs bg-gray-200 px-2 py-0.5 rounded">{{.ID}}</span></span>
-              </div>
-              <div class="flex items-center">
-                <i class="fas fa-user w-5 text-gray-400"></i>
-                <span class="ml-2" >作成者: <span class="font-semibold">{{.DisplayName}}</span></span>
-              </div>
-              <div class="flex items-center">
-                <i class="far fa-calendar-plus w-5 text-gray-400"></i>
-                <span class="ml-2">開始日時: {{.CreatedAt}}</span>
-              </div>
-              <div class="flex items-center">
-                <i class="far fa-calendar-check w-5 text-gray-400"></i>
-                <span class="ml-2">終了日時: {{.EndTime}}</span>
-              </div>
-              <div class="flex items-center">
-                <i class="far fa-comment-dots w-5 text-gray-400"></i>
-                <span class="ml-2">意見数: <span class="font-semibold">{{.OpinionCount}}</span></span>
-              </div>
-              <div>
-                <i class="fas fa-thumbs-up w-5 text-gray-400"></i>
-                <span class="ml-2">投票数: <span class="font-semibold">{{.VoteCount}}</span></span>
-              </div>
-              <div>
-                <i class="fas fa-user-friends w-5 text-gray-400"></i>
-                <span class="ml-2">投票ユーザー数: <span class="font-semibold">{{.VoteUserCount}}</span></span>
-              </div>
-
-            </div>
-          </div>
-
-          <div class="border-t border-gray-200">
-            <button
-              onclick="toggleReport('{{.ID}}')"
-              class="w-full px-4 py-3 text-sm font-medium {{if eq .OpinionCount 0}}text-gray-400 cursor-not-allowed{{else}}text-gray-700 hover:bg-gray-50{{end}} transition-colors duration-200 flex items-center justify-center"
-              {{if eq .OpinionCount 0}}disabled title="意見が投稿されていないため、レポートをプレビューできません"{{end}}
-            >
-              <i class="fas fa-file-alt mr-2"></i>
-              <span class="report-button-text">レポートをプレビュー</span>
-              <i class="fas fa-chevron-down ml-2 transform transition-transform duration-300 report-button-icon"></i>
-            </button>
-            <div class="report-content hidden overflow-hidden transition-all duration-300 ease-in-out" style="height: 0" id="report-content-{{.ID}}">
-              <div class="p-5 bg-gray-50 border-t border-gray-200">
-                <pre id="report-text-{{.ID}}" class="whitespace-pre-wrap text-sm text-gray-700"></pre>
-              </div>
-            </div>
-          </div>
-
-          <div class="p-4 bg-gray-100 flex flex-wrap gap-2">
-            <button
-              onclick="generateReport('{{.ID}}')"
-              class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white {{if eq .OpinionCount 0}}bg-gray-400 cursor-not-allowed{{else}}bg-indigo-600 hover:bg-indigo-700{{end}} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
-              {{if eq .OpinionCount 0}}disabled title="意見が投稿されていないため、レポートを生成できません"{{end}}
-            >
-              <i class="fas fa-sync-alt mr-2"></i> レポート再生成
-            </button>
-            <button
-              onclick="generateAnalysis('{{.ID}}')"
-              class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white {{if eq .OpinionCount 0}}bg-gray-400 cursor-not-allowed{{else}}bg-purple-600 hover:bg-purple-700{{end}} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-200"
-              {{if eq .OpinionCount 0}}disabled title="意見が投稿されていないため、分析を実行できません"{{end}}
-            >
-              <i class="fas fa-chart-pie mr-2"></i> 分析再実行
-            </button>
-            <button
-              onclick="toggleHideReport('{{.ID}}', {{if .HideReport}}false{{else}}true{{end}})"
-              id="toggle-button-{{.ID}}"
-              class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white {{if .HideReport}}bg-green-600 hover:bg-green-700{{else}}bg-red-600 hover:bg-red-700{{end}} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-{{if .HideReport}}green{{else}}red{{end}}-500 transition-colors duration-200"
-            >
-              <i class="fas {{if .HideReport}}fa-eye mr-2{{else}}fa-eye-slash mr-2{{end}}"></i>
-              レポート{{if .HideReport}}表示{{else}}非表示{{end}}
-            </button>
-            {{if .IsOwner}}
-            <button
-              @click="showSeedModal = true; currentSessionId='{{.ID}}'"
-              class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200"
-            >
-              <i class="fas fa-seedling mr-2"></i> シード意見投稿
-            </button>
-            {{end}}
-          </div>
-        </div>
-        {{end}}
+      <div id="session-list" class="grid grid-cols-1 gap-6">
       </div>
 
       <!-- Empty state if no sessions -->
-      {{if not .Sessions}}
-      <div class="text-center py-12">
+      <div id="empty-state" class="text-center py-12 hidden">
         <i class="fas fa-box-open text-gray-300 text-5xl mb-3"></i>
         <p class="text-gray-500 text-xl">セッションがありません</p>
       </div>
-      {{end}}
     </div>
 
     <!-- シード意見投稿用モーダル -->
@@ -284,7 +182,7 @@
 
         async function getReport(talkSessionID) {
             try {
-                const response = await fetch(`/manage/report?talkSessionId=${talkSessionID}`, {
+                const response = await fetch(`/v1/manage/talksessions/${talkSessionID}/analysis/report`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -358,14 +256,13 @@
                 buttonElement.disabled = true;
                 buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> 処理中...';
 
-                const response = await fetch(`/manage/regenerate`, {
+                const response = await fetch(`/v1/manage/talksessions/${talkSessionID}/analysis/regenerate`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
                         type: "group",
-                        talkSessionID: talkSessionID,
                     }),
                 });
 
@@ -392,14 +289,13 @@
                 buttonElement.disabled = true;
                 buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> 処理中...';
 
-                const response = await fetch(`/manage/regenerate`, {
+                const response = await fetch(`/v1/manage/talksessions/${talkSessionID}/analysis/regenerate`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
                         type:"report",
-                        talkSessionID: talkSessionID,
                     }),
                 });
 
@@ -426,7 +322,7 @@
                 buttonElement.disabled = true;
                 buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> 処理中...';
 
-                const response = await fetch(`/manage/hideTalkSession`, {
+                const response = await fetch(`/v1/manage/talksessions/${talkSessionID}/analysis/report`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -542,16 +438,133 @@
             }
         }
 
-        window.onload = async function() {
-            const user = await me();
-            if (user) {
-                document.getElementById("user").innerText = user.displayName;
-                document.getElementById("user").style.display = "block";
-            } else {
-                document.getElementById("user").style.display = "none";
+        // セッション一覧を取得して表示する関数
+        async function fetchAndDisplaySessions() {
+            try {
+                const response = await fetch('/v1/manage/talksessions/list', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const sessions = await response.json();
+                const sessionListElement = document.getElementById('session-list');
+                const emptyStateElement = document.getElementById('empty-state');
+
+                if (!sessions || sessions.length === 0) {
+                    sessionListElement.innerHTML = '';
+                    emptyStateElement.classList.remove('hidden');
+                    return;
+                }
+
+                emptyStateElement.classList.add('hidden');
+                sessionListElement.innerHTML = sessions.map(session => `
+                    <div id="task-${session.TalkSessionID}" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                        <div class="p-5 border-b border-gray-200">
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-xl font-bold text-gray-800">${session.Theme}</h3>
+                                <span
+                                    class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${session.Hidden ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}"
+                                    id="report-status-${session.TalkSessionID}"
+                                >
+                                    <i class="${session.Hidden ? 'fas fa-eye-slash mr-1' : 'fas fa-eye mr-1'}"></i>
+                                    レポート: ${session.Hidden ? '非表示' : '表示'}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="p-5 bg-gray-50">
+                            <div class="grid grid-cols-2 gap-3 text-sm text-gray-600">
+                                <div class="flex items-center">
+                                    <i class="fas fa-fingerprint w-5 text-gray-400"></i>
+                                    <span class="ml-2">セッションID: <span class="font-mono text-xs bg-gray-200 px-2 py-0.5 rounded">${session.TalkSessionID}</span></span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-user w-5 text-gray-400"></i>
+                                    <span class="ml-2">作成者: <span class="font-semibold">${session.Owner.DisplayName}</span></span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="far fa-calendar-plus w-5 text-gray-400"></i>
+                                    <span class="ml-2">開始日時: ${new Date(session.CreatedAt).toLocaleString()}</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="far fa-calendar-check w-5 text-gray-400"></i>
+                                    <span class="ml-2">終了日時: ${new Date(session.ScheduledEndTime).toLocaleString()}</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="far fa-comment-dots w-5 text-gray-400"></i>
+                                    <span class="ml-2">意見数: <span class="font-semibold">${session.OpinionCount}</span></span>
+                                </div>
+                                <div>
+                                    <i class="fas fa-thumbs-up w-5 text-gray-400"></i>
+                                    <span class="ml-2">投票数: <span class="font-semibold">${session.VoteCount}</span></span>
+                                </div>
+                                <div>
+                                    <i class="fas fa-user-friends w-5 text-gray-400"></i>
+                                    <span class="ml-2">投票ユーザー数: <span class="font-semibold">${session.VoteUserCount}</span></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-gray-200">
+                            <button
+                                onclick="toggleReport('${session.TalkSessionID}')"
+                                class="w-full px-4 py-3 text-sm font-medium ${session.OpinionCount === 0 ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-50'} transition-colors duration-200 flex items-center justify-center"
+                                ${session.OpinionCount === 0 ? 'disabled title="意見が投稿されていないため、レポートをプレビューできません"' : ''}
+                            >
+                                <i class="fas fa-file-alt mr-2"></i>
+                                <span class="report-button-text">レポートをプレビュー</span>
+                                <i class="fas fa-chevron-down ml-2 transform transition-transform duration-300 report-button-icon"></i>
+                            </button>
+                            <div class="report-content hidden overflow-hidden transition-all duration-300 ease-in-out" style="height: 0" id="report-content-${session.TalkSessionID}">
+                                <div class="p-5 bg-gray-50 border-t border-gray-200">
+                                    <pre id="report-text-${session.TalkSessionID}" class="whitespace-pre-wrap text-sm text-gray-700"></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-gray-100 flex flex-wrap gap-2">
+                            <button
+                                onclick="generateReport('${session.TalkSessionID}')"
+                                class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${session.OpinionCount === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+                                ${session.OpinionCount === 0 ? 'disabled title="意見が投稿されていないため、レポートを生成できません"' : ''}
+                            >
+                                <i class="fas fa-sync-alt mr-2"></i> レポート再生成
+                            </button>
+                            <button
+                                onclick="generateAnalysis('${session.TalkSessionID}')"
+                                class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${session.OpinionCount === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-purple-600 hover:bg-purple-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-200"
+                                ${session.OpinionCount === 0 ? 'disabled title="意見が投稿されていないため、分析を実行できません"' : ''}
+                            >
+                                <i class="fas fa-chart-pie mr-2"></i> 分析再実行
+                            </button>
+                            <button
+                                onclick="toggleHideReport('${session.TalkSessionID}', ${!session.Hidden})"
+                                id="toggle-button-${session.TalkSessionID}"
+                                class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${session.Hidden ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-${session.Hidden ? 'green' : 'red'}-500 transition-colors duration-200"
+                            >
+                                <i class="fas ${session.Hidden ? 'fa-eye mr-2' : 'fa-eye-slash mr-2'}"></i>
+                                レポート${session.Hidden ? '表示' : '非表示'}
+                            </button>
+                            ${session.Owner.UserID === (window.currentUser?.UserID || '') ? `
+                                <button
+                                    @click="showSeedModal = true; currentSessionId='${session.TalkSessionID}'"
+                                    class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200"
+                                >
+                                    <i class="fas fa-seedling mr-2"></i> シード意見投稿
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error fetching sessions:', error);
+                showNotification('セッション一覧の取得に失敗しました', 'error');
             }
         }
 
+        // 既存の関数を更新
         async function me() {
             try {
                 const response = await fetch(`/auth/token/info`, {
@@ -563,12 +576,29 @@
 
                 const result = await response.json();
                 if (result.code) {
+                    window.currentUser = null;
                     return;
                 }
+                window.currentUser = result; // ユーザー情報をグローバルに保存
                 return result;
             } catch (error) {
                 console.error('Error:', error);
             }
+        }
+
+        // ページ読み込み時の処理を更新
+        window.onload = async function() {
+            const user = await me();
+            if (user) {
+                document.getElementById("user").innerText = user.displayName;
+                document.getElementById("user").style.display = "block";
+            } else {
+                document.getElementById("user").innerText = "ログインしていません";
+                document.getElementById("user").style.display = "none";
+            }
+
+            // セッション一覧を取得して表示
+            await fetchAndDisplaySessions();
         }
     </script>
   </body>

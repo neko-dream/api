@@ -123,8 +123,8 @@ func (t *talkSessionHandler) PostConclusion(ctx context.Context, req oas.OptPost
 		return nil, err
 	}
 
-	return &oas.PostConclusionOK{
-		User: oas.PostConclusionOKUser{
+	return &oas.Conclusion{
+		User: oas.User{
 			DisplayID:   res.DisplayID,
 			DisplayName: res.DisplayName,
 			IconURL:     utils.ToOptNil[oas.OptNilString](res.IconURL),
@@ -154,8 +154,8 @@ func (t *talkSessionHandler) GetConclusion(ctx context.Context, params oas.GetCo
 		return nil, messages.TalkSessionConclusionNotSet
 	}
 
-	return &oas.GetConclusionOK{
-		User: oas.GetConclusionOKUser{
+	return &oas.Conclusion{
+		User: oas.User{
 			DisplayID:   res.DisplayID,
 			DisplayName: res.DisplayName,
 			IconURL:     utils.ToOptNil[oas.OptNilString](res.IconURL),
@@ -206,36 +206,36 @@ func (t *talkSessionHandler) GetOpenedTalkSession(ctx context.Context, params oa
 
 	resultTalkSession := make([]oas.GetOpenedTalkSessionOKTalkSessionsItem, 0, len(out.TalkSessions))
 	for _, talkSession := range out.TalkSessions {
-		owner := oas.GetOpenedTalkSessionOKTalkSessionsItemTalkSessionOwner{
+		owner := oas.User{
 			DisplayID:   talkSession.User.DisplayID,
 			DisplayName: talkSession.User.DisplayName,
 			IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.User.IconURL),
 		}
-		var location oas.OptGetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation
+		var location oas.OptLocation
 		if talkSession.HasLocation() {
-			location = oas.OptGetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation{
-				Value: oas.GetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation{
+			location = oas.OptLocation{
+				Value: oas.Location{
 					Latitude:  utils.ToOpt[oas.OptFloat64](talkSession.Latitude),
 					Longitude: utils.ToOpt[oas.OptFloat64](talkSession.Longitude),
 				},
 				Set: true,
 			}
 		} else {
-			location = oas.OptGetOpenedTalkSessionOKTalkSessionsItemTalkSessionLocation{}
+			location = oas.OptLocation{}
 			location.Set = false
 		}
-		var restrictions []oas.GetOpenedTalkSessionOKTalkSessionsItemTalkSessionRestrictionsItem
+		var restrictions []oas.Restriction
 		for _, restriction := range talkSession.TalkSession.Restrictions {
 			res := talksession.RestrictionAttributeKey(restriction)
 			attr := res.RestrictionAttribute()
-			restrictions = append(restrictions, oas.GetOpenedTalkSessionOKTalkSessionsItemTalkSessionRestrictionsItem{
+			restrictions = append(restrictions, oas.Restriction{
 				Key:         string(attr.Key),
 				Description: attr.Description,
 			})
 		}
 
 		resultTalkSession = append(resultTalkSession, oas.GetOpenedTalkSessionOKTalkSessionsItem{
-			TalkSession: oas.GetOpenedTalkSessionOKTalkSessionsItemTalkSession{
+			TalkSession: oas.TalkSession{
 				ID:               talkSession.TalkSessionID.String(),
 				Theme:            talkSession.Theme,
 				Owner:            owner,
@@ -325,21 +325,21 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 		return nil, errtrace.Wrap(err)
 	}
 
-	var location oas.OptCreateTalkSessionOKLocation
+	var location oas.OptLocation
 	if out.HasLocation() {
-		location = oas.OptCreateTalkSessionOKLocation{
-			Value: oas.CreateTalkSessionOKLocation{
+		location = oas.OptLocation{
+			Value: oas.Location{
 				Latitude:  utils.ToOpt[oas.OptFloat64](out.Latitude),
 				Longitude: utils.ToOpt[oas.OptFloat64](out.Longitude),
 			},
 			Set: true,
 		}
 	}
-	var restrictions []oas.CreateTalkSessionOKRestrictionsItem
+	var restrictions []oas.Restriction
 	for _, restriction := range out.TalkSession.Restrictions {
 		res := talksession.RestrictionAttributeKey(restriction)
 		attr := res.RestrictionAttribute()
-		restrictions = append(restrictions, oas.CreateTalkSessionOKRestrictionsItem{
+		restrictions = append(restrictions, oas.Restriction{
 			Key:         string(attr.Key),
 			Description: attr.Description,
 		})
@@ -347,7 +347,7 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 
 	res := &oas.CreateTalkSessionOK{
 		ID: out.TalkSession.TalkSessionID.String(),
-		Owner: oas.CreateTalkSessionOKOwner{
+		Owner: oas.User{
 			DisplayID:   out.User.DisplayID,
 			DisplayName: out.User.DisplayName,
 			IconURL:     utils.ToOptNil[oas.OptNilString](out.User.IconURL),
@@ -381,32 +381,32 @@ func (t *talkSessionHandler) GetTalkSessionDetail(ctx context.Context, params oa
 		return nil, err
 	}
 
-	owner := oas.GetTalkSessionDetailOKOwner{
+	owner := oas.User{
 		DisplayID:   out.User.DisplayID,
 		DisplayName: out.User.DisplayName,
 		IconURL:     utils.ToOptNil[oas.OptNilString](out.User.IconURL),
 	}
-	var location oas.OptGetTalkSessionDetailOKLocation
+	var location oas.OptLocation
 	if out.HasLocation() {
-		location = oas.OptGetTalkSessionDetailOKLocation{
-			Value: oas.GetTalkSessionDetailOKLocation{
+		location = oas.OptLocation{
+			Value: oas.Location{
 				Latitude:  utils.ToOpt[oas.OptFloat64](out.Latitude),
 				Longitude: utils.ToOpt[oas.OptFloat64](out.Longitude),
 			},
 			Set: true,
 		}
 	}
-	var restrictions []oas.GetTalkSessionDetailOKRestrictionsItem
+	var restrictions []oas.Restriction
 	for _, restriction := range out.TalkSession.Restrictions {
 		res := talksession.RestrictionAttributeKey(restriction)
 		attr := res.RestrictionAttribute()
-		restrictions = append(restrictions, oas.GetTalkSessionDetailOKRestrictionsItem{
+		restrictions = append(restrictions, oas.Restriction{
 			Key:         string(attr.Key),
 			Description: attr.Description,
 		})
 	}
 
-	return &oas.GetTalkSessionDetailOK{
+	return &oas.TalkSession{
 		ID:               out.TalkSessionID.String(),
 		Theme:            out.Theme,
 		Description:      utils.ToOptNil[oas.OptNilString](out.Description),
@@ -472,33 +472,33 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 
 	resultTalkSession := make([]oas.GetTalkSessionListOKTalkSessionsItem, 0, len(out.TalkSessions))
 	for _, talkSession := range out.TalkSessions {
-		owner := oas.GetTalkSessionListOKTalkSessionsItemTalkSessionOwner{
+		owner := oas.User{
 			DisplayID:   talkSession.User.DisplayID,
 			DisplayName: talkSession.User.DisplayName,
 			IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.User.IconURL),
 		}
-		var location oas.OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation
+		var location oas.OptLocation
 		if talkSession.HasLocation() {
-			location = oas.OptGetTalkSessionListOKTalkSessionsItemTalkSessionLocation{
-				Value: oas.GetTalkSessionListOKTalkSessionsItemTalkSessionLocation{
+			location = oas.OptLocation{
+				Value: oas.Location{
 					Latitude:  utils.ToOpt[oas.OptFloat64](talkSession.Latitude),
 					Longitude: utils.ToOpt[oas.OptFloat64](talkSession.Longitude),
 				},
 				Set: true,
 			}
 		}
-		var restrictions []oas.GetTalkSessionListOKTalkSessionsItemTalkSessionRestrictionsItem
+		var restrictions []oas.Restriction
 		for _, restriction := range talkSession.TalkSession.Restrictions {
 			res := talksession.RestrictionAttributeKey(restriction)
 			attr := res.RestrictionAttribute()
-			restrictions = append(restrictions, oas.GetTalkSessionListOKTalkSessionsItemTalkSessionRestrictionsItem{
+			restrictions = append(restrictions, oas.Restriction{
 				Key:         string(attr.Key),
 				Description: attr.Description,
 			})
 		}
 
 		res := oas.GetTalkSessionListOKTalkSessionsItem{
-			TalkSession: oas.GetTalkSessionListOKTalkSessionsItemTalkSession{
+			TalkSession: oas.TalkSession{
 				ID:               talkSession.TalkSessionID.String(),
 				Theme:            talkSession.Theme,
 				Description:      utils.ToOptNil[oas.OptNilString](talkSession.Description),
@@ -519,7 +519,7 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 
 	return &oas.GetTalkSessionListOK{
 		TalkSessions: resultTalkSession,
-		Pagination: oas.GetTalkSessionListOKPagination{
+		Pagination: oas.OffsetPagination{
 			TotalCount: out.TotalCount,
 			Limit:      out.Limit,
 			Offset:     out.Offset,
@@ -554,10 +554,10 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 		return nil, err
 	}
 
-	var myPosition oas.OptTalkSessionAnalysisOKMyPosition
+	var myPosition oas.OptUserGroupPosition
 	if out.MyPosition != nil {
-		myPosition = oas.OptTalkSessionAnalysisOKMyPosition{
-			Value: oas.TalkSessionAnalysisOKMyPosition{
+		myPosition = oas.OptUserGroupPosition{
+			Value: oas.UserGroupPosition{
 				PosX:           out.MyPosition.PosX,
 				PosY:           out.MyPosition.PosY,
 				DisplayID:      out.MyPosition.DisplayID,
@@ -571,9 +571,9 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 		}
 	}
 
-	positions := make([]oas.TalkSessionAnalysisOKPositionsItem, 0, len(out.Positions))
+	positions := make([]oas.UserGroupPosition, 0, len(out.Positions))
 	for _, position := range out.Positions {
-		positions = append(positions, oas.TalkSessionAnalysisOKPositionsItem{
+		positions = append(positions, oas.UserGroupPosition{
 			PosX:           position.PosX,
 			PosY:           position.PosY,
 			DisplayID:      position.DisplayID,
@@ -590,7 +590,7 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 		opinions := make([]oas.TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem, 0, len(groupOpinion.Opinions))
 		for _, opinion := range groupOpinion.Opinions {
 			opinions = append(opinions, oas.TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem{
-				Opinion: oas.TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemOpinion{
+				Opinion: oas.Opinion{
 					ID:           opinion.Opinion.OpinionID.String(),
 					Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Title),
 					Content:      opinion.Opinion.Content,
@@ -600,7 +600,7 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 					PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
 					IsDeleted:    opinion.Opinion.IsDeleted,
 				},
-				User: oas.TalkSessionAnalysisOKGroupOpinionsItemOpinionsItemUser{
+				User: oas.User{
 					DisplayID:   opinion.User.DisplayID,
 					DisplayName: opinion.User.DisplayName,
 					IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.IconURL),
@@ -669,32 +669,32 @@ func (t *talkSessionHandler) EditTalkSession(ctx context.Context, req oas.OptEdi
 	if err != nil {
 		return nil, err
 	}
-	owner := oas.EditTalkSessionOKOwner{
+	owner := oas.User{
 		DisplayID:   out.User.DisplayID,
 		DisplayName: out.User.DisplayName,
 		IconURL:     utils.ToOptNil[oas.OptNilString](talkSessionDetail.User.IconURL),
 	}
 
-	var location oas.OptEditTalkSessionOKLocation
+	var location oas.OptLocation
 	if out.HasLocation() {
-		location = oas.OptEditTalkSessionOKLocation{
-			Value: oas.EditTalkSessionOKLocation{
+		location = oas.OptLocation{
+			Value: oas.Location{
 				Latitude:  utils.ToOpt[oas.OptFloat64](talkSessionDetail.Latitude),
 				Longitude: utils.ToOpt[oas.OptFloat64](talkSessionDetail.Longitude),
 			},
 			Set: true,
 		}
 	}
-	var restrictions []oas.EditTalkSessionOKRestrictionsItem
+	var restrictions []oas.Restriction
 	for _, restriction := range out.TalkSession.Restrictions {
 		res := talksession.RestrictionAttributeKey(restriction)
 		attr := res.RestrictionAttribute()
-		restrictions = append(restrictions, oas.EditTalkSessionOKRestrictionsItem{
+		restrictions = append(restrictions, oas.Restriction{
 			Key:         string(attr.Key),
 			Description: attr.Description,
 		})
 	}
-	res := &oas.EditTalkSessionOK{
+	res := &oas.TalkSession{
 		ID:               out.TalkSession.TalkSessionID.String(),
 		Theme:            out.TalkSession.Theme,
 		Description:      utils.ToOptNil[oas.OptNilString](out.TalkSession.Description),
@@ -721,9 +721,9 @@ func (t *talkSessionHandler) GetTalkSessionRestrictionKeys(ctx context.Context) 
 		return nil, err
 	}
 
-	keys := make([]oas.GetTalkSessionRestrictionKeysOKItem, 0, len(out.Restrictions))
+	keys := make([]oas.Restriction, 0, len(out.Restrictions))
 	for _, restriction := range out.Restrictions {
-		keys = append(keys, oas.GetTalkSessionRestrictionKeysOKItem{
+		keys = append(keys, oas.Restriction{
 			Key:         string(restriction.Key),
 			Description: restriction.Description,
 		})
@@ -763,9 +763,9 @@ func (t *talkSessionHandler) GetTalkSessionRestrictionSatisfied(ctx context.Cont
 		return nil, err
 	}
 
-	attributes := make([]oas.GetTalkSessionRestrictionSatisfiedOKItem, 0, len(out.Attributes))
+	attributes := make([]oas.Restriction, 0, len(out.Attributes))
 	for _, attribute := range out.Attributes {
-		attributes = append(attributes, oas.GetTalkSessionRestrictionSatisfiedOKItem{
+		attributes = append(attributes, oas.Restriction{
 			Key:         string(attribute.Key),
 			Description: attribute.Description,
 		})
@@ -815,7 +815,7 @@ func (t *talkSessionHandler) GetReportsForTalkSession(ctx context.Context, param
 		return nil, err
 	}
 
-	reports := make([]oas.GetReportsForTalkSessionOKReportsItem, 0, len(out.Reports))
+	reports := make([]oas.ReportDetail, 0, len(out.Reports))
 	for _, report := range out.Reports {
 		var parentOpinionID oas.OptString
 		if report.Opinion.ParentOpinionID != nil {
@@ -825,16 +825,16 @@ func (t *talkSessionHandler) GetReportsForTalkSession(ctx context.Context, param
 			}
 		}
 
-		reasons := make([]oas.GetReportsForTalkSessionOKReportsItemReasonsItem, 0, len(report.Reasons))
+		reasons := make([]oas.ReportDetailReasonsItem, 0, len(report.Reasons))
 		for _, reason := range report.Reasons {
-			reasons = append(reasons, oas.GetReportsForTalkSessionOKReportsItemReasonsItem{
+			reasons = append(reasons, oas.ReportDetailReasonsItem{
 				Reason:  reason.Reason,
 				Content: utils.ToOptNil[oas.OptNilString](reason.Content),
 			})
 		}
 
-		reports = append(reports, oas.GetReportsForTalkSessionOKReportsItem{
-			Opinion: oas.GetReportsForTalkSessionOKReportsItemOpinion{
+		reports = append(reports, oas.ReportDetail{
+			Opinion: oas.Opinion{
 				ID:           report.Opinion.OpinionID.String(),
 				Title:        utils.ToOpt[oas.OptString](report.Opinion.Title),
 				Content:      report.Opinion.Content,
@@ -844,12 +844,12 @@ func (t *talkSessionHandler) GetReportsForTalkSession(ctx context.Context, param
 				PostedAt:     report.Opinion.CreatedAt.Format(time.RFC3339),
 				IsDeleted:    report.Opinion.IsDeleted,
 			},
-			User: oas.GetReportsForTalkSessionOKReportsItemUser{
+			User: oas.User{
 				DisplayID:   report.User.DisplayID,
 				DisplayName: report.User.DisplayName,
 				IconURL:     utils.ToOptNil[oas.OptNilString](report.User.IconURL),
 			},
-			Status:      oas.GetReportsForTalkSessionOKReportsItemStatus(report.Status),
+			Status:      oas.ReportDetailStatus(report.Status),
 			Reasons:     reasons,
 			ReportCount: report.ReportCount,
 		})

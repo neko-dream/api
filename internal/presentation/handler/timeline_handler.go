@@ -54,9 +54,9 @@ func (t *timelineHandler) GetTimeLine(ctx context.Context, params oas.GetTimeLin
 		return nil, err
 	}
 
-	actionItems := make([]oas.GetTimeLineOKItemsItem, len(output.ActionItems))
+	actionItems := make([]oas.ActionItem, len(output.ActionItems))
 	for i, actionItem := range output.ActionItems {
-		actionItems[i] = oas.GetTimeLineOKItemsItem{
+		actionItems[i] = oas.ActionItem{
 			ActionItemID: actionItem.ActionItemID.String(),
 			Sequence:     actionItem.Sequence,
 			Content:      actionItem.Content,
@@ -165,7 +165,7 @@ func (t *timelineHandler) EditTimeLine(ctx context.Context, req oas.OptEditTimeL
 		return nil, err
 	}
 
-	return &oas.EditTimeLineOK{
+	return &oas.ActionItem{
 		ActionItemID: output.ActionItem.ActionItemID.String(),
 		Content:      output.ActionItem.Content,
 		Status:       output.ActionItem.Status.String(),

@@ -61,6 +61,7 @@ func main() {
 		domain = "http://localhost:" + conf.PORT + "/static/openapi.yaml"
 	}
 	mux.Handle("/static/", http.StripPrefix("/static/", handler.NewStaticHandler()))
+	mux.Handle("/manage/", http.StripPrefix("/manage/", handler.NewManageFrontHandler()))
 	mux.Handle("/docs/", v5emb.New("kotohiro", domain, "/docs/"))
 	// }
 

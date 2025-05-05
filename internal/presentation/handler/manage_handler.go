@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"database/sql"
-	"strings"
 	"text/template"
 	"time"
 
@@ -13,7 +12,6 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/infrastructure/http/templates"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/server/internal/presentation/oas"
@@ -35,13 +33,7 @@ func NewManageHandler(
 	arep analysis.AnalysisRepository,
 	tokenManager session.TokenManager,
 ) oas.ManageHandler {
-	tmpl, err := template.ParseFS(templates.TemplateFS, "*html")
-	if err != nil {
-		panic(err)
-	}
-
 	return &manageHandler{
-		templates:          tmpl,
 		DBManager:          dbm,
 		AnalysisService:    ansv,
 		AnalysisRepository: arep,
@@ -49,19 +41,120 @@ func NewManageHandler(
 	}
 }
 
-// ManageRegenerate implements oas.ManageHandler.
-func (m *manageHandler) ManageRegenerate(ctx context.Context, req oas.OptManageRegenerateReq) (*oas.ManageRegenerateOK, error) {
+// GetTalkSessionListManage implements oas.ManageHandler.
+func (m *manageHandler) GetTalkSessionListManage(ctx context.Context, params oas.GetTalkSessionListManageParams) ([]oas.TalkSessionStats, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetTalkSessionListManage")
+	defer span.End()
+
+	claim := session.GetSession(m.SetSession(ctx))
+	var userID *shared.UUID[user.User]
+	if claim != nil {
+		id, err := claim.UserID()
+		if err == nil {
+			userID = &id
+		}
+	}
+	if userID == nil {
+		return []oas.TalkSessionStats{}, messages.ForbiddenError
+	}
+	// org所属のユーザであることを確認
+	if claim.OrgType == nil {
+		return []oas.TalkSessionStats{}, messages.ForbiddenError
+	}
+
+	rows, err := m.GetQueries(ctx).ListTalkSessions(ctx, model.ListTalkSessionsParams{
+		Limit:   1000,
+		Offset:  0,
+		SortKey: sql.NullString{String: "latest", Valid: true},
+	})
+	if err != nil {
+		utils.HandleError(ctx, err, "GetQueries.ListTalkSessions")
+		return []oas.TalkSessionStats{}, err
+	}
+
+	talkSessionStats := make([]oas.TalkSessionStats, 0, len(rows))
+	for _, row := range rows {
+		var city oas.OptString
+		if row.TalkSession.City.Valid {
+			city = oas.OptString{
+				Value: row.TalkSession.City.String,
+				Set:   true,
+			}
+		}
+		var description string
+		if row.TalkSession.Description.Valid {
+			description = row.TalkSession.Description.String
+		}
+
+		var prefecture oas.OptString
+		if row.TalkSession.Prefecture.Valid {
+			prefecture = oas.OptString{
+				Value: row.TalkSession.Prefecture.String,
+				Set:   true,
+			}
+		}
+
+		var iconURL string
+		if row.User.IconUrl.Valid {
+			iconURL = row.User.IconUrl.String
+		} else {
+			iconURL = ""
+		}
+		owner := oas.UserForManage{
+			DisplayID:   row.User.DisplayID.String,
+			DisplayName: row.User.DisplayName.String,
+			IconURL:     iconURL,
+		}
+		var thumbnailURL string
+		if row.TalkSession.ThumbnailUrl.Valid {
+			thumbnailURL = row.TalkSession.ThumbnailUrl.String
+		} else {
+			thumbnailURL = ""
+		}
+
+		talkSessionStats = append(talkSessionStats, oas.TalkSessionStats{
+			TalkSessionID:    row.TalkSession.TalkSessionID.String(),
+			Theme:            row.TalkSession.Theme,
+			Description:      description,
+			City:             city,
+			Prefecture:       prefecture,
+			ThumbnailURL:     thumbnailURL,
+			Hidden:           row.TalkSession.HideReport.Bool,
+			Owner:            owner,
+			ScheduledEndTime: row.TalkSession.ScheduledEndTime,
+			CreatedAt:        row.TalkSession.CreatedAt.Format(time.RFC3339),
+			OpinionCount:     int32(int(row.OpinionCount)),
+			VoteCount:        int32(int(row.VoteCount)),
+			VoteUserCount:    int32(int(row.VoteUserCount)),
+		})
+	}
+
+	return talkSessionStats, nil
+}
+
+// GetTalkSessionManage implements oas.ManageHandler.
+func (m *manageHandler) GetTalkSessionManage(ctx context.Context, params oas.GetTalkSessionManageParams) (*oas.TalkSessionForManage, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetTalkSessionManage")
+	defer span.End()
+
+	_ = ctx
+
+	panic("unimplemented")
+}
+
+// ManageRegenerateManage implements oas.ManageHandler.
+func (m *manageHandler) ManageRegenerateManage(ctx context.Context, req *oas.RegenerateRequest, params oas.ManageRegenerateManageParams) (*oas.RegenerateResponse, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.ManageRegenerate")
 	defer span.End()
 
-	tp := req.Value.Type
+	tp := req.Type
 	tpb, err := tp.MarshalText()
 	if err != nil {
 		return nil, err
 	}
 	tpt := string(tpb)
 
-	talkSessionIDStr := req.Value.TalkSessionID
+	talkSessionIDStr := params.TalkSessionID
 	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](talkSessionIDStr)
 	if err != nil {
 		utils.HandleError(ctx, err, "shared.ParseUUID")
@@ -89,125 +182,46 @@ func (m *manageHandler) ManageRegenerate(ctx context.Context, req oas.OptManageR
 		}()
 	}
 
-	return &oas.ManageRegenerateOK{
-		Message: oas.OptString{Value: "success", Set: true},
+	return &oas.RegenerateResponse{
+		Message: "success",
+		Status:  "success",
 	}, nil
 }
 
-// ManageIndex implements oas.ManageHandler.
-func (m *manageHandler) ManageIndex(ctx context.Context) (oas.ManageIndexOK, error) {
-	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.ManageIndex")
+// ToggleReportVisibilityManage implements oas.ManageHandler.
+func (m *manageHandler) ToggleReportVisibilityManage(ctx context.Context, req *oas.ToggleReportVisibilityRequest, params oas.ToggleReportVisibilityManageParams) (*oas.ToggleReportVisibilityResponse, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.ToggleReportVisibilityManage")
 	defer span.End()
 
 	claim := session.GetSession(m.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if claim != nil {
-		id, err := claim.UserID()
-		if err == nil {
-			userID = &id
-		}
-	}
-	if userID == nil {
-		return oas.ManageIndexOK{}, messages.ForbiddenError
-	}
-	// org所属のユーザであることを確認
-	if claim.OrgType == nil {
-		return oas.ManageIndexOK{}, messages.ForbiddenError
-	}
-
-	rows, err := m.GetQueries(ctx).ListTalkSessions(ctx, model.ListTalkSessionsParams{
-		Limit:   1000,
-		Offset:  0,
-		SortKey: sql.NullString{String: "latest", Valid: true},
-	})
-	if err != nil {
-		utils.HandleError(ctx, err, "GetQueries.ListTalkSessions")
-		return oas.ManageIndexOK{}, err
-	}
-
-	var sessions []map[string]any
-	for _, row := range rows {
-		res := map[string]any{
-			"ID":            row.TalkSession.TalkSessionID,
-			"Theme":         row.TalkSession.Theme,
-			"HideReport":    row.TalkSession.HideReport.Bool,
-			"CreatedAt":     row.TalkSession.CreatedAt.Format(time.RFC3339),
-			"EndTime":       row.TalkSession.ScheduledEndTime.Format(time.RFC3339),
-			"OpinionCount":  row.OpinionCount,
-			"DisplayName":   row.User.DisplayName.String,
-			"IsOwner":       row.TalkSession.OwnerID == userID.UUID(),
-			"VoteCount":     row.VoteCount,
-			"VoteUserCount": row.VoteUserCount,
-		}
-
-		rr, err := m.GetQueries(ctx).GetGeneratedImages(ctx, row.TalkSession.TalkSessionID)
-		if err == nil {
-			res["WordCloud"] = rr.WordmapUrl
-			res["Tsnc"] = rr.TsncUrl
-		}
-
-		sessions = append(sessions, res)
-	}
-
-	var html strings.Builder
-	data := map[string]any{
-		"Sessions": sessions,
-	}
-
-	if err := m.templates.ExecuteTemplate(&html, "index.gohtml", data); err != nil {
-		utils.HandleError(ctx, err, "templates.ExecuteTemplate")
-		return oas.ManageIndexOK{}, err
-	}
-
-	return oas.ManageIndexOK{
-		Data: strings.NewReader(html.String()),
-	}, nil
-}
-
-// TalkSessionHideToggle implements oas.ManageHandler.
-func (m *manageHandler) TalkSessionHideToggle(ctx context.Context, req oas.OptTalkSessionHideToggleReq) (*oas.TalkSessionHideToggleOK, error) {
-	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.TalkSessionHideToggle")
-	defer span.End()
-
-	claim := session.GetSession(m.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if claim != nil {
-		id, err := claim.UserID()
-		if err == nil {
-			userID = &id
-		}
-	}
-	if userID == nil {
+	if claim == nil {
 		return nil, messages.ForbiddenError
 	}
-	// org所属のユーザであることを確認
 	if claim.OrgType == nil {
 		return nil, messages.ForbiddenError
 	}
 
-	talkSessionIDStr := req.Value.TalkSessionID
-	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](talkSessionIDStr)
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
 	if err != nil {
-		utils.HandleError(ctx, err, "shared.ParseUUID")
-		return nil, err
+		return nil, messages.BadRequestError
 	}
 
-	hide := req.Value.Hide
 	if err := m.GetQueries(ctx).UpdateTalkSessionHideReport(ctx, model.UpdateTalkSessionHideReportParams{
 		TalkSessionID: talkSessionID.UUID(),
-		HideReport:    sql.NullBool{Bool: hide, Valid: true},
+		HideReport:    sql.NullBool{Bool: req.Hidden, Valid: true},
 	}); err != nil {
-		utils.HandleError(ctx, err, "GetQueries.UpdateTalkSessionHideReport")
+
 		return nil, err
 	}
 
-	return &oas.TalkSessionHideToggleOK{
-		Status: oas.OptString{Value: "success", Set: true},
+	return &oas.ToggleReportVisibilityResponse{
+		Status:  "success",
+		Message: "success",
 	}, nil
 }
 
 // GetReportBySessionId implements oas.ManageHandler.
-func (m *manageHandler) GetReportBySessionId(ctx context.Context, params oas.GetReportBySessionIdParams) (*oas.GetReportBySessionIdOK, error) {
+func (m *manageHandler) GetAnalysisReportManage(ctx context.Context, params oas.GetAnalysisReportManageParams) (*oas.AnalysisReportResponse, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetReportBySessionId")
 	defer span.End()
 
@@ -227,7 +241,7 @@ func (m *manageHandler) GetReportBySessionId(ctx context.Context, params oas.Get
 		return nil, messages.ForbiddenError
 	}
 
-	talkSessionIDStr := params.TalkSessionId
+	talkSessionIDStr := params.TalkSessionID
 	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](talkSessionIDStr)
 	if err != nil {
 		utils.HandleError(ctx, err, "shared.ParseUUID")
@@ -240,10 +254,10 @@ func (m *manageHandler) GetReportBySessionId(ctx context.Context, params oas.Get
 		return nil, err
 	}
 	if res.Report == nil {
-		return &oas.GetReportBySessionIdOK{}, nil
+		return nil, &messages.ReportNotFound
 	}
 
-	return &oas.GetReportBySessionIdOK{
+	return &oas.AnalysisReportResponse{
 		Report: oas.OptString{Value: *res.Report, Set: true},
 	}, nil
 }

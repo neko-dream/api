@@ -100,10 +100,10 @@ func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHi
 
 	opinions := make([]oas.OpinionsHistoryOKOpinionsItem, 0, len(out.Opinions))
 	for _, opinion := range out.Opinions {
-		var parentVoteType oas.OptNilOpinionsHistoryOKOpinionsItemOpinionVoteType
+		var parentVoteType oas.OptNilOpinionVoteType
 		if opinion.GetParentVoteType() != nil {
-			parentVoteType = oas.OptNilOpinionsHistoryOKOpinionsItemOpinionVoteType{
-				Value: oas.OpinionsHistoryOKOpinionsItemOpinionVoteType(*opinion.GetParentVoteType()),
+			parentVoteType = oas.OptNilOpinionVoteType{
+				Value: oas.OpinionVoteType(*opinion.GetParentVoteType()),
 				Set:   true,
 				Null:  false,
 			}
@@ -117,7 +117,7 @@ func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHi
 		}
 
 		opinions = append(opinions, oas.OpinionsHistoryOKOpinionsItem{
-			Opinion: oas.OpinionsHistoryOKOpinionsItemOpinion{
+			Opinion: oas.Opinion{
 				ID:           opinion.Opinion.OpinionID.String(),
 				Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Title),
 				Content:      opinion.Opinion.Content,
@@ -128,7 +128,7 @@ func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHi
 				PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
 				IsDeleted:    opinion.Opinion.IsDeleted,
 			},
-			User: oas.OpinionsHistoryOKOpinionsItemUser{
+			User: oas.User{
 				DisplayID:   opinion.User.DisplayID,
 				DisplayName: opinion.User.DisplayName,
 				IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.IconURL),
@@ -193,10 +193,10 @@ func (u *userHandler) SessionsHistory(ctx context.Context, params oas.SessionsHi
 	talkSessions := make([]oas.SessionsHistoryOKTalkSessionsItem, 0, len(out.TalkSessions))
 	for _, talkSession := range out.TalkSessions {
 		talkSessions = append(talkSessions, oas.SessionsHistoryOKTalkSessionsItem{
-			TalkSession: oas.SessionsHistoryOKTalkSessionsItemTalkSession{
+			TalkSession: oas.TalkSession{
 				ID:    talkSession.TalkSessionID.String(),
 				Theme: talkSession.Theme,
-				Owner: oas.SessionsHistoryOKTalkSessionsItemTalkSessionOwner{
+				Owner: oas.User{
 					DisplayID:   talkSession.User.DisplayID,
 					DisplayName: talkSession.User.DisplayName,
 					IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.User.IconURL),
@@ -210,7 +210,7 @@ func (u *userHandler) SessionsHistory(ctx context.Context, params oas.SessionsHi
 
 	return &oas.SessionsHistoryOK{
 		TalkSessions: talkSessions,
-		Pagination: oas.SessionsHistoryOKPagination{
+		Pagination: oas.OffsetPagination{
 			TotalCount: out.TotalCount,
 		},
 	}, nil
@@ -240,13 +240,13 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 		return nil, messages.InternalServerError
 	}
 
-	userResp := oas.GetUserInfoOKUser{
+	userResp := oas.User{
 		DisplayID:   res.User.DisplayID,
 		DisplayName: res.User.DisplayName,
 		IconURL:     utils.ToOptNil[oas.OptNilString](res.User.IconURL),
 	}
 
-	var demographicsResp oas.GetUserInfoOKDemographics
+	var demographicsResp oas.UserDemographics
 	if res.User.UserDemographic != nil {
 		demographics := res.User.UserDemographic
 		var city oas.OptNilString
@@ -278,7 +278,7 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 			}
 		}
 
-		demographicsResp = oas.GetUserInfoOKDemographics{
+		demographicsResp = oas.UserDemographics{
 			DateOfBirth: dateOfBirth,
 			Gender:      gender,
 			Prefecture:  prefecture,

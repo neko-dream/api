@@ -3,7 +3,6 @@
 package oas
 
 import (
-	"io"
 	"net/http"
 
 	"github.com/go-faster/errors"
@@ -480,7 +479,7 @@ func encodeDummiInitResponse(response DummiInitRes, w http.ResponseWriter, span 
 
 func encodeEditTalkSessionResponse(response EditTalkSessionRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *EditTalkSessionOK:
+	case *TalkSession:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -526,7 +525,7 @@ func encodeEditTalkSessionResponse(response EditTalkSessionRes, w http.ResponseW
 
 func encodeEditTimeLineResponse(response EditTimeLineRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *EditTimeLineOK:
+	case *ActionItem:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -616,9 +615,23 @@ func encodeEditUserProfileResponse(response EditUserProfileRes, w http.ResponseW
 	}
 }
 
+func encodeGetAnalysisReportManageResponse(response *AnalysisReportResponse, w http.ResponseWriter, span trace.Span) error {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(200)
+	span.SetStatus(codes.Ok, http.StatusText(200))
+
+	e := new(jx.Encoder)
+	response.Encode(e)
+	if _, err := e.WriteTo(w); err != nil {
+		return errors.Wrap(err, "write")
+	}
+
+	return nil
+}
+
 func encodeGetConclusionResponse(response GetConclusionRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *GetConclusionOK:
+	case *Conclusion:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -868,7 +881,7 @@ func encodeGetOpinionReportReasonsResponse(response GetOpinionReportReasonsRes, 
 
 func encodeGetOpinionReportsResponse(response GetOpinionReportsRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *GetOpinionReportsOK:
+	case *ReportDetail:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -1006,7 +1019,7 @@ func encodeGetOrganizationsResponse(response GetOrganizationsRes, w http.Respons
 
 func encodeGetPolicyConsentStatusResponse(response GetPolicyConsentStatusRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *GetPolicyConsentStatusOK:
+	case *PolicyConsentStatus:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -1048,20 +1061,6 @@ func encodeGetPolicyConsentStatusResponse(response GetPolicyConsentStatusRes, w 
 	default:
 		return errors.Errorf("unexpected response type: %T", response)
 	}
-}
-
-func encodeGetReportBySessionIdResponse(response *GetReportBySessionIdOK, w http.ResponseWriter, span trace.Span) error {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(200)
-	span.SetStatus(codes.Ok, http.StatusText(200))
-
-	e := new(jx.Encoder)
-	response.Encode(e)
-	if _, err := e.WriteTo(w); err != nil {
-		return errors.Wrap(err, "write")
-	}
-
-	return nil
 }
 
 func encodeGetReportsForTalkSessionResponse(response GetReportsForTalkSessionRes, w http.ResponseWriter, span trace.Span) error {
@@ -1112,7 +1111,7 @@ func encodeGetReportsForTalkSessionResponse(response GetReportsForTalkSessionRes
 
 func encodeGetTalkSessionDetailResponse(response GetTalkSessionDetailRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *GetTalkSessionDetailOK:
+	case *TalkSession:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -1187,6 +1186,38 @@ func encodeGetTalkSessionListResponse(response GetTalkSessionListRes, w http.Res
 	default:
 		return errors.Errorf("unexpected response type: %T", response)
 	}
+}
+
+func encodeGetTalkSessionListManageResponse(response []TalkSessionStats, w http.ResponseWriter, span trace.Span) error {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(200)
+	span.SetStatus(codes.Ok, http.StatusText(200))
+
+	e := new(jx.Encoder)
+	e.ArrStart()
+	for _, elem := range response {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+	if _, err := e.WriteTo(w); err != nil {
+		return errors.Wrap(err, "write")
+	}
+
+	return nil
+}
+
+func encodeGetTalkSessionManageResponse(response *TalkSessionForManage, w http.ResponseWriter, span trace.Span) error {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(200)
+	span.SetStatus(codes.Ok, http.StatusText(200))
+
+	e := new(jx.Encoder)
+	response.Encode(e)
+	if _, err := e.WriteTo(w); err != nil {
+		return errors.Wrap(err, "write")
+	}
+
+	return nil
 }
 
 func encodeGetTalkSessionReportResponse(response GetTalkSessionReportRes, w http.ResponseWriter, span trace.Span) error {
@@ -1623,20 +1654,7 @@ func encodeInviteOrganizationForUserResponse(response InviteOrganizationForUserR
 	}
 }
 
-func encodeManageIndexResponse(response ManageIndexOK, w http.ResponseWriter, span trace.Span) error {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	w.WriteHeader(200)
-	span.SetStatus(codes.Ok, http.StatusText(200))
-
-	writer := w
-	if _, err := io.Copy(writer, response); err != nil {
-		return errors.Wrap(err, "write")
-	}
-
-	return nil
-}
-
-func encodeManageRegenerateResponse(response *ManageRegenerateOK, w http.ResponseWriter, span trace.Span) error {
+func encodeManageRegenerateManageResponse(response *RegenerateResponse, w http.ResponseWriter, span trace.Span) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(200)
 	span.SetStatus(codes.Ok, http.StatusText(200))
@@ -2073,7 +2091,7 @@ func encodePasswordRegisterResponse(response PasswordRegisterRes, w http.Respons
 
 func encodePolicyConsentResponse(response PolicyConsentRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *PolicyConsentOK:
+	case *PolicyConsentStatus:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -2119,7 +2137,7 @@ func encodePolicyConsentResponse(response PolicyConsentRes, w http.ResponseWrite
 
 func encodePostConclusionResponse(response PostConclusionRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *PostConclusionOK:
+	case *Conclusion:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -2623,20 +2641,6 @@ func encodeTalkSessionAnalysisResponse(response TalkSessionAnalysisRes, w http.R
 	}
 }
 
-func encodeTalkSessionHideToggleResponse(response *TalkSessionHideToggleOK, w http.ResponseWriter, span trace.Span) error {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(200)
-	span.SetStatus(codes.Ok, http.StatusText(200))
-
-	e := new(jx.Encoder)
-	response.Encode(e)
-	if _, err := e.WriteTo(w); err != nil {
-		return errors.Wrap(err, "write")
-	}
-
-	return nil
-}
-
 func encodeTestResponse(response TestRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
 	case *TestOK:
@@ -2681,6 +2685,20 @@ func encodeTestResponse(response TestRes, w http.ResponseWriter, span trace.Span
 	default:
 		return errors.Errorf("unexpected response type: %T", response)
 	}
+}
+
+func encodeToggleReportVisibilityManageResponse(response *ToggleReportVisibilityResponse, w http.ResponseWriter, span trace.Span) error {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(200)
+	span.SetStatus(codes.Ok, http.StatusText(200))
+
+	e := new(jx.Encoder)
+	response.Encode(e)
+	if _, err := e.WriteTo(w); err != nil {
+		return errors.Wrap(err, "write")
+	}
+
+	return nil
 }
 
 func encodeVoteResponse(response VoteRes, w http.ResponseWriter, span trace.Span) error {

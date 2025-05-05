@@ -381,7 +381,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "Vote"
@@ -529,7 +529,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "Opinion"
@@ -634,7 +634,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "Opinion"
@@ -871,7 +871,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "Opinion"
@@ -977,7 +977,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "Opinion"
@@ -1118,7 +1118,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "Vote"
@@ -1265,7 +1265,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "Opinion"
@@ -1726,7 +1726,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "TalkSession"
@@ -1925,7 +1925,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "TalkSession"
@@ -2280,7 +2280,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "Opinion"
@@ -2833,7 +2833,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "TalkSession"
@@ -3063,7 +3063,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "Timeline"
@@ -3176,7 +3176,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "Timeline"
@@ -3334,7 +3334,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "TalkSession"
@@ -3442,7 +3442,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "TalkSession"
@@ -3547,7 +3547,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "TalkSession"
@@ -3640,7 +3640,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "Auth"
@@ -3724,7 +3724,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "TalkSession"
@@ -3813,7 +3813,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "TalkSession"
@@ -4000,7 +4000,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "user"
@@ -4182,7 +4182,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "user"
@@ -4249,7 +4249,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "User"
@@ -4396,7 +4396,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "User"
@@ -4539,7 +4539,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "User"
@@ -4688,7 +4688,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "TalkSession"
@@ -4848,7 +4848,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "Auth"
@@ -5182,7 +5182,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "Auth"
@@ -5377,7 +5377,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "Auth"
@@ -5833,7 +5833,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "Image"
@@ -5906,7 +5906,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "Policy"
@@ -5996,7 +5996,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "Policy"
@@ -6092,7 +6092,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "Organization"
@@ -6175,7 +6175,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "Organization"
@@ -6282,7 +6282,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "Organization"
@@ -6396,7 +6396,7 @@
         },
         "security": [
           {
-            "SessionId": []
+            "ApiKeyAuth": []
           }
         ],
         "x-ogen-operation-group": "Organization"
@@ -7056,7 +7056,7 @@
       }
     },
     "securitySchemes": {
-      "SessionId": {
+      "ApiKeyAuth": {
         "type": "apiKey",
         "in": "cookie",
         "name": "SessionId"

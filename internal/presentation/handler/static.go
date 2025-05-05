@@ -14,3 +14,11 @@ func NewStaticHandler() http.Handler {
 	}
 	return http.FileServer(http.FS(fsys))
 }
+
+func NewManageFrontHandler() http.Handler {
+	fsys, err := fs.Sub(static.IndexHTML, ".")
+	if err != nil {
+		panic(err)
+	}
+	return http.FileServer(http.FS(fsys))
+}

@@ -14,8 +14,8 @@ import (
 
 // SecurityHandler is handler for security parameters.
 type SecurityHandler interface {
-	// HandleSessionId handles SessionId security.
-	HandleSessionId(ctx context.Context, operationName string, t SessionId) (context.Context, error)
+	// HandleApiKeyAuth handles ApiKeyAuth security.
+	HandleApiKeyAuth(ctx context.Context, operationName string, t ApiKeyAuth) (context.Context, error)
 }
 
 func findAuthorization(h http.Header, prefix string) (string, bool) {
@@ -33,8 +33,8 @@ func findAuthorization(h http.Header, prefix string) (string, bool) {
 	return "", false
 }
 
-func (s *Server) securitySessionId(ctx context.Context, operationName string, req *http.Request) (context.Context, bool, error) {
-	var t SessionId
+func (s *Server) securityApiKeyAuth(ctx context.Context, operationName string, req *http.Request) (context.Context, bool, error) {
+	var t ApiKeyAuth
 	const parameterName = "SessionId"
 	var value string
 	switch cookie, err := req.Cookie(parameterName); {
@@ -46,7 +46,7 @@ func (s *Server) securitySessionId(ctx context.Context, operationName string, re
 		return nil, false, errors.Wrap(err, "get cookie value")
 	}
 	t.APIKey = value
-	rctx, err := s.sec.HandleSessionId(ctx, operationName, t)
+	rctx, err := s.sec.HandleApiKeyAuth(ctx, operationName, t)
 	if errors.Is(err, ogenerrors.ErrSkipServerSecurity) {
 		return nil, false, nil
 	} else if err != nil {
