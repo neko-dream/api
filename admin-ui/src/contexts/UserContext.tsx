@@ -50,6 +50,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [data]);
 
+  useEffect(() => {
+    if (!isLoading && !currentUser && !error) {
+      window.location.href = '/login';
+    }
+  }, [currentUser]);
+
   const value = {
     currentUser,
     isLoading,

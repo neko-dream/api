@@ -5,7 +5,7 @@ import { NotificationProvider } from '@/contexts/NotificationContext'
 
 export const Route = createRootRoute({
   component: () => (
-    <UserProvider >
+    <UserProvider>
       <NotificationProvider>
         <Layout>
           <div className="container mx-auto px-4 py-6">
@@ -15,4 +15,4 @@ export const Route = createRootRoute({
       </NotificationProvider>
     </UserProvider>
   ),
-})
+});

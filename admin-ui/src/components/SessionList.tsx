@@ -53,11 +53,7 @@ export const SessionList = ({ initialPage = 1 }: SessionListProps) => {
   }
 
   if (!currentUser) {
-    return (
-      <div className="text-center text-gray-500">
-        ユーザー情報を取得できませんでした
-      </div>
-    );
+    return null;
   }
 
   const totalPages = Math.ceil((data?.TotalCount || 0) / ITEMS_PER_PAGE);

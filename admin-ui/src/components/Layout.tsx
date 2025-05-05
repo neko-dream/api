@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
+import { useUser } from '../contexts/UserContext';
 
 interface LayoutProps {
   children?: React.ReactNode;
@@ -8,12 +9,18 @@ interface LayoutProps {
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { currentUser } = useUser();
+
+  if (!currentUser) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* モバイル用ヘッダー */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
         <div className="flex items-center justify-between px-4 py-3">
+          <h1 className="text-xl font-bold text-gray-800">ことひろ</h1>
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             className="p-2 rounded-md text-gray-500 hover:text-gray-600 focus:outline-none"
@@ -33,20 +40,20 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               />
             </svg>
           </button>
-          <h1 className="text-xl font-bold text-gray-800">ことひろ</h1>
-          <div className="w-6" /> {/* スペーサー */}
         </div>
       </div>
 
       <div className="flex">
-        {/* サイドバー */}
+        {/* デスクトップ用サイドバー */}
         <div className="hidden lg:block lg:w-72 lg:fixed lg:left-0 lg:top-0 lg:h-screen lg:bg-white lg:shadow-lg lg:z-40">
           <Sidebar isOpen={true} onClose={() => { }} />
         </div>
 
         {/* モバイル用サイドバー */}
-        <div className={`lg:hidden fixed top-0 left-0 h-screen w-72 bg-white shadow-lg z-40 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-          <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+        <div className={`lg:hidden fixed top-0 left-0 right-0 bg-white shadow-lg z-40 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-y-0' : '-translate-y-full'}`}>
+          <div className="max-h-[60vh] overflow-y-auto">
+            <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+          </div>
         </div>
 
         {/* メインコンテンツ */}

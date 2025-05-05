@@ -28,26 +28,51 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       {/* オーバーレイ */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black bg-opacity-20 z-40 lg:hidden"
+          style={{ top: 'auto', bottom: 0 }}
           onClick={onClose}
         />
       )}
 
       {/* サイドバー */}
-      <div className="h-screen flex flex-col">
+      <div className="flex flex-col bg-white">
         {/* ヘッダー */}
-        <div className="p-6 border-b border-gray-100">
-          <h1 className="text-2xl font-bold text-gray-800">ことひろ</h1>
-          <p className="text-sm text-gray-500 mt-1">管理画面</p>
+        <div className="p-4 border-b border-gray-100">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold text-gray-800">ことひろ</h1>
+              <p className="text-xs text-gray-500 mt-1">管理画面</p>
+            </div>
+            <button
+              onClick={onClose}
+              className="lg:hidden p-2 rounded-md text-gray-500 hover:text-gray-600 focus:outline-none"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* メニュー */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="overflow-y-auto">
           <nav className="p-4 space-y-2">
             {menuItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
+                onClick={onClose}
                 activeProps={{
                   className: 'flex items-center px-4 py-3 rounded-lg transition-colors duration-200 bg-blue-50 text-blue-600'
                 }}
