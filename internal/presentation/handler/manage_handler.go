@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"text/template"
 	"time"
 
@@ -27,6 +28,117 @@ type manageHandler struct {
 	session.TokenManager
 }
 
+// GetUserStatsTotalManage implements oas.ManageHandler.
+func (m *manageHandler) GetUserStatsTotalManage(ctx context.Context) (*oas.UserStatsResponse, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetUserStatsTotalManage")
+	defer span.End()
+
+	claim := session.GetSession(m.SetSession(ctx))
+	var userID *shared.UUID[user.User]
+	if claim != nil {
+		id, err := claim.UserID()
+		if err == nil {
+			userID = &id
+		}
+	}
+	if userID == nil {
+		return nil, messages.ForbiddenError
+	}
+	// org所属のユーザであることを確認
+	if claim.OrgType == nil {
+		return nil, messages.ForbiddenError
+	}
+
+	res, err := m.GetQueries(ctx).GetUserStats(ctx)
+	if err != nil {
+		utils.HandleError(ctx, err, "GetQueries.GetUserStats")
+		return nil, err
+	}
+
+	totalTalkSessionCount, err := m.GetQueries(ctx).GetAllTalkSessionCount(ctx)
+	if err != nil {
+		utils.HandleError(ctx, err, "GetQueries.GetAllTalkSessionCount")
+		return nil, err
+	}
+
+	return &oas.UserStatsResponse{
+		UserCount:             int32(res.TotalUsers),
+		UniqueActionUserCount: int32(res.ActiveUsers),
+		TalkSessionCount:      int32(totalTalkSessionCount),
+	}, nil
+}
+
+// GetUserStatsListManage implements oas.ManageHandler.
+func (m *manageHandler) GetUserStatsListManage(ctx context.Context, params oas.GetUserStatsListManageParams) ([]oas.UserStatsResponse, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetUserStatsListManage")
+	defer span.End()
+
+	claim := session.GetSession(m.SetSession(ctx))
+	var userID *shared.UUID[user.User]
+	if claim != nil {
+		id, err := claim.UserID()
+		if err == nil {
+			userID = &id
+		}
+	}
+	if userID == nil {
+		return []oas.UserStatsResponse{}, messages.ForbiddenError
+	}
+	// org所属のユーザであることを確認
+	if claim.OrgType == nil {
+		return []oas.UserStatsResponse{}, messages.ForbiddenError
+	}
+
+	var page, limit int32
+	if params.Offset.IsSet() {
+		page = params.Offset.Value
+	} else {
+		page = 1
+	}
+	if params.Limit.IsSet() {
+		limit = params.Limit.Value
+	} else {
+		limit = 10
+	}
+	var stats []oas.UserStatsResponse
+	if params.Range == "daily" {
+		rows, err := m.GetQueries(ctx).GetDailyUserStats(ctx, model.GetDailyUserStatsParams{
+			Offset: page,
+			Limit:  limit,
+		})
+		if err != nil {
+			utils.HandleError(ctx, err, "GetQueries.GetDailyUserStats")
+			return []oas.UserStatsResponse{}, err
+		}
+
+		for _, row := range rows {
+			stats = append(stats, oas.UserStatsResponse{
+				Date:                  row.ActivityDate,
+				UserCount:             int32(row.TotalUsers),
+				UniqueActionUserCount: int32(row.ActiveUsers),
+			})
+		}
+	} else if params.Range == "weekly" {
+		rows, err := m.GetQueries(ctx).GetWeeklyUserStats(ctx, model.GetWeeklyUserStatsParams{
+			Offset: page,
+			Limit:  limit,
+		})
+		if err != nil {
+			utils.HandleError(ctx, err, "GetQueries.GetWeeklyUserStats")
+			return []oas.UserStatsResponse{}, err
+		}
+		for _, row := range rows {
+			stats = append(stats, oas.UserStatsResponse{
+				Date:                  row.ActivityDate,
+				UserCount:             int32(row.TotalUsers),
+				UniqueActionUserCount: int32(row.ActiveUsers),
+			})
+		}
+	}
+
+	return stats, nil
+}
+
 func NewManageHandler(
 	dbm *db.DBManager,
 	ansv analysis.AnalysisService,
@@ -42,7 +154,7 @@ func NewManageHandler(
 }
 
 // GetTalkSessionListManage implements oas.ManageHandler.
-func (m *manageHandler) GetTalkSessionListManage(ctx context.Context, params oas.GetTalkSessionListManageParams) ([]oas.TalkSessionStats, error) {
+func (m *manageHandler) GetTalkSessionListManage(ctx context.Context, params oas.GetTalkSessionListManageParams) (*oas.TalkSessionListResponse, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetTalkSessionListManage")
 	defer span.End()
 
@@ -55,21 +167,45 @@ func (m *manageHandler) GetTalkSessionListManage(ctx context.Context, params oas
 		}
 	}
 	if userID == nil {
-		return []oas.TalkSessionStats{}, messages.ForbiddenError
+		return &oas.TalkSessionListResponse{
+			TotalCount: 0,
+		}, messages.ForbiddenError
 	}
 	// org所属のユーザであることを確認
 	if claim.OrgType == nil {
-		return []oas.TalkSessionStats{}, messages.ForbiddenError
+		return &oas.TalkSessionListResponse{
+			TotalCount: 0,
+		}, messages.ForbiddenError
+	}
+
+	limit, ok := params.Limit.Get()
+	if !ok {
+		limit = 10
+	}
+
+	offset, ok := params.Offset.Get()
+	if !ok {
+		offset = 0
 	}
 
 	rows, err := m.GetQueries(ctx).ListTalkSessions(ctx, model.ListTalkSessionsParams{
-		Limit:   1000,
-		Offset:  0,
+		Limit:   limit,
+		Offset:  offset,
 		SortKey: sql.NullString{String: "latest", Valid: true},
 	})
 	if err != nil {
 		utils.HandleError(ctx, err, "GetQueries.ListTalkSessions")
-		return []oas.TalkSessionStats{}, err
+		return &oas.TalkSessionListResponse{
+			TotalCount: 0,
+		}, err
+	}
+
+	totalCount, err := m.GetQueries(ctx).GetAllTalkSessionCount(ctx)
+	if err != nil {
+		utils.HandleError(ctx, err, "GetQueries.GetAllTalkSessionCount")
+		return &oas.TalkSessionListResponse{
+			TotalCount: 0,
+		}, err
 	}
 
 	talkSessionStats := make([]oas.TalkSessionStats, 0, len(rows))
@@ -129,7 +265,10 @@ func (m *manageHandler) GetTalkSessionListManage(ctx context.Context, params oas
 		})
 	}
 
-	return talkSessionStats, nil
+	return &oas.TalkSessionListResponse{
+		TotalCount:       int32(totalCount),
+		TalkSessionStats: talkSessionStats,
+	}, nil
 }
 
 // GetTalkSessionManage implements oas.ManageHandler.
@@ -250,6 +389,9 @@ func (m *manageHandler) GetAnalysisReportManage(ctx context.Context, params oas.
 
 	res, err := m.AnalysisRepository.FindByTalkSessionID(ctx, talkSessionID)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, &messages.ReportNotFound
+		}
 		utils.HandleError(ctx, err, "GetQueries.GetReportByTalkSessionId")
 		return nil, err
 	}

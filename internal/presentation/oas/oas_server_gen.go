@@ -117,11 +117,19 @@ type ManageHandler interface {
 	// GetTalkSessionListManage implements getTalkSessionListManage operation.
 	//
 	// GET /v1/manage/talksessions/list
-	GetTalkSessionListManage(ctx context.Context, params GetTalkSessionListManageParams) ([]TalkSessionStats, error)
+	GetTalkSessionListManage(ctx context.Context, params GetTalkSessionListManageParams) (*TalkSessionListResponse, error)
 	// GetTalkSessionManage implements getTalkSessionManage operation.
 	//
 	// GET /v1/manage/talksessions/{talkSessionID}
 	GetTalkSessionManage(ctx context.Context, params GetTalkSessionManageParams) (*TalkSessionForManage, error)
+	// GetUserStatsListManage implements getUserStatsListManage operation.
+	//
+	// GET /v1/manage/users/stats/list
+	GetUserStatsListManage(ctx context.Context, params GetUserStatsListManageParams) ([]UserStatsResponse, error)
+	// GetUserStatsTotalManage implements getUserStatsTotalManage operation.
+	//
+	// GET /v1/manage/users/stats/total
+	GetUserStatsTotalManage(ctx context.Context) (*UserStatsResponse, error)
 	// ManageRegenerateManage implements manageRegenerateManage operation.
 	//
 	// POST /v1/manage/talksessions/{talkSessionID}/analysis/regenerate

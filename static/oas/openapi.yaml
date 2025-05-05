@@ -77,6 +77,19 @@ components:
                 - UpdatedAt
                 - CreatedAt
             type: object
+        TalkSessionListResponse:
+            properties:
+                TalkSessionStats:
+                    items:
+                        $ref: '#/components/schemas/TalkSessionStats'
+                    type: array
+                TotalCount:
+                    format: int32
+                    type: integer
+            required:
+                - TalkSessionStats
+                - TotalCount
+            type: object
         TalkSessionStats:
             properties:
                 City:
@@ -164,6 +177,30 @@ components:
                 - DisplayID
                 - DisplayName
                 - IconURL
+            type: object
+        UserStatsResponse:
+            properties:
+                date:
+                    description: 日付
+                    format: date-time
+                    type: string
+                talkSessionCount:
+                    description: セッション数
+                    format: int32
+                    type: integer
+                uniqueActionUserCount:
+                    description: ユニークアクション数
+                    format: int32
+                    type: integer
+                userCount:
+                    description: 登録ユーザー数
+                    format: int32
+                    type: integer
+            required:
+                - uniqueActionUserCount
+                - userCount
+                - talkSessionCount
+                - date
             type: object
         actionItem:
             properties:
@@ -4574,7 +4611,39 @@ paths:
                     type: string
                 - explode: false
                   in: query
-                  name: page
+                  name: offset
+                  schema:
+                    format: int32
+                    type: integer
+                - explode: false
+                  in: query
+                  name: limit
+                  schema:
+                    format: int32
+                    type: integer
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/TalkSessionListResponse'
+                    description: The request has succeeded.
+            tags:
+                - manage
+            x-ogen-operation-group: manage
+    /v1/manage/users/stats/list:
+        get:
+            operationId: getUserStatsListManage
+            parameters:
+                - explode: false
+                  in: query
+                  name: range
+                  required: true
+                  schema:
+                    type: string
+                - explode: false
+                  in: query
+                  name: offset
                   schema:
                     format: int32
                     type: integer
@@ -4590,8 +4659,21 @@ paths:
                         application/json:
                             schema:
                                 items:
-                                    $ref: '#/components/schemas/TalkSessionStats'
+                                    $ref: '#/components/schemas/UserStatsResponse'
                                 type: array
+                    description: The request has succeeded.
+            tags:
+                - manage
+            x-ogen-operation-group: manage
+    /v1/manage/users/stats/total:
+        get:
+            operationId: getUserStatsTotalManage
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UserStatsResponse'
                     description: The request has succeeded.
             tags:
                 - manage

@@ -7725,6 +7725,32 @@ func (s *TalkSessionForManage) SetUpdatedAt(val string) {
 	s.UpdatedAt = val
 }
 
+// Ref: #/components/schemas/TalkSessionListResponse
+type TalkSessionListResponse struct {
+	TalkSessionStats []TalkSessionStats `json:"TalkSessionStats"`
+	TotalCount       int32              `json:"TotalCount"`
+}
+
+// GetTalkSessionStats returns the value of TalkSessionStats.
+func (s *TalkSessionListResponse) GetTalkSessionStats() []TalkSessionStats {
+	return s.TalkSessionStats
+}
+
+// GetTotalCount returns the value of TotalCount.
+func (s *TalkSessionListResponse) GetTotalCount() int32 {
+	return s.TotalCount
+}
+
+// SetTalkSessionStats sets the value of TalkSessionStats.
+func (s *TalkSessionListResponse) SetTalkSessionStats(val []TalkSessionStats) {
+	s.TalkSessionStats = val
+}
+
+// SetTotalCount sets the value of TotalCount.
+func (s *TalkSessionListResponse) SetTotalCount(val int32) {
+	s.TotalCount = val
+}
+
 // Ref: #/components/schemas/TalkSessionStats
 type TalkSessionStats struct {
 	City             OptString     `json:"City"`
@@ -8245,6 +8271,58 @@ func (s *UserGroupPosition) SetPosX(val float64) {
 // SetPosY sets the value of PosY.
 func (s *UserGroupPosition) SetPosY(val float64) {
 	s.PosY = val
+}
+
+// Ref: #/components/schemas/UserStatsResponse
+type UserStatsResponse struct {
+	// 日付.
+	Date time.Time `json:"date"`
+	// セッション数.
+	TalkSessionCount int32 `json:"talkSessionCount"`
+	// ユニークアクション数.
+	UniqueActionUserCount int32 `json:"uniqueActionUserCount"`
+	// 登録ユーザー数.
+	UserCount int32 `json:"userCount"`
+}
+
+// GetDate returns the value of Date.
+func (s *UserStatsResponse) GetDate() time.Time {
+	return s.Date
+}
+
+// GetTalkSessionCount returns the value of TalkSessionCount.
+func (s *UserStatsResponse) GetTalkSessionCount() int32 {
+	return s.TalkSessionCount
+}
+
+// GetUniqueActionUserCount returns the value of UniqueActionUserCount.
+func (s *UserStatsResponse) GetUniqueActionUserCount() int32 {
+	return s.UniqueActionUserCount
+}
+
+// GetUserCount returns the value of UserCount.
+func (s *UserStatsResponse) GetUserCount() int32 {
+	return s.UserCount
+}
+
+// SetDate sets the value of Date.
+func (s *UserStatsResponse) SetDate(val time.Time) {
+	s.Date = val
+}
+
+// SetTalkSessionCount sets the value of TalkSessionCount.
+func (s *UserStatsResponse) SetTalkSessionCount(val int32) {
+	s.TalkSessionCount = val
+}
+
+// SetUniqueActionUserCount sets the value of UniqueActionUserCount.
+func (s *UserStatsResponse) SetUniqueActionUserCount(val int32) {
+	s.UniqueActionUserCount = val
+}
+
+// SetUserCount sets the value of UserCount.
+func (s *UserStatsResponse) SetUserCount(val int32) {
+	s.UserCount = val
 }
 
 type Vote2BadRequest struct {

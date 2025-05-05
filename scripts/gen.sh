@@ -10,10 +10,15 @@ cd manage
 npm run build
 cd ../
 
-oasc -f ./api/target/apidog.openapi.yaml  -f ./api/target/manage.openapi.yaml -o ./static/openapi.yaml --format yaml
-ogen --package oas --target internal/presentation/oas --clean ./static/openapi.yaml --convenient-errors=on
+oasc -f ./api/target/apidog.openapi.yaml  -f ./api/target/manage.openapi.yaml -o ./static/oas/openapi.yaml --format yaml
+ogen --package oas --target internal/presentation/oas --clean ./static/oas/openapi.yaml --convenient-errors=on
 
 sqlc generate
 oapi-codegen -config oapi.yaml ./api/analysis.openapi.json
 
 find . -name "*.go" | grep -v "vendor/\|.git/\|_test.go" | xargs -n 1 -t otelinji -template "./internal/infrastructure/telemetry/otelinji.template" -w -filename &> /dev/null
+
+cd admin-ui
+npm run build
+cd ../
+

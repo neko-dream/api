@@ -51,6 +51,11 @@ namespace KotohiroManageService {
     IconURL: string;
   }
 
+  model TalkSessionListResponse {
+    TalkSessionStats: TalkSessionStats[];
+    TotalCount: int32;
+  }
+
   @route("/talksessions")
   @tag("manage")
   interface TalkSessions {
@@ -60,9 +65,9 @@ namespace KotohiroManageService {
     @extension("x-ogen-operation-group", "manage")
     @get getTalkSessionList(
       @query status?: "active" | "inactive",
-      @query page?: int32,
+      @query offset?: int32,
       @query limit?: int32,
-    ): TalkSessionStats[];
+    ): TalkSessionListResponse;
 
 
     @route("/{talkSessionID}")
@@ -135,6 +140,39 @@ namespace KotohiroManageService {
       @path talkSessionID: string,
       @body body: RegenerateRequest,
     ): RegenerateResponse;
+  }
+
+
+  model UserStatsResponse {
+    @doc("ユニークアクション数")
+    uniqueActionUserCount: int32;
+
+    @doc("登録ユーザー数")
+    userCount: int32;
+
+    @doc("セッション数")
+    talkSessionCount: int32;
+
+    @doc("日付")
+    date: utcDateTime;
+  }
+
+  @route("/users")
+  @tag("manage")
+  interface UserStats {
+    @route("/stats/list")
+    @extension("x-ogen-operation-group", "manage")
+    @operationId("getUserStatsListManage")
+    @get getUserStats(
+      @query range: string,
+      @query offset?: int32,
+      @query limit?: int32,
+    ): UserStatsResponse[];
+
+    @route("/stats/total")
+    @extension("x-ogen-operation-group", "manage")
+    @operationId("getUserStatsTotalManage")
+    @get getUserStatsTotal(): UserStatsResponse;
   }
 }
 

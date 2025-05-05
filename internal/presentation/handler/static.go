@@ -8,7 +8,7 @@ import (
 )
 
 func NewStaticHandler() http.Handler {
-	fsys, err := fs.Sub(static.Static, ".")
+	fsys, err := fs.Sub(static.Oas, ".")
 	if err != nil {
 		panic(err)
 	}
@@ -16,7 +16,7 @@ func NewStaticHandler() http.Handler {
 }
 
 func NewManageFrontHandler() http.Handler {
-	fsys, err := fs.Sub(static.IndexHTML, ".")
+	fsys, err := fs.Sub(static.AdminUI, ".")
 	if err != nil {
 		panic(err)
 	}

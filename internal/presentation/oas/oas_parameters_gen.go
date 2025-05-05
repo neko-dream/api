@@ -2190,7 +2190,7 @@ func decodeGetTalkSessionListParams(args [0]string, argsEscaped bool, r *http.Re
 // GetTalkSessionListManageParams is parameters of getTalkSessionListManage operation.
 type GetTalkSessionListManageParams struct {
 	Status OptGetTalkSessionListManageStatus
-	Page   OptInt32
+	Offset OptInt32
 	Limit  OptInt32
 }
 
@@ -2206,11 +2206,11 @@ func unpackGetTalkSessionListManageParams(packed middleware.Parameters) (params 
 	}
 	{
 		key := middleware.ParameterKey{
-			Name: "page",
+			Name: "offset",
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.Page = v.(OptInt32)
+			params.Offset = v.(OptInt32)
 		}
 	}
 	{
@@ -2283,17 +2283,17 @@ func decodeGetTalkSessionListManageParams(args [0]string, argsEscaped bool, r *h
 			Err:  err,
 		}
 	}
-	// Decode query: page.
+	// Decode query: offset.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "page",
+			Name:    "offset",
 			Style:   uri.QueryStyleForm,
 			Explode: false,
 		}
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotPageVal int32
+				var paramsDotOffsetVal int32
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
@@ -2305,12 +2305,12 @@ func decodeGetTalkSessionListManageParams(args [0]string, argsEscaped bool, r *h
 						return err
 					}
 
-					paramsDotPageVal = c
+					paramsDotOffsetVal = c
 					return nil
 				}(); err != nil {
 					return err
 				}
-				params.Page.SetTo(paramsDotPageVal)
+				params.Offset.SetTo(paramsDotOffsetVal)
 				return nil
 			}); err != nil {
 				return err
@@ -2319,7 +2319,7 @@ func decodeGetTalkSessionListManageParams(args [0]string, argsEscaped bool, r *h
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "page",
+			Name: "offset",
 			In:   "query",
 			Err:  err,
 		}
@@ -2740,6 +2740,165 @@ func decodeGetTimeLineParams(args [1]string, argsEscaped bool, r *http.Request) 
 		return params, &ogenerrors.DecodeParamError{
 			Name: "talkSessionID",
 			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// GetUserStatsListManageParams is parameters of getUserStatsListManage operation.
+type GetUserStatsListManageParams struct {
+	Range  string
+	Offset OptInt32
+	Limit  OptInt32
+}
+
+func unpackGetUserStatsListManageParams(packed middleware.Parameters) (params GetUserStatsListManageParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "range",
+			In:   "query",
+		}
+		params.Range = packed[key].(string)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "offset",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Offset = v.(OptInt32)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "limit",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Limit = v.(OptInt32)
+		}
+	}
+	return params
+}
+
+func decodeGetUserStatsListManageParams(args [0]string, argsEscaped bool, r *http.Request) (params GetUserStatsListManageParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode query: range.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "range",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.Range = c
+				return nil
+			}); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "range",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: offset.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "offset",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotOffsetVal int32
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToInt32(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotOffsetVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Offset.SetTo(paramsDotOffsetVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "offset",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: limit.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "limit",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotLimitVal int32
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToInt32(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotLimitVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Limit.SetTo(paramsDotLimitVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "limit",
+			In:   "query",
 			Err:  err,
 		}
 	}

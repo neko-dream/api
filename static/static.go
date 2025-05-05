@@ -2,8 +2,8 @@ package static
 
 import "embed"
 
-//go:embed *.yaml
-var Static embed.FS
+//go:embed oas/*
+var Oas embed.FS
 
-//go:embed index.html
-var IndexHTML embed.FS
+//go:embed admin-ui/*
+var AdminUI embed.FS
