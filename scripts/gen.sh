@@ -1,3 +1,7 @@
+#!/bin/bash
+
+set -e
+
 curl -L "http://127.0.0.1:3658/export/openapi/674502/0" -o api/target/apidog.openapi.yaml
 
 jq '(..|objects|select(IN(paths; ["securitySchemes", "apikey-header-SessionId"])))."securitySchemes"."apikey-header-SessionId" |= {"type":"apiKey","in":"cookie","name":"SessionId"}' ./api/target/apidog.openapi.yaml > ./tmp.openapi.yaml
