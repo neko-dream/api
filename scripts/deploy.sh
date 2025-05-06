@@ -13,6 +13,10 @@ fi
 aws --profile $AWS_PROFILE ecr get-login-password --region ap-northeast-1 |
 docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com
 
+cd admin-ui
+bun build:prod
+cd ../
+
 go mod tidy
 go mod download
 CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -tags timetzdata -ldflags="-s -w" -trimpath -o server ./cmd/server

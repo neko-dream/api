@@ -1564,9 +1564,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					}
 
 					elem = origElem
-				case 'u': // Prefix: "users/stats/"
+				case 'u': // Prefix: "users/"
 					origElem := elem
-					if l := len("users/stats/"); len(elem) >= l && elem[0:l] == "users/stats/" {
+					if l := len("users/"); len(elem) >= l && elem[0:l] == "users/" {
 						elem = elem[l:]
 					} else {
 						break
@@ -1588,7 +1588,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							// Leaf node.
 							switch r.Method {
 							case "GET":
-								s.handleGetUserStatsListManageRequest([0]string{}, elemIsEscaped, w, r)
+								s.handleGetUserListManageRequest([0]string{}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "GET")
 							}
@@ -1597,24 +1597,60 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						}
 
 						elem = origElem
-					case 't': // Prefix: "total"
+					case 's': // Prefix: "stats/"
 						origElem := elem
-						if l := len("total"); len(elem) >= l && elem[0:l] == "total" {
+						if l := len("stats/"); len(elem) >= l && elem[0:l] == "stats/" {
 							elem = elem[l:]
 						} else {
 							break
 						}
 
 						if len(elem) == 0 {
-							// Leaf node.
-							switch r.Method {
-							case "GET":
-								s.handleGetUserStatsTotalManageRequest([0]string{}, elemIsEscaped, w, r)
-							default:
-								s.notAllowed(w, r, "GET")
+							break
+						}
+						switch elem[0] {
+						case 'l': // Prefix: "list"
+							origElem := elem
+							if l := len("list"); len(elem) >= l && elem[0:l] == "list" {
+								elem = elem[l:]
+							} else {
+								break
 							}
 
-							return
+							if len(elem) == 0 {
+								// Leaf node.
+								switch r.Method {
+								case "GET":
+									s.handleGetUserStatsListManageRequest([0]string{}, elemIsEscaped, w, r)
+								default:
+									s.notAllowed(w, r, "GET")
+								}
+
+								return
+							}
+
+							elem = origElem
+						case 't': // Prefix: "total"
+							origElem := elem
+							if l := len("total"); len(elem) >= l && elem[0:l] == "total" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch r.Method {
+								case "GET":
+									s.handleGetUserStatsTotalManageRequest([0]string{}, elemIsEscaped, w, r)
+								default:
+									s.notAllowed(w, r, "GET")
+								}
+
+								return
+							}
+
+							elem = origElem
 						}
 
 						elem = origElem
@@ -3416,9 +3452,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					}
 
 					elem = origElem
-				case 'u': // Prefix: "users/stats/"
+				case 'u': // Prefix: "users/"
 					origElem := elem
-					if l := len("users/stats/"); len(elem) >= l && elem[0:l] == "users/stats/" {
+					if l := len("users/"); len(elem) >= l && elem[0:l] == "users/" {
 						elem = elem[l:]
 					} else {
 						break
@@ -3440,10 +3476,10 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							// Leaf node.
 							switch method {
 							case "GET":
-								r.name = "GetUserStatsListManage"
+								r.name = "GetUserListManage"
 								r.summary = ""
-								r.operationID = "getUserStatsListManage"
-								r.pathPattern = "/v1/manage/users/stats/list"
+								r.operationID = "getUserListManage"
+								r.pathPattern = "/v1/manage/users/list"
 								r.args = args
 								r.count = 0
 								return r, true
@@ -3453,28 +3489,68 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						}
 
 						elem = origElem
-					case 't': // Prefix: "total"
+					case 's': // Prefix: "stats/"
 						origElem := elem
-						if l := len("total"); len(elem) >= l && elem[0:l] == "total" {
+						if l := len("stats/"); len(elem) >= l && elem[0:l] == "stats/" {
 							elem = elem[l:]
 						} else {
 							break
 						}
 
 						if len(elem) == 0 {
-							// Leaf node.
-							switch method {
-							case "GET":
-								r.name = "GetUserStatsTotalManage"
-								r.summary = ""
-								r.operationID = "getUserStatsTotalManage"
-								r.pathPattern = "/v1/manage/users/stats/total"
-								r.args = args
-								r.count = 0
-								return r, true
-							default:
-								return
+							break
+						}
+						switch elem[0] {
+						case 'l': // Prefix: "list"
+							origElem := elem
+							if l := len("list"); len(elem) >= l && elem[0:l] == "list" {
+								elem = elem[l:]
+							} else {
+								break
 							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch method {
+								case "GET":
+									r.name = "GetUserStatsListManage"
+									r.summary = ""
+									r.operationID = "getUserStatsListManage"
+									r.pathPattern = "/v1/manage/users/stats/list"
+									r.args = args
+									r.count = 0
+									return r, true
+								default:
+									return
+								}
+							}
+
+							elem = origElem
+						case 't': // Prefix: "total"
+							origElem := elem
+							if l := len("total"); len(elem) >= l && elem[0:l] == "total" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch method {
+								case "GET":
+									r.name = "GetUserStatsTotalManage"
+									r.summary = ""
+									r.operationID = "getUserStatsTotalManage"
+									r.pathPattern = "/v1/manage/users/stats/total"
+									r.args = args
+									r.count = 0
+									return r, true
+								default:
+									return
+								}
+							}
+
+							elem = origElem
 						}
 
 						elem = origElem

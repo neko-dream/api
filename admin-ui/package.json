@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "VITE_API_URL=http://localhost:3000 vite",
+    "build": "VITE_API_URL=http://localhost:3000 vite build",
     "build:dev": "vite build --mode development",
-    "build:prod": "vite preview --mode production",
+    "build:prod": "vite build --mode production",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit"
   },
@@ -37,6 +38,7 @@
     "tailwindcss": "^3.4.1",
     "tsx": "^4.7.0",
     "typescript": "^5.2.2",
-    "vite": "^5.1.4"
+    "vite": "^5.1.4",
+    "wrangler": "^4.14.1"
   }
 }

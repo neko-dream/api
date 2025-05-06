@@ -318,6 +318,13 @@ func (UnimplementedHandler) GetUserInfo(ctx context.Context) (r GetUserInfoRes, 
 	return r, ht.ErrNotImplemented
 }
 
+// GetUserListManage implements getUserListManage operation.
+//
+// GET /v1/manage/users/list
+func (UnimplementedHandler) GetUserListManage(ctx context.Context, params GetUserListManageParams) (r []UserForManage, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetUserStatsListManage implements getUserStatsListManage operation.
 //
 // GET /v1/manage/users/stats/list

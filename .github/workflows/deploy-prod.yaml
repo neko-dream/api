@@ -28,6 +28,15 @@ jobs:
           cache-dependency-path: |
             go.mod
 
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Build Admin UI
+        run: |
+          cd admin-ui
+          bun build:prod
+          cd ../
+
       - name: Download Go Modules
         if: ${{ steps.setup-go.outputs.cache-hit != 'true' }}
         run: |

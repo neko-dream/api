@@ -4,9 +4,18 @@ import { TanStackRouterVite } from '@tanstack/router-vite-plugin';
 import { resolve } from 'path';
 
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '');
-  const apiBaseUrl = env.VITE_API_URL || 'http://localhost:3000';
-  console.log(apiBaseUrl)
+  let apiBaseURL: string;
+  switch (mode) {
+    case 'production':
+      apiBaseURL = 'https://api.kotohiro.com';
+      break;
+    case 'development':
+      apiBaseURL = 'https://api-dev.kotohiro.com';
+      break;
+    default:
+      apiBaseURL = 'http://localhost:3000';
+  }
+
   return {
     plugins: [
       react(),
@@ -18,8 +27,8 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       proxy: {
-        '/v1': apiBaseUrl,
-        '/auth': apiBaseUrl
+        '/v1': apiBaseURL,
+        '/auth': apiBaseURL
       }
     },
     resolve: {

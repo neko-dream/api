@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { UserStatsGraph, UserStatsTotal } from '@/components/UserStats'
+
 export const Route = createFileRoute('/')({
   component: Index,
 })

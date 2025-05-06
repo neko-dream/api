@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"text/template"
 	"time"
 
 	"github.com/neko-dream/server/internal/domain/messages"
@@ -21,11 +20,20 @@ import (
 )
 
 type manageHandler struct {
-	templates *template.Template
 	analysis.AnalysisService
 	analysis.AnalysisRepository
 	*db.DBManager
 	session.TokenManager
+}
+
+// GetUserListManage implements oas.ManageHandler.
+func (m *manageHandler) GetUserListManage(ctx context.Context, params oas.GetUserListManageParams) ([]oas.UserForManage, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetUserListManage")
+	defer span.End()
+
+	_ = ctx
+
+	panic("unimplemented")
 }
 
 // GetUserStatsTotalManage implements oas.ManageHandler.

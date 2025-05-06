@@ -44,11 +44,28 @@ namespace KotohiroManageService {
     VoteUserCount: int32;
   }
 
+
   model UserForManage {
-    UserID: string;
-    DisplayID: string;
-    DisplayName: string;
-    IconURL: string;
+    @doc("ユーザーID")
+    userID: string;
+
+    @doc("表示ID")
+    displayID: string;
+
+    @doc("表示名")
+    displayName: string;
+
+    @doc("アイコンURL")
+    iconURL: string;
+
+    @doc("最終ログイン日時")
+    lastLoginAt: utcDateTime;
+
+    @doc("作成日時")
+    createdAt: utcDateTime;
+
+    @doc("更新日時")
+    updatedAt: utcDateTime;
   }
 
   model TalkSessionListResponse {
@@ -156,10 +173,21 @@ namespace KotohiroManageService {
     @doc("日付")
     date: utcDateTime;
   }
-
   @route("/users")
   @tag("manage")
   interface UserStats {
+
+    @route("/list")
+    @extension("x-ogen-operation-group", "manage")
+    @operationId("getUserListManage")
+    @get getUserList(
+      @query offset?: int32,
+      @query limit?: int32,
+      @query search?: string,
+      @query orderBy?: "createdAt" | "updatedAt" | "displayName" | "lastLoginAt",
+      @query order?: "asc" | "desc"
+    ): UserForManage[];
+
     @route("/stats/list")
     @extension("x-ogen-operation-group", "manage")
     @operationId("getUserStatsListManage")

@@ -16040,28 +16040,43 @@ func (s *UserForManage) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *UserForManage) encodeFields(e *jx.Encoder) {
 	{
-		e.FieldStart("DisplayID")
+		e.FieldStart("createdAt")
+		json.EncodeDateTime(e, s.CreatedAt)
+	}
+	{
+		e.FieldStart("displayID")
 		e.Str(s.DisplayID)
 	}
 	{
-		e.FieldStart("DisplayName")
+		e.FieldStart("displayName")
 		e.Str(s.DisplayName)
 	}
 	{
-		e.FieldStart("IconURL")
+		e.FieldStart("iconURL")
 		e.Str(s.IconURL)
 	}
 	{
-		e.FieldStart("UserID")
+		e.FieldStart("lastLoginAt")
+		json.EncodeDateTime(e, s.LastLoginAt)
+	}
+	{
+		e.FieldStart("updatedAt")
+		json.EncodeDateTime(e, s.UpdatedAt)
+	}
+	{
+		e.FieldStart("userID")
 		e.Str(s.UserID)
 	}
 }
 
-var jsonFieldsNameOfUserForManage = [4]string{
-	0: "DisplayID",
-	1: "DisplayName",
-	2: "IconURL",
-	3: "UserID",
+var jsonFieldsNameOfUserForManage = [7]string{
+	0: "createdAt",
+	1: "displayID",
+	2: "displayName",
+	3: "iconURL",
+	4: "lastLoginAt",
+	5: "updatedAt",
+	6: "userID",
 }
 
 // Decode decodes UserForManage from json.
@@ -16073,8 +16088,20 @@ func (s *UserForManage) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "DisplayID":
+		case "createdAt":
 			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := json.DecodeDateTime(d)
+				s.CreatedAt = v
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"createdAt\"")
+			}
+		case "displayID":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
 				v, err := d.Str()
 				s.DisplayID = string(v)
@@ -16083,10 +16110,10 @@ func (s *UserForManage) Decode(d *jx.Decoder) error {
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"DisplayID\"")
+				return errors.Wrap(err, "decode field \"displayID\"")
 			}
-		case "DisplayName":
-			requiredBitSet[0] |= 1 << 1
+		case "displayName":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
 				v, err := d.Str()
 				s.DisplayName = string(v)
@@ -16095,10 +16122,10 @@ func (s *UserForManage) Decode(d *jx.Decoder) error {
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"DisplayName\"")
+				return errors.Wrap(err, "decode field \"displayName\"")
 			}
-		case "IconURL":
-			requiredBitSet[0] |= 1 << 2
+		case "iconURL":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
 				v, err := d.Str()
 				s.IconURL = string(v)
@@ -16107,10 +16134,34 @@ func (s *UserForManage) Decode(d *jx.Decoder) error {
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"IconURL\"")
+				return errors.Wrap(err, "decode field \"iconURL\"")
 			}
-		case "UserID":
-			requiredBitSet[0] |= 1 << 3
+		case "lastLoginAt":
+			requiredBitSet[0] |= 1 << 4
+			if err := func() error {
+				v, err := json.DecodeDateTime(d)
+				s.LastLoginAt = v
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"lastLoginAt\"")
+			}
+		case "updatedAt":
+			requiredBitSet[0] |= 1 << 5
+			if err := func() error {
+				v, err := json.DecodeDateTime(d)
+				s.UpdatedAt = v
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"updatedAt\"")
+			}
+		case "userID":
+			requiredBitSet[0] |= 1 << 6
 			if err := func() error {
 				v, err := d.Str()
 				s.UserID = string(v)
@@ -16119,7 +16170,7 @@ func (s *UserForManage) Decode(d *jx.Decoder) error {
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"UserID\"")
+				return errors.Wrap(err, "decode field \"userID\"")
 			}
 		default:
 			return d.Skip()
@@ -16131,7 +16182,7 @@ func (s *UserForManage) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00001111,
+		0b01111111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

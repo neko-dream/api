@@ -868,6 +868,32 @@ func (s *GetUserInfoOK) Validate() error {
 	return nil
 }
 
+func (s GetUserListManageOrder) Validate() error {
+	switch s {
+	case "asc":
+		return nil
+	case "desc":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s GetUserListManageOrderBy) Validate() error {
+	switch s {
+	case "createdAt":
+		return nil
+	case "updatedAt":
+		return nil
+	case "displayName":
+		return nil
+	case "lastLoginAt":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
 func (s *InviteOrganizationForUserReq) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer

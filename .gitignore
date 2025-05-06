@@ -11,3 +11,5 @@ dist/
 node_modules/
 .env.development
 .env.production
+
+./static/admin-ui

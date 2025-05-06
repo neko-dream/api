@@ -122,6 +122,10 @@ type ManageHandler interface {
 	//
 	// GET /v1/manage/talksessions/{talkSessionID}
 	GetTalkSessionManage(ctx context.Context, params GetTalkSessionManageParams) (*TalkSessionForManage, error)
+	// GetUserListManage implements getUserListManage operation.
+	//
+	// GET /v1/manage/users/list
+	GetUserListManage(ctx context.Context, params GetUserListManageParams) ([]UserForManage, error)
 	// GetUserStatsListManage implements getUserStatsListManage operation.
 	//
 	// GET /v1/manage/users/stats/list
