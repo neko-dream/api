@@ -1428,9 +1428,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				}
 
 				elem = origElem
-			case 'v': // Prefix: "v1/manage/talksessions/"
+			case 'v': // Prefix: "v1/manage/"
 				origElem := elem
-				if l := len("v1/manage/talksessions/"); len(elem) >= l && elem[0:l] == "v1/manage/talksessions/" {
+				if l := len("v1/manage/"); len(elem) >= l && elem[0:l] == "v1/manage/" {
 					elem = elem[l:]
 				} else {
 					break
@@ -1440,53 +1440,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					break
 				}
 				switch elem[0] {
-				case 'l': // Prefix: "list"
+				case 't': // Prefix: "talksessions/"
 					origElem := elem
-					if l := len("list"); len(elem) >= l && elem[0:l] == "list" {
-						elem = elem[l:]
-					} else {
-						break
-					}
-
-					if len(elem) == 0 {
-						// Leaf node.
-						switch r.Method {
-						case "GET":
-							s.handleGetTalkSessionListManageRequest([0]string{}, elemIsEscaped, w, r)
-						default:
-							s.notAllowed(w, r, "GET")
-						}
-
-						return
-					}
-
-					elem = origElem
-				}
-				// Param: "talkSessionID"
-				// Match until "/"
-				idx := strings.IndexByte(elem, '/')
-				if idx < 0 {
-					idx = len(elem)
-				}
-				args[0] = elem[:idx]
-				elem = elem[idx:]
-
-				if len(elem) == 0 {
-					switch r.Method {
-					case "GET":
-						s.handleGetTalkSessionManageRequest([1]string{
-							args[0],
-						}, elemIsEscaped, w, r)
-					default:
-						s.notAllowed(w, r, "GET")
-					}
-
-					return
-				}
-				switch elem[0] {
-				case '/': // Prefix: "/analysis/re"
-					origElem := elem
-					if l := len("/analysis/re"); len(elem) >= l && elem[0:l] == "/analysis/re" {
+					if l := len("talksessions/"); len(elem) >= l && elem[0:l] == "talksessions/" {
 						elem = elem[l:]
 					} else {
 						break
@@ -1496,32 +1452,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						break
 					}
 					switch elem[0] {
-					case 'g': // Prefix: "generate"
+					case 'l': // Prefix: "list"
 						origElem := elem
-						if l := len("generate"); len(elem) >= l && elem[0:l] == "generate" {
-							elem = elem[l:]
-						} else {
-							break
-						}
-
-						if len(elem) == 0 {
-							// Leaf node.
-							switch r.Method {
-							case "POST":
-								s.handleManageRegenerateManageRequest([1]string{
-									args[0],
-								}, elemIsEscaped, w, r)
-							default:
-								s.notAllowed(w, r, "POST")
-							}
-
-							return
-						}
-
-						elem = origElem
-					case 'p': // Prefix: "port"
-						origElem := elem
-						if l := len("port"); len(elem) >= l && elem[0:l] == "port" {
+						if l := len("list"); len(elem) >= l && elem[0:l] == "list" {
 							elem = elem[l:]
 						} else {
 							break
@@ -1531,18 +1464,193 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							// Leaf node.
 							switch r.Method {
 							case "GET":
-								s.handleGetAnalysisReportManageRequest([1]string{
-									args[0],
-								}, elemIsEscaped, w, r)
-							case "POST":
-								s.handleToggleReportVisibilityManageRequest([1]string{
-									args[0],
-								}, elemIsEscaped, w, r)
+								s.handleGetTalkSessionListManageRequest([0]string{}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "GET,POST")
+								s.notAllowed(w, r, "GET")
 							}
 
 							return
+						}
+
+						elem = origElem
+					}
+					// Param: "talkSessionID"
+					// Match until "/"
+					idx := strings.IndexByte(elem, '/')
+					if idx < 0 {
+						idx = len(elem)
+					}
+					args[0] = elem[:idx]
+					elem = elem[idx:]
+
+					if len(elem) == 0 {
+						switch r.Method {
+						case "GET":
+							s.handleGetTalkSessionManageRequest([1]string{
+								args[0],
+							}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, "GET")
+						}
+
+						return
+					}
+					switch elem[0] {
+					case '/': // Prefix: "/analysis/re"
+						origElem := elem
+						if l := len("/analysis/re"); len(elem) >= l && elem[0:l] == "/analysis/re" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							break
+						}
+						switch elem[0] {
+						case 'g': // Prefix: "generate"
+							origElem := elem
+							if l := len("generate"); len(elem) >= l && elem[0:l] == "generate" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch r.Method {
+								case "POST":
+									s.handleManageRegenerateManageRequest([1]string{
+										args[0],
+									}, elemIsEscaped, w, r)
+								default:
+									s.notAllowed(w, r, "POST")
+								}
+
+								return
+							}
+
+							elem = origElem
+						case 'p': // Prefix: "port"
+							origElem := elem
+							if l := len("port"); len(elem) >= l && elem[0:l] == "port" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch r.Method {
+								case "GET":
+									s.handleGetAnalysisReportManageRequest([1]string{
+										args[0],
+									}, elemIsEscaped, w, r)
+								case "POST":
+									s.handleToggleReportVisibilityManageRequest([1]string{
+										args[0],
+									}, elemIsEscaped, w, r)
+								default:
+									s.notAllowed(w, r, "GET,POST")
+								}
+
+								return
+							}
+
+							elem = origElem
+						}
+
+						elem = origElem
+					}
+
+					elem = origElem
+				case 'u': // Prefix: "users/"
+					origElem := elem
+					if l := len("users/"); len(elem) >= l && elem[0:l] == "users/" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						break
+					}
+					switch elem[0] {
+					case 'l': // Prefix: "list"
+						origElem := elem
+						if l := len("list"); len(elem) >= l && elem[0:l] == "list" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch r.Method {
+							case "GET":
+								s.handleGetUserListManageRequest([0]string{}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "GET")
+							}
+
+							return
+						}
+
+						elem = origElem
+					case 's': // Prefix: "stats/"
+						origElem := elem
+						if l := len("stats/"); len(elem) >= l && elem[0:l] == "stats/" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							break
+						}
+						switch elem[0] {
+						case 'l': // Prefix: "list"
+							origElem := elem
+							if l := len("list"); len(elem) >= l && elem[0:l] == "list" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch r.Method {
+								case "GET":
+									s.handleGetUserStatsListManageRequest([0]string{}, elemIsEscaped, w, r)
+								default:
+									s.notAllowed(w, r, "GET")
+								}
+
+								return
+							}
+
+							elem = origElem
+						case 't': // Prefix: "total"
+							origElem := elem
+							if l := len("total"); len(elem) >= l && elem[0:l] == "total" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch r.Method {
+								case "GET":
+									s.handleGetUserStatsTotalManageRequest([0]string{}, elemIsEscaped, w, r)
+								default:
+									s.notAllowed(w, r, "GET")
+								}
+
+								return
+							}
+
+							elem = origElem
 						}
 
 						elem = origElem
@@ -3194,9 +3302,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 				}
 
 				elem = origElem
-			case 'v': // Prefix: "v1/manage/talksessions/"
+			case 'v': // Prefix: "v1/manage/"
 				origElem := elem
-				if l := len("v1/manage/talksessions/"); len(elem) >= l && elem[0:l] == "v1/manage/talksessions/" {
+				if l := len("v1/manage/"); len(elem) >= l && elem[0:l] == "v1/manage/" {
 					elem = elem[l:]
 				} else {
 					break
@@ -3206,59 +3314,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					break
 				}
 				switch elem[0] {
-				case 'l': // Prefix: "list"
+				case 't': // Prefix: "talksessions/"
 					origElem := elem
-					if l := len("list"); len(elem) >= l && elem[0:l] == "list" {
-						elem = elem[l:]
-					} else {
-						break
-					}
-
-					if len(elem) == 0 {
-						// Leaf node.
-						switch method {
-						case "GET":
-							r.name = "GetTalkSessionListManage"
-							r.summary = ""
-							r.operationID = "getTalkSessionListManage"
-							r.pathPattern = "/v1/manage/talksessions/list"
-							r.args = args
-							r.count = 0
-							return r, true
-						default:
-							return
-						}
-					}
-
-					elem = origElem
-				}
-				// Param: "talkSessionID"
-				// Match until "/"
-				idx := strings.IndexByte(elem, '/')
-				if idx < 0 {
-					idx = len(elem)
-				}
-				args[0] = elem[:idx]
-				elem = elem[idx:]
-
-				if len(elem) == 0 {
-					switch method {
-					case "GET":
-						r.name = "GetTalkSessionManage"
-						r.summary = ""
-						r.operationID = "getTalkSessionManage"
-						r.pathPattern = "/v1/manage/talksessions/{talkSessionID}"
-						r.args = args
-						r.count = 1
-						return r, true
-					default:
-						return
-					}
-				}
-				switch elem[0] {
-				case '/': // Prefix: "/analysis/re"
-					origElem := elem
-					if l := len("/analysis/re"); len(elem) >= l && elem[0:l] == "/analysis/re" {
+					if l := len("talksessions/"); len(elem) >= l && elem[0:l] == "talksessions/" {
 						elem = elem[l:]
 					} else {
 						break
@@ -3268,34 +3326,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						break
 					}
 					switch elem[0] {
-					case 'g': // Prefix: "generate"
+					case 'l': // Prefix: "list"
 						origElem := elem
-						if l := len("generate"); len(elem) >= l && elem[0:l] == "generate" {
-							elem = elem[l:]
-						} else {
-							break
-						}
-
-						if len(elem) == 0 {
-							// Leaf node.
-							switch method {
-							case "POST":
-								r.name = "ManageRegenerateManage"
-								r.summary = ""
-								r.operationID = "manageRegenerateManage"
-								r.pathPattern = "/v1/manage/talksessions/{talkSessionID}/analysis/regenerate"
-								r.args = args
-								r.count = 1
-								return r, true
-							default:
-								return
-							}
-						}
-
-						elem = origElem
-					case 'p': // Prefix: "port"
-						origElem := elem
-						if l := len("port"); len(elem) >= l && elem[0:l] == "port" {
+						if l := len("list"); len(elem) >= l && elem[0:l] == "list" {
 							elem = elem[l:]
 						} else {
 							break
@@ -3305,24 +3338,219 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							// Leaf node.
 							switch method {
 							case "GET":
-								r.name = "GetAnalysisReportManage"
+								r.name = "GetTalkSessionListManage"
 								r.summary = ""
-								r.operationID = "getAnalysisReportManage"
-								r.pathPattern = "/v1/manage/talksessions/{talkSessionID}/analysis/report"
+								r.operationID = "getTalkSessionListManage"
+								r.pathPattern = "/v1/manage/talksessions/list"
 								r.args = args
-								r.count = 1
-								return r, true
-							case "POST":
-								r.name = "ToggleReportVisibilityManage"
-								r.summary = ""
-								r.operationID = "toggleReportVisibilityManage"
-								r.pathPattern = "/v1/manage/talksessions/{talkSessionID}/analysis/report"
-								r.args = args
-								r.count = 1
+								r.count = 0
 								return r, true
 							default:
 								return
 							}
+						}
+
+						elem = origElem
+					}
+					// Param: "talkSessionID"
+					// Match until "/"
+					idx := strings.IndexByte(elem, '/')
+					if idx < 0 {
+						idx = len(elem)
+					}
+					args[0] = elem[:idx]
+					elem = elem[idx:]
+
+					if len(elem) == 0 {
+						switch method {
+						case "GET":
+							r.name = "GetTalkSessionManage"
+							r.summary = ""
+							r.operationID = "getTalkSessionManage"
+							r.pathPattern = "/v1/manage/talksessions/{talkSessionID}"
+							r.args = args
+							r.count = 1
+							return r, true
+						default:
+							return
+						}
+					}
+					switch elem[0] {
+					case '/': // Prefix: "/analysis/re"
+						origElem := elem
+						if l := len("/analysis/re"); len(elem) >= l && elem[0:l] == "/analysis/re" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							break
+						}
+						switch elem[0] {
+						case 'g': // Prefix: "generate"
+							origElem := elem
+							if l := len("generate"); len(elem) >= l && elem[0:l] == "generate" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch method {
+								case "POST":
+									r.name = "ManageRegenerateManage"
+									r.summary = ""
+									r.operationID = "manageRegenerateManage"
+									r.pathPattern = "/v1/manage/talksessions/{talkSessionID}/analysis/regenerate"
+									r.args = args
+									r.count = 1
+									return r, true
+								default:
+									return
+								}
+							}
+
+							elem = origElem
+						case 'p': // Prefix: "port"
+							origElem := elem
+							if l := len("port"); len(elem) >= l && elem[0:l] == "port" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch method {
+								case "GET":
+									r.name = "GetAnalysisReportManage"
+									r.summary = ""
+									r.operationID = "getAnalysisReportManage"
+									r.pathPattern = "/v1/manage/talksessions/{talkSessionID}/analysis/report"
+									r.args = args
+									r.count = 1
+									return r, true
+								case "POST":
+									r.name = "ToggleReportVisibilityManage"
+									r.summary = ""
+									r.operationID = "toggleReportVisibilityManage"
+									r.pathPattern = "/v1/manage/talksessions/{talkSessionID}/analysis/report"
+									r.args = args
+									r.count = 1
+									return r, true
+								default:
+									return
+								}
+							}
+
+							elem = origElem
+						}
+
+						elem = origElem
+					}
+
+					elem = origElem
+				case 'u': // Prefix: "users/"
+					origElem := elem
+					if l := len("users/"); len(elem) >= l && elem[0:l] == "users/" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						break
+					}
+					switch elem[0] {
+					case 'l': // Prefix: "list"
+						origElem := elem
+						if l := len("list"); len(elem) >= l && elem[0:l] == "list" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch method {
+							case "GET":
+								r.name = "GetUserListManage"
+								r.summary = ""
+								r.operationID = "getUserListManage"
+								r.pathPattern = "/v1/manage/users/list"
+								r.args = args
+								r.count = 0
+								return r, true
+							default:
+								return
+							}
+						}
+
+						elem = origElem
+					case 's': // Prefix: "stats/"
+						origElem := elem
+						if l := len("stats/"); len(elem) >= l && elem[0:l] == "stats/" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							break
+						}
+						switch elem[0] {
+						case 'l': // Prefix: "list"
+							origElem := elem
+							if l := len("list"); len(elem) >= l && elem[0:l] == "list" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch method {
+								case "GET":
+									r.name = "GetUserStatsListManage"
+									r.summary = ""
+									r.operationID = "getUserStatsListManage"
+									r.pathPattern = "/v1/manage/users/stats/list"
+									r.args = args
+									r.count = 0
+									return r, true
+								default:
+									return
+								}
+							}
+
+							elem = origElem
+						case 't': // Prefix: "total"
+							origElem := elem
+							if l := len("total"); len(elem) >= l && elem[0:l] == "total" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch method {
+								case "GET":
+									r.name = "GetUserStatsTotalManage"
+									r.summary = ""
+									r.operationID = "getUserStatsTotalManage"
+									r.pathPattern = "/v1/manage/users/stats/total"
+									r.args = args
+									r.count = 0
+									return r, true
+								default:
+									return
+								}
+							}
+
+							elem = origElem
 						}
 
 						elem = origElem

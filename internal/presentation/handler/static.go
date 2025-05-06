@@ -8,15 +8,23 @@ import (
 )
 
 func NewStaticHandler() http.Handler {
-	fsys, err := fs.Sub(static.Static, ".")
+	fsys, err := fs.Sub(static.Oas, ".")
 	if err != nil {
 		panic(err)
 	}
 	return http.FileServer(http.FS(fsys))
 }
 
-func NewManageFrontHandler() http.Handler {
-	fsys, err := fs.Sub(static.IndexHTML, ".")
+func NewAdminUIHandler() http.Handler {
+	fsys, err := fs.Sub(static.AdminUI, "admin-ui")
+	if err != nil {
+		panic(err)
+	}
+	return http.FileServer(http.FS(fsys))
+}
+
+func NewAdminUIAssetsHandler() http.Handler {
+	fsys, err := fs.Sub(static.AdminUI, "admin-ui/assets")
 	if err != nil {
 		panic(err)
 	}

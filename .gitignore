@@ -3,3 +3,13 @@ tmp
 .env
 *.log
 *.test
+# Default TypeSpec output
+tsp-output/
+dist/
+
+# Dependency directories
+node_modules/
+.env.development
+.env.production
+
+./static/admin-ui

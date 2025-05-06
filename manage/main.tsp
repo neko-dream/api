@@ -44,11 +44,33 @@ namespace KotohiroManageService {
     VoteUserCount: int32;
   }
 
+
   model UserForManage {
-    UserID: string;
-    DisplayID: string;
-    DisplayName: string;
-    IconURL: string;
+    @doc("ユーザーID")
+    userID: string;
+
+    @doc("表示ID")
+    displayID: string;
+
+    @doc("表示名")
+    displayName: string;
+
+    @doc("アイコンURL")
+    iconURL: string;
+
+    @doc("最終ログイン日時")
+    lastLoginAt: utcDateTime;
+
+    @doc("作成日時")
+    createdAt: utcDateTime;
+
+    @doc("更新日時")
+    updatedAt: utcDateTime;
+  }
+
+  model TalkSessionListResponse {
+    TalkSessionStats: TalkSessionStats[];
+    TotalCount: int32;
   }
 
   @route("/talksessions")
@@ -60,9 +82,9 @@ namespace KotohiroManageService {
     @extension("x-ogen-operation-group", "manage")
     @get getTalkSessionList(
       @query status?: "active" | "inactive",
-      @query page?: int32,
+      @query offset?: int32,
       @query limit?: int32,
-    ): TalkSessionStats[];
+    ): TalkSessionListResponse;
 
 
     @route("/{talkSessionID}")
@@ -135,6 +157,50 @@ namespace KotohiroManageService {
       @path talkSessionID: string,
       @body body: RegenerateRequest,
     ): RegenerateResponse;
+  }
+
+
+  model UserStatsResponse {
+    @doc("ユニークアクション数")
+    uniqueActionUserCount: int32;
+
+    @doc("登録ユーザー数")
+    userCount: int32;
+
+    @doc("セッション数")
+    talkSessionCount: int32;
+
+    @doc("日付")
+    date: utcDateTime;
+  }
+  @route("/users")
+  @tag("manage")
+  interface UserStats {
+
+    @route("/list")
+    @extension("x-ogen-operation-group", "manage")
+    @operationId("getUserListManage")
+    @get getUserList(
+      @query offset?: int32,
+      @query limit?: int32,
+      @query search?: string,
+      @query orderBy?: "createdAt" | "updatedAt" | "displayName" | "lastLoginAt",
+      @query order?: "asc" | "desc"
+    ): UserForManage[];
+
+    @route("/stats/list")
+    @extension("x-ogen-operation-group", "manage")
+    @operationId("getUserStatsListManage")
+    @get getUserStats(
+      @query range: string,
+      @query offset?: int32,
+      @query limit?: int32,
+    ): UserStatsResponse[];
+
+    @route("/stats/total")
+    @extension("x-ogen-operation-group", "manage")
+    @operationId("getUserStatsTotalManage")
+    @get getUserStatsTotal(): UserStatsResponse;
   }
 }
 

@@ -1,3 +1,7 @@
+#!/bin/bash
+
+set -e
+
 curl -L "http://127.0.0.1:3658/export/openapi/674502/0" -o api/target/apidog.openapi.yaml
 
 jq '(..|objects|select(IN(paths; ["securitySchemes", "apikey-header-SessionId"])))."securitySchemes"."apikey-header-SessionId" |= {"type":"apiKey","in":"cookie","name":"SessionId"}' ./api/target/apidog.openapi.yaml > ./tmp.openapi.yaml
@@ -10,10 +14,15 @@ cd manage
 npm run build
 cd ../
 
-oasc -f ./api/target/apidog.openapi.yaml  -f ./api/target/manage.openapi.yaml -o ./static/openapi.yaml --format yaml
-ogen --package oas --target internal/presentation/oas --clean ./static/openapi.yaml --convenient-errors=on
+oasc -f ./api/target/apidog.openapi.yaml  -f ./api/target/manage.openapi.yaml -o ./static/oas/openapi.yaml --format yaml
+ogen --package oas --target internal/presentation/oas --clean ./static/oas/openapi.yaml --convenient-errors=on
 
 sqlc generate
 oapi-codegen -config oapi.yaml ./api/analysis.openapi.json
 
 find . -name "*.go" | grep -v "vendor/\|.git/\|_test.go" | xargs -n 1 -t otelinji -template "./internal/infrastructure/telemetry/otelinji.template" -w -filename &> /dev/null
+
+cd admin-ui
+bun run build
+cd ../
+

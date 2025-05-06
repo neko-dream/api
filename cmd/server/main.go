@@ -54,14 +54,16 @@ func main() {
 	// if conf.Env != config.PROD {
 	var domain string
 	if conf.Env == config.DEV {
-		domain = "https://api-dev.kotohiro.com/static/openapi.yaml"
+		domain = "https://api-dev.kotohiro.com/static/oas/openapi.yaml"
 	} else if conf.Env == config.PROD {
-		domain = "https://api.kotohiro.com/static/openapi.yaml"
+		domain = "https://api.kotohiro.com/static/oas/openapi.yaml"
 	} else {
-		domain = "http://localhost:" + conf.PORT + "/static/openapi.yaml"
+		domain = "http://localhost:" + conf.PORT + "/static/oas/openapi.yaml"
 	}
 	mux.Handle("/static/", http.StripPrefix("/static/", handler.NewStaticHandler()))
-	mux.Handle("/manage/", http.StripPrefix("/manage/", handler.NewManageFrontHandler()))
+	mux.Handle("/admin/", http.StripPrefix("/admin/", handler.NewAdminUIHandler()))
+	mux.Handle("/assets/", http.StripPrefix("/assets/", handler.NewAdminUIAssetsHandler()))
+	mux.Handle("/admin", http.RedirectHandler("/admin/index.html", http.StatusSeeOther))
 	mux.Handle("/docs/", v5emb.New("kotohiro", domain, "/docs/"))
 	// }
 

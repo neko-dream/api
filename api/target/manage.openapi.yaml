@@ -18,7 +18,7 @@ paths:
               - active
               - inactive
           explode: false
-        - name: page
+        - name: offset
           in: query
           required: false
           schema:
@@ -38,9 +38,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TalkSessionStats'
+                $ref: '#/components/schemas/TalkSessionListResponse'
       tags:
         - manage
       x-ogen-operation-group: manage
@@ -131,6 +129,112 @@ paths:
             schema:
               $ref: '#/components/schemas/ToggleReportVisibilityRequest'
       x-ogen-operation-group: manage
+  /v1/manage/users/list:
+    get:
+      operationId: getUserListManage
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+          explode: false
+        - name: orderBy
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - createdAt
+              - updatedAt
+              - displayName
+              - lastLoginAt
+          explode: false
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserForManage'
+      tags:
+        - manage
+      x-ogen-operation-group: manage
+  /v1/manage/users/stats/list:
+    get:
+      operationId: getUserStatsListManage
+      parameters:
+        - name: range
+          in: query
+          required: true
+          schema:
+            type: string
+          explode: false
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserStatsResponse'
+      tags:
+        - manage
+      x-ogen-operation-group: manage
+  /v1/manage/users/stats/total:
+    get:
+      operationId: getUserStatsTotalManage
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStatsResponse'
+      tags:
+        - manage
+      x-ogen-operation-group: manage
 security:
   - ApiKeyAuth: []
 components:
@@ -201,6 +305,19 @@ components:
           type: string
         CreatedAt:
           type: string
+    TalkSessionListResponse:
+      type: object
+      required:
+        - TalkSessionStats
+        - TotalCount
+      properties:
+        TalkSessionStats:
+          type: array
+          items:
+            $ref: '#/components/schemas/TalkSessionStats'
+        TotalCount:
+          type: integer
+          format: int32
     TalkSessionStats:
       type: object
       required:
@@ -276,19 +393,62 @@ components:
     UserForManage:
       type: object
       required:
-        - UserID
-        - DisplayID
-        - DisplayName
-        - IconURL
+        - userID
+        - displayID
+        - displayName
+        - iconURL
+        - lastLoginAt
+        - createdAt
+        - updatedAt
       properties:
-        UserID:
+        userID:
           type: string
-        DisplayID:
+          description: ユーザーID
+        displayID:
           type: string
-        DisplayName:
+          description: 表示ID
+        displayName:
           type: string
-        IconURL:
+          description: 表示名
+        iconURL:
           type: string
+          description: アイコンURL
+        lastLoginAt:
+          type: string
+          format: date-time
+          description: 最終ログイン日時
+        createdAt:
+          type: string
+          format: date-time
+          description: 作成日時
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新日時
+    UserStatsResponse:
+      type: object
+      required:
+        - uniqueActionUserCount
+        - userCount
+        - talkSessionCount
+        - date
+      properties:
+        uniqueActionUserCount:
+          type: integer
+          format: int32
+          description: ユニークアクション数
+        userCount:
+          type: integer
+          format: int32
+          description: 登録ユーザー数
+        talkSessionCount:
+          type: integer
+          format: int32
+          description: セッション数
+        date:
+          type: string
+          format: date-time
+          description: 日付
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

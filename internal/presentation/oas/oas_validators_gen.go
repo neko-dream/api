@@ -868,6 +868,32 @@ func (s *GetUserInfoOK) Validate() error {
 	return nil
 }
 
+func (s GetUserListManageOrder) Validate() error {
+	switch s {
+	case "asc":
+		return nil
+	case "desc":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s GetUserListManageOrderBy) Validate() error {
+	switch s {
+	case "createdAt":
+		return nil
+	case "updatedAt":
+		return nil
+	case "displayName":
+		return nil
+	case "lastLoginAt":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
 func (s *InviteOrganizationForUserReq) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -2006,6 +2032,29 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) Validate() error {
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
 			Name:  "user",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s *TalkSessionListResponse) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if s.TalkSessionStats == nil {
+			return errors.New("nil is invalid value")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "TalkSessionStats",
 			Error: err,
 		})
 	}

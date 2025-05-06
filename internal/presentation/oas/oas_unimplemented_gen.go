@@ -253,7 +253,7 @@ func (UnimplementedHandler) GetTalkSessionList(ctx context.Context, params GetTa
 // GetTalkSessionListManage implements getTalkSessionListManage operation.
 //
 // GET /v1/manage/talksessions/list
-func (UnimplementedHandler) GetTalkSessionListManage(ctx context.Context, params GetTalkSessionListManageParams) (r []TalkSessionStats, _ error) {
+func (UnimplementedHandler) GetTalkSessionListManage(ctx context.Context, params GetTalkSessionListManageParams) (r *TalkSessionListResponse, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -315,6 +315,27 @@ func (UnimplementedHandler) GetTimeLine(ctx context.Context, params GetTimeLineP
 //
 // GET /user
 func (UnimplementedHandler) GetUserInfo(ctx context.Context) (r GetUserInfoRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetUserListManage implements getUserListManage operation.
+//
+// GET /v1/manage/users/list
+func (UnimplementedHandler) GetUserListManage(ctx context.Context, params GetUserListManageParams) (r []UserForManage, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetUserStatsListManage implements getUserStatsListManage operation.
+//
+// GET /v1/manage/users/stats/list
+func (UnimplementedHandler) GetUserStatsListManage(ctx context.Context, params GetUserStatsListManageParams) (r []UserStatsResponse, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetUserStatsTotalManage implements getUserStatsTotalManage operation.
+//
+// GET /v1/manage/users/stats/total
+func (UnimplementedHandler) GetUserStatsTotalManage(ctx context.Context) (r *UserStatsResponse, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

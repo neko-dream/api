@@ -198,6 +198,24 @@ func (q *Queries) EditTalkSession(ctx context.Context, arg EditTalkSessionParams
 	return err
 }
 
+const getAllTalkSessionCount = `-- name: GetAllTalkSessionCount :one
+SELECT
+    COUNT(DISTINCT talk_sessions.talk_session_id) AS talk_session_count
+FROM talk_sessions
+`
+
+// GetAllTalkSessionCount
+//
+//	SELECT
+//	    COUNT(DISTINCT talk_sessions.talk_session_id) AS talk_session_count
+//	FROM talk_sessions
+func (q *Queries) GetAllTalkSessionCount(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getAllTalkSessionCount)
+	var talk_session_count int64
+	err := row.Scan(&talk_session_count)
+	return talk_session_count, err
+}
+
 const getOwnTalkSessionByUserID = `-- name: GetOwnTalkSessionByUserID :many
 SELECT
     talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url, talk_sessions.restrictions, talk_sessions.updated_at, talk_sessions.hide_report,
