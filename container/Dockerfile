@@ -7,7 +7,7 @@ WORKDIR /admin-ui
 COPY admin-ui/package*.json admin-ui/bun.lockb ./
 RUN bun install
 COPY admin-ui ./
-RUN VITE_API_URL=${API_URL} bun build:${ENV}
+RUN VITE_API_URL=${API_URL} bun build:dev
 
 FROM golang:1.24.2-alpine AS builder
 
