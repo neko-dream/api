@@ -124,6 +124,13 @@ func (UnimplementedHandler) EditUserProfile(ctx context.Context, req OptEditUser
 	return r, ht.ErrNotImplemented
 }
 
+// GetAnalysisReportManage implements getAnalysisReportManage operation.
+//
+// GET /v1/manage/talksessions/{talkSessionID}/analysis/report
+func (UnimplementedHandler) GetAnalysisReportManage(ctx context.Context, params GetAnalysisReportManageParams) (r *AnalysisReportResponse, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetConclusion implements getConclusion operation.
 //
 // 結論取得.
@@ -216,13 +223,6 @@ func (UnimplementedHandler) GetPolicyConsentStatus(ctx context.Context) (r GetPo
 	return r, ht.ErrNotImplemented
 }
 
-// GetReportBySessionId implements getReportBySessionId operation.
-//
-// GET /manage/report
-func (UnimplementedHandler) GetReportBySessionId(ctx context.Context, params GetReportBySessionIdParams) (r *GetReportBySessionIdOK, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // GetReportsForTalkSession implements getReportsForTalkSession operation.
 //
 // 通報一覧.
@@ -247,6 +247,20 @@ func (UnimplementedHandler) GetTalkSessionDetail(ctx context.Context, params Get
 //
 // GET /talksessions
 func (UnimplementedHandler) GetTalkSessionList(ctx context.Context, params GetTalkSessionListParams) (r GetTalkSessionListRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetTalkSessionListManage implements getTalkSessionListManage operation.
+//
+// GET /v1/manage/talksessions/list
+func (UnimplementedHandler) GetTalkSessionListManage(ctx context.Context, params GetTalkSessionListManageParams) (r *TalkSessionListResponse, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetTalkSessionManage implements getTalkSessionManage operation.
+//
+// GET /v1/manage/talksessions/{talkSessionID}
+func (UnimplementedHandler) GetTalkSessionManage(ctx context.Context, params GetTalkSessionManageParams) (r *TalkSessionForManage, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -304,6 +318,27 @@ func (UnimplementedHandler) GetUserInfo(ctx context.Context) (r GetUserInfoRes, 
 	return r, ht.ErrNotImplemented
 }
 
+// GetUserListManage implements getUserListManage operation.
+//
+// GET /v1/manage/users/list
+func (UnimplementedHandler) GetUserListManage(ctx context.Context, params GetUserListManageParams) (r []UserForManage, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetUserStatsListManage implements getUserStatsListManage operation.
+//
+// GET /v1/manage/users/stats/list
+func (UnimplementedHandler) GetUserStatsListManage(ctx context.Context, params GetUserStatsListManageParams) (r []UserStatsResponse, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetUserStatsTotalManage implements getUserStatsTotalManage operation.
+//
+// GET /v1/manage/users/stats/total
+func (UnimplementedHandler) GetUserStatsTotalManage(ctx context.Context) (r *UserStatsResponse, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // HasConsent implements hasConsent operation.
 //
 // セッションに同意しているか.
@@ -343,19 +378,10 @@ func (UnimplementedHandler) InviteOrganizationForUser(ctx context.Context, req O
 	return r, ht.ErrNotImplemented
 }
 
-// ManageIndex implements manageIndex operation.
+// ManageRegenerateManage implements manageRegenerateManage operation.
 //
-// GET /manage
-func (UnimplementedHandler) ManageIndex(ctx context.Context) (r ManageIndexOK, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// ManageRegenerate implements manageRegenerate operation.
-//
-// Analysisを再生成する。enum: [report, group, image].
-//
-// POST /manage/regenerate
-func (UnimplementedHandler) ManageRegenerate(ctx context.Context, req OptManageRegenerateReq) (r *ManageRegenerateOK, _ error) {
+// POST /v1/manage/talksessions/{talkSessionID}/analysis/regenerate
+func (UnimplementedHandler) ManageRegenerateManage(ctx context.Context, req *RegenerateRequest, params ManageRegenerateManageParams) (r *RegenerateResponse, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -547,21 +573,19 @@ func (UnimplementedHandler) TalkSessionAnalysis(ctx context.Context, params Talk
 	return r, ht.ErrNotImplemented
 }
 
-// TalkSessionHideToggle implements talkSessionHideToggle operation.
-//
-// Reportの表示をトグルする.
-//
-// POST /manage/hideTalkSession
-func (UnimplementedHandler) TalkSessionHideToggle(ctx context.Context, req OptTalkSessionHideToggleReq) (r *TalkSessionHideToggleOK, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // Test implements test operation.
 //
 // OpenAPIテスト用.
 //
 // GET /test
 func (UnimplementedHandler) Test(ctx context.Context) (r TestRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// ToggleReportVisibilityManage implements toggleReportVisibilityManage operation.
+//
+// POST /v1/manage/talksessions/{talkSessionID}/analysis/report
+func (UnimplementedHandler) ToggleReportVisibilityManage(ctx context.Context, req *ToggleReportVisibilityRequest, params ToggleReportVisibilityManageParams) (r *ToggleReportVisibilityResponse, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

@@ -13,6 +13,8 @@ go = "1.24.2"
 task = "latest"
 "go:github.com/dmarkham/enumer" = "latest"
 ecspresso = "latest"
+"go:github.com/haryoiro/oasc" = "v0.1.35"
+"go:github.com/haryoiro/oasc/cmd/oasc" = "v0.1.47"
 
 [tasks.migrate-create]
 description = "Create a new migration file"

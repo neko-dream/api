@@ -1,0 +1,460 @@
+openapi: 3.0.0
+info:
+  title: Kotohiro Manage API Server
+  version: 0.0.0
+tags:
+  - name: manage
+paths:
+  /v1/manage/talksessions/list:
+    get:
+      operationId: getTalkSessionListManage
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - active
+              - inactive
+          explode: false
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TalkSessionListResponse'
+      tags:
+        - manage
+      x-ogen-operation-group: manage
+  /v1/manage/talksessions/{talkSessionID}:
+    get:
+      operationId: getTalkSessionManage
+      parameters:
+        - name: talkSessionID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TalkSessionForManage'
+      tags:
+        - manage
+      x-ogen-operation-group: manage
+  /v1/manage/talksessions/{talkSessionID}/analysis/regenerate:
+    post:
+      operationId: manageRegenerateManage
+      parameters:
+        - name: talkSessionID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegenerateResponse'
+      tags:
+        - manage
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RegenerateRequest'
+      x-ogen-operation-group: manage
+  /v1/manage/talksessions/{talkSessionID}/analysis/report:
+    get:
+      operationId: getAnalysisReportManage
+      parameters:
+        - name: talkSessionID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisReportResponse'
+      tags:
+        - manage
+      x-ogen-operation-group: manage
+    post:
+      operationId: toggleReportVisibilityManage
+      parameters:
+        - name: talkSessionID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToggleReportVisibilityResponse'
+      tags:
+        - manage
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ToggleReportVisibilityRequest'
+      x-ogen-operation-group: manage
+  /v1/manage/users/list:
+    get:
+      operationId: getUserListManage
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+          explode: false
+        - name: orderBy
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - createdAt
+              - updatedAt
+              - displayName
+              - lastLoginAt
+          explode: false
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserForManage'
+      tags:
+        - manage
+      x-ogen-operation-group: manage
+  /v1/manage/users/stats/list:
+    get:
+      operationId: getUserStatsListManage
+      parameters:
+        - name: range
+          in: query
+          required: true
+          schema:
+            type: string
+          explode: false
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserStatsResponse'
+      tags:
+        - manage
+      x-ogen-operation-group: manage
+  /v1/manage/users/stats/total:
+    get:
+      operationId: getUserStatsTotalManage
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStatsResponse'
+      tags:
+        - manage
+      x-ogen-operation-group: manage
+security:
+  - ApiKeyAuth: []
+components:
+  schemas:
+    AnalysisReportResponse:
+      type: object
+      properties:
+        report:
+          type: string
+          description: レポート本文
+    RegenerateRequest:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum:
+            - report
+            - group
+            - image
+          description: 再生成するタイプ
+    RegenerateResponse:
+      type: object
+      required:
+        - status
+        - message
+      properties:
+        status:
+          type: string
+          description: ステータス
+        message:
+          type: string
+          description: メッセージ
+    TalkSessionForManage:
+      type: object
+      required:
+        - TalkSessionID
+        - Theme
+        - Description
+        - Owner
+        - ScheduledEndTime
+        - ThumbnailURL
+        - Hidden
+        - UpdatedAt
+        - CreatedAt
+      properties:
+        TalkSessionID:
+          type: string
+        Theme:
+          type: string
+        Description:
+          type: string
+        Owner:
+          $ref: '#/components/schemas/UserForManage'
+        ScheduledEndTime:
+          type: string
+          format: date-time
+        City:
+          type: string
+        Prefecture:
+          type: string
+        ThumbnailURL:
+          type: string
+        Hidden:
+          type: boolean
+        UpdatedAt:
+          type: string
+        CreatedAt:
+          type: string
+    TalkSessionListResponse:
+      type: object
+      required:
+        - TalkSessionStats
+        - TotalCount
+      properties:
+        TalkSessionStats:
+          type: array
+          items:
+            $ref: '#/components/schemas/TalkSessionStats'
+        TotalCount:
+          type: integer
+          format: int32
+    TalkSessionStats:
+      type: object
+      required:
+        - TalkSessionID
+        - Theme
+        - Description
+        - Owner
+        - ScheduledEndTime
+        - ThumbnailURL
+        - Hidden
+        - UpdatedAt
+        - CreatedAt
+        - OpinionCount
+        - OpinionUserCount
+        - VoteCount
+        - VoteUserCount
+      properties:
+        TalkSessionID:
+          type: string
+        Theme:
+          type: string
+        Description:
+          type: string
+        Owner:
+          $ref: '#/components/schemas/UserForManage'
+        ScheduledEndTime:
+          type: string
+          format: date-time
+        City:
+          type: string
+        Prefecture:
+          type: string
+        ThumbnailURL:
+          type: string
+        Hidden:
+          type: boolean
+        UpdatedAt:
+          type: string
+        CreatedAt:
+          type: string
+        OpinionCount:
+          type: integer
+          format: int32
+        OpinionUserCount:
+          type: integer
+          format: int32
+        VoteCount:
+          type: integer
+          format: int32
+        VoteUserCount:
+          type: integer
+          format: int32
+    ToggleReportVisibilityRequest:
+      type: object
+      required:
+        - hidden
+      properties:
+        hidden:
+          type: boolean
+          description: 非表示にするかどうか
+    ToggleReportVisibilityResponse:
+      type: object
+      required:
+        - status
+        - message
+      properties:
+        status:
+          type: string
+          description: ステータス
+        message:
+          type: string
+          description: メッセージ
+    UserForManage:
+      type: object
+      required:
+        - userID
+        - displayID
+        - displayName
+        - iconURL
+        - lastLoginAt
+        - createdAt
+        - updatedAt
+      properties:
+        userID:
+          type: string
+          description: ユーザーID
+        displayID:
+          type: string
+          description: 表示ID
+        displayName:
+          type: string
+          description: 表示名
+        iconURL:
+          type: string
+          description: アイコンURL
+        lastLoginAt:
+          type: string
+          format: date-time
+          description: 最終ログイン日時
+        createdAt:
+          type: string
+          format: date-time
+          description: 作成日時
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新日時
+    UserStatsResponse:
+      type: object
+      required:
+        - uniqueActionUserCount
+        - userCount
+        - talkSessionCount
+        - date
+      properties:
+        uniqueActionUserCount:
+          type: integer
+          format: int32
+          description: ユニークアクション数
+        userCount:
+          type: integer
+          format: int32
+          description: 登録ユーザー数
+        talkSessionCount:
+          type: integer
+          format: int32
+          description: セッション数
+        date:
+          type: string
+          format: date-time
+          description: 日付
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: cookie
+      name: SessionId
+servers:
+  - url: http://localhost:3000
+    description: Kotohiro Manage API Server
+    variables: {}

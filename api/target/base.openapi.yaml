@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  title: neko-dream
+  title: kotohiro
   description: ""
   version: 1.0.0
 paths:

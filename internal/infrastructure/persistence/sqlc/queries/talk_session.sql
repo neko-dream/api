@@ -227,3 +227,9 @@ WHERE
 GROUP BY talk_sessions.talk_session_id, oc.opinion_count, users.user_id, users.display_name, users.display_id, users.icon_url, talk_session_locations.talk_session_id
 ORDER BY talk_sessions.created_at DESC
 LIMIT $1 OFFSET $2;
+
+
+-- name: GetAllTalkSessionCount :one
+SELECT
+    COUNT(DISTINCT talk_sessions.talk_session_id) AS talk_session_count
+FROM talk_sessions;

@@ -58,13 +58,11 @@ func (h *policyHandler) GetPolicyConsentStatus(ctx context.Context) (oas.GetPoli
 		consentedAt = lo.ToPtr(output.ConsentedAt.Format(time.RFC3339))
 	}
 
-	res := &oas.GetPolicyConsentStatusOK{
+	return &oas.PolicyConsentStatus{
 		PolicyVersion: output.PolicyVersion,
 		ConsentGiven:  output.ConsentGiven,
 		ConsentedAt:   utils.ToOptNil[oas.OptNilString](consentedAt),
-	}
-
-	return res, nil
+	}, nil
 }
 
 func (h *policyHandler) PolicyConsent(ctx context.Context, req oas.OptPolicyConsentReq) (oas.PolicyConsentRes, error) {
@@ -103,7 +101,7 @@ func (h *policyHandler) PolicyConsent(ctx context.Context, req oas.OptPolicyCons
 		consentedAt = lo.ToPtr(output.ConsentedAt.Format(time.RFC3339))
 	}
 
-	return &oas.PolicyConsentOK{
+	return &oas.PolicyConsentStatus{
 		PolicyVersion: req.Value.PolicyVersion,
 		ConsentedAt:   utils.ToOptNil[oas.OptNilString](consentedAt),
 		ConsentGiven:  output.Success,

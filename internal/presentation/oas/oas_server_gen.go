@@ -110,26 +110,38 @@ type ImageHandler interface {
 //
 // x-ogen-operation-group: Manage
 type ManageHandler interface {
-	// GetReportBySessionId implements getReportBySessionId operation.
+	// GetAnalysisReportManage implements getAnalysisReportManage operation.
 	//
-	// GET /manage/report
-	GetReportBySessionId(ctx context.Context, params GetReportBySessionIdParams) (*GetReportBySessionIdOK, error)
-	// ManageIndex implements manageIndex operation.
+	// GET /v1/manage/talksessions/{talkSessionID}/analysis/report
+	GetAnalysisReportManage(ctx context.Context, params GetAnalysisReportManageParams) (*AnalysisReportResponse, error)
+	// GetTalkSessionListManage implements getTalkSessionListManage operation.
 	//
-	// GET /manage
-	ManageIndex(ctx context.Context) (ManageIndexOK, error)
-	// ManageRegenerate implements manageRegenerate operation.
+	// GET /v1/manage/talksessions/list
+	GetTalkSessionListManage(ctx context.Context, params GetTalkSessionListManageParams) (*TalkSessionListResponse, error)
+	// GetTalkSessionManage implements getTalkSessionManage operation.
 	//
-	// Analysisを再生成する。enum: [report, group, image].
+	// GET /v1/manage/talksessions/{talkSessionID}
+	GetTalkSessionManage(ctx context.Context, params GetTalkSessionManageParams) (*TalkSessionForManage, error)
+	// GetUserListManage implements getUserListManage operation.
 	//
-	// POST /manage/regenerate
-	ManageRegenerate(ctx context.Context, req OptManageRegenerateReq) (*ManageRegenerateOK, error)
-	// TalkSessionHideToggle implements talkSessionHideToggle operation.
+	// GET /v1/manage/users/list
+	GetUserListManage(ctx context.Context, params GetUserListManageParams) ([]UserForManage, error)
+	// GetUserStatsListManage implements getUserStatsListManage operation.
 	//
-	// Reportの表示をトグルする.
+	// GET /v1/manage/users/stats/list
+	GetUserStatsListManage(ctx context.Context, params GetUserStatsListManageParams) ([]UserStatsResponse, error)
+	// GetUserStatsTotalManage implements getUserStatsTotalManage operation.
 	//
-	// POST /manage/hideTalkSession
-	TalkSessionHideToggle(ctx context.Context, req OptTalkSessionHideToggleReq) (*TalkSessionHideToggleOK, error)
+	// GET /v1/manage/users/stats/total
+	GetUserStatsTotalManage(ctx context.Context) (*UserStatsResponse, error)
+	// ManageRegenerateManage implements manageRegenerateManage operation.
+	//
+	// POST /v1/manage/talksessions/{talkSessionID}/analysis/regenerate
+	ManageRegenerateManage(ctx context.Context, req *RegenerateRequest, params ManageRegenerateManageParams) (*RegenerateResponse, error)
+	// ToggleReportVisibilityManage implements toggleReportVisibilityManage operation.
+	//
+	// POST /v1/manage/talksessions/{talkSessionID}/analysis/report
+	ToggleReportVisibilityManage(ctx context.Context, req *ToggleReportVisibilityRequest, params ToggleReportVisibilityManageParams) (*ToggleReportVisibilityResponse, error)
 }
 
 // OpinionHandler handles operations described by OpenAPI v3 specification.
