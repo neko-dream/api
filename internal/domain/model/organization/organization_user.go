@@ -31,6 +31,21 @@ func NewOrganizationUserRole(role int) OrganizationUserRole {
 	return OrganizationUserRole(role)
 }
 
+func RoleToName(role OrganizationUserRole) string {
+	switch role {
+	case OrganizationUserRoleMember:
+		return "メンバー"
+	case OrganizationUserRoleAdmin:
+		return "管理者"
+	case OrganizationUserRoleOwner:
+		return "オーナー"
+	case OrganizationUserRoleSuperAdmin:
+		return "運営"
+	default:
+		return "メンバー"
+	}
+}
+
 const (
 	OrganizationUserRoleMember OrganizationUserRole = iota + 1
 	OrganizationUserRoleAdmin
@@ -60,7 +75,7 @@ func NewOrganizationUser(
 	}
 }
 
-// SetRole はユーザーのロールを設定するのじゃ
+// SetRole
 func (ou *OrganizationUser) SetRole(role OrganizationUserRole) error {
 	if role < OrganizationUserRoleMember || role > OrganizationUserRoleSuperAdmin {
 		return errors.New("invalid role")
@@ -69,7 +84,7 @@ func (ou *OrganizationUser) SetRole(role OrganizationUserRole) error {
 	return nil
 }
 
-// HasPermissionToChangeRoleTo は現在のユーザーが指定されたロールに変更する権限があるかをチェックするのじゃ
+// HasPermissionToChangeRoleTo
 func (ou *OrganizationUser) HasPermissionToChangeRoleTo(targetRole OrganizationUserRole) bool {
 	return int(ou.Role) >= int(targetRole) && ou.Role >= OrganizationUserRoleAdmin
 }

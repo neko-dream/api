@@ -18,7 +18,7 @@ type TransactionalTestCase[T any] struct {
 func RunTransactionalTests[T any](t *testing.T, dbManager *db.DBManager, initialData *T, testCases []*TransactionalTestCase[T]) {
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
-			err := dbManager.TestTx(context.Background(), func(ctx context.Context) error {
+			err := dbManager.TestTx(t.Context(), func(ctx context.Context) error {
 				if tc.SetupFn != nil {
 					if err := tc.SetupFn(ctx, initialData); err != nil {
 						return fmt.Errorf("setup error: %w", err)

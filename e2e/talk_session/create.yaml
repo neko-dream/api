@@ -54,7 +54,6 @@ steps:
               prefecture: "{{ vars.prefecture }}"
               city: "{{ vars.city }}"
               restrictions: "demographics.prefecture,demographics.city"
-
     test: |
       current.res.status == 200 &&
       current.res.body.theme == 'テストセッション' &&
