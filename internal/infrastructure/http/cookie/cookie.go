@@ -7,10 +7,9 @@ import (
 )
 
 const (
-	SessionCookieName  = "SessionId"
-	RedirectCookieName = "redirect_url"
-	SessionMaxAge      = 86400 * 5 // 24 hours
-	AuthCookieMaxAge   = 900       // 15 minutes
+	SessionCookieName = "SessionId"
+	SessionMaxAge     = 86400 * 5 // 24 hours
+	AuthCookieMaxAge  = 900       // 15 minutes
 )
 
 type CookieManager struct {
