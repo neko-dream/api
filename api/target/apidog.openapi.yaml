@@ -7014,6 +7014,9 @@
             "type": "integer",
             "description": "組織のタイプ"
           },
+          "RoleName": {
+            "type": "string"
+          },
           "Role": {
             "type": "integer",
             "description": "ロール"
@@ -7023,7 +7026,8 @@
           "ID",
           "Name",
           "Type",
-          "Role"
+          "Role",
+          "RoleName"
         ]
       },
       "success": {
