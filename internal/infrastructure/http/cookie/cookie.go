@@ -8,10 +8,9 @@ import (
 
 const (
 	SessionCookieName  = "SessionId"
-	StateCookieName    = "state"
 	RedirectCookieName = "redirect_url"
 	SessionMaxAge      = 86400 * 5 // 24 hours
-	AuthCookieMaxAge   = 300       // 5 minutes
+	AuthCookieMaxAge   = 900       // 15 minutes
 )
 
 type CookieManager struct {
@@ -43,18 +42,8 @@ func (cm *CookieManager) CreateSessionCookie(token string) *http.Cookie {
 	}
 }
 
-func (cm *CookieManager) CreateAuthCookies(state, redirectURL string) []*http.Cookie {
+func (cm *CookieManager) CreateAuthCookies(redirectURL string) []*http.Cookie {
 	return []*http.Cookie{
-		{
-			Name:     StateCookieName,
-			Value:    state,
-			HttpOnly: true,
-			Secure:   cm.secure,
-			Path:     "/",
-			SameSite: cm.sameSite,
-			Domain:   "." + cm.config.DOMAIN,
-			MaxAge:   AuthCookieMaxAge,
-		},
 		{
 			Name:     RedirectCookieName,
 			Value:    redirectURL,

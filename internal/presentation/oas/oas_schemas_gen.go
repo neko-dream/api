@@ -2404,7 +2404,7 @@ type OAuthCallbackFound struct{}
 // OAuthCallbackFoundHeaders wraps OAuthCallbackFound with response headers.
 type OAuthCallbackFoundHeaders struct {
 	Location  string
-	SetCookie string
+	SetCookie []string
 	Response  OAuthCallbackFound
 }
 
@@ -2414,7 +2414,7 @@ func (s *OAuthCallbackFoundHeaders) GetLocation() string {
 }
 
 // GetSetCookie returns the value of SetCookie.
-func (s *OAuthCallbackFoundHeaders) GetSetCookie() string {
+func (s *OAuthCallbackFoundHeaders) GetSetCookie() []string {
 	return s.SetCookie
 }
 
@@ -2429,7 +2429,7 @@ func (s *OAuthCallbackFoundHeaders) SetLocation(val string) {
 }
 
 // SetSetCookie sets the value of SetCookie.
-func (s *OAuthCallbackFoundHeaders) SetSetCookie(val string) {
+func (s *OAuthCallbackFoundHeaders) SetSetCookie(val []string) {
 	s.SetCookie = val
 }
 

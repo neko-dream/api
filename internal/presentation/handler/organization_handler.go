@@ -3,12 +3,12 @@ package handler
 import (
 	"context"
 
+	"github.com/neko-dream/server/internal/application/command/organization_command"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/presentation/oas"
-	"github.com/neko-dream/server/internal/usecase/command/organization_command"
 	"go.opentelemetry.io/otel"
 )
 

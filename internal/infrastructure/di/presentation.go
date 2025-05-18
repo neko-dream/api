@@ -2,6 +2,9 @@ package di
 
 import "github.com/neko-dream/server/internal/presentation/handler"
 
+// このファイルはプレゼンテーション層（ハンドラ等）のコンストラクタを管理します。
+// 新しいハンドラ等を追加した場合は必ずここに追記してください。
+
 func presentationDeps() []ProvideArg {
 	return []ProvideArg{
 		{handler.NewSecurityHandler, nil},

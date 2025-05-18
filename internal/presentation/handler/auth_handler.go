@@ -5,13 +5,13 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/neko-dream/server/internal/application/command/auth_command"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/http/cookie"
 	"github.com/neko-dream/server/internal/presentation/oas"
-	"github.com/neko-dream/server/internal/usecase/command/auth_command"
 	cookie_utils "github.com/neko-dream/server/pkg/cookie"
 	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/utils"
@@ -70,7 +70,8 @@ func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams)
 	}
 
 	out, err := a.AuthLogin.Execute(ctx, auth_command.AuthLoginInput{
-		Provider: string(provider),
+		Provider:    string(provider),
+		RedirectURL: params.RedirectURL,
 	})
 	if err != nil {
 		return nil, err
@@ -78,7 +79,6 @@ func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams)
 
 	headers := new(oas.AuthorizeFoundHeaders)
 	headers.SetLocation(out.RedirectURL)
-	headers.SetSetCookie(cookie_utils.EncodeCookies(a.CookieManager.CreateAuthCookies(out.State, params.RedirectURL)))
 	return headers, nil
 }
 
@@ -103,25 +103,19 @@ func (a *authHandler) DevAuthorize(ctx context.Context, params oas.DevAuthorizeP
 func (a *authHandler) OAuthCallback(ctx context.Context, params oas.OAuthCallbackParams) (oas.OAuthCallbackRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.OAuthCallback")
 	defer span.End()
-	// CookieStateとQueryStateが一致しているか確認
-	if params.CookieState != params.QueryState {
-		return nil, messages.InvalidStateError
-	}
 
 	output, err := a.AuthCallback.Execute(ctx, auth_command.CallbackInput{
 		Provider: params.Provider,
 		Code:     params.Code,
+		State:    params.State,
 	})
 	if err != nil {
 		return nil, err
 	}
 
 	headers := new(oas.OAuthCallbackFoundHeaders)
-	headers.SetSetCookie(
-		cookie_utils.EncodeCookies([]*http.Cookie{a.CookieManager.CreateSessionCookie(output.Token)})[0],
-	)
-	// LoginでRedirectURLを設定しているためエラーは発生しない
-	headers.SetLocation(params.RedirectURL)
+	headers.SetSetCookie(cookie_utils.EncodeCookies([]*http.Cookie{a.CookieManager.CreateSessionCookie(output.Token)}))
+	headers.SetLocation(output.RedirectURL)
 	return headers, nil
 }
 
