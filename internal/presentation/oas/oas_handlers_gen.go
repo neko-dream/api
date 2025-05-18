@@ -5864,10 +5864,6 @@ func (s *Server) handleOAuthCallbackRequest(args [1]string, argsEscaped bool, w 
 			Body:             nil,
 			Params: middleware.Parameters{
 				{
-					Name: "state",
-					In:   "cookie",
-				}: params.CookieState,
-				{
 					Name: "redirect_url",
 					In:   "cookie",
 				}: params.RedirectURL,
@@ -5882,7 +5878,7 @@ func (s *Server) handleOAuthCallbackRequest(args [1]string, argsEscaped bool, w 
 				{
 					Name: "state",
 					In:   "query",
-				}: params.QueryState,
+				}: params.State,
 			},
 			Raw: r,
 		}

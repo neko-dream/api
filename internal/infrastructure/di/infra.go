@@ -50,5 +50,6 @@ func infraDeps() []ProvideArg {
 		{ses.NewSESEmailSender, nil},
 		{repository.NewTalkSessionConsentRepository, nil},
 		{repository.NewAnalysisRepository, nil},
+		{repository.NewAuthStateRepository, nil},
 	}
 }

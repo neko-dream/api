@@ -4865,16 +4865,6 @@
         ],
         "parameters": [
           {
-            "name": "state",
-            "in": "cookie",
-            "description": "OAuth2.0 State from Cookie",
-            "required": true,
-            "example": "{{$string.uuid}}",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "redirect_url",
             "in": "cookie",
             "description": "Authorization Code",
@@ -4937,7 +4927,10 @@
                 "required": true,
                 "description": "SessionID",
                 "schema": {
-                  "type": "string"
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 }
               }
             }
@@ -5240,7 +5233,7 @@
               "Set-Cookie": {
                 "example": "",
                 "required": false,
-                "description": "OAuth2.0 State",
+                "description": "",
                 "schema": {
                   "type": "array",
                   "items": {

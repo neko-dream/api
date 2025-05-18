@@ -642,13 +642,6 @@ paths:
         get:
             operationId: oauth_callback
             parameters:
-                - description: OAuth2.0 State from Cookie
-                  example: '{{$string.uuid}}'
-                  in: cookie
-                  name: state
-                  required: true
-                  schema:
-                    type: string
                 - description: Authorization Code
                   example: ""
                   in: cookie
@@ -690,7 +683,9 @@ paths:
                             example: ""
                             required: true
                             schema:
-                                type: string
+                                items:
+                                    type: string
+                                type: array
                 "400":
                     content:
                         application/json:
@@ -865,7 +860,6 @@ paths:
                             schema:
                                 type: string
                         Set-Cookie:
-                            description: OAuth2.0 State
                             example: ""
                             schema:
                                 items:

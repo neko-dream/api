@@ -3465,24 +3465,15 @@ func decodeManageRegenerateManageParams(args [1]string, argsEscaped bool, r *htt
 
 // OAuthCallbackParams is parameters of oauth_callback operation.
 type OAuthCallbackParams struct {
-	// OAuth2.0 State from Cookie.
-	CookieState string
 	// Authorization Code.
 	RedirectURL string
 	Provider    string
 	Code        string
 	// OAuth State from Query.
-	QueryState string
+	State string
 }
 
 func unpackOAuthCallbackParams(packed middleware.Parameters) (params OAuthCallbackParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "state",
-			In:   "cookie",
-		}
-		params.CookieState = packed[key].(string)
-	}
 	{
 		key := middleware.ParameterKey{
 			Name: "redirect_url",
@@ -3509,7 +3500,7 @@ func unpackOAuthCallbackParams(packed middleware.Parameters) (params OAuthCallba
 			Name: "state",
 			In:   "query",
 		}
-		params.QueryState = packed[key].(string)
+		params.State = packed[key].(string)
 	}
 	return params
 }
@@ -3517,40 +3508,6 @@ func unpackOAuthCallbackParams(packed middleware.Parameters) (params OAuthCallba
 func decodeOAuthCallbackParams(args [1]string, argsEscaped bool, r *http.Request) (params OAuthCallbackParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	c := uri.NewCookieDecoder(r)
-	// Decode cookie: state.
-	if err := func() error {
-		cfg := uri.CookieParameterDecodingConfig{
-			Name:    "state",
-			Explode: true,
-		}
-		if err := c.HasParam(cfg); err == nil {
-			if err := c.DecodeParam(cfg, func(d uri.Decoder) error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.CookieState = c
-				return nil
-			}); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "state",
-			In:   "cookie",
-			Err:  err,
-		}
-	}
 	// Decode cookie: redirect_url.
 	if err := func() error {
 		cfg := uri.CookieParameterDecodingConfig{
@@ -3686,7 +3643,7 @@ func decodeOAuthCallbackParams(args [1]string, argsEscaped bool, r *http.Request
 					return err
 				}
 
-				params.QueryState = c
+				params.State = c
 				return nil
 			}); err != nil {
 				return err

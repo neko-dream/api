@@ -2,7 +2,6 @@ package auth_command
 
 import (
 	"context"
-	"log"
 	"regexp"
 
 	"github.com/neko-dream/server/internal/domain/messages"
@@ -84,7 +83,6 @@ func (p *passwordLoginInteractor) Execute(ctx context.Context, input PasswordLog
 			}
 			foundUser, err := p.UserRepository.FindBySubject(ctx, user.UserSubject(emailHash))
 			if err != nil {
-				log.Println("failed to find user by subject", err)
 				return messages.InvalidPasswordOrEmailError
 			}
 			usr = foundUser
@@ -97,7 +95,6 @@ func (p *passwordLoginInteractor) Execute(ctx context.Context, input PasswordLog
 			usr = foundUser
 		}
 		if usr == nil {
-			log.Println("user not found")
 			return messages.InvalidPasswordOrEmailError
 		}
 
@@ -108,7 +105,6 @@ func (p *passwordLoginInteractor) Execute(ctx context.Context, input PasswordLog
 		}
 		// パスワードが一致しない場合はエラーを返す
 		if !userPassword {
-			log.Println("password mismatch")
 			return messages.InvalidPasswordOrEmailError
 		}
 

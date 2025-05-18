@@ -22,8 +22,8 @@ type DetachAccountInput struct {
 }
 
 type detachAccountInteractor struct {
+	*db.DBManager
 	userService user.UserService
-	dbm         *db.DBManager
 	conf        *config.Config
 }
 
@@ -33,8 +33,8 @@ func NewDetachAccount(
 	conf *config.Config,
 ) DetachAccount {
 	return &detachAccountInteractor{
+		DBManager:   dbm,
 		userService: userService,
-		dbm:         dbm,
 		conf:        conf,
 	}
 }
@@ -49,10 +49,10 @@ func (d *detachAccountInteractor) Execute(ctx context.Context, input DetachAccou
 		return nil
 	}
 
-	d.dbm.GetQueries(ctx).ChangeSubject(ctx, model.ChangeSubjectParams{
-		UserID:  input.UserID.UUID(),
-		Subject: uuid.New().String(),
+	return d.ExecTx(ctx, func(ctx context.Context) error {
+		return d.GetQueries(ctx).ChangeSubject(ctx, model.ChangeSubjectParams{
+			UserID:  input.UserID.UUID(),
+			Subject: uuid.New().String(),
+		})
 	})
-
-	return nil
 }

@@ -22,6 +22,14 @@ type ActionItem struct {
 	UpdatedAt     time.Time
 }
 
+type AuthState struct {
+	ID        int32
+	State     string
+	Provider  string
+	CreatedAt time.Time
+	ExpiresAt time.Time
+}
+
 type Opinion struct {
 	OpinionID       uuid.UUID
 	TalkSessionID   uuid.UUID
