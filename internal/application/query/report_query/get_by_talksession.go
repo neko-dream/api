@@ -3,10 +3,10 @@ package report_query
 import (
 	"context"
 
+	"github.com/neko-dream/server/internal/application/query/dto"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/application/query/dto"
 )
 
 type GetByTalkSessionQuery interface {

@@ -70,7 +70,8 @@ func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams)
 	}
 
 	out, err := a.AuthLogin.Execute(ctx, auth_command.AuthLoginInput{
-		Provider: string(provider),
+		Provider:    string(provider),
+		RedirectURL: params.RedirectURL,
 	})
 	if err != nil {
 		return nil, err
@@ -78,7 +79,6 @@ func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams)
 
 	headers := new(oas.AuthorizeFoundHeaders)
 	headers.SetLocation(out.RedirectURL)
-	headers.SetSetCookie(cookie_utils.EncodeCookies(a.CookieManager.CreateAuthCookies(params.RedirectURL)))
 	return headers, nil
 }
 
@@ -115,8 +115,7 @@ func (a *authHandler) OAuthCallback(ctx context.Context, params oas.OAuthCallbac
 
 	headers := new(oas.OAuthCallbackFoundHeaders)
 	headers.SetSetCookie(cookie_utils.EncodeCookies([]*http.Cookie{a.CookieManager.CreateSessionCookie(output.Token)}))
-	// LoginでRedirectURLを設定しているためエラーは発生しない
-	headers.SetLocation(params.RedirectURL)
+	headers.SetLocation(output.RedirectURL)
 	return headers, nil
 }
 

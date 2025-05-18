@@ -21,7 +21,8 @@ type (
 
 	// AuthLoginInput 認証プロバイダー名を受け取る
 	AuthLoginInput struct {
-		Provider string
+		Provider    string
+		RedirectURL string
 	}
 
 	// AuthLoginOutput
@@ -85,9 +86,10 @@ func (a *authLoginInteractor) Execute(ctx context.Context, input AuthLoginInput)
 
 		// stateをDBに保存（CSRF対策）
 		err = a.stateRepository.Create(ctx, &auth.State{
-			State:     state,
-			Provider:  input.Provider,
-			ExpiresAt: time.Now().Add(auth.StateExpirationDuration), // 15分後に期限切れ
+			State:       state,
+			Provider:    input.Provider,
+			RedirectURL: input.RedirectURL,
+			ExpiresAt:   time.Now().Add(auth.StateExpirationDuration), // 15分後に期限切れ
 		})
 		if err != nil {
 			utils.HandleError(ctx, err, "CreateAuthState") // DB保存失敗

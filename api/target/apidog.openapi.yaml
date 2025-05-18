@@ -4865,16 +4865,6 @@
         ],
         "parameters": [
           {
-            "name": "redirect_url",
-            "in": "cookie",
-            "description": "Authorization Code",
-            "required": true,
-            "example": "",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "provider",
             "in": "path",
             "description": "",

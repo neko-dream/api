@@ -3,8 +3,8 @@ package opinion_query
 import (
 	"context"
 
-	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/application/query/dto"
+	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"go.opentelemetry.io/otel"
 )
 

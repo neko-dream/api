@@ -642,13 +642,6 @@ paths:
         get:
             operationId: oauth_callback
             parameters:
-                - description: Authorization Code
-                  example: ""
-                  in: cookie
-                  name: redirect_url
-                  required: true
-                  schema:
-                    type: string
                 - in: path
                   name: provider
                   required: true

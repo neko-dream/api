@@ -2,11 +2,13 @@
 INSERT INTO auth_states (
     state,
     provider,
+    redirect_url,
     expires_at
 ) VALUES (
     $1,
     $2,
-    $3
+    $3,
+    $4
 ) RETURNING *;
 
 -- name: GetAuthState :one

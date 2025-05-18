@@ -14,18 +14,21 @@ const createAuthState = `-- name: CreateAuthState :one
 INSERT INTO auth_states (
     state,
     provider,
+    redirect_url,
     expires_at
 ) VALUES (
     $1,
     $2,
-    $3
-) RETURNING id, state, provider, created_at, expires_at
+    $3,
+    $4
+) RETURNING id, state, provider, redirect_url, created_at, expires_at
 `
 
 type CreateAuthStateParams struct {
-	State     string
-	Provider  string
-	ExpiresAt time.Time
+	State       string
+	Provider    string
+	RedirectUrl string
+	ExpiresAt   time.Time
 }
 
 // CreateAuthState
@@ -33,19 +36,27 @@ type CreateAuthStateParams struct {
 //	INSERT INTO auth_states (
 //	    state,
 //	    provider,
+//	    redirect_url,
 //	    expires_at
 //	) VALUES (
 //	    $1,
 //	    $2,
-//	    $3
-//	) RETURNING id, state, provider, created_at, expires_at
+//	    $3,
+//	    $4
+//	) RETURNING id, state, provider, redirect_url, created_at, expires_at
 func (q *Queries) CreateAuthState(ctx context.Context, arg CreateAuthStateParams) (AuthState, error) {
-	row := q.db.QueryRowContext(ctx, createAuthState, arg.State, arg.Provider, arg.ExpiresAt)
+	row := q.db.QueryRowContext(ctx, createAuthState,
+		arg.State,
+		arg.Provider,
+		arg.RedirectUrl,
+		arg.ExpiresAt,
+	)
 	var i AuthState
 	err := row.Scan(
 		&i.ID,
 		&i.State,
 		&i.Provider,
+		&i.RedirectUrl,
 		&i.CreatedAt,
 		&i.ExpiresAt,
 	)
@@ -81,14 +92,14 @@ func (q *Queries) DeleteExpiredAuthStates(ctx context.Context) error {
 }
 
 const getAuthState = `-- name: GetAuthState :one
-SELECT id, state, provider, created_at, expires_at FROM auth_states
+SELECT id, state, provider, redirect_url, created_at, expires_at FROM auth_states
 WHERE state = $1 AND expires_at > CURRENT_TIMESTAMP
 LIMIT 1
 `
 
 // GetAuthState
 //
-//	SELECT id, state, provider, created_at, expires_at FROM auth_states
+//	SELECT id, state, provider, redirect_url, created_at, expires_at FROM auth_states
 //	WHERE state = $1 AND expires_at > CURRENT_TIMESTAMP
 //	LIMIT 1
 func (q *Queries) GetAuthState(ctx context.Context, state string) (AuthState, error) {
@@ -98,6 +109,7 @@ func (q *Queries) GetAuthState(ctx context.Context, state string) (AuthState, er
 		&i.ID,
 		&i.State,
 		&i.Provider,
+		&i.RedirectUrl,
 		&i.CreatedAt,
 		&i.ExpiresAt,
 	)

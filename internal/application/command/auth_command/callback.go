@@ -25,13 +25,13 @@ type (
 	CallbackInput struct {
 		Provider string
 		Code     string
-		Remember bool
 		State    string
 	}
 
 	// CallbackOutput 認証トークン
 	CallbackOutput struct {
-		Token string
+		Token       string
+		RedirectURL string
 	}
 
 	// authCallbackInteractor
@@ -76,6 +76,7 @@ func (u *authCallbackInteractor) Execute(ctx context.Context, input CallbackInpu
 	defer span.End()
 
 	var tokenRes string
+	var redirectURL string
 	if err := u.ExecTx(ctx, func(ctx context.Context) error {
 		// stateの検証
 		state, err := u.StateRepository.Get(ctx, input.State)
@@ -88,6 +89,7 @@ func (u *authCallbackInteractor) Execute(ctx context.Context, input CallbackInpu
 			utils.HandleError(ctx, err, "stateが不正です") // state検証失敗
 			return errtrace.Wrap(err)
 		}
+		redirectURL = state.RedirectURL
 
 		// stateの削除（ワンタイム性担保）
 		if err := u.StateRepository.Delete(ctx, input.State); err != nil {
@@ -134,6 +136,7 @@ func (u *authCallbackInteractor) Execute(ctx context.Context, input CallbackInpu
 	}
 
 	return CallbackOutput{
-		Token: tokenRes,
+		Token:       tokenRes,
+		RedirectURL: redirectURL,
 	}, nil
 }

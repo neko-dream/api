@@ -27,9 +27,10 @@ func (r *authStateRepository) Create(ctx context.Context, state *auth.State) err
 
 	return r.ExecTx(ctx, func(ctx context.Context) error {
 		_, err := r.GetQueries(ctx).CreateAuthState(ctx, model.CreateAuthStateParams{
-			State:     state.State,
-			Provider:  state.Provider,
-			ExpiresAt: state.ExpiresAt,
+			State:       state.State,
+			Provider:    state.Provider,
+			ExpiresAt:   state.ExpiresAt,
+			RedirectUrl: state.RedirectURL,
 		})
 		return err // 失敗時はそのまま返す
 	})
@@ -48,11 +49,12 @@ func (r *authStateRepository) Get(ctx context.Context, state string) (*auth.Stat
 		}
 
 		result = &auth.State{
-			ID:        int(s.ID),
-			State:     s.State,
-			Provider:  s.Provider,
-			CreatedAt: s.CreatedAt,
-			ExpiresAt: s.ExpiresAt,
+			ID:          int(s.ID),
+			State:       s.State,
+			Provider:    s.Provider,
+			RedirectURL: s.RedirectUrl,
+			CreatedAt:   s.CreatedAt,
+			ExpiresAt:   s.ExpiresAt,
 		}
 		return nil
 	})
