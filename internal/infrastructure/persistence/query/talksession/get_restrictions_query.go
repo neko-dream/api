@@ -5,7 +5,7 @@ import (
 	"sort"
 
 	ts "github.com/neko-dream/server/internal/domain/model/talksession"
-	"github.com/neko-dream/server/internal/usecase/query/talksession"
+	"github.com/neko-dream/server/internal/application/query/talksession"
 	"go.opentelemetry.io/otel"
 )
 

@@ -5,7 +5,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
-	"github.com/neko-dream/server/internal/usecase/query/dto"
+	"github.com/neko-dream/server/internal/application/query/dto"
 )
 
 // ProcessReportedOpinions 通報された意見の内容を置き換える関数

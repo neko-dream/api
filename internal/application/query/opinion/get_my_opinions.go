@@ -7,7 +7,7 @@ import (
 
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/usecase/query/dto"
+	"github.com/neko-dream/server/internal/application/query/dto"
 	"github.com/neko-dream/server/pkg/sort"
 	"github.com/samber/lo"
 )

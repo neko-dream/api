@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/neko-dream/server/internal/domain/model/opinion"
-	"github.com/neko-dream/server/internal/usecase/query/dto"
+	"github.com/neko-dream/server/internal/application/query/dto"
 	"go.opentelemetry.io/otel"
 )
 

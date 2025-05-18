@@ -7,29 +7,30 @@ import (
 
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/usecase/query/dto"
+	"github.com/neko-dream/server/internal/application/query/dto"
 	"github.com/samber/lo"
 )
 
 type (
-	BrowseOpenedByUserQuery interface {
-		Execute(context.Context, BrowseOpenedByUserInput) (*BrowseOpenedByUserOutput, error)
+	BrowseJoinedTalkSessionsQuery interface {
+		Execute(context.Context, BrowseJoinedTalkSessionsQueryInput) (*BrowseJoinedTalkSessionsQueryOutput, error)
 	}
 
-	BrowseOpenedByUserInput struct {
+	BrowseJoinedTalkSessionsQueryInput struct {
 		UserID shared.UUID[user.User]
 		Limit  *int
 		Offset *int
-		Status Status
 		Theme  *string
+		Status Status
 	}
 
-	BrowseOpenedByUserOutput struct {
+	BrowseJoinedTalkSessionsQueryOutput struct {
 		TalkSessions []dto.TalkSessionWithDetail
+		TotalCount   int
 	}
 )
 
-func (h *BrowseOpenedByUserInput) Validate() error {
+func (h *BrowseJoinedTalkSessionsQueryInput) Validate() error {
 	var err error
 
 	if h.Status == "" {

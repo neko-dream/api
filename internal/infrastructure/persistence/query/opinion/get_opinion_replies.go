@@ -8,8 +8,8 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	dto_mapper "github.com/neko-dream/server/internal/infrastructure/persistence/utils"
-	"github.com/neko-dream/server/internal/usecase/query/dto"
-	opinion_query "github.com/neko-dream/server/internal/usecase/query/opinion"
+	"github.com/neko-dream/server/internal/application/query/dto"
+	opinion_query "github.com/neko-dream/server/internal/application/query/opinion"
 	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
 )

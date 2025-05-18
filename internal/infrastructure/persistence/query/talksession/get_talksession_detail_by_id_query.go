@@ -6,8 +6,8 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
-	"github.com/neko-dream/server/internal/usecase/query/dto"
-	"github.com/neko-dream/server/internal/usecase/query/talksession"
+	"github.com/neko-dream/server/internal/application/query/dto"
+	"github.com/neko-dream/server/internal/application/query/talksession"
 	"go.opentelemetry.io/otel"
 )
 

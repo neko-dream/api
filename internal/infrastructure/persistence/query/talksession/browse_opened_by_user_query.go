@@ -9,8 +9,8 @@ import (
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
-	"github.com/neko-dream/server/internal/usecase/query/dto"
-	"github.com/neko-dream/server/internal/usecase/query/talksession"
+	"github.com/neko-dream/server/internal/application/query/dto"
+	"github.com/neko-dream/server/internal/application/query/talksession"
 	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
