@@ -27,6 +27,10 @@ type (
 	}
 )
 
+func (v *Vote) ChangeVoteType(voteType VoteType) {
+	v.VoteType = voteType
+}
+
 func NewVote(
 	voteID shared.UUID[Vote],
 	parentOpinionID shared.UUID[opinion.Opinion],
