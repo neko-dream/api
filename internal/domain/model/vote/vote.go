@@ -13,6 +13,7 @@ import (
 type (
 	VoteRepository interface {
 		Create(ctx context.Context, vote Vote) error
+		Update(ctx context.Context, vote Vote) error
 		FindByOpinionAndUserID(ctx context.Context, opinionID shared.UUID[opinion.Opinion], userID shared.UUID[user.User]) (*Vote, error)
 	}
 
@@ -25,6 +26,10 @@ type (
 		CreatedAt     time.Time
 	}
 )
+
+func (v *Vote) ChangeVoteType(voteType VoteType) {
+	v.VoteType = voteType
+}
 
 func NewVote(
 	voteID shared.UUID[Vote],
