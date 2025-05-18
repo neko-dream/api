@@ -5970,7 +5970,8 @@ type Organization struct {
 	// 組織名.
 	Name string `json:"Name"`
 	// ロール.
-	Role int `json:"Role"`
+	Role     int    `json:"Role"`
+	RoleName string `json:"RoleName"`
 	// 組織のタイプ.
 	Type int `json:"Type"`
 }
@@ -5988,6 +5989,11 @@ func (s *Organization) GetName() string {
 // GetRole returns the value of Role.
 func (s *Organization) GetRole() int {
 	return s.Role
+}
+
+// GetRoleName returns the value of RoleName.
+func (s *Organization) GetRoleName() string {
+	return s.RoleName
 }
 
 // GetType returns the value of Type.
@@ -6008,6 +6014,11 @@ func (s *Organization) SetName(val string) {
 // SetRole sets the value of Role.
 func (s *Organization) SetRole(val int) {
 	s.Role = val
+}
+
+// SetRoleName sets the value of RoleName.
+func (s *Organization) SetRoleName(val string) {
+	s.RoleName = val
 }
 
 // SetType sets the value of Type.

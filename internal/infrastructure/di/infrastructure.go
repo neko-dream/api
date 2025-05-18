@@ -11,6 +11,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/http/cookie"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/postgresql"
+	"github.com/neko-dream/server/internal/infrastructure/persistence/query/organization"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/repository"
 	"github.com/neko-dream/server/internal/infrastructure/telemetry"
 )
@@ -54,5 +55,6 @@ func infraDeps() []ProvideArg {
 		{cookie.NewCookieManager, nil},
 		{crypto.NewEncryptor, nil},
 		{db.NewDummyInitializer, nil},
+		{organization.NewListJoinedOrganizationQuery, nil},
 	}
 }

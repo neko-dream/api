@@ -356,6 +356,8 @@ components:
                 Role:
                     description: ロール
                     type: integer
+                RoleName:
+                    type: string
                 Type:
                     description: 組織のタイプ
                     type: integer
@@ -364,6 +366,7 @@ components:
                 - Name
                 - Type
                 - Role
+                - RoleName
             type: object
         policyConsentStatus:
             properties:

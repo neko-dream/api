@@ -9983,16 +9983,21 @@ func (s *Organization) encodeFields(e *jx.Encoder) {
 		e.Int(s.Role)
 	}
 	{
+		e.FieldStart("RoleName")
+		e.Str(s.RoleName)
+	}
+	{
 		e.FieldStart("Type")
 		e.Int(s.Type)
 	}
 }
 
-var jsonFieldsNameOfOrganization = [4]string{
+var jsonFieldsNameOfOrganization = [5]string{
 	0: "ID",
 	1: "Name",
 	2: "Role",
-	3: "Type",
+	3: "RoleName",
+	4: "Type",
 }
 
 // Decode decodes Organization from json.
@@ -10040,8 +10045,20 @@ func (s *Organization) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"Role\"")
 			}
-		case "Type":
+		case "RoleName":
 			requiredBitSet[0] |= 1 << 3
+			if err := func() error {
+				v, err := d.Str()
+				s.RoleName = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"RoleName\"")
+			}
+		case "Type":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
 				v, err := d.Int()
 				s.Type = int(v)
@@ -10062,7 +10079,7 @@ func (s *Organization) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00001111,
+		0b00011111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

@@ -6,7 +6,6 @@ runners:
     notFollowRedirect: true
   dev: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
 
-skipTest: true
 vars:
   id: policy_test_user
   name: policy_test_user

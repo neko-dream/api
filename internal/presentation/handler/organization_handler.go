@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/neko-dream/server/internal/application/command/organization_command"
+	"github.com/neko-dream/server/internal/application/query/organization_query"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/session"
@@ -16,17 +17,20 @@ type organizationHandler struct {
 	create organization_command.CreateOrganizationCommand
 	invite organization_command.InviteOrganizationCommand
 	add    organization_command.InviteOrganizationForUserCommand
+	list   organization_query.ListJoinedOrganizationQuery
 }
 
 func NewOrganizationHandler(
 	create organization_command.CreateOrganizationCommand,
 	invite organization_command.InviteOrganizationCommand,
 	add organization_command.InviteOrganizationForUserCommand,
+	list organization_query.ListJoinedOrganizationQuery,
 ) oas.OrganizationHandler {
 	return &organizationHandler{
 		create: create,
 		invite: invite,
 		add:    add,
+		list:   list,
 	}
 }
 
@@ -127,10 +131,41 @@ func (o *organizationHandler) GetOrganizations(ctx context.Context) (oas.GetOrga
 	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.GetOrganizations")
 	defer span.End()
 
-	_ = ctx
-	return nil, &messages.APIError{
-		StatusCode: 501,
-		Code:       "ORG-0001",
-		Message:    "この機能はまだ実装されていません",
+	claim := session.GetSession(ctx)
+	if claim == nil {
+		return nil, messages.ForbiddenError
 	}
+	userID, err := claim.UserID()
+	if err != nil {
+		return nil, messages.ForbiddenError
+	}
+
+	res, err := o.list.Execute(ctx, organization_query.ListJoinedOrganizationInput{
+		UserID: userID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(res.Organizations) == 0 {
+		return &oas.GetOrganizationsOK{
+			Organizations: []oas.Organization{},
+		}, nil
+	}
+
+	var orgs []oas.Organization
+	for _, org := range res.Organizations {
+		args := oas.Organization{
+			ID:       org.Organization.ID,
+			Name:     org.Organization.Name,
+			Type:     org.Organization.OrganizationType,
+			Role:     org.OrganizationUser.Role,
+			RoleName: org.OrganizationUser.RoleName,
+		}
+		orgs = append(orgs, args)
+	}
+
+	return &oas.GetOrganizationsOK{
+		Organizations: orgs,
+	}, nil
+
 }
