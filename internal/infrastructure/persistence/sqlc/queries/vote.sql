@@ -10,3 +10,6 @@ INSERT INTO votes (
 
 -- name: FindVoteByUserIDAndOpinionID :one
 SELECT * FROM votes WHERE user_id = $1 AND opinion_id = $2;
+
+-- name: UpdateVote :exec
+UPDATE votes SET vote_type = $3 WHERE user_id = $1 AND opinion_id = $2;

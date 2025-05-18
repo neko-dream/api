@@ -39,6 +39,21 @@ func (o *voteRepository) Create(ctx context.Context, vote vote.Vote) error {
 	return nil
 }
 
+func (o *voteRepository) Update(ctx context.Context, vote vote.Vote) error {
+	ctx, span := otel.Tracer("repository").Start(ctx, "voteRepository.Update")
+	defer span.End()
+
+	if err := o.GetQueries(ctx).UpdateVote(ctx, model.UpdateVoteParams{
+		UserID:    vote.UserID.UUID(),
+		OpinionID: vote.OpinionID.UUID(),
+		VoteType:  int16(vote.VoteType.Int()),
+	}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (o *voteRepository) FindByOpinionAndUserID(ctx context.Context, opinionID shared.UUID[opinion.Opinion], userID shared.UUID[user.User]) (*vote.Vote, error) {
 	ctx, span := otel.Tracer("repository").Start(ctx, "voteRepository.FindByOpinionAndUserID")
 	defer span.End()
