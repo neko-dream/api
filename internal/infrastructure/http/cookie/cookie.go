@@ -42,21 +42,6 @@ func (cm *CookieManager) CreateSessionCookie(token string) *http.Cookie {
 	}
 }
 
-func (cm *CookieManager) CreateAuthCookies(redirectURL string) []*http.Cookie {
-	return []*http.Cookie{
-		{
-			Name:     RedirectCookieName,
-			Value:    redirectURL,
-			HttpOnly: true,
-			Secure:   cm.secure,
-			Path:     "/",
-			SameSite: cm.sameSite,
-			Domain:   "." + cm.config.DOMAIN,
-			MaxAge:   AuthCookieMaxAge,
-		},
-	}
-}
-
 func (cm *CookieManager) CreateRevokeCookie() *http.Cookie {
 	return &http.Cookie{
 		Name:     SessionCookieName,
