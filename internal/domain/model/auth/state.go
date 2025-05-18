@@ -7,6 +7,11 @@ import (
 	"github.com/neko-dream/server/internal/domain/messages"
 )
 
+const (
+	// StateExpirationDuration stateの有効期限（15分）
+	StateExpirationDuration = 15 * time.Minute
+)
+
 var (
 	ErrInvalidState = messages.InvalidStateError
 	ErrExpiredState = messages.ExpiredStateError

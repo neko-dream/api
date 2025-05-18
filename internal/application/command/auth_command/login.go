@@ -87,7 +87,7 @@ func (a *authLoginInteractor) Execute(ctx context.Context, input AuthLoginInput)
 		err = a.stateRepository.Create(ctx, &auth.State{
 			State:     state,
 			Provider:  input.Provider,
-			ExpiresAt: time.Now().Add(30 * time.Minute), // 30分後に期限切れ
+			ExpiresAt: time.Now().Add(auth.StateExpirationDuration), // 15分後に期限切れ
 		})
 		if err != nil {
 			utils.HandleError(ctx, err, "CreateAuthState") // DB保存失敗

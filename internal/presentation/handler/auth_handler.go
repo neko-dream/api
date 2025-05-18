@@ -78,7 +78,7 @@ func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams)
 
 	headers := new(oas.AuthorizeFoundHeaders)
 	headers.SetLocation(out.RedirectURL)
-	headers.SetSetCookie(cookie_utils.EncodeCookies(a.CookieManager.CreateAuthCookies(out.State, params.RedirectURL)))
+	headers.SetSetCookie(cookie_utils.EncodeCookies(a.CookieManager.CreateAuthCookies(params.RedirectURL)))
 	return headers, nil
 }
 
