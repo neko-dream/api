@@ -114,12 +114,22 @@ func (i *voteHandler) Execute(ctx context.Context, input VoteInput) error {
 				utils.HandleError(ctx, err, "VoteRepository.FindByOpinionAndUserID")
 				return err
 			}
-			vo.VoteType = vote.VoteFromString(lo.ToPtr(input.VoteType))
+			vt, err := vote.VoteFromString(lo.ToPtr(input.VoteType))
+			if err != nil {
+				utils.HandleError(ctx, err, "VoteFromString")
+				return err
+			}
+			vo.VoteType = *vt
 			if err := i.VoteRepository.Update(ctx, *vo); err != nil {
 				utils.HandleError(ctx, err, "VoteRepository.Update")
 				return err
 			}
 			return nil
+		}
+		vt, err := vote.VoteFromString(lo.ToPtr(input.VoteType))
+		if err != nil {
+			utils.HandleError(ctx, err, "VoteFromString")
+			return err
 		}
 
 		// 投票を行っていない場合、投票を行う
@@ -128,7 +138,7 @@ func (i *voteHandler) Execute(ctx context.Context, input VoteInput) error {
 			input.TargetOpinionID,
 			op.TalkSessionID(),
 			input.UserID,
-			vote.VoteFromString(lo.ToPtr(input.VoteType)),
+			*vt,
 			clock.Now(ctx),
 		)
 		if err != nil {

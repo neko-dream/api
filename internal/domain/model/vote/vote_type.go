@@ -1,5 +1,11 @@
 package vote
 
+import (
+	"errors"
+
+	"github.com/samber/lo"
+)
+
 type VoteType int
 
 const (
@@ -39,18 +45,18 @@ func VoteTypeFromInt(i int) VoteType {
 	}
 }
 
-func VoteFromString(s *string) VoteType {
+func VoteFromString(s *string) (*VoteType, error) {
 	if s == nil {
-		return UnVoted
+		return nil, nil
 	}
 	switch *s {
 	case "agree":
-		return Agree
+		return lo.ToPtr(Agree), nil
 	case "disagree":
-		return Disagree
+		return lo.ToPtr(Disagree), nil
 	case "pass":
-		return Pass
+		return lo.ToPtr(Pass), nil
 	default:
-		return UnVoted
+		return nil, errors.New("invalid vote type")
 	}
 }
