@@ -15,6 +15,9 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/telemetry"
 )
 
+// このファイルはインフラ層（DB・リポジトリ・外部API等）のコンストラクタを管理します。
+// 新しいリポジトリや外部サービスを追加した場合は必ずここに追記してください。
+
 func infraDeps() []ProvideArg {
 	return []ProvideArg{
 		{config.LoadConfig, nil},
@@ -22,6 +25,7 @@ func infraDeps() []ProvideArg {
 		{db.NewMigrator, nil},
 		{db.NewDBManager, nil},
 		{oauth.NewProviderFactory, nil},
+		{jwt.NewTokenManager, nil},
 		// {telemetry.SentryProvider, nil},
 		{telemetry.BaselimeProvider, nil},
 		{repository.InitS3Client, nil},
@@ -37,19 +41,18 @@ func infraDeps() []ProvideArg {
 		{repository.NewPolicyRepository, nil},
 		{repository.NewConsentRecordRepository, nil},
 		{repository.NewReportRepository, nil},
-		{jwt.NewTokenManager, nil},
-		{db.NewDummyInitializer, nil},
-		{client.NewAnalysisService, nil},
-		{cookie.NewCookieManager, nil},
-		{crypto.NewEncryptor, nil},
-		{aws.NewAWSConfig, nil},
-		{aws.NewSESClient, nil},
 		{repository.NewPasswordAuthRepository, nil},
 		{repository.NewOrganizationUserRepository, nil},
 		{repository.NewOrganizationRepository, nil},
-		{ses.NewSESEmailSender, nil},
 		{repository.NewTalkSessionConsentRepository, nil},
 		{repository.NewAnalysisRepository, nil},
 		{repository.NewAuthStateRepository, nil},
+		{client.NewAnalysisService, nil},
+		{aws.NewAWSConfig, nil},
+		{aws.NewSESClient, nil},
+		{ses.NewSESEmailSender, nil},
+		{cookie.NewCookieManager, nil},
+		{crypto.NewEncryptor, nil},
+		{db.NewDummyInitializer, nil},
 	}
 }
