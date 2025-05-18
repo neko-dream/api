@@ -6,6 +6,9 @@ import (
 	organization_svc "github.com/neko-dream/server/internal/domain/service/organization"
 )
 
+// このファイルはドメイン層（サービス等）のコンストラクタを管理します。
+// 新しいドメインサービス等を追加した場合は必ずここに追記してください。
+
 func domainDeps() []ProvideArg {
 	return []ProvideArg{
 		{service.NewAuthService, nil},

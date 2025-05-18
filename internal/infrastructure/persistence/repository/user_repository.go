@@ -74,6 +74,7 @@ func (u *userRepository) newUserFromModel(ctx context.Context, modelUser *model.
 	if modelUser.Email.Valid {
 		email, err := u.encryptor.DecryptString(ctx, modelUser.Email.String)
 		if err != nil {
+			utils.HandleError(ctx, err, "encryptor.DecryptString")
 			return nil, errtrace.Wrap(err)
 		}
 		user.ChangeEmail(email)

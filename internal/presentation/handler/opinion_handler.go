@@ -6,6 +6,10 @@ import (
 
 	"mime/multipart"
 
+	"github.com/neko-dream/server/internal/application/command/opinion_command"
+	"github.com/neko-dream/server/internal/application/command/report_command"
+	opinion_query "github.com/neko-dream/server/internal/application/query/opinion"
+	"github.com/neko-dream/server/internal/application/query/report_query"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/session"
@@ -13,10 +17,6 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/presentation/oas"
-	"github.com/neko-dream/server/internal/usecase/command/opinion_command"
-	"github.com/neko-dream/server/internal/usecase/command/report_command"
-	opinion_query "github.com/neko-dream/server/internal/usecase/query/opinion"
-	"github.com/neko-dream/server/internal/usecase/query/report_query"
 	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/sort"
 	"github.com/neko-dream/server/pkg/utils"

@@ -4,11 +4,11 @@ import (
 	"context"
 
 	"github.com/jinzhu/copier"
+	"github.com/neko-dream/server/internal/application/query/dto"
+	user_query "github.com/neko-dream/server/internal/application/query/user"
 	"github.com/neko-dream/server/internal/domain/model/crypto"
 	crypto_infra "github.com/neko-dream/server/internal/infrastructure/crypto"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
-	"github.com/neko-dream/server/internal/usecase/query/dto"
-	user_query "github.com/neko-dream/server/internal/usecase/query/user"
 	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
