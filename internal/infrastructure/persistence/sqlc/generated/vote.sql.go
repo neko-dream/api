@@ -79,3 +79,21 @@ func (q *Queries) FindVoteByUserIDAndOpinionID(ctx context.Context, arg FindVote
 	)
 	return i, err
 }
+
+const updateVote = `-- name: UpdateVote :exec
+UPDATE votes SET vote_type = $3 WHERE user_id = $1 AND opinion_id = $2
+`
+
+type UpdateVoteParams struct {
+	UserID    uuid.UUID
+	OpinionID uuid.UUID
+	VoteType  int16
+}
+
+// UpdateVote
+//
+//	UPDATE votes SET vote_type = $3 WHERE user_id = $1 AND opinion_id = $2
+func (q *Queries) UpdateVote(ctx context.Context, arg UpdateVoteParams) error {
+	_, err := q.db.ExecContext(ctx, updateVote, arg.UserID, arg.OpinionID, arg.VoteType)
+	return err
+}

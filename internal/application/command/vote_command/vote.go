@@ -102,12 +102,26 @@ func (i *voteHandler) Execute(ctx context.Context, input VoteInput) error {
 		utils.HandleError(ctx, err, "IsVoted")
 		return errtrace.Wrap(err)
 	}
-	// 投票を行っている場合、エラーを返す
-	if voted {
-		return messages.OpinionAlreadyVoted
-	}
 
 	if err := i.ExecTx(ctx, func(ctx context.Context) error {
+		if voted {
+			vo, err := i.VoteRepository.FindByOpinionAndUserID(
+				ctx,
+				op.OpinionID(),
+				input.UserID,
+			)
+			if err != nil {
+				utils.HandleError(ctx, err, "VoteRepository.FindByOpinionAndUserID")
+				return err
+			}
+			vo.VoteType = vote.VoteFromString(lo.ToPtr(input.VoteType))
+			if err := i.VoteRepository.Update(ctx, *vo); err != nil {
+				utils.HandleError(ctx, err, "VoteRepository.Update")
+				return err
+			}
+			return nil
+		}
+
 		// 投票を行っていない場合、投票を行う
 		vote, err := vote.NewVote(
 			shared.NewUUID[vote.Vote](),
