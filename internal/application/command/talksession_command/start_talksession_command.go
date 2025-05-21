@@ -54,7 +54,7 @@ func (in *StartTalkSessionCommandInput) Validate() error {
 		return messages.TalkSessionThemeTooLong
 	}
 	// Descriptionは400文字
-	if in.Description != nil && utf8.RuneCountInString(*in.Description) > 400 {
+	if in.Description != nil && utf8.RuneCountInString(*in.Description) > 40000 {
 		return messages.TalkSessionDescriptionTooLong
 	}
 
