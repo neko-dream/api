@@ -117,14 +117,14 @@ export const SessionReport = ({ session, onRefetch }: SessionReportProps) => {
       }
     },
     onMutate: (type) => {
-      if (type === 'analysis') {
+      if (type === 'group') {
         setIsGeneratingAnalysis(true);
       } else if (type === 'report') {
         setIsGeneratingReport(true);
       }
     },
     onSettled: (_, __, type) => {
-      if (type === 'analysis') {
+      if (type === 'group') {
         setIsGeneratingAnalysis(false);
       } else if (type === 'report') {
         setIsGeneratingReport(false);
@@ -132,41 +132,6 @@ export const SessionReport = ({ session, onRefetch }: SessionReportProps) => {
     },
     onError: (error) => {
       console.error('Error in generateAnalysis:', error);
-      showNotification(error.message || 'エラーが発生しました', 'error');
-    },
-  });
-
-  const generateReport = useMutation<void, Error, void>({
-    mutationFn: async () => {
-      const result = await api.generateAnalysis(session.TalkSessionID, 'report');
-      if (result.status === "success" || result.status === "ok") {
-        showNotification('レポートを再生成しました', 'success');
-
-        if (expanded) {
-          try {
-            const reportResult = await api.getReport(session.TalkSessionID);
-            if (!reportResult.code && reportResult.report) {
-              setReportContent(reportResult.report);
-            } else {
-              throw new Error('レポートの取得に失敗しました');
-            }
-          } catch (error) {
-            console.error('Error fetching report:', error);
-            throw error;
-          }
-        }
-      } else {
-        throw new Error('レポートの再生成に失敗しました');
-      }
-    },
-    onMutate: () => {
-      setIsGeneratingReport(true);
-    },
-    onSettled: () => {
-      setIsGeneratingReport(false);
-    },
-    onError: (error) => {
-      console.error('Error in generateReport:', error);
       showNotification(error.message || 'エラーが発生しました', 'error');
     },
   });
@@ -298,7 +263,7 @@ export const SessionReport = ({ session, onRefetch }: SessionReportProps) => {
 
         <div className="flex items-center space-x-2">
           <button
-            onClick={() => generateAnalysis.mutate('analysis')}
+            onClick={() => generateAnalysis.mutate('group')}
             disabled={isGeneratingAnalysis}
             className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out
               bg-gradient-to-r from-blue-50 to-sky-50
