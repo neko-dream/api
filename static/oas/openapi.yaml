@@ -432,6 +432,11 @@ components:
             type: object
         restriction:
             properties:
+                dependsOn:
+                    description: 依存しているrestriction
+                    items:
+                        type: string
+                    type: array
                 description:
                     type: string
                 key:

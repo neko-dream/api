@@ -6886,6 +6886,13 @@
           },
           "description": {
             "type": "string"
+          },
+          "dependsOn": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "依存しているrestriction"
           }
         },
         "required": [
