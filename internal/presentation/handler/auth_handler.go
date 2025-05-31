@@ -59,7 +59,7 @@ func NewAuthHandler(
 	}
 }
 
-// Authorize implements oas.AuthHandler.
+// Authorize 認証プロバイダーの認可URLとstateを生成
 func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams) (oas.AuthorizeRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.Authorize")
 	defer span.End()
@@ -68,10 +68,15 @@ func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams)
 	if err != nil {
 		return nil, err
 	}
+	var registrationURL *string
+	if params.RegistrationURL.Set {
+		registrationURL = lo.ToPtr(params.RegistrationURL.Value)
+	}
 
 	out, err := a.AuthLogin.Execute(ctx, auth_command.AuthLoginInput{
-		Provider:    string(provider),
-		RedirectURL: params.RedirectURL,
+		Provider:        string(provider),
+		RedirectURL:     params.RedirectURL,
+		RegistrationURL: registrationURL,
 	})
 	if err != nil {
 		return nil, err

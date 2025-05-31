@@ -114,16 +114,19 @@ func encodeAuthorizeResponse(response AuthorizeRes, w http.ResponseWriter, span 
 					Explode: false,
 				}
 				if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
-					return e.EncodeArray(func(e uri.Encoder) error {
-						for i, item := range response.SetCookie {
-							if err := func() error {
-								return e.EncodeValue(conv.StringToString(item))
-							}(); err != nil {
-								return errors.Wrapf(err, "[%d]", i)
+					if response.SetCookie != nil {
+						return e.EncodeArray(func(e uri.Encoder) error {
+							for i, item := range response.SetCookie {
+								if err := func() error {
+									return e.EncodeValue(conv.StringToString(item))
+								}(); err != nil {
+									return errors.Wrapf(err, "[%d]", i)
+								}
 							}
-						}
-						return nil
-					})
+							return nil
+						})
+					}
+					return nil
 				}); err != nil {
 					return errors.Wrap(err, "encode Set-Cookie header")
 				}

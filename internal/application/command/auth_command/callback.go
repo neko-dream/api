@@ -18,6 +18,9 @@ import (
 type (
 	// AuthCallback
 	AuthCallback interface {
+		// Execute コールバック時の認証・セッション生成処理を行う
+		//
+		// stateにRegistrationURLが設定されている場合、userが存在しなければ登録画面にリダイレクト
 		Execute(ctx context.Context, input CallbackInput) (CallbackOutput, error)
 	}
 
@@ -102,6 +105,14 @@ func (u *authCallbackInteractor) Execute(ctx context.Context, input CallbackInpu
 			utils.HandleError(ctx, err, "ユーザー認証に失敗しました") // ユーザー認証失敗
 			return errtrace.Wrap(err)
 		}
+
+		// RegistrationURLが設定されている場合、userがnilならリダイレクト
+		if state.RegistrationURL != nil && user == nil {
+			redirectURL = *state.RegistrationURL
+			// トークン発行やセッション生成はスキップ
+			return nil
+		}
+
 		if user != nil {
 			if err := u.SessionService.DeactivateUserSessions(ctx, user.UserID()); err != nil {
 				utils.HandleError(ctx, err, "既存セッションの無効化に失敗しました")

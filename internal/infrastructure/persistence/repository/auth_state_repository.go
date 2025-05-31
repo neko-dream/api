@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
@@ -25,14 +26,21 @@ func (r *authStateRepository) Create(ctx context.Context, state *auth.State) err
 	ctx, span := otel.Tracer("repository").Start(ctx, "authStateRepository.Create")
 	defer span.End()
 
+	var registrationURL sql.NullString
+	if state.RegistrationURL != nil {
+		registrationURL.String = *state.RegistrationURL
+		registrationURL.Valid = true
+	}
+
 	return r.ExecTx(ctx, func(ctx context.Context) error {
 		_, err := r.GetQueries(ctx).CreateAuthState(ctx, model.CreateAuthStateParams{
-			State:       state.State,
-			Provider:    state.Provider,
-			ExpiresAt:   state.ExpiresAt,
-			RedirectUrl: state.RedirectURL,
+			State:           state.State,
+			Provider:        state.Provider,
+			ExpiresAt:       state.ExpiresAt,
+			RedirectUrl:     state.RedirectURL,
+			RegistrationUrl: registrationURL,
 		})
-		return err // 失敗時はそのまま返す
+		return err
 	})
 }
 
@@ -48,13 +56,19 @@ func (r *authStateRepository) Get(ctx context.Context, state string) (*auth.Stat
 			return err // 取得失敗時はエラーを返す
 		}
 
+		var registrationURL *string
+		if s.RegistrationUrl.Valid {
+			registrationURL = &s.RegistrationUrl.String
+		}
+
 		result = &auth.State{
-			ID:          int(s.ID),
-			State:       s.State,
-			Provider:    s.Provider,
-			RedirectURL: s.RedirectUrl,
-			CreatedAt:   s.CreatedAt,
-			ExpiresAt:   s.ExpiresAt,
+			ID:              int(s.ID),
+			State:           s.State,
+			Provider:        s.Provider,
+			RedirectURL:     s.RedirectUrl,
+			CreatedAt:       s.CreatedAt,
+			ExpiresAt:       s.ExpiresAt,
+			RegistrationURL: registrationURL,
 		}
 		return nil
 	})
