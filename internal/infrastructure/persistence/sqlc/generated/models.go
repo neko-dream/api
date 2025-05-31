@@ -161,6 +161,13 @@ type TalkSessionReport struct {
 	UpdatedAt     time.Time
 }
 
+type TalkSessionReportHistory struct {
+	TalkSessionReportHistoryID uuid.UUID
+	TalkSessionID              uuid.UUID
+	Report                     string
+	CreatedAt                  time.Time
+}
+
 type TalksessionConsent struct {
 	TalksessionID uuid.UUID
 	UserID        uuid.UUID

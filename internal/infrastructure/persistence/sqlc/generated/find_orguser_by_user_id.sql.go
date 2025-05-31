@@ -61,29 +61,24 @@ func (q *Queries) FindOrgUserByUserID(ctx context.Context, userID uuid.UUID) ([]
 const findOrgUserByUserIDWithOrganization = `-- name: FindOrgUserByUserIDWithOrganization :many
 SELECT
     organization_users.organization_user_id, organization_users.user_id, organization_users.organization_id, organization_users.role, organization_users.created_at, organization_users.updated_at,
-    organizations.organization_id, organizations.organization_type, organizations.name, organizations.owner_id,
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified
+    organizations.organization_id, organizations.organization_type, organizations.name, organizations.owner_id
 FROM organization_users
 LEFT JOIN organizations ON organization_users.organization_id = organizations.id
-LEFT JOIN users ON organization_users.user_id = users.id
 WHERE organization_users.user_id = $1
 `
 
 type FindOrgUserByUserIDWithOrganizationRow struct {
 	OrganizationUser OrganizationUser
 	Organization     Organization
-	User             User
 }
 
 // FindOrgUserByUserIDWithOrganization
 //
 //	SELECT
 //	    organization_users.organization_user_id, organization_users.user_id, organization_users.organization_id, organization_users.role, organization_users.created_at, organization_users.updated_at,
-//	    organizations.organization_id, organizations.organization_type, organizations.name, organizations.owner_id,
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified
+//	    organizations.organization_id, organizations.organization_type, organizations.name, organizations.owner_id
 //	FROM organization_users
 //	LEFT JOIN organizations ON organization_users.organization_id = organizations.id
-//	LEFT JOIN users ON organization_users.user_id = users.id
 //	WHERE organization_users.user_id = $1
 func (q *Queries) FindOrgUserByUserIDWithOrganization(ctx context.Context, userID uuid.UUID) ([]FindOrgUserByUserIDWithOrganizationRow, error) {
 	rows, err := q.db.QueryContext(ctx, findOrgUserByUserIDWithOrganization, userID)
@@ -105,14 +100,6 @@ func (q *Queries) FindOrgUserByUserIDWithOrganization(ctx context.Context, userI
 			&i.Organization.OrganizationType,
 			&i.Organization.Name,
 			&i.Organization.OwnerID,
-			&i.User.UserID,
-			&i.User.DisplayID,
-			&i.User.DisplayName,
-			&i.User.IconUrl,
-			&i.User.CreatedAt,
-			&i.User.UpdatedAt,
-			&i.User.Email,
-			&i.User.EmailVerified,
 		); err != nil {
 			return nil, err
 		}
