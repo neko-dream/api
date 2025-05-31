@@ -20,6 +20,8 @@ type AuthorizeParams struct {
 	Provider AuthorizeProvider
 	// ログイン後にリダイレクトするURL.
 	RedirectURL string
+	// 登録していなかった場合に飛ばすURL.
+	RegistrationURL OptString
 }
 
 func unpackAuthorizeParams(packed middleware.Parameters) (params AuthorizeParams) {
@@ -36,6 +38,15 @@ func unpackAuthorizeParams(packed middleware.Parameters) (params AuthorizeParams
 			In:   "query",
 		}
 		params.RedirectURL = packed[key].(string)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "registration_url",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.RegistrationURL = v.(OptString)
+		}
 	}
 	return params
 }
@@ -127,6 +138,47 @@ func decodeAuthorizeParams(args [1]string, argsEscaped bool, r *http.Request) (p
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "redirect_url",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: registration_url.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "registration_url",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotRegistrationURLVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotRegistrationURLVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.RegistrationURL.SetTo(paramsDotRegistrationURLVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "registration_url",
 			In:   "query",
 			Err:  err,
 		}

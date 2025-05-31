@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 
-	"github.com/neko-dream/server/internal/application/command/vote_command"
+	"github.com/neko-dream/server/internal/application/usecase/vote_usecase"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/session"
@@ -14,11 +14,11 @@ import (
 )
 
 type voteHandler struct {
-	voteCommand vote_command.Vote
+	voteCommand vote_usecase.Vote
 }
 
 func NewVoteHandler(
-	voteCommand vote_command.Vote,
+	voteCommand vote_usecase.Vote,
 ) oas.VoteHandler {
 	return &voteHandler{
 		voteCommand: voteCommand,
@@ -45,7 +45,7 @@ func (v *voteHandler) Vote2(ctx context.Context, req oas.OptVote2Req, params oas
 		return nil, messages.BadRequestError
 	}
 
-	err = v.voteCommand.Execute(ctx, vote_command.VoteInput{
+	err = v.voteCommand.Execute(ctx, vote_usecase.VoteInput{
 		TargetOpinionID: targetOpinionID,
 		UserID:          userID,
 		VoteType:        string(value.VoteStatus.Value),
@@ -79,7 +79,7 @@ func (v *voteHandler) Vote(ctx context.Context, req oas.OptVoteReq, params oas.V
 		return nil, messages.BadRequestError
 	}
 
-	err = v.voteCommand.Execute(ctx, vote_command.VoteInput{
+	err = v.voteCommand.Execute(ctx, vote_usecase.VoteInput{
 		TargetOpinionID: targetOpinionID,
 		UserID:          userID,
 		VoteType:        string(value.VoteStatus.Value),
