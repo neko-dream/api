@@ -34,7 +34,6 @@ type (
 		Longitude        *float64                             // 経度
 		City             *string                              // 市区町村
 		Prefecture       *string                              // 都道府県
-		Restrictions     []string                             // 制限事項
 	}
 
 	EditCommandOutput struct {
@@ -123,20 +122,18 @@ func (i *editCommandHandler) Execute(ctx context.Context, input EditCommandInput
 
 		output.TalkSession = dto.TalkSession{
 			TalkSessionID:    input.TalkSessionID,
-			Theme:            input.Theme,
+			Theme:            talkSession.Theme(),
 			ThumbnailURL:     talkSession.ThumbnailURL(),
-			ScheduledEndTime: input.ScheduledEndTime,
+			ScheduledEndTime: talkSession.ScheduledEndTime(),
 			OwnerID:          talkSession.OwnerUserID(),
 			CreatedAt:        talkSession.CreatedAt(),
-			Description:      input.Description,
-			City:             input.City,
-			Prefecture:       input.Prefecture,
+			Description:      talkSession.Description(),
+			City:             talkSession.City(),
+			Prefecture:       talkSession.Prefecture(),
 		}
 		output.Latitude = input.Latitude
 		output.Longitude = input.Longitude
-		if input.Restrictions != nil {
-			output.Restrictions = input.Restrictions
-		}
+		output.Restrictions = talkSession.RestrictionList()
 
 		// オーナーのユーザー情報を取得
 		ownerUser, err := i.UserRepository.FindByID(ctx, input.UserID)
@@ -144,10 +141,21 @@ func (i *editCommandHandler) Execute(ctx context.Context, input EditCommandInput
 			utils.HandleError(ctx, err, "UserRepository.FindByID")
 			return messages.ForbiddenError
 		}
-		output.User = dto.User{
-			DisplayID:   *ownerUser.DisplayID(),
-			DisplayName: *ownerUser.DisplayName(),
-			IconURL:     ownerUser.IconURL(),
+
+		// ユーザー情報をDTOに設定
+		if ownerUser.DisplayID() != nil && ownerUser.DisplayName() != nil {
+			output.User = dto.User{
+				DisplayID:   *ownerUser.DisplayID(),
+				DisplayName: *ownerUser.DisplayName(),
+				IconURL:     ownerUser.IconURL(),
+			}
+		} else {
+			// DisplayIDまたはDisplayNameがnilの場合はデフォルト値を使用
+			output.User = dto.User{
+				DisplayID:   "",
+				DisplayName: "",
+				IconURL:     ownerUser.IconURL(),
+			}
 		}
 
 		return nil
