@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/neko-dream/server/internal/application/command/auth_command"
+	"github.com/neko-dream/server/internal/application/usecase/auth_usecase"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -20,29 +20,29 @@ import (
 )
 
 type authHandler struct {
-	auth_command.AuthCallback
-	auth_command.AuthLogin
-	auth_command.Revoke
-	auth_command.LoginForDev
-	auth_command.DetachAccount
+	auth_usecase.AuthCallback
+	auth_usecase.AuthLogin
+	auth_usecase.Revoke
+	auth_usecase.LoginForDev
+	auth_usecase.DetachAccount
 
-	passwordLogin    auth_command.PasswordLogin
-	passwordRegister auth_command.PasswordRegister
-	changePassword   auth_command.ChangePassword
+	passwordLogin    auth_usecase.PasswordLogin
+	passwordRegister auth_usecase.PasswordRegister
+	changePassword   auth_usecase.ChangePassword
 
 	cookie.CookieManager
 }
 
 func NewAuthHandler(
-	authLogin auth_command.AuthLogin,
-	authCallback auth_command.AuthCallback,
-	revoke auth_command.Revoke,
-	devLogin auth_command.LoginForDev,
-	detachAccount auth_command.DetachAccount,
+	authLogin auth_usecase.AuthLogin,
+	authCallback auth_usecase.AuthCallback,
+	revoke auth_usecase.Revoke,
+	devLogin auth_usecase.LoginForDev,
+	detachAccount auth_usecase.DetachAccount,
 
-	login auth_command.PasswordLogin,
-	register auth_command.PasswordRegister,
-	changePassword auth_command.ChangePassword,
+	login auth_usecase.PasswordLogin,
+	register auth_usecase.PasswordRegister,
+	changePassword auth_usecase.ChangePassword,
 
 	cookieManger cookie.CookieManager,
 ) oas.AuthHandler {
@@ -73,7 +73,7 @@ func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams)
 		registrationURL = lo.ToPtr(params.RegistrationURL.Value)
 	}
 
-	out, err := a.AuthLogin.Execute(ctx, auth_command.AuthLoginInput{
+	out, err := a.AuthLogin.Execute(ctx, auth_usecase.AuthLoginInput{
 		Provider:        string(provider),
 		RedirectURL:     params.RedirectURL,
 		RegistrationURL: registrationURL,
@@ -91,7 +91,7 @@ func (a *authHandler) DevAuthorize(ctx context.Context, params oas.DevAuthorizeP
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.DevAuthorize")
 	defer span.End()
 
-	output, err := a.LoginForDev.Execute(ctx, auth_command.LoginForDevInput{
+	output, err := a.LoginForDev.Execute(ctx, auth_usecase.LoginForDevInput{
 		Subject: params.ID,
 	})
 	if err != nil {
@@ -109,7 +109,7 @@ func (a *authHandler) OAuthCallback(ctx context.Context, params oas.OAuthCallbac
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.OAuthCallback")
 	defer span.End()
 
-	output, err := a.AuthCallback.Execute(ctx, auth_command.CallbackInput{
+	output, err := a.AuthCallback.Execute(ctx, auth_usecase.CallbackInput{
 		Provider: params.Provider,
 		Code:     params.Code,
 		State:    params.State,
@@ -134,7 +134,7 @@ func (a *authHandler) OAuthTokenRevoke(ctx context.Context) (oas.OAuthTokenRevok
 	if err != nil {
 		return nil, messages.ForbiddenError
 	}
-	_, err = a.Revoke.Execute(ctx, auth_command.RevokeInput{
+	_, err = a.Revoke.Execute(ctx, auth_usecase.RevokeInput{
 		SessID: sessID,
 	})
 	if err != nil {
@@ -196,14 +196,14 @@ func (a *authHandler) AuthAccountDetach(ctx context.Context) (oas.AuthAccountDet
 		return nil, messages.ForbiddenError
 	}
 
-	if err = a.DetachAccount.Execute(ctx, auth_command.DetachAccountInput{
+	if err = a.DetachAccount.Execute(ctx, auth_usecase.DetachAccountInput{
 		UserID: shared.UUID[user.User](userID),
 	}); err != nil {
 		return nil, err
 	}
 
 	// revoke
-	_, err = a.Revoke.Execute(ctx, auth_command.RevokeInput{
+	_, err = a.Revoke.Execute(ctx, auth_usecase.RevokeInput{
 		SessID: sessID,
 	})
 	if err != nil {
@@ -220,7 +220,7 @@ func (a *authHandler) PasswordLogin(ctx context.Context, req oas.OptPasswordLogi
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.PasswordLogin")
 	defer span.End()
 
-	out, err := a.passwordLogin.Execute(ctx, auth_command.PasswordLoginInput{
+	out, err := a.passwordLogin.Execute(ctx, auth_usecase.PasswordLoginInput{
 		IDorEmail: req.Value.IDOrEmail,
 		Password:  req.Value.Password,
 	})
@@ -238,7 +238,7 @@ func (a *authHandler) PasswordRegister(ctx context.Context, req oas.OptPasswordR
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.PasswordRegister")
 	defer span.End()
 
-	out, err := a.passwordRegister.Execute(ctx, auth_command.PasswordRegisterInput{
+	out, err := a.passwordRegister.Execute(ctx, auth_usecase.PasswordRegisterInput{
 		Email:    req.Value.Email,
 		Password: req.Value.Password,
 	})
@@ -265,7 +265,7 @@ func (a *authHandler) ChangePassword(ctx context.Context, params oas.ChangePassw
 		return nil, messages.ForbiddenError
 	}
 
-	out, err := a.changePassword.Execute(ctx, auth_command.ChangePasswordInput{
+	out, err := a.changePassword.Execute(ctx, auth_usecase.ChangePasswordInput{
 		UserID:      shared.UUID[user.User](userID),
 		OldPassword: params.OldPassword,
 		NewPassword: params.NewPassword,

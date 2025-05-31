@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/neko-dream/server/internal/application/command/user_command"
+	"github.com/neko-dream/server/internal/application/usecase/user_usecase"
 	opinion_query "github.com/neko-dream/server/internal/application/query/opinion"
 	talksession_query "github.com/neko-dream/server/internal/application/query/talksession"
 	user_query "github.com/neko-dream/server/internal/application/query/user"
@@ -27,8 +27,8 @@ type userHandler struct {
 	getMyOpinionsQuery           opinion_query.GetMyOpinionsQuery
 	browseJoinedTalkSessionQuery talksession_query.BrowseJoinedTalkSessionsQuery
 
-	editUser     user_command.Edit
-	registerUser user_command.Register
+	editUser     user_usecase.Edit
+	registerUser user_usecase.Register
 
 	userDetail user_query.Detail
 	cookie.CookieManager
@@ -38,8 +38,8 @@ func NewUserHandler(
 	getMyOpinionsQuery opinion_query.GetMyOpinionsQuery,
 	browseJoinedTalkSessionQuery talksession_query.BrowseJoinedTalkSessionsQuery,
 
-	editUser user_command.Edit,
-	registerUser user_command.Register,
+	editUser user_usecase.Edit,
+	registerUser user_usecase.Register,
 
 	userDetail user_query.Detail,
 	cookieManager cookie.CookieManager,
@@ -381,7 +381,7 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 		}
 	}
 
-	out, err := u.editUser.Execute(ctx, user_command.EditInput{
+	out, err := u.editUser.Execute(ctx, user_usecase.EditInput{
 		UserID:      userID,
 		DisplayName: displayName,
 		Icon:        file,
@@ -476,7 +476,7 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 		return nil, messages.UserDisplayNameTooShort
 	}
 
-	input := user_command.RegisterInput{
+	input := user_usecase.RegisterInput{
 		SessionID:   sessionID,
 		UserID:      userID,
 		DisplayID:   value.DisplayID,
