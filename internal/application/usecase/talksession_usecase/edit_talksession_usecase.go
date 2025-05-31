@@ -12,6 +12,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
@@ -44,6 +45,7 @@ type (
 		talksession.TalkSessionRepository
 		user.UserRepository
 		*db.DBManager
+		*config.Config
 	}
 )
 
@@ -67,11 +69,13 @@ func NewEditTalkSessionUseCase(
 	talkSessionRepository talksession.TalkSessionRepository,
 	userRepository user.UserRepository,
 	DBManager *db.DBManager,
+	config *config.Config,
 ) EditTalkSessionUseCase {
 	return &editTalkSessionHandler{
 		TalkSessionRepository: talkSessionRepository,
 		UserRepository:        userRepository,
 		DBManager:             DBManager,
+		Config:                config,
 	}
 }
 
@@ -86,8 +90,8 @@ func (i *editTalkSessionHandler) Execute(ctx context.Context, input EditTalkSess
 		return nil, messages.TalkSessionNotFound
 	}
 
-	// 編集するユーザーがオーナーかどうかを確認
-	if talkSession.OwnerUserID() != input.UserID {
+	// ローカル環境以外では編集するユーザーがオーナーかどうかを確認
+	if i.Config.Env != config.LOCAL && talkSession.OwnerUserID() != input.UserID {
 		return nil, messages.ForbiddenError
 	}
 

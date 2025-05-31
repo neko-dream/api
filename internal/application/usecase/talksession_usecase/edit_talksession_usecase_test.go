@@ -60,11 +60,17 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 	)
 	talkSessionRepo := repository.NewTalkSessionRepository(dbManager)
 
+	// テスト用のconfig作成（LOCAL環境に設定）
+	testConfig := &config.Config{
+		Env: config.LOCAL, // ローカル環境として設定
+	}
+
 	// コマンドハンドラの初期化
 	editCommand := talksession_usecase.NewEditTalkSessionUseCase(
 		talkSessionRepo,
 		userRepo,
 		dbManager,
+		testConfig,
 	)
 
 	// テストデータの初期化
@@ -158,7 +164,7 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 			WantErr: false,
 		},
 		{
-			Name: "異常系: オーナー以外のユーザーは編集できない",
+			Name: "正常系: ローカル環境では非オーナーでも編集できる",
 			SetupFn: func(ctx context.Context, data *EditTalkSessionUseCaseTestData) error {
 				// オーナーユーザーの作成
 				ownerUser := user.NewUser(
@@ -213,7 +219,7 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 				}
 
 				_, err := data.EditTalkSessionUseCase.Execute(ctx, input)
-				assert.ErrorIs(t, err, messages.ForbiddenError)
+				assert.NoError(t, err) // ローカル環境では成功する
 				return nil
 			},
 			WantErr: false,
@@ -593,4 +599,109 @@ func TestEditTalkSessionInput_Validate(t *testing.T) {
 			}
 		})
 	}
+}
+
+// プロダクション環境でのテスト
+func TestEditTalkSessionUseCase_ProductionEnvironment(t *testing.T) {
+	// プロダクション用のconfig作成
+	prodConfig := &config.Config{
+		Env: config.PROD, // プロダクション環境として設定
+	}
+
+	// 環境変数設定
+	t.Setenv("ENCRYPTION_VERSION", "v1")
+	t.Setenv("ENCRYPTION_SECRET", "12345678901234567890123456789012")
+	t.Setenv("DATABASE_URL", "postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable")
+	t.Setenv("ENV", "production")
+	
+	// OpenTelemetryのnoop tracerを設定
+	otel.SetTracerProvider(noop.NewTracerProvider())
+	
+	container := di.BuildContainer()
+	dbManager := di.Invoke[*db.DBManager](container)
+	encryptor, _ := crypto.NewEncryptor(lo.ToPtr(config.Config{
+		ENCRYPTION_VERSION: crypto.Version1,
+		ENCRYPTION_SECRET:  "12345678901234567890123456789012",
+	}))
+
+	// リポジトリの初期化
+	userRepo := repository.NewUserRepository(
+		dbManager,
+		repository.NewImageRepositoryMock(),
+		encryptor,
+	)
+	talkSessionRepo := repository.NewTalkSessionRepository(dbManager)
+
+	// プロダクション環境用のコマンドハンドラの初期化
+	editCommand := talksession_usecase.NewEditTalkSessionUseCase(
+		talkSessionRepo,
+		userRepo,
+		dbManager,
+		prodConfig,
+	)
+
+	err := dbManager.TestTx(context.Background(), func(ctx context.Context) error {
+		// テストデータ準備
+		ownerUserID := shared.NewUUID[user.User]()
+		nonOwnerUserID := shared.NewUUID[user.User]()
+		talkSessionID := shared.NewUUID[talksession.TalkSession]()
+
+		// オーナーユーザーの作成
+		ownerUser := user.NewUser(
+			ownerUserID,
+			lo.ToPtr("owner_display_id"),
+			lo.ToPtr("Owner User"),
+			"owner@example.com",
+			"GOOGLE",
+			lo.ToPtr("https://example.com/owner-icon.jpg"),
+		)
+		if err := userRepo.Create(ctx, ownerUser); err != nil {
+			return err
+		}
+
+		// 非オーナーユーザーの作成
+		nonOwnerUser := user.NewUser(
+			nonOwnerUserID,
+			lo.ToPtr("nonowner"),
+			lo.ToPtr("Non-Owner User"),
+			"nonowner@example.com",
+			"GOOGLE",
+			nil,
+		)
+		if err := userRepo.Create(ctx, nonOwnerUser); err != nil {
+			return err
+		}
+
+		// トークセッション作成
+		talkSession := talksession.NewTalkSession(
+			talkSessionID,
+			"初期テーマ",
+			lo.ToPtr("初期説明文"),
+			lo.ToPtr("https://example.com/initial.jpg"),
+			ownerUserID,
+			clock.Now(ctx),
+			clock.Now(ctx).Add(time.Hour*24),
+			nil,
+			lo.ToPtr("初期市区町村"),
+			lo.ToPtr("初期都道府県"),
+		)
+		if err := talkSessionRepo.Create(ctx, talkSession); err != nil {
+			return err
+		}
+
+		// プロダクション環境では非オーナーが編集を試みると失敗する
+		input := talksession_usecase.EditTalkSessionInput{
+			TalkSessionID:    talkSessionID,
+			UserID:           nonOwnerUserID, // 非オーナーのID
+			Theme:            "不正な編集",
+			ScheduledEndTime: clock.Now(ctx).Add(time.Hour * 24),
+		}
+
+		_, err := editCommand.Execute(ctx, input)
+		assert.ErrorIs(t, err, messages.ForbiddenError)
+
+		return nil
+	})
+	
+	assert.NoError(t, err)
 }

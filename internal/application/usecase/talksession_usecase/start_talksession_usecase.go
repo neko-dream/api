@@ -13,6 +13,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
@@ -45,6 +46,7 @@ type (
 		user.UserRepository
 		organization.OrganizationUserRepository
 		*db.DBManager
+		*config.Config
 	}
 )
 
@@ -66,26 +68,31 @@ func NewStartTalkSessionUseCase(
 	userRepository user.UserRepository,
 	organizationUserRepository organization.OrganizationUserRepository,
 	DBManager *db.DBManager,
+	config *config.Config,
 ) StartTalkSessionUseCase {
 	return &startTalkSessionHandler{
 		TalkSessionRepository:      talkSessionRepository,
 		UserRepository:             userRepository,
 		OrganizationUserRepository: organizationUserRepository,
 		DBManager:                  DBManager,
+		Config:                     config,
 	}
 }
 
 func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSessionUseCaseInput) (StartTalkSessionUseCaseOutput, error) {
 	ctx, span := otel.Tracer("talksession_command").Start(ctx, "startTalkSessionHandler.Execute")
 	defer span.End()
-	// Organizationに所属していないとセッションを開始できない
-	orgs, err := i.OrganizationUserRepository.FindByUserID(ctx, input.OwnerID)
-	if err != nil {
-		utils.HandleError(ctx, err, "OrganizationUserRepository.FindByUserID")
-		return StartTalkSessionUseCaseOutput{}, messages.ForbiddenError
-	}
-	if len(orgs) == 0 {
-		return StartTalkSessionUseCaseOutput{}, messages.ForbiddenError
+	
+	// ローカル環境以外ではOrganizationに所属していないとセッションを開始できない
+	if i.Config.Env != config.LOCAL {
+		orgs, err := i.OrganizationUserRepository.FindByUserID(ctx, input.OwnerID)
+		if err != nil {
+			utils.HandleError(ctx, err, "OrganizationUserRepository.FindByUserID")
+			return StartTalkSessionUseCaseOutput{}, messages.ForbiddenError
+		}
+		if len(orgs) == 0 {
+			return StartTalkSessionUseCaseOutput{}, messages.ForbiddenError
+		}
 	}
 
 	var output StartTalkSessionUseCaseOutput
