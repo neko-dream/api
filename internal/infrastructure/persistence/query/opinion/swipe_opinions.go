@@ -9,6 +9,7 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/neko-dream/server/internal/application/query/dto"
 	opinion_query "github.com/neko-dream/server/internal/application/query/opinion"
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/server/pkg/utils"
@@ -41,6 +42,19 @@ func convertToSwipeOpinion(source any) (dto.SwipeOpinion, error) {
 func (g *GetSwipeOpinionsQueryHandler) Execute(ctx context.Context, in opinion_query.GetSwipeOpinionsQueryInput) (*opinion_query.GetSwipeOpinionsQueryOutput, error) {
 	ctx, span := otel.Tracer("opinion_query").Start(ctx, "GetSwipeOpinionsQueryHandler.Execute")
 	defer span.End()
+
+	talkSession, err := g.GetQueries(ctx).GetTalkSessionByID(ctx, in.TalkSessionID.UUID())
+	if err != nil {
+		utils.HandleError(ctx, err, "トークセッションの取得に失敗")
+		return nil, err
+	}
+
+	if talkSession.TalkSession.ScheduledEndTime.Before(clock.Now(ctx)) {
+		return &opinion_query.GetSwipeOpinionsQueryOutput{
+			Opinions:          []dto.SwipeOpinion{},
+			RemainingOpinions: 0,
+		}, nil
+	}
 
 	// スワイプ可能な意見の総数を取得
 	swipeableOpinionCount, err := g.GetQueries(ctx).CountSwipeableOpinions(ctx, model.CountSwipeableOpinionsParams{
