@@ -20,12 +20,13 @@ var (
 type (
 	// State OAuth認証のstate
 	State struct {
-		ID          int       // データベースの主キー
-		State       string    // 認証stateの値
-		Provider    string    // 認証プロバイダー名
-		RedirectURL string    // リダイレクトURL
-		CreatedAt   time.Time // 作成日時
-		ExpiresAt   time.Time // 有効期限
+		ID              int       // データベースの主キー
+		State           string    // 認証stateの値
+		Provider        string    // 認証プロバイダー名
+		RedirectURL     string    // リダイレクトURL
+		CreatedAt       time.Time // 作成日時
+		ExpiresAt       time.Time // 有効期限
+		RegistrationURL *string   // ログイン時に登録していない場合に飛ばすURL
 	}
 
 	// StateRepository
@@ -61,11 +62,12 @@ func (s *State) Validate(cookieState string) error {
 // provider: 認証プロバイダー名
 // redirectURL: リダイレクトURL
 // expiresAt: 有効期限
-func NewState(state string, provider string, redirectURL string, expiresAt time.Time) *State {
+func NewState(state string, provider string, redirectURL string, expiresAt time.Time, registrationURL *string) *State {
 	return &State{
-		State:       state,
-		Provider:    provider,
-		RedirectURL: redirectURL,
-		ExpiresAt:   expiresAt,
+		State:           state,
+		Provider:        provider,
+		RedirectURL:     redirectURL,
+		ExpiresAt:       expiresAt,
+		RegistrationURL: registrationURL,
 	}
 }
