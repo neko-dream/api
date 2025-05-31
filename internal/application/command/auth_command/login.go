@@ -16,6 +16,9 @@ import (
 type (
 	// AuthLogin OAuth認証開始時のリダイレクトURL生成
 	AuthLogin interface {
+		// Execute 認証プロバイダーの認可URLとstateを生成し返す
+		//
+		// ここでRegistrationURLがある場合はログイン、ない場合は登録
 		Execute(context.Context, AuthLoginInput) (AuthLoginOutput, error)
 	}
 
@@ -23,6 +26,8 @@ type (
 	AuthLoginInput struct {
 		Provider    string
 		RedirectURL string
+		// 登録URLがある場合はログイン
+		RegistrationURL *string
 	}
 
 	// AuthLoginOutput
@@ -78,26 +83,22 @@ func (a *authLoginInteractor) Execute(ctx context.Context, input AuthLoginInput)
 			return errtrace.Wrap(err)
 		}
 
-		state, err := a.GenerateState(ctx)
+		stateString, err := a.GenerateState(ctx)
 		if err != nil {
 			utils.HandleError(ctx, err, "GenerateState") // state生成失敗
 			return errtrace.Wrap(err)
 		}
 
-		// stateをDBに保存（CSRF対策）
-		err = a.stateRepository.Create(ctx, &auth.State{
-			State:       state,
-			Provider:    input.Provider,
-			RedirectURL: input.RedirectURL,
-			ExpiresAt:   time.Now().Add(auth.StateExpirationDuration), // 15分後に期限切れ
-		})
+		state := auth.NewState(stateString, input.Provider, input.RedirectURL, time.Now().Add(auth.StateExpirationDuration), input.RegistrationURL)
+		// stateをDBに保存（cookieじゃないのは一部ブラウザでうまく動作しないため）
+		err = a.stateRepository.Create(ctx, state)
 		if err != nil {
 			utils.HandleError(ctx, err, "CreateAuthState") // DB保存失敗
 			return errtrace.Wrap(err)
 		}
 
-		s = state
-		au = provider.GetAuthorizationURL(ctx, state)
+		s = stateString
+		au = provider.GetAuthorizationURL(ctx, stateString)
 		return nil
 	}); err != nil {
 		return AuthLoginOutput{}, errtrace.Wrap(err)
