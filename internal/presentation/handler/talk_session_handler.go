@@ -726,6 +726,7 @@ func (t *talkSessionHandler) GetTalkSessionRestrictionKeys(ctx context.Context) 
 		keys = append(keys, oas.Restriction{
 			Key:         string(restriction.Key),
 			Description: restriction.Description,
+			DependsOn:   lo.Map(restriction.DependsOn, func(item talksession.RestrictionAttributeKey, _ int) string { return string(item) }),
 		})
 	}
 
