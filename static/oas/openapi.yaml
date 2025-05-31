@@ -729,6 +729,11 @@ paths:
                   required: true
                   schema:
                     type: string
+                - description: 登録していなかった場合に飛ばすURL
+                  in: query
+                  name: registration_url
+                  schema:
+                    type: string
             responses:
                 "302":
                     content:
@@ -746,7 +751,6 @@ paths:
                         Set-Cookie:
                             description: OAuth2.0 State
                             example: ""
-                            required: true
                             schema:
                                 items:
                                     type: string

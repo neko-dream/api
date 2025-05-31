@@ -5003,6 +5003,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "registration_url",
+            "in": "query",
+            "description": "登録していなかった場合に飛ばすURL",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -5027,7 +5036,7 @@
               },
               "Set-Cookie": {
                 "example": "",
-                "required": true,
+                "required": false,
                 "description": "OAuth2.0 State",
                 "schema": {
                   "type": "array",
