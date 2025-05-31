@@ -6,8 +6,8 @@ import (
 
 	"mime/multipart"
 
-	"github.com/neko-dream/server/internal/application/command/opinion_command"
-	"github.com/neko-dream/server/internal/application/command/report_command"
+	"github.com/neko-dream/server/internal/application/usecase/opinion_usecase"
+	"github.com/neko-dream/server/internal/application/usecase/report_usecase"
 	opinion_query "github.com/neko-dream/server/internal/application/query/opinion"
 	"github.com/neko-dream/server/internal/application/query/report_query"
 	"github.com/neko-dream/server/internal/domain/messages"
@@ -33,9 +33,9 @@ type opinionHandler struct {
 	getOpinionGroupRatio         opinion_query.GetOpinionGroupRatioQuery
 	getReportByOpinionID         report_query.GetOpinionReportQuery
 
-	submitOpinionCommand opinion_command.SubmitOpinion
-	reportOpinionCommand opinion_command.ReportOpinion
-	solveReportCommand   report_command.SolveReportCommand
+	submitOpinionCommand opinion_usecase.SubmitOpinion
+	reportOpinionCommand opinion_usecase.ReportOpinion
+	solveReportCommand   report_usecase.SolveReportCommand
 
 	session.TokenManager
 }
@@ -49,9 +49,9 @@ func NewOpinionHandler(
 	getOpinionGroupRatio opinion_query.GetOpinionGroupRatioQuery,
 	getReportByOpinionID report_query.GetOpinionReportQuery,
 
-	submitOpinionCommand opinion_command.SubmitOpinion,
-	reportOpinionCommand opinion_command.ReportOpinion,
-	solveReportCommand report_command.SolveReportCommand,
+	submitOpinionCommand opinion_usecase.SubmitOpinion,
+	reportOpinionCommand opinion_usecase.ReportOpinion,
+	solveReportCommand report_usecase.SolveReportCommand,
 
 	tokenManager session.TokenManager,
 ) oas.OpinionHandler {
@@ -598,7 +598,7 @@ func (o *opinionHandler) PostOpinionPost(ctx context.Context, req oas.OptPostOpi
 		parentOpinionID = &id
 	}
 
-	if err = o.submitOpinionCommand.Execute(ctx, opinion_command.SubmitOpinionInput{
+	if err = o.submitOpinionCommand.Execute(ctx, opinion_usecase.SubmitOpinionInput{
 		TalkSessionID:   &talkSessionID,
 		UserID:          userID,
 		ParentOpinionID: parentOpinionID,
@@ -665,7 +665,7 @@ func (o *opinionHandler) PostOpinionPost2(ctx context.Context, req oas.OptPostOp
 		isSeed = false
 	}
 
-	if err = o.submitOpinionCommand.Execute(ctx, opinion_command.SubmitOpinionInput{
+	if err = o.submitOpinionCommand.Execute(ctx, opinion_usecase.SubmitOpinionInput{
 		TalkSessionID:   talkSessionID,
 		UserID:          userID,
 		ParentOpinionID: parentOpinionID,
@@ -708,7 +708,7 @@ func (o *opinionHandler) ReportOpinion(ctx context.Context, req oas.OptReportOpi
 		reasonText = lo.ToPtr(req.Value.Content.Value)
 	}
 
-	if err := o.reportOpinionCommand.Execute(ctx, opinion_command.ReportOpinionInput{
+	if err := o.reportOpinionCommand.Execute(ctx, opinion_usecase.ReportOpinionInput{
 		ReporterID: userID,
 		OpinionID:  opinionID,
 		Reason:     int32(req.Value.Reason.Value),
@@ -866,7 +866,7 @@ func (o *opinionHandler) SolveOpinionReport(ctx context.Context, req oas.OptSolv
 		return nil, messages.BadRequestError
 	}
 
-	if err := o.solveReportCommand.Execute(ctx, report_command.SolveReportInput{
+	if err := o.solveReportCommand.Execute(ctx, report_usecase.SolveReportInput{
 		OpinionID: opinionID,
 		UserID:    userID,
 		Status:    status,

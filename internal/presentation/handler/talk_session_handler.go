@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"braces.dev/errtrace"
-	"github.com/neko-dream/server/internal/application/command/talksession_command"
+	"github.com/neko-dream/server/internal/application/usecase/talksession_usecase"
 	"github.com/neko-dream/server/internal/application/query/analysis_query"
 	"github.com/neko-dream/server/internal/application/query/report_query"
 	talksession_query "github.com/neko-dream/server/internal/application/query/talksession"
@@ -37,10 +37,10 @@ type talkSessionHandler struct {
 	getReportCount                report_query.GetCountQuery
 	hasConsent                    talksession_query.HasConsentQuery
 
-	addConclusionCommand    talksession_command.AddConclusionCommand
-	startTalkSessionCommand talksession_command.StartTalkSessionCommand
-	editTalkSessionCommand  talksession_command.EditCommand
-	takeConsentCommand      talksession_command.TakeConsentUseCase
+	addConclusionCommand    talksession_usecase.AddConclusionCommand
+	startTalkSessionCommand talksession_usecase.StartTalkSessionUseCase
+	editTalkSessionCommand  talksession_usecase.EditTalkSessionUseCase
+	takeConsentCommand      talksession_usecase.TakeConsentUseCase
 
 	session.TokenManager
 }
@@ -58,10 +58,10 @@ func NewTalkSessionHandler(
 	getReportCount report_query.GetCountQuery,
 	hasConsent talksession_query.HasConsentQuery,
 
-	AddConclusionCommand talksession_command.AddConclusionCommand,
-	startTalkSessionCommand talksession_command.StartTalkSessionCommand,
-	editTalkSessionCommand talksession_command.EditCommand,
-	takeConsentCommand talksession_command.TakeConsentUseCase,
+	AddConclusionCommand talksession_usecase.AddConclusionCommand,
+	startTalkSessionCommand talksession_usecase.StartTalkSessionUseCase,
+	editTalkSessionCommand talksession_usecase.EditTalkSessionUseCase,
+	takeConsentCommand talksession_usecase.TakeConsentUseCase,
 
 	tokenManager session.TokenManager,
 ) oas.TalkSessionHandler {
@@ -108,7 +108,7 @@ func (t *talkSessionHandler) PostConclusion(ctx context.Context, req oas.OptPost
 		return nil, messages.BadRequestError
 	}
 
-	if err := t.addConclusionCommand.Execute(ctx, talksession_command.AddConclusionCommandInput{
+	if err := t.addConclusionCommand.Execute(ctx, talksession_usecase.AddConclusionCommandInput{
 		TalkSessionID: talkSessionID,
 		UserID:        userID,
 		Conclusion:    req.Value.Content,
@@ -309,7 +309,7 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 		}
 	}
 
-	out, err := t.startTalkSessionCommand.Execute(ctx, talksession_command.StartTalkSessionCommandInput{
+	out, err := t.startTalkSessionCommand.Execute(ctx, talksession_usecase.StartTalkSessionUseCaseInput{
 		Theme:            req.Value.Theme,
 		Description:      utils.ToPtrIfNotNullValue(!req.Value.Description.IsSet(), req.Value.Description.Value),
 		ThumbnailURL:     utils.ToPtrIfNotNullValue(!req.Value.ThumbnailURL.IsSet(), req.Value.ThumbnailURL.Value),
@@ -648,7 +648,7 @@ func (t *talkSessionHandler) EditTalkSession(ctx context.Context, req oas.OptEdi
 		return nil, messages.RequiredParameterError
 	}
 
-	out, err := t.editTalkSessionCommand.Execute(ctx, talksession_command.EditCommandInput{
+	out, err := t.editTalkSessionCommand.Execute(ctx, talksession_usecase.EditTalkSessionInput{
 		TalkSessionID:    talkSessionID,
 		UserID:           userID,
 		Theme:            req.Value.Theme,
@@ -919,7 +919,7 @@ func (t *talkSessionHandler) ConsentTalkSession(ctx context.Context, params oas.
 		return nil, messages.BadRequestError
 	}
 
-	if err := t.takeConsentCommand.Execute(ctx, talksession_command.TakeConsentUseCaseInput{
+	if err := t.takeConsentCommand.Execute(ctx, talksession_usecase.TakeConsentUseCaseInput{
 		TalkSessionID: talkSessionID,
 		UserID:        *userID,
 	}); err != nil {
