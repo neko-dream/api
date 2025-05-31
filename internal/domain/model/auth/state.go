@@ -62,6 +62,7 @@ func (s *State) Validate(cookieState string) error {
 // provider: 認証プロバイダー名
 // redirectURL: リダイレクトURL
 // expiresAt: 有効期限
+// registrationURL: ログイン時に登録していない場合に飛ばすURL
 func NewState(state string, provider string, redirectURL string, expiresAt time.Time, registrationURL *string) *State {
 	return &State{
 		State:           state,
