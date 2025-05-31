@@ -23,12 +23,13 @@ type ActionItem struct {
 }
 
 type AuthState struct {
-	ID          int32
-	State       string
-	Provider    string
-	RedirectUrl string
-	CreatedAt   time.Time
-	ExpiresAt   time.Time
+	ID              int32
+	State           string
+	Provider        string
+	RedirectUrl     string
+	CreatedAt       time.Time
+	ExpiresAt       time.Time
+	RegistrationUrl sql.NullString
 }
 
 type Opinion struct {
