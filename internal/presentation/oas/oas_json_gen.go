@@ -12735,6 +12735,16 @@ func (s *Restriction) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *Restriction) encodeFields(e *jx.Encoder) {
 	{
+		if s.DependsOn != nil {
+			e.FieldStart("dependsOn")
+			e.ArrStart()
+			for _, elem := range s.DependsOn {
+				e.Str(elem)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
 		e.FieldStart("description")
 		e.Str(s.Description)
 	}
@@ -12744,9 +12754,10 @@ func (s *Restriction) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfRestriction = [2]string{
-	0: "description",
-	1: "key",
+var jsonFieldsNameOfRestriction = [3]string{
+	0: "dependsOn",
+	1: "description",
+	2: "key",
 }
 
 // Decode decodes Restriction from json.
@@ -12758,8 +12769,27 @@ func (s *Restriction) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
+		case "dependsOn":
+			if err := func() error {
+				s.DependsOn = make([]string, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem string
+					v, err := d.Str()
+					elem = string(v)
+					if err != nil {
+						return err
+					}
+					s.DependsOn = append(s.DependsOn, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"dependsOn\"")
+			}
 		case "description":
-			requiredBitSet[0] |= 1 << 0
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
 				v, err := d.Str()
 				s.Description = string(v)
@@ -12771,7 +12801,7 @@ func (s *Restriction) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"description\"")
 			}
 		case "key":
-			requiredBitSet[0] |= 1 << 1
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
 				v, err := d.Str()
 				s.Key = string(v)
@@ -12792,7 +12822,7 @@ func (s *Restriction) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000011,
+		0b00000110,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
