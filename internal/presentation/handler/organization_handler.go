@@ -3,8 +3,8 @@ package handler
 import (
 	"context"
 
-	"github.com/neko-dream/server/internal/application/usecase/organization_usecase"
 	"github.com/neko-dream/server/internal/application/query/organization_query"
+	"github.com/neko-dream/server/internal/application/usecase/organization_usecase"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/session"

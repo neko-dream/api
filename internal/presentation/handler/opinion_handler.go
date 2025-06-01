@@ -6,10 +6,10 @@ import (
 
 	"mime/multipart"
 
-	"github.com/neko-dream/server/internal/application/usecase/opinion_usecase"
-	"github.com/neko-dream/server/internal/application/usecase/report_usecase"
 	opinion_query "github.com/neko-dream/server/internal/application/query/opinion"
 	"github.com/neko-dream/server/internal/application/query/report_query"
+	"github.com/neko-dream/server/internal/application/usecase/opinion_usecase"
+	"github.com/neko-dream/server/internal/application/usecase/report_usecase"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/session"
@@ -335,72 +335,6 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 	}, nil
 }
 
-// GetOpinionDetail implements oas.OpinionHandler.
-func (o *opinionHandler) GetOpinionDetail(ctx context.Context, params oas.GetOpinionDetailParams) (oas.GetOpinionDetailRes, error) {
-	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.GetOpinionDetail")
-	defer span.End()
-
-	claim := session.GetSession(o.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if claim != nil {
-		userIDTmp, err := claim.UserID()
-		if err != nil {
-			return nil, messages.ForbiddenError
-		}
-		userID = lo.ToPtr(userIDTmp)
-	}
-
-	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
-	if err != nil {
-		return nil, messages.BadRequestError
-	}
-
-	opinion, err := o.getOpinionDetailByIDQuery.Execute(ctx, opinion_query.GetOpinionDetailByIDInput{
-		OpinionID: opinionID,
-		UserID:    userID,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	user := &oas.User{
-		DisplayID:   opinion.Opinion.User.DisplayID,
-		DisplayName: opinion.Opinion.User.DisplayName,
-		IconURL:     utils.ToOptNil[oas.OptNilString](opinion.Opinion.User.IconURL),
-	}
-
-	var parentOpinionID oas.OptString
-	if opinion.Opinion.Opinion.ParentOpinionID != nil {
-		parentOpinionID = utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ParentOpinionID.String())
-	}
-
-	var parentVoteType oas.OptNilOpinionVoteType
-	if opinion.Opinion.GetParentVoteType() != nil {
-		parentVoteType = oas.OptNilOpinionVoteType{
-			Value: oas.OpinionVoteType(*opinion.Opinion.GetParentVoteType()),
-			Set:   true,
-			Null:  false,
-		}
-	}
-
-	op := &oas.Opinion{
-		ID:           opinion.Opinion.Opinion.OpinionID.String(),
-		ParentID:     parentOpinionID,
-		Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.Title),
-		Content:      opinion.Opinion.Opinion.Content,
-		VoteType:     parentVoteType,
-		PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.Opinion.PictureURL),
-		ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ReferenceURL),
-		PostedAt:     opinion.Opinion.Opinion.CreatedAt.Format(time.RFC3339),
-		IsDeleted:    opinion.Opinion.Opinion.IsDeleted,
-	}
-
-	return &oas.GetOpinionDetailOK{
-		User:    *user,
-		Opinion: *op,
-	}, nil
-}
-
 // SwipeOpinions スワイプ用の意見取得
 // 自分が投稿した意見は取得しない
 func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpinionsParams) (oas.SwipeOpinionsRes, error) {
@@ -474,144 +408,6 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 		Opinions:       ress,
 		RemainingCount: opinions.RemainingOpinions,
 	}, nil
-}
-
-// OpinionComments 意見に対するリプライ意見取得
-func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.OpinionCommentsParams) (oas.OpinionCommentsRes, error) {
-	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.OpinionComments")
-	defer span.End()
-
-	claim := session.GetSession(o.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if claim != nil {
-		userIDTmp, err := claim.UserID()
-		if err != nil {
-			return nil, messages.ForbiddenError
-		}
-		userID = lo.ToPtr(userIDTmp)
-	}
-
-	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
-	if err != nil {
-		return nil, messages.BadRequestError
-	}
-
-	opinions, err := o.getOpinionRepliesQuery.Execute(ctx, opinion_query.GetOpinionRepliesQueryInput{
-		OpinionID: opinionID,
-		UserID:    userID,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	var replies []oas.OpinionCommentsOKOpinionsItem
-	for _, reply := range opinions.Replies {
-		user := &oas.User{
-			DisplayID:   reply.User.DisplayID,
-			DisplayName: reply.User.DisplayName,
-			IconURL:     utils.ToOptNil[oas.OptNilString](reply.User.IconURL),
-		}
-		var parentOpinionID oas.OptString
-		if reply.Opinion.ParentOpinionID != nil {
-			parentOpinionID = utils.ToOpt[oas.OptString](reply.Opinion.ParentOpinionID.String())
-		}
-
-		var parentVoteType oas.OptNilOpinionVoteType
-		if reply.GetParentVoteType() != nil {
-			parentVoteType = oas.OptNilOpinionVoteType{
-				Value: oas.OpinionVoteType(*reply.GetParentVoteType()),
-				Set:   true,
-				Null:  false,
-			}
-		}
-		opinion := &oas.Opinion{
-			ID:           reply.Opinion.OpinionID.String(),
-			ParentID:     parentOpinionID,
-			Title:        utils.ToOpt[oas.OptString](reply.Opinion.Title),
-			Content:      reply.Opinion.Content,
-			VoteType:     parentVoteType,
-			PictureURL:   utils.ToOptNil[oas.OptNilString](reply.Opinion.PictureURL),
-			ReferenceURL: utils.ToOpt[oas.OptString](reply.Opinion.ReferenceURL),
-			PostedAt:     reply.Opinion.CreatedAt.Format(time.RFC3339),
-			IsDeleted:    reply.Opinion.IsDeleted,
-		}
-
-		var myVoteType oas.OptNilOpinionCommentsOKOpinionsItemMyVoteType
-		if reply.GetMyVoteType() != nil {
-			myVoteType = oas.OptNilOpinionCommentsOKOpinionsItemMyVoteType{
-				Value: oas.OpinionCommentsOKOpinionsItemMyVoteType(*reply.GetMyVoteType()),
-				Set:   true,
-				Null:  false,
-			}
-		}
-		replies = append(replies, oas.OpinionCommentsOKOpinionsItem{
-			User:       *user,
-			Opinion:    *opinion,
-			MyVoteType: myVoteType,
-		})
-	}
-
-	return &oas.OpinionCommentsOK{
-		Opinions: replies,
-	}, nil
-
-}
-
-// PostOpinionPost implements oas.OpinionHandler.
-func (o *opinionHandler) PostOpinionPost(ctx context.Context, req oas.OptPostOpinionPostReq, params oas.PostOpinionPostParams) (oas.PostOpinionPostRes, error) {
-	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.PostOpinionPost")
-	defer span.End()
-
-	claim := session.GetSession(ctx)
-	userID, err := claim.UserID()
-	if err != nil {
-		return nil, messages.ForbiddenError
-	}
-	if !req.IsSet() {
-		return nil, messages.RequiredParameterError
-	}
-
-	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
-	if err != nil {
-		return nil, messages.BadRequestError
-	}
-
-	if err := req.Value.Validate(); err != nil {
-		return nil, err
-	}
-	value := req.Value
-
-	var file *multipart.FileHeader
-	if value.Picture.IsSet() {
-		file, err = http_utils.CreateFileHeader(ctx, value.Picture.Value.File, value.Picture.Value.Name)
-		if err != nil {
-			utils.HandleError(ctx, err, "MakeFileHeader")
-			return nil, messages.InternalServerError
-		}
-	}
-	var parentOpinionID *shared.UUID[opinion.Opinion]
-	if value.ParentOpinionID.IsSet() {
-		id, err := shared.ParseUUID[opinion.Opinion](value.ParentOpinionID.Value)
-		if err != nil {
-			return nil, messages.BadRequestError
-		}
-		parentOpinionID = &id
-	}
-
-	if err = o.submitOpinionCommand.Execute(ctx, opinion_usecase.SubmitOpinionInput{
-		TalkSessionID:   &talkSessionID,
-		UserID:          userID,
-		ParentOpinionID: parentOpinionID,
-		Title:           utils.ToPtrIfNotNullValue(!req.Value.Title.IsSet(), value.Title.Value),
-		Content:         req.Value.OpinionContent,
-		ReferenceURL:    utils.ToPtrIfNotNullValue(!req.Value.ReferenceURL.IsSet(), value.ReferenceURL.Value),
-		Picture:         file,
-	}); err != nil {
-		return nil, err
-	}
-
-	res := &oas.PostOpinionPostOK{}
-	return res, nil
 }
 
 // PostOpinionPost2 TalkSessionIDをBodyで受け取るタイプのやつ

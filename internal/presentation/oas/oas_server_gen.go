@@ -154,14 +154,6 @@ type OpinionHandler interface {
 	//
 	// GET /opinions/{opinionID}/analysis
 	GetOpinionAnalysis(ctx context.Context, params GetOpinionAnalysisParams) (GetOpinionAnalysisRes, error)
-	// GetOpinionDetail implements getOpinionDetail operation.
-	//
-	// 意見の詳細.
-	//
-	// Deprecated: schema marks this operation as deprecated.
-	//
-	// GET /talksessions/{talkSessionID}/opinions/{opinionID}
-	GetOpinionDetail(ctx context.Context, params GetOpinionDetailParams) (GetOpinionDetailRes, error)
 	// GetOpinionDetail2 implements getOpinionDetail2 operation.
 	//
 	// 意見詳細.
@@ -186,28 +178,12 @@ type OpinionHandler interface {
 	//
 	// GET /talksessions/{talkSessionID}/opinions
 	GetOpinionsForTalkSession(ctx context.Context, params GetOpinionsForTalkSessionParams) (GetOpinionsForTalkSessionRes, error)
-	// OpinionComments implements opinionComments operation.
-	//
-	// 意見に対するリプライ意見一覧.
-	//
-	// Deprecated: schema marks this operation as deprecated.
-	//
-	// GET /talksessions/{talkSessionID}/opinions/{opinionID}/replies
-	OpinionComments(ctx context.Context, params OpinionCommentsParams) (OpinionCommentsRes, error)
 	// OpinionComments2 implements opinionComments2 operation.
 	//
 	// 意見に対するリプライ意見一覧.
 	//
 	// GET /opinions/{opinionID}/replies
 	OpinionComments2(ctx context.Context, params OpinionComments2Params) (OpinionComments2Res, error)
-	// PostOpinionPost implements postOpinionPost operation.
-	//
-	// ParentOpinionIDがなければルートの意見として投稿される.
-	//
-	// Deprecated: schema marks this operation as deprecated.
-	//
-	// POST /talksessions/{talkSessionID}/opinions
-	PostOpinionPost(ctx context.Context, req OptPostOpinionPostReq, params PostOpinionPostParams) (PostOpinionPostRes, error)
 	// PostOpinionPost2 implements postOpinionPost2 operation.
 	//
 	// ParentOpinionIDがなければルートの意見として投稿される
@@ -479,14 +455,6 @@ type UserHandler interface {
 //
 // x-ogen-operation-group: Vote
 type VoteHandler interface {
-	// Vote implements vote operation.
-	//
-	// 意思表明API.
-	//
-	// Deprecated: schema marks this operation as deprecated.
-	//
-	// POST /talksessions/{talkSessionID}/opinions/{opinionID}/votes
-	Vote(ctx context.Context, req OptVoteReq, params VoteParams) (VoteRes, error)
 	// Vote2 implements vote2 operation.
 	//
 	// 意思表明API.

@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/neko-dream/server/internal/application/usecase/timeline_usecase"
 	"github.com/neko-dream/server/internal/application/query/timeline_query"
+	"github.com/neko-dream/server/internal/application/usecase/timeline_usecase"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"

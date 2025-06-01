@@ -158,17 +158,6 @@ func (UnimplementedHandler) GetOpinionAnalysis(ctx context.Context, params GetOp
 	return r, ht.ErrNotImplemented
 }
 
-// GetOpinionDetail implements getOpinionDetail operation.
-//
-// 意見の詳細.
-//
-// Deprecated: schema marks this operation as deprecated.
-//
-// GET /talksessions/{talkSessionID}/opinions/{opinionID}
-func (UnimplementedHandler) GetOpinionDetail(ctx context.Context, params GetOpinionDetailParams) (r GetOpinionDetailRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // GetOpinionDetail2 implements getOpinionDetail2 operation.
 //
 // 意見詳細.
@@ -412,17 +401,6 @@ func (UnimplementedHandler) OAuthTokenRevoke(ctx context.Context) (r OAuthTokenR
 	return r, ht.ErrNotImplemented
 }
 
-// OpinionComments implements opinionComments operation.
-//
-// 意見に対するリプライ意見一覧.
-//
-// Deprecated: schema marks this operation as deprecated.
-//
-// GET /talksessions/{talkSessionID}/opinions/{opinionID}/replies
-func (UnimplementedHandler) OpinionComments(ctx context.Context, params OpinionCommentsParams) (r OpinionCommentsRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // OpinionComments2 implements opinionComments2 operation.
 //
 // 意見に対するリプライ意見一覧.
@@ -484,17 +462,6 @@ func (UnimplementedHandler) PostConclusion(ctx context.Context, req OptPostConcl
 //
 // POST /images
 func (UnimplementedHandler) PostImage(ctx context.Context, req OptPostImageReq) (r PostImageRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// PostOpinionPost implements postOpinionPost operation.
-//
-// ParentOpinionIDがなければルートの意見として投稿される.
-//
-// Deprecated: schema marks this operation as deprecated.
-//
-// POST /talksessions/{talkSessionID}/opinions
-func (UnimplementedHandler) PostOpinionPost(ctx context.Context, req OptPostOpinionPostReq, params PostOpinionPostParams) (r PostOpinionPostRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -586,17 +553,6 @@ func (UnimplementedHandler) Test(ctx context.Context) (r TestRes, _ error) {
 //
 // POST /v1/manage/talksessions/{talkSessionID}/analysis/report
 func (UnimplementedHandler) ToggleReportVisibilityManage(ctx context.Context, req *ToggleReportVisibilityRequest, params ToggleReportVisibilityManageParams) (r *ToggleReportVisibilityResponse, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// Vote implements vote operation.
-//
-// 意思表明API.
-//
-// Deprecated: schema marks this operation as deprecated.
-//
-// POST /talksessions/{talkSessionID}/opinions/{opinionID}/votes
-func (UnimplementedHandler) Vote(ctx context.Context, req OptVoteReq, params VoteParams) (r VoteRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

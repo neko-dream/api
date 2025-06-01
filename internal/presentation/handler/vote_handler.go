@@ -58,37 +58,3 @@ func (v *voteHandler) Vote2(ctx context.Context, req oas.OptVote2Req, params oas
 	res := &oas.Vote2OKApplicationJSON{}
 	return res, nil
 }
-
-// Vote implements oas.VoteHandler.
-func (v *voteHandler) Vote(ctx context.Context, req oas.OptVoteReq, params oas.VoteParams) (oas.VoteRes, error) {
-	ctx, span := otel.Tracer("handler").Start(ctx, "voteHandler.Vote")
-	defer span.End()
-
-	claim := session.GetSession(ctx)
-	userID, err := claim.UserID()
-	if err != nil {
-		return nil, messages.ForbiddenError
-	}
-	if !req.IsSet() {
-		return nil, messages.RequiredParameterError
-	}
-
-	value := req.Value
-	targetOpinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
-	if err != nil {
-		return nil, messages.BadRequestError
-	}
-
-	err = v.voteCommand.Execute(ctx, vote_usecase.VoteInput{
-		TargetOpinionID: targetOpinionID,
-		UserID:          userID,
-		VoteType:        string(value.VoteStatus.Value),
-	})
-	if err != nil {
-		utils.HandleError(ctx, err, "postVoteUseCase.Execute")
-		return nil, err
-	}
-
-	res := &oas.VoteOKApplicationJSON{}
-	return res, nil
-}

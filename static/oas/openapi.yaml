@@ -690,24 +690,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -763,24 +757,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -810,24 +798,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -873,24 +855,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -925,24 +901,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -980,24 +950,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -1038,24 +1002,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -1086,24 +1044,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -1176,12 +1128,9 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 properties:
                                     code:
@@ -1196,12 +1145,9 @@ paths:
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 properties:
                                     code:
@@ -1232,24 +1178,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -1290,24 +1230,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -1374,12 +1308,9 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 properties:
                                     code:
@@ -1394,12 +1325,9 @@ paths:
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 properties:
                                     code:
@@ -1451,12 +1379,9 @@ paths:
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -1486,24 +1411,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -1554,12 +1473,9 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 properties:
                                     code:
@@ -1574,12 +1490,9 @@ paths:
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 properties:
                                     code:
@@ -1629,24 +1542,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -1676,24 +1583,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -1736,24 +1637,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -1801,12 +1696,9 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 properties:
                                     code:
@@ -1821,12 +1713,9 @@ paths:
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 properties:
                                     code:
@@ -1902,24 +1791,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -1944,24 +1827,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -1991,24 +1868,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -2052,24 +1923,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -2118,24 +1983,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -2184,24 +2043,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -2224,24 +2077,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -2275,24 +2122,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -2387,12 +2228,9 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 properties:
                                     code:
@@ -2407,12 +2245,9 @@ paths:
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 properties:
                                     code:
@@ -2551,12 +2386,9 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 properties:
                                     code:
@@ -2593,12 +2425,9 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 properties:
                                     code:
@@ -2677,24 +2506,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -2767,12 +2590,9 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 properties:
                                     code:
@@ -2787,12 +2607,9 @@ paths:
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 properties:
                                     code:
@@ -2828,24 +2645,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -2888,24 +2699,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -2939,24 +2744,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -2984,24 +2783,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -3089,24 +2882,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -3115,324 +2902,6 @@ paths:
             tags:
                 - opinion
             x-ogen-operation-group: Opinion
-        post:
-            deprecated: true
-            description: parentOpinionIDがなければルートの意見として投稿される
-            operationId: postOpinionPost
-            parameters:
-                - in: path
-                  name: talkSessionID
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    multipart/form-data:
-                        schema:
-                            properties:
-                                opinionContent:
-                                    example: ""
-                                    maxLength: 140
-                                    type: string
-                                parentOpinionID:
-                                    example: ""
-                                    nullable: true
-                                    type: string
-                                picture:
-                                    description: 参考画像。4MiBまで
-                                    example: ""
-                                    format: binary
-                                    type: string
-                                referenceURL:
-                                    example: ""
-                                    format: url
-                                    nullable: true
-                                    type: string
-                                title:
-                                    example: ""
-                                    nullable: true
-                                    type: string
-                            required:
-                                - opinionContent
-                            type: object
-            responses:
-                "200":
-                    content:
-                        application/json:
-                            schema:
-                                type: object
-                    description: ""
-                "400":
-                    content:
-                        application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
-                            schema:
-                                properties:
-                                    code:
-                                        type: string
-                                    message:
-                                        type: string
-                                required:
-                                    - code
-                                    - message
-                                type: object
-                    description: ""
-                "500":
-                    content:
-                        application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
-                            schema:
-                                properties:
-                                    code:
-                                        type: string
-                                    message:
-                                        type: string
-                                required:
-                                    - code
-                                    - message
-                                type: object
-                    description: ""
-            security:
-                - ApiKeyAuth: []
-            summary: セッションに対して意見投稿
-            tags:
-                - opinion
-            x-ogen-operation-group: Opinion
-    /talksessions/{talkSessionID}/opinions/{opinionID}:
-        get:
-            deprecated: true
-            operationId: getOpinionDetail
-            parameters:
-                - in: path
-                  name: talkSessionID
-                  required: true
-                  schema:
-                    type: string
-                - in: path
-                  name: opinionID
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    content:
-                        application/json:
-                            schema:
-                                properties:
-                                    opinion:
-                                        $ref: '#/components/schemas/opinion'
-                                    user:
-                                        $ref: '#/components/schemas/user'
-                                required:
-                                    - opinion
-                                    - user
-                                type: object
-                    description: ""
-                "500":
-                    content:
-                        application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
-                            schema:
-                                type: object
-                    description: ""
-            security: []
-            summary: 意見の詳細
-            tags:
-                - opinion
-            x-ogen-operation-group: Opinion
-    /talksessions/{talkSessionID}/opinions/{opinionID}/replies:
-        get:
-            deprecated: true
-            operationId: opinionComments
-            parameters:
-                - in: path
-                  name: talkSessionID
-                  required: true
-                  schema:
-                    type: string
-                - description: 親意見のID
-                  in: path
-                  name: opinionID
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    content:
-                        application/json:
-                            schema:
-                                properties:
-                                    opinions:
-                                        items:
-                                            properties:
-                                                myVoteType:
-                                                    enum:
-                                                        - agree
-                                                        - disagree
-                                                        - pass
-                                                    nullable: true
-                                                    type: string
-                                                opinion:
-                                                    $ref: '#/components/schemas/opinion'
-                                                user:
-                                                    $ref: '#/components/schemas/user'
-                                            required:
-                                                - opinion
-                                                - user
-                                            type: object
-                                        type: array
-                                required:
-                                    - opinions
-                                type: object
-                    description: ""
-                "400":
-                    content:
-                        application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
-                            schema:
-                                properties:
-                                    code:
-                                        type: string
-                                    message:
-                                        type: string
-                                required:
-                                    - code
-                                    - message
-                                type: object
-                    description: ""
-                "500":
-                    content:
-                        application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
-                            schema:
-                                properties:
-                                    code:
-                                        type: string
-                                    message:
-                                        type: string
-                                required:
-                                    - code
-                                    - message
-                                type: object
-                    description: ""
-            security: []
-            summary: 意見に対するリプライ意見一覧
-            tags:
-                - opinion
-            x-ogen-operation-group: Opinion
-    /talksessions/{talkSessionID}/opinions/{opinionID}/votes:
-        post:
-            deprecated: true
-            operationId: vote
-            parameters:
-                - description: セッションのID
-                  in: path
-                  name: talkSessionID
-                  required: true
-                  schema:
-                    type: string
-                - description: 意見のID
-                  in: path
-                  name: opinionID
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    multipart/form-data:
-                        schema:
-                            properties:
-                                voteStatus:
-                                    enum:
-                                        - agree
-                                        - disagree
-                                        - pass
-                                    example: ""
-                                    nullable: true
-                                    type: string
-                            required:
-                                - voteStatus
-                            type: object
-            responses:
-                "200":
-                    content:
-                        application/json:
-                            schema:
-                                items:
-                                    $ref: '#/components/schemas/opinion'
-                                type: array
-                    description: ""
-                "400":
-                    content:
-                        application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
-                            schema:
-                                properties:
-                                    code:
-                                        type: string
-                                    message:
-                                        type: string
-                                required:
-                                    - code
-                                    - message
-                                type: object
-                    description: ""
-                "500":
-                    content:
-                        application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
-                            schema:
-                                properties:
-                                    code:
-                                        type: string
-                                    message:
-                                        type: string
-                                required:
-                                    - code
-                                    - message
-                                type: object
-                    description: ""
-            security:
-                - ApiKeyAuth: []
-            summary: 意思表明API
-            tags:
-                - vote
-            x-ogen-operation-group: Vote
     /talksessions/{talkSessionID}/report:
         get:
             operationId: getTalkSessionReport
@@ -3456,12 +2925,9 @@ paths:
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -3504,24 +2970,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -3564,24 +3024,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -3613,24 +3067,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -3689,12 +3137,9 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 properties:
                                     code:
@@ -3709,12 +3154,9 @@ paths:
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 properties:
                                     code:
@@ -3791,24 +3233,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -3845,24 +3281,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -3909,24 +3339,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -3990,24 +3414,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -4076,24 +3494,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -4119,24 +3531,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -4176,24 +3582,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -4215,24 +3615,18 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -4265,12 +3659,9 @@ paths:
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 type: object
                     description: ""
@@ -4362,12 +3753,9 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 properties:
                                     code:
@@ -4382,12 +3770,9 @@ paths:
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 properties:
                                     code:
@@ -4485,12 +3870,9 @@ paths:
                 "400":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 properties:
                                     code:
@@ -4505,12 +3887,9 @@ paths:
                 "500":
                     content:
                         application/json:
-                            examples:
-                                "1":
-                                    summary: internal
-                                    value:
-                                        code: GENERAL-000
-                                        message: INTERNAL SERVER ERROR.
+                            example:
+                                code: GENERAL-000
+                                message: INTERNAL SERVER ERROR.
                             schema:
                                 properties:
                                     code:

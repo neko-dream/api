@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/neko-dream/server/internal/application/usecase/user_usecase"
 	opinion_query "github.com/neko-dream/server/internal/application/query/opinion"
 	talksession_query "github.com/neko-dream/server/internal/application/query/talksession"
 	user_query "github.com/neko-dream/server/internal/application/query/user"
+	"github.com/neko-dream/server/internal/application/usecase/user_usecase"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"

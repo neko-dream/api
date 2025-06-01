@@ -7,10 +7,10 @@ import (
 	"time"
 
 	"braces.dev/errtrace"
-	"github.com/neko-dream/server/internal/application/usecase/talksession_usecase"
 	"github.com/neko-dream/server/internal/application/query/analysis_query"
 	"github.com/neko-dream/server/internal/application/query/report_query"
 	talksession_query "github.com/neko-dream/server/internal/application/query/talksession"
+	"github.com/neko-dream/server/internal/application/usecase/talksession_usecase"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/session"

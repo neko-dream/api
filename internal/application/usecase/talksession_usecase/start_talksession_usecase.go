@@ -82,7 +82,6 @@ func NewStartTalkSessionUseCase(
 func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSessionUseCaseInput) (StartTalkSessionUseCaseOutput, error) {
 	ctx, span := otel.Tracer("talksession_command").Start(ctx, "startTalkSessionHandler.Execute")
 	defer span.End()
-	
 	// ローカル環境以外ではOrganizationに所属していないとセッションを開始できない
 	if i.Config.Env != config.LOCAL {
 		orgs, err := i.OrganizationUserRepository.FindByUserID(ctx, input.OwnerID)

@@ -61,10 +61,6 @@ type GetOpinionDetail2Res interface {
 	getOpinionDetail2Res()
 }
 
-type GetOpinionDetailRes interface {
-	getOpinionDetailRes()
-}
-
 type GetOpinionReportReasonsRes interface {
 	getOpinionReportReasonsRes()
 }
@@ -153,10 +149,6 @@ type OpinionComments2Res interface {
 	opinionComments2Res()
 }
 
-type OpinionCommentsRes interface {
-	opinionCommentsRes()
-}
-
 type OpinionsHistoryRes interface {
 	opinionsHistoryRes()
 }
@@ -183,10 +175,6 @@ type PostImageRes interface {
 
 type PostOpinionPost2Res interface {
 	postOpinionPost2Res()
-}
-
-type PostOpinionPostRes interface {
-	postOpinionPostRes()
 }
 
 type PostTimeLineItemRes interface {
@@ -223,8 +211,4 @@ type TestRes interface {
 
 type Vote2Res interface {
 	vote2Res()
-}
-
-type VoteRes interface {
-	voteRes()
 }
