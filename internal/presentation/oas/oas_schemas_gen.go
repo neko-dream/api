@@ -7156,8 +7156,15 @@ func (s *ReportReason) SetReasonID(val int) {
 
 // Ref: #/components/schemas/restriction
 type Restriction struct {
-	Description string `json:"description"`
-	Key         string `json:"key"`
+	// 依存しているrestriction.
+	DependsOn   []string `json:"dependsOn"`
+	Description string   `json:"description"`
+	Key         string   `json:"key"`
+}
+
+// GetDependsOn returns the value of DependsOn.
+func (s *Restriction) GetDependsOn() []string {
+	return s.DependsOn
 }
 
 // GetDescription returns the value of Description.
@@ -7168,6 +7175,11 @@ func (s *Restriction) GetDescription() string {
 // GetKey returns the value of Key.
 func (s *Restriction) GetKey() string {
 	return s.Key
+}
+
+// SetDependsOn sets the value of DependsOn.
+func (s *Restriction) SetDependsOn(val []string) {
+	s.DependsOn = val
 }
 
 // SetDescription sets the value of Description.

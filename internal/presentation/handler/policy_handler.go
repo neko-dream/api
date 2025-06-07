@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/neko-dream/server/internal/application/command/policy_command"
+	"github.com/neko-dream/server/internal/application/usecase/policy_usecase"
 	"github.com/neko-dream/server/internal/application/query/policy_query"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
@@ -19,12 +19,12 @@ import (
 
 type policyHandler struct {
 	checkConsentQuery policy_query.CheckConsent
-	acceptPolicy      policy_command.AcceptPolicy
+	acceptPolicy      policy_usecase.AcceptPolicy
 }
 
 func NewPolicyHandler(
 	checkConsentQuery policy_query.CheckConsent,
-	acceptPolicy policy_command.AcceptPolicy,
+	acceptPolicy policy_usecase.AcceptPolicy,
 ) oas.PolicyHandler {
 	return &policyHandler{
 		checkConsentQuery: checkConsentQuery,
@@ -86,7 +86,7 @@ func (h *policyHandler) PolicyConsent(ctx context.Context, req oas.OptPolicyCons
 	ipAddress := request.Header.Get("X-Forwarded-For")
 	userAgent := request.Header.Get("User-Agent")
 
-	output, err := h.acceptPolicy.Execute(ctx, policy_command.AcceptPolicyInput{
+	output, err := h.acceptPolicy.Execute(ctx, policy_usecase.AcceptPolicyInput{
 		UserID:    shared.UUID[user.User](userID),
 		Version:   req.Value.PolicyVersion,
 		IPAddress: ipAddress,

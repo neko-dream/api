@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 
-	"github.com/neko-dream/server/internal/application/command/image_command"
+	"github.com/neko-dream/server/internal/application/usecase/image_usecase"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/presentation/oas"
@@ -13,11 +13,11 @@ import (
 )
 
 type imageHandler struct {
-	image_command.UploadImage
+	image_usecase.UploadImage
 }
 
 func NewImageHandler(
-	uploadImage image_command.UploadImage,
+	uploadImage image_usecase.UploadImage,
 ) oas.ImageHandler {
 	return &imageHandler{
 		UploadImage: uploadImage,
@@ -46,7 +46,7 @@ func (i *imageHandler) PostImage(ctx context.Context, req oas.OptPostImageReq) (
 		return nil, messages.InternalServerError
 	}
 
-	input := image_command.UploadImageInput{
+	input := image_usecase.UploadImageInput{
 		OwnerID: userID,
 		Image:   file,
 	}

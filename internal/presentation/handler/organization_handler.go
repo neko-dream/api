@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 
-	"github.com/neko-dream/server/internal/application/command/organization_command"
+	"github.com/neko-dream/server/internal/application/usecase/organization_usecase"
 	"github.com/neko-dream/server/internal/application/query/organization_query"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/organization"
@@ -14,16 +14,16 @@ import (
 )
 
 type organizationHandler struct {
-	create organization_command.CreateOrganizationCommand
-	invite organization_command.InviteOrganizationCommand
-	add    organization_command.InviteOrganizationForUserCommand
+	create organization_usecase.CreateOrganizationCommand
+	invite organization_usecase.InviteOrganizationCommand
+	add    organization_usecase.InviteOrganizationForUserCommand
 	list   organization_query.ListJoinedOrganizationQuery
 }
 
 func NewOrganizationHandler(
-	create organization_command.CreateOrganizationCommand,
-	invite organization_command.InviteOrganizationCommand,
-	add organization_command.InviteOrganizationForUserCommand,
+	create organization_usecase.CreateOrganizationCommand,
+	invite organization_usecase.InviteOrganizationCommand,
+	add organization_usecase.InviteOrganizationForUserCommand,
 	list organization_query.ListJoinedOrganizationQuery,
 ) oas.OrganizationHandler {
 	return &organizationHandler{
@@ -47,7 +47,7 @@ func (o *organizationHandler) CreateOrganizations(ctx context.Context, req oas.O
 	if err != nil {
 		return nil, messages.ForbiddenError
 	}
-	_, err = o.create.Execute(ctx, organization_command.CreateOrganizationInput{
+	_, err = o.create.Execute(ctx, organization_usecase.CreateOrganizationInput{
 		UserID: userID,
 		Name:   req.Value.Name,
 		Type:   req.Value.OrgType.Value,
@@ -78,7 +78,7 @@ func (o *organizationHandler) InviteOrganization(ctx context.Context, req oas.Op
 		return nil, messages.BadRequestError
 	}
 
-	_, err = o.invite.Execute(ctx, organization_command.InviteOrganizationInput{
+	_, err = o.invite.Execute(ctx, organization_usecase.InviteOrganizationInput{
 		UserID:         userID,
 		OrganizationID: organizationID,
 		Email:          req.Value.Email,
@@ -110,7 +110,7 @@ func (o *organizationHandler) InviteOrganizationForUser(ctx context.Context, req
 		return nil, messages.BadRequestError
 	}
 
-	_, err = o.add.Execute(ctx, organization_command.InviteOrganizationForUserInput{
+	_, err = o.add.Execute(ctx, organization_usecase.InviteOrganizationForUserInput{
 		UserID:         userID,
 		OrganizationID: organizationID,
 		DisplayID:      req.Value.DisplayID,
