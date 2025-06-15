@@ -482,15 +482,19 @@ paths:
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
-            application/json:
+            multipart/form-data:
               schema:
                 type: object
+                properties: {}
+                required: []
         '500':
           description: Server error
           content:
-            application/json:
+            multipart/form-data:
               schema:
                 type: object
+                properties: {}
+                required: []
       tags:
         - health
       security:
@@ -912,7 +916,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -921,6 +925,12 @@ paths:
                 content:
                   type: string
                   nullable: true
+              required: []
+            encoding:
+              reason:
+                contentType: text/plain
+              content:
+                contentType: application/json
       x-ogen-operation-group: Opinion
   /opinions/{opinionID}/reports:
     get:
@@ -989,7 +999,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -1054,7 +1064,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -1067,6 +1077,9 @@ paths:
                   nullable: true
               required:
                 - voteStatus
+            encoding:
+              voteStatus:
+                contentType: application/json
       x-ogen-operation-group: Vote
   /organizations:
     get:
@@ -1138,7 +1151,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -1146,8 +1159,12 @@ paths:
                   type: string
                 orgType:
                   type: integer
+                  nullable: true
               required:
                 - name
+            encoding:
+              orgType:
+                contentType: application/json
       x-ogen-operation-group: Organization
   /organizations/{organizationID}/invite:
     post:
@@ -1188,7 +1205,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -1199,6 +1216,9 @@ paths:
               required:
                 - role
                 - email
+            encoding:
+              role:
+                contentType: text/plain
       x-ogen-operation-group: Organization
   /organizations/{organizationID}/invite_user:
     post:
@@ -1239,17 +1259,23 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
                 role:
-                  type: number
+                  type: integer
                 displayID:
                   type: string
+                  nullable: true
               required:
                 - role
                 - displayID
+            encoding:
+              role:
+                contentType: text/plain
+              displayID:
+                contentType: application/json
       x-ogen-operation-group: Organization
   /policy/consent:
     get:
@@ -1517,7 +1543,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -1551,6 +1577,21 @@ paths:
               required:
                 - theme
                 - scheduledEndTime
+            encoding:
+              latitude:
+                contentType: application/json
+              longitude:
+                contentType: application/json
+              city:
+                contentType: application/json
+              prefecture:
+                contentType: application/json
+              description:
+                contentType: application/json
+              thumbnailURL:
+                contentType: application/json
+              restrictions:
+                contentType: application/json
       x-ogen-operation-group: TalkSession
   /talksessions/histories:
     get:

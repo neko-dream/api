@@ -486,8 +486,6 @@ namespace kotohiro {
     date: utcDateTime;
   }
 
-  // ==================== Operations from api.tsp ====================
-
   @tag("opinion")
   @extension("x-ogen-operation-group", "Opinion")
   @route("/opinions/{opinionID}")
@@ -543,8 +541,8 @@ namespace kotohiro {
      */
     @path opinionID: string,
 
-    @body body: {
-      voteStatus: "agree" | "disagree" | "pass" | null;
+    @multipartBody body: {
+      voteStatus: HttpPart<"agree" | "disagree" | "pass" | null>;
     },
   ): Body<opinion[]> | {
     @statusCode statusCode: 400;
@@ -567,9 +565,9 @@ namespace kotohiro {
   @summary("意見通報API")
   op reportOpinion(
     @path opinionID: string,
-    @body body: {
-      reason?: integer;
-      content?: string | null;
+    @multipartBody body: {
+      reason?: HttpPart<integer>;
+      content?: HttpPart<string | null>;
     },
   ): Body<{}> | {
     @statusCode statusCode: 400;
@@ -602,8 +600,8 @@ namespace kotohiro {
   @summary("通報を解決")
   op solveOpinionReport(
     @path opinionID: string,
-    @body body: {
-      action: "deleted" | "hold";
+    @multipartBody body: {
+      action: HttpPart<"deleted" | "hold">;
     },
   ): Body<{}> | {
     @statusCode statusCode: 400;
@@ -867,16 +865,16 @@ namespace kotohiro {
   @post
   @summary("セッション作成")
   op createTalkSession(
-    @body body: {
-      theme: string;
-      scheduledEndTime: utcDateTime;
-      latitude?: numeric | null;
-      longitude?: numeric | null;
-      city?: string | null;
-      prefecture?: string | null;
-      description?: string | null;
-      thumbnailURL?: string | null;
-      restrictions?: string[];
+    @multipartBody body: {
+      theme: HttpPart<string>;
+      scheduledEndTime: HttpPart<utcDateTime>;
+      latitude?: HttpPart<numeric | null>;
+      longitude?: HttpPart<numeric | null>;
+      city?: HttpPart<string | null>;
+      prefecture?: HttpPart<string | null>;
+      description?: HttpPart<string | null>;
+      thumbnailURL?: HttpPart<string | null>;
+      restrictions?: HttpPart<string[]>;
     },
   ): Body<{
     id: string;
@@ -988,9 +986,9 @@ namespace kotohiro {
   op editTimeLine(
     @path talkSessionID: string,
     @path actionItemID: string,
-    @body body: {
-      content?: string | null;
-      status?: string | null;
+    @multipartBody body: {
+      content?: HttpPart<string | null>;
+      status?: HttpPart<string | null>;
     },
   ): actionItem | {
     @statusCode statusCode: 400;
@@ -1024,8 +1022,8 @@ namespace kotohiro {
   @summary("結論投稿")
   op postConclusion(
     @path talkSessionID: string,
-    @body body: {
-      content: string;
+    @multipartBody body: {
+      content: HttpPart<string>;
     },
   ): conclusion | {
     @statusCode statusCode: 400;
@@ -1060,10 +1058,10 @@ namespace kotohiro {
   @summary("タイムラインアイテム追加")
   op postTimeLineItem(
     @path talkSessionID: string,
-    @body body: {
-      content: string;
-      status: string;
-      parentActionItemID?: string | null;
+    @multipartBody body: {
+      content: HttpPart<string>;
+      status: HttpPart<string>;
+      parentActionItemID?: HttpPart<string | null>;
     },
   ): Body<{
     ActionItemID: string;
@@ -1531,10 +1529,10 @@ namespace kotohiro {
   @summary("パスワードによる登録（devのみ）")
   @useAuth([])
   op passwordRegister(
-    @body body: {
-      id: string;
-      password: string;
-      email: string;
+    @multipartBody body: {
+      id: HttpPart<string>;
+      password: HttpPart<string>;
+      email: HttpPart<string>;
     },
   ): Body<{}> | {
     @statusCode statusCode: 400;
@@ -1621,8 +1619,8 @@ namespace kotohiro {
   @post
   @summary("最新のポリシーに同意する")
   op policyConsent(
-    @body body: {
-      policyVersion: string;
+    @multipartBody body: {
+      policyVersion: HttpPart<string>;
     },
   ): policyConsentStatus | {
     @statusCode statusCode: 400;
@@ -1662,9 +1660,9 @@ namespace kotohiro {
   @post
   @summary("組織作成（運営ユーザーのみ）")
   op createOrganizations(
-    @body body: {
-      name: string;
-      orgType?: integer;
+    @multipartBody body: {
+      name: HttpPart<string>;
+      orgType?: HttpPart<integer | null>;
     },
   ): Body<{}> | {
     @statusCode statusCode: 400;
@@ -1687,9 +1685,9 @@ namespace kotohiro {
   @summary("組織ユーザー招待（運営ユーザーのみ）")
   op inviteOrganization(
     @path organizationID: string,
-    @body body: {
-      role: integer;
-      email: string;
+    @multipartBody body: {
+      role: HttpPart<integer>;
+      email: HttpPart<string>;
     },
   ): Body<{}> | {
     @statusCode statusCode: 400;
@@ -1706,9 +1704,9 @@ namespace kotohiro {
   @summary("組織にユーザーを追加")
   op inviteOrganizationForUser(
     @path organizationID: string,
-    @body body: {
-      role: numeric;
-      displayID: string;
+    @multipartBody body: {
+      role: HttpPart<integer>;
+      displayID: HttpPart<string | null>;
     },
   ): Body<{
     success: boolean;
@@ -1728,10 +1726,10 @@ namespace kotohiro {
   @useAuth([])
   op health(): Body<{}> | {
     @statusCode statusCode: 400;
-    @body body: {};
+    @multipartBody body: {};
   } | {
     @statusCode statusCode: 500;
-    @body body: {};
+    @multipartBody body: {};
   };
 
   @route("/v1/manage")
