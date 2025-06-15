@@ -3,6 +3,7 @@ package jwt
 import (
 	"context"
 	"errors"
+	"log"
 	"net/http"
 	"sort"
 
@@ -77,6 +78,13 @@ func (j *tokenManager) Generate(ctx context.Context, user user.User, sessionID s
 	ctx, span := otel.Tracer("jwt").Start(ctx, "tokenManager.Generate")
 	defer span.End()
 
+	// セッション情報を取得
+	sess, err := j.SessionRepository.FindBySessionID(ctx, sessionID)
+	if err != nil {
+		utils.HandleError(ctx, err, "FindBySessionID")
+		return "", err
+	}
+
 	requiredPasswordChange := false
 	if user.Provider() == auth.ProviderPassword {
 		auths, err := j.DBManager.GetQueries(ctx).GetPasswordAuthByUserId(ctx, user.UserID().UUID())
@@ -86,28 +94,53 @@ func (j *tokenManager) Generate(ctx context.Context, user user.User, sessionID s
 		}
 		requiredPasswordChange = auths.PasswordAuth.RequiredPasswordChange
 	}
+
 	var orgType *int
-	orgUsers, _ := j.OrganizationUserRepository.FindByUserID(ctx, user.UserID())
-	// orgTypeでソート
-	sort.SliceStable(orgUsers, func(i, j int) bool {
-		return orgUsers[i].Role < orgUsers[j].Role
-	})
-	if len(orgUsers) > 0 {
-		orgUser := orgUsers[0]
-		// organizationをとる
-		org, err := j.OrganizationRepository.FindByID(ctx, orgUser.OrganizationID)
-		if err != nil {
-			utils.HandleError(ctx, err, "GetOrganizationByID")
-			return "", err
+	var organizationID *string
+	var organizationCode *string
+	var organizationRole *string
+
+	// セッションに組織IDがある場合、その組織情報を優先的に使用
+	if sess != nil && sess.OrganizationID() != nil && !sess.OrganizationID().IsZero() {
+		log.Println("Session found with OrganizationID:", sess.OrganizationID())
+		orgID := shared.UUID[organization.Organization](sess.OrganizationID().UUID())
+		org, err := j.OrganizationRepository.FindByID(ctx, orgID)
+		if err == nil && org != nil {
+			orgType = lo.ToPtr(int(org.OrganizationType))
+			organizationID = lo.ToPtr(org.OrganizationID.String())
+			organizationCode = lo.ToPtr(org.Code)
+			// 組織でのユーザーのロールを取得
+			orgUser, err := j.OrganizationUserRepository.FindByOrganizationIDAndUserID(ctx, orgID, user.UserID())
+			if err == nil && orgUser != nil {
+				organizationRole = lo.ToPtr(organization.RoleToName(orgUser.Role))
+			}
 		}
-		if org == nil {
-			return "", errtrace.Wrap(errors.New("organization not found"))
+	} else {
+		// 組織IDがない場合は、従来通りユーザーの所属組織から最も権限の高いものを選択
+		orgUsers, _ := j.OrganizationUserRepository.FindByUserID(ctx, user.UserID())
+		// roleでソート
+		sort.SliceStable(orgUsers, func(i, j int) bool {
+			return orgUsers[i].Role < orgUsers[j].Role
+		})
+		if len(orgUsers) > 0 {
+			orgUser := orgUsers[0]
+			// organizationをとる
+			org, err := j.OrganizationRepository.FindByID(ctx, orgUser.OrganizationID)
+			if err != nil {
+				utils.HandleError(ctx, err, "GetOrganizationByID")
+				return "", err
+			}
+			if org == nil {
+				return "", errtrace.Wrap(errors.New("organization not found"))
+			}
+			// organizationのroleを取得
+			orgType = lo.ToPtr(int(org.OrganizationType))
+			organizationRole = lo.ToPtr(organization.RoleToName(orgUser.Role))
 		}
-		// organizationのroleを取得
-		orgType = lo.ToPtr(int(org.OrganizationType))
 	}
 
-	claim := session.NewClaim(ctx, user, sessionID, requiredPasswordChange, orgType)
+	claim := session.NewClaimWithOrganization(ctx, user, sessionID, requiredPasswordChange, orgType, organizationID, organizationCode, organizationRole)
+	log.Println("Generating JWT for user:", user.UserID(), "with session ID:", sessionID)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim.GenMapClaim())
 	return errtrace.Wrap2(token.SignedString([]byte(j.secret)))
 }
