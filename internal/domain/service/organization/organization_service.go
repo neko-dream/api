@@ -19,6 +19,9 @@ type OrganizationService interface {
 
 	// ユーザーの所属組織
 	GetUserOrganizations(ctx context.Context, userID shared.UUID[user.User]) ([]*organization.Organization, error)
+
+	// 組織コードから組織IDを解決
+	ResolveOrganizationIDFromCode(ctx context.Context, code *string) (*shared.UUID[any], error)
 }
 
 type organizationService struct {
@@ -135,4 +138,34 @@ func (s *organizationService) CreateOrganization(ctx context.Context, name strin
 	}
 
 	return org, nil
+}
+
+// 組織が見つからない場合はnilを返し、エラーとはしない
+// 組織コードが無効な場合もnilを返す
+func (s *organizationService) ResolveOrganizationIDFromCode(ctx context.Context, code *string) (*shared.UUID[any], error) {
+	ctx, span := otel.Tracer("organization").Start(ctx, "organizationService.ResolveOrganizationIDFromCode")
+	defer span.End()
+
+	if code == nil || *code == "" {
+		return nil, nil
+	}
+
+	// 組織コードのバリデーション
+	if err := organization.ValidateOrganizationCode(*code); err != nil {
+		// バリデーションエラーの場合も組織なしで続行
+		return nil, nil
+	}
+
+	org, err := s.organizationRepo.FindByCode(ctx, *code)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			// 組織が見つからない場合は組織なしで続行
+			return nil, nil
+		}
+		// その他のエラーは返す
+		return nil, err
+	}
+
+	orgID := shared.UUID[any](org.OrganizationID)
+	return &orgID, nil
 }

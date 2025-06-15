@@ -2,16 +2,12 @@ package auth_usecase
 
 import (
 	"context"
-	"database/sql"
-	"errors"
-	"log"
 	"time"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/auth"
-	"github.com/neko-dream/server/internal/domain/model/organization"
-	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/service"
+	organizationService "github.com/neko-dream/server/internal/domain/service/organization"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/pkg/utils"
@@ -48,9 +44,9 @@ type (
 		*db.DBManager
 		*config.Config
 		service.AuthService
-		authProviderFactory    auth.AuthProviderFactory
-		stateRepository        auth.StateRepository
-		organizationRepository organization.OrganizationRepository
+		authProviderFactory auth.AuthProviderFactory
+		stateRepository     auth.StateRepository
+		organizationService organizationService.OrganizationService
 	}
 )
 
@@ -61,15 +57,15 @@ func NewAuthLogin(
 	authService service.AuthService,
 	authProviderFactory auth.AuthProviderFactory,
 	stateRepository auth.StateRepository,
-	organizationRepository organization.OrganizationRepository,
+	organizationService organizationService.OrganizationService,
 ) AuthLogin {
 	return &authLoginInteractor{
-		DBManager:              tm,
-		Config:                 config,
-		AuthService:            authService,
-		authProviderFactory:    authProviderFactory,
-		stateRepository:        stateRepository,
-		organizationRepository: organizationRepository,
+		DBManager:           tm,
+		Config:              config,
+		AuthService:         authService,
+		authProviderFactory: authProviderFactory,
+		stateRepository:     stateRepository,
+		organizationService: organizationService,
 	}
 }
 
@@ -100,22 +96,10 @@ func (a *authLoginInteractor) Execute(ctx context.Context, input AuthLoginInput)
 		}
 
 		// 組織コードが指定されている場合、組織IDを取得
-		var organizationID *shared.UUID[any]
-		if input.OrganizationCode != nil && *input.OrganizationCode != "" {
-			org, err := a.organizationRepository.FindByCode(ctx, *input.OrganizationCode)
-			if err != nil {
-				if !errors.Is(err, sql.ErrNoRows) {
-					utils.HandleError(ctx, err, "FindOrganizationByCode")
-					return errtrace.Wrap(err)
-				}
-				// 組織が見つからない場合はエラーにせず、組織IDをnilのままにする
-				// ユーザーは通常のログインフローに進む
-			} else {
-				// 組織が見つかった場合、組織IDを設定
-				log.Println("Organization found:", org.OrganizationID)
-				orgIDAny := shared.UUID[any](org.OrganizationID)
-				organizationID = &orgIDAny
-			}
+		organizationID, err := a.organizationService.ResolveOrganizationIDFromCode(ctx, input.OrganizationCode)
+		if err != nil {
+			utils.HandleError(ctx, err, "ResolveOrganizationIDFromCode")
+			return errtrace.Wrap(err)
 		}
 
 		state := auth.NewState(stateString, input.Provider, input.RedirectURL, time.Now().Add(auth.StateExpirationDuration), input.RegistrationURL, organizationID)

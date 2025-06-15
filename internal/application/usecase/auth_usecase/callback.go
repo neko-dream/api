@@ -136,14 +136,14 @@ func (u *authCallbackInteractor) Execute(ctx context.Context, input CallbackInpu
 				// ユーザーが既に組織のメンバーかチェック
 				_, err := u.organizationUserRepo.FindByOrganizationIDAndUserID(ctx, orgID, user.UserID())
 				if err != nil {
-					if errors.Is(err, sql.ErrNoRows) {
-						// ユーザーが組織のメンバーでない場合
-						// 組織コードを知っているだけでは自動的にメンバーにはしない
-						// 招待制であるべきなので、ここでは何もしない
-					} else {
+					if !errors.Is(err, sql.ErrNoRows) {
+						// SQL以外のエラーは返す
 						utils.HandleError(ctx, err, "failed to check organization membership")
-						// エラーが発生してもログインは続行
+						return errtrace.Wrap(err)
 					}
+					// ユーザーが組織のメンバーでない場合
+					// 組織コードを知っているだけでは自動的にメンバーにはしない
+					// 招待制であるべきなので、ここでは何もしない
 				}
 				// 既にメンバーの場合は通常通りログイン
 			}

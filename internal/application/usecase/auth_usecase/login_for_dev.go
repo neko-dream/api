@@ -2,15 +2,13 @@ package auth_usecase
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/clock"
-	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/service"
+	organizationService "github.com/neko-dream/server/internal/domain/service/organization"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/pkg/utils"
@@ -39,8 +37,7 @@ type (
 		session.SessionRepository
 		session.SessionService
 		session.TokenManager
-		organizationRepo     organization.OrganizationRepository
-		organizationUserRepo organization.OrganizationUserRepository
+		organizationService organizationService.OrganizationService
 	}
 )
 
@@ -51,18 +48,16 @@ func NewLoginForDev(
 	sessionRepository session.SessionRepository,
 	sessionService session.SessionService,
 	tokenManager session.TokenManager,
-	organizationRepo organization.OrganizationRepository,
-	organizationUserRepo organization.OrganizationUserRepository,
+	organizationService organizationService.OrganizationService,
 ) LoginForDev {
 	return &loginForDevInteractor{
-		DBManager:            tm,
-		Config:               config,
-		AuthService:          authService,
-		SessionRepository:    sessionRepository,
-		SessionService:       sessionService,
-		TokenManager:         tokenManager,
-		organizationRepo:     organizationRepo,
-		organizationUserRepo: organizationUserRepo,
+		DBManager:           tm,
+		Config:              config,
+		AuthService:         authService,
+		SessionRepository:   sessionRepository,
+		SessionService:      sessionService,
+		TokenManager:        tokenManager,
+		organizationService: organizationService,
 	}
 }
 
@@ -88,50 +83,18 @@ func (a *loginForDevInteractor) Execute(ctx context.Context, input LoginForDevIn
 			if err := a.SessionService.DeactivateUserSessions(ctx, newUser.UserID()); err != nil {
 				utils.HandleError(ctx, err, "failed to deactivate user sessions")
 			}
-
-			// 組織コードが指定されている場合、ユーザーを組織に追加
-			if input.OrganizationCode != nil && *input.OrganizationCode != "" {
-				org, err := a.organizationRepo.FindByCode(ctx, *input.OrganizationCode)
-				if err != nil {
-					if !errors.Is(err, sql.ErrNoRows) {
-						utils.HandleError(ctx, err, "FindOrganizationByCode")
-						return errtrace.Wrap(err)
-					}
-					// 組織が見つからない場合は無視して通常のログインを続行
-				} else {
-					// ユーザーが既に組織のメンバーかチェック
-					_, err := a.organizationUserRepo.FindByOrganizationIDAndUserID(ctx, org.OrganizationID, newUser.UserID())
-					if err != nil {
-						if errors.Is(err, sql.ErrNoRows) {
-							// ユーザーが組織のメンバーでない場合
-							// 開発環境でも組織コードを知っているだけでは自動的にメンバーにはしない
-							// 招待制であるべきなので、ここでは何もしない
-						} else {
-							utils.HandleError(ctx, err, "failed to check organization membership")
-							// エラーが発生してもログインは続行
-						}
-					}
-					// 既にメンバーの場合は通常通りログイン
-				}
-			}
 		}
 
-		// セッション作成（組織IDの処理）
+		// 組織コードから組織IDを解決
+		organizationID, err := a.organizationService.ResolveOrganizationIDFromCode(ctx, input.OrganizationCode)
+		if err != nil {
+			utils.HandleError(ctx, err, "ResolveOrganizationIDFromCode")
+			return errtrace.Wrap(err)
+		}
+
+		// セッション作成
 		var sess *session.Session
-		var orgID *shared.UUID[any]
-		if input.OrganizationCode != nil && *input.OrganizationCode != "" {
-			// 組織コードから組織を検索（エラーは無視）
-			if org, err := a.organizationRepo.FindByCode(ctx, *input.OrganizationCode); err == nil {
-				// ユーザーが組織のメンバーかチェック
-				if _, err := a.organizationUserRepo.FindByOrganizationIDAndUserID(ctx, org.OrganizationID, newUser.UserID()); err == nil {
-					// メンバーの場合のみ組織IDを設定
-					orgIDAny := shared.UUID[any](org.OrganizationID)
-					orgID = &orgIDAny
-				}
-			}
-		}
-
-		if orgID != nil {
+		if organizationID != nil {
 			sess = session.NewSessionWithOrganization(
 				shared.NewUUID[session.Session](),
 				newUser.UserID(),
@@ -139,7 +102,7 @@ func (a *loginForDevInteractor) Execute(ctx context.Context, input LoginForDevIn
 				session.SESSION_ACTIVE,
 				*session.NewExpiresAt(ctx),
 				clock.Now(ctx),
-				orgID,
+				organizationID,
 			)
 		} else {
 			sess = session.NewSession(
