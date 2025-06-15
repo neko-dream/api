@@ -59,7 +59,7 @@ func (UnimplementedHandler) ConsentTalkSession(ctx context.Context, params Conse
 // - 3: 議員.
 //
 // POST /organizations
-func (UnimplementedHandler) CreateOrganizations(ctx context.Context, req OptCreateOrganizationsReq) (r CreateOrganizationsRes, _ error) {
+func (UnimplementedHandler) CreateOrganizations(ctx context.Context, req *CreateOrganizationsReq) (r CreateOrganizationsRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -75,7 +75,7 @@ func (UnimplementedHandler) CreateOrganizations(ctx context.Context, req OptCrea
 // より取れるkeyをカンマ区切りで入力してください。.
 //
 // POST /talksessions
-func (UnimplementedHandler) CreateTalkSession(ctx context.Context, req OptCreateTalkSessionReq) (r CreateTalkSessionRes, _ error) {
+func (UnimplementedHandler) CreateTalkSession(ctx context.Context, req *CreateTalkSessionReq) (r CreateTalkSessionRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -102,7 +102,7 @@ func (UnimplementedHandler) DummiInit(ctx context.Context) (r DummiInitRes, _ er
 // セッション編集.
 //
 // PUT /talksessions/{talkSessionID}
-func (UnimplementedHandler) EditTalkSession(ctx context.Context, req OptEditTalkSessionReq, params EditTalkSessionParams) (r EditTalkSessionRes, _ error) {
+func (UnimplementedHandler) EditTalkSession(ctx context.Context, req *EditTalkSessionReq, params EditTalkSessionParams) (r EditTalkSessionRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -111,7 +111,7 @@ func (UnimplementedHandler) EditTalkSession(ctx context.Context, req OptEditTalk
 // タイムライン編集.
 //
 // PUT /talksessions/{talkSessionID}/timelines/{actionItemID}
-func (UnimplementedHandler) EditTimeLine(ctx context.Context, req OptEditTimeLineReq, params EditTimeLineParams) (r EditTimeLineRes, _ error) {
+func (UnimplementedHandler) EditTimeLine(ctx context.Context, req *EditTimeLineReq, params EditTimeLineParams) (r EditTimeLineRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -120,7 +120,7 @@ func (UnimplementedHandler) EditTimeLine(ctx context.Context, req OptEditTimeLin
 // ユーザー情報の変更.
 //
 // PUT /user
-func (UnimplementedHandler) EditUserProfile(ctx context.Context, req OptEditUserProfileReq) (r EditUserProfileRes, _ error) {
+func (UnimplementedHandler) EditUserProfile(ctx context.Context, req *EditUserProfileReq) (r EditUserProfileRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -155,17 +155,6 @@ func (UnimplementedHandler) GetOpenedTalkSession(ctx context.Context, params Get
 //
 // GET /opinions/{opinionID}/analysis
 func (UnimplementedHandler) GetOpinionAnalysis(ctx context.Context, params GetOpinionAnalysisParams) (r GetOpinionAnalysisRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// GetOpinionDetail implements getOpinionDetail operation.
-//
-// 意見の詳細.
-//
-// Deprecated: schema marks this operation as deprecated.
-//
-// GET /talksessions/{talkSessionID}/opinions/{opinionID}
-func (UnimplementedHandler) GetOpinionDetail(ctx context.Context, params GetOpinionDetailParams) (r GetOpinionDetailRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -365,7 +354,7 @@ func (UnimplementedHandler) Health(ctx context.Context) (r HealthRes, _ error) {
 // - 3: Owner.
 //
 // POST /organizations/{organizationID}/invite
-func (UnimplementedHandler) InviteOrganization(ctx context.Context, req OptInviteOrganizationReq, params InviteOrganizationParams) (r InviteOrganizationRes, _ error) {
+func (UnimplementedHandler) InviteOrganization(ctx context.Context, req *InviteOrganizationReq, params InviteOrganizationParams) (r InviteOrganizationRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -374,7 +363,7 @@ func (UnimplementedHandler) InviteOrganization(ctx context.Context, req OptInvit
 // 組織にユーザーを追加.
 //
 // POST /organizations/{organizationID}/invite_user
-func (UnimplementedHandler) InviteOrganizationForUser(ctx context.Context, req OptInviteOrganizationForUserReq, params InviteOrganizationForUserParams) (r InviteOrganizationForUserRes, _ error) {
+func (UnimplementedHandler) InviteOrganizationForUser(ctx context.Context, req *InviteOrganizationForUserReq, params InviteOrganizationForUserParams) (r InviteOrganizationForUserRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -412,17 +401,6 @@ func (UnimplementedHandler) OAuthTokenRevoke(ctx context.Context) (r OAuthTokenR
 	return r, ht.ErrNotImplemented
 }
 
-// OpinionComments implements opinionComments operation.
-//
-// 意見に対するリプライ意見一覧.
-//
-// Deprecated: schema marks this operation as deprecated.
-//
-// GET /talksessions/{talkSessionID}/opinions/{opinionID}/replies
-func (UnimplementedHandler) OpinionComments(ctx context.Context, params OpinionCommentsParams) (r OpinionCommentsRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // OpinionComments2 implements opinionComments2 operation.
 //
 // 意見に対するリプライ意見一覧.
@@ -446,7 +424,7 @@ func (UnimplementedHandler) OpinionsHistory(ctx context.Context, params Opinions
 // パスワードによるログイン.
 //
 // POST /auth/password/login
-func (UnimplementedHandler) PasswordLogin(ctx context.Context, req OptPasswordLoginReq) (r PasswordLoginRes, _ error) {
+func (UnimplementedHandler) PasswordLogin(ctx context.Context, req *PasswordLoginReq) (r PasswordLoginRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -455,7 +433,7 @@ func (UnimplementedHandler) PasswordLogin(ctx context.Context, req OptPasswordLo
 // パスワードによる登録（devのみ）.
 //
 // POST /auth/password/register
-func (UnimplementedHandler) PasswordRegister(ctx context.Context, req OptPasswordRegisterReq) (r PasswordRegisterRes, _ error) {
+func (UnimplementedHandler) PasswordRegister(ctx context.Context, req *PasswordRegisterReq) (r PasswordRegisterRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -464,7 +442,7 @@ func (UnimplementedHandler) PasswordRegister(ctx context.Context, req OptPasswor
 // 最新のポリシーに同意する.
 //
 // POST /policy/consent
-func (UnimplementedHandler) PolicyConsent(ctx context.Context, req OptPolicyConsentReq) (r PolicyConsentRes, _ error) {
+func (UnimplementedHandler) PolicyConsent(ctx context.Context, req *PolicyConsentReq) (r PolicyConsentRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -474,7 +452,7 @@ func (UnimplementedHandler) PolicyConsent(ctx context.Context, req OptPolicyCons
 // セッションの流れやグループの分かれ方などに対するセッション作成者の感想やそれらの意見を受け、これからの方向性などを記入する。.
 //
 // POST /talksessions/{talkSessionID}/conclusion
-func (UnimplementedHandler) PostConclusion(ctx context.Context, req OptPostConclusionReq, params PostConclusionParams) (r PostConclusionRes, _ error) {
+func (UnimplementedHandler) PostConclusion(ctx context.Context, req *PostConclusionReq, params PostConclusionParams) (r PostConclusionRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -483,18 +461,7 @@ func (UnimplementedHandler) PostConclusion(ctx context.Context, req OptPostConcl
 // 画像を投稿してURLを返すAPI.
 //
 // POST /images
-func (UnimplementedHandler) PostImage(ctx context.Context, req OptPostImageReq) (r PostImageRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// PostOpinionPost implements postOpinionPost operation.
-//
-// ParentOpinionIDがなければルートの意見として投稿される.
-//
-// Deprecated: schema marks this operation as deprecated.
-//
-// POST /talksessions/{talkSessionID}/opinions
-func (UnimplementedHandler) PostOpinionPost(ctx context.Context, req OptPostOpinionPostReq, params PostOpinionPostParams) (r PostOpinionPostRes, _ error) {
+func (UnimplementedHandler) PostImage(ctx context.Context, req *PostImageReq) (r PostImageRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -505,7 +472,7 @@ func (UnimplementedHandler) PostOpinionPost(ctx context.Context, req OptPostOpin
 // セッション管理者はisSeedをtrueにするとシード意見として投稿できる.
 //
 // POST /opinions
-func (UnimplementedHandler) PostOpinionPost2(ctx context.Context, req OptPostOpinionPost2Req) (r PostOpinionPost2Res, _ error) {
+func (UnimplementedHandler) PostOpinionPost2(ctx context.Context, req *PostOpinionPost2Req) (r PostOpinionPost2Res, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -514,7 +481,7 @@ func (UnimplementedHandler) PostOpinionPost2(ctx context.Context, req OptPostOpi
 // タイムラインアイテム追加.
 //
 // POST /talksessions/{talkSessionID}/timeline
-func (UnimplementedHandler) PostTimeLineItem(ctx context.Context, req OptPostTimeLineItemReq, params PostTimeLineItemParams) (r PostTimeLineItemRes, _ error) {
+func (UnimplementedHandler) PostTimeLineItem(ctx context.Context, req *PostTimeLineItemReq, params PostTimeLineItemParams) (r PostTimeLineItemRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -523,7 +490,7 @@ func (UnimplementedHandler) PostTimeLineItem(ctx context.Context, req OptPostTim
 // ユーザー作成.
 //
 // POST /user
-func (UnimplementedHandler) RegisterUser(ctx context.Context, req OptRegisterUserReq) (r RegisterUserRes, _ error) {
+func (UnimplementedHandler) RegisterUser(ctx context.Context, req *RegisterUserReq) (r RegisterUserRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -532,7 +499,7 @@ func (UnimplementedHandler) RegisterUser(ctx context.Context, req OptRegisterUse
 // 意見通報API.
 //
 // POST /opinions/{opinionID}/report
-func (UnimplementedHandler) ReportOpinion(ctx context.Context, req OptReportOpinionReq, params ReportOpinionParams) (r ReportOpinionRes, _ error) {
+func (UnimplementedHandler) ReportOpinion(ctx context.Context, req *ReportOpinionReq, params ReportOpinionParams) (r ReportOpinionRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -550,7 +517,7 @@ func (UnimplementedHandler) SessionsHistory(ctx context.Context, params Sessions
 // 通報を解決.
 //
 // POST /opinions/{opinionID}/reports/solve
-func (UnimplementedHandler) SolveOpinionReport(ctx context.Context, req OptSolveOpinionReportReq, params SolveOpinionReportParams) (r SolveOpinionReportRes, _ error) {
+func (UnimplementedHandler) SolveOpinionReport(ctx context.Context, req *SolveOpinionReportReq, params SolveOpinionReportParams) (r SolveOpinionReportRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -589,22 +556,11 @@ func (UnimplementedHandler) ToggleReportVisibilityManage(ctx context.Context, re
 	return r, ht.ErrNotImplemented
 }
 
-// Vote implements vote operation.
-//
-// 意思表明API.
-//
-// Deprecated: schema marks this operation as deprecated.
-//
-// POST /talksessions/{talkSessionID}/opinions/{opinionID}/votes
-func (UnimplementedHandler) Vote(ctx context.Context, req OptVoteReq, params VoteParams) (r VoteRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // Vote2 implements vote2 operation.
 //
 // 意思表明API.
 //
 // POST /opinions/{opinionID}/votes
-func (UnimplementedHandler) Vote2(ctx context.Context, req OptVote2Req, params Vote2Params) (r Vote2Res, _ error) {
+func (UnimplementedHandler) Vote2(ctx context.Context, req *Vote2Req, params Vote2Params) (r Vote2Res, _ error) {
 	return r, ht.ErrNotImplemented
 }

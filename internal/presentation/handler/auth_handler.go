@@ -216,13 +216,13 @@ func (a *authHandler) AuthAccountDetach(ctx context.Context) (oas.AuthAccountDet
 }
 
 // PasswordLogin
-func (a *authHandler) PasswordLogin(ctx context.Context, req oas.OptPasswordLoginReq) (oas.PasswordLoginRes, error) {
+func (a *authHandler) PasswordLogin(ctx context.Context, req *oas.PasswordLoginReq) (oas.PasswordLoginRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.PasswordLogin")
 	defer span.End()
 
 	out, err := a.passwordLogin.Execute(ctx, auth_usecase.PasswordLoginInput{
-		IDorEmail: req.Value.IDOrEmail,
-		Password:  req.Value.Password,
+		IDorEmail: req.IDOrEmail,
+		Password:  req.Password,
 	})
 	if err != nil {
 		return nil, err
@@ -234,13 +234,13 @@ func (a *authHandler) PasswordLogin(ctx context.Context, req oas.OptPasswordLogi
 }
 
 // PasswordRegister
-func (a *authHandler) PasswordRegister(ctx context.Context, req oas.OptPasswordRegisterReq) (oas.PasswordRegisterRes, error) {
+func (a *authHandler) PasswordRegister(ctx context.Context, req *oas.PasswordRegisterReq) (oas.PasswordRegisterRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.PasswordRegister")
 	defer span.End()
 
 	out, err := a.passwordRegister.Execute(ctx, auth_usecase.PasswordRegisterInput{
-		Email:    req.Value.Email,
-		Password: req.Value.Password,
+		Email:    req.Email,
+		Password: req.Password,
 	})
 	if err != nil {
 		return nil, err

@@ -7,6 +7,11 @@ import (
 	talksession_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/talksession"
 	user_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/user"
 
+	opinion_q "github.com/neko-dream/server/internal/application/query/opinion"
+	"github.com/neko-dream/server/internal/application/query/policy_query"
+	report_q "github.com/neko-dream/server/internal/application/query/report_query"
+	"github.com/neko-dream/server/internal/application/query/talksession"
+	"github.com/neko-dream/server/internal/application/query/timeline_query"
 	"github.com/neko-dream/server/internal/application/usecase/auth_usecase"
 	"github.com/neko-dream/server/internal/application/usecase/image_usecase"
 	"github.com/neko-dream/server/internal/application/usecase/opinion_usecase"
@@ -17,11 +22,6 @@ import (
 	"github.com/neko-dream/server/internal/application/usecase/timeline_usecase"
 	"github.com/neko-dream/server/internal/application/usecase/user_usecase"
 	"github.com/neko-dream/server/internal/application/usecase/vote_usecase"
-	opinion_q "github.com/neko-dream/server/internal/application/query/opinion"
-	"github.com/neko-dream/server/internal/application/query/policy_query"
-	report_q "github.com/neko-dream/server/internal/application/query/report_query"
-	"github.com/neko-dream/server/internal/application/query/talksession"
-	"github.com/neko-dream/server/internal/application/query/timeline_query"
 )
 
 // このファイルはアプリケーション層（ユースケース/クエリ）のコンストラクタを管理します。

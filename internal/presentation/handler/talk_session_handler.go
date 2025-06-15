@@ -7,10 +7,10 @@ import (
 	"time"
 
 	"braces.dev/errtrace"
-	"github.com/neko-dream/server/internal/application/usecase/talksession_usecase"
 	"github.com/neko-dream/server/internal/application/query/analysis_query"
 	"github.com/neko-dream/server/internal/application/query/report_query"
 	talksession_query "github.com/neko-dream/server/internal/application/query/talksession"
+	"github.com/neko-dream/server/internal/application/usecase/talksession_usecase"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/session"
@@ -88,12 +88,12 @@ func NewTalkSessionHandler(
 }
 
 // PostConclusion implements oas.TalkSessionHandler.
-func (t *talkSessionHandler) PostConclusion(ctx context.Context, req oas.OptPostConclusionReq, params oas.PostConclusionParams) (oas.PostConclusionRes, error) {
+func (t *talkSessionHandler) PostConclusion(ctx context.Context, req *oas.PostConclusionReq, params oas.PostConclusionParams) (oas.PostConclusionRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.PostConclusion")
 	defer span.End()
 
 	claim := session.GetSession(t.SetSession(ctx))
-	if !req.IsSet() {
+	if claim == nil {
 		return nil, messages.RequiredParameterError
 	}
 
@@ -111,7 +111,7 @@ func (t *talkSessionHandler) PostConclusion(ctx context.Context, req oas.OptPost
 	if err := t.addConclusionCommand.Execute(ctx, talksession_usecase.AddConclusionCommandInput{
 		TalkSessionID: talkSessionID,
 		UserID:        userID,
-		Conclusion:    req.Value.Content,
+		Conclusion:    req.Content,
 	}); err != nil {
 		return nil, errtrace.Wrap(err)
 	}
@@ -124,7 +124,7 @@ func (t *talkSessionHandler) PostConclusion(ctx context.Context, req oas.OptPost
 	}
 
 	return &oas.Conclusion{
-		User: oas.User{
+		User: oas.ConclusionUser{
 			DisplayID:   res.DisplayID,
 			DisplayName: res.DisplayName,
 			IconURL:     utils.ToOptNil[oas.OptNilString](res.IconURL),
@@ -155,7 +155,7 @@ func (t *talkSessionHandler) GetConclusion(ctx context.Context, params oas.GetCo
 	}
 
 	return &oas.Conclusion{
-		User: oas.User{
+		User: oas.ConclusionUser{
 			DisplayID:   res.DisplayID,
 			DisplayName: res.DisplayName,
 			IconURL:     utils.ToOptNil[oas.OptNilString](res.IconURL),
@@ -206,22 +206,22 @@ func (t *talkSessionHandler) GetOpenedTalkSession(ctx context.Context, params oa
 
 	resultTalkSession := make([]oas.GetOpenedTalkSessionOKTalkSessionsItem, 0, len(out.TalkSessions))
 	for _, talkSession := range out.TalkSessions {
-		owner := oas.User{
+		owner := oas.TalkSessionOwner{
 			DisplayID:   talkSession.User.DisplayID,
 			DisplayName: talkSession.User.DisplayName,
 			IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.User.IconURL),
 		}
-		var location oas.OptLocation
+		var location oas.OptTalkSessionLocation
 		if talkSession.HasLocation() {
-			location = oas.OptLocation{
-				Value: oas.Location{
+			location = oas.OptTalkSessionLocation{
+				Value: oas.TalkSessionLocation{
 					Latitude:  utils.ToOpt[oas.OptFloat64](talkSession.Latitude),
 					Longitude: utils.ToOpt[oas.OptFloat64](talkSession.Longitude),
 				},
 				Set: true,
 			}
 		} else {
-			location = oas.OptLocation{}
+			location = oas.OptTalkSessionLocation{}
 			location.Set = false
 		}
 		var restrictions []oas.Restriction
@@ -288,12 +288,12 @@ func (t *talkSessionHandler) GetTalkSessionReport(ctx context.Context, params oa
 }
 
 // CreateTalkSession トークセッション作成
-func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptCreateTalkSessionReq) (oas.CreateTalkSessionRes, error) {
+func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req *oas.CreateTalkSessionReq) (oas.CreateTalkSessionRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.CreateTalkSession")
 	defer span.End()
 
 	claim := session.GetSession(ctx)
-	if !req.IsSet() {
+	if req == nil {
 		return nil, messages.RequiredParameterError
 	}
 
@@ -303,22 +303,22 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptC
 		return nil, messages.ForbiddenError
 	}
 	var restrictionStrings []string
-	if req.Value.Restrictions != nil && req.Value.Restrictions[0] != "" {
-		if sl := strings.Split(strings.Join(req.Value.Restrictions, ","), ","); len(sl) > 0 {
+	if req.Restrictions != nil && req.Restrictions[0] != "" {
+		if sl := strings.Split(strings.Join(req.Restrictions, ","), ","); len(sl) > 0 {
 			restrictionStrings = sl
 		}
 	}
 
 	out, err := t.startTalkSessionCommand.Execute(ctx, talksession_usecase.StartTalkSessionUseCaseInput{
-		Theme:            req.Value.Theme,
-		Description:      utils.ToPtrIfNotNullValue(!req.Value.Description.IsSet(), req.Value.Description.Value),
-		ThumbnailURL:     utils.ToPtrIfNotNullValue(!req.Value.ThumbnailURL.IsSet(), req.Value.ThumbnailURL.Value),
+		Theme:            req.Theme,
+		Description:      utils.ToPtrIfNotNullValue(!req.Description.IsSet(), req.Description.Value),
+		ThumbnailURL:     utils.ToPtrIfNotNullValue(!req.ThumbnailURL.IsSet(), req.ThumbnailURL.Value),
 		OwnerID:          userID,
-		ScheduledEndTime: req.Value.ScheduledEndTime,
-		Latitude:         utils.ToPtrIfNotNullValue(!req.Value.Latitude.IsSet(), req.Value.Latitude.Value),
-		Longitude:        utils.ToPtrIfNotNullValue(!req.Value.Longitude.IsSet(), req.Value.Longitude.Value),
-		City:             utils.ToPtrIfNotNullValue(!req.Value.City.IsSet(), req.Value.City.Value),
-		Prefecture:       utils.ToPtrIfNotNullValue(!req.Value.Prefecture.IsSet(), req.Value.Prefecture.Value),
+		ScheduledEndTime: req.ScheduledEndTime,
+		Latitude:         utils.ToPtrIfNotNullValue(!req.Latitude.IsSet(), req.Latitude.Value),
+		Longitude:        utils.ToPtrIfNotNullValue(!req.Longitude.IsSet(), req.Longitude.Value),
+		City:             utils.ToPtrIfNotNullValue(!req.City.IsSet(), req.City.Value),
+		Prefecture:       utils.ToPtrIfNotNullValue(!req.Prefecture.IsSet(), req.Prefecture.Value),
 		Restrictions:     restrictionStrings,
 	})
 	if err != nil {
@@ -381,15 +381,15 @@ func (t *talkSessionHandler) GetTalkSessionDetail(ctx context.Context, params oa
 		return nil, err
 	}
 
-	owner := oas.User{
+	owner := oas.TalkSessionOwner{
 		DisplayID:   out.User.DisplayID,
 		DisplayName: out.User.DisplayName,
 		IconURL:     utils.ToOptNil[oas.OptNilString](out.User.IconURL),
 	}
-	var location oas.OptLocation
+	var location oas.OptTalkSessionLocation
 	if out.HasLocation() {
-		location = oas.OptLocation{
-			Value: oas.Location{
+		location = oas.OptTalkSessionLocation{
+			Value: oas.TalkSessionLocation{
 				Latitude:  utils.ToOpt[oas.OptFloat64](out.Latitude),
 				Longitude: utils.ToOpt[oas.OptFloat64](out.Longitude),
 			},
@@ -472,15 +472,15 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 
 	resultTalkSession := make([]oas.GetTalkSessionListOKTalkSessionsItem, 0, len(out.TalkSessions))
 	for _, talkSession := range out.TalkSessions {
-		owner := oas.User{
+		owner := oas.TalkSessionOwner{
 			DisplayID:   talkSession.User.DisplayID,
 			DisplayName: talkSession.User.DisplayName,
 			IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.User.IconURL),
 		}
-		var location oas.OptLocation
+		var location oas.OptTalkSessionLocation
 		if talkSession.HasLocation() {
-			location = oas.OptLocation{
-				Value: oas.Location{
+			location = oas.OptTalkSessionLocation{
+				Value: oas.TalkSessionLocation{
 					Latitude:  utils.ToOpt[oas.OptFloat64](talkSession.Latitude),
 					Longitude: utils.ToOpt[oas.OptFloat64](talkSession.Longitude),
 				},
@@ -625,7 +625,7 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 }
 
 // EditTalkSession implements oas.TalkSessionHandler.
-func (t *talkSessionHandler) EditTalkSession(ctx context.Context, req oas.OptEditTalkSessionReq, params oas.EditTalkSessionParams) (oas.EditTalkSessionRes, error) {
+func (t *talkSessionHandler) EditTalkSession(ctx context.Context, req *oas.EditTalkSessionReq, params oas.EditTalkSessionParams) (oas.EditTalkSessionRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.EditTalkSession")
 	defer span.End()
 
@@ -644,21 +644,21 @@ func (t *talkSessionHandler) EditTalkSession(ctx context.Context, req oas.OptEdi
 		return nil, messages.BadRequestError
 	}
 
-	if !req.IsSet() {
+	if req == nil {
 		return nil, messages.RequiredParameterError
 	}
 
 	out, err := t.editTalkSessionCommand.Execute(ctx, talksession_usecase.EditTalkSessionInput{
 		TalkSessionID:    talkSessionID,
 		UserID:           userID,
-		Theme:            req.Value.Theme,
-		Description:      utils.ToPtrIfNotNullValue(!req.Value.Description.IsSet(), req.Value.Description.Value),
-		ThumbnailURL:     utils.ToPtrIfNotNullValue(!req.Value.ThumbnailURL.IsSet(), req.Value.ThumbnailURL.Value),
-		ScheduledEndTime: req.Value.ScheduledEndTime,
-		Latitude:         utils.ToPtrIfNotNullValue(!req.Value.Latitude.IsSet(), req.Value.Latitude.Value),
-		Longitude:        utils.ToPtrIfNotNullValue(!req.Value.Longitude.IsSet(), req.Value.Longitude.Value),
-		City:             utils.ToPtrIfNotNullValue(!req.Value.City.IsSet(), req.Value.City.Value),
-		Prefecture:       utils.ToPtrIfNotNullValue(!req.Value.Prefecture.IsSet(), req.Value.Prefecture.Value),
+		Theme:            req.Theme,
+		Description:      utils.ToPtrIfNotNullValue(!req.Description.IsSet(), req.Description.Value),
+		ThumbnailURL:     utils.ToPtrIfNotNullValue(!req.ThumbnailURL.IsSet(), req.ThumbnailURL.Value),
+		ScheduledEndTime: req.ScheduledEndTime,
+		Latitude:         utils.ToPtrIfNotNullValue(!req.Latitude.IsSet(), req.Latitude.Value),
+		Longitude:        utils.ToPtrIfNotNullValue(!req.Longitude.IsSet(), req.Longitude.Value),
+		City:             utils.ToPtrIfNotNullValue(!req.City.IsSet(), req.City.Value),
+		Prefecture:       utils.ToPtrIfNotNullValue(!req.Prefecture.IsSet(), req.Prefecture.Value),
 	})
 	if err != nil {
 		return nil, err
@@ -669,16 +669,16 @@ func (t *talkSessionHandler) EditTalkSession(ctx context.Context, req oas.OptEdi
 	if err != nil {
 		return nil, err
 	}
-	owner := oas.User{
+	owner := oas.TalkSessionOwner{
 		DisplayID:   out.User.DisplayID,
 		DisplayName: out.User.DisplayName,
 		IconURL:     utils.ToOptNil[oas.OptNilString](talkSessionDetail.User.IconURL),
 	}
 
-	var location oas.OptLocation
+	var location oas.OptTalkSessionLocation
 	if out.HasLocation() {
-		location = oas.OptLocation{
-			Value: oas.Location{
+		location = oas.OptTalkSessionLocation{
+			Value: oas.TalkSessionLocation{
 				Latitude:  utils.ToOpt[oas.OptFloat64](talkSessionDetail.Latitude),
 				Longitude: utils.ToOpt[oas.OptFloat64](talkSessionDetail.Longitude),
 			},
@@ -845,7 +845,7 @@ func (t *talkSessionHandler) GetReportsForTalkSession(ctx context.Context, param
 				PostedAt:     report.Opinion.CreatedAt.Format(time.RFC3339),
 				IsDeleted:    report.Opinion.IsDeleted,
 			},
-			User: oas.User{
+			User: oas.ReportDetailUser{
 				DisplayID:   report.User.DisplayID,
 				DisplayName: report.User.DisplayName,
 				IconURL:     utils.ToOptNil[oas.OptNilString](report.User.IconURL),

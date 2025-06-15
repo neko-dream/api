@@ -25,7 +25,7 @@ func NewImageHandler(
 }
 
 // PostImage POST /image
-func (i *imageHandler) PostImage(ctx context.Context, req oas.OptPostImageReq) (oas.PostImageRes, error) {
+func (i *imageHandler) PostImage(ctx context.Context, req *oas.PostImageReq) (oas.PostImageRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "imageHandler.PostImage")
 	defer span.End()
 
@@ -40,7 +40,7 @@ func (i *imageHandler) PostImage(ctx context.Context, req oas.OptPostImageReq) (
 		return nil, messages.ForbiddenError
 	}
 
-	file, err := http_utils.CreateFileHeader(ctx, req.Value.GetImage().File, req.Value.GetImage().Name)
+	file, err := http_utils.CreateFileHeader(ctx, req.Image.File, req.GetImage().Name)
 	if err != nil {
 		utils.HandleError(ctx, err, "MakeFileHeader")
 		return nil, messages.InternalServerError

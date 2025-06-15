@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/neko-dream/server/internal/application/usecase/timeline_usecase"
 	"github.com/neko-dream/server/internal/application/query/timeline_query"
+	"github.com/neko-dream/server/internal/application/usecase/timeline_usecase"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -72,7 +72,7 @@ func (t *timelineHandler) GetTimeLine(ctx context.Context, params oas.GetTimeLin
 }
 
 // PostTimeLineItem implements oas.TimelineHandler.
-func (t *timelineHandler) PostTimeLineItem(ctx context.Context, req oas.OptPostTimeLineItemReq, params oas.PostTimeLineItemParams) (oas.PostTimeLineItemRes, error) {
+func (t *timelineHandler) PostTimeLineItem(ctx context.Context, req *oas.PostTimeLineItemReq, params oas.PostTimeLineItemParams) (oas.PostTimeLineItemRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "timelineHandler.PostTimeLineItem")
 	defer span.End()
 
@@ -80,6 +80,11 @@ func (t *timelineHandler) PostTimeLineItem(ctx context.Context, req oas.OptPostT
 	if claim == nil {
 		return nil, messages.ForbiddenError
 	}
+	if req == nil {
+		utils.HandleError(ctx, nil, "req is nil")
+		return nil, messages.RequiredParameterError
+	}
+
 	userID, err := claim.UserID()
 	if err != nil {
 		utils.HandleError(ctx, err, "claim.UserID")
@@ -91,8 +96,8 @@ func (t *timelineHandler) PostTimeLineItem(ctx context.Context, req oas.OptPostT
 		return nil, messages.InternalServerError
 	}
 	var parentActionID *shared.UUID[timelineactions.ActionItem]
-	if req.Value.ParentActionItemID.IsSet() {
-		parentActionIDIn, err := shared.ParseUUID[timelineactions.ActionItem](req.Value.ParentActionItemID.Value)
+	if req.ParentActionItemID.IsSet() {
+		parentActionIDIn, err := shared.ParseUUID[timelineactions.ActionItem](req.ParentActionItemID.Value)
 		if err != nil {
 			utils.HandleError(ctx, err, "shared.ParseUUID")
 			return nil, messages.InternalServerError
@@ -104,8 +109,8 @@ func (t *timelineHandler) PostTimeLineItem(ctx context.Context, req oas.OptPostT
 		OwnerID:        userID,
 		TalkSessionID:  talkSessionID,
 		ParentActionID: parentActionID,
-		Content:        req.Value.Content,
-		Status:         req.Value.Status,
+		Content:        req.Content,
+		Status:         req.Status,
 	})
 	if err != nil {
 		utils.HandleError(ctx, err, "AddTimeLineUseCase.Execute")
@@ -122,7 +127,7 @@ func (t *timelineHandler) PostTimeLineItem(ctx context.Context, req oas.OptPostT
 }
 
 // EditTimeLine implements oas.TimelineHandler.
-func (t *timelineHandler) EditTimeLine(ctx context.Context, req oas.OptEditTimeLineReq, params oas.EditTimeLineParams) (oas.EditTimeLineRes, error) {
+func (t *timelineHandler) EditTimeLine(ctx context.Context, req *oas.EditTimeLineReq, params oas.EditTimeLineParams) (oas.EditTimeLineRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "timelineHandler.EditTimeLine")
 	defer span.End()
 
@@ -146,11 +151,11 @@ func (t *timelineHandler) EditTimeLine(ctx context.Context, req oas.OptEditTimeL
 		return nil, messages.InternalServerError
 	}
 	var content, status *string
-	if req.Value.Content.IsSet() {
-		content = lo.ToPtr(req.Value.Content.Value)
+	if req.Content.IsSet() {
+		content = lo.ToPtr(req.Content.Value)
 	}
-	if req.Value.Status.IsSet() {
-		status = lo.ToPtr(req.Value.Status.Value)
+	if req.Status.IsSet() {
+		status = lo.ToPtr(req.Status.Value)
 	}
 
 	output, err := t.et.Execute(ctx, timeline_usecase.EditTimeLineInput{

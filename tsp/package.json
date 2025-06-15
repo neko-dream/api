@@ -7,12 +7,12 @@
     "build": "tsp compile ."
   },
   "peerDependencies": {
-    "@typespec/compiler": "latest",
-    "@typespec/http": "latest",
-    "@typespec/rest": "latest",
-    "@typespec/openapi": "latest",
-    "@typespec/openapi3": "latest",
-    "@typespec/http-client-js": "latest"
+    "@typespec/compiler": "1.1.0",
+    "@typespec/http": "1.1.0",
+    "@typespec/rest": "0.71.0",
+    "@typespec/openapi": "1.1.0",
+    "@typespec/openapi3": "1.1.0",
+    "@typespec/http-client-js": "0.6.0"
   },
   "devDependencies": {
     "@typespec/compiler": "latest",
