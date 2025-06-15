@@ -9,12 +9,13 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/server/internal/infrastructure/config"
 	"go.opentelemetry.io/otel"
 )
 
 type OrganizationService interface {
 	// 組織の作成・更新・削除
-	CreateOrganization(ctx context.Context, name string, orgType organization.OrganizationType, ownerID shared.UUID[user.User]) (*organization.Organization, error)
+	CreateOrganization(ctx context.Context, name string, code string, orgType organization.OrganizationType, ownerID shared.UUID[user.User]) (*organization.Organization, error)
 
 	// ユーザーの所属組織
 	GetUserOrganizations(ctx context.Context, userID shared.UUID[user.User]) ([]*organization.Organization, error)
@@ -24,17 +25,20 @@ type organizationService struct {
 	organizationRepo          organization.OrganizationRepository
 	organizationUserRepo      organization.OrganizationUserRepository
 	organizationMemberManager OrganizationMemberManager
+	config                    *config.Config
 }
 
 func NewOrganizationService(
 	organizationRepo organization.OrganizationRepository,
 	organizationUserRepo organization.OrganizationUserRepository,
 	organizationMemberManager OrganizationMemberManager,
+	cfg *config.Config,
 ) OrganizationService {
 	return &organizationService{
 		organizationRepo:          organizationRepo,
 		organizationUserRepo:      organizationUserRepo,
 		organizationMemberManager: organizationMemberManager,
+		config:                    cfg,
 	}
 }
 
@@ -64,18 +68,20 @@ func (s *organizationService) GetUserOrganizations(ctx context.Context, userID s
 	return orgs, nil
 }
 
-// CreateOrganization implements OrganizationService.
-func (s *organizationService) CreateOrganization(ctx context.Context, name string, orgType organization.OrganizationType, ownerID shared.UUID[user.User]) (*organization.Organization, error) {
-	ctx, span := otel.Tracer("organization").Start(ctx, "organizationService.CreateOrganization")
+// CreateOrganizationWithCode implements OrganizationService.
+func (s *organizationService) CreateOrganization(ctx context.Context, name string, code string, orgType organization.OrganizationType, ownerID shared.UUID[user.User]) (*organization.Organization, error) {
+	ctx, span := otel.Tracer("organization").Start(ctx, "organizationService.CreateOrganizationWithCode")
 	defer span.End()
 
-	// 現状はSuperAdminのみ作成可能
-	isSuperAdmin, err := s.organizationMemberManager.IsSuperAdmin(ctx, ownerID)
-	if err != nil {
-		return nil, err
-	}
-	if !isSuperAdmin {
-		return nil, messages.OrganizationForbidden
+	// 開発環境以外はSuperAdminのみ作成可能
+	if s.config.Env != config.LOCAL && s.config.Env != config.DEV {
+		isSuperAdmin, err := s.organizationMemberManager.IsSuperAdmin(ctx, ownerID)
+		if err != nil {
+			return nil, err
+		}
+		if !isSuperAdmin {
+			return nil, messages.OrganizationForbidden
+		}
 	}
 
 	// 名前が重複していないか確認
@@ -91,10 +97,26 @@ func (s *organizationService) CreateOrganization(ctx context.Context, name strin
 
 	// 組織の作成
 	orgID := shared.NewUUID[organization.Organization]()
+
+	// Validate provided code
+	if err := organization.ValidateOrganizationCode(code); err != nil {
+		return nil, err
+	}
+	// Check if code already exists
+	_, err = s.organizationRepo.FindByCode(ctx, code)
+	if err == nil {
+		// Code exists
+		return nil, messages.OrganizationCodeAlreadyExists
+	}
+	if !errors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+
 	org := organization.NewOrganization(
 		orgID,
 		orgType,
 		name,
+		code,
 		ownerID,
 	)
 	if err := s.organizationRepo.Create(ctx, org); err != nil {
