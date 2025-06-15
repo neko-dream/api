@@ -2,10 +2,15 @@ package auth_usecase
 
 import (
 	"context"
+	"database/sql"
+	"errors"
+	"log"
 	"time"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/auth"
+	"github.com/neko-dream/server/internal/domain/model/organization"
+	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
@@ -28,6 +33,8 @@ type (
 		RedirectURL string
 		// 登録URLがある場合はログイン
 		RegistrationURL *string
+		// 組織コード（組織ログインの場合）
+		OrganizationCode *string
 	}
 
 	// AuthLoginOutput
@@ -41,8 +48,9 @@ type (
 		*db.DBManager
 		*config.Config
 		service.AuthService
-		authProviderFactory auth.AuthProviderFactory
-		stateRepository     auth.StateRepository
+		authProviderFactory    auth.AuthProviderFactory
+		stateRepository        auth.StateRepository
+		organizationRepository organization.OrganizationRepository
 	}
 )
 
@@ -53,13 +61,15 @@ func NewAuthLogin(
 	authService service.AuthService,
 	authProviderFactory auth.AuthProviderFactory,
 	stateRepository auth.StateRepository,
+	organizationRepository organization.OrganizationRepository,
 ) AuthLogin {
 	return &authLoginInteractor{
-		DBManager:           tm,
-		Config:              config,
-		AuthService:         authService,
-		authProviderFactory: authProviderFactory,
-		stateRepository:     stateRepository,
+		DBManager:              tm,
+		Config:                 config,
+		AuthService:            authService,
+		authProviderFactory:    authProviderFactory,
+		stateRepository:        stateRepository,
+		organizationRepository: organizationRepository,
 	}
 }
 
@@ -89,7 +99,26 @@ func (a *authLoginInteractor) Execute(ctx context.Context, input AuthLoginInput)
 			return errtrace.Wrap(err)
 		}
 
-		state := auth.NewState(stateString, input.Provider, input.RedirectURL, time.Now().Add(auth.StateExpirationDuration), input.RegistrationURL)
+		// 組織コードが指定されている場合、組織IDを取得
+		var organizationID *shared.UUID[any]
+		if input.OrganizationCode != nil && *input.OrganizationCode != "" {
+			org, err := a.organizationRepository.FindByCode(ctx, *input.OrganizationCode)
+			if err != nil {
+				if !errors.Is(err, sql.ErrNoRows) {
+					utils.HandleError(ctx, err, "FindOrganizationByCode")
+					return errtrace.Wrap(err)
+				}
+				// 組織が見つからない場合はエラーにせず、組織IDをnilのままにする
+				// ユーザーは通常のログインフローに進む
+			} else {
+				// 組織が見つかった場合、組織IDを設定
+				log.Println("Organization found:", org.OrganizationID)
+				orgIDAny := shared.UUID[any](org.OrganizationID)
+				organizationID = &orgIDAny
+			}
+		}
+
+		state := auth.NewState(stateString, input.Provider, input.RedirectURL, time.Now().Add(auth.StateExpirationDuration), input.RegistrationURL, organizationID)
 		// stateをDBに保存（cookieじゃないのは一部ブラウザでうまく動作しないため）
 		err = a.stateRepository.Create(ctx, state)
 		if err != nil {
