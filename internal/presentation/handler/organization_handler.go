@@ -14,10 +14,11 @@ import (
 )
 
 type organizationHandler struct {
-	create organization_usecase.CreateOrganizationCommand
-	invite organization_usecase.InviteOrganizationCommand
-	add    organization_usecase.InviteOrganizationForUserCommand
-	list   organization_query.ListJoinedOrganizationQuery
+	create  organization_usecase.CreateOrganizationCommand
+	invite  organization_usecase.InviteOrganizationCommand
+	add     organization_usecase.InviteOrganizationForUserCommand
+	list    organization_query.ListJoinedOrganizationQuery
+	orgRepo organization.OrganizationRepository
 }
 
 func NewOrganizationHandler(
@@ -25,12 +26,14 @@ func NewOrganizationHandler(
 	invite organization_usecase.InviteOrganizationCommand,
 	add organization_usecase.InviteOrganizationForUserCommand,
 	list organization_query.ListJoinedOrganizationQuery,
+	orgRepo organization.OrganizationRepository,
 ) oas.OrganizationHandler {
 	return &organizationHandler{
-		create: create,
-		invite: invite,
-		add:    add,
-		list:   list,
+		create:  create,
+		invite:  invite,
+		add:     add,
+		list:    list,
+		orgRepo: orgRepo,
 	}
 }
 
@@ -46,15 +49,16 @@ func (o *organizationHandler) CreateOrganizations(ctx context.Context, req *oas.
 	if req == nil {
 		return nil, messages.BadRequestError
 	}
-
 	userID, err := claim.UserID()
 	if err != nil {
 		return nil, messages.ForbiddenError
 	}
+
 	_, err = o.create.Execute(ctx, organization_usecase.CreateOrganizationInput{
 		UserID: userID,
 		Name:   req.Name,
-		Type:   req.OrgType.Value,
+		Code:   req.Code,
+		Type:   int(req.OrgType),
 	})
 	if err != nil {
 		return nil, err
@@ -90,7 +94,7 @@ func (o *organizationHandler) InviteOrganization(ctx context.Context, req *oas.I
 		UserID:         userID,
 		OrganizationID: organizationID,
 		Email:          req.Email,
-		Role:           req.Role,
+		Role:           int(req.Role),
 	})
 	if err != nil {
 		return nil, err
@@ -165,6 +169,7 @@ func (o *organizationHandler) GetOrganizations(ctx context.Context) (oas.GetOrga
 		args := oas.Organization{
 			ID:       org.Organization.ID,
 			Name:     org.Organization.Name,
+			Code:     org.Organization.Code,
 			Type:     org.Organization.OrganizationType,
 			Role:     org.OrganizationUser.Role,
 			RoleName: org.OrganizationUser.RoleName,
@@ -176,4 +181,32 @@ func (o *organizationHandler) GetOrganizations(ctx context.Context) (oas.GetOrga
 		Organizations: orgs,
 	}, nil
 
+}
+
+// ValidateOrganizationCode 組織コード検証
+func (o *organizationHandler) ValidateOrganizationCode(ctx context.Context, params oas.ValidateOrganizationCodeParams) (oas.ValidateOrganizationCodeRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.ValidateOrganizationCode")
+	defer span.End()
+
+	// Find organization by code
+	org, err := o.orgRepo.FindByCode(ctx, params.Code)
+	if err != nil {
+		// Organization not found
+		return &oas.ValidateOrganizationCodeOK{
+			Valid: false,
+		}, nil
+	}
+
+	// Organization found
+	return &oas.ValidateOrganizationCodeOK{
+		Valid: true,
+		Organization: oas.NewOptOrganization(oas.Organization{
+			ID:       org.OrganizationID.String(),
+			Name:     org.Name,
+			Code:     org.Code,
+			Type:     int(org.OrganizationType),
+			Role:     0,  // Role is not applicable in this context
+			RoleName: "", // RoleName is not applicable in this context
+		}),
+	}, nil
 }

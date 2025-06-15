@@ -9,6 +9,7 @@ import (
 type Organization struct {
 	ID               string    `json:"id"`                // 組織ID
 	Name             string    `json:"name"`              // 組織名
+	Code             string    `json:"code"`              // 組織コード
 	OrganizationType int       `json:"organization_type"` // 組織の種類
 	CreatedAt        time.Time `json:"created_at"`        // 組織の作成日時
 	UpdatedAt        time.Time `json:"updated_at"`        // 組織の更新日時

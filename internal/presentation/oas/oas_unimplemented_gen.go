@@ -556,6 +556,15 @@ func (UnimplementedHandler) ToggleReportVisibilityManage(ctx context.Context, re
 	return r, ht.ErrNotImplemented
 }
 
+// ValidateOrganizationCode implements validateOrganizationCode operation.
+//
+// 組織コード検証.
+//
+// GET /auth/organization/{code}/validate
+func (UnimplementedHandler) ValidateOrganizationCode(ctx context.Context, params ValidateOrganizationCodeParams) (r ValidateOrganizationCodeRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // Vote2 implements vote2 operation.
 //
 // 意思表明API.

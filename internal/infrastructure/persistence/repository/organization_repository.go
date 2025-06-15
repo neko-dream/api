@@ -32,6 +32,7 @@ func (o *organizationRepository) Create(ctx context.Context, org *organization.O
 		OrganizationType: int32(org.OrganizationType),
 		Name:             org.Name,
 		OwnerID:          org.OwnerID.UUID(),
+		Code:             org.Code,
 	}); err != nil {
 		return err
 	}
@@ -52,6 +53,7 @@ func (o *organizationRepository) FindByID(ctx context.Context, id shared.UUID[or
 		shared.UUID[organization.Organization](org.Organization.OrganizationID),
 		organization.OrganizationType(org.Organization.OrganizationType),
 		org.Organization.Name,
+		org.Organization.Code,
 		shared.UUID[user.User](org.Organization.OwnerID),
 	), nil
 }
@@ -78,9 +80,10 @@ func (o *organizationRepository) FindByIDs(ctx context.Context, ids []shared.UUI
 	var result []*organization.Organization
 	for _, org := range orgs {
 		result = append(result, organization.NewOrganization(
-			shared.NewUUID[organization.Organization](),
+			shared.UUID[organization.Organization](org.Organization.OrganizationID),
 			organization.OrganizationType(org.Organization.OrganizationType),
 			org.Organization.Name,
+			org.Organization.Code,
 			shared.UUID[user.User](org.Organization.OwnerID),
 		))
 	}
@@ -99,9 +102,29 @@ func (o *organizationRepository) FindByName(ctx context.Context, name string) (*
 	}
 
 	return organization.NewOrganization(
-		shared.NewUUID[organization.Organization](),
+		shared.UUID[organization.Organization](org.Organization.OrganizationID),
 		organization.OrganizationType(org.Organization.OrganizationType),
 		org.Organization.Name,
+		org.Organization.Code,
+		shared.UUID[user.User](org.Organization.OwnerID),
+	), nil
+}
+
+// FindByCode implements organization.OrganizationRepository.
+func (o *organizationRepository) FindByCode(ctx context.Context, code string) (*organization.Organization, error) {
+	ctx, span := otel.Tracer("repository").Start(ctx, "organizationRepository.FindByCode")
+	defer span.End()
+
+	org, err := o.GetQueries(ctx).FindOrganizationByCode(ctx, code)
+	if err != nil {
+		return nil, err
+	}
+
+	return organization.NewOrganization(
+		shared.UUID[organization.Organization](org.Organization.OrganizationID),
+		organization.OrganizationType(org.Organization.OrganizationType),
+		org.Organization.Name,
+		org.Organization.Code,
 		shared.UUID[user.User](org.Organization.OwnerID),
 	), nil
 }

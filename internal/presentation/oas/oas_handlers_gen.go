@@ -190,6 +190,10 @@ func (s *Server) handleAuthorizeRequest(args [1]string, argsEscaped bool, w http
 					In:   "query",
 				}: params.RedirectURL,
 				{
+					Name: "organization_code",
+					In:   "query",
+				}: params.OrganizationCode,
+				{
 					Name: "registration_url",
 					In:   "query",
 				}: params.RegistrationURL,
@@ -949,6 +953,10 @@ func (s *Server) handleDevAuthorizeRequest(args [0]string, argsEscaped bool, w h
 					Name: "id",
 					In:   "query",
 				}: params.ID,
+				{
+					Name: "organization_code",
+					In:   "query",
+				}: params.OrganizationCode,
 			},
 			Raw: r,
 		}
@@ -9173,6 +9181,118 @@ func (s *Server) handleToggleReportVisibilityManageRequest(args [1]string, argsE
 	}
 
 	if err := encodeToggleReportVisibilityManageResponse(response, w, span); err != nil {
+		defer recordError("EncodeResponse", err)
+		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+		}
+		return
+	}
+}
+
+// handleValidateOrganizationCodeRequest handles validateOrganizationCode operation.
+//
+// 組織コード検証.
+//
+// GET /auth/organization/{code}/validate
+func (s *Server) handleValidateOrganizationCodeRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("validateOrganizationCode"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/auth/organization/{code}/validate"),
+	}
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "ValidateOrganizationCode",
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Add Labeler to context.
+	labeler := &Labeler{attrs: otelAttrs}
+	ctx = contextWithLabeler(ctx, labeler)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
+
+		// Increment request counter.
+		s.requests.Add(ctx, 1, attrOpt)
+
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
+	}()
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "ValidateOrganizationCode",
+			ID:   "validateOrganizationCode",
+		}
+	)
+	params, err := decodeValidateOrganizationCodeParams(args, argsEscaped, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		defer recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	var response ValidateOrganizationCodeRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:          ctx,
+			OperationName:    "ValidateOrganizationCode",
+			OperationSummary: "組織コード検証",
+			OperationID:      "validateOrganizationCode",
+			Body:             nil,
+			Params: middleware.Parameters{
+				{
+					Name: "code",
+					In:   "path",
+				}: params.Code,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = struct{}
+			Params   = ValidateOrganizationCodeParams
+			Response = ValidateOrganizationCodeRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackValidateOrganizationCodeParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.ValidateOrganizationCode(ctx, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.ValidateOrganizationCode(ctx, params)
+	}
+	if err != nil {
+		defer recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeValidateOrganizationCodeResponse(response, w, span); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)

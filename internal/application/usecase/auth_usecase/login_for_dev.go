@@ -8,6 +8,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/service"
+	organizationService "github.com/neko-dream/server/internal/domain/service/organization"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/pkg/utils"
@@ -21,6 +22,8 @@ type (
 
 	LoginForDevInput struct {
 		Subject string
+		// 組織コード（組織ログインの場合）
+		OrganizationCode *string
 	}
 
 	LoginForDevOutput struct {
@@ -34,6 +37,7 @@ type (
 		session.SessionRepository
 		session.SessionService
 		session.TokenManager
+		organizationService organizationService.OrganizationService
 	}
 )
 
@@ -44,14 +48,16 @@ func NewLoginForDev(
 	sessionRepository session.SessionRepository,
 	sessionService session.SessionService,
 	tokenManager session.TokenManager,
+	organizationService organizationService.OrganizationService,
 ) LoginForDev {
 	return &loginForDevInteractor{
-		DBManager:         tm,
-		Config:            config,
-		AuthService:       authService,
-		SessionRepository: sessionRepository,
-		SessionService:    sessionService,
-		TokenManager:      tokenManager,
+		DBManager:           tm,
+		Config:              config,
+		AuthService:         authService,
+		SessionRepository:   sessionRepository,
+		SessionService:      sessionService,
+		TokenManager:        tokenManager,
+		organizationService: organizationService,
 	}
 }
 
@@ -79,14 +85,35 @@ func (a *loginForDevInteractor) Execute(ctx context.Context, input LoginForDevIn
 			}
 		}
 
-		sess := session.NewSession(
-			shared.NewUUID[session.Session](),
-			newUser.UserID(),
-			newUser.Provider(),
-			session.SESSION_ACTIVE,
-			*session.NewExpiresAt(ctx),
-			clock.Now(ctx),
-		)
+		// 組織コードから組織IDを解決
+		organizationID, err := a.organizationService.ResolveOrganizationIDFromCode(ctx, input.OrganizationCode)
+		if err != nil {
+			utils.HandleError(ctx, err, "ResolveOrganizationIDFromCode")
+			return errtrace.Wrap(err)
+		}
+
+		// セッション作成
+		var sess *session.Session
+		if organizationID != nil {
+			sess = session.NewSessionWithOrganization(
+				shared.NewUUID[session.Session](),
+				newUser.UserID(),
+				newUser.Provider(),
+				session.SESSION_ACTIVE,
+				*session.NewExpiresAt(ctx),
+				clock.Now(ctx),
+				organizationID,
+			)
+		} else {
+			sess = session.NewSession(
+				shared.NewUUID[session.Session](),
+				newUser.UserID(),
+				newUser.Provider(),
+				session.SESSION_ACTIVE,
+				*session.NewExpiresAt(ctx),
+				clock.Now(ctx),
+			)
+		}
 
 		if _, err := a.SessionRepository.Create(ctx, *sess); err != nil {
 			utils.HandleError(ctx, err, "failed to create session")

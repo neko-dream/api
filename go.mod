@@ -82,6 +82,7 @@ require (
 	github.com/caarlos0/env/v11 v11.3.1
 	github.com/coreos/go-oidc/v3 v3.14.1
 	github.com/dlclark/regexp2 v1.11.5 // indirect
+	github.com/expr-lang/expr v1.17.5
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/getsentry/sentry-go/otel v0.33.0
 	github.com/ghodss/yaml v1.0.0 // indirect

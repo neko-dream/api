@@ -7,6 +7,7 @@ import (
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/service"
+	organizationService "github.com/neko-dream/server/internal/domain/service/organization"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/pkg/utils"
@@ -28,6 +29,8 @@ type (
 		RedirectURL string
 		// 登録URLがある場合はログイン
 		RegistrationURL *string
+		// 組織コード（組織ログインの場合）
+		OrganizationCode *string
 	}
 
 	// AuthLoginOutput
@@ -43,6 +46,7 @@ type (
 		service.AuthService
 		authProviderFactory auth.AuthProviderFactory
 		stateRepository     auth.StateRepository
+		organizationService organizationService.OrganizationService
 	}
 )
 
@@ -53,6 +57,7 @@ func NewAuthLogin(
 	authService service.AuthService,
 	authProviderFactory auth.AuthProviderFactory,
 	stateRepository auth.StateRepository,
+	organizationService organizationService.OrganizationService,
 ) AuthLogin {
 	return &authLoginInteractor{
 		DBManager:           tm,
@@ -60,6 +65,7 @@ func NewAuthLogin(
 		AuthService:         authService,
 		authProviderFactory: authProviderFactory,
 		stateRepository:     stateRepository,
+		organizationService: organizationService,
 	}
 }
 
@@ -89,7 +95,14 @@ func (a *authLoginInteractor) Execute(ctx context.Context, input AuthLoginInput)
 			return errtrace.Wrap(err)
 		}
 
-		state := auth.NewState(stateString, input.Provider, input.RedirectURL, time.Now().Add(auth.StateExpirationDuration), input.RegistrationURL)
+		// 組織コードが指定されている場合、組織IDを取得
+		organizationID, err := a.organizationService.ResolveOrganizationIDFromCode(ctx, input.OrganizationCode)
+		if err != nil {
+			utils.HandleError(ctx, err, "ResolveOrganizationIDFromCode")
+			return errtrace.Wrap(err)
+		}
+
+		state := auth.NewState(stateString, input.Provider, input.RedirectURL, time.Now().Add(auth.StateExpirationDuration), input.RegistrationURL, organizationID)
 		// stateをDBに保存（cookieじゃないのは一部ブラウザでうまく動作しないため）
 		err = a.stateRepository.Create(ctx, state)
 		if err != nil {

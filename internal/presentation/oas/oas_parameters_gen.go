@@ -20,6 +20,8 @@ type AuthorizeParams struct {
 	Provider AuthorizeProvider
 	// ログイン後にリダイレクトするURL.
 	RedirectURL string
+	// 組織コード（組織ログインの場合）.
+	OrganizationCode OptString
 	// 登録していなかった場合に飛ばすURL.
 	RegistrationURL OptString
 }
@@ -38,6 +40,15 @@ func unpackAuthorizeParams(packed middleware.Parameters) (params AuthorizeParams
 			In:   "query",
 		}
 		params.RedirectURL = packed[key].(string)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "organization_code",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.OrganizationCode = v.(OptString)
+		}
 	}
 	{
 		key := middleware.ParameterKey{
@@ -138,6 +149,47 @@ func decodeAuthorizeParams(args [1]string, argsEscaped bool, r *http.Request) (p
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "redirect_url",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: organization_code.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "organization_code",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotOrganizationCodeVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotOrganizationCodeVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.OrganizationCode.SetTo(paramsDotOrganizationCodeVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "organization_code",
 			In:   "query",
 			Err:  err,
 		}
@@ -359,6 +411,8 @@ type DevAuthorizeParams struct {
 	RedirectURL string
 	// Devのみで使用するsubjectです。ここで指定した値はログインした後も確認できないため覚えておいてください。同じ値を指定すると同じアカウントにログインできます。.
 	ID string
+	// 組織コード（組織ログインの場合）.
+	OrganizationCode OptString
 }
 
 func unpackDevAuthorizeParams(packed middleware.Parameters) (params DevAuthorizeParams) {
@@ -375,6 +429,15 @@ func unpackDevAuthorizeParams(packed middleware.Parameters) (params DevAuthorize
 			In:   "query",
 		}
 		params.ID = packed[key].(string)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "organization_code",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.OrganizationCode = v.(OptString)
+		}
 	}
 	return params
 }
@@ -449,6 +512,47 @@ func decodeDevAuthorizeParams(args [0]string, argsEscaped bool, r *http.Request)
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "id",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: organization_code.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "organization_code",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotOrganizationCodeVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotOrganizationCodeVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.OrganizationCode.SetTo(paramsDotOrganizationCodeVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "organization_code",
 			In:   "query",
 			Err:  err,
 		}
@@ -4538,6 +4642,71 @@ func decodeToggleReportVisibilityManageParams(args [1]string, argsEscaped bool, 
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "talkSessionID",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// ValidateOrganizationCodeParams is parameters of validateOrganizationCode operation.
+type ValidateOrganizationCodeParams struct {
+	Code string
+}
+
+func unpackValidateOrganizationCodeParams(packed middleware.Parameters) (params ValidateOrganizationCodeParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "code",
+			In:   "path",
+		}
+		params.Code = packed[key].(string)
+	}
+	return params
+}
+
+func decodeValidateOrganizationCodeParams(args [1]string, argsEscaped bool, r *http.Request) (params ValidateOrganizationCodeParams, _ error) {
+	// Decode path: code.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "code",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.Code = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "code",
 			In:   "path",
 			Err:  err,
 		}

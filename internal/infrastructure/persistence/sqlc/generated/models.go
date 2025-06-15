@@ -30,6 +30,7 @@ type AuthState struct {
 	CreatedAt       time.Time
 	ExpiresAt       time.Time
 	RegistrationUrl sql.NullString
+	OrganizationID  uuid.NullUUID
 }
 
 type Opinion struct {
@@ -61,6 +62,7 @@ type Organization struct {
 	OrganizationType int32
 	Name             string
 	OwnerID          uuid.UUID
+	Code             string
 }
 
 type OrganizationUser struct {
@@ -117,6 +119,7 @@ type Session struct {
 	ExpiresAt      time.Time
 	CreatedAt      time.Time
 	LastActivityAt time.Time
+	OrganizationID uuid.NullUUID
 }
 
 type TalkSession struct {

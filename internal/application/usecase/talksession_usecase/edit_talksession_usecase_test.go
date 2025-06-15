@@ -24,15 +24,15 @@ import (
 )
 
 type EditTalkSessionUseCaseTestData struct {
-	EditTalkSessionUseCase      talksession_usecase.EditTalkSessionUseCase
-	TalkSessionRepo  talksession.TalkSessionRepository
-	UserRepo         user.UserRepository
-	OwnerUser        *user.User
-	NonOwnerUser     *user.User
-	TalkSession      *talksession.TalkSession
-	TalkSessionID    shared.UUID[talksession.TalkSession]
-	OwnerUserID      shared.UUID[user.User]
-	NonOwnerUserID   shared.UUID[user.User]
+	EditTalkSessionUseCase talksession_usecase.EditTalkSessionUseCase
+	TalkSessionRepo        talksession.TalkSessionRepository
+	UserRepo               user.UserRepository
+	OwnerUser              *user.User
+	NonOwnerUser           *user.User
+	TalkSession            *talksession.TalkSession
+	TalkSessionID          shared.UUID[talksession.TalkSession]
+	OwnerUserID            shared.UUID[user.User]
+	NonOwnerUserID         shared.UUID[user.User]
 }
 
 func TestEditTalkSessionUseCase_Execute(t *testing.T) {
@@ -41,10 +41,10 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 	t.Setenv("ENCRYPTION_SECRET", "12345678901234567890123456789012")
 	t.Setenv("DATABASE_URL", "postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable")
 	t.Setenv("ENV", "test")
-	
+
 	// OpenTelemetryのnoop tracerを設定
 	otel.SetTracerProvider(noop.NewTracerProvider())
-	
+
 	container := di.BuildContainer()
 	dbManager := di.Invoke[*db.DBManager](container)
 	encryptor, _ := crypto.NewEncryptor(lo.ToPtr(config.Config{
@@ -75,12 +75,12 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 
 	// テストデータの初期化
 	initData := &EditTalkSessionUseCaseTestData{
-		EditTalkSessionUseCase:     editCommand,
-		TalkSessionRepo: talkSessionRepo,
-		UserRepo:        userRepo,
-		TalkSessionID:   shared.NewUUID[talksession.TalkSession](),
-		OwnerUserID:     shared.NewUUID[user.User](),
-		NonOwnerUserID:  shared.NewUUID[user.User](),
+		EditTalkSessionUseCase: editCommand,
+		TalkSessionRepo:        talkSessionRepo,
+		UserRepo:               userRepo,
+		TalkSessionID:          shared.NewUUID[talksession.TalkSession](),
+		OwnerUserID:            shared.NewUUID[user.User](),
+		NonOwnerUserID:         shared.NewUUID[user.User](),
 	}
 
 	testCases := []*txtest.TransactionalTestCase[EditTalkSessionUseCaseTestData]{
@@ -613,10 +613,10 @@ func TestEditTalkSessionUseCase_ProductionEnvironment(t *testing.T) {
 	t.Setenv("ENCRYPTION_SECRET", "12345678901234567890123456789012")
 	t.Setenv("DATABASE_URL", "postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable")
 	t.Setenv("ENV", "production")
-	
+
 	// OpenTelemetryのnoop tracerを設定
 	otel.SetTracerProvider(noop.NewTracerProvider())
-	
+
 	container := di.BuildContainer()
 	dbManager := di.Invoke[*db.DBManager](container)
 	encryptor, _ := crypto.NewEncryptor(lo.ToPtr(config.Config{
@@ -702,6 +702,6 @@ func TestEditTalkSessionUseCase_ProductionEnvironment(t *testing.T) {
 
 		return nil
 	})
-	
+
 	assert.NoError(t, err)
 }
