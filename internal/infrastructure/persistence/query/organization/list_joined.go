@@ -47,7 +47,7 @@ func (q *listJoinedOrganizationQuery) Execute(ctx context.Context, input organiz
 			utils.HandleError(ctx, err, "failed to copy organization")
 			return nil, err
 		}
-
+		orgResp.OrganizationUser.SetRoleName(int(org.OrganizationUser.Role))
 		orgRespList = append(orgRespList, &orgResp)
 	}
 
