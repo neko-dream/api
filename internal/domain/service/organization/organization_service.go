@@ -76,6 +76,11 @@ func (s *organizationService) CreateOrganization(ctx context.Context, name strin
 	ctx, span := otel.Tracer("organization").Start(ctx, "organizationService.CreateOrganizationWithCode")
 	defer span.End()
 
+	// 組織種別のバリデーション（0は無効）
+	if orgType < organization.OrganizationTypeNormal || orgType > organization.OrganizationTypeCouncillor {
+		return nil, messages.OrganizationTypeInvalid
+	}
+
 	// 開発環境以外はSuperAdminのみ作成可能
 	if s.config.Env != config.LOCAL && s.config.Env != config.DEV {
 		isSuperAdmin, err := s.organizationMemberManager.IsSuperAdmin(ctx, ownerID)

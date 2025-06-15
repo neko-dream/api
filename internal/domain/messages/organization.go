@@ -48,4 +48,9 @@ var (
 		Code:       "ORGANIZATION-009",
 		Message:    "組織コードは英数字で構成される必要があります",
 	}
+	OrganizationTypeInvalid = &APIError{
+		StatusCode: http.StatusBadRequest,
+		Code:       "ORGANIZATION-010",
+		Message:    "無効な組織種別です",
+	}
 )
