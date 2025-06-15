@@ -363,6 +363,11 @@ namespace kotohiro {
     Name: string;
 
     /**
+     * 組織コード
+     */
+    Code: string;
+
+    /**
      * 組織のタイプ
      */
     Type: integer;
@@ -566,7 +571,7 @@ namespace kotohiro {
   op reportOpinion(
     @path opinionID: string,
     @multipartBody body: {
-      reason?: HttpPart<integer>;
+      reason?: HttpPart<integer | null>;
       content?: HttpPart<string | null>;
     },
   ): Body<{}> | {
@@ -1347,8 +1352,11 @@ namespace kotohiro {
     iconURL?: string;
     isRegistered: boolean;
     isEmailVerified: boolean;
-    orgType?: integer | null;
     requiredPasswordChange: boolean;
+    orgType?: integer | null;
+    organizationRole?: string | null;
+    organizationCode?: string | null;
+    organizationID?: string | null;
   }> | {
     @statusCode statusCode: 400;
     @body body: {
@@ -1408,6 +1416,11 @@ namespace kotohiro {
      * devのみで使用するsubjectです。ここで指定した値はログインした後も確認できないため覚えておいてください。同じ値を指定すると同じアカウントにログインできます。
      */
     @query(#{ explode: true }) id: string,
+
+    /**
+     * 組織コード（組織ログインの場合）
+     */
+    @query(#{ explode: true }) organization_code?: string,
   ): {
     @statusCode statusCode: 302;
     @header("Location") Location?: string;
@@ -1434,6 +1447,11 @@ namespace kotohiro {
      * ログイン後にリダイレクトするURL
      */
     @query(#{ explode: true }) redirect_url: string,
+
+    /**
+     * 組織コード（組織ログインの場合）
+     */
+    @query(#{ explode: true }) organization_code?: string,
 
     /**
      * 登録していなかった場合に飛ばすURL
@@ -1510,9 +1528,9 @@ namespace kotohiro {
   @summary("パスワードによるログイン")
   @useAuth([])
   op passwordLogin(
-    @body body: {
-      id_or_email: string;
-      password: string;
+    @multipartBody body: {
+      id_or_email: HttpPart<string>;
+      password: HttpPart<string>;
     },
   ): Body<{}> | {
     @statusCode statusCode: 400;
@@ -1662,7 +1680,8 @@ namespace kotohiro {
   op createOrganizations(
     @multipartBody body: {
       name: HttpPart<string>;
-      orgType?: HttpPart<integer | null>;
+      code: HttpPart<string>;
+      orgType: HttpPart<numeric>;
     },
   ): Body<{}> | {
     @statusCode statusCode: 400;
@@ -1686,8 +1705,8 @@ namespace kotohiro {
   op inviteOrganization(
     @path organizationID: string,
     @multipartBody body: {
-      role: HttpPart<integer>;
       email: HttpPart<string>;
+      role: HttpPart<numeric>;
     },
   ): Body<{}> | {
     @statusCode statusCode: 400;
@@ -1705,11 +1724,28 @@ namespace kotohiro {
   op inviteOrganizationForUser(
     @path organizationID: string,
     @multipartBody body: {
-      role: HttpPart<integer>;
-      displayID: HttpPart<string | null>;
+      displayID: HttpPart<string>;
+      role: HttpPart<numeric>;
     },
   ): Body<{
     success: boolean;
+  }> | {
+    @statusCode statusCode: 400;
+    @body body: {};
+  } | {
+    @statusCode statusCode: 500;
+    @body body: {};
+  };
+
+  @tag("organization")
+  @extension("x-ogen-operation-group", "Organization")
+  @route("/auth/organization/{code}/validate")
+  @get
+  @summary("組織コード検証")
+  @useAuth([])
+  op validateOrganizationCode(@path code: string): Body<{
+    valid: boolean;
+    organization?: organization;
   }> | {
     @statusCode statusCode: 400;
     @body body: {};
@@ -1726,10 +1762,10 @@ namespace kotohiro {
   @useAuth([])
   op health(): Body<{}> | {
     @statusCode statusCode: 400;
-    @multipartBody body: {};
+    @body body: {};
   } | {
     @statusCode statusCode: 500;
-    @multipartBody body: {};
+    @body body: {};
   };
 
   @route("/v1/manage")
