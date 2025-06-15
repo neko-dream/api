@@ -57,12 +57,13 @@ type (
 	}
 
 	Session struct {
-		sessionID    shared.UUID[Session]
-		userID       shared.UUID[user.User]
-		authProvider auth.AuthProviderName
-		status       status
-		expires      time.Time
-		lastActivity time.Time
+		sessionID      shared.UUID[Session]
+		userID         shared.UUID[user.User]
+		authProvider   auth.AuthProviderName
+		status         status
+		expires        time.Time
+		lastActivity   time.Time
+		organizationID *shared.UUID[any] // ログイン時に使用した組織ID（組織経由ログインの場合）
 	}
 )
 
@@ -81,6 +82,26 @@ func NewSession(
 		status:       status,
 		expires:      expires,
 		lastActivity: lastActivity,
+	}
+}
+
+func NewSessionWithOrganization(
+	sessionID shared.UUID[Session],
+	userID shared.UUID[user.User],
+	authProvider auth.AuthProviderName,
+	status status,
+	expires time.Time,
+	lastActivity time.Time,
+	organizationID *shared.UUID[any],
+) *Session {
+	return &Session{
+		sessionID:      sessionID,
+		userID:         userID,
+		authProvider:   authProvider,
+		status:         status,
+		expires:        expires,
+		lastActivity:   lastActivity,
+		organizationID: organizationID,
 	}
 }
 
@@ -127,6 +148,10 @@ func (s *Session) UpdateLastActivity(ctx context.Context) {
 	defer span.End()
 
 	s.lastActivity = clock.Now(ctx)
+}
+
+func (s *Session) OrganizationID() *shared.UUID[any] {
+	return s.organizationID
 }
 
 func SortByLastActivity(sessions []Session) []Session {
