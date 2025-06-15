@@ -1,7 +1,8 @@
 package organization
 
 import (
-	"github.com/expr-lang/expr/parser/utils"
+	"unicode"
+
 	"github.com/neko-dream/server/internal/domain/messages"
 )
 
@@ -12,7 +13,10 @@ func ValidateOrganizationCode(code string) error {
 		return messages.OrganizationCodeTooShort
 	}
 	for _, r := range code {
-		if !utils.IsAlphaNumeric(r) {
+		if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
+			return messages.OrganizationCodeInvalid
+		}
+		if r > 127 {
 			return messages.OrganizationCodeInvalid
 		}
 	}
