@@ -4,9 +4,12 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/google/uuid"
 	"github.com/neko-dream/server/internal/domain/model/auth"
+	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
+	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
@@ -32,6 +35,12 @@ func (r *authStateRepository) Create(ctx context.Context, state *auth.State) err
 		registrationURL.Valid = true
 	}
 
+	var organizationID uuid.NullUUID
+	if state.OrganizationID != nil && !state.OrganizationID.IsZero() {
+		organizationID.UUID = state.OrganizationID.UUID()
+		organizationID.Valid = true
+	}
+
 	return r.ExecTx(ctx, func(ctx context.Context) error {
 		_, err := r.GetQueries(ctx).CreateAuthState(ctx, model.CreateAuthStateParams{
 			State:           state.State,
@@ -39,6 +48,7 @@ func (r *authStateRepository) Create(ctx context.Context, state *auth.State) err
 			ExpiresAt:       state.ExpiresAt,
 			RedirectUrl:     state.RedirectURL,
 			RegistrationUrl: registrationURL,
+			OrganizationID:  organizationID,
 		})
 		return err
 	})
@@ -61,6 +71,11 @@ func (r *authStateRepository) Get(ctx context.Context, state string) (*auth.Stat
 			registrationURL = &s.RegistrationUrl.String
 		}
 
+		var organizationID *shared.UUID[any]
+		if s.OrganizationID.Valid {
+			organizationID = lo.ToPtr(shared.UUID[any](s.OrganizationID.UUID))
+		}
+
 		result = &auth.State{
 			ID:              int(s.ID),
 			State:           s.State,
@@ -69,6 +84,7 @@ func (r *authStateRepository) Get(ctx context.Context, state string) (*auth.Stat
 			CreatedAt:       s.CreatedAt,
 			ExpiresAt:       s.ExpiresAt,
 			RegistrationURL: registrationURL,
+			OrganizationID:  organizationID,
 		}
 		return nil
 	})
