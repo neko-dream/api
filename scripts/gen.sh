@@ -4,6 +4,7 @@ set -e
 
 # Compile TypeSpec to OpenAPI
 cd tsp
+tsp format main.tsp
 npm run build
 cd ../
 
