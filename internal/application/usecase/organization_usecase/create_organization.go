@@ -2,7 +2,6 @@ package organization_usecase
 
 import (
 	"context"
-	"log"
 
 	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -19,6 +18,7 @@ type CreateOrganizationCommand interface {
 type CreateOrganizationInput struct {
 	UserID shared.UUID[user.User]
 	Name   string
+	Code   string
 	Type   int
 }
 
@@ -46,12 +46,11 @@ func (c *createOrganizationInteractor) Execute(ctx context.Context, input Create
 	ownerID := input.UserID
 
 	// 組織を作成
-	org, err := c.organizationService.CreateOrganization(ctx, input.Name, orgType, ownerID)
+	_, err := c.organizationService.CreateOrganization(ctx, input.Name, input.Code, orgType, ownerID)
 	if err != nil {
 		utils.HandleError(ctx, err, "CreateOrganization")
 		return nil, err
 	}
-	log.Println("Organization created:", org)
 
 	return &CreateOrganizationOutput{}, nil
 }
