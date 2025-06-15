@@ -13,7 +13,7 @@ func ValidateOrganizationCode(code string) error {
 	}
 	for _, r := range code {
 		if !utils.IsAlphaNumeric(r) {
-			return messages.OrganizationCodeTooShort
+			return messages.OrganizationCodeInvalid
 		}
 	}
 	return nil
