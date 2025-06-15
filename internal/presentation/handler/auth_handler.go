@@ -73,10 +73,16 @@ func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams)
 		registrationURL = lo.ToPtr(params.RegistrationURL.Value)
 	}
 
+	var organizationCode *string
+	if params.OrganizationCode.Set {
+		organizationCode = lo.ToPtr(params.OrganizationCode.Value)
+	}
+
 	out, err := a.AuthLogin.Execute(ctx, auth_usecase.AuthLoginInput{
-		Provider:        string(provider),
-		RedirectURL:     params.RedirectURL,
-		RegistrationURL: registrationURL,
+		Provider:         string(provider),
+		RedirectURL:      params.RedirectURL,
+		RegistrationURL:  registrationURL,
+		OrganizationCode: organizationCode,
 	})
 	if err != nil {
 		return nil, err
@@ -91,8 +97,14 @@ func (a *authHandler) DevAuthorize(ctx context.Context, params oas.DevAuthorizeP
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.DevAuthorize")
 	defer span.End()
 
+	var organizationCode *string
+	if params.OrganizationCode.Set {
+		organizationCode = lo.ToPtr(params.OrganizationCode.Value)
+	}
+
 	output, err := a.LoginForDev.Execute(ctx, auth_usecase.LoginForDevInput{
-		Subject: params.ID,
+		Subject:          params.ID,
+		OrganizationCode: organizationCode,
 	})
 	if err != nil {
 		return nil, err
@@ -165,18 +177,22 @@ func (a *authHandler) OAuthTokenInfo(ctx context.Context) (oas.OAuthTokenInfoRes
 	}
 
 	return &oas.OAuthTokenInfoOK{
-		Aud:             claim.Audience(),
-		Iat:             claim.IssueAt().Format(time.RFC3339),
-		Exp:             claim.ExpiresAt().Format(time.RFC3339),
-		Iss:             claim.Issuer(),
-		Sub:             claim.Sub,
-		Jti:             sessID.String(),
-		IsRegistered:    claim.IsRegistered,
-		IsEmailVerified: claim.IsEmailVerified,
-		DisplayID:       utils.ToOpt[oas.OptString](claim.DisplayID),
-		DisplayName:     utils.ToOpt[oas.OptString](claim.DisplayName),
-		IconURL:         utils.ToOpt[oas.OptString](claim.IconURL),
-		OrgType:         utils.ToOptNil[oas.OptNilInt](orgType),
+		Aud:                    claim.Audience(),
+		Iat:                    claim.IssueAt().Format(time.RFC3339),
+		Exp:                    claim.ExpiresAt().Format(time.RFC3339),
+		Iss:                    claim.Issuer(),
+		Sub:                    claim.Sub,
+		Jti:                    sessID.String(),
+		IsRegistered:           claim.IsRegistered,
+		IsEmailVerified:        claim.IsEmailVerified,
+		DisplayID:              utils.ToOpt[oas.OptString](claim.DisplayID),
+		DisplayName:            utils.ToOpt[oas.OptString](claim.DisplayName),
+		IconURL:                utils.ToOpt[oas.OptString](claim.IconURL),
+		RequiredPasswordChange: claim.RequiredPasswordChange,
+		OrgType:                utils.ToOptNil[oas.OptNilInt](orgType),
+		OrganizationRole:       utils.ToOptNil[oas.OptNilString](claim.OrganizationRole),
+		OrganizationCode:       utils.ToOptNil[oas.OptNilString](claim.OrganizationCode),
+		OrganizationID:         utils.ToOptNil[oas.OptNilString](claim.OrganizationID),
 	}, nil
 }
 
