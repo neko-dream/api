@@ -127,6 +127,11 @@ func (t *talkSessionAccessControl) UserSatisfiesRestriction(ctx context.Context,
 		return nil, messages.UserNotFoundError
 	}
 
+	// セッション作成者なら参加可能
+	if talkSession.OwnerUserID() == userID {
+		return nil, nil
+	}
+
 	// 参加制限がない場合は参加可能
 	if len(talkSession.Restrictions()) == 0 {
 		return nil, nil

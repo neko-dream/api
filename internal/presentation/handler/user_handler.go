@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/neko-dream/server/internal/application/command/user_command"
 	opinion_query "github.com/neko-dream/server/internal/application/query/opinion"
 	talksession_query "github.com/neko-dream/server/internal/application/query/talksession"
 	user_query "github.com/neko-dream/server/internal/application/query/user"
+	"github.com/neko-dream/server/internal/application/usecase/user_usecase"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -27,8 +27,8 @@ type userHandler struct {
 	getMyOpinionsQuery           opinion_query.GetMyOpinionsQuery
 	browseJoinedTalkSessionQuery talksession_query.BrowseJoinedTalkSessionsQuery
 
-	editUser     user_command.Edit
-	registerUser user_command.Register
+	editUser     user_usecase.Edit
+	registerUser user_usecase.Register
 
 	userDetail user_query.Detail
 	cookie.CookieManager
@@ -38,8 +38,8 @@ func NewUserHandler(
 	getMyOpinionsQuery opinion_query.GetMyOpinionsQuery,
 	browseJoinedTalkSessionQuery talksession_query.BrowseJoinedTalkSessionsQuery,
 
-	editUser user_command.Edit,
-	registerUser user_command.Register,
+	editUser user_usecase.Edit,
+	registerUser user_usecase.Register,
 
 	userDetail user_query.Detail,
 	cookieManager cookie.CookieManager,
@@ -196,7 +196,7 @@ func (u *userHandler) SessionsHistory(ctx context.Context, params oas.SessionsHi
 			TalkSession: oas.TalkSession{
 				ID:    talkSession.TalkSessionID.String(),
 				Theme: talkSession.Theme,
-				Owner: oas.User{
+				Owner: oas.TalkSessionOwner{
 					DisplayID:   talkSession.User.DisplayID,
 					DisplayName: talkSession.User.DisplayName,
 					IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.User.IconURL),
@@ -302,12 +302,12 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 }
 
 // EditUserProfile ユーザープロフィールの編集
-func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUserProfileReq) (oas.EditUserProfileRes, error) {
+func (u *userHandler) EditUserProfile(ctx context.Context, params *oas.EditUserProfileReq) (oas.EditUserProfileRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "userHandler.EditUserProfile")
 	defer span.End()
 
 	claim := session.GetSession(ctx)
-	if !params.IsSet() {
+	if params == nil {
 		return nil, messages.RequiredParameterError
 	}
 	userID, err := claim.UserID()
@@ -315,7 +315,7 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 		utils.HandleError(ctx, err, "claim.UserID")
 		return nil, messages.InternalServerError
 	}
-	value := params.Value
+	value := params
 	if err := value.Validate(); err != nil {
 		utils.HandleError(ctx, err, "value.Validate")
 		return nil, messages.RequiredParameterError
@@ -381,7 +381,7 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 		}
 	}
 
-	out, err := u.editUser.Execute(ctx, user_command.EditInput{
+	out, err := u.editUser.Execute(ctx, user_usecase.EditInput{
 		UserID:      userID,
 		DisplayName: displayName,
 		Icon:        file,
@@ -408,12 +408,12 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 }
 
 // RegisterUser ユーザー登録
-func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUserReq) (oas.RegisterUserRes, error) {
+func (u *userHandler) RegisterUser(ctx context.Context, params *oas.RegisterUserReq) (oas.RegisterUserRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "userHandler.RegisterUser")
 	defer span.End()
 
 	claim := session.GetSession(ctx)
-	if !params.IsSet() {
+	if params == nil {
 		return nil, messages.RequiredParameterError
 	}
 	var err error
@@ -434,7 +434,7 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 		utils.HandleError(ctx, err, "claim.UserID")
 		return nil, messages.InternalServerError
 	}
-	value := params.Value
+	value := params
 	if err := value.Validate(); err != nil {
 		utils.HandleError(ctx, err, "value.Validate")
 		return nil, messages.RequiredParameterError
@@ -476,7 +476,7 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 		return nil, messages.UserDisplayNameTooShort
 	}
 
-	input := user_command.RegisterInput{
+	input := user_usecase.RegisterInput{
 		SessionID:   sessionID,
 		UserID:      userID,
 		DisplayID:   value.DisplayID,

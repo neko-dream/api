@@ -9,7 +9,7 @@ RUN bun install
 COPY admin-ui ./
 RUN VITE_API_URL=${API_URL} bun build:dev
 
-FROM golang:1.24.2-alpine AS builder
+FROM golang:1.24.3-alpine AS builder
 
 ENV CGO_ENABLED=0
 ENV GOOS=linux

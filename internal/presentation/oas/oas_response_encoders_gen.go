@@ -114,16 +114,19 @@ func encodeAuthorizeResponse(response AuthorizeRes, w http.ResponseWriter, span 
 					Explode: false,
 				}
 				if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
-					return e.EncodeArray(func(e uri.Encoder) error {
-						for i, item := range response.SetCookie {
-							if err := func() error {
-								return e.EncodeValue(conv.StringToString(item))
-							}(); err != nil {
-								return errors.Wrapf(err, "[%d]", i)
+					if response.SetCookie != nil {
+						return e.EncodeArray(func(e uri.Encoder) error {
+							for i, item := range response.SetCookie {
+								if err := func() error {
+									return e.EncodeValue(conv.StringToString(item))
+								}(); err != nil {
+									return errors.Wrapf(err, "[%d]", i)
+								}
 							}
-						}
-						return nil
-					})
+							return nil
+						})
+					}
+					return nil
 				}); err != nil {
 					return errors.Wrap(err, "encode Set-Cookie header")
 				}
@@ -750,39 +753,6 @@ func encodeGetOpinionAnalysisResponse(response GetOpinionAnalysisRes, w http.Res
 		return nil
 
 	case *GetOpinionAnalysisInternalServerError:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(500)
-		span.SetStatus(codes.Error, http.StatusText(500))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
-func encodeGetOpinionDetailResponse(response GetOpinionDetailRes, w http.ResponseWriter, span trace.Span) error {
-	switch response := response.(type) {
-	case *GetOpinionDetailOK:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *GetOpinionDetailInternalServerError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))
@@ -1914,52 +1884,6 @@ func encodeOAuthTokenRevokeResponse(response OAuthTokenRevokeRes, w http.Respons
 	}
 }
 
-func encodeOpinionCommentsResponse(response OpinionCommentsRes, w http.ResponseWriter, span trace.Span) error {
-	switch response := response.(type) {
-	case *OpinionCommentsOK:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *OpinionCommentsBadRequest:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(400)
-		span.SetStatus(codes.Error, http.StatusText(400))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *OpinionCommentsInternalServerError:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(500)
-		span.SetStatus(codes.Error, http.StatusText(500))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
 func encodeOpinionComments2Response(response OpinionComments2Res, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
 	case *OpinionComments2OK:
@@ -2265,52 +2189,6 @@ func encodePostImageResponse(response PostImageRes, w http.ResponseWriter, span 
 		return nil
 
 	case *PostImageInternalServerError:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(500)
-		span.SetStatus(codes.Error, http.StatusText(500))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
-func encodePostOpinionPostResponse(response PostOpinionPostRes, w http.ResponseWriter, span trace.Span) error {
-	switch response := response.(type) {
-	case *PostOpinionPostOK:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *PostOpinionPostBadRequest:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(400)
-		span.SetStatus(codes.Error, http.StatusText(400))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *PostOpinionPostInternalServerError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))
@@ -2756,9 +2634,9 @@ func encodeToggleReportVisibilityManageResponse(response *ToggleReportVisibility
 	return nil
 }
 
-func encodeVoteResponse(response VoteRes, w http.ResponseWriter, span trace.Span) error {
+func encodeValidateOrganizationCodeResponse(response ValidateOrganizationCodeRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *VoteOKApplicationJSON:
+	case *ValidateOrganizationCodeOK:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -2771,7 +2649,7 @@ func encodeVoteResponse(response VoteRes, w http.ResponseWriter, span trace.Span
 
 		return nil
 
-	case *VoteBadRequest:
+	case *ValidateOrganizationCodeBadRequest:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
@@ -2784,7 +2662,7 @@ func encodeVoteResponse(response VoteRes, w http.ResponseWriter, span trace.Span
 
 		return nil
 
-	case *VoteInternalServerError:
+	case *ValidateOrganizationCodeInternalServerError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))

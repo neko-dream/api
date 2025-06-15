@@ -23,12 +23,14 @@ type ActionItem struct {
 }
 
 type AuthState struct {
-	ID          int32
-	State       string
-	Provider    string
-	RedirectUrl string
-	CreatedAt   time.Time
-	ExpiresAt   time.Time
+	ID              int32
+	State           string
+	Provider        string
+	RedirectUrl     string
+	CreatedAt       time.Time
+	ExpiresAt       time.Time
+	RegistrationUrl sql.NullString
+	OrganizationID  uuid.NullUUID
 }
 
 type Opinion struct {
@@ -60,6 +62,7 @@ type Organization struct {
 	OrganizationType int32
 	Name             string
 	OwnerID          uuid.UUID
+	Code             string
 }
 
 type OrganizationUser struct {
@@ -116,6 +119,7 @@ type Session struct {
 	ExpiresAt      time.Time
 	CreatedAt      time.Time
 	LastActivityAt time.Time
+	OrganizationID uuid.NullUUID
 }
 
 type TalkSession struct {

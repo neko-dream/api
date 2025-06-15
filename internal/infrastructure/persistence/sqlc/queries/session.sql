@@ -5,7 +5,7 @@ FROM sessions
     AND session_status = 0;
 
 -- name: CreateSession :exec
-INSERT INTO sessions (session_id, user_id, provider, session_status, created_at, expires_at, last_activity_at) VALUES ($1, $2, $3, $4, $5, $6, $7);
+INSERT INTO sessions (session_id, user_id, provider, session_status, created_at, expires_at, last_activity_at, organization_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
 
 -- name: DeactivateSessions :exec
 UPDATE sessions

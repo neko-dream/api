@@ -13,6 +13,7 @@ type RestrictionAttribute struct {
 	Key         RestrictionAttributeKey
 	Description string
 	Order       int
+	DependsOn   []RestrictionAttributeKey
 	// IsSatisfied ユーザーが条件を満たしているかを判定する
 	IsSatisfied func(user user.User) bool
 }
@@ -57,7 +58,9 @@ var (
 					return false
 				}
 				return user.Demographics().City() != nil
-			}},
+			},
+			DependsOn: []RestrictionAttributeKey{DemographicsPrefecture},
+		},
 		DemographicsPrefecture: {
 			Key:         DemographicsPrefecture,
 			Description: "都道府県",

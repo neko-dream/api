@@ -20,7 +20,7 @@ var skipOperations = []string{
 	"OAuthTokenInfo",
 }
 
-func (s *securityHandler) HandleApiKeyAuth(ctx context.Context, operationName string, t oas.ApiKeyAuth) (context.Context, error) {
+func (s *securityHandler) HandleCookieAuth(ctx context.Context, operationName string, t oas.CookieAuth) (context.Context, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "securityHandler.HandleSessionId")
 	defer span.End()
 

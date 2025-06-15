@@ -32,7 +32,10 @@ type (
 		IsRegistered           bool    `json:"isRegistered"`
 		IsEmailVerified        bool    `json:"isEmailVerified"`
 		RequiredPasswordChange bool    `json:"requiredPasswordChange"`
-		OrgType                *int    `json:"orgType,omitempty"` // 組織の種類
+		OrgType                *int    `json:"orgType,omitempty"`          // 組織の種類
+		OrganizationID         *string `json:"organizationID,omitempty"`   // ログイン時に使用した組織ID
+		OrganizationCode       *string `json:"organizationCode,omitempty"` // ログイン時に使用した組織コード
+		OrganizationRole       *string `json:"organizationRole,omitempty"` // 組織でのロール名
 	}
 )
 
@@ -52,6 +55,28 @@ func NewClaim(ctx context.Context, user user.User, sessionID shared.UUID[Session
 		IsEmailVerified:        user.IsEmailVerified(),
 		RequiredPasswordChange: requiredPasswordChange,
 		OrgType:                orgType,
+	}
+}
+
+func NewClaimWithOrganization(ctx context.Context, user user.User, sessionID shared.UUID[Session], requiredPasswordChange bool, orgType *int, organizationID *string, organizationCode *string, organizationRole *string) Claim {
+	ctx, span := otel.Tracer("session").Start(ctx, "NewClaimWithOrganization")
+	defer span.End()
+	now := clock.Now(ctx)
+	return Claim{
+		Sub:                    user.UserID().String(),
+		Iat:                    now.Unix(),
+		Exp:                    now.Add(time.Second * 60 * 60 * 24 * 7).Unix(),
+		Jti:                    sessionID.String(),
+		IconURL:                user.IconURL(),
+		DisplayID:              user.DisplayID(),
+		DisplayName:            user.DisplayName(),
+		IsRegistered:           user.Verify(),
+		IsEmailVerified:        user.IsEmailVerified(),
+		RequiredPasswordChange: requiredPasswordChange,
+		OrgType:                orgType,
+		OrganizationID:         organizationID,
+		OrganizationCode:       organizationCode,
+		OrganizationRole:       organizationRole,
 	}
 }
 
@@ -79,6 +104,18 @@ func NewClaimFromMap(claims jwt.MapClaims) Claim {
 	if claims["orgType"] != nil {
 		orgType = lo.ToPtr(int(claims["orgType"].(float64)))
 	}
+	var organizationID *string
+	if claims["organizationID"] != nil {
+		organizationID = lo.ToPtr(claims["organizationID"].(string))
+	}
+	var organizationCode *string
+	if claims["organizationCode"] != nil {
+		organizationCode = lo.ToPtr(claims["organizationCode"].(string))
+	}
+	var organizationRole *string
+	if claims["organizationRole"] != nil {
+		organizationRole = lo.ToPtr(claims["organizationRole"].(string))
+	}
 
 	return Claim{
 		Sub:                    claims["sub"].(string),
@@ -92,6 +129,9 @@ func NewClaimFromMap(claims jwt.MapClaims) Claim {
 		IsEmailVerified:        isEmailVerified,
 		RequiredPasswordChange: requiredPasswordChange,
 		OrgType:                orgType,
+		OrganizationID:         organizationID,
+		OrganizationCode:       organizationCode,
+		OrganizationRole:       organizationRole,
 	}
 }
 
@@ -147,6 +187,18 @@ func (c *Claim) GenMapClaim() *jwt.MapClaims {
 		(*cl)["orgType"] = *c.OrgType
 	} else {
 		(*cl)["orgType"] = nil
+	}
+
+	if c.OrganizationID != nil {
+		(*cl)["organizationID"] = *c.OrganizationID
+	}
+
+	if c.OrganizationCode != nil {
+		(*cl)["organizationCode"] = *c.OrganizationCode
+	}
+
+	if c.OrganizationRole != nil {
+		(*cl)["organizationRole"] = *c.OrganizationRole
 	}
 
 	return cl

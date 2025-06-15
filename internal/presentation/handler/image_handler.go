@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 
-	"github.com/neko-dream/server/internal/application/command/image_command"
+	"github.com/neko-dream/server/internal/application/usecase/image_usecase"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/presentation/oas"
@@ -13,11 +13,11 @@ import (
 )
 
 type imageHandler struct {
-	image_command.UploadImage
+	image_usecase.UploadImage
 }
 
 func NewImageHandler(
-	uploadImage image_command.UploadImage,
+	uploadImage image_usecase.UploadImage,
 ) oas.ImageHandler {
 	return &imageHandler{
 		UploadImage: uploadImage,
@@ -25,7 +25,7 @@ func NewImageHandler(
 }
 
 // PostImage POST /image
-func (i *imageHandler) PostImage(ctx context.Context, req oas.OptPostImageReq) (oas.PostImageRes, error) {
+func (i *imageHandler) PostImage(ctx context.Context, req *oas.PostImageReq) (oas.PostImageRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "imageHandler.PostImage")
 	defer span.End()
 
@@ -40,13 +40,13 @@ func (i *imageHandler) PostImage(ctx context.Context, req oas.OptPostImageReq) (
 		return nil, messages.ForbiddenError
 	}
 
-	file, err := http_utils.CreateFileHeader(ctx, req.Value.GetImage().File, req.Value.GetImage().Name)
+	file, err := http_utils.CreateFileHeader(ctx, req.Image.File, req.GetImage().Name)
 	if err != nil {
 		utils.HandleError(ctx, err, "MakeFileHeader")
 		return nil, messages.InternalServerError
 	}
 
-	input := image_command.UploadImageInput{
+	input := image_usecase.UploadImageInput{
 		OwnerID: userID,
 		Image:   file,
 	}

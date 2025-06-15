@@ -16,8 +16,9 @@ INSERT INTO organizations (
     organization_id,
     organization_type,
     name,
-    owner_id
-) VALUES ($1, $2, $3, $4)
+    owner_id,
+    code
+) VALUES ($1, $2, $3, $4, $5)
 `
 
 type CreateOrganizationParams struct {
@@ -25,6 +26,7 @@ type CreateOrganizationParams struct {
 	OrganizationType int32
 	Name             string
 	OwnerID          uuid.UUID
+	Code             string
 }
 
 // CreateOrganization
@@ -33,14 +35,16 @@ type CreateOrganizationParams struct {
 //	    organization_id,
 //	    organization_type,
 //	    name,
-//	    owner_id
-//	) VALUES ($1, $2, $3, $4)
+//	    owner_id,
+//	    code
+//	) VALUES ($1, $2, $3, $4, $5)
 func (q *Queries) CreateOrganization(ctx context.Context, arg CreateOrganizationParams) error {
 	_, err := q.db.ExecContext(ctx, createOrganization,
 		arg.OrganizationID,
 		arg.OrganizationType,
 		arg.Name,
 		arg.OwnerID,
+		arg.Code,
 	)
 	return err
 }

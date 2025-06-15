@@ -13,7 +13,7 @@ import (
 )
 
 const createSession = `-- name: CreateSession :exec
-INSERT INTO sessions (session_id, user_id, provider, session_status, created_at, expires_at, last_activity_at) VALUES ($1, $2, $3, $4, $5, $6, $7)
+INSERT INTO sessions (session_id, user_id, provider, session_status, created_at, expires_at, last_activity_at, organization_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 `
 
 type CreateSessionParams struct {
@@ -24,11 +24,12 @@ type CreateSessionParams struct {
 	CreatedAt      time.Time
 	ExpiresAt      time.Time
 	LastActivityAt time.Time
+	OrganizationID uuid.NullUUID
 }
 
 // CreateSession
 //
-//	INSERT INTO sessions (session_id, user_id, provider, session_status, created_at, expires_at, last_activity_at) VALUES ($1, $2, $3, $4, $5, $6, $7)
+//	INSERT INTO sessions (session_id, user_id, provider, session_status, created_at, expires_at, last_activity_at, organization_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) error {
 	_, err := q.db.ExecContext(ctx, createSession,
 		arg.SessionID,
@@ -38,6 +39,7 @@ func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) er
 		arg.CreatedAt,
 		arg.ExpiresAt,
 		arg.LastActivityAt,
+		arg.OrganizationID,
 	)
 	return err
 }
@@ -71,7 +73,7 @@ func (q *Queries) DeactivateSessions(ctx context.Context, userID uuid.UUID) erro
 }
 
 const findActiveSessionsByUserID = `-- name: FindActiveSessionsByUserID :many
-SELECT session_id, user_id, provider, session_status, expires_at, created_at, last_activity_at
+SELECT session_id, user_id, provider, session_status, expires_at, created_at, last_activity_at, organization_id
 FROM sessions
     WHERE user_id = $1
     AND session_status = 0
@@ -79,7 +81,7 @@ FROM sessions
 
 // FindActiveSessionsByUserID
 //
-//	SELECT session_id, user_id, provider, session_status, expires_at, created_at, last_activity_at
+//	SELECT session_id, user_id, provider, session_status, expires_at, created_at, last_activity_at, organization_id
 //	FROM sessions
 //	    WHERE user_id = $1
 //	    AND session_status = 0
@@ -100,6 +102,7 @@ func (q *Queries) FindActiveSessionsByUserID(ctx context.Context, userID uuid.UU
 			&i.ExpiresAt,
 			&i.CreatedAt,
 			&i.LastActivityAt,
+			&i.OrganizationID,
 		); err != nil {
 			return nil, err
 		}
@@ -115,14 +118,14 @@ func (q *Queries) FindActiveSessionsByUserID(ctx context.Context, userID uuid.UU
 }
 
 const findSessionBySessionID = `-- name: FindSessionBySessionID :one
-SELECT session_id, user_id, provider, session_status, expires_at, created_at, last_activity_at
+SELECT session_id, user_id, provider, session_status, expires_at, created_at, last_activity_at, organization_id
 FROM sessions
 WHERE session_id = $1
 `
 
 // FindSessionBySessionID
 //
-//	SELECT session_id, user_id, provider, session_status, expires_at, created_at, last_activity_at
+//	SELECT session_id, user_id, provider, session_status, expires_at, created_at, last_activity_at, organization_id
 //	FROM sessions
 //	WHERE session_id = $1
 func (q *Queries) FindSessionBySessionID(ctx context.Context, sessionID uuid.UUID) (Session, error) {
@@ -136,6 +139,7 @@ func (q *Queries) FindSessionBySessionID(ctx context.Context, sessionID uuid.UUI
 		&i.ExpiresAt,
 		&i.CreatedAt,
 		&i.LastActivityAt,
+		&i.OrganizationID,
 	)
 	return i, err
 }

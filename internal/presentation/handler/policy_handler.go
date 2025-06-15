@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/neko-dream/server/internal/application/command/policy_command"
 	"github.com/neko-dream/server/internal/application/query/policy_query"
+	"github.com/neko-dream/server/internal/application/usecase/policy_usecase"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -19,12 +19,12 @@ import (
 
 type policyHandler struct {
 	checkConsentQuery policy_query.CheckConsent
-	acceptPolicy      policy_command.AcceptPolicy
+	acceptPolicy      policy_usecase.AcceptPolicy
 }
 
 func NewPolicyHandler(
 	checkConsentQuery policy_query.CheckConsent,
-	acceptPolicy policy_command.AcceptPolicy,
+	acceptPolicy policy_usecase.AcceptPolicy,
 ) oas.PolicyHandler {
 	return &policyHandler{
 		checkConsentQuery: checkConsentQuery,
@@ -65,7 +65,7 @@ func (h *policyHandler) GetPolicyConsentStatus(ctx context.Context) (oas.GetPoli
 	}, nil
 }
 
-func (h *policyHandler) PolicyConsent(ctx context.Context, req oas.OptPolicyConsentReq) (oas.PolicyConsentRes, error) {
+func (h *policyHandler) PolicyConsent(ctx context.Context, req *oas.PolicyConsentReq) (oas.PolicyConsentRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "PolicyHandler.AcceptPolicy")
 	defer span.End()
 	claim := session.GetSession(ctx)
@@ -78,7 +78,7 @@ func (h *policyHandler) PolicyConsent(ctx context.Context, req oas.OptPolicyCons
 		return nil, messages.ForbiddenError
 	}
 
-	if !req.IsSet() {
+	if req == nil {
 		return nil, messages.BadRequestError
 	}
 
@@ -86,9 +86,9 @@ func (h *policyHandler) PolicyConsent(ctx context.Context, req oas.OptPolicyCons
 	ipAddress := request.Header.Get("X-Forwarded-For")
 	userAgent := request.Header.Get("User-Agent")
 
-	output, err := h.acceptPolicy.Execute(ctx, policy_command.AcceptPolicyInput{
+	output, err := h.acceptPolicy.Execute(ctx, policy_usecase.AcceptPolicyInput{
 		UserID:    shared.UUID[user.User](userID),
-		Version:   req.Value.PolicyVersion,
+		Version:   req.PolicyVersion,
 		IPAddress: ipAddress,
 		UserAgent: userAgent,
 	})
@@ -102,7 +102,7 @@ func (h *policyHandler) PolicyConsent(ctx context.Context, req oas.OptPolicyCons
 	}
 
 	return &oas.PolicyConsentStatus{
-		PolicyVersion: req.Value.PolicyVersion,
+		PolicyVersion: req.PolicyVersion,
 		ConsentedAt:   utils.ToOptNil[oas.OptNilString](consentedAt),
 		ConsentGiven:  output.Success,
 	}, nil

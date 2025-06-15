@@ -62,56 +62,8 @@ func (s *Server) handleAuthAccountDetachRequest(args [0]string, argsEscaped bool
 			span.SetStatus(codes.Error, stage)
 			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
 		}
-		err          error
-		opErrContext = ogenerrors.OperationContext{
-			Name: "AuthAccountDetach",
-			ID:   "authAccountDetach",
-		}
+		err error
 	)
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "AuthAccountDetach", r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
-					Err:              err,
-				}
-				defer recordError("Security:ApiKeyAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 0
-				ctx = sctx
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			err = &ogenerrors.SecurityError{
-				OperationContext: opErrContext,
-				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
-			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
-			return
-		}
-	}
 
 	var response AuthAccountDetachRes
 	if m := s.cfg.Middleware; m != nil {
@@ -237,6 +189,14 @@ func (s *Server) handleAuthorizeRequest(args [1]string, argsEscaped bool, w http
 					Name: "redirect_url",
 					In:   "query",
 				}: params.RedirectURL,
+				{
+					Name: "organization_code",
+					In:   "query",
+				}: params.OrganizationCode,
+				{
+					Name: "registration_url",
+					In:   "query",
+				}: params.RegistrationURL,
 			},
 			Raw: r,
 		}
@@ -329,14 +289,14 @@ func (s *Server) handleChangePasswordRequest(args [0]string, argsEscaped bool, w
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "ChangePassword", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "ChangePassword", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -489,14 +449,14 @@ func (s *Server) handleConsentTalkSessionRequest(args [1]string, argsEscaped boo
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "ConsentTalkSession", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "ConsentTalkSession", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -650,14 +610,14 @@ func (s *Server) handleCreateOrganizationsRequest(args [0]string, argsEscaped bo
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "CreateOrganizations", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "CreateOrganizations", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -719,7 +679,7 @@ func (s *Server) handleCreateOrganizationsRequest(args [0]string, argsEscaped bo
 		}
 
 		type (
-			Request  = OptCreateOrganizationsReq
+			Request  = *CreateOrganizationsReq
 			Params   = struct{}
 			Response = CreateOrganizationsRes
 		)
@@ -813,14 +773,14 @@ func (s *Server) handleCreateTalkSessionRequest(args [0]string, argsEscaped bool
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "CreateTalkSession", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "CreateTalkSession", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -882,7 +842,7 @@ func (s *Server) handleCreateTalkSessionRequest(args [0]string, argsEscaped bool
 		}
 
 		type (
-			Request  = OptCreateTalkSessionReq
+			Request  = *CreateTalkSessionReq
 			Params   = struct{}
 			Response = CreateTalkSessionRes
 		)
@@ -993,6 +953,10 @@ func (s *Server) handleDevAuthorizeRequest(args [0]string, argsEscaped bool, w h
 					Name: "id",
 					In:   "query",
 				}: params.ID,
+				{
+					Name: "organization_code",
+					In:   "query",
+				}: params.OrganizationCode,
 			},
 			Raw: r,
 		}
@@ -1075,8 +1039,56 @@ func (s *Server) handleDummiInitRequest(args [0]string, argsEscaped bool, w http
 			span.SetStatus(codes.Error, stage)
 			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
 		}
-		err error
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "DummiInit",
+			ID:   "dummiInit",
+		}
 	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityCookieAuth(ctx, "DummiInit", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "CookieAuth",
+					Err:              err,
+				}
+				defer recordError("Security:CookieAuth", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			defer recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
 
 	var response DummiInitRes
 	if m := s.cfg.Middleware; m != nil {
@@ -1178,14 +1190,14 @@ func (s *Server) handleEditTalkSessionRequest(args [1]string, argsEscaped bool, 
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "EditTalkSession", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "EditTalkSession", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -1262,7 +1274,7 @@ func (s *Server) handleEditTalkSessionRequest(args [1]string, argsEscaped bool, 
 		}
 
 		type (
-			Request  = OptEditTalkSessionReq
+			Request  = *EditTalkSessionReq
 			Params   = EditTalkSessionParams
 			Response = EditTalkSessionRes
 		)
@@ -1349,14 +1361,14 @@ func (s *Server) handleEditTimeLineRequest(args [2]string, argsEscaped bool, w h
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "EditTimeLine", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "EditTimeLine", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -1437,7 +1449,7 @@ func (s *Server) handleEditTimeLineRequest(args [2]string, argsEscaped bool, w h
 		}
 
 		type (
-			Request  = OptEditTimeLineReq
+			Request  = *EditTimeLineReq
 			Params   = EditTimeLineParams
 			Response = EditTimeLineRes
 		)
@@ -1524,14 +1536,14 @@ func (s *Server) handleEditUserProfileRequest(args [0]string, argsEscaped bool, 
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "EditUserProfile", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "EditUserProfile", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -1593,7 +1605,7 @@ func (s *Server) handleEditUserProfileRequest(args [0]string, argsEscaped bool, 
 		}
 
 		type (
-			Request  = OptEditUserProfileReq
+			Request  = *EditUserProfileReq
 			Params   = struct{}
 			Response = EditUserProfileRes
 		)
@@ -1678,14 +1690,14 @@ func (s *Server) handleGetAnalysisReportManageRequest(args [1]string, argsEscape
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "GetAnalysisReportManage", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "GetAnalysisReportManage", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -1830,6 +1842,50 @@ func (s *Server) handleGetConclusionRequest(args [1]string, argsEscaped bool, w 
 			ID:   "getConclusion",
 		}
 	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityCookieAuth(ctx, "GetConclusion", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "CookieAuth",
+					Err:              err,
+				}
+				defer recordError("Security:CookieAuth", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			defer recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
 	params, err := decodeGetConclusionParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
@@ -1946,14 +2002,14 @@ func (s *Server) handleGetOpenedTalkSessionRequest(args [0]string, argsEscaped b
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "GetOpenedTalkSession", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "GetOpenedTalkSession", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -2110,6 +2166,50 @@ func (s *Server) handleGetOpinionAnalysisRequest(args [1]string, argsEscaped boo
 			ID:   "getOpinionAnalysis",
 		}
 	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityCookieAuth(ctx, "GetOpinionAnalysis", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "CookieAuth",
+					Err:              err,
+				}
+				defer recordError("Security:CookieAuth", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			defer recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
 	params, err := decodeGetOpinionAnalysisParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
@@ -2174,124 +2274,6 @@ func (s *Server) handleGetOpinionAnalysisRequest(args [1]string, argsEscaped boo
 	}
 }
 
-// handleGetOpinionDetailRequest handles getOpinionDetail operation.
-//
-// 意見の詳細.
-//
-// Deprecated: schema marks this operation as deprecated.
-//
-// GET /talksessions/{talkSessionID}/opinions/{opinionID}
-func (s *Server) handleGetOpinionDetailRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("getOpinionDetail"),
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/opinions/{opinionID}"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "GetOpinionDetail",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
-
-	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
-		err          error
-		opErrContext = ogenerrors.OperationContext{
-			Name: "GetOpinionDetail",
-			ID:   "getOpinionDetail",
-		}
-	)
-	params, err := decodeGetOpinionDetailParams(args, argsEscaped, r)
-	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		defer recordError("DecodeParams", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-
-	var response GetOpinionDetailRes
-	if m := s.cfg.Middleware; m != nil {
-		mreq := middleware.Request{
-			Context:          ctx,
-			OperationName:    "GetOpinionDetail",
-			OperationSummary: "意見の詳細",
-			OperationID:      "getOpinionDetail",
-			Body:             nil,
-			Params: middleware.Parameters{
-				{
-					Name: "talkSessionID",
-					In:   "path",
-				}: params.TalkSessionID,
-				{
-					Name: "opinionID",
-					In:   "path",
-				}: params.OpinionID,
-			},
-			Raw: r,
-		}
-
-		type (
-			Request  = struct{}
-			Params   = GetOpinionDetailParams
-			Response = GetOpinionDetailRes
-		)
-		response, err = middleware.HookMiddleware[
-			Request,
-			Params,
-			Response,
-		](
-			m,
-			mreq,
-			unpackGetOpinionDetailParams,
-			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.GetOpinionDetail(ctx, params)
-				return response, err
-			},
-		)
-	} else {
-		response, err = s.h.GetOpinionDetail(ctx, params)
-	}
-	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-
-	if err := encodeGetOpinionDetailResponse(response, w, span); err != nil {
-		defer recordError("EncodeResponse", err)
-		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
-			s.cfg.ErrorHandler(ctx, w, r, err)
-		}
-		return
-	}
-}
-
 // handleGetOpinionDetail2Request handles getOpinionDetail2 operation.
 //
 // 意見詳細.
@@ -2340,6 +2322,50 @@ func (s *Server) handleGetOpinionDetail2Request(args [1]string, argsEscaped bool
 			ID:   "getOpinionDetail2",
 		}
 	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityCookieAuth(ctx, "GetOpinionDetail2", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "CookieAuth",
+					Err:              err,
+				}
+				defer recordError("Security:CookieAuth", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			defer recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
 	params, err := decodeGetOpinionDetail2Params(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
@@ -2446,8 +2472,56 @@ func (s *Server) handleGetOpinionReportReasonsRequest(args [0]string, argsEscape
 			span.SetStatus(codes.Error, stage)
 			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
 		}
-		err error
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "GetOpinionReportReasons",
+			ID:   "getOpinionReportReasons",
+		}
 	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityCookieAuth(ctx, "GetOpinionReportReasons", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "CookieAuth",
+					Err:              err,
+				}
+				defer recordError("Security:CookieAuth", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			defer recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
 
 	var response GetOpinionReportReasonsRes
 	if m := s.cfg.Middleware; m != nil {
@@ -2549,14 +2623,14 @@ func (s *Server) handleGetOpinionReportsRequest(args [1]string, argsEscaped bool
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "GetOpinionReports", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "GetOpinionReports", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -2701,6 +2775,50 @@ func (s *Server) handleGetOpinionsForTalkSessionRequest(args [1]string, argsEsca
 			ID:   "getOpinionsForTalkSession",
 		}
 	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityCookieAuth(ctx, "GetOpinionsForTalkSession", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "CookieAuth",
+					Err:              err,
+				}
+				defer recordError("Security:CookieAuth", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			defer recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
 	params, err := decodeGetOpinionsForTalkSessionParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
@@ -2833,14 +2951,14 @@ func (s *Server) handleGetOrganizationsRequest(args [0]string, argsEscaped bool,
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "GetOrganizations", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "GetOrganizations", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -2974,14 +3092,14 @@ func (s *Server) handleGetPolicyConsentStatusRequest(args [0]string, argsEscaped
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "GetPolicyConsentStatus", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "GetPolicyConsentStatus", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -3115,14 +3233,14 @@ func (s *Server) handleGetReportsForTalkSessionRequest(args [1]string, argsEscap
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "GetReportsForTalkSession", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "GetReportsForTalkSession", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -3271,6 +3389,50 @@ func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped b
 			ID:   "getTalkSessionDetail",
 		}
 	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityCookieAuth(ctx, "GetTalkSessionDetail", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "CookieAuth",
+					Err:              err,
+				}
+				defer recordError("Security:CookieAuth", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			defer recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
 	params, err := decodeGetTalkSessionDetailParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
@@ -3383,6 +3545,50 @@ func (s *Server) handleGetTalkSessionListRequest(args [0]string, argsEscaped boo
 			ID:   "getTalkSessionList",
 		}
 	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityCookieAuth(ctx, "GetTalkSessionList", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "CookieAuth",
+					Err:              err,
+				}
+				defer recordError("Security:CookieAuth", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			defer recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
 	params, err := decodeGetTalkSessionListParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
@@ -3521,14 +3727,14 @@ func (s *Server) handleGetTalkSessionListManageRequest(args [0]string, argsEscap
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "GetTalkSessionListManage", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "GetTalkSessionListManage", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -3683,14 +3889,14 @@ func (s *Server) handleGetTalkSessionManageRequest(args [1]string, argsEscaped b
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "GetTalkSessionManage", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "GetTalkSessionManage", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -3835,6 +4041,50 @@ func (s *Server) handleGetTalkSessionReportRequest(args [1]string, argsEscaped b
 			ID:   "getTalkSessionReport",
 		}
 	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityCookieAuth(ctx, "GetTalkSessionReport", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "CookieAuth",
+					Err:              err,
+				}
+				defer recordError("Security:CookieAuth", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			defer recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
 	params, err := decodeGetTalkSessionReportParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
@@ -3951,14 +4201,14 @@ func (s *Server) handleGetTalkSessionReportCountRequest(args [1]string, argsEsca
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "GetTalkSessionReportCount", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "GetTalkSessionReportCount", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -4101,8 +4351,56 @@ func (s *Server) handleGetTalkSessionRestrictionKeysRequest(args [0]string, args
 			span.SetStatus(codes.Error, stage)
 			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
 		}
-		err error
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "GetTalkSessionRestrictionKeys",
+			ID:   "getTalkSessionRestrictionKeys",
+		}
 	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityCookieAuth(ctx, "GetTalkSessionRestrictionKeys", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "CookieAuth",
+					Err:              err,
+				}
+				defer recordError("Security:CookieAuth", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			defer recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
 
 	var response GetTalkSessionRestrictionKeysRes
 	if m := s.cfg.Middleware; m != nil {
@@ -4204,14 +4502,14 @@ func (s *Server) handleGetTalkSessionRestrictionSatisfiedRequest(args [1]string,
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "GetTalkSessionRestrictionSatisfied", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "GetTalkSessionRestrictionSatisfied", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -4356,6 +4654,50 @@ func (s *Server) handleGetTimeLineRequest(args [1]string, argsEscaped bool, w ht
 			ID:   "getTimeLine",
 		}
 	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityCookieAuth(ctx, "GetTimeLine", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "CookieAuth",
+					Err:              err,
+				}
+				defer recordError("Security:CookieAuth", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			defer recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
 	params, err := decodeGetTimeLineParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
@@ -4472,14 +4814,14 @@ func (s *Server) handleGetUserInfoRequest(args [0]string, argsEscaped bool, w ht
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "GetUserInfo", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "GetUserInfo", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -4611,14 +4953,14 @@ func (s *Server) handleGetUserListManageRequest(args [0]string, argsEscaped bool
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "GetUserListManage", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "GetUserListManage", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -4781,14 +5123,14 @@ func (s *Server) handleGetUserStatsListManageRequest(args [0]string, argsEscaped
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "GetUserStatsListManage", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "GetUserStatsListManage", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -4943,14 +5285,14 @@ func (s *Server) handleGetUserStatsTotalManageRequest(args [0]string, argsEscape
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "GetUserStatsTotalManage", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "GetUserStatsTotalManage", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -5084,14 +5426,14 @@ func (s *Server) handleHasConsentRequest(args [1]string, argsEscaped bool, w htt
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "HasConsent", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "HasConsent", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -5336,14 +5678,14 @@ func (s *Server) handleInviteOrganizationRequest(args [1]string, argsEscaped boo
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "InviteOrganization", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "InviteOrganization", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -5420,7 +5762,7 @@ func (s *Server) handleInviteOrganizationRequest(args [1]string, argsEscaped boo
 		}
 
 		type (
-			Request  = OptInviteOrganizationReq
+			Request  = *InviteOrganizationReq
 			Params   = InviteOrganizationParams
 			Response = InviteOrganizationRes
 		)
@@ -5507,14 +5849,14 @@ func (s *Server) handleInviteOrganizationForUserRequest(args [1]string, argsEsca
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "InviteOrganizationForUser", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "InviteOrganizationForUser", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -5591,7 +5933,7 @@ func (s *Server) handleInviteOrganizationForUserRequest(args [1]string, argsEsca
 		}
 
 		type (
-			Request  = OptInviteOrganizationForUserReq
+			Request  = *InviteOrganizationForUserReq
 			Params   = InviteOrganizationForUserParams
 			Response = InviteOrganizationForUserRes
 		)
@@ -5676,14 +6018,14 @@ func (s *Server) handleManageRegenerateManageRequest(args [1]string, argsEscaped
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "ManageRegenerateManage", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "ManageRegenerateManage", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -5967,14 +6309,14 @@ func (s *Server) handleOAuthTokenInfoRequest(args [0]string, argsEscaped bool, w
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "OAuthTokenInfo", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "OAuthTokenInfo", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -6108,14 +6450,14 @@ func (s *Server) handleOAuthTokenRevokeRequest(args [0]string, argsEscaped bool,
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "OAuthTokenRevoke", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "OAuthTokenRevoke", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -6197,124 +6539,6 @@ func (s *Server) handleOAuthTokenRevokeRequest(args [0]string, argsEscaped bool,
 	}
 }
 
-// handleOpinionCommentsRequest handles opinionComments operation.
-//
-// 意見に対するリプライ意見一覧.
-//
-// Deprecated: schema marks this operation as deprecated.
-//
-// GET /talksessions/{talkSessionID}/opinions/{opinionID}/replies
-func (s *Server) handleOpinionCommentsRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("opinionComments"),
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/opinions/{opinionID}/replies"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "OpinionComments",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
-
-	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
-		err          error
-		opErrContext = ogenerrors.OperationContext{
-			Name: "OpinionComments",
-			ID:   "opinionComments",
-		}
-	)
-	params, err := decodeOpinionCommentsParams(args, argsEscaped, r)
-	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		defer recordError("DecodeParams", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-
-	var response OpinionCommentsRes
-	if m := s.cfg.Middleware; m != nil {
-		mreq := middleware.Request{
-			Context:          ctx,
-			OperationName:    "OpinionComments",
-			OperationSummary: "意見に対するリプライ意見一覧",
-			OperationID:      "opinionComments",
-			Body:             nil,
-			Params: middleware.Parameters{
-				{
-					Name: "talkSessionID",
-					In:   "path",
-				}: params.TalkSessionID,
-				{
-					Name: "opinionID",
-					In:   "path",
-				}: params.OpinionID,
-			},
-			Raw: r,
-		}
-
-		type (
-			Request  = struct{}
-			Params   = OpinionCommentsParams
-			Response = OpinionCommentsRes
-		)
-		response, err = middleware.HookMiddleware[
-			Request,
-			Params,
-			Response,
-		](
-			m,
-			mreq,
-			unpackOpinionCommentsParams,
-			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.OpinionComments(ctx, params)
-				return response, err
-			},
-		)
-	} else {
-		response, err = s.h.OpinionComments(ctx, params)
-	}
-	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-
-	if err := encodeOpinionCommentsResponse(response, w, span); err != nil {
-		defer recordError("EncodeResponse", err)
-		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
-			s.cfg.ErrorHandler(ctx, w, r, err)
-		}
-		return
-	}
-}
-
 // handleOpinionComments2Request handles opinionComments2 operation.
 //
 // 意見に対するリプライ意見一覧.
@@ -6363,6 +6587,50 @@ func (s *Server) handleOpinionComments2Request(args [1]string, argsEscaped bool,
 			ID:   "opinionComments2",
 		}
 	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityCookieAuth(ctx, "OpinionComments2", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "CookieAuth",
+					Err:              err,
+				}
+				defer recordError("Security:CookieAuth", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			defer recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
 	params, err := decodeOpinionComments2Params(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
@@ -6479,14 +6747,14 @@ func (s *Server) handleOpinionsHistoryRequest(args [0]string, argsEscaped bool, 
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "OpinionsHistory", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "OpinionsHistory", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -6668,7 +6936,7 @@ func (s *Server) handlePasswordLoginRequest(args [0]string, argsEscaped bool, w 
 		}
 
 		type (
-			Request  = OptPasswordLoginReq
+			Request  = *PasswordLoginReq
 			Params   = struct{}
 			Response = PasswordLoginRes
 		)
@@ -6780,7 +7048,7 @@ func (s *Server) handlePasswordRegisterRequest(args [0]string, argsEscaped bool,
 		}
 
 		type (
-			Request  = OptPasswordRegisterReq
+			Request  = *PasswordRegisterReq
 			Params   = struct{}
 			Response = PasswordRegisterRes
 		)
@@ -6867,14 +7135,14 @@ func (s *Server) handlePolicyConsentRequest(args [0]string, argsEscaped bool, w 
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "PolicyConsent", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "PolicyConsent", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -6936,7 +7204,7 @@ func (s *Server) handlePolicyConsentRequest(args [0]string, argsEscaped bool, w 
 		}
 
 		type (
-			Request  = OptPolicyConsentReq
+			Request  = *PolicyConsentReq
 			Params   = struct{}
 			Response = PolicyConsentRes
 		)
@@ -7024,14 +7292,14 @@ func (s *Server) handlePostConclusionRequest(args [1]string, argsEscaped bool, w
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "PostConclusion", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "PostConclusion", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -7108,7 +7376,7 @@ func (s *Server) handlePostConclusionRequest(args [1]string, argsEscaped bool, w
 		}
 
 		type (
-			Request  = OptPostConclusionReq
+			Request  = *PostConclusionReq
 			Params   = PostConclusionParams
 			Response = PostConclusionRes
 		)
@@ -7195,14 +7463,14 @@ func (s *Server) handlePostImageRequest(args [0]string, argsEscaped bool, w http
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "PostImage", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "PostImage", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -7264,7 +7532,7 @@ func (s *Server) handlePostImageRequest(args [0]string, argsEscaped bool, w http
 		}
 
 		type (
-			Request  = OptPostImageReq
+			Request  = *PostImageReq
 			Params   = struct{}
 			Response = PostImageRes
 		)
@@ -7291,179 +7559,6 @@ func (s *Server) handlePostImageRequest(args [0]string, argsEscaped bool, w http
 	}
 
 	if err := encodePostImageResponse(response, w, span); err != nil {
-		defer recordError("EncodeResponse", err)
-		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
-			s.cfg.ErrorHandler(ctx, w, r, err)
-		}
-		return
-	}
-}
-
-// handlePostOpinionPostRequest handles postOpinionPost operation.
-//
-// ParentOpinionIDがなければルートの意見として投稿される.
-//
-// Deprecated: schema marks this operation as deprecated.
-//
-// POST /talksessions/{talkSessionID}/opinions
-func (s *Server) handlePostOpinionPostRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("postOpinionPost"),
-		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/opinions"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "PostOpinionPost",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Add Labeler to context.
-	labeler := &Labeler{attrs: otelAttrs}
-	ctx = contextWithLabeler(ctx, labeler)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		attrOpt := metric.WithAttributeSet(labeler.AttributeSet())
-
-		// Increment request counter.
-		s.requests.Add(ctx, 1, attrOpt)
-
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), attrOpt)
-	}()
-
-	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
-		}
-		err          error
-		opErrContext = ogenerrors.OperationContext{
-			Name: "PostOpinionPost",
-			ID:   "postOpinionPost",
-		}
-	)
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "PostOpinionPost", r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
-					Err:              err,
-				}
-				defer recordError("Security:ApiKeyAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 0
-				ctx = sctx
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			err = &ogenerrors.SecurityError{
-				OperationContext: opErrContext,
-				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
-			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
-			return
-		}
-	}
-	params, err := decodePostOpinionPostParams(args, argsEscaped, r)
-	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		defer recordError("DecodeParams", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-	request, close, err := s.decodePostOpinionPostRequest(r)
-	if err != nil {
-		err = &ogenerrors.DecodeRequestError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		defer recordError("DecodeRequest", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-	defer func() {
-		if err := close(); err != nil {
-			recordError("CloseRequest", err)
-		}
-	}()
-
-	var response PostOpinionPostRes
-	if m := s.cfg.Middleware; m != nil {
-		mreq := middleware.Request{
-			Context:          ctx,
-			OperationName:    "PostOpinionPost",
-			OperationSummary: "セッションに対して意見投稿",
-			OperationID:      "postOpinionPost",
-			Body:             request,
-			Params: middleware.Parameters{
-				{
-					Name: "talkSessionID",
-					In:   "path",
-				}: params.TalkSessionID,
-			},
-			Raw: r,
-		}
-
-		type (
-			Request  = OptPostOpinionPostReq
-			Params   = PostOpinionPostParams
-			Response = PostOpinionPostRes
-		)
-		response, err = middleware.HookMiddleware[
-			Request,
-			Params,
-			Response,
-		](
-			m,
-			mreq,
-			unpackPostOpinionPostParams,
-			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.PostOpinionPost(ctx, request, params)
-				return response, err
-			},
-		)
-	} else {
-		response, err = s.h.PostOpinionPost(ctx, request, params)
-	}
-	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-
-	if err := encodePostOpinionPostResponse(response, w, span); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -7526,14 +7621,14 @@ func (s *Server) handlePostOpinionPost2Request(args [0]string, argsEscaped bool,
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "PostOpinionPost2", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "PostOpinionPost2", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -7595,7 +7690,7 @@ func (s *Server) handlePostOpinionPost2Request(args [0]string, argsEscaped bool,
 		}
 
 		type (
-			Request  = OptPostOpinionPost2Req
+			Request  = *PostOpinionPost2Req
 			Params   = struct{}
 			Response = PostOpinionPost2Res
 		)
@@ -7682,14 +7777,14 @@ func (s *Server) handlePostTimeLineItemRequest(args [1]string, argsEscaped bool,
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "PostTimeLineItem", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "PostTimeLineItem", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -7766,7 +7861,7 @@ func (s *Server) handlePostTimeLineItemRequest(args [1]string, argsEscaped bool,
 		}
 
 		type (
-			Request  = OptPostTimeLineItemReq
+			Request  = *PostTimeLineItemReq
 			Params   = PostTimeLineItemParams
 			Response = PostTimeLineItemRes
 		)
@@ -7853,14 +7948,14 @@ func (s *Server) handleRegisterUserRequest(args [0]string, argsEscaped bool, w h
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "RegisterUser", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "RegisterUser", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -7922,7 +8017,7 @@ func (s *Server) handleRegisterUserRequest(args [0]string, argsEscaped bool, w h
 		}
 
 		type (
-			Request  = OptRegisterUserReq
+			Request  = *RegisterUserReq
 			Params   = struct{}
 			Response = RegisterUserRes
 		)
@@ -8009,14 +8104,14 @@ func (s *Server) handleReportOpinionRequest(args [1]string, argsEscaped bool, w 
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "ReportOpinion", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "ReportOpinion", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -8093,7 +8188,7 @@ func (s *Server) handleReportOpinionRequest(args [1]string, argsEscaped bool, w 
 		}
 
 		type (
-			Request  = OptReportOpinionReq
+			Request  = *ReportOpinionReq
 			Params   = ReportOpinionParams
 			Response = ReportOpinionRes
 		)
@@ -8180,14 +8275,14 @@ func (s *Server) handleSessionsHistoryRequest(args [0]string, argsEscaped bool, 
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "SessionsHistory", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "SessionsHistory", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -8348,14 +8443,14 @@ func (s *Server) handleSolveOpinionReportRequest(args [1]string, argsEscaped boo
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "SolveOpinionReport", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "SolveOpinionReport", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -8432,7 +8527,7 @@ func (s *Server) handleSolveOpinionReportRequest(args [1]string, argsEscaped boo
 		}
 
 		type (
-			Request  = OptSolveOpinionReportReq
+			Request  = *SolveOpinionReportReq
 			Params   = SolveOpinionReportParams
 			Response = SolveOpinionReportRes
 		)
@@ -8520,14 +8615,14 @@ func (s *Server) handleSwipeOpinionsRequest(args [1]string, argsEscaped bool, w 
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "SwipeOpinions", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "SwipeOpinions", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -8676,6 +8771,50 @@ func (s *Server) handleTalkSessionAnalysisRequest(args [1]string, argsEscaped bo
 			ID:   "talkSessionAnalysis",
 		}
 	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityCookieAuth(ctx, "TalkSessionAnalysis", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "CookieAuth",
+					Err:              err,
+				}
+				defer recordError("Security:CookieAuth", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			defer recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
 	params, err := decodeTalkSessionAnalysisParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
@@ -8782,8 +8921,56 @@ func (s *Server) handleTestRequest(args [0]string, argsEscaped bool, w http.Resp
 			span.SetStatus(codes.Error, stage)
 			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
 		}
-		err error
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: "Test",
+			ID:   "test",
+		}
 	)
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			sctx, ok, err := s.securityCookieAuth(ctx, "Test", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "CookieAuth",
+					Err:              err,
+				}
+				defer recordError("Security:CookieAuth", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 0
+				ctx = sctx
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			err = &ogenerrors.SecurityError{
+				OperationContext: opErrContext,
+				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
+			}
+			defer recordError("Security", err)
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+	}
 
 	var response TestRes
 	if m := s.cfg.Middleware; m != nil {
@@ -8883,14 +9070,14 @@ func (s *Server) handleToggleReportVisibilityManageRequest(args [1]string, argsE
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "ToggleReportVisibilityManage", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "ToggleReportVisibilityManage", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -9002,22 +9189,20 @@ func (s *Server) handleToggleReportVisibilityManageRequest(args [1]string, argsE
 	}
 }
 
-// handleVoteRequest handles vote operation.
+// handleValidateOrganizationCodeRequest handles validateOrganizationCode operation.
 //
-// 意思表明API.
+// 組織コード検証.
 //
-// Deprecated: schema marks this operation as deprecated.
-//
-// POST /talksessions/{talkSessionID}/opinions/{opinionID}/votes
-func (s *Server) handleVoteRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+// GET /auth/organization/{code}/validate
+func (s *Server) handleValidateOrganizationCodeRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("vote"),
-		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/opinions/{opinionID}/votes"),
+		otelogen.OperationID("validateOrganizationCode"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/auth/organization/{code}/validate"),
 	}
 
 	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "Vote",
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "ValidateOrganizationCode",
 		trace.WithAttributes(otelAttrs...),
 		serverSpanKind,
 	)
@@ -9048,55 +9233,11 @@ func (s *Server) handleVoteRequest(args [2]string, argsEscaped bool, w http.Resp
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: "Vote",
-			ID:   "vote",
+			Name: "ValidateOrganizationCode",
+			ID:   "validateOrganizationCode",
 		}
 	)
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "Vote", r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
-					Err:              err,
-				}
-				defer recordError("Security:ApiKeyAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 0
-				ctx = sctx
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			err = &ogenerrors.SecurityError{
-				OperationContext: opErrContext,
-				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
-			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
-			return
-		}
-	}
-	params, err := decodeVoteParams(args, argsEscaped, r)
+	params, err := decodeValidateOrganizationCodeParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
 			OperationContext: opErrContext,
@@ -9106,47 +9247,28 @@ func (s *Server) handleVoteRequest(args [2]string, argsEscaped bool, w http.Resp
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
-	request, close, err := s.decodeVoteRequest(r)
-	if err != nil {
-		err = &ogenerrors.DecodeRequestError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		defer recordError("DecodeRequest", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-	defer func() {
-		if err := close(); err != nil {
-			recordError("CloseRequest", err)
-		}
-	}()
 
-	var response VoteRes
+	var response ValidateOrganizationCodeRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
-			OperationName:    "Vote",
-			OperationSummary: "意思表明API",
-			OperationID:      "vote",
-			Body:             request,
+			OperationName:    "ValidateOrganizationCode",
+			OperationSummary: "組織コード検証",
+			OperationID:      "validateOrganizationCode",
+			Body:             nil,
 			Params: middleware.Parameters{
 				{
-					Name: "talkSessionID",
+					Name: "code",
 					In:   "path",
-				}: params.TalkSessionID,
-				{
-					Name: "opinionID",
-					In:   "path",
-				}: params.OpinionID,
+				}: params.Code,
 			},
 			Raw: r,
 		}
 
 		type (
-			Request  = OptVoteReq
-			Params   = VoteParams
-			Response = VoteRes
+			Request  = struct{}
+			Params   = ValidateOrganizationCodeParams
+			Response = ValidateOrganizationCodeRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -9155,14 +9277,14 @@ func (s *Server) handleVoteRequest(args [2]string, argsEscaped bool, w http.Resp
 		](
 			m,
 			mreq,
-			unpackVoteParams,
+			unpackValidateOrganizationCodeParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.Vote(ctx, request, params)
+				response, err = s.h.ValidateOrganizationCode(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.Vote(ctx, request, params)
+		response, err = s.h.ValidateOrganizationCode(ctx, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -9170,7 +9292,7 @@ func (s *Server) handleVoteRequest(args [2]string, argsEscaped bool, w http.Resp
 		return
 	}
 
-	if err := encodeVoteResponse(response, w, span); err != nil {
+	if err := encodeValidateOrganizationCodeResponse(response, w, span); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -9231,14 +9353,14 @@ func (s *Server) handleVote2Request(args [1]string, argsEscaped bool, w http.Res
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "Vote2", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "Vote2", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -9315,7 +9437,7 @@ func (s *Server) handleVote2Request(args [1]string, argsEscaped bool, w http.Res
 		}
 
 		type (
-			Request  = OptVote2Req
+			Request  = *Vote2Req
 			Params   = Vote2Params
 			Response = Vote2Res
 		)

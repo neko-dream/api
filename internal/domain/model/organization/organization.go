@@ -12,6 +12,7 @@ type OrganizationRepository interface {
 	FindByID(ctx context.Context, id shared.UUID[Organization]) (*Organization, error)
 	FindByIDs(ctx context.Context, ids []shared.UUID[Organization]) ([]*Organization, error)
 	FindByName(ctx context.Context, name string) (*Organization, error)
+	FindByCode(ctx context.Context, code string) (*Organization, error)
 
 	// 組織の作成・更新・削除
 	Create(ctx context.Context, org *Organization) error
@@ -29,6 +30,7 @@ type Organization struct {
 	OrganizationID   shared.UUID[Organization]
 	OrganizationType OrganizationType
 	Name             string
+	Code             string
 	OwnerID          shared.UUID[user.User]
 }
 
@@ -36,12 +38,14 @@ func NewOrganization(
 	organizationID shared.UUID[Organization],
 	organizationType OrganizationType,
 	name string,
+	code string,
 	ownerID shared.UUID[user.User],
 ) *Organization {
 	return &Organization{
 		OrganizationID:   organizationID,
 		OrganizationType: organizationType,
 		Name:             name,
+		Code:             code,
 		OwnerID:          ownerID,
 	}
 }
