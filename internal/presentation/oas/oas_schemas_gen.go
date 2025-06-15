@@ -345,8 +345,9 @@ type CreateOrganizationsOK struct{}
 func (*CreateOrganizationsOK) createOrganizationsRes() {}
 
 type CreateOrganizationsReq struct {
-	Name    string `json:"name"`
-	OrgType OptInt `json:"orgType"`
+	Name    string  `json:"name"`
+	Code    string  `json:"code"`
+	OrgType float64 `json:"orgType"`
 }
 
 // GetName returns the value of Name.
@@ -354,8 +355,13 @@ func (s *CreateOrganizationsReq) GetName() string {
 	return s.Name
 }
 
+// GetCode returns the value of Code.
+func (s *CreateOrganizationsReq) GetCode() string {
+	return s.Code
+}
+
 // GetOrgType returns the value of OrgType.
-func (s *CreateOrganizationsReq) GetOrgType() OptInt {
+func (s *CreateOrganizationsReq) GetOrgType() float64 {
 	return s.OrgType
 }
 
@@ -364,8 +370,13 @@ func (s *CreateOrganizationsReq) SetName(val string) {
 	s.Name = val
 }
 
+// SetCode sets the value of Code.
+func (s *CreateOrganizationsReq) SetCode(val string) {
+	s.Code = val
+}
+
 // SetOrgType sets the value of OrgType.
-func (s *CreateOrganizationsReq) SetOrgType(val OptInt) {
+func (s *CreateOrganizationsReq) SetOrgType(val float64) {
 	s.OrgType = val
 }
 
@@ -2196,13 +2207,8 @@ func (s *InviteOrganizationForUserOK) SetSuccess(val bool) {
 func (*InviteOrganizationForUserOK) inviteOrganizationForUserRes() {}
 
 type InviteOrganizationForUserReq struct {
-	Role      float64 `json:"role"`
 	DisplayID string  `json:"displayID"`
-}
-
-// GetRole returns the value of Role.
-func (s *InviteOrganizationForUserReq) GetRole() float64 {
-	return s.Role
+	Role      float64 `json:"role"`
 }
 
 // GetDisplayID returns the value of DisplayID.
@@ -2210,14 +2216,19 @@ func (s *InviteOrganizationForUserReq) GetDisplayID() string {
 	return s.DisplayID
 }
 
-// SetRole sets the value of Role.
-func (s *InviteOrganizationForUserReq) SetRole(val float64) {
-	s.Role = val
+// GetRole returns the value of Role.
+func (s *InviteOrganizationForUserReq) GetRole() float64 {
+	return s.Role
 }
 
 // SetDisplayID sets the value of DisplayID.
 func (s *InviteOrganizationForUserReq) SetDisplayID(val string) {
 	s.DisplayID = val
+}
+
+// SetRole sets the value of Role.
+func (s *InviteOrganizationForUserReq) SetRole(val float64) {
+	s.Role = val
 }
 
 type InviteOrganizationInternalServerError struct{}
@@ -2229,13 +2240,8 @@ type InviteOrganizationOK struct{}
 func (*InviteOrganizationOK) inviteOrganizationRes() {}
 
 type InviteOrganizationReq struct {
-	Role  int    `json:"role"`
-	Email string `json:"email"`
-}
-
-// GetRole returns the value of Role.
-func (s *InviteOrganizationReq) GetRole() int {
-	return s.Role
+	Email string  `json:"email"`
+	Role  float64 `json:"role"`
 }
 
 // GetEmail returns the value of Email.
@@ -2243,14 +2249,19 @@ func (s *InviteOrganizationReq) GetEmail() string {
 	return s.Email
 }
 
-// SetRole sets the value of Role.
-func (s *InviteOrganizationReq) SetRole(val int) {
-	s.Role = val
+// GetRole returns the value of Role.
+func (s *InviteOrganizationReq) GetRole() float64 {
+	return s.Role
 }
 
 // SetEmail sets the value of Email.
 func (s *InviteOrganizationReq) SetEmail(val string) {
 	s.Email = val
+}
+
+// SetRole sets the value of Role.
+func (s *InviteOrganizationReq) SetRole(val float64) {
+	s.Role = val
 }
 
 // Ref: #/components/schemas/location
@@ -2430,19 +2441,22 @@ func (s *OAuthTokenInfoInternalServerError) SetMessage(val string) {
 func (*OAuthTokenInfoInternalServerError) oAuthTokenInfoRes() {}
 
 type OAuthTokenInfoOK struct {
-	Aud                    string    `json:"aud"`
-	Exp                    string    `json:"exp"`
-	Iat                    string    `json:"iat"`
-	Iss                    string    `json:"iss"`
-	Sub                    string    `json:"sub"`
-	Jti                    string    `json:"jti"`
-	DisplayID              OptString `json:"displayID"`
-	DisplayName            OptString `json:"displayName"`
-	IconURL                OptString `json:"iconURL"`
-	IsRegistered           bool      `json:"isRegistered"`
-	IsEmailVerified        bool      `json:"isEmailVerified"`
-	OrgType                OptNilInt `json:"orgType"`
-	RequiredPasswordChange bool      `json:"requiredPasswordChange"`
+	Aud                    string       `json:"aud"`
+	Exp                    string       `json:"exp"`
+	Iat                    string       `json:"iat"`
+	Iss                    string       `json:"iss"`
+	Sub                    string       `json:"sub"`
+	Jti                    string       `json:"jti"`
+	DisplayID              OptString    `json:"displayID"`
+	DisplayName            OptString    `json:"displayName"`
+	IconURL                OptString    `json:"iconURL"`
+	IsRegistered           bool         `json:"isRegistered"`
+	IsEmailVerified        bool         `json:"isEmailVerified"`
+	RequiredPasswordChange bool         `json:"requiredPasswordChange"`
+	OrgType                OptNilInt    `json:"orgType"`
+	OrganizationRole       OptNilString `json:"organizationRole"`
+	OrganizationCode       OptNilString `json:"organizationCode"`
+	OrganizationID         OptNilString `json:"organizationID"`
 }
 
 // GetAud returns the value of Aud.
@@ -2500,14 +2514,29 @@ func (s *OAuthTokenInfoOK) GetIsEmailVerified() bool {
 	return s.IsEmailVerified
 }
 
+// GetRequiredPasswordChange returns the value of RequiredPasswordChange.
+func (s *OAuthTokenInfoOK) GetRequiredPasswordChange() bool {
+	return s.RequiredPasswordChange
+}
+
 // GetOrgType returns the value of OrgType.
 func (s *OAuthTokenInfoOK) GetOrgType() OptNilInt {
 	return s.OrgType
 }
 
-// GetRequiredPasswordChange returns the value of RequiredPasswordChange.
-func (s *OAuthTokenInfoOK) GetRequiredPasswordChange() bool {
-	return s.RequiredPasswordChange
+// GetOrganizationRole returns the value of OrganizationRole.
+func (s *OAuthTokenInfoOK) GetOrganizationRole() OptNilString {
+	return s.OrganizationRole
+}
+
+// GetOrganizationCode returns the value of OrganizationCode.
+func (s *OAuthTokenInfoOK) GetOrganizationCode() OptNilString {
+	return s.OrganizationCode
+}
+
+// GetOrganizationID returns the value of OrganizationID.
+func (s *OAuthTokenInfoOK) GetOrganizationID() OptNilString {
+	return s.OrganizationID
 }
 
 // SetAud sets the value of Aud.
@@ -2565,14 +2594,29 @@ func (s *OAuthTokenInfoOK) SetIsEmailVerified(val bool) {
 	s.IsEmailVerified = val
 }
 
+// SetRequiredPasswordChange sets the value of RequiredPasswordChange.
+func (s *OAuthTokenInfoOK) SetRequiredPasswordChange(val bool) {
+	s.RequiredPasswordChange = val
+}
+
 // SetOrgType sets the value of OrgType.
 func (s *OAuthTokenInfoOK) SetOrgType(val OptNilInt) {
 	s.OrgType = val
 }
 
-// SetRequiredPasswordChange sets the value of RequiredPasswordChange.
-func (s *OAuthTokenInfoOK) SetRequiredPasswordChange(val bool) {
-	s.RequiredPasswordChange = val
+// SetOrganizationRole sets the value of OrganizationRole.
+func (s *OAuthTokenInfoOK) SetOrganizationRole(val OptNilString) {
+	s.OrganizationRole = val
+}
+
+// SetOrganizationCode sets the value of OrganizationCode.
+func (s *OAuthTokenInfoOK) SetOrganizationCode(val OptNilString) {
+	s.OrganizationCode = val
+}
+
+// SetOrganizationID sets the value of OrganizationID.
+func (s *OAuthTokenInfoOK) SetOrganizationID(val OptNilString) {
+	s.OrganizationID = val
 }
 
 func (*OAuthTokenInfoOK) oAuthTokenInfoRes() {}
@@ -4607,6 +4651,52 @@ func (o OptNilString) Or(d string) string {
 	return d
 }
 
+// NewOptOrganization returns new OptOrganization with value set to v.
+func NewOptOrganization(v Organization) OptOrganization {
+	return OptOrganization{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptOrganization is optional Organization.
+type OptOrganization struct {
+	Value Organization
+	Set   bool
+}
+
+// IsSet returns true if OptOrganization was set.
+func (o OptOrganization) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptOrganization) Reset() {
+	var v Organization
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptOrganization) SetTo(v Organization) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptOrganization) Get() (v Organization, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptOrganization) Or(d Organization) Organization {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptString returns new OptString with value set to v.
 func NewOptString(v string) OptString {
 	return OptString{
@@ -4797,6 +4887,8 @@ type Organization struct {
 	ID string `json:"ID"`
 	// 組織名.
 	Name string `json:"Name"`
+	// 組織コード.
+	Code string `json:"Code"`
 	// 組織のタイプ.
 	Type     int    `json:"Type"`
 	RoleName string `json:"RoleName"`
@@ -4812,6 +4904,11 @@ func (s *Organization) GetID() string {
 // GetName returns the value of Name.
 func (s *Organization) GetName() string {
 	return s.Name
+}
+
+// GetCode returns the value of Code.
+func (s *Organization) GetCode() string {
+	return s.Code
 }
 
 // GetType returns the value of Type.
@@ -4837,6 +4934,11 @@ func (s *Organization) SetID(val string) {
 // SetName sets the value of Name.
 func (s *Organization) SetName(val string) {
 	s.Name = val
+}
+
+// SetCode sets the value of Code.
+func (s *Organization) SetCode(val string) {
+	s.Code = val
 }
 
 // SetType sets the value of Type.
@@ -5833,12 +5935,12 @@ type ReportOpinionOK struct{}
 func (*ReportOpinionOK) reportOpinionRes() {}
 
 type ReportOpinionReq struct {
-	Reason  OptInt       `json:"reason"`
+	Reason  OptNilInt    `json:"reason"`
 	Content OptNilString `json:"content"`
 }
 
 // GetReason returns the value of Reason.
-func (s *ReportOpinionReq) GetReason() OptInt {
+func (s *ReportOpinionReq) GetReason() OptNilInt {
 	return s.Reason
 }
 
@@ -5848,7 +5950,7 @@ func (s *ReportOpinionReq) GetContent() OptNilString {
 }
 
 // SetReason sets the value of Reason.
-func (s *ReportOpinionReq) SetReason(val OptInt) {
+func (s *ReportOpinionReq) SetReason(val OptNilInt) {
 	s.Reason = val
 }
 
@@ -7371,6 +7473,41 @@ func (s *UserStatsResponse) SetTalkSessionCount(val int32) {
 func (s *UserStatsResponse) SetDate(val time.Time) {
 	s.Date = val
 }
+
+type ValidateOrganizationCodeBadRequest struct{}
+
+func (*ValidateOrganizationCodeBadRequest) validateOrganizationCodeRes() {}
+
+type ValidateOrganizationCodeInternalServerError struct{}
+
+func (*ValidateOrganizationCodeInternalServerError) validateOrganizationCodeRes() {}
+
+type ValidateOrganizationCodeOK struct {
+	Valid        bool            `json:"valid"`
+	Organization OptOrganization `json:"organization"`
+}
+
+// GetValid returns the value of Valid.
+func (s *ValidateOrganizationCodeOK) GetValid() bool {
+	return s.Valid
+}
+
+// GetOrganization returns the value of Organization.
+func (s *ValidateOrganizationCodeOK) GetOrganization() OptOrganization {
+	return s.Organization
+}
+
+// SetValid sets the value of Valid.
+func (s *ValidateOrganizationCodeOK) SetValid(val bool) {
+	s.Valid = val
+}
+
+// SetOrganization sets the value of Organization.
+func (s *ValidateOrganizationCodeOK) SetOrganization(val OptOrganization) {
+	s.Organization = val
+}
+
+func (*ValidateOrganizationCodeOK) validateOrganizationCodeRes() {}
 
 type Vote2BadRequest struct {
 	Code    string `json:"code"`

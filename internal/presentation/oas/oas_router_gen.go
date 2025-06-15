@@ -130,6 +130,53 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					}
 
 					elem = origElem
+				case 'o': // Prefix: "organization/"
+					origElem := elem
+					if l := len("organization/"); len(elem) >= l && elem[0:l] == "organization/" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					// Param: "code"
+					// Match until "/"
+					idx := strings.IndexByte(elem, '/')
+					if idx < 0 {
+						idx = len(elem)
+					}
+					args[0] = elem[:idx]
+					elem = elem[idx:]
+
+					if len(elem) == 0 {
+						break
+					}
+					switch elem[0] {
+					case '/': // Prefix: "/validate"
+						origElem := elem
+						if l := len("/validate"); len(elem) >= l && elem[0:l] == "/validate" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch r.Method {
+							case "GET":
+								s.handleValidateOrganizationCodeRequest([1]string{
+									args[0],
+								}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "GET")
+							}
+
+							return
+						}
+
+						elem = origElem
+					}
+
+					elem = origElem
 				case 'p': // Prefix: "password/"
 					origElem := elem
 					if l := len("password/"); len(elem) >= l && elem[0:l] == "password/" {
@@ -1720,6 +1767,55 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.pathPattern = "/auth/dev/login"
 								r.args = args
 								r.count = 0
+								return r, true
+							default:
+								return
+							}
+						}
+
+						elem = origElem
+					}
+
+					elem = origElem
+				case 'o': // Prefix: "organization/"
+					origElem := elem
+					if l := len("organization/"); len(elem) >= l && elem[0:l] == "organization/" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					// Param: "code"
+					// Match until "/"
+					idx := strings.IndexByte(elem, '/')
+					if idx < 0 {
+						idx = len(elem)
+					}
+					args[0] = elem[:idx]
+					elem = elem[idx:]
+
+					if len(elem) == 0 {
+						break
+					}
+					switch elem[0] {
+					case '/': // Prefix: "/validate"
+						origElem := elem
+						if l := len("/validate"); len(elem) >= l && elem[0:l] == "/validate" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch method {
+							case "GET":
+								r.name = "ValidateOrganizationCode"
+								r.summary = "組織コード検証"
+								r.operationID = "validateOrganizationCode"
+								r.pathPattern = "/auth/organization/{code}/validate"
+								r.args = args
+								r.count = 1
 								return r, true
 							default:
 								return

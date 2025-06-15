@@ -209,6 +209,10 @@ type TestRes interface {
 	testRes()
 }
 
+type ValidateOrganizationCodeRes interface {
+	validateOrganizationCodeRes()
+}
+
 type Vote2Res interface {
 	vote2Res()
 }

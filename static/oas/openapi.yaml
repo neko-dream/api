@@ -69,6 +69,12 @@ paths:
           description: devのみで使用するsubjectです。ここで指定した値はログインした後も確認できないため覚えておいてください。同じ値を指定すると同じアカウントにログインできます。
           schema:
             type: string
+        - name: organization_code
+          in: query
+          required: false
+          description: 組織コード（組織ログインの場合）
+          schema:
+            type: string
       responses:
         '302':
           description: Redirection
@@ -104,6 +110,47 @@ paths:
       security:
         - {}
       x-ogen-operation-group: Auth
+  /auth/organization/{code}/validate:
+    get:
+      operationId: validateOrganizationCode
+      summary: 組織コード検証
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+                  organization:
+                    $ref: '#/components/schemas/organization'
+                required:
+                  - valid
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - organization
+      security:
+        - {}
+      x-ogen-operation-group: Organization
   /auth/password/change:
     put:
       operationId: changePassword
@@ -172,7 +219,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -215,7 +262,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -302,11 +349,20 @@ paths:
                     type: boolean
                   isEmailVerified:
                     type: boolean
+                  requiredPasswordChange:
+                    type: boolean
                   orgType:
                     type: integer
                     nullable: true
-                  requiredPasswordChange:
-                    type: boolean
+                  organizationRole:
+                    type: string
+                    nullable: true
+                  organizationCode:
+                    type: string
+                    nullable: true
+                  organizationID:
+                    type: string
+                    nullable: true
                 required:
                   - aud
                   - exp
@@ -424,6 +480,12 @@ paths:
           description: ログイン後にリダイレクトするURL
           schema:
             type: string
+        - name: organization_code
+          in: query
+          required: false
+          description: 組織コード（組織ログインの場合）
+          schema:
+            type: string
         - name: registration_url
           in: query
           required: false
@@ -482,19 +544,15 @@ paths:
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
-            multipart/form-data:
+            application/json:
               schema:
                 type: object
-                properties: {}
-                required: []
         '500':
           description: Server error
           content:
-            multipart/form-data:
+            application/json:
               schema:
                 type: object
-                properties: {}
-                required: []
       tags:
         - health
       security:
@@ -922,13 +980,14 @@ paths:
               properties:
                 reason:
                   type: integer
+                  nullable: true
                 content:
                   type: string
                   nullable: true
               required: []
             encoding:
               reason:
-                contentType: text/plain
+                contentType: application/json
               content:
                 contentType: application/json
       x-ogen-operation-group: Opinion
@@ -1157,14 +1216,14 @@ paths:
               properties:
                 name:
                   type: string
+                code:
+                  type: string
                 orgType:
-                  type: integer
-                  nullable: true
+                  type: number
               required:
                 - name
-            encoding:
-              orgType:
-                contentType: application/json
+                - code
+                - orgType
       x-ogen-operation-group: Organization
   /organizations/{organizationID}/invite:
     post:
@@ -1209,16 +1268,13 @@ paths:
             schema:
               type: object
               properties:
-                role:
-                  type: integer
                 email:
                   type: string
+                role:
+                  type: number
               required:
-                - role
                 - email
-            encoding:
-              role:
-                contentType: text/plain
+                - role
       x-ogen-operation-group: Organization
   /organizations/{organizationID}/invite_user:
     post:
@@ -1263,19 +1319,13 @@ paths:
             schema:
               type: object
               properties:
-                role:
-                  type: integer
                 displayID:
                   type: string
-                  nullable: true
+                role:
+                  type: number
               required:
-                - role
                 - displayID
-            encoding:
-              role:
-                contentType: text/plain
-              displayID:
-                contentType: application/json
+                - role
       x-ogen-operation-group: Organization
   /policy/consent:
     get:
@@ -1332,7 +1382,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -2026,7 +2076,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -2488,7 +2538,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -2502,6 +2552,9 @@ paths:
               required:
                 - content
                 - status
+            encoding:
+              parentActionItemID:
+                contentType: application/json
       x-ogen-operation-group: Timeline
   /talksessions/{talkSessionID}/timelines:
     get:
@@ -2582,7 +2635,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -2592,6 +2645,12 @@ paths:
                 status:
                   type: string
                   nullable: true
+              required: []
+            encoding:
+              content:
+                contentType: application/json
+              status:
+                contentType: application/json
       x-ogen-operation-group: Timeline
   /test:
     get:
@@ -3509,6 +3568,7 @@ components:
       required:
         - ID
         - Name
+        - Code
         - Type
         - RoleName
         - Role
@@ -3519,6 +3579,9 @@ components:
         Name:
           type: string
           description: 組織名
+        Code:
+          type: string
+          description: 組織コード
         Type:
           type: integer
           description: 組織のタイプ

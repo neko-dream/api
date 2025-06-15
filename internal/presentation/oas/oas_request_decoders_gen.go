@@ -44,37 +44,112 @@ func (s *Server) decodeCreateOrganizationsRequest(r *http.Request) (
 		return req, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
-	case ct == "application/json":
+	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
 			return req, close, validate.ErrBodyRequired
 		}
-		buf, err := io.ReadAll(r.Body)
-		if err != nil {
-			return req, close, err
+		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
+			return req, close, errors.Wrap(err, "parse multipart form")
 		}
-
-		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
-		}
-
-		d := jx.DecodeBytes(buf)
+		// Remove all temporary files created by ParseMultipartForm when the request is done.
+		//
+		// Notice that the closers are called in reverse order, to match defer behavior, so
+		// any opened file will be closed before RemoveAll call.
+		closers = append(closers, r.MultipartForm.RemoveAll)
+		// Form values may be unused.
+		form := url.Values(r.MultipartForm.Value)
+		_ = form
 
 		var request CreateOrganizationsReq
-		if err := func() error {
-			if err := request.Decode(d); err != nil {
-				return err
+		q := uri.NewQueryDecoder(form)
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "name",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
 			}
-			if err := d.Skip(); err != io.EOF {
-				return errors.New("unexpected trailing data")
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					request.Name = c
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"name\"")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
 			}
-			return nil
-		}(); err != nil {
-			err = &ogenerrors.DecodeBodyError{
-				ContentType: ct,
-				Body:        buf,
-				Err:         err,
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "code",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
 			}
-			return req, close, err
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					request.Code = c
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"code\"")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
+			}
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "orgType",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToFloat64(val)
+					if err != nil {
+						return err
+					}
+
+					request.OrgType = c
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"orgType\"")
+				}
+				if err := func() error {
+					if err := (validate.Float{}).Validate(float64(request.OrgType)); err != nil {
+						return errors.Wrap(err, "float")
+					}
+					return nil
+				}(); err != nil {
+					return req, close, errors.Wrap(err, "validate")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
+			}
 		}
 		return &request, close, nil
 	default:
@@ -107,45 +182,305 @@ func (s *Server) decodeCreateTalkSessionRequest(r *http.Request) (
 		return req, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
-	case ct == "application/json":
+	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
 			return req, close, validate.ErrBodyRequired
 		}
-		buf, err := io.ReadAll(r.Body)
-		if err != nil {
-			return req, close, err
+		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
+			return req, close, errors.Wrap(err, "parse multipart form")
 		}
-
-		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
-		}
-
-		d := jx.DecodeBytes(buf)
+		// Remove all temporary files created by ParseMultipartForm when the request is done.
+		//
+		// Notice that the closers are called in reverse order, to match defer behavior, so
+		// any opened file will be closed before RemoveAll call.
+		closers = append(closers, r.MultipartForm.RemoveAll)
+		// Form values may be unused.
+		form := url.Values(r.MultipartForm.Value)
+		_ = form
 
 		var request CreateTalkSessionReq
-		if err := func() error {
-			if err := request.Decode(d); err != nil {
-				return err
+		q := uri.NewQueryDecoder(form)
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "theme",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
 			}
-			if err := d.Skip(); err != io.EOF {
-				return errors.New("unexpected trailing data")
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					request.Theme = c
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"theme\"")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
 			}
-			return nil
-		}(); err != nil {
-			err = &ogenerrors.DecodeBodyError{
-				ContentType: ct,
-				Body:        buf,
-				Err:         err,
-			}
-			return req, close, err
 		}
-		if err := func() error {
-			if err := request.Validate(); err != nil {
-				return err
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "scheduledEndTime",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
 			}
-			return nil
-		}(); err != nil {
-			return req, close, errors.Wrap(err, "validate")
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToDateTime(val)
+					if err != nil {
+						return err
+					}
+
+					request.ScheduledEndTime = c
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"scheduledEndTime\"")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
+			}
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "latitude",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+					if err := func(d *jx.Decoder) error {
+						request.Latitude.Reset()
+						if err := request.Latitude.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"latitude\"")
+				}
+				if err := func() error {
+					if value, ok := request.Latitude.Get(); ok {
+						if err := func() error {
+							if err := (validate.Float{}).Validate(float64(value)); err != nil {
+								return errors.Wrap(err, "float")
+							}
+							return nil
+						}(); err != nil {
+							return err
+						}
+					}
+					return nil
+				}(); err != nil {
+					return req, close, errors.Wrap(err, "validate")
+				}
+			}
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "longitude",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+					if err := func(d *jx.Decoder) error {
+						request.Longitude.Reset()
+						if err := request.Longitude.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"longitude\"")
+				}
+				if err := func() error {
+					if value, ok := request.Longitude.Get(); ok {
+						if err := func() error {
+							if err := (validate.Float{}).Validate(float64(value)); err != nil {
+								return errors.Wrap(err, "float")
+							}
+							return nil
+						}(); err != nil {
+							return err
+						}
+					}
+					return nil
+				}(); err != nil {
+					return req, close, errors.Wrap(err, "validate")
+				}
+			}
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "city",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+					if err := func(d *jx.Decoder) error {
+						request.City.Reset()
+						if err := request.City.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"city\"")
+				}
+			}
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "prefecture",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+					if err := func(d *jx.Decoder) error {
+						request.Prefecture.Reset()
+						if err := request.Prefecture.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"prefecture\"")
+				}
+			}
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "description",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+					if err := func(d *jx.Decoder) error {
+						request.Description.Reset()
+						if err := request.Description.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"description\"")
+				}
+			}
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "thumbnailURL",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+					if err := func(d *jx.Decoder) error {
+						request.ThumbnailURL.Reset()
+						if err := request.ThumbnailURL.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"thumbnailURL\"")
+				}
+			}
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "restrictions",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+					if err := func(d *jx.Decoder) error {
+						request.Restrictions = make([]string, 0)
+						if err := d.Arr(func(d *jx.Decoder) error {
+							var elem string
+							v, err := d.Str()
+							elem = string(v)
+							if err != nil {
+								return err
+							}
+							request.Restrictions = append(request.Restrictions, elem)
+							return nil
+						}); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"restrictions\"")
+				}
+			}
 		}
 		return &request, close, nil
 	default:
@@ -249,37 +584,77 @@ func (s *Server) decodeEditTimeLineRequest(r *http.Request) (
 		return req, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
-	case ct == "application/json":
+	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
 			return req, close, validate.ErrBodyRequired
 		}
-		buf, err := io.ReadAll(r.Body)
-		if err != nil {
-			return req, close, err
+		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
+			return req, close, errors.Wrap(err, "parse multipart form")
 		}
-
-		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
-		}
-
-		d := jx.DecodeBytes(buf)
+		// Remove all temporary files created by ParseMultipartForm when the request is done.
+		//
+		// Notice that the closers are called in reverse order, to match defer behavior, so
+		// any opened file will be closed before RemoveAll call.
+		closers = append(closers, r.MultipartForm.RemoveAll)
+		// Form values may be unused.
+		form := url.Values(r.MultipartForm.Value)
+		_ = form
 
 		var request EditTimeLineReq
-		if err := func() error {
-			if err := request.Decode(d); err != nil {
-				return err
+		q := uri.NewQueryDecoder(form)
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "content",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
 			}
-			if err := d.Skip(); err != io.EOF {
-				return errors.New("unexpected trailing data")
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+					if err := func(d *jx.Decoder) error {
+						request.Content.Reset()
+						if err := request.Content.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"content\"")
+				}
 			}
-			return nil
-		}(); err != nil {
-			err = &ogenerrors.DecodeBodyError{
-				ContentType: ct,
-				Body:        buf,
-				Err:         err,
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "status",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
 			}
-			return req, close, err
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+					if err := func(d *jx.Decoder) error {
+						request.Status.Reset()
+						if err := request.Status.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"status\"")
+				}
+			}
 		}
 		return &request, close, nil
 	default:
@@ -594,37 +969,85 @@ func (s *Server) decodeInviteOrganizationRequest(r *http.Request) (
 		return req, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
-	case ct == "application/json":
+	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
 			return req, close, validate.ErrBodyRequired
 		}
-		buf, err := io.ReadAll(r.Body)
-		if err != nil {
-			return req, close, err
+		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
+			return req, close, errors.Wrap(err, "parse multipart form")
 		}
-
-		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
-		}
-
-		d := jx.DecodeBytes(buf)
+		// Remove all temporary files created by ParseMultipartForm when the request is done.
+		//
+		// Notice that the closers are called in reverse order, to match defer behavior, so
+		// any opened file will be closed before RemoveAll call.
+		closers = append(closers, r.MultipartForm.RemoveAll)
+		// Form values may be unused.
+		form := url.Values(r.MultipartForm.Value)
+		_ = form
 
 		var request InviteOrganizationReq
-		if err := func() error {
-			if err := request.Decode(d); err != nil {
-				return err
+		q := uri.NewQueryDecoder(form)
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "email",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
 			}
-			if err := d.Skip(); err != io.EOF {
-				return errors.New("unexpected trailing data")
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					request.Email = c
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"email\"")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
 			}
-			return nil
-		}(); err != nil {
-			err = &ogenerrors.DecodeBodyError{
-				ContentType: ct,
-				Body:        buf,
-				Err:         err,
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "role",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
 			}
-			return req, close, err
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToFloat64(val)
+					if err != nil {
+						return err
+					}
+
+					request.Role = c
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"role\"")
+				}
+				if err := func() error {
+					if err := (validate.Float{}).Validate(float64(request.Role)); err != nil {
+						return errors.Wrap(err, "float")
+					}
+					return nil
+				}(); err != nil {
+					return req, close, errors.Wrap(err, "validate")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
+			}
 		}
 		return &request, close, nil
 	default:
@@ -657,45 +1080,85 @@ func (s *Server) decodeInviteOrganizationForUserRequest(r *http.Request) (
 		return req, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
-	case ct == "application/json":
+	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
 			return req, close, validate.ErrBodyRequired
 		}
-		buf, err := io.ReadAll(r.Body)
-		if err != nil {
-			return req, close, err
+		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
+			return req, close, errors.Wrap(err, "parse multipart form")
 		}
-
-		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
-		}
-
-		d := jx.DecodeBytes(buf)
+		// Remove all temporary files created by ParseMultipartForm when the request is done.
+		//
+		// Notice that the closers are called in reverse order, to match defer behavior, so
+		// any opened file will be closed before RemoveAll call.
+		closers = append(closers, r.MultipartForm.RemoveAll)
+		// Form values may be unused.
+		form := url.Values(r.MultipartForm.Value)
+		_ = form
 
 		var request InviteOrganizationForUserReq
-		if err := func() error {
-			if err := request.Decode(d); err != nil {
-				return err
+		q := uri.NewQueryDecoder(form)
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "displayID",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
 			}
-			if err := d.Skip(); err != io.EOF {
-				return errors.New("unexpected trailing data")
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					request.DisplayID = c
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"displayID\"")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
 			}
-			return nil
-		}(); err != nil {
-			err = &ogenerrors.DecodeBodyError{
-				ContentType: ct,
-				Body:        buf,
-				Err:         err,
-			}
-			return req, close, err
 		}
-		if err := func() error {
-			if err := request.Validate(); err != nil {
-				return err
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "role",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
 			}
-			return nil
-		}(); err != nil {
-			return req, close, errors.Wrap(err, "validate")
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToFloat64(val)
+					if err != nil {
+						return err
+					}
+
+					request.Role = c
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"role\"")
+				}
+				if err := func() error {
+					if err := (validate.Float{}).Validate(float64(request.Role)); err != nil {
+						return errors.Wrap(err, "float")
+					}
+					return nil
+				}(); err != nil {
+					return req, close, errors.Wrap(err, "validate")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
+			}
 		}
 		return &request, close, nil
 	default:
@@ -805,37 +1268,77 @@ func (s *Server) decodePasswordLoginRequest(r *http.Request) (
 		return req, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
-	case ct == "application/json":
+	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
 			return req, close, validate.ErrBodyRequired
 		}
-		buf, err := io.ReadAll(r.Body)
-		if err != nil {
-			return req, close, err
+		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
+			return req, close, errors.Wrap(err, "parse multipart form")
 		}
-
-		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
-		}
-
-		d := jx.DecodeBytes(buf)
+		// Remove all temporary files created by ParseMultipartForm when the request is done.
+		//
+		// Notice that the closers are called in reverse order, to match defer behavior, so
+		// any opened file will be closed before RemoveAll call.
+		closers = append(closers, r.MultipartForm.RemoveAll)
+		// Form values may be unused.
+		form := url.Values(r.MultipartForm.Value)
+		_ = form
 
 		var request PasswordLoginReq
-		if err := func() error {
-			if err := request.Decode(d); err != nil {
-				return err
+		q := uri.NewQueryDecoder(form)
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "id_or_email",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
 			}
-			if err := d.Skip(); err != io.EOF {
-				return errors.New("unexpected trailing data")
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					request.IDOrEmail = c
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"id_or_email\"")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
 			}
-			return nil
-		}(); err != nil {
-			err = &ogenerrors.DecodeBodyError{
-				ContentType: ct,
-				Body:        buf,
-				Err:         err,
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "password",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
 			}
-			return req, close, err
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					request.Password = c
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"password\"")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
+			}
 		}
 		return &request, close, nil
 	default:
@@ -868,37 +1371,104 @@ func (s *Server) decodePasswordRegisterRequest(r *http.Request) (
 		return req, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
-	case ct == "application/json":
+	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
 			return req, close, validate.ErrBodyRequired
 		}
-		buf, err := io.ReadAll(r.Body)
-		if err != nil {
-			return req, close, err
+		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
+			return req, close, errors.Wrap(err, "parse multipart form")
 		}
-
-		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
-		}
-
-		d := jx.DecodeBytes(buf)
+		// Remove all temporary files created by ParseMultipartForm when the request is done.
+		//
+		// Notice that the closers are called in reverse order, to match defer behavior, so
+		// any opened file will be closed before RemoveAll call.
+		closers = append(closers, r.MultipartForm.RemoveAll)
+		// Form values may be unused.
+		form := url.Values(r.MultipartForm.Value)
+		_ = form
 
 		var request PasswordRegisterReq
-		if err := func() error {
-			if err := request.Decode(d); err != nil {
-				return err
+		q := uri.NewQueryDecoder(form)
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "id",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
 			}
-			if err := d.Skip(); err != io.EOF {
-				return errors.New("unexpected trailing data")
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					request.ID = c
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"id\"")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
 			}
-			return nil
-		}(); err != nil {
-			err = &ogenerrors.DecodeBodyError{
-				ContentType: ct,
-				Body:        buf,
-				Err:         err,
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "password",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
 			}
-			return req, close, err
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					request.Password = c
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"password\"")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
+			}
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "email",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					request.Email = c
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"email\"")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
+			}
 		}
 		return &request, close, nil
 	default:
@@ -931,37 +1501,50 @@ func (s *Server) decodePolicyConsentRequest(r *http.Request) (
 		return req, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
-	case ct == "application/json":
+	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
 			return req, close, validate.ErrBodyRequired
 		}
-		buf, err := io.ReadAll(r.Body)
-		if err != nil {
-			return req, close, err
+		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
+			return req, close, errors.Wrap(err, "parse multipart form")
 		}
-
-		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
-		}
-
-		d := jx.DecodeBytes(buf)
+		// Remove all temporary files created by ParseMultipartForm when the request is done.
+		//
+		// Notice that the closers are called in reverse order, to match defer behavior, so
+		// any opened file will be closed before RemoveAll call.
+		closers = append(closers, r.MultipartForm.RemoveAll)
+		// Form values may be unused.
+		form := url.Values(r.MultipartForm.Value)
+		_ = form
 
 		var request PolicyConsentReq
-		if err := func() error {
-			if err := request.Decode(d); err != nil {
-				return err
+		q := uri.NewQueryDecoder(form)
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "policyVersion",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
 			}
-			if err := d.Skip(); err != io.EOF {
-				return errors.New("unexpected trailing data")
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					request.PolicyVersion = c
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"policyVersion\"")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
 			}
-			return nil
-		}(); err != nil {
-			err = &ogenerrors.DecodeBodyError{
-				ContentType: ct,
-				Body:        buf,
-				Err:         err,
-			}
-			return req, close, err
 		}
 		return &request, close, nil
 	default:
@@ -994,37 +1577,50 @@ func (s *Server) decodePostConclusionRequest(r *http.Request) (
 		return req, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
-	case ct == "application/json":
+	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
 			return req, close, validate.ErrBodyRequired
 		}
-		buf, err := io.ReadAll(r.Body)
-		if err != nil {
-			return req, close, err
+		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
+			return req, close, errors.Wrap(err, "parse multipart form")
 		}
-
-		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
-		}
-
-		d := jx.DecodeBytes(buf)
+		// Remove all temporary files created by ParseMultipartForm when the request is done.
+		//
+		// Notice that the closers are called in reverse order, to match defer behavior, so
+		// any opened file will be closed before RemoveAll call.
+		closers = append(closers, r.MultipartForm.RemoveAll)
+		// Form values may be unused.
+		form := url.Values(r.MultipartForm.Value)
+		_ = form
 
 		var request PostConclusionReq
-		if err := func() error {
-			if err := request.Decode(d); err != nil {
-				return err
+		q := uri.NewQueryDecoder(form)
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "content",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
 			}
-			if err := d.Skip(); err != io.EOF {
-				return errors.New("unexpected trailing data")
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					request.Content = c
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"content\"")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
 			}
-			return nil
-		}(); err != nil {
-			err = &ogenerrors.DecodeBodyError{
-				ContentType: ct,
-				Body:        buf,
-				Err:         err,
-			}
-			return req, close, err
 		}
 		return &request, close, nil
 	default:
@@ -1364,37 +1960,104 @@ func (s *Server) decodePostTimeLineItemRequest(r *http.Request) (
 		return req, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
-	case ct == "application/json":
+	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
 			return req, close, validate.ErrBodyRequired
 		}
-		buf, err := io.ReadAll(r.Body)
-		if err != nil {
-			return req, close, err
+		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
+			return req, close, errors.Wrap(err, "parse multipart form")
 		}
-
-		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
-		}
-
-		d := jx.DecodeBytes(buf)
+		// Remove all temporary files created by ParseMultipartForm when the request is done.
+		//
+		// Notice that the closers are called in reverse order, to match defer behavior, so
+		// any opened file will be closed before RemoveAll call.
+		closers = append(closers, r.MultipartForm.RemoveAll)
+		// Form values may be unused.
+		form := url.Values(r.MultipartForm.Value)
+		_ = form
 
 		var request PostTimeLineItemReq
-		if err := func() error {
-			if err := request.Decode(d); err != nil {
-				return err
+		q := uri.NewQueryDecoder(form)
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "content",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
 			}
-			if err := d.Skip(); err != io.EOF {
-				return errors.New("unexpected trailing data")
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					request.Content = c
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"content\"")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
 			}
-			return nil
-		}(); err != nil {
-			err = &ogenerrors.DecodeBodyError{
-				ContentType: ct,
-				Body:        buf,
-				Err:         err,
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "status",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
 			}
-			return req, close, err
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					request.Status = c
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"status\"")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
+			}
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "parentActionItemID",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+					if err := func(d *jx.Decoder) error {
+						request.ParentActionItemID.Reset()
+						if err := request.ParentActionItemID.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"parentActionItemID\"")
+				}
+			}
 		}
 		return &request, close, nil
 	default:
@@ -1714,37 +2377,77 @@ func (s *Server) decodeReportOpinionRequest(r *http.Request) (
 		return req, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
-	case ct == "application/json":
+	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
 			return req, close, validate.ErrBodyRequired
 		}
-		buf, err := io.ReadAll(r.Body)
-		if err != nil {
-			return req, close, err
+		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
+			return req, close, errors.Wrap(err, "parse multipart form")
 		}
-
-		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
-		}
-
-		d := jx.DecodeBytes(buf)
+		// Remove all temporary files created by ParseMultipartForm when the request is done.
+		//
+		// Notice that the closers are called in reverse order, to match defer behavior, so
+		// any opened file will be closed before RemoveAll call.
+		closers = append(closers, r.MultipartForm.RemoveAll)
+		// Form values may be unused.
+		form := url.Values(r.MultipartForm.Value)
+		_ = form
 
 		var request ReportOpinionReq
-		if err := func() error {
-			if err := request.Decode(d); err != nil {
-				return err
+		q := uri.NewQueryDecoder(form)
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "reason",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
 			}
-			if err := d.Skip(); err != io.EOF {
-				return errors.New("unexpected trailing data")
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+					if err := func(d *jx.Decoder) error {
+						request.Reason.Reset()
+						if err := request.Reason.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"reason\"")
+				}
 			}
-			return nil
-		}(); err != nil {
-			err = &ogenerrors.DecodeBodyError{
-				ContentType: ct,
-				Body:        buf,
-				Err:         err,
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "content",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
 			}
-			return req, close, err
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+					if err := func(d *jx.Decoder) error {
+						request.Content.Reset()
+						if err := request.Content.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"content\"")
+				}
+			}
 		}
 		return &request, close, nil
 	default:
@@ -1777,45 +2480,58 @@ func (s *Server) decodeSolveOpinionReportRequest(r *http.Request) (
 		return req, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
-	case ct == "application/json":
+	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
 			return req, close, validate.ErrBodyRequired
 		}
-		buf, err := io.ReadAll(r.Body)
-		if err != nil {
-			return req, close, err
+		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
+			return req, close, errors.Wrap(err, "parse multipart form")
 		}
-
-		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
-		}
-
-		d := jx.DecodeBytes(buf)
+		// Remove all temporary files created by ParseMultipartForm when the request is done.
+		//
+		// Notice that the closers are called in reverse order, to match defer behavior, so
+		// any opened file will be closed before RemoveAll call.
+		closers = append(closers, r.MultipartForm.RemoveAll)
+		// Form values may be unused.
+		form := url.Values(r.MultipartForm.Value)
+		_ = form
 
 		var request SolveOpinionReportReq
-		if err := func() error {
-			if err := request.Decode(d); err != nil {
-				return err
+		q := uri.NewQueryDecoder(form)
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "action",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
 			}
-			if err := d.Skip(); err != io.EOF {
-				return errors.New("unexpected trailing data")
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					request.Action = SolveOpinionReportReqAction(c)
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"action\"")
+				}
+				if err := func() error {
+					if err := request.Action.Validate(); err != nil {
+						return err
+					}
+					return nil
+				}(); err != nil {
+					return req, close, errors.Wrap(err, "validate")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
 			}
-			return nil
-		}(); err != nil {
-			err = &ogenerrors.DecodeBodyError{
-				ContentType: ct,
-				Body:        buf,
-				Err:         err,
-			}
-			return req, close, err
-		}
-		if err := func() error {
-			if err := request.Validate(); err != nil {
-				return err
-			}
-			return nil
-		}(); err != nil {
-			return req, close, errors.Wrap(err, "validate")
 		}
 		return &request, close, nil
 	default:
@@ -1917,45 +2633,66 @@ func (s *Server) decodeVote2Request(r *http.Request) (
 		return req, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
-	case ct == "application/json":
+	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
 			return req, close, validate.ErrBodyRequired
 		}
-		buf, err := io.ReadAll(r.Body)
-		if err != nil {
-			return req, close, err
+		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
+			return req, close, errors.Wrap(err, "parse multipart form")
 		}
-
-		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
-		}
-
-		d := jx.DecodeBytes(buf)
+		// Remove all temporary files created by ParseMultipartForm when the request is done.
+		//
+		// Notice that the closers are called in reverse order, to match defer behavior, so
+		// any opened file will be closed before RemoveAll call.
+		closers = append(closers, r.MultipartForm.RemoveAll)
+		// Form values may be unused.
+		form := url.Values(r.MultipartForm.Value)
+		_ = form
 
 		var request Vote2Req
-		if err := func() error {
-			if err := request.Decode(d); err != nil {
-				return err
+		q := uri.NewQueryDecoder(form)
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "voteStatus",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
 			}
-			if err := d.Skip(); err != io.EOF {
-				return errors.New("unexpected trailing data")
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+					if err := func(d *jx.Decoder) error {
+						if err := request.VoteStatus.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"voteStatus\"")
+				}
+				if err := func() error {
+					if value, ok := request.VoteStatus.Get(); ok {
+						if err := func() error {
+							if err := value.Validate(); err != nil {
+								return err
+							}
+							return nil
+						}(); err != nil {
+							return err
+						}
+					}
+					return nil
+				}(); err != nil {
+					return req, close, errors.Wrap(err, "validate")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
 			}
-			return nil
-		}(); err != nil {
-			err = &ogenerrors.DecodeBodyError{
-				ContentType: ct,
-				Body:        buf,
-				Err:         err,
-			}
-			return req, close, err
-		}
-		if err := func() error {
-			if err := request.Validate(); err != nil {
-				return err
-			}
-			return nil
-		}(); err != nil {
-			return req, close, errors.Wrap(err, "validate")
 		}
 		return &request, close, nil
 	default:
