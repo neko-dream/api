@@ -4,6 +4,31 @@ import "./user.tsp";
 using Http;
 
 namespace kotohiro {
+  /**
+   * 投票タイプ
+   */
+  enum VoteType {
+    Agree: "agree",
+    Disagree: "disagree",
+    Pass: "pass",
+  }
+
+  /**
+   * 通報ステータス
+   */
+  enum ReportStatus {
+    Unsolved: "unsolved",
+    Deleted: "deleted",
+    Hold: "hold",
+  }
+
+  /**
+   * 通報解決アクション
+   */
+  enum ReportAction {
+    Deleted: "deleted",
+    Hold: "hold",
+  }
   model Opinion {
     /**
      * 意見ID
@@ -25,7 +50,7 @@ namespace kotohiro {
     /**
      * 意見投稿主の意見。ルート意見の場合はここには何も入らない
      */
-    voteType?: "disagree" | "agree" | "pass" | null;
+    voteType?: VoteType | null;
 
     /**
      * 画像が返る場合もある
@@ -69,7 +94,7 @@ namespace kotohiro {
      */
     user: User;
 
-    status: "unsolved" | "deleted" | "hold";
+    status: ReportStatus;
     reasons: {
       reason: string;
       content?: string | null;

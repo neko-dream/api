@@ -18,7 +18,7 @@ namespace kotohiro {
     @path opinionID: string,
 
     @multipartBody body: {
-      voteStatus: HttpPart<"agree" | "disagree" | "pass" | null>;
+      voteStatus: HttpPart<VoteType | null>;
     },
   ): Body<Opinion[]> | {
     @statusCode statusCode: 400;

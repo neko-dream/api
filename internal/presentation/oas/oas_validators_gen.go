@@ -471,11 +471,11 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItem) Validate() error {
 
 func (s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) Validate() error {
 	switch s {
-	case "pass":
+	case "agree":
 		return nil
 	case "disagree":
 		return nil
-	case "agree":
+	case "pass":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
@@ -1168,9 +1168,9 @@ func (s OpinionComments2OKOpinionsItemMyVoteType) Validate() error {
 
 func (s OpinionVoteType) Validate() error {
 	switch s {
-	case "disagree":
-		return nil
 	case "agree":
+		return nil
+	case "disagree":
 		return nil
 	case "pass":
 		return nil
@@ -1302,6 +1302,17 @@ func (s RegenerateRequestType) Validate() error {
 	}
 }
 
+func (s ReportAction) Validate() error {
+	switch s {
+	case "deleted":
+		return nil
+	case "hold":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
 func (s *ReportDetail) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -1358,19 +1369,6 @@ func (s *ReportDetail) Validate() error {
 	return nil
 }
 
-func (s ReportDetailStatus) Validate() error {
-	switch s {
-	case "unsolved":
-		return nil
-	case "deleted":
-		return nil
-	case "hold":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
-}
-
 func (s *ReportDetailUser) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -1400,6 +1398,19 @@ func (s *ReportDetailUser) Validate() error {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
+}
+
+func (s ReportStatus) Validate() error {
+	switch s {
+	case "unsolved":
+		return nil
+	case "deleted":
+		return nil
+	case "hold":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
 }
 
 func (s *RevokeTokenNoContentHeaders) Validate() error {
@@ -1520,17 +1531,6 @@ func (s *SolveOpinionReportReq) Validate() error {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
-}
-
-func (s SolveOpinionReportReqAction) Validate() error {
-	switch s {
-	case "deleted":
-		return nil
-	case "hold":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
 }
 
 func (s *SwipeOpinionsOK) Validate() error {

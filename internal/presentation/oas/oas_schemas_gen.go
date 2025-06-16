@@ -1035,6 +1035,7 @@ func (s *GetOpinionDetail2OK) SetMyVoteType(val OptNilGetOpinionDetail2OKMyVoteT
 
 func (*GetOpinionDetail2OK) getOpinionDetail2Res() {}
 
+// 投票タイプ.
 type GetOpinionDetail2OKMyVoteType string
 
 const (
@@ -1185,31 +1186,32 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItem) SetMyVoteType(val OptNilGetOpi
 	s.MyVoteType = val
 }
 
+// 投票タイプ.
 type GetOpinionsForTalkSessionOKOpinionsItemMyVoteType string
 
 const (
-	GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass     GetOpinionsForTalkSessionOKOpinionsItemMyVoteType = "pass"
-	GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree GetOpinionsForTalkSessionOKOpinionsItemMyVoteType = "disagree"
 	GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree    GetOpinionsForTalkSessionOKOpinionsItemMyVoteType = "agree"
+	GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree GetOpinionsForTalkSessionOKOpinionsItemMyVoteType = "disagree"
+	GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass     GetOpinionsForTalkSessionOKOpinionsItemMyVoteType = "pass"
 )
 
 // AllValues returns all GetOpinionsForTalkSessionOKOpinionsItemMyVoteType values.
 func (GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) AllValues() []GetOpinionsForTalkSessionOKOpinionsItemMyVoteType {
 	return []GetOpinionsForTalkSessionOKOpinionsItemMyVoteType{
-		GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass,
-		GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree,
 		GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree,
+		GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree,
+		GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
 func (s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) MarshalText() ([]byte, error) {
 	switch s {
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass:
+	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree:
 		return []byte(s), nil
 	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree:
 		return []byte(s), nil
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree:
+	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -1219,14 +1221,14 @@ func (s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) MarshalText() ([]byte
 // UnmarshalText implements encoding.TextUnmarshaler.
 func (s *GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) UnmarshalText(data []byte) error {
 	switch GetOpinionsForTalkSessionOKOpinionsItemMyVoteType(data) {
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass:
-		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass
+	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree:
+		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree
 		return nil
 	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree:
 		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree
 		return nil
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree:
-		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree
+	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass:
+		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -2835,6 +2837,7 @@ func (s *OpinionComments2OKOpinionsItem) SetMyVoteType(val OptNilOpinionComments
 	s.MyVoteType = val
 }
 
+// 投票タイプ.
 type OpinionComments2OKOpinionsItemMyVoteType string
 
 const (
@@ -2942,20 +2945,20 @@ func (s *OpinionGroupRatio) SetGroupName(val string) {
 	s.GroupName = val
 }
 
-// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+// 投票タイプ.
 type OpinionVoteType string
 
 const (
-	OpinionVoteTypeDisagree OpinionVoteType = "disagree"
 	OpinionVoteTypeAgree    OpinionVoteType = "agree"
+	OpinionVoteTypeDisagree OpinionVoteType = "disagree"
 	OpinionVoteTypePass     OpinionVoteType = "pass"
 )
 
 // AllValues returns all OpinionVoteType values.
 func (OpinionVoteType) AllValues() []OpinionVoteType {
 	return []OpinionVoteType{
-		OpinionVoteTypeDisagree,
 		OpinionVoteTypeAgree,
+		OpinionVoteTypeDisagree,
 		OpinionVoteTypePass,
 	}
 }
@@ -2963,9 +2966,9 @@ func (OpinionVoteType) AllValues() []OpinionVoteType {
 // MarshalText implements encoding.TextMarshaler.
 func (s OpinionVoteType) MarshalText() ([]byte, error) {
 	switch s {
-	case OpinionVoteTypeDisagree:
-		return []byte(s), nil
 	case OpinionVoteTypeAgree:
+		return []byte(s), nil
+	case OpinionVoteTypeDisagree:
 		return []byte(s), nil
 	case OpinionVoteTypePass:
 		return []byte(s), nil
@@ -2977,11 +2980,11 @@ func (s OpinionVoteType) MarshalText() ([]byte, error) {
 // UnmarshalText implements encoding.TextUnmarshaler.
 func (s *OpinionVoteType) UnmarshalText(data []byte) error {
 	switch OpinionVoteType(data) {
-	case OpinionVoteTypeDisagree:
-		*s = OpinionVoteTypeDisagree
-		return nil
 	case OpinionVoteTypeAgree:
 		*s = OpinionVoteTypeAgree
+		return nil
+	case OpinionVoteTypeDisagree:
+		*s = OpinionVoteTypeDisagree
 		return nil
 	case OpinionVoteTypePass:
 		*s = OpinionVoteTypePass
@@ -5436,12 +5439,55 @@ func (s *RegenerateResponse) SetMessage(val string) {
 	s.Message = val
 }
 
+// 通報解決アクション.
+// Ref: #/components/schemas/ReportAction
+type ReportAction string
+
+const (
+	ReportActionDeleted ReportAction = "deleted"
+	ReportActionHold    ReportAction = "hold"
+)
+
+// AllValues returns all ReportAction values.
+func (ReportAction) AllValues() []ReportAction {
+	return []ReportAction{
+		ReportActionDeleted,
+		ReportActionHold,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s ReportAction) MarshalText() ([]byte, error) {
+	switch s {
+	case ReportActionDeleted:
+		return []byte(s), nil
+	case ReportActionHold:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *ReportAction) UnmarshalText(data []byte) error {
+	switch ReportAction(data) {
+	case ReportActionDeleted:
+		*s = ReportActionDeleted
+		return nil
+	case ReportActionHold:
+		*s = ReportActionHold
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
 // Ref: #/components/schemas/ReportDetail
 type ReportDetail struct {
 	Opinion Opinion `json:"opinion"`
 	// 作成ユーザー.
 	User    ReportDetailUser          `json:"user"`
-	Status  ReportDetailStatus        `json:"status"`
+	Status  ReportStatus              `json:"status"`
 	Reasons []ReportDetailReasonsItem `json:"reasons"`
 	// この意見が通報を受けた回数.
 	ReportCount int `json:"reportCount"`
@@ -5458,7 +5504,7 @@ func (s *ReportDetail) GetUser() ReportDetailUser {
 }
 
 // GetStatus returns the value of Status.
-func (s *ReportDetail) GetStatus() ReportDetailStatus {
+func (s *ReportDetail) GetStatus() ReportStatus {
 	return s.Status
 }
 
@@ -5483,7 +5529,7 @@ func (s *ReportDetail) SetUser(val ReportDetailUser) {
 }
 
 // SetStatus sets the value of Status.
-func (s *ReportDetail) SetStatus(val ReportDetailStatus) {
+func (s *ReportDetail) SetStatus(val ReportStatus) {
 	s.Status = val
 }
 
@@ -5522,54 +5568,6 @@ func (s *ReportDetailReasonsItem) SetReason(val string) {
 // SetContent sets the value of Content.
 func (s *ReportDetailReasonsItem) SetContent(val OptNilString) {
 	s.Content = val
-}
-
-type ReportDetailStatus string
-
-const (
-	ReportDetailStatusUnsolved ReportDetailStatus = "unsolved"
-	ReportDetailStatusDeleted  ReportDetailStatus = "deleted"
-	ReportDetailStatusHold     ReportDetailStatus = "hold"
-)
-
-// AllValues returns all ReportDetailStatus values.
-func (ReportDetailStatus) AllValues() []ReportDetailStatus {
-	return []ReportDetailStatus{
-		ReportDetailStatusUnsolved,
-		ReportDetailStatusDeleted,
-		ReportDetailStatusHold,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s ReportDetailStatus) MarshalText() ([]byte, error) {
-	switch s {
-	case ReportDetailStatusUnsolved:
-		return []byte(s), nil
-	case ReportDetailStatusDeleted:
-		return []byte(s), nil
-	case ReportDetailStatusHold:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *ReportDetailStatus) UnmarshalText(data []byte) error {
-	switch ReportDetailStatus(data) {
-	case ReportDetailStatusUnsolved:
-		*s = ReportDetailStatusUnsolved
-		return nil
-	case ReportDetailStatusDeleted:
-		*s = ReportDetailStatusDeleted
-		return nil
-	case ReportDetailStatusHold:
-		*s = ReportDetailStatusHold
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
 }
 
 type ReportDetailUser struct {
@@ -5671,6 +5669,56 @@ func (s *ReportReason) SetReasonID(val int) {
 // SetReason sets the value of Reason.
 func (s *ReportReason) SetReason(val string) {
 	s.Reason = val
+}
+
+// 通報ステータス.
+// Ref: #/components/schemas/ReportStatus
+type ReportStatus string
+
+const (
+	ReportStatusUnsolved ReportStatus = "unsolved"
+	ReportStatusDeleted  ReportStatus = "deleted"
+	ReportStatusHold     ReportStatus = "hold"
+)
+
+// AllValues returns all ReportStatus values.
+func (ReportStatus) AllValues() []ReportStatus {
+	return []ReportStatus{
+		ReportStatusUnsolved,
+		ReportStatusDeleted,
+		ReportStatusHold,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s ReportStatus) MarshalText() ([]byte, error) {
+	switch s {
+	case ReportStatusUnsolved:
+		return []byte(s), nil
+	case ReportStatusDeleted:
+		return []byte(s), nil
+	case ReportStatusHold:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *ReportStatus) UnmarshalText(data []byte) error {
+	switch ReportStatus(data) {
+	case ReportStatusUnsolved:
+		*s = ReportStatusUnsolved
+		return nil
+	case ReportStatusDeleted:
+		*s = ReportStatusDeleted
+		return nil
+	case ReportStatusHold:
+		*s = ReportStatusHold
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
 // Ref: #/components/schemas/Restriction
@@ -5863,58 +5911,17 @@ type SolveOpinionReportOK struct{}
 func (*SolveOpinionReportOK) solveOpinionReportRes() {}
 
 type SolveOpinionReportReq struct {
-	Action SolveOpinionReportReqAction `json:"action"`
+	Action ReportAction `json:"action"`
 }
 
 // GetAction returns the value of Action.
-func (s *SolveOpinionReportReq) GetAction() SolveOpinionReportReqAction {
+func (s *SolveOpinionReportReq) GetAction() ReportAction {
 	return s.Action
 }
 
 // SetAction sets the value of Action.
-func (s *SolveOpinionReportReq) SetAction(val SolveOpinionReportReqAction) {
+func (s *SolveOpinionReportReq) SetAction(val ReportAction) {
 	s.Action = val
-}
-
-type SolveOpinionReportReqAction string
-
-const (
-	SolveOpinionReportReqActionDeleted SolveOpinionReportReqAction = "deleted"
-	SolveOpinionReportReqActionHold    SolveOpinionReportReqAction = "hold"
-)
-
-// AllValues returns all SolveOpinionReportReqAction values.
-func (SolveOpinionReportReqAction) AllValues() []SolveOpinionReportReqAction {
-	return []SolveOpinionReportReqAction{
-		SolveOpinionReportReqActionDeleted,
-		SolveOpinionReportReqActionHold,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s SolveOpinionReportReqAction) MarshalText() ([]byte, error) {
-	switch s {
-	case SolveOpinionReportReqActionDeleted:
-		return []byte(s), nil
-	case SolveOpinionReportReqActionHold:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *SolveOpinionReportReqAction) UnmarshalText(data []byte) error {
-	switch SolveOpinionReportReqAction(data) {
-	case SolveOpinionReportReqActionDeleted:
-		*s = SolveOpinionReportReqActionDeleted
-		return nil
-	case SolveOpinionReportReqActionHold:
-		*s = SolveOpinionReportReqActionHold
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
 }
 
 type SwipeOpinionsBadRequest struct {
@@ -7741,6 +7748,7 @@ func (s *Vote2Req) SetVoteStatus(val NilVote2ReqVoteStatus) {
 	s.VoteStatus = val
 }
 
+// 投票タイプ.
 type Vote2ReqVoteStatus string
 
 const (

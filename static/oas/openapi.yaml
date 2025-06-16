@@ -770,11 +770,8 @@ paths:
                   user:
                     $ref: '#/components/schemas/User'
                   myVoteType:
-                    type: string
-                    enum:
-                      - agree
-                      - disagree
-                      - pass
+                    allOf:
+                      - $ref: '#/components/schemas/VoteType'
                     nullable: true
                 required:
                   - opinion
@@ -851,11 +848,8 @@ paths:
                         user:
                           $ref: '#/components/schemas/User'
                         myVoteType:
-                          type: string
-                          enum:
-                            - agree
-                            - disagree
-                            - pass
+                          allOf:
+                            - $ref: '#/components/schemas/VoteType'
                           nullable: true
                       required:
                         - opinion
@@ -1016,12 +1010,12 @@ paths:
               type: object
               properties:
                 action:
-                  type: string
-                  enum:
-                    - deleted
-                    - hold
+                  $ref: '#/components/schemas/ReportAction'
               required:
                 - action
+            encoding:
+              action:
+                contentType: application/json
       x-ogen-operation-group: Opinion
   /opinions/{opinionID}/votes:
     post:
@@ -1081,11 +1075,8 @@ paths:
               type: object
               properties:
                 voteStatus:
-                  type: string
-                  enum:
-                    - agree
-                    - disagree
-                    - pass
+                  allOf:
+                    - $ref: '#/components/schemas/VoteType'
                   nullable: true
               required:
                 - voteStatus
@@ -2309,11 +2300,8 @@ paths:
                         replyCount:
                           type: integer
                         myVoteType:
-                          type: string
-                          enum:
-                            - pass
-                            - disagree
-                            - agree
+                          allOf:
+                            - $ref: '#/components/schemas/VoteType'
                           nullable: true
                       required:
                         - opinion
@@ -3409,11 +3397,8 @@ components:
           type: string
           description: 親の意見ID。ルートならば無し
         voteType:
-          type: string
-          enum:
-            - disagree
-            - agree
-            - pass
+          allOf:
+            - $ref: '#/components/schemas/VoteType'
           nullable: true
           description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
         pictureURL:
@@ -3524,6 +3509,12 @@ components:
         content:
           type: string
           description: レポート本文
+    ReportAction:
+      type: string
+      enum:
+        - deleted
+        - hold
+      description: 通報解決アクション
     ReportDetail:
       type: object
       required:
@@ -3540,11 +3531,7 @@ components:
             - $ref: '#/components/schemas/User'
           description: 作成ユーザー
         status:
-          type: string
-          enum:
-            - unsolved
-            - deleted
-            - hold
+          $ref: '#/components/schemas/ReportStatus'
         reasons:
           type: array
           items:
@@ -3572,6 +3559,13 @@ components:
         reason:
           type: string
           description: 不適切な内容
+    ReportStatus:
+      type: string
+      enum:
+        - unsolved
+        - deleted
+        - hold
+      description: 通報ステータス
     Restriction:
       type: object
       required:
@@ -3973,6 +3967,13 @@ components:
         message:
           type: string
           description: バリデーションエラーメッセージ
+    VoteType:
+      type: string
+      enum:
+        - agree
+        - disagree
+        - pass
+      description: 投票タイプ
   securitySchemes:
     CookieAuth:
       type: apiKey

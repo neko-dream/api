@@ -16,7 +16,7 @@ namespace kotohiro {
   op getOpinionDetail2(@path opinionID: string): Body<{
     opinion: Opinion;
     user: User;
-    myVoteType?: "agree" | "disagree" | "pass" | null;
+    myVoteType?: VoteType | null;
   }> | {
     @statusCode statusCode: 500;
     @body body: {};
@@ -36,7 +36,7 @@ namespace kotohiro {
     opinions: {
       opinion: Opinion;
       user: User;
-      myVoteType?: "agree" | "disagree" | "pass" | null;
+      myVoteType?: VoteType | null;
     }[];
   }> | {
     @statusCode statusCode: 400;
@@ -79,7 +79,7 @@ namespace kotohiro {
   @route("/opinions/{opinionID}/reports")
   @get
   @summary("意見に対する通報取得")
-  op getOpinionReports(@path opinionID: string): ReportDetail | {
+  op getOpinionReports(@path opinionID: string): Body<ReportDetail> | {
     @statusCode statusCode: 400;
     @body body: {};
   } | {
@@ -95,7 +95,7 @@ namespace kotohiro {
   op solveOpinionReport(
     @path opinionID: string,
     @multipartBody body: {
-      action: HttpPart<"deleted" | "hold">;
+      action: HttpPart<ReportAction>;
     },
   ): Body<{}> | {
     @statusCode statusCode: 400;
@@ -187,7 +187,7 @@ namespace kotohiro {
       opinion: Opinion;
       user: User;
       replyCount: integer;
-      myVoteType?: "pass" | "disagree" | "agree" | null;
+      myVoteType?: VoteType | null;
     }[];
     pagination: {
       totalCount: integer;

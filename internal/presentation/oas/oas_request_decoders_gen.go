@@ -2331,13 +2331,14 @@ func (s *Server) decodeSolveOpinionReportRequest(r *http.Request) (
 					if err != nil {
 						return err
 					}
-
-					c, err := conv.ToString(val)
-					if err != nil {
+					if err := func(d *jx.Decoder) error {
+						if err := request.Action.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
 						return err
 					}
-
-					request.Action = SolveOpinionReportReqAction(c)
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"action\"")

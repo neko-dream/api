@@ -3900,12 +3900,12 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) Decode(d *jx.Decoder
 	}
 	// Try to use constant string.
 	switch GetOpinionsForTalkSessionOKOpinionsItemMyVoteType(v) {
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass:
-		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree:
-		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree
 	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree:
 		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree
+	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree:
+		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree
+	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass:
+		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass
 	default:
 		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteType(v)
 	}
@@ -8886,10 +8886,10 @@ func (s *OpinionVoteType) Decode(d *jx.Decoder) error {
 	}
 	// Try to use constant string.
 	switch OpinionVoteType(v) {
-	case OpinionVoteTypeDisagree:
-		*s = OpinionVoteTypeDisagree
 	case OpinionVoteTypeAgree:
 		*s = OpinionVoteTypeAgree
+	case OpinionVoteTypeDisagree:
+		*s = OpinionVoteTypeDisagree
 	case OpinionVoteTypePass:
 		*s = OpinionVoteTypePass
 	default:
@@ -11735,6 +11735,46 @@ func (s *RegenerateResponse) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes ReportAction as json.
+func (s ReportAction) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes ReportAction from json.
+func (s *ReportAction) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ReportAction to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch ReportAction(v) {
+	case ReportActionDeleted:
+		*s = ReportActionDeleted
+	case ReportActionHold:
+		*s = ReportActionHold
+	default:
+		*s = ReportAction(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s ReportAction) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ReportAction) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode implements json.Marshaler.
 func (s *ReportDetail) Encode(e *jx.Encoder) {
 	e.ObjStart()
@@ -12012,48 +12052,6 @@ func (s *ReportDetailReasonsItem) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *ReportDetailReasonsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes ReportDetailStatus as json.
-func (s ReportDetailStatus) Encode(e *jx.Encoder) {
-	e.Str(string(s))
-}
-
-// Decode decodes ReportDetailStatus from json.
-func (s *ReportDetailStatus) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode ReportDetailStatus to nil")
-	}
-	v, err := d.StrBytes()
-	if err != nil {
-		return err
-	}
-	// Try to use constant string.
-	switch ReportDetailStatus(v) {
-	case ReportDetailStatusUnsolved:
-		*s = ReportDetailStatusUnsolved
-	case ReportDetailStatusDeleted:
-		*s = ReportDetailStatusDeleted
-	case ReportDetailStatusHold:
-		*s = ReportDetailStatusHold
-	default:
-		*s = ReportDetailStatus(v)
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s ReportDetailStatus) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ReportDetailStatus) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -12429,6 +12427,48 @@ func (s *ReportReason) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *ReportReason) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes ReportStatus as json.
+func (s ReportStatus) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes ReportStatus from json.
+func (s *ReportStatus) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ReportStatus to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch ReportStatus(v) {
+	case ReportStatusUnsolved:
+		*s = ReportStatusUnsolved
+	case ReportStatusDeleted:
+		*s = ReportStatusDeleted
+	case ReportStatusHold:
+		*s = ReportStatusHold
+	default:
+		*s = ReportStatus(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s ReportStatus) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ReportStatus) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
