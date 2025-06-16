@@ -80,9 +80,9 @@ type OrganizationUser struct {
 	OrganizationUserID uuid.UUID
 	UserID             uuid.UUID
 	OrganizationID     uuid.UUID
-	Role               int32
 	CreatedAt          time.Time
 	UpdatedAt          time.Time
+	Role               int32
 }
 
 type PasswordAuth struct {

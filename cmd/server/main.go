@@ -14,6 +14,7 @@ import (
 	"github.com/rs/cors"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 
+	"github.com/swaggest/swgui"
 	"github.com/swaggest/swgui/v5emb"
 )
 
@@ -64,7 +65,25 @@ func main() {
 	mux.Handle("/admin/", http.StripPrefix("/admin/", handler.NewAdminUIHandler()))
 	mux.Handle("/assets/", http.StripPrefix("/assets/", handler.NewAdminUIAssetsHandler()))
 	mux.Handle("/admin", http.RedirectHandler("/admin/index.html", http.StatusSeeOther))
-	mux.Handle("/docs/", v5emb.New("kotohiro", domain, "/docs/"))
+	swag := v5emb.NewWithConfig(swgui.Config{
+		Title:       "Kotohiro API",
+		HideCurl:    true,
+		SwaggerJSON: domain,
+		BasePath:    "/docs/",
+		JsonEditor:  true,
+		SettingsUI: map[string]string{
+			"deepLinking":              "true", // URLで各APIに直リンク可能
+			"defaultModelsExpandDepth": "1",
+			"defaultModelExpandDepth":  "1",
+			"defaultModelRendering":    "\"model\"",
+			"displayRequestDuration":   "true",
+			"tryItOutEnabled":          "true",
+			"layout":                   "\"BaseLayout\"",
+			"showExtensions":           "true",
+			"showCommonExtensions":     "true",
+		},
+	})
+	mux.Handle("/docs/", swag("Kotohiro API", domain, "/docs/"))
 	// }
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%s", conf.PORT), mux); err != nil {
