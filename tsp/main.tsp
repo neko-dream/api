@@ -7,7 +7,6 @@ using OpenAPI;
 
 @service(#{ title: "Kotohiro API", version: "1.0.0" })
 @info(#{ version: "1.0.0" })
-@server("http://localhost:3000", "Kotohiro API Server")
 @useAuth(CookieAuth)
 namespace kotohiro {
   @doc("Cookie-based authentication using JWT tokens stored in secure HTTP-only cookies")

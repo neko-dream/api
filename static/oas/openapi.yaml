@@ -4012,7 +4012,3 @@ components:
       in: cookie
       name: SessionId
       description: Cookie-based authentication using JWT tokens stored in secure HTTP-only cookies
-servers:
-  - url: http://localhost:3000
-    description: Kotohiro API Server
-    variables: {}
