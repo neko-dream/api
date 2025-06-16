@@ -58,7 +58,7 @@ paths:
       operationId: devAuthorize
       summary: 開発用登録/ログイン
       parameters:
-        - name: redirect_url
+        - name: redirectUrl
           in: query
           required: true
           schema:
@@ -69,7 +69,7 @@ paths:
           description: devのみで使用するsubjectです。ここで指定した値はログインした後も確認できないため覚えておいてください。同じ値を指定すると同じアカウントにログインできます。
           schema:
             type: string
-        - name: organization_code
+        - name: organizationCode
           in: query
           required: false
           description: 組織コード（組織ログインの場合）
@@ -156,13 +156,13 @@ paths:
       operationId: changePassword
       summary: パスワード変更
       parameters:
-        - name: old_password
+        - name: oldPassword
           in: query
           required: true
           description: 古いパスワード
           schema:
             type: string
-        - name: new_password
+        - name: newPassword
           in: query
           required: true
           description: 新たなパスワード
@@ -223,12 +223,12 @@ paths:
             schema:
               type: object
               properties:
-                id_or_email:
+                idOrEmail:
                   type: string
                 password:
                   type: string
               required:
-                - id_or_email
+                - idOrEmail
                 - password
       security:
         - {}
@@ -281,7 +281,7 @@ paths:
       x-ogen-operation-group: Auth
   /auth/revoke:
     post:
-      operationId: oauth_token_revoke
+      operationId: revokeToken
       summary: トークンを失効（ログアウト）
       parameters: []
       responses:
@@ -316,7 +316,7 @@ paths:
       x-ogen-operation-group: Auth
   /auth/token/info:
     get:
-      operationId: oauth_token_info
+      operationId: getTokenInfo
       summary: JWTの内容を返してくれる
       parameters: []
       responses:
@@ -359,7 +359,7 @@ paths:
       x-ogen-operation-group: Auth
   /auth/{provider}/callback:
     get:
-      operationId: oauth_callback
+      operationId: handleAuthCallback
       summary: Auth Callback
       parameters:
         - name: provider
@@ -427,19 +427,19 @@ paths:
             enum:
               - google
               - line
-        - name: redirect_url
+        - name: redirectUrl
           in: query
           required: true
           description: ログイン後にリダイレクトするURL
           schema:
             type: string
-        - name: organization_code
+        - name: organizationCode
           in: query
           required: false
           description: 組織コード（組織ログインの場合）
           schema:
             type: string
-        - name: registration_url
+        - name: registrationUrl
           in: query
           required: false
           description: 登録していなかった場合に飛ばすURL

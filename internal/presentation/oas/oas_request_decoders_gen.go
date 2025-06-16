@@ -1396,7 +1396,7 @@ func (s *Server) decodePasswordLoginRequest(r *http.Request) (
 		q := uri.NewQueryDecoder(form)
 		{
 			cfg := uri.QueryParameterDecodingConfig{
-				Name:    "id_or_email",
+				Name:    "idOrEmail",
 				Style:   uri.QueryStyleForm,
 				Explode: true,
 			}
@@ -1412,10 +1412,10 @@ func (s *Server) decodePasswordLoginRequest(r *http.Request) (
 						return err
 					}
 
-					request.IDOrEmail = c
+					request.IdOrEmail = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"id_or_email\"")
+					return req, close, errors.Wrap(err, "decode \"idOrEmail\"")
 				}
 			} else {
 				return req, close, errors.Wrap(err, "query")

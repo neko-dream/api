@@ -121,8 +121,16 @@ type GetTimeLineRes interface {
 	getTimeLineRes()
 }
 
+type GetTokenInfoRes interface {
+	getTokenInfoRes()
+}
+
 type GetUserInfoRes interface {
 	getUserInfoRes()
+}
+
+type HandleAuthCallbackRes interface {
+	handleAuthCallbackRes()
 }
 
 type HasConsentRes interface {
@@ -143,18 +151,6 @@ type InviteOrganizationForUserRes interface {
 
 type InviteOrganizationRes interface {
 	inviteOrganizationRes()
-}
-
-type OAuthCallbackRes interface {
-	oAuthCallbackRes()
-}
-
-type OAuthTokenInfoRes interface {
-	oAuthTokenInfoRes()
-}
-
-type OAuthTokenRevokeRes interface {
-	oAuthTokenRevokeRes()
 }
 
 type OpinionComments2Res interface {
@@ -195,6 +191,10 @@ type PostTimeLineItemRes interface {
 
 type ReportOpinionRes interface {
 	reportOpinionRes()
+}
+
+type RevokeTokenRes interface {
+	revokeTokenRes()
 }
 
 type SessionsHistoryRes interface {

@@ -267,7 +267,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						// Leaf node.
 						switch r.Method {
 						case "POST":
-							s.handleOAuthTokenRevokeRequest([0]string{}, elemIsEscaped, w, r)
+							s.handleRevokeTokenRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "POST")
 						}
@@ -288,7 +288,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						// Leaf node.
 						switch r.Method {
 						case "GET":
-							s.handleOAuthTokenInfoRequest([0]string{}, elemIsEscaped, w, r)
+							s.handleGetTokenInfoRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "GET")
 						}
@@ -335,7 +335,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							// Leaf node.
 							switch r.Method {
 							case "GET":
-								s.handleOAuthCallbackRequest([1]string{
+								s.handleHandleAuthCallbackRequest([1]string{
 									args[0],
 								}, elemIsEscaped, w, r)
 							default:
@@ -2000,9 +2000,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						// Leaf node.
 						switch method {
 						case "POST":
-							r.name = "OAuthTokenRevoke"
+							r.name = "RevokeToken"
 							r.summary = "トークンを失効（ログアウト）"
-							r.operationID = "oauth_token_revoke"
+							r.operationID = "revokeToken"
 							r.pathPattern = "/auth/revoke"
 							r.args = args
 							r.count = 0
@@ -2025,9 +2025,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						// Leaf node.
 						switch method {
 						case "GET":
-							r.name = "OAuthTokenInfo"
+							r.name = "GetTokenInfo"
 							r.summary = "JWTの内容を返してくれる"
-							r.operationID = "oauth_token_info"
+							r.operationID = "getTokenInfo"
 							r.pathPattern = "/auth/token/info"
 							r.args = args
 							r.count = 0
@@ -2076,9 +2076,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							// Leaf node.
 							switch method {
 							case "GET":
-								r.name = "OAuthCallback"
+								r.name = "HandleAuthCallback"
 								r.summary = "Auth Callback"
-								r.operationID = "oauth_callback"
+								r.operationID = "handleAuthCallback"
 								r.pathPattern = "/auth/{provider}/callback"
 								r.args = args
 								r.count = 1

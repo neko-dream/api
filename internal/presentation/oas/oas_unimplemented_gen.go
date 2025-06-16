@@ -309,6 +309,15 @@ func (UnimplementedHandler) GetTimeLine(ctx context.Context, params GetTimeLineP
 	return r, ht.ErrNotImplemented
 }
 
+// GetTokenInfo implements getTokenInfo operation.
+//
+// JWTの内容を返してくれる.
+//
+// GET /auth/token/info
+func (UnimplementedHandler) GetTokenInfo(ctx context.Context) (r GetTokenInfoRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetUserInfo implements get_user_info operation.
 //
 // ユーザー情報の取得.
@@ -336,6 +345,15 @@ func (UnimplementedHandler) GetUserStatsListManage(ctx context.Context, params G
 //
 // GET /v1/manage/users/stats/total
 func (UnimplementedHandler) GetUserStatsTotalManage(ctx context.Context) (r *UserStatsResponse, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// HandleAuthCallback implements handleAuthCallback operation.
+//
+// Auth Callback.
+//
+// GET /auth/{provider}/callback
+func (UnimplementedHandler) HandleAuthCallback(ctx context.Context, params HandleAuthCallbackParams) (r HandleAuthCallbackRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -398,33 +416,6 @@ func (UnimplementedHandler) InviteOrganizationForUser(ctx context.Context, req *
 //
 // POST /v1/manage/talksessions/{talkSessionID}/analysis/regenerate
 func (UnimplementedHandler) ManageRegenerateManage(ctx context.Context, req *RegenerateRequest, params ManageRegenerateManageParams) (r *RegenerateResponse, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// OAuthCallback implements oauth_callback operation.
-//
-// Auth Callback.
-//
-// GET /auth/{provider}/callback
-func (UnimplementedHandler) OAuthCallback(ctx context.Context, params OAuthCallbackParams) (r OAuthCallbackRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// OAuthTokenInfo implements oauth_token_info operation.
-//
-// JWTの内容を返してくれる.
-//
-// GET /auth/token/info
-func (UnimplementedHandler) OAuthTokenInfo(ctx context.Context) (r OAuthTokenInfoRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// OAuthTokenRevoke implements oauth_token_revoke operation.
-//
-// トークンを失効（ログアウト）.
-//
-// POST /auth/revoke
-func (UnimplementedHandler) OAuthTokenRevoke(ctx context.Context) (r OAuthTokenRevokeRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -518,6 +509,15 @@ func (UnimplementedHandler) PostTimeLineItem(ctx context.Context, req *PostTimeL
 //
 // POST /opinions/{opinionID}/report
 func (UnimplementedHandler) ReportOpinion(ctx context.Context, req *ReportOpinionReq, params ReportOpinionParams) (r ReportOpinionRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// RevokeToken implements revokeToken operation.
+//
+// トークンを失効（ログアウト）.
+//
+// POST /auth/revoke
+func (UnimplementedHandler) RevokeToken(ctx context.Context) (r RevokeTokenRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

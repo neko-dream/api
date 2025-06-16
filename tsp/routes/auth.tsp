@@ -16,12 +16,12 @@ namespace kotohiro {
     /**
      * 古いパスワード
      */
-    @query(#{ explode: true }) old_password: string,
+    @query(#{ explode: true }) oldPassword: string,
 
     /**
      * 新たなパスワード
      */
-    @query(#{ explode: true }) new_password: string,
+    @query(#{ explode: true }) newPassword: string,
   ): Body<{}> | {
     @statusCode statusCode: 400;
     @body body: {};
@@ -35,7 +35,7 @@ namespace kotohiro {
   @route("/auth/token/info")
   @get
   @summary("JWTの内容を返してくれる")
-  op oauth_token_info(): Body<TokenClaim> | {
+  op getTokenInfo(): Body<TokenClaim> | {
     @statusCode statusCode: 400;
     @body body: {
       code: string;
@@ -55,7 +55,7 @@ namespace kotohiro {
   @get
   @summary("Auth Callback")
   @useAuth([])
-  op oauth_callback(
+  op handleAuthCallback(
     @path provider: string,
     @query(#{ explode: true }) code: string,
 
@@ -88,7 +88,7 @@ namespace kotohiro {
   @summary("開発用登録/ログイン")
   @useAuth([])
   op devAuthorize(
-    @query(#{ explode: true }) redirect_url: string,
+    @query(#{ explode: true }) redirectUrl: string,
 
     /**
      * devのみで使用するsubjectです。ここで指定した値はログインした後も確認できないため覚えておいてください。同じ値を指定すると同じアカウントにログインできます。
@@ -98,7 +98,7 @@ namespace kotohiro {
     /**
      * 組織コード（組織ログインの場合）
      */
-    @query(#{ explode: true }) organization_code?: string,
+    @query(#{ explode: true }) organizationCode?: string,
   ): {
     @statusCode statusCode: 302;
     @header("Location") Location?: string;
@@ -124,17 +124,17 @@ namespace kotohiro {
     /**
      * ログイン後にリダイレクトするURL
      */
-    @query(#{ explode: true }) redirect_url: string,
+    @query(#{ explode: true }) redirectUrl: string,
 
     /**
      * 組織コード（組織ログインの場合）
      */
-    @query(#{ explode: true }) organization_code?: string,
+    @query(#{ explode: true }) organizationCode?: string,
 
     /**
      * 登録していなかった場合に飛ばすURL
      */
-    @query(#{ explode: true }) registration_url?: string,
+    @query(#{ explode: true }) registrationUrl?: string,
   ): {
     @statusCode statusCode: 302;
 
@@ -182,7 +182,7 @@ namespace kotohiro {
   @route("/auth/revoke")
   @post
   @summary("トークンを失効（ログアウト）")
-  op oauth_token_revoke(): {
+  op revokeToken(): {
     @statusCode statusCode: 204;
 
     /**
@@ -207,7 +207,7 @@ namespace kotohiro {
   @useAuth([])
   op passwordLogin(
     @multipartBody body: {
-      id_or_email: HttpPart<string>;
+      idOrEmail: HttpPart<string>;
       password: HttpPart<string>;
     },
   ): Body<{}> | {

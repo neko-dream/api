@@ -50,24 +50,18 @@ type AuthHandler interface {
 	//
 	// GET /auth/dev/login
 	DevAuthorize(ctx context.Context, params DevAuthorizeParams) (DevAuthorizeRes, error)
-	// OAuthCallback implements oauth_callback operation.
-	//
-	// Auth Callback.
-	//
-	// GET /auth/{provider}/callback
-	OAuthCallback(ctx context.Context, params OAuthCallbackParams) (OAuthCallbackRes, error)
-	// OAuthTokenInfo implements oauth_token_info operation.
+	// GetTokenInfo implements getTokenInfo operation.
 	//
 	// JWTの内容を返してくれる.
 	//
 	// GET /auth/token/info
-	OAuthTokenInfo(ctx context.Context) (OAuthTokenInfoRes, error)
-	// OAuthTokenRevoke implements oauth_token_revoke operation.
+	GetTokenInfo(ctx context.Context) (GetTokenInfoRes, error)
+	// HandleAuthCallback implements handleAuthCallback operation.
 	//
-	// トークンを失効（ログアウト）.
+	// Auth Callback.
 	//
-	// POST /auth/revoke
-	OAuthTokenRevoke(ctx context.Context) (OAuthTokenRevokeRes, error)
+	// GET /auth/{provider}/callback
+	HandleAuthCallback(ctx context.Context, params HandleAuthCallbackParams) (HandleAuthCallbackRes, error)
 	// PasswordLogin implements passwordLogin operation.
 	//
 	// パスワードによるログイン.
@@ -80,6 +74,12 @@ type AuthHandler interface {
 	//
 	// POST /auth/password/register
 	PasswordRegister(ctx context.Context, req *PasswordRegisterReq) (PasswordRegisterRes, error)
+	// RevokeToken implements revokeToken operation.
+	//
+	// トークンを失効（ログアウト）.
+	//
+	// POST /auth/revoke
+	RevokeToken(ctx context.Context) (RevokeTokenRes, error)
 }
 
 // HealthHandler handles operations described by OpenAPI v3 specification.

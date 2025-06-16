@@ -1870,6 +1870,60 @@ func (s *GetTimeLineOK) SetItems(val []ActionItem) {
 
 func (*GetTimeLineOK) getTimeLineRes() {}
 
+type GetTokenInfoBadRequest struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *GetTokenInfoBadRequest) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *GetTokenInfoBadRequest) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *GetTokenInfoBadRequest) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *GetTokenInfoBadRequest) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*GetTokenInfoBadRequest) getTokenInfoRes() {}
+
+type GetTokenInfoInternalServerError struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *GetTokenInfoInternalServerError) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *GetTokenInfoInternalServerError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *GetTokenInfoInternalServerError) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *GetTokenInfoInternalServerError) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*GetTokenInfoInternalServerError) getTokenInfoRes() {}
+
 type GetUserInfoInternalServerError struct{}
 
 func (*GetUserInfoInternalServerError) getUserInfoRes() {}
@@ -2007,6 +2061,55 @@ func (s *GetUserListManageOrderBy) UnmarshalText(data []byte) error {
 		return errors.Errorf("invalid value: %q", data)
 	}
 }
+
+type HandleAuthCallbackBadRequest struct{}
+
+func (*HandleAuthCallbackBadRequest) handleAuthCallbackRes() {}
+
+type HandleAuthCallbackFound struct{}
+
+// HandleAuthCallbackFoundHeaders wraps HandleAuthCallbackFound with response headers.
+type HandleAuthCallbackFoundHeaders struct {
+	Location  string
+	SetCookie []string
+	Response  HandleAuthCallbackFound
+}
+
+// GetLocation returns the value of Location.
+func (s *HandleAuthCallbackFoundHeaders) GetLocation() string {
+	return s.Location
+}
+
+// GetSetCookie returns the value of SetCookie.
+func (s *HandleAuthCallbackFoundHeaders) GetSetCookie() []string {
+	return s.SetCookie
+}
+
+// GetResponse returns the value of Response.
+func (s *HandleAuthCallbackFoundHeaders) GetResponse() HandleAuthCallbackFound {
+	return s.Response
+}
+
+// SetLocation sets the value of Location.
+func (s *HandleAuthCallbackFoundHeaders) SetLocation(val string) {
+	s.Location = val
+}
+
+// SetSetCookie sets the value of SetCookie.
+func (s *HandleAuthCallbackFoundHeaders) SetSetCookie(val []string) {
+	s.SetCookie = val
+}
+
+// SetResponse sets the value of Response.
+func (s *HandleAuthCallbackFoundHeaders) SetResponse(val HandleAuthCallbackFound) {
+	s.Response = val
+}
+
+func (*HandleAuthCallbackFoundHeaders) handleAuthCallbackRes() {}
+
+type HandleAuthCallbackInternalServerError struct{}
+
+func (*HandleAuthCallbackInternalServerError) handleAuthCallbackRes() {}
 
 type HasConsentBadRequest struct{}
 
@@ -2479,147 +2582,6 @@ func (o NilVote2ReqVoteStatus) Or(d Vote2ReqVoteStatus) Vote2ReqVoteStatus {
 	}
 	return d
 }
-
-type OAuthCallbackBadRequest struct{}
-
-func (*OAuthCallbackBadRequest) oAuthCallbackRes() {}
-
-type OAuthCallbackFound struct{}
-
-// OAuthCallbackFoundHeaders wraps OAuthCallbackFound with response headers.
-type OAuthCallbackFoundHeaders struct {
-	Location  string
-	SetCookie []string
-	Response  OAuthCallbackFound
-}
-
-// GetLocation returns the value of Location.
-func (s *OAuthCallbackFoundHeaders) GetLocation() string {
-	return s.Location
-}
-
-// GetSetCookie returns the value of SetCookie.
-func (s *OAuthCallbackFoundHeaders) GetSetCookie() []string {
-	return s.SetCookie
-}
-
-// GetResponse returns the value of Response.
-func (s *OAuthCallbackFoundHeaders) GetResponse() OAuthCallbackFound {
-	return s.Response
-}
-
-// SetLocation sets the value of Location.
-func (s *OAuthCallbackFoundHeaders) SetLocation(val string) {
-	s.Location = val
-}
-
-// SetSetCookie sets the value of SetCookie.
-func (s *OAuthCallbackFoundHeaders) SetSetCookie(val []string) {
-	s.SetCookie = val
-}
-
-// SetResponse sets the value of Response.
-func (s *OAuthCallbackFoundHeaders) SetResponse(val OAuthCallbackFound) {
-	s.Response = val
-}
-
-func (*OAuthCallbackFoundHeaders) oAuthCallbackRes() {}
-
-type OAuthCallbackInternalServerError struct{}
-
-func (*OAuthCallbackInternalServerError) oAuthCallbackRes() {}
-
-type OAuthTokenInfoBadRequest struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-}
-
-// GetCode returns the value of Code.
-func (s *OAuthTokenInfoBadRequest) GetCode() string {
-	return s.Code
-}
-
-// GetMessage returns the value of Message.
-func (s *OAuthTokenInfoBadRequest) GetMessage() string {
-	return s.Message
-}
-
-// SetCode sets the value of Code.
-func (s *OAuthTokenInfoBadRequest) SetCode(val string) {
-	s.Code = val
-}
-
-// SetMessage sets the value of Message.
-func (s *OAuthTokenInfoBadRequest) SetMessage(val string) {
-	s.Message = val
-}
-
-func (*OAuthTokenInfoBadRequest) oAuthTokenInfoRes() {}
-
-type OAuthTokenInfoInternalServerError struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-}
-
-// GetCode returns the value of Code.
-func (s *OAuthTokenInfoInternalServerError) GetCode() string {
-	return s.Code
-}
-
-// GetMessage returns the value of Message.
-func (s *OAuthTokenInfoInternalServerError) GetMessage() string {
-	return s.Message
-}
-
-// SetCode sets the value of Code.
-func (s *OAuthTokenInfoInternalServerError) SetCode(val string) {
-	s.Code = val
-}
-
-// SetMessage sets the value of Message.
-func (s *OAuthTokenInfoInternalServerError) SetMessage(val string) {
-	s.Message = val
-}
-
-func (*OAuthTokenInfoInternalServerError) oAuthTokenInfoRes() {}
-
-type OAuthTokenRevokeBadRequest struct{}
-
-func (*OAuthTokenRevokeBadRequest) oAuthTokenRevokeRes() {}
-
-type OAuthTokenRevokeInternalServerError struct{}
-
-func (*OAuthTokenRevokeInternalServerError) oAuthTokenRevokeRes() {}
-
-type OAuthTokenRevokeNoContent struct{}
-
-// OAuthTokenRevokeNoContentHeaders wraps OAuthTokenRevokeNoContent with response headers.
-type OAuthTokenRevokeNoContentHeaders struct {
-	SetCookie []string
-	Response  OAuthTokenRevokeNoContent
-}
-
-// GetSetCookie returns the value of SetCookie.
-func (s *OAuthTokenRevokeNoContentHeaders) GetSetCookie() []string {
-	return s.SetCookie
-}
-
-// GetResponse returns the value of Response.
-func (s *OAuthTokenRevokeNoContentHeaders) GetResponse() OAuthTokenRevokeNoContent {
-	return s.Response
-}
-
-// SetSetCookie sets the value of SetCookie.
-func (s *OAuthTokenRevokeNoContentHeaders) SetSetCookie(val []string) {
-	s.SetCookie = val
-}
-
-// SetResponse sets the value of Response.
-func (s *OAuthTokenRevokeNoContentHeaders) SetResponse(val OAuthTokenRevokeNoContent) {
-	s.Response = val
-}
-
-func (*OAuthTokenRevokeNoContentHeaders) oAuthTokenRevokeRes() {}
 
 // Ref: #/components/schemas/OffsetPagination
 type OffsetPagination struct {
@@ -4931,13 +4893,13 @@ type PasswordLoginOK struct{}
 func (*PasswordLoginOK) passwordLoginRes() {}
 
 type PasswordLoginReq struct {
-	IDOrEmail string `json:"id_or_email"`
+	IdOrEmail string `json:"idOrEmail"`
 	Password  string `json:"password"`
 }
 
-// GetIDOrEmail returns the value of IDOrEmail.
-func (s *PasswordLoginReq) GetIDOrEmail() string {
-	return s.IDOrEmail
+// GetIdOrEmail returns the value of IdOrEmail.
+func (s *PasswordLoginReq) GetIdOrEmail() string {
+	return s.IdOrEmail
 }
 
 // GetPassword returns the value of Password.
@@ -4945,9 +4907,9 @@ func (s *PasswordLoginReq) GetPassword() string {
 	return s.Password
 }
 
-// SetIDOrEmail sets the value of IDOrEmail.
-func (s *PasswordLoginReq) SetIDOrEmail(val string) {
-	s.IDOrEmail = val
+// SetIdOrEmail sets the value of IdOrEmail.
+func (s *PasswordLoginReq) SetIdOrEmail(val string) {
+	s.IdOrEmail = val
 }
 
 // SetPassword sets the value of Password.
@@ -5748,6 +5710,44 @@ func (s *Restriction) SetDescription(val string) {
 func (s *Restriction) SetDependsOn(val []string) {
 	s.DependsOn = val
 }
+
+type RevokeTokenBadRequest struct{}
+
+func (*RevokeTokenBadRequest) revokeTokenRes() {}
+
+type RevokeTokenInternalServerError struct{}
+
+func (*RevokeTokenInternalServerError) revokeTokenRes() {}
+
+type RevokeTokenNoContent struct{}
+
+// RevokeTokenNoContentHeaders wraps RevokeTokenNoContent with response headers.
+type RevokeTokenNoContentHeaders struct {
+	SetCookie []string
+	Response  RevokeTokenNoContent
+}
+
+// GetSetCookie returns the value of SetCookie.
+func (s *RevokeTokenNoContentHeaders) GetSetCookie() []string {
+	return s.SetCookie
+}
+
+// GetResponse returns the value of Response.
+func (s *RevokeTokenNoContentHeaders) GetResponse() RevokeTokenNoContent {
+	return s.Response
+}
+
+// SetSetCookie sets the value of SetCookie.
+func (s *RevokeTokenNoContentHeaders) SetSetCookie(val []string) {
+	s.SetCookie = val
+}
+
+// SetResponse sets the value of Response.
+func (s *RevokeTokenNoContentHeaders) SetResponse(val RevokeTokenNoContent) {
+	s.Response = val
+}
+
+func (*RevokeTokenNoContentHeaders) revokeTokenRes() {}
 
 type SessionsHistoryBadRequest struct{}
 
@@ -7072,7 +7072,7 @@ func (s *TokenClaim) SetOrganizationID(val OptNilString) {
 	s.OrganizationID = val
 }
 
-func (*TokenClaim) oAuthTokenInfoRes() {}
+func (*TokenClaim) getTokenInfoRes() {}
 
 type UpdateUserProfileBadRequest struct {
 	Code    string `json:"code"`
