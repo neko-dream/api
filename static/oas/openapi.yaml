@@ -1520,18 +1520,6 @@ paths:
               - oldest
               - mostReplies
               - nearest
-            x-apidog:
-              enumDescriptions:
-                latest: ''
-                oldest: ''
-                mostReplies: ''
-                nearest: ''
-          x-apidog:
-            enumDescriptions:
-              latest: ''
-              oldest: ''
-              mostReplies: ''
-              nearest: ''
         - name: latitude
           in: query
           required: false
@@ -1976,7 +1964,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -2004,6 +1992,15 @@ paths:
               required:
                 - theme
                 - scheduledEndTime
+            encoding:
+              latitude:
+                contentType: application/json
+              prefecture:
+                contentType: application/json
+              city:
+                contentType: application/json
+              description:
+                contentType: application/json
       x-ogen-operation-group: TalkSession
   /talksessions/{talkSessionID}/analysis:
     get:
