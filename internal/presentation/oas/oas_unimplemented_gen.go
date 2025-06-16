@@ -49,6 +49,15 @@ func (UnimplementedHandler) ConsentTalkSession(ctx context.Context, params Conse
 	return r, ht.ErrNotImplemented
 }
 
+// CreateOrganizationAlias implements createOrganizationAlias operation.
+//
+// 組織エイリアス作成.
+//
+// POST /organizations/{organizationID}/aliases
+func (UnimplementedHandler) CreateOrganizationAlias(ctx context.Context, req *CreateOrganizationAliasReq, params CreateOrganizationAliasParams) (r CreateOrganizationAliasRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // CreateOrganizations implements createOrganizations operation.
 //
 // 組織を作成できる。
@@ -76,6 +85,15 @@ func (UnimplementedHandler) CreateOrganizations(ctx context.Context, req *Create
 //
 // POST /talksessions
 func (UnimplementedHandler) CreateTalkSession(ctx context.Context, req *CreateTalkSessionReq) (r CreateTalkSessionRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// DeleteOrganizationAlias implements deleteOrganizationAlias operation.
+//
+// 組織エイリアス削除.
+//
+// DELETE /organizations/{organizationID}/aliases/{aliasID}
+func (UnimplementedHandler) DeleteOrganizationAlias(ctx context.Context, params DeleteOrganizationAliasParams) (r DeleteOrganizationAliasRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -191,6 +209,15 @@ func (UnimplementedHandler) GetOpinionReports(ctx context.Context, params GetOpi
 //
 // GET /talksessions/{talkSessionID}/opinions
 func (UnimplementedHandler) GetOpinionsForTalkSession(ctx context.Context, params GetOpinionsForTalkSessionParams) (r GetOpinionsForTalkSessionRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetOrganizationAliases implements getOrganizationAliases operation.
+//
+// 組織エイリアス一覧取得.
+//
+// GET /organizations/{organizationID}/aliases
+func (UnimplementedHandler) GetOrganizationAliases(ctx context.Context, params GetOrganizationAliasesParams) (r GetOrganizationAliasesRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

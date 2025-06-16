@@ -743,40 +743,87 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							break
 						}
 						switch elem[0] {
-						case '/': // Prefix: "/invite"
+						case '/': // Prefix: "/"
 							origElem := elem
-							if l := len("/invite"); len(elem) >= l && elem[0:l] == "/invite" {
+							if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 								elem = elem[l:]
 							} else {
 								break
 							}
 
 							if len(elem) == 0 {
-								switch r.Method {
-								case "POST":
-									s.handleInviteOrganizationRequest([1]string{
-										args[0],
-									}, elemIsEscaped, w, r)
-								default:
-									s.notAllowed(w, r, "POST")
-								}
-
-								return
+								break
 							}
 							switch elem[0] {
-							case '_': // Prefix: "_user"
+							case 'a': // Prefix: "aliases"
 								origElem := elem
-								if l := len("_user"); len(elem) >= l && elem[0:l] == "_user" {
+								if l := len("aliases"); len(elem) >= l && elem[0:l] == "aliases" {
 									elem = elem[l:]
 								} else {
 									break
 								}
 
 								if len(elem) == 0 {
-									// Leaf node.
+									switch r.Method {
+									case "GET":
+										s.handleGetOrganizationAliasesRequest([1]string{
+											args[0],
+										}, elemIsEscaped, w, r)
+									case "POST":
+										s.handleCreateOrganizationAliasRequest([1]string{
+											args[0],
+										}, elemIsEscaped, w, r)
+									default:
+										s.notAllowed(w, r, "GET,POST")
+									}
+
+									return
+								}
+								switch elem[0] {
+								case '/': // Prefix: "/"
+									origElem := elem
+									if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+										elem = elem[l:]
+									} else {
+										break
+									}
+
+									// Param: "aliasID"
+									// Leaf parameter
+									args[1] = elem
+									elem = ""
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch r.Method {
+										case "DELETE":
+											s.handleDeleteOrganizationAliasRequest([2]string{
+												args[0],
+												args[1],
+											}, elemIsEscaped, w, r)
+										default:
+											s.notAllowed(w, r, "DELETE")
+										}
+
+										return
+									}
+
+									elem = origElem
+								}
+
+								elem = origElem
+							case 'i': // Prefix: "invite"
+								origElem := elem
+								if l := len("invite"); len(elem) >= l && elem[0:l] == "invite" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								if len(elem) == 0 {
 									switch r.Method {
 									case "POST":
-										s.handleInviteOrganizationForUserRequest([1]string{
+										s.handleInviteOrganizationRequest([1]string{
 											args[0],
 										}, elemIsEscaped, w, r)
 									default:
@@ -784,6 +831,31 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									}
 
 									return
+								}
+								switch elem[0] {
+								case '_': // Prefix: "_user"
+									origElem := elem
+									if l := len("_user"); len(elem) >= l && elem[0:l] == "_user" {
+										elem = elem[l:]
+									} else {
+										break
+									}
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch r.Method {
+										case "POST":
+											s.handleInviteOrganizationForUserRequest([1]string{
+												args[0],
+											}, elemIsEscaped, w, r)
+										default:
+											s.notAllowed(w, r, "POST")
+										}
+
+										return
+									}
+
+									elem = origElem
 								}
 
 								elem = origElem
@@ -2460,51 +2532,130 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							break
 						}
 						switch elem[0] {
-						case '/': // Prefix: "/invite"
+						case '/': // Prefix: "/"
 							origElem := elem
-							if l := len("/invite"); len(elem) >= l && elem[0:l] == "/invite" {
+							if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 								elem = elem[l:]
 							} else {
 								break
 							}
 
 							if len(elem) == 0 {
-								switch method {
-								case "POST":
-									r.name = "InviteOrganization"
-									r.summary = "組織ユーザー招待（運営ユーザーのみ）"
-									r.operationID = "inviteOrganization"
-									r.pathPattern = "/organizations/{organizationID}/invite"
-									r.args = args
-									r.count = 1
-									return r, true
-								default:
-									return
-								}
+								break
 							}
 							switch elem[0] {
-							case '_': // Prefix: "_user"
+							case 'a': // Prefix: "aliases"
 								origElem := elem
-								if l := len("_user"); len(elem) >= l && elem[0:l] == "_user" {
+								if l := len("aliases"); len(elem) >= l && elem[0:l] == "aliases" {
 									elem = elem[l:]
 								} else {
 									break
 								}
 
 								if len(elem) == 0 {
-									// Leaf node.
 									switch method {
+									case "GET":
+										r.name = "GetOrganizationAliases"
+										r.summary = "組織エイリアス一覧取得"
+										r.operationID = "getOrganizationAliases"
+										r.pathPattern = "/organizations/{organizationID}/aliases"
+										r.args = args
+										r.count = 1
+										return r, true
 									case "POST":
-										r.name = "InviteOrganizationForUser"
-										r.summary = "組織にユーザーを追加"
-										r.operationID = "inviteOrganizationForUser"
-										r.pathPattern = "/organizations/{organizationID}/invite_user"
+										r.name = "CreateOrganizationAlias"
+										r.summary = "組織エイリアス作成"
+										r.operationID = "createOrganizationAlias"
+										r.pathPattern = "/organizations/{organizationID}/aliases"
 										r.args = args
 										r.count = 1
 										return r, true
 									default:
 										return
 									}
+								}
+								switch elem[0] {
+								case '/': // Prefix: "/"
+									origElem := elem
+									if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+										elem = elem[l:]
+									} else {
+										break
+									}
+
+									// Param: "aliasID"
+									// Leaf parameter
+									args[1] = elem
+									elem = ""
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch method {
+										case "DELETE":
+											r.name = "DeleteOrganizationAlias"
+											r.summary = "組織エイリアス削除"
+											r.operationID = "deleteOrganizationAlias"
+											r.pathPattern = "/organizations/{organizationID}/aliases/{aliasID}"
+											r.args = args
+											r.count = 2
+											return r, true
+										default:
+											return
+										}
+									}
+
+									elem = origElem
+								}
+
+								elem = origElem
+							case 'i': // Prefix: "invite"
+								origElem := elem
+								if l := len("invite"); len(elem) >= l && elem[0:l] == "invite" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								if len(elem) == 0 {
+									switch method {
+									case "POST":
+										r.name = "InviteOrganization"
+										r.summary = "組織ユーザー招待（運営ユーザーのみ）"
+										r.operationID = "inviteOrganization"
+										r.pathPattern = "/organizations/{organizationID}/invite"
+										r.args = args
+										r.count = 1
+										return r, true
+									default:
+										return
+									}
+								}
+								switch elem[0] {
+								case '_': // Prefix: "_user"
+									origElem := elem
+									if l := len("_user"); len(elem) >= l && elem[0:l] == "_user" {
+										elem = elem[l:]
+									} else {
+										break
+									}
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch method {
+										case "POST":
+											r.name = "InviteOrganizationForUser"
+											r.summary = "組織にユーザーを追加"
+											r.operationID = "inviteOrganizationForUser"
+											r.pathPattern = "/organizations/{organizationID}/invite_user"
+											r.args = args
+											r.count = 1
+											return r, true
+										default:
+											return
+										}
+									}
+
+									elem = origElem
 								}
 
 								elem = origElem

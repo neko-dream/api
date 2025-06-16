@@ -17,12 +17,20 @@ type ConsentTalkSessionRes interface {
 	consentTalkSessionRes()
 }
 
+type CreateOrganizationAliasRes interface {
+	createOrganizationAliasRes()
+}
+
 type CreateOrganizationsRes interface {
 	createOrganizationsRes()
 }
 
 type CreateTalkSessionRes interface {
 	createTalkSessionRes()
+}
+
+type DeleteOrganizationAliasRes interface {
+	deleteOrganizationAliasRes()
 }
 
 type DevAuthorizeRes interface {
@@ -71,6 +79,10 @@ type GetOpinionReportsRes interface {
 
 type GetOpinionsForTalkSessionRes interface {
 	getOpinionsForTalkSessionRes()
+}
+
+type GetOrganizationAliasesRes interface {
+	getOrganizationAliasesRes()
 }
 
 type GetOrganizationsRes interface {

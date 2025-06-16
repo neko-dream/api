@@ -332,6 +332,66 @@ func (s *CookieAuth) SetAPIKey(val string) {
 	s.APIKey = val
 }
 
+type CreateOrganizationAliasBadRequest struct{}
+
+func (*CreateOrganizationAliasBadRequest) createOrganizationAliasRes() {}
+
+type CreateOrganizationAliasInternalServerError struct{}
+
+func (*CreateOrganizationAliasInternalServerError) createOrganizationAliasRes() {}
+
+type CreateOrganizationAliasOK struct {
+	AliasID   string `json:"aliasID"`
+	AliasName string `json:"aliasName"`
+	CreatedAt string `json:"createdAt"`
+}
+
+// GetAliasID returns the value of AliasID.
+func (s *CreateOrganizationAliasOK) GetAliasID() string {
+	return s.AliasID
+}
+
+// GetAliasName returns the value of AliasName.
+func (s *CreateOrganizationAliasOK) GetAliasName() string {
+	return s.AliasName
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *CreateOrganizationAliasOK) GetCreatedAt() string {
+	return s.CreatedAt
+}
+
+// SetAliasID sets the value of AliasID.
+func (s *CreateOrganizationAliasOK) SetAliasID(val string) {
+	s.AliasID = val
+}
+
+// SetAliasName sets the value of AliasName.
+func (s *CreateOrganizationAliasOK) SetAliasName(val string) {
+	s.AliasName = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *CreateOrganizationAliasOK) SetCreatedAt(val string) {
+	s.CreatedAt = val
+}
+
+func (*CreateOrganizationAliasOK) createOrganizationAliasRes() {}
+
+type CreateOrganizationAliasReq struct {
+	AliasName string `json:"aliasName"`
+}
+
+// GetAliasName returns the value of AliasName.
+func (s *CreateOrganizationAliasReq) GetAliasName() string {
+	return s.AliasName
+}
+
+// SetAliasName sets the value of AliasName.
+func (s *CreateOrganizationAliasReq) SetAliasName(val string) {
+	s.AliasName = val
+}
+
 type CreateOrganizationsBadRequest struct{}
 
 func (*CreateOrganizationsBadRequest) createOrganizationsRes() {}
@@ -545,15 +605,16 @@ func (s *CreateTalkSessionOK) SetHideReport(val bool) {
 func (*CreateTalkSessionOK) createTalkSessionRes() {}
 
 type CreateTalkSessionReq struct {
-	Theme            string        `json:"theme"`
-	ScheduledEndTime time.Time     `json:"scheduledEndTime"`
-	Latitude         OptNilFloat64 `json:"latitude"`
-	Longitude        OptNilFloat64 `json:"longitude"`
-	City             OptNilString  `json:"city"`
-	Prefecture       OptNilString  `json:"prefecture"`
-	Description      OptNilString  `json:"description"`
-	ThumbnailURL     OptNilString  `json:"thumbnailURL"`
-	Restrictions     []string      `json:"restrictions"`
+	Theme               string        `json:"theme"`
+	ScheduledEndTime    time.Time     `json:"scheduledEndTime"`
+	Latitude            OptNilFloat64 `json:"latitude"`
+	Longitude           OptNilFloat64 `json:"longitude"`
+	City                OptNilString  `json:"city"`
+	Prefecture          OptNilString  `json:"prefecture"`
+	Description         OptNilString  `json:"description"`
+	ThumbnailURL        OptNilString  `json:"thumbnailURL"`
+	Restrictions        []string      `json:"restrictions"`
+	OrganizationAliasID OptNilString  `json:"organizationAliasID"`
 }
 
 // GetTheme returns the value of Theme.
@@ -601,6 +662,11 @@ func (s *CreateTalkSessionReq) GetRestrictions() []string {
 	return s.Restrictions
 }
 
+// GetOrganizationAliasID returns the value of OrganizationAliasID.
+func (s *CreateTalkSessionReq) GetOrganizationAliasID() OptNilString {
+	return s.OrganizationAliasID
+}
+
 // SetTheme sets the value of Theme.
 func (s *CreateTalkSessionReq) SetTheme(val string) {
 	s.Theme = val
@@ -645,6 +711,23 @@ func (s *CreateTalkSessionReq) SetThumbnailURL(val OptNilString) {
 func (s *CreateTalkSessionReq) SetRestrictions(val []string) {
 	s.Restrictions = val
 }
+
+// SetOrganizationAliasID sets the value of OrganizationAliasID.
+func (s *CreateTalkSessionReq) SetOrganizationAliasID(val OptNilString) {
+	s.OrganizationAliasID = val
+}
+
+type DeleteOrganizationAliasBadRequest struct{}
+
+func (*DeleteOrganizationAliasBadRequest) deleteOrganizationAliasRes() {}
+
+type DeleteOrganizationAliasInternalServerError struct{}
+
+func (*DeleteOrganizationAliasInternalServerError) deleteOrganizationAliasRes() {}
+
+type DeleteOrganizationAliasOK struct{}
+
+func (*DeleteOrganizationAliasOK) deleteOrganizationAliasRes() {}
 
 type DevAuthorizeBadRequest struct{}
 
@@ -1487,6 +1570,66 @@ func (s *GetOpinionsForTalkSessionSort) UnmarshalText(data []byte) error {
 	default:
 		return errors.Errorf("invalid value: %q", data)
 	}
+}
+
+type GetOrganizationAliasesBadRequest struct{}
+
+func (*GetOrganizationAliasesBadRequest) getOrganizationAliasesRes() {}
+
+type GetOrganizationAliasesInternalServerError struct{}
+
+func (*GetOrganizationAliasesInternalServerError) getOrganizationAliasesRes() {}
+
+type GetOrganizationAliasesOK struct {
+	Aliases []GetOrganizationAliasesOKAliasesItem `json:"aliases"`
+}
+
+// GetAliases returns the value of Aliases.
+func (s *GetOrganizationAliasesOK) GetAliases() []GetOrganizationAliasesOKAliasesItem {
+	return s.Aliases
+}
+
+// SetAliases sets the value of Aliases.
+func (s *GetOrganizationAliasesOK) SetAliases(val []GetOrganizationAliasesOKAliasesItem) {
+	s.Aliases = val
+}
+
+func (*GetOrganizationAliasesOK) getOrganizationAliasesRes() {}
+
+type GetOrganizationAliasesOKAliasesItem struct {
+	AliasID   string `json:"aliasID"`
+	AliasName string `json:"aliasName"`
+	CreatedAt string `json:"createdAt"`
+}
+
+// GetAliasID returns the value of AliasID.
+func (s *GetOrganizationAliasesOKAliasesItem) GetAliasID() string {
+	return s.AliasID
+}
+
+// GetAliasName returns the value of AliasName.
+func (s *GetOrganizationAliasesOKAliasesItem) GetAliasName() string {
+	return s.AliasName
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *GetOrganizationAliasesOKAliasesItem) GetCreatedAt() string {
+	return s.CreatedAt
+}
+
+// SetAliasID sets the value of AliasID.
+func (s *GetOrganizationAliasesOKAliasesItem) SetAliasID(val string) {
+	s.AliasID = val
+}
+
+// SetAliasName sets the value of AliasName.
+func (s *GetOrganizationAliasesOKAliasesItem) SetAliasName(val string) {
+	s.AliasName = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *GetOrganizationAliasesOKAliasesItem) SetCreatedAt(val string) {
+	s.CreatedAt = val
 }
 
 type GetOrganizationsBadRequest struct{}

@@ -1225,6 +1225,146 @@ paths:
                 - code
                 - orgType
       x-ogen-operation-group: Organization
+  /organizations/{organizationID}/aliases:
+    get:
+      operationId: getOrganizationAliases
+      summary: 組織エイリアス一覧取得
+      parameters:
+        - name: organizationID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  aliases:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        aliasID:
+                          type: string
+                        aliasName:
+                          type: string
+                        createdAt:
+                          type: string
+                      required:
+                        - aliasID
+                        - aliasName
+                        - createdAt
+                required:
+                  - aliases
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - organization
+      x-ogen-operation-group: Organization
+    post:
+      operationId: createOrganizationAlias
+      summary: 組織エイリアス作成
+      parameters:
+        - name: organizationID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  aliasID:
+                    type: string
+                  aliasName:
+                    type: string
+                  createdAt:
+                    type: string
+                required:
+                  - aliasID
+                  - aliasName
+                  - createdAt
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - organization
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                aliasName:
+                  type: string
+              required:
+                - aliasName
+      x-ogen-operation-group: Organization
+  /organizations/{organizationID}/aliases/{aliasID}:
+    delete:
+      operationId: deleteOrganizationAlias
+      summary: 組織エイリアス削除
+      parameters:
+        - name: organizationID
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: aliasID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - organization
+      x-ogen-operation-group: Organization
   /organizations/{organizationID}/invite:
     post:
       operationId: inviteOrganization
@@ -1624,6 +1764,9 @@ paths:
                   type: array
                   items:
                     type: string
+                organizationAliasID:
+                  type: string
+                  nullable: true
               required:
                 - theme
                 - scheduledEndTime
@@ -1641,6 +1784,8 @@ paths:
               thumbnailURL:
                 contentType: application/json
               restrictions:
+                contentType: application/json
+              organizationAliasID:
                 contentType: application/json
       x-ogen-operation-group: TalkSession
   /talksessions/histories:

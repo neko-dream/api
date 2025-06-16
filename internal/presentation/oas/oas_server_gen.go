@@ -217,6 +217,12 @@ type OpinionHandler interface {
 //
 // x-ogen-operation-group: Organization
 type OrganizationHandler interface {
+	// CreateOrganizationAlias implements createOrganizationAlias operation.
+	//
+	// 組織エイリアス作成.
+	//
+	// POST /organizations/{organizationID}/aliases
+	CreateOrganizationAlias(ctx context.Context, req *CreateOrganizationAliasReq, params CreateOrganizationAliasParams) (CreateOrganizationAliasRes, error)
 	// CreateOrganizations implements createOrganizations operation.
 	//
 	// 組織を作成できる。
@@ -228,6 +234,18 @@ type OrganizationHandler interface {
 	//
 	// POST /organizations
 	CreateOrganizations(ctx context.Context, req *CreateOrganizationsReq) (CreateOrganizationsRes, error)
+	// DeleteOrganizationAlias implements deleteOrganizationAlias operation.
+	//
+	// 組織エイリアス削除.
+	//
+	// DELETE /organizations/{organizationID}/aliases/{aliasID}
+	DeleteOrganizationAlias(ctx context.Context, params DeleteOrganizationAliasParams) (DeleteOrganizationAliasRes, error)
+	// GetOrganizationAliases implements getOrganizationAliases operation.
+	//
+	// 組織エイリアス一覧取得.
+	//
+	// GET /organizations/{organizationID}/aliases
+	GetOrganizationAliases(ctx context.Context, params GetOrganizationAliasesParams) (GetOrganizationAliasesRes, error)
 	// GetOrganizations implements getOrganizations operation.
 	//
 	// 所属組織一覧.

@@ -24,5 +24,6 @@ func domainDeps() []ProvideArg {
 		{organization_svc.NewOrganizationService, nil},
 		{organization_svc.NewOrganizationMemberManager, nil},
 		{talksession_consent.NewTalkSessionConsentService, nil},
+		{service.NewOrganizationAliasService, nil},
 	}
 }

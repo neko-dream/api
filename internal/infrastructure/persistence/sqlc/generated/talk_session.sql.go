@@ -90,26 +90,28 @@ func (q *Queries) CountTalkSessions(ctx context.Context, arg CountTalkSessionsPa
 }
 
 const createTalkSession = `-- name: CreateTalkSession :exec
-INSERT INTO talk_sessions (talk_session_id, theme, description, thumbnail_url, owner_id, scheduled_end_time, created_at, city, prefecture, restrictions, hide_report) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+INSERT INTO talk_sessions (talk_session_id, theme, description, thumbnail_url, owner_id, scheduled_end_time, created_at, city, prefecture, restrictions, hide_report, organization_id, organization_alias_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
 `
 
 type CreateTalkSessionParams struct {
-	TalkSessionID    uuid.UUID
-	Theme            string
-	Description      sql.NullString
-	ThumbnailUrl     sql.NullString
-	OwnerID          uuid.UUID
-	ScheduledEndTime time.Time
-	CreatedAt        time.Time
-	City             sql.NullString
-	Prefecture       sql.NullString
-	Restrictions     talksession.Restrictions
-	HideReport       sql.NullBool
+	TalkSessionID       uuid.UUID
+	Theme               string
+	Description         sql.NullString
+	ThumbnailUrl        sql.NullString
+	OwnerID             uuid.UUID
+	ScheduledEndTime    time.Time
+	CreatedAt           time.Time
+	City                sql.NullString
+	Prefecture          sql.NullString
+	Restrictions        talksession.Restrictions
+	HideReport          sql.NullBool
+	OrganizationID      uuid.NullUUID
+	OrganizationAliasID uuid.NullUUID
 }
 
 // CreateTalkSession
 //
-//	INSERT INTO talk_sessions (talk_session_id, theme, description, thumbnail_url, owner_id, scheduled_end_time, created_at, city, prefecture, restrictions, hide_report) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+//	INSERT INTO talk_sessions (talk_session_id, theme, description, thumbnail_url, owner_id, scheduled_end_time, created_at, city, prefecture, restrictions, hide_report, organization_id, organization_alias_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
 func (q *Queries) CreateTalkSession(ctx context.Context, arg CreateTalkSessionParams) error {
 	_, err := q.db.ExecContext(ctx, createTalkSession,
 		arg.TalkSessionID,
@@ -123,6 +125,8 @@ func (q *Queries) CreateTalkSession(ctx context.Context, arg CreateTalkSessionPa
 		arg.Prefecture,
 		arg.Restrictions,
 		arg.HideReport,
+		arg.OrganizationID,
+		arg.OrganizationAliasID,
 	)
 	return err
 }
@@ -154,20 +158,24 @@ UPDATE talk_sessions
         prefecture = $7,
         restrictions = $8,
         hide_report = $9,
-        updated_at = NOW()
+        updated_at = NOW(),
+        organization_id = $10,
+        organization_alias_id = $11
     WHERE talk_session_id = $1
 `
 
 type EditTalkSessionParams struct {
-	TalkSessionID    uuid.UUID
-	Theme            string
-	Description      sql.NullString
-	ScheduledEndTime time.Time
-	ThumbnailUrl     sql.NullString
-	City             sql.NullString
-	Prefecture       sql.NullString
-	Restrictions     talksession.Restrictions
-	HideReport       sql.NullBool
+	TalkSessionID       uuid.UUID
+	Theme               string
+	Description         sql.NullString
+	ScheduledEndTime    time.Time
+	ThumbnailUrl        sql.NullString
+	City                sql.NullString
+	Prefecture          sql.NullString
+	Restrictions        talksession.Restrictions
+	HideReport          sql.NullBool
+	OrganizationID      uuid.NullUUID
+	OrganizationAliasID uuid.NullUUID
 }
 
 // EditTalkSession
@@ -181,7 +189,9 @@ type EditTalkSessionParams struct {
 //	        prefecture = $7,
 //	        restrictions = $8,
 //	        hide_report = $9,
-//	        updated_at = NOW()
+//	        updated_at = NOW(),
+//	        organization_id = $10,
+//	        organization_alias_id = $11
 //	    WHERE talk_session_id = $1
 func (q *Queries) EditTalkSession(ctx context.Context, arg EditTalkSessionParams) error {
 	_, err := q.db.ExecContext(ctx, editTalkSession,
@@ -194,6 +204,8 @@ func (q *Queries) EditTalkSession(ctx context.Context, arg EditTalkSessionParams
 		arg.Prefecture,
 		arg.Restrictions,
 		arg.HideReport,
+		arg.OrganizationID,
+		arg.OrganizationAliasID,
 	)
 	return err
 }
@@ -218,38 +230,38 @@ func (q *Queries) GetAllTalkSessionCount(ctx context.Context) (int64, error) {
 
 const getOwnTalkSessionByUserID = `-- name: GetOwnTalkSessionByUserID :many
 SELECT
-    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url, talk_sessions.restrictions, talk_sessions.updated_at, talk_sessions.hide_report,
+    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
     talk_session_locations.talk_session_id as location_id,
     COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
     COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
-FROM talk_sessions
+FROM talk_sessions ts
 LEFT JOIN (
     SELECT talk_session_id, COUNT(opinion_id) AS opinion_count
     FROM opinions
     GROUP BY talk_session_id
-) oc ON  oc.talk_session_id = talk_sessions.talk_session_id
+) oc ON  oc.talk_session_id = ts.talk_session_id
 LEFT JOIN users
-    ON talk_sessions.owner_id = users.user_id
+    ON ts.owner_id = users.user_id
 LEFT JOIN talk_session_locations
-    ON talk_session_locations.talk_session_id = talk_sessions.talk_session_id
+    ON talk_session_locations.talk_session_id = ts.talk_session_id
 WHERE
-    talk_sessions.owner_id = $3::uuid
+    ts.owner_id = $3::uuid
     AND
     CASE $4::text
-        WHEN 'finished' THEN talk_sessions.scheduled_end_time <= now()
-        WHEN 'open' THEN talk_sessions.scheduled_end_time > now()
+        WHEN 'finished' THEN ts.scheduled_end_time <= now()
+        WHEN 'open' THEN ts.scheduled_end_time > now()
         ELSE TRUE
     END
     AND
     CASE
         WHEN $5::text IS NOT NULL
-            THEN talk_sessions.theme LIKE '%' || $5::text || '%'
+            THEN ts.theme LIKE '%' || $5::text || '%'
         ELSE TRUE
     END
-GROUP BY talk_sessions.talk_session_id, oc.opinion_count, users.user_id, users.display_name, users.display_id, users.icon_url, talk_session_locations.talk_session_id
-ORDER BY talk_sessions.created_at DESC
+GROUP BY ts.talk_session_id, oc.opinion_count, users.user_id, users.display_name, users.display_id, users.icon_url, talk_session_locations.talk_session_id
+ORDER BY ts.created_at DESC
 LIMIT $1 OFFSET $2
 `
 
@@ -273,38 +285,38 @@ type GetOwnTalkSessionByUserIDRow struct {
 // GetOwnTalkSessionByUserID
 //
 //	SELECT
-//	    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url, talk_sessions.restrictions, talk_sessions.updated_at, talk_sessions.hide_report,
+//	    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
 //	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
 //	    talk_session_locations.talk_session_id as location_id,
 //	    COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
 //	    COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
-//	FROM talk_sessions
+//	FROM talk_sessions ts
 //	LEFT JOIN (
 //	    SELECT talk_session_id, COUNT(opinion_id) AS opinion_count
 //	    FROM opinions
 //	    GROUP BY talk_session_id
-//	) oc ON  oc.talk_session_id = talk_sessions.talk_session_id
+//	) oc ON  oc.talk_session_id = ts.talk_session_id
 //	LEFT JOIN users
-//	    ON talk_sessions.owner_id = users.user_id
+//	    ON ts.owner_id = users.user_id
 //	LEFT JOIN talk_session_locations
-//	    ON talk_session_locations.talk_session_id = talk_sessions.talk_session_id
+//	    ON talk_session_locations.talk_session_id = ts.talk_session_id
 //	WHERE
-//	    talk_sessions.owner_id = $3::uuid
+//	    ts.owner_id = $3::uuid
 //	    AND
 //	    CASE $4::text
-//	        WHEN 'finished' THEN talk_sessions.scheduled_end_time <= now()
-//	        WHEN 'open' THEN talk_sessions.scheduled_end_time > now()
+//	        WHEN 'finished' THEN ts.scheduled_end_time <= now()
+//	        WHEN 'open' THEN ts.scheduled_end_time > now()
 //	        ELSE TRUE
 //	    END
 //	    AND
 //	    CASE
 //	        WHEN $5::text IS NOT NULL
-//	            THEN talk_sessions.theme LIKE '%' || $5::text || '%'
+//	            THEN ts.theme LIKE '%' || $5::text || '%'
 //	        ELSE TRUE
 //	    END
-//	GROUP BY talk_sessions.talk_session_id, oc.opinion_count, users.user_id, users.display_name, users.display_id, users.icon_url, talk_session_locations.talk_session_id
-//	ORDER BY talk_sessions.created_at DESC
+//	GROUP BY ts.talk_session_id, oc.opinion_count, users.user_id, users.display_name, users.display_id, users.icon_url, talk_session_locations.talk_session_id
+//	ORDER BY ts.created_at DESC
 //	LIMIT $1 OFFSET $2
 func (q *Queries) GetOwnTalkSessionByUserID(ctx context.Context, arg GetOwnTalkSessionByUserIDParams) ([]GetOwnTalkSessionByUserIDRow, error) {
 	rows, err := q.db.QueryContext(ctx, getOwnTalkSessionByUserID,
@@ -334,6 +346,8 @@ func (q *Queries) GetOwnTalkSessionByUserID(ctx context.Context, arg GetOwnTalkS
 			&i.TalkSession.Restrictions,
 			&i.TalkSession.UpdatedAt,
 			&i.TalkSession.HideReport,
+			&i.TalkSession.OrganizationID,
+			&i.TalkSession.OrganizationAliasID,
 			&i.OpinionCount,
 			&i.User.UserID,
 			&i.User.DisplayID,
@@ -362,40 +376,40 @@ func (q *Queries) GetOwnTalkSessionByUserID(ctx context.Context, arg GetOwnTalkS
 
 const getRespondTalkSessionByUserID = `-- name: GetRespondTalkSessionByUserID :many
 SELECT
-    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url, talk_sessions.restrictions, talk_sessions.updated_at, talk_sessions.hide_report,
+    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
     talk_session_locations.talk_session_id as location_id,
     COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
     COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
-FROM talk_sessions
+FROM talk_sessions ts
 LEFT JOIN (
     SELECT talk_session_id, COUNT(opinion_id) AS opinion_count
     FROM opinions
     GROUP BY talk_session_id
-) oc ON  oc.talk_session_id = talk_sessions.talk_session_id
+) oc ON  oc.talk_session_id = ts.talk_session_id
 LEFT JOIN users
-    ON talk_sessions.owner_id = users.user_id
+    ON ts.owner_id = users.user_id
 LEFT JOIN votes
-    ON votes.talk_session_id = talk_sessions.talk_session_id
+    ON votes.talk_session_id = ts.talk_session_id
 LEFT JOIN talk_session_locations
-    ON talk_session_locations.talk_session_id = talk_sessions.talk_session_id
+    ON talk_session_locations.talk_session_id = ts.talk_session_id
 WHERE
     votes.user_id = $3::uuid
     AND
     CASE $4::text IS NOT NULL
-        WHEN $4::text = 'finished' THEN talk_sessions.scheduled_end_time <= now()
-        WHEN $4::text = 'open' THEN talk_sessions.scheduled_end_time > now()
+        WHEN $4::text = 'finished' THEN ts.scheduled_end_time <= now()
+        WHEN $4::text = 'open' THEN ts.scheduled_end_time > now()
         ELSE TRUE
     END
     AND
     CASE
         WHEN $5::text IS NOT NULL
-            THEN talk_sessions.theme LIKE '%' || $5::text || '%'
+            THEN ts.theme LIKE '%' || $5::text || '%'
         ELSE TRUE
     END
-GROUP BY talk_sessions.talk_session_id, oc.opinion_count, users.user_id, users.display_name, users.display_id, users.icon_url, talk_session_locations.talk_session_id
-ORDER BY talk_sessions.created_at DESC
+GROUP BY ts.talk_session_id, oc.opinion_count, users.user_id, users.display_name, users.display_id, users.icon_url, talk_session_locations.talk_session_id
+ORDER BY ts.created_at DESC
 LIMIT $1 OFFSET $2
 `
 
@@ -419,40 +433,40 @@ type GetRespondTalkSessionByUserIDRow struct {
 // GetRespondTalkSessionByUserID
 //
 //	SELECT
-//	    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url, talk_sessions.restrictions, talk_sessions.updated_at, talk_sessions.hide_report,
+//	    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
 //	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
 //	    talk_session_locations.talk_session_id as location_id,
 //	    COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
 //	    COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
-//	FROM talk_sessions
+//	FROM talk_sessions ts
 //	LEFT JOIN (
 //	    SELECT talk_session_id, COUNT(opinion_id) AS opinion_count
 //	    FROM opinions
 //	    GROUP BY talk_session_id
-//	) oc ON  oc.talk_session_id = talk_sessions.talk_session_id
+//	) oc ON  oc.talk_session_id = ts.talk_session_id
 //	LEFT JOIN users
-//	    ON talk_sessions.owner_id = users.user_id
+//	    ON ts.owner_id = users.user_id
 //	LEFT JOIN votes
-//	    ON votes.talk_session_id = talk_sessions.talk_session_id
+//	    ON votes.talk_session_id = ts.talk_session_id
 //	LEFT JOIN talk_session_locations
-//	    ON talk_session_locations.talk_session_id = talk_sessions.talk_session_id
+//	    ON talk_session_locations.talk_session_id = ts.talk_session_id
 //	WHERE
 //	    votes.user_id = $3::uuid
 //	    AND
 //	    CASE $4::text IS NOT NULL
-//	        WHEN $4::text = 'finished' THEN talk_sessions.scheduled_end_time <= now()
-//	        WHEN $4::text = 'open' THEN talk_sessions.scheduled_end_time > now()
+//	        WHEN $4::text = 'finished' THEN ts.scheduled_end_time <= now()
+//	        WHEN $4::text = 'open' THEN ts.scheduled_end_time > now()
 //	        ELSE TRUE
 //	    END
 //	    AND
 //	    CASE
 //	        WHEN $5::text IS NOT NULL
-//	            THEN talk_sessions.theme LIKE '%' || $5::text || '%'
+//	            THEN ts.theme LIKE '%' || $5::text || '%'
 //	        ELSE TRUE
 //	    END
-//	GROUP BY talk_sessions.talk_session_id, oc.opinion_count, users.user_id, users.display_name, users.display_id, users.icon_url, talk_session_locations.talk_session_id
-//	ORDER BY talk_sessions.created_at DESC
+//	GROUP BY ts.talk_session_id, oc.opinion_count, users.user_id, users.display_name, users.display_id, users.icon_url, talk_session_locations.talk_session_id
+//	ORDER BY ts.created_at DESC
 //	LIMIT $1 OFFSET $2
 func (q *Queries) GetRespondTalkSessionByUserID(ctx context.Context, arg GetRespondTalkSessionByUserIDParams) ([]GetRespondTalkSessionByUserIDRow, error) {
 	rows, err := q.db.QueryContext(ctx, getRespondTalkSessionByUserID,
@@ -482,6 +496,8 @@ func (q *Queries) GetRespondTalkSessionByUserID(ctx context.Context, arg GetResp
 			&i.TalkSession.Restrictions,
 			&i.TalkSession.UpdatedAt,
 			&i.TalkSession.HideReport,
+			&i.TalkSession.OrganizationID,
+			&i.TalkSession.OrganizationAliasID,
 			&i.OpinionCount,
 			&i.User.UserID,
 			&i.User.DisplayID,
@@ -510,23 +526,23 @@ func (q *Queries) GetRespondTalkSessionByUserID(ctx context.Context, arg GetResp
 
 const getTalkSessionByID = `-- name: GetTalkSessionByID :one
 SELECT
-    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url, talk_sessions.restrictions, talk_sessions.updated_at, talk_sessions.hide_report,
+    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
     talk_session_locations.talk_session_id as location_id,
     COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
     COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
-FROM talk_sessions
+FROM talk_sessions ts
 LEFT JOIN users
-    ON talk_sessions.owner_id = users.user_id
+    ON ts.owner_id = users.user_id
 LEFT JOIN (
     SELECT opinions.talk_session_id, COUNT(opinions.opinion_id) AS opinion_count
     FROM opinions
     GROUP BY opinions.talk_session_id
-) oc ON talk_sessions.talk_session_id = oc.talk_session_id
+) oc ON ts.talk_session_id = oc.talk_session_id
 LEFT JOIN talk_session_locations
-    ON talk_sessions.talk_session_id = talk_session_locations.talk_session_id
-WHERE talk_sessions.talk_session_id = $1
+    ON ts.talk_session_id = talk_session_locations.talk_session_id
+WHERE ts.talk_session_id = $1
 `
 
 type GetTalkSessionByIDRow struct {
@@ -541,23 +557,23 @@ type GetTalkSessionByIDRow struct {
 // GetTalkSessionByID
 //
 //	SELECT
-//	    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url, talk_sessions.restrictions, talk_sessions.updated_at, talk_sessions.hide_report,
+//	    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
 //	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
 //	    talk_session_locations.talk_session_id as location_id,
 //	    COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
 //	    COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
-//	FROM talk_sessions
+//	FROM talk_sessions ts
 //	LEFT JOIN users
-//	    ON talk_sessions.owner_id = users.user_id
+//	    ON ts.owner_id = users.user_id
 //	LEFT JOIN (
 //	    SELECT opinions.talk_session_id, COUNT(opinions.opinion_id) AS opinion_count
 //	    FROM opinions
 //	    GROUP BY opinions.talk_session_id
-//	) oc ON talk_sessions.talk_session_id = oc.talk_session_id
+//	) oc ON ts.talk_session_id = oc.talk_session_id
 //	LEFT JOIN talk_session_locations
-//	    ON talk_sessions.talk_session_id = talk_session_locations.talk_session_id
-//	WHERE talk_sessions.talk_session_id = $1
+//	    ON ts.talk_session_id = talk_session_locations.talk_session_id
+//	WHERE ts.talk_session_id = $1
 func (q *Queries) GetTalkSessionByID(ctx context.Context, talkSessionID uuid.UUID) (GetTalkSessionByIDRow, error) {
 	row := q.db.QueryRowContext(ctx, getTalkSessionByID, talkSessionID)
 	var i GetTalkSessionByIDRow
@@ -574,6 +590,8 @@ func (q *Queries) GetTalkSessionByID(ctx context.Context, talkSessionID uuid.UUI
 		&i.TalkSession.Restrictions,
 		&i.TalkSession.UpdatedAt,
 		&i.TalkSession.HideReport,
+		&i.TalkSession.OrganizationID,
+		&i.TalkSession.OrganizationAliasID,
 		&i.OpinionCount,
 		&i.User.UserID,
 		&i.User.DisplayID,
@@ -592,7 +610,7 @@ func (q *Queries) GetTalkSessionByID(ctx context.Context, talkSessionID uuid.UUI
 
 const listTalkSessions = `-- name: ListTalkSessions :many
 SELECT
-    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url, talk_sessions.restrictions, talk_sessions.updated_at, talk_sessions.hide_report,
+    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
     COALESCE(votes.vote_count, 0) AS vote_count,
@@ -609,36 +627,36 @@ SELECT
             ('SRID=4326;POINT(' || $3::float || ' ' || $4::float || ')')::geometry
         ELSE NULL
     END AS distance
-FROM talk_sessions
+FROM talk_sessions ts
 LEFT JOIN (
     SELECT talk_session_id, COUNT(opinion_id) AS opinion_count
     FROM opinions
     GROUP BY talk_session_id
-) oc ON talk_sessions.talk_session_id = oc.talk_session_id
+) oc ON ts.talk_session_id = oc.talk_session_id
 LEFT JOIN users
-    ON talk_sessions.owner_id = users.user_id
+    ON ts.owner_id = users.user_id
 LEFT JOIN (
     SELECT talk_session_id, COUNT(DISTINCT vote_id) AS vote_count
     FROM votes
     GROUP BY talk_session_id
-) votes ON talk_sessions.talk_session_id = votes.talk_session_id
+) votes ON ts.talk_session_id = votes.talk_session_id
 LEFT JOIN (
     SELECT talk_session_id, COUNT(DISTINCT user_id) AS vote_count
     FROM votes
     GROUP BY talk_session_id
-) vote_users ON talk_sessions.talk_session_id = vote_users.talk_session_id
+) vote_users ON ts.talk_session_id = vote_users.talk_session_id
 LEFT JOIN talk_session_locations
-    ON talk_sessions.talk_session_id = talk_session_locations.talk_session_id
+    ON ts.talk_session_id = talk_session_locations.talk_session_id
 WHERE
     CASE $5::text
-        WHEN 'finished' THEN scheduled_end_time <= now()
-        WHEN 'open' THEN scheduled_end_time > now()
+        WHEN 'finished' THEN ts.scheduled_end_time <= now()
+        WHEN 'open' THEN ts.scheduled_end_time > now()
         ELSE TRUE
     END
     AND
     (CASE
         WHEN $6::text IS NOT NULL
-        THEN talk_sessions.theme LIKE '%' || $6::text || '%'
+        THEN ts.theme LIKE '%' || $6::text || '%'
         ELSE TRUE
     END)
     AND
@@ -655,7 +673,7 @@ WHERE
     END)
 ORDER BY
     CASE $7::text
-        WHEN 'oldest' THEN (EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM talk_sessions.created_at))*-1
+        WHEN 'oldest' THEN (EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM ts.created_at))*-1
         WHEN 'mostReplies' THEN -oc.opinion_count
         WHEN 'nearest' THEN (
         CASE
@@ -668,7 +686,7 @@ ORDER BY
             ELSE NULL
         END
         )
-        ELSE EXTRACT(EPOCH FROM talk_sessions.created_at)*-1
+        ELSE EXTRACT(EPOCH FROM ts.created_at)*-1
     END ASC
 LIMIT $1 OFFSET $2
 `
@@ -698,7 +716,7 @@ type ListTalkSessionsRow struct {
 // ListTalkSessions
 //
 //	SELECT
-//	    talk_sessions.talk_session_id, talk_sessions.owner_id, talk_sessions.theme, talk_sessions.scheduled_end_time, talk_sessions.created_at, talk_sessions.city, talk_sessions.prefecture, talk_sessions.description, talk_sessions.thumbnail_url, talk_sessions.restrictions, talk_sessions.updated_at, talk_sessions.hide_report,
+//	    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
 //	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
 //	    COALESCE(votes.vote_count, 0) AS vote_count,
@@ -715,36 +733,36 @@ type ListTalkSessionsRow struct {
 //	            ('SRID=4326;POINT(' || $3::float || ' ' || $4::float || ')')::geometry
 //	        ELSE NULL
 //	    END AS distance
-//	FROM talk_sessions
+//	FROM talk_sessions ts
 //	LEFT JOIN (
 //	    SELECT talk_session_id, COUNT(opinion_id) AS opinion_count
 //	    FROM opinions
 //	    GROUP BY talk_session_id
-//	) oc ON talk_sessions.talk_session_id = oc.talk_session_id
+//	) oc ON ts.talk_session_id = oc.talk_session_id
 //	LEFT JOIN users
-//	    ON talk_sessions.owner_id = users.user_id
+//	    ON ts.owner_id = users.user_id
 //	LEFT JOIN (
 //	    SELECT talk_session_id, COUNT(DISTINCT vote_id) AS vote_count
 //	    FROM votes
 //	    GROUP BY talk_session_id
-//	) votes ON talk_sessions.talk_session_id = votes.talk_session_id
+//	) votes ON ts.talk_session_id = votes.talk_session_id
 //	LEFT JOIN (
 //	    SELECT talk_session_id, COUNT(DISTINCT user_id) AS vote_count
 //	    FROM votes
 //	    GROUP BY talk_session_id
-//	) vote_users ON talk_sessions.talk_session_id = vote_users.talk_session_id
+//	) vote_users ON ts.talk_session_id = vote_users.talk_session_id
 //	LEFT JOIN talk_session_locations
-//	    ON talk_sessions.talk_session_id = talk_session_locations.talk_session_id
+//	    ON ts.talk_session_id = talk_session_locations.talk_session_id
 //	WHERE
 //	    CASE $5::text
-//	        WHEN 'finished' THEN scheduled_end_time <= now()
-//	        WHEN 'open' THEN scheduled_end_time > now()
+//	        WHEN 'finished' THEN ts.scheduled_end_time <= now()
+//	        WHEN 'open' THEN ts.scheduled_end_time > now()
 //	        ELSE TRUE
 //	    END
 //	    AND
 //	    (CASE
 //	        WHEN $6::text IS NOT NULL
-//	        THEN talk_sessions.theme LIKE '%' || $6::text || '%'
+//	        THEN ts.theme LIKE '%' || $6::text || '%'
 //	        ELSE TRUE
 //	    END)
 //	    AND
@@ -761,7 +779,7 @@ type ListTalkSessionsRow struct {
 //	    END)
 //	ORDER BY
 //	    CASE $7::text
-//	        WHEN 'oldest' THEN (EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM talk_sessions.created_at))*-1
+//	        WHEN 'oldest' THEN (EXTRACT(EPOCH FROM TIMESTAMP '2199-12-31 23:59:59') - EXTRACT(EPOCH FROM ts.created_at))*-1
 //	        WHEN 'mostReplies' THEN -oc.opinion_count
 //	        WHEN 'nearest' THEN (
 //	        CASE
@@ -774,7 +792,7 @@ type ListTalkSessionsRow struct {
 //	            ELSE NULL
 //	        END
 //	        )
-//	        ELSE EXTRACT(EPOCH FROM talk_sessions.created_at)*-1
+//	        ELSE EXTRACT(EPOCH FROM ts.created_at)*-1
 //	    END ASC
 //	LIMIT $1 OFFSET $2
 func (q *Queries) ListTalkSessions(ctx context.Context, arg ListTalkSessionsParams) ([]ListTalkSessionsRow, error) {
@@ -807,6 +825,8 @@ func (q *Queries) ListTalkSessions(ctx context.Context, arg ListTalkSessionsPara
 			&i.TalkSession.Restrictions,
 			&i.TalkSession.UpdatedAt,
 			&i.TalkSession.HideReport,
+			&i.TalkSession.OrganizationID,
+			&i.TalkSession.OrganizationAliasID,
 			&i.OpinionCount,
 			&i.User.UserID,
 			&i.User.DisplayID,

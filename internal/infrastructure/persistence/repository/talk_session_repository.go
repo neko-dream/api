@@ -205,6 +205,8 @@ func (t *talkSessionRepository) FindByID(ctx context.Context, talkSessionID shar
 		location,
 		city,
 		prefecture,
+		nil, // organizationID
+		nil, // organizationAliasID
 	)
 	ts.SetReportVisibility(row.TalkSession.HideReport.Bool)
 

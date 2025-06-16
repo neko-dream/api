@@ -13,6 +13,7 @@ import (
 	"github.com/neko-dream/server/internal/application/usecase/talksession_usecase"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/clock"
+	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
@@ -309,17 +310,27 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req *oas.Cre
 		}
 	}
 
+	var organizationAliasID *shared.UUID[organization.OrganizationAlias]
+	if req.OrganizationAliasID.IsSet() && req.OrganizationAliasID.Value != "" {
+		aliasID, err := shared.ParseUUID[organization.OrganizationAlias](req.OrganizationAliasID.Value)
+		if err == nil {
+			organizationAliasID = &aliasID
+		}
+	}
+
 	out, err := t.startTalkSessionCommand.Execute(ctx, talksession_usecase.StartTalkSessionUseCaseInput{
-		Theme:            req.Theme,
-		Description:      utils.ToPtrIfNotNullValue(!req.Description.IsSet(), req.Description.Value),
-		ThumbnailURL:     utils.ToPtrIfNotNullValue(!req.ThumbnailURL.IsSet(), req.ThumbnailURL.Value),
-		OwnerID:          userID,
-		ScheduledEndTime: req.ScheduledEndTime,
-		Latitude:         utils.ToPtrIfNotNullValue(!req.Latitude.IsSet(), req.Latitude.Value),
-		Longitude:        utils.ToPtrIfNotNullValue(!req.Longitude.IsSet(), req.Longitude.Value),
-		City:             utils.ToPtrIfNotNullValue(!req.City.IsSet(), req.City.Value),
-		Prefecture:       utils.ToPtrIfNotNullValue(!req.Prefecture.IsSet(), req.Prefecture.Value),
-		Restrictions:     restrictionStrings,
+		Theme:               req.Theme,
+		Description:         utils.ToPtrIfNotNullValue(!req.Description.IsSet(), req.Description.Value),
+		ThumbnailURL:        utils.ToPtrIfNotNullValue(!req.ThumbnailURL.IsSet(), req.ThumbnailURL.Value),
+		OwnerID:             userID,
+		ScheduledEndTime:    req.ScheduledEndTime,
+		Latitude:            utils.ToPtrIfNotNullValue(!req.Latitude.IsSet(), req.Latitude.Value),
+		Longitude:           utils.ToPtrIfNotNullValue(!req.Longitude.IsSet(), req.Longitude.Value),
+		City:                utils.ToPtrIfNotNullValue(!req.City.IsSet(), req.City.Value),
+		Prefecture:          utils.ToPtrIfNotNullValue(!req.Prefecture.IsSet(), req.Prefecture.Value),
+		Restrictions:        restrictionStrings,
+		SessionClaim:        claim,
+		OrganizationAliasID: organizationAliasID,
 	})
 	if err != nil {
 		return nil, errtrace.Wrap(err)

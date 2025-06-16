@@ -65,6 +65,17 @@ type Organization struct {
 	Code             string
 }
 
+type OrganizationAlias struct {
+	AliasID        uuid.UUID
+	OrganizationID uuid.UUID
+	AliasName      string
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	CreatedBy      uuid.UUID
+	DeactivatedAt  sql.NullTime
+	DeactivatedBy  uuid.NullUUID
+}
+
 type OrganizationUser struct {
 	OrganizationUserID uuid.UUID
 	UserID             uuid.UUID
@@ -123,18 +134,20 @@ type Session struct {
 }
 
 type TalkSession struct {
-	TalkSessionID    uuid.UUID
-	OwnerID          uuid.UUID
-	Theme            string
-	ScheduledEndTime time.Time
-	CreatedAt        time.Time
-	City             sql.NullString
-	Prefecture       sql.NullString
-	Description      sql.NullString
-	ThumbnailUrl     sql.NullString
-	Restrictions     talksession.Restrictions
-	UpdatedAt        time.Time
-	HideReport       sql.NullBool
+	TalkSessionID       uuid.UUID
+	OwnerID             uuid.UUID
+	Theme               string
+	ScheduledEndTime    time.Time
+	CreatedAt           time.Time
+	City                sql.NullString
+	Prefecture          sql.NullString
+	Description         sql.NullString
+	ThumbnailUrl        sql.NullString
+	Restrictions        talksession.Restrictions
+	UpdatedAt           time.Time
+	HideReport          sql.NullBool
+	OrganizationID      uuid.NullUUID
+	OrganizationAliasID uuid.NullUUID
 }
 
 type TalkSessionConclusion struct {

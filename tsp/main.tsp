@@ -880,6 +880,7 @@ namespace kotohiro {
       description?: HttpPart<string | null>;
       thumbnailURL?: HttpPart<string | null>;
       restrictions?: HttpPart<string[]>;
+      organizationAliasID?: HttpPart<string | null>;
     },
   ): Body<{
     id: string;
@@ -1747,6 +1748,63 @@ namespace kotohiro {
     valid: boolean;
     organization?: organization;
   }> | {
+    @statusCode statusCode: 400;
+    @body body: {};
+  } | {
+    @statusCode statusCode: 500;
+    @body body: {};
+  };
+
+  @tag("organization")
+  @extension("x-ogen-operation-group", "Organization")
+  @route("/organizations/{organizationID}/aliases")
+  @get
+  @summary("組織エイリアス一覧取得")
+  op getOrganizationAliases(@path organizationID: string): Body<{
+    aliases: {
+      aliasID: string;
+      aliasName: string;
+      createdAt: string;
+    }[];
+  }> | {
+    @statusCode statusCode: 400;
+    @body body: {};
+  } | {
+    @statusCode statusCode: 500;
+    @body body: {};
+  };
+
+  @tag("organization")
+  @extension("x-ogen-operation-group", "Organization")
+  @route("/organizations/{organizationID}/aliases")
+  @post
+  @summary("組織エイリアス作成")
+  op createOrganizationAlias(
+    @path organizationID: string,
+    @multipartBody body: {
+      aliasName: HttpPart<string>;
+    },
+  ): Body<{
+    aliasID: string;
+    aliasName: string;
+    createdAt: string;
+  }> | {
+    @statusCode statusCode: 400;
+    @body body: {};
+  } | {
+    @statusCode statusCode: 500;
+    @body body: {};
+  };
+
+  @tag("organization")
+  @extension("x-ogen-operation-group", "Organization")
+  @route("/organizations/{organizationID}/aliases/{aliasID}")
+  @delete
+  @summary("組織エイリアス削除")
+  op deleteOrganizationAlias(
+    @path organizationID: string,
+    @path aliasID: string,
+  ): Body<{}> | {
     @statusCode statusCode: 400;
     @body body: {};
   } | {
