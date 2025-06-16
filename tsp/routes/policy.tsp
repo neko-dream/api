@@ -11,7 +11,7 @@ namespace kotohiro {
   @route("/policy/consent")
   @get
   @summary("最新のポリシーに同意したかを取得")
-  op getPolicyConsentStatus(): policyConsentStatus | {
+  op getPolicyConsentStatus(): PolicyConsentStatus | {
     @statusCode statusCode: 400;
     @body body: {};
   } | {
@@ -28,7 +28,7 @@ namespace kotohiro {
     @multipartBody body: {
       policyVersion: HttpPart<string>;
     },
-  ): policyConsentStatus | {
+  ): PolicyConsentStatus | {
     @statusCode statusCode: 400;
     @body body: {};
   } | {

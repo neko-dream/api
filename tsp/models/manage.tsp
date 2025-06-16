@@ -4,35 +4,35 @@ using Http;
 
 namespace kotohiro {
   model TalkSessionForManage {
-    TalkSessionID: string;
-    Theme: string;
-    Description: string;
-    Owner: UserForManage;
-    ScheduledEndTime: utcDateTime;
-    City?: string;
-    Prefecture?: string;
-    ThumbnailURL: string;
-    Hidden: boolean;
-    UpdatedAt: string;
-    CreatedAt: string;
+    talkSessionID: string;
+    theme: string;
+    description: string;
+    owner: UserForManage;
+    scheduledEndTime: utcDateTime;
+    city?: string;
+    prefecture?: string;
+    thumbnailURL: string;
+    hidden: boolean;
+    updatedAt: string;
+    createdAt: string;
   }
 
   model TalkSessionStats {
-    TalkSessionID: string;
-    Theme: string;
-    Description: string;
-    Owner: UserForManage;
-    ScheduledEndTime: utcDateTime;
-    City?: string;
-    Prefecture?: string;
-    ThumbnailURL: string;
-    Hidden: boolean;
-    UpdatedAt: string;
-    CreatedAt: string;
-    OpinionCount: int32;
-    OpinionUserCount: int32;
-    VoteCount: int32;
-    VoteUserCount: int32;
+    talkSessionID: string;
+    theme: string;
+    description: string;
+    owner: UserForManage;
+    scheduledEndTime: utcDateTime;
+    city?: string;
+    prefecture?: string;
+    thumbnailURL: string;
+    hidden: boolean;
+    updatedAt: string;
+    createdAt: string;
+    opinionCount: int32;
+    opinionUserCount: int32;
+    voteCount: int32;
+    voteUserCount: int32;
   }
 
   model UserForManage {
@@ -59,8 +59,8 @@ namespace kotohiro {
   }
 
   model TalkSessionListResponse {
-    TalkSessionStats: TalkSessionStats[];
-    TotalCount: int32;
+    talkSessionStats: TalkSessionStats[];
+    totalCount: int32;
   }
 
   model AnalysisReportResponse {

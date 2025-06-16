@@ -20,7 +20,7 @@ namespace kotohiro {
     @multipartBody body: {
       voteStatus: HttpPart<"agree" | "disagree" | "pass" | null>;
     },
-  ): Body<opinion[]> | {
+  ): Body<Opinion[]> | {
     @statusCode statusCode: 400;
     @body body: {
       code: string;

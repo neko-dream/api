@@ -19,7 +19,7 @@ namespace kotohiro {
   @summary("セッションで満たしていない制限")
   op getTalkSessionRestrictionSatisfied(
     @path talkSessionID: string,
-  ): Body<restriction[]> | {
+  ): Body<Restriction[]> | {
     @statusCode statusCode: 400;
     @body body: {};
   } | {
@@ -32,7 +32,7 @@ namespace kotohiro {
   @route("/talksessions/{talkSessionID}")
   @get
   @summary("トークセッションの詳細")
-  op getTalkSessionDetail(@path talkSessionID: string): talkSession | {
+  op getTalkSessionDetail(@path talkSessionID: string): TalkSession | {
     @statusCode statusCode: 400;
     @body body: {
       code: string;
@@ -57,7 +57,7 @@ namespace kotohiro {
       description?: string | null;
       thumbnailURL?: string;
     },
-  ): talkSession | {
+  ): TalkSession | {
     @statusCode statusCode: 400;
     @body body: {};
   } | {
@@ -102,10 +102,10 @@ namespace kotohiro {
     @query(#{ explode: true }) longitude?: numeric | null,
   ): Body<{
     talkSessions: {
-      talkSession: talkSession;
+      talkSession: TalkSession;
       opinionCount: integer;
     }[];
-    pagination: offsetPagination;
+    pagination: OffsetPagination;
   }> | {
     @statusCode statusCode: 400;
     @body body: {
@@ -134,7 +134,7 @@ namespace kotohiro {
   @route("/talksessions")
   @post
   @summary("セッション作成")
-  op createTalkSession(
+  op initiateTalkSession(
     @multipartBody body: {
       theme: HttpPart<string>;
       scheduledEndTime: HttpPart<utcDateTime>;
@@ -151,14 +151,14 @@ namespace kotohiro {
     id: string;
     theme: string;
     description?: string | null;
-    owner: user;
+    owner: User;
     createdAt: string;
     scheduledEndTime: string;
-    location?: location;
+    location?: Location;
     city?: string | null;
     prefecture?: string | null;
     thumbnailURL?: string | null;
-    restrictions: restriction[];
+    restrictions: Restriction[];
     hideReport: boolean;
   }> | {
     @statusCode statusCode: 400;
@@ -174,14 +174,14 @@ namespace kotohiro {
   @get
   @summary("分析結果一覧")
   op talkSessionAnalysis(@path talkSessionID: string): Body<{
-    myPosition?: userGroupPosition;
-    positions: userGroupPosition[];
+    myPosition?: UserGroupPosition;
+    positions: UserGroupPosition[];
     groupOpinions: {
       groupName: string;
       groupID: integer;
       opinions: {
-        opinion: opinion;
-        user: user;
+        opinion: Opinion;
+        user: User;
         agreeCount: integer;
         disagreeCount: integer;
         passCount: integer;
@@ -222,7 +222,7 @@ namespace kotohiro {
     @path talkSessionID: string,
     @query(#{ explode: true }) status?: "unsolved" | "deleted" | "hold",
   ): Body<{
-    reports: reportDetail[];
+    reports: ReportDetail[];
   }> | {
     @statusCode statusCode: 400;
     @body body: {};
@@ -254,7 +254,7 @@ namespace kotohiro {
   @route("/talksessions/{talkSessionID}/conclusion")
   @get
   @summary("結論取得")
-  op getConclusion(@path talkSessionID: string): conclusion | {
+  op getConclusion(@path talkSessionID: string): Conclusion | {
     @statusCode statusCode: 400;
     @body body: {};
   } | {
@@ -276,7 +276,7 @@ namespace kotohiro {
     @multipartBody body: {
       content: HttpPart<string>;
     },
-  ): conclusion | {
+  ): Conclusion | {
     @statusCode statusCode: 400;
     @body body: {};
   } | {
@@ -320,7 +320,7 @@ namespace kotohiro {
   @route("/talksessions/restrictions")
   @get
   @summary("セッションで指定可能な制限一覧")
-  op getTalkSessionRestrictionKeys(): Body<restriction[]> | {
+  op getTalkSessionRestrictionKeys(): Body<Restriction[]> | {
     @statusCode statusCode: 400;
     @body body: {};
   } | {
@@ -347,7 +347,7 @@ namespace kotohiro {
     status?: "finished" | "open" | null,
   ): Body<{
     talkSessions: {
-      talkSession: talkSession;
+      talkSession: TalkSession;
       opinionCount: integer;
     }[];
   }> | {
@@ -374,9 +374,9 @@ namespace kotohiro {
 
     @query(#{ explode: true }) status?: "open" | "finished" | null,
   ): Body<{
-    pagination: offsetPagination;
+    pagination: OffsetPagination;
     talkSessions: {
-      talkSession: talkSession;
+      talkSession: TalkSession;
       opinionCount: integer;
     }[];
   }> | {

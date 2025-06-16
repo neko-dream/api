@@ -3,7 +3,7 @@ import "@typespec/http";
 using Http;
 
 namespace kotohiro {
-  model validationErrorItem {
+  model ValidationErrorItem {
     /**
      * バリデーションエラーのフィールド
      */
@@ -15,22 +15,22 @@ namespace kotohiro {
     message: string;
   }
 
-  model error {
+  model Error {
     code: string;
     message: string;
   }
 
-  model offsetPagination {
+  model OffsetPagination {
     totalCount: integer;
     offset: integer;
     limit: integer;
   }
 
-  model success {
+  model Success {
     message: string;
   }
 
-  model location {
+  model Location {
     /**
      * 緯度
      */

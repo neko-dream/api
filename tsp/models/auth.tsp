@@ -3,7 +3,7 @@ import "@typespec/http";
 using Http;
 
 namespace kotohiro {
-  model tokenClaim {
+  model TokenClaim {
     /**
      * Audience
      */

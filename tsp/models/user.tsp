@@ -3,7 +3,7 @@ import "@typespec/http";
 using Http;
 
 namespace kotohiro {
-  model user {
+  model User {
     @minLength(3)
     @maxLength(25)
     @pattern("^[A-Za-z0-9]$")
@@ -13,7 +13,7 @@ namespace kotohiro {
     iconURL?: string | null;
   }
 
-  model userDemographics {
+  model UserDemographics {
     /**
      * 生年月日
      */
@@ -35,7 +35,7 @@ namespace kotohiro {
     @summary("都道府県") prefecture?: string | null;
   }
 
-  model userGroupPosition {
+  model UserGroupPosition {
     posX: numeric;
     posY: numeric;
     displayID: string;

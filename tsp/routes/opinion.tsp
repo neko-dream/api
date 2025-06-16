@@ -14,8 +14,8 @@ namespace kotohiro {
   @get
   @summary("意見詳細")
   op getOpinionDetail2(@path opinionID: string): Body<{
-    opinion: opinion;
-    user: user;
+    opinion: Opinion;
+    user: User;
     myVoteType?: "agree" | "disagree" | "pass" | null;
   }> | {
     @statusCode statusCode: 500;
@@ -34,8 +34,8 @@ namespace kotohiro {
     @path opinionID: string,
   ): Body<{
     opinions: {
-      opinion: opinion;
-      user: user;
+      opinion: Opinion;
+      user: User;
       myVoteType?: "agree" | "disagree" | "pass" | null;
     }[];
   }> | {
@@ -79,7 +79,7 @@ namespace kotohiro {
   @route("/opinions/{opinionID}/reports")
   @get
   @summary("意見に対する通報取得")
-  op getOpinionReports(@path opinionID: string): reportDetail | {
+  op getOpinionReports(@path opinionID: string): ReportDetail | {
     @statusCode statusCode: 400;
     @body body: {};
   } | {
@@ -110,7 +110,7 @@ namespace kotohiro {
   @route("/opinions/{opinionID}/analysis")
   @get
   @summary("意見に投票したグループごとの割合")
-  op getOpinionAnalysis(@path opinionID: string): Body<opinionGroupRatio[]> | {
+  op getOpinionAnalysis(@path opinionID: string): Body<OpinionGroupRatio[]> | {
     @statusCode statusCode: 400;
     @body body: {};
   } | {
@@ -159,7 +159,7 @@ namespace kotohiro {
   @route("/opinions/report_reasons")
   @get
   @summary("意見への通報理由一覧")
-  op getOpinionReportReasons(): Body<reportReason[]> | {
+  op getOpinionReportReasons(): Body<ReportReason[]> | {
     @statusCode statusCode: 400;
     @body body: {};
   } | {
@@ -184,8 +184,8 @@ namespace kotohiro {
     @query(#{ explode: true }) seed?: boolean | null,
   ): Body<{
     opinions: {
-      opinion: opinion;
-      user: user;
+      opinion: Opinion;
+      user: User;
       replyCount: integer;
       myVoteType?: "pass" | "disagree" | "agree" | null;
     }[];
@@ -215,8 +215,8 @@ namespace kotohiro {
   ): Body<{
     opinions: {
       replyCount: integer;
-      opinion: opinion;
-      user: user;
+      opinion: Opinion;
+      user: User;
     }[];
     remainingCount: integer;
   }> | {
@@ -252,8 +252,8 @@ namespace kotohiro {
     @query(#{ explode: true }) offset?: integer,
   ): Body<{
     opinions: {
-      user: user;
-      opinion: opinion;
+      user: User;
+      opinion: Opinion;
       replyCount: integer;
     }[];
     pagination: {

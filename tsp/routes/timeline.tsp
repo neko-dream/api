@@ -18,7 +18,7 @@ namespace kotohiro {
       content?: HttpPart<string | null>;
       status?: HttpPart<string | null>;
     },
-  ): actionItem | {
+  ): ActionItem | {
     @statusCode statusCode: 400;
     @body body: {};
   } | {
@@ -35,7 +35,7 @@ namespace kotohiro {
   @get
   @summary("タイムライン取得")
   op getTimeLine(@path talkSessionID: string): Body<{
-    items: actionItem[];
+    items: ActionItem[];
   }> | {
     @statusCode statusCode: 400;
     @body body: {};
@@ -57,12 +57,12 @@ namespace kotohiro {
       parentActionItemID?: HttpPart<string | null>;
     },
   ): Body<{
-    ActionItemID: string;
-    Sequence: integer;
-    Content: string;
-    Status: string;
-    CreatedAt: string;
-    UpdatedAt: string;
+    actionItemID: string;
+    sequence: integer;
+    content: string;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
   }> | {
     @statusCode statusCode: 400;
     @body body: {};

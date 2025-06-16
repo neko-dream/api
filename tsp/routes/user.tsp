@@ -12,8 +12,8 @@ namespace kotohiro {
   @get
   @summary("ユーザー情報の取得")
   op get_user_info(): Body<{
-    user: user;
-    demographics: userDemographics;
+    user: User;
+    demographics: UserDemographics;
     email?: string | null;
   }> | {
     @statusCode statusCode: 500;
@@ -25,7 +25,7 @@ namespace kotohiro {
   @route("/user")
   @post
   @summary("ユーザー作成")
-  op registerUser(
+  op establishUser(
     @header contentType: "multipart/form-data",
     @multipartBody body: {
       displayName: HttpPart<string>;
@@ -64,7 +64,7 @@ namespace kotohiro {
   @route("/user")
   @put
   @summary("ユーザー情報の変更")
-  op editUserProfile(
+  op updateUserProfile(
     @header contentType: "multipart/form-data",
     @multipartBody body: {
       displayName?: HttpPart<string | null>;

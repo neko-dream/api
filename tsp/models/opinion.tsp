@@ -4,7 +4,7 @@ import "./user.tsp";
 using Http;
 
 namespace kotohiro {
-  model opinion {
+  model Opinion {
     /**
      * 意見ID
      */
@@ -41,7 +41,7 @@ namespace kotohiro {
     isDeleted: boolean;
   }
 
-  model reportReason {
+  model ReportReason {
     /**
      * 1
      */
@@ -53,7 +53,7 @@ namespace kotohiro {
     reason: string;
   }
 
-  model opinionGroupRatio {
+  model OpinionGroupRatio {
     agreeCount: integer;
     disagreeCount: integer;
     passCount: integer;
@@ -61,13 +61,13 @@ namespace kotohiro {
     groupName: string;
   }
 
-  model reportDetail {
-    opinion: opinion;
+  model ReportDetail {
+    opinion: Opinion;
 
     /**
      * 作成ユーザー
      */
-    user: user;
+    user: User;
 
     status: "unsolved" | "deleted" | "hold";
     reasons: {
@@ -81,3 +81,4 @@ namespace kotohiro {
     reportCount: integer;
   }
 }
+

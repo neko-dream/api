@@ -5,7 +5,7 @@ import "./common.tsp";
 using Http;
 
 namespace kotohiro {
-  model talkSession {
+  model TalkSession {
     /**
      * トークセッションID
      */
@@ -24,7 +24,7 @@ namespace kotohiro {
     /**
      * 作成ユーザー
      */
-    owner: user;
+    owner: User;
 
     /**
      * 作成日時
@@ -39,7 +39,7 @@ namespace kotohiro {
     /**
      * 位置情報
      */
-    location?: location;
+    location?: Location;
 
     /**
      * 市区町村
@@ -59,7 +59,7 @@ namespace kotohiro {
     /**
      * セッションの参加制限
      */
-    restrictions: restriction[];
+    restrictions: Restriction[];
 
     hideReport: boolean;
   }
@@ -73,11 +73,11 @@ namespace kotohiro {
     content: string;
   }
 
-  model conclusion {
+  model Conclusion {
     /**
      * 作成ユーザー
      */
-    user: user;
+    user: User;
 
     /**
      * 結論本文
@@ -85,16 +85,16 @@ namespace kotohiro {
     content: string;
   }
 
-  model actionItem {
-    ActionItemID: string;
-    Sequence: integer;
-    Content: string;
-    Status: string;
-    CreatedAt: string;
-    UpdatedAt: string;
+  model ActionItem {
+    actionItemID: string;
+    sequence: integer;
+    content: string;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
   }
 
-  model restriction {
+  model Restriction {
     key: string;
     description: string;
 
@@ -104,7 +104,7 @@ namespace kotohiro {
     dependsOn?: string[];
   }
 
-  model policyConsentStatus {
+  model PolicyConsentStatus {
     /**
      * 最新ポリシーのバージョン
      */
@@ -121,3 +121,4 @@ namespace kotohiro {
     consentGiven: boolean;
   }
 }
+

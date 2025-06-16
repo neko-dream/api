@@ -3,7 +3,7 @@ import "@typespec/http";
 using Http;
 
 namespace kotohiro {
-  model organization {
+  model Organization {
     /**
      * 組織ID
      */
@@ -12,23 +12,23 @@ namespace kotohiro {
     /**
      * 組織名
      */
-    Name: string;
+    name: string;
 
     /**
      * 組織コード
      */
-    Code: string;
+    code: string;
 
     /**
      * 組織のタイプ
      */
-    Type: integer;
+    type: integer;
 
-    RoleName: string;
+    roleName: string;
 
     /**
      * ロール
      */
-    Role: integer;
+    role: integer;
   }
 }

@@ -13,7 +13,7 @@ namespace kotohiro {
   @get
   @summary("所属組織一覧")
   op getOrganizations(): Body<{
-    organizations: organization[];
+    organizations: Organization[];
   }> | {
     @statusCode statusCode: 400;
     @body body: {};
@@ -36,7 +36,7 @@ namespace kotohiro {
   @route("/organizations")
   @post
   @summary("組織作成（運営ユーザーのみ）")
-  op createOrganizations(
+  op establishOrganization(
     @multipartBody body: {
       name: HttpPart<string>;
       code: HttpPart<string>;
@@ -104,7 +104,7 @@ namespace kotohiro {
   @useAuth([])
   op validateOrganizationCode(@path code: string): Body<{
     valid: boolean;
-    organization?: organization;
+    organization?: Organization;
   }> | {
     @statusCode statusCode: 400;
     @body body: {};
