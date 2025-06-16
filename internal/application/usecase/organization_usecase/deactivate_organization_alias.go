@@ -11,19 +11,16 @@ import (
 	"go.opentelemetry.io/otel"
 )
 
-// DeactivateOrganizationAliasInput 入力
 type DeactivateOrganizationAliasInput struct {
-	AliasID string
+	AliasID shared.UUID[organization.OrganizationAlias]
 }
 
-// DeactivateOrganizationAliasUseCase エイリアス論理削除ユースケース
 type DeactivateOrganizationAliasUseCase struct {
 	dbManager       *db.DBManager
 	sessionRepo     session.SessionRepository
 	orgAliasService *service.OrganizationAliasService
 }
 
-// NewDeactivateOrganizationAliasUseCase コンストラクタ
 func NewDeactivateOrganizationAliasUseCase(
 	dbManager *db.DBManager,
 	sessionRepo session.SessionRepository,
@@ -36,22 +33,16 @@ func NewDeactivateOrganizationAliasUseCase(
 	}
 }
 
-// Execute エイリアス論理削除を実行
 func (u *DeactivateOrganizationAliasUseCase) Execute(
 	ctx context.Context,
-	sessionID string,
+	sessionID shared.UUID[session.Session],
 	input DeactivateOrganizationAliasInput,
 ) error {
 	ctx, span := otel.Tracer("organization_usecase").Start(ctx, "DeactivateOrganizationAliasUseCase.Execute")
 	defer span.End()
 
 	return u.dbManager.ExecTx(ctx, func(ctx context.Context) error {
-		// セッション取得
-		sessID, err := shared.ParseUUID[session.Session](sessionID)
-		if err != nil {
-			return err
-		}
-		sess, err := u.sessionRepo.FindBySessionID(ctx, sessID)
+		sess, err := u.sessionRepo.FindBySessionID(ctx, sessionID)
 		if err != nil {
 			return err
 		}
@@ -59,13 +50,6 @@ func (u *DeactivateOrganizationAliasUseCase) Execute(
 			return ErrSessionNotFound
 		}
 
-		// エイリアスID解析
-		aliasID, err := shared.ParseUUID[organization.OrganizationAlias](input.AliasID)
-		if err != nil {
-			return err
-		}
-
-		// エイリアス論理削除
-		return u.orgAliasService.DeactivateAlias(ctx, aliasID, sess.UserID())
+		return u.orgAliasService.DeactivateAlias(ctx, input.AliasID, sess.UserID())
 	})
 }

@@ -20,6 +20,9 @@ type organizationHandler struct {
 	invite              organization_usecase.InviteOrganizationCommand
 	add                 organization_usecase.InviteOrganizationForUserCommand
 	list                organization_query.ListJoinedOrganizationQuery
+	createAlias         *organization_usecase.CreateOrganizationAliasUseCase
+	deactivateAlias     *organization_usecase.DeactivateOrganizationAliasUseCase
+	listAliases         *organization_usecase.ListOrganizationAliasesUseCase
 	orgRepo             organization.OrganizationRepository
 	aliasRepo           organization.OrganizationAliasRepository
 	orgUserRepo         organization.OrganizationUserRepository
@@ -32,6 +35,9 @@ func NewOrganizationHandler(
 	invite organization_usecase.InviteOrganizationCommand,
 	add organization_usecase.InviteOrganizationForUserCommand,
 	list organization_query.ListJoinedOrganizationQuery,
+	createAlias *organization_usecase.CreateOrganizationAliasUseCase,
+	deactivateAlias *organization_usecase.DeactivateOrganizationAliasUseCase,
+	listAliases *organization_usecase.ListOrganizationAliasesUseCase,
 	orgRepo organization.OrganizationRepository,
 	aliasRepo organization.OrganizationAliasRepository,
 	orgUserRepo organization.OrganizationUserRepository,
@@ -43,6 +49,9 @@ func NewOrganizationHandler(
 		invite:              invite,
 		add:                 add,
 		list:                list,
+		createAlias:         createAlias,
+		deactivateAlias:     deactivateAlias,
+		listAliases:         listAliases,
 		orgRepo:             orgRepo,
 		aliasRepo:           aliasRepo,
 		orgUserRepo:         orgUserRepo,
@@ -254,17 +263,19 @@ func (o *organizationHandler) GetOrganizationAliases(ctx context.Context, params
 	}
 
 	// エイリアス一覧取得
-	aliases, err := o.aliasRepo.FindActiveByOrganizationID(ctx, organizationID)
+	output, err := o.listAliases.Execute(ctx, organization_usecase.ListOrganizationAliasesInput{
+		OrganizationID: organizationID,
+	})
 	if err != nil {
 		return nil, err
 	}
 
 	var aliasResponses []oas.GetOrganizationAliasesOKAliasesItem
-	for _, alias := range aliases {
+	for _, alias := range output.Aliases {
 		aliasResponses = append(aliasResponses, oas.GetOrganizationAliasesOKAliasesItem{
-			AliasID:   alias.AliasID().String(),
-			AliasName: alias.AliasName(),
-			CreatedAt: alias.CreatedAt().Format(time.RFC3339),
+			AliasID:   alias.AliasID,
+			AliasName: alias.AliasName,
+			CreatedAt: alias.CreatedAt,
 		})
 	}
 
@@ -282,7 +293,8 @@ func (o *organizationHandler) CreateOrganizationAlias(ctx context.Context, req *
 	if claim == nil {
 		return nil, messages.ForbiddenError
 	}
-	userID, err := claim.UserID()
+
+	sessionID, err := claim.SessionID()
 	if err != nil {
 		return nil, messages.ForbiddenError
 	}
@@ -293,15 +305,18 @@ func (o *organizationHandler) CreateOrganizationAlias(ctx context.Context, req *
 	}
 
 	// エイリアス作成
-	alias, err := o.aliasService.CreateAlias(ctx, req.AliasName, organizationID, userID)
+	output, err := o.createAlias.Execute(ctx, sessionID, organization_usecase.CreateOrganizationAliasInput{
+		OrganizationID: organizationID,
+		AliasName:      req.AliasName,
+	})
 	if err != nil {
 		return nil, err
 	}
 
 	return &oas.CreateOrganizationAliasOK{
-		AliasID:   alias.AliasID().String(),
-		AliasName: alias.AliasName(),
-		CreatedAt: alias.CreatedAt().Format(time.RFC3339),
+		AliasID:   output.AliasID,
+		AliasName: output.AliasName,
+		CreatedAt: time.Now().Format(time.RFC3339),
 	}, nil
 }
 
@@ -314,14 +329,10 @@ func (o *organizationHandler) DeleteOrganizationAlias(ctx context.Context, param
 	if claim == nil {
 		return nil, messages.ForbiddenError
 	}
-	userID, err := claim.UserID()
+
+	sessionID, err := claim.SessionID()
 	if err != nil {
 		return nil, messages.ForbiddenError
-	}
-
-	organizationID, err := shared.ParseUUID[organization.Organization](params.OrganizationID)
-	if err != nil {
-		return nil, messages.BadRequestError
 	}
 
 	aliasID, err := shared.ParseUUID[organization.OrganizationAlias](params.AliasID)
@@ -329,17 +340,10 @@ func (o *organizationHandler) DeleteOrganizationAlias(ctx context.Context, param
 		return nil, messages.BadRequestError
 	}
 
-	// 権限チェック - ユーザーがAdmin以上の権限を持っているか確認
-	orgUser, err := o.orgUserRepo.FindByOrganizationIDAndUserID(ctx, organizationID, userID)
-	if err != nil {
-		return nil, messages.ForbiddenError
-	}
-	if orgUser.Role < organization.OrganizationUserRoleAdmin {
-		return nil, messages.ForbiddenError
-	}
-
 	// エイリアス削除
-	err = o.aliasService.DeactivateAlias(ctx, aliasID, userID)
+	err = o.deactivateAlias.Execute(ctx, sessionID, organization_usecase.DeactivateOrganizationAliasInput{
+		AliasID: aliasID,
+	})
 	if err != nil {
 		return nil, err
 	}
