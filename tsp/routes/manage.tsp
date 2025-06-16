@@ -48,7 +48,7 @@ namespace kotohiro {
       toggleReportVisibility(
         @header contentType: "application/x-www-form-urlencoded",
         @path talkSessionID: string,
-        @multipartBody body: kotohiro.ToggleReportVisibilityRequest,
+        @body body: kotohiro.ToggleReportVisibilityRequest,
       ): kotohiro.ToggleReportVisibilityResponse;
 
       @route("/regenerate")
@@ -58,7 +58,7 @@ namespace kotohiro {
       regenerateAnalysis(
         @header contentType: "application/x-www-form-urlencoded",
         @path talkSessionID: string,
-        @multipartBody body: kotohiro.RegenerateRequest,
+        @body body: kotohiro.RegenerateRequest,
       ): kotohiro.RegenerateResponse;
     }
 
