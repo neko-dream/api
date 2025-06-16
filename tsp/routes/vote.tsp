@@ -22,13 +22,13 @@ namespace kotohiro {
     },
   ): Body<Opinion[]> | {
     @statusCode statusCode: 400;
-    @body body: {
+    @multipartBody body: {
       code: string;
       message: string;
     };
   } | {
     @statusCode statusCode: 500;
-    @body body: {
+    @multipartBody body: {
       code: string;
       message: string;
     };

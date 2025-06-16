@@ -337,6 +337,59 @@ model User {
 }
 ```
 
+### リクエストボディの規約
+
+- **すべてのリクエストボディは `@multipartBody` を使用する**
+- 各フィールドは `HttpPart<T>` 型でラップする
+- ファイルアップロード用途以外でも統一してmultipartBodyを使用
+
+```tsp
+// Good
+@post
+op createOrganization(
+  @multipartBody body: {
+    name: HttpPart<string>;
+    code: HttpPart<string>;
+    orgType: HttpPart<numeric>;
+  },
+): Organization;
+
+@post
+op submitOpinion(
+  @multipartBody body: {
+    content: HttpPart<string>;
+    title?: HttpPart<string | null>;
+    referenceURL?: HttpPart<string | null>;
+    picture?: HttpPart<bytes>;
+    isSeed?: HttpPart<boolean | null>;
+  },
+): Opinion;
+
+// Bad - @bodyは使用しない
+@post
+op createOrganization(
+  @body body: {
+    name: string;
+    code: string;
+    orgType: numeric;
+  },
+): Organization;
+
+// Bad - HttpPartでラップしていない
+@post
+op createOrganization(
+  @multipartBody body: {
+    name: string;        // HttpPart<string>とする
+    code: string;        // HttpPart<string>とする
+    orgType: numeric;    // HttpPart<numeric>とする
+  },
+): Organization;
+```
+
+**注意事項:**
+- レスポンスボディは `@body` または `Body<T>` を使用
+
+
 ### 配列フィールド
 
 - 複数形を使用

@@ -47,15 +47,15 @@ namespace kotohiro {
   @summary("セッション編集")
   op editTalkSession(
     @path talkSessionID: string,
-    @body body: {
-      theme: string;
-      scheduledEndTime: utcDateTime;
-      latitude?: numeric | null;
-      longitude?: numeric;
-      prefecture?: string | null;
-      city?: string | null;
-      description?: string | null;
-      thumbnailURL?: string;
+    @multipartBody body: {
+      theme: HttpPart<string>;
+      scheduledEndTime: HttpPart<utcDateTime>;
+      latitude?: HttpPart<numeric | null>;
+      longitude?: HttpPart<numeric>;
+      prefecture?: HttpPart<string | null>;
+      city?: HttpPart<string | null>;
+      description?: HttpPart<string | null>;
+      thumbnailURL?: HttpPart<string>;
     },
   ): TalkSession | {
     @statusCode statusCode: 400;
@@ -84,17 +84,6 @@ namespace kotohiro {
     @query(#{ explode: true }) theme?: string | null,
     @query(#{ explode: true }) status?: "open" | "finished" | null = "open",
 
-    @extension(
-      "x-apidog",
-      #{
-        enumDescriptions: #{
-          latest: "",
-          oldest: "",
-          mostReplies: "",
-          nearest: "",
-        },
-      }
-    )
     @query(#{ explode: true })
     sortKey?: "latest" | "oldest" | "mostReplies" | "nearest",
 
