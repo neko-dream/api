@@ -3,16 +3,16 @@ info:
   title: Kotohiro API
   version: 1.0.0
 tags:
+  - name: auth
+  - name: user
   - name: opinion
   - name: vote
   - name: talk_session
   - name: timeline
-  - name: auth
-  - name: user
-  - name: test
-  - name: image
-  - name: policy
   - name: organization
+  - name: policy
+  - name: image
+  - name: test
   - name: health
   - name: manage
 paths:
