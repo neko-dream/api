@@ -21,14 +21,6 @@ type CreateOrganizationAliasRes interface {
 	createOrganizationAliasRes()
 }
 
-type CreateOrganizationsRes interface {
-	createOrganizationsRes()
-}
-
-type CreateTalkSessionRes interface {
-	createTalkSessionRes()
-}
-
 type DeleteOrganizationAliasRes interface {
 	deleteOrganizationAliasRes()
 }
@@ -49,8 +41,12 @@ type EditTimeLineRes interface {
 	editTimeLineRes()
 }
 
-type EditUserProfileRes interface {
-	editUserProfileRes()
+type EstablishOrganizationRes interface {
+	establishOrganizationRes()
+}
+
+type EstablishUserRes interface {
+	establishUserRes()
 }
 
 type GetConclusionRes interface {
@@ -137,6 +133,10 @@ type HealthRes interface {
 	healthRes()
 }
 
+type InitiateTalkSessionRes interface {
+	initiateTalkSessionRes()
+}
+
 type InviteOrganizationForUserRes interface {
 	inviteOrganizationForUserRes()
 }
@@ -193,10 +193,6 @@ type PostTimeLineItemRes interface {
 	postTimeLineItemRes()
 }
 
-type RegisterUserRes interface {
-	registerUserRes()
-}
-
 type ReportOpinionRes interface {
 	reportOpinionRes()
 }
@@ -219,6 +215,10 @@ type TalkSessionAnalysisRes interface {
 
 type TestRes interface {
 	testRes()
+}
+
+type UpdateUserProfileRes interface {
+	updateUserProfileRes()
 }
 
 type ValidateOrganizationCodeRes interface {

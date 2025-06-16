@@ -223,7 +223,13 @@ type OrganizationHandler interface {
 	//
 	// POST /organizations/{organizationID}/aliases
 	CreateOrganizationAlias(ctx context.Context, req *CreateOrganizationAliasReq, params CreateOrganizationAliasParams) (CreateOrganizationAliasRes, error)
-	// CreateOrganizations implements createOrganizations operation.
+	// DeleteOrganizationAlias implements deleteOrganizationAlias operation.
+	//
+	// 組織エイリアス削除.
+	//
+	// DELETE /organizations/{organizationID}/aliases/{aliasID}
+	DeleteOrganizationAlias(ctx context.Context, params DeleteOrganizationAliasParams) (DeleteOrganizationAliasRes, error)
+	// EstablishOrganization implements establishOrganization operation.
 	//
 	// 組織を作成できる。
 	// これを作れるユーザーはDBを直接叩いて作るしかない。
@@ -233,13 +239,7 @@ type OrganizationHandler interface {
 	// - 3: 議員.
 	//
 	// POST /organizations
-	CreateOrganizations(ctx context.Context, req *CreateOrganizationsReq) (CreateOrganizationsRes, error)
-	// DeleteOrganizationAlias implements deleteOrganizationAlias operation.
-	//
-	// 組織エイリアス削除.
-	//
-	// DELETE /organizations/{organizationID}/aliases/{aliasID}
-	DeleteOrganizationAlias(ctx context.Context, params DeleteOrganizationAliasParams) (DeleteOrganizationAliasRes, error)
+	EstablishOrganization(ctx context.Context, req *EstablishOrganizationReq) (EstablishOrganizationRes, error)
 	// GetOrganizationAliases implements getOrganizationAliases operation.
 	//
 	// 組織エイリアス一覧取得.
@@ -303,19 +303,6 @@ type TalkSessionHandler interface {
 	//
 	// POST /talksessions/{talkSessionID}/consent
 	ConsentTalkSession(ctx context.Context, params ConsentTalkSessionParams) (ConsentTalkSessionRes, error)
-	// CreateTalkSession implements createTalkSession operation.
-	//
-	// ## サムネイル画像について
-	// - `Description中に出てくる画像で一番最初のものを使用`。
-	// - 画像自体は`POST /images`でサーバにポストしたものを使用してください。
-	// ## 投稿制限のキーについて
-	// restrictionsに値を入れると一定のデモグラ情報を登録していない限り、セッションへの投稿が制限されるようにできる。
-	// restrictionsには [GET /talksessions/restrictions](https://app.apidog.
-	// com/link/project/674502/apis/api-14271260)
-	// より取れるkeyをカンマ区切りで入力してください。.
-	//
-	// POST /talksessions
-	CreateTalkSession(ctx context.Context, req *CreateTalkSessionReq) (CreateTalkSessionRes, error)
 	// EditTalkSession implements editTalkSession operation.
 	//
 	// セッション編集.
@@ -382,6 +369,19 @@ type TalkSessionHandler interface {
 	//
 	// GET /talksessions/{talkSessionID}/consent
 	HasConsent(ctx context.Context, params HasConsentParams) (HasConsentRes, error)
+	// InitiateTalkSession implements initiateTalkSession operation.
+	//
+	// ## サムネイル画像について
+	// - `Description中に出てくる画像で一番最初のものを使用`。
+	// - 画像自体は`POST /images`でサーバにポストしたものを使用してください。
+	// ## 投稿制限のキーについて
+	// restrictionsに値を入れると一定のデモグラ情報を登録していない限り、セッションへの投稿が制限されるようにできる。
+	// restrictionsには [GET /talksessions/restrictions](https://app.apidog.
+	// com/link/project/674502/apis/api-14271260)
+	// より取れるkeyをカンマ区切りで入力してください。.
+	//
+	// POST /talksessions
+	InitiateTalkSession(ctx context.Context, req *InitiateTalkSessionReq) (InitiateTalkSessionRes, error)
 	// PostConclusion implements postConclusion operation.
 	//
 	// 結論（conclusion）はセッションが終了した後にセッっションの作成者が投稿できる文章。
@@ -443,12 +443,12 @@ type TimelineHandler interface {
 //
 // x-ogen-operation-group: User
 type UserHandler interface {
-	// EditUserProfile implements editUserProfile operation.
+	// EstablishUser implements establishUser operation.
 	//
-	// ユーザー情報の変更.
+	// ユーザー作成.
 	//
-	// PUT /user
-	EditUserProfile(ctx context.Context, req *EditUserProfileReq) (EditUserProfileRes, error)
+	// POST /user
+	EstablishUser(ctx context.Context, req *EstablishUserReq) (EstablishUserRes, error)
 	// GetUserInfo implements get_user_info operation.
 	//
 	// ユーザー情報の取得.
@@ -461,18 +461,18 @@ type UserHandler interface {
 	//
 	// GET /opinions/histories
 	OpinionsHistory(ctx context.Context, params OpinionsHistoryParams) (OpinionsHistoryRes, error)
-	// RegisterUser implements registerUser operation.
-	//
-	// ユーザー作成.
-	//
-	// POST /user
-	RegisterUser(ctx context.Context, req *RegisterUserReq) (RegisterUserRes, error)
 	// SessionsHistory implements sessionsHistory operation.
 	//
 	// リアクション済みのセッション一覧.
 	//
 	// GET /talksessions/histories
 	SessionsHistory(ctx context.Context, params SessionsHistoryParams) (SessionsHistoryRes, error)
+	// UpdateUserProfile implements updateUserProfile operation.
+	//
+	// ユーザー情報の変更.
+	//
+	// PUT /user
+	UpdateUserProfile(ctx context.Context, req *UpdateUserProfileReq) (UpdateUserProfileRes, error)
 }
 
 // VoteHandler handles operations described by OpenAPI v3 specification.

@@ -65,5 +65,9 @@ namespace kotohiro {
      * パスワードの更新が必要かどうか
      */
     requiredPasswordChange: boolean;
+
+        organizationRole?: string | null;
+    organizationCode?: string | null;
+    organizationID?: string | null;
   }
 }

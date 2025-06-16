@@ -131,7 +131,7 @@ paths:
                   valid:
                     type: boolean
                   organization:
-                    $ref: '#/components/schemas/organization'
+                    $ref: '#/components/schemas/Organization'
                 required:
                   - valid
         '400':
@@ -731,9 +731,9 @@ paths:
                       type: object
                       properties:
                         user:
-                          $ref: '#/components/schemas/user'
+                          $ref: '#/components/schemas/User'
                         opinion:
-                          $ref: '#/components/schemas/opinion'
+                          $ref: '#/components/schemas/Opinion'
                         replyCount:
                           type: integer
                       required:
@@ -778,7 +778,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/reportReason'
+                  $ref: '#/components/schemas/ReportReason'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -813,9 +813,9 @@ paths:
                 type: object
                 properties:
                   opinion:
-                    $ref: '#/components/schemas/opinion'
+                    $ref: '#/components/schemas/Opinion'
                   user:
-                    $ref: '#/components/schemas/user'
+                    $ref: '#/components/schemas/User'
                   myVoteType:
                     type: string
                     enum:
@@ -853,7 +853,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/opinionGroupRatio'
+                  $ref: '#/components/schemas/OpinionGroupRatio'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -894,9 +894,9 @@ paths:
                       type: object
                       properties:
                         opinion:
-                          $ref: '#/components/schemas/opinion'
+                          $ref: '#/components/schemas/Opinion'
                         user:
-                          $ref: '#/components/schemas/user'
+                          $ref: '#/components/schemas/User'
                         myVoteType:
                           type: string
                           enum:
@@ -1008,7 +1008,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/reportDetail'
+                $ref: '#/components/schemas/ReportDetail'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -1089,7 +1089,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/opinion'
+                  $ref: '#/components/schemas/Opinion'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -1156,7 +1156,7 @@ paths:
                   organizations:
                     type: array
                     items:
-                      $ref: '#/components/schemas/organization'
+                      $ref: '#/components/schemas/Organization'
                 required:
                   - organizations
         '400':
@@ -1175,7 +1175,7 @@ paths:
         - organization
       x-ogen-operation-group: Organization
     post:
-      operationId: createOrganizations
+      operationId: establishOrganization
       summary: 組織作成（運営ユーザーのみ）
       description: |-
         組織を作成できる。
@@ -1478,7 +1478,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/policyConsentStatus'
+                $ref: '#/components/schemas/PolicyConsentStatus'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -1504,7 +1504,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/policyConsentStatus'
+                $ref: '#/components/schemas/PolicyConsentStatus'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -1614,14 +1614,14 @@ paths:
                       type: object
                       properties:
                         talkSession:
-                          $ref: '#/components/schemas/talkSession'
+                          $ref: '#/components/schemas/TalkSession'
                         opinionCount:
                           type: integer
                       required:
                         - talkSession
                         - opinionCount
                   pagination:
-                    $ref: '#/components/schemas/offsetPagination'
+                    $ref: '#/components/schemas/OffsetPagination'
                 required:
                   - talkSessions
                   - pagination
@@ -1657,7 +1657,7 @@ paths:
         - talk_session
       x-ogen-operation-group: TalkSession
     post:
-      operationId: createTalkSession
+      operationId: initiateTalkSession
       summary: セッション作成
       description: |-
         ## サムネイル画像について
@@ -1684,13 +1684,13 @@ paths:
                     type: string
                     nullable: true
                   owner:
-                    $ref: '#/components/schemas/user'
+                    $ref: '#/components/schemas/User'
                   createdAt:
                     type: string
                   scheduledEndTime:
                     type: string
                   location:
-                    $ref: '#/components/schemas/location'
+                    $ref: '#/components/schemas/Location'
                   city:
                     type: string
                     nullable: true
@@ -1703,7 +1703,7 @@ paths:
                   restrictions:
                     type: array
                     items:
-                      $ref: '#/components/schemas/restriction'
+                      $ref: '#/components/schemas/Restriction'
                   hideReport:
                     type: boolean
                 required:
@@ -1828,14 +1828,14 @@ paths:
                 type: object
                 properties:
                   pagination:
-                    $ref: '#/components/schemas/offsetPagination'
+                    $ref: '#/components/schemas/OffsetPagination'
                   talkSessions:
                     type: array
                     items:
                       type: object
                       properties:
                         talkSession:
-                          $ref: '#/components/schemas/talkSession'
+                          $ref: '#/components/schemas/TalkSession'
                         opinionCount:
                           type: integer
                       required:
@@ -1912,7 +1912,7 @@ paths:
                       type: object
                       properties:
                         talkSession:
-                          $ref: '#/components/schemas/talkSession'
+                          $ref: '#/components/schemas/TalkSession'
                         opinionCount:
                           type: integer
                       required:
@@ -1949,7 +1949,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/restriction'
+                  $ref: '#/components/schemas/Restriction'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -1981,7 +1981,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/talkSession'
+                $ref: '#/components/schemas/TalkSession'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -2014,7 +2014,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/talkSession'
+                $ref: '#/components/schemas/TalkSession'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -2080,11 +2080,11 @@ paths:
                 type: object
                 properties:
                   myPosition:
-                    $ref: '#/components/schemas/userGroupPosition'
+                    $ref: '#/components/schemas/UserGroupPosition'
                   positions:
                     type: array
                     items:
-                      $ref: '#/components/schemas/userGroupPosition'
+                      $ref: '#/components/schemas/UserGroupPosition'
                   groupOpinions:
                     type: array
                     items:
@@ -2100,9 +2100,9 @@ paths:
                             type: object
                             properties:
                               opinion:
-                                $ref: '#/components/schemas/opinion'
+                                $ref: '#/components/schemas/Opinion'
                               user:
-                                $ref: '#/components/schemas/user'
+                                $ref: '#/components/schemas/User'
                               agreeCount:
                                 type: integer
                               disagreeCount:
@@ -2169,7 +2169,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/conclusion'
+                $ref: '#/components/schemas/Conclusion'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -2203,7 +2203,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/conclusion'
+                $ref: '#/components/schemas/Conclusion'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -2350,9 +2350,9 @@ paths:
                       type: object
                       properties:
                         opinion:
-                          $ref: '#/components/schemas/opinion'
+                          $ref: '#/components/schemas/Opinion'
                         user:
-                          $ref: '#/components/schemas/user'
+                          $ref: '#/components/schemas/User'
                         replyCount:
                           type: integer
                         myVoteType:
@@ -2451,7 +2451,7 @@ paths:
                   reports:
                     type: array
                     items:
-                      $ref: '#/components/schemas/reportDetail'
+                      $ref: '#/components/schemas/ReportDetail'
                 required:
                   - reports
         '400':
@@ -2534,7 +2534,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/restriction'
+                  $ref: '#/components/schemas/Restriction'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -2586,9 +2586,9 @@ paths:
                         replyCount:
                           type: integer
                         opinion:
-                          $ref: '#/components/schemas/opinion'
+                          $ref: '#/components/schemas/Opinion'
                         user:
-                          $ref: '#/components/schemas/user'
+                          $ref: '#/components/schemas/User'
                       required:
                         - replyCount
                         - opinion
@@ -2647,25 +2647,25 @@ paths:
               schema:
                 type: object
                 properties:
-                  ActionItemID:
+                  actionItemID:
                     type: string
-                  Sequence:
+                  sequence:
                     type: integer
-                  Content:
+                  content:
                     type: string
-                  Status:
+                  status:
                     type: string
-                  CreatedAt:
+                  createdAt:
                     type: string
-                  UpdatedAt:
+                  updatedAt:
                     type: string
                 required:
-                  - ActionItemID
-                  - Sequence
-                  - Content
-                  - Status
-                  - CreatedAt
-                  - UpdatedAt
+                  - actionItemID
+                  - sequence
+                  - content
+                  - status
+                  - createdAt
+                  - updatedAt
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -2723,7 +2723,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: '#/components/schemas/actionItem'
+                      $ref: '#/components/schemas/ActionItem'
                 required:
                   - items
         '400':
@@ -2762,7 +2762,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/actionItem'
+                $ref: '#/components/schemas/ActionItem'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -2883,9 +2883,9 @@ paths:
                 type: object
                 properties:
                   user:
-                    $ref: '#/components/schemas/user'
+                    $ref: '#/components/schemas/User'
                   demographics:
-                    $ref: '#/components/schemas/userDemographics'
+                    $ref: '#/components/schemas/UserDemographics'
                   email:
                     type: string
                     nullable: true
@@ -2902,7 +2902,7 @@ paths:
         - user
       x-ogen-operation-group: User
     post:
-      operationId: registerUser
+      operationId: establishUser
       summary: ユーザー作成
       parameters: []
       responses:
@@ -3000,7 +3000,7 @@ paths:
                 contentType: application/json
       x-ogen-operation-group: user
     put:
-      operationId: editUserProfile
+      operationId: updateUserProfile
       summary: ユーザー情報の変更
       parameters: []
       responses:
@@ -3338,12 +3338,47 @@ security:
   - CookieAuth: []
 components:
   schemas:
+    ActionItem:
+      type: object
+      required:
+        - actionItemID
+        - sequence
+        - content
+        - status
+        - createdAt
+        - updatedAt
+      properties:
+        actionItemID:
+          type: string
+        sequence:
+          type: integer
+        content:
+          type: string
+        status:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
     AnalysisReportResponse:
       type: object
       properties:
         report:
           type: string
           description: レポート本文
+    Conclusion:
+      type: object
+      required:
+        - user
+        - content
+      properties:
+        user:
+          allOf:
+            - $ref: '#/components/schemas/User'
+          description: 作成ユーザー
+        content:
+          type: string
+          description: 結論本文
     CookieAuth:
       type: object
       required:
@@ -3367,257 +3402,7 @@ components:
             - SessionId
           description: name of the API key
       description: Cookie-based authentication using JWT tokens stored in secure HTTP-only cookies
-    RegenerateRequest:
-      type: object
-      required:
-        - type
-      properties:
-        type:
-          type: string
-          enum:
-            - report
-            - group
-            - image
-          description: 再生成するタイプ
-    RegenerateResponse:
-      type: object
-      required:
-        - status
-        - message
-      properties:
-        status:
-          type: string
-          description: ステータス
-        message:
-          type: string
-          description: メッセージ
-    Report:
-      type: object
-      required:
-        - talkSessionID
-        - content
-      properties:
-        talkSessionID:
-          type: string
-        content:
-          type: string
-          description: レポート本文
-    TalkSessionForManage:
-      type: object
-      required:
-        - TalkSessionID
-        - Theme
-        - Description
-        - Owner
-        - ScheduledEndTime
-        - ThumbnailURL
-        - Hidden
-        - UpdatedAt
-        - CreatedAt
-      properties:
-        TalkSessionID:
-          type: string
-        Theme:
-          type: string
-        Description:
-          type: string
-        Owner:
-          $ref: '#/components/schemas/UserForManage'
-        ScheduledEndTime:
-          type: string
-          format: date-time
-        City:
-          type: string
-        Prefecture:
-          type: string
-        ThumbnailURL:
-          type: string
-        Hidden:
-          type: boolean
-        UpdatedAt:
-          type: string
-        CreatedAt:
-          type: string
-    TalkSessionListResponse:
-      type: object
-      required:
-        - TalkSessionStats
-        - TotalCount
-      properties:
-        TalkSessionStats:
-          type: array
-          items:
-            $ref: '#/components/schemas/TalkSessionStats'
-        TotalCount:
-          type: integer
-          format: int32
-    TalkSessionStats:
-      type: object
-      required:
-        - TalkSessionID
-        - Theme
-        - Description
-        - Owner
-        - ScheduledEndTime
-        - ThumbnailURL
-        - Hidden
-        - UpdatedAt
-        - CreatedAt
-        - OpinionCount
-        - OpinionUserCount
-        - VoteCount
-        - VoteUserCount
-      properties:
-        TalkSessionID:
-          type: string
-        Theme:
-          type: string
-        Description:
-          type: string
-        Owner:
-          $ref: '#/components/schemas/UserForManage'
-        ScheduledEndTime:
-          type: string
-          format: date-time
-        City:
-          type: string
-        Prefecture:
-          type: string
-        ThumbnailURL:
-          type: string
-        Hidden:
-          type: boolean
-        UpdatedAt:
-          type: string
-        CreatedAt:
-          type: string
-        OpinionCount:
-          type: integer
-          format: int32
-        OpinionUserCount:
-          type: integer
-          format: int32
-        VoteCount:
-          type: integer
-          format: int32
-        VoteUserCount:
-          type: integer
-          format: int32
-    ToggleReportVisibilityRequest:
-      type: object
-      required:
-        - hidden
-      properties:
-        hidden:
-          type: boolean
-          description: 非表示にするかどうか
-    ToggleReportVisibilityResponse:
-      type: object
-      required:
-        - status
-        - message
-      properties:
-        status:
-          type: string
-          description: ステータス
-        message:
-          type: string
-          description: メッセージ
-    UserForManage:
-      type: object
-      required:
-        - userID
-        - displayID
-        - displayName
-        - iconURL
-        - lastLoginAt
-        - createdAt
-        - updatedAt
-      properties:
-        userID:
-          type: string
-          description: ユーザーID
-        displayID:
-          type: string
-          description: 表示ID
-        displayName:
-          type: string
-          description: 表示名
-        iconURL:
-          type: string
-          description: アイコンURL
-        lastLoginAt:
-          type: string
-          format: date-time
-          description: 最終ログイン日時
-        createdAt:
-          type: string
-          format: date-time
-          description: 作成日時
-        updatedAt:
-          type: string
-          format: date-time
-          description: 更新日時
-    UserStatsResponse:
-      type: object
-      required:
-        - uniqueActionUserCount
-        - userCount
-        - talkSessionCount
-        - date
-      properties:
-        uniqueActionUserCount:
-          type: integer
-          format: int32
-          description: ユニークアクション数
-        userCount:
-          type: integer
-          format: int32
-          description: 登録ユーザー数
-        talkSessionCount:
-          type: integer
-          format: int32
-          description: セッション数
-        date:
-          type: string
-          format: date-time
-          description: 日付
-    actionItem:
-      type: object
-      required:
-        - ActionItemID
-        - Sequence
-        - Content
-        - Status
-        - CreatedAt
-        - UpdatedAt
-      properties:
-        ActionItemID:
-          type: string
-        Sequence:
-          type: integer
-        Content:
-          type: string
-        Status:
-          type: string
-        CreatedAt:
-          type: string
-        UpdatedAt:
-          type: string
-    conclusion:
-      type: object
-      required:
-        - user
-        - content
-      properties:
-        user:
-          allOf:
-            - $ref: '#/components/schemas/user'
-          description: 作成ユーザー
-        content:
-          type: string
-          description: 結論本文
-    error:
+    Error:
       type: object
       required:
         - code
@@ -3627,7 +3412,7 @@ components:
           type: string
         message:
           type: string
-    location:
+    Location:
       type: object
       properties:
         latitude:
@@ -3636,7 +3421,7 @@ components:
         longitude:
           type: number
           description: 経度
-    offsetPagination:
+    OffsetPagination:
       type: object
       required:
         - totalCount
@@ -3649,7 +3434,7 @@ components:
           type: integer
         limit:
           type: integer
-    opinion:
+    Opinion:
       type: object
       required:
         - id
@@ -3689,7 +3474,7 @@ components:
           type: string
         isDeleted:
           type: boolean
-    opinionGroupRatio:
+    OpinionGroupRatio:
       type: object
       required:
         - agreeCount
@@ -3708,34 +3493,34 @@ components:
           type: integer
         groupName:
           type: string
-    organization:
+    Organization:
       type: object
       required:
         - ID
-        - Name
-        - Code
-        - Type
-        - RoleName
-        - Role
+        - name
+        - code
+        - type
+        - roleName
+        - role
       properties:
         ID:
           type: string
           description: 組織ID
-        Name:
+        name:
           type: string
           description: 組織名
-        Code:
+        code:
           type: string
           description: 組織コード
-        Type:
+        type:
           type: integer
           description: 組織のタイプ
-        RoleName:
+        roleName:
           type: string
-        Role:
+        role:
           type: integer
           description: ロール
-    policyConsentStatus:
+    PolicyConsentStatus:
       type: object
       required:
         - policyVersion
@@ -3751,7 +3536,42 @@ components:
         consentGiven:
           type: boolean
           description: 同意したか
-    reportDetail:
+    RegenerateRequest:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum:
+            - report
+            - group
+            - image
+          description: 再生成するタイプ
+    RegenerateResponse:
+      type: object
+      required:
+        - status
+        - message
+      properties:
+        status:
+          type: string
+          description: ステータス
+        message:
+          type: string
+          description: メッセージ
+    Report:
+      type: object
+      required:
+        - talkSessionID
+        - content
+      properties:
+        talkSessionID:
+          type: string
+        content:
+          type: string
+          description: レポート本文
+    ReportDetail:
       type: object
       required:
         - opinion
@@ -3761,10 +3581,10 @@ components:
         - reportCount
       properties:
         opinion:
-          $ref: '#/components/schemas/opinion'
+          $ref: '#/components/schemas/Opinion'
         user:
           allOf:
-            - $ref: '#/components/schemas/user'
+            - $ref: '#/components/schemas/User'
           description: 作成ユーザー
         status:
           type: string
@@ -3787,7 +3607,7 @@ components:
         reportCount:
           type: integer
           description: この意見が通報を受けた回数
-    reportReason:
+    ReportReason:
       type: object
       required:
         - reasonID
@@ -3799,7 +3619,7 @@ components:
         reason:
           type: string
           description: 不適切な内容
-    restriction:
+    Restriction:
       type: object
       required:
         - key
@@ -3814,14 +3634,14 @@ components:
           items:
             type: string
           description: 依存しているrestriction
-    success:
+    Success:
       type: object
       required:
         - message
       properties:
         message:
           type: string
-    talkSession:
+    TalkSession:
       type: object
       required:
         - id
@@ -3844,7 +3664,7 @@ components:
           description: 説明
         owner:
           allOf:
-            - $ref: '#/components/schemas/user'
+            - $ref: '#/components/schemas/User'
           description: 作成ユーザー
         createdAt:
           type: string
@@ -3854,7 +3674,7 @@ components:
           description: 終了予定日時
         location:
           allOf:
-            - $ref: '#/components/schemas/location'
+            - $ref: '#/components/schemas/Location'
           description: 位置情報
         city:
           type: string
@@ -3871,11 +3691,132 @@ components:
         restrictions:
           type: array
           items:
-            $ref: '#/components/schemas/restriction'
+            $ref: '#/components/schemas/Restriction'
           description: セッションの参加制限
         hideReport:
           type: boolean
-    tokenClaim:
+    TalkSessionForManage:
+      type: object
+      required:
+        - talkSessionID
+        - theme
+        - description
+        - owner
+        - scheduledEndTime
+        - thumbnailURL
+        - hidden
+        - updatedAt
+        - createdAt
+      properties:
+        talkSessionID:
+          type: string
+        theme:
+          type: string
+        description:
+          type: string
+        owner:
+          $ref: '#/components/schemas/UserForManage'
+        scheduledEndTime:
+          type: string
+          format: date-time
+        city:
+          type: string
+        prefecture:
+          type: string
+        thumbnailURL:
+          type: string
+        hidden:
+          type: boolean
+        updatedAt:
+          type: string
+        createdAt:
+          type: string
+    TalkSessionListResponse:
+      type: object
+      required:
+        - talkSessionStats
+        - totalCount
+      properties:
+        talkSessionStats:
+          type: array
+          items:
+            $ref: '#/components/schemas/TalkSessionStats'
+        totalCount:
+          type: integer
+          format: int32
+    TalkSessionStats:
+      type: object
+      required:
+        - talkSessionID
+        - theme
+        - description
+        - owner
+        - scheduledEndTime
+        - thumbnailURL
+        - hidden
+        - updatedAt
+        - createdAt
+        - opinionCount
+        - opinionUserCount
+        - voteCount
+        - voteUserCount
+      properties:
+        talkSessionID:
+          type: string
+        theme:
+          type: string
+        description:
+          type: string
+        owner:
+          $ref: '#/components/schemas/UserForManage'
+        scheduledEndTime:
+          type: string
+          format: date-time
+        city:
+          type: string
+        prefecture:
+          type: string
+        thumbnailURL:
+          type: string
+        hidden:
+          type: boolean
+        updatedAt:
+          type: string
+        createdAt:
+          type: string
+        opinionCount:
+          type: integer
+          format: int32
+        opinionUserCount:
+          type: integer
+          format: int32
+        voteCount:
+          type: integer
+          format: int32
+        voteUserCount:
+          type: integer
+          format: int32
+    ToggleReportVisibilityRequest:
+      type: object
+      required:
+        - hidden
+      properties:
+        hidden:
+          type: boolean
+          description: 非表示にするかどうか
+    ToggleReportVisibilityResponse:
+      type: object
+      required:
+        - status
+        - message
+      properties:
+        status:
+          type: string
+          description: ステータス
+        message:
+          type: string
+          description: メッセージ
+    TokenClaim:
       type: object
       required:
         - aud
@@ -3927,7 +3868,7 @@ components:
         requiredPasswordChange:
           type: boolean
           description: パスワードの更新が必要かどうか
-    user:
+    User:
       type: object
       required:
         - displayID
@@ -3943,7 +3884,7 @@ components:
         iconURL:
           type: string
           nullable: true
-    userDemographics:
+    UserDemographics:
       type: object
       properties:
         dateOfBirth:
@@ -3966,7 +3907,42 @@ components:
           nullable: true
           description: 都道府県
           title: 都道府県
-    userGroupPosition:
+    UserForManage:
+      type: object
+      required:
+        - userID
+        - displayID
+        - displayName
+        - iconURL
+        - lastLoginAt
+        - createdAt
+        - updatedAt
+      properties:
+        userID:
+          type: string
+          description: ユーザーID
+        displayID:
+          type: string
+          description: 表示ID
+        displayName:
+          type: string
+          description: 表示名
+        iconURL:
+          type: string
+          description: アイコンURL
+        lastLoginAt:
+          type: string
+          format: date-time
+          description: 最終ログイン日時
+        createdAt:
+          type: string
+          format: date-time
+          description: 作成日時
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新日時
+    UserGroupPosition:
       type: object
       required:
         - posX
@@ -3994,7 +3970,31 @@ components:
         perimeterIndex:
           type: integer
           description: 境界ポイントのインデックス
-    validationErrorItem:
+    UserStatsResponse:
+      type: object
+      required:
+        - uniqueActionUserCount
+        - userCount
+        - talkSessionCount
+        - date
+      properties:
+        uniqueActionUserCount:
+          type: integer
+          format: int32
+          description: ユニークアクション数
+        userCount:
+          type: integer
+          format: int32
+          description: 登録ユーザー数
+        talkSessionCount:
+          type: integer
+          format: int32
+          description: セッション数
+        date:
+          type: string
+          format: date-time
+          description: 日付
+    ValidationErrorItem:
       type: object
       required:
         - field

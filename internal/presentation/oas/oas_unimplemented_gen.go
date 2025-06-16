@@ -58,36 +58,6 @@ func (UnimplementedHandler) CreateOrganizationAlias(ctx context.Context, req *Cr
 	return r, ht.ErrNotImplemented
 }
 
-// CreateOrganizations implements createOrganizations operation.
-//
-// 組織を作成できる。
-// これを作れるユーザーはDBを直接叩いて作るしかない。
-// OrgType
-// - 1: 通常
-// - 2: 自治体
-// - 3: 議員.
-//
-// POST /organizations
-func (UnimplementedHandler) CreateOrganizations(ctx context.Context, req *CreateOrganizationsReq) (r CreateOrganizationsRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// CreateTalkSession implements createTalkSession operation.
-//
-// ## サムネイル画像について
-// - `Description中に出てくる画像で一番最初のものを使用`。
-// - 画像自体は`POST /images`でサーバにポストしたものを使用してください。
-// ## 投稿制限のキーについて
-// restrictionsに値を入れると一定のデモグラ情報を登録していない限り、セッションへの投稿が制限されるようにできる。
-// restrictionsには [GET /talksessions/restrictions](https://app.apidog.
-// com/link/project/674502/apis/api-14271260)
-// より取れるkeyをカンマ区切りで入力してください。.
-//
-// POST /talksessions
-func (UnimplementedHandler) CreateTalkSession(ctx context.Context, req *CreateTalkSessionReq) (r CreateTalkSessionRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // DeleteOrganizationAlias implements deleteOrganizationAlias operation.
 //
 // 組織エイリアス削除.
@@ -133,12 +103,26 @@ func (UnimplementedHandler) EditTimeLine(ctx context.Context, req *EditTimeLineR
 	return r, ht.ErrNotImplemented
 }
 
-// EditUserProfile implements editUserProfile operation.
+// EstablishOrganization implements establishOrganization operation.
 //
-// ユーザー情報の変更.
+// 組織を作成できる。
+// これを作れるユーザーはDBを直接叩いて作るしかない。
+// OrgType
+// - 1: 通常
+// - 2: 自治体
+// - 3: 議員.
 //
-// PUT /user
-func (UnimplementedHandler) EditUserProfile(ctx context.Context, req *EditUserProfileReq) (r EditUserProfileRes, _ error) {
+// POST /organizations
+func (UnimplementedHandler) EstablishOrganization(ctx context.Context, req *EstablishOrganizationReq) (r EstablishOrganizationRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// EstablishUser implements establishUser operation.
+//
+// ユーザー作成.
+//
+// POST /user
+func (UnimplementedHandler) EstablishUser(ctx context.Context, req *EstablishUserReq) (r EstablishUserRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -373,6 +357,22 @@ func (UnimplementedHandler) Health(ctx context.Context) (r HealthRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
+// InitiateTalkSession implements initiateTalkSession operation.
+//
+// ## サムネイル画像について
+// - `Description中に出てくる画像で一番最初のものを使用`。
+// - 画像自体は`POST /images`でサーバにポストしたものを使用してください。
+// ## 投稿制限のキーについて
+// restrictionsに値を入れると一定のデモグラ情報を登録していない限り、セッションへの投稿が制限されるようにできる。
+// restrictionsには [GET /talksessions/restrictions](https://app.apidog.
+// com/link/project/674502/apis/api-14271260)
+// より取れるkeyをカンマ区切りで入力してください。.
+//
+// POST /talksessions
+func (UnimplementedHandler) InitiateTalkSession(ctx context.Context, req *InitiateTalkSessionReq) (r InitiateTalkSessionRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // InviteOrganization implements inviteOrganization operation.
 //
 // Role
@@ -512,15 +512,6 @@ func (UnimplementedHandler) PostTimeLineItem(ctx context.Context, req *PostTimeL
 	return r, ht.ErrNotImplemented
 }
 
-// RegisterUser implements registerUser operation.
-//
-// ユーザー作成.
-//
-// POST /user
-func (UnimplementedHandler) RegisterUser(ctx context.Context, req *RegisterUserReq) (r RegisterUserRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // ReportOpinion implements reportOpinion operation.
 //
 // 意見通報API.
@@ -580,6 +571,15 @@ func (UnimplementedHandler) Test(ctx context.Context) (r TestRes, _ error) {
 //
 // POST /v1/manage/talksessions/{talkSessionID}/analysis/report
 func (UnimplementedHandler) ToggleReportVisibilityManage(ctx context.Context, req *ToggleReportVisibilityRequest, params ToggleReportVisibilityManageParams) (r *ToggleReportVisibilityResponse, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// UpdateUserProfile implements updateUserProfile operation.
+//
+// ユーザー情報の変更.
+//
+// PUT /user
+func (UnimplementedHandler) UpdateUserProfile(ctx context.Context, req *UpdateUserProfileReq) (r UpdateUserProfileRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

@@ -34,4 +34,6 @@ using OpenAPI;
 @service(#{ title: "Kotohiro API", version: "1.0.0" })
 @info(#{ version: "1.0.0" })
 @useAuth(CookieAuth)
-namespace kotohiro {}
+namespace kotohiro {
+
+}

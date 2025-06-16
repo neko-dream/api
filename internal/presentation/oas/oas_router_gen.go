@@ -714,7 +714,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						case "GET":
 							s.handleGetOrganizationsRequest([0]string{}, elemIsEscaped, w, r)
 						case "POST":
-							s.handleCreateOrganizationsRequest([0]string{}, elemIsEscaped, w, r)
+							s.handleEstablishOrganizationRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "GET,POST")
 						}
@@ -919,7 +919,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						case "GET":
 							s.handleGetTalkSessionListRequest([0]string{}, elemIsEscaped, w, r)
 						case "POST":
-							s.handleCreateTalkSessionRequest([0]string{}, elemIsEscaped, w, r)
+							s.handleInitiateTalkSessionRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "GET,POST")
 						}
@@ -1434,9 +1434,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					case "GET":
 						s.handleGetUserInfoRequest([0]string{}, elemIsEscaped, w, r)
 					case "POST":
-						s.handleRegisterUserRequest([0]string{}, elemIsEscaped, w, r)
+						s.handleEstablishUserRequest([0]string{}, elemIsEscaped, w, r)
 					case "PUT":
-						s.handleEditUserProfileRequest([0]string{}, elemIsEscaped, w, r)
+						s.handleUpdateUserProfileRequest([0]string{}, elemIsEscaped, w, r)
 					default:
 						s.notAllowed(w, r, "GET,POST,PUT")
 					}
@@ -2499,9 +2499,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							r.count = 0
 							return r, true
 						case "POST":
-							r.name = "CreateOrganizations"
+							r.name = "EstablishOrganization"
 							r.summary = "組織作成（運営ユーザーのみ）"
-							r.operationID = "createOrganizations"
+							r.operationID = "establishOrganization"
 							r.pathPattern = "/organizations"
 							r.args = args
 							r.count = 0
@@ -2735,9 +2735,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							r.count = 0
 							return r, true
 						case "POST":
-							r.name = "CreateTalkSession"
+							r.name = "InitiateTalkSession"
 							r.summary = "セッション作成"
-							r.operationID = "createTalkSession"
+							r.operationID = "initiateTalkSession"
 							r.pathPattern = "/talksessions"
 							r.args = args
 							r.count = 0
@@ -3317,17 +3317,17 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						r.count = 0
 						return r, true
 					case "POST":
-						r.name = "RegisterUser"
+						r.name = "EstablishUser"
 						r.summary = "ユーザー作成"
-						r.operationID = "registerUser"
+						r.operationID = "establishUser"
 						r.pathPattern = "/user"
 						r.args = args
 						r.count = 0
 						return r, true
 					case "PUT":
-						r.name = "EditUserProfile"
+						r.name = "UpdateUserProfile"
 						r.summary = "ユーザー情報の変更"
-						r.operationID = "editUserProfile"
+						r.operationID = "updateUserProfile"
 						r.pathPattern = "/user"
 						r.args = args
 						r.count = 0
