@@ -258,7 +258,7 @@ func (o *organizationHandler) GetOrganizationAliases(ctx context.Context, params
 	if err != nil {
 		return nil, messages.ForbiddenError
 	}
-	if orgUser.Role < organization.OrganizationUserRoleAdmin {
+	if orgUser.Role > organization.OrganizationUserRoleAdmin {
 		return nil, messages.ForbiddenError
 	}
 

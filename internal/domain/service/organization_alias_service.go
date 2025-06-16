@@ -128,5 +128,5 @@ func (s *OrganizationAliasService) CanManageAlias(
 	}
 
 	// AdminまたはOwner権限が必要
-	return orgUser.Role >= organization.OrganizationUserRoleAdmin, nil
+	return orgUser.Role <= organization.OrganizationUserRoleAdmin, nil
 }
