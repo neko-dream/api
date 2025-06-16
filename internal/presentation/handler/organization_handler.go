@@ -60,9 +60,9 @@ func NewOrganizationHandler(
 	}
 }
 
-// CreateOrganizations implements oas.OrganizationHandler.
-func (o *organizationHandler) CreateOrganizations(ctx context.Context, req *oas.CreateOrganizationsReq) (oas.CreateOrganizationsRes, error) {
-	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.CreateOrganizations")
+// EstablishOrganization implements oas.OrganizationHandler.
+func (o *organizationHandler) EstablishOrganization(ctx context.Context, req *oas.EstablishOrganizationReq) (oas.EstablishOrganizationRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.EstablishOrganization")
 	defer span.End()
 
 	claim := session.GetSession(ctx)
@@ -87,7 +87,7 @@ func (o *organizationHandler) CreateOrganizations(ctx context.Context, req *oas.
 		return nil, err
 	}
 
-	res := &oas.CreateOrganizationsOK{}
+	res := &oas.EstablishOrganizationOK{}
 	return res, nil
 }
 

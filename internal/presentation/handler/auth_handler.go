@@ -69,8 +69,8 @@ func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams)
 		return nil, err
 	}
 	var registrationURL *string
-	if params.RegistrationURL.Set {
-		registrationURL = lo.ToPtr(params.RegistrationURL.Value)
+	if params.RegistrationUrl.Set {
+		registrationURL = lo.ToPtr(params.RegistrationUrl.Value)
 	}
 
 	var organizationCode *string
@@ -80,7 +80,7 @@ func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams)
 
 	out, err := a.AuthLogin.Execute(ctx, auth_usecase.AuthLoginInput{
 		Provider:         string(provider),
-		RedirectURL:      params.RedirectURL,
+		RedirectURL:      params.RedirectUrl,
 		RegistrationURL:  registrationURL,
 		OrganizationCode: organizationCode,
 	})
@@ -112,12 +112,12 @@ func (a *authHandler) DevAuthorize(ctx context.Context, params oas.DevAuthorizeP
 
 	headers := new(oas.DevAuthorizeFoundHeaders)
 	headers.SetSetCookie(cookie_utils.EncodeCookies([]*http.Cookie{a.CookieManager.CreateSessionCookie(output.Token)}))
-	headers.SetLocation(oas.NewOptString(params.RedirectURL))
+	headers.SetLocation(oas.NewOptString(params.RedirectUrl))
 	return headers, nil
 }
 
-// OAuthCallback implements oas.AuthHandler.
-func (a *authHandler) OAuthCallback(ctx context.Context, params oas.OAuthCallbackParams) (oas.OAuthCallbackRes, error) {
+// HandleAuthCallback implements oas.Handler.
+func (a *authHandler) HandleAuthCallback(ctx context.Context, params oas.HandleAuthCallbackParams) (oas.HandleAuthCallbackRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.OAuthCallback")
 	defer span.End()
 
@@ -130,14 +130,14 @@ func (a *authHandler) OAuthCallback(ctx context.Context, params oas.OAuthCallbac
 		return nil, err
 	}
 
-	headers := new(oas.OAuthCallbackFoundHeaders)
+	headers := new(oas.HandleAuthCallbackFoundHeaders)
 	headers.SetSetCookie(cookie_utils.EncodeCookies([]*http.Cookie{a.CookieManager.CreateSessionCookie(output.Token)}))
 	headers.SetLocation(output.RedirectURL)
 	return headers, nil
 }
 
-// OAuthRevoke implements oas.AuthHandler.
-func (a *authHandler) OAuthTokenRevoke(ctx context.Context) (oas.OAuthTokenRevokeRes, error) {
+// RevokeToken implements oas.Handler.
+func (a *authHandler) RevokeToken(ctx context.Context) (oas.RevokeTokenRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.OAuthTokenRevoke")
 	defer span.End()
 
@@ -153,13 +153,13 @@ func (a *authHandler) OAuthTokenRevoke(ctx context.Context) (oas.OAuthTokenRevok
 		return nil, err
 	}
 
-	headers := new(oas.OAuthTokenRevokeNoContentHeaders)
+	headers := new(oas.RevokeTokenNoContentHeaders)
 	headers.SetSetCookie(cookie_utils.EncodeCookies([]*http.Cookie{a.CookieManager.CreateRevokeCookie()}))
 	return headers, nil
 }
 
-// OAuthTokenInfo implements oas.AuthHandler.
-func (a *authHandler) OAuthTokenInfo(ctx context.Context) (oas.OAuthTokenInfoRes, error) {
+// GetTokenInfo implements oas.Handler.
+func (a *authHandler) GetTokenInfo(ctx context.Context) (oas.GetTokenInfoRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.OAuthTokenInfo")
 	defer span.End()
 
@@ -176,7 +176,7 @@ func (a *authHandler) OAuthTokenInfo(ctx context.Context) (oas.OAuthTokenInfoRes
 		orgType = lo.ToPtr(*claim.OrgType)
 	}
 
-	return &oas.OAuthTokenInfoOK{
+	return &oas.TokenClaim{
 		Aud:                    claim.Audience(),
 		Iat:                    claim.IssueAt().Format(time.RFC3339),
 		Exp:                    claim.ExpiresAt().Format(time.RFC3339),
@@ -237,7 +237,7 @@ func (a *authHandler) PasswordLogin(ctx context.Context, req *oas.PasswordLoginR
 	defer span.End()
 
 	out, err := a.passwordLogin.Execute(ctx, auth_usecase.PasswordLoginInput{
-		IDorEmail: req.IDOrEmail,
+		IDorEmail: req.IdOrEmail,
 		Password:  req.Password,
 	})
 	if err != nil {

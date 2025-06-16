@@ -301,8 +301,8 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 	}, nil
 }
 
-// EditUserProfile ユーザープロフィールの編集
-func (u *userHandler) EditUserProfile(ctx context.Context, params *oas.EditUserProfileReq) (oas.EditUserProfileRes, error) {
+// UpdateUserProfile ユーザープロフィールの編集
+func (u *userHandler) UpdateUserProfile(ctx context.Context, params *oas.UpdateUserProfileReq) (oas.UpdateUserProfileRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "userHandler.EditUserProfile")
 	defer span.End()
 
@@ -400,15 +400,15 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params *oas.EditUserP
 	w := http_utils.GetHTTPResponse(ctx)
 	http.SetCookie(w, u.CookieManager.CreateSessionCookie(out.Token))
 
-	return &oas.EditUserProfileOK{
+	return &oas.UpdateUserProfileOK{
 		DisplayID:   out.DisplayID,
 		DisplayName: out.DisplayName,
 		IconURL:     utils.ToOptNil[oas.OptNilString](claim.IconURL),
 	}, nil
 }
 
-// RegisterUser ユーザー登録
-func (u *userHandler) RegisterUser(ctx context.Context, params *oas.RegisterUserReq) (oas.RegisterUserRes, error) {
+// EstablishUser ユーザー登録
+func (u *userHandler) EstablishUser(ctx context.Context, params *oas.EstablishUserReq) (oas.EstablishUserRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "userHandler.RegisterUser")
 	defer span.End()
 
@@ -502,7 +502,7 @@ func (u *userHandler) RegisterUser(ctx context.Context, params *oas.RegisterUser
 	w := http_utils.GetHTTPResponse(ctx)
 	http.SetCookie(w, u.CookieManager.CreateSessionCookie(out.Token))
 
-	return &oas.RegisterUserOK{
+	return &oas.EstablishUserOK{
 		DisplayID:   out.DisplayID,
 		DisplayName: out.DisplayName,
 		IconURL:     utils.ToOptNil[oas.OptNilString](out.IconURL),

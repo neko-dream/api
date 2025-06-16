@@ -288,9 +288,9 @@ func (t *talkSessionHandler) GetTalkSessionReport(ctx context.Context, params oa
 	}, nil
 }
 
-// CreateTalkSession トークセッション作成
-func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req *oas.CreateTalkSessionReq) (oas.CreateTalkSessionRes, error) {
-	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.CreateTalkSession")
+// InitiateTalkSession トークセッション作成
+func (t *talkSessionHandler) InitiateTalkSession(ctx context.Context, req *oas.InitiateTalkSessionReq) (oas.InitiateTalkSessionRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.InitiateTalkSession")
 	defer span.End()
 
 	claim := session.GetSession(ctx)
@@ -356,7 +356,7 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req *oas.Cre
 		})
 	}
 
-	res := &oas.CreateTalkSessionOK{
+	res := &oas.InitiateTalkSessionOK{
 		ID: out.TalkSession.TalkSessionID.String(),
 		Owner: oas.User{
 			DisplayID:   out.User.DisplayID,
@@ -861,7 +861,7 @@ func (t *talkSessionHandler) GetReportsForTalkSession(ctx context.Context, param
 				DisplayName: report.User.DisplayName,
 				IconURL:     utils.ToOptNil[oas.OptNilString](report.User.IconURL),
 			},
-			Status:      oas.ReportDetailStatus(report.Status),
+			Status:      oas.ReportStatus(report.Status),
 			Reasons:     reasons,
 			ReportCount: report.ReportCount,
 		})
