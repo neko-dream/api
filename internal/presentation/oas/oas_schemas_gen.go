@@ -2583,187 +2583,6 @@ func (s *OAuthTokenInfoInternalServerError) SetMessage(val string) {
 
 func (*OAuthTokenInfoInternalServerError) oAuthTokenInfoRes() {}
 
-type OAuthTokenInfoOK struct {
-	Aud                    string       `json:"aud"`
-	Exp                    string       `json:"exp"`
-	Iat                    string       `json:"iat"`
-	Iss                    string       `json:"iss"`
-	Sub                    string       `json:"sub"`
-	Jti                    string       `json:"jti"`
-	DisplayID              OptString    `json:"displayID"`
-	DisplayName            OptString    `json:"displayName"`
-	IconURL                OptString    `json:"iconURL"`
-	IsRegistered           bool         `json:"isRegistered"`
-	IsEmailVerified        bool         `json:"isEmailVerified"`
-	RequiredPasswordChange bool         `json:"requiredPasswordChange"`
-	OrgType                OptNilInt    `json:"orgType"`
-	OrganizationRole       OptNilString `json:"organizationRole"`
-	OrganizationCode       OptNilString `json:"organizationCode"`
-	OrganizationID         OptNilString `json:"organizationID"`
-}
-
-// GetAud returns the value of Aud.
-func (s *OAuthTokenInfoOK) GetAud() string {
-	return s.Aud
-}
-
-// GetExp returns the value of Exp.
-func (s *OAuthTokenInfoOK) GetExp() string {
-	return s.Exp
-}
-
-// GetIat returns the value of Iat.
-func (s *OAuthTokenInfoOK) GetIat() string {
-	return s.Iat
-}
-
-// GetIss returns the value of Iss.
-func (s *OAuthTokenInfoOK) GetIss() string {
-	return s.Iss
-}
-
-// GetSub returns the value of Sub.
-func (s *OAuthTokenInfoOK) GetSub() string {
-	return s.Sub
-}
-
-// GetJti returns the value of Jti.
-func (s *OAuthTokenInfoOK) GetJti() string {
-	return s.Jti
-}
-
-// GetDisplayID returns the value of DisplayID.
-func (s *OAuthTokenInfoOK) GetDisplayID() OptString {
-	return s.DisplayID
-}
-
-// GetDisplayName returns the value of DisplayName.
-func (s *OAuthTokenInfoOK) GetDisplayName() OptString {
-	return s.DisplayName
-}
-
-// GetIconURL returns the value of IconURL.
-func (s *OAuthTokenInfoOK) GetIconURL() OptString {
-	return s.IconURL
-}
-
-// GetIsRegistered returns the value of IsRegistered.
-func (s *OAuthTokenInfoOK) GetIsRegistered() bool {
-	return s.IsRegistered
-}
-
-// GetIsEmailVerified returns the value of IsEmailVerified.
-func (s *OAuthTokenInfoOK) GetIsEmailVerified() bool {
-	return s.IsEmailVerified
-}
-
-// GetRequiredPasswordChange returns the value of RequiredPasswordChange.
-func (s *OAuthTokenInfoOK) GetRequiredPasswordChange() bool {
-	return s.RequiredPasswordChange
-}
-
-// GetOrgType returns the value of OrgType.
-func (s *OAuthTokenInfoOK) GetOrgType() OptNilInt {
-	return s.OrgType
-}
-
-// GetOrganizationRole returns the value of OrganizationRole.
-func (s *OAuthTokenInfoOK) GetOrganizationRole() OptNilString {
-	return s.OrganizationRole
-}
-
-// GetOrganizationCode returns the value of OrganizationCode.
-func (s *OAuthTokenInfoOK) GetOrganizationCode() OptNilString {
-	return s.OrganizationCode
-}
-
-// GetOrganizationID returns the value of OrganizationID.
-func (s *OAuthTokenInfoOK) GetOrganizationID() OptNilString {
-	return s.OrganizationID
-}
-
-// SetAud sets the value of Aud.
-func (s *OAuthTokenInfoOK) SetAud(val string) {
-	s.Aud = val
-}
-
-// SetExp sets the value of Exp.
-func (s *OAuthTokenInfoOK) SetExp(val string) {
-	s.Exp = val
-}
-
-// SetIat sets the value of Iat.
-func (s *OAuthTokenInfoOK) SetIat(val string) {
-	s.Iat = val
-}
-
-// SetIss sets the value of Iss.
-func (s *OAuthTokenInfoOK) SetIss(val string) {
-	s.Iss = val
-}
-
-// SetSub sets the value of Sub.
-func (s *OAuthTokenInfoOK) SetSub(val string) {
-	s.Sub = val
-}
-
-// SetJti sets the value of Jti.
-func (s *OAuthTokenInfoOK) SetJti(val string) {
-	s.Jti = val
-}
-
-// SetDisplayID sets the value of DisplayID.
-func (s *OAuthTokenInfoOK) SetDisplayID(val OptString) {
-	s.DisplayID = val
-}
-
-// SetDisplayName sets the value of DisplayName.
-func (s *OAuthTokenInfoOK) SetDisplayName(val OptString) {
-	s.DisplayName = val
-}
-
-// SetIconURL sets the value of IconURL.
-func (s *OAuthTokenInfoOK) SetIconURL(val OptString) {
-	s.IconURL = val
-}
-
-// SetIsRegistered sets the value of IsRegistered.
-func (s *OAuthTokenInfoOK) SetIsRegistered(val bool) {
-	s.IsRegistered = val
-}
-
-// SetIsEmailVerified sets the value of IsEmailVerified.
-func (s *OAuthTokenInfoOK) SetIsEmailVerified(val bool) {
-	s.IsEmailVerified = val
-}
-
-// SetRequiredPasswordChange sets the value of RequiredPasswordChange.
-func (s *OAuthTokenInfoOK) SetRequiredPasswordChange(val bool) {
-	s.RequiredPasswordChange = val
-}
-
-// SetOrgType sets the value of OrgType.
-func (s *OAuthTokenInfoOK) SetOrgType(val OptNilInt) {
-	s.OrgType = val
-}
-
-// SetOrganizationRole sets the value of OrganizationRole.
-func (s *OAuthTokenInfoOK) SetOrganizationRole(val OptNilString) {
-	s.OrganizationRole = val
-}
-
-// SetOrganizationCode sets the value of OrganizationCode.
-func (s *OAuthTokenInfoOK) SetOrganizationCode(val OptNilString) {
-	s.OrganizationCode = val
-}
-
-// SetOrganizationID sets the value of OrganizationID.
-func (s *OAuthTokenInfoOK) SetOrganizationID(val OptNilString) {
-	s.OrganizationID = val
-}
-
-func (*OAuthTokenInfoOK) oAuthTokenInfoRes() {}
-
 type OAuthTokenRevokeBadRequest struct{}
 
 func (*OAuthTokenRevokeBadRequest) oAuthTokenRevokeRes() {}
@@ -7056,6 +6875,204 @@ func (s *ToggleReportVisibilityResponse) SetStatus(val string) {
 func (s *ToggleReportVisibilityResponse) SetMessage(val string) {
 	s.Message = val
 }
+
+// Ref: #/components/schemas/TokenClaim
+type TokenClaim struct {
+	// Audience.
+	Aud string `json:"aud"`
+	// 有効期限.
+	Exp string `json:"exp"`
+	// 発行日時.
+	Iat string `json:"iat"`
+	// 発行者.
+	Iss string `json:"iss"`
+	// ユーザID.
+	Sub string `json:"sub"`
+	// JWT ID.
+	Jti string `json:"jti"`
+	// ユーザーID.
+	DisplayID OptString `json:"displayID"`
+	// ユーザー名.
+	DisplayName OptString `json:"displayName"`
+	// アイコンURL.
+	IconURL OptString `json:"iconURL"`
+	// ユーザ登録済みか.
+	IsRegistered    bool `json:"isRegistered"`
+	IsEmailVerified bool `json:"isEmailVerified"`
+	// アカウントの種類。組織がなければ空.
+	OrgType OptNilInt `json:"orgType"`
+	// パスワードの更新が必要かどうか.
+	RequiredPasswordChange bool `json:"requiredPasswordChange"`
+	// 組織のRole.
+	OrganizationRole OptNilString `json:"organizationRole"`
+	// 組織コード
+	// ログイン時に使用する.
+	OrganizationCode OptNilString `json:"organizationCode"`
+	// 組織ID.
+	OrganizationID OptNilString `json:"organizationID"`
+}
+
+// GetAud returns the value of Aud.
+func (s *TokenClaim) GetAud() string {
+	return s.Aud
+}
+
+// GetExp returns the value of Exp.
+func (s *TokenClaim) GetExp() string {
+	return s.Exp
+}
+
+// GetIat returns the value of Iat.
+func (s *TokenClaim) GetIat() string {
+	return s.Iat
+}
+
+// GetIss returns the value of Iss.
+func (s *TokenClaim) GetIss() string {
+	return s.Iss
+}
+
+// GetSub returns the value of Sub.
+func (s *TokenClaim) GetSub() string {
+	return s.Sub
+}
+
+// GetJti returns the value of Jti.
+func (s *TokenClaim) GetJti() string {
+	return s.Jti
+}
+
+// GetDisplayID returns the value of DisplayID.
+func (s *TokenClaim) GetDisplayID() OptString {
+	return s.DisplayID
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *TokenClaim) GetDisplayName() OptString {
+	return s.DisplayName
+}
+
+// GetIconURL returns the value of IconURL.
+func (s *TokenClaim) GetIconURL() OptString {
+	return s.IconURL
+}
+
+// GetIsRegistered returns the value of IsRegistered.
+func (s *TokenClaim) GetIsRegistered() bool {
+	return s.IsRegistered
+}
+
+// GetIsEmailVerified returns the value of IsEmailVerified.
+func (s *TokenClaim) GetIsEmailVerified() bool {
+	return s.IsEmailVerified
+}
+
+// GetOrgType returns the value of OrgType.
+func (s *TokenClaim) GetOrgType() OptNilInt {
+	return s.OrgType
+}
+
+// GetRequiredPasswordChange returns the value of RequiredPasswordChange.
+func (s *TokenClaim) GetRequiredPasswordChange() bool {
+	return s.RequiredPasswordChange
+}
+
+// GetOrganizationRole returns the value of OrganizationRole.
+func (s *TokenClaim) GetOrganizationRole() OptNilString {
+	return s.OrganizationRole
+}
+
+// GetOrganizationCode returns the value of OrganizationCode.
+func (s *TokenClaim) GetOrganizationCode() OptNilString {
+	return s.OrganizationCode
+}
+
+// GetOrganizationID returns the value of OrganizationID.
+func (s *TokenClaim) GetOrganizationID() OptNilString {
+	return s.OrganizationID
+}
+
+// SetAud sets the value of Aud.
+func (s *TokenClaim) SetAud(val string) {
+	s.Aud = val
+}
+
+// SetExp sets the value of Exp.
+func (s *TokenClaim) SetExp(val string) {
+	s.Exp = val
+}
+
+// SetIat sets the value of Iat.
+func (s *TokenClaim) SetIat(val string) {
+	s.Iat = val
+}
+
+// SetIss sets the value of Iss.
+func (s *TokenClaim) SetIss(val string) {
+	s.Iss = val
+}
+
+// SetSub sets the value of Sub.
+func (s *TokenClaim) SetSub(val string) {
+	s.Sub = val
+}
+
+// SetJti sets the value of Jti.
+func (s *TokenClaim) SetJti(val string) {
+	s.Jti = val
+}
+
+// SetDisplayID sets the value of DisplayID.
+func (s *TokenClaim) SetDisplayID(val OptString) {
+	s.DisplayID = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *TokenClaim) SetDisplayName(val OptString) {
+	s.DisplayName = val
+}
+
+// SetIconURL sets the value of IconURL.
+func (s *TokenClaim) SetIconURL(val OptString) {
+	s.IconURL = val
+}
+
+// SetIsRegistered sets the value of IsRegistered.
+func (s *TokenClaim) SetIsRegistered(val bool) {
+	s.IsRegistered = val
+}
+
+// SetIsEmailVerified sets the value of IsEmailVerified.
+func (s *TokenClaim) SetIsEmailVerified(val bool) {
+	s.IsEmailVerified = val
+}
+
+// SetOrgType sets the value of OrgType.
+func (s *TokenClaim) SetOrgType(val OptNilInt) {
+	s.OrgType = val
+}
+
+// SetRequiredPasswordChange sets the value of RequiredPasswordChange.
+func (s *TokenClaim) SetRequiredPasswordChange(val bool) {
+	s.RequiredPasswordChange = val
+}
+
+// SetOrganizationRole sets the value of OrganizationRole.
+func (s *TokenClaim) SetOrganizationRole(val OptNilString) {
+	s.OrganizationRole = val
+}
+
+// SetOrganizationCode sets the value of OrganizationCode.
+func (s *TokenClaim) SetOrganizationCode(val OptNilString) {
+	s.OrganizationCode = val
+}
+
+// SetOrganizationID sets the value of OrganizationID.
+func (s *TokenClaim) SetOrganizationID(val OptNilString) {
+	s.OrganizationID = val
+}
+
+func (*TokenClaim) oAuthTokenInfoRes() {}
 
 type UpdateUserProfileBadRequest struct {
 	Code    string `json:"code"`

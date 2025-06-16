@@ -1,6 +1,7 @@
 import "@typespec/http";
 import "@typespec/openapi";
 import "../config/service.tsp";
+import "../models/auth.tsp";
 
 using Http;
 using OpenAPI;
@@ -34,24 +35,7 @@ namespace kotohiro {
   @route("/auth/token/info")
   @get
   @summary("JWTの内容を返してくれる")
-  op oauth_token_info(): Body<{
-    aud: string;
-    exp: string;
-    iat: string;
-    iss: string;
-    `sub`: string;
-    jti: string;
-    displayID?: string;
-    displayName?: string;
-    iconURL?: string;
-    isRegistered: boolean;
-    isEmailVerified: boolean;
-    requiredPasswordChange: boolean;
-    orgType?: integer | null;
-    organizationRole?: string | null;
-    organizationCode?: string | null;
-    organizationID?: string | null;
-  }> | {
+  op oauth_token_info(): Body<TokenClaim> | {
     @statusCode statusCode: 400;
     @body body: {
       code: string;

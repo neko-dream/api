@@ -66,8 +66,18 @@ namespace kotohiro {
      */
     requiredPasswordChange: boolean;
 
-        organizationRole?: string | null;
+    /**
+     * 組織のRole
+     */
+    organizationRole?: string | null;
+    /**
+     * 組織コード
+     * ログイン時に使用する
+     */
     organizationCode?: string | null;
+    /**
+     * 組織ID
+     */
     organizationID?: string | null;
   }
 }

@@ -7844,358 +7844,6 @@ func (s *OAuthTokenInfoInternalServerError) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
-func (s *OAuthTokenInfoOK) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *OAuthTokenInfoOK) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("aud")
-		e.Str(s.Aud)
-	}
-	{
-		e.FieldStart("exp")
-		e.Str(s.Exp)
-	}
-	{
-		e.FieldStart("iat")
-		e.Str(s.Iat)
-	}
-	{
-		e.FieldStart("iss")
-		e.Str(s.Iss)
-	}
-	{
-		e.FieldStart("sub")
-		e.Str(s.Sub)
-	}
-	{
-		e.FieldStart("jti")
-		e.Str(s.Jti)
-	}
-	{
-		if s.DisplayID.Set {
-			e.FieldStart("displayID")
-			s.DisplayID.Encode(e)
-		}
-	}
-	{
-		if s.DisplayName.Set {
-			e.FieldStart("displayName")
-			s.DisplayName.Encode(e)
-		}
-	}
-	{
-		if s.IconURL.Set {
-			e.FieldStart("iconURL")
-			s.IconURL.Encode(e)
-		}
-	}
-	{
-		e.FieldStart("isRegistered")
-		e.Bool(s.IsRegistered)
-	}
-	{
-		e.FieldStart("isEmailVerified")
-		e.Bool(s.IsEmailVerified)
-	}
-	{
-		e.FieldStart("requiredPasswordChange")
-		e.Bool(s.RequiredPasswordChange)
-	}
-	{
-		if s.OrgType.Set {
-			e.FieldStart("orgType")
-			s.OrgType.Encode(e)
-		}
-	}
-	{
-		if s.OrganizationRole.Set {
-			e.FieldStart("organizationRole")
-			s.OrganizationRole.Encode(e)
-		}
-	}
-	{
-		if s.OrganizationCode.Set {
-			e.FieldStart("organizationCode")
-			s.OrganizationCode.Encode(e)
-		}
-	}
-	{
-		if s.OrganizationID.Set {
-			e.FieldStart("organizationID")
-			s.OrganizationID.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfOAuthTokenInfoOK = [16]string{
-	0:  "aud",
-	1:  "exp",
-	2:  "iat",
-	3:  "iss",
-	4:  "sub",
-	5:  "jti",
-	6:  "displayID",
-	7:  "displayName",
-	8:  "iconURL",
-	9:  "isRegistered",
-	10: "isEmailVerified",
-	11: "requiredPasswordChange",
-	12: "orgType",
-	13: "organizationRole",
-	14: "organizationCode",
-	15: "organizationID",
-}
-
-// Decode decodes OAuthTokenInfoOK from json.
-func (s *OAuthTokenInfoOK) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode OAuthTokenInfoOK to nil")
-	}
-	var requiredBitSet [2]uint8
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "aud":
-			requiredBitSet[0] |= 1 << 0
-			if err := func() error {
-				v, err := d.Str()
-				s.Aud = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"aud\"")
-			}
-		case "exp":
-			requiredBitSet[0] |= 1 << 1
-			if err := func() error {
-				v, err := d.Str()
-				s.Exp = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"exp\"")
-			}
-		case "iat":
-			requiredBitSet[0] |= 1 << 2
-			if err := func() error {
-				v, err := d.Str()
-				s.Iat = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"iat\"")
-			}
-		case "iss":
-			requiredBitSet[0] |= 1 << 3
-			if err := func() error {
-				v, err := d.Str()
-				s.Iss = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"iss\"")
-			}
-		case "sub":
-			requiredBitSet[0] |= 1 << 4
-			if err := func() error {
-				v, err := d.Str()
-				s.Sub = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"sub\"")
-			}
-		case "jti":
-			requiredBitSet[0] |= 1 << 5
-			if err := func() error {
-				v, err := d.Str()
-				s.Jti = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"jti\"")
-			}
-		case "displayID":
-			if err := func() error {
-				s.DisplayID.Reset()
-				if err := s.DisplayID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"displayID\"")
-			}
-		case "displayName":
-			if err := func() error {
-				s.DisplayName.Reset()
-				if err := s.DisplayName.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"displayName\"")
-			}
-		case "iconURL":
-			if err := func() error {
-				s.IconURL.Reset()
-				if err := s.IconURL.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"iconURL\"")
-			}
-		case "isRegistered":
-			requiredBitSet[1] |= 1 << 1
-			if err := func() error {
-				v, err := d.Bool()
-				s.IsRegistered = bool(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"isRegistered\"")
-			}
-		case "isEmailVerified":
-			requiredBitSet[1] |= 1 << 2
-			if err := func() error {
-				v, err := d.Bool()
-				s.IsEmailVerified = bool(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"isEmailVerified\"")
-			}
-		case "requiredPasswordChange":
-			requiredBitSet[1] |= 1 << 3
-			if err := func() error {
-				v, err := d.Bool()
-				s.RequiredPasswordChange = bool(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"requiredPasswordChange\"")
-			}
-		case "orgType":
-			if err := func() error {
-				s.OrgType.Reset()
-				if err := s.OrgType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"orgType\"")
-			}
-		case "organizationRole":
-			if err := func() error {
-				s.OrganizationRole.Reset()
-				if err := s.OrganizationRole.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"organizationRole\"")
-			}
-		case "organizationCode":
-			if err := func() error {
-				s.OrganizationCode.Reset()
-				if err := s.OrganizationCode.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"organizationCode\"")
-			}
-		case "organizationID":
-			if err := func() error {
-				s.OrganizationID.Reset()
-				if err := s.OrganizationID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"organizationID\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode OAuthTokenInfoOK")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [2]uint8{
-		0b00111111,
-		0b00001110,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfOAuthTokenInfoOK) {
-					name = jsonFieldsNameOfOAuthTokenInfoOK[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *OAuthTokenInfoOK) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OAuthTokenInfoOK) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
 func (s *OAuthTokenRevokeBadRequest) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -16231,6 +15879,358 @@ func (s *ToggleReportVisibilityResponse) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *ToggleReportVisibilityResponse) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *TokenClaim) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *TokenClaim) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("aud")
+		e.Str(s.Aud)
+	}
+	{
+		e.FieldStart("exp")
+		e.Str(s.Exp)
+	}
+	{
+		e.FieldStart("iat")
+		e.Str(s.Iat)
+	}
+	{
+		e.FieldStart("iss")
+		e.Str(s.Iss)
+	}
+	{
+		e.FieldStart("sub")
+		e.Str(s.Sub)
+	}
+	{
+		e.FieldStart("jti")
+		e.Str(s.Jti)
+	}
+	{
+		if s.DisplayID.Set {
+			e.FieldStart("displayID")
+			s.DisplayID.Encode(e)
+		}
+	}
+	{
+		if s.DisplayName.Set {
+			e.FieldStart("displayName")
+			s.DisplayName.Encode(e)
+		}
+	}
+	{
+		if s.IconURL.Set {
+			e.FieldStart("iconURL")
+			s.IconURL.Encode(e)
+		}
+	}
+	{
+		e.FieldStart("isRegistered")
+		e.Bool(s.IsRegistered)
+	}
+	{
+		e.FieldStart("isEmailVerified")
+		e.Bool(s.IsEmailVerified)
+	}
+	{
+		if s.OrgType.Set {
+			e.FieldStart("orgType")
+			s.OrgType.Encode(e)
+		}
+	}
+	{
+		e.FieldStart("requiredPasswordChange")
+		e.Bool(s.RequiredPasswordChange)
+	}
+	{
+		if s.OrganizationRole.Set {
+			e.FieldStart("organizationRole")
+			s.OrganizationRole.Encode(e)
+		}
+	}
+	{
+		if s.OrganizationCode.Set {
+			e.FieldStart("organizationCode")
+			s.OrganizationCode.Encode(e)
+		}
+	}
+	{
+		if s.OrganizationID.Set {
+			e.FieldStart("organizationID")
+			s.OrganizationID.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfTokenClaim = [16]string{
+	0:  "aud",
+	1:  "exp",
+	2:  "iat",
+	3:  "iss",
+	4:  "sub",
+	5:  "jti",
+	6:  "displayID",
+	7:  "displayName",
+	8:  "iconURL",
+	9:  "isRegistered",
+	10: "isEmailVerified",
+	11: "orgType",
+	12: "requiredPasswordChange",
+	13: "organizationRole",
+	14: "organizationCode",
+	15: "organizationID",
+}
+
+// Decode decodes TokenClaim from json.
+func (s *TokenClaim) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode TokenClaim to nil")
+	}
+	var requiredBitSet [2]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "aud":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Str()
+				s.Aud = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"aud\"")
+			}
+		case "exp":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := d.Str()
+				s.Exp = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"exp\"")
+			}
+		case "iat":
+			requiredBitSet[0] |= 1 << 2
+			if err := func() error {
+				v, err := d.Str()
+				s.Iat = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"iat\"")
+			}
+		case "iss":
+			requiredBitSet[0] |= 1 << 3
+			if err := func() error {
+				v, err := d.Str()
+				s.Iss = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"iss\"")
+			}
+		case "sub":
+			requiredBitSet[0] |= 1 << 4
+			if err := func() error {
+				v, err := d.Str()
+				s.Sub = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"sub\"")
+			}
+		case "jti":
+			requiredBitSet[0] |= 1 << 5
+			if err := func() error {
+				v, err := d.Str()
+				s.Jti = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"jti\"")
+			}
+		case "displayID":
+			if err := func() error {
+				s.DisplayID.Reset()
+				if err := s.DisplayID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"displayID\"")
+			}
+		case "displayName":
+			if err := func() error {
+				s.DisplayName.Reset()
+				if err := s.DisplayName.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"displayName\"")
+			}
+		case "iconURL":
+			if err := func() error {
+				s.IconURL.Reset()
+				if err := s.IconURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"iconURL\"")
+			}
+		case "isRegistered":
+			requiredBitSet[1] |= 1 << 1
+			if err := func() error {
+				v, err := d.Bool()
+				s.IsRegistered = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"isRegistered\"")
+			}
+		case "isEmailVerified":
+			requiredBitSet[1] |= 1 << 2
+			if err := func() error {
+				v, err := d.Bool()
+				s.IsEmailVerified = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"isEmailVerified\"")
+			}
+		case "orgType":
+			if err := func() error {
+				s.OrgType.Reset()
+				if err := s.OrgType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"orgType\"")
+			}
+		case "requiredPasswordChange":
+			requiredBitSet[1] |= 1 << 4
+			if err := func() error {
+				v, err := d.Bool()
+				s.RequiredPasswordChange = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"requiredPasswordChange\"")
+			}
+		case "organizationRole":
+			if err := func() error {
+				s.OrganizationRole.Reset()
+				if err := s.OrganizationRole.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"organizationRole\"")
+			}
+		case "organizationCode":
+			if err := func() error {
+				s.OrganizationCode.Reset()
+				if err := s.OrganizationCode.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"organizationCode\"")
+			}
+		case "organizationID":
+			if err := func() error {
+				s.OrganizationID.Reset()
+				if err := s.OrganizationID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"organizationID\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode TokenClaim")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [2]uint8{
+		0b00111111,
+		0b00010110,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfTokenClaim) {
+					name = jsonFieldsNameOfTokenClaim[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *TokenClaim) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *TokenClaim) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

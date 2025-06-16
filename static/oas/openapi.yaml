@@ -325,54 +325,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  aud:
-                    type: string
-                  exp:
-                    type: string
-                  iat:
-                    type: string
-                  iss:
-                    type: string
-                  sub:
-                    type: string
-                  jti:
-                    type: string
-                  displayID:
-                    type: string
-                  displayName:
-                    type: string
-                  iconURL:
-                    type: string
-                  isRegistered:
-                    type: boolean
-                  isEmailVerified:
-                    type: boolean
-                  requiredPasswordChange:
-                    type: boolean
-                  orgType:
-                    type: integer
-                    nullable: true
-                  organizationRole:
-                    type: string
-                    nullable: true
-                  organizationCode:
-                    type: string
-                    nullable: true
-                  organizationID:
-                    type: string
-                    nullable: true
-                required:
-                  - aud
-                  - exp
-                  - iat
-                  - iss
-                  - sub
-                  - jti
-                  - isRegistered
-                  - isEmailVerified
-                  - requiredPasswordChange
+                $ref: '#/components/schemas/TokenClaim'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -3868,6 +3821,20 @@ components:
         requiredPasswordChange:
           type: boolean
           description: パスワードの更新が必要かどうか
+        organizationRole:
+          type: string
+          nullable: true
+          description: 組織のRole
+        organizationCode:
+          type: string
+          nullable: true
+          description: |-
+            組織コード
+            ログイン時に使用する
+        organizationID:
+          type: string
+          nullable: true
+          description: 組織ID
     User:
       type: object
       required:

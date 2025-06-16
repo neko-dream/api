@@ -1907,7 +1907,7 @@ func encodeOAuthCallbackResponse(response OAuthCallbackRes, w http.ResponseWrite
 
 func encodeOAuthTokenInfoResponse(response OAuthTokenInfoRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *OAuthTokenInfoOK:
+	case *TokenClaim:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
