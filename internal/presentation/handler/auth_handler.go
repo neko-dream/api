@@ -69,8 +69,8 @@ func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams)
 		return nil, err
 	}
 	var registrationURL *string
-	if params.RegistrationUrl.Set {
-		registrationURL = lo.ToPtr(params.RegistrationUrl.Value)
+	if params.RegistrationURL.Set {
+		registrationURL = lo.ToPtr(params.RegistrationURL.Value)
 	}
 
 	var organizationCode *string
@@ -80,7 +80,7 @@ func (a *authHandler) Authorize(ctx context.Context, params oas.AuthorizeParams)
 
 	out, err := a.AuthLogin.Execute(ctx, auth_usecase.AuthLoginInput{
 		Provider:         string(provider),
-		RedirectURL:      params.RedirectUrl,
+		RedirectURL:      params.RedirectURL,
 		RegistrationURL:  registrationURL,
 		OrganizationCode: organizationCode,
 	})
@@ -112,7 +112,7 @@ func (a *authHandler) DevAuthorize(ctx context.Context, params oas.DevAuthorizeP
 
 	headers := new(oas.DevAuthorizeFoundHeaders)
 	headers.SetSetCookie(cookie_utils.EncodeCookies([]*http.Cookie{a.CookieManager.CreateSessionCookie(output.Token)}))
-	headers.SetLocation(oas.NewOptString(params.RedirectUrl))
+	headers.SetLocation(oas.NewOptString(params.RedirectURL))
 	return headers, nil
 }
 
