@@ -209,7 +209,7 @@ namespace kotohiro {
   @route("/talksessions/{talkSessionID}/swipe_opinions")
   @get
   @summary("スワイプ用のエンドポイント")
-  op swipe_opinions(
+  op swipeOpinions(
     @path talkSessionID: string,
     @query(#{ explode: true }) limit?: integer | null = 10,
   ): Body<{

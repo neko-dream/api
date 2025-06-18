@@ -336,10 +336,10 @@ func (t *talkSessionHandler) InitiateTalkSession(ctx context.Context, req *oas.I
 		return nil, errtrace.Wrap(err)
 	}
 
-	var location oas.OptLocation
+	var location oas.OptTalkSessionLocation
 	if out.HasLocation() {
-		location = oas.OptLocation{
-			Value: oas.Location{
+		location = oas.OptTalkSessionLocation{
+			Value: oas.TalkSessionLocation{
 				Latitude:  utils.ToOpt[oas.OptFloat64](out.Latitude),
 				Longitude: utils.ToOpt[oas.OptFloat64](out.Longitude),
 			},
@@ -356,9 +356,9 @@ func (t *talkSessionHandler) InitiateTalkSession(ctx context.Context, req *oas.I
 		})
 	}
 
-	res := &oas.InitiateTalkSessionOK{
+	res := &oas.TalkSession{
 		ID: out.TalkSession.TalkSessionID.String(),
-		Owner: oas.User{
+		Owner: oas.TalkSessionOwner{
 			DisplayID:   out.User.DisplayID,
 			DisplayName: out.User.DisplayName,
 			IconURL:     utils.ToOptNil[oas.OptNilString](out.User.IconURL),

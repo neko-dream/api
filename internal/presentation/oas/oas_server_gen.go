@@ -204,7 +204,7 @@ type OpinionHandler interface {
 	//
 	// POST /opinions/{opinionID}/reports/solve
 	SolveOpinionReport(ctx context.Context, req *SolveOpinionReportReq, params SolveOpinionReportParams) (SolveOpinionReportRes, error)
-	// SwipeOpinions implements swipe_opinions operation.
+	// SwipeOpinions implements swipeOpinions operation.
 	//
 	// セッションの中からまだ投票していない意見をランダムに取得する
 	// remainingCountは取得した意見を含めてスワイプできる意見の総数を返す.
@@ -449,7 +449,7 @@ type UserHandler interface {
 	//
 	// POST /user
 	EstablishUser(ctx context.Context, req *EstablishUserReq) (EstablishUserRes, error)
-	// GetUserInfo implements get_user_info operation.
+	// GetUserInfo implements getUserInfo operation.
 	//
 	// ユーザー情報の取得.
 	//

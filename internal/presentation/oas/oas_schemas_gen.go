@@ -699,44 +699,6 @@ func (s *EstablishUserInternalServerError) SetMessage(val string) {
 
 func (*EstablishUserInternalServerError) establishUserRes() {}
 
-type EstablishUserOK struct {
-	DisplayID   string       `json:"displayID"`
-	DisplayName string       `json:"displayName"`
-	IconURL     OptNilString `json:"iconURL"`
-}
-
-// GetDisplayID returns the value of DisplayID.
-func (s *EstablishUserOK) GetDisplayID() string {
-	return s.DisplayID
-}
-
-// GetDisplayName returns the value of DisplayName.
-func (s *EstablishUserOK) GetDisplayName() string {
-	return s.DisplayName
-}
-
-// GetIconURL returns the value of IconURL.
-func (s *EstablishUserOK) GetIconURL() OptNilString {
-	return s.IconURL
-}
-
-// SetDisplayID sets the value of DisplayID.
-func (s *EstablishUserOK) SetDisplayID(val string) {
-	s.DisplayID = val
-}
-
-// SetDisplayName sets the value of DisplayName.
-func (s *EstablishUserOK) SetDisplayName(val string) {
-	s.DisplayName = val
-}
-
-// SetIconURL sets the value of IconURL.
-func (s *EstablishUserOK) SetIconURL(val OptNilString) {
-	s.IconURL = val
-}
-
-func (*EstablishUserOK) establishUserRes() {}
-
 type EstablishUserReq struct {
 	DisplayName string                       `json:"displayName"`
 	DisplayID   string                       `json:"displayID"`
@@ -2176,143 +2138,6 @@ func (s *InitiateTalkSessionBadRequest) SetMessage(val string) {
 
 func (*InitiateTalkSessionBadRequest) initiateTalkSessionRes() {}
 
-type InitiateTalkSessionOK struct {
-	ID               string        `json:"id"`
-	Theme            string        `json:"theme"`
-	Description      OptNilString  `json:"description"`
-	Owner            User          `json:"owner"`
-	CreatedAt        string        `json:"createdAt"`
-	ScheduledEndTime string        `json:"scheduledEndTime"`
-	Location         OptLocation   `json:"location"`
-	City             OptNilString  `json:"city"`
-	Prefecture       OptNilString  `json:"prefecture"`
-	ThumbnailURL     OptNilString  `json:"thumbnailURL"`
-	Restrictions     []Restriction `json:"restrictions"`
-	HideReport       bool          `json:"hideReport"`
-}
-
-// GetID returns the value of ID.
-func (s *InitiateTalkSessionOK) GetID() string {
-	return s.ID
-}
-
-// GetTheme returns the value of Theme.
-func (s *InitiateTalkSessionOK) GetTheme() string {
-	return s.Theme
-}
-
-// GetDescription returns the value of Description.
-func (s *InitiateTalkSessionOK) GetDescription() OptNilString {
-	return s.Description
-}
-
-// GetOwner returns the value of Owner.
-func (s *InitiateTalkSessionOK) GetOwner() User {
-	return s.Owner
-}
-
-// GetCreatedAt returns the value of CreatedAt.
-func (s *InitiateTalkSessionOK) GetCreatedAt() string {
-	return s.CreatedAt
-}
-
-// GetScheduledEndTime returns the value of ScheduledEndTime.
-func (s *InitiateTalkSessionOK) GetScheduledEndTime() string {
-	return s.ScheduledEndTime
-}
-
-// GetLocation returns the value of Location.
-func (s *InitiateTalkSessionOK) GetLocation() OptLocation {
-	return s.Location
-}
-
-// GetCity returns the value of City.
-func (s *InitiateTalkSessionOK) GetCity() OptNilString {
-	return s.City
-}
-
-// GetPrefecture returns the value of Prefecture.
-func (s *InitiateTalkSessionOK) GetPrefecture() OptNilString {
-	return s.Prefecture
-}
-
-// GetThumbnailURL returns the value of ThumbnailURL.
-func (s *InitiateTalkSessionOK) GetThumbnailURL() OptNilString {
-	return s.ThumbnailURL
-}
-
-// GetRestrictions returns the value of Restrictions.
-func (s *InitiateTalkSessionOK) GetRestrictions() []Restriction {
-	return s.Restrictions
-}
-
-// GetHideReport returns the value of HideReport.
-func (s *InitiateTalkSessionOK) GetHideReport() bool {
-	return s.HideReport
-}
-
-// SetID sets the value of ID.
-func (s *InitiateTalkSessionOK) SetID(val string) {
-	s.ID = val
-}
-
-// SetTheme sets the value of Theme.
-func (s *InitiateTalkSessionOK) SetTheme(val string) {
-	s.Theme = val
-}
-
-// SetDescription sets the value of Description.
-func (s *InitiateTalkSessionOK) SetDescription(val OptNilString) {
-	s.Description = val
-}
-
-// SetOwner sets the value of Owner.
-func (s *InitiateTalkSessionOK) SetOwner(val User) {
-	s.Owner = val
-}
-
-// SetCreatedAt sets the value of CreatedAt.
-func (s *InitiateTalkSessionOK) SetCreatedAt(val string) {
-	s.CreatedAt = val
-}
-
-// SetScheduledEndTime sets the value of ScheduledEndTime.
-func (s *InitiateTalkSessionOK) SetScheduledEndTime(val string) {
-	s.ScheduledEndTime = val
-}
-
-// SetLocation sets the value of Location.
-func (s *InitiateTalkSessionOK) SetLocation(val OptLocation) {
-	s.Location = val
-}
-
-// SetCity sets the value of City.
-func (s *InitiateTalkSessionOK) SetCity(val OptNilString) {
-	s.City = val
-}
-
-// SetPrefecture sets the value of Prefecture.
-func (s *InitiateTalkSessionOK) SetPrefecture(val OptNilString) {
-	s.Prefecture = val
-}
-
-// SetThumbnailURL sets the value of ThumbnailURL.
-func (s *InitiateTalkSessionOK) SetThumbnailURL(val OptNilString) {
-	s.ThumbnailURL = val
-}
-
-// SetRestrictions sets the value of Restrictions.
-func (s *InitiateTalkSessionOK) SetRestrictions(val []Restriction) {
-	s.Restrictions = val
-}
-
-// SetHideReport sets the value of HideReport.
-func (s *InitiateTalkSessionOK) SetHideReport(val bool) {
-	s.HideReport = val
-}
-
-func (*InitiateTalkSessionOK) initiateTalkSessionRes() {}
-
 type InitiateTalkSessionReq struct {
 	Theme               string        `json:"theme"`
 	ScheduledEndTime    time.Time     `json:"scheduledEndTime"`
@@ -2510,34 +2335,6 @@ func (s *InviteOrganizationReq) SetEmail(val string) {
 // SetRole sets the value of Role.
 func (s *InviteOrganizationReq) SetRole(val float64) {
 	s.Role = val
-}
-
-// Ref: #/components/schemas/Location
-type Location struct {
-	// 緯度.
-	Latitude OptFloat64 `json:"latitude"`
-	// 経度.
-	Longitude OptFloat64 `json:"longitude"`
-}
-
-// GetLatitude returns the value of Latitude.
-func (s *Location) GetLatitude() OptFloat64 {
-	return s.Latitude
-}
-
-// GetLongitude returns the value of Longitude.
-func (s *Location) GetLongitude() OptFloat64 {
-	return s.Longitude
-}
-
-// SetLatitude sets the value of Latitude.
-func (s *Location) SetLatitude(val OptFloat64) {
-	s.Latitude = val
-}
-
-// SetLongitude sets the value of Longitude.
-func (s *Location) SetLongitude(val OptFloat64) {
-	s.Longitude = val
 }
 
 // NewNilVote2ReqVoteStatus returns new NilVote2ReqVoteStatus with value set to v.
@@ -3535,52 +3332,6 @@ func (o OptInt32) Get() (v int32, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptInt32) Or(d int32) int32 {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptLocation returns new OptLocation with value set to v.
-func NewOptLocation(v Location) OptLocation {
-	return OptLocation{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptLocation is optional Location.
-type OptLocation struct {
-	Value Location
-	Set   bool
-}
-
-// IsSet returns true if OptLocation was set.
-func (o OptLocation) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptLocation) Reset() {
-	var v Location
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptLocation) SetTo(v Location) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptLocation) Get() (v Location, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptLocation) Or(d Location) Location {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -6190,6 +5941,7 @@ func (s *TalkSession) SetHideReport(val bool) {
 
 func (*TalkSession) editTalkSessionRes()      {}
 func (*TalkSession) getTalkSessionDetailRes() {}
+func (*TalkSession) initiateTalkSessionRes()  {}
 
 type TalkSessionAnalysisBadRequest struct {
 	Code    string `json:"code"`
@@ -7135,44 +6887,6 @@ func (s *UpdateUserProfileInternalServerError) SetMessage(val string) {
 
 func (*UpdateUserProfileInternalServerError) updateUserProfileRes() {}
 
-type UpdateUserProfileOK struct {
-	DisplayID   string       `json:"displayID"`
-	DisplayName string       `json:"displayName"`
-	IconURL     OptNilString `json:"iconURL"`
-}
-
-// GetDisplayID returns the value of DisplayID.
-func (s *UpdateUserProfileOK) GetDisplayID() string {
-	return s.DisplayID
-}
-
-// GetDisplayName returns the value of DisplayName.
-func (s *UpdateUserProfileOK) GetDisplayName() string {
-	return s.DisplayName
-}
-
-// GetIconURL returns the value of IconURL.
-func (s *UpdateUserProfileOK) GetIconURL() OptNilString {
-	return s.IconURL
-}
-
-// SetDisplayID sets the value of DisplayID.
-func (s *UpdateUserProfileOK) SetDisplayID(val string) {
-	s.DisplayID = val
-}
-
-// SetDisplayName sets the value of DisplayName.
-func (s *UpdateUserProfileOK) SetDisplayName(val string) {
-	s.DisplayName = val
-}
-
-// SetIconURL sets the value of IconURL.
-func (s *UpdateUserProfileOK) SetIconURL(val OptNilString) {
-	s.IconURL = val
-}
-
-func (*UpdateUserProfileOK) updateUserProfileRes() {}
-
 type UpdateUserProfileReq struct {
 	DisplayName OptNilString                     `json:"displayName"`
 	Icon        OptMultipartFile                 `json:"icon"`
@@ -7355,6 +7069,9 @@ func (s *User) SetDisplayName(val string) {
 func (s *User) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
+
+func (*User) establishUserRes()     {}
+func (*User) updateUserProfileRes() {}
 
 // Ref: #/components/schemas/UserDemographics
 type UserDemographics struct {

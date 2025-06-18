@@ -11,7 +11,7 @@ namespace kotohiro {
   @route("/user")
   @get
   @summary("ユーザー情報の取得")
-  op get_user_info(): Body<{
+  op getUserInfo(): Body<{
     user: User;
     demographics: UserDemographics;
     email?: string | null;
@@ -37,15 +37,7 @@ namespace kotohiro {
       city?: HttpPart<string | null>;
       email?: HttpPart<string | null>;
     },
-  ): Body<{
-    @minLength(3)
-    @maxLength(25)
-    @pattern("^[A-Za-z0-9]$")
-    displayID: string;
-
-    displayName: string;
-    iconURL?: string | null;
-  }> | {
+  ): User | {
     @statusCode statusCode: 400;
     @body body: {
       code: string;
@@ -76,15 +68,7 @@ namespace kotohiro {
       prefecture?: HttpPart<string | null>;
       email?: HttpPart<string | null>;
     },
-  ): Body<{
-    @minLength(3)
-    @maxLength(25)
-    @pattern("^[A-Za-z0-9]$")
-    displayID: string;
-
-    displayName: string;
-    iconURL?: string | null;
-  }> | {
+  ): User | {
     @statusCode statusCode: 400;
     @body body: {
       code: string;

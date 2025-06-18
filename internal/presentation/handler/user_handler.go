@@ -400,7 +400,7 @@ func (u *userHandler) UpdateUserProfile(ctx context.Context, params *oas.UpdateU
 	w := http_utils.GetHTTPResponse(ctx)
 	http.SetCookie(w, u.CookieManager.CreateSessionCookie(out.Token))
 
-	return &oas.UpdateUserProfileOK{
+	return &oas.User{
 		DisplayID:   out.DisplayID,
 		DisplayName: out.DisplayName,
 		IconURL:     utils.ToOptNil[oas.OptNilString](claim.IconURL),
@@ -502,7 +502,7 @@ func (u *userHandler) EstablishUser(ctx context.Context, params *oas.EstablishUs
 	w := http_utils.GetHTTPResponse(ctx)
 	http.SetCookie(w, u.CookieManager.CreateSessionCookie(out.Token))
 
-	return &oas.EstablishUserOK{
+	return &oas.User{
 		DisplayID:   out.DisplayID,
 		DisplayName: out.DisplayName,
 		IconURL:     utils.ToOptNil[oas.OptNilString](out.IconURL),

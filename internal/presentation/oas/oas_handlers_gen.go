@@ -5227,14 +5227,14 @@ func (s *Server) handleGetTokenInfoRequest(args [0]string, argsEscaped bool, w h
 	}
 }
 
-// handleGetUserInfoRequest handles get_user_info operation.
+// handleGetUserInfoRequest handles getUserInfo operation.
 //
 // ユーザー情報の取得.
 //
 // GET /user
 func (s *Server) handleGetUserInfoRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("get_user_info"),
+		otelogen.OperationID("getUserInfo"),
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/user"),
 	}
@@ -5272,7 +5272,7 @@ func (s *Server) handleGetUserInfoRequest(args [0]string, argsEscaped bool, w ht
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "GetUserInfo",
-			ID:   "get_user_info",
+			ID:   "getUserInfo",
 		}
 	)
 	{
@@ -5326,7 +5326,7 @@ func (s *Server) handleGetUserInfoRequest(args [0]string, argsEscaped bool, w ht
 			Context:          ctx,
 			OperationName:    "GetUserInfo",
 			OperationSummary: "ユーザー情報の取得",
-			OperationID:      "get_user_info",
+			OperationID:      "getUserInfo",
 			Body:             nil,
 			Params:           middleware.Parameters{},
 			Raw:              r,
@@ -8893,7 +8893,7 @@ func (s *Server) handleSolveOpinionReportRequest(args [1]string, argsEscaped boo
 	}
 }
 
-// handleSwipeOpinionsRequest handles swipe_opinions operation.
+// handleSwipeOpinionsRequest handles swipeOpinions operation.
 //
 // セッションの中からまだ投票していない意見をランダムに取得する
 // remainingCountは取得した意見を含めてスワイプできる意見の総数を返す.
@@ -8901,7 +8901,7 @@ func (s *Server) handleSolveOpinionReportRequest(args [1]string, argsEscaped boo
 // GET /talksessions/{talkSessionID}/swipe_opinions
 func (s *Server) handleSwipeOpinionsRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("swipe_opinions"),
+		otelogen.OperationID("swipeOpinions"),
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/swipe_opinions"),
 	}
@@ -8939,7 +8939,7 @@ func (s *Server) handleSwipeOpinionsRequest(args [1]string, argsEscaped bool, w 
 		err          error
 		opErrContext = ogenerrors.OperationContext{
 			Name: "SwipeOpinions",
-			ID:   "swipe_opinions",
+			ID:   "swipeOpinions",
 		}
 	)
 	{
@@ -9003,7 +9003,7 @@ func (s *Server) handleSwipeOpinionsRequest(args [1]string, argsEscaped bool, w 
 			Context:          ctx,
 			OperationName:    "SwipeOpinions",
 			OperationSummary: "スワイプ用のエンドポイント",
-			OperationID:      "swipe_opinions",
+			OperationID:      "swipeOpinions",
 			Body:             nil,
 			Params: middleware.Parameters{
 				{

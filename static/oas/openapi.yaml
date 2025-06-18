@@ -1606,46 +1606,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                  theme:
-                    type: string
-                  description:
-                    type: string
-                    nullable: true
-                  owner:
-                    $ref: '#/components/schemas/User'
-                  createdAt:
-                    type: string
-                  scheduledEndTime:
-                    type: string
-                  location:
-                    $ref: '#/components/schemas/Location'
-                  city:
-                    type: string
-                    nullable: true
-                  prefecture:
-                    type: string
-                    nullable: true
-                  thumbnailURL:
-                    type: string
-                    nullable: true
-                  restrictions:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Restriction'
-                  hideReport:
-                    type: boolean
-                required:
-                  - id
-                  - theme
-                  - owner
-                  - createdAt
-                  - scheduledEndTime
-                  - restrictions
-                  - hideReport
+                $ref: '#/components/schemas/TalkSession'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -2490,7 +2451,7 @@ paths:
       x-ogen-operation-group: TalkSession
   /talksessions/{talkSessionID}/swipe_opinions:
     get:
-      operationId: swipe_opinions
+      operationId: swipeOpinions
       summary: スワイプ用のエンドポイント
       description: |-
         セッションの中からまだ投票していない意見をランダムに取得する
@@ -2809,7 +2770,7 @@ paths:
       x-ogen-operation-group: Test
   /user:
     get:
-      operationId: get_user_info
+      operationId: getUserInfo
       summary: ユーザー情報の取得
       parameters: []
       responses:
@@ -2849,21 +2810,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  displayID:
-                    type: string
-                    minLength: 3
-                    maxLength: 25
-                    pattern: ^[A-Za-z0-9]$
-                  displayName:
-                    type: string
-                  iconURL:
-                    type: string
-                    nullable: true
-                required:
-                  - displayID
-                  - displayName
+                $ref: '#/components/schemas/User'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -2947,21 +2894,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  displayID:
-                    type: string
-                    minLength: 3
-                    maxLength: 25
-                    pattern: ^[A-Za-z0-9]$
-                  displayName:
-                    type: string
-                  iconURL:
-                    type: string
-                    nullable: true
-                required:
-                  - displayID
-                  - displayName
+                $ref: '#/components/schemas/User'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:

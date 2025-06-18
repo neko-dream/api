@@ -633,7 +633,7 @@ func encodeEstablishOrganizationResponse(response EstablishOrganizationRes, w ht
 
 func encodeEstablishUserResponse(response EstablishUserRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *EstablishUserOK:
+	case *User:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -1814,7 +1814,7 @@ func encodeHealthResponse(response HealthRes, w http.ResponseWriter, span trace.
 
 func encodeInitiateTalkSessionResponse(response InitiateTalkSessionRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *InitiateTalkSessionOK:
+	case *TalkSession:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -2728,7 +2728,7 @@ func encodeToggleReportVisibilityManageResponse(response *ToggleReportVisibility
 
 func encodeUpdateUserProfileResponse(response UpdateUserProfileRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *UpdateUserProfileOK:
+	case *User:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))

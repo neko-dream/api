@@ -4645,7 +4645,7 @@ func decodeSolveOpinionReportParams(args [1]string, argsEscaped bool, r *http.Re
 	return params, nil
 }
 
-// SwipeOpinionsParams is parameters of swipe_opinions operation.
+// SwipeOpinionsParams is parameters of swipeOpinions operation.
 type SwipeOpinionsParams struct {
 	TalkSessionID string
 	Limit         OptNilInt

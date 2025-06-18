@@ -136,20 +136,7 @@ namespace kotohiro {
       restrictions?: HttpPart<string[]>;
       organizationAliasID?: HttpPart<string | null>;
     },
-  ): Body<{
-    id: string;
-    theme: string;
-    description?: string | null;
-    owner: User;
-    createdAt: string;
-    scheduledEndTime: string;
-    location?: Location;
-    city?: string | null;
-    prefecture?: string | null;
-    thumbnailURL?: string | null;
-    restrictions: Restriction[];
-    hideReport: boolean;
-  }> | {
+  ): TalkSession | {
     @statusCode statusCode: 400;
     @body body: {
       code: string;

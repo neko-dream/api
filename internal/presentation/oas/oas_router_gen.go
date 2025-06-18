@@ -3141,7 +3141,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									case "GET":
 										r.name = "SwipeOpinions"
 										r.summary = "スワイプ用のエンドポイント"
-										r.operationID = "swipe_opinions"
+										r.operationID = "swipeOpinions"
 										r.pathPattern = "/talksessions/{talkSessionID}/swipe_opinions"
 										r.args = args
 										r.count = 1
@@ -3311,7 +3311,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					case "GET":
 						r.name = "GetUserInfo"
 						r.summary = "ユーザー情報の取得"
-						r.operationID = "get_user_info"
+						r.operationID = "getUserInfo"
 						r.pathPattern = "/user"
 						r.args = args
 						r.count = 0

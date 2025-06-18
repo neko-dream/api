@@ -318,7 +318,7 @@ func (UnimplementedHandler) GetTokenInfo(ctx context.Context) (r GetTokenInfoRes
 	return r, ht.ErrNotImplemented
 }
 
-// GetUserInfo implements get_user_info operation.
+// GetUserInfo implements getUserInfo operation.
 //
 // ユーザー情報の取得.
 //
@@ -539,7 +539,7 @@ func (UnimplementedHandler) SolveOpinionReport(ctx context.Context, req *SolveOp
 	return r, ht.ErrNotImplemented
 }
 
-// SwipeOpinions implements swipe_opinions operation.
+// SwipeOpinions implements swipeOpinions operation.
 //
 // セッションの中からまだ投票していない意見をランダムに取得する
 // remainingCountは取得した意見を含めてスワイプできる意見の総数を返す.
