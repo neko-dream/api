@@ -90,7 +90,7 @@ func main() {
 			"layout":                   "\"BaseLayout\"",
 			"showExtensions":           "true",
 			"showCommonExtensions":     "true",
-			"syntaxHighlight":          "{\"activate\": true,\"theme\": \"agate\"}",
+			"syntaxHighlight":          "{\"activate\": true,\"theme\": \"tomorrow-night\"}",
 			"displayOperationId":       "true",
 			"filter":                   "true",
 			"operationsSorter":         "\"alpha\"",
