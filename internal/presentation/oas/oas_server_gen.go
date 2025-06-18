@@ -232,11 +232,7 @@ type OrganizationHandler interface {
 	// EstablishOrganization implements establishOrganization operation.
 	//
 	// 組織を作成できる。
-	// これを作れるユーザーはDBを直接叩いて作るしかない。
-	// OrgType
-	// - 1: 通常
-	// - 2: 自治体
-	// - 3: 議員.
+	// これを作れるユーザーはDBを直接叩いて作るしかない。.
 	//
 	// POST /organizations
 	EstablishOrganization(ctx context.Context, req *EstablishOrganizationReq) (EstablishOrganizationRes, error)
@@ -255,9 +251,10 @@ type OrganizationHandler interface {
 	// InviteOrganization implements inviteOrganization operation.
 	//
 	// Role
-	// - 1: Member
-	// - 2: Admin
-	// - 3: Owner.
+	// - 10: SuperAdmin
+	// - 20: Owner
+	// - 30: Admin
+	// - 40: Member.
 	//
 	// POST /organizations/{organizationID}/invite
 	InviteOrganization(ctx context.Context, req *InviteOrganizationReq, params InviteOrganizationParams) (InviteOrganizationRes, error)

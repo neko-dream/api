@@ -1134,11 +1134,6 @@ paths:
       description: |-
         組織を作成できる。
         これを作れるユーザーはDBを直接叩いて作るしかない。
-
-        OrgType
-        - 1: 通常
-        - 2: 自治体
-        - 3: 議員
       parameters: []
       responses:
         '200':
@@ -1172,8 +1167,14 @@ paths:
                   type: string
                 code:
                   type: string
+                  description: |-
+                    組織コード（ログイン時に使用）
+                    4文字以上127文字以下の英数字 _- のみ使用可能
                 orgType:
                   type: number
+                  description: |-
+                    組織タイプ
+                    - 1: 通常（基本これ）
               required:
                 - name
                 - code
@@ -1325,9 +1326,10 @@ paths:
       summary: 組織ユーザー招待（運営ユーザーのみ）
       description: |-
         Role
-        - 1: Member
-        - 2: Admin
-        - 3: Owner
+        - 10: SuperAdmin
+        - 20: Owner
+        - 30: Admin
+        - 40: Member
       parameters:
         - name: organizationID
           in: path

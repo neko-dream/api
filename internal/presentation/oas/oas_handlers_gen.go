@@ -1446,11 +1446,7 @@ func (s *Server) handleEditTimeLineRequest(args [2]string, argsEscaped bool, w h
 // handleEstablishOrganizationRequest handles establishOrganization operation.
 //
 // 組織を作成できる。
-// これを作れるユーザーはDBを直接叩いて作るしかない。
-// OrgType
-// - 1: 通常
-// - 2: 自治体
-// - 3: 議員.
+// これを作れるユーザーはDBを直接叩いて作るしかない。.
 //
 // POST /organizations
 func (s *Server) handleEstablishOrganizationRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
@@ -5742,9 +5738,10 @@ func (s *Server) handleInitiateTalkSessionRequest(args [0]string, argsEscaped bo
 // handleInviteOrganizationRequest handles inviteOrganization operation.
 //
 // Role
-// - 1: Member
-// - 2: Admin
-// - 3: Owner.
+// - 10: SuperAdmin
+// - 20: Owner
+// - 30: Admin
+// - 40: Member.
 //
 // POST /organizations/{organizationID}/invite
 func (s *Server) handleInviteOrganizationRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {

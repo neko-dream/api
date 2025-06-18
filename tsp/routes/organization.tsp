@@ -56,9 +56,10 @@ namespace kotohiro {
 
   /**
    * Role
-   * - 1: Member
-   * - 2: Admin
-   * - 3: Owner
+   * - 10: SuperAdmin
+   * - 20: Owner
+   * - 30: Admin
+   * - 40: Member
    */
   @tag("organization")
   @extension("x-ogen-operation-group", "Organization")

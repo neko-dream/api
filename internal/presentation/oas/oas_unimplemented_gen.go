@@ -106,11 +106,7 @@ func (UnimplementedHandler) EditTimeLine(ctx context.Context, req *EditTimeLineR
 // EstablishOrganization implements establishOrganization operation.
 //
 // 組織を作成できる。
-// これを作れるユーザーはDBを直接叩いて作るしかない。
-// OrgType
-// - 1: 通常
-// - 2: 自治体
-// - 3: 議員.
+// これを作れるユーザーはDBを直接叩いて作るしかない。.
 //
 // POST /organizations
 func (UnimplementedHandler) EstablishOrganization(ctx context.Context, req *EstablishOrganizationReq) (r EstablishOrganizationRes, _ error) {
@@ -394,9 +390,10 @@ func (UnimplementedHandler) InitiateTalkSession(ctx context.Context, req *Initia
 // InviteOrganization implements inviteOrganization operation.
 //
 // Role
-// - 1: Member
-// - 2: Admin
-// - 3: Owner.
+// - 10: SuperAdmin
+// - 20: Owner
+// - 30: Admin
+// - 40: Member.
 //
 // POST /organizations/{organizationID}/invite
 func (UnimplementedHandler) InviteOrganization(ctx context.Context, req *InviteOrganizationReq, params InviteOrganizationParams) (r InviteOrganizationRes, _ error) {

@@ -610,8 +610,12 @@ type EstablishOrganizationOK struct{}
 func (*EstablishOrganizationOK) establishOrganizationRes() {}
 
 type EstablishOrganizationReq struct {
-	Name    string  `json:"name"`
-	Code    string  `json:"code"`
+	Name string `json:"name"`
+	// 組織コード（ログイン時に使用）
+	// 4文字以上127文字以下の英数字 _- のみ使用可能.
+	Code string `json:"code"`
+	// 組織タイプ
+	// - 1: 通常（基本これ）.
 	OrgType float64 `json:"orgType"`
 }
 
