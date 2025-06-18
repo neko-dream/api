@@ -69,8 +69,16 @@ func (i *inviteOrganizationInteractor) Execute(ctx context.Context, input Invite
 		return nil, errors.New("organization user not found")
 	}
 
-	// roleが4以上の場合はエラー
-	if input.Role < 0 || input.Role > 3 {
+	// 有効なロール値かチェック (10, 20, 30, 40)
+	validRoles := []int{10, 20, 30, 40}
+	isValidRole := false
+	for _, validRole := range validRoles {
+		if input.Role == validRole {
+			isValidRole = true
+			break
+		}
+	}
+	if !isValidRole {
 		return nil, errors.New("invalid role")
 	}
 

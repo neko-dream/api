@@ -614,7 +614,7 @@ func (o *opinionHandler) GetOpinionReports(ctx context.Context, params oas.GetOp
 			IconURL:     utils.ToOptNil[oas.OptNilString](reports.Report.User.IconURL),
 		},
 		ReportCount: reports.Report.ReportCount,
-		Status:      oas.ReportDetailStatus(reports.Report.Status),
+		Status:      oas.ReportStatus(reports.Report.Status),
 		Reasons:     make([]oas.ReportDetailReasonsItem, 0, len(reports.Report.Reasons)),
 	}
 

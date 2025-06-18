@@ -11,14 +11,14 @@ import (
 	ht "github.com/ogen-go/ogen/http"
 )
 
-// Ref: #/components/schemas/actionItem
+// Ref: #/components/schemas/ActionItem
 type ActionItem struct {
-	ActionItemID string `json:"ActionItemID"`
-	Sequence     int    `json:"Sequence"`
-	Content      string `json:"Content"`
-	Status       string `json:"Status"`
-	CreatedAt    string `json:"CreatedAt"`
-	UpdatedAt    string `json:"UpdatedAt"`
+	ActionItemID string `json:"actionItemID"`
+	Sequence     int    `json:"sequence"`
+	Content      string `json:"content"`
+	Status       string `json:"status"`
+	CreatedAt    string `json:"createdAt"`
+	UpdatedAt    string `json:"updatedAt"`
 }
 
 // GetActionItemID returns the value of ActionItemID.
@@ -239,7 +239,7 @@ type ChangePasswordOK struct{}
 
 func (*ChangePasswordOK) changePasswordRes() {}
 
-// Ref: #/components/schemas/conclusion
+// Ref: #/components/schemas/Conclusion
 type Conclusion struct {
 	// 作成ユーザー.
 	User ConclusionUser `json:"user"`
@@ -332,319 +332,77 @@ func (s *CookieAuth) SetAPIKey(val string) {
 	s.APIKey = val
 }
 
-type CreateOrganizationsBadRequest struct{}
+type CreateOrganizationAliasBadRequest struct{}
 
-func (*CreateOrganizationsBadRequest) createOrganizationsRes() {}
+func (*CreateOrganizationAliasBadRequest) createOrganizationAliasRes() {}
 
-type CreateOrganizationsInternalServerError struct{}
+type CreateOrganizationAliasInternalServerError struct{}
 
-func (*CreateOrganizationsInternalServerError) createOrganizationsRes() {}
+func (*CreateOrganizationAliasInternalServerError) createOrganizationAliasRes() {}
 
-type CreateOrganizationsOK struct{}
-
-func (*CreateOrganizationsOK) createOrganizationsRes() {}
-
-type CreateOrganizationsReq struct {
-	Name    string  `json:"name"`
-	Code    string  `json:"code"`
-	OrgType float64 `json:"orgType"`
+type CreateOrganizationAliasOK struct {
+	AliasID   string `json:"aliasID"`
+	AliasName string `json:"aliasName"`
+	CreatedAt string `json:"createdAt"`
 }
 
-// GetName returns the value of Name.
-func (s *CreateOrganizationsReq) GetName() string {
-	return s.Name
+// GetAliasID returns the value of AliasID.
+func (s *CreateOrganizationAliasOK) GetAliasID() string {
+	return s.AliasID
 }
 
-// GetCode returns the value of Code.
-func (s *CreateOrganizationsReq) GetCode() string {
-	return s.Code
-}
-
-// GetOrgType returns the value of OrgType.
-func (s *CreateOrganizationsReq) GetOrgType() float64 {
-	return s.OrgType
-}
-
-// SetName sets the value of Name.
-func (s *CreateOrganizationsReq) SetName(val string) {
-	s.Name = val
-}
-
-// SetCode sets the value of Code.
-func (s *CreateOrganizationsReq) SetCode(val string) {
-	s.Code = val
-}
-
-// SetOrgType sets the value of OrgType.
-func (s *CreateOrganizationsReq) SetOrgType(val float64) {
-	s.OrgType = val
-}
-
-type CreateTalkSessionBadRequest struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-}
-
-// GetCode returns the value of Code.
-func (s *CreateTalkSessionBadRequest) GetCode() string {
-	return s.Code
-}
-
-// GetMessage returns the value of Message.
-func (s *CreateTalkSessionBadRequest) GetMessage() string {
-	return s.Message
-}
-
-// SetCode sets the value of Code.
-func (s *CreateTalkSessionBadRequest) SetCode(val string) {
-	s.Code = val
-}
-
-// SetMessage sets the value of Message.
-func (s *CreateTalkSessionBadRequest) SetMessage(val string) {
-	s.Message = val
-}
-
-func (*CreateTalkSessionBadRequest) createTalkSessionRes() {}
-
-type CreateTalkSessionOK struct {
-	ID               string        `json:"id"`
-	Theme            string        `json:"theme"`
-	Description      OptNilString  `json:"description"`
-	Owner            User          `json:"owner"`
-	CreatedAt        string        `json:"createdAt"`
-	ScheduledEndTime string        `json:"scheduledEndTime"`
-	Location         OptLocation   `json:"location"`
-	City             OptNilString  `json:"city"`
-	Prefecture       OptNilString  `json:"prefecture"`
-	ThumbnailURL     OptNilString  `json:"thumbnailURL"`
-	Restrictions     []Restriction `json:"restrictions"`
-	HideReport       bool          `json:"hideReport"`
-}
-
-// GetID returns the value of ID.
-func (s *CreateTalkSessionOK) GetID() string {
-	return s.ID
-}
-
-// GetTheme returns the value of Theme.
-func (s *CreateTalkSessionOK) GetTheme() string {
-	return s.Theme
-}
-
-// GetDescription returns the value of Description.
-func (s *CreateTalkSessionOK) GetDescription() OptNilString {
-	return s.Description
-}
-
-// GetOwner returns the value of Owner.
-func (s *CreateTalkSessionOK) GetOwner() User {
-	return s.Owner
+// GetAliasName returns the value of AliasName.
+func (s *CreateOrganizationAliasOK) GetAliasName() string {
+	return s.AliasName
 }
 
 // GetCreatedAt returns the value of CreatedAt.
-func (s *CreateTalkSessionOK) GetCreatedAt() string {
+func (s *CreateOrganizationAliasOK) GetCreatedAt() string {
 	return s.CreatedAt
 }
 
-// GetScheduledEndTime returns the value of ScheduledEndTime.
-func (s *CreateTalkSessionOK) GetScheduledEndTime() string {
-	return s.ScheduledEndTime
+// SetAliasID sets the value of AliasID.
+func (s *CreateOrganizationAliasOK) SetAliasID(val string) {
+	s.AliasID = val
 }
 
-// GetLocation returns the value of Location.
-func (s *CreateTalkSessionOK) GetLocation() OptLocation {
-	return s.Location
-}
-
-// GetCity returns the value of City.
-func (s *CreateTalkSessionOK) GetCity() OptNilString {
-	return s.City
-}
-
-// GetPrefecture returns the value of Prefecture.
-func (s *CreateTalkSessionOK) GetPrefecture() OptNilString {
-	return s.Prefecture
-}
-
-// GetThumbnailURL returns the value of ThumbnailURL.
-func (s *CreateTalkSessionOK) GetThumbnailURL() OptNilString {
-	return s.ThumbnailURL
-}
-
-// GetRestrictions returns the value of Restrictions.
-func (s *CreateTalkSessionOK) GetRestrictions() []Restriction {
-	return s.Restrictions
-}
-
-// GetHideReport returns the value of HideReport.
-func (s *CreateTalkSessionOK) GetHideReport() bool {
-	return s.HideReport
-}
-
-// SetID sets the value of ID.
-func (s *CreateTalkSessionOK) SetID(val string) {
-	s.ID = val
-}
-
-// SetTheme sets the value of Theme.
-func (s *CreateTalkSessionOK) SetTheme(val string) {
-	s.Theme = val
-}
-
-// SetDescription sets the value of Description.
-func (s *CreateTalkSessionOK) SetDescription(val OptNilString) {
-	s.Description = val
-}
-
-// SetOwner sets the value of Owner.
-func (s *CreateTalkSessionOK) SetOwner(val User) {
-	s.Owner = val
+// SetAliasName sets the value of AliasName.
+func (s *CreateOrganizationAliasOK) SetAliasName(val string) {
+	s.AliasName = val
 }
 
 // SetCreatedAt sets the value of CreatedAt.
-func (s *CreateTalkSessionOK) SetCreatedAt(val string) {
+func (s *CreateOrganizationAliasOK) SetCreatedAt(val string) {
 	s.CreatedAt = val
 }
 
-// SetScheduledEndTime sets the value of ScheduledEndTime.
-func (s *CreateTalkSessionOK) SetScheduledEndTime(val string) {
-	s.ScheduledEndTime = val
+func (*CreateOrganizationAliasOK) createOrganizationAliasRes() {}
+
+type CreateOrganizationAliasReq struct {
+	AliasName string `json:"aliasName"`
 }
 
-// SetLocation sets the value of Location.
-func (s *CreateTalkSessionOK) SetLocation(val OptLocation) {
-	s.Location = val
+// GetAliasName returns the value of AliasName.
+func (s *CreateOrganizationAliasReq) GetAliasName() string {
+	return s.AliasName
 }
 
-// SetCity sets the value of City.
-func (s *CreateTalkSessionOK) SetCity(val OptNilString) {
-	s.City = val
+// SetAliasName sets the value of AliasName.
+func (s *CreateOrganizationAliasReq) SetAliasName(val string) {
+	s.AliasName = val
 }
 
-// SetPrefecture sets the value of Prefecture.
-func (s *CreateTalkSessionOK) SetPrefecture(val OptNilString) {
-	s.Prefecture = val
-}
+type DeleteOrganizationAliasBadRequest struct{}
 
-// SetThumbnailURL sets the value of ThumbnailURL.
-func (s *CreateTalkSessionOK) SetThumbnailURL(val OptNilString) {
-	s.ThumbnailURL = val
-}
+func (*DeleteOrganizationAliasBadRequest) deleteOrganizationAliasRes() {}
 
-// SetRestrictions sets the value of Restrictions.
-func (s *CreateTalkSessionOK) SetRestrictions(val []Restriction) {
-	s.Restrictions = val
-}
+type DeleteOrganizationAliasInternalServerError struct{}
 
-// SetHideReport sets the value of HideReport.
-func (s *CreateTalkSessionOK) SetHideReport(val bool) {
-	s.HideReport = val
-}
+func (*DeleteOrganizationAliasInternalServerError) deleteOrganizationAliasRes() {}
 
-func (*CreateTalkSessionOK) createTalkSessionRes() {}
+type DeleteOrganizationAliasOK struct{}
 
-type CreateTalkSessionReq struct {
-	Theme            string        `json:"theme"`
-	ScheduledEndTime time.Time     `json:"scheduledEndTime"`
-	Latitude         OptNilFloat64 `json:"latitude"`
-	Longitude        OptNilFloat64 `json:"longitude"`
-	City             OptNilString  `json:"city"`
-	Prefecture       OptNilString  `json:"prefecture"`
-	Description      OptNilString  `json:"description"`
-	ThumbnailURL     OptNilString  `json:"thumbnailURL"`
-	Restrictions     []string      `json:"restrictions"`
-}
-
-// GetTheme returns the value of Theme.
-func (s *CreateTalkSessionReq) GetTheme() string {
-	return s.Theme
-}
-
-// GetScheduledEndTime returns the value of ScheduledEndTime.
-func (s *CreateTalkSessionReq) GetScheduledEndTime() time.Time {
-	return s.ScheduledEndTime
-}
-
-// GetLatitude returns the value of Latitude.
-func (s *CreateTalkSessionReq) GetLatitude() OptNilFloat64 {
-	return s.Latitude
-}
-
-// GetLongitude returns the value of Longitude.
-func (s *CreateTalkSessionReq) GetLongitude() OptNilFloat64 {
-	return s.Longitude
-}
-
-// GetCity returns the value of City.
-func (s *CreateTalkSessionReq) GetCity() OptNilString {
-	return s.City
-}
-
-// GetPrefecture returns the value of Prefecture.
-func (s *CreateTalkSessionReq) GetPrefecture() OptNilString {
-	return s.Prefecture
-}
-
-// GetDescription returns the value of Description.
-func (s *CreateTalkSessionReq) GetDescription() OptNilString {
-	return s.Description
-}
-
-// GetThumbnailURL returns the value of ThumbnailURL.
-func (s *CreateTalkSessionReq) GetThumbnailURL() OptNilString {
-	return s.ThumbnailURL
-}
-
-// GetRestrictions returns the value of Restrictions.
-func (s *CreateTalkSessionReq) GetRestrictions() []string {
-	return s.Restrictions
-}
-
-// SetTheme sets the value of Theme.
-func (s *CreateTalkSessionReq) SetTheme(val string) {
-	s.Theme = val
-}
-
-// SetScheduledEndTime sets the value of ScheduledEndTime.
-func (s *CreateTalkSessionReq) SetScheduledEndTime(val time.Time) {
-	s.ScheduledEndTime = val
-}
-
-// SetLatitude sets the value of Latitude.
-func (s *CreateTalkSessionReq) SetLatitude(val OptNilFloat64) {
-	s.Latitude = val
-}
-
-// SetLongitude sets the value of Longitude.
-func (s *CreateTalkSessionReq) SetLongitude(val OptNilFloat64) {
-	s.Longitude = val
-}
-
-// SetCity sets the value of City.
-func (s *CreateTalkSessionReq) SetCity(val OptNilString) {
-	s.City = val
-}
-
-// SetPrefecture sets the value of Prefecture.
-func (s *CreateTalkSessionReq) SetPrefecture(val OptNilString) {
-	s.Prefecture = val
-}
-
-// SetDescription sets the value of Description.
-func (s *CreateTalkSessionReq) SetDescription(val OptNilString) {
-	s.Description = val
-}
-
-// SetThumbnailURL sets the value of ThumbnailURL.
-func (s *CreateTalkSessionReq) SetThumbnailURL(val OptNilString) {
-	s.ThumbnailURL = val
-}
-
-// SetRestrictions sets the value of Restrictions.
-func (s *CreateTalkSessionReq) SetRestrictions(val []string) {
-	s.Restrictions = val
-}
+func (*DeleteOrganizationAliasOK) deleteOrganizationAliasRes() {}
 
 type DevAuthorizeBadRequest struct{}
 
@@ -839,218 +597,228 @@ func (s *EditTimeLineReq) SetStatus(val OptNilString) {
 	s.Status = val
 }
 
-type EditUserProfileBadRequest struct {
+type EstablishOrganizationBadRequest struct{}
+
+func (*EstablishOrganizationBadRequest) establishOrganizationRes() {}
+
+type EstablishOrganizationInternalServerError struct{}
+
+func (*EstablishOrganizationInternalServerError) establishOrganizationRes() {}
+
+type EstablishOrganizationOK struct{}
+
+func (*EstablishOrganizationOK) establishOrganizationRes() {}
+
+type EstablishOrganizationReq struct {
+	Name    string  `json:"name"`
+	Code    string  `json:"code"`
+	OrgType float64 `json:"orgType"`
+}
+
+// GetName returns the value of Name.
+func (s *EstablishOrganizationReq) GetName() string {
+	return s.Name
+}
+
+// GetCode returns the value of Code.
+func (s *EstablishOrganizationReq) GetCode() string {
+	return s.Code
+}
+
+// GetOrgType returns the value of OrgType.
+func (s *EstablishOrganizationReq) GetOrgType() float64 {
+	return s.OrgType
+}
+
+// SetName sets the value of Name.
+func (s *EstablishOrganizationReq) SetName(val string) {
+	s.Name = val
+}
+
+// SetCode sets the value of Code.
+func (s *EstablishOrganizationReq) SetCode(val string) {
+	s.Code = val
+}
+
+// SetOrgType sets the value of OrgType.
+func (s *EstablishOrganizationReq) SetOrgType(val float64) {
+	s.OrgType = val
+}
+
+type EstablishUserBadRequest struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
 }
 
 // GetCode returns the value of Code.
-func (s *EditUserProfileBadRequest) GetCode() string {
+func (s *EstablishUserBadRequest) GetCode() string {
 	return s.Code
 }
 
 // GetMessage returns the value of Message.
-func (s *EditUserProfileBadRequest) GetMessage() string {
+func (s *EstablishUserBadRequest) GetMessage() string {
 	return s.Message
 }
 
 // SetCode sets the value of Code.
-func (s *EditUserProfileBadRequest) SetCode(val string) {
+func (s *EstablishUserBadRequest) SetCode(val string) {
 	s.Code = val
 }
 
 // SetMessage sets the value of Message.
-func (s *EditUserProfileBadRequest) SetMessage(val string) {
+func (s *EstablishUserBadRequest) SetMessage(val string) {
 	s.Message = val
 }
 
-func (*EditUserProfileBadRequest) editUserProfileRes() {}
+func (*EstablishUserBadRequest) establishUserRes() {}
 
-type EditUserProfileInternalServerError struct {
+type EstablishUserInternalServerError struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
 }
 
 // GetCode returns the value of Code.
-func (s *EditUserProfileInternalServerError) GetCode() string {
+func (s *EstablishUserInternalServerError) GetCode() string {
 	return s.Code
 }
 
 // GetMessage returns the value of Message.
-func (s *EditUserProfileInternalServerError) GetMessage() string {
+func (s *EstablishUserInternalServerError) GetMessage() string {
 	return s.Message
 }
 
 // SetCode sets the value of Code.
-func (s *EditUserProfileInternalServerError) SetCode(val string) {
+func (s *EstablishUserInternalServerError) SetCode(val string) {
 	s.Code = val
 }
 
 // SetMessage sets the value of Message.
-func (s *EditUserProfileInternalServerError) SetMessage(val string) {
+func (s *EstablishUserInternalServerError) SetMessage(val string) {
 	s.Message = val
 }
 
-func (*EditUserProfileInternalServerError) editUserProfileRes() {}
+func (*EstablishUserInternalServerError) establishUserRes() {}
 
-type EditUserProfileOK struct {
-	DisplayID   string       `json:"displayID"`
-	DisplayName string       `json:"displayName"`
-	IconURL     OptNilString `json:"iconURL"`
+type EstablishUserReq struct {
+	DisplayName string                       `json:"displayName"`
+	DisplayID   string                       `json:"displayID"`
+	Icon        OptMultipartFile             `json:"icon"`
+	DateOfBirth OptString                    `json:"dateOfBirth"`
+	Gender      OptNilEstablishUserReqGender `json:"gender"`
+	Prefecture  OptString                    `json:"prefecture"`
+	City        OptNilString                 `json:"city"`
+	Email       OptNilString                 `json:"email"`
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *EstablishUserReq) GetDisplayName() string {
+	return s.DisplayName
 }
 
 // GetDisplayID returns the value of DisplayID.
-func (s *EditUserProfileOK) GetDisplayID() string {
+func (s *EstablishUserReq) GetDisplayID() string {
 	return s.DisplayID
 }
 
-// GetDisplayName returns the value of DisplayName.
-func (s *EditUserProfileOK) GetDisplayName() string {
-	return s.DisplayName
-}
-
-// GetIconURL returns the value of IconURL.
-func (s *EditUserProfileOK) GetIconURL() OptNilString {
-	return s.IconURL
-}
-
-// SetDisplayID sets the value of DisplayID.
-func (s *EditUserProfileOK) SetDisplayID(val string) {
-	s.DisplayID = val
-}
-
-// SetDisplayName sets the value of DisplayName.
-func (s *EditUserProfileOK) SetDisplayName(val string) {
-	s.DisplayName = val
-}
-
-// SetIconURL sets the value of IconURL.
-func (s *EditUserProfileOK) SetIconURL(val OptNilString) {
-	s.IconURL = val
-}
-
-func (*EditUserProfileOK) editUserProfileRes() {}
-
-type EditUserProfileReq struct {
-	DisplayName OptNilString                   `json:"displayName"`
-	Icon        OptMultipartFile               `json:"icon"`
-	DeleteIcon  OptNilBool                     `json:"deleteIcon"`
-	DateOfBirth OptString                      `json:"dateOfBirth"`
-	Gender      OptNilEditUserProfileReqGender `json:"gender"`
-	City        OptNilString                   `json:"city"`
-	Prefecture  OptNilString                   `json:"prefecture"`
-	Email       OptNilString                   `json:"email"`
-}
-
-// GetDisplayName returns the value of DisplayName.
-func (s *EditUserProfileReq) GetDisplayName() OptNilString {
-	return s.DisplayName
-}
-
 // GetIcon returns the value of Icon.
-func (s *EditUserProfileReq) GetIcon() OptMultipartFile {
+func (s *EstablishUserReq) GetIcon() OptMultipartFile {
 	return s.Icon
 }
 
-// GetDeleteIcon returns the value of DeleteIcon.
-func (s *EditUserProfileReq) GetDeleteIcon() OptNilBool {
-	return s.DeleteIcon
-}
-
 // GetDateOfBirth returns the value of DateOfBirth.
-func (s *EditUserProfileReq) GetDateOfBirth() OptString {
+func (s *EstablishUserReq) GetDateOfBirth() OptString {
 	return s.DateOfBirth
 }
 
 // GetGender returns the value of Gender.
-func (s *EditUserProfileReq) GetGender() OptNilEditUserProfileReqGender {
+func (s *EstablishUserReq) GetGender() OptNilEstablishUserReqGender {
 	return s.Gender
 }
 
-// GetCity returns the value of City.
-func (s *EditUserProfileReq) GetCity() OptNilString {
-	return s.City
-}
-
 // GetPrefecture returns the value of Prefecture.
-func (s *EditUserProfileReq) GetPrefecture() OptNilString {
+func (s *EstablishUserReq) GetPrefecture() OptString {
 	return s.Prefecture
 }
 
+// GetCity returns the value of City.
+func (s *EstablishUserReq) GetCity() OptNilString {
+	return s.City
+}
+
 // GetEmail returns the value of Email.
-func (s *EditUserProfileReq) GetEmail() OptNilString {
+func (s *EstablishUserReq) GetEmail() OptNilString {
 	return s.Email
 }
 
 // SetDisplayName sets the value of DisplayName.
-func (s *EditUserProfileReq) SetDisplayName(val OptNilString) {
+func (s *EstablishUserReq) SetDisplayName(val string) {
 	s.DisplayName = val
 }
 
+// SetDisplayID sets the value of DisplayID.
+func (s *EstablishUserReq) SetDisplayID(val string) {
+	s.DisplayID = val
+}
+
 // SetIcon sets the value of Icon.
-func (s *EditUserProfileReq) SetIcon(val OptMultipartFile) {
+func (s *EstablishUserReq) SetIcon(val OptMultipartFile) {
 	s.Icon = val
 }
 
-// SetDeleteIcon sets the value of DeleteIcon.
-func (s *EditUserProfileReq) SetDeleteIcon(val OptNilBool) {
-	s.DeleteIcon = val
-}
-
 // SetDateOfBirth sets the value of DateOfBirth.
-func (s *EditUserProfileReq) SetDateOfBirth(val OptString) {
+func (s *EstablishUserReq) SetDateOfBirth(val OptString) {
 	s.DateOfBirth = val
 }
 
 // SetGender sets the value of Gender.
-func (s *EditUserProfileReq) SetGender(val OptNilEditUserProfileReqGender) {
+func (s *EstablishUserReq) SetGender(val OptNilEstablishUserReqGender) {
 	s.Gender = val
 }
 
-// SetCity sets the value of City.
-func (s *EditUserProfileReq) SetCity(val OptNilString) {
-	s.City = val
-}
-
 // SetPrefecture sets the value of Prefecture.
-func (s *EditUserProfileReq) SetPrefecture(val OptNilString) {
+func (s *EstablishUserReq) SetPrefecture(val OptString) {
 	s.Prefecture = val
 }
 
+// SetCity sets the value of City.
+func (s *EstablishUserReq) SetCity(val OptNilString) {
+	s.City = val
+}
+
 // SetEmail sets the value of Email.
-func (s *EditUserProfileReq) SetEmail(val OptNilString) {
+func (s *EstablishUserReq) SetEmail(val OptNilString) {
 	s.Email = val
 }
 
-type EditUserProfileReqGender string
+type EstablishUserReqGender string
 
 const (
-	EditUserProfileReqGender_0 EditUserProfileReqGender = "男性"
-	EditUserProfileReqGender_1 EditUserProfileReqGender = "女性"
-	EditUserProfileReqGender_2 EditUserProfileReqGender = "その他"
-	EditUserProfileReqGender_3 EditUserProfileReqGender = "回答しない"
+	EstablishUserReqGender_0 EstablishUserReqGender = "男性"
+	EstablishUserReqGender_1 EstablishUserReqGender = "女性"
+	EstablishUserReqGender_2 EstablishUserReqGender = "その他"
+	EstablishUserReqGender_3 EstablishUserReqGender = "回答しない"
 )
 
-// AllValues returns all EditUserProfileReqGender values.
-func (EditUserProfileReqGender) AllValues() []EditUserProfileReqGender {
-	return []EditUserProfileReqGender{
-		EditUserProfileReqGender_0,
-		EditUserProfileReqGender_1,
-		EditUserProfileReqGender_2,
-		EditUserProfileReqGender_3,
+// AllValues returns all EstablishUserReqGender values.
+func (EstablishUserReqGender) AllValues() []EstablishUserReqGender {
+	return []EstablishUserReqGender{
+		EstablishUserReqGender_0,
+		EstablishUserReqGender_1,
+		EstablishUserReqGender_2,
+		EstablishUserReqGender_3,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s EditUserProfileReqGender) MarshalText() ([]byte, error) {
+func (s EstablishUserReqGender) MarshalText() ([]byte, error) {
 	switch s {
-	case EditUserProfileReqGender_0:
+	case EstablishUserReqGender_0:
 		return []byte(s), nil
-	case EditUserProfileReqGender_1:
+	case EstablishUserReqGender_1:
 		return []byte(s), nil
-	case EditUserProfileReqGender_2:
+	case EstablishUserReqGender_2:
 		return []byte(s), nil
-	case EditUserProfileReqGender_3:
+	case EstablishUserReqGender_3:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -1058,19 +826,19 @@ func (s EditUserProfileReqGender) MarshalText() ([]byte, error) {
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *EditUserProfileReqGender) UnmarshalText(data []byte) error {
-	switch EditUserProfileReqGender(data) {
-	case EditUserProfileReqGender_0:
-		*s = EditUserProfileReqGender_0
+func (s *EstablishUserReqGender) UnmarshalText(data []byte) error {
+	switch EstablishUserReqGender(data) {
+	case EstablishUserReqGender_0:
+		*s = EstablishUserReqGender_0
 		return nil
-	case EditUserProfileReqGender_1:
-		*s = EditUserProfileReqGender_1
+	case EstablishUserReqGender_1:
+		*s = EstablishUserReqGender_1
 		return nil
-	case EditUserProfileReqGender_2:
-		*s = EditUserProfileReqGender_2
+	case EstablishUserReqGender_2:
+		*s = EstablishUserReqGender_2
 		return nil
-	case EditUserProfileReqGender_3:
-		*s = EditUserProfileReqGender_3
+	case EstablishUserReqGender_3:
+		*s = EstablishUserReqGender_3
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -1229,6 +997,7 @@ func (s *GetOpinionDetail2OK) SetMyVoteType(val OptNilGetOpinionDetail2OKMyVoteT
 
 func (*GetOpinionDetail2OK) getOpinionDetail2Res() {}
 
+// 投票タイプ.
 type GetOpinionDetail2OKMyVoteType string
 
 const (
@@ -1379,31 +1148,32 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItem) SetMyVoteType(val OptNilGetOpi
 	s.MyVoteType = val
 }
 
+// 投票タイプ.
 type GetOpinionsForTalkSessionOKOpinionsItemMyVoteType string
 
 const (
-	GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass     GetOpinionsForTalkSessionOKOpinionsItemMyVoteType = "pass"
-	GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree GetOpinionsForTalkSessionOKOpinionsItemMyVoteType = "disagree"
 	GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree    GetOpinionsForTalkSessionOKOpinionsItemMyVoteType = "agree"
+	GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree GetOpinionsForTalkSessionOKOpinionsItemMyVoteType = "disagree"
+	GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass     GetOpinionsForTalkSessionOKOpinionsItemMyVoteType = "pass"
 )
 
 // AllValues returns all GetOpinionsForTalkSessionOKOpinionsItemMyVoteType values.
 func (GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) AllValues() []GetOpinionsForTalkSessionOKOpinionsItemMyVoteType {
 	return []GetOpinionsForTalkSessionOKOpinionsItemMyVoteType{
-		GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass,
-		GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree,
 		GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree,
+		GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree,
+		GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
 func (s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) MarshalText() ([]byte, error) {
 	switch s {
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass:
+	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree:
 		return []byte(s), nil
 	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree:
 		return []byte(s), nil
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree:
+	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -1413,14 +1183,14 @@ func (s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) MarshalText() ([]byte
 // UnmarshalText implements encoding.TextUnmarshaler.
 func (s *GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) UnmarshalText(data []byte) error {
 	switch GetOpinionsForTalkSessionOKOpinionsItemMyVoteType(data) {
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass:
-		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass
+	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree:
+		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree
 		return nil
 	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree:
 		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree
 		return nil
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree:
-		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree
+	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass:
+		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -1487,6 +1257,66 @@ func (s *GetOpinionsForTalkSessionSort) UnmarshalText(data []byte) error {
 	default:
 		return errors.Errorf("invalid value: %q", data)
 	}
+}
+
+type GetOrganizationAliasesBadRequest struct{}
+
+func (*GetOrganizationAliasesBadRequest) getOrganizationAliasesRes() {}
+
+type GetOrganizationAliasesInternalServerError struct{}
+
+func (*GetOrganizationAliasesInternalServerError) getOrganizationAliasesRes() {}
+
+type GetOrganizationAliasesOK struct {
+	Aliases []GetOrganizationAliasesOKAliasesItem `json:"aliases"`
+}
+
+// GetAliases returns the value of Aliases.
+func (s *GetOrganizationAliasesOK) GetAliases() []GetOrganizationAliasesOKAliasesItem {
+	return s.Aliases
+}
+
+// SetAliases sets the value of Aliases.
+func (s *GetOrganizationAliasesOK) SetAliases(val []GetOrganizationAliasesOKAliasesItem) {
+	s.Aliases = val
+}
+
+func (*GetOrganizationAliasesOK) getOrganizationAliasesRes() {}
+
+type GetOrganizationAliasesOKAliasesItem struct {
+	AliasID   string `json:"aliasID"`
+	AliasName string `json:"aliasName"`
+	CreatedAt string `json:"createdAt"`
+}
+
+// GetAliasID returns the value of AliasID.
+func (s *GetOrganizationAliasesOKAliasesItem) GetAliasID() string {
+	return s.AliasID
+}
+
+// GetAliasName returns the value of AliasName.
+func (s *GetOrganizationAliasesOKAliasesItem) GetAliasName() string {
+	return s.AliasName
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *GetOrganizationAliasesOKAliasesItem) GetCreatedAt() string {
+	return s.CreatedAt
+}
+
+// SetAliasID sets the value of AliasID.
+func (s *GetOrganizationAliasesOKAliasesItem) SetAliasID(val string) {
+	s.AliasID = val
+}
+
+// SetAliasName sets the value of AliasName.
+func (s *GetOrganizationAliasesOKAliasesItem) SetAliasName(val string) {
+	s.AliasName = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *GetOrganizationAliasesOKAliasesItem) SetCreatedAt(val string) {
+	s.CreatedAt = val
 }
 
 type GetOrganizationsBadRequest struct{}
@@ -2004,6 +1834,60 @@ func (s *GetTimeLineOK) SetItems(val []ActionItem) {
 
 func (*GetTimeLineOK) getTimeLineRes() {}
 
+type GetTokenInfoBadRequest struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *GetTokenInfoBadRequest) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *GetTokenInfoBadRequest) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *GetTokenInfoBadRequest) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *GetTokenInfoBadRequest) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*GetTokenInfoBadRequest) getTokenInfoRes() {}
+
+type GetTokenInfoInternalServerError struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *GetTokenInfoInternalServerError) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *GetTokenInfoInternalServerError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *GetTokenInfoInternalServerError) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *GetTokenInfoInternalServerError) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*GetTokenInfoInternalServerError) getTokenInfoRes() {}
+
 type GetUserInfoInternalServerError struct{}
 
 func (*GetUserInfoInternalServerError) getUserInfoRes() {}
@@ -2142,6 +2026,55 @@ func (s *GetUserListManageOrderBy) UnmarshalText(data []byte) error {
 	}
 }
 
+type HandleAuthCallbackBadRequest struct{}
+
+func (*HandleAuthCallbackBadRequest) handleAuthCallbackRes() {}
+
+type HandleAuthCallbackFound struct{}
+
+// HandleAuthCallbackFoundHeaders wraps HandleAuthCallbackFound with response headers.
+type HandleAuthCallbackFoundHeaders struct {
+	Location  string
+	SetCookie []string
+	Response  HandleAuthCallbackFound
+}
+
+// GetLocation returns the value of Location.
+func (s *HandleAuthCallbackFoundHeaders) GetLocation() string {
+	return s.Location
+}
+
+// GetSetCookie returns the value of SetCookie.
+func (s *HandleAuthCallbackFoundHeaders) GetSetCookie() []string {
+	return s.SetCookie
+}
+
+// GetResponse returns the value of Response.
+func (s *HandleAuthCallbackFoundHeaders) GetResponse() HandleAuthCallbackFound {
+	return s.Response
+}
+
+// SetLocation sets the value of Location.
+func (s *HandleAuthCallbackFoundHeaders) SetLocation(val string) {
+	s.Location = val
+}
+
+// SetSetCookie sets the value of SetCookie.
+func (s *HandleAuthCallbackFoundHeaders) SetSetCookie(val []string) {
+	s.SetCookie = val
+}
+
+// SetResponse sets the value of Response.
+func (s *HandleAuthCallbackFoundHeaders) SetResponse(val HandleAuthCallbackFound) {
+	s.Response = val
+}
+
+func (*HandleAuthCallbackFoundHeaders) handleAuthCallbackRes() {}
+
+type HandleAuthCallbackInternalServerError struct{}
+
+func (*HandleAuthCallbackInternalServerError) handleAuthCallbackRes() {}
+
 type HasConsentBadRequest struct{}
 
 func (*HasConsentBadRequest) hasConsentRes() {}
@@ -2177,6 +2110,146 @@ func (*HealthInternalServerError) healthRes() {}
 type HealthOK struct{}
 
 func (*HealthOK) healthRes() {}
+
+type InitiateTalkSessionBadRequest struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *InitiateTalkSessionBadRequest) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *InitiateTalkSessionBadRequest) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *InitiateTalkSessionBadRequest) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *InitiateTalkSessionBadRequest) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*InitiateTalkSessionBadRequest) initiateTalkSessionRes() {}
+
+type InitiateTalkSessionReq struct {
+	Theme               string        `json:"theme"`
+	ScheduledEndTime    time.Time     `json:"scheduledEndTime"`
+	Latitude            OptNilFloat64 `json:"latitude"`
+	Longitude           OptNilFloat64 `json:"longitude"`
+	City                OptNilString  `json:"city"`
+	Prefecture          OptNilString  `json:"prefecture"`
+	Description         OptNilString  `json:"description"`
+	ThumbnailURL        OptNilString  `json:"thumbnailURL"`
+	Restrictions        []string      `json:"restrictions"`
+	OrganizationAliasID OptNilString  `json:"organizationAliasID"`
+}
+
+// GetTheme returns the value of Theme.
+func (s *InitiateTalkSessionReq) GetTheme() string {
+	return s.Theme
+}
+
+// GetScheduledEndTime returns the value of ScheduledEndTime.
+func (s *InitiateTalkSessionReq) GetScheduledEndTime() time.Time {
+	return s.ScheduledEndTime
+}
+
+// GetLatitude returns the value of Latitude.
+func (s *InitiateTalkSessionReq) GetLatitude() OptNilFloat64 {
+	return s.Latitude
+}
+
+// GetLongitude returns the value of Longitude.
+func (s *InitiateTalkSessionReq) GetLongitude() OptNilFloat64 {
+	return s.Longitude
+}
+
+// GetCity returns the value of City.
+func (s *InitiateTalkSessionReq) GetCity() OptNilString {
+	return s.City
+}
+
+// GetPrefecture returns the value of Prefecture.
+func (s *InitiateTalkSessionReq) GetPrefecture() OptNilString {
+	return s.Prefecture
+}
+
+// GetDescription returns the value of Description.
+func (s *InitiateTalkSessionReq) GetDescription() OptNilString {
+	return s.Description
+}
+
+// GetThumbnailURL returns the value of ThumbnailURL.
+func (s *InitiateTalkSessionReq) GetThumbnailURL() OptNilString {
+	return s.ThumbnailURL
+}
+
+// GetRestrictions returns the value of Restrictions.
+func (s *InitiateTalkSessionReq) GetRestrictions() []string {
+	return s.Restrictions
+}
+
+// GetOrganizationAliasID returns the value of OrganizationAliasID.
+func (s *InitiateTalkSessionReq) GetOrganizationAliasID() OptNilString {
+	return s.OrganizationAliasID
+}
+
+// SetTheme sets the value of Theme.
+func (s *InitiateTalkSessionReq) SetTheme(val string) {
+	s.Theme = val
+}
+
+// SetScheduledEndTime sets the value of ScheduledEndTime.
+func (s *InitiateTalkSessionReq) SetScheduledEndTime(val time.Time) {
+	s.ScheduledEndTime = val
+}
+
+// SetLatitude sets the value of Latitude.
+func (s *InitiateTalkSessionReq) SetLatitude(val OptNilFloat64) {
+	s.Latitude = val
+}
+
+// SetLongitude sets the value of Longitude.
+func (s *InitiateTalkSessionReq) SetLongitude(val OptNilFloat64) {
+	s.Longitude = val
+}
+
+// SetCity sets the value of City.
+func (s *InitiateTalkSessionReq) SetCity(val OptNilString) {
+	s.City = val
+}
+
+// SetPrefecture sets the value of Prefecture.
+func (s *InitiateTalkSessionReq) SetPrefecture(val OptNilString) {
+	s.Prefecture = val
+}
+
+// SetDescription sets the value of Description.
+func (s *InitiateTalkSessionReq) SetDescription(val OptNilString) {
+	s.Description = val
+}
+
+// SetThumbnailURL sets the value of ThumbnailURL.
+func (s *InitiateTalkSessionReq) SetThumbnailURL(val OptNilString) {
+	s.ThumbnailURL = val
+}
+
+// SetRestrictions sets the value of Restrictions.
+func (s *InitiateTalkSessionReq) SetRestrictions(val []string) {
+	s.Restrictions = val
+}
+
+// SetOrganizationAliasID sets the value of OrganizationAliasID.
+func (s *InitiateTalkSessionReq) SetOrganizationAliasID(val OptNilString) {
+	s.OrganizationAliasID = val
+}
 
 type InviteOrganizationBadRequest struct{}
 
@@ -2264,34 +2337,6 @@ func (s *InviteOrganizationReq) SetRole(val float64) {
 	s.Role = val
 }
 
-// Ref: #/components/schemas/location
-type Location struct {
-	// 緯度.
-	Latitude OptFloat64 `json:"latitude"`
-	// 経度.
-	Longitude OptFloat64 `json:"longitude"`
-}
-
-// GetLatitude returns the value of Latitude.
-func (s *Location) GetLatitude() OptFloat64 {
-	return s.Latitude
-}
-
-// GetLongitude returns the value of Longitude.
-func (s *Location) GetLongitude() OptFloat64 {
-	return s.Longitude
-}
-
-// SetLatitude sets the value of Latitude.
-func (s *Location) SetLatitude(val OptFloat64) {
-	s.Latitude = val
-}
-
-// SetLongitude sets the value of Longitude.
-func (s *Location) SetLongitude(val OptFloat64) {
-	s.Longitude = val
-}
-
 // NewNilVote2ReqVoteStatus returns new NilVote2ReqVoteStatus with value set to v.
 func NewNilVote2ReqVoteStatus(v Vote2ReqVoteStatus) NilVote2ReqVoteStatus {
 	return NilVote2ReqVoteStatus{
@@ -2337,329 +2382,7 @@ func (o NilVote2ReqVoteStatus) Or(d Vote2ReqVoteStatus) Vote2ReqVoteStatus {
 	return d
 }
 
-type OAuthCallbackBadRequest struct{}
-
-func (*OAuthCallbackBadRequest) oAuthCallbackRes() {}
-
-type OAuthCallbackFound struct{}
-
-// OAuthCallbackFoundHeaders wraps OAuthCallbackFound with response headers.
-type OAuthCallbackFoundHeaders struct {
-	Location  string
-	SetCookie []string
-	Response  OAuthCallbackFound
-}
-
-// GetLocation returns the value of Location.
-func (s *OAuthCallbackFoundHeaders) GetLocation() string {
-	return s.Location
-}
-
-// GetSetCookie returns the value of SetCookie.
-func (s *OAuthCallbackFoundHeaders) GetSetCookie() []string {
-	return s.SetCookie
-}
-
-// GetResponse returns the value of Response.
-func (s *OAuthCallbackFoundHeaders) GetResponse() OAuthCallbackFound {
-	return s.Response
-}
-
-// SetLocation sets the value of Location.
-func (s *OAuthCallbackFoundHeaders) SetLocation(val string) {
-	s.Location = val
-}
-
-// SetSetCookie sets the value of SetCookie.
-func (s *OAuthCallbackFoundHeaders) SetSetCookie(val []string) {
-	s.SetCookie = val
-}
-
-// SetResponse sets the value of Response.
-func (s *OAuthCallbackFoundHeaders) SetResponse(val OAuthCallbackFound) {
-	s.Response = val
-}
-
-func (*OAuthCallbackFoundHeaders) oAuthCallbackRes() {}
-
-type OAuthCallbackInternalServerError struct{}
-
-func (*OAuthCallbackInternalServerError) oAuthCallbackRes() {}
-
-type OAuthTokenInfoBadRequest struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-}
-
-// GetCode returns the value of Code.
-func (s *OAuthTokenInfoBadRequest) GetCode() string {
-	return s.Code
-}
-
-// GetMessage returns the value of Message.
-func (s *OAuthTokenInfoBadRequest) GetMessage() string {
-	return s.Message
-}
-
-// SetCode sets the value of Code.
-func (s *OAuthTokenInfoBadRequest) SetCode(val string) {
-	s.Code = val
-}
-
-// SetMessage sets the value of Message.
-func (s *OAuthTokenInfoBadRequest) SetMessage(val string) {
-	s.Message = val
-}
-
-func (*OAuthTokenInfoBadRequest) oAuthTokenInfoRes() {}
-
-type OAuthTokenInfoInternalServerError struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-}
-
-// GetCode returns the value of Code.
-func (s *OAuthTokenInfoInternalServerError) GetCode() string {
-	return s.Code
-}
-
-// GetMessage returns the value of Message.
-func (s *OAuthTokenInfoInternalServerError) GetMessage() string {
-	return s.Message
-}
-
-// SetCode sets the value of Code.
-func (s *OAuthTokenInfoInternalServerError) SetCode(val string) {
-	s.Code = val
-}
-
-// SetMessage sets the value of Message.
-func (s *OAuthTokenInfoInternalServerError) SetMessage(val string) {
-	s.Message = val
-}
-
-func (*OAuthTokenInfoInternalServerError) oAuthTokenInfoRes() {}
-
-type OAuthTokenInfoOK struct {
-	Aud                    string       `json:"aud"`
-	Exp                    string       `json:"exp"`
-	Iat                    string       `json:"iat"`
-	Iss                    string       `json:"iss"`
-	Sub                    string       `json:"sub"`
-	Jti                    string       `json:"jti"`
-	DisplayID              OptString    `json:"displayID"`
-	DisplayName            OptString    `json:"displayName"`
-	IconURL                OptString    `json:"iconURL"`
-	IsRegistered           bool         `json:"isRegistered"`
-	IsEmailVerified        bool         `json:"isEmailVerified"`
-	RequiredPasswordChange bool         `json:"requiredPasswordChange"`
-	OrgType                OptNilInt    `json:"orgType"`
-	OrganizationRole       OptNilString `json:"organizationRole"`
-	OrganizationCode       OptNilString `json:"organizationCode"`
-	OrganizationID         OptNilString `json:"organizationID"`
-}
-
-// GetAud returns the value of Aud.
-func (s *OAuthTokenInfoOK) GetAud() string {
-	return s.Aud
-}
-
-// GetExp returns the value of Exp.
-func (s *OAuthTokenInfoOK) GetExp() string {
-	return s.Exp
-}
-
-// GetIat returns the value of Iat.
-func (s *OAuthTokenInfoOK) GetIat() string {
-	return s.Iat
-}
-
-// GetIss returns the value of Iss.
-func (s *OAuthTokenInfoOK) GetIss() string {
-	return s.Iss
-}
-
-// GetSub returns the value of Sub.
-func (s *OAuthTokenInfoOK) GetSub() string {
-	return s.Sub
-}
-
-// GetJti returns the value of Jti.
-func (s *OAuthTokenInfoOK) GetJti() string {
-	return s.Jti
-}
-
-// GetDisplayID returns the value of DisplayID.
-func (s *OAuthTokenInfoOK) GetDisplayID() OptString {
-	return s.DisplayID
-}
-
-// GetDisplayName returns the value of DisplayName.
-func (s *OAuthTokenInfoOK) GetDisplayName() OptString {
-	return s.DisplayName
-}
-
-// GetIconURL returns the value of IconURL.
-func (s *OAuthTokenInfoOK) GetIconURL() OptString {
-	return s.IconURL
-}
-
-// GetIsRegistered returns the value of IsRegistered.
-func (s *OAuthTokenInfoOK) GetIsRegistered() bool {
-	return s.IsRegistered
-}
-
-// GetIsEmailVerified returns the value of IsEmailVerified.
-func (s *OAuthTokenInfoOK) GetIsEmailVerified() bool {
-	return s.IsEmailVerified
-}
-
-// GetRequiredPasswordChange returns the value of RequiredPasswordChange.
-func (s *OAuthTokenInfoOK) GetRequiredPasswordChange() bool {
-	return s.RequiredPasswordChange
-}
-
-// GetOrgType returns the value of OrgType.
-func (s *OAuthTokenInfoOK) GetOrgType() OptNilInt {
-	return s.OrgType
-}
-
-// GetOrganizationRole returns the value of OrganizationRole.
-func (s *OAuthTokenInfoOK) GetOrganizationRole() OptNilString {
-	return s.OrganizationRole
-}
-
-// GetOrganizationCode returns the value of OrganizationCode.
-func (s *OAuthTokenInfoOK) GetOrganizationCode() OptNilString {
-	return s.OrganizationCode
-}
-
-// GetOrganizationID returns the value of OrganizationID.
-func (s *OAuthTokenInfoOK) GetOrganizationID() OptNilString {
-	return s.OrganizationID
-}
-
-// SetAud sets the value of Aud.
-func (s *OAuthTokenInfoOK) SetAud(val string) {
-	s.Aud = val
-}
-
-// SetExp sets the value of Exp.
-func (s *OAuthTokenInfoOK) SetExp(val string) {
-	s.Exp = val
-}
-
-// SetIat sets the value of Iat.
-func (s *OAuthTokenInfoOK) SetIat(val string) {
-	s.Iat = val
-}
-
-// SetIss sets the value of Iss.
-func (s *OAuthTokenInfoOK) SetIss(val string) {
-	s.Iss = val
-}
-
-// SetSub sets the value of Sub.
-func (s *OAuthTokenInfoOK) SetSub(val string) {
-	s.Sub = val
-}
-
-// SetJti sets the value of Jti.
-func (s *OAuthTokenInfoOK) SetJti(val string) {
-	s.Jti = val
-}
-
-// SetDisplayID sets the value of DisplayID.
-func (s *OAuthTokenInfoOK) SetDisplayID(val OptString) {
-	s.DisplayID = val
-}
-
-// SetDisplayName sets the value of DisplayName.
-func (s *OAuthTokenInfoOK) SetDisplayName(val OptString) {
-	s.DisplayName = val
-}
-
-// SetIconURL sets the value of IconURL.
-func (s *OAuthTokenInfoOK) SetIconURL(val OptString) {
-	s.IconURL = val
-}
-
-// SetIsRegistered sets the value of IsRegistered.
-func (s *OAuthTokenInfoOK) SetIsRegistered(val bool) {
-	s.IsRegistered = val
-}
-
-// SetIsEmailVerified sets the value of IsEmailVerified.
-func (s *OAuthTokenInfoOK) SetIsEmailVerified(val bool) {
-	s.IsEmailVerified = val
-}
-
-// SetRequiredPasswordChange sets the value of RequiredPasswordChange.
-func (s *OAuthTokenInfoOK) SetRequiredPasswordChange(val bool) {
-	s.RequiredPasswordChange = val
-}
-
-// SetOrgType sets the value of OrgType.
-func (s *OAuthTokenInfoOK) SetOrgType(val OptNilInt) {
-	s.OrgType = val
-}
-
-// SetOrganizationRole sets the value of OrganizationRole.
-func (s *OAuthTokenInfoOK) SetOrganizationRole(val OptNilString) {
-	s.OrganizationRole = val
-}
-
-// SetOrganizationCode sets the value of OrganizationCode.
-func (s *OAuthTokenInfoOK) SetOrganizationCode(val OptNilString) {
-	s.OrganizationCode = val
-}
-
-// SetOrganizationID sets the value of OrganizationID.
-func (s *OAuthTokenInfoOK) SetOrganizationID(val OptNilString) {
-	s.OrganizationID = val
-}
-
-func (*OAuthTokenInfoOK) oAuthTokenInfoRes() {}
-
-type OAuthTokenRevokeBadRequest struct{}
-
-func (*OAuthTokenRevokeBadRequest) oAuthTokenRevokeRes() {}
-
-type OAuthTokenRevokeInternalServerError struct{}
-
-func (*OAuthTokenRevokeInternalServerError) oAuthTokenRevokeRes() {}
-
-type OAuthTokenRevokeNoContent struct{}
-
-// OAuthTokenRevokeNoContentHeaders wraps OAuthTokenRevokeNoContent with response headers.
-type OAuthTokenRevokeNoContentHeaders struct {
-	SetCookie []string
-	Response  OAuthTokenRevokeNoContent
-}
-
-// GetSetCookie returns the value of SetCookie.
-func (s *OAuthTokenRevokeNoContentHeaders) GetSetCookie() []string {
-	return s.SetCookie
-}
-
-// GetResponse returns the value of Response.
-func (s *OAuthTokenRevokeNoContentHeaders) GetResponse() OAuthTokenRevokeNoContent {
-	return s.Response
-}
-
-// SetSetCookie sets the value of SetCookie.
-func (s *OAuthTokenRevokeNoContentHeaders) SetSetCookie(val []string) {
-	s.SetCookie = val
-}
-
-// SetResponse sets the value of Response.
-func (s *OAuthTokenRevokeNoContentHeaders) SetResponse(val OAuthTokenRevokeNoContent) {
-	s.Response = val
-}
-
-func (*OAuthTokenRevokeNoContentHeaders) oAuthTokenRevokeRes() {}
-
-// Ref: #/components/schemas/offsetPagination
+// Ref: #/components/schemas/OffsetPagination
 type OffsetPagination struct {
 	TotalCount int `json:"totalCount"`
 	Offset     int `json:"offset"`
@@ -2696,7 +2419,7 @@ func (s *OffsetPagination) SetLimit(val int) {
 	s.Limit = val
 }
 
-// Ref: #/components/schemas/opinion
+// Ref: #/components/schemas/Opinion
 type Opinion struct {
 	// 意見ID.
 	ID    string    `json:"id"`
@@ -2911,6 +2634,7 @@ func (s *OpinionComments2OKOpinionsItem) SetMyVoteType(val OptNilOpinionComments
 	s.MyVoteType = val
 }
 
+// 投票タイプ.
 type OpinionComments2OKOpinionsItemMyVoteType string
 
 const (
@@ -2959,7 +2683,7 @@ func (s *OpinionComments2OKOpinionsItemMyVoteType) UnmarshalText(data []byte) er
 	}
 }
 
-// Ref: #/components/schemas/opinionGroupRatio
+// Ref: #/components/schemas/OpinionGroupRatio
 type OpinionGroupRatio struct {
 	AgreeCount    int    `json:"agreeCount"`
 	DisagreeCount int    `json:"disagreeCount"`
@@ -3018,20 +2742,20 @@ func (s *OpinionGroupRatio) SetGroupName(val string) {
 	s.GroupName = val
 }
 
-// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+// 投票タイプ.
 type OpinionVoteType string
 
 const (
-	OpinionVoteTypeDisagree OpinionVoteType = "disagree"
 	OpinionVoteTypeAgree    OpinionVoteType = "agree"
+	OpinionVoteTypeDisagree OpinionVoteType = "disagree"
 	OpinionVoteTypePass     OpinionVoteType = "pass"
 )
 
 // AllValues returns all OpinionVoteType values.
 func (OpinionVoteType) AllValues() []OpinionVoteType {
 	return []OpinionVoteType{
-		OpinionVoteTypeDisagree,
 		OpinionVoteTypeAgree,
+		OpinionVoteTypeDisagree,
 		OpinionVoteTypePass,
 	}
 }
@@ -3039,9 +2763,9 @@ func (OpinionVoteType) AllValues() []OpinionVoteType {
 // MarshalText implements encoding.TextMarshaler.
 func (s OpinionVoteType) MarshalText() ([]byte, error) {
 	switch s {
-	case OpinionVoteTypeDisagree:
-		return []byte(s), nil
 	case OpinionVoteTypeAgree:
+		return []byte(s), nil
+	case OpinionVoteTypeDisagree:
 		return []byte(s), nil
 	case OpinionVoteTypePass:
 		return []byte(s), nil
@@ -3053,11 +2777,11 @@ func (s OpinionVoteType) MarshalText() ([]byte, error) {
 // UnmarshalText implements encoding.TextUnmarshaler.
 func (s *OpinionVoteType) UnmarshalText(data []byte) error {
 	switch OpinionVoteType(data) {
-	case OpinionVoteTypeDisagree:
-		*s = OpinionVoteTypeDisagree
-		return nil
 	case OpinionVoteTypeAgree:
 		*s = OpinionVoteTypeAgree
+		return nil
+	case OpinionVoteTypeDisagree:
+		*s = OpinionVoteTypeDisagree
 		return nil
 	case OpinionVoteTypePass:
 		*s = OpinionVoteTypePass
@@ -3614,52 +3338,6 @@ func (o OptInt32) Or(d int32) int32 {
 	return d
 }
 
-// NewOptLocation returns new OptLocation with value set to v.
-func NewOptLocation(v Location) OptLocation {
-	return OptLocation{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptLocation is optional Location.
-type OptLocation struct {
-	Value Location
-	Set   bool
-}
-
-// IsSet returns true if OptLocation was set.
-func (o OptLocation) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptLocation) Reset() {
-	var v Location
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptLocation) SetTo(v Location) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptLocation) Get() (v Location, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptLocation) Or(d Location) Location {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptMultipartFile returns new OptMultipartFile with value set to v.
 func NewOptMultipartFile(v ht.MultipartFile) OptMultipartFile {
 	return OptMultipartFile{
@@ -3769,52 +3447,52 @@ func (o OptNilBool) Or(d bool) bool {
 	return d
 }
 
-// NewOptNilEditUserProfileReqGender returns new OptNilEditUserProfileReqGender with value set to v.
-func NewOptNilEditUserProfileReqGender(v EditUserProfileReqGender) OptNilEditUserProfileReqGender {
-	return OptNilEditUserProfileReqGender{
+// NewOptNilEstablishUserReqGender returns new OptNilEstablishUserReqGender with value set to v.
+func NewOptNilEstablishUserReqGender(v EstablishUserReqGender) OptNilEstablishUserReqGender {
+	return OptNilEstablishUserReqGender{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptNilEditUserProfileReqGender is optional nullable EditUserProfileReqGender.
-type OptNilEditUserProfileReqGender struct {
-	Value EditUserProfileReqGender
+// OptNilEstablishUserReqGender is optional nullable EstablishUserReqGender.
+type OptNilEstablishUserReqGender struct {
+	Value EstablishUserReqGender
 	Set   bool
 	Null  bool
 }
 
-// IsSet returns true if OptNilEditUserProfileReqGender was set.
-func (o OptNilEditUserProfileReqGender) IsSet() bool { return o.Set }
+// IsSet returns true if OptNilEstablishUserReqGender was set.
+func (o OptNilEstablishUserReqGender) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptNilEditUserProfileReqGender) Reset() {
-	var v EditUserProfileReqGender
+func (o *OptNilEstablishUserReqGender) Reset() {
+	var v EstablishUserReqGender
 	o.Value = v
 	o.Set = false
 	o.Null = false
 }
 
 // SetTo sets value to v.
-func (o *OptNilEditUserProfileReqGender) SetTo(v EditUserProfileReqGender) {
+func (o *OptNilEstablishUserReqGender) SetTo(v EstablishUserReqGender) {
 	o.Set = true
 	o.Null = false
 	o.Value = v
 }
 
 // IsSet returns true if value is Null.
-func (o OptNilEditUserProfileReqGender) IsNull() bool { return o.Null }
+func (o OptNilEstablishUserReqGender) IsNull() bool { return o.Null }
 
 // SetNull sets value to null.
-func (o *OptNilEditUserProfileReqGender) SetToNull() {
+func (o *OptNilEstablishUserReqGender) SetToNull() {
 	o.Set = true
 	o.Null = true
-	var v EditUserProfileReqGender
+	var v EstablishUserReqGender
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptNilEditUserProfileReqGender) Get() (v EditUserProfileReqGender, ok bool) {
+func (o OptNilEstablishUserReqGender) Get() (v EstablishUserReqGender, ok bool) {
 	if o.Null {
 		return v, false
 	}
@@ -3825,7 +3503,7 @@ func (o OptNilEditUserProfileReqGender) Get() (v EditUserProfileReqGender, ok bo
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptNilEditUserProfileReqGender) Or(d EditUserProfileReqGender) EditUserProfileReqGender {
+func (o OptNilEstablishUserReqGender) Or(d EstablishUserReqGender) EstablishUserReqGender {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -4462,69 +4140,6 @@ func (o OptNilOpinionsHistorySort) Or(d OpinionsHistorySort) OpinionsHistorySort
 	return d
 }
 
-// NewOptNilRegisterUserReqGender returns new OptNilRegisterUserReqGender with value set to v.
-func NewOptNilRegisterUserReqGender(v RegisterUserReqGender) OptNilRegisterUserReqGender {
-	return OptNilRegisterUserReqGender{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilRegisterUserReqGender is optional nullable RegisterUserReqGender.
-type OptNilRegisterUserReqGender struct {
-	Value RegisterUserReqGender
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilRegisterUserReqGender was set.
-func (o OptNilRegisterUserReqGender) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilRegisterUserReqGender) Reset() {
-	var v RegisterUserReqGender
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilRegisterUserReqGender) SetTo(v RegisterUserReqGender) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsSet returns true if value is Null.
-func (o OptNilRegisterUserReqGender) IsNull() bool { return o.Null }
-
-// SetNull sets value to null.
-func (o *OptNilRegisterUserReqGender) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v RegisterUserReqGender
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilRegisterUserReqGender) Get() (v RegisterUserReqGender, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilRegisterUserReqGender) Or(d RegisterUserReqGender) RegisterUserReqGender {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptNilSessionsHistoryStatus returns new OptNilSessionsHistoryStatus with value set to v.
 func NewOptNilSessionsHistoryStatus(v SessionsHistoryStatus) OptNilSessionsHistoryStatus {
 	return OptNilSessionsHistoryStatus{
@@ -4645,6 +4260,69 @@ func (o OptNilString) Get() (v string, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilString) Or(d string) string {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilUpdateUserProfileReqGender returns new OptNilUpdateUserProfileReqGender with value set to v.
+func NewOptNilUpdateUserProfileReqGender(v UpdateUserProfileReqGender) OptNilUpdateUserProfileReqGender {
+	return OptNilUpdateUserProfileReqGender{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilUpdateUserProfileReqGender is optional nullable UpdateUserProfileReqGender.
+type OptNilUpdateUserProfileReqGender struct {
+	Value UpdateUserProfileReqGender
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilUpdateUserProfileReqGender was set.
+func (o OptNilUpdateUserProfileReqGender) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilUpdateUserProfileReqGender) Reset() {
+	var v UpdateUserProfileReqGender
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilUpdateUserProfileReqGender) SetTo(v UpdateUserProfileReqGender) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilUpdateUserProfileReqGender) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilUpdateUserProfileReqGender) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v UpdateUserProfileReqGender
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilUpdateUserProfileReqGender) Get() (v UpdateUserProfileReqGender, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilUpdateUserProfileReqGender) Or(d UpdateUserProfileReqGender) UpdateUserProfileReqGender {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -4881,19 +4559,19 @@ func (o OptUserGroupPosition) Or(d UserGroupPosition) UserGroupPosition {
 	return d
 }
 
-// Ref: #/components/schemas/organization
+// Ref: #/components/schemas/Organization
 type Organization struct {
 	// 組織ID.
 	ID string `json:"ID"`
 	// 組織名.
-	Name string `json:"Name"`
+	Name string `json:"name"`
 	// 組織コード.
-	Code string `json:"Code"`
+	Code string `json:"code"`
 	// 組織のタイプ.
-	Type     int    `json:"Type"`
-	RoleName string `json:"RoleName"`
+	Type     int    `json:"type"`
+	RoleName string `json:"roleName"`
 	// ロール.
-	Role int `json:"Role"`
+	Role int `json:"role"`
 }
 
 // GetID returns the value of ID.
@@ -4969,13 +4647,13 @@ type PasswordLoginOK struct{}
 func (*PasswordLoginOK) passwordLoginRes() {}
 
 type PasswordLoginReq struct {
-	IDOrEmail string `json:"id_or_email"`
+	IdOrEmail string `json:"idOrEmail"`
 	Password  string `json:"password"`
 }
 
-// GetIDOrEmail returns the value of IDOrEmail.
-func (s *PasswordLoginReq) GetIDOrEmail() string {
-	return s.IDOrEmail
+// GetIdOrEmail returns the value of IdOrEmail.
+func (s *PasswordLoginReq) GetIdOrEmail() string {
+	return s.IdOrEmail
 }
 
 // GetPassword returns the value of Password.
@@ -4983,9 +4661,9 @@ func (s *PasswordLoginReq) GetPassword() string {
 	return s.Password
 }
 
-// SetIDOrEmail sets the value of IDOrEmail.
-func (s *PasswordLoginReq) SetIDOrEmail(val string) {
-	s.IDOrEmail = val
+// SetIdOrEmail sets the value of IdOrEmail.
+func (s *PasswordLoginReq) SetIdOrEmail(val string) {
+	s.IdOrEmail = val
 }
 
 // SetPassword sets the value of Password.
@@ -5063,7 +4741,7 @@ func (s *PolicyConsentReq) SetPolicyVersion(val string) {
 	s.PolicyVersion = val
 }
 
-// Ref: #/components/schemas/policyConsentStatus
+// Ref: #/components/schemas/PolicyConsentStatus
 type PolicyConsentStatus struct {
 	// 最新ポリシーのバージョン.
 	PolicyVersion string `json:"policyVersion"`
@@ -5313,12 +4991,12 @@ type PostTimeLineItemInternalServerError struct{}
 func (*PostTimeLineItemInternalServerError) postTimeLineItemRes() {}
 
 type PostTimeLineItemOK struct {
-	ActionItemID string `json:"ActionItemID"`
-	Sequence     int    `json:"Sequence"`
-	Content      string `json:"Content"`
-	Status       string `json:"Status"`
-	CreatedAt    string `json:"CreatedAt"`
-	UpdatedAt    string `json:"UpdatedAt"`
+	ActionItemID string `json:"actionItemID"`
+	Sequence     int    `json:"sequence"`
+	Content      string `json:"content"`
+	Status       string `json:"status"`
+	CreatedAt    string `json:"createdAt"`
+	UpdatedAt    string `json:"updatedAt"`
 }
 
 // GetActionItemID returns the value of ActionItemID.
@@ -5512,218 +5190,29 @@ func (s *RegenerateResponse) SetMessage(val string) {
 	s.Message = val
 }
 
-type RegisterUserBadRequest struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-}
-
-// GetCode returns the value of Code.
-func (s *RegisterUserBadRequest) GetCode() string {
-	return s.Code
-}
-
-// GetMessage returns the value of Message.
-func (s *RegisterUserBadRequest) GetMessage() string {
-	return s.Message
-}
-
-// SetCode sets the value of Code.
-func (s *RegisterUserBadRequest) SetCode(val string) {
-	s.Code = val
-}
-
-// SetMessage sets the value of Message.
-func (s *RegisterUserBadRequest) SetMessage(val string) {
-	s.Message = val
-}
-
-func (*RegisterUserBadRequest) registerUserRes() {}
-
-type RegisterUserInternalServerError struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-}
-
-// GetCode returns the value of Code.
-func (s *RegisterUserInternalServerError) GetCode() string {
-	return s.Code
-}
-
-// GetMessage returns the value of Message.
-func (s *RegisterUserInternalServerError) GetMessage() string {
-	return s.Message
-}
-
-// SetCode sets the value of Code.
-func (s *RegisterUserInternalServerError) SetCode(val string) {
-	s.Code = val
-}
-
-// SetMessage sets the value of Message.
-func (s *RegisterUserInternalServerError) SetMessage(val string) {
-	s.Message = val
-}
-
-func (*RegisterUserInternalServerError) registerUserRes() {}
-
-type RegisterUserOK struct {
-	DisplayID   string       `json:"displayID"`
-	DisplayName string       `json:"displayName"`
-	IconURL     OptNilString `json:"iconURL"`
-}
-
-// GetDisplayID returns the value of DisplayID.
-func (s *RegisterUserOK) GetDisplayID() string {
-	return s.DisplayID
-}
-
-// GetDisplayName returns the value of DisplayName.
-func (s *RegisterUserOK) GetDisplayName() string {
-	return s.DisplayName
-}
-
-// GetIconURL returns the value of IconURL.
-func (s *RegisterUserOK) GetIconURL() OptNilString {
-	return s.IconURL
-}
-
-// SetDisplayID sets the value of DisplayID.
-func (s *RegisterUserOK) SetDisplayID(val string) {
-	s.DisplayID = val
-}
-
-// SetDisplayName sets the value of DisplayName.
-func (s *RegisterUserOK) SetDisplayName(val string) {
-	s.DisplayName = val
-}
-
-// SetIconURL sets the value of IconURL.
-func (s *RegisterUserOK) SetIconURL(val OptNilString) {
-	s.IconURL = val
-}
-
-func (*RegisterUserOK) registerUserRes() {}
-
-type RegisterUserReq struct {
-	DisplayName string                      `json:"displayName"`
-	DisplayID   string                      `json:"displayID"`
-	Icon        OptMultipartFile            `json:"icon"`
-	DateOfBirth OptString                   `json:"dateOfBirth"`
-	Gender      OptNilRegisterUserReqGender `json:"gender"`
-	Prefecture  OptString                   `json:"prefecture"`
-	City        OptNilString                `json:"city"`
-	Email       OptNilString                `json:"email"`
-}
-
-// GetDisplayName returns the value of DisplayName.
-func (s *RegisterUserReq) GetDisplayName() string {
-	return s.DisplayName
-}
-
-// GetDisplayID returns the value of DisplayID.
-func (s *RegisterUserReq) GetDisplayID() string {
-	return s.DisplayID
-}
-
-// GetIcon returns the value of Icon.
-func (s *RegisterUserReq) GetIcon() OptMultipartFile {
-	return s.Icon
-}
-
-// GetDateOfBirth returns the value of DateOfBirth.
-func (s *RegisterUserReq) GetDateOfBirth() OptString {
-	return s.DateOfBirth
-}
-
-// GetGender returns the value of Gender.
-func (s *RegisterUserReq) GetGender() OptNilRegisterUserReqGender {
-	return s.Gender
-}
-
-// GetPrefecture returns the value of Prefecture.
-func (s *RegisterUserReq) GetPrefecture() OptString {
-	return s.Prefecture
-}
-
-// GetCity returns the value of City.
-func (s *RegisterUserReq) GetCity() OptNilString {
-	return s.City
-}
-
-// GetEmail returns the value of Email.
-func (s *RegisterUserReq) GetEmail() OptNilString {
-	return s.Email
-}
-
-// SetDisplayName sets the value of DisplayName.
-func (s *RegisterUserReq) SetDisplayName(val string) {
-	s.DisplayName = val
-}
-
-// SetDisplayID sets the value of DisplayID.
-func (s *RegisterUserReq) SetDisplayID(val string) {
-	s.DisplayID = val
-}
-
-// SetIcon sets the value of Icon.
-func (s *RegisterUserReq) SetIcon(val OptMultipartFile) {
-	s.Icon = val
-}
-
-// SetDateOfBirth sets the value of DateOfBirth.
-func (s *RegisterUserReq) SetDateOfBirth(val OptString) {
-	s.DateOfBirth = val
-}
-
-// SetGender sets the value of Gender.
-func (s *RegisterUserReq) SetGender(val OptNilRegisterUserReqGender) {
-	s.Gender = val
-}
-
-// SetPrefecture sets the value of Prefecture.
-func (s *RegisterUserReq) SetPrefecture(val OptString) {
-	s.Prefecture = val
-}
-
-// SetCity sets the value of City.
-func (s *RegisterUserReq) SetCity(val OptNilString) {
-	s.City = val
-}
-
-// SetEmail sets the value of Email.
-func (s *RegisterUserReq) SetEmail(val OptNilString) {
-	s.Email = val
-}
-
-type RegisterUserReqGender string
+// 通報解決アクション.
+// Ref: #/components/schemas/ReportAction
+type ReportAction string
 
 const (
-	RegisterUserReqGender_0 RegisterUserReqGender = "男性"
-	RegisterUserReqGender_1 RegisterUserReqGender = "女性"
-	RegisterUserReqGender_2 RegisterUserReqGender = "その他"
-	RegisterUserReqGender_3 RegisterUserReqGender = "回答しない"
+	ReportActionDeleted ReportAction = "deleted"
+	ReportActionHold    ReportAction = "hold"
 )
 
-// AllValues returns all RegisterUserReqGender values.
-func (RegisterUserReqGender) AllValues() []RegisterUserReqGender {
-	return []RegisterUserReqGender{
-		RegisterUserReqGender_0,
-		RegisterUserReqGender_1,
-		RegisterUserReqGender_2,
-		RegisterUserReqGender_3,
+// AllValues returns all ReportAction values.
+func (ReportAction) AllValues() []ReportAction {
+	return []ReportAction{
+		ReportActionDeleted,
+		ReportActionHold,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s RegisterUserReqGender) MarshalText() ([]byte, error) {
+func (s ReportAction) MarshalText() ([]byte, error) {
 	switch s {
-	case RegisterUserReqGender_0:
+	case ReportActionDeleted:
 		return []byte(s), nil
-	case RegisterUserReqGender_1:
-		return []byte(s), nil
-	case RegisterUserReqGender_2:
-		return []byte(s), nil
-	case RegisterUserReqGender_3:
+	case ReportActionHold:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -5731,31 +5220,25 @@ func (s RegisterUserReqGender) MarshalText() ([]byte, error) {
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *RegisterUserReqGender) UnmarshalText(data []byte) error {
-	switch RegisterUserReqGender(data) {
-	case RegisterUserReqGender_0:
-		*s = RegisterUserReqGender_0
+func (s *ReportAction) UnmarshalText(data []byte) error {
+	switch ReportAction(data) {
+	case ReportActionDeleted:
+		*s = ReportActionDeleted
 		return nil
-	case RegisterUserReqGender_1:
-		*s = RegisterUserReqGender_1
-		return nil
-	case RegisterUserReqGender_2:
-		*s = RegisterUserReqGender_2
-		return nil
-	case RegisterUserReqGender_3:
-		*s = RegisterUserReqGender_3
+	case ReportActionHold:
+		*s = ReportActionHold
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
 	}
 }
 
-// Ref: #/components/schemas/reportDetail
+// Ref: #/components/schemas/ReportDetail
 type ReportDetail struct {
 	Opinion Opinion `json:"opinion"`
 	// 作成ユーザー.
 	User    ReportDetailUser          `json:"user"`
-	Status  ReportDetailStatus        `json:"status"`
+	Status  ReportStatus              `json:"status"`
 	Reasons []ReportDetailReasonsItem `json:"reasons"`
 	// この意見が通報を受けた回数.
 	ReportCount int `json:"reportCount"`
@@ -5772,7 +5255,7 @@ func (s *ReportDetail) GetUser() ReportDetailUser {
 }
 
 // GetStatus returns the value of Status.
-func (s *ReportDetail) GetStatus() ReportDetailStatus {
+func (s *ReportDetail) GetStatus() ReportStatus {
 	return s.Status
 }
 
@@ -5797,7 +5280,7 @@ func (s *ReportDetail) SetUser(val ReportDetailUser) {
 }
 
 // SetStatus sets the value of Status.
-func (s *ReportDetail) SetStatus(val ReportDetailStatus) {
+func (s *ReportDetail) SetStatus(val ReportStatus) {
 	s.Status = val
 }
 
@@ -5836,54 +5319,6 @@ func (s *ReportDetailReasonsItem) SetReason(val string) {
 // SetContent sets the value of Content.
 func (s *ReportDetailReasonsItem) SetContent(val OptNilString) {
 	s.Content = val
-}
-
-type ReportDetailStatus string
-
-const (
-	ReportDetailStatusUnsolved ReportDetailStatus = "unsolved"
-	ReportDetailStatusDeleted  ReportDetailStatus = "deleted"
-	ReportDetailStatusHold     ReportDetailStatus = "hold"
-)
-
-// AllValues returns all ReportDetailStatus values.
-func (ReportDetailStatus) AllValues() []ReportDetailStatus {
-	return []ReportDetailStatus{
-		ReportDetailStatusUnsolved,
-		ReportDetailStatusDeleted,
-		ReportDetailStatusHold,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s ReportDetailStatus) MarshalText() ([]byte, error) {
-	switch s {
-	case ReportDetailStatusUnsolved:
-		return []byte(s), nil
-	case ReportDetailStatusDeleted:
-		return []byte(s), nil
-	case ReportDetailStatusHold:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *ReportDetailStatus) UnmarshalText(data []byte) error {
-	switch ReportDetailStatus(data) {
-	case ReportDetailStatusUnsolved:
-		*s = ReportDetailStatusUnsolved
-		return nil
-	case ReportDetailStatusDeleted:
-		*s = ReportDetailStatusDeleted
-		return nil
-	case ReportDetailStatusHold:
-		*s = ReportDetailStatusHold
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
 }
 
 type ReportDetailUser struct {
@@ -5959,7 +5394,7 @@ func (s *ReportOpinionReq) SetContent(val OptNilString) {
 	s.Content = val
 }
 
-// Ref: #/components/schemas/reportReason
+// Ref: #/components/schemas/ReportReason
 type ReportReason struct {
 	// 1.
 	ReasonID int `json:"reasonID"`
@@ -5987,7 +5422,57 @@ func (s *ReportReason) SetReason(val string) {
 	s.Reason = val
 }
 
-// Ref: #/components/schemas/restriction
+// 通報ステータス.
+// Ref: #/components/schemas/ReportStatus
+type ReportStatus string
+
+const (
+	ReportStatusUnsolved ReportStatus = "unsolved"
+	ReportStatusDeleted  ReportStatus = "deleted"
+	ReportStatusHold     ReportStatus = "hold"
+)
+
+// AllValues returns all ReportStatus values.
+func (ReportStatus) AllValues() []ReportStatus {
+	return []ReportStatus{
+		ReportStatusUnsolved,
+		ReportStatusDeleted,
+		ReportStatusHold,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s ReportStatus) MarshalText() ([]byte, error) {
+	switch s {
+	case ReportStatusUnsolved:
+		return []byte(s), nil
+	case ReportStatusDeleted:
+		return []byte(s), nil
+	case ReportStatusHold:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *ReportStatus) UnmarshalText(data []byte) error {
+	switch ReportStatus(data) {
+	case ReportStatusUnsolved:
+		*s = ReportStatusUnsolved
+		return nil
+	case ReportStatusDeleted:
+		*s = ReportStatusDeleted
+		return nil
+	case ReportStatusHold:
+		*s = ReportStatusHold
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// Ref: #/components/schemas/Restriction
 type Restriction struct {
 	Key         string `json:"key"`
 	Description string `json:"description"`
@@ -6024,6 +5509,44 @@ func (s *Restriction) SetDescription(val string) {
 func (s *Restriction) SetDependsOn(val []string) {
 	s.DependsOn = val
 }
+
+type RevokeTokenBadRequest struct{}
+
+func (*RevokeTokenBadRequest) revokeTokenRes() {}
+
+type RevokeTokenInternalServerError struct{}
+
+func (*RevokeTokenInternalServerError) revokeTokenRes() {}
+
+type RevokeTokenNoContent struct{}
+
+// RevokeTokenNoContentHeaders wraps RevokeTokenNoContent with response headers.
+type RevokeTokenNoContentHeaders struct {
+	SetCookie []string
+	Response  RevokeTokenNoContent
+}
+
+// GetSetCookie returns the value of SetCookie.
+func (s *RevokeTokenNoContentHeaders) GetSetCookie() []string {
+	return s.SetCookie
+}
+
+// GetResponse returns the value of Response.
+func (s *RevokeTokenNoContentHeaders) GetResponse() RevokeTokenNoContent {
+	return s.Response
+}
+
+// SetSetCookie sets the value of SetCookie.
+func (s *RevokeTokenNoContentHeaders) SetSetCookie(val []string) {
+	s.SetCookie = val
+}
+
+// SetResponse sets the value of Response.
+func (s *RevokeTokenNoContentHeaders) SetResponse(val RevokeTokenNoContent) {
+	s.Response = val
+}
+
+func (*RevokeTokenNoContentHeaders) revokeTokenRes() {}
 
 type SessionsHistoryBadRequest struct{}
 
@@ -6139,58 +5662,17 @@ type SolveOpinionReportOK struct{}
 func (*SolveOpinionReportOK) solveOpinionReportRes() {}
 
 type SolveOpinionReportReq struct {
-	Action SolveOpinionReportReqAction `json:"action"`
+	Action ReportAction `json:"action"`
 }
 
 // GetAction returns the value of Action.
-func (s *SolveOpinionReportReq) GetAction() SolveOpinionReportReqAction {
+func (s *SolveOpinionReportReq) GetAction() ReportAction {
 	return s.Action
 }
 
 // SetAction sets the value of Action.
-func (s *SolveOpinionReportReq) SetAction(val SolveOpinionReportReqAction) {
+func (s *SolveOpinionReportReq) SetAction(val ReportAction) {
 	s.Action = val
-}
-
-type SolveOpinionReportReqAction string
-
-const (
-	SolveOpinionReportReqActionDeleted SolveOpinionReportReqAction = "deleted"
-	SolveOpinionReportReqActionHold    SolveOpinionReportReqAction = "hold"
-)
-
-// AllValues returns all SolveOpinionReportReqAction values.
-func (SolveOpinionReportReqAction) AllValues() []SolveOpinionReportReqAction {
-	return []SolveOpinionReportReqAction{
-		SolveOpinionReportReqActionDeleted,
-		SolveOpinionReportReqActionHold,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s SolveOpinionReportReqAction) MarshalText() ([]byte, error) {
-	switch s {
-	case SolveOpinionReportReqActionDeleted:
-		return []byte(s), nil
-	case SolveOpinionReportReqActionHold:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *SolveOpinionReportReqAction) UnmarshalText(data []byte) error {
-	switch SolveOpinionReportReqAction(data) {
-	case SolveOpinionReportReqActionDeleted:
-		*s = SolveOpinionReportReqActionDeleted
-		return nil
-	case SolveOpinionReportReqActionHold:
-		*s = SolveOpinionReportReqActionHold
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
 }
 
 type SwipeOpinionsBadRequest struct {
@@ -6310,7 +5792,7 @@ func (s *SwipeOpinionsOKOpinionsItem) SetUser(val User) {
 	s.User = val
 }
 
-// Ref: #/components/schemas/talkSession
+// Ref: #/components/schemas/TalkSession
 type TalkSession struct {
 	// トークセッションID.
 	ID string `json:"id"`
@@ -6459,6 +5941,7 @@ func (s *TalkSession) SetHideReport(val bool) {
 
 func (*TalkSession) editTalkSessionRes()      {}
 func (*TalkSession) getTalkSessionDetailRes() {}
+func (*TalkSession) initiateTalkSessionRes()  {}
 
 type TalkSessionAnalysisBadRequest struct {
 	Code    string `json:"code"`
@@ -6648,17 +6131,17 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) SetPassCount(val in
 
 // Ref: #/components/schemas/TalkSessionForManage
 type TalkSessionForManage struct {
-	TalkSessionID    string        `json:"TalkSessionID"`
-	Theme            string        `json:"Theme"`
-	Description      string        `json:"Description"`
-	Owner            UserForManage `json:"Owner"`
-	ScheduledEndTime time.Time     `json:"ScheduledEndTime"`
-	City             OptString     `json:"City"`
-	Prefecture       OptString     `json:"Prefecture"`
-	ThumbnailURL     string        `json:"ThumbnailURL"`
-	Hidden           bool          `json:"Hidden"`
-	UpdatedAt        string        `json:"UpdatedAt"`
-	CreatedAt        string        `json:"CreatedAt"`
+	TalkSessionID    string        `json:"talkSessionID"`
+	Theme            string        `json:"theme"`
+	Description      string        `json:"description"`
+	Owner            UserForManage `json:"owner"`
+	ScheduledEndTime time.Time     `json:"scheduledEndTime"`
+	City             OptString     `json:"city"`
+	Prefecture       OptString     `json:"prefecture"`
+	ThumbnailURL     string        `json:"thumbnailURL"`
+	Hidden           bool          `json:"hidden"`
+	UpdatedAt        string        `json:"updatedAt"`
+	CreatedAt        string        `json:"createdAt"`
 }
 
 // GetTalkSessionID returns the value of TalkSessionID.
@@ -6773,8 +6256,8 @@ func (s *TalkSessionForManage) SetCreatedAt(val string) {
 
 // Ref: #/components/schemas/TalkSessionListResponse
 type TalkSessionListResponse struct {
-	TalkSessionStats []TalkSessionStats `json:"TalkSessionStats"`
-	TotalCount       int32              `json:"TotalCount"`
+	TalkSessionStats []TalkSessionStats `json:"talkSessionStats"`
+	TotalCount       int32              `json:"totalCount"`
 }
 
 // GetTalkSessionStats returns the value of TalkSessionStats.
@@ -6862,21 +6345,21 @@ func (s *TalkSessionOwner) SetIconURL(val OptNilString) {
 
 // Ref: #/components/schemas/TalkSessionStats
 type TalkSessionStats struct {
-	TalkSessionID    string        `json:"TalkSessionID"`
-	Theme            string        `json:"Theme"`
-	Description      string        `json:"Description"`
-	Owner            UserForManage `json:"Owner"`
-	ScheduledEndTime time.Time     `json:"ScheduledEndTime"`
-	City             OptString     `json:"City"`
-	Prefecture       OptString     `json:"Prefecture"`
-	ThumbnailURL     string        `json:"ThumbnailURL"`
-	Hidden           bool          `json:"Hidden"`
-	UpdatedAt        string        `json:"UpdatedAt"`
-	CreatedAt        string        `json:"CreatedAt"`
-	OpinionCount     int32         `json:"OpinionCount"`
-	OpinionUserCount int32         `json:"OpinionUserCount"`
-	VoteCount        int32         `json:"VoteCount"`
-	VoteUserCount    int32         `json:"VoteUserCount"`
+	TalkSessionID    string        `json:"talkSessionID"`
+	Theme            string        `json:"theme"`
+	Description      string        `json:"description"`
+	Owner            UserForManage `json:"owner"`
+	ScheduledEndTime time.Time     `json:"scheduledEndTime"`
+	City             OptString     `json:"city"`
+	Prefecture       OptString     `json:"prefecture"`
+	ThumbnailURL     string        `json:"thumbnailURL"`
+	Hidden           bool          `json:"hidden"`
+	UpdatedAt        string        `json:"updatedAt"`
+	CreatedAt        string        `json:"createdAt"`
+	OpinionCount     int32         `json:"opinionCount"`
+	OpinionUserCount int32         `json:"opinionUserCount"`
+	VoteCount        int32         `json:"voteCount"`
+	VoteUserCount    int32         `json:"voteUserCount"`
 }
 
 // GetTalkSessionID returns the value of TalkSessionID.
@@ -7152,7 +6635,405 @@ func (s *ToggleReportVisibilityResponse) SetMessage(val string) {
 	s.Message = val
 }
 
-// Ref: #/components/schemas/user
+// Ref: #/components/schemas/TokenClaim
+type TokenClaim struct {
+	// Audience.
+	Aud string `json:"aud"`
+	// 有効期限.
+	Exp string `json:"exp"`
+	// 発行日時.
+	Iat string `json:"iat"`
+	// 発行者.
+	Iss string `json:"iss"`
+	// ユーザID.
+	Sub string `json:"sub"`
+	// JWT ID.
+	Jti string `json:"jti"`
+	// ユーザーID.
+	DisplayID OptString `json:"displayID"`
+	// ユーザー名.
+	DisplayName OptString `json:"displayName"`
+	// アイコンURL.
+	IconURL OptString `json:"iconURL"`
+	// ユーザ登録済みか.
+	IsRegistered    bool `json:"isRegistered"`
+	IsEmailVerified bool `json:"isEmailVerified"`
+	// アカウントの種類。組織がなければ空.
+	OrgType OptNilInt `json:"orgType"`
+	// パスワードの更新が必要かどうか.
+	RequiredPasswordChange bool `json:"requiredPasswordChange"`
+	// 組織のRole.
+	OrganizationRole OptNilString `json:"organizationRole"`
+	// 組織コード
+	// ログイン時に使用する.
+	OrganizationCode OptNilString `json:"organizationCode"`
+	// 組織ID.
+	OrganizationID OptNilString `json:"organizationID"`
+}
+
+// GetAud returns the value of Aud.
+func (s *TokenClaim) GetAud() string {
+	return s.Aud
+}
+
+// GetExp returns the value of Exp.
+func (s *TokenClaim) GetExp() string {
+	return s.Exp
+}
+
+// GetIat returns the value of Iat.
+func (s *TokenClaim) GetIat() string {
+	return s.Iat
+}
+
+// GetIss returns the value of Iss.
+func (s *TokenClaim) GetIss() string {
+	return s.Iss
+}
+
+// GetSub returns the value of Sub.
+func (s *TokenClaim) GetSub() string {
+	return s.Sub
+}
+
+// GetJti returns the value of Jti.
+func (s *TokenClaim) GetJti() string {
+	return s.Jti
+}
+
+// GetDisplayID returns the value of DisplayID.
+func (s *TokenClaim) GetDisplayID() OptString {
+	return s.DisplayID
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *TokenClaim) GetDisplayName() OptString {
+	return s.DisplayName
+}
+
+// GetIconURL returns the value of IconURL.
+func (s *TokenClaim) GetIconURL() OptString {
+	return s.IconURL
+}
+
+// GetIsRegistered returns the value of IsRegistered.
+func (s *TokenClaim) GetIsRegistered() bool {
+	return s.IsRegistered
+}
+
+// GetIsEmailVerified returns the value of IsEmailVerified.
+func (s *TokenClaim) GetIsEmailVerified() bool {
+	return s.IsEmailVerified
+}
+
+// GetOrgType returns the value of OrgType.
+func (s *TokenClaim) GetOrgType() OptNilInt {
+	return s.OrgType
+}
+
+// GetRequiredPasswordChange returns the value of RequiredPasswordChange.
+func (s *TokenClaim) GetRequiredPasswordChange() bool {
+	return s.RequiredPasswordChange
+}
+
+// GetOrganizationRole returns the value of OrganizationRole.
+func (s *TokenClaim) GetOrganizationRole() OptNilString {
+	return s.OrganizationRole
+}
+
+// GetOrganizationCode returns the value of OrganizationCode.
+func (s *TokenClaim) GetOrganizationCode() OptNilString {
+	return s.OrganizationCode
+}
+
+// GetOrganizationID returns the value of OrganizationID.
+func (s *TokenClaim) GetOrganizationID() OptNilString {
+	return s.OrganizationID
+}
+
+// SetAud sets the value of Aud.
+func (s *TokenClaim) SetAud(val string) {
+	s.Aud = val
+}
+
+// SetExp sets the value of Exp.
+func (s *TokenClaim) SetExp(val string) {
+	s.Exp = val
+}
+
+// SetIat sets the value of Iat.
+func (s *TokenClaim) SetIat(val string) {
+	s.Iat = val
+}
+
+// SetIss sets the value of Iss.
+func (s *TokenClaim) SetIss(val string) {
+	s.Iss = val
+}
+
+// SetSub sets the value of Sub.
+func (s *TokenClaim) SetSub(val string) {
+	s.Sub = val
+}
+
+// SetJti sets the value of Jti.
+func (s *TokenClaim) SetJti(val string) {
+	s.Jti = val
+}
+
+// SetDisplayID sets the value of DisplayID.
+func (s *TokenClaim) SetDisplayID(val OptString) {
+	s.DisplayID = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *TokenClaim) SetDisplayName(val OptString) {
+	s.DisplayName = val
+}
+
+// SetIconURL sets the value of IconURL.
+func (s *TokenClaim) SetIconURL(val OptString) {
+	s.IconURL = val
+}
+
+// SetIsRegistered sets the value of IsRegistered.
+func (s *TokenClaim) SetIsRegistered(val bool) {
+	s.IsRegistered = val
+}
+
+// SetIsEmailVerified sets the value of IsEmailVerified.
+func (s *TokenClaim) SetIsEmailVerified(val bool) {
+	s.IsEmailVerified = val
+}
+
+// SetOrgType sets the value of OrgType.
+func (s *TokenClaim) SetOrgType(val OptNilInt) {
+	s.OrgType = val
+}
+
+// SetRequiredPasswordChange sets the value of RequiredPasswordChange.
+func (s *TokenClaim) SetRequiredPasswordChange(val bool) {
+	s.RequiredPasswordChange = val
+}
+
+// SetOrganizationRole sets the value of OrganizationRole.
+func (s *TokenClaim) SetOrganizationRole(val OptNilString) {
+	s.OrganizationRole = val
+}
+
+// SetOrganizationCode sets the value of OrganizationCode.
+func (s *TokenClaim) SetOrganizationCode(val OptNilString) {
+	s.OrganizationCode = val
+}
+
+// SetOrganizationID sets the value of OrganizationID.
+func (s *TokenClaim) SetOrganizationID(val OptNilString) {
+	s.OrganizationID = val
+}
+
+func (*TokenClaim) getTokenInfoRes() {}
+
+type UpdateUserProfileBadRequest struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *UpdateUserProfileBadRequest) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *UpdateUserProfileBadRequest) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *UpdateUserProfileBadRequest) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *UpdateUserProfileBadRequest) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*UpdateUserProfileBadRequest) updateUserProfileRes() {}
+
+type UpdateUserProfileInternalServerError struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *UpdateUserProfileInternalServerError) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *UpdateUserProfileInternalServerError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *UpdateUserProfileInternalServerError) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *UpdateUserProfileInternalServerError) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*UpdateUserProfileInternalServerError) updateUserProfileRes() {}
+
+type UpdateUserProfileReq struct {
+	DisplayName OptNilString                     `json:"displayName"`
+	Icon        OptMultipartFile                 `json:"icon"`
+	DeleteIcon  OptNilBool                       `json:"deleteIcon"`
+	DateOfBirth OptString                        `json:"dateOfBirth"`
+	Gender      OptNilUpdateUserProfileReqGender `json:"gender"`
+	City        OptNilString                     `json:"city"`
+	Prefecture  OptNilString                     `json:"prefecture"`
+	Email       OptNilString                     `json:"email"`
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *UpdateUserProfileReq) GetDisplayName() OptNilString {
+	return s.DisplayName
+}
+
+// GetIcon returns the value of Icon.
+func (s *UpdateUserProfileReq) GetIcon() OptMultipartFile {
+	return s.Icon
+}
+
+// GetDeleteIcon returns the value of DeleteIcon.
+func (s *UpdateUserProfileReq) GetDeleteIcon() OptNilBool {
+	return s.DeleteIcon
+}
+
+// GetDateOfBirth returns the value of DateOfBirth.
+func (s *UpdateUserProfileReq) GetDateOfBirth() OptString {
+	return s.DateOfBirth
+}
+
+// GetGender returns the value of Gender.
+func (s *UpdateUserProfileReq) GetGender() OptNilUpdateUserProfileReqGender {
+	return s.Gender
+}
+
+// GetCity returns the value of City.
+func (s *UpdateUserProfileReq) GetCity() OptNilString {
+	return s.City
+}
+
+// GetPrefecture returns the value of Prefecture.
+func (s *UpdateUserProfileReq) GetPrefecture() OptNilString {
+	return s.Prefecture
+}
+
+// GetEmail returns the value of Email.
+func (s *UpdateUserProfileReq) GetEmail() OptNilString {
+	return s.Email
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *UpdateUserProfileReq) SetDisplayName(val OptNilString) {
+	s.DisplayName = val
+}
+
+// SetIcon sets the value of Icon.
+func (s *UpdateUserProfileReq) SetIcon(val OptMultipartFile) {
+	s.Icon = val
+}
+
+// SetDeleteIcon sets the value of DeleteIcon.
+func (s *UpdateUserProfileReq) SetDeleteIcon(val OptNilBool) {
+	s.DeleteIcon = val
+}
+
+// SetDateOfBirth sets the value of DateOfBirth.
+func (s *UpdateUserProfileReq) SetDateOfBirth(val OptString) {
+	s.DateOfBirth = val
+}
+
+// SetGender sets the value of Gender.
+func (s *UpdateUserProfileReq) SetGender(val OptNilUpdateUserProfileReqGender) {
+	s.Gender = val
+}
+
+// SetCity sets the value of City.
+func (s *UpdateUserProfileReq) SetCity(val OptNilString) {
+	s.City = val
+}
+
+// SetPrefecture sets the value of Prefecture.
+func (s *UpdateUserProfileReq) SetPrefecture(val OptNilString) {
+	s.Prefecture = val
+}
+
+// SetEmail sets the value of Email.
+func (s *UpdateUserProfileReq) SetEmail(val OptNilString) {
+	s.Email = val
+}
+
+type UpdateUserProfileReqGender string
+
+const (
+	UpdateUserProfileReqGender_0 UpdateUserProfileReqGender = "男性"
+	UpdateUserProfileReqGender_1 UpdateUserProfileReqGender = "女性"
+	UpdateUserProfileReqGender_2 UpdateUserProfileReqGender = "その他"
+	UpdateUserProfileReqGender_3 UpdateUserProfileReqGender = "回答しない"
+)
+
+// AllValues returns all UpdateUserProfileReqGender values.
+func (UpdateUserProfileReqGender) AllValues() []UpdateUserProfileReqGender {
+	return []UpdateUserProfileReqGender{
+		UpdateUserProfileReqGender_0,
+		UpdateUserProfileReqGender_1,
+		UpdateUserProfileReqGender_2,
+		UpdateUserProfileReqGender_3,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s UpdateUserProfileReqGender) MarshalText() ([]byte, error) {
+	switch s {
+	case UpdateUserProfileReqGender_0:
+		return []byte(s), nil
+	case UpdateUserProfileReqGender_1:
+		return []byte(s), nil
+	case UpdateUserProfileReqGender_2:
+		return []byte(s), nil
+	case UpdateUserProfileReqGender_3:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *UpdateUserProfileReqGender) UnmarshalText(data []byte) error {
+	switch UpdateUserProfileReqGender(data) {
+	case UpdateUserProfileReqGender_0:
+		*s = UpdateUserProfileReqGender_0
+		return nil
+	case UpdateUserProfileReqGender_1:
+		*s = UpdateUserProfileReqGender_1
+		return nil
+	case UpdateUserProfileReqGender_2:
+		*s = UpdateUserProfileReqGender_2
+		return nil
+	case UpdateUserProfileReqGender_3:
+		*s = UpdateUserProfileReqGender_3
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// Ref: #/components/schemas/User
 type User struct {
 	DisplayID   string       `json:"displayID"`
 	DisplayName string       `json:"displayName"`
@@ -7189,7 +7070,10 @@ func (s *User) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
 
-// Ref: #/components/schemas/userDemographics
+func (*User) establishUserRes()     {}
+func (*User) updateUserProfileRes() {}
+
+// Ref: #/components/schemas/UserDemographics
 type UserDemographics struct {
 	// 生年月日.
 	DateOfBirth OptNilInt `json:"dateOfBirth"`
@@ -7329,7 +7213,7 @@ func (s *UserForManage) SetUpdatedAt(val time.Time) {
 	s.UpdatedAt = val
 }
 
-// Ref: #/components/schemas/userGroupPosition
+// Ref: #/components/schemas/UserGroupPosition
 type UserGroupPosition struct {
 	PosX        float64      `json:"posX"`
 	PosY        float64      `json:"posY"`
@@ -7581,6 +7465,7 @@ func (s *Vote2Req) SetVoteStatus(val NilVote2ReqVoteStatus) {
 	s.VoteStatus = val
 }
 
+// 投票タイプ.
 type Vote2ReqVoteStatus string
 
 const (

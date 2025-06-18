@@ -113,6 +113,8 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					nil, // location
 					lo.ToPtr("初期市区町村"),
 					lo.ToPtr("初期都道府県"),
+					nil, // organizationID
+					nil, // organizationAliasID
 				)
 				return data.TalkSessionRepo.Create(ctx, data.TalkSession)
 			},
@@ -206,6 +208,8 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					nil,
 					lo.ToPtr("初期市区町村"),
 					lo.ToPtr("初期都道府県"),
+					nil, // organizationID
+					nil, // organizationAliasID
 				)
 				return data.TalkSessionRepo.Create(ctx, data.TalkSession)
 			},
@@ -270,6 +274,8 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					nil,
 					lo.ToPtr("初期市区町村"),
 					lo.ToPtr("初期都道府県"),
+					nil, // organizationID
+					nil, // organizationAliasID
 				)
 				return data.TalkSessionRepo.Create(ctx, data.TalkSession)
 			},
@@ -322,6 +328,8 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					nil,
 					lo.ToPtr("初期市区町村"),
 					lo.ToPtr("初期都道府県"),
+					nil, // organizationID
+					nil, // organizationAliasID
 				)
 				return data.TalkSessionRepo.Create(ctx, data.TalkSession)
 			},
@@ -375,6 +383,8 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					nil,
 					lo.ToPtr("初期市区町村"),
 					lo.ToPtr("初期都道府県"),
+					nil, // organizationID
+					nil, // organizationAliasID
 				)
 				return data.TalkSessionRepo.Create(ctx, data.TalkSession)
 			},
@@ -421,6 +431,8 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					nil, // location
 					lo.ToPtr("初期市区町村"),
 					lo.ToPtr("初期都道府県"),
+					nil, // organizationID
+					nil, // organizationAliasID
 				)
 				return data.TalkSessionRepo.Create(ctx, data.TalkSession)
 			},
@@ -474,6 +486,8 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					nil, // location
 					lo.ToPtr("初期市区町村"),
 					lo.ToPtr("初期都道府県"),
+					nil, // organizationID
+					nil, // organizationAliasID
 				)
 				return data.TalkSessionRepo.Create(ctx, data.TalkSession)
 			},
@@ -684,6 +698,8 @@ func TestEditTalkSessionUseCase_ProductionEnvironment(t *testing.T) {
 			nil,
 			lo.ToPtr("初期市区町村"),
 			lo.ToPtr("初期都道府県"),
+			nil, // organizationID
+			nil, // organizationAliasID
 		)
 		if err := talkSessionRepo.Create(ctx, talkSession); err != nil {
 			return err

@@ -13,6 +13,7 @@ import (
 	"github.com/neko-dream/server/internal/application/usecase/talksession_usecase"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/clock"
+	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
@@ -287,9 +288,9 @@ func (t *talkSessionHandler) GetTalkSessionReport(ctx context.Context, params oa
 	}, nil
 }
 
-// CreateTalkSession トークセッション作成
-func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req *oas.CreateTalkSessionReq) (oas.CreateTalkSessionRes, error) {
-	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.CreateTalkSession")
+// InitiateTalkSession トークセッション作成
+func (t *talkSessionHandler) InitiateTalkSession(ctx context.Context, req *oas.InitiateTalkSessionReq) (oas.InitiateTalkSessionRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.InitiateTalkSession")
 	defer span.End()
 
 	claim := session.GetSession(ctx)
@@ -309,26 +310,36 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req *oas.Cre
 		}
 	}
 
+	var organizationAliasID *shared.UUID[organization.OrganizationAlias]
+	if req.OrganizationAliasID.IsSet() && req.OrganizationAliasID.Value != "" {
+		aliasID, err := shared.ParseUUID[organization.OrganizationAlias](req.OrganizationAliasID.Value)
+		if err == nil {
+			organizationAliasID = &aliasID
+		}
+	}
+
 	out, err := t.startTalkSessionCommand.Execute(ctx, talksession_usecase.StartTalkSessionUseCaseInput{
-		Theme:            req.Theme,
-		Description:      utils.ToPtrIfNotNullValue(!req.Description.IsSet(), req.Description.Value),
-		ThumbnailURL:     utils.ToPtrIfNotNullValue(!req.ThumbnailURL.IsSet(), req.ThumbnailURL.Value),
-		OwnerID:          userID,
-		ScheduledEndTime: req.ScheduledEndTime,
-		Latitude:         utils.ToPtrIfNotNullValue(!req.Latitude.IsSet(), req.Latitude.Value),
-		Longitude:        utils.ToPtrIfNotNullValue(!req.Longitude.IsSet(), req.Longitude.Value),
-		City:             utils.ToPtrIfNotNullValue(!req.City.IsSet(), req.City.Value),
-		Prefecture:       utils.ToPtrIfNotNullValue(!req.Prefecture.IsSet(), req.Prefecture.Value),
-		Restrictions:     restrictionStrings,
+		Theme:               req.Theme,
+		Description:         utils.ToPtrIfNotNullValue(!req.Description.IsSet(), req.Description.Value),
+		ThumbnailURL:        utils.ToPtrIfNotNullValue(!req.ThumbnailURL.IsSet(), req.ThumbnailURL.Value),
+		OwnerID:             userID,
+		ScheduledEndTime:    req.ScheduledEndTime,
+		Latitude:            utils.ToPtrIfNotNullValue(!req.Latitude.IsSet(), req.Latitude.Value),
+		Longitude:           utils.ToPtrIfNotNullValue(!req.Longitude.IsSet(), req.Longitude.Value),
+		City:                utils.ToPtrIfNotNullValue(!req.City.IsSet(), req.City.Value),
+		Prefecture:          utils.ToPtrIfNotNullValue(!req.Prefecture.IsSet(), req.Prefecture.Value),
+		Restrictions:        restrictionStrings,
+		SessionClaim:        claim,
+		OrganizationAliasID: organizationAliasID,
 	})
 	if err != nil {
 		return nil, errtrace.Wrap(err)
 	}
 
-	var location oas.OptLocation
+	var location oas.OptTalkSessionLocation
 	if out.HasLocation() {
-		location = oas.OptLocation{
-			Value: oas.Location{
+		location = oas.OptTalkSessionLocation{
+			Value: oas.TalkSessionLocation{
 				Latitude:  utils.ToOpt[oas.OptFloat64](out.Latitude),
 				Longitude: utils.ToOpt[oas.OptFloat64](out.Longitude),
 			},
@@ -345,9 +356,9 @@ func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req *oas.Cre
 		})
 	}
 
-	res := &oas.CreateTalkSessionOK{
+	res := &oas.TalkSession{
 		ID: out.TalkSession.TalkSessionID.String(),
-		Owner: oas.User{
+		Owner: oas.TalkSessionOwner{
 			DisplayID:   out.User.DisplayID,
 			DisplayName: out.User.DisplayName,
 			IconURL:     utils.ToOptNil[oas.OptNilString](out.User.IconURL),
@@ -850,7 +861,7 @@ func (t *talkSessionHandler) GetReportsForTalkSession(ctx context.Context, param
 				DisplayName: report.User.DisplayName,
 				IconURL:     utils.ToOptNil[oas.OptNilString](report.User.IconURL),
 			},
-			Status:      oas.ReportDetailStatus(report.Status),
+			Status:      oas.ReportStatus(report.Status),
 			Reasons:     reasons,
 			ReportCount: report.ReportCount,
 		})

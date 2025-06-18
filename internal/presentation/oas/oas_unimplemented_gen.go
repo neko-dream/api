@@ -49,33 +49,21 @@ func (UnimplementedHandler) ConsentTalkSession(ctx context.Context, params Conse
 	return r, ht.ErrNotImplemented
 }
 
-// CreateOrganizations implements createOrganizations operation.
+// CreateOrganizationAlias implements createOrganizationAlias operation.
 //
-// 組織を作成できる。
-// これを作れるユーザーはDBを直接叩いて作るしかない。
-// OrgType
-// - 1: 通常
-// - 2: 自治体
-// - 3: 議員.
+// 組織エイリアス作成.
 //
-// POST /organizations
-func (UnimplementedHandler) CreateOrganizations(ctx context.Context, req *CreateOrganizationsReq) (r CreateOrganizationsRes, _ error) {
+// POST /organizations/{organizationID}/aliases
+func (UnimplementedHandler) CreateOrganizationAlias(ctx context.Context, req *CreateOrganizationAliasReq, params CreateOrganizationAliasParams) (r CreateOrganizationAliasRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
-// CreateTalkSession implements createTalkSession operation.
+// DeleteOrganizationAlias implements deleteOrganizationAlias operation.
 //
-// ## サムネイル画像について
-// - `Description中に出てくる画像で一番最初のものを使用`。
-// - 画像自体は`POST /images`でサーバにポストしたものを使用してください。
-// ## 投稿制限のキーについて
-// restrictionsに値を入れると一定のデモグラ情報を登録していない限り、セッションへの投稿が制限されるようにできる。
-// restrictionsには [GET /talksessions/restrictions](https://app.apidog.
-// com/link/project/674502/apis/api-14271260)
-// より取れるkeyをカンマ区切りで入力してください。.
+// 組織エイリアス削除.
 //
-// POST /talksessions
-func (UnimplementedHandler) CreateTalkSession(ctx context.Context, req *CreateTalkSessionReq) (r CreateTalkSessionRes, _ error) {
+// DELETE /organizations/{organizationID}/aliases/{aliasID}
+func (UnimplementedHandler) DeleteOrganizationAlias(ctx context.Context, params DeleteOrganizationAliasParams) (r DeleteOrganizationAliasRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -115,12 +103,26 @@ func (UnimplementedHandler) EditTimeLine(ctx context.Context, req *EditTimeLineR
 	return r, ht.ErrNotImplemented
 }
 
-// EditUserProfile implements editUserProfile operation.
+// EstablishOrganization implements establishOrganization operation.
 //
-// ユーザー情報の変更.
+// 組織を作成できる。
+// これを作れるユーザーはDBを直接叩いて作るしかない。
+// OrgType
+// - 1: 通常
+// - 2: 自治体
+// - 3: 議員.
 //
-// PUT /user
-func (UnimplementedHandler) EditUserProfile(ctx context.Context, req *EditUserProfileReq) (r EditUserProfileRes, _ error) {
+// POST /organizations
+func (UnimplementedHandler) EstablishOrganization(ctx context.Context, req *EstablishOrganizationReq) (r EstablishOrganizationRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// EstablishUser implements establishUser operation.
+//
+// ユーザー作成.
+//
+// POST /user
+func (UnimplementedHandler) EstablishUser(ctx context.Context, req *EstablishUserReq) (r EstablishUserRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -191,6 +193,15 @@ func (UnimplementedHandler) GetOpinionReports(ctx context.Context, params GetOpi
 //
 // GET /talksessions/{talkSessionID}/opinions
 func (UnimplementedHandler) GetOpinionsForTalkSession(ctx context.Context, params GetOpinionsForTalkSessionParams) (r GetOpinionsForTalkSessionRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetOrganizationAliases implements getOrganizationAliases operation.
+//
+// 組織エイリアス一覧取得.
+//
+// GET /organizations/{organizationID}/aliases
+func (UnimplementedHandler) GetOrganizationAliases(ctx context.Context, params GetOrganizationAliasesParams) (r GetOrganizationAliasesRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -298,7 +309,16 @@ func (UnimplementedHandler) GetTimeLine(ctx context.Context, params GetTimeLineP
 	return r, ht.ErrNotImplemented
 }
 
-// GetUserInfo implements get_user_info operation.
+// GetTokenInfo implements getTokenInfo operation.
+//
+// JWTの内容を返してくれる.
+//
+// GET /auth/token/info
+func (UnimplementedHandler) GetTokenInfo(ctx context.Context) (r GetTokenInfoRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetUserInfo implements getUserInfo operation.
 //
 // ユーザー情報の取得.
 //
@@ -328,6 +348,15 @@ func (UnimplementedHandler) GetUserStatsTotalManage(ctx context.Context) (r *Use
 	return r, ht.ErrNotImplemented
 }
 
+// HandleAuthCallback implements handleAuthCallback operation.
+//
+// Auth Callback.
+//
+// GET /auth/{provider}/callback
+func (UnimplementedHandler) HandleAuthCallback(ctx context.Context, params HandleAuthCallbackParams) (r HandleAuthCallbackRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // HasConsent implements hasConsent operation.
 //
 // セッションに同意しているか.
@@ -343,6 +372,22 @@ func (UnimplementedHandler) HasConsent(ctx context.Context, params HasConsentPar
 //
 // GET /health
 func (UnimplementedHandler) Health(ctx context.Context) (r HealthRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// InitiateTalkSession implements initiateTalkSession operation.
+//
+// ## サムネイル画像について
+// - `Description中に出てくる画像で一番最初のものを使用`。
+// - 画像自体は`POST /images`でサーバにポストしたものを使用してください。
+// ## 投稿制限のキーについて
+// restrictionsに値を入れると一定のデモグラ情報を登録していない限り、セッションへの投稿が制限されるようにできる。
+// restrictionsには [GET /talksessions/restrictions](https://app.apidog.
+// com/link/project/674502/apis/api-14271260)
+// より取れるkeyをカンマ区切りで入力してください。.
+//
+// POST /talksessions
+func (UnimplementedHandler) InitiateTalkSession(ctx context.Context, req *InitiateTalkSessionReq) (r InitiateTalkSessionRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -371,33 +416,6 @@ func (UnimplementedHandler) InviteOrganizationForUser(ctx context.Context, req *
 //
 // POST /v1/manage/talksessions/{talkSessionID}/analysis/regenerate
 func (UnimplementedHandler) ManageRegenerateManage(ctx context.Context, req *RegenerateRequest, params ManageRegenerateManageParams) (r *RegenerateResponse, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// OAuthCallback implements oauth_callback operation.
-//
-// Auth Callback.
-//
-// GET /auth/{provider}/callback
-func (UnimplementedHandler) OAuthCallback(ctx context.Context, params OAuthCallbackParams) (r OAuthCallbackRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// OAuthTokenInfo implements oauth_token_info operation.
-//
-// JWTの内容を返してくれる.
-//
-// GET /auth/token/info
-func (UnimplementedHandler) OAuthTokenInfo(ctx context.Context) (r OAuthTokenInfoRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// OAuthTokenRevoke implements oauth_token_revoke operation.
-//
-// トークンを失効（ログアウト）.
-//
-// POST /auth/revoke
-func (UnimplementedHandler) OAuthTokenRevoke(ctx context.Context) (r OAuthTokenRevokeRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -485,21 +503,21 @@ func (UnimplementedHandler) PostTimeLineItem(ctx context.Context, req *PostTimeL
 	return r, ht.ErrNotImplemented
 }
 
-// RegisterUser implements registerUser operation.
-//
-// ユーザー作成.
-//
-// POST /user
-func (UnimplementedHandler) RegisterUser(ctx context.Context, req *RegisterUserReq) (r RegisterUserRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // ReportOpinion implements reportOpinion operation.
 //
 // 意見通報API.
 //
 // POST /opinions/{opinionID}/report
 func (UnimplementedHandler) ReportOpinion(ctx context.Context, req *ReportOpinionReq, params ReportOpinionParams) (r ReportOpinionRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// RevokeToken implements revokeToken operation.
+//
+// トークンを失効（ログアウト）.
+//
+// POST /auth/revoke
+func (UnimplementedHandler) RevokeToken(ctx context.Context) (r RevokeTokenRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -521,7 +539,7 @@ func (UnimplementedHandler) SolveOpinionReport(ctx context.Context, req *SolveOp
 	return r, ht.ErrNotImplemented
 }
 
-// SwipeOpinions implements swipe_opinions operation.
+// SwipeOpinions implements swipeOpinions operation.
 //
 // セッションの中からまだ投票していない意見をランダムに取得する
 // remainingCountは取得した意見を含めてスワイプできる意見の総数を返す.
@@ -553,6 +571,15 @@ func (UnimplementedHandler) Test(ctx context.Context) (r TestRes, _ error) {
 //
 // POST /v1/manage/talksessions/{talkSessionID}/analysis/report
 func (UnimplementedHandler) ToggleReportVisibilityManage(ctx context.Context, req *ToggleReportVisibilityRequest, params ToggleReportVisibilityManageParams) (r *ToggleReportVisibilityResponse, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// UpdateUserProfile implements updateUserProfile operation.
+//
+// ユーザー情報の変更.
+//
+// PUT /user
+func (UnimplementedHandler) UpdateUserProfile(ctx context.Context, req *UpdateUserProfileReq) (r UpdateUserProfileRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

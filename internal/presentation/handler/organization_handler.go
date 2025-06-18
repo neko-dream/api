@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"time"
 
 	"github.com/neko-dream/server/internal/application/query/organization_query"
 	"github.com/neko-dream/server/internal/application/usecase/organization_usecase"
@@ -9,16 +10,24 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
+	domainservice "github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"go.opentelemetry.io/otel"
 )
 
 type organizationHandler struct {
-	create  organization_usecase.CreateOrganizationCommand
-	invite  organization_usecase.InviteOrganizationCommand
-	add     organization_usecase.InviteOrganizationForUserCommand
-	list    organization_query.ListJoinedOrganizationQuery
-	orgRepo organization.OrganizationRepository
+	create              organization_usecase.CreateOrganizationCommand
+	invite              organization_usecase.InviteOrganizationCommand
+	add                 organization_usecase.InviteOrganizationForUserCommand
+	list                organization_query.ListJoinedOrganizationQuery
+	createAlias         *organization_usecase.CreateOrganizationAliasUseCase
+	deactivateAlias     *organization_usecase.DeactivateOrganizationAliasUseCase
+	listAliases         *organization_usecase.ListOrganizationAliasesUseCase
+	orgRepo             organization.OrganizationRepository
+	aliasRepo           organization.OrganizationAliasRepository
+	orgUserRepo         organization.OrganizationUserRepository
+	aliasService        *domainservice.OrganizationAliasService
+	sessionTokenManager session.TokenManager
 }
 
 func NewOrganizationHandler(
@@ -26,20 +35,34 @@ func NewOrganizationHandler(
 	invite organization_usecase.InviteOrganizationCommand,
 	add organization_usecase.InviteOrganizationForUserCommand,
 	list organization_query.ListJoinedOrganizationQuery,
+	createAlias *organization_usecase.CreateOrganizationAliasUseCase,
+	deactivateAlias *organization_usecase.DeactivateOrganizationAliasUseCase,
+	listAliases *organization_usecase.ListOrganizationAliasesUseCase,
 	orgRepo organization.OrganizationRepository,
+	aliasRepo organization.OrganizationAliasRepository,
+	orgUserRepo organization.OrganizationUserRepository,
+	aliasService *domainservice.OrganizationAliasService,
+	sessionTokenManager session.TokenManager,
 ) oas.OrganizationHandler {
 	return &organizationHandler{
-		create:  create,
-		invite:  invite,
-		add:     add,
-		list:    list,
-		orgRepo: orgRepo,
+		create:              create,
+		invite:              invite,
+		add:                 add,
+		list:                list,
+		createAlias:         createAlias,
+		deactivateAlias:     deactivateAlias,
+		listAliases:         listAliases,
+		orgRepo:             orgRepo,
+		aliasRepo:           aliasRepo,
+		orgUserRepo:         orgUserRepo,
+		aliasService:        aliasService,
+		sessionTokenManager: sessionTokenManager,
 	}
 }
 
-// CreateOrganizations implements oas.OrganizationHandler.
-func (o *organizationHandler) CreateOrganizations(ctx context.Context, req *oas.CreateOrganizationsReq) (oas.CreateOrganizationsRes, error) {
-	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.CreateOrganizations")
+// EstablishOrganization implements oas.OrganizationHandler.
+func (o *organizationHandler) EstablishOrganization(ctx context.Context, req *oas.EstablishOrganizationReq) (oas.EstablishOrganizationRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.EstablishOrganization")
 	defer span.End()
 
 	claim := session.GetSession(ctx)
@@ -64,7 +87,7 @@ func (o *organizationHandler) CreateOrganizations(ctx context.Context, req *oas.
 		return nil, err
 	}
 
-	res := &oas.CreateOrganizationsOK{}
+	res := &oas.EstablishOrganizationOK{}
 	return res, nil
 }
 
@@ -209,4 +232,121 @@ func (o *organizationHandler) ValidateOrganizationCode(ctx context.Context, para
 			RoleName: "", // RoleName is not applicable in this context
 		}),
 	}, nil
+}
+
+// GetOrganizationAliases 組織エイリアス一覧取得
+func (o *organizationHandler) GetOrganizationAliases(ctx context.Context, params oas.GetOrganizationAliasesParams) (oas.GetOrganizationAliasesRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.GetOrganizationAliases")
+	defer span.End()
+
+	claim := session.GetSession(ctx)
+	if claim == nil {
+		return nil, messages.ForbiddenError
+	}
+	userID, err := claim.UserID()
+	if err != nil {
+		return nil, messages.ForbiddenError
+	}
+
+	organizationID, err := shared.ParseUUID[organization.Organization](params.OrganizationID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
+	// 権限チェック - ユーザーがAdmin以上の権限を持っているか確認
+	orgUser, err := o.orgUserRepo.FindByOrganizationIDAndUserID(ctx, organizationID, userID)
+	if err != nil {
+		return nil, messages.ForbiddenError
+	}
+	if orgUser.Role > organization.OrganizationUserRoleAdmin {
+		return nil, messages.ForbiddenError
+	}
+
+	// エイリアス一覧取得
+	output, err := o.listAliases.Execute(ctx, organization_usecase.ListOrganizationAliasesInput{
+		OrganizationID: organizationID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var aliasResponses []oas.GetOrganizationAliasesOKAliasesItem
+	for _, alias := range output.Aliases {
+		aliasResponses = append(aliasResponses, oas.GetOrganizationAliasesOKAliasesItem{
+			AliasID:   alias.AliasID,
+			AliasName: alias.AliasName,
+			CreatedAt: alias.CreatedAt,
+		})
+	}
+
+	return &oas.GetOrganizationAliasesOK{
+		Aliases: aliasResponses,
+	}, nil
+}
+
+// CreateOrganizationAlias 組織エイリアス作成
+func (o *organizationHandler) CreateOrganizationAlias(ctx context.Context, req *oas.CreateOrganizationAliasReq, params oas.CreateOrganizationAliasParams) (oas.CreateOrganizationAliasRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.CreateOrganizationAlias")
+	defer span.End()
+
+	claim := session.GetSession(ctx)
+	if claim == nil {
+		return nil, messages.ForbiddenError
+	}
+
+	sessionID, err := claim.SessionID()
+	if err != nil {
+		return nil, messages.ForbiddenError
+	}
+
+	organizationID, err := shared.ParseUUID[organization.Organization](params.OrganizationID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
+	// エイリアス作成
+	output, err := o.createAlias.Execute(ctx, sessionID, organization_usecase.CreateOrganizationAliasInput{
+		OrganizationID: organizationID,
+		AliasName:      req.AliasName,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &oas.CreateOrganizationAliasOK{
+		AliasID:   output.AliasID,
+		AliasName: output.AliasName,
+		CreatedAt: time.Now().Format(time.RFC3339),
+	}, nil
+}
+
+// DeleteOrganizationAlias 組織エイリアス削除
+func (o *organizationHandler) DeleteOrganizationAlias(ctx context.Context, params oas.DeleteOrganizationAliasParams) (oas.DeleteOrganizationAliasRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.DeleteOrganizationAlias")
+	defer span.End()
+
+	claim := session.GetSession(ctx)
+	if claim == nil {
+		return nil, messages.ForbiddenError
+	}
+
+	sessionID, err := claim.SessionID()
+	if err != nil {
+		return nil, messages.ForbiddenError
+	}
+
+	aliasID, err := shared.ParseUUID[organization.OrganizationAlias](params.AliasID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
+	// エイリアス削除
+	err = o.deactivateAlias.Execute(ctx, sessionID, organization_usecase.DeactivateOrganizationAliasInput{
+		AliasID: aliasID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &oas.DeleteOrganizationAliasOK{}, nil
 }

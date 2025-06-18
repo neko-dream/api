@@ -13,7 +13,7 @@ import (
 
 const findOrgUserByOrganizationID = `-- name: FindOrgUserByOrganizationID :many
 SELECT
-    organization_users.organization_user_id, organization_users.user_id, organization_users.organization_id, organization_users.role, organization_users.created_at, organization_users.updated_at
+    organization_users.organization_user_id, organization_users.user_id, organization_users.organization_id, organization_users.created_at, organization_users.updated_at, organization_users.role
 FROM organization_users
 WHERE organization_id = $1
 `
@@ -25,7 +25,7 @@ type FindOrgUserByOrganizationIDRow struct {
 // FindOrgUserByOrganizationID
 //
 //	SELECT
-//	    organization_users.organization_user_id, organization_users.user_id, organization_users.organization_id, organization_users.role, organization_users.created_at, organization_users.updated_at
+//	    organization_users.organization_user_id, organization_users.user_id, organization_users.organization_id, organization_users.created_at, organization_users.updated_at, organization_users.role
 //	FROM organization_users
 //	WHERE organization_id = $1
 func (q *Queries) FindOrgUserByOrganizationID(ctx context.Context, organizationID uuid.UUID) ([]FindOrgUserByOrganizationIDRow, error) {
@@ -41,9 +41,9 @@ func (q *Queries) FindOrgUserByOrganizationID(ctx context.Context, organizationI
 			&i.OrganizationUser.OrganizationUserID,
 			&i.OrganizationUser.UserID,
 			&i.OrganizationUser.OrganizationID,
-			&i.OrganizationUser.Role,
 			&i.OrganizationUser.CreatedAt,
 			&i.OrganizationUser.UpdatedAt,
+			&i.OrganizationUser.Role,
 		); err != nil {
 			return nil, err
 		}

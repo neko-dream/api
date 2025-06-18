@@ -17,12 +17,12 @@ type ConsentTalkSessionRes interface {
 	consentTalkSessionRes()
 }
 
-type CreateOrganizationsRes interface {
-	createOrganizationsRes()
+type CreateOrganizationAliasRes interface {
+	createOrganizationAliasRes()
 }
 
-type CreateTalkSessionRes interface {
-	createTalkSessionRes()
+type DeleteOrganizationAliasRes interface {
+	deleteOrganizationAliasRes()
 }
 
 type DevAuthorizeRes interface {
@@ -41,8 +41,12 @@ type EditTimeLineRes interface {
 	editTimeLineRes()
 }
 
-type EditUserProfileRes interface {
-	editUserProfileRes()
+type EstablishOrganizationRes interface {
+	establishOrganizationRes()
+}
+
+type EstablishUserRes interface {
+	establishUserRes()
 }
 
 type GetConclusionRes interface {
@@ -71,6 +75,10 @@ type GetOpinionReportsRes interface {
 
 type GetOpinionsForTalkSessionRes interface {
 	getOpinionsForTalkSessionRes()
+}
+
+type GetOrganizationAliasesRes interface {
+	getOrganizationAliasesRes()
 }
 
 type GetOrganizationsRes interface {
@@ -113,8 +121,16 @@ type GetTimeLineRes interface {
 	getTimeLineRes()
 }
 
+type GetTokenInfoRes interface {
+	getTokenInfoRes()
+}
+
 type GetUserInfoRes interface {
 	getUserInfoRes()
+}
+
+type HandleAuthCallbackRes interface {
+	handleAuthCallbackRes()
 }
 
 type HasConsentRes interface {
@@ -125,24 +141,16 @@ type HealthRes interface {
 	healthRes()
 }
 
+type InitiateTalkSessionRes interface {
+	initiateTalkSessionRes()
+}
+
 type InviteOrganizationForUserRes interface {
 	inviteOrganizationForUserRes()
 }
 
 type InviteOrganizationRes interface {
 	inviteOrganizationRes()
-}
-
-type OAuthCallbackRes interface {
-	oAuthCallbackRes()
-}
-
-type OAuthTokenInfoRes interface {
-	oAuthTokenInfoRes()
-}
-
-type OAuthTokenRevokeRes interface {
-	oAuthTokenRevokeRes()
 }
 
 type OpinionComments2Res interface {
@@ -181,12 +189,12 @@ type PostTimeLineItemRes interface {
 	postTimeLineItemRes()
 }
 
-type RegisterUserRes interface {
-	registerUserRes()
-}
-
 type ReportOpinionRes interface {
 	reportOpinionRes()
+}
+
+type RevokeTokenRes interface {
+	revokeTokenRes()
 }
 
 type SessionsHistoryRes interface {
@@ -207,6 +215,10 @@ type TalkSessionAnalysisRes interface {
 
 type TestRes interface {
 	testRes()
+}
+
+type UpdateUserProfileRes interface {
+	updateUserProfileRes()
 }
 
 type ValidateOrganizationCodeRes interface {

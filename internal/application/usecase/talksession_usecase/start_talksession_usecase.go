@@ -10,6 +10,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/organization"
+	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
@@ -25,16 +26,18 @@ type (
 	}
 
 	StartTalkSessionUseCaseInput struct {
-		OwnerID          shared.UUID[user.User]
-		Theme            string
-		Description      *string
-		ThumbnailURL     *string
-		ScheduledEndTime time.Time
-		Latitude         *float64
-		Longitude        *float64
-		City             *string
-		Prefecture       *string
-		Restrictions     []string
+		OwnerID             shared.UUID[user.User]
+		Theme               string
+		Description         *string
+		ThumbnailURL        *string
+		ScheduledEndTime    time.Time
+		Latitude            *float64
+		Longitude           *float64
+		City                *string
+		Prefecture          *string
+		Restrictions        []string
+		SessionClaim        *session.Claim // セッション情報を追加
+		OrganizationAliasID *shared.UUID[organization.OrganizationAlias]
 	}
 
 	StartTalkSessionUseCaseOutput struct {
@@ -45,6 +48,7 @@ type (
 		talksession.TalkSessionRepository
 		user.UserRepository
 		organization.OrganizationUserRepository
+		organization.OrganizationAliasRepository
 		*db.DBManager
 		*config.Config
 	}
@@ -67,21 +71,43 @@ func NewStartTalkSessionUseCase(
 	talkSessionRepository talksession.TalkSessionRepository,
 	userRepository user.UserRepository,
 	organizationUserRepository organization.OrganizationUserRepository,
+	organizationAliasRepository organization.OrganizationAliasRepository,
 	DBManager *db.DBManager,
 	config *config.Config,
 ) StartTalkSessionUseCase {
 	return &startTalkSessionHandler{
-		TalkSessionRepository:      talkSessionRepository,
-		UserRepository:             userRepository,
-		OrganizationUserRepository: organizationUserRepository,
-		DBManager:                  DBManager,
-		Config:                     config,
+		TalkSessionRepository:       talkSessionRepository,
+		UserRepository:              userRepository,
+		OrganizationUserRepository:  organizationUserRepository,
+		OrganizationAliasRepository: organizationAliasRepository,
+		DBManager:                   DBManager,
+		Config:                      config,
 	}
 }
 
 func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSessionUseCaseInput) (StartTalkSessionUseCaseOutput, error) {
 	ctx, span := otel.Tracer("talksession_command").Start(ctx, "startTalkSessionHandler.Execute")
 	defer span.End()
+	// セッションから組織IDとエイリアスIDを取得
+	var organizationID *shared.UUID[organization.Organization]
+	var organizationAliasID *shared.UUID[organization.OrganizationAlias]
+
+	// 明示的にエイリアスIDが指定されている場合はそれを使用
+	if input.OrganizationAliasID != nil {
+		organizationAliasID = input.OrganizationAliasID
+		// エイリアスから組織IDを取得
+		alias, err := i.OrganizationAliasRepository.FindByID(ctx, *input.OrganizationAliasID)
+		if err == nil && alias != nil {
+			orgID := alias.OrganizationID()
+			organizationID = &orgID
+		}
+	} else if input.SessionClaim != nil && input.SessionClaim.OrganizationID != nil {
+		// セッションに組織IDがある場合
+		orgID, err := shared.ParseUUID[organization.Organization](*input.SessionClaim.OrganizationID)
+		if err == nil {
+			organizationID = &orgID
+		}
+	}
 	// ローカル環境以外ではOrganizationに所属していないとセッションを開始できない
 	if i.Config.Env != config.LOCAL {
 		orgs, err := i.OrganizationUserRepository.FindByUserID(ctx, input.OwnerID)
@@ -124,6 +150,8 @@ func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSe
 			location,
 			input.City,
 			input.Prefecture,
+			organizationID,
+			organizationAliasID,
 		)
 
 		if len(input.Restrictions) > 0 {

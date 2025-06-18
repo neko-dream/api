@@ -19,11 +19,11 @@ import (
 type AuthorizeParams struct {
 	Provider AuthorizeProvider
 	// ログイン後にリダイレクトするURL.
-	RedirectURL string
+	RedirectUrl string
 	// 組織コード（組織ログインの場合）.
 	OrganizationCode OptString
 	// 登録していなかった場合に飛ばすURL.
-	RegistrationURL OptString
+	RegistrationUrl OptString
 }
 
 func unpackAuthorizeParams(packed middleware.Parameters) (params AuthorizeParams) {
@@ -36,14 +36,14 @@ func unpackAuthorizeParams(packed middleware.Parameters) (params AuthorizeParams
 	}
 	{
 		key := middleware.ParameterKey{
-			Name: "redirect_url",
+			Name: "redirectUrl",
 			In:   "query",
 		}
-		params.RedirectURL = packed[key].(string)
+		params.RedirectUrl = packed[key].(string)
 	}
 	{
 		key := middleware.ParameterKey{
-			Name: "organization_code",
+			Name: "organizationCode",
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
@@ -52,11 +52,11 @@ func unpackAuthorizeParams(packed middleware.Parameters) (params AuthorizeParams
 	}
 	{
 		key := middleware.ParameterKey{
-			Name: "registration_url",
+			Name: "registrationUrl",
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.RegistrationURL = v.(OptString)
+			params.RegistrationUrl = v.(OptString)
 		}
 	}
 	return params
@@ -117,10 +117,10 @@ func decodeAuthorizeParams(args [1]string, argsEscaped bool, r *http.Request) (p
 			Err:  err,
 		}
 	}
-	// Decode query: redirect_url.
+	// Decode query: redirectUrl.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "redirect_url",
+			Name:    "redirectUrl",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
@@ -137,7 +137,7 @@ func decodeAuthorizeParams(args [1]string, argsEscaped bool, r *http.Request) (p
 					return err
 				}
 
-				params.RedirectURL = c
+				params.RedirectUrl = c
 				return nil
 			}); err != nil {
 				return err
@@ -148,15 +148,15 @@ func decodeAuthorizeParams(args [1]string, argsEscaped bool, r *http.Request) (p
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "redirect_url",
+			Name: "redirectUrl",
 			In:   "query",
 			Err:  err,
 		}
 	}
-	// Decode query: organization_code.
+	// Decode query: organizationCode.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "organization_code",
+			Name:    "organizationCode",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
@@ -189,22 +189,22 @@ func decodeAuthorizeParams(args [1]string, argsEscaped bool, r *http.Request) (p
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "organization_code",
+			Name: "organizationCode",
 			In:   "query",
 			Err:  err,
 		}
 	}
-	// Decode query: registration_url.
+	// Decode query: registrationUrl.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "registration_url",
+			Name:    "registrationUrl",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotRegistrationURLVal string
+				var paramsDotRegistrationUrlVal string
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
@@ -216,12 +216,12 @@ func decodeAuthorizeParams(args [1]string, argsEscaped bool, r *http.Request) (p
 						return err
 					}
 
-					paramsDotRegistrationURLVal = c
+					paramsDotRegistrationUrlVal = c
 					return nil
 				}(); err != nil {
 					return err
 				}
-				params.RegistrationURL.SetTo(paramsDotRegistrationURLVal)
+				params.RegistrationUrl.SetTo(paramsDotRegistrationUrlVal)
 				return nil
 			}); err != nil {
 				return err
@@ -230,7 +230,7 @@ func decodeAuthorizeParams(args [1]string, argsEscaped bool, r *http.Request) (p
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "registration_url",
+			Name: "registrationUrl",
 			In:   "query",
 			Err:  err,
 		}
@@ -249,14 +249,14 @@ type ChangePasswordParams struct {
 func unpackChangePasswordParams(packed middleware.Parameters) (params ChangePasswordParams) {
 	{
 		key := middleware.ParameterKey{
-			Name: "old_password",
+			Name: "oldPassword",
 			In:   "query",
 		}
 		params.OldPassword = packed[key].(string)
 	}
 	{
 		key := middleware.ParameterKey{
-			Name: "new_password",
+			Name: "newPassword",
 			In:   "query",
 		}
 		params.NewPassword = packed[key].(string)
@@ -266,10 +266,10 @@ func unpackChangePasswordParams(packed middleware.Parameters) (params ChangePass
 
 func decodeChangePasswordParams(args [0]string, argsEscaped bool, r *http.Request) (params ChangePasswordParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
-	// Decode query: old_password.
+	// Decode query: oldPassword.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "old_password",
+			Name:    "oldPassword",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
@@ -297,15 +297,15 @@ func decodeChangePasswordParams(args [0]string, argsEscaped bool, r *http.Reques
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "old_password",
+			Name: "oldPassword",
 			In:   "query",
 			Err:  err,
 		}
 	}
-	// Decode query: new_password.
+	// Decode query: newPassword.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "new_password",
+			Name:    "newPassword",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
@@ -333,7 +333,7 @@ func decodeChangePasswordParams(args [0]string, argsEscaped bool, r *http.Reques
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "new_password",
+			Name: "newPassword",
 			In:   "query",
 			Err:  err,
 		}
@@ -406,9 +406,192 @@ func decodeConsentTalkSessionParams(args [1]string, argsEscaped bool, r *http.Re
 	return params, nil
 }
 
+// CreateOrganizationAliasParams is parameters of createOrganizationAlias operation.
+type CreateOrganizationAliasParams struct {
+	OrganizationID string
+}
+
+func unpackCreateOrganizationAliasParams(packed middleware.Parameters) (params CreateOrganizationAliasParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "organizationID",
+			In:   "path",
+		}
+		params.OrganizationID = packed[key].(string)
+	}
+	return params
+}
+
+func decodeCreateOrganizationAliasParams(args [1]string, argsEscaped bool, r *http.Request) (params CreateOrganizationAliasParams, _ error) {
+	// Decode path: organizationID.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "organizationID",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.OrganizationID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "organizationID",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// DeleteOrganizationAliasParams is parameters of deleteOrganizationAlias operation.
+type DeleteOrganizationAliasParams struct {
+	OrganizationID string
+	AliasID        string
+}
+
+func unpackDeleteOrganizationAliasParams(packed middleware.Parameters) (params DeleteOrganizationAliasParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "organizationID",
+			In:   "path",
+		}
+		params.OrganizationID = packed[key].(string)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "aliasID",
+			In:   "path",
+		}
+		params.AliasID = packed[key].(string)
+	}
+	return params
+}
+
+func decodeDeleteOrganizationAliasParams(args [2]string, argsEscaped bool, r *http.Request) (params DeleteOrganizationAliasParams, _ error) {
+	// Decode path: organizationID.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "organizationID",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.OrganizationID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "organizationID",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	// Decode path: aliasID.
+	if err := func() error {
+		param := args[1]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[1])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "aliasID",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.AliasID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "aliasID",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // DevAuthorizeParams is parameters of devAuthorize operation.
 type DevAuthorizeParams struct {
-	RedirectURL string
+	RedirectUrl string
 	// Devのみで使用するsubjectです。ここで指定した値はログインした後も確認できないため覚えておいてください。同じ値を指定すると同じアカウントにログインできます。.
 	ID string
 	// 組織コード（組織ログインの場合）.
@@ -418,10 +601,10 @@ type DevAuthorizeParams struct {
 func unpackDevAuthorizeParams(packed middleware.Parameters) (params DevAuthorizeParams) {
 	{
 		key := middleware.ParameterKey{
-			Name: "redirect_url",
+			Name: "redirectUrl",
 			In:   "query",
 		}
-		params.RedirectURL = packed[key].(string)
+		params.RedirectUrl = packed[key].(string)
 	}
 	{
 		key := middleware.ParameterKey{
@@ -432,7 +615,7 @@ func unpackDevAuthorizeParams(packed middleware.Parameters) (params DevAuthorize
 	}
 	{
 		key := middleware.ParameterKey{
-			Name: "organization_code",
+			Name: "organizationCode",
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
@@ -444,10 +627,10 @@ func unpackDevAuthorizeParams(packed middleware.Parameters) (params DevAuthorize
 
 func decodeDevAuthorizeParams(args [0]string, argsEscaped bool, r *http.Request) (params DevAuthorizeParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
-	// Decode query: redirect_url.
+	// Decode query: redirectUrl.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "redirect_url",
+			Name:    "redirectUrl",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
@@ -464,7 +647,7 @@ func decodeDevAuthorizeParams(args [0]string, argsEscaped bool, r *http.Request)
 					return err
 				}
 
-				params.RedirectURL = c
+				params.RedirectUrl = c
 				return nil
 			}); err != nil {
 				return err
@@ -475,7 +658,7 @@ func decodeDevAuthorizeParams(args [0]string, argsEscaped bool, r *http.Request)
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "redirect_url",
+			Name: "redirectUrl",
 			In:   "query",
 			Err:  err,
 		}
@@ -516,10 +699,10 @@ func decodeDevAuthorizeParams(args [0]string, argsEscaped bool, r *http.Request)
 			Err:  err,
 		}
 	}
-	// Decode query: organization_code.
+	// Decode query: organizationCode.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "organization_code",
+			Name:    "organizationCode",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
@@ -552,7 +735,7 @@ func decodeDevAuthorizeParams(args [0]string, argsEscaped bool, r *http.Request)
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "organization_code",
+			Name: "organizationCode",
 			In:   "query",
 			Err:  err,
 		}
@@ -1585,6 +1768,71 @@ func decodeGetOpinionsForTalkSessionParams(args [1]string, argsEscaped bool, r *
 		return params, &ogenerrors.DecodeParamError{
 			Name: "seed",
 			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// GetOrganizationAliasesParams is parameters of getOrganizationAliases operation.
+type GetOrganizationAliasesParams struct {
+	OrganizationID string
+}
+
+func unpackGetOrganizationAliasesParams(packed middleware.Parameters) (params GetOrganizationAliasesParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "organizationID",
+			In:   "path",
+		}
+		params.OrganizationID = packed[key].(string)
+	}
+	return params
+}
+
+func decodeGetOrganizationAliasesParams(args [1]string, argsEscaped bool, r *http.Request) (params GetOrganizationAliasesParams, _ error) {
+	// Decode path: organizationID.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "organizationID",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.OrganizationID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "organizationID",
+			In:   "path",
 			Err:  err,
 		}
 	}
@@ -3241,6 +3489,161 @@ func decodeGetUserStatsListManageParams(args [0]string, argsEscaped bool, r *htt
 	return params, nil
 }
 
+// HandleAuthCallbackParams is parameters of handleAuthCallback operation.
+type HandleAuthCallbackParams struct {
+	Provider string
+	Code     string
+	// OAuth State from Query.
+	State string
+}
+
+func unpackHandleAuthCallbackParams(packed middleware.Parameters) (params HandleAuthCallbackParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "provider",
+			In:   "path",
+		}
+		params.Provider = packed[key].(string)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "code",
+			In:   "query",
+		}
+		params.Code = packed[key].(string)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "state",
+			In:   "query",
+		}
+		params.State = packed[key].(string)
+	}
+	return params
+}
+
+func decodeHandleAuthCallbackParams(args [1]string, argsEscaped bool, r *http.Request) (params HandleAuthCallbackParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode path: provider.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "provider",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.Provider = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "provider",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	// Decode query: code.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "code",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.Code = c
+				return nil
+			}); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "code",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: state.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "state",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.State = c
+				return nil
+			}); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "state",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // HasConsentParams is parameters of hasConsent operation.
 type HasConsentParams struct {
 	TalkSessionID string
@@ -3495,161 +3898,6 @@ func decodeManageRegenerateManageParams(args [1]string, argsEscaped bool, r *htt
 		return params, &ogenerrors.DecodeParamError{
 			Name: "talkSessionID",
 			In:   "path",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
-// OAuthCallbackParams is parameters of oauth_callback operation.
-type OAuthCallbackParams struct {
-	Provider string
-	Code     string
-	// OAuth State from Query.
-	State string
-}
-
-func unpackOAuthCallbackParams(packed middleware.Parameters) (params OAuthCallbackParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "provider",
-			In:   "path",
-		}
-		params.Provider = packed[key].(string)
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "code",
-			In:   "query",
-		}
-		params.Code = packed[key].(string)
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "state",
-			In:   "query",
-		}
-		params.State = packed[key].(string)
-	}
-	return params
-}
-
-func decodeOAuthCallbackParams(args [1]string, argsEscaped bool, r *http.Request) (params OAuthCallbackParams, _ error) {
-	q := uri.NewQueryDecoder(r.URL.Query())
-	// Decode path: provider.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "provider",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.Provider = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "provider",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	// Decode query: code.
-	if err := func() error {
-		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "code",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.HasParam(cfg); err == nil {
-			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.Code = c
-				return nil
-			}); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "code",
-			In:   "query",
-			Err:  err,
-		}
-	}
-	// Decode query: state.
-	if err := func() error {
-		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "state",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.HasParam(cfg); err == nil {
-			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.State = c
-				return nil
-			}); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "state",
-			In:   "query",
 			Err:  err,
 		}
 	}
@@ -4397,7 +4645,7 @@ func decodeSolveOpinionReportParams(args [1]string, argsEscaped bool, r *http.Re
 	return params, nil
 }
 
-// SwipeOpinionsParams is parameters of swipe_opinions operation.
+// SwipeOpinionsParams is parameters of swipeOpinions operation.
 type SwipeOpinionsParams struct {
 	TalkSessionID string
 	Limit         OptNilInt

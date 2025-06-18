@@ -75,129 +75,6 @@ func (s *ConclusionUser) Validate() error {
 	return nil
 }
 
-func (s *CreateOrganizationsReq) Validate() error {
-	if s == nil {
-		return validate.ErrNilPointer
-	}
-
-	var failures []validate.FieldError
-	if err := func() error {
-		if err := (validate.Float{}).Validate(float64(s.OrgType)); err != nil {
-			return errors.Wrap(err, "float")
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "orgType",
-			Error: err,
-		})
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *CreateTalkSessionOK) Validate() error {
-	if s == nil {
-		return validate.ErrNilPointer
-	}
-
-	var failures []validate.FieldError
-	if err := func() error {
-		if err := s.Owner.Validate(); err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "owner",
-			Error: err,
-		})
-	}
-	if err := func() error {
-		if value, ok := s.Location.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "location",
-			Error: err,
-		})
-	}
-	if err := func() error {
-		if s.Restrictions == nil {
-			return errors.New("nil is invalid value")
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "restrictions",
-			Error: err,
-		})
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *CreateTalkSessionReq) Validate() error {
-	if s == nil {
-		return validate.ErrNilPointer
-	}
-
-	var failures []validate.FieldError
-	if err := func() error {
-		if value, ok := s.Latitude.Get(); ok {
-			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(value)); err != nil {
-					return errors.Wrap(err, "float")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "latitude",
-			Error: err,
-		})
-	}
-	if err := func() error {
-		if value, ok := s.Longitude.Get(); ok {
-			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(value)); err != nil {
-					return errors.Wrap(err, "float")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "longitude",
-			Error: err,
-		})
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
 func (s *EditTalkSessionReq) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -246,28 +123,20 @@ func (s *EditTalkSessionReq) Validate() error {
 	return nil
 }
 
-func (s *EditUserProfileOK) Validate() error {
+func (s *EstablishOrganizationReq) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if err := (validate.String{
-			MinLength:    3,
-			MinLengthSet: true,
-			MaxLength:    25,
-			MaxLengthSet: true,
-			Email:        false,
-			Hostname:     false,
-			Regex:        regexMap["^[A-Za-z0-9]$"],
-		}).Validate(string(s.DisplayID)); err != nil {
-			return errors.Wrap(err, "string")
+		if err := (validate.Float{}).Validate(float64(s.OrgType)); err != nil {
+			return errors.Wrap(err, "float")
 		}
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "displayID",
+			Name:  "orgType",
 			Error: err,
 		})
 	}
@@ -277,7 +146,7 @@ func (s *EditUserProfileOK) Validate() error {
 	return nil
 }
 
-func (s *EditUserProfileReq) Validate() error {
+func (s *EstablishUserReq) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
@@ -307,7 +176,7 @@ func (s *EditUserProfileReq) Validate() error {
 	return nil
 }
 
-func (s EditUserProfileReqGender) Validate() error {
+func (s EstablishUserReqGender) Validate() error {
 	switch s {
 	case "男性":
 		return nil
@@ -571,11 +440,11 @@ func (s *GetOpinionsForTalkSessionOKOpinionsItem) Validate() error {
 
 func (s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) Validate() error {
 	switch s {
-	case "pass":
+	case "agree":
 		return nil
 	case "disagree":
 		return nil
-	case "agree":
+	case "pass":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
@@ -593,6 +462,29 @@ func (s GetOpinionsForTalkSessionSort) Validate() error {
 	default:
 		return errors.Errorf("invalid value: %v", s)
 	}
+}
+
+func (s *GetOrganizationAliasesOK) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if s.Aliases == nil {
+			return errors.New("nil is invalid value")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "aliases",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
 }
 
 func (s *GetOrganizationsOK) Validate() error {
@@ -872,20 +764,20 @@ func (s GetUserListManageOrderBy) Validate() error {
 	}
 }
 
-func (s *InviteOrganizationForUserReq) Validate() error {
+func (s *HandleAuthCallbackFoundHeaders) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if err := (validate.Float{}).Validate(float64(s.Role)); err != nil {
-			return errors.Wrap(err, "float")
+		if s.SetCookie == nil {
+			return errors.New("nil is invalid value")
 		}
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "role",
+			Name:  "SetCookie",
 			Error: err,
 		})
 	}
@@ -895,30 +787,7 @@ func (s *InviteOrganizationForUserReq) Validate() error {
 	return nil
 }
 
-func (s *InviteOrganizationReq) Validate() error {
-	if s == nil {
-		return validate.ErrNilPointer
-	}
-
-	var failures []validate.FieldError
-	if err := func() error {
-		if err := (validate.Float{}).Validate(float64(s.Role)); err != nil {
-			return errors.Wrap(err, "float")
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "role",
-			Error: err,
-		})
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *Location) Validate() error {
+func (s *InitiateTalkSessionReq) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
@@ -966,20 +835,20 @@ func (s *Location) Validate() error {
 	return nil
 }
 
-func (s *OAuthCallbackFoundHeaders) Validate() error {
+func (s *InviteOrganizationForUserReq) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.SetCookie == nil {
-			return errors.New("nil is invalid value")
+		if err := (validate.Float{}).Validate(float64(s.Role)); err != nil {
+			return errors.Wrap(err, "float")
 		}
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "SetCookie",
+			Name:  "role",
 			Error: err,
 		})
 	}
@@ -989,20 +858,20 @@ func (s *OAuthCallbackFoundHeaders) Validate() error {
 	return nil
 }
 
-func (s *OAuthTokenRevokeNoContentHeaders) Validate() error {
+func (s *InviteOrganizationReq) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.SetCookie == nil {
-			return errors.New("nil is invalid value")
+		if err := (validate.Float{}).Validate(float64(s.Role)); err != nil {
+			return errors.Wrap(err, "float")
 		}
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "SetCookie",
+			Name:  "role",
 			Error: err,
 		})
 	}
@@ -1168,9 +1037,9 @@ func (s OpinionComments2OKOpinionsItemMyVoteType) Validate() error {
 
 func (s OpinionVoteType) Validate() error {
 	switch s {
-	case "disagree":
-		return nil
 	case "agree":
+		return nil
+	case "disagree":
 		return nil
 	case "pass":
 		return nil
@@ -1302,76 +1171,11 @@ func (s RegenerateRequestType) Validate() error {
 	}
 }
 
-func (s *RegisterUserOK) Validate() error {
-	if s == nil {
-		return validate.ErrNilPointer
-	}
-
-	var failures []validate.FieldError
-	if err := func() error {
-		if err := (validate.String{
-			MinLength:    3,
-			MinLengthSet: true,
-			MaxLength:    25,
-			MaxLengthSet: true,
-			Email:        false,
-			Hostname:     false,
-			Regex:        regexMap["^[A-Za-z0-9]$"],
-		}).Validate(string(s.DisplayID)); err != nil {
-			return errors.Wrap(err, "string")
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "displayID",
-			Error: err,
-		})
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *RegisterUserReq) Validate() error {
-	if s == nil {
-		return validate.ErrNilPointer
-	}
-
-	var failures []validate.FieldError
-	if err := func() error {
-		if value, ok := s.Gender.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "gender",
-			Error: err,
-		})
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s RegisterUserReqGender) Validate() error {
+func (s ReportAction) Validate() error {
 	switch s {
-	case "男性":
+	case "deleted":
 		return nil
-	case "女性":
-		return nil
-	case "その他":
-		return nil
-	case "回答しない":
+	case "hold":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
@@ -1434,19 +1238,6 @@ func (s *ReportDetail) Validate() error {
 	return nil
 }
 
-func (s ReportDetailStatus) Validate() error {
-	switch s {
-	case "unsolved":
-		return nil
-	case "deleted":
-		return nil
-	case "hold":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
-}
-
 func (s *ReportDetailUser) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -1469,6 +1260,42 @@ func (s *ReportDetailUser) Validate() error {
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
 			Name:  "displayID",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s ReportStatus) Validate() error {
+	switch s {
+	case "unsolved":
+		return nil
+	case "deleted":
+		return nil
+	case "hold":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s *RevokeTokenNoContentHeaders) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if s.SetCookie == nil {
+			return errors.New("nil is invalid value")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "SetCookie",
 			Error: err,
 		})
 	}
@@ -1573,17 +1400,6 @@ func (s *SolveOpinionReportReq) Validate() error {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
-}
-
-func (s SolveOpinionReportReqAction) Validate() error {
-	switch s {
-	case "deleted":
-		return nil
-	case "hold":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
 }
 
 func (s *SwipeOpinionsOK) Validate() error {
@@ -1885,7 +1701,7 @@ func (s *TalkSessionListResponse) Validate() error {
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "TalkSessionStats",
+			Name:  "talkSessionStats",
 			Error: err,
 		})
 	}
@@ -1972,6 +1788,51 @@ func (s *TalkSessionOwner) Validate() error {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
+}
+
+func (s *UpdateUserProfileReq) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.Gender.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "gender",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s UpdateUserProfileReqGender) Validate() error {
+	switch s {
+	case "男性":
+		return nil
+	case "女性":
+		return nil
+	case "その他":
+		return nil
+	case "回答しない":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
 }
 
 func (s *User) Validate() error {

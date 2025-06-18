@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/neko-dream/server/internal/domain/model/clock"
+	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/samber/lo"
@@ -20,18 +21,20 @@ type (
 	}
 
 	TalkSession struct {
-		talkSessionID    shared.UUID[TalkSession]
-		ownerUserID      shared.UUID[user.User]
-		theme            string
-		description      *string
-		thumbnailURL     *string
-		scheduledEndTime time.Time // 予定終了時間
-		createdAt        time.Time // 作成日時
-		location         *Location
-		city             *string
-		prefecture       *string
-		restrictions     []*RestrictionAttribute // 参加制限
-		hideReport       bool
+		talkSessionID       shared.UUID[TalkSession]
+		ownerUserID         shared.UUID[user.User]
+		theme               string
+		description         *string
+		thumbnailURL        *string
+		scheduledEndTime    time.Time // 予定終了時間
+		createdAt           time.Time // 作成日時
+		location            *Location
+		city                *string
+		prefecture          *string
+		restrictions        []*RestrictionAttribute // 参加制限
+		hideReport          bool
+		organizationID      *shared.UUID[organization.Organization]
+		organizationAliasID *shared.UUID[organization.OrganizationAlias]
 	}
 )
 
@@ -46,19 +49,23 @@ func NewTalkSession(
 	location *Location,
 	city *string,
 	prefecture *string,
+	organizationID *shared.UUID[organization.Organization],
+	organizationAliasID *shared.UUID[organization.OrganizationAlias],
 ) *TalkSession {
 	return &TalkSession{
-		talkSessionID:    talkSessionID,
-		theme:            theme,
-		description:      description,
-		thumbnailURL:     thumbnailURL,
-		ownerUserID:      ownerUserID,
-		createdAt:        createdAt,
-		scheduledEndTime: scheduledEndTime,
-		location:         location,
-		city:             city,
-		prefecture:       prefecture,
-		hideReport:       false,
+		talkSessionID:       talkSessionID,
+		theme:               theme,
+		description:         description,
+		thumbnailURL:        thumbnailURL,
+		ownerUserID:         ownerUserID,
+		createdAt:           createdAt,
+		scheduledEndTime:    scheduledEndTime,
+		location:            location,
+		city:                city,
+		prefecture:          prefecture,
+		hideReport:          false,
+		organizationID:      organizationID,
+		organizationAliasID: organizationAliasID,
 	}
 }
 
@@ -180,4 +187,12 @@ func (t *TalkSession) HideReport() bool {
 
 func (t *TalkSession) SetReportVisibility(hideReport bool) {
 	t.hideReport = hideReport
+}
+
+func (t *TalkSession) OrganizationID() *shared.UUID[organization.Organization] {
+	return t.organizationID
+}
+
+func (t *TalkSession) OrganizationAliasID() *shared.UUID[organization.OrganizationAlias] {
+	return t.organizationAliasID
 }

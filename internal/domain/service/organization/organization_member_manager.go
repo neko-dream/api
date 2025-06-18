@@ -125,7 +125,7 @@ func (s *organizationMemberManager) IsSuperAdmin(ctx context.Context, userID sha
 
 	// スーパーユーザーかどうかをチェック
 	for _, orgUser := range orgUsers {
-		if orgUser.Role >= organization.OrganizationUserRoleSuperAdmin {
+		if orgUser.Role <= organization.OrganizationUserRoleSuperAdmin {
 			return true, nil
 		}
 	}

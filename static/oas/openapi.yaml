@@ -3,16 +3,16 @@ info:
   title: Kotohiro API
   version: 1.0.0
 tags:
+  - name: auth
+  - name: user
   - name: opinion
   - name: vote
   - name: talk_session
   - name: timeline
-  - name: auth
-  - name: user
-  - name: test
-  - name: image
-  - name: policy
   - name: organization
+  - name: policy
+  - name: image
+  - name: test
   - name: health
   - name: manage
 paths:
@@ -58,7 +58,7 @@ paths:
       operationId: devAuthorize
       summary: 開発用登録/ログイン
       parameters:
-        - name: redirect_url
+        - name: redirectUrl
           in: query
           required: true
           schema:
@@ -69,7 +69,7 @@ paths:
           description: devのみで使用するsubjectです。ここで指定した値はログインした後も確認できないため覚えておいてください。同じ値を指定すると同じアカウントにログインできます。
           schema:
             type: string
-        - name: organization_code
+        - name: organizationCode
           in: query
           required: false
           description: 組織コード（組織ログインの場合）
@@ -131,7 +131,7 @@ paths:
                   valid:
                     type: boolean
                   organization:
-                    $ref: '#/components/schemas/organization'
+                    $ref: '#/components/schemas/Organization'
                 required:
                   - valid
         '400':
@@ -156,13 +156,13 @@ paths:
       operationId: changePassword
       summary: パスワード変更
       parameters:
-        - name: old_password
+        - name: oldPassword
           in: query
           required: true
           description: 古いパスワード
           schema:
             type: string
-        - name: new_password
+        - name: newPassword
           in: query
           required: true
           description: 新たなパスワード
@@ -223,12 +223,12 @@ paths:
             schema:
               type: object
               properties:
-                id_or_email:
+                idOrEmail:
                   type: string
                 password:
                   type: string
               required:
-                - id_or_email
+                - idOrEmail
                 - password
       security:
         - {}
@@ -281,7 +281,7 @@ paths:
       x-ogen-operation-group: Auth
   /auth/revoke:
     post:
-      operationId: oauth_token_revoke
+      operationId: revokeToken
       summary: トークンを失効（ログアウト）
       parameters: []
       responses:
@@ -316,7 +316,7 @@ paths:
       x-ogen-operation-group: Auth
   /auth/token/info:
     get:
-      operationId: oauth_token_info
+      operationId: getTokenInfo
       summary: JWTの内容を返してくれる
       parameters: []
       responses:
@@ -325,54 +325,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  aud:
-                    type: string
-                  exp:
-                    type: string
-                  iat:
-                    type: string
-                  iss:
-                    type: string
-                  sub:
-                    type: string
-                  jti:
-                    type: string
-                  displayID:
-                    type: string
-                  displayName:
-                    type: string
-                  iconURL:
-                    type: string
-                  isRegistered:
-                    type: boolean
-                  isEmailVerified:
-                    type: boolean
-                  requiredPasswordChange:
-                    type: boolean
-                  orgType:
-                    type: integer
-                    nullable: true
-                  organizationRole:
-                    type: string
-                    nullable: true
-                  organizationCode:
-                    type: string
-                    nullable: true
-                  organizationID:
-                    type: string
-                    nullable: true
-                required:
-                  - aud
-                  - exp
-                  - iat
-                  - iss
-                  - sub
-                  - jti
-                  - isRegistered
-                  - isEmailVerified
-                  - requiredPasswordChange
+                $ref: '#/components/schemas/TokenClaim'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -406,7 +359,7 @@ paths:
       x-ogen-operation-group: Auth
   /auth/{provider}/callback:
     get:
-      operationId: oauth_callback
+      operationId: handleAuthCallback
       summary: Auth Callback
       parameters:
         - name: provider
@@ -474,19 +427,19 @@ paths:
             enum:
               - google
               - line
-        - name: redirect_url
+        - name: redirectUrl
           in: query
           required: true
           description: ログイン後にリダイレクトするURL
           schema:
             type: string
-        - name: organization_code
+        - name: organizationCode
           in: query
           required: false
           description: 組織コード（組織ログインの場合）
           schema:
             type: string
-        - name: registration_url
+        - name: registrationUrl
           in: query
           required: false
           description: 登録していなかった場合に飛ばすURL
@@ -731,9 +684,9 @@ paths:
                       type: object
                       properties:
                         user:
-                          $ref: '#/components/schemas/user'
+                          $ref: '#/components/schemas/User'
                         opinion:
-                          $ref: '#/components/schemas/opinion'
+                          $ref: '#/components/schemas/Opinion'
                         replyCount:
                           type: integer
                       required:
@@ -778,7 +731,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/reportReason'
+                  $ref: '#/components/schemas/ReportReason'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -813,15 +766,12 @@ paths:
                 type: object
                 properties:
                   opinion:
-                    $ref: '#/components/schemas/opinion'
+                    $ref: '#/components/schemas/Opinion'
                   user:
-                    $ref: '#/components/schemas/user'
+                    $ref: '#/components/schemas/User'
                   myVoteType:
-                    type: string
-                    enum:
-                      - agree
-                      - disagree
-                      - pass
+                    allOf:
+                      - $ref: '#/components/schemas/VoteType'
                     nullable: true
                 required:
                   - opinion
@@ -853,7 +803,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/opinionGroupRatio'
+                  $ref: '#/components/schemas/OpinionGroupRatio'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -894,15 +844,12 @@ paths:
                       type: object
                       properties:
                         opinion:
-                          $ref: '#/components/schemas/opinion'
+                          $ref: '#/components/schemas/Opinion'
                         user:
-                          $ref: '#/components/schemas/user'
+                          $ref: '#/components/schemas/User'
                         myVoteType:
-                          type: string
-                          enum:
-                            - agree
-                            - disagree
-                            - pass
+                          allOf:
+                            - $ref: '#/components/schemas/VoteType'
                           nullable: true
                       required:
                         - opinion
@@ -1008,7 +955,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/reportDetail'
+                $ref: '#/components/schemas/ReportDetail'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -1063,12 +1010,12 @@ paths:
               type: object
               properties:
                 action:
-                  type: string
-                  enum:
-                    - deleted
-                    - hold
+                  $ref: '#/components/schemas/ReportAction'
               required:
                 - action
+            encoding:
+              action:
+                contentType: application/json
       x-ogen-operation-group: Opinion
   /opinions/{opinionID}/votes:
     post:
@@ -1089,7 +1036,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/opinion'
+                  $ref: '#/components/schemas/Opinion'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -1128,11 +1075,8 @@ paths:
               type: object
               properties:
                 voteStatus:
-                  type: string
-                  enum:
-                    - agree
-                    - disagree
-                    - pass
+                  allOf:
+                    - $ref: '#/components/schemas/VoteType'
                   nullable: true
               required:
                 - voteStatus
@@ -1156,7 +1100,7 @@ paths:
                   organizations:
                     type: array
                     items:
-                      $ref: '#/components/schemas/organization'
+                      $ref: '#/components/schemas/Organization'
                 required:
                   - organizations
         '400':
@@ -1175,7 +1119,7 @@ paths:
         - organization
       x-ogen-operation-group: Organization
     post:
-      operationId: createOrganizations
+      operationId: establishOrganization
       summary: 組織作成（運営ユーザーのみ）
       description: |-
         組織を作成できる。
@@ -1224,6 +1168,146 @@ paths:
                 - name
                 - code
                 - orgType
+      x-ogen-operation-group: Organization
+  /organizations/{organizationID}/aliases:
+    get:
+      operationId: getOrganizationAliases
+      summary: 組織エイリアス一覧取得
+      parameters:
+        - name: organizationID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  aliases:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        aliasID:
+                          type: string
+                        aliasName:
+                          type: string
+                        createdAt:
+                          type: string
+                      required:
+                        - aliasID
+                        - aliasName
+                        - createdAt
+                required:
+                  - aliases
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - organization
+      x-ogen-operation-group: Organization
+    post:
+      operationId: createOrganizationAlias
+      summary: 組織エイリアス作成
+      parameters:
+        - name: organizationID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  aliasID:
+                    type: string
+                  aliasName:
+                    type: string
+                  createdAt:
+                    type: string
+                required:
+                  - aliasID
+                  - aliasName
+                  - createdAt
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - organization
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                aliasName:
+                  type: string
+              required:
+                - aliasName
+      x-ogen-operation-group: Organization
+  /organizations/{organizationID}/aliases/{aliasID}:
+    delete:
+      operationId: deleteOrganizationAlias
+      summary: 組織エイリアス削除
+      parameters:
+        - name: organizationID
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: aliasID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - organization
       x-ogen-operation-group: Organization
   /organizations/{organizationID}/invite:
     post:
@@ -1338,7 +1422,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/policyConsentStatus'
+                $ref: '#/components/schemas/PolicyConsentStatus'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -1364,7 +1448,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/policyConsentStatus'
+                $ref: '#/components/schemas/PolicyConsentStatus'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -1436,18 +1520,6 @@ paths:
               - oldest
               - mostReplies
               - nearest
-            x-apidog:
-              enumDescriptions:
-                latest: ''
-                oldest: ''
-                mostReplies: ''
-                nearest: ''
-          x-apidog:
-            enumDescriptions:
-              latest: ''
-              oldest: ''
-              mostReplies: ''
-              nearest: ''
         - name: latitude
           in: query
           required: false
@@ -1474,14 +1546,14 @@ paths:
                       type: object
                       properties:
                         talkSession:
-                          $ref: '#/components/schemas/talkSession'
+                          $ref: '#/components/schemas/TalkSession'
                         opinionCount:
                           type: integer
                       required:
                         - talkSession
                         - opinionCount
                   pagination:
-                    $ref: '#/components/schemas/offsetPagination'
+                    $ref: '#/components/schemas/OffsetPagination'
                 required:
                   - talkSessions
                   - pagination
@@ -1517,7 +1589,7 @@ paths:
         - talk_session
       x-ogen-operation-group: TalkSession
     post:
-      operationId: createTalkSession
+      operationId: initiateTalkSession
       summary: セッション作成
       description: |-
         ## サムネイル画像について
@@ -1534,46 +1606,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                  theme:
-                    type: string
-                  description:
-                    type: string
-                    nullable: true
-                  owner:
-                    $ref: '#/components/schemas/user'
-                  createdAt:
-                    type: string
-                  scheduledEndTime:
-                    type: string
-                  location:
-                    $ref: '#/components/schemas/location'
-                  city:
-                    type: string
-                    nullable: true
-                  prefecture:
-                    type: string
-                    nullable: true
-                  thumbnailURL:
-                    type: string
-                    nullable: true
-                  restrictions:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/restriction'
-                  hideReport:
-                    type: boolean
-                required:
-                  - id
-                  - theme
-                  - owner
-                  - createdAt
-                  - scheduledEndTime
-                  - restrictions
-                  - hideReport
+                $ref: '#/components/schemas/TalkSession'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -1624,6 +1657,9 @@ paths:
                   type: array
                   items:
                     type: string
+                organizationAliasID:
+                  type: string
+                  nullable: true
               required:
                 - theme
                 - scheduledEndTime
@@ -1641,6 +1677,8 @@ paths:
               thumbnailURL:
                 contentType: application/json
               restrictions:
+                contentType: application/json
+              organizationAliasID:
                 contentType: application/json
       x-ogen-operation-group: TalkSession
   /talksessions/histories:
@@ -1683,14 +1721,14 @@ paths:
                 type: object
                 properties:
                   pagination:
-                    $ref: '#/components/schemas/offsetPagination'
+                    $ref: '#/components/schemas/OffsetPagination'
                   talkSessions:
                     type: array
                     items:
                       type: object
                       properties:
                         talkSession:
-                          $ref: '#/components/schemas/talkSession'
+                          $ref: '#/components/schemas/TalkSession'
                         opinionCount:
                           type: integer
                       required:
@@ -1767,7 +1805,7 @@ paths:
                       type: object
                       properties:
                         talkSession:
-                          $ref: '#/components/schemas/talkSession'
+                          $ref: '#/components/schemas/TalkSession'
                         opinionCount:
                           type: integer
                       required:
@@ -1804,7 +1842,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/restriction'
+                  $ref: '#/components/schemas/Restriction'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -1836,7 +1874,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/talkSession'
+                $ref: '#/components/schemas/TalkSession'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -1869,7 +1907,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/talkSession'
+                $ref: '#/components/schemas/TalkSession'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -1887,7 +1925,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -1915,6 +1953,15 @@ paths:
               required:
                 - theme
                 - scheduledEndTime
+            encoding:
+              latitude:
+                contentType: application/json
+              prefecture:
+                contentType: application/json
+              city:
+                contentType: application/json
+              description:
+                contentType: application/json
       x-ogen-operation-group: TalkSession
   /talksessions/{talkSessionID}/analysis:
     get:
@@ -1935,11 +1982,11 @@ paths:
                 type: object
                 properties:
                   myPosition:
-                    $ref: '#/components/schemas/userGroupPosition'
+                    $ref: '#/components/schemas/UserGroupPosition'
                   positions:
                     type: array
                     items:
-                      $ref: '#/components/schemas/userGroupPosition'
+                      $ref: '#/components/schemas/UserGroupPosition'
                   groupOpinions:
                     type: array
                     items:
@@ -1955,9 +2002,9 @@ paths:
                             type: object
                             properties:
                               opinion:
-                                $ref: '#/components/schemas/opinion'
+                                $ref: '#/components/schemas/Opinion'
                               user:
-                                $ref: '#/components/schemas/user'
+                                $ref: '#/components/schemas/User'
                               agreeCount:
                                 type: integer
                               disagreeCount:
@@ -2024,7 +2071,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/conclusion'
+                $ref: '#/components/schemas/Conclusion'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -2058,7 +2105,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/conclusion'
+                $ref: '#/components/schemas/Conclusion'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -2205,17 +2252,14 @@ paths:
                       type: object
                       properties:
                         opinion:
-                          $ref: '#/components/schemas/opinion'
+                          $ref: '#/components/schemas/Opinion'
                         user:
-                          $ref: '#/components/schemas/user'
+                          $ref: '#/components/schemas/User'
                         replyCount:
                           type: integer
                         myVoteType:
-                          type: string
-                          enum:
-                            - pass
-                            - disagree
-                            - agree
+                          allOf:
+                            - $ref: '#/components/schemas/VoteType'
                           nullable: true
                       required:
                         - opinion
@@ -2306,7 +2350,7 @@ paths:
                   reports:
                     type: array
                     items:
-                      $ref: '#/components/schemas/reportDetail'
+                      $ref: '#/components/schemas/ReportDetail'
                 required:
                   - reports
         '400':
@@ -2389,7 +2433,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/restriction'
+                  $ref: '#/components/schemas/Restriction'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -2407,7 +2451,7 @@ paths:
       x-ogen-operation-group: TalkSession
   /talksessions/{talkSessionID}/swipe_opinions:
     get:
-      operationId: swipe_opinions
+      operationId: swipeOpinions
       summary: スワイプ用のエンドポイント
       description: |-
         セッションの中からまだ投票していない意見をランダムに取得する
@@ -2441,9 +2485,9 @@ paths:
                         replyCount:
                           type: integer
                         opinion:
-                          $ref: '#/components/schemas/opinion'
+                          $ref: '#/components/schemas/Opinion'
                         user:
-                          $ref: '#/components/schemas/user'
+                          $ref: '#/components/schemas/User'
                       required:
                         - replyCount
                         - opinion
@@ -2502,25 +2546,25 @@ paths:
               schema:
                 type: object
                 properties:
-                  ActionItemID:
+                  actionItemID:
                     type: string
-                  Sequence:
+                  sequence:
                     type: integer
-                  Content:
+                  content:
                     type: string
-                  Status:
+                  status:
                     type: string
-                  CreatedAt:
+                  createdAt:
                     type: string
-                  UpdatedAt:
+                  updatedAt:
                     type: string
                 required:
-                  - ActionItemID
-                  - Sequence
-                  - Content
-                  - Status
-                  - CreatedAt
-                  - UpdatedAt
+                  - actionItemID
+                  - sequence
+                  - content
+                  - status
+                  - createdAt
+                  - updatedAt
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -2578,7 +2622,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: '#/components/schemas/actionItem'
+                      $ref: '#/components/schemas/ActionItem'
                 required:
                   - items
         '400':
@@ -2617,7 +2661,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/actionItem'
+                $ref: '#/components/schemas/ActionItem'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -2726,7 +2770,7 @@ paths:
       x-ogen-operation-group: Test
   /user:
     get:
-      operationId: get_user_info
+      operationId: getUserInfo
       summary: ユーザー情報の取得
       parameters: []
       responses:
@@ -2738,9 +2782,9 @@ paths:
                 type: object
                 properties:
                   user:
-                    $ref: '#/components/schemas/user'
+                    $ref: '#/components/schemas/User'
                   demographics:
-                    $ref: '#/components/schemas/userDemographics'
+                    $ref: '#/components/schemas/UserDemographics'
                   email:
                     type: string
                     nullable: true
@@ -2757,7 +2801,7 @@ paths:
         - user
       x-ogen-operation-group: User
     post:
-      operationId: registerUser
+      operationId: establishUser
       summary: ユーザー作成
       parameters: []
       responses:
@@ -2766,21 +2810,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  displayID:
-                    type: string
-                    minLength: 3
-                    maxLength: 25
-                    pattern: ^[A-Za-z0-9]$
-                  displayName:
-                    type: string
-                  iconURL:
-                    type: string
-                    nullable: true
-                required:
-                  - displayID
-                  - displayName
+                $ref: '#/components/schemas/User'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -2855,7 +2885,7 @@ paths:
                 contentType: application/json
       x-ogen-operation-group: user
     put:
-      operationId: editUserProfile
+      operationId: updateUserProfile
       summary: ユーザー情報の変更
       parameters: []
       responses:
@@ -2864,21 +2894,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  displayID:
-                    type: string
-                    minLength: 3
-                    maxLength: 25
-                    pattern: ^[A-Za-z0-9]$
-                  displayName:
-                    type: string
-                  iconURL:
-                    type: string
-                    nullable: true
-                required:
-                  - displayID
-                  - displayName
+                $ref: '#/components/schemas/User'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -3193,12 +3209,47 @@ security:
   - CookieAuth: []
 components:
   schemas:
+    ActionItem:
+      type: object
+      required:
+        - actionItemID
+        - sequence
+        - content
+        - status
+        - createdAt
+        - updatedAt
+      properties:
+        actionItemID:
+          type: string
+        sequence:
+          type: integer
+        content:
+          type: string
+        status:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
     AnalysisReportResponse:
       type: object
       properties:
         report:
           type: string
           description: レポート本文
+    Conclusion:
+      type: object
+      required:
+        - user
+        - content
+      properties:
+        user:
+          allOf:
+            - $ref: '#/components/schemas/User'
+          description: 作成ユーザー
+        content:
+          type: string
+          description: 結論本文
     CookieAuth:
       type: object
       required:
@@ -3222,6 +3273,137 @@ components:
             - SessionId
           description: name of the API key
       description: Cookie-based authentication using JWT tokens stored in secure HTTP-only cookies
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+    Location:
+      type: object
+      properties:
+        latitude:
+          type: number
+          description: 緯度
+        longitude:
+          type: number
+          description: 経度
+    OffsetPagination:
+      type: object
+      required:
+        - totalCount
+        - offset
+        - limit
+      properties:
+        totalCount:
+          type: integer
+        offset:
+          type: integer
+        limit:
+          type: integer
+    Opinion:
+      type: object
+      required:
+        - id
+        - content
+        - postedAt
+        - isDeleted
+      properties:
+        id:
+          type: string
+          description: 意見ID
+        title:
+          type: string
+        content:
+          type: string
+          minLength: 1
+          maxLength: 140
+          description: 意見のテキスト
+        parentID:
+          type: string
+          description: 親の意見ID。ルートならば無し
+        voteType:
+          allOf:
+            - $ref: '#/components/schemas/VoteType'
+          nullable: true
+          description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
+        pictureURL:
+          type: string
+          nullable: true
+          description: 画像が返る場合もある
+        referenceURL:
+          type: string
+          description: 参考文献URL
+        postedAt:
+          type: string
+        isDeleted:
+          type: boolean
+    OpinionGroupRatio:
+      type: object
+      required:
+        - agreeCount
+        - disagreeCount
+        - passCount
+        - groupID
+        - groupName
+      properties:
+        agreeCount:
+          type: integer
+        disagreeCount:
+          type: integer
+        passCount:
+          type: integer
+        groupID:
+          type: integer
+        groupName:
+          type: string
+    Organization:
+      type: object
+      required:
+        - ID
+        - name
+        - code
+        - type
+        - roleName
+        - role
+      properties:
+        ID:
+          type: string
+          description: 組織ID
+        name:
+          type: string
+          description: 組織名
+        code:
+          type: string
+          description: 組織コード
+        type:
+          type: integer
+          description: 組織のタイプ
+        roleName:
+          type: string
+        role:
+          type: integer
+          description: ロール
+    PolicyConsentStatus:
+      type: object
+      required:
+        - policyVersion
+        - consentGiven
+      properties:
+        policyVersion:
+          type: string
+          description: 最新ポリシーのバージョン
+        consentedAt:
+          type: string
+          nullable: true
+          description: 同意した日時
+        consentGiven:
+          type: boolean
+          description: 同意したか
     RegenerateRequest:
       type: object
       required:
@@ -3257,356 +3439,13 @@ components:
         content:
           type: string
           description: レポート本文
-    TalkSessionForManage:
-      type: object
-      required:
-        - TalkSessionID
-        - Theme
-        - Description
-        - Owner
-        - ScheduledEndTime
-        - ThumbnailURL
-        - Hidden
-        - UpdatedAt
-        - CreatedAt
-      properties:
-        TalkSessionID:
-          type: string
-        Theme:
-          type: string
-        Description:
-          type: string
-        Owner:
-          $ref: '#/components/schemas/UserForManage'
-        ScheduledEndTime:
-          type: string
-          format: date-time
-        City:
-          type: string
-        Prefecture:
-          type: string
-        ThumbnailURL:
-          type: string
-        Hidden:
-          type: boolean
-        UpdatedAt:
-          type: string
-        CreatedAt:
-          type: string
-    TalkSessionListResponse:
-      type: object
-      required:
-        - TalkSessionStats
-        - TotalCount
-      properties:
-        TalkSessionStats:
-          type: array
-          items:
-            $ref: '#/components/schemas/TalkSessionStats'
-        TotalCount:
-          type: integer
-          format: int32
-    TalkSessionStats:
-      type: object
-      required:
-        - TalkSessionID
-        - Theme
-        - Description
-        - Owner
-        - ScheduledEndTime
-        - ThumbnailURL
-        - Hidden
-        - UpdatedAt
-        - CreatedAt
-        - OpinionCount
-        - OpinionUserCount
-        - VoteCount
-        - VoteUserCount
-      properties:
-        TalkSessionID:
-          type: string
-        Theme:
-          type: string
-        Description:
-          type: string
-        Owner:
-          $ref: '#/components/schemas/UserForManage'
-        ScheduledEndTime:
-          type: string
-          format: date-time
-        City:
-          type: string
-        Prefecture:
-          type: string
-        ThumbnailURL:
-          type: string
-        Hidden:
-          type: boolean
-        UpdatedAt:
-          type: string
-        CreatedAt:
-          type: string
-        OpinionCount:
-          type: integer
-          format: int32
-        OpinionUserCount:
-          type: integer
-          format: int32
-        VoteCount:
-          type: integer
-          format: int32
-        VoteUserCount:
-          type: integer
-          format: int32
-    ToggleReportVisibilityRequest:
-      type: object
-      required:
-        - hidden
-      properties:
-        hidden:
-          type: boolean
-          description: 非表示にするかどうか
-    ToggleReportVisibilityResponse:
-      type: object
-      required:
-        - status
-        - message
-      properties:
-        status:
-          type: string
-          description: ステータス
-        message:
-          type: string
-          description: メッセージ
-    UserForManage:
-      type: object
-      required:
-        - userID
-        - displayID
-        - displayName
-        - iconURL
-        - lastLoginAt
-        - createdAt
-        - updatedAt
-      properties:
-        userID:
-          type: string
-          description: ユーザーID
-        displayID:
-          type: string
-          description: 表示ID
-        displayName:
-          type: string
-          description: 表示名
-        iconURL:
-          type: string
-          description: アイコンURL
-        lastLoginAt:
-          type: string
-          format: date-time
-          description: 最終ログイン日時
-        createdAt:
-          type: string
-          format: date-time
-          description: 作成日時
-        updatedAt:
-          type: string
-          format: date-time
-          description: 更新日時
-    UserStatsResponse:
-      type: object
-      required:
-        - uniqueActionUserCount
-        - userCount
-        - talkSessionCount
-        - date
-      properties:
-        uniqueActionUserCount:
-          type: integer
-          format: int32
-          description: ユニークアクション数
-        userCount:
-          type: integer
-          format: int32
-          description: 登録ユーザー数
-        talkSessionCount:
-          type: integer
-          format: int32
-          description: セッション数
-        date:
-          type: string
-          format: date-time
-          description: 日付
-    actionItem:
-      type: object
-      required:
-        - ActionItemID
-        - Sequence
-        - Content
-        - Status
-        - CreatedAt
-        - UpdatedAt
-      properties:
-        ActionItemID:
-          type: string
-        Sequence:
-          type: integer
-        Content:
-          type: string
-        Status:
-          type: string
-        CreatedAt:
-          type: string
-        UpdatedAt:
-          type: string
-    conclusion:
-      type: object
-      required:
-        - user
-        - content
-      properties:
-        user:
-          allOf:
-            - $ref: '#/components/schemas/user'
-          description: 作成ユーザー
-        content:
-          type: string
-          description: 結論本文
-    error:
-      type: object
-      required:
-        - code
-        - message
-      properties:
-        code:
-          type: string
-        message:
-          type: string
-    location:
-      type: object
-      properties:
-        latitude:
-          type: number
-          description: 緯度
-        longitude:
-          type: number
-          description: 経度
-    offsetPagination:
-      type: object
-      required:
-        - totalCount
-        - offset
-        - limit
-      properties:
-        totalCount:
-          type: integer
-        offset:
-          type: integer
-        limit:
-          type: integer
-    opinion:
-      type: object
-      required:
-        - id
-        - content
-        - postedAt
-        - isDeleted
-      properties:
-        id:
-          type: string
-          description: 意見ID
-        title:
-          type: string
-        content:
-          type: string
-          minLength: 1
-          maxLength: 140
-          description: 意見のテキスト
-        parentID:
-          type: string
-          description: 親の意見ID。ルートならば無し
-        voteType:
-          type: string
-          enum:
-            - disagree
-            - agree
-            - pass
-          nullable: true
-          description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
-        pictureURL:
-          type: string
-          nullable: true
-          description: 画像が返る場合もある
-        referenceURL:
-          type: string
-          description: 参考文献URL
-        postedAt:
-          type: string
-        isDeleted:
-          type: boolean
-    opinionGroupRatio:
-      type: object
-      required:
-        - agreeCount
-        - disagreeCount
-        - passCount
-        - groupID
-        - groupName
-      properties:
-        agreeCount:
-          type: integer
-        disagreeCount:
-          type: integer
-        passCount:
-          type: integer
-        groupID:
-          type: integer
-        groupName:
-          type: string
-    organization:
-      type: object
-      required:
-        - ID
-        - Name
-        - Code
-        - Type
-        - RoleName
-        - Role
-      properties:
-        ID:
-          type: string
-          description: 組織ID
-        Name:
-          type: string
-          description: 組織名
-        Code:
-          type: string
-          description: 組織コード
-        Type:
-          type: integer
-          description: 組織のタイプ
-        RoleName:
-          type: string
-        Role:
-          type: integer
-          description: ロール
-    policyConsentStatus:
-      type: object
-      required:
-        - policyVersion
-        - consentGiven
-      properties:
-        policyVersion:
-          type: string
-          description: 最新ポリシーのバージョン
-        consentedAt:
-          type: string
-          nullable: true
-          description: 同意した日時
-        consentGiven:
-          type: boolean
-          description: 同意したか
-    reportDetail:
+    ReportAction:
+      type: string
+      enum:
+        - deleted
+        - hold
+      description: 通報解決アクション
+    ReportDetail:
       type: object
       required:
         - opinion
@@ -3616,17 +3455,13 @@ components:
         - reportCount
       properties:
         opinion:
-          $ref: '#/components/schemas/opinion'
+          $ref: '#/components/schemas/Opinion'
         user:
           allOf:
-            - $ref: '#/components/schemas/user'
+            - $ref: '#/components/schemas/User'
           description: 作成ユーザー
         status:
-          type: string
-          enum:
-            - unsolved
-            - deleted
-            - hold
+          $ref: '#/components/schemas/ReportStatus'
         reasons:
           type: array
           items:
@@ -3642,7 +3477,7 @@ components:
         reportCount:
           type: integer
           description: この意見が通報を受けた回数
-    reportReason:
+    ReportReason:
       type: object
       required:
         - reasonID
@@ -3654,7 +3489,14 @@ components:
         reason:
           type: string
           description: 不適切な内容
-    restriction:
+    ReportStatus:
+      type: string
+      enum:
+        - unsolved
+        - deleted
+        - hold
+      description: 通報ステータス
+    Restriction:
       type: object
       required:
         - key
@@ -3669,14 +3511,14 @@ components:
           items:
             type: string
           description: 依存しているrestriction
-    success:
+    Success:
       type: object
       required:
         - message
       properties:
         message:
           type: string
-    talkSession:
+    TalkSession:
       type: object
       required:
         - id
@@ -3699,7 +3541,7 @@ components:
           description: 説明
         owner:
           allOf:
-            - $ref: '#/components/schemas/user'
+            - $ref: '#/components/schemas/User'
           description: 作成ユーザー
         createdAt:
           type: string
@@ -3709,7 +3551,7 @@ components:
           description: 終了予定日時
         location:
           allOf:
-            - $ref: '#/components/schemas/location'
+            - $ref: '#/components/schemas/Location'
           description: 位置情報
         city:
           type: string
@@ -3726,11 +3568,132 @@ components:
         restrictions:
           type: array
           items:
-            $ref: '#/components/schemas/restriction'
+            $ref: '#/components/schemas/Restriction'
           description: セッションの参加制限
         hideReport:
           type: boolean
-    tokenClaim:
+    TalkSessionForManage:
+      type: object
+      required:
+        - talkSessionID
+        - theme
+        - description
+        - owner
+        - scheduledEndTime
+        - thumbnailURL
+        - hidden
+        - updatedAt
+        - createdAt
+      properties:
+        talkSessionID:
+          type: string
+        theme:
+          type: string
+        description:
+          type: string
+        owner:
+          $ref: '#/components/schemas/UserForManage'
+        scheduledEndTime:
+          type: string
+          format: date-time
+        city:
+          type: string
+        prefecture:
+          type: string
+        thumbnailURL:
+          type: string
+        hidden:
+          type: boolean
+        updatedAt:
+          type: string
+        createdAt:
+          type: string
+    TalkSessionListResponse:
+      type: object
+      required:
+        - talkSessionStats
+        - totalCount
+      properties:
+        talkSessionStats:
+          type: array
+          items:
+            $ref: '#/components/schemas/TalkSessionStats'
+        totalCount:
+          type: integer
+          format: int32
+    TalkSessionStats:
+      type: object
+      required:
+        - talkSessionID
+        - theme
+        - description
+        - owner
+        - scheduledEndTime
+        - thumbnailURL
+        - hidden
+        - updatedAt
+        - createdAt
+        - opinionCount
+        - opinionUserCount
+        - voteCount
+        - voteUserCount
+      properties:
+        talkSessionID:
+          type: string
+        theme:
+          type: string
+        description:
+          type: string
+        owner:
+          $ref: '#/components/schemas/UserForManage'
+        scheduledEndTime:
+          type: string
+          format: date-time
+        city:
+          type: string
+        prefecture:
+          type: string
+        thumbnailURL:
+          type: string
+        hidden:
+          type: boolean
+        updatedAt:
+          type: string
+        createdAt:
+          type: string
+        opinionCount:
+          type: integer
+          format: int32
+        opinionUserCount:
+          type: integer
+          format: int32
+        voteCount:
+          type: integer
+          format: int32
+        voteUserCount:
+          type: integer
+          format: int32
+    ToggleReportVisibilityRequest:
+      type: object
+      required:
+        - hidden
+      properties:
+        hidden:
+          type: boolean
+          description: 非表示にするかどうか
+    ToggleReportVisibilityResponse:
+      type: object
+      required:
+        - status
+        - message
+      properties:
+        status:
+          type: string
+          description: ステータス
+        message:
+          type: string
+          description: メッセージ
+    TokenClaim:
       type: object
       required:
         - aud
@@ -3782,7 +3745,21 @@ components:
         requiredPasswordChange:
           type: boolean
           description: パスワードの更新が必要かどうか
-    user:
+        organizationRole:
+          type: string
+          nullable: true
+          description: 組織のRole
+        organizationCode:
+          type: string
+          nullable: true
+          description: |-
+            組織コード
+            ログイン時に使用する
+        organizationID:
+          type: string
+          nullable: true
+          description: 組織ID
+    User:
       type: object
       required:
         - displayID
@@ -3798,7 +3775,7 @@ components:
         iconURL:
           type: string
           nullable: true
-    userDemographics:
+    UserDemographics:
       type: object
       properties:
         dateOfBirth:
@@ -3821,7 +3798,42 @@ components:
           nullable: true
           description: 都道府県
           title: 都道府県
-    userGroupPosition:
+    UserForManage:
+      type: object
+      required:
+        - userID
+        - displayID
+        - displayName
+        - iconURL
+        - lastLoginAt
+        - createdAt
+        - updatedAt
+      properties:
+        userID:
+          type: string
+          description: ユーザーID
+        displayID:
+          type: string
+          description: 表示ID
+        displayName:
+          type: string
+          description: 表示名
+        iconURL:
+          type: string
+          description: アイコンURL
+        lastLoginAt:
+          type: string
+          format: date-time
+          description: 最終ログイン日時
+        createdAt:
+          type: string
+          format: date-time
+          description: 作成日時
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新日時
+    UserGroupPosition:
       type: object
       required:
         - posX
@@ -3849,7 +3861,31 @@ components:
         perimeterIndex:
           type: integer
           description: 境界ポイントのインデックス
-    validationErrorItem:
+    UserStatsResponse:
+      type: object
+      required:
+        - uniqueActionUserCount
+        - userCount
+        - talkSessionCount
+        - date
+      properties:
+        uniqueActionUserCount:
+          type: integer
+          format: int32
+          description: ユニークアクション数
+        userCount:
+          type: integer
+          format: int32
+          description: 登録ユーザー数
+        talkSessionCount:
+          type: integer
+          format: int32
+          description: セッション数
+        date:
+          type: string
+          format: date-time
+          description: 日付
+    ValidationErrorItem:
       type: object
       required:
         - field
@@ -3861,13 +3897,16 @@ components:
         message:
           type: string
           description: バリデーションエラーメッセージ
+    VoteType:
+      type: string
+      enum:
+        - agree
+        - disagree
+        - pass
+      description: 投票タイプ
   securitySchemes:
     CookieAuth:
       type: apiKey
       in: cookie
       name: SessionId
       description: Cookie-based authentication using JWT tokens stored in secure HTTP-only cookies
-servers:
-  - url: http://localhost:3000
-    description: Kotohiro API Server
-    variables: {}
