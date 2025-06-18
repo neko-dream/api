@@ -11,6 +11,7 @@ namespace kotohiro {
   @route("/policy/consent")
   @get
   @summary("最新のポリシーに同意したかを取得")
+  @useAuth([])
   op getPolicyConsentStatus(): PolicyConsentStatus | {
     @statusCode statusCode: 400;
     @body body: {};

@@ -34,6 +34,7 @@ namespace kotohiro {
   @route("/talksessions/{talkSessionID}/timelines")
   @get
   @summary("タイムライン取得")
+  @useAuth([])
   op getTimeLine(@path talkSessionID: string): Body<{
     items: ActionItem[];
   }> | {

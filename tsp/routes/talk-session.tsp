@@ -17,6 +17,7 @@ namespace kotohiro {
   @route("/talksessions/{talkSessionID}/restrictions")
   @get
   @summary("セッションで満たしていない制限")
+  @useAuth([])
   op getTalkSessionRestrictionSatisfied(
     @path talkSessionID: string,
   ): Body<Restriction[]> | {
@@ -32,6 +33,7 @@ namespace kotohiro {
   @route("/talksessions/{talkSessionID}")
   @get
   @summary("トークセッションの詳細")
+  @useAuth([])
   op getTalkSessionDetail(@path talkSessionID: string): TalkSession | {
     @statusCode statusCode: 400;
     @body body: {
@@ -70,6 +72,7 @@ namespace kotohiro {
   @route("/talksessions")
   @get
   @summary("セッション一覧")
+  @useAuth([])
   op getTalkSessionList(
     /**
      * 1ページあたりの要素数
@@ -149,6 +152,7 @@ namespace kotohiro {
   @route("/talksessions/{talkSessionID}/analysis")
   @get
   @summary("分析結果一覧")
+  @useAuth([])
   op talkSessionAnalysis(@path talkSessionID: string): Body<{
     myPosition?: UserGroupPosition;
     positions: UserGroupPosition[];
@@ -182,6 +186,7 @@ namespace kotohiro {
   @route("/talksessions/{talkSessionID}/report")
   @get
   @summary("セッションレポートを返す")
+  @useAuth([])
   op getTalkSessionReport(@path talkSessionID: string): Body<{
     report?: string | null;
   }> | {
@@ -230,6 +235,7 @@ namespace kotohiro {
   @route("/talksessions/{talkSessionID}/conclusion")
   @get
   @summary("結論取得")
+  @useAuth([])
   op getConclusion(@path talkSessionID: string): Conclusion | {
     @statusCode statusCode: 400;
     @body body: {};
@@ -265,6 +271,7 @@ namespace kotohiro {
   @route("/talksessions/{talkSessionID}/consent")
   @get
   @summary("セッションに同意しているか")
+  @useAuth([])
   op hasConsent(@path talkSessionID: string): Body<{
     hasConsent: boolean;
   }> | {
@@ -296,6 +303,7 @@ namespace kotohiro {
   @route("/talksessions/restrictions")
   @get
   @summary("セッションで指定可能な制限一覧")
+  @useAuth([])
   op getTalkSessionRestrictionKeys(): Body<Restriction[]> | {
     @statusCode statusCode: 400;
     @body body: {};
@@ -318,7 +326,6 @@ namespace kotohiro {
      */
     @query(#{ explode: true }) theme?: string,
 
-    @extension("x-apidog", #{ enumDescriptions: #{ finished: "", open: "" } })
     @query(#{ explode: true })
     status?: "finished" | "open" | null,
   ): Body<{

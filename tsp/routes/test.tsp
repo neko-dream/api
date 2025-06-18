@@ -10,6 +10,7 @@ namespace kotohiro {
   @route("/test")
   @get
   @summary("OpenAPIテスト用")
+  @useAuth([])
   op test(): Body<{
     optInt?: integer | null;
     optNilInt?: integer;
@@ -32,6 +33,7 @@ namespace kotohiro {
   @route("/test/dummy")
   @post
   @summary("mudai")
+  @useAuth([])
   op dummiInit(): Body<{}> | {
     @statusCode statusCode: 400;
     @body body: {};
