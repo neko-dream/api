@@ -186,17 +186,17 @@ func (s *Server) handleAuthorizeRequest(args [1]string, argsEscaped bool, w http
 					In:   "path",
 				}: params.Provider,
 				{
-					Name: "redirectUrl",
+					Name: "redirectURL",
 					In:   "query",
-				}: params.RedirectUrl,
+				}: params.RedirectURL,
 				{
 					Name: "organizationCode",
 					In:   "query",
 				}: params.OrganizationCode,
 				{
-					Name: "registrationUrl",
+					Name: "registrationURL",
 					In:   "query",
-				}: params.RegistrationUrl,
+				}: params.RegistrationURL,
 			},
 			Raw: r,
 		}

@@ -429,7 +429,7 @@ paths:
             enum:
               - google
               - line
-        - name: redirectUrl
+        - name: redirectURL
           in: query
           required: true
           description: ログイン後にリダイレクトするURL
@@ -441,7 +441,7 @@ paths:
           description: 組織コード（組織ログインの場合）
           schema:
             type: string
-        - name: registrationUrl
+        - name: registrationURL
           in: query
           required: false
           description: 登録していなかった場合に飛ばすURL

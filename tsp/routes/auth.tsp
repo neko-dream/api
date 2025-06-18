@@ -124,7 +124,7 @@ namespace kotohiro {
     /**
      * ログイン後にリダイレクトするURL
      */
-    @query(#{ explode: true }) redirectUrl: string,
+    @query(#{ explode: true }) redirectURL: string,
 
     /**
      * 組織コード（組織ログインの場合）
@@ -134,7 +134,7 @@ namespace kotohiro {
     /**
      * 登録していなかった場合に飛ばすURL
      */
-    @query(#{ explode: true }) registrationUrl?: string,
+    @query(#{ explode: true }) registrationURL?: string,
   ): {
     @statusCode statusCode: 302;
 

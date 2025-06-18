@@ -19,11 +19,11 @@ import (
 type AuthorizeParams struct {
 	Provider AuthorizeProvider
 	// ログイン後にリダイレクトするURL.
-	RedirectUrl string
+	RedirectURL string
 	// 組織コード（組織ログインの場合）.
 	OrganizationCode OptString
 	// 登録していなかった場合に飛ばすURL.
-	RegistrationUrl OptString
+	RegistrationURL OptString
 }
 
 func unpackAuthorizeParams(packed middleware.Parameters) (params AuthorizeParams) {
@@ -36,10 +36,10 @@ func unpackAuthorizeParams(packed middleware.Parameters) (params AuthorizeParams
 	}
 	{
 		key := middleware.ParameterKey{
-			Name: "redirectUrl",
+			Name: "redirectURL",
 			In:   "query",
 		}
-		params.RedirectUrl = packed[key].(string)
+		params.RedirectURL = packed[key].(string)
 	}
 	{
 		key := middleware.ParameterKey{
@@ -52,11 +52,11 @@ func unpackAuthorizeParams(packed middleware.Parameters) (params AuthorizeParams
 	}
 	{
 		key := middleware.ParameterKey{
-			Name: "registrationUrl",
+			Name: "registrationURL",
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.RegistrationUrl = v.(OptString)
+			params.RegistrationURL = v.(OptString)
 		}
 	}
 	return params
@@ -117,10 +117,10 @@ func decodeAuthorizeParams(args [1]string, argsEscaped bool, r *http.Request) (p
 			Err:  err,
 		}
 	}
-	// Decode query: redirectUrl.
+	// Decode query: redirectURL.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "redirectUrl",
+			Name:    "redirectURL",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
@@ -137,7 +137,7 @@ func decodeAuthorizeParams(args [1]string, argsEscaped bool, r *http.Request) (p
 					return err
 				}
 
-				params.RedirectUrl = c
+				params.RedirectURL = c
 				return nil
 			}); err != nil {
 				return err
@@ -148,7 +148,7 @@ func decodeAuthorizeParams(args [1]string, argsEscaped bool, r *http.Request) (p
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "redirectUrl",
+			Name: "redirectURL",
 			In:   "query",
 			Err:  err,
 		}
@@ -194,17 +194,17 @@ func decodeAuthorizeParams(args [1]string, argsEscaped bool, r *http.Request) (p
 			Err:  err,
 		}
 	}
-	// Decode query: registrationUrl.
+	// Decode query: registrationURL.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "registrationUrl",
+			Name:    "registrationURL",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotRegistrationUrlVal string
+				var paramsDotRegistrationURLVal string
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
@@ -216,12 +216,12 @@ func decodeAuthorizeParams(args [1]string, argsEscaped bool, r *http.Request) (p
 						return err
 					}
 
-					paramsDotRegistrationUrlVal = c
+					paramsDotRegistrationURLVal = c
 					return nil
 				}(); err != nil {
 					return err
 				}
-				params.RegistrationUrl.SetTo(paramsDotRegistrationUrlVal)
+				params.RegistrationURL.SetTo(paramsDotRegistrationURLVal)
 				return nil
 			}); err != nil {
 				return err
@@ -230,7 +230,7 @@ func decodeAuthorizeParams(args [1]string, argsEscaped bool, r *http.Request) (p
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "registrationUrl",
+			Name: "registrationURL",
 			In:   "query",
 			Err:  err,
 		}
