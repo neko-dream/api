@@ -2230,7 +2230,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								switch method {
 								case "GET":
 									r.name = "OpinionsHistory"
-									r.summary = "今までに投稿した異見"
+									r.summary = "今までに投稿した意見"
 									r.operationID = "opinionsHistory"
 									r.pathPattern = "/opinions/histories"
 									r.args = args

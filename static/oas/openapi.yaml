@@ -313,6 +313,8 @@ paths:
                 type: object
       tags:
         - auth
+      security:
+        - {}
       x-ogen-operation-group: Auth
   /auth/token/info:
     get:
@@ -647,7 +649,7 @@ paths:
   /opinions/histories:
     get:
       operationId: opinionsHistory
-      summary: 今までに投稿した異見
+      summary: 今までに投稿した意見
       parameters:
         - name: sort
           in: query
@@ -746,6 +748,8 @@ paths:
                 type: object
       tags:
         - opinion
+      security:
+        - {}
       x-ogen-operation-group: Opinion
   /opinions/{opinionID}:
     get:
@@ -784,6 +788,8 @@ paths:
                 type: object
       tags:
         - opinion
+      security:
+        - {}
       x-ogen-operation-group: Opinion
   /opinions/{opinionID}/analysis:
     get:
@@ -818,6 +824,8 @@ paths:
                 type: object
       tags:
         - opinion
+      security:
+        - {}
       x-ogen-operation-group: Opinion
   /opinions/{opinionID}/replies:
     get:
@@ -886,6 +894,8 @@ paths:
                   - message
       tags:
         - opinion
+      security:
+        - {}
       x-ogen-operation-group: Opinion
   /opinions/{opinionID}/report:
     post:
@@ -1437,6 +1447,8 @@ paths:
                 type: object
       tags:
         - policy
+      security:
+        - {}
       x-ogen-operation-group: Policy
     post:
       operationId: policyConsent
@@ -1587,6 +1599,8 @@ paths:
                   - message
       tags:
         - talk_session
+      security:
+        - {}
       x-ogen-operation-group: TalkSession
     post:
       operationId: initiateTalkSession
@@ -1783,14 +1797,6 @@ paths:
               - finished
               - open
             nullable: true
-            x-apidog:
-              enumDescriptions:
-                finished: ''
-                open: ''
-          x-apidog:
-            enumDescriptions:
-              finished: ''
-              open: ''
       responses:
         '200':
           description: The request has succeeded.
@@ -1857,6 +1863,8 @@ paths:
                 type: object
       tags:
         - talk_session
+      security:
+        - {}
       x-ogen-operation-group: TalkSession
   /talksessions/{talkSessionID}:
     get:
@@ -1891,6 +1899,8 @@ paths:
                   - message
       tags:
         - talk_session
+      security:
+        - {}
       x-ogen-operation-group: TalkSession
     put:
       operationId: editTalkSession
@@ -2054,6 +2064,8 @@ paths:
                   - message
       tags:
         - talk_session
+      security:
+        - {}
       x-ogen-operation-group: TalkSession
   /talksessions/{talkSessionID}/conclusion:
     get:
@@ -2086,6 +2098,8 @@ paths:
                 type: object
       tags:
         - talk_session
+      security:
+        - {}
       x-ogen-operation-group: TalkSession
     post:
       operationId: postConclusion
@@ -2168,6 +2182,8 @@ paths:
                 type: object
       tags:
         - talk_session
+      security:
+        - {}
       x-ogen-operation-group: TalkSession
     post:
       operationId: consentTalkSession
@@ -2289,6 +2305,8 @@ paths:
                 type: object
       tags:
         - opinion
+      security:
+        - {}
       x-ogen-operation-group: Opinion
   /talksessions/{talkSessionID}/report:
     get:
@@ -2319,6 +2337,8 @@ paths:
                 type: object
       tags:
         - talk_session
+      security:
+        - {}
       x-ogen-operation-group: TalkSession
   /talksessions/{talkSessionID}/reports:
     get:
@@ -2448,6 +2468,8 @@ paths:
                 type: object
       tags:
         - talk_session
+      security:
+        - {}
       x-ogen-operation-group: TalkSession
   /talksessions/{talkSessionID}/swipe_opinions:
     get:
@@ -2527,6 +2549,8 @@ paths:
                   - message
       tags:
         - opinion
+      security:
+        - {}
       x-ogen-operation-group: Opinion
   /talksessions/{talkSessionID}/timeline:
     post:
@@ -2639,6 +2663,8 @@ paths:
                 type: object
       tags:
         - timeline
+      security:
+        - {}
       x-ogen-operation-group: Timeline
   /talksessions/{talkSessionID}/timelines/{actionItemID}:
     put:
@@ -2740,6 +2766,8 @@ paths:
                 type: object
       tags:
         - user
+      security:
+        - {}
       x-ogen-operation-group: test
   /test/dummy:
     post:
@@ -2767,6 +2795,8 @@ paths:
                 type: object
       tags:
         - test
+      security:
+        - {}
       x-ogen-operation-group: Test
   /user:
     get:

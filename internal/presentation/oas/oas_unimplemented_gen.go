@@ -430,7 +430,7 @@ func (UnimplementedHandler) OpinionComments2(ctx context.Context, params Opinion
 
 // OpinionsHistory implements opinionsHistory operation.
 //
-// 今までに投稿した異見.
+// 今までに投稿した意見.
 //
 // GET /opinions/histories
 func (UnimplementedHandler) OpinionsHistory(ctx context.Context, params OpinionsHistoryParams) (r OpinionsHistoryRes, _ error) {

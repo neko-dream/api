@@ -457,7 +457,7 @@ type UserHandler interface {
 	GetUserInfo(ctx context.Context) (GetUserInfoRes, error)
 	// OpinionsHistory implements opinionsHistory operation.
 	//
-	// 今までに投稿した異見.
+	// 今までに投稿した意見.
 	//
 	// GET /opinions/histories
 	OpinionsHistory(ctx context.Context, params OpinionsHistoryParams) (OpinionsHistoryRes, error)
