@@ -58,7 +58,7 @@ paths:
       operationId: devAuthorize
       summary: 開発用登録/ログイン
       parameters:
-        - name: redirectUrl
+        - name: redirectURL
           in: query
           required: true
           schema:

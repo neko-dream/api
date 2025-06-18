@@ -88,7 +88,7 @@ namespace kotohiro {
   @summary("開発用登録/ログイン")
   @useAuth([])
   op devAuthorize(
-    @query(#{ explode: true }) redirectUrl: string,
+    @query(#{ explode: true }) redirectURL: string,
 
     /**
      * devのみで使用するsubjectです。ここで指定した値はログインした後も確認できないため覚えておいてください。同じ値を指定すると同じアカウントにログインできます。

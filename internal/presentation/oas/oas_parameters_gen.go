@@ -591,7 +591,7 @@ func decodeDeleteOrganizationAliasParams(args [2]string, argsEscaped bool, r *ht
 
 // DevAuthorizeParams is parameters of devAuthorize operation.
 type DevAuthorizeParams struct {
-	RedirectUrl string
+	RedirectURL string
 	// Devのみで使用するsubjectです。ここで指定した値はログインした後も確認できないため覚えておいてください。同じ値を指定すると同じアカウントにログインできます。.
 	ID string
 	// 組織コード（組織ログインの場合）.
@@ -601,10 +601,10 @@ type DevAuthorizeParams struct {
 func unpackDevAuthorizeParams(packed middleware.Parameters) (params DevAuthorizeParams) {
 	{
 		key := middleware.ParameterKey{
-			Name: "redirectUrl",
+			Name: "redirectURL",
 			In:   "query",
 		}
-		params.RedirectUrl = packed[key].(string)
+		params.RedirectURL = packed[key].(string)
 	}
 	{
 		key := middleware.ParameterKey{
@@ -627,10 +627,10 @@ func unpackDevAuthorizeParams(packed middleware.Parameters) (params DevAuthorize
 
 func decodeDevAuthorizeParams(args [0]string, argsEscaped bool, r *http.Request) (params DevAuthorizeParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
-	// Decode query: redirectUrl.
+	// Decode query: redirectURL.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "redirectUrl",
+			Name:    "redirectURL",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
@@ -647,7 +647,7 @@ func decodeDevAuthorizeParams(args [0]string, argsEscaped bool, r *http.Request)
 					return err
 				}
 
-				params.RedirectUrl = c
+				params.RedirectURL = c
 				return nil
 			}); err != nil {
 				return err
@@ -658,7 +658,7 @@ func decodeDevAuthorizeParams(args [0]string, argsEscaped bool, r *http.Request)
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "redirectUrl",
+			Name: "redirectURL",
 			In:   "query",
 			Err:  err,
 		}
