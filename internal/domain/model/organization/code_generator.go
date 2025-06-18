@@ -1,6 +1,7 @@
 package organization
 
 import (
+	"slices"
 	"unicode"
 
 	"github.com/neko-dream/server/internal/domain/messages"
@@ -13,7 +14,7 @@ func ValidateOrganizationCode(code string) error {
 		return messages.OrganizationCodeTooShort
 	}
 	for _, r := range code {
-		if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
+		if !unicode.IsLetter(r) && !unicode.IsDigit(r) && !slices.Contains([]rune{'_', '-'}, r) {
 			return messages.OrganizationCodeInvalid
 		}
 		if r > 127 {

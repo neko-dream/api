@@ -3,9 +3,7 @@ package jwt
 import (
 	"context"
 	"errors"
-	"log"
 	"net/http"
-	"sort"
 
 	"braces.dev/errtrace"
 	"github.com/golang-jwt/jwt/v5"
@@ -102,7 +100,6 @@ func (j *tokenManager) Generate(ctx context.Context, user user.User, sessionID s
 
 	// セッションに組織IDがある場合、その組織情報を優先的に使用
 	if sess != nil && sess.OrganizationID() != nil && !sess.OrganizationID().IsZero() {
-		log.Println("Session found with OrganizationID:", sess.OrganizationID())
 		orgID := shared.UUID[organization.Organization](sess.OrganizationID().UUID())
 		org, err := j.OrganizationRepository.FindByID(ctx, orgID)
 		if err == nil && org != nil {
@@ -115,32 +112,9 @@ func (j *tokenManager) Generate(ctx context.Context, user user.User, sessionID s
 				organizationRole = lo.ToPtr(organization.RoleToName(orgUser.Role))
 			}
 		}
-	} else {
-		// 組織IDがない場合は、従来通りユーザーの所属組織から最も権限の高いものを選択
-		orgUsers, _ := j.OrganizationUserRepository.FindByUserID(ctx, user.UserID())
-		// roleでソート
-		sort.SliceStable(orgUsers, func(i, j int) bool {
-			return orgUsers[i].Role < orgUsers[j].Role
-		})
-		if len(orgUsers) > 0 {
-			orgUser := orgUsers[0]
-			// organizationをとる
-			org, err := j.OrganizationRepository.FindByID(ctx, orgUser.OrganizationID)
-			if err != nil {
-				utils.HandleError(ctx, err, "GetOrganizationByID")
-				return "", err
-			}
-			if org == nil {
-				return "", errtrace.Wrap(errors.New("organization not found"))
-			}
-			// organizationのroleを取得
-			orgType = lo.ToPtr(int(org.OrganizationType))
-			organizationRole = lo.ToPtr(organization.RoleToName(orgUser.Role))
-		}
 	}
 
 	claim := session.NewClaimWithOrganization(ctx, user, sessionID, requiredPasswordChange, orgType, organizationID, organizationCode, organizationRole)
-	log.Println("Generating JWT for user:", user.UserID(), "with session ID:", sessionID)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim.GenMapClaim())
 	return errtrace.Wrap2(token.SignedString([]byte(j.secret)))
 }

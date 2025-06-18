@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"log"
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/organization"
@@ -157,7 +158,7 @@ func (s *organizationService) ResolveOrganizationIDFromCode(ctx context.Context,
 
 	// 組織コードのバリデーション
 	if err := organization.ValidateOrganizationCode(*code); err != nil {
-		// バリデーションエラーの場合も組織なしで続行
+		log.Println("Invalid organization code:", *code, "Error:", err)
 		return nil, nil
 	}
 

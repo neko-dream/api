@@ -26,10 +26,6 @@ namespace kotohiro {
    * 組織を作成できる。
    * これを作れるユーザーはDBを直接叩いて作るしかない。
    *
-   * OrgType
-   * - 1: 通常
-   * - 2: 自治体
-   * - 3: 議員
    */
   @tag("organization")
   @extension("x-ogen-operation-group", "Organization")
@@ -39,7 +35,15 @@ namespace kotohiro {
   op establishOrganization(
     @multipartBody body: {
       name: HttpPart<string>;
+      /**
+       * 組織コード（ログイン時に使用）
+       * 4文字以上127文字以下の英数字 _- のみ使用可能
+       */
       code: HttpPart<string>;
+      /**
+       * 組織タイプ
+       * - 1: 通常（基本これ）
+       */
       orgType: HttpPart<numeric>;
     },
   ): Body<{}> | {

@@ -41,12 +41,12 @@ var (
 	OrganizationCodeTooShort = &APIError{
 		StatusCode: http.StatusBadRequest,
 		Code:       "ORGANIZATION-008",
-		Message:    "組織コードは4文字以上でなければなりません",
+		Message:    "組織コードは4文字~127文字の英数字か-_で構成される必要があります",
 	}
 	OrganizationCodeInvalid = &APIError{
 		StatusCode: http.StatusBadRequest,
 		Code:       "ORGANIZATION-009",
-		Message:    "組織コードは英数字で構成される必要があります",
+		Message:    "組織コードは4文字~127文字の英数字か-_で構成される必要があります",
 	}
 	OrganizationTypeInvalid = &APIError{
 		StatusCode: http.StatusBadRequest,
