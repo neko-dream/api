@@ -6,6 +6,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/server/internal/presentation/oas"
+	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
@@ -59,4 +61,12 @@ type UserDetail struct {
 	User
 	UserAuth
 	*UserDemographic
+}
+
+func (u *User) ToTalkSessionOwner() oas.TalkSessionOwner {
+	return oas.TalkSessionOwner{
+		DisplayID:   u.DisplayID,
+		DisplayName: u.DisplayName,
+		IconURL:     utils.ToOptNil[oas.OptNilString](u.IconURL),
+	}
 }

@@ -9,6 +9,8 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/domain/model/vote"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
+	"github.com/neko-dream/server/internal/presentation/oas"
+	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
 )
 
@@ -93,6 +95,20 @@ func (o *OpinionWithRepresentative) Mask(reports []model.OpinionReport) {
 	o.Opinion.Mask(reports)
 }
 
+func (o *OpinionWithRepresentative) ToAnalysisOpinionItem() oas.TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem {
+	return oas.TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem{
+		Opinion: o.Opinion.ToResponse(),
+		User: oas.User{
+			DisplayID:   o.User.DisplayID,
+			DisplayName: o.User.DisplayName,
+			IconURL:     utils.ToOptNil[oas.OptNilString](o.User.IconURL),
+		},
+		AgreeCount:    o.AgreeCount,
+		DisagreeCount: o.DisagreeCount,
+		PassCount:     o.PassCount,
+	}
+}
+
 type RepresentativeOpinion struct {
 	TalkSessionID shared.UUID[talksession.TalkSession]
 	OpinionID     shared.UUID[opinion.Opinion]
@@ -105,4 +121,25 @@ type RepresentativeOpinion struct {
 type ReportReason struct {
 	ReasonID int
 	Reason   string
+}
+
+func (o *Opinion) ToResponse() oas.Opinion {
+	var parentID oas.OptString
+	if o.ParentOpinionID != nil {
+		parentID = oas.OptString{
+			Value: o.ParentOpinionID.String(),
+			Set:   true,
+		}
+	}
+
+	return oas.Opinion{
+		ID:           o.OpinionID.String(),
+		Title:        utils.ToOpt[oas.OptString](o.Title),
+		Content:      o.Content,
+		ParentID:     parentID,
+		PictureURL:   utils.ToOptNil[oas.OptNilString](o.PictureURL),
+		ReferenceURL: utils.ToOpt[oas.OptString](o.ReferenceURL),
+		PostedAt:     o.CreatedAt.Format(time.RFC3339),
+		IsDeleted:    o.IsDeleted,
+	}
 }
