@@ -124,11 +124,7 @@ namespace kotohiro {
   @get
   @summary("組織エイリアス一覧取得")
   op getOrganizationAliases(@path organizationID: string): Body<{
-    aliases: {
-      aliasID: string;
-      aliasName: string;
-      createdAt: string;
-    }[];
+    aliases: OrganizationAlias[];
   }> | {
     @statusCode statusCode: 400;
     @body body: {};
@@ -147,11 +143,7 @@ namespace kotohiro {
     @multipartBody body: {
       aliasName: HttpPart<string>;
     },
-  ): Body<{
-    aliasID: string;
-    aliasName: string;
-    createdAt: string;
-  }> | {
+  ): Body<OrganizationAlias> | {
     @statusCode statusCode: 400;
     @body body: {};
   } | {

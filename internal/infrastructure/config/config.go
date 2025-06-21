@@ -45,7 +45,7 @@ type Config struct {
 	// 暗号化バージョン (v1, etc..)
 	ENCRYPTION_VERSION string `env:"ENCRYPTION_VERSION"`
 	// 暗号化キー (16バイトの文字列) コマンド: openssl rand -base64 16
-	ENCRYPTION_SECRET string `env:"ENCRYPTION_SECRET,required"`
+	ENCRYPTION_SECRET string `env:"ENCRYPTION_SECRET"`
 
 	// ポリシーバージョン 現状は固定。API生えたら別途取得する
 	POLICY_VERSION string `env:"POLICY_VERSION"`
@@ -77,7 +77,7 @@ func LoadConfig() *Config {
 
 	config, err := env.ParseAs[Config]()
 	if err != nil {
-		panic(err)
+		panic("Failed to load config: " + err.Error())
 	}
 
 	return &config

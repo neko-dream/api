@@ -46,6 +46,21 @@ func RoleToName(role OrganizationUserRole) string {
 	}
 }
 
+func NameToRole(name string) OrganizationUserRole {
+	switch name {
+	case "メンバー":
+		return OrganizationUserRoleMember
+	case "管理者":
+		return OrganizationUserRoleAdmin
+	case "オーナー":
+		return OrganizationUserRoleOwner
+	case "運営":
+		return OrganizationUserRoleSuperAdmin
+	default:
+		return OrganizationUserRoleMember
+	}
+}
+
 const (
 	OrganizationUserRoleSuperAdmin OrganizationUserRole = 10
 	OrganizationUserRoleOwner      OrganizationUserRole = 20

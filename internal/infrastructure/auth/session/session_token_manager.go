@@ -191,10 +191,10 @@ func NewSessionTokenManager(
 	organizationRepository organization.OrganizationRepository,
 ) session.TokenManager {
 	return &sessionTokenManager{
-		secret:                      config.TokenSecret,
-		DBManager:                   dbManager,
-		SessionRepository:           sessionRepository,
-		UserRepository:              userRepository,
+		secret:                     config.TokenSecret,
+		DBManager:                  dbManager,
+		SessionRepository:          sessionRepository,
+		UserRepository:             userRepository,
 		OrganizationUserRepository: organizationUserRepository,
 		OrganizationRepository:     organizationRepository,
 	}

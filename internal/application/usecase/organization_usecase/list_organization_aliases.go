@@ -6,6 +6,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/service"
+	"github.com/neko-dream/server/internal/presentation/oas"
 	"go.opentelemetry.io/otel"
 )
 
@@ -17,6 +18,14 @@ type OrganizationAliasDTO struct {
 	AliasID   string
 	AliasName string
 	CreatedAt string
+}
+
+func (o *OrganizationAliasDTO) ToResponse() oas.OrganizationAlias {
+	return oas.OrganizationAlias{
+		AliasID:   o.AliasID,
+		AliasName: o.AliasName,
+		CreatedAt: o.CreatedAt,
+	}
 }
 
 type ListOrganizationAliasesOutput struct {

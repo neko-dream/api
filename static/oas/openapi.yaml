@@ -683,18 +683,7 @@ paths:
                   opinions:
                     type: array
                     items:
-                      type: object
-                      properties:
-                        user:
-                          $ref: '#/components/schemas/User'
-                        opinion:
-                          $ref: '#/components/schemas/Opinion'
-                        replyCount:
-                          type: integer
-                      required:
-                        - user
-                        - opinion
-                        - replyCount
+                      $ref: '#/components/schemas/OpinionWithReplyCount'
                   pagination:
                     type: object
                     properties:
@@ -767,19 +756,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  opinion:
-                    $ref: '#/components/schemas/Opinion'
-                  user:
-                    $ref: '#/components/schemas/User'
-                  myVoteType:
-                    allOf:
-                      - $ref: '#/components/schemas/VoteType'
-                    nullable: true
-                required:
-                  - opinion
-                  - user
+                $ref: '#/components/schemas/OpinionWithVote'
         '500':
           description: Server error
           content:
@@ -849,19 +826,7 @@ paths:
                   opinions:
                     type: array
                     items:
-                      type: object
-                      properties:
-                        opinion:
-                          $ref: '#/components/schemas/Opinion'
-                        user:
-                          $ref: '#/components/schemas/User'
-                        myVoteType:
-                          allOf:
-                            - $ref: '#/components/schemas/VoteType'
-                          nullable: true
-                      required:
-                        - opinion
-                        - user
+                      $ref: '#/components/schemas/OpinionWithVote'
                 required:
                   - opinions
         '400':
@@ -1201,18 +1166,7 @@ paths:
                   aliases:
                     type: array
                     items:
-                      type: object
-                      properties:
-                        aliasID:
-                          type: string
-                        aliasName:
-                          type: string
-                        createdAt:
-                          type: string
-                      required:
-                        - aliasID
-                        - aliasName
-                        - createdAt
+                      $ref: '#/components/schemas/OrganizationAlias'
                 required:
                   - aliases
         '400':
@@ -1245,18 +1199,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  aliasID:
-                    type: string
-                  aliasName:
-                    type: string
-                  createdAt:
-                    type: string
-                required:
-                  - aliasID
-                  - aliasName
-                  - createdAt
+                $ref: '#/components/schemas/OrganizationAlias'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -2267,22 +2210,7 @@ paths:
                   opinions:
                     type: array
                     items:
-                      type: object
-                      properties:
-                        opinion:
-                          $ref: '#/components/schemas/Opinion'
-                        user:
-                          $ref: '#/components/schemas/User'
-                        replyCount:
-                          type: integer
-                        myVoteType:
-                          allOf:
-                            - $ref: '#/components/schemas/VoteType'
-                          nullable: true
-                      required:
-                        - opinion
-                        - user
-                        - replyCount
+                      $ref: '#/components/schemas/OpinionWithReplyAndVote'
                   pagination:
                     type: object
                     properties:
@@ -2504,18 +2432,7 @@ paths:
                   opinions:
                     type: array
                     items:
-                      type: object
-                      properties:
-                        replyCount:
-                          type: integer
-                        opinion:
-                          $ref: '#/components/schemas/Opinion'
-                        user:
-                          $ref: '#/components/schemas/User'
-                      required:
-                        - replyCount
-                        - opinion
-                        - user
+                      $ref: '#/components/schemas/OpinionWithReplyCount'
                   remainingCount:
                     type: integer
                 required:
@@ -3393,6 +3310,64 @@ components:
           type: integer
         groupName:
           type: string
+    OpinionWithReplyAndVote:
+      type: object
+      required:
+        - opinion
+        - user
+        - replyCount
+      properties:
+        opinion:
+          $ref: '#/components/schemas/Opinion'
+        user:
+          $ref: '#/components/schemas/User'
+        replyCount:
+          type: integer
+        myVoteType:
+          allOf:
+            - $ref: '#/components/schemas/VoteType'
+          nullable: true
+      description: 意見とリプライ数と投票情報を含むレスポンス
+    OpinionWithReplyCount:
+      type: object
+      required:
+        - opinion
+        - user
+        - replyCount
+      properties:
+        opinion:
+          $ref: '#/components/schemas/Opinion'
+        user:
+          $ref: '#/components/schemas/User'
+        replyCount:
+          type: integer
+      description: 意見とリプライ数を含むレスポンス
+    OpinionWithUser:
+      type: object
+      required:
+        - opinion
+        - user
+      properties:
+        opinion:
+          $ref: '#/components/schemas/Opinion'
+        user:
+          $ref: '#/components/schemas/User'
+      description: 意見とユーザー情報を含む基本レスポンス
+    OpinionWithVote:
+      type: object
+      required:
+        - opinion
+        - user
+      properties:
+        opinion:
+          $ref: '#/components/schemas/Opinion'
+        user:
+          $ref: '#/components/schemas/User'
+        myVoteType:
+          allOf:
+            - $ref: '#/components/schemas/VoteType'
+          nullable: true
+      description: 意見と投票情報を含むレスポンス
     Organization:
       type: object
       required:
@@ -3420,6 +3395,20 @@ components:
         role:
           type: integer
           description: ロール
+    OrganizationAlias:
+      type: object
+      required:
+        - aliasID
+        - aliasName
+        - createdAt
+      properties:
+        aliasID:
+          type: string
+        aliasName:
+          type: string
+        createdAt:
+          type: string
+      description: 組織エイリアス
     PolicyConsentStatus:
       type: object
       required:

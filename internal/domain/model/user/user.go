@@ -5,7 +5,6 @@ import (
 	"unicode/utf8"
 
 	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
@@ -44,7 +43,7 @@ type (
 		displayName   *string
 		iconURL       *string
 		subject       string
-		provider      auth.AuthProviderName
+		provider      shared.AuthProviderName
 		demographics  *UserDemographic
 		email         *string
 		emailVerified bool
@@ -104,7 +103,7 @@ func (u *User) DeleteIcon() {
 	u.iconURL = nil
 }
 
-func (u *User) Provider() auth.AuthProviderName {
+func (u *User) Provider() shared.AuthProviderName {
 	return u.provider
 }
 
@@ -142,7 +141,7 @@ func NewUser(
 	displayID *string,
 	displayName *string,
 	subject string,
-	provider auth.AuthProviderName,
+	provider shared.AuthProviderName,
 	iconURL *string,
 ) User {
 	return User{

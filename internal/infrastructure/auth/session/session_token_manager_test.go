@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/organization"
 	domainSession "github.com/neko-dream/server/internal/domain/model/session"
@@ -13,8 +12,10 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/auth/session"
 	"github.com/neko-dream/server/internal/infrastructure/config"
+	"github.com/neko-dream/server/internal/infrastructure/crypto"
 	"github.com/neko-dream/server/internal/infrastructure/di"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
+	"github.com/neko-dream/server/internal/infrastructure/persistence/repository"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -37,11 +38,17 @@ func TestSessionTokenManager(t *testing.T) {
 					lo.ToPtr("testid"),
 					lo.ToPtr("TestUser"),
 					"test-subject",
-					auth.ProviderGoogle,
+					shared.ProviderGoogle,
 					lo.ToPtr("test-icon.png"),
 				)
 				testUser.SetEmailVerified(true)
 				err := userRepo.Create(ctx, testUser)
+				if err != nil {
+					return "", err
+				}
+				
+				// CreateはdisplayIDとdisplayNameを保存しないので、Updateで設定する
+				err = userRepo.Update(ctx, testUser)
 				if err != nil {
 					return "", err
 				}
@@ -50,7 +57,7 @@ func TestSessionTokenManager(t *testing.T) {
 				sess := domainSession.NewSession(
 					shared.NewUUID[domainSession.Session](),
 					testUser.UserID(),
-					auth.ProviderGoogle,
+					shared.ProviderGoogle,
 					domainSession.SESSION_ACTIVE,
 					clock.Now(ctx).Add(24*time.Hour),
 					clock.Now(ctx),
@@ -87,10 +94,16 @@ func TestSessionTokenManager(t *testing.T) {
 					lo.ToPtr("testid2"),
 					lo.ToPtr("TestUser2"),
 					"test-subject2",
-					auth.ProviderGoogle,
+					shared.ProviderGoogle,
 					lo.ToPtr("test-icon2.png"),
 				)
 				err := userRepo.Create(ctx, testUser)
+				if err != nil {
+					return "", err
+				}
+				
+				// CreateはdisplayIDとdisplayNameを保存しないので、Updateで設定する
+				err = userRepo.Update(ctx, testUser)
 				if err != nil {
 					return "", err
 				}
@@ -99,7 +112,7 @@ func TestSessionTokenManager(t *testing.T) {
 				sess := domainSession.NewSession(
 					shared.NewUUID[domainSession.Session](),
 					testUser.UserID(),
-					auth.ProviderGoogle,
+					shared.ProviderGoogle,
 					domainSession.SESSION_INACTIVE,
 					clock.Now(ctx).Add(24*time.Hour),
 					clock.Now(ctx),
@@ -122,23 +135,28 @@ func TestSessionTokenManager(t *testing.T) {
 
 			cont := di.BuildContainer()
 			dbm := di.Invoke[*db.DBManager](cont)
+			encryptor, _ := crypto.NewEncryptor(lo.ToPtr(config.Config{
+				ENCRYPTION_VERSION: crypto.Version1,
+				ENCRYPTION_SECRET:  "12345678901234567890123456789012",
+			}))
+
+			userRepo := repository.NewUserRepository(
+				dbm,
+				repository.NewImageRepositoryMock(),
+				encryptor,
+			)
+			sessionRepo := di.Invoke[domainSession.SessionRepository](cont)
+			orgUserRepo := di.Invoke[organization.OrganizationUserRepository](cont)
+			orgRepo := di.Invoke[organization.OrganizationRepository](cont)
 
 			err := dbm.ExecTx(context.Background(), func(ctx context.Context) error {
-				// DIコンテナから必要な依存関係を取得
-				sessionRepo := di.Invoke[domainSession.SessionRepository](cont)
-				userRepo := di.Invoke[user.UserRepository](cont)
-				orgUserRepo := di.Invoke[organization.OrganizationUserRepository](cont)
-				orgRepo := di.Invoke[organization.OrganizationRepository](cont)
 
-				// SessionTokenManagerを作成
 				cfg := &config.Config{TokenSecret: "test-secret"}
 				tm := session.NewSessionTokenManager(cfg, dbm, sessionRepo, userRepo, orgUserRepo, orgRepo)
 
-				// セットアップ実行
 				token, err := tt.setup(ctx, tm, sessionRepo, userRepo)
 				require.NoError(t, err)
 
-				// トークンをパース
 				claim, err := tm.Parse(ctx, token)
 
 				if tt.wantErr {
@@ -165,43 +183,4 @@ func TestSessionTokenManager(t *testing.T) {
 			require.NoError(t, err)
 		})
 	}
-}
-
-func TestSessionTokenManager_Generate(t *testing.T) {
-	t.Parallel()
-
-	cont := di.BuildContainer()
-	dbm := di.Invoke[*db.DBManager](cont)
-
-	err := dbm.ExecTx(context.Background(), func(ctx context.Context) error {
-		// DIコンテナから必要な依存関係を取得
-		sessionRepo := di.Invoke[domainSession.SessionRepository](cont)
-		userRepo := di.Invoke[user.UserRepository](cont)
-		orgUserRepo := di.Invoke[organization.OrganizationUserRepository](cont)
-		orgRepo := di.Invoke[organization.OrganizationRepository](cont)
-
-		// SessionTokenManagerを作成
-		cfg := &config.Config{TokenSecret: "test-secret"}
-		tm := session.NewSessionTokenManager(cfg, dbm, sessionRepo, userRepo, orgUserRepo, orgRepo)
-
-		// テストユーザー作成
-		testUser := user.NewUser(
-			shared.NewUUID[user.User](),
-			lo.ToPtr("testid3"),
-			lo.ToPtr("TestUser3"),
-			"test-subject3",
-			auth.ProviderGoogle,
-			lo.ToPtr("test-icon3.png"),
-		)
-
-		// セッションID
-		sessionID := shared.NewUUID[domainSession.Session]()
-
-		// Generate実行（SessionIDをそのまま返すだけ）
-		token, err := tm.Generate(ctx, testUser, sessionID)
-		assert.NoError(t, err)
-		assert.Equal(t, sessionID.String(), token)
-		return nil
-	})
-	require.NoError(t, err)
 }

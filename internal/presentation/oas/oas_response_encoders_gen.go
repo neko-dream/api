@@ -268,7 +268,7 @@ func encodeConsentTalkSessionResponse(response ConsentTalkSessionRes, w http.Res
 
 func encodeCreateOrganizationAliasResponse(response CreateOrganizationAliasRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *CreateOrganizationAliasOK:
+	case *OrganizationAlias:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -831,7 +831,7 @@ func encodeGetOpinionAnalysisResponse(response GetOpinionAnalysisRes, w http.Res
 
 func encodeGetOpinionDetail2Response(response GetOpinionDetail2Res, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *GetOpinionDetail2OK:
+	case *OpinionWithVote:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))

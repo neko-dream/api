@@ -5,8 +5,9 @@ import (
 	"database/sql"
 	"errors"
 
-	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/auth"
+
+	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/session"

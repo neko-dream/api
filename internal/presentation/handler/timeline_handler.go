@@ -7,10 +7,10 @@ import (
 	"github.com/neko-dream/server/internal/application/query/timeline_query"
 	"github.com/neko-dream/server/internal/application/usecase/timeline_usecase"
 	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
 	timelineactions "github.com/neko-dream/server/internal/domain/model/timeline_actions"
+	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
@@ -19,19 +19,22 @@ import (
 
 type timelineHandler struct {
 	timeline_usecase.AddTimeLine
-	et timeline_usecase.EditTimeLine
-	gt timeline_query.GetTimeLine
+	et          timeline_usecase.EditTimeLine
+	gt          timeline_query.GetTimeLine
+	authService service.AuthenticationService
 }
 
 func NewTimelineHandler(
 	addTimeLine timeline_usecase.AddTimeLine,
 	editTimeLine timeline_usecase.EditTimeLine,
 	getTimeLine timeline_query.GetTimeLine,
+	authService service.AuthenticationService,
 ) oas.TimelineHandler {
 	return &timelineHandler{
 		AddTimeLine: addTimeLine,
 		et:          editTimeLine,
 		gt:          getTimeLine,
+		authService: authService,
 	}
 }
 
@@ -76,20 +79,15 @@ func (t *timelineHandler) PostTimeLineItem(ctx context.Context, req *oas.PostTim
 	ctx, span := otel.Tracer("handler").Start(ctx, "timelineHandler.PostTimeLineItem")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	if claim == nil {
-		return nil, messages.ForbiddenError
+	authCtx, err := requireAuthentication(t.authService, ctx)
+	if err != nil {
+		return nil, err
 	}
 	if req == nil {
 		utils.HandleError(ctx, nil, "req is nil")
 		return nil, messages.RequiredParameterError
 	}
 
-	userID, err := claim.UserID()
-	if err != nil {
-		utils.HandleError(ctx, err, "claim.UserID")
-		return nil, messages.InternalServerError
-	}
 	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
 	if err != nil {
 		utils.HandleError(ctx, err, "shared.ParseUUID")
@@ -106,7 +104,7 @@ func (t *timelineHandler) PostTimeLineItem(ctx context.Context, req *oas.PostTim
 	}
 
 	output, err := t.AddTimeLine.Execute(ctx, timeline_usecase.AddTimeLineInput{
-		OwnerID:        userID,
+		OwnerID:        authCtx.UserID,
 		TalkSessionID:  talkSessionID,
 		ParentActionID: parentActionID,
 		Content:        req.Content,
@@ -131,15 +129,11 @@ func (t *timelineHandler) EditTimeLine(ctx context.Context, req *oas.EditTimeLin
 	ctx, span := otel.Tracer("handler").Start(ctx, "timelineHandler.EditTimeLine")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	if claim == nil {
-		return nil, messages.ForbiddenError
-	}
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(t.authService, ctx)
 	if err != nil {
-		utils.HandleError(ctx, err, "claim.UserID")
-		return nil, messages.InternalServerError
+		return nil, err
 	}
+	userID := authCtx.UserID
 	actionItemID, err := shared.ParseUUID[timelineactions.ActionItem](params.ActionItemID)
 	if err != nil {
 		utils.HandleError(ctx, err, "shared.ParseUUID")

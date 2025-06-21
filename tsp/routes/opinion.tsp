@@ -14,11 +14,7 @@ namespace kotohiro {
   @get
   @summary("意見詳細")
   @useAuth([])
-  op getOpinionDetail2(@path opinionID: string): Body<{
-    opinion: Opinion;
-    user: User;
-    myVoteType?: VoteType | null;
-  }> | {
+  op getOpinionDetail2(@path opinionID: string): Body<OpinionWithVote> | {
     @statusCode statusCode: 500;
     @body body: {};
   };
@@ -35,11 +31,7 @@ namespace kotohiro {
      */
     @path opinionID: string,
   ): Body<{
-    opinions: {
-      opinion: Opinion;
-      user: User;
-      myVoteType?: VoteType | null;
-    }[];
+    opinions: OpinionWithVote[];
   }> | {
     @statusCode statusCode: 400;
     @body body: {
@@ -188,12 +180,7 @@ namespace kotohiro {
     @query(#{ explode: true }) offset?: integer | null,
     @query(#{ explode: true }) seed?: boolean | null,
   ): Body<{
-    opinions: {
-      opinion: Opinion;
-      user: User;
-      replyCount: integer;
-      myVoteType?: VoteType | null;
-    }[];
+    opinions: OpinionWithReplyAndVote[];
     pagination: {
       totalCount: integer;
     };
@@ -219,11 +206,7 @@ namespace kotohiro {
     @path talkSessionID: string,
     @query(#{ explode: true }) limit?: integer | null = 10,
   ): Body<{
-    opinions: {
-      replyCount: integer;
-      opinion: Opinion;
-      user: User;
-    }[];
+    opinions: OpinionWithReplyCount[];
     remainingCount: integer;
   }> | {
     @statusCode statusCode: 400;
@@ -257,11 +240,7 @@ namespace kotohiro {
     @query(#{ explode: true }) limit?: integer,
     @query(#{ explode: true }) offset?: integer,
   ): Body<{
-    opinions: {
-      user: User;
-      opinion: Opinion;
-      replyCount: integer;
-    }[];
+    opinions: OpinionWithReplyCount[];
     pagination: {
       totalCount: integer;
     };

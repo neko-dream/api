@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/neko-dream/server/internal/domain/model/auth"
+	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"go.opentelemetry.io/otel"
 )
@@ -26,10 +27,10 @@ func (p *providerFactory) NewAuthProvider(ctx context.Context, providerName stri
 
 	// 本番以外の場合のみDevAuthProviderを返す
 	if p.conf.Env != config.PROD && providerName == "dev" {
-		return NewDevAuthProvider(ctx, auth.AuthProviderName(providerName), p.conf)
+		return NewDevAuthProvider(ctx, shared.AuthProviderName(providerName), p.conf)
 	}
 
-	authProviderName, err := auth.NewAuthProviderName(providerName)
+	authProviderName, err := shared.NewAuthProviderName(providerName)
 	if err != nil {
 		return nil, err
 	}

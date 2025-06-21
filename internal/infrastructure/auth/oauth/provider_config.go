@@ -1,12 +1,12 @@
 package oauth
 
 import (
-	"github.com/neko-dream/server/internal/domain/model/auth"
+	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 )
 
 type Provider struct {
-	Issuer                auth.IssuerURI
+	Issuer                shared.IssuerURI
 	AuthorizationEndpoint string
 	TokenEndpoint         string
 	UserInfoEndpoint      string
@@ -16,17 +16,17 @@ type Provider struct {
 }
 
 var (
-	providers = map[auth.IssuerURI]Provider{
-		auth.GoogleIssuerURI: {
-			Issuer:                auth.GoogleIssuerURI,
+	providers = map[shared.IssuerURI]Provider{
+		shared.GoogleIssuerURI: {
+			Issuer:                shared.GoogleIssuerURI,
 			AuthorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth",
 			TokenEndpoint:         "https://oauth2.googleapis.com/token",
 			UserInfoEndpoint:      "https://openidconnect.googleapis.com/v1/userinfo",
 			JwksURI:               "https://www.googleapis.com/oauth2/v3/certs",
 			Algos:                 []string{"RS256"},
 		},
-		auth.LineIssuerURI: {
-			Issuer:                auth.LineIssuerURI,
+		shared.LineIssuerURI: {
+			Issuer:                shared.LineIssuerURI,
 			AuthorizationEndpoint: "https://access.line.me/oauth2/v2.1/authorize",
 			TokenEndpoint:         "https://api.line.me/oauth2/v2.1/token",
 			UserInfoEndpoint:      "https://api.line.me/v2/profile",
@@ -36,7 +36,7 @@ var (
 	}
 )
 
-func GetProvider(issuerURI auth.IssuerURI, conf *config.Config) (Provider, bool) {
+func GetProvider(issuerURI shared.IssuerURI, conf *config.Config) (Provider, bool) {
 	provider, ok := providers[issuerURI]
 	provider.Config = conf
 	return provider, ok
@@ -44,9 +44,9 @@ func GetProvider(issuerURI auth.IssuerURI, conf *config.Config) (Provider, bool)
 
 func (p Provider) ClientID() string {
 	switch p.Issuer {
-	case auth.LineIssuerURI:
+	case shared.LineIssuerURI:
 		return p.Config.LineClientID
-	case auth.GoogleIssuerURI:
+	case shared.GoogleIssuerURI:
 		return p.Config.GoogleClientID
 	default:
 		return ""
@@ -55,9 +55,9 @@ func (p Provider) ClientID() string {
 
 func (p Provider) ClientSecret() string {
 	switch p.Issuer {
-	case auth.LineIssuerURI:
+	case shared.LineIssuerURI:
 		return p.Config.LineClientSecret
-	case auth.GoogleIssuerURI:
+	case shared.GoogleIssuerURI:
 		return p.Config.GoogleClientSecret
 	default:
 		return ""
@@ -66,9 +66,9 @@ func (p Provider) ClientSecret() string {
 
 func (p Provider) Scopes() []string {
 	switch p.Issuer {
-	case auth.LineIssuerURI:
+	case shared.LineIssuerURI:
 		return []string{"openid", "email"}
-	case auth.GoogleIssuerURI:
+	case shared.GoogleIssuerURI:
 		return []string{"openid", "email"}
 	default:
 		return []string{}
@@ -77,9 +77,9 @@ func (p Provider) Scopes() []string {
 
 func (p Provider) RedirectURL() string {
 	switch p.Issuer {
-	case auth.LineIssuerURI:
+	case shared.LineIssuerURI:
 		return p.Config.LineCallbackURL
-	case auth.GoogleIssuerURI:
+	case shared.GoogleIssuerURI:
 		return p.Config.GoogleCallbackURL
 	default:
 		return ""
