@@ -53,3 +53,13 @@ func (u *UserPosition) ToResponse() oas.UserGroupPosition {
 		PerimeterIndex: utils.ToOpt[oas.OptInt](u.PerimeterIndex),
 	}
 }
+
+func (o *OpinionGroupRatio) ToResponse() oas.OpinionGroupRatio {
+	return oas.OpinionGroupRatio{
+		GroupName:     o.GroupName,
+		GroupID:       o.GroupID,
+		AgreeCount:    o.AgreeCount,
+		DisagreeCount: o.DisagreeCount,
+		PassCount:     o.PassCount,
+	}
+}

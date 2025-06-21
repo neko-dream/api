@@ -5,7 +5,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"strconv"
-	"time"
 
 	opinion_query "github.com/neko-dream/server/internal/application/query/opinion"
 	talksession_query "github.com/neko-dream/server/internal/application/query/talksession"
@@ -98,36 +97,10 @@ func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHi
 		return nil, messages.InternalServerError
 	}
 
-	opinions := make([]oas.OpinionsHistoryOKOpinionsItem, 0, len(out.Opinions))
+	opinions := make([]oas.OpinionWithReplyCount, 0, len(out.Opinions))
 	for _, opinion := range out.Opinions {
-		var parentVoteType oas.OptNilOpinionVoteType
-		if opinion.GetParentVoteType() != nil {
-			parentVoteType = oas.OptNilOpinionVoteType{
-				Value: oas.OpinionVoteType(*opinion.GetParentVoteType()),
-				Set:   true,
-				Null:  false,
-			}
-		}
-		var parentOpinionID oas.OptNilString
-		if opinion.Opinion.ParentOpinionID != nil {
-			parentOpinionID = oas.OptNilString{
-				Set:   true,
-				Value: opinion.Opinion.ParentOpinionID.String(),
-			}
-		}
-
-		opinions = append(opinions, oas.OpinionsHistoryOKOpinionsItem{
-			Opinion: oas.Opinion{
-				ID:           opinion.Opinion.OpinionID.String(),
-				Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Title),
-				Content:      opinion.Opinion.Content,
-				ParentID:     utils.ToOpt[oas.OptString](parentOpinionID),
-				VoteType:     parentVoteType,
-				ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
-				PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.PictureURL),
-				PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
-				IsDeleted:    opinion.Opinion.IsDeleted,
-			},
+		opinions = append(opinions, oas.OpinionWithReplyCount{
+			Opinion: opinion.Opinion.ToResponse(),
 			User: oas.User{
 				DisplayID:   opinion.User.DisplayID,
 				DisplayName: opinion.User.DisplayName,
@@ -193,17 +166,7 @@ func (u *userHandler) SessionsHistory(ctx context.Context, params oas.SessionsHi
 	talkSessions := make([]oas.SessionsHistoryOKTalkSessionsItem, 0, len(out.TalkSessions))
 	for _, talkSession := range out.TalkSessions {
 		talkSessions = append(talkSessions, oas.SessionsHistoryOKTalkSessionsItem{
-			TalkSession: oas.TalkSession{
-				ID:    talkSession.TalkSessionID.String(),
-				Theme: talkSession.Theme,
-				Owner: oas.TalkSessionOwner{
-					DisplayID:   talkSession.User.DisplayID,
-					DisplayName: talkSession.User.DisplayName,
-					IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.User.IconURL),
-				},
-				CreatedAt:        talkSession.CreatedAt.Format(time.RFC3339),
-				ScheduledEndTime: talkSession.ScheduledEndTime.Format(time.RFC3339),
-			},
+			TalkSession:  talkSession.ToResponse(),
 			OpinionCount: talkSession.OpinionCount,
 		})
 	}

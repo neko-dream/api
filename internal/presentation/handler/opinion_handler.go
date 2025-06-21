@@ -2,8 +2,6 @@ package handler
 
 import (
 	"context"
-	"time"
-
 	"mime/multipart"
 
 	opinion_query "github.com/neko-dream/server/internal/application/query/opinion"
@@ -100,51 +98,22 @@ func (o *opinionHandler) GetOpinionDetail2(ctx context.Context, params oas.GetOp
 		return nil, err
 	}
 
-	user := &oas.User{
-		DisplayID:   opinion.Opinion.User.DisplayID,
-		DisplayName: opinion.Opinion.User.DisplayName,
-		IconURL:     utils.ToOptNil[oas.OptNilString](opinion.Opinion.User.IconURL),
-	}
-	var parentOpinionID oas.OptString
-	if opinion.Opinion.Opinion.ParentOpinionID != nil {
-		parentOpinionID = utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ParentOpinionID.String())
-	}
-
-	var parentVoteType oas.OptNilOpinionVoteType
-	if opinion.Opinion.GetParentVoteType() != nil {
-		parentVoteType = oas.OptNilOpinionVoteType{
-			Value: oas.OpinionVoteType(*opinion.Opinion.GetParentVoteType()),
-			Set:   true,
-			Null:  false,
-		}
-	}
-
-	op := &oas.Opinion{
-		ID:           opinion.Opinion.Opinion.OpinionID.String(),
-		ParentID:     parentOpinionID,
-		Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.Title),
-		Content:      opinion.Opinion.Opinion.Content,
-		VoteType:     parentVoteType,
-		PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.Opinion.PictureURL),
-		ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ReferenceURL),
-		PostedAt:     opinion.Opinion.Opinion.CreatedAt.Format(time.RFC3339),
-		IsDeleted:    opinion.Opinion.Opinion.IsDeleted,
-	}
-
-	var myVoteType oas.OptNilGetOpinionDetail2OKMyVoteType
+	// Convert to OpinionWithVote response
+	var myVoteType oas.OptNilOpinionWithVoteMyVoteType
 	if opinion.Opinion.GetMyVoteType() != nil {
-		myVoteType = oas.OptNilGetOpinionDetail2OKMyVoteType{
-			Value: oas.GetOpinionDetail2OKMyVoteType(*opinion.Opinion.GetMyVoteType()),
+		myVoteType = oas.OptNilOpinionWithVoteMyVoteType{
+			Value: oas.OpinionWithVoteMyVoteType(*opinion.Opinion.GetMyVoteType()),
 			Set:   true,
 			Null:  false,
 		}
 	}
 
-	return &oas.GetOpinionDetail2OK{
-		User:       *user,
-		Opinion:    *op,
+	result := oas.OpinionWithVote{
+		User:       opinion.Opinion.User.ToResponse(),
+		Opinion:    opinion.Opinion.Opinion.ToResponse(),
 		MyVoteType: myVoteType,
-	}, nil
+	}
+	return &result, nil
 }
 
 // OpinionComments2 implements oas.OpinionHandler.
@@ -175,51 +144,21 @@ func (o *opinionHandler) OpinionComments2(ctx context.Context, params oas.Opinio
 		return nil, err
 	}
 
-	var replies []oas.OpinionComments2OKOpinionsItem
+	var replies []oas.OpinionWithVote
 	for _, reply := range opinions.Replies {
-		user := &oas.User{
-			DisplayID:   reply.User.DisplayID,
-			DisplayName: reply.User.DisplayName,
-			IconURL:     utils.ToOptNil[oas.OptNilString](reply.User.IconURL),
-		}
-		var parentOpinionID oas.OptString
-		if reply.Opinion.ParentOpinionID != nil {
-			parentOpinionID = utils.ToOpt[oas.OptString](reply.Opinion.ParentOpinionID.String())
-		}
-
-		var parentVoteType oas.OptNilOpinionVoteType
-		if reply.GetParentVoteType() != nil {
-			parentVoteType = oas.OptNilOpinionVoteType{
-				Value: oas.OpinionVoteType(*reply.GetParentVoteType()),
-				Set:   true,
-				Null:  false,
-			}
-		}
-
-		opinion := &oas.Opinion{
-			ID:           reply.Opinion.OpinionID.String(),
-			ParentID:     parentOpinionID,
-			Title:        utils.ToOpt[oas.OptString](reply.Opinion.Title),
-			Content:      reply.Opinion.Content,
-			VoteType:     parentVoteType,
-			PictureURL:   utils.ToOptNil[oas.OptNilString](reply.Opinion.PictureURL),
-			ReferenceURL: utils.ToOpt[oas.OptString](reply.Opinion.ReferenceURL),
-			PostedAt:     reply.Opinion.CreatedAt.Format(time.RFC3339),
-			IsDeleted:    reply.Opinion.IsDeleted,
-		}
-
-		var myVoteType oas.OptNilOpinionComments2OKOpinionsItemMyVoteType
+		// Convert SwipeOpinion to OpinionWithVote
+		var myVoteType oas.OptNilOpinionWithVoteMyVoteType
 		if reply.GetMyVoteType() != nil {
-			myVoteType = oas.OptNilOpinionComments2OKOpinionsItemMyVoteType{
-				Value: oas.OpinionComments2OKOpinionsItemMyVoteType(*reply.GetMyVoteType()),
+			myVoteType = oas.OptNilOpinionWithVoteMyVoteType{
+				Value: oas.OpinionWithVoteMyVoteType(*reply.GetMyVoteType()),
 				Set:   true,
 				Null:  false,
 			}
 		}
 
-		replies = append(replies, oas.OpinionComments2OKOpinionsItem{
-			User:       *user,
-			Opinion:    *opinion,
+		replies = append(replies, oas.OpinionWithVote{
+			User:       reply.User.ToResponse(),
+			Opinion:    reply.Opinion.ToResponse(),
 			MyVoteType: myVoteType,
 		})
 	}
@@ -281,47 +220,21 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 	if err != nil {
 		return nil, err
 	}
-	opinions := make([]oas.GetOpinionsForTalkSessionOKOpinionsItem, 0, len(out.Opinions))
+	opinions := make([]oas.OpinionWithReplyAndVote, 0, len(out.Opinions))
 	for _, opinion := range out.Opinions {
-		var parentOpinionID oas.OptString
-		if opinion.Opinion.ParentOpinionID != nil {
-			parentOpinionID = utils.ToOpt[oas.OptString](opinion.Opinion.ParentOpinionID.String())
-		}
-
-		var parentVoteType oas.OptNilOpinionVoteType
-		if opinion.GetParentVoteType() != nil {
-			parentVoteType = oas.OptNilOpinionVoteType{
-				Value: oas.OpinionVoteType(*opinion.GetParentVoteType()),
-				Set:   true,
-				Null:  false,
-			}
-		}
-		var myVoteType oas.OptNilGetOpinionsForTalkSessionOKOpinionsItemMyVoteType
+		// Convert SwipeOpinion to OpinionWithReplyAndVote
+		var myVoteType oas.OptNilOpinionWithReplyAndVoteMyVoteType
 		if opinion.GetMyVoteType() != nil {
-			myVoteType = oas.OptNilGetOpinionsForTalkSessionOKOpinionsItemMyVoteType{
-				Value: oas.GetOpinionsForTalkSessionOKOpinionsItemMyVoteType(*opinion.GetMyVoteType()),
+			myVoteType = oas.OptNilOpinionWithReplyAndVoteMyVoteType{
+				Value: oas.OpinionWithReplyAndVoteMyVoteType(*opinion.GetMyVoteType()),
 				Set:   true,
 				Null:  false,
 			}
 		}
 
-		opinions = append(opinions, oas.GetOpinionsForTalkSessionOKOpinionsItem{
-			Opinion: oas.Opinion{
-				ID:           opinion.Opinion.OpinionID.String(),
-				Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Title),
-				Content:      opinion.Opinion.Content,
-				VoteType:     parentVoteType,
-				ParentID:     parentOpinionID,
-				ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
-				PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.PictureURL),
-				PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
-				IsDeleted:    opinion.Opinion.IsDeleted,
-			},
-			User: oas.User{
-				DisplayID:   opinion.User.DisplayID,
-				DisplayName: opinion.User.DisplayName,
-				IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.IconURL),
-			},
+		opinions = append(opinions, oas.OpinionWithReplyAndVote{
+			User:       opinion.User.ToResponse(),
+			Opinion:    opinion.Opinion.ToResponse(),
 			ReplyCount: opinion.ReplyCount,
 			MyVoteType: myVoteType,
 		})
@@ -367,39 +280,12 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 		return nil, err
 	}
 
-	var ress []oas.SwipeOpinionsOKOpinionsItem
+	var ress []oas.OpinionWithReplyCount
 	for _, opinion := range opinions.Opinions {
-		user := &oas.User{
-			DisplayID:   opinion.User.DisplayID,
-			DisplayName: opinion.User.DisplayName,
-			IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.IconURL),
-		}
-		var parentOpinionID oas.OptString
-		if opinion.Opinion.ParentOpinionID != nil {
-			parentOpinionID = utils.ToOpt[oas.OptString](opinion.Opinion.ParentOpinionID.String())
-		}
-		var parentVoteType oas.OptNilOpinionVoteType
-		if opinion.GetParentVoteType() != nil {
-			parentVoteType = oas.OptNilOpinionVoteType{
-				Value: oas.OpinionVoteType(*opinion.GetParentVoteType()),
-				Set:   true,
-				Null:  false,
-			}
-		}
-		ops := &oas.Opinion{
-			ID:           opinion.Opinion.OpinionID.String(),
-			ParentID:     parentOpinionID,
-			Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Title),
-			Content:      opinion.Opinion.Content,
-			VoteType:     parentVoteType,
-			PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.PictureURL),
-			ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
-			PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
-			IsDeleted:    opinion.Opinion.IsDeleted,
-		}
-		ress = append(ress, oas.SwipeOpinionsOKOpinionsItem{
-			User:       *user,
-			Opinion:    *ops,
+		// Convert SwipeOpinion to OpinionWithReplyCount
+		ress = append(ress, oas.OpinionWithReplyCount{
+			User:       opinion.User.ToResponse(),
+			Opinion:    opinion.Opinion.ToResponse(),
 			ReplyCount: opinion.ReplyCount,
 		})
 	}
@@ -554,13 +440,7 @@ func (o *opinionHandler) GetOpinionAnalysis(ctx context.Context, params oas.GetO
 
 	var res oas.GetOpinionAnalysisOKApplicationJSON
 	for _, r := range out {
-		res = append(res, oas.OpinionGroupRatio{
-			GroupName:     r.GroupName,
-			GroupID:       r.GroupID,
-			AgreeCount:    r.AgreeCount,
-			DisagreeCount: r.DisagreeCount,
-			PassCount:     r.PassCount,
-		})
+		res = append(res, r.ToResponse())
 	}
 
 	return &res, nil
@@ -592,39 +472,7 @@ func (o *opinionHandler) GetOpinionReports(ctx context.Context, params oas.GetOp
 	if err != nil {
 		return nil, err
 	}
-	var parentOpinionID oas.OptString
-	if reports.Report.Opinion.ParentOpinionID != nil {
-		parentOpinionID = utils.ToOpt[oas.OptString](reports.Report.Opinion.ParentOpinionID.String())
-	}
-
-	reportDetail := oas.ReportDetail{
-		Opinion: oas.Opinion{
-			ID:           reports.Report.Opinion.OpinionID.String(),
-			ParentID:     parentOpinionID,
-			Title:        utils.ToOpt[oas.OptString](reports.Report.Opinion.Title),
-			Content:      reports.Report.Opinion.Content,
-			PictureURL:   utils.ToOptNil[oas.OptNilString](reports.Report.Opinion.PictureURL),
-			ReferenceURL: utils.ToOpt[oas.OptString](reports.Report.Opinion.ReferenceURL),
-			PostedAt:     reports.Report.Opinion.CreatedAt.Format(time.RFC3339),
-			IsDeleted:    reports.Report.Opinion.IsDeleted,
-		},
-		User: oas.ReportDetailUser{
-			DisplayID:   reports.Report.User.DisplayID,
-			DisplayName: reports.Report.User.DisplayName,
-			IconURL:     utils.ToOptNil[oas.OptNilString](reports.Report.User.IconURL),
-		},
-		ReportCount: reports.Report.ReportCount,
-		Status:      oas.ReportStatus(reports.Report.Status),
-		Reasons:     make([]oas.ReportDetailReasonsItem, 0, len(reports.Report.Reasons)),
-	}
-
-	for _, reason := range reports.Report.Reasons {
-		reportDetail.Reasons = append(reportDetail.Reasons, oas.ReportDetailReasonsItem{
-			Reason:  reason.Reason,
-			Content: utils.ToOptNil[oas.OptNilString](reason.Content),
-		})
-	}
-
+	reportDetail := reports.Report.ToResponse()
 	return &reportDetail, nil
 }
 

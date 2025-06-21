@@ -105,5 +105,41 @@ namespace kotohiro {
      */
     reportCount: integer;
   }
+
+  /**
+   * 意見とユーザー情報を含む基本レスポンス
+   */
+  model OpinionWithUser {
+    opinion: Opinion;
+    user: User;
+  }
+
+  /**
+   * 意見と投票情報を含むレスポンス
+   */
+  model OpinionWithVote {
+    opinion: Opinion;
+    user: User;
+    myVoteType?: VoteType | null;
+  }
+
+  /**
+   * 意見とリプライ数を含むレスポンス
+   */
+  model OpinionWithReplyCount {
+    opinion: Opinion;
+    user: User;
+    replyCount: integer;
+  }
+
+  /**
+   * 意見とリプライ数と投票情報を含むレスポンス
+   */
+  model OpinionWithReplyAndVote {
+    opinion: Opinion;
+    user: User;
+    replyCount: integer;
+    myVoteType?: VoteType | null;
+  }
 }
 

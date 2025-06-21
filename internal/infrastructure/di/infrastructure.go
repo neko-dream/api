@@ -1,8 +1,8 @@
 package di
 
 import (
-	"github.com/neko-dream/server/internal/infrastructure/auth/session"
 	"github.com/neko-dream/server/internal/infrastructure/auth/oauth"
+	"github.com/neko-dream/server/internal/infrastructure/auth/session"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/crypto"
 	client "github.com/neko-dream/server/internal/infrastructure/external/analysis"

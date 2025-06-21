@@ -38,8 +38,6 @@ func (t *TalkSessionWithDetail) HasLocation() bool {
 }
 
 func (t *TalkSessionWithDetail) ToResponse() oas.TalkSession {
-	owner := t.User.ToTalkSessionOwner()
-
 	var location oas.OptTalkSessionLocation
 	if t.HasLocation() {
 		location = oas.OptTalkSessionLocation{
@@ -65,7 +63,7 @@ func (t *TalkSessionWithDetail) ToResponse() oas.TalkSession {
 		ID:               t.TalkSessionID.String(),
 		Theme:            t.Theme,
 		Description:      utils.ToOptNil[oas.OptNilString](t.Description),
-		Owner:            owner,
+		Owner:            oas.TalkSessionOwner(t.User.ToResponse()),
 		CreatedAt:        t.CreatedAt.Format(time.RFC3339),
 		ScheduledEndTime: t.ScheduledEndTime.Format(time.RFC3339),
 		Location:         location,

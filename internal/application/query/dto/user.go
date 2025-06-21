@@ -63,8 +63,8 @@ type UserDetail struct {
 	*UserDemographic
 }
 
-func (u *User) ToTalkSessionOwner() oas.TalkSessionOwner {
-	return oas.TalkSessionOwner{
+func (u *User) ToResponse() oas.User {
+	return oas.User{
 		DisplayID:   u.DisplayID,
 		DisplayName: u.DisplayName,
 		IconURL:     utils.ToOptNil[oas.OptNilString](u.IconURL),

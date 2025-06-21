@@ -123,11 +123,7 @@ func (t *talkSessionHandler) PostConclusion(ctx context.Context, req *oas.PostCo
 	}
 
 	return &oas.Conclusion{
-		User: oas.ConclusionUser{
-			DisplayID:   res.DisplayID,
-			DisplayName: res.DisplayName,
-			IconURL:     utils.ToOptNil[oas.OptNilString](res.IconURL),
-		},
+		User:    oas.ConclusionUser(res.ToResponse()),
 		Content: res.Content,
 	}, nil
 }
@@ -154,11 +150,7 @@ func (t *talkSessionHandler) GetConclusion(ctx context.Context, params oas.GetCo
 	}
 
 	return &oas.Conclusion{
-		User: oas.ConclusionUser{
-			DisplayID:   res.DisplayID,
-			DisplayName: res.DisplayName,
-			IconURL:     utils.ToOptNil[oas.OptNilString](res.IconURL),
-		},
+		User:    oas.ConclusionUser(res.ToResponse()),
 		Content: res.Content,
 	}, nil
 }
@@ -417,7 +409,7 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 	if out.MyPosition != nil {
 		myPosition = oas.OptUserGroupPosition{
 			Value: out.MyPosition.ToResponse(),
-			Set: true,
+			Set:   true,
 		}
 	}
 
@@ -430,7 +422,18 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 	for _, groupOpinion := range out.GroupOpinions {
 		opinions := make([]oas.TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem, 0, len(groupOpinion.Opinions))
 		for _, opinion := range groupOpinion.Opinions {
-			opinions = append(opinions, opinion.ToAnalysisOpinionItem())
+			// Convert OpinionWithRepresentative to TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem
+			opinions = append(opinions, oas.TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem{
+				Opinion: opinion.Opinion.ToResponse(),
+				User: oas.User{
+					DisplayID:   opinion.User.DisplayID,
+					DisplayName: opinion.User.DisplayName,
+					IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.IconURL),
+				},
+				AgreeCount:    opinion.AgreeCount,
+				DisagreeCount: opinion.DisagreeCount,
+				PassCount:     opinion.PassCount,
+			})
 		}
 		groupOpinions = append(groupOpinions, oas.TalkSessionAnalysisOKGroupOpinionsItem{
 			GroupName: groupOpinion.GroupName,
