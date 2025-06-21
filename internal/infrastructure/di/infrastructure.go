@@ -1,7 +1,7 @@
 package di
 
 import (
-	"github.com/neko-dream/server/internal/infrastructure/auth/jwt"
+	"github.com/neko-dream/server/internal/infrastructure/auth/session"
 	"github.com/neko-dream/server/internal/infrastructure/auth/oauth"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/crypto"
@@ -26,7 +26,7 @@ func infraDeps() []ProvideArg {
 		{db.NewMigrator, nil},
 		{db.NewDBManager, nil},
 		{oauth.NewProviderFactory, nil},
-		{jwt.NewTokenManager, nil},
+		{session.NewSessionTokenManager, nil},
 		// {telemetry.SentryProvider, nil},
 		{telemetry.BaselimeProvider, nil},
 		{repository.InitS3Client, nil},
