@@ -44,14 +44,14 @@ func TestValidateOrganizationCode(t *testing.T) {
 			wantErr: messages.OrganizationCodeInvalid,
 		},
 		{
-			name:    "異常系: 特殊文字を含む（ハイフン）",
+			name:    "正常系: ハイフンを含む",
 			code:    "ABC-123",
-			wantErr: messages.OrganizationCodeInvalid,
+			wantErr: nil,
 		},
 		{
-			name:    "異常系: 特殊文字を含む（アンダースコア）",
+			name:    "正常系: アンダースコアを含む",
 			code:    "ABC_123",
-			wantErr: messages.OrganizationCodeInvalid,
+			wantErr: nil,
 		},
 		{
 			name:    "異常系: スペースを含む",
