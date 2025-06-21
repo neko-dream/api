@@ -1,0 +1,207 @@
+package session_test
+
+import (
+	"context"
+	"testing"
+	"time"
+
+	"github.com/neko-dream/server/internal/domain/model/auth"
+	"github.com/neko-dream/server/internal/domain/model/clock"
+	"github.com/neko-dream/server/internal/domain/model/organization"
+	domainSession "github.com/neko-dream/server/internal/domain/model/session"
+	"github.com/neko-dream/server/internal/domain/model/shared"
+	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/server/internal/infrastructure/auth/session"
+	"github.com/neko-dream/server/internal/infrastructure/config"
+	"github.com/neko-dream/server/internal/infrastructure/di"
+	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
+	"github.com/samber/lo"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
+
+func TestSessionTokenManager(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name    string
+		setup   func(ctx context.Context, tm domainSession.TokenManager, sessionRepo domainSession.SessionRepository, userRepo user.UserRepository) (string, error)
+		wantErr bool
+	}{
+		{
+			name: "正常にセッションIDからClaimを取得できる",
+			setup: func(ctx context.Context, tm domainSession.TokenManager, sessionRepo domainSession.SessionRepository, userRepo user.UserRepository) (string, error) {
+				// ユーザー作成
+				testUser := user.NewUser(
+					shared.NewUUID[user.User](),
+					lo.ToPtr("testid"),
+					lo.ToPtr("TestUser"),
+					"test-subject",
+					auth.ProviderGoogle,
+					lo.ToPtr("test-icon.png"),
+				)
+				testUser.SetEmailVerified(true)
+				err := userRepo.Create(ctx, testUser)
+				if err != nil {
+					return "", err
+				}
+
+				// セッション作成
+				sess := domainSession.NewSession(
+					shared.NewUUID[domainSession.Session](),
+					testUser.UserID(),
+					auth.ProviderGoogle,
+					domainSession.SESSION_ACTIVE,
+					clock.Now(ctx).Add(24*time.Hour),
+					clock.Now(ctx),
+				)
+				createdSess, err := sessionRepo.Create(ctx, *sess)
+				if err != nil {
+					return "", err
+				}
+
+				// トークン生成（SessionIDを返すだけ）
+				token, err := tm.Generate(ctx, testUser, createdSess.SessionID())
+				if err != nil {
+					return "", err
+				}
+
+				return token, nil
+			},
+			wantErr: false,
+		},
+		{
+			name: "存在しないセッションIDでエラーになる",
+			setup: func(ctx context.Context, tm domainSession.TokenManager, sessionRepo domainSession.SessionRepository, userRepo user.UserRepository) (string, error) {
+				// 存在しないセッションID
+				return shared.NewUUID[domainSession.Session]().String(), nil
+			},
+			wantErr: true,
+		},
+		{
+			name: "無効なセッションステータスでエラーになる",
+			setup: func(ctx context.Context, tm domainSession.TokenManager, sessionRepo domainSession.SessionRepository, userRepo user.UserRepository) (string, error) {
+				// ユーザー作成
+				testUser := user.NewUser(
+					shared.NewUUID[user.User](),
+					lo.ToPtr("testid2"),
+					lo.ToPtr("TestUser2"),
+					"test-subject2",
+					auth.ProviderGoogle,
+					lo.ToPtr("test-icon2.png"),
+				)
+				err := userRepo.Create(ctx, testUser)
+				if err != nil {
+					return "", err
+				}
+
+				// 無効なセッション作成
+				sess := domainSession.NewSession(
+					shared.NewUUID[domainSession.Session](),
+					testUser.UserID(),
+					auth.ProviderGoogle,
+					domainSession.SESSION_INACTIVE,
+					clock.Now(ctx).Add(24*time.Hour),
+					clock.Now(ctx),
+				)
+				createdSess, err := sessionRepo.Create(ctx, *sess)
+				if err != nil {
+					return "", err
+				}
+
+				return createdSess.SessionID().String(), nil
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			cont := di.BuildContainer()
+			dbm := di.Invoke[*db.DBManager](cont)
+
+			err := dbm.ExecTx(context.Background(), func(ctx context.Context) error {
+				// DIコンテナから必要な依存関係を取得
+				sessionRepo := di.Invoke[domainSession.SessionRepository](cont)
+				userRepo := di.Invoke[user.UserRepository](cont)
+				orgUserRepo := di.Invoke[organization.OrganizationUserRepository](cont)
+				orgRepo := di.Invoke[organization.OrganizationRepository](cont)
+
+				// SessionTokenManagerを作成
+				cfg := &config.Config{TokenSecret: "test-secret"}
+				tm := session.NewSessionTokenManager(cfg, dbm, sessionRepo, userRepo, orgUserRepo, orgRepo)
+
+				// セットアップ実行
+				token, err := tt.setup(ctx, tm, sessionRepo, userRepo)
+				require.NoError(t, err)
+
+				// トークンをパース
+				claim, err := tm.Parse(ctx, token)
+
+				if tt.wantErr {
+					assert.Error(t, err)
+					return nil
+				}
+
+				assert.NoError(t, err)
+				assert.NotNil(t, claim)
+
+				// Claimの内容を検証
+				userID, err := claim.UserID()
+				assert.NoError(t, err)
+				assert.NotEmpty(t, userID)
+
+				sessionID, err := claim.SessionID()
+				assert.NoError(t, err)
+				assert.NotEmpty(t, sessionID)
+
+				assert.True(t, claim.IsRegistered)
+				assert.False(t, claim.IsExpired(ctx))
+				return nil
+			})
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestSessionTokenManager_Generate(t *testing.T) {
+	t.Parallel()
+
+	cont := di.BuildContainer()
+	dbm := di.Invoke[*db.DBManager](cont)
+
+	err := dbm.ExecTx(context.Background(), func(ctx context.Context) error {
+		// DIコンテナから必要な依存関係を取得
+		sessionRepo := di.Invoke[domainSession.SessionRepository](cont)
+		userRepo := di.Invoke[user.UserRepository](cont)
+		orgUserRepo := di.Invoke[organization.OrganizationUserRepository](cont)
+		orgRepo := di.Invoke[organization.OrganizationRepository](cont)
+
+		// SessionTokenManagerを作成
+		cfg := &config.Config{TokenSecret: "test-secret"}
+		tm := session.NewSessionTokenManager(cfg, dbm, sessionRepo, userRepo, orgUserRepo, orgRepo)
+
+		// テストユーザー作成
+		testUser := user.NewUser(
+			shared.NewUUID[user.User](),
+			lo.ToPtr("testid3"),
+			lo.ToPtr("TestUser3"),
+			"test-subject3",
+			auth.ProviderGoogle,
+			lo.ToPtr("test-icon3.png"),
+		)
+
+		// セッションID
+		sessionID := shared.NewUUID[domainSession.Session]()
+
+		// Generate実行（SessionIDをそのまま返すだけ）
+		token, err := tm.Generate(ctx, testUser, sessionID)
+		assert.NoError(t, err)
+		assert.Equal(t, sessionID.String(), token)
+		return nil
+	})
+	require.NoError(t, err)
+}
