@@ -31,4 +31,13 @@ namespace kotohiro {
      */
     role: integer;
   }
+
+  /**
+   * 組織エイリアス
+   */
+  model OrganizationAlias {
+    aliasID: string;
+    aliasName: string;
+    createdAt: string;
+  }
 }

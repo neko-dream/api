@@ -189,15 +189,7 @@ func (o *organizationHandler) GetOrganizations(ctx context.Context) (oas.GetOrga
 
 	var orgs []oas.Organization
 	for _, org := range res.Organizations {
-		args := oas.Organization{
-			ID:       org.Organization.ID,
-			Name:     org.Organization.Name,
-			Code:     org.Organization.Code,
-			Type:     org.Organization.OrganizationType,
-			Role:     org.OrganizationUser.Role,
-			RoleName: org.OrganizationUser.RoleName,
-		}
-		orgs = append(orgs, args)
+		orgs = append(orgs, org.ToResponse())
 	}
 
 	return &oas.GetOrganizationsOK{
@@ -270,13 +262,9 @@ func (o *organizationHandler) GetOrganizationAliases(ctx context.Context, params
 		return nil, err
 	}
 
-	var aliasResponses []oas.GetOrganizationAliasesOKAliasesItem
+	var aliasResponses []oas.OrganizationAlias
 	for _, alias := range output.Aliases {
-		aliasResponses = append(aliasResponses, oas.GetOrganizationAliasesOKAliasesItem{
-			AliasID:   alias.AliasID,
-			AliasName: alias.AliasName,
-			CreatedAt: alias.CreatedAt,
-		})
+		aliasResponses = append(aliasResponses, alias.ToResponse())
 	}
 
 	return &oas.GetOrganizationAliasesOK{
@@ -313,7 +301,7 @@ func (o *organizationHandler) CreateOrganizationAlias(ctx context.Context, req *
 		return nil, err
 	}
 
-	return &oas.CreateOrganizationAliasOK{
+	return &oas.OrganizationAlias{
 		AliasID:   output.AliasID,
 		AliasName: output.AliasName,
 		CreatedAt: time.Now().Format(time.RFC3339),

@@ -1166,18 +1166,7 @@ paths:
                   aliases:
                     type: array
                     items:
-                      type: object
-                      properties:
-                        aliasID:
-                          type: string
-                        aliasName:
-                          type: string
-                        createdAt:
-                          type: string
-                      required:
-                        - aliasID
-                        - aliasName
-                        - createdAt
+                      $ref: '#/components/schemas/OrganizationAlias'
                 required:
                   - aliases
         '400':
@@ -1210,18 +1199,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  aliasID:
-                    type: string
-                  aliasName:
-                    type: string
-                  createdAt:
-                    type: string
-                required:
-                  - aliasID
-                  - aliasName
-                  - createdAt
+                $ref: '#/components/schemas/OrganizationAlias'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -3417,6 +3395,20 @@ components:
         role:
           type: integer
           description: ロール
+    OrganizationAlias:
+      type: object
+      required:
+        - aliasID
+        - aliasName
+        - createdAt
+      properties:
+        aliasID:
+          type: string
+        aliasName:
+          type: string
+        createdAt:
+          type: string
+      description: 組織エイリアス
     PolicyConsentStatus:
       type: object
       required:

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/neko-dream/server/internal/domain/model/organization"
+	"github.com/neko-dream/server/internal/presentation/oas"
 )
 
 type Organization struct {
@@ -30,4 +31,15 @@ func (ou *OrganizationUser) SetRoleName(role int) {
 type OrganizationResponse struct {
 	Organization     Organization     `json:"organization"`
 	OrganizationUser OrganizationUser `json:"organization_user"`
+}
+
+func (o *OrganizationResponse) ToResponse() oas.Organization {
+	return oas.Organization{
+		ID:       o.Organization.ID,
+		Name:     o.Organization.Name,
+		Code:     o.Organization.Code,
+		Type:     o.Organization.OrganizationType,
+		Role:     o.OrganizationUser.Role,
+		RoleName: o.OrganizationUser.RoleName,
+	}
 }

@@ -340,44 +340,6 @@ type CreateOrganizationAliasInternalServerError struct{}
 
 func (*CreateOrganizationAliasInternalServerError) createOrganizationAliasRes() {}
 
-type CreateOrganizationAliasOK struct {
-	AliasID   string `json:"aliasID"`
-	AliasName string `json:"aliasName"`
-	CreatedAt string `json:"createdAt"`
-}
-
-// GetAliasID returns the value of AliasID.
-func (s *CreateOrganizationAliasOK) GetAliasID() string {
-	return s.AliasID
-}
-
-// GetAliasName returns the value of AliasName.
-func (s *CreateOrganizationAliasOK) GetAliasName() string {
-	return s.AliasName
-}
-
-// GetCreatedAt returns the value of CreatedAt.
-func (s *CreateOrganizationAliasOK) GetCreatedAt() string {
-	return s.CreatedAt
-}
-
-// SetAliasID sets the value of AliasID.
-func (s *CreateOrganizationAliasOK) SetAliasID(val string) {
-	s.AliasID = val
-}
-
-// SetAliasName sets the value of AliasName.
-func (s *CreateOrganizationAliasOK) SetAliasName(val string) {
-	s.AliasName = val
-}
-
-// SetCreatedAt sets the value of CreatedAt.
-func (s *CreateOrganizationAliasOK) SetCreatedAt(val string) {
-	s.CreatedAt = val
-}
-
-func (*CreateOrganizationAliasOK) createOrganizationAliasRes() {}
-
 type CreateOrganizationAliasReq struct {
 	AliasName string `json:"aliasName"`
 }
@@ -1089,56 +1051,20 @@ type GetOrganizationAliasesInternalServerError struct{}
 func (*GetOrganizationAliasesInternalServerError) getOrganizationAliasesRes() {}
 
 type GetOrganizationAliasesOK struct {
-	Aliases []GetOrganizationAliasesOKAliasesItem `json:"aliases"`
+	Aliases []OrganizationAlias `json:"aliases"`
 }
 
 // GetAliases returns the value of Aliases.
-func (s *GetOrganizationAliasesOK) GetAliases() []GetOrganizationAliasesOKAliasesItem {
+func (s *GetOrganizationAliasesOK) GetAliases() []OrganizationAlias {
 	return s.Aliases
 }
 
 // SetAliases sets the value of Aliases.
-func (s *GetOrganizationAliasesOK) SetAliases(val []GetOrganizationAliasesOKAliasesItem) {
+func (s *GetOrganizationAliasesOK) SetAliases(val []OrganizationAlias) {
 	s.Aliases = val
 }
 
 func (*GetOrganizationAliasesOK) getOrganizationAliasesRes() {}
-
-type GetOrganizationAliasesOKAliasesItem struct {
-	AliasID   string `json:"aliasID"`
-	AliasName string `json:"aliasName"`
-	CreatedAt string `json:"createdAt"`
-}
-
-// GetAliasID returns the value of AliasID.
-func (s *GetOrganizationAliasesOKAliasesItem) GetAliasID() string {
-	return s.AliasID
-}
-
-// GetAliasName returns the value of AliasName.
-func (s *GetOrganizationAliasesOKAliasesItem) GetAliasName() string {
-	return s.AliasName
-}
-
-// GetCreatedAt returns the value of CreatedAt.
-func (s *GetOrganizationAliasesOKAliasesItem) GetCreatedAt() string {
-	return s.CreatedAt
-}
-
-// SetAliasID sets the value of AliasID.
-func (s *GetOrganizationAliasesOKAliasesItem) SetAliasID(val string) {
-	s.AliasID = val
-}
-
-// SetAliasName sets the value of AliasName.
-func (s *GetOrganizationAliasesOKAliasesItem) SetAliasName(val string) {
-	s.AliasName = val
-}
-
-// SetCreatedAt sets the value of CreatedAt.
-func (s *GetOrganizationAliasesOKAliasesItem) SetCreatedAt(val string) {
-	s.CreatedAt = val
-}
 
 type GetOrganizationsBadRequest struct{}
 
@@ -4495,6 +4421,46 @@ func (s *Organization) SetRoleName(val string) {
 func (s *Organization) SetRole(val int) {
 	s.Role = val
 }
+
+// 組織エイリアス.
+// Ref: #/components/schemas/OrganizationAlias
+type OrganizationAlias struct {
+	AliasID   string `json:"aliasID"`
+	AliasName string `json:"aliasName"`
+	CreatedAt string `json:"createdAt"`
+}
+
+// GetAliasID returns the value of AliasID.
+func (s *OrganizationAlias) GetAliasID() string {
+	return s.AliasID
+}
+
+// GetAliasName returns the value of AliasName.
+func (s *OrganizationAlias) GetAliasName() string {
+	return s.AliasName
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *OrganizationAlias) GetCreatedAt() string {
+	return s.CreatedAt
+}
+
+// SetAliasID sets the value of AliasID.
+func (s *OrganizationAlias) SetAliasID(val string) {
+	s.AliasID = val
+}
+
+// SetAliasName sets the value of AliasName.
+func (s *OrganizationAlias) SetAliasName(val string) {
+	s.AliasName = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *OrganizationAlias) SetCreatedAt(val string) {
+	s.CreatedAt = val
+}
+
+func (*OrganizationAlias) createOrganizationAliasRes() {}
 
 type PasswordLoginBadRequest struct{}
 
