@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/neko-dream/server/internal/domain/model/auth"
+	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/session"
-	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/pkg/utils"
 )
@@ -29,7 +29,7 @@ func (a *authenticationServiceImpl) RequireAuthentication(ctx context.Context) (
 	return a.GetCurrentUser(ctx)
 }
 
-func (a *authenticationServiceImpl) RequireOrganizationRole(ctx context.Context, minRole shared.OrganizationUserRole) (*auth.AuthenticationContext, error) {
+func (a *authenticationServiceImpl) RequireOrganizationRole(ctx context.Context, minRole organization.OrganizationUserRole) (*auth.AuthenticationContext, error) {
 	authCtx, err := a.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
@@ -47,15 +47,15 @@ func (a *authenticationServiceImpl) RequireOrganizationRole(ctx context.Context,
 }
 
 func (a *authenticationServiceImpl) RequireSuperAdmin(ctx context.Context) (*auth.AuthenticationContext, error) {
-	return a.RequireOrganizationRole(ctx, shared.OrganizationUserRoleSuperAdmin)
+	return a.RequireOrganizationRole(ctx, organization.OrganizationUserRoleSuperAdmin)
 }
 
 func (a *authenticationServiceImpl) RequireOwner(ctx context.Context) (*auth.AuthenticationContext, error) {
-	return a.RequireOrganizationRole(ctx, shared.OrganizationUserRoleOwner)
+	return a.RequireOrganizationRole(ctx, organization.OrganizationUserRoleOwner)
 }
 
 func (a *authenticationServiceImpl) RequireAdmin(ctx context.Context) (*auth.AuthenticationContext, error) {
-	return a.RequireOrganizationRole(ctx, shared.OrganizationUserRoleAdmin)
+	return a.RequireOrganizationRole(ctx, organization.OrganizationUserRoleAdmin)
 }
 
 func (a *authenticationServiceImpl) IsAuthenticated(ctx context.Context) bool {
@@ -106,7 +106,7 @@ func (a *authenticationServiceImpl) claimToAuthenticationContext(ctx context.Con
 	}
 
 	if claim.OrganizationRole != nil {
-		role := shared.NameToRole(*claim.OrganizationRole)
+		role := organization.NameToRole(*claim.OrganizationRole)
 		authCtx.OrganizationRole = &role
 	}
 

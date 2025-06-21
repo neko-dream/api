@@ -9,6 +9,7 @@ import (
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/consent"
+	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/config"
@@ -30,7 +31,7 @@ type AuthenticationService interface {
 	RequireAuthentication(ctx context.Context) (*auth.AuthenticationContext, error)
 
 	// 指定された役割以上の権限を持つことを確認
-	RequireOrganizationRole(ctx context.Context, minRole shared.OrganizationUserRole) (*auth.AuthenticationContext, error)
+	RequireOrganizationRole(ctx context.Context, minRole organization.OrganizationUserRole) (*auth.AuthenticationContext, error)
 
 	// スーパー管理者権限を持つことを確認
 	RequireSuperAdmin(ctx context.Context) (*auth.AuthenticationContext, error)

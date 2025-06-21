@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
@@ -22,7 +23,7 @@ type AuthenticationContext struct {
 
 	OrganizationID   *string
 	OrganizationCode *string
-	OrganizationRole *shared.OrganizationUserRole
+	OrganizationRole *organization.OrganizationUserRole
 }
 
 // 組織コンテキスト内かどうかを確認
@@ -31,7 +32,7 @@ func (ac *AuthenticationContext) IsInOrganization() bool {
 }
 
 // 指定された役割以上の権限を持つかを確認
-func (ac *AuthenticationContext) HasOrganizationRole(minRole shared.OrganizationUserRole) bool {
+func (ac *AuthenticationContext) HasOrganizationRole(minRole organization.OrganizationUserRole) bool {
 	if !ac.IsInOrganization() || ac.OrganizationRole == nil {
 		return false
 	}
@@ -41,17 +42,17 @@ func (ac *AuthenticationContext) HasOrganizationRole(minRole shared.Organization
 
 // スーパー管理者権限を持つかを確認
 func (ac *AuthenticationContext) IsSuperAdmin() bool {
-	return ac.HasOrganizationRole(shared.OrganizationUserRoleSuperAdmin)
+	return ac.HasOrganizationRole(organization.OrganizationUserRoleSuperAdmin)
 }
 
 // オーナー権限を持つかを確認
 func (ac *AuthenticationContext) IsOwner() bool {
-	return ac.HasOrganizationRole(shared.OrganizationUserRoleOwner)
+	return ac.HasOrganizationRole(organization.OrganizationUserRoleOwner)
 }
 
 // 管理者以上の権限を持つかを確認
 func (ac *AuthenticationContext) IsAdmin() bool {
-	return ac.HasOrganizationRole(shared.OrganizationUserRoleAdmin)
+	return ac.HasOrganizationRole(organization.OrganizationUserRoleAdmin)
 }
 
 // パスワード変更が必要かを確認

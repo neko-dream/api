@@ -5,7 +5,7 @@ import (
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/auth"
-	"github.com/neko-dream/server/internal/domain/model/shared"
+	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/service"
 )
 
@@ -34,7 +34,7 @@ func requireAuthentication(authService service.AuthenticationService, ctx contex
 }
 
 // 指定された組織役割以上の権限を要求
-func requireOrganizationRole(authService service.AuthenticationService, ctx context.Context, minRole shared.OrganizationUserRole) (*auth.AuthenticationContext, error) {
+func requireOrganizationRole(authService service.AuthenticationService, ctx context.Context, minRole organization.OrganizationUserRole) (*auth.AuthenticationContext, error) {
 	authCtx, err := authService.RequireOrganizationRole(ctx, minRole)
 	if err != nil {
 		if err == service.ErrNotAuthenticated {
