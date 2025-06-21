@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"time"
 
 	"github.com/neko-dream/server/internal/application/query/organization_query"
 	"github.com/neko-dream/server/internal/application/usecase/organization_usecase"
@@ -203,16 +202,13 @@ func (o *organizationHandler) ValidateOrganizationCode(ctx context.Context, para
 	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.ValidateOrganizationCode")
 	defer span.End()
 
-	// Find organization by code
 	org, err := o.orgRepo.FindByCode(ctx, params.Code)
 	if err != nil {
-		// Organization not found
 		return &oas.ValidateOrganizationCodeOK{
 			Valid: false,
 		}, nil
 	}
 
-	// Organization found
 	return &oas.ValidateOrganizationCodeOK{
 		Valid: true,
 		Organization: oas.NewOptOrganization(oas.Organization{
@@ -301,11 +297,8 @@ func (o *organizationHandler) CreateOrganizationAlias(ctx context.Context, req *
 		return nil, err
 	}
 
-	return &oas.OrganizationAlias{
-		AliasID:   output.AliasID,
-		AliasName: output.AliasName,
-		CreatedAt: time.Now().Format(time.RFC3339),
-	}, nil
+	res := output.ToResponse()
+	return &res, nil
 }
 
 // DeleteOrganizationAlias 組織エイリアス削除

@@ -3,12 +3,14 @@ package organization_usecase
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
+	"github.com/neko-dream/server/internal/presentation/oas"
 	"go.opentelemetry.io/otel"
 )
 
@@ -22,6 +24,15 @@ type CreateOrganizationAliasInput struct {
 type CreateOrganizationAliasOutput struct {
 	AliasID   string
 	AliasName string
+	CreatedAt time.Time
+}
+
+func (o *CreateOrganizationAliasOutput) ToResponse() oas.OrganizationAlias {
+	return oas.OrganizationAlias{
+		AliasID:   o.AliasID,
+		AliasName: o.AliasName,
+		CreatedAt: o.CreatedAt.Format(time.RFC3339),
+	}
 }
 
 type CreateOrganizationAliasUseCase struct {
@@ -73,6 +84,7 @@ func (u *CreateOrganizationAliasUseCase) Execute(
 		output = &CreateOrganizationAliasOutput{
 			AliasID:   alias.AliasID().String(),
 			AliasName: alias.AliasName(),
+			CreatedAt: alias.CreatedAt(),
 		}
 
 		return nil
