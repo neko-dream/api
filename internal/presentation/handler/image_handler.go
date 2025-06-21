@@ -5,7 +5,7 @@ import (
 
 	"github.com/neko-dream/server/internal/application/usecase/image_usecase"
 	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/session"
+	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/utils"
@@ -14,13 +14,16 @@ import (
 
 type imageHandler struct {
 	image_usecase.UploadImage
+	authService service.AuthenticationService
 }
 
 func NewImageHandler(
 	uploadImage image_usecase.UploadImage,
+	authService service.AuthenticationService,
 ) oas.ImageHandler {
 	return &imageHandler{
 		UploadImage: uploadImage,
+		authService: authService,
 	}
 }
 
@@ -29,15 +32,9 @@ func (i *imageHandler) PostImage(ctx context.Context, req *oas.PostImageReq) (oa
 	ctx, span := otel.Tracer("handler").Start(ctx, "imageHandler.PostImage")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	if claim == nil {
-		return nil, messages.ForbiddenError
-	}
-
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(i.authService, ctx)
 	if err != nil {
-		utils.HandleError(ctx, err, "claim.UserID")
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
 
 	file, err := http_utils.CreateFileHeader(ctx, req.Image.File, req.GetImage().Name)
@@ -47,7 +44,7 @@ func (i *imageHandler) PostImage(ctx context.Context, req *oas.PostImageReq) (oa
 	}
 
 	input := image_usecase.UploadImageInput{
-		OwnerID: userID,
+		OwnerID: authCtx.UserID,
 		Image:   file,
 	}
 

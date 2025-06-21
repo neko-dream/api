@@ -7,7 +7,6 @@ import (
 
 	"braces.dev/errtrace"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -84,7 +83,7 @@ func (j *tokenManager) Generate(ctx context.Context, user user.User, sessionID s
 	}
 
 	requiredPasswordChange := false
-	if user.Provider() == auth.ProviderPassword {
+	if user.Provider() == shared.ProviderPassword {
 		auths, err := j.DBManager.GetQueries(ctx).GetPasswordAuthByUserId(ctx, user.UserID().UUID())
 		if err != nil {
 			utils.HandleError(ctx, err, "GetPasswordAuthByUserId")

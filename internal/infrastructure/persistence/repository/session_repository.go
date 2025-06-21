@@ -8,7 +8,6 @@ import (
 
 	"braces.dev/errtrace"
 	"github.com/google/uuid"
-	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -78,7 +77,7 @@ func (s *sessionRepository) FindBySessionID(ctx context.Context, sess shared.UUI
 		return nil, errtrace.Wrap(err)
 	}
 
-	providerName, err := auth.NewAuthProviderName(sessRow.Provider)
+	providerName, err := shared.NewAuthProviderName(sessRow.Provider)
 	if err != nil {
 		return nil, errtrace.Wrap(err)
 	}
@@ -127,7 +126,7 @@ func (s *sessionRepository) FindByUserID(ctx context.Context, userID shared.UUID
 
 	sessions := make([]session.Session, 0, len(sessionModels))
 	for _, sess := range sessionModels {
-		providerName, err := auth.NewAuthProviderName(sess.Provider)
+		providerName, err := shared.NewAuthProviderName(sess.Provider)
 		if err != nil {
 			utils.HandleError(ctx, err, fmt.Sprintf("NewAuthProviderName: %s", sess.Provider))
 			continue

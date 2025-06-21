@@ -16,6 +16,38 @@ import (
 	"go.opentelemetry.io/otel"
 )
 
+var (
+	ErrNotAuthenticated        = errors.New("not authenticated")
+	ErrInsufficientPermissions = errors.New("insufficient permissions")
+	ErrNotInOrganization       = errors.New("not in organization context")
+)
+
+type AuthenticationService interface {
+	// 現在認証されているユーザーのコンテキストを取得
+	GetCurrentUser(ctx context.Context) (*auth.AuthenticationContext, error)
+
+	// ユーザーが認証されていることを確認
+	RequireAuthentication(ctx context.Context) (*auth.AuthenticationContext, error)
+
+	// 指定された役割以上の権限を持つことを確認
+	RequireOrganizationRole(ctx context.Context, minRole shared.OrganizationUserRole) (*auth.AuthenticationContext, error)
+
+	// スーパー管理者権限を持つことを確認
+	RequireSuperAdmin(ctx context.Context) (*auth.AuthenticationContext, error)
+
+	// オーナー権限を持つことを確認
+	RequireOwner(ctx context.Context) (*auth.AuthenticationContext, error)
+
+	// 管理者以上の権限を持つことを確認
+	RequireAdmin(ctx context.Context) (*auth.AuthenticationContext, error)
+
+	// 認証されているかをチェック
+	IsAuthenticated(ctx context.Context) bool
+
+	// 組織コンテキスト内かをチェック
+	IsInOrganization(ctx context.Context) bool
+}
+
 type AuthService interface {
 	Authenticate(ctx context.Context, provider, code string) (*user.User, error)
 	GenerateState(ctx context.Context) (string, error)
@@ -76,7 +108,7 @@ func (a *authService) Authenticate(
 		return existUser, nil
 	}
 
-	authProviderName, err := auth.NewAuthProviderName(providerName)
+	authProviderName, err := shared.NewAuthProviderName(providerName)
 	if err != nil {
 		utils.HandleError(ctx, err, "AuthProviderName.NewAuthProviderName")
 		return nil, errtrace.Wrap(err)

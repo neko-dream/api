@@ -11,6 +11,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
+	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
@@ -38,6 +39,7 @@ type (
 		DisplayID   string // ユーザーの表示用ID
 		DisplayName string // ユーザーの表示名
 		Token       string // ユーザーのトークン
+		IconURL     *string // ユーザーのアイコンURL
 	}
 
 	editHandler struct {
@@ -50,6 +52,14 @@ type (
 		profileIconService service.ProfileIconService
 	}
 )
+
+func (o *EditOutput) ToResponse() oas.User {
+	return oas.User{
+		DisplayID:   o.DisplayID,
+		DisplayName: o.DisplayName,
+		IconURL:     utils.ToOptNil[oas.OptNilString](o.IconURL),
+	}
+}
 
 func NewEditHandler(
 	dm *db.DBManager,
@@ -160,5 +170,6 @@ func (e *editHandler) Execute(ctx context.Context, input EditInput) (*EditOutput
 		DisplayID:   *u.DisplayID(),
 		DisplayName: *u.DisplayName(),
 		Token:       token,
+		IconURL:     u.IconURL(),
 	}, nil
 }

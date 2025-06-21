@@ -10,6 +10,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/infrastructure/http/cookie"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	cookie_utils "github.com/neko-dream/server/pkg/cookie"
@@ -30,6 +31,7 @@ type authHandler struct {
 	passwordRegister auth_usecase.PasswordRegister
 	changePassword   auth_usecase.ChangePassword
 
+	authService service.AuthenticationService
 	cookie.CookieManager
 }
 
@@ -44,6 +46,7 @@ func NewAuthHandler(
 	register auth_usecase.PasswordRegister,
 	changePassword auth_usecase.ChangePassword,
 
+	authService service.AuthenticationService,
 	cookieManger cookie.CookieManager,
 ) oas.AuthHandler {
 	return &authHandler{
@@ -52,6 +55,7 @@ func NewAuthHandler(
 		Revoke:           revoke,
 		LoginForDev:      devLogin,
 		DetachAccount:    detachAccount,
+		authService:      authService,
 		CookieManager:    cookieManger,
 		passwordLogin:    login,
 		passwordRegister: register,
@@ -141,13 +145,13 @@ func (a *authHandler) RevokeToken(ctx context.Context) (oas.RevokeTokenRes, erro
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.OAuthTokenRevoke")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	sessID, err := claim.SessionID()
+	authCtx, err := requireAuthentication(a.authService, ctx)
 	if err != nil {
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
+
 	_, err = a.Revoke.Execute(ctx, auth_usecase.RevokeInput{
-		SessID: sessID,
+		SessID: authCtx.SessionID,
 	})
 	if err != nil {
 		return nil, err
@@ -163,14 +167,20 @@ func (a *authHandler) GetTokenInfo(ctx context.Context) (oas.GetTokenInfoRes, er
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.OAuthTokenInfo")
 	defer span.End()
 
+	// GetTokenInfoは特別で、セッション情報の詳細を返す必要があるため、直接claimを取得
 	claim := session.GetSession(ctx)
-	sessID, err := claim.SessionID()
-	if err != nil {
+	if claim == nil {
 		return nil, messages.ForbiddenError
 	}
 	if claim.IsExpired(ctx) {
 		return nil, messages.TokenExpiredError
 	}
+
+	sessID, err := claim.SessionID()
+	if err != nil {
+		return nil, messages.InternalServerError
+	}
+
 	var orgType *int
 	if claim.OrgType != nil {
 		orgType = lo.ToPtr(*claim.OrgType)
@@ -201,17 +211,11 @@ func (a *authHandler) AuthAccountDetach(ctx context.Context) (oas.AuthAccountDet
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.AuthAccountDetach")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	sessID, err := claim.SessionID()
+	authCtx, err := requireAuthentication(a.authService, ctx)
 	if err != nil {
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
-
-	userID, err := claim.UserID()
-	if err != nil {
-		return nil, messages.ForbiddenError
-	}
-
+	userID := authCtx.UserID
 	if err = a.DetachAccount.Execute(ctx, auth_usecase.DetachAccountInput{
 		UserID: shared.UUID[user.User](userID),
 	}); err != nil {
@@ -220,7 +224,7 @@ func (a *authHandler) AuthAccountDetach(ctx context.Context) (oas.AuthAccountDet
 
 	// revoke
 	_, err = a.Revoke.Execute(ctx, auth_usecase.RevokeInput{
-		SessID: sessID,
+		SessID: authCtx.SessionID,
 	})
 	if err != nil {
 		return nil, err
@@ -272,14 +276,11 @@ func (a *authHandler) ChangePassword(ctx context.Context, params oas.ChangePassw
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.ChangePassword")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	if claim == nil {
-		return nil, messages.ForbiddenError
-	}
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(a.authService, ctx)
 	if err != nil {
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
+	userID := authCtx.UserID
 
 	out, err := a.changePassword.Execute(ctx, auth_usecase.ChangePasswordInput{
 		UserID:      shared.UUID[user.User](userID),

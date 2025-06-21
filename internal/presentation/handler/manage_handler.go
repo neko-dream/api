@@ -11,7 +11,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
-	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/server/internal/presentation/oas"
@@ -23,6 +23,7 @@ type manageHandler struct {
 	analysis.AnalysisService
 	analysis.AnalysisRepository
 	*db.DBManager
+	authService service.AuthenticationService
 	session.TokenManager
 }
 
@@ -41,19 +42,12 @@ func (m *manageHandler) GetUserStatsTotalManage(ctx context.Context) (*oas.UserS
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetUserStatsTotalManage")
 	defer span.End()
 
-	claim := session.GetSession(m.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if claim != nil {
-		id, err := claim.UserID()
-		if err == nil {
-			userID = &id
-		}
-	}
-	if userID == nil {
-		return nil, messages.ForbiddenError
+	authCtx, err := requireAuthentication(m.authService, m.SetSession(ctx))
+	if err != nil {
+		return nil, err
 	}
 	// org所属のユーザであることを確認
-	if claim.OrgType == nil {
+	if !authCtx.IsInOrganization() {
 		return nil, messages.ForbiddenError
 	}
 
@@ -81,19 +75,12 @@ func (m *manageHandler) GetUserStatsListManage(ctx context.Context, params oas.G
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetUserStatsListManage")
 	defer span.End()
 
-	claim := session.GetSession(m.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if claim != nil {
-		id, err := claim.UserID()
-		if err == nil {
-			userID = &id
-		}
-	}
-	if userID == nil {
-		return []oas.UserStatsResponse{}, messages.ForbiddenError
+	authCtx, err := requireAuthentication(m.authService, m.SetSession(ctx))
+	if err != nil {
+		return []oas.UserStatsResponse{}, err
 	}
 	// org所属のユーザであることを確認
-	if claim.OrgType == nil {
+	if !authCtx.IsInOrganization() {
 		return []oas.UserStatsResponse{}, messages.ForbiddenError
 	}
 
@@ -151,12 +138,14 @@ func NewManageHandler(
 	dbm *db.DBManager,
 	ansv analysis.AnalysisService,
 	arep analysis.AnalysisRepository,
+	authService service.AuthenticationService,
 	tokenManager session.TokenManager,
 ) oas.ManageHandler {
 	return &manageHandler{
 		DBManager:          dbm,
 		AnalysisService:    ansv,
 		AnalysisRepository: arep,
+		authService:        authService,
 		TokenManager:       tokenManager,
 	}
 }
@@ -166,21 +155,14 @@ func (m *manageHandler) GetTalkSessionListManage(ctx context.Context, params oas
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetTalkSessionListManage")
 	defer span.End()
 
-	claim := session.GetSession(m.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if claim != nil {
-		id, err := claim.UserID()
-		if err == nil {
-			userID = &id
-		}
-	}
-	if userID == nil {
+	authCtx, err := requireAuthentication(m.authService, m.SetSession(ctx))
+	if err != nil {
 		return &oas.TalkSessionListResponse{
 			TotalCount: 0,
-		}, messages.ForbiddenError
+		}, err
 	}
 	// org所属のユーザであることを確認
-	if claim.OrgType == nil {
+	if !authCtx.IsInOrganization() {
 		return &oas.TalkSessionListResponse{
 			TotalCount: 0,
 		}, messages.ForbiddenError
@@ -340,11 +322,11 @@ func (m *manageHandler) ToggleReportVisibilityManage(ctx context.Context, req *o
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.ToggleReportVisibilityManage")
 	defer span.End()
 
-	claim := session.GetSession(m.SetSession(ctx))
-	if claim == nil {
-		return nil, messages.ForbiddenError
+	authCtx, err := requireAuthentication(m.authService, m.SetSession(ctx))
+	if err != nil {
+		return nil, err
 	}
-	if claim.OrgType == nil {
+	if !authCtx.IsInOrganization() {
 		return nil, messages.ForbiddenError
 	}
 
@@ -372,19 +354,12 @@ func (m *manageHandler) GetAnalysisReportManage(ctx context.Context, params oas.
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetReportBySessionId")
 	defer span.End()
 
-	claim := session.GetSession(m.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if claim != nil {
-		id, err := claim.UserID()
-		if err == nil {
-			userID = &id
-		}
-	}
-	if userID == nil {
-		return nil, messages.ForbiddenError
+	authCtx, err := requireAuthentication(m.authService, m.SetSession(ctx))
+	if err != nil {
+		return nil, err
 	}
 	// org所属のユーザであることを確認
-	if claim.OrgType == nil {
+	if !authCtx.IsInOrganization() {
 		return nil, messages.ForbiddenError
 	}
 

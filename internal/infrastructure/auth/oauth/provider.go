@@ -10,6 +10,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/lestrrat-go/jwx/v3/jwk"
 	"github.com/neko-dream/server/internal/domain/model/auth"
+	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
@@ -19,7 +20,7 @@ import (
 
 type (
 	authProvider struct {
-		providerName auth.AuthProviderName
+		providerName shared.AuthProviderName
 		oauthConf    oauth2.Config
 		conf         *config.Config
 		provider     *oidc.Provider
@@ -28,7 +29,7 @@ type (
 
 func NewAuthProvider(
 	ctx context.Context,
-	providerName auth.AuthProviderName,
+	providerName shared.AuthProviderName,
 	conf *config.Config,
 ) (auth.AuthProvider, error) {
 	ctx, span := otel.Tracer("oauth").Start(ctx, "NewAuthProvider")

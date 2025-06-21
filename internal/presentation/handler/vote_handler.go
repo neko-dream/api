@@ -6,8 +6,8 @@ import (
 	"github.com/neko-dream/server/internal/application/usecase/vote_usecase"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
-	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
+	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
@@ -15,13 +15,16 @@ import (
 
 type voteHandler struct {
 	voteCommand vote_usecase.Vote
+	authService service.AuthenticationService
 }
 
 func NewVoteHandler(
 	voteCommand vote_usecase.Vote,
+	authService service.AuthenticationService,
 ) oas.VoteHandler {
 	return &voteHandler{
 		voteCommand: voteCommand,
+		authService: authService,
 	}
 }
 
@@ -30,10 +33,9 @@ func (v *voteHandler) Vote2(ctx context.Context, req *oas.Vote2Req, params oas.V
 	ctx, span := otel.Tracer("handler").Start(ctx, "voteHandler.Vote")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(v.authService, ctx)
 	if err != nil {
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
 	if req == nil {
 		return nil, messages.RequiredParameterError
@@ -47,7 +49,7 @@ func (v *voteHandler) Vote2(ctx context.Context, req *oas.Vote2Req, params oas.V
 
 	err = v.voteCommand.Execute(ctx, vote_usecase.VoteInput{
 		TargetOpinionID: targetOpinionID,
-		UserID:          userID,
+		UserID:          authCtx.UserID,
 		VoteType:        string(value.VoteStatus.Value),
 	})
 	if err != nil {

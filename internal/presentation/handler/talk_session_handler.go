@@ -16,6 +16,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/pkg/sort"
 	"github.com/neko-dream/server/pkg/utils"
@@ -41,6 +42,7 @@ type talkSessionHandler struct {
 	editTalkSessionCommand  talksession_usecase.EditTalkSessionUseCase
 	takeConsentCommand      talksession_usecase.TakeConsentUseCase
 
+	authService service.AuthenticationService
 	session.TokenManager
 }
 
@@ -62,6 +64,7 @@ func NewTalkSessionHandler(
 	editTalkSessionCommand talksession_usecase.EditTalkSessionUseCase,
 	takeConsentCommand talksession_usecase.TakeConsentUseCase,
 
+	authService service.AuthenticationService,
 	tokenManager session.TokenManager,
 ) oas.TalkSessionHandler {
 	return &talkSessionHandler{
@@ -82,6 +85,7 @@ func NewTalkSessionHandler(
 		editTalkSessionCommand:  editTalkSessionCommand,
 		takeConsentCommand:      takeConsentCommand,
 
+		authService:  authService,
 		TokenManager: tokenManager,
 	}
 }
@@ -91,16 +95,11 @@ func (t *talkSessionHandler) PostConclusion(ctx context.Context, req *oas.PostCo
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.PostConclusion")
 	defer span.End()
 
-	claim := session.GetSession(t.SetSession(ctx))
-	if claim == nil {
-		return nil, messages.RequiredParameterError
-	}
-
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(t.authService, t.SetSession(ctx))
 	if err != nil {
-		utils.HandleError(ctx, err, "claim.UserID")
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
+	userID := authCtx.UserID
 
 	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
 	if err != nil {
@@ -160,15 +159,11 @@ func (t *talkSessionHandler) GetOpenedTalkSession(ctx context.Context, params oa
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetOpenedTalkSession")
 	defer span.End()
 
-	claim := session.GetSession(t.SetSession(ctx))
-	if claim == nil {
-		return nil, messages.ForbiddenError
-	}
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(t.authService, t.SetSession(ctx))
 	if err != nil {
-		utils.HandleError(ctx, err, "claim.UserID")
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
+	userID := authCtx.UserID
 
 	var limit, offset *int
 	if params.Limit.IsSet() {
@@ -243,16 +238,15 @@ func (t *talkSessionHandler) InitiateTalkSession(ctx context.Context, req *oas.I
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.InitiateTalkSession")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
 	if req == nil {
 		return nil, messages.RequiredParameterError
 	}
 
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(t.authService, ctx)
 	if err != nil {
-		utils.HandleError(ctx, err, "claim.UserID")
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
+	userID := authCtx.UserID
 	var restrictionStrings []string
 	if req.Restrictions != nil && req.Restrictions[0] != "" {
 		if sl := strings.Split(strings.Join(req.Restrictions, ","), ","); len(sl) > 0 {
@@ -279,7 +273,7 @@ func (t *talkSessionHandler) InitiateTalkSession(ctx context.Context, req *oas.I
 		City:                utils.ToPtrIfNotNullValue(!req.City.IsSet(), req.City.Value),
 		Prefecture:          utils.ToPtrIfNotNullValue(!req.Prefecture.IsSet(), req.Prefecture.Value),
 		Restrictions:        restrictionStrings,
-		SessionClaim:        claim,
+		SessionClaim:        session.GetSession(ctx),
 		OrganizationAliasID: organizationAliasID,
 	})
 	if err != nil {
@@ -383,13 +377,10 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.TalkSessionAnalysis")
 	defer span.End()
 
-	claim := session.GetSession(t.SetSession(ctx))
+	authCtx, err := getAuthenticationContext(t.authService, t.SetSession(ctx))
 	var userID *shared.UUID[user.User]
-	if claim != nil {
-		id, err := claim.UserID()
-		if err == nil {
-			userID = &id
-		}
+	if err == nil {
+		userID = &authCtx.UserID
 	}
 
 	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
@@ -454,15 +445,11 @@ func (t *talkSessionHandler) EditTalkSession(ctx context.Context, req *oas.EditT
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.EditTalkSession")
 	defer span.End()
 
-	claim := session.GetSession(t.SetSession(ctx))
-	if claim == nil {
-		return nil, messages.ForbiddenError
-	}
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(t.authService, t.SetSession(ctx))
 	if err != nil {
-		utils.HandleError(ctx, err, "claim.UserID")
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
+	userID := authCtx.UserID
 
 	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
 	if err != nil {
@@ -526,17 +513,11 @@ func (t *talkSessionHandler) GetTalkSessionRestrictionSatisfied(ctx context.Cont
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetTalkSessionRestrictionSatisfied")
 	defer span.End()
 
-	claim := session.GetSession(t.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if claim != nil {
-		id, err := claim.UserID()
-		if err == nil {
-			userID = &id
-		}
+	authCtx, err := requireAuthentication(t.authService, t.SetSession(ctx))
+	if err != nil {
+		return nil, err
 	}
-	if userID == nil {
-		return nil, messages.ForbiddenError
-	}
+	userID := authCtx.UserID
 
 	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
 	if err != nil {
@@ -545,7 +526,7 @@ func (t *talkSessionHandler) GetTalkSessionRestrictionSatisfied(ctx context.Cont
 
 	out, err := t.isSatisfied.Execute(ctx, talksession_query.IsTalkSessionSatisfiedInput{
 		TalkSessionID: talkSessionID,
-		UserID:        *userID,
+		UserID:        userID,
 	})
 	if err != nil {
 		return nil, err
@@ -568,17 +549,11 @@ func (t *talkSessionHandler) GetReportsForTalkSession(ctx context.Context, param
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetReportsForTalkSession")
 	defer span.End()
 
-	claim := session.GetSession(t.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if claim != nil {
-		id, err := claim.UserID()
-		if err == nil {
-			userID = &id
-		}
+	authCtx, err := requireAuthentication(t.authService, t.SetSession(ctx))
+	if err != nil {
+		return nil, err
 	}
-	if userID == nil {
-		return nil, messages.ForbiddenError
-	}
+	userID := authCtx.UserID
 
 	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
 	if err != nil {
@@ -596,7 +571,7 @@ func (t *talkSessionHandler) GetReportsForTalkSession(ctx context.Context, param
 
 	out, err := t.getReports.Execute(ctx, report_query.GetByTalkSessionInput{
 		TalkSessionID: talkSessionID,
-		UserID:        *userID,
+		UserID:        userID,
 		Status:        status,
 	})
 	if err != nil {
@@ -618,17 +593,11 @@ func (t *talkSessionHandler) GetTalkSessionReportCount(ctx context.Context, para
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetTalkSessionReportCount")
 	defer span.End()
 
-	claim := session.GetSession(t.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if claim != nil {
-		id, err := claim.UserID()
-		if err == nil {
-			userID = &id
-		}
+	authCtx, err := requireAuthentication(t.authService, t.SetSession(ctx))
+	if err != nil {
+		return nil, err
 	}
-	if userID == nil {
-		return nil, messages.ForbiddenError
-	}
+	userID := authCtx.UserID
 
 	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
 	if err != nil {
@@ -637,7 +606,7 @@ func (t *talkSessionHandler) GetTalkSessionReportCount(ctx context.Context, para
 
 	out, err := t.getReportCount.Execute(ctx, report_query.GetCountInput{
 		TalkSessionID: talkSessionID,
-		UserID:        *userID,
+		UserID:        userID,
 		Status:        string(params.Status),
 	})
 	if err != nil {
@@ -654,17 +623,11 @@ func (t *talkSessionHandler) ConsentTalkSession(ctx context.Context, params oas.
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.ConsentTalkSession")
 	defer span.End()
 
-	claim := session.GetSession(t.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if claim != nil {
-		id, err := claim.UserID()
-		if err == nil {
-			userID = &id
-		}
+	authCtx, err := requireAuthentication(t.authService, t.SetSession(ctx))
+	if err != nil {
+		return nil, err
 	}
-	if userID == nil {
-		return nil, messages.ForbiddenError
-	}
+	userID := authCtx.UserID
 
 	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
 	if err != nil {
@@ -673,7 +636,7 @@ func (t *talkSessionHandler) ConsentTalkSession(ctx context.Context, params oas.
 
 	if err := t.takeConsentCommand.Execute(ctx, talksession_usecase.TakeConsentUseCaseInput{
 		TalkSessionID: talkSessionID,
-		UserID:        *userID,
+		UserID:        userID,
 	}); err != nil {
 		return nil, errtrace.Wrap(err)
 	}
@@ -687,17 +650,11 @@ func (t *talkSessionHandler) HasConsent(ctx context.Context, params oas.HasConse
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.HasConsent")
 	defer span.End()
 
-	claim := session.GetSession(t.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if claim != nil {
-		id, err := claim.UserID()
-		if err == nil {
-			userID = &id
-		}
+	authCtx, err := requireAuthentication(t.authService, t.SetSession(ctx))
+	if err != nil {
+		return nil, err
 	}
-	if userID == nil {
-		return nil, messages.ForbiddenError
-	}
+	userID := authCtx.UserID
 
 	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
 	if err != nil {
@@ -706,7 +663,7 @@ func (t *talkSessionHandler) HasConsent(ctx context.Context, params oas.HasConse
 
 	hasConsent, err := t.hasConsent.Execute(ctx, talksession_query.HasConsentQueryInput{
 		TalkSessionID: talkSessionID,
-		UserID:        *userID,
+		UserID:        userID,
 	})
 	if err != nil {
 		return nil, err

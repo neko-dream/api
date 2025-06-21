@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/organization"
 	domainSession "github.com/neko-dream/server/internal/domain/model/session"
@@ -37,7 +36,7 @@ func TestSessionTokenManager(t *testing.T) {
 					lo.ToPtr("testid"),
 					lo.ToPtr("TestUser"),
 					"test-subject",
-					auth.ProviderGoogle,
+					shared.ProviderGoogle,
 					lo.ToPtr("test-icon.png"),
 				)
 				testUser.SetEmailVerified(true)
@@ -50,7 +49,7 @@ func TestSessionTokenManager(t *testing.T) {
 				sess := domainSession.NewSession(
 					shared.NewUUID[domainSession.Session](),
 					testUser.UserID(),
-					auth.ProviderGoogle,
+					shared.ProviderGoogle,
 					domainSession.SESSION_ACTIVE,
 					clock.Now(ctx).Add(24*time.Hour),
 					clock.Now(ctx),
@@ -87,7 +86,7 @@ func TestSessionTokenManager(t *testing.T) {
 					lo.ToPtr("testid2"),
 					lo.ToPtr("TestUser2"),
 					"test-subject2",
-					auth.ProviderGoogle,
+					shared.ProviderGoogle,
 					lo.ToPtr("test-icon2.png"),
 				)
 				err := userRepo.Create(ctx, testUser)
@@ -99,7 +98,7 @@ func TestSessionTokenManager(t *testing.T) {
 				sess := domainSession.NewSession(
 					shared.NewUUID[domainSession.Session](),
 					testUser.UserID(),
-					auth.ProviderGoogle,
+					shared.ProviderGoogle,
 					domainSession.SESSION_INACTIVE,
 					clock.Now(ctx).Add(24*time.Hour),
 					clock.Now(ctx),
@@ -190,7 +189,7 @@ func TestSessionTokenManager_Generate(t *testing.T) {
 			lo.ToPtr("testid3"),
 			lo.ToPtr("TestUser3"),
 			"test-subject3",
-			auth.ProviderGoogle,
+			shared.ProviderGoogle,
 			lo.ToPtr("test-icon3.png"),
 		)
 

@@ -14,6 +14,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/sort"
@@ -35,6 +36,7 @@ type opinionHandler struct {
 	reportOpinionCommand opinion_usecase.ReportOpinion
 	solveReportCommand   report_usecase.SolveReportCommand
 
+	authService service.AuthenticationService
 	session.TokenManager
 }
 
@@ -51,6 +53,7 @@ func NewOpinionHandler(
 	reportOpinionCommand opinion_usecase.ReportOpinion,
 	solveReportCommand report_usecase.SolveReportCommand,
 
+	authService service.AuthenticationService,
 	tokenManager session.TokenManager,
 ) oas.OpinionHandler {
 	return &opinionHandler{
@@ -66,6 +69,7 @@ func NewOpinionHandler(
 		reportOpinionCommand: reportOpinionCommand,
 		solveReportCommand:   solveReportCommand,
 
+		authService:  authService,
 		TokenManager: tokenManager,
 	}
 }
@@ -75,14 +79,9 @@ func (o *opinionHandler) GetOpinionDetail2(ctx context.Context, params oas.GetOp
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.GetOpinionDetail")
 	defer span.End()
 
-	claim := session.GetSession(o.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if claim != nil {
-		userIDTmp, err := claim.UserID()
-		if err != nil {
-			return nil, messages.ForbiddenError
-		}
-		userID = lo.ToPtr(userIDTmp)
+	authCtx, err := getAuthenticationContext(o.authService, o.SetSession(ctx))
+	if err != nil {
+		return nil, err
 	}
 
 	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
@@ -92,7 +91,7 @@ func (o *opinionHandler) GetOpinionDetail2(ctx context.Context, params oas.GetOp
 
 	opinion, err := o.getOpinionDetailByIDQuery.Execute(ctx, opinion_query.GetOpinionDetailByIDInput{
 		OpinionID: opinionID,
-		UserID:    userID,
+		UserID:    lo.ToPtr(authCtx.UserID),
 	})
 	if err != nil {
 		return nil, err
@@ -121,14 +120,10 @@ func (o *opinionHandler) OpinionComments2(ctx context.Context, params oas.Opinio
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.OpinionComments")
 	defer span.End()
 
-	claim := session.GetSession(o.SetSession(ctx))
+	authCtx, err := getAuthenticationContext(o.authService, o.SetSession(ctx))
 	var userID *shared.UUID[user.User]
-	if claim != nil {
-		userIDTmp, err := claim.UserID()
-		if err != nil {
-			return nil, messages.ForbiddenError
-		}
-		userID = lo.ToPtr(userIDTmp)
+	if err == nil {
+		userID = lo.ToPtr(authCtx.UserID)
 	}
 
 	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
@@ -173,13 +168,10 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.GetOpinionsForTalkSession")
 	defer span.End()
 
-	claim := session.GetSession(o.SetSession(ctx))
+	authCtx, err := getAuthenticationContext(o.authService, o.SetSession(ctx))
 	var userID *shared.UUID[user.User]
-	if claim != nil {
-		id, err := claim.UserID()
-		if err == nil {
-			userID = &id
-		}
+	if err == nil {
+		userID = &authCtx.UserID
 	}
 
 	var sortKey sort.SortKey
@@ -254,10 +246,9 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.SwipeOpinions")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(o.authService, ctx)
 	if err != nil {
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
 	var limit int
 	if params.Limit.IsSet() {
@@ -272,7 +263,7 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 	}
 
 	opinions, err := o.getSwipeOpinionQuery.Execute(ctx, opinion_query.GetSwipeOpinionsQueryInput{
-		UserID:        userID,
+		UserID:        authCtx.UserID,
 		TalkSessionID: talkSessionID,
 		Limit:         limit,
 	})
@@ -301,10 +292,9 @@ func (o *opinionHandler) PostOpinionPost2(ctx context.Context, req *oas.PostOpin
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.PostOpinionPost2")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(o.authService, ctx)
 	if err != nil {
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
 	if req == nil {
 		return nil, messages.RequiredParameterError
@@ -345,7 +335,7 @@ func (o *opinionHandler) PostOpinionPost2(ctx context.Context, req *oas.PostOpin
 
 	if err = o.submitOpinionCommand.Execute(ctx, opinion_usecase.SubmitOpinionInput{
 		TalkSessionID:   talkSessionID,
-		UserID:          userID,
+		UserID:          authCtx.UserID,
 		ParentOpinionID: parentOpinionID,
 		Title:           utils.ToPtrIfNotNullValue(!req.Title.IsSet(), value.Title.Value),
 		Content:         req.OpinionContent,
@@ -365,13 +355,9 @@ func (o *opinionHandler) ReportOpinion(ctx context.Context, req *oas.ReportOpini
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.ReportOpinion")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	if claim == nil {
-		return nil, messages.ForbiddenError
-	}
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(o.authService, ctx)
 	if err != nil {
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
 	if req == nil {
 		return nil, messages.RequiredParameterError
@@ -387,7 +373,7 @@ func (o *opinionHandler) ReportOpinion(ctx context.Context, req *oas.ReportOpini
 	}
 
 	if err := o.reportOpinionCommand.Execute(ctx, opinion_usecase.ReportOpinionInput{
-		ReporterID: userID,
+		ReporterID: authCtx.UserID,
 		OpinionID:  opinionID,
 		Reason:     int32(req.Reason.Value),
 		ReasonText: reasonText,
@@ -451,13 +437,9 @@ func (o *opinionHandler) GetOpinionReports(ctx context.Context, params oas.GetOp
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.GetOpinionReports")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	if claim == nil {
-		return nil, messages.ForbiddenError
-	}
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(o.authService, ctx)
 	if err != nil {
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
 
 	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
@@ -467,7 +449,7 @@ func (o *opinionHandler) GetOpinionReports(ctx context.Context, params oas.GetOp
 
 	reports, err := o.getReportByOpinionID.Execute(ctx, report_query.GetOpinionReportInput{
 		OpinionID: opinionID,
-		UserID:    userID,
+		UserID:    authCtx.UserID,
 	})
 	if err != nil {
 		return nil, err
@@ -481,13 +463,9 @@ func (o *opinionHandler) SolveOpinionReport(ctx context.Context, req *oas.SolveO
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.SolveOpinionReport")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	if claim == nil {
-		return nil, messages.ForbiddenError
-	}
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(o.authService, ctx)
 	if err != nil {
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
 
 	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
@@ -508,7 +486,7 @@ func (o *opinionHandler) SolveOpinionReport(ctx context.Context, req *oas.SolveO
 
 	if err := o.solveReportCommand.Execute(ctx, report_usecase.SolveReportInput{
 		OpinionID: opinionID,
-		UserID:    userID,
+		UserID:    authCtx.UserID,
 		Status:    status,
 	}); err != nil {
 		return nil, err

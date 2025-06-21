@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"braces.dev/errtrace"
-	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/crypto"
 	"github.com/neko-dream/server/internal/domain/model/image"
@@ -41,7 +40,7 @@ func NewUserRepository(
 
 // NewUserFromModel SQLCのモデルからドメインモデルのユーザーを生成する
 func (u *userRepository) newUserFromModel(ctx context.Context, modelUser *model.User, modelAuth *model.UserAuth) (*um.User, error) {
-	providerName, err := auth.NewAuthProviderName(modelAuth.Provider)
+	providerName, err := shared.NewAuthProviderName(modelAuth.Provider)
 	if err != nil {
 		return nil, errtrace.Wrap(err)
 	}

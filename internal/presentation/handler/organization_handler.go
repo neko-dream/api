@@ -9,6 +9,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
+	"github.com/neko-dream/server/internal/domain/service"
 	domainservice "github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"go.opentelemetry.io/otel"
@@ -26,6 +27,7 @@ type organizationHandler struct {
 	aliasRepo           organization.OrganizationAliasRepository
 	orgUserRepo         organization.OrganizationUserRepository
 	aliasService        *domainservice.OrganizationAliasService
+	authService         service.AuthenticationService
 	sessionTokenManager session.TokenManager
 }
 
@@ -41,6 +43,7 @@ func NewOrganizationHandler(
 	aliasRepo organization.OrganizationAliasRepository,
 	orgUserRepo organization.OrganizationUserRepository,
 	aliasService *domainservice.OrganizationAliasService,
+	authService service.AuthenticationService,
 	sessionTokenManager session.TokenManager,
 ) oas.OrganizationHandler {
 	return &organizationHandler{
@@ -55,6 +58,7 @@ func NewOrganizationHandler(
 		aliasRepo:           aliasRepo,
 		orgUserRepo:         orgUserRepo,
 		aliasService:        aliasService,
+		authService:         authService,
 		sessionTokenManager: sessionTokenManager,
 	}
 }
@@ -64,20 +68,16 @@ func (o *organizationHandler) EstablishOrganization(ctx context.Context, req *oa
 	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.EstablishOrganization")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	if claim == nil {
-		return nil, messages.ForbiddenError
-	}
 	if req == nil {
 		return nil, messages.BadRequestError
 	}
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(o.authService, ctx)
 	if err != nil {
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
 
 	_, err = o.create.Execute(ctx, organization_usecase.CreateOrganizationInput{
-		UserID: userID,
+		UserID: authCtx.UserID,
 		Name:   req.Name,
 		Code:   req.Code,
 		Type:   int(req.OrgType),
@@ -95,17 +95,13 @@ func (o *organizationHandler) InviteOrganization(ctx context.Context, req *oas.I
 	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.InviteOrganization")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	if claim == nil {
-		return nil, messages.ForbiddenError
-	}
 	if req == nil {
 		return nil, messages.BadRequestError
 	}
 
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(o.authService, ctx)
 	if err != nil {
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
 	organizationID, err := shared.ParseUUID[organization.Organization](params.OrganizationID)
 	if err != nil {
@@ -113,7 +109,7 @@ func (o *organizationHandler) InviteOrganization(ctx context.Context, req *oas.I
 	}
 
 	_, err = o.invite.Execute(ctx, organization_usecase.InviteOrganizationInput{
-		UserID:         userID,
+		UserID:         authCtx.UserID,
 		OrganizationID: organizationID,
 		Email:          req.Email,
 		Role:           int(req.Role),
@@ -131,13 +127,9 @@ func (o *organizationHandler) InviteOrganizationForUser(ctx context.Context, req
 	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.InviteOrganizationForUser")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	if claim == nil {
-		return nil, messages.ForbiddenError
-	}
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(o.authService, ctx)
 	if err != nil {
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
 	organizationID, err := shared.ParseUUID[organization.Organization](params.OrganizationID)
 	if err != nil {
@@ -145,7 +137,7 @@ func (o *organizationHandler) InviteOrganizationForUser(ctx context.Context, req
 	}
 
 	_, err = o.add.Execute(ctx, organization_usecase.InviteOrganizationForUserInput{
-		UserID:         userID,
+		UserID:         authCtx.UserID,
 		OrganizationID: organizationID,
 		DisplayID:      req.DisplayID,
 		Role:           int(req.Role),
@@ -165,17 +157,13 @@ func (o *organizationHandler) GetOrganizations(ctx context.Context) (oas.GetOrga
 	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.GetOrganizations")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	if claim == nil {
-		return nil, messages.ForbiddenError
-	}
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(o.authService, ctx)
 	if err != nil {
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
 
 	res, err := o.list.Execute(ctx, organization_query.ListJoinedOrganizationInput{
-		UserID: userID,
+		UserID: authCtx.UserID,
 	})
 	if err != nil {
 		return nil, err
@@ -227,13 +215,9 @@ func (o *organizationHandler) GetOrganizationAliases(ctx context.Context, params
 	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.GetOrganizationAliases")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	if claim == nil {
-		return nil, messages.ForbiddenError
-	}
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(o.authService, ctx)
 	if err != nil {
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
 
 	organizationID, err := shared.ParseUUID[organization.Organization](params.OrganizationID)
@@ -242,7 +226,7 @@ func (o *organizationHandler) GetOrganizationAliases(ctx context.Context, params
 	}
 
 	// 権限チェック - ユーザーがAdmin以上の権限を持っているか確認
-	orgUser, err := o.orgUserRepo.FindByOrganizationIDAndUserID(ctx, organizationID, userID)
+	orgUser, err := o.orgUserRepo.FindByOrganizationIDAndUserID(ctx, organizationID, authCtx.UserID)
 	if err != nil {
 		return nil, messages.ForbiddenError
 	}
@@ -273,14 +257,9 @@ func (o *organizationHandler) CreateOrganizationAlias(ctx context.Context, req *
 	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.CreateOrganizationAlias")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	if claim == nil {
-		return nil, messages.ForbiddenError
-	}
-
-	sessionID, err := claim.SessionID()
+	authCtx, err := requireAuthentication(o.authService, ctx)
 	if err != nil {
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
 
 	organizationID, err := shared.ParseUUID[organization.Organization](params.OrganizationID)
@@ -289,7 +268,7 @@ func (o *organizationHandler) CreateOrganizationAlias(ctx context.Context, req *
 	}
 
 	// エイリアス作成
-	output, err := o.createAlias.Execute(ctx, sessionID, organization_usecase.CreateOrganizationAliasInput{
+	output, err := o.createAlias.Execute(ctx, authCtx.SessionID, organization_usecase.CreateOrganizationAliasInput{
 		OrganizationID: organizationID,
 		AliasName:      req.AliasName,
 	})
@@ -306,14 +285,9 @@ func (o *organizationHandler) DeleteOrganizationAlias(ctx context.Context, param
 	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.DeleteOrganizationAlias")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	if claim == nil {
-		return nil, messages.ForbiddenError
-	}
-
-	sessionID, err := claim.SessionID()
+	authCtx, err := requireAuthentication(o.authService, ctx)
 	if err != nil {
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
 
 	aliasID, err := shared.ParseUUID[organization.OrganizationAlias](params.AliasID)
@@ -322,7 +296,7 @@ func (o *organizationHandler) DeleteOrganizationAlias(ctx context.Context, param
 	}
 
 	// エイリアス削除
-	err = o.deactivateAlias.Execute(ctx, sessionID, organization_usecase.DeactivateOrganizationAliasInput{
+	err = o.deactivateAlias.Execute(ctx, authCtx.SessionID, organization_usecase.DeactivateOrganizationAliasInput{
 		AliasID: aliasID,
 	})
 	if err != nil {

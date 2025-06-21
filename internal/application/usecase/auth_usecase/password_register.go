@@ -6,7 +6,6 @@ import (
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/auth"
 	password_auth "github.com/neko-dream/server/internal/domain/model/auth/password"
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/consent"
@@ -75,7 +74,7 @@ func (p *passwordRegisterInteractor) Execute(ctx context.Context, input Password
 
 	var tokenRes string
 	if err := p.ExecTx(ctx, func(ctx context.Context) error {
-		authProviderName, err := auth.NewAuthProviderName("password")
+		authProviderName, err := shared.NewAuthProviderName("password")
 		if err != nil {
 			return errtrace.Wrap(err)
 		}

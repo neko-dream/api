@@ -7,7 +7,6 @@ import (
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/auth"
 	password_auth "github.com/neko-dream/server/internal/domain/model/auth/password"
 	"github.com/neko-dream/server/internal/domain/model/consent"
 	"github.com/neko-dream/server/internal/domain/model/organization"
@@ -159,7 +158,7 @@ func (s *organizationMemberManager) InviteUser(ctx context.Context, input Invite
 		}
 
 		// 単純にユーザーを作成
-		authProviderName, err := auth.NewAuthProviderName("password")
+		authProviderName, err := shared.NewAuthProviderName("password")
 		if err != nil {
 			utils.HandleError(ctx, err, "AuthProviderName")
 			return errtrace.Wrap(err)

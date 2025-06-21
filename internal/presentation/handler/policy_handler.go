@@ -7,9 +7,9 @@ import (
 	"github.com/neko-dream/server/internal/application/query/policy_query"
 	"github.com/neko-dream/server/internal/application/usecase/policy_usecase"
 	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/utils"
@@ -20,15 +20,18 @@ import (
 type policyHandler struct {
 	checkConsentQuery policy_query.CheckConsent
 	acceptPolicy      policy_usecase.AcceptPolicy
+	authService       service.AuthenticationService
 }
 
 func NewPolicyHandler(
 	checkConsentQuery policy_query.CheckConsent,
 	acceptPolicy policy_usecase.AcceptPolicy,
+	authService service.AuthenticationService,
 ) oas.PolicyHandler {
 	return &policyHandler{
 		checkConsentQuery: checkConsentQuery,
 		acceptPolicy:      acceptPolicy,
+		authService:       authService,
 	}
 }
 
@@ -36,16 +39,11 @@ func (h *policyHandler) GetPolicyConsentStatus(ctx context.Context) (oas.GetPoli
 	ctx, span := otel.Tracer("handler").Start(ctx, "PolicyHandler.CheckConsent")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	if claim == nil {
-		return nil, messages.ForbiddenError
-	}
-
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(h.authService, ctx)
 	if err != nil {
-		utils.HandleError(ctx, err, "claim.UserID")
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
+	userID := authCtx.UserID
 
 	output, err := h.checkConsentQuery.Execute(ctx, policy_query.CheckConsentInput{
 		UserID: shared.UUID[user.User](userID),
@@ -68,16 +66,10 @@ func (h *policyHandler) GetPolicyConsentStatus(ctx context.Context) (oas.GetPoli
 func (h *policyHandler) PolicyConsent(ctx context.Context, req *oas.PolicyConsentReq) (oas.PolicyConsentRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "PolicyHandler.AcceptPolicy")
 	defer span.End()
-	claim := session.GetSession(ctx)
-	if claim == nil {
-		return nil, messages.ForbiddenError
-	}
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(h.authService, ctx)
 	if err != nil {
-		utils.HandleError(ctx, err, "claim.UserID")
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
-
 	if req == nil {
 		return nil, messages.BadRequestError
 	}
@@ -87,7 +79,7 @@ func (h *policyHandler) PolicyConsent(ctx context.Context, req *oas.PolicyConsen
 	userAgent := request.Header.Get("User-Agent")
 
 	output, err := h.acceptPolicy.Execute(ctx, policy_usecase.AcceptPolicyInput{
-		UserID:    shared.UUID[user.User](userID),
+		UserID:    authCtx.UserID,
 		Version:   req.PolicyVersion,
 		IPAddress: ipAddress,
 		UserAgent: userAgent,

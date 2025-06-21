@@ -70,3 +70,16 @@ func (u *User) ToResponse() oas.User {
 		IconURL:     utils.ToOptNil[oas.OptNilString](u.IconURL),
 	}
 }
+
+func (u *UserAuth) ToEmailResponse() oas.OptNilString {
+	return utils.ToOptNil[oas.OptNilString](u.Email)
+}
+
+func (u *UserDemographic) ToResponse() oas.UserDemographics {
+	return oas.UserDemographics{
+		DateOfBirth: utils.ToOptNil[oas.OptNilInt](u.DateOfBirth),
+		Gender:      utils.ToOptNil[oas.OptNilString](u.GenderString()),
+		Prefecture:  utils.ToOptNil[oas.OptNilString](u.Prefecture),
+		City:        utils.ToOptNil[oas.OptNilString](u.City),
+	}
+}
