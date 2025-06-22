@@ -5,10 +5,11 @@ import (
 
 	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/presentation/oas"
+	"github.com/neko-dream/server/pkg/utils"
 )
 
 type Organization struct {
-	ID               string    `json:"id"`                // 組織ID
+	OrganizationID   string    `json:"organization_id"`   // 組織ID
 	Name             string    `json:"name"`              // 組織名
 	Code             string    `json:"code"`              // 組織コード
 	OrganizationType int       `json:"organization_type"` // 組織の種類
@@ -35,11 +36,36 @@ type OrganizationResponse struct {
 
 func (o *OrganizationResponse) ToResponse() oas.Organization {
 	return oas.Organization{
-		ID:       o.Organization.ID,
+		ID:       o.Organization.OrganizationID,
 		Name:     o.Organization.Name,
 		Code:     o.Organization.Code,
 		Type:     o.Organization.OrganizationType,
 		Role:     o.OrganizationUser.Role,
 		RoleName: o.OrganizationUser.RoleName,
+	}
+}
+
+type OrganizationAlias struct {
+	AliasID   string     `json:"alias_id"`   // エイリアスID
+	AliasName string     `json:"alias_name"` // エイリアス名
+	CreatedAt *time.Time `json:"created_at"` // エイリアスの作成日時
+}
+
+func (o *OrganizationAlias) ToResponse() oas.OrganizationAlias {
+	if o == nil {
+		return oas.OrganizationAlias{}
+	}
+	if o.AliasName == "" {
+		o.AliasName = ""
+	}
+
+	var createdAt oas.OptNilString
+	if o.CreatedAt != nil {
+		createdAt = utils.ToOptNil[oas.OptNilString](o.CreatedAt.Format(time.RFC3339))
+	}
+	return oas.OrganizationAlias{
+		AliasID:   o.AliasID,
+		AliasName: o.AliasName,
+		CreatedAt: createdAt,
 	}
 }
