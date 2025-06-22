@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
@@ -57,19 +56,20 @@ type (
 	}
 
 	Session struct {
-		sessionID    shared.UUID[Session]
-		userID       shared.UUID[user.User]
-		authProvider auth.AuthProviderName
-		status       status
-		expires      time.Time
-		lastActivity time.Time
+		sessionID      shared.UUID[Session]
+		userID         shared.UUID[user.User]
+		authProvider   shared.AuthProviderName
+		status         status
+		expires        time.Time
+		lastActivity   time.Time
+		organizationID *shared.UUID[any] // ログイン時に使用した組織ID（組織経由ログインの場合）
 	}
 )
 
 func NewSession(
 	sessionID shared.UUID[Session],
 	userID shared.UUID[user.User],
-	authProvider auth.AuthProviderName,
+	authProvider shared.AuthProviderName,
 	status status,
 	expires time.Time,
 	lastActivity time.Time,
@@ -84,6 +84,26 @@ func NewSession(
 	}
 }
 
+func NewSessionWithOrganization(
+	sessionID shared.UUID[Session],
+	userID shared.UUID[user.User],
+	authProvider shared.AuthProviderName,
+	status status,
+	expires time.Time,
+	lastActivity time.Time,
+	organizationID *shared.UUID[any],
+) *Session {
+	return &Session{
+		sessionID:      sessionID,
+		userID:         userID,
+		authProvider:   authProvider,
+		status:         status,
+		expires:        expires,
+		lastActivity:   lastActivity,
+		organizationID: organizationID,
+	}
+}
+
 func (s *Session) UserID() shared.UUID[user.User] {
 	return s.userID
 }
@@ -92,7 +112,7 @@ func (s *Session) SessionID() shared.UUID[Session] {
 	return s.sessionID
 }
 
-func (s *Session) Provider() auth.AuthProviderName {
+func (s *Session) Provider() shared.AuthProviderName {
 	return s.authProvider
 }
 
@@ -127,6 +147,10 @@ func (s *Session) UpdateLastActivity(ctx context.Context) {
 	defer span.End()
 
 	s.lastActivity = clock.Now(ctx)
+}
+
+func (s *Session) OrganizationID() *shared.UUID[any] {
+	return s.organizationID
 }
 
 func SortByLastActivity(sessions []Session) []Session {

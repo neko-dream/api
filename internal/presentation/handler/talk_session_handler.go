@@ -4,19 +4,19 @@ import (
 	"bytes"
 	"context"
 	"strings"
-	"time"
 
 	"braces.dev/errtrace"
-	"github.com/neko-dream/server/internal/application/command/talksession_command"
 	"github.com/neko-dream/server/internal/application/query/analysis_query"
 	"github.com/neko-dream/server/internal/application/query/report_query"
 	talksession_query "github.com/neko-dream/server/internal/application/query/talksession"
+	"github.com/neko-dream/server/internal/application/usecase/talksession_usecase"
 	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/clock"
+	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/pkg/sort"
 	"github.com/neko-dream/server/pkg/utils"
@@ -37,11 +37,12 @@ type talkSessionHandler struct {
 	getReportCount                report_query.GetCountQuery
 	hasConsent                    talksession_query.HasConsentQuery
 
-	addConclusionCommand    talksession_command.AddConclusionCommand
-	startTalkSessionCommand talksession_command.StartTalkSessionCommand
-	editTalkSessionCommand  talksession_command.EditCommand
-	takeConsentCommand      talksession_command.TakeConsentUseCase
+	addConclusionCommand    talksession_usecase.AddConclusionCommand
+	startTalkSessionCommand talksession_usecase.StartTalkSessionUseCase
+	editTalkSessionCommand  talksession_usecase.EditTalkSessionUseCase
+	takeConsentCommand      talksession_usecase.TakeConsentUseCase
 
+	authService service.AuthenticationService
 	session.TokenManager
 }
 
@@ -58,11 +59,12 @@ func NewTalkSessionHandler(
 	getReportCount report_query.GetCountQuery,
 	hasConsent talksession_query.HasConsentQuery,
 
-	AddConclusionCommand talksession_command.AddConclusionCommand,
-	startTalkSessionCommand talksession_command.StartTalkSessionCommand,
-	editTalkSessionCommand talksession_command.EditCommand,
-	takeConsentCommand talksession_command.TakeConsentUseCase,
+	AddConclusionCommand talksession_usecase.AddConclusionCommand,
+	startTalkSessionCommand talksession_usecase.StartTalkSessionUseCase,
+	editTalkSessionCommand talksession_usecase.EditTalkSessionUseCase,
+	takeConsentCommand talksession_usecase.TakeConsentUseCase,
 
+	authService service.AuthenticationService,
 	tokenManager session.TokenManager,
 ) oas.TalkSessionHandler {
 	return &talkSessionHandler{
@@ -83,35 +85,31 @@ func NewTalkSessionHandler(
 		editTalkSessionCommand:  editTalkSessionCommand,
 		takeConsentCommand:      takeConsentCommand,
 
+		authService:  authService,
 		TokenManager: tokenManager,
 	}
 }
 
 // PostConclusion implements oas.TalkSessionHandler.
-func (t *talkSessionHandler) PostConclusion(ctx context.Context, req oas.OptPostConclusionReq, params oas.PostConclusionParams) (oas.PostConclusionRes, error) {
+func (t *talkSessionHandler) PostConclusion(ctx context.Context, req *oas.PostConclusionReq, params oas.PostConclusionParams) (oas.PostConclusionRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.PostConclusion")
 	defer span.End()
 
-	claim := session.GetSession(t.SetSession(ctx))
-	if !req.IsSet() {
-		return nil, messages.RequiredParameterError
-	}
-
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(t.authService, t.SetSession(ctx))
 	if err != nil {
-		utils.HandleError(ctx, err, "claim.UserID")
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
+	userID := authCtx.UserID
 
 	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
 	if err != nil {
 		return nil, messages.BadRequestError
 	}
 
-	if err := t.addConclusionCommand.Execute(ctx, talksession_command.AddConclusionCommandInput{
+	if err := t.addConclusionCommand.Execute(ctx, talksession_usecase.AddConclusionCommandInput{
 		TalkSessionID: talkSessionID,
 		UserID:        userID,
-		Conclusion:    req.Value.Content,
+		Conclusion:    req.Content,
 	}); err != nil {
 		return nil, errtrace.Wrap(err)
 	}
@@ -124,11 +122,7 @@ func (t *talkSessionHandler) PostConclusion(ctx context.Context, req oas.OptPost
 	}
 
 	return &oas.Conclusion{
-		User: oas.User{
-			DisplayID:   res.DisplayID,
-			DisplayName: res.DisplayName,
-			IconURL:     utils.ToOptNil[oas.OptNilString](res.IconURL),
-		},
+		User:    oas.ConclusionUser(res.ToResponse()),
 		Content: res.Content,
 	}, nil
 }
@@ -155,11 +149,7 @@ func (t *talkSessionHandler) GetConclusion(ctx context.Context, params oas.GetCo
 	}
 
 	return &oas.Conclusion{
-		User: oas.User{
-			DisplayID:   res.DisplayID,
-			DisplayName: res.DisplayName,
-			IconURL:     utils.ToOptNil[oas.OptNilString](res.IconURL),
-		},
+		User:    oas.ConclusionUser(res.ToResponse()),
 		Content: res.Content,
 	}, nil
 }
@@ -169,15 +159,11 @@ func (t *talkSessionHandler) GetOpenedTalkSession(ctx context.Context, params oa
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetOpenedTalkSession")
 	defer span.End()
 
-	claim := session.GetSession(t.SetSession(ctx))
-	if claim == nil {
-		return nil, messages.ForbiddenError
-	}
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(t.authService, t.SetSession(ctx))
 	if err != nil {
-		utils.HandleError(ctx, err, "claim.UserID")
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
+	userID := authCtx.UserID
 
 	var limit, offset *int
 	if params.Limit.IsSet() {
@@ -206,48 +192,8 @@ func (t *talkSessionHandler) GetOpenedTalkSession(ctx context.Context, params oa
 
 	resultTalkSession := make([]oas.GetOpenedTalkSessionOKTalkSessionsItem, 0, len(out.TalkSessions))
 	for _, talkSession := range out.TalkSessions {
-		owner := oas.User{
-			DisplayID:   talkSession.User.DisplayID,
-			DisplayName: talkSession.User.DisplayName,
-			IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.User.IconURL),
-		}
-		var location oas.OptLocation
-		if talkSession.HasLocation() {
-			location = oas.OptLocation{
-				Value: oas.Location{
-					Latitude:  utils.ToOpt[oas.OptFloat64](talkSession.Latitude),
-					Longitude: utils.ToOpt[oas.OptFloat64](talkSession.Longitude),
-				},
-				Set: true,
-			}
-		} else {
-			location = oas.OptLocation{}
-			location.Set = false
-		}
-		var restrictions []oas.Restriction
-		for _, restriction := range talkSession.TalkSession.Restrictions {
-			res := talksession.RestrictionAttributeKey(restriction)
-			attr := res.RestrictionAttribute()
-			restrictions = append(restrictions, oas.Restriction{
-				Key:         string(attr.Key),
-				Description: attr.Description,
-			})
-		}
-
 		resultTalkSession = append(resultTalkSession, oas.GetOpenedTalkSessionOKTalkSessionsItem{
-			TalkSession: oas.TalkSession{
-				ID:               talkSession.TalkSessionID.String(),
-				Theme:            talkSession.Theme,
-				Owner:            owner,
-				Description:      utils.ToOptNil[oas.OptNilString](talkSession.Description),
-				ThumbnailURL:     utils.ToOptNil[oas.OptNilString](talkSession.ThumbnailURL),
-				Location:         location,
-				CreatedAt:        talkSession.CreatedAt.Format(time.RFC3339),
-				ScheduledEndTime: talkSession.ScheduledEndTime.Format(time.RFC3339),
-				City:             utils.ToOptNil[oas.OptNilString](talkSession.City),
-				Prefecture:       utils.ToOptNil[oas.OptNilString](talkSession.Prefecture),
-				Restrictions:     restrictions,
-			},
+			TalkSession:  talkSession.ToResponse(),
 			OpinionCount: talkSession.OpinionCount,
 		})
 	}
@@ -287,81 +233,55 @@ func (t *talkSessionHandler) GetTalkSessionReport(ctx context.Context, params oa
 	}, nil
 }
 
-// CreateTalkSession トークセッション作成
-func (t *talkSessionHandler) CreateTalkSession(ctx context.Context, req oas.OptCreateTalkSessionReq) (oas.CreateTalkSessionRes, error) {
-	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.CreateTalkSession")
+// InitiateTalkSession トークセッション作成
+func (t *talkSessionHandler) InitiateTalkSession(ctx context.Context, req *oas.InitiateTalkSessionReq) (oas.InitiateTalkSessionRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.InitiateTalkSession")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	if !req.IsSet() {
+	if req == nil {
 		return nil, messages.RequiredParameterError
 	}
 
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(t.authService, ctx)
 	if err != nil {
-		utils.HandleError(ctx, err, "claim.UserID")
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
+	userID := authCtx.UserID
 	var restrictionStrings []string
-	if req.Value.Restrictions != nil && req.Value.Restrictions[0] != "" {
-		if sl := strings.Split(strings.Join(req.Value.Restrictions, ","), ","); len(sl) > 0 {
+	if req.Restrictions != nil && req.Restrictions[0] != "" {
+		if sl := strings.Split(strings.Join(req.Restrictions, ","), ","); len(sl) > 0 {
 			restrictionStrings = sl
 		}
 	}
 
-	out, err := t.startTalkSessionCommand.Execute(ctx, talksession_command.StartTalkSessionCommandInput{
-		Theme:            req.Value.Theme,
-		Description:      utils.ToPtrIfNotNullValue(!req.Value.Description.IsSet(), req.Value.Description.Value),
-		ThumbnailURL:     utils.ToPtrIfNotNullValue(!req.Value.ThumbnailURL.IsSet(), req.Value.ThumbnailURL.Value),
-		OwnerID:          userID,
-		ScheduledEndTime: req.Value.ScheduledEndTime,
-		Latitude:         utils.ToPtrIfNotNullValue(!req.Value.Latitude.IsSet(), req.Value.Latitude.Value),
-		Longitude:        utils.ToPtrIfNotNullValue(!req.Value.Longitude.IsSet(), req.Value.Longitude.Value),
-		City:             utils.ToPtrIfNotNullValue(!req.Value.City.IsSet(), req.Value.City.Value),
-		Prefecture:       utils.ToPtrIfNotNullValue(!req.Value.Prefecture.IsSet(), req.Value.Prefecture.Value),
-		Restrictions:     restrictionStrings,
+	var organizationAliasID *shared.UUID[organization.OrganizationAlias]
+	if req.GetAliasId().IsSet() && req.GetAliasId().Value != "" {
+		aliasID, err := shared.ParseUUID[organization.OrganizationAlias](req.GetAliasId().Value)
+		if err == nil {
+			organizationAliasID = &aliasID
+		}
+	}
+
+	out, err := t.startTalkSessionCommand.Execute(ctx, talksession_usecase.StartTalkSessionUseCaseInput{
+		Theme:               req.Theme,
+		Description:         utils.ToPtrIfNotNullValue(!req.Description.IsSet(), req.Description.Value),
+		ThumbnailURL:        utils.ToPtrIfNotNullValue(!req.ThumbnailURL.IsSet(), req.ThumbnailURL.Value),
+		OwnerID:             userID,
+		ScheduledEndTime:    req.ScheduledEndTime,
+		Latitude:            utils.ToPtrIfNotNullValue(!req.Latitude.IsSet(), req.Latitude.Value),
+		Longitude:           utils.ToPtrIfNotNullValue(!req.Longitude.IsSet(), req.Longitude.Value),
+		City:                utils.ToPtrIfNotNullValue(!req.City.IsSet(), req.City.Value),
+		Prefecture:          utils.ToPtrIfNotNullValue(!req.Prefecture.IsSet(), req.Prefecture.Value),
+		Restrictions:        restrictionStrings,
+		SessionClaim:        session.GetSession(ctx),
+		OrganizationAliasID: organizationAliasID,
 	})
 	if err != nil {
 		return nil, errtrace.Wrap(err)
 	}
 
-	var location oas.OptLocation
-	if out.HasLocation() {
-		location = oas.OptLocation{
-			Value: oas.Location{
-				Latitude:  utils.ToOpt[oas.OptFloat64](out.Latitude),
-				Longitude: utils.ToOpt[oas.OptFloat64](out.Longitude),
-			},
-			Set: true,
-		}
-	}
-	var restrictions []oas.Restriction
-	for _, restriction := range out.TalkSession.Restrictions {
-		res := talksession.RestrictionAttributeKey(restriction)
-		attr := res.RestrictionAttribute()
-		restrictions = append(restrictions, oas.Restriction{
-			Key:         string(attr.Key),
-			Description: attr.Description,
-		})
-	}
-
-	res := &oas.CreateTalkSessionOK{
-		ID: out.TalkSession.TalkSessionID.String(),
-		Owner: oas.User{
-			DisplayID:   out.User.DisplayID,
-			DisplayName: out.User.DisplayName,
-			IconURL:     utils.ToOptNil[oas.OptNilString](out.User.IconURL),
-		},
-		Theme:            out.TalkSession.Theme,
-		Description:      utils.ToOptNil[oas.OptNilString](out.TalkSession.Description),
-		ThumbnailURL:     utils.ToOptNil[oas.OptNilString](out.TalkSession.ThumbnailURL),
-		CreatedAt:        clock.Now(ctx).Format(time.RFC3339),
-		ScheduledEndTime: out.TalkSession.ScheduledEndTime.Format(time.RFC3339),
-		Location:         location,
-		Restrictions:     restrictions,
-		HideReport:       out.TalkSession.HideReport,
-	}
-	return res, nil
+	res := out.ToResponse()
+	return &res, nil
 }
 
 // ViewTalkSessionDetail トークセッション詳細取得
@@ -381,45 +301,8 @@ func (t *talkSessionHandler) GetTalkSessionDetail(ctx context.Context, params oa
 		return nil, err
 	}
 
-	owner := oas.User{
-		DisplayID:   out.User.DisplayID,
-		DisplayName: out.User.DisplayName,
-		IconURL:     utils.ToOptNil[oas.OptNilString](out.User.IconURL),
-	}
-	var location oas.OptLocation
-	if out.HasLocation() {
-		location = oas.OptLocation{
-			Value: oas.Location{
-				Latitude:  utils.ToOpt[oas.OptFloat64](out.Latitude),
-				Longitude: utils.ToOpt[oas.OptFloat64](out.Longitude),
-			},
-			Set: true,
-		}
-	}
-	var restrictions []oas.Restriction
-	for _, restriction := range out.TalkSession.Restrictions {
-		res := talksession.RestrictionAttributeKey(restriction)
-		attr := res.RestrictionAttribute()
-		restrictions = append(restrictions, oas.Restriction{
-			Key:         string(attr.Key),
-			Description: attr.Description,
-		})
-	}
-
-	return &oas.TalkSession{
-		ID:               out.TalkSessionID.String(),
-		Theme:            out.Theme,
-		Description:      utils.ToOptNil[oas.OptNilString](out.Description),
-		ThumbnailURL:     utils.ToOptNil[oas.OptNilString](out.ThumbnailURL),
-		Owner:            owner,
-		CreatedAt:        out.CreatedAt.Format(time.RFC3339),
-		ScheduledEndTime: out.ScheduledEndTime.Format(time.RFC3339),
-		Location:         location,
-		City:             utils.ToOptNil[oas.OptNilString](out.City),
-		Prefecture:       utils.ToOptNil[oas.OptNilString](out.Prefecture),
-		Restrictions:     restrictions,
-		HideReport:       out.TalkSession.HideReport,
-	}, nil
+	res := out.ToResponse()
+	return &res, nil
 }
 
 // GetTalkSessionList セッション一覧取得
@@ -472,46 +355,8 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 
 	resultTalkSession := make([]oas.GetTalkSessionListOKTalkSessionsItem, 0, len(out.TalkSessions))
 	for _, talkSession := range out.TalkSessions {
-		owner := oas.User{
-			DisplayID:   talkSession.User.DisplayID,
-			DisplayName: talkSession.User.DisplayName,
-			IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.User.IconURL),
-		}
-		var location oas.OptLocation
-		if talkSession.HasLocation() {
-			location = oas.OptLocation{
-				Value: oas.Location{
-					Latitude:  utils.ToOpt[oas.OptFloat64](talkSession.Latitude),
-					Longitude: utils.ToOpt[oas.OptFloat64](talkSession.Longitude),
-				},
-				Set: true,
-			}
-		}
-		var restrictions []oas.Restriction
-		for _, restriction := range talkSession.TalkSession.Restrictions {
-			res := talksession.RestrictionAttributeKey(restriction)
-			attr := res.RestrictionAttribute()
-			restrictions = append(restrictions, oas.Restriction{
-				Key:         string(attr.Key),
-				Description: attr.Description,
-			})
-		}
-
 		res := oas.GetTalkSessionListOKTalkSessionsItem{
-			TalkSession: oas.TalkSession{
-				ID:               talkSession.TalkSessionID.String(),
-				Theme:            talkSession.Theme,
-				Description:      utils.ToOptNil[oas.OptNilString](talkSession.Description),
-				ThumbnailURL:     utils.ToOptNil[oas.OptNilString](talkSession.ThumbnailURL),
-				Owner:            owner,
-				CreatedAt:        talkSession.CreatedAt.Format(time.RFC3339),
-				ScheduledEndTime: talkSession.ScheduledEndTime.Format(time.RFC3339),
-				Location:         location,
-				City:             utils.ToOptNil[oas.OptNilString](talkSession.City),
-				Prefecture:       utils.ToOptNil[oas.OptNilString](talkSession.Prefecture),
-				Restrictions:     restrictions,
-				HideReport:       talkSession.HideReport,
-			},
+			TalkSession:  talkSession.ToResponse(),
 			OpinionCount: talkSession.OpinionCount,
 		}
 		resultTalkSession = append(resultTalkSession, res)
@@ -532,13 +377,10 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.TalkSessionAnalysis")
 	defer span.End()
 
-	claim := session.GetSession(t.SetSession(ctx))
+	authCtx, err := getAuthenticationContext(t.authService, t.SetSession(ctx))
 	var userID *shared.UUID[user.User]
-	if claim != nil {
-		id, err := claim.UserID()
-		if err == nil {
-			userID = &id
-		}
+	if err == nil {
+		userID = &authCtx.UserID
 	}
 
 	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
@@ -557,49 +399,23 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 	var myPosition oas.OptUserGroupPosition
 	if out.MyPosition != nil {
 		myPosition = oas.OptUserGroupPosition{
-			Value: oas.UserGroupPosition{
-				PosX:           out.MyPosition.PosX,
-				PosY:           out.MyPosition.PosY,
-				DisplayID:      out.MyPosition.DisplayID,
-				DisplayName:    out.MyPosition.DisplayName,
-				IconURL:        utils.ToOptNil[oas.OptNilString](out.MyPosition.IconURL),
-				GroupID:        out.MyPosition.GroupID,
-				GroupName:      out.MyPosition.GroupName,
-				PerimeterIndex: utils.ToOpt[oas.OptInt](out.MyPosition.PerimeterIndex),
-			},
-			Set: true,
+			Value: out.MyPosition.ToResponse(),
+			Set:   true,
 		}
 	}
 
 	positions := make([]oas.UserGroupPosition, 0, len(out.Positions))
 	for _, position := range out.Positions {
-		positions = append(positions, oas.UserGroupPosition{
-			PosX:           position.PosX,
-			PosY:           position.PosY,
-			DisplayID:      position.DisplayID,
-			DisplayName:    position.DisplayName,
-			IconURL:        utils.ToOptNil[oas.OptNilString](position.IconURL),
-			GroupName:      position.GroupName,
-			GroupID:        position.GroupID,
-			PerimeterIndex: utils.ToOpt[oas.OptInt](position.PerimeterIndex),
-		})
+		positions = append(positions, position.ToResponse())
 	}
 
 	groupOpinions := make([]oas.TalkSessionAnalysisOKGroupOpinionsItem, 0, len(out.GroupOpinions))
 	for _, groupOpinion := range out.GroupOpinions {
 		opinions := make([]oas.TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem, 0, len(groupOpinion.Opinions))
 		for _, opinion := range groupOpinion.Opinions {
+			// Convert OpinionWithRepresentative to TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem
 			opinions = append(opinions, oas.TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem{
-				Opinion: oas.Opinion{
-					ID:           opinion.Opinion.OpinionID.String(),
-					Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Title),
-					Content:      opinion.Opinion.Content,
-					ParentID:     utils.ToOpt[oas.OptString](opinion.Opinion.ParentOpinionID),
-					PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.PictureURL),
-					ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
-					PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
-					IsDeleted:    opinion.Opinion.IsDeleted,
-				},
+				Opinion: opinion.Opinion.ToResponse(),
 				User: oas.User{
 					DisplayID:   opinion.User.DisplayID,
 					DisplayName: opinion.User.DisplayName,
@@ -625,40 +441,36 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 }
 
 // EditTalkSession implements oas.TalkSessionHandler.
-func (t *talkSessionHandler) EditTalkSession(ctx context.Context, req oas.OptEditTalkSessionReq, params oas.EditTalkSessionParams) (oas.EditTalkSessionRes, error) {
+func (t *talkSessionHandler) EditTalkSession(ctx context.Context, req *oas.EditTalkSessionReq, params oas.EditTalkSessionParams) (oas.EditTalkSessionRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.EditTalkSession")
 	defer span.End()
 
-	claim := session.GetSession(t.SetSession(ctx))
-	if claim == nil {
-		return nil, messages.ForbiddenError
-	}
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(t.authService, t.SetSession(ctx))
 	if err != nil {
-		utils.HandleError(ctx, err, "claim.UserID")
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
+	userID := authCtx.UserID
 
 	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
 	if err != nil {
 		return nil, messages.BadRequestError
 	}
 
-	if !req.IsSet() {
+	if req == nil {
 		return nil, messages.RequiredParameterError
 	}
 
-	out, err := t.editTalkSessionCommand.Execute(ctx, talksession_command.EditCommandInput{
+	_, err = t.editTalkSessionCommand.Execute(ctx, talksession_usecase.EditTalkSessionInput{
 		TalkSessionID:    talkSessionID,
 		UserID:           userID,
-		Theme:            req.Value.Theme,
-		Description:      utils.ToPtrIfNotNullValue(!req.Value.Description.IsSet(), req.Value.Description.Value),
-		ThumbnailURL:     utils.ToPtrIfNotNullValue(!req.Value.ThumbnailURL.IsSet(), req.Value.ThumbnailURL.Value),
-		ScheduledEndTime: req.Value.ScheduledEndTime,
-		Latitude:         utils.ToPtrIfNotNullValue(!req.Value.Latitude.IsSet(), req.Value.Latitude.Value),
-		Longitude:        utils.ToPtrIfNotNullValue(!req.Value.Longitude.IsSet(), req.Value.Longitude.Value),
-		City:             utils.ToPtrIfNotNullValue(!req.Value.City.IsSet(), req.Value.City.Value),
-		Prefecture:       utils.ToPtrIfNotNullValue(!req.Value.Prefecture.IsSet(), req.Value.Prefecture.Value),
+		Theme:            req.Theme,
+		Description:      utils.ToPtrIfNotNullValue(!req.Description.IsSet(), req.Description.Value),
+		ThumbnailURL:     utils.ToPtrIfNotNullValue(!req.ThumbnailURL.IsSet(), req.ThumbnailURL.Value),
+		ScheduledEndTime: req.ScheduledEndTime,
+		Latitude:         utils.ToPtrIfNotNullValue(!req.Latitude.IsSet(), req.Latitude.Value),
+		Longitude:        utils.ToPtrIfNotNullValue(!req.Longitude.IsSet(), req.Longitude.Value),
+		City:             utils.ToPtrIfNotNullValue(!req.City.IsSet(), req.City.Value),
+		Prefecture:       utils.ToPtrIfNotNullValue(!req.Prefecture.IsSet(), req.Prefecture.Value),
 	})
 	if err != nil {
 		return nil, err
@@ -669,46 +481,8 @@ func (t *talkSessionHandler) EditTalkSession(ctx context.Context, req oas.OptEdi
 	if err != nil {
 		return nil, err
 	}
-	owner := oas.User{
-		DisplayID:   out.User.DisplayID,
-		DisplayName: out.User.DisplayName,
-		IconURL:     utils.ToOptNil[oas.OptNilString](talkSessionDetail.User.IconURL),
-	}
-
-	var location oas.OptLocation
-	if out.HasLocation() {
-		location = oas.OptLocation{
-			Value: oas.Location{
-				Latitude:  utils.ToOpt[oas.OptFloat64](talkSessionDetail.Latitude),
-				Longitude: utils.ToOpt[oas.OptFloat64](talkSessionDetail.Longitude),
-			},
-			Set: true,
-		}
-	}
-	var restrictions []oas.Restriction
-	for _, restriction := range out.TalkSession.Restrictions {
-		res := talksession.RestrictionAttributeKey(restriction)
-		attr := res.RestrictionAttribute()
-		restrictions = append(restrictions, oas.Restriction{
-			Key:         string(attr.Key),
-			Description: attr.Description,
-		})
-	}
-	res := &oas.TalkSession{
-		ID:               out.TalkSession.TalkSessionID.String(),
-		Theme:            out.TalkSession.Theme,
-		Description:      utils.ToOptNil[oas.OptNilString](out.TalkSession.Description),
-		ThumbnailURL:     utils.ToOptNil[oas.OptNilString](out.TalkSession.ThumbnailURL),
-		Owner:            owner,
-		CreatedAt:        out.CreatedAt.Format(time.RFC3339),
-		ScheduledEndTime: out.TalkSession.ScheduledEndTime.Format(time.RFC3339),
-		Location:         location,
-		City:             utils.ToOptNil[oas.OptNilString](out.City),
-		Prefecture:       utils.ToOptNil[oas.OptNilString](out.Prefecture),
-		Restrictions:     restrictions,
-		HideReport:       out.TalkSession.HideReport,
-	}
-	return res, nil
+	res := talkSessionDetail.ToResponse()
+	return &res, nil
 }
 
 // GetTalkSessionRestrictionKeys implements oas.TalkSessionHandler.
@@ -726,6 +500,7 @@ func (t *talkSessionHandler) GetTalkSessionRestrictionKeys(ctx context.Context) 
 		keys = append(keys, oas.Restriction{
 			Key:         string(restriction.Key),
 			Description: restriction.Description,
+			DependsOn:   lo.Map(restriction.DependsOn, func(item talksession.RestrictionAttributeKey, _ int) string { return string(item) }),
 		})
 	}
 
@@ -738,17 +513,11 @@ func (t *talkSessionHandler) GetTalkSessionRestrictionSatisfied(ctx context.Cont
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetTalkSessionRestrictionSatisfied")
 	defer span.End()
 
-	claim := session.GetSession(t.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if claim != nil {
-		id, err := claim.UserID()
-		if err == nil {
-			userID = &id
-		}
+	authCtx, err := requireAuthentication(t.authService, t.SetSession(ctx))
+	if err != nil {
+		return nil, err
 	}
-	if userID == nil {
-		return nil, messages.ForbiddenError
-	}
+	userID := authCtx.UserID
 
 	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
 	if err != nil {
@@ -757,7 +526,7 @@ func (t *talkSessionHandler) GetTalkSessionRestrictionSatisfied(ctx context.Cont
 
 	out, err := t.isSatisfied.Execute(ctx, talksession_query.IsTalkSessionSatisfiedInput{
 		TalkSessionID: talkSessionID,
-		UserID:        *userID,
+		UserID:        userID,
 	})
 	if err != nil {
 		return nil, err
@@ -780,17 +549,11 @@ func (t *talkSessionHandler) GetReportsForTalkSession(ctx context.Context, param
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetReportsForTalkSession")
 	defer span.End()
 
-	claim := session.GetSession(t.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if claim != nil {
-		id, err := claim.UserID()
-		if err == nil {
-			userID = &id
-		}
+	authCtx, err := requireAuthentication(t.authService, t.SetSession(ctx))
+	if err != nil {
+		return nil, err
 	}
-	if userID == nil {
-		return nil, messages.ForbiddenError
-	}
+	userID := authCtx.UserID
 
 	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
 	if err != nil {
@@ -808,7 +571,7 @@ func (t *talkSessionHandler) GetReportsForTalkSession(ctx context.Context, param
 
 	out, err := t.getReports.Execute(ctx, report_query.GetByTalkSessionInput{
 		TalkSessionID: talkSessionID,
-		UserID:        *userID,
+		UserID:        userID,
 		Status:        status,
 	})
 	if err != nil {
@@ -817,42 +580,7 @@ func (t *talkSessionHandler) GetReportsForTalkSession(ctx context.Context, param
 
 	reports := make([]oas.ReportDetail, 0, len(out.Reports))
 	for _, report := range out.Reports {
-		var parentOpinionID oas.OptString
-		if report.Opinion.ParentOpinionID != nil {
-			parentOpinionID = oas.OptString{
-				Value: report.Opinion.ParentOpinionID.String(),
-				Set:   true,
-			}
-		}
-
-		reasons := make([]oas.ReportDetailReasonsItem, 0, len(report.Reasons))
-		for _, reason := range report.Reasons {
-			reasons = append(reasons, oas.ReportDetailReasonsItem{
-				Reason:  reason.Reason,
-				Content: utils.ToOptNil[oas.OptNilString](reason.Content),
-			})
-		}
-
-		reports = append(reports, oas.ReportDetail{
-			Opinion: oas.Opinion{
-				ID:           report.Opinion.OpinionID.String(),
-				Title:        utils.ToOpt[oas.OptString](report.Opinion.Title),
-				Content:      report.Opinion.Content,
-				ParentID:     parentOpinionID,
-				PictureURL:   utils.ToOptNil[oas.OptNilString](report.Opinion.PictureURL),
-				ReferenceURL: utils.ToOpt[oas.OptString](report.Opinion.ReferenceURL),
-				PostedAt:     report.Opinion.CreatedAt.Format(time.RFC3339),
-				IsDeleted:    report.Opinion.IsDeleted,
-			},
-			User: oas.User{
-				DisplayID:   report.User.DisplayID,
-				DisplayName: report.User.DisplayName,
-				IconURL:     utils.ToOptNil[oas.OptNilString](report.User.IconURL),
-			},
-			Status:      oas.ReportDetailStatus(report.Status),
-			Reasons:     reasons,
-			ReportCount: report.ReportCount,
-		})
+		reports = append(reports, report.ToResponse())
 	}
 
 	return &oas.GetReportsForTalkSessionOK{
@@ -865,17 +593,11 @@ func (t *talkSessionHandler) GetTalkSessionReportCount(ctx context.Context, para
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetTalkSessionReportCount")
 	defer span.End()
 
-	claim := session.GetSession(t.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if claim != nil {
-		id, err := claim.UserID()
-		if err == nil {
-			userID = &id
-		}
+	authCtx, err := requireAuthentication(t.authService, t.SetSession(ctx))
+	if err != nil {
+		return nil, err
 	}
-	if userID == nil {
-		return nil, messages.ForbiddenError
-	}
+	userID := authCtx.UserID
 
 	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
 	if err != nil {
@@ -884,7 +606,7 @@ func (t *talkSessionHandler) GetTalkSessionReportCount(ctx context.Context, para
 
 	out, err := t.getReportCount.Execute(ctx, report_query.GetCountInput{
 		TalkSessionID: talkSessionID,
-		UserID:        *userID,
+		UserID:        userID,
 		Status:        string(params.Status),
 	})
 	if err != nil {
@@ -901,26 +623,20 @@ func (t *talkSessionHandler) ConsentTalkSession(ctx context.Context, params oas.
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.ConsentTalkSession")
 	defer span.End()
 
-	claim := session.GetSession(t.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if claim != nil {
-		id, err := claim.UserID()
-		if err == nil {
-			userID = &id
-		}
+	authCtx, err := requireAuthentication(t.authService, t.SetSession(ctx))
+	if err != nil {
+		return nil, err
 	}
-	if userID == nil {
-		return nil, messages.ForbiddenError
-	}
+	userID := authCtx.UserID
 
 	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
 	if err != nil {
 		return nil, messages.BadRequestError
 	}
 
-	if err := t.takeConsentCommand.Execute(ctx, talksession_command.TakeConsentUseCaseInput{
+	if err := t.takeConsentCommand.Execute(ctx, talksession_usecase.TakeConsentUseCaseInput{
 		TalkSessionID: talkSessionID,
-		UserID:        *userID,
+		UserID:        userID,
 	}); err != nil {
 		return nil, errtrace.Wrap(err)
 	}
@@ -934,17 +650,11 @@ func (t *talkSessionHandler) HasConsent(ctx context.Context, params oas.HasConse
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.HasConsent")
 	defer span.End()
 
-	claim := session.GetSession(t.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if claim != nil {
-		id, err := claim.UserID()
-		if err == nil {
-			userID = &id
-		}
+	authCtx, err := requireAuthentication(t.authService, t.SetSession(ctx))
+	if err != nil {
+		return nil, err
 	}
-	if userID == nil {
-		return nil, messages.ForbiddenError
-	}
+	userID := authCtx.UserID
 
 	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
 	if err != nil {
@@ -953,7 +663,7 @@ func (t *talkSessionHandler) HasConsent(ctx context.Context, params oas.HasConse
 
 	hasConsent, err := t.hasConsent.Execute(ctx, talksession_query.HasConsentQueryInput{
 		TalkSessionID: talkSessionID,
-		UserID:        *userID,
+		UserID:        userID,
 	})
 	if err != nil {
 		return nil, err

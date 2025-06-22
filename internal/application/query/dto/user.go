@@ -6,6 +6,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/server/internal/presentation/oas"
+	"github.com/neko-dream/server/pkg/utils"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
@@ -59,4 +61,25 @@ type UserDetail struct {
 	User
 	UserAuth
 	*UserDemographic
+}
+
+func (u *User) ToResponse() oas.User {
+	return oas.User{
+		DisplayID:   u.DisplayID,
+		DisplayName: u.DisplayName,
+		IconURL:     utils.ToOptNil[oas.OptNilString](u.IconURL),
+	}
+}
+
+func (u *UserAuth) ToEmailResponse() oas.OptNilString {
+	return utils.ToOptNil[oas.OptNilString](u.Email)
+}
+
+func (u *UserDemographic) ToResponse() oas.UserDemographics {
+	return oas.UserDemographics{
+		DateOfBirth: utils.ToOptNil[oas.OptNilInt](u.DateOfBirth),
+		Gender:      utils.ToOptNil[oas.OptNilString](u.GenderString()),
+		Prefecture:  utils.ToOptNil[oas.OptNilString](u.Prefecture),
+		City:        utils.ToOptNil[oas.OptNilString](u.City),
+	}
 }

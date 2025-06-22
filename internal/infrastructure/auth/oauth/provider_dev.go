@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/neko-dream/server/internal/domain/model/auth"
+	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
@@ -12,14 +13,14 @@ import (
 // devAuthProvider 開発環境専用の認証プロバイダーです。本番環境では使用しないでください。
 type (
 	devAuthProvider struct {
-		providerName auth.AuthProviderName
+		providerName shared.AuthProviderName
 		conf         *config.Config
 	}
 )
 
 func NewDevAuthProvider(
 	ctx context.Context,
-	providerName auth.AuthProviderName,
+	providerName shared.AuthProviderName,
 	conf *config.Config,
 ) (auth.AuthProvider, error) {
 	_, span := otel.Tracer("oauth").Start(ctx, "NewDevAuthProvider")

@@ -50,36 +50,36 @@ type AuthHandler interface {
 	//
 	// GET /auth/dev/login
 	DevAuthorize(ctx context.Context, params DevAuthorizeParams) (DevAuthorizeRes, error)
-	// OAuthCallback implements oauth_callback operation.
-	//
-	// Auth Callback.
-	//
-	// GET /auth/{provider}/callback
-	OAuthCallback(ctx context.Context, params OAuthCallbackParams) (OAuthCallbackRes, error)
-	// OAuthTokenInfo implements oauth_token_info operation.
+	// GetTokenInfo implements getTokenInfo operation.
 	//
 	// JWTの内容を返してくれる.
 	//
 	// GET /auth/token/info
-	OAuthTokenInfo(ctx context.Context) (OAuthTokenInfoRes, error)
-	// OAuthTokenRevoke implements oauth_token_revoke operation.
+	GetTokenInfo(ctx context.Context) (GetTokenInfoRes, error)
+	// HandleAuthCallback implements handleAuthCallback operation.
 	//
-	// トークンを失効（ログアウト）.
+	// Auth Callback.
 	//
-	// POST /auth/revoke
-	OAuthTokenRevoke(ctx context.Context) (OAuthTokenRevokeRes, error)
+	// GET /auth/{provider}/callback
+	HandleAuthCallback(ctx context.Context, params HandleAuthCallbackParams) (HandleAuthCallbackRes, error)
 	// PasswordLogin implements passwordLogin operation.
 	//
 	// パスワードによるログイン.
 	//
 	// POST /auth/password/login
-	PasswordLogin(ctx context.Context, req OptPasswordLoginReq) (PasswordLoginRes, error)
+	PasswordLogin(ctx context.Context, req *PasswordLoginReq) (PasswordLoginRes, error)
 	// PasswordRegister implements passwordRegister operation.
 	//
 	// パスワードによる登録（devのみ）.
 	//
 	// POST /auth/password/register
-	PasswordRegister(ctx context.Context, req OptPasswordRegisterReq) (PasswordRegisterRes, error)
+	PasswordRegister(ctx context.Context, req *PasswordRegisterReq) (PasswordRegisterRes, error)
+	// RevokeToken implements revokeToken operation.
+	//
+	// トークンを失効（ログアウト）.
+	//
+	// POST /auth/revoke
+	RevokeToken(ctx context.Context) (RevokeTokenRes, error)
 }
 
 // HealthHandler handles operations described by OpenAPI v3 specification.
@@ -103,7 +103,7 @@ type ImageHandler interface {
 	// 画像を投稿してURLを返すAPI.
 	//
 	// POST /images
-	PostImage(ctx context.Context, req OptPostImageReq) (PostImageRes, error)
+	PostImage(ctx context.Context, req *PostImageReq) (PostImageRes, error)
 }
 
 // ManageHandler handles operations described by OpenAPI v3 specification.
@@ -154,14 +154,6 @@ type OpinionHandler interface {
 	//
 	// GET /opinions/{opinionID}/analysis
 	GetOpinionAnalysis(ctx context.Context, params GetOpinionAnalysisParams) (GetOpinionAnalysisRes, error)
-	// GetOpinionDetail implements getOpinionDetail operation.
-	//
-	// 意見の詳細.
-	//
-	// Deprecated: schema marks this operation as deprecated.
-	//
-	// GET /talksessions/{talkSessionID}/opinions/{opinionID}
-	GetOpinionDetail(ctx context.Context, params GetOpinionDetailParams) (GetOpinionDetailRes, error)
 	// GetOpinionDetail2 implements getOpinionDetail2 operation.
 	//
 	// 意見詳細.
@@ -186,28 +178,12 @@ type OpinionHandler interface {
 	//
 	// GET /talksessions/{talkSessionID}/opinions
 	GetOpinionsForTalkSession(ctx context.Context, params GetOpinionsForTalkSessionParams) (GetOpinionsForTalkSessionRes, error)
-	// OpinionComments implements opinionComments operation.
-	//
-	// 意見に対するリプライ意見一覧.
-	//
-	// Deprecated: schema marks this operation as deprecated.
-	//
-	// GET /talksessions/{talkSessionID}/opinions/{opinionID}/replies
-	OpinionComments(ctx context.Context, params OpinionCommentsParams) (OpinionCommentsRes, error)
 	// OpinionComments2 implements opinionComments2 operation.
 	//
 	// 意見に対するリプライ意見一覧.
 	//
 	// GET /opinions/{opinionID}/replies
 	OpinionComments2(ctx context.Context, params OpinionComments2Params) (OpinionComments2Res, error)
-	// PostOpinionPost implements postOpinionPost operation.
-	//
-	// ParentOpinionIDがなければルートの意見として投稿される.
-	//
-	// Deprecated: schema marks this operation as deprecated.
-	//
-	// POST /talksessions/{talkSessionID}/opinions
-	PostOpinionPost(ctx context.Context, req OptPostOpinionPostReq, params PostOpinionPostParams) (PostOpinionPostRes, error)
 	// PostOpinionPost2 implements postOpinionPost2 operation.
 	//
 	// ParentOpinionIDがなければルートの意見として投稿される
@@ -215,20 +191,20 @@ type OpinionHandler interface {
 	// セッション管理者はisSeedをtrueにするとシード意見として投稿できる.
 	//
 	// POST /opinions
-	PostOpinionPost2(ctx context.Context, req OptPostOpinionPost2Req) (PostOpinionPost2Res, error)
+	PostOpinionPost2(ctx context.Context, req *PostOpinionPost2Req) (PostOpinionPost2Res, error)
 	// ReportOpinion implements reportOpinion operation.
 	//
 	// 意見通報API.
 	//
 	// POST /opinions/{opinionID}/report
-	ReportOpinion(ctx context.Context, req OptReportOpinionReq, params ReportOpinionParams) (ReportOpinionRes, error)
+	ReportOpinion(ctx context.Context, req *ReportOpinionReq, params ReportOpinionParams) (ReportOpinionRes, error)
 	// SolveOpinionReport implements solveOpinionReport operation.
 	//
 	// 通報を解決.
 	//
 	// POST /opinions/{opinionID}/reports/solve
-	SolveOpinionReport(ctx context.Context, req OptSolveOpinionReportReq, params SolveOpinionReportParams) (SolveOpinionReportRes, error)
-	// SwipeOpinions implements swipe_opinions operation.
+	SolveOpinionReport(ctx context.Context, req *SolveOpinionReportReq, params SolveOpinionReportParams) (SolveOpinionReportRes, error)
+	// SwipeOpinions implements swipeOpinions operation.
 	//
 	// セッションの中からまだ投票していない意見をランダムに取得する
 	// remainingCountは取得した意見を含めてスワイプできる意見の総数を返す.
@@ -241,17 +217,31 @@ type OpinionHandler interface {
 //
 // x-ogen-operation-group: Organization
 type OrganizationHandler interface {
-	// CreateOrganizations implements createOrganizations operation.
+	// CreateOrganizationAlias implements createOrganizationAlias operation.
+	//
+	// 組織エイリアス作成.
+	//
+	// POST /organizations/aliases
+	CreateOrganizationAlias(ctx context.Context, req *CreateOrganizationAliasReq) (CreateOrganizationAliasRes, error)
+	// DeleteOrganizationAlias implements deleteOrganizationAlias operation.
+	//
+	// 組織エイリアス削除.
+	//
+	// DELETE /organizations/aliases/{aliasID}
+	DeleteOrganizationAlias(ctx context.Context, params DeleteOrganizationAliasParams) (DeleteOrganizationAliasRes, error)
+	// EstablishOrganization implements establishOrganization operation.
 	//
 	// 組織を作成できる。
-	// これを作れるユーザーはDBを直接叩いて作るしかない。
-	// OrgType
-	// - 1: 通常
-	// - 2: 自治体
-	// - 3: 議員.
+	// これを作れるユーザーはDBを直接叩いて作るしかない。.
 	//
 	// POST /organizations
-	CreateOrganizations(ctx context.Context, req OptCreateOrganizationsReq) (CreateOrganizationsRes, error)
+	EstablishOrganization(ctx context.Context, req *EstablishOrganizationReq) (EstablishOrganizationRes, error)
+	// GetOrganizationAliases implements getOrganizationAliases operation.
+	//
+	// 組織エイリアス一覧取得.
+	//
+	// GET /organizations/aliases
+	GetOrganizationAliases(ctx context.Context) (GetOrganizationAliasesRes, error)
 	// GetOrganizations implements getOrganizations operation.
 	//
 	// 所属組織一覧.
@@ -261,18 +251,25 @@ type OrganizationHandler interface {
 	// InviteOrganization implements inviteOrganization operation.
 	//
 	// Role
-	// - 1: Member
-	// - 2: Admin
-	// - 3: Owner.
+	// - 10: SuperAdmin
+	// - 20: Owner
+	// - 30: Admin
+	// - 40: Member.
 	//
-	// POST /organizations/{organizationID}/invite
-	InviteOrganization(ctx context.Context, req OptInviteOrganizationReq, params InviteOrganizationParams) (InviteOrganizationRes, error)
+	// POST /organizations/invite
+	InviteOrganization(ctx context.Context, req *InviteOrganizationReq) (InviteOrganizationRes, error)
 	// InviteOrganizationForUser implements inviteOrganizationForUser operation.
 	//
 	// 組織にユーザーを追加.
 	//
-	// POST /organizations/{organizationID}/invite_user
-	InviteOrganizationForUser(ctx context.Context, req OptInviteOrganizationForUserReq, params InviteOrganizationForUserParams) (InviteOrganizationForUserRes, error)
+	// POST /organizations/invite_user
+	InviteOrganizationForUser(ctx context.Context, req *InviteOrganizationForUserReq) (InviteOrganizationForUserRes, error)
+	// ValidateOrganizationCode implements validateOrganizationCode operation.
+	//
+	// 組織コード検証.
+	//
+	// GET /organization/{code}/validate
+	ValidateOrganizationCode(ctx context.Context, params ValidateOrganizationCodeParams) (ValidateOrganizationCodeRes, error)
 }
 
 // PolicyHandler handles operations described by OpenAPI v3 specification.
@@ -290,7 +287,7 @@ type PolicyHandler interface {
 	// 最新のポリシーに同意する.
 	//
 	// POST /policy/consent
-	PolicyConsent(ctx context.Context, req OptPolicyConsentReq) (PolicyConsentRes, error)
+	PolicyConsent(ctx context.Context, req *PolicyConsentReq) (PolicyConsentRes, error)
 }
 
 // TalkSessionHandler handles operations described by OpenAPI v3 specification.
@@ -303,25 +300,12 @@ type TalkSessionHandler interface {
 	//
 	// POST /talksessions/{talkSessionID}/consent
 	ConsentTalkSession(ctx context.Context, params ConsentTalkSessionParams) (ConsentTalkSessionRes, error)
-	// CreateTalkSession implements createTalkSession operation.
-	//
-	// ## サムネイル画像について
-	// - `Description中に出てくる画像で一番最初のものを使用`。
-	// - 画像自体は`POST /images`でサーバにポストしたものを使用してください。
-	// ## 投稿制限のキーについて
-	// restrictionsに値を入れると一定のデモグラ情報を登録していない限り、セッションへの投稿が制限されるようにできる。
-	// restrictionsには [GET /talksessions/restrictions](https://app.apidog.
-	// com/link/project/674502/apis/api-14271260)
-	// より取れるkeyをカンマ区切りで入力してください。.
-	//
-	// POST /talksessions
-	CreateTalkSession(ctx context.Context, req OptCreateTalkSessionReq) (CreateTalkSessionRes, error)
 	// EditTalkSession implements editTalkSession operation.
 	//
 	// セッション編集.
 	//
 	// PUT /talksessions/{talkSessionID}
-	EditTalkSession(ctx context.Context, req OptEditTalkSessionReq, params EditTalkSessionParams) (EditTalkSessionRes, error)
+	EditTalkSession(ctx context.Context, req *EditTalkSessionReq, params EditTalkSessionParams) (EditTalkSessionRes, error)
 	// GetConclusion implements getConclusion operation.
 	//
 	// 結論取得.
@@ -382,13 +366,26 @@ type TalkSessionHandler interface {
 	//
 	// GET /talksessions/{talkSessionID}/consent
 	HasConsent(ctx context.Context, params HasConsentParams) (HasConsentRes, error)
+	// InitiateTalkSession implements initiateTalkSession operation.
+	//
+	// ## サムネイル画像について
+	// - `Description中に出てくる画像で一番最初のものを使用`。
+	// - 画像自体は`POST /images`でサーバにポストしたものを使用してください。
+	// ## 投稿制限のキーについて
+	// restrictionsに値を入れると一定のデモグラ情報を登録していない限り、セッションへの投稿が制限されるようにできる。
+	// restrictionsには [GET /talksessions/restrictions](https://app.apidog.
+	// com/link/project/674502/apis/api-14271260)
+	// より取れるkeyをカンマ区切りで入力してください。.
+	//
+	// POST /talksessions
+	InitiateTalkSession(ctx context.Context, req *InitiateTalkSessionReq) (InitiateTalkSessionRes, error)
 	// PostConclusion implements postConclusion operation.
 	//
 	// 結論（conclusion）はセッションが終了した後にセッっションの作成者が投稿できる文章。
 	// セッションの流れやグループの分かれ方などに対するセッション作成者の感想やそれらの意見を受け、これからの方向性などを記入する。.
 	//
 	// POST /talksessions/{talkSessionID}/conclusion
-	PostConclusion(ctx context.Context, req OptPostConclusionReq, params PostConclusionParams) (PostConclusionRes, error)
+	PostConclusion(ctx context.Context, req *PostConclusionReq, params PostConclusionParams) (PostConclusionRes, error)
 	// TalkSessionAnalysis implements talkSessionAnalysis operation.
 	//
 	// 分析結果一覧.
@@ -424,7 +421,7 @@ type TimelineHandler interface {
 	// タイムライン編集.
 	//
 	// PUT /talksessions/{talkSessionID}/timelines/{actionItemID}
-	EditTimeLine(ctx context.Context, req OptEditTimeLineReq, params EditTimeLineParams) (EditTimeLineRes, error)
+	EditTimeLine(ctx context.Context, req *EditTimeLineReq, params EditTimeLineParams) (EditTimeLineRes, error)
 	// GetTimeLine implements getTimeLine operation.
 	//
 	// タイムラインはセッション終了後にセッション作成者が設定できるその後の予定を知らせるもの.
@@ -436,20 +433,20 @@ type TimelineHandler interface {
 	// タイムラインアイテム追加.
 	//
 	// POST /talksessions/{talkSessionID}/timeline
-	PostTimeLineItem(ctx context.Context, req OptPostTimeLineItemReq, params PostTimeLineItemParams) (PostTimeLineItemRes, error)
+	PostTimeLineItem(ctx context.Context, req *PostTimeLineItemReq, params PostTimeLineItemParams) (PostTimeLineItemRes, error)
 }
 
 // UserHandler handles operations described by OpenAPI v3 specification.
 //
 // x-ogen-operation-group: User
 type UserHandler interface {
-	// EditUserProfile implements editUserProfile operation.
+	// EstablishUser implements establishUser operation.
 	//
-	// ユーザー情報の変更.
+	// ユーザー作成.
 	//
-	// PUT /user
-	EditUserProfile(ctx context.Context, req OptEditUserProfileReq) (EditUserProfileRes, error)
-	// GetUserInfo implements get_user_info operation.
+	// POST /user
+	EstablishUser(ctx context.Context, req *EstablishUserReq) (EstablishUserRes, error)
+	// GetUserInfo implements getUserInfo operation.
 	//
 	// ユーザー情報の取得.
 	//
@@ -457,42 +454,34 @@ type UserHandler interface {
 	GetUserInfo(ctx context.Context) (GetUserInfoRes, error)
 	// OpinionsHistory implements opinionsHistory operation.
 	//
-	// 今までに投稿した異見.
+	// 今までに投稿した意見.
 	//
 	// GET /opinions/histories
 	OpinionsHistory(ctx context.Context, params OpinionsHistoryParams) (OpinionsHistoryRes, error)
-	// RegisterUser implements registerUser operation.
-	//
-	// ユーザー作成.
-	//
-	// POST /user
-	RegisterUser(ctx context.Context, req OptRegisterUserReq) (RegisterUserRes, error)
 	// SessionsHistory implements sessionsHistory operation.
 	//
 	// リアクション済みのセッション一覧.
 	//
 	// GET /talksessions/histories
 	SessionsHistory(ctx context.Context, params SessionsHistoryParams) (SessionsHistoryRes, error)
+	// UpdateUserProfile implements updateUserProfile operation.
+	//
+	// ユーザー情報の変更.
+	//
+	// PUT /user
+	UpdateUserProfile(ctx context.Context, req *UpdateUserProfileReq) (UpdateUserProfileRes, error)
 }
 
 // VoteHandler handles operations described by OpenAPI v3 specification.
 //
 // x-ogen-operation-group: Vote
 type VoteHandler interface {
-	// Vote implements vote operation.
-	//
-	// 意思表明API.
-	//
-	// Deprecated: schema marks this operation as deprecated.
-	//
-	// POST /talksessions/{talkSessionID}/opinions/{opinionID}/votes
-	Vote(ctx context.Context, req OptVoteReq, params VoteParams) (VoteRes, error)
 	// Vote2 implements vote2 operation.
 	//
 	// 意思表明API.
 	//
 	// POST /opinions/{opinionID}/votes
-	Vote2(ctx context.Context, req OptVote2Req, params Vote2Params) (Vote2Res, error)
+	Vote2(ctx context.Context, req *Vote2Req, params Vote2Params) (Vote2Res, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and

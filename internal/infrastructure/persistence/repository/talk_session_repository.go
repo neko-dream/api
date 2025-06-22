@@ -3,8 +3,10 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"log"
 
 	"braces.dev/errtrace"
+	"github.com/google/uuid"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
@@ -62,6 +64,20 @@ func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talkses
 			restrictions = append(restrictions, string(restriction.Key))
 		}
 	}
+	var organizationAliasID, organizationID uuid.NullUUID
+	if talkSession.OrganizationAliasID() != nil {
+		organizationAliasID = uuid.NullUUID{
+			UUID:  talkSession.OrganizationAliasID().UUID(),
+			Valid: true,
+		}
+	}
+	if talkSession.OrganizationID() != nil {
+		organizationID = uuid.NullUUID{
+			UUID:  talkSession.OrganizationID().UUID(),
+			Valid: true,
+		}
+	}
+	log.Println("organization alias ID:", organizationAliasID, "organization ID:", organizationID)
 
 	if err := t.GetQueries(ctx).CreateTalkSession(ctx, model.CreateTalkSessionParams{
 		TalkSessionID:    talkSession.TalkSessionID().UUID(),
@@ -78,6 +94,8 @@ func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talkses
 			Bool:  talkSession.HideReport(),
 			Valid: true,
 		},
+		OrganizationAliasID: organizationAliasID,
+		OrganizationID:      organizationID,
 	}); err != nil {
 		return errtrace.Wrap(err)
 	}
@@ -205,6 +223,8 @@ func (t *talkSessionRepository) FindByID(ctx context.Context, talkSessionID shar
 		location,
 		city,
 		prefecture,
+		nil, // organizationID
+		nil, // organizationAliasID
 	)
 	ts.SetReportVisibility(row.TalkSession.HideReport.Bool)
 

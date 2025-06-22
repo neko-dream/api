@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"github.com/neko-dream/server/internal/domain/model/analysis"
+	"github.com/neko-dream/server/internal/presentation/oas"
+	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
@@ -37,4 +39,27 @@ type OpinionGroupRatio struct {
 	AgreeCount    int
 	DisagreeCount int
 	PassCount     int
+}
+
+func (u *UserPosition) ToResponse() oas.UserGroupPosition {
+	return oas.UserGroupPosition{
+		PosX:           u.PosX,
+		PosY:           u.PosY,
+		DisplayID:      u.DisplayID,
+		DisplayName:    u.DisplayName,
+		IconURL:        utils.ToOptNil[oas.OptNilString](u.IconURL),
+		GroupName:      u.GroupName,
+		GroupID:        u.GroupID,
+		PerimeterIndex: utils.ToOpt[oas.OptInt](u.PerimeterIndex),
+	}
+}
+
+func (o *OpinionGroupRatio) ToResponse() oas.OpinionGroupRatio {
+	return oas.OpinionGroupRatio{
+		GroupName:     o.GroupName,
+		GroupID:       o.GroupID,
+		AgreeCount:    o.AgreeCount,
+		DisagreeCount: o.DisagreeCount,
+		PassCount:     o.PassCount,
+	}
 }

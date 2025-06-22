@@ -7,7 +7,10 @@ package model
 
 import (
 	"context"
+	"database/sql"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 const createAuthState = `-- name: CreateAuthState :one
@@ -15,20 +18,26 @@ INSERT INTO auth_states (
     state,
     provider,
     redirect_url,
-    expires_at
+    expires_at,
+    registration_url,
+    organization_id
 ) VALUES (
     $1,
     $2,
     $3,
-    $4
-) RETURNING id, state, provider, redirect_url, created_at, expires_at
+    $4,
+    $5,
+    $6
+) RETURNING id, state, provider, redirect_url, created_at, expires_at, registration_url, organization_id
 `
 
 type CreateAuthStateParams struct {
-	State       string
-	Provider    string
-	RedirectUrl string
-	ExpiresAt   time.Time
+	State           string
+	Provider        string
+	RedirectUrl     string
+	ExpiresAt       time.Time
+	RegistrationUrl sql.NullString
+	OrganizationID  uuid.NullUUID
 }
 
 // CreateAuthState
@@ -37,19 +46,25 @@ type CreateAuthStateParams struct {
 //	    state,
 //	    provider,
 //	    redirect_url,
-//	    expires_at
+//	    expires_at,
+//	    registration_url,
+//	    organization_id
 //	) VALUES (
 //	    $1,
 //	    $2,
 //	    $3,
-//	    $4
-//	) RETURNING id, state, provider, redirect_url, created_at, expires_at
+//	    $4,
+//	    $5,
+//	    $6
+//	) RETURNING id, state, provider, redirect_url, created_at, expires_at, registration_url, organization_id
 func (q *Queries) CreateAuthState(ctx context.Context, arg CreateAuthStateParams) (AuthState, error) {
 	row := q.db.QueryRowContext(ctx, createAuthState,
 		arg.State,
 		arg.Provider,
 		arg.RedirectUrl,
 		arg.ExpiresAt,
+		arg.RegistrationUrl,
+		arg.OrganizationID,
 	)
 	var i AuthState
 	err := row.Scan(
@@ -59,6 +74,8 @@ func (q *Queries) CreateAuthState(ctx context.Context, arg CreateAuthStateParams
 		&i.RedirectUrl,
 		&i.CreatedAt,
 		&i.ExpiresAt,
+		&i.RegistrationUrl,
+		&i.OrganizationID,
 	)
 	return i, err
 }
@@ -92,14 +109,14 @@ func (q *Queries) DeleteExpiredAuthStates(ctx context.Context) error {
 }
 
 const getAuthState = `-- name: GetAuthState :one
-SELECT id, state, provider, redirect_url, created_at, expires_at FROM auth_states
+SELECT id, state, provider, redirect_url, created_at, expires_at, registration_url, organization_id FROM auth_states
 WHERE state = $1 AND expires_at > CURRENT_TIMESTAMP
 LIMIT 1
 `
 
 // GetAuthState
 //
-//	SELECT id, state, provider, redirect_url, created_at, expires_at FROM auth_states
+//	SELECT id, state, provider, redirect_url, created_at, expires_at, registration_url, organization_id FROM auth_states
 //	WHERE state = $1 AND expires_at > CURRENT_TIMESTAMP
 //	LIMIT 1
 func (q *Queries) GetAuthState(ctx context.Context, state string) (AuthState, error) {
@@ -112,6 +129,8 @@ func (q *Queries) GetAuthState(ctx context.Context, state string) (AuthState, er
 		&i.RedirectUrl,
 		&i.CreatedAt,
 		&i.ExpiresAt,
+		&i.RegistrationUrl,
+		&i.OrganizationID,
 	)
 	return i, err
 }

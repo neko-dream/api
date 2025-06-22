@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/neko-dream/server/internal/domain/messages"
+	"github.com/neko-dream/server/internal/domain/model/shared"
 )
 
 const (
@@ -20,12 +21,14 @@ var (
 type (
 	// State OAuth認証のstate
 	State struct {
-		ID          int       // データベースの主キー
-		State       string    // 認証stateの値
-		Provider    string    // 認証プロバイダー名
-		RedirectURL string    // リダイレクトURL
-		CreatedAt   time.Time // 作成日時
-		ExpiresAt   time.Time // 有効期限
+		ID              int               // データベースの主キー
+		State           string            // 認証stateの値
+		Provider        string            // 認証プロバイダー名
+		RedirectURL     string            // リダイレクトURL
+		CreatedAt       time.Time         // 作成日時
+		ExpiresAt       time.Time         // 有効期限
+		RegistrationURL *string           // ログイン時に登録していない場合に飛ばすURL
+		OrganizationID  *shared.UUID[any] // 組織ID（組織経由のログインの場合）
 	}
 
 	// StateRepository
@@ -61,11 +64,15 @@ func (s *State) Validate(cookieState string) error {
 // provider: 認証プロバイダー名
 // redirectURL: リダイレクトURL
 // expiresAt: 有効期限
-func NewState(state string, provider string, redirectURL string, expiresAt time.Time) *State {
+// registrationURL: ログイン時に登録していない場合に飛ばすURL
+// organizationID: 組織ID（組織経由のログインの場合）
+func NewState(state string, provider string, redirectURL string, expiresAt time.Time, registrationURL *string, organizationID *shared.UUID[any]) *State {
 	return &State{
-		State:       state,
-		Provider:    provider,
-		RedirectURL: redirectURL,
-		ExpiresAt:   expiresAt,
+		State:           state,
+		Provider:        provider,
+		RedirectURL:     redirectURL,
+		ExpiresAt:       expiresAt,
+		RegistrationURL: registrationURL,
+		OrganizationID:  organizationID,
 	}
 }

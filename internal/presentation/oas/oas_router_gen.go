@@ -220,7 +220,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						// Leaf node.
 						switch r.Method {
 						case "POST":
-							s.handleOAuthTokenRevokeRequest([0]string{}, elemIsEscaped, w, r)
+							s.handleRevokeTokenRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "POST")
 						}
@@ -241,7 +241,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						// Leaf node.
 						switch r.Method {
 						case "GET":
-							s.handleOAuthTokenInfoRequest([0]string{}, elemIsEscaped, w, r)
+							s.handleGetTokenInfoRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "GET")
 						}
@@ -288,7 +288,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							// Leaf node.
 							switch r.Method {
 							case "GET":
-								s.handleOAuthCallbackRequest([1]string{
+								s.handleHandleAuthCallbackRequest([1]string{
 									args[0],
 								}, elemIsEscaped, w, r)
 							default:
@@ -654,25 +654,16 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					}
 
 					elem = origElem
-				case 'r': // Prefix: "rganizations"
+				case 'r': // Prefix: "rganization"
 					origElem := elem
-					if l := len("rganizations"); len(elem) >= l && elem[0:l] == "rganizations" {
+					if l := len("rganization"); len(elem) >= l && elem[0:l] == "rganization" {
 						elem = elem[l:]
 					} else {
 						break
 					}
 
 					if len(elem) == 0 {
-						switch r.Method {
-						case "GET":
-							s.handleGetOrganizationsRequest([0]string{}, elemIsEscaped, w, r)
-						case "POST":
-							s.handleCreateOrganizationsRequest([0]string{}, elemIsEscaped, w, r)
-						default:
-							s.notAllowed(w, r, "GET,POST")
-						}
-
-						return
+						break
 					}
 					switch elem[0] {
 					case '/': // Prefix: "/"
@@ -683,7 +674,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							break
 						}
 
-						// Param: "organizationID"
+						// Param: "code"
 						// Match until "/"
 						idx := strings.IndexByte(elem, '/')
 						if idx < 0 {
@@ -696,47 +687,157 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							break
 						}
 						switch elem[0] {
-						case '/': // Prefix: "/invite"
+						case '/': // Prefix: "/validate"
 							origElem := elem
-							if l := len("/invite"); len(elem) >= l && elem[0:l] == "/invite" {
+							if l := len("/validate"); len(elem) >= l && elem[0:l] == "/validate" {
 								elem = elem[l:]
 							} else {
 								break
 							}
 
 							if len(elem) == 0 {
+								// Leaf node.
 								switch r.Method {
-								case "POST":
-									s.handleInviteOrganizationRequest([1]string{
+								case "GET":
+									s.handleValidateOrganizationCodeRequest([1]string{
 										args[0],
 									}, elemIsEscaped, w, r)
 								default:
-									s.notAllowed(w, r, "POST")
+									s.notAllowed(w, r, "GET")
 								}
 
 								return
 							}
+
+							elem = origElem
+						}
+
+						elem = origElem
+					case 's': // Prefix: "s"
+						origElem := elem
+						if l := len("s"); len(elem) >= l && elem[0:l] == "s" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							switch r.Method {
+							case "GET":
+								s.handleGetOrganizationsRequest([0]string{}, elemIsEscaped, w, r)
+							case "POST":
+								s.handleEstablishOrganizationRequest([0]string{}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "GET,POST")
+							}
+
+							return
+						}
+						switch elem[0] {
+						case '/': // Prefix: "/"
+							origElem := elem
+							if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								break
+							}
 							switch elem[0] {
-							case '_': // Prefix: "_user"
+							case 'a': // Prefix: "aliases"
 								origElem := elem
-								if l := len("_user"); len(elem) >= l && elem[0:l] == "_user" {
+								if l := len("aliases"); len(elem) >= l && elem[0:l] == "aliases" {
 									elem = elem[l:]
 								} else {
 									break
 								}
 
 								if len(elem) == 0 {
-									// Leaf node.
+									switch r.Method {
+									case "GET":
+										s.handleGetOrganizationAliasesRequest([0]string{}, elemIsEscaped, w, r)
+									case "POST":
+										s.handleCreateOrganizationAliasRequest([0]string{}, elemIsEscaped, w, r)
+									default:
+										s.notAllowed(w, r, "GET,POST")
+									}
+
+									return
+								}
+								switch elem[0] {
+								case '/': // Prefix: "/"
+									origElem := elem
+									if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+										elem = elem[l:]
+									} else {
+										break
+									}
+
+									// Param: "aliasID"
+									// Leaf parameter
+									args[0] = elem
+									elem = ""
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch r.Method {
+										case "DELETE":
+											s.handleDeleteOrganizationAliasRequest([1]string{
+												args[0],
+											}, elemIsEscaped, w, r)
+										default:
+											s.notAllowed(w, r, "DELETE")
+										}
+
+										return
+									}
+
+									elem = origElem
+								}
+
+								elem = origElem
+							case 'i': // Prefix: "invite"
+								origElem := elem
+								if l := len("invite"); len(elem) >= l && elem[0:l] == "invite" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								if len(elem) == 0 {
 									switch r.Method {
 									case "POST":
-										s.handleInviteOrganizationForUserRequest([1]string{
-											args[0],
-										}, elemIsEscaped, w, r)
+										s.handleInviteOrganizationRequest([0]string{}, elemIsEscaped, w, r)
 									default:
 										s.notAllowed(w, r, "POST")
 									}
 
 									return
+								}
+								switch elem[0] {
+								case '_': // Prefix: "_user"
+									origElem := elem
+									if l := len("_user"); len(elem) >= l && elem[0:l] == "_user" {
+										elem = elem[l:]
+									} else {
+										break
+									}
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch r.Method {
+										case "POST":
+											s.handleInviteOrganizationForUserRequest([0]string{}, elemIsEscaped, w, r)
+										default:
+											s.notAllowed(w, r, "POST")
+										}
+
+										return
+									}
+
+									elem = origElem
 								}
 
 								elem = origElem
@@ -800,7 +901,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						case "GET":
 							s.handleGetTalkSessionListRequest([0]string{}, elemIsEscaped, w, r)
 						case "POST":
-							s.handleCreateTalkSessionRequest([0]string{}, elemIsEscaped, w, r)
+							s.handleInitiateTalkSessionRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "GET,POST")
 						}
@@ -1023,119 +1124,17 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								}
 
 								if len(elem) == 0 {
+									// Leaf node.
 									switch r.Method {
 									case "GET":
 										s.handleGetOpinionsForTalkSessionRequest([1]string{
 											args[0],
 										}, elemIsEscaped, w, r)
-									case "POST":
-										s.handlePostOpinionPostRequest([1]string{
-											args[0],
-										}, elemIsEscaped, w, r)
 									default:
-										s.notAllowed(w, r, "GET,POST")
+										s.notAllowed(w, r, "GET")
 									}
 
 									return
-								}
-								switch elem[0] {
-								case '/': // Prefix: "/"
-									origElem := elem
-									if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
-										elem = elem[l:]
-									} else {
-										break
-									}
-
-									// Param: "opinionID"
-									// Match until "/"
-									idx := strings.IndexByte(elem, '/')
-									if idx < 0 {
-										idx = len(elem)
-									}
-									args[1] = elem[:idx]
-									elem = elem[idx:]
-
-									if len(elem) == 0 {
-										switch r.Method {
-										case "GET":
-											s.handleGetOpinionDetailRequest([2]string{
-												args[0],
-												args[1],
-											}, elemIsEscaped, w, r)
-										default:
-											s.notAllowed(w, r, "GET")
-										}
-
-										return
-									}
-									switch elem[0] {
-									case '/': // Prefix: "/"
-										origElem := elem
-										if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
-											elem = elem[l:]
-										} else {
-											break
-										}
-
-										if len(elem) == 0 {
-											break
-										}
-										switch elem[0] {
-										case 'r': // Prefix: "replies"
-											origElem := elem
-											if l := len("replies"); len(elem) >= l && elem[0:l] == "replies" {
-												elem = elem[l:]
-											} else {
-												break
-											}
-
-											if len(elem) == 0 {
-												// Leaf node.
-												switch r.Method {
-												case "GET":
-													s.handleOpinionCommentsRequest([2]string{
-														args[0],
-														args[1],
-													}, elemIsEscaped, w, r)
-												default:
-													s.notAllowed(w, r, "GET")
-												}
-
-												return
-											}
-
-											elem = origElem
-										case 'v': // Prefix: "votes"
-											origElem := elem
-											if l := len("votes"); len(elem) >= l && elem[0:l] == "votes" {
-												elem = elem[l:]
-											} else {
-												break
-											}
-
-											if len(elem) == 0 {
-												// Leaf node.
-												switch r.Method {
-												case "POST":
-													s.handleVoteRequest([2]string{
-														args[0],
-														args[1],
-													}, elemIsEscaped, w, r)
-												default:
-													s.notAllowed(w, r, "POST")
-												}
-
-												return
-											}
-
-											elem = origElem
-										}
-
-										elem = origElem
-									}
-
-									elem = origElem
 								}
 
 								elem = origElem
@@ -1417,9 +1416,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					case "GET":
 						s.handleGetUserInfoRequest([0]string{}, elemIsEscaped, w, r)
 					case "POST":
-						s.handleRegisterUserRequest([0]string{}, elemIsEscaped, w, r)
+						s.handleEstablishUserRequest([0]string{}, elemIsEscaped, w, r)
 					case "PUT":
-						s.handleEditUserProfileRequest([0]string{}, elemIsEscaped, w, r)
+						s.handleUpdateUserProfileRequest([0]string{}, elemIsEscaped, w, r)
 					default:
 						s.notAllowed(w, r, "GET,POST,PUT")
 					}
@@ -1934,9 +1933,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						// Leaf node.
 						switch method {
 						case "POST":
-							r.name = "OAuthTokenRevoke"
+							r.name = "RevokeToken"
 							r.summary = "トークンを失効（ログアウト）"
-							r.operationID = "oauth_token_revoke"
+							r.operationID = "revokeToken"
 							r.pathPattern = "/auth/revoke"
 							r.args = args
 							r.count = 0
@@ -1959,9 +1958,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						// Leaf node.
 						switch method {
 						case "GET":
-							r.name = "OAuthTokenInfo"
+							r.name = "GetTokenInfo"
 							r.summary = "JWTの内容を返してくれる"
-							r.operationID = "oauth_token_info"
+							r.operationID = "getTokenInfo"
 							r.pathPattern = "/auth/token/info"
 							r.args = args
 							r.count = 0
@@ -2010,9 +2009,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							// Leaf node.
 							switch method {
 							case "GET":
-								r.name = "OAuthCallback"
+								r.name = "HandleAuthCallback"
 								r.summary = "Auth Callback"
-								r.operationID = "oauth_callback"
+								r.operationID = "handleAuthCallback"
 								r.pathPattern = "/auth/{provider}/callback"
 								r.args = args
 								r.count = 1
@@ -2164,7 +2163,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								switch method {
 								case "GET":
 									r.name = "OpinionsHistory"
-									r.summary = "今までに投稿した異見"
+									r.summary = "今までに投稿した意見"
 									r.operationID = "opinionsHistory"
 									r.pathPattern = "/opinions/histories"
 									r.args = args
@@ -2414,35 +2413,16 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					}
 
 					elem = origElem
-				case 'r': // Prefix: "rganizations"
+				case 'r': // Prefix: "rganization"
 					origElem := elem
-					if l := len("rganizations"); len(elem) >= l && elem[0:l] == "rganizations" {
+					if l := len("rganization"); len(elem) >= l && elem[0:l] == "rganization" {
 						elem = elem[l:]
 					} else {
 						break
 					}
 
 					if len(elem) == 0 {
-						switch method {
-						case "GET":
-							r.name = "GetOrganizations"
-							r.summary = "所属組織一覧"
-							r.operationID = "getOrganizations"
-							r.pathPattern = "/organizations"
-							r.args = args
-							r.count = 0
-							return r, true
-						case "POST":
-							r.name = "CreateOrganizations"
-							r.summary = "組織作成（運営ユーザーのみ）"
-							r.operationID = "createOrganizations"
-							r.pathPattern = "/organizations"
-							r.args = args
-							r.count = 0
-							return r, true
-						default:
-							return
-						}
+						break
 					}
 					switch elem[0] {
 					case '/': // Prefix: "/"
@@ -2453,7 +2433,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							break
 						}
 
-						// Param: "organizationID"
+						// Param: "code"
 						// Match until "/"
 						idx := strings.IndexByte(elem, '/')
 						if idx < 0 {
@@ -2466,21 +2446,22 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							break
 						}
 						switch elem[0] {
-						case '/': // Prefix: "/invite"
+						case '/': // Prefix: "/validate"
 							origElem := elem
-							if l := len("/invite"); len(elem) >= l && elem[0:l] == "/invite" {
+							if l := len("/validate"); len(elem) >= l && elem[0:l] == "/validate" {
 								elem = elem[l:]
 							} else {
 								break
 							}
 
 							if len(elem) == 0 {
+								// Leaf node.
 								switch method {
-								case "POST":
-									r.name = "InviteOrganization"
-									r.summary = "組織ユーザー招待（運営ユーザーのみ）"
-									r.operationID = "inviteOrganization"
-									r.pathPattern = "/organizations/{organizationID}/invite"
+								case "GET":
+									r.name = "ValidateOrganizationCode"
+									r.summary = "組織コード検証"
+									r.operationID = "validateOrganizationCode"
+									r.pathPattern = "/organization/{code}/validate"
 									r.args = args
 									r.count = 1
 									return r, true
@@ -2488,29 +2469,166 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									return
 								}
 							}
+
+							elem = origElem
+						}
+
+						elem = origElem
+					case 's': // Prefix: "s"
+						origElem := elem
+						if l := len("s"); len(elem) >= l && elem[0:l] == "s" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							switch method {
+							case "GET":
+								r.name = "GetOrganizations"
+								r.summary = "所属組織一覧"
+								r.operationID = "getOrganizations"
+								r.pathPattern = "/organizations"
+								r.args = args
+								r.count = 0
+								return r, true
+							case "POST":
+								r.name = "EstablishOrganization"
+								r.summary = "組織作成（運営ユーザーのみ）"
+								r.operationID = "establishOrganization"
+								r.pathPattern = "/organizations"
+								r.args = args
+								r.count = 0
+								return r, true
+							default:
+								return
+							}
+						}
+						switch elem[0] {
+						case '/': // Prefix: "/"
+							origElem := elem
+							if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								break
+							}
 							switch elem[0] {
-							case '_': // Prefix: "_user"
+							case 'a': // Prefix: "aliases"
 								origElem := elem
-								if l := len("_user"); len(elem) >= l && elem[0:l] == "_user" {
+								if l := len("aliases"); len(elem) >= l && elem[0:l] == "aliases" {
 									elem = elem[l:]
 								} else {
 									break
 								}
 
 								if len(elem) == 0 {
-									// Leaf node.
 									switch method {
-									case "POST":
-										r.name = "InviteOrganizationForUser"
-										r.summary = "組織にユーザーを追加"
-										r.operationID = "inviteOrganizationForUser"
-										r.pathPattern = "/organizations/{organizationID}/invite_user"
+									case "GET":
+										r.name = "GetOrganizationAliases"
+										r.summary = "組織エイリアス一覧取得"
+										r.operationID = "getOrganizationAliases"
+										r.pathPattern = "/organizations/aliases"
 										r.args = args
-										r.count = 1
+										r.count = 0
+										return r, true
+									case "POST":
+										r.name = "CreateOrganizationAlias"
+										r.summary = "組織エイリアス作成"
+										r.operationID = "createOrganizationAlias"
+										r.pathPattern = "/organizations/aliases"
+										r.args = args
+										r.count = 0
 										return r, true
 									default:
 										return
 									}
+								}
+								switch elem[0] {
+								case '/': // Prefix: "/"
+									origElem := elem
+									if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+										elem = elem[l:]
+									} else {
+										break
+									}
+
+									// Param: "aliasID"
+									// Leaf parameter
+									args[0] = elem
+									elem = ""
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch method {
+										case "DELETE":
+											r.name = "DeleteOrganizationAlias"
+											r.summary = "組織エイリアス削除"
+											r.operationID = "deleteOrganizationAlias"
+											r.pathPattern = "/organizations/aliases/{aliasID}"
+											r.args = args
+											r.count = 1
+											return r, true
+										default:
+											return
+										}
+									}
+
+									elem = origElem
+								}
+
+								elem = origElem
+							case 'i': // Prefix: "invite"
+								origElem := elem
+								if l := len("invite"); len(elem) >= l && elem[0:l] == "invite" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								if len(elem) == 0 {
+									switch method {
+									case "POST":
+										r.name = "InviteOrganization"
+										r.summary = "組織ユーザー招待（運営ユーザーのみ）"
+										r.operationID = "inviteOrganization"
+										r.pathPattern = "/organizations/invite"
+										r.args = args
+										r.count = 0
+										return r, true
+									default:
+										return
+									}
+								}
+								switch elem[0] {
+								case '_': // Prefix: "_user"
+									origElem := elem
+									if l := len("_user"); len(elem) >= l && elem[0:l] == "_user" {
+										elem = elem[l:]
+									} else {
+										break
+									}
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch method {
+										case "POST":
+											r.name = "InviteOrganizationForUser"
+											r.summary = "組織にユーザーを追加"
+											r.operationID = "inviteOrganizationForUser"
+											r.pathPattern = "/organizations/invite_user"
+											r.args = args
+											r.count = 0
+											return r, true
+										default:
+											return
+										}
+									}
+
+									elem = origElem
 								}
 
 								elem = origElem
@@ -2590,9 +2708,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							r.count = 0
 							return r, true
 						case "POST":
-							r.name = "CreateTalkSession"
+							r.name = "InitiateTalkSession"
 							r.summary = "セッション作成"
-							r.operationID = "createTalkSession"
+							r.operationID = "initiateTalkSession"
 							r.pathPattern = "/talksessions"
 							r.args = args
 							r.count = 0
@@ -2849,6 +2967,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								}
 
 								if len(elem) == 0 {
+									// Leaf node.
 									switch method {
 									case "GET":
 										r.name = "GetOpinionsForTalkSession"
@@ -2858,119 +2977,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										r.args = args
 										r.count = 1
 										return r, true
-									case "POST":
-										r.name = "PostOpinionPost"
-										r.summary = "セッションに対して意見投稿"
-										r.operationID = "postOpinionPost"
-										r.pathPattern = "/talksessions/{talkSessionID}/opinions"
-										r.args = args
-										r.count = 1
-										return r, true
 									default:
 										return
 									}
-								}
-								switch elem[0] {
-								case '/': // Prefix: "/"
-									origElem := elem
-									if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
-										elem = elem[l:]
-									} else {
-										break
-									}
-
-									// Param: "opinionID"
-									// Match until "/"
-									idx := strings.IndexByte(elem, '/')
-									if idx < 0 {
-										idx = len(elem)
-									}
-									args[1] = elem[:idx]
-									elem = elem[idx:]
-
-									if len(elem) == 0 {
-										switch method {
-										case "GET":
-											r.name = "GetOpinionDetail"
-											r.summary = "意見の詳細"
-											r.operationID = "getOpinionDetail"
-											r.pathPattern = "/talksessions/{talkSessionID}/opinions/{opinionID}"
-											r.args = args
-											r.count = 2
-											return r, true
-										default:
-											return
-										}
-									}
-									switch elem[0] {
-									case '/': // Prefix: "/"
-										origElem := elem
-										if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
-											elem = elem[l:]
-										} else {
-											break
-										}
-
-										if len(elem) == 0 {
-											break
-										}
-										switch elem[0] {
-										case 'r': // Prefix: "replies"
-											origElem := elem
-											if l := len("replies"); len(elem) >= l && elem[0:l] == "replies" {
-												elem = elem[l:]
-											} else {
-												break
-											}
-
-											if len(elem) == 0 {
-												// Leaf node.
-												switch method {
-												case "GET":
-													r.name = "OpinionComments"
-													r.summary = "意見に対するリプライ意見一覧"
-													r.operationID = "opinionComments"
-													r.pathPattern = "/talksessions/{talkSessionID}/opinions/{opinionID}/replies"
-													r.args = args
-													r.count = 2
-													return r, true
-												default:
-													return
-												}
-											}
-
-											elem = origElem
-										case 'v': // Prefix: "votes"
-											origElem := elem
-											if l := len("votes"); len(elem) >= l && elem[0:l] == "votes" {
-												elem = elem[l:]
-											} else {
-												break
-											}
-
-											if len(elem) == 0 {
-												// Leaf node.
-												switch method {
-												case "POST":
-													r.name = "Vote"
-													r.summary = "意思表明API"
-													r.operationID = "vote"
-													r.pathPattern = "/talksessions/{talkSessionID}/opinions/{opinionID}/votes"
-													r.args = args
-													r.count = 2
-													return r, true
-												default:
-													return
-												}
-											}
-
-											elem = origElem
-										}
-
-										elem = origElem
-									}
-
-									elem = origElem
 								}
 
 								elem = origElem
@@ -3105,7 +3114,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									case "GET":
 										r.name = "SwipeOpinions"
 										r.summary = "スワイプ用のエンドポイント"
-										r.operationID = "swipe_opinions"
+										r.operationID = "swipeOpinions"
 										r.pathPattern = "/talksessions/{talkSessionID}/swipe_opinions"
 										r.args = args
 										r.count = 1
@@ -3275,23 +3284,23 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					case "GET":
 						r.name = "GetUserInfo"
 						r.summary = "ユーザー情報の取得"
-						r.operationID = "get_user_info"
+						r.operationID = "getUserInfo"
 						r.pathPattern = "/user"
 						r.args = args
 						r.count = 0
 						return r, true
 					case "POST":
-						r.name = "RegisterUser"
+						r.name = "EstablishUser"
 						r.summary = "ユーザー作成"
-						r.operationID = "registerUser"
+						r.operationID = "establishUser"
 						r.pathPattern = "/user"
 						r.args = args
 						r.count = 0
 						return r, true
 					case "PUT":
-						r.name = "EditUserProfile"
+						r.name = "UpdateUserProfile"
 						r.summary = "ユーザー情報の変更"
-						r.operationID = "editUserProfile"
+						r.operationID = "updateUserProfile"
 						r.pathPattern = "/user"
 						r.args = args
 						r.count = 0

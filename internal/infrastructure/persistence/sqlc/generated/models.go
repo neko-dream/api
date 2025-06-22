@@ -23,12 +23,14 @@ type ActionItem struct {
 }
 
 type AuthState struct {
-	ID          int32
-	State       string
-	Provider    string
-	RedirectUrl string
-	CreatedAt   time.Time
-	ExpiresAt   time.Time
+	ID              int32
+	State           string
+	Provider        string
+	RedirectUrl     string
+	CreatedAt       time.Time
+	ExpiresAt       time.Time
+	RegistrationUrl sql.NullString
+	OrganizationID  uuid.NullUUID
 }
 
 type Opinion struct {
@@ -60,15 +62,27 @@ type Organization struct {
 	OrganizationType int32
 	Name             string
 	OwnerID          uuid.UUID
+	Code             string
+}
+
+type OrganizationAlias struct {
+	AliasID        uuid.UUID
+	OrganizationID uuid.UUID
+	AliasName      string
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	CreatedBy      uuid.UUID
+	DeactivatedAt  sql.NullTime
+	DeactivatedBy  uuid.NullUUID
 }
 
 type OrganizationUser struct {
 	OrganizationUserID uuid.UUID
 	UserID             uuid.UUID
 	OrganizationID     uuid.UUID
-	Role               int32
 	CreatedAt          time.Time
 	UpdatedAt          time.Time
+	Role               int32
 }
 
 type PasswordAuth struct {
@@ -116,21 +130,24 @@ type Session struct {
 	ExpiresAt      time.Time
 	CreatedAt      time.Time
 	LastActivityAt time.Time
+	OrganizationID uuid.NullUUID
 }
 
 type TalkSession struct {
-	TalkSessionID    uuid.UUID
-	OwnerID          uuid.UUID
-	Theme            string
-	ScheduledEndTime time.Time
-	CreatedAt        time.Time
-	City             sql.NullString
-	Prefecture       sql.NullString
-	Description      sql.NullString
-	ThumbnailUrl     sql.NullString
-	Restrictions     talksession.Restrictions
-	UpdatedAt        time.Time
-	HideReport       sql.NullBool
+	TalkSessionID       uuid.UUID
+	OwnerID             uuid.UUID
+	Theme               string
+	ScheduledEndTime    time.Time
+	CreatedAt           time.Time
+	City                sql.NullString
+	Prefecture          sql.NullString
+	Description         sql.NullString
+	ThumbnailUrl        sql.NullString
+	Restrictions        talksession.Restrictions
+	UpdatedAt           time.Time
+	HideReport          sql.NullBool
+	OrganizationID      uuid.NullUUID
+	OrganizationAliasID uuid.NullUUID
 }
 
 type TalkSessionConclusion struct {

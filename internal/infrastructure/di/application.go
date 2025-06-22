@@ -7,21 +7,21 @@ import (
 	talksession_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/talksession"
 	user_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/user"
 
-	"github.com/neko-dream/server/internal/application/command/auth_command"
-	"github.com/neko-dream/server/internal/application/command/image_command"
-	"github.com/neko-dream/server/internal/application/command/opinion_command"
-	"github.com/neko-dream/server/internal/application/command/organization_command"
-	"github.com/neko-dream/server/internal/application/command/policy_command"
-	"github.com/neko-dream/server/internal/application/command/report_command"
-	"github.com/neko-dream/server/internal/application/command/talksession_command"
-	"github.com/neko-dream/server/internal/application/command/timeline_command"
-	"github.com/neko-dream/server/internal/application/command/user_command"
-	"github.com/neko-dream/server/internal/application/command/vote_command"
 	opinion_q "github.com/neko-dream/server/internal/application/query/opinion"
 	"github.com/neko-dream/server/internal/application/query/policy_query"
 	report_q "github.com/neko-dream/server/internal/application/query/report_query"
 	"github.com/neko-dream/server/internal/application/query/talksession"
 	"github.com/neko-dream/server/internal/application/query/timeline_query"
+	"github.com/neko-dream/server/internal/application/usecase/auth_usecase"
+	"github.com/neko-dream/server/internal/application/usecase/image_usecase"
+	"github.com/neko-dream/server/internal/application/usecase/opinion_usecase"
+	"github.com/neko-dream/server/internal/application/usecase/organization_usecase"
+	"github.com/neko-dream/server/internal/application/usecase/policy_usecase"
+	"github.com/neko-dream/server/internal/application/usecase/report_usecase"
+	"github.com/neko-dream/server/internal/application/usecase/talksession_usecase"
+	"github.com/neko-dream/server/internal/application/usecase/timeline_usecase"
+	"github.com/neko-dream/server/internal/application/usecase/user_usecase"
+	"github.com/neko-dream/server/internal/application/usecase/vote_usecase"
 )
 
 // このファイルはアプリケーション層（ユースケース/クエリ）のコンストラクタを管理します。
@@ -29,10 +29,10 @@ import (
 
 func useCaseDeps() []ProvideArg {
 	return []ProvideArg{
-		{talksession_command.NewAddConclusionCommandHandler, nil},
-		{talksession_command.NewStartTalkSessionCommand, nil},
-		{talksession_command.NewTakeConsentUseCase, nil},
-		{talksession_command.NewEditCommand, nil},
+		{talksession_usecase.NewAddConclusionCommandHandler, nil},
+		{talksession_usecase.NewStartTalkSessionUseCase, nil},
+		{talksession_usecase.NewTakeConsentUseCase, nil},
+		{talksession_usecase.NewEditTalkSessionUseCase, nil},
 		{talksession_query.NewBrowseTalkSessionQueryHandler, nil},
 		{talksession_query.NewBrowseOpenedByUserQueryHandler, nil},
 		{talksession_query.NewBrowseJoinedTalkSessionQueryHandler, nil},
@@ -41,8 +41,8 @@ func useCaseDeps() []ProvideArg {
 		{talksession_query.NewGetRestrictionsQuery, nil},
 		{talksession_query.NewHasConsentQuery, nil},
 		{talksession.NewIsTalkSessionSatisfiedInteractor, nil},
-		{opinion_command.NewSubmitOpinionHandler, nil},
-		{opinion_command.NewReportOpinion, nil},
+		{opinion_usecase.NewSubmitOpinionHandler, nil},
+		{opinion_usecase.NewReportOpinion, nil},
 		{opinion_query.NewGetOpinionsByTalkSessionIDQueryHandler, nil},
 		{opinion_query.NewGetOpinionDetailByIDQueryHandler, nil},
 		{opinion_query.NewGetOpinionRepliesQueryHandler, nil},
@@ -50,32 +50,35 @@ func useCaseDeps() []ProvideArg {
 		{opinion_query.NewGetMyOpinionsQueryHandler, nil},
 		{opinion_query.NewGetOpinionGroupRatioInteractor, nil},
 		{opinion_q.NewGetReportReasons, nil},
-		{user_command.NewEditHandler, nil},
-		{user_command.NewRegisterHandler, nil},
+		{user_usecase.NewEditHandler, nil},
+		{user_usecase.NewRegisterHandler, nil},
 		{user_query.NewDetailHandler, nil},
-		{vote_command.NewVoteHandler, nil},
-		{auth_command.NewAuthLogin, nil},
-		{auth_command.NewRevoke, nil},
-		{auth_command.NewAuthCallback, nil},
-		{auth_command.NewLoginForDev, nil},
-		{auth_command.NewDetachAccount, nil},
-		{auth_command.NewPasswordRegister, nil},
-		{auth_command.NewPasswordLogin, nil},
-		{auth_command.NewChangePassword, nil},
-		{timeline_command.NewAddTimeLine, nil},
-		{timeline_command.NewEditTimeLine, nil},
+		{vote_usecase.NewVoteHandler, nil},
+		{auth_usecase.NewAuthLogin, nil},
+		{auth_usecase.NewRevoke, nil},
+		{auth_usecase.NewAuthCallback, nil},
+		{auth_usecase.NewLoginForDev, nil},
+		{auth_usecase.NewDetachAccount, nil},
+		{auth_usecase.NewPasswordRegister, nil},
+		{auth_usecase.NewPasswordLogin, nil},
+		{auth_usecase.NewChangePassword, nil},
+		{timeline_usecase.NewAddTimeLine, nil},
+		{timeline_usecase.NewEditTimeLine, nil},
 		{timeline_query.NewGetTimeLine, nil},
 		{analysis_query.NewGetAnalysisResultHandler, nil},
 		{analysis_query.NewGetReportQueryHandler, nil},
 		{report_query.NewGetByTalkSessionQueryInteractor, nil},
 		{report_query.NewGetOpinionReportQueryInteractor, nil},
-		{report_command.NewSolveReportCommandInteractor, nil},
+		{report_usecase.NewSolveReportCommandInteractor, nil},
 		{report_q.NewGetCountQueryInteractor, nil},
-		{image_command.NewUploadImageHandler, nil},
-		{policy_command.NewAcceptPolicy, nil},
+		{image_usecase.NewUploadImageHandler, nil},
+		{policy_usecase.NewAcceptPolicy, nil},
 		{policy_query.NewCheckConsent, nil},
-		{organization_command.NewCreateOrganizationInteractor, nil},
-		{organization_command.NewInviteOrganizationInteractor, nil},
-		{organization_command.NewInviteOrganizationForUserInteractor, nil},
+		{organization_usecase.NewCreateOrganizationInteractor, nil},
+		{organization_usecase.NewInviteOrganizationInteractor, nil},
+		{organization_usecase.NewInviteOrganizationForUserInteractor, nil},
+		{organization_usecase.NewCreateOrganizationAliasUseCase, nil},
+		{organization_usecase.NewDeactivateOrganizationAliasUseCase, nil},
+		{organization_usecase.NewListOrganizationAliasesUseCase, nil},
 	}
 }

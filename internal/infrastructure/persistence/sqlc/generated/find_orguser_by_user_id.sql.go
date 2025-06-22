@@ -13,7 +13,7 @@ import (
 
 const findOrgUserByUserID = `-- name: FindOrgUserByUserID :many
 SELECT
-    organization_users.organization_user_id, organization_users.user_id, organization_users.organization_id, organization_users.role, organization_users.created_at, organization_users.updated_at
+    organization_users.organization_user_id, organization_users.user_id, organization_users.organization_id, organization_users.created_at, organization_users.updated_at, organization_users.role
 FROM organization_users
 WHERE organization_users.user_id = $1
 `
@@ -25,7 +25,7 @@ type FindOrgUserByUserIDRow struct {
 // FindOrgUserByUserID
 //
 //	SELECT
-//	    organization_users.organization_user_id, organization_users.user_id, organization_users.organization_id, organization_users.role, organization_users.created_at, organization_users.updated_at
+//	    organization_users.organization_user_id, organization_users.user_id, organization_users.organization_id, organization_users.created_at, organization_users.updated_at, organization_users.role
 //	FROM organization_users
 //	WHERE organization_users.user_id = $1
 func (q *Queries) FindOrgUserByUserID(ctx context.Context, userID uuid.UUID) ([]FindOrgUserByUserIDRow, error) {
@@ -41,9 +41,9 @@ func (q *Queries) FindOrgUserByUserID(ctx context.Context, userID uuid.UUID) ([]
 			&i.OrganizationUser.OrganizationUserID,
 			&i.OrganizationUser.UserID,
 			&i.OrganizationUser.OrganizationID,
-			&i.OrganizationUser.Role,
 			&i.OrganizationUser.CreatedAt,
 			&i.OrganizationUser.UpdatedAt,
+			&i.OrganizationUser.Role,
 		); err != nil {
 			return nil, err
 		}
@@ -60,10 +60,10 @@ func (q *Queries) FindOrgUserByUserID(ctx context.Context, userID uuid.UUID) ([]
 
 const findOrgUserByUserIDWithOrganization = `-- name: FindOrgUserByUserIDWithOrganization :many
 SELECT
-    organization_users.organization_user_id, organization_users.user_id, organization_users.organization_id, organization_users.role, organization_users.created_at, organization_users.updated_at,
-    organizations.organization_id, organizations.organization_type, organizations.name, organizations.owner_id
+    organization_users.organization_user_id, organization_users.user_id, organization_users.organization_id, organization_users.created_at, organization_users.updated_at, organization_users.role,
+    organizations.organization_id, organizations.organization_type, organizations.name, organizations.owner_id, organizations.code
 FROM organization_users
-LEFT JOIN organizations ON organization_users.organization_id = organizations.id
+LEFT JOIN organizations ON organization_users.organization_id = organizations.organization_id
 WHERE organization_users.user_id = $1
 `
 
@@ -75,10 +75,10 @@ type FindOrgUserByUserIDWithOrganizationRow struct {
 // FindOrgUserByUserIDWithOrganization
 //
 //	SELECT
-//	    organization_users.organization_user_id, organization_users.user_id, organization_users.organization_id, organization_users.role, organization_users.created_at, organization_users.updated_at,
-//	    organizations.organization_id, organizations.organization_type, organizations.name, organizations.owner_id
+//	    organization_users.organization_user_id, organization_users.user_id, organization_users.organization_id, organization_users.created_at, organization_users.updated_at, organization_users.role,
+//	    organizations.organization_id, organizations.organization_type, organizations.name, organizations.owner_id, organizations.code
 //	FROM organization_users
-//	LEFT JOIN organizations ON organization_users.organization_id = organizations.id
+//	LEFT JOIN organizations ON organization_users.organization_id = organizations.organization_id
 //	WHERE organization_users.user_id = $1
 func (q *Queries) FindOrgUserByUserIDWithOrganization(ctx context.Context, userID uuid.UUID) ([]FindOrgUserByUserIDWithOrganizationRow, error) {
 	rows, err := q.db.QueryContext(ctx, findOrgUserByUserIDWithOrganization, userID)
@@ -93,13 +93,14 @@ func (q *Queries) FindOrgUserByUserIDWithOrganization(ctx context.Context, userI
 			&i.OrganizationUser.OrganizationUserID,
 			&i.OrganizationUser.UserID,
 			&i.OrganizationUser.OrganizationID,
-			&i.OrganizationUser.Role,
 			&i.OrganizationUser.CreatedAt,
 			&i.OrganizationUser.UpdatedAt,
+			&i.OrganizationUser.Role,
 			&i.Organization.OrganizationID,
 			&i.Organization.OrganizationType,
 			&i.Organization.Name,
 			&i.Organization.OwnerID,
+			&i.Organization.Code,
 		); err != nil {
 			return nil, err
 		}

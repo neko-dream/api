@@ -7,7 +7,7 @@ import (
 	"fmt"
 
 	"braces.dev/errtrace"
-	"github.com/neko-dream/server/internal/domain/model/auth"
+	"github.com/google/uuid"
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -39,7 +39,7 @@ func (s *sessionRepository) Create(ctx context.Context, sess session.Session) (*
 	ctx, span := otel.Tracer("repository").Start(ctx, "sessionRepository.Create")
 	defer span.End()
 
-	if err := s.GetQueries(ctx).CreateSession(ctx, model.CreateSessionParams{
+	params := model.CreateSessionParams{
 		SessionID:      sess.SessionID().UUID(),
 		UserID:         sess.UserID().UUID(),
 		Provider:       sess.Provider().String(),
@@ -47,7 +47,17 @@ func (s *sessionRepository) Create(ctx context.Context, sess session.Session) (*
 		ExpiresAt:      sess.ExpiresAt(),
 		LastActivityAt: sess.LastActivityAt(),
 		CreatedAt:      clock.Now(ctx),
-	}); err != nil {
+	}
+
+	// organization_idの設定
+	if sess.OrganizationID() != nil && !sess.OrganizationID().IsZero() {
+		params.OrganizationID = uuid.NullUUID{
+			UUID:  sess.OrganizationID().UUID(),
+			Valid: true,
+		}
+	}
+
+	if err := s.GetQueries(ctx).CreateSession(ctx, params); err != nil {
 		return nil, errtrace.Wrap(err)
 	}
 
@@ -67,10 +77,30 @@ func (s *sessionRepository) FindBySessionID(ctx context.Context, sess shared.UUI
 		return nil, errtrace.Wrap(err)
 	}
 
-	providerName, err := auth.NewAuthProviderName(sessRow.Provider)
+	providerName, err := shared.NewAuthProviderName(sessRow.Provider)
 	if err != nil {
 		return nil, errtrace.Wrap(err)
 	}
+
+	// organization_idの処理
+	var orgID *shared.UUID[any]
+	if sessRow.OrganizationID.Valid {
+		id := shared.UUID[any](sessRow.OrganizationID.UUID)
+		orgID = &id
+	}
+
+	if orgID != nil {
+		return session.NewSessionWithOrganization(
+			shared.UUID[session.Session](sessRow.SessionID),
+			shared.UUID[user.User](sessRow.UserID),
+			providerName,
+			*session.NewSessionStatus(int(sessRow.SessionStatus)),
+			sessRow.ExpiresAt,
+			sessRow.LastActivityAt,
+			orgID,
+		), nil
+	}
+
 	return session.NewSession(
 		shared.UUID[session.Session](sessRow.SessionID),
 		shared.UUID[user.User](sessRow.UserID),
@@ -96,19 +126,38 @@ func (s *sessionRepository) FindByUserID(ctx context.Context, userID shared.UUID
 
 	sessions := make([]session.Session, 0, len(sessionModels))
 	for _, sess := range sessionModels {
-		providerName, err := auth.NewAuthProviderName(sess.Provider)
+		providerName, err := shared.NewAuthProviderName(sess.Provider)
 		if err != nil {
 			utils.HandleError(ctx, err, fmt.Sprintf("NewAuthProviderName: %s", sess.Provider))
 			continue
 		}
-		sessions = append(sessions, *session.NewSession(
-			shared.UUID[session.Session](sess.SessionID),
-			shared.UUID[user.User](sess.UserID),
-			providerName,
-			*session.NewSessionStatus(int(sess.SessionStatus)),
-			sess.ExpiresAt,
-			sess.LastActivityAt,
-		))
+		// organization_idの処理
+		var orgID *shared.UUID[any]
+		if sess.OrganizationID.Valid {
+			id := shared.UUID[any](sess.OrganizationID.UUID)
+			orgID = &id
+		}
+
+		if orgID != nil {
+			sessions = append(sessions, *session.NewSessionWithOrganization(
+				shared.UUID[session.Session](sess.SessionID),
+				shared.UUID[user.User](sess.UserID),
+				providerName,
+				*session.NewSessionStatus(int(sess.SessionStatus)),
+				sess.ExpiresAt,
+				sess.LastActivityAt,
+				orgID,
+			))
+		} else {
+			sessions = append(sessions, *session.NewSession(
+				shared.UUID[session.Session](sess.SessionID),
+				shared.UUID[user.User](sess.UserID),
+				providerName,
+				*session.NewSessionStatus(int(sess.SessionStatus)),
+				sess.ExpiresAt,
+				sess.LastActivityAt,
+			))
+		}
 	}
 
 	return sessions, nil

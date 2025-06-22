@@ -21,7 +21,7 @@ type OrganizationUserRepository interface {
 type OrganizationUserRole int
 
 func NewOrganizationUserRole(role int) OrganizationUserRole {
-	if role < int(OrganizationUserRoleMember) || role > int(OrganizationUserRoleSuperAdmin) {
+	if role < int(OrganizationUserRoleSuperAdmin) || role > int(OrganizationUserRoleMember) {
 		return OrganizationUserRoleMember
 	}
 	if role == 0 {
@@ -46,11 +46,26 @@ func RoleToName(role OrganizationUserRole) string {
 	}
 }
 
+func NameToRole(name string) OrganizationUserRole {
+	switch name {
+	case "メンバー":
+		return OrganizationUserRoleMember
+	case "管理者":
+		return OrganizationUserRoleAdmin
+	case "オーナー":
+		return OrganizationUserRoleOwner
+	case "運営":
+		return OrganizationUserRoleSuperAdmin
+	default:
+		return OrganizationUserRoleMember
+	}
+}
+
 const (
-	OrganizationUserRoleMember OrganizationUserRole = iota + 1
-	OrganizationUserRoleAdmin
-	OrganizationUserRoleOwner
-	OrganizationUserRoleSuperAdmin
+	OrganizationUserRoleSuperAdmin OrganizationUserRole = 10
+	OrganizationUserRoleOwner      OrganizationUserRole = 20
+	OrganizationUserRoleAdmin      OrganizationUserRole = 30
+	OrganizationUserRoleMember     OrganizationUserRole = 40
 )
 
 type OrganizationUser struct {
@@ -77,7 +92,7 @@ func NewOrganizationUser(
 
 // SetRole
 func (ou *OrganizationUser) SetRole(role OrganizationUserRole) error {
-	if role < OrganizationUserRoleMember || role > OrganizationUserRoleSuperAdmin {
+	if role < OrganizationUserRoleSuperAdmin || role > OrganizationUserRoleMember {
 		return errors.New("invalid role")
 	}
 	ou.Role = role
@@ -86,5 +101,5 @@ func (ou *OrganizationUser) SetRole(role OrganizationUserRole) error {
 
 // HasPermissionToChangeRoleTo
 func (ou *OrganizationUser) HasPermissionToChangeRoleTo(targetRole OrganizationUserRole) bool {
-	return int(ou.Role) >= int(targetRole) && ou.Role >= OrganizationUserRoleAdmin
+	return int(ou.Role) <= int(targetRole) && ou.Role <= OrganizationUserRoleAdmin
 }

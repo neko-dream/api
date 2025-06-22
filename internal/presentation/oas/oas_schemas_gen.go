@@ -11,14 +11,14 @@ import (
 	ht "github.com/ogen-go/ogen/http"
 )
 
-// Ref: #/components/schemas/actionItem
+// Ref: #/components/schemas/ActionItem
 type ActionItem struct {
-	ActionItemID string `json:"ActionItemID"`
-	Content      string `json:"Content"`
-	CreatedAt    string `json:"CreatedAt"`
-	Sequence     int    `json:"Sequence"`
-	Status       string `json:"Status"`
-	UpdatedAt    string `json:"UpdatedAt"`
+	ActionItemID string `json:"actionItemID"`
+	Sequence     int    `json:"sequence"`
+	Content      string `json:"content"`
+	Status       string `json:"status"`
+	CreatedAt    string `json:"createdAt"`
+	UpdatedAt    string `json:"updatedAt"`
 }
 
 // GetActionItemID returns the value of ActionItemID.
@@ -26,24 +26,24 @@ func (s *ActionItem) GetActionItemID() string {
 	return s.ActionItemID
 }
 
-// GetContent returns the value of Content.
-func (s *ActionItem) GetContent() string {
-	return s.Content
-}
-
-// GetCreatedAt returns the value of CreatedAt.
-func (s *ActionItem) GetCreatedAt() string {
-	return s.CreatedAt
-}
-
 // GetSequence returns the value of Sequence.
 func (s *ActionItem) GetSequence() int {
 	return s.Sequence
 }
 
+// GetContent returns the value of Content.
+func (s *ActionItem) GetContent() string {
+	return s.Content
+}
+
 // GetStatus returns the value of Status.
 func (s *ActionItem) GetStatus() string {
 	return s.Status
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *ActionItem) GetCreatedAt() string {
+	return s.CreatedAt
 }
 
 // GetUpdatedAt returns the value of UpdatedAt.
@@ -56,24 +56,24 @@ func (s *ActionItem) SetActionItemID(val string) {
 	s.ActionItemID = val
 }
 
-// SetContent sets the value of Content.
-func (s *ActionItem) SetContent(val string) {
-	s.Content = val
-}
-
-// SetCreatedAt sets the value of CreatedAt.
-func (s *ActionItem) SetCreatedAt(val string) {
-	s.CreatedAt = val
-}
-
 // SetSequence sets the value of Sequence.
 func (s *ActionItem) SetSequence(val int) {
 	s.Sequence = val
 }
 
+// SetContent sets the value of Content.
+func (s *ActionItem) SetContent(val string) {
+	s.Content = val
+}
+
 // SetStatus sets the value of Status.
 func (s *ActionItem) SetStatus(val string) {
 	s.Status = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *ActionItem) SetCreatedAt(val string) {
+	s.CreatedAt = val
 }
 
 // SetUpdatedAt sets the value of UpdatedAt.
@@ -97,20 +97,6 @@ func (s *AnalysisReportResponse) GetReport() OptString {
 // SetReport sets the value of Report.
 func (s *AnalysisReportResponse) SetReport(val OptString) {
 	s.Report = val
-}
-
-type ApiKeyAuth struct {
-	APIKey string
-}
-
-// GetAPIKey returns the value of APIKey.
-func (s *ApiKeyAuth) GetAPIKey() string {
-	return s.APIKey
-}
-
-// SetAPIKey sets the value of APIKey.
-func (s *ApiKeyAuth) SetAPIKey(val string) {
-	s.APIKey = val
 }
 
 type AuthAccountDetachBadRequest struct{}
@@ -253,11 +239,17 @@ type ChangePasswordOK struct{}
 
 func (*ChangePasswordOK) changePasswordRes() {}
 
-// Ref: #/components/schemas/conclusion
+// Ref: #/components/schemas/Conclusion
 type Conclusion struct {
+	// 作成ユーザー.
+	User ConclusionUser `json:"user"`
 	// 結論本文.
 	Content string `json:"content"`
-	User    User   `json:"user"`
+}
+
+// GetUser returns the value of User.
+func (s *Conclusion) GetUser() ConclusionUser {
+	return s.User
 }
 
 // GetContent returns the value of Content.
@@ -265,9 +257,9 @@ func (s *Conclusion) GetContent() string {
 	return s.Content
 }
 
-// GetUser returns the value of User.
-func (s *Conclusion) GetUser() User {
-	return s.User
+// SetUser sets the value of User.
+func (s *Conclusion) SetUser(val ConclusionUser) {
+	s.User = val
 }
 
 // SetContent sets the value of Content.
@@ -275,13 +267,44 @@ func (s *Conclusion) SetContent(val string) {
 	s.Content = val
 }
 
-// SetUser sets the value of User.
-func (s *Conclusion) SetUser(val User) {
-	s.User = val
-}
-
 func (*Conclusion) getConclusionRes()  {}
 func (*Conclusion) postConclusionRes() {}
+
+type ConclusionUser struct {
+	DisplayID   string       `json:"displayID"`
+	DisplayName string       `json:"displayName"`
+	IconURL     OptNilString `json:"iconURL"`
+}
+
+// GetDisplayID returns the value of DisplayID.
+func (s *ConclusionUser) GetDisplayID() string {
+	return s.DisplayID
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *ConclusionUser) GetDisplayName() string {
+	return s.DisplayName
+}
+
+// GetIconURL returns the value of IconURL.
+func (s *ConclusionUser) GetIconURL() OptNilString {
+	return s.IconURL
+}
+
+// SetDisplayID sets the value of DisplayID.
+func (s *ConclusionUser) SetDisplayID(val string) {
+	s.DisplayID = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *ConclusionUser) SetDisplayName(val string) {
+	s.DisplayName = val
+}
+
+// SetIconURL sets the value of IconURL.
+func (s *ConclusionUser) SetIconURL(val OptNilString) {
+	s.IconURL = val
+}
 
 type ConsentTalkSessionBadRequest struct{}
 
@@ -295,323 +318,53 @@ type ConsentTalkSessionOK struct{}
 
 func (*ConsentTalkSessionOK) consentTalkSessionRes() {}
 
-type CreateOrganizationsBadRequest struct{}
-
-func (*CreateOrganizationsBadRequest) createOrganizationsRes() {}
-
-type CreateOrganizationsInternalServerError struct{}
-
-func (*CreateOrganizationsInternalServerError) createOrganizationsRes() {}
-
-type CreateOrganizationsOK struct{}
-
-func (*CreateOrganizationsOK) createOrganizationsRes() {}
-
-type CreateOrganizationsReq struct {
-	Name    string `json:"name"`
-	OrgType OptInt `json:"orgType"`
+type CookieAuth struct {
+	APIKey string
 }
 
-// GetName returns the value of Name.
-func (s *CreateOrganizationsReq) GetName() string {
-	return s.Name
+// GetAPIKey returns the value of APIKey.
+func (s *CookieAuth) GetAPIKey() string {
+	return s.APIKey
 }
 
-// GetOrgType returns the value of OrgType.
-func (s *CreateOrganizationsReq) GetOrgType() OptInt {
-	return s.OrgType
+// SetAPIKey sets the value of APIKey.
+func (s *CookieAuth) SetAPIKey(val string) {
+	s.APIKey = val
 }
 
-// SetName sets the value of Name.
-func (s *CreateOrganizationsReq) SetName(val string) {
-	s.Name = val
+type CreateOrganizationAliasBadRequest struct{}
+
+func (*CreateOrganizationAliasBadRequest) createOrganizationAliasRes() {}
+
+type CreateOrganizationAliasInternalServerError struct{}
+
+func (*CreateOrganizationAliasInternalServerError) createOrganizationAliasRes() {}
+
+type CreateOrganizationAliasReq struct {
+	AliasName string `json:"aliasName"`
 }
 
-// SetOrgType sets the value of OrgType.
-func (s *CreateOrganizationsReq) SetOrgType(val OptInt) {
-	s.OrgType = val
+// GetAliasName returns the value of AliasName.
+func (s *CreateOrganizationAliasReq) GetAliasName() string {
+	return s.AliasName
 }
 
-type CreateTalkSessionBadRequest struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
+// SetAliasName sets the value of AliasName.
+func (s *CreateOrganizationAliasReq) SetAliasName(val string) {
+	s.AliasName = val
 }
 
-// GetCode returns the value of Code.
-func (s *CreateTalkSessionBadRequest) GetCode() string {
-	return s.Code
-}
+type DeleteOrganizationAliasBadRequest struct{}
 
-// GetMessage returns the value of Message.
-func (s *CreateTalkSessionBadRequest) GetMessage() string {
-	return s.Message
-}
+func (*DeleteOrganizationAliasBadRequest) deleteOrganizationAliasRes() {}
 
-// SetCode sets the value of Code.
-func (s *CreateTalkSessionBadRequest) SetCode(val string) {
-	s.Code = val
-}
+type DeleteOrganizationAliasInternalServerError struct{}
 
-// SetMessage sets the value of Message.
-func (s *CreateTalkSessionBadRequest) SetMessage(val string) {
-	s.Message = val
-}
+func (*DeleteOrganizationAliasInternalServerError) deleteOrganizationAliasRes() {}
 
-func (*CreateTalkSessionBadRequest) createTalkSessionRes() {}
+type DeleteOrganizationAliasOK struct{}
 
-type CreateTalkSessionOK struct {
-	// 市区町村.
-	City OptNilString `json:"city"`
-	// 作成日時.
-	CreatedAt string `json:"createdAt"`
-	// 説明.
-	Description OptNilString `json:"description"`
-	HideReport  bool         `json:"hideReport"`
-	// トークセッションID.
-	ID       string      `json:"id"`
-	Location OptLocation `json:"location"`
-	Owner    User        `json:"owner"`
-	// 都道府県.
-	Prefecture OptNilString `json:"prefecture"`
-	// セッションの参加制限.
-	Restrictions []Restriction `json:"restrictions"`
-	// 終了予定日時.
-	ScheduledEndTime string `json:"scheduledEndTime"`
-	// テーマ.
-	Theme string `json:"theme"`
-	// サムネ画像.
-	ThumbnailURL OptNilString `json:"thumbnailURL"`
-}
-
-// GetCity returns the value of City.
-func (s *CreateTalkSessionOK) GetCity() OptNilString {
-	return s.City
-}
-
-// GetCreatedAt returns the value of CreatedAt.
-func (s *CreateTalkSessionOK) GetCreatedAt() string {
-	return s.CreatedAt
-}
-
-// GetDescription returns the value of Description.
-func (s *CreateTalkSessionOK) GetDescription() OptNilString {
-	return s.Description
-}
-
-// GetHideReport returns the value of HideReport.
-func (s *CreateTalkSessionOK) GetHideReport() bool {
-	return s.HideReport
-}
-
-// GetID returns the value of ID.
-func (s *CreateTalkSessionOK) GetID() string {
-	return s.ID
-}
-
-// GetLocation returns the value of Location.
-func (s *CreateTalkSessionOK) GetLocation() OptLocation {
-	return s.Location
-}
-
-// GetOwner returns the value of Owner.
-func (s *CreateTalkSessionOK) GetOwner() User {
-	return s.Owner
-}
-
-// GetPrefecture returns the value of Prefecture.
-func (s *CreateTalkSessionOK) GetPrefecture() OptNilString {
-	return s.Prefecture
-}
-
-// GetRestrictions returns the value of Restrictions.
-func (s *CreateTalkSessionOK) GetRestrictions() []Restriction {
-	return s.Restrictions
-}
-
-// GetScheduledEndTime returns the value of ScheduledEndTime.
-func (s *CreateTalkSessionOK) GetScheduledEndTime() string {
-	return s.ScheduledEndTime
-}
-
-// GetTheme returns the value of Theme.
-func (s *CreateTalkSessionOK) GetTheme() string {
-	return s.Theme
-}
-
-// GetThumbnailURL returns the value of ThumbnailURL.
-func (s *CreateTalkSessionOK) GetThumbnailURL() OptNilString {
-	return s.ThumbnailURL
-}
-
-// SetCity sets the value of City.
-func (s *CreateTalkSessionOK) SetCity(val OptNilString) {
-	s.City = val
-}
-
-// SetCreatedAt sets the value of CreatedAt.
-func (s *CreateTalkSessionOK) SetCreatedAt(val string) {
-	s.CreatedAt = val
-}
-
-// SetDescription sets the value of Description.
-func (s *CreateTalkSessionOK) SetDescription(val OptNilString) {
-	s.Description = val
-}
-
-// SetHideReport sets the value of HideReport.
-func (s *CreateTalkSessionOK) SetHideReport(val bool) {
-	s.HideReport = val
-}
-
-// SetID sets the value of ID.
-func (s *CreateTalkSessionOK) SetID(val string) {
-	s.ID = val
-}
-
-// SetLocation sets the value of Location.
-func (s *CreateTalkSessionOK) SetLocation(val OptLocation) {
-	s.Location = val
-}
-
-// SetOwner sets the value of Owner.
-func (s *CreateTalkSessionOK) SetOwner(val User) {
-	s.Owner = val
-}
-
-// SetPrefecture sets the value of Prefecture.
-func (s *CreateTalkSessionOK) SetPrefecture(val OptNilString) {
-	s.Prefecture = val
-}
-
-// SetRestrictions sets the value of Restrictions.
-func (s *CreateTalkSessionOK) SetRestrictions(val []Restriction) {
-	s.Restrictions = val
-}
-
-// SetScheduledEndTime sets the value of ScheduledEndTime.
-func (s *CreateTalkSessionOK) SetScheduledEndTime(val string) {
-	s.ScheduledEndTime = val
-}
-
-// SetTheme sets the value of Theme.
-func (s *CreateTalkSessionOK) SetTheme(val string) {
-	s.Theme = val
-}
-
-// SetThumbnailURL sets the value of ThumbnailURL.
-func (s *CreateTalkSessionOK) SetThumbnailURL(val OptNilString) {
-	s.ThumbnailURL = val
-}
-
-func (*CreateTalkSessionOK) createTalkSessionRes() {}
-
-type CreateTalkSessionReq struct {
-	// 市区町村.
-	City OptNilString `json:"city"`
-	// 説明文.
-	Description OptNilString `json:"description"`
-	// 緯度.
-	Latitude OptNilFloat64 `json:"latitude"`
-	// 経度.
-	Longitude OptNilFloat64 `json:"longitude"`
-	// 都道府県.
-	Prefecture       OptNilString `json:"prefecture"`
-	Restrictions     []string     `json:"restrictions"`
-	ScheduledEndTime time.Time    `json:"scheduledEndTime"`
-	Theme            string       `json:"theme"`
-	// サムネイルURL。文中から一番最初の画像URLをサムネとする。.
-	ThumbnailURL OptNilString `json:"thumbnailURL"`
-}
-
-// GetCity returns the value of City.
-func (s *CreateTalkSessionReq) GetCity() OptNilString {
-	return s.City
-}
-
-// GetDescription returns the value of Description.
-func (s *CreateTalkSessionReq) GetDescription() OptNilString {
-	return s.Description
-}
-
-// GetLatitude returns the value of Latitude.
-func (s *CreateTalkSessionReq) GetLatitude() OptNilFloat64 {
-	return s.Latitude
-}
-
-// GetLongitude returns the value of Longitude.
-func (s *CreateTalkSessionReq) GetLongitude() OptNilFloat64 {
-	return s.Longitude
-}
-
-// GetPrefecture returns the value of Prefecture.
-func (s *CreateTalkSessionReq) GetPrefecture() OptNilString {
-	return s.Prefecture
-}
-
-// GetRestrictions returns the value of Restrictions.
-func (s *CreateTalkSessionReq) GetRestrictions() []string {
-	return s.Restrictions
-}
-
-// GetScheduledEndTime returns the value of ScheduledEndTime.
-func (s *CreateTalkSessionReq) GetScheduledEndTime() time.Time {
-	return s.ScheduledEndTime
-}
-
-// GetTheme returns the value of Theme.
-func (s *CreateTalkSessionReq) GetTheme() string {
-	return s.Theme
-}
-
-// GetThumbnailURL returns the value of ThumbnailURL.
-func (s *CreateTalkSessionReq) GetThumbnailURL() OptNilString {
-	return s.ThumbnailURL
-}
-
-// SetCity sets the value of City.
-func (s *CreateTalkSessionReq) SetCity(val OptNilString) {
-	s.City = val
-}
-
-// SetDescription sets the value of Description.
-func (s *CreateTalkSessionReq) SetDescription(val OptNilString) {
-	s.Description = val
-}
-
-// SetLatitude sets the value of Latitude.
-func (s *CreateTalkSessionReq) SetLatitude(val OptNilFloat64) {
-	s.Latitude = val
-}
-
-// SetLongitude sets the value of Longitude.
-func (s *CreateTalkSessionReq) SetLongitude(val OptNilFloat64) {
-	s.Longitude = val
-}
-
-// SetPrefecture sets the value of Prefecture.
-func (s *CreateTalkSessionReq) SetPrefecture(val OptNilString) {
-	s.Prefecture = val
-}
-
-// SetRestrictions sets the value of Restrictions.
-func (s *CreateTalkSessionReq) SetRestrictions(val []string) {
-	s.Restrictions = val
-}
-
-// SetScheduledEndTime sets the value of ScheduledEndTime.
-func (s *CreateTalkSessionReq) SetScheduledEndTime(val time.Time) {
-	s.ScheduledEndTime = val
-}
-
-// SetTheme sets the value of Theme.
-func (s *CreateTalkSessionReq) SetTheme(val string) {
-	s.Theme = val
-}
-
-// SetThumbnailURL sets the value of ThumbnailURL.
-func (s *CreateTalkSessionReq) SetThumbnailURL(val OptNilString) {
-	s.ThumbnailURL = val
-}
+func (*DeleteOrganizationAliasOK) deleteOrganizationAliasRes() {}
 
 type DevAuthorizeBadRequest struct{}
 
@@ -683,30 +436,24 @@ type EditTalkSessionInternalServerError struct{}
 func (*EditTalkSessionInternalServerError) editTalkSessionRes() {}
 
 type EditTalkSessionReq struct {
-	// 市区町村.
-	City OptNilString `json:"city"`
-	// 説明文.
-	Description OptNilString `json:"description"`
-	// 緯度.
-	Latitude OptNilFloat64 `json:"latitude"`
-	// 経度.
-	Longitude OptFloat64 `json:"longitude"`
-	// 都道府県.
-	Prefecture       OptNilString `json:"prefecture"`
-	ScheduledEndTime time.Time    `json:"scheduledEndTime"`
-	Theme            string       `json:"theme"`
-	// サムネイルURL。文中から一番最初の画像URLをサムネとする。.
-	ThumbnailURL OptString `json:"thumbnailURL"`
+	Theme            string        `json:"theme"`
+	ScheduledEndTime time.Time     `json:"scheduledEndTime"`
+	Latitude         OptNilFloat64 `json:"latitude"`
+	Longitude        OptFloat64    `json:"longitude"`
+	Prefecture       OptNilString  `json:"prefecture"`
+	City             OptNilString  `json:"city"`
+	Description      OptNilString  `json:"description"`
+	ThumbnailURL     OptString     `json:"thumbnailURL"`
 }
 
-// GetCity returns the value of City.
-func (s *EditTalkSessionReq) GetCity() OptNilString {
-	return s.City
+// GetTheme returns the value of Theme.
+func (s *EditTalkSessionReq) GetTheme() string {
+	return s.Theme
 }
 
-// GetDescription returns the value of Description.
-func (s *EditTalkSessionReq) GetDescription() OptNilString {
-	return s.Description
+// GetScheduledEndTime returns the value of ScheduledEndTime.
+func (s *EditTalkSessionReq) GetScheduledEndTime() time.Time {
+	return s.ScheduledEndTime
 }
 
 // GetLatitude returns the value of Latitude.
@@ -724,14 +471,14 @@ func (s *EditTalkSessionReq) GetPrefecture() OptNilString {
 	return s.Prefecture
 }
 
-// GetScheduledEndTime returns the value of ScheduledEndTime.
-func (s *EditTalkSessionReq) GetScheduledEndTime() time.Time {
-	return s.ScheduledEndTime
+// GetCity returns the value of City.
+func (s *EditTalkSessionReq) GetCity() OptNilString {
+	return s.City
 }
 
-// GetTheme returns the value of Theme.
-func (s *EditTalkSessionReq) GetTheme() string {
-	return s.Theme
+// GetDescription returns the value of Description.
+func (s *EditTalkSessionReq) GetDescription() OptNilString {
+	return s.Description
 }
 
 // GetThumbnailURL returns the value of ThumbnailURL.
@@ -739,14 +486,14 @@ func (s *EditTalkSessionReq) GetThumbnailURL() OptString {
 	return s.ThumbnailURL
 }
 
-// SetCity sets the value of City.
-func (s *EditTalkSessionReq) SetCity(val OptNilString) {
-	s.City = val
+// SetTheme sets the value of Theme.
+func (s *EditTalkSessionReq) SetTheme(val string) {
+	s.Theme = val
 }
 
-// SetDescription sets the value of Description.
-func (s *EditTalkSessionReq) SetDescription(val OptNilString) {
-	s.Description = val
+// SetScheduledEndTime sets the value of ScheduledEndTime.
+func (s *EditTalkSessionReq) SetScheduledEndTime(val time.Time) {
+	s.ScheduledEndTime = val
 }
 
 // SetLatitude sets the value of Latitude.
@@ -764,14 +511,14 @@ func (s *EditTalkSessionReq) SetPrefecture(val OptNilString) {
 	s.Prefecture = val
 }
 
-// SetScheduledEndTime sets the value of ScheduledEndTime.
-func (s *EditTalkSessionReq) SetScheduledEndTime(val time.Time) {
-	s.ScheduledEndTime = val
+// SetCity sets the value of City.
+func (s *EditTalkSessionReq) SetCity(val OptNilString) {
+	s.City = val
 }
 
-// SetTheme sets the value of Theme.
-func (s *EditTalkSessionReq) SetTheme(val string) {
-	s.Theme = val
+// SetDescription sets the value of Description.
+func (s *EditTalkSessionReq) SetDescription(val OptNilString) {
+	s.Description = val
 }
 
 // SetThumbnailURL sets the value of ThumbnailURL.
@@ -812,226 +559,232 @@ func (s *EditTimeLineReq) SetStatus(val OptNilString) {
 	s.Status = val
 }
 
-type EditUserProfileBadRequest struct {
+type EstablishOrganizationBadRequest struct{}
+
+func (*EstablishOrganizationBadRequest) establishOrganizationRes() {}
+
+type EstablishOrganizationInternalServerError struct{}
+
+func (*EstablishOrganizationInternalServerError) establishOrganizationRes() {}
+
+type EstablishOrganizationOK struct{}
+
+func (*EstablishOrganizationOK) establishOrganizationRes() {}
+
+type EstablishOrganizationReq struct {
+	Name string `json:"name"`
+	// 組織コード（ログイン時に使用）
+	// 4文字以上127文字以下の英数字 _- のみ使用可能.
+	Code string `json:"code"`
+	// 組織タイプ
+	// - 1: 通常（基本これ）.
+	OrgType float64 `json:"orgType"`
+}
+
+// GetName returns the value of Name.
+func (s *EstablishOrganizationReq) GetName() string {
+	return s.Name
+}
+
+// GetCode returns the value of Code.
+func (s *EstablishOrganizationReq) GetCode() string {
+	return s.Code
+}
+
+// GetOrgType returns the value of OrgType.
+func (s *EstablishOrganizationReq) GetOrgType() float64 {
+	return s.OrgType
+}
+
+// SetName sets the value of Name.
+func (s *EstablishOrganizationReq) SetName(val string) {
+	s.Name = val
+}
+
+// SetCode sets the value of Code.
+func (s *EstablishOrganizationReq) SetCode(val string) {
+	s.Code = val
+}
+
+// SetOrgType sets the value of OrgType.
+func (s *EstablishOrganizationReq) SetOrgType(val float64) {
+	s.OrgType = val
+}
+
+type EstablishUserBadRequest struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
 }
 
 // GetCode returns the value of Code.
-func (s *EditUserProfileBadRequest) GetCode() string {
+func (s *EstablishUserBadRequest) GetCode() string {
 	return s.Code
 }
 
 // GetMessage returns the value of Message.
-func (s *EditUserProfileBadRequest) GetMessage() string {
+func (s *EstablishUserBadRequest) GetMessage() string {
 	return s.Message
 }
 
 // SetCode sets the value of Code.
-func (s *EditUserProfileBadRequest) SetCode(val string) {
+func (s *EstablishUserBadRequest) SetCode(val string) {
 	s.Code = val
 }
 
 // SetMessage sets the value of Message.
-func (s *EditUserProfileBadRequest) SetMessage(val string) {
+func (s *EstablishUserBadRequest) SetMessage(val string) {
 	s.Message = val
 }
 
-func (*EditUserProfileBadRequest) editUserProfileRes() {}
+func (*EstablishUserBadRequest) establishUserRes() {}
 
-type EditUserProfileInternalServerError struct {
+type EstablishUserInternalServerError struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
 }
 
 // GetCode returns the value of Code.
-func (s *EditUserProfileInternalServerError) GetCode() string {
+func (s *EstablishUserInternalServerError) GetCode() string {
 	return s.Code
 }
 
 // GetMessage returns the value of Message.
-func (s *EditUserProfileInternalServerError) GetMessage() string {
+func (s *EstablishUserInternalServerError) GetMessage() string {
 	return s.Message
 }
 
 // SetCode sets the value of Code.
-func (s *EditUserProfileInternalServerError) SetCode(val string) {
+func (s *EstablishUserInternalServerError) SetCode(val string) {
 	s.Code = val
 }
 
 // SetMessage sets the value of Message.
-func (s *EditUserProfileInternalServerError) SetMessage(val string) {
+func (s *EstablishUserInternalServerError) SetMessage(val string) {
 	s.Message = val
 }
 
-func (*EditUserProfileInternalServerError) editUserProfileRes() {}
+func (*EstablishUserInternalServerError) establishUserRes() {}
 
-type EditUserProfileOK struct {
-	DisplayID   string       `json:"displayID"`
-	DisplayName string       `json:"displayName"`
-	IconURL     OptNilString `json:"iconURL"`
+type EstablishUserReq struct {
+	DisplayName string                       `json:"displayName"`
+	DisplayID   string                       `json:"displayID"`
+	Icon        OptMultipartFile             `json:"icon"`
+	DateOfBirth OptString                    `json:"dateOfBirth"`
+	Gender      OptNilEstablishUserReqGender `json:"gender"`
+	Prefecture  OptString                    `json:"prefecture"`
+	City        OptNilString                 `json:"city"`
+	Email       OptNilString                 `json:"email"`
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *EstablishUserReq) GetDisplayName() string {
+	return s.DisplayName
 }
 
 // GetDisplayID returns the value of DisplayID.
-func (s *EditUserProfileOK) GetDisplayID() string {
+func (s *EstablishUserReq) GetDisplayID() string {
 	return s.DisplayID
 }
 
-// GetDisplayName returns the value of DisplayName.
-func (s *EditUserProfileOK) GetDisplayName() string {
-	return s.DisplayName
-}
-
-// GetIconURL returns the value of IconURL.
-func (s *EditUserProfileOK) GetIconURL() OptNilString {
-	return s.IconURL
-}
-
-// SetDisplayID sets the value of DisplayID.
-func (s *EditUserProfileOK) SetDisplayID(val string) {
-	s.DisplayID = val
-}
-
-// SetDisplayName sets the value of DisplayName.
-func (s *EditUserProfileOK) SetDisplayName(val string) {
-	s.DisplayName = val
-}
-
-// SetIconURL sets the value of IconURL.
-func (s *EditUserProfileOK) SetIconURL(val OptNilString) {
-	s.IconURL = val
-}
-
-func (*EditUserProfileOK) editUserProfileRes() {}
-
-type EditUserProfileReq struct {
-	// 市町村.
-	City OptNilString `json:"city"`
-	// 生年月日.
-	DateOfBirth OptString  `json:"dateOfBirth"`
-	DeleteIcon  OptNilBool `json:"deleteIcon"`
-	// ユーザー名.
-	DisplayName OptNilString `json:"displayName"`
-	// メールアドレス.
-	Email OptNilString `json:"email"`
-	// 性別.
-	Gender OptNilEditUserProfileReqGender `json:"gender"`
-	// ユーザーアイコン.
-	Icon OptMultipartFile `json:"icon"`
-	// 都道府県.
-	Prefecture OptNilString `json:"prefecture"`
-}
-
-// GetCity returns the value of City.
-func (s *EditUserProfileReq) GetCity() OptNilString {
-	return s.City
-}
-
-// GetDateOfBirth returns the value of DateOfBirth.
-func (s *EditUserProfileReq) GetDateOfBirth() OptString {
-	return s.DateOfBirth
-}
-
-// GetDeleteIcon returns the value of DeleteIcon.
-func (s *EditUserProfileReq) GetDeleteIcon() OptNilBool {
-	return s.DeleteIcon
-}
-
-// GetDisplayName returns the value of DisplayName.
-func (s *EditUserProfileReq) GetDisplayName() OptNilString {
-	return s.DisplayName
-}
-
-// GetEmail returns the value of Email.
-func (s *EditUserProfileReq) GetEmail() OptNilString {
-	return s.Email
-}
-
-// GetGender returns the value of Gender.
-func (s *EditUserProfileReq) GetGender() OptNilEditUserProfileReqGender {
-	return s.Gender
-}
-
 // GetIcon returns the value of Icon.
-func (s *EditUserProfileReq) GetIcon() OptMultipartFile {
+func (s *EstablishUserReq) GetIcon() OptMultipartFile {
 	return s.Icon
 }
 
+// GetDateOfBirth returns the value of DateOfBirth.
+func (s *EstablishUserReq) GetDateOfBirth() OptString {
+	return s.DateOfBirth
+}
+
+// GetGender returns the value of Gender.
+func (s *EstablishUserReq) GetGender() OptNilEstablishUserReqGender {
+	return s.Gender
+}
+
 // GetPrefecture returns the value of Prefecture.
-func (s *EditUserProfileReq) GetPrefecture() OptNilString {
+func (s *EstablishUserReq) GetPrefecture() OptString {
 	return s.Prefecture
 }
 
-// SetCity sets the value of City.
-func (s *EditUserProfileReq) SetCity(val OptNilString) {
-	s.City = val
+// GetCity returns the value of City.
+func (s *EstablishUserReq) GetCity() OptNilString {
+	return s.City
 }
 
-// SetDateOfBirth sets the value of DateOfBirth.
-func (s *EditUserProfileReq) SetDateOfBirth(val OptString) {
-	s.DateOfBirth = val
-}
-
-// SetDeleteIcon sets the value of DeleteIcon.
-func (s *EditUserProfileReq) SetDeleteIcon(val OptNilBool) {
-	s.DeleteIcon = val
+// GetEmail returns the value of Email.
+func (s *EstablishUserReq) GetEmail() OptNilString {
+	return s.Email
 }
 
 // SetDisplayName sets the value of DisplayName.
-func (s *EditUserProfileReq) SetDisplayName(val OptNilString) {
+func (s *EstablishUserReq) SetDisplayName(val string) {
 	s.DisplayName = val
 }
 
-// SetEmail sets the value of Email.
-func (s *EditUserProfileReq) SetEmail(val OptNilString) {
-	s.Email = val
-}
-
-// SetGender sets the value of Gender.
-func (s *EditUserProfileReq) SetGender(val OptNilEditUserProfileReqGender) {
-	s.Gender = val
+// SetDisplayID sets the value of DisplayID.
+func (s *EstablishUserReq) SetDisplayID(val string) {
+	s.DisplayID = val
 }
 
 // SetIcon sets the value of Icon.
-func (s *EditUserProfileReq) SetIcon(val OptMultipartFile) {
+func (s *EstablishUserReq) SetIcon(val OptMultipartFile) {
 	s.Icon = val
 }
 
+// SetDateOfBirth sets the value of DateOfBirth.
+func (s *EstablishUserReq) SetDateOfBirth(val OptString) {
+	s.DateOfBirth = val
+}
+
+// SetGender sets the value of Gender.
+func (s *EstablishUserReq) SetGender(val OptNilEstablishUserReqGender) {
+	s.Gender = val
+}
+
 // SetPrefecture sets the value of Prefecture.
-func (s *EditUserProfileReq) SetPrefecture(val OptNilString) {
+func (s *EstablishUserReq) SetPrefecture(val OptString) {
 	s.Prefecture = val
 }
 
-// 性別.
-type EditUserProfileReqGender string
+// SetCity sets the value of City.
+func (s *EstablishUserReq) SetCity(val OptNilString) {
+	s.City = val
+}
+
+// SetEmail sets the value of Email.
+func (s *EstablishUserReq) SetEmail(val OptNilString) {
+	s.Email = val
+}
+
+type EstablishUserReqGender string
 
 const (
-	EditUserProfileReqGender_0 EditUserProfileReqGender = "男性"
-	EditUserProfileReqGender_1 EditUserProfileReqGender = "女性"
-	EditUserProfileReqGender_2 EditUserProfileReqGender = "その他"
-	EditUserProfileReqGender_3 EditUserProfileReqGender = "回答しない"
+	EstablishUserReqGender_0 EstablishUserReqGender = "男性"
+	EstablishUserReqGender_1 EstablishUserReqGender = "女性"
+	EstablishUserReqGender_2 EstablishUserReqGender = "その他"
+	EstablishUserReqGender_3 EstablishUserReqGender = "回答しない"
 )
 
-// AllValues returns all EditUserProfileReqGender values.
-func (EditUserProfileReqGender) AllValues() []EditUserProfileReqGender {
-	return []EditUserProfileReqGender{
-		EditUserProfileReqGender_0,
-		EditUserProfileReqGender_1,
-		EditUserProfileReqGender_2,
-		EditUserProfileReqGender_3,
+// AllValues returns all EstablishUserReqGender values.
+func (EstablishUserReqGender) AllValues() []EstablishUserReqGender {
+	return []EstablishUserReqGender{
+		EstablishUserReqGender_0,
+		EstablishUserReqGender_1,
+		EstablishUserReqGender_2,
+		EstablishUserReqGender_3,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s EditUserProfileReqGender) MarshalText() ([]byte, error) {
+func (s EstablishUserReqGender) MarshalText() ([]byte, error) {
 	switch s {
-	case EditUserProfileReqGender_0:
+	case EstablishUserReqGender_0:
 		return []byte(s), nil
-	case EditUserProfileReqGender_1:
+	case EstablishUserReqGender_1:
 		return []byte(s), nil
-	case EditUserProfileReqGender_2:
+	case EstablishUserReqGender_2:
 		return []byte(s), nil
-	case EditUserProfileReqGender_3:
+	case EstablishUserReqGender_3:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -1039,19 +792,19 @@ func (s EditUserProfileReqGender) MarshalText() ([]byte, error) {
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *EditUserProfileReqGender) UnmarshalText(data []byte) error {
-	switch EditUserProfileReqGender(data) {
-	case EditUserProfileReqGender_0:
-		*s = EditUserProfileReqGender_0
+func (s *EstablishUserReqGender) UnmarshalText(data []byte) error {
+	switch EstablishUserReqGender(data) {
+	case EstablishUserReqGender_0:
+		*s = EstablishUserReqGender_0
 		return nil
-	case EditUserProfileReqGender_1:
-		*s = EditUserProfileReqGender_1
+	case EstablishUserReqGender_1:
+		*s = EstablishUserReqGender_1
 		return nil
-	case EditUserProfileReqGender_2:
-		*s = EditUserProfileReqGender_2
+	case EstablishUserReqGender_2:
+		*s = EstablishUserReqGender_2
 		return nil
-	case EditUserProfileReqGender_3:
-		*s = EditUserProfileReqGender_3
+	case EstablishUserReqGender_3:
+		*s = EstablishUserReqGender_3
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -1091,13 +844,8 @@ func (s *GetOpenedTalkSessionOK) SetTalkSessions(val []GetOpenedTalkSessionOKTal
 func (*GetOpenedTalkSessionOK) getOpenedTalkSessionRes() {}
 
 type GetOpenedTalkSessionOKTalkSessionsItem struct {
-	OpinionCount int         `json:"opinionCount"`
 	TalkSession  TalkSession `json:"talkSession"`
-}
-
-// GetOpinionCount returns the value of OpinionCount.
-func (s *GetOpenedTalkSessionOKTalkSessionsItem) GetOpinionCount() int {
-	return s.OpinionCount
+	OpinionCount int         `json:"opinionCount"`
 }
 
 // GetTalkSession returns the value of TalkSession.
@@ -1105,14 +853,19 @@ func (s *GetOpenedTalkSessionOKTalkSessionsItem) GetTalkSession() TalkSession {
 	return s.TalkSession
 }
 
-// SetOpinionCount sets the value of OpinionCount.
-func (s *GetOpenedTalkSessionOKTalkSessionsItem) SetOpinionCount(val int) {
-	s.OpinionCount = val
+// GetOpinionCount returns the value of OpinionCount.
+func (s *GetOpenedTalkSessionOKTalkSessionsItem) GetOpinionCount() int {
+	return s.OpinionCount
 }
 
 // SetTalkSession sets the value of TalkSession.
 func (s *GetOpenedTalkSessionOKTalkSessionsItem) SetTalkSession(val TalkSession) {
 	s.TalkSession = val
+}
+
+// SetOpinionCount sets the value of OpinionCount.
+func (s *GetOpenedTalkSessionOKTalkSessionsItem) SetOpinionCount(val int) {
+	s.OpinionCount = val
 }
 
 type GetOpenedTalkSessionStatus string
@@ -1172,123 +925,6 @@ type GetOpinionDetail2InternalServerError struct{}
 
 func (*GetOpinionDetail2InternalServerError) getOpinionDetail2Res() {}
 
-type GetOpinionDetail2OK struct {
-	MyVoteType OptNilGetOpinionDetail2OKMyVoteType `json:"myVoteType"`
-	Opinion    Opinion                             `json:"opinion"`
-	User       User                                `json:"user"`
-}
-
-// GetMyVoteType returns the value of MyVoteType.
-func (s *GetOpinionDetail2OK) GetMyVoteType() OptNilGetOpinionDetail2OKMyVoteType {
-	return s.MyVoteType
-}
-
-// GetOpinion returns the value of Opinion.
-func (s *GetOpinionDetail2OK) GetOpinion() Opinion {
-	return s.Opinion
-}
-
-// GetUser returns the value of User.
-func (s *GetOpinionDetail2OK) GetUser() User {
-	return s.User
-}
-
-// SetMyVoteType sets the value of MyVoteType.
-func (s *GetOpinionDetail2OK) SetMyVoteType(val OptNilGetOpinionDetail2OKMyVoteType) {
-	s.MyVoteType = val
-}
-
-// SetOpinion sets the value of Opinion.
-func (s *GetOpinionDetail2OK) SetOpinion(val Opinion) {
-	s.Opinion = val
-}
-
-// SetUser sets the value of User.
-func (s *GetOpinionDetail2OK) SetUser(val User) {
-	s.User = val
-}
-
-func (*GetOpinionDetail2OK) getOpinionDetail2Res() {}
-
-type GetOpinionDetail2OKMyVoteType string
-
-const (
-	GetOpinionDetail2OKMyVoteTypeAgree    GetOpinionDetail2OKMyVoteType = "agree"
-	GetOpinionDetail2OKMyVoteTypeDisagree GetOpinionDetail2OKMyVoteType = "disagree"
-	GetOpinionDetail2OKMyVoteTypePass     GetOpinionDetail2OKMyVoteType = "pass"
-)
-
-// AllValues returns all GetOpinionDetail2OKMyVoteType values.
-func (GetOpinionDetail2OKMyVoteType) AllValues() []GetOpinionDetail2OKMyVoteType {
-	return []GetOpinionDetail2OKMyVoteType{
-		GetOpinionDetail2OKMyVoteTypeAgree,
-		GetOpinionDetail2OKMyVoteTypeDisagree,
-		GetOpinionDetail2OKMyVoteTypePass,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s GetOpinionDetail2OKMyVoteType) MarshalText() ([]byte, error) {
-	switch s {
-	case GetOpinionDetail2OKMyVoteTypeAgree:
-		return []byte(s), nil
-	case GetOpinionDetail2OKMyVoteTypeDisagree:
-		return []byte(s), nil
-	case GetOpinionDetail2OKMyVoteTypePass:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *GetOpinionDetail2OKMyVoteType) UnmarshalText(data []byte) error {
-	switch GetOpinionDetail2OKMyVoteType(data) {
-	case GetOpinionDetail2OKMyVoteTypeAgree:
-		*s = GetOpinionDetail2OKMyVoteTypeAgree
-		return nil
-	case GetOpinionDetail2OKMyVoteTypeDisagree:
-		*s = GetOpinionDetail2OKMyVoteTypeDisagree
-		return nil
-	case GetOpinionDetail2OKMyVoteTypePass:
-		*s = GetOpinionDetail2OKMyVoteTypePass
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
-}
-
-type GetOpinionDetailInternalServerError struct{}
-
-func (*GetOpinionDetailInternalServerError) getOpinionDetailRes() {}
-
-type GetOpinionDetailOK struct {
-	Opinion Opinion `json:"opinion"`
-	User    User    `json:"user"`
-}
-
-// GetOpinion returns the value of Opinion.
-func (s *GetOpinionDetailOK) GetOpinion() Opinion {
-	return s.Opinion
-}
-
-// GetUser returns the value of User.
-func (s *GetOpinionDetailOK) GetUser() User {
-	return s.User
-}
-
-// SetOpinion sets the value of Opinion.
-func (s *GetOpinionDetailOK) SetOpinion(val Opinion) {
-	s.Opinion = val
-}
-
-// SetUser sets the value of User.
-func (s *GetOpinionDetailOK) SetUser(val User) {
-	s.User = val
-}
-
-func (*GetOpinionDetailOK) getOpinionDetailRes() {}
-
 type GetOpinionReportReasonsBadRequest struct{}
 
 func (*GetOpinionReportReasonsBadRequest) getOpinionReportReasonsRes() {}
@@ -1318,12 +954,12 @@ type GetOpinionsForTalkSessionInternalServerError struct{}
 func (*GetOpinionsForTalkSessionInternalServerError) getOpinionsForTalkSessionRes() {}
 
 type GetOpinionsForTalkSessionOK struct {
-	Opinions   []GetOpinionsForTalkSessionOKOpinionsItem `json:"opinions"`
-	Pagination GetOpinionsForTalkSessionOKPagination     `json:"pagination"`
+	Opinions   []OpinionWithReplyAndVote             `json:"opinions"`
+	Pagination GetOpinionsForTalkSessionOKPagination `json:"pagination"`
 }
 
 // GetOpinions returns the value of Opinions.
-func (s *GetOpinionsForTalkSessionOK) GetOpinions() []GetOpinionsForTalkSessionOKOpinionsItem {
+func (s *GetOpinionsForTalkSessionOK) GetOpinions() []OpinionWithReplyAndVote {
 	return s.Opinions
 }
 
@@ -1333,7 +969,7 @@ func (s *GetOpinionsForTalkSessionOK) GetPagination() GetOpinionsForTalkSessionO
 }
 
 // SetOpinions sets the value of Opinions.
-func (s *GetOpinionsForTalkSessionOK) SetOpinions(val []GetOpinionsForTalkSessionOKOpinionsItem) {
+func (s *GetOpinionsForTalkSessionOK) SetOpinions(val []OpinionWithReplyAndVote) {
 	s.Opinions = val
 }
 
@@ -1343,101 +979,6 @@ func (s *GetOpinionsForTalkSessionOK) SetPagination(val GetOpinionsForTalkSessio
 }
 
 func (*GetOpinionsForTalkSessionOK) getOpinionsForTalkSessionRes() {}
-
-type GetOpinionsForTalkSessionOKOpinionsItem struct {
-	MyVoteType OptNilGetOpinionsForTalkSessionOKOpinionsItemMyVoteType `json:"myVoteType"`
-	Opinion    Opinion                                                 `json:"opinion"`
-	ReplyCount int                                                     `json:"replyCount"`
-	User       User                                                    `json:"user"`
-}
-
-// GetMyVoteType returns the value of MyVoteType.
-func (s *GetOpinionsForTalkSessionOKOpinionsItem) GetMyVoteType() OptNilGetOpinionsForTalkSessionOKOpinionsItemMyVoteType {
-	return s.MyVoteType
-}
-
-// GetOpinion returns the value of Opinion.
-func (s *GetOpinionsForTalkSessionOKOpinionsItem) GetOpinion() Opinion {
-	return s.Opinion
-}
-
-// GetReplyCount returns the value of ReplyCount.
-func (s *GetOpinionsForTalkSessionOKOpinionsItem) GetReplyCount() int {
-	return s.ReplyCount
-}
-
-// GetUser returns the value of User.
-func (s *GetOpinionsForTalkSessionOKOpinionsItem) GetUser() User {
-	return s.User
-}
-
-// SetMyVoteType sets the value of MyVoteType.
-func (s *GetOpinionsForTalkSessionOKOpinionsItem) SetMyVoteType(val OptNilGetOpinionsForTalkSessionOKOpinionsItemMyVoteType) {
-	s.MyVoteType = val
-}
-
-// SetOpinion sets the value of Opinion.
-func (s *GetOpinionsForTalkSessionOKOpinionsItem) SetOpinion(val Opinion) {
-	s.Opinion = val
-}
-
-// SetReplyCount sets the value of ReplyCount.
-func (s *GetOpinionsForTalkSessionOKOpinionsItem) SetReplyCount(val int) {
-	s.ReplyCount = val
-}
-
-// SetUser sets the value of User.
-func (s *GetOpinionsForTalkSessionOKOpinionsItem) SetUser(val User) {
-	s.User = val
-}
-
-type GetOpinionsForTalkSessionOKOpinionsItemMyVoteType string
-
-const (
-	GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass     GetOpinionsForTalkSessionOKOpinionsItemMyVoteType = "pass"
-	GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree GetOpinionsForTalkSessionOKOpinionsItemMyVoteType = "disagree"
-	GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree    GetOpinionsForTalkSessionOKOpinionsItemMyVoteType = "agree"
-)
-
-// AllValues returns all GetOpinionsForTalkSessionOKOpinionsItemMyVoteType values.
-func (GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) AllValues() []GetOpinionsForTalkSessionOKOpinionsItemMyVoteType {
-	return []GetOpinionsForTalkSessionOKOpinionsItemMyVoteType{
-		GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass,
-		GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree,
-		GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) MarshalText() ([]byte, error) {
-	switch s {
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass:
-		return []byte(s), nil
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree:
-		return []byte(s), nil
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) UnmarshalText(data []byte) error {
-	switch GetOpinionsForTalkSessionOKOpinionsItemMyVoteType(data) {
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass:
-		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypePass
-		return nil
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree:
-		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeDisagree
-		return nil
-	case GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree:
-		*s = GetOpinionsForTalkSessionOKOpinionsItemMyVoteTypeAgree
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
-}
 
 type GetOpinionsForTalkSessionOKPagination struct {
 	TotalCount int `json:"totalCount"`
@@ -1501,6 +1042,30 @@ func (s *GetOpinionsForTalkSessionSort) UnmarshalText(data []byte) error {
 	}
 }
 
+type GetOrganizationAliasesBadRequest struct{}
+
+func (*GetOrganizationAliasesBadRequest) getOrganizationAliasesRes() {}
+
+type GetOrganizationAliasesInternalServerError struct{}
+
+func (*GetOrganizationAliasesInternalServerError) getOrganizationAliasesRes() {}
+
+type GetOrganizationAliasesOK struct {
+	Aliases []OrganizationAlias `json:"aliases"`
+}
+
+// GetAliases returns the value of Aliases.
+func (s *GetOrganizationAliasesOK) GetAliases() []OrganizationAlias {
+	return s.Aliases
+}
+
+// SetAliases sets the value of Aliases.
+func (s *GetOrganizationAliasesOK) SetAliases(val []OrganizationAlias) {
+	s.Aliases = val
+}
+
+func (*GetOrganizationAliasesOK) getOrganizationAliasesRes() {}
+
 type GetOrganizationsBadRequest struct{}
 
 func (*GetOrganizationsBadRequest) getOrganizationsRes() {}
@@ -1510,7 +1075,6 @@ type GetOrganizationsInternalServerError struct{}
 func (*GetOrganizationsInternalServerError) getOrganizationsRes() {}
 
 type GetOrganizationsOK struct {
-	// 所属組織.
 	Organizations []Organization `json:"organizations"`
 }
 
@@ -1729,13 +1293,8 @@ func (s *GetTalkSessionListManageStatus) UnmarshalText(data []byte) error {
 }
 
 type GetTalkSessionListOK struct {
-	Pagination   OffsetPagination                       `json:"pagination"`
 	TalkSessions []GetTalkSessionListOKTalkSessionsItem `json:"talkSessions"`
-}
-
-// GetPagination returns the value of Pagination.
-func (s *GetTalkSessionListOK) GetPagination() OffsetPagination {
-	return s.Pagination
+	Pagination   OffsetPagination                       `json:"pagination"`
 }
 
 // GetTalkSessions returns the value of TalkSessions.
@@ -1743,9 +1302,9 @@ func (s *GetTalkSessionListOK) GetTalkSessions() []GetTalkSessionListOKTalkSessi
 	return s.TalkSessions
 }
 
-// SetPagination sets the value of Pagination.
-func (s *GetTalkSessionListOK) SetPagination(val OffsetPagination) {
-	s.Pagination = val
+// GetPagination returns the value of Pagination.
+func (s *GetTalkSessionListOK) GetPagination() OffsetPagination {
+	return s.Pagination
 }
 
 // SetTalkSessions sets the value of TalkSessions.
@@ -1753,16 +1312,16 @@ func (s *GetTalkSessionListOK) SetTalkSessions(val []GetTalkSessionListOKTalkSes
 	s.TalkSessions = val
 }
 
+// SetPagination sets the value of Pagination.
+func (s *GetTalkSessionListOK) SetPagination(val OffsetPagination) {
+	s.Pagination = val
+}
+
 func (*GetTalkSessionListOK) getTalkSessionListRes() {}
 
 type GetTalkSessionListOKTalkSessionsItem struct {
-	OpinionCount int         `json:"opinionCount"`
 	TalkSession  TalkSession `json:"talkSession"`
-}
-
-// GetOpinionCount returns the value of OpinionCount.
-func (s *GetTalkSessionListOKTalkSessionsItem) GetOpinionCount() int {
-	return s.OpinionCount
+	OpinionCount int         `json:"opinionCount"`
 }
 
 // GetTalkSession returns the value of TalkSession.
@@ -1770,14 +1329,19 @@ func (s *GetTalkSessionListOKTalkSessionsItem) GetTalkSession() TalkSession {
 	return s.TalkSession
 }
 
-// SetOpinionCount sets the value of OpinionCount.
-func (s *GetTalkSessionListOKTalkSessionsItem) SetOpinionCount(val int) {
-	s.OpinionCount = val
+// GetOpinionCount returns the value of OpinionCount.
+func (s *GetTalkSessionListOKTalkSessionsItem) GetOpinionCount() int {
+	return s.OpinionCount
 }
 
 // SetTalkSession sets the value of TalkSession.
 func (s *GetTalkSessionListOKTalkSessionsItem) SetTalkSession(val TalkSession) {
 	s.TalkSession = val
+}
+
+// SetOpinionCount sets the value of OpinionCount.
+func (s *GetTalkSessionListOKTalkSessionsItem) SetOpinionCount(val int) {
+	s.OpinionCount = val
 }
 
 type GetTalkSessionListSortKey string
@@ -2017,14 +1581,73 @@ func (s *GetTimeLineOK) SetItems(val []ActionItem) {
 
 func (*GetTimeLineOK) getTimeLineRes() {}
 
+type GetTokenInfoBadRequest struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *GetTokenInfoBadRequest) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *GetTokenInfoBadRequest) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *GetTokenInfoBadRequest) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *GetTokenInfoBadRequest) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*GetTokenInfoBadRequest) getTokenInfoRes() {}
+
+type GetTokenInfoInternalServerError struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *GetTokenInfoInternalServerError) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *GetTokenInfoInternalServerError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *GetTokenInfoInternalServerError) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *GetTokenInfoInternalServerError) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*GetTokenInfoInternalServerError) getTokenInfoRes() {}
+
 type GetUserInfoInternalServerError struct{}
 
 func (*GetUserInfoInternalServerError) getUserInfoRes() {}
 
 type GetUserInfoOK struct {
+	User         User             `json:"user"`
 	Demographics UserDemographics `json:"demographics"`
 	Email        OptNilString     `json:"email"`
-	User         User             `json:"user"`
+}
+
+// GetUser returns the value of User.
+func (s *GetUserInfoOK) GetUser() User {
+	return s.User
 }
 
 // GetDemographics returns the value of Demographics.
@@ -2037,9 +1660,9 @@ func (s *GetUserInfoOK) GetEmail() OptNilString {
 	return s.Email
 }
 
-// GetUser returns the value of User.
-func (s *GetUserInfoOK) GetUser() User {
-	return s.User
+// SetUser sets the value of User.
+func (s *GetUserInfoOK) SetUser(val User) {
+	s.User = val
 }
 
 // SetDemographics sets the value of Demographics.
@@ -2050,11 +1673,6 @@ func (s *GetUserInfoOK) SetDemographics(val UserDemographics) {
 // SetEmail sets the value of Email.
 func (s *GetUserInfoOK) SetEmail(val OptNilString) {
 	s.Email = val
-}
-
-// SetUser sets the value of User.
-func (s *GetUserInfoOK) SetUser(val User) {
-	s.User = val
 }
 
 func (*GetUserInfoOK) getUserInfoRes() {}
@@ -2155,6 +1773,55 @@ func (s *GetUserListManageOrderBy) UnmarshalText(data []byte) error {
 	}
 }
 
+type HandleAuthCallbackBadRequest struct{}
+
+func (*HandleAuthCallbackBadRequest) handleAuthCallbackRes() {}
+
+type HandleAuthCallbackFound struct{}
+
+// HandleAuthCallbackFoundHeaders wraps HandleAuthCallbackFound with response headers.
+type HandleAuthCallbackFoundHeaders struct {
+	Location  string
+	SetCookie []string
+	Response  HandleAuthCallbackFound
+}
+
+// GetLocation returns the value of Location.
+func (s *HandleAuthCallbackFoundHeaders) GetLocation() string {
+	return s.Location
+}
+
+// GetSetCookie returns the value of SetCookie.
+func (s *HandleAuthCallbackFoundHeaders) GetSetCookie() []string {
+	return s.SetCookie
+}
+
+// GetResponse returns the value of Response.
+func (s *HandleAuthCallbackFoundHeaders) GetResponse() HandleAuthCallbackFound {
+	return s.Response
+}
+
+// SetLocation sets the value of Location.
+func (s *HandleAuthCallbackFoundHeaders) SetLocation(val string) {
+	s.Location = val
+}
+
+// SetSetCookie sets the value of SetCookie.
+func (s *HandleAuthCallbackFoundHeaders) SetSetCookie(val []string) {
+	s.SetCookie = val
+}
+
+// SetResponse sets the value of Response.
+func (s *HandleAuthCallbackFoundHeaders) SetResponse(val HandleAuthCallbackFound) {
+	s.Response = val
+}
+
+func (*HandleAuthCallbackFoundHeaders) handleAuthCallbackRes() {}
+
+type HandleAuthCallbackInternalServerError struct{}
+
+func (*HandleAuthCallbackInternalServerError) handleAuthCallbackRes() {}
+
 type HasConsentBadRequest struct{}
 
 func (*HasConsentBadRequest) hasConsentRes() {}
@@ -2190,6 +1857,146 @@ func (*HealthInternalServerError) healthRes() {}
 type HealthOK struct{}
 
 func (*HealthOK) healthRes() {}
+
+type InitiateTalkSessionBadRequest struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *InitiateTalkSessionBadRequest) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *InitiateTalkSessionBadRequest) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *InitiateTalkSessionBadRequest) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *InitiateTalkSessionBadRequest) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*InitiateTalkSessionBadRequest) initiateTalkSessionRes() {}
+
+type InitiateTalkSessionReq struct {
+	Theme            string        `json:"theme"`
+	ScheduledEndTime time.Time     `json:"scheduledEndTime"`
+	Latitude         OptNilFloat64 `json:"latitude"`
+	Longitude        OptNilFloat64 `json:"longitude"`
+	City             OptNilString  `json:"city"`
+	Prefecture       OptNilString  `json:"prefecture"`
+	Description      OptNilString  `json:"description"`
+	ThumbnailURL     OptNilString  `json:"thumbnailURL"`
+	Restrictions     []string      `json:"restrictions"`
+	AliasId          OptString     `json:"aliasId"`
+}
+
+// GetTheme returns the value of Theme.
+func (s *InitiateTalkSessionReq) GetTheme() string {
+	return s.Theme
+}
+
+// GetScheduledEndTime returns the value of ScheduledEndTime.
+func (s *InitiateTalkSessionReq) GetScheduledEndTime() time.Time {
+	return s.ScheduledEndTime
+}
+
+// GetLatitude returns the value of Latitude.
+func (s *InitiateTalkSessionReq) GetLatitude() OptNilFloat64 {
+	return s.Latitude
+}
+
+// GetLongitude returns the value of Longitude.
+func (s *InitiateTalkSessionReq) GetLongitude() OptNilFloat64 {
+	return s.Longitude
+}
+
+// GetCity returns the value of City.
+func (s *InitiateTalkSessionReq) GetCity() OptNilString {
+	return s.City
+}
+
+// GetPrefecture returns the value of Prefecture.
+func (s *InitiateTalkSessionReq) GetPrefecture() OptNilString {
+	return s.Prefecture
+}
+
+// GetDescription returns the value of Description.
+func (s *InitiateTalkSessionReq) GetDescription() OptNilString {
+	return s.Description
+}
+
+// GetThumbnailURL returns the value of ThumbnailURL.
+func (s *InitiateTalkSessionReq) GetThumbnailURL() OptNilString {
+	return s.ThumbnailURL
+}
+
+// GetRestrictions returns the value of Restrictions.
+func (s *InitiateTalkSessionReq) GetRestrictions() []string {
+	return s.Restrictions
+}
+
+// GetAliasId returns the value of AliasId.
+func (s *InitiateTalkSessionReq) GetAliasId() OptString {
+	return s.AliasId
+}
+
+// SetTheme sets the value of Theme.
+func (s *InitiateTalkSessionReq) SetTheme(val string) {
+	s.Theme = val
+}
+
+// SetScheduledEndTime sets the value of ScheduledEndTime.
+func (s *InitiateTalkSessionReq) SetScheduledEndTime(val time.Time) {
+	s.ScheduledEndTime = val
+}
+
+// SetLatitude sets the value of Latitude.
+func (s *InitiateTalkSessionReq) SetLatitude(val OptNilFloat64) {
+	s.Latitude = val
+}
+
+// SetLongitude sets the value of Longitude.
+func (s *InitiateTalkSessionReq) SetLongitude(val OptNilFloat64) {
+	s.Longitude = val
+}
+
+// SetCity sets the value of City.
+func (s *InitiateTalkSessionReq) SetCity(val OptNilString) {
+	s.City = val
+}
+
+// SetPrefecture sets the value of Prefecture.
+func (s *InitiateTalkSessionReq) SetPrefecture(val OptNilString) {
+	s.Prefecture = val
+}
+
+// SetDescription sets the value of Description.
+func (s *InitiateTalkSessionReq) SetDescription(val OptNilString) {
+	s.Description = val
+}
+
+// SetThumbnailURL sets the value of ThumbnailURL.
+func (s *InitiateTalkSessionReq) SetThumbnailURL(val OptNilString) {
+	s.ThumbnailURL = val
+}
+
+// SetRestrictions sets the value of Restrictions.
+func (s *InitiateTalkSessionReq) SetRestrictions(val []string) {
+	s.Restrictions = val
+}
+
+// SetAliasId sets the value of AliasId.
+func (s *InitiateTalkSessionReq) SetAliasId(val OptString) {
+	s.AliasId = val
+}
 
 type InviteOrganizationBadRequest struct{}
 
@@ -2253,8 +2060,8 @@ type InviteOrganizationOK struct{}
 func (*InviteOrganizationOK) inviteOrganizationRes() {}
 
 type InviteOrganizationReq struct {
-	Email string `json:"email"`
-	Role  int    `json:"role"`
+	Email string  `json:"email"`
+	Role  float64 `json:"role"`
 }
 
 // GetEmail returns the value of Email.
@@ -2263,7 +2070,7 @@ func (s *InviteOrganizationReq) GetEmail() string {
 }
 
 // GetRole returns the value of Role.
-func (s *InviteOrganizationReq) GetRole() int {
+func (s *InviteOrganizationReq) GetRole() float64 {
 	return s.Role
 }
 
@@ -2273,36 +2080,8 @@ func (s *InviteOrganizationReq) SetEmail(val string) {
 }
 
 // SetRole sets the value of Role.
-func (s *InviteOrganizationReq) SetRole(val int) {
+func (s *InviteOrganizationReq) SetRole(val float64) {
 	s.Role = val
-}
-
-// Ref: #/components/schemas/location
-type Location struct {
-	// 緯度.
-	Latitude OptFloat64 `json:"latitude"`
-	// 経度.
-	Longitude OptFloat64 `json:"longitude"`
-}
-
-// GetLatitude returns the value of Latitude.
-func (s *Location) GetLatitude() OptFloat64 {
-	return s.Latitude
-}
-
-// GetLongitude returns the value of Longitude.
-func (s *Location) GetLongitude() OptFloat64 {
-	return s.Longitude
-}
-
-// SetLatitude sets the value of Latitude.
-func (s *Location) SetLatitude(val OptFloat64) {
-	s.Latitude = val
-}
-
-// SetLongitude sets the value of Longitude.
-func (s *Location) SetLongitude(val OptFloat64) {
-	s.Longitude = val
 }
 
 // NewNilVote2ReqVoteStatus returns new NilVote2ReqVoteStatus with value set to v.
@@ -2350,367 +2129,11 @@ func (o NilVote2ReqVoteStatus) Or(d Vote2ReqVoteStatus) Vote2ReqVoteStatus {
 	return d
 }
 
-// NewNilVoteReqVoteStatus returns new NilVoteReqVoteStatus with value set to v.
-func NewNilVoteReqVoteStatus(v VoteReqVoteStatus) NilVoteReqVoteStatus {
-	return NilVoteReqVoteStatus{
-		Value: v,
-	}
-}
-
-// NilVoteReqVoteStatus is nullable VoteReqVoteStatus.
-type NilVoteReqVoteStatus struct {
-	Value VoteReqVoteStatus
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilVoteReqVoteStatus) SetTo(v VoteReqVoteStatus) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsSet returns true if value is Null.
-func (o NilVoteReqVoteStatus) IsNull() bool { return o.Null }
-
-// SetNull sets value to null.
-func (o *NilVoteReqVoteStatus) SetToNull() {
-	o.Null = true
-	var v VoteReqVoteStatus
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilVoteReqVoteStatus) Get() (v VoteReqVoteStatus, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilVoteReqVoteStatus) Or(d VoteReqVoteStatus) VoteReqVoteStatus {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-type OAuthCallbackBadRequest struct{}
-
-func (*OAuthCallbackBadRequest) oAuthCallbackRes() {}
-
-type OAuthCallbackFound struct{}
-
-// OAuthCallbackFoundHeaders wraps OAuthCallbackFound with response headers.
-type OAuthCallbackFoundHeaders struct {
-	Location  string
-	SetCookie []string
-	Response  OAuthCallbackFound
-}
-
-// GetLocation returns the value of Location.
-func (s *OAuthCallbackFoundHeaders) GetLocation() string {
-	return s.Location
-}
-
-// GetSetCookie returns the value of SetCookie.
-func (s *OAuthCallbackFoundHeaders) GetSetCookie() []string {
-	return s.SetCookie
-}
-
-// GetResponse returns the value of Response.
-func (s *OAuthCallbackFoundHeaders) GetResponse() OAuthCallbackFound {
-	return s.Response
-}
-
-// SetLocation sets the value of Location.
-func (s *OAuthCallbackFoundHeaders) SetLocation(val string) {
-	s.Location = val
-}
-
-// SetSetCookie sets the value of SetCookie.
-func (s *OAuthCallbackFoundHeaders) SetSetCookie(val []string) {
-	s.SetCookie = val
-}
-
-// SetResponse sets the value of Response.
-func (s *OAuthCallbackFoundHeaders) SetResponse(val OAuthCallbackFound) {
-	s.Response = val
-}
-
-func (*OAuthCallbackFoundHeaders) oAuthCallbackRes() {}
-
-type OAuthCallbackInternalServerError struct{}
-
-func (*OAuthCallbackInternalServerError) oAuthCallbackRes() {}
-
-type OAuthTokenInfoBadRequest struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-}
-
-// GetCode returns the value of Code.
-func (s *OAuthTokenInfoBadRequest) GetCode() string {
-	return s.Code
-}
-
-// GetMessage returns the value of Message.
-func (s *OAuthTokenInfoBadRequest) GetMessage() string {
-	return s.Message
-}
-
-// SetCode sets the value of Code.
-func (s *OAuthTokenInfoBadRequest) SetCode(val string) {
-	s.Code = val
-}
-
-// SetMessage sets the value of Message.
-func (s *OAuthTokenInfoBadRequest) SetMessage(val string) {
-	s.Message = val
-}
-
-func (*OAuthTokenInfoBadRequest) oAuthTokenInfoRes() {}
-
-type OAuthTokenInfoInternalServerError struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-}
-
-// GetCode returns the value of Code.
-func (s *OAuthTokenInfoInternalServerError) GetCode() string {
-	return s.Code
-}
-
-// GetMessage returns the value of Message.
-func (s *OAuthTokenInfoInternalServerError) GetMessage() string {
-	return s.Message
-}
-
-// SetCode sets the value of Code.
-func (s *OAuthTokenInfoInternalServerError) SetCode(val string) {
-	s.Code = val
-}
-
-// SetMessage sets the value of Message.
-func (s *OAuthTokenInfoInternalServerError) SetMessage(val string) {
-	s.Message = val
-}
-
-func (*OAuthTokenInfoInternalServerError) oAuthTokenInfoRes() {}
-
-type OAuthTokenInfoOK struct {
-	// Audience.
-	Aud string `json:"aud"`
-	// ユーザーID.
-	DisplayID OptString `json:"displayID"`
-	// ユーザー名.
-	DisplayName OptString `json:"displayName"`
-	// 有効期限.
-	Exp string `json:"exp"`
-	// 発行日時.
-	Iat string `json:"iat"`
-	// アイコンURL.
-	IconURL         OptString `json:"iconURL"`
-	IsEmailVerified bool      `json:"isEmailVerified"`
-	// ユーザ登録済みか.
-	IsRegistered bool `json:"isRegistered"`
-	// 発行者.
-	Iss string `json:"iss"`
-	// JWT ID.
-	Jti string `json:"jti"`
-	// アカウントの種類。組織がなければ空.
-	OrgType OptNilInt `json:"orgType"`
-	// パスワードの更新が必要かどうか.
-	RequiredPasswordChange bool `json:"requiredPasswordChange"`
-	// ユーザID.
-	Sub string `json:"sub"`
-}
-
-// GetAud returns the value of Aud.
-func (s *OAuthTokenInfoOK) GetAud() string {
-	return s.Aud
-}
-
-// GetDisplayID returns the value of DisplayID.
-func (s *OAuthTokenInfoOK) GetDisplayID() OptString {
-	return s.DisplayID
-}
-
-// GetDisplayName returns the value of DisplayName.
-func (s *OAuthTokenInfoOK) GetDisplayName() OptString {
-	return s.DisplayName
-}
-
-// GetExp returns the value of Exp.
-func (s *OAuthTokenInfoOK) GetExp() string {
-	return s.Exp
-}
-
-// GetIat returns the value of Iat.
-func (s *OAuthTokenInfoOK) GetIat() string {
-	return s.Iat
-}
-
-// GetIconURL returns the value of IconURL.
-func (s *OAuthTokenInfoOK) GetIconURL() OptString {
-	return s.IconURL
-}
-
-// GetIsEmailVerified returns the value of IsEmailVerified.
-func (s *OAuthTokenInfoOK) GetIsEmailVerified() bool {
-	return s.IsEmailVerified
-}
-
-// GetIsRegistered returns the value of IsRegistered.
-func (s *OAuthTokenInfoOK) GetIsRegistered() bool {
-	return s.IsRegistered
-}
-
-// GetIss returns the value of Iss.
-func (s *OAuthTokenInfoOK) GetIss() string {
-	return s.Iss
-}
-
-// GetJti returns the value of Jti.
-func (s *OAuthTokenInfoOK) GetJti() string {
-	return s.Jti
-}
-
-// GetOrgType returns the value of OrgType.
-func (s *OAuthTokenInfoOK) GetOrgType() OptNilInt {
-	return s.OrgType
-}
-
-// GetRequiredPasswordChange returns the value of RequiredPasswordChange.
-func (s *OAuthTokenInfoOK) GetRequiredPasswordChange() bool {
-	return s.RequiredPasswordChange
-}
-
-// GetSub returns the value of Sub.
-func (s *OAuthTokenInfoOK) GetSub() string {
-	return s.Sub
-}
-
-// SetAud sets the value of Aud.
-func (s *OAuthTokenInfoOK) SetAud(val string) {
-	s.Aud = val
-}
-
-// SetDisplayID sets the value of DisplayID.
-func (s *OAuthTokenInfoOK) SetDisplayID(val OptString) {
-	s.DisplayID = val
-}
-
-// SetDisplayName sets the value of DisplayName.
-func (s *OAuthTokenInfoOK) SetDisplayName(val OptString) {
-	s.DisplayName = val
-}
-
-// SetExp sets the value of Exp.
-func (s *OAuthTokenInfoOK) SetExp(val string) {
-	s.Exp = val
-}
-
-// SetIat sets the value of Iat.
-func (s *OAuthTokenInfoOK) SetIat(val string) {
-	s.Iat = val
-}
-
-// SetIconURL sets the value of IconURL.
-func (s *OAuthTokenInfoOK) SetIconURL(val OptString) {
-	s.IconURL = val
-}
-
-// SetIsEmailVerified sets the value of IsEmailVerified.
-func (s *OAuthTokenInfoOK) SetIsEmailVerified(val bool) {
-	s.IsEmailVerified = val
-}
-
-// SetIsRegistered sets the value of IsRegistered.
-func (s *OAuthTokenInfoOK) SetIsRegistered(val bool) {
-	s.IsRegistered = val
-}
-
-// SetIss sets the value of Iss.
-func (s *OAuthTokenInfoOK) SetIss(val string) {
-	s.Iss = val
-}
-
-// SetJti sets the value of Jti.
-func (s *OAuthTokenInfoOK) SetJti(val string) {
-	s.Jti = val
-}
-
-// SetOrgType sets the value of OrgType.
-func (s *OAuthTokenInfoOK) SetOrgType(val OptNilInt) {
-	s.OrgType = val
-}
-
-// SetRequiredPasswordChange sets the value of RequiredPasswordChange.
-func (s *OAuthTokenInfoOK) SetRequiredPasswordChange(val bool) {
-	s.RequiredPasswordChange = val
-}
-
-// SetSub sets the value of Sub.
-func (s *OAuthTokenInfoOK) SetSub(val string) {
-	s.Sub = val
-}
-
-func (*OAuthTokenInfoOK) oAuthTokenInfoRes() {}
-
-type OAuthTokenRevokeBadRequest struct{}
-
-func (*OAuthTokenRevokeBadRequest) oAuthTokenRevokeRes() {}
-
-type OAuthTokenRevokeInternalServerError struct{}
-
-func (*OAuthTokenRevokeInternalServerError) oAuthTokenRevokeRes() {}
-
-type OAuthTokenRevokeNoContent struct{}
-
-// OAuthTokenRevokeNoContentHeaders wraps OAuthTokenRevokeNoContent with response headers.
-type OAuthTokenRevokeNoContentHeaders struct {
-	SetCookie []string
-	Response  OAuthTokenRevokeNoContent
-}
-
-// GetSetCookie returns the value of SetCookie.
-func (s *OAuthTokenRevokeNoContentHeaders) GetSetCookie() []string {
-	return s.SetCookie
-}
-
-// GetResponse returns the value of Response.
-func (s *OAuthTokenRevokeNoContentHeaders) GetResponse() OAuthTokenRevokeNoContent {
-	return s.Response
-}
-
-// SetSetCookie sets the value of SetCookie.
-func (s *OAuthTokenRevokeNoContentHeaders) SetSetCookie(val []string) {
-	s.SetCookie = val
-}
-
-// SetResponse sets the value of Response.
-func (s *OAuthTokenRevokeNoContentHeaders) SetResponse(val OAuthTokenRevokeNoContent) {
-	s.Response = val
-}
-
-func (*OAuthTokenRevokeNoContentHeaders) oAuthTokenRevokeRes() {}
-
-// Ref: #/components/schemas/offsetPagination
+// Ref: #/components/schemas/OffsetPagination
 type OffsetPagination struct {
-	Limit      int `json:"limit"`
-	Offset     int `json:"offset"`
 	TotalCount int `json:"totalCount"`
-}
-
-// GetLimit returns the value of Limit.
-func (s *OffsetPagination) GetLimit() int {
-	return s.Limit
-}
-
-// GetOffset returns the value of Offset.
-func (s *OffsetPagination) GetOffset() int {
-	return s.Offset
+	Offset     int `json:"offset"`
+	Limit      int `json:"limit"`
 }
 
 // GetTotalCount returns the value of TotalCount.
@@ -2718,14 +2141,14 @@ func (s *OffsetPagination) GetTotalCount() int {
 	return s.TotalCount
 }
 
-// SetLimit sets the value of Limit.
-func (s *OffsetPagination) SetLimit(val int) {
-	s.Limit = val
+// GetOffset returns the value of Offset.
+func (s *OffsetPagination) GetOffset() int {
+	return s.Offset
 }
 
-// SetOffset sets the value of Offset.
-func (s *OffsetPagination) SetOffset(val int) {
-	s.Offset = val
+// GetLimit returns the value of Limit.
+func (s *OffsetPagination) GetLimit() int {
+	return s.Limit
 }
 
 // SetTotalCount sets the value of TotalCount.
@@ -2733,28 +2156,33 @@ func (s *OffsetPagination) SetTotalCount(val int) {
 	s.TotalCount = val
 }
 
-// Ref: #/components/schemas/opinion
-type Opinion struct {
-	// 意見のテキスト.
-	Content string `json:"content"`
-	// 意見ID.
-	ID        string `json:"id"`
-	IsDeleted bool   `json:"isDeleted"`
-	// 親の意見ID。ルートならば無し.
-	ParentID OptString `json:"parentID"`
-	// 画像が返る場合もある.
-	PictureURL OptNilString `json:"pictureURL"`
-	PostedAt   string       `json:"postedAt"`
-	// 参考文献URL.
-	ReferenceURL OptString `json:"referenceURL"`
-	Title        OptString `json:"title"`
-	// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
-	VoteType OptNilOpinionVoteType `json:"voteType"`
+// SetOffset sets the value of Offset.
+func (s *OffsetPagination) SetOffset(val int) {
+	s.Offset = val
 }
 
-// GetContent returns the value of Content.
-func (s *Opinion) GetContent() string {
-	return s.Content
+// SetLimit sets the value of Limit.
+func (s *OffsetPagination) SetLimit(val int) {
+	s.Limit = val
+}
+
+// Ref: #/components/schemas/Opinion
+type Opinion struct {
+	// 意見ID.
+	ID    string    `json:"id"`
+	Title OptString `json:"title"`
+	// 意見のテキスト.
+	Content string `json:"content"`
+	// 親の意見ID。ルートならば無し.
+	ParentID OptString `json:"parentID"`
+	// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+	VoteType OptNilOpinionVoteType `json:"voteType"`
+	// 画像が返る場合もある.
+	PictureURL OptNilString `json:"pictureURL"`
+	// 参考文献URL.
+	ReferenceURL OptString `json:"referenceURL"`
+	PostedAt     string    `json:"postedAt"`
+	IsDeleted    bool      `json:"isDeleted"`
 }
 
 // GetID returns the value of ID.
@@ -2762,9 +2190,14 @@ func (s *Opinion) GetID() string {
 	return s.ID
 }
 
-// GetIsDeleted returns the value of IsDeleted.
-func (s *Opinion) GetIsDeleted() bool {
-	return s.IsDeleted
+// GetTitle returns the value of Title.
+func (s *Opinion) GetTitle() OptString {
+	return s.Title
+}
+
+// GetContent returns the value of Content.
+func (s *Opinion) GetContent() string {
+	return s.Content
 }
 
 // GetParentID returns the value of ParentID.
@@ -2772,14 +2205,14 @@ func (s *Opinion) GetParentID() OptString {
 	return s.ParentID
 }
 
+// GetVoteType returns the value of VoteType.
+func (s *Opinion) GetVoteType() OptNilOpinionVoteType {
+	return s.VoteType
+}
+
 // GetPictureURL returns the value of PictureURL.
 func (s *Opinion) GetPictureURL() OptNilString {
 	return s.PictureURL
-}
-
-// GetPostedAt returns the value of PostedAt.
-func (s *Opinion) GetPostedAt() string {
-	return s.PostedAt
 }
 
 // GetReferenceURL returns the value of ReferenceURL.
@@ -2787,19 +2220,14 @@ func (s *Opinion) GetReferenceURL() OptString {
 	return s.ReferenceURL
 }
 
-// GetTitle returns the value of Title.
-func (s *Opinion) GetTitle() OptString {
-	return s.Title
+// GetPostedAt returns the value of PostedAt.
+func (s *Opinion) GetPostedAt() string {
+	return s.PostedAt
 }
 
-// GetVoteType returns the value of VoteType.
-func (s *Opinion) GetVoteType() OptNilOpinionVoteType {
-	return s.VoteType
-}
-
-// SetContent sets the value of Content.
-func (s *Opinion) SetContent(val string) {
-	s.Content = val
+// GetIsDeleted returns the value of IsDeleted.
+func (s *Opinion) GetIsDeleted() bool {
+	return s.IsDeleted
 }
 
 // SetID sets the value of ID.
@@ -2807,9 +2235,14 @@ func (s *Opinion) SetID(val string) {
 	s.ID = val
 }
 
-// SetIsDeleted sets the value of IsDeleted.
-func (s *Opinion) SetIsDeleted(val bool) {
-	s.IsDeleted = val
+// SetTitle sets the value of Title.
+func (s *Opinion) SetTitle(val OptString) {
+	s.Title = val
+}
+
+// SetContent sets the value of Content.
+func (s *Opinion) SetContent(val string) {
+	s.Content = val
 }
 
 // SetParentID sets the value of ParentID.
@@ -2817,14 +2250,14 @@ func (s *Opinion) SetParentID(val OptString) {
 	s.ParentID = val
 }
 
+// SetVoteType sets the value of VoteType.
+func (s *Opinion) SetVoteType(val OptNilOpinionVoteType) {
+	s.VoteType = val
+}
+
 // SetPictureURL sets the value of PictureURL.
 func (s *Opinion) SetPictureURL(val OptNilString) {
 	s.PictureURL = val
-}
-
-// SetPostedAt sets the value of PostedAt.
-func (s *Opinion) SetPostedAt(val string) {
-	s.PostedAt = val
 }
 
 // SetReferenceURL sets the value of ReferenceURL.
@@ -2832,14 +2265,14 @@ func (s *Opinion) SetReferenceURL(val OptString) {
 	s.ReferenceURL = val
 }
 
-// SetTitle sets the value of Title.
-func (s *Opinion) SetTitle(val OptString) {
-	s.Title = val
+// SetPostedAt sets the value of PostedAt.
+func (s *Opinion) SetPostedAt(val string) {
+	s.PostedAt = val
 }
 
-// SetVoteType sets the value of VoteType.
-func (s *Opinion) SetVoteType(val OptNilOpinionVoteType) {
-	s.VoteType = val
+// SetIsDeleted sets the value of IsDeleted.
+func (s *Opinion) SetIsDeleted(val bool) {
+	s.IsDeleted = val
 }
 
 type OpinionComments2BadRequest struct {
@@ -2897,266 +2330,28 @@ func (s *OpinionComments2InternalServerError) SetMessage(val string) {
 func (*OpinionComments2InternalServerError) opinionComments2Res() {}
 
 type OpinionComments2OK struct {
-	Opinions []OpinionComments2OKOpinionsItem `json:"opinions"`
+	Opinions []OpinionWithVote `json:"opinions"`
 }
 
 // GetOpinions returns the value of Opinions.
-func (s *OpinionComments2OK) GetOpinions() []OpinionComments2OKOpinionsItem {
+func (s *OpinionComments2OK) GetOpinions() []OpinionWithVote {
 	return s.Opinions
 }
 
 // SetOpinions sets the value of Opinions.
-func (s *OpinionComments2OK) SetOpinions(val []OpinionComments2OKOpinionsItem) {
+func (s *OpinionComments2OK) SetOpinions(val []OpinionWithVote) {
 	s.Opinions = val
 }
 
 func (*OpinionComments2OK) opinionComments2Res() {}
 
-type OpinionComments2OKOpinionsItem struct {
-	MyVoteType OptNilOpinionComments2OKOpinionsItemMyVoteType `json:"myVoteType"`
-	Opinion    Opinion                                        `json:"opinion"`
-	User       User                                           `json:"user"`
-}
-
-// GetMyVoteType returns the value of MyVoteType.
-func (s *OpinionComments2OKOpinionsItem) GetMyVoteType() OptNilOpinionComments2OKOpinionsItemMyVoteType {
-	return s.MyVoteType
-}
-
-// GetOpinion returns the value of Opinion.
-func (s *OpinionComments2OKOpinionsItem) GetOpinion() Opinion {
-	return s.Opinion
-}
-
-// GetUser returns the value of User.
-func (s *OpinionComments2OKOpinionsItem) GetUser() User {
-	return s.User
-}
-
-// SetMyVoteType sets the value of MyVoteType.
-func (s *OpinionComments2OKOpinionsItem) SetMyVoteType(val OptNilOpinionComments2OKOpinionsItemMyVoteType) {
-	s.MyVoteType = val
-}
-
-// SetOpinion sets the value of Opinion.
-func (s *OpinionComments2OKOpinionsItem) SetOpinion(val Opinion) {
-	s.Opinion = val
-}
-
-// SetUser sets the value of User.
-func (s *OpinionComments2OKOpinionsItem) SetUser(val User) {
-	s.User = val
-}
-
-type OpinionComments2OKOpinionsItemMyVoteType string
-
-const (
-	OpinionComments2OKOpinionsItemMyVoteTypeAgree    OpinionComments2OKOpinionsItemMyVoteType = "agree"
-	OpinionComments2OKOpinionsItemMyVoteTypeDisagree OpinionComments2OKOpinionsItemMyVoteType = "disagree"
-	OpinionComments2OKOpinionsItemMyVoteTypePass     OpinionComments2OKOpinionsItemMyVoteType = "pass"
-)
-
-// AllValues returns all OpinionComments2OKOpinionsItemMyVoteType values.
-func (OpinionComments2OKOpinionsItemMyVoteType) AllValues() []OpinionComments2OKOpinionsItemMyVoteType {
-	return []OpinionComments2OKOpinionsItemMyVoteType{
-		OpinionComments2OKOpinionsItemMyVoteTypeAgree,
-		OpinionComments2OKOpinionsItemMyVoteTypeDisagree,
-		OpinionComments2OKOpinionsItemMyVoteTypePass,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s OpinionComments2OKOpinionsItemMyVoteType) MarshalText() ([]byte, error) {
-	switch s {
-	case OpinionComments2OKOpinionsItemMyVoteTypeAgree:
-		return []byte(s), nil
-	case OpinionComments2OKOpinionsItemMyVoteTypeDisagree:
-		return []byte(s), nil
-	case OpinionComments2OKOpinionsItemMyVoteTypePass:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *OpinionComments2OKOpinionsItemMyVoteType) UnmarshalText(data []byte) error {
-	switch OpinionComments2OKOpinionsItemMyVoteType(data) {
-	case OpinionComments2OKOpinionsItemMyVoteTypeAgree:
-		*s = OpinionComments2OKOpinionsItemMyVoteTypeAgree
-		return nil
-	case OpinionComments2OKOpinionsItemMyVoteTypeDisagree:
-		*s = OpinionComments2OKOpinionsItemMyVoteTypeDisagree
-		return nil
-	case OpinionComments2OKOpinionsItemMyVoteTypePass:
-		*s = OpinionComments2OKOpinionsItemMyVoteTypePass
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
-}
-
-type OpinionCommentsBadRequest struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-}
-
-// GetCode returns the value of Code.
-func (s *OpinionCommentsBadRequest) GetCode() string {
-	return s.Code
-}
-
-// GetMessage returns the value of Message.
-func (s *OpinionCommentsBadRequest) GetMessage() string {
-	return s.Message
-}
-
-// SetCode sets the value of Code.
-func (s *OpinionCommentsBadRequest) SetCode(val string) {
-	s.Code = val
-}
-
-// SetMessage sets the value of Message.
-func (s *OpinionCommentsBadRequest) SetMessage(val string) {
-	s.Message = val
-}
-
-func (*OpinionCommentsBadRequest) opinionCommentsRes() {}
-
-type OpinionCommentsInternalServerError struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-}
-
-// GetCode returns the value of Code.
-func (s *OpinionCommentsInternalServerError) GetCode() string {
-	return s.Code
-}
-
-// GetMessage returns the value of Message.
-func (s *OpinionCommentsInternalServerError) GetMessage() string {
-	return s.Message
-}
-
-// SetCode sets the value of Code.
-func (s *OpinionCommentsInternalServerError) SetCode(val string) {
-	s.Code = val
-}
-
-// SetMessage sets the value of Message.
-func (s *OpinionCommentsInternalServerError) SetMessage(val string) {
-	s.Message = val
-}
-
-func (*OpinionCommentsInternalServerError) opinionCommentsRes() {}
-
-type OpinionCommentsOK struct {
-	Opinions []OpinionCommentsOKOpinionsItem `json:"opinions"`
-}
-
-// GetOpinions returns the value of Opinions.
-func (s *OpinionCommentsOK) GetOpinions() []OpinionCommentsOKOpinionsItem {
-	return s.Opinions
-}
-
-// SetOpinions sets the value of Opinions.
-func (s *OpinionCommentsOK) SetOpinions(val []OpinionCommentsOKOpinionsItem) {
-	s.Opinions = val
-}
-
-func (*OpinionCommentsOK) opinionCommentsRes() {}
-
-type OpinionCommentsOKOpinionsItem struct {
-	MyVoteType OptNilOpinionCommentsOKOpinionsItemMyVoteType `json:"myVoteType"`
-	Opinion    Opinion                                       `json:"opinion"`
-	User       User                                          `json:"user"`
-}
-
-// GetMyVoteType returns the value of MyVoteType.
-func (s *OpinionCommentsOKOpinionsItem) GetMyVoteType() OptNilOpinionCommentsOKOpinionsItemMyVoteType {
-	return s.MyVoteType
-}
-
-// GetOpinion returns the value of Opinion.
-func (s *OpinionCommentsOKOpinionsItem) GetOpinion() Opinion {
-	return s.Opinion
-}
-
-// GetUser returns the value of User.
-func (s *OpinionCommentsOKOpinionsItem) GetUser() User {
-	return s.User
-}
-
-// SetMyVoteType sets the value of MyVoteType.
-func (s *OpinionCommentsOKOpinionsItem) SetMyVoteType(val OptNilOpinionCommentsOKOpinionsItemMyVoteType) {
-	s.MyVoteType = val
-}
-
-// SetOpinion sets the value of Opinion.
-func (s *OpinionCommentsOKOpinionsItem) SetOpinion(val Opinion) {
-	s.Opinion = val
-}
-
-// SetUser sets the value of User.
-func (s *OpinionCommentsOKOpinionsItem) SetUser(val User) {
-	s.User = val
-}
-
-type OpinionCommentsOKOpinionsItemMyVoteType string
-
-const (
-	OpinionCommentsOKOpinionsItemMyVoteTypeAgree    OpinionCommentsOKOpinionsItemMyVoteType = "agree"
-	OpinionCommentsOKOpinionsItemMyVoteTypeDisagree OpinionCommentsOKOpinionsItemMyVoteType = "disagree"
-	OpinionCommentsOKOpinionsItemMyVoteTypePass     OpinionCommentsOKOpinionsItemMyVoteType = "pass"
-)
-
-// AllValues returns all OpinionCommentsOKOpinionsItemMyVoteType values.
-func (OpinionCommentsOKOpinionsItemMyVoteType) AllValues() []OpinionCommentsOKOpinionsItemMyVoteType {
-	return []OpinionCommentsOKOpinionsItemMyVoteType{
-		OpinionCommentsOKOpinionsItemMyVoteTypeAgree,
-		OpinionCommentsOKOpinionsItemMyVoteTypeDisagree,
-		OpinionCommentsOKOpinionsItemMyVoteTypePass,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s OpinionCommentsOKOpinionsItemMyVoteType) MarshalText() ([]byte, error) {
-	switch s {
-	case OpinionCommentsOKOpinionsItemMyVoteTypeAgree:
-		return []byte(s), nil
-	case OpinionCommentsOKOpinionsItemMyVoteTypeDisagree:
-		return []byte(s), nil
-	case OpinionCommentsOKOpinionsItemMyVoteTypePass:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *OpinionCommentsOKOpinionsItemMyVoteType) UnmarshalText(data []byte) error {
-	switch OpinionCommentsOKOpinionsItemMyVoteType(data) {
-	case OpinionCommentsOKOpinionsItemMyVoteTypeAgree:
-		*s = OpinionCommentsOKOpinionsItemMyVoteTypeAgree
-		return nil
-	case OpinionCommentsOKOpinionsItemMyVoteTypeDisagree:
-		*s = OpinionCommentsOKOpinionsItemMyVoteTypeDisagree
-		return nil
-	case OpinionCommentsOKOpinionsItemMyVoteTypePass:
-		*s = OpinionCommentsOKOpinionsItemMyVoteTypePass
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
-}
-
-// Ref: #/components/schemas/opinionGroupRatio
+// Ref: #/components/schemas/OpinionGroupRatio
 type OpinionGroupRatio struct {
 	AgreeCount    int    `json:"agreeCount"`
 	DisagreeCount int    `json:"disagreeCount"`
+	PassCount     int    `json:"passCount"`
 	GroupID       int    `json:"groupID"`
 	GroupName     string `json:"groupName"`
-	PassCount     int    `json:"passCount"`
 }
 
 // GetAgreeCount returns the value of AgreeCount.
@@ -3169,6 +2364,11 @@ func (s *OpinionGroupRatio) GetDisagreeCount() int {
 	return s.DisagreeCount
 }
 
+// GetPassCount returns the value of PassCount.
+func (s *OpinionGroupRatio) GetPassCount() int {
+	return s.PassCount
+}
+
 // GetGroupID returns the value of GroupID.
 func (s *OpinionGroupRatio) GetGroupID() int {
 	return s.GroupID
@@ -3177,11 +2377,6 @@ func (s *OpinionGroupRatio) GetGroupID() int {
 // GetGroupName returns the value of GroupName.
 func (s *OpinionGroupRatio) GetGroupName() string {
 	return s.GroupName
-}
-
-// GetPassCount returns the value of PassCount.
-func (s *OpinionGroupRatio) GetPassCount() int {
-	return s.PassCount
 }
 
 // SetAgreeCount sets the value of AgreeCount.
@@ -3194,6 +2389,11 @@ func (s *OpinionGroupRatio) SetDisagreeCount(val int) {
 	s.DisagreeCount = val
 }
 
+// SetPassCount sets the value of PassCount.
+func (s *OpinionGroupRatio) SetPassCount(val int) {
+	s.PassCount = val
+}
+
 // SetGroupID sets the value of GroupID.
 func (s *OpinionGroupRatio) SetGroupID(val int) {
 	s.GroupID = val
@@ -3204,25 +2404,20 @@ func (s *OpinionGroupRatio) SetGroupName(val string) {
 	s.GroupName = val
 }
 
-// SetPassCount sets the value of PassCount.
-func (s *OpinionGroupRatio) SetPassCount(val int) {
-	s.PassCount = val
-}
-
-// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
+// 投票タイプ.
 type OpinionVoteType string
 
 const (
-	OpinionVoteTypeDisagree OpinionVoteType = "disagree"
 	OpinionVoteTypeAgree    OpinionVoteType = "agree"
+	OpinionVoteTypeDisagree OpinionVoteType = "disagree"
 	OpinionVoteTypePass     OpinionVoteType = "pass"
 )
 
 // AllValues returns all OpinionVoteType values.
 func (OpinionVoteType) AllValues() []OpinionVoteType {
 	return []OpinionVoteType{
-		OpinionVoteTypeDisagree,
 		OpinionVoteTypeAgree,
+		OpinionVoteTypeDisagree,
 		OpinionVoteTypePass,
 	}
 }
@@ -3230,9 +2425,9 @@ func (OpinionVoteType) AllValues() []OpinionVoteType {
 // MarshalText implements encoding.TextMarshaler.
 func (s OpinionVoteType) MarshalText() ([]byte, error) {
 	switch s {
-	case OpinionVoteTypeDisagree:
-		return []byte(s), nil
 	case OpinionVoteTypeAgree:
+		return []byte(s), nil
+	case OpinionVoteTypeDisagree:
 		return []byte(s), nil
 	case OpinionVoteTypePass:
 		return []byte(s), nil
@@ -3244,14 +2439,239 @@ func (s OpinionVoteType) MarshalText() ([]byte, error) {
 // UnmarshalText implements encoding.TextUnmarshaler.
 func (s *OpinionVoteType) UnmarshalText(data []byte) error {
 	switch OpinionVoteType(data) {
-	case OpinionVoteTypeDisagree:
-		*s = OpinionVoteTypeDisagree
-		return nil
 	case OpinionVoteTypeAgree:
 		*s = OpinionVoteTypeAgree
 		return nil
+	case OpinionVoteTypeDisagree:
+		*s = OpinionVoteTypeDisagree
+		return nil
 	case OpinionVoteTypePass:
 		*s = OpinionVoteTypePass
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// 意見とリプライ数と投票情報を含むレスポンス.
+// Ref: #/components/schemas/OpinionWithReplyAndVote
+type OpinionWithReplyAndVote struct {
+	Opinion    Opinion                                 `json:"opinion"`
+	User       User                                    `json:"user"`
+	ReplyCount int                                     `json:"replyCount"`
+	MyVoteType OptNilOpinionWithReplyAndVoteMyVoteType `json:"myVoteType"`
+}
+
+// GetOpinion returns the value of Opinion.
+func (s *OpinionWithReplyAndVote) GetOpinion() Opinion {
+	return s.Opinion
+}
+
+// GetUser returns the value of User.
+func (s *OpinionWithReplyAndVote) GetUser() User {
+	return s.User
+}
+
+// GetReplyCount returns the value of ReplyCount.
+func (s *OpinionWithReplyAndVote) GetReplyCount() int {
+	return s.ReplyCount
+}
+
+// GetMyVoteType returns the value of MyVoteType.
+func (s *OpinionWithReplyAndVote) GetMyVoteType() OptNilOpinionWithReplyAndVoteMyVoteType {
+	return s.MyVoteType
+}
+
+// SetOpinion sets the value of Opinion.
+func (s *OpinionWithReplyAndVote) SetOpinion(val Opinion) {
+	s.Opinion = val
+}
+
+// SetUser sets the value of User.
+func (s *OpinionWithReplyAndVote) SetUser(val User) {
+	s.User = val
+}
+
+// SetReplyCount sets the value of ReplyCount.
+func (s *OpinionWithReplyAndVote) SetReplyCount(val int) {
+	s.ReplyCount = val
+}
+
+// SetMyVoteType sets the value of MyVoteType.
+func (s *OpinionWithReplyAndVote) SetMyVoteType(val OptNilOpinionWithReplyAndVoteMyVoteType) {
+	s.MyVoteType = val
+}
+
+// 投票タイプ.
+type OpinionWithReplyAndVoteMyVoteType string
+
+const (
+	OpinionWithReplyAndVoteMyVoteTypeAgree    OpinionWithReplyAndVoteMyVoteType = "agree"
+	OpinionWithReplyAndVoteMyVoteTypeDisagree OpinionWithReplyAndVoteMyVoteType = "disagree"
+	OpinionWithReplyAndVoteMyVoteTypePass     OpinionWithReplyAndVoteMyVoteType = "pass"
+)
+
+// AllValues returns all OpinionWithReplyAndVoteMyVoteType values.
+func (OpinionWithReplyAndVoteMyVoteType) AllValues() []OpinionWithReplyAndVoteMyVoteType {
+	return []OpinionWithReplyAndVoteMyVoteType{
+		OpinionWithReplyAndVoteMyVoteTypeAgree,
+		OpinionWithReplyAndVoteMyVoteTypeDisagree,
+		OpinionWithReplyAndVoteMyVoteTypePass,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s OpinionWithReplyAndVoteMyVoteType) MarshalText() ([]byte, error) {
+	switch s {
+	case OpinionWithReplyAndVoteMyVoteTypeAgree:
+		return []byte(s), nil
+	case OpinionWithReplyAndVoteMyVoteTypeDisagree:
+		return []byte(s), nil
+	case OpinionWithReplyAndVoteMyVoteTypePass:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *OpinionWithReplyAndVoteMyVoteType) UnmarshalText(data []byte) error {
+	switch OpinionWithReplyAndVoteMyVoteType(data) {
+	case OpinionWithReplyAndVoteMyVoteTypeAgree:
+		*s = OpinionWithReplyAndVoteMyVoteTypeAgree
+		return nil
+	case OpinionWithReplyAndVoteMyVoteTypeDisagree:
+		*s = OpinionWithReplyAndVoteMyVoteTypeDisagree
+		return nil
+	case OpinionWithReplyAndVoteMyVoteTypePass:
+		*s = OpinionWithReplyAndVoteMyVoteTypePass
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// 意見とリプライ数を含むレスポンス.
+// Ref: #/components/schemas/OpinionWithReplyCount
+type OpinionWithReplyCount struct {
+	Opinion    Opinion `json:"opinion"`
+	User       User    `json:"user"`
+	ReplyCount int     `json:"replyCount"`
+}
+
+// GetOpinion returns the value of Opinion.
+func (s *OpinionWithReplyCount) GetOpinion() Opinion {
+	return s.Opinion
+}
+
+// GetUser returns the value of User.
+func (s *OpinionWithReplyCount) GetUser() User {
+	return s.User
+}
+
+// GetReplyCount returns the value of ReplyCount.
+func (s *OpinionWithReplyCount) GetReplyCount() int {
+	return s.ReplyCount
+}
+
+// SetOpinion sets the value of Opinion.
+func (s *OpinionWithReplyCount) SetOpinion(val Opinion) {
+	s.Opinion = val
+}
+
+// SetUser sets the value of User.
+func (s *OpinionWithReplyCount) SetUser(val User) {
+	s.User = val
+}
+
+// SetReplyCount sets the value of ReplyCount.
+func (s *OpinionWithReplyCount) SetReplyCount(val int) {
+	s.ReplyCount = val
+}
+
+// 意見と投票情報を含むレスポンス.
+// Ref: #/components/schemas/OpinionWithVote
+type OpinionWithVote struct {
+	Opinion    Opinion                         `json:"opinion"`
+	User       User                            `json:"user"`
+	MyVoteType OptNilOpinionWithVoteMyVoteType `json:"myVoteType"`
+}
+
+// GetOpinion returns the value of Opinion.
+func (s *OpinionWithVote) GetOpinion() Opinion {
+	return s.Opinion
+}
+
+// GetUser returns the value of User.
+func (s *OpinionWithVote) GetUser() User {
+	return s.User
+}
+
+// GetMyVoteType returns the value of MyVoteType.
+func (s *OpinionWithVote) GetMyVoteType() OptNilOpinionWithVoteMyVoteType {
+	return s.MyVoteType
+}
+
+// SetOpinion sets the value of Opinion.
+func (s *OpinionWithVote) SetOpinion(val Opinion) {
+	s.Opinion = val
+}
+
+// SetUser sets the value of User.
+func (s *OpinionWithVote) SetUser(val User) {
+	s.User = val
+}
+
+// SetMyVoteType sets the value of MyVoteType.
+func (s *OpinionWithVote) SetMyVoteType(val OptNilOpinionWithVoteMyVoteType) {
+	s.MyVoteType = val
+}
+
+func (*OpinionWithVote) getOpinionDetail2Res() {}
+
+// 投票タイプ.
+type OpinionWithVoteMyVoteType string
+
+const (
+	OpinionWithVoteMyVoteTypeAgree    OpinionWithVoteMyVoteType = "agree"
+	OpinionWithVoteMyVoteTypeDisagree OpinionWithVoteMyVoteType = "disagree"
+	OpinionWithVoteMyVoteTypePass     OpinionWithVoteMyVoteType = "pass"
+)
+
+// AllValues returns all OpinionWithVoteMyVoteType values.
+func (OpinionWithVoteMyVoteType) AllValues() []OpinionWithVoteMyVoteType {
+	return []OpinionWithVoteMyVoteType{
+		OpinionWithVoteMyVoteTypeAgree,
+		OpinionWithVoteMyVoteTypeDisagree,
+		OpinionWithVoteMyVoteTypePass,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s OpinionWithVoteMyVoteType) MarshalText() ([]byte, error) {
+	switch s {
+	case OpinionWithVoteMyVoteTypeAgree:
+		return []byte(s), nil
+	case OpinionWithVoteMyVoteTypeDisagree:
+		return []byte(s), nil
+	case OpinionWithVoteMyVoteTypePass:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *OpinionWithVoteMyVoteType) UnmarshalText(data []byte) error {
+	switch OpinionWithVoteMyVoteType(data) {
+	case OpinionWithVoteMyVoteTypeAgree:
+		*s = OpinionWithVoteMyVoteTypeAgree
+		return nil
+	case OpinionWithVoteMyVoteTypeDisagree:
+		*s = OpinionWithVoteMyVoteTypeDisagree
+		return nil
+	case OpinionWithVoteMyVoteTypePass:
+		*s = OpinionWithVoteMyVoteTypePass
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -3267,12 +2687,12 @@ type OpinionsHistoryInternalServerError struct{}
 func (*OpinionsHistoryInternalServerError) opinionsHistoryRes() {}
 
 type OpinionsHistoryOK struct {
-	Opinions   []OpinionsHistoryOKOpinionsItem `json:"opinions"`
-	Pagination OpinionsHistoryOKPagination     `json:"pagination"`
+	Opinions   []OpinionWithReplyCount     `json:"opinions"`
+	Pagination OpinionsHistoryOKPagination `json:"pagination"`
 }
 
 // GetOpinions returns the value of Opinions.
-func (s *OpinionsHistoryOK) GetOpinions() []OpinionsHistoryOKOpinionsItem {
+func (s *OpinionsHistoryOK) GetOpinions() []OpinionWithReplyCount {
 	return s.Opinions
 }
 
@@ -3282,7 +2702,7 @@ func (s *OpinionsHistoryOK) GetPagination() OpinionsHistoryOKPagination {
 }
 
 // SetOpinions sets the value of Opinions.
-func (s *OpinionsHistoryOK) SetOpinions(val []OpinionsHistoryOKOpinionsItem) {
+func (s *OpinionsHistoryOK) SetOpinions(val []OpinionWithReplyCount) {
 	s.Opinions = val
 }
 
@@ -3292,42 +2712,6 @@ func (s *OpinionsHistoryOK) SetPagination(val OpinionsHistoryOKPagination) {
 }
 
 func (*OpinionsHistoryOK) opinionsHistoryRes() {}
-
-type OpinionsHistoryOKOpinionsItem struct {
-	Opinion    Opinion `json:"opinion"`
-	ReplyCount int     `json:"replyCount"`
-	User       User    `json:"user"`
-}
-
-// GetOpinion returns the value of Opinion.
-func (s *OpinionsHistoryOKOpinionsItem) GetOpinion() Opinion {
-	return s.Opinion
-}
-
-// GetReplyCount returns the value of ReplyCount.
-func (s *OpinionsHistoryOKOpinionsItem) GetReplyCount() int {
-	return s.ReplyCount
-}
-
-// GetUser returns the value of User.
-func (s *OpinionsHistoryOKOpinionsItem) GetUser() User {
-	return s.User
-}
-
-// SetOpinion sets the value of Opinion.
-func (s *OpinionsHistoryOKOpinionsItem) SetOpinion(val Opinion) {
-	s.Opinion = val
-}
-
-// SetReplyCount sets the value of ReplyCount.
-func (s *OpinionsHistoryOKOpinionsItem) SetReplyCount(val int) {
-	s.ReplyCount = val
-}
-
-// SetUser sets the value of User.
-func (s *OpinionsHistoryOKOpinionsItem) SetUser(val User) {
-	s.User = val
-}
 
 type OpinionsHistoryOKPagination struct {
 	TotalCount int `json:"totalCount"`
@@ -3431,236 +2815,6 @@ func (o OptBool) Get() (v bool, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptBool) Or(d bool) bool {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptCreateOrganizationsReq returns new OptCreateOrganizationsReq with value set to v.
-func NewOptCreateOrganizationsReq(v CreateOrganizationsReq) OptCreateOrganizationsReq {
-	return OptCreateOrganizationsReq{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptCreateOrganizationsReq is optional CreateOrganizationsReq.
-type OptCreateOrganizationsReq struct {
-	Value CreateOrganizationsReq
-	Set   bool
-}
-
-// IsSet returns true if OptCreateOrganizationsReq was set.
-func (o OptCreateOrganizationsReq) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptCreateOrganizationsReq) Reset() {
-	var v CreateOrganizationsReq
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptCreateOrganizationsReq) SetTo(v CreateOrganizationsReq) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptCreateOrganizationsReq) Get() (v CreateOrganizationsReq, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptCreateOrganizationsReq) Or(d CreateOrganizationsReq) CreateOrganizationsReq {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptCreateTalkSessionReq returns new OptCreateTalkSessionReq with value set to v.
-func NewOptCreateTalkSessionReq(v CreateTalkSessionReq) OptCreateTalkSessionReq {
-	return OptCreateTalkSessionReq{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptCreateTalkSessionReq is optional CreateTalkSessionReq.
-type OptCreateTalkSessionReq struct {
-	Value CreateTalkSessionReq
-	Set   bool
-}
-
-// IsSet returns true if OptCreateTalkSessionReq was set.
-func (o OptCreateTalkSessionReq) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptCreateTalkSessionReq) Reset() {
-	var v CreateTalkSessionReq
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptCreateTalkSessionReq) SetTo(v CreateTalkSessionReq) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptCreateTalkSessionReq) Get() (v CreateTalkSessionReq, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptCreateTalkSessionReq) Or(d CreateTalkSessionReq) CreateTalkSessionReq {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptEditTalkSessionReq returns new OptEditTalkSessionReq with value set to v.
-func NewOptEditTalkSessionReq(v EditTalkSessionReq) OptEditTalkSessionReq {
-	return OptEditTalkSessionReq{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEditTalkSessionReq is optional EditTalkSessionReq.
-type OptEditTalkSessionReq struct {
-	Value EditTalkSessionReq
-	Set   bool
-}
-
-// IsSet returns true if OptEditTalkSessionReq was set.
-func (o OptEditTalkSessionReq) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEditTalkSessionReq) Reset() {
-	var v EditTalkSessionReq
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEditTalkSessionReq) SetTo(v EditTalkSessionReq) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEditTalkSessionReq) Get() (v EditTalkSessionReq, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEditTalkSessionReq) Or(d EditTalkSessionReq) EditTalkSessionReq {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptEditTimeLineReq returns new OptEditTimeLineReq with value set to v.
-func NewOptEditTimeLineReq(v EditTimeLineReq) OptEditTimeLineReq {
-	return OptEditTimeLineReq{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEditTimeLineReq is optional EditTimeLineReq.
-type OptEditTimeLineReq struct {
-	Value EditTimeLineReq
-	Set   bool
-}
-
-// IsSet returns true if OptEditTimeLineReq was set.
-func (o OptEditTimeLineReq) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEditTimeLineReq) Reset() {
-	var v EditTimeLineReq
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEditTimeLineReq) SetTo(v EditTimeLineReq) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEditTimeLineReq) Get() (v EditTimeLineReq, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEditTimeLineReq) Or(d EditTimeLineReq) EditTimeLineReq {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptEditUserProfileReq returns new OptEditUserProfileReq with value set to v.
-func NewOptEditUserProfileReq(v EditUserProfileReq) OptEditUserProfileReq {
-	return OptEditUserProfileReq{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptEditUserProfileReq is optional EditUserProfileReq.
-type OptEditUserProfileReq struct {
-	Value EditUserProfileReq
-	Set   bool
-}
-
-// IsSet returns true if OptEditUserProfileReq was set.
-func (o OptEditUserProfileReq) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptEditUserProfileReq) Reset() {
-	var v EditUserProfileReq
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptEditUserProfileReq) SetTo(v EditUserProfileReq) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptEditUserProfileReq) Get() (v EditUserProfileReq, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptEditUserProfileReq) Or(d EditUserProfileReq) EditUserProfileReq {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -4035,144 +3189,6 @@ func (o OptInt32) Or(d int32) int32 {
 	return d
 }
 
-// NewOptInviteOrganizationForUserReq returns new OptInviteOrganizationForUserReq with value set to v.
-func NewOptInviteOrganizationForUserReq(v InviteOrganizationForUserReq) OptInviteOrganizationForUserReq {
-	return OptInviteOrganizationForUserReq{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptInviteOrganizationForUserReq is optional InviteOrganizationForUserReq.
-type OptInviteOrganizationForUserReq struct {
-	Value InviteOrganizationForUserReq
-	Set   bool
-}
-
-// IsSet returns true if OptInviteOrganizationForUserReq was set.
-func (o OptInviteOrganizationForUserReq) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptInviteOrganizationForUserReq) Reset() {
-	var v InviteOrganizationForUserReq
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptInviteOrganizationForUserReq) SetTo(v InviteOrganizationForUserReq) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptInviteOrganizationForUserReq) Get() (v InviteOrganizationForUserReq, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptInviteOrganizationForUserReq) Or(d InviteOrganizationForUserReq) InviteOrganizationForUserReq {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptInviteOrganizationReq returns new OptInviteOrganizationReq with value set to v.
-func NewOptInviteOrganizationReq(v InviteOrganizationReq) OptInviteOrganizationReq {
-	return OptInviteOrganizationReq{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptInviteOrganizationReq is optional InviteOrganizationReq.
-type OptInviteOrganizationReq struct {
-	Value InviteOrganizationReq
-	Set   bool
-}
-
-// IsSet returns true if OptInviteOrganizationReq was set.
-func (o OptInviteOrganizationReq) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptInviteOrganizationReq) Reset() {
-	var v InviteOrganizationReq
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptInviteOrganizationReq) SetTo(v InviteOrganizationReq) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptInviteOrganizationReq) Get() (v InviteOrganizationReq, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptInviteOrganizationReq) Or(d InviteOrganizationReq) InviteOrganizationReq {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptLocation returns new OptLocation with value set to v.
-func NewOptLocation(v Location) OptLocation {
-	return OptLocation{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptLocation is optional Location.
-type OptLocation struct {
-	Value Location
-	Set   bool
-}
-
-// IsSet returns true if OptLocation was set.
-func (o OptLocation) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptLocation) Reset() {
-	var v Location
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptLocation) SetTo(v Location) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptLocation) Get() (v Location, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptLocation) Or(d Location) Location {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptMultipartFile returns new OptMultipartFile with value set to v.
 func NewOptMultipartFile(v ht.MultipartFile) OptMultipartFile {
 	return OptMultipartFile{
@@ -4282,52 +3298,52 @@ func (o OptNilBool) Or(d bool) bool {
 	return d
 }
 
-// NewOptNilEditUserProfileReqGender returns new OptNilEditUserProfileReqGender with value set to v.
-func NewOptNilEditUserProfileReqGender(v EditUserProfileReqGender) OptNilEditUserProfileReqGender {
-	return OptNilEditUserProfileReqGender{
+// NewOptNilEstablishUserReqGender returns new OptNilEstablishUserReqGender with value set to v.
+func NewOptNilEstablishUserReqGender(v EstablishUserReqGender) OptNilEstablishUserReqGender {
+	return OptNilEstablishUserReqGender{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptNilEditUserProfileReqGender is optional nullable EditUserProfileReqGender.
-type OptNilEditUserProfileReqGender struct {
-	Value EditUserProfileReqGender
+// OptNilEstablishUserReqGender is optional nullable EstablishUserReqGender.
+type OptNilEstablishUserReqGender struct {
+	Value EstablishUserReqGender
 	Set   bool
 	Null  bool
 }
 
-// IsSet returns true if OptNilEditUserProfileReqGender was set.
-func (o OptNilEditUserProfileReqGender) IsSet() bool { return o.Set }
+// IsSet returns true if OptNilEstablishUserReqGender was set.
+func (o OptNilEstablishUserReqGender) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptNilEditUserProfileReqGender) Reset() {
-	var v EditUserProfileReqGender
+func (o *OptNilEstablishUserReqGender) Reset() {
+	var v EstablishUserReqGender
 	o.Value = v
 	o.Set = false
 	o.Null = false
 }
 
 // SetTo sets value to v.
-func (o *OptNilEditUserProfileReqGender) SetTo(v EditUserProfileReqGender) {
+func (o *OptNilEstablishUserReqGender) SetTo(v EstablishUserReqGender) {
 	o.Set = true
 	o.Null = false
 	o.Value = v
 }
 
 // IsSet returns true if value is Null.
-func (o OptNilEditUserProfileReqGender) IsNull() bool { return o.Null }
+func (o OptNilEstablishUserReqGender) IsNull() bool { return o.Null }
 
 // SetNull sets value to null.
-func (o *OptNilEditUserProfileReqGender) SetToNull() {
+func (o *OptNilEstablishUserReqGender) SetToNull() {
 	o.Set = true
 	o.Null = true
-	var v EditUserProfileReqGender
+	var v EstablishUserReqGender
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptNilEditUserProfileReqGender) Get() (v EditUserProfileReqGender, ok bool) {
+func (o OptNilEstablishUserReqGender) Get() (v EstablishUserReqGender, ok bool) {
 	if o.Null {
 		return v, false
 	}
@@ -4338,7 +3354,7 @@ func (o OptNilEditUserProfileReqGender) Get() (v EditUserProfileReqGender, ok bo
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptNilEditUserProfileReqGender) Or(d EditUserProfileReqGender) EditUserProfileReqGender {
+func (o OptNilEstablishUserReqGender) Or(d EstablishUserReqGender) EstablishUserReqGender {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -4465,132 +3481,6 @@ func (o OptNilGetOpenedTalkSessionStatus) Get() (v GetOpenedTalkSessionStatus, o
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilGetOpenedTalkSessionStatus) Or(d GetOpenedTalkSessionStatus) GetOpenedTalkSessionStatus {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilGetOpinionDetail2OKMyVoteType returns new OptNilGetOpinionDetail2OKMyVoteType with value set to v.
-func NewOptNilGetOpinionDetail2OKMyVoteType(v GetOpinionDetail2OKMyVoteType) OptNilGetOpinionDetail2OKMyVoteType {
-	return OptNilGetOpinionDetail2OKMyVoteType{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilGetOpinionDetail2OKMyVoteType is optional nullable GetOpinionDetail2OKMyVoteType.
-type OptNilGetOpinionDetail2OKMyVoteType struct {
-	Value GetOpinionDetail2OKMyVoteType
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilGetOpinionDetail2OKMyVoteType was set.
-func (o OptNilGetOpinionDetail2OKMyVoteType) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilGetOpinionDetail2OKMyVoteType) Reset() {
-	var v GetOpinionDetail2OKMyVoteType
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilGetOpinionDetail2OKMyVoteType) SetTo(v GetOpinionDetail2OKMyVoteType) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsSet returns true if value is Null.
-func (o OptNilGetOpinionDetail2OKMyVoteType) IsNull() bool { return o.Null }
-
-// SetNull sets value to null.
-func (o *OptNilGetOpinionDetail2OKMyVoteType) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v GetOpinionDetail2OKMyVoteType
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilGetOpinionDetail2OKMyVoteType) Get() (v GetOpinionDetail2OKMyVoteType, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilGetOpinionDetail2OKMyVoteType) Or(d GetOpinionDetail2OKMyVoteType) GetOpinionDetail2OKMyVoteType {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilGetOpinionsForTalkSessionOKOpinionsItemMyVoteType returns new OptNilGetOpinionsForTalkSessionOKOpinionsItemMyVoteType with value set to v.
-func NewOptNilGetOpinionsForTalkSessionOKOpinionsItemMyVoteType(v GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) OptNilGetOpinionsForTalkSessionOKOpinionsItemMyVoteType {
-	return OptNilGetOpinionsForTalkSessionOKOpinionsItemMyVoteType{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilGetOpinionsForTalkSessionOKOpinionsItemMyVoteType is optional nullable GetOpinionsForTalkSessionOKOpinionsItemMyVoteType.
-type OptNilGetOpinionsForTalkSessionOKOpinionsItemMyVoteType struct {
-	Value GetOpinionsForTalkSessionOKOpinionsItemMyVoteType
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilGetOpinionsForTalkSessionOKOpinionsItemMyVoteType was set.
-func (o OptNilGetOpinionsForTalkSessionOKOpinionsItemMyVoteType) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilGetOpinionsForTalkSessionOKOpinionsItemMyVoteType) Reset() {
-	var v GetOpinionsForTalkSessionOKOpinionsItemMyVoteType
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilGetOpinionsForTalkSessionOKOpinionsItemMyVoteType) SetTo(v GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsSet returns true if value is Null.
-func (o OptNilGetOpinionsForTalkSessionOKOpinionsItemMyVoteType) IsNull() bool { return o.Null }
-
-// SetNull sets value to null.
-func (o *OptNilGetOpinionsForTalkSessionOKOpinionsItemMyVoteType) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v GetOpinionsForTalkSessionOKOpinionsItemMyVoteType
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilGetOpinionsForTalkSessionOKOpinionsItemMyVoteType) Get() (v GetOpinionsForTalkSessionOKOpinionsItemMyVoteType, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilGetOpinionsForTalkSessionOKOpinionsItemMyVoteType) Or(d GetOpinionsForTalkSessionOKOpinionsItemMyVoteType) GetOpinionsForTalkSessionOKOpinionsItemMyVoteType {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -4786,132 +3676,6 @@ func (o OptNilInt) Or(d int) int {
 	return d
 }
 
-// NewOptNilOpinionComments2OKOpinionsItemMyVoteType returns new OptNilOpinionComments2OKOpinionsItemMyVoteType with value set to v.
-func NewOptNilOpinionComments2OKOpinionsItemMyVoteType(v OpinionComments2OKOpinionsItemMyVoteType) OptNilOpinionComments2OKOpinionsItemMyVoteType {
-	return OptNilOpinionComments2OKOpinionsItemMyVoteType{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilOpinionComments2OKOpinionsItemMyVoteType is optional nullable OpinionComments2OKOpinionsItemMyVoteType.
-type OptNilOpinionComments2OKOpinionsItemMyVoteType struct {
-	Value OpinionComments2OKOpinionsItemMyVoteType
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilOpinionComments2OKOpinionsItemMyVoteType was set.
-func (o OptNilOpinionComments2OKOpinionsItemMyVoteType) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilOpinionComments2OKOpinionsItemMyVoteType) Reset() {
-	var v OpinionComments2OKOpinionsItemMyVoteType
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilOpinionComments2OKOpinionsItemMyVoteType) SetTo(v OpinionComments2OKOpinionsItemMyVoteType) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsSet returns true if value is Null.
-func (o OptNilOpinionComments2OKOpinionsItemMyVoteType) IsNull() bool { return o.Null }
-
-// SetNull sets value to null.
-func (o *OptNilOpinionComments2OKOpinionsItemMyVoteType) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v OpinionComments2OKOpinionsItemMyVoteType
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilOpinionComments2OKOpinionsItemMyVoteType) Get() (v OpinionComments2OKOpinionsItemMyVoteType, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilOpinionComments2OKOpinionsItemMyVoteType) Or(d OpinionComments2OKOpinionsItemMyVoteType) OpinionComments2OKOpinionsItemMyVoteType {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilOpinionCommentsOKOpinionsItemMyVoteType returns new OptNilOpinionCommentsOKOpinionsItemMyVoteType with value set to v.
-func NewOptNilOpinionCommentsOKOpinionsItemMyVoteType(v OpinionCommentsOKOpinionsItemMyVoteType) OptNilOpinionCommentsOKOpinionsItemMyVoteType {
-	return OptNilOpinionCommentsOKOpinionsItemMyVoteType{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilOpinionCommentsOKOpinionsItemMyVoteType is optional nullable OpinionCommentsOKOpinionsItemMyVoteType.
-type OptNilOpinionCommentsOKOpinionsItemMyVoteType struct {
-	Value OpinionCommentsOKOpinionsItemMyVoteType
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilOpinionCommentsOKOpinionsItemMyVoteType was set.
-func (o OptNilOpinionCommentsOKOpinionsItemMyVoteType) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilOpinionCommentsOKOpinionsItemMyVoteType) Reset() {
-	var v OpinionCommentsOKOpinionsItemMyVoteType
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilOpinionCommentsOKOpinionsItemMyVoteType) SetTo(v OpinionCommentsOKOpinionsItemMyVoteType) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsSet returns true if value is Null.
-func (o OptNilOpinionCommentsOKOpinionsItemMyVoteType) IsNull() bool { return o.Null }
-
-// SetNull sets value to null.
-func (o *OptNilOpinionCommentsOKOpinionsItemMyVoteType) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v OpinionCommentsOKOpinionsItemMyVoteType
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilOpinionCommentsOKOpinionsItemMyVoteType) Get() (v OpinionCommentsOKOpinionsItemMyVoteType, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilOpinionCommentsOKOpinionsItemMyVoteType) Or(d OpinionCommentsOKOpinionsItemMyVoteType) OpinionCommentsOKOpinionsItemMyVoteType {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptNilOpinionVoteType returns new OptNilOpinionVoteType with value set to v.
 func NewOptNilOpinionVoteType(v OpinionVoteType) OptNilOpinionVoteType {
 	return OptNilOpinionVoteType{
@@ -4975,6 +3739,132 @@ func (o OptNilOpinionVoteType) Or(d OpinionVoteType) OpinionVoteType {
 	return d
 }
 
+// NewOptNilOpinionWithReplyAndVoteMyVoteType returns new OptNilOpinionWithReplyAndVoteMyVoteType with value set to v.
+func NewOptNilOpinionWithReplyAndVoteMyVoteType(v OpinionWithReplyAndVoteMyVoteType) OptNilOpinionWithReplyAndVoteMyVoteType {
+	return OptNilOpinionWithReplyAndVoteMyVoteType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilOpinionWithReplyAndVoteMyVoteType is optional nullable OpinionWithReplyAndVoteMyVoteType.
+type OptNilOpinionWithReplyAndVoteMyVoteType struct {
+	Value OpinionWithReplyAndVoteMyVoteType
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilOpinionWithReplyAndVoteMyVoteType was set.
+func (o OptNilOpinionWithReplyAndVoteMyVoteType) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilOpinionWithReplyAndVoteMyVoteType) Reset() {
+	var v OpinionWithReplyAndVoteMyVoteType
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilOpinionWithReplyAndVoteMyVoteType) SetTo(v OpinionWithReplyAndVoteMyVoteType) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilOpinionWithReplyAndVoteMyVoteType) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilOpinionWithReplyAndVoteMyVoteType) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v OpinionWithReplyAndVoteMyVoteType
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilOpinionWithReplyAndVoteMyVoteType) Get() (v OpinionWithReplyAndVoteMyVoteType, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilOpinionWithReplyAndVoteMyVoteType) Or(d OpinionWithReplyAndVoteMyVoteType) OpinionWithReplyAndVoteMyVoteType {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilOpinionWithVoteMyVoteType returns new OptNilOpinionWithVoteMyVoteType with value set to v.
+func NewOptNilOpinionWithVoteMyVoteType(v OpinionWithVoteMyVoteType) OptNilOpinionWithVoteMyVoteType {
+	return OptNilOpinionWithVoteMyVoteType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilOpinionWithVoteMyVoteType is optional nullable OpinionWithVoteMyVoteType.
+type OptNilOpinionWithVoteMyVoteType struct {
+	Value OpinionWithVoteMyVoteType
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilOpinionWithVoteMyVoteType was set.
+func (o OptNilOpinionWithVoteMyVoteType) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilOpinionWithVoteMyVoteType) Reset() {
+	var v OpinionWithVoteMyVoteType
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilOpinionWithVoteMyVoteType) SetTo(v OpinionWithVoteMyVoteType) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilOpinionWithVoteMyVoteType) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilOpinionWithVoteMyVoteType) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v OpinionWithVoteMyVoteType
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilOpinionWithVoteMyVoteType) Get() (v OpinionWithVoteMyVoteType, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilOpinionWithVoteMyVoteType) Or(d OpinionWithVoteMyVoteType) OpinionWithVoteMyVoteType {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilOpinionsHistorySort returns new OptNilOpinionsHistorySort with value set to v.
 func NewOptNilOpinionsHistorySort(v OpinionsHistorySort) OptNilOpinionsHistorySort {
 	return OptNilOpinionsHistorySort{
@@ -5032,69 +3922,6 @@ func (o OptNilOpinionsHistorySort) Get() (v OpinionsHistorySort, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilOpinionsHistorySort) Or(d OpinionsHistorySort) OpinionsHistorySort {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilRegisterUserReqGender returns new OptNilRegisterUserReqGender with value set to v.
-func NewOptNilRegisterUserReqGender(v RegisterUserReqGender) OptNilRegisterUserReqGender {
-	return OptNilRegisterUserReqGender{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilRegisterUserReqGender is optional nullable RegisterUserReqGender.
-type OptNilRegisterUserReqGender struct {
-	Value RegisterUserReqGender
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilRegisterUserReqGender was set.
-func (o OptNilRegisterUserReqGender) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilRegisterUserReqGender) Reset() {
-	var v RegisterUserReqGender
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilRegisterUserReqGender) SetTo(v RegisterUserReqGender) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsSet returns true if value is Null.
-func (o OptNilRegisterUserReqGender) IsNull() bool { return o.Null }
-
-// SetNull sets value to null.
-func (o *OptNilRegisterUserReqGender) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v RegisterUserReqGender
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilRegisterUserReqGender) Get() (v RegisterUserReqGender, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilRegisterUserReqGender) Or(d RegisterUserReqGender) RegisterUserReqGender {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -5227,38 +4054,55 @@ func (o OptNilString) Or(d string) string {
 	return d
 }
 
-// NewOptPasswordLoginReq returns new OptPasswordLoginReq with value set to v.
-func NewOptPasswordLoginReq(v PasswordLoginReq) OptPasswordLoginReq {
-	return OptPasswordLoginReq{
+// NewOptNilTalkSessionOrganizationAlias returns new OptNilTalkSessionOrganizationAlias with value set to v.
+func NewOptNilTalkSessionOrganizationAlias(v TalkSessionOrganizationAlias) OptNilTalkSessionOrganizationAlias {
+	return OptNilTalkSessionOrganizationAlias{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptPasswordLoginReq is optional PasswordLoginReq.
-type OptPasswordLoginReq struct {
-	Value PasswordLoginReq
+// OptNilTalkSessionOrganizationAlias is optional nullable TalkSessionOrganizationAlias.
+type OptNilTalkSessionOrganizationAlias struct {
+	Value TalkSessionOrganizationAlias
 	Set   bool
+	Null  bool
 }
 
-// IsSet returns true if OptPasswordLoginReq was set.
-func (o OptPasswordLoginReq) IsSet() bool { return o.Set }
+// IsSet returns true if OptNilTalkSessionOrganizationAlias was set.
+func (o OptNilTalkSessionOrganizationAlias) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptPasswordLoginReq) Reset() {
-	var v PasswordLoginReq
+func (o *OptNilTalkSessionOrganizationAlias) Reset() {
+	var v TalkSessionOrganizationAlias
 	o.Value = v
 	o.Set = false
+	o.Null = false
 }
 
 // SetTo sets value to v.
-func (o *OptPasswordLoginReq) SetTo(v PasswordLoginReq) {
+func (o *OptNilTalkSessionOrganizationAlias) SetTo(v TalkSessionOrganizationAlias) {
 	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilTalkSessionOrganizationAlias) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilTalkSessionOrganizationAlias) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v TalkSessionOrganizationAlias
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptPasswordLoginReq) Get() (v PasswordLoginReq, ok bool) {
+func (o OptNilTalkSessionOrganizationAlias) Get() (v TalkSessionOrganizationAlias, ok bool) {
+	if o.Null {
+		return v, false
+	}
 	if !o.Set {
 		return v, false
 	}
@@ -5266,45 +4110,62 @@ func (o OptPasswordLoginReq) Get() (v PasswordLoginReq, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptPasswordLoginReq) Or(d PasswordLoginReq) PasswordLoginReq {
+func (o OptNilTalkSessionOrganizationAlias) Or(d TalkSessionOrganizationAlias) TalkSessionOrganizationAlias {
 	if v, ok := o.Get(); ok {
 		return v
 	}
 	return d
 }
 
-// NewOptPasswordRegisterReq returns new OptPasswordRegisterReq with value set to v.
-func NewOptPasswordRegisterReq(v PasswordRegisterReq) OptPasswordRegisterReq {
-	return OptPasswordRegisterReq{
+// NewOptNilUpdateUserProfileReqGender returns new OptNilUpdateUserProfileReqGender with value set to v.
+func NewOptNilUpdateUserProfileReqGender(v UpdateUserProfileReqGender) OptNilUpdateUserProfileReqGender {
+	return OptNilUpdateUserProfileReqGender{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptPasswordRegisterReq is optional PasswordRegisterReq.
-type OptPasswordRegisterReq struct {
-	Value PasswordRegisterReq
+// OptNilUpdateUserProfileReqGender is optional nullable UpdateUserProfileReqGender.
+type OptNilUpdateUserProfileReqGender struct {
+	Value UpdateUserProfileReqGender
 	Set   bool
+	Null  bool
 }
 
-// IsSet returns true if OptPasswordRegisterReq was set.
-func (o OptPasswordRegisterReq) IsSet() bool { return o.Set }
+// IsSet returns true if OptNilUpdateUserProfileReqGender was set.
+func (o OptNilUpdateUserProfileReqGender) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptPasswordRegisterReq) Reset() {
-	var v PasswordRegisterReq
+func (o *OptNilUpdateUserProfileReqGender) Reset() {
+	var v UpdateUserProfileReqGender
 	o.Value = v
 	o.Set = false
+	o.Null = false
 }
 
 // SetTo sets value to v.
-func (o *OptPasswordRegisterReq) SetTo(v PasswordRegisterReq) {
+func (o *OptNilUpdateUserProfileReqGender) SetTo(v UpdateUserProfileReqGender) {
 	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilUpdateUserProfileReqGender) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilUpdateUserProfileReqGender) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v UpdateUserProfileReqGender
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptPasswordRegisterReq) Get() (v PasswordRegisterReq, ok bool) {
+func (o OptNilUpdateUserProfileReqGender) Get() (v UpdateUserProfileReqGender, ok bool) {
+	if o.Null {
+		return v, false
+	}
 	if !o.Set {
 		return v, false
 	}
@@ -5312,45 +4173,45 @@ func (o OptPasswordRegisterReq) Get() (v PasswordRegisterReq, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptPasswordRegisterReq) Or(d PasswordRegisterReq) PasswordRegisterReq {
+func (o OptNilUpdateUserProfileReqGender) Or(d UpdateUserProfileReqGender) UpdateUserProfileReqGender {
 	if v, ok := o.Get(); ok {
 		return v
 	}
 	return d
 }
 
-// NewOptPolicyConsentReq returns new OptPolicyConsentReq with value set to v.
-func NewOptPolicyConsentReq(v PolicyConsentReq) OptPolicyConsentReq {
-	return OptPolicyConsentReq{
+// NewOptOrganization returns new OptOrganization with value set to v.
+func NewOptOrganization(v Organization) OptOrganization {
+	return OptOrganization{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptPolicyConsentReq is optional PolicyConsentReq.
-type OptPolicyConsentReq struct {
-	Value PolicyConsentReq
+// OptOrganization is optional Organization.
+type OptOrganization struct {
+	Value Organization
 	Set   bool
 }
 
-// IsSet returns true if OptPolicyConsentReq was set.
-func (o OptPolicyConsentReq) IsSet() bool { return o.Set }
+// IsSet returns true if OptOrganization was set.
+func (o OptOrganization) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptPolicyConsentReq) Reset() {
-	var v PolicyConsentReq
+func (o *OptOrganization) Reset() {
+	var v Organization
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptPolicyConsentReq) SetTo(v PolicyConsentReq) {
+func (o *OptOrganization) SetTo(v Organization) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptPolicyConsentReq) Get() (v PolicyConsentReq, ok bool) {
+func (o OptOrganization) Get() (v Organization, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -5358,375 +4219,7 @@ func (o OptPolicyConsentReq) Get() (v PolicyConsentReq, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptPolicyConsentReq) Or(d PolicyConsentReq) PolicyConsentReq {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptPostConclusionReq returns new OptPostConclusionReq with value set to v.
-func NewOptPostConclusionReq(v PostConclusionReq) OptPostConclusionReq {
-	return OptPostConclusionReq{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptPostConclusionReq is optional PostConclusionReq.
-type OptPostConclusionReq struct {
-	Value PostConclusionReq
-	Set   bool
-}
-
-// IsSet returns true if OptPostConclusionReq was set.
-func (o OptPostConclusionReq) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptPostConclusionReq) Reset() {
-	var v PostConclusionReq
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptPostConclusionReq) SetTo(v PostConclusionReq) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptPostConclusionReq) Get() (v PostConclusionReq, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptPostConclusionReq) Or(d PostConclusionReq) PostConclusionReq {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptPostImageReq returns new OptPostImageReq with value set to v.
-func NewOptPostImageReq(v PostImageReq) OptPostImageReq {
-	return OptPostImageReq{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptPostImageReq is optional PostImageReq.
-type OptPostImageReq struct {
-	Value PostImageReq
-	Set   bool
-}
-
-// IsSet returns true if OptPostImageReq was set.
-func (o OptPostImageReq) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptPostImageReq) Reset() {
-	var v PostImageReq
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptPostImageReq) SetTo(v PostImageReq) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptPostImageReq) Get() (v PostImageReq, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptPostImageReq) Or(d PostImageReq) PostImageReq {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptPostOpinionPost2Req returns new OptPostOpinionPost2Req with value set to v.
-func NewOptPostOpinionPost2Req(v PostOpinionPost2Req) OptPostOpinionPost2Req {
-	return OptPostOpinionPost2Req{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptPostOpinionPost2Req is optional PostOpinionPost2Req.
-type OptPostOpinionPost2Req struct {
-	Value PostOpinionPost2Req
-	Set   bool
-}
-
-// IsSet returns true if OptPostOpinionPost2Req was set.
-func (o OptPostOpinionPost2Req) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptPostOpinionPost2Req) Reset() {
-	var v PostOpinionPost2Req
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptPostOpinionPost2Req) SetTo(v PostOpinionPost2Req) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptPostOpinionPost2Req) Get() (v PostOpinionPost2Req, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptPostOpinionPost2Req) Or(d PostOpinionPost2Req) PostOpinionPost2Req {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptPostOpinionPostReq returns new OptPostOpinionPostReq with value set to v.
-func NewOptPostOpinionPostReq(v PostOpinionPostReq) OptPostOpinionPostReq {
-	return OptPostOpinionPostReq{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptPostOpinionPostReq is optional PostOpinionPostReq.
-type OptPostOpinionPostReq struct {
-	Value PostOpinionPostReq
-	Set   bool
-}
-
-// IsSet returns true if OptPostOpinionPostReq was set.
-func (o OptPostOpinionPostReq) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptPostOpinionPostReq) Reset() {
-	var v PostOpinionPostReq
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptPostOpinionPostReq) SetTo(v PostOpinionPostReq) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptPostOpinionPostReq) Get() (v PostOpinionPostReq, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptPostOpinionPostReq) Or(d PostOpinionPostReq) PostOpinionPostReq {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptPostTimeLineItemReq returns new OptPostTimeLineItemReq with value set to v.
-func NewOptPostTimeLineItemReq(v PostTimeLineItemReq) OptPostTimeLineItemReq {
-	return OptPostTimeLineItemReq{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptPostTimeLineItemReq is optional PostTimeLineItemReq.
-type OptPostTimeLineItemReq struct {
-	Value PostTimeLineItemReq
-	Set   bool
-}
-
-// IsSet returns true if OptPostTimeLineItemReq was set.
-func (o OptPostTimeLineItemReq) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptPostTimeLineItemReq) Reset() {
-	var v PostTimeLineItemReq
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptPostTimeLineItemReq) SetTo(v PostTimeLineItemReq) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptPostTimeLineItemReq) Get() (v PostTimeLineItemReq, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptPostTimeLineItemReq) Or(d PostTimeLineItemReq) PostTimeLineItemReq {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptRegisterUserReq returns new OptRegisterUserReq with value set to v.
-func NewOptRegisterUserReq(v RegisterUserReq) OptRegisterUserReq {
-	return OptRegisterUserReq{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptRegisterUserReq is optional RegisterUserReq.
-type OptRegisterUserReq struct {
-	Value RegisterUserReq
-	Set   bool
-}
-
-// IsSet returns true if OptRegisterUserReq was set.
-func (o OptRegisterUserReq) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptRegisterUserReq) Reset() {
-	var v RegisterUserReq
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptRegisterUserReq) SetTo(v RegisterUserReq) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptRegisterUserReq) Get() (v RegisterUserReq, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptRegisterUserReq) Or(d RegisterUserReq) RegisterUserReq {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptReportOpinionReq returns new OptReportOpinionReq with value set to v.
-func NewOptReportOpinionReq(v ReportOpinionReq) OptReportOpinionReq {
-	return OptReportOpinionReq{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptReportOpinionReq is optional ReportOpinionReq.
-type OptReportOpinionReq struct {
-	Value ReportOpinionReq
-	Set   bool
-}
-
-// IsSet returns true if OptReportOpinionReq was set.
-func (o OptReportOpinionReq) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptReportOpinionReq) Reset() {
-	var v ReportOpinionReq
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptReportOpinionReq) SetTo(v ReportOpinionReq) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptReportOpinionReq) Get() (v ReportOpinionReq, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptReportOpinionReq) Or(d ReportOpinionReq) ReportOpinionReq {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptSolveOpinionReportReq returns new OptSolveOpinionReportReq with value set to v.
-func NewOptSolveOpinionReportReq(v SolveOpinionReportReq) OptSolveOpinionReportReq {
-	return OptSolveOpinionReportReq{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptSolveOpinionReportReq is optional SolveOpinionReportReq.
-type OptSolveOpinionReportReq struct {
-	Value SolveOpinionReportReq
-	Set   bool
-}
-
-// IsSet returns true if OptSolveOpinionReportReq was set.
-func (o OptSolveOpinionReportReq) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptSolveOpinionReportReq) Reset() {
-	var v SolveOpinionReportReq
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptSolveOpinionReportReq) SetTo(v SolveOpinionReportReq) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptSolveOpinionReportReq) Get() (v SolveOpinionReportReq, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptSolveOpinionReportReq) Or(d SolveOpinionReportReq) SolveOpinionReportReq {
+func (o OptOrganization) Or(d Organization) Organization {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -5773,6 +4266,52 @@ func (o OptString) Get() (v string, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptString) Or(d string) string {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptTalkSessionLocation returns new OptTalkSessionLocation with value set to v.
+func NewOptTalkSessionLocation(v TalkSessionLocation) OptTalkSessionLocation {
+	return OptTalkSessionLocation{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptTalkSessionLocation is optional TalkSessionLocation.
+type OptTalkSessionLocation struct {
+	Value TalkSessionLocation
+	Set   bool
+}
+
+// IsSet returns true if OptTalkSessionLocation was set.
+func (o OptTalkSessionLocation) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptTalkSessionLocation) Reset() {
+	var v TalkSessionLocation
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptTalkSessionLocation) SetTo(v TalkSessionLocation) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptTalkSessionLocation) Get() (v TalkSessionLocation, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptTalkSessionLocation) Or(d TalkSessionLocation) TalkSessionLocation {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -5871,109 +4410,20 @@ func (o OptUserGroupPosition) Or(d UserGroupPosition) UserGroupPosition {
 	return d
 }
 
-// NewOptVote2Req returns new OptVote2Req with value set to v.
-func NewOptVote2Req(v Vote2Req) OptVote2Req {
-	return OptVote2Req{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptVote2Req is optional Vote2Req.
-type OptVote2Req struct {
-	Value Vote2Req
-	Set   bool
-}
-
-// IsSet returns true if OptVote2Req was set.
-func (o OptVote2Req) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptVote2Req) Reset() {
-	var v Vote2Req
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptVote2Req) SetTo(v Vote2Req) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptVote2Req) Get() (v Vote2Req, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptVote2Req) Or(d Vote2Req) Vote2Req {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptVoteReq returns new OptVoteReq with value set to v.
-func NewOptVoteReq(v VoteReq) OptVoteReq {
-	return OptVoteReq{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptVoteReq is optional VoteReq.
-type OptVoteReq struct {
-	Value VoteReq
-	Set   bool
-}
-
-// IsSet returns true if OptVoteReq was set.
-func (o OptVoteReq) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptVoteReq) Reset() {
-	var v VoteReq
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptVoteReq) SetTo(v VoteReq) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptVoteReq) Get() (v VoteReq, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptVoteReq) Or(d VoteReq) VoteReq {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// Ref: #/components/schemas/organization
+// Ref: #/components/schemas/Organization
 type Organization struct {
 	// 組織ID.
 	ID string `json:"ID"`
 	// 組織名.
-	Name string `json:"Name"`
-	// ロール.
-	Role     int    `json:"Role"`
-	RoleName string `json:"RoleName"`
+	Name string `json:"name"`
+	// 組織コード.
+	Code string `json:"code"`
 	// 組織のタイプ.
-	Type int `json:"Type"`
+	Type int `json:"type"`
+	// ロールの名前.
+	RoleName string `json:"roleName"`
+	// ロール.
+	Role int `json:"role"`
 }
 
 // GetID returns the value of ID.
@@ -5986,9 +4436,14 @@ func (s *Organization) GetName() string {
 	return s.Name
 }
 
-// GetRole returns the value of Role.
-func (s *Organization) GetRole() int {
-	return s.Role
+// GetCode returns the value of Code.
+func (s *Organization) GetCode() string {
+	return s.Code
+}
+
+// GetType returns the value of Type.
+func (s *Organization) GetType() int {
+	return s.Type
 }
 
 // GetRoleName returns the value of RoleName.
@@ -5996,9 +4451,9 @@ func (s *Organization) GetRoleName() string {
 	return s.RoleName
 }
 
-// GetType returns the value of Type.
-func (s *Organization) GetType() int {
-	return s.Type
+// GetRole returns the value of Role.
+func (s *Organization) GetRole() int {
+	return s.Role
 }
 
 // SetID sets the value of ID.
@@ -6011,9 +4466,14 @@ func (s *Organization) SetName(val string) {
 	s.Name = val
 }
 
-// SetRole sets the value of Role.
-func (s *Organization) SetRole(val int) {
-	s.Role = val
+// SetCode sets the value of Code.
+func (s *Organization) SetCode(val string) {
+	s.Code = val
+}
+
+// SetType sets the value of Type.
+func (s *Organization) SetType(val int) {
+	s.Type = val
 }
 
 // SetRoleName sets the value of RoleName.
@@ -6021,10 +4481,50 @@ func (s *Organization) SetRoleName(val string) {
 	s.RoleName = val
 }
 
-// SetType sets the value of Type.
-func (s *Organization) SetType(val int) {
-	s.Type = val
+// SetRole sets the value of Role.
+func (s *Organization) SetRole(val int) {
+	s.Role = val
 }
+
+// 組織エイリアス.
+// Ref: #/components/schemas/OrganizationAlias
+type OrganizationAlias struct {
+	AliasID   string       `json:"aliasID"`
+	AliasName string       `json:"aliasName"`
+	CreatedAt OptNilString `json:"createdAt"`
+}
+
+// GetAliasID returns the value of AliasID.
+func (s *OrganizationAlias) GetAliasID() string {
+	return s.AliasID
+}
+
+// GetAliasName returns the value of AliasName.
+func (s *OrganizationAlias) GetAliasName() string {
+	return s.AliasName
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *OrganizationAlias) GetCreatedAt() OptNilString {
+	return s.CreatedAt
+}
+
+// SetAliasID sets the value of AliasID.
+func (s *OrganizationAlias) SetAliasID(val string) {
+	s.AliasID = val
+}
+
+// SetAliasName sets the value of AliasName.
+func (s *OrganizationAlias) SetAliasName(val string) {
+	s.AliasName = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *OrganizationAlias) SetCreatedAt(val OptNilString) {
+	s.CreatedAt = val
+}
+
+func (*OrganizationAlias) createOrganizationAliasRes() {}
 
 type PasswordLoginBadRequest struct{}
 
@@ -6039,13 +4539,13 @@ type PasswordLoginOK struct{}
 func (*PasswordLoginOK) passwordLoginRes() {}
 
 type PasswordLoginReq struct {
-	IDOrEmail string `json:"id_or_email"`
+	IdOrEmail string `json:"idOrEmail"`
 	Password  string `json:"password"`
 }
 
-// GetIDOrEmail returns the value of IDOrEmail.
-func (s *PasswordLoginReq) GetIDOrEmail() string {
-	return s.IDOrEmail
+// GetIdOrEmail returns the value of IdOrEmail.
+func (s *PasswordLoginReq) GetIdOrEmail() string {
+	return s.IdOrEmail
 }
 
 // GetPassword returns the value of Password.
@@ -6053,9 +4553,9 @@ func (s *PasswordLoginReq) GetPassword() string {
 	return s.Password
 }
 
-// SetIDOrEmail sets the value of IDOrEmail.
-func (s *PasswordLoginReq) SetIDOrEmail(val string) {
-	s.IDOrEmail = val
+// SetIdOrEmail sets the value of IdOrEmail.
+func (s *PasswordLoginReq) SetIdOrEmail(val string) {
+	s.IdOrEmail = val
 }
 
 // SetPassword sets the value of Password.
@@ -6076,14 +4576,9 @@ type PasswordRegisterOK struct{}
 func (*PasswordRegisterOK) passwordRegisterRes() {}
 
 type PasswordRegisterReq struct {
-	Email    string `json:"email"`
 	ID       string `json:"id"`
 	Password string `json:"password"`
-}
-
-// GetEmail returns the value of Email.
-func (s *PasswordRegisterReq) GetEmail() string {
-	return s.Email
+	Email    string `json:"email"`
 }
 
 // GetID returns the value of ID.
@@ -6096,9 +4591,9 @@ func (s *PasswordRegisterReq) GetPassword() string {
 	return s.Password
 }
 
-// SetEmail sets the value of Email.
-func (s *PasswordRegisterReq) SetEmail(val string) {
-	s.Email = val
+// GetEmail returns the value of Email.
+func (s *PasswordRegisterReq) GetEmail() string {
+	return s.Email
 }
 
 // SetID sets the value of ID.
@@ -6111,6 +4606,11 @@ func (s *PasswordRegisterReq) SetPassword(val string) {
 	s.Password = val
 }
 
+// SetEmail sets the value of Email.
+func (s *PasswordRegisterReq) SetEmail(val string) {
+	s.Email = val
+}
+
 type PolicyConsentBadRequest struct{}
 
 func (*PolicyConsentBadRequest) policyConsentRes() {}
@@ -6120,7 +4620,6 @@ type PolicyConsentInternalServerError struct{}
 func (*PolicyConsentInternalServerError) policyConsentRes() {}
 
 type PolicyConsentReq struct {
-	// ポリシーバージョン.
 	PolicyVersion string `json:"policyVersion"`
 }
 
@@ -6134,24 +4633,14 @@ func (s *PolicyConsentReq) SetPolicyVersion(val string) {
 	s.PolicyVersion = val
 }
 
-// Ref: #/components/schemas/policyConsentStatus
+// Ref: #/components/schemas/PolicyConsentStatus
 type PolicyConsentStatus struct {
-	// 同意したか.
-	ConsentGiven bool `json:"consentGiven"`
-	// 同意した日時.
-	ConsentedAt OptNilString `json:"consentedAt"`
 	// 最新ポリシーのバージョン.
 	PolicyVersion string `json:"policyVersion"`
-}
-
-// GetConsentGiven returns the value of ConsentGiven.
-func (s *PolicyConsentStatus) GetConsentGiven() bool {
-	return s.ConsentGiven
-}
-
-// GetConsentedAt returns the value of ConsentedAt.
-func (s *PolicyConsentStatus) GetConsentedAt() OptNilString {
-	return s.ConsentedAt
+	// 同意した日時.
+	ConsentedAt OptNilString `json:"consentedAt"`
+	// 同意したか.
+	ConsentGiven bool `json:"consentGiven"`
 }
 
 // GetPolicyVersion returns the value of PolicyVersion.
@@ -6159,9 +4648,19 @@ func (s *PolicyConsentStatus) GetPolicyVersion() string {
 	return s.PolicyVersion
 }
 
-// SetConsentGiven sets the value of ConsentGiven.
-func (s *PolicyConsentStatus) SetConsentGiven(val bool) {
-	s.ConsentGiven = val
+// GetConsentedAt returns the value of ConsentedAt.
+func (s *PolicyConsentStatus) GetConsentedAt() OptNilString {
+	return s.ConsentedAt
+}
+
+// GetConsentGiven returns the value of ConsentGiven.
+func (s *PolicyConsentStatus) GetConsentGiven() bool {
+	return s.ConsentGiven
+}
+
+// SetPolicyVersion sets the value of PolicyVersion.
+func (s *PolicyConsentStatus) SetPolicyVersion(val string) {
+	s.PolicyVersion = val
 }
 
 // SetConsentedAt sets the value of ConsentedAt.
@@ -6169,9 +4668,9 @@ func (s *PolicyConsentStatus) SetConsentedAt(val OptNilString) {
 	s.ConsentedAt = val
 }
 
-// SetPolicyVersion sets the value of PolicyVersion.
-func (s *PolicyConsentStatus) SetPolicyVersion(val string) {
-	s.PolicyVersion = val
+// SetConsentGiven sets the value of ConsentGiven.
+func (s *PolicyConsentStatus) SetConsentGiven(val bool) {
+	s.ConsentGiven = val
 }
 
 func (*PolicyConsentStatus) getPolicyConsentStatusRes() {}
@@ -6186,7 +4685,6 @@ type PostConclusionInternalServerError struct{}
 func (*PostConclusionInternalServerError) postConclusionRes() {}
 
 type PostConclusionReq struct {
-	// 結論本文。2文字以上.
 	Content string `json:"content"`
 }
 
@@ -6209,7 +4707,6 @@ type PostImageInternalServerError struct{}
 func (*PostImageInternalServerError) postImageRes() {}
 
 type PostImageOK struct {
-	// 画像のURL.
 	URL string `json:"url"`
 }
 
@@ -6298,41 +4795,13 @@ type PostOpinionPost2OK struct{}
 func (*PostOpinionPost2OK) postOpinionPost2Res() {}
 
 type PostOpinionPost2Req struct {
-	// シード意見かどうか.
-	IsSeed         OptBool `json:"isSeed"`
-	OpinionContent string  `json:"opinionContent"`
-	// これがある場合はリプライとみなす。これがない場合はTalkSessionIDが必須。.
-	ParentOpinionID OptNilString `json:"parentOpinionID"`
-	// 参考画像。4MiBまで.
-	Picture       OptMultipartFile `json:"picture"`
-	ReferenceURL  OptNilString     `json:"referenceURL"`
-	TalkSessionID OptNilString     `json:"talkSessionID"`
-	Title         OptNilString     `json:"title"`
-}
-
-// GetIsSeed returns the value of IsSeed.
-func (s *PostOpinionPost2Req) GetIsSeed() OptBool {
-	return s.IsSeed
-}
-
-// GetOpinionContent returns the value of OpinionContent.
-func (s *PostOpinionPost2Req) GetOpinionContent() string {
-	return s.OpinionContent
-}
-
-// GetParentOpinionID returns the value of ParentOpinionID.
-func (s *PostOpinionPost2Req) GetParentOpinionID() OptNilString {
-	return s.ParentOpinionID
-}
-
-// GetPicture returns the value of Picture.
-func (s *PostOpinionPost2Req) GetPicture() OptMultipartFile {
-	return s.Picture
-}
-
-// GetReferenceURL returns the value of ReferenceURL.
-func (s *PostOpinionPost2Req) GetReferenceURL() OptNilString {
-	return s.ReferenceURL
+	TalkSessionID   OptNilString     `json:"talkSessionID"`
+	ParentOpinionID OptNilString     `json:"parentOpinionID"`
+	Title           OptNilString     `json:"title"`
+	OpinionContent  string           `json:"opinionContent"`
+	ReferenceURL    OptNilString     `json:"referenceURL"`
+	Picture         OptMultipartFile `json:"picture"`
+	IsSeed          OptNilBool       `json:"isSeed"`
 }
 
 // GetTalkSessionID returns the value of TalkSessionID.
@@ -6340,34 +4809,34 @@ func (s *PostOpinionPost2Req) GetTalkSessionID() OptNilString {
 	return s.TalkSessionID
 }
 
+// GetParentOpinionID returns the value of ParentOpinionID.
+func (s *PostOpinionPost2Req) GetParentOpinionID() OptNilString {
+	return s.ParentOpinionID
+}
+
 // GetTitle returns the value of Title.
 func (s *PostOpinionPost2Req) GetTitle() OptNilString {
 	return s.Title
 }
 
-// SetIsSeed sets the value of IsSeed.
-func (s *PostOpinionPost2Req) SetIsSeed(val OptBool) {
-	s.IsSeed = val
+// GetOpinionContent returns the value of OpinionContent.
+func (s *PostOpinionPost2Req) GetOpinionContent() string {
+	return s.OpinionContent
 }
 
-// SetOpinionContent sets the value of OpinionContent.
-func (s *PostOpinionPost2Req) SetOpinionContent(val string) {
-	s.OpinionContent = val
+// GetReferenceURL returns the value of ReferenceURL.
+func (s *PostOpinionPost2Req) GetReferenceURL() OptNilString {
+	return s.ReferenceURL
 }
 
-// SetParentOpinionID sets the value of ParentOpinionID.
-func (s *PostOpinionPost2Req) SetParentOpinionID(val OptNilString) {
-	s.ParentOpinionID = val
+// GetPicture returns the value of Picture.
+func (s *PostOpinionPost2Req) GetPicture() OptMultipartFile {
+	return s.Picture
 }
 
-// SetPicture sets the value of Picture.
-func (s *PostOpinionPost2Req) SetPicture(val OptMultipartFile) {
-	s.Picture = val
-}
-
-// SetReferenceURL sets the value of ReferenceURL.
-func (s *PostOpinionPost2Req) SetReferenceURL(val OptNilString) {
-	s.ReferenceURL = val
+// GetIsSeed returns the value of IsSeed.
+func (s *PostOpinionPost2Req) GetIsSeed() OptNilBool {
+	return s.IsSeed
 }
 
 // SetTalkSessionID sets the value of TalkSessionID.
@@ -6375,126 +4844,34 @@ func (s *PostOpinionPost2Req) SetTalkSessionID(val OptNilString) {
 	s.TalkSessionID = val
 }
 
+// SetParentOpinionID sets the value of ParentOpinionID.
+func (s *PostOpinionPost2Req) SetParentOpinionID(val OptNilString) {
+	s.ParentOpinionID = val
+}
+
 // SetTitle sets the value of Title.
 func (s *PostOpinionPost2Req) SetTitle(val OptNilString) {
 	s.Title = val
 }
 
-type PostOpinionPostBadRequest struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-}
-
-// GetCode returns the value of Code.
-func (s *PostOpinionPostBadRequest) GetCode() string {
-	return s.Code
-}
-
-// GetMessage returns the value of Message.
-func (s *PostOpinionPostBadRequest) GetMessage() string {
-	return s.Message
-}
-
-// SetCode sets the value of Code.
-func (s *PostOpinionPostBadRequest) SetCode(val string) {
-	s.Code = val
-}
-
-// SetMessage sets the value of Message.
-func (s *PostOpinionPostBadRequest) SetMessage(val string) {
-	s.Message = val
-}
-
-func (*PostOpinionPostBadRequest) postOpinionPostRes() {}
-
-type PostOpinionPostInternalServerError struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-}
-
-// GetCode returns the value of Code.
-func (s *PostOpinionPostInternalServerError) GetCode() string {
-	return s.Code
-}
-
-// GetMessage returns the value of Message.
-func (s *PostOpinionPostInternalServerError) GetMessage() string {
-	return s.Message
-}
-
-// SetCode sets the value of Code.
-func (s *PostOpinionPostInternalServerError) SetCode(val string) {
-	s.Code = val
-}
-
-// SetMessage sets the value of Message.
-func (s *PostOpinionPostInternalServerError) SetMessage(val string) {
-	s.Message = val
-}
-
-func (*PostOpinionPostInternalServerError) postOpinionPostRes() {}
-
-type PostOpinionPostOK struct{}
-
-func (*PostOpinionPostOK) postOpinionPostRes() {}
-
-type PostOpinionPostReq struct {
-	OpinionContent  string       `json:"opinionContent"`
-	ParentOpinionID OptNilString `json:"parentOpinionID"`
-	// 参考画像。4MiBまで.
-	Picture      OptMultipartFile `json:"picture"`
-	ReferenceURL OptNilString     `json:"referenceURL"`
-	Title        OptNilString     `json:"title"`
-}
-
-// GetOpinionContent returns the value of OpinionContent.
-func (s *PostOpinionPostReq) GetOpinionContent() string {
-	return s.OpinionContent
-}
-
-// GetParentOpinionID returns the value of ParentOpinionID.
-func (s *PostOpinionPostReq) GetParentOpinionID() OptNilString {
-	return s.ParentOpinionID
-}
-
-// GetPicture returns the value of Picture.
-func (s *PostOpinionPostReq) GetPicture() OptMultipartFile {
-	return s.Picture
-}
-
-// GetReferenceURL returns the value of ReferenceURL.
-func (s *PostOpinionPostReq) GetReferenceURL() OptNilString {
-	return s.ReferenceURL
-}
-
-// GetTitle returns the value of Title.
-func (s *PostOpinionPostReq) GetTitle() OptNilString {
-	return s.Title
-}
-
 // SetOpinionContent sets the value of OpinionContent.
-func (s *PostOpinionPostReq) SetOpinionContent(val string) {
+func (s *PostOpinionPost2Req) SetOpinionContent(val string) {
 	s.OpinionContent = val
 }
 
-// SetParentOpinionID sets the value of ParentOpinionID.
-func (s *PostOpinionPostReq) SetParentOpinionID(val OptNilString) {
-	s.ParentOpinionID = val
-}
-
-// SetPicture sets the value of Picture.
-func (s *PostOpinionPostReq) SetPicture(val OptMultipartFile) {
-	s.Picture = val
-}
-
 // SetReferenceURL sets the value of ReferenceURL.
-func (s *PostOpinionPostReq) SetReferenceURL(val OptNilString) {
+func (s *PostOpinionPost2Req) SetReferenceURL(val OptNilString) {
 	s.ReferenceURL = val
 }
 
-// SetTitle sets the value of Title.
-func (s *PostOpinionPostReq) SetTitle(val OptNilString) {
-	s.Title = val
+// SetPicture sets the value of Picture.
+func (s *PostOpinionPost2Req) SetPicture(val OptMultipartFile) {
+	s.Picture = val
+}
+
+// SetIsSeed sets the value of IsSeed.
+func (s *PostOpinionPost2Req) SetIsSeed(val OptNilBool) {
+	s.IsSeed = val
 }
 
 type PostTimeLineItemBadRequest struct{}
@@ -6506,12 +4883,12 @@ type PostTimeLineItemInternalServerError struct{}
 func (*PostTimeLineItemInternalServerError) postTimeLineItemRes() {}
 
 type PostTimeLineItemOK struct {
-	ActionItemID string `json:"ActionItemID"`
-	Content      string `json:"Content"`
-	CreatedAt    string `json:"CreatedAt"`
-	Sequence     int    `json:"Sequence"`
-	Status       string `json:"Status"`
-	UpdatedAt    string `json:"UpdatedAt"`
+	ActionItemID string `json:"actionItemID"`
+	Sequence     int    `json:"sequence"`
+	Content      string `json:"content"`
+	Status       string `json:"status"`
+	CreatedAt    string `json:"createdAt"`
+	UpdatedAt    string `json:"updatedAt"`
 }
 
 // GetActionItemID returns the value of ActionItemID.
@@ -6519,24 +4896,24 @@ func (s *PostTimeLineItemOK) GetActionItemID() string {
 	return s.ActionItemID
 }
 
-// GetContent returns the value of Content.
-func (s *PostTimeLineItemOK) GetContent() string {
-	return s.Content
-}
-
-// GetCreatedAt returns the value of CreatedAt.
-func (s *PostTimeLineItemOK) GetCreatedAt() string {
-	return s.CreatedAt
-}
-
 // GetSequence returns the value of Sequence.
 func (s *PostTimeLineItemOK) GetSequence() int {
 	return s.Sequence
 }
 
+// GetContent returns the value of Content.
+func (s *PostTimeLineItemOK) GetContent() string {
+	return s.Content
+}
+
 // GetStatus returns the value of Status.
 func (s *PostTimeLineItemOK) GetStatus() string {
 	return s.Status
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *PostTimeLineItemOK) GetCreatedAt() string {
+	return s.CreatedAt
 }
 
 // GetUpdatedAt returns the value of UpdatedAt.
@@ -6549,24 +4926,24 @@ func (s *PostTimeLineItemOK) SetActionItemID(val string) {
 	s.ActionItemID = val
 }
 
-// SetContent sets the value of Content.
-func (s *PostTimeLineItemOK) SetContent(val string) {
-	s.Content = val
-}
-
-// SetCreatedAt sets the value of CreatedAt.
-func (s *PostTimeLineItemOK) SetCreatedAt(val string) {
-	s.CreatedAt = val
-}
-
 // SetSequence sets the value of Sequence.
 func (s *PostTimeLineItemOK) SetSequence(val int) {
 	s.Sequence = val
 }
 
+// SetContent sets the value of Content.
+func (s *PostTimeLineItemOK) SetContent(val string) {
+	s.Content = val
+}
+
 // SetStatus sets the value of Status.
 func (s *PostTimeLineItemOK) SetStatus(val string) {
 	s.Status = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *PostTimeLineItemOK) SetCreatedAt(val string) {
+	s.CreatedAt = val
 }
 
 // SetUpdatedAt sets the value of UpdatedAt.
@@ -6577,10 +4954,9 @@ func (s *PostTimeLineItemOK) SetUpdatedAt(val string) {
 func (*PostTimeLineItemOK) postTimeLineItemRes() {}
 
 type PostTimeLineItemReq struct {
-	Content string `json:"content"`
-	// 親があるなら親のIDヲシテイ.
-	ParentActionItemID OptNilString `json:"parentActionItemID"`
+	Content            string       `json:"content"`
 	Status             string       `json:"status"`
+	ParentActionItemID OptNilString `json:"parentActionItemID"`
 }
 
 // GetContent returns the value of Content.
@@ -6588,14 +4964,14 @@ func (s *PostTimeLineItemReq) GetContent() string {
 	return s.Content
 }
 
-// GetParentActionItemID returns the value of ParentActionItemID.
-func (s *PostTimeLineItemReq) GetParentActionItemID() OptNilString {
-	return s.ParentActionItemID
-}
-
 // GetStatus returns the value of Status.
 func (s *PostTimeLineItemReq) GetStatus() string {
 	return s.Status
+}
+
+// GetParentActionItemID returns the value of ParentActionItemID.
+func (s *PostTimeLineItemReq) GetParentActionItemID() OptNilString {
+	return s.ParentActionItemID
 }
 
 // SetContent sets the value of Content.
@@ -6603,14 +4979,14 @@ func (s *PostTimeLineItemReq) SetContent(val string) {
 	s.Content = val
 }
 
-// SetParentActionItemID sets the value of ParentActionItemID.
-func (s *PostTimeLineItemReq) SetParentActionItemID(val OptNilString) {
-	s.ParentActionItemID = val
-}
-
 // SetStatus sets the value of Status.
 func (s *PostTimeLineItemReq) SetStatus(val string) {
 	s.Status = val
+}
+
+// SetParentActionItemID sets the value of ParentActionItemID.
+func (s *PostTimeLineItemReq) SetParentActionItemID(val OptNilString) {
+	s.ParentActionItemID = val
 }
 
 // Ref: #/components/schemas/RegenerateRequest
@@ -6680,15 +5056,10 @@ func (s *RegenerateRequestType) UnmarshalText(data []byte) error {
 
 // Ref: #/components/schemas/RegenerateResponse
 type RegenerateResponse struct {
-	// メッセージ.
-	Message string `json:"message"`
 	// ステータス.
 	Status string `json:"status"`
-}
-
-// GetMessage returns the value of Message.
-func (s *RegenerateResponse) GetMessage() string {
-	return s.Message
+	// メッセージ.
+	Message string `json:"message"`
 }
 
 // GetStatus returns the value of Status.
@@ -6696,9 +5067,9 @@ func (s *RegenerateResponse) GetStatus() string {
 	return s.Status
 }
 
-// SetMessage sets the value of Message.
-func (s *RegenerateResponse) SetMessage(val string) {
-	s.Message = val
+// GetMessage returns the value of Message.
+func (s *RegenerateResponse) GetMessage() string {
+	return s.Message
 }
 
 // SetStatus sets the value of Status.
@@ -6706,227 +5077,34 @@ func (s *RegenerateResponse) SetStatus(val string) {
 	s.Status = val
 }
 
-type RegisterUserBadRequest struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-}
-
-// GetCode returns the value of Code.
-func (s *RegisterUserBadRequest) GetCode() string {
-	return s.Code
-}
-
-// GetMessage returns the value of Message.
-func (s *RegisterUserBadRequest) GetMessage() string {
-	return s.Message
-}
-
-// SetCode sets the value of Code.
-func (s *RegisterUserBadRequest) SetCode(val string) {
-	s.Code = val
-}
-
 // SetMessage sets the value of Message.
-func (s *RegisterUserBadRequest) SetMessage(val string) {
+func (s *RegenerateResponse) SetMessage(val string) {
 	s.Message = val
 }
 
-func (*RegisterUserBadRequest) registerUserRes() {}
-
-type RegisterUserInternalServerError struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-}
-
-// GetCode returns the value of Code.
-func (s *RegisterUserInternalServerError) GetCode() string {
-	return s.Code
-}
-
-// GetMessage returns the value of Message.
-func (s *RegisterUserInternalServerError) GetMessage() string {
-	return s.Message
-}
-
-// SetCode sets the value of Code.
-func (s *RegisterUserInternalServerError) SetCode(val string) {
-	s.Code = val
-}
-
-// SetMessage sets the value of Message.
-func (s *RegisterUserInternalServerError) SetMessage(val string) {
-	s.Message = val
-}
-
-func (*RegisterUserInternalServerError) registerUserRes() {}
-
-type RegisterUserOK struct {
-	DisplayID   string       `json:"displayID"`
-	DisplayName string       `json:"displayName"`
-	IconURL     OptNilString `json:"iconURL"`
-}
-
-// GetDisplayID returns the value of DisplayID.
-func (s *RegisterUserOK) GetDisplayID() string {
-	return s.DisplayID
-}
-
-// GetDisplayName returns the value of DisplayName.
-func (s *RegisterUserOK) GetDisplayName() string {
-	return s.DisplayName
-}
-
-// GetIconURL returns the value of IconURL.
-func (s *RegisterUserOK) GetIconURL() OptNilString {
-	return s.IconURL
-}
-
-// SetDisplayID sets the value of DisplayID.
-func (s *RegisterUserOK) SetDisplayID(val string) {
-	s.DisplayID = val
-}
-
-// SetDisplayName sets the value of DisplayName.
-func (s *RegisterUserOK) SetDisplayName(val string) {
-	s.DisplayName = val
-}
-
-// SetIconURL sets the value of IconURL.
-func (s *RegisterUserOK) SetIconURL(val OptNilString) {
-	s.IconURL = val
-}
-
-func (*RegisterUserOK) registerUserRes() {}
-
-type RegisterUserReq struct {
-	// 市区町村.
-	City OptNilString `json:"city"`
-	// 生年月日.
-	DateOfBirth OptString `json:"dateOfBirth"`
-	// ユーザーID。プロフィールのパスなどで使用される。DBのIDとは別。.
-	DisplayID string `json:"displayID"`
-	// ユーザー名。日本語なども設定可能。.
-	DisplayName string `json:"displayName"`
-	// メアド.
-	Email OptNilString `json:"email"`
-	// 性別.
-	Gender OptNilRegisterUserReqGender `json:"gender"`
-	// ユーザーアイコン.
-	Icon OptMultipartFile `json:"icon"`
-	// 都道府県.
-	Prefecture OptString `json:"prefecture"`
-}
-
-// GetCity returns the value of City.
-func (s *RegisterUserReq) GetCity() OptNilString {
-	return s.City
-}
-
-// GetDateOfBirth returns the value of DateOfBirth.
-func (s *RegisterUserReq) GetDateOfBirth() OptString {
-	return s.DateOfBirth
-}
-
-// GetDisplayID returns the value of DisplayID.
-func (s *RegisterUserReq) GetDisplayID() string {
-	return s.DisplayID
-}
-
-// GetDisplayName returns the value of DisplayName.
-func (s *RegisterUserReq) GetDisplayName() string {
-	return s.DisplayName
-}
-
-// GetEmail returns the value of Email.
-func (s *RegisterUserReq) GetEmail() OptNilString {
-	return s.Email
-}
-
-// GetGender returns the value of Gender.
-func (s *RegisterUserReq) GetGender() OptNilRegisterUserReqGender {
-	return s.Gender
-}
-
-// GetIcon returns the value of Icon.
-func (s *RegisterUserReq) GetIcon() OptMultipartFile {
-	return s.Icon
-}
-
-// GetPrefecture returns the value of Prefecture.
-func (s *RegisterUserReq) GetPrefecture() OptString {
-	return s.Prefecture
-}
-
-// SetCity sets the value of City.
-func (s *RegisterUserReq) SetCity(val OptNilString) {
-	s.City = val
-}
-
-// SetDateOfBirth sets the value of DateOfBirth.
-func (s *RegisterUserReq) SetDateOfBirth(val OptString) {
-	s.DateOfBirth = val
-}
-
-// SetDisplayID sets the value of DisplayID.
-func (s *RegisterUserReq) SetDisplayID(val string) {
-	s.DisplayID = val
-}
-
-// SetDisplayName sets the value of DisplayName.
-func (s *RegisterUserReq) SetDisplayName(val string) {
-	s.DisplayName = val
-}
-
-// SetEmail sets the value of Email.
-func (s *RegisterUserReq) SetEmail(val OptNilString) {
-	s.Email = val
-}
-
-// SetGender sets the value of Gender.
-func (s *RegisterUserReq) SetGender(val OptNilRegisterUserReqGender) {
-	s.Gender = val
-}
-
-// SetIcon sets the value of Icon.
-func (s *RegisterUserReq) SetIcon(val OptMultipartFile) {
-	s.Icon = val
-}
-
-// SetPrefecture sets the value of Prefecture.
-func (s *RegisterUserReq) SetPrefecture(val OptString) {
-	s.Prefecture = val
-}
-
-// 性別.
-type RegisterUserReqGender string
+// 通報解決アクション.
+// Ref: #/components/schemas/ReportAction
+type ReportAction string
 
 const (
-	RegisterUserReqGender_0 RegisterUserReqGender = "男性"
-	RegisterUserReqGender_1 RegisterUserReqGender = "女性"
-	RegisterUserReqGender_2 RegisterUserReqGender = "その他"
-	RegisterUserReqGender_3 RegisterUserReqGender = "回答しない"
+	ReportActionDeleted ReportAction = "deleted"
+	ReportActionHold    ReportAction = "hold"
 )
 
-// AllValues returns all RegisterUserReqGender values.
-func (RegisterUserReqGender) AllValues() []RegisterUserReqGender {
-	return []RegisterUserReqGender{
-		RegisterUserReqGender_0,
-		RegisterUserReqGender_1,
-		RegisterUserReqGender_2,
-		RegisterUserReqGender_3,
+// AllValues returns all ReportAction values.
+func (ReportAction) AllValues() []ReportAction {
+	return []ReportAction{
+		ReportActionDeleted,
+		ReportActionHold,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s RegisterUserReqGender) MarshalText() ([]byte, error) {
+func (s ReportAction) MarshalText() ([]byte, error) {
 	switch s {
-	case RegisterUserReqGender_0:
+	case ReportActionDeleted:
 		return []byte(s), nil
-	case RegisterUserReqGender_1:
-		return []byte(s), nil
-	case RegisterUserReqGender_2:
-		return []byte(s), nil
-	case RegisterUserReqGender_3:
+	case ReportActionHold:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -6934,38 +5112,43 @@ func (s RegisterUserReqGender) MarshalText() ([]byte, error) {
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *RegisterUserReqGender) UnmarshalText(data []byte) error {
-	switch RegisterUserReqGender(data) {
-	case RegisterUserReqGender_0:
-		*s = RegisterUserReqGender_0
+func (s *ReportAction) UnmarshalText(data []byte) error {
+	switch ReportAction(data) {
+	case ReportActionDeleted:
+		*s = ReportActionDeleted
 		return nil
-	case RegisterUserReqGender_1:
-		*s = RegisterUserReqGender_1
-		return nil
-	case RegisterUserReqGender_2:
-		*s = RegisterUserReqGender_2
-		return nil
-	case RegisterUserReqGender_3:
-		*s = RegisterUserReqGender_3
+	case ReportActionHold:
+		*s = ReportActionHold
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
 	}
 }
 
-// Ref: #/components/schemas/reportDetail
+// Ref: #/components/schemas/ReportDetail
 type ReportDetail struct {
-	Opinion Opinion                   `json:"opinion"`
+	Opinion Opinion `json:"opinion"`
+	// 作成ユーザー.
+	User    ReportDetailUser          `json:"user"`
+	Status  ReportStatus              `json:"status"`
 	Reasons []ReportDetailReasonsItem `json:"reasons"`
 	// この意見が通報を受けた回数.
-	ReportCount int                `json:"reportCount"`
-	Status      ReportDetailStatus `json:"status"`
-	User        User               `json:"user"`
+	ReportCount int `json:"reportCount"`
 }
 
 // GetOpinion returns the value of Opinion.
 func (s *ReportDetail) GetOpinion() Opinion {
 	return s.Opinion
+}
+
+// GetUser returns the value of User.
+func (s *ReportDetail) GetUser() ReportDetailUser {
+	return s.User
+}
+
+// GetStatus returns the value of Status.
+func (s *ReportDetail) GetStatus() ReportStatus {
+	return s.Status
 }
 
 // GetReasons returns the value of Reasons.
@@ -6978,19 +5161,19 @@ func (s *ReportDetail) GetReportCount() int {
 	return s.ReportCount
 }
 
-// GetStatus returns the value of Status.
-func (s *ReportDetail) GetStatus() ReportDetailStatus {
-	return s.Status
-}
-
-// GetUser returns the value of User.
-func (s *ReportDetail) GetUser() User {
-	return s.User
-}
-
 // SetOpinion sets the value of Opinion.
 func (s *ReportDetail) SetOpinion(val Opinion) {
 	s.Opinion = val
+}
+
+// SetUser sets the value of User.
+func (s *ReportDetail) SetUser(val ReportDetailUser) {
+	s.User = val
+}
+
+// SetStatus sets the value of Status.
+func (s *ReportDetail) SetStatus(val ReportStatus) {
+	s.Status = val
 }
 
 // SetReasons sets the value of Reasons.
@@ -7003,26 +5186,11 @@ func (s *ReportDetail) SetReportCount(val int) {
 	s.ReportCount = val
 }
 
-// SetStatus sets the value of Status.
-func (s *ReportDetail) SetStatus(val ReportDetailStatus) {
-	s.Status = val
-}
-
-// SetUser sets the value of User.
-func (s *ReportDetail) SetUser(val User) {
-	s.User = val
-}
-
 func (*ReportDetail) getOpinionReportsRes() {}
 
 type ReportDetailReasonsItem struct {
-	Content OptNilString `json:"content"`
 	Reason  string       `json:"reason"`
-}
-
-// GetContent returns the value of Content.
-func (s *ReportDetailReasonsItem) GetContent() OptNilString {
-	return s.Content
+	Content OptNilString `json:"content"`
 }
 
 // GetReason returns the value of Reason.
@@ -7030,9 +5198,9 @@ func (s *ReportDetailReasonsItem) GetReason() string {
 	return s.Reason
 }
 
-// SetContent sets the value of Content.
-func (s *ReportDetailReasonsItem) SetContent(val OptNilString) {
-	s.Content = val
+// GetContent returns the value of Content.
+func (s *ReportDetailReasonsItem) GetContent() OptNilString {
+	return s.Content
 }
 
 // SetReason sets the value of Reason.
@@ -7040,52 +5208,45 @@ func (s *ReportDetailReasonsItem) SetReason(val string) {
 	s.Reason = val
 }
 
-type ReportDetailStatus string
-
-const (
-	ReportDetailStatusUnsolved ReportDetailStatus = "unsolved"
-	ReportDetailStatusDeleted  ReportDetailStatus = "deleted"
-	ReportDetailStatusHold     ReportDetailStatus = "hold"
-)
-
-// AllValues returns all ReportDetailStatus values.
-func (ReportDetailStatus) AllValues() []ReportDetailStatus {
-	return []ReportDetailStatus{
-		ReportDetailStatusUnsolved,
-		ReportDetailStatusDeleted,
-		ReportDetailStatusHold,
-	}
+// SetContent sets the value of Content.
+func (s *ReportDetailReasonsItem) SetContent(val OptNilString) {
+	s.Content = val
 }
 
-// MarshalText implements encoding.TextMarshaler.
-func (s ReportDetailStatus) MarshalText() ([]byte, error) {
-	switch s {
-	case ReportDetailStatusUnsolved:
-		return []byte(s), nil
-	case ReportDetailStatusDeleted:
-		return []byte(s), nil
-	case ReportDetailStatusHold:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
+type ReportDetailUser struct {
+	DisplayID   string       `json:"displayID"`
+	DisplayName string       `json:"displayName"`
+	IconURL     OptNilString `json:"iconURL"`
 }
 
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *ReportDetailStatus) UnmarshalText(data []byte) error {
-	switch ReportDetailStatus(data) {
-	case ReportDetailStatusUnsolved:
-		*s = ReportDetailStatusUnsolved
-		return nil
-	case ReportDetailStatusDeleted:
-		*s = ReportDetailStatusDeleted
-		return nil
-	case ReportDetailStatusHold:
-		*s = ReportDetailStatusHold
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
+// GetDisplayID returns the value of DisplayID.
+func (s *ReportDetailUser) GetDisplayID() string {
+	return s.DisplayID
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *ReportDetailUser) GetDisplayName() string {
+	return s.DisplayName
+}
+
+// GetIconURL returns the value of IconURL.
+func (s *ReportDetailUser) GetIconURL() OptNilString {
+	return s.IconURL
+}
+
+// SetDisplayID sets the value of DisplayID.
+func (s *ReportDetailUser) SetDisplayID(val string) {
+	s.DisplayID = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *ReportDetailUser) SetDisplayName(val string) {
+	s.DisplayName = val
+}
+
+// SetIconURL sets the value of IconURL.
+func (s *ReportDetailUser) SetIconURL(val OptNilString) {
+	s.IconURL = val
 }
 
 type ReportOpinionBadRequest struct{}
@@ -7101,9 +5262,13 @@ type ReportOpinionOK struct{}
 func (*ReportOpinionOK) reportOpinionRes() {}
 
 type ReportOpinionReq struct {
-	// その他の場合のみ理由のテキスト.
+	Reason  OptNilInt    `json:"reason"`
 	Content OptNilString `json:"content"`
-	Reason  OptInt       `json:"reason"`
+}
+
+// GetReason returns the value of Reason.
+func (s *ReportOpinionReq) GetReason() OptNilInt {
+	return s.Reason
 }
 
 // GetContent returns the value of Content.
@@ -7111,9 +5276,9 @@ func (s *ReportOpinionReq) GetContent() OptNilString {
 	return s.Content
 }
 
-// GetReason returns the value of Reason.
-func (s *ReportOpinionReq) GetReason() OptInt {
-	return s.Reason
+// SetReason sets the value of Reason.
+func (s *ReportOpinionReq) SetReason(val OptNilInt) {
+	s.Reason = val
 }
 
 // SetContent sets the value of Content.
@@ -7121,22 +5286,12 @@ func (s *ReportOpinionReq) SetContent(val OptNilString) {
 	s.Content = val
 }
 
-// SetReason sets the value of Reason.
-func (s *ReportOpinionReq) SetReason(val OptInt) {
-	s.Reason = val
-}
-
-// Ref: #/components/schemas/reportReason
+// Ref: #/components/schemas/ReportReason
 type ReportReason struct {
-	// 不適切な内容.
-	Reason string `json:"reason"`
 	// 1.
 	ReasonID int `json:"reasonID"`
-}
-
-// GetReason returns the value of Reason.
-func (s *ReportReason) GetReason() string {
-	return s.Reason
+	// 不適切な内容.
+	Reason string `json:"reason"`
 }
 
 // GetReasonID returns the value of ReasonID.
@@ -7144,9 +5299,9 @@ func (s *ReportReason) GetReasonID() int {
 	return s.ReasonID
 }
 
-// SetReason sets the value of Reason.
-func (s *ReportReason) SetReason(val string) {
-	s.Reason = val
+// GetReason returns the value of Reason.
+func (s *ReportReason) GetReason() string {
+	return s.Reason
 }
 
 // SetReasonID sets the value of ReasonID.
@@ -7154,15 +5309,67 @@ func (s *ReportReason) SetReasonID(val int) {
 	s.ReasonID = val
 }
 
-// Ref: #/components/schemas/restriction
-type Restriction struct {
-	Description string `json:"description"`
-	Key         string `json:"key"`
+// SetReason sets the value of Reason.
+func (s *ReportReason) SetReason(val string) {
+	s.Reason = val
 }
 
-// GetDescription returns the value of Description.
-func (s *Restriction) GetDescription() string {
-	return s.Description
+// 通報ステータス.
+// Ref: #/components/schemas/ReportStatus
+type ReportStatus string
+
+const (
+	ReportStatusUnsolved ReportStatus = "unsolved"
+	ReportStatusDeleted  ReportStatus = "deleted"
+	ReportStatusHold     ReportStatus = "hold"
+)
+
+// AllValues returns all ReportStatus values.
+func (ReportStatus) AllValues() []ReportStatus {
+	return []ReportStatus{
+		ReportStatusUnsolved,
+		ReportStatusDeleted,
+		ReportStatusHold,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s ReportStatus) MarshalText() ([]byte, error) {
+	switch s {
+	case ReportStatusUnsolved:
+		return []byte(s), nil
+	case ReportStatusDeleted:
+		return []byte(s), nil
+	case ReportStatusHold:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *ReportStatus) UnmarshalText(data []byte) error {
+	switch ReportStatus(data) {
+	case ReportStatusUnsolved:
+		*s = ReportStatusUnsolved
+		return nil
+	case ReportStatusDeleted:
+		*s = ReportStatusDeleted
+		return nil
+	case ReportStatusHold:
+		*s = ReportStatusHold
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// Ref: #/components/schemas/Restriction
+type Restriction struct {
+	Key         string `json:"key"`
+	Description string `json:"description"`
+	// 依存しているrestriction.
+	DependsOn []string `json:"dependsOn"`
 }
 
 // GetKey returns the value of Key.
@@ -7170,15 +5377,68 @@ func (s *Restriction) GetKey() string {
 	return s.Key
 }
 
-// SetDescription sets the value of Description.
-func (s *Restriction) SetDescription(val string) {
-	s.Description = val
+// GetDescription returns the value of Description.
+func (s *Restriction) GetDescription() string {
+	return s.Description
+}
+
+// GetDependsOn returns the value of DependsOn.
+func (s *Restriction) GetDependsOn() []string {
+	return s.DependsOn
 }
 
 // SetKey sets the value of Key.
 func (s *Restriction) SetKey(val string) {
 	s.Key = val
 }
+
+// SetDescription sets the value of Description.
+func (s *Restriction) SetDescription(val string) {
+	s.Description = val
+}
+
+// SetDependsOn sets the value of DependsOn.
+func (s *Restriction) SetDependsOn(val []string) {
+	s.DependsOn = val
+}
+
+type RevokeTokenBadRequest struct{}
+
+func (*RevokeTokenBadRequest) revokeTokenRes() {}
+
+type RevokeTokenInternalServerError struct{}
+
+func (*RevokeTokenInternalServerError) revokeTokenRes() {}
+
+type RevokeTokenNoContent struct{}
+
+// RevokeTokenNoContentHeaders wraps RevokeTokenNoContent with response headers.
+type RevokeTokenNoContentHeaders struct {
+	SetCookie []string
+	Response  RevokeTokenNoContent
+}
+
+// GetSetCookie returns the value of SetCookie.
+func (s *RevokeTokenNoContentHeaders) GetSetCookie() []string {
+	return s.SetCookie
+}
+
+// GetResponse returns the value of Response.
+func (s *RevokeTokenNoContentHeaders) GetResponse() RevokeTokenNoContent {
+	return s.Response
+}
+
+// SetSetCookie sets the value of SetCookie.
+func (s *RevokeTokenNoContentHeaders) SetSetCookie(val []string) {
+	s.SetCookie = val
+}
+
+// SetResponse sets the value of Response.
+func (s *RevokeTokenNoContentHeaders) SetResponse(val RevokeTokenNoContent) {
+	s.Response = val
+}
+
+func (*RevokeTokenNoContentHeaders) revokeTokenRes() {}
 
 type SessionsHistoryBadRequest struct{}
 
@@ -7216,13 +5476,8 @@ func (s *SessionsHistoryOK) SetTalkSessions(val []SessionsHistoryOKTalkSessionsI
 func (*SessionsHistoryOK) sessionsHistoryRes() {}
 
 type SessionsHistoryOKTalkSessionsItem struct {
-	OpinionCount int         `json:"opinionCount"`
 	TalkSession  TalkSession `json:"talkSession"`
-}
-
-// GetOpinionCount returns the value of OpinionCount.
-func (s *SessionsHistoryOKTalkSessionsItem) GetOpinionCount() int {
-	return s.OpinionCount
+	OpinionCount int         `json:"opinionCount"`
 }
 
 // GetTalkSession returns the value of TalkSession.
@@ -7230,14 +5485,19 @@ func (s *SessionsHistoryOKTalkSessionsItem) GetTalkSession() TalkSession {
 	return s.TalkSession
 }
 
-// SetOpinionCount sets the value of OpinionCount.
-func (s *SessionsHistoryOKTalkSessionsItem) SetOpinionCount(val int) {
-	s.OpinionCount = val
+// GetOpinionCount returns the value of OpinionCount.
+func (s *SessionsHistoryOKTalkSessionsItem) GetOpinionCount() int {
+	return s.OpinionCount
 }
 
 // SetTalkSession sets the value of TalkSession.
 func (s *SessionsHistoryOKTalkSessionsItem) SetTalkSession(val TalkSession) {
 	s.TalkSession = val
+}
+
+// SetOpinionCount sets the value of OpinionCount.
+func (s *SessionsHistoryOKTalkSessionsItem) SetOpinionCount(val int) {
+	s.OpinionCount = val
 }
 
 type SessionsHistoryStatus string
@@ -7294,58 +5554,17 @@ type SolveOpinionReportOK struct{}
 func (*SolveOpinionReportOK) solveOpinionReportRes() {}
 
 type SolveOpinionReportReq struct {
-	Action SolveOpinionReportReqAction `json:"action"`
+	Action ReportAction `json:"action"`
 }
 
 // GetAction returns the value of Action.
-func (s *SolveOpinionReportReq) GetAction() SolveOpinionReportReqAction {
+func (s *SolveOpinionReportReq) GetAction() ReportAction {
 	return s.Action
 }
 
 // SetAction sets the value of Action.
-func (s *SolveOpinionReportReq) SetAction(val SolveOpinionReportReqAction) {
+func (s *SolveOpinionReportReq) SetAction(val ReportAction) {
 	s.Action = val
-}
-
-type SolveOpinionReportReqAction string
-
-const (
-	SolveOpinionReportReqActionDeleted SolveOpinionReportReqAction = "deleted"
-	SolveOpinionReportReqActionHold    SolveOpinionReportReqAction = "hold"
-)
-
-// AllValues returns all SolveOpinionReportReqAction values.
-func (SolveOpinionReportReqAction) AllValues() []SolveOpinionReportReqAction {
-	return []SolveOpinionReportReqAction{
-		SolveOpinionReportReqActionDeleted,
-		SolveOpinionReportReqActionHold,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s SolveOpinionReportReqAction) MarshalText() ([]byte, error) {
-	switch s {
-	case SolveOpinionReportReqActionDeleted:
-		return []byte(s), nil
-	case SolveOpinionReportReqActionHold:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *SolveOpinionReportReqAction) UnmarshalText(data []byte) error {
-	switch SolveOpinionReportReqAction(data) {
-	case SolveOpinionReportReqActionDeleted:
-		*s = SolveOpinionReportReqActionDeleted
-		return nil
-	case SolveOpinionReportReqActionHold:
-		*s = SolveOpinionReportReqActionHold
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
 }
 
 type SwipeOpinionsBadRequest struct {
@@ -7403,12 +5622,12 @@ func (s *SwipeOpinionsInternalServerError) SetMessage(val string) {
 func (*SwipeOpinionsInternalServerError) swipeOpinionsRes() {}
 
 type SwipeOpinionsOK struct {
-	Opinions       []SwipeOpinionsOKOpinionsItem `json:"opinions"`
-	RemainingCount int                           `json:"remainingCount"`
+	Opinions       []OpinionWithReplyCount `json:"opinions"`
+	RemainingCount int                     `json:"remainingCount"`
 }
 
 // GetOpinions returns the value of Opinions.
-func (s *SwipeOpinionsOK) GetOpinions() []SwipeOpinionsOKOpinionsItem {
+func (s *SwipeOpinionsOK) GetOpinions() []OpinionWithReplyCount {
 	return s.Opinions
 }
 
@@ -7418,7 +5637,7 @@ func (s *SwipeOpinionsOK) GetRemainingCount() int {
 }
 
 // SetOpinions sets the value of Opinions.
-func (s *SwipeOpinionsOK) SetOpinions(val []SwipeOpinionsOKOpinionsItem) {
+func (s *SwipeOpinionsOK) SetOpinions(val []OpinionWithReplyCount) {
 	s.Opinions = val
 }
 
@@ -7429,85 +5648,34 @@ func (s *SwipeOpinionsOK) SetRemainingCount(val int) {
 
 func (*SwipeOpinionsOK) swipeOpinionsRes() {}
 
-type SwipeOpinionsOKOpinionsItem struct {
-	Opinion    Opinion `json:"opinion"`
-	ReplyCount int     `json:"replyCount"`
-	User       User    `json:"user"`
-}
-
-// GetOpinion returns the value of Opinion.
-func (s *SwipeOpinionsOKOpinionsItem) GetOpinion() Opinion {
-	return s.Opinion
-}
-
-// GetReplyCount returns the value of ReplyCount.
-func (s *SwipeOpinionsOKOpinionsItem) GetReplyCount() int {
-	return s.ReplyCount
-}
-
-// GetUser returns the value of User.
-func (s *SwipeOpinionsOKOpinionsItem) GetUser() User {
-	return s.User
-}
-
-// SetOpinion sets the value of Opinion.
-func (s *SwipeOpinionsOKOpinionsItem) SetOpinion(val Opinion) {
-	s.Opinion = val
-}
-
-// SetReplyCount sets the value of ReplyCount.
-func (s *SwipeOpinionsOKOpinionsItem) SetReplyCount(val int) {
-	s.ReplyCount = val
-}
-
-// SetUser sets the value of User.
-func (s *SwipeOpinionsOKOpinionsItem) SetUser(val User) {
-	s.User = val
-}
-
-// Ref: #/components/schemas/talkSession
+// Ref: #/components/schemas/TalkSession
 type TalkSession struct {
-	// 市区町村.
-	City OptNilString `json:"city"`
-	// 作成日時.
-	CreatedAt string `json:"createdAt"`
-	// 説明.
-	Description OptNilString `json:"description"`
-	HideReport  bool         `json:"hideReport"`
 	// トークセッションID.
-	ID       string      `json:"id"`
-	Location OptLocation `json:"location"`
-	Owner    User        `json:"owner"`
-	// 都道府県.
-	Prefecture OptNilString `json:"prefecture"`
-	// セッションの参加制限.
-	Restrictions []Restriction `json:"restrictions"`
-	// 終了予定日時.
-	ScheduledEndTime string `json:"scheduledEndTime"`
+	ID string `json:"id"`
 	// テーマ.
 	Theme string `json:"theme"`
+	// 説明.
+	Description OptNilString `json:"description"`
+	// 作成ユーザー.
+	Owner TalkSessionOwner `json:"owner"`
+	// 作成組織名.
+	OrganizationAlias OptNilTalkSessionOrganizationAlias `json:"organizationAlias"`
+	// 作成日時.
+	CreatedAt string `json:"createdAt"`
+	// 終了予定日時.
+	ScheduledEndTime string `json:"scheduledEndTime"`
+	// 位置情報.
+	Location OptTalkSessionLocation `json:"location"`
+	// 市区町村.
+	City OptNilString `json:"city"`
+	// 都道府県.
+	Prefecture OptNilString `json:"prefecture"`
 	// サムネ画像.
 	ThumbnailURL OptNilString `json:"thumbnailURL"`
-}
-
-// GetCity returns the value of City.
-func (s *TalkSession) GetCity() OptNilString {
-	return s.City
-}
-
-// GetCreatedAt returns the value of CreatedAt.
-func (s *TalkSession) GetCreatedAt() string {
-	return s.CreatedAt
-}
-
-// GetDescription returns the value of Description.
-func (s *TalkSession) GetDescription() OptNilString {
-	return s.Description
-}
-
-// GetHideReport returns the value of HideReport.
-func (s *TalkSession) GetHideReport() bool {
-	return s.HideReport
+	// セッションの参加制限.
+	Restrictions []Restriction `json:"restrictions"`
+	// レポートを隠すかどうか.
+	HideReport bool `json:"hideReport"`
 }
 
 // GetID returns the value of ID.
@@ -7515,24 +5683,29 @@ func (s *TalkSession) GetID() string {
 	return s.ID
 }
 
-// GetLocation returns the value of Location.
-func (s *TalkSession) GetLocation() OptLocation {
-	return s.Location
+// GetTheme returns the value of Theme.
+func (s *TalkSession) GetTheme() string {
+	return s.Theme
+}
+
+// GetDescription returns the value of Description.
+func (s *TalkSession) GetDescription() OptNilString {
+	return s.Description
 }
 
 // GetOwner returns the value of Owner.
-func (s *TalkSession) GetOwner() User {
+func (s *TalkSession) GetOwner() TalkSessionOwner {
 	return s.Owner
 }
 
-// GetPrefecture returns the value of Prefecture.
-func (s *TalkSession) GetPrefecture() OptNilString {
-	return s.Prefecture
+// GetOrganizationAlias returns the value of OrganizationAlias.
+func (s *TalkSession) GetOrganizationAlias() OptNilTalkSessionOrganizationAlias {
+	return s.OrganizationAlias
 }
 
-// GetRestrictions returns the value of Restrictions.
-func (s *TalkSession) GetRestrictions() []Restriction {
-	return s.Restrictions
+// GetCreatedAt returns the value of CreatedAt.
+func (s *TalkSession) GetCreatedAt() string {
+	return s.CreatedAt
 }
 
 // GetScheduledEndTime returns the value of ScheduledEndTime.
@@ -7540,9 +5713,19 @@ func (s *TalkSession) GetScheduledEndTime() string {
 	return s.ScheduledEndTime
 }
 
-// GetTheme returns the value of Theme.
-func (s *TalkSession) GetTheme() string {
-	return s.Theme
+// GetLocation returns the value of Location.
+func (s *TalkSession) GetLocation() OptTalkSessionLocation {
+	return s.Location
+}
+
+// GetCity returns the value of City.
+func (s *TalkSession) GetCity() OptNilString {
+	return s.City
+}
+
+// GetPrefecture returns the value of Prefecture.
+func (s *TalkSession) GetPrefecture() OptNilString {
+	return s.Prefecture
 }
 
 // GetThumbnailURL returns the value of ThumbnailURL.
@@ -7550,24 +5733,14 @@ func (s *TalkSession) GetThumbnailURL() OptNilString {
 	return s.ThumbnailURL
 }
 
-// SetCity sets the value of City.
-func (s *TalkSession) SetCity(val OptNilString) {
-	s.City = val
+// GetRestrictions returns the value of Restrictions.
+func (s *TalkSession) GetRestrictions() []Restriction {
+	return s.Restrictions
 }
 
-// SetCreatedAt sets the value of CreatedAt.
-func (s *TalkSession) SetCreatedAt(val string) {
-	s.CreatedAt = val
-}
-
-// SetDescription sets the value of Description.
-func (s *TalkSession) SetDescription(val OptNilString) {
-	s.Description = val
-}
-
-// SetHideReport sets the value of HideReport.
-func (s *TalkSession) SetHideReport(val bool) {
-	s.HideReport = val
+// GetHideReport returns the value of HideReport.
+func (s *TalkSession) GetHideReport() bool {
+	return s.HideReport
 }
 
 // SetID sets the value of ID.
@@ -7575,24 +5748,29 @@ func (s *TalkSession) SetID(val string) {
 	s.ID = val
 }
 
-// SetLocation sets the value of Location.
-func (s *TalkSession) SetLocation(val OptLocation) {
-	s.Location = val
+// SetTheme sets the value of Theme.
+func (s *TalkSession) SetTheme(val string) {
+	s.Theme = val
+}
+
+// SetDescription sets the value of Description.
+func (s *TalkSession) SetDescription(val OptNilString) {
+	s.Description = val
 }
 
 // SetOwner sets the value of Owner.
-func (s *TalkSession) SetOwner(val User) {
+func (s *TalkSession) SetOwner(val TalkSessionOwner) {
 	s.Owner = val
 }
 
-// SetPrefecture sets the value of Prefecture.
-func (s *TalkSession) SetPrefecture(val OptNilString) {
-	s.Prefecture = val
+// SetOrganizationAlias sets the value of OrganizationAlias.
+func (s *TalkSession) SetOrganizationAlias(val OptNilTalkSessionOrganizationAlias) {
+	s.OrganizationAlias = val
 }
 
-// SetRestrictions sets the value of Restrictions.
-func (s *TalkSession) SetRestrictions(val []Restriction) {
-	s.Restrictions = val
+// SetCreatedAt sets the value of CreatedAt.
+func (s *TalkSession) SetCreatedAt(val string) {
+	s.CreatedAt = val
 }
 
 // SetScheduledEndTime sets the value of ScheduledEndTime.
@@ -7600,9 +5778,19 @@ func (s *TalkSession) SetScheduledEndTime(val string) {
 	s.ScheduledEndTime = val
 }
 
-// SetTheme sets the value of Theme.
-func (s *TalkSession) SetTheme(val string) {
-	s.Theme = val
+// SetLocation sets the value of Location.
+func (s *TalkSession) SetLocation(val OptTalkSessionLocation) {
+	s.Location = val
+}
+
+// SetCity sets the value of City.
+func (s *TalkSession) SetCity(val OptNilString) {
+	s.City = val
+}
+
+// SetPrefecture sets the value of Prefecture.
+func (s *TalkSession) SetPrefecture(val OptNilString) {
+	s.Prefecture = val
 }
 
 // SetThumbnailURL sets the value of ThumbnailURL.
@@ -7610,8 +5798,19 @@ func (s *TalkSession) SetThumbnailURL(val OptNilString) {
 	s.ThumbnailURL = val
 }
 
+// SetRestrictions sets the value of Restrictions.
+func (s *TalkSession) SetRestrictions(val []Restriction) {
+	s.Restrictions = val
+}
+
+// SetHideReport sets the value of HideReport.
+func (s *TalkSession) SetHideReport(val bool) {
+	s.HideReport = val
+}
+
 func (*TalkSession) editTalkSessionRes()      {}
 func (*TalkSession) getTalkSessionDetailRes() {}
+func (*TalkSession) initiateTalkSessionRes()  {}
 
 type TalkSessionAnalysisBadRequest struct {
 	Code    string `json:"code"`
@@ -7668,14 +5867,9 @@ func (s *TalkSessionAnalysisInternalServerError) SetMessage(val string) {
 func (*TalkSessionAnalysisInternalServerError) talkSessionAnalysisRes() {}
 
 type TalkSessionAnalysisOK struct {
-	GroupOpinions []TalkSessionAnalysisOKGroupOpinionsItem `json:"groupOpinions"`
 	MyPosition    OptUserGroupPosition                     `json:"myPosition"`
 	Positions     []UserGroupPosition                      `json:"positions"`
-}
-
-// GetGroupOpinions returns the value of GroupOpinions.
-func (s *TalkSessionAnalysisOK) GetGroupOpinions() []TalkSessionAnalysisOKGroupOpinionsItem {
-	return s.GroupOpinions
+	GroupOpinions []TalkSessionAnalysisOKGroupOpinionsItem `json:"groupOpinions"`
 }
 
 // GetMyPosition returns the value of MyPosition.
@@ -7688,9 +5882,9 @@ func (s *TalkSessionAnalysisOK) GetPositions() []UserGroupPosition {
 	return s.Positions
 }
 
-// SetGroupOpinions sets the value of GroupOpinions.
-func (s *TalkSessionAnalysisOK) SetGroupOpinions(val []TalkSessionAnalysisOKGroupOpinionsItem) {
-	s.GroupOpinions = val
+// GetGroupOpinions returns the value of GroupOpinions.
+func (s *TalkSessionAnalysisOK) GetGroupOpinions() []TalkSessionAnalysisOKGroupOpinionsItem {
+	return s.GroupOpinions
 }
 
 // SetMyPosition sets the value of MyPosition.
@@ -7703,17 +5897,17 @@ func (s *TalkSessionAnalysisOK) SetPositions(val []UserGroupPosition) {
 	s.Positions = val
 }
 
+// SetGroupOpinions sets the value of GroupOpinions.
+func (s *TalkSessionAnalysisOK) SetGroupOpinions(val []TalkSessionAnalysisOKGroupOpinionsItem) {
+	s.GroupOpinions = val
+}
+
 func (*TalkSessionAnalysisOK) talkSessionAnalysisRes() {}
 
 type TalkSessionAnalysisOKGroupOpinionsItem struct {
-	GroupID   int                                                  `json:"groupID"`
 	GroupName string                                               `json:"groupName"`
+	GroupID   int                                                  `json:"groupID"`
 	Opinions  []TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem `json:"opinions"`
-}
-
-// GetGroupID returns the value of GroupID.
-func (s *TalkSessionAnalysisOKGroupOpinionsItem) GetGroupID() int {
-	return s.GroupID
 }
 
 // GetGroupName returns the value of GroupName.
@@ -7721,19 +5915,24 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItem) GetGroupName() string {
 	return s.GroupName
 }
 
+// GetGroupID returns the value of GroupID.
+func (s *TalkSessionAnalysisOKGroupOpinionsItem) GetGroupID() int {
+	return s.GroupID
+}
+
 // GetOpinions returns the value of Opinions.
 func (s *TalkSessionAnalysisOKGroupOpinionsItem) GetOpinions() []TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem {
 	return s.Opinions
 }
 
-// SetGroupID sets the value of GroupID.
-func (s *TalkSessionAnalysisOKGroupOpinionsItem) SetGroupID(val int) {
-	s.GroupID = val
-}
-
 // SetGroupName sets the value of GroupName.
 func (s *TalkSessionAnalysisOKGroupOpinionsItem) SetGroupName(val string) {
 	s.GroupName = val
+}
+
+// SetGroupID sets the value of GroupID.
+func (s *TalkSessionAnalysisOKGroupOpinionsItem) SetGroupID(val int) {
+	s.GroupID = val
 }
 
 // SetOpinions sets the value of Opinions.
@@ -7742,11 +5941,21 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItem) SetOpinions(val []TalkSessionAn
 }
 
 type TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem struct {
+	Opinion       Opinion `json:"opinion"`
+	User          User    `json:"user"`
 	AgreeCount    int     `json:"agreeCount"`
 	DisagreeCount int     `json:"disagreeCount"`
-	Opinion       Opinion `json:"opinion"`
 	PassCount     int     `json:"passCount"`
-	User          User    `json:"user"`
+}
+
+// GetOpinion returns the value of Opinion.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) GetOpinion() Opinion {
+	return s.Opinion
+}
+
+// GetUser returns the value of User.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) GetUser() User {
+	return s.User
 }
 
 // GetAgreeCount returns the value of AgreeCount.
@@ -7759,19 +5968,19 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) GetDisagreeCount() 
 	return s.DisagreeCount
 }
 
-// GetOpinion returns the value of Opinion.
-func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) GetOpinion() Opinion {
-	return s.Opinion
-}
-
 // GetPassCount returns the value of PassCount.
 func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) GetPassCount() int {
 	return s.PassCount
 }
 
-// GetUser returns the value of User.
-func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) GetUser() User {
-	return s.User
+// SetOpinion sets the value of Opinion.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) SetOpinion(val Opinion) {
+	s.Opinion = val
+}
+
+// SetUser sets the value of User.
+func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) SetUser(val User) {
+	s.User = val
 }
 
 // SetAgreeCount sets the value of AgreeCount.
@@ -7784,69 +5993,24 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) SetDisagreeCount(va
 	s.DisagreeCount = val
 }
 
-// SetOpinion sets the value of Opinion.
-func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) SetOpinion(val Opinion) {
-	s.Opinion = val
-}
-
 // SetPassCount sets the value of PassCount.
 func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) SetPassCount(val int) {
 	s.PassCount = val
 }
 
-// SetUser sets the value of User.
-func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) SetUser(val User) {
-	s.User = val
-}
-
 // Ref: #/components/schemas/TalkSessionForManage
 type TalkSessionForManage struct {
-	City             OptString     `json:"City"`
-	CreatedAt        string        `json:"CreatedAt"`
-	Description      string        `json:"Description"`
-	Hidden           bool          `json:"Hidden"`
-	Owner            UserForManage `json:"Owner"`
-	Prefecture       OptString     `json:"Prefecture"`
-	ScheduledEndTime time.Time     `json:"ScheduledEndTime"`
-	TalkSessionID    string        `json:"TalkSessionID"`
-	Theme            string        `json:"Theme"`
-	ThumbnailURL     string        `json:"ThumbnailURL"`
-	UpdatedAt        string        `json:"UpdatedAt"`
-}
-
-// GetCity returns the value of City.
-func (s *TalkSessionForManage) GetCity() OptString {
-	return s.City
-}
-
-// GetCreatedAt returns the value of CreatedAt.
-func (s *TalkSessionForManage) GetCreatedAt() string {
-	return s.CreatedAt
-}
-
-// GetDescription returns the value of Description.
-func (s *TalkSessionForManage) GetDescription() string {
-	return s.Description
-}
-
-// GetHidden returns the value of Hidden.
-func (s *TalkSessionForManage) GetHidden() bool {
-	return s.Hidden
-}
-
-// GetOwner returns the value of Owner.
-func (s *TalkSessionForManage) GetOwner() UserForManage {
-	return s.Owner
-}
-
-// GetPrefecture returns the value of Prefecture.
-func (s *TalkSessionForManage) GetPrefecture() OptString {
-	return s.Prefecture
-}
-
-// GetScheduledEndTime returns the value of ScheduledEndTime.
-func (s *TalkSessionForManage) GetScheduledEndTime() time.Time {
-	return s.ScheduledEndTime
+	TalkSessionID    string        `json:"talkSessionID"`
+	Theme            string        `json:"theme"`
+	Description      string        `json:"description"`
+	Owner            UserForManage `json:"owner"`
+	ScheduledEndTime time.Time     `json:"scheduledEndTime"`
+	City             OptString     `json:"city"`
+	Prefecture       OptString     `json:"prefecture"`
+	ThumbnailURL     string        `json:"thumbnailURL"`
+	Hidden           bool          `json:"hidden"`
+	UpdatedAt        string        `json:"updatedAt"`
+	CreatedAt        string        `json:"createdAt"`
 }
 
 // GetTalkSessionID returns the value of TalkSessionID.
@@ -7859,9 +6023,39 @@ func (s *TalkSessionForManage) GetTheme() string {
 	return s.Theme
 }
 
+// GetDescription returns the value of Description.
+func (s *TalkSessionForManage) GetDescription() string {
+	return s.Description
+}
+
+// GetOwner returns the value of Owner.
+func (s *TalkSessionForManage) GetOwner() UserForManage {
+	return s.Owner
+}
+
+// GetScheduledEndTime returns the value of ScheduledEndTime.
+func (s *TalkSessionForManage) GetScheduledEndTime() time.Time {
+	return s.ScheduledEndTime
+}
+
+// GetCity returns the value of City.
+func (s *TalkSessionForManage) GetCity() OptString {
+	return s.City
+}
+
+// GetPrefecture returns the value of Prefecture.
+func (s *TalkSessionForManage) GetPrefecture() OptString {
+	return s.Prefecture
+}
+
 // GetThumbnailURL returns the value of ThumbnailURL.
 func (s *TalkSessionForManage) GetThumbnailURL() string {
 	return s.ThumbnailURL
+}
+
+// GetHidden returns the value of Hidden.
+func (s *TalkSessionForManage) GetHidden() bool {
+	return s.Hidden
 }
 
 // GetUpdatedAt returns the value of UpdatedAt.
@@ -7869,39 +6063,9 @@ func (s *TalkSessionForManage) GetUpdatedAt() string {
 	return s.UpdatedAt
 }
 
-// SetCity sets the value of City.
-func (s *TalkSessionForManage) SetCity(val OptString) {
-	s.City = val
-}
-
-// SetCreatedAt sets the value of CreatedAt.
-func (s *TalkSessionForManage) SetCreatedAt(val string) {
-	s.CreatedAt = val
-}
-
-// SetDescription sets the value of Description.
-func (s *TalkSessionForManage) SetDescription(val string) {
-	s.Description = val
-}
-
-// SetHidden sets the value of Hidden.
-func (s *TalkSessionForManage) SetHidden(val bool) {
-	s.Hidden = val
-}
-
-// SetOwner sets the value of Owner.
-func (s *TalkSessionForManage) SetOwner(val UserForManage) {
-	s.Owner = val
-}
-
-// SetPrefecture sets the value of Prefecture.
-func (s *TalkSessionForManage) SetPrefecture(val OptString) {
-	s.Prefecture = val
-}
-
-// SetScheduledEndTime sets the value of ScheduledEndTime.
-func (s *TalkSessionForManage) SetScheduledEndTime(val time.Time) {
-	s.ScheduledEndTime = val
+// GetCreatedAt returns the value of CreatedAt.
+func (s *TalkSessionForManage) GetCreatedAt() string {
+	return s.CreatedAt
 }
 
 // SetTalkSessionID sets the value of TalkSessionID.
@@ -7914,9 +6078,39 @@ func (s *TalkSessionForManage) SetTheme(val string) {
 	s.Theme = val
 }
 
+// SetDescription sets the value of Description.
+func (s *TalkSessionForManage) SetDescription(val string) {
+	s.Description = val
+}
+
+// SetOwner sets the value of Owner.
+func (s *TalkSessionForManage) SetOwner(val UserForManage) {
+	s.Owner = val
+}
+
+// SetScheduledEndTime sets the value of ScheduledEndTime.
+func (s *TalkSessionForManage) SetScheduledEndTime(val time.Time) {
+	s.ScheduledEndTime = val
+}
+
+// SetCity sets the value of City.
+func (s *TalkSessionForManage) SetCity(val OptString) {
+	s.City = val
+}
+
+// SetPrefecture sets the value of Prefecture.
+func (s *TalkSessionForManage) SetPrefecture(val OptString) {
+	s.Prefecture = val
+}
+
 // SetThumbnailURL sets the value of ThumbnailURL.
 func (s *TalkSessionForManage) SetThumbnailURL(val string) {
 	s.ThumbnailURL = val
+}
+
+// SetHidden sets the value of Hidden.
+func (s *TalkSessionForManage) SetHidden(val bool) {
+	s.Hidden = val
 }
 
 // SetUpdatedAt sets the value of UpdatedAt.
@@ -7924,10 +6118,15 @@ func (s *TalkSessionForManage) SetUpdatedAt(val string) {
 	s.UpdatedAt = val
 }
 
+// SetCreatedAt sets the value of CreatedAt.
+func (s *TalkSessionForManage) SetCreatedAt(val string) {
+	s.CreatedAt = val
+}
+
 // Ref: #/components/schemas/TalkSessionListResponse
 type TalkSessionListResponse struct {
-	TalkSessionStats []TalkSessionStats `json:"TalkSessionStats"`
-	TotalCount       int32              `json:"TotalCount"`
+	TalkSessionStats []TalkSessionStats `json:"talkSessionStats"`
+	TotalCount       int32              `json:"totalCount"`
 }
 
 // GetTalkSessionStats returns the value of TalkSessionStats.
@@ -7950,68 +6149,123 @@ func (s *TalkSessionListResponse) SetTotalCount(val int32) {
 	s.TotalCount = val
 }
 
-// Ref: #/components/schemas/TalkSessionStats
-type TalkSessionStats struct {
-	City             OptString     `json:"City"`
-	CreatedAt        string        `json:"CreatedAt"`
-	Description      string        `json:"Description"`
-	Hidden           bool          `json:"Hidden"`
-	OpinionCount     int32         `json:"OpinionCount"`
-	OpinionUserCount int32         `json:"OpinionUserCount"`
-	Owner            UserForManage `json:"Owner"`
-	Prefecture       OptString     `json:"Prefecture"`
-	ScheduledEndTime time.Time     `json:"ScheduledEndTime"`
-	TalkSessionID    string        `json:"TalkSessionID"`
-	Theme            string        `json:"Theme"`
-	ThumbnailURL     string        `json:"ThumbnailURL"`
-	UpdatedAt        string        `json:"UpdatedAt"`
-	VoteCount        int32         `json:"VoteCount"`
-	VoteUserCount    int32         `json:"VoteUserCount"`
+type TalkSessionLocation struct {
+	// 緯度.
+	Latitude OptFloat64 `json:"latitude"`
+	// 経度.
+	Longitude OptFloat64 `json:"longitude"`
 }
 
-// GetCity returns the value of City.
-func (s *TalkSessionStats) GetCity() OptString {
-	return s.City
+// GetLatitude returns the value of Latitude.
+func (s *TalkSessionLocation) GetLatitude() OptFloat64 {
+	return s.Latitude
+}
+
+// GetLongitude returns the value of Longitude.
+func (s *TalkSessionLocation) GetLongitude() OptFloat64 {
+	return s.Longitude
+}
+
+// SetLatitude sets the value of Latitude.
+func (s *TalkSessionLocation) SetLatitude(val OptFloat64) {
+	s.Latitude = val
+}
+
+// SetLongitude sets the value of Longitude.
+func (s *TalkSessionLocation) SetLongitude(val OptFloat64) {
+	s.Longitude = val
+}
+
+// 組織エイリアス.
+type TalkSessionOrganizationAlias struct {
+	AliasID   string       `json:"aliasID"`
+	AliasName string       `json:"aliasName"`
+	CreatedAt OptNilString `json:"createdAt"`
+}
+
+// GetAliasID returns the value of AliasID.
+func (s *TalkSessionOrganizationAlias) GetAliasID() string {
+	return s.AliasID
+}
+
+// GetAliasName returns the value of AliasName.
+func (s *TalkSessionOrganizationAlias) GetAliasName() string {
+	return s.AliasName
 }
 
 // GetCreatedAt returns the value of CreatedAt.
-func (s *TalkSessionStats) GetCreatedAt() string {
+func (s *TalkSessionOrganizationAlias) GetCreatedAt() OptNilString {
 	return s.CreatedAt
 }
 
-// GetDescription returns the value of Description.
-func (s *TalkSessionStats) GetDescription() string {
-	return s.Description
+// SetAliasID sets the value of AliasID.
+func (s *TalkSessionOrganizationAlias) SetAliasID(val string) {
+	s.AliasID = val
 }
 
-// GetHidden returns the value of Hidden.
-func (s *TalkSessionStats) GetHidden() bool {
-	return s.Hidden
+// SetAliasName sets the value of AliasName.
+func (s *TalkSessionOrganizationAlias) SetAliasName(val string) {
+	s.AliasName = val
 }
 
-// GetOpinionCount returns the value of OpinionCount.
-func (s *TalkSessionStats) GetOpinionCount() int32 {
-	return s.OpinionCount
+// SetCreatedAt sets the value of CreatedAt.
+func (s *TalkSessionOrganizationAlias) SetCreatedAt(val OptNilString) {
+	s.CreatedAt = val
 }
 
-// GetOpinionUserCount returns the value of OpinionUserCount.
-func (s *TalkSessionStats) GetOpinionUserCount() int32 {
-	return s.OpinionUserCount
+type TalkSessionOwner struct {
+	DisplayID   string       `json:"displayID"`
+	DisplayName string       `json:"displayName"`
+	IconURL     OptNilString `json:"iconURL"`
 }
 
-// GetOwner returns the value of Owner.
-func (s *TalkSessionStats) GetOwner() UserForManage {
-	return s.Owner
+// GetDisplayID returns the value of DisplayID.
+func (s *TalkSessionOwner) GetDisplayID() string {
+	return s.DisplayID
 }
 
-// GetPrefecture returns the value of Prefecture.
-func (s *TalkSessionStats) GetPrefecture() OptString {
-	return s.Prefecture
+// GetDisplayName returns the value of DisplayName.
+func (s *TalkSessionOwner) GetDisplayName() string {
+	return s.DisplayName
 }
 
-// GetScheduledEndTime returns the value of ScheduledEndTime.
-func (s *TalkSessionStats) GetScheduledEndTime() time.Time {
-	return s.ScheduledEndTime
+// GetIconURL returns the value of IconURL.
+func (s *TalkSessionOwner) GetIconURL() OptNilString {
+	return s.IconURL
+}
+
+// SetDisplayID sets the value of DisplayID.
+func (s *TalkSessionOwner) SetDisplayID(val string) {
+	s.DisplayID = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *TalkSessionOwner) SetDisplayName(val string) {
+	s.DisplayName = val
+}
+
+// SetIconURL sets the value of IconURL.
+func (s *TalkSessionOwner) SetIconURL(val OptNilString) {
+	s.IconURL = val
+}
+
+// Ref: #/components/schemas/TalkSessionStats
+type TalkSessionStats struct {
+	TalkSessionID    string        `json:"talkSessionID"`
+	Theme            string        `json:"theme"`
+	Description      string        `json:"description"`
+	Owner            UserForManage `json:"owner"`
+	ScheduledEndTime time.Time     `json:"scheduledEndTime"`
+	City             OptString     `json:"city"`
+	Prefecture       OptString     `json:"prefecture"`
+	ThumbnailURL     string        `json:"thumbnailURL"`
+	Hidden           bool          `json:"hidden"`
+	UpdatedAt        string        `json:"updatedAt"`
+	CreatedAt        string        `json:"createdAt"`
+	OpinionCount     int32         `json:"opinionCount"`
+	OpinionUserCount int32         `json:"opinionUserCount"`
+	VoteCount        int32         `json:"voteCount"`
+	VoteUserCount    int32         `json:"voteUserCount"`
 }
 
 // GetTalkSessionID returns the value of TalkSessionID.
@@ -8024,14 +6278,59 @@ func (s *TalkSessionStats) GetTheme() string {
 	return s.Theme
 }
 
+// GetDescription returns the value of Description.
+func (s *TalkSessionStats) GetDescription() string {
+	return s.Description
+}
+
+// GetOwner returns the value of Owner.
+func (s *TalkSessionStats) GetOwner() UserForManage {
+	return s.Owner
+}
+
+// GetScheduledEndTime returns the value of ScheduledEndTime.
+func (s *TalkSessionStats) GetScheduledEndTime() time.Time {
+	return s.ScheduledEndTime
+}
+
+// GetCity returns the value of City.
+func (s *TalkSessionStats) GetCity() OptString {
+	return s.City
+}
+
+// GetPrefecture returns the value of Prefecture.
+func (s *TalkSessionStats) GetPrefecture() OptString {
+	return s.Prefecture
+}
+
 // GetThumbnailURL returns the value of ThumbnailURL.
 func (s *TalkSessionStats) GetThumbnailURL() string {
 	return s.ThumbnailURL
 }
 
+// GetHidden returns the value of Hidden.
+func (s *TalkSessionStats) GetHidden() bool {
+	return s.Hidden
+}
+
 // GetUpdatedAt returns the value of UpdatedAt.
 func (s *TalkSessionStats) GetUpdatedAt() string {
 	return s.UpdatedAt
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *TalkSessionStats) GetCreatedAt() string {
+	return s.CreatedAt
+}
+
+// GetOpinionCount returns the value of OpinionCount.
+func (s *TalkSessionStats) GetOpinionCount() int32 {
+	return s.OpinionCount
+}
+
+// GetOpinionUserCount returns the value of OpinionUserCount.
+func (s *TalkSessionStats) GetOpinionUserCount() int32 {
+	return s.OpinionUserCount
 }
 
 // GetVoteCount returns the value of VoteCount.
@@ -8044,51 +6343,6 @@ func (s *TalkSessionStats) GetVoteUserCount() int32 {
 	return s.VoteUserCount
 }
 
-// SetCity sets the value of City.
-func (s *TalkSessionStats) SetCity(val OptString) {
-	s.City = val
-}
-
-// SetCreatedAt sets the value of CreatedAt.
-func (s *TalkSessionStats) SetCreatedAt(val string) {
-	s.CreatedAt = val
-}
-
-// SetDescription sets the value of Description.
-func (s *TalkSessionStats) SetDescription(val string) {
-	s.Description = val
-}
-
-// SetHidden sets the value of Hidden.
-func (s *TalkSessionStats) SetHidden(val bool) {
-	s.Hidden = val
-}
-
-// SetOpinionCount sets the value of OpinionCount.
-func (s *TalkSessionStats) SetOpinionCount(val int32) {
-	s.OpinionCount = val
-}
-
-// SetOpinionUserCount sets the value of OpinionUserCount.
-func (s *TalkSessionStats) SetOpinionUserCount(val int32) {
-	s.OpinionUserCount = val
-}
-
-// SetOwner sets the value of Owner.
-func (s *TalkSessionStats) SetOwner(val UserForManage) {
-	s.Owner = val
-}
-
-// SetPrefecture sets the value of Prefecture.
-func (s *TalkSessionStats) SetPrefecture(val OptString) {
-	s.Prefecture = val
-}
-
-// SetScheduledEndTime sets the value of ScheduledEndTime.
-func (s *TalkSessionStats) SetScheduledEndTime(val time.Time) {
-	s.ScheduledEndTime = val
-}
-
 // SetTalkSessionID sets the value of TalkSessionID.
 func (s *TalkSessionStats) SetTalkSessionID(val string) {
 	s.TalkSessionID = val
@@ -8099,14 +6353,59 @@ func (s *TalkSessionStats) SetTheme(val string) {
 	s.Theme = val
 }
 
+// SetDescription sets the value of Description.
+func (s *TalkSessionStats) SetDescription(val string) {
+	s.Description = val
+}
+
+// SetOwner sets the value of Owner.
+func (s *TalkSessionStats) SetOwner(val UserForManage) {
+	s.Owner = val
+}
+
+// SetScheduledEndTime sets the value of ScheduledEndTime.
+func (s *TalkSessionStats) SetScheduledEndTime(val time.Time) {
+	s.ScheduledEndTime = val
+}
+
+// SetCity sets the value of City.
+func (s *TalkSessionStats) SetCity(val OptString) {
+	s.City = val
+}
+
+// SetPrefecture sets the value of Prefecture.
+func (s *TalkSessionStats) SetPrefecture(val OptString) {
+	s.Prefecture = val
+}
+
 // SetThumbnailURL sets the value of ThumbnailURL.
 func (s *TalkSessionStats) SetThumbnailURL(val string) {
 	s.ThumbnailURL = val
 }
 
+// SetHidden sets the value of Hidden.
+func (s *TalkSessionStats) SetHidden(val bool) {
+	s.Hidden = val
+}
+
 // SetUpdatedAt sets the value of UpdatedAt.
 func (s *TalkSessionStats) SetUpdatedAt(val string) {
 	s.UpdatedAt = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *TalkSessionStats) SetCreatedAt(val string) {
+	s.CreatedAt = val
+}
+
+// SetOpinionCount sets the value of OpinionCount.
+func (s *TalkSessionStats) SetOpinionCount(val int32) {
+	s.OpinionCount = val
+}
+
+// SetOpinionUserCount sets the value of OpinionUserCount.
+func (s *TalkSessionStats) SetOpinionUserCount(val int32) {
+	s.OpinionUserCount = val
 }
 
 // SetVoteCount sets the value of VoteCount.
@@ -8128,17 +6427,12 @@ type TestInternalServerError struct{}
 func (*TestInternalServerError) testRes() {}
 
 type TestOK struct {
-	OptBool    OptBool      `json:"optBool"`
 	OptInt     OptNilInt    `json:"optInt"`
-	OptNilBool OptNilBool   `json:"optNilBool"`
 	OptNilInt  OptInt       `json:"optNilInt"`
-	OptNilUrl  OptNilString `json:"optNilUrl"`
+	OptNilBool OptNilBool   `json:"optNilBool"`
+	OptBool    OptBool      `json:"optBool"`
 	OptUrl     OptURI       `json:"optUrl"`
-}
-
-// GetOptBool returns the value of OptBool.
-func (s *TestOK) GetOptBool() OptBool {
-	return s.OptBool
+	OptNilUrl  OptNilString `json:"optNilUrl"`
 }
 
 // GetOptInt returns the value of OptInt.
@@ -8146,19 +6440,19 @@ func (s *TestOK) GetOptInt() OptNilInt {
 	return s.OptInt
 }
 
-// GetOptNilBool returns the value of OptNilBool.
-func (s *TestOK) GetOptNilBool() OptNilBool {
-	return s.OptNilBool
-}
-
 // GetOptNilInt returns the value of OptNilInt.
 func (s *TestOK) GetOptNilInt() OptInt {
 	return s.OptNilInt
 }
 
-// GetOptNilUrl returns the value of OptNilUrl.
-func (s *TestOK) GetOptNilUrl() OptNilString {
-	return s.OptNilUrl
+// GetOptNilBool returns the value of OptNilBool.
+func (s *TestOK) GetOptNilBool() OptNilBool {
+	return s.OptNilBool
+}
+
+// GetOptBool returns the value of OptBool.
+func (s *TestOK) GetOptBool() OptBool {
+	return s.OptBool
 }
 
 // GetOptUrl returns the value of OptUrl.
@@ -8166,9 +6460,9 @@ func (s *TestOK) GetOptUrl() OptURI {
 	return s.OptUrl
 }
 
-// SetOptBool sets the value of OptBool.
-func (s *TestOK) SetOptBool(val OptBool) {
-	s.OptBool = val
+// GetOptNilUrl returns the value of OptNilUrl.
+func (s *TestOK) GetOptNilUrl() OptNilString {
+	return s.OptNilUrl
 }
 
 // SetOptInt sets the value of OptInt.
@@ -8176,24 +6470,29 @@ func (s *TestOK) SetOptInt(val OptNilInt) {
 	s.OptInt = val
 }
 
-// SetOptNilBool sets the value of OptNilBool.
-func (s *TestOK) SetOptNilBool(val OptNilBool) {
-	s.OptNilBool = val
-}
-
 // SetOptNilInt sets the value of OptNilInt.
 func (s *TestOK) SetOptNilInt(val OptInt) {
 	s.OptNilInt = val
 }
 
-// SetOptNilUrl sets the value of OptNilUrl.
-func (s *TestOK) SetOptNilUrl(val OptNilString) {
-	s.OptNilUrl = val
+// SetOptNilBool sets the value of OptNilBool.
+func (s *TestOK) SetOptNilBool(val OptNilBool) {
+	s.OptNilBool = val
+}
+
+// SetOptBool sets the value of OptBool.
+func (s *TestOK) SetOptBool(val OptBool) {
+	s.OptBool = val
 }
 
 // SetOptUrl sets the value of OptUrl.
 func (s *TestOK) SetOptUrl(val OptURI) {
 	s.OptUrl = val
+}
+
+// SetOptNilUrl sets the value of OptNilUrl.
+func (s *TestOK) SetOptNilUrl(val OptNilString) {
+	s.OptNilUrl = val
 }
 
 func (*TestOK) testRes() {}
@@ -8216,15 +6515,10 @@ func (s *ToggleReportVisibilityRequest) SetHidden(val bool) {
 
 // Ref: #/components/schemas/ToggleReportVisibilityResponse
 type ToggleReportVisibilityResponse struct {
-	// メッセージ.
-	Message string `json:"message"`
 	// ステータス.
 	Status string `json:"status"`
-}
-
-// GetMessage returns the value of Message.
-func (s *ToggleReportVisibilityResponse) GetMessage() string {
-	return s.Message
+	// メッセージ.
+	Message string `json:"message"`
 }
 
 // GetStatus returns the value of Status.
@@ -8232,9 +6526,9 @@ func (s *ToggleReportVisibilityResponse) GetStatus() string {
 	return s.Status
 }
 
-// SetMessage sets the value of Message.
-func (s *ToggleReportVisibilityResponse) SetMessage(val string) {
-	s.Message = val
+// GetMessage returns the value of Message.
+func (s *ToggleReportVisibilityResponse) GetMessage() string {
+	return s.Message
 }
 
 // SetStatus sets the value of Status.
@@ -8242,7 +6536,410 @@ func (s *ToggleReportVisibilityResponse) SetStatus(val string) {
 	s.Status = val
 }
 
-// Ref: #/components/schemas/user
+// SetMessage sets the value of Message.
+func (s *ToggleReportVisibilityResponse) SetMessage(val string) {
+	s.Message = val
+}
+
+// Ref: #/components/schemas/TokenClaim
+type TokenClaim struct {
+	// Audience.
+	Aud string `json:"aud"`
+	// 有効期限.
+	Exp string `json:"exp"`
+	// 発行日時.
+	Iat string `json:"iat"`
+	// 発行者.
+	Iss string `json:"iss"`
+	// ユーザID.
+	Sub string `json:"sub"`
+	// JWT ID.
+	Jti string `json:"jti"`
+	// ユーザーID.
+	DisplayID OptString `json:"displayID"`
+	// ユーザー名.
+	DisplayName OptString `json:"displayName"`
+	// アイコンURL.
+	IconURL OptString `json:"iconURL"`
+	// ユーザ登録済みか.
+	IsRegistered    bool `json:"isRegistered"`
+	IsEmailVerified bool `json:"isEmailVerified"`
+	// アカウントの種類。組織がなければ空.
+	OrgType OptNilInt `json:"orgType"`
+	// パスワードの更新が必要かどうか.
+	RequiredPasswordChange bool `json:"requiredPasswordChange"`
+	// 組織のRole.
+	OrganizationRole OptNilString `json:"organizationRole"`
+	// 組織コード
+	// ログイン時に使用する.
+	OrganizationCode OptNilString `json:"organizationCode"`
+	// 組織ID.
+	OrganizationID OptNilString `json:"organizationID"`
+}
+
+// GetAud returns the value of Aud.
+func (s *TokenClaim) GetAud() string {
+	return s.Aud
+}
+
+// GetExp returns the value of Exp.
+func (s *TokenClaim) GetExp() string {
+	return s.Exp
+}
+
+// GetIat returns the value of Iat.
+func (s *TokenClaim) GetIat() string {
+	return s.Iat
+}
+
+// GetIss returns the value of Iss.
+func (s *TokenClaim) GetIss() string {
+	return s.Iss
+}
+
+// GetSub returns the value of Sub.
+func (s *TokenClaim) GetSub() string {
+	return s.Sub
+}
+
+// GetJti returns the value of Jti.
+func (s *TokenClaim) GetJti() string {
+	return s.Jti
+}
+
+// GetDisplayID returns the value of DisplayID.
+func (s *TokenClaim) GetDisplayID() OptString {
+	return s.DisplayID
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *TokenClaim) GetDisplayName() OptString {
+	return s.DisplayName
+}
+
+// GetIconURL returns the value of IconURL.
+func (s *TokenClaim) GetIconURL() OptString {
+	return s.IconURL
+}
+
+// GetIsRegistered returns the value of IsRegistered.
+func (s *TokenClaim) GetIsRegistered() bool {
+	return s.IsRegistered
+}
+
+// GetIsEmailVerified returns the value of IsEmailVerified.
+func (s *TokenClaim) GetIsEmailVerified() bool {
+	return s.IsEmailVerified
+}
+
+// GetOrgType returns the value of OrgType.
+func (s *TokenClaim) GetOrgType() OptNilInt {
+	return s.OrgType
+}
+
+// GetRequiredPasswordChange returns the value of RequiredPasswordChange.
+func (s *TokenClaim) GetRequiredPasswordChange() bool {
+	return s.RequiredPasswordChange
+}
+
+// GetOrganizationRole returns the value of OrganizationRole.
+func (s *TokenClaim) GetOrganizationRole() OptNilString {
+	return s.OrganizationRole
+}
+
+// GetOrganizationCode returns the value of OrganizationCode.
+func (s *TokenClaim) GetOrganizationCode() OptNilString {
+	return s.OrganizationCode
+}
+
+// GetOrganizationID returns the value of OrganizationID.
+func (s *TokenClaim) GetOrganizationID() OptNilString {
+	return s.OrganizationID
+}
+
+// SetAud sets the value of Aud.
+func (s *TokenClaim) SetAud(val string) {
+	s.Aud = val
+}
+
+// SetExp sets the value of Exp.
+func (s *TokenClaim) SetExp(val string) {
+	s.Exp = val
+}
+
+// SetIat sets the value of Iat.
+func (s *TokenClaim) SetIat(val string) {
+	s.Iat = val
+}
+
+// SetIss sets the value of Iss.
+func (s *TokenClaim) SetIss(val string) {
+	s.Iss = val
+}
+
+// SetSub sets the value of Sub.
+func (s *TokenClaim) SetSub(val string) {
+	s.Sub = val
+}
+
+// SetJti sets the value of Jti.
+func (s *TokenClaim) SetJti(val string) {
+	s.Jti = val
+}
+
+// SetDisplayID sets the value of DisplayID.
+func (s *TokenClaim) SetDisplayID(val OptString) {
+	s.DisplayID = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *TokenClaim) SetDisplayName(val OptString) {
+	s.DisplayName = val
+}
+
+// SetIconURL sets the value of IconURL.
+func (s *TokenClaim) SetIconURL(val OptString) {
+	s.IconURL = val
+}
+
+// SetIsRegistered sets the value of IsRegistered.
+func (s *TokenClaim) SetIsRegistered(val bool) {
+	s.IsRegistered = val
+}
+
+// SetIsEmailVerified sets the value of IsEmailVerified.
+func (s *TokenClaim) SetIsEmailVerified(val bool) {
+	s.IsEmailVerified = val
+}
+
+// SetOrgType sets the value of OrgType.
+func (s *TokenClaim) SetOrgType(val OptNilInt) {
+	s.OrgType = val
+}
+
+// SetRequiredPasswordChange sets the value of RequiredPasswordChange.
+func (s *TokenClaim) SetRequiredPasswordChange(val bool) {
+	s.RequiredPasswordChange = val
+}
+
+// SetOrganizationRole sets the value of OrganizationRole.
+func (s *TokenClaim) SetOrganizationRole(val OptNilString) {
+	s.OrganizationRole = val
+}
+
+// SetOrganizationCode sets the value of OrganizationCode.
+func (s *TokenClaim) SetOrganizationCode(val OptNilString) {
+	s.OrganizationCode = val
+}
+
+// SetOrganizationID sets the value of OrganizationID.
+func (s *TokenClaim) SetOrganizationID(val OptNilString) {
+	s.OrganizationID = val
+}
+
+func (*TokenClaim) getTokenInfoRes() {}
+
+type UpdateUserProfileBadRequest struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *UpdateUserProfileBadRequest) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *UpdateUserProfileBadRequest) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *UpdateUserProfileBadRequest) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *UpdateUserProfileBadRequest) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*UpdateUserProfileBadRequest) updateUserProfileRes() {}
+
+type UpdateUserProfileInternalServerError struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *UpdateUserProfileInternalServerError) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *UpdateUserProfileInternalServerError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *UpdateUserProfileInternalServerError) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *UpdateUserProfileInternalServerError) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*UpdateUserProfileInternalServerError) updateUserProfileRes() {}
+
+type UpdateUserProfileReq struct {
+	DisplayName OptNilString                     `json:"displayName"`
+	Icon        OptMultipartFile                 `json:"icon"`
+	DeleteIcon  OptNilBool                       `json:"deleteIcon"`
+	DateOfBirth OptString                        `json:"dateOfBirth"`
+	Gender      OptNilUpdateUserProfileReqGender `json:"gender"`
+	City        OptNilString                     `json:"city"`
+	Prefecture  OptNilString                     `json:"prefecture"`
+	Email       OptNilString                     `json:"email"`
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *UpdateUserProfileReq) GetDisplayName() OptNilString {
+	return s.DisplayName
+}
+
+// GetIcon returns the value of Icon.
+func (s *UpdateUserProfileReq) GetIcon() OptMultipartFile {
+	return s.Icon
+}
+
+// GetDeleteIcon returns the value of DeleteIcon.
+func (s *UpdateUserProfileReq) GetDeleteIcon() OptNilBool {
+	return s.DeleteIcon
+}
+
+// GetDateOfBirth returns the value of DateOfBirth.
+func (s *UpdateUserProfileReq) GetDateOfBirth() OptString {
+	return s.DateOfBirth
+}
+
+// GetGender returns the value of Gender.
+func (s *UpdateUserProfileReq) GetGender() OptNilUpdateUserProfileReqGender {
+	return s.Gender
+}
+
+// GetCity returns the value of City.
+func (s *UpdateUserProfileReq) GetCity() OptNilString {
+	return s.City
+}
+
+// GetPrefecture returns the value of Prefecture.
+func (s *UpdateUserProfileReq) GetPrefecture() OptNilString {
+	return s.Prefecture
+}
+
+// GetEmail returns the value of Email.
+func (s *UpdateUserProfileReq) GetEmail() OptNilString {
+	return s.Email
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *UpdateUserProfileReq) SetDisplayName(val OptNilString) {
+	s.DisplayName = val
+}
+
+// SetIcon sets the value of Icon.
+func (s *UpdateUserProfileReq) SetIcon(val OptMultipartFile) {
+	s.Icon = val
+}
+
+// SetDeleteIcon sets the value of DeleteIcon.
+func (s *UpdateUserProfileReq) SetDeleteIcon(val OptNilBool) {
+	s.DeleteIcon = val
+}
+
+// SetDateOfBirth sets the value of DateOfBirth.
+func (s *UpdateUserProfileReq) SetDateOfBirth(val OptString) {
+	s.DateOfBirth = val
+}
+
+// SetGender sets the value of Gender.
+func (s *UpdateUserProfileReq) SetGender(val OptNilUpdateUserProfileReqGender) {
+	s.Gender = val
+}
+
+// SetCity sets the value of City.
+func (s *UpdateUserProfileReq) SetCity(val OptNilString) {
+	s.City = val
+}
+
+// SetPrefecture sets the value of Prefecture.
+func (s *UpdateUserProfileReq) SetPrefecture(val OptNilString) {
+	s.Prefecture = val
+}
+
+// SetEmail sets the value of Email.
+func (s *UpdateUserProfileReq) SetEmail(val OptNilString) {
+	s.Email = val
+}
+
+type UpdateUserProfileReqGender string
+
+const (
+	UpdateUserProfileReqGender_0 UpdateUserProfileReqGender = "男性"
+	UpdateUserProfileReqGender_1 UpdateUserProfileReqGender = "女性"
+	UpdateUserProfileReqGender_2 UpdateUserProfileReqGender = "その他"
+	UpdateUserProfileReqGender_3 UpdateUserProfileReqGender = "回答しない"
+)
+
+// AllValues returns all UpdateUserProfileReqGender values.
+func (UpdateUserProfileReqGender) AllValues() []UpdateUserProfileReqGender {
+	return []UpdateUserProfileReqGender{
+		UpdateUserProfileReqGender_0,
+		UpdateUserProfileReqGender_1,
+		UpdateUserProfileReqGender_2,
+		UpdateUserProfileReqGender_3,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s UpdateUserProfileReqGender) MarshalText() ([]byte, error) {
+	switch s {
+	case UpdateUserProfileReqGender_0:
+		return []byte(s), nil
+	case UpdateUserProfileReqGender_1:
+		return []byte(s), nil
+	case UpdateUserProfileReqGender_2:
+		return []byte(s), nil
+	case UpdateUserProfileReqGender_3:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *UpdateUserProfileReqGender) UnmarshalText(data []byte) error {
+	switch UpdateUserProfileReqGender(data) {
+	case UpdateUserProfileReqGender_0:
+		*s = UpdateUserProfileReqGender_0
+		return nil
+	case UpdateUserProfileReqGender_1:
+		*s = UpdateUserProfileReqGender_1
+		return nil
+	case UpdateUserProfileReqGender_2:
+		*s = UpdateUserProfileReqGender_2
+		return nil
+	case UpdateUserProfileReqGender_3:
+		*s = UpdateUserProfileReqGender_3
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// Ref: #/components/schemas/User
 type User struct {
 	DisplayID   string       `json:"displayID"`
 	DisplayName string       `json:"displayName"`
@@ -8279,21 +6976,19 @@ func (s *User) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
 
-// Ref: #/components/schemas/userDemographics
+func (*User) establishUserRes()     {}
+func (*User) updateUserProfileRes() {}
+
+// Ref: #/components/schemas/UserDemographics
 type UserDemographics struct {
-	// 市町村.
-	City OptNilString `json:"city"`
 	// 生年月日.
 	DateOfBirth OptNilInt `json:"dateOfBirth"`
 	// 性別.
 	Gender OptNilString `json:"gender"`
+	// 市町村.
+	City OptNilString `json:"city"`
 	// 都道府県.
 	Prefecture OptNilString `json:"prefecture"`
-}
-
-// GetCity returns the value of City.
-func (s *UserDemographics) GetCity() OptNilString {
-	return s.City
 }
 
 // GetDateOfBirth returns the value of DateOfBirth.
@@ -8306,14 +7001,14 @@ func (s *UserDemographics) GetGender() OptNilString {
 	return s.Gender
 }
 
+// GetCity returns the value of City.
+func (s *UserDemographics) GetCity() OptNilString {
+	return s.City
+}
+
 // GetPrefecture returns the value of Prefecture.
 func (s *UserDemographics) GetPrefecture() OptNilString {
 	return s.Prefecture
-}
-
-// SetCity sets the value of City.
-func (s *UserDemographics) SetCity(val OptNilString) {
-	s.City = val
 }
 
 // SetDateOfBirth sets the value of DateOfBirth.
@@ -8326,6 +7021,11 @@ func (s *UserDemographics) SetGender(val OptNilString) {
 	s.Gender = val
 }
 
+// SetCity sets the value of City.
+func (s *UserDemographics) SetCity(val OptNilString) {
+	s.City = val
+}
+
 // SetPrefecture sets the value of Prefecture.
 func (s *UserDemographics) SetPrefecture(val OptNilString) {
 	s.Prefecture = val
@@ -8333,8 +7033,8 @@ func (s *UserDemographics) SetPrefecture(val OptNilString) {
 
 // Ref: #/components/schemas/UserForManage
 type UserForManage struct {
-	// 作成日時.
-	CreatedAt time.Time `json:"createdAt"`
+	// ユーザーID.
+	UserID string `json:"userID"`
 	// 表示ID.
 	DisplayID string `json:"displayID"`
 	// 表示名.
@@ -8343,15 +7043,15 @@ type UserForManage struct {
 	IconURL string `json:"iconURL"`
 	// 最終ログイン日時.
 	LastLoginAt time.Time `json:"lastLoginAt"`
+	// 作成日時.
+	CreatedAt time.Time `json:"createdAt"`
 	// 更新日時.
 	UpdatedAt time.Time `json:"updatedAt"`
-	// ユーザーID.
-	UserID string `json:"userID"`
 }
 
-// GetCreatedAt returns the value of CreatedAt.
-func (s *UserForManage) GetCreatedAt() time.Time {
-	return s.CreatedAt
+// GetUserID returns the value of UserID.
+func (s *UserForManage) GetUserID() string {
+	return s.UserID
 }
 
 // GetDisplayID returns the value of DisplayID.
@@ -8374,19 +7074,19 @@ func (s *UserForManage) GetLastLoginAt() time.Time {
 	return s.LastLoginAt
 }
 
+// GetCreatedAt returns the value of CreatedAt.
+func (s *UserForManage) GetCreatedAt() time.Time {
+	return s.CreatedAt
+}
+
 // GetUpdatedAt returns the value of UpdatedAt.
 func (s *UserForManage) GetUpdatedAt() time.Time {
 	return s.UpdatedAt
 }
 
-// GetUserID returns the value of UserID.
-func (s *UserForManage) GetUserID() string {
-	return s.UserID
-}
-
-// SetCreatedAt sets the value of CreatedAt.
-func (s *UserForManage) SetCreatedAt(val time.Time) {
-	s.CreatedAt = val
+// SetUserID sets the value of UserID.
+func (s *UserForManage) SetUserID(val string) {
+	s.UserID = val
 }
 
 // SetDisplayID sets the value of DisplayID.
@@ -8409,57 +7109,27 @@ func (s *UserForManage) SetLastLoginAt(val time.Time) {
 	s.LastLoginAt = val
 }
 
+// SetCreatedAt sets the value of CreatedAt.
+func (s *UserForManage) SetCreatedAt(val time.Time) {
+	s.CreatedAt = val
+}
+
 // SetUpdatedAt sets the value of UpdatedAt.
 func (s *UserForManage) SetUpdatedAt(val time.Time) {
 	s.UpdatedAt = val
 }
 
-// SetUserID sets the value of UserID.
-func (s *UserForManage) SetUserID(val string) {
-	s.UserID = val
-}
-
-// Ref: #/components/schemas/userGroupPosition
+// Ref: #/components/schemas/UserGroupPosition
 type UserGroupPosition struct {
+	PosX        float64      `json:"posX"`
+	PosY        float64      `json:"posY"`
 	DisplayID   string       `json:"displayID"`
 	DisplayName string       `json:"displayName"`
-	GroupID     int          `json:"groupID"`
-	GroupName   string       `json:"groupName"`
 	IconURL     OptNilString `json:"iconURL"`
+	GroupName   string       `json:"groupName"`
+	GroupID     int          `json:"groupID"`
 	// 境界ポイントのインデックス.
-	PerimeterIndex OptInt  `json:"perimeterIndex"`
-	PosX           float64 `json:"posX"`
-	PosY           float64 `json:"posY"`
-}
-
-// GetDisplayID returns the value of DisplayID.
-func (s *UserGroupPosition) GetDisplayID() string {
-	return s.DisplayID
-}
-
-// GetDisplayName returns the value of DisplayName.
-func (s *UserGroupPosition) GetDisplayName() string {
-	return s.DisplayName
-}
-
-// GetGroupID returns the value of GroupID.
-func (s *UserGroupPosition) GetGroupID() int {
-	return s.GroupID
-}
-
-// GetGroupName returns the value of GroupName.
-func (s *UserGroupPosition) GetGroupName() string {
-	return s.GroupName
-}
-
-// GetIconURL returns the value of IconURL.
-func (s *UserGroupPosition) GetIconURL() OptNilString {
-	return s.IconURL
-}
-
-// GetPerimeterIndex returns the value of PerimeterIndex.
-func (s *UserGroupPosition) GetPerimeterIndex() OptInt {
-	return s.PerimeterIndex
+	PerimeterIndex OptInt `json:"perimeterIndex"`
 }
 
 // GetPosX returns the value of PosX.
@@ -8472,34 +7142,34 @@ func (s *UserGroupPosition) GetPosY() float64 {
 	return s.PosY
 }
 
-// SetDisplayID sets the value of DisplayID.
-func (s *UserGroupPosition) SetDisplayID(val string) {
-	s.DisplayID = val
+// GetDisplayID returns the value of DisplayID.
+func (s *UserGroupPosition) GetDisplayID() string {
+	return s.DisplayID
 }
 
-// SetDisplayName sets the value of DisplayName.
-func (s *UserGroupPosition) SetDisplayName(val string) {
-	s.DisplayName = val
+// GetDisplayName returns the value of DisplayName.
+func (s *UserGroupPosition) GetDisplayName() string {
+	return s.DisplayName
 }
 
-// SetGroupID sets the value of GroupID.
-func (s *UserGroupPosition) SetGroupID(val int) {
-	s.GroupID = val
+// GetIconURL returns the value of IconURL.
+func (s *UserGroupPosition) GetIconURL() OptNilString {
+	return s.IconURL
 }
 
-// SetGroupName sets the value of GroupName.
-func (s *UserGroupPosition) SetGroupName(val string) {
-	s.GroupName = val
+// GetGroupName returns the value of GroupName.
+func (s *UserGroupPosition) GetGroupName() string {
+	return s.GroupName
 }
 
-// SetIconURL sets the value of IconURL.
-func (s *UserGroupPosition) SetIconURL(val OptNilString) {
-	s.IconURL = val
+// GetGroupID returns the value of GroupID.
+func (s *UserGroupPosition) GetGroupID() int {
+	return s.GroupID
 }
 
-// SetPerimeterIndex sets the value of PerimeterIndex.
-func (s *UserGroupPosition) SetPerimeterIndex(val OptInt) {
-	s.PerimeterIndex = val
+// GetPerimeterIndex returns the value of PerimeterIndex.
+func (s *UserGroupPosition) GetPerimeterIndex() OptInt {
+	return s.PerimeterIndex
 }
 
 // SetPosX sets the value of PosX.
@@ -8512,26 +7182,46 @@ func (s *UserGroupPosition) SetPosY(val float64) {
 	s.PosY = val
 }
 
+// SetDisplayID sets the value of DisplayID.
+func (s *UserGroupPosition) SetDisplayID(val string) {
+	s.DisplayID = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *UserGroupPosition) SetDisplayName(val string) {
+	s.DisplayName = val
+}
+
+// SetIconURL sets the value of IconURL.
+func (s *UserGroupPosition) SetIconURL(val OptNilString) {
+	s.IconURL = val
+}
+
+// SetGroupName sets the value of GroupName.
+func (s *UserGroupPosition) SetGroupName(val string) {
+	s.GroupName = val
+}
+
+// SetGroupID sets the value of GroupID.
+func (s *UserGroupPosition) SetGroupID(val int) {
+	s.GroupID = val
+}
+
+// SetPerimeterIndex sets the value of PerimeterIndex.
+func (s *UserGroupPosition) SetPerimeterIndex(val OptInt) {
+	s.PerimeterIndex = val
+}
+
 // Ref: #/components/schemas/UserStatsResponse
 type UserStatsResponse struct {
-	// 日付.
-	Date time.Time `json:"date"`
-	// セッション数.
-	TalkSessionCount int32 `json:"talkSessionCount"`
 	// ユニークアクション数.
 	UniqueActionUserCount int32 `json:"uniqueActionUserCount"`
 	// 登録ユーザー数.
 	UserCount int32 `json:"userCount"`
-}
-
-// GetDate returns the value of Date.
-func (s *UserStatsResponse) GetDate() time.Time {
-	return s.Date
-}
-
-// GetTalkSessionCount returns the value of TalkSessionCount.
-func (s *UserStatsResponse) GetTalkSessionCount() int32 {
-	return s.TalkSessionCount
+	// セッション数.
+	TalkSessionCount int32 `json:"talkSessionCount"`
+	// 日付.
+	Date time.Time `json:"date"`
 }
 
 // GetUniqueActionUserCount returns the value of UniqueActionUserCount.
@@ -8544,14 +7234,14 @@ func (s *UserStatsResponse) GetUserCount() int32 {
 	return s.UserCount
 }
 
-// SetDate sets the value of Date.
-func (s *UserStatsResponse) SetDate(val time.Time) {
-	s.Date = val
+// GetTalkSessionCount returns the value of TalkSessionCount.
+func (s *UserStatsResponse) GetTalkSessionCount() int32 {
+	return s.TalkSessionCount
 }
 
-// SetTalkSessionCount sets the value of TalkSessionCount.
-func (s *UserStatsResponse) SetTalkSessionCount(val int32) {
-	s.TalkSessionCount = val
+// GetDate returns the value of Date.
+func (s *UserStatsResponse) GetDate() time.Time {
+	return s.Date
 }
 
 // SetUniqueActionUserCount sets the value of UniqueActionUserCount.
@@ -8563,6 +7253,51 @@ func (s *UserStatsResponse) SetUniqueActionUserCount(val int32) {
 func (s *UserStatsResponse) SetUserCount(val int32) {
 	s.UserCount = val
 }
+
+// SetTalkSessionCount sets the value of TalkSessionCount.
+func (s *UserStatsResponse) SetTalkSessionCount(val int32) {
+	s.TalkSessionCount = val
+}
+
+// SetDate sets the value of Date.
+func (s *UserStatsResponse) SetDate(val time.Time) {
+	s.Date = val
+}
+
+type ValidateOrganizationCodeBadRequest struct{}
+
+func (*ValidateOrganizationCodeBadRequest) validateOrganizationCodeRes() {}
+
+type ValidateOrganizationCodeInternalServerError struct{}
+
+func (*ValidateOrganizationCodeInternalServerError) validateOrganizationCodeRes() {}
+
+type ValidateOrganizationCodeOK struct {
+	Valid        bool            `json:"valid"`
+	Organization OptOrganization `json:"organization"`
+}
+
+// GetValid returns the value of Valid.
+func (s *ValidateOrganizationCodeOK) GetValid() bool {
+	return s.Valid
+}
+
+// GetOrganization returns the value of Organization.
+func (s *ValidateOrganizationCodeOK) GetOrganization() OptOrganization {
+	return s.Organization
+}
+
+// SetValid sets the value of Valid.
+func (s *ValidateOrganizationCodeOK) SetValid(val bool) {
+	s.Valid = val
+}
+
+// SetOrganization sets the value of Organization.
+func (s *ValidateOrganizationCodeOK) SetOrganization(val OptOrganization) {
+	s.Organization = val
+}
+
+func (*ValidateOrganizationCodeOK) validateOrganizationCodeRes() {}
 
 type Vote2BadRequest struct {
 	Code    string `json:"code"`
@@ -8636,6 +7371,7 @@ func (s *Vote2Req) SetVoteStatus(val NilVote2ReqVoteStatus) {
 	s.VoteStatus = val
 }
 
+// 投票タイプ.
 type Vote2ReqVoteStatus string
 
 const (
@@ -8678,126 +7414,6 @@ func (s *Vote2ReqVoteStatus) UnmarshalText(data []byte) error {
 		return nil
 	case Vote2ReqVoteStatusPass:
 		*s = Vote2ReqVoteStatusPass
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
-}
-
-type VoteBadRequest struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-}
-
-// GetCode returns the value of Code.
-func (s *VoteBadRequest) GetCode() string {
-	return s.Code
-}
-
-// GetMessage returns the value of Message.
-func (s *VoteBadRequest) GetMessage() string {
-	return s.Message
-}
-
-// SetCode sets the value of Code.
-func (s *VoteBadRequest) SetCode(val string) {
-	s.Code = val
-}
-
-// SetMessage sets the value of Message.
-func (s *VoteBadRequest) SetMessage(val string) {
-	s.Message = val
-}
-
-func (*VoteBadRequest) voteRes() {}
-
-type VoteInternalServerError struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-}
-
-// GetCode returns the value of Code.
-func (s *VoteInternalServerError) GetCode() string {
-	return s.Code
-}
-
-// GetMessage returns the value of Message.
-func (s *VoteInternalServerError) GetMessage() string {
-	return s.Message
-}
-
-// SetCode sets the value of Code.
-func (s *VoteInternalServerError) SetCode(val string) {
-	s.Code = val
-}
-
-// SetMessage sets the value of Message.
-func (s *VoteInternalServerError) SetMessage(val string) {
-	s.Message = val
-}
-
-func (*VoteInternalServerError) voteRes() {}
-
-type VoteOKApplicationJSON []Opinion
-
-func (*VoteOKApplicationJSON) voteRes() {}
-
-type VoteReq struct {
-	VoteStatus NilVoteReqVoteStatus `json:"voteStatus"`
-}
-
-// GetVoteStatus returns the value of VoteStatus.
-func (s *VoteReq) GetVoteStatus() NilVoteReqVoteStatus {
-	return s.VoteStatus
-}
-
-// SetVoteStatus sets the value of VoteStatus.
-func (s *VoteReq) SetVoteStatus(val NilVoteReqVoteStatus) {
-	s.VoteStatus = val
-}
-
-type VoteReqVoteStatus string
-
-const (
-	VoteReqVoteStatusAgree    VoteReqVoteStatus = "agree"
-	VoteReqVoteStatusDisagree VoteReqVoteStatus = "disagree"
-	VoteReqVoteStatusPass     VoteReqVoteStatus = "pass"
-)
-
-// AllValues returns all VoteReqVoteStatus values.
-func (VoteReqVoteStatus) AllValues() []VoteReqVoteStatus {
-	return []VoteReqVoteStatus{
-		VoteReqVoteStatusAgree,
-		VoteReqVoteStatusDisagree,
-		VoteReqVoteStatusPass,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s VoteReqVoteStatus) MarshalText() ([]byte, error) {
-	switch s {
-	case VoteReqVoteStatusAgree:
-		return []byte(s), nil
-	case VoteReqVoteStatusDisagree:
-		return []byte(s), nil
-	case VoteReqVoteStatusPass:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *VoteReqVoteStatus) UnmarshalText(data []byte) error {
-	switch VoteReqVoteStatus(data) {
-	case VoteReqVoteStatusAgree:
-		*s = VoteReqVoteStatusAgree
-		return nil
-	case VoteReqVoteStatusDisagree:
-		*s = VoteReqVoteStatusDisagree
-		return nil
-	case VoteReqVoteStatusPass:
-		*s = VoteReqVoteStatusPass
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)

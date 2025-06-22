@@ -2,20 +2,19 @@ package handler
 
 import (
 	"context"
-	"time"
-
 	"mime/multipart"
 
-	"github.com/neko-dream/server/internal/application/command/opinion_command"
-	"github.com/neko-dream/server/internal/application/command/report_command"
 	opinion_query "github.com/neko-dream/server/internal/application/query/opinion"
 	"github.com/neko-dream/server/internal/application/query/report_query"
+	"github.com/neko-dream/server/internal/application/usecase/opinion_usecase"
+	"github.com/neko-dream/server/internal/application/usecase/report_usecase"
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/sort"
@@ -33,10 +32,11 @@ type opinionHandler struct {
 	getOpinionGroupRatio         opinion_query.GetOpinionGroupRatioQuery
 	getReportByOpinionID         report_query.GetOpinionReportQuery
 
-	submitOpinionCommand opinion_command.SubmitOpinion
-	reportOpinionCommand opinion_command.ReportOpinion
-	solveReportCommand   report_command.SolveReportCommand
+	submitOpinionCommand opinion_usecase.SubmitOpinion
+	reportOpinionCommand opinion_usecase.ReportOpinion
+	solveReportCommand   report_usecase.SolveReportCommand
 
+	authService service.AuthenticationService
 	session.TokenManager
 }
 
@@ -49,10 +49,11 @@ func NewOpinionHandler(
 	getOpinionGroupRatio opinion_query.GetOpinionGroupRatioQuery,
 	getReportByOpinionID report_query.GetOpinionReportQuery,
 
-	submitOpinionCommand opinion_command.SubmitOpinion,
-	reportOpinionCommand opinion_command.ReportOpinion,
-	solveReportCommand report_command.SolveReportCommand,
+	submitOpinionCommand opinion_usecase.SubmitOpinion,
+	reportOpinionCommand opinion_usecase.ReportOpinion,
+	solveReportCommand report_usecase.SolveReportCommand,
 
+	authService service.AuthenticationService,
 	tokenManager session.TokenManager,
 ) oas.OpinionHandler {
 	return &opinionHandler{
@@ -68,6 +69,7 @@ func NewOpinionHandler(
 		reportOpinionCommand: reportOpinionCommand,
 		solveReportCommand:   solveReportCommand,
 
+		authService:  authService,
 		TokenManager: tokenManager,
 	}
 }
@@ -77,14 +79,9 @@ func (o *opinionHandler) GetOpinionDetail2(ctx context.Context, params oas.GetOp
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.GetOpinionDetail")
 	defer span.End()
 
-	claim := session.GetSession(o.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if claim != nil {
-		userIDTmp, err := claim.UserID()
-		if err != nil {
-			return nil, messages.ForbiddenError
-		}
-		userID = lo.ToPtr(userIDTmp)
+	authCtx, err := getAuthenticationContext(o.authService, o.SetSession(ctx))
+	if err != nil {
+		return nil, err
 	}
 
 	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
@@ -94,57 +91,28 @@ func (o *opinionHandler) GetOpinionDetail2(ctx context.Context, params oas.GetOp
 
 	opinion, err := o.getOpinionDetailByIDQuery.Execute(ctx, opinion_query.GetOpinionDetailByIDInput{
 		OpinionID: opinionID,
-		UserID:    userID,
+		UserID:    lo.ToPtr(authCtx.UserID),
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	user := &oas.User{
-		DisplayID:   opinion.Opinion.User.DisplayID,
-		DisplayName: opinion.Opinion.User.DisplayName,
-		IconURL:     utils.ToOptNil[oas.OptNilString](opinion.Opinion.User.IconURL),
-	}
-	var parentOpinionID oas.OptString
-	if opinion.Opinion.Opinion.ParentOpinionID != nil {
-		parentOpinionID = utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ParentOpinionID.String())
-	}
-
-	var parentVoteType oas.OptNilOpinionVoteType
-	if opinion.Opinion.GetParentVoteType() != nil {
-		parentVoteType = oas.OptNilOpinionVoteType{
-			Value: oas.OpinionVoteType(*opinion.Opinion.GetParentVoteType()),
-			Set:   true,
-			Null:  false,
-		}
-	}
-
-	op := &oas.Opinion{
-		ID:           opinion.Opinion.Opinion.OpinionID.String(),
-		ParentID:     parentOpinionID,
-		Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.Title),
-		Content:      opinion.Opinion.Opinion.Content,
-		VoteType:     parentVoteType,
-		PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.Opinion.PictureURL),
-		ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ReferenceURL),
-		PostedAt:     opinion.Opinion.Opinion.CreatedAt.Format(time.RFC3339),
-		IsDeleted:    opinion.Opinion.Opinion.IsDeleted,
-	}
-
-	var myVoteType oas.OptNilGetOpinionDetail2OKMyVoteType
+	// Convert to OpinionWithVote response
+	var myVoteType oas.OptNilOpinionWithVoteMyVoteType
 	if opinion.Opinion.GetMyVoteType() != nil {
-		myVoteType = oas.OptNilGetOpinionDetail2OKMyVoteType{
-			Value: oas.GetOpinionDetail2OKMyVoteType(*opinion.Opinion.GetMyVoteType()),
+		myVoteType = oas.OptNilOpinionWithVoteMyVoteType{
+			Value: oas.OpinionWithVoteMyVoteType(*opinion.Opinion.GetMyVoteType()),
 			Set:   true,
 			Null:  false,
 		}
 	}
 
-	return &oas.GetOpinionDetail2OK{
-		User:       *user,
-		Opinion:    *op,
+	result := oas.OpinionWithVote{
+		User:       opinion.Opinion.User.ToResponse(),
+		Opinion:    opinion.Opinion.Opinion.ToResponse(),
 		MyVoteType: myVoteType,
-	}, nil
+	}
+	return &result, nil
 }
 
 // OpinionComments2 implements oas.OpinionHandler.
@@ -152,14 +120,10 @@ func (o *opinionHandler) OpinionComments2(ctx context.Context, params oas.Opinio
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.OpinionComments")
 	defer span.End()
 
-	claim := session.GetSession(o.SetSession(ctx))
+	authCtx, err := getAuthenticationContext(o.authService, o.SetSession(ctx))
 	var userID *shared.UUID[user.User]
-	if claim != nil {
-		userIDTmp, err := claim.UserID()
-		if err != nil {
-			return nil, messages.ForbiddenError
-		}
-		userID = lo.ToPtr(userIDTmp)
+	if err == nil {
+		userID = lo.ToPtr(authCtx.UserID)
 	}
 
 	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
@@ -175,51 +139,21 @@ func (o *opinionHandler) OpinionComments2(ctx context.Context, params oas.Opinio
 		return nil, err
 	}
 
-	var replies []oas.OpinionComments2OKOpinionsItem
+	var replies []oas.OpinionWithVote
 	for _, reply := range opinions.Replies {
-		user := &oas.User{
-			DisplayID:   reply.User.DisplayID,
-			DisplayName: reply.User.DisplayName,
-			IconURL:     utils.ToOptNil[oas.OptNilString](reply.User.IconURL),
-		}
-		var parentOpinionID oas.OptString
-		if reply.Opinion.ParentOpinionID != nil {
-			parentOpinionID = utils.ToOpt[oas.OptString](reply.Opinion.ParentOpinionID.String())
-		}
-
-		var parentVoteType oas.OptNilOpinionVoteType
-		if reply.GetParentVoteType() != nil {
-			parentVoteType = oas.OptNilOpinionVoteType{
-				Value: oas.OpinionVoteType(*reply.GetParentVoteType()),
-				Set:   true,
-				Null:  false,
-			}
-		}
-
-		opinion := &oas.Opinion{
-			ID:           reply.Opinion.OpinionID.String(),
-			ParentID:     parentOpinionID,
-			Title:        utils.ToOpt[oas.OptString](reply.Opinion.Title),
-			Content:      reply.Opinion.Content,
-			VoteType:     parentVoteType,
-			PictureURL:   utils.ToOptNil[oas.OptNilString](reply.Opinion.PictureURL),
-			ReferenceURL: utils.ToOpt[oas.OptString](reply.Opinion.ReferenceURL),
-			PostedAt:     reply.Opinion.CreatedAt.Format(time.RFC3339),
-			IsDeleted:    reply.Opinion.IsDeleted,
-		}
-
-		var myVoteType oas.OptNilOpinionComments2OKOpinionsItemMyVoteType
+		// Convert SwipeOpinion to OpinionWithVote
+		var myVoteType oas.OptNilOpinionWithVoteMyVoteType
 		if reply.GetMyVoteType() != nil {
-			myVoteType = oas.OptNilOpinionComments2OKOpinionsItemMyVoteType{
-				Value: oas.OpinionComments2OKOpinionsItemMyVoteType(*reply.GetMyVoteType()),
+			myVoteType = oas.OptNilOpinionWithVoteMyVoteType{
+				Value: oas.OpinionWithVoteMyVoteType(*reply.GetMyVoteType()),
 				Set:   true,
 				Null:  false,
 			}
 		}
 
-		replies = append(replies, oas.OpinionComments2OKOpinionsItem{
-			User:       *user,
-			Opinion:    *opinion,
+		replies = append(replies, oas.OpinionWithVote{
+			User:       reply.User.ToResponse(),
+			Opinion:    reply.Opinion.ToResponse(),
 			MyVoteType: myVoteType,
 		})
 	}
@@ -234,13 +168,10 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.GetOpinionsForTalkSession")
 	defer span.End()
 
-	claim := session.GetSession(o.SetSession(ctx))
+	authCtx, err := getAuthenticationContext(o.authService, o.SetSession(ctx))
 	var userID *shared.UUID[user.User]
-	if claim != nil {
-		id, err := claim.UserID()
-		if err == nil {
-			userID = &id
-		}
+	if err == nil {
+		userID = &authCtx.UserID
 	}
 
 	var sortKey sort.SortKey
@@ -281,47 +212,21 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 	if err != nil {
 		return nil, err
 	}
-	opinions := make([]oas.GetOpinionsForTalkSessionOKOpinionsItem, 0, len(out.Opinions))
+	opinions := make([]oas.OpinionWithReplyAndVote, 0, len(out.Opinions))
 	for _, opinion := range out.Opinions {
-		var parentOpinionID oas.OptString
-		if opinion.Opinion.ParentOpinionID != nil {
-			parentOpinionID = utils.ToOpt[oas.OptString](opinion.Opinion.ParentOpinionID.String())
-		}
-
-		var parentVoteType oas.OptNilOpinionVoteType
-		if opinion.GetParentVoteType() != nil {
-			parentVoteType = oas.OptNilOpinionVoteType{
-				Value: oas.OpinionVoteType(*opinion.GetParentVoteType()),
-				Set:   true,
-				Null:  false,
-			}
-		}
-		var myVoteType oas.OptNilGetOpinionsForTalkSessionOKOpinionsItemMyVoteType
+		// Convert SwipeOpinion to OpinionWithReplyAndVote
+		var myVoteType oas.OptNilOpinionWithReplyAndVoteMyVoteType
 		if opinion.GetMyVoteType() != nil {
-			myVoteType = oas.OptNilGetOpinionsForTalkSessionOKOpinionsItemMyVoteType{
-				Value: oas.GetOpinionsForTalkSessionOKOpinionsItemMyVoteType(*opinion.GetMyVoteType()),
+			myVoteType = oas.OptNilOpinionWithReplyAndVoteMyVoteType{
+				Value: oas.OpinionWithReplyAndVoteMyVoteType(*opinion.GetMyVoteType()),
 				Set:   true,
 				Null:  false,
 			}
 		}
 
-		opinions = append(opinions, oas.GetOpinionsForTalkSessionOKOpinionsItem{
-			Opinion: oas.Opinion{
-				ID:           opinion.Opinion.OpinionID.String(),
-				Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Title),
-				Content:      opinion.Opinion.Content,
-				VoteType:     parentVoteType,
-				ParentID:     parentOpinionID,
-				ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
-				PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.PictureURL),
-				PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
-				IsDeleted:    opinion.Opinion.IsDeleted,
-			},
-			User: oas.User{
-				DisplayID:   opinion.User.DisplayID,
-				DisplayName: opinion.User.DisplayName,
-				IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.IconURL),
-			},
+		opinions = append(opinions, oas.OpinionWithReplyAndVote{
+			User:       opinion.User.ToResponse(),
+			Opinion:    opinion.Opinion.ToResponse(),
 			ReplyCount: opinion.ReplyCount,
 			MyVoteType: myVoteType,
 		})
@@ -335,82 +240,15 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 	}, nil
 }
 
-// GetOpinionDetail implements oas.OpinionHandler.
-func (o *opinionHandler) GetOpinionDetail(ctx context.Context, params oas.GetOpinionDetailParams) (oas.GetOpinionDetailRes, error) {
-	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.GetOpinionDetail")
-	defer span.End()
-
-	claim := session.GetSession(o.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if claim != nil {
-		userIDTmp, err := claim.UserID()
-		if err != nil {
-			return nil, messages.ForbiddenError
-		}
-		userID = lo.ToPtr(userIDTmp)
-	}
-
-	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
-	if err != nil {
-		return nil, messages.BadRequestError
-	}
-
-	opinion, err := o.getOpinionDetailByIDQuery.Execute(ctx, opinion_query.GetOpinionDetailByIDInput{
-		OpinionID: opinionID,
-		UserID:    userID,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	user := &oas.User{
-		DisplayID:   opinion.Opinion.User.DisplayID,
-		DisplayName: opinion.Opinion.User.DisplayName,
-		IconURL:     utils.ToOptNil[oas.OptNilString](opinion.Opinion.User.IconURL),
-	}
-
-	var parentOpinionID oas.OptString
-	if opinion.Opinion.Opinion.ParentOpinionID != nil {
-		parentOpinionID = utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ParentOpinionID.String())
-	}
-
-	var parentVoteType oas.OptNilOpinionVoteType
-	if opinion.Opinion.GetParentVoteType() != nil {
-		parentVoteType = oas.OptNilOpinionVoteType{
-			Value: oas.OpinionVoteType(*opinion.Opinion.GetParentVoteType()),
-			Set:   true,
-			Null:  false,
-		}
-	}
-
-	op := &oas.Opinion{
-		ID:           opinion.Opinion.Opinion.OpinionID.String(),
-		ParentID:     parentOpinionID,
-		Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.Title),
-		Content:      opinion.Opinion.Opinion.Content,
-		VoteType:     parentVoteType,
-		PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.Opinion.PictureURL),
-		ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.Opinion.ReferenceURL),
-		PostedAt:     opinion.Opinion.Opinion.CreatedAt.Format(time.RFC3339),
-		IsDeleted:    opinion.Opinion.Opinion.IsDeleted,
-	}
-
-	return &oas.GetOpinionDetailOK{
-		User:    *user,
-		Opinion: *op,
-	}, nil
-}
-
 // SwipeOpinions スワイプ用の意見取得
 // 自分が投稿した意見は取得しない
 func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpinionsParams) (oas.SwipeOpinionsRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.SwipeOpinions")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(o.authService, ctx)
 	if err != nil {
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
 	var limit int
 	if params.Limit.IsSet() {
@@ -425,7 +263,7 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 	}
 
 	opinions, err := o.getSwipeOpinionQuery.Execute(ctx, opinion_query.GetSwipeOpinionsQueryInput{
-		UserID:        userID,
+		UserID:        authCtx.UserID,
 		TalkSessionID: talkSessionID,
 		Limit:         limit,
 	})
@@ -433,39 +271,12 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 		return nil, err
 	}
 
-	var ress []oas.SwipeOpinionsOKOpinionsItem
+	var ress []oas.OpinionWithReplyCount
 	for _, opinion := range opinions.Opinions {
-		user := &oas.User{
-			DisplayID:   opinion.User.DisplayID,
-			DisplayName: opinion.User.DisplayName,
-			IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.IconURL),
-		}
-		var parentOpinionID oas.OptString
-		if opinion.Opinion.ParentOpinionID != nil {
-			parentOpinionID = utils.ToOpt[oas.OptString](opinion.Opinion.ParentOpinionID.String())
-		}
-		var parentVoteType oas.OptNilOpinionVoteType
-		if opinion.GetParentVoteType() != nil {
-			parentVoteType = oas.OptNilOpinionVoteType{
-				Value: oas.OpinionVoteType(*opinion.GetParentVoteType()),
-				Set:   true,
-				Null:  false,
-			}
-		}
-		ops := &oas.Opinion{
-			ID:           opinion.Opinion.OpinionID.String(),
-			ParentID:     parentOpinionID,
-			Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Title),
-			Content:      opinion.Opinion.Content,
-			VoteType:     parentVoteType,
-			PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.PictureURL),
-			ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
-			PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
-			IsDeleted:    opinion.Opinion.IsDeleted,
-		}
-		ress = append(ress, oas.SwipeOpinionsOKOpinionsItem{
-			User:       *user,
-			Opinion:    *ops,
+		// Convert SwipeOpinion to OpinionWithReplyCount
+		ress = append(ress, oas.OpinionWithReplyCount{
+			User:       opinion.User.ToResponse(),
+			Opinion:    opinion.Opinion.ToResponse(),
 			ReplyCount: opinion.ReplyCount,
 		})
 	}
@@ -476,163 +287,20 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 	}, nil
 }
 
-// OpinionComments 意見に対するリプライ意見取得
-func (o *opinionHandler) OpinionComments(ctx context.Context, params oas.OpinionCommentsParams) (oas.OpinionCommentsRes, error) {
-	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.OpinionComments")
-	defer span.End()
-
-	claim := session.GetSession(o.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if claim != nil {
-		userIDTmp, err := claim.UserID()
-		if err != nil {
-			return nil, messages.ForbiddenError
-		}
-		userID = lo.ToPtr(userIDTmp)
-	}
-
-	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
-	if err != nil {
-		return nil, messages.BadRequestError
-	}
-
-	opinions, err := o.getOpinionRepliesQuery.Execute(ctx, opinion_query.GetOpinionRepliesQueryInput{
-		OpinionID: opinionID,
-		UserID:    userID,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	var replies []oas.OpinionCommentsOKOpinionsItem
-	for _, reply := range opinions.Replies {
-		user := &oas.User{
-			DisplayID:   reply.User.DisplayID,
-			DisplayName: reply.User.DisplayName,
-			IconURL:     utils.ToOptNil[oas.OptNilString](reply.User.IconURL),
-		}
-		var parentOpinionID oas.OptString
-		if reply.Opinion.ParentOpinionID != nil {
-			parentOpinionID = utils.ToOpt[oas.OptString](reply.Opinion.ParentOpinionID.String())
-		}
-
-		var parentVoteType oas.OptNilOpinionVoteType
-		if reply.GetParentVoteType() != nil {
-			parentVoteType = oas.OptNilOpinionVoteType{
-				Value: oas.OpinionVoteType(*reply.GetParentVoteType()),
-				Set:   true,
-				Null:  false,
-			}
-		}
-		opinion := &oas.Opinion{
-			ID:           reply.Opinion.OpinionID.String(),
-			ParentID:     parentOpinionID,
-			Title:        utils.ToOpt[oas.OptString](reply.Opinion.Title),
-			Content:      reply.Opinion.Content,
-			VoteType:     parentVoteType,
-			PictureURL:   utils.ToOptNil[oas.OptNilString](reply.Opinion.PictureURL),
-			ReferenceURL: utils.ToOpt[oas.OptString](reply.Opinion.ReferenceURL),
-			PostedAt:     reply.Opinion.CreatedAt.Format(time.RFC3339),
-			IsDeleted:    reply.Opinion.IsDeleted,
-		}
-
-		var myVoteType oas.OptNilOpinionCommentsOKOpinionsItemMyVoteType
-		if reply.GetMyVoteType() != nil {
-			myVoteType = oas.OptNilOpinionCommentsOKOpinionsItemMyVoteType{
-				Value: oas.OpinionCommentsOKOpinionsItemMyVoteType(*reply.GetMyVoteType()),
-				Set:   true,
-				Null:  false,
-			}
-		}
-		replies = append(replies, oas.OpinionCommentsOKOpinionsItem{
-			User:       *user,
-			Opinion:    *opinion,
-			MyVoteType: myVoteType,
-		})
-	}
-
-	return &oas.OpinionCommentsOK{
-		Opinions: replies,
-	}, nil
-
-}
-
-// PostOpinionPost implements oas.OpinionHandler.
-func (o *opinionHandler) PostOpinionPost(ctx context.Context, req oas.OptPostOpinionPostReq, params oas.PostOpinionPostParams) (oas.PostOpinionPostRes, error) {
-	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.PostOpinionPost")
-	defer span.End()
-
-	claim := session.GetSession(ctx)
-	userID, err := claim.UserID()
-	if err != nil {
-		return nil, messages.ForbiddenError
-	}
-	if !req.IsSet() {
-		return nil, messages.RequiredParameterError
-	}
-
-	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
-	if err != nil {
-		return nil, messages.BadRequestError
-	}
-
-	if err := req.Value.Validate(); err != nil {
-		return nil, err
-	}
-	value := req.Value
-
-	var file *multipart.FileHeader
-	if value.Picture.IsSet() {
-		file, err = http_utils.CreateFileHeader(ctx, value.Picture.Value.File, value.Picture.Value.Name)
-		if err != nil {
-			utils.HandleError(ctx, err, "MakeFileHeader")
-			return nil, messages.InternalServerError
-		}
-	}
-	var parentOpinionID *shared.UUID[opinion.Opinion]
-	if value.ParentOpinionID.IsSet() {
-		id, err := shared.ParseUUID[opinion.Opinion](value.ParentOpinionID.Value)
-		if err != nil {
-			return nil, messages.BadRequestError
-		}
-		parentOpinionID = &id
-	}
-
-	if err = o.submitOpinionCommand.Execute(ctx, opinion_command.SubmitOpinionInput{
-		TalkSessionID:   &talkSessionID,
-		UserID:          userID,
-		ParentOpinionID: parentOpinionID,
-		Title:           utils.ToPtrIfNotNullValue(!req.Value.Title.IsSet(), value.Title.Value),
-		Content:         req.Value.OpinionContent,
-		ReferenceURL:    utils.ToPtrIfNotNullValue(!req.Value.ReferenceURL.IsSet(), value.ReferenceURL.Value),
-		Picture:         file,
-	}); err != nil {
-		return nil, err
-	}
-
-	res := &oas.PostOpinionPostOK{}
-	return res, nil
-}
-
 // PostOpinionPost2 TalkSessionIDをBodyで受け取るタイプのやつ
-func (o *opinionHandler) PostOpinionPost2(ctx context.Context, req oas.OptPostOpinionPost2Req) (oas.PostOpinionPost2Res, error) {
+func (o *opinionHandler) PostOpinionPost2(ctx context.Context, req *oas.PostOpinionPost2Req) (oas.PostOpinionPost2Res, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.PostOpinionPost2")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(o.authService, ctx)
 	if err != nil {
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
-	if !req.IsSet() {
+	if req == nil {
 		return nil, messages.RequiredParameterError
 	}
 
-	if err := req.Value.Validate(); err != nil {
-		return nil, err
-	}
-	value := req.Value
-
+	value := req
 	var talkSessionID *shared.UUID[talksession.TalkSession]
 	if value.TalkSessionID.IsSet() {
 		id, err := shared.ParseUUID[talksession.TalkSession](value.TalkSessionID.Value)
@@ -644,7 +312,7 @@ func (o *opinionHandler) PostOpinionPost2(ctx context.Context, req oas.OptPostOp
 
 	var file *multipart.FileHeader
 	if value.Picture.IsSet() {
-		file, err = http_utils.CreateFileHeader(ctx, value.Picture.Value.File, value.Picture.Value.Name)
+		file, err = http_utils.CreateFileHeader(ctx, value.Picture.Value.File, value.GetPicture().Value.Name)
 		if err != nil {
 			utils.HandleError(ctx, err, "MakeFileHeader")
 			return nil, messages.InternalServerError
@@ -665,13 +333,13 @@ func (o *opinionHandler) PostOpinionPost2(ctx context.Context, req oas.OptPostOp
 		isSeed = false
 	}
 
-	if err = o.submitOpinionCommand.Execute(ctx, opinion_command.SubmitOpinionInput{
+	if err = o.submitOpinionCommand.Execute(ctx, opinion_usecase.SubmitOpinionInput{
 		TalkSessionID:   talkSessionID,
-		UserID:          userID,
+		UserID:          authCtx.UserID,
 		ParentOpinionID: parentOpinionID,
-		Title:           utils.ToPtrIfNotNullValue(!req.Value.Title.IsSet(), value.Title.Value),
-		Content:         req.Value.OpinionContent,
-		ReferenceURL:    utils.ToPtrIfNotNullValue(!req.Value.ReferenceURL.IsSet(), value.ReferenceURL.Value),
+		Title:           utils.ToPtrIfNotNullValue(!req.Title.IsSet(), value.Title.Value),
+		Content:         req.OpinionContent,
+		ReferenceURL:    utils.ToPtrIfNotNullValue(!req.ReferenceURL.IsSet(), value.ReferenceURL.Value),
 		Picture:         file,
 		IsSeed:          isSeed,
 	}); err != nil {
@@ -683,19 +351,15 @@ func (o *opinionHandler) PostOpinionPost2(ctx context.Context, req oas.OptPostOp
 }
 
 // ReportOpinion 意見を通報する
-func (o *opinionHandler) ReportOpinion(ctx context.Context, req oas.OptReportOpinionReq, params oas.ReportOpinionParams) (oas.ReportOpinionRes, error) {
+func (o *opinionHandler) ReportOpinion(ctx context.Context, req *oas.ReportOpinionReq, params oas.ReportOpinionParams) (oas.ReportOpinionRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.ReportOpinion")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	if claim == nil {
-		return nil, messages.ForbiddenError
-	}
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(o.authService, ctx)
 	if err != nil {
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
-	if !req.IsSet() {
+	if req == nil {
 		return nil, messages.RequiredParameterError
 	}
 
@@ -704,14 +368,14 @@ func (o *opinionHandler) ReportOpinion(ctx context.Context, req oas.OptReportOpi
 		return nil, messages.BadRequestError
 	}
 	var reasonText *string
-	if !req.Value.Content.IsNull() {
-		reasonText = lo.ToPtr(req.Value.Content.Value)
+	if !req.Content.IsNull() {
+		reasonText = lo.ToPtr(req.Content.Value)
 	}
 
-	if err := o.reportOpinionCommand.Execute(ctx, opinion_command.ReportOpinionInput{
-		ReporterID: userID,
+	if err := o.reportOpinionCommand.Execute(ctx, opinion_usecase.ReportOpinionInput{
+		ReporterID: authCtx.UserID,
 		OpinionID:  opinionID,
-		Reason:     int32(req.Value.Reason.Value),
+		Reason:     int32(req.Reason.Value),
 		ReasonText: reasonText,
 	}); err != nil {
 		utils.HandleError(ctx, err, "reportOpinionCommand.Execute")
@@ -762,13 +426,7 @@ func (o *opinionHandler) GetOpinionAnalysis(ctx context.Context, params oas.GetO
 
 	var res oas.GetOpinionAnalysisOKApplicationJSON
 	for _, r := range out {
-		res = append(res, oas.OpinionGroupRatio{
-			GroupName:     r.GroupName,
-			GroupID:       r.GroupID,
-			AgreeCount:    r.AgreeCount,
-			DisagreeCount: r.DisagreeCount,
-			PassCount:     r.PassCount,
-		})
+		res = append(res, r.ToResponse())
 	}
 
 	return &res, nil
@@ -779,13 +437,9 @@ func (o *opinionHandler) GetOpinionReports(ctx context.Context, params oas.GetOp
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.GetOpinionReports")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	if claim == nil {
-		return nil, messages.ForbiddenError
-	}
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(o.authService, ctx)
 	if err != nil {
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
 
 	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
@@ -795,59 +449,23 @@ func (o *opinionHandler) GetOpinionReports(ctx context.Context, params oas.GetOp
 
 	reports, err := o.getReportByOpinionID.Execute(ctx, report_query.GetOpinionReportInput{
 		OpinionID: opinionID,
-		UserID:    userID,
+		UserID:    authCtx.UserID,
 	})
 	if err != nil {
 		return nil, err
 	}
-	var parentOpinionID oas.OptString
-	if reports.Report.Opinion.ParentOpinionID != nil {
-		parentOpinionID = utils.ToOpt[oas.OptString](reports.Report.Opinion.ParentOpinionID.String())
-	}
-
-	reportDetail := oas.ReportDetail{
-		Opinion: oas.Opinion{
-			ID:           reports.Report.Opinion.OpinionID.String(),
-			ParentID:     parentOpinionID,
-			Title:        utils.ToOpt[oas.OptString](reports.Report.Opinion.Title),
-			Content:      reports.Report.Opinion.Content,
-			PictureURL:   utils.ToOptNil[oas.OptNilString](reports.Report.Opinion.PictureURL),
-			ReferenceURL: utils.ToOpt[oas.OptString](reports.Report.Opinion.ReferenceURL),
-			PostedAt:     reports.Report.Opinion.CreatedAt.Format(time.RFC3339),
-			IsDeleted:    reports.Report.Opinion.IsDeleted,
-		},
-		User: oas.User{
-			DisplayID:   reports.Report.User.DisplayID,
-			DisplayName: reports.Report.User.DisplayName,
-			IconURL:     utils.ToOptNil[oas.OptNilString](reports.Report.User.IconURL),
-		},
-		ReportCount: reports.Report.ReportCount,
-		Status:      oas.ReportDetailStatus(reports.Report.Status),
-		Reasons:     make([]oas.ReportDetailReasonsItem, 0, len(reports.Report.Reasons)),
-	}
-
-	for _, reason := range reports.Report.Reasons {
-		reportDetail.Reasons = append(reportDetail.Reasons, oas.ReportDetailReasonsItem{
-			Reason:  reason.Reason,
-			Content: utils.ToOptNil[oas.OptNilString](reason.Content),
-		})
-	}
-
+	reportDetail := reports.Report.ToResponse()
 	return &reportDetail, nil
 }
 
 // SolveOpinionReport 通報を解決する
-func (o *opinionHandler) SolveOpinionReport(ctx context.Context, req oas.OptSolveOpinionReportReq, params oas.SolveOpinionReportParams) (oas.SolveOpinionReportRes, error) {
+func (o *opinionHandler) SolveOpinionReport(ctx context.Context, req *oas.SolveOpinionReportReq, params oas.SolveOpinionReportParams) (oas.SolveOpinionReportRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.SolveOpinionReport")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	if claim == nil {
-		return nil, messages.ForbiddenError
-	}
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(o.authService, ctx)
 	if err != nil {
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
 
 	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
@@ -855,20 +473,20 @@ func (o *opinionHandler) SolveOpinionReport(ctx context.Context, req oas.OptSolv
 		return nil, messages.BadRequestError
 	}
 
-	if !req.IsSet() {
+	if req == nil {
 		return nil, messages.RequiredParameterError
 	}
-	if err := req.Value.Validate(); err != nil {
+	if err := req.Validate(); err != nil {
 		return nil, err
 	}
-	status, err := opinion.NewStatus(string(req.Value.GetAction()))
+	status, err := opinion.NewStatus(string(req.GetAction()))
 	if err != nil {
 		return nil, messages.BadRequestError
 	}
 
-	if err := o.solveReportCommand.Execute(ctx, report_command.SolveReportInput{
+	if err := o.solveReportCommand.Execute(ctx, report_usecase.SolveReportInput{
 		OpinionID: opinionID,
-		UserID:    userID,
+		UserID:    authCtx.UserID,
 		Status:    status,
 	}); err != nil {
 		return nil, err

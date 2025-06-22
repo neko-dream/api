@@ -5,15 +5,13 @@ import (
 	"mime/multipart"
 	"net/http"
 	"strconv"
-	"time"
 
-	"github.com/neko-dream/server/internal/application/command/user_command"
 	opinion_query "github.com/neko-dream/server/internal/application/query/opinion"
 	talksession_query "github.com/neko-dream/server/internal/application/query/talksession"
 	user_query "github.com/neko-dream/server/internal/application/query/user"
+	"github.com/neko-dream/server/internal/application/usecase/user_usecase"
 	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/session"
-	"github.com/neko-dream/server/internal/domain/model/shared"
+	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/infrastructure/http/cookie"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	http_utils "github.com/neko-dream/server/pkg/http"
@@ -27,10 +25,11 @@ type userHandler struct {
 	getMyOpinionsQuery           opinion_query.GetMyOpinionsQuery
 	browseJoinedTalkSessionQuery talksession_query.BrowseJoinedTalkSessionsQuery
 
-	editUser     user_command.Edit
-	registerUser user_command.Register
+	editUser     user_usecase.Edit
+	registerUser user_usecase.Register
 
-	userDetail user_query.Detail
+	userDetail  user_query.Detail
+	authService service.AuthenticationService
 	cookie.CookieManager
 }
 
@@ -38,10 +37,11 @@ func NewUserHandler(
 	getMyOpinionsQuery opinion_query.GetMyOpinionsQuery,
 	browseJoinedTalkSessionQuery talksession_query.BrowseJoinedTalkSessionsQuery,
 
-	editUser user_command.Edit,
-	registerUser user_command.Register,
+	editUser user_usecase.Edit,
+	registerUser user_usecase.Register,
 
 	userDetail user_query.Detail,
+	authService service.AuthenticationService,
 	cookieManager cookie.CookieManager,
 ) oas.UserHandler {
 	return &userHandler{
@@ -50,6 +50,7 @@ func NewUserHandler(
 		editUser:                     editUser,
 		registerUser:                 registerUser,
 		userDetail:                   userDetail,
+		authService:                  authService,
 		CookieManager:                cookieManager,
 	}
 }
@@ -59,16 +60,11 @@ func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHi
 	ctx, span := otel.Tracer("handler").Start(ctx, "userHandler.OpinionsHistory")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	if claim == nil {
-		return nil, messages.ForbiddenError
-	}
-
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(u.authService, ctx)
 	if err != nil {
-		utils.HandleError(ctx, err, "claim.UserID")
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
+	userID := authCtx.UserID
 
 	var sortKey sort.SortKey
 	if params.Sort.IsSet() {
@@ -98,41 +94,11 @@ func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHi
 		return nil, messages.InternalServerError
 	}
 
-	opinions := make([]oas.OpinionsHistoryOKOpinionsItem, 0, len(out.Opinions))
+	opinions := make([]oas.OpinionWithReplyCount, 0, len(out.Opinions))
 	for _, opinion := range out.Opinions {
-		var parentVoteType oas.OptNilOpinionVoteType
-		if opinion.GetParentVoteType() != nil {
-			parentVoteType = oas.OptNilOpinionVoteType{
-				Value: oas.OpinionVoteType(*opinion.GetParentVoteType()),
-				Set:   true,
-				Null:  false,
-			}
-		}
-		var parentOpinionID oas.OptNilString
-		if opinion.Opinion.ParentOpinionID != nil {
-			parentOpinionID = oas.OptNilString{
-				Set:   true,
-				Value: opinion.Opinion.ParentOpinionID.String(),
-			}
-		}
-
-		opinions = append(opinions, oas.OpinionsHistoryOKOpinionsItem{
-			Opinion: oas.Opinion{
-				ID:           opinion.Opinion.OpinionID.String(),
-				Title:        utils.ToOpt[oas.OptString](opinion.Opinion.Title),
-				Content:      opinion.Opinion.Content,
-				ParentID:     utils.ToOpt[oas.OptString](parentOpinionID),
-				VoteType:     parentVoteType,
-				ReferenceURL: utils.ToOpt[oas.OptString](opinion.Opinion.ReferenceURL),
-				PictureURL:   utils.ToOptNil[oas.OptNilString](opinion.Opinion.PictureURL),
-				PostedAt:     opinion.Opinion.CreatedAt.Format(time.RFC3339),
-				IsDeleted:    opinion.Opinion.IsDeleted,
-			},
-			User: oas.User{
-				DisplayID:   opinion.User.DisplayID,
-				DisplayName: opinion.User.DisplayName,
-				IconURL:     utils.ToOptNil[oas.OptNilString](opinion.User.IconURL),
-			},
+		opinions = append(opinions, oas.OpinionWithReplyCount{
+			Opinion:    opinion.Opinion.ToResponse(),
+			User:       opinion.User.ToResponse(),
 			ReplyCount: opinion.ReplyCount,
 		})
 	}
@@ -150,16 +116,11 @@ func (u *userHandler) SessionsHistory(ctx context.Context, params oas.SessionsHi
 	ctx, span := otel.Tracer("handler").Start(ctx, "userHandler.SessionsHistory")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	if claim == nil {
-		return nil, messages.ForbiddenError
-	}
-
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(u.authService, ctx)
 	if err != nil {
-		utils.HandleError(ctx, err, "claim.UserID")
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
+	userID := authCtx.UserID
 
 	var status string
 	if params.Status.IsSet() {
@@ -193,17 +154,7 @@ func (u *userHandler) SessionsHistory(ctx context.Context, params oas.SessionsHi
 	talkSessions := make([]oas.SessionsHistoryOKTalkSessionsItem, 0, len(out.TalkSessions))
 	for _, talkSession := range out.TalkSessions {
 		talkSessions = append(talkSessions, oas.SessionsHistoryOKTalkSessionsItem{
-			TalkSession: oas.TalkSession{
-				ID:    talkSession.TalkSessionID.String(),
-				Theme: talkSession.Theme,
-				Owner: oas.User{
-					DisplayID:   talkSession.User.DisplayID,
-					DisplayName: talkSession.User.DisplayName,
-					IconURL:     utils.ToOptNil[oas.OptNilString](talkSession.User.IconURL),
-				},
-				CreatedAt:        talkSession.CreatedAt.Format(time.RFC3339),
-				ScheduledEndTime: talkSession.ScheduledEndTime.Format(time.RFC3339),
-			},
+			TalkSession:  talkSession.ToResponse(),
 			OpinionCount: talkSession.OpinionCount,
 		})
 	}
@@ -221,16 +172,11 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 	ctx, span := otel.Tracer("handler").Start(ctx, "userHandler.GetUserInfo")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	if claim == nil {
-		return nil, messages.ForbiddenError
-	}
-
-	userID, err := claim.UserID()
+	authCtx, err := requireAuthentication(u.authService, ctx)
 	if err != nil {
-		utils.HandleError(ctx, err, "claim.UserID")
-		return nil, messages.ForbiddenError
+		return nil, err
 	}
+	userID := authCtx.UserID
 
 	res, err := u.userDetail.Execute(ctx, user_query.DetailInput{
 		UserID: userID,
@@ -240,59 +186,14 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 		return nil, messages.InternalServerError
 	}
 
-	userResp := oas.User{
-		DisplayID:   res.User.DisplayID,
-		DisplayName: res.User.DisplayName,
-		IconURL:     utils.ToOptNil[oas.OptNilString](res.User.IconURL),
-	}
+	userResp := res.User.User.ToResponse()
 
 	var demographicsResp oas.UserDemographics
 	if res.User.UserDemographic != nil {
-		demographics := res.User.UserDemographic
-		var city oas.OptNilString
-		if demographics.City != nil {
-			city = oas.OptNilString{
-				Set:   true,
-				Value: *demographics.City,
-			}
-		}
-		var dateOfBirth oas.OptNilInt
-		if demographics.DateOfBirth != nil {
-			dateOfBirth = oas.OptNilInt{
-				Set:   true,
-				Value: *demographics.DateOfBirth,
-			}
-		}
-		var prefecture oas.OptNilString
-		if demographics.Prefecture != nil {
-			prefecture = oas.OptNilString{
-				Set:   true,
-				Value: *demographics.Prefecture,
-			}
-		}
-		var gender oas.OptNilString
-		if demographics.GenderString() != nil {
-			gender = oas.OptNilString{
-				Set:   true,
-				Value: *demographics.GenderString(),
-			}
-		}
-
-		demographicsResp = oas.UserDemographics{
-			DateOfBirth: dateOfBirth,
-			Gender:      gender,
-			Prefecture:  prefecture,
-			City:        city,
-		}
+		demographicsResp = res.User.UserDemographic.ToResponse()
 	}
 
-	var email oas.OptNilString
-	if res.User.UserAuth.Email != nil {
-		email = oas.OptNilString{
-			Set:   true,
-			Value: *res.User.UserAuth.Email,
-		}
-	}
+	email := res.User.UserAuth.ToEmailResponse()
 
 	return &oas.GetUserInfoOK{
 		User:         userResp,
@@ -301,21 +202,21 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 	}, nil
 }
 
-// EditUserProfile ユーザープロフィールの編集
-func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUserProfileReq) (oas.EditUserProfileRes, error) {
+// UpdateUserProfile ユーザープロフィールの編集
+func (u *userHandler) UpdateUserProfile(ctx context.Context, params *oas.UpdateUserProfileReq) (oas.UpdateUserProfileRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "userHandler.EditUserProfile")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	if !params.IsSet() {
+	if params == nil {
 		return nil, messages.RequiredParameterError
 	}
-	userID, err := claim.UserID()
+
+	authCtx, err := requireAuthentication(u.authService, ctx)
 	if err != nil {
-		utils.HandleError(ctx, err, "claim.UserID")
-		return nil, messages.InternalServerError
+		return nil, err
 	}
-	value := params.Value
+	userID := authCtx.UserID
+	value := params
 	if err := value.Validate(); err != nil {
 		utils.HandleError(ctx, err, "value.Validate")
 		return nil, messages.RequiredParameterError
@@ -381,7 +282,7 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 		}
 	}
 
-	out, err := u.editUser.Execute(ctx, user_command.EditInput{
+	out, err := u.editUser.Execute(ctx, user_usecase.EditInput{
 		UserID:      userID,
 		DisplayName: displayName,
 		Icon:        file,
@@ -400,41 +301,25 @@ func (u *userHandler) EditUserProfile(ctx context.Context, params oas.OptEditUse
 	w := http_utils.GetHTTPResponse(ctx)
 	http.SetCookie(w, u.CookieManager.CreateSessionCookie(out.Token))
 
-	return &oas.EditUserProfileOK{
-		DisplayID:   out.DisplayID,
-		DisplayName: out.DisplayName,
-		IconURL:     utils.ToOptNil[oas.OptNilString](claim.IconURL),
-	}, nil
+	resp := out.ToResponse()
+	return &resp, nil
 }
 
-// RegisterUser ユーザー登録
-func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUserReq) (oas.RegisterUserRes, error) {
+// EstablishUser ユーザー登録
+func (u *userHandler) EstablishUser(ctx context.Context, params *oas.EstablishUserReq) (oas.EstablishUserRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "userHandler.RegisterUser")
 	defer span.End()
 
-	claim := session.GetSession(ctx)
-	if !params.IsSet() {
+	if params == nil {
 		return nil, messages.RequiredParameterError
 	}
-	var err error
-	var sessionID shared.UUID[session.Session]
-	if claim != nil {
-		sessionID, err = claim.SessionID()
-		if err != nil {
-			utils.HandleError(ctx, err, "claim.SessionID")
-			return nil, messages.InternalServerError
-		}
-		if claim.IsExpired(ctx) {
-			return nil, messages.TokenExpiredError
-		}
+
+	authCtx, err := requireAuthentication(u.authService, ctx)
+	if err != nil {
+		return nil, err
 	}
 
-	userID, err := claim.UserID()
-	if err != nil {
-		utils.HandleError(ctx, err, "claim.UserID")
-		return nil, messages.InternalServerError
-	}
-	value := params.Value
+	value := params
 	if err := value.Validate(); err != nil {
 		utils.HandleError(ctx, err, "value.Validate")
 		return nil, messages.RequiredParameterError
@@ -476,9 +361,9 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 		return nil, messages.UserDisplayNameTooShort
 	}
 
-	input := user_command.RegisterInput{
-		SessionID:   sessionID,
-		UserID:      userID,
+	input := user_usecase.RegisterInput{
+		SessionID:   authCtx.SessionID,
+		UserID:      authCtx.UserID,
 		DisplayID:   value.DisplayID,
 		DisplayName: value.DisplayName,
 		Icon:        file,
@@ -502,9 +387,6 @@ func (u *userHandler) RegisterUser(ctx context.Context, params oas.OptRegisterUs
 	w := http_utils.GetHTTPResponse(ctx)
 	http.SetCookie(w, u.CookieManager.CreateSessionCookie(out.Token))
 
-	return &oas.RegisterUserOK{
-		DisplayID:   out.DisplayID,
-		DisplayName: out.DisplayName,
-		IconURL:     utils.ToOptNil[oas.OptNilString](out.IconURL),
-	}, nil
+	resp := out.ToResponse()
+	return &resp, nil
 }

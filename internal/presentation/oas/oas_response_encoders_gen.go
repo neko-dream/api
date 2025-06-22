@@ -114,16 +114,19 @@ func encodeAuthorizeResponse(response AuthorizeRes, w http.ResponseWriter, span 
 					Explode: false,
 				}
 				if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
-					return e.EncodeArray(func(e uri.Encoder) error {
-						for i, item := range response.SetCookie {
-							if err := func() error {
-								return e.EncodeValue(conv.StringToString(item))
-							}(); err != nil {
-								return errors.Wrapf(err, "[%d]", i)
+					if response.SetCookie != nil {
+						return e.EncodeArray(func(e uri.Encoder) error {
+							for i, item := range response.SetCookie {
+								if err := func() error {
+									return e.EncodeValue(conv.StringToString(item))
+								}(); err != nil {
+									return errors.Wrapf(err, "[%d]", i)
+								}
 							}
-						}
-						return nil
-					})
+							return nil
+						})
+					}
+					return nil
 				}); err != nil {
 					return errors.Wrap(err, "encode Set-Cookie header")
 				}
@@ -263,9 +266,9 @@ func encodeConsentTalkSessionResponse(response ConsentTalkSessionRes, w http.Res
 	}
 }
 
-func encodeCreateOrganizationsResponse(response CreateOrganizationsRes, w http.ResponseWriter, span trace.Span) error {
+func encodeCreateOrganizationAliasResponse(response CreateOrganizationAliasRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *CreateOrganizationsOK:
+	case *OrganizationAlias:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -278,7 +281,7 @@ func encodeCreateOrganizationsResponse(response CreateOrganizationsRes, w http.R
 
 		return nil
 
-	case *CreateOrganizationsBadRequest:
+	case *CreateOrganizationAliasBadRequest:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
@@ -291,7 +294,7 @@ func encodeCreateOrganizationsResponse(response CreateOrganizationsRes, w http.R
 
 		return nil
 
-	case *CreateOrganizationsInternalServerError:
+	case *CreateOrganizationAliasInternalServerError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))
@@ -309,9 +312,9 @@ func encodeCreateOrganizationsResponse(response CreateOrganizationsRes, w http.R
 	}
 }
 
-func encodeCreateTalkSessionResponse(response CreateTalkSessionRes, w http.ResponseWriter, span trace.Span) error {
+func encodeDeleteOrganizationAliasResponse(response DeleteOrganizationAliasRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *CreateTalkSessionOK:
+	case *DeleteOrganizationAliasOK:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -324,10 +327,23 @@ func encodeCreateTalkSessionResponse(response CreateTalkSessionRes, w http.Respo
 
 		return nil
 
-	case *CreateTalkSessionBadRequest:
+	case *DeleteOrganizationAliasBadRequest:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *DeleteOrganizationAliasInternalServerError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(500)
+		span.SetStatus(codes.Error, http.StatusText(500))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -569,9 +585,9 @@ func encodeEditTimeLineResponse(response EditTimeLineRes, w http.ResponseWriter,
 	}
 }
 
-func encodeEditUserProfileResponse(response EditUserProfileRes, w http.ResponseWriter, span trace.Span) error {
+func encodeEstablishOrganizationResponse(response EstablishOrganizationRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *EditUserProfileOK:
+	case *EstablishOrganizationOK:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -584,7 +600,7 @@ func encodeEditUserProfileResponse(response EditUserProfileRes, w http.ResponseW
 
 		return nil
 
-	case *EditUserProfileBadRequest:
+	case *EstablishOrganizationBadRequest:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
@@ -597,7 +613,53 @@ func encodeEditUserProfileResponse(response EditUserProfileRes, w http.ResponseW
 
 		return nil
 
-	case *EditUserProfileInternalServerError:
+	case *EstablishOrganizationInternalServerError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(500)
+		span.SetStatus(codes.Error, http.StatusText(500))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
+func encodeEstablishUserResponse(response EstablishUserRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *User:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *EstablishUserBadRequest:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(400)
+		span.SetStatus(codes.Error, http.StatusText(400))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *EstablishUserInternalServerError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))
@@ -767,42 +829,9 @@ func encodeGetOpinionAnalysisResponse(response GetOpinionAnalysisRes, w http.Res
 	}
 }
 
-func encodeGetOpinionDetailResponse(response GetOpinionDetailRes, w http.ResponseWriter, span trace.Span) error {
-	switch response := response.(type) {
-	case *GetOpinionDetailOK:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *GetOpinionDetailInternalServerError:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(500)
-		span.SetStatus(codes.Error, http.StatusText(500))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
 func encodeGetOpinionDetail2Response(response GetOpinionDetail2Res, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *GetOpinionDetail2OK:
+	case *OpinionWithVote:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -954,6 +983,52 @@ func encodeGetOpinionsForTalkSessionResponse(response GetOpinionsForTalkSessionR
 		return nil
 
 	case *GetOpinionsForTalkSessionInternalServerError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(500)
+		span.SetStatus(codes.Error, http.StatusText(500))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
+func encodeGetOrganizationAliasesResponse(response GetOrganizationAliasesRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *GetOrganizationAliasesOK:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetOrganizationAliasesBadRequest:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(400)
+		span.SetStatus(codes.Error, http.StatusText(400))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetOrganizationAliasesInternalServerError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))
@@ -1433,6 +1508,52 @@ func encodeGetTimeLineResponse(response GetTimeLineRes, w http.ResponseWriter, s
 	}
 }
 
+func encodeGetTokenInfoResponse(response GetTokenInfoRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *TokenClaim:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetTokenInfoBadRequest:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(400)
+		span.SetStatus(codes.Error, http.StatusText(400))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetTokenInfoInternalServerError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(500)
+		span.SetStatus(codes.Error, http.StatusText(500))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
 func encodeGetUserInfoResponse(response GetUserInfoRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
 	case *GetUserInfoOK:
@@ -1516,6 +1637,89 @@ func encodeGetUserStatsTotalManageResponse(response *UserStatsResponse, w http.R
 	return nil
 }
 
+func encodeHandleAuthCallbackResponse(response HandleAuthCallbackRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *HandleAuthCallbackFoundHeaders:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		// Encoding response headers.
+		{
+			h := uri.NewHeaderEncoder(w.Header())
+			// Encode "Location" header.
+			{
+				cfg := uri.HeaderParameterEncodingConfig{
+					Name:    "Location",
+					Explode: false,
+				}
+				if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+					return e.EncodeValue(conv.StringToString(response.Location))
+				}); err != nil {
+					return errors.Wrap(err, "encode Location header")
+				}
+			}
+			// Encode "Set-Cookie" header.
+			{
+				cfg := uri.HeaderParameterEncodingConfig{
+					Name:    "Set-Cookie",
+					Explode: false,
+				}
+				if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+					return e.EncodeArray(func(e uri.Encoder) error {
+						for i, item := range response.SetCookie {
+							if err := func() error {
+								return e.EncodeValue(conv.StringToString(item))
+							}(); err != nil {
+								return errors.Wrapf(err, "[%d]", i)
+							}
+						}
+						return nil
+					})
+				}); err != nil {
+					return errors.Wrap(err, "encode Set-Cookie header")
+				}
+			}
+		}
+		w.WriteHeader(302)
+		span.SetStatus(codes.Ok, http.StatusText(302))
+
+		e := new(jx.Encoder)
+		response.Response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *HandleAuthCallbackBadRequest:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(400)
+		span.SetStatus(codes.Error, http.StatusText(400))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *HandleAuthCallbackInternalServerError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(500)
+		span.SetStatus(codes.Error, http.StatusText(500))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
 func encodeHasConsentResponse(response HasConsentRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
 	case *HasConsentOK:
@@ -1594,6 +1798,39 @@ func encodeHealthResponse(response HealthRes, w http.ResponseWriter, span trace.
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
+func encodeInitiateTalkSessionResponse(response InitiateTalkSessionRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *TalkSession:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *InitiateTalkSessionBadRequest:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(400)
+		span.SetStatus(codes.Error, http.StatusText(400))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1712,252 +1949,6 @@ func encodeManageRegenerateManageResponse(response *RegenerateResponse, w http.R
 	}
 
 	return nil
-}
-
-func encodeOAuthCallbackResponse(response OAuthCallbackRes, w http.ResponseWriter, span trace.Span) error {
-	switch response := response.(type) {
-	case *OAuthCallbackFoundHeaders:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		// Encoding response headers.
-		{
-			h := uri.NewHeaderEncoder(w.Header())
-			// Encode "Location" header.
-			{
-				cfg := uri.HeaderParameterEncodingConfig{
-					Name:    "Location",
-					Explode: false,
-				}
-				if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
-					return e.EncodeValue(conv.StringToString(response.Location))
-				}); err != nil {
-					return errors.Wrap(err, "encode Location header")
-				}
-			}
-			// Encode "Set-Cookie" header.
-			{
-				cfg := uri.HeaderParameterEncodingConfig{
-					Name:    "Set-Cookie",
-					Explode: false,
-				}
-				if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
-					return e.EncodeArray(func(e uri.Encoder) error {
-						for i, item := range response.SetCookie {
-							if err := func() error {
-								return e.EncodeValue(conv.StringToString(item))
-							}(); err != nil {
-								return errors.Wrapf(err, "[%d]", i)
-							}
-						}
-						return nil
-					})
-				}); err != nil {
-					return errors.Wrap(err, "encode Set-Cookie header")
-				}
-			}
-		}
-		w.WriteHeader(302)
-		span.SetStatus(codes.Ok, http.StatusText(302))
-
-		e := new(jx.Encoder)
-		response.Response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *OAuthCallbackBadRequest:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(400)
-		span.SetStatus(codes.Error, http.StatusText(400))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *OAuthCallbackInternalServerError:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(500)
-		span.SetStatus(codes.Error, http.StatusText(500))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
-func encodeOAuthTokenInfoResponse(response OAuthTokenInfoRes, w http.ResponseWriter, span trace.Span) error {
-	switch response := response.(type) {
-	case *OAuthTokenInfoOK:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *OAuthTokenInfoBadRequest:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(400)
-		span.SetStatus(codes.Error, http.StatusText(400))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *OAuthTokenInfoInternalServerError:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(500)
-		span.SetStatus(codes.Error, http.StatusText(500))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
-func encodeOAuthTokenRevokeResponse(response OAuthTokenRevokeRes, w http.ResponseWriter, span trace.Span) error {
-	switch response := response.(type) {
-	case *OAuthTokenRevokeNoContentHeaders:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		// Encoding response headers.
-		{
-			h := uri.NewHeaderEncoder(w.Header())
-			// Encode "Set-Cookie" header.
-			{
-				cfg := uri.HeaderParameterEncodingConfig{
-					Name:    "Set-Cookie",
-					Explode: false,
-				}
-				if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
-					return e.EncodeArray(func(e uri.Encoder) error {
-						for i, item := range response.SetCookie {
-							if err := func() error {
-								return e.EncodeValue(conv.StringToString(item))
-							}(); err != nil {
-								return errors.Wrapf(err, "[%d]", i)
-							}
-						}
-						return nil
-					})
-				}); err != nil {
-					return errors.Wrap(err, "encode Set-Cookie header")
-				}
-			}
-		}
-		w.WriteHeader(204)
-		span.SetStatus(codes.Ok, http.StatusText(204))
-
-		e := new(jx.Encoder)
-		response.Response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *OAuthTokenRevokeBadRequest:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(400)
-		span.SetStatus(codes.Error, http.StatusText(400))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *OAuthTokenRevokeInternalServerError:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(500)
-		span.SetStatus(codes.Error, http.StatusText(500))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
-func encodeOpinionCommentsResponse(response OpinionCommentsRes, w http.ResponseWriter, span trace.Span) error {
-	switch response := response.(type) {
-	case *OpinionCommentsOK:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *OpinionCommentsBadRequest:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(400)
-		span.SetStatus(codes.Error, http.StatusText(400))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *OpinionCommentsInternalServerError:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(500)
-		span.SetStatus(codes.Error, http.StatusText(500))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
 }
 
 func encodeOpinionComments2Response(response OpinionComments2Res, w http.ResponseWriter, span trace.Span) error {
@@ -2282,52 +2273,6 @@ func encodePostImageResponse(response PostImageRes, w http.ResponseWriter, span 
 	}
 }
 
-func encodePostOpinionPostResponse(response PostOpinionPostRes, w http.ResponseWriter, span trace.Span) error {
-	switch response := response.(type) {
-	case *PostOpinionPostOK:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *PostOpinionPostBadRequest:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(400)
-		span.SetStatus(codes.Error, http.StatusText(400))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *PostOpinionPostInternalServerError:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(500)
-		span.SetStatus(codes.Error, http.StatusText(500))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
 func encodePostOpinionPost2Response(response PostOpinionPost2Res, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
 	case *PostOpinionPost2OK:
@@ -2420,52 +2365,6 @@ func encodePostTimeLineItemResponse(response PostTimeLineItemRes, w http.Respons
 	}
 }
 
-func encodeRegisterUserResponse(response RegisterUserRes, w http.ResponseWriter, span trace.Span) error {
-	switch response := response.(type) {
-	case *RegisterUserOK:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *RegisterUserBadRequest:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(400)
-		span.SetStatus(codes.Error, http.StatusText(400))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *RegisterUserInternalServerError:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(500)
-		span.SetStatus(codes.Error, http.StatusText(500))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
 func encodeReportOpinionResponse(response ReportOpinionRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
 	case *ReportOpinionOK:
@@ -2495,6 +2394,77 @@ func encodeReportOpinionResponse(response ReportOpinionRes, w http.ResponseWrite
 		return nil
 
 	case *ReportOpinionInternalServerError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(500)
+		span.SetStatus(codes.Error, http.StatusText(500))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
+func encodeRevokeTokenResponse(response RevokeTokenRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *RevokeTokenNoContentHeaders:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		// Encoding response headers.
+		{
+			h := uri.NewHeaderEncoder(w.Header())
+			// Encode "Set-Cookie" header.
+			{
+				cfg := uri.HeaderParameterEncodingConfig{
+					Name:    "Set-Cookie",
+					Explode: false,
+				}
+				if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+					return e.EncodeArray(func(e uri.Encoder) error {
+						for i, item := range response.SetCookie {
+							if err := func() error {
+								return e.EncodeValue(conv.StringToString(item))
+							}(); err != nil {
+								return errors.Wrapf(err, "[%d]", i)
+							}
+						}
+						return nil
+					})
+				}); err != nil {
+					return errors.Wrap(err, "encode Set-Cookie header")
+				}
+			}
+		}
+		w.WriteHeader(204)
+		span.SetStatus(codes.Ok, http.StatusText(204))
+
+		e := new(jx.Encoder)
+		response.Response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *RevokeTokenBadRequest:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(400)
+		span.SetStatus(codes.Error, http.StatusText(400))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *RevokeTokenInternalServerError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))
@@ -2756,9 +2726,9 @@ func encodeToggleReportVisibilityManageResponse(response *ToggleReportVisibility
 	return nil
 }
 
-func encodeVoteResponse(response VoteRes, w http.ResponseWriter, span trace.Span) error {
+func encodeUpdateUserProfileResponse(response UpdateUserProfileRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *VoteOKApplicationJSON:
+	case *User:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -2771,7 +2741,7 @@ func encodeVoteResponse(response VoteRes, w http.ResponseWriter, span trace.Span
 
 		return nil
 
-	case *VoteBadRequest:
+	case *UpdateUserProfileBadRequest:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
@@ -2784,7 +2754,53 @@ func encodeVoteResponse(response VoteRes, w http.ResponseWriter, span trace.Span
 
 		return nil
 
-	case *VoteInternalServerError:
+	case *UpdateUserProfileInternalServerError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(500)
+		span.SetStatus(codes.Error, http.StatusText(500))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
+func encodeValidateOrganizationCodeResponse(response ValidateOrganizationCodeRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *ValidateOrganizationCodeOK:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ValidateOrganizationCodeBadRequest:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(400)
+		span.SetStatus(codes.Error, http.StatusText(400))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ValidateOrganizationCodeInternalServerError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))

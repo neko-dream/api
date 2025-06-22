@@ -14,6 +14,7 @@ import (
 	"github.com/rs/cors"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 
+	"github.com/swaggest/swgui"
 	"github.com/swaggest/swgui/v5emb"
 )
 
@@ -64,7 +65,39 @@ func main() {
 	mux.Handle("/admin/", http.StripPrefix("/admin/", handler.NewAdminUIHandler()))
 	mux.Handle("/assets/", http.StripPrefix("/assets/", handler.NewAdminUIAssetsHandler()))
 	mux.Handle("/admin", http.RedirectHandler("/admin/index.html", http.StatusSeeOther))
-	mux.Handle("/docs/", v5emb.New("kotohiro", domain, "/docs/"))
+	tagsSorterFunc := "(a, b) => {" +
+		"const priority = {\"auth\": 1, \"user\": 2, \"talk_session\": 3, \"opinion\": 4, \"organization\": 5, \"vote\": 6}; " +
+		"const ap = priority[a.toLowerCase()]; " +
+		"const bp = priority[b.toLowerCase()]; " +
+		"if (ap && bp) return ap - bp; " +
+		"if (ap) return -1; " +
+		"if (bp) return 1; " +
+		"return a.toLowerCase().localeCompare(b.toLowerCase());" +
+		"}"
+	swagger := v5emb.NewWithConfig(swgui.Config{
+		Title:       "Kotohiro API",
+		HideCurl:    true,
+		SwaggerJSON: domain,
+		BasePath:    "/docs/",
+		JsonEditor:  true,
+		SettingsUI: map[string]string{
+			"deepLinking":              "true", // URLで各APIに直リンク可能
+			"defaultModelsExpandDepth": "-1",
+			"defaultModelExpandDepth":  "-1",
+			"defaultModelRendering":    "\"model\"",
+			"displayRequestDuration":   "true",
+			"tryItOutEnabled":          "true",
+			"layout":                   "\"BaseLayout\"",
+			"showExtensions":           "true",
+			"showCommonExtensions":     "true",
+			"syntaxHighlight":          "{\"activate\": true,\"theme\": \"tomorrow-night\"}",
+			"displayOperationId":       "true",
+			"filter":                   "true",
+			"operationsSorter":         "\"alpha\"",
+			"tagsSorter":               tagsSorterFunc,
+		},
+	})
+	mux.Handle("/docs/", swagger("Kotohiro API", domain, "/docs/"))
 	// }
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%s", conf.PORT), mux); err != nil {

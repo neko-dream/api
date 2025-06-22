@@ -13,7 +13,7 @@ import (
 
 const findOrgUserByOrganizationIDAndUserID = `-- name: FindOrgUserByOrganizationIDAndUserID :one
 SELECT
-    organization_users.organization_user_id, organization_users.user_id, organization_users.organization_id, organization_users.role, organization_users.created_at, organization_users.updated_at
+    organization_users.organization_user_id, organization_users.user_id, organization_users.organization_id, organization_users.created_at, organization_users.updated_at, organization_users.role
 FROM organization_users
 WHERE organization_id = $1
   AND user_id = $2
@@ -31,7 +31,7 @@ type FindOrgUserByOrganizationIDAndUserIDRow struct {
 // FindOrgUserByOrganizationIDAndUserID
 //
 //	SELECT
-//	    organization_users.organization_user_id, organization_users.user_id, organization_users.organization_id, organization_users.role, organization_users.created_at, organization_users.updated_at
+//	    organization_users.organization_user_id, organization_users.user_id, organization_users.organization_id, organization_users.created_at, organization_users.updated_at, organization_users.role
 //	FROM organization_users
 //	WHERE organization_id = $1
 //	  AND user_id = $2
@@ -42,9 +42,9 @@ func (q *Queries) FindOrgUserByOrganizationIDAndUserID(ctx context.Context, arg 
 		&i.OrganizationUser.OrganizationUserID,
 		&i.OrganizationUser.UserID,
 		&i.OrganizationUser.OrganizationID,
-		&i.OrganizationUser.Role,
 		&i.OrganizationUser.CreatedAt,
 		&i.OrganizationUser.UpdatedAt,
+		&i.OrganizationUser.Role,
 	)
 	return i, err
 }

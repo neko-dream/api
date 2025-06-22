@@ -14,8 +14,9 @@ import (
 
 // SecurityHandler is handler for security parameters.
 type SecurityHandler interface {
-	// HandleApiKeyAuth handles ApiKeyAuth security.
-	HandleApiKeyAuth(ctx context.Context, operationName string, t ApiKeyAuth) (context.Context, error)
+	// HandleCookieAuth handles CookieAuth security.
+	// Cookie-based authentication using JWT tokens stored in secure HTTP-only cookies.
+	HandleCookieAuth(ctx context.Context, operationName string, t CookieAuth) (context.Context, error)
 }
 
 func findAuthorization(h http.Header, prefix string) (string, bool) {
@@ -33,8 +34,8 @@ func findAuthorization(h http.Header, prefix string) (string, bool) {
 	return "", false
 }
 
-func (s *Server) securityApiKeyAuth(ctx context.Context, operationName string, req *http.Request) (context.Context, bool, error) {
-	var t ApiKeyAuth
+func (s *Server) securityCookieAuth(ctx context.Context, operationName string, req *http.Request) (context.Context, bool, error) {
+	var t CookieAuth
 	const parameterName = "SessionId"
 	var value string
 	switch cookie, err := req.Cookie(parameterName); {
@@ -46,7 +47,7 @@ func (s *Server) securityApiKeyAuth(ctx context.Context, operationName string, r
 		return nil, false, errors.Wrap(err, "get cookie value")
 	}
 	t.APIKey = value
-	rctx, err := s.sec.HandleApiKeyAuth(ctx, operationName, t)
+	rctx, err := s.sec.HandleCookieAuth(ctx, operationName, t)
 	if errors.Is(err, ogenerrors.ErrSkipServerSecurity) {
 		return nil, false, nil
 	} else if err != nil {

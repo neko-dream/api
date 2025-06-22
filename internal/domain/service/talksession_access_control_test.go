@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/talksession/talksession_consent"
@@ -121,7 +120,7 @@ func TestCanUserJoin(t *testing.T) {
 			nil, nil, nil,
 		)
 		u := user.NewUser(
-			userID, lo.ToPtr("u"), lo.ToPtr("u"), "u", auth.AuthProviderName("u"), nil,
+			userID, lo.ToPtr("u"), lo.ToPtr("u"), "u", shared.AuthProviderName("u"), nil,
 		)
 		u.SetDemographics(demographics)
 
@@ -159,7 +158,7 @@ func TestCanUserJoin(t *testing.T) {
 			nil, nil, nil,
 		)
 		u := user.NewUser(
-			userID, lo.ToPtr("u"), lo.ToPtr("u"), "u", auth.AuthProviderName("u"), nil,
+			userID, lo.ToPtr("u"), lo.ToPtr("u"), "u", shared.AuthProviderName("u"), nil,
 		)
 		u.SetDemographics(demographics)
 
@@ -198,7 +197,7 @@ func TestCanUserJoin(t *testing.T) {
 			nil, nil, nil,
 		)
 		u := user.NewUser(
-			userID, lo.ToPtr("u"), lo.ToPtr("u"), "u", auth.AuthProviderName("u"), nil,
+			userID, lo.ToPtr("u"), lo.ToPtr("u"), "u", shared.AuthProviderName("u"), nil,
 		)
 		u.SetDemographics(demographics)
 
