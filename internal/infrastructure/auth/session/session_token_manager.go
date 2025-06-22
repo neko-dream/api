@@ -7,6 +7,8 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"log"
+	"net/url"
 	"strings"
 
 	"braces.dev/errtrace"
@@ -68,14 +70,18 @@ func (s *sessionTokenManager) verifySignedToken(token string) (string, error) {
 
 	sessionID := parts[0]
 	providedSignature := parts[1]
+	decodedSignature, err := url.QueryUnescape(providedSignature)
+	if err != nil {
+		return "", ErrInvalidToken
+	}
 
-	// 署名を再計算
+	// 署名を再計
 	h := hmac.New(sha256.New, []byte(s.secret))
 	h.Write([]byte(sessionID))
 	expectedSignature := base64.URLEncoding.EncodeToString(h.Sum(nil))
 
 	// 署名を比較
-	if !hmac.Equal([]byte(providedSignature), []byte(expectedSignature)) {
+	if !hmac.Equal([]byte(decodedSignature), []byte(expectedSignature)) {
 		return "", ErrInvalidToken
 	}
 
@@ -91,6 +97,7 @@ func (s *sessionTokenManager) Parse(ctx context.Context, token string) (*session
 	// トークンを検証してセッションIDを取得
 	sessionIDStr, err := s.verifySignedToken(token)
 	if err != nil {
+		log.Println("Failed to verify token:", err)
 		return nil, errtrace.Wrap(err)
 	}
 
