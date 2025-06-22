@@ -2,7 +2,6 @@ package aws
 
 import (
 	"context"
-	"os"
 	"sync"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -17,10 +16,7 @@ var (
 
 func NewAWSConfig() aws.Config {
 	once.Do(func() {
-		region := os.Getenv("AWS_REGION")
-		if region == "" {
-			region = "ap-northeast-1" // Default region
-		}
+		region := "ap-northeast-1" // デフォルトのリージョンを設定
 		c, err := awsConfig.LoadDefaultConfig(context.TODO(),
 			awsConfig.WithRegion(region),
 			awsConfig.WithSharedConfigProfile("admin"),
