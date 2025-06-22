@@ -27,6 +27,11 @@ namespace kotohiro {
     owner: User;
 
     /**
+     * 作成組織名
+     */
+    organizationAlias?: OrganizationAlias | null;
+
+    /**
      * 作成日時
      */
     createdAt: string;
@@ -61,6 +66,9 @@ namespace kotohiro {
      */
     restrictions: Restriction[];
 
+    /**
+     * レポートを隠すかどうか
+     */
     hideReport: boolean;
   }
 

@@ -1616,9 +1616,8 @@ paths:
                   type: array
                   items:
                     type: string
-                organizationAliasID:
+                aliasId:
                   type: string
-                  nullable: true
               required:
                 - theme
                 - scheduledEndTime
@@ -1636,8 +1635,6 @@ paths:
               thumbnailURL:
                 contentType: application/json
               restrictions:
-                contentType: application/json
-              organizationAliasID:
                 contentType: application/json
       x-ogen-operation-group: TalkSession
   /talksessions/histories:
@@ -3392,6 +3389,7 @@ components:
           description: 組織のタイプ
         roleName:
           type: string
+          description: ロールの名前
         role:
           type: integer
           description: ロール
@@ -3400,7 +3398,6 @@ components:
       required:
         - aliasID
         - aliasName
-        - createdAt
       properties:
         aliasID:
           type: string
@@ -3408,6 +3405,7 @@ components:
           type: string
         createdAt:
           type: string
+          nullable: true
       description: 組織エイリアス
     PolicyConsentStatus:
       type: object
@@ -3564,6 +3562,12 @@ components:
           allOf:
             - $ref: '#/components/schemas/User'
           description: 作成ユーザー
+        organizationAlias:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/OrganizationAlias'
+          nullable: true
+          description: 作成組織名
         createdAt:
           type: string
           description: 作成日時
@@ -3593,6 +3597,7 @@ components:
           description: セッションの参加制限
         hideReport:
           type: boolean
+          description: レポートを隠すかどうか
     TalkSessionForManage:
       type: object
       required:

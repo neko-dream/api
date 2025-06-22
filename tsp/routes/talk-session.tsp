@@ -137,7 +137,7 @@ namespace kotohiro {
       description?: HttpPart<string | null>;
       thumbnailURL?: HttpPart<string | null>;
       restrictions?: HttpPart<string[]>;
-      organizationAliasID?: HttpPart<string | null>;
+      aliasId?: HttpPart<string>;
     },
   ): TalkSession | {
     @statusCode statusCode: 400;

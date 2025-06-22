@@ -24,6 +24,9 @@ namespace kotohiro {
      */
     type: integer;
 
+    /**
+     * ロールの名前
+     */
     roleName: string;
 
     /**
@@ -38,6 +41,6 @@ namespace kotohiro {
   model OrganizationAlias {
     aliasID: string;
     aliasName: string;
-    createdAt: string;
+    createdAt?: string | null;
   }
 }
