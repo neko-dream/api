@@ -2,6 +2,7 @@ package aws
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"sync"
 
@@ -11,32 +12,49 @@ import (
 )
 
 var (
-	once sync.Once
-	s    aws.Config
+	s         aws.Config
+	once      sync.Once
+	configErr error
 )
 
-func NewAWSConfig() aws.Config {
+func NewAWSConfig() (aws.Config, error) {
 	once.Do(func() {
 		region := "ap-northeast-1"
 		var funs []func(*awsConfig.LoadOptions) error
+
 		// localならWithSharedConfigProfileを使う
 		if os.Getenv("ENV") == "local" {
-			funs = append(funs, awsConfig.WithSharedConfigProfile("local"))
+			funs = append(funs, awsConfig.WithSharedConfigProfile("admin"))
 		}
 		funs = append(funs, awsConfig.WithRegion(region))
 
-		c, err := awsConfig.LoadDefaultConfig(context.TODO(), funs...)
+		var err error
+		s, err = awsConfig.LoadDefaultConfig(context.TODO(), funs...)
 		if err != nil {
+			configErr = fmt.Errorf("failed to load AWS config: %w", err)
 			return
 		}
-
-		s = c
 	})
 
-	return s
+	if configErr != nil {
+		return aws.Config{}, configErr
+	}
+
+	return s, nil
 }
 
 func NewSESClient() *sesv2.Client {
-	sesClient := sesv2.NewFromConfig(NewAWSConfig())
+	cfg, err := NewAWSConfig()
+	if err != nil {
+		fmt.Printf("Error creating AWS config: %v\n", err)
+		return nil
+	}
+	// SESv2クライアントを作成
+	sesClient := sesv2.NewFromConfig(cfg)
+	if sesClient == nil {
+		fmt.Println("Error creating SES client")
+		return nil
+	}
+	fmt.Println("SES client created successfully")
 	return sesClient
 }
