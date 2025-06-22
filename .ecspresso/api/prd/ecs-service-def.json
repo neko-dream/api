@@ -32,15 +32,15 @@
 	],
 	"networkConfiguration": {
 		"awsvpcConfiguration": {
-			"assignPublicIp": "DISABLED",
+			"assignPublicIp": "ENABLED",
 			"securityGroups": ["{{ ssm `/kotohiro-prd-api-sg/id`}}"],
 			"subnets": [
-				"{{ ssm `/kotohiro-prd-private-subnet/0/id` }}",
-				"{{ ssm `/kotohiro-prd-private-subnet/1/id` }}"
+				"{{ ssm `/kotohiro-prd-public-subnet/0/id` }}",
+				"{{ ssm `/kotohiro-prd-public-subnet/1/id` }}"
 			]
 		}
 	},
-	"enableECSManagedTags": false,
+	"enableECSManagedTags": true,
 	"enableExecuteCommand": true,
 	"desiredCount": 1,
 	"schedulingStrategy": "REPLICA",
