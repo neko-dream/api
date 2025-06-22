@@ -34,6 +34,7 @@ func (r *organizationAliasRepository) Create(ctx context.Context, alias *organiz
 
 	queries := r.GetQueries(ctx)
 	params := model.CreateOrganizationAliasParams{
+		AliasID:        alias.AliasID().UUID(),
 		OrganizationID: alias.OrganizationID().UUID(),
 		AliasName:      alias.AliasName(),
 		CreatedBy:      alias.CreatedBy().UUID(),
