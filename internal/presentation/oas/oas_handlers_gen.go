@@ -2776,12 +2776,12 @@ func (s *Server) handleGetOpinionsForTalkSessionRequest(args [1]string, argsEsca
 //
 // 組織エイリアス一覧取得.
 //
-// GET /organizations/{organizationID}/aliases
-func (s *Server) handleGetOrganizationAliasesRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+// GET /organizations/aliases
+func (s *Server) handleGetOrganizationAliasesRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getOrganizationAliases"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/organizations/{organizationID}/aliases"),
+		semconv.HTTPRouteKey.String("/organizations/aliases"),
 	}
 
 	// Start a span for this request.
@@ -2864,16 +2864,6 @@ func (s *Server) handleGetOrganizationAliasesRequest(args [1]string, argsEscaped
 			return
 		}
 	}
-	params, err := decodeGetOrganizationAliasesParams(args, argsEscaped, r)
-	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		defer recordError("DecodeParams", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
 
 	var response GetOrganizationAliasesRes
 	if m := s.cfg.Middleware; m != nil {
@@ -2883,18 +2873,13 @@ func (s *Server) handleGetOrganizationAliasesRequest(args [1]string, argsEscaped
 			OperationSummary: "組織エイリアス一覧取得",
 			OperationID:      "getOrganizationAliases",
 			Body:             nil,
-			Params: middleware.Parameters{
-				{
-					Name: "organizationID",
-					In:   "path",
-				}: params.OrganizationID,
-			},
-			Raw: r,
+			Params:           middleware.Parameters{},
+			Raw:              r,
 		}
 
 		type (
 			Request  = struct{}
-			Params   = GetOrganizationAliasesParams
+			Params   = struct{}
 			Response = GetOrganizationAliasesRes
 		)
 		response, err = middleware.HookMiddleware[
@@ -2904,14 +2889,14 @@ func (s *Server) handleGetOrganizationAliasesRequest(args [1]string, argsEscaped
 		](
 			m,
 			mreq,
-			unpackGetOrganizationAliasesParams,
+			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.GetOrganizationAliases(ctx, params)
+				response, err = s.h.GetOrganizationAliases(ctx)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.GetOrganizationAliases(ctx, params)
+		response, err = s.h.GetOrganizationAliases(ctx)
 	}
 	if err != nil {
 		defer recordError("Internal", err)

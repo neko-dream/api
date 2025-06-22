@@ -196,8 +196,8 @@ func (UnimplementedHandler) GetOpinionsForTalkSession(ctx context.Context, param
 //
 // 組織エイリアス一覧取得.
 //
-// GET /organizations/{organizationID}/aliases
-func (UnimplementedHandler) GetOrganizationAliases(ctx context.Context, params GetOrganizationAliasesParams) (r GetOrganizationAliasesRes, _ error) {
+// GET /organizations/aliases
+func (UnimplementedHandler) GetOrganizationAliases(ctx context.Context) (r GetOrganizationAliasesRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

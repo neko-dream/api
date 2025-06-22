@@ -221,7 +221,7 @@ func (o *organizationHandler) ValidateOrganizationCode(ctx context.Context, para
 }
 
 // GetOrganizationAliases 組織エイリアス一覧取得
-func (o *organizationHandler) GetOrganizationAliases(ctx context.Context, params oas.GetOrganizationAliasesParams) (oas.GetOrganizationAliasesRes, error) {
+func (o *organizationHandler) GetOrganizationAliases(ctx context.Context) (oas.GetOrganizationAliasesRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.GetOrganizationAliases")
 	defer span.End()
 
@@ -229,24 +229,13 @@ func (o *organizationHandler) GetOrganizationAliases(ctx context.Context, params
 	if err != nil {
 		return nil, err
 	}
-
-	organizationID, err := shared.ParseUUID[organization.Organization](params.OrganizationID)
-	if err != nil {
-		return nil, messages.BadRequestError
-	}
-
-	// 権限チェック - ユーザーがAdmin以上の権限を持っているか確認
-	orgUser, err := o.orgUserRepo.FindByOrganizationIDAndUserID(ctx, organizationID, authCtx.UserID)
-	if err != nil {
-		return nil, messages.ForbiddenError
-	}
-	if orgUser.Role > organization.OrganizationUserRoleAdmin {
-		return nil, messages.ForbiddenError
+	if !authCtx.IsInOrganization() {
+		return nil, messages.OrganizationContextRequired
 	}
 
 	// エイリアス一覧取得
 	output, err := o.listAliases.Execute(ctx, organization_usecase.ListOrganizationAliasesInput{
-		OrganizationID: organizationID,
+		OrganizationID: *authCtx.OrganizationID,
 	})
 	if err != nil {
 		return nil, err

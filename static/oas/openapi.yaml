@@ -1146,6 +1146,39 @@ paths:
                 - orgType
       x-ogen-operation-group: Organization
   /organizations/aliases:
+    get:
+      operationId: getOrganizationAliases
+      summary: 組織エイリアス一覧取得
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  aliases:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OrganizationAlias'
+                required:
+                  - aliases
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - organization
+      x-ogen-operation-group: Organization
     post:
       operationId: createOrganizationAlias
       summary: 組織エイリアス作成
@@ -1307,45 +1340,6 @@ paths:
               required:
                 - displayID
                 - role
-      x-ogen-operation-group: Organization
-  /organizations/{organizationID}/aliases:
-    get:
-      operationId: getOrganizationAliases
-      summary: 組織エイリアス一覧取得
-      parameters:
-        - name: organizationID
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  aliases:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/OrganizationAlias'
-                required:
-                  - aliases
-        '400':
-          description: The server could not understand the request due to invalid syntax.
-          content:
-            application/json:
-              schema:
-                type: object
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                type: object
-      tags:
-        - organization
       x-ogen-operation-group: Organization
   /policy/consent:
     get:

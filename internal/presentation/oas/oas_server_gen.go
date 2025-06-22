@@ -240,8 +240,8 @@ type OrganizationHandler interface {
 	//
 	// 組織エイリアス一覧取得.
 	//
-	// GET /organizations/{organizationID}/aliases
-	GetOrganizationAliases(ctx context.Context, params GetOrganizationAliasesParams) (GetOrganizationAliasesRes, error)
+	// GET /organizations/aliases
+	GetOrganizationAliases(ctx context.Context) (GetOrganizationAliasesRes, error)
 	// GetOrganizations implements getOrganizations operation.
 	//
 	// 所属組織一覧.

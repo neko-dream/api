@@ -118,10 +118,10 @@ namespace kotohiro {
 
   @tag("organization")
   @extension("x-ogen-operation-group", "Organization")
-  @route("/organizations/{organizationID}/aliases")
+  @route("/organizations/aliases")
   @get
   @summary("組織エイリアス一覧取得")
-  op getOrganizationAliases(@path organizationID: string): Body<{
+  op getOrganizationAliases(): Body<{
     aliases: OrganizationAlias[];
   }> | {
     @statusCode statusCode: 400;
