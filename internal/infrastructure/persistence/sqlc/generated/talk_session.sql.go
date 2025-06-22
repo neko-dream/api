@@ -233,7 +233,9 @@ SELECT
     ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
-    talk_session_locations.talk_session_id as location_id,
+    COALESCE(organization_aliases.alias_name, '') AS alias_name,
+    COALESCE(organization_aliases.alias_id, '00000000-0000-0000-0000-000000000000'::uuid) AS alias_id,
+    COALESCE(organization_aliases.organization_id, '00000000-0000-0000-0000-000000000000'::uuid) AS organization_id,
     COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
     COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
 FROM talk_sessions ts
@@ -246,6 +248,8 @@ LEFT JOIN users
     ON ts.owner_id = users.user_id
 LEFT JOIN talk_session_locations
     ON talk_session_locations.talk_session_id = ts.talk_session_id
+LEFT JOIN organization_aliases
+    ON ts.organization_alias_id = organization_aliases.alias_id
 WHERE
     ts.owner_id = $3::uuid
     AND
@@ -274,12 +278,14 @@ type GetOwnTalkSessionByUserIDParams struct {
 }
 
 type GetOwnTalkSessionByUserIDRow struct {
-	TalkSession  TalkSession
-	OpinionCount int64
-	User         User
-	LocationID   uuid.NullUUID
-	Latitude     float64
-	Longitude    float64
+	TalkSession    TalkSession
+	OpinionCount   int64
+	User           User
+	AliasName      string
+	AliasID        uuid.UUID
+	OrganizationID uuid.UUID
+	Latitude       float64
+	Longitude      float64
 }
 
 // GetOwnTalkSessionByUserID
@@ -288,7 +294,9 @@ type GetOwnTalkSessionByUserIDRow struct {
 //	    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
 //	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
-//	    talk_session_locations.talk_session_id as location_id,
+//	    COALESCE(organization_aliases.alias_name, '') AS alias_name,
+//	    COALESCE(organization_aliases.alias_id, '00000000-0000-0000-0000-000000000000'::uuid) AS alias_id,
+//	    COALESCE(organization_aliases.organization_id, '00000000-0000-0000-0000-000000000000'::uuid) AS organization_id,
 //	    COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
 //	    COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
 //	FROM talk_sessions ts
@@ -301,6 +309,8 @@ type GetOwnTalkSessionByUserIDRow struct {
 //	    ON ts.owner_id = users.user_id
 //	LEFT JOIN talk_session_locations
 //	    ON talk_session_locations.talk_session_id = ts.talk_session_id
+//	LEFT JOIN organization_aliases
+//	    ON ts.organization_alias_id = organization_aliases.alias_id
 //	WHERE
 //	    ts.owner_id = $3::uuid
 //	    AND
@@ -357,7 +367,9 @@ func (q *Queries) GetOwnTalkSessionByUserID(ctx context.Context, arg GetOwnTalkS
 			&i.User.UpdatedAt,
 			&i.User.Email,
 			&i.User.EmailVerified,
-			&i.LocationID,
+			&i.AliasName,
+			&i.AliasID,
+			&i.OrganizationID,
 			&i.Latitude,
 			&i.Longitude,
 		); err != nil {
@@ -379,6 +391,10 @@ SELECT
     ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
+    COALESCE(organization_aliases.alias_name, '') AS alias_name,
+    COALESCE(organization_aliases.alias_id, '00000000-0000-0000-0000-000000000000'::uuid) AS alias_id,
+    COALESCE(organization_aliases.organization_id, '00000000-0000-0000-0000-000000000000'::uuid) AS organization_id,
+    organization_aliases.created_at,
     talk_session_locations.talk_session_id as location_id,
     COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
     COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
@@ -394,6 +410,8 @@ LEFT JOIN votes
     ON votes.talk_session_id = ts.talk_session_id
 LEFT JOIN talk_session_locations
     ON talk_session_locations.talk_session_id = ts.talk_session_id
+LEFT JOIN organization_aliases
+    ON ts.organization_alias_id = organization_aliases.alias_id
 WHERE
     votes.user_id = $3::uuid
     AND
@@ -422,12 +440,16 @@ type GetRespondTalkSessionByUserIDParams struct {
 }
 
 type GetRespondTalkSessionByUserIDRow struct {
-	TalkSession  TalkSession
-	OpinionCount int64
-	User         User
-	LocationID   uuid.NullUUID
-	Latitude     float64
-	Longitude    float64
+	TalkSession    TalkSession
+	OpinionCount   int64
+	User           User
+	AliasName      string
+	AliasID        uuid.UUID
+	OrganizationID uuid.UUID
+	CreatedAt      sql.NullTime
+	LocationID     uuid.NullUUID
+	Latitude       float64
+	Longitude      float64
 }
 
 // GetRespondTalkSessionByUserID
@@ -436,6 +458,10 @@ type GetRespondTalkSessionByUserIDRow struct {
 //	    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
 //	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
+//	    COALESCE(organization_aliases.alias_name, '') AS alias_name,
+//	    COALESCE(organization_aliases.alias_id, '00000000-0000-0000-0000-000000000000'::uuid) AS alias_id,
+//	    COALESCE(organization_aliases.organization_id, '00000000-0000-0000-0000-000000000000'::uuid) AS organization_id,
+//	    organization_aliases.created_at,
 //	    talk_session_locations.talk_session_id as location_id,
 //	    COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
 //	    COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
@@ -451,6 +477,8 @@ type GetRespondTalkSessionByUserIDRow struct {
 //	    ON votes.talk_session_id = ts.talk_session_id
 //	LEFT JOIN talk_session_locations
 //	    ON talk_session_locations.talk_session_id = ts.talk_session_id
+//	LEFT JOIN organization_aliases
+//	    ON ts.organization_alias_id = organization_aliases.alias_id
 //	WHERE
 //	    votes.user_id = $3::uuid
 //	    AND
@@ -507,6 +535,10 @@ func (q *Queries) GetRespondTalkSessionByUserID(ctx context.Context, arg GetResp
 			&i.User.UpdatedAt,
 			&i.User.Email,
 			&i.User.EmailVerified,
+			&i.AliasName,
+			&i.AliasID,
+			&i.OrganizationID,
+			&i.CreatedAt,
 			&i.LocationID,
 			&i.Latitude,
 			&i.Longitude,
@@ -529,6 +561,9 @@ SELECT
     ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
+    COALESCE(organization_aliases.alias_name, '') AS alias_name,
+    COALESCE(organization_aliases.alias_id, '00000000-0000-0000-0000-000000000000'::uuid) AS alias_id,
+    COALESCE(organization_aliases.organization_id, '00000000-0000-0000-0000-000000000000'::uuid) AS organization_id,
     talk_session_locations.talk_session_id as location_id,
     COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
     COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
@@ -540,18 +575,23 @@ LEFT JOIN (
     FROM opinions
     GROUP BY opinions.talk_session_id
 ) oc ON ts.talk_session_id = oc.talk_session_id
+LEFT JOIN organization_aliases
+    ON ts.organization_alias_id = organization_aliases.alias_id
 LEFT JOIN talk_session_locations
     ON ts.talk_session_id = talk_session_locations.talk_session_id
 WHERE ts.talk_session_id = $1
 `
 
 type GetTalkSessionByIDRow struct {
-	TalkSession  TalkSession
-	OpinionCount int64
-	User         User
-	LocationID   uuid.NullUUID
-	Latitude     float64
-	Longitude    float64
+	TalkSession    TalkSession
+	OpinionCount   int64
+	User           User
+	AliasName      string
+	AliasID        uuid.UUID
+	OrganizationID uuid.UUID
+	LocationID     uuid.NullUUID
+	Latitude       float64
+	Longitude      float64
 }
 
 // GetTalkSessionByID
@@ -560,6 +600,9 @@ type GetTalkSessionByIDRow struct {
 //	    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
 //	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
+//	    COALESCE(organization_aliases.alias_name, '') AS alias_name,
+//	    COALESCE(organization_aliases.alias_id, '00000000-0000-0000-0000-000000000000'::uuid) AS alias_id,
+//	    COALESCE(organization_aliases.organization_id, '00000000-0000-0000-0000-000000000000'::uuid) AS organization_id,
 //	    talk_session_locations.talk_session_id as location_id,
 //	    COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
 //	    COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
@@ -571,6 +614,8 @@ type GetTalkSessionByIDRow struct {
 //	    FROM opinions
 //	    GROUP BY opinions.talk_session_id
 //	) oc ON ts.talk_session_id = oc.talk_session_id
+//	LEFT JOIN organization_aliases
+//	    ON ts.organization_alias_id = organization_aliases.alias_id
 //	LEFT JOIN talk_session_locations
 //	    ON ts.talk_session_id = talk_session_locations.talk_session_id
 //	WHERE ts.talk_session_id = $1
@@ -601,6 +646,9 @@ func (q *Queries) GetTalkSessionByID(ctx context.Context, talkSessionID uuid.UUI
 		&i.User.UpdatedAt,
 		&i.User.Email,
 		&i.User.EmailVerified,
+		&i.AliasName,
+		&i.AliasID,
+		&i.OrganizationID,
 		&i.LocationID,
 		&i.Latitude,
 		&i.Longitude,
@@ -613,6 +661,9 @@ SELECT
     ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
+    COALESCE(organization_aliases.alias_name, '') AS alias_name,
+    COALESCE(organization_aliases.alias_id, '00000000-0000-0000-0000-000000000000'::uuid) AS alias_id,
+    COALESCE(organization_aliases.organization_id, '00000000-0000-0000-0000-000000000000'::uuid) AS organization_id,
     COALESCE(votes.vote_count, 0) AS vote_count,
     COALESCE(vote_users.vote_count, 0) AS vote_user_count,
     talk_session_locations.talk_session_id as location_id,
@@ -645,6 +696,8 @@ LEFT JOIN (
     FROM votes
     GROUP BY talk_session_id
 ) vote_users ON ts.talk_session_id = vote_users.talk_session_id
+LEFT JOIN organization_aliases
+    ON ts.organization_alias_id = organization_aliases.alias_id
 LEFT JOIN talk_session_locations
     ON ts.talk_session_id = talk_session_locations.talk_session_id
 WHERE
@@ -702,15 +755,18 @@ type ListTalkSessionsParams struct {
 }
 
 type ListTalkSessionsRow struct {
-	TalkSession   TalkSession
-	OpinionCount  int64
-	User          User
-	VoteCount     int64
-	VoteUserCount int64
-	LocationID    uuid.NullUUID
-	Latitude      float64
-	Longitude     float64
-	Distance      interface{}
+	TalkSession    TalkSession
+	OpinionCount   int64
+	User           User
+	AliasName      string
+	AliasID        uuid.UUID
+	OrganizationID uuid.UUID
+	VoteCount      int64
+	VoteUserCount  int64
+	LocationID     uuid.NullUUID
+	Latitude       float64
+	Longitude      float64
+	Distance       interface{}
 }
 
 // ListTalkSessions
@@ -719,6 +775,9 @@ type ListTalkSessionsRow struct {
 //	    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
 //	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
+//	    COALESCE(organization_aliases.alias_name, '') AS alias_name,
+//	    COALESCE(organization_aliases.alias_id, '00000000-0000-0000-0000-000000000000'::uuid) AS alias_id,
+//	    COALESCE(organization_aliases.organization_id, '00000000-0000-0000-0000-000000000000'::uuid) AS organization_id,
 //	    COALESCE(votes.vote_count, 0) AS vote_count,
 //	    COALESCE(vote_users.vote_count, 0) AS vote_user_count,
 //	    talk_session_locations.talk_session_id as location_id,
@@ -751,6 +810,8 @@ type ListTalkSessionsRow struct {
 //	    FROM votes
 //	    GROUP BY talk_session_id
 //	) vote_users ON ts.talk_session_id = vote_users.talk_session_id
+//	LEFT JOIN organization_aliases
+//	    ON ts.organization_alias_id = organization_aliases.alias_id
 //	LEFT JOIN talk_session_locations
 //	    ON ts.talk_session_id = talk_session_locations.talk_session_id
 //	WHERE
@@ -836,6 +897,9 @@ func (q *Queries) ListTalkSessions(ctx context.Context, arg ListTalkSessionsPara
 			&i.User.UpdatedAt,
 			&i.User.Email,
 			&i.User.EmailVerified,
+			&i.AliasName,
+			&i.AliasID,
+			&i.OrganizationID,
 			&i.VoteCount,
 			&i.VoteUserCount,
 			&i.LocationID,

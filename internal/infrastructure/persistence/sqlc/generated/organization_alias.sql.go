@@ -54,14 +54,16 @@ func (q *Queries) CountActiveAliasesByOrganization(ctx context.Context, organiza
 
 const createOrganizationAlias = `-- name: CreateOrganizationAlias :one
 INSERT INTO organization_aliases (
+    alias_id,
     organization_id,
     alias_name,
     created_by
-) VALUES ($1, $2, $3)
+) VALUES ($1, $2, $3, $4)
 RETURNING alias_id, organization_id, alias_name, created_at, updated_at, created_by, deactivated_at, deactivated_by
 `
 
 type CreateOrganizationAliasParams struct {
+	AliasID        uuid.UUID
 	OrganizationID uuid.UUID
 	AliasName      string
 	CreatedBy      uuid.UUID
@@ -70,13 +72,19 @@ type CreateOrganizationAliasParams struct {
 // CreateOrganizationAlias
 //
 //	INSERT INTO organization_aliases (
+//	    alias_id,
 //	    organization_id,
 //	    alias_name,
 //	    created_by
-//	) VALUES ($1, $2, $3)
+//	) VALUES ($1, $2, $3, $4)
 //	RETURNING alias_id, organization_id, alias_name, created_at, updated_at, created_by, deactivated_at, deactivated_by
 func (q *Queries) CreateOrganizationAlias(ctx context.Context, arg CreateOrganizationAliasParams) (OrganizationAlias, error) {
-	row := q.db.QueryRowContext(ctx, createOrganizationAlias, arg.OrganizationID, arg.AliasName, arg.CreatedBy)
+	row := q.db.QueryRowContext(ctx, createOrganizationAlias,
+		arg.AliasID,
+		arg.OrganizationID,
+		arg.AliasName,
+		arg.CreatedBy,
+	)
 	var i OrganizationAlias
 	err := row.Scan(
 		&i.AliasID,

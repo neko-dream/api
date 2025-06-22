@@ -1886,16 +1886,16 @@ func (s *InitiateTalkSessionBadRequest) SetMessage(val string) {
 func (*InitiateTalkSessionBadRequest) initiateTalkSessionRes() {}
 
 type InitiateTalkSessionReq struct {
-	Theme               string        `json:"theme"`
-	ScheduledEndTime    time.Time     `json:"scheduledEndTime"`
-	Latitude            OptNilFloat64 `json:"latitude"`
-	Longitude           OptNilFloat64 `json:"longitude"`
-	City                OptNilString  `json:"city"`
-	Prefecture          OptNilString  `json:"prefecture"`
-	Description         OptNilString  `json:"description"`
-	ThumbnailURL        OptNilString  `json:"thumbnailURL"`
-	Restrictions        []string      `json:"restrictions"`
-	OrganizationAliasID OptNilString  `json:"organizationAliasID"`
+	Theme            string        `json:"theme"`
+	ScheduledEndTime time.Time     `json:"scheduledEndTime"`
+	Latitude         OptNilFloat64 `json:"latitude"`
+	Longitude        OptNilFloat64 `json:"longitude"`
+	City             OptNilString  `json:"city"`
+	Prefecture       OptNilString  `json:"prefecture"`
+	Description      OptNilString  `json:"description"`
+	ThumbnailURL     OptNilString  `json:"thumbnailURL"`
+	Restrictions     []string      `json:"restrictions"`
+	AliasId          OptString     `json:"aliasId"`
 }
 
 // GetTheme returns the value of Theme.
@@ -1943,9 +1943,9 @@ func (s *InitiateTalkSessionReq) GetRestrictions() []string {
 	return s.Restrictions
 }
 
-// GetOrganizationAliasID returns the value of OrganizationAliasID.
-func (s *InitiateTalkSessionReq) GetOrganizationAliasID() OptNilString {
-	return s.OrganizationAliasID
+// GetAliasId returns the value of AliasId.
+func (s *InitiateTalkSessionReq) GetAliasId() OptString {
+	return s.AliasId
 }
 
 // SetTheme sets the value of Theme.
@@ -1993,9 +1993,9 @@ func (s *InitiateTalkSessionReq) SetRestrictions(val []string) {
 	s.Restrictions = val
 }
 
-// SetOrganizationAliasID sets the value of OrganizationAliasID.
-func (s *InitiateTalkSessionReq) SetOrganizationAliasID(val OptNilString) {
-	s.OrganizationAliasID = val
+// SetAliasId sets the value of AliasId.
+func (s *InitiateTalkSessionReq) SetAliasId(val OptString) {
+	s.AliasId = val
 }
 
 type InviteOrganizationBadRequest struct{}
@@ -4054,6 +4054,69 @@ func (o OptNilString) Or(d string) string {
 	return d
 }
 
+// NewOptNilTalkSessionOrganizationAlias returns new OptNilTalkSessionOrganizationAlias with value set to v.
+func NewOptNilTalkSessionOrganizationAlias(v TalkSessionOrganizationAlias) OptNilTalkSessionOrganizationAlias {
+	return OptNilTalkSessionOrganizationAlias{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilTalkSessionOrganizationAlias is optional nullable TalkSessionOrganizationAlias.
+type OptNilTalkSessionOrganizationAlias struct {
+	Value TalkSessionOrganizationAlias
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilTalkSessionOrganizationAlias was set.
+func (o OptNilTalkSessionOrganizationAlias) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilTalkSessionOrganizationAlias) Reset() {
+	var v TalkSessionOrganizationAlias
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilTalkSessionOrganizationAlias) SetTo(v TalkSessionOrganizationAlias) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilTalkSessionOrganizationAlias) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilTalkSessionOrganizationAlias) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v TalkSessionOrganizationAlias
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilTalkSessionOrganizationAlias) Get() (v TalkSessionOrganizationAlias, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilTalkSessionOrganizationAlias) Or(d TalkSessionOrganizationAlias) TalkSessionOrganizationAlias {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilUpdateUserProfileReqGender returns new OptNilUpdateUserProfileReqGender with value set to v.
 func NewOptNilUpdateUserProfileReqGender(v UpdateUserProfileReqGender) OptNilUpdateUserProfileReqGender {
 	return OptNilUpdateUserProfileReqGender{
@@ -4356,7 +4419,8 @@ type Organization struct {
 	// 組織コード.
 	Code string `json:"code"`
 	// 組織のタイプ.
-	Type     int    `json:"type"`
+	Type int `json:"type"`
+	// ロールの名前.
 	RoleName string `json:"roleName"`
 	// ロール.
 	Role int `json:"role"`
@@ -4425,9 +4489,9 @@ func (s *Organization) SetRole(val int) {
 // 組織エイリアス.
 // Ref: #/components/schemas/OrganizationAlias
 type OrganizationAlias struct {
-	AliasID   string `json:"aliasID"`
-	AliasName string `json:"aliasName"`
-	CreatedAt string `json:"createdAt"`
+	AliasID   string       `json:"aliasID"`
+	AliasName string       `json:"aliasName"`
+	CreatedAt OptNilString `json:"createdAt"`
 }
 
 // GetAliasID returns the value of AliasID.
@@ -4441,7 +4505,7 @@ func (s *OrganizationAlias) GetAliasName() string {
 }
 
 // GetCreatedAt returns the value of CreatedAt.
-func (s *OrganizationAlias) GetCreatedAt() string {
+func (s *OrganizationAlias) GetCreatedAt() OptNilString {
 	return s.CreatedAt
 }
 
@@ -4456,7 +4520,7 @@ func (s *OrganizationAlias) SetAliasName(val string) {
 }
 
 // SetCreatedAt sets the value of CreatedAt.
-func (s *OrganizationAlias) SetCreatedAt(val string) {
+func (s *OrganizationAlias) SetCreatedAt(val OptNilString) {
 	s.CreatedAt = val
 }
 
@@ -5594,6 +5658,8 @@ type TalkSession struct {
 	Description OptNilString `json:"description"`
 	// 作成ユーザー.
 	Owner TalkSessionOwner `json:"owner"`
+	// 作成組織名.
+	OrganizationAlias OptNilTalkSessionOrganizationAlias `json:"organizationAlias"`
 	// 作成日時.
 	CreatedAt string `json:"createdAt"`
 	// 終了予定日時.
@@ -5608,7 +5674,8 @@ type TalkSession struct {
 	ThumbnailURL OptNilString `json:"thumbnailURL"`
 	// セッションの参加制限.
 	Restrictions []Restriction `json:"restrictions"`
-	HideReport   bool          `json:"hideReport"`
+	// レポートを隠すかどうか.
+	HideReport bool `json:"hideReport"`
 }
 
 // GetID returns the value of ID.
@@ -5629,6 +5696,11 @@ func (s *TalkSession) GetDescription() OptNilString {
 // GetOwner returns the value of Owner.
 func (s *TalkSession) GetOwner() TalkSessionOwner {
 	return s.Owner
+}
+
+// GetOrganizationAlias returns the value of OrganizationAlias.
+func (s *TalkSession) GetOrganizationAlias() OptNilTalkSessionOrganizationAlias {
+	return s.OrganizationAlias
 }
 
 // GetCreatedAt returns the value of CreatedAt.
@@ -5689,6 +5761,11 @@ func (s *TalkSession) SetDescription(val OptNilString) {
 // SetOwner sets the value of Owner.
 func (s *TalkSession) SetOwner(val TalkSessionOwner) {
 	s.Owner = val
+}
+
+// SetOrganizationAlias sets the value of OrganizationAlias.
+func (s *TalkSession) SetOrganizationAlias(val OptNilTalkSessionOrganizationAlias) {
+	s.OrganizationAlias = val
 }
 
 // SetCreatedAt sets the value of CreatedAt.
@@ -6097,6 +6174,43 @@ func (s *TalkSessionLocation) SetLatitude(val OptFloat64) {
 // SetLongitude sets the value of Longitude.
 func (s *TalkSessionLocation) SetLongitude(val OptFloat64) {
 	s.Longitude = val
+}
+
+// 組織エイリアス.
+type TalkSessionOrganizationAlias struct {
+	AliasID   string       `json:"aliasID"`
+	AliasName string       `json:"aliasName"`
+	CreatedAt OptNilString `json:"createdAt"`
+}
+
+// GetAliasID returns the value of AliasID.
+func (s *TalkSessionOrganizationAlias) GetAliasID() string {
+	return s.AliasID
+}
+
+// GetAliasName returns the value of AliasName.
+func (s *TalkSessionOrganizationAlias) GetAliasName() string {
+	return s.AliasName
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *TalkSessionOrganizationAlias) GetCreatedAt() OptNilString {
+	return s.CreatedAt
+}
+
+// SetAliasID sets the value of AliasID.
+func (s *TalkSessionOrganizationAlias) SetAliasID(val string) {
+	s.AliasID = val
+}
+
+// SetAliasName sets the value of AliasName.
+func (s *TalkSessionOrganizationAlias) SetAliasName(val string) {
+	s.AliasName = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *TalkSessionOrganizationAlias) SetCreatedAt(val OptNilString) {
+	s.CreatedAt = val
 }
 
 type TalkSessionOwner struct {

@@ -1253,28 +1253,33 @@ func (s *Server) decodeInitiateTalkSessionRequest(r *http.Request) (
 		}
 		{
 			cfg := uri.QueryParameterDecodingConfig{
-				Name:    "organizationAliasID",
+				Name:    "aliasId",
 				Style:   uri.QueryStyleForm,
 				Explode: true,
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-					if err := func(d *jx.Decoder) error {
-						request.OrganizationAliasID.Reset()
-						if err := request.OrganizationAliasID.Decode(d); err != nil {
+					var requestDotAliasIdVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotAliasIdVal = c
 						return nil
-					}(jx.DecodeStr(val)); err != nil {
+					}(); err != nil {
 						return err
 					}
+					request.AliasId.SetTo(requestDotAliasIdVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"organizationAliasID\"")
+					return req, close, errors.Wrap(err, "decode \"aliasId\"")
 				}
 			}
 		}
