@@ -3,14 +3,14 @@ package organization_usecase
 import (
 	"context"
 	"errors"
-	"time"
 
+	"github.com/neko-dream/server/internal/application/query/dto"
 	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
-	"github.com/neko-dream/server/internal/presentation/oas"
+	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
@@ -22,17 +22,7 @@ type CreateOrganizationAliasInput struct {
 }
 
 type CreateOrganizationAliasOutput struct {
-	AliasID   string
-	AliasName string
-	CreatedAt time.Time
-}
-
-func (o *CreateOrganizationAliasOutput) ToResponse() oas.OrganizationAlias {
-	return oas.OrganizationAlias{
-		AliasID:   o.AliasID,
-		AliasName: o.AliasName,
-		CreatedAt: o.CreatedAt.Format(time.RFC3339),
-	}
+	dto.OrganizationAlias
 }
 
 type CreateOrganizationAliasUseCase struct {
@@ -61,7 +51,7 @@ func (u *CreateOrganizationAliasUseCase) Execute(
 	ctx, span := otel.Tracer("organization_usecase").Start(ctx, "CreateOrganizationAliasUseCase.Execute")
 	defer span.End()
 
-	var output *CreateOrganizationAliasOutput
+	var output dto.OrganizationAlias
 	err := u.dbManager.ExecTx(ctx, func(ctx context.Context) error {
 		sess, err := u.sessionRepo.FindBySessionID(ctx, sessionID)
 		if err != nil {
@@ -81,14 +71,16 @@ func (u *CreateOrganizationAliasUseCase) Execute(
 			return err
 		}
 
-		output = &CreateOrganizationAliasOutput{
+		output = dto.OrganizationAlias{
 			AliasID:   alias.AliasID().String(),
 			AliasName: alias.AliasName(),
-			CreatedAt: alias.CreatedAt(),
+			CreatedAt: lo.ToPtr(alias.CreatedAt()),
 		}
 
 		return nil
 	})
 
-	return output, err
+	return &CreateOrganizationAliasOutput{
+		OrganizationAlias: output,
+	}, err
 }

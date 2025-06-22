@@ -17,6 +17,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/pkg/utils"
+	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
@@ -181,7 +182,6 @@ func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSe
 		if input.Restrictions != nil {
 			output.Restrictions = input.Restrictions
 		}
-
 		// オーナーのユーザー情報を取得
 		ownerUser, err := i.UserRepository.FindByID(ctx, input.OwnerID)
 		if err != nil {
@@ -192,6 +192,25 @@ func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSe
 			DisplayID:   *ownerUser.DisplayID(),
 			DisplayName: *ownerUser.DisplayName(),
 			IconURL:     ownerUser.IconURL(),
+		}
+		// 組織エイリアス情報を取得
+		if organizationAliasID != nil {
+			alias, err := i.OrganizationAliasRepository.FindByID(ctx, *organizationAliasID)
+			if err != nil {
+				utils.HandleError(ctx, err, "OrganizationAliasRepository.FindByID")
+				return messages.TalkSessionNotFound
+			}
+			if alias != nil {
+				output.OrganizationAlias = &dto.OrganizationAlias{
+					AliasID:   alias.AliasID().String(),
+					AliasName: alias.AliasName(),
+					CreatedAt: lo.ToPtr(alias.CreatedAt()),
+				}
+			} else {
+				output.OrganizationAlias = nil
+			}
+		} else {
+			output.OrganizationAlias = nil
 		}
 
 		return nil

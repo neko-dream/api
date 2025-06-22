@@ -36,9 +36,9 @@ type (
 	}
 
 	EditOutput struct {
-		DisplayID   string // ユーザーの表示用ID
-		DisplayName string // ユーザーの表示名
-		Token       string // ユーザーのトークン
+		DisplayID   string  // ユーザーの表示用ID
+		DisplayName string  // ユーザーの表示名
+		Token       string  // ユーザーのトークン
 		IconURL     *string // ユーザーのアイコンURL
 	}
 

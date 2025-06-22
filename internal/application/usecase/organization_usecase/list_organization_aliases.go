@@ -3,10 +3,11 @@ package organization_usecase
 import (
 	"context"
 
+	"github.com/neko-dream/server/internal/application/query/dto"
 	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/service"
-	"github.com/neko-dream/server/internal/presentation/oas"
+	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
@@ -14,22 +15,8 @@ type ListOrganizationAliasesInput struct {
 	OrganizationID shared.UUID[organization.Organization]
 }
 
-type OrganizationAliasDTO struct {
-	AliasID   string
-	AliasName string
-	CreatedAt string
-}
-
-func (o *OrganizationAliasDTO) ToResponse() oas.OrganizationAlias {
-	return oas.OrganizationAlias{
-		AliasID:   o.AliasID,
-		AliasName: o.AliasName,
-		CreatedAt: o.CreatedAt,
-	}
-}
-
 type ListOrganizationAliasesOutput struct {
-	Aliases []OrganizationAliasDTO
+	Aliases []dto.OrganizationAlias
 }
 
 type ListOrganizationAliasesUseCase struct {
@@ -56,12 +43,12 @@ func (u *ListOrganizationAliasesUseCase) Execute(
 		return nil, err
 	}
 
-	aliasDTOs := make([]OrganizationAliasDTO, 0, len(aliases))
+	aliasDTOs := make([]dto.OrganizationAlias, 0, len(aliases))
 	for _, alias := range aliases {
-		aliasDTOs = append(aliasDTOs, OrganizationAliasDTO{
+		aliasDTOs = append(aliasDTOs, dto.OrganizationAlias{
 			AliasID:   alias.AliasID().String(),
 			AliasName: alias.AliasName(),
-			CreatedAt: alias.CreatedAt().Format("2006-01-02T15:04:05Z07:00"),
+			CreatedAt: lo.ToPtr(alias.CreatedAt()),
 		})
 	}
 
