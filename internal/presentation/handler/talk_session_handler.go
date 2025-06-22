@@ -255,8 +255,8 @@ func (t *talkSessionHandler) InitiateTalkSession(ctx context.Context, req *oas.I
 	}
 
 	var organizationAliasID *shared.UUID[organization.OrganizationAlias]
-	if req.OrganizationAliasID.IsSet() && req.OrganizationAliasID.Value != "" {
-		aliasID, err := shared.ParseUUID[organization.OrganizationAlias](req.OrganizationAliasID.Value)
+	if req.GetAliasId().IsSet() && req.GetAliasId().Value != "" {
+		aliasID, err := shared.ParseUUID[organization.OrganizationAlias](req.GetAliasId().Value)
 		if err == nil {
 			organizationAliasID = &aliasID
 		}
