@@ -55,6 +55,5 @@ func NewSESClient() *sesv2.Client {
 		fmt.Println("Error creating SES client")
 		return nil
 	}
-	fmt.Println("SES client created successfully")
 	return sesClient
 }
