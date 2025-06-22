@@ -8,6 +8,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/pkg/utils"
+	"go.opentelemetry.io/otel"
 )
 
 type authenticationServiceImpl struct{}
@@ -17,6 +18,9 @@ func NewAuthenticationService() service.AuthenticationService {
 }
 
 func (a *authenticationServiceImpl) GetCurrentUser(ctx context.Context) (*auth.AuthenticationContext, error) {
+	ctx, span := otel.Tracer("service").Start(ctx, "authenticationServiceImpl.GetCurrentUser")
+	defer span.End()
+
 	claim := session.GetSession(ctx)
 	if claim == nil {
 		return nil, service.ErrNotAuthenticated
@@ -26,10 +30,16 @@ func (a *authenticationServiceImpl) GetCurrentUser(ctx context.Context) (*auth.A
 }
 
 func (a *authenticationServiceImpl) RequireAuthentication(ctx context.Context) (*auth.AuthenticationContext, error) {
+	ctx, span := otel.Tracer("service").Start(ctx, "authenticationServiceImpl.RequireAuthentication")
+	defer span.End()
+
 	return a.GetCurrentUser(ctx)
 }
 
 func (a *authenticationServiceImpl) RequireOrganizationRole(ctx context.Context, minRole organization.OrganizationUserRole) (*auth.AuthenticationContext, error) {
+	ctx, span := otel.Tracer("service").Start(ctx, "authenticationServiceImpl.RequireOrganizationRole")
+	defer span.End()
+
 	authCtx, err := a.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
@@ -47,23 +57,38 @@ func (a *authenticationServiceImpl) RequireOrganizationRole(ctx context.Context,
 }
 
 func (a *authenticationServiceImpl) RequireSuperAdmin(ctx context.Context) (*auth.AuthenticationContext, error) {
+	ctx, span := otel.Tracer("service").Start(ctx, "authenticationServiceImpl.RequireSuperAdmin")
+	defer span.End()
+
 	return a.RequireOrganizationRole(ctx, organization.OrganizationUserRoleSuperAdmin)
 }
 
 func (a *authenticationServiceImpl) RequireOwner(ctx context.Context) (*auth.AuthenticationContext, error) {
+	ctx, span := otel.Tracer("service").Start(ctx, "authenticationServiceImpl.RequireOwner")
+	defer span.End()
+
 	return a.RequireOrganizationRole(ctx, organization.OrganizationUserRoleOwner)
 }
 
 func (a *authenticationServiceImpl) RequireAdmin(ctx context.Context) (*auth.AuthenticationContext, error) {
+	ctx, span := otel.Tracer("service").Start(ctx, "authenticationServiceImpl.RequireAdmin")
+	defer span.End()
+
 	return a.RequireOrganizationRole(ctx, organization.OrganizationUserRoleAdmin)
 }
 
 func (a *authenticationServiceImpl) IsAuthenticated(ctx context.Context) bool {
+	ctx, span := otel.Tracer("service").Start(ctx, "authenticationServiceImpl.IsAuthenticated")
+	defer span.End()
+
 	_, err := a.GetCurrentUser(ctx)
 	return err == nil
 }
 
 func (a *authenticationServiceImpl) IsInOrganization(ctx context.Context) bool {
+	ctx, span := otel.Tracer("service").Start(ctx, "authenticationServiceImpl.IsInOrganization")
+	defer span.End()
+
 	authCtx, err := a.GetCurrentUser(ctx)
 	if err != nil {
 		return false
