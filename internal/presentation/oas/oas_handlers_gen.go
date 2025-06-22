@@ -557,12 +557,12 @@ func (s *Server) handleConsentTalkSessionRequest(args [1]string, argsEscaped boo
 //
 // 組織エイリアス作成.
 //
-// POST /organizations/{organizationID}/aliases
-func (s *Server) handleCreateOrganizationAliasRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+// POST /organizations/aliases
+func (s *Server) handleCreateOrganizationAliasRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("createOrganizationAlias"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/organizations/{organizationID}/aliases"),
+		semconv.HTTPRouteKey.String("/organizations/aliases"),
 	}
 
 	// Start a span for this request.
@@ -645,16 +645,6 @@ func (s *Server) handleCreateOrganizationAliasRequest(args [1]string, argsEscape
 			return
 		}
 	}
-	params, err := decodeCreateOrganizationAliasParams(args, argsEscaped, r)
-	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		defer recordError("DecodeParams", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
 	request, close, err := s.decodeCreateOrganizationAliasRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
@@ -679,18 +669,13 @@ func (s *Server) handleCreateOrganizationAliasRequest(args [1]string, argsEscape
 			OperationSummary: "組織エイリアス作成",
 			OperationID:      "createOrganizationAlias",
 			Body:             request,
-			Params: middleware.Parameters{
-				{
-					Name: "organizationID",
-					In:   "path",
-				}: params.OrganizationID,
-			},
-			Raw: r,
+			Params:           middleware.Parameters{},
+			Raw:              r,
 		}
 
 		type (
 			Request  = *CreateOrganizationAliasReq
-			Params   = CreateOrganizationAliasParams
+			Params   = struct{}
 			Response = CreateOrganizationAliasRes
 		)
 		response, err = middleware.HookMiddleware[
@@ -700,14 +685,14 @@ func (s *Server) handleCreateOrganizationAliasRequest(args [1]string, argsEscape
 		](
 			m,
 			mreq,
-			unpackCreateOrganizationAliasParams,
+			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.CreateOrganizationAlias(ctx, request, params)
+				response, err = s.h.CreateOrganizationAlias(ctx, request)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.CreateOrganizationAlias(ctx, request, params)
+		response, err = s.h.CreateOrganizationAlias(ctx, request)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -728,12 +713,12 @@ func (s *Server) handleCreateOrganizationAliasRequest(args [1]string, argsEscape
 //
 // 組織エイリアス削除.
 //
-// DELETE /organizations/{organizationID}/aliases/{aliasID}
-func (s *Server) handleDeleteOrganizationAliasRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+// DELETE /organizations/aliases/{aliasID}
+func (s *Server) handleDeleteOrganizationAliasRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("deleteOrganizationAlias"),
 		semconv.HTTPRequestMethodKey.String("DELETE"),
-		semconv.HTTPRouteKey.String("/organizations/{organizationID}/aliases/{aliasID}"),
+		semconv.HTTPRouteKey.String("/organizations/aliases/{aliasID}"),
 	}
 
 	// Start a span for this request.
@@ -836,10 +821,6 @@ func (s *Server) handleDeleteOrganizationAliasRequest(args [2]string, argsEscape
 			OperationID:      "deleteOrganizationAlias",
 			Body:             nil,
 			Params: middleware.Parameters{
-				{
-					Name: "organizationID",
-					In:   "path",
-				}: params.OrganizationID,
 				{
 					Name: "aliasID",
 					In:   "path",
@@ -5743,12 +5724,12 @@ func (s *Server) handleInitiateTalkSessionRequest(args [0]string, argsEscaped bo
 // - 30: Admin
 // - 40: Member.
 //
-// POST /organizations/{organizationID}/invite
-func (s *Server) handleInviteOrganizationRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+// POST /organizations/invite
+func (s *Server) handleInviteOrganizationRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("inviteOrganization"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/organizations/{organizationID}/invite"),
+		semconv.HTTPRouteKey.String("/organizations/invite"),
 	}
 
 	// Start a span for this request.
@@ -5831,16 +5812,6 @@ func (s *Server) handleInviteOrganizationRequest(args [1]string, argsEscaped boo
 			return
 		}
 	}
-	params, err := decodeInviteOrganizationParams(args, argsEscaped, r)
-	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		defer recordError("DecodeParams", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
 	request, close, err := s.decodeInviteOrganizationRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
@@ -5865,18 +5836,13 @@ func (s *Server) handleInviteOrganizationRequest(args [1]string, argsEscaped boo
 			OperationSummary: "組織ユーザー招待（運営ユーザーのみ）",
 			OperationID:      "inviteOrganization",
 			Body:             request,
-			Params: middleware.Parameters{
-				{
-					Name: "organizationID",
-					In:   "path",
-				}: params.OrganizationID,
-			},
-			Raw: r,
+			Params:           middleware.Parameters{},
+			Raw:              r,
 		}
 
 		type (
 			Request  = *InviteOrganizationReq
-			Params   = InviteOrganizationParams
+			Params   = struct{}
 			Response = InviteOrganizationRes
 		)
 		response, err = middleware.HookMiddleware[
@@ -5886,14 +5852,14 @@ func (s *Server) handleInviteOrganizationRequest(args [1]string, argsEscaped boo
 		](
 			m,
 			mreq,
-			unpackInviteOrganizationParams,
+			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.InviteOrganization(ctx, request, params)
+				response, err = s.h.InviteOrganization(ctx, request)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.InviteOrganization(ctx, request, params)
+		response, err = s.h.InviteOrganization(ctx, request)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -5914,12 +5880,12 @@ func (s *Server) handleInviteOrganizationRequest(args [1]string, argsEscaped boo
 //
 // 組織にユーザーを追加.
 //
-// POST /organizations/{organizationID}/invite_user
-func (s *Server) handleInviteOrganizationForUserRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+// POST /organizations/invite_user
+func (s *Server) handleInviteOrganizationForUserRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("inviteOrganizationForUser"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/organizations/{organizationID}/invite_user"),
+		semconv.HTTPRouteKey.String("/organizations/invite_user"),
 	}
 
 	// Start a span for this request.
@@ -6002,16 +5968,6 @@ func (s *Server) handleInviteOrganizationForUserRequest(args [1]string, argsEsca
 			return
 		}
 	}
-	params, err := decodeInviteOrganizationForUserParams(args, argsEscaped, r)
-	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		defer recordError("DecodeParams", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
 	request, close, err := s.decodeInviteOrganizationForUserRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
@@ -6036,18 +5992,13 @@ func (s *Server) handleInviteOrganizationForUserRequest(args [1]string, argsEsca
 			OperationSummary: "組織にユーザーを追加",
 			OperationID:      "inviteOrganizationForUser",
 			Body:             request,
-			Params: middleware.Parameters{
-				{
-					Name: "organizationID",
-					In:   "path",
-				}: params.OrganizationID,
-			},
-			Raw: r,
+			Params:           middleware.Parameters{},
+			Raw:              r,
 		}
 
 		type (
 			Request  = *InviteOrganizationForUserReq
-			Params   = InviteOrganizationForUserParams
+			Params   = struct{}
 			Response = InviteOrganizationForUserRes
 		)
 		response, err = middleware.HookMiddleware[
@@ -6057,14 +6008,14 @@ func (s *Server) handleInviteOrganizationForUserRequest(args [1]string, argsEsca
 		](
 			m,
 			mreq,
-			unpackInviteOrganizationForUserParams,
+			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.InviteOrganizationForUser(ctx, request, params)
+				response, err = s.h.InviteOrganizationForUser(ctx, request)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.InviteOrganizationForUser(ctx, request, params)
+		response, err = s.h.InviteOrganizationForUser(ctx, request)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -8817,12 +8768,12 @@ func (s *Server) handleUpdateUserProfileRequest(args [0]string, argsEscaped bool
 //
 // 組織コード検証.
 //
-// GET /auth/organization/{code}/validate
+// GET /organization/{code}/validate
 func (s *Server) handleValidateOrganizationCodeRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("validateOrganizationCode"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/auth/organization/{code}/validate"),
+		semconv.HTTPRouteKey.String("/organization/{code}/validate"),
 	}
 
 	// Start a span for this request.

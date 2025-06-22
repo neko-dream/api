@@ -6,8 +6,10 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/session"
+	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/pkg/utils"
+	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
@@ -123,7 +125,7 @@ func (a *authenticationServiceImpl) claimToAuthenticationContext(ctx context.Con
 
 	// 組織コンテキストがある場合は設定
 	if claim.OrganizationID != nil {
-		authCtx.OrganizationID = claim.OrganizationID
+		authCtx.OrganizationID = lo.ToPtr(shared.MustParseUUID[organization.Organization](*claim.OrganizationID))
 	}
 
 	if claim.OrganizationCode != nil {

@@ -63,11 +63,10 @@ namespace kotohiro {
    */
   @tag("organization")
   @extension("x-ogen-operation-group", "Organization")
-  @route("/organizations/{organizationID}/invite")
+  @route("/organizations/invite")
   @post
   @summary("組織ユーザー招待（運営ユーザーのみ）")
   op inviteOrganization(
-    @path organizationID: string,
     @multipartBody body: {
       email: HttpPart<string>;
       role: HttpPart<numeric>;
@@ -82,11 +81,10 @@ namespace kotohiro {
 
   @tag("organization")
   @extension("x-ogen-operation-group", "Organization")
-  @route("/organizations/{organizationID}/invite_user")
+  @route("/organizations/invite_user")
   @post
   @summary("組織にユーザーを追加")
   op inviteOrganizationForUser(
-    @path organizationID: string,
     @multipartBody body: {
       displayID: HttpPart<string>;
       role: HttpPart<numeric>;
@@ -103,7 +101,7 @@ namespace kotohiro {
 
   @tag("organization")
   @extension("x-ogen-operation-group", "Organization")
-  @route("/auth/organization/{code}/validate")
+  @route("/organization/{code}/validate")
   @get
   @summary("組織コード検証")
   @useAuth([])
@@ -135,11 +133,10 @@ namespace kotohiro {
 
   @tag("organization")
   @extension("x-ogen-operation-group", "Organization")
-  @route("/organizations/{organizationID}/aliases")
+  @route("/organizations/aliases")
   @post
   @summary("組織エイリアス作成")
   op createOrganizationAlias(
-    @path organizationID: string,
     @multipartBody body: {
       aliasName: HttpPart<string>;
     },
@@ -153,11 +150,10 @@ namespace kotohiro {
 
   @tag("organization")
   @extension("x-ogen-operation-group", "Organization")
-  @route("/organizations/{organizationID}/aliases/{aliasID}")
+  @route("/organizations/aliases/{aliasID}")
   @delete
   @summary("組織エイリアス削除")
   op deleteOrganizationAlias(
-    @path organizationID: string,
     @path aliasID: string,
   ): Body<{}> | {
     @statusCode statusCode: 400;

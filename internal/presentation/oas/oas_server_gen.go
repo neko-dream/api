@@ -221,13 +221,13 @@ type OrganizationHandler interface {
 	//
 	// 組織エイリアス作成.
 	//
-	// POST /organizations/{organizationID}/aliases
-	CreateOrganizationAlias(ctx context.Context, req *CreateOrganizationAliasReq, params CreateOrganizationAliasParams) (CreateOrganizationAliasRes, error)
+	// POST /organizations/aliases
+	CreateOrganizationAlias(ctx context.Context, req *CreateOrganizationAliasReq) (CreateOrganizationAliasRes, error)
 	// DeleteOrganizationAlias implements deleteOrganizationAlias operation.
 	//
 	// 組織エイリアス削除.
 	//
-	// DELETE /organizations/{organizationID}/aliases/{aliasID}
+	// DELETE /organizations/aliases/{aliasID}
 	DeleteOrganizationAlias(ctx context.Context, params DeleteOrganizationAliasParams) (DeleteOrganizationAliasRes, error)
 	// EstablishOrganization implements establishOrganization operation.
 	//
@@ -256,19 +256,19 @@ type OrganizationHandler interface {
 	// - 30: Admin
 	// - 40: Member.
 	//
-	// POST /organizations/{organizationID}/invite
-	InviteOrganization(ctx context.Context, req *InviteOrganizationReq, params InviteOrganizationParams) (InviteOrganizationRes, error)
+	// POST /organizations/invite
+	InviteOrganization(ctx context.Context, req *InviteOrganizationReq) (InviteOrganizationRes, error)
 	// InviteOrganizationForUser implements inviteOrganizationForUser operation.
 	//
 	// 組織にユーザーを追加.
 	//
-	// POST /organizations/{organizationID}/invite_user
-	InviteOrganizationForUser(ctx context.Context, req *InviteOrganizationForUserReq, params InviteOrganizationForUserParams) (InviteOrganizationForUserRes, error)
+	// POST /organizations/invite_user
+	InviteOrganizationForUser(ctx context.Context, req *InviteOrganizationForUserReq) (InviteOrganizationForUserRes, error)
 	// ValidateOrganizationCode implements validateOrganizationCode operation.
 	//
 	// 組織コード検証.
 	//
-	// GET /auth/organization/{code}/validate
+	// GET /organization/{code}/validate
 	ValidateOrganizationCode(ctx context.Context, params ValidateOrganizationCodeParams) (ValidateOrganizationCodeRes, error)
 }
 

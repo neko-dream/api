@@ -75,6 +75,13 @@ func (o *organizationHandler) EstablishOrganization(ctx context.Context, req *oa
 	if err != nil {
 		return nil, err
 	}
+	if !authCtx.IsInOrganization() {
+		return nil, messages.OrganizationContextRequired
+	}
+	// SuperAdmin権限を持つか確認
+	if !authCtx.HasOrganizationRole(organization.OrganizationUserRoleSuperAdmin) {
+		return nil, messages.InsufficientPermissionsError
+	}
 
 	_, err = o.create.Execute(ctx, organization_usecase.CreateOrganizationInput{
 		UserID: authCtx.UserID,
@@ -91,10 +98,9 @@ func (o *organizationHandler) EstablishOrganization(ctx context.Context, req *oa
 }
 
 // InviteOrganization implements oas.OrganizationHandler.
-func (o *organizationHandler) InviteOrganization(ctx context.Context, req *oas.InviteOrganizationReq, params oas.InviteOrganizationParams) (oas.InviteOrganizationRes, error) {
+func (o *organizationHandler) InviteOrganization(ctx context.Context, req *oas.InviteOrganizationReq) (oas.InviteOrganizationRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.InviteOrganization")
 	defer span.End()
-
 	if req == nil {
 		return nil, messages.BadRequestError
 	}
@@ -103,14 +109,16 @@ func (o *organizationHandler) InviteOrganization(ctx context.Context, req *oas.I
 	if err != nil {
 		return nil, err
 	}
-	organizationID, err := shared.ParseUUID[organization.Organization](params.OrganizationID)
-	if err != nil {
-		return nil, messages.BadRequestError
+	if !authCtx.IsInOrganization() {
+		return nil, messages.OrganizationContextRequired
+	}
+	if !authCtx.HasOrganizationRole(organization.OrganizationUserRoleAdmin) {
+		return nil, messages.InsufficientPermissionsError
 	}
 
 	_, err = o.invite.Execute(ctx, organization_usecase.InviteOrganizationInput{
 		UserID:         authCtx.UserID,
-		OrganizationID: organizationID,
+		OrganizationID: *authCtx.OrganizationID,
 		Email:          req.Email,
 		Role:           int(req.Role),
 	})
@@ -123,7 +131,7 @@ func (o *organizationHandler) InviteOrganization(ctx context.Context, req *oas.I
 }
 
 // InviteOrganizationForUser implements oas.OrganizationHandler.
-func (o *organizationHandler) InviteOrganizationForUser(ctx context.Context, req *oas.InviteOrganizationForUserReq, params oas.InviteOrganizationForUserParams) (oas.InviteOrganizationForUserRes, error) {
+func (o *organizationHandler) InviteOrganizationForUser(ctx context.Context, req *oas.InviteOrganizationForUserReq) (oas.InviteOrganizationForUserRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.InviteOrganizationForUser")
 	defer span.End()
 
@@ -131,14 +139,16 @@ func (o *organizationHandler) InviteOrganizationForUser(ctx context.Context, req
 	if err != nil {
 		return nil, err
 	}
-	organizationID, err := shared.ParseUUID[organization.Organization](params.OrganizationID)
-	if err != nil {
-		return nil, messages.BadRequestError
+	if !authCtx.IsInOrganization() {
+		return nil, messages.OrganizationContextRequired
+	}
+	if !authCtx.HasOrganizationRole(organization.OrganizationUserRoleAdmin) {
+		return nil, messages.InsufficientPermissionsError
 	}
 
 	_, err = o.add.Execute(ctx, organization_usecase.InviteOrganizationForUserInput{
 		UserID:         authCtx.UserID,
-		OrganizationID: organizationID,
+		OrganizationID: *authCtx.OrganizationID,
 		DisplayID:      req.DisplayID,
 		Role:           int(req.Role),
 	})
@@ -253,7 +263,7 @@ func (o *organizationHandler) GetOrganizationAliases(ctx context.Context, params
 }
 
 // CreateOrganizationAlias 組織エイリアス作成
-func (o *organizationHandler) CreateOrganizationAlias(ctx context.Context, req *oas.CreateOrganizationAliasReq, params oas.CreateOrganizationAliasParams) (oas.CreateOrganizationAliasRes, error) {
+func (o *organizationHandler) CreateOrganizationAlias(ctx context.Context, req *oas.CreateOrganizationAliasReq) (oas.CreateOrganizationAliasRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.CreateOrganizationAlias")
 	defer span.End()
 
@@ -261,15 +271,21 @@ func (o *organizationHandler) CreateOrganizationAlias(ctx context.Context, req *
 	if err != nil {
 		return nil, err
 	}
-
-	organizationID, err := shared.ParseUUID[organization.Organization](params.OrganizationID)
-	if err != nil {
+	if req == nil || req.AliasName == "" {
 		return nil, messages.BadRequestError
+	}
+	// ユーザーが組織に所属しているか確認
+	if !authCtx.IsInOrganization() {
+		return nil, messages.OrganizationContextRequired
+	}
+	// ユーザーがAdmin以上の権限を持っているか確認
+	if !authCtx.HasOrganizationRole(organization.OrganizationUserRoleAdmin) {
+		return nil, messages.InsufficientPermissionsError
 	}
 
 	// エイリアス作成
 	output, err := o.createAlias.Execute(ctx, authCtx.SessionID, organization_usecase.CreateOrganizationAliasInput{
-		OrganizationID: organizationID,
+		OrganizationID: *authCtx.OrganizationID,
 		AliasName:      req.AliasName,
 	})
 	if err != nil {

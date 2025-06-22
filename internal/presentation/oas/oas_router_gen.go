@@ -130,53 +130,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					}
 
 					elem = origElem
-				case 'o': // Prefix: "organization/"
-					origElem := elem
-					if l := len("organization/"); len(elem) >= l && elem[0:l] == "organization/" {
-						elem = elem[l:]
-					} else {
-						break
-					}
-
-					// Param: "code"
-					// Match until "/"
-					idx := strings.IndexByte(elem, '/')
-					if idx < 0 {
-						idx = len(elem)
-					}
-					args[0] = elem[:idx]
-					elem = elem[idx:]
-
-					if len(elem) == 0 {
-						break
-					}
-					switch elem[0] {
-					case '/': // Prefix: "/validate"
-						origElem := elem
-						if l := len("/validate"); len(elem) >= l && elem[0:l] == "/validate" {
-							elem = elem[l:]
-						} else {
-							break
-						}
-
-						if len(elem) == 0 {
-							// Leaf node.
-							switch r.Method {
-							case "GET":
-								s.handleValidateOrganizationCodeRequest([1]string{
-									args[0],
-								}, elemIsEscaped, w, r)
-							default:
-								s.notAllowed(w, r, "GET")
-							}
-
-							return
-						}
-
-						elem = origElem
-					}
-
-					elem = origElem
 				case 'p': // Prefix: "password/"
 					origElem := elem
 					if l := len("password/"); len(elem) >= l && elem[0:l] == "password/" {
@@ -701,25 +654,16 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					}
 
 					elem = origElem
-				case 'r': // Prefix: "rganizations"
+				case 'r': // Prefix: "rganization"
 					origElem := elem
-					if l := len("rganizations"); len(elem) >= l && elem[0:l] == "rganizations" {
+					if l := len("rganization"); len(elem) >= l && elem[0:l] == "rganization" {
 						elem = elem[l:]
 					} else {
 						break
 					}
 
 					if len(elem) == 0 {
-						switch r.Method {
-						case "GET":
-							s.handleGetOrganizationsRequest([0]string{}, elemIsEscaped, w, r)
-						case "POST":
-							s.handleEstablishOrganizationRequest([0]string{}, elemIsEscaped, w, r)
-						default:
-							s.notAllowed(w, r, "GET,POST")
-						}
-
-						return
+						break
 					}
 					switch elem[0] {
 					case '/': // Prefix: "/"
@@ -730,7 +674,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							break
 						}
 
-						// Param: "organizationID"
+						// Param: "code"
 						// Match until "/"
 						idx := strings.IndexByte(elem, '/')
 						if idx < 0 {
@@ -741,6 +685,53 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 						if len(elem) == 0 {
 							break
+						}
+						switch elem[0] {
+						case '/': // Prefix: "/validate"
+							origElem := elem
+							if l := len("/validate"); len(elem) >= l && elem[0:l] == "/validate" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch r.Method {
+								case "GET":
+									s.handleValidateOrganizationCodeRequest([1]string{
+										args[0],
+									}, elemIsEscaped, w, r)
+								default:
+									s.notAllowed(w, r, "GET")
+								}
+
+								return
+							}
+
+							elem = origElem
+						}
+
+						elem = origElem
+					case 's': // Prefix: "s"
+						origElem := elem
+						if l := len("s"); len(elem) >= l && elem[0:l] == "s" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							switch r.Method {
+							case "GET":
+								s.handleGetOrganizationsRequest([0]string{}, elemIsEscaped, w, r)
+							case "POST":
+								s.handleEstablishOrganizationRequest([0]string{}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "GET,POST")
+							}
+
+							return
 						}
 						switch elem[0] {
 						case '/': // Prefix: "/"
@@ -765,16 +756,10 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 								if len(elem) == 0 {
 									switch r.Method {
-									case "GET":
-										s.handleGetOrganizationAliasesRequest([1]string{
-											args[0],
-										}, elemIsEscaped, w, r)
 									case "POST":
-										s.handleCreateOrganizationAliasRequest([1]string{
-											args[0],
-										}, elemIsEscaped, w, r)
+										s.handleCreateOrganizationAliasRequest([0]string{}, elemIsEscaped, w, r)
 									default:
-										s.notAllowed(w, r, "GET,POST")
+										s.notAllowed(w, r, "POST")
 									}
 
 									return
@@ -790,16 +775,15 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 									// Param: "aliasID"
 									// Leaf parameter
-									args[1] = elem
+									args[0] = elem
 									elem = ""
 
 									if len(elem) == 0 {
 										// Leaf node.
 										switch r.Method {
 										case "DELETE":
-											s.handleDeleteOrganizationAliasRequest([2]string{
+											s.handleDeleteOrganizationAliasRequest([1]string{
 												args[0],
-												args[1],
 											}, elemIsEscaped, w, r)
 										default:
 											s.notAllowed(w, r, "DELETE")
@@ -823,9 +807,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								if len(elem) == 0 {
 									switch r.Method {
 									case "POST":
-										s.handleInviteOrganizationRequest([1]string{
-											args[0],
-										}, elemIsEscaped, w, r)
+										s.handleInviteOrganizationRequest([0]string{}, elemIsEscaped, w, r)
 									default:
 										s.notAllowed(w, r, "POST")
 									}
@@ -845,9 +827,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										// Leaf node.
 										switch r.Method {
 										case "POST":
-											s.handleInviteOrganizationForUserRequest([1]string{
-												args[0],
-											}, elemIsEscaped, w, r)
+											s.handleInviteOrganizationForUserRequest([0]string{}, elemIsEscaped, w, r)
 										default:
 											s.notAllowed(w, r, "POST")
 										}
@@ -856,6 +836,43 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									}
 
 									elem = origElem
+								}
+
+								elem = origElem
+							}
+							// Param: "organizationID"
+							// Match until "/"
+							idx := strings.IndexByte(elem, '/')
+							if idx < 0 {
+								idx = len(elem)
+							}
+							args[0] = elem[:idx]
+							elem = elem[idx:]
+
+							if len(elem) == 0 {
+								break
+							}
+							switch elem[0] {
+							case '/': // Prefix: "/aliases"
+								origElem := elem
+								if l := len("/aliases"); len(elem) >= l && elem[0:l] == "/aliases" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								if len(elem) == 0 {
+									// Leaf node.
+									switch r.Method {
+									case "GET":
+										s.handleGetOrganizationAliasesRequest([1]string{
+											args[0],
+										}, elemIsEscaped, w, r)
+									default:
+										s.notAllowed(w, r, "GET")
+									}
+
+									return
 								}
 
 								elem = origElem
@@ -1849,55 +1866,6 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					}
 
 					elem = origElem
-				case 'o': // Prefix: "organization/"
-					origElem := elem
-					if l := len("organization/"); len(elem) >= l && elem[0:l] == "organization/" {
-						elem = elem[l:]
-					} else {
-						break
-					}
-
-					// Param: "code"
-					// Match until "/"
-					idx := strings.IndexByte(elem, '/')
-					if idx < 0 {
-						idx = len(elem)
-					}
-					args[0] = elem[:idx]
-					elem = elem[idx:]
-
-					if len(elem) == 0 {
-						break
-					}
-					switch elem[0] {
-					case '/': // Prefix: "/validate"
-						origElem := elem
-						if l := len("/validate"); len(elem) >= l && elem[0:l] == "/validate" {
-							elem = elem[l:]
-						} else {
-							break
-						}
-
-						if len(elem) == 0 {
-							// Leaf node.
-							switch method {
-							case "GET":
-								r.name = "ValidateOrganizationCode"
-								r.summary = "組織コード検証"
-								r.operationID = "validateOrganizationCode"
-								r.pathPattern = "/auth/organization/{code}/validate"
-								r.args = args
-								r.count = 1
-								return r, true
-							default:
-								return
-							}
-						}
-
-						elem = origElem
-					}
-
-					elem = origElem
 				case 'p': // Prefix: "password/"
 					origElem := elem
 					if l := len("password/"); len(elem) >= l && elem[0:l] == "password/" {
@@ -2480,35 +2448,16 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					}
 
 					elem = origElem
-				case 'r': // Prefix: "rganizations"
+				case 'r': // Prefix: "rganization"
 					origElem := elem
-					if l := len("rganizations"); len(elem) >= l && elem[0:l] == "rganizations" {
+					if l := len("rganization"); len(elem) >= l && elem[0:l] == "rganization" {
 						elem = elem[l:]
 					} else {
 						break
 					}
 
 					if len(elem) == 0 {
-						switch method {
-						case "GET":
-							r.name = "GetOrganizations"
-							r.summary = "所属組織一覧"
-							r.operationID = "getOrganizations"
-							r.pathPattern = "/organizations"
-							r.args = args
-							r.count = 0
-							return r, true
-						case "POST":
-							r.name = "EstablishOrganization"
-							r.summary = "組織作成（運営ユーザーのみ）"
-							r.operationID = "establishOrganization"
-							r.pathPattern = "/organizations"
-							r.args = args
-							r.count = 0
-							return r, true
-						default:
-							return
-						}
+						break
 					}
 					switch elem[0] {
 					case '/': // Prefix: "/"
@@ -2519,7 +2468,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							break
 						}
 
-						// Param: "organizationID"
+						// Param: "code"
 						// Match until "/"
 						idx := strings.IndexByte(elem, '/')
 						if idx < 0 {
@@ -2530,6 +2479,65 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 
 						if len(elem) == 0 {
 							break
+						}
+						switch elem[0] {
+						case '/': // Prefix: "/validate"
+							origElem := elem
+							if l := len("/validate"); len(elem) >= l && elem[0:l] == "/validate" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch method {
+								case "GET":
+									r.name = "ValidateOrganizationCode"
+									r.summary = "組織コード検証"
+									r.operationID = "validateOrganizationCode"
+									r.pathPattern = "/organization/{code}/validate"
+									r.args = args
+									r.count = 1
+									return r, true
+								default:
+									return
+								}
+							}
+
+							elem = origElem
+						}
+
+						elem = origElem
+					case 's': // Prefix: "s"
+						origElem := elem
+						if l := len("s"); len(elem) >= l && elem[0:l] == "s" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							switch method {
+							case "GET":
+								r.name = "GetOrganizations"
+								r.summary = "所属組織一覧"
+								r.operationID = "getOrganizations"
+								r.pathPattern = "/organizations"
+								r.args = args
+								r.count = 0
+								return r, true
+							case "POST":
+								r.name = "EstablishOrganization"
+								r.summary = "組織作成（運営ユーザーのみ）"
+								r.operationID = "establishOrganization"
+								r.pathPattern = "/organizations"
+								r.args = args
+								r.count = 0
+								return r, true
+							default:
+								return
+							}
 						}
 						switch elem[0] {
 						case '/': // Prefix: "/"
@@ -2554,21 +2562,13 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 
 								if len(elem) == 0 {
 									switch method {
-									case "GET":
-										r.name = "GetOrganizationAliases"
-										r.summary = "組織エイリアス一覧取得"
-										r.operationID = "getOrganizationAliases"
-										r.pathPattern = "/organizations/{organizationID}/aliases"
-										r.args = args
-										r.count = 1
-										return r, true
 									case "POST":
 										r.name = "CreateOrganizationAlias"
 										r.summary = "組織エイリアス作成"
 										r.operationID = "createOrganizationAlias"
-										r.pathPattern = "/organizations/{organizationID}/aliases"
+										r.pathPattern = "/organizations/aliases"
 										r.args = args
-										r.count = 1
+										r.count = 0
 										return r, true
 									default:
 										return
@@ -2585,7 +2585,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 
 									// Param: "aliasID"
 									// Leaf parameter
-									args[1] = elem
+									args[0] = elem
 									elem = ""
 
 									if len(elem) == 0 {
@@ -2595,9 +2595,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = "DeleteOrganizationAlias"
 											r.summary = "組織エイリアス削除"
 											r.operationID = "deleteOrganizationAlias"
-											r.pathPattern = "/organizations/{organizationID}/aliases/{aliasID}"
+											r.pathPattern = "/organizations/aliases/{aliasID}"
 											r.args = args
-											r.count = 2
+											r.count = 1
 											return r, true
 										default:
 											return
@@ -2622,9 +2622,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										r.name = "InviteOrganization"
 										r.summary = "組織ユーザー招待（運営ユーザーのみ）"
 										r.operationID = "inviteOrganization"
-										r.pathPattern = "/organizations/{organizationID}/invite"
+										r.pathPattern = "/organizations/invite"
 										r.args = args
-										r.count = 1
+										r.count = 0
 										return r, true
 									default:
 										return
@@ -2646,9 +2646,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = "InviteOrganizationForUser"
 											r.summary = "組織にユーザーを追加"
 											r.operationID = "inviteOrganizationForUser"
-											r.pathPattern = "/organizations/{organizationID}/invite_user"
+											r.pathPattern = "/organizations/invite_user"
 											r.args = args
-											r.count = 1
+											r.count = 0
 											return r, true
 										default:
 											return
@@ -2656,6 +2656,45 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									}
 
 									elem = origElem
+								}
+
+								elem = origElem
+							}
+							// Param: "organizationID"
+							// Match until "/"
+							idx := strings.IndexByte(elem, '/')
+							if idx < 0 {
+								idx = len(elem)
+							}
+							args[0] = elem[:idx]
+							elem = elem[idx:]
+
+							if len(elem) == 0 {
+								break
+							}
+							switch elem[0] {
+							case '/': // Prefix: "/aliases"
+								origElem := elem
+								if l := len("/aliases"); len(elem) >= l && elem[0:l] == "/aliases" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								if len(elem) == 0 {
+									// Leaf node.
+									switch method {
+									case "GET":
+										r.name = "GetOrganizationAliases"
+										r.summary = "組織エイリアス一覧取得"
+										r.operationID = "getOrganizationAliases"
+										r.pathPattern = "/organizations/{organizationID}/aliases"
+										r.args = args
+										r.count = 1
+										return r, true
+									default:
+										return
+									}
 								}
 
 								elem = origElem

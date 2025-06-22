@@ -110,47 +110,6 @@ paths:
       security:
         - {}
       x-ogen-operation-group: Auth
-  /auth/organization/{code}/validate:
-    get:
-      operationId: validateOrganizationCode
-      summary: 組織コード検証
-      parameters:
-        - name: code
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  valid:
-                    type: boolean
-                  organization:
-                    $ref: '#/components/schemas/Organization'
-                required:
-                  - valid
-        '400':
-          description: The server could not understand the request due to invalid syntax.
-          content:
-            application/json:
-              schema:
-                type: object
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                type: object
-      tags:
-        - organization
-      security:
-        - {}
-      x-ogen-operation-group: Organization
   /auth/password/change:
     put:
       operationId: changePassword
@@ -1059,6 +1018,47 @@ paths:
               voteStatus:
                 contentType: application/json
       x-ogen-operation-group: Vote
+  /organization/{code}/validate:
+    get:
+      operationId: validateOrganizationCode
+      summary: 組織コード検証
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+                  organization:
+                    $ref: '#/components/schemas/Organization'
+                required:
+                  - valid
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - organization
+      security:
+        - {}
+      x-ogen-operation-group: Organization
   /organizations:
     get:
       operationId: getOrganizations
@@ -1145,54 +1145,11 @@ paths:
                 - code
                 - orgType
       x-ogen-operation-group: Organization
-  /organizations/{organizationID}/aliases:
-    get:
-      operationId: getOrganizationAliases
-      summary: 組織エイリアス一覧取得
-      parameters:
-        - name: organizationID
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  aliases:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/OrganizationAlias'
-                required:
-                  - aliases
-        '400':
-          description: The server could not understand the request due to invalid syntax.
-          content:
-            application/json:
-              schema:
-                type: object
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                type: object
-      tags:
-        - organization
-      x-ogen-operation-group: Organization
+  /organizations/aliases:
     post:
       operationId: createOrganizationAlias
       summary: 組織エイリアス作成
-      parameters:
-        - name: organizationID
-          in: path
-          required: true
-          schema:
-            type: string
+      parameters: []
       responses:
         '200':
           description: The request has succeeded.
@@ -1226,16 +1183,11 @@ paths:
               required:
                 - aliasName
       x-ogen-operation-group: Organization
-  /organizations/{organizationID}/aliases/{aliasID}:
+  /organizations/aliases/{aliasID}:
     delete:
       operationId: deleteOrganizationAlias
       summary: 組織エイリアス削除
       parameters:
-        - name: organizationID
-          in: path
-          required: true
-          schema:
-            type: string
         - name: aliasID
           in: path
           required: true
@@ -1263,7 +1215,7 @@ paths:
       tags:
         - organization
       x-ogen-operation-group: Organization
-  /organizations/{organizationID}/invite:
+  /organizations/invite:
     post:
       operationId: inviteOrganization
       summary: 組織ユーザー招待（運営ユーザーのみ）
@@ -1273,12 +1225,7 @@ paths:
         - 20: Owner
         - 30: Admin
         - 40: Member
-      parameters:
-        - name: organizationID
-          in: path
-          required: true
-          schema:
-            type: string
+      parameters: []
       responses:
         '200':
           description: The request has succeeded.
@@ -1315,16 +1262,11 @@ paths:
                 - email
                 - role
       x-ogen-operation-group: Organization
-  /organizations/{organizationID}/invite_user:
+  /organizations/invite_user:
     post:
       operationId: inviteOrganizationForUser
       summary: 組織にユーザーを追加
-      parameters:
-        - name: organizationID
-          in: path
-          required: true
-          schema:
-            type: string
+      parameters: []
       responses:
         '200':
           description: The request has succeeded.
@@ -1365,6 +1307,45 @@ paths:
               required:
                 - displayID
                 - role
+      x-ogen-operation-group: Organization
+  /organizations/{organizationID}/aliases:
+    get:
+      operationId: getOrganizationAliases
+      summary: 組織エイリアス一覧取得
+      parameters:
+        - name: organizationID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  aliases:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OrganizationAlias'
+                required:
+                  - aliases
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - organization
       x-ogen-operation-group: Organization
   /policy/consent:
     get:

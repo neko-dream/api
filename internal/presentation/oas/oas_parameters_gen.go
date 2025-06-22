@@ -406,85 +406,12 @@ func decodeConsentTalkSessionParams(args [1]string, argsEscaped bool, r *http.Re
 	return params, nil
 }
 
-// CreateOrganizationAliasParams is parameters of createOrganizationAlias operation.
-type CreateOrganizationAliasParams struct {
-	OrganizationID string
-}
-
-func unpackCreateOrganizationAliasParams(packed middleware.Parameters) (params CreateOrganizationAliasParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "organizationID",
-			In:   "path",
-		}
-		params.OrganizationID = packed[key].(string)
-	}
-	return params
-}
-
-func decodeCreateOrganizationAliasParams(args [1]string, argsEscaped bool, r *http.Request) (params CreateOrganizationAliasParams, _ error) {
-	// Decode path: organizationID.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "organizationID",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.OrganizationID = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "organizationID",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
 // DeleteOrganizationAliasParams is parameters of deleteOrganizationAlias operation.
 type DeleteOrganizationAliasParams struct {
-	OrganizationID string
-	AliasID        string
+	AliasID string
 }
 
 func unpackDeleteOrganizationAliasParams(packed middleware.Parameters) (params DeleteOrganizationAliasParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "organizationID",
-			In:   "path",
-		}
-		params.OrganizationID = packed[key].(string)
-	}
 	{
 		key := middleware.ParameterKey{
 			Name: "aliasID",
@@ -495,57 +422,12 @@ func unpackDeleteOrganizationAliasParams(packed middleware.Parameters) (params D
 	return params
 }
 
-func decodeDeleteOrganizationAliasParams(args [2]string, argsEscaped bool, r *http.Request) (params DeleteOrganizationAliasParams, _ error) {
-	// Decode path: organizationID.
+func decodeDeleteOrganizationAliasParams(args [1]string, argsEscaped bool, r *http.Request) (params DeleteOrganizationAliasParams, _ error) {
+	// Decode path: aliasID.
 	if err := func() error {
 		param := args[0]
 		if argsEscaped {
 			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "organizationID",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.OrganizationID = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "organizationID",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	// Decode path: aliasID.
-	if err := func() error {
-		param := args[1]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[1])
 			if err != nil {
 				return errors.Wrap(err, "unescape path")
 			}
@@ -3702,136 +3584,6 @@ func decodeHasConsentParams(args [1]string, argsEscaped bool, r *http.Request) (
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "talkSessionID",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
-// InviteOrganizationParams is parameters of inviteOrganization operation.
-type InviteOrganizationParams struct {
-	OrganizationID string
-}
-
-func unpackInviteOrganizationParams(packed middleware.Parameters) (params InviteOrganizationParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "organizationID",
-			In:   "path",
-		}
-		params.OrganizationID = packed[key].(string)
-	}
-	return params
-}
-
-func decodeInviteOrganizationParams(args [1]string, argsEscaped bool, r *http.Request) (params InviteOrganizationParams, _ error) {
-	// Decode path: organizationID.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "organizationID",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.OrganizationID = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "organizationID",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
-// InviteOrganizationForUserParams is parameters of inviteOrganizationForUser operation.
-type InviteOrganizationForUserParams struct {
-	OrganizationID string
-}
-
-func unpackInviteOrganizationForUserParams(packed middleware.Parameters) (params InviteOrganizationForUserParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "organizationID",
-			In:   "path",
-		}
-		params.OrganizationID = packed[key].(string)
-	}
-	return params
-}
-
-func decodeInviteOrganizationForUserParams(args [1]string, argsEscaped bool, r *http.Request) (params InviteOrganizationForUserParams, _ error) {
-	// Decode path: organizationID.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "organizationID",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.OrganizationID = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "organizationID",
 			In:   "path",
 			Err:  err,
 		}

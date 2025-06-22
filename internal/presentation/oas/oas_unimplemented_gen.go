@@ -53,8 +53,8 @@ func (UnimplementedHandler) ConsentTalkSession(ctx context.Context, params Conse
 //
 // 組織エイリアス作成.
 //
-// POST /organizations/{organizationID}/aliases
-func (UnimplementedHandler) CreateOrganizationAlias(ctx context.Context, req *CreateOrganizationAliasReq, params CreateOrganizationAliasParams) (r CreateOrganizationAliasRes, _ error) {
+// POST /organizations/aliases
+func (UnimplementedHandler) CreateOrganizationAlias(ctx context.Context, req *CreateOrganizationAliasReq) (r CreateOrganizationAliasRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -62,7 +62,7 @@ func (UnimplementedHandler) CreateOrganizationAlias(ctx context.Context, req *Cr
 //
 // 組織エイリアス削除.
 //
-// DELETE /organizations/{organizationID}/aliases/{aliasID}
+// DELETE /organizations/aliases/{aliasID}
 func (UnimplementedHandler) DeleteOrganizationAlias(ctx context.Context, params DeleteOrganizationAliasParams) (r DeleteOrganizationAliasRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
@@ -395,8 +395,8 @@ func (UnimplementedHandler) InitiateTalkSession(ctx context.Context, req *Initia
 // - 30: Admin
 // - 40: Member.
 //
-// POST /organizations/{organizationID}/invite
-func (UnimplementedHandler) InviteOrganization(ctx context.Context, req *InviteOrganizationReq, params InviteOrganizationParams) (r InviteOrganizationRes, _ error) {
+// POST /organizations/invite
+func (UnimplementedHandler) InviteOrganization(ctx context.Context, req *InviteOrganizationReq) (r InviteOrganizationRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -404,8 +404,8 @@ func (UnimplementedHandler) InviteOrganization(ctx context.Context, req *InviteO
 //
 // 組織にユーザーを追加.
 //
-// POST /organizations/{organizationID}/invite_user
-func (UnimplementedHandler) InviteOrganizationForUser(ctx context.Context, req *InviteOrganizationForUserReq, params InviteOrganizationForUserParams) (r InviteOrganizationForUserRes, _ error) {
+// POST /organizations/invite_user
+func (UnimplementedHandler) InviteOrganizationForUser(ctx context.Context, req *InviteOrganizationForUserReq) (r InviteOrganizationForUserRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -584,7 +584,7 @@ func (UnimplementedHandler) UpdateUserProfile(ctx context.Context, req *UpdateUs
 //
 // 組織コード検証.
 //
-// GET /auth/organization/{code}/validate
+// GET /organization/{code}/validate
 func (UnimplementedHandler) ValidateOrganizationCode(ctx context.Context, params ValidateOrganizationCodeParams) (r ValidateOrganizationCodeRes, _ error) {
 	return r, ht.ErrNotImplemented
 }

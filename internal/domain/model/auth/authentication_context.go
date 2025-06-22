@@ -21,7 +21,7 @@ type AuthenticationContext struct {
 	// パスワード変更要求
 	RequiredPasswordChange bool
 
-	OrganizationID   *string
+	OrganizationID   *shared.UUID[organization.Organization]
 	OrganizationCode *string
 	OrganizationRole *organization.OrganizationUserRole
 }

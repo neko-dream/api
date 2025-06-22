@@ -53,4 +53,15 @@ var (
 		Code:       "ORGANIZATION-010",
 		Message:    "無効な組織種別です",
 	}
+	// 組織コンテキスト外のため、組織アカウントとしてログインする必要がある
+	OrganizationContextRequired = &APIError{
+		StatusCode: http.StatusForbidden,
+		Code:       "ORGANIZATION-011",
+		Message:    "組織アカウントとしてログインしてください",
+	}
+	InsufficientPermissionsError = &APIError{
+		StatusCode: http.StatusForbidden,
+		Code:       "ORGANIZATION-012",
+		Message:    "この操作を実行する権限がありません",
+	}
 )
