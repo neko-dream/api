@@ -1,9 +1,10 @@
 -- name: CreateOrganizationAlias :one
 INSERT INTO organization_aliases (
+    alias_id,
     organization_id,
     alias_name,
     created_by
-) VALUES ($1, $2, $3)
+) VALUES ($1, $2, $3, $4)
 RETURNING *;
 
 -- name: GetActiveOrganizationAliases :many

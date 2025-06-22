@@ -30,6 +30,9 @@ SELECT
     sqlc.embed(ts),
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     sqlc.embed(users),
+    COALESCE(organization_aliases.alias_name, '') AS alias_name,
+    COALESCE(organization_aliases.alias_id, '00000000-0000-0000-0000-000000000000'::uuid) AS alias_id,
+    COALESCE(organization_aliases.organization_id, '00000000-0000-0000-0000-000000000000'::uuid) AS organization_id,
     talk_session_locations.talk_session_id as location_id,
     COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
     COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
@@ -41,6 +44,8 @@ LEFT JOIN (
     FROM opinions
     GROUP BY opinions.talk_session_id
 ) oc ON ts.talk_session_id = oc.talk_session_id
+LEFT JOIN organization_aliases
+    ON ts.organization_alias_id = organization_aliases.alias_id
 LEFT JOIN talk_session_locations
     ON ts.talk_session_id = talk_session_locations.talk_session_id
 WHERE ts.talk_session_id = $1;
@@ -50,6 +55,9 @@ SELECT
     sqlc.embed(ts),
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     sqlc.embed(users),
+    COALESCE(organization_aliases.alias_name, '') AS alias_name,
+    COALESCE(organization_aliases.alias_id, '00000000-0000-0000-0000-000000000000'::uuid) AS alias_id,
+    COALESCE(organization_aliases.organization_id, '00000000-0000-0000-0000-000000000000'::uuid) AS organization_id,
     COALESCE(votes.vote_count, 0) AS vote_count,
     COALESCE(vote_users.vote_count, 0) AS vote_user_count,
     talk_session_locations.talk_session_id as location_id,
@@ -82,6 +90,8 @@ LEFT JOIN (
     FROM votes
     GROUP BY talk_session_id
 ) vote_users ON ts.talk_session_id = vote_users.talk_session_id
+LEFT JOIN organization_aliases
+    ON ts.organization_alias_id = organization_aliases.alias_id
 LEFT JOIN talk_session_locations
     ON ts.talk_session_id = talk_session_locations.talk_session_id
 WHERE
@@ -161,7 +171,9 @@ SELECT
     sqlc.embed(ts),
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     sqlc.embed(users),
-    talk_session_locations.talk_session_id as location_id,
+    COALESCE(organization_aliases.alias_name, '') AS alias_name,
+    COALESCE(organization_aliases.alias_id, '00000000-0000-0000-0000-000000000000'::uuid) AS alias_id,
+    COALESCE(organization_aliases.organization_id, '00000000-0000-0000-0000-000000000000'::uuid) AS organization_id,
     COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
     COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
 FROM talk_sessions ts
@@ -174,6 +186,8 @@ LEFT JOIN users
     ON ts.owner_id = users.user_id
 LEFT JOIN talk_session_locations
     ON talk_session_locations.talk_session_id = ts.talk_session_id
+LEFT JOIN organization_aliases
+    ON ts.organization_alias_id = organization_aliases.alias_id
 WHERE
     ts.owner_id = sqlc.narg('user_id')::uuid
     AND
@@ -197,6 +211,10 @@ SELECT
     sqlc.embed(ts),
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     sqlc.embed(users),
+    COALESCE(organization_aliases.alias_name, '') AS alias_name,
+    COALESCE(organization_aliases.alias_id, '00000000-0000-0000-0000-000000000000'::uuid) AS alias_id,
+    COALESCE(organization_aliases.organization_id, '00000000-0000-0000-0000-000000000000'::uuid) AS organization_id,
+    organization_aliases.created_at,
     talk_session_locations.talk_session_id as location_id,
     COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
     COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
@@ -212,6 +230,8 @@ LEFT JOIN votes
     ON votes.talk_session_id = ts.talk_session_id
 LEFT JOIN talk_session_locations
     ON talk_session_locations.talk_session_id = ts.talk_session_id
+LEFT JOIN organization_aliases
+    ON ts.organization_alias_id = organization_aliases.alias_id
 WHERE
     votes.user_id = sqlc.narg('user_id')::uuid
     AND

@@ -1,5 +1,5 @@
 CREATE TABLE organization_aliases (
-    alias_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    alias_id UUID PRIMARY KEY,
     organization_id UUID NOT NULL REFERENCES organizations(organization_id) ON DELETE CASCADE,
     alias_name VARCHAR(255) NOT NULL,
     is_primary BOOLEAN DEFAULT FALSE,
