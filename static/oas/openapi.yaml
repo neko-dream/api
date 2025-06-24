@@ -58,7 +58,7 @@ paths:
       operationId: devAuthorize
       summary: 開発用登録/ログイン
       parameters:
-        - name: redirectURL
+        - name: redirectUrl
           in: query
           required: true
           schema:
@@ -388,7 +388,7 @@ paths:
             enum:
               - google
               - line
-        - name: redirectURL
+        - name: redirectUrl
           in: query
           required: true
           description: ログイン後にリダイレクトするURL

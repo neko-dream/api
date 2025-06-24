@@ -186,9 +186,9 @@ func (s *Server) handleAuthorizeRequest(args [1]string, argsEscaped bool, w http
 					In:   "path",
 				}: params.Provider,
 				{
-					Name: "redirectURL",
+					Name: "redirectUrl",
 					In:   "query",
-				}: params.RedirectURL,
+				}: params.RedirectUrl,
 				{
 					Name: "organizationCode",
 					In:   "query",
@@ -934,9 +934,9 @@ func (s *Server) handleDevAuthorizeRequest(args [0]string, argsEscaped bool, w h
 			Body:             nil,
 			Params: middleware.Parameters{
 				{
-					Name: "redirectURL",
+					Name: "redirectUrl",
 					In:   "query",
-				}: params.RedirectURL,
+				}: params.RedirectUrl,
 				{
 					Name: "id",
 					In:   "query",
