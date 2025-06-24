@@ -58,7 +58,7 @@ paths:
       operationId: devAuthorize
       summary: 開発用登録/ログイン
       parameters:
-        - name: redirectUrl
+        - name: redirect_url
           in: query
           required: true
           schema:
@@ -388,19 +388,19 @@ paths:
             enum:
               - google
               - line
-        - name: redirectUrl
+        - name: redirect_url
           in: query
           required: true
           description: ログイン後にリダイレクトするURL
           schema:
             type: string
-        - name: organizationCode
+        - name: organization_code
           in: query
           required: false
           description: 組織コード（組織ログインの場合）
           schema:
             type: string
-        - name: registrationURL
+        - name: registration_url
           in: query
           required: false
           description: 登録していなかった場合に飛ばすURL
