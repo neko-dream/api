@@ -88,7 +88,7 @@ namespace kotohiro {
   @summary("開発用登録/ログイン")
   @useAuth([])
   op devAuthorize(
-    @query(#{ explode: true }) redirectURL: string,
+    @query(#{ explode: true }) redirect_url: string,
 
     /**
      * devのみで使用するsubjectです。ここで指定した値はログインした後も確認できないため覚えておいてください。同じ値を指定すると同じアカウントにログインできます。
@@ -124,17 +124,17 @@ namespace kotohiro {
     /**
      * ログイン後にリダイレクトするURL
      */
-    @query(#{ explode: true }) redirectURL: string,
+    @query(#{ explode: true }) redirect_url: string,
 
     /**
      * 組織コード（組織ログインの場合）
      */
-    @query(#{ explode: true }) organizationCode?: string,
+    @query(#{ explode: true }) organization_code?: string,
 
     /**
      * 登録していなかった場合に飛ばすURL
      */
-    @query(#{ explode: true }) registrationURL?: string,
+    @query(#{ explode: true }) registration_url?: string,
   ): {
     @statusCode statusCode: 302;
 
