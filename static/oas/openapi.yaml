@@ -50,8 +50,6 @@ paths:
                 type: object
       tags:
         - auth
-      security:
-        - {}
       x-ogen-operation-group: Auth
   /auth/dev/login:
     get:
