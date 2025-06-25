@@ -271,7 +271,6 @@ namespace kotohiro {
   @route("/talksessions/{talkSessionID}/consent")
   @get
   @summary("セッションに同意しているか")
-  @useAuth([])
   op hasConsent(@path talkSessionID: string): Body<{
     hasConsent: boolean;
   }> | {

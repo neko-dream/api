@@ -449,19 +449,24 @@ func (s *Server) decodeEditTimeLineRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-					if err := func(d *jx.Decoder) error {
-						request.Content.Reset()
-						if err := request.Content.Decode(d); err != nil {
+					var requestDotContentVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotContentVal = c
 						return nil
-					}(jx.DecodeStr(val)); err != nil {
+					}(); err != nil {
 						return err
 					}
+					request.Content.SetTo(requestDotContentVal)
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"content\"")
@@ -476,19 +481,24 @@ func (s *Server) decodeEditTimeLineRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-					if err := func(d *jx.Decoder) error {
-						request.Status.Reset()
-						if err := request.Status.Decode(d); err != nil {
+					var requestDotStatusVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotStatusVal = c
 						return nil
-					}(jx.DecodeStr(val)); err != nil {
+					}(); err != nil {
 						return err
 					}
+					request.Status.SetTo(requestDotStatusVal)
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"status\"")
@@ -744,19 +754,24 @@ func (s *Server) decodeEstablishUserRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-					if err := func(d *jx.Decoder) error {
-						request.DateOfBirth.Reset()
-						if err := request.DateOfBirth.Decode(d); err != nil {
+					var requestDotDateOfBirthVal float64
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToFloat64(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotDateOfBirthVal = c
 						return nil
-					}(jx.DecodeStr(val)); err != nil {
+					}(); err != nil {
 						return err
 					}
+					request.DateOfBirth.SetTo(requestDotDateOfBirthVal)
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"dateOfBirth\"")
@@ -786,37 +801,27 @@ func (s *Server) decodeEstablishUserRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-					if err := func(d *jx.Decoder) error {
-						request.Gender.Reset()
-						if err := request.Gender.Decode(d); err != nil {
+					var requestDotGenderVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotGenderVal = c
 						return nil
-					}(jx.DecodeStr(val)); err != nil {
+					}(); err != nil {
 						return err
 					}
+					request.Gender.SetTo(requestDotGenderVal)
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"gender\"")
-				}
-				if err := func() error {
-					if value, ok := request.Gender.Get(); ok {
-						if err := func() error {
-							if err := value.Validate(); err != nil {
-								return err
-							}
-							return nil
-						}(); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return req, close, errors.Wrap(err, "validate")
 				}
 			}
 		}
@@ -860,19 +865,24 @@ func (s *Server) decodeEstablishUserRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-					if err := func(d *jx.Decoder) error {
-						request.City.Reset()
-						if err := request.City.Decode(d); err != nil {
+					var requestDotCityVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotCityVal = c
 						return nil
-					}(jx.DecodeStr(val)); err != nil {
+					}(); err != nil {
 						return err
 					}
+					request.City.SetTo(requestDotCityVal)
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"city\"")
@@ -887,19 +897,24 @@ func (s *Server) decodeEstablishUserRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-					if err := func(d *jx.Decoder) error {
-						request.Email.Reset()
-						if err := request.Email.Decode(d); err != nil {
+					var requestDotEmailVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotEmailVal = c
 						return nil
-					}(jx.DecodeStr(val)); err != nil {
+					}(); err != nil {
 						return err
 					}
+					request.Email.SetTo(requestDotEmailVal)
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"email\"")
@@ -2106,19 +2121,24 @@ func (s *Server) decodePostOpinionPost2Request(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-					if err := func(d *jx.Decoder) error {
-						request.TalkSessionID.Reset()
-						if err := request.TalkSessionID.Decode(d); err != nil {
+					var requestDotTalkSessionIDVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotTalkSessionIDVal = c
 						return nil
-					}(jx.DecodeStr(val)); err != nil {
+					}(); err != nil {
 						return err
 					}
+					request.TalkSessionID.SetTo(requestDotTalkSessionIDVal)
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"talkSessionID\"")
@@ -2133,19 +2153,24 @@ func (s *Server) decodePostOpinionPost2Request(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-					if err := func(d *jx.Decoder) error {
-						request.ParentOpinionID.Reset()
-						if err := request.ParentOpinionID.Decode(d); err != nil {
+					var requestDotParentOpinionIDVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotParentOpinionIDVal = c
 						return nil
-					}(jx.DecodeStr(val)); err != nil {
+					}(); err != nil {
 						return err
 					}
+					request.ParentOpinionID.SetTo(requestDotParentOpinionIDVal)
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"parentOpinionID\"")
@@ -2160,19 +2185,24 @@ func (s *Server) decodePostOpinionPost2Request(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-					if err := func(d *jx.Decoder) error {
-						request.Title.Reset()
-						if err := request.Title.Decode(d); err != nil {
+					var requestDotTitleVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotTitleVal = c
 						return nil
-					}(jx.DecodeStr(val)); err != nil {
+					}(); err != nil {
 						return err
 					}
+					request.Title.SetTo(requestDotTitleVal)
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"title\"")
@@ -2214,19 +2244,24 @@ func (s *Server) decodePostOpinionPost2Request(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-					if err := func(d *jx.Decoder) error {
-						request.ReferenceURL.Reset()
-						if err := request.ReferenceURL.Decode(d); err != nil {
+					var requestDotReferenceURLVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotReferenceURLVal = c
 						return nil
-					}(jx.DecodeStr(val)); err != nil {
+					}(); err != nil {
 						return err
 					}
+					request.ReferenceURL.SetTo(requestDotReferenceURLVal)
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"referenceURL\"")
@@ -2395,19 +2430,24 @@ func (s *Server) decodePostTimeLineItemRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-					if err := func(d *jx.Decoder) error {
-						request.ParentActionItemID.Reset()
-						if err := request.ParentActionItemID.Decode(d); err != nil {
+					var requestDotParentActionItemIDVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotParentActionItemIDVal = c
 						return nil
-					}(jx.DecodeStr(val)); err != nil {
+					}(); err != nil {
 						return err
 					}
+					request.ParentActionItemID.SetTo(requestDotParentActionItemIDVal)
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"parentActionItemID\"")
@@ -2471,22 +2511,42 @@ func (s *Server) decodeReportOpinionRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-					if err := func(d *jx.Decoder) error {
-						request.Reason.Reset()
-						if err := request.Reason.Decode(d); err != nil {
+					var requestDotReasonVal float64
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToFloat64(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotReasonVal = c
 						return nil
-					}(jx.DecodeStr(val)); err != nil {
+					}(); err != nil {
 						return err
 					}
+					request.Reason.SetTo(requestDotReasonVal)
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"reason\"")
+				}
+				if err := func() error {
+					if value, ok := request.Reason.Get(); ok {
+						if err := func() error {
+							if err := (validate.Float{}).Validate(float64(value)); err != nil {
+								return errors.Wrap(err, "float")
+							}
+							return nil
+						}(); err != nil {
+							return err
+						}
+					}
+					return nil
+				}(); err != nil {
+					return req, close, errors.Wrap(err, "validate")
 				}
 			}
 		}
@@ -2498,19 +2558,24 @@ func (s *Server) decodeReportOpinionRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-					if err := func(d *jx.Decoder) error {
-						request.Content.Reset()
-						if err := request.Content.Decode(d); err != nil {
+					var requestDotContentVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotContentVal = c
 						return nil
-					}(jx.DecodeStr(val)); err != nil {
+					}(); err != nil {
 						return err
 					}
+					request.Content.SetTo(requestDotContentVal)
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"content\"")
@@ -2728,19 +2793,24 @@ func (s *Server) decodeUpdateUserProfileRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-					if err := func(d *jx.Decoder) error {
-						request.DisplayName.Reset()
-						if err := request.DisplayName.Decode(d); err != nil {
+					var requestDotDisplayNameVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotDisplayNameVal = c
 						return nil
-					}(jx.DecodeStr(val)); err != nil {
+					}(); err != nil {
 						return err
 					}
+					request.DisplayName.SetTo(requestDotDisplayNameVal)
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"displayName\"")
@@ -2782,19 +2852,24 @@ func (s *Server) decodeUpdateUserProfileRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-					if err := func(d *jx.Decoder) error {
-						request.DateOfBirth.Reset()
-						if err := request.DateOfBirth.Decode(d); err != nil {
+					var requestDotDateOfBirthVal float64
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToFloat64(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotDateOfBirthVal = c
 						return nil
-					}(jx.DecodeStr(val)); err != nil {
+					}(); err != nil {
 						return err
 					}
+					request.DateOfBirth.SetTo(requestDotDateOfBirthVal)
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"dateOfBirth\"")
@@ -2824,37 +2899,27 @@ func (s *Server) decodeUpdateUserProfileRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-					if err := func(d *jx.Decoder) error {
-						request.Gender.Reset()
-						if err := request.Gender.Decode(d); err != nil {
+					var requestDotGenderVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotGenderVal = c
 						return nil
-					}(jx.DecodeStr(val)); err != nil {
+					}(); err != nil {
 						return err
 					}
+					request.Gender.SetTo(requestDotGenderVal)
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"gender\"")
-				}
-				if err := func() error {
-					if value, ok := request.Gender.Get(); ok {
-						if err := func() error {
-							if err := value.Validate(); err != nil {
-								return err
-							}
-							return nil
-						}(); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return req, close, errors.Wrap(err, "validate")
 				}
 			}
 		}
@@ -2866,19 +2931,24 @@ func (s *Server) decodeUpdateUserProfileRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-					if err := func(d *jx.Decoder) error {
-						request.City.Reset()
-						if err := request.City.Decode(d); err != nil {
+					var requestDotCityVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotCityVal = c
 						return nil
-					}(jx.DecodeStr(val)); err != nil {
+					}(); err != nil {
 						return err
 					}
+					request.City.SetTo(requestDotCityVal)
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"city\"")
@@ -2893,19 +2963,24 @@ func (s *Server) decodeUpdateUserProfileRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-					if err := func(d *jx.Decoder) error {
-						request.Prefecture.Reset()
-						if err := request.Prefecture.Decode(d); err != nil {
+					var requestDotPrefectureVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotPrefectureVal = c
 						return nil
-					}(jx.DecodeStr(val)); err != nil {
+					}(); err != nil {
 						return err
 					}
+					request.Prefecture.SetTo(requestDotPrefectureVal)
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"prefecture\"")
@@ -2920,19 +2995,24 @@ func (s *Server) decodeUpdateUserProfileRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-					if err := func(d *jx.Decoder) error {
-						request.Email.Reset()
-						if err := request.Email.Decode(d); err != nil {
+					var requestDotEmailVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotEmailVal = c
 						return nil
-					}(jx.DecodeStr(val)); err != nil {
+					}(); err != nil {
 						return err
 					}
+					request.Email.SetTo(requestDotEmailVal)
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"email\"")

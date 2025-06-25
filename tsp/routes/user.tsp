@@ -31,11 +31,11 @@ namespace kotohiro {
       displayName: HttpPart<string>;
       displayID: HttpPart<string>;
       icon?: HttpPart<bytes>;
-      dateOfBirth?: HttpPart<numeric | null>;
-      gender?: HttpPart<"男性" | "女性" | "その他" | "回答しない" | null>;
+      dateOfBirth?: HttpPart<numeric>;
+      gender?: HttpPart<string>;
       prefecture?: HttpPart<string>;
-      city?: HttpPart<string | null>;
-      email?: HttpPart<string | null>;
+      city?: HttpPart<string>;
+      email?: HttpPart<string>;
     },
   ): User | {
     @statusCode statusCode: 400;
@@ -59,14 +59,14 @@ namespace kotohiro {
   op updateUserProfile(
     @header contentType: "multipart/form-data",
     @multipartBody body: {
-      displayName?: HttpPart<string | null>;
+      displayName?: HttpPart<string>;
       icon?: HttpPart<bytes>;
       deleteIcon?: HttpPart<boolean | null>;
-      dateOfBirth?: HttpPart<numeric | null>;
-      gender?: HttpPart<"男性" | "女性" | "その他" | "回答しない" | null>;
-      city?: HttpPart<string | null>;
-      prefecture?: HttpPart<string | null>;
-      email?: HttpPart<string | null>;
+      dateOfBirth?: HttpPart<numeric>;
+      gender?: HttpPart<string>;
+      city?: HttpPart<string>;
+      prefecture?: HttpPart<string>;
+      email?: HttpPart<string>;
     },
   ): User | {
     @statusCode statusCode: 400;

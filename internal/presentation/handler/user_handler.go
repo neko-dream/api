@@ -244,16 +244,16 @@ func (u *userHandler) UpdateUserProfile(ctx context.Context, params *oas.UpdateU
 	}
 
 	var city *string
-	if !value.City.Null && value.City.Value != "" {
+	if value.City.IsSet() && value.City.Value != "" {
 		city = &value.City.Value
 	}
 
 	var prefecture *string
-	if !value.Prefecture.Null && value.Prefecture.Value != "" {
+	if value.Prefecture.IsSet() && value.Prefecture.Value != "" {
 		prefecture = &value.Prefecture.Value
 	}
 	var displayName *string
-	if !value.DisplayName.IsNull() && value.DisplayName.IsSet() {
+	if value.DisplayName.IsSet() && value.DisplayName.Value != "" {
 		if value.DisplayName.Value == "" {
 			return nil, messages.UserDisplayNameTooShort
 		}
@@ -261,14 +261,8 @@ func (u *userHandler) UpdateUserProfile(ctx context.Context, params *oas.UpdateU
 	}
 
 	var gender *string
-	if value.Gender.IsSet() && !value.Gender.IsNull() {
-		txt, err := value.Gender.Value.MarshalText()
-		if err != nil {
-			return nil, messages.InternalServerError
-		}
-		if string(txt) != "" {
-			gender = lo.ToPtr(string(txt))
-		}
+	if value.Gender.IsSet() && value.Gender.Value != "" {
+		gender = lo.ToPtr(string(value.Gender.Value))
 	}
 
 	out, err := u.editUser.Execute(ctx, user_usecase.EditInput{
@@ -332,14 +326,8 @@ func (u *userHandler) EstablishUser(ctx context.Context, params *oas.EstablishUs
 		dateOfBirth = lo.ToPtr(int(birthStr))
 	}
 	var gender *string
-	if value.Gender.IsSet() && !value.Gender.IsNull() {
-		txt, err := value.Gender.Value.MarshalText()
-		if err != nil {
-			return nil, messages.InternalServerError
-		}
-		if string(txt) != "" {
-			gender = lo.ToPtr(string(txt))
-		}
+	if value.Gender.IsSet() && value.Gender.Value != "" {
+		gender = lo.ToPtr(string(value.Gender.Value))
 	}
 
 	if value.DisplayID == "" {
@@ -356,7 +344,7 @@ func (u *userHandler) EstablishUser(ctx context.Context, params *oas.EstablishUs
 		DisplayName: value.DisplayName,
 		Icon:        file,
 		DateOfBirth: dateOfBirth,
-		City:        utils.ToPtrIfNotNullValue(value.City.Null, value.City.Value),
+		City:        utils.ToPtrIfNotNullValue(!value.City.IsSet(), value.City.Value),
 		Gender:      gender,
 		Prefecture:  prefecture,
 	}
