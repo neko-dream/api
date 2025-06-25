@@ -270,8 +270,6 @@ paths:
                 type: object
       tags:
         - auth
-      security:
-        - {}
       x-ogen-operation-group: Auth
   /auth/token/info:
     get:
@@ -2716,6 +2714,8 @@ paths:
                 type: object
       tags:
         - user
+      security:
+        - {}
       x-ogen-operation-group: User
     post:
       operationId: establishUser

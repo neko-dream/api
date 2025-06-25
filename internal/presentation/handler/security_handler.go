@@ -16,14 +16,13 @@ type securityHandler struct {
 }
 
 var skipOperations = []string{
-	"RegisterUser",
-	"OAuthTokenInfo",
+	"EstablishUser",
+	"GetTokenInfo",
 }
 
 func (s *securityHandler) HandleCookieAuth(ctx context.Context, operationName string, t oas.CookieAuth) (context.Context, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "securityHandler.HandleSessionId")
 	defer span.End()
-
 	// セッションIDを取得
 	claim, err := s.TokenManager.Parse(ctx, t.GetAPIKey())
 	if err != nil {

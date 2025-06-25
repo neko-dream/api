@@ -181,7 +181,6 @@ namespace kotohiro {
   @route("/auth/revoke")
   @post
   @summary("トークンを失効（ログアウト）")
-  @useAuth([])
   op revokeToken(): {
     @statusCode statusCode: 204;
 

@@ -145,7 +145,7 @@ func (a *authHandler) RevokeToken(ctx context.Context) (oas.RevokeTokenRes, erro
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.OAuthTokenRevoke")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(a.authService, ctx)
+	authCtx, err := getAuthenticationContext(a.authService, ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +167,6 @@ func (a *authHandler) GetTokenInfo(ctx context.Context) (oas.GetTokenInfoRes, er
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.OAuthTokenInfo")
 	defer span.End()
 
-	// GetTokenInfoは特別で、セッション情報の詳細を返す必要があるため、直接claimを取得
 	claim := session.GetSession(ctx)
 	if claim == nil {
 		return nil, messages.ForbiddenError
