@@ -253,7 +253,7 @@ func (u *userHandler) UpdateUserProfile(ctx context.Context, params *oas.UpdateU
 		prefecture = &value.Prefecture.Value
 	}
 	var displayName *string
-	if !value.DisplayName.Null {
+	if !value.DisplayName.IsNull() && value.DisplayName.IsSet() {
 		if value.DisplayName.Value == "" {
 			return nil, messages.UserDisplayNameTooShort
 		}
@@ -331,6 +331,14 @@ func (u *userHandler) EstablishUser(ctx context.Context, params *oas.EstablishUs
 	if birthStr, ok := value.DateOfBirth.Get(); ok {
 		dateOfBirth = lo.ToPtr(int(birthStr))
 	}
+	var gender *string
+	if value.Gender.IsSet() && !value.Gender.IsNull() {
+		txt, err := value.Gender.Value.MarshalText()
+		if err == nil {
+			gender = lo.ToPtr(string(txt))
+		}
+	}
+
 	if value.DisplayID == "" {
 		return nil, messages.UserDisplayIDTooShort
 	}
@@ -346,14 +354,8 @@ func (u *userHandler) EstablishUser(ctx context.Context, params *oas.EstablishUs
 		Icon:        file,
 		DateOfBirth: dateOfBirth,
 		City:        utils.ToPtrIfNotNullValue(value.City.Null, value.City.Value),
-		Gender: utils.ToPtrIfNotNullFunc(value.Gender.Null, func() *string {
-			txt, err := value.Gender.Value.MarshalText()
-			if err != nil {
-				return nil
-			}
-			return lo.ToPtr(string(txt))
-		}),
-		Prefecture: prefecture,
+		Gender:      gender,
+		Prefecture:  prefecture,
 	}
 	out, err := u.registerUser.Execute(ctx, input)
 	if err != nil {

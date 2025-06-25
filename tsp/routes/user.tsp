@@ -11,7 +11,6 @@ namespace kotohiro {
   @route("/user")
   @get
   @summary("ユーザー情報の取得")
-  @useAuth([])
   op getUserInfo(): Body<{
     user: User;
     demographics: UserDemographics;
