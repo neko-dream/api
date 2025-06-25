@@ -238,22 +238,12 @@ func (u *userHandler) UpdateUserProfile(ctx context.Context, params *oas.UpdateU
 			return nil, messages.InternalServerError
 		}
 	}
+
 	var dateOfBirth *int
-	if birthStr, ok := value.DateOfBirth.Get(); ok && birthStr != "" {
-		if len(birthStr) != 8 {
-			err := messages.BadRequestError
-			err.Message = "誕生日の形式が不正です"
-			return nil, err
-		}
-		dateOfBirthRes, err := strconv.Atoi(birthStr)
-		if err != nil {
-			utils.HandleError(ctx, err, "strconv.Atoi")
-			err := messages.BadRequestError
-			err.Message = "誕生日の形式が不正です"
-			return nil, err
-		}
-		dateOfBirth = &dateOfBirthRes
+	if birthStr, ok := value.DateOfBirth.Get(); ok {
+		dateOfBirth = lo.ToPtr(int(birthStr))
 	}
+
 	var city *string
 	if !value.City.Null && value.City.Value != "" {
 		city = &value.City.Value

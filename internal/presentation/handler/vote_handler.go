@@ -50,7 +50,7 @@ func (v *voteHandler) Vote2(ctx context.Context, req *oas.Vote2Req, params oas.V
 	err = v.voteCommand.Execute(ctx, vote_usecase.VoteInput{
 		TargetOpinionID: targetOpinionID,
 		UserID:          authCtx.UserID,
-		VoteType:        string(value.VoteStatus.Value),
+		VoteType:        string(value.VoteStatus),
 	})
 	if err != nil {
 		utils.HandleError(ctx, err, "postVoteUseCase.Execute")

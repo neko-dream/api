@@ -2772,27 +2772,37 @@ func (s *Server) decodeUpdateUserProfileRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					var requestDotDateOfBirthVal string
-					if err := func() error {
-						val, err := d.DecodeValue()
-						if err != nil {
-							return err
-						}
-
-						c, err := conv.ToString(val)
-						if err != nil {
-							return err
-						}
-
-						requestDotDateOfBirthVal = c
-						return nil
-					}(); err != nil {
+					val, err := d.DecodeValue()
+					if err != nil {
 						return err
 					}
-					request.DateOfBirth.SetTo(requestDotDateOfBirthVal)
+					if err := func(d *jx.Decoder) error {
+						request.DateOfBirth.Reset()
+						if err := request.DateOfBirth.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"dateOfBirth\"")
+				}
+				if err := func() error {
+					if value, ok := request.DateOfBirth.Get(); ok {
+						if err := func() error {
+							if err := (validate.Float{}).Validate(float64(value)); err != nil {
+								return errors.Wrap(err, "float")
+							}
+							return nil
+						}(); err != nil {
+							return err
+						}
+					}
+					return nil
+				}(); err != nil {
+					return req, close, errors.Wrap(err, "validate")
 				}
 			}
 		}
@@ -3017,15 +3027,8 @@ func (s *Server) decodeVote2Request(r *http.Request) (
 					return req, close, errors.Wrap(err, "decode \"voteStatus\"")
 				}
 				if err := func() error {
-					if value, ok := request.VoteStatus.Get(); ok {
-						if err := func() error {
-							if err := value.Validate(); err != nil {
-								return err
-							}
-							return nil
-						}(); err != nil {
-							return err
-						}
+					if err := request.VoteStatus.Validate(); err != nil {
+						return err
 					}
 					return nil
 				}(); err != nil {

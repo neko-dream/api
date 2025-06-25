@@ -1698,6 +1698,24 @@ func (s *UpdateUserProfileReq) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
+		if value, ok := s.DateOfBirth.Get(); ok {
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "dateOfBirth",
+			Error: err,
+		})
+	}
+	if err := func() error {
 		if value, ok := s.Gender.Get(); ok {
 			if err := func() error {
 				if err := value.Validate(); err != nil {
@@ -1833,15 +1851,8 @@ func (s *Vote2Req) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if value, ok := s.VoteStatus.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
+		if err := s.VoteStatus.Validate(); err != nil {
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -1856,7 +1867,7 @@ func (s *Vote2Req) Validate() error {
 	return nil
 }
 
-func (s Vote2ReqVoteStatus) Validate() error {
+func (s VoteType) Validate() error {
 	switch s {
 	case "agree":
 		return nil

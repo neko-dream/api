@@ -2084,51 +2084,6 @@ func (s *InviteOrganizationReq) SetRole(val float64) {
 	s.Role = val
 }
 
-// NewNilVote2ReqVoteStatus returns new NilVote2ReqVoteStatus with value set to v.
-func NewNilVote2ReqVoteStatus(v Vote2ReqVoteStatus) NilVote2ReqVoteStatus {
-	return NilVote2ReqVoteStatus{
-		Value: v,
-	}
-}
-
-// NilVote2ReqVoteStatus is nullable Vote2ReqVoteStatus.
-type NilVote2ReqVoteStatus struct {
-	Value Vote2ReqVoteStatus
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilVote2ReqVoteStatus) SetTo(v Vote2ReqVoteStatus) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsSet returns true if value is Null.
-func (o NilVote2ReqVoteStatus) IsNull() bool { return o.Null }
-
-// SetNull sets value to null.
-func (o *NilVote2ReqVoteStatus) SetToNull() {
-	o.Null = true
-	var v Vote2ReqVoteStatus
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilVote2ReqVoteStatus) Get() (v Vote2ReqVoteStatus, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilVote2ReqVoteStatus) Or(d Vote2ReqVoteStatus) Vote2ReqVoteStatus {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // Ref: #/components/schemas/OffsetPagination
 type OffsetPagination struct {
 	TotalCount int `json:"totalCount"`
@@ -6797,7 +6752,7 @@ type UpdateUserProfileReq struct {
 	DisplayName OptNilString                     `json:"displayName"`
 	Icon        OptMultipartFile                 `json:"icon"`
 	DeleteIcon  OptNilBool                       `json:"deleteIcon"`
-	DateOfBirth OptString                        `json:"dateOfBirth"`
+	DateOfBirth OptNilFloat64                    `json:"dateOfBirth"`
 	Gender      OptNilUpdateUserProfileReqGender `json:"gender"`
 	City        OptNilString                     `json:"city"`
 	Prefecture  OptNilString                     `json:"prefecture"`
@@ -6820,7 +6775,7 @@ func (s *UpdateUserProfileReq) GetDeleteIcon() OptNilBool {
 }
 
 // GetDateOfBirth returns the value of DateOfBirth.
-func (s *UpdateUserProfileReq) GetDateOfBirth() OptString {
+func (s *UpdateUserProfileReq) GetDateOfBirth() OptNilFloat64 {
 	return s.DateOfBirth
 }
 
@@ -6860,7 +6815,7 @@ func (s *UpdateUserProfileReq) SetDeleteIcon(val OptNilBool) {
 }
 
 // SetDateOfBirth sets the value of DateOfBirth.
-func (s *UpdateUserProfileReq) SetDateOfBirth(val OptString) {
+func (s *UpdateUserProfileReq) SetDateOfBirth(val OptNilFloat64) {
 	s.DateOfBirth = val
 }
 
@@ -7358,45 +7313,46 @@ type Vote2OKApplicationJSON []Opinion
 func (*Vote2OKApplicationJSON) vote2Res() {}
 
 type Vote2Req struct {
-	VoteStatus NilVote2ReqVoteStatus `json:"voteStatus"`
+	VoteStatus VoteType `json:"voteStatus"`
 }
 
 // GetVoteStatus returns the value of VoteStatus.
-func (s *Vote2Req) GetVoteStatus() NilVote2ReqVoteStatus {
+func (s *Vote2Req) GetVoteStatus() VoteType {
 	return s.VoteStatus
 }
 
 // SetVoteStatus sets the value of VoteStatus.
-func (s *Vote2Req) SetVoteStatus(val NilVote2ReqVoteStatus) {
+func (s *Vote2Req) SetVoteStatus(val VoteType) {
 	s.VoteStatus = val
 }
 
 // 投票タイプ.
-type Vote2ReqVoteStatus string
+// Ref: #/components/schemas/VoteType
+type VoteType string
 
 const (
-	Vote2ReqVoteStatusAgree    Vote2ReqVoteStatus = "agree"
-	Vote2ReqVoteStatusDisagree Vote2ReqVoteStatus = "disagree"
-	Vote2ReqVoteStatusPass     Vote2ReqVoteStatus = "pass"
+	VoteTypeAgree    VoteType = "agree"
+	VoteTypeDisagree VoteType = "disagree"
+	VoteTypePass     VoteType = "pass"
 )
 
-// AllValues returns all Vote2ReqVoteStatus values.
-func (Vote2ReqVoteStatus) AllValues() []Vote2ReqVoteStatus {
-	return []Vote2ReqVoteStatus{
-		Vote2ReqVoteStatusAgree,
-		Vote2ReqVoteStatusDisagree,
-		Vote2ReqVoteStatusPass,
+// AllValues returns all VoteType values.
+func (VoteType) AllValues() []VoteType {
+	return []VoteType{
+		VoteTypeAgree,
+		VoteTypeDisagree,
+		VoteTypePass,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s Vote2ReqVoteStatus) MarshalText() ([]byte, error) {
+func (s VoteType) MarshalText() ([]byte, error) {
 	switch s {
-	case Vote2ReqVoteStatusAgree:
+	case VoteTypeAgree:
 		return []byte(s), nil
-	case Vote2ReqVoteStatusDisagree:
+	case VoteTypeDisagree:
 		return []byte(s), nil
-	case Vote2ReqVoteStatusPass:
+	case VoteTypePass:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -7404,16 +7360,16 @@ func (s Vote2ReqVoteStatus) MarshalText() ([]byte, error) {
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *Vote2ReqVoteStatus) UnmarshalText(data []byte) error {
-	switch Vote2ReqVoteStatus(data) {
-	case Vote2ReqVoteStatusAgree:
-		*s = Vote2ReqVoteStatusAgree
+func (s *VoteType) UnmarshalText(data []byte) error {
+	switch VoteType(data) {
+	case VoteTypeAgree:
+		*s = VoteTypeAgree
 		return nil
-	case Vote2ReqVoteStatusDisagree:
-		*s = Vote2ReqVoteStatusDisagree
+	case VoteTypeDisagree:
+		*s = VoteTypeDisagree
 		return nil
-	case Vote2ReqVoteStatusPass:
-		*s = Vote2ReqVoteStatusPass
+	case VoteTypePass:
+		*s = VoteTypePass
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)

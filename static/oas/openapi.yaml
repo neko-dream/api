@@ -1007,9 +1007,7 @@ paths:
               type: object
               properties:
                 voteStatus:
-                  allOf:
-                    - $ref: '#/components/schemas/VoteType'
-                  nullable: true
+                  $ref: '#/components/schemas/VoteType'
               required:
                 - voteStatus
             encoding:
@@ -2861,7 +2859,8 @@ paths:
                   type: boolean
                   nullable: true
                 dateOfBirth:
-                  type: string
+                  type: number
+                  nullable: true
                 gender:
                   type: string
                   enum:
@@ -2884,6 +2883,8 @@ paths:
               displayName:
                 contentType: application/json
               deleteIcon:
+                contentType: application/json
+              dateOfBirth:
                 contentType: application/json
               gender:
                 contentType: application/json
