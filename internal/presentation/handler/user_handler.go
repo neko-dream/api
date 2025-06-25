@@ -334,7 +334,10 @@ func (u *userHandler) EstablishUser(ctx context.Context, params *oas.EstablishUs
 	var gender *string
 	if value.Gender.IsSet() && !value.Gender.IsNull() {
 		txt, err := value.Gender.Value.MarshalText()
-		if err == nil {
+		if err != nil {
+			return nil, messages.InternalServerError
+		}
+		if string(txt) != "" {
 			gender = lo.ToPtr(string(txt))
 		}
 	}
