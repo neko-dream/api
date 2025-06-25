@@ -2773,7 +2773,8 @@ paths:
                   type: string
                   format: binary
                 dateOfBirth:
-                  type: string
+                  type: number
+                  nullable: true
                 gender:
                   type: string
                   enum:
@@ -2794,6 +2795,8 @@ paths:
                 - displayName
                 - displayID
             encoding:
+              dateOfBirth:
+                contentType: application/json
               gender:
                 contentType: application/json
               city:

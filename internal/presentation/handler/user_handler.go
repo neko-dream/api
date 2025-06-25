@@ -4,7 +4,6 @@ import (
 	"context"
 	"mime/multipart"
 	"net/http"
-	"strconv"
 
 	opinion_query "github.com/neko-dream/server/internal/application/query/opinion"
 	talksession_query "github.com/neko-dream/server/internal/application/query/talksession"
@@ -329,20 +328,8 @@ func (u *userHandler) EstablishUser(ctx context.Context, params *oas.EstablishUs
 		prefecture = &value.Prefecture.Value
 	}
 	var dateOfBirth *int
-	if birthStr, ok := value.DateOfBirth.Get(); ok && birthStr != "" {
-		if len(birthStr) != 8 {
-			err := messages.BadRequestError
-			err.Message = "誕生日の形式が不正です"
-			return nil, err
-		}
-		dateOfBirthRes, err := strconv.Atoi(birthStr)
-		if err != nil {
-			utils.HandleError(ctx, err, "strconv.Atoi")
-			err := messages.BadRequestError
-			err.Message = "誕生日の形式が不正です"
-			return nil, err
-		}
-		dateOfBirth = &dateOfBirthRes
+	if birthStr, ok := value.DateOfBirth.Get(); ok {
+		dateOfBirth = lo.ToPtr(int(birthStr))
 	}
 	if value.DisplayID == "" {
 		return nil, messages.UserDisplayIDTooShort

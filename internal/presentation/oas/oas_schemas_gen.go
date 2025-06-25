@@ -669,7 +669,7 @@ type EstablishUserReq struct {
 	DisplayName string                       `json:"displayName"`
 	DisplayID   string                       `json:"displayID"`
 	Icon        OptMultipartFile             `json:"icon"`
-	DateOfBirth OptString                    `json:"dateOfBirth"`
+	DateOfBirth OptNilFloat64                `json:"dateOfBirth"`
 	Gender      OptNilEstablishUserReqGender `json:"gender"`
 	Prefecture  OptString                    `json:"prefecture"`
 	City        OptNilString                 `json:"city"`
@@ -692,7 +692,7 @@ func (s *EstablishUserReq) GetIcon() OptMultipartFile {
 }
 
 // GetDateOfBirth returns the value of DateOfBirth.
-func (s *EstablishUserReq) GetDateOfBirth() OptString {
+func (s *EstablishUserReq) GetDateOfBirth() OptNilFloat64 {
 	return s.DateOfBirth
 }
 
@@ -732,7 +732,7 @@ func (s *EstablishUserReq) SetIcon(val OptMultipartFile) {
 }
 
 // SetDateOfBirth sets the value of DateOfBirth.
-func (s *EstablishUserReq) SetDateOfBirth(val OptString) {
+func (s *EstablishUserReq) SetDateOfBirth(val OptNilFloat64) {
 	s.DateOfBirth = val
 }
 

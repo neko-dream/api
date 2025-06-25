@@ -31,7 +31,7 @@ namespace kotohiro {
       displayName: HttpPart<string>;
       displayID: HttpPart<string>;
       icon?: HttpPart<bytes>;
-      dateOfBirth?: HttpPart<string>;
+      dateOfBirth?: HttpPart<numeric | null>;
       gender?: HttpPart<"男性" | "女性" | "その他" | "回答しない" | null>;
       prefecture?: HttpPart<string>;
       city?: HttpPart<string | null>;
