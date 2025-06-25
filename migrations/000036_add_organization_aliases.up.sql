@@ -23,8 +23,9 @@ ADD COLUMN organization_alias_id UUID REFERENCES organization_aliases(alias_id);
 
 CREATE INDEX idx_talk_sessions_organization_id ON talk_sessions(organization_id);
 
-INSERT INTO organization_aliases (organization_id, alias_name, is_primary, created_by)
+INSERT INTO organization_aliases (alias_id, organization_id, alias_name, is_primary, created_by)
 SELECT
+    gen_random_uuid(),
     o.organization_id,
     o.name,
     TRUE,
