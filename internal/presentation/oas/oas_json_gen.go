@@ -2044,50 +2044,6 @@ func (s *EstablishUserInternalServerError) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes EstablishUserReqGender as json.
-func (s EstablishUserReqGender) Encode(e *jx.Encoder) {
-	e.Str(string(s))
-}
-
-// Decode decodes EstablishUserReqGender from json.
-func (s *EstablishUserReqGender) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode EstablishUserReqGender to nil")
-	}
-	v, err := d.StrBytes()
-	if err != nil {
-		return err
-	}
-	// Try to use constant string.
-	switch EstablishUserReqGender(v) {
-	case EstablishUserReqGender_0:
-		*s = EstablishUserReqGender_0
-	case EstablishUserReqGender_1:
-		*s = EstablishUserReqGender_1
-	case EstablishUserReqGender_2:
-		*s = EstablishUserReqGender_2
-	case EstablishUserReqGender_3:
-		*s = EstablishUserReqGender_3
-	default:
-		*s = EstablishUserReqGender(v)
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s EstablishUserReqGender) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *EstablishUserReqGender) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode implements json.Marshaler.
 func (s *GetConclusionBadRequest) Encode(e *jx.Encoder) {
 	e.ObjStart()
@@ -6469,50 +6425,6 @@ func (s *InviteOrganizationOK) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes Vote2ReqVoteStatus as json.
-func (o NilVote2ReqVoteStatus) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.Str(string(o.Value))
-}
-
-// Decode decodes Vote2ReqVoteStatus from json.
-func (o *NilVote2ReqVoteStatus) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilVote2ReqVoteStatus to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v Vote2ReqVoteStatus
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilVote2ReqVoteStatus) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilVote2ReqVoteStatus) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode implements json.Marshaler.
 func (s *OffsetPagination) Encode(e *jx.Encoder) {
 	e.ObjStart()
@@ -8354,55 +8266,6 @@ func (s *OptNilBool) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes EstablishUserReqGender as json.
-func (o OptNilEstablishUserReqGender) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.Str(string(o.Value))
-}
-
-// Decode decodes EstablishUserReqGender from json.
-func (o *OptNilEstablishUserReqGender) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilEstablishUserReqGender to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v EstablishUserReqGender
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilEstablishUserReqGender) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilEstablishUserReqGender) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes float64 as json.
 func (o OptNilFloat64) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -8748,55 +8611,6 @@ func (s OptNilTalkSessionOrganizationAlias) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptNilTalkSessionOrganizationAlias) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes UpdateUserProfileReqGender as json.
-func (o OptNilUpdateUserProfileReqGender) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.Str(string(o.Value))
-}
-
-// Decode decodes UpdateUserProfileReqGender from json.
-func (o *OptNilUpdateUserProfileReqGender) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilUpdateUserProfileReqGender to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v UpdateUserProfileReqGender
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilUpdateUserProfileReqGender) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilUpdateUserProfileReqGender) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -15474,50 +15288,6 @@ func (s *UpdateUserProfileInternalServerError) UnmarshalJSON(data []byte) error 
 	return s.Decode(d)
 }
 
-// Encode encodes UpdateUserProfileReqGender as json.
-func (s UpdateUserProfileReqGender) Encode(e *jx.Encoder) {
-	e.Str(string(s))
-}
-
-// Decode decodes UpdateUserProfileReqGender from json.
-func (s *UpdateUserProfileReqGender) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode UpdateUserProfileReqGender to nil")
-	}
-	v, err := d.StrBytes()
-	if err != nil {
-		return err
-	}
-	// Try to use constant string.
-	switch UpdateUserProfileReqGender(v) {
-	case UpdateUserProfileReqGender_0:
-		*s = UpdateUserProfileReqGender_0
-	case UpdateUserProfileReqGender_1:
-		*s = UpdateUserProfileReqGender_1
-	case UpdateUserProfileReqGender_2:
-		*s = UpdateUserProfileReqGender_2
-	case UpdateUserProfileReqGender_3:
-		*s = UpdateUserProfileReqGender_3
-	default:
-		*s = UpdateUserProfileReqGender(v)
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s UpdateUserProfileReqGender) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *UpdateUserProfileReqGender) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode implements json.Marshaler.
 func (s *User) Encode(e *jx.Encoder) {
 	e.ObjStart()
@@ -16799,44 +16569,44 @@ func (s *Vote2OKApplicationJSON) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes Vote2ReqVoteStatus as json.
-func (s Vote2ReqVoteStatus) Encode(e *jx.Encoder) {
+// Encode encodes VoteType as json.
+func (s VoteType) Encode(e *jx.Encoder) {
 	e.Str(string(s))
 }
 
-// Decode decodes Vote2ReqVoteStatus from json.
-func (s *Vote2ReqVoteStatus) Decode(d *jx.Decoder) error {
+// Decode decodes VoteType from json.
+func (s *VoteType) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode Vote2ReqVoteStatus to nil")
+		return errors.New("invalid: unable to decode VoteType to nil")
 	}
 	v, err := d.StrBytes()
 	if err != nil {
 		return err
 	}
 	// Try to use constant string.
-	switch Vote2ReqVoteStatus(v) {
-	case Vote2ReqVoteStatusAgree:
-		*s = Vote2ReqVoteStatusAgree
-	case Vote2ReqVoteStatusDisagree:
-		*s = Vote2ReqVoteStatusDisagree
-	case Vote2ReqVoteStatusPass:
-		*s = Vote2ReqVoteStatusPass
+	switch VoteType(v) {
+	case VoteTypeAgree:
+		*s = VoteTypeAgree
+	case VoteTypeDisagree:
+		*s = VoteTypeDisagree
+	case VoteTypePass:
+		*s = VoteTypePass
 	default:
-		*s = Vote2ReqVoteStatus(v)
+		*s = VoteType(v)
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s Vote2ReqVoteStatus) MarshalJSON() ([]byte, error) {
+func (s VoteType) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *Vote2ReqVoteStatus) UnmarshalJSON(data []byte) error {
+func (s *VoteType) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

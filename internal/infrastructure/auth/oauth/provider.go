@@ -70,7 +70,17 @@ func (p *authProvider) GetAuthorizationURL(ctx context.Context, state string) st
 
 	_ = ctx
 
-	return p.oauthConf.AuthCodeURL(state, oauth2.AccessTypeOffline)
+	provider := p.getProvider()
+
+	opts := []oauth2.AuthCodeOption{oauth2.AccessTypeOffline}
+
+	if provider.AuthURLOptions != nil {
+		for key, value := range provider.AuthURLOptions {
+			opts = append(opts, oauth2.SetAuthURLParam(key, value))
+		}
+	}
+
+	return p.oauthConf.AuthCodeURL(state, opts...)
 }
 
 func (p *authProvider) VerifyAndIdentify(ctx context.Context, code string) (*string, *string, error) {

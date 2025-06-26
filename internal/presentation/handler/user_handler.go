@@ -4,7 +4,6 @@ import (
 	"context"
 	"mime/multipart"
 	"net/http"
-	"strconv"
 
 	opinion_query "github.com/neko-dream/server/internal/application/query/opinion"
 	talksession_query "github.com/neko-dream/server/internal/application/query/talksession"
@@ -238,33 +237,23 @@ func (u *userHandler) UpdateUserProfile(ctx context.Context, params *oas.UpdateU
 			return nil, messages.InternalServerError
 		}
 	}
+
 	var dateOfBirth *int
-	if birthStr, ok := value.DateOfBirth.Get(); ok && birthStr != "" {
-		if len(birthStr) != 8 {
-			err := messages.BadRequestError
-			err.Message = "誕生日の形式が不正です"
-			return nil, err
-		}
-		dateOfBirthRes, err := strconv.Atoi(birthStr)
-		if err != nil {
-			utils.HandleError(ctx, err, "strconv.Atoi")
-			err := messages.BadRequestError
-			err.Message = "誕生日の形式が不正です"
-			return nil, err
-		}
-		dateOfBirth = &dateOfBirthRes
+	if birthStr, ok := value.DateOfBirth.Get(); ok {
+		dateOfBirth = lo.ToPtr(int(birthStr))
 	}
+
 	var city *string
-	if !value.City.Null && value.City.Value != "" {
+	if value.City.IsSet() && value.City.Value != "" {
 		city = &value.City.Value
 	}
 
 	var prefecture *string
-	if !value.Prefecture.Null && value.Prefecture.Value != "" {
+	if value.Prefecture.IsSet() && value.Prefecture.Value != "" {
 		prefecture = &value.Prefecture.Value
 	}
 	var displayName *string
-	if !value.DisplayName.Null {
+	if value.DisplayName.IsSet() && value.DisplayName.Value != "" {
 		if value.DisplayName.Value == "" {
 			return nil, messages.UserDisplayNameTooShort
 		}
@@ -272,14 +261,8 @@ func (u *userHandler) UpdateUserProfile(ctx context.Context, params *oas.UpdateU
 	}
 
 	var gender *string
-	if value.Gender.IsSet() && !value.Gender.IsNull() {
-		txt, err := value.Gender.Value.MarshalText()
-		if err != nil {
-			return nil, messages.InternalServerError
-		}
-		if string(txt) != "" {
-			gender = lo.ToPtr(string(txt))
-		}
+	if value.Gender.IsSet() && value.Gender.Value != "" {
+		gender = lo.ToPtr(string(value.Gender.Value))
 	}
 
 	out, err := u.editUser.Execute(ctx, user_usecase.EditInput{
@@ -339,21 +322,14 @@ func (u *userHandler) EstablishUser(ctx context.Context, params *oas.EstablishUs
 		prefecture = &value.Prefecture.Value
 	}
 	var dateOfBirth *int
-	if birthStr, ok := value.DateOfBirth.Get(); ok && birthStr != "" {
-		if len(birthStr) != 8 {
-			err := messages.BadRequestError
-			err.Message = "誕生日の形式が不正です"
-			return nil, err
-		}
-		dateOfBirthRes, err := strconv.Atoi(birthStr)
-		if err != nil {
-			utils.HandleError(ctx, err, "strconv.Atoi")
-			err := messages.BadRequestError
-			err.Message = "誕生日の形式が不正です"
-			return nil, err
-		}
-		dateOfBirth = &dateOfBirthRes
+	if birthStr, ok := value.DateOfBirth.Get(); ok {
+		dateOfBirth = lo.ToPtr(int(birthStr))
 	}
+	var gender *string
+	if value.Gender.IsSet() && value.Gender.Value != "" {
+		gender = lo.ToPtr(string(value.Gender.Value))
+	}
+
 	if value.DisplayID == "" {
 		return nil, messages.UserDisplayIDTooShort
 	}
@@ -368,15 +344,9 @@ func (u *userHandler) EstablishUser(ctx context.Context, params *oas.EstablishUs
 		DisplayName: value.DisplayName,
 		Icon:        file,
 		DateOfBirth: dateOfBirth,
-		City:        utils.ToPtrIfNotNullValue(value.City.Null, value.City.Value),
-		Gender: utils.ToPtrIfNotNullFunc(value.Gender.Null, func() *string {
-			txt, err := value.Gender.Value.MarshalText()
-			if err != nil {
-				return nil
-			}
-			return lo.ToPtr(string(txt))
-		}),
-		Prefecture: prefecture,
+		City:        utils.ToPtrIfNotNullValue(!value.City.IsSet(), value.City.Value),
+		Gender:      gender,
+		Prefecture:  prefecture,
 	}
 	out, err := u.registerUser.Execute(ctx, input)
 	if err != nil {

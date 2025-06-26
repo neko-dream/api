@@ -8,8 +8,8 @@
 ALTER TABLE organization_users ADD COLUMN role_new INT;
 
 -- Update roles to new values
-UPDATE organization_users SET role_new = 
-    CASE 
+UPDATE organization_users SET role_new =
+    CASE
         WHEN role = 4 THEN 10  -- SuperAdmin
         WHEN role = 3 THEN 20  -- Owner
         WHEN role = 2 THEN 30  -- Admin

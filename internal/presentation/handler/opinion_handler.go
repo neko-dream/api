@@ -368,7 +368,7 @@ func (o *opinionHandler) ReportOpinion(ctx context.Context, req *oas.ReportOpini
 		return nil, messages.BadRequestError
 	}
 	var reasonText *string
-	if !req.Content.IsNull() {
+	if req.Content.IsSet() && req.Content.Value != "" {
 		reasonText = lo.ToPtr(req.Content.Value)
 	}
 

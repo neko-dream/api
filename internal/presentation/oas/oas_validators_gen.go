@@ -153,10 +153,10 @@ func (s *EstablishUserReq) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if value, ok := s.Gender.Get(); ok {
+		if value, ok := s.DateOfBirth.Get(); ok {
 			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
+					return errors.Wrap(err, "float")
 				}
 				return nil
 			}(); err != nil {
@@ -166,7 +166,7 @@ func (s *EstablishUserReq) Validate() error {
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "gender",
+			Name:  "dateOfBirth",
 			Error: err,
 		})
 	}
@@ -174,21 +174,6 @@ func (s *EstablishUserReq) Validate() error {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
-}
-
-func (s EstablishUserReqGender) Validate() error {
-	switch s {
-	case "男性":
-		return nil
-	case "女性":
-		return nil
-	case "その他":
-		return nil
-	case "回答しない":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
 }
 
 func (s *GetOpenedTalkSessionOK) Validate() error {
@@ -1204,6 +1189,36 @@ func (s *ReportDetailUser) Validate() error {
 	return nil
 }
 
+func (s *ReportOpinionReq) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.Reason.Get(); ok {
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "reason",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
 func (s ReportStatus) Validate() error {
 	switch s {
 	case "unsolved":
@@ -1698,10 +1713,10 @@ func (s *UpdateUserProfileReq) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if value, ok := s.Gender.Get(); ok {
+		if value, ok := s.DateOfBirth.Get(); ok {
 			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
+					return errors.Wrap(err, "float")
 				}
 				return nil
 			}(); err != nil {
@@ -1711,7 +1726,7 @@ func (s *UpdateUserProfileReq) Validate() error {
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "gender",
+			Name:  "dateOfBirth",
 			Error: err,
 		})
 	}
@@ -1719,21 +1734,6 @@ func (s *UpdateUserProfileReq) Validate() error {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
-}
-
-func (s UpdateUserProfileReqGender) Validate() error {
-	switch s {
-	case "男性":
-		return nil
-	case "女性":
-		return nil
-	case "その他":
-		return nil
-	case "回答しない":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
 }
 
 func (s *User) Validate() error {
@@ -1833,15 +1833,8 @@ func (s *Vote2Req) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if value, ok := s.VoteStatus.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
+		if err := s.VoteStatus.Validate(); err != nil {
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -1856,7 +1849,7 @@ func (s *Vote2Req) Validate() error {
 	return nil
 }
 
-func (s Vote2ReqVoteStatus) Validate() error {
+func (s VoteType) Validate() error {
 	switch s {
 	case "agree":
 		return nil

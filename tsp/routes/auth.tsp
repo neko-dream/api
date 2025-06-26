@@ -165,7 +165,6 @@ namespace kotohiro {
   @route("/auth/dev/detach")
   @delete
   @summary("**開発用** 現在のアカウントを切り離す")
-  @useAuth([])
   op authAccountDetach(): {
     @header("Set-Cookie") SetCookie?: string[];
     @body body: {};
@@ -182,7 +181,6 @@ namespace kotohiro {
   @route("/auth/revoke")
   @post
   @summary("トークンを失効（ログアウト）")
-  @useAuth([])
   op revokeToken(): {
     @statusCode statusCode: 204;
 

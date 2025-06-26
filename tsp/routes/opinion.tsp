@@ -54,8 +54,8 @@ namespace kotohiro {
   op reportOpinion(
     @path opinionID: string,
     @multipartBody body: {
-      reason?: HttpPart<integer | null>;
-      content?: HttpPart<string | null>;
+      reason?: HttpPart<numeric>;
+      content?: HttpPart<string>;
     },
   ): Body<{}> | {
     @statusCode statusCode: 400;
@@ -127,11 +127,11 @@ namespace kotohiro {
   op postOpinionPost2(
     @header contentType: "multipart/form-data",
     @multipartBody body: {
-      talkSessionID?: HttpPart<string | null>;
-      parentOpinionID?: HttpPart<string | null>;
-      title?: HttpPart<string | null>;
+      talkSessionID?: HttpPart<string>;
+      parentOpinionID?: HttpPart<string>;
+      title?: HttpPart<string>;
       opinionContent: HttpPart<string>;
-      referenceURL?: HttpPart<string | null>;
+      referenceURL?: HttpPart<string>;
       picture?: HttpPart<bytes>;
       isSeed?: HttpPart<boolean | null>;
     },

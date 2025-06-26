@@ -50,8 +50,6 @@ paths:
                 type: object
       tags:
         - auth
-      security:
-        - {}
       x-ogen-operation-group: Auth
   /auth/dev/login:
     get:
@@ -272,8 +270,6 @@ paths:
                 type: object
       tags:
         - auth
-      security:
-        - {}
       x-ogen-operation-group: Auth
   /auth/token/info:
     get:
@@ -573,18 +569,14 @@ paths:
               properties:
                 talkSessionID:
                   type: string
-                  nullable: true
                 parentOpinionID:
                   type: string
-                  nullable: true
                 title:
                   type: string
-                  nullable: true
                 opinionContent:
                   type: string
                 referenceURL:
                   type: string
-                  nullable: true
                 picture:
                   type: string
                   format: binary
@@ -594,14 +586,6 @@ paths:
               required:
                 - opinionContent
             encoding:
-              talkSessionID:
-                contentType: application/json
-              parentOpinionID:
-                contentType: application/json
-              title:
-                contentType: application/json
-              referenceURL:
-                contentType: application/json
               isSeed:
                 contentType: application/json
       x-ogen-operation-group: Opinion
@@ -860,17 +844,10 @@ paths:
               type: object
               properties:
                 reason:
-                  type: integer
-                  nullable: true
+                  type: number
                 content:
                   type: string
-                  nullable: true
               required: []
-            encoding:
-              reason:
-                contentType: application/json
-              content:
-                contentType: application/json
       x-ogen-operation-group: Opinion
   /opinions/{opinionID}/reports:
     get:
@@ -1009,9 +986,7 @@ paths:
               type: object
               properties:
                 voteStatus:
-                  allOf:
-                    - $ref: '#/components/schemas/VoteType'
-                  nullable: true
+                  $ref: '#/components/schemas/VoteType'
               required:
                 - voteStatus
             encoding:
@@ -2099,8 +2074,6 @@ paths:
                 type: object
       tags:
         - talk_session
-      security:
-        - {}
       x-ogen-operation-group: TalkSession
     post:
       operationId: consentTalkSession
@@ -2507,13 +2480,9 @@ paths:
                   type: string
                 parentActionItemID:
                   type: string
-                  nullable: true
               required:
                 - content
                 - status
-            encoding:
-              parentActionItemID:
-                contentType: application/json
       x-ogen-operation-group: Timeline
   /talksessions/{talkSessionID}/timelines:
     get:
@@ -2602,16 +2571,9 @@ paths:
               properties:
                 content:
                   type: string
-                  nullable: true
                 status:
                   type: string
-                  nullable: true
               required: []
-            encoding:
-              content:
-                contentType: application/json
-              status:
-                contentType: application/json
       x-ogen-operation-group: Timeline
   /test:
     get:
@@ -2777,33 +2739,18 @@ paths:
                   type: string
                   format: binary
                 dateOfBirth:
-                  type: string
+                  type: number
                 gender:
                   type: string
-                  enum:
-                    - 男性
-                    - 女性
-                    - その他
-                    - 回答しない
-                  nullable: true
                 prefecture:
                   type: string
                 city:
                   type: string
-                  nullable: true
                 email:
                   type: string
-                  nullable: true
               required:
                 - displayName
                 - displayID
-            encoding:
-              gender:
-                contentType: application/json
-              city:
-                contentType: application/json
-              email:
-                contentType: application/json
       x-ogen-operation-group: user
     put:
       operationId: updateUserProfile
@@ -2855,7 +2802,6 @@ paths:
               properties:
                 displayName:
                   type: string
-                  nullable: true
                 icon:
                   type: string
                   format: binary
@@ -2863,37 +2809,18 @@ paths:
                   type: boolean
                   nullable: true
                 dateOfBirth:
-                  type: string
+                  type: number
                 gender:
                   type: string
-                  enum:
-                    - 男性
-                    - 女性
-                    - その他
-                    - 回答しない
-                  nullable: true
                 city:
                   type: string
-                  nullable: true
                 prefecture:
                   type: string
-                  nullable: true
                 email:
                   type: string
-                  nullable: true
               required: []
             encoding:
-              displayName:
-                contentType: application/json
               deleteIcon:
-                contentType: application/json
-              gender:
-                contentType: application/json
-              city:
-                contentType: application/json
-              prefecture:
-                contentType: application/json
-              email:
                 contentType: application/json
       x-ogen-operation-group: user
   /v1/manage/talksessions/list:
