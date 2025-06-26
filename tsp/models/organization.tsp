@@ -43,4 +43,16 @@ namespace kotohiro {
     aliasName: string;
     createdAt?: string | null;
   }
+
+  /**
+   * 組織ユーザー
+   */
+  model OrganizationUser {
+    userID: string;
+    displayID: string;
+    displayName: string;
+    iconURL?: string | null;
+    role: integer;
+    roleName: string;
+  }
 }

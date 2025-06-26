@@ -162,4 +162,22 @@ namespace kotohiro {
     @statusCode statusCode: 500;
     @body body: {};
   };
+
+  @tag("organization")
+  @extension("x-ogen-operation-group", "Organization")
+  @route("/organizations/users")
+  @get
+  @summary("現在の組織のユーザー一覧取得")
+  op getOrganizationUsers(): Body<{
+    users: OrganizationUser[];
+  }> | {
+    @statusCode statusCode: 400;
+    @body body: {};
+  } | {
+    @statusCode statusCode: 401;
+    @body body: {};
+  } | {
+    @statusCode statusCode: 500;
+    @body body: {};
+  };
 }
