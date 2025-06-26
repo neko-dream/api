@@ -8,6 +8,7 @@ import (
 	user_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/user"
 
 	opinion_q "github.com/neko-dream/server/internal/application/query/opinion"
+	"github.com/neko-dream/server/internal/application/query/organization_query"
 	"github.com/neko-dream/server/internal/application/query/policy_query"
 	report_q "github.com/neko-dream/server/internal/application/query/report_query"
 	"github.com/neko-dream/server/internal/application/query/talksession"
@@ -80,5 +81,6 @@ func useCaseDeps() []ProvideArg {
 		{organization_usecase.NewCreateOrganizationAliasUseCase, nil},
 		{organization_usecase.NewDeactivateOrganizationAliasUseCase, nil},
 		{organization_usecase.NewListOrganizationAliasesUseCase, nil},
+		{organization_query.NewListOrganizationUsersQuery, nil},
 	}
 }

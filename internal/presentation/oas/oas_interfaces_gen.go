@@ -81,6 +81,10 @@ type GetOrganizationAliasesRes interface {
 	getOrganizationAliasesRes()
 }
 
+type GetOrganizationUsersRes interface {
+	getOrganizationUsersRes()
+}
+
 type GetOrganizationsRes interface {
 	getOrganizationsRes()
 }
