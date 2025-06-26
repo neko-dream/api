@@ -13,6 +13,8 @@ type Provider struct {
 	JwksURI               string
 	Algos                 []string
 	Config                *config.Config
+	// AuthURLOptions contains provider-specific OAuth URL parameters
+	AuthURLOptions map[string]string
 }
 
 var (
@@ -32,6 +34,9 @@ var (
 			UserInfoEndpoint:      "https://api.line.me/v2/profile",
 			JwksURI:               "https://api.line.me/oauth2/v2.1/certs",
 			Algos:                 []string{"ES256", "HS256"},
+			AuthURLOptions: map[string]string{
+				"bot_prompt": "aggressive",
+			},
 		},
 	}
 )
