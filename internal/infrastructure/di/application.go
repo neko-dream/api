@@ -3,11 +3,13 @@ package di
 import (
 	analysis_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/analysis"
 	opinion_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/opinion"
+	organization_q "github.com/neko-dream/server/internal/infrastructure/persistence/query/organization"
 	report_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/report"
 	talksession_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/talksession"
 	user_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/user"
 
 	opinion_q "github.com/neko-dream/server/internal/application/query/opinion"
+	"github.com/neko-dream/server/internal/application/query/organization_query"
 	"github.com/neko-dream/server/internal/application/query/policy_query"
 	report_q "github.com/neko-dream/server/internal/application/query/report_query"
 	"github.com/neko-dream/server/internal/application/query/talksession"
@@ -80,5 +82,7 @@ func useCaseDeps() []ProvideArg {
 		{organization_usecase.NewCreateOrganizationAliasUseCase, nil},
 		{organization_usecase.NewDeactivateOrganizationAliasUseCase, nil},
 		{organization_usecase.NewListOrganizationAliasesUseCase, nil},
+		{organization_q.NewListJoinedOrganizationQuery, nil},
+		{organization_query.NewListOrganizationUsersQuery, nil},
 	}
 }
