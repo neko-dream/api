@@ -9,21 +9,23 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   const router = useRouterState();
-  const isLoginPage = router.location.pathname === '/login';
+  const isLoginPage = router.location.pathname === '/login' || router.location.pathname === '/admin/login';
 
   return (
-    <UserProvider>
-      <NotificationProvider>
-        {isLoginPage ? (
-          <Outlet />
-        ) : (
-          <Layout>
-            <div className="container mx-auto px-4 py-6">
-              <Outlet />
-            </div>
-          </Layout>
-        )}
-      </NotificationProvider>
-    </UserProvider>
+    <div className="h-full">
+      <UserProvider>
+        <NotificationProvider>
+          {isLoginPage ? (
+            <Outlet />
+          ) : (
+            <Layout>
+              <div className="container mx-auto px-4 py-6">
+                <Outlet />
+              </div>
+            </Layout>
+          )}
+        </NotificationProvider>
+      </UserProvider>
+    </div>
   );
 }
