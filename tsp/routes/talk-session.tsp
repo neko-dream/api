@@ -17,7 +17,6 @@ namespace kotohiro {
   @route("/talksessions/{talkSessionID}/restrictions")
   @get
   @summary("セッションで満たしていない制限")
-  @useAuth([])
   op getTalkSessionRestrictionSatisfied(
     @path talkSessionID: string,
   ): Body<Restriction[]> | {

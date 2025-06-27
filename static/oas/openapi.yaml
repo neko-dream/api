@@ -2380,8 +2380,6 @@ paths:
                 type: object
       tags:
         - talk_session
-      security:
-        - {}
       x-ogen-operation-group: TalkSession
   /talksessions/{talkSessionID}/swipe_opinions:
     get:
