@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
-import { useUser } from '../contexts/UserContext';
 
 interface LayoutProps {
   children?: React.ReactNode;
@@ -9,11 +8,6 @@ interface LayoutProps {
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { currentUser } = useUser();
-
-  if (!currentUser) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
