@@ -4212,6 +4212,20 @@ func (o OptUserGroupPosition) Or(d UserGroupPosition) UserGroupPosition {
 	return d
 }
 
+type OptionalCookieAuth struct {
+	APIKey string
+}
+
+// GetAPIKey returns the value of APIKey.
+func (s *OptionalCookieAuth) GetAPIKey() string {
+	return s.APIKey
+}
+
+// SetAPIKey sets the value of APIKey.
+func (s *OptionalCookieAuth) SetAPIKey(val string) {
+	s.APIKey = val
+}
+
 // Ref: #/components/schemas/Organization
 type Organization struct {
 	// 組織ID.

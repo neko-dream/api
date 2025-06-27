@@ -2,7 +2,6 @@ package talksession_query
 
 import (
 	"context"
-	"log"
 
 	"github.com/jinzhu/copier"
 	"github.com/neko-dream/server/internal/application/query/dto"
@@ -31,7 +30,6 @@ func (h *getTalkSessionDetailByIDQuery) Execute(ctx context.Context, input talks
 	if err != nil {
 		return nil, messages.TalkSessionNotFound
 	}
-	log.Printf("talkSessionRow: %+v", talkSessionRow)
 
 	var result dto.TalkSessionWithDetail
 	if err := copier.CopyWithOption(&result, talkSessionRow, copier.Option{

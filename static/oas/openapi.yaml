@@ -681,7 +681,7 @@ paths:
       tags:
         - opinion
       security:
-        - {}
+        - OptionalCookieAuth: []
       x-ogen-operation-group: Opinion
   /opinions/{opinionID}:
     get:
@@ -709,7 +709,7 @@ paths:
       tags:
         - opinion
       security:
-        - {}
+        - OptionalCookieAuth: []
       x-ogen-operation-group: Opinion
   /opinions/{opinionID}/analysis:
     get:
@@ -745,7 +745,7 @@ paths:
       tags:
         - opinion
       security:
-        - {}
+        - OptionalCookieAuth: []
       x-ogen-operation-group: Opinion
   /opinions/{opinionID}/replies:
     get:
@@ -803,7 +803,7 @@ paths:
       tags:
         - opinion
       security:
-        - {}
+        - OptionalCookieAuth: []
       x-ogen-operation-group: Opinion
   /opinions/{opinionID}/report:
     post:
@@ -2218,7 +2218,7 @@ paths:
       tags:
         - opinion
       security:
-        - {}
+        - OptionalCookieAuth: []
       x-ogen-operation-group: Opinion
   /talksessions/{talkSessionID}/report:
     get:
@@ -2448,6 +2448,8 @@ paths:
                   - message
       tags:
         - opinion
+      security:
+        - OptionalCookieAuth: []
       x-ogen-operation-group: Opinion
   /talksessions/{talkSessionID}/timeline:
     post:
@@ -3300,6 +3302,29 @@ components:
             - $ref: '#/components/schemas/VoteType'
           nullable: true
       description: 意見と投票情報を含むレスポンス
+    OptionalCookieAuth:
+      type: object
+      required:
+        - type
+        - in
+        - name
+      properties:
+        type:
+          type: string
+          enum:
+            - apiKey
+          description: API key authentication
+        in:
+          type: string
+          enum:
+            - cookie
+          description: location of the API key
+        name:
+          type: string
+          enum:
+            - SessionId
+          description: name of the API key
+      description: Optional cookie-based authentication - will populate session context if authenticated but won't require it
     Organization:
       type: object
       required:
@@ -3894,3 +3919,8 @@ components:
       in: cookie
       name: SessionId
       description: Cookie-based authentication using JWT tokens stored in secure HTTP-only cookies
+    OptionalCookieAuth:
+      type: apiKey
+      in: cookie
+      name: SessionId
+      description: Optional cookie-based authentication - will populate session context if authenticated but won't require it
