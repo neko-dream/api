@@ -1380,7 +1380,7 @@ paths:
       tags:
         - policy
       security:
-        - {}
+        - OptionalCookieAuth: []
       x-ogen-operation-group: Policy
     post:
       operationId: policyConsent
@@ -1532,7 +1532,7 @@ paths:
       tags:
         - talk_session
       security:
-        - {}
+        - OptionalCookieAuth: []
       x-ogen-operation-group: TalkSession
     post:
       operationId: initiateTalkSession
@@ -1793,7 +1793,7 @@ paths:
       tags:
         - talk_session
       security:
-        - {}
+        - OptionalCookieAuth: []
       x-ogen-operation-group: TalkSession
   /talksessions/{talkSessionID}:
     get:
@@ -1829,7 +1829,7 @@ paths:
       tags:
         - talk_session
       security:
-        - {}
+        - OptionalCookieAuth: []
       x-ogen-operation-group: TalkSession
     put:
       operationId: editTalkSession
@@ -1994,7 +1994,7 @@ paths:
       tags:
         - talk_session
       security:
-        - {}
+        - OptionalCookieAuth: []
       x-ogen-operation-group: TalkSession
   /talksessions/{talkSessionID}/conclusion:
     get:
@@ -2380,6 +2380,8 @@ paths:
                 type: object
       tags:
         - talk_session
+      security:
+        - OptionalCookieAuth: []
       x-ogen-operation-group: TalkSession
   /talksessions/{talkSessionID}/swipe_opinions:
     get:
