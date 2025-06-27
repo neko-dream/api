@@ -17,10 +17,10 @@ export const SessionCard = ({ session, onRefetch }: SessionCardProps) => {
   }
 
   return (
-    <Card title={session.Theme} headerRight={
+    <Card title={session.theme} headerRight={
       <span
         className={`inline-flex items-center px-4 mx-4 py-1 rounded-full text-xs font-medium
-          ${session.Hidden
+          ${session.hidden
             ? 'bg-red-50/50 text-red-600 ring-1 ring-red-100'
             : 'bg-green-50/50 text-green-600 ring-1 ring-green-100'
           }`}
@@ -32,7 +32,7 @@ export const SessionCard = ({ session, onRefetch }: SessionCardProps) => {
           viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
         >
-          {session.Hidden ? (
+          {session.hidden ? (
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -56,38 +56,38 @@ export const SessionCard = ({ session, onRefetch }: SessionCardProps) => {
             </>
           )}
         </svg>
-        レポート: {session.Hidden ? '非表示' : '表示'}
+        レポート: {session.hidden ? '非表示' : '表示'}
       </span>
     }>
       <div className="p-5 bg-gray-50">
         <div className="grid grid-cols-2 gap-3 text-sm text-gray-600">
           <div className="flex items-center">
             <i className="fas fa-fingerprint w-5 text-gray-400"></i>
-            <span className="ml-2">セッションID: <span className="font-mono text-xs bg-gray-200 px-2 py-0.5 rounded">{session.TalkSessionID}</span></span>
+            <span className="ml-2">セッションID: <span className="font-mono text-xs bg-gray-200 px-2 py-0.5 rounded">{session.talkSessionID}</span></span>
           </div>
           <div className="flex items-center">
             <i className="fas fa-user w-5 text-gray-400"></i>
-            <span className="ml-2">作成者: <span className="font-semibold">{session.Owner.DisplayName}</span></span>
+            <span className="ml-2">作成者: <span className="font-semibold">{session.owner.displayName}</span></span>
           </div>
           <div className="flex items-center">
             <i className="far fa-calendar-plus w-5 text-gray-400"></i>
-            <span className="ml-2">開始日時: {new Date(session.CreatedAt).toLocaleString()}</span>
+            <span className="ml-2">開始日時: {new Date(session.createdAt).toLocaleString()}</span>
           </div>
           <div className="flex items-center">
             <i className="far fa-calendar-check w-5 text-gray-400"></i>
-            <span className="ml-2">終了日時: {new Date(session.ScheduledEndTime).toLocaleString()}</span>
+            <span className="ml-2">終了日時: {new Date(session.scheduledEndTime).toLocaleString()}</span>
           </div>
           <div className="flex items-center">
             <i className="far fa-comment-dots w-5 text-gray-400"></i>
-            <span className="ml-2">意見数: <span className="font-semibold">{session.OpinionCount}</span></span>
+            <span className="ml-2">意見数: <span className="font-semibold">{session.opinionCount}</span></span>
           </div>
           <div>
             <i className="fas fa-thumbs-up w-5 text-gray-400"></i>
-            <span className="ml-2">投票数: <span className="font-semibold">{session.VoteCount}</span></span>
+            <span className="ml-2">投票数: <span className="font-semibold">{session.voteCount}</span></span>
           </div>
           <div>
             <i className="fas fa-user-friends w-5 text-gray-400"></i>
-            <span className="ml-2">投票ユーザー数: <span className="font-semibold">{session.VoteUserCount}</span></span>
+            <span className="ml-2">投票ユーザー数: <span className="font-semibold">{session.voteUserCount}</span></span>
           </div>
         </div>
       </div>
