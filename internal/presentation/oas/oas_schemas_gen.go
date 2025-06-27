@@ -4463,14 +4463,8 @@ type PasswordRegisterOK struct{}
 func (*PasswordRegisterOK) passwordRegisterRes() {}
 
 type PasswordRegisterReq struct {
-	ID       string `json:"id"`
 	Password string `json:"password"`
 	Email    string `json:"email"`
-}
-
-// GetID returns the value of ID.
-func (s *PasswordRegisterReq) GetID() string {
-	return s.ID
 }
 
 // GetPassword returns the value of Password.
@@ -4481,11 +4475,6 @@ func (s *PasswordRegisterReq) GetPassword() string {
 // GetEmail returns the value of Email.
 func (s *PasswordRegisterReq) GetEmail() string {
 	return s.Email
-}
-
-// SetID sets the value of ID.
-func (s *PasswordRegisterReq) SetID(val string) {
-	s.ID = val
 }
 
 // SetPassword sets the value of Password.
