@@ -31,6 +31,7 @@ const api = {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: formData.toString(),
+        credentials: 'include',
       });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -48,6 +49,7 @@ const api = {
       formData.append('type', type);
       const response = await fetch(`/v1/manage/talksessions/${talkSessionID}/analysis/regenerate`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
@@ -70,6 +72,7 @@ const api = {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
       });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -93,7 +96,7 @@ export const SessionReport = ({ session, onRefetch }: SessionReportProps) => {
 
   const toggleHideReport = useMutation<void, Error, boolean>({
     mutationFn: async (hideStatus) => {
-      const result = await api.toggleHideReport(session.TalkSessionID, hideStatus);
+      const result = await api.toggleHideReport(session.talkSessionID, hideStatus);
       if (result.status === "success" || result.status === "ok") {
         onRefetch();
         showNotification(`レポートを${hideStatus ? '非表示' : '表示'}にしました`, 'success');
@@ -109,7 +112,7 @@ export const SessionReport = ({ session, onRefetch }: SessionReportProps) => {
 
   const generateAnalysis = useMutation<void, Error, string>({
     mutationFn: async (type) => {
-      const result = await api.generateAnalysis(session.TalkSessionID, type);
+      const result = await api.generateAnalysis(session.talkSessionID, type);
       if (result.status === "success" || result.status === "ok") {
         showNotification('分析を再実行しました', 'success');
       } else {
@@ -141,7 +144,7 @@ export const SessionReport = ({ session, onRefetch }: SessionReportProps) => {
       setExpanded(true);
       if (!reportContent) {
         try {
-          const result = await api.getReport(session.TalkSessionID);
+          const result = await api.getReport(session.talkSessionID);
           if (!result.code && result.report) {
             setReportContent(result.report);
           } else {
@@ -175,10 +178,10 @@ export const SessionReport = ({ session, onRefetch }: SessionReportProps) => {
       <div className="flex justify-between items-center px-4 mt-4">
         <div className="flex items-center space-x-2">
           <button
-            onClick={() => toggleHideReport.mutate(!session.Hidden)}
+            onClick={() => toggleHideReport.mutate(!session.hidden)}
             disabled={toggleHideReport.isPending}
             className={`inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out
-              ${session.Hidden
+              ${session.hidden
                 ? 'bg-gradient-to-r from-red-50 to-rose-50 text-red-600 hover:text-red-700 border border-red-100 hover:border-red-200'
                 : 'bg-gradient-to-r from-green-50 to-emerald-50 text-green-600 hover:text-green-700 border border-green-100 hover:border-green-200'
               }
@@ -203,7 +206,7 @@ export const SessionReport = ({ session, onRefetch }: SessionReportProps) => {
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
                 >
-                  {session.Hidden ? (
+                  {session.hidden ? (
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -227,12 +230,12 @@ export const SessionReport = ({ session, onRefetch }: SessionReportProps) => {
                     </>
                   )}
                 </svg>
-                レポート{session.Hidden ? '表示' : '非表示'}
+                レポート{session.hidden ? '表示' : '非表示'}
               </>
             )}
           </button>
 
-          {currentUser && currentUser.displayID === session.Owner.DisplayID && (
+          {currentUser && currentUser.displayID === session.owner.displayID && (
             <button
               onClick={() => setShowSeedModal(true)}
               className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out
@@ -347,9 +350,9 @@ export const SessionReport = ({ session, onRefetch }: SessionReportProps) => {
       <div className="border-t border-gray-200">
         <button
           onClick={toggleReport}
-          className={`w-full px-4 py-3 text-sm font-medium ${session.OpinionCount === 0 ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-50'} transition-colors duration-200 flex items-center justify-center`}
-          disabled={session.OpinionCount === 0}
-          title={session.OpinionCount === 0 ? '意見が投稿されていないため、レポートをプレビューできません' : ''}
+          className={`w-full px-4 py-3 text-sm font-medium ${session.opinionCount === 0 ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-50'} transition-colors duration-200 flex items-center justify-center`}
+          disabled={session.opinionCount === 0}
+          title={session.opinionCount === 0 ? '意見が投稿されていないため、レポートをプレビューできません' : ''}
         >
           <i className="fas fa-file-alt mr-2"></i>
           <span>{expanded ? 'レポートを隠す' : 'レポートをプレビュー'}</span>
@@ -371,7 +374,7 @@ export const SessionReport = ({ session, onRefetch }: SessionReportProps) => {
 
       {showSeedModal && (
         <SeedOpinionModal
-          sessionId={session.TalkSessionID}
+          sessionId={session.talkSessionID}
           onClose={() => setShowSeedModal(false)}
         />
       )}
