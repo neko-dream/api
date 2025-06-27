@@ -38,6 +38,10 @@ export const authService = {
       });
 
       if (!response.ok) {
+        // If 403, redirect to login page (only if not already on login page)
+        if (response.status === 403 && !window.location.pathname.includes('/login')) {
+          window.location.href = '/admin/login';
+        }
         return null;
       }
 
