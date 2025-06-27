@@ -32,8 +32,12 @@ export const LoginForm = () => {
     const baseUrl = '/auth/google/login';
     const params = new URLSearchParams({
       redirect_url: redirectUrl,
-      organization_code: organizationCode || 'ORG_CODE'
     });
+    
+    // Only add organization_code if it has a value
+    if (organizationCode) {
+      params.append('organization_code', organizationCode);
+    }
 
     const loginUrl = `${baseUrl}?${params.toString()}`;
     window.location.href = loginUrl;
@@ -42,12 +46,12 @@ export const LoginForm = () => {
   return (
     <Card className="w-full max-w-md" title="ログイン">
       <div className="px-6">
-        <p className="text-gray-600 mb-6">組織を選択してGoogleアカウントでログインしてください</p>
+        <p className="text-gray-600 mb-6">Googleアカウントでログインしてください</p>
 
         <div className="space-y-4">
           <div>
             <label htmlFor="organization-code" className="block text-sm font-medium text-gray-700 mb-1">
-              組織
+              組織（オプション）
             </label>
             {organizations.length > 0 ? (
               <select
@@ -57,7 +61,7 @@ export const LoginForm = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 disabled={isLoadingOrgs}
               >
-                <option value="">組織を選択してください</option>
+                <option value="">組織を選択（オプション）</option>
                 {organizations.map((org) => (
                   <option key={org.ID} value={org.code}>
                     {org.name} ({org.roleName})
@@ -68,7 +72,7 @@ export const LoginForm = () => {
               <input
                 id="organization-code"
                 type="text"
-                placeholder="組織コード"
+                placeholder="組織コード（オプション）"
                 value={organizationCode}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOrganizationCode(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -79,7 +83,7 @@ export const LoginForm = () => {
 
           <button
             onClick={handleGoogleLogin}
-            disabled={!organizationCode || isLoadingOrgs}
+            disabled={isLoadingOrgs}
             className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             {isLoadingOrgs ? '読み込み中...' : 'Googleでログイン'}
