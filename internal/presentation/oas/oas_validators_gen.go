@@ -1848,39 +1848,3 @@ func (s Vote2OKApplicationJSON) Validate() error {
 	}
 	return nil
 }
-
-func (s *Vote2Req) Validate() error {
-	if s == nil {
-		return validate.ErrNilPointer
-	}
-
-	var failures []validate.FieldError
-	if err := func() error {
-		if err := s.VoteStatus.Validate(); err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "voteStatus",
-			Error: err,
-		})
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s VoteType) Validate() error {
-	switch s {
-	case "agree":
-		return nil
-	case "disagree":
-		return nil
-	case "pass":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
-}

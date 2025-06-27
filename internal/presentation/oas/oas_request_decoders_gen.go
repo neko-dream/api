@@ -3104,25 +3104,16 @@ func (s *Server) decodeVote2Request(r *http.Request) (
 					if err != nil {
 						return err
 					}
-					if err := func(d *jx.Decoder) error {
-						if err := request.VoteStatus.Decode(d); err != nil {
-							return err
-						}
-						return nil
-					}(jx.DecodeStr(val)); err != nil {
+
+					c, err := conv.ToString(val)
+					if err != nil {
 						return err
 					}
+
+					request.VoteStatus = c
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"voteStatus\"")
-				}
-				if err := func() error {
-					if err := request.VoteStatus.Validate(); err != nil {
-						return err
-					}
-					return nil
-				}(); err != nil {
-					return req, close, errors.Wrap(err, "validate")
 				}
 			} else {
 				return req, close, errors.Wrap(err, "query")

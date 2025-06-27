@@ -986,12 +986,9 @@ paths:
               type: object
               properties:
                 voteStatus:
-                  $ref: '#/components/schemas/VoteType'
+                  type: string
               required:
                 - voteStatus
-            encoding:
-              voteStatus:
-                contentType: application/json
       x-ogen-operation-group: Vote
   /organization/{code}/validate:
     get:

@@ -7176,65 +7176,15 @@ type Vote2OKApplicationJSON []Opinion
 func (*Vote2OKApplicationJSON) vote2Res() {}
 
 type Vote2Req struct {
-	VoteStatus VoteType `json:"voteStatus"`
+	VoteStatus string `json:"voteStatus"`
 }
 
 // GetVoteStatus returns the value of VoteStatus.
-func (s *Vote2Req) GetVoteStatus() VoteType {
+func (s *Vote2Req) GetVoteStatus() string {
 	return s.VoteStatus
 }
 
 // SetVoteStatus sets the value of VoteStatus.
-func (s *Vote2Req) SetVoteStatus(val VoteType) {
+func (s *Vote2Req) SetVoteStatus(val string) {
 	s.VoteStatus = val
-}
-
-// 投票タイプ.
-// Ref: #/components/schemas/VoteType
-type VoteType string
-
-const (
-	VoteTypeAgree    VoteType = "agree"
-	VoteTypeDisagree VoteType = "disagree"
-	VoteTypePass     VoteType = "pass"
-)
-
-// AllValues returns all VoteType values.
-func (VoteType) AllValues() []VoteType {
-	return []VoteType{
-		VoteTypeAgree,
-		VoteTypeDisagree,
-		VoteTypePass,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s VoteType) MarshalText() ([]byte, error) {
-	switch s {
-	case VoteTypeAgree:
-		return []byte(s), nil
-	case VoteTypeDisagree:
-		return []byte(s), nil
-	case VoteTypePass:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *VoteType) UnmarshalText(data []byte) error {
-	switch VoteType(data) {
-	case VoteTypeAgree:
-		*s = VoteTypeAgree
-		return nil
-	case VoteTypeDisagree:
-		*s = VoteTypeDisagree
-		return nil
-	case VoteTypePass:
-		*s = VoteTypePass
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
 }
