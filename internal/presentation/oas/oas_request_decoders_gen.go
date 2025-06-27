@@ -1761,33 +1761,6 @@ func (s *Server) decodePasswordRegisterRequest(r *http.Request) (
 		q := uri.NewQueryDecoder(form)
 		{
 			cfg := uri.QueryParameterDecodingConfig{
-				Name:    "id",
-				Style:   uri.QueryStyleForm,
-				Explode: true,
-			}
-			if err := q.HasParam(cfg); err == nil {
-				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-
-					c, err := conv.ToString(val)
-					if err != nil {
-						return err
-					}
-
-					request.ID = c
-					return nil
-				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"id\"")
-				}
-			} else {
-				return req, close, errors.Wrap(err, "query")
-			}
-		}
-		{
-			cfg := uri.QueryParameterDecodingConfig{
 				Name:    "password",
 				Style:   uri.QueryStyleForm,
 				Explode: true,

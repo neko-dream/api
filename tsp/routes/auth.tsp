@@ -225,7 +225,6 @@ namespace kotohiro {
   @useAuth([])
   op passwordRegister(
     @multipartBody body: {
-      id: HttpPart<string>;
       password: HttpPart<string>;
       email: HttpPart<string>;
     },

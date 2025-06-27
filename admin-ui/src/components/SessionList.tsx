@@ -27,6 +27,7 @@ export const SessionList = ({ initialPage = 1 }: SessionListProps) => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
       });
 
       if (!response.ok) {
@@ -56,7 +57,7 @@ export const SessionList = ({ initialPage = 1 }: SessionListProps) => {
     return null;
   }
 
-  const totalPages = Math.ceil((data?.TotalCount || 0) / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil((data?.totalCount || 0) / ITEMS_PER_PAGE);
 
   return (
     <div className="space-y-4">
@@ -70,15 +71,21 @@ export const SessionList = ({ initialPage = 1 }: SessionListProps) => {
         </div>
       )}
 
-      {data?.TalkSessionStats?.map((session: any) => (
-        <SessionCard
-          key={session.TalkSessionID}
-          session={session}
-          onRefetch={() => {
-            refetch();
-          }}
-        />
-      ))}
+      {data?.talkSessionStats && data.talkSessionStats.length > 0 ? (
+        data.talkSessionStats.map((session: any) => (
+          <SessionCard
+            key={session.talkSessionID}
+            session={session}
+            onRefetch={() => {
+              refetch();
+            }}
+          />
+        ))
+      ) : (
+        <div className="text-center py-8 text-gray-500">
+          セッションが見つかりませんでした
+        </div>
+      )}
 
       {totalPages > 1 && (
         <div className="mt-8">

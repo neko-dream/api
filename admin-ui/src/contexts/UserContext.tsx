@@ -1,69 +1,93 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-
-interface User {
-  displayName: string;
-  displayID: string;
-  Email: string;
-  Role: string;
-  IconURL?: string;
-}
+import { useNavigate, useRouterState } from '@tanstack/react-router';
+import { authService } from '@/services/auth';
 
 interface UserContextType {
-  currentUser: User | null;
+  currentUser?: {
+    id: string;
+    name?: string;
+    email?: string;
+    displayID?: string;
+    organizationCode?: string;
+    organizationID?: string;
+    organizationRole?: string;
+  };
   isLoading: boolean;
-  error: Error | null;
-  refetch: () => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | null>(null);
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: async () => {
-      const response = await fetch('/auth/token/info', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('ユーザー情報の取得に失敗しました');
-      }
-
-      const result = await response.json();
-      if (result.code) {
-        throw new Error('ユーザー情報の取得に失敗しました');
-      }
-      return result;
-    },
-    staleTime: 5 * 60 * 1000, // 5分間キャッシュ
-  });
+  const [currentUser, setCurrentUser] = useState<UserContextType['currentUser']>();
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+  const router = useRouterState();
+  const isLoginPage = router.location.pathname === '/login';
 
   useEffect(() => {
-    if (data) {
-      setCurrentUser(data);
-    }
-  }, [data]);
+    const checkAuth = async () => {
+      // Skip auth check on login page
+      if (isLoginPage) {
+        setIsLoading(false);
+        return;
+      }
+      setIsLoading(true);
+      try {
+        const tokenInfo = await authService.getTokenInfo();
+        
+        if (!tokenInfo) {
+          // Not authenticated
+          navigate({ to: '/login' });
+          return;
+        }
 
-  useEffect(() => {
-    if (!isLoading && !currentUser && !error) {
-      window.location.href = '/login';
-    }
-  }, [currentUser]);
+        // Check if user has organization parameters
+        if (!tokenInfo.organizationCode || !tokenInfo.organizationID) {
+          // User is authenticated but not associated with an organization
+          navigate({ to: '/login' });
+          return;
+        }
 
-  const value = {
+        // Set user data
+        setCurrentUser({
+          id: tokenInfo.sub,
+          name: tokenInfo.displayName,
+          displayID: tokenInfo.displayID,
+          organizationCode: tokenInfo.organizationCode,
+          organizationID: tokenInfo.organizationID,
+          organizationRole: tokenInfo.organizationRole,
+        });
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        navigate({ to: '/login' });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, [navigate, isLoginPage]);
+
+  const logout = async () => {
+    await authService.logout();
+    setCurrentUser(undefined);
+    navigate({ to: '/login' });
+  };
+
+  const value: UserContextType = {
     currentUser,
     isLoading,
-    error,
-    refetch: async () => {
-      await refetch();
-    },
+    logout,
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-gray-500">Loading...</div>
+      </div>
+    );
+  }
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };

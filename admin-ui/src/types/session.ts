@@ -1,23 +1,32 @@
 export interface Owner {
-  DisplayName: string;
-  DisplayID: string;
+  userID: string;
+  displayName: string;
+  displayID: string;
+  iconURL: string;
+  lastLoginAt: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Session {
-  TalkSessionID: string;
-  Theme: string;
-  Hidden: boolean;
-  Owner: Owner;
-  CreatedAt: string;
-  ScheduledEndTime: string;
-  OpinionCount: number;
-  VoteCount: number;
-  VoteUserCount: number;
+  talkSessionID: string;
+  theme: string;
+  description: string;
+  owner: Owner;
+  scheduledEndTime: string;
+  thumbnailURL: string;
+  hidden: boolean;
+  updatedAt: string;
+  createdAt: string;
+  opinionCount: number;
+  opinionUserCount: number;
+  voteCount: number;
+  voteUserCount: number;
 }
 
 export interface TalkSessionListResponse {
-  TotalCount: number;
-  TalkSessionStats: Session[];
+  totalCount: number;
+  talkSessionStats: Session[];
 }
 
 export interface ReportResponse {

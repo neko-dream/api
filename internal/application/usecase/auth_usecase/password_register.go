@@ -68,7 +68,7 @@ func NewPasswordRegister(
 func (p *passwordRegisterInteractor) Execute(ctx context.Context, input PasswordRegisterInput) (*PasswordRegisterOutput, error) {
 	ctx, span := otel.Tracer("auth_command").Start(ctx, "passwordRegisterInteractor.Execute")
 	defer span.End()
-	if p.cfg.Env != config.PROD {
+	if p.cfg.Env == config.PROD {
 		return nil, messages.InternalServerError
 	}
 
@@ -76,6 +76,7 @@ func (p *passwordRegisterInteractor) Execute(ctx context.Context, input Password
 	if err := p.ExecTx(ctx, func(ctx context.Context) error {
 		authProviderName, err := shared.NewAuthProviderName("password")
 		if err != nil {
+			utils.HandleError(ctx, err, "NewAuthProviderName")
 			return errtrace.Wrap(err)
 		}
 		subject, err := hash.HashEmail(input.Email, p.cfg.HASH_PEPPER)
@@ -83,11 +84,7 @@ func (p *passwordRegisterInteractor) Execute(ctx context.Context, input Password
 			utils.HandleError(ctx, err, "HashEmail")
 			return messages.InvalidPasswordOrEmailError
 		}
-		existUser, err := p.userRepository.FindBySubject(ctx, user.UserSubject(subject))
-		if err != nil {
-			utils.HandleError(ctx, err, "UserRepository.FindBySubject")
-			return errtrace.Wrap(err)
-		}
+		existUser, _ := p.userRepository.FindBySubject(ctx, user.UserSubject(subject))
 		if existUser != nil {
 			return errors.New("既に登録済みです。")
 		}

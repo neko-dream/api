@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"braces.dev/errtrace"
+	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/service"
 	organizationService "github.com/neko-dream/server/internal/domain/service/organization"
@@ -100,6 +101,10 @@ func (a *authLoginInteractor) Execute(ctx context.Context, input AuthLoginInput)
 		if err != nil {
 			utils.HandleError(ctx, err, "ResolveOrganizationIDFromCode")
 			return errtrace.Wrap(err)
+		}
+		if input.OrganizationCode != nil && organizationID == nil {
+			// 組織コードが指定されているが、組織が見つからない場合はエラー
+			return messages.OrganizationNotFound
 		}
 
 		state := auth.NewState(stateString, input.Provider, input.RedirectURL, time.Now().Add(auth.StateExpirationDuration), input.RegistrationURL, organizationID)

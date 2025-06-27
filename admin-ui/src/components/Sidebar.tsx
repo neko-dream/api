@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from '@tanstack/react-router';
 import { UserStatsGraph, UserStatsTotal } from './UserStats';
-import { useUser } from '../contexts/UserContext';
+import { useUser } from '@/contexts/UserContext';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -15,7 +15,7 @@ interface MenuItem {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
-  const { currentUser } = useUser();
+  const { currentUser, logout } = useUser();
   const menuItems: MenuItem[] = [
     { path: '/', label: 'ダッシュボード', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
     // { path: '/users', label: 'ユーザー管理', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z' },
@@ -102,22 +102,40 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
         {/* フッター */}
         <div className="p-4 border-t border-gray-100">
-          <div className="flex items-center">
-            {currentUser?.IconURL ? (
-              <img
-                src={currentUser.IconURL}
-                alt={currentUser.displayName}
-                className="w-8 h-8 rounded-full object-cover"
-              />
-            ) : (
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
               <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
-                {currentUser?.displayName?.charAt(0) || 'A'}
+                {currentUser?.name?.[0]?.toUpperCase() || currentUser?.displayID?.[0]?.toUpperCase() || 'U'}
               </div>
-            )}
-            <div className="ml-3">
-              <p className="text-sm font-medium text-gray-800">{currentUser?.displayName || 'Admin User'}</p>
-              <p className="text-xs text-gray-500">{currentUser?.displayID}</p>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-800">
+                  {currentUser?.name || currentUser?.displayID || 'ユーザー'}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {currentUser?.organizationRole || '一般'} - {currentUser?.organizationCode}
+                </p>
+              </div>
             </div>
+            <button
+              onClick={logout}
+              className="p-2 text-gray-500 hover:text-gray-700 transition-colors duration-200"
+              title="ログアウト"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                />
+              </svg>
+            </button>
           </div>
         </div>
       </div>

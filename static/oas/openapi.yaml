@@ -223,14 +223,11 @@ paths:
             schema:
               type: object
               properties:
-                id:
-                  type: string
                 password:
                   type: string
                 email:
                   type: string
               required:
-                - id
                 - password
                 - email
       security:

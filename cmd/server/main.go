@@ -63,8 +63,8 @@ func main() {
 	}
 	mux.Handle("/static/", http.StripPrefix("/static/", handler.NewStaticHandler()))
 	mux.Handle("/admin/", http.StripPrefix("/admin/", handler.NewAdminUIHandler()))
-	mux.Handle("/assets/", http.StripPrefix("/assets/", handler.NewAdminUIAssetsHandler()))
-	mux.Handle("/admin", http.RedirectHandler("/admin/index.html", http.StatusSeeOther))
+	mux.Handle("/admin/assets/", http.StripPrefix("/admin/assets/", handler.NewAdminUIAssetsHandler()))
+	mux.Handle("/admin", http.RedirectHandler("/admin/", http.StatusSeeOther))
 	tagsSorterFunc := "(a, b) => {" +
 		"const priority = {\"auth\": 1, \"user\": 2, \"talk_session\": 3, \"opinion\": 4, \"organization\": 5, \"vote\": 6}; " +
 		"const ap = priority[a.toLowerCase()]; " +
