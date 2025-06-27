@@ -2448,8 +2448,6 @@ paths:
                   - message
       tags:
         - opinion
-      security:
-        - {}
       x-ogen-operation-group: Opinion
   /talksessions/{talkSessionID}/timeline:
     post:

@@ -201,7 +201,6 @@ namespace kotohiro {
   @route("/talksessions/{talkSessionID}/swipe_opinions")
   @get
   @summary("スワイプ用のエンドポイント")
-  @useAuth([])
   op swipeOpinions(
     @path talkSessionID: string,
     @query(#{ explode: true }) limit?: integer | null = 10,
