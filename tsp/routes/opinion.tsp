@@ -3,6 +3,7 @@ import "@typespec/openapi";
 import "../models/opinion.tsp";
 import "../models/user.tsp";
 import "../models/common.tsp";
+import "../config/service.tsp";
 
 using Http;
 using OpenAPI;
@@ -13,7 +14,7 @@ namespace kotohiro {
   @route("/opinions/{opinionID}")
   @get
   @summary("意見詳細")
-  @useAuth([])
+  @useAuth(OptionalCookieAuth)
   op getOpinionDetail2(@path opinionID: string): Body<OpinionWithVote> | {
     @statusCode statusCode: 500;
     @body body: {};
@@ -24,7 +25,7 @@ namespace kotohiro {
   @route("/opinions/{opinionID}/replies")
   @get
   @summary("意見に対するリプライ意見一覧")
-  @useAuth([])
+  @useAuth(OptionalCookieAuth)
   op opinionComments2(
     /**
      * 親意見のID
@@ -104,7 +105,7 @@ namespace kotohiro {
   @route("/opinions/{opinionID}/analysis")
   @get
   @summary("意見に投票したグループごとの割合")
-  @useAuth([])
+  @useAuth(OptionalCookieAuth)
   op getOpinionAnalysis(@path opinionID: string): Body<OpinionGroupRatio[]> | {
     @statusCode statusCode: 400;
     @body body: {};
@@ -154,7 +155,7 @@ namespace kotohiro {
   @route("/opinions/report_reasons")
   @get
   @summary("意見への通報理由一覧")
-  @useAuth([])
+  @useAuth(OptionalCookieAuth)
   op getOpinionReportReasons(): Body<ReportReason[]> | {
     @statusCode statusCode: 400;
     @body body: {};
@@ -168,7 +169,7 @@ namespace kotohiro {
   @route("/talksessions/{talkSessionID}/opinions")
   @get
   @summary("セッションに対する意見一覧")
-  @useAuth([])
+  @useAuth(OptionalCookieAuth)
   op getOpinionsForTalkSession(
     @path talkSessionID: string,
     @query(#{ explode: true }) sort?:
@@ -201,7 +202,7 @@ namespace kotohiro {
   @route("/talksessions/{talkSessionID}/swipe_opinions")
   @get
   @summary("スワイプ用のエンドポイント")
-  @useAuth([])
+  @useAuth(OptionalCookieAuth)
   op swipeOpinions(
     @path talkSessionID: string,
     @query(#{ explode: true }) limit?: integer | null = 10,

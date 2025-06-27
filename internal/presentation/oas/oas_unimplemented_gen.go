@@ -201,6 +201,15 @@ func (UnimplementedHandler) GetOrganizationAliases(ctx context.Context) (r GetOr
 	return r, ht.ErrNotImplemented
 }
 
+// GetOrganizationUsers implements getOrganizationUsers operation.
+//
+// 現在の組織のユーザー一覧取得.
+//
+// GET /organizations/users
+func (UnimplementedHandler) GetOrganizationUsers(ctx context.Context) (r GetOrganizationUsersRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetOrganizations implements getOrganizations operation.
 //
 // 所属組織一覧.

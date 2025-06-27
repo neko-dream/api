@@ -242,6 +242,12 @@ type OrganizationHandler interface {
 	//
 	// GET /organizations/aliases
 	GetOrganizationAliases(ctx context.Context) (GetOrganizationAliasesRes, error)
+	// GetOrganizationUsers implements getOrganizationUsers operation.
+	//
+	// 現在の組織のユーザー一覧取得.
+	//
+	// GET /organizations/users
+	GetOrganizationUsers(ctx context.Context) (GetOrganizationUsersRes, error)
 	// GetOrganizations implements getOrganizations operation.
 	//
 	// 所属組織一覧.

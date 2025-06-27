@@ -1011,6 +1011,34 @@ func (s *GetOrganizationAliasesOK) SetAliases(val []OrganizationAlias) {
 
 func (*GetOrganizationAliasesOK) getOrganizationAliasesRes() {}
 
+type GetOrganizationUsersBadRequest struct{}
+
+func (*GetOrganizationUsersBadRequest) getOrganizationUsersRes() {}
+
+type GetOrganizationUsersInternalServerError struct{}
+
+func (*GetOrganizationUsersInternalServerError) getOrganizationUsersRes() {}
+
+type GetOrganizationUsersOK struct {
+	Users []OrganizationUser `json:"users"`
+}
+
+// GetUsers returns the value of Users.
+func (s *GetOrganizationUsersOK) GetUsers() []OrganizationUser {
+	return s.Users
+}
+
+// SetUsers sets the value of Users.
+func (s *GetOrganizationUsersOK) SetUsers(val []OrganizationUser) {
+	s.Users = val
+}
+
+func (*GetOrganizationUsersOK) getOrganizationUsersRes() {}
+
+type GetOrganizationUsersUnauthorized struct{}
+
+func (*GetOrganizationUsersUnauthorized) getOrganizationUsersRes() {}
+
 type GetOrganizationsBadRequest struct{}
 
 func (*GetOrganizationsBadRequest) getOrganizationsRes() {}
@@ -4184,6 +4212,20 @@ func (o OptUserGroupPosition) Or(d UserGroupPosition) UserGroupPosition {
 	return d
 }
 
+type OptionalCookieAuth struct {
+	APIKey string
+}
+
+// GetAPIKey returns the value of APIKey.
+func (s *OptionalCookieAuth) GetAPIKey() string {
+	return s.APIKey
+}
+
+// SetAPIKey sets the value of APIKey.
+func (s *OptionalCookieAuth) SetAPIKey(val string) {
+	s.APIKey = val
+}
+
 // Ref: #/components/schemas/Organization
 type Organization struct {
 	// 組織ID.
@@ -4299,6 +4341,77 @@ func (s *OrganizationAlias) SetCreatedAt(val OptNilString) {
 }
 
 func (*OrganizationAlias) createOrganizationAliasRes() {}
+
+// 組織ユーザー.
+// Ref: #/components/schemas/OrganizationUser
+type OrganizationUser struct {
+	UserID      string       `json:"userID"`
+	DisplayID   string       `json:"displayID"`
+	DisplayName string       `json:"displayName"`
+	IconURL     OptNilString `json:"iconURL"`
+	Role        int          `json:"role"`
+	RoleName    string       `json:"roleName"`
+}
+
+// GetUserID returns the value of UserID.
+func (s *OrganizationUser) GetUserID() string {
+	return s.UserID
+}
+
+// GetDisplayID returns the value of DisplayID.
+func (s *OrganizationUser) GetDisplayID() string {
+	return s.DisplayID
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *OrganizationUser) GetDisplayName() string {
+	return s.DisplayName
+}
+
+// GetIconURL returns the value of IconURL.
+func (s *OrganizationUser) GetIconURL() OptNilString {
+	return s.IconURL
+}
+
+// GetRole returns the value of Role.
+func (s *OrganizationUser) GetRole() int {
+	return s.Role
+}
+
+// GetRoleName returns the value of RoleName.
+func (s *OrganizationUser) GetRoleName() string {
+	return s.RoleName
+}
+
+// SetUserID sets the value of UserID.
+func (s *OrganizationUser) SetUserID(val string) {
+	s.UserID = val
+}
+
+// SetDisplayID sets the value of DisplayID.
+func (s *OrganizationUser) SetDisplayID(val string) {
+	s.DisplayID = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *OrganizationUser) SetDisplayName(val string) {
+	s.DisplayName = val
+}
+
+// SetIconURL sets the value of IconURL.
+func (s *OrganizationUser) SetIconURL(val OptNilString) {
+	s.IconURL = val
+}
+
+// SetRole sets the value of Role.
+func (s *OrganizationUser) SetRole(val int) {
+	s.Role = val
+}
+
+// SetRoleName sets the value of RoleName.
+func (s *OrganizationUser) SetRoleName(val string) {
+	s.RoleName = val
+}
 
 type PasswordLoginBadRequest struct{}
 
@@ -7077,65 +7190,15 @@ type Vote2OKApplicationJSON []Opinion
 func (*Vote2OKApplicationJSON) vote2Res() {}
 
 type Vote2Req struct {
-	VoteStatus VoteType `json:"voteStatus"`
+	VoteStatus string `json:"voteStatus"`
 }
 
 // GetVoteStatus returns the value of VoteStatus.
-func (s *Vote2Req) GetVoteStatus() VoteType {
+func (s *Vote2Req) GetVoteStatus() string {
 	return s.VoteStatus
 }
 
 // SetVoteStatus sets the value of VoteStatus.
-func (s *Vote2Req) SetVoteStatus(val VoteType) {
+func (s *Vote2Req) SetVoteStatus(val string) {
 	s.VoteStatus = val
-}
-
-// 投票タイプ.
-// Ref: #/components/schemas/VoteType
-type VoteType string
-
-const (
-	VoteTypeAgree    VoteType = "agree"
-	VoteTypeDisagree VoteType = "disagree"
-	VoteTypePass     VoteType = "pass"
-)
-
-// AllValues returns all VoteType values.
-func (VoteType) AllValues() []VoteType {
-	return []VoteType{
-		VoteTypeAgree,
-		VoteTypeDisagree,
-		VoteTypePass,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s VoteType) MarshalText() ([]byte, error) {
-	switch s {
-	case VoteTypeAgree:
-		return []byte(s), nil
-	case VoteTypeDisagree:
-		return []byte(s), nil
-	case VoteTypePass:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *VoteType) UnmarshalText(data []byte) error {
-	switch VoteType(data) {
-	case VoteTypeAgree:
-		*s = VoteTypeAgree
-		return nil
-	case VoteTypeDisagree:
-		*s = VoteTypeDisagree
-		return nil
-	case VoteTypePass:
-		*s = VoteTypePass
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
 }

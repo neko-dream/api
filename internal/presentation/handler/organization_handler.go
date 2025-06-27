@@ -20,6 +20,7 @@ type organizationHandler struct {
 	invite              organization_usecase.InviteOrganizationCommand
 	add                 organization_usecase.InviteOrganizationForUserCommand
 	list                organization_query.ListJoinedOrganizationQuery
+	listUsers           organization_query.ListOrganizationUsersQuery
 	createAlias         *organization_usecase.CreateOrganizationAliasUseCase
 	deactivateAlias     *organization_usecase.DeactivateOrganizationAliasUseCase
 	listAliases         *organization_usecase.ListOrganizationAliasesUseCase
@@ -36,6 +37,7 @@ func NewOrganizationHandler(
 	invite organization_usecase.InviteOrganizationCommand,
 	add organization_usecase.InviteOrganizationForUserCommand,
 	list organization_query.ListJoinedOrganizationQuery,
+	listUsers organization_query.ListOrganizationUsersQuery,
 	createAlias *organization_usecase.CreateOrganizationAliasUseCase,
 	deactivateAlias *organization_usecase.DeactivateOrganizationAliasUseCase,
 	listAliases *organization_usecase.ListOrganizationAliasesUseCase,
@@ -51,6 +53,7 @@ func NewOrganizationHandler(
 		invite:              invite,
 		add:                 add,
 		list:                list,
+		listUsers:           listUsers,
 		createAlias:         createAlias,
 		deactivateAlias:     deactivateAlias,
 		listAliases:         listAliases,
@@ -309,4 +312,32 @@ func (o *organizationHandler) DeleteOrganizationAlias(ctx context.Context, param
 	}
 
 	return &oas.DeleteOrganizationAliasOK{}, nil
+}
+
+// GetOrganizationUsers 現在の組織のユーザー一覧取得
+func (o *organizationHandler) GetOrganizationUsers(ctx context.Context) (oas.GetOrganizationUsersRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.GetOrganizationUsers")
+	defer span.End()
+
+	authCtx, err := requireAuthentication(o.authService, ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// 組織コンテキストが必要
+	if !authCtx.IsInOrganization() {
+		return &oas.GetOrganizationUsersUnauthorized{}, nil
+	}
+
+	// クエリを実行
+	result, err := o.listUsers.Execute(ctx, organization_query.ListOrganizationUsersInput{
+		OrganizationID: *authCtx.OrganizationID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &oas.GetOrganizationUsersOK{
+		Users: result.Users,
+	}, nil
 }
