@@ -198,19 +198,24 @@ func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-					if err := func(d *jx.Decoder) error {
-						request.Latitude.Reset()
-						if err := request.Latitude.Decode(d); err != nil {
+					var requestDotLatitudeVal float64
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToFloat64(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotLatitudeVal = c
 						return nil
-					}(jx.DecodeStr(val)); err != nil {
+					}(); err != nil {
 						return err
 					}
+					request.Latitude.SetTo(requestDotLatitudeVal)
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"latitude\"")
@@ -287,19 +292,24 @@ func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-					if err := func(d *jx.Decoder) error {
-						request.Prefecture.Reset()
-						if err := request.Prefecture.Decode(d); err != nil {
+					var requestDotPrefectureVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotPrefectureVal = c
 						return nil
-					}(jx.DecodeStr(val)); err != nil {
+					}(); err != nil {
 						return err
 					}
+					request.Prefecture.SetTo(requestDotPrefectureVal)
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"prefecture\"")
@@ -314,19 +324,24 @@ func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-					if err := func(d *jx.Decoder) error {
-						request.City.Reset()
-						if err := request.City.Decode(d); err != nil {
+					var requestDotCityVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotCityVal = c
 						return nil
-					}(jx.DecodeStr(val)); err != nil {
+					}(); err != nil {
 						return err
 					}
+					request.City.SetTo(requestDotCityVal)
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"city\"")
@@ -341,19 +356,24 @@ func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-					if err := func(d *jx.Decoder) error {
-						request.Description.Reset()
-						if err := request.Description.Decode(d); err != nil {
+					var requestDotDescriptionVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotDescriptionVal = c
 						return nil
-					}(jx.DecodeStr(val)); err != nil {
+					}(); err != nil {
 						return err
 					}
+					request.Description.SetTo(requestDotDescriptionVal)
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"description\"")

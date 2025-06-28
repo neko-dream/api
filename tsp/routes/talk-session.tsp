@@ -33,7 +33,7 @@ namespace kotohiro {
   @route("/talksessions/{talkSessionID}")
   @get
   @summary("トークセッションの詳細")
-  @useAuth(OptionalCookieAuth)
+  @useAuth([])
   op getTalkSessionDetail(@path talkSessionID: string): TalkSession | {
     @statusCode statusCode: 400;
     @body body: {
@@ -52,11 +52,11 @@ namespace kotohiro {
     @multipartBody body: {
       theme: HttpPart<string>;
       scheduledEndTime: HttpPart<utcDateTime>;
-      latitude?: HttpPart<numeric | null>;
+      latitude?: HttpPart<numeric>;
       longitude?: HttpPart<numeric>;
-      prefecture?: HttpPart<string | null>;
-      city?: HttpPart<string | null>;
-      description?: HttpPart<string | null>;
+      prefecture?: HttpPart<string>;
+      city?: HttpPart<string>;
+      description?: HttpPart<string>;
       thumbnailURL?: HttpPart<string>;
     },
   ): TalkSession | {
