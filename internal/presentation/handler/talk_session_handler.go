@@ -248,7 +248,7 @@ func (t *talkSessionHandler) InitiateTalkSession(ctx context.Context, req *oas.I
 	}
 	userID := authCtx.UserID
 	var restrictionStrings []string
-	if req.Restrictions != nil && req.Restrictions[0] != "" {
+	if req.Restrictions != nil && len(req.Restrictions) > 0 && req.Restrictions[0] != "" {
 		if sl := strings.Split(strings.Join(req.Restrictions, ","), ","); len(sl) > 0 {
 			restrictionStrings = sl
 		}
