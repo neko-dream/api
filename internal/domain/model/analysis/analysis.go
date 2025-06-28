@@ -32,6 +32,10 @@ type AnalysisReport struct {
 
 // ShouldReGenerateReport 再生成するかどうかを判定する
 func (r *AnalysisReport) ShouldReGenerateReport() bool {
+	if r.Report == nil {
+		// レポートが存在しない場合は再生成する
+		return true
+	}
 	// 10分以上経過していれば再生成する
 	return time.Since(r.UpdatedAt) > 10*time.Minute
 }
