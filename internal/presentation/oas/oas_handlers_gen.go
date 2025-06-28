@@ -3932,14 +3932,14 @@ func (s *Server) handleGetTalkSessionListRequest(args [0]string, argsEscaped boo
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityOptionalCookieAuth(ctx, "GetTalkSessionList", r)
+			sctx, ok, err := s.securityCookieAuth(ctx, "GetTalkSessionList", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "OptionalCookieAuth",
+					Security:         "CookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:OptionalCookieAuth", err)
+				defer recordError("Security:CookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}

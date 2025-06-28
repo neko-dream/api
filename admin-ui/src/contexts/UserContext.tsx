@@ -23,7 +23,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const router = useRouterState();
-  const isLoginPage = router.location.pathname === '/login';
+  const isLoginPage = router.location.pathname === '/login' || router.location.pathname === '/admin/login';
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -42,6 +42,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
           return;
         }
 
+        // Check if user has orgType (only if not on login page)
+        if ((tokenInfo.orgType === undefined || tokenInfo.orgType === null) && !isLoginPage) {
+          // User is authenticated but doesn't have orgType - redirect to login
+          window.location.href = '/admin/login';
+          return;
+        }
+        
         // Check if user has organization parameters
         if (!tokenInfo.organizationCode || !tokenInfo.organizationID) {
           // User is authenticated but not associated with an organization

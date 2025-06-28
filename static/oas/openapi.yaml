@@ -1424,7 +1424,9 @@ paths:
         - name: limit
           in: query
           required: false
-          description: 1ページあたりの要素数
+          description: |-
+            ir
+            1ページあたりの要素数
           schema:
             type: integer
             nullable: true
@@ -1528,8 +1530,6 @@ paths:
                   - message
       tags:
         - talk_session
-      security:
-        - OptionalCookieAuth: []
       x-ogen-operation-group: TalkSession
     post:
       operationId: initiateTalkSession

@@ -15,7 +15,7 @@ namespace kotohiro {
       @operationId("getTalkSessionListManage")
       @extension("x-ogen-operation-group", "manage")
       @get
-      getTalkSessionList(
+      getTalkSessionListManage(
         @query status?: "active" | "inactive",
         @query offset?: int32,
         @query limit?: int32,

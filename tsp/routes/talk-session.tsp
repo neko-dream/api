@@ -72,9 +72,8 @@ namespace kotohiro {
   @route("/talksessions")
   @get
   @summary("セッション一覧")
-  @useAuth(OptionalCookieAuth)
   op getTalkSessionList(
-    /**
+    /**ir
      * 1ページあたりの要素数
      */
     @query(#{ explode: true }) limit?: integer | null,
