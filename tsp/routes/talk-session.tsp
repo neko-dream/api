@@ -72,6 +72,7 @@ namespace kotohiro {
   @route("/talksessions")
   @get
   @summary("セッション一覧")
+  @useAuth([])
   op getTalkSessionList(
     /**ir
      * 1ページあたりの要素数

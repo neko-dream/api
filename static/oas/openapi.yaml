@@ -1530,6 +1530,8 @@ paths:
                   - message
       tags:
         - talk_session
+      security:
+        - {}
       x-ogen-operation-group: TalkSession
     post:
       operationId: initiateTalkSession
