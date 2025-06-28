@@ -1582,22 +1582,16 @@ paths:
                   format: date-time
                 latitude:
                   type: number
-                  nullable: true
                 longitude:
                   type: number
-                  nullable: true
                 city:
                   type: string
-                  nullable: true
                 prefecture:
                   type: string
-                  nullable: true
                 description:
                   type: string
-                  nullable: true
                 thumbnailURL:
                   type: string
-                  nullable: true
                 restrictions:
                   type: array
                   items:
@@ -1608,18 +1602,6 @@ paths:
                 - theme
                 - scheduledEndTime
             encoding:
-              latitude:
-                contentType: application/json
-              longitude:
-                contentType: application/json
-              city:
-                contentType: application/json
-              prefecture:
-                contentType: application/json
-              description:
-                contentType: application/json
-              thumbnailURL:
-                contentType: application/json
               restrictions:
                 contentType: application/json
       x-ogen-operation-group: TalkSession

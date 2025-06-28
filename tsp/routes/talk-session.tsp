@@ -130,12 +130,12 @@ namespace kotohiro {
     @multipartBody body: {
       theme: HttpPart<string>;
       scheduledEndTime: HttpPart<utcDateTime>;
-      latitude?: HttpPart<numeric | null>;
-      longitude?: HttpPart<numeric | null>;
-      city?: HttpPart<string | null>;
-      prefecture?: HttpPart<string | null>;
-      description?: HttpPart<string | null>;
-      thumbnailURL?: HttpPart<string | null>;
+      latitude?: HttpPart<numeric>;
+      longitude?: HttpPart<numeric>;
+      city?: HttpPart<string>;
+      prefecture?: HttpPart<string>;
+      description?: HttpPart<string>;
+      thumbnailURL?: HttpPart<string>;
       restrictions?: HttpPart<string[]>;
       aliasId?: HttpPart<string>;
     },
