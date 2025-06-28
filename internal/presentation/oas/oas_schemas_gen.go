@@ -1859,16 +1859,16 @@ func (s *InitiateTalkSessionBadRequest) SetMessage(val string) {
 func (*InitiateTalkSessionBadRequest) initiateTalkSessionRes() {}
 
 type InitiateTalkSessionReq struct {
-	Theme            string        `json:"theme"`
-	ScheduledEndTime time.Time     `json:"scheduledEndTime"`
-	Latitude         OptNilFloat64 `json:"latitude"`
-	Longitude        OptNilFloat64 `json:"longitude"`
-	City             OptNilString  `json:"city"`
-	Prefecture       OptNilString  `json:"prefecture"`
-	Description      OptNilString  `json:"description"`
-	ThumbnailURL     OptNilString  `json:"thumbnailURL"`
-	Restrictions     []string      `json:"restrictions"`
-	AliasId          OptString     `json:"aliasId"`
+	Theme            string     `json:"theme"`
+	ScheduledEndTime time.Time  `json:"scheduledEndTime"`
+	Latitude         OptFloat64 `json:"latitude"`
+	Longitude        OptFloat64 `json:"longitude"`
+	City             OptString  `json:"city"`
+	Prefecture       OptString  `json:"prefecture"`
+	Description      OptString  `json:"description"`
+	ThumbnailURL     OptString  `json:"thumbnailURL"`
+	Restrictions     []string   `json:"restrictions"`
+	AliasId          OptString  `json:"aliasId"`
 }
 
 // GetTheme returns the value of Theme.
@@ -1882,32 +1882,32 @@ func (s *InitiateTalkSessionReq) GetScheduledEndTime() time.Time {
 }
 
 // GetLatitude returns the value of Latitude.
-func (s *InitiateTalkSessionReq) GetLatitude() OptNilFloat64 {
+func (s *InitiateTalkSessionReq) GetLatitude() OptFloat64 {
 	return s.Latitude
 }
 
 // GetLongitude returns the value of Longitude.
-func (s *InitiateTalkSessionReq) GetLongitude() OptNilFloat64 {
+func (s *InitiateTalkSessionReq) GetLongitude() OptFloat64 {
 	return s.Longitude
 }
 
 // GetCity returns the value of City.
-func (s *InitiateTalkSessionReq) GetCity() OptNilString {
+func (s *InitiateTalkSessionReq) GetCity() OptString {
 	return s.City
 }
 
 // GetPrefecture returns the value of Prefecture.
-func (s *InitiateTalkSessionReq) GetPrefecture() OptNilString {
+func (s *InitiateTalkSessionReq) GetPrefecture() OptString {
 	return s.Prefecture
 }
 
 // GetDescription returns the value of Description.
-func (s *InitiateTalkSessionReq) GetDescription() OptNilString {
+func (s *InitiateTalkSessionReq) GetDescription() OptString {
 	return s.Description
 }
 
 // GetThumbnailURL returns the value of ThumbnailURL.
-func (s *InitiateTalkSessionReq) GetThumbnailURL() OptNilString {
+func (s *InitiateTalkSessionReq) GetThumbnailURL() OptString {
 	return s.ThumbnailURL
 }
 
@@ -1932,32 +1932,32 @@ func (s *InitiateTalkSessionReq) SetScheduledEndTime(val time.Time) {
 }
 
 // SetLatitude sets the value of Latitude.
-func (s *InitiateTalkSessionReq) SetLatitude(val OptNilFloat64) {
+func (s *InitiateTalkSessionReq) SetLatitude(val OptFloat64) {
 	s.Latitude = val
 }
 
 // SetLongitude sets the value of Longitude.
-func (s *InitiateTalkSessionReq) SetLongitude(val OptNilFloat64) {
+func (s *InitiateTalkSessionReq) SetLongitude(val OptFloat64) {
 	s.Longitude = val
 }
 
 // SetCity sets the value of City.
-func (s *InitiateTalkSessionReq) SetCity(val OptNilString) {
+func (s *InitiateTalkSessionReq) SetCity(val OptString) {
 	s.City = val
 }
 
 // SetPrefecture sets the value of Prefecture.
-func (s *InitiateTalkSessionReq) SetPrefecture(val OptNilString) {
+func (s *InitiateTalkSessionReq) SetPrefecture(val OptString) {
 	s.Prefecture = val
 }
 
 // SetDescription sets the value of Description.
-func (s *InitiateTalkSessionReq) SetDescription(val OptNilString) {
+func (s *InitiateTalkSessionReq) SetDescription(val OptString) {
 	s.Description = val
 }
 
 // SetThumbnailURL sets the value of ThumbnailURL.
-func (s *InitiateTalkSessionReq) SetThumbnailURL(val OptNilString) {
+func (s *InitiateTalkSessionReq) SetThumbnailURL(val OptString) {
 	s.ThumbnailURL = val
 }
 
