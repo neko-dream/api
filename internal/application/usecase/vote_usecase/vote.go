@@ -177,6 +177,9 @@ func (i *voteHandler) StartAnalysisIfNeeded(ctx context.Context, talkSessionID s
 			utils.HandleError(ctx, err, "AnalysisRepository.FindByTalkSessionID")
 			return
 		}
+		if report == nil {
+			return
+		}
 		if report.ShouldReGenerateReport() {
 			_ = i.AnalysisService.GenerateReport(bg, talkSessionID)
 		}
