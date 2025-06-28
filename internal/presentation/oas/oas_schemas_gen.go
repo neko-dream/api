@@ -436,14 +436,14 @@ type EditTalkSessionInternalServerError struct{}
 func (*EditTalkSessionInternalServerError) editTalkSessionRes() {}
 
 type EditTalkSessionReq struct {
-	Theme            string        `json:"theme"`
-	ScheduledEndTime time.Time     `json:"scheduledEndTime"`
-	Latitude         OptNilFloat64 `json:"latitude"`
-	Longitude        OptFloat64    `json:"longitude"`
-	Prefecture       OptNilString  `json:"prefecture"`
-	City             OptNilString  `json:"city"`
-	Description      OptNilString  `json:"description"`
-	ThumbnailURL     OptString     `json:"thumbnailURL"`
+	Theme            string     `json:"theme"`
+	ScheduledEndTime time.Time  `json:"scheduledEndTime"`
+	Latitude         OptFloat64 `json:"latitude"`
+	Longitude        OptFloat64 `json:"longitude"`
+	Prefecture       OptString  `json:"prefecture"`
+	City             OptString  `json:"city"`
+	Description      OptString  `json:"description"`
+	ThumbnailURL     OptString  `json:"thumbnailURL"`
 }
 
 // GetTheme returns the value of Theme.
@@ -457,7 +457,7 @@ func (s *EditTalkSessionReq) GetScheduledEndTime() time.Time {
 }
 
 // GetLatitude returns the value of Latitude.
-func (s *EditTalkSessionReq) GetLatitude() OptNilFloat64 {
+func (s *EditTalkSessionReq) GetLatitude() OptFloat64 {
 	return s.Latitude
 }
 
@@ -467,17 +467,17 @@ func (s *EditTalkSessionReq) GetLongitude() OptFloat64 {
 }
 
 // GetPrefecture returns the value of Prefecture.
-func (s *EditTalkSessionReq) GetPrefecture() OptNilString {
+func (s *EditTalkSessionReq) GetPrefecture() OptString {
 	return s.Prefecture
 }
 
 // GetCity returns the value of City.
-func (s *EditTalkSessionReq) GetCity() OptNilString {
+func (s *EditTalkSessionReq) GetCity() OptString {
 	return s.City
 }
 
 // GetDescription returns the value of Description.
-func (s *EditTalkSessionReq) GetDescription() OptNilString {
+func (s *EditTalkSessionReq) GetDescription() OptString {
 	return s.Description
 }
 
@@ -497,7 +497,7 @@ func (s *EditTalkSessionReq) SetScheduledEndTime(val time.Time) {
 }
 
 // SetLatitude sets the value of Latitude.
-func (s *EditTalkSessionReq) SetLatitude(val OptNilFloat64) {
+func (s *EditTalkSessionReq) SetLatitude(val OptFloat64) {
 	s.Latitude = val
 }
 
@@ -507,17 +507,17 @@ func (s *EditTalkSessionReq) SetLongitude(val OptFloat64) {
 }
 
 // SetPrefecture sets the value of Prefecture.
-func (s *EditTalkSessionReq) SetPrefecture(val OptNilString) {
+func (s *EditTalkSessionReq) SetPrefecture(val OptString) {
 	s.Prefecture = val
 }
 
 // SetCity sets the value of City.
-func (s *EditTalkSessionReq) SetCity(val OptNilString) {
+func (s *EditTalkSessionReq) SetCity(val OptString) {
 	s.City = val
 }
 
 // SetDescription sets the value of Description.
-func (s *EditTalkSessionReq) SetDescription(val OptNilString) {
+func (s *EditTalkSessionReq) SetDescription(val OptString) {
 	s.Description = val
 }
 
