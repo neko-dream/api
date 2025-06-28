@@ -1855,6 +1855,7 @@ func decodeGetTalkSessionDetailParams(args [1]string, argsEscaped bool, r *http.
 
 // GetTalkSessionListParams is parameters of getTalkSessionList operation.
 type GetTalkSessionListParams struct {
+	// Ir
 	// 1ページあたりの要素数.
 	Limit OptNilInt
 	// どの要素から始めるか.

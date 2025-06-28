@@ -35,17 +35,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       )}
 
       {/* サイドバー */}
-      <div className="flex flex-col bg-white">
+      <div className="flex flex-col bg-gradient-to-b from-gray-50 to-white h-full">
         {/* ヘッダー */}
-        <div className="p-4 border-b border-gray-100">
+        <div className="p-6 bg-white border-b border-gray-100">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold text-gray-800">ことひろ</h1>
-              <p className="text-xs text-gray-500 mt-1">管理画面</p>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">ことひろ</h1>
+              <p className="text-sm text-gray-500 mt-1">管理画面</p>
             </div>
             <button
               onClick={onClose}
-              className="lg:hidden p-2 rounded-md text-gray-500 hover:text-gray-600 focus:outline-none"
+              className="lg:hidden p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors focus:outline-none"
             >
               <svg
                 className="w-6 h-6"
@@ -66,18 +66,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* メニュー */}
-        <div className="overflow-y-auto">
-          <nav className="p-4 space-y-2">
+        <div className="flex-1 overflow-y-auto">
+          <nav className="p-6 space-y-2">
             {menuItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
                 onClick={onClose}
                 activeProps={{
-                  className: 'flex items-center px-4 py-3 rounded-lg transition-colors duration-200 bg-blue-50 text-blue-600'
+                  className: 'flex items-center px-4 py-3 rounded-xl transition-all duration-200 bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-600 shadow-sm border border-blue-100'
                 }}
                 inactiveProps={{
-                  className: 'flex items-center px-4 py-3 rounded-lg transition-colors duration-200 text-gray-600 hover:bg-gray-50'
+                  className: 'flex items-center px-4 py-3 rounded-xl transition-all duration-200 text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                 }}
               >
                 <svg
@@ -101,24 +101,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* フッター */}
-        <div className="p-4 border-t border-gray-100">
+        <div className="p-6 bg-white border-t border-gray-100">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-lg">
                 {currentUser?.name?.[0]?.toUpperCase() || currentUser?.displayID?.[0]?.toUpperCase() || 'U'}
               </div>
               <div className="ml-3">
-                <p className="text-sm font-medium text-gray-800">
+                <p className="text-sm font-semibold text-gray-800">
                   {currentUser?.name || currentUser?.displayID || 'ユーザー'}
                 </p>
                 <p className="text-xs text-gray-500">
-                  {currentUser?.organizationRole || '一般'} - {currentUser?.organizationCode}
+                  {currentUser?.organizationRole || '一般'} • {currentUser?.organizationCode}
                 </p>
               </div>
             </div>
             <button
               onClick={logout}
-              className="p-2 text-gray-500 hover:text-gray-700 transition-colors duration-200"
+              className="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
               title="ログアウト"
             >
               <svg

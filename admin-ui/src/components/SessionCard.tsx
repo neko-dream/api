@@ -11,18 +11,24 @@ interface SessionCardProps {
 
 export const SessionCard = ({ session, onRefetch }: SessionCardProps) => {
   const { currentUser } = useUser();
+  const [copied, setCopied] = useState(false);
 
   if (!currentUser) {
     return null;
   }
 
   return (
-    <Card title={session.theme} headerRight={
+    <Card title={
+      <div className="flex items-center gap-3">
+        <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500"></div>
+        <span className="text-xl font-semibold text-gray-800">{session.theme}</span>
+      </div>
+    } headerRight={
       <span
-        className={`inline-flex items-center px-4 mx-4 py-1 rounded-full text-xs font-medium
+        className={`inline-flex items-center px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-200
           ${session.hidden
-            ? 'bg-red-50/50 text-red-600 ring-1 ring-red-100'
-            : 'bg-green-50/50 text-green-600 ring-1 ring-green-100'
+            ? 'bg-red-100 text-red-700 shadow-sm'
+            : 'bg-emerald-100 text-emerald-700 shadow-sm'
           }`}
       >
         <svg
@@ -59,35 +65,75 @@ export const SessionCard = ({ session, onRefetch }: SessionCardProps) => {
         レポート: {session.hidden ? '非表示' : '表示'}
       </span>
     }>
-      <div className="p-5 bg-gray-50">
-        <div className="grid grid-cols-2 gap-3 text-sm text-gray-600">
-          <div className="flex items-center">
-            <i className="fas fa-fingerprint w-5 text-gray-400"></i>
-            <span className="ml-2">セッションID: <span className="font-mono text-xs bg-gray-200 px-2 py-0.5 rounded">{session.talkSessionID}</span></span>
+      <div className="-m-6 p-6 bg-gradient-to-r from-gray-50 to-gray-50/50">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-3">
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <i className="fas fa-fingerprint text-blue-600"></i>
+              </div>
+              <div className="flex-1">
+                <p className="text-xs text-gray-500">セッションID</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="font-mono text-xs bg-white px-2 py-1 rounded shadow-sm inline-block break-all">{session.talkSessionID}</p>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(session.talkSessionID);
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    }}
+                    className="p-1.5 bg-white rounded shadow-sm hover:bg-gray-50 transition-colors relative"
+                    title="IDをコピー"
+                  >
+                    <i className={`${copied ? 'fas fa-check' : 'far fa-copy'} text-gray-600 text-xs`}></i>
+                    {copied && (
+                      <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs bg-gray-800 text-white px-2 py-1 rounded whitespace-nowrap">
+                        コピーしました
+                      </span>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <i className="fas fa-user text-purple-600"></i>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">作成者</p>
+                <p className="font-semibold text-sm text-gray-800">{session.owner.displayName}</p>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center">
-            <i className="fas fa-user w-5 text-gray-400"></i>
-            <span className="ml-2">作成者: <span className="font-semibold">{session.owner.displayName}</span></span>
+          <div className="space-y-3">
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-indigo-100 rounded-lg">
+                <i className="far fa-calendar text-indigo-600"></i>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">期間</p>
+                <p className="text-sm text-gray-800">{new Date(session.createdAt).toLocaleDateString()} 〜</p>
+                <p className="text-sm text-gray-800">{new Date(session.scheduledEndTime).toLocaleDateString()}</p>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center">
-            <i className="far fa-calendar-plus w-5 text-gray-400"></i>
-            <span className="ml-2">開始日時: {new Date(session.createdAt).toLocaleString()}</span>
+        </div>
+        
+        <div className="grid grid-cols-3 gap-4 mt-6">
+          <div className="bg-white rounded-xl p-3 text-center shadow-sm">
+            <i className="far fa-comment-dots text-lg text-blue-500 mb-1"></i>
+            <p className="text-lg font-bold text-gray-800">{session.opinionCount}</p>
+            <p className="text-xs text-gray-500">意見数</p>
           </div>
-          <div className="flex items-center">
-            <i className="far fa-calendar-check w-5 text-gray-400"></i>
-            <span className="ml-2">終了日時: {new Date(session.scheduledEndTime).toLocaleString()}</span>
+          <div className="bg-white rounded-xl p-3 text-center shadow-sm">
+            <i className="fas fa-thumbs-up text-lg text-green-500 mb-1"></i>
+            <p className="text-lg font-bold text-gray-800">{session.voteCount}</p>
+            <p className="text-xs text-gray-500">投票数</p>
           </div>
-          <div className="flex items-center">
-            <i className="far fa-comment-dots w-5 text-gray-400"></i>
-            <span className="ml-2">意見数: <span className="font-semibold">{session.opinionCount}</span></span>
-          </div>
-          <div>
-            <i className="fas fa-thumbs-up w-5 text-gray-400"></i>
-            <span className="ml-2">投票数: <span className="font-semibold">{session.voteCount}</span></span>
-          </div>
-          <div>
-            <i className="fas fa-user-friends w-5 text-gray-400"></i>
-            <span className="ml-2">投票ユーザー数: <span className="font-semibold">{session.voteUserCount}</span></span>
+          <div className="bg-white rounded-xl p-3 text-center shadow-sm">
+            <i className="fas fa-users text-lg text-purple-500 mb-1"></i>
+            <p className="text-lg font-bold text-gray-800">{session.voteUserCount}</p>
+            <p className="text-xs text-gray-500">参加者数</p>
           </div>
         </div>
       </div>
