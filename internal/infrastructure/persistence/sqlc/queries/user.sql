@@ -85,3 +85,26 @@ FROM
     "users"
 WHERE
     display_id = $1;
+
+-- name: WithdrawUser :exec
+UPDATE "user_auths" SET withdrawal_date = $2 WHERE user_id = $1;
+
+-- name: AnonymizeUser :exec
+UPDATE "users" SET 
+    display_id = 'deleted_user', 
+    display_name = '削除されたユーザー', 
+    icon_url = NULL 
+WHERE user_id = $1;
+
+-- name: GetWithdrawalDate :one
+SELECT withdrawal_date FROM "user_auths" WHERE user_id = $1;
+
+-- name: CheckReregistrationAllowed :one
+SELECT 
+    CASE 
+        WHEN withdrawal_date IS NULL THEN true
+        WHEN withdrawal_date < NOW() - INTERVAL '30 days' THEN true
+        ELSE false
+    END as allowed
+FROM "user_auths" 
+WHERE subject = $1;

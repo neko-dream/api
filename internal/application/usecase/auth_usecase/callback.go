@@ -117,6 +117,22 @@ func (u *authCallbackInteractor) Execute(ctx context.Context, input CallbackInpu
 			return errtrace.Wrap(err)
 		}
 
+		// Check if re-registration is allowed for withdrawn users
+		if user != nil {
+			// Get user's subject from authentication to check withdrawal status
+			subject := user.Subject()
+			allowed, err := u.GetQueries(ctx).CheckReregistrationAllowed(ctx, subject)
+			if err != nil {
+				utils.HandleError(ctx, err, "再登録可能性チェックに失敗しました")
+				return errtrace.Wrap(err)
+			}
+			
+			if !allowed {
+				// User is withdrawn and re-registration period hasn't passed
+				return errtrace.New("退会後の再登録期間が経過していません。30日後に再度お試しください。")
+			}
+		}
+
 		// RegistrationURLが設定されている場合、userがnilならリダイレクト
 		if state.RegistrationURL != nil && user == nil {
 			redirectURL = *state.RegistrationURL

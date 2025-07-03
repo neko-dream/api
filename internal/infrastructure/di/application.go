@@ -59,7 +59,7 @@ func useCaseDeps() []ProvideArg {
 		{auth_usecase.NewRevoke, nil},
 		{auth_usecase.NewAuthCallback, nil},
 		{auth_usecase.NewLoginForDev, nil},
-		{auth_usecase.NewDetachAccount, nil},
+		{auth_usecase.NewWithdrawUser, nil},
 		{auth_usecase.NewPasswordRegister, nil},
 		{auth_usecase.NewPasswordLogin, nil},
 		{auth_usecase.NewChangePassword, nil},
