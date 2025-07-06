@@ -13,6 +13,15 @@ type UnimplementedHandler struct{}
 
 var _ Handler = UnimplementedHandler{}
 
+// ApplyFeedbackToReport implements applyFeedbackToReport operation.
+//
+// セッションのレポートにフィードバックを適用する.
+//
+// POST /report/feedback
+func (UnimplementedHandler) ApplyFeedbackToReport(ctx context.Context, req *ApplyFeedbackToReportReq) (r ApplyFeedbackToReportRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // AuthAccountDetach implements authAccountDetach operation.
 //
 // そのアカウントには再度ログインできなくなります。ログインしたければ言ってね！.

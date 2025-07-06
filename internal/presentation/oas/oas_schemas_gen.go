@@ -99,6 +99,39 @@ func (s *AnalysisReportResponse) SetReport(val OptString) {
 	s.Report = val
 }
 
+type ApplyFeedbackToReportInternalServerError struct{}
+
+func (*ApplyFeedbackToReportInternalServerError) applyFeedbackToReportRes() {}
+
+type ApplyFeedbackToReportOK struct{}
+
+func (*ApplyFeedbackToReportOK) applyFeedbackToReportRes() {}
+
+type ApplyFeedbackToReportReq struct {
+	ReportID     string `json:"reportID"`
+	FeedbackType string `json:"feedbackType"`
+}
+
+// GetReportID returns the value of ReportID.
+func (s *ApplyFeedbackToReportReq) GetReportID() string {
+	return s.ReportID
+}
+
+// GetFeedbackType returns the value of FeedbackType.
+func (s *ApplyFeedbackToReportReq) GetFeedbackType() string {
+	return s.FeedbackType
+}
+
+// SetReportID sets the value of ReportID.
+func (s *ApplyFeedbackToReportReq) SetReportID(val string) {
+	s.ReportID = val
+}
+
+// SetFeedbackType sets the value of FeedbackType.
+func (s *ApplyFeedbackToReportReq) SetFeedbackType(val string) {
+	s.FeedbackType = val
+}
+
 type AuthAccountDetachBadRequest struct{}
 
 func (*AuthAccountDetachBadRequest) authAccountDetachRes() {}

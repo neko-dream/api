@@ -110,6 +110,14 @@ type PolicyVersion struct {
 	CreatedAt time.Time
 }
 
+type ReportFeedback struct {
+	ReportFeedbackID           uuid.UUID
+	TalkSessionReportHistoryID uuid.UUID
+	UserID                     uuid.UUID
+	FeedbackType               int32
+	CreatedAt                  time.Time
+}
+
 type RepresentativeOpinion struct {
 	TalkSessionID uuid.UUID
 	OpinionID     uuid.UUID
