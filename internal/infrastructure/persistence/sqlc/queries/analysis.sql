@@ -41,12 +41,13 @@ WHERE talk_session_id = $1;
 
 -- name: GetReportByTalkSessionId :one
 SELECT
+    talk_session_report_history_id as analysis_report_history_id,
     talk_session_id,
     report,
-    created_at,
-    updated_at
-FROM talk_session_reports
+    created_at
+FROM talk_session_report_histories
 WHERE talk_session_id = $1;
+
 
 -- name: AddGeneratedImages :exec
 INSERT INTO talk_session_generated_images (talk_session_id, wordmap_url, tsnc_url) VALUES ($1, $2, $3)
