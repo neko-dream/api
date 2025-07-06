@@ -48,6 +48,38 @@ SELECT
 FROM talk_session_report_histories
 WHERE talk_session_id = $1;
 
+-- name: FindReportByID :one
+SELECT
+    talk_session_report_history_id as analysis_report_history_id,
+    talk_session_id,
+    report,
+    created_at
+FROM talk_session_report_histories
+WHERE talk_session_report_history_id = $1;
+
+-- name: GetFeedbackByReportHistoryID :many
+SELECT
+    report_feedback_id,
+    user_id,
+    feedback_type,
+    created_at
+FROM report_feedback
+WHERE talk_session_report_history_id = $1;
+
+-- name: SaveReportFeedback :exec
+INSERT INTO report_feedback (
+    report_feedback_id,
+    talk_session_report_history_id,
+    user_id,
+    feedback_type,
+    created_at
+) VALUES (
+    $1,
+    $2,
+    $3,
+    $4,
+    $5
+) ON CONFLICT (user_id, talk_session_report_history_id) DO NOTHING;
 
 -- name: AddGeneratedImages :exec
 INSERT INTO talk_session_generated_images (talk_session_id, wordmap_url, tsnc_url) VALUES ($1, $2, $3)
