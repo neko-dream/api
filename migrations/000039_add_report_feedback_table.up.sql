@@ -9,4 +9,4 @@ CREATE TABLE report_feedback (
     UNIQUE(talk_session_report_history_id, user_id)
 );
 
-CREATE INDEX idx_report_feedback_user_id_history_id ON talk_session_feedback(user_id, talk_session_report_history_id);
+CREATE INDEX idx_report_feedback_user_id_talk_session_report_history_id  ON report_feedback(user_id, talk_session_report_history_id);
