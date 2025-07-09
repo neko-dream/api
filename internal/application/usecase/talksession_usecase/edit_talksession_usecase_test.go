@@ -58,7 +58,8 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 		repository.NewImageRepositoryMock(),
 		encryptor,
 	)
-	talkSessionRepo := repository.NewTalkSessionRepository(dbManager)
+	eventStore := repository.NewEventStoreMock()
+	talkSessionRepo := repository.NewTalkSessionRepository(dbManager, eventStore)
 
 	// テスト用のconfig作成（LOCAL環境に設定）
 	testConfig := &config.Config{
@@ -644,7 +645,8 @@ func TestEditTalkSessionUseCase_ProductionEnvironment(t *testing.T) {
 		repository.NewImageRepositoryMock(),
 		encryptor,
 	)
-	talkSessionRepo := repository.NewTalkSessionRepository(dbManager)
+	eventStore := repository.NewEventStoreMock()
+	talkSessionRepo := repository.NewTalkSessionRepository(dbManager, eventStore)
 
 	// プロダクション環境用のコマンドハンドラの初期化
 	editCommand := talksession_usecase.NewEditTalkSessionUseCase(

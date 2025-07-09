@@ -18,6 +18,7 @@ type handlers struct {
 	oas.OrganizationHandler
 	oas.HealthHandler
 	oas.AnalysisHandler
+	oas.NotificationsHandler
 }
 
 func NewHandler(
@@ -34,20 +35,22 @@ func NewHandler(
 	organizationHandler oas.OrganizationHandler,
 	healthHandler oas.HealthHandler,
 	analysisHandler oas.AnalysisHandler,
+	notificationsHandler oas.NotificationsHandler,
 ) oas.Handler {
 	return &handlers{
-		AuthHandler:         authHandler,
-		VoteHandler:         voteHandler,
-		OpinionHandler:      opinionHandler,
-		TalkSessionHandler:  talkSessionHandler,
-		UserHandler:         userHandler,
-		TestHandler:         testHandler,
-		ManageHandler:       manageHandler,
-		TimelineHandler:     timelineHandler,
-		ImageHandler:        imageHandler,
-		PolicyHandler:       policyHandler,
-		OrganizationHandler: organizationHandler,
-		HealthHandler:       healthHandler,
-		AnalysisHandler:     analysisHandler,
+		AuthHandler:          authHandler,
+		VoteHandler:          voteHandler,
+		OpinionHandler:       opinionHandler,
+		TalkSessionHandler:   talkSessionHandler,
+		UserHandler:          userHandler,
+		TestHandler:          testHandler,
+		ManageHandler:        manageHandler,
+		TimelineHandler:      timelineHandler,
+		ImageHandler:         imageHandler,
+		PolicyHandler:        policyHandler,
+		OrganizationHandler:  organizationHandler,
+		HealthHandler:        healthHandler,
+		AnalysisHandler:      analysisHandler,
+		NotificationsHandler: notificationsHandler,
 	}
 }
