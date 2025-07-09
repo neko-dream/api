@@ -370,6 +370,122 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				}
 
 				elem = origElem
+			case 'n': // Prefix: "notifications/"
+				origElem := elem
+				if l := len("notifications/"); len(elem) >= l && elem[0:l] == "notifications/" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					break
+				}
+				switch elem[0] {
+				case 'd': // Prefix: "devices"
+					origElem := elem
+					if l := len("devices"); len(elem) >= l && elem[0:l] == "devices" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						switch r.Method {
+						case "GET":
+							s.handleGetDevicesRequest([0]string{}, elemIsEscaped, w, r)
+						case "POST":
+							s.handleRegisterDeviceRequest([0]string{}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, "GET,POST")
+						}
+
+						return
+					}
+					switch elem[0] {
+					case '/': // Prefix: "/"
+						origElem := elem
+						if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							break
+						}
+						switch elem[0] {
+						case 'e': // Prefix: "exists"
+							origElem := elem
+							if l := len("exists"); len(elem) >= l && elem[0:l] == "exists" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch r.Method {
+								case "GET":
+									s.handleCheckDeviceExistsRequest([0]string{}, elemIsEscaped, w, r)
+								default:
+									s.notAllowed(w, r, "GET")
+								}
+
+								return
+							}
+
+							elem = origElem
+						}
+						// Param: "deviceId"
+						// Leaf parameter
+						args[0] = elem
+						elem = ""
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch r.Method {
+							case "DELETE":
+								s.handleDeleteDeviceRequest([1]string{
+									args[0],
+								}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "DELETE")
+							}
+
+							return
+						}
+
+						elem = origElem
+					}
+
+					elem = origElem
+				case 'p': // Prefix: "preferences"
+					origElem := elem
+					if l := len("preferences"); len(elem) >= l && elem[0:l] == "preferences" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch r.Method {
+						case "GET":
+							s.handleGetNotificationPreferencesRequest([0]string{}, elemIsEscaped, w, r)
+						case "PUT":
+							s.handleUpdateNotificationPreferencesRequest([0]string{}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, "GET,PUT")
+						}
+
+						return
+					}
+
+					elem = origElem
+				}
+
+				elem = origElem
 			case 'o': // Prefix: "o"
 				origElem := elem
 				if l := len("o"); len(elem) >= l && elem[0:l] == "o" {
@@ -2142,6 +2258,148 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					default:
 						return
 					}
+				}
+
+				elem = origElem
+			case 'n': // Prefix: "notifications/"
+				origElem := elem
+				if l := len("notifications/"); len(elem) >= l && elem[0:l] == "notifications/" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					break
+				}
+				switch elem[0] {
+				case 'd': // Prefix: "devices"
+					origElem := elem
+					if l := len("devices"); len(elem) >= l && elem[0:l] == "devices" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						switch method {
+						case "GET":
+							r.name = "GetDevices"
+							r.summary = "デバイス一覧取得"
+							r.operationID = "getDevices"
+							r.pathPattern = "/notifications/devices"
+							r.args = args
+							r.count = 0
+							return r, true
+						case "POST":
+							r.name = "RegisterDevice"
+							r.summary = "デバイス登録/更新"
+							r.operationID = "registerDevice"
+							r.pathPattern = "/notifications/devices"
+							r.args = args
+							r.count = 0
+							return r, true
+						default:
+							return
+						}
+					}
+					switch elem[0] {
+					case '/': // Prefix: "/"
+						origElem := elem
+						if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							break
+						}
+						switch elem[0] {
+						case 'e': // Prefix: "exists"
+							origElem := elem
+							if l := len("exists"); len(elem) >= l && elem[0:l] == "exists" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch method {
+								case "GET":
+									r.name = "CheckDeviceExists"
+									r.summary = "デバイストークンが登録されているか確認"
+									r.operationID = "checkDeviceExists"
+									r.pathPattern = "/notifications/devices/exists"
+									r.args = args
+									r.count = 0
+									return r, true
+								default:
+									return
+								}
+							}
+
+							elem = origElem
+						}
+						// Param: "deviceId"
+						// Leaf parameter
+						args[0] = elem
+						elem = ""
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch method {
+							case "DELETE":
+								r.name = "DeleteDevice"
+								r.summary = "デバイス削除"
+								r.operationID = "deleteDevice"
+								r.pathPattern = "/notifications/devices/{deviceId}"
+								r.args = args
+								r.count = 1
+								return r, true
+							default:
+								return
+							}
+						}
+
+						elem = origElem
+					}
+
+					elem = origElem
+				case 'p': // Prefix: "preferences"
+					origElem := elem
+					if l := len("preferences"); len(elem) >= l && elem[0:l] == "preferences" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch method {
+						case "GET":
+							r.name = "GetNotificationPreferences"
+							r.summary = "通知設定取得"
+							r.operationID = "getNotificationPreferences"
+							r.pathPattern = "/notifications/preferences"
+							r.args = args
+							r.count = 0
+							return r, true
+						case "PUT":
+							r.name = "UpdateNotificationPreferences"
+							r.summary = "通知設定更新"
+							r.operationID = "updateNotificationPreferences"
+							r.pathPattern = "/notifications/preferences"
+							r.args = args
+							r.count = 0
+							return r, true
+						default:
+							return
+						}
+					}
+
+					elem = origElem
 				}
 
 				elem = origElem

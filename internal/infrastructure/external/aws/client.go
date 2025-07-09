@@ -8,6 +8,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/pinpoint"
 	"github.com/aws/aws-sdk-go-v2/service/sesv2"
 	"go.opentelemetry.io/otel"
 )
@@ -64,4 +65,18 @@ func NewSESClient() *sesv2.Client {
 		return nil
 	}
 	return sesClient
+}
+
+func NewPinpointClient() *pinpoint.Client {
+	cfg, err := NewAWSConfig()
+	if err != nil {
+		fmt.Printf("Error creating AWS config: %v\n", err)
+		return nil
+	}
+	pinpointClient := pinpoint.NewFromConfig(cfg)
+	if pinpointClient == nil {
+		fmt.Println("Error creating Pinpoint client")
+		return nil
+	}
+	return pinpointClient
 }

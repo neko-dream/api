@@ -47,6 +47,8 @@ type Config struct {
 	// 暗号化キー (16バイトの文字列) コマンド: openssl rand -base64 16
 	ENCRYPTION_SECRET string `env:"ENCRYPTION_SECRET"`
 
+	PINPOINT_APPLICATION_ID string `env:"PINPOINT_APPLICATION_ID"`
+
 	// ポリシーバージョン 現状は固定。API生えたら別途取得する
 	POLICY_VERSION string `env:"POLICY_VERSION"`
 	// ポリシー作成日 現状は固定。API生えたら別途取得する

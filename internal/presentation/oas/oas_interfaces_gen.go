@@ -17,12 +17,20 @@ type ChangePasswordRes interface {
 	changePasswordRes()
 }
 
+type CheckDeviceExistsRes interface {
+	checkDeviceExistsRes()
+}
+
 type ConsentTalkSessionRes interface {
 	consentTalkSessionRes()
 }
 
 type CreateOrganizationAliasRes interface {
 	createOrganizationAliasRes()
+}
+
+type DeleteDeviceRes interface {
+	deleteDeviceRes()
 }
 
 type DeleteOrganizationAliasRes interface {
@@ -55,6 +63,14 @@ type EstablishUserRes interface {
 
 type GetConclusionRes interface {
 	getConclusionRes()
+}
+
+type GetDevicesRes interface {
+	getDevicesRes()
+}
+
+type GetNotificationPreferencesRes interface {
+	getNotificationPreferencesRes()
 }
 
 type GetOpenedTalkSessionRes interface {
@@ -197,6 +213,10 @@ type PostTimeLineItemRes interface {
 	postTimeLineItemRes()
 }
 
+type RegisterDeviceRes interface {
+	registerDeviceRes()
+}
+
 type ReportOpinionRes interface {
 	reportOpinionRes()
 }
@@ -223,6 +243,10 @@ type TalkSessionAnalysisRes interface {
 
 type TestRes interface {
 	testRes()
+}
+
+type UpdateNotificationPreferencesRes interface {
+	updateNotificationPreferencesRes()
 }
 
 type UpdateUserProfileRes interface {

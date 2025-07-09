@@ -7,6 +7,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/crypto"
 	client "github.com/neko-dream/server/internal/infrastructure/external/analysis"
 	"github.com/neko-dream/server/internal/infrastructure/external/aws"
+	"github.com/neko-dream/server/internal/infrastructure/external/aws/pinpoint"
 	"github.com/neko-dream/server/internal/infrastructure/external/aws/ses"
 	"github.com/neko-dream/server/internal/infrastructure/http/cookie"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
@@ -52,9 +53,13 @@ func infraDeps() []ProvideArg {
 		{client.NewAnalysisService, nil},
 		{aws.NewAWSConfig, nil},
 		{aws.NewSESClient, nil},
+		{aws.NewPinpointClient, nil},
 		{ses.NewSESEmailSender, nil},
 		{cookie.NewCookieManager, nil},
 		{crypto.NewEncryptor, nil},
+		{pinpoint.NewPushNotificationSender, nil},
+		{repository.NewDeviceRepository, nil},
+		{repository.NewNotificationPreferenceRepository, nil},
 		{db.NewDummyInitializer, nil},
 		{organization.NewListJoinedOrganizationQuery, nil},
 	}
