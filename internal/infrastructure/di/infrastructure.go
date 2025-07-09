@@ -10,6 +10,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/external/aws/pinpoint"
 	"github.com/neko-dream/server/internal/infrastructure/external/aws/ses"
 	"github.com/neko-dream/server/internal/infrastructure/http/cookie"
+	"github.com/neko-dream/server/internal/infrastructure/persistence"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/postgresql"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/query/organization"
@@ -62,5 +63,6 @@ func infraDeps() []ProvideArg {
 		{repository.NewNotificationPreferenceRepository, nil},
 		{db.NewDummyInitializer, nil},
 		{organization.NewListJoinedOrganizationQuery, nil},
+		{persistence.NewEventStore, nil},
 	}
 }

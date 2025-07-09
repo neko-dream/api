@@ -3,7 +3,7 @@ ALTER TABLE devices
 ADD COLUMN IF NOT EXISTS device_name TEXT,
 ADD COLUMN IF NOT EXISTS app_version TEXT,
 ADD COLUMN IF NOT EXISTS os_version TEXT,
-ADD COLUMN IF NOT EXISTS last_active_at TIMESTAMPT;
+ADD COLUMN IF NOT EXISTS last_active_at TIMESTAMP;
 
 -- platformの値を更新
 ALTER TABLE devices DROP CONSTRAINT IF EXISTS devices_platform_check;
