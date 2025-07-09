@@ -14,6 +14,7 @@ tags:
   - name: image
   - name: test
   - name: health
+  - name: analysis
   - name: manage
 paths:
   /auth/dev/detach:
@@ -1416,6 +1417,41 @@ paths:
               required:
                 - policyVersion
       x-ogen-operation-group: Policy
+  /report/feedback:
+    post:
+      operationId: applyFeedbackToReport
+      summary: セッションのレポートにフィードバックを適用する
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - analysis
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                reportID:
+                  type: string
+                feedbackType:
+                  type: string
+              required:
+                - reportID
+                - feedbackType
+      x-ogen-operation-group: Analysis
   /talksessions:
     get:
       operationId: getTalkSessionList

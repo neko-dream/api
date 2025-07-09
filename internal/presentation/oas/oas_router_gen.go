@@ -897,6 +897,27 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				}
 
 				elem = origElem
+			case 'r': // Prefix: "report/feedback"
+				origElem := elem
+				if l := len("report/feedback"); len(elem) >= l && elem[0:l] == "report/feedback" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch r.Method {
+					case "POST":
+						s.handleApplyFeedbackToReportRequest([0]string{}, elemIsEscaped, w, r)
+					default:
+						s.notAllowed(w, r, "POST")
+					}
+
+					return
+				}
+
+				elem = origElem
 			case 't': // Prefix: "t"
 				origElem := elem
 				if l := len("t"); len(elem) >= l && elem[0:l] == "t" {
@@ -2714,6 +2735,31 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						r.summary = "最新のポリシーに同意する"
 						r.operationID = "policyConsent"
 						r.pathPattern = "/policy/consent"
+						r.args = args
+						r.count = 0
+						return r, true
+					default:
+						return
+					}
+				}
+
+				elem = origElem
+			case 'r': // Prefix: "report/feedback"
+				origElem := elem
+				if l := len("report/feedback"); len(elem) >= l && elem[0:l] == "report/feedback" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch method {
+					case "POST":
+						r.name = "ApplyFeedbackToReport"
+						r.summary = "セッションのレポートにフィードバックを適用する"
+						r.operationID = "applyFeedbackToReport"
+						r.pathPattern = "/report/feedback"
 						r.args = args
 						r.count = 0
 						return r, true

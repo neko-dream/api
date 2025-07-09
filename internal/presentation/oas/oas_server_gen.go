@@ -8,6 +8,7 @@ import (
 
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
+	AnalysisHandler
 	AuthHandler
 	HealthHandler
 	ImageHandler
@@ -20,6 +21,18 @@ type Handler interface {
 	TimelineHandler
 	UserHandler
 	VoteHandler
+}
+
+// AnalysisHandler handles operations described by OpenAPI v3 specification.
+//
+// x-ogen-operation-group: Analysis
+type AnalysisHandler interface {
+	// ApplyFeedbackToReport implements applyFeedbackToReport operation.
+	//
+	// セッションのレポートにフィードバックを適用する.
+	//
+	// POST /report/feedback
+	ApplyFeedbackToReport(ctx context.Context, req *ApplyFeedbackToReportReq) (ApplyFeedbackToReportRes, error)
 }
 
 // AuthHandler handles operations described by OpenAPI v3 specification.
