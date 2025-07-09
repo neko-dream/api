@@ -27,6 +27,7 @@ import "./routes/image.tsp";
 import "./routes/test.tsp";
 import "./routes/health.tsp";
 import "./routes/manage.tsp";
+import "./routes/analysis.tsp";
 
 using Http;
 using OpenAPI;

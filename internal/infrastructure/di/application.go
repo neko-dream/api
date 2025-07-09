@@ -13,6 +13,7 @@ import (
 	report_q "github.com/neko-dream/server/internal/application/query/report_query"
 	"github.com/neko-dream/server/internal/application/query/talksession"
 	"github.com/neko-dream/server/internal/application/query/timeline_query"
+	"github.com/neko-dream/server/internal/application/usecase/analysis_usecase"
 	"github.com/neko-dream/server/internal/application/usecase/auth_usecase"
 	"github.com/neko-dream/server/internal/application/usecase/image_usecase"
 	"github.com/neko-dream/server/internal/application/usecase/opinion_usecase"
@@ -82,5 +83,6 @@ func useCaseDeps() []ProvideArg {
 		{organization_usecase.NewDeactivateOrganizationAliasUseCase, nil},
 		{organization_usecase.NewListOrganizationAliasesUseCase, nil},
 		{organization_query.NewListOrganizationUsersQuery, nil},
+		{analysis_usecase.NewApplyFeedbackInteractor, nil},
 	}
 }
