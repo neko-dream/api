@@ -341,6 +341,64 @@ func decodeChangePasswordParams(args [0]string, argsEscaped bool, r *http.Reques
 	return params, nil
 }
 
+// CheckDeviceExistsParams is parameters of checkDeviceExists operation.
+type CheckDeviceExistsParams struct {
+	// FCMトークンまたはAPNSトークン.
+	DeviceToken string
+}
+
+func unpackCheckDeviceExistsParams(packed middleware.Parameters) (params CheckDeviceExistsParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "device_token",
+			In:   "query",
+		}
+		params.DeviceToken = packed[key].(string)
+	}
+	return params
+}
+
+func decodeCheckDeviceExistsParams(args [0]string, argsEscaped bool, r *http.Request) (params CheckDeviceExistsParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode query: device_token.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "device_token",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.DeviceToken = c
+				return nil
+			}); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "device_token",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // ConsentTalkSessionParams is parameters of consentTalkSession operation.
 type ConsentTalkSessionParams struct {
 	TalkSessionID string
@@ -399,6 +457,71 @@ func decodeConsentTalkSessionParams(args [1]string, argsEscaped bool, r *http.Re
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "talkSessionID",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// DeleteDeviceParams is parameters of deleteDevice operation.
+type DeleteDeviceParams struct {
+	DeviceId string
+}
+
+func unpackDeleteDeviceParams(packed middleware.Parameters) (params DeleteDeviceParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "deviceId",
+			In:   "path",
+		}
+		params.DeviceId = packed[key].(string)
+	}
+	return params
+}
+
+func decodeDeleteDeviceParams(args [1]string, argsEscaped bool, r *http.Request) (params DeleteDeviceParams, _ error) {
+	// Decode path: deviceId.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "deviceId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.DeviceId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "deviceId",
 			In:   "path",
 			Err:  err,
 		}

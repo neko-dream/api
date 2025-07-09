@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 
+	"github.com/neko-dream/server/internal/application/event_processor"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/di"
 	"github.com/neko-dream/server/internal/infrastructure/http/middleware"
@@ -36,6 +38,13 @@ func main() {
 	// migrator.Down()
 	migrator.Up()
 	// di.Invoke[*db.DummyInitializer](container).Initialize()
+
+	eventProcessor := di.Invoke[*event_processor.EventProcessor](container)
+	ctx := context.Background()
+	go func() {
+		eventProcessor.Start(ctx)
+		log.Printf("Event processor started")
+	}()
 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://localhost:3000"},

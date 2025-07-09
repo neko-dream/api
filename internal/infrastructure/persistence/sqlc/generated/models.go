@@ -6,10 +6,12 @@ package model
 
 import (
 	"database/sql"
+	"encoding/json"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
+	"github.com/sqlc-dev/pqtype"
 )
 
 type ActionItem struct {
@@ -31,6 +33,64 @@ type AuthState struct {
 	ExpiresAt       time.Time
 	RegistrationUrl sql.NullString
 	OrganizationID  uuid.NullUUID
+}
+
+type Device struct {
+	DeviceID     uuid.UUID
+	UserID       uuid.UUID
+	DeviceToken  string
+	Platform     string
+	Enabled      bool
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	DeviceName   sql.NullString
+	AppVersion   sql.NullString
+	OsVersion    sql.NullString
+	LastActiveAt sql.NullTime
+}
+
+type DomainEvent struct {
+	ID            uuid.UUID
+	EventType     string
+	EventData     json.RawMessage
+	AggregateID   string
+	AggregateType string
+	Status        string
+	OccurredAt    time.Time
+	ProcessedAt   sql.NullTime
+	FailedAt      sql.NullTime
+	FailureReason sql.NullString
+	RetryCount    int32
+}
+
+type NotificationHistory struct {
+	ID               uuid.UUID
+	UserID           uuid.UUID
+	DeviceID         uuid.NullUUID
+	NotificationType string
+	Title            string
+	Body             string
+	Data             pqtype.NullRawMessage
+	Status           string
+	FailureReason    sql.NullString
+	Read             bool
+	ReadAt           sql.NullTime
+	SentAt           time.Time
+}
+
+type NotificationPreference struct {
+	ID                      uuid.UUID
+	UserID                  uuid.UUID
+	PushNotificationEnabled bool
+	TalkSessionEnd          bool
+	TalkSessionParticipated bool
+	NewTalkSession          bool
+	QuietHoursEnabled       bool
+	QuietHoursStart         sql.NullString
+	QuietHoursEnd           sql.NullString
+	Timezone                sql.NullString
+	CreatedAt               time.Time
+	UpdatedAt               time.Time
 }
 
 type Opinion struct {

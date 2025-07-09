@@ -656,6 +656,107 @@ func (q *Queries) GetTalkSessionByID(ctx context.Context, talkSessionID uuid.UUI
 	return i, err
 }
 
+const getTalkSessionParticipants = `-- name: GetTalkSessionParticipants :many
+SELECT DISTINCT u.user_id
+FROM users u
+INNER JOIN opinions o ON u.user_id = o.user_id
+WHERE o.talk_session_id = $1
+`
+
+// GetTalkSessionParticipants
+//
+//	SELECT DISTINCT u.user_id
+//	FROM users u
+//	INNER JOIN opinions o ON u.user_id = o.user_id
+//	WHERE o.talk_session_id = $1
+func (q *Queries) GetTalkSessionParticipants(ctx context.Context, talkSessionID uuid.UUID) ([]uuid.UUID, error) {
+	rows, err := q.db.QueryContext(ctx, getTalkSessionParticipants, talkSessionID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []uuid.UUID
+	for rows.Next() {
+		var user_id uuid.UUID
+		if err := rows.Scan(&user_id); err != nil {
+			return nil, err
+		}
+		items = append(items, user_id)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getUnprocessedEndedSessions = `-- name: GetUnprocessedEndedSessions :many
+SELECT talk_session_id, owner_id, theme, scheduled_end_time, created_at, city, prefecture, description, thumbnail_url, restrictions, updated_at, hide_report, organization_id, organization_alias_id FROM talk_sessions
+WHERE scheduled_end_time < NOW()
+  AND NOT EXISTS (
+    SELECT 1 FROM domain_events 
+    WHERE aggregate_id = talk_sessions.talk_session_id::text
+      AND aggregate_type = 'TalkSession'
+      AND event_type = 'talksession.ended'
+  )
+ORDER BY scheduled_end_time ASC
+LIMIT $1
+FOR UPDATE SKIP LOCKED
+`
+
+// GetUnprocessedEndedSessions
+//
+//	SELECT talk_session_id, owner_id, theme, scheduled_end_time, created_at, city, prefecture, description, thumbnail_url, restrictions, updated_at, hide_report, organization_id, organization_alias_id FROM talk_sessions
+//	WHERE scheduled_end_time < NOW()
+//	  AND NOT EXISTS (
+//	    SELECT 1 FROM domain_events
+//	    WHERE aggregate_id = talk_sessions.talk_session_id::text
+//	      AND aggregate_type = 'TalkSession'
+//	      AND event_type = 'talksession.ended'
+//	  )
+//	ORDER BY scheduled_end_time ASC
+//	LIMIT $1
+//	FOR UPDATE SKIP LOCKED
+func (q *Queries) GetUnprocessedEndedSessions(ctx context.Context, limit int32) ([]TalkSession, error) {
+	rows, err := q.db.QueryContext(ctx, getUnprocessedEndedSessions, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TalkSession
+	for rows.Next() {
+		var i TalkSession
+		if err := rows.Scan(
+			&i.TalkSessionID,
+			&i.OwnerID,
+			&i.Theme,
+			&i.ScheduledEndTime,
+			&i.CreatedAt,
+			&i.City,
+			&i.Prefecture,
+			&i.Description,
+			&i.ThumbnailUrl,
+			&i.Restrictions,
+			&i.UpdatedAt,
+			&i.HideReport,
+			&i.OrganizationID,
+			&i.OrganizationAliasID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listTalkSessions = `-- name: ListTalkSessions :many
 SELECT
     ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
