@@ -5,15 +5,15 @@ DROP TABLE IF EXISTS notification_history;
 DROP TABLE IF EXISTS notification_preferences;
 
 -- devicesテーブルから追加したカラムを削除
-ALTER TABLE devices 
-DROP COLUMN IF EXISTS device_name,
-DROP COLUMN IF EXISTS app_version,
-DROP COLUMN IF EXISTS os_version,
-DROP COLUMN IF EXISTS last_active_at;
+ALTER TABLE devices
+    DROP COLUMN IF EXISTS device_name,
+    DROP COLUMN IF EXISTS app_version,
+    DROP COLUMN IF EXISTS os_version,
+    DROP COLUMN IF EXISTS last_active_at;
 
 -- platformの制約を元に戻す
 ALTER TABLE devices DROP CONSTRAINT IF EXISTS devices_platform_check;
-ALTER TABLE devices ADD CONSTRAINT devices_platform_check 
+ALTER TABLE devices ADD CONSTRAINT devices_platform_check
     CHECK (platform IN ('APNS', 'GCM'));
 
 -- 追加したインデックスを削除
