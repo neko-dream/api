@@ -277,6 +277,8 @@ SELECT
     created_at
 FROM talk_session_report_histories
 WHERE talk_session_id = $1
+ORDER BY created_at DESC
+LIMIT 1
 `
 
 type GetReportByTalkSessionIdRow struct {
@@ -295,6 +297,8 @@ type GetReportByTalkSessionIdRow struct {
 //	    created_at
 //	FROM talk_session_report_histories
 //	WHERE talk_session_id = $1
+//	ORDER BY created_at DESC
+//	LIMIT 1
 func (q *Queries) GetReportByTalkSessionId(ctx context.Context, talkSessionID uuid.UUID) (GetReportByTalkSessionIdRow, error) {
 	row := q.db.QueryRowContext(ctx, getReportByTalkSessionId, talkSessionID)
 	var i GetReportByTalkSessionIdRow
