@@ -36,6 +36,7 @@ var (
 			Algos:                 []string{"ES256", "HS256"},
 			AuthURLOptions: map[string]string{
 				"bot_prompt": "aggressive",
+				"prompt":     "consent",
 			},
 		},
 	}

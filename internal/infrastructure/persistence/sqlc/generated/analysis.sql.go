@@ -8,6 +8,7 @@ package model
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -30,6 +31,98 @@ type AddGeneratedImagesParams struct {
 func (q *Queries) AddGeneratedImages(ctx context.Context, arg AddGeneratedImagesParams) error {
 	_, err := q.db.ExecContext(ctx, addGeneratedImages, arg.TalkSessionID, arg.WordmapUrl, arg.TsncUrl)
 	return err
+}
+
+const findReportByID = `-- name: FindReportByID :one
+SELECT
+    talk_session_report_history_id as analysis_report_history_id,
+    talk_session_id,
+    report,
+    created_at
+FROM talk_session_report_histories
+WHERE talk_session_report_history_id = $1
+`
+
+type FindReportByIDRow struct {
+	AnalysisReportHistoryID uuid.UUID
+	TalkSessionID           uuid.UUID
+	Report                  string
+	CreatedAt               time.Time
+}
+
+// FindReportByID
+//
+//	SELECT
+//	    talk_session_report_history_id as analysis_report_history_id,
+//	    talk_session_id,
+//	    report,
+//	    created_at
+//	FROM talk_session_report_histories
+//	WHERE talk_session_report_history_id = $1
+func (q *Queries) FindReportByID(ctx context.Context, talkSessionReportHistoryID uuid.UUID) (FindReportByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, findReportByID, talkSessionReportHistoryID)
+	var i FindReportByIDRow
+	err := row.Scan(
+		&i.AnalysisReportHistoryID,
+		&i.TalkSessionID,
+		&i.Report,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getFeedbackByReportHistoryID = `-- name: GetFeedbackByReportHistoryID :many
+SELECT
+    report_feedback_id,
+    user_id,
+    feedback_type,
+    created_at
+FROM report_feedback
+WHERE talk_session_report_history_id = $1
+`
+
+type GetFeedbackByReportHistoryIDRow struct {
+	ReportFeedbackID uuid.UUID
+	UserID           uuid.UUID
+	FeedbackType     int32
+	CreatedAt        time.Time
+}
+
+// GetFeedbackByReportHistoryID
+//
+//	SELECT
+//	    report_feedback_id,
+//	    user_id,
+//	    feedback_type,
+//	    created_at
+//	FROM report_feedback
+//	WHERE talk_session_report_history_id = $1
+func (q *Queries) GetFeedbackByReportHistoryID(ctx context.Context, talkSessionReportHistoryID uuid.UUID) ([]GetFeedbackByReportHistoryIDRow, error) {
+	rows, err := q.db.QueryContext(ctx, getFeedbackByReportHistoryID, talkSessionReportHistoryID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetFeedbackByReportHistoryIDRow
+	for rows.Next() {
+		var i GetFeedbackByReportHistoryIDRow
+		if err := rows.Scan(
+			&i.ReportFeedbackID,
+			&i.UserID,
+			&i.FeedbackType,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getGeneratedImages = `-- name: GetGeneratedImages :one
@@ -178,31 +271,42 @@ func (q *Queries) GetGroupListByTalkSessionId(ctx context.Context, talkSessionID
 
 const getReportByTalkSessionId = `-- name: GetReportByTalkSessionId :one
 SELECT
+    talk_session_report_history_id as analysis_report_history_id,
     talk_session_id,
     report,
-    created_at,
-    updated_at
-FROM talk_session_reports
+    created_at
+FROM talk_session_report_histories
 WHERE talk_session_id = $1
+ORDER BY created_at DESC
+LIMIT 1
 `
+
+type GetReportByTalkSessionIdRow struct {
+	AnalysisReportHistoryID uuid.UUID
+	TalkSessionID           uuid.UUID
+	Report                  string
+	CreatedAt               time.Time
+}
 
 // GetReportByTalkSessionId
 //
 //	SELECT
+//	    talk_session_report_history_id as analysis_report_history_id,
 //	    talk_session_id,
 //	    report,
-//	    created_at,
-//	    updated_at
-//	FROM talk_session_reports
+//	    created_at
+//	FROM talk_session_report_histories
 //	WHERE talk_session_id = $1
-func (q *Queries) GetReportByTalkSessionId(ctx context.Context, talkSessionID uuid.UUID) (TalkSessionReport, error) {
+//	ORDER BY created_at DESC
+//	LIMIT 1
+func (q *Queries) GetReportByTalkSessionId(ctx context.Context, talkSessionID uuid.UUID) (GetReportByTalkSessionIdRow, error) {
 	row := q.db.QueryRowContext(ctx, getReportByTalkSessionId, talkSessionID)
-	var i TalkSessionReport
+	var i GetReportByTalkSessionIdRow
 	err := row.Scan(
+		&i.AnalysisReportHistoryID,
 		&i.TalkSessionID,
 		&i.Report,
 		&i.CreatedAt,
-		&i.UpdatedAt,
 	)
 	return i, err
 }
@@ -304,4 +408,54 @@ func (q *Queries) GetRepresentativeOpinionsByTalkSessionId(ctx context.Context, 
 		return nil, err
 	}
 	return items, nil
+}
+
+const saveReportFeedback = `-- name: SaveReportFeedback :exec
+INSERT INTO report_feedback (
+    report_feedback_id,
+    talk_session_report_history_id,
+    user_id,
+    feedback_type,
+    created_at
+) VALUES (
+    $1,
+    $2,
+    $3,
+    $4,
+    $5
+) ON CONFLICT (user_id, talk_session_report_history_id) DO NOTHING
+`
+
+type SaveReportFeedbackParams struct {
+	ReportFeedbackID           uuid.UUID
+	TalkSessionReportHistoryID uuid.UUID
+	UserID                     uuid.UUID
+	FeedbackType               int32
+	CreatedAt                  time.Time
+}
+
+// SaveReportFeedback
+//
+//	INSERT INTO report_feedback (
+//	    report_feedback_id,
+//	    talk_session_report_history_id,
+//	    user_id,
+//	    feedback_type,
+//	    created_at
+//	) VALUES (
+//	    $1,
+//	    $2,
+//	    $3,
+//	    $4,
+//	    $5
+//	) ON CONFLICT (user_id, talk_session_report_history_id) DO NOTHING
+func (q *Queries) SaveReportFeedback(ctx context.Context, arg SaveReportFeedbackParams) error {
+	_, err := q.db.ExecContext(ctx, saveReportFeedback,
+		arg.ReportFeedbackID,
+		arg.TalkSessionReportHistoryID,
+		arg.UserID,
+		arg.FeedbackType,
+		arg.CreatedAt,
+	)
+	return err
 }
