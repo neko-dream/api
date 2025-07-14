@@ -18,7 +18,6 @@ func NewStaticHandler() http.Handler {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			// Create new request with modified path
 			newReq := r.Clone(r.Context())
 			newReq.URL.Path = "/" + path
 			http.FileServer(http.FS(fsys)).ServeHTTP(w, newReq)
