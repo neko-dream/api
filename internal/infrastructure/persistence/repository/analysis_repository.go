@@ -8,7 +8,6 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/analysis"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
-	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/server/pkg/utils"
@@ -37,32 +36,32 @@ func (r *analysisRepository) FindByTalkSessionID(ctx context.Context, talkSessio
 		return nil, err
 	}
 
-	feedbackRows, err := r.DBManager.GetQueries(ctx).GetFeedbackByReportHistoryID(ctx, analysisReport.AnalysisReportHistoryID)
-	if err != nil {
-		if !errors.Is(err, sql.ErrNoRows) {
-			utils.HandleError(ctx, err, "failed to retrieve feedback by report history ID")
-		}
-		return nil, err
-	}
+	// feedbackRows, err := r.DBManager.GetQueries(ctx).GetFeedbackByReportHistoryID(ctx, analysisReport.AnalysisReportHistoryID)
+	// if err != nil {
+	// 	if !errors.Is(err, sql.ErrNoRows) {
+	// 		utils.HandleError(ctx, err, "failed to retrieve feedback by report history ID")
+	// 	}
+	// 	return nil, err
+	// }
 
-	feedbacks := make([]analysis.Feedback, len(feedbackRows))
-	for i, row := range feedbackRows {
-		feedbacks[i] = analysis.Feedback{
-			FeedbackID: shared.UUID[analysis.Feedback](row.ReportFeedbackID),
-			UserID:     shared.UUID[user.User](row.UserID),
-			Type:       analysis.FeedbackType(row.FeedbackType),
-			CreatedAt:  row.CreatedAt,
-		}
-	}
+	// feedbacks := make([]analysis.Feedback, len(feedbackRows))
+	// for i, row := range feedbackRows {
+	// 	feedbacks[i] = analysis.Feedback{
+	// 		FeedbackID: shared.UUID[analysis.Feedback](row.ReportFeedbackID),
+	// 		UserID:     shared.UUID[user.User](row.UserID),
+	// 		Type:       analysis.FeedbackType(row.FeedbackType),
+	// 		CreatedAt:  row.CreatedAt,
+	// 	}
+	// }
 
 	reportModel := &analysis.AnalysisReport{
-		AnalysisReportID: shared.UUID[analysis.AnalysisReport](analysisReport.AnalysisReportHistoryID),
+		AnalysisReportID: shared.UUID[analysis.AnalysisReport](analysisReport.TalkSessionID),
 		Report:           &analysisReport.Report,
 		CreatedAt:        analysisReport.CreatedAt,
 	}
-	if len(feedbacks) > 0 {
-		reportModel.Feedbacks = feedbacks
-	}
+	// if len(feedbacks) > 0 {
+	// 	reportModel.Feedbacks = feedbacks
+	// }
 
 	return reportModel, nil
 }
@@ -80,32 +79,32 @@ func (r *analysisRepository) FindByID(ctx context.Context, analysisReportID shar
 		return nil, err
 	}
 
-	feedbackRows, err := r.DBManager.GetQueries(ctx).GetFeedbackByReportHistoryID(ctx, analysisReport.AnalysisReportHistoryID)
-	if err != nil {
-		if !errors.Is(err, sql.ErrNoRows) {
-			utils.HandleError(ctx, err, "failed to retrieve feedback by report history ID")
-		}
-		return nil, err
-	}
+	// feedbackRows, err := r.DBManager.GetQueries(ctx).GetFeedbackByReportHistoryID(ctx, analysisReport.AnalysisReportHistoryID)
+	// if err != nil {
+	// 	if !errors.Is(err, sql.ErrNoRows) {
+	// 		utils.HandleError(ctx, err, "failed to retrieve feedback by report history ID")
+	// 	}
+	// 	return nil, err
+	// }
 
-	feedbacks := make([]analysis.Feedback, len(feedbackRows))
-	for i, row := range feedbackRows {
-		feedbacks[i] = analysis.Feedback{
-			FeedbackID: shared.UUID[analysis.Feedback](row.ReportFeedbackID),
-			UserID:     shared.UUID[user.User](row.UserID),
-			Type:       analysis.FeedbackType(row.FeedbackType),
-			CreatedAt:  row.CreatedAt,
-		}
-	}
+	// feedbacks := make([]analysis.Feedback, len(feedbackRows))
+	// for i, row := range feedbackRows {
+	// 	feedbacks[i] = analysis.Feedback{
+	// 		FeedbackID: shared.UUID[analysis.Feedback](row.ReportFeedbackID),
+	// 		UserID:     shared.UUID[user.User](row.UserID),
+	// 		Type:       analysis.FeedbackType(row.FeedbackType),
+	// 		CreatedAt:  row.CreatedAt,
+	// 	}
+	// }
 
 	reportModel := &analysis.AnalysisReport{
-		AnalysisReportID: shared.UUID[analysis.AnalysisReport](analysisReport.AnalysisReportHistoryID),
+		AnalysisReportID: shared.UUID[analysis.AnalysisReport](analysisReport.TalkSessionID),
 		Report:           &analysisReport.Report,
 		CreatedAt:        analysisReport.CreatedAt,
 	}
-	if len(feedbacks) > 0 {
-		reportModel.Feedbacks = feedbacks
-	}
+	// if len(feedbacks) > 0 {
+	// 	reportModel.Feedbacks = feedbacks
+	// }
 
 	return reportModel, nil
 }

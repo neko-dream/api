@@ -35,39 +35,33 @@ func (q *Queries) AddGeneratedImages(ctx context.Context, arg AddGeneratedImages
 
 const findReportByID = `-- name: FindReportByID :one
 SELECT
-    talk_session_report_history_id as analysis_report_history_id,
+    -- talk_session_report_history_id as analysis_report_history_id,
     talk_session_id,
     report,
     created_at
-FROM talk_session_report_histories
-WHERE talk_session_report_history_id = $1
+FROM talk_session_reports
+WHERE talk_session_id = $1
 `
 
 type FindReportByIDRow struct {
-	AnalysisReportHistoryID uuid.UUID
-	TalkSessionID           uuid.UUID
-	Report                  string
-	CreatedAt               time.Time
+	TalkSessionID uuid.UUID
+	Report        string
+	CreatedAt     time.Time
 }
 
 // FindReportByID
 //
 //	SELECT
-//	    talk_session_report_history_id as analysis_report_history_id,
+//	    -- talk_session_report_history_id as analysis_report_history_id,
 //	    talk_session_id,
 //	    report,
 //	    created_at
-//	FROM talk_session_report_histories
-//	WHERE talk_session_report_history_id = $1
-func (q *Queries) FindReportByID(ctx context.Context, talkSessionReportHistoryID uuid.UUID) (FindReportByIDRow, error) {
-	row := q.db.QueryRowContext(ctx, findReportByID, talkSessionReportHistoryID)
+//	FROM talk_session_reports
+//	WHERE talk_session_id = $1
+func (q *Queries) FindReportByID(ctx context.Context, talkSessionID uuid.UUID) (FindReportByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, findReportByID, talkSessionID)
 	var i FindReportByIDRow
-	err := row.Scan(
-		&i.AnalysisReportHistoryID,
-		&i.TalkSessionID,
-		&i.Report,
-		&i.CreatedAt,
-	)
+	err := row.Scan(&i.TalkSessionID, &i.Report, &i.CreatedAt)
 	return i, err
 }
 
@@ -271,41 +265,33 @@ func (q *Queries) GetGroupListByTalkSessionId(ctx context.Context, talkSessionID
 
 const getReportByTalkSessionId = `-- name: GetReportByTalkSessionId :one
 SELECT
-    talk_session_report_history_id as analysis_report_history_id,
+    -- talk_session_report_history_id as analysis_report_history_id,
     talk_session_id,
     report,
     created_at
-FROM talk_session_report_histories
+FROM talk_session_reports
 WHERE talk_session_id = $1
 `
 
 type GetReportByTalkSessionIdRow struct {
-	AnalysisReportHistoryID uuid.UUID
-	TalkSessionID           uuid.UUID
-	Report                  string
-	CreatedAt               time.Time
+	TalkSessionID uuid.UUID
+	Report        string
+	CreatedAt     time.Time
 }
 
 // GetReportByTalkSessionId
 //
 //	SELECT
-//	    talk_session_report_history_id as analysis_report_history_id,
+//	    -- talk_session_report_history_id as analysis_report_history_id,
 //	    talk_session_id,
 //	    report,
 //	    created_at
-//	FROM talk_session_report_histories
+//	FROM talk_session_reports
 //	WHERE talk_session_id = $1
-//	ORDER BY created_at DESC
-//	LIMIT 1
 func (q *Queries) GetReportByTalkSessionId(ctx context.Context, talkSessionID uuid.UUID) (GetReportByTalkSessionIdRow, error) {
 	row := q.db.QueryRowContext(ctx, getReportByTalkSessionId, talkSessionID)
 	var i GetReportByTalkSessionIdRow
-	err := row.Scan(
-		&i.AnalysisReportHistoryID,
-		&i.TalkSessionID,
-		&i.Report,
-		&i.CreatedAt,
-	)
+	err := row.Scan(&i.TalkSessionID, &i.Report, &i.CreatedAt)
 	return i, err
 }
 

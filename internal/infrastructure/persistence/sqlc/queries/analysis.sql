@@ -41,21 +41,21 @@ WHERE talk_session_id = $1;
 
 -- name: GetReportByTalkSessionId :one
 SELECT
-    talk_session_report_history_id as analysis_report_history_id,
+    -- talk_session_report_history_id as analysis_report_history_id,
     talk_session_id,
     report,
     created_at
-FROM talk_session_report_histories
+FROM talk_session_reports
 WHERE talk_session_id = $1;
 
 -- name: FindReportByID :one
 SELECT
-    talk_session_report_history_id as analysis_report_history_id,
+    -- talk_session_report_history_id as analysis_report_history_id,
     talk_session_id,
     report,
     created_at
-FROM talk_session_report_histories
-WHERE talk_session_report_history_id = $1;
+FROM talk_session_reports
+WHERE talk_session_id = $1;
 
 -- name: GetFeedbackByReportHistoryID :many
 SELECT
