@@ -73,12 +73,11 @@ func (h *GetReportQueryHandler) Execute(ctx context.Context, input analysis_quer
 		if errors.Is(err, sql.ErrNoRows) {
 			if err := h.AnalysisService.GenerateReport(ctx, input.TalkSessionID); err != nil {
 				utils.HandleError(ctx, err, "レポートの生成に失敗しました")
-				return nil, messages.AnalysisReportNotFound
 			}
 		}
-
-		utils.HandleError(ctx, err, "レポートの生成に失敗しました")
-		return nil, messages.AnalysisReportNotFound
+		return &analysis_query.GetReportOutput{
+			Report: &out.Report,
+		}, nil
 	}
 
 	return &analysis_query.GetReportOutput{
