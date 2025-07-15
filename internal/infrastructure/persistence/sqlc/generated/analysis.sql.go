@@ -277,8 +277,6 @@ SELECT
     created_at
 FROM talk_session_report_histories
 WHERE talk_session_id = $1
-ORDER BY created_at DESC
-LIMIT 1
 `
 
 type GetReportByTalkSessionIdRow struct {
