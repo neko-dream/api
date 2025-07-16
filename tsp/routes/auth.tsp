@@ -158,13 +158,13 @@ namespace kotohiro {
   };
 
   /**
-   * そのアカウントには再度ログインできなくなります。ログインしたければ言ってね！
+   * ユーザーを退会させます。ユーザーデータは匿名化され、30日間は再登録できません。
    */
   @tag("auth")
   @extension("x-ogen-operation-group", "Auth")
   @route("/auth/dev/detach")
   @delete
-  @summary("**開発用** 現在のアカウントを切り離す")
+  @summary("ユーザー退会")
   op authAccountDetach(): {
     @header("Set-Cookie") SetCookie?: string[];
     @body body: {};
