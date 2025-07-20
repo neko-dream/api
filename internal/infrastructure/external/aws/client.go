@@ -18,6 +18,10 @@ var (
 )
 
 func NewAWSConfig() (aws.Config, error) {
+	return NewAWSConfigWithContext(context.Background())
+}
+
+func NewAWSConfigWithContext(ctx context.Context) (aws.Config, error) {
 	once.Do(func() {
 		region := "ap-northeast-1"
 		var funs []func(*awsConfig.LoadOptions) error
@@ -29,7 +33,7 @@ func NewAWSConfig() (aws.Config, error) {
 		funs = append(funs, awsConfig.WithRegion(region))
 
 		var err error
-		s, err = awsConfig.LoadDefaultConfig(context.TODO(), funs...)
+		s, err = awsConfig.LoadDefaultConfig(ctx, funs...)
 		if err != nil {
 			configErr = fmt.Errorf("failed to load AWS config: %w", err)
 			return

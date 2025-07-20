@@ -18,9 +18,13 @@ var (
 
 // initConfig awsConfigを作成。 otelawsによる計装も設定
 func InitConfig(appConf *config.Config) aws.Config {
+	return InitConfigWithContext(context.Background(), appConf)
+}
+
+func InitConfigWithContext(ctx context.Context, appConf *config.Config) aws.Config {
 	once.Do(func() {
 		c, err := awsConfig.LoadDefaultConfig(
-			context.TODO(),
+			ctx,
 			awsConfig.WithRegion(appConf.R2_REGION),
 			awsConfig.WithCredentialsProvider(
 				credentials.NewStaticCredentialsProvider(
