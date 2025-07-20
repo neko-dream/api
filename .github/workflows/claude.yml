@@ -1,4 +1,4 @@
-name: Claude Code
+name: Claude Code Assistant
 
 on:
   issue_comment:
@@ -9,6 +9,8 @@ on:
     types: [opened, assigned]
   pull_request_review:
     types: [submitted]
+  pull_request:
+    types: [opened]
 
 jobs:
   claude:
@@ -16,7 +18,8 @@ jobs:
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
       (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
       (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
-      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude'))) ||
+      (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '@claude'))
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -28,16 +31,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0  # Full history for better context
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '^1.24.x'
+          go-version-file: 'go.mod'
           cache: true
           cache-dependency-path: |
             go.mod
             go.sum
+
+      - name: Install dependencies
+        run: |
+          go mod download
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
       - name: Run Claude Code
         id: claude
@@ -47,7 +56,22 @@ jobs:
           additional_permissions: |
             actions: read
           model: "claude-opus-4-20250514"
-          allowed_tools: "Bash(bash:*),Bash(git:*),Bash(gh:*),Bash(go:*),Bash(ginkgo:*)"
+          allowed_tools: "Bash(bash:*),Bash(git:*),Bash(gh:*),Bash(go:*),Bash(ginkgo:*),Bash(./scripts/*)"
           direct_prompt: |
-            ${{ github.event_name == 'issue_comment' && 'issueタイトルには適切なgitmojiをつけてください。' || ''}}
-            ビルドが成功することを必ず確認してください。
+            ## プロジェクト固有のルール
+            1. TypeSpecやSQL定義を変更した場合は必ず `./scripts/gen.sh` を実行してください
+            2. 新機能実装時はTDDアプローチを採用し、テストから書き始めてください
+            3. アーキテクチャの依存関係を守ってください: presentation → application → domain ← infrastructure
+            4. issueタイトルには適切なgitmojiをつけてください
+            5. PRのコミットメッセージには適切なgitmojiプレフィックスを使用してください
+
+            ## 実行すべきチェック
+            1. `go test ./...` でテストが通ることを確認
+            2. `golangci-lint run` でリントエラーがないことを確認
+            3. `go fmt ./...` でフォーマットを整える
+            4. ビルドが成功することを確認: `go build ./...`
+
+            ## 参照すべきドキュメント
+            - アーキテクチャ: docs/development/architecture/architecture.md
+            - 開発ガイドライン: docs/development/guidelines/development-guideline.md
+            - TDDガイドライン: docs/development/guidelines/tdd-guideline.md
