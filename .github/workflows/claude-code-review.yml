@@ -3,28 +3,18 @@ name: Claude Code Review
 on:
   pull_request:
     types: [opened, synchronize]
-    # Optional: Only run on specific file changes
-    # paths:
-    #   - "src/**/*.ts"
-    #   - "src/**/*.tsx"
-    #   - "src/**/*.js"
-    #   - "src/**/*.jsx"
 
 jobs:
   claude-review:
-    # Optional: Filter by PR author
-    # if: |
-    #   github.event.pull_request.user.login == 'external-contributor' ||
-    #   github.event.pull_request.user.login == 'new-developer' ||
-    #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
-    
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      pull-requests: read
-      issues: read
+      contents: write
+      pull-requests: write
+      issues: write
       id-token: write
-    
+      actions: read
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -36,43 +26,29 @@ jobs:
         uses: anthropics/claude-code-action@beta
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-
-          # Optional: Specify model (defaults to Claude Sonnet 4, uncomment for Claude Opus 4)
-          # model: "claude-opus-4-20250514"
-          
-          # Direct prompt for automated review (no @claude mention needed)
+          model: "claude-opus-4-20250514"
           direct_prompt: |
-            Please review this pull request and provide feedback on:
+            ## Workflow
+            - Start: `mcp__github__create_pending_pull_request_review`
+            - Analyze: `mcp__github__get_pull_request_diff`
+            - Comment: `mcp__github__add_pull_request_review_comment_to_pending_review` (use suggestions when fix is clear)
+            - Submit: `mcp__github__submit_pending_pull_request_review` with **COMMENT** type (never REQUEST_CHANGES)
+
+            ## Inline Comments
+            - Start with one-line conclusion
+            - Follow with reasoning and specific fix
+            - Focus on bugs, readability, concrete improvements
+            - Limit positive feedback to exceptional implementations
+
+            ## Review Focus
+            - CLAUDE.md compliance
             - Code quality and best practices
-            - Potential bugs or issues
-            - Performance considerations
-            - Security concerns
-            - Test coverage
-            
-            Be constructive and helpful in your feedback.
+            - Security/bugs/performance
+            - Architecture and maintainability
 
-          # Optional: Use sticky comments to make Claude reuse the same comment on subsequent pushes to the same PR
-          # use_sticky_comment: true
-          
-          # Optional: Customize review based on file types
-          # direct_prompt: |
-          #   Review this PR focusing on:
-          #   - For TypeScript files: Type safety and proper interface usage
-          #   - For API endpoints: Security, input validation, and error handling
-          #   - For React components: Performance, accessibility, and best practices
-          #   - For tests: Coverage, edge cases, and test quality
-          
-          # Optional: Different prompts for different authors
-          # direct_prompt: |
-          #   ${{ github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR' && 
-          #   'Welcome! Please review this PR from a first-time contributor. Be encouraging and provide detailed explanations for any suggestions.' ||
-          #   'Please provide a thorough code review focusing on our coding standards and best practices.' }}
-          
-          # Optional: Add specific tools for running tests or linting
-          # allowed_tools: "Bash(npm run test),Bash(npm run lint),Bash(npm run typecheck)"
-          
-          # Optional: Skip review for certain conditions
-          # if: |
-          #   !contains(github.event.pull_request.title, '[skip-review]') &&
-          #   !contains(github.event.pull_request.title, '[WIP]')
+            ## Notes
+            - Use Japanese for feedback（必ず日本語でフィードバックをお願いします）
+            - Be specific and actionable
+            - Always use COMMENT type (don't block PR)
 
+          allowed_tools: "Bash(git:*),View,GlobTool,GrepTool,mcp__github__create_pending_pull_request_review,mcp__github__add_pull_request_review_comment_to_pending_review,mcp__github__submit_pending_pull_request_review,mcp__github__get_pull_request_diff"
