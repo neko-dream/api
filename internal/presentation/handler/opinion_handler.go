@@ -124,7 +124,7 @@ func (o *opinionHandler) OpinionComments2(ctx context.Context, params oas.Opinio
 	authCtx, err := getAuthenticationContext(o.authService, o.SetSession(ctx))
 	var userID *shared.UUID[user.User]
 	if err == nil {
-		userID = lo.ToPtr(authCtx.UserID)
+		userID = &authCtx.UserID
 	}
 
 	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
