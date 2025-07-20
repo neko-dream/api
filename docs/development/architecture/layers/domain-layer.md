@@ -46,6 +46,9 @@ IDによる同一性を持つオブジェクト。
 **型安全なID:**
 - `shared.UUID[T]` - ジェネリクスを使用した型安全なUUID
 - 例：`UUID[User]`、`UUID[TalkSession]`
+- **重要**: エンティティのIDは必ず`shared.UUID[エンティティ名]`の形式で定義すること
+  - 正しい例: `shared.UUID[Opinion]`、`shared.UUID[Vote]`
+  - 誤った例: `string`、`int`、`uuid.UUID`などのプリミティブ型
 
 **ドメイン固有の値:**
 - `UserName`、`UserSubject` - ユーザー関連
