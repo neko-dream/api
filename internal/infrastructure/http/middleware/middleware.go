@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/neko-dream/server/internal/domain/model/session"
+	"github.com/neko-dream/server/internal/infrastructure/di"
 	http_utils "github.com/neko-dream/server/pkg/http"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
@@ -11,6 +13,7 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	"go.opentelemetry.io/otel/trace"
+	"go.uber.org/dig"
 )
 
 func Labeler(find RouteFinder) Middleware {
@@ -60,6 +63,60 @@ func Instrument(serviceName string, find RouteFinder, traceProvider *sdktrace.Tr
 				return operation
 			}),
 		)
+	}
+}
+
+// contextにCookieKeyをセットするミドルウェア
+func SetContextCookieKey(cont *dig.Container) Middleware {
+	tokenManager := di.Invoke[session.TokenManager](cont)
+	sessionRepository := di.Invoke[session.SessionRepository](cont)
+	return func(h http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
+			// headerからSessionIdを取得
+			cookie, err := r.Cookie("SessionId")
+			if err != nil {
+				// Cookieが存在しない場合はそのまま続行
+				h.ServeHTTP(w, r)
+				return
+			}
+
+			// トークンをパース
+			claim, err := tokenManager.Parse(ctx, cookie.Value)
+			if err != nil {
+				// パースエラーの場合もそのまま続行（オプショナル認証のため）
+				h.ServeHTTP(w, r)
+				return
+			}
+
+			// トークンの有効性を確認
+			if claim.IsExpired(ctx) {
+				// 期限切れの場合もそのまま続行（オプショナル認証のため）
+				h.ServeHTTP(w, r)
+				return
+			}
+
+			// セッションIDを取得して、セッションが存在するか確認
+			sessionID, err := claim.SessionID()
+			if err != nil {
+				h.ServeHTTP(w, r)
+				return
+			}
+
+			// セッションの存在確認
+			_, err = sessionRepository.FindBySessionID(ctx, sessionID)
+			if err != nil {
+				// セッションが見つからない場合もそのまま続行
+				h.ServeHTTP(w, r)
+				return
+			}
+
+			// contextにセッション情報を設定
+			ctx = session.SetSession(ctx, claim)
+			r = r.WithContext(ctx)
+
+			h.ServeHTTP(w, r)
+		})
 	}
 }
 

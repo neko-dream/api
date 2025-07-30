@@ -49,6 +49,7 @@ func main() {
 	corsHandler := c.Handler(middleware.Wrap(
 		srv,
 		middleware.Instrument("kotohiro-api", routeFinder, di.Invoke[*sdktrace.TracerProvider](container)),
+		middleware.SetContextCookieKey(container),
 		middleware.Labeler(routeFinder),
 	))
 

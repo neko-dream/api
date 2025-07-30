@@ -2423,50 +2423,6 @@ func (s *Server) handleGetOpinionAnalysisRequest(args [1]string, argsEscaped boo
 			ID:   "getOpinionAnalysis",
 		}
 	)
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			sctx, ok, err := s.securityOptionalCookieAuth(ctx, "GetOpinionAnalysis", r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "OptionalCookieAuth",
-					Err:              err,
-				}
-				defer recordError("Security:OptionalCookieAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 0
-				ctx = sctx
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			err = &ogenerrors.SecurityError{
-				OperationContext: opErrContext,
-				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
-			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
-			return
-		}
-	}
 	params, err := decodeGetOpinionAnalysisParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
@@ -2579,50 +2535,6 @@ func (s *Server) handleGetOpinionDetail2Request(args [1]string, argsEscaped bool
 			ID:   "getOpinionDetail2",
 		}
 	)
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			sctx, ok, err := s.securityOptionalCookieAuth(ctx, "GetOpinionDetail2", r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "OptionalCookieAuth",
-					Err:              err,
-				}
-				defer recordError("Security:OptionalCookieAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 0
-				ctx = sctx
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			err = &ogenerrors.SecurityError{
-				OperationContext: opErrContext,
-				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
-			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
-			return
-		}
-	}
 	params, err := decodeGetOpinionDetail2Params(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
@@ -2729,56 +2641,8 @@ func (s *Server) handleGetOpinionReportReasonsRequest(args [0]string, argsEscape
 			span.SetStatus(codes.Error, stage)
 			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
 		}
-		err          error
-		opErrContext = ogenerrors.OperationContext{
-			Name: "GetOpinionReportReasons",
-			ID:   "getOpinionReportReasons",
-		}
+		err error
 	)
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			sctx, ok, err := s.securityOptionalCookieAuth(ctx, "GetOpinionReportReasons", r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "OptionalCookieAuth",
-					Err:              err,
-				}
-				defer recordError("Security:OptionalCookieAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 0
-				ctx = sctx
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			err = &ogenerrors.SecurityError{
-				OperationContext: opErrContext,
-				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
-			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
-			return
-		}
-	}
 
 	var response GetOpinionReportReasonsRes
 	if m := s.cfg.Middleware; m != nil {
@@ -3032,50 +2896,6 @@ func (s *Server) handleGetOpinionsForTalkSessionRequest(args [1]string, argsEsca
 			ID:   "getOpinionsForTalkSession",
 		}
 	)
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			sctx, ok, err := s.securityOptionalCookieAuth(ctx, "GetOpinionsForTalkSession", r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "OptionalCookieAuth",
-					Err:              err,
-				}
-				defer recordError("Security:OptionalCookieAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 0
-				ctx = sctx
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			err = &ogenerrors.SecurityError{
-				OperationContext: opErrContext,
-				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
-			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
-			return
-		}
-	}
 	params, err := decodeGetOpinionsForTalkSessionParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
@@ -3621,56 +3441,8 @@ func (s *Server) handleGetPolicyConsentStatusRequest(args [0]string, argsEscaped
 			span.SetStatus(codes.Error, stage)
 			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
 		}
-		err          error
-		opErrContext = ogenerrors.OperationContext{
-			Name: "GetPolicyConsentStatus",
-			ID:   "getPolicyConsentStatus",
-		}
+		err error
 	)
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			sctx, ok, err := s.securityOptionalCookieAuth(ctx, "GetPolicyConsentStatus", r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "OptionalCookieAuth",
-					Err:              err,
-				}
-				defer recordError("Security:OptionalCookieAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 0
-				ctx = sctx
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			err = &ogenerrors.SecurityError{
-				OperationContext: opErrContext,
-				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
-			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
-			return
-		}
-	}
 
 	var response GetPolicyConsentStatusRes
 	if m := s.cfg.Middleware; m != nil {
@@ -4758,56 +4530,8 @@ func (s *Server) handleGetTalkSessionRestrictionKeysRequest(args [0]string, args
 			span.SetStatus(codes.Error, stage)
 			s.errors.Add(ctx, 1, metric.WithAttributeSet(labeler.AttributeSet()))
 		}
-		err          error
-		opErrContext = ogenerrors.OperationContext{
-			Name: "GetTalkSessionRestrictionKeys",
-			ID:   "getTalkSessionRestrictionKeys",
-		}
+		err error
 	)
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			sctx, ok, err := s.securityOptionalCookieAuth(ctx, "GetTalkSessionRestrictionKeys", r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "OptionalCookieAuth",
-					Err:              err,
-				}
-				defer recordError("Security:OptionalCookieAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 0
-				ctx = sctx
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			err = &ogenerrors.SecurityError{
-				OperationContext: opErrContext,
-				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
-			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
-			return
-		}
-	}
 
 	var response GetTalkSessionRestrictionKeysRes
 	if m := s.cfg.Middleware; m != nil {
@@ -4905,50 +4629,6 @@ func (s *Server) handleGetTalkSessionRestrictionSatisfiedRequest(args [1]string,
 			ID:   "getTalkSessionRestrictionSatisfied",
 		}
 	)
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			sctx, ok, err := s.securityOptionalCookieAuth(ctx, "GetTalkSessionRestrictionSatisfied", r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "OptionalCookieAuth",
-					Err:              err,
-				}
-				defer recordError("Security:OptionalCookieAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 0
-				ctx = sctx
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			err = &ogenerrors.SecurityError{
-				OperationContext: opErrContext,
-				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
-			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
-			return
-		}
-	}
 	params, err := decodeGetTalkSessionRestrictionSatisfiedParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
@@ -6943,50 +6623,6 @@ func (s *Server) handleOpinionComments2Request(args [1]string, argsEscaped bool,
 			ID:   "opinionComments2",
 		}
 	)
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			sctx, ok, err := s.securityOptionalCookieAuth(ctx, "OpinionComments2", r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "OptionalCookieAuth",
-					Err:              err,
-				}
-				defer recordError("Security:OptionalCookieAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 0
-				ctx = sctx
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			err = &ogenerrors.SecurityError{
-				OperationContext: opErrContext,
-				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
-			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
-			return
-		}
-	}
 	params, err := decodeOpinionComments2Params(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
@@ -8952,50 +8588,6 @@ func (s *Server) handleSwipeOpinionsRequest(args [1]string, argsEscaped bool, w 
 			ID:   "swipeOpinions",
 		}
 	)
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			sctx, ok, err := s.securityOptionalCookieAuth(ctx, "SwipeOpinions", r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "OptionalCookieAuth",
-					Err:              err,
-				}
-				defer recordError("Security:OptionalCookieAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 0
-				ctx = sctx
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			err = &ogenerrors.SecurityError{
-				OperationContext: opErrContext,
-				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
-			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
-			return
-		}
-	}
 	params, err := decodeSwipeOpinionsParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
@@ -9112,50 +8704,6 @@ func (s *Server) handleTalkSessionAnalysisRequest(args [1]string, argsEscaped bo
 			ID:   "talkSessionAnalysis",
 		}
 	)
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			sctx, ok, err := s.securityOptionalCookieAuth(ctx, "TalkSessionAnalysis", r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "OptionalCookieAuth",
-					Err:              err,
-				}
-				defer recordError("Security:OptionalCookieAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 0
-				ctx = sctx
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			err = &ogenerrors.SecurityError{
-				OperationContext: opErrContext,
-				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
-			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
-			return
-		}
-	}
 	params, err := decodeTalkSessionAnalysisParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{

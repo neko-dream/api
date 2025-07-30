@@ -679,7 +679,7 @@ paths:
       tags:
         - opinion
       security:
-        - OptionalCookieAuth: []
+        - {}
       x-ogen-operation-group: Opinion
   /opinions/{opinionID}:
     get:
@@ -707,7 +707,7 @@ paths:
       tags:
         - opinion
       security:
-        - OptionalCookieAuth: []
+        - {}
       x-ogen-operation-group: Opinion
   /opinions/{opinionID}/analysis:
     get:
@@ -743,7 +743,7 @@ paths:
       tags:
         - opinion
       security:
-        - OptionalCookieAuth: []
+        - {}
       x-ogen-operation-group: Opinion
   /opinions/{opinionID}/replies:
     get:
@@ -801,7 +801,7 @@ paths:
       tags:
         - opinion
       security:
-        - OptionalCookieAuth: []
+        - {}
       x-ogen-operation-group: Opinion
   /opinions/{opinionID}/report:
     post:
@@ -1378,7 +1378,7 @@ paths:
       tags:
         - policy
       security:
-        - OptionalCookieAuth: []
+        - {}
       x-ogen-operation-group: Policy
     post:
       operationId: policyConsent
@@ -1810,7 +1810,7 @@ paths:
       tags:
         - talk_session
       security:
-        - OptionalCookieAuth: []
+        - {}
       x-ogen-operation-group: TalkSession
   /talksessions/{talkSessionID}:
     get:
@@ -1998,7 +1998,7 @@ paths:
       tags:
         - talk_session
       security:
-        - OptionalCookieAuth: []
+        - {}
       x-ogen-operation-group: TalkSession
   /talksessions/{talkSessionID}/conclusion:
     get:
@@ -2222,7 +2222,7 @@ paths:
       tags:
         - opinion
       security:
-        - OptionalCookieAuth: []
+        - {}
       x-ogen-operation-group: Opinion
   /talksessions/{talkSessionID}/report:
     get:
@@ -2385,7 +2385,7 @@ paths:
       tags:
         - talk_session
       security:
-        - OptionalCookieAuth: []
+        - {}
       x-ogen-operation-group: TalkSession
   /talksessions/{talkSessionID}/swipe_opinions:
     get:
@@ -2455,7 +2455,7 @@ paths:
       tags:
         - opinion
       security:
-        - OptionalCookieAuth: []
+        - {}
       x-ogen-operation-group: Opinion
   /talksessions/{talkSessionID}/timeline:
     post:
@@ -3925,8 +3925,3 @@ components:
       in: cookie
       name: SessionId
       description: Cookie-based authentication using JWT tokens stored in secure HTTP-only cookies
-    OptionalCookieAuth:
-      type: apiKey
-      in: cookie
-      name: SessionId
-      description: Optional cookie-based authentication - will populate session context if authenticated but won't require it

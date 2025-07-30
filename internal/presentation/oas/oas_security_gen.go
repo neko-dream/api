@@ -17,10 +17,6 @@ type SecurityHandler interface {
 	// HandleCookieAuth handles CookieAuth security.
 	// Cookie-based authentication using JWT tokens stored in secure HTTP-only cookies.
 	HandleCookieAuth(ctx context.Context, operationName string, t CookieAuth) (context.Context, error)
-	// HandleOptionalCookieAuth handles OptionalCookieAuth security.
-	// Optional cookie-based authentication - will populate session context if authenticated but won't
-	// require it.
-	HandleOptionalCookieAuth(ctx context.Context, operationName string, t OptionalCookieAuth) (context.Context, error)
 }
 
 func findAuthorization(h http.Header, prefix string) (string, bool) {
@@ -52,27 +48,6 @@ func (s *Server) securityCookieAuth(ctx context.Context, operationName string, r
 	}
 	t.APIKey = value
 	rctx, err := s.sec.HandleCookieAuth(ctx, operationName, t)
-	if errors.Is(err, ogenerrors.ErrSkipServerSecurity) {
-		return nil, false, nil
-	} else if err != nil {
-		return nil, false, err
-	}
-	return rctx, true, err
-}
-func (s *Server) securityOptionalCookieAuth(ctx context.Context, operationName string, req *http.Request) (context.Context, bool, error) {
-	var t OptionalCookieAuth
-	const parameterName = "SessionId"
-	var value string
-	switch cookie, err := req.Cookie(parameterName); {
-	case err == nil: // if NO error
-		value = cookie.Value
-	case errors.Is(err, http.ErrNoCookie):
-		return ctx, false, nil
-	default:
-		return nil, false, errors.Wrap(err, "get cookie value")
-	}
-	t.APIKey = value
-	rctx, err := s.sec.HandleOptionalCookieAuth(ctx, operationName, t)
 	if errors.Is(err, ogenerrors.ErrSkipServerSecurity) {
 		return nil, false, nil
 	} else if err != nil {

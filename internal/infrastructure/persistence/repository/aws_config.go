@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/neko-dream/server/internal/infrastructure/config"
+	"go.opentelemetry.io/otel"
 )
 
 var (
@@ -22,6 +23,9 @@ func InitConfig(appConf *config.Config) aws.Config {
 }
 
 func InitConfigWithContext(ctx context.Context, appConf *config.Config) aws.Config {
+	ctx, span := otel.Tracer("repository").Start(ctx, "InitConfigWithContext")
+	defer span.End()
+
 	once.Do(func() {
 		c, err := awsConfig.LoadDefaultConfig(
 			ctx,
