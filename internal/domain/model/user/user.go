@@ -136,6 +136,22 @@ func (u *User) IsEmailVerified() bool {
 	return u.emailVerified
 }
 
+// Withdraw anonymizes the user data for withdrawal
+func (u *User) Withdraw(ctx context.Context) {
+	ctx, span := otel.Tracer("user").Start(ctx, "User.Withdraw")
+	defer span.End()
+
+	// Anonymize user data
+	u.displayID = lo.ToPtr("deleted_user")
+	u.displayName = lo.ToPtr("削除されたユーザー")
+	u.iconURL = nil
+}
+
+// IsWithdrawn checks if the user has been withdrawn based on anonymized data
+func (u *User) IsWithdrawn() bool {
+	return u.displayID != nil && *u.displayID == "deleted_user"
+}
+
 func NewUser(
 	userID shared.UUID[User],
 	displayID *string,

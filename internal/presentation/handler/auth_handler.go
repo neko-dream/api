@@ -25,7 +25,7 @@ type authHandler struct {
 	auth_usecase.AuthLogin
 	auth_usecase.Revoke
 	auth_usecase.LoginForDev
-	auth_usecase.DetachAccount
+	auth_usecase.WithdrawUser
 
 	passwordLogin    auth_usecase.PasswordLogin
 	passwordRegister auth_usecase.PasswordRegister
@@ -40,7 +40,7 @@ func NewAuthHandler(
 	authCallback auth_usecase.AuthCallback,
 	revoke auth_usecase.Revoke,
 	devLogin auth_usecase.LoginForDev,
-	detachAccount auth_usecase.DetachAccount,
+	withdrawUser auth_usecase.WithdrawUser,
 
 	login auth_usecase.PasswordLogin,
 	register auth_usecase.PasswordRegister,
@@ -54,7 +54,7 @@ func NewAuthHandler(
 		AuthCallback:     authCallback,
 		Revoke:           revoke,
 		LoginForDev:      devLogin,
-		DetachAccount:    detachAccount,
+		WithdrawUser:     withdrawUser,
 		authService:      authService,
 		CookieManager:    cookieManger,
 		passwordLogin:    login,
@@ -205,7 +205,7 @@ func (a *authHandler) GetTokenInfo(ctx context.Context) (oas.GetTokenInfoRes, er
 	}, nil
 }
 
-// AuthAccountDetach 開発向け。退会処理を作るまでの代替。Subjectを付け替えることで、一度SSOしても再度SSOさせることができるやつ。
+// AuthAccountDetach 退会処理。ユーザーデータを匿名化し、セッションを無効化する。
 func (a *authHandler) AuthAccountDetach(ctx context.Context) (oas.AuthAccountDetachRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.AuthAccountDetach")
 	defer span.End()
@@ -215,13 +215,14 @@ func (a *authHandler) AuthAccountDetach(ctx context.Context) (oas.AuthAccountDet
 		return nil, err
 	}
 	userID := authCtx.UserID
-	if err = a.DetachAccount.Execute(ctx, auth_usecase.DetachAccountInput{
+	
+	if err = a.WithdrawUser.Execute(ctx, auth_usecase.WithdrawUserInput{
 		UserID: shared.UUID[user.User](userID),
 	}); err != nil {
 		return nil, err
 	}
 
-	// revoke
+	// revoke current session
 	_, err = a.Revoke.Execute(ctx, auth_usecase.RevokeInput{
 		SessID: authCtx.SessionID,
 	})
