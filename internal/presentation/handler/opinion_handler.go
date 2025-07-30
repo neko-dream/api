@@ -80,8 +80,9 @@ func (o *opinionHandler) GetOpinionDetail2(ctx context.Context, params oas.GetOp
 	defer span.End()
 
 	authCtx, err := getAuthenticationContext(o.authService, o.SetSession(ctx))
-	if err != nil {
-		return nil, err
+	var userID *shared.UUID[user.User]
+	if err == nil {
+		userID = &authCtx.UserID
 	}
 
 	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
@@ -91,7 +92,7 @@ func (o *opinionHandler) GetOpinionDetail2(ctx context.Context, params oas.GetOp
 
 	opinion, err := o.getOpinionDetailByIDQuery.Execute(ctx, opinion_query.GetOpinionDetailByIDInput{
 		OpinionID: opinionID,
-		UserID:    lo.ToPtr(authCtx.UserID),
+		UserID:    userID,
 	})
 	if err != nil {
 		return nil, err
