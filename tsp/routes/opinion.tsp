@@ -14,7 +14,7 @@ namespace kotohiro {
   @route("/opinions/{opinionID}")
   @get
   @summary("意見詳細")
-  @useAuth(OptionalCookieAuth)
+  @useAuth([])
   op getOpinionDetail2(@path opinionID: string): Body<OpinionWithVote> | {
     @statusCode statusCode: 500;
     @body body: {};
@@ -25,7 +25,7 @@ namespace kotohiro {
   @route("/opinions/{opinionID}/replies")
   @get
   @summary("意見に対するリプライ意見一覧")
-  @useAuth(OptionalCookieAuth)
+  @useAuth([])
   op opinionComments2(
     /**
      * 親意見のID
@@ -105,7 +105,7 @@ namespace kotohiro {
   @route("/opinions/{opinionID}/analysis")
   @get
   @summary("意見に投票したグループごとの割合")
-  @useAuth(OptionalCookieAuth)
+  @useAuth([])
   op getOpinionAnalysis(@path opinionID: string): Body<OpinionGroupRatio[]> | {
     @statusCode statusCode: 400;
     @body body: {};
@@ -155,7 +155,7 @@ namespace kotohiro {
   @route("/opinions/report_reasons")
   @get
   @summary("意見への通報理由一覧")
-  @useAuth(OptionalCookieAuth)
+  @useAuth([])
   op getOpinionReportReasons(): Body<ReportReason[]> | {
     @statusCode statusCode: 400;
     @body body: {};
@@ -169,7 +169,7 @@ namespace kotohiro {
   @route("/talksessions/{talkSessionID}/opinions")
   @get
   @summary("セッションに対する意見一覧")
-  @useAuth(OptionalCookieAuth)
+  @useAuth([])
   op getOpinionsForTalkSession(
     @path talkSessionID: string,
     @query(#{ explode: true }) sort?:
@@ -202,7 +202,7 @@ namespace kotohiro {
   @route("/talksessions/{talkSessionID}/swipe_opinions")
   @get
   @summary("スワイプ用のエンドポイント")
-  @useAuth(OptionalCookieAuth)
+  @useAuth([])
   op swipeOpinions(
     @path talkSessionID: string,
     @query(#{ explode: true }) limit?: integer | null = 10,

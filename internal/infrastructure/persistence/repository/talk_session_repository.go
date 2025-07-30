@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"log"
 
 	"braces.dev/errtrace"
 	"github.com/google/uuid"
@@ -77,7 +76,6 @@ func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talkses
 			Valid: true,
 		}
 	}
-	log.Println("organization alias ID:", organizationAliasID, "organization ID:", organizationID)
 
 	if err := t.GetQueries(ctx).CreateTalkSession(ctx, model.CreateTalkSessionParams{
 		TalkSessionID:    talkSession.TalkSessionID().UUID(),

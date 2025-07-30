@@ -35,7 +35,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.30.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.33.20 // indirect
 	github.com/aws/smithy-go v1.22.3 // indirect
-	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.4.0 // indirect
@@ -82,7 +81,6 @@ require (
 	github.com/caarlos0/env/v11 v11.3.1
 	github.com/coreos/go-oidc/v3 v3.14.1
 	github.com/dlclark/regexp2 v1.11.5 // indirect
-	github.com/expr-lang/expr v1.17.5
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/getsentry/sentry-go/otel v0.33.0
 	github.com/ghodss/yaml v1.0.0 // indirect

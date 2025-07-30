@@ -7,7 +7,6 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"log"
 	"net/url"
 	"strings"
 
@@ -97,7 +96,6 @@ func (s *sessionTokenManager) Parse(ctx context.Context, token string) (*session
 	// トークンを検証してセッションIDを取得
 	sessionIDStr, err := s.verifySignedToken(token)
 	if err != nil {
-		log.Println("Failed to verify token:", err)
 		return nil, errtrace.Wrap(err)
 	}
 

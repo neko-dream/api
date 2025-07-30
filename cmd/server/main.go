@@ -34,7 +34,9 @@ func main() {
 	migrator := di.Invoke[*db.Migrator](container)
 
 	// migrator.Down()
-	migrator.Up()
+	if err := migrator.Up(); err != nil {
+		log.Fatalf("Failed to run database migrations: %v", err)
+	}
 	// di.Invoke[*db.DummyInitializer](container).Initialize()
 
 	c := cors.New(cors.Options{
@@ -47,6 +49,7 @@ func main() {
 	corsHandler := c.Handler(middleware.Wrap(
 		srv,
 		middleware.Instrument("kotohiro-api", routeFinder, di.Invoke[*sdktrace.TracerProvider](container)),
+		middleware.SetContextCookieKey(container),
 		middleware.Labeler(routeFinder),
 	))
 
