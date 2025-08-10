@@ -26,6 +26,5 @@ func main() {
 
 	if err := boot.Run(); err != nil {
 		log.Fatal("Server error: ", err)
-
 	}
 }
