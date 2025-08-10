@@ -1983,6 +1983,20 @@ func (s *GetUserListManageOrderBy) UnmarshalText(data []byte) error {
 	}
 }
 
+type GetVapidKeyOK struct {
+	VapidKey string `json:"vapid_key"`
+}
+
+// GetVapidKey returns the value of VapidKey.
+func (s *GetVapidKeyOK) GetVapidKey() string {
+	return s.VapidKey
+}
+
+// SetVapidKey sets the value of VapidKey.
+func (s *GetVapidKeyOK) SetVapidKey(val string) {
+	s.VapidKey = val
+}
+
 type HandleAuthCallbackBadRequest struct{}
 
 func (*HandleAuthCallbackBadRequest) handleAuthCallbackRes() {}
@@ -5658,6 +5672,77 @@ func (s *RevokeTokenNoContent) SetSetCookie(val []string) {
 }
 
 func (*RevokeTokenNoContent) revokeTokenRes() {}
+
+type SendTestNotificationBadRequest struct{}
+
+func (*SendTestNotificationBadRequest) sendTestNotificationRes() {}
+
+type SendTestNotificationOK struct {
+	DevicesCount int32 `json:"devices_count"`
+	SuccessCount int32 `json:"success_count"`
+}
+
+// GetDevicesCount returns the value of DevicesCount.
+func (s *SendTestNotificationOK) GetDevicesCount() int32 {
+	return s.DevicesCount
+}
+
+// GetSuccessCount returns the value of SuccessCount.
+func (s *SendTestNotificationOK) GetSuccessCount() int32 {
+	return s.SuccessCount
+}
+
+// SetDevicesCount sets the value of DevicesCount.
+func (s *SendTestNotificationOK) SetDevicesCount(val int32) {
+	s.DevicesCount = val
+}
+
+// SetSuccessCount sets the value of SuccessCount.
+func (s *SendTestNotificationOK) SetSuccessCount(val int32) {
+	s.SuccessCount = val
+}
+
+func (*SendTestNotificationOK) sendTestNotificationRes() {}
+
+type SendTestNotificationReq struct {
+	Title    OptString `json:"title"`
+	Body     OptString `json:"body"`
+	DeviceID OptString `json:"device_id"`
+}
+
+// GetTitle returns the value of Title.
+func (s *SendTestNotificationReq) GetTitle() OptString {
+	return s.Title
+}
+
+// GetBody returns the value of Body.
+func (s *SendTestNotificationReq) GetBody() OptString {
+	return s.Body
+}
+
+// GetDeviceID returns the value of DeviceID.
+func (s *SendTestNotificationReq) GetDeviceID() OptString {
+	return s.DeviceID
+}
+
+// SetTitle sets the value of Title.
+func (s *SendTestNotificationReq) SetTitle(val OptString) {
+	s.Title = val
+}
+
+// SetBody sets the value of Body.
+func (s *SendTestNotificationReq) SetBody(val OptString) {
+	s.Body = val
+}
+
+// SetDeviceID sets the value of DeviceID.
+func (s *SendTestNotificationReq) SetDeviceID(val OptString) {
+	s.DeviceID = val
+}
+
+type SendTestNotificationUnauthorized struct{}
+
+func (*SendTestNotificationUnauthorized) sendTestNotificationRes() {}
 
 type SessionsHistoryBadRequest struct{}
 

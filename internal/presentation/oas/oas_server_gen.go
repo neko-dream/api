@@ -186,12 +186,24 @@ type NotificationsHandler interface {
 	//
 	// GET /notifications/preferences
 	GetNotificationPreferences(ctx context.Context) (GetNotificationPreferencesRes, error)
+	// GetVapidKey implements getVapidKey operation.
+	//
+	// VAPID公開鍵取得.
+	//
+	// GET /notifications/vapid-key
+	GetVapidKey(ctx context.Context) (*GetVapidKeyOK, error)
 	// RegisterDevice implements registerDevice operation.
 	//
 	// デバイス登録/更新.
 	//
 	// POST /notifications/devices
 	RegisterDevice(ctx context.Context, req *RegisterDeviceReq) (RegisterDeviceRes, error)
+	// SendTestNotification implements sendTestNotification operation.
+	//
+	// テスト通知送信.
+	//
+	// POST /notifications/test
+	SendTestNotification(ctx context.Context, req *SendTestNotificationReq) (SendTestNotificationRes, error)
 	// UpdateNotificationPreferences implements updateNotificationPreferences operation.
 	//
 	// 通知設定更新.

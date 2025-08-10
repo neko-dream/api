@@ -715,6 +715,77 @@ paths:
               push_notification_enabled:
                 contentType: application/json
       x-ogen-operation-group: Notifications
+  /notifications/test:
+    post:
+      operationId: sendTestNotification
+      summary: テスト通知送信
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  devices_count:
+                    type: integer
+                    format: int32
+                  success_count:
+                    type: integer
+                    format: int32
+                required:
+                  - devices_count
+                  - success_count
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                type: object
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - notifications
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                body:
+                  type: string
+                device_id:
+                  type: string
+              required: []
+      x-ogen-operation-group: Notifications
+  /notifications/vapid-key:
+    get:
+      operationId: getVapidKey
+      summary: VAPID公開鍵取得
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  vapid_key:
+                    type: string
+                required:
+                  - vapid_key
+      tags:
+        - notifications
+      x-ogen-operation-group: Notifications
   /opinions:
     post:
       operationId: postOpinionPost2

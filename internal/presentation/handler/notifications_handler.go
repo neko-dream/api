@@ -11,6 +11,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/domain/service"
+	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"go.opentelemetry.io/otel"
@@ -22,6 +23,8 @@ type notificationsHandler struct {
 	notificationPreferenceRepository user.NotificationPreferenceRepository
 	authService                      service.AuthenticationService
 	pushNotificationSender           notification.PushNotificationSender
+	cfg                              *config.Config
+	vapidKey                         string
 	logger                           *slog.Logger
 }
 
@@ -31,6 +34,7 @@ func NewNotificationsHandler(
 	notificationPreferenceRepository user.NotificationPreferenceRepository,
 	authService service.AuthenticationService,
 	pushNotificationSender notification.PushNotificationSender,
+	cfg *config.Config,
 ) oas.NotificationsHandler {
 	return &notificationsHandler{
 		dbManager:                        dbManager,
@@ -38,6 +42,8 @@ func NewNotificationsHandler(
 		notificationPreferenceRepository: notificationPreferenceRepository,
 		authService:                      authService,
 		pushNotificationSender:           pushNotificationSender,
+		cfg:                              cfg,
+		vapidKey:                         cfg.FCM_VAPID_KEY,
 		logger:                           slog.Default(),
 	}
 }
@@ -316,4 +322,120 @@ func (h *notificationsHandler) checkDeviceTokenExists(ctx context.Context, devic
 	}
 
 	return false, nil
+}
+
+// SendTestNotification テスト通知送信
+func (h *notificationsHandler) SendTestNotification(ctx context.Context, req *oas.SendTestNotificationReq) (oas.SendTestNotificationRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "notificationsHandler.SendTestNotification")
+	defer span.End()
+
+	// 環境チェック（dev/localのみ許可）
+	if h.cfg.Env != config.LOCAL && h.cfg.Env != config.DEV {
+		return &oas.SendTestNotificationBadRequest{}, nil
+	}
+
+	// 認証チェック
+	authCtx, err := requireAuthentication(h.authService, ctx)
+	if err != nil {
+		return &oas.SendTestNotificationUnauthorized{}, nil
+	}
+	userID := authCtx.UserID
+
+	// タイトルとボディの設定
+	title := "Kotohiro テスト通知"
+	body := fmt.Sprintf("これはテスト通知です。時刻: %s", time.Now().Format("15:04:05"))
+
+	if req.Title.IsSet() && req.Title.Value != "" {
+		title = req.Title.Value
+	}
+	if req.Body.IsSet() && req.Body.Value != "" {
+		body = req.Body.Value
+	}
+
+	var devicesToSend []notification.Device
+
+	// 特定のデバイスIDが指定されている場合
+	if req.DeviceID.IsSet() && req.DeviceID.Value != "" {
+		deviceID, err := shared.ParseUUID[notification.Device](req.DeviceID.Value)
+		if err != nil {
+			h.logger.Error("デバイスIDのパースに失敗しました", slog.String("error", err.Error()))
+			return &oas.SendTestNotificationBadRequest{}, nil
+		}
+
+		device, err := h.deviceRepository.FindByID(ctx, deviceID)
+		if err != nil {
+			h.logger.Error("デバイスの取得に失敗しました", slog.String("error", err.Error()))
+			return &oas.SendTestNotificationBadRequest{}, nil
+		}
+
+		// デバイスの所有者確認
+		if device.UserID != userID {
+			return &oas.SendTestNotificationBadRequest{}, nil
+		}
+
+		devicesToSend = append(devicesToSend, *device)
+	} else {
+		// ユーザーの全デバイスに送信
+		devices, err := h.deviceRepository.FindByUserID(ctx, userID)
+		if err != nil {
+			h.logger.Error("デバイスの取得に失敗しました", slog.String("error", err.Error()))
+			return &oas.SendTestNotificationBadRequest{}, nil
+		}
+		for _, device := range devices {
+			devicesToSend = append(devicesToSend, *device)
+		}
+	}
+
+	// 有効なデバイスのみフィルタリング
+	var activeDevices []notification.Device
+	for _, device := range devicesToSend {
+		if device.Enabled {
+			activeDevices = append(activeDevices, device)
+		}
+	}
+
+	if len(activeDevices) == 0 {
+		return &oas.SendTestNotificationOK{
+			DevicesCount: 0,
+			SuccessCount: 0,
+		}, nil
+	}
+
+	// 通知を送信
+	pushNotification := &notification.PushNotification{
+		RecipientID: userID,
+		Title:       title,
+		Body:        body,
+		Data: map[string]string{
+			"type":      "test",
+			"timestamp": time.Now().Format(time.RFC3339),
+		},
+	}
+
+	err = h.pushNotificationSender.Send(ctx, pushNotification)
+	if err != nil {
+		h.logger.Error("プッシュ通知の送信に失敗しました",
+			slog.String("user_id", userID.String()),
+			slog.String("error", err.Error()),
+		)
+		return &oas.SendTestNotificationOK{
+			DevicesCount: int32(len(activeDevices)),
+			SuccessCount: 0,
+		}, nil
+	}
+
+	return &oas.SendTestNotificationOK{
+		DevicesCount: int32(len(activeDevices)),
+		SuccessCount: int32(len(activeDevices)),
+	}, nil
+}
+
+// GetVapidKey VAPID公開鍵を取得
+func (h *notificationsHandler) GetVapidKey(ctx context.Context) (*oas.GetVapidKeyOK, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "notificationsHandler.GetVapidKey")
+	defer span.End()
+
+	return &oas.GetVapidKeyOK{
+		VapidKey: h.vapidKey,
+	}, nil
 }

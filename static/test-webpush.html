@@ -212,12 +212,14 @@
             appId: "1:1023394330741:web:d31f1b8176164e8903a03c"
         };
 
-        const vapidKey = 'BOeHeua3epcKCcuSGQ-Q0wNtf-rHKv-AF_E8b3oSL3fEasNkFOTYFO-fy7VgOtmvFFnaY9cJZ-ZwYNvKef4pYmk';
+        // APIサーバーのベースURL（現在のオリジンを使用）
+        const API_BASE_URL = window.location.origin;
 
         // グローバル変数
         let messaging;
         let currentUser = null;
         let fcmToken = null;
+        let vapidKey = null;
 
         // Firebase初期化
         const app = initializeApp(firebaseConfig);
@@ -234,6 +236,25 @@
             logs.scrollTop = logs.scrollHeight;
         }
 
+        // VAPID Keyを取得
+        async function fetchVapidKey() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/notifications/vapid-key`);
+                if (response.ok) {
+                    const data = await response.json();
+                    vapidKey = data.vapid_key;
+                    addLog('VAPID Key取得成功', 'success');
+                    return true;
+                } else {
+                    addLog('VAPID Key取得失敗', 'error');
+                    return false;
+                }
+            } catch (error) {
+                addLog(`VAPID Key取得エラー: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
         // 認証状態をチェック
         async function checkAuthStatus() {
             try {
@@ -246,6 +267,31 @@
                 if (response.ok) {
                     const data = await response.json();
                     currentUser = data;
+                    
+                    // displayIDが含まれていない場合
+                    if (!data.displayID) {
+                        // セッションストレージから保留中のユーザーIDを確認
+                        const pendingUserId = sessionStorage.getItem('pendingUserId');
+                        if (pendingUserId) {
+                            sessionStorage.removeItem('pendingUserId');
+                            // ユーザー登録を実行
+                            await checkAndRegisterUser(pendingUserId);
+                            // 登録後、再度認証情報を取得
+                            const updatedResponse = await fetch(`${API_BASE_URL}/auth/token/info`, {
+                                credentials: 'include',
+                            });
+                            if (updatedResponse.ok) {
+                                const updatedData = await updatedResponse.json();
+                                currentUser = updatedData;
+                                data.displayID = updatedData.displayID;
+                            }
+                        } else {
+                            // pendingUserIdがない場合は再度ログインを促す
+                            window.login();
+                            return;
+                        }
+                    }
+
                     updateAuthUI(true, data);
                     addLog(`ログイン済み: ${data.displayID || data.sub}`, 'success');
 
@@ -294,13 +340,47 @@
         }
 
         // ログイン
-        window.login = function() {
+        window.login = async function() {
             const displayId = prompt('表示IDを入力してください:', 'testuser');
             if (!displayId) return;
 
+            // セッションストレージに表示IDを保存（ログイン後のユーザー登録用）
+            sessionStorage.setItem('pendingUserId', displayId);
+            
+            // ログイン処理（GETリクエスト）
             const redirectUrl = encodeURIComponent(window.location.href);
-            window.location.href = `/auth/dev/login?display_id=${displayId}&id=${displayId}&redirect_url=${redirectUrl}`;
+            const loginUrl = `/auth/dev/login?id=${displayId}&redirect_url=${redirectUrl}`;
+            
+            // ブラウザでGETリクエスト（リダイレクト）
+            window.location.href = loginUrl;
         };
+
+        // ユーザー登録
+        async function checkAndRegisterUser(displayId) {
+            try {
+                // ユーザー登録を試みる
+                addLog('ユーザー登録を試行中...', 'info');
+                const formData = new FormData();
+                formData.append('displayName', displayId);
+                formData.append('displayID', displayId);
+
+                const registerResponse = await fetch(`${API_BASE_URL}/user`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    body: formData
+                });
+
+                if (registerResponse.ok) {
+                    addLog('新規ユーザーを登録しました', 'success');
+                } else if (registerResponse.status === 409) {
+                    addLog('既存ユーザーです', 'info');
+                } else {
+                    addLog('ユーザー登録エラー', 'warning');
+                }
+            } catch (error) {
+                addLog(`ユーザー登録エラー: ${error.message}`, 'warning');
+            }
+        }
 
         // ログアウト
         window.logout = async function() {
@@ -362,6 +442,16 @@
         window.getFCMToken = async function() {
             try {
                 addLog('FCMトークンを取得中...', 'info');
+
+                // VAPID Keyがない場合は取得
+                if (!vapidKey) {
+                    addLog('VAPID Keyを取得中...', 'info');
+                    const success = await fetchVapidKey();
+                    if (!success) {
+                        addLog('VAPID Keyの取得に失敗しました', 'error');
+                        return;
+                    }
+                }
 
                 // Service Workerを登録
                 const registration = await navigator.serviceWorker.register('/static/firebase-messaging-sw.js');

@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"log"
 
 	"braces.dev/errtrace"
 	"github.com/google/uuid"

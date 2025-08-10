@@ -483,6 +483,48 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					}
 
 					elem = origElem
+				case 't': // Prefix: "test"
+					origElem := elem
+					if l := len("test"); len(elem) >= l && elem[0:l] == "test" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch r.Method {
+						case "POST":
+							s.handleSendTestNotificationRequest([0]string{}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, "POST")
+						}
+
+						return
+					}
+
+					elem = origElem
+				case 'v': // Prefix: "vapid-key"
+					origElem := elem
+					if l := len("vapid-key"); len(elem) >= l && elem[0:l] == "vapid-key" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch r.Method {
+						case "GET":
+							s.handleGetVapidKeyRequest([0]string{}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, "GET")
+						}
+
+						return
+					}
+
+					elem = origElem
 				}
 
 				elem = origElem
@@ -2391,6 +2433,56 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							r.summary = "通知設定更新"
 							r.operationID = "updateNotificationPreferences"
 							r.pathPattern = "/notifications/preferences"
+							r.args = args
+							r.count = 0
+							return r, true
+						default:
+							return
+						}
+					}
+
+					elem = origElem
+				case 't': // Prefix: "test"
+					origElem := elem
+					if l := len("test"); len(elem) >= l && elem[0:l] == "test" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch method {
+						case "POST":
+							r.name = "SendTestNotification"
+							r.summary = "テスト通知送信"
+							r.operationID = "sendTestNotification"
+							r.pathPattern = "/notifications/test"
+							r.args = args
+							r.count = 0
+							return r, true
+						default:
+							return
+						}
+					}
+
+					elem = origElem
+				case 'v': // Prefix: "vapid-key"
+					origElem := elem
+					if l := len("vapid-key"); len(elem) >= l && elem[0:l] == "vapid-key" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch method {
+						case "GET":
+							r.name = "GetVapidKey"
+							r.summary = "VAPID公開鍵取得"
+							r.operationID = "getVapidKey"
+							r.pathPattern = "/notifications/vapid-key"
 							r.args = args
 							r.count = 0
 							return r, true

@@ -18,7 +18,7 @@ INSERT INTO notification_preferences (
     push_notification_enabled
 ) VALUES (
     $1, $2
-) RETURNING id, user_id, push_notification_enabled, talk_session_end, talk_session_participated, new_talk_session, quiet_hours_enabled, quiet_hours_start, quiet_hours_end, timezone, created_at, updated_at
+) RETURNING id, user_id, push_notification_enabled, created_at, updated_at
 `
 
 type CreateNotificationPreferenceParams struct {
@@ -33,7 +33,7 @@ type CreateNotificationPreferenceParams struct {
 //	    push_notification_enabled
 //	) VALUES (
 //	    $1, $2
-//	) RETURNING id, user_id, push_notification_enabled, talk_session_end, talk_session_participated, new_talk_session, quiet_hours_enabled, quiet_hours_start, quiet_hours_end, timezone, created_at, updated_at
+//	) RETURNING id, user_id, push_notification_enabled, created_at, updated_at
 func (q *Queries) CreateNotificationPreference(ctx context.Context, arg CreateNotificationPreferenceParams) (NotificationPreference, error) {
 	row := q.db.QueryRowContext(ctx, createNotificationPreference, arg.UserID, arg.PushNotificationEnabled)
 	var i NotificationPreference
@@ -41,13 +41,6 @@ func (q *Queries) CreateNotificationPreference(ctx context.Context, arg CreateNo
 		&i.ID,
 		&i.UserID,
 		&i.PushNotificationEnabled,
-		&i.TalkSessionEnd,
-		&i.TalkSessionParticipated,
-		&i.NewTalkSession,
-		&i.QuietHoursEnabled,
-		&i.QuietHoursStart,
-		&i.QuietHoursEnd,
-		&i.Timezone,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -55,13 +48,13 @@ func (q *Queries) CreateNotificationPreference(ctx context.Context, arg CreateNo
 }
 
 const getNotificationPreference = `-- name: GetNotificationPreference :one
-SELECT id, user_id, push_notification_enabled, talk_session_end, talk_session_participated, new_talk_session, quiet_hours_enabled, quiet_hours_start, quiet_hours_end, timezone, created_at, updated_at FROM notification_preferences
+SELECT id, user_id, push_notification_enabled, created_at, updated_at FROM notification_preferences
 WHERE user_id = $1
 `
 
 // GetNotificationPreference
 //
-//	SELECT id, user_id, push_notification_enabled, talk_session_end, talk_session_participated, new_talk_session, quiet_hours_enabled, quiet_hours_start, quiet_hours_end, timezone, created_at, updated_at FROM notification_preferences
+//	SELECT id, user_id, push_notification_enabled, created_at, updated_at FROM notification_preferences
 //	WHERE user_id = $1
 func (q *Queries) GetNotificationPreference(ctx context.Context, userID uuid.UUID) (NotificationPreference, error) {
 	row := q.db.QueryRowContext(ctx, getNotificationPreference, userID)
@@ -70,13 +63,6 @@ func (q *Queries) GetNotificationPreference(ctx context.Context, userID uuid.UUI
 		&i.ID,
 		&i.UserID,
 		&i.PushNotificationEnabled,
-		&i.TalkSessionEnd,
-		&i.TalkSessionParticipated,
-		&i.NewTalkSession,
-		&i.QuietHoursEnabled,
-		&i.QuietHoursStart,
-		&i.QuietHoursEnd,
-		&i.Timezone,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -84,13 +70,13 @@ func (q *Queries) GetNotificationPreference(ctx context.Context, userID uuid.UUI
 }
 
 const getNotificationPreferencesByUserIDs = `-- name: GetNotificationPreferencesByUserIDs :many
-SELECT id, user_id, push_notification_enabled, talk_session_end, talk_session_participated, new_talk_session, quiet_hours_enabled, quiet_hours_start, quiet_hours_end, timezone, created_at, updated_at FROM notification_preferences
+SELECT id, user_id, push_notification_enabled, created_at, updated_at FROM notification_preferences
 WHERE user_id = ANY($1::uuid[])
 `
 
 // GetNotificationPreferencesByUserIDs
 //
-//	SELECT id, user_id, push_notification_enabled, talk_session_end, talk_session_participated, new_talk_session, quiet_hours_enabled, quiet_hours_start, quiet_hours_end, timezone, created_at, updated_at FROM notification_preferences
+//	SELECT id, user_id, push_notification_enabled, created_at, updated_at FROM notification_preferences
 //	WHERE user_id = ANY($1::uuid[])
 func (q *Queries) GetNotificationPreferencesByUserIDs(ctx context.Context, dollar_1 []uuid.UUID) ([]NotificationPreference, error) {
 	rows, err := q.db.QueryContext(ctx, getNotificationPreferencesByUserIDs, pq.Array(dollar_1))
@@ -105,13 +91,6 @@ func (q *Queries) GetNotificationPreferencesByUserIDs(ctx context.Context, dolla
 			&i.ID,
 			&i.UserID,
 			&i.PushNotificationEnabled,
-			&i.TalkSessionEnd,
-			&i.TalkSessionParticipated,
-			&i.NewTalkSession,
-			&i.QuietHoursEnabled,
-			&i.QuietHoursStart,
-			&i.QuietHoursEnd,
-			&i.Timezone,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -132,7 +111,7 @@ const updateNotificationPreference = `-- name: UpdateNotificationPreference :one
 UPDATE notification_preferences SET
     push_notification_enabled = $2
 WHERE user_id = $1
-RETURNING id, user_id, push_notification_enabled, talk_session_end, talk_session_participated, new_talk_session, quiet_hours_enabled, quiet_hours_start, quiet_hours_end, timezone, created_at, updated_at
+RETURNING id, user_id, push_notification_enabled, created_at, updated_at
 `
 
 type UpdateNotificationPreferenceParams struct {
@@ -145,7 +124,7 @@ type UpdateNotificationPreferenceParams struct {
 //	UPDATE notification_preferences SET
 //	    push_notification_enabled = $2
 //	WHERE user_id = $1
-//	RETURNING id, user_id, push_notification_enabled, talk_session_end, talk_session_participated, new_talk_session, quiet_hours_enabled, quiet_hours_start, quiet_hours_end, timezone, created_at, updated_at
+//	RETURNING id, user_id, push_notification_enabled, created_at, updated_at
 func (q *Queries) UpdateNotificationPreference(ctx context.Context, arg UpdateNotificationPreferenceParams) (NotificationPreference, error) {
 	row := q.db.QueryRowContext(ctx, updateNotificationPreference, arg.UserID, arg.PushNotificationEnabled)
 	var i NotificationPreference
@@ -153,13 +132,6 @@ func (q *Queries) UpdateNotificationPreference(ctx context.Context, arg UpdateNo
 		&i.ID,
 		&i.UserID,
 		&i.PushNotificationEnabled,
-		&i.TalkSessionEnd,
-		&i.TalkSessionParticipated,
-		&i.NewTalkSession,
-		&i.QuietHoursEnabled,
-		&i.QuietHoursStart,
-		&i.QuietHoursEnd,
-		&i.Timezone,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -174,7 +146,7 @@ INSERT INTO notification_preferences (
     $1, $2
 ) ON CONFLICT (user_id) DO UPDATE SET
     push_notification_enabled = EXCLUDED.push_notification_enabled
-RETURNING id, user_id, push_notification_enabled, talk_session_end, talk_session_participated, new_talk_session, quiet_hours_enabled, quiet_hours_start, quiet_hours_end, timezone, created_at, updated_at
+RETURNING id, user_id, push_notification_enabled, created_at, updated_at
 `
 
 type UpsertNotificationPreferenceParams struct {
@@ -191,7 +163,7 @@ type UpsertNotificationPreferenceParams struct {
 //	    $1, $2
 //	) ON CONFLICT (user_id) DO UPDATE SET
 //	    push_notification_enabled = EXCLUDED.push_notification_enabled
-//	RETURNING id, user_id, push_notification_enabled, talk_session_end, talk_session_participated, new_talk_session, quiet_hours_enabled, quiet_hours_start, quiet_hours_end, timezone, created_at, updated_at
+//	RETURNING id, user_id, push_notification_enabled, created_at, updated_at
 func (q *Queries) UpsertNotificationPreference(ctx context.Context, arg UpsertNotificationPreferenceParams) (NotificationPreference, error) {
 	row := q.db.QueryRowContext(ctx, upsertNotificationPreference, arg.UserID, arg.PushNotificationEnabled)
 	var i NotificationPreference
@@ -199,13 +171,6 @@ func (q *Queries) UpsertNotificationPreference(ctx context.Context, arg UpsertNo
 		&i.ID,
 		&i.UserID,
 		&i.PushNotificationEnabled,
-		&i.TalkSessionEnd,
-		&i.TalkSessionParticipated,
-		&i.NewTalkSession,
-		&i.QuietHoursEnabled,
-		&i.QuietHoursStart,
-		&i.QuietHoursEnd,
-		&i.Timezone,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

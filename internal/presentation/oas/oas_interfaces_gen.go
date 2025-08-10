@@ -225,6 +225,10 @@ type RevokeTokenRes interface {
 	revokeTokenRes()
 }
 
+type SendTestNotificationRes interface {
+	sendTestNotificationRes()
+}
+
 type SessionsHistoryRes interface {
 	sessionsHistoryRes()
 }

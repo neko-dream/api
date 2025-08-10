@@ -5,14 +5,20 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/static"
 )
 
-func NewStaticHandler() http.Handler {
+func NewStaticHandler(cfg *config.Config) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		path := strings.TrimPrefix(r.URL.Path, "/static/")
 		// Check if it's a Web Push test file
 		if path == "test-webpush.html" || path == "firebase-messaging-sw.js" {
+			// Only allow in dev/local environments
+			if cfg.Env != config.LOCAL && cfg.Env != config.DEV {
+				http.NotFound(w, r)
+				return
+			}
 			fsys, err := fs.Sub(static.WebPushTest, ".")
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)

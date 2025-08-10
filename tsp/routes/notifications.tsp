@@ -9,6 +9,15 @@ using OpenAPI;
 namespace kotohiro {
   @tag("notifications")
   @extension("x-ogen-operation-group", "Notifications")
+  @route("/notifications/vapid-key")
+  @get
+  @summary("VAPID公開鍵取得")
+  op getVapidKey(): Body<{
+    vapid_key: string;
+  }>;
+
+  @tag("notifications")
+  @extension("x-ogen-operation-group", "Notifications")
   @route("/notifications/devices")
   @post
   @summary("デバイス登録/更新")
@@ -104,6 +113,28 @@ namespace kotohiro {
       push_notification_enabled?: HttpPart<boolean | null>;
     }
   ): Body<NotificationPreferences> | {
+    @statusCode statusCode: 400;
+    @body body: {};
+  } | {
+    @statusCode statusCode: 401;
+    @body body: {};
+  };
+
+  @tag("notifications")
+  @extension("x-ogen-operation-group", "Notifications")
+  @route("/notifications/test")
+  @post
+  @summary("テスト通知送信")
+  op sendTestNotification(
+    @multipartBody body: {
+      title?: HttpPart<string>;
+      body?: HttpPart<string>;
+      device_id?: HttpPart<string>;
+    }
+  ): Body<{
+    devices_count: int32;
+    success_count: int32;
+  }> | {
     @statusCode statusCode: 400;
     @body body: {};
   } | {

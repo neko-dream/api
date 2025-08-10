@@ -82,13 +82,6 @@ type NotificationPreference struct {
 	ID                      uuid.UUID
 	UserID                  uuid.UUID
 	PushNotificationEnabled bool
-	TalkSessionEnd          bool
-	TalkSessionParticipated bool
-	NewTalkSession          bool
-	QuietHoursEnabled       bool
-	QuietHoursStart         sql.NullString
-	QuietHoursEnd           sql.NullString
-	Timezone                sql.NullString
 	CreatedAt               time.Time
 	UpdatedAt               time.Time
 }

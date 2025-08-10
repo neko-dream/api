@@ -398,6 +398,15 @@ func (UnimplementedHandler) GetUserStatsTotalManage(ctx context.Context) (r *Use
 	return r, ht.ErrNotImplemented
 }
 
+// GetVapidKey implements getVapidKey operation.
+//
+// VAPID公開鍵取得.
+//
+// GET /notifications/vapid-key
+func (UnimplementedHandler) GetVapidKey(ctx context.Context) (r *GetVapidKeyOK, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // HandleAuthCallback implements handleAuthCallback operation.
 //
 // Auth Callback.
@@ -578,6 +587,15 @@ func (UnimplementedHandler) ReportOpinion(ctx context.Context, req *ReportOpinio
 //
 // POST /auth/revoke
 func (UnimplementedHandler) RevokeToken(ctx context.Context) (r RevokeTokenRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// SendTestNotification implements sendTestNotification operation.
+//
+// テスト通知送信.
+//
+// POST /notifications/test
+func (UnimplementedHandler) SendTestNotification(ctx context.Context, req *SendTestNotificationReq) (r SendTestNotificationRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
