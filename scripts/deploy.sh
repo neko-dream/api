@@ -52,5 +52,9 @@ docker push $TAG
 
 rm -rf ./server
 
+if [ "$ENV" = "prod" ]; then
+    ecspresso deploy --config ./.ecspresso/api/prd/ecspresso.yml --force-new-deployment
+else
+    ecspresso deploy --config ./.ecspresso/api/dev/ecspresso.yml --force-new-deployment
+fi
 
-ecspresso deploy --config ./.ecspresso/api/$ENV/ecspresso.yml --force-new-deployment
