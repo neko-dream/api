@@ -60,9 +60,9 @@ type Config struct {
 	HASH_ITERATIONS int    `env:"HASH_ITERATIONS"`
 
 	// HTTPサーバー設定
-	HTTPReadTimeout  int `env:"HTTP_READ_TIMEOUT" envDefault:"15"`   // 秒
-	HTTPWriteTimeout int `env:"HTTP_WRITE_TIMEOUT" envDefault:"15"`  // 秒
-	HTTPIdleTimeout  int `env:"HTTP_IDLE_TIMEOUT" envDefault:"60"`   // 秒
+	HTTPReadTimeout  int `env:"HTTP_READ_TIMEOUT" envDefault:"15"`  // 秒
+	HTTPWriteTimeout int `env:"HTTP_WRITE_TIMEOUT" envDefault:"15"` // 秒
+	HTTPIdleTimeout  int `env:"HTTP_IDLE_TIMEOUT" envDefault:"60"`  // 秒
 }
 
 type ENV string
