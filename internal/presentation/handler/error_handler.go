@@ -36,25 +36,22 @@ func CustomErrorHandler(ctx context.Context, w http.ResponseWriter, r *http.Requ
 func convertToAPIError(ctx context.Context, err error) *messages.APIError {
 	apiErr := &messages.APIError{}
 
-	if errors.As(err, &apiErr) {
-		return apiErr
-	}
-
-	// 既知のエラータイプの処理
 	switch {
+	case errors.As(err, &apiErr):
+		return apiErr
 	case errors.Is(err, onerror.ErrSecurityRequirementIsNotSatisfied):
 		return messages.ForbiddenError
 	case errors.Is(err, context.DeadlineExceeded):
 		return &messages.APIError{
 			StatusCode: http.StatusRequestTimeout,
 			Code:       "REQUEST_TIMEOUT",
-			Message:    "Request timeout exceeded",
+			Message:    "リクエストがタイムアウトしました。",
 		}
 	case errors.Is(err, context.Canceled):
 		return &messages.APIError{
 			StatusCode: 499, // Client Closed Request
 			Code:       "CLIENT_CLOSED_REQUEST",
-			Message:    "Client closed the request",
+			Message:    "クライアントがリクエストを閉じました。",
 		}
 	default:
 		// 特定のエラータイプの処理
