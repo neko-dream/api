@@ -137,7 +137,6 @@ echo "ユーザー: $RDS_USERNAME"
 echo "======================================="
 echo ""
 
-echo "postgresql://${RDS_USERNAME}:$(urlencode "$RDS_PASSWORD")@localhost:${RDS_PORT}/${RDS_DATABASE}"
 psql "postgresql://${RDS_USERNAME}:$(urlencode "$RDS_PASSWORD")@localhost:${RDS_PORT}/${RDS_DATABASE}" "$@"
 
 echo ""
