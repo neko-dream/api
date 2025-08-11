@@ -111,6 +111,9 @@ func (s *sessionTokenManager) Parse(ctx context.Context, token string) (*session
 		utils.HandleError(ctx, err, "SessionRepository.FindBySessionID")
 		return nil, errtrace.Wrap(ErrSessionNotFound)
 	}
+	if sess == nil {
+		return nil, errtrace.Wrap(ErrSessionNotFound)
+	}
 
 	// セッションが無効な場合はエラー
 	if sess.Status() != session.SESSION_ACTIVE {
