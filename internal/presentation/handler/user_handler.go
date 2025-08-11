@@ -27,8 +27,9 @@ type userHandler struct {
 	editUser     user_usecase.Edit
 	registerUser user_usecase.Register
 
-	userDetail  user_query.Detail
-	authService service.AuthenticationService
+	userDetail     user_query.Detail
+	getByDisplayID user_query.GetByDisplayID
+	authService    service.AuthenticationService
 	cookie.CookieManager
 }
 
@@ -40,6 +41,7 @@ func NewUserHandler(
 	registerUser user_usecase.Register,
 
 	userDetail user_query.Detail,
+	getByDisplayID user_query.GetByDisplayID,
 	authService service.AuthenticationService,
 	cookieManager cookie.CookieManager,
 ) oas.UserHandler {
@@ -49,6 +51,7 @@ func NewUserHandler(
 		editUser:                     editUser,
 		registerUser:                 registerUser,
 		userDetail:                   userDetail,
+		getByDisplayID:               getByDisplayID,
 		authService:                  authService,
 		CookieManager:                cookieManager,
 	}
@@ -359,4 +362,24 @@ func (u *userHandler) EstablishUser(ctx context.Context, params *oas.EstablishUs
 
 	resp := out.ToResponse()
 	return &resp, nil
+}
+
+func (u *userHandler) GetUserByDisplayID(ctx context.Context, params oas.GetUserByDisplayIDParams) (oas.GetUserByDisplayIDRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "userHandler.GetUserByDisplayID")
+	defer span.End()
+
+	result, err := u.getByDisplayID.Execute(ctx, user_query.GetByDisplayIDInput{
+		DisplayID: params.DisplayID,
+	})
+	if err != nil {
+		utils.HandleError(ctx, err, "GetByDisplayID.Execute")
+		return &oas.GetUserByDisplayIDInternalServerError{}, nil
+	}
+
+	if result.User == nil {
+		return nil, messages.UserNotFound
+	}
+
+	userResp := result.User.ToResponse()
+	return &userResp, nil
 }

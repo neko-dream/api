@@ -368,6 +368,15 @@ func (UnimplementedHandler) GetTokenInfo(ctx context.Context) (r GetTokenInfoRes
 	return r, ht.ErrNotImplemented
 }
 
+// GetUserByDisplayID implements getUserByDisplayID operation.
+//
+// 表示IDからユーザー情報の取得.
+//
+// GET /user/{displayID}
+func (UnimplementedHandler) GetUserByDisplayID(ctx context.Context, params GetUserByDisplayIDParams) (r GetUserByDisplayIDRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetUserInfo implements getUserInfo operation.
 //
 // ユーザー情報の取得.
