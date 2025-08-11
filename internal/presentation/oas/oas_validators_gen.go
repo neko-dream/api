@@ -1255,7 +1255,7 @@ func (s ReportStatus) Validate() error {
 	}
 }
 
-func (s *RevokeTokenNoContentHeaders) Validate() error {
+func (s *RevokeTokenNoContent) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}

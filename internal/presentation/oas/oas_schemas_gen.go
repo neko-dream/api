@@ -5305,35 +5305,22 @@ type RevokeTokenInternalServerError struct{}
 
 func (*RevokeTokenInternalServerError) revokeTokenRes() {}
 
-type RevokeTokenNoContent struct{}
-
-// RevokeTokenNoContentHeaders wraps RevokeTokenNoContent with response headers.
-type RevokeTokenNoContentHeaders struct {
+// RevokeTokenNoContent is response for RevokeToken operation.
+type RevokeTokenNoContent struct {
 	SetCookie []string
-	Response  RevokeTokenNoContent
 }
 
 // GetSetCookie returns the value of SetCookie.
-func (s *RevokeTokenNoContentHeaders) GetSetCookie() []string {
+func (s *RevokeTokenNoContent) GetSetCookie() []string {
 	return s.SetCookie
 }
 
-// GetResponse returns the value of Response.
-func (s *RevokeTokenNoContentHeaders) GetResponse() RevokeTokenNoContent {
-	return s.Response
-}
-
 // SetSetCookie sets the value of SetCookie.
-func (s *RevokeTokenNoContentHeaders) SetSetCookie(val []string) {
+func (s *RevokeTokenNoContent) SetSetCookie(val []string) {
 	s.SetCookie = val
 }
 
-// SetResponse sets the value of Response.
-func (s *RevokeTokenNoContentHeaders) SetResponse(val RevokeTokenNoContent) {
-	s.Response = val
-}
-
-func (*RevokeTokenNoContentHeaders) revokeTokenRes() {}
+func (*RevokeTokenNoContent) revokeTokenRes() {}
 
 type SessionsHistoryBadRequest struct{}
 
