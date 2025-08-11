@@ -250,10 +250,6 @@ paths:
                 type: array
                 items:
                   type: string
-          content:
-            application/json:
-              schema:
-                type: object
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
