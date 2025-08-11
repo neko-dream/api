@@ -18,10 +18,20 @@ type Bootstrap struct {
 
 // New 新しいBootstrapインスタンスを作成する
 func New(container *dig.Container) (*Bootstrap, error) {
+	config, err := di.InvokeWithError[*config.Config](container)
+	if err != nil {
+		return nil, fmt.Errorf("failed to invoke config: %w", err)
+	}
+
+	migrator, err := di.InvokeWithError[*db.Migrator](container)
+	if err != nil {
+		return nil, fmt.Errorf("failed to invoke migrator: %w", err)
+	}
+
 	return &Bootstrap{
 		container: container,
-		config:    di.Invoke[*config.Config](container),
-		migrator:  di.Invoke[*db.Migrator](container),
+		config:    config,
+		migrator:  migrator,
 	}, nil
 }
 
