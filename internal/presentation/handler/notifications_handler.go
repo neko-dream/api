@@ -59,6 +59,33 @@ func (h *notificationsHandler) RegisterDevice(ctx context.Context, req *oas.Regi
 		return &oas.RegisterDeviceUnauthorized{}, nil
 	}
 
+	exists, _ := h.checkDeviceTokenExists(ctx, req.DeviceToken)
+	if exists != nil {
+		var platformStr string
+		switch req.Platform {
+		case oas.RegisterDeviceReqPlatformIos:
+			platformStr = "ios"
+		case oas.RegisterDeviceReqPlatformAndroid:
+			platformStr = "android"
+		case oas.RegisterDeviceReqPlatformWeb:
+			platformStr = "web"
+		}
+		response := &oas.Device{
+			DeviceID:  exists.ID.String(),
+			UserID:    exists.UserID.String(),
+			Platform:  oas.DevicePlatform(platformStr),
+			Enabled:   exists.Enabled,
+			CreatedAt: exists.CreatedAt.Format(time.RFC3339),
+			UpdatedAt: exists.UpdatedAt.Format(time.RFC3339),
+		}
+		if exists.DeviceName != nil {
+			response.DeviceName = oas.NewOptString(*exists.DeviceName)
+		}
+		if exists.LastActiveAt != nil {
+			response.LastActiveAt = oas.NewOptString(exists.LastActiveAt.Format(time.RFC3339))
+		}
+	}
+
 	// プラットフォームを変換
 	var platform notification.DevicePlatform
 	switch req.Platform {
@@ -67,7 +94,7 @@ func (h *notificationsHandler) RegisterDevice(ctx context.Context, req *oas.Regi
 	case oas.RegisterDeviceReqPlatformAndroid:
 		platform = notification.DevicePlatformGCM
 	case oas.RegisterDeviceReqPlatformWeb:
-		platform = notification.DevicePlatformGCM // WebもFCMを使用
+		platform = notification.DevicePlatformWeb
 	default:
 		return &oas.RegisterDeviceBadRequest{}, nil
 	}
@@ -287,7 +314,7 @@ func (h *notificationsHandler) CheckDeviceExists(ctx context.Context, params oas
 
 	// 全てのアクティブなデバイスを取得してトークンをマッチング
 	// 認証不要でデバイストークンの存在を確認する
-	exists, err := h.checkDeviceTokenExists(ctx, params.DeviceToken)
+	dev, err := h.checkDeviceTokenExists(ctx, params.DeviceToken)
 	if err != nil {
 		h.logger.Error("デバイストークンの存在確認に失敗しました",
 			slog.String("error", err.Error()),
@@ -299,29 +326,29 @@ func (h *notificationsHandler) CheckDeviceExists(ctx context.Context, params oas
 
 	// レスポンスを返す
 	return &oas.CheckDeviceExistsOK{
-		Exists: exists,
+		Exists: dev != nil,
 	}, nil
 }
 
 // checkDeviceTokenExists デバイストークンが存在するか確認するヘルパーメソッド
-func (h *notificationsHandler) checkDeviceTokenExists(ctx context.Context, deviceToken string) (bool, error) {
+func (h *notificationsHandler) checkDeviceTokenExists(ctx context.Context, deviceToken string) (*notification.Device, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "notificationsHandler.checkDeviceTokenExists")
 	defer span.End()
 
 	// 全てのアクティブなデバイスを取得
 	devices, err := h.deviceRepository.GetAllActiveDevices(ctx)
 	if err != nil {
-		return false, fmt.Errorf("アクティブデバイスの取得に失敗しました: %w", err)
+		return nil, fmt.Errorf("アクティブデバイスの取得に失敗しました: %w", err)
 	}
 
 	// 各デバイスのトークンと比較
 	for _, device := range devices {
 		if device.DeviceToken == deviceToken {
-			return true, nil
+			return device, nil
 		}
 	}
 
-	return false, nil
+	return nil, nil
 }
 
 // SendTestNotification テスト通知送信

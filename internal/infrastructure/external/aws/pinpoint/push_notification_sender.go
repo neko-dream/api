@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"net/url"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/pinpoint"
@@ -17,7 +18,7 @@ import (
 // PushNotificationSender AWS Pinpointを使用したプッシュ通知送信実装
 type PushNotificationSender struct {
 	client                     *pinpoint.Client
-	applicationID              string
+	conf                       *config.Config
 	deviceRepository           notification.DeviceRepository
 	notificationPrefRepository user.NotificationPreferenceRepository
 	logger                     *slog.Logger
@@ -32,7 +33,7 @@ func NewPushNotificationSender(
 ) notification.PushNotificationSender {
 	return &PushNotificationSender{
 		client:                     client,
-		applicationID:              cfg.PINPOINT_APPLICATION_ID,
+		conf:                       cfg,
 		deviceRepository:           deviceRepository,
 		notificationPrefRepository: notificationPrefRepository,
 		logger:                     slog.Default(),
@@ -133,63 +134,27 @@ func (s *PushNotificationSender) filterActiveDevices(devices []*notification.Dev
 	return activeDevices
 }
 
-// sendToPinpoint AWS Pinpoint経由で通知を送信
+// sendToPinpoint AWS Pinpoint経由で通知を送信（改善版）
 func (s *PushNotificationSender) sendToPinpoint(
 	ctx context.Context,
 	notification *notification.PushNotification,
 	devices []*notification.Device,
 ) error {
-	addresses := make(map[string]types.AddressConfiguration)
-	for _, device := range devices {
-		channelType := s.getChannelType(device.Platform)
-		addresses[device.DeviceToken] = types.AddressConfiguration{
-			ChannelType: channelType,
+	// プラットフォームごとにデバイスをグループ化
+	devicesByPlatform := s.groupDevicesByPlatform(devices)
+
+	// プラットフォームごとに送信
+	var errs []error
+	for platform, platformDevices := range devicesByPlatform {
+		if err := s.sendToPlatformDevices(ctx, notification, platform, platformDevices); err != nil {
+			errs = append(errs, err)
 		}
 	}
 
-	dataPayload := make(map[string]string)
-	for k, v := range notification.Data {
-		dataPayload[k] = v
+	if len(errs) > 0 {
+		return fmt.Errorf("送信エラー: %v", errs)
 	}
-	dataPayload["title"] = notification.Title
-	dataPayload["body"] = notification.Body
-
-	messageRequest := &pinpoint.SendMessagesInput{
-		ApplicationId: aws.String(s.applicationID),
-		MessageRequest: &types.MessageRequest{
-			Addresses: addresses,
-			MessageConfiguration: &types.DirectMessageConfiguration{
-				GCMMessage: &types.GCMMessage{
-					Title:    aws.String(notification.Title),
-					Body:     aws.String(notification.Body),
-					Data:     dataPayload,
-					Priority: aws.String(notification.Priority),
-				},
-			},
-		},
-	}
-
-	// 送信実行
-	output, err := s.client.SendMessages(ctx, messageRequest)
-	if err != nil {
-		return fmt.Errorf("Pinpoint送信エラー: %w", err)
-	}
-
-	s.processSendResults(ctx, output, devices)
-
 	return nil
-}
-
-// getChannelType プラットフォームからチャンネルタイプを取得
-func (s *PushNotificationSender) getChannelType(platform notification.DevicePlatform) types.ChannelType {
-	switch platform {
-	case notification.DevicePlatformAPNS:
-		return types.ChannelTypeApns
-	case notification.DevicePlatformGCM:
-		return types.ChannelTypeGcm
-	default:
-		return types.ChannelTypeGcm
-	}
 }
 
 // processSendResults 送信結果を処理
@@ -246,4 +211,139 @@ func (s *PushNotificationSender) handleInvalidDevice(ctx context.Context, device
 			slog.String("error", err.Error()),
 		)
 	}
+}
+
+// groupDevicesByPlatform デバイスをプラットフォームごとにグループ化
+func (s *PushNotificationSender) groupDevicesByPlatform(devices []*notification.Device) map[string][]*notification.Device {
+	grouped := make(map[string][]*notification.Device)
+	for _, device := range devices {
+		platform := string(device.Platform)
+		grouped[platform] = append(grouped[platform], device)
+	}
+	return grouped
+}
+
+// sendToPlatformDevices プラットフォーム別に送信
+func (s *PushNotificationSender) sendToPlatformDevices(
+	ctx context.Context,
+	notification *notification.PushNotification,
+	platform string,
+	devices []*notification.Device,
+) error {
+	addresses := make(map[string]types.AddressConfiguration)
+	channelType := s.getChannelTypeFromString(platform)
+
+	for _, device := range devices {
+		addresses[device.DeviceToken] = types.AddressConfiguration{
+			ChannelType: channelType,
+		}
+	}
+
+	messageConfig := s.createMessageConfiguration(notification, platform)
+
+	messageRequest := &pinpoint.SendMessagesInput{
+		ApplicationId: aws.String(s.conf.PINPOINT_APPLICATION_ID),
+		MessageRequest: &types.MessageRequest{
+			Addresses:            addresses,
+			MessageConfiguration: messageConfig,
+		},
+	}
+
+	output, err := s.client.SendMessages(ctx, messageRequest)
+	if err != nil {
+		return fmt.Errorf("Pinpoint送信エラー (%s): %w", platform, err)
+	}
+
+	s.processSendResults(ctx, output, devices)
+	return nil
+}
+
+// createMessageConfiguration プラットフォームに応じたメッセージ設定を作成
+func (s *PushNotificationSender) createMessageConfiguration(
+	notify *notification.PushNotification,
+	platform string,
+) *types.DirectMessageConfiguration {
+	config := &types.DirectMessageConfiguration{}
+
+	// 共通のデータペイロード
+	dataPayload := make(map[string]string)
+	for k, v := range notify.Data {
+		dataPayload[k] = v
+	}
+
+	switch platform {
+	case string(notification.DevicePlatformGCM):
+		// Android/FCM用の設定
+		gcmMsg := &types.GCMMessage{
+			Title:    aws.String(notify.Title),
+			Body:     aws.String(notify.Body),
+			Data:     dataPayload,
+			Priority: aws.String(notify.Priority),
+			Sound:    aws.String(notify.Sound),
+		}
+		config.GCMMessage = gcmMsg
+	case string(notification.DevicePlatformAPNS):
+		// iOS/APNs用の設定
+		apnsMsg := &types.APNSMessage{
+			Title:    aws.String(notify.Title),
+			Body:     aws.String(notify.Body),
+			Data:     dataPayload,
+			Priority: aws.String(s.convertToAPNSPriority(notify.Priority)),
+			Sound:    aws.String(notify.Sound),
+		}
+		config.APNSMessage = apnsMsg
+	case string(notification.DevicePlatformWeb):
+		// Web Push用の設定（GCMメッセージを使用）
+		gcmMsg := &types.GCMMessage{
+			Title:    aws.String(notify.Title),
+			Body:     aws.String(notify.Body),
+			Data:     dataPayload,
+			Priority: aws.String(notify.Priority),
+		}
+		config.GCMMessage = gcmMsg
+
+	default:
+		// デフォルト設定（GCM）
+		config.GCMMessage = &types.GCMMessage{
+			Title:    aws.String(notify.Title),
+			Body:     aws.String(notify.Body),
+			Data:     dataPayload,
+			Priority: aws.String(notify.Priority),
+			Sound:    aws.String(notify.Sound),
+		}
+	}
+
+	return config
+}
+
+// getChannelTypeFromString 文字列からチャンネルタイプを取得
+func (s *PushNotificationSender) getChannelTypeFromString(platform string) types.ChannelType {
+	switch platform {
+	case string(notification.DevicePlatformGCM):
+		return types.ChannelTypeGcm
+	case string(notification.DevicePlatformAPNS):
+		return types.ChannelTypeApns
+	case string(notification.DevicePlatformWeb):
+		return types.ChannelTypeGcm
+	default:
+		return types.ChannelTypeGcm
+	}
+}
+
+// convertToAPNSPriority FCMの優先度をAPNS用に変換
+func (s *PushNotificationSender) convertToAPNSPriority(priority string) string {
+	switch priority {
+	case "high":
+		return "10"
+	case "normal":
+		return "5"
+	default:
+		return "5"
+	}
+}
+
+// isValidURL URLの妥当性をチェック
+func (s *PushNotificationSender) isValidURL(str string) bool {
+	u, err := url.Parse(str)
+	return err == nil && u.Scheme != "" && u.Host != ""
 }

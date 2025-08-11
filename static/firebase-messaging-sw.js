@@ -53,10 +53,10 @@ messaging.onBackgroundMessage((payload) => {
     console.log('[firebase-messaging-sw.js] Received background message ', JSON.stringify(payload, null, 2));
 
     // PinpointからのGCMメッセージはdataフィールドに通知内容が含まれる
-    const notificationTitle = payload.notification?.title || payload.data?.title || 'Kotohiro';
+    const notificationTitle = payload.notification?.title || payload.data["pinpoint.notification.title"] || 'Kotohiro';
     const notificationOptions = {
-        body: payload.notification?.body || payload.data?.body || '',
-        icon: payload.notification?.icon || payload.data?.icon || '/icon-192x192.png',
+        body: payload.notification["pinpoint.notification.body"] || payload.data?.body || '',
+        icon: payload.notification["pinpoint.notification.icon"] || payload.data?.icon || '/icon-192x192.png',
         badge: '/badge-72x72.png',
         data: payload.data || {},
         actions: [
@@ -104,9 +104,9 @@ self.addEventListener('push', (event) => {
             // FirebaseのonBackgroundMessageが処理しない場合のフォールバック
             // dataのみのメッセージの場合、手動で通知を表示
             if (data && !data.notification && data.data) {
-                const notificationTitle = data.data.title || 'Kotohiro';
+                const notificationTitle = data.data["pinpoint.notification.title"] || 'Kotohiro';
                 const notificationOptions = {
-                    body: data.data.body || '',
+                    body: data.data["pinpoint.notification.body"] || '',
                     icon: data.data.icon || '/icon-192x192.png',
                     badge: '/badge-72x72.png',
                     data: data.data || {}

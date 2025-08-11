@@ -267,7 +267,7 @@
                 if (response.ok) {
                     const data = await response.json();
                     currentUser = data;
-                    
+
                     // displayIDが含まれていない場合
                     if (!data.displayID) {
                         // セッションストレージから保留中のユーザーIDを確認
@@ -346,11 +346,11 @@
 
             // セッションストレージに表示IDを保存（ログイン後のユーザー登録用）
             sessionStorage.setItem('pendingUserId', displayId);
-            
+
             // ログイン処理（GETリクエスト）
             const redirectUrl = encodeURIComponent(window.location.href);
             const loginUrl = `/auth/dev/login?id=${displayId}&redirect_url=${redirectUrl}`;
-            
+
             // ブラウザでGETリクエスト（リダイレクト）
             window.location.href = loginUrl;
         };
@@ -485,6 +485,7 @@
                     document.getElementById('tokenValue').textContent = token;
                     document.getElementById('tokenDisplay').style.display = 'block';
                     document.getElementById('registerDeviceBtn').disabled = false;
+                    document.getElementById('sendTestBtn').disabled = false;
                     addLog('FCMトークンを取得しました', 'success');
                 } else {
                     addLog('FCMトークンの取得に失敗しました', 'error');

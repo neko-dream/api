@@ -77,6 +77,7 @@ type DevicePlatform string
 const (
 	DevicePlatformAPNS DevicePlatform = "APNS"
 	DevicePlatformGCM  DevicePlatform = "GCM"
+	DevicePlatformWeb  DevicePlatform = "web"
 )
 
 // Device デバイス情報

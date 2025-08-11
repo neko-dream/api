@@ -97,6 +97,9 @@ func (a *authService) Authenticate(
 		utils.HandleError(ctx, err, "OIDCProvider.UserInfo")
 		return nil, errtrace.Wrap(err)
 	}
+	if subject == nil {
+		return nil, ErrNotAuthenticated
+	}
 
 	existUser, err := a.userRepository.FindBySubject(ctx, user.UserSubject(*subject))
 	if err != nil {

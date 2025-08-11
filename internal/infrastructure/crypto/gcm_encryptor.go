@@ -23,6 +23,7 @@ type GCMEncryptor struct {
 func NewGCMEncryptor(key []byte) (*GCMEncryptor, error) {
 	// 鍵長の検証
 	if len(key) != 16 && len(key) != 24 && len(key) != 32 {
+		utils.HandleError(context.Background(), fmt.Errorf("%w: %d バイト (16, 24, または 32 バイトである必要があります)", ErrInvalidKeyLength, len(key)), "NewGCMEncryptor")
 		return nil, fmt.Errorf("%w: %d バイト (16, 24, または 32 バイトである必要があります)", ErrInvalidKeyLength, len(key))
 	}
 	return &GCMEncryptor{
@@ -120,7 +121,7 @@ func (e *GCMEncryptor) DecryptBytes(ctx context.Context, ciphertext string) ([]b
 	plaintext, err := aesGCM.Open(nil, nonce, encrypted, nil)
 	if err != nil {
 		utils.HandleError(ctx, err, "aesGCM.Open")
-		return nil, fmt.Errorf("%w: 復号化に失敗しました: %v", ErrDecryption, err)
+		return nil, fmt.Errorf("%w: 復号に失敗しました: %v", ErrDecryption, err)
 	}
 
 	return plaintext, nil

@@ -27,7 +27,7 @@
 				},
 				{
 					"name": "DOMAIN",
-					"value": "dev.kotohiro.com"
+					"value": "kotohiro.com"
 				},
 				{
 					"name": "IMAGE_DOMAIN",
@@ -122,6 +122,14 @@
 				{
 					"name": "HASH_ITERATIONS",
 					"valueFrom": "{{ ssm `/kotohiro-dev-app-secret/arn` }}:HASH_ITERATIONS::"
+				},
+				{
+					"name": "FCM_VAPID_KEY",
+					"valueFrom": "{{ ssm `/kotohiro-dev-app-secret/arn` }}:FCM_VAPID_KEY::"
+				},
+				{
+					"name": "PINPOINT_APPLICATION_ID",
+					"valueFrom": "{{ ssm `/kotohiro-dev-app-secret/arn` }}:PINPOINT_APPLICATION_ID::"
 				}
 			],
 			"logConfiguration": {
