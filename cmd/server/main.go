@@ -55,14 +55,14 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.Handle("/", corsHandler)
-	// if conf.Env != config.PROD {
-	var domain string
-	if conf.Env == config.DEV {
-		domain = "https://api-dev.kotohiro.com/static/oas/openapi.yaml"
-	} else if conf.Env == config.PROD {
-		domain = "https://api.kotohiro.com/static/oas/openapi.yaml"
-	} else {
-		domain = "http://localhost:" + conf.PORT + "/static/oas/openapi.yaml"
+	var defaultDomain string
+	switch conf.Env {
+	case config.DEV:
+		defaultDomain = "https://api-dev.kotohiro.com/static/oas/openapi.yaml"
+	case config.PROD:
+		defaultDomain = "https://api.kotohiro.com/static/oas/openapi.yaml"
+	default:
+		defaultDomain = "http://localhost:" + conf.PORT + "/static/oas/openapi.yaml"
 	}
 	mux.Handle("/static/", http.StripPrefix("/static/", handler.NewStaticHandler()))
 	mux.Handle("/admin/", http.StripPrefix("/admin/", handler.NewAdminUIHandler()))
@@ -77,31 +77,44 @@ func main() {
 		"if (bp) return 1; " +
 		"return a.toLowerCase().localeCompare(b.toLowerCase());" +
 		"}"
-	swagger := v5emb.NewWithConfig(swgui.Config{
-		Title:       "Kotohiro API",
-		HideCurl:    true,
-		SwaggerJSON: domain,
-		BasePath:    "/docs/",
-		JsonEditor:  true,
-		SettingsUI: map[string]string{
-			"deepLinking":              "true", // URLで各APIに直リンク可能
-			"defaultModelsExpandDepth": "-1",
-			"defaultModelExpandDepth":  "-1",
-			"defaultModelRendering":    "\"model\"",
-			"displayRequestDuration":   "true",
-			"tryItOutEnabled":          "true",
-			"layout":                   "\"BaseLayout\"",
-			"showExtensions":           "true",
-			"showCommonExtensions":     "true",
-			"syntaxHighlight":          "{\"activate\": true,\"theme\": \"tomorrow-night\"}",
-			"displayOperationId":       "true",
-			"filter":                   "true",
-			"operationsSorter":         "\"alpha\"",
-			"tagsSorter":               tagsSorterFunc,
-		},
-	})
-	mux.Handle("/docs/", swagger("Kotohiro API", domain, "/docs/"))
-	// }
+
+	// Swagger UIのハンドラーを動的に生成
+	swaggerHandler := func(w http.ResponseWriter, r *http.Request) {
+		// リクエストのHostヘッダーに基づいてドメインを決定
+		domain := defaultDomain
+		if conf.Env == config.DEV {
+			host := r.Host
+			if host == "api-dev.kotohiro.com" || host == "api.dev.kotohiro.com" {
+				domain = "https://" + host + "/static/oas/openapi.yaml"
+			}
+		}
+
+		swagger := v5emb.NewWithConfig(swgui.Config{
+			Title:       "Kotohiro API",
+			HideCurl:    true,
+			SwaggerJSON: domain,
+			BasePath:    "/docs/",
+			JsonEditor:  true,
+			SettingsUI: map[string]string{
+				"deepLinking":              "true", // URLで各APIに直リンク可能
+				"defaultModelsExpandDepth": "-1",
+				"defaultModelExpandDepth":  "-1",
+				"defaultModelRendering":    "\"model\"",
+				"displayRequestDuration":   "true",
+				"tryItOutEnabled":          "true",
+				"layout":                   "\"BaseLayout\"",
+				"showExtensions":           "true",
+				"showCommonExtensions":     "true",
+				"syntaxHighlight":          "{\"activate\": true,\"theme\": \"tomorrow-night\"}",
+				"displayOperationId":       "true",
+				"filter":                   "true",
+				"operationsSorter":         "\"alpha\"",
+				"tagsSorter":               tagsSorterFunc,
+			},
+		})
+		swagger("Kotohiro API", domain, "/docs/").ServeHTTP(w, r)
+	}
+	mux.HandleFunc("/docs/", swaggerHandler)
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%s", conf.PORT), mux); err != nil {
 		log.Println("Error starting server:", err)

@@ -2,6 +2,17 @@
 
 set -eu
 
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 <dev|prod>"
+    exit 1
+fi
+
+ENV=$1
+if [ "$ENV" != "dev" ] && [ "$ENV" != "prod" ]; then
+    echo "Environment must be 'dev' or 'prod'"
+    exit 1
+fi
+
 source scripts/utils.sh
 
 export ACCOUNT_ID=$(login_aws $AWS_PROFILE)
@@ -14,7 +25,11 @@ aws --profile $AWS_PROFILE ecr get-login-password --region ap-northeast-1 |
 docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com
 
 cd admin-ui
-bun build:prod
+if [ "$ENV" = "prod" ]; then
+    bun build:prod
+else
+    bun build:dev
+fi
 cd ../
 
 go mod tidy
@@ -24,7 +39,13 @@ CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -tags timetzdata -ldflags="-s -w"
 COMMIT_HASH=$(git show --format='%h' --no-patch)
 TIMESTAMP=$(date '+%s%3')
 export IMAGE_TAG=$COMMIT_HASH$TIMESTAMP
-TAG=$ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/kotohiro-prd-api:$IMAGE_TAG
+
+if [ "$ENV" = "prod" ]; then
+    ECR_REPO="kotohiro-prd-api"
+else
+    ECR_REPO="kotohiro-dev-api"
+fi
+TAG=$ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/$ECR_REPO:$IMAGE_TAG
 
 docker build -f ./container/Dockerfile.gh . -t $TAG --no-cache
 docker push $TAG
@@ -32,4 +53,4 @@ docker push $TAG
 rm -rf ./server
 
 
-ecspresso deploy --config ./.ecspresso/api/prd/ecspresso.yml --force-new-deployment
+ecspresso deploy --config ./.ecspresso/api/$ENV/ecspresso.yml --force-new-deployment
