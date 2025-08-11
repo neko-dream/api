@@ -182,13 +182,13 @@ func TestVoteFromString(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := vote.VoteFromString(tt.input)
-			
+
 			if tt.wantErr {
 				assert.Error(t, err)
 				assert.Nil(t, got)
 				return
 			}
-			
+
 			assert.NoError(t, err)
 			if tt.want == nil {
 				assert.Nil(t, got)

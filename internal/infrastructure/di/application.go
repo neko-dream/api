@@ -57,6 +57,7 @@ func useCaseDeps() []ProvideArg {
 		{user_usecase.NewEditHandler, nil},
 		{user_usecase.NewRegisterHandler, nil},
 		{user_query.NewDetailHandler, nil},
+		{user_query.NewGetByDisplayIDHandler, nil},
 		{vote_usecase.NewVoteHandler, nil},
 		{auth_usecase.NewAuthLogin, nil},
 		{auth_usecase.NewRevoke, nil},

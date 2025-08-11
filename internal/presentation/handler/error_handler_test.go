@@ -128,4 +128,3 @@ func TestShouldSkipBody(t *testing.T) {
 		})
 	}
 }
-

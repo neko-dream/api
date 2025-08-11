@@ -149,6 +149,10 @@ type GetTokenInfoRes interface {
 	getTokenInfoRes()
 }
 
+type GetUserByDisplayIDRes interface {
+	getUserByDisplayIDRes()
+}
+
 type GetUserInfoRes interface {
 	getUserInfoRes()
 }

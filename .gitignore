@@ -14,3 +14,4 @@ node_modules/
 
 ./static/admin-ui
 poc
+.serena/cache

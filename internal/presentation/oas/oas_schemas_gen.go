@@ -1845,6 +1845,37 @@ func (s *GetTokenInfoInternalServerError) SetMessage(val string) {
 
 func (*GetTokenInfoInternalServerError) getTokenInfoRes() {}
 
+type GetUserByDisplayIDInternalServerError struct{}
+
+func (*GetUserByDisplayIDInternalServerError) getUserByDisplayIDRes() {}
+
+type GetUserByDisplayIDNotFound struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *GetUserByDisplayIDNotFound) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *GetUserByDisplayIDNotFound) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *GetUserByDisplayIDNotFound) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *GetUserByDisplayIDNotFound) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*GetUserByDisplayIDNotFound) getUserByDisplayIDRes() {}
+
 type GetUserInfoInternalServerError struct{}
 
 func (*GetUserInfoInternalServerError) getUserInfoRes() {}
@@ -7247,8 +7278,9 @@ func (s *User) SetIconURL(val OptNilString) {
 	s.IconURL = val
 }
 
-func (*User) establishUserRes()     {}
-func (*User) updateUserProfileRes() {}
+func (*User) establishUserRes()      {}
+func (*User) getUserByDisplayIDRes() {}
+func (*User) updateUserProfileRes()  {}
 
 // Ref: #/components/schemas/UserDemographics
 type UserDemographics struct {

@@ -2973,6 +2973,71 @@ func decodeGetTimeLineParams(args [1]string, argsEscaped bool, r *http.Request) 
 	return params, nil
 }
 
+// GetUserByDisplayIDParams is parameters of getUserByDisplayID operation.
+type GetUserByDisplayIDParams struct {
+	DisplayID string
+}
+
+func unpackGetUserByDisplayIDParams(packed middleware.Parameters) (params GetUserByDisplayIDParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "displayID",
+			In:   "path",
+		}
+		params.DisplayID = packed[key].(string)
+	}
+	return params
+}
+
+func decodeGetUserByDisplayIDParams(args [1]string, argsEscaped bool, r *http.Request) (params GetUserByDisplayIDParams, _ error) {
+	// Decode path: displayID.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "displayID",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.DisplayID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "displayID",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // GetUserListManageParams is parameters of getUserListManage operation.
 type GetUserListManageParams struct {
 	Offset  OptInt32

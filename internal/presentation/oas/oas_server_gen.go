@@ -520,6 +520,12 @@ type UserHandler interface {
 	//
 	// POST /user
 	EstablishUser(ctx context.Context, req *EstablishUserReq) (EstablishUserRes, error)
+	// GetUserByDisplayID implements getUserByDisplayID operation.
+	//
+	// 表示IDからユーザー情報の取得.
+	//
+	// GET /user/{displayID}
+	GetUserByDisplayID(ctx context.Context, params GetUserByDisplayIDParams) (GetUserByDisplayIDRes, error)
 	// GetUserInfo implements getUserInfo operation.
 	//
 	// ユーザー情報の取得.
