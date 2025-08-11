@@ -27,7 +27,7 @@ func (b *Bootstrap) setupRoutes() *http.ServeMux {
 		// API routes
 		{Pattern: "/", Handler: b.setupAPIHandler()},
 		// Static files
-		{Pattern: "/static/", Handler: handler.NewStaticHandler(), StripPrefix: "/static/"},
+		{Pattern: "/static/", Handler: handler.NewStaticHandler(b.config), StripPrefix: "/static/"},
 	}
 
 	routes = append(routes, b.getAdminRoutes()...)
