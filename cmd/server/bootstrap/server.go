@@ -13,9 +13,9 @@ func (b *Bootstrap) setupHTTPServer() (*http.Server, error) {
 	return &http.Server{
 		Addr:         fmt.Sprintf(":%s", b.config.PORT),
 		Handler:      mux,
-		ReadTimeout:  15 * time.Second,
-		WriteTimeout: 15 * time.Second,
-		IdleTimeout:  60 * time.Second,
+		ReadTimeout:  time.Duration(b.config.HTTPReadTimeout) * time.Second,
+		WriteTimeout: time.Duration(b.config.HTTPWriteTimeout) * time.Second,
+		IdleTimeout:  time.Duration(b.config.HTTPIdleTimeout) * time.Second,
 	}, nil
 }
 
