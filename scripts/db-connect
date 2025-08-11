@@ -18,7 +18,7 @@ shift  # 最初の引数（環境）を削除して、残りをpsqlに渡す
 
 source scripts/utils.sh
 
-ACCOUNT_ID=$(login_aws admin)
+ACCOUNT_ID=$(login_aws $AWS_PROFILE)
 if [ -z "$ACCOUNT_ID" ]; then
     echo "AWS認証に失敗しました" >&2
     exit 1
