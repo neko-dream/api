@@ -3,9 +3,12 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"log"
 
 	"braces.dev/errtrace"
 	"github.com/google/uuid"
+	"github.com/neko-dream/server/internal/domain/model/event"
+	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
@@ -16,13 +19,16 @@ import (
 
 type talkSessionRepository struct {
 	*db.DBManager
+	eventStore event.EventStore
 }
 
 func NewTalkSessionRepository(
 	DBManager *db.DBManager,
+	eventStore event.EventStore,
 ) talksession.TalkSessionRepository {
 	return &talkSessionRepository{
-		DBManager: DBManager,
+		DBManager:  DBManager,
+		eventStore: eventStore,
 	}
 }
 
@@ -107,6 +113,15 @@ func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talkses
 		}
 	}
 
+	// イベントがある場合は保存
+	events := talkSession.GetRecordedEvents()
+	if len(events) > 0 {
+		if err := t.eventStore.StoreBatch(ctx, events); err != nil {
+			return errtrace.Wrap(err)
+		}
+		talkSession.ClearRecordedEvents()
+	}
+
 	return nil
 }
 
@@ -176,6 +191,15 @@ func (t *talkSessionRepository) Update(ctx context.Context, talkSession *talkses
 		}
 	}
 
+	// イベントがある場合は保存
+	events := talkSession.GetRecordedEvents()
+	if len(events) > 0 {
+		if err := t.eventStore.StoreBatch(ctx, events); err != nil {
+			return errtrace.Wrap(err)
+		}
+		talkSession.ClearRecordedEvents()
+	}
+
 	return nil
 }
 
@@ -233,4 +257,86 @@ func (t *talkSessionRepository) FindByID(ctx context.Context, talkSessionID shar
 	}
 
 	return ts, nil
+}
+
+func (t *talkSessionRepository) GetUnprocessedEndedSessions(ctx context.Context, limit int) ([]*talksession.TalkSession, error) {
+	ctx, span := otel.Tracer("repository").Start(ctx, "talkSessionRepository.GetUnprocessedEndedSessions")
+	defer span.End()
+
+	rows, err := t.GetQueries(ctx).GetUnprocessedEndedSessions(ctx, int32(limit))
+	if err != nil {
+		return nil, errtrace.Wrap(err)
+	}
+
+	var sessions []*talksession.TalkSession
+	for _, row := range rows {
+		var description, thumbnailURL, city, prefecture *string
+		if row.Description.Valid {
+			description = &row.Description.String
+		}
+		if row.ThumbnailUrl.Valid {
+			thumbnailURL = &row.ThumbnailUrl.String
+		}
+		if row.City.Valid {
+			city = &row.City.String
+		}
+		if row.Prefecture.Valid {
+			prefecture = &row.Prefecture.String
+		}
+
+		var organizationID *shared.UUID[organization.Organization]
+		if row.OrganizationID.Valid {
+			orgID := shared.UUID[organization.Organization](row.OrganizationID.UUID)
+			organizationID = &orgID
+		}
+
+		var organizationAliasID *shared.UUID[organization.OrganizationAlias]
+		if row.OrganizationAliasID.Valid {
+			aliasID := shared.UUID[organization.OrganizationAlias](row.OrganizationAliasID.UUID)
+			organizationAliasID = &aliasID
+		}
+
+		session := talksession.NewTalkSession(
+			shared.UUID[talksession.TalkSession](row.TalkSessionID),
+			row.Theme,
+			description,
+			thumbnailURL,
+			shared.UUID[user.User](row.OwnerID),
+			row.CreatedAt,
+			row.ScheduledEndTime,
+			nil, // Location は別途取得が必要な場合
+			city,
+			prefecture,
+			organizationID,
+			organizationAliasID,
+		)
+		// 制限事項を設定
+		if len(row.Restrictions) > 0 {
+			if err := session.UpdateRestrictions(ctx, row.Restrictions); err != nil {
+				log.Printf("failed to update restrictions: %v", err)
+			}
+		}
+		// レポート表示設定
+		session.SetReportVisibility(row.HideReport.Bool)
+		sessions = append(sessions, session)
+	}
+
+	return sessions, nil
+}
+
+func (t *talkSessionRepository) GetParticipantIDs(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession]) ([]shared.UUID[user.User], error) {
+	ctx, span := otel.Tracer("repository").Start(ctx, "talkSessionRepository.GetParticipantIDs")
+	defer span.End()
+
+	userIDs, err := t.GetQueries(ctx).GetTalkSessionParticipants(ctx, talkSessionID.UUID())
+	if err != nil {
+		return nil, errtrace.Wrap(err)
+	}
+
+	var participantIDs []shared.UUID[user.User]
+	for _, userID := range userIDs {
+		participantIDs = append(participantIDs, shared.UUID[user.User](userID))
+	}
+
+	return participantIDs, nil
 }

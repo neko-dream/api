@@ -13,6 +13,7 @@ func main() {
 	if err != nil {
 		log.Fatal("Failed to initialize: ", err)
 	}
+
 	if err := boot.Run(); err != nil {
 		log.Fatal("Server error: ", err)
 	}

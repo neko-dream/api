@@ -13,6 +13,7 @@ type Handler interface {
 	HealthHandler
 	ImageHandler
 	ManageHandler
+	NotificationsHandler
 	OpinionHandler
 	OrganizationHandler
 	PolicyHandler
@@ -155,6 +156,60 @@ type ManageHandler interface {
 	//
 	// POST /v1/manage/talksessions/{talkSessionID}/analysis/report
 	ToggleReportVisibilityManage(ctx context.Context, req *ToggleReportVisibilityRequest, params ToggleReportVisibilityManageParams) (*ToggleReportVisibilityResponse, error)
+}
+
+// NotificationsHandler handles operations described by OpenAPI v3 specification.
+//
+// x-ogen-operation-group: Notifications
+type NotificationsHandler interface {
+	// CheckDeviceExists implements checkDeviceExists operation.
+	//
+	// デバイストークンが登録されているか確認.
+	//
+	// GET /notifications/devices/exists
+	CheckDeviceExists(ctx context.Context, params CheckDeviceExistsParams) (CheckDeviceExistsRes, error)
+	// DeleteDevice implements deleteDevice operation.
+	//
+	// デバイス削除.
+	//
+	// DELETE /notifications/devices/{deviceId}
+	DeleteDevice(ctx context.Context, params DeleteDeviceParams) (DeleteDeviceRes, error)
+	// GetDevices implements getDevices operation.
+	//
+	// デバイス一覧取得.
+	//
+	// GET /notifications/devices
+	GetDevices(ctx context.Context) (GetDevicesRes, error)
+	// GetNotificationPreferences implements getNotificationPreferences operation.
+	//
+	// 通知設定取得.
+	//
+	// GET /notifications/preferences
+	GetNotificationPreferences(ctx context.Context) (GetNotificationPreferencesRes, error)
+	// GetVapidKey implements getVapidKey operation.
+	//
+	// VAPID公開鍵取得.
+	//
+	// GET /notifications/vapid-key
+	GetVapidKey(ctx context.Context) (*GetVapidKeyOK, error)
+	// RegisterDevice implements registerDevice operation.
+	//
+	// デバイス登録/更新.
+	//
+	// POST /notifications/devices
+	RegisterDevice(ctx context.Context, req *RegisterDeviceReq) (RegisterDeviceRes, error)
+	// SendTestNotification implements sendTestNotification operation.
+	//
+	// テスト通知送信.
+	//
+	// POST /notifications/test
+	SendTestNotification(ctx context.Context, req *SendTestNotificationReq) (SendTestNotificationRes, error)
+	// UpdateNotificationPreferences implements updateNotificationPreferences operation.
+	//
+	// 通知設定更新.
+	//
+	// PUT /notifications/preferences
+	UpdateNotificationPreferences(ctx context.Context, req *UpdateNotificationPreferencesReq) (UpdateNotificationPreferencesRes, error)
 }
 
 // OpinionHandler handles operations described by OpenAPI v3 specification.

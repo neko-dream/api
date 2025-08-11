@@ -272,6 +272,30 @@ type ChangePasswordOK struct{}
 
 func (*ChangePasswordOK) changePasswordRes() {}
 
+type CheckDeviceExistsNotFound struct{}
+
+func (*CheckDeviceExistsNotFound) checkDeviceExistsRes() {}
+
+type CheckDeviceExistsOK struct {
+	Exists bool `json:"exists"`
+}
+
+// GetExists returns the value of Exists.
+func (s *CheckDeviceExistsOK) GetExists() bool {
+	return s.Exists
+}
+
+// SetExists sets the value of Exists.
+func (s *CheckDeviceExistsOK) SetExists(val bool) {
+	s.Exists = val
+}
+
+func (*CheckDeviceExistsOK) checkDeviceExistsRes() {}
+
+type CheckDeviceExistsUnauthorized struct{}
+
+func (*CheckDeviceExistsUnauthorized) checkDeviceExistsRes() {}
+
 // Ref: #/components/schemas/Conclusion
 type Conclusion struct {
 	// 作成ユーザー.
@@ -387,6 +411,19 @@ func (s *CreateOrganizationAliasReq) SetAliasName(val string) {
 	s.AliasName = val
 }
 
+// DeleteDeviceNoContent is response for DeleteDevice operation.
+type DeleteDeviceNoContent struct{}
+
+func (*DeleteDeviceNoContent) deleteDeviceRes() {}
+
+type DeleteDeviceNotFound struct{}
+
+func (*DeleteDeviceNotFound) deleteDeviceRes() {}
+
+type DeleteDeviceUnauthorized struct{}
+
+func (*DeleteDeviceUnauthorized) deleteDeviceRes() {}
+
 type DeleteOrganizationAliasBadRequest struct{}
 
 func (*DeleteOrganizationAliasBadRequest) deleteOrganizationAliasRes() {}
@@ -447,6 +484,149 @@ func (*DevAuthorizeFoundHeaders) devAuthorizeRes() {}
 type DevAuthorizeInternalServerError struct{}
 
 func (*DevAuthorizeInternalServerError) devAuthorizeRes() {}
+
+// デバイス情報.
+// Ref: #/components/schemas/Device
+type Device struct {
+	DeviceID     string         `json:"device_id"`
+	UserID       string         `json:"user_id"`
+	Platform     DevicePlatform `json:"platform"`
+	DeviceName   OptString      `json:"device_name"`
+	Enabled      bool           `json:"enabled"`
+	LastActiveAt OptString      `json:"last_active_at"`
+	CreatedAt    string         `json:"created_at"`
+	UpdatedAt    string         `json:"updated_at"`
+}
+
+// GetDeviceID returns the value of DeviceID.
+func (s *Device) GetDeviceID() string {
+	return s.DeviceID
+}
+
+// GetUserID returns the value of UserID.
+func (s *Device) GetUserID() string {
+	return s.UserID
+}
+
+// GetPlatform returns the value of Platform.
+func (s *Device) GetPlatform() DevicePlatform {
+	return s.Platform
+}
+
+// GetDeviceName returns the value of DeviceName.
+func (s *Device) GetDeviceName() OptString {
+	return s.DeviceName
+}
+
+// GetEnabled returns the value of Enabled.
+func (s *Device) GetEnabled() bool {
+	return s.Enabled
+}
+
+// GetLastActiveAt returns the value of LastActiveAt.
+func (s *Device) GetLastActiveAt() OptString {
+	return s.LastActiveAt
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *Device) GetCreatedAt() string {
+	return s.CreatedAt
+}
+
+// GetUpdatedAt returns the value of UpdatedAt.
+func (s *Device) GetUpdatedAt() string {
+	return s.UpdatedAt
+}
+
+// SetDeviceID sets the value of DeviceID.
+func (s *Device) SetDeviceID(val string) {
+	s.DeviceID = val
+}
+
+// SetUserID sets the value of UserID.
+func (s *Device) SetUserID(val string) {
+	s.UserID = val
+}
+
+// SetPlatform sets the value of Platform.
+func (s *Device) SetPlatform(val DevicePlatform) {
+	s.Platform = val
+}
+
+// SetDeviceName sets the value of DeviceName.
+func (s *Device) SetDeviceName(val OptString) {
+	s.DeviceName = val
+}
+
+// SetEnabled sets the value of Enabled.
+func (s *Device) SetEnabled(val bool) {
+	s.Enabled = val
+}
+
+// SetLastActiveAt sets the value of LastActiveAt.
+func (s *Device) SetLastActiveAt(val OptString) {
+	s.LastActiveAt = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *Device) SetCreatedAt(val string) {
+	s.CreatedAt = val
+}
+
+// SetUpdatedAt sets the value of UpdatedAt.
+func (s *Device) SetUpdatedAt(val string) {
+	s.UpdatedAt = val
+}
+
+func (*Device) registerDeviceRes() {}
+
+type DevicePlatform string
+
+const (
+	DevicePlatformIos     DevicePlatform = "ios"
+	DevicePlatformAndroid DevicePlatform = "android"
+	DevicePlatformWeb     DevicePlatform = "web"
+)
+
+// AllValues returns all DevicePlatform values.
+func (DevicePlatform) AllValues() []DevicePlatform {
+	return []DevicePlatform{
+		DevicePlatformIos,
+		DevicePlatformAndroid,
+		DevicePlatformWeb,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s DevicePlatform) MarshalText() ([]byte, error) {
+	switch s {
+	case DevicePlatformIos:
+		return []byte(s), nil
+	case DevicePlatformAndroid:
+		return []byte(s), nil
+	case DevicePlatformWeb:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *DevicePlatform) UnmarshalText(data []byte) error {
+	switch DevicePlatform(data) {
+	case DevicePlatformIos:
+		*s = DevicePlatformIos
+		return nil
+	case DevicePlatformAndroid:
+		*s = DevicePlatformAndroid
+		return nil
+	case DevicePlatformWeb:
+		*s = DevicePlatformWeb
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
 
 type DummiInitBadRequest struct{}
 
@@ -796,6 +976,30 @@ func (*GetConclusionBadRequest) getConclusionRes() {}
 type GetConclusionInternalServerError struct{}
 
 func (*GetConclusionInternalServerError) getConclusionRes() {}
+
+type GetDevicesOK struct {
+	Devices []Device `json:"devices"`
+}
+
+// GetDevices returns the value of Devices.
+func (s *GetDevicesOK) GetDevices() []Device {
+	return s.Devices
+}
+
+// SetDevices sets the value of Devices.
+func (s *GetDevicesOK) SetDevices(val []Device) {
+	s.Devices = val
+}
+
+func (*GetDevicesOK) getDevicesRes() {}
+
+type GetDevicesUnauthorized struct{}
+
+func (*GetDevicesUnauthorized) getDevicesRes() {}
+
+type GetNotificationPreferencesUnauthorized struct{}
+
+func (*GetNotificationPreferencesUnauthorized) getNotificationPreferencesRes() {}
 
 type GetOpenedTalkSessionBadRequest struct{}
 
@@ -1779,6 +1983,20 @@ func (s *GetUserListManageOrderBy) UnmarshalText(data []byte) error {
 	}
 }
 
+type GetVapidKeyOK struct {
+	VapidKey string `json:"vapid_key"`
+}
+
+// GetVapidKey returns the value of VapidKey.
+func (s *GetVapidKeyOK) GetVapidKey() string {
+	return s.VapidKey
+}
+
+// SetVapidKey sets the value of VapidKey.
+func (s *GetVapidKeyOK) SetVapidKey(val string) {
+	s.VapidKey = val
+}
+
 type HandleAuthCallbackBadRequest struct{}
 
 func (*HandleAuthCallbackBadRequest) handleAuthCallbackRes() {}
@@ -2089,6 +2307,25 @@ func (s *InviteOrganizationReq) SetEmail(val string) {
 func (s *InviteOrganizationReq) SetRole(val float64) {
 	s.Role = val
 }
+
+// 通知設定.
+// Ref: #/components/schemas/NotificationPreferences
+type NotificationPreferences struct {
+	PushNotificationEnabled bool `json:"push_notification_enabled"`
+}
+
+// GetPushNotificationEnabled returns the value of PushNotificationEnabled.
+func (s *NotificationPreferences) GetPushNotificationEnabled() bool {
+	return s.PushNotificationEnabled
+}
+
+// SetPushNotificationEnabled sets the value of PushNotificationEnabled.
+func (s *NotificationPreferences) SetPushNotificationEnabled(val bool) {
+	s.PushNotificationEnabled = val
+}
+
+func (*NotificationPreferences) getNotificationPreferencesRes()    {}
+func (*NotificationPreferences) updateNotificationPreferencesRes() {}
 
 // Ref: #/components/schemas/OffsetPagination
 type OffsetPagination struct {
@@ -4977,6 +5214,120 @@ func (s *RegenerateResponse) SetMessage(val string) {
 	s.Message = val
 }
 
+type RegisterDeviceBadRequest struct{}
+
+func (*RegisterDeviceBadRequest) registerDeviceRes() {}
+
+type RegisterDeviceReq struct {
+	DeviceToken string                    `json:"device_token"`
+	Platform    RegisterDeviceReqPlatform `json:"platform"`
+	DeviceName  OptString                 `json:"device_name"`
+	AppVersion  OptString                 `json:"app_version"`
+	OsVersion   OptString                 `json:"os_version"`
+}
+
+// GetDeviceToken returns the value of DeviceToken.
+func (s *RegisterDeviceReq) GetDeviceToken() string {
+	return s.DeviceToken
+}
+
+// GetPlatform returns the value of Platform.
+func (s *RegisterDeviceReq) GetPlatform() RegisterDeviceReqPlatform {
+	return s.Platform
+}
+
+// GetDeviceName returns the value of DeviceName.
+func (s *RegisterDeviceReq) GetDeviceName() OptString {
+	return s.DeviceName
+}
+
+// GetAppVersion returns the value of AppVersion.
+func (s *RegisterDeviceReq) GetAppVersion() OptString {
+	return s.AppVersion
+}
+
+// GetOsVersion returns the value of OsVersion.
+func (s *RegisterDeviceReq) GetOsVersion() OptString {
+	return s.OsVersion
+}
+
+// SetDeviceToken sets the value of DeviceToken.
+func (s *RegisterDeviceReq) SetDeviceToken(val string) {
+	s.DeviceToken = val
+}
+
+// SetPlatform sets the value of Platform.
+func (s *RegisterDeviceReq) SetPlatform(val RegisterDeviceReqPlatform) {
+	s.Platform = val
+}
+
+// SetDeviceName sets the value of DeviceName.
+func (s *RegisterDeviceReq) SetDeviceName(val OptString) {
+	s.DeviceName = val
+}
+
+// SetAppVersion sets the value of AppVersion.
+func (s *RegisterDeviceReq) SetAppVersion(val OptString) {
+	s.AppVersion = val
+}
+
+// SetOsVersion sets the value of OsVersion.
+func (s *RegisterDeviceReq) SetOsVersion(val OptString) {
+	s.OsVersion = val
+}
+
+type RegisterDeviceReqPlatform string
+
+const (
+	RegisterDeviceReqPlatformIos     RegisterDeviceReqPlatform = "ios"
+	RegisterDeviceReqPlatformAndroid RegisterDeviceReqPlatform = "android"
+	RegisterDeviceReqPlatformWeb     RegisterDeviceReqPlatform = "web"
+)
+
+// AllValues returns all RegisterDeviceReqPlatform values.
+func (RegisterDeviceReqPlatform) AllValues() []RegisterDeviceReqPlatform {
+	return []RegisterDeviceReqPlatform{
+		RegisterDeviceReqPlatformIos,
+		RegisterDeviceReqPlatformAndroid,
+		RegisterDeviceReqPlatformWeb,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s RegisterDeviceReqPlatform) MarshalText() ([]byte, error) {
+	switch s {
+	case RegisterDeviceReqPlatformIos:
+		return []byte(s), nil
+	case RegisterDeviceReqPlatformAndroid:
+		return []byte(s), nil
+	case RegisterDeviceReqPlatformWeb:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *RegisterDeviceReqPlatform) UnmarshalText(data []byte) error {
+	switch RegisterDeviceReqPlatform(data) {
+	case RegisterDeviceReqPlatformIos:
+		*s = RegisterDeviceReqPlatformIos
+		return nil
+	case RegisterDeviceReqPlatformAndroid:
+		*s = RegisterDeviceReqPlatformAndroid
+		return nil
+	case RegisterDeviceReqPlatformWeb:
+		*s = RegisterDeviceReqPlatformWeb
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type RegisterDeviceUnauthorized struct{}
+
+func (*RegisterDeviceUnauthorized) registerDeviceRes() {}
+
 // 通報解決アクション.
 // Ref: #/components/schemas/ReportAction
 type ReportAction string
@@ -5321,6 +5672,77 @@ func (s *RevokeTokenNoContent) SetSetCookie(val []string) {
 }
 
 func (*RevokeTokenNoContent) revokeTokenRes() {}
+
+type SendTestNotificationBadRequest struct{}
+
+func (*SendTestNotificationBadRequest) sendTestNotificationRes() {}
+
+type SendTestNotificationOK struct {
+	DevicesCount int32 `json:"devices_count"`
+	SuccessCount int32 `json:"success_count"`
+}
+
+// GetDevicesCount returns the value of DevicesCount.
+func (s *SendTestNotificationOK) GetDevicesCount() int32 {
+	return s.DevicesCount
+}
+
+// GetSuccessCount returns the value of SuccessCount.
+func (s *SendTestNotificationOK) GetSuccessCount() int32 {
+	return s.SuccessCount
+}
+
+// SetDevicesCount sets the value of DevicesCount.
+func (s *SendTestNotificationOK) SetDevicesCount(val int32) {
+	s.DevicesCount = val
+}
+
+// SetSuccessCount sets the value of SuccessCount.
+func (s *SendTestNotificationOK) SetSuccessCount(val int32) {
+	s.SuccessCount = val
+}
+
+func (*SendTestNotificationOK) sendTestNotificationRes() {}
+
+type SendTestNotificationReq struct {
+	Title    OptString `json:"title"`
+	Body     OptString `json:"body"`
+	DeviceID OptString `json:"device_id"`
+}
+
+// GetTitle returns the value of Title.
+func (s *SendTestNotificationReq) GetTitle() OptString {
+	return s.Title
+}
+
+// GetBody returns the value of Body.
+func (s *SendTestNotificationReq) GetBody() OptString {
+	return s.Body
+}
+
+// GetDeviceID returns the value of DeviceID.
+func (s *SendTestNotificationReq) GetDeviceID() OptString {
+	return s.DeviceID
+}
+
+// SetTitle sets the value of Title.
+func (s *SendTestNotificationReq) SetTitle(val OptString) {
+	s.Title = val
+}
+
+// SetBody sets the value of Body.
+func (s *SendTestNotificationReq) SetBody(val OptString) {
+	s.Body = val
+}
+
+// SetDeviceID sets the value of DeviceID.
+func (s *SendTestNotificationReq) SetDeviceID(val OptString) {
+	s.DeviceID = val
+}
+
+type SendTestNotificationUnauthorized struct{}
+
+func (*SendTestNotificationUnauthorized) sendTestNotificationRes() {}
 
 type SessionsHistoryBadRequest struct{}
 
@@ -6620,6 +7042,28 @@ func (s *TokenClaim) SetOrganizationID(val OptNilString) {
 }
 
 func (*TokenClaim) getTokenInfoRes() {}
+
+type UpdateNotificationPreferencesBadRequest struct{}
+
+func (*UpdateNotificationPreferencesBadRequest) updateNotificationPreferencesRes() {}
+
+type UpdateNotificationPreferencesReq struct {
+	PushNotificationEnabled OptNilBool `json:"push_notification_enabled"`
+}
+
+// GetPushNotificationEnabled returns the value of PushNotificationEnabled.
+func (s *UpdateNotificationPreferencesReq) GetPushNotificationEnabled() OptNilBool {
+	return s.PushNotificationEnabled
+}
+
+// SetPushNotificationEnabled sets the value of PushNotificationEnabled.
+func (s *UpdateNotificationPreferencesReq) SetPushNotificationEnabled(val OptNilBool) {
+	s.PushNotificationEnabled = val
+}
+
+type UpdateNotificationPreferencesUnauthorized struct{}
+
+func (*UpdateNotificationPreferencesUnauthorized) updateNotificationPreferencesRes() {}
 
 type UpdateUserProfileBadRequest struct {
 	Code    string `json:"code"`

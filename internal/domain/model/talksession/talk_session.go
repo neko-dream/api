@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/neko-dream/server/internal/domain/model/clock"
+	"github.com/neko-dream/server/internal/domain/model/event"
 	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
@@ -18,6 +19,9 @@ type (
 		Create(ctx context.Context, talkSession *TalkSession) error
 		Update(ctx context.Context, talkSession *TalkSession) error
 		FindByID(ctx context.Context, talkSessionID shared.UUID[TalkSession]) (*TalkSession, error)
+		// 終了処理用の新規メソッド
+		GetUnprocessedEndedSessions(ctx context.Context, limit int) ([]*TalkSession, error)
+		GetParticipantIDs(ctx context.Context, talkSessionID shared.UUID[TalkSession]) ([]shared.UUID[user.User], error)
 	}
 
 	TalkSession struct {
@@ -35,6 +39,10 @@ type (
 		hideReport          bool
 		organizationID      *shared.UUID[organization.Organization]
 		organizationAliasID *shared.UUID[organization.OrganizationAlias]
+		// イベント記録用（埋め込み）
+		event.EventRecorder
+		// 終了処理済みフラグ
+		endProcessed bool
 	}
 )
 
@@ -66,6 +74,8 @@ func NewTalkSession(
 		hideReport:          false,
 		organizationID:      organizationID,
 		organizationAliasID: organizationAliasID,
+		EventRecorder:       event.EventRecorder{},
+		endProcessed:        false,
 	}
 }
 
@@ -196,3 +206,74 @@ func (t *TalkSession) OrganizationID() *shared.UUID[organization.Organization] {
 func (t *TalkSession) OrganizationAliasID() *shared.UUID[organization.OrganizationAlias] {
 	return t.organizationAliasID
 }
+
+// StartSession セッションを開始（開始イベントを生成）
+func (t *TalkSession) StartSession() error {
+	// 既に開始イベントが生成されている場合はエラー
+	for _, event := range t.GetRecordedEvents() {
+		if event.EventType() == EventTypeTalkSessionStarted {
+			return ErrSessionAlreadyStarted
+		}
+	}
+
+	description := ""
+	if t.description != nil {
+		description = *t.description
+	}
+
+	// 開始イベントを記録
+	t.RecordEvent(NewTalkSessionStartedEvent(
+		t.talkSessionID,
+		t.ownerUserID,
+		t.theme,
+		description,
+		t.organizationID,
+		t.scheduledEndTime,
+	))
+
+	return nil
+}
+
+// EndSession セッションを終了
+func (t *TalkSession) EndSession(participantIDs []shared.UUID[user.User]) error {
+	if t.endProcessed {
+		return ErrSessionAlreadyEnded
+	}
+
+	if !t.IsFinished(context.Background()) {
+		return ErrSessionNotYetFinished
+	}
+
+	// 終了イベントを記録
+	t.RecordEvent(NewTalkSessionEndedEvent(
+		t.talkSessionID,
+		t.ownerUserID,
+		t.theme,
+		participantIDs,
+	))
+
+	t.endProcessed = true
+	return nil
+}
+
+// IsEndProcessed 終了処理済みかどうか
+func (t *TalkSession) IsEndProcessed() bool {
+	return t.endProcessed
+}
+
+// MarkAsEndProcessed 終了処理済みとしてマーク（リポジトリ用）
+func (t *TalkSession) MarkAsEndProcessed() {
+	t.endProcessed = true
+}
+
+// ID エイリアスメソッド（IDを返す）
+func (t *TalkSession) ID() shared.UUID[TalkSession] {
+	return t.talkSessionID
+}
+
+// エラー定義
+var (
+	ErrSessionAlreadyStarted = errors.New("session has already been started")
+	ErrSessionAlreadyEnded   = errors.New("session has already been ended")
+	ErrSessionNotYetFinished = errors.New("session has not yet reached scheduled end time")
+)
