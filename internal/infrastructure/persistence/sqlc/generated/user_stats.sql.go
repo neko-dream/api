@@ -11,17 +11,29 @@ import (
 )
 
 const getDailyUserStats = `-- name: GetDailyUserStats :many
-WITH date_range AS (
+WITH params AS (
+    SELECT
+        $1::integer AS offset,
+        $2::integer AS limit
+),
+date_bounds AS (
+    SELECT
+        CURRENT_DATE - ((params.offset + params.limit - 1) * INTERVAL '1 day') AS start_date,
+        CURRENT_DATE - (params.offset * INTERVAL '1 day') AS end_date
+    FROM params
+),
+date_range AS (
     SELECT generate_series(
-        CURRENT_DATE - (($1::integer + $2::integer - 1) * INTERVAL '1 day'),
-        CURRENT_DATE - ($1::integer * INTERVAL '1 day'),
+        date_bounds.start_date,
+        date_bounds.end_date,
         INTERVAL '1 day'
     )::date as activity_date
+    FROM date_bounds
 ),
 user_activity AS (
     SELECT DISTINCT
         users.user_id,
-        DATE_TRUNC('day', COALESCE(votes.created_at, opinions.created_at)) as activity_date,
+        DATE_TRUNC('day', COALESCE(votes.created_at, opinions.created_at))::date as activity_date,
         CASE WHEN votes.user_id IS NOT NULL THEN 1 ELSE 0 END as has_voted,
         CASE WHEN opinions.user_id IS NOT NULL THEN 1 ELSE 0 END as has_posted
     FROM users
@@ -38,7 +50,7 @@ SELECT
     COALESCE(SUM(has_posted), 0) as users_with_posts,
     COALESCE(SUM(CASE WHEN has_voted = 1 OR has_posted = 1 THEN 1 ELSE 0 END), 0)::integer as active_users
 FROM date_range
-LEFT JOIN user_activity ON date_range.activity_date = user_activity.activity_date::date
+LEFT JOIN user_activity ON date_range.activity_date = user_activity.activity_date
 GROUP BY date_range.activity_date
 ORDER BY date_range.activity_date DESC
 `
@@ -58,17 +70,29 @@ type GetDailyUserStatsRow struct {
 
 // GetDailyUserStats
 //
-//	WITH date_range AS (
+//	WITH params AS (
+//	    SELECT
+//	        $1::integer AS offset,
+//	        $2::integer AS limit
+//	),
+//	date_bounds AS (
+//	    SELECT
+//	        CURRENT_DATE - ((params.offset + params.limit - 1) * INTERVAL '1 day') AS start_date,
+//	        CURRENT_DATE - (params.offset * INTERVAL '1 day') AS end_date
+//	    FROM params
+//	),
+//	date_range AS (
 //	    SELECT generate_series(
-//	        CURRENT_DATE - (($1::integer + $2::integer - 1) * INTERVAL '1 day'),
-//	        CURRENT_DATE - ($1::integer * INTERVAL '1 day'),
+//	        date_bounds.start_date,
+//	        date_bounds.end_date,
 //	        INTERVAL '1 day'
 //	    )::date as activity_date
+//	    FROM date_bounds
 //	),
 //	user_activity AS (
 //	    SELECT DISTINCT
 //	        users.user_id,
-//	        DATE_TRUNC('day', COALESCE(votes.created_at, opinions.created_at)) as activity_date,
+//	        DATE_TRUNC('day', COALESCE(votes.created_at, opinions.created_at))::date as activity_date,
 //	        CASE WHEN votes.user_id IS NOT NULL THEN 1 ELSE 0 END as has_voted,
 //	        CASE WHEN opinions.user_id IS NOT NULL THEN 1 ELSE 0 END as has_posted
 //	    FROM users
@@ -85,7 +109,7 @@ type GetDailyUserStatsRow struct {
 //	    COALESCE(SUM(has_posted), 0) as users_with_posts,
 //	    COALESCE(SUM(CASE WHEN has_voted = 1 OR has_posted = 1 THEN 1 ELSE 0 END), 0)::integer as active_users
 //	FROM date_range
-//	LEFT JOIN user_activity ON date_range.activity_date = user_activity.activity_date::date
+//	LEFT JOIN user_activity ON date_range.activity_date = user_activity.activity_date
 //	GROUP BY date_range.activity_date
 //	ORDER BY date_range.activity_date DESC
 func (q *Queries) GetDailyUserStats(ctx context.Context, arg GetDailyUserStatsParams) ([]GetDailyUserStatsRow, error) {
@@ -174,17 +198,29 @@ func (q *Queries) GetUserStats(ctx context.Context) (GetUserStatsRow, error) {
 }
 
 const getWeeklyUserStats = `-- name: GetWeeklyUserStats :many
-WITH date_range AS (
+WITH params AS (
+    SELECT
+        $1::integer AS offset,
+        $2::integer AS limit
+),
+date_bounds AS (
+    SELECT
+        DATE_TRUNC('week', CURRENT_DATE - ((params.offset + params.limit - 1) * INTERVAL '1 week')) AS start_date,
+        DATE_TRUNC('week', CURRENT_DATE - (params.offset * INTERVAL '1 week')) AS end_date
+    FROM params
+),
+date_range AS (
     SELECT generate_series(
-        DATE_TRUNC('week', CURRENT_DATE - (($1::integer + $2::integer - 1) * INTERVAL '1 week')),
-        DATE_TRUNC('week', CURRENT_DATE - ($1::integer * INTERVAL '1 week')),
+        date_bounds.start_date,
+        date_bounds.end_date,
         INTERVAL '1 week'
     )::date as activity_date
+    FROM date_bounds
 ),
 user_activity AS (
     SELECT DISTINCT
         users.user_id,
-        DATE_TRUNC('week', COALESCE(votes.created_at, opinions.created_at)) as activity_date,
+        DATE_TRUNC('week', COALESCE(votes.created_at, opinions.created_at))::date as activity_date,
         CASE WHEN votes.user_id IS NOT NULL THEN 1 ELSE 0 END as has_voted,
         CASE WHEN opinions.user_id IS NOT NULL THEN 1 ELSE 0 END as has_posted
     FROM users
@@ -201,7 +237,7 @@ SELECT
     COALESCE(SUM(has_posted), 0) as users_with_posts,
     COALESCE(SUM(CASE WHEN has_voted = 1 OR has_posted = 1 THEN 1 ELSE 0 END), 0)::integer as active_users
 FROM date_range
-LEFT JOIN user_activity ON date_range.activity_date = user_activity.activity_date::date
+LEFT JOIN user_activity ON date_range.activity_date = user_activity.activity_date
 GROUP BY date_range.activity_date
 ORDER BY date_range.activity_date DESC
 `
@@ -221,17 +257,29 @@ type GetWeeklyUserStatsRow struct {
 
 // GetWeeklyUserStats
 //
-//	WITH date_range AS (
+//	WITH params AS (
+//	    SELECT
+//	        $1::integer AS offset,
+//	        $2::integer AS limit
+//	),
+//	date_bounds AS (
+//	    SELECT
+//	        DATE_TRUNC('week', CURRENT_DATE - ((params.offset + params.limit - 1) * INTERVAL '1 week')) AS start_date,
+//	        DATE_TRUNC('week', CURRENT_DATE - (params.offset * INTERVAL '1 week')) AS end_date
+//	    FROM params
+//	),
+//	date_range AS (
 //	    SELECT generate_series(
-//	        DATE_TRUNC('week', CURRENT_DATE - (($1::integer + $2::integer - 1) * INTERVAL '1 week')),
-//	        DATE_TRUNC('week', CURRENT_DATE - ($1::integer * INTERVAL '1 week')),
+//	        date_bounds.start_date,
+//	        date_bounds.end_date,
 //	        INTERVAL '1 week'
 //	    )::date as activity_date
+//	    FROM date_bounds
 //	),
 //	user_activity AS (
 //	    SELECT DISTINCT
 //	        users.user_id,
-//	        DATE_TRUNC('week', COALESCE(votes.created_at, opinions.created_at)) as activity_date,
+//	        DATE_TRUNC('week', COALESCE(votes.created_at, opinions.created_at))::date as activity_date,
 //	        CASE WHEN votes.user_id IS NOT NULL THEN 1 ELSE 0 END as has_voted,
 //	        CASE WHEN opinions.user_id IS NOT NULL THEN 1 ELSE 0 END as has_posted
 //	    FROM users
@@ -248,7 +296,7 @@ type GetWeeklyUserStatsRow struct {
 //	    COALESCE(SUM(has_posted), 0) as users_with_posts,
 //	    COALESCE(SUM(CASE WHEN has_voted = 1 OR has_posted = 1 THEN 1 ELSE 0 END), 0)::integer as active_users
 //	FROM date_range
-//	LEFT JOIN user_activity ON date_range.activity_date = user_activity.activity_date::date
+//	LEFT JOIN user_activity ON date_range.activity_date = user_activity.activity_date
 //	GROUP BY date_range.activity_date
 //	ORDER BY date_range.activity_date DESC
 func (q *Queries) GetWeeklyUserStats(ctx context.Context, arg GetWeeklyUserStatsParams) ([]GetWeeklyUserStatsRow, error) {
