@@ -75,6 +75,42 @@ func (s *ConclusionUser) Validate() error {
 	return nil
 }
 
+func (s *Device) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := s.Platform.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "platform",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s DevicePlatform) Validate() error {
+	switch s {
+	case "ios":
+		return nil
+	case "android":
+		return nil
+	case "web":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
 func (s *EditTalkSessionReq) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -167,6 +203,46 @@ func (s *EstablishUserReq) Validate() error {
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
 			Name:  "dateOfBirth",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s *GetDevicesOK) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if s.Devices == nil {
+			return errors.New("nil is invalid value")
+		}
+		var failures []validate.FieldError
+		for i, elem := range s.Devices {
+			if err := func() error {
+				if err := elem.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
+			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "devices",
 			Error: err,
 		})
 	}
@@ -1114,6 +1190,42 @@ func (s RegenerateRequestType) Validate() error {
 	}
 }
 
+func (s *RegisterDeviceReq) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := s.Platform.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "platform",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s RegisterDeviceReqPlatform) Validate() error {
+	switch s {
+	case "ios":
+		return nil
+	case "android":
+		return nil
+	case "web":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
 func (s ReportAction) Validate() error {
 	switch s {
 	case "deleted":
@@ -1255,7 +1367,7 @@ func (s ReportStatus) Validate() error {
 	}
 }
 
-func (s *RevokeTokenNoContentHeaders) Validate() error {
+func (s *RevokeTokenNoContent) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}

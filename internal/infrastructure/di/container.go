@@ -50,6 +50,18 @@ func Invoke[T any](container *dig.Container, opts ...dig.InvokeOption) T {
 	return res
 }
 
+// InvokeWithError コンテナに登録したプロバイダの型をTにわたすとそのインスタンスを得られる（エラーを返す）
+func InvokeWithError[T any](container *dig.Container, opts ...dig.InvokeOption) (T, error) {
+	var res T
+
+	if err := container.Invoke(func(t T) {
+		res = t
+	}, opts...); err != nil {
+		return res, errtrace.Wrap(err)
+	}
+	return res, nil
+}
+
 // Provide コンテナにコンストラクタを登録する。Invokeされるとここで登録されたコンストラクタが実行される
 func Provide(container *dig.Container, constructor any, opts ...dig.ProvideOption) error {
 	return errtrace.Wrap(container.Provide(constructor, opts...))

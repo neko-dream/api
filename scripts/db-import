@@ -1,0 +1,200 @@
+#!/bin/bash
+
+if [ $# -lt 2 ]; then
+    echo "エラー: 環境とインポートファイルを指定してください"
+    echo ""
+    echo "使い方: $0 <dev|prd> <import_file.sql>"
+    echo ""
+    echo "例:"
+    echo "  $0 dev supabase_to_dev_dump_20240101_120000.sql"
+    echo ""
+    echo "オプション:"
+    echo "  --truncate       インポート前に全テーブルをTRUNCATE"
+    echo "  --no-triggers    トリガーを無効化してインポート"
+    echo "  --reset-sequence COPY形式インポート後にシーケンスをリセット"
+    exit 1
+fi
+
+ENV="$1"
+IMPORT_FILE="$2"
+shift 2
+
+# オプション
+TRUNCATE=false
+NO_TRIGGERS=false
+RESET_SEQUENCE=false
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --truncate)
+            TRUNCATE=true
+            shift
+            ;;
+        --no-triggers)
+            NO_TRIGGERS=true
+            shift
+            ;;
+        --reset-sequence)
+            RESET_SEQUENCE=true
+            shift
+            ;;
+        *)
+            echo "不明なオプション: $1"
+            exit 1
+            ;;
+    esac
+done
+
+# ファイルの存在確認
+if [ ! -f "$IMPORT_FILE" ]; then
+    echo "エラー: ファイルが見つかりません: $IMPORT_FILE"
+    exit 1
+fi
+
+# 環境の確認
+case "$ENV" in
+    "dev")
+        echo "dev環境にインポートします"
+        ;;
+    "prd"|"prod")
+        echo "⚠️  警告: 本番環境にデータをインポートしようとしています！"
+        echo -n "本当に続けますか？ (yes/no): "
+        read confirmation
+
+        if [ "$confirmation" != "yes" ]; then
+            echo "インポートをキャンセルしました"
+            exit 0
+        fi
+        ;;
+    *)
+        echo "エラー: 無効な環境 '$ENV'"
+        exit 1
+        ;;
+esac
+
+echo ""
+echo "インポート設定:"
+echo "  環境: $ENV"
+echo "  ファイル: $IMPORT_FILE"
+echo "  TRUNCATE: $TRUNCATE"
+echo "  トリガー無効化: $NO_TRIGGERS"
+
+# ファイル形式の検出
+if grep -q "^COPY " "$IMPORT_FILE" 2>/dev/null; then
+    FILE_FORMAT="COPY"
+    echo "  形式: COPY形式を検出"
+else
+    FILE_FORMAT="INSERT"
+    echo "  形式: INSERT形式を検出"
+fi
+
+echo ""
+
+# 一時的なSQLファイルを作成
+TEMP_SQL=$(mktemp)
+
+# TRUNCATEオプション
+if [ "$TRUNCATE" = true ]; then
+    echo "-- Truncate all tables" >> "$TEMP_SQL"
+    echo "DO \$\$ DECLARE" >> "$TEMP_SQL"
+    echo "    r RECORD;" >> "$TEMP_SQL"
+    echo "BEGIN" >> "$TEMP_SQL"
+    echo "    FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP" >> "$TEMP_SQL"
+    echo "        EXECUTE 'TRUNCATE TABLE ' || quote_ident(r.tablename) || ' CASCADE';" >> "$TEMP_SQL"
+    echo "    END LOOP;" >> "$TEMP_SQL"
+    echo "END \$\$;" >> "$TEMP_SQL"
+    echo "" >> "$TEMP_SQL"
+fi
+
+# トリガー無効化オプション
+if [ "$NO_TRIGGERS" = true ]; then
+    echo "-- Disable triggers" >> "$TEMP_SQL"
+    echo "SET session_replication_role = 'replica';" >> "$TEMP_SQL"
+    echo "" >> "$TEMP_SQL"
+fi
+
+# 元のSQLファイルを追加
+cat "$IMPORT_FILE" >> "$TEMP_SQL"
+
+# トリガー再有効化
+if [ "$NO_TRIGGERS" = true ]; then
+    echo "" >> "$TEMP_SQL"
+    echo "-- Re-enable triggers" >> "$TEMP_SQL"
+    echo "SET session_replication_role = 'origin';" >> "$TEMP_SQL"
+fi
+
+# インポート実行
+echo "インポートを実行しています..."
+
+if [ "$FILE_FORMAT" = "COPY" ]; then
+    # COPY形式の場合は特別な処理が必要
+    echo ""
+    echo "COPY形式のデータをインポート中..."
+    echo "注意: エラーが発生した場合、データの整合性を確認してください"
+
+    # psqlの-fオプションはCOPY形式を正しく処理できるので、直接実行
+    ./scripts/db-connect "$ENV" -f "$TEMP_SQL"
+else
+    # INSERT形式は通常通り実行
+    ./scripts/db-connect "$ENV" -f "$TEMP_SQL"
+fi
+
+# 一時ファイルを削除
+rm -f "$TEMP_SQL"
+
+echo ""
+echo "インポート処理が完了しました"
+
+# COPY形式の場合の追加処理
+if [ "$FILE_FORMAT" = "COPY" ]; then
+    echo ""
+
+    # シーケンスのリセット
+    if [ "$RESET_SEQUENCE" = true ]; then
+        echo "シーケンスをリセットしています..."
+
+        # シーケンスリセット用のSQLを生成
+        SEQUENCE_SQL=$(mktemp)
+        cat > "$SEQUENCE_SQL" << 'EOF'
+DO $$
+DECLARE
+    r RECORD;
+    seq_name TEXT;
+    max_id BIGINT;
+BEGIN
+    -- 全テーブルのidカラムを持つシーケンスをリセット
+    FOR r IN (
+        SELECT
+            table_name,
+            column_name,
+            column_default
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+        AND column_default LIKE 'nextval%'
+    ) LOOP
+        -- シーケンス名を抽出
+        seq_name := substring(r.column_default from 'nextval\(''([^'']+)''');
+
+        -- 最大IDを取得
+        EXECUTE format('SELECT COALESCE(MAX(%I), 0) FROM %I', r.column_name, r.table_name) INTO max_id;
+
+        -- シーケンスをリセット
+        EXECUTE format('SELECT setval(%L, %s)', seq_name, max_id + 1);
+
+        RAISE NOTICE 'Reset sequence % to %', seq_name, max_id + 1;
+    END LOOP;
+END $$;
+EOF
+
+        ./scripts/db-connect "$ENV" -f "$SEQUENCE_SQL"
+        rm -f "$SEQUENCE_SQL"
+
+        echo "シーケンスのリセットが完了しました"
+    else
+        echo "COPY形式のインポート後の確認事項:"
+        echo "  - シーケンスの値が正しく設定されているか確認"
+        echo "    （--reset-sequence オプションで自動リセット可能）"
+        echo "  - 外部キー制約違反がないか確認"
+        echo "  - NULL値（\\N）が正しく処理されたか確認"
+    fi
+fi

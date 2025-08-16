@@ -35,7 +35,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       setIsLoading(true);
       try {
         const tokenInfo = await authService.getTokenInfo();
-        
+
         if (!tokenInfo) {
           // Not authenticated
           navigate({ to: '/login' });
@@ -48,7 +48,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
           window.location.href = '/admin/login';
           return;
         }
-        
+
         // Check if user has organization parameters
         if (!tokenInfo.organizationCode || !tokenInfo.organizationID) {
           // User is authenticated but not associated with an organization

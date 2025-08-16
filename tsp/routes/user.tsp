@@ -81,4 +81,22 @@ namespace kotohiro {
       message: string;
     };
   };
+
+  @tag("user")
+  @extension("x-ogen-operation-group", "User")
+  @route("/user/{displayID}")
+  @get
+  @summary("表示IDからユーザー情報の取得")
+  op getUserByDisplayID(
+    @path displayID: string,
+  ): User | {
+    @statusCode statusCode: 404;
+    @body body: {
+      code: string;
+      message: string;
+    };
+  } | {
+    @statusCode statusCode: 500;
+    @body body: {};
+  };
 }

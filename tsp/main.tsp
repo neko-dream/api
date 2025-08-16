@@ -13,6 +13,7 @@ import "./models/opinion.tsp";
 import "./models/talk-session.tsp";
 import "./models/organization.tsp";
 import "./models/manage.tsp";
+import "./models/notifications.tsp";
 
 // Route imports
 import "./routes/auth.tsp";
@@ -28,6 +29,7 @@ import "./routes/test.tsp";
 import "./routes/health.tsp";
 import "./routes/manage.tsp";
 import "./routes/analysis.tsp";
+import "./routes/notifications.tsp";
 
 using Http;
 using OpenAPI;

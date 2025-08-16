@@ -377,9 +377,9 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.TalkSessionAnalysis")
 	defer span.End()
 
-	authCtx, err := getAuthenticationContext(t.authService, t.SetSession(ctx))
+	authCtx, _ := getAuthenticationContext(t.authService, t.SetSession(ctx))
 	var userID *shared.UUID[user.User]
-	if err == nil {
+	if authCtx != nil {
 		userID = &authCtx.UserID
 	}
 

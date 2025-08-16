@@ -47,6 +47,11 @@ type Config struct {
 	// 暗号化キー (16バイトの文字列) コマンド: openssl rand -base64 16
 	ENCRYPTION_SECRET string `env:"ENCRYPTION_SECRET"`
 
+	PINPOINT_APPLICATION_ID string `env:"PINPOINT_APPLICATION_ID"`
+
+	// FCM VAPID Key
+	FCM_VAPID_KEY string `env:"FCM_VAPID_KEY"`
+
 	// ポリシーバージョン 現状は固定。API生えたら別途取得する
 	POLICY_VERSION string `env:"POLICY_VERSION"`
 	// ポリシー作成日 現状は固定。API生えたら別途取得する
@@ -58,6 +63,11 @@ type Config struct {
 
 	HASH_PEPPER     string `env:"HASH_PEPPER"`
 	HASH_ITERATIONS int    `env:"HASH_ITERATIONS"`
+
+	// HTTPサーバー設定
+	HTTPReadTimeout  int `env:"HTTP_READ_TIMEOUT" envDefault:"15"`  // 秒
+	HTTPWriteTimeout int `env:"HTTP_WRITE_TIMEOUT" envDefault:"15"` // 秒
+	HTTPIdleTimeout  int `env:"HTTP_IDLE_TIMEOUT" envDefault:"60"`  // 秒
 }
 
 type ENV string

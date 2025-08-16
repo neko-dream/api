@@ -188,8 +188,6 @@ namespace kotohiro {
      * Cookie削除用のSet-Cookie
      */
     @header("Set-Cookie") SetCookie: string[];
-
-    @body body: {};
   } | {
     @statusCode statusCode: 400;
     @body body: {};

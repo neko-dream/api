@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kotohiro Web Push Notification Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h3 {
+            color: #555;
+            margin-top: 30px;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .status.info {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+        .status.success {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+        .status.warning {
+            background-color: #fff3e0;
+            color: #f57c00;
+        }
+        .status.error {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            transition: background-color 0.3s;
+        }
+        button:hover:not(:disabled) {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+        }
+        .token-display {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+            margin-top: 10px;
+        }
+        .device-item {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .log-container {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #263238;
+            color: #aed581;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin: 2px 0;
+        }
+        .log-entry.error {
+            color: #ef5350;
+        }
+        .log-entry.success {
+            color: #66bb6a;
+        }
+        .log-entry.warning {
+            color: #ffa726;
+        }
+        .user-info {
+            background-color: #e8f5e9;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔔 Kotohiro Web Push Notification Test</h1>
+
+        <!-- 認証セクション -->
+        <div class="section">
+            <h3>👤 認証状態</h3>
+            <div id="authStatus" class="status warning">
+                認証状態を確認中...
+            </div>
+            <div id="userInfo" class="user-info" style="display: none;">
+                <strong>ユーザー情報</strong><br>
+                表示ID: <span id="displayId"></span><br>
+                ユーザーID: <span id="userId"></span>
+            </div>
+            <button id="loginBtn" onclick="login()" style="display: none;">
+                開発用ログイン
+            </button>
+            <button id="logoutBtn" onclick="logout()" style="display: none;">
+                ログアウト
+            </button>
+        </div>
+
+        <!-- 通知権限セクション -->
+        <div id="permissionSection" class="section" style="display: none;">
+            <h3>🔔 通知権限</h3>
+            <div id="permissionStatus" class="status info">
+                通知権限を確認中...
+            </div>
+            <button id="requestPermissionBtn" onclick="requestNotificationPermission()">
+                通知権限をリクエスト
+            </button>
+        </div>
+
+        <!-- FCMトークンセクション -->
+        <div id="tokenSection" class="section" style="display: none;">
+            <h3>🔑 FCMトークン</h3>
+            <button id="getTokenBtn" onclick="getFCMToken()" disabled>
+                FCMトークンを取得
+            </button>
+            <div id="tokenDisplay" class="token-display" style="display: none;">
+                <strong>Token:</strong> <span id="tokenValue"></span>
+            </div>
+        </div>
+
+        <!-- デバイス管理セクション -->
+        <div id="deviceSection" class="section" style="display: none;">
+            <h3>📱 デバイス管理</h3>
+            <button id="registerDeviceBtn" onclick="registerDevice()" disabled>
+                このデバイスを登録
+            </button>
+            <button id="refreshDevicesBtn" onclick="fetchDevices()">
+                デバイス一覧を更新
+            </button>
+            <div id="deviceList" style="margin-top: 15px;"></div>
+        </div>
+
+        <!-- テスト通知セクション -->
+        <div id="testSection" class="section" style="display: none;">
+            <h3>🚀 テスト通知</h3>
+            <button id="sendTestBtn" onclick="sendTestNotification()" disabled>
+                テスト通知を送信
+            </button>
+            <div style="margin-top: 10px;">
+                <input type="text" id="testTitle" placeholder="通知タイトル (オプション)" style="width: 100%; padding: 5px; margin: 5px 0;">
+                <input type="text" id="testBody" placeholder="通知本文 (オプション)" style="width: 100%; padding: 5px; margin: 5px 0;">
+            </div>
+        </div>
+
+        <!-- ログ表示 -->
+        <div class="log-container">
+            <div id="logs"></div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js';
+        import { getMessaging, getToken, onMessage } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-messaging.js';
+
+        // Firebase設定
+        const firebaseConfig = {
+            apiKey: "AIzaSyBEQ-gqPCUMyyBZ-YP10t_0X0D01BGPCgQ",
+            authDomain: "kotohiro-dev-c57a8.firebaseapp.com",
+            projectId: "kotohiro-dev-c57a8",
+            storageBucket: "kotohiro-dev-c57a8.firebasestorage.app",
+            messagingSenderId: "1023394330741",
+            appId: "1:1023394330741:web:d31f1b8176164e8903a03c"
+        };
+
+        // APIサーバーのベースURL（現在のオリジンを使用）
+        const API_BASE_URL = window.location.origin;
+
+        // グローバル変数
+        let messaging;
+        let currentUser = null;
+        let fcmToken = null;
+        let vapidKey = null;
+
+        // Firebase初期化
+        const app = initializeApp(firebaseConfig);
+        messaging = getMessaging(app);
+
+        // ログ表示関数
+        function addLog(message, type = 'info') {
+            const logs = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logs.appendChild(logEntry);
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        // VAPID Keyを取得
+        async function fetchVapidKey() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/notifications/vapid-key`);
+                if (response.ok) {
+                    const data = await response.json();
+                    vapidKey = data.vapid_key;
+                    addLog('VAPID Key取得成功', 'success');
+                    return true;
+                } else {
+                    addLog('VAPID Key取得失敗', 'error');
+                    return false;
+                }
+            } catch (error) {
+                addLog(`VAPID Key取得エラー: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        // 認証状態をチェック
+        async function checkAuthStatus() {
+            try {
+                addLog('認証状態を確認中...', 'info');
+                const response = await fetch(`${API_BASE_URL}/auth/token/info`, {
+                    credentials: 'include',
+                });
+                console.log('Auth check response:', response);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    currentUser = data;
+
+                    // displayIDが含まれていない場合
+                    if (!data.displayID) {
+                        // セッションストレージから保留中のユーザーIDを確認
+                        const pendingUserId = sessionStorage.getItem('pendingUserId');
+                        if (pendingUserId) {
+                            sessionStorage.removeItem('pendingUserId');
+                            // ユーザー登録を実行
+                            await checkAndRegisterUser(pendingUserId);
+                            // 登録後、再度認証情報を取得
+                            const updatedResponse = await fetch(`${API_BASE_URL}/auth/token/info`, {
+                                credentials: 'include',
+                            });
+                            if (updatedResponse.ok) {
+                                const updatedData = await updatedResponse.json();
+                                currentUser = updatedData;
+                                data.displayID = updatedData.displayID;
+                            }
+                        } else {
+                            // pendingUserIdがない場合は再度ログインを促す
+                            window.login();
+                            return;
+                        }
+                    }
+
+                    updateAuthUI(true, data);
+                    addLog(`ログイン済み: ${data.displayID || data.sub}`, 'success');
+
+                    // 認証済みの場合は他のセクションを表示
+                    document.getElementById('permissionSection').style.display = 'block';
+                    document.getElementById('tokenSection').style.display = 'block';
+                    document.getElementById('deviceSection').style.display = 'block';
+                    document.getElementById('testSection').style.display = 'block';
+
+                    // 通知権限をチェック
+                    checkNotificationPermission();
+                    // デバイス一覧を取得
+                    await fetchDevices();
+                } else {
+                    updateAuthUI(false);
+                    addLog('未ログイン状態', 'warning');
+                }
+            } catch (error) {
+                addLog(`認証チェックエラー: ${error.message}`, 'error');
+                updateAuthUI(false);
+            }
+        }
+
+        // 認証UIを更新
+        function updateAuthUI(isAuthenticated, userData = null) {
+            const authStatus = document.getElementById('authStatus');
+            const userInfo = document.getElementById('userInfo');
+            const loginBtn = document.getElementById('loginBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+
+            if (isAuthenticated && userData) {
+                authStatus.className = 'status success';
+                authStatus.textContent = 'ログイン済み';
+                userInfo.style.display = 'block';
+                document.getElementById('displayId').textContent = userData.displayID || 'N/A';
+                document.getElementById('userId').textContent = userData.sub || 'N/A';
+                loginBtn.style.display = 'none';
+                logoutBtn.style.display = 'inline-block';
+            } else {
+                authStatus.className = 'status error';
+                authStatus.textContent = '未ログイン';
+                userInfo.style.display = 'none';
+                loginBtn.style.display = 'inline-block';
+                logoutBtn.style.display = 'none';
+            }
+        }
+
+        // ログイン
+        window.login = async function() {
+            const displayId = prompt('表示IDを入力してください:', 'testuser');
+            if (!displayId) return;
+
+            // セッションストレージに表示IDを保存（ログイン後のユーザー登録用）
+            sessionStorage.setItem('pendingUserId', displayId);
+
+            // ログイン処理（GETリクエスト）
+            const redirectUrl = encodeURIComponent(window.location.href);
+            const loginUrl = `/auth/dev/login?id=${displayId}&redirect_url=${redirectUrl}`;
+
+            // ブラウザでGETリクエスト（リダイレクト）
+            window.location.href = loginUrl;
+        };
+
+        // ユーザー登録
+        async function checkAndRegisterUser(displayId) {
+            try {
+                // ユーザー登録を試みる
+                addLog('ユーザー登録を試行中...', 'info');
+                const formData = new FormData();
+                formData.append('displayName', displayId);
+                formData.append('displayID', displayId);
+
+                const registerResponse = await fetch(`${API_BASE_URL}/user`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    body: formData
+                });
+
+                if (registerResponse.ok) {
+                    addLog('新規ユーザーを登録しました', 'success');
+                } else if (registerResponse.status === 409) {
+                    addLog('既存ユーザーです', 'info');
+                } else {
+                    addLog('ユーザー登録エラー', 'warning');
+                }
+            } catch (error) {
+                addLog(`ユーザー登録エラー: ${error.message}`, 'warning');
+            }
+        }
+
+        // ログアウト
+        window.logout = async function() {
+            try {
+                const response = await fetch(`/auth/revoke`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    addLog('ログアウトしました', 'success');
+                    location.reload();
+                }
+            } catch (error) {
+                addLog(`ログアウトエラー: ${error.message}`, 'error');
+            }
+        };
+
+        // 通知権限をチェック
+        function checkNotificationPermission() {
+            const status = Notification.permission;
+            const permissionStatus = document.getElementById('permissionStatus');
+            const requestBtn = document.getElementById('requestPermissionBtn');
+
+            if (status === 'granted') {
+                permissionStatus.className = 'status success';
+                permissionStatus.textContent = '通知権限: 許可済み';
+                requestBtn.style.display = 'none';
+                document.getElementById('getTokenBtn').disabled = false;
+                addLog('通知権限は許可されています', 'success');
+            } else if (status === 'denied') {
+                permissionStatus.className = 'status error';
+                permissionStatus.textContent = '通知権限: 拒否されています';
+                requestBtn.disabled = true;
+                addLog('通知権限が拒否されています', 'error');
+            } else {
+                permissionStatus.className = 'status warning';
+                permissionStatus.textContent = '通知権限: 未設定';
+                addLog('通知権限が未設定です', 'warning');
+            }
+        }
+
+        // 通知権限をリクエスト
+        window.requestNotificationPermission = async function() {
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    addLog('通知権限が許可されました', 'success');
+                    checkNotificationPermission();
+                } else {
+                    addLog('通知権限が拒否されました', 'error');
+                }
+            } catch (error) {
+                addLog(`権限リクエストエラー: ${error.message}`, 'error');
+            }
+        };
+
+        // FCMトークンを取得
+        window.getFCMToken = async function() {
+            try {
+                addLog('FCMトークンを取得中...', 'info');
+
+                // VAPID Keyがない場合は取得
+                if (!vapidKey) {
+                    addLog('VAPID Keyを取得中...', 'info');
+                    const success = await fetchVapidKey();
+                    if (!success) {
+                        addLog('VAPID Keyの取得に失敗しました', 'error');
+                        return;
+                    }
+                }
+
+                // Service Workerを登録
+                const registration = await navigator.serviceWorker.register('/static/firebase-messaging-sw.js');
+                addLog('Service Workerを登録しました', 'success');
+
+                // Service Workerからのメッセージを受信
+                navigator.serviceWorker.addEventListener('message', (event) => {
+                    if (event.data && event.data.type === 'SW_LOG') {
+                        console.log('[SW]', event.data.message);
+                        addLog(`[SW] ${event.data.message}`, 'info');
+                    }
+                });
+
+                // Service Workerが準備できたらログ転送を有効化
+                await navigator.serviceWorker.ready;
+                if (registration.active) {
+                    registration.active.postMessage({ type: 'ENABLE_LOG_FORWARDING' });
+                }
+
+                // メッセージリスナーを設定
+                setupMessageListener();
+
+                // トークンを取得
+                const token = await getToken(messaging, {
+                    vapidKey: vapidKey,
+                    serviceWorkerRegistration: registration
+                });
+
+                if (token) {
+                    fcmToken = token;
+                    document.getElementById('tokenValue').textContent = token;
+                    document.getElementById('tokenDisplay').style.display = 'block';
+                    document.getElementById('registerDeviceBtn').disabled = false;
+                    document.getElementById('sendTestBtn').disabled = false;
+                    addLog('FCMトークンを取得しました', 'success');
+                } else {
+                    addLog('FCMトークンの取得に失敗しました', 'error');
+                }
+            } catch (error) {
+                addLog(`トークン取得エラー: ${error.message}`, 'error');
+                console.error('Token error:', error);
+            }
+        };
+
+        // デバイスを登録
+        window.registerDevice = async function() {
+            if (!fcmToken) {
+                addLog('FCMトークンが必要です', 'error');
+                return;
+            }
+
+            try {
+                addLog('デバイスを登録中...', 'info');
+
+                const formData = new FormData();
+                formData.append('device_token', fcmToken);
+                formData.append('platform', 'web');
+                formData.append('device_name', navigator.userAgent.substring(0, 100));
+                formData.append('app_version', '1.0.0');
+                formData.append('os_version', navigator.platform);
+
+                const response = await fetch(`/notifications/devices`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    addLog(`デバイスを登録しました: ${data.device_id}`, 'success');
+                    document.getElementById('sendTestBtn').disabled = false;
+                    await fetchDevices();
+                } else {
+                    const error = await response.json();
+                    addLog(`デバイス登録エラー: ${error.message}`, 'error');
+                }
+            } catch (error) {
+                addLog(`デバイス登録エラー: ${error.message}`, 'error');
+            }
+        };
+
+        // デバイス一覧を取得
+        window.fetchDevices = async function() {
+            try {
+                const response = await fetch(`/notifications/devices`, {
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    displayDevices(data.devices);
+                }
+            } catch (error) {
+                addLog(`デバイス取得エラー: ${error.message}`, 'error');
+            }
+        };
+
+        // デバイス一覧を表示
+        function displayDevices(devices) {
+            const deviceList = document.getElementById('deviceList');
+
+            if (devices.length === 0) {
+                deviceList.innerHTML = '<em>登録済みデバイスなし</em>';
+                return;
+            }
+
+            deviceList.innerHTML = devices.map(device => `
+                <div class="device-item">
+                    <div>
+                        <strong>${device.platform}</strong><br>
+                        <small>ID: ${device.device_id.substring(0, 8)}...</small><br>
+                        <small>登録日: ${new Date(device.created_at).toLocaleDateString()}</small>
+                    </div>
+                    <div>
+                        ${device.enabled ? '✅ 有効' : '❌ 無効'}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // テスト通知を送信
+        window.sendTestNotification = async function() {
+            try {
+                const title = document.getElementById('testTitle').value || 'Kotohiro テスト通知';
+                const body = document.getElementById('testBody').value || `テスト通知です (${new Date().toLocaleTimeString()})`;
+
+                addLog('テスト通知を送信中...', 'info');
+
+                const formData = new FormData();
+                formData.append('title', title);
+                formData.append('body', body);
+
+                const response = await fetch(`/notifications/test`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    addLog(`テスト通知を送信しました: ${data.devices_count}台のデバイスに送信`, 'success');
+                } else {
+                    const error = await response.json();
+                    addLog(`通知送信エラー: ${error.message}`, 'error');
+                }
+            } catch (error) {
+                addLog(`通知送信エラー: ${error.message}`, 'error');
+            }
+        };
+
+        // フォアグラウンドでメッセージを受信
+        onMessage(messaging, (payload) => {
+            addLog('メッセージを受信しました', 'success');
+            console.log('Message received:', payload);
+
+            // フォアグラウンドで通知を表示
+            if (Notification.permission === 'granted') {
+                // Pinpointからのメッセージはdataフィールドに通知内容が含まれる場合がある
+                const title = payload.notification?.title || payload.data?.title || 'Kotohiro';
+                const body = payload.notification?.body || payload.data?.body || '';
+                const icon = payload.notification?.icon || payload.data?.icon || '/icon-192x192.png';
+
+                new Notification(title, {
+                    body: body,
+                    icon: icon
+                });
+            }
+        });
+
+        // フォアグラウンドでメッセージを受信（デバッグ用）
+        // messagingオブジェクトが初期化された後に設定
+        function setupMessageListener() {
+            if (typeof messaging !== 'undefined' && messaging.onMessage) {
+                messaging.onMessage((payload) => {
+                    console.log('Message received in foreground:', payload);
+                    addLog(`フォアグラウンドメッセージ受信: ${JSON.stringify(payload)}`, 'info');
+
+                    // 手動で通知を表示
+                    if (Notification.permission === 'granted') {
+                        const title = payload.notification?.title || payload.data?.title || 'Kotohiro';
+                        const body = payload.notification?.body || payload.data?.body || 'New notification';
+
+                        new Notification(title, {
+                            body: body,
+                            icon: '/icon-192x192.png',
+                            badge: '/badge-72x72.png'
+                        });
+                    }
+                });
+                addLog('フォアグラウンドメッセージリスナー設定完了', 'info');
+            }
+        }
+
+        // Service Workerの状態をチェック
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                console.log('Registered Service Workers:', registrations);
+                if (registrations.length > 0) {
+                    addLog(`Service Worker登録済み: ${registrations.length}件`, 'info');
+                }
+            });
+        }
+
+        // 初期化
+        checkAuthStatus();
+    </script>
+</body>
+</html>

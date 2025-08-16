@@ -161,6 +161,10 @@ func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSe
 			}
 		}
 
+		if err := talkSession.StartSession(); err != nil {
+			return errtrace.Wrap(err)
+		}
+
 		if err := i.TalkSessionRepository.Create(ctx, talkSession); err != nil {
 			utils.HandleError(ctx, err, "TalkSessionRepository.Create")
 			return messages.TalkSessionCreateFailed

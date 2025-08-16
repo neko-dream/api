@@ -1,3 +1,22 @@
+-- name: GetUnprocessedEndedSessions :many
+SELECT * FROM talk_sessions
+WHERE scheduled_end_time < NOW()
+  AND NOT EXISTS (
+    SELECT 1 FROM domain_events 
+    WHERE aggregate_id = talk_sessions.talk_session_id::text
+      AND aggregate_type = 'TalkSession'
+      AND event_type = 'talksession.ended'
+  )
+ORDER BY scheduled_end_time ASC
+LIMIT $1
+FOR UPDATE SKIP LOCKED;
+
+-- name: GetTalkSessionParticipants :many
+SELECT DISTINCT u.user_id
+FROM users u
+INNER JOIN opinions o ON u.user_id = o.user_id
+WHERE o.talk_session_id = $1;
+
 -- name: CreateTalkSession :exec
 INSERT INTO talk_sessions (talk_session_id, theme, description, thumbnail_url, owner_id, scheduled_end_time, created_at, city, prefecture, restrictions, hide_report, organization_id, organization_alias_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);
 

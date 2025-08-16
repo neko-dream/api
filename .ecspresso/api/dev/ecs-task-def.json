@@ -1,0 +1,189 @@
+{
+	"containerDefinitions": [
+		{
+			"essential": true,
+			"name": "api",
+			"image": "{{ ssm `/kotohiro-dev-api-rep/uri` }}:{{ must_env `IMAGE_TAG` }}",
+			"environment": [
+				{
+					"name": "ENV",
+					"value": "development"
+				},
+				{
+					"name": "PORT",
+					"value": "3000"
+				},
+				{
+					"name": "GOOGLE_ISSUER",
+					"value": "https://accounts.google.com"
+				},
+				{
+					"name": "GOOGLE_CALLBACK_URL",
+					"value": "https://api.dev.kotohiro.com/auth/google/callback"
+				},
+				{
+					"name": "R2_REGION",
+					"value": "auto"
+				},
+				{
+					"name": "DOMAIN",
+					"value": "kotohiro.com"
+				},
+				{
+					"name": "IMAGE_DOMAIN",
+					"value": "https://images-dev.kotohiro.com"
+				},
+				{
+					"name": "APP_NAME",
+					"value": "kotohiro"
+				},
+				{
+					"name": "WEBSITE_URL",
+					"value": "https://develop.kotohiro.com"
+				}
+			],
+			"secrets": [
+				{
+					"name": "DATABASE_URL",
+					"valueFrom": "{{ ssm `/kotohiro-dev-app-secret/arn` }}:DATABASE_URL::"
+				},
+				{
+					"name": "ANALYSIS_API_DOMAIN",
+					"valueFrom": "{{ ssm `/kotohiro-dev-app-secret/arn` }}:ANALYSIS_API_DOMAIN::"
+				},
+				{
+					"name": "ANALYSIS_USER",
+					"valueFrom": "{{ ssm `/kotohiro-dev-app-secret/arn` }}:ANALYSIS_USER::"
+				},
+				{
+					"name": "ANALYSIS_USER_PASSWORD",
+					"valueFrom": "{{ ssm `/kotohiro-dev-app-secret/arn` }}:ANALYSIS_USER_PASSWORD::"
+				},
+				{
+					"name": "AWS_S3_BUCKET",
+					"valueFrom": "{{ ssm `/kotohiro-dev-app-secret/arn` }}:AWS_S3_BUCKET::"
+				},
+				{
+					"name": "AWS_S3_ENDPOINT",
+					"valueFrom": "{{ ssm `/kotohiro-dev-app-secret/arn` }}:AWS_S3_ENDPOINT::"
+				},
+				{
+					"name": "BASELIME_API_KEY",
+					"valueFrom": "{{ ssm `/kotohiro-dev-app-secret/arn` }}:BASELIME_API_KEY::"
+				},
+				{
+					"name": "ENCRYPTION_SECRET",
+					"valueFrom": "{{ ssm `/kotohiro-dev-app-secret/arn` }}:ENCRYPTION_SECRET::"
+				},
+				{
+					"name": "ENCRYPTION_VERSION",
+					"valueFrom": "{{ ssm `/kotohiro-dev-app-secret/arn` }}:ENCRYPTION_VERSION::"
+				},
+				{
+					"name": "GOOGLE_CLIENT_ID",
+					"valueFrom": "{{ ssm `/kotohiro-dev-app-secret/arn` }}:GOOGLE_CLIENT_ID::"
+				},
+				{
+					"name": "GOOGLE_CLIENT_SECRET",
+					"valueFrom": "{{ ssm `/kotohiro-dev-app-secret/arn` }}:GOOGLE_CLIENT_SECRET::"
+				},
+				{
+					"name": "LINE_CALLBACK_URL",
+					"valueFrom": "{{ ssm `/kotohiro-dev-app-secret/arn` }}:LINE_CALLBACK_URL::"
+				},
+				{
+					"name": "LINE_CHANNEL_ID",
+					"valueFrom": "{{ ssm `/kotohiro-dev-app-secret/arn` }}:LINE_CHANNEL_ID::"
+				},
+				{
+					"name": "LINE_CHANNEL_SECRET",
+					"valueFrom": "{{ ssm `/kotohiro-dev-app-secret/arn` }}:LINE_CHANNEL_SECRET::"
+				},
+				{
+					"name": "POLICY_VERSION",
+					"valueFrom": "{{ ssm `/kotohiro-dev-app-secret/arn` }}:POLICY_VERSION::"
+				},
+				{
+					"name": "R2_ACCESS_KEY_ID",
+					"valueFrom": "{{ ssm `/kotohiro-dev-app-secret/arn` }}:R2_ACCESS_KEY_ID::"
+				},
+				{
+					"name": "R2_SECRET_ACCESS_KEY",
+					"valueFrom": "{{ ssm `/kotohiro-dev-app-secret/arn` }}:R2_SECRET_ACCESS_KEY::"
+				},
+				{
+					"name": "TOKEN_SECRET",
+					"valueFrom": "{{ ssm `/kotohiro-dev-app-secret/arn` }}:TOKEN_SECRET::"
+				},
+				{
+					"name": "HASH_PEPPER",
+					"valueFrom": "{{ ssm `/kotohiro-dev-app-secret/arn` }}:HASH_PEPPER::"
+				},
+				{
+					"name": "HASH_ITERATIONS",
+					"valueFrom": "{{ ssm `/kotohiro-dev-app-secret/arn` }}:HASH_ITERATIONS::"
+				},
+				{
+					"name": "FCM_VAPID_KEY",
+					"valueFrom": "{{ ssm `/kotohiro-dev-app-secret/arn` }}:FCM_VAPID_KEY::"
+				},
+				{
+					"name": "PINPOINT_APPLICATION_ID",
+					"valueFrom": "{{ ssm `/kotohiro-dev-app-secret/arn` }}:PINPOINT_APPLICATION_ID::"
+				}
+			],
+			"logConfiguration": {
+				"logDriver": "awslogs",
+				"options": {
+					"awslogs-group": "{{ ssm `/kotohiro-dev-api-log-group/name` }}",
+					"awslogs-region": "ap-northeast-1",
+					"awslogs-stream-prefix": "develop"
+				}
+			},
+			"portMappings": [
+				{
+					"appProtocol": "http",
+					"containerPort": 3000,
+					"hostPort": 3000,
+					"protocol": "tcp"
+				}
+			],
+			"mountPoints": [
+				{
+					"readOnly": false,
+					"containerPath": "/var/lib/amazon",
+					"sourceVolume": "var-lib-amazon"
+				},
+				{
+					"readOnly": false,
+					"containerPath": "/var/log/amazon",
+					"sourceVolume": "var-log-amazon"
+				}
+			]
+		}
+	],
+	"cpu": "256",
+	"memory": "512",
+	"family": "kotohiro-dev-api",
+	"taskRoleArn": "{{ ssm `/kotohiro-dev-task-role/arn` }}",
+	"executionRoleArn": "{{ ssm `/kotohiro-dev-task-execution-role/arn` }}",
+	"networkMode": "awsvpc",
+	"requiresCompatibilities": ["FARGATE"],
+	"runtimePlatform": {
+		"cpuArchitecture": "ARM64"
+	},
+	"tags": [
+		{
+			"key": "Name",
+			"value": "kotohiro-dev-task-definition"
+		}
+	],
+	"volumes": [
+		{
+			"name": "var-lib-amazon"
+		},
+		{
+			"name": "var-log-amazon"
+		}
+	]
+}

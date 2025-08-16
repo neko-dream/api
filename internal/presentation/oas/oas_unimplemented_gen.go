@@ -49,6 +49,15 @@ func (UnimplementedHandler) ChangePassword(ctx context.Context, params ChangePas
 	return r, ht.ErrNotImplemented
 }
 
+// CheckDeviceExists implements checkDeviceExists operation.
+//
+// デバイストークンが登録されているか確認.
+//
+// GET /notifications/devices/exists
+func (UnimplementedHandler) CheckDeviceExists(ctx context.Context, params CheckDeviceExistsParams) (r CheckDeviceExistsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // ConsentTalkSession implements consentTalkSession operation.
 //
 // セッションへの同意.
@@ -64,6 +73,15 @@ func (UnimplementedHandler) ConsentTalkSession(ctx context.Context, params Conse
 //
 // POST /organizations/aliases
 func (UnimplementedHandler) CreateOrganizationAlias(ctx context.Context, req *CreateOrganizationAliasReq) (r CreateOrganizationAliasRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// DeleteDevice implements deleteDevice operation.
+//
+// デバイス削除.
+//
+// DELETE /notifications/devices/{deviceId}
+func (UnimplementedHandler) DeleteDevice(ctx context.Context, params DeleteDeviceParams) (r DeleteDeviceRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -144,6 +162,24 @@ func (UnimplementedHandler) GetAnalysisReportManage(ctx context.Context, params 
 //
 // GET /talksessions/{talkSessionID}/conclusion
 func (UnimplementedHandler) GetConclusion(ctx context.Context, params GetConclusionParams) (r GetConclusionRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetDevices implements getDevices operation.
+//
+// デバイス一覧取得.
+//
+// GET /notifications/devices
+func (UnimplementedHandler) GetDevices(ctx context.Context) (r GetDevicesRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetNotificationPreferences implements getNotificationPreferences operation.
+//
+// 通知設定取得.
+//
+// GET /notifications/preferences
+func (UnimplementedHandler) GetNotificationPreferences(ctx context.Context) (r GetNotificationPreferencesRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -332,6 +368,15 @@ func (UnimplementedHandler) GetTokenInfo(ctx context.Context) (r GetTokenInfoRes
 	return r, ht.ErrNotImplemented
 }
 
+// GetUserByDisplayID implements getUserByDisplayID operation.
+//
+// 表示IDからユーザー情報の取得.
+//
+// GET /user/{displayID}
+func (UnimplementedHandler) GetUserByDisplayID(ctx context.Context, params GetUserByDisplayIDParams) (r GetUserByDisplayIDRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetUserInfo implements getUserInfo operation.
 //
 // ユーザー情報の取得.
@@ -359,6 +404,15 @@ func (UnimplementedHandler) GetUserStatsListManage(ctx context.Context, params G
 //
 // GET /v1/manage/users/stats/total
 func (UnimplementedHandler) GetUserStatsTotalManage(ctx context.Context) (r *UserStatsResponse, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetVapidKey implements getVapidKey operation.
+//
+// VAPID公開鍵取得.
+//
+// GET /notifications/vapid-key
+func (UnimplementedHandler) GetVapidKey(ctx context.Context) (r *GetVapidKeyOK, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -518,6 +572,15 @@ func (UnimplementedHandler) PostTimeLineItem(ctx context.Context, req *PostTimeL
 	return r, ht.ErrNotImplemented
 }
 
+// RegisterDevice implements registerDevice operation.
+//
+// デバイス登録/更新.
+//
+// POST /notifications/devices
+func (UnimplementedHandler) RegisterDevice(ctx context.Context, req *RegisterDeviceReq) (r RegisterDeviceRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // ReportOpinion implements reportOpinion operation.
 //
 // 意見通報API.
@@ -533,6 +596,15 @@ func (UnimplementedHandler) ReportOpinion(ctx context.Context, req *ReportOpinio
 //
 // POST /auth/revoke
 func (UnimplementedHandler) RevokeToken(ctx context.Context) (r RevokeTokenRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// SendTestNotification implements sendTestNotification operation.
+//
+// テスト通知送信.
+//
+// POST /notifications/test
+func (UnimplementedHandler) SendTestNotification(ctx context.Context, req *SendTestNotificationReq) (r SendTestNotificationRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -586,6 +658,15 @@ func (UnimplementedHandler) Test(ctx context.Context) (r TestRes, _ error) {
 //
 // POST /v1/manage/talksessions/{talkSessionID}/analysis/report
 func (UnimplementedHandler) ToggleReportVisibilityManage(ctx context.Context, req *ToggleReportVisibilityRequest, params ToggleReportVisibilityManageParams) (r *ToggleReportVisibilityResponse, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// UpdateNotificationPreferences implements updateNotificationPreferences operation.
+//
+// 通知設定更新.
+//
+// PUT /notifications/preferences
+func (UnimplementedHandler) UpdateNotificationPreferences(ctx context.Context, req *UpdateNotificationPreferencesReq) (r UpdateNotificationPreferencesRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

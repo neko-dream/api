@@ -17,7 +17,7 @@ namespace kotohiro {
   @route("/talksessions/{talkSessionID}/restrictions")
   @get
   @summary("セッションで満たしていない制限")
-  @useAuth(OptionalCookieAuth)
+  @useAuth([])
   op getTalkSessionRestrictionSatisfied(
     @path talkSessionID: string,
   ): Body<Restriction[]> | {
@@ -152,7 +152,7 @@ namespace kotohiro {
   @route("/talksessions/{talkSessionID}/analysis")
   @get
   @summary("分析結果一覧")
-  @useAuth(OptionalCookieAuth)
+  @useAuth([])
   op talkSessionAnalysis(@path talkSessionID: string): Body<{
     myPosition?: UserGroupPosition;
     positions: UserGroupPosition[];
@@ -302,7 +302,7 @@ namespace kotohiro {
   @route("/talksessions/restrictions")
   @get
   @summary("セッションで指定可能な制限一覧")
-  @useAuth(OptionalCookieAuth)
+  @useAuth([])
   op getTalkSessionRestrictionKeys(): Body<Restriction[]> | {
     @statusCode statusCode: 400;
     @body body: {};
