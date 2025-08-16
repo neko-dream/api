@@ -36,6 +36,7 @@ func infraDeps() []ProvideArg {
 		{repository.NewImageStorage, nil},
 		{repository.NewSessionRepository, nil},
 		{repository.NewUserRepository, nil},
+		{repository.NewUserAuthRepository, nil},
 		{repository.NewTalkSessionRepository, nil},
 		{repository.NewOpinionRepository, nil},
 		{repository.NewVoteRepository, nil},
