@@ -136,7 +136,7 @@ namespace kotohiro {
       picture?: HttpPart<bytes>;
       isSeed?: HttpPart<boolean | null>;
     },
-  ): Body<{}> | {
+  ): Body<Opinion> | {
     @statusCode statusCode: 400;
     @body body: {
       code: string;
