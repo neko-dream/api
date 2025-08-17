@@ -49,7 +49,7 @@ WHERE
 UPDATE "user_auths" SET is_verified = true WHERE user_id = $1;
 
 -- name: UpdateUser :exec
-UPDATE "users" SET display_id = $2, display_name = $3, icon_url = $4, email = $5, email_verified = $6 WHERE user_id = $1;
+UPDATE "users" SET display_id = $2, display_name = $3, icon_url = $4, email = $5, email_verified = $6, withdrawal_date = $7 WHERE user_id = $1;
 
 -- name: UpdateOrCreateUserDemographic :exec
 INSERT INTO user_demographics (
@@ -85,3 +85,41 @@ FROM
     "users"
 WHERE
     display_id = $1;
+
+-- name: WithdrawUser :exec
+UPDATE "users" SET withdrawal_date = $2 WHERE user_id = $1;
+
+-- name: ReactivateUser :exec
+UPDATE "users" SET withdrawal_date = NULL WHERE user_id = $1;
+
+-- name: UpdateUserEmailAndSubject :exec
+UPDATE "users" SET email = $2 WHERE user_id = $1;
+
+-- name: CreateUserStatusChangeLog :exec
+INSERT INTO user_status_change_logs (
+    user_status_change_logs_id,
+    user_id,
+    status,
+    reason,
+    changed_at,
+    changed_by,
+    ip_address,
+    user_agent,
+    additional_data
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);
+
+-- name: FindUserStatusChangeLogsByUserID :many
+SELECT
+    user_status_change_logs_id,
+    user_id,
+    status,
+    reason,
+    changed_at,
+    changed_by,
+    ip_address,
+    user_agent,
+    additional_data,
+    created_at
+FROM user_status_change_logs
+WHERE user_id = $1
+ORDER BY changed_at DESC;
