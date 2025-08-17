@@ -18,6 +18,9 @@ type securityHandler struct {
 var skipOperations = []string{
 	"EstablishUser",
 	"GetTokenInfo",
+	"RevokeUser",
+}
+
 }
 
 func (s *securityHandler) HandleCookieAuth(ctx context.Context, operationName string, t oas.CookieAuth) (context.Context, error) {
