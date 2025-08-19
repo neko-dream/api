@@ -17,3 +17,11 @@ sql:
             go_type:
               import: "github.com/neko-dream/server/internal/domain/model/talksession"
               type: "Restrictions"
+          - column: "notification_preferences.quiet_hours_start"
+            go_type:
+              import: "database/sql"
+              type: "NullString"
+          - column: "notification_preferences.quiet_hours_end"
+            go_type:
+              import: "database/sql"
+              type: "NullString"

@@ -122,6 +122,14 @@
 				{
 					"name": "HASH_ITERATIONS",
 					"valueFrom": "{{ ssm `/kotohiro-prd-app-secret/arn` }}:HASH_ITERATIONS::"
+				},
+				{
+					"name": "FCM_VAPID_KEY",
+					"valueFrom": "{{ ssm `/kotohiro-prd-app-secret/arn` }}:FCM_VAPID_KEY::"
+				},
+				{
+					"name": "PINPOINT_APPLICATION_ID",
+					"valueFrom": "{{ ssm `/kotohiro-prd-app-secret/arn` }}:PINPOINT_APPLICATION_ID::"
 				}
 			],
 			"logConfiguration": {

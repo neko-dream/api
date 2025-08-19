@@ -34,8 +34,9 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 		TalkSession *talksession.TalkSession
 	}
 
+	eventStore := repository.NewEventStoreMock()
 	initData := TestData{
-		TsRepo: repository.NewTalkSessionRepository(dbManager),
+		TsRepo: repository.NewTalkSessionRepository(dbManager, eventStore),
 	}
 	talkSessionID := shared.NewUUID[talksession.TalkSession]()
 	ownerUserID := shared.NewUUID[user.User]()

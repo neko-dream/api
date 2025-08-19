@@ -8,7 +8,9 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/pinpoint"
 	"github.com/aws/aws-sdk-go-v2/service/sesv2"
+	"go.opentelemetry.io/otel"
 )
 
 var (
@@ -18,6 +20,13 @@ var (
 )
 
 func NewAWSConfig() (aws.Config, error) {
+	return NewAWSConfigWithContext(context.Background())
+}
+
+func NewAWSConfigWithContext(ctx context.Context) (aws.Config, error) {
+	ctx, span := otel.Tracer("aws").Start(ctx, "NewAWSConfigWithContext")
+	defer span.End()
+
 	once.Do(func() {
 		region := "ap-northeast-1"
 		var funs []func(*awsConfig.LoadOptions) error
@@ -29,7 +38,7 @@ func NewAWSConfig() (aws.Config, error) {
 		funs = append(funs, awsConfig.WithRegion(region))
 
 		var err error
-		s, err = awsConfig.LoadDefaultConfig(context.TODO(), funs...)
+		s, err = awsConfig.LoadDefaultConfig(ctx, funs...)
 		if err != nil {
 			configErr = fmt.Errorf("failed to load AWS config: %w", err)
 			return
@@ -56,4 +65,18 @@ func NewSESClient() *sesv2.Client {
 		return nil
 	}
 	return sesClient
+}
+
+func NewPinpointClient() *pinpoint.Client {
+	cfg, err := NewAWSConfig()
+	if err != nil {
+		fmt.Printf("Error creating AWS config: %v\n", err)
+		return nil
+	}
+	pinpointClient := pinpoint.NewFromConfig(cfg)
+	if pinpointClient == nil {
+		fmt.Println("Error creating Pinpoint client")
+		return nil
+	}
+	return pinpointClient
 }

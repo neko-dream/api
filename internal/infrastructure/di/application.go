@@ -7,6 +7,8 @@ import (
 	talksession_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/talksession"
 	user_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/user"
 
+	"github.com/neko-dream/server/internal/application/event_processor"
+	"github.com/neko-dream/server/internal/application/event_processor/handlers"
 	opinion_q "github.com/neko-dream/server/internal/application/query/opinion"
 	"github.com/neko-dream/server/internal/application/query/organization_query"
 	"github.com/neko-dream/server/internal/application/query/policy_query"
@@ -55,6 +57,7 @@ func useCaseDeps() []ProvideArg {
 		{user_usecase.NewEditHandler, nil},
 		{user_usecase.NewRegisterHandler, nil},
 		{user_query.NewDetailHandler, nil},
+		{user_query.NewGetByDisplayIDHandler, nil},
 		{vote_usecase.NewVoteHandler, nil},
 		{auth_usecase.NewAuthLogin, nil},
 		{auth_usecase.NewRevoke, nil},
@@ -84,5 +87,8 @@ func useCaseDeps() []ProvideArg {
 		{organization_usecase.NewListOrganizationAliasesUseCase, nil},
 		{organization_query.NewListOrganizationUsersQuery, nil},
 		{analysis_usecase.NewApplyFeedbackInteractor, nil},
+		{event_processor.NewEventHandlerRegistry, nil},
+		{handlers.NewTalkSessionPushNotificationHandler, nil},
+		{SetupEventProcessor, nil},
 	}
 }

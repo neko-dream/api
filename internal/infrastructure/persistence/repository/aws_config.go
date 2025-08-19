@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/neko-dream/server/internal/infrastructure/config"
+	"go.opentelemetry.io/otel"
 )
 
 var (
@@ -18,9 +19,16 @@ var (
 
 // initConfig awsConfigを作成。 otelawsによる計装も設定
 func InitConfig(appConf *config.Config) aws.Config {
+	return InitConfigWithContext(context.Background(), appConf)
+}
+
+func InitConfigWithContext(ctx context.Context, appConf *config.Config) aws.Config {
+	ctx, span := otel.Tracer("repository").Start(ctx, "InitConfigWithContext")
+	defer span.End()
+
 	once.Do(func() {
 		c, err := awsConfig.LoadDefaultConfig(
-			context.TODO(),
+			ctx,
 			awsConfig.WithRegion(appConf.R2_REGION),
 			awsConfig.WithCredentialsProvider(
 				credentials.NewStaticCredentialsProvider(

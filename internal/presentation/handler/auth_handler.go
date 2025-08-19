@@ -157,7 +157,7 @@ func (a *authHandler) RevokeToken(ctx context.Context) (oas.RevokeTokenRes, erro
 		return nil, err
 	}
 
-	headers := new(oas.RevokeTokenNoContentHeaders)
+	headers := new(oas.RevokeTokenNoContent)
 	headers.SetSetCookie(cookie_utils.EncodeCookies([]*http.Cookie{a.CookieManager.CreateRevokeCookie()}))
 	return headers, nil
 }

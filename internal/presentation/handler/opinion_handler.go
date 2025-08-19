@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"log"
 	"mime/multipart"
 
 	opinion_query "github.com/neko-dream/server/internal/application/query/opinion"
@@ -81,8 +80,9 @@ func (o *opinionHandler) GetOpinionDetail2(ctx context.Context, params oas.GetOp
 	defer span.End()
 
 	authCtx, err := getAuthenticationContext(o.authService, o.SetSession(ctx))
-	if err != nil {
-		return nil, err
+	var userID *shared.UUID[user.User]
+	if err == nil {
+		userID = &authCtx.UserID
 	}
 
 	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
@@ -92,7 +92,7 @@ func (o *opinionHandler) GetOpinionDetail2(ctx context.Context, params oas.GetOp
 
 	opinion, err := o.getOpinionDetailByIDQuery.Execute(ctx, opinion_query.GetOpinionDetailByIDInput{
 		OpinionID: opinionID,
-		UserID:    lo.ToPtr(authCtx.UserID),
+		UserID:    userID,
 	})
 	if err != nil {
 		return nil, err
@@ -246,7 +246,7 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpinionsParams) (oas.SwipeOpinionsRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.SwipeOpinions")
 	defer span.End()
-	log.Println("SwipeOpinions called with params:", params)
+
 	authCtx, err := requireAuthentication(o.authService, ctx)
 	if err != nil {
 		return nil, err
@@ -262,7 +262,6 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 	if err != nil {
 		return nil, messages.BadRequestError
 	}
-	log.Println("talksessionID:", talkSessionID)
 
 	opinions, err := o.getSwipeOpinionQuery.Execute(ctx, opinion_query.GetSwipeOpinionsQueryInput{
 		UserID:        authCtx.UserID,

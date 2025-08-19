@@ -46,7 +46,7 @@ func TestSessionTokenManager(t *testing.T) {
 				if err != nil {
 					return "", err
 				}
-				
+
 				// CreateはdisplayIDとdisplayNameを保存しないので、Updateで設定する
 				err = userRepo.Update(ctx, testUser)
 				if err != nil {
@@ -101,7 +101,7 @@ func TestSessionTokenManager(t *testing.T) {
 				if err != nil {
 					return "", err
 				}
-				
+
 				// CreateはdisplayIDとdisplayNameを保存しないので、Updateで設定する
 				err = userRepo.Update(ctx, testUser)
 				if err != nil {

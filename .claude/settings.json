@@ -1,0 +1,56 @@
+{
+  "env": {},
+  "permissions": {
+    "allow": [
+      "Read(**)",
+      "Write(src/**)",
+      "Write(docs/**)",
+      "Write(.tmp/**)",
+      "Write(.claude/**)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(go mod tidy:*)",
+      "Bash(go build:*)",
+      "Bash(go test:*)",
+      "Bash(go run:*)",
+      "Bash(go fmt:*)",
+      "Bash(go vet:*)",
+      "Bash(golangci-lint:*)",
+      "Bash(./scripts/gen.sh)",
+      "Bash(rm *)",
+      "Bash(ls:*)",
+      "Bash(cat **)",
+      "Bash(chmod:*)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs"
+    ],
+    "deny": [
+      "Bash(sudo:*)",
+      "Bash(rm -rf:*)",
+      "Bash(git push:*)",
+      "Bash(git reset:*)",
+      "Bash(git rebase:*)",
+      "Write(.env*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)"
+    ]
+  },
+  "model": "opus",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/go-quality-check.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

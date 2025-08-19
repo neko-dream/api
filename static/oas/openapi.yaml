@@ -15,6 +15,7 @@ tags:
   - name: test
   - name: health
   - name: analysis
+  - name: notifications
   - name: manage
 paths:
   /auth/dev/detach:
@@ -250,10 +251,6 @@ paths:
                 type: array
                 items:
                   type: string
-          content:
-            application/json:
-              schema:
-                type: object
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -511,6 +508,284 @@ paths:
               required:
                 - image
       x-ogen-operation-group: Image
+  /notifications/devices:
+    post:
+      operationId: registerDevice
+      summary: デバイス登録/更新
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                type: object
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - notifications
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                device_token:
+                  type: string
+                platform:
+                  type: string
+                  enum:
+                    - ios
+                    - android
+                    - web
+                device_name:
+                  type: string
+                app_version:
+                  type: string
+                os_version:
+                  type: string
+              required:
+                - device_token
+                - platform
+        description: FCMトークンまたはAPNSトークン
+      x-ogen-operation-group: Notifications
+    get:
+      operationId: getDevices
+      summary: デバイス一覧取得
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  devices:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Device'
+                required:
+                  - devices
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - notifications
+      x-ogen-operation-group: Notifications
+  /notifications/devices/exists:
+    get:
+      operationId: checkDeviceExists
+      summary: デバイストークンが登録されているか確認
+      parameters:
+        - name: device_token
+          in: query
+          required: true
+          description: FCMトークンまたはAPNSトークン
+          schema:
+            type: string
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exists:
+                    type: boolean
+                required:
+                  - exists
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - notifications
+      x-ogen-operation-group: Notifications
+  /notifications/devices/{deviceId}:
+    delete:
+      operationId: deleteDevice
+      summary: デバイス削除
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - notifications
+      x-ogen-operation-group: Notifications
+  /notifications/preferences:
+    get:
+      operationId: getNotificationPreferences
+      summary: 通知設定取得
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationPreferences'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - notifications
+      x-ogen-operation-group: Notifications
+    put:
+      operationId: updateNotificationPreferences
+      summary: 通知設定更新
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationPreferences'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                type: object
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - notifications
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                push_notification_enabled:
+                  type: boolean
+                  nullable: true
+              required: []
+            encoding:
+              push_notification_enabled:
+                contentType: application/json
+      x-ogen-operation-group: Notifications
+  /notifications/test:
+    post:
+      operationId: sendTestNotification
+      summary: テスト通知送信
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  devices_count:
+                    type: integer
+                    format: int32
+                  success_count:
+                    type: integer
+                    format: int32
+                required:
+                  - devices_count
+                  - success_count
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                type: object
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - notifications
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                body:
+                  type: string
+                device_id:
+                  type: string
+              required: []
+      x-ogen-operation-group: Notifications
+  /notifications/vapid-key:
+    get:
+      operationId: getVapidKey
+      summary: VAPID公開鍵取得
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  vapid_key:
+                    type: string
+                required:
+                  - vapid_key
+      tags:
+        - notifications
+      x-ogen-operation-group: Notifications
   /opinions:
     post:
       operationId: postOpinionPost2
@@ -679,7 +954,7 @@ paths:
       tags:
         - opinion
       security:
-        - OptionalCookieAuth: []
+        - {}
       x-ogen-operation-group: Opinion
   /opinions/{opinionID}:
     get:
@@ -707,7 +982,7 @@ paths:
       tags:
         - opinion
       security:
-        - OptionalCookieAuth: []
+        - {}
       x-ogen-operation-group: Opinion
   /opinions/{opinionID}/analysis:
     get:
@@ -743,7 +1018,7 @@ paths:
       tags:
         - opinion
       security:
-        - OptionalCookieAuth: []
+        - {}
       x-ogen-operation-group: Opinion
   /opinions/{opinionID}/replies:
     get:
@@ -801,7 +1076,7 @@ paths:
       tags:
         - opinion
       security:
-        - OptionalCookieAuth: []
+        - {}
       x-ogen-operation-group: Opinion
   /opinions/{opinionID}/report:
     post:
@@ -1378,7 +1653,7 @@ paths:
       tags:
         - policy
       security:
-        - OptionalCookieAuth: []
+        - {}
       x-ogen-operation-group: Policy
     post:
       operationId: policyConsent
@@ -1810,7 +2085,7 @@ paths:
       tags:
         - talk_session
       security:
-        - OptionalCookieAuth: []
+        - {}
       x-ogen-operation-group: TalkSession
   /talksessions/{talkSessionID}:
     get:
@@ -1998,7 +2273,7 @@ paths:
       tags:
         - talk_session
       security:
-        - OptionalCookieAuth: []
+        - {}
       x-ogen-operation-group: TalkSession
   /talksessions/{talkSessionID}/conclusion:
     get:
@@ -2222,7 +2497,7 @@ paths:
       tags:
         - opinion
       security:
-        - OptionalCookieAuth: []
+        - {}
       x-ogen-operation-group: Opinion
   /talksessions/{talkSessionID}/report:
     get:
@@ -2385,7 +2660,7 @@ paths:
       tags:
         - talk_session
       security:
-        - OptionalCookieAuth: []
+        - {}
       x-ogen-operation-group: TalkSession
   /talksessions/{talkSessionID}/swipe_opinions:
     get:
@@ -2455,7 +2730,7 @@ paths:
       tags:
         - opinion
       security:
-        - OptionalCookieAuth: []
+        - {}
       x-ogen-operation-group: Opinion
   /talksessions/{talkSessionID}/timeline:
     post:
@@ -2864,6 +3139,46 @@ paths:
               deleteIcon:
                 contentType: application/json
       x-ogen-operation-group: user
+  /user/{displayID}:
+    get:
+      operationId: getUserByDisplayID
+      summary: 表示IDからユーザー情報の取得
+      parameters:
+        - name: displayID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - user
+      x-ogen-operation-group: User
   /v1/manage/talksessions/list:
     get:
       operationId: getTalkSessionListManage
@@ -3162,6 +3477,37 @@ components:
             - SessionId
           description: name of the API key
       description: Cookie-based authentication using JWT tokens stored in secure HTTP-only cookies
+    Device:
+      type: object
+      required:
+        - device_id
+        - user_id
+        - platform
+        - enabled
+        - created_at
+        - updated_at
+      properties:
+        device_id:
+          type: string
+        user_id:
+          type: string
+        platform:
+          type: string
+          enum:
+            - ios
+            - android
+            - web
+        device_name:
+          type: string
+        enabled:
+          type: boolean
+        last_active_at:
+          type: string
+        created_at:
+          type: string
+        updated_at:
+          type: string
+      description: デバイス情報
     Error:
       type: object
       required:
@@ -3181,6 +3527,14 @@ components:
         longitude:
           type: number
           description: 経度
+    NotificationPreferences:
+      type: object
+      required:
+        - push_notification_enabled
+      properties:
+        push_notification_enabled:
+          type: boolean
+      description: 通知設定
     OffsetPagination:
       type: object
       required:
@@ -3925,8 +4279,3 @@ components:
       in: cookie
       name: SessionId
       description: Cookie-based authentication using JWT tokens stored in secure HTTP-only cookies
-    OptionalCookieAuth:
-      type: apiKey
-      in: cookie
-      name: SessionId
-      description: Optional cookie-based authentication - will populate session context if authenticated but won't require it

@@ -22,5 +22,6 @@ func presentationDeps() []ProvideArg {
 		{handler.NewOrganizationHandler, nil},
 		{handler.NewHealthHandler, nil},
 		{handler.NewAnalysisHandler, nil},
+		{handler.NewNotificationsHandler, nil},
 	}
 }
