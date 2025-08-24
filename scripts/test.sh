@@ -81,7 +81,7 @@ if ! wait_for_server 3000; then
 fi
 
 print_success "\n=== E2Eテスト実行中 ==="
-runn run $TEST_PATH --verbose --debug
+runn run $TEST_PATH --verbose
 
 EXIT_CODE=$?
 
