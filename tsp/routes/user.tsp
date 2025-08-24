@@ -87,6 +87,7 @@ namespace kotohiro {
   @route("/user/{displayID}")
   @get
   @summary("表示IDからユーザー情報の取得")
+  @useAuth([])
   op getUserByDisplayID(
     @path displayID: string,
   ): User | {
@@ -98,5 +99,36 @@ namespace kotohiro {
   } | {
     @statusCode statusCode: 500;
     @body body: {};
+  };
+
+  @tag("user")
+  @extension("x-ogen-operation-group", "user")
+  @route("/user")
+  @delete
+  @summary("ユーザー退会")
+  op withdrawUser(): {
+    @statusCode statusCode: 200;
+    @body body: {
+      message: string;
+      withdrawalDate: utcDateTime;
+    };
+  } | {
+    @statusCode statusCode: 400;
+    @body body: {
+      code: string;
+      message: string;
+    };
+  } | {
+    @statusCode statusCode: 401;
+    @body body: {
+      code: string;
+      message: string;
+    };
+  } | {
+    @statusCode statusCode: 500;
+    @body body: {
+      code: string;
+      message: string;
+    };
   };
 }

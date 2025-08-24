@@ -22,20 +22,22 @@ type (
 	}
 
 	Claim struct {
-		Sub                    string  `json:"sub"` // subject (user)
-		Iat                    int64   `json:"iat"` // issued at (seconds)
-		Exp                    int64   `json:"exp"` // expiration time (seconds)
-		Jti                    string  `json:"jti"` // JWT ID（SessionID）
-		IconURL                *string `json:"iconURL,omitempty"`
-		DisplayName            *string `json:"displayName,omitempty"`
-		DisplayID              *string `json:"displayID,omitempty"`
-		IsRegistered           bool    `json:"isRegistered"`
-		IsEmailVerified        bool    `json:"isEmailVerified"`
-		RequiredPasswordChange bool    `json:"requiredPasswordChange"`
-		OrgType                *int    `json:"orgType,omitempty"`          // 組織の種類
-		OrganizationID         *string `json:"organizationID,omitempty"`   // ログイン時に使用した組織ID
-		OrganizationCode       *string `json:"organizationCode,omitempty"` // ログイン時に使用した組織コード
-		OrganizationRole       *string `json:"organizationRole,omitempty"` // 組織でのロール名
+		Sub                    string     `json:"sub"` // subject (user)
+		Iat                    int64      `json:"iat"` // issued at (seconds)
+		Exp                    int64      `json:"exp"` // expiration time (seconds)
+		Jti                    string     `json:"jti"` // JWT ID（SessionID）
+		IconURL                *string    `json:"iconURL,omitempty"`
+		DisplayName            *string    `json:"displayName,omitempty"`
+		DisplayID              *string    `json:"displayID,omitempty"`
+		IsRegistered           bool       `json:"isRegistered"`
+		IsEmailVerified        bool       `json:"isEmailVerified"`
+		RequiredPasswordChange bool       `json:"requiredPasswordChange"`
+		OrgType                *int       `json:"orgType,omitempty"`          // 組織の種類
+		OrganizationID         *string    `json:"organizationID,omitempty"`   // ログイン時に使用した組織ID
+		OrganizationCode       *string    `json:"organizationCode,omitempty"` // ログイン時に使用した組織コード
+		OrganizationRole       *string    `json:"organizationRole,omitempty"` // 組織でのロール名
+		IsWithdrawn            bool       `json:"isWithdrawn,omitempty"`      // 退会ユーザーフラグ
+		WithdrawalDate         *time.Time `json:"withdrawalDate,omitempty"`   // 退会日時
 	}
 )
 

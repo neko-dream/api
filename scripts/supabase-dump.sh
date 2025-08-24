@@ -1,22 +1,25 @@
 #!/bin/bash
 
+SCRIPT_DIR=$(cd $(dirname $0); pwd)
+source "${SCRIPT_DIR}/utils.sh"
+
 if [ $# -lt 2 ]; then
-    echo "エラー: Supabase接続文字列とターゲット環境を指定してください"
+    print_error "エラー: Supabase接続文字列とターゲット環境を指定してください"
     echo ""
-    echo "使い方: $0 <SUPABASE_DSN> <dev|prd> [オプション]"
+    print_info "使い方: $0 <SUPABASE_DSN> <dev|prd> [オプション]"
     echo ""
-    echo "オプション:"
+    print_info "オプション:"
     echo "  -t, --table SOURCE[:TARGET]   特定のテーブルをダンプ（複数指定可）"
     echo "  -o, --output FILE            出力ファイル名（デフォルト: supabase_to_{env}_dump_{timestamp}.sql）"
     echo "  -c, --copy                   COPY形式で出力（高速だが注意が必要）"
     echo ""
-    echo "例:"
+    print_info "例:"
     echo "  $0 'postgresql://user:pass@host:5432/db' dev                    # 全データダンプ（INSERT形式）"
     echo "  $0 'postgresql://user:pass@host:5432/db' dev -c                 # COPY形式で高速ダンプ"
     echo "  $0 'postgresql://user:pass@host:5432/db' dev -t users          # usersテーブルのみ"
     echo "  $0 'postgresql://user:pass@host:5432/db' dev -t users:members  # usersをmembersとして"
     echo ""
-    echo "注意: Supabaseのpublicスキーマから、RDSのkotohiro_{env}データベースへのダンプを想定"
+    print_warning "注意: Supabaseのpublicスキーマから、RDSのkotohiro_{env}データベースへのダンプを想定"
     exit 1
 fi
 
@@ -34,8 +37,8 @@ case "$TARGET_ENV" in
         TARGET_ENV="prd"
         ;;
     *)
-        echo "エラー: 無効な環境 '$TARGET_ENV'"
-        echo "有効な環境: dev, prd"
+        print_error "エラー: 無効な環境 '$TARGET_ENV'"
+        print_info "有効な環境: dev, prd"
         exit 1
         ;;
 esac
@@ -70,7 +73,7 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         *)
-            echo "不明なオプション: $1"
+            print_error "不明なオプション: $1"
             exit 1
             ;;
     esac
@@ -81,18 +84,18 @@ if [ -z "$OUTPUT_FILE" ]; then
     OUTPUT_FILE="supabase_to_${TARGET_ENV}_dump_$(date +%Y%m%d_%H%M%S).sql"
 fi
 
-echo "Supabase (public) → RDS ($TARGET_DB) データダンプ"
-echo "出力ファイル: $OUTPUT_FILE"
+print_info "Supabase (public) → RDS ($TARGET_DB) データダンプ"
+print_info "出力ファイル: $OUTPUT_FILE"
 echo ""
 
 # ダンプ実行
 if [ "$DUMP_ALL" = true ]; then
     # 全テーブルのデータダンプ
-    echo "全テーブルのデータをダンプ中..."
+    print_info "全テーブルのデータをダンプ中..."
 
     # pg_dumpでダンプして、public.を削除
     if [ "$USE_COPY" = true ]; then
-        echo "COPY形式でダンプ中（高速）..."
+        print_info "COPY形式でダンプ中（高速）..."
         pg_dump "$DSN" \
             --data-only \
             --no-owner \
@@ -102,7 +105,7 @@ if [ "$DUMP_ALL" = true ]; then
             --exclude-table-data='migrations' \
             --exclude-table-data='schema_migrations' > "$OUTPUT_FILE"
     else
-        echo "INSERT形式でダンプ中（安全）..."
+        print_info "INSERT形式でダンプ中（安全）..."
         pg_dump "$DSN" \
             --data-only \
             --no-owner \
@@ -131,7 +134,7 @@ else
     for i in "${!TABLE_LIST[@]}"; do
         source_table="${TABLE_LIST[$i]}"
         target_table="${TARGET_LIST[$i]}"
-        echo "ダンプ中: $source_table → $target_table"
+        print_info "ダンプ中: $source_table → $target_table"
 
         if [ "$source_table" != "$target_table" ]; then
             # テーブル名変換が必要な場合（現在はINSERT形式のみサポート）
@@ -176,7 +179,7 @@ fi
 
 if [ $? -eq 0 ]; then
     echo ""
-    echo "✅ ダンプ完了: $OUTPUT_FILE"
+    print_success "✅ ダンプ完了: $OUTPUT_FILE"
     echo ""
     echo "========================================="
     echo "RDS ($TARGET_DB) へのインポート手順:"
@@ -194,11 +197,11 @@ if [ $? -eq 0 ]; then
     echo "または、コマンドラインから直接実行:"
     echo "   ./scripts/db-connect $TARGET_ENV -f $OUTPUT_FILE"
     echo ""
-    echo "注意事項:"
+    print_warning "注意事項:"
     echo "  - インポート前にRDS側のテーブル構造が準備されていることを確認"
     echo "  - 外部キー制約がある場合は、適切な順序でインポート"
     echo "  - 大量データの場合は、トランザクションを分割することを検討"
 else
     echo ""
-    echo "❌ エラー: ダンプに失敗しました"
+    print_error "❌ エラー: ダンプに失敗しました"
 fi

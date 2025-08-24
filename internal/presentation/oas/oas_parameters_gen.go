@@ -4643,6 +4643,71 @@ func decodeSwipeOpinionsParams(args [1]string, argsEscaped bool, r *http.Request
 	return params, nil
 }
 
+// SwitchOrganizationParams is parameters of switchOrganization operation.
+type SwitchOrganizationParams struct {
+	Code string
+}
+
+func unpackSwitchOrganizationParams(packed middleware.Parameters) (params SwitchOrganizationParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "code",
+			In:   "path",
+		}
+		params.Code = packed[key].(string)
+	}
+	return params
+}
+
+func decodeSwitchOrganizationParams(args [1]string, argsEscaped bool, r *http.Request) (params SwitchOrganizationParams, _ error) {
+	// Decode path: code.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "code",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.Code = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "code",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // TalkSessionAnalysisParams is parameters of talkSessionAnalysis operation.
 type TalkSessionAnalysisParams struct {
 	TalkSessionID string

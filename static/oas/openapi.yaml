@@ -235,6 +235,71 @@ paths:
       security:
         - {}
       x-ogen-operation-group: Auth
+  /auth/reactivate:
+    post:
+      operationId: reactivateUser
+      summary: 退会ユーザーの復活
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+                required:
+                  - message
+                  - user
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+      tags:
+        - auth
+      x-ogen-operation-group: Auth
   /auth/revoke:
     post:
       operationId: revokeToken
@@ -802,7 +867,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/Opinion'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -1585,6 +1650,42 @@ paths:
               required:
                 - displayID
                 - role
+      x-ogen-operation-group: Organization
+  /organizations/switch/{code}:
+    post:
+      operationId: switchOrganization
+      summary: 組織切り替え
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            Set-Cookie:
+              required: true
+              description: SessionID
+              schema:
+                type: array
+                items:
+                  type: string
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - organization
       x-ogen-operation-group: Organization
   /organizations/users:
     get:
@@ -3139,6 +3240,71 @@ paths:
               deleteIcon:
                 contentType: application/json
       x-ogen-operation-group: user
+    delete:
+      operationId: withdrawUser
+      summary: ユーザー退会
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  withdrawalDate:
+                    type: string
+                    format: date-time
+                required:
+                  - message
+                  - withdrawalDate
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+      tags:
+        - user
+      x-ogen-operation-group: user
   /user/{displayID}:
     get:
       operationId: getUserByDisplayID
@@ -3178,6 +3344,8 @@ paths:
                 type: object
       tags:
         - user
+      security:
+        - {}
       x-ogen-operation-group: User
   /v1/manage/talksessions/list:
     get:

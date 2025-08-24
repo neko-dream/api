@@ -88,6 +88,12 @@ type AuthHandler interface {
 	//
 	// POST /auth/password/register
 	PasswordRegister(ctx context.Context, req *PasswordRegisterReq) (PasswordRegisterRes, error)
+	// ReactivateUser implements reactivateUser operation.
+	//
+	// 退会ユーザーの復活.
+	//
+	// POST /auth/reactivate
+	ReactivateUser(ctx context.Context) (ReactivateUserRes, error)
 	// RevokeToken implements revokeToken operation.
 	//
 	// トークンを失効（ログアウト）.
@@ -338,6 +344,12 @@ type OrganizationHandler interface {
 	//
 	// POST /organizations/invite_user
 	InviteOrganizationForUser(ctx context.Context, req *InviteOrganizationForUserReq) (InviteOrganizationForUserRes, error)
+	// SwitchOrganization implements switchOrganization operation.
+	//
+	// 組織切り替え.
+	//
+	// POST /organizations/switch/{code}
+	SwitchOrganization(ctx context.Context, params SwitchOrganizationParams) (SwitchOrganizationRes, error)
 	// ValidateOrganizationCode implements validateOrganizationCode operation.
 	//
 	// 組織コード検証.
@@ -550,6 +562,12 @@ type UserHandler interface {
 	//
 	// PUT /user
 	UpdateUserProfile(ctx context.Context, req *UpdateUserProfileReq) (UpdateUserProfileRes, error)
+	// WithdrawUser implements withdrawUser operation.
+	//
+	// ユーザー退会.
+	//
+	// DELETE /user
+	WithdrawUser(ctx context.Context) (WithdrawUserRes, error)
 }
 
 // VoteHandler handles operations described by OpenAPI v3 specification.

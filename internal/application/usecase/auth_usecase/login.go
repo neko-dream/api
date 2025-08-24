@@ -44,7 +44,7 @@ type (
 	authLoginInteractor struct {
 		*db.DBManager
 		*config.Config
-		service.AuthService
+		service.AuthenticationService
 		authProviderFactory auth.AuthProviderFactory
 		stateRepository     auth.StateRepository
 		organizationService organizationService.OrganizationService
@@ -55,18 +55,18 @@ type (
 func NewAuthLogin(
 	tm *db.DBManager,
 	config *config.Config,
-	authService service.AuthService,
+	authService service.AuthenticationService,
 	authProviderFactory auth.AuthProviderFactory,
 	stateRepository auth.StateRepository,
 	organizationService organizationService.OrganizationService,
 ) AuthLogin {
 	return &authLoginInteractor{
-		DBManager:           tm,
-		Config:              config,
-		AuthService:         authService,
-		authProviderFactory: authProviderFactory,
-		stateRepository:     stateRepository,
-		organizationService: organizationService,
+		DBManager:             tm,
+		Config:                config,
+		AuthenticationService: authService,
+		authProviderFactory:   authProviderFactory,
+		stateRepository:       stateRepository,
+		organizationService:   organizationService,
 	}
 }
 

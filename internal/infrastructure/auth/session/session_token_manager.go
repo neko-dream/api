@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+	"time"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/organization"
@@ -127,6 +128,13 @@ func (s *sessionTokenManager) Parse(ctx context.Context, token string) (*session
 		return nil, errtrace.Wrap(ErrUserNotFound)
 	}
 
+	// 退会ユーザーチェック
+	if user.IsWithdrawn() && user.IsReactivationPeriodExpired(time.Now()) {
+		// 31日以上経過している場合はエラー
+		return nil, errtrace.Wrap(ErrSessionNotFound)
+	}
+	// 30日以内の場合は、後でClaimに退会情報を含める
+
 	// パスワード変更要求フラグの確認
 	requiredPasswordChange := false
 	if sess.Provider() == "password" {
@@ -174,6 +182,8 @@ func (s *sessionTokenManager) Parse(ctx context.Context, token string) (*session
 		OrganizationID:         organizationID,
 		OrganizationCode:       organizationCode,
 		OrganizationRole:       organizationRole,
+		IsWithdrawn:            user.IsWithdrawn(),
+		WithdrawalDate:         user.WithdrawalDate(),
 	}, nil
 }
 

@@ -59,10 +59,10 @@ func (h *BrowseOpenedByUserQueryImpl) Execute(ctx context.Context, input talkses
 	if len(talkSessionRow) <= 0 {
 		return &out, nil
 	}
-
 	var talkSessions []dto.TalkSessionWithDetail
 	if err := copier.CopyWithOption(&talkSessions, talkSessionRow, copier.Option{
-		DeepCopy: true,
+		DeepCopy:      true,
+		CaseSensitive: true,
 	}); err != nil {
 		utils.HandleError(ctx, err, "copier.CopyWithOptionでエラー")
 		return nil, err

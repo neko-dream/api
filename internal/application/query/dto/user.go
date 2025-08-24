@@ -2,6 +2,7 @@ package dto
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -13,9 +14,10 @@ import (
 )
 
 type User struct {
-	DisplayID   string
-	DisplayName string
-	IconURL     *string
+	DisplayID      string
+	DisplayName    string
+	IconURL        *string
+	WithdrawalDate *time.Time
 }
 
 type UserAuth struct {
@@ -64,6 +66,12 @@ type UserDetail struct {
 }
 
 func (u *User) ToResponse() oas.User {
+	if u.WithdrawalDate != nil {
+		return oas.User{
+			DisplayID:   "unknown",
+			DisplayName: "unknown",
+		}
+	}
 	return oas.User{
 		DisplayID:   u.DisplayID,
 		DisplayName: u.DisplayName,

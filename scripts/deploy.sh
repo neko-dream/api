@@ -2,22 +2,28 @@
 
 set -eu
 
+SCRIPT_DIR=$(cd $(dirname $0); pwd)
+source "${SCRIPT_DIR}/utils.sh"
+
 if [ $# -eq 0 ]; then
-    echo "Usage: $0 <dev|prod>"
+    print_error "エラー: 環境を指定してください"
+    print_info "使い方: $0 <dev|prod>"
+    print_info "例:"
+    echo "  $0 dev   # 開発環境にデプロイ"
+    echo "  $0 prod  # 本番環境にデプロイ"
     exit 1
 fi
 
 ENV=$1
 if [ "$ENV" != "dev" ] && [ "$ENV" != "prod" ]; then
-    echo "Environment must be 'dev' or 'prod'"
+    print_error "エラー: 無効な環境 '$ENV'"
+    print_info "有効な環境: dev, prod"
     exit 1
 fi
 
-source scripts/utils.sh
-
 export ACCOUNT_ID=$(login_aws $AWS_PROFILE)
 if [ -z "$ACCOUNT_ID" ]; then
-    echo "Failed to get AWS account ID" >&2
+    print_error "AWSアカウントIDの取得に失敗しました"
     exit 1
 fi
 

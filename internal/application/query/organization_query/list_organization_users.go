@@ -3,10 +3,12 @@ package organization_query
 import (
 	"context"
 
+	"github.com/jinzhu/copier"
+	"github.com/neko-dream/server/internal/application/query/dto"
 	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
-	"github.com/neko-dream/server/internal/presentation/oas"
+	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
@@ -19,7 +21,7 @@ type ListOrganizationUsersInput struct {
 }
 
 type ListOrganizationUsersOutput struct {
-	Users []oas.OrganizationUser
+	Organizations []dto.OrganizationResponse
 }
 
 type listOrganizationUsersQuery struct {
@@ -42,34 +44,22 @@ func (q *listOrganizationUsersQuery) Execute(ctx context.Context, input ListOrga
 		return nil, err
 	}
 
-	var users []oas.OrganizationUser
-	for _, row := range result {
-		iconURL := oas.OptNilString{}
-		if row.IconUrl.Valid {
-			iconURL = oas.NewOptNilString(row.IconUrl.String)
-		}
-
-		displayID := ""
-		if row.DisplayID.Valid {
-			displayID = row.DisplayID.String
-		}
-
-		displayName := ""
-		if row.DisplayName.Valid {
-			displayName = row.DisplayName.String
-		}
-
-		users = append(users, oas.OrganizationUser{
-			UserID:      row.UserID.String(),
-			DisplayID:   displayID,
-			DisplayName: displayName,
-			IconURL:     iconURL,
-			Role:        int(row.Role),
-			RoleName:    organization.RoleToName(organization.OrganizationUserRole(row.Role)),
+	var orgRespList []dto.OrganizationResponse
+	for _, org := range result {
+		var orgResp dto.OrganizationResponse
+		err := copier.CopyWithOption(&orgResp, org, copier.Option{
+			IgnoreEmpty: true,
+			DeepCopy:    true,
 		})
+		if err != nil {
+			utils.HandleError(ctx, err, "failed to copy organization")
+			return nil, err
+		}
+		orgResp.OrganizationUser.SetRoleName(int(org.OrganizationUser.Role))
+		orgRespList = append(orgRespList, orgResp)
 	}
 
 	return &ListOrganizationUsersOutput{
-		Users: users,
+		Organizations: orgRespList,
 	}, nil
 }

@@ -7,8 +7,6 @@ import (
 	"github.com/neko-dream/server/internal/application/query/policy_query"
 	"github.com/neko-dream/server/internal/application/usecase/policy_usecase"
 	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	http_utils "github.com/neko-dream/server/pkg/http"
@@ -18,20 +16,20 @@ import (
 )
 
 type policyHandler struct {
-	checkConsentQuery policy_query.CheckConsent
-	acceptPolicy      policy_usecase.AcceptPolicy
-	authService       service.AuthenticationService
+	checkConsentQuery    policy_query.CheckConsent
+	acceptPolicy         policy_usecase.AcceptPolicy
+	authorizationService service.AuthorizationService
 }
 
 func NewPolicyHandler(
 	checkConsentQuery policy_query.CheckConsent,
 	acceptPolicy policy_usecase.AcceptPolicy,
-	authService service.AuthenticationService,
+	authorizationService service.AuthorizationService,
 ) oas.PolicyHandler {
 	return &policyHandler{
-		checkConsentQuery: checkConsentQuery,
-		acceptPolicy:      acceptPolicy,
-		authService:       authService,
+		checkConsentQuery:    checkConsentQuery,
+		acceptPolicy:         acceptPolicy,
+		authorizationService: authorizationService,
 	}
 }
 
@@ -39,14 +37,13 @@ func (h *policyHandler) GetPolicyConsentStatus(ctx context.Context) (oas.GetPoli
 	ctx, span := otel.Tracer("handler").Start(ctx, "PolicyHandler.CheckConsent")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(h.authService, ctx)
+	authCtx, err := h.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
-	userID := authCtx.UserID
 
 	output, err := h.checkConsentQuery.Execute(ctx, policy_query.CheckConsentInput{
-		UserID: shared.UUID[user.User](userID),
+		UserID: authCtx.UserID,
 	})
 	if err != nil {
 		return nil, err
@@ -66,7 +63,8 @@ func (h *policyHandler) GetPolicyConsentStatus(ctx context.Context) (oas.GetPoli
 func (h *policyHandler) PolicyConsent(ctx context.Context, req *oas.PolicyConsentReq) (oas.PolicyConsentRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "PolicyHandler.AcceptPolicy")
 	defer span.End()
-	authCtx, err := requireAuthentication(h.authService, ctx)
+
+	authCtx, err := h.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}

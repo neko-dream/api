@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/sqlc-dev/pqtype"
 )
 
 const changeSubject = `-- name: ChangeSubject :exec
@@ -80,6 +81,127 @@ func (q *Queries) CreateUserAuth(ctx context.Context, arg CreateUserAuthParams) 
 	return err
 }
 
+const createUserStatusChangeLog = `-- name: CreateUserStatusChangeLog :exec
+INSERT INTO user_status_change_logs (
+    user_status_change_logs_id,
+    user_id,
+    status,
+    reason,
+    changed_at,
+    changed_by,
+    ip_address,
+    user_agent,
+    additional_data
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+`
+
+type CreateUserStatusChangeLogParams struct {
+	UserStatusChangeLogsID uuid.UUID
+	UserID                 uuid.UUID
+	Status                 string
+	Reason                 sql.NullString
+	ChangedAt              time.Time
+	ChangedBy              string
+	IpAddress              pqtype.Inet
+	UserAgent              sql.NullString
+	AdditionalData         pqtype.NullRawMessage
+}
+
+// CreateUserStatusChangeLog
+//
+//	INSERT INTO user_status_change_logs (
+//	    user_status_change_logs_id,
+//	    user_id,
+//	    status,
+//	    reason,
+//	    changed_at,
+//	    changed_by,
+//	    ip_address,
+//	    user_agent,
+//	    additional_data
+//	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+func (q *Queries) CreateUserStatusChangeLog(ctx context.Context, arg CreateUserStatusChangeLogParams) error {
+	_, err := q.db.ExecContext(ctx, createUserStatusChangeLog,
+		arg.UserStatusChangeLogsID,
+		arg.UserID,
+		arg.Status,
+		arg.Reason,
+		arg.ChangedAt,
+		arg.ChangedBy,
+		arg.IpAddress,
+		arg.UserAgent,
+		arg.AdditionalData,
+	)
+	return err
+}
+
+const findUserStatusChangeLogsByUserID = `-- name: FindUserStatusChangeLogsByUserID :many
+SELECT
+    user_status_change_logs_id,
+    user_id,
+    status,
+    reason,
+    changed_at,
+    changed_by,
+    ip_address,
+    user_agent,
+    additional_data,
+    created_at
+FROM user_status_change_logs
+WHERE user_id = $1
+ORDER BY changed_at DESC
+`
+
+// FindUserStatusChangeLogsByUserID
+//
+//	SELECT
+//	    user_status_change_logs_id,
+//	    user_id,
+//	    status,
+//	    reason,
+//	    changed_at,
+//	    changed_by,
+//	    ip_address,
+//	    user_agent,
+//	    additional_data,
+//	    created_at
+//	FROM user_status_change_logs
+//	WHERE user_id = $1
+//	ORDER BY changed_at DESC
+func (q *Queries) FindUserStatusChangeLogsByUserID(ctx context.Context, userID uuid.UUID) ([]UserStatusChangeLog, error) {
+	rows, err := q.db.QueryContext(ctx, findUserStatusChangeLogsByUserID, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []UserStatusChangeLog
+	for rows.Next() {
+		var i UserStatusChangeLog
+		if err := rows.Scan(
+			&i.UserStatusChangeLogsID,
+			&i.UserID,
+			&i.Status,
+			&i.Reason,
+			&i.ChangedAt,
+			&i.ChangedBy,
+			&i.IpAddress,
+			&i.UserAgent,
+			&i.AdditionalData,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getUserAuthByUserID = `-- name: GetUserAuthByUserID :one
 SELECT
     user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at
@@ -117,7 +239,7 @@ func (q *Queries) GetUserAuthByUserID(ctx context.Context, userID uuid.UUID) (Ge
 
 const getUserByID = `-- name: GetUserByID :one
 SELECT
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date
 FROM
     "users"
 WHERE
@@ -131,7 +253,7 @@ type GetUserByIDRow struct {
 // GetUserByID
 //
 //	SELECT
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date
 //	FROM
 //	    "users"
 //	WHERE
@@ -148,13 +270,14 @@ func (q *Queries) GetUserByID(ctx context.Context, userID uuid.UUID) (GetUserByI
 		&i.User.UpdatedAt,
 		&i.User.Email,
 		&i.User.EmailVerified,
+		&i.User.WithdrawalDate,
 	)
 	return i, err
 }
 
 const getUserBySubject = `-- name: GetUserBySubject :one
 SELECT
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
     user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at
 FROM
     "users"
@@ -171,7 +294,7 @@ type GetUserBySubjectRow struct {
 // GetUserBySubject
 //
 //	SELECT
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
 //	    user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at
 //	FROM
 //	    "users"
@@ -190,6 +313,7 @@ func (q *Queries) GetUserBySubject(ctx context.Context, subject string) (GetUser
 		&i.User.UpdatedAt,
 		&i.User.Email,
 		&i.User.EmailVerified,
+		&i.User.WithdrawalDate,
 		&i.UserAuth.UserAuthID,
 		&i.UserAuth.UserID,
 		&i.UserAuth.Provider,
@@ -235,7 +359,7 @@ func (q *Queries) GetUserDemographicByUserID(ctx context.Context, userID uuid.UU
 
 const getUserDetailByID = `-- name: GetUserDetailByID :one
 SELECT
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
     user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at,
     user_demographics.user_demographics_id, user_demographics.user_id, user_demographics.date_of_birth, user_demographics.gender, user_demographics.city, user_demographics.created_at, user_demographics.updated_at, user_demographics.prefecture
 FROM
@@ -255,7 +379,7 @@ type GetUserDetailByIDRow struct {
 // GetUserDetailByID
 //
 //	SELECT
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
 //	    user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at,
 //	    user_demographics.user_demographics_id, user_demographics.user_id, user_demographics.date_of_birth, user_demographics.gender, user_demographics.city, user_demographics.created_at, user_demographics.updated_at, user_demographics.prefecture
 //	FROM
@@ -276,6 +400,7 @@ func (q *Queries) GetUserDetailByID(ctx context.Context, userID uuid.UUID) (GetU
 		&i.User.UpdatedAt,
 		&i.User.Email,
 		&i.User.EmailVerified,
+		&i.User.WithdrawalDate,
 		&i.UserAuth.UserAuthID,
 		&i.UserAuth.UserID,
 		&i.UserAuth.Provider,
@@ -292,6 +417,18 @@ func (q *Queries) GetUserDetailByID(ctx context.Context, userID uuid.UUID) (GetU
 		&i.UserDemographic.Prefecture,
 	)
 	return i, err
+}
+
+const reactivateUser = `-- name: ReactivateUser :exec
+UPDATE "users" SET withdrawal_date = NULL WHERE user_id = $1
+`
+
+// ReactivateUser
+//
+//	UPDATE "users" SET withdrawal_date = NULL WHERE user_id = $1
+func (q *Queries) ReactivateUser(ctx context.Context, userID uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, reactivateUser, userID)
+	return err
 }
 
 const updateOrCreateUserDemographic = `-- name: UpdateOrCreateUserDemographic :exec
@@ -355,21 +492,22 @@ func (q *Queries) UpdateOrCreateUserDemographic(ctx context.Context, arg UpdateO
 }
 
 const updateUser = `-- name: UpdateUser :exec
-UPDATE "users" SET display_id = $2, display_name = $3, icon_url = $4, email = $5, email_verified = $6 WHERE user_id = $1
+UPDATE "users" SET display_id = $2, display_name = $3, icon_url = $4, email = $5, email_verified = $6, withdrawal_date = $7 WHERE user_id = $1
 `
 
 type UpdateUserParams struct {
-	UserID        uuid.UUID
-	DisplayID     sql.NullString
-	DisplayName   sql.NullString
-	IconUrl       sql.NullString
-	Email         sql.NullString
-	EmailVerified bool
+	UserID         uuid.UUID
+	DisplayID      sql.NullString
+	DisplayName    sql.NullString
+	IconUrl        sql.NullString
+	Email          sql.NullString
+	EmailVerified  bool
+	WithdrawalDate sql.NullTime
 }
 
 // UpdateUser
 //
-//	UPDATE "users" SET display_id = $2, display_name = $3, icon_url = $4, email = $5, email_verified = $6 WHERE user_id = $1
+//	UPDATE "users" SET display_id = $2, display_name = $3, icon_url = $4, email = $5, email_verified = $6, withdrawal_date = $7 WHERE user_id = $1
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
 	_, err := q.db.ExecContext(ctx, updateUser,
 		arg.UserID,
@@ -378,13 +516,31 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
 		arg.IconUrl,
 		arg.Email,
 		arg.EmailVerified,
+		arg.WithdrawalDate,
 	)
+	return err
+}
+
+const updateUserEmailAndSubject = `-- name: UpdateUserEmailAndSubject :exec
+UPDATE "users" SET email = $2 WHERE user_id = $1
+`
+
+type UpdateUserEmailAndSubjectParams struct {
+	UserID uuid.UUID
+	Email  sql.NullString
+}
+
+// UpdateUserEmailAndSubject
+//
+//	UPDATE "users" SET email = $2 WHERE user_id = $1
+func (q *Queries) UpdateUserEmailAndSubject(ctx context.Context, arg UpdateUserEmailAndSubjectParams) error {
+	_, err := q.db.ExecContext(ctx, updateUserEmailAndSubject, arg.UserID, arg.Email)
 	return err
 }
 
 const userFindByDisplayID = `-- name: UserFindByDisplayID :one
 SELECT
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date
 FROM
     "users"
 WHERE
@@ -398,7 +554,7 @@ type UserFindByDisplayIDRow struct {
 // UserFindByDisplayID
 //
 //	SELECT
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date
 //	FROM
 //	    "users"
 //	WHERE
@@ -415,6 +571,7 @@ func (q *Queries) UserFindByDisplayID(ctx context.Context, displayID sql.NullStr
 		&i.User.UpdatedAt,
 		&i.User.Email,
 		&i.User.EmailVerified,
+		&i.User.WithdrawalDate,
 	)
 	return i, err
 }
@@ -428,5 +585,22 @@ UPDATE "user_auths" SET is_verified = true WHERE user_id = $1
 //	UPDATE "user_auths" SET is_verified = true WHERE user_id = $1
 func (q *Queries) VerifyUser(ctx context.Context, userID uuid.UUID) error {
 	_, err := q.db.ExecContext(ctx, verifyUser, userID)
+	return err
+}
+
+const withdrawUser = `-- name: WithdrawUser :exec
+UPDATE "users" SET withdrawal_date = $2 WHERE user_id = $1
+`
+
+type WithdrawUserParams struct {
+	UserID         uuid.UUID
+	WithdrawalDate sql.NullTime
+}
+
+// WithdrawUser
+//
+//	UPDATE "users" SET withdrawal_date = $2 WHERE user_id = $1
+func (q *Queries) WithdrawUser(ctx context.Context, arg WithdrawUserParams) error {
+	_, err := q.db.ExecContext(ctx, withdrawUser, arg.UserID, arg.WithdrawalDate)
 	return err
 }

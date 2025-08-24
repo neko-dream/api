@@ -1,6 +1,13 @@
 package messages
 
 var (
+	// 組織に所属していない場合のエラー
+	ErrNotInOrganization = &APIError{
+		StatusCode: 403,
+		Code:       "AUTH-NOT-IN-ORGANIZATION",
+		Message:    "組織への所属が必要です",
+	}
+
 	ForbiddenError = &APIError{
 		StatusCode: 403,
 		Code:       "AUTH-0000",
@@ -50,5 +57,22 @@ var (
 		StatusCode: 401,
 		Code:       "AUTH-0009",
 		Message:    "パスワードが不正です。",
+	}
+	UserWithdrawnRecoverableError = &APIError{
+		StatusCode: 403,
+		Code:       "AUTH-0010",
+		Message:    "このアカウントは退会済みです。30日以内であれば復活可能です。",
+	}
+	// 認証情報の解析に失敗した場合のエラー
+	AuthenticationFailedError = &APIError{
+		StatusCode: 401,
+		Code:       "AUTH-0011",
+		Message:    "認証情報の解析に失敗しました。再度ログインしてください。",
+	}
+	// セッション情報の解析に失敗した場合のエラー
+	SessionParseError = &APIError{
+		StatusCode: 401,
+		Code:       "AUTH-0012",
+		Message:    "セッション情報の解析に失敗しました。再度ログインしてください。",
 	}
 )

@@ -3,8 +3,13 @@ package organization
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
+)
+
+var (
+	KotohiroOrganizationID = shared.UUID[Organization](uuid.MustParse("00000000-0000-0000-0000-000000000001"))
 )
 
 type OrganizationRepository interface {

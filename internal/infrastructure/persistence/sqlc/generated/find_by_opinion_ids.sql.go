@@ -15,7 +15,7 @@ import (
 const findOpinionsByOpinionIDs = `-- name: FindOpinionsByOpinionIDs :many
 SELECT
     opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date
 FROM
     opinions
 LEFT JOIN users
@@ -34,7 +34,7 @@ type FindOpinionsByOpinionIDsRow struct {
 //
 //	SELECT
 //	    opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date
 //	FROM
 //	    opinions
 //	LEFT JOIN users
@@ -79,6 +79,7 @@ func (q *Queries) FindOpinionsByOpinionIDs(ctx context.Context, opinionIds []uui
 			&i.User.UpdatedAt,
 			&i.User.Email,
 			&i.User.EmailVerified,
+			&i.User.WithdrawalDate,
 		); err != nil {
 			return nil, err
 		}

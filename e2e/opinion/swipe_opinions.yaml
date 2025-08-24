@@ -21,6 +21,7 @@ steps:
     desc: ユーザー削除
     dev:
       query: |
+        DELETE FROM user_status_change_logs WHERE (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}') = user_id;
         DELETE FROM user_demographics WHERE (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}') = user_id;
         DELETE FROM talk_sessions WHERE owner_id = (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}');
         DELETE FROM user_auths WHERE subject = '{{ vars.id }}';
@@ -30,6 +31,7 @@ steps:
     desc: 他のユーザー削除
     dev:
       query: |
+        DELETE FROM user_status_change_logs WHERE (SELECT user_id FROM users WHERE display_id = '{{ vars.other_id }}') = user_id;
         DELETE FROM user_demographics WHERE (SELECT user_id FROM users WHERE display_id = '{{ vars.other_id }}') = user_id;
         DELETE FROM talk_sessions WHERE owner_id = (SELECT user_id FROM users WHERE display_id = '{{ vars.other_id }}');
         DELETE FROM user_auths WHERE subject = '{{ vars.other_id }}';
@@ -90,15 +92,25 @@ steps:
     bind:
       talkSession: current.res.body
 
+  consentSession:
+    desc: セッションへの同意
+    req:
+      /talksessions/{{ talkSession.id }}/consent:
+        post:
+          body:
+            multipart/form-data:
+              userID: "{{ vars.id }}"
+
   createOtherOpinions:
     desc: 他のユーザーで意見を投稿
     loop:
       count: 5
     req:
-      /talksessions/{{ talkSession.id }}/opinions:
+      /opinions:
         post:
           body:
             multipart/form-data:
+              talkSessionID: "{{ talkSession.id }}"
               opinionContent: "他のユーザーの意見 {{ i }}"
               title: "他のユーザーのタイトル {{ i }}"
 
@@ -122,6 +134,15 @@ steps:
           headers: null
     test: len(current.res.headers['Set-Cookie']) > 0
 
+  consentSession2:
+    desc: セッションへの同意
+    req:
+      /talksessions/{{ talkSession.id }}/consent:
+        post:
+          body:
+            multipart/form-data:
+              userID: "{{ vars.id }}"
+
   createOpinions:
     desc: 自分の意見を投稿
     loop:
@@ -132,7 +153,7 @@ steps:
           body:
             multipart/form-data:
               talkSessionID: "{{ talkSession.id }}"
-              content: "自分の意見 {{ i }}"
+              opinionContent: "自分の意見 {{ i }}"
               title: "自分のタイトル {{ i }}"
 
   getSwipeOpinions:

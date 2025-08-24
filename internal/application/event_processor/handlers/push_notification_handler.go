@@ -8,6 +8,7 @@ import (
 
 	"github.com/neko-dream/server/internal/domain/model/event"
 	"github.com/neko-dream/server/internal/domain/model/notification"
+	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
 	"github.com/neko-dream/server/internal/domain/model/user"
@@ -128,7 +129,7 @@ func (h *TalkSessionPushNotificationHandler) getNotificationTargetsForNewSession
 	session *talksession.TalkSession,
 ) ([]shared.UUID[user.User], error) {
 	// 運営（Neko Dream）のセッションかチェック
-	if h.isNekoDreamSession(session) {
+	if h.isKotohiroSession(session) {
 		// TODO: 全アクティブユーザーを取得する機能を実装
 		// 現在は空のリストを返す
 		return []shared.UUID[user.User]{}, nil
@@ -138,14 +139,13 @@ func (h *TalkSessionPushNotificationHandler) getNotificationTargetsForNewSession
 	return []shared.UUID[user.User]{}, nil
 }
 
-// isNekoDreamSession 運営のセッションかチェック
-func (h *TalkSessionPushNotificationHandler) isNekoDreamSession(session *talksession.TalkSession) bool {
-	nekoDreamOrgID := "00000000-0000-0000-0000-000000000001"
+// isKotohiroSession 運営のセッションかチェック
+func (h *TalkSessionPushNotificationHandler) isKotohiroSession(session *talksession.TalkSession) bool {
 	if session.OrganizationID() == nil {
 		return false
 	}
 
-	return session.OrganizationID().String() == nekoDreamOrgID
+	return session.OrganizationID().String() == organization.KotohiroOrganizationID.String()
 }
 
 // createNewSessionNotifications 新規セッション通知を作成

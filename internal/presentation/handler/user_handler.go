@@ -26,10 +26,11 @@ type userHandler struct {
 
 	editUser     user_usecase.Edit
 	registerUser user_usecase.Register
+	withdrawUser user_usecase.Withdraw
 
-	userDetail     user_query.Detail
-	getByDisplayID user_query.GetByDisplayID
-	authService    service.AuthenticationService
+	userDetail           user_query.Detail
+	getByDisplayID       user_query.GetByDisplayID
+	authorizationService service.AuthorizationService
 	cookie.CookieManager
 }
 
@@ -39,10 +40,11 @@ func NewUserHandler(
 
 	editUser user_usecase.Edit,
 	registerUser user_usecase.Register,
+	withdrawUser user_usecase.Withdraw,
 
 	userDetail user_query.Detail,
 	getByDisplayID user_query.GetByDisplayID,
-	authService service.AuthenticationService,
+	authorizationService service.AuthorizationService,
 	cookieManager cookie.CookieManager,
 ) oas.UserHandler {
 	return &userHandler{
@@ -50,9 +52,10 @@ func NewUserHandler(
 		browseJoinedTalkSessionQuery: browseJoinedTalkSessionQuery,
 		editUser:                     editUser,
 		registerUser:                 registerUser,
+		withdrawUser:                 withdrawUser,
 		userDetail:                   userDetail,
 		getByDisplayID:               getByDisplayID,
-		authService:                  authService,
+		authorizationService:         authorizationService,
 		CookieManager:                cookieManager,
 	}
 }
@@ -62,7 +65,7 @@ func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHi
 	ctx, span := otel.Tracer("handler").Start(ctx, "userHandler.OpinionsHistory")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(u.authService, ctx)
+	authCtx, err := u.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +121,7 @@ func (u *userHandler) SessionsHistory(ctx context.Context, params oas.SessionsHi
 	ctx, span := otel.Tracer("handler").Start(ctx, "userHandler.SessionsHistory")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(u.authService, ctx)
+	authCtx, err := u.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -174,7 +177,7 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 	ctx, span := otel.Tracer("handler").Start(ctx, "userHandler.GetUserInfo")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(u.authService, ctx)
+	authCtx, err := u.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -213,7 +216,7 @@ func (u *userHandler) UpdateUserProfile(ctx context.Context, params *oas.UpdateU
 		return nil, messages.RequiredParameterError
 	}
 
-	authCtx, err := requireAuthentication(u.authService, ctx)
+	authCtx, err := u.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -300,7 +303,7 @@ func (u *userHandler) EstablishUser(ctx context.Context, params *oas.EstablishUs
 		return nil, messages.RequiredParameterError
 	}
 
-	authCtx, err := requireAuthentication(u.authService, ctx)
+	authCtx, err := u.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -382,4 +385,29 @@ func (u *userHandler) GetUserByDisplayID(ctx context.Context, params oas.GetUser
 
 	userResp := result.User.ToResponse()
 	return &userResp, nil
+}
+
+// WithdrawUser implements oas.UserHandler.
+func (u *userHandler) WithdrawUser(ctx context.Context) (oas.WithdrawUserRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "userHandler.WithdrawUser")
+	defer span.End()
+
+	authCtx, err := u.authorizationService.RequireAuthentication(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// 退会処理を実行
+	output, err := u.withdrawUser.Execute(ctx, user_usecase.WithdrawInput{
+		UserID: authCtx.UserID,
+	})
+	if err != nil {
+		utils.HandleError(ctx, err, "withdrawUser.Execute")
+		return nil, err
+	}
+
+	return &oas.WithdrawUserOK{
+		Message:        output.Message,
+		WithdrawalDate: output.WithdrawalDate,
+	}, nil
 }

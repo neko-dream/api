@@ -572,6 +572,15 @@ func (UnimplementedHandler) PostTimeLineItem(ctx context.Context, req *PostTimeL
 	return r, ht.ErrNotImplemented
 }
 
+// ReactivateUser implements reactivateUser operation.
+//
+// 退会ユーザーの復活.
+//
+// POST /auth/reactivate
+func (UnimplementedHandler) ReactivateUser(ctx context.Context) (r ReactivateUserRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // RegisterDevice implements registerDevice operation.
 //
 // デバイス登録/更新.
@@ -636,6 +645,15 @@ func (UnimplementedHandler) SwipeOpinions(ctx context.Context, params SwipeOpini
 	return r, ht.ErrNotImplemented
 }
 
+// SwitchOrganization implements switchOrganization operation.
+//
+// 組織切り替え.
+//
+// POST /organizations/switch/{code}
+func (UnimplementedHandler) SwitchOrganization(ctx context.Context, params SwitchOrganizationParams) (r SwitchOrganizationRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // TalkSessionAnalysis implements talkSessionAnalysis operation.
 //
 // 分析結果一覧.
@@ -694,5 +712,14 @@ func (UnimplementedHandler) ValidateOrganizationCode(ctx context.Context, params
 //
 // POST /opinions/{opinionID}/votes
 func (UnimplementedHandler) Vote2(ctx context.Context, req *Vote2Req, params Vote2Params) (r Vote2Res, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// WithdrawUser implements withdrawUser operation.
+//
+// ユーザー退会.
+//
+// DELETE /user
+func (UnimplementedHandler) WithdrawUser(ctx context.Context) (r WithdrawUserRes, _ error) {
 	return r, ht.ErrNotImplemented
 }

@@ -42,4 +42,21 @@ var (
 		Code:       "USER-0007",
 		Message:    "ユーザ名は1文字以上で入力してください。",
 	}
+
+	// 退会関連のエラー
+	UserAlreadyWithdrawn = &APIError{
+		StatusCode: 400,
+		Code:       "USER-0011",
+		Message:    "既に退会済みです",
+	}
+	UserNotWithdrawn = &APIError{
+		StatusCode: 400,
+		Code:       "USER-0012",
+		Message:    "このアカウントは退会していません",
+	}
+	UserReactivationPeriodExpired = &APIError{
+		StatusCode: 403,
+		Code:       "USER-0013",
+		Message:    "復活可能期間（30日）を過ぎています",
+	}
 )

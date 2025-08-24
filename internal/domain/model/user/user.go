@@ -2,12 +2,21 @@ package user
 
 import (
 	"context"
+	"database/sql"
+	"fmt"
+	"time"
 	"unicode/utf8"
 
 	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/shared"
+	"github.com/neko-dream/server/pkg/random"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
+)
+
+const (
+	// ReactivationPeriodDays 復活可能期間（日数）
+	ReactivationPeriodDays = 30
 )
 
 type UserName string
@@ -29,6 +38,7 @@ type (
 		FindBySubject(context.Context, UserSubject) (*User, error)
 		FindByDisplayID(context.Context, string) (*User, error)
 		Update(context.Context, User) error
+		ChangeSubject(context.Context, shared.UUID[User], string) error
 	}
 
 	// UserService ユーザードメインサービス
@@ -38,15 +48,16 @@ type (
 	}
 
 	User struct {
-		userID        shared.UUID[User]
-		displayID     *string
-		displayName   *string
-		iconURL       *string
-		subject       string
-		provider      shared.AuthProviderName
-		demographics  *UserDemographic
-		email         *string
-		emailVerified bool
+		userID         shared.UUID[User]
+		displayID      *string
+		displayName    *string
+		iconURL        *string
+		subject        string
+		provider       shared.AuthProviderName
+		demographics   *UserDemographic
+		email          *string
+		emailVerified  bool
+		withdrawalDate *time.Time
 	}
 )
 
@@ -136,6 +147,82 @@ func (u *User) IsEmailVerified() bool {
 	return u.emailVerified
 }
 
+// 退会関連メソッド
+
+// Withdraw ユーザーを退会状態にする
+func (u *User) Withdraw(now time.Time) error {
+	if u.withdrawalDate != nil {
+		return ErrAlreadyWithdrawn
+	}
+	u.withdrawalDate = &now
+	return nil
+}
+
+// IsWithdrawn ユーザーが退会しているかどうか
+func (u *User) IsWithdrawn() bool {
+	return u.withdrawalDate != nil
+}
+
+// WithdrawalDate 退会日時を取得
+func (u *User) WithdrawalDate() *time.Time {
+	return u.withdrawalDate
+}
+
+// CanReactivate 復活可能かどうかを判定
+func (u *User) CanReactivate(now time.Time) (bool, error) {
+	if u.withdrawalDate == nil {
+		return false, ErrNotWithdrawn
+	}
+
+	daysSinceWithdrawal := now.Sub(*u.withdrawalDate).Hours() / 24
+	if daysSinceWithdrawal > ReactivationPeriodDays {
+		return false, ErrReactivationPeriodExpired
+	}
+
+	return true, nil
+}
+
+// Reactivate ユーザーを復活させる
+func (u *User) Reactivate(now time.Time) error {
+	if _, err := u.CanReactivate(now); err != nil {
+		return err
+	}
+	u.withdrawalDate = nil
+	return nil
+}
+
+// IsReactivationPeriodExpired 復活可能期間が過ぎているかチェック
+func (u *User) IsReactivationPeriodExpired(now time.Time) bool {
+	if u.withdrawalDate == nil {
+		return false
+	}
+	daysSinceWithdrawal := now.Sub(*u.withdrawalDate).Hours() / 24
+	return daysSinceWithdrawal > ReactivationPeriodDays
+}
+
+// PrepareForDeleteUser 削除前の準備
+func (u *User) PrepareForDeleteUser() (newSubject string) {
+	if u.withdrawalDate == nil {
+		return u.subject
+	}
+
+	withdrawnSuffix := fmt.Sprintf("_withdrawn_%d", u.withdrawalDate.Unix())
+	newSubject = u.subject + withdrawnSuffix
+	u.subject = newSubject
+	u.email = nil           // 退会後はメールアドレスをクリア
+	u.emailVerified = false // メールアドレスの検証状態もクリア
+	u.iconURL = nil         // アイコンURLもクリア
+	u.displayID = lo.ToPtr(fmt.Sprintf("%s_%s", *u.displayID, random.GenerateRandom()))
+	u.displayName = lo.ToPtr("unknown")
+
+	return newSubject
+}
+
+// ChangeSubject subjectを変更する（31日経過後の重複回避用）
+func (u *User) ChangeSubject(newSubject string) {
+	u.subject = newSubject
+}
+
 func NewUser(
 	userID shared.UUID[User],
 	displayID *string,
@@ -152,4 +239,21 @@ func NewUser(
 		provider:    provider,
 		iconURL:     iconURL,
 	}
+}
+
+// NewUserWithWithdrawalDate リポジトリから読み込む際に使用
+func NewUserWithWithdrawalDate(
+	userID shared.UUID[User],
+	displayID *string,
+	displayName *string,
+	subject string,
+	provider shared.AuthProviderName,
+	iconURL *string,
+	withdrawalDate sql.NullTime,
+) User {
+	user := NewUser(userID, displayID, displayName, subject, provider, iconURL)
+	if withdrawalDate.Valid {
+		user.withdrawalDate = &withdrawalDate.Time
+	}
+	return user
 }

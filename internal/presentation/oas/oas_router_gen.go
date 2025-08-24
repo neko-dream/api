@@ -208,24 +208,60 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					}
 
 					elem = origElem
-				case 'r': // Prefix: "revoke"
+				case 'r': // Prefix: "re"
 					origElem := elem
-					if l := len("revoke"); len(elem) >= l && elem[0:l] == "revoke" {
+					if l := len("re"); len(elem) >= l && elem[0:l] == "re" {
 						elem = elem[l:]
 					} else {
 						break
 					}
 
 					if len(elem) == 0 {
-						// Leaf node.
-						switch r.Method {
-						case "POST":
-							s.handleRevokeTokenRequest([0]string{}, elemIsEscaped, w, r)
-						default:
-							s.notAllowed(w, r, "POST")
+						break
+					}
+					switch elem[0] {
+					case 'a': // Prefix: "activate"
+						origElem := elem
+						if l := len("activate"); len(elem) >= l && elem[0:l] == "activate" {
+							elem = elem[l:]
+						} else {
+							break
 						}
 
-						return
+						if len(elem) == 0 {
+							// Leaf node.
+							switch r.Method {
+							case "POST":
+								s.handleReactivateUserRequest([0]string{}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "POST")
+							}
+
+							return
+						}
+
+						elem = origElem
+					case 'v': // Prefix: "voke"
+						origElem := elem
+						if l := len("voke"); len(elem) >= l && elem[0:l] == "voke" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch r.Method {
+							case "POST":
+								s.handleRevokeTokenRequest([0]string{}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "POST")
+							}
+
+							return
+						}
+
+						elem = origElem
 					}
 
 					elem = origElem
@@ -999,6 +1035,34 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								}
 
 								elem = origElem
+							case 's': // Prefix: "switch/"
+								origElem := elem
+								if l := len("switch/"); len(elem) >= l && elem[0:l] == "switch/" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								// Param: "code"
+								// Leaf parameter
+								args[0] = elem
+								elem = ""
+
+								if len(elem) == 0 {
+									// Leaf node.
+									switch r.Method {
+									case "POST":
+										s.handleSwitchOrganizationRequest([1]string{
+											args[0],
+										}, elemIsEscaped, w, r)
+									default:
+										s.notAllowed(w, r, "POST")
+									}
+
+									return
+								}
+
+								elem = origElem
 							case 'u': // Prefix: "users"
 								origElem := elem
 								if l := len("users"); len(elem) >= l && elem[0:l] == "users" {
@@ -1612,6 +1676,8 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 				if len(elem) == 0 {
 					switch r.Method {
+					case "DELETE":
+						s.handleWithdrawUserRequest([0]string{}, elemIsEscaped, w, r)
 					case "GET":
 						s.handleGetUserInfoRequest([0]string{}, elemIsEscaped, w, r)
 					case "POST":
@@ -1619,7 +1685,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					case "PUT":
 						s.handleUpdateUserProfileRequest([0]string{}, elemIsEscaped, w, r)
 					default:
-						s.notAllowed(w, r, "GET,POST,PUT")
+						s.notAllowed(w, r, "DELETE,GET,POST,PUT")
 					}
 
 					return
@@ -2150,28 +2216,68 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					}
 
 					elem = origElem
-				case 'r': // Prefix: "revoke"
+				case 'r': // Prefix: "re"
 					origElem := elem
-					if l := len("revoke"); len(elem) >= l && elem[0:l] == "revoke" {
+					if l := len("re"); len(elem) >= l && elem[0:l] == "re" {
 						elem = elem[l:]
 					} else {
 						break
 					}
 
 					if len(elem) == 0 {
-						// Leaf node.
-						switch method {
-						case "POST":
-							r.name = "RevokeToken"
-							r.summary = "トークンを失効（ログアウト）"
-							r.operationID = "revokeToken"
-							r.pathPattern = "/auth/revoke"
-							r.args = args
-							r.count = 0
-							return r, true
-						default:
-							return
+						break
+					}
+					switch elem[0] {
+					case 'a': // Prefix: "activate"
+						origElem := elem
+						if l := len("activate"); len(elem) >= l && elem[0:l] == "activate" {
+							elem = elem[l:]
+						} else {
+							break
 						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch method {
+							case "POST":
+								r.name = "ReactivateUser"
+								r.summary = "退会ユーザーの復活"
+								r.operationID = "reactivateUser"
+								r.pathPattern = "/auth/reactivate"
+								r.args = args
+								r.count = 0
+								return r, true
+							default:
+								return
+							}
+						}
+
+						elem = origElem
+					case 'v': // Prefix: "voke"
+						origElem := elem
+						if l := len("voke"); len(elem) >= l && elem[0:l] == "voke" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch method {
+							case "POST":
+								r.name = "RevokeToken"
+								r.summary = "トークンを失効（ログアウト）"
+								r.operationID = "revokeToken"
+								r.pathPattern = "/auth/revoke"
+								r.args = args
+								r.count = 0
+								return r, true
+							default:
+								return
+							}
+						}
+
+						elem = origElem
 					}
 
 					elem = origElem
@@ -3053,6 +3159,36 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								}
 
 								elem = origElem
+							case 's': // Prefix: "switch/"
+								origElem := elem
+								if l := len("switch/"); len(elem) >= l && elem[0:l] == "switch/" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								// Param: "code"
+								// Leaf parameter
+								args[0] = elem
+								elem = ""
+
+								if len(elem) == 0 {
+									// Leaf node.
+									switch method {
+									case "POST":
+										r.name = "SwitchOrganization"
+										r.summary = "組織切り替え"
+										r.operationID = "switchOrganization"
+										r.pathPattern = "/organizations/switch/{code}"
+										r.args = args
+										r.count = 1
+										return r, true
+									default:
+										return
+									}
+								}
+
+								elem = origElem
 							case 'u': // Prefix: "users"
 								origElem := elem
 								if l := len("users"); len(elem) >= l && elem[0:l] == "users" {
@@ -3751,6 +3887,14 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 
 				if len(elem) == 0 {
 					switch method {
+					case "DELETE":
+						r.name = "WithdrawUser"
+						r.summary = "ユーザー退会"
+						r.operationID = "withdrawUser"
+						r.pathPattern = "/user"
+						r.args = args
+						r.count = 0
+						return r, true
 					case "GET":
 						r.name = "GetUserInfo"
 						r.summary = "ユーザー情報の取得"
