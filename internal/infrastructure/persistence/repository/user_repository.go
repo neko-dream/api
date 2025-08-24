@@ -61,13 +61,14 @@ func (u *userRepository) newUserFromModel(ctx context.Context, modelUser *model.
 		return nil, errtrace.Wrap(err)
 	}
 
-	user := user.NewUser(
+	user := user.NewUserWithWithdrawalDate(
 		userID,
 		displayID,
 		displayName,
 		modelAuth.Subject,
 		providerName,
 		iconURL,
+		modelUser.WithdrawalDate,
 	)
 
 	if modelUser.Email.Valid {
@@ -116,6 +117,7 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 	defer span.End()
 
 	var displayID, displayName, iconURL, email sql.NullString
+	var withdrawalDate sql.NullTime
 	if user.DisplayID() != nil {
 		displayID = sql.NullString{String: *user.DisplayID(), Valid: true}
 	}
@@ -133,14 +135,18 @@ func (u *userRepository) Update(ctx context.Context, user um.User) error {
 		}
 		email = sql.NullString{String: emailEncrypted, Valid: true}
 	}
+	if user.WithdrawalDate() != nil {
+		withdrawalDate = sql.NullTime{Time: *user.WithdrawalDate(), Valid: true}
+	}
 
 	if err := u.GetQueries(ctx).UpdateUser(ctx, model.UpdateUserParams{
-		UserID:        user.UserID().UUID(),
-		DisplayName:   displayName,
-		DisplayID:     displayID,
-		IconUrl:       iconURL,
-		Email:         email,
-		EmailVerified: user.IsEmailVerified(),
+		UserID:         user.UserID().UUID(),
+		DisplayName:    displayName,
+		DisplayID:      displayID,
+		IconUrl:        iconURL,
+		Email:          email,
+		EmailVerified:  user.IsEmailVerified(),
+		WithdrawalDate: withdrawalDate,
 	}); err != nil {
 		utils.HandleError(ctx, err, "UpdateUser")
 		return errtrace.Wrap(err)
@@ -278,4 +284,15 @@ func (u *userRepository) FindBySubject(ctx context.Context, subject user.UserSub
 	}
 
 	return u.newUserFromModel(ctx, &row.User, &row.UserAuth)
+}
+
+// ChangeSubject subjectを変更する（退会ユーザーの重複回避用）
+func (u *userRepository) ChangeSubject(ctx context.Context, userID shared.UUID[user.User], newSubject string) error {
+	ctx, span := otel.Tracer("repository").Start(ctx, "userRepository.ChangeSubject")
+	defer span.End()
+
+	return u.GetQueries(ctx).ChangeSubject(ctx, model.ChangeSubjectParams{
+		UserID:  userID.UUID(),
+		Subject: newSubject,
+	})
 }

@@ -30,6 +30,7 @@ type authHandler struct {
 	passwordLogin    auth_usecase.PasswordLogin
 	passwordRegister auth_usecase.PasswordRegister
 	changePassword   auth_usecase.ChangePassword
+	reactivate       auth_usecase.Reactivate
 
 	authService service.AuthenticationService
 	cookie.CookieManager
@@ -45,6 +46,7 @@ func NewAuthHandler(
 	login auth_usecase.PasswordLogin,
 	register auth_usecase.PasswordRegister,
 	changePassword auth_usecase.ChangePassword,
+	reactivate auth_usecase.Reactivate,
 
 	authService service.AuthenticationService,
 	cookieManger cookie.CookieManager,
@@ -60,6 +62,7 @@ func NewAuthHandler(
 		passwordLogin:    login,
 		passwordRegister: register,
 		changePassword:   changePassword,
+		reactivate:       reactivate,
 	}
 }
 
@@ -295,4 +298,41 @@ func (a *authHandler) ChangePassword(ctx context.Context, params oas.ChangePassw
 
 	res := &oas.ChangePasswordOK{}
 	return res, nil
+}
+
+func (a *authHandler) ReactivateUser(ctx context.Context) (oas.ReactivateUserRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.ReactivateUser")
+	defer span.End()
+
+	// トークンから退会ユーザー情報を取得
+	claim := session.GetSession(ctx)
+	if claim == nil {
+		return nil, messages.ForbiddenError
+	}
+
+	// 退会していないユーザーからのリクエストの場合
+	if !claim.IsWithdrawn {
+		return nil, messages.UserNotWithdrawn
+	}
+
+	// ユーザーIDを取得
+	userID, err := claim.UserID()
+	if err != nil {
+		utils.HandleError(ctx, err, "claim.UserID")
+		return nil, messages.InternalServerError
+	}
+
+	// 復活処理を実行
+	output, err := a.reactivate.Execute(ctx, auth_usecase.ReactivateInput{
+		UserID: userID,
+	})
+	if err != nil {
+		utils.HandleError(ctx, err, "reactivate.Execute")
+		return nil, err
+	}
+
+	return &oas.ReactivateUserOK{
+		Message: output.Message,
+		User:    output.User.ToResponse(),
+	}, nil
 }

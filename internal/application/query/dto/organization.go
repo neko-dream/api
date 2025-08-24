@@ -32,6 +32,7 @@ func (ou *OrganizationUser) SetRoleName(role int) {
 type OrganizationResponse struct {
 	Organization     Organization     `json:"organization"`
 	OrganizationUser OrganizationUser `json:"organization_user"`
+	User             User             `json:"user"`
 }
 
 func (o *OrganizationResponse) ToResponse() oas.Organization {
@@ -42,6 +43,18 @@ func (o *OrganizationResponse) ToResponse() oas.Organization {
 		Type:     o.Organization.OrganizationType,
 		Role:     o.OrganizationUser.Role,
 		RoleName: o.OrganizationUser.RoleName,
+	}
+}
+
+func (o *OrganizationResponse) ToUserResponse() oas.OrganizationUser {
+	user := o.User.ToResponse()
+	return oas.OrganizationUser{
+		DisplayName: user.DisplayName,
+		DisplayID:   user.DisplayID,
+		IconURL:     user.IconURL,
+		Role:        o.OrganizationUser.Role,
+		RoleName:    o.OrganizationUser.RoleName,
+		UserID:      o.OrganizationUser.UserID,
 	}
 }
 

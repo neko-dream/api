@@ -1,14 +1,17 @@
 #!/bin/bash
 
+SCRIPT_DIR=$(cd $(dirname $0); pwd)
+source "${SCRIPT_DIR}/utils.sh"
+
 if [ $# -lt 2 ]; then
-    echo "エラー: 環境とインポートファイルを指定してください"
+    print_error "エラー: 環境とインポートファイルを指定してください"
     echo ""
-    echo "使い方: $0 <dev|prd> <import_file.sql>"
+    print_info "使い方: $0 <dev|prd> <import_file.sql>"
     echo ""
-    echo "例:"
+    print_info "例:"
     echo "  $0 dev supabase_to_dev_dump_20240101_120000.sql"
     echo ""
-    echo "オプション:"
+    print_info "オプション:"
     echo "  --truncate       インポート前に全テーブルをTRUNCATE"
     echo "  --no-triggers    トリガーを無効化してインポート"
     echo "  --reset-sequence COPY形式インポート後にシーケンスをリセット"
@@ -39,7 +42,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         *)
-            echo "不明なオプション: $1"
+            print_error "不明なオプション: $1"
             exit 1
             ;;
     esac
@@ -47,33 +50,33 @@ done
 
 # ファイルの存在確認
 if [ ! -f "$IMPORT_FILE" ]; then
-    echo "エラー: ファイルが見つかりません: $IMPORT_FILE"
+    print_error "エラー: ファイルが見つかりません: $IMPORT_FILE"
     exit 1
 fi
 
 # 環境の確認
 case "$ENV" in
     "dev")
-        echo "dev環境にインポートします"
+        print_info "dev環境にインポートします"
         ;;
     "prd"|"prod")
-        echo "⚠️  警告: 本番環境にデータをインポートしようとしています！"
+        print_warning "⚠️  警告: 本番環境にデータをインポートしようとしています！"
         echo -n "本当に続けますか？ (yes/no): "
         read confirmation
 
         if [ "$confirmation" != "yes" ]; then
-            echo "インポートをキャンセルしました"
+            print_info "インポートをキャンセルしました"
             exit 0
         fi
         ;;
     *)
-        echo "エラー: 無効な環境 '$ENV'"
+        print_error "エラー: 無効な環境 '$ENV'"
         exit 1
         ;;
 esac
 
 echo ""
-echo "インポート設定:"
+print_info "インポート設定:"
 echo "  環境: $ENV"
 echo "  ファイル: $IMPORT_FILE"
 echo "  TRUNCATE: $TRUNCATE"
@@ -124,13 +127,13 @@ if [ "$NO_TRIGGERS" = true ]; then
 fi
 
 # インポート実行
-echo "インポートを実行しています..."
+print_info "インポートを実行しています..."
 
 if [ "$FILE_FORMAT" = "COPY" ]; then
     # COPY形式の場合は特別な処理が必要
     echo ""
-    echo "COPY形式のデータをインポート中..."
-    echo "注意: エラーが発生した場合、データの整合性を確認してください"
+    print_info "COPY形式のデータをインポート中..."
+    print_warning "注意: エラーが発生した場合、データの整合性を確認してください"
 
     # psqlの-fオプションはCOPY形式を正しく処理できるので、直接実行
     ./scripts/db-connect "$ENV" -f "$TEMP_SQL"
@@ -143,7 +146,7 @@ fi
 rm -f "$TEMP_SQL"
 
 echo ""
-echo "インポート処理が完了しました"
+print_success "インポート処理が完了しました"
 
 # COPY形式の場合の追加処理
 if [ "$FILE_FORMAT" = "COPY" ]; then
@@ -151,7 +154,7 @@ if [ "$FILE_FORMAT" = "COPY" ]; then
 
     # シーケンスのリセット
     if [ "$RESET_SEQUENCE" = true ]; then
-        echo "シーケンスをリセットしています..."
+        print_info "シーケンスをリセットしています..."
 
         # シーケンスリセット用のSQLを生成
         SEQUENCE_SQL=$(mktemp)
@@ -189,9 +192,9 @@ EOF
         ./scripts/db-connect "$ENV" -f "$SEQUENCE_SQL"
         rm -f "$SEQUENCE_SQL"
 
-        echo "シーケンスのリセットが完了しました"
+        print_success "シーケンスのリセットが完了しました"
     else
-        echo "COPY形式のインポート後の確認事項:"
+        print_warning "COPY形式のインポート後の確認事項:"
         echo "  - シーケンスの値が正しく設定されているか確認"
         echo "    （--reset-sequence オプションで自動リセット可能）"
         echo "  - 外部キー制約違反がないか確認"

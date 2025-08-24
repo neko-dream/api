@@ -337,7 +337,12 @@ func (o *organizationHandler) GetOrganizationUsers(ctx context.Context) (oas.Get
 		return nil, err
 	}
 
+	organizationUsers := make([]oas.OrganizationUser, 0, len(result.Organizations))
+	for _, org := range result.Organizations {
+		organizationUsers = append(organizationUsers, org.ToUserResponse())
+	}
+
 	return &oas.GetOrganizationUsersOK{
-		Users: result.Users,
+		Users: organizationUsers,
 	}, nil
 }

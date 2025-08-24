@@ -334,7 +334,7 @@ func (o *opinionHandler) PostOpinionPost2(ctx context.Context, req *oas.PostOpin
 		isSeed = false
 	}
 
-	if err = o.submitOpinionCommand.Execute(ctx, opinion_usecase.SubmitOpinionInput{
+	out, err := o.submitOpinionCommand.Execute(ctx, opinion_usecase.SubmitOpinionInput{
 		TalkSessionID:   talkSessionID,
 		UserID:          authCtx.UserID,
 		ParentOpinionID: parentOpinionID,
@@ -343,12 +343,13 @@ func (o *opinionHandler) PostOpinionPost2(ctx context.Context, req *oas.PostOpin
 		ReferenceURL:    utils.ToPtrIfNotNullValue(!req.ReferenceURL.IsSet(), value.ReferenceURL.Value),
 		Picture:         file,
 		IsSeed:          isSeed,
-	}); err != nil {
+	})
+	if err != nil {
 		return nil, err
 	}
 
-	res := &oas.PostOpinionPost2OK{}
-	return res, nil
+	res := out.Opinion.ToResponse()
+	return &res, nil
 }
 
 // ReportOpinion 意見を通報する

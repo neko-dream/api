@@ -262,6 +262,8 @@ type User struct {
 	UpdatedAt     time.Time
 	Email         sql.NullString
 	EmailVerified bool
+	// ユーザーの退会日時。NULLの場合はアクティブユーザー
+	WithdrawalDate sql.NullTime
 }
 
 type UserAuth struct {
@@ -306,6 +308,20 @@ type UserImage struct {
 	Url          string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
+}
+
+// ユーザーのステータス変更履歴（退会・復活など）
+type UserStatusChangeLog struct {
+	UserStatusChangeLogsID uuid.UUID
+	UserID                 uuid.UUID
+	Status                 string
+	Reason                 sql.NullString
+	ChangedAt              time.Time
+	ChangedBy              string
+	IpAddress              pqtype.Inet
+	UserAgent              sql.NullString
+	AdditionalData         pqtype.NullRawMessage
+	CreatedAt              time.Time
 }
 
 type Vote struct {

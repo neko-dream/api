@@ -53,6 +53,11 @@ func (m *MockUserRepository) Update(ctx context.Context, user user.User) error {
 	return args.Error(0)
 }
 
+func (m *MockUserRepository) ChangeSubject(ctx context.Context, userID shared.UUID[user.User], newSubject string) error {
+	args := m.Called(ctx, userID, newSubject)
+	return args.Error(0)
+}
+
 func TestGetByDisplayIDHandler_Execute(t *testing.T) {
 	tests := []struct {
 		name           string

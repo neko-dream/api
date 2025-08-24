@@ -8,6 +8,7 @@ import (
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/auth"
+	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/consent"
 	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -107,6 +108,23 @@ func (a *authService) Authenticate(
 			utils.HandleError(ctx, err, "UserRepository.FindBySubject")
 			return nil, errtrace.Wrap(err)
 		}
+	}
+	// 退会ユーザーで31日以上経過している場合の処理
+	if existUser != nil && existUser.IsWithdrawn() && existUser.IsReactivationPeriodExpired(clock.Now(ctx)) {
+		// 古いユーザーのsubjectとemailを変更して重複を回避
+		newSubject := existUser.PrepareForDeleteUser()
+
+		// 更新をDBに反映
+		if err := a.userRepository.Update(ctx, *existUser); err != nil {
+			utils.HandleError(ctx, err, "UserRepository.Update withdrawn user")
+			return nil, errtrace.Wrap(err)
+		}
+		// ChangeSubjectクエリも実行
+		if err := a.userRepository.ChangeSubject(ctx, existUser.UserID(), newSubject); err != nil {
+			utils.HandleError(ctx, err, "UserRepository.ChangeSubject")
+			return nil, errtrace.Wrap(err)
+		}
+		existUser = nil // 新規ユーザーとして処理を続行
 	}
 	if existUser != nil {
 		return existUser, nil
