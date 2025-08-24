@@ -2504,6 +2504,8 @@ func (s *Opinion) SetIsDeleted(val bool) {
 	s.IsDeleted = val
 }
 
+func (*Opinion) postOpinionPost2Res() {}
+
 type OpinionComments2BadRequest struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
@@ -4953,10 +4955,6 @@ func (s *PostOpinionPost2InternalServerError) SetMessage(val string) {
 
 func (*PostOpinionPost2InternalServerError) postOpinionPost2Res() {}
 
-type PostOpinionPost2OK struct{}
-
-func (*PostOpinionPost2OK) postOpinionPost2Res() {}
-
 type PostOpinionPost2Req struct {
 	TalkSessionID   OptString        `json:"talkSessionID"`
 	ParentOpinionID OptString        `json:"parentOpinionID"`
@@ -5151,6 +5149,114 @@ func (s *PostTimeLineItemReq) SetStatus(val string) {
 func (s *PostTimeLineItemReq) SetParentActionItemID(val OptString) {
 	s.ParentActionItemID = val
 }
+
+type ReactivateUserBadRequest struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *ReactivateUserBadRequest) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *ReactivateUserBadRequest) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *ReactivateUserBadRequest) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *ReactivateUserBadRequest) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*ReactivateUserBadRequest) reactivateUserRes() {}
+
+type ReactivateUserForbidden struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *ReactivateUserForbidden) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *ReactivateUserForbidden) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *ReactivateUserForbidden) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *ReactivateUserForbidden) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*ReactivateUserForbidden) reactivateUserRes() {}
+
+type ReactivateUserInternalServerError struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *ReactivateUserInternalServerError) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *ReactivateUserInternalServerError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *ReactivateUserInternalServerError) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *ReactivateUserInternalServerError) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*ReactivateUserInternalServerError) reactivateUserRes() {}
+
+type ReactivateUserOK struct {
+	Message string `json:"message"`
+	User    User   `json:"user"`
+}
+
+// GetMessage returns the value of Message.
+func (s *ReactivateUserOK) GetMessage() string {
+	return s.Message
+}
+
+// GetUser returns the value of User.
+func (s *ReactivateUserOK) GetUser() User {
+	return s.User
+}
+
+// SetMessage sets the value of Message.
+func (s *ReactivateUserOK) SetMessage(val string) {
+	s.Message = val
+}
+
+// SetUser sets the value of User.
+func (s *ReactivateUserOK) SetUser(val User) {
+	s.User = val
+}
+
+func (*ReactivateUserOK) reactivateUserRes() {}
 
 // Ref: #/components/schemas/RegenerateRequest
 type RegenerateRequest struct {
@@ -7673,3 +7779,111 @@ func (s *Vote2Req) GetVoteStatus() string {
 func (s *Vote2Req) SetVoteStatus(val string) {
 	s.VoteStatus = val
 }
+
+type WithdrawUserBadRequest struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *WithdrawUserBadRequest) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *WithdrawUserBadRequest) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *WithdrawUserBadRequest) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *WithdrawUserBadRequest) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*WithdrawUserBadRequest) withdrawUserRes() {}
+
+type WithdrawUserInternalServerError struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *WithdrawUserInternalServerError) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *WithdrawUserInternalServerError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *WithdrawUserInternalServerError) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *WithdrawUserInternalServerError) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*WithdrawUserInternalServerError) withdrawUserRes() {}
+
+type WithdrawUserOK struct {
+	Message        string    `json:"message"`
+	WithdrawalDate time.Time `json:"withdrawalDate"`
+}
+
+// GetMessage returns the value of Message.
+func (s *WithdrawUserOK) GetMessage() string {
+	return s.Message
+}
+
+// GetWithdrawalDate returns the value of WithdrawalDate.
+func (s *WithdrawUserOK) GetWithdrawalDate() time.Time {
+	return s.WithdrawalDate
+}
+
+// SetMessage sets the value of Message.
+func (s *WithdrawUserOK) SetMessage(val string) {
+	s.Message = val
+}
+
+// SetWithdrawalDate sets the value of WithdrawalDate.
+func (s *WithdrawUserOK) SetWithdrawalDate(val time.Time) {
+	s.WithdrawalDate = val
+}
+
+func (*WithdrawUserOK) withdrawUserRes() {}
+
+type WithdrawUserUnauthorized struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *WithdrawUserUnauthorized) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *WithdrawUserUnauthorized) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *WithdrawUserUnauthorized) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *WithdrawUserUnauthorized) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*WithdrawUserUnauthorized) withdrawUserRes() {}

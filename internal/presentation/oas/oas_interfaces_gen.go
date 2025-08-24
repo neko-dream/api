@@ -217,6 +217,10 @@ type PostTimeLineItemRes interface {
 	postTimeLineItemRes()
 }
 
+type ReactivateUserRes interface {
+	reactivateUserRes()
+}
+
 type RegisterDeviceRes interface {
 	registerDeviceRes()
 }
@@ -267,4 +271,8 @@ type ValidateOrganizationCodeRes interface {
 
 type Vote2Res interface {
 	vote2Res()
+}
+
+type WithdrawUserRes interface {
+	withdrawUserRes()
 }
