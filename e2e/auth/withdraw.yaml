@@ -1,4 +1,4 @@
-desc: ユーザー編集
+desc: ユーザー退会APIのテスト
 runners:
   req:
     endpoint: http://localhost:3000
@@ -7,32 +7,28 @@ runners:
   dev: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
 
 vars:
-  id: edit
-  name: edit
+  id: withdraw_only_test
+  name: WithdrawOnlyTest
 
 steps:
+  # Arrange: ユーザー削除とdev login
   deleteUser:
     desc: ユーザー削除
     dev:
-      query:
+      query: |
         DELETE FROM user_status_change_logs WHERE (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}') = user_id;
         DELETE FROM user_demographics WHERE (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}') = user_id;
         DELETE FROM user_auths WHERE subject = '{{ vars.id }}';
         DELETE FROM users WHERE display_id = '{{ vars.id }}';
+
   loginUser:
-    desc: ログイン
+    desc: dev loginでログイン
     req:
       /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.id }}:
         get:
           headers: null
     test: len(current.res.headers['Set-Cookie']) > 0
-  checkToken:
-    desc: Tokenが設定されている
-    req:
-      /auth/token/info:
-        get:
-          headers: null
-    test: current.res.body.aud == "https://api.kotohiro.com" && current.res.body.isRegistered == false
+
   createUser:
     desc: ユーザー作成
     req:
@@ -42,36 +38,49 @@ steps:
             multipart/form-data:
               displayName: "{{ vars.name }}"
               displayID: "{{ vars.id }}"
-  editUser:
-    desc: ユーザー編集
+    test: current.res.status == 200
+
+  # Act: 退会
+  withdrawUser:
+    desc: ユーザー退会
     req:
       /user:
-        put:
+        delete:
           body:
             multipart/form-data:
-              displayName: "edited"
-              dateOfBirth: 19990101
-              gender: "男性"
-              prefecture: "福井県"
-              city: "鯖江市"
-  checkUserName:
-    desc: ユーザー名が変更されている
+              reason: "Test withdrawal"
+    test: |
+      current.res.status == 200 &&
+      hasPrefix(current.res.body.message, "退会処理が完了しました") &&
+      current.res.body.withdrawalDate != null
+
+  # Assert: 退会後の認証エラー確認
+  loginAfterWithdrawUser:
+    desc: dev loginでログイン（退会後）
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.id }}:
+        get:
+          headers: null
+    test: len(current.res.headers['Set-Cookie']) > 0
+
+  checkAccessRestriction:
+    desc: 退会後のアクセス制限確認
     req:
       /user:
         get:
           headers: null
     test: |
-      current.res.body.user.displayID == vars.id &&
-      current.res.body.user.displayName == "edited" &&
-      current.res.body.demographics.city == "鯖江市" &&
-      current.res.body.demographics.dateOfBirth == 19990101
-  reEditUser:
-    desc: ユーザー名が戻っているか
+      current.res.status == 403 &&
+      current.res.body.code == "AUTH-0010"
+
+  # Assert: 退会後でもログアウトは可能
+  checkLogoutAvailable:
+    desc: 退会後でもログアウトは可能
     req:
-      /user:
-        put:
+      /auth/revoke:
+        post:
           body:
             multipart/form-data:
-              displayName: "{{ vars.name }}"
-              dateOfBirth: 19990101
-    test: current.res.body.displayName == vars.name
+              id: "{{ vars.id }}"
+    test: |
+      current.res.status == 204
