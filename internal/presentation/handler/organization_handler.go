@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/neko-dream/server/internal/application/query/organization_query"
 	"github.com/neko-dream/server/internal/application/usecase/organization_usecase"
@@ -11,7 +12,9 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/service"
 	domainservice "github.com/neko-dream/server/internal/domain/service"
+	"github.com/neko-dream/server/internal/infrastructure/http/cookie"
 	"github.com/neko-dream/server/internal/presentation/oas"
+	cookie_utils "github.com/neko-dream/server/pkg/cookie"
 	"go.opentelemetry.io/otel"
 )
 
@@ -30,6 +33,8 @@ type organizationHandler struct {
 	aliasService         *domainservice.OrganizationAliasService
 	authorizationService service.AuthorizationService
 	sessionTokenManager  session.TokenManager
+	switchOrganization   organization_usecase.SwitchOrganizationUseCase
+	cookieManager        cookie.CookieManager
 }
 
 func NewOrganizationHandler(
@@ -47,6 +52,8 @@ func NewOrganizationHandler(
 	aliasService *domainservice.OrganizationAliasService,
 	authorizationService service.AuthorizationService,
 	sessionTokenManager session.TokenManager,
+	switchOrganization organization_usecase.SwitchOrganizationUseCase,
+	cookieManager cookie.CookieManager,
 ) oas.OrganizationHandler {
 	return &organizationHandler{
 		create:               create,
@@ -63,6 +70,8 @@ func NewOrganizationHandler(
 		aliasService:         aliasService,
 		authorizationService: authorizationService,
 		sessionTokenManager:  sessionTokenManager,
+		switchOrganization:   switchOrganization,
+		cookieManager:        cookieManager,
 	}
 }
 
@@ -329,4 +338,28 @@ func (o *organizationHandler) GetOrganizationUsers(ctx context.Context) (oas.Get
 	return &oas.GetOrganizationUsersOK{
 		Users: organizationUsers,
 	}, nil
+}
+
+// SwitchOrganization 組織を切り替える
+func (o *organizationHandler) SwitchOrganization(ctx context.Context, params oas.SwitchOrganizationParams) (oas.SwitchOrganizationRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.SwitchOrganization")
+	defer span.End()
+
+	authCtx, err := o.authorizationService.RequireAuthentication(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	output, err := o.switchOrganization.Execute(ctx, organization_usecase.SwitchOrganizationUseCaseInput{
+		Code:      params.Code,
+		UserID:    authCtx.UserID,
+		SessionID: authCtx.SessionID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	res := oas.SwitchOrganizationOK{}
+	res.SetSetCookie(cookie_utils.EncodeCookies([]*http.Cookie{o.cookieManager.CreateSessionCookie(output.SessionTokenStr)}))
+	return &res, nil
 }

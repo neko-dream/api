@@ -645,6 +645,15 @@ func (UnimplementedHandler) SwipeOpinions(ctx context.Context, params SwipeOpini
 	return r, ht.ErrNotImplemented
 }
 
+// SwitchOrganization implements switchOrganization operation.
+//
+// 組織切り替え.
+//
+// POST /organizations/switch/{code}
+func (UnimplementedHandler) SwitchOrganization(ctx context.Context, params SwitchOrganizationParams) (r SwitchOrganizationRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // TalkSessionAnalysis implements talkSessionAnalysis operation.
 //
 // 分析結果一覧.

@@ -344,6 +344,12 @@ type OrganizationHandler interface {
 	//
 	// POST /organizations/invite_user
 	InviteOrganizationForUser(ctx context.Context, req *InviteOrganizationForUserReq) (InviteOrganizationForUserRes, error)
+	// SwitchOrganization implements switchOrganization operation.
+	//
+	// 組織切り替え.
+	//
+	// POST /organizations/switch/{code}
+	SwitchOrganization(ctx context.Context, params SwitchOrganizationParams) (SwitchOrganizationRes, error)
 	// ValidateOrganizationCode implements validateOrganizationCode operation.
 	//
 	// 組織コード検証.
