@@ -6089,6 +6089,31 @@ func (s *SwipeOpinionsOK) SetRemainingCount(val int) {
 
 func (*SwipeOpinionsOK) swipeOpinionsRes() {}
 
+type SwitchOrganizationBadRequest struct{}
+
+func (*SwitchOrganizationBadRequest) switchOrganizationRes() {}
+
+type SwitchOrganizationInternalServerError struct{}
+
+func (*SwitchOrganizationInternalServerError) switchOrganizationRes() {}
+
+// SwitchOrganizationOK is response for SwitchOrganization operation.
+type SwitchOrganizationOK struct {
+	SetCookie []string
+}
+
+// GetSetCookie returns the value of SetCookie.
+func (s *SwitchOrganizationOK) GetSetCookie() []string {
+	return s.SetCookie
+}
+
+// SetSetCookie sets the value of SetCookie.
+func (s *SwitchOrganizationOK) SetSetCookie(val []string) {
+	s.SetCookie = val
+}
+
+func (*SwitchOrganizationOK) switchOrganizationRes() {}
+
 // Ref: #/components/schemas/TalkSession
 type TalkSession struct {
 	// トークセッションID.

@@ -249,6 +249,10 @@ type SwipeOpinionsRes interface {
 	swipeOpinionsRes()
 }
 
+type SwitchOrganizationRes interface {
+	switchOrganizationRes()
+}
+
 type TalkSessionAnalysisRes interface {
 	talkSessionAnalysisRes()
 }

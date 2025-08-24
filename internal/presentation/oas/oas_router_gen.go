@@ -1035,6 +1035,34 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								}
 
 								elem = origElem
+							case 's': // Prefix: "switch/"
+								origElem := elem
+								if l := len("switch/"); len(elem) >= l && elem[0:l] == "switch/" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								// Param: "code"
+								// Leaf parameter
+								args[0] = elem
+								elem = ""
+
+								if len(elem) == 0 {
+									// Leaf node.
+									switch r.Method {
+									case "POST":
+										s.handleSwitchOrganizationRequest([1]string{
+											args[0],
+										}, elemIsEscaped, w, r)
+									default:
+										s.notAllowed(w, r, "POST")
+									}
+
+									return
+								}
+
+								elem = origElem
 							case 'u': // Prefix: "users"
 								origElem := elem
 								if l := len("users"); len(elem) >= l && elem[0:l] == "users" {
@@ -3128,6 +3156,36 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									}
 
 									elem = origElem
+								}
+
+								elem = origElem
+							case 's': // Prefix: "switch/"
+								origElem := elem
+								if l := len("switch/"); len(elem) >= l && elem[0:l] == "switch/" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								// Param: "code"
+								// Leaf parameter
+								args[0] = elem
+								elem = ""
+
+								if len(elem) == 0 {
+									// Leaf node.
+									switch method {
+									case "POST":
+										r.name = "SwitchOrganization"
+										r.summary = "組織切り替え"
+										r.operationID = "switchOrganization"
+										r.pathPattern = "/organizations/switch/{code}"
+										r.args = args
+										r.count = 1
+										return r, true
+									default:
+										return
+									}
 								}
 
 								elem = origElem
