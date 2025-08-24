@@ -13,7 +13,6 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/talksession"
-	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/domain/service"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	http_utils "github.com/neko-dream/server/pkg/http"
@@ -36,7 +35,7 @@ type opinionHandler struct {
 	reportOpinionCommand opinion_usecase.ReportOpinion
 	solveReportCommand   report_usecase.SolveReportCommand
 
-	authService service.AuthenticationService
+	authorizationService service.AuthorizationService
 	session.TokenManager
 }
 
@@ -53,7 +52,7 @@ func NewOpinionHandler(
 	reportOpinionCommand opinion_usecase.ReportOpinion,
 	solveReportCommand report_usecase.SolveReportCommand,
 
-	authService service.AuthenticationService,
+	authorizationService service.AuthorizationService,
 	tokenManager session.TokenManager,
 ) oas.OpinionHandler {
 	return &opinionHandler{
@@ -69,8 +68,8 @@ func NewOpinionHandler(
 		reportOpinionCommand: reportOpinionCommand,
 		solveReportCommand:   solveReportCommand,
 
-		authService:  authService,
-		TokenManager: tokenManager,
+		authorizationService: authorizationService,
+		TokenManager:         tokenManager,
 	}
 }
 
@@ -79,10 +78,9 @@ func (o *opinionHandler) GetOpinionDetail2(ctx context.Context, params oas.GetOp
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.GetOpinionDetail")
 	defer span.End()
 
-	authCtx, err := getAuthenticationContext(o.authService, o.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if err == nil {
-		userID = &authCtx.UserID
+	userID, err := o.authorizationService.GetUserID(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
@@ -121,10 +119,9 @@ func (o *opinionHandler) OpinionComments2(ctx context.Context, params oas.Opinio
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.OpinionComments")
 	defer span.End()
 
-	authCtx, err := getAuthenticationContext(o.authService, o.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if err == nil {
-		userID = &authCtx.UserID
+	userID, err := o.authorizationService.GetUserID(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
@@ -169,10 +166,9 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.GetOpinionsForTalkSession")
 	defer span.End()
 
-	authCtx, err := getAuthenticationContext(o.authService, o.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if err == nil {
-		userID = &authCtx.UserID
+	userID, err := o.authorizationService.GetUserID(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	var sortKey sort.SortKey
@@ -247,7 +243,7 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.SwipeOpinions")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(o.authService, ctx)
+	authCtx, err := o.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -293,7 +289,7 @@ func (o *opinionHandler) PostOpinionPost2(ctx context.Context, req *oas.PostOpin
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.PostOpinionPost2")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(o.authService, ctx)
+	authCtx, err := o.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -357,7 +353,7 @@ func (o *opinionHandler) ReportOpinion(ctx context.Context, req *oas.ReportOpini
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.ReportOpinion")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(o.authService, ctx)
+	authCtx, err := o.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -434,12 +430,12 @@ func (o *opinionHandler) GetOpinionAnalysis(ctx context.Context, params oas.GetO
 	return &res, nil
 }
 
-// GetOpinionReports implements oas.OpinionHandler.
+// GetOpinionReports 意見の通報一覧取得
 func (o *opinionHandler) GetOpinionReports(ctx context.Context, params oas.GetOpinionReportsParams) (oas.GetOpinionReportsRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.GetOpinionReports")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(o.authService, ctx)
+	authCtx, err := o.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -465,7 +461,7 @@ func (o *opinionHandler) SolveOpinionReport(ctx context.Context, req *oas.SolveO
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.SolveOpinionReport")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(o.authService, ctx)
+	authCtx, err := o.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}

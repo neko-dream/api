@@ -7,55 +7,32 @@ import (
 	"errors"
 
 	"braces.dev/errtrace"
+	"github.com/neko-dream/server/internal/domain/messages"
 	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/consent"
 	"github.com/neko-dream/server/internal/domain/model/organization"
+	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/pkg/utils"
+	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
-var (
-	ErrNotAuthenticated        = errors.New("not authenticated")
-	ErrInsufficientPermissions = errors.New("insufficient permissions")
-	ErrNotInOrganization       = errors.New("not in organization context")
-)
-
+// AuthenticationService ユーザー認証を扱うサービス
 type AuthenticationService interface {
-	// 現在認証されているユーザーのコンテキストを取得
-	GetCurrentUser(ctx context.Context) (*auth.AuthenticationContext, error)
-
-	// ユーザーが認証されていることを確認
-	RequireAuthentication(ctx context.Context) (*auth.AuthenticationContext, error)
-
-	// 指定された役割以上の権限を持つことを確認
-	RequireOrganizationRole(ctx context.Context, minRole organization.OrganizationUserRole) (*auth.AuthenticationContext, error)
-
-	// スーパー管理者権限を持つことを確認
-	RequireSuperAdmin(ctx context.Context) (*auth.AuthenticationContext, error)
-
-	// オーナー権限を持つことを確認
-	RequireOwner(ctx context.Context) (*auth.AuthenticationContext, error)
-
-	// 管理者以上の権限を持つことを確認
-	RequireAdmin(ctx context.Context) (*auth.AuthenticationContext, error)
-
-	// 認証されているかをチェック
-	IsAuthenticated(ctx context.Context) bool
-
-	// 組織コンテキスト内かをチェック
-	IsInOrganization(ctx context.Context) bool
-}
-
-type AuthService interface {
+	// OAuth認証でユーザーを認証
 	Authenticate(ctx context.Context, provider, code string) (*user.User, error)
-	GenerateState(ctx context.Context) (string, error)
-}
 
-type authService struct {
+	// OAuth用のstate生成
+	GenerateState(ctx context.Context) (string, error)
+
+	// セッションクレームから認証コンテキストを構築
+	BuildAuthContext(ctx context.Context, claim *session.Claim) (*auth.AuthenticationContext, error)
+}
+type authenticationService struct {
 	config              *config.Config
 	userRepository      user.UserRepository
 	authProviderFactory auth.AuthProviderFactory
@@ -63,14 +40,14 @@ type authService struct {
 	policyRepository    consent.PolicyRepository
 }
 
-func NewAuthService(
+func NewAuthenticationService(
 	config *config.Config,
 	userRepository user.UserRepository,
 	authProviderFactory auth.AuthProviderFactory,
 	consentService consent.ConsentService,
 	policyRepository consent.PolicyRepository,
-) AuthService {
-	return &authService{
+) AuthenticationService {
+	return &authenticationService{
 		config:              config,
 		userRepository:      userRepository,
 		authProviderFactory: authProviderFactory,
@@ -79,12 +56,12 @@ func NewAuthService(
 	}
 }
 
-func (a *authService) Authenticate(
+func (a *authenticationService) Authenticate(
 	ctx context.Context,
 	providerName,
 	code string,
 ) (*user.User, error) {
-	ctx, span := otel.Tracer("service").Start(ctx, "authService.Authenticate")
+	ctx, span := otel.Tracer("service").Start(ctx, "authenticationService.Authenticate")
 	defer span.End()
 
 	provider, err := a.authProviderFactory.NewAuthProvider(ctx, providerName)
@@ -99,7 +76,7 @@ func (a *authService) Authenticate(
 		return nil, errtrace.Wrap(err)
 	}
 	if subject == nil {
-		return nil, ErrNotAuthenticated
+		return nil, messages.ForbiddenError
 	}
 
 	existUser, err := a.userRepository.FindBySubject(ctx, user.UserSubject(*subject))
@@ -175,8 +152,8 @@ func (a *authService) Authenticate(
 
 var randTable = []byte("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
 
-func (a *authService) GenerateState(ctx context.Context) (string, error) {
-	ctx, span := otel.Tracer("service").Start(ctx, "authService.GenerateState")
+func (a *authenticationService) GenerateState(ctx context.Context) (string, error) {
+	ctx, span := otel.Tracer("service").Start(ctx, "authenticationService.GenerateState")
 	defer span.End()
 
 	b := make([]byte, 32)
@@ -190,4 +167,49 @@ func (a *authService) GenerateState(ctx context.Context) (string, error) {
 	}
 
 	return string(b), nil
+}
+
+// BuildAuthContext implements AuthenticationService.
+func (a *authenticationService) BuildAuthContext(ctx context.Context, claim *session.Claim) (*auth.AuthenticationContext, error) {
+	ctx, span := otel.Tracer("service").Start(ctx, "authenticationService.BuildAuthContext")
+	defer span.End()
+
+	userID, err := claim.UserID()
+	if err != nil {
+		utils.HandleError(ctx, err, "claim.UserID")
+		return nil, messages.AuthenticationFailedError
+	}
+
+	sessionID, err := claim.SessionID()
+	if err != nil {
+		utils.HandleError(ctx, err, "claim.SessionID")
+		return nil, messages.SessionParseError
+	}
+
+	authCtx := &auth.AuthenticationContext{
+		UserID:                 userID,
+		SessionID:              sessionID,
+		DisplayName:            claim.DisplayName,
+		DisplayID:              claim.DisplayID,
+		IconURL:                claim.IconURL,
+		IsRegistered:           claim.IsRegistered,
+		IsEmailVerified:        claim.IsEmailVerified,
+		RequiredPasswordChange: claim.RequiredPasswordChange,
+	}
+
+	// 組織コンテキストがある場合は設定
+	if claim.OrganizationID != nil {
+		authCtx.OrganizationID = lo.ToPtr(shared.MustParseUUID[organization.Organization](*claim.OrganizationID))
+	}
+
+	if claim.OrganizationCode != nil {
+		authCtx.OrganizationCode = claim.OrganizationCode
+	}
+
+	if claim.OrganizationRole != nil {
+		role := organization.NameToRole(*claim.OrganizationRole)
+		authCtx.OrganizationRole = &role
+	}
+
+	return authCtx, nil
 }
