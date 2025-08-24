@@ -117,7 +117,6 @@ func (s *sessionService) SwitchOrganization(
 
 	// 新しい組織付きセッションを作成
 	// organizationIDをany型にキャスト
-	orgID := shared.UUID[any](organizationID.UUID())
 	newSess := session.NewSessionWithOrganization(
 		shared.NewUUID[session.Session](),
 		userID,
@@ -125,7 +124,7 @@ func (s *sessionService) SwitchOrganization(
 		session.SESSION_ACTIVE,
 		*session.NewExpiresAt(ctx),
 		clock.Now(ctx),
-		&orgID,
+		organizationID,
 	)
 
 	createdSess, err := s.sessionRepository.Create(ctx, *newSess)
