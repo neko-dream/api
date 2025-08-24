@@ -177,13 +177,13 @@ func (a *authenticationService) BuildAuthContext(ctx context.Context, claim *ses
 	userID, err := claim.UserID()
 	if err != nil {
 		utils.HandleError(ctx, err, "claim.UserID")
-		return nil, messages.ForbiddenError
+		return nil, messages.AuthenticationFailedError
 	}
 
 	sessionID, err := claim.SessionID()
 	if err != nil {
 		utils.HandleError(ctx, err, "claim.SessionID")
-		return nil, messages.ForbiddenError
+		return nil, messages.SessionParseError
 	}
 
 	authCtx := &auth.AuthenticationContext{
