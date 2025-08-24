@@ -166,6 +166,9 @@ func (a *authorizationService) IsInOrganization(ctx context.Context) bool {
 
 // IsKotohio implements AuthorizationService.
 func (a *authorizationService) IsKotohiro(ctx context.Context) bool {
+	ctx, span := otel.Tracer("service").Start(ctx, "authorizationService.IsKotohiro")
+	defer span.End()
+
 	authCtx, err := a.GetAuthContext(ctx)
 	if err != nil {
 		return false

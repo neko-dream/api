@@ -8,7 +8,6 @@ import (
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/samber/lo"
 	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/consent"
@@ -18,6 +17,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/config"
 	"github.com/neko-dream/server/pkg/utils"
+	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
