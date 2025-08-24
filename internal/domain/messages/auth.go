@@ -51,4 +51,9 @@ var (
 		Code:       "AUTH-0009",
 		Message:    "パスワードが不正です。",
 	}
+	UserWithdrawnRecoverableError = &APIError{
+		StatusCode: 403,
+		Code:       "AUTH-0010",
+		Message:    "このアカウントは退会済みです。30日以内であれば復活可能です。",
+	}
 )
