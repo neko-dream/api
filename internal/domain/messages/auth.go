@@ -1,6 +1,13 @@
 package messages
 
 var (
+	// 組織に所属していない場合のエラー
+	ErrNotInOrganization = &APIError{
+		StatusCode: 403,
+		Code:       "AUTH-NOT-IN-ORGANIZATION",
+		Message:    "組織への所属が必要です",
+	}
+
 	ForbiddenError = &APIError{
 		StatusCode: 403,
 		Code:       "AUTH-0000",
