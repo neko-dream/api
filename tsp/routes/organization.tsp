@@ -54,6 +54,26 @@ namespace kotohiro {
     @body body: {};
   };
 
+  @tag("organization")
+  @extension("x-ogen-operation-group", "Organization")
+  @route("/organizations/switch/{code}")
+  @post
+  @summary("組織切り替え")
+  op switchOrganization(
+    @path code: string
+  ) : {
+    /**
+     * SessionID
+     */
+    @header("Set-Cookie") SetCookie: string[];
+  } | {
+    @statusCode statusCode: 400;
+    @body body: {};
+  } | {
+    @statusCode statusCode: 500;
+    @body body: {};
+  };
+
   /**
    * Role
    * - 10: SuperAdmin
