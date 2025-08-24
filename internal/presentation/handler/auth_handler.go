@@ -49,23 +49,21 @@ func NewAuthHandler(
 	changePassword auth_usecase.ChangePassword,
 	reactivate auth_usecase.Reactivate,
 
-	authenticationService service.AuthenticationService,
 	authorizationService service.AuthorizationService,
 	cookieManger cookie.CookieManager,
 ) oas.AuthHandler {
 	return &authHandler{
-		AuthLogin:             authLogin,
-		AuthCallback:          authCallback,
-		Revoke:                revoke,
-		LoginForDev:           devLogin,
-		DetachAccount:         detachAccount,
-		authenticationService: authenticationService,
-		authorizationService:  authorizationService,
-		CookieManager:         cookieManger,
-		passwordLogin:         login,
-		passwordRegister:      register,
-		changePassword:        changePassword,
-		reactivate:            reactivate,
+		AuthLogin:            authLogin,
+		AuthCallback:         authCallback,
+		Revoke:               revoke,
+		LoginForDev:          devLogin,
+		DetachAccount:        detachAccount,
+		authorizationService: authorizationService,
+		CookieManager:        cookieManger,
+		passwordLogin:        login,
+		passwordRegister:     register,
+		changePassword:       changePassword,
+		reactivate:           reactivate,
 	}
 }
 
