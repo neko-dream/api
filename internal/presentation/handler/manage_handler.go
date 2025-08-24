@@ -23,7 +23,7 @@ type manageHandler struct {
 	analysis.AnalysisService
 	analysis.AnalysisRepository
 	*db.DBManager
-	authService service.AuthenticationService
+	authorizationService service.AuthorizationService
 	session.TokenManager
 }
 
@@ -42,7 +42,7 @@ func (m *manageHandler) GetUserStatsTotalManage(ctx context.Context) (*oas.UserS
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetUserStatsTotalManage")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(m.authService, m.SetSession(ctx))
+	authCtx, err := m.authorizationService.RequireAuth(m.SetSession(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (m *manageHandler) GetUserStatsListManage(ctx context.Context, params oas.G
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetUserStatsListManage")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(m.authService, m.SetSession(ctx))
+	authCtx, err := m.authorizationService.RequireAuth(m.SetSession(ctx))
 	if err != nil {
 		return []oas.UserStatsResponse{}, err
 	}
@@ -138,15 +138,15 @@ func NewManageHandler(
 	dbm *db.DBManager,
 	ansv analysis.AnalysisService,
 	arep analysis.AnalysisRepository,
-	authService service.AuthenticationService,
+	authorizationService service.AuthorizationService,
 	tokenManager session.TokenManager,
 ) oas.ManageHandler {
 	return &manageHandler{
-		DBManager:          dbm,
-		AnalysisService:    ansv,
-		AnalysisRepository: arep,
-		authService:        authService,
-		TokenManager:       tokenManager,
+		DBManager:            dbm,
+		AnalysisService:      ansv,
+		AnalysisRepository:   arep,
+		authorizationService: authorizationService,
+		TokenManager:         tokenManager,
 	}
 }
 
@@ -155,7 +155,7 @@ func (m *manageHandler) GetTalkSessionListManage(ctx context.Context, params oas
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetTalkSessionListManage")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(m.authService, m.SetSession(ctx))
+	authCtx, err := m.authorizationService.RequireAuth(m.SetSession(ctx))
 	if err != nil {
 		return &oas.TalkSessionListResponse{
 			TotalCount: 0,
@@ -322,7 +322,7 @@ func (m *manageHandler) ToggleReportVisibilityManage(ctx context.Context, req *o
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.ToggleReportVisibilityManage")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(m.authService, m.SetSession(ctx))
+	authCtx, err := m.authorizationService.RequireAuth(m.SetSession(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -354,7 +354,7 @@ func (m *manageHandler) GetAnalysisReportManage(ctx context.Context, params oas.
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetReportBySessionId")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(m.authService, m.SetSession(ctx))
+	authCtx, err := m.authorizationService.RequireAuth(m.SetSession(ctx))
 	if err != nil {
 		return nil, err
 	}

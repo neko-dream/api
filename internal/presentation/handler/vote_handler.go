@@ -14,17 +14,17 @@ import (
 )
 
 type voteHandler struct {
-	voteCommand vote_usecase.Vote
-	authService service.AuthenticationService
+	voteCommand          vote_usecase.Vote
+	authorizationService service.AuthorizationService
 }
 
 func NewVoteHandler(
 	voteCommand vote_usecase.Vote,
-	authService service.AuthenticationService,
+	authorizationService service.AuthorizationService,
 ) oas.VoteHandler {
 	return &voteHandler{
-		voteCommand: voteCommand,
-		authService: authService,
+		voteCommand:          voteCommand,
+		authorizationService: authorizationService,
 	}
 }
 
@@ -33,7 +33,7 @@ func (v *voteHandler) Vote2(ctx context.Context, req *oas.Vote2Req, params oas.V
 	ctx, span := otel.Tracer("handler").Start(ctx, "voteHandler.Vote")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(v.authService, ctx)
+	authCtx, err := v.authorizationService.RequireAuth(ctx)
 	if err != nil {
 		return nil, err
 	}

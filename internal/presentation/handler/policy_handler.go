@@ -18,20 +18,20 @@ import (
 )
 
 type policyHandler struct {
-	checkConsentQuery policy_query.CheckConsent
-	acceptPolicy      policy_usecase.AcceptPolicy
-	authService       service.AuthenticationService
+	checkConsentQuery    policy_query.CheckConsent
+	acceptPolicy         policy_usecase.AcceptPolicy
+	authorizationService service.AuthorizationService
 }
 
 func NewPolicyHandler(
 	checkConsentQuery policy_query.CheckConsent,
 	acceptPolicy policy_usecase.AcceptPolicy,
-	authService service.AuthenticationService,
+	authorizationService service.AuthorizationService,
 ) oas.PolicyHandler {
 	return &policyHandler{
-		checkConsentQuery: checkConsentQuery,
-		acceptPolicy:      acceptPolicy,
-		authService:       authService,
+		checkConsentQuery:    checkConsentQuery,
+		acceptPolicy:         acceptPolicy,
+		authorizationService: authorizationService,
 	}
 }
 
@@ -39,7 +39,7 @@ func (h *policyHandler) GetPolicyConsentStatus(ctx context.Context) (oas.GetPoli
 	ctx, span := otel.Tracer("handler").Start(ctx, "PolicyHandler.CheckConsent")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(h.authService, ctx)
+	authCtx, err := h.authorizationService.RequireAuth(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func (h *policyHandler) GetPolicyConsentStatus(ctx context.Context) (oas.GetPoli
 func (h *policyHandler) PolicyConsent(ctx context.Context, req *oas.PolicyConsentReq) (oas.PolicyConsentRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "PolicyHandler.AcceptPolicy")
 	defer span.End()
-	authCtx, err := requireAuthentication(h.authService, ctx)
+	authCtx, err := h.authorizationService.RequireAuth(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -14,16 +14,16 @@ import (
 
 type imageHandler struct {
 	image_usecase.UploadImage
-	authService service.AuthenticationService
+	authorizationService service.AuthorizationService
 }
 
 func NewImageHandler(
 	uploadImage image_usecase.UploadImage,
-	authService service.AuthenticationService,
+	authorizationService service.AuthorizationService,
 ) oas.ImageHandler {
 	return &imageHandler{
-		UploadImage: uploadImage,
-		authService: authService,
+		UploadImage:          uploadImage,
+		authorizationService: authorizationService,
 	}
 }
 
@@ -32,7 +32,7 @@ func (i *imageHandler) PostImage(ctx context.Context, req *oas.PostImageReq) (oa
 	ctx, span := otel.Tracer("handler").Start(ctx, "imageHandler.PostImage")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(i.authService, ctx)
+	authCtx, err := i.authorizationService.RequireAuth(ctx)
 	if err != nil {
 		return nil, err
 	}

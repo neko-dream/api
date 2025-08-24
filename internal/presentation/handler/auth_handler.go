@@ -32,7 +32,8 @@ type authHandler struct {
 	changePassword   auth_usecase.ChangePassword
 	reactivate       auth_usecase.Reactivate
 
-	authService service.AuthenticationService
+	authenticationService service.AuthenticationService
+	authorizationService  service.AuthorizationService
 	cookie.CookieManager
 }
 
@@ -48,21 +49,23 @@ func NewAuthHandler(
 	changePassword auth_usecase.ChangePassword,
 	reactivate auth_usecase.Reactivate,
 
-	authService service.AuthenticationService,
+	authenticationService service.AuthenticationService,
+	authorizationService service.AuthorizationService,
 	cookieManger cookie.CookieManager,
 ) oas.AuthHandler {
 	return &authHandler{
-		AuthLogin:        authLogin,
-		AuthCallback:     authCallback,
-		Revoke:           revoke,
-		LoginForDev:      devLogin,
-		DetachAccount:    detachAccount,
-		authService:      authService,
-		CookieManager:    cookieManger,
-		passwordLogin:    login,
-		passwordRegister: register,
-		changePassword:   changePassword,
-		reactivate:       reactivate,
+		AuthLogin:             authLogin,
+		AuthCallback:          authCallback,
+		Revoke:                revoke,
+		LoginForDev:           devLogin,
+		DetachAccount:         detachAccount,
+		authenticationService: authenticationService,
+		authorizationService:  authorizationService,
+		CookieManager:         cookieManger,
+		passwordLogin:         login,
+		passwordRegister:      register,
+		changePassword:        changePassword,
+		reactivate:            reactivate,
 	}
 }
 
@@ -148,7 +151,7 @@ func (a *authHandler) RevokeToken(ctx context.Context) (oas.RevokeTokenRes, erro
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.OAuthTokenRevoke")
 	defer span.End()
 
-	authCtx, err := getAuthenticationContext(a.authService, ctx)
+	authCtx, err := a.authorizationService.GetAuthContext(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -213,7 +216,7 @@ func (a *authHandler) AuthAccountDetach(ctx context.Context) (oas.AuthAccountDet
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.AuthAccountDetach")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(a.authService, ctx)
+	authCtx, err := a.authorizationService.RequireAuth(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -278,7 +281,7 @@ func (a *authHandler) ChangePassword(ctx context.Context, params oas.ChangePassw
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.ChangePassword")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(a.authService, ctx)
+	authCtx, err := a.authorizationService.RequireAuth(ctx)
 	if err != nil {
 		return nil, err
 	}

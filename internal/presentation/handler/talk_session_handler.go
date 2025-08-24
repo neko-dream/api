@@ -42,7 +42,7 @@ type talkSessionHandler struct {
 	editTalkSessionCommand  talksession_usecase.EditTalkSessionUseCase
 	takeConsentCommand      talksession_usecase.TakeConsentUseCase
 
-	authService service.AuthenticationService
+	authorizationService service.AuthorizationService
 	session.TokenManager
 }
 
@@ -64,7 +64,7 @@ func NewTalkSessionHandler(
 	editTalkSessionCommand talksession_usecase.EditTalkSessionUseCase,
 	takeConsentCommand talksession_usecase.TakeConsentUseCase,
 
-	authService service.AuthenticationService,
+	authorizationService service.AuthorizationService,
 	tokenManager session.TokenManager,
 ) oas.TalkSessionHandler {
 	return &talkSessionHandler{
@@ -85,8 +85,8 @@ func NewTalkSessionHandler(
 		editTalkSessionCommand:  editTalkSessionCommand,
 		takeConsentCommand:      takeConsentCommand,
 
-		authService:  authService,
-		TokenManager: tokenManager,
+		authorizationService: authorizationService,
+		TokenManager:         tokenManager,
 	}
 }
 
@@ -95,7 +95,7 @@ func (t *talkSessionHandler) PostConclusion(ctx context.Context, req *oas.PostCo
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.PostConclusion")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(t.authService, t.SetSession(ctx))
+	authCtx, err := t.authorizationService.RequireAuth(t.SetSession(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -159,7 +159,7 @@ func (t *talkSessionHandler) GetOpenedTalkSession(ctx context.Context, params oa
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetOpenedTalkSession")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(t.authService, t.SetSession(ctx))
+	authCtx, err := t.authorizationService.RequireAuth(t.SetSession(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -242,7 +242,7 @@ func (t *talkSessionHandler) InitiateTalkSession(ctx context.Context, req *oas.I
 		return nil, messages.RequiredParameterError
 	}
 
-	authCtx, err := requireAuthentication(t.authService, ctx)
+	authCtx, err := t.authorizationService.RequireAuth(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -377,7 +377,7 @@ func (t *talkSessionHandler) TalkSessionAnalysis(ctx context.Context, params oas
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.TalkSessionAnalysis")
 	defer span.End()
 
-	authCtx, _ := getAuthenticationContext(t.authService, t.SetSession(ctx))
+	authCtx, _ := t.authorizationService.GetAuthContext(t.SetSession(ctx))
 	var userID *shared.UUID[user.User]
 	if authCtx != nil {
 		userID = &authCtx.UserID
@@ -445,7 +445,7 @@ func (t *talkSessionHandler) EditTalkSession(ctx context.Context, req *oas.EditT
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.EditTalkSession")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(t.authService, t.SetSession(ctx))
+	authCtx, err := t.authorizationService.RequireAuth(t.SetSession(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -513,7 +513,7 @@ func (t *talkSessionHandler) GetTalkSessionRestrictionSatisfied(ctx context.Cont
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetTalkSessionRestrictionSatisfied")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(t.authService, t.SetSession(ctx))
+	authCtx, err := t.authorizationService.RequireAuth(t.SetSession(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -549,7 +549,7 @@ func (t *talkSessionHandler) GetReportsForTalkSession(ctx context.Context, param
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetReportsForTalkSession")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(t.authService, t.SetSession(ctx))
+	authCtx, err := t.authorizationService.RequireAuth(t.SetSession(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -593,7 +593,7 @@ func (t *talkSessionHandler) GetTalkSessionReportCount(ctx context.Context, para
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetTalkSessionReportCount")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(t.authService, t.SetSession(ctx))
+	authCtx, err := t.authorizationService.RequireAuth(t.SetSession(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -623,7 +623,7 @@ func (t *talkSessionHandler) ConsentTalkSession(ctx context.Context, params oas.
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.ConsentTalkSession")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(t.authService, t.SetSession(ctx))
+	authCtx, err := t.authorizationService.RequireAuth(t.SetSession(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -650,7 +650,7 @@ func (t *talkSessionHandler) HasConsent(ctx context.Context, params oas.HasConse
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.HasConsent")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(t.authService, t.SetSession(ctx))
+	authCtx, err := t.authorizationService.RequireAuth(t.SetSession(ctx))
 	if err != nil {
 		return nil, err
 	}

@@ -14,16 +14,16 @@ import (
 
 type analysisHandler struct {
 	applyFeedbackUseCase analysis_usecase.ApplyFeedbackUseCase
-	authService          service.AuthenticationService
+	authorizationService service.AuthorizationService
 }
 
 func NewAnalysisHandler(
 	applyFeedbackUseCase analysis_usecase.ApplyFeedbackUseCase,
-	authService service.AuthenticationService,
+	authorizationService service.AuthorizationService,
 ) oas.AnalysisHandler {
 	return &analysisHandler{
 		applyFeedbackUseCase: applyFeedbackUseCase,
-		authService:          authService,
+		authorizationService: authorizationService,
 	}
 }
 
@@ -32,7 +32,7 @@ func (a *analysisHandler) ApplyFeedbackToReport(ctx context.Context, req *oas.Ap
 	ctx, span := otel.Tracer("handler").Start(ctx, "analysisHandler.ApplyFeedbackToReport")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(a.authService, ctx)
+	authCtx, err := a.authorizationService.RequireAuth(ctx)
 	if err != nil {
 		return nil, err
 	}

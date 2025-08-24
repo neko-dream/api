@@ -19,22 +19,22 @@ import (
 
 type timelineHandler struct {
 	timeline_usecase.AddTimeLine
-	et          timeline_usecase.EditTimeLine
-	gt          timeline_query.GetTimeLine
-	authService service.AuthenticationService
+	et                   timeline_usecase.EditTimeLine
+	gt                   timeline_query.GetTimeLine
+	authorizationService service.AuthorizationService
 }
 
 func NewTimelineHandler(
 	addTimeLine timeline_usecase.AddTimeLine,
 	editTimeLine timeline_usecase.EditTimeLine,
 	getTimeLine timeline_query.GetTimeLine,
-	authService service.AuthenticationService,
+	authorizationService service.AuthorizationService,
 ) oas.TimelineHandler {
 	return &timelineHandler{
-		AddTimeLine: addTimeLine,
-		et:          editTimeLine,
-		gt:          getTimeLine,
-		authService: authService,
+		AddTimeLine:          addTimeLine,
+		et:                   editTimeLine,
+		gt:                   getTimeLine,
+		authorizationService: authorizationService,
 	}
 }
 
@@ -79,7 +79,7 @@ func (t *timelineHandler) PostTimeLineItem(ctx context.Context, req *oas.PostTim
 	ctx, span := otel.Tracer("handler").Start(ctx, "timelineHandler.PostTimeLineItem")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(t.authService, ctx)
+	authCtx, err := t.authorizationService.RequireAuth(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ func (t *timelineHandler) EditTimeLine(ctx context.Context, req *oas.EditTimeLin
 	ctx, span := otel.Tracer("handler").Start(ctx, "timelineHandler.EditTimeLine")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(t.authService, ctx)
+	authCtx, err := t.authorizationService.RequireAuth(ctx)
 	if err != nil {
 		return nil, err
 	}
