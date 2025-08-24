@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/neko-dream/server/internal/domain/model/clock"
+	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"go.opentelemetry.io/otel"
@@ -53,6 +54,7 @@ type (
 	SessionService interface {
 		RefreshSession(context.Context, shared.UUID[user.User]) (*Session, error)
 		DeactivateUserSessions(context.Context, shared.UUID[user.User]) error
+		SwitchOrganization(context.Context, shared.UUID[user.User], shared.UUID[organization.Organization]) (*Session, error)
 	}
 
 	Session struct {
