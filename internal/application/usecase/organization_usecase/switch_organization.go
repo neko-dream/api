@@ -11,14 +11,15 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/domain/service"
 	organization_svc "github.com/neko-dream/server/internal/domain/service/organization"
 	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
 type SwitchOrganizationUseCaseInput struct {
-	Code string
+	Code      string
+	UserID    shared.UUID[user.User]
+	SessionID shared.UUID[session.Session]
 }
 
 type SwitchOrganizationUseCaseOutput struct {
@@ -30,7 +31,6 @@ type SwitchOrganizationUseCase interface {
 }
 
 type switchOrganizationInteractor struct {
-	authorizationService service.AuthorizationService
 	organizationService  organization_svc.OrganizationService
 	organizationUserRepo organization.OrganizationUserRepository
 	sessionService       session.SessionService
@@ -46,13 +46,6 @@ func (s *switchOrganizationInteractor) Execute(
 	ctx, span := otel.Tracer("usecase").Start(ctx, "switchOrganizationInteractor.Execute")
 	defer span.End()
 
-	// 認証必須
-	authCtx, err := s.authorizationService.RequireAuthentication(ctx)
-	if err != nil {
-		utils.HandleError(ctx, err, "authorizationService.RequireAuthentication")
-		return nil, errtrace.Wrap(err)
-	}
-
 	// 組織コードから組織IDを解決
 	orgIDAny, err := s.organizationService.ResolveOrganizationIDFromCode(ctx, &input.Code)
 	if err != nil {
@@ -60,7 +53,6 @@ func (s *switchOrganizationInteractor) Execute(
 		return nil, errtrace.Wrap(err)
 	}
 	if orgIDAny == nil {
-		// セキュリティ強化: 組織が見つからない場合も権限エラーとして返す
 		return nil, messages.OrganizationPermissionDenied
 	}
 
@@ -68,7 +60,7 @@ func (s *switchOrganizationInteractor) Execute(
 	orgID := shared.UUID[organization.Organization](orgIDAny.UUID())
 
 	// ユーザーがその組織に所属しているか確認
-	_, err = s.organizationUserRepo.FindByOrganizationIDAndUserID(ctx, orgID, authCtx.UserID)
+	_, err = s.organizationUserRepo.FindByOrganizationIDAndUserID(ctx, orgID, input.UserID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, messages.OrganizationPermissionDenied
@@ -78,14 +70,14 @@ func (s *switchOrganizationInteractor) Execute(
 	}
 
 	// 現在のセッションを無効化し、新しい組織付きセッションを作成
-	newSession, err := s.sessionService.SwitchOrganization(ctx, authCtx.UserID, orgID, authCtx.SessionID)
+	newSession, err := s.sessionService.SwitchOrganization(ctx, input.UserID, orgID, input.SessionID)
 	if err != nil {
 		utils.HandleError(ctx, err, "sessionService.SwitchOrganization")
 		return nil, errtrace.Wrap(err)
 	}
 
 	// ユーザー情報を取得
-	userInfo, err := s.userRepository.FindByID(ctx, authCtx.UserID)
+	userInfo, err := s.userRepository.FindByID(ctx, input.UserID)
 	if err != nil {
 		utils.HandleError(ctx, err, "userRepository.FindByID")
 		return nil, errtrace.Wrap(err)
@@ -108,7 +100,6 @@ func (s *switchOrganizationInteractor) Execute(
 }
 
 func NewSwitchOrganizationUseCase(
-	authorizationService service.AuthorizationService,
 	organizationService organization_svc.OrganizationService,
 	organizationUserRepo organization.OrganizationUserRepository,
 	sessionService session.SessionService,
@@ -116,7 +107,6 @@ func NewSwitchOrganizationUseCase(
 	userRepository user.UserRepository,
 ) SwitchOrganizationUseCase {
 	return &switchOrganizationInteractor{
-		authorizationService: authorizationService,
 		organizationService:  organizationService,
 		organizationUserRepo: organizationUserRepo,
 		sessionService:       sessionService,

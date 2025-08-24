@@ -345,8 +345,15 @@ func (o *organizationHandler) SwitchOrganization(ctx context.Context, params oas
 	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.SwitchOrganization")
 	defer span.End()
 
+	authCtx, err := o.authorizationService.RequireAuthentication(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	output, err := o.switchOrganization.Execute(ctx, organization_usecase.SwitchOrganizationUseCaseInput{
-		Code: params.Code,
+		Code:      params.Code,
+		UserID:    authCtx.UserID,
+		SessionID: authCtx.SessionID,
 	})
 	if err != nil {
 		return nil, err
