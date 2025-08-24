@@ -13,7 +13,6 @@ func domainDeps() []ProvideArg {
 	return []ProvideArg{
 		{service.NewAuthenticationService, nil},
 		{service.NewAuthorizationService, nil},
-		{service.NewAuthService, nil}, // 後方互換性のため保持
 		{service.NewSessionService, nil},
 		{service.NewUserService, nil},
 		{service.NewOpinionService, nil},
