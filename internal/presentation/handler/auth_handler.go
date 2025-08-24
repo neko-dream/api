@@ -32,8 +32,7 @@ type authHandler struct {
 	changePassword   auth_usecase.ChangePassword
 	reactivate       auth_usecase.Reactivate
 
-	authenticationService service.AuthenticationService
-	authorizationService  service.AuthorizationService
+	authorizationService service.AuthorizationService
 	cookie.CookieManager
 }
 
@@ -152,6 +151,9 @@ func (a *authHandler) RevokeToken(ctx context.Context) (oas.RevokeTokenRes, erro
 	authCtx, err := a.authorizationService.GetAuthContext(ctx)
 	if err != nil {
 		return nil, err
+	}
+	if authCtx == nil {
+		return nil, nil
 	}
 
 	_, err = a.Revoke.Execute(ctx, auth_usecase.RevokeInput{
