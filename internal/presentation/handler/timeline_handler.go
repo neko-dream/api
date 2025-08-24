@@ -79,7 +79,7 @@ func (t *timelineHandler) PostTimeLineItem(ctx context.Context, req *oas.PostTim
 	ctx, span := otel.Tracer("handler").Start(ctx, "timelineHandler.PostTimeLineItem")
 	defer span.End()
 
-	authCtx, err := t.authorizationService.RequireAuth(ctx)
+	authCtx, err := t.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ func (t *timelineHandler) EditTimeLine(ctx context.Context, req *oas.EditTimeLin
 	ctx, span := otel.Tracer("handler").Start(ctx, "timelineHandler.EditTimeLine")
 	defer span.End()
 
-	authCtx, err := t.authorizationService.RequireAuth(ctx)
+	authCtx, err := t.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -335,7 +335,7 @@ func (m *manageHandler) GetAnalysisReportManage(ctx context.Context, params oas.
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetReportBySessionId")
 	defer span.End()
 
-	authCtx, err := m.authorizationService.RequireAuth(m.SetSession(ctx))
+	authCtx, err := m.authorizationService.RequireAuthentication(m.SetSession(ctx))
 	if err != nil {
 		return nil, err
 	}

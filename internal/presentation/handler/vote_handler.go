@@ -33,7 +33,7 @@ func (v *voteHandler) Vote2(ctx context.Context, req *oas.Vote2Req, params oas.V
 	ctx, span := otel.Tracer("handler").Start(ctx, "voteHandler.Vote")
 	defer span.End()
 
-	authCtx, err := v.authorizationService.RequireAuth(ctx)
+	authCtx, err := v.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}

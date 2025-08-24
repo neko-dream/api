@@ -32,7 +32,7 @@ func (a *analysisHandler) ApplyFeedbackToReport(ctx context.Context, req *oas.Ap
 	ctx, span := otel.Tracer("handler").Start(ctx, "analysisHandler.ApplyFeedbackToReport")
 	defer span.End()
 
-	authCtx, err := a.authorizationService.RequireAuth(ctx)
+	authCtx, err := a.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -214,7 +214,7 @@ func (a *authHandler) AuthAccountDetach(ctx context.Context) (oas.AuthAccountDet
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.AuthAccountDetach")
 	defer span.End()
 
-	authCtx, err := a.authorizationService.RequireAuth(ctx)
+	authCtx, err := a.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -279,7 +279,7 @@ func (a *authHandler) ChangePassword(ctx context.Context, params oas.ChangePassw
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.ChangePassword")
 	defer span.End()
 
-	authCtx, err := a.authorizationService.RequireAuth(ctx)
+	authCtx, err := a.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}

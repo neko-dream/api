@@ -65,7 +65,7 @@ func (u *userHandler) OpinionsHistory(ctx context.Context, params oas.OpinionsHi
 	ctx, span := otel.Tracer("handler").Start(ctx, "userHandler.OpinionsHistory")
 	defer span.End()
 
-	authCtx, err := u.authorizationService.RequireAuth(ctx)
+	authCtx, err := u.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +121,7 @@ func (u *userHandler) SessionsHistory(ctx context.Context, params oas.SessionsHi
 	ctx, span := otel.Tracer("handler").Start(ctx, "userHandler.SessionsHistory")
 	defer span.End()
 
-	authCtx, err := u.authorizationService.RequireAuth(ctx)
+	authCtx, err := u.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +177,7 @@ func (u *userHandler) GetUserInfo(ctx context.Context) (oas.GetUserInfoRes, erro
 	ctx, span := otel.Tracer("handler").Start(ctx, "userHandler.GetUserInfo")
 	defer span.End()
 
-	authCtx, err := u.authorizationService.RequireAuth(ctx)
+	authCtx, err := u.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -216,7 +216,7 @@ func (u *userHandler) UpdateUserProfile(ctx context.Context, params *oas.UpdateU
 		return nil, messages.RequiredParameterError
 	}
 
-	authCtx, err := u.authorizationService.RequireAuth(ctx)
+	authCtx, err := u.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -303,7 +303,7 @@ func (u *userHandler) EstablishUser(ctx context.Context, params *oas.EstablishUs
 		return nil, messages.RequiredParameterError
 	}
 
-	authCtx, err := u.authorizationService.RequireAuth(ctx)
+	authCtx, err := u.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -392,7 +392,7 @@ func (u *userHandler) WithdrawUser(ctx context.Context) (oas.WithdrawUserRes, er
 	ctx, span := otel.Tracer("handler").Start(ctx, "userHandler.WithdrawUser")
 	defer span.End()
 
-	authCtx, err := u.authorizationService.RequireAuth(ctx)
+	authCtx, err := u.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}

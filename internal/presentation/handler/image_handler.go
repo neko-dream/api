@@ -32,7 +32,7 @@ func (i *imageHandler) PostImage(ctx context.Context, req *oas.PostImageReq) (oa
 	ctx, span := otel.Tracer("handler").Start(ctx, "imageHandler.PostImage")
 	defer span.End()
 
-	authCtx, err := i.authorizationService.RequireAuth(ctx)
+	authCtx, err := i.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}

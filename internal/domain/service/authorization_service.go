@@ -21,18 +21,18 @@ type AuthorizationService interface {
 	GetUserID(ctx context.Context) (*shared.UUID[user.User], error)
 
 	// 認証必須（認証されていない場合はエラー）
-	RequireAuth(ctx context.Context) (*auth.AuthenticationContext, error)
+	RequireAuthentication(ctx context.Context) (*auth.AuthenticationContext, error)
 
 	// 組織ロール必須
-	RequireOrgRole(ctx context.Context, minRole organization.OrganizationUserRole) (*auth.AuthenticationContext, error)
+	RequireOrganizationRole(ctx context.Context, minRole organization.OrganizationUserRole) (*auth.AuthenticationContext, error)
 
-	// スーパー管理者必須（RequireOrgRoleのエイリアス）
+	// スーパー管理者必須（RequireOrganizationRoleのエイリアス）
 	RequireSuperAdmin(ctx context.Context) (*auth.AuthenticationContext, error)
 
-	// オーナー権限必須（RequireOrgRoleのエイリアス）
+	// オーナー権限必須（RequireOrganizationRoleのエイリアス）
 	RequireOwner(ctx context.Context) (*auth.AuthenticationContext, error)
 
-	// 管理者以上の権限必須（RequireOrgRoleのエイリアス）
+	// 管理者以上の権限必須（RequireOrganizationRoleのエイリアス）
 	RequireAdmin(ctx context.Context) (*auth.AuthenticationContext, error)
 
 	// 運営ユーザーかどうか
@@ -85,9 +85,9 @@ func (a *authorizationService) GetUserID(ctx context.Context) (*shared.UUID[user
 	return &authCtx.UserID, nil
 }
 
-// RequireAuth 認証必須（認証されていない場合はエラー）
-func (a *authorizationService) RequireAuth(ctx context.Context) (*auth.AuthenticationContext, error) {
-	ctx, span := otel.Tracer("service").Start(ctx, "authorizationService.RequireAuth")
+// RequireAuthentication 認証必須（認証されていない場合はエラー）
+func (a *authorizationService) RequireAuthentication(ctx context.Context) (*auth.AuthenticationContext, error) {
+	ctx, span := otel.Tracer("service").Start(ctx, "authorizationService.RequireAuthentication")
 	defer span.End()
 
 	claim, err := a.GetAuthContext(ctx)
@@ -98,12 +98,12 @@ func (a *authorizationService) RequireAuth(ctx context.Context) (*auth.Authentic
 	return claim, nil
 }
 
-// RequireOrgRole 組織ロール必須
-func (a *authorizationService) RequireOrgRole(ctx context.Context, minRole organization.OrganizationUserRole) (*auth.AuthenticationContext, error) {
-	ctx, span := otel.Tracer("service").Start(ctx, "authorizationService.RequireOrgRole")
+// RequireOrganizationRole 組織ロール必須
+func (a *authorizationService) RequireOrganizationRole(ctx context.Context, minRole organization.OrganizationUserRole) (*auth.AuthenticationContext, error) {
+	ctx, span := otel.Tracer("service").Start(ctx, "authorizationService.RequireOrganizationRole")
 	defer span.End()
 
-	authCtx, err := a.RequireAuth(ctx)
+	authCtx, err := a.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +124,7 @@ func (a *authorizationService) RequireSuperAdmin(ctx context.Context) (*auth.Aut
 	ctx, span := otel.Tracer("service").Start(ctx, "authorizationService.RequireSuperAdmin")
 	defer span.End()
 
-	return a.RequireOrgRole(ctx, organization.OrganizationUserRoleSuperAdmin)
+	return a.RequireOrganizationRole(ctx, organization.OrganizationUserRoleSuperAdmin)
 }
 
 // RequireOwner オーナー権限必須（RequireOrgRoleのエイリアス）
@@ -132,7 +132,7 @@ func (a *authorizationService) RequireOwner(ctx context.Context) (*auth.Authenti
 	ctx, span := otel.Tracer("service").Start(ctx, "authorizationService.RequireOwner")
 	defer span.End()
 
-	return a.RequireOrgRole(ctx, organization.OrganizationUserRoleOwner)
+	return a.RequireOrganizationRole(ctx, organization.OrganizationUserRoleOwner)
 }
 
 // RequireAdmin 管理者以上の権限必須（RequireOrgRoleのエイリアス）
@@ -140,7 +140,7 @@ func (a *authorizationService) RequireAdmin(ctx context.Context) (*auth.Authenti
 	ctx, span := otel.Tracer("service").Start(ctx, "authorizationService.RequireAdmin")
 	defer span.End()
 
-	return a.RequireOrgRole(ctx, organization.OrganizationUserRoleAdmin)
+	return a.RequireOrganizationRole(ctx, organization.OrganizationUserRoleAdmin)
 }
 
 // IsAuthenticated 認証されているかをチェック

@@ -74,7 +74,7 @@ func (o *organizationHandler) EstablishOrganization(ctx context.Context, req *oa
 	if req == nil {
 		return nil, messages.BadRequestError
 	}
-	authCtx, err := o.authorizationService.RequireAuth(ctx)
+	authCtx, err := o.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func (o *organizationHandler) InviteOrganization(ctx context.Context, req *oas.I
 		return nil, messages.BadRequestError
 	}
 
-	authCtx, err := o.authorizationService.RequireAuth(ctx)
+	authCtx, err := o.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +138,7 @@ func (o *organizationHandler) InviteOrganizationForUser(ctx context.Context, req
 	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.InviteOrganizationForUser")
 	defer span.End()
 
-	authCtx, err := o.authorizationService.RequireAuth(ctx)
+	authCtx, err := o.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -170,7 +170,7 @@ func (o *organizationHandler) GetOrganizations(ctx context.Context) (oas.GetOrga
 	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.GetOrganizations")
 	defer span.End()
 
-	authCtx, err := o.authorizationService.RequireAuth(ctx)
+	authCtx, err := o.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -228,7 +228,7 @@ func (o *organizationHandler) GetOrganizationAliases(ctx context.Context) (oas.G
 	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.GetOrganizationAliases")
 	defer span.End()
 
-	authCtx, err := o.authorizationService.RequireOrgRole(ctx, organization.OrganizationUserRoleMember)
+	authCtx, err := o.authorizationService.RequireOrganizationRole(ctx, organization.OrganizationUserRoleMember)
 	if err != nil {
 		return nil, err
 	}
@@ -308,7 +308,7 @@ func (o *organizationHandler) GetOrganizationUsers(ctx context.Context) (oas.Get
 	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.GetOrganizationUsers")
 	defer span.End()
 
-	authCtx, err := o.authorizationService.RequireOrgRole(ctx, organization.OrganizationUserRoleMember)
+	authCtx, err := o.authorizationService.RequireOrganizationRole(ctx, organization.OrganizationUserRoleMember)
 	if err != nil {
 		return nil, err
 	}

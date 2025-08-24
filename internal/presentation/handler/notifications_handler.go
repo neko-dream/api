@@ -54,7 +54,7 @@ func (h *notificationsHandler) RegisterDevice(ctx context.Context, req *oas.Regi
 	defer span.End()
 
 	// 認証チェック
-	authCtx, err := h.authorizationService.RequireAuth(ctx)
+	authCtx, err := h.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return &oas.RegisterDeviceUnauthorized{}, nil
 	}
@@ -160,7 +160,7 @@ func (h *notificationsHandler) GetDevices(ctx context.Context) (oas.GetDevicesRe
 	defer span.End()
 
 	// 認証チェック
-	authCtx, err := h.authorizationService.RequireAuth(ctx)
+	authCtx, err := h.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return &oas.GetDevicesUnauthorized{}, nil
 	}
@@ -214,7 +214,7 @@ func (h *notificationsHandler) DeleteDevice(ctx context.Context, params oas.Dele
 	ctx, span := otel.Tracer("handler").Start(ctx, "notificationsHandler.DeleteDevice")
 	defer span.End()
 
-	authCtx, err := h.authorizationService.RequireAuth(ctx)
+	authCtx, err := h.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return &oas.DeleteDeviceUnauthorized{}, nil
 	}
@@ -254,7 +254,7 @@ func (h *notificationsHandler) GetNotificationPreferences(ctx context.Context) (
 	defer span.End()
 
 	// 認証チェック
-	authCtx, err := h.authorizationService.RequireAuth(ctx)
+	authCtx, err := h.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return &oas.GetNotificationPreferencesUnauthorized{}, nil
 	}
@@ -277,7 +277,7 @@ func (h *notificationsHandler) UpdateNotificationPreferences(ctx context.Context
 	ctx, span := otel.Tracer("handler").Start(ctx, "notificationsHandler.UpdateNotificationPreferences")
 	defer span.End()
 
-	authCtx, err := h.authorizationService.RequireAuth(ctx)
+	authCtx, err := h.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return &oas.UpdateNotificationPreferencesUnauthorized{}, nil
 	}
@@ -362,7 +362,7 @@ func (h *notificationsHandler) SendTestNotification(ctx context.Context, req *oa
 	}
 
 	// 認証チェック
-	authCtx, err := h.authorizationService.RequireAuth(ctx)
+	authCtx, err := h.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return &oas.SendTestNotificationUnauthorized{}, nil
 	}

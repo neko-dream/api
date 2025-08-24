@@ -37,7 +37,7 @@ func (h *policyHandler) GetPolicyConsentStatus(ctx context.Context) (oas.GetPoli
 	ctx, span := otel.Tracer("handler").Start(ctx, "PolicyHandler.CheckConsent")
 	defer span.End()
 
-	authCtx, err := h.authorizationService.RequireAuth(ctx)
+	authCtx, err := h.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (h *policyHandler) PolicyConsent(ctx context.Context, req *oas.PolicyConsen
 	ctx, span := otel.Tracer("handler").Start(ctx, "PolicyHandler.AcceptPolicy")
 	defer span.End()
 
-	authCtx, err := h.authorizationService.RequireAuth(ctx)
+	authCtx, err := h.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
