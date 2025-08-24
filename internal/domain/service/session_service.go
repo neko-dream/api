@@ -6,6 +6,7 @@ import (
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/model/clock"
+	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
@@ -84,6 +85,56 @@ func (s *sessionService) RefreshSession(
 	}
 
 	return updatedSess, nil
+}
+
+// SwitchOrganization implements session.SessionService.
+func (s *sessionService) SwitchOrganization(
+	ctx context.Context,
+	userID shared.UUID[user.User],
+	organizationID shared.UUID[organization.Organization],
+) (*session.Session, error) {
+	ctx, span := otel.Tracer("service").Start(ctx, "sessionService.SwitchOrganization")
+	defer span.End()
+
+	// 既存セッションを取得してプロバイダー情報を引き継ぐ
+	sessions, err := s.sessionRepository.FindByUserID(ctx, userID)
+	if err != nil {
+		utils.HandleError(ctx, err, "sessionRepository.FindByUserID")
+		return nil, errtrace.Wrap(err)
+	}
+	// 最新のアクティブなセッションからプロバイダー情報を取得
+	var provider shared.AuthProviderName
+	activeSessions := session.FilterActiveSessions(ctx, session.SortByLastActivity(sessions))
+	if len(activeSessions) > 0 {
+		provider = activeSessions[0].Provider()
+	}
+
+	// 既存のアクティブなセッションをすべて無効化
+	if err := s.sessionRepository.DeactivateAllByUserID(ctx, userID); err != nil {
+		utils.HandleError(ctx, err, "sessionRepository.DeactivateAllByUserID")
+		return nil, errtrace.Wrap(err)
+	}
+
+	// 新しい組織付きセッションを作成
+	// organizationIDをany型にキャスト
+	orgID := shared.UUID[any](organizationID.UUID())
+	newSess := session.NewSessionWithOrganization(
+		shared.NewUUID[session.Session](),
+		userID,
+		provider,
+		session.SESSION_ACTIVE,
+		*session.NewExpiresAt(ctx),
+		clock.Now(ctx),
+		&orgID,
+	)
+
+	createdSess, err := s.sessionRepository.Create(ctx, *newSess)
+	if err != nil {
+		utils.HandleError(ctx, err, "sessionRepository.Create")
+		return nil, errtrace.Wrap(err)
+	}
+
+	return createdSess, nil
 }
 
 func NewSessionService(
