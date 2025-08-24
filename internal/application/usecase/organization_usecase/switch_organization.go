@@ -30,13 +30,12 @@ type SwitchOrganizationUseCase interface {
 }
 
 type switchOrganizationInteractor struct {
-	authorizationService      service.AuthorizationService
-	organizationService       organization_svc.OrganizationService
-	organizationMemberManager organization_svc.OrganizationMemberManager
-	organizationUserRepo      organization.OrganizationUserRepository
-	sessionService            session.SessionService
-	tokenManager              session.TokenManager
-	userRepository            user.UserRepository
+	authorizationService service.AuthorizationService
+	organizationService  organization_svc.OrganizationService
+	organizationUserRepo organization.OrganizationUserRepository
+	sessionService       session.SessionService
+	tokenManager         session.TokenManager
+	userRepository       user.UserRepository
 }
 
 // Execute 組織を切り替える
@@ -110,19 +109,17 @@ func (s *switchOrganizationInteractor) Execute(
 func NewSwitchOrganizationUseCase(
 	authorizationService service.AuthorizationService,
 	organizationService organization_svc.OrganizationService,
-	organizationMemberManager organization_svc.OrganizationMemberManager,
 	organizationUserRepo organization.OrganizationUserRepository,
 	sessionService session.SessionService,
 	tokenManager session.TokenManager,
 	userRepository user.UserRepository,
 ) SwitchOrganizationUseCase {
 	return &switchOrganizationInteractor{
-		authorizationService:      authorizationService,
-		organizationService:       organizationService,
-		organizationMemberManager: organizationMemberManager,
-		organizationUserRepo:      organizationUserRepo,
-		sessionService:            sessionService,
-		tokenManager:              tokenManager,
-		userRepository:            userRepository,
+		authorizationService: authorizationService,
+		organizationService:  organizationService,
+		organizationUserRepo: organizationUserRepo,
+		sessionService:       sessionService,
+		tokenManager:         tokenManager,
+		userRepository:       userRepository,
 	}
 }
