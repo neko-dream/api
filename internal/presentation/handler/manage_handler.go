@@ -42,12 +42,7 @@ func (m *manageHandler) GetUserStatsTotalManage(ctx context.Context) (*oas.UserS
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetUserStatsTotalManage")
 	defer span.End()
 
-	authCtx, err := m.authorizationService.RequireAuth(m.SetSession(ctx))
-	if err != nil {
-		return nil, err
-	}
-	// org所属のユーザであることを確認
-	if !authCtx.IsInOrganization() {
+	if !m.authorizationService.IsKotohiro(m.SetSession(ctx)) {
 		return nil, messages.ForbiddenError
 	}
 
@@ -75,13 +70,8 @@ func (m *manageHandler) GetUserStatsListManage(ctx context.Context, params oas.G
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetUserStatsListManage")
 	defer span.End()
 
-	authCtx, err := m.authorizationService.RequireAuth(m.SetSession(ctx))
-	if err != nil {
-		return []oas.UserStatsResponse{}, err
-	}
-	// org所属のユーザであることを確認
-	if !authCtx.IsInOrganization() {
-		return []oas.UserStatsResponse{}, messages.ForbiddenError
+	if !m.authorizationService.IsKotohiro(m.SetSession(ctx)) {
+		return nil, messages.ForbiddenError
 	}
 
 	var page, limit int32
@@ -155,17 +145,8 @@ func (m *manageHandler) GetTalkSessionListManage(ctx context.Context, params oas
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetTalkSessionListManage")
 	defer span.End()
 
-	authCtx, err := m.authorizationService.RequireAuth(m.SetSession(ctx))
-	if err != nil {
-		return &oas.TalkSessionListResponse{
-			TotalCount: 0,
-		}, err
-	}
-	// org所属のユーザであることを確認
-	if !authCtx.IsInOrganization() {
-		return &oas.TalkSessionListResponse{
-			TotalCount: 0,
-		}, messages.ForbiddenError
+	if !m.authorizationService.IsKotohiro(m.SetSession(ctx)) {
+		return nil, messages.ForbiddenError
 	}
 
 	limit, ok := params.Limit.Get()
@@ -276,6 +257,10 @@ func (m *manageHandler) ManageRegenerateManage(ctx context.Context, req *oas.Reg
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.ManageRegenerate")
 	defer span.End()
 
+	if !m.authorizationService.IsKotohiro(m.SetSession(ctx)) {
+		return nil, messages.ForbiddenError
+	}
+
 	tp := req.Type
 	tpb, err := tp.MarshalText()
 	if err != nil {
@@ -322,11 +307,7 @@ func (m *manageHandler) ToggleReportVisibilityManage(ctx context.Context, req *o
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.ToggleReportVisibilityManage")
 	defer span.End()
 
-	authCtx, err := m.authorizationService.RequireAuth(m.SetSession(ctx))
-	if err != nil {
-		return nil, err
-	}
-	if !authCtx.IsInOrganization() {
+	if !m.authorizationService.IsKotohiro(m.SetSession(ctx)) {
 		return nil, messages.ForbiddenError
 	}
 

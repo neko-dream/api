@@ -59,3 +59,7 @@ func (ac *AuthenticationContext) IsAdmin() bool {
 func (ac *AuthenticationContext) RequiresPasswordChange() bool {
 	return ac.RequiredPasswordChange
 }
+
+func (ac *AuthenticationContext) IsKotohiro() bool {
+	return ac.OrganizationID != nil && *ac.OrganizationID == organization.KotohiroOrganizationID
+}

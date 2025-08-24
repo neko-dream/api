@@ -144,7 +144,7 @@ func (a *authHandler) HandleAuthCallback(ctx context.Context, params oas.HandleA
 	return headers, nil
 }
 
-// RevokeToken implements oas.Handler.
+// RevokeToken ログアウト
 func (a *authHandler) RevokeToken(ctx context.Context) (oas.RevokeTokenRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.OAuthTokenRevoke")
 	defer span.End()

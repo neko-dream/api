@@ -8,9 +8,12 @@ import (
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/server/internal/domain/messages"
+	"github.com/samber/lo"
 	"github.com/neko-dream/server/internal/domain/model/auth"
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/consent"
+	"github.com/neko-dream/server/internal/domain/model/organization"
+	"github.com/neko-dream/server/internal/domain/model/session"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/config"
@@ -25,6 +28,9 @@ type AuthenticationService interface {
 
 	// OAuth用のstate生成
 	GenerateState(ctx context.Context) (string, error)
+
+	// セッションクレームから認証コンテキストを構築
+	BuildAuthContext(ctx context.Context, claim *session.Claim) (*auth.AuthenticationContext, error)
 }
 type authenticationService struct {
 	config              *config.Config
@@ -161,4 +167,49 @@ func (a *authenticationService) GenerateState(ctx context.Context) (string, erro
 	}
 
 	return string(b), nil
+}
+
+// BuildAuthContext implements AuthenticationService.
+func (a *authenticationService) BuildAuthContext(ctx context.Context, claim *session.Claim) (*auth.AuthenticationContext, error) {
+	ctx, span := otel.Tracer("service").Start(ctx, "authenticationService.BuildAuthContext")
+	defer span.End()
+
+	userID, err := claim.UserID()
+	if err != nil {
+		utils.HandleError(ctx, err, "claim.UserID")
+		return nil, messages.ForbiddenError
+	}
+
+	sessionID, err := claim.SessionID()
+	if err != nil {
+		utils.HandleError(ctx, err, "claim.SessionID")
+		return nil, messages.ForbiddenError
+	}
+
+	authCtx := &auth.AuthenticationContext{
+		UserID:                 userID,
+		SessionID:              sessionID,
+		DisplayName:            claim.DisplayName,
+		DisplayID:              claim.DisplayID,
+		IconURL:                claim.IconURL,
+		IsRegistered:           claim.IsRegistered,
+		IsEmailVerified:        claim.IsEmailVerified,
+		RequiredPasswordChange: claim.RequiredPasswordChange,
+	}
+
+	// 組織コンテキストがある場合は設定
+	if claim.OrganizationID != nil {
+		authCtx.OrganizationID = lo.ToPtr(shared.MustParseUUID[organization.Organization](*claim.OrganizationID))
+	}
+
+	if claim.OrganizationCode != nil {
+		authCtx.OrganizationCode = claim.OrganizationCode
+	}
+
+	if claim.OrganizationRole != nil {
+		role := organization.NameToRole(*claim.OrganizationRole)
+		authCtx.OrganizationRole = &role
+	}
+
+	return authCtx, nil
 }

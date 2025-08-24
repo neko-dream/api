@@ -228,12 +228,9 @@ func (o *organizationHandler) GetOrganizationAliases(ctx context.Context) (oas.G
 	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.GetOrganizationAliases")
 	defer span.End()
 
-	authCtx, err := o.authorizationService.RequireAuth(ctx)
+	authCtx, err := o.authorizationService.RequireOrgRole(ctx, organization.OrganizationUserRoleMember)
 	if err != nil {
 		return nil, err
-	}
-	if !authCtx.IsInOrganization() {
-		return nil, messages.OrganizationContextRequired
 	}
 
 	// エイリアス一覧取得
@@ -259,20 +256,12 @@ func (o *organizationHandler) CreateOrganizationAlias(ctx context.Context, req *
 	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.CreateOrganizationAlias")
 	defer span.End()
 
-	authCtx, err := o.authorizationService.RequireAuth(ctx)
+	authCtx, err := o.authorizationService.RequireAdmin(ctx)
 	if err != nil {
 		return nil, err
 	}
 	if req == nil || req.AliasName == "" {
 		return nil, messages.BadRequestError
-	}
-	// ユーザーが組織に所属しているか確認
-	if !authCtx.IsInOrganization() {
-		return nil, messages.OrganizationContextRequired
-	}
-	// ユーザーがAdmin以上の権限を持っているか確認
-	if !authCtx.HasOrganizationRole(organization.OrganizationUserRoleAdmin) {
-		return nil, messages.InsufficientPermissionsError
 	}
 
 	// エイリアス作成
@@ -293,7 +282,7 @@ func (o *organizationHandler) DeleteOrganizationAlias(ctx context.Context, param
 	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.DeleteOrganizationAlias")
 	defer span.End()
 
-	authCtx, err := o.authorizationService.RequireAuth(ctx)
+	authCtx, err := o.authorizationService.RequireAdmin(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -319,14 +308,9 @@ func (o *organizationHandler) GetOrganizationUsers(ctx context.Context) (oas.Get
 	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.GetOrganizationUsers")
 	defer span.End()
 
-	authCtx, err := o.authorizationService.RequireAuth(ctx)
+	authCtx, err := o.authorizationService.RequireOrgRole(ctx, organization.OrganizationUserRoleMember)
 	if err != nil {
 		return nil, err
-	}
-
-	// 組織コンテキストが必要
-	if !authCtx.IsInOrganization() {
-		return &oas.GetOrganizationUsersUnauthorized{}, nil
 	}
 
 	// クエリを実行
