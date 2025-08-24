@@ -92,21 +92,16 @@ func (s *sessionService) SwitchOrganization(
 	ctx context.Context,
 	userID shared.UUID[user.User],
 	organizationID shared.UUID[organization.Organization],
+	sessionID shared.UUID[session.Session],
 ) (*session.Session, error) {
 	ctx, span := otel.Tracer("service").Start(ctx, "sessionService.SwitchOrganization")
 	defer span.End()
 
 	// 既存セッションを取得してプロバイダー情報を引き継ぐ
-	sessions, err := s.sessionRepository.FindByUserID(ctx, userID)
+	sess, err := s.sessionRepository.FindBySessionID(ctx, sessionID)
 	if err != nil {
-		utils.HandleError(ctx, err, "sessionRepository.FindByUserID")
+		utils.HandleError(ctx, err, "sessionRepository.FindBySessionID")
 		return nil, errtrace.Wrap(err)
-	}
-	// 最新のアクティブなセッションからプロバイダー情報を取得
-	var provider shared.AuthProviderName
-	activeSessions := session.FilterActiveSessions(ctx, session.SortByLastActivity(sessions))
-	if len(activeSessions) > 0 {
-		provider = activeSessions[0].Provider()
 	}
 
 	// 既存のアクティブなセッションをすべて無効化
@@ -121,7 +116,7 @@ func (s *sessionService) SwitchOrganization(
 	newSess := session.NewSessionWithOrganization(
 		shared.NewUUID[session.Session](),
 		userID,
-		provider,
+		sess.Provider(),
 		session.SESSION_ACTIVE,
 		*session.NewExpiresAt(ctx),
 		clock.Now(ctx),

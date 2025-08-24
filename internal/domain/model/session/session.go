@@ -54,7 +54,7 @@ type (
 	SessionService interface {
 		RefreshSession(context.Context, shared.UUID[user.User]) (*Session, error)
 		DeactivateUserSessions(context.Context, shared.UUID[user.User]) error
-		SwitchOrganization(context.Context, shared.UUID[user.User], shared.UUID[organization.Organization]) (*Session, error)
+		SwitchOrganization(context.Context, shared.UUID[user.User], shared.UUID[organization.Organization], shared.UUID[Session]) (*Session, error)
 	}
 
 	Session struct {

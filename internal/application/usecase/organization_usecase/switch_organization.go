@@ -60,7 +60,8 @@ func (s *switchOrganizationInteractor) Execute(
 		return nil, errtrace.Wrap(err)
 	}
 	if orgIDAny == nil {
-		return nil, messages.OrganizationNotFound
+		// セキュリティ強化: 組織が見つからない場合も権限エラーとして返す
+		return nil, messages.OrganizationPermissionDenied
 	}
 
 	// UUID[any]をUUID[organization.Organization]に変換
@@ -77,7 +78,7 @@ func (s *switchOrganizationInteractor) Execute(
 	}
 
 	// 現在のセッションを無効化し、新しい組織付きセッションを作成
-	newSession, err := s.sessionService.SwitchOrganization(ctx, authCtx.UserID, orgID)
+	newSession, err := s.sessionService.SwitchOrganization(ctx, authCtx.UserID, orgID, authCtx.SessionID)
 	if err != nil {
 		utils.HandleError(ctx, err, "sessionService.SwitchOrganization")
 		return nil, errtrace.Wrap(err)
