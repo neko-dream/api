@@ -785,6 +785,7 @@ type EstablishOrganizationOK struct{}
 func (*EstablishOrganizationOK) establishOrganizationRes() {}
 
 type EstablishOrganizationReq struct {
+	// 組織名.
 	Name string `json:"name"`
 	// 組織コード（ログイン時に使用）
 	// 4文字以上127文字以下の英数字 _- のみ使用可能.
@@ -792,6 +793,8 @@ type EstablishOrganizationReq struct {
 	// 組織タイプ
 	// - 1: 通常（基本これ）.
 	OrgType float64 `json:"orgType"`
+	// 組織アイコン.
+	Icon OptMultipartFile `json:"icon"`
 }
 
 // GetName returns the value of Name.
@@ -809,6 +812,11 @@ func (s *EstablishOrganizationReq) GetOrgType() float64 {
 	return s.OrgType
 }
 
+// GetIcon returns the value of Icon.
+func (s *EstablishOrganizationReq) GetIcon() OptMultipartFile {
+	return s.Icon
+}
+
 // SetName sets the value of Name.
 func (s *EstablishOrganizationReq) SetName(val string) {
 	s.Name = val
@@ -822,6 +830,11 @@ func (s *EstablishOrganizationReq) SetCode(val string) {
 // SetOrgType sets the value of OrgType.
 func (s *EstablishOrganizationReq) SetOrgType(val float64) {
 	s.OrgType = val
+}
+
+// SetIcon sets the value of Icon.
+func (s *EstablishOrganizationReq) SetIcon(val OptMultipartFile) {
+	s.Icon = val
 }
 
 type EstablishUserBadRequest struct {
@@ -4523,6 +4536,8 @@ type Organization struct {
 	Name string `json:"name"`
 	// 組織コード.
 	Code string `json:"code"`
+	// 組織アイコンURL.
+	IconURL OptNilString `json:"iconURL"`
 	// 組織のタイプ.
 	Type int `json:"type"`
 	// ロールの名前.
@@ -4544,6 +4559,11 @@ func (s *Organization) GetName() string {
 // GetCode returns the value of Code.
 func (s *Organization) GetCode() string {
 	return s.Code
+}
+
+// GetIconURL returns the value of IconURL.
+func (s *Organization) GetIconURL() OptNilString {
+	return s.IconURL
 }
 
 // GetType returns the value of Type.
@@ -4574,6 +4594,11 @@ func (s *Organization) SetName(val string) {
 // SetCode sets the value of Code.
 func (s *Organization) SetCode(val string) {
 	s.Code = val
+}
+
+// SetIconURL sets the value of IconURL.
+func (s *Organization) SetIconURL(val OptNilString) {
+	s.IconURL = val
 }
 
 // SetType sets the value of Type.

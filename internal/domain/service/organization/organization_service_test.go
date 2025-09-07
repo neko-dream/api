@@ -11,6 +11,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/config"
+	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -120,6 +121,7 @@ func TestOrganizationService_CreateOrganization(t *testing.T) {
 		name        string
 		orgName     string
 		code        string
+		iconURL     *string
 		orgType     organization.OrganizationType
 		env         config.ENV
 		setupMocks  func(*mockOrganizationRepository, *mockOrganizationUserRepository, *mockOrganizationMemberManager)
@@ -129,6 +131,7 @@ func TestOrganizationService_CreateOrganization(t *testing.T) {
 			name:    "Success in local environment",
 			orgName: "Test Organization",
 			code:    "TEST123",
+			iconURL: lo.ToPtr("https://kotohiro.com/aaaa"),
 			orgType: organization.OrganizationTypeNormal,
 			env:     config.LOCAL,
 			setupMocks: func(orgRepo *mockOrganizationRepository, orgUserRepo *mockOrganizationUserRepository, memberManager *mockOrganizationMemberManager) {
@@ -143,6 +146,7 @@ func TestOrganizationService_CreateOrganization(t *testing.T) {
 			name:    "Success in dev environment",
 			orgName: "Dev Organization",
 			code:    "DEV001",
+			iconURL: lo.ToPtr("https://kotohiro.com/bbbb"),
 			orgType: organization.OrganizationTypeNormal,
 			env:     config.DEV,
 			setupMocks: func(orgRepo *mockOrganizationRepository, orgUserRepo *mockOrganizationUserRepository, memberManager *mockOrganizationMemberManager) {
@@ -157,6 +161,7 @@ func TestOrganizationService_CreateOrganization(t *testing.T) {
 			name:    "Success with SuperAdmin in production",
 			orgName: "Prod Organization",
 			code:    "PROD001",
+			iconURL: lo.ToPtr("https://kotohiro.com/cccc"),
 			orgType: organization.OrganizationTypeGovernment,
 			env:     config.PROD,
 			setupMocks: func(orgRepo *mockOrganizationRepository, orgUserRepo *mockOrganizationUserRepository, memberManager *mockOrganizationMemberManager) {
@@ -172,6 +177,7 @@ func TestOrganizationService_CreateOrganization(t *testing.T) {
 			name:    "Fail without SuperAdmin in production",
 			orgName: "Prod Organization",
 			code:    "PROD002",
+			iconURL: lo.ToPtr("https://kotohiro.com/dddd"),
 			orgType: organization.OrganizationTypeNormal,
 			env:     config.PROD,
 			setupMocks: func(orgRepo *mockOrganizationRepository, orgUserRepo *mockOrganizationUserRepository, memberManager *mockOrganizationMemberManager) {
@@ -183,6 +189,7 @@ func TestOrganizationService_CreateOrganization(t *testing.T) {
 			name:    "Fail with duplicate name",
 			orgName: "Duplicate Organization",
 			code:    "DUP001",
+			iconURL: lo.ToPtr("https://kotohiro.com/eeee"),
 			orgType: organization.OrganizationTypeNormal,
 			env:     config.LOCAL,
 			setupMocks: func(orgRepo *mockOrganizationRepository, orgUserRepo *mockOrganizationUserRepository, memberManager *mockOrganizationMemberManager) {
@@ -198,6 +205,7 @@ func TestOrganizationService_CreateOrganization(t *testing.T) {
 			name:    "Fail with invalid code",
 			orgName: "Invalid Code Organization",
 			code:    "123", // Too short
+			iconURL: lo.ToPtr("https://kotohiro.com/ffff"),
 			orgType: organization.OrganizationTypeNormal,
 			env:     config.LOCAL,
 			setupMocks: func(orgRepo *mockOrganizationRepository, orgUserRepo *mockOrganizationUserRepository, memberManager *mockOrganizationMemberManager) {
@@ -209,6 +217,7 @@ func TestOrganizationService_CreateOrganization(t *testing.T) {
 			name:    "Fail with duplicate code",
 			orgName: "Duplicate Code Organization",
 			code:    "EXIST001",
+			iconURL: lo.ToPtr("https://kotohiro.com/gggg"),
 			orgType: organization.OrganizationTypeNormal,
 			env:     config.LOCAL,
 			setupMocks: func(orgRepo *mockOrganizationRepository, orgUserRepo *mockOrganizationUserRepository, memberManager *mockOrganizationMemberManager) {
@@ -237,7 +246,7 @@ func TestOrganizationService_CreateOrganization(t *testing.T) {
 
 			service := NewOrganizationService(orgRepo, orgUserRepo, memberManager, cfg)
 
-			result, err := service.CreateOrganization(ctx, tt.orgName, tt.code, tt.orgType, ownerID)
+			result, err := service.CreateOrganization(ctx, tt.orgName, tt.code, tt.iconURL, tt.orgType, ownerID)
 
 			if tt.expectError != nil {
 				assert.Error(t, err)
@@ -248,6 +257,7 @@ func TestOrganizationService_CreateOrganization(t *testing.T) {
 				assert.NotNil(t, result)
 				assert.Equal(t, tt.orgName, result.Name)
 				assert.Equal(t, tt.code, result.Code)
+				assert.Equal(t, tt.iconURL, result.IconURL)
 				assert.Equal(t, tt.orgType, result.OrganizationType)
 				assert.Equal(t, ownerID, result.OwnerID)
 			}

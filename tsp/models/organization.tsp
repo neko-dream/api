@@ -20,6 +20,11 @@ namespace kotohiro {
     code: string;
 
     /**
+     * 組織アイコンURL
+     */
+    iconURL?: string | null;
+
+    /**
      * 組織のタイプ
      */
     type: integer;

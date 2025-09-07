@@ -1440,6 +1440,7 @@ paths:
               properties:
                 name:
                   type: string
+                  description: 組織名
                 code:
                   type: string
                   description: |-
@@ -1450,6 +1451,10 @@ paths:
                   description: |-
                     組織タイプ
                     - 1: 通常（基本これ）
+                icon:
+                  type: string
+                  format: binary
+                  description: 組織アイコン
               required:
                 - name
                 - code
@@ -3872,6 +3877,10 @@ components:
         code:
           type: string
           description: 組織コード
+        iconURL:
+          type: string
+          nullable: true
+          description: 組織アイコンURL
         type:
           type: integer
           description: 組織のタイプ

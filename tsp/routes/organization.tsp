@@ -34,6 +34,9 @@ namespace kotohiro {
   @summary("組織作成（運営ユーザーのみ）")
   op establishOrganization(
     @multipartBody body: {
+      /**
+       * 組織名
+       */
       name: HttpPart<string>;
       /**
        * 組織コード（ログイン時に使用）
@@ -45,6 +48,10 @@ namespace kotohiro {
        * - 1: 通常（基本これ）
        */
       orgType: HttpPart<numeric>;
+      /**
+       * 組織アイコン
+       */
+      icon?: HttpPart<bytes>;
     },
   ): Body<{}> | {
     @statusCode statusCode: 400;

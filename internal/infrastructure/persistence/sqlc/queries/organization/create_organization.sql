@@ -4,5 +4,6 @@ INSERT INTO organizations (
     organization_type,
     name,
     owner_id,
-    code
-) VALUES ($1, $2, $3, $4, $5);
+    code,
+    icon_url
+) VALUES ($1, $2, $3, $4, $5, $6);

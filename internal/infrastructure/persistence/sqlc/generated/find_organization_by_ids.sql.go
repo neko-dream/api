@@ -14,7 +14,7 @@ import (
 
 const findOrganizationsByIDs = `-- name: FindOrganizationsByIDs :many
 SELECT
-    organizations.organization_id, organizations.organization_type, organizations.name, organizations.owner_id, organizations.code
+    organizations.organization_id, organizations.organization_type, organizations.name, organizations.owner_id, organizations.code, organizations.icon_url
 FROM organizations
 WHERE organization_id = ANY($1::uuid[])
 `
@@ -26,7 +26,7 @@ type FindOrganizationsByIDsRow struct {
 // FindOrganizationsByIDs
 //
 //	SELECT
-//	    organizations.organization_id, organizations.organization_type, organizations.name, organizations.owner_id, organizations.code
+//	    organizations.organization_id, organizations.organization_type, organizations.name, organizations.owner_id, organizations.code, organizations.icon_url
 //	FROM organizations
 //	WHERE organization_id = ANY($1::uuid[])
 func (q *Queries) FindOrganizationsByIDs(ctx context.Context, dollar_1 []uuid.UUID) ([]FindOrganizationsByIDsRow, error) {
@@ -44,6 +44,7 @@ func (q *Queries) FindOrganizationsByIDs(ctx context.Context, dollar_1 []uuid.UU
 			&i.Organization.Name,
 			&i.Organization.OwnerID,
 			&i.Organization.Code,
+			&i.Organization.IconUrl,
 		); err != nil {
 			return nil, err
 		}

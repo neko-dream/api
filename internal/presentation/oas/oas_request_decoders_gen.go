@@ -766,6 +766,30 @@ func (s *Server) decodeEstablishOrganizationRequest(r *http.Request) (
 				return req, close, errors.Wrap(err, "query")
 			}
 		}
+		{
+			if err := func() error {
+				files, ok := r.MultipartForm.File["icon"]
+				if !ok || len(files) < 1 {
+					return nil
+				}
+				fh := files[0]
+
+				f, err := fh.Open()
+				if err != nil {
+					return errors.Wrap(err, "open")
+				}
+				closers = append(closers, f.Close)
+				request.Icon.SetTo(ht.MultipartFile{
+					Name:   fh.Filename,
+					File:   f,
+					Size:   fh.Size,
+					Header: fh.Header,
+				})
+				return nil
+			}(); err != nil {
+				return req, close, errors.Wrap(err, "decode \"icon\"")
+			}
+		}
 		return &request, close, nil
 	default:
 		return req, close, validate.InvalidContentType(ct)

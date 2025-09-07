@@ -5,13 +5,14 @@ import (
 
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestOrganization_CanChangeRole(t *testing.T) {
 	orgID := shared.NewUUID[Organization]()
 	userID := shared.NewUUID[user.User]()
-	org := NewOrganization(orgID, OrganizationTypeNormal, "Test Org", "TEST", userID)
+	org := NewOrganization(orgID, OrganizationTypeNormal, "Test Org", "TEST", lo.ToPtr("https://kotohiro.com/aaaa"), userID)
 
 	tests := []struct {
 		name            string
@@ -110,6 +111,7 @@ func TestNewOrganization(t *testing.T) {
 		orgType OrganizationType
 		orgName string
 		code    string
+		iconURL *string
 		ownerID shared.UUID[user.User]
 	}{
 		{
@@ -117,6 +119,7 @@ func TestNewOrganization(t *testing.T) {
 			orgType: OrganizationTypeNormal,
 			orgName: "Test Organization",
 			code:    "TEST123",
+			iconURL: lo.ToPtr("https://kotohiro.com/aaaa"),
 			ownerID: userID,
 		},
 		{
@@ -124,6 +127,7 @@ func TestNewOrganization(t *testing.T) {
 			orgType: OrganizationTypeGovernment,
 			orgName: "Government Agency",
 			code:    "GOV001",
+			iconURL: lo.ToPtr("https://kotohiro.com/aaaa"),
 			ownerID: userID,
 		},
 		{
@@ -131,18 +135,20 @@ func TestNewOrganization(t *testing.T) {
 			orgType: OrganizationTypeCouncillor,
 			orgName: "City Council",
 			code:    "COUNCIL1",
+			iconURL: lo.ToPtr("https://kotohiro.com/aaaa"),
 			ownerID: userID,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			org := NewOrganization(orgID, tt.orgType, tt.orgName, tt.code, tt.ownerID)
+			org := NewOrganization(orgID, tt.orgType, tt.orgName, tt.code, tt.iconURL, tt.ownerID)
 
 			assert.Equal(t, orgID, org.OrganizationID)
 			assert.Equal(t, tt.orgType, org.OrganizationType)
 			assert.Equal(t, tt.orgName, org.Name)
 			assert.Equal(t, tt.code, org.Code)
+			assert.Equal(t, tt.iconURL, org.IconURL)
 			assert.Equal(t, tt.ownerID, org.OwnerID)
 		})
 	}

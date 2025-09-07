@@ -62,7 +62,7 @@ const findOrgUserByUserIDWithOrganization = `-- name: FindOrgUserByUserIDWithOrg
 SELECT
     users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
     organization_users.organization_user_id, organization_users.user_id, organization_users.organization_id, organization_users.created_at, organization_users.updated_at, organization_users.role,
-    organizations.organization_id, organizations.organization_type, organizations.name, organizations.owner_id, organizations.code
+    organizations.organization_id, organizations.organization_type, organizations.name, organizations.owner_id, organizations.code, organizations.icon_url
 FROM organization_users
 LEFT JOIN organizations ON organization_users.organization_id = organizations.organization_id
 LEFT JOIN users ON organization_users.user_id = users.user_id
@@ -81,7 +81,7 @@ type FindOrgUserByUserIDWithOrganizationRow struct {
 //	SELECT
 //	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
 //	    organization_users.organization_user_id, organization_users.user_id, organization_users.organization_id, organization_users.created_at, organization_users.updated_at, organization_users.role,
-//	    organizations.organization_id, organizations.organization_type, organizations.name, organizations.owner_id, organizations.code
+//	    organizations.organization_id, organizations.organization_type, organizations.name, organizations.owner_id, organizations.code, organizations.icon_url
 //	FROM organization_users
 //	LEFT JOIN organizations ON organization_users.organization_id = organizations.organization_id
 //	LEFT JOIN users ON organization_users.user_id = users.user_id
@@ -117,6 +117,7 @@ func (q *Queries) FindOrgUserByUserIDWithOrganization(ctx context.Context, userI
 			&i.Organization.Name,
 			&i.Organization.OwnerID,
 			&i.Organization.Code,
+			&i.Organization.IconUrl,
 		); err != nil {
 			return nil, err
 		}

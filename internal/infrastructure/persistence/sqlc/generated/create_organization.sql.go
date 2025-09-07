@@ -7,6 +7,7 @@ package model
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/google/uuid"
 )
@@ -17,8 +18,9 @@ INSERT INTO organizations (
     organization_type,
     name,
     owner_id,
-    code
-) VALUES ($1, $2, $3, $4, $5)
+    code,
+    icon_url
+) VALUES ($1, $2, $3, $4, $5, $6)
 `
 
 type CreateOrganizationParams struct {
@@ -27,6 +29,7 @@ type CreateOrganizationParams struct {
 	Name             string
 	OwnerID          uuid.UUID
 	Code             string
+	IconUrl          sql.NullString
 }
 
 // CreateOrganization
@@ -36,8 +39,9 @@ type CreateOrganizationParams struct {
 //	    organization_type,
 //	    name,
 //	    owner_id,
-//	    code
-//	) VALUES ($1, $2, $3, $4, $5)
+//	    code,
+//	    icon_url
+//	) VALUES ($1, $2, $3, $4, $5, $6)
 func (q *Queries) CreateOrganization(ctx context.Context, arg CreateOrganizationParams) error {
 	_, err := q.db.ExecContext(ctx, createOrganization,
 		arg.OrganizationID,
@@ -45,6 +49,7 @@ func (q *Queries) CreateOrganization(ctx context.Context, arg CreateOrganization
 		arg.Name,
 		arg.OwnerID,
 		arg.Code,
+		arg.IconUrl,
 	)
 	return err
 }

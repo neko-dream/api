@@ -36,6 +36,7 @@ type Organization struct {
 	OrganizationType OrganizationType
 	Name             string
 	Code             string
+	IconURL          *string
 	OwnerID          shared.UUID[user.User]
 }
 
@@ -44,6 +45,7 @@ func NewOrganization(
 	organizationType OrganizationType,
 	name string,
 	code string,
+	iconURL *string,
 	ownerID shared.UUID[user.User],
 ) *Organization {
 	return &Organization{
@@ -51,6 +53,7 @@ func NewOrganization(
 		OrganizationType: organizationType,
 		Name:             name,
 		Code:             code,
+		IconURL:          iconURL,
 		OwnerID:          ownerID,
 	}
 }

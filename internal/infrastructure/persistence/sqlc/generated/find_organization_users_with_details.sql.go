@@ -15,7 +15,7 @@ const findOrganizationUsersWithDetails = `-- name: FindOrganizationUsersWithDeta
 SELECT
     ou.organization_user_id, ou.user_id, ou.organization_id, ou.created_at, ou.updated_at, ou.role,
     u.user_id, u.display_id, u.display_name, u.icon_url, u.created_at, u.updated_at, u.email, u.email_verified, u.withdrawal_date,
-    o.organization_id, o.organization_type, o.name, o.owner_id, o.code
+    o.organization_id, o.organization_type, o.name, o.owner_id, o.code, o.icon_url
 FROM organizations o
 LEFT JOIN organization_users ou ON o.organization_id = ou.organization_id
 LEFT JOIN users u ON ou.user_id = u.user_id
@@ -35,7 +35,7 @@ type FindOrganizationUsersWithDetailsRow struct {
 //	SELECT
 //	    ou.organization_user_id, ou.user_id, ou.organization_id, ou.created_at, ou.updated_at, ou.role,
 //	    u.user_id, u.display_id, u.display_name, u.icon_url, u.created_at, u.updated_at, u.email, u.email_verified, u.withdrawal_date,
-//	    o.organization_id, o.organization_type, o.name, o.owner_id, o.code
+//	    o.organization_id, o.organization_type, o.name, o.owner_id, o.code, o.icon_url
 //	FROM organizations o
 //	LEFT JOIN organization_users ou ON o.organization_id = ou.organization_id
 //	LEFT JOIN users u ON ou.user_id = u.user_id
@@ -72,6 +72,7 @@ func (q *Queries) FindOrganizationUsersWithDetails(ctx context.Context, organiza
 			&i.Organization.Name,
 			&i.Organization.OwnerID,
 			&i.Organization.Code,
+			&i.Organization.IconUrl,
 		); err != nil {
 			return nil, err
 		}

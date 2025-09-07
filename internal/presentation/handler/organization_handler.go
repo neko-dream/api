@@ -15,6 +15,7 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/http/cookie"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	cookie_utils "github.com/neko-dream/server/pkg/cookie"
+	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
@@ -204,7 +205,6 @@ func (o *organizationHandler) GetOrganizations(ctx context.Context) (oas.GetOrga
 	return &oas.GetOrganizationsOK{
 		Organizations: orgs,
 	}, nil
-
 }
 
 // ValidateOrganizationCode 組織コード検証
@@ -226,6 +226,7 @@ func (o *organizationHandler) ValidateOrganizationCode(ctx context.Context, para
 			Name:     org.Name,
 			Code:     org.Code,
 			Type:     int(org.OrganizationType),
+			IconURL:  utils.ToOptNil[oas.OptNilString](org.IconURL),
 			Role:     0,  // Role is not applicable in this context
 			RoleName: "", // RoleName is not applicable in this context
 		}),

@@ -15,7 +15,7 @@ import (
 
 type OrganizationService interface {
 	// 組織の作成・更新・削除
-	CreateOrganization(ctx context.Context, name string, code string, orgType organization.OrganizationType, ownerID shared.UUID[user.User]) (*organization.Organization, error)
+	CreateOrganization(ctx context.Context, name string, code string, iconURL *string, orgType organization.OrganizationType, ownerID shared.UUID[user.User]) (*organization.Organization, error)
 
 	// ユーザーの所属組織
 	GetUserOrganizations(ctx context.Context, userID shared.UUID[user.User]) ([]*organization.Organization, error)
@@ -72,7 +72,7 @@ func (s *organizationService) GetUserOrganizations(ctx context.Context, userID s
 }
 
 // CreateOrganizationWithCode implements OrganizationService.
-func (s *organizationService) CreateOrganization(ctx context.Context, name string, code string, orgType organization.OrganizationType, ownerID shared.UUID[user.User]) (*organization.Organization, error) {
+func (s *organizationService) CreateOrganization(ctx context.Context, name string, code string, iconURL *string, orgType organization.OrganizationType, ownerID shared.UUID[user.User]) (*organization.Organization, error) {
 	ctx, span := otel.Tracer("organization").Start(ctx, "organizationService.CreateOrganizationWithCode")
 	defer span.End()
 
@@ -125,6 +125,7 @@ func (s *organizationService) CreateOrganization(ctx context.Context, name strin
 		orgType,
 		name,
 		code,
+		iconURL,
 		ownerID,
 	)
 	if err := s.organizationRepo.Create(ctx, org); err != nil {
