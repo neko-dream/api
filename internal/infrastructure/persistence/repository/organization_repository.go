@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/google/uuid"
 	"github.com/neko-dream/server/internal/domain/model/organization"
@@ -21,6 +22,21 @@ func NewOrganizationRepository(dbManager *db.DBManager) organization.Organizatio
 	return &organizationRepository{
 		DBManager: dbManager,
 	}
+}
+
+func (o *organizationRepository) Update(ctx context.Context, org *organization.Organization) error {
+	ctx, span := otel.Tracer("repository").Start(ctx, "organizationRepository.Update")
+	defer span.End()
+
+	if err := o.GetQueries(ctx).UpdateOrganization(ctx, model.UpdateOrganizationParams{
+		OrganizationID: org.OrganizationID.UUID(),
+		Name:           org.Name,
+		IconUrl:        sql.NullString{String: lo.FromPtrOr(org.IconURL, ""), Valid: org.IconURL != nil},
+	}); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Create

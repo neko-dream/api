@@ -12,6 +12,7 @@ var (
 	KotohiroOrganizationID = shared.UUID[Organization](uuid.MustParse("00000000-0000-0000-0000-000000000001"))
 )
 
+//go:generate mockgen -source=$GOFILE -package=mock_${GOPACKAGE}_model -destination=../mock/$GOPACKAGE/$GOFILE
 type OrganizationRepository interface {
 	// 組織の取得
 	FindByID(ctx context.Context, id shared.UUID[Organization]) (*Organization, error)
@@ -21,6 +22,7 @@ type OrganizationRepository interface {
 
 	// 組織の作成・更新・削除
 	Create(ctx context.Context, org *Organization) error
+	Update(ctx context.Context, org *Organization) error
 }
 
 type OrganizationType int
