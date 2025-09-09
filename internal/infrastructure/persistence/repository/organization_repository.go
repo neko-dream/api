@@ -48,6 +48,7 @@ func (o *organizationRepository) Create(ctx context.Context, org *organization.O
 		OrganizationID:   org.OrganizationID.UUID(),
 		OrganizationType: int32(org.OrganizationType),
 		Name:             org.Name,
+		IconUrl:          sql.NullString{String: lo.FromPtrOr(org.IconURL, ""), Valid: org.IconURL != nil},
 		OwnerID:          org.OwnerID.UUID(),
 		Code:             org.Code,
 	}); err != nil {
