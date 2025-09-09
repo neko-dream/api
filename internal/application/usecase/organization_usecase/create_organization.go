@@ -2,6 +2,7 @@ package organization_usecase
 
 import (
 	"context"
+	"mime/multipart"
 
 	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -16,10 +17,11 @@ type CreateOrganizationCommand interface {
 }
 
 type CreateOrganizationInput struct {
-	UserID shared.UUID[user.User]
-	Name   string
-	Code   string
-	Type   int
+	UserID    shared.UUID[user.User]
+	Name      string
+	Code      string
+	Type      int
+	IconImage *multipart.FileHeader
 }
 
 type CreateOrganizationOutput struct {
@@ -37,7 +39,6 @@ func NewCreateOrganizationInteractor(
 	}
 }
 
-// Execute implements CreateOrganizationCommand.
 func (c *createOrganizationInteractor) Execute(ctx context.Context, input CreateOrganizationInput) (*CreateOrganizationOutput, error) {
 	ctx, span := otel.Tracer("organization_command").Start(ctx, "createOrganizationInteractor.Execute")
 	defer span.End()
@@ -45,8 +46,7 @@ func (c *createOrganizationInteractor) Execute(ctx context.Context, input Create
 	orgType := organization.OrganizationType(input.Type)
 	ownerID := input.UserID
 
-	// 組織を作成
-	_, err := c.organizationService.CreateOrganization(ctx, input.Name, input.Code, orgType, ownerID)
+	_, err := c.organizationService.CreateOrganization(ctx, input.Name, input.Code, input.IconImage, orgType, ownerID)
 	if err != nil {
 		utils.HandleError(ctx, err, "CreateOrganization")
 		return nil, err

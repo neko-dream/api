@@ -11,7 +11,7 @@ import (
 
 const findOrganizationByName = `-- name: FindOrganizationByName :one
 SELECT
-    organizations.organization_id, organizations.organization_type, organizations.name, organizations.owner_id, organizations.code
+    organizations.organization_id, organizations.organization_type, organizations.name, organizations.owner_id, organizations.code, organizations.icon_url
 FROM organizations
 WHERE name = $1
 `
@@ -23,7 +23,7 @@ type FindOrganizationByNameRow struct {
 // FindOrganizationByName
 //
 //	SELECT
-//	    organizations.organization_id, organizations.organization_type, organizations.name, organizations.owner_id, organizations.code
+//	    organizations.organization_id, organizations.organization_type, organizations.name, organizations.owner_id, organizations.code, organizations.icon_url
 //	FROM organizations
 //	WHERE name = $1
 func (q *Queries) FindOrganizationByName(ctx context.Context, name string) (FindOrganizationByNameRow, error) {
@@ -35,6 +35,7 @@ func (q *Queries) FindOrganizationByName(ctx context.Context, name string) (Find
 		&i.Organization.Name,
 		&i.Organization.OwnerID,
 		&i.Organization.Code,
+		&i.Organization.IconUrl,
 	)
 	return i, err
 }

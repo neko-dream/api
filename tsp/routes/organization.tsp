@@ -34,6 +34,9 @@ namespace kotohiro {
   @summary("組織作成（運営ユーザーのみ）")
   op establishOrganization(
     @multipartBody body: {
+      /**
+       * 組織名
+       */
       name: HttpPart<string>;
       /**
        * 組織コード（ログイン時に使用）
@@ -45,6 +48,38 @@ namespace kotohiro {
        * - 1: 通常（基本これ）
        */
       orgType: HttpPart<numeric>;
+      /**
+       * 組織アイコン
+       */
+      icon?: HttpPart<bytes>;
+    },
+  ): Body<{}> | {
+    @statusCode statusCode: 400;
+    @body body: {};
+  } | {
+    @statusCode statusCode: 500;
+    @body body: {};
+  };
+  /**
+   * 組織を更新できる。
+   * 組織のAdmin以上のユーザーが実行可能。
+   */
+  @tag("organization")
+  @extension("x-ogen-operation-group", "Organization")
+  @route("/organizations/{code}")
+  @put
+  @summary("組織更新（組織のAdmin以上のユーザーのみ）")
+  op updateOrganization(
+    @path code: string,
+    @multipartBody body: {
+      /**
+       * 組織名
+       */
+      name: HttpPart<string>;
+      /**
+       * 組織アイコン
+       */
+      icon?: HttpPart<bytes>;
     },
   ): Body<{}> | {
     @statusCode statusCode: 400;

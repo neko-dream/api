@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"mime/multipart"
 	"net/http"
 
 	"github.com/neko-dream/server/internal/application/query/organization_query"
@@ -15,11 +16,14 @@ import (
 	"github.com/neko-dream/server/internal/infrastructure/http/cookie"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	cookie_utils "github.com/neko-dream/server/pkg/cookie"
+	http_utils "github.com/neko-dream/server/pkg/http"
+	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
 type organizationHandler struct {
 	create               organization_usecase.CreateOrganizationCommand
+	update               organization_usecase.UpdateOrganizationCommand
 	invite               organization_usecase.InviteOrganizationCommand
 	add                  organization_usecase.InviteOrganizationForUserCommand
 	list                 organization_query.ListJoinedOrganizationQuery
@@ -39,6 +43,7 @@ type organizationHandler struct {
 
 func NewOrganizationHandler(
 	create organization_usecase.CreateOrganizationCommand,
+	update organization_usecase.UpdateOrganizationCommand,
 	invite organization_usecase.InviteOrganizationCommand,
 	add organization_usecase.InviteOrganizationForUserCommand,
 	list organization_query.ListJoinedOrganizationQuery,
@@ -57,6 +62,7 @@ func NewOrganizationHandler(
 ) oas.OrganizationHandler {
 	return &organizationHandler{
 		create:               create,
+		update:               update,
 		invite:               invite,
 		add:                  add,
 		list:                 list,
@@ -75,7 +81,7 @@ func NewOrganizationHandler(
 	}
 }
 
-// EstablishOrganization implements oas.OrganizationHandler.
+// EstablishOrganization 組織を設立する
 func (o *organizationHandler) EstablishOrganization(ctx context.Context, req *oas.EstablishOrganizationReq) (oas.EstablishOrganizationRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.EstablishOrganization")
 	defer span.End()
@@ -109,23 +115,55 @@ func (o *organizationHandler) EstablishOrganization(ctx context.Context, req *oa
 	return res, nil
 }
 
-// InviteOrganization implements oas.OrganizationHandler.
-func (o *organizationHandler) InviteOrganization(ctx context.Context, req *oas.InviteOrganizationReq) (oas.InviteOrganizationRes, error) {
-	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.InviteOrganization")
+// UpdateOrganization 組織の内容を更新する
+func (o *organizationHandler) UpdateOrganization(ctx context.Context, req *oas.UpdateOrganizationReq, param oas.UpdateOrganizationParams) (oas.UpdateOrganizationRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.UpdateOrganization")
 	defer span.End()
-	if req == nil {
-		return nil, messages.BadRequestError
-	}
 
-	authCtx, err := o.authorizationService.RequireAuthentication(ctx)
+	authCtx, err := o.authorizationService.RequireOrganizationRole(ctx, organization.OrganizationUserRoleAdmin)
 	if err != nil {
 		return nil, err
 	}
-	if !authCtx.IsInOrganization() {
-		return nil, messages.OrganizationContextRequired
+	if req == nil {
+		return nil, messages.BadRequestError
 	}
-	if !authCtx.HasOrganizationRole(organization.OrganizationUserRoleAdmin) {
-		return nil, messages.InsufficientPermissionsError
+	if *authCtx.OrganizationCode != param.Code {
+		return nil, messages.BadRequestError
+	}
+
+	var file *multipart.FileHeader
+	if req.Icon.Value.File != nil {
+		file, err = http_utils.CreateFileHeader(ctx, req.Icon.Value.File, req.Icon.Value.Name)
+		if err != nil {
+			utils.HandleError(ctx, err, "CreateFileHeader")
+			return nil, messages.InternalServerError
+		}
+	}
+
+	if err := o.update.Execute(ctx, organization_usecase.UpdateOrganizationInput{
+		UserID:         authCtx.UserID,
+		OrganizationID: *authCtx.OrganizationID,
+		Name:           req.Name,
+		IconImage:      file,
+	}); err != nil {
+		return nil, err
+	}
+
+	res := &oas.UpdateOrganizationOK{}
+	return res, nil
+}
+
+// InviteOrganization 組織にユーザーを招待する
+func (o *organizationHandler) InviteOrganization(ctx context.Context, req *oas.InviteOrganizationReq) (oas.InviteOrganizationRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.InviteOrganization")
+	defer span.End()
+
+	authCtx, err := o.authorizationService.RequireOrganizationRole(ctx, organization.OrganizationUserRoleAdmin)
+	if err != nil {
+		return nil, err
+	}
+	if req == nil {
+		return nil, messages.BadRequestError
 	}
 
 	_, err = o.invite.Execute(ctx, organization_usecase.InviteOrganizationInput{
@@ -147,15 +185,12 @@ func (o *organizationHandler) InviteOrganizationForUser(ctx context.Context, req
 	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.InviteOrganizationForUser")
 	defer span.End()
 
-	authCtx, err := o.authorizationService.RequireAuthentication(ctx)
+	authCtx, err := o.authorizationService.RequireOrganizationRole(ctx, organization.OrganizationUserRoleAdmin)
 	if err != nil {
 		return nil, err
 	}
-	if !authCtx.IsInOrganization() {
-		return nil, messages.OrganizationContextRequired
-	}
-	if !authCtx.HasOrganizationRole(organization.OrganizationUserRoleAdmin) {
-		return nil, messages.InsufficientPermissionsError
+	if req == nil {
+		return nil, messages.BadRequestError
 	}
 
 	_, err = o.add.Execute(ctx, organization_usecase.InviteOrganizationForUserInput{
@@ -204,7 +239,6 @@ func (o *organizationHandler) GetOrganizations(ctx context.Context) (oas.GetOrga
 	return &oas.GetOrganizationsOK{
 		Organizations: orgs,
 	}, nil
-
 }
 
 // ValidateOrganizationCode 組織コード検証
@@ -226,6 +260,7 @@ func (o *organizationHandler) ValidateOrganizationCode(ctx context.Context, para
 			Name:     org.Name,
 			Code:     org.Code,
 			Type:     int(org.OrganizationType),
+			IconURL:  utils.ToOptNil[oas.OptNilString](org.IconURL),
 			Role:     0,  // Role is not applicable in this context
 			RoleName: "", // RoleName is not applicable in this context
 		}),

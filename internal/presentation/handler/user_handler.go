@@ -239,7 +239,7 @@ func (u *userHandler) UpdateUserProfile(ctx context.Context, params *oas.UpdateU
 	if value.Icon.IsSet() {
 		file, err = http_utils.CreateFileHeader(ctx, value.Icon.Value.File, value.Icon.Value.Name)
 		if err != nil {
-			utils.HandleError(ctx, err, "MakeFileHeader")
+			utils.HandleError(ctx, err, "CreateFileHeader")
 			return nil, messages.InternalServerError
 		}
 	}
@@ -318,7 +318,7 @@ func (u *userHandler) EstablishUser(ctx context.Context, params *oas.EstablishUs
 	if value.Icon.IsSet() {
 		file, err = http_utils.CreateFileHeader(ctx, value.Icon.Value.File, value.Icon.Value.Name)
 		if err != nil {
-			utils.HandleError(ctx, err, "MakeFileHeader")
+			utils.HandleError(ctx, err, "CreateFileHeader")
 			return nil, messages.InternalServerError
 		}
 	}

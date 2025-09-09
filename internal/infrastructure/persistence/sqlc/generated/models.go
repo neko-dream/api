@@ -116,6 +116,7 @@ type Organization struct {
 	Name             string
 	OwnerID          uuid.UUID
 	Code             string
+	IconUrl          sql.NullString
 }
 
 type OrganizationAlias struct {

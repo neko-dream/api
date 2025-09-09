@@ -12,6 +12,7 @@ type Organization struct {
 	OrganizationID   string    `json:"organization_id"`   // 組織ID
 	Name             string    `json:"name"`              // 組織名
 	Code             string    `json:"code"`              // 組織コード
+	IconURL          *string   `json:"icon_url"`          // 組織アイコンURL
 	OrganizationType int       `json:"organization_type"` // 組織の種類
 	CreatedAt        time.Time `json:"created_at"`        // 組織の作成日時
 	UpdatedAt        time.Time `json:"updated_at"`        // 組織の更新日時
@@ -43,6 +44,7 @@ func (o *OrganizationResponse) ToResponse() oas.Organization {
 		Type:     o.Organization.OrganizationType,
 		Role:     o.OrganizationUser.Role,
 		RoleName: o.OrganizationUser.RoleName,
+		IconURL:  utils.ToOptNil[oas.OptNilString](o.Organization.IconURL),
 	}
 }
 

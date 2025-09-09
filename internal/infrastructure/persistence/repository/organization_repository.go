@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/google/uuid"
 	"github.com/neko-dream/server/internal/domain/model/organization"
@@ -9,6 +10,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
+	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
@@ -22,6 +24,21 @@ func NewOrganizationRepository(dbManager *db.DBManager) organization.Organizatio
 	}
 }
 
+func (o *organizationRepository) Update(ctx context.Context, org *organization.Organization) error {
+	ctx, span := otel.Tracer("repository").Start(ctx, "organizationRepository.Update")
+	defer span.End()
+
+	if err := o.GetQueries(ctx).UpdateOrganization(ctx, model.UpdateOrganizationParams{
+		OrganizationID: org.OrganizationID.UUID(),
+		Name:           org.Name,
+		IconUrl:        sql.NullString{String: lo.FromPtrOr(org.IconURL, ""), Valid: org.IconURL != nil},
+	}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Create
 func (o *organizationRepository) Create(ctx context.Context, org *organization.Organization) error {
 	ctx, span := otel.Tracer("repository").Start(ctx, "organizationRepository.Create")
@@ -31,6 +48,7 @@ func (o *organizationRepository) Create(ctx context.Context, org *organization.O
 		OrganizationID:   org.OrganizationID.UUID(),
 		OrganizationType: int32(org.OrganizationType),
 		Name:             org.Name,
+		IconUrl:          sql.NullString{String: lo.FromPtrOr(org.IconURL, ""), Valid: org.IconURL != nil},
 		OwnerID:          org.OwnerID.UUID(),
 		Code:             org.Code,
 	}); err != nil {
@@ -49,11 +67,17 @@ func (o *organizationRepository) FindByID(ctx context.Context, id shared.UUID[or
 		return nil, err
 	}
 
+	var iconURL *string
+	if org.Organization.IconUrl.Valid {
+		iconURL = lo.ToPtr(org.Organization.IconUrl.String)
+	}
+
 	return organization.NewOrganization(
 		shared.UUID[organization.Organization](org.Organization.OrganizationID),
 		organization.OrganizationType(org.Organization.OrganizationType),
 		org.Organization.Name,
 		org.Organization.Code,
+		iconURL,
 		shared.UUID[user.User](org.Organization.OwnerID),
 	), nil
 }
@@ -79,11 +103,17 @@ func (o *organizationRepository) FindByIDs(ctx context.Context, ids []shared.UUI
 
 	var result []*organization.Organization
 	for _, org := range orgs {
+		var iconURL *string
+		if org.Organization.IconUrl.Valid {
+			iconURL = lo.ToPtr(org.Organization.IconUrl.String)
+		}
+
 		result = append(result, organization.NewOrganization(
 			shared.UUID[organization.Organization](org.Organization.OrganizationID),
 			organization.OrganizationType(org.Organization.OrganizationType),
 			org.Organization.Name,
 			org.Organization.Code,
+			iconURL,
 			shared.UUID[user.User](org.Organization.OwnerID),
 		))
 	}
@@ -101,11 +131,17 @@ func (o *organizationRepository) FindByName(ctx context.Context, name string) (*
 		return nil, err
 	}
 
+	var iconURL *string
+	if org.Organization.IconUrl.Valid {
+		iconURL = lo.ToPtr(org.Organization.IconUrl.String)
+	}
+
 	return organization.NewOrganization(
 		shared.UUID[organization.Organization](org.Organization.OrganizationID),
 		organization.OrganizationType(org.Organization.OrganizationType),
 		org.Organization.Name,
 		org.Organization.Code,
+		iconURL,
 		shared.UUID[user.User](org.Organization.OwnerID),
 	), nil
 }
@@ -120,11 +156,17 @@ func (o *organizationRepository) FindByCode(ctx context.Context, code string) (*
 		return nil, err
 	}
 
+	var iconURL *string
+	if org.Organization.IconUrl.Valid {
+		iconURL = lo.ToPtr(org.Organization.IconUrl.String)
+	}
+
 	return organization.NewOrganization(
 		shared.UUID[organization.Organization](org.Organization.OrganizationID),
 		organization.OrganizationType(org.Organization.OrganizationType),
 		org.Organization.Name,
 		org.Organization.Code,
+		iconURL,
 		shared.UUID[user.User](org.Organization.OwnerID),
 	), nil
 }

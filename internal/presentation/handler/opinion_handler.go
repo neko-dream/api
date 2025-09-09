@@ -311,7 +311,7 @@ func (o *opinionHandler) PostOpinionPost2(ctx context.Context, req *oas.PostOpin
 	if value.Picture.IsSet() {
 		file, err = http_utils.CreateFileHeader(ctx, value.Picture.Value.File, value.GetPicture().Value.Name)
 		if err != nil {
-			utils.HandleError(ctx, err, "MakeFileHeader")
+			utils.HandleError(ctx, err, "CreateFileHeader")
 			return nil, messages.InternalServerError
 		}
 	}
