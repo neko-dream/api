@@ -185,15 +185,12 @@ func (o *organizationHandler) InviteOrganizationForUser(ctx context.Context, req
 	ctx, span := otel.Tracer("handler").Start(ctx, "organizationHandler.InviteOrganizationForUser")
 	defer span.End()
 
-	authCtx, err := o.authorizationService.RequireAuthentication(ctx)
+	authCtx, err := o.authorizationService.RequireOrganizationRole(ctx, organization.OrganizationUserRoleAdmin)
 	if err != nil {
 		return nil, err
 	}
-	if !authCtx.IsInOrganization() {
-		return nil, messages.OrganizationContextRequired
-	}
-	if !authCtx.HasOrganizationRole(organization.OrganizationUserRoleAdmin) {
-		return nil, messages.InsufficientPermissionsError
+	if req == nil {
+		return nil, messages.BadRequestError
 	}
 
 	_, err = o.add.Execute(ctx, organization_usecase.InviteOrganizationForUserInput{
