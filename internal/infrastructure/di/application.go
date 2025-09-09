@@ -88,6 +88,7 @@ func useCaseDeps() []ProvideArg {
 		{organization_usecase.NewDeactivateOrganizationAliasUseCase, nil},
 		{organization_usecase.NewListOrganizationAliasesUseCase, nil},
 		{organization_usecase.NewSwitchOrganizationUseCase, nil},
+		{organization_usecase.NewUpdateOrganizationInteractor, nil},
 		{organization_query.NewListOrganizationUsersQuery, nil},
 		{analysis_usecase.NewApplyFeedbackInteractor, nil},
 		{event_processor.NewEventHandlerRegistry, nil},

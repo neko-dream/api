@@ -2,6 +2,7 @@ package organization_usecase
 
 import (
 	"context"
+	"mime/multipart"
 
 	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/shared"
@@ -16,11 +17,11 @@ type CreateOrganizationCommand interface {
 }
 
 type CreateOrganizationInput struct {
-	UserID  shared.UUID[user.User]
-	Name    string
-	Code    string
-	Type    int
-	IconURL *string
+	UserID    shared.UUID[user.User]
+	Name      string
+	Code      string
+	Type      int
+	IconImage *multipart.FileHeader
 }
 
 type CreateOrganizationOutput struct {
@@ -45,7 +46,7 @@ func (c *createOrganizationInteractor) Execute(ctx context.Context, input Create
 	orgType := organization.OrganizationType(input.Type)
 	ownerID := input.UserID
 
-	_, err := c.organizationService.CreateOrganization(ctx, input.Name, input.Code, input.IconURL, orgType, ownerID)
+	_, err := c.organizationService.CreateOrganization(ctx, input.Name, input.Code, input.IconImage, orgType, ownerID)
 	if err != nil {
 		utils.HandleError(ctx, err, "CreateOrganization")
 		return nil, err
