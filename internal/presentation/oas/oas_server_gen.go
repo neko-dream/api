@@ -350,6 +350,13 @@ type OrganizationHandler interface {
 	//
 	// POST /organizations/switch/{code}
 	SwitchOrganization(ctx context.Context, params SwitchOrganizationParams) (SwitchOrganizationRes, error)
+	// UpdateOrganization implements updateOrganization operation.
+	//
+	// 組織を更新できる。
+	// 組織のAdmin以上のユーザーが実行可能。.
+	//
+	// PUT /organizations/{code}
+	UpdateOrganization(ctx context.Context, req *UpdateOrganizationReq, params UpdateOrganizationParams) (UpdateOrganizationRes, error)
 	// ValidateOrganizationCode implements validateOrganizationCode operation.
 	//
 	// 組織コード検証.

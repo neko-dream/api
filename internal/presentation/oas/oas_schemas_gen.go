@@ -7252,6 +7252,45 @@ type UpdateNotificationPreferencesUnauthorized struct{}
 
 func (*UpdateNotificationPreferencesUnauthorized) updateNotificationPreferencesRes() {}
 
+type UpdateOrganizationBadRequest struct{}
+
+func (*UpdateOrganizationBadRequest) updateOrganizationRes() {}
+
+type UpdateOrganizationInternalServerError struct{}
+
+func (*UpdateOrganizationInternalServerError) updateOrganizationRes() {}
+
+type UpdateOrganizationOK struct{}
+
+func (*UpdateOrganizationOK) updateOrganizationRes() {}
+
+type UpdateOrganizationReq struct {
+	// 組織名.
+	Name string `json:"name"`
+	// 組織アイコン.
+	Icon OptMultipartFile `json:"icon"`
+}
+
+// GetName returns the value of Name.
+func (s *UpdateOrganizationReq) GetName() string {
+	return s.Name
+}
+
+// GetIcon returns the value of Icon.
+func (s *UpdateOrganizationReq) GetIcon() OptMultipartFile {
+	return s.Icon
+}
+
+// SetName sets the value of Name.
+func (s *UpdateOrganizationReq) SetName(val string) {
+	s.Name = val
+}
+
+// SetIcon sets the value of Icon.
+func (s *UpdateOrganizationReq) SetIcon(val OptMultipartFile) {
+	s.Icon = val
+}
+
 type UpdateUserProfileBadRequest struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`

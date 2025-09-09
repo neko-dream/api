@@ -1732,6 +1732,57 @@ paths:
       tags:
         - organization
       x-ogen-operation-group: Organization
+  /organizations/{code}:
+    put:
+      operationId: updateOrganization
+      summary: 組織更新（組織のAdmin以上のユーザーのみ）
+      description: |-
+        組織を更新できる。
+        組織のAdmin以上のユーザーが実行可能。
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - organization
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 組織名
+                icon:
+                  type: string
+                  format: binary
+                  description: 組織アイコン
+              required:
+                - name
+      x-ogen-operation-group: Organization
   /policy/consent:
     get:
       operationId: getPolicyConsentStatus

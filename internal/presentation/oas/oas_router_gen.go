@@ -1085,6 +1085,24 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 								elem = origElem
 							}
+							// Param: "code"
+							// Leaf parameter
+							args[0] = elem
+							elem = ""
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch r.Method {
+								case "PUT":
+									s.handleUpdateOrganizationRequest([1]string{
+										args[0],
+									}, elemIsEscaped, w, r)
+								default:
+									s.notAllowed(w, r, "PUT")
+								}
+
+								return
+							}
 
 							elem = origElem
 						}
@@ -3214,6 +3232,26 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								}
 
 								elem = origElem
+							}
+							// Param: "code"
+							// Leaf parameter
+							args[0] = elem
+							elem = ""
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch method {
+								case "PUT":
+									r.name = "UpdateOrganization"
+									r.summary = "組織更新（組織のAdmin以上のユーザーのみ）"
+									r.operationID = "updateOrganization"
+									r.pathPattern = "/organizations/{code}"
+									r.args = args
+									r.count = 1
+									return r, true
+								default:
+									return
+								}
 							}
 
 							elem = origElem

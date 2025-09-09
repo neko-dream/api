@@ -265,6 +265,10 @@ type UpdateNotificationPreferencesRes interface {
 	updateNotificationPreferencesRes()
 }
 
+type UpdateOrganizationRes interface {
+	updateOrganizationRes()
+}
+
 type UpdateUserProfileRes interface {
 	updateUserProfileRes()
 }

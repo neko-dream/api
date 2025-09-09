@@ -688,6 +688,16 @@ func (UnimplementedHandler) UpdateNotificationPreferences(ctx context.Context, r
 	return r, ht.ErrNotImplemented
 }
 
+// UpdateOrganization implements updateOrganization operation.
+//
+// 組織を更新できる。
+// 組織のAdmin以上のユーザーが実行可能。.
+//
+// PUT /organizations/{code}
+func (UnimplementedHandler) UpdateOrganization(ctx context.Context, req *UpdateOrganizationReq, params UpdateOrganizationParams) (r UpdateOrganizationRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // UpdateUserProfile implements updateUserProfile operation.
 //
 // ユーザー情報の変更.
