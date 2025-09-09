@@ -11,6 +11,7 @@ import (
 	"github.com/h2non/filetype/types"
 	"github.com/neko-dream/server/internal/domain/model/clock"
 	"github.com/neko-dream/server/internal/domain/model/opinion"
+	"github.com/neko-dream/server/internal/domain/model/organization"
 	"github.com/neko-dream/server/internal/domain/model/shared"
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/pkg/utils"
@@ -34,7 +35,52 @@ var (
 	AnalysisImageKeyPattern = "gen/%v-%v-%v.%v"
 	// 画像ID.jpg
 	CommonImageKeyPattern = "i/%v.%v"
+	// 組織アイコン.jpg
+	OrganizationImageKeyPattern = "o/%s.%v"
 )
+
+func NewOrganizationImage(
+	ctx context.Context,
+	organizationID shared.UUID[organization.Organization],
+	file io.Reader,
+) (*ImageMeta, error) {
+	ctx, span := otel.Tracer("meta").Start(ctx, "NewOrganizationImage")
+	defer span.End()
+
+	imageBytes, err := io.ReadAll(file)
+	if err != nil {
+		utils.HandleError(ctx, err, "io.ReadAll")
+		return nil, err
+	}
+
+	x, y, err := GetBounds(ctx, bytes.NewReader(imageBytes))
+	if err != nil {
+		utils.HandleError(ctx, err, "GetBounds")
+		return nil, err
+	}
+
+	size, err := GetImageSize(ctx, bytes.NewReader(imageBytes))
+	if err != nil {
+		utils.HandleError(ctx, err, "GetImageSize")
+		return nil, err
+	}
+
+	ext, err := GetExtension(ctx, bytes.NewReader(imageBytes))
+	if err != nil {
+		utils.HandleError(ctx, err, "GetExtension")
+		return nil, err
+	}
+
+	key := fmt.Sprintf(OrganizationImageKeyPattern, organizationID.String(), ext.Subtype)
+
+	return &ImageMeta{
+		Key:       key,
+		Size:      size,
+		Extension: ext,
+		Width:     x,
+		Height:    y,
+	}, nil
+}
 
 // ProfileIcon用の画像メタデータを生成
 func NewImageForProfile(
