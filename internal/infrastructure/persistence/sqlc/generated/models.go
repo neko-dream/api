@@ -287,6 +287,16 @@ type UserDemographic struct {
 	Prefecture         sql.NullString
 }
 
+type UserGroupDimensionReductionInfo struct {
+	TalkSessionID          uuid.UUID
+	CreatedAt              time.Time
+	UpdatedAt              time.Time
+	DimensionReductionType string
+	Summary                string
+	XDesc                  string
+	YDesc                  string
+}
+
 type UserGroupInfo struct {
 	TalkSessionID  uuid.UUID
 	UserID         uuid.UUID

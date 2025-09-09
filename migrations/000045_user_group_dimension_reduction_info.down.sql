@@ -1,0 +1,2 @@
+DROP TRIGGER IF EXISTS update_user_group_dimension_reduction_info_updated_at ON user_group_dimension_reduction_info;
+DROP TABLE IF EXISTS user_group_dimension_reduction_info;
