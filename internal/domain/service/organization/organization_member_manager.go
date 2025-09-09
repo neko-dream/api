@@ -28,6 +28,7 @@ type InviteUserParams struct {
 	Email          string
 }
 
+//go:generate mockgen -source=$GOFILE -package=mock_$GOPACKAGE -destination=../mock/$GOPACKAGE/$GOFILE
 type OrganizationMemberManager interface {
 	// ユーザーの発行
 	InviteUser(ctx context.Context, params InviteUserParams) (*organization.OrganizationUser, error)

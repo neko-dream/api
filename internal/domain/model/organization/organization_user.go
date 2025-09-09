@@ -8,6 +8,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/user"
 )
 
+//go:generate mockgen -source=$GOFILE -package=mock_${GOPACKAGE}_model -destination=../mock/$GOPACKAGE/$GOFILE
 type OrganizationUserRepository interface {
 	// OrganizationUserの取得
 	FindByOrganizationIDAndUserID(ctx context.Context, orgID shared.UUID[Organization], userID shared.UUID[user.User]) (*OrganizationUser, error)
