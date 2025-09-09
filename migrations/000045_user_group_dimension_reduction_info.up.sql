@@ -8,8 +8,3 @@ CREATE TABLE IF NOT EXISTS user_group_dimension_reduction_info (
     y_desc TEXT NOT NULL,
     PRIMARY KEY (talk_session_id)
 );
-
-CREATE TRIGGER update_user_group_dimension_reduction_info_updated_at
-    BEFORE UPDATE ON user_group_dimension_reduction_info
-    FOR EACH ROW
-    EXECUTE FUNCTION update_updated_at_column();
