@@ -282,7 +282,7 @@ func TestOrganizationService_ResolveOrganizationIDFromCode(t *testing.T) {
 					OrganizationID: orgID,
 					Code:           "TEST123",
 				}
-				orgRepo.EXPECT().FindByCode(gomock.Any(), lo.ToPtr("TEST123")).Return(org, nil)
+				orgRepo.EXPECT().FindByCode(gomock.Any(), "TEST123").Return(org, nil)
 			},
 			expectID:    true,
 			expectError: nil,
@@ -309,7 +309,7 @@ func TestOrganizationService_ResolveOrganizationIDFromCode(t *testing.T) {
 			name: "組織が見つからない場合nilを返す",
 			code: lo.ToPtr("NOTFOUND"),
 			setupMocks: func(orgRepo *mock_organization_model.MockOrganizationRepository) {
-				orgRepo.EXPECT().FindByCode(gomock.Any(), lo.ToPtr("NOTFOUND")).Return(nil, sql.ErrNoRows)
+				orgRepo.EXPECT().FindByCode(gomock.Any(), "NOTFOUND").Return(nil, sql.ErrNoRows)
 			},
 			expectID:    false,
 			expectError: nil,
@@ -318,7 +318,7 @@ func TestOrganizationService_ResolveOrganizationIDFromCode(t *testing.T) {
 			name: "データベースエラーの場合エラーを返す",
 			code: lo.ToPtr("NOTFOUND"),
 			setupMocks: func(orgRepo *mock_organization_model.MockOrganizationRepository) {
-				orgRepo.EXPECT().FindByCode(gomock.Any(), lo.ToPtr("NOTFOUND")).Return(nil, errors.New("database error"))
+				orgRepo.EXPECT().FindByCode(gomock.Any(), "NOTFOUND").Return(nil, errors.New("database error"))
 			},
 			expectID:    false,
 			expectError: errors.New("database error"),
@@ -337,7 +337,9 @@ func TestOrganizationService_ResolveOrganizationIDFromCode(t *testing.T) {
 
 			cfg := &config.Config{}
 
-			tt.setupMocks(mockOrgRepo)
+			if tt.setupMocks != nil {
+				tt.setupMocks(mockOrgRepo)
+			}
 
 			service := organization_service.NewOrganizationService(mockOrgRepo, mockOrgUserRepo, mockMemberManager, mockImageStorage, cfg)
 
