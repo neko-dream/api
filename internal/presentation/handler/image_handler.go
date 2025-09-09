@@ -39,7 +39,7 @@ func (i *imageHandler) PostImage(ctx context.Context, req *oas.PostImageReq) (oa
 
 	file, err := http_utils.CreateFileHeader(ctx, req.Image.File, req.GetImage().Name)
 	if err != nil {
-		utils.HandleError(ctx, err, "MakeFileHeader")
+		utils.HandleError(ctx, err, "CreateFileHeader")
 		return nil, messages.InternalServerError
 	}
 

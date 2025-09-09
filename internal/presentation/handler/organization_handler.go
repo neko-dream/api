@@ -135,7 +135,7 @@ func (o *organizationHandler) UpdateOrganization(ctx context.Context, req *oas.U
 	if req.Icon.Value.File != nil {
 		file, err = http_utils.CreateFileHeader(ctx, req.Icon.Value.File, req.Icon.Value.Name)
 		if err != nil {
-			utils.HandleError(ctx, err, "MakeFileHeader")
+			utils.HandleError(ctx, err, "CreateFileHeader")
 			return nil, messages.InternalServerError
 		}
 	}
