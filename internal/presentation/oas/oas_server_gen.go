@@ -453,6 +453,12 @@ type TalkSessionHandler interface {
 	//
 	// GET /talksessions/{talkSessionID}/restrictions
 	GetTalkSessionRestrictionSatisfied(ctx context.Context, params GetTalkSessionRestrictionSatisfiedParams) (GetTalkSessionRestrictionSatisfiedRes, error)
+	// GetUserTalkSessions implements getUserTalkSessions operation.
+	//
+	// 特定ユーザが開いたセッション一覧.
+	//
+	// GET /users/{userID}/talksessions
+	GetUserTalkSessions(ctx context.Context, params GetUserTalkSessionsParams) (GetUserTalkSessionsRes, error)
 	// HasConsent implements hasConsent operation.
 	//
 	// セッションに同意しているか.

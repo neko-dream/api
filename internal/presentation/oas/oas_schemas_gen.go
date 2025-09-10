@@ -2027,6 +2027,103 @@ func (s *GetUserListManageOrderBy) UnmarshalText(data []byte) error {
 	}
 }
 
+type GetUserTalkSessionsBadRequest struct{}
+
+func (*GetUserTalkSessionsBadRequest) getUserTalkSessionsRes() {}
+
+type GetUserTalkSessionsOK struct {
+	TalkSessions []GetUserTalkSessionsOKTalkSessionsItem `json:"talkSessions"`
+	Pagination   OffsetPagination                        `json:"pagination"`
+}
+
+// GetTalkSessions returns the value of TalkSessions.
+func (s *GetUserTalkSessionsOK) GetTalkSessions() []GetUserTalkSessionsOKTalkSessionsItem {
+	return s.TalkSessions
+}
+
+// GetPagination returns the value of Pagination.
+func (s *GetUserTalkSessionsOK) GetPagination() OffsetPagination {
+	return s.Pagination
+}
+
+// SetTalkSessions sets the value of TalkSessions.
+func (s *GetUserTalkSessionsOK) SetTalkSessions(val []GetUserTalkSessionsOKTalkSessionsItem) {
+	s.TalkSessions = val
+}
+
+// SetPagination sets the value of Pagination.
+func (s *GetUserTalkSessionsOK) SetPagination(val OffsetPagination) {
+	s.Pagination = val
+}
+
+func (*GetUserTalkSessionsOK) getUserTalkSessionsRes() {}
+
+type GetUserTalkSessionsOKTalkSessionsItem struct {
+	TalkSession  TalkSession `json:"talkSession"`
+	OpinionCount int         `json:"opinionCount"`
+}
+
+// GetTalkSession returns the value of TalkSession.
+func (s *GetUserTalkSessionsOKTalkSessionsItem) GetTalkSession() TalkSession {
+	return s.TalkSession
+}
+
+// GetOpinionCount returns the value of OpinionCount.
+func (s *GetUserTalkSessionsOKTalkSessionsItem) GetOpinionCount() int {
+	return s.OpinionCount
+}
+
+// SetTalkSession sets the value of TalkSession.
+func (s *GetUserTalkSessionsOKTalkSessionsItem) SetTalkSession(val TalkSession) {
+	s.TalkSession = val
+}
+
+// SetOpinionCount sets the value of OpinionCount.
+func (s *GetUserTalkSessionsOKTalkSessionsItem) SetOpinionCount(val int) {
+	s.OpinionCount = val
+}
+
+type GetUserTalkSessionsStatus string
+
+const (
+	GetUserTalkSessionsStatusFinished GetUserTalkSessionsStatus = "finished"
+	GetUserTalkSessionsStatusOpen     GetUserTalkSessionsStatus = "open"
+)
+
+// AllValues returns all GetUserTalkSessionsStatus values.
+func (GetUserTalkSessionsStatus) AllValues() []GetUserTalkSessionsStatus {
+	return []GetUserTalkSessionsStatus{
+		GetUserTalkSessionsStatusFinished,
+		GetUserTalkSessionsStatusOpen,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s GetUserTalkSessionsStatus) MarshalText() ([]byte, error) {
+	switch s {
+	case GetUserTalkSessionsStatusFinished:
+		return []byte(s), nil
+	case GetUserTalkSessionsStatusOpen:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *GetUserTalkSessionsStatus) UnmarshalText(data []byte) error {
+	switch GetUserTalkSessionsStatus(data) {
+	case GetUserTalkSessionsStatusFinished:
+		*s = GetUserTalkSessionsStatusFinished
+		return nil
+	case GetUserTalkSessionsStatusOpen:
+		*s = GetUserTalkSessionsStatusOpen
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
 type GetVapidKeyOK struct {
 	VapidKey string `json:"vapid_key"`
 }
@@ -3788,6 +3885,69 @@ func (o OptNilGetTalkSessionListStatus) Get() (v GetTalkSessionListStatus, ok bo
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilGetTalkSessionListStatus) Or(d GetTalkSessionListStatus) GetTalkSessionListStatus {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilGetUserTalkSessionsStatus returns new OptNilGetUserTalkSessionsStatus with value set to v.
+func NewOptNilGetUserTalkSessionsStatus(v GetUserTalkSessionsStatus) OptNilGetUserTalkSessionsStatus {
+	return OptNilGetUserTalkSessionsStatus{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilGetUserTalkSessionsStatus is optional nullable GetUserTalkSessionsStatus.
+type OptNilGetUserTalkSessionsStatus struct {
+	Value GetUserTalkSessionsStatus
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilGetUserTalkSessionsStatus was set.
+func (o OptNilGetUserTalkSessionsStatus) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilGetUserTalkSessionsStatus) Reset() {
+	var v GetUserTalkSessionsStatus
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilGetUserTalkSessionsStatus) SetTo(v GetUserTalkSessionsStatus) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilGetUserTalkSessionsStatus) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilGetUserTalkSessionsStatus) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v GetUserTalkSessionsStatus
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilGetUserTalkSessionsStatus) Get() (v GetUserTalkSessionsStatus, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilGetUserTalkSessionsStatus) Or(d GetUserTalkSessionsStatus) GetUserTalkSessionsStatus {
 	if v, ok := o.Get(); ok {
 		return v
 	}

@@ -368,4 +368,26 @@ namespace kotohiro {
     @statusCode statusCode: 500;
     @body body: {};
   };
+
+  @tag("user")
+  @extension("x-ogen-operation-group", "TalkSession")
+  @route("/users/{userID}/talksessions")
+  @get
+  @summary("特定ユーザが開いたセッション一覧")
+  @useAuth([])
+  op getUserTalkSessions(
+    @path userID: string,
+    @query(#{ explode: true }) limit?: integer = 10,
+    @query(#{ explode: true }) offset?: integer,
+    @query(#{ explode: true }) status?: "finished" | "open" | null,
+  ): Body<{
+    talkSessions: {
+      talkSession: TalkSession;
+      opinionCount: integer;
+    }[];
+    pagination: OffsetPagination;
+  }> | {
+    @statusCode statusCode: 400;
+    @body body: {};
+  };
 }
