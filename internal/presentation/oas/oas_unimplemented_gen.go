@@ -407,6 +407,15 @@ func (UnimplementedHandler) GetUserStatsTotalManage(ctx context.Context) (r *Use
 	return r, ht.ErrNotImplemented
 }
 
+// GetUserTalkSessions implements getUserTalkSessions operation.
+//
+// 特定ユーザが開いたセッション一覧.
+//
+// GET /users/{userID}/talksessions
+func (UnimplementedHandler) GetUserTalkSessions(ctx context.Context, params GetUserTalkSessionsParams) (r GetUserTalkSessionsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetVapidKey implements getVapidKey operation.
 //
 // VAPID公開鍵取得.

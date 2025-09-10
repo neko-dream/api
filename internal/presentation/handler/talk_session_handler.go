@@ -89,6 +89,11 @@ func NewTalkSessionHandler(
 	}
 }
 
+// GetUserTalkSessions implements oas.TalkSessionHandler.
+func (t *talkSessionHandler) GetUserTalkSessions(ctx context.Context, params oas.GetUserTalkSessionsParams) (oas.GetUserTalkSessionsRes, error) {
+	panic("unimplemented")
+}
+
 // PostConclusion implements oas.TalkSessionHandler.
 func (t *talkSessionHandler) PostConclusion(ctx context.Context, req *oas.PostConclusionReq, params oas.PostConclusionParams) (oas.PostConclusionRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.PostConclusion")

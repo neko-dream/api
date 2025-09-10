@@ -3403,6 +3403,72 @@ paths:
       security:
         - {}
       x-ogen-operation-group: User
+  /users/{userID}/talksessions:
+    get:
+      operationId: getUserTalkSessions
+      summary: 特定ユーザが開いたセッション一覧
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - finished
+              - open
+            nullable: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  talkSessions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        talkSession:
+                          $ref: '#/components/schemas/TalkSession'
+                        opinionCount:
+                          type: integer
+                      required:
+                        - talkSession
+                        - opinionCount
+                  pagination:
+                    $ref: '#/components/schemas/OffsetPagination'
+                required:
+                  - talkSessions
+                  - pagination
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - user
+      security:
+        - {}
+      x-ogen-operation-group: TalkSession
   /v1/manage/talksessions/list:
     get:
       operationId: getTalkSessionListManage

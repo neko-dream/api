@@ -1737,6 +1737,53 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					}
 
 					elem = origElem
+				case 's': // Prefix: "s/"
+					origElem := elem
+					if l := len("s/"); len(elem) >= l && elem[0:l] == "s/" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					// Param: "userID"
+					// Match until "/"
+					idx := strings.IndexByte(elem, '/')
+					if idx < 0 {
+						idx = len(elem)
+					}
+					args[0] = elem[:idx]
+					elem = elem[idx:]
+
+					if len(elem) == 0 {
+						break
+					}
+					switch elem[0] {
+					case '/': // Prefix: "/talksessions"
+						origElem := elem
+						if l := len("/talksessions"); len(elem) >= l && elem[0:l] == "/talksessions" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch r.Method {
+							case "GET":
+								s.handleGetUserTalkSessionsRequest([1]string{
+									args[0],
+								}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "GET")
+							}
+
+							return
+						}
+
+						elem = origElem
+					}
+
+					elem = origElem
 				}
 
 				elem = origElem
@@ -3989,6 +4036,55 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						default:
 							return
 						}
+					}
+
+					elem = origElem
+				case 's': // Prefix: "s/"
+					origElem := elem
+					if l := len("s/"); len(elem) >= l && elem[0:l] == "s/" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					// Param: "userID"
+					// Match until "/"
+					idx := strings.IndexByte(elem, '/')
+					if idx < 0 {
+						idx = len(elem)
+					}
+					args[0] = elem[:idx]
+					elem = elem[idx:]
+
+					if len(elem) == 0 {
+						break
+					}
+					switch elem[0] {
+					case '/': // Prefix: "/talksessions"
+						origElem := elem
+						if l := len("/talksessions"); len(elem) >= l && elem[0:l] == "/talksessions" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch method {
+							case "GET":
+								r.name = "GetUserTalkSessions"
+								r.summary = "特定ユーザが開いたセッション一覧"
+								r.operationID = "getUserTalkSessions"
+								r.pathPattern = "/users/{userID}/talksessions"
+								r.args = args
+								r.count = 1
+								return r, true
+							default:
+								return
+							}
+						}
+
+						elem = origElem
 					}
 
 					elem = origElem
