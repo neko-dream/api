@@ -14950,9 +14950,15 @@ func (s *TalkSession) encodeFields(e *jx.Encoder) {
 		e.FieldStart("hideReport")
 		e.Bool(s.HideReport)
 	}
+	{
+		if s.ShowTop.Set {
+			e.FieldStart("showTop")
+			s.ShowTop.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfTalkSession = [13]string{
+var jsonFieldsNameOfTalkSession = [14]string{
 	0:  "id",
 	1:  "theme",
 	2:  "description",
@@ -14966,6 +14972,7 @@ var jsonFieldsNameOfTalkSession = [13]string{
 	10: "thumbnailURL",
 	11: "restrictions",
 	12: "hideReport",
+	13: "showTop",
 }
 
 // Decode decodes TalkSession from json.
@@ -15124,6 +15131,16 @@ func (s *TalkSession) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"hideReport\"")
+			}
+		case "showTop":
+			if err := func() error {
+				s.ShowTop.Reset()
+				if err := s.ShowTop.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"showTop\"")
 			}
 		default:
 			return d.Skip()

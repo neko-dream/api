@@ -70,6 +70,11 @@ namespace kotohiro {
      * レポートを隠すかどうか
      */
     hideReport: boolean;
+
+    /**
+     * トップに表示するかどうか
+     */
+    showTop?: boolean | null;
   }
 
   model Report {

@@ -138,6 +138,7 @@ namespace kotohiro {
       thumbnailURL?: HttpPart<string>;
       restrictions?: HttpPart<string[]>;
       aliasId?: HttpPart<string>;
+      showTop?: HttpPart<boolean | null>;
     },
   ): TalkSession | {
     @statusCode statusCode: 400;

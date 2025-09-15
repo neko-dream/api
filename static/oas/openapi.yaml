@@ -2066,11 +2066,16 @@ paths:
                     type: string
                 aliasId:
                   type: string
+                showTop:
+                  type: boolean
+                  nullable: true
               required:
                 - theme
                 - scheduledEndTime
             encoding:
               restrictions:
+                contentType: application/json
+              showTop:
                 contentType: application/json
       x-ogen-operation-group: TalkSession
   /talksessions/histories:
@@ -4235,6 +4240,10 @@ components:
         hideReport:
           type: boolean
           description: レポートを隠すかどうか
+        showTop:
+          type: boolean
+          nullable: true
+          description: トップに表示するかどうか
     TalkSessionForManage:
       type: object
       required:
