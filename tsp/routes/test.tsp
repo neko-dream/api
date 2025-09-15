@@ -17,7 +17,6 @@ namespace kotohiro {
     optNilBool?: boolean | null;
     optBool?: boolean;
     optUrl?: url;
-
     @format("url")
     optNilUrl?: string | null;
   }> | {
@@ -32,9 +31,26 @@ namespace kotohiro {
   @extension("x-ogen-operation-group", "Test")
   @route("/test/dummy")
   @post
-  @summary("mudai")
+  @summary("init dummy")
   @useAuth([])
-  op dummiInit(): Body<{}> | {
+  op dummyInit(
+    @multipartBody body: {
+      // integerOptionalNull?: HttpPart<integer | null>;
+      integerNull: HttpPart<integer | null>;
+      // integerOptional?: HttpPart<integer>;
+      // integer: HttpPart<integer>;
+      numericOptionalNull?: HttpPart<numeric | null>;
+      numericNull: HttpPart<numeric | null>;
+      numericOptional?: HttpPart<numeric>;
+      numeric: HttpPart<numeric>;
+      booleanOptionalNull?: HttpPart<boolean | null>;
+      booleanNull: HttpPart<boolean | null>;
+      // booleanOptional?: HttpPart<boolean>;
+      // boolean: HttpPart<boolean>;
+    };
+  ): Body<{
+
+  }> | {
     @statusCode statusCode: 400;
     @body body: {};
   } | {
