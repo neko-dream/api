@@ -2,11 +2,15 @@ package utils
 
 import (
 	"database/sql"
+	"encoding"
+	"math"
 	"net/url"
+	"reflect"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/neko-dream/server/internal/presentation/oas"
+	"github.com/samber/lo"
 )
 
 // Deprecated: utils.ToPtrIf を使用すること
