@@ -8,6 +8,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/pkg/utils"
+	"github.com/samber/lo"
 )
 
 type TalkSession struct {
@@ -22,6 +23,7 @@ type TalkSession struct {
 	Prefecture       *string
 	Restrictions     []string
 	HideReport       bool
+	ShowTop          bool
 }
 
 type TalkSessionWithDetail struct {
@@ -86,5 +88,6 @@ func (t *TalkSessionWithDetail) ToResponse() oas.TalkSession {
 		ThumbnailURL:      utils.ToOptNil[oas.OptNilString](t.ThumbnailURL),
 		Restrictions:      restrictions,
 		HideReport:        t.HideReport,
+		ShowTop:           utils.ToOptNil[oas.OptNilBool](lo.ToPtr(t.ShowTop)),
 	}
 }

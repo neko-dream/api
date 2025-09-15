@@ -325,8 +325,7 @@ func (t *talkSessionHandler) InitiateTalkSession(ctx context.Context, req *oas.I
 		return nil, errtrace.Wrap(err)
 	}
 
-	res := out.ToResponse()
-	return &res, nil
+	return lo.ToPtr(out.ToResponse()), nil
 }
 
 // ViewTalkSessionDetail トークセッション詳細取得
@@ -346,8 +345,7 @@ func (t *talkSessionHandler) GetTalkSessionDetail(ctx context.Context, params oa
 		return nil, err
 	}
 
-	res := out.ToResponse()
-	return &res, nil
+	return lo.ToPtr(out.ToResponse()), nil
 }
 
 // GetTalkSessionList セッション一覧取得
