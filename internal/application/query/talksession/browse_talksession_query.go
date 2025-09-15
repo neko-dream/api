@@ -43,7 +43,7 @@ const (
 func (h *BrowseTalkSessionQueryInput) Validate() error {
 	var errs []error
 
-	if h.SortKey != nil && h.SortKey.IsValid() {
+	if h.SortKey != nil && !h.SortKey.IsValid() {
 		errs = append(errs, fmt.Errorf("無効なSortKeyです。: %s", h.SortKey))
 	}
 
