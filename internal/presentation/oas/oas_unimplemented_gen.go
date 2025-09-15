@@ -103,12 +103,12 @@ func (UnimplementedHandler) DevAuthorize(ctx context.Context, params DevAuthoriz
 	return r, ht.ErrNotImplemented
 }
 
-// DummiInit implements dummiInit operation.
+// DummyInit implements dummyInit operation.
 //
-// Mudai.
+// Init dummy.
 //
 // POST /test/dummy
-func (UnimplementedHandler) DummiInit(ctx context.Context) (r DummiInitRes, _ error) {
+func (UnimplementedHandler) DummyInit(ctx context.Context, req *DummyInitReq) (r DummyInitRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

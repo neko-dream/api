@@ -565,9 +565,9 @@ func encodeDevAuthorizeResponse(response DevAuthorizeRes, w http.ResponseWriter,
 	}
 }
 
-func encodeDummiInitResponse(response DummiInitRes, w http.ResponseWriter, span trace.Span) error {
+func encodeDummyInitResponse(response DummyInitRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *DummiInitOK:
+	case *DummyInitOK:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -580,7 +580,7 @@ func encodeDummiInitResponse(response DummiInitRes, w http.ResponseWriter, span 
 
 		return nil
 
-	case *DummiInitBadRequest:
+	case *DummyInitBadRequest:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
@@ -593,7 +593,7 @@ func encodeDummiInitResponse(response DummiInitRes, w http.ResponseWriter, span 
 
 		return nil
 
-	case *DummiInitInternalServerError:
+	case *DummyInitInternalServerError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))
