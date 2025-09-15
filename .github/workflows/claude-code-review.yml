@@ -49,35 +49,43 @@ jobs:
 
             ## 実行手順（厳密に従うこと）
 
-            ### Step 1: 既存レビューの確認（サイレントで実行）
-            1. get_pull_request_reviews でPR #${{ github.event.pull_request.number }}の既存レビューを取得
-            2. github-actions[bot]による既存のレビューIDを記録
-            3. 既存レビューがある場合は、get_pull_request_review_comments で既存コメントを取得
-            4. 各コメントのbody内の識別子 [Claude-{hash}] を抽出してマッピング作成
-            5. 既存コメントツリーに基づき、解決済み、継続中、未対応の問題を分類
-            6. 既存コメントツリーより、何かしらユーザーがコメントしていたらそれに基づき問題を分類
-            7. 解決済みとコメントしてある場合はマッピングからはずす。
-
-            ### Step 2: 差分解析（サイレントで実行）
+            ### Step 1: 差分解析（サイレントで実行）
             1. get_pull_request_diff で最新の差分を取得
             2. 各変更箇所を解析して問題を特定
             3. 各問題に対して一意な識別子 [Claude-{hash}] を生成（ファイルパス+行番号のハッシュ）
 
+            ### Step 2: 既存レビューの確認（サイレントで実行）
+            1. get_pull_request_reviews でPR #${{ github.event.pull_request.number }}の既存レビューを取得
+            2. github-actions[bot]による既存のレビューIDを記録
+            3. 既存レビューがある場合は、get_pull_request_review_comments で既存コメントを取得
+            4. コメントがある場合、各コメントのbody内の識別子 [Claude-{hash}] を抽出してマッピング作成
+            5. 解決済み、継続中、新規の問題をリスト化
+            6. 既存コメントのbodyを解析して、必要に応じて更新内容を準備
+                - コメントで解決済みすでになっている場合は更新不要
+                - 解決済みコメントはないが、解決済みの場合は解決済みリストに追加
+                - 継続中のコメントは更新リストに追加
+                - 新規問題は新規作成リストに追加
+
             ### Step 3: コメント管理戦略の決定（サイレントで実行）
             既存コメントがある場合:
-            - 既存コメントと新規問題を照合
-            - 解決済み問題: 解決リストに追加（後で返信コメントで対応）
-            - 継続中の問題: 更新リストに追加（新しいコメントで状況説明）
-            - 新規問題: 新規作成リストに追加
+              1. Step 1で特定した問題とStep 2で取得したコメントを照合し、以下のリストを作成
+                - 解決済み問題（既存コメントがあるが、現在の差分には存在しない）
+                - 継続中の問題（既存コメントがあり、現在の差分にも存在する）
+                - 新規問題（既存コメントがなく、現在の差分に存在する）
+              2. 各リストに基づいて以下のアクションを決定
+                - 返信が解決済みを示す場合は解決済みリストに追加
+                - 返信が継続中を示す場合は更新リストに追加
+                - 返信が新規問題を示す場合は新規作成リストに追加
 
             既存コメントがない場合:
             - すべての問題を新規作成リストに追加
 
             ### Step 4: レビューの実行（この時点で初めてコメントを作成）
+            以下はフローを示す擬似コードです。
 
             #### パターンA: 既存コメントへの対応と新規問題の追加
             ```python
-            # ペンディングレビューを作成
+            # 保留中のレビューを作成
             create_pending_pull_request_review(
                 owner=owner,
                 repo=repo,
@@ -86,16 +94,19 @@ jobs:
 
             # 解決済み問題への返信
             for comment in resolved_comments:
-                add_comment_to_pending_review(
-                    owner=owner,
-                    repo=repo,
-                    pullNumber=pr_number,
-                    path=comment.path,
-                    line=comment.line,
-                    body="✅ [Claude-{hash}] この問題は修正されました",
-                    side="RIGHT",
-                    subjectType="line"
-                )
+                if comment.body.contains("✅"):
+                    continue
+                else:
+                    add_comment_to_pending_review(
+                        owner=owner,
+                        repo=repo,
+                        pullNumber=pr_number,
+                        path=comment.path,
+                        line=comment.line,
+                        body="✅ [Claude-{hash}] この問題は修正されました",
+                        side="RIGHT",
+                        subjectType="line"
+                    )
 
             # 継続中の問題への更新コメント
             for comment in continuing_issues:
@@ -131,8 +142,11 @@ jobs:
                 event="COMMENT",
                 body="レビューを更新しました。上記のコメントをご確認ください。"
             )
-            パターンB: 新規レビューの場合
-            python# ペンディングレビューを作成
+            ```
+
+            #### パターンB: 新規レビューの場合
+            ```python
+            # 保留中のレビューを作成
             create_pending_pull_request_review(
                 owner=owner,
                 repo=repo,
@@ -160,6 +174,8 @@ jobs:
                 event="COMMENT",
                 body="コードレビューを実施しました。上記のコメントをご確認ください。"
             )
+            ```
+
             コメントフォーマット（厳密に従う）
             各コメントは以下の形式で作成:
             [Claude-{8文字のハッシュ}] 🔴 Critical: セキュリティ脆弱性
@@ -172,6 +188,7 @@ jobs:
             ```suggestion
             const query = 'SELECT * FROM users WHERE id = ?';
             db.query(query, [userId], callback);
+            ```
 
             ## 識別子ルール
             - 形式: `[Claude-{hash}]` （hashは8文字）
