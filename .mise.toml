@@ -13,6 +13,8 @@ go = "1.24.3"
 jq = "latest"
 ecspresso = "latest"
 task = "latest"
+"go:github.com/fzipp/gocyclo/cmd/gocyclo" = "latest"
+"go:github.com/uudashr/gocognit/cmd/gocognit" = "latest"
 
 [tasks.migrate-create]
 description = "Create a new migration file"
