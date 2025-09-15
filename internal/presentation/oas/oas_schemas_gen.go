@@ -657,6 +657,7 @@ type EditTalkSessionReq struct {
 	City             OptString  `json:"city"`
 	Description      OptString  `json:"description"`
 	ThumbnailURL     OptString  `json:"thumbnailURL"`
+	HideTop          OptNilBool `json:"hideTop"`
 }
 
 // GetTheme returns the value of Theme.
@@ -699,6 +700,11 @@ func (s *EditTalkSessionReq) GetThumbnailURL() OptString {
 	return s.ThumbnailURL
 }
 
+// GetHideTop returns the value of HideTop.
+func (s *EditTalkSessionReq) GetHideTop() OptNilBool {
+	return s.HideTop
+}
+
 // SetTheme sets the value of Theme.
 func (s *EditTalkSessionReq) SetTheme(val string) {
 	s.Theme = val
@@ -737,6 +743,11 @@ func (s *EditTalkSessionReq) SetDescription(val OptString) {
 // SetThumbnailURL sets the value of ThumbnailURL.
 func (s *EditTalkSessionReq) SetThumbnailURL(val OptString) {
 	s.ThumbnailURL = val
+}
+
+// SetHideTop sets the value of HideTop.
+func (s *EditTalkSessionReq) SetHideTop(val OptNilBool) {
+	s.HideTop = val
 }
 
 type EditTimeLineBadRequest struct{}
@@ -2261,7 +2272,7 @@ type InitiateTalkSessionReq struct {
 	ThumbnailURL     OptString  `json:"thumbnailURL"`
 	Restrictions     []string   `json:"restrictions"`
 	AliasId          OptString  `json:"aliasId"`
-	ShowTop          OptNilBool `json:"showTop"`
+	HideTop          OptNilBool `json:"hideTop"`
 }
 
 // GetTheme returns the value of Theme.
@@ -2314,9 +2325,9 @@ func (s *InitiateTalkSessionReq) GetAliasId() OptString {
 	return s.AliasId
 }
 
-// GetShowTop returns the value of ShowTop.
-func (s *InitiateTalkSessionReq) GetShowTop() OptNilBool {
-	return s.ShowTop
+// GetHideTop returns the value of HideTop.
+func (s *InitiateTalkSessionReq) GetHideTop() OptNilBool {
+	return s.HideTop
 }
 
 // SetTheme sets the value of Theme.
@@ -2369,9 +2380,9 @@ func (s *InitiateTalkSessionReq) SetAliasId(val OptString) {
 	s.AliasId = val
 }
 
-// SetShowTop sets the value of ShowTop.
-func (s *InitiateTalkSessionReq) SetShowTop(val OptNilBool) {
-	s.ShowTop = val
+// SetHideTop sets the value of HideTop.
+func (s *InitiateTalkSessionReq) SetHideTop(val OptNilBool) {
+	s.HideTop = val
 }
 
 type InviteOrganizationBadRequest struct{}
@@ -6339,7 +6350,7 @@ type TalkSession struct {
 	// レポートを隠すかどうか.
 	HideReport bool `json:"hideReport"`
 	// トップに表示するかどうか.
-	ShowTop OptNilBool `json:"showTop"`
+	HideTop OptNilBool `json:"hideTop"`
 }
 
 // GetID returns the value of ID.
@@ -6407,9 +6418,9 @@ func (s *TalkSession) GetHideReport() bool {
 	return s.HideReport
 }
 
-// GetShowTop returns the value of ShowTop.
-func (s *TalkSession) GetShowTop() OptNilBool {
-	return s.ShowTop
+// GetHideTop returns the value of HideTop.
+func (s *TalkSession) GetHideTop() OptNilBool {
+	return s.HideTop
 }
 
 // SetID sets the value of ID.
@@ -6477,9 +6488,9 @@ func (s *TalkSession) SetHideReport(val bool) {
 	s.HideReport = val
 }
 
-// SetShowTop sets the value of ShowTop.
-func (s *TalkSession) SetShowTop(val OptNilBool) {
-	s.ShowTop = val
+// SetHideTop sets the value of HideTop.
+func (s *TalkSession) SetHideTop(val OptNilBool) {
+	s.HideTop = val
 }
 
 func (*TalkSession) editTalkSessionRes()      {}

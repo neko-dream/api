@@ -74,7 +74,7 @@ namespace kotohiro {
     /**
      * トップに表示するかどうか
      */
-    showTop?: boolean | null;
+    hideTop?: boolean | null;
   }
 
   model Report {

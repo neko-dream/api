@@ -5,4 +5,4 @@ options:
     emitter-output-dir: "{cwd}/../static/oas"
     output-file: "openapi.yaml"
     openapi-versions:
-      - 3.0.0
+      - 3.1.0

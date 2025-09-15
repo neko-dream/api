@@ -1,4 +1,4 @@
-openapi: 3.0.0
+openapi: 3.1.0
 info:
   title: Kotohiro API
   version: 1.0.0
@@ -567,9 +567,7 @@ paths:
             schema:
               type: object
               properties:
-                image:
-                  type: string
-                  format: binary
+                image: {}
               required:
                 - image
       x-ogen-operation-group: Image
@@ -773,8 +771,9 @@ paths:
               type: object
               properties:
                 push_notification_enabled:
-                  type: boolean
-                  nullable: true
+                  anyOf:
+                    - type: boolean
+                    - type: 'null'
               required: []
             encoding:
               push_notification_enabled:
@@ -915,12 +914,11 @@ paths:
                   type: string
                 referenceURL:
                   type: string
-                picture:
-                  type: string
-                  format: binary
+                picture: {}
                 isSeed:
-                  type: boolean
-                  nullable: true
+                  anyOf:
+                    - type: boolean
+                    - type: 'null'
               required:
                 - opinionContent
             encoding:
@@ -937,12 +935,13 @@ paths:
           required: false
           description: ソートきー
           schema:
-            type: string
-            enum:
-              - latest
-              - mostReplies
-              - oldest
-            nullable: true
+            anyOf:
+              - type: string
+                enum:
+                  - latest
+                  - mostReplies
+                  - oldest
+              - type: 'null'
         - name: limit
           in: query
           required: false
@@ -1452,8 +1451,6 @@ paths:
                     組織タイプ
                     - 1: 通常（基本これ）
                 icon:
-                  type: string
-                  format: binary
                   description: 組織アイコン
               required:
                 - name
@@ -1777,8 +1774,6 @@ paths:
                   type: string
                   description: 組織名
                 icon:
-                  type: string
-                  format: binary
                   description: 組織アイコン
               required:
                 - name
@@ -1896,30 +1891,34 @@ paths:
             ir
             1ページあたりの要素数
           schema:
-            type: integer
-            nullable: true
+            anyOf:
+              - type: integer
+              - type: 'null'
         - name: offset
           in: query
           required: false
           description: どの要素から始めるか
           schema:
-            type: integer
-            nullable: true
+            anyOf:
+              - type: integer
+              - type: 'null'
         - name: theme
           in: query
           required: false
           schema:
-            type: string
-            nullable: true
+            anyOf:
+              - type: string
+              - type: 'null'
         - name: status
           in: query
           required: false
           schema:
-            type: string
-            enum:
-              - open
-              - finished
-            nullable: true
+            anyOf:
+              - type: string
+                enum:
+                  - open
+                  - finished
+              - type: 'null'
             default: open
         - name: sortKey
           in: query
@@ -1935,14 +1934,16 @@ paths:
           in: query
           required: false
           schema:
-            type: number
-            nullable: true
+            anyOf:
+              - type: number
+              - type: 'null'
         - name: longitude
           in: query
           required: false
           schema:
-            type: number
-            nullable: true
+            anyOf:
+              - type: number
+              - type: 'null'
       responses:
         '200':
           description: The request has succeeded.
@@ -2066,16 +2067,17 @@ paths:
                     type: string
                 aliasId:
                   type: string
-                showTop:
-                  type: boolean
-                  nullable: true
+                hideTop:
+                  anyOf:
+                    - type: boolean
+                    - type: 'null'
               required:
                 - theme
                 - scheduledEndTime
             encoding:
               restrictions:
                 contentType: application/json
-              showTop:
+              hideTop:
                 contentType: application/json
       x-ogen-operation-group: TalkSession
   /talksessions/histories:
@@ -2098,17 +2100,19 @@ paths:
           required: false
           description: テーマ
           schema:
-            type: string
-            nullable: true
+            anyOf:
+              - type: string
+              - type: 'null'
         - name: status
           in: query
           required: false
           schema:
-            type: string
-            enum:
-              - open
-              - finished
-            nullable: true
+            anyOf:
+              - type: string
+                enum:
+                  - open
+                  - finished
+              - type: 'null'
       responses:
         '200':
           description: The request has succeeded.
@@ -2175,11 +2179,12 @@ paths:
           in: query
           required: false
           schema:
-            type: string
-            enum:
-              - finished
-              - open
-            nullable: true
+            anyOf:
+              - type: string
+                enum:
+                  - finished
+                  - open
+              - type: 'null'
       responses:
         '200':
           description: The request has succeeded.
@@ -2339,9 +2344,16 @@ paths:
                   type: string
                 thumbnailURL:
                   type: string
+                hideTop:
+                  anyOf:
+                    - type: boolean
+                    - type: 'null'
               required:
                 - theme
                 - scheduledEndTime
+            encoding:
+              hideTop:
+                contentType: application/json
       x-ogen-operation-group: TalkSession
   /talksessions/{talkSessionID}/analysis:
     get:
@@ -2598,30 +2610,34 @@ paths:
           in: query
           required: false
           schema:
-            type: string
-            enum:
-              - latest
-              - mostReplies
-              - oldest
-            nullable: true
+            anyOf:
+              - type: string
+                enum:
+                  - latest
+                  - mostReplies
+                  - oldest
+              - type: 'null'
         - name: limit
           in: query
           required: false
           schema:
-            type: integer
-            nullable: true
+            anyOf:
+              - type: integer
+              - type: 'null'
         - name: offset
           in: query
           required: false
           schema:
-            type: integer
-            nullable: true
+            anyOf:
+              - type: integer
+              - type: 'null'
         - name: seed
           in: query
           required: false
           schema:
-            type: boolean
-            nullable: true
+            anyOf:
+              - type: boolean
+              - type: 'null'
       responses:
         '200':
           description: The request has succeeded.
@@ -2680,8 +2696,9 @@ paths:
                 type: object
                 properties:
                   report:
-                    type: string
-                    nullable: true
+                    anyOf:
+                      - type: string
+                      - type: 'null'
         '500':
           description: Server error
           content:
@@ -2841,8 +2858,9 @@ paths:
           in: query
           required: false
           schema:
-            type: integer
-            nullable: true
+            anyOf:
+              - type: integer
+              - type: 'null'
             default: 10
       responses:
         '200':
@@ -3067,21 +3085,24 @@ paths:
                 type: object
                 properties:
                   optInt:
-                    type: integer
-                    nullable: true
+                    anyOf:
+                      - type: integer
+                      - type: 'null'
                   optNilInt:
                     type: integer
                   optNilBool:
-                    type: boolean
-                    nullable: true
+                    anyOf:
+                      - type: boolean
+                      - type: 'null'
                   optBool:
                     type: boolean
                   optUrl:
                     type: string
                     format: uri
                   optNilUrl:
-                    type: string
-                    nullable: true
+                    anyOf:
+                      - type: string
+                      - type: 'null'
                     format: url
         '400':
           description: The server could not understand the request due to invalid syntax.
@@ -3147,8 +3168,9 @@ paths:
                   demographics:
                     $ref: '#/components/schemas/UserDemographics'
                   email:
-                    type: string
-                    nullable: true
+                    anyOf:
+                      - type: string
+                      - type: 'null'
                 required:
                   - user
                   - demographics
@@ -3213,9 +3235,7 @@ paths:
                   type: string
                 displayID:
                   type: string
-                icon:
-                  type: string
-                  format: binary
+                icon: {}
                 dateOfBirth:
                   type: number
                 gender:
@@ -3280,12 +3300,11 @@ paths:
               properties:
                 displayName:
                   type: string
-                icon:
-                  type: string
-                  format: binary
+                icon: {}
                 deleteIcon:
-                  type: boolean
-                  nullable: true
+                  anyOf:
+                    - type: boolean
+                    - type: 'null'
                 dateOfBirth:
                   type: number
                 gender:
@@ -3433,11 +3452,12 @@ paths:
           in: query
           required: false
           schema:
-            type: string
-            enum:
-              - finished
-              - open
-            nullable: true
+            anyOf:
+              - type: string
+                enum:
+                  - finished
+                  - open
+              - type: 'null'
       responses:
         '200':
           description: The request has succeeded.
@@ -3865,13 +3885,14 @@ components:
           type: string
           description: 親の意見ID。ルートならば無し
         voteType:
-          allOf:
+          anyOf:
             - $ref: '#/components/schemas/VoteType'
-          nullable: true
+            - type: 'null'
           description: 意見投稿主の意見。ルート意見の場合はここには何も入らない
         pictureURL:
-          type: string
-          nullable: true
+          anyOf:
+            - type: string
+            - type: 'null'
           description: 画像が返る場合もある
         referenceURL:
           type: string
@@ -3913,9 +3934,9 @@ components:
         replyCount:
           type: integer
         myVoteType:
-          allOf:
+          anyOf:
             - $ref: '#/components/schemas/VoteType'
-          nullable: true
+            - type: 'null'
       description: 意見とリプライ数と投票情報を含むレスポンス
     OpinionWithReplyCount:
       type: object
@@ -3953,9 +3974,9 @@ components:
         user:
           $ref: '#/components/schemas/User'
         myVoteType:
-          allOf:
+          anyOf:
             - $ref: '#/components/schemas/VoteType'
-          nullable: true
+            - type: 'null'
       description: 意見と投票情報を含むレスポンス
     OptionalCookieAuth:
       type: object
@@ -4000,8 +4021,9 @@ components:
           type: string
           description: 組織コード
         iconURL:
-          type: string
-          nullable: true
+          anyOf:
+            - type: string
+            - type: 'null'
           description: 組織アイコンURL
         type:
           type: integer
@@ -4023,8 +4045,9 @@ components:
         aliasName:
           type: string
         createdAt:
-          type: string
-          nullable: true
+          anyOf:
+            - type: string
+            - type: 'null'
       description: 組織エイリアス
     OrganizationUser:
       type: object
@@ -4042,8 +4065,9 @@ components:
         displayName:
           type: string
         iconURL:
-          type: string
-          nullable: true
+          anyOf:
+            - type: string
+            - type: 'null'
         role:
           type: integer
         roleName:
@@ -4059,8 +4083,9 @@ components:
           type: string
           description: 最新ポリシーのバージョン
         consentedAt:
-          type: string
-          nullable: true
+          anyOf:
+            - type: string
+            - type: 'null'
           description: 同意した日時
         consentGiven:
           type: boolean
@@ -4131,8 +4156,9 @@ components:
               reason:
                 type: string
               content:
-                type: string
-                nullable: true
+                anyOf:
+                  - type: string
+                  - type: 'null'
             required:
               - reason
         reportCount:
@@ -4197,18 +4223,18 @@ components:
           type: string
           description: テーマ
         description:
-          type: string
-          nullable: true
+          anyOf:
+            - type: string
+            - type: 'null'
           description: 説明
         owner:
           allOf:
             - $ref: '#/components/schemas/User'
           description: 作成ユーザー
         organizationAlias:
-          type: object
-          allOf:
+          anyOf:
             - $ref: '#/components/schemas/OrganizationAlias'
-          nullable: true
+            - type: 'null'
           description: 作成組織名
         createdAt:
           type: string
@@ -4221,16 +4247,19 @@ components:
             - $ref: '#/components/schemas/Location'
           description: 位置情報
         city:
-          type: string
-          nullable: true
+          anyOf:
+            - type: string
+            - type: 'null'
           description: 市区町村
         prefecture:
-          type: string
-          nullable: true
+          anyOf:
+            - type: string
+            - type: 'null'
           description: 都道府県
         thumbnailURL:
-          type: string
-          nullable: true
+          anyOf:
+            - type: string
+            - type: 'null'
           description: サムネ画像
         restrictions:
           type: array
@@ -4240,9 +4269,10 @@ components:
         hideReport:
           type: boolean
           description: レポートを隠すかどうか
-        showTop:
-          type: boolean
-          nullable: true
+        hideTop:
+          anyOf:
+            - type: boolean
+            - type: 'null'
           description: トップに表示するかどうか
     TalkSessionForManage:
       type: object
@@ -4411,25 +4441,29 @@ components:
         isEmailVerified:
           type: boolean
         orgType:
-          type: integer
-          nullable: true
+          anyOf:
+            - type: integer
+            - type: 'null'
           description: アカウントの種類。組織がなければ空
         requiredPasswordChange:
           type: boolean
           description: パスワードの更新が必要かどうか
         organizationRole:
-          type: string
-          nullable: true
+          anyOf:
+            - type: string
+            - type: 'null'
           description: 組織のRole
         organizationCode:
-          type: string
-          nullable: true
+          anyOf:
+            - type: string
+            - type: 'null'
           description: |-
             組織コード
             ログイン時に使用する
         organizationID:
-          type: string
-          nullable: true
+          anyOf:
+            - type: string
+            - type: 'null'
           description: 組織ID
     User:
       type: object
@@ -4445,29 +4479,34 @@ components:
         displayName:
           type: string
         iconURL:
-          type: string
-          nullable: true
+          anyOf:
+            - type: string
+            - type: 'null'
     UserDemographics:
       type: object
       properties:
         dateOfBirth:
-          type: integer
-          nullable: true
+          anyOf:
+            - type: integer
+            - type: 'null'
           description: 生年月日
           title: '20001010'
         gender:
-          type: string
-          nullable: true
+          anyOf:
+            - type: string
+            - type: 'null'
           description: 性別
           title: 性別
         city:
-          type: string
-          nullable: true
+          anyOf:
+            - type: string
+            - type: 'null'
           description: 市町村
           title: 市町村
         prefecture:
-          type: string
-          nullable: true
+          anyOf:
+            - type: string
+            - type: 'null'
           description: 都道府県
           title: 都道府県
     UserForManage:
@@ -4524,8 +4563,9 @@ components:
         displayName:
           type: string
         iconURL:
-          type: string
-          nullable: true
+          anyOf:
+            - type: string
+            - type: 'null'
         groupName:
           type: string
         groupID:

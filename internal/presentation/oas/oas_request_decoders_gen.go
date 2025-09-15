@@ -515,6 +515,33 @@ func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
 				}
 			}
 		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "hideTop",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+					if err := func(d *jx.Decoder) error {
+						request.HideTop.Reset()
+						if err := request.HideTop.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"hideTop\"")
+				}
+			}
+		}
 		return &request, close, nil
 	default:
 		return req, close, validate.InvalidContentType(ct)
@@ -1487,7 +1514,7 @@ func (s *Server) decodeInitiateTalkSessionRequest(r *http.Request) (
 		}
 		{
 			cfg := uri.QueryParameterDecodingConfig{
-				Name:    "showTop",
+				Name:    "hideTop",
 				Style:   uri.QueryStyleForm,
 				Explode: true,
 			}
@@ -1498,8 +1525,8 @@ func (s *Server) decodeInitiateTalkSessionRequest(r *http.Request) (
 						return err
 					}
 					if err := func(d *jx.Decoder) error {
-						request.ShowTop.Reset()
-						if err := request.ShowTop.Decode(d); err != nil {
+						request.HideTop.Reset()
+						if err := request.HideTop.Decode(d); err != nil {
 							return err
 						}
 						return nil
@@ -1508,7 +1535,7 @@ func (s *Server) decodeInitiateTalkSessionRequest(r *http.Request) (
 					}
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"showTop\"")
+					return req, close, errors.Wrap(err, "decode \"hideTop\"")
 				}
 			}
 		}

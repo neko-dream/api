@@ -58,6 +58,8 @@ namespace kotohiro {
       city?: HttpPart<string>;
       description?: HttpPart<string>;
       thumbnailURL?: HttpPart<string>;
+      // hideTop nullの場合は変更しない
+      hideTop?: HttpPart<boolean | null>;
     },
   ): TalkSession | {
     @statusCode statusCode: 400;
@@ -138,7 +140,8 @@ namespace kotohiro {
       thumbnailURL?: HttpPart<string>;
       restrictions?: HttpPart<string[]>;
       aliasId?: HttpPart<string>;
-      showTop?: HttpPart<boolean | null>;
+      // hideTop デフォルトfalse
+      hideTop?: HttpPart<boolean | null>;
     },
   ): TalkSession | {
     @statusCode statusCode: 400;

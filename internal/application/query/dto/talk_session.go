@@ -23,7 +23,7 @@ type TalkSession struct {
 	Prefecture       *string
 	Restrictions     []string
 	HideReport       bool
-	ShowTop          bool
+	HideTop          bool
 }
 
 type TalkSessionWithDetail struct {
@@ -88,6 +88,6 @@ func (t *TalkSessionWithDetail) ToResponse() oas.TalkSession {
 		ThumbnailURL:      utils.ToOptNil[oas.OptNilString](t.ThumbnailURL),
 		Restrictions:      restrictions,
 		HideReport:        t.HideReport,
-		ShowTop:           utils.ToOptNil[oas.OptNilBool](lo.ToPtr(t.ShowTop)),
+		HideTop:           utils.ToOptNil[oas.OptNilBool](lo.ToPtr(t.HideTop)),
 	}
 }

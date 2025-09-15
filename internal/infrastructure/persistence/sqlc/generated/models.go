@@ -210,7 +210,7 @@ type TalkSession struct {
 	HideReport          sql.NullBool
 	OrganizationID      uuid.NullUUID
 	OrganizationAliasID uuid.NullUUID
-	ShowTop             bool
+	HideTop             bool
 }
 
 type TalkSessionConclusion struct {

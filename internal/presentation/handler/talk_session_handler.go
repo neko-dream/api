@@ -319,7 +319,7 @@ func (t *talkSessionHandler) InitiateTalkSession(ctx context.Context, req *oas.I
 		Restrictions:        restrictionStrings,
 		SessionClaim:        session.GetSession(ctx),
 		OrganizationAliasID: organizationAliasID,
-		ShowTop:             utils.ToPtrIf(req.ShowTop.IsSet(), req.ShowTop.Value),
+		HideTop:             utils.ToPtrIf(req.HideTop.IsSet(), req.HideTop.Value),
 	})
 	if err != nil {
 		return nil, errtrace.Wrap(err)

@@ -18,7 +18,7 @@ INNER JOIN opinions o ON u.user_id = o.user_id
 WHERE o.talk_session_id = $1;
 
 -- name: CreateTalkSession :exec
-INSERT INTO talk_sessions (talk_session_id, theme, description, thumbnail_url, owner_id, scheduled_end_time, created_at, city, prefecture, restrictions, hide_report, organization_id, organization_alias_id, show_top) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14);
+INSERT INTO talk_sessions (talk_session_id, theme, description, thumbnail_url, owner_id, scheduled_end_time, created_at, city, prefecture, restrictions, hide_report, organization_id, organization_alias_id, hide_top) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14);
 
 -- name: CreateTalkSessionLocation :exec
 INSERT INTO talk_session_locations (talk_session_id, location) VALUES ($1, ST_GeographyFromText($2));
@@ -42,7 +42,7 @@ UPDATE talk_sessions
         updated_at = NOW(),
         organization_id = $10,
         organization_alias_id = $11,
-        show_top = $12
+        hide_top = $12
     WHERE talk_session_id = $1;
 
 -- name: GetTalkSessionByID :one

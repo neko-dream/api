@@ -27,7 +27,7 @@ func TestNewTalkSession(t *testing.T) {
 		location            *talksession.Location
 		city                *string
 		prefecture          *string
-		showTop             bool
+		hideTop             bool
 		organizationID      *shared.UUID[organization.Organization]
 		organizationAliasID *shared.UUID[organization.OrganizationAlias]
 	}{
@@ -43,7 +43,7 @@ func TestNewTalkSession(t *testing.T) {
 			location:            nil, // Locationは別の構造体のため、ここではnilを設定
 			city:                lo.ToPtr("東京都"),
 			prefecture:          lo.ToPtr("関東"),
-			showTop:             true,
+			hideTop:             true,
 			organizationID:      lo.ToPtr(shared.MustParseUUID[organization.Organization]("00000000-0000-0000-0000-000000000003")),
 			organizationAliasID: lo.ToPtr(shared.MustParseUUID[organization.OrganizationAlias]("00000000-0000-0000-0000-000000000004")),
 		},
@@ -59,7 +59,7 @@ func TestNewTalkSession(t *testing.T) {
 			location:            nil,
 			city:                nil,
 			prefecture:          nil,
-			showTop:             false,
+			hideTop:             false,
 			organizationID:      nil,
 			organizationAliasID: nil,
 		},
@@ -78,7 +78,7 @@ func TestNewTalkSession(t *testing.T) {
 				tt.location,
 				tt.city,
 				tt.prefecture,
-				tt.showTop,
+				tt.hideTop,
 				tt.organizationID,
 				tt.organizationAliasID,
 			)
@@ -95,7 +95,7 @@ func TestNewTalkSession(t *testing.T) {
 			assert.Equal(t, tt.prefecture, ts.Prefecture())
 			assert.Equal(t, tt.organizationID, ts.OrganizationID())
 			assert.Equal(t, tt.organizationAliasID, ts.OrganizationAliasID())
-			assert.Equal(t, tt.showTop, ts.ShowTop())
+			assert.Equal(t, tt.hideTop, ts.HideTop())
 			assert.False(t, ts.HideReport())
 			assert.False(t, ts.IsEndProcessed())
 		})
