@@ -1745,7 +1745,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						break
 					}
 
-					// Param: "userID"
+					// Param: "displayID"
 					// Match until "/"
 					idx := strings.IndexByte(elem, '/')
 					if idx < 0 {
@@ -4047,7 +4047,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						break
 					}
 
-					// Param: "userID"
+					// Param: "displayID"
 					// Match until "/"
 					idx := strings.IndexByte(elem, '/')
 					if idx < 0 {
@@ -4075,7 +4075,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = "GetUserTalkSessions"
 								r.summary = "特定ユーザが開いたセッション一覧"
 								r.operationID = "getUserTalkSessions"
-								r.pathPattern = "/users/{userID}/talksessions"
+								r.pathPattern = "/users/{displayID}/talksessions"
 								r.args = args
 								r.count = 1
 								return r, true

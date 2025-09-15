@@ -457,7 +457,7 @@ type TalkSessionHandler interface {
 	//
 	// 特定ユーザが開いたセッション一覧.
 	//
-	// GET /users/{userID}/talksessions
+	// GET /users/{displayID}/talksessions
 	GetUserTalkSessions(ctx context.Context, params GetUserTalkSessionsParams) (GetUserTalkSessionsRes, error)
 	// HasConsent implements hasConsent operation.
 	//

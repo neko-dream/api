@@ -411,7 +411,7 @@ func (UnimplementedHandler) GetUserStatsTotalManage(ctx context.Context) (r *Use
 //
 // 特定ユーザが開いたセッション一覧.
 //
-// GET /users/{userID}/talksessions
+// GET /users/{displayID}/talksessions
 func (UnimplementedHandler) GetUserTalkSessions(ctx context.Context, params GetUserTalkSessionsParams) (r GetUserTalkSessionsRes, _ error) {
 	return r, ht.ErrNotImplemented
 }

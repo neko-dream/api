@@ -3403,12 +3403,12 @@ paths:
       security:
         - {}
       x-ogen-operation-group: User
-  /users/{userID}/talksessions:
+  /users/{displayID}/talksessions:
     get:
       operationId: getUserTalkSessions
       summary: 特定ユーザが開いたセッション一覧
       parameters:
-        - name: userID
+        - name: displayID
           in: path
           required: true
           schema:

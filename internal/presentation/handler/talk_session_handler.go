@@ -89,9 +89,51 @@ func NewTalkSessionHandler(
 	}
 }
 
-// GetUserTalkSessions implements oas.TalkSessionHandler.
+// GetUserTalkSessions DisplayIDで指定されたユーザーが作成したセッション一覧を取得
 func (t *talkSessionHandler) GetUserTalkSessions(ctx context.Context, params oas.GetUserTalkSessionsParams) (oas.GetUserTalkSessionsRes, error) {
-	panic("unimplemented")
+	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetUserTalkSessions")
+	defer span.End()
+
+	var limit, offset *int
+	if params.Limit.IsSet() {
+		limit = &params.Limit.Value
+	}
+	if params.Offset.IsSet() {
+		offset = &params.Offset.Value
+	}
+
+	status := ""
+	if params.Status.IsSet() {
+		bytes, err := params.Status.Value.MarshalText()
+		if err == nil {
+			status = string(bytes)
+		}
+	}
+	out, err := t.browseOpenedByUserQuery.Execute(ctx, talksession_query.BrowseOpenedByUserInput{
+		DisplayID: params.DisplayID,
+		Limit:     limit,
+		Offset:    offset,
+		Status:    talksession_query.Status(status),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	resultTalkSession := make([]oas.GetUserTalkSessionsOKTalkSessionsItem, 0, len(out.TalkSessions))
+	for _, talkSession := range out.TalkSessions {
+		resultTalkSession = append(resultTalkSession, oas.GetUserTalkSessionsOKTalkSessionsItem{
+			TalkSession:  talkSession.ToResponse(),
+			OpinionCount: talkSession.OpinionCount,
+		})
+	}
+
+	return &oas.GetUserTalkSessionsOK{
+		TalkSessions: resultTalkSession,
+		Pagination: oas.OffsetPagination{
+			Limit:  lo.FromPtrOr(limit, int(out.TotalCount)),
+			Offset: lo.FromPtrOr(offset, 0),
+		},
+	}, nil
 }
 
 // PostConclusion implements oas.TalkSessionHandler.
@@ -183,10 +225,10 @@ func (t *talkSessionHandler) GetOpenedTalkSession(ctx context.Context, params oa
 		}
 	}
 	out, err := t.browseOpenedByUserQuery.Execute(ctx, talksession_query.BrowseOpenedByUserInput{
-		UserID: authCtx.UserID,
-		Limit:  limit,
-		Offset: offset,
-		Status: talksession_query.Status(status),
+		DisplayID: *authCtx.DisplayID,
+		Limit:     limit,
+		Offset:    offset,
+		Status:    talksession_query.Status(status),
 	})
 	if err != nil {
 		return nil, err

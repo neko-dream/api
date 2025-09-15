@@ -6268,12 +6268,12 @@ func (s *Server) handleGetUserStatsTotalManageRequest(args [0]string, argsEscape
 //
 // 特定ユーザが開いたセッション一覧.
 //
-// GET /users/{userID}/talksessions
+// GET /users/{displayID}/talksessions
 func (s *Server) handleGetUserTalkSessionsRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getUserTalkSessions"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/users/{userID}/talksessions"),
+		semconv.HTTPRouteKey.String("/users/{displayID}/talksessions"),
 	}
 
 	// Start a span for this request.
@@ -6333,9 +6333,9 @@ func (s *Server) handleGetUserTalkSessionsRequest(args [1]string, argsEscaped bo
 			Body:             nil,
 			Params: middleware.Parameters{
 				{
-					Name: "userID",
+					Name: "displayID",
 					In:   "path",
-				}: params.UserID,
+				}: params.DisplayID,
 				{
 					Name: "limit",
 					In:   "query",
