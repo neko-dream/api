@@ -186,11 +186,9 @@ steps:
   getTalkSessionListByUser:
     desc: 特定ユーザーのセッション一覧取得
     req:
-      /users/{{ vars.id }}/talksessions:
+      /users/{{ vars.id }}/talksessions?limit=10&offset=0:
         get:
-          query:
-            limit: 10
-            offset: 0
+          headers: null
     test: |
       current.res.status == 200 &&
       // hideTop:trueのセッションも含めて2件取得できる
