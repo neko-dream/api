@@ -103,12 +103,12 @@ func (UnimplementedHandler) DevAuthorize(ctx context.Context, params DevAuthoriz
 	return r, ht.ErrNotImplemented
 }
 
-// DummiInit implements dummiInit operation.
+// DummyInit implements dummyInit operation.
 //
-// Mudai.
+// Init dummy.
 //
 // POST /test/dummy
-func (UnimplementedHandler) DummiInit(ctx context.Context) (r DummiInitRes, _ error) {
+func (UnimplementedHandler) DummyInit(ctx context.Context, req *DummyInitReq) (r DummyInitRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -411,7 +411,7 @@ func (UnimplementedHandler) GetUserStatsTotalManage(ctx context.Context) (r *Use
 //
 // 特定ユーザが開いたセッション一覧.
 //
-// GET /users/{userID}/talksessions
+// GET /users/{displayID}/talksessions
 func (UnimplementedHandler) GetUserTalkSessions(ctx context.Context, params GetUserTalkSessionsParams) (r GetUserTalkSessionsRes, _ error) {
 	return r, ht.ErrNotImplemented
 }

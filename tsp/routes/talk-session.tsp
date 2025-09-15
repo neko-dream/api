@@ -58,6 +58,8 @@ namespace kotohiro {
       city?: HttpPart<string>;
       description?: HttpPart<string>;
       thumbnailURL?: HttpPart<string>;
+      // hideTop nullの場合は変更しない
+      hideTop?: HttpPart<boolean | null>;
     },
   ): TalkSession | {
     @statusCode statusCode: 400;
@@ -138,6 +140,8 @@ namespace kotohiro {
       thumbnailURL?: HttpPart<string>;
       restrictions?: HttpPart<string[]>;
       aliasId?: HttpPart<string>;
+      // hideTop デフォルトfalse
+      hideTop?: HttpPart<boolean | null>;
     },
   ): TalkSession | {
     @statusCode statusCode: 400;
@@ -371,12 +375,12 @@ namespace kotohiro {
 
   @tag("user")
   @extension("x-ogen-operation-group", "TalkSession")
-  @route("/users/{userID}/talksessions")
+  @route("/users/{displayID}/talksessions")
   @get
   @summary("特定ユーザが開いたセッション一覧")
   @useAuth([])
   op getUserTalkSessions(
-    @path userID: string,
+    @path displayID: string,
     @query(#{ explode: true }) limit?: integer = 10,
     @query(#{ explode: true }) offset?: integer,
     @query(#{ explode: true }) status?: "finished" | "open" | null,

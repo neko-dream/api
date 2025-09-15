@@ -40,7 +40,7 @@ infrastructure/
 
 ### 1. データ永続化（persistence/）
 
-- **SQLC**: SQLから型安全なGoコードを自動生成(./scripts/gen.sh)
+- **SQLC**: SQLから型安全なGoコードを自動生成(go generate ./...)
 - **リポジトリ**: ドメイン層のインターフェースを実装
 - **クエリ**: 読み取り専用の最適化されたクエリ
 

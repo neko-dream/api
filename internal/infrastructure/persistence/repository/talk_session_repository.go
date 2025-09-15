@@ -14,6 +14,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
+	"github.com/neko-dream/server/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
@@ -36,70 +37,28 @@ func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talkses
 	ctx, span := otel.Tracer("repository").Start(ctx, "talkSessionRepository.Create")
 	defer span.End()
 
-	var description, city, prefecture, thumbnailURL sql.NullString
-	if talkSession.City() != nil {
-		city = sql.NullString{
-			String: *talkSession.City(),
-			Valid:  true,
-		}
-	}
-	if talkSession.Prefecture() != nil {
-		prefecture = sql.NullString{
-			String: *talkSession.Prefecture(),
-			Valid:  true,
-		}
-	}
-	if talkSession.Description() != nil {
-		description = sql.NullString{
-			String: *talkSession.Description(),
-			Valid:  true,
-		}
-	}
-
-	if talkSession.ThumbnailURL() != nil {
-		thumbnailURL = sql.NullString{
-			String: *talkSession.ThumbnailURL(),
-			Valid:  true,
-		}
-	}
-
 	var restrictions []string
 	if len(talkSession.Restrictions()) > 0 {
 		for _, restriction := range talkSession.Restrictions() {
 			restrictions = append(restrictions, string(restriction.Key))
 		}
 	}
-	var organizationAliasID, organizationID uuid.NullUUID
-	if talkSession.OrganizationAliasID() != nil {
-		organizationAliasID = uuid.NullUUID{
-			UUID:  talkSession.OrganizationAliasID().UUID(),
-			Valid: true,
-		}
-	}
-	if talkSession.OrganizationID() != nil {
-		organizationID = uuid.NullUUID{
-			UUID:  talkSession.OrganizationID().UUID(),
-			Valid: true,
-		}
-	}
 
 	if err := t.GetQueries(ctx).CreateTalkSession(ctx, model.CreateTalkSessionParams{
-		TalkSessionID:    talkSession.TalkSessionID().UUID(),
-		Theme:            talkSession.Theme(),
-		Description:      description,
-		OwnerID:          talkSession.OwnerUserID().UUID(),
-		CreatedAt:        talkSession.CreatedAt(),
-		ScheduledEndTime: talkSession.ScheduledEndTime(),
-		ThumbnailUrl:     thumbnailURL,
-		Prefecture:       prefecture,
-		City:             city,
-		Restrictions:     talksession.Restrictions(restrictions),
-		HideReport: sql.NullBool{
-			Bool:  talkSession.HideReport(),
-			Valid: true,
-		},
-		OrganizationAliasID: organizationAliasID,
-		OrganizationID:      organizationID,
+		TalkSessionID:       talkSession.TalkSessionID().UUID(),
+		Theme:               talkSession.Theme(),
+		Description:         utils.ToNullableSQL[sql.NullString](talkSession.Description()),
+		OwnerID:             talkSession.OwnerUserID().UUID(),
+		CreatedAt:           talkSession.CreatedAt(),
+		ScheduledEndTime:    talkSession.ScheduledEndTime(),
+		ThumbnailUrl:        utils.ToNullableSQL[sql.NullString](talkSession.ThumbnailURL()),
+		Prefecture:          utils.ToNullableSQL[sql.NullString](talkSession.Prefecture()),
+		City:                utils.ToNullableSQL[sql.NullString](talkSession.City()),
+		Restrictions:        talksession.Restrictions(restrictions),
+		HideReport:          utils.ToNullableSQL[sql.NullBool](talkSession.HideReport()),
+		OrganizationAliasID: utils.ToNullableSQL[uuid.NullUUID](talkSession.OrganizationAliasID()),
+		OrganizationID:      utils.ToNullableSQL[uuid.NullUUID](talkSession.OrganizationID()),
+		HideTop:             talkSession.HideTop(),
 	}); err != nil {
 		return errtrace.Wrap(err)
 	}
@@ -133,31 +92,7 @@ func (t *talkSessionRepository) Update(ctx context.Context, talkSession *talkses
 	if talkSession == nil {
 		return nil
 	}
-	var description, thumbnailURL, city, preference sql.NullString
-	if talkSession.Description() != nil {
-		description = sql.NullString{
-			String: *talkSession.Description(),
-			Valid:  true,
-		}
-	}
-	if talkSession.ThumbnailURL() != nil {
-		thumbnailURL = sql.NullString{
-			String: *talkSession.ThumbnailURL(),
-			Valid:  true,
-		}
-	}
-	if talkSession.City() != nil {
-		city = sql.NullString{
-			String: *talkSession.City(),
-			Valid:  true,
-		}
-	}
-	if talkSession.Prefecture() != nil {
-		preference = sql.NullString{
-			String: *talkSession.Prefecture(),
-			Valid:  true,
-		}
-	}
+
 	var restrictions []string
 	if len(talkSession.Restrictions()) > 0 {
 		for _, restriction := range talkSession.Restrictions() {
@@ -169,15 +104,13 @@ func (t *talkSessionRepository) Update(ctx context.Context, talkSession *talkses
 		TalkSessionID:    talkSession.TalkSessionID().UUID(),
 		Theme:            talkSession.Theme(),
 		ScheduledEndTime: talkSession.ScheduledEndTime(),
-		Description:      description,
-		ThumbnailUrl:     thumbnailURL,
-		City:             city,
-		Prefecture:       preference,
+		Description:      utils.ToNullableSQL[sql.NullString](talkSession.Description()),
+		ThumbnailUrl:     utils.ToNullableSQL[sql.NullString](talkSession.ThumbnailURL()),
+		City:             utils.ToNullableSQL[sql.NullString](talkSession.City()),
+		Prefecture:       utils.ToNullableSQL[sql.NullString](talkSession.Prefecture()),
 		Restrictions:     talksession.Restrictions(restrictions),
-		HideReport: sql.NullBool{
-			Bool:  talkSession.HideReport(),
-			Valid: true,
-		},
+		HideReport:       utils.ToNullableSQL[sql.NullBool](talkSession.HideReport()),
+		HideTop:          talkSession.HideTop(),
 	}); err != nil {
 		return errtrace.Wrap(err)
 	}
@@ -245,8 +178,9 @@ func (t *talkSessionRepository) FindByID(ctx context.Context, talkSessionID shar
 		location,
 		city,
 		prefecture,
-		nil, // organizationID
-		nil, // organizationAliasID
+		row.TalkSession.HideTop,
+		nil,
+		nil,
 	)
 	ts.SetReportVisibility(row.TalkSession.HideReport.Bool)
 
@@ -307,6 +241,7 @@ func (t *talkSessionRepository) GetUnprocessedEndedSessions(ctx context.Context,
 			nil, // Location は別途取得が必要な場合
 			city,
 			prefecture,
+			row.HideTop,
 			organizationID,
 			organizationAliasID,
 		)

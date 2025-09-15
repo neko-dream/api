@@ -1,54 +1,228 @@
 name: Claude Code Review
-
 on:
   pull_request:
     types: [opened, synchronize]
 
+concurrency:
+  group: ${ inputs.concurrency-group || test-${{ github.workflow }}-${{ github.ref || github.run_id  }}
+  cancel-in-progress: true
+
 jobs:
   claude-review:
-    if: github.event.pull_request.draft == false
+    if: github.actor == 'haryoiro'
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       pull-requests: write
       issues: write
-      id-token: write
-      actions: read
-
+      id-token: write  # OIDCトークン生成に必要
+      statuses: write
+      checks: write
+      actions: read   # Actions環境変数へのアクセスに必要
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0
 
       - name: Run Claude Code Review
         id: claude-review
-        uses: anthropics/claude-code-action@beta
+        uses: anthropics/claude-code-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # デフォルトトークンを明示的に設定
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          model: "claude-opus-4-20250514"
-          direct_prompt: |
-            ## Workflow
-            - Start: `mcp__github__create_pending_pull_request_review`
-            - Analyze: `mcp__github__get_pull_request_diff`
-            - Comment: `mcp__github__add_pull_request_review_comment_to_pending_review` (use suggestions when fix is clear)
-            - Submit: `mcp__github__submit_pending_pull_request_review` with **COMMENT** type (never REQUEST_CHANGES)
+          github_token: ${{ secrets.GITHUB_TOKEN }}  # GitHubトークンを明示的に渡す
+          claude_args: |
+            --mcp-config ./mcp-servers.json
+            --allowedTools "Bash(git:*), View, GlobTool, GrepTool, mcp__github__get_pull_request_reviews, mcp__github__get_pull_request_review_comments, mcp__github__get_pull_request_diff, mcp__github__create_pending_pull_request_review, mcp__github__add_comment_to_pending_review, mcp__github__submit_pending_pull_request_review"
+            --model "claude-opus-4-20250514"
+          prompt: |
+            ## Context
+            あなたはコードレビュアーです。PRに対して既存のレビューコメントを更新する必要があります。
 
-            ## Inline Comments
-            - Start with one-line conclusion
-            - Follow with reasoning and specific fix
-            - Focus on bugs, readability, concrete improvements
-            - Limit positive feedback to exceptional implementations
+            ## ⚠️ 重要な制約
+            - **思考プロセスや進捗状況をコメントとして投稿しない**
+            - **「レビュー中...」「確認中...」などの一時的なコメントを作成しない**
+            - **最終的なレビュー結果のみをコメントとして投稿する**
+            - **同じ問題に対して複数のコメントを作成しない**
 
-            ## Review Focus
-            - CLAUDE.md compliance
-            - Code quality and best practices
-            - Security/bugs/performance
-            - Architecture and maintainability
+            ## 実行手順（厳密に従うこと）
 
-            ## Notes
-            - Use Japanese for feedback（必ず日本語でフィードバックをお願いします）
-            - Be specific and actionable
-            - Always use COMMENT type (don't block PR)
+            ### Step 1: 差分解析（サイレントで実行）
+            1. get_pull_request_diff で最新の差分を取得
+            2. 各変更箇所を解析して問題を特定
+            3. 各問題に対して一意な識別子 [Claude-{hash}] を生成（ファイルパス+行番号のハッシュ）
 
-          allowed_tools: "Bash(git:*),View,GlobTool,GrepTool,mcp__github__create_pending_pull_request_review,mcp__github__add_pull_request_review_comment_to_pending_review,mcp__github__submit_pending_pull_request_review,mcp__github__get_pull_request_diff"
+            ### Step 2: 既存レビューの確認（サイレントで実行）
+            1. get_pull_request_reviews でPR #${{ github.event.pull_request.number }}の既存レビューを取得
+            2. github-actions[bot]による既存のレビューIDを記録
+            3. 既存レビューがある場合は、get_pull_request_review_comments で既存コメントを取得
+            4. コメントがある場合、各コメントのbody内の識別子 [Claude-{hash}] を抽出してマッピング作成
+            5. 解決済み、継続中、新規の問題をリスト化
+            6. 既存コメントのbodyを解析して、必要に応じて更新内容を準備
+                - コメントで解決済みすでになっている場合は更新不要
+                - 解決済みコメントはないが、解決済みの場合は解決済みリストに追加
+                - 継続中のコメントは更新リストに追加
+                - 新規問題は新規作成リストに追加
+
+            ### Step 3: コメント管理戦略の決定（サイレントで実行）
+            既存コメントがある場合:
+              1. Step 1で特定した問題とStep 2で取得したコメントを照合し、以下のリストを作成
+                - 解決済み問題（既存コメントがあるが、現在の差分には存在しない）
+                - 継続中の問題（既存コメントがあり、現在の差分にも存在する）
+                - 新規問題（既存コメントがなく、現在の差分に存在する）
+              2. 各リストに基づいて以下のアクションを決定
+                - 返信が解決済みを示す場合は解決済みリストに追加
+                - 返信が継続中を示す場合は更新リストに追加
+                - 返信が新規問題を示す場合は新規作成リストに追加
+
+            既存コメントがない場合:
+            - すべての問題を新規作成リストに追加
+
+            ### Step 4: レビューの実行（この時点で初めてコメントを作成）
+            以下はフローを示す擬似コードです。
+
+            #### パターンA: 既存コメントへの対応と新規問題の追加
+            ```python
+            # 保留中のレビューを作成
+            create_pending_pull_request_review(
+                owner=owner,
+                repo=repo,
+                pullNumber=pr_number
+            )
+
+            # 解決済み問題への返信
+            for comment in resolved_comments:
+                if comment.body.contains("✅"):
+                    continue
+                else:
+                    add_comment_to_pending_review(
+                        owner=owner,
+                        repo=repo,
+                        pullNumber=pr_number,
+                        path=comment.path,
+                        line=comment.line,
+                        body="✅ [Claude-{hash}] この問題は修正されました",
+                        side="RIGHT",
+                        subjectType="line"
+                    )
+
+            # 継続中の問題への更新コメント
+            for comment in continuing_issues:
+                add_comment_to_pending_review(
+                    owner=owner,
+                    repo=repo,
+                    pullNumber=pr_number,
+                    path=comment.path,
+                    line=comment.line,
+                    body="⚠️ [Claude-{hash}] まだ対応が必要です: {updated_description}",
+                    side="RIGHT",
+                    subjectType="line"
+                )
+
+            # 新規問題の追加
+            for issue in new_issues:
+                add_comment_to_pending_review(
+                    owner=owner,
+                    repo=repo,
+                    pullNumber=pr_number,
+                    path=issue.path,
+                    line=issue.line,
+                    body=body_with_identifier,
+                    side="RIGHT",
+                    subjectType="line"
+                )
+
+            # レビューを送信
+            submit_pending_pull_request_review(
+                owner=owner,
+                repo=repo,
+                pullNumber=pr_number,
+                event="COMMENT",
+                body="レビューを更新しました。上記のコメントをご確認ください。"
+            )
+            ```
+
+            #### パターンB: 新規レビューの場合
+            ```python
+            # 保留中のレビューを作成
+            create_pending_pull_request_review(
+                owner=owner,
+                repo=repo,
+                pullNumber=pr_number
+            )
+
+            # すべての問題をコメントとして追加
+            for issue in all_issues:
+                add_comment_to_pending_review(
+                    owner=owner,
+                    repo=repo,
+                    pullNumber=pr_number,
+                    path=issue.path,
+                    line=issue.line,
+                    body=body_with_identifier,
+                    side="RIGHT",
+                    subjectType="line"
+                )
+
+            # レビューを送信
+            submit_pending_pull_request_review(
+                owner=owner,
+                repo=repo,
+                pullNumber=pr_number,
+                event="COMMENT",
+                body="コードレビューを実施しました。上記のコメントをご確認ください。"
+            )
+            ```
+
+            コメントフォーマット（厳密に従う）
+            各コメントは以下の形式で作成:
+            [Claude-{8文字のハッシュ}] 🔴 Critical: セキュリティ脆弱性
+
+            SQLインジェクションの脆弱性があります。
+
+            **理由**: ユーザー入力が直接SQLクエリに埋め込まれています。
+
+            **修正案**:
+            ```suggestion
+            const query = 'SELECT * FROM users WHERE id = ?';
+            db.query(query, [userId], callback);
+            ```
+
+            ## 識別子ルール
+            - 形式: `[Claude-{hash}]` （hashは8文字）
+            - hash生成: `{file_path}:{line_number}:{issue_type}` のMD5ハッシュの先頭8文字
+            - 各コメントの最初の行に必ず含める
+
+            ## 優先度マーカー
+            - 🔴 Critical: 本番環境に影響する重大な問題
+            - 🟡 Important: 修正が推奨される問題
+            - 🟢 Suggestion: 改善提案
+
+            ## 禁止事項
+            1. ❌ 「レビュー中...」のような進捗コメントを作成しない
+            2. ❌ 同じ場所に複数のコメントを作成しない
+            3. ❌ 識別子なしのコメントを作成しない
+            4. ❌ REQUEST_CHANGESやAPPROVEを使わない（常にCOMMENT）
+            5. ❌ 思考プロセスをコメントとして投稿しない
+            6. ❌ ユーザーによって解決済みとマークされた場合完全に解決されたものとしてサマリーに表示しない
+
+            ## MCP制限事項への対応
+            - 既存コメントの削除はできない → ✅マークで解決済みを示す
+            - 既存コメントの更新はできない → 新しいコメントで状況を説明
+            - すべてのコメントは`add_comment_to_pending_review`で追加する
+
+            ## Context
+            - Repository: ${{ github.repository }}
+            - PR: #${{ github.event.pull_request.number }}
+            - Commit: ${{ github.event.pull_request.head.sha }}
+            - 言語: 日本語でフィードバック
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Claude Code Review Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **PR:** #${{ github.event.pull_request.number }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** \`${{ github.event.pull_request.head.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Time:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY

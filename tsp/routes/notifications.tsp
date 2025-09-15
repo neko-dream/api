@@ -110,7 +110,7 @@ namespace kotohiro {
   @summary("通知設定更新")
   op updateNotificationPreferences(
     @multipartBody body: {
-      push_notification_enabled?: HttpPart<boolean | null>;
+      push_notification_enabled: HttpPart<boolean | null>;
     }
   ): Body<NotificationPreferences> | {
     @statusCode statusCode: 400;
@@ -127,8 +127,8 @@ namespace kotohiro {
   @summary("テスト通知送信")
   op sendTestNotification(
     @multipartBody body: {
-      title?: HttpPart<string>;
-      body?: HttpPart<string>;
+      title: HttpPart<string>;
+      body: HttpPart<string>;
       device_id?: HttpPart<string>;
     }
   ): Body<{

@@ -8,6 +8,7 @@ import (
 	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/neko-dream/server/internal/presentation/oas"
 	"github.com/neko-dream/server/pkg/utils"
+	"github.com/samber/lo"
 )
 
 type TalkSession struct {
@@ -22,6 +23,7 @@ type TalkSession struct {
 	Prefecture       *string
 	Restrictions     []string
 	HideReport       bool
+	HideTop          bool
 }
 
 type TalkSessionWithDetail struct {
@@ -43,10 +45,10 @@ func (t *TalkSessionWithDetail) HasOrganization() bool {
 }
 
 func (t *TalkSessionWithDetail) ToResponse() oas.TalkSession {
-	var location oas.OptTalkSessionLocation
+	var location oas.OptLocation
 	if t.HasLocation() {
-		location = oas.OptTalkSessionLocation{
-			Value: oas.TalkSessionLocation{
+		location = oas.OptLocation{
+			Value: oas.Location{
 				Latitude:  utils.ToOpt[oas.OptFloat64](t.Latitude),
 				Longitude: utils.ToOpt[oas.OptFloat64](t.Longitude),
 			},
@@ -54,10 +56,10 @@ func (t *TalkSessionWithDetail) ToResponse() oas.TalkSession {
 		}
 	}
 
-	var organizationAlias oas.OptNilTalkSessionOrganizationAlias
+	var organizationAlias oas.OptNilOrganizationAlias
 	if t.HasOrganization() {
-		organizationAlias = oas.OptNilTalkSessionOrganizationAlias{
-			Value: oas.TalkSessionOrganizationAlias(t.OrganizationAlias.ToResponse()),
+		organizationAlias = oas.OptNilOrganizationAlias{
+			Value: oas.OrganizationAlias(t.OrganizationAlias.ToResponse()),
 			Set:   true,
 		}
 	}
@@ -76,7 +78,7 @@ func (t *TalkSessionWithDetail) ToResponse() oas.TalkSession {
 		ID:                t.TalkSessionID.String(),
 		Theme:             t.Theme,
 		Description:       utils.ToOptNil[oas.OptNilString](t.Description),
-		Owner:             oas.TalkSessionOwner(t.User.ToResponse()),
+		Owner:             oas.User(t.User.ToResponse()),
 		OrganizationAlias: organizationAlias,
 		CreatedAt:         t.TalkSession.CreatedAt.Format(time.RFC3339),
 		ScheduledEndTime:  t.ScheduledEndTime.Format(time.RFC3339),
@@ -86,5 +88,6 @@ func (t *TalkSessionWithDetail) ToResponse() oas.TalkSession {
 		ThumbnailURL:      utils.ToOptNil[oas.OptNilString](t.ThumbnailURL),
 		Restrictions:      restrictions,
 		HideReport:        t.HideReport,
+		HideTop:           utils.ToOptNil[oas.OptNilBool](lo.ToPtr(t.HideTop)),
 	}
 }

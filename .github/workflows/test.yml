@@ -9,7 +9,6 @@ on:
       - 'internal/presentation/oas/**'
       - 'internal/infrastructure/persistence/sqlc/generated/**'
 
-
   workflow_call:
     inputs:
       concurrency-group:
@@ -66,12 +65,30 @@ jobs:
 
       - name: Run unit tests with coverage
         run: go test -parallel 2 -v -coverprofile=coverage.out ./...
+      - name: Setup runn
+        uses: k1LoW/gh-setup@v1
+        with:
+          repo: k1LoW/runn
+      - name: Setup octoconv-runn-coverage
+        uses: k1LoW/gh-setup@v1
+        with:
+          repo: k1LoW/octocov-runn-coverage
 
-      # - name: Run E2E tests
-      #   run: |
-      #     go install github.com/k1LoW/runn/cmd/runn@latest
-      #     POLICY_VERSION="1.0.0" go run cmd/server/main.go & sleep 5
-      #     ./scripts/test.sh
+      - name: Run E2E tests
+        run: |
+          export POLICY_VERSION="1.0.0"
+          ./scripts/test.sh
 
-      - name: Coverage Report
+      - name: coverage tests
+        continue-on-error: true
+        run: |
+             runn coverage --format json ./e2e/**/* | octocov-runn-coverage > custom_metrics_runn.json
+      - name: Run octocov
+        continue-on-error: true
         uses: k1LoW/octocov-action@v1
+        with:
+          config: .octoconv.yml
+        env:
+          OCTOCOV_GITHUB_REF: "${{ github.ref }}"
+          OCTOCOV_GITHUB_SHA: none
+          OCTOCOV_CUSTOM_METRICS_BENCHMARK: custom_metrics_runn.json

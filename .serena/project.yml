@@ -94,12 +94,12 @@ initial_prompt: |
   - PostgreSQLを使用、SQLCでクエリ生成
 
   ## 重要事項
-  - TypeSpecやSQLを変更したら必ず`./scripts/gen.sh`を実行
+  - TypeSpecやSQLを変更したら必ず`go generate ./...`を実行
   - 新機能は必ずテストから書き始める（TDD）
   - 詳細は`CLAUDE.md`を参照
 
   ## 主要コマンド
-  - コード生成: ./scripts/gen.sh
+  - コード生成: go generate ./...
   - テスト: go test ./...
   - リンター: golangci-lint run
 

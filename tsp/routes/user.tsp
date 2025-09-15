@@ -62,7 +62,7 @@ namespace kotohiro {
       displayName?: HttpPart<string>;
       icon?: HttpPart<bytes>;
       deleteIcon?: HttpPart<boolean | null>;
-      dateOfBirth?: HttpPart<numeric>;
+      dateOfBirth: HttpPart<integer | null>;
       gender?: HttpPart<string>;
       city?: HttpPart<string>;
       prefecture?: HttpPart<string>;

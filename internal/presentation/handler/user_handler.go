@@ -221,23 +221,18 @@ func (u *userHandler) UpdateUserProfile(ctx context.Context, params *oas.UpdateU
 		return nil, err
 	}
 	userID := authCtx.UserID
-	value := params
-	if err := value.Validate(); err != nil {
-		utils.HandleError(ctx, err, "value.Validate")
-		return nil, messages.RequiredParameterError
-	}
 	deleteIcon := false
-	if value.DeleteIcon.IsSet() {
-		deleteIcon = value.DeleteIcon.Value
+	if params.DeleteIcon.IsSet() {
+		deleteIcon = params.DeleteIcon.Value
 	}
 	var email *string
-	if value.Email.IsSet() {
-		email = &value.Email.Value
+	if params.Email.IsSet() {
+		email = &params.Email.Value
 	}
 
 	var file *multipart.FileHeader
-	if value.Icon.IsSet() {
-		file, err = http_utils.CreateFileHeader(ctx, value.Icon.Value.File, value.Icon.Value.Name)
+	if params.Icon.IsSet() {
+		file, err = http_utils.CreateFileHeader(ctx, params.Icon.Value.File, params.Icon.Value.Name)
 		if err != nil {
 			utils.HandleError(ctx, err, "CreateFileHeader")
 			return nil, messages.InternalServerError
@@ -245,30 +240,30 @@ func (u *userHandler) UpdateUserProfile(ctx context.Context, params *oas.UpdateU
 	}
 
 	var dateOfBirth *int
-	if birthStr, ok := value.DateOfBirth.Get(); ok {
+	if birthStr, ok := params.DateOfBirth.Get(); ok {
 		dateOfBirth = lo.ToPtr(int(birthStr))
 	}
 
 	var city *string
-	if value.City.IsSet() && value.City.Value != "" {
-		city = &value.City.Value
+	if params.City.IsSet() && params.City.Value != "" {
+		city = &params.City.Value
 	}
 
 	var prefecture *string
-	if value.Prefecture.IsSet() && value.Prefecture.Value != "" {
-		prefecture = &value.Prefecture.Value
+	if params.Prefecture.IsSet() && params.Prefecture.Value != "" {
+		prefecture = &params.Prefecture.Value
 	}
 	var displayName *string
-	if value.DisplayName.IsSet() && value.DisplayName.Value != "" {
-		if value.DisplayName.Value == "" {
+	if params.DisplayName.IsSet() && params.DisplayName.Value != "" {
+		if params.DisplayName.Value == "" {
 			return nil, messages.UserDisplayNameTooShort
 		}
-		displayName = &value.DisplayName.Value
+		displayName = &params.DisplayName.Value
 	}
 
 	var gender *string
-	if value.Gender.IsSet() && value.Gender.Value != "" {
-		gender = lo.ToPtr(string(value.Gender.Value))
+	if params.Gender.IsSet() && params.Gender.Value != "" {
+		gender = lo.ToPtr(string(params.Gender.Value))
 	}
 
 	out, err := u.editUser.Execute(ctx, user_usecase.EditInput{

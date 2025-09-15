@@ -39,6 +39,7 @@ type (
 		hideReport          bool
 		organizationID      *shared.UUID[organization.Organization]
 		organizationAliasID *shared.UUID[organization.OrganizationAlias]
+		hideTop             bool // トップに表示するかどうか
 		// イベント記録用（埋め込み）
 		event.EventRecorder
 		// 終了処理済みフラグ
@@ -57,6 +58,7 @@ func NewTalkSession(
 	location *Location,
 	city *string,
 	prefecture *string,
+	hideTop bool,
 	organizationID *shared.UUID[organization.Organization],
 	organizationAliasID *shared.UUID[organization.OrganizationAlias],
 ) *TalkSession {
@@ -72,6 +74,7 @@ func NewTalkSession(
 		city:                city,
 		prefecture:          prefecture,
 		hideReport:          false,
+		hideTop:             hideTop,
 		organizationID:      organizationID,
 		organizationAliasID: organizationAliasID,
 		EventRecorder:       event.EventRecorder{},
@@ -119,6 +122,10 @@ func (t *TalkSession) Prefecture() *string {
 	return t.prefecture
 }
 
+func (t *TalkSession) HideTop() bool {
+	return t.hideTop
+}
+
 func (t *TalkSession) ChangeTheme(theme string) {
 	t.theme = theme
 }
@@ -139,6 +146,10 @@ func (t *TalkSession) ChangeCity(city *string) {
 }
 func (t *TalkSession) ChangePrefecture(prefecture *string) {
 	t.prefecture = prefecture
+}
+
+func (t *TalkSession) ChangeHideTop(hideTop bool) {
+	t.hideTop = hideTop
 }
 
 func (t *TalkSession) Restrictions() []*RestrictionAttribute {

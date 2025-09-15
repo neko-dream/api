@@ -55,8 +55,8 @@ namespace kotohiro {
   op reportOpinion(
     @path opinionID: string,
     @multipartBody body: {
-      reason?: HttpPart<numeric>;
-      content?: HttpPart<string>;
+      reason: HttpPart<integer | null>;
+      content: HttpPart<string | null>;
     },
   ): Body<{}> | {
     @statusCode statusCode: 400;

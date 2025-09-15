@@ -27,6 +27,7 @@ func TestNewTalkSession(t *testing.T) {
 		location            *talksession.Location
 		city                *string
 		prefecture          *string
+		hideTop             bool
 		organizationID      *shared.UUID[organization.Organization]
 		organizationAliasID *shared.UUID[organization.OrganizationAlias]
 	}{
@@ -42,6 +43,7 @@ func TestNewTalkSession(t *testing.T) {
 			location:            nil, // Locationは別の構造体のため、ここではnilを設定
 			city:                lo.ToPtr("東京都"),
 			prefecture:          lo.ToPtr("関東"),
+			hideTop:             true,
 			organizationID:      lo.ToPtr(shared.MustParseUUID[organization.Organization]("00000000-0000-0000-0000-000000000003")),
 			organizationAliasID: lo.ToPtr(shared.MustParseUUID[organization.OrganizationAlias]("00000000-0000-0000-0000-000000000004")),
 		},
@@ -57,6 +59,7 @@ func TestNewTalkSession(t *testing.T) {
 			location:            nil,
 			city:                nil,
 			prefecture:          nil,
+			hideTop:             false,
 			organizationID:      nil,
 			organizationAliasID: nil,
 		},
@@ -75,6 +78,7 @@ func TestNewTalkSession(t *testing.T) {
 				tt.location,
 				tt.city,
 				tt.prefecture,
+				tt.hideTop,
 				tt.organizationID,
 				tt.organizationAliasID,
 			)
@@ -91,6 +95,7 @@ func TestNewTalkSession(t *testing.T) {
 			assert.Equal(t, tt.prefecture, ts.Prefecture())
 			assert.Equal(t, tt.organizationID, ts.OrganizationID())
 			assert.Equal(t, tt.organizationAliasID, ts.OrganizationAliasID())
+			assert.Equal(t, tt.hideTop, ts.HideTop())
 			assert.False(t, ts.HideReport())
 			assert.False(t, ts.IsEndProcessed())
 		})
@@ -106,10 +111,11 @@ func TestTalkSession_ChangeTheme(t *testing.T) {
 			nil,
 			shared.MustParseUUID[user.User]("00000000-0000-0000-0000-000000000002"),
 			time.Now(),
-			time.Now().Add(1 * time.Hour),
+			time.Now().Add(1*time.Hour),
 			nil,
 			nil,
 			nil,
+			true,
 			nil,
 			nil,
 		)
@@ -156,10 +162,11 @@ func TestTalkSession_ChangeDescription(t *testing.T) {
 				nil,
 				shared.MustParseUUID[user.User]("00000000-0000-0000-0000-000000000002"),
 				time.Now(),
-				time.Now().Add(1 * time.Hour),
+				time.Now().Add(1*time.Hour),
 				nil,
 				nil,
 				nil,
+				true,
 				nil,
 				nil,
 			)
@@ -180,10 +187,11 @@ func TestTalkSession_ChangeThumbnailURL(t *testing.T) {
 			lo.ToPtr("https://example.com/old.png"),
 			shared.MustParseUUID[user.User]("00000000-0000-0000-0000-000000000002"),
 			time.Now(),
-			time.Now().Add(1 * time.Hour),
+			time.Now().Add(1*time.Hour),
 			nil,
 			nil,
 			nil,
+			true,
 			nil,
 			nil,
 		)
@@ -209,6 +217,7 @@ func TestTalkSession_ChangeScheduledEndTime(t *testing.T) {
 			nil,
 			nil,
 			nil,
+			true,
 			nil,
 			nil,
 		)
@@ -237,10 +246,11 @@ func TestTalkSession_StartSession(t *testing.T) {
 			nil,
 			shared.MustParseUUID[user.User]("00000000-0000-0000-0000-000000000002"),
 			time.Now(),
-			time.Now().Add(1 * time.Hour),
+			time.Now().Add(1*time.Hour),
 			nil,
 			nil,
 			nil,
+			true,
 			lo.ToPtr(shared.MustParseUUID[organization.Organization]("00000000-0000-0000-0000-000000000003")),
 			nil,
 		)
@@ -262,10 +272,11 @@ func TestTalkSession_StartSession(t *testing.T) {
 			nil,
 			shared.MustParseUUID[user.User]("00000000-0000-0000-0000-000000000002"),
 			time.Now(),
-			time.Now().Add(1 * time.Hour),
+			time.Now().Add(1*time.Hour),
 			nil,
 			nil,
 			nil,
+			true,
 			nil,
 			nil,
 		)
@@ -289,10 +300,11 @@ func TestTalkSession_EndSession(t *testing.T) {
 			nil,
 			shared.MustParseUUID[user.User]("00000000-0000-0000-0000-000000000002"),
 			time.Now(),
-			time.Now().Add(-1 * time.Hour), // 過去の時刻を設定
+			time.Now().Add(-1*time.Hour), // 過去の時刻を設定
 			nil,
 			nil,
 			nil,
+			true,
 			nil,
 			nil,
 		)
@@ -325,10 +337,11 @@ func TestTalkSession_EndSession(t *testing.T) {
 			nil,
 			shared.MustParseUUID[user.User]("00000000-0000-0000-0000-000000000002"),
 			time.Now(),
-			time.Now().Add(1 * time.Hour),
+			time.Now().Add(1*time.Hour),
 			nil,
 			nil,
 			nil,
+			true,
 			nil,
 			nil,
 		)
@@ -347,10 +360,11 @@ func TestTalkSession_EndSession(t *testing.T) {
 			nil,
 			shared.MustParseUUID[user.User]("00000000-0000-0000-0000-000000000002"),
 			time.Now(),
-			time.Now().Add(-1 * time.Hour), // 過去の時刻を設定
+			time.Now().Add(-1*time.Hour), // 過去の時刻を設定
 			nil,
 			nil,
 			nil,
+			true,
 			nil,
 			nil,
 		)
@@ -377,10 +391,11 @@ func TestTalkSession_SetReportVisibility(t *testing.T) {
 			nil,
 			shared.MustParseUUID[user.User]("00000000-0000-0000-0000-000000000002"),
 			time.Now(),
-			time.Now().Add(1 * time.Hour),
+			time.Now().Add(1*time.Hour),
 			nil,
 			nil,
 			nil,
+			true,
 			nil,
 			nil,
 		)
@@ -407,10 +422,11 @@ func TestTalkSession_MarkAsEndProcessed(t *testing.T) {
 			nil,
 			shared.MustParseUUID[user.User]("00000000-0000-0000-0000-000000000002"),
 			time.Now(),
-			time.Now().Add(1 * time.Hour),
+			time.Now().Add(1*time.Hour),
 			nil,
 			nil,
 			nil,
+			true,
 			nil,
 			nil,
 		)
@@ -433,10 +449,11 @@ func TestTalkSession_UpdateRestrictions(t *testing.T) {
 			nil,
 			shared.MustParseUUID[user.User]("00000000-0000-0000-0000-000000000002"),
 			time.Now(),
-			time.Now().Add(1 * time.Hour),
+			time.Now().Add(1*time.Hour),
 			nil,
 			nil,
 			nil,
+			true,
 			nil,
 			nil,
 		)

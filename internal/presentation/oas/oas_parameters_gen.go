@@ -143,7 +143,7 @@ func decodeAuthorizeParams(args [1]string, argsEscaped bool, r *http.Request) (p
 				return err
 			}
 		} else {
-			return validate.ErrFieldRequired
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -292,7 +292,7 @@ func decodeChangePasswordParams(args [0]string, argsEscaped bool, r *http.Reques
 				return err
 			}
 		} else {
-			return validate.ErrFieldRequired
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -328,7 +328,7 @@ func decodeChangePasswordParams(args [0]string, argsEscaped bool, r *http.Reques
 				return err
 			}
 		} else {
-			return validate.ErrFieldRequired
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -386,7 +386,7 @@ func decodeCheckDeviceExistsParams(args [0]string, argsEscaped bool, r *http.Req
 				return err
 			}
 		} else {
-			return validate.ErrFieldRequired
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -658,7 +658,7 @@ func decodeDevAuthorizeParams(args [0]string, argsEscaped bool, r *http.Request)
 				return err
 			}
 		} else {
-			return validate.ErrFieldRequired
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -694,7 +694,7 @@ func decodeDevAuthorizeParams(args [0]string, argsEscaped bool, r *http.Request)
 				return err
 			}
 		} else {
-			return validate.ErrFieldRequired
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -2830,7 +2830,7 @@ func decodeGetTalkSessionReportCountParams(args [1]string, argsEscaped bool, r *
 				return err
 			}
 		} else {
-			return validate.ErrFieldRequired
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -3400,7 +3400,7 @@ func decodeGetUserStatsListManageParams(args [0]string, argsEscaped bool, r *htt
 				return err
 			}
 		} else {
-			return validate.ErrFieldRequired
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -3497,19 +3497,19 @@ func decodeGetUserStatsListManageParams(args [0]string, argsEscaped bool, r *htt
 
 // GetUserTalkSessionsParams is parameters of getUserTalkSessions operation.
 type GetUserTalkSessionsParams struct {
-	UserID string
-	Limit  OptInt
-	Offset OptInt
-	Status OptNilGetUserTalkSessionsStatus
+	DisplayID string
+	Limit     OptInt
+	Offset    OptInt
+	Status    OptNilGetUserTalkSessionsStatus
 }
 
 func unpackGetUserTalkSessionsParams(packed middleware.Parameters) (params GetUserTalkSessionsParams) {
 	{
 		key := middleware.ParameterKey{
-			Name: "userID",
+			Name: "displayID",
 			In:   "path",
 		}
-		params.UserID = packed[key].(string)
+		params.DisplayID = packed[key].(string)
 	}
 	{
 		key := middleware.ParameterKey{
@@ -3543,7 +3543,7 @@ func unpackGetUserTalkSessionsParams(packed middleware.Parameters) (params GetUs
 
 func decodeGetUserTalkSessionsParams(args [1]string, argsEscaped bool, r *http.Request) (params GetUserTalkSessionsParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
-	// Decode path: userID.
+	// Decode path: displayID.
 	if err := func() error {
 		param := args[0]
 		if argsEscaped {
@@ -3555,7 +3555,7 @@ func decodeGetUserTalkSessionsParams(args [1]string, argsEscaped bool, r *http.R
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "userID",
+				Param:   "displayID",
 				Value:   param,
 				Style:   uri.PathStyleSimple,
 				Explode: false,
@@ -3572,7 +3572,7 @@ func decodeGetUserTalkSessionsParams(args [1]string, argsEscaped bool, r *http.R
 					return err
 				}
 
-				params.UserID = c
+				params.DisplayID = c
 				return nil
 			}(); err != nil {
 				return err
@@ -3583,7 +3583,7 @@ func decodeGetUserTalkSessionsParams(args [1]string, argsEscaped bool, r *http.R
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "userID",
+			Name: "displayID",
 			In:   "path",
 			Err:  err,
 		}
@@ -3840,7 +3840,7 @@ func decodeHandleAuthCallbackParams(args [1]string, argsEscaped bool, r *http.Re
 				return err
 			}
 		} else {
-			return validate.ErrFieldRequired
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -3876,7 +3876,7 @@ func decodeHandleAuthCallbackParams(args [1]string, argsEscaped bool, r *http.Re
 				return err
 			}
 		} else {
-			return validate.ErrFieldRequired
+			return err
 		}
 		return nil
 	}(); err != nil {

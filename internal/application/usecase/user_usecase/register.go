@@ -89,7 +89,7 @@ func (i *registerHandler) Execute(ctx context.Context, input RegisterInput) (*Re
 		token   string
 	)
 
-	err := i.ExecTx(ctx, func(ctx context.Context) error {
+	err := i.DBManager.ExecTx(ctx, func(ctx context.Context) error {
 		// ユーザーの存在を確認
 		foundUser, err := i.userRep.FindByID(ctx, input.UserID)
 		if err != nil {

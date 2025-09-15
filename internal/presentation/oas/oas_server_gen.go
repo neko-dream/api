@@ -457,7 +457,7 @@ type TalkSessionHandler interface {
 	//
 	// 特定ユーザが開いたセッション一覧.
 	//
-	// GET /users/{userID}/talksessions
+	// GET /users/{displayID}/talksessions
 	GetUserTalkSessions(ctx context.Context, params GetUserTalkSessionsParams) (GetUserTalkSessionsRes, error)
 	// HasConsent implements hasConsent operation.
 	//
@@ -497,12 +497,12 @@ type TalkSessionHandler interface {
 //
 // x-ogen-operation-group: Test
 type TestHandler interface {
-	// DummiInit implements dummiInit operation.
+	// DummyInit implements dummyInit operation.
 	//
-	// Mudai.
+	// Init dummy.
 	//
 	// POST /test/dummy
-	DummiInit(ctx context.Context) (DummiInitRes, error)
+	DummyInit(ctx context.Context, req *DummyInitReq) (DummyInitRes, error)
 	// Test implements test operation.
 	//
 	// OpenAPIテスト用.

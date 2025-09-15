@@ -103,7 +103,7 @@ func (i *voteHandler) Execute(ctx context.Context, input VoteInput) error {
 		return errtrace.Wrap(err)
 	}
 
-	if err := i.ExecTx(ctx, func(ctx context.Context) error {
+	if err := i.DBManager.ExecTx(ctx, func(ctx context.Context) error {
 		if voted {
 			vo, err := i.VoteRepository.FindByOpinionAndUserID(
 				ctx,

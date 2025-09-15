@@ -1,6 +1,4 @@
 import "@typespec/http";
-import "@typespec/openapi";
-import "@typespec/openapi3";
 
 // Config imports
 import "./config/service.tsp";

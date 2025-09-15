@@ -299,13 +299,13 @@ func (*CheckDeviceExistsUnauthorized) checkDeviceExistsRes() {}
 // Ref: #/components/schemas/Conclusion
 type Conclusion struct {
 	// 作成ユーザー.
-	User ConclusionUser `json:"user"`
+	User User `json:"user"`
 	// 結論本文.
 	Content string `json:"content"`
 }
 
 // GetUser returns the value of User.
-func (s *Conclusion) GetUser() ConclusionUser {
+func (s *Conclusion) GetUser() User {
 	return s.User
 }
 
@@ -315,7 +315,7 @@ func (s *Conclusion) GetContent() string {
 }
 
 // SetUser sets the value of User.
-func (s *Conclusion) SetUser(val ConclusionUser) {
+func (s *Conclusion) SetUser(val User) {
 	s.User = val
 }
 
@@ -326,42 +326,6 @@ func (s *Conclusion) SetContent(val string) {
 
 func (*Conclusion) getConclusionRes()  {}
 func (*Conclusion) postConclusionRes() {}
-
-type ConclusionUser struct {
-	DisplayID   string       `json:"displayID"`
-	DisplayName string       `json:"displayName"`
-	IconURL     OptNilString `json:"iconURL"`
-}
-
-// GetDisplayID returns the value of DisplayID.
-func (s *ConclusionUser) GetDisplayID() string {
-	return s.DisplayID
-}
-
-// GetDisplayName returns the value of DisplayName.
-func (s *ConclusionUser) GetDisplayName() string {
-	return s.DisplayName
-}
-
-// GetIconURL returns the value of IconURL.
-func (s *ConclusionUser) GetIconURL() OptNilString {
-	return s.IconURL
-}
-
-// SetDisplayID sets the value of DisplayID.
-func (s *ConclusionUser) SetDisplayID(val string) {
-	s.DisplayID = val
-}
-
-// SetDisplayName sets the value of DisplayName.
-func (s *ConclusionUser) SetDisplayName(val string) {
-	s.DisplayName = val
-}
-
-// SetIconURL sets the value of IconURL.
-func (s *ConclusionUser) SetIconURL(val OptNilString) {
-	s.IconURL = val
-}
 
 type ConsentTalkSessionBadRequest struct{}
 
@@ -377,6 +341,7 @@ func (*ConsentTalkSessionOK) consentTalkSessionRes() {}
 
 type CookieAuth struct {
 	APIKey string
+	Roles  []string
 }
 
 // GetAPIKey returns the value of APIKey.
@@ -384,9 +349,19 @@ func (s *CookieAuth) GetAPIKey() string {
 	return s.APIKey
 }
 
+// GetRoles returns the value of Roles.
+func (s *CookieAuth) GetRoles() []string {
+	return s.Roles
+}
+
 // SetAPIKey sets the value of APIKey.
 func (s *CookieAuth) SetAPIKey(val string) {
 	s.APIKey = val
+}
+
+// SetRoles sets the value of Roles.
+func (s *CookieAuth) SetRoles(val []string) {
+	s.Roles = val
 }
 
 type CreateOrganizationAliasBadRequest struct{}
@@ -628,17 +603,97 @@ func (s *DevicePlatform) UnmarshalText(data []byte) error {
 	}
 }
 
-type DummiInitBadRequest struct{}
+type DummyInitBadRequest struct{}
 
-func (*DummiInitBadRequest) dummiInitRes() {}
+func (*DummyInitBadRequest) dummyInitRes() {}
 
-type DummiInitInternalServerError struct{}
+type DummyInitInternalServerError struct{}
 
-func (*DummiInitInternalServerError) dummiInitRes() {}
+func (*DummyInitInternalServerError) dummyInitRes() {}
 
-type DummiInitOK struct{}
+type DummyInitOK struct{}
 
-func (*DummiInitOK) dummiInitRes() {}
+func (*DummyInitOK) dummyInitRes() {}
+
+type DummyInitReq struct {
+	IntegerNull         NilInt        `json:"integerNull"`
+	NumericOptionalNull OptNilFloat64 `json:"numericOptionalNull"`
+	NumericNull         NilFloat64    `json:"numericNull"`
+	NumericOptional     OptFloat64    `json:"numericOptional"`
+	Numeric             float64       `json:"numeric"`
+	BooleanOptionalNull OptNilBool    `json:"booleanOptionalNull"`
+	BooleanNull         NilBool       `json:"booleanNull"`
+}
+
+// GetIntegerNull returns the value of IntegerNull.
+func (s *DummyInitReq) GetIntegerNull() NilInt {
+	return s.IntegerNull
+}
+
+// GetNumericOptionalNull returns the value of NumericOptionalNull.
+func (s *DummyInitReq) GetNumericOptionalNull() OptNilFloat64 {
+	return s.NumericOptionalNull
+}
+
+// GetNumericNull returns the value of NumericNull.
+func (s *DummyInitReq) GetNumericNull() NilFloat64 {
+	return s.NumericNull
+}
+
+// GetNumericOptional returns the value of NumericOptional.
+func (s *DummyInitReq) GetNumericOptional() OptFloat64 {
+	return s.NumericOptional
+}
+
+// GetNumeric returns the value of Numeric.
+func (s *DummyInitReq) GetNumeric() float64 {
+	return s.Numeric
+}
+
+// GetBooleanOptionalNull returns the value of BooleanOptionalNull.
+func (s *DummyInitReq) GetBooleanOptionalNull() OptNilBool {
+	return s.BooleanOptionalNull
+}
+
+// GetBooleanNull returns the value of BooleanNull.
+func (s *DummyInitReq) GetBooleanNull() NilBool {
+	return s.BooleanNull
+}
+
+// SetIntegerNull sets the value of IntegerNull.
+func (s *DummyInitReq) SetIntegerNull(val NilInt) {
+	s.IntegerNull = val
+}
+
+// SetNumericOptionalNull sets the value of NumericOptionalNull.
+func (s *DummyInitReq) SetNumericOptionalNull(val OptNilFloat64) {
+	s.NumericOptionalNull = val
+}
+
+// SetNumericNull sets the value of NumericNull.
+func (s *DummyInitReq) SetNumericNull(val NilFloat64) {
+	s.NumericNull = val
+}
+
+// SetNumericOptional sets the value of NumericOptional.
+func (s *DummyInitReq) SetNumericOptional(val OptFloat64) {
+	s.NumericOptional = val
+}
+
+// SetNumeric sets the value of Numeric.
+func (s *DummyInitReq) SetNumeric(val float64) {
+	s.Numeric = val
+}
+
+// SetBooleanOptionalNull sets the value of BooleanOptionalNull.
+func (s *DummyInitReq) SetBooleanOptionalNull(val OptNilBool) {
+	s.BooleanOptionalNull = val
+}
+
+// SetBooleanNull sets the value of BooleanNull.
+func (s *DummyInitReq) SetBooleanNull(val NilBool) {
+	s.BooleanNull = val
+}
 
 type EditTalkSessionBadRequest struct{}
 
@@ -657,6 +712,7 @@ type EditTalkSessionReq struct {
 	City             OptString  `json:"city"`
 	Description      OptString  `json:"description"`
 	ThumbnailURL     OptString  `json:"thumbnailURL"`
+	HideTop          OptNilBool `json:"hideTop"`
 }
 
 // GetTheme returns the value of Theme.
@@ -699,6 +755,11 @@ func (s *EditTalkSessionReq) GetThumbnailURL() OptString {
 	return s.ThumbnailURL
 }
 
+// GetHideTop returns the value of HideTop.
+func (s *EditTalkSessionReq) GetHideTop() OptNilBool {
+	return s.HideTop
+}
+
 // SetTheme sets the value of Theme.
 func (s *EditTalkSessionReq) SetTheme(val string) {
 	s.Theme = val
@@ -739,6 +800,11 @@ func (s *EditTalkSessionReq) SetThumbnailURL(val OptString) {
 	s.ThumbnailURL = val
 }
 
+// SetHideTop sets the value of HideTop.
+func (s *EditTalkSessionReq) SetHideTop(val OptNilBool) {
+	s.HideTop = val
+}
+
 type EditTimeLineBadRequest struct{}
 
 func (*EditTimeLineBadRequest) editTimeLineRes() {}
@@ -748,27 +814,27 @@ type EditTimeLineInternalServerError struct{}
 func (*EditTimeLineInternalServerError) editTimeLineRes() {}
 
 type EditTimeLineReq struct {
-	Content OptString `json:"content"`
-	Status  OptString `json:"status"`
+	Content NilString `json:"content"`
+	Status  NilString `json:"status"`
 }
 
 // GetContent returns the value of Content.
-func (s *EditTimeLineReq) GetContent() OptString {
+func (s *EditTimeLineReq) GetContent() NilString {
 	return s.Content
 }
 
 // GetStatus returns the value of Status.
-func (s *EditTimeLineReq) GetStatus() OptString {
+func (s *EditTimeLineReq) GetStatus() NilString {
 	return s.Status
 }
 
 // SetContent sets the value of Content.
-func (s *EditTimeLineReq) SetContent(val OptString) {
+func (s *EditTimeLineReq) SetContent(val NilString) {
 	s.Content = val
 }
 
 // SetStatus sets the value of Status.
-func (s *EditTimeLineReq) SetStatus(val OptString) {
+func (s *EditTimeLineReq) SetStatus(val NilString) {
 	s.Status = val
 }
 
@@ -2261,6 +2327,7 @@ type InitiateTalkSessionReq struct {
 	ThumbnailURL     OptString  `json:"thumbnailURL"`
 	Restrictions     []string   `json:"restrictions"`
 	AliasId          OptString  `json:"aliasId"`
+	HideTop          OptNilBool `json:"hideTop"`
 }
 
 // GetTheme returns the value of Theme.
@@ -2313,6 +2380,11 @@ func (s *InitiateTalkSessionReq) GetAliasId() OptString {
 	return s.AliasId
 }
 
+// GetHideTop returns the value of HideTop.
+func (s *InitiateTalkSessionReq) GetHideTop() OptNilBool {
+	return s.HideTop
+}
+
 // SetTheme sets the value of Theme.
 func (s *InitiateTalkSessionReq) SetTheme(val string) {
 	s.Theme = val
@@ -2361,6 +2433,11 @@ func (s *InitiateTalkSessionReq) SetRestrictions(val []string) {
 // SetAliasId sets the value of AliasId.
 func (s *InitiateTalkSessionReq) SetAliasId(val OptString) {
 	s.AliasId = val
+}
+
+// SetHideTop sets the value of HideTop.
+func (s *InitiateTalkSessionReq) SetHideTop(val OptNilBool) {
+	s.HideTop = val
 }
 
 type InviteOrganizationBadRequest struct{}
@@ -2449,6 +2526,214 @@ func (s *InviteOrganizationReq) SetRole(val float64) {
 	s.Role = val
 }
 
+// Ref: #/components/schemas/Location
+type Location struct {
+	// 緯度.
+	Latitude OptFloat64 `json:"latitude"`
+	// 経度.
+	Longitude OptFloat64 `json:"longitude"`
+}
+
+// GetLatitude returns the value of Latitude.
+func (s *Location) GetLatitude() OptFloat64 {
+	return s.Latitude
+}
+
+// GetLongitude returns the value of Longitude.
+func (s *Location) GetLongitude() OptFloat64 {
+	return s.Longitude
+}
+
+// SetLatitude sets the value of Latitude.
+func (s *Location) SetLatitude(val OptFloat64) {
+	s.Latitude = val
+}
+
+// SetLongitude sets the value of Longitude.
+func (s *Location) SetLongitude(val OptFloat64) {
+	s.Longitude = val
+}
+
+// NewNilBool returns new NilBool with value set to v.
+func NewNilBool(v bool) NilBool {
+	return NilBool{
+		Value: v,
+	}
+}
+
+// NilBool is nullable bool.
+type NilBool struct {
+	Value bool
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilBool) SetTo(v bool) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o NilBool) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *NilBool) SetToNull() {
+	o.Null = true
+	var v bool
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilBool) Get() (v bool, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilBool) Or(d bool) bool {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewNilFloat64 returns new NilFloat64 with value set to v.
+func NewNilFloat64(v float64) NilFloat64 {
+	return NilFloat64{
+		Value: v,
+	}
+}
+
+// NilFloat64 is nullable float64.
+type NilFloat64 struct {
+	Value float64
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilFloat64) SetTo(v float64) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o NilFloat64) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *NilFloat64) SetToNull() {
+	o.Null = true
+	var v float64
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilFloat64) Get() (v float64, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilFloat64) Or(d float64) float64 {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewNilInt returns new NilInt with value set to v.
+func NewNilInt(v int) NilInt {
+	return NilInt{
+		Value: v,
+	}
+}
+
+// NilInt is nullable int.
+type NilInt struct {
+	Value int
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilInt) SetTo(v int) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o NilInt) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *NilInt) SetToNull() {
+	o.Null = true
+	var v int
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilInt) Get() (v int, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilInt) Or(d int) int {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewNilString returns new NilString with value set to v.
+func NewNilString(v string) NilString {
+	return NilString{
+		Value: v,
+	}
+}
+
+// NilString is nullable string.
+type NilString struct {
+	Value string
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilString) SetTo(v string) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o NilString) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *NilString) SetToNull() {
+	o.Null = true
+	var v string
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilString) Get() (v string, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilString) Or(d string) string {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // 通知設定.
 // Ref: #/components/schemas/NotificationPreferences
 type NotificationPreferences struct {
@@ -2515,7 +2800,7 @@ type Opinion struct {
 	// 親の意見ID。ルートならば無し.
 	ParentID OptString `json:"parentID"`
 	// 意見投稿主の意見。ルート意見の場合はここには何も入らない.
-	VoteType OptNilOpinionVoteType `json:"voteType"`
+	VoteType OptNilVoteType `json:"voteType"`
 	// 画像が返る場合もある.
 	PictureURL OptNilString `json:"pictureURL"`
 	// 参考文献URL.
@@ -2545,7 +2830,7 @@ func (s *Opinion) GetParentID() OptString {
 }
 
 // GetVoteType returns the value of VoteType.
-func (s *Opinion) GetVoteType() OptNilOpinionVoteType {
+func (s *Opinion) GetVoteType() OptNilVoteType {
 	return s.VoteType
 }
 
@@ -2590,7 +2875,7 @@ func (s *Opinion) SetParentID(val OptString) {
 }
 
 // SetVoteType sets the value of VoteType.
-func (s *Opinion) SetVoteType(val OptNilOpinionVoteType) {
+func (s *Opinion) SetVoteType(val OptNilVoteType) {
 	s.VoteType = val
 }
 
@@ -2745,62 +3030,13 @@ func (s *OpinionGroupRatio) SetGroupName(val string) {
 	s.GroupName = val
 }
 
-// 投票タイプ.
-type OpinionVoteType string
-
-const (
-	OpinionVoteTypeAgree    OpinionVoteType = "agree"
-	OpinionVoteTypeDisagree OpinionVoteType = "disagree"
-	OpinionVoteTypePass     OpinionVoteType = "pass"
-)
-
-// AllValues returns all OpinionVoteType values.
-func (OpinionVoteType) AllValues() []OpinionVoteType {
-	return []OpinionVoteType{
-		OpinionVoteTypeAgree,
-		OpinionVoteTypeDisagree,
-		OpinionVoteTypePass,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s OpinionVoteType) MarshalText() ([]byte, error) {
-	switch s {
-	case OpinionVoteTypeAgree:
-		return []byte(s), nil
-	case OpinionVoteTypeDisagree:
-		return []byte(s), nil
-	case OpinionVoteTypePass:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *OpinionVoteType) UnmarshalText(data []byte) error {
-	switch OpinionVoteType(data) {
-	case OpinionVoteTypeAgree:
-		*s = OpinionVoteTypeAgree
-		return nil
-	case OpinionVoteTypeDisagree:
-		*s = OpinionVoteTypeDisagree
-		return nil
-	case OpinionVoteTypePass:
-		*s = OpinionVoteTypePass
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
-}
-
 // 意見とリプライ数と投票情報を含むレスポンス.
 // Ref: #/components/schemas/OpinionWithReplyAndVote
 type OpinionWithReplyAndVote struct {
-	Opinion    Opinion                                 `json:"opinion"`
-	User       User                                    `json:"user"`
-	ReplyCount int                                     `json:"replyCount"`
-	MyVoteType OptNilOpinionWithReplyAndVoteMyVoteType `json:"myVoteType"`
+	Opinion    Opinion        `json:"opinion"`
+	User       User           `json:"user"`
+	ReplyCount int            `json:"replyCount"`
+	MyVoteType OptNilVoteType `json:"myVoteType"`
 }
 
 // GetOpinion returns the value of Opinion.
@@ -2819,7 +3055,7 @@ func (s *OpinionWithReplyAndVote) GetReplyCount() int {
 }
 
 // GetMyVoteType returns the value of MyVoteType.
-func (s *OpinionWithReplyAndVote) GetMyVoteType() OptNilOpinionWithReplyAndVoteMyVoteType {
+func (s *OpinionWithReplyAndVote) GetMyVoteType() OptNilVoteType {
 	return s.MyVoteType
 }
 
@@ -2839,57 +3075,8 @@ func (s *OpinionWithReplyAndVote) SetReplyCount(val int) {
 }
 
 // SetMyVoteType sets the value of MyVoteType.
-func (s *OpinionWithReplyAndVote) SetMyVoteType(val OptNilOpinionWithReplyAndVoteMyVoteType) {
+func (s *OpinionWithReplyAndVote) SetMyVoteType(val OptNilVoteType) {
 	s.MyVoteType = val
-}
-
-// 投票タイプ.
-type OpinionWithReplyAndVoteMyVoteType string
-
-const (
-	OpinionWithReplyAndVoteMyVoteTypeAgree    OpinionWithReplyAndVoteMyVoteType = "agree"
-	OpinionWithReplyAndVoteMyVoteTypeDisagree OpinionWithReplyAndVoteMyVoteType = "disagree"
-	OpinionWithReplyAndVoteMyVoteTypePass     OpinionWithReplyAndVoteMyVoteType = "pass"
-)
-
-// AllValues returns all OpinionWithReplyAndVoteMyVoteType values.
-func (OpinionWithReplyAndVoteMyVoteType) AllValues() []OpinionWithReplyAndVoteMyVoteType {
-	return []OpinionWithReplyAndVoteMyVoteType{
-		OpinionWithReplyAndVoteMyVoteTypeAgree,
-		OpinionWithReplyAndVoteMyVoteTypeDisagree,
-		OpinionWithReplyAndVoteMyVoteTypePass,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s OpinionWithReplyAndVoteMyVoteType) MarshalText() ([]byte, error) {
-	switch s {
-	case OpinionWithReplyAndVoteMyVoteTypeAgree:
-		return []byte(s), nil
-	case OpinionWithReplyAndVoteMyVoteTypeDisagree:
-		return []byte(s), nil
-	case OpinionWithReplyAndVoteMyVoteTypePass:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *OpinionWithReplyAndVoteMyVoteType) UnmarshalText(data []byte) error {
-	switch OpinionWithReplyAndVoteMyVoteType(data) {
-	case OpinionWithReplyAndVoteMyVoteTypeAgree:
-		*s = OpinionWithReplyAndVoteMyVoteTypeAgree
-		return nil
-	case OpinionWithReplyAndVoteMyVoteTypeDisagree:
-		*s = OpinionWithReplyAndVoteMyVoteTypeDisagree
-		return nil
-	case OpinionWithReplyAndVoteMyVoteTypePass:
-		*s = OpinionWithReplyAndVoteMyVoteTypePass
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
 }
 
 // 意見とリプライ数を含むレスポンス.
@@ -2933,9 +3120,9 @@ func (s *OpinionWithReplyCount) SetReplyCount(val int) {
 // 意見と投票情報を含むレスポンス.
 // Ref: #/components/schemas/OpinionWithVote
 type OpinionWithVote struct {
-	Opinion    Opinion                         `json:"opinion"`
-	User       User                            `json:"user"`
-	MyVoteType OptNilOpinionWithVoteMyVoteType `json:"myVoteType"`
+	Opinion    Opinion        `json:"opinion"`
+	User       User           `json:"user"`
+	MyVoteType OptNilVoteType `json:"myVoteType"`
 }
 
 // GetOpinion returns the value of Opinion.
@@ -2949,7 +3136,7 @@ func (s *OpinionWithVote) GetUser() User {
 }
 
 // GetMyVoteType returns the value of MyVoteType.
-func (s *OpinionWithVote) GetMyVoteType() OptNilOpinionWithVoteMyVoteType {
+func (s *OpinionWithVote) GetMyVoteType() OptNilVoteType {
 	return s.MyVoteType
 }
 
@@ -2964,60 +3151,11 @@ func (s *OpinionWithVote) SetUser(val User) {
 }
 
 // SetMyVoteType sets the value of MyVoteType.
-func (s *OpinionWithVote) SetMyVoteType(val OptNilOpinionWithVoteMyVoteType) {
+func (s *OpinionWithVote) SetMyVoteType(val OptNilVoteType) {
 	s.MyVoteType = val
 }
 
 func (*OpinionWithVote) getOpinionDetail2Res() {}
-
-// 投票タイプ.
-type OpinionWithVoteMyVoteType string
-
-const (
-	OpinionWithVoteMyVoteTypeAgree    OpinionWithVoteMyVoteType = "agree"
-	OpinionWithVoteMyVoteTypeDisagree OpinionWithVoteMyVoteType = "disagree"
-	OpinionWithVoteMyVoteTypePass     OpinionWithVoteMyVoteType = "pass"
-)
-
-// AllValues returns all OpinionWithVoteMyVoteType values.
-func (OpinionWithVoteMyVoteType) AllValues() []OpinionWithVoteMyVoteType {
-	return []OpinionWithVoteMyVoteType{
-		OpinionWithVoteMyVoteTypeAgree,
-		OpinionWithVoteMyVoteTypeDisagree,
-		OpinionWithVoteMyVoteTypePass,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s OpinionWithVoteMyVoteType) MarshalText() ([]byte, error) {
-	switch s {
-	case OpinionWithVoteMyVoteTypeAgree:
-		return []byte(s), nil
-	case OpinionWithVoteMyVoteTypeDisagree:
-		return []byte(s), nil
-	case OpinionWithVoteMyVoteTypePass:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *OpinionWithVoteMyVoteType) UnmarshalText(data []byte) error {
-	switch OpinionWithVoteMyVoteType(data) {
-	case OpinionWithVoteMyVoteTypeAgree:
-		*s = OpinionWithVoteMyVoteTypeAgree
-		return nil
-	case OpinionWithVoteMyVoteTypeDisagree:
-		*s = OpinionWithVoteMyVoteTypeDisagree
-		return nil
-	case OpinionWithVoteMyVoteTypePass:
-		*s = OpinionWithVoteMyVoteTypePass
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
-}
 
 type OpinionsHistoryBadRequest struct{}
 
@@ -3530,6 +3668,52 @@ func (o OptInt32) Or(d int32) int32 {
 	return d
 }
 
+// NewOptLocation returns new OptLocation with value set to v.
+func NewOptLocation(v Location) OptLocation {
+	return OptLocation{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptLocation is optional Location.
+type OptLocation struct {
+	Value Location
+	Set   bool
+}
+
+// IsSet returns true if OptLocation was set.
+func (o OptLocation) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptLocation) Reset() {
+	var v Location
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptLocation) SetTo(v Location) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptLocation) Get() (v Location, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptLocation) Or(d Location) Location {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptMultipartFile returns new OptMultipartFile with value set to v.
 func NewOptMultipartFile(v ht.MultipartFile) OptMultipartFile {
 	return OptMultipartFile{
@@ -3609,10 +3793,10 @@ func (o *OptNilBool) SetTo(v bool) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilBool) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilBool) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -3672,10 +3856,10 @@ func (o *OptNilFloat64) SetTo(v float64) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilFloat64) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilFloat64) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -3735,10 +3919,10 @@ func (o *OptNilGetOpenedTalkSessionStatus) SetTo(v GetOpenedTalkSessionStatus) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilGetOpenedTalkSessionStatus) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilGetOpenedTalkSessionStatus) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -3798,10 +3982,10 @@ func (o *OptNilGetOpinionsForTalkSessionSort) SetTo(v GetOpinionsForTalkSessionS
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilGetOpinionsForTalkSessionSort) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilGetOpinionsForTalkSessionSort) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -3861,10 +4045,10 @@ func (o *OptNilGetTalkSessionListStatus) SetTo(v GetTalkSessionListStatus) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilGetTalkSessionListStatus) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilGetTalkSessionListStatus) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -3924,10 +4108,10 @@ func (o *OptNilGetUserTalkSessionsStatus) SetTo(v GetUserTalkSessionsStatus) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilGetUserTalkSessionsStatus) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilGetUserTalkSessionsStatus) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -3987,10 +4171,10 @@ func (o *OptNilInt) SetTo(v int) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilInt) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilInt) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -4011,195 +4195,6 @@ func (o OptNilInt) Get() (v int, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilInt) Or(d int) int {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilOpinionVoteType returns new OptNilOpinionVoteType with value set to v.
-func NewOptNilOpinionVoteType(v OpinionVoteType) OptNilOpinionVoteType {
-	return OptNilOpinionVoteType{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilOpinionVoteType is optional nullable OpinionVoteType.
-type OptNilOpinionVoteType struct {
-	Value OpinionVoteType
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilOpinionVoteType was set.
-func (o OptNilOpinionVoteType) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilOpinionVoteType) Reset() {
-	var v OpinionVoteType
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilOpinionVoteType) SetTo(v OpinionVoteType) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsSet returns true if value is Null.
-func (o OptNilOpinionVoteType) IsNull() bool { return o.Null }
-
-// SetNull sets value to null.
-func (o *OptNilOpinionVoteType) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v OpinionVoteType
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilOpinionVoteType) Get() (v OpinionVoteType, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilOpinionVoteType) Or(d OpinionVoteType) OpinionVoteType {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilOpinionWithReplyAndVoteMyVoteType returns new OptNilOpinionWithReplyAndVoteMyVoteType with value set to v.
-func NewOptNilOpinionWithReplyAndVoteMyVoteType(v OpinionWithReplyAndVoteMyVoteType) OptNilOpinionWithReplyAndVoteMyVoteType {
-	return OptNilOpinionWithReplyAndVoteMyVoteType{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilOpinionWithReplyAndVoteMyVoteType is optional nullable OpinionWithReplyAndVoteMyVoteType.
-type OptNilOpinionWithReplyAndVoteMyVoteType struct {
-	Value OpinionWithReplyAndVoteMyVoteType
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilOpinionWithReplyAndVoteMyVoteType was set.
-func (o OptNilOpinionWithReplyAndVoteMyVoteType) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilOpinionWithReplyAndVoteMyVoteType) Reset() {
-	var v OpinionWithReplyAndVoteMyVoteType
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilOpinionWithReplyAndVoteMyVoteType) SetTo(v OpinionWithReplyAndVoteMyVoteType) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsSet returns true if value is Null.
-func (o OptNilOpinionWithReplyAndVoteMyVoteType) IsNull() bool { return o.Null }
-
-// SetNull sets value to null.
-func (o *OptNilOpinionWithReplyAndVoteMyVoteType) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v OpinionWithReplyAndVoteMyVoteType
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilOpinionWithReplyAndVoteMyVoteType) Get() (v OpinionWithReplyAndVoteMyVoteType, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilOpinionWithReplyAndVoteMyVoteType) Or(d OpinionWithReplyAndVoteMyVoteType) OpinionWithReplyAndVoteMyVoteType {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilOpinionWithVoteMyVoteType returns new OptNilOpinionWithVoteMyVoteType with value set to v.
-func NewOptNilOpinionWithVoteMyVoteType(v OpinionWithVoteMyVoteType) OptNilOpinionWithVoteMyVoteType {
-	return OptNilOpinionWithVoteMyVoteType{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilOpinionWithVoteMyVoteType is optional nullable OpinionWithVoteMyVoteType.
-type OptNilOpinionWithVoteMyVoteType struct {
-	Value OpinionWithVoteMyVoteType
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilOpinionWithVoteMyVoteType was set.
-func (o OptNilOpinionWithVoteMyVoteType) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilOpinionWithVoteMyVoteType) Reset() {
-	var v OpinionWithVoteMyVoteType
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilOpinionWithVoteMyVoteType) SetTo(v OpinionWithVoteMyVoteType) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsSet returns true if value is Null.
-func (o OptNilOpinionWithVoteMyVoteType) IsNull() bool { return o.Null }
-
-// SetNull sets value to null.
-func (o *OptNilOpinionWithVoteMyVoteType) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v OpinionWithVoteMyVoteType
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilOpinionWithVoteMyVoteType) Get() (v OpinionWithVoteMyVoteType, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilOpinionWithVoteMyVoteType) Or(d OpinionWithVoteMyVoteType) OpinionWithVoteMyVoteType {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -4239,10 +4234,10 @@ func (o *OptNilOpinionsHistorySort) SetTo(v OpinionsHistorySort) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilOpinionsHistorySort) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilOpinionsHistorySort) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -4263,6 +4258,69 @@ func (o OptNilOpinionsHistorySort) Get() (v OpinionsHistorySort, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilOpinionsHistorySort) Or(d OpinionsHistorySort) OpinionsHistorySort {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilOrganizationAlias returns new OptNilOrganizationAlias with value set to v.
+func NewOptNilOrganizationAlias(v OrganizationAlias) OptNilOrganizationAlias {
+	return OptNilOrganizationAlias{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilOrganizationAlias is optional nullable OrganizationAlias.
+type OptNilOrganizationAlias struct {
+	Value OrganizationAlias
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilOrganizationAlias was set.
+func (o OptNilOrganizationAlias) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilOrganizationAlias) Reset() {
+	var v OrganizationAlias
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilOrganizationAlias) SetTo(v OrganizationAlias) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilOrganizationAlias) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilOrganizationAlias) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v OrganizationAlias
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilOrganizationAlias) Get() (v OrganizationAlias, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilOrganizationAlias) Or(d OrganizationAlias) OrganizationAlias {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -4302,10 +4360,10 @@ func (o *OptNilSessionsHistoryStatus) SetTo(v SessionsHistoryStatus) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilSessionsHistoryStatus) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilSessionsHistoryStatus) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -4365,10 +4423,10 @@ func (o *OptNilString) SetTo(v string) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilString) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilString) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -4395,52 +4453,52 @@ func (o OptNilString) Or(d string) string {
 	return d
 }
 
-// NewOptNilTalkSessionOrganizationAlias returns new OptNilTalkSessionOrganizationAlias with value set to v.
-func NewOptNilTalkSessionOrganizationAlias(v TalkSessionOrganizationAlias) OptNilTalkSessionOrganizationAlias {
-	return OptNilTalkSessionOrganizationAlias{
+// NewOptNilVoteType returns new OptNilVoteType with value set to v.
+func NewOptNilVoteType(v VoteType) OptNilVoteType {
+	return OptNilVoteType{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptNilTalkSessionOrganizationAlias is optional nullable TalkSessionOrganizationAlias.
-type OptNilTalkSessionOrganizationAlias struct {
-	Value TalkSessionOrganizationAlias
+// OptNilVoteType is optional nullable VoteType.
+type OptNilVoteType struct {
+	Value VoteType
 	Set   bool
 	Null  bool
 }
 
-// IsSet returns true if OptNilTalkSessionOrganizationAlias was set.
-func (o OptNilTalkSessionOrganizationAlias) IsSet() bool { return o.Set }
+// IsSet returns true if OptNilVoteType was set.
+func (o OptNilVoteType) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptNilTalkSessionOrganizationAlias) Reset() {
-	var v TalkSessionOrganizationAlias
+func (o *OptNilVoteType) Reset() {
+	var v VoteType
 	o.Value = v
 	o.Set = false
 	o.Null = false
 }
 
 // SetTo sets value to v.
-func (o *OptNilTalkSessionOrganizationAlias) SetTo(v TalkSessionOrganizationAlias) {
+func (o *OptNilVoteType) SetTo(v VoteType) {
 	o.Set = true
 	o.Null = false
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
-func (o OptNilTalkSessionOrganizationAlias) IsNull() bool { return o.Null }
+// IsNull returns true if value is Null.
+func (o OptNilVoteType) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
-func (o *OptNilTalkSessionOrganizationAlias) SetToNull() {
+// SetToNull sets value to null.
+func (o *OptNilVoteType) SetToNull() {
 	o.Set = true
 	o.Null = true
-	var v TalkSessionOrganizationAlias
+	var v VoteType
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptNilTalkSessionOrganizationAlias) Get() (v TalkSessionOrganizationAlias, ok bool) {
+func (o OptNilVoteType) Get() (v VoteType, ok bool) {
 	if o.Null {
 		return v, false
 	}
@@ -4451,7 +4509,7 @@ func (o OptNilTalkSessionOrganizationAlias) Get() (v TalkSessionOrganizationAlia
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptNilTalkSessionOrganizationAlias) Or(d TalkSessionOrganizationAlias) TalkSessionOrganizationAlias {
+func (o OptNilVoteType) Or(d VoteType) VoteType {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -4544,52 +4602,6 @@ func (o OptString) Get() (v string, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptString) Or(d string) string {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptTalkSessionLocation returns new OptTalkSessionLocation with value set to v.
-func NewOptTalkSessionLocation(v TalkSessionLocation) OptTalkSessionLocation {
-	return OptTalkSessionLocation{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptTalkSessionLocation is optional TalkSessionLocation.
-type OptTalkSessionLocation struct {
-	Value TalkSessionLocation
-	Set   bool
-}
-
-// IsSet returns true if OptTalkSessionLocation was set.
-func (o OptTalkSessionLocation) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptTalkSessionLocation) Reset() {
-	var v TalkSessionLocation
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptTalkSessionLocation) SetTo(v TalkSessionLocation) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptTalkSessionLocation) Get() (v TalkSessionLocation, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptTalkSessionLocation) Or(d TalkSessionLocation) TalkSessionLocation {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -5697,7 +5709,7 @@ func (s *ReportAction) UnmarshalText(data []byte) error {
 type ReportDetail struct {
 	Opinion Opinion `json:"opinion"`
 	// 作成ユーザー.
-	User    ReportDetailUser          `json:"user"`
+	User    User                      `json:"user"`
 	Status  ReportStatus              `json:"status"`
 	Reasons []ReportDetailReasonsItem `json:"reasons"`
 	// この意見が通報を受けた回数.
@@ -5710,7 +5722,7 @@ func (s *ReportDetail) GetOpinion() Opinion {
 }
 
 // GetUser returns the value of User.
-func (s *ReportDetail) GetUser() ReportDetailUser {
+func (s *ReportDetail) GetUser() User {
 	return s.User
 }
 
@@ -5735,7 +5747,7 @@ func (s *ReportDetail) SetOpinion(val Opinion) {
 }
 
 // SetUser sets the value of User.
-func (s *ReportDetail) SetUser(val ReportDetailUser) {
+func (s *ReportDetail) SetUser(val User) {
 	s.User = val
 }
 
@@ -5781,42 +5793,6 @@ func (s *ReportDetailReasonsItem) SetContent(val OptNilString) {
 	s.Content = val
 }
 
-type ReportDetailUser struct {
-	DisplayID   string       `json:"displayID"`
-	DisplayName string       `json:"displayName"`
-	IconURL     OptNilString `json:"iconURL"`
-}
-
-// GetDisplayID returns the value of DisplayID.
-func (s *ReportDetailUser) GetDisplayID() string {
-	return s.DisplayID
-}
-
-// GetDisplayName returns the value of DisplayName.
-func (s *ReportDetailUser) GetDisplayName() string {
-	return s.DisplayName
-}
-
-// GetIconURL returns the value of IconURL.
-func (s *ReportDetailUser) GetIconURL() OptNilString {
-	return s.IconURL
-}
-
-// SetDisplayID sets the value of DisplayID.
-func (s *ReportDetailUser) SetDisplayID(val string) {
-	s.DisplayID = val
-}
-
-// SetDisplayName sets the value of DisplayName.
-func (s *ReportDetailUser) SetDisplayName(val string) {
-	s.DisplayName = val
-}
-
-// SetIconURL sets the value of IconURL.
-func (s *ReportDetailUser) SetIconURL(val OptNilString) {
-	s.IconURL = val
-}
-
 type ReportOpinionBadRequest struct{}
 
 func (*ReportOpinionBadRequest) reportOpinionRes() {}
@@ -5830,27 +5806,27 @@ type ReportOpinionOK struct{}
 func (*ReportOpinionOK) reportOpinionRes() {}
 
 type ReportOpinionReq struct {
-	Reason  OptFloat64 `json:"reason"`
-	Content OptString  `json:"content"`
+	Reason  NilInt    `json:"reason"`
+	Content NilString `json:"content"`
 }
 
 // GetReason returns the value of Reason.
-func (s *ReportOpinionReq) GetReason() OptFloat64 {
+func (s *ReportOpinionReq) GetReason() NilInt {
 	return s.Reason
 }
 
 // GetContent returns the value of Content.
-func (s *ReportOpinionReq) GetContent() OptString {
+func (s *ReportOpinionReq) GetContent() NilString {
 	return s.Content
 }
 
 // SetReason sets the value of Reason.
-func (s *ReportOpinionReq) SetReason(val OptFloat64) {
+func (s *ReportOpinionReq) SetReason(val NilInt) {
 	s.Reason = val
 }
 
 // SetContent sets the value of Content.
-func (s *ReportOpinionReq) SetContent(val OptString) {
+func (s *ReportOpinionReq) SetContent(val NilString) {
 	s.Content = val
 }
 
@@ -6027,18 +6003,18 @@ func (s *SendTestNotificationOK) SetSuccessCount(val int32) {
 func (*SendTestNotificationOK) sendTestNotificationRes() {}
 
 type SendTestNotificationReq struct {
-	Title    OptString `json:"title"`
-	Body     OptString `json:"body"`
+	Title    string    `json:"title"`
+	Body     string    `json:"body"`
 	DeviceID OptString `json:"device_id"`
 }
 
 // GetTitle returns the value of Title.
-func (s *SendTestNotificationReq) GetTitle() OptString {
+func (s *SendTestNotificationReq) GetTitle() string {
 	return s.Title
 }
 
 // GetBody returns the value of Body.
-func (s *SendTestNotificationReq) GetBody() OptString {
+func (s *SendTestNotificationReq) GetBody() string {
 	return s.Body
 }
 
@@ -6048,12 +6024,12 @@ func (s *SendTestNotificationReq) GetDeviceID() OptString {
 }
 
 // SetTitle sets the value of Title.
-func (s *SendTestNotificationReq) SetTitle(val OptString) {
+func (s *SendTestNotificationReq) SetTitle(val string) {
 	s.Title = val
 }
 
 // SetBody sets the value of Body.
-func (s *SendTestNotificationReq) SetBody(val OptString) {
+func (s *SendTestNotificationReq) SetBody(val string) {
 	s.Body = val
 }
 
@@ -6308,15 +6284,15 @@ type TalkSession struct {
 	// 説明.
 	Description OptNilString `json:"description"`
 	// 作成ユーザー.
-	Owner TalkSessionOwner `json:"owner"`
+	Owner User `json:"owner"`
 	// 作成組織名.
-	OrganizationAlias OptNilTalkSessionOrganizationAlias `json:"organizationAlias"`
+	OrganizationAlias OptNilOrganizationAlias `json:"organizationAlias"`
 	// 作成日時.
 	CreatedAt string `json:"createdAt"`
 	// 終了予定日時.
 	ScheduledEndTime string `json:"scheduledEndTime"`
 	// 位置情報.
-	Location OptTalkSessionLocation `json:"location"`
+	Location OptLocation `json:"location"`
 	// 市区町村.
 	City OptNilString `json:"city"`
 	// 都道府県.
@@ -6327,6 +6303,8 @@ type TalkSession struct {
 	Restrictions []Restriction `json:"restrictions"`
 	// レポートを隠すかどうか.
 	HideReport bool `json:"hideReport"`
+	// トップに表示するかどうか.
+	HideTop OptNilBool `json:"hideTop"`
 }
 
 // GetID returns the value of ID.
@@ -6345,12 +6323,12 @@ func (s *TalkSession) GetDescription() OptNilString {
 }
 
 // GetOwner returns the value of Owner.
-func (s *TalkSession) GetOwner() TalkSessionOwner {
+func (s *TalkSession) GetOwner() User {
 	return s.Owner
 }
 
 // GetOrganizationAlias returns the value of OrganizationAlias.
-func (s *TalkSession) GetOrganizationAlias() OptNilTalkSessionOrganizationAlias {
+func (s *TalkSession) GetOrganizationAlias() OptNilOrganizationAlias {
 	return s.OrganizationAlias
 }
 
@@ -6365,7 +6343,7 @@ func (s *TalkSession) GetScheduledEndTime() string {
 }
 
 // GetLocation returns the value of Location.
-func (s *TalkSession) GetLocation() OptTalkSessionLocation {
+func (s *TalkSession) GetLocation() OptLocation {
 	return s.Location
 }
 
@@ -6394,6 +6372,11 @@ func (s *TalkSession) GetHideReport() bool {
 	return s.HideReport
 }
 
+// GetHideTop returns the value of HideTop.
+func (s *TalkSession) GetHideTop() OptNilBool {
+	return s.HideTop
+}
+
 // SetID sets the value of ID.
 func (s *TalkSession) SetID(val string) {
 	s.ID = val
@@ -6410,12 +6393,12 @@ func (s *TalkSession) SetDescription(val OptNilString) {
 }
 
 // SetOwner sets the value of Owner.
-func (s *TalkSession) SetOwner(val TalkSessionOwner) {
+func (s *TalkSession) SetOwner(val User) {
 	s.Owner = val
 }
 
 // SetOrganizationAlias sets the value of OrganizationAlias.
-func (s *TalkSession) SetOrganizationAlias(val OptNilTalkSessionOrganizationAlias) {
+func (s *TalkSession) SetOrganizationAlias(val OptNilOrganizationAlias) {
 	s.OrganizationAlias = val
 }
 
@@ -6430,7 +6413,7 @@ func (s *TalkSession) SetScheduledEndTime(val string) {
 }
 
 // SetLocation sets the value of Location.
-func (s *TalkSession) SetLocation(val OptTalkSessionLocation) {
+func (s *TalkSession) SetLocation(val OptLocation) {
 	s.Location = val
 }
 
@@ -6457,6 +6440,11 @@ func (s *TalkSession) SetRestrictions(val []Restriction) {
 // SetHideReport sets the value of HideReport.
 func (s *TalkSession) SetHideReport(val bool) {
 	s.HideReport = val
+}
+
+// SetHideTop sets the value of HideTop.
+func (s *TalkSession) SetHideTop(val OptNilBool) {
+	s.HideTop = val
 }
 
 func (*TalkSession) editTalkSessionRes()      {}
@@ -6798,106 +6786,6 @@ func (s *TalkSessionListResponse) SetTalkSessionStats(val []TalkSessionStats) {
 // SetTotalCount sets the value of TotalCount.
 func (s *TalkSessionListResponse) SetTotalCount(val int32) {
 	s.TotalCount = val
-}
-
-type TalkSessionLocation struct {
-	// 緯度.
-	Latitude OptFloat64 `json:"latitude"`
-	// 経度.
-	Longitude OptFloat64 `json:"longitude"`
-}
-
-// GetLatitude returns the value of Latitude.
-func (s *TalkSessionLocation) GetLatitude() OptFloat64 {
-	return s.Latitude
-}
-
-// GetLongitude returns the value of Longitude.
-func (s *TalkSessionLocation) GetLongitude() OptFloat64 {
-	return s.Longitude
-}
-
-// SetLatitude sets the value of Latitude.
-func (s *TalkSessionLocation) SetLatitude(val OptFloat64) {
-	s.Latitude = val
-}
-
-// SetLongitude sets the value of Longitude.
-func (s *TalkSessionLocation) SetLongitude(val OptFloat64) {
-	s.Longitude = val
-}
-
-// 組織エイリアス.
-type TalkSessionOrganizationAlias struct {
-	AliasID   string       `json:"aliasID"`
-	AliasName string       `json:"aliasName"`
-	CreatedAt OptNilString `json:"createdAt"`
-}
-
-// GetAliasID returns the value of AliasID.
-func (s *TalkSessionOrganizationAlias) GetAliasID() string {
-	return s.AliasID
-}
-
-// GetAliasName returns the value of AliasName.
-func (s *TalkSessionOrganizationAlias) GetAliasName() string {
-	return s.AliasName
-}
-
-// GetCreatedAt returns the value of CreatedAt.
-func (s *TalkSessionOrganizationAlias) GetCreatedAt() OptNilString {
-	return s.CreatedAt
-}
-
-// SetAliasID sets the value of AliasID.
-func (s *TalkSessionOrganizationAlias) SetAliasID(val string) {
-	s.AliasID = val
-}
-
-// SetAliasName sets the value of AliasName.
-func (s *TalkSessionOrganizationAlias) SetAliasName(val string) {
-	s.AliasName = val
-}
-
-// SetCreatedAt sets the value of CreatedAt.
-func (s *TalkSessionOrganizationAlias) SetCreatedAt(val OptNilString) {
-	s.CreatedAt = val
-}
-
-type TalkSessionOwner struct {
-	DisplayID   string       `json:"displayID"`
-	DisplayName string       `json:"displayName"`
-	IconURL     OptNilString `json:"iconURL"`
-}
-
-// GetDisplayID returns the value of DisplayID.
-func (s *TalkSessionOwner) GetDisplayID() string {
-	return s.DisplayID
-}
-
-// GetDisplayName returns the value of DisplayName.
-func (s *TalkSessionOwner) GetDisplayName() string {
-	return s.DisplayName
-}
-
-// GetIconURL returns the value of IconURL.
-func (s *TalkSessionOwner) GetIconURL() OptNilString {
-	return s.IconURL
-}
-
-// SetDisplayID sets the value of DisplayID.
-func (s *TalkSessionOwner) SetDisplayID(val string) {
-	s.DisplayID = val
-}
-
-// SetDisplayName sets the value of DisplayName.
-func (s *TalkSessionOwner) SetDisplayName(val string) {
-	s.DisplayName = val
-}
-
-// SetIconURL sets the value of IconURL.
-func (s *TalkSessionOwner) SetIconURL(val OptNilString) {
-	s.IconURL = val
 }
 
 // Ref: #/components/schemas/TalkSessionStats
@@ -7395,16 +7283,16 @@ type UpdateNotificationPreferencesBadRequest struct{}
 func (*UpdateNotificationPreferencesBadRequest) updateNotificationPreferencesRes() {}
 
 type UpdateNotificationPreferencesReq struct {
-	PushNotificationEnabled OptNilBool `json:"push_notification_enabled"`
+	PushNotificationEnabled NilBool `json:"push_notification_enabled"`
 }
 
 // GetPushNotificationEnabled returns the value of PushNotificationEnabled.
-func (s *UpdateNotificationPreferencesReq) GetPushNotificationEnabled() OptNilBool {
+func (s *UpdateNotificationPreferencesReq) GetPushNotificationEnabled() NilBool {
 	return s.PushNotificationEnabled
 }
 
 // SetPushNotificationEnabled sets the value of PushNotificationEnabled.
-func (s *UpdateNotificationPreferencesReq) SetPushNotificationEnabled(val OptNilBool) {
+func (s *UpdateNotificationPreferencesReq) SetPushNotificationEnabled(val NilBool) {
 	s.PushNotificationEnabled = val
 }
 
@@ -7509,7 +7397,7 @@ type UpdateUserProfileReq struct {
 	DisplayName OptString        `json:"displayName"`
 	Icon        OptMultipartFile `json:"icon"`
 	DeleteIcon  OptNilBool       `json:"deleteIcon"`
-	DateOfBirth OptFloat64       `json:"dateOfBirth"`
+	DateOfBirth NilInt           `json:"dateOfBirth"`
 	Gender      OptString        `json:"gender"`
 	City        OptString        `json:"city"`
 	Prefecture  OptString        `json:"prefecture"`
@@ -7532,7 +7420,7 @@ func (s *UpdateUserProfileReq) GetDeleteIcon() OptNilBool {
 }
 
 // GetDateOfBirth returns the value of DateOfBirth.
-func (s *UpdateUserProfileReq) GetDateOfBirth() OptFloat64 {
+func (s *UpdateUserProfileReq) GetDateOfBirth() NilInt {
 	return s.DateOfBirth
 }
 
@@ -7572,7 +7460,7 @@ func (s *UpdateUserProfileReq) SetDeleteIcon(val OptNilBool) {
 }
 
 // SetDateOfBirth sets the value of DateOfBirth.
-func (s *UpdateUserProfileReq) SetDateOfBirth(val OptFloat64) {
+func (s *UpdateUserProfileReq) SetDateOfBirth(val NilInt) {
 	s.DateOfBirth = val
 }
 
@@ -8027,6 +7915,56 @@ func (s *Vote2Req) GetVoteStatus() string {
 // SetVoteStatus sets the value of VoteStatus.
 func (s *Vote2Req) SetVoteStatus(val string) {
 	s.VoteStatus = val
+}
+
+// 投票タイプ.
+// Ref: #/components/schemas/VoteType
+type VoteType string
+
+const (
+	VoteTypeAgree    VoteType = "agree"
+	VoteTypeDisagree VoteType = "disagree"
+	VoteTypePass     VoteType = "pass"
+)
+
+// AllValues returns all VoteType values.
+func (VoteType) AllValues() []VoteType {
+	return []VoteType{
+		VoteTypeAgree,
+		VoteTypeDisagree,
+		VoteTypePass,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s VoteType) MarshalText() ([]byte, error) {
+	switch s {
+	case VoteTypeAgree:
+		return []byte(s), nil
+	case VoteTypeDisagree:
+		return []byte(s), nil
+	case VoteTypePass:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *VoteType) UnmarshalText(data []byte) error {
+	switch VoteType(data) {
+	case VoteTypeAgree:
+		*s = VoteTypeAgree
+		return nil
+	case VoteTypeDisagree:
+		*s = VoteTypeDisagree
+		return nil
+	case VoteTypePass:
+		*s = VoteTypePass
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
 type WithdrawUserBadRequest struct {

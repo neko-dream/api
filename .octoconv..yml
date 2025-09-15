@@ -1,0 +1,21 @@
+coverage:
+  paths:
+    - coverage.out
+codeToTestRatio:
+  codeToTestRatio:
+  code:
+    - "**/*.go"
+    - "!**/*_test.go"
+    - "!internal/presentation/oas/**"
+    - "!internal/infrastructure/persistence/sqlc/generated/**"
+  test:
+    - "**/*_test.go"
+testExecutionTime:
+  if: true
+report:
+  datastores:
+    - local://main
+comment:
+  if: is_pull_request
+summary:
+  if: true

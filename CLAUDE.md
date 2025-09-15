@@ -37,7 +37,7 @@ Kent BeckのTDDとTidy Firstアプローチに基づいた開発方法が記載�
 
 ```bash
 # コード生成
-./scripts/gen.sh
+go generate ./...
 
 # テスト実行
 go test ./...
@@ -51,6 +51,6 @@ go fmt ./...
 
 ## 重要な注意事項
 
-- **コード生成を忘れずに**: TypeSpecやSQLを変更したら必ず`./scripts/gen.sh`を実行
+- **コード生成を忘れずに**: TypeSpecやSQLを変更したら必ず`go generate ./...`を実行
 - **テストファースト**: 新機能は必ずテストから書き始める
 - **層の依存関係を守る**: presentation → application → domain ← infrastructure

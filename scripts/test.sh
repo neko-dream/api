@@ -62,9 +62,13 @@ print_warning "テスト対象: $TEST_PATH"
 
 kill_port 3000
 
+cp .env .env.bak
+cp ./.env.example ./.env
 print_warning "サーバーを起動しています..."
 go run ./cmd/server/main.go &
 SERVER_PID=$!
+cp .env.bak .env
+rm .env.bak
 
 if [ -z "$SERVER_PID" ] || ! kill -0 $SERVER_PID 2>/dev/null; then
     print_error "サーバーの起動に失敗しました"

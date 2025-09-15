@@ -41,8 +41,8 @@ type DevAuthorizeRes interface {
 	devAuthorizeRes()
 }
 
-type DummiInitRes interface {
-	dummiInitRes()
+type DummyInitRes interface {
+	dummyInitRes()
 }
 
 type EditTalkSessionRes interface {

@@ -114,6 +114,7 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					nil, // location
 					lo.ToPtr("初期市区町村"),
 					lo.ToPtr("初期都道府県"),
+					true,
 					nil, // organizationID
 					nil, // organizationAliasID
 				)
@@ -209,6 +210,7 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					nil,
 					lo.ToPtr("初期市区町村"),
 					lo.ToPtr("初期都道府県"),
+					true,
 					nil, // organizationID
 					nil, // organizationAliasID
 				)
@@ -275,6 +277,7 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					nil,
 					lo.ToPtr("初期市区町村"),
 					lo.ToPtr("初期都道府県"),
+					true,
 					nil, // organizationID
 					nil, // organizationAliasID
 				)
@@ -329,6 +332,7 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					nil,
 					lo.ToPtr("初期市区町村"),
 					lo.ToPtr("初期都道府県"),
+					true,
 					nil, // organizationID
 					nil, // organizationAliasID
 				)
@@ -384,6 +388,7 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					nil,
 					lo.ToPtr("初期市区町村"),
 					lo.ToPtr("初期都道府県"),
+					true,
 					nil, // organizationID
 					nil, // organizationAliasID
 				)
@@ -432,6 +437,7 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					nil, // location
 					lo.ToPtr("初期市区町村"),
 					lo.ToPtr("初期都道府県"),
+					true,
 					nil, // organizationID
 					nil, // organizationAliasID
 				)
@@ -487,6 +493,7 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					nil, // location
 					lo.ToPtr("初期市区町村"),
 					lo.ToPtr("初期都道府県"),
+					true,
 					nil, // organizationID
 					nil, // organizationAliasID
 				)
@@ -700,6 +707,7 @@ func TestEditTalkSessionUseCase_ProductionEnvironment(t *testing.T) {
 			nil,
 			lo.ToPtr("初期市区町村"),
 			lo.ToPtr("初期都道府県"),
+			true,
 			nil, // organizationID
 			nil, // organizationAliasID
 		)

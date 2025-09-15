@@ -2,7 +2,7 @@
 
 ## 必須実行項目
 1. **コード生成の実行**
-   - TypeSpecやSQLを変更した場合: `./scripts/gen.sh`
+   - TypeSpecやSQLを変更した場合: `go generate ./...`
 
 2. **テストの実行**
    - `go test ./...` でテストがパスすることを確認

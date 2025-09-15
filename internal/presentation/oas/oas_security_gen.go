@@ -16,7 +16,7 @@ import (
 type SecurityHandler interface {
 	// HandleCookieAuth handles CookieAuth security.
 	// Cookie-based authentication using JWT tokens stored in secure HTTP-only cookies.
-	HandleCookieAuth(ctx context.Context, operationName string, t CookieAuth) (context.Context, error)
+	HandleCookieAuth(ctx context.Context, operationName OperationName, t CookieAuth) (context.Context, error)
 }
 
 func findAuthorization(h http.Header, prefix string) (string, bool) {
@@ -34,7 +34,65 @@ func findAuthorization(h http.Header, prefix string) (string, bool) {
 	return "", false
 }
 
-func (s *Server) securityCookieAuth(ctx context.Context, operationName string, req *http.Request) (context.Context, bool, error) {
+var operationRolesCookieAuth = map[string][]string{
+	ApplyFeedbackToReportOperation:         []string{},
+	AuthAccountDetachOperation:             []string{},
+	ChangePasswordOperation:                []string{},
+	CheckDeviceExistsOperation:             []string{},
+	ConsentTalkSessionOperation:            []string{},
+	CreateOrganizationAliasOperation:       []string{},
+	DeleteDeviceOperation:                  []string{},
+	DeleteOrganizationAliasOperation:       []string{},
+	EditTalkSessionOperation:               []string{},
+	EditTimeLineOperation:                  []string{},
+	EstablishOrganizationOperation:         []string{},
+	EstablishUserOperation:                 []string{},
+	GetAnalysisReportManageOperation:       []string{},
+	GetDevicesOperation:                    []string{},
+	GetNotificationPreferencesOperation:    []string{},
+	GetOpenedTalkSessionOperation:          []string{},
+	GetOpinionReportsOperation:             []string{},
+	GetOrganizationAliasesOperation:        []string{},
+	GetOrganizationUsersOperation:          []string{},
+	GetOrganizationsOperation:              []string{},
+	GetReportsForTalkSessionOperation:      []string{},
+	GetTalkSessionListManageOperation:      []string{},
+	GetTalkSessionManageOperation:          []string{},
+	GetTalkSessionReportCountOperation:     []string{},
+	GetTokenInfoOperation:                  []string{},
+	GetUserInfoOperation:                   []string{},
+	GetUserListManageOperation:             []string{},
+	GetUserStatsListManageOperation:        []string{},
+	GetUserStatsTotalManageOperation:       []string{},
+	GetVapidKeyOperation:                   []string{},
+	HasConsentOperation:                    []string{},
+	InitiateTalkSessionOperation:           []string{},
+	InviteOrganizationOperation:            []string{},
+	InviteOrganizationForUserOperation:     []string{},
+	ManageRegenerateManageOperation:        []string{},
+	OpinionsHistoryOperation:               []string{},
+	PolicyConsentOperation:                 []string{},
+	PostConclusionOperation:                []string{},
+	PostImageOperation:                     []string{},
+	PostOpinionPost2Operation:              []string{},
+	PostTimeLineItemOperation:              []string{},
+	ReactivateUserOperation:                []string{},
+	RegisterDeviceOperation:                []string{},
+	ReportOpinionOperation:                 []string{},
+	RevokeTokenOperation:                   []string{},
+	SendTestNotificationOperation:          []string{},
+	SessionsHistoryOperation:               []string{},
+	SolveOpinionReportOperation:            []string{},
+	SwitchOrganizationOperation:            []string{},
+	ToggleReportVisibilityManageOperation:  []string{},
+	UpdateNotificationPreferencesOperation: []string{},
+	UpdateOrganizationOperation:            []string{},
+	UpdateUserProfileOperation:             []string{},
+	Vote2Operation:                         []string{},
+	WithdrawUserOperation:                  []string{},
+}
+
+func (s *Server) securityCookieAuth(ctx context.Context, operationName OperationName, req *http.Request) (context.Context, bool, error) {
 	var t CookieAuth
 	const parameterName = "SessionId"
 	var value string
@@ -47,6 +105,7 @@ func (s *Server) securityCookieAuth(ctx context.Context, operationName string, r
 		return nil, false, errors.Wrap(err, "get cookie value")
 	}
 	t.APIKey = value
+	t.Roles = operationRolesCookieAuth[operationName]
 	rctx, err := s.sec.HandleCookieAuth(ctx, operationName, t)
 	if errors.Is(err, ogenerrors.ErrSkipServerSecurity) {
 		return nil, false, nil

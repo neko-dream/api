@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd admin-ui
+bun run build
+cd ../
