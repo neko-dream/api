@@ -76,13 +76,14 @@ jobs:
 
       - name: Run E2E tests
         run: |
-          export POLICY_VERSION="1.0.0"
           ./scripts/test.sh
 
       - name: coverage tests
         continue-on-error: true
         run: |
-             runn coverage --format json ./e2e/**/* | octocov-runn-coverage > custom_metrics_runn.json
+          cp ./.env.example ./.env
+          go run ./cmd/server/main.go & sleep 3
+          runn coverage --format json ./e2e/**/* | octocov-runn-coverage > custom_metrics_runn.json
       - name: Run octocov
         continue-on-error: true
         uses: k1LoW/octocov-action@v1
