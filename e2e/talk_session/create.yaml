@@ -4,6 +4,9 @@ runners:
     endpoint: http://localhost:3000
     useCookie: true
     notFollowRedirect: true
+    openapi3: http://localhost:3000/static/oas/openapi.yaml
+    skipValidateRequest: false
+    skipValidateResponse: true
   dev: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
 
 vars:
