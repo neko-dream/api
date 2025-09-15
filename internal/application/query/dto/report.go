@@ -34,7 +34,7 @@ func (r *ReportDetail) ToResponse() oas.ReportDetail {
 
 	return oas.ReportDetail{
 		Opinion: r.Opinion.ToResponse(),
-		User: oas.ReportDetailUser{
+		User: oas.User{
 			DisplayID:   r.User.DisplayID,
 			DisplayName: r.User.DisplayName,
 			IconURL:     utils.ToOptNil[oas.OptNilString](r.User.IconURL),
