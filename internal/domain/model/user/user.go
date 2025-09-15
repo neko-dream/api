@@ -65,8 +65,6 @@ func (u *User) ChangeName(ctx context.Context, name *string) {
 	ctx, span := otel.Tracer("user").Start(ctx, "User.ChangeName")
 	defer span.End()
 
-	_ = ctx
-
 	if name == nil || *name == "" {
 		return
 	}

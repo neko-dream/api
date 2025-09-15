@@ -167,7 +167,7 @@ func (t *talkSessionHandler) PostConclusion(ctx context.Context, req *oas.PostCo
 	}
 
 	return &oas.Conclusion{
-		User:    oas.ConclusionUser(res.ToResponse()),
+		User:    oas.User(res.ToResponse()),
 		Content: res.Content,
 	}, nil
 }
@@ -194,7 +194,7 @@ func (t *talkSessionHandler) GetConclusion(ctx context.Context, params oas.GetCo
 	}
 
 	return &oas.Conclusion{
-		User:    oas.ConclusionUser(res.ToResponse()),
+		User:    oas.User(res.ToResponse()),
 		Content: res.Content,
 	}, nil
 }

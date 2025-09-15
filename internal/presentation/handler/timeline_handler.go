@@ -145,10 +145,10 @@ func (t *timelineHandler) EditTimeLine(ctx context.Context, req *oas.EditTimeLin
 		return nil, messages.InternalServerError
 	}
 	var content, status *string
-	if req.Content.IsSet() {
+	if !req.Content.IsNull() {
 		content = lo.ToPtr(req.Content.Value)
 	}
-	if req.Status.IsSet() {
+	if !req.Status.IsNull() {
 		status = lo.ToPtr(req.Status.Value)
 	}
 

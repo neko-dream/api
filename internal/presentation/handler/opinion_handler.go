@@ -18,7 +18,6 @@ import (
 	http_utils "github.com/neko-dream/server/pkg/http"
 	"github.com/neko-dream/server/pkg/sort"
 	"github.com/neko-dream/server/pkg/utils"
-	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
@@ -97,10 +96,10 @@ func (o *opinionHandler) GetOpinionDetail2(ctx context.Context, params oas.GetOp
 	}
 
 	// Convert to OpinionWithVote response
-	var myVoteType oas.OptNilOpinionWithVoteMyVoteType
+	var myVoteType oas.OptNilVoteType
 	if opinion.Opinion.GetMyVoteType() != nil {
-		myVoteType = oas.OptNilOpinionWithVoteMyVoteType{
-			Value: oas.OpinionWithVoteMyVoteType(*opinion.Opinion.GetMyVoteType()),
+		myVoteType = oas.OptNilVoteType{
+			Value: oas.VoteType(*opinion.Opinion.GetMyVoteType()),
 			Set:   true,
 			Null:  false,
 		}
@@ -140,10 +139,10 @@ func (o *opinionHandler) OpinionComments2(ctx context.Context, params oas.Opinio
 	var replies []oas.OpinionWithVote
 	for _, reply := range opinions.Replies {
 		// Convert SwipeOpinion to OpinionWithVote
-		var myVoteType oas.OptNilOpinionWithVoteMyVoteType
+		var myVoteType oas.OptNilVoteType
 		if reply.GetMyVoteType() != nil {
-			myVoteType = oas.OptNilOpinionWithVoteMyVoteType{
-				Value: oas.OpinionWithVoteMyVoteType(*reply.GetMyVoteType()),
+			myVoteType = oas.OptNilVoteType{
+				Value: oas.VoteType(*reply.GetMyVoteType()),
 				Set:   true,
 				Null:  false,
 			}
@@ -212,10 +211,10 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 	opinions := make([]oas.OpinionWithReplyAndVote, 0, len(out.Opinions))
 	for _, opinion := range out.Opinions {
 		// Convert SwipeOpinion to OpinionWithReplyAndVote
-		var myVoteType oas.OptNilOpinionWithReplyAndVoteMyVoteType
+		var myVoteType oas.OptNilVoteType
 		if opinion.GetMyVoteType() != nil {
-			myVoteType = oas.OptNilOpinionWithReplyAndVoteMyVoteType{
-				Value: oas.OpinionWithReplyAndVoteMyVoteType(*opinion.GetMyVoteType()),
+			myVoteType = oas.OptNilVoteType{
+				Value: oas.VoteType(*opinion.GetMyVoteType()),
 				Set:   true,
 				Null:  false,
 			}
@@ -365,16 +364,12 @@ func (o *opinionHandler) ReportOpinion(ctx context.Context, req *oas.ReportOpini
 	if err != nil {
 		return nil, messages.BadRequestError
 	}
-	var reasonText *string
-	if req.Content.IsSet() && req.Content.Value != "" {
-		reasonText = lo.ToPtr(req.Content.Value)
-	}
 
 	if err := o.reportOpinionCommand.Execute(ctx, opinion_usecase.ReportOpinionInput{
 		ReporterID: authCtx.UserID,
 		OpinionID:  opinionID,
 		Reason:     int32(req.Reason.Value),
-		ReasonText: reasonText,
+		ReasonText: utils.ToPtrIf(!req.Content.IsNull(), req.Content.Value),
 	}); err != nil {
 		utils.HandleError(ctx, err, "reportOpinionCommand.Execute")
 		return nil, err

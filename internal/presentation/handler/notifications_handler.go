@@ -290,7 +290,7 @@ func (h *notificationsHandler) UpdateNotificationPreferences(ctx context.Context
 		return &oas.UpdateNotificationPreferencesBadRequest{}, nil
 	}
 
-	if req.PushNotificationEnabled.IsSet() {
+	if !req.PushNotificationEnabled.IsNull() {
 		pref.PushNotificationEnabled = req.PushNotificationEnabled.Value
 	}
 
@@ -372,11 +372,11 @@ func (h *notificationsHandler) SendTestNotification(ctx context.Context, req *oa
 	title := "Kotohiro テスト通知"
 	body := fmt.Sprintf("これはテスト通知です。時刻: %s", time.Now().Format("15:04:05"))
 
-	if req.Title.IsSet() && req.Title.Value != "" {
-		title = req.Title.Value
+	if req.Title != "" {
+		title = req.Title
 	}
-	if req.Body.IsSet() && req.Body.Value != "" {
-		body = req.Body.Value
+	if req.Body != "" {
+		body = req.Body
 	}
 
 	var devicesToSend []notification.Device
