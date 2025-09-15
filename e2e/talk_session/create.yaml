@@ -58,7 +58,7 @@ steps:
               prefecture: "{{ vars.prefecture }}"
               city: "{{ vars.city }}"
               restrictions: '["demographics.prefecture","demographics.city"]'
-              hideTop: "true"
+              hideTop: "false"
     bind:
       createTalkSession: current.res.body
     test: |
