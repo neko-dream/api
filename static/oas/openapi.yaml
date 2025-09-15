@@ -775,7 +775,8 @@ paths:
                 push_notification_enabled:
                   type: boolean
                   nullable: true
-              required: []
+              required:
+                - push_notification_enabled
             encoding:
               push_notification_enabled:
                 contentType: application/json
@@ -829,7 +830,9 @@ paths:
                   type: string
                 device_id:
                   type: string
-              required: []
+              required:
+                - title
+                - body
       x-ogen-operation-group: Notifications
   /notifications/vapid-key:
     get:
@@ -1182,10 +1185,19 @@ paths:
               type: object
               properties:
                 reason:
-                  type: number
+                  type: integer
+                  nullable: true
                 content:
                   type: string
-              required: []
+                  nullable: true
+              required:
+                - reason
+                - content
+            encoding:
+              reason:
+                contentType: application/json
+              content:
+                contentType: application/json
       x-ogen-operation-group: Opinion
   /opinions/{opinionID}/reports:
     get:
@@ -3055,9 +3067,18 @@ paths:
               properties:
                 content:
                   type: string
+                  nullable: true
                 status:
                   type: string
-              required: []
+                  nullable: true
+              required:
+                - content
+                - status
+            encoding:
+              content:
+                contentType: application/json
+              status:
+                contentType: application/json
       x-ogen-operation-group: Timeline
   /test:
     get:
@@ -3108,8 +3129,8 @@ paths:
       x-ogen-operation-group: test
   /test/dummy:
     post:
-      operationId: dummiInit
-      summary: mudai
+      operationId: dummyInit
+      summary: init dummy
       parameters: []
       responses:
         '200':
@@ -3132,6 +3153,48 @@ paths:
                 type: object
       tags:
         - test
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                integerNull:
+                  type: integer
+                  nullable: true
+                numericOptionalNull:
+                  type: number
+                  nullable: true
+                numericNull:
+                  type: number
+                  nullable: true
+                numericOptional:
+                  type: number
+                numeric:
+                  type: number
+                booleanOptionalNull:
+                  type: boolean
+                  nullable: true
+                booleanNull:
+                  type: boolean
+                  nullable: true
+              required:
+                - integerNull
+                - numericNull
+                - numeric
+                - booleanNull
+            encoding:
+              integerNull:
+                contentType: application/json
+              numericOptionalNull:
+                contentType: application/json
+              numericNull:
+                contentType: application/json
+              booleanOptionalNull:
+                contentType: application/json
+              booleanNull:
+                contentType: application/json
       security:
         - {}
       x-ogen-operation-group: Test
@@ -3293,7 +3356,8 @@ paths:
                   type: boolean
                   nullable: true
                 dateOfBirth:
-                  type: number
+                  type: integer
+                  nullable: true
                 gender:
                   type: string
                 city:
@@ -3302,9 +3366,12 @@ paths:
                   type: string
                 email:
                   type: string
-              required: []
+              required:
+                - dateOfBirth
             encoding:
               deleteIcon:
+                contentType: application/json
+              dateOfBirth:
                 contentType: application/json
       x-ogen-operation-group: user
     delete:

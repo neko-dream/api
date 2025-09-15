@@ -17,22 +17,26 @@ namespace kotohiro {
     /**
      * 生年月日
      */
-    @summary("20001010") dateOfBirth?: integer | null;
+    @summary("20001010")
+    dateOfBirth?: integer | null;
 
     /**
      * 性別
      */
-    @summary("性別") gender?: string | null;
+    @summary("性別")
+    gender?: string | null;
 
     /**
      * 市町村
      */
-    @summary("市町村") city?: string | null;
+    @summary("市町村")
+    city?: string | null;
 
     /**
      * 都道府県
      */
-    @summary("都道府県") prefecture?: string | null;
+    @summary("都道府県")
+    prefecture?: string | null;
   }
 
   model UserGroupPosition {
