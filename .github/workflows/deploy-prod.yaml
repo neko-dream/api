@@ -26,7 +26,7 @@ jobs:
           cache: true
           cache-dependency-path: |
             go.mod
-            go.sumod
+            go.sum
 
       - name: Install Bun
         uses: oven-sh/setup-bun@v2

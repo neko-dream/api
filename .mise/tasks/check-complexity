@@ -10,7 +10,6 @@ readonly CYAN='\033[0;36m'
 readonly BOLD='\033[1m'
 readonly NC='\033[0m' # No Color
 
-# 複雑度の閾値
 readonly COGNITIVE_THRESHOLD=15
 readonly CYCLOMATIC_THRESHOLD=10
 
@@ -38,12 +37,9 @@ find_go_files() {
         ! -name "*_test.go" | sort
 }
 
-# メイン処理
 main() {
-    # ヘッダー表示
     print_header
 
-    # タイムスタンプとファイル数
     echo -e "${GREEN}📅 分析日時: $(date '+%Y年%m月%d日 %H:%M:%S')${NC}"
 
     local files=$(find_go_files)
@@ -91,7 +87,6 @@ main() {
         echo ""
     fi
 
-    # サマリー統計
     echo -e "${YELLOW}${BOLD}📊 プロジェクト全体の統計${NC}"
     echo -e "${CYAN}───────────────────────────────────────────────────────────────────────────────${NC}"
     echo "$files" | xargs go tool scc | grep -E "^Go|^Language|^Estimated"
@@ -113,7 +108,6 @@ main() {
     echo ""
 }
 
-# ツールの確認
 echo -e "${CYAN}🔍 必要なツールを確認中...${NC}"
 
 # sccがインストールされているか確認
@@ -123,7 +117,6 @@ if ! command -v go tool scc &> /dev/null; then
     exit 1
 fi
 
-# オプショナルツールの確認
 tools_status="ツール状態: "
 if command -v go tool gocognit &> /dev/null; then
     tools_status="${tools_status}${GREEN}✅${NC} gocognit "
@@ -140,5 +133,6 @@ fi
 echo -e "$tools_status"
 echo ""
 
-# メイン処理実行
 main
+
+exit 0
