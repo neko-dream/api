@@ -72,6 +72,28 @@ steps:
     bind:
       session1: current.res.body
 
+  createHideTopTalkSession:
+    desc: トップ非表示セッション作成
+    req:
+      /talksessions:
+        post:
+          body:
+            multipart/form-data:
+              theme: "トップ非表示セッション"
+              description: "トップ非表示の説明文です"
+              scheduledEndTime: "2100-12-31T23:59:59Z"
+              prefecture: "{{ vars.prefecture }}"
+              city: "{{ vars.city }}"
+              restrictions: '["demographics.prefecture","demographics.city"]'
+              hideTop: "true"
+    test: |
+      current.res.status == 200 &&
+      current.res.body.theme == 'トップ非表示セッション' &&
+      current.res.body.description == 'トップ非表示の説明文です' &&
+      current.res.body.owner.displayID == 'talk_session_test'
+    bind:
+      hideTopSession1: current.res.body
+
   loginUser2:
     desc: ユーザー2ログイン
     req:
@@ -112,6 +134,28 @@ steps:
     bind:
       createTalkSession2: current.res.body
 
+  createHideTopTalkSession2:
+    desc: トップ非表示セッション2作成
+    req:
+      /talksessions:
+        post:
+          body:
+            multipart/form-data:
+              theme: "トップ非表示セッション2"
+              description: "トップ非表示の説明文です"
+              scheduledEndTime: "2100-12-31T23:59:59Z"
+              prefecture: "{{ vars.prefecture }}"
+              city: "{{ vars.city }}"
+              restrictions: '["demographics.prefecture","demographics.city"]'
+              hideTop: "true"
+    test: |
+      current.res.status == 200 &&
+      current.res.body.theme == 'トップ非表示セッション2' &&
+      current.res.body.description == 'トップ非表示の説明文です' &&
+      current.res.body.owner.displayID == 'talk_session_test2'
+    bind:
+      hideTopSession1: current.res.body
+
   getTalkSessionList:
     desc: セッション一覧取得
     req:
@@ -149,20 +193,31 @@ steps:
             offset: 0
     test: |
       current.res.status == 200 &&
-      len(current.res.body.talkSessions) == 1 &&
-      current.res.body.talkSessions[0].talkSession.theme == vars.theme &&
-      current.res.body.talkSessions[0].talkSession.owner.displayID == vars.id
+      // hideTop:trueのセッションも含めて2件取得できる
+      len(current.res.body.talkSessions) == 2 &&
+      // 最新のセッションが先頭に来るのでid指定のセッションは2番目
+      current.res.body.talkSessions[1].talkSession.theme == vars.theme &&
+      current.res.body.talkSessions[1].talkSession.owner.displayID == vars.id
 
   getTalkSessionListByMe:
     desc: 自分のセッション一覧取得
     req:
-      /talksessions/opened:
+      /talksessions/opened?limit=10&offset=0:
         get:
-          query:
-            limit: 10
-            offset: 0
+          headers: null
     test: |
       current.res.status == 200 &&
-      len(current.res.body.talkSessions) == 1 &&
-      current.res.body.talkSessions[0].talkSession.theme == vars.theme2 &&
-      current.res.body.talkSessions[0].talkSession.owner.displayID == vars.id2
+      // hideTop:trueのセッションも含めて2件取得できる
+      len(current.res.body.talkSessions) == 2 &&
+      current.res.body.talkSessions[1].talkSession.theme == vars.theme2 &&
+      current.res.body.talkSessions[1].talkSession.owner.displayID == vars.id2
+
+  getTalkSessionListOverOffset:
+    desc: セッション一覧取得（offset超過）
+    req:
+      /talksessions?limit=10&offset=10:
+        get:
+          headers: null
+    test: |
+      current.res.status == 200 &&
+      len(current.res.body.talkSessions) == 0
