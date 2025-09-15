@@ -90,6 +90,6 @@ jobs:
         with:
           config: .octoconv.yml
         env:
-          OCTOCOV_GITHUB_REF: "{{ github.ref }}"
+          OCTOCOV_GITHUB_REF: "${{ github.ref }}"
           OCTOCOV_GITHUB_SHA: none
           OCTOCOV_CUSTOM_METRICS_BENCHMARK: custom_metrics_runn.json
