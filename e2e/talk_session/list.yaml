@@ -115,10 +115,9 @@ steps:
   getTalkSessionList:
     desc: セッション一覧取得
     req:
-      /talksessions:
+      /talksessions?limit=10&offset=0&theme={{ vars.theme }}:
         get:
-          query:
-            theme: "{{ vars.theme }}"
+          headers: null
     test: |
       current.res.status == 200 &&
       len(current.res.body.talkSessions) == 2 &&

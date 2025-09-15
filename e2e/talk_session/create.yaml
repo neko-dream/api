@@ -58,6 +58,7 @@ steps:
               prefecture: "{{ vars.prefecture }}"
               city: "{{ vars.city }}"
               restrictions: '["demographics.prefecture","demographics.city"]'
+              showTop: true
     test: |
       current.res.status == 200 &&
       current.res.body.theme == 'テストセッション' &&
@@ -69,10 +70,9 @@ steps:
   getTalkSessionList:
     desc: トークセッション一覧取得
     req:
-      /talksessions:
+      /talksessions?theme={{ vars.theme }}:
         get:
-          query:
-            theme: "{{ vars.theme }}"
+          headers: null
     test: |
       current.res.status == 200 &&
       len(current.res.body.talkSessions) > 0 &&
