@@ -13,8 +13,8 @@ import (
 	context "context"
 	reflect "reflect"
 
-	organization "github.com/neko-dream/server/internal/domain/model/organization"
-	shared "github.com/neko-dream/server/internal/domain/model/shared"
+	organization "github.com/neko-dream/api/internal/domain/model/organization"
+	shared "github.com/neko-dream/api/internal/domain/model/shared"
 	gomock "go.uber.org/mock/gomock"
 )
 

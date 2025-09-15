@@ -6,8 +6,8 @@ import (
 	"fmt"
 
 	"braces.dev/errtrace"
-	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
-	"github.com/neko-dream/server/pkg/utils"
+	model "github.com/neko-dream/api/internal/infrastructure/persistence/sqlc/generated"
+	"github.com/neko-dream/api/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 

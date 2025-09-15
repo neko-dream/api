@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/neko-dream/server/internal/domain/model/consent"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/api/internal/domain/model/consent"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/user"
 	"go.opentelemetry.io/otel"
 )
 

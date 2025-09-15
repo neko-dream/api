@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/neko-dream/api/pkg/utils"
 	"github.com/samber/lo"
 )
 

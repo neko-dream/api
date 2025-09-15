@@ -1,4 +1,4 @@
-module github.com/neko-dream/server
+module github.com/neko-dream/api
 
 go 1.24.3
 

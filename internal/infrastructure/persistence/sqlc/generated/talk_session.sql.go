@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/neko-dream/server/internal/domain/model/talksession"
+	"github.com/neko-dream/api/internal/domain/model/talksession"
 )
 
 const countTalkSessions = `-- name: CountTalkSessions :one

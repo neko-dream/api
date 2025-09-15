@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/neko-dream/api/internal/domain/messages"
+	"github.com/neko-dream/api/pkg/utils"
 	onerror "github.com/ogen-go/ogen/ogenerrors"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"

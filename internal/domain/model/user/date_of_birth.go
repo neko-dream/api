@@ -3,7 +3,7 @@ package user
 import (
 	"context"
 
-	"github.com/neko-dream/server/internal/domain/model/clock"
+	"github.com/neko-dream/api/internal/domain/model/clock"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )

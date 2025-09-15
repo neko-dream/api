@@ -3,7 +3,7 @@ package cookie
 import (
 	"net/http"
 
-	"github.com/neko-dream/server/internal/infrastructure/config"
+	"github.com/neko-dream/api/internal/infrastructure/config"
 )
 
 const (

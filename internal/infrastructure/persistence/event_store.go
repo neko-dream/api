@@ -8,10 +8,10 @@ import (
 	"time"
 
 	"braces.dev/errtrace"
-	"github.com/neko-dream/server/internal/domain/model/event"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
-	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
+	"github.com/neko-dream/api/internal/domain/model/event"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
+	model "github.com/neko-dream/api/internal/infrastructure/persistence/sqlc/generated"
 	"go.opentelemetry.io/otel"
 )
 

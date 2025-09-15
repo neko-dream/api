@@ -5,10 +5,10 @@ import (
 	"mime/multipart"
 
 	"braces.dev/errtrace"
-	"github.com/neko-dream/server/internal/domain/model/image"
-	"github.com/neko-dream/server/internal/domain/model/image/meta"
-	"github.com/neko-dream/server/internal/infrastructure/config"
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/neko-dream/api/internal/domain/model/image"
+	"github.com/neko-dream/api/internal/domain/model/image/meta"
+	"github.com/neko-dream/api/internal/infrastructure/config"
+	"github.com/neko-dream/api/pkg/utils"
 	"github.com/samber/lo"
 
 	"github.com/aws/aws-sdk-go-v2/aws"

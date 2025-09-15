@@ -5,13 +5,13 @@ import (
 	"errors"
 
 	"github.com/jinzhu/copier"
-	"github.com/neko-dream/server/internal/application/query/analysis_query"
-	"github.com/neko-dream/server/internal/application/query/dto"
-	"github.com/neko-dream/server/internal/domain/model/analysis"
-	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
-	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
-	dto_mapper "github.com/neko-dream/server/internal/infrastructure/persistence/utils"
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/neko-dream/api/internal/application/query/analysis_query"
+	"github.com/neko-dream/api/internal/application/query/dto"
+	"github.com/neko-dream/api/internal/domain/model/analysis"
+	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
+	model "github.com/neko-dream/api/internal/infrastructure/persistence/sqlc/generated"
+	dto_mapper "github.com/neko-dream/api/internal/infrastructure/persistence/utils"
+	"github.com/neko-dream/api/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 

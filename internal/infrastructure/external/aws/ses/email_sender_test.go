@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/neko-dream/server/internal/infrastructure/config"
-	email_template "github.com/neko-dream/server/internal/infrastructure/email/template"
+	"github.com/neko-dream/api/internal/infrastructure/config"
+	email_template "github.com/neko-dream/api/internal/infrastructure/email/template"
 )
 
 func TestSESEmailSender_Send(t *testing.T) {

@@ -9,7 +9,7 @@ import (
 
 	"github.com/h2non/filetype"
 	"github.com/h2non/filetype/types"
-	"github.com/neko-dream/server/internal/domain/messages"
+	"github.com/neko-dream/api/internal/domain/messages"
 	"github.com/samber/lo"
 
 	_ "image/gif"

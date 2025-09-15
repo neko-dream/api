@@ -3,7 +3,7 @@ package user_query
 import (
 	"context"
 
-	"github.com/neko-dream/server/internal/application/query/dto"
+	"github.com/neko-dream/api/internal/application/query/dto"
 )
 
 type (

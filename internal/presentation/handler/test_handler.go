@@ -3,8 +3,8 @@ package handler
 import (
 	"context"
 
-	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
-	"github.com/neko-dream/server/internal/presentation/oas"
+	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
+	"github.com/neko-dream/api/internal/presentation/oas"
 	"go.opentelemetry.io/otel"
 )
 

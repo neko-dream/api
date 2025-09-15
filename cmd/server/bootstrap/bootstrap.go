@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/neko-dream/server/internal/application/event_processor"
-	"github.com/neko-dream/server/internal/infrastructure/config"
-	"github.com/neko-dream/server/internal/infrastructure/di"
-	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
+	"github.com/neko-dream/api/internal/application/event_processor"
+	"github.com/neko-dream/api/internal/infrastructure/config"
+	"github.com/neko-dream/api/internal/infrastructure/di"
+	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
 	"go.uber.org/dig"
 )
 

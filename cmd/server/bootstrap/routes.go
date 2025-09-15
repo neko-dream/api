@@ -3,10 +3,10 @@ package bootstrap
 import (
 	"net/http"
 
-	"github.com/neko-dream/server/internal/infrastructure/di"
-	"github.com/neko-dream/server/internal/infrastructure/http/middleware"
-	"github.com/neko-dream/server/internal/presentation/handler"
-	"github.com/neko-dream/server/internal/presentation/oas"
+	"github.com/neko-dream/api/internal/infrastructure/di"
+	"github.com/neko-dream/api/internal/infrastructure/http/middleware"
+	"github.com/neko-dream/api/internal/presentation/handler"
+	"github.com/neko-dream/api/internal/presentation/oas"
 	"github.com/rs/cors"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )

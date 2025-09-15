@@ -3,9 +3,9 @@ package talksession_query
 import (
 	"context"
 
-	"github.com/neko-dream/server/internal/application/query/talksession"
-	"github.com/neko-dream/server/internal/domain/model/talksession/talksession_consent"
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/neko-dream/api/internal/application/query/talksession"
+	"github.com/neko-dream/api/internal/domain/model/talksession/talksession_consent"
+	"github.com/neko-dream/api/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 

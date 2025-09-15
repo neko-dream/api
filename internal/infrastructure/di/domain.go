@@ -1,9 +1,9 @@
 package di
 
 import (
-	"github.com/neko-dream/server/internal/domain/model/talksession/talksession_consent"
-	"github.com/neko-dream/server/internal/domain/service"
-	organization_svc "github.com/neko-dream/server/internal/domain/service/organization"
+	"github.com/neko-dream/api/internal/domain/model/talksession/talksession_consent"
+	"github.com/neko-dream/api/internal/domain/service"
+	organization_svc "github.com/neko-dream/api/internal/domain/service/organization"
 )
 
 // このファイルはドメイン層（サービス等）のコンストラクタを管理します。

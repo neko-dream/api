@@ -14,10 +14,10 @@ import (
 	multipart "mime/multipart"
 	reflect "reflect"
 
-	image "github.com/neko-dream/server/internal/domain/model/image"
-	meta "github.com/neko-dream/server/internal/domain/model/image/meta"
-	shared "github.com/neko-dream/server/internal/domain/model/shared"
-	user "github.com/neko-dream/server/internal/domain/model/user"
+	image "github.com/neko-dream/api/internal/domain/model/image"
+	meta "github.com/neko-dream/api/internal/domain/model/image/meta"
+	shared "github.com/neko-dream/api/internal/domain/model/shared"
+	user "github.com/neko-dream/api/internal/domain/model/user"
 	gomock "go.uber.org/mock/gomock"
 )
 

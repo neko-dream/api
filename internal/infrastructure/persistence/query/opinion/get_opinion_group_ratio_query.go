@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/neko-dream/server/internal/application/query/dto"
-	opinion_query "github.com/neko-dream/server/internal/application/query/opinion"
-	"github.com/neko-dream/server/internal/domain/model/analysis"
-	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
+	"github.com/neko-dream/api/internal/application/query/dto"
+	opinion_query "github.com/neko-dream/api/internal/application/query/opinion"
+	"github.com/neko-dream/api/internal/domain/model/analysis"
+	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
 	"go.opentelemetry.io/otel"
 )
 

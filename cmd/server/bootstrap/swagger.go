@@ -3,7 +3,7 @@ package bootstrap
 import (
 	"net/http"
 
-	"github.com/neko-dream/server/internal/infrastructure/config"
+	"github.com/neko-dream/api/internal/infrastructure/config"
 	"github.com/swaggest/swgui"
 	"github.com/swaggest/swgui/v5emb"
 )

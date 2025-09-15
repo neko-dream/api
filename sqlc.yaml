@@ -11,11 +11,11 @@ sql:
         overrides:
           - column: "talk_sessions.restrictions"
             go_type:
-              import: "github.com/neko-dream/server/internal/domain/model/talksession"
+              import: "github.com/neko-dream/api/internal/domain/model/talksession"
               type: "Restrictions"
           - column: "talksession_consents.restrictions"
             go_type:
-              import: "github.com/neko-dream/server/internal/domain/model/talksession"
+              import: "github.com/neko-dream/api/internal/domain/model/talksession"
               type: "Restrictions"
           - column: "notification_preferences.quiet_hours_start"
             go_type:

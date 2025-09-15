@@ -3,7 +3,7 @@ package bootstrap
 import (
 	"testing"
 
-	"github.com/neko-dream/server/internal/infrastructure/config"
+	"github.com/neko-dream/api/internal/infrastructure/config"
 	"github.com/stretchr/testify/assert"
 )
 

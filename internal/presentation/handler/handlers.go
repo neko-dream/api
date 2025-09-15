@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/neko-dream/server/internal/presentation/oas"
+	"github.com/neko-dream/api/internal/presentation/oas"
 )
 
 type handlers struct {

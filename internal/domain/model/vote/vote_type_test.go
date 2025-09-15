@@ -3,7 +3,7 @@ package vote_test
 import (
 	"testing"
 
-	"github.com/neko-dream/server/internal/domain/model/vote"
+	"github.com/neko-dream/api/internal/domain/model/vote"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 )

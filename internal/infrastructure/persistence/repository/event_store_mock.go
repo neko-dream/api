@@ -3,8 +3,8 @@ package repository
 import (
 	"context"
 
-	"github.com/neko-dream/server/internal/domain/model/event"
-	"github.com/neko-dream/server/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/event"
+	"github.com/neko-dream/api/internal/domain/model/shared"
 	"go.opentelemetry.io/otel"
 )
 

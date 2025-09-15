@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/neko-dream/server/internal/application/query/dto"
+	"github.com/neko-dream/api/internal/application/query/dto"
 	"github.com/samber/lo"
 )
 

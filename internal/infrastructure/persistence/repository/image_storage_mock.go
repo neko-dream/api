@@ -4,8 +4,8 @@ import (
 	"context"
 	"mime/multipart"
 
-	"github.com/neko-dream/server/internal/domain/model/image"
-	"github.com/neko-dream/server/internal/domain/model/image/meta"
+	"github.com/neko-dream/api/internal/domain/model/image"
+	"github.com/neko-dream/api/internal/domain/model/image/meta"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )

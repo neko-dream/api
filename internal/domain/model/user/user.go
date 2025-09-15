@@ -7,9 +7,9 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/pkg/random"
+	"github.com/neko-dream/api/internal/domain/messages"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/pkg/random"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
