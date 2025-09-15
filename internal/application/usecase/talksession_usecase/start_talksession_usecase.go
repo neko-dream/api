@@ -39,6 +39,7 @@ type (
 		Restrictions        []string
 		SessionClaim        *session.Claim // セッション情報を追加
 		OrganizationAliasID *shared.UUID[organization.OrganizationAlias]
+		ShowTop             *bool // トップに表示するかどうか
 	}
 
 	StartTalkSessionUseCaseOutput struct {
@@ -127,7 +128,7 @@ func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSe
 		return output, errtrace.Wrap(err)
 	}
 
-	if err := i.ExecTx(ctx, func(ctx context.Context) error {
+	if err := i.DBManager.ExecTx(ctx, func(ctx context.Context) error {
 		talkSessionID := shared.NewUUID[talksession.TalkSession]()
 		var location *talksession.Location
 		if input.Latitude != nil && input.Longitude != nil {
@@ -151,6 +152,7 @@ func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSe
 			location,
 			input.City,
 			input.Prefecture,
+			lo.FromPtrOr(input.ShowTop, true),
 			organizationID,
 			organizationAliasID,
 		)

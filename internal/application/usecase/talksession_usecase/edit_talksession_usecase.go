@@ -35,6 +35,7 @@ type (
 		Longitude        *float64                             // 経度
 		City             *string                              // 市区町村
 		Prefecture       *string                              // 都道府県
+		ShowTop          *bool                                // トップに表示するかどうか
 	}
 
 	EditTalkSessionOutput struct {
@@ -117,6 +118,9 @@ func (i *editTalkSessionHandler) Execute(ctx context.Context, input EditTalkSess
 				*input.Latitude,
 				*input.Longitude,
 			))
+		}
+		if input.ShowTop != nil {
+			talkSession.ChangeShowTop(*input.ShowTop)
 		}
 
 		if err := i.TalkSessionRepository.Update(ctx, talkSession); err != nil {
