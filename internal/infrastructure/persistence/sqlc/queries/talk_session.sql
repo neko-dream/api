@@ -68,7 +68,7 @@ LEFT JOIN organization_aliases
     ON ts.organization_alias_id = organization_aliases.alias_id
 LEFT JOIN talk_session_locations
     ON ts.talk_session_id = talk_session_locations.talk_session_id
-WHERE ts.talk_session_id = $1
+WHERE ts.talk_session_id = $1;
 
 -- name: ListTalkSessions :many
 SELECT
