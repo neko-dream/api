@@ -68,7 +68,7 @@ LEFT JOIN organization_aliases
     ON ts.organization_alias_id = organization_aliases.alias_id
 LEFT JOIN talk_session_locations
     ON ts.talk_session_id = talk_session_locations.talk_session_id
-WHERE ts.talk_session_id = $1;
+WHERE ts.talk_session_id = $1
 
 -- name: ListTalkSessions :many
 SELECT
@@ -115,6 +115,7 @@ LEFT JOIN organization_aliases
 LEFT JOIN talk_session_locations
     ON ts.talk_session_id = talk_session_locations.talk_session_id
 WHERE
+    ts.hide_top = FALSE AND
     CASE sqlc.narg('status')::text
         WHEN 'finished' THEN ts.scheduled_end_time <= now()
         WHEN 'open' THEN ts.scheduled_end_time > now()
@@ -168,6 +169,7 @@ LEFT JOIN talk_session_locations
 LEFT JOIN votes
     ON votes.talk_session_id = talk_sessions.talk_session_id
 WHERE
+    talk_sessions.hide_top = FALSE AND
     CASE
         WHEN sqlc.narg('user_id')::uuid IS NOT NULL
             THEN votes.user_id = sqlc.narg('user_id')::uuid
@@ -185,46 +187,6 @@ WHERE
         THEN talk_sessions.theme LIKE '%' || sqlc.narg('theme')::text || '%'
         ELSE TRUE
     END;
-
--- name: GetOwnTalkSessionByUserID :many
-SELECT
-    sqlc.embed(ts),
-    COALESCE(oc.opinion_count, 0) AS opinion_count,
-    sqlc.embed(users),
-    COALESCE(organization_aliases.alias_name, '') AS alias_name,
-    COALESCE(organization_aliases.alias_id, '00000000-0000-0000-0000-000000000000'::uuid) AS alias_id,
-    COALESCE(organization_aliases.organization_id, '00000000-0000-0000-0000-000000000000'::uuid) AS organization_id,
-    COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
-    COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude
-FROM talk_sessions ts
-LEFT JOIN (
-    SELECT talk_session_id, COUNT(opinion_id) AS opinion_count
-    FROM opinions
-    GROUP BY talk_session_id
-) oc ON  oc.talk_session_id = ts.talk_session_id
-LEFT JOIN users
-    ON ts.owner_id = users.user_id
-LEFT JOIN talk_session_locations
-    ON talk_session_locations.talk_session_id = ts.talk_session_id
-LEFT JOIN organization_aliases
-    ON ts.organization_alias_id = organization_aliases.alias_id
-WHERE
-    users.display_id = sqlc.narg('display_id')::text
-    AND
-    CASE sqlc.narg('status')::text
-        WHEN 'finished' THEN ts.scheduled_end_time <= now()
-        WHEN 'open' THEN ts.scheduled_end_time > now()
-        ELSE TRUE
-    END
-    AND
-    CASE
-        WHEN sqlc.narg('theme')::text IS NOT NULL
-            THEN ts.theme LIKE '%' || sqlc.narg('theme')::text || '%'
-        ELSE TRUE
-    END
-GROUP BY ts.talk_session_id, oc.opinion_count, users.user_id, users.display_name, users.display_id, users.icon_url, talk_session_locations.talk_session_id
-ORDER BY ts.created_at DESC
-LIMIT sqlc.narg('limit') OFFSET sqlc.narg('offset');
 
 -- name: GetOwnTalkSessionByDisplayIDWithCount :many
 WITH filtered_sessions AS (
