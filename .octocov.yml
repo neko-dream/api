@@ -1,3 +1,4 @@
+repository: neko-dream/api
 coverage:
   paths:
     - coverage.out
@@ -14,7 +15,10 @@ testExecutionTime:
   if: true
 report:
   datastores:
-    - local://main
+    - artifact://${GITHUB_REPOSITORY}
+diff:
+  datastores:
+    - artifact://${GITHUB_REPOSITORY}
 comment:
   if: is_pull_request
 summary:
