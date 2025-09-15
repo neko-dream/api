@@ -9,6 +9,8 @@ import (
 	"github.com/neko-dream/server/internal/presentation/oas"
 )
 
+// Deprecated: utils.ToPtrIf を使用すること
+// ToPtrIfNotNullValue の場合は、nullFlagがtrueの場合にnilを返す
 func ToPtrIfNotNullValue[T any](nullFlag bool, value T) *T {
 	if nullFlag {
 		return nil
@@ -24,6 +26,15 @@ func ToPtrIfNotNullFunc[T any](nullFlag bool, getValue func() *T) *T {
 	return val
 }
 
+// ToOpt ポインタ型をoas.OptXXX型に変換する
+// code:
+//
+//	str := lo.ToPtr("example")
+//	optStr := utils.ToOpt[oas.OptString](str) // oas.OptString{Value: "example", Set: true}
+//	str = nil
+//	optStr = utils.ToOpt[oas.OptString](str) // oas.OptString{Set: false}
+//	num := 29
+//	optNum := utils.ToOpt[oas.OptInt](num) // oas.OptInt{Value: 29, Set: true}
 func ToOpt[O any](v any) O {
 	switch val := v.(type) {
 	case *string:
