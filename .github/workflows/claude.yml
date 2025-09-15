@@ -50,14 +50,15 @@ jobs:
 
       - name: Run Claude Code
         id: claude
-        uses: anthropics/claude-code-action@beta
+        uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           additional_permissions: |
             actions: read
-          model: "claude-opus-4-20250514"
-          allowed_tools: "Bash(bash:*),Bash(git:*),Bash(gh:*),Bash(go:*),Bash(ginkgo:*),Bash(./scripts/*)"
-          direct_prompt: |
+          claude_args: |
+            --allowedTools "Bash(bash:*),Bash(git:*),Bash(gh:*),Bash(go:*),Bash(ginkgo:*),Bash(./scripts/*)"
+            model: "claude-opus-4-20250514"
+          prompt: |
             ## プロジェクト固有のルール
             1. TypeSpecやSQL定義を変更した場合は必ず `./scripts/gen.sh` を実行してください
             2. 新機能実装時はTDDアプローチを採用し、テストから書き始めてください
