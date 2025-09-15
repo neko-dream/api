@@ -69,6 +69,7 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 					nil,
 					nil,
 					nil,
+					true,
 					nil, // organizationID
 					nil, // organizationAliasID
 				)
@@ -108,6 +109,7 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 						30.0,
 					),
 					nil, nil,
+					true,
 					nil, // organizationID
 					nil, // organizationAliasID
 				)
@@ -150,6 +152,7 @@ func TestTalkSessionRepository_Create(t *testing.T) {
 					nil,
 					nil,
 					nil,
+					true,
 					nil, // organizationID
 					nil, // organizationAliasID
 				)
