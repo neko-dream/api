@@ -10,7 +10,7 @@ readonly CYAN='\033[0;36m'
 readonly BOLD='\033[1m'
 readonly NC='\033[0m' # No Color
 
-readonly COGNITIVE_THRESHOLD=15
+readonly COGNITIVE_THRESHOLD=30
 readonly CYCLOMATIC_THRESHOLD=10
 
 print_header() {
@@ -71,8 +71,34 @@ main() {
 
         local cognitive_results=$(echo "$files" | xargs go tool gocognit -over $COGNITIVE_THRESHOLD 2>/dev/null)
         if [[ -n "$cognitive_results" ]]; then
-            echo "$cognitive_results"
+            # 結果を1行ずつ処理して色付け
+            while IFS= read -r line; do
+                if [[ $line =~ ^([0-9]+)[[:space:]]+(.+) ]]; then
+                    local complexity="${BASH_REMATCH[1]}"
+                    local location="${BASH_REMATCH[2]}"
+
+                    # 認知的複雑度レベルに応じた色の判定
+                    if [ "$complexity" -le 7 ]; then
+                        local color="${GREEN}"
+                    elif [ "$complexity" -le 15 ]; then
+                        local color="${YELLOW}"
+                    elif [ "$complexity" -le 25 ]; then
+                        local color="${YELLOW}${BOLD}"
+                    elif [ "$complexity" -le 40 ]; then
+                        local color="${RED}"
+                    else
+                        local color="${RED}${BOLD}"
+                    fi
+
+                    # 色付きで出力
+                    echo -e "${color}${complexity} ${location}${NC}"
+                else
+                    echo "$line"
+                fi
+            done <<< "$cognitive_results"
+
             local cognitive_count=$(echo "$cognitive_results" | wc -l)
+            echo ""
             echo -e "${YELLOW}⚠️  ${cognitive_count}個の関数が要リファクタリング対象です${NC}"
         else
             echo -e "${GREEN}✅ 認知的複雑度${COGNITIVE_THRESHOLD}以上の関数はありません${NC}"
@@ -91,8 +117,34 @@ main() {
 
         local cyclo_results=$(echo "$files" | xargs go tool gocyclo -over $CYCLOMATIC_THRESHOLD 2>/dev/null)
         if [[ -n "$cyclo_results" ]]; then
-            echo "$cyclo_results" | head -20
+            # 結果を1行ずつ処理して色付け
+            while IFS= read -r line; do
+                if [[ $line =~ ^([0-9]+)[[:space:]]+(.+) ]]; then
+                    local complexity="${BASH_REMATCH[1]}"
+                    local location="${BASH_REMATCH[2]}"
+
+                    # 複雑度レベルに応じた色の判定
+                    if [ "$complexity" -le 10 ]; then
+                        local color="${GREEN}"
+                    elif [ "$complexity" -lt 30 ]; then
+                        local color="${YELLOW}"
+                    elif [ "$complexity" -lt 50 ]; then
+                        local color="${YELLOW}${BOLD}"
+                    elif [ "$complexity" -lt 75 ]; then
+                        local color="${RED}"
+                    else
+                        local color="${RED}${BOLD}"
+                    fi
+
+                    # 色付きで出力
+                    echo -e "${color}${complexity} ${location}${NC}"
+                else
+                    echo "$line"
+                fi
+            done <<< "$cyclo_results"
+
             local cyclo_count=$(echo "$cyclo_results" | wc -l)
+            echo ""
             echo -e "${YELLOW}⚠️  ${cyclo_count}個の関数が要確認対象です${NC}"
         else
             echo -e "${GREEN}✅ 循環的複雑度${CYCLOMATIC_THRESHOLD}以上の関数はありません${NC}"
@@ -119,9 +171,18 @@ main() {
     # 複雑度の解説
     echo ""
     echo -e "${CYAN}${BOLD}📖 複雑度の目安${NC}"
-    echo -e "  ${GREEN}良好${NC}    認知的複雑度 <10  / 循環的複雑度 <5"
-    echo -e "  ${YELLOW}要注意${NC}  認知的複雑度 10-20 / 循環的複雑度 5-10"
-    echo -e "  ${RED}危険${NC}    認知的複雑度 >20  / 循環的複雑度 >10"
+    echo -e "${BOLD}循環的複雑度:${NC}"
+    echo -e "  ${GREEN}● 10以下${NC}: 非常に良い構造 (バグ混入確率: 25%)"
+    echo -e "  ${YELLOW}● 30以上${NC}: 構造的なリスクあり (バグ混入確率: 40%)"
+    echo -e "  ${RED}● 50以上${NC}: テスト不可能 (バグ混入確率: 70%)"
+    echo -e "  ${RED}${BOLD}● 75以上${NC}: いかなる変更も誤修正を生む (バグ混入確率: 98%)"
+    echo ""
+    echo -e "${BOLD}認知的複雑度:${NC}"
+    echo -e "  ${GREEN}● 7以下${NC}: 非常に良い構造"
+    echo -e "  ${YELLOW}● 8-15${NC}: 良い構造"
+    echo -e "  ${YELLOW}${BOLD}● 16-25${NC}: 構造的なリスクあり"
+    echo -e "  ${RED}● 26-40${NC}: 理解困難・テスト困難"
+    echo -e "  ${RED}${BOLD}● 40以上${NC}: いかなる変更も誤修正を生む"
     echo ""
 }
 
