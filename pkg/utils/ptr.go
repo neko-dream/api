@@ -1,8 +1,11 @@
 package utils
 
 import (
+	"database/sql"
 	"net/url"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/neko-dream/server/internal/presentation/oas"
 )
 
@@ -89,6 +92,95 @@ func ToOptNil[O any](v any) O {
 		} else {
 			return any(oas.OptNilBool{Value: *val, Set: true}).(O)
 		}
+	default:
+		var zero O
+		return zero
+	}
+}
+
+// ToSQLNull ポインタ型をsql.NullXXX型に変換する
+// code:
+//
+//	str := lo.ToPtr("example")
+//	nullStr := utils.ToSQLNull[sql.NullString](str) // sql.NullString{String: "example", Valid: true}
+//	str = nil
+//	nullStr = utils.ToSQLNull[sql.NullString](str) // sql.NullString{Valid: false}
+//	num := 29
+//	nullNum := utils.ToSQLNull[sql.NullInt32](num) // sql.NullInt32{Int32: 29, Valid: true}
+func ToSQLNull[O any](v any) O {
+	switch val := v.(type) {
+	case *string:
+		if val == nil {
+			return any(sql.NullString{}).(O)
+		} else {
+			return any(sql.NullString{String: *val, Valid: true}).(O)
+		}
+	case string:
+		return any(sql.NullString{String: val, Valid: true}).(O)
+	case *int:
+		if val == nil {
+			return any(sql.NullInt32{}).(O)
+		} else {
+			return any(sql.NullInt32{Int32: int32(*val), Valid: true}).(O)
+		}
+	case int:
+		return any(sql.NullInt32{Int32: int32(val), Valid: true}).(O)
+	case *int32:
+		if val == nil {
+			return any(sql.NullInt32{}).(O)
+		} else {
+			return any(sql.NullInt32{Int32: *val, Valid: true}).(O)
+		}
+	case int32:
+		return any(sql.NullInt32{Int32: val, Valid: true}).(O)
+	case *int64:
+		if val == nil {
+			return any(sql.NullInt64{}).(O)
+		} else {
+			return any(sql.NullInt64{Int64: *val, Valid: true}).(O)
+		}
+	case int64:
+		return any(sql.NullInt64{Int64: val, Valid: true}).(O)
+	case *bool:
+		if val == nil {
+			return any(sql.NullBool{}).(O)
+		} else {
+			return any(sql.NullBool{Bool: *val, Valid: true}).(O)
+		}
+	case bool:
+		return any(sql.NullBool{Bool: val, Valid: true}).(O)
+	case *float32:
+		if val == nil {
+			return any(sql.NullFloat64{}).(O)
+		} else {
+			return any(sql.NullFloat64{Float64: float64(*val), Valid: true}).(O)
+		}
+	case float32:
+		return any(sql.NullFloat64{Float64: float64(val), Valid: true}).(O)
+	case *float64:
+		if val == nil {
+			return any(sql.NullFloat64{}).(O)
+		} else {
+			return any(sql.NullFloat64{Float64: *val, Valid: true}).(O)
+		}
+	case float64:
+		return any(sql.NullFloat64{Float64: val, Valid: true}).(O)
+	case *time.Time:
+		if val == nil {
+			return any(sql.NullTime{}).(O)
+		} else {
+			return any(sql.NullTime{Time: *val, Valid: true}).(O)
+		}
+	case time.Time:
+		return any(sql.NullTime{Time: val, Valid: true}).(O)
+	case *uuid.UUID:
+		if val == nil {
+			return any(uuid.NullUUID{}).(O)
+		} else {
+			return any(uuid.NullUUID{UUID: *val, Valid: true}).(O)
+		}
+	case uuid.UUID:
+		return any(uuid.NullUUID{UUID: val, Valid: true}).(O)
 	default:
 		var zero O
 		return zero
