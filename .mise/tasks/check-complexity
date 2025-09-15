@@ -52,11 +52,11 @@ main() {
     echo ""
 
     # 認知的複雑度分析（gocognit）
-    if command -v gocognit &> /dev/null; then
+    if command -v go tool gocognit &> /dev/null; then
         echo -e "${MAGENTA}${BOLD}🧠 認知的複雑度が高い関数（${COGNITIVE_THRESHOLD}以上）${NC}"
         echo -e "${CYAN}───────────────────────────────────────────────────────────────────────────────${NC}"
 
-        local cognitive_results=$(echo "$files" | xargs gocognit -over $COGNITIVE_THRESHOLD 2>/dev/null)
+        local cognitive_results=$(echo "$files" | xargs go tool gocognit -over $COGNITIVE_THRESHOLD 2>/dev/null)
         if [[ -n "$cognitive_results" ]]; then
             echo "$cognitive_results"
             local cognitive_count=$(echo "$cognitive_results" | wc -l)
@@ -67,16 +67,16 @@ main() {
         echo ""
     else
         echo -e "${YELLOW}⚠️  gocognitがインストールされていません（認知的複雑度分析をスキップ）${NC}"
-        echo -e "${YELLOW}   インストール方法: go install github.com/uudashr/gocognit/cmd/gocognit@latest${NC}"
+        echo -e "${YELLOW}   インストール方法: go get tool${NC}"
         echo ""
     fi
 
     # 循環的複雑度分析（gocyclo）
-    if command -v gocyclo &> /dev/null; then
+    if command -v go tool gocyclo &> /dev/null; then
         echo -e "${BLUE}${BOLD}🔄 循環的複雑度が高い関数（${CYCLOMATIC_THRESHOLD}以上）${NC}"
         echo -e "${CYAN}───────────────────────────────────────────────────────────────────────────────${NC}"
 
-        local cyclo_results=$(echo "$files" | xargs gocyclo -over $CYCLOMATIC_THRESHOLD 2>/dev/null)
+        local cyclo_results=$(echo "$files" | xargs go tool gocyclo -over $CYCLOMATIC_THRESHOLD 2>/dev/null)
         if [[ -n "$cyclo_results" ]]; then
             echo "$cyclo_results" | head -20
             local cyclo_count=$(echo "$cyclo_results" | wc -l)
@@ -87,14 +87,14 @@ main() {
         echo ""
     else
         echo -e "${YELLOW}⚠️  gocycloがインストールされていません（循環的複雑度分析をスキップ）${NC}"
-        echo -e "${YELLOW}   インストール方法: go install github.com/fzipp/gocyclo/cmd/gocyclo@latest${NC}"
+        echo -e "${YELLOW}   インストール方法: go get tool${NC}"
         echo ""
     fi
 
     # サマリー統計
     echo -e "${YELLOW}${BOLD}📊 プロジェクト全体の統計${NC}"
     echo -e "${CYAN}───────────────────────────────────────────────────────────────────────────────${NC}"
-    echo "$files" | xargs scc | grep -E "^Go|^Language|^Estimated"
+    echo "$files" | xargs go tool scc | grep -E "^Go|^Language|^Estimated"
     echo -e "${CYAN}───────────────────────────────────────────────────────────────────────────────${NC}"
 
     # 推奨事項
@@ -117,21 +117,21 @@ main() {
 echo -e "${CYAN}🔍 必要なツールを確認中...${NC}"
 
 # sccがインストールされているか確認
-if ! command -v scc &> /dev/null; then
+if ! command -v go tool scc &> /dev/null; then
     echo -e "${RED}❌ エラー: sccがインストールされていません${NC}"
-    echo -e "${YELLOW}インストール方法: go install github.com/boyter/scc/v3@latest${NC}"
+    echo -e "${YELLOW}インストール方法: go get tool${NC}"
     exit 1
 fi
 
 # オプショナルツールの確認
 tools_status="ツール状態: "
-if command -v gocognit &> /dev/null; then
+if command -v go tool gocognit &> /dev/null; then
     tools_status="${tools_status}${GREEN}✅${NC} gocognit "
 else
     tools_status="${tools_status}${YELLOW}❌${NC} gocognit "
 fi
 
-if command -v gocyclo &> /dev/null; then
+if command -v go tool gocyclo &> /dev/null; then
     tools_status="${tools_status}${GREEN}✅${NC} gocyclo"
 else
     tools_status="${tools_status}${YELLOW}❌${NC} gocyclo"

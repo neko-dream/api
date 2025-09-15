@@ -25,6 +25,7 @@ import (
 type MockImageStorage struct {
 	ctrl     *gomock.Controller
 	recorder *MockImageStorageMockRecorder
+	isgomock struct{}
 }
 
 // MockImageStorageMockRecorder is the mock recorder for MockImageStorage.
@@ -63,6 +64,7 @@ func (mr *MockImageStorageMockRecorder) Upload(arg0, arg1, arg2 any) *gomock.Cal
 type MockImageRepository struct {
 	ctrl     *gomock.Controller
 	recorder *MockImageRepositoryMockRecorder
+	isgomock struct{}
 }
 
 // MockImageRepositoryMockRecorder is the mock recorder for MockImageRepository.

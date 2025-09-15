@@ -10,7 +10,7 @@ import (
 	"go.opentelemetry.io/otel"
 )
 
-//go:generate mockgen -source=$GOFILE -package=mock_${GOPACKAGE}_model -destination=../mock/$GOPACKAGE/$GOFILE
+//go:generate go tool mockgen -source=$GOFILE -package=mock_${GOPACKAGE}_model -destination=../mock/$GOPACKAGE/$GOFILE
 type (
 	ImageStorage interface {
 		Upload(context.Context, meta.ImageMeta, *multipart.FileHeader) (*string, error)
