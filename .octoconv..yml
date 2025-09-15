@@ -1,5 +1,6 @@
 coverage:
-  if: false
+  paths:
+    - coverage.out
 codeToTestRatio:
   codeToTestRatio:
   code:
