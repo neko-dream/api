@@ -87,7 +87,7 @@ jobs:
         continue-on-error: true
         uses: k1LoW/octocov-action@v1
         with:
-          config: .github/resources/.octoconv.runn.yml
+          config: .octoconv.yml
         env:
           OCTOCOV_GITHUB_REF: "{{ github.ref }}"
           OCTOCOV_GITHUB_SHA: none
