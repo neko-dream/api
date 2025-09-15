@@ -11,5 +11,8 @@
         "getsentry",
         "kotohiro",
         "talksession"
-    ]
+    ],
+    "gopls": {
+        "buildFlags": ["-tags=generate"]
+    }
 }

@@ -60,7 +60,7 @@ jobs:
             model: "claude-opus-4-20250514"
           prompt: |
             ## プロジェクト固有のルール
-            1. TypeSpecやSQL定義を変更した場合は必ず `./scripts/gen.sh` を実行してください
+            1. TypeSpecやSQL定義を変更した場合は必ず `go generate ./...` を実行してください
             2. 新機能実装時はTDDアプローチを採用し、テストから書き始めてください
             3. アーキテクチャの依存関係を守ってください: presentation → application → domain ← infrastructure
             4. issueタイトルには適切なgitmojiをつけてください

@@ -20,7 +20,7 @@
       "Bash(go fmt:*)",
       "Bash(go vet:*)",
       "Bash(golangci-lint:*)",
-      "Bash(./scripts/gen.sh)",
+      "Bash(go generate:*)",
       "Bash(rm *)",
       "Bash(ls:*)",
       "Bash(cat **)",
