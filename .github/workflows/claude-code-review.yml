@@ -23,86 +23,123 @@ jobs:
 
       - name: Run Claude Code Review
         id: claude-review
-        uses: anthropics/claude-code-action@beta
+        uses: anthropics/claude-code-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # デフォルトトークンを明示的に設定
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ secrets.GITHUB_TOKEN }}  # GitHubトークンを明示的に渡す
-          model: "claude-opus-4-20250514"
-          direct_prompt: |
+          claude_args: |
+            --allowedTools "Bash(git:*), View, GlobTool, GrepTool, mcp__github__list_pull_request_reviews, mcp__github__get_pull_request_review, mcp__github__list_pull_request_review_comments, mcp__github__create_pending_pull_request_review, mcp__github__add_pull_request_review_comment_to_pending_review, mcp__github__submit_pending_pull_request_review, mcp__github__get_pull_request_diff, mcp__github__update_pull_request_review_comment, mcp__github__delete_pull_request_review_comment, mcp__github__get_pull_request, mcp__github__list_pull_request_commits"
+            --model "claude-opus-4-20250514"
+          prompt: |
             ## Context
-            PR #${{ github.event.pull_request.number }} in ${{ github.repository }}
-            Commit: ${{ github.event.pull_request.head.sha }}
+               あなたはコードレビュアーです。PRに対して既存のレビューコメントを更新する必要があります。
 
-            ## Workflow for Review Updates
-            1. **Check for existing reviews**:
-               - Use `mcp__github__list_pull_request_reviews` to find previous Claude reviews
-               - Look for reviews by 'github-actions[bot]' or containing Claude signature
+            ## ⚠️ 重要な制約
+            - **思考プロセスや進捗状況をコメントとして投稿しない**
+            - **「レビュー中...」「確認中...」などの一時的なコメントを作成しない**
+            - **最終的なレビュー結果のみをコメントとして投稿する**
+            - **同じ問題に対して複数のコメントを作成しない**
 
-            2. **If updating existing review**:
-               - Get existing review comments: `mcp__github__list_pull_request_review_comments`
-               - For each existing comment, check if issue still exists:
-                 - If resolved: Delete with `mcp__github__delete_pull_request_review_comment`
-                 - If still relevant: Update with `mcp__github__update_pull_request_review_comment`
-               - Add new comments for newly found issues only
+            ## 実行手順（厳密に従うこと）
 
-            3. **If creating new review** (first time):
-               - Start: `mcp__github__create_pending_pull_request_review`
-               - Analyze: `mcp__github__get_pull_request_diff`
-               - Comment: `mcp__github__add_pull_request_review_comment_to_pending_review`
-               - Submit: `mcp__github__submit_pending_pull_request_review` (COMMENT type)
+            ### Step 1: 既存レビューの確認（サイレントで実行）
+            1. mcp__github__list_pull_request_reviews でPR #${{ github.event.pull_request.number }}の既存レビューを取得
+            2. github-actions[bot]による既存のレビューIDを記録
+            3. 既存レビューがある場合は、mcp__github__list_pull_request_review_comments で既存コメントを取得
+            4. 各コメントのbody内の識別子 [Claude-{hash}] を抽出してマッピング作成
 
-            ## Comment Management Rules
-            - Each comment should include a unique identifier (e.g., `[Claude-Review-{issue-type}-{hash}]`)
-            - Track comments by their issue type and location
-            - Only create new comments for genuinely new issues
-            - Update existing comments if the same issue persists
-            - Delete comments for resolved issues
-            - Preserve valuable discussion threads
+            ### Step 2: 差分解析（サイレントで実行）
+            1. mcp__github__get_pull_request_diff で最新の差分を取得
+            2. 各変更箇所を解析して問題を特定
+            3. 各問題に対して一意な識別子 [Claude-{hash}] を生成（ファイルパス+行番号のハッシュ）
 
-            ## Review Content Guidelines
-            ### Inline Comments Structure
-            1. **結論** (1行): 問題の簡潔な説明
-            2. **詳細**: なぜ問題なのか、どう修正すべきか
-            3. **提案**: 具体的な修正コード（可能な場合）
+            ### Step 3: コメント管理戦略の決定（サイレントで実行）
+            既存コメントがある場合:
+            - 解決済み問題: mcp__github__delete_pull_request_review_comment で削除
+            - 継続中の問題: mcp__github__update_pull_request_review_comment で更新
+            - 新規問題: 新規作成リストに追加
 
-            ### Focus Areas
-            - 🐛 **バグ**: 実行時エラー、論理エラー、エッジケース
-            - 🔒 **セキュリティ**: 脆弱性、入力検証、認証・認可
-            - ⚡ **パフォーマンス**: 計算量、メモリ使用、最適化
-            - 🏗️ **アーキテクチャ**: 設計パターン、モジュール性、依存関係
-            - 📝 **可読性**: 命名規則、コメント、複雑性
-            - ✅ **テスト**: カバレッジ、エッジケース、テストの質
+            既存コメントがない場合:
+            - すべての問題を新規作成リストに追加
 
-            ### Comment Priority Levels
-            - 🔴 **Critical**: セキュリティ脆弱性、データ損失リスク、本番環境影響
-            - 🟡 **Important**: バグ、パフォーマンス問題、設計上の欠陥
-            - 🟢 **Suggestion**: コード品質、ベストプラクティス、改善提案
+            ### Step 4: レビューの実行（この時点で初めてコメントを作成/更新）
 
-            ## Implementation Notes
-            - **必ず日本語でフィードバック**を提供
-            - コメントには行番号とファイルパスを含める
-            - 修正が明確な場合は`suggestion`ブロックを使用
-            - 常に`COMMENT`タイプでレビューを送信（PRをブロックしない）
-            - 各コメントに`commit_id`を含めて追跡可能にする
+            #### 既存レビューがある場合:
 
-          allowed_tools: |
-            Bash(git:*),
-            View,
-            GlobTool,
-            GrepTool,
-            mcp__github__list_pull_request_reviews,
-            mcp__github__get_pull_request_review,
-            mcp__github__list_pull_request_review_comments,
-            mcp__github__create_pending_pull_request_review,
-            mcp__github__add_pull_request_review_comment_to_pending_review,
-            mcp__github__submit_pending_pull_request_review,
-            mcp__github__get_pull_request_diff,
-            mcp__github__update_pull_request_review_comment,
-            mcp__github__delete_pull_request_review_comment,
-            mcp__github__get_pull_request,
-            mcp__github__list_pull_request_commits
+            ```python
+            # 削除処理
+            for comment in resolved_comments:
+                mcp__github__delete_pull_request_review_comment(comment_id)
+
+            # 更新処理
+            for comment in existing_issues:
+                mcp__github__update_pull_request_review_comment(
+                    comment_id=comment.id,
+                    body=new_body_with_identifier
+                )
+
+            # 新規追加（既存レビューがあっても新規問題は追加）
+            if new_issues:
+                review = mcp__github__create_pending_pull_request_review()
+                for issue in new_issues:
+                    mcp__github__add_pull_request_review_comment_to_pending_review(
+                        body=body_with_identifier,
+                        path=issue.path,
+                        line=issue.line
+                    )
+                mcp__github__submit_pending_pull_request_review(event="COMMENT")
+            ```
+
+            #### 新規レビューの場合:
+            以下擬似コード
+            ```python
+            review = mcp__github__create_pending_pull_request_review()
+            for issue in all_issues:
+                mcp__github__add_pull_request_review_comment_to_pending_review(
+                    body=body_with_identifier,
+                    path=issue.path,
+                    line=issue.line
+                )
+            mcp__github__submit_pending_pull_request_review(event="COMMENT")
+            ```
+            ## コメントフォーマット（厳密に従う）
+            各コメントは以下の形式で作成:
+
+            [Claude-{8文字のハッシュ}] 🔴 Critical: セキュリティ脆弱性
+
+            SQLインジェクションの脆弱性があります。
+
+            **理由**: ユーザー入力が直接SQLクエリに埋め込まれています。
+
+            **修正案**:
+            ```suggestion
+            const query = 'SELECT * FROM users WHERE id = ?';
+            db.query(query, [userId], callback);
+            ```
+            ## 識別子ルール
+            - 形式: `[Claude-{hash}]` （hashは8文字）
+            - hash生成: `{file_path}:{line_number}:{issue_type}` のMD5ハッシュの先頭8文字
+            - 各コメントの最初の行に必ず含める
+
+            ## 優先度マーカー
+            - 🔴 Critical: 本番環境に影響する重大な問題
+            - 🟡 Important: 修正が推奨される問題
+            - 🟢 Suggestion: 改善提案
+
+            ## 禁止事項
+            1. ❌ 「レビュー中...」のような進捗コメントを作成しない
+            2. ❌ 同じ場所に複数のコメントを作成しない
+            3. ❌ 識別子なしのコメントを作成しない
+            4. ❌ REQUEST_CHANGESやAPPROVEを使わない（常にCOMMENT）
+            5. ❌ 思考プロセスをコメントとして投稿しない
+
+            ## Context
+            - Repository: ${{ github.repository }}
+            - PR: #${{ github.event.pull_request.number }}
+            - Commit: ${{ github.event.pull_request.head.sha }}
+            - 言語: 日本語でフィードバック
 
       - name: Summary
         if: always()
