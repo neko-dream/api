@@ -6,8 +6,6 @@ import (
 	"fmt"
 
 	"github.com/neko-dream/server/internal/application/query/dto"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/user"
 	"github.com/samber/lo"
 )
 
@@ -17,15 +15,16 @@ type (
 	}
 
 	BrowseOpenedByUserInput struct {
-		UserID shared.UUID[user.User]
-		Limit  *int
-		Offset *int
-		Status Status
-		Theme  *string
+		DisplayID string
+		Limit     *int
+		Offset    *int
+		Status    Status
+		Theme     *string
 	}
 
 	BrowseOpenedByUserOutput struct {
 		TalkSessions []dto.TalkSessionWithDetail
+		TotalCount   int32
 	}
 )
 
