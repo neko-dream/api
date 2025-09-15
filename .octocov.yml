@@ -7,8 +7,10 @@ codeToTestRatio:
   code:
     - "**/*.go"
     - "!**/*_test.go"
-    - "!internal/presentation/oas/**"
-    - "!internal/infrastructure/persistence/sqlc/generated/**"
+    - "!**/*_gen.go"
+    - "!**/*.gen.go"
+    - "!**/*.sql.go"
+    - "!**/mock/**"
   test:
     - "**/*_test.go"
 testExecutionTime:
