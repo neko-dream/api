@@ -104,7 +104,7 @@ func (i *editTalkSessionHandler) Execute(ctx context.Context, input EditTalkSess
 		return nil, messages.InvalidScheduledEndTime
 	}
 
-	if err := i.ExecTx(ctx, func(ctx context.Context) error {
+	if err := i.DBManager.ExecTx(ctx, func(ctx context.Context) error {
 
 		talkSession.ChangeTheme(input.Theme)
 		talkSession.ChangeDescription(input.Description)
