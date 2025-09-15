@@ -71,7 +71,7 @@ jobs:
       - name: Run unit tests with coverage
         run: |
           go test -parallel 2 -v -coverprofile=coverage.out.tmp ./...
-          cat coverage.out.tmp | grep -v -E "(_gen\.go|\.gen\.go|\.sql\.go)" > coverage.out
+          cat coverage.out.tmp | grep -v -E "(_gen\.go|\.gen\.go|\.sql\.go|/mock/)" > coverage.out
           rm coverage.out.tmp
       - name: Setup runn
         uses: k1LoW/gh-setup@v1
