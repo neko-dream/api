@@ -39,6 +39,8 @@ cd api
 
 ```sh
 mise install
+# mise, go get -toolではtag指定ができないため
+go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 ```
 
 環境変数の設定

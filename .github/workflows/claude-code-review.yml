@@ -45,7 +45,7 @@ jobs:
             - **思考プロセスや進捗状況をコメントとして投稿しない**
             - **「レビュー中...」「確認中...」などの一時的なコメントを作成しない**
             - **最終的なレビュー結果のみをコメントとして投稿する**
-            - **同じ問題に対して複数のコメントを作成しない**
+            - **同じ問題に対して複数のコメントを作成せず既存コメントを編集する**
 
             ## 実行手順（厳密に従うこと）
 
@@ -110,16 +110,19 @@ jobs:
 
             # 継続中の問題への更新コメント
             for comment in continuing_issues:
-                add_comment_to_pending_review(
-                    owner=owner,
-                    repo=repo,
-                    pullNumber=pr_number,
-                    path=comment.path,
-                    line=comment.line,
-                    body="⚠️ [Claude-{hash}] まだ対応が必要です: {updated_description}",
-                    side="RIGHT",
-                    subjectType="line"
-                )
+                if same_as_existing(comment, updated_description):
+                    continue
+                else:
+                  add_comment_to_pending_review(
+                      owner=owner,
+                      repo=repo,
+                      pullNumber=pr_number,
+                      path=comment.path,
+                      line=comment.line,
+                      body="⚠️ [Claude-{hash}] まだ対応が必要です: {updated_description}",
+                      side="RIGHT",
+                      subjectType="line"
+                  )
 
             # 新規問題の追加
             for issue in new_issues:

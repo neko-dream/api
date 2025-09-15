@@ -1,17 +1,10 @@
 [tools]
-"go:github.com/ogen-go/ogen/cmd/ogen" = "1.14.0"
-"go:github.com/air-verse/air" = "latest"
-"go:github.com/sqlc-dev/sqlc/cmd/sqlc" = "latest"
-"go:go.uber.org/mock/mockgen" = "latest"
-"go:github.com/hedhyw/otelinji/cmd/otelinji" = "latest"
-"go:github.com/k1LoW/runn/cmd/runn" = "latest"
-"go:github.com/dmarkham/enumer" = "latest"
-"go:github.com/deepmap/oapi-codegen/v2/cmd/oapi-codegen" = "v2.2.0"
+"go:github.com/air-verse/air" = "v1.61.7"
 "npm:@openapitools/openapi-generator-cli" = "latest"
 "npm:@typespec/compiler" = "latest"
-go = "1.24.3"
-jq = "latest"
 ecspresso = "latest"
+go = "1.25.1"
+jq = "latest"
 task = "latest"
 
 [tasks.migrate-create]
