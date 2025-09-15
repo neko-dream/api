@@ -373,7 +373,7 @@ func BenchmarkToNullableSQL_UnsupportedType(b *testing.B) {
 
 func BenchmarkToNullableSQL_NestedPointer(b *testing.B) {
 	str := "--------------------------------------------------------------------"
-	strPtr := lo.ToPtr(lo.ToPtr(lo.ToPtr(lo.ToPtr(lo.ToPtr(lo.ToPtr(lo.ToPtr(str)))))))
+	strPtr := lo.ToPtr(lo.ToPtr(lo.ToPtr(str)))
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = utils.ToNullableSQL[sql.NullString](strPtr)
