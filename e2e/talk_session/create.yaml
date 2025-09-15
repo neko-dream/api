@@ -21,9 +21,12 @@ steps:
       query: |
         DELETE FROM user_status_change_logs WHERE (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}') = user_id;
         DELETE FROM user_demographics WHERE (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}') = user_id;
-        DELETE FROM talk_sessions WHERE owner_id = (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}');
         DELETE FROM user_auths WHERE subject = '{{ vars.id }}';
         DELETE FROM users WHERE display_id = '{{ vars.id }}';
+        DELETE FROM opinions;
+        DELETE FROM votes;
+        DELETE FROM talk_sessions;
+        DELETE FROM domain_events;
   loginUser:
     desc: ログイン
     req:

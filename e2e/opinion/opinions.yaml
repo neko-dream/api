@@ -21,13 +21,14 @@ steps:
     desc: テストユーザー削除
     dev:
       query: |
-        DELETE FROM votes WHERE user_id IN (SELECT user_id FROM users WHERE display_id IN ('{{ vars.id }}', '{{ vars.withdraw_id }}'));
-        DELETE FROM opinions WHERE user_id IN (SELECT user_id FROM users WHERE display_id IN ('{{ vars.id }}', '{{ vars.withdraw_id }}'));
         DELETE FROM user_status_change_logs WHERE user_id IN (SELECT user_id FROM users WHERE display_id IN ('{{ vars.id }}', '{{ vars.withdraw_id }}'));
         DELETE FROM user_demographics WHERE user_id IN (SELECT user_id FROM users WHERE display_id IN ('{{ vars.id }}', '{{ vars.withdraw_id }}'));
-        DELETE FROM talk_sessions WHERE owner_id IN (SELECT user_id FROM users WHERE display_id IN ('{{ vars.id }}', '{{ vars.withdraw_id }}'));
         DELETE FROM user_auths WHERE subject IN ('{{ vars.id }}', '{{ vars.withdraw_id }}');
         DELETE FROM users WHERE display_id IN ('{{ vars.id }}', '{{ vars.withdraw_id }}');
+        DELETE FROM opinions;
+        DELETE FROM votes;
+        DELETE FROM talk_sessions;
+        DELETE FROM domain_events;
 
   loginUser1:
     desc: テストユーザー1ログイン
