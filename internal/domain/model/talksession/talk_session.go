@@ -148,8 +148,8 @@ func (t *TalkSession) ChangePrefecture(prefecture *string) {
 	t.prefecture = prefecture
 }
 
-func (t *TalkSession) ChangeHideTop(hide bool) {
-	t.hideTop = hide
+func (t *TalkSession) ChangeHideTop(hideTop bool) {
+	t.hideTop = hideTop
 }
 
 func (t *TalkSession) Restrictions() []*RestrictionAttribute {
