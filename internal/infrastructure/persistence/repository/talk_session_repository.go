@@ -58,6 +58,7 @@ func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talkses
 		HideReport:          utils.ToSQLNull[sql.NullBool](talkSession.HideReport()),
 		OrganizationAliasID: utils.ToSQLNull[uuid.NullUUID](talkSession.OrganizationAliasID()),
 		OrganizationID:      utils.ToSQLNull[uuid.NullUUID](talkSession.OrganizationID()),
+		ShowTop:             talkSession.ShowTop(),
 	}); err != nil {
 		return errtrace.Wrap(err)
 	}
@@ -109,6 +110,7 @@ func (t *talkSessionRepository) Update(ctx context.Context, talkSession *talkses
 		Prefecture:       utils.ToSQLNull[sql.NullString](talkSession.Prefecture()),
 		Restrictions:     talksession.Restrictions(restrictions),
 		HideReport:       utils.ToSQLNull[sql.NullBool](talkSession.HideReport()),
+		ShowTop:          talkSession.ShowTop(),
 	}); err != nil {
 		return errtrace.Wrap(err)
 	}
@@ -176,6 +178,7 @@ func (t *talkSessionRepository) FindByID(ctx context.Context, talkSessionID shar
 		location,
 		city,
 		prefecture,
+		row.TalkSession.ShowTop,
 		nil,
 		nil,
 	)
@@ -238,6 +241,7 @@ func (t *talkSessionRepository) GetUnprocessedEndedSessions(ctx context.Context,
 			nil, // Location は別途取得が必要な場合
 			city,
 			prefecture,
+			row.ShowTop,
 			organizationID,
 			organizationAliasID,
 		)
