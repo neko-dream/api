@@ -11,69 +11,81 @@ jobs:
       contents: read
       pull-requests: write
       issues: write
+      id-token: write  # OIDCトークン生成に必要
       statuses: write
       checks: write
+      actions: read   # Actions環境変数へのアクセスに必要
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 全履歴を取得（差分比較のため）
+          fetch-depth: 0
 
       - name: Run Claude Code Review
         id: claude-review
         uses: anthropics/claude-code-action@beta
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # デフォルトトークンを明示的に設定
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}  # GitHubトークンを明示的に渡す
           model: "claude-opus-4-20250514"
           direct_prompt: |
             ## Context
             PR #${{ github.event.pull_request.number }} in ${{ github.repository }}
+            Commit: ${{ github.event.pull_request.head.sha }}
 
-            ## Workflow
-            1. First check for existing reviews: `mcp__github__list_pull_request_reviews`
-            2. If Claude's previous review exists:
-               - Get review ID from the list
-               - Update existing comments: `mcp__github__update_pull_request_review_comment`
-               - Delete outdated comments if needed: `mcp__github__delete_pull_request_review_comment`
-            3. If no previous review or first time:
-               - Start new review: `mcp__github__create_pending_pull_request_review`
-               - Analyze diff: `mcp__github__get_pull_request_diff`
-               - Add comments: `mcp__github__add_pull_request_review_comment_to_pending_review`
-               - Submit review: `mcp__github__submit_pending_pull_request_review` with COMMENT type
+            ## Workflow for Review Updates
+            1. **Check for existing reviews**:
+               - Use `mcp__github__list_pull_request_reviews` to find previous Claude reviews
+               - Look for reviews by 'github-actions[bot]' or containing Claude signature
 
-            ## Review Update Strategy
-            - Check if a review by 'github-actions[bot]' or with Claude signature exists
-            - If exists, update that review's comments instead of creating new ones
-            - Remove comments that are no longer relevant (resolved issues)
-            - Add new comments for new issues found
-            - Preserve useful discussion threads
+            2. **If updating existing review**:
+               - Get existing review comments: `mcp__github__list_pull_request_review_comments`
+               - For each existing comment, check if issue still exists:
+                 - If resolved: Delete with `mcp__github__delete_pull_request_review_comment`
+                 - If still relevant: Update with `mcp__github__update_pull_request_review_comment`
+               - Add new comments for newly found issues only
 
-            ## Inline Comments
-            - Start with one-line conclusion
-            - Follow with reasoning and specific fix
-            - Use code suggestions when fix is clear
-            - Focus on actionable improvements
+            3. **If creating new review** (first time):
+               - Start: `mcp__github__create_pending_pull_request_review`
+               - Analyze: `mcp__github__get_pull_request_diff`
+               - Comment: `mcp__github__add_pull_request_review_comment_to_pending_review`
+               - Submit: `mcp__github__submit_pending_pull_request_review` (COMMENT type)
 
-            ## Review Focus
-            - CLAUDE.md compliance (if exists)
-            - Code quality and best practices
-            - Security vulnerabilities and bugs
-            - Performance issues
-            - Architecture and maintainability
-            - Type safety and error handling
+            ## Comment Management Rules
+            - Each comment should include a unique identifier (e.g., `[Claude-Review-{issue-type}-{hash}]`)
+            - Track comments by their issue type and location
+            - Only create new comments for genuinely new issues
+            - Update existing comments if the same issue persists
+            - Delete comments for resolved issues
+            - Preserve valuable discussion threads
 
-            ## Comment Management
-            - Mark resolved issues as outdated
-            - Update existing comments if the issue persists but context changed
-            - Add new comments only for newly introduced issues
-            - Include commit SHA reference for tracking
+            ## Review Content Guidelines
+            ### Inline Comments Structure
+            1. **結論** (1行): 問題の簡潔な説明
+            2. **詳細**: なぜ問題なのか、どう修正すべきか
+            3. **提案**: 具体的な修正コード（可能な場合）
 
-            ## Notes
-            - Use Japanese for all feedback（必ず日本語でフィードバックをお願いします）
-            - Be specific and actionable
-            - Always use COMMENT type (never block PR)
-            - Include line numbers and file paths in comments
-            - Reference specific commit if commenting on changes
+            ### Focus Areas
+            - 🐛 **バグ**: 実行時エラー、論理エラー、エッジケース
+            - 🔒 **セキュリティ**: 脆弱性、入力検証、認証・認可
+            - ⚡ **パフォーマンス**: 計算量、メモリ使用、最適化
+            - 🏗️ **アーキテクチャ**: 設計パターン、モジュール性、依存関係
+            - 📝 **可読性**: 命名規則、コメント、複雑性
+            - ✅ **テスト**: カバレッジ、エッジケース、テストの質
+
+            ### Comment Priority Levels
+            - 🔴 **Critical**: セキュリティ脆弱性、データ損失リスク、本番環境影響
+            - 🟡 **Important**: バグ、パフォーマンス問題、設計上の欠陥
+            - 🟢 **Suggestion**: コード品質、ベストプラクティス、改善提案
+
+            ## Implementation Notes
+            - **必ず日本語でフィードバック**を提供
+            - コメントには行番号とファイルパスを含める
+            - 修正が明確な場合は`suggestion`ブロックを使用
+            - 常に`COMMENT`タイプでレビューを送信（PRをブロックしない）
+            - 各コメントに`commit_id`を含めて追跡可能にする
 
           allowed_tools: |
             Bash(git:*),
@@ -89,11 +101,14 @@ jobs:
             mcp__github__get_pull_request_diff,
             mcp__github__update_pull_request_review_comment,
             mcp__github__delete_pull_request_review_comment,
-            mcp__github__get_pull_request
+            mcp__github__get_pull_request,
+            mcp__github__list_pull_request_commits
 
-      - name: Add review metadata
+      - name: Summary
         if: always()
         run: |
-          echo "Review completed at $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_STEP_SUMMARY
-          echo "PR: #${{ github.event.pull_request.number }}" >> $GITHUB_STEP_SUMMARY
-          echo "Commit: ${{ github.event.pull_request.head.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "## Claude Code Review Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **PR:** #${{ github.event.pull_request.number }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** \`${{ github.event.pull_request.head.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Time:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
