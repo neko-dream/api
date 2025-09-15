@@ -21,20 +21,37 @@ print_header() {
     echo -e "${NC}"
 }
 
-# 対象のGoファイルを探す
 find_go_files() {
-    find . -type f -name "*.go" \
-        ! -path "*/vendor/*" \
-        ! -path "*/.git/*" \
-        ! -path "*/.serena/*" \
-        ! -path "*/internal/infrastructure/persistence/sqlc/generated/*" \
-        ! -path "*/internal/presentation/oas/*" \
-        ! -path "*/mock/*" \
-        ! -name "*.gen.go" \
-        ! -name "*_gen.go" \
-        ! -name "*.sql.go" \
-        ! -name "*.pb.go" \
-        ! -name "*_test.go" | sort
+    local exclude_paths=(
+        "*/vendor/*"
+        "*/.git/*"
+        "*/.serena/*"
+        "*/internal/infrastructure/persistence/sqlc/generated/*"
+        "*/internal/presentation/oas/*"
+        "*/mock/*"
+    )
+
+    local exclude_names=(
+        "*.gen.go"
+        "*_gen.go"
+        "*.sql.go"
+        "*.pb.go"
+        "*_test.go"
+    )
+
+    local find_args=()
+
+    # パスの除外条件を追加
+    for path in "${exclude_paths[@]}"; do
+        find_args+=("!" "-path" "$path")
+    done
+
+    # ファイル名の除外条件を追加
+    for name in "${exclude_names[@]}"; do
+        find_args+=("!" "-name" "$name")
+    done
+
+    find . -type f -name "*.go" "${find_args[@]}" | sort
 }
 
 main() {
