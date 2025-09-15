@@ -228,6 +228,173 @@ func (q *Queries) GetAllTalkSessionCount(ctx context.Context) (int64, error) {
 	return talk_session_count, err
 }
 
+const getOwnTalkSessionByDisplayIDWithCount = `-- name: GetOwnTalkSessionByDisplayIDWithCount :many
+WITH filtered_sessions AS (
+    SELECT ts.talk_session_id
+    FROM talk_sessions ts
+    LEFT JOIN users ON ts.owner_id = users.user_id
+    WHERE
+        users.display_id = $3::text
+        AND
+        CASE $4::text
+            WHEN 'finished' THEN ts.scheduled_end_time <= now()
+            WHEN 'open' THEN ts.scheduled_end_time > now()
+            ELSE TRUE
+        END
+        AND
+        CASE
+            WHEN $5::text IS NOT NULL
+                THEN ts.theme LIKE '%' || $5::text || '%'
+            ELSE TRUE
+        END
+)
+SELECT
+    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
+    COALESCE(oc.opinion_count, 0) AS opinion_count,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+    COALESCE(organization_aliases.alias_name, '') AS alias_name,
+    COALESCE(organization_aliases.alias_id, '00000000-0000-0000-0000-000000000000'::uuid) AS alias_id,
+    COALESCE(organization_aliases.organization_id, '00000000-0000-0000-0000-000000000000'::uuid) AS organization_id,
+    COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
+    COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude,
+    (SELECT COUNT(*) FROM filtered_sessions) AS total_count
+FROM talk_sessions ts
+INNER JOIN filtered_sessions fs ON fs.talk_session_id = ts.talk_session_id
+LEFT JOIN (
+    SELECT talk_session_id, COUNT(opinion_id) AS opinion_count
+    FROM opinions
+    GROUP BY talk_session_id
+) oc ON oc.talk_session_id = ts.talk_session_id
+LEFT JOIN users ON ts.owner_id = users.user_id
+LEFT JOIN talk_session_locations ON talk_session_locations.talk_session_id = ts.talk_session_id
+LEFT JOIN organization_aliases ON ts.organization_alias_id = organization_aliases.alias_id
+ORDER BY ts.created_at DESC
+LIMIT $2 OFFSET $1
+`
+
+type GetOwnTalkSessionByDisplayIDWithCountParams struct {
+	Offset    sql.NullInt32
+	Limit     sql.NullInt32
+	DisplayID string
+	Status    sql.NullString
+	Theme     sql.NullString
+}
+
+type GetOwnTalkSessionByDisplayIDWithCountRow struct {
+	TalkSession    TalkSession
+	OpinionCount   int64
+	User           User
+	AliasName      string
+	AliasID        uuid.UUID
+	OrganizationID uuid.UUID
+	Latitude       float64
+	Longitude      float64
+	TotalCount     int64
+}
+
+// GetOwnTalkSessionByDisplayIDWithCount
+//
+//	WITH filtered_sessions AS (
+//	    SELECT ts.talk_session_id
+//	    FROM talk_sessions ts
+//	    LEFT JOIN users ON ts.owner_id = users.user_id
+//	    WHERE
+//	        users.display_id = $3::text
+//	        AND
+//	        CASE $4::text
+//	            WHEN 'finished' THEN ts.scheduled_end_time <= now()
+//	            WHEN 'open' THEN ts.scheduled_end_time > now()
+//	            ELSE TRUE
+//	        END
+//	        AND
+//	        CASE
+//	            WHEN $5::text IS NOT NULL
+//	                THEN ts.theme LIKE '%' || $5::text || '%'
+//	            ELSE TRUE
+//	        END
+//	)
+//	SELECT
+//	    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
+//	    COALESCE(oc.opinion_count, 0) AS opinion_count,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+//	    COALESCE(organization_aliases.alias_name, '') AS alias_name,
+//	    COALESCE(organization_aliases.alias_id, '00000000-0000-0000-0000-000000000000'::uuid) AS alias_id,
+//	    COALESCE(organization_aliases.organization_id, '00000000-0000-0000-0000-000000000000'::uuid) AS organization_id,
+//	    COALESCE(ST_Y(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS latitude,
+//	    COALESCE(ST_X(ST_GeomFromWKB(ST_AsBinary(talk_session_locations.location))),0)::float AS longitude,
+//	    (SELECT COUNT(*) FROM filtered_sessions) AS total_count
+//	FROM talk_sessions ts
+//	INNER JOIN filtered_sessions fs ON fs.talk_session_id = ts.talk_session_id
+//	LEFT JOIN (
+//	    SELECT talk_session_id, COUNT(opinion_id) AS opinion_count
+//	    FROM opinions
+//	    GROUP BY talk_session_id
+//	) oc ON oc.talk_session_id = ts.talk_session_id
+//	LEFT JOIN users ON ts.owner_id = users.user_id
+//	LEFT JOIN talk_session_locations ON talk_session_locations.talk_session_id = ts.talk_session_id
+//	LEFT JOIN organization_aliases ON ts.organization_alias_id = organization_aliases.alias_id
+//	ORDER BY ts.created_at DESC
+//	LIMIT $2 OFFSET $1
+func (q *Queries) GetOwnTalkSessionByDisplayIDWithCount(ctx context.Context, arg GetOwnTalkSessionByDisplayIDWithCountParams) ([]GetOwnTalkSessionByDisplayIDWithCountRow, error) {
+	rows, err := q.db.QueryContext(ctx, getOwnTalkSessionByDisplayIDWithCount,
+		arg.Offset,
+		arg.Limit,
+		arg.DisplayID,
+		arg.Status,
+		arg.Theme,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetOwnTalkSessionByDisplayIDWithCountRow
+	for rows.Next() {
+		var i GetOwnTalkSessionByDisplayIDWithCountRow
+		if err := rows.Scan(
+			&i.TalkSession.TalkSessionID,
+			&i.TalkSession.OwnerID,
+			&i.TalkSession.Theme,
+			&i.TalkSession.ScheduledEndTime,
+			&i.TalkSession.CreatedAt,
+			&i.TalkSession.City,
+			&i.TalkSession.Prefecture,
+			&i.TalkSession.Description,
+			&i.TalkSession.ThumbnailUrl,
+			&i.TalkSession.Restrictions,
+			&i.TalkSession.UpdatedAt,
+			&i.TalkSession.HideReport,
+			&i.TalkSession.OrganizationID,
+			&i.TalkSession.OrganizationAliasID,
+			&i.OpinionCount,
+			&i.User.UserID,
+			&i.User.DisplayID,
+			&i.User.DisplayName,
+			&i.User.IconUrl,
+			&i.User.CreatedAt,
+			&i.User.UpdatedAt,
+			&i.User.Email,
+			&i.User.EmailVerified,
+			&i.User.WithdrawalDate,
+			&i.AliasName,
+			&i.AliasID,
+			&i.OrganizationID,
+			&i.Latitude,
+			&i.Longitude,
+			&i.TotalCount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getOwnTalkSessionByUserID = `-- name: GetOwnTalkSessionByUserID :many
 SELECT
     ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
@@ -251,30 +418,30 @@ LEFT JOIN talk_session_locations
 LEFT JOIN organization_aliases
     ON ts.organization_alias_id = organization_aliases.alias_id
 WHERE
-    ts.owner_id = $3::uuid
+    users.display_id = $1::text
     AND
-    CASE $4::text
+    CASE $2::text
         WHEN 'finished' THEN ts.scheduled_end_time <= now()
         WHEN 'open' THEN ts.scheduled_end_time > now()
         ELSE TRUE
     END
     AND
     CASE
-        WHEN $5::text IS NOT NULL
-            THEN ts.theme LIKE '%' || $5::text || '%'
+        WHEN $3::text IS NOT NULL
+            THEN ts.theme LIKE '%' || $3::text || '%'
         ELSE TRUE
     END
 GROUP BY ts.talk_session_id, oc.opinion_count, users.user_id, users.display_name, users.display_id, users.icon_url, talk_session_locations.talk_session_id
 ORDER BY ts.created_at DESC
-LIMIT $1 OFFSET $2
+LIMIT $5 OFFSET $4
 `
 
 type GetOwnTalkSessionByUserIDParams struct {
-	Limit  int32
-	Offset int32
-	UserID uuid.NullUUID
-	Status sql.NullString
-	Theme  sql.NullString
+	DisplayID sql.NullString
+	Status    sql.NullString
+	Theme     sql.NullString
+	Offset    sql.NullInt32
+	Limit     sql.NullInt32
 }
 
 type GetOwnTalkSessionByUserIDRow struct {
@@ -312,29 +479,29 @@ type GetOwnTalkSessionByUserIDRow struct {
 //	LEFT JOIN organization_aliases
 //	    ON ts.organization_alias_id = organization_aliases.alias_id
 //	WHERE
-//	    ts.owner_id = $3::uuid
+//	    users.display_id = $1::text
 //	    AND
-//	    CASE $4::text
+//	    CASE $2::text
 //	        WHEN 'finished' THEN ts.scheduled_end_time <= now()
 //	        WHEN 'open' THEN ts.scheduled_end_time > now()
 //	        ELSE TRUE
 //	    END
 //	    AND
 //	    CASE
-//	        WHEN $5::text IS NOT NULL
-//	            THEN ts.theme LIKE '%' || $5::text || '%'
+//	        WHEN $3::text IS NOT NULL
+//	            THEN ts.theme LIKE '%' || $3::text || '%'
 //	        ELSE TRUE
 //	    END
 //	GROUP BY ts.talk_session_id, oc.opinion_count, users.user_id, users.display_name, users.display_id, users.icon_url, talk_session_locations.talk_session_id
 //	ORDER BY ts.created_at DESC
-//	LIMIT $1 OFFSET $2
+//	LIMIT $5 OFFSET $4
 func (q *Queries) GetOwnTalkSessionByUserID(ctx context.Context, arg GetOwnTalkSessionByUserIDParams) ([]GetOwnTalkSessionByUserIDRow, error) {
 	rows, err := q.db.QueryContext(ctx, getOwnTalkSessionByUserID,
-		arg.Limit,
-		arg.Offset,
-		arg.UserID,
+		arg.DisplayID,
 		arg.Status,
 		arg.Theme,
+		arg.Offset,
+		arg.Limit,
 	)
 	if err != nil {
 		return nil, err
@@ -699,7 +866,7 @@ const getUnprocessedEndedSessions = `-- name: GetUnprocessedEndedSessions :many
 SELECT talk_session_id, owner_id, theme, scheduled_end_time, created_at, city, prefecture, description, thumbnail_url, restrictions, updated_at, hide_report, organization_id, organization_alias_id FROM talk_sessions
 WHERE scheduled_end_time < NOW()
   AND NOT EXISTS (
-    SELECT 1 FROM domain_events 
+    SELECT 1 FROM domain_events
     WHERE aggregate_id = talk_sessions.talk_session_id::text
       AND aggregate_type = 'TalkSession'
       AND event_type = 'talksession.ended'
