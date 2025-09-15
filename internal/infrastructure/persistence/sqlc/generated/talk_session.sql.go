@@ -90,7 +90,7 @@ func (q *Queries) CountTalkSessions(ctx context.Context, arg CountTalkSessionsPa
 }
 
 const createTalkSession = `-- name: CreateTalkSession :exec
-INSERT INTO talk_sessions (talk_session_id, theme, description, thumbnail_url, owner_id, scheduled_end_time, created_at, city, prefecture, restrictions, hide_report, organization_id, organization_alias_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+INSERT INTO talk_sessions (talk_session_id, theme, description, thumbnail_url, owner_id, scheduled_end_time, created_at, city, prefecture, restrictions, hide_report, organization_id, organization_alias_id, show_top) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
 `
 
 type CreateTalkSessionParams struct {
@@ -107,11 +107,12 @@ type CreateTalkSessionParams struct {
 	HideReport          sql.NullBool
 	OrganizationID      uuid.NullUUID
 	OrganizationAliasID uuid.NullUUID
+	ShowTop             bool
 }
 
 // CreateTalkSession
 //
-//	INSERT INTO talk_sessions (talk_session_id, theme, description, thumbnail_url, owner_id, scheduled_end_time, created_at, city, prefecture, restrictions, hide_report, organization_id, organization_alias_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+//	INSERT INTO talk_sessions (talk_session_id, theme, description, thumbnail_url, owner_id, scheduled_end_time, created_at, city, prefecture, restrictions, hide_report, organization_id, organization_alias_id, show_top) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
 func (q *Queries) CreateTalkSession(ctx context.Context, arg CreateTalkSessionParams) error {
 	_, err := q.db.ExecContext(ctx, createTalkSession,
 		arg.TalkSessionID,
@@ -127,6 +128,7 @@ func (q *Queries) CreateTalkSession(ctx context.Context, arg CreateTalkSessionPa
 		arg.HideReport,
 		arg.OrganizationID,
 		arg.OrganizationAliasID,
+		arg.ShowTop,
 	)
 	return err
 }
@@ -160,7 +162,8 @@ UPDATE talk_sessions
         hide_report = $9,
         updated_at = NOW(),
         organization_id = $10,
-        organization_alias_id = $11
+        organization_alias_id = $11,
+        show_top = $12
     WHERE talk_session_id = $1
 `
 
@@ -176,6 +179,7 @@ type EditTalkSessionParams struct {
 	HideReport          sql.NullBool
 	OrganizationID      uuid.NullUUID
 	OrganizationAliasID uuid.NullUUID
+	ShowTop             bool
 }
 
 // EditTalkSession
@@ -191,7 +195,8 @@ type EditTalkSessionParams struct {
 //	        hide_report = $9,
 //	        updated_at = NOW(),
 //	        organization_id = $10,
-//	        organization_alias_id = $11
+//	        organization_alias_id = $11,
+//	        show_top = $12
 //	    WHERE talk_session_id = $1
 func (q *Queries) EditTalkSession(ctx context.Context, arg EditTalkSessionParams) error {
 	_, err := q.db.ExecContext(ctx, editTalkSession,
@@ -206,6 +211,7 @@ func (q *Queries) EditTalkSession(ctx context.Context, arg EditTalkSessionParams
 		arg.HideReport,
 		arg.OrganizationID,
 		arg.OrganizationAliasID,
+		arg.ShowTop,
 	)
 	return err
 }
@@ -249,7 +255,7 @@ WITH filtered_sessions AS (
         END
 )
 SELECT
-    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
+    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id, ts.show_top,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
     COALESCE(organization_aliases.alias_name, '') AS alias_name,
@@ -314,7 +320,7 @@ type GetOwnTalkSessionByDisplayIDWithCountRow struct {
 //	        END
 //	)
 //	SELECT
-//	    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
+//	    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id, ts.show_top,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
 //	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
 //	    COALESCE(organization_aliases.alias_name, '') AS alias_name,
@@ -365,6 +371,7 @@ func (q *Queries) GetOwnTalkSessionByDisplayIDWithCount(ctx context.Context, arg
 			&i.TalkSession.HideReport,
 			&i.TalkSession.OrganizationID,
 			&i.TalkSession.OrganizationAliasID,
+			&i.TalkSession.ShowTop,
 			&i.OpinionCount,
 			&i.User.UserID,
 			&i.User.DisplayID,
@@ -397,7 +404,7 @@ func (q *Queries) GetOwnTalkSessionByDisplayIDWithCount(ctx context.Context, arg
 
 const getOwnTalkSessionByUserID = `-- name: GetOwnTalkSessionByUserID :many
 SELECT
-    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
+    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id, ts.show_top,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
     COALESCE(organization_aliases.alias_name, '') AS alias_name,
@@ -458,7 +465,7 @@ type GetOwnTalkSessionByUserIDRow struct {
 // GetOwnTalkSessionByUserID
 //
 //	SELECT
-//	    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
+//	    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id, ts.show_top,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
 //	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
 //	    COALESCE(organization_aliases.alias_name, '') AS alias_name,
@@ -525,6 +532,7 @@ func (q *Queries) GetOwnTalkSessionByUserID(ctx context.Context, arg GetOwnTalkS
 			&i.TalkSession.HideReport,
 			&i.TalkSession.OrganizationID,
 			&i.TalkSession.OrganizationAliasID,
+			&i.TalkSession.ShowTop,
 			&i.OpinionCount,
 			&i.User.UserID,
 			&i.User.DisplayID,
@@ -556,7 +564,7 @@ func (q *Queries) GetOwnTalkSessionByUserID(ctx context.Context, arg GetOwnTalkS
 
 const getRespondTalkSessionByUserID = `-- name: GetRespondTalkSessionByUserID :many
 SELECT
-    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
+    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id, ts.show_top,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
     COALESCE(organization_aliases.alias_name, '') AS alias_name,
@@ -623,7 +631,7 @@ type GetRespondTalkSessionByUserIDRow struct {
 // GetRespondTalkSessionByUserID
 //
 //	SELECT
-//	    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
+//	    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id, ts.show_top,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
 //	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
 //	    COALESCE(organization_aliases.alias_name, '') AS alias_name,
@@ -694,6 +702,7 @@ func (q *Queries) GetRespondTalkSessionByUserID(ctx context.Context, arg GetResp
 			&i.TalkSession.HideReport,
 			&i.TalkSession.OrganizationID,
 			&i.TalkSession.OrganizationAliasID,
+			&i.TalkSession.ShowTop,
 			&i.OpinionCount,
 			&i.User.UserID,
 			&i.User.DisplayID,
@@ -727,7 +736,7 @@ func (q *Queries) GetRespondTalkSessionByUserID(ctx context.Context, arg GetResp
 
 const getTalkSessionByID = `-- name: GetTalkSessionByID :one
 SELECT
-    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
+    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id, ts.show_top,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
     COALESCE(organization_aliases.alias_name, '') AS alias_name,
@@ -766,7 +775,7 @@ type GetTalkSessionByIDRow struct {
 // GetTalkSessionByID
 //
 //	SELECT
-//	    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
+//	    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id, ts.show_top,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
 //	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
 //	    COALESCE(organization_aliases.alias_name, '') AS alias_name,
@@ -806,6 +815,7 @@ func (q *Queries) GetTalkSessionByID(ctx context.Context, talkSessionID uuid.UUI
 		&i.TalkSession.HideReport,
 		&i.TalkSession.OrganizationID,
 		&i.TalkSession.OrganizationAliasID,
+		&i.TalkSession.ShowTop,
 		&i.OpinionCount,
 		&i.User.UserID,
 		&i.User.DisplayID,
@@ -863,7 +873,7 @@ func (q *Queries) GetTalkSessionParticipants(ctx context.Context, talkSessionID 
 }
 
 const getUnprocessedEndedSessions = `-- name: GetUnprocessedEndedSessions :many
-SELECT talk_session_id, owner_id, theme, scheduled_end_time, created_at, city, prefecture, description, thumbnail_url, restrictions, updated_at, hide_report, organization_id, organization_alias_id FROM talk_sessions
+SELECT talk_session_id, owner_id, theme, scheduled_end_time, created_at, city, prefecture, description, thumbnail_url, restrictions, updated_at, hide_report, organization_id, organization_alias_id, show_top FROM talk_sessions
 WHERE scheduled_end_time < NOW()
   AND NOT EXISTS (
     SELECT 1 FROM domain_events
@@ -878,7 +888,7 @@ FOR UPDATE SKIP LOCKED
 
 // GetUnprocessedEndedSessions
 //
-//	SELECT talk_session_id, owner_id, theme, scheduled_end_time, created_at, city, prefecture, description, thumbnail_url, restrictions, updated_at, hide_report, organization_id, organization_alias_id FROM talk_sessions
+//	SELECT talk_session_id, owner_id, theme, scheduled_end_time, created_at, city, prefecture, description, thumbnail_url, restrictions, updated_at, hide_report, organization_id, organization_alias_id, show_top FROM talk_sessions
 //	WHERE scheduled_end_time < NOW()
 //	  AND NOT EXISTS (
 //	    SELECT 1 FROM domain_events
@@ -913,6 +923,7 @@ func (q *Queries) GetUnprocessedEndedSessions(ctx context.Context, limit int32) 
 			&i.HideReport,
 			&i.OrganizationID,
 			&i.OrganizationAliasID,
+			&i.ShowTop,
 		); err != nil {
 			return nil, err
 		}
@@ -929,7 +940,7 @@ func (q *Queries) GetUnprocessedEndedSessions(ctx context.Context, limit int32) 
 
 const listTalkSessions = `-- name: ListTalkSessions :many
 SELECT
-    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
+    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id, ts.show_top,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
     users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
     COALESCE(organization_aliases.alias_name, '') AS alias_name,
@@ -1043,7 +1054,7 @@ type ListTalkSessionsRow struct {
 // ListTalkSessions
 //
 //	SELECT
-//	    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id,
+//	    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id, ts.show_top,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
 //	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
 //	    COALESCE(organization_aliases.alias_name, '') AS alias_name,
@@ -1159,6 +1170,7 @@ func (q *Queries) ListTalkSessions(ctx context.Context, arg ListTalkSessionsPara
 			&i.TalkSession.HideReport,
 			&i.TalkSession.OrganizationID,
 			&i.TalkSession.OrganizationAliasID,
+			&i.TalkSession.ShowTop,
 			&i.OpinionCount,
 			&i.User.UserID,
 			&i.User.DisplayID,
