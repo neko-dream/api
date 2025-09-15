@@ -3,6 +3,10 @@ on:
   pull_request:
     types: [opened, synchronize]
 
+concurrency:
+  group: ${ inputs.concurrency-group || test-${{ github.workflow }}-${{ github.ref || github.run_id  }}
+  cancel-in-progress: true
+
 jobs:
   claude-review:
     if: github.actor == 'haryoiro'
