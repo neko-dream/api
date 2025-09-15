@@ -37,10 +37,10 @@ func (h *BrowseOpenedByUserQueryImpl) Execute(ctx context.Context, input talkses
 
 	talkSessionRow, err := h.GetQueries(ctx).GetOwnTalkSessionByDisplayIDWithCount(ctx, model.GetOwnTalkSessionByDisplayIDWithCountParams{
 		DisplayID: input.DisplayID,
-		Limit:     utils.ToSQLNull[sql.NullInt32](input.Limit),
-		Offset:    utils.ToSQLNull[sql.NullInt32](input.Offset),
-		Theme:     utils.ToSQLNull[sql.NullString](input.Theme),
-		Status:    utils.ToSQLNull[sql.NullString](input.Status),
+		Limit:     utils.ToNullableSQL[sql.NullInt32](input.Limit),
+		Offset:    utils.ToNullableSQL[sql.NullInt32](input.Offset),
+		Theme:     utils.ToNullableSQL[sql.NullString](input.Theme),
+		Status:    utils.ToNullableSQL[sql.NullString](input.Status),
 	})
 	if err != nil {
 		utils.HandleError(ctx, err, "GetOwnTalkSessionByIDでエラー")

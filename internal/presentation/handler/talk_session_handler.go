@@ -308,17 +308,18 @@ func (t *talkSessionHandler) InitiateTalkSession(ctx context.Context, req *oas.I
 
 	out, err := t.startTalkSessionCommand.Execute(ctx, talksession_usecase.StartTalkSessionUseCaseInput{
 		Theme:               req.Theme,
-		Description:         utils.ToPtrIfNotNullValue(!req.Description.IsSet(), req.Description.Value),
-		ThumbnailURL:        utils.ToPtrIfNotNullValue(!req.ThumbnailURL.IsSet(), req.ThumbnailURL.Value),
+		Description:         utils.ToPtrIf(req.Description.IsSet(), req.Description.Value),
+		ThumbnailURL:        utils.ToPtrIf(req.ThumbnailURL.IsSet(), req.ThumbnailURL.Value),
 		OwnerID:             userID,
 		ScheduledEndTime:    req.ScheduledEndTime,
-		Latitude:            utils.ToPtrIfNotNullValue(!req.Latitude.IsSet(), req.Latitude.Value),
-		Longitude:           utils.ToPtrIfNotNullValue(!req.Longitude.IsSet(), req.Longitude.Value),
-		City:                utils.ToPtrIfNotNullValue(!req.City.IsSet(), req.City.Value),
-		Prefecture:          utils.ToPtrIfNotNullValue(!req.Prefecture.IsSet(), req.Prefecture.Value),
+		Latitude:            utils.ToPtrIf(req.Latitude.IsSet(), req.Latitude.Value),
+		Longitude:           utils.ToPtrIf(req.Longitude.IsSet(), req.Longitude.Value),
+		City:                utils.ToPtrIf(req.City.IsSet(), req.City.Value),
+		Prefecture:          utils.ToPtrIf(req.Prefecture.IsSet(), req.Prefecture.Value),
 		Restrictions:        restrictionStrings,
 		SessionClaim:        session.GetSession(ctx),
 		OrganizationAliasID: organizationAliasID,
+		ShowTop:             utils.ToPtrIf(req.ShowTop.IsSet(), req.ShowTop.Value),
 	})
 	if err != nil {
 		return nil, errtrace.Wrap(err)
@@ -354,14 +355,6 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetTalkSessionList")
 	defer span.End()
 
-	var limit, offset *int
-	if params.Limit.IsSet() {
-		limit = &params.Limit.Value
-	}
-	if params.Offset.IsSet() {
-		offset = &params.Offset.Value
-	}
-
 	var status *talksession_query.Status
 	if params.Status.IsSet() {
 		bytes, err := params.Status.Value.MarshalText()
@@ -369,29 +362,19 @@ func (t *talkSessionHandler) GetTalkSessionList(ctx context.Context, params oas.
 			status = lo.ToPtr(talksession_query.Status(string(bytes)))
 		}
 	}
-	var sortKey sort.SortKey
-	if params.SortKey.IsSet() {
-		if bytes, err := params.SortKey.Value.MarshalText(); err == nil {
-			sortKey = sort.SortKey(string(bytes))
-		}
-	}
-	var latitude, longitude *float64
-	if params.Latitude.IsSet() {
-		latitude = utils.ToPtrIfNotNullValue(params.Latitude.Null, params.Latitude.Value)
-	}
-	if params.Longitude.IsSet() {
-		longitude = utils.ToPtrIfNotNullValue(params.Longitude.Null, params.Longitude.Value)
-	}
 
-	theme := utils.ToPtrIfNotNullValue(params.Theme.Null, params.Theme.Value)
+	sortKey := utils.OptionalMarshalToPtr(params.SortKey.IsSet(), params.SortKey.Value, func(sk string) sort.SortKey {
+		return sort.SortKey(sk)
+	})
+
 	out, err := t.browseTalkSessionsQuery.Execute(ctx, talksession_query.BrowseTalkSessionQueryInput{
-		Limit:     limit,
-		Offset:    offset,
-		Theme:     theme,
+		Limit:     utils.ToPtrIf(params.Limit.IsSet(), params.Limit.Value),
+		Offset:    utils.ToPtrIf(params.Offset.IsSet(), params.Offset.Value),
+		Theme:     utils.ToPtrIf(params.Theme.IsSet(), params.Theme.Value),
 		Status:    status,
 		SortKey:   sortKey,
-		Latitude:  latitude,
-		Longitude: longitude,
+		Latitude:  utils.ToPtrIf(params.Latitude.IsSet(), params.Latitude.Value),
+		Longitude: utils.ToPtrIf(params.Longitude.IsSet(), params.Longitude.Value),
 	})
 	if err != nil {
 		return nil, err
@@ -506,13 +489,13 @@ func (t *talkSessionHandler) EditTalkSession(ctx context.Context, req *oas.EditT
 		TalkSessionID:    talkSessionID,
 		UserID:           authCtx.UserID,
 		Theme:            req.Theme,
-		Description:      utils.ToPtrIfNotNullValue(!req.Description.IsSet(), req.Description.Value),
-		ThumbnailURL:     utils.ToPtrIfNotNullValue(!req.ThumbnailURL.IsSet(), req.ThumbnailURL.Value),
+		Description:      utils.ToPtrIf(req.Description.IsSet(), req.Description.Value),
+		ThumbnailURL:     utils.ToPtrIf(req.ThumbnailURL.IsSet(), req.ThumbnailURL.Value),
 		ScheduledEndTime: req.ScheduledEndTime,
-		Latitude:         utils.ToPtrIfNotNullValue(!req.Latitude.IsSet(), req.Latitude.Value),
-		Longitude:        utils.ToPtrIfNotNullValue(!req.Longitude.IsSet(), req.Longitude.Value),
-		City:             utils.ToPtrIfNotNullValue(!req.City.IsSet(), req.City.Value),
-		Prefecture:       utils.ToPtrIfNotNullValue(!req.Prefecture.IsSet(), req.Prefecture.Value),
+		Latitude:         utils.ToPtrIf(req.Latitude.IsSet(), req.Latitude.Value),
+		Longitude:        utils.ToPtrIf(req.Longitude.IsSet(), req.Longitude.Value),
+		City:             utils.ToPtrIf(req.City.IsSet(), req.City.Value),
+		Prefecture:       utils.ToPtrIf(req.Prefecture.IsSet(), req.Prefecture.Value),
 	})
 	if err != nil {
 		return nil, err

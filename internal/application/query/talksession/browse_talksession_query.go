@@ -20,7 +20,7 @@ type (
 		Offset    *int
 		Theme     *string
 		Status    *Status
-		SortKey   sort.SortKey
+		SortKey   *sort.SortKey
 		Latitude  *float64
 		Longitude *float64
 	}
@@ -43,7 +43,7 @@ const (
 func (h *BrowseTalkSessionQueryInput) Validate() error {
 	var errs []error
 
-	if !h.SortKey.IsValid() {
+	if h.SortKey != nil && h.SortKey.IsValid() {
 		errs = append(errs, fmt.Errorf("無効なSortKeyです。: %s", h.SortKey))
 	}
 
