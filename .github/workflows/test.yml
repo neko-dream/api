@@ -14,6 +14,10 @@ on:
       concurrency-group:
         required: true
         type: string
+permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
 
 concurrency:
   group: ${ inputs.concurrency-group || test-${{ github.workflow }}-${{ github.ref || github.run_id  }}
