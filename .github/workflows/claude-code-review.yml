@@ -34,7 +34,7 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ secrets.GITHUB_TOKEN }}  # GitHubトークンを明示的に渡す
           claude_args: |
-            --mcp-config ./mcp-servers.json
+            --mcp-config ./.mcp.json
             --allowedTools "Bash(git:*), View, GlobTool, GrepTool, mcp__github__get_pull_request_reviews, mcp__github__get_pull_request_review_comments, mcp__github__get_pull_request_diff, mcp__github__create_pending_pull_request_review, mcp__github__add_comment_to_pending_review, mcp__github__submit_pending_pull_request_review"
             --model "claude-opus-4-20250514"
           prompt: |
