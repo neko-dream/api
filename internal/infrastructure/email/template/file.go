@@ -4,7 +4,7 @@ import (
 	"embed"
 	"html/template"
 
-	"github.com/neko-dream/server/internal/infrastructure/config"
+	"github.com/neko-dream/api/internal/infrastructure/config"
 )
 
 type EmailTemplateType string

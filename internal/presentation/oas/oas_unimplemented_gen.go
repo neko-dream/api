@@ -103,12 +103,12 @@ func (UnimplementedHandler) DevAuthorize(ctx context.Context, params DevAuthoriz
 	return r, ht.ErrNotImplemented
 }
 
-// DummiInit implements dummiInit operation.
+// DummyInit implements dummyInit operation.
 //
-// Mudai.
+// Init dummy.
 //
 // POST /test/dummy
-func (UnimplementedHandler) DummiInit(ctx context.Context) (r DummiInitRes, _ error) {
+func (UnimplementedHandler) DummyInit(ctx context.Context, req *DummyInitReq) (r DummyInitRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -407,6 +407,15 @@ func (UnimplementedHandler) GetUserStatsTotalManage(ctx context.Context) (r *Use
 	return r, ht.ErrNotImplemented
 }
 
+// GetUserTalkSessions implements getUserTalkSessions operation.
+//
+// 特定ユーザが開いたセッション一覧.
+//
+// GET /users/{displayID}/talksessions
+func (UnimplementedHandler) GetUserTalkSessions(ctx context.Context, params GetUserTalkSessionsParams) (r GetUserTalkSessionsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetVapidKey implements getVapidKey operation.
 //
 // VAPID公開鍵取得.
@@ -572,6 +581,15 @@ func (UnimplementedHandler) PostTimeLineItem(ctx context.Context, req *PostTimeL
 	return r, ht.ErrNotImplemented
 }
 
+// ReactivateUser implements reactivateUser operation.
+//
+// 退会ユーザーの復活.
+//
+// POST /auth/reactivate
+func (UnimplementedHandler) ReactivateUser(ctx context.Context) (r ReactivateUserRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // RegisterDevice implements registerDevice operation.
 //
 // デバイス登録/更新.
@@ -636,6 +654,15 @@ func (UnimplementedHandler) SwipeOpinions(ctx context.Context, params SwipeOpini
 	return r, ht.ErrNotImplemented
 }
 
+// SwitchOrganization implements switchOrganization operation.
+//
+// 組織切り替え.
+//
+// POST /organizations/switch/{code}
+func (UnimplementedHandler) SwitchOrganization(ctx context.Context, params SwitchOrganizationParams) (r SwitchOrganizationRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // TalkSessionAnalysis implements talkSessionAnalysis operation.
 //
 // 分析結果一覧.
@@ -670,6 +697,16 @@ func (UnimplementedHandler) UpdateNotificationPreferences(ctx context.Context, r
 	return r, ht.ErrNotImplemented
 }
 
+// UpdateOrganization implements updateOrganization operation.
+//
+// 組織を更新できる。
+// 組織のAdmin以上のユーザーが実行可能。.
+//
+// PUT /organizations/{code}
+func (UnimplementedHandler) UpdateOrganization(ctx context.Context, req *UpdateOrganizationReq, params UpdateOrganizationParams) (r UpdateOrganizationRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // UpdateUserProfile implements updateUserProfile operation.
 //
 // ユーザー情報の変更.
@@ -694,5 +731,14 @@ func (UnimplementedHandler) ValidateOrganizationCode(ctx context.Context, params
 //
 // POST /opinions/{opinionID}/votes
 func (UnimplementedHandler) Vote2(ctx context.Context, req *Vote2Req, params Vote2Params) (r Vote2Res, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// WithdrawUser implements withdrawUser operation.
+//
+// ユーザー退会.
+//
+// DELETE /user
+func (UnimplementedHandler) WithdrawUser(ctx context.Context) (r WithdrawUserRes, _ error) {
 	return r, ht.ErrNotImplemented
 }

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/neko-dream/server/internal/domain/model/crypto"
-	"github.com/neko-dream/server/internal/infrastructure/config"
+	"github.com/neko-dream/api/internal/domain/model/crypto"
+	"github.com/neko-dream/api/internal/infrastructure/config"
 )
 
 var (

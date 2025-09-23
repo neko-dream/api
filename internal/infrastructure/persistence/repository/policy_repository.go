@@ -6,11 +6,11 @@ import (
 	"errors"
 	"time"
 
-	"github.com/neko-dream/server/internal/domain/model/consent"
-	"github.com/neko-dream/server/internal/infrastructure/config"
-	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
-	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/neko-dream/api/internal/domain/model/consent"
+	"github.com/neko-dream/api/internal/infrastructure/config"
+	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
+	model "github.com/neko-dream/api/internal/infrastructure/persistence/sqlc/generated"
+	"github.com/neko-dream/api/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 

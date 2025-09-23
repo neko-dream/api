@@ -6,15 +6,15 @@ import (
 	"unicode/utf8"
 
 	"braces.dev/errtrace"
-	"github.com/neko-dream/server/internal/application/query/dto"
-	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/clock"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/talksession"
-	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/infrastructure/config"
-	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/neko-dream/api/internal/application/query/dto"
+	"github.com/neko-dream/api/internal/domain/messages"
+	"github.com/neko-dream/api/internal/domain/model/clock"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/talksession"
+	"github.com/neko-dream/api/internal/domain/model/user"
+	"github.com/neko-dream/api/internal/infrastructure/config"
+	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
+	"github.com/neko-dream/api/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
@@ -35,6 +35,7 @@ type (
 		Longitude        *float64                             // 経度
 		City             *string                              // 市区町村
 		Prefecture       *string                              // 都道府県
+		HideTop          *bool                                // トップに表示するかどうか
 	}
 
 	EditTalkSessionOutput struct {
@@ -103,7 +104,7 @@ func (i *editTalkSessionHandler) Execute(ctx context.Context, input EditTalkSess
 		return nil, messages.InvalidScheduledEndTime
 	}
 
-	if err := i.ExecTx(ctx, func(ctx context.Context) error {
+	if err := i.DBManager.ExecTx(ctx, func(ctx context.Context) error {
 
 		talkSession.ChangeTheme(input.Theme)
 		talkSession.ChangeDescription(input.Description)
@@ -117,6 +118,9 @@ func (i *editTalkSessionHandler) Execute(ctx context.Context, input EditTalkSess
 				*input.Latitude,
 				*input.Longitude,
 			))
+		}
+		if input.HideTop != nil {
+			talkSession.ChangeHideTop(*input.HideTop)
 		}
 
 		if err := i.TalkSessionRepository.Update(ctx, talkSession); err != nil {

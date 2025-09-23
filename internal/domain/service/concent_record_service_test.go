@@ -6,10 +6,10 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/consent"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/api/internal/domain/messages"
+	"github.com/neko-dream/api/internal/domain/model/consent"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/user"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

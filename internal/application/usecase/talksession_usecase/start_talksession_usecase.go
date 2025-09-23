@@ -6,17 +6,17 @@ import (
 	"unicode/utf8"
 
 	"braces.dev/errtrace"
-	"github.com/neko-dream/server/internal/application/query/dto"
-	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/clock"
-	"github.com/neko-dream/server/internal/domain/model/organization"
-	"github.com/neko-dream/server/internal/domain/model/session"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/talksession"
-	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/infrastructure/config"
-	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/neko-dream/api/internal/application/query/dto"
+	"github.com/neko-dream/api/internal/domain/messages"
+	"github.com/neko-dream/api/internal/domain/model/clock"
+	"github.com/neko-dream/api/internal/domain/model/organization"
+	"github.com/neko-dream/api/internal/domain/model/session"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/talksession"
+	"github.com/neko-dream/api/internal/domain/model/user"
+	"github.com/neko-dream/api/internal/infrastructure/config"
+	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
+	"github.com/neko-dream/api/pkg/utils"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
@@ -39,6 +39,7 @@ type (
 		Restrictions        []string
 		SessionClaim        *session.Claim // セッション情報を追加
 		OrganizationAliasID *shared.UUID[organization.OrganizationAlias]
+		HideTop             *bool // トップに表示するかどうか
 	}
 
 	StartTalkSessionUseCaseOutput struct {
@@ -127,7 +128,7 @@ func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSe
 		return output, errtrace.Wrap(err)
 	}
 
-	if err := i.ExecTx(ctx, func(ctx context.Context) error {
+	if err := i.DBManager.ExecTx(ctx, func(ctx context.Context) error {
 		talkSessionID := shared.NewUUID[talksession.TalkSession]()
 		var location *talksession.Location
 		if input.Latitude != nil && input.Longitude != nil {
@@ -151,6 +152,7 @@ func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSe
 			location,
 			input.City,
 			input.Prefecture,
+			lo.FromPtrOr(input.HideTop, false),
 			organizationID,
 			organizationAliasID,
 		)
@@ -180,6 +182,7 @@ func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSe
 			Description:      input.Description,
 			City:             input.City,
 			Prefecture:       input.Prefecture,
+			HideTop:          talkSession.HideTop(),
 		}
 		output.Latitude = input.Latitude
 		output.Longitude = input.Longitude

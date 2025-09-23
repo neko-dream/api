@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/neko-dream/server/internal/infrastructure/config"
-	"github.com/neko-dream/server/static"
+	"github.com/neko-dream/api/internal/infrastructure/config"
+	"github.com/neko-dream/api/static"
 )
 
 func NewStaticHandler(cfg *config.Config) http.Handler {

@@ -1,0 +1,27 @@
+repository: neko-dream/api
+coverage:
+  paths:
+    - coverage.out
+codeToTestRatio:
+  codeToTestRatio:
+  code:
+    - "**/*.go"
+    - "!**/*_test.go"
+    - "!**/*_gen.go"
+    - "!**/*.gen.go"
+    - "!**/*.sql.go"
+    - "!**/mock/**"
+  test:
+    - "**/*_test.go"
+testExecutionTime:
+  if: true
+report:
+  datastores:
+    - artifact://${GITHUB_REPOSITORY}
+diff:
+  datastores:
+    - artifact://${GITHUB_REPOSITORY}
+comment:
+  if: is_pull_request
+summary:
+  if: true

@@ -5,15 +5,15 @@ import (
 	"mime/multipart"
 
 	"braces.dev/errtrace"
-	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/session"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/domain/service"
-	"github.com/neko-dream/server/internal/infrastructure/config"
-	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
-	"github.com/neko-dream/server/internal/presentation/oas"
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/neko-dream/api/internal/domain/messages"
+	"github.com/neko-dream/api/internal/domain/model/session"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/user"
+	"github.com/neko-dream/api/internal/domain/service"
+	"github.com/neko-dream/api/internal/infrastructure/config"
+	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
+	"github.com/neko-dream/api/internal/presentation/oas"
+	"github.com/neko-dream/api/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
@@ -89,7 +89,7 @@ func (i *registerHandler) Execute(ctx context.Context, input RegisterInput) (*Re
 		token   string
 	)
 
-	err := i.ExecTx(ctx, func(ctx context.Context) error {
+	err := i.DBManager.ExecTx(ctx, func(ctx context.Context) error {
 		// ユーザーの存在を確認
 		foundUser, err := i.userRep.FindByID(ctx, input.UserID)
 		if err != nil {

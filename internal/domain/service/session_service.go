@@ -5,11 +5,12 @@ import (
 	"errors"
 
 	"braces.dev/errtrace"
-	"github.com/neko-dream/server/internal/domain/model/clock"
-	"github.com/neko-dream/server/internal/domain/model/session"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/neko-dream/api/internal/domain/model/clock"
+	"github.com/neko-dream/api/internal/domain/model/organization"
+	"github.com/neko-dream/api/internal/domain/model/session"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/user"
+	"github.com/neko-dream/api/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
@@ -84,6 +85,51 @@ func (s *sessionService) RefreshSession(
 	}
 
 	return updatedSess, nil
+}
+
+// SwitchOrganization implements session.SessionService.
+func (s *sessionService) SwitchOrganization(
+	ctx context.Context,
+	userID shared.UUID[user.User],
+	organizationID shared.UUID[organization.Organization],
+	sessionID shared.UUID[session.Session],
+) (*session.Session, error) {
+	ctx, span := otel.Tracer("service").Start(ctx, "sessionService.SwitchOrganization")
+	defer span.End()
+
+	// 既存セッションを取得してプロバイダー情報を引き継ぐ
+	sess, err := s.sessionRepository.FindBySessionID(ctx, sessionID)
+	if err != nil {
+		utils.HandleError(ctx, err, "sessionRepository.FindBySessionID")
+		return nil, errtrace.Wrap(err)
+	}
+
+	// 既存のアクティブなセッションをすべて無効化
+	if err := s.sessionRepository.DeactivateAllByUserID(ctx, userID); err != nil {
+		utils.HandleError(ctx, err, "sessionRepository.DeactivateAllByUserID")
+		return nil, errtrace.Wrap(err)
+	}
+
+	// 新しい組織付きセッションを作成
+	// organizationIDをany型にキャスト
+	orgID := shared.UUID[any](organizationID.UUID())
+	newSess := session.NewSessionWithOrganization(
+		shared.NewUUID[session.Session](),
+		userID,
+		sess.Provider(),
+		session.SESSION_ACTIVE,
+		*session.NewExpiresAt(ctx),
+		clock.Now(ctx),
+		&orgID,
+	)
+
+	createdSess, err := s.sessionRepository.Create(ctx, *newSess)
+	if err != nil {
+		utils.HandleError(ctx, err, "sessionRepository.Create")
+		return nil, errtrace.Wrap(err)
+	}
+
+	return createdSess, nil
 }
 
 func NewSessionService(

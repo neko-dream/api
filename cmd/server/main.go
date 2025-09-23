@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/neko-dream/server/cmd/server/bootstrap"
-	"github.com/neko-dream/server/internal/infrastructure/di"
+	"github.com/neko-dream/api/cmd/server/bootstrap"
+	"github.com/neko-dream/api/internal/infrastructure/di"
 )
 
 func main() {

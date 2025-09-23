@@ -1,10 +1,9 @@
 package di
 
 import (
-	"github.com/neko-dream/server/internal/domain/model/talksession/talksession_consent"
-	"github.com/neko-dream/server/internal/domain/service"
-	organization_svc "github.com/neko-dream/server/internal/domain/service/organization"
-	infra_service "github.com/neko-dream/server/internal/infrastructure/service"
+	"github.com/neko-dream/api/internal/domain/model/talksession/talksession_consent"
+	"github.com/neko-dream/api/internal/domain/service"
+	organization_svc "github.com/neko-dream/api/internal/domain/service/organization"
 )
 
 // このファイルはドメイン層（サービス等）のコンストラクタを管理します。
@@ -12,7 +11,8 @@ import (
 
 func domainDeps() []ProvideArg {
 	return []ProvideArg{
-		{service.NewAuthService, nil},
+		{service.NewAuthenticationService, nil},
+		{service.NewAuthorizationService, nil},
 		{service.NewSessionService, nil},
 		{service.NewUserService, nil},
 		{service.NewOpinionService, nil},
@@ -26,6 +26,5 @@ func domainDeps() []ProvideArg {
 		{organization_svc.NewOrganizationMemberManager, nil},
 		{talksession_consent.NewTalkSessionConsentService, nil},
 		{service.NewOrganizationAliasService, nil},
-		{infra_service.NewAuthenticationService, nil},
 	}
 }

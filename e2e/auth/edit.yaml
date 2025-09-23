@@ -4,6 +4,9 @@ runners:
     endpoint: http://localhost:3000
     useCookie: true
     notFollowRedirect: true
+    openapi3: http://localhost:3000/static/oas/openapi.yaml
+    skipValidateRequest: false
+    skipValidateResponse: true
   dev: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
 
 vars:
@@ -15,6 +18,7 @@ steps:
     desc: ユーザー削除
     dev:
       query:
+        DELETE FROM user_status_change_logs WHERE (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}') = user_id;
         DELETE FROM user_demographics WHERE (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}') = user_id;
         DELETE FROM user_auths WHERE subject = '{{ vars.id }}';
         DELETE FROM users WHERE display_id = '{{ vars.id }}';

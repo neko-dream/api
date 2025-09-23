@@ -4,14 +4,14 @@ import (
 	"context"
 
 	"braces.dev/errtrace"
-	"github.com/neko-dream/server/internal/domain/model/clock"
-	"github.com/neko-dream/server/internal/domain/model/session"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/service"
-	organizationService "github.com/neko-dream/server/internal/domain/service/organization"
-	"github.com/neko-dream/server/internal/infrastructure/config"
-	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/neko-dream/api/internal/domain/model/clock"
+	"github.com/neko-dream/api/internal/domain/model/session"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/service"
+	organizationService "github.com/neko-dream/api/internal/domain/service/organization"
+	"github.com/neko-dream/api/internal/infrastructure/config"
+	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
+	"github.com/neko-dream/api/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
@@ -33,7 +33,7 @@ type (
 	loginForDevInteractor struct {
 		*db.DBManager
 		*config.Config
-		service.AuthService
+		service.AuthenticationService
 		session.SessionRepository
 		session.SessionService
 		session.TokenManager
@@ -44,20 +44,20 @@ type (
 func NewLoginForDev(
 	tm *db.DBManager,
 	config *config.Config,
-	authService service.AuthService,
+	authService service.AuthenticationService,
 	sessionRepository session.SessionRepository,
 	sessionService session.SessionService,
 	tokenManager session.TokenManager,
 	organizationService organizationService.OrganizationService,
 ) LoginForDev {
 	return &loginForDevInteractor{
-		DBManager:           tm,
-		Config:              config,
-		AuthService:         authService,
-		SessionRepository:   sessionRepository,
-		SessionService:      sessionService,
-		TokenManager:        tokenManager,
-		organizationService: organizationService,
+		DBManager:             tm,
+		Config:                config,
+		AuthenticationService: authService,
+		SessionRepository:     sessionRepository,
+		SessionService:        sessionService,
+		TokenManager:          tokenManager,
+		organizationService:   organizationService,
 	}
 }
 
@@ -75,7 +75,7 @@ func (a *loginForDevInteractor) Execute(ctx context.Context, input LoginForDevIn
 	)
 
 	if err := a.ExecTx(ctx, func(ctx context.Context) error {
-		newUser, err := a.AuthService.Authenticate(ctx, "dev", input.Subject)
+		newUser, err := a.AuthenticationService.Authenticate(ctx, "dev", input.Subject)
 		if err != nil {
 			return err
 		}

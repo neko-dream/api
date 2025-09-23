@@ -41,8 +41,8 @@ type DevAuthorizeRes interface {
 	devAuthorizeRes()
 }
 
-type DummiInitRes interface {
-	dummiInitRes()
+type DummyInitRes interface {
+	dummyInitRes()
 }
 
 type EditTalkSessionRes interface {
@@ -157,6 +157,10 @@ type GetUserInfoRes interface {
 	getUserInfoRes()
 }
 
+type GetUserTalkSessionsRes interface {
+	getUserTalkSessionsRes()
+}
+
 type HandleAuthCallbackRes interface {
 	handleAuthCallbackRes()
 }
@@ -217,6 +221,10 @@ type PostTimeLineItemRes interface {
 	postTimeLineItemRes()
 }
 
+type ReactivateUserRes interface {
+	reactivateUserRes()
+}
+
 type RegisterDeviceRes interface {
 	registerDeviceRes()
 }
@@ -245,6 +253,10 @@ type SwipeOpinionsRes interface {
 	swipeOpinionsRes()
 }
 
+type SwitchOrganizationRes interface {
+	switchOrganizationRes()
+}
+
 type TalkSessionAnalysisRes interface {
 	talkSessionAnalysisRes()
 }
@@ -257,6 +269,10 @@ type UpdateNotificationPreferencesRes interface {
 	updateNotificationPreferencesRes()
 }
 
+type UpdateOrganizationRes interface {
+	updateOrganizationRes()
+}
+
 type UpdateUserProfileRes interface {
 	updateUserProfileRes()
 }
@@ -267,4 +283,8 @@ type ValidateOrganizationCodeRes interface {
 
 type Vote2Res interface {
 	vote2Res()
+}
+
+type WithdrawUserRes interface {
+	withdrawUserRes()
 }

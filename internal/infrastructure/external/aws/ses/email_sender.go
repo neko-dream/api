@@ -7,11 +7,11 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/sesv2"
 	"github.com/aws/aws-sdk-go-v2/service/sesv2/types"
-	"github.com/neko-dream/server/internal/infrastructure/config"
-	"github.com/neko-dream/server/internal/infrastructure/email"
-	email_template "github.com/neko-dream/server/internal/infrastructure/email/template"
-	"github.com/neko-dream/server/internal/infrastructure/external/aws"
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/neko-dream/api/internal/infrastructure/config"
+	"github.com/neko-dream/api/internal/infrastructure/email"
+	email_template "github.com/neko-dream/api/internal/infrastructure/email/template"
+	"github.com/neko-dream/api/internal/infrastructure/external/aws"
+	"github.com/neko-dream/api/pkg/utils"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )

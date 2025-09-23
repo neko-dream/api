@@ -350,7 +350,7 @@ op createOrganization(
   @multipartBody body: {
     name: HttpPart<string>;
     code: HttpPart<string>;
-    orgType: HttpPart<numeric>;
+    orgType: HttpPart<integer>;
   },
 ): Organization;
 
@@ -387,8 +387,29 @@ op createOrganization(
 ```
 
 **注意事項:**
-- レスポンスボディは `@body` または `Body<T>` を使用
 
+- レスポンスボディは `@body` または `Body<T>` を使用
+- HttpPartとnumeric, integer, booleanを使用するとき、以下を指定するとコンパイルに失敗します。
+
+```typespec
+integerOptionalNull?: HttpPart<integer | null>;
+integerOptional?: HttpPart<integer>;
+integer: HttpPart<integer>;
+booleanOptional?: HttpPart<boolean>;
+boolean: HttpPart<boolean>;
+```
+
+- 以下の指定なら大丈夫です。
+
+```typespec
+integerNull: HttpPart<integer | null>;
+numericOptionalNull?: HttpPart<numeric | null>;
+numericNull: HttpPart<numeric | null>;
+numericOptional?: HttpPart<numeric>;
+numeric: HttpPart<numeric>;
+booleanOptionalNull?: HttpPart<boolean | null>;
+booleanNull: HttpPart<boolean | null>;
+```
 
 ### 配列フィールド
 

@@ -3,7 +3,7 @@ package organization
 import (
 	"testing"
 
-	"github.com/neko-dream/server/internal/domain/messages"
+	"github.com/neko-dream/api/internal/domain/messages"
 	"github.com/stretchr/testify/assert"
 )
 

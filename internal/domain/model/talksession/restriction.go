@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/api/internal/domain/messages"
+	"github.com/neko-dream/api/internal/domain/model/user"
 )
 
 type RestrictionAttribute struct {

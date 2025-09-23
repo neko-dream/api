@@ -4,37 +4,37 @@ import (
 	"context"
 	"time"
 
-	"github.com/neko-dream/server/internal/application/query/timeline_query"
-	"github.com/neko-dream/server/internal/application/usecase/timeline_usecase"
-	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/talksession"
-	timelineactions "github.com/neko-dream/server/internal/domain/model/timeline_actions"
-	"github.com/neko-dream/server/internal/domain/service"
-	"github.com/neko-dream/server/internal/presentation/oas"
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/neko-dream/api/internal/application/query/timeline_query"
+	"github.com/neko-dream/api/internal/application/usecase/timeline_usecase"
+	"github.com/neko-dream/api/internal/domain/messages"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/talksession"
+	timelineactions "github.com/neko-dream/api/internal/domain/model/timeline_actions"
+	"github.com/neko-dream/api/internal/domain/service"
+	"github.com/neko-dream/api/internal/presentation/oas"
+	"github.com/neko-dream/api/pkg/utils"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
 type timelineHandler struct {
 	timeline_usecase.AddTimeLine
-	et          timeline_usecase.EditTimeLine
-	gt          timeline_query.GetTimeLine
-	authService service.AuthenticationService
+	et                   timeline_usecase.EditTimeLine
+	gt                   timeline_query.GetTimeLine
+	authorizationService service.AuthorizationService
 }
 
 func NewTimelineHandler(
 	addTimeLine timeline_usecase.AddTimeLine,
 	editTimeLine timeline_usecase.EditTimeLine,
 	getTimeLine timeline_query.GetTimeLine,
-	authService service.AuthenticationService,
+	authorizationService service.AuthorizationService,
 ) oas.TimelineHandler {
 	return &timelineHandler{
-		AddTimeLine: addTimeLine,
-		et:          editTimeLine,
-		gt:          getTimeLine,
-		authService: authService,
+		AddTimeLine:          addTimeLine,
+		et:                   editTimeLine,
+		gt:                   getTimeLine,
+		authorizationService: authorizationService,
 	}
 }
 
@@ -79,7 +79,7 @@ func (t *timelineHandler) PostTimeLineItem(ctx context.Context, req *oas.PostTim
 	ctx, span := otel.Tracer("handler").Start(ctx, "timelineHandler.PostTimeLineItem")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(t.authService, ctx)
+	authCtx, err := t.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ func (t *timelineHandler) EditTimeLine(ctx context.Context, req *oas.EditTimeLin
 	ctx, span := otel.Tracer("handler").Start(ctx, "timelineHandler.EditTimeLine")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(t.authService, ctx)
+	authCtx, err := t.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -145,10 +145,10 @@ func (t *timelineHandler) EditTimeLine(ctx context.Context, req *oas.EditTimeLin
 		return nil, messages.InternalServerError
 	}
 	var content, status *string
-	if req.Content.IsSet() {
+	if !req.Content.IsNull() {
 		content = lo.ToPtr(req.Content.Value)
 	}
-	if req.Status.IsSet() {
+	if !req.Status.IsNull() {
 		status = lo.ToPtr(req.Status.Value)
 	}
 

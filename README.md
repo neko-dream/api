@@ -39,6 +39,8 @@ cd api
 
 ```sh
 mise install
+# mise, go get -toolではtag指定ができないため
+go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 ```
 
 環境変数の設定
@@ -49,10 +51,10 @@ cp .env.example .env
 
 ### 3. コード生成
 
-自動生成スクリプトを実行
+Go Generateでコード生成
 
 ```sh
-./scripts/gen.sh
+go generate ./...
 ```
 
 ### 4. DBセットアップ

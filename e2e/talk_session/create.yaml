@@ -4,6 +4,9 @@ runners:
     endpoint: http://localhost:3000
     useCookie: true
     notFollowRedirect: true
+    openapi3: http://localhost:3000/static/oas/openapi.yaml
+    skipValidateRequest: false
+    skipValidateResponse: true
   dev: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
 
 vars:
@@ -19,10 +22,14 @@ steps:
     desc: ユーザー削除
     dev:
       query: |
+        DELETE FROM user_status_change_logs WHERE (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}') = user_id;
         DELETE FROM user_demographics WHERE (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}') = user_id;
-        DELETE FROM talk_sessions WHERE owner_id = (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}');
         DELETE FROM user_auths WHERE subject = '{{ vars.id }}';
         DELETE FROM users WHERE display_id = '{{ vars.id }}';
+        DELETE FROM opinions;
+        DELETE FROM votes;
+        DELETE FROM talk_sessions;
+        DELETE FROM domain_events;
   loginUser:
     desc: ログイン
     req:
@@ -53,25 +60,31 @@ steps:
               scheduledEndTime: "2100-12-31T23:59:59Z"
               prefecture: "{{ vars.prefecture }}"
               city: "{{ vars.city }}"
-              restrictions: "demographics.prefecture,demographics.city"
+              restrictions: '["demographics.prefecture","demographics.city"]'
+              hideTop: "false"
+    bind:
+      createTalkSession: current.res.body
     test: |
       current.res.status == 200 &&
       current.res.body.theme == 'テストセッション' &&
       current.res.body.description == 'テストの説明文です' &&
-      current.res.body.owner.displayID == 'talk_session_test'
-    bind:
-      createTalkSession: current.res.body
+      current.res.body.owner.displayID == 'talk_session_test' &&
+      current.res.body.prefecture == vars.prefecture &&
+      current.res.body.city == vars.city &&
+      current.res.body.restrictions == [{"description":"都道府県","key":"demographics.prefecture"},{"description":"市区町村","key":"demographics.city"}] &&
+      current.res.body.hideTop == false
+
   getTalkSessionList:
     desc: トークセッション一覧取得
     req:
-      /talksessions:
+      /talksessions?theme={{ vars.theme }}:
         get:
-          query:
-            theme: "{{ vars.theme }}"
+          headers: null
     test: |
       current.res.status == 200 &&
       len(current.res.body.talkSessions) > 0 &&
       current.res.body.talkSessions[0].talkSession.theme == vars.theme
+
   getTalkSessionDetail:
     desc: トークセッション詳細取得
     req:

@@ -3,13 +3,13 @@ package auth_usecase
 import (
 	"context"
 
-	"github.com/neko-dream/server/internal/domain/messages"
-	password_auth "github.com/neko-dream/server/internal/domain/model/auth/password"
-	"github.com/neko-dream/server/internal/domain/model/session"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/infrastructure/config"
-	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
+	"github.com/neko-dream/api/internal/domain/messages"
+	password_auth "github.com/neko-dream/api/internal/domain/model/auth/password"
+	"github.com/neko-dream/api/internal/domain/model/session"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/user"
+	"github.com/neko-dream/api/internal/infrastructure/config"
+	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
 	"go.opentelemetry.io/otel"
 )
 

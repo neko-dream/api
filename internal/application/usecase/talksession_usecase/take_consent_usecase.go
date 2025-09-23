@@ -5,12 +5,12 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/talksession"
-	"github.com/neko-dream/server/internal/domain/model/talksession/talksession_consent"
-	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/neko-dream/api/internal/domain/messages"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/talksession"
+	"github.com/neko-dream/api/internal/domain/model/talksession/talksession_consent"
+	"github.com/neko-dream/api/internal/domain/model/user"
+	"github.com/neko-dream/api/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 

@@ -4,25 +4,26 @@ import (
 	"context"
 	"mime/multipart"
 
-	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/clock"
-	"github.com/neko-dream/server/internal/domain/model/image"
-	"github.com/neko-dream/server/internal/domain/model/image/meta"
-	"github.com/neko-dream/server/internal/domain/model/opinion"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/talksession"
-	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/domain/model/vote"
-	"github.com/neko-dream/server/internal/domain/service"
-	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/neko-dream/api/internal/application/query/dto"
+	"github.com/neko-dream/api/internal/domain/messages"
+	"github.com/neko-dream/api/internal/domain/model/clock"
+	"github.com/neko-dream/api/internal/domain/model/image"
+	"github.com/neko-dream/api/internal/domain/model/image/meta"
+	"github.com/neko-dream/api/internal/domain/model/opinion"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/talksession"
+	"github.com/neko-dream/api/internal/domain/model/user"
+	"github.com/neko-dream/api/internal/domain/model/vote"
+	"github.com/neko-dream/api/internal/domain/service"
+	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
+	"github.com/neko-dream/api/pkg/utils"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
 type (
 	SubmitOpinion interface {
-		Execute(context.Context, SubmitOpinionInput) error
+		Execute(context.Context, SubmitOpinionInput) (*SubmitOpinionOutput, error)
 	}
 
 	SubmitOpinionInput struct {
@@ -36,6 +37,10 @@ type (
 		ReferenceURL    *string
 		Picture         *multipart.FileHeader
 		IsSeed          bool
+	}
+
+	SubmitOpinionOutput struct {
+		Opinion dto.Opinion
 	}
 
 	submitOpinionHandler struct {
@@ -72,7 +77,7 @@ func NewSubmitOpinionHandler(
 	}
 }
 
-func (h *submitOpinionHandler) Execute(ctx context.Context, input SubmitOpinionInput) error {
+func (h *submitOpinionHandler) Execute(ctx context.Context, input SubmitOpinionInput) (*SubmitOpinionOutput, error) {
 	ctx, span := otel.Tracer("opinion_command").Start(ctx, "submitOpinionHandler.Execute")
 	defer span.End()
 
@@ -86,29 +91,31 @@ func (h *submitOpinionHandler) Execute(ctx context.Context, input SubmitOpinionI
 		parentOpinion, err := h.OpinionRepository.FindByID(ctx, *input.ParentOpinionID)
 		if err != nil {
 			utils.HandleError(ctx, err, "OpinionRepository.FindByID")
-			return messages.OpinionCreateFailed
+			return nil, messages.OpinionCreateFailed
 		}
 		talkSessionID = parentOpinion.TalkSessionID()
 	} else {
-		return messages.OpinionCreateFailed
+		return nil, messages.OpinionCreateFailed
 	}
 	// talksessionが存在するか確認
 	talkSession, err := h.TalkSessionRepository.FindByID(ctx, talkSessionID)
 	if err != nil || talkSession == nil {
 		utils.HandleError(ctx, err, "TalkSessionRepository.FindByID")
-		return messages.TalkSessionNotFound
+		return nil, messages.TalkSessionNotFound
 	}
 
 	// オーナーではない場合、IsSeedがtrueの場合はエラーを返す
 	if talkSession.OwnerUserID() != input.UserID && input.IsSeed {
-		return messages.OpinionSeedIsOwnerOnly
+		return nil, messages.OpinionSeedIsOwnerOnly
 	}
 
 	// 参加制限を満たしているか確認。満たしていない場合はエラーを返す
 	if _, err := h.TalkSessionAccessControl.CanUserJoin(ctx, talkSessionID, lo.ToPtr(input.UserID)); err != nil {
 		utils.HandleError(ctx, err, "TalkSessionAccessControl.CanUserJoin")
-		return err
+		return nil, err
 	}
+
+	var op *opinion.Opinion
 
 	if err := h.ExecTx(ctx, func(ctx context.Context) error {
 		opinion, err := opinion.NewOpinion(
@@ -174,6 +181,7 @@ func (h *submitOpinionHandler) Execute(ctx context.Context, input SubmitOpinionI
 			utils.HandleError(ctx, err, "OpinionRepository.Create")
 			return messages.OpinionCreateFailed
 		}
+		op = opinion
 
 		// シード意見の場合はvoteしない
 		if input.IsSeed {
@@ -199,8 +207,19 @@ func (h *submitOpinionHandler) Execute(ctx context.Context, input SubmitOpinionI
 
 		return nil
 	}); err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return &SubmitOpinionOutput{
+		Opinion: dto.Opinion{
+			OpinionID:       op.OpinionID(),
+			TalkSessionID:   op.TalkSessionID(),
+			UserID:          op.UserID(),
+			ParentOpinionID: op.ParentOpinionID(),
+			Title:           op.Title(),
+			Content:         op.Content(),
+			CreatedAt:       op.CreatedAt(),
+			ReferenceURL:    op.ReferenceImageURL(),
+		},
+	}, nil
 }

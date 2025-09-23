@@ -9,9 +9,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/pinpoint"
 	"github.com/aws/aws-sdk-go-v2/service/pinpoint/types"
-	"github.com/neko-dream/server/internal/domain/model/notification"
-	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/infrastructure/config"
+	"github.com/neko-dream/api/internal/domain/model/notification"
+	"github.com/neko-dream/api/internal/domain/model/user"
+	"github.com/neko-dream/api/internal/infrastructure/config"
 	"go.opentelemetry.io/otel"
 )
 

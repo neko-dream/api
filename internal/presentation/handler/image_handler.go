@@ -3,27 +3,27 @@ package handler
 import (
 	"context"
 
-	"github.com/neko-dream/server/internal/application/usecase/image_usecase"
-	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/service"
-	"github.com/neko-dream/server/internal/presentation/oas"
-	http_utils "github.com/neko-dream/server/pkg/http"
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/neko-dream/api/internal/application/usecase/image_usecase"
+	"github.com/neko-dream/api/internal/domain/messages"
+	"github.com/neko-dream/api/internal/domain/service"
+	"github.com/neko-dream/api/internal/presentation/oas"
+	http_utils "github.com/neko-dream/api/pkg/http"
+	"github.com/neko-dream/api/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
 type imageHandler struct {
 	image_usecase.UploadImage
-	authService service.AuthenticationService
+	authorizationService service.AuthorizationService
 }
 
 func NewImageHandler(
 	uploadImage image_usecase.UploadImage,
-	authService service.AuthenticationService,
+	authorizationService service.AuthorizationService,
 ) oas.ImageHandler {
 	return &imageHandler{
-		UploadImage: uploadImage,
-		authService: authService,
+		UploadImage:          uploadImage,
+		authorizationService: authorizationService,
 	}
 }
 
@@ -32,14 +32,14 @@ func (i *imageHandler) PostImage(ctx context.Context, req *oas.PostImageReq) (oa
 	ctx, span := otel.Tracer("handler").Start(ctx, "imageHandler.PostImage")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(i.authService, ctx)
+	authCtx, err := i.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	file, err := http_utils.CreateFileHeader(ctx, req.Image.File, req.GetImage().Name)
 	if err != nil {
-		utils.HandleError(ctx, err, "MakeFileHeader")
+		utils.HandleError(ctx, err, "CreateFileHeader")
 		return nil, messages.InternalServerError
 	}
 

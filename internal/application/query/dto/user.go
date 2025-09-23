@@ -2,20 +2,22 @@ package dto
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/presentation/oas"
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/user"
+	"github.com/neko-dream/api/internal/presentation/oas"
+	"github.com/neko-dream/api/pkg/utils"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
 type User struct {
-	DisplayID   string
-	DisplayName string
-	IconURL     *string
+	DisplayID      string
+	DisplayName    string
+	IconURL        *string
+	WithdrawalDate *time.Time
 }
 
 type UserAuth struct {
@@ -64,6 +66,12 @@ type UserDetail struct {
 }
 
 func (u *User) ToResponse() oas.User {
+	if u.WithdrawalDate != nil {
+		return oas.User{
+			DisplayID:   "unknown",
+			DisplayName: "unknown",
+		}
+	}
 	return oas.User{
 		DisplayID:   u.DisplayID,
 		DisplayName: u.DisplayName,

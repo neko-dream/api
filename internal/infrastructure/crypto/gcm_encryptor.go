@@ -11,7 +11,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/neko-dream/api/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 

@@ -9,7 +9,6 @@ import (
 
 	"github.com/go-faster/errors"
 	"github.com/go-faster/jx"
-	"go.uber.org/multierr"
 
 	"github.com/ogen-go/ogen/conv"
 	ht "github.com/ogen-go/ogen/http"
@@ -28,13 +27,13 @@ func (s *Server) decodeApplyFeedbackToReportRequest(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
@@ -131,13 +130,13 @@ func (s *Server) decodeCreateOrganizationAliasRequest(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
@@ -196,6 +195,305 @@ func (s *Server) decodeCreateOrganizationAliasRequest(r *http.Request) (
 	}
 }
 
+func (s *Server) decodeDummyInitRequest(r *http.Request) (
+	req *DummyInitReq,
+	close func() error,
+	rerr error,
+) {
+	var closers []func() error
+	close = func() error {
+		var merr error
+		// Close in reverse order, to match defer behavior.
+		for i := len(closers) - 1; i >= 0; i-- {
+			c := closers[i]
+			merr = errors.Join(merr, c())
+		}
+		return merr
+	}
+	defer func() {
+		if rerr != nil {
+			rerr = errors.Join(rerr, close())
+		}
+	}()
+	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
+	if err != nil {
+		return req, close, errors.Wrap(err, "parse media type")
+	}
+	switch {
+	case ct == "multipart/form-data":
+		if r.ContentLength == 0 {
+			return req, close, validate.ErrBodyRequired
+		}
+		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
+			return req, close, errors.Wrap(err, "parse multipart form")
+		}
+		// Remove all temporary files created by ParseMultipartForm when the request is done.
+		//
+		// Notice that the closers are called in reverse order, to match defer behavior, so
+		// any opened file will be closed before RemoveAll call.
+		closers = append(closers, r.MultipartForm.RemoveAll)
+		// Form values may be unused.
+		form := url.Values(r.MultipartForm.Value)
+		_ = form
+
+		var request DummyInitReq
+		q := uri.NewQueryDecoder(form)
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "integerNull",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+					if err := func(d *jx.Decoder) error {
+						if err := request.IntegerNull.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"integerNull\"")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
+			}
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "numericOptionalNull",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+					if err := func(d *jx.Decoder) error {
+						request.NumericOptionalNull.Reset()
+						if err := request.NumericOptionalNull.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"numericOptionalNull\"")
+				}
+				if err := func() error {
+					if value, ok := request.NumericOptionalNull.Get(); ok {
+						if err := func() error {
+							if err := (validate.Float{}).Validate(float64(value)); err != nil {
+								return errors.Wrap(err, "float")
+							}
+							return nil
+						}(); err != nil {
+							return err
+						}
+					}
+					return nil
+				}(); err != nil {
+					return req, close, errors.Wrap(err, "validate")
+				}
+			}
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "numericNull",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+					if err := func(d *jx.Decoder) error {
+						if err := request.NumericNull.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"numericNull\"")
+				}
+				if err := func() error {
+					if value, ok := request.NumericNull.Get(); ok {
+						if err := func() error {
+							if err := (validate.Float{}).Validate(float64(value)); err != nil {
+								return errors.Wrap(err, "float")
+							}
+							return nil
+						}(); err != nil {
+							return err
+						}
+					}
+					return nil
+				}(); err != nil {
+					return req, close, errors.Wrap(err, "validate")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
+			}
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "numericOptional",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					var requestDotNumericOptionalVal float64
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToFloat64(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotNumericOptionalVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					request.NumericOptional.SetTo(requestDotNumericOptionalVal)
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"numericOptional\"")
+				}
+				if err := func() error {
+					if value, ok := request.NumericOptional.Get(); ok {
+						if err := func() error {
+							if err := (validate.Float{}).Validate(float64(value)); err != nil {
+								return errors.Wrap(err, "float")
+							}
+							return nil
+						}(); err != nil {
+							return err
+						}
+					}
+					return nil
+				}(); err != nil {
+					return req, close, errors.Wrap(err, "validate")
+				}
+			}
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "numeric",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToFloat64(val)
+					if err != nil {
+						return err
+					}
+
+					request.Numeric = c
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"numeric\"")
+				}
+				if err := func() error {
+					if err := (validate.Float{}).Validate(float64(request.Numeric)); err != nil {
+						return errors.Wrap(err, "float")
+					}
+					return nil
+				}(); err != nil {
+					return req, close, errors.Wrap(err, "validate")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
+			}
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "booleanOptionalNull",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+					if err := func(d *jx.Decoder) error {
+						request.BooleanOptionalNull.Reset()
+						if err := request.BooleanOptionalNull.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"booleanOptionalNull\"")
+				}
+			}
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "booleanNull",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+					if err := func(d *jx.Decoder) error {
+						if err := request.BooleanNull.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"booleanNull\"")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
+			}
+		}
+		return &request, close, nil
+	default:
+		return req, close, validate.InvalidContentType(ct)
+	}
+}
+
 func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
 	req *EditTalkSessionReq,
 	close func() error,
@@ -207,13 +505,13 @@ func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
@@ -515,6 +813,33 @@ func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
 				}
 			}
 		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "hideTop",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+					if err := func(d *jx.Decoder) error {
+						request.HideTop.Reset()
+						if err := request.HideTop.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"hideTop\"")
+				}
+			}
+		}
 		return &request, close, nil
 	default:
 		return req, close, validate.InvalidContentType(ct)
@@ -532,13 +857,13 @@ func (s *Server) decodeEditTimeLineRequest(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
@@ -572,28 +897,24 @@ func (s *Server) decodeEditTimeLineRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					var requestDotContentVal string
-					if err := func() error {
-						val, err := d.DecodeValue()
-						if err != nil {
-							return err
-						}
-
-						c, err := conv.ToString(val)
-						if err != nil {
-							return err
-						}
-
-						requestDotContentVal = c
-						return nil
-					}(); err != nil {
+					val, err := d.DecodeValue()
+					if err != nil {
 						return err
 					}
-					request.Content.SetTo(requestDotContentVal)
+					if err := func(d *jx.Decoder) error {
+						if err := request.Content.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"content\"")
 				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -604,28 +925,24 @@ func (s *Server) decodeEditTimeLineRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					var requestDotStatusVal string
-					if err := func() error {
-						val, err := d.DecodeValue()
-						if err != nil {
-							return err
-						}
-
-						c, err := conv.ToString(val)
-						if err != nil {
-							return err
-						}
-
-						requestDotStatusVal = c
-						return nil
-					}(); err != nil {
+					val, err := d.DecodeValue()
+					if err != nil {
 						return err
 					}
-					request.Status.SetTo(requestDotStatusVal)
+					if err := func(d *jx.Decoder) error {
+						if err := request.Status.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"status\"")
 				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
 			}
 		}
 		return &request, close, nil
@@ -645,13 +962,13 @@ func (s *Server) decodeEstablishOrganizationRequest(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
@@ -766,6 +1083,30 @@ func (s *Server) decodeEstablishOrganizationRequest(r *http.Request) (
 				return req, close, errors.Wrap(err, "query")
 			}
 		}
+		{
+			if err := func() error {
+				files, ok := r.MultipartForm.File["icon"]
+				if !ok || len(files) < 1 {
+					return nil
+				}
+				fh := files[0]
+
+				f, err := fh.Open()
+				if err != nil {
+					return errors.Wrap(err, "open")
+				}
+				closers = append(closers, f.Close)
+				request.Icon.SetTo(ht.MultipartFile{
+					Name:   fh.Filename,
+					File:   f,
+					Size:   fh.Size,
+					Header: fh.Header,
+				})
+				return nil
+			}(); err != nil {
+				return req, close, errors.Wrap(err, "decode \"icon\"")
+			}
+		}
 		return &request, close, nil
 	default:
 		return req, close, validate.InvalidContentType(ct)
@@ -783,13 +1124,13 @@ func (s *Server) decodeEstablishUserRequest(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
@@ -1085,13 +1426,13 @@ func (s *Server) decodeInitiateTalkSessionRequest(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
@@ -1461,6 +1802,33 @@ func (s *Server) decodeInitiateTalkSessionRequest(r *http.Request) (
 				}
 			}
 		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "hideTop",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+					if err := func(d *jx.Decoder) error {
+						request.HideTop.Reset()
+						if err := request.HideTop.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"hideTop\"")
+				}
+			}
+		}
 		return &request, close, nil
 	default:
 		return req, close, validate.InvalidContentType(ct)
@@ -1478,13 +1846,13 @@ func (s *Server) decodeInviteOrganizationRequest(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
@@ -1589,13 +1957,13 @@ func (s *Server) decodeInviteOrganizationForUserRequest(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
@@ -1700,13 +2068,13 @@ func (s *Server) decodeManageRegenerateManageRequest(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
@@ -1777,13 +2145,13 @@ func (s *Server) decodePasswordLoginRequest(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
@@ -1880,13 +2248,13 @@ func (s *Server) decodePasswordRegisterRequest(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
@@ -1983,13 +2351,13 @@ func (s *Server) decodePolicyConsentRequest(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
@@ -2059,13 +2427,13 @@ func (s *Server) decodePostConclusionRequest(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
@@ -2135,13 +2503,13 @@ func (s *Server) decodePostImageRequest(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
@@ -2207,13 +2575,13 @@ func (s *Server) decodePostOpinionPost2Request(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
@@ -2462,13 +2830,13 @@ func (s *Server) decodePostTimeLineItemRequest(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
@@ -2597,13 +2965,13 @@ func (s *Server) decodeRegisterDeviceRequest(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
@@ -2804,13 +3172,13 @@ func (s *Server) decodeReportOpinionRequest(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
@@ -2844,43 +3212,24 @@ func (s *Server) decodeReportOpinionRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					var requestDotReasonVal float64
-					if err := func() error {
-						val, err := d.DecodeValue()
-						if err != nil {
-							return err
-						}
-
-						c, err := conv.ToFloat64(val)
-						if err != nil {
-							return err
-						}
-
-						requestDotReasonVal = c
-						return nil
-					}(); err != nil {
+					val, err := d.DecodeValue()
+					if err != nil {
 						return err
 					}
-					request.Reason.SetTo(requestDotReasonVal)
+					if err := func(d *jx.Decoder) error {
+						if err := request.Reason.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"reason\"")
 				}
-				if err := func() error {
-					if value, ok := request.Reason.Get(); ok {
-						if err := func() error {
-							if err := (validate.Float{}).Validate(float64(value)); err != nil {
-								return errors.Wrap(err, "float")
-							}
-							return nil
-						}(); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return req, close, errors.Wrap(err, "validate")
-				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -2891,28 +3240,24 @@ func (s *Server) decodeReportOpinionRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					var requestDotContentVal string
-					if err := func() error {
-						val, err := d.DecodeValue()
-						if err != nil {
-							return err
-						}
-
-						c, err := conv.ToString(val)
-						if err != nil {
-							return err
-						}
-
-						requestDotContentVal = c
-						return nil
-					}(); err != nil {
+					val, err := d.DecodeValue()
+					if err != nil {
 						return err
 					}
-					request.Content.SetTo(requestDotContentVal)
+					if err := func(d *jx.Decoder) error {
+						if err := request.Content.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"content\"")
 				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
 			}
 		}
 		return &request, close, nil
@@ -2932,13 +3277,13 @@ func (s *Server) decodeSendTestNotificationRequest(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
@@ -2972,28 +3317,23 @@ func (s *Server) decodeSendTestNotificationRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					var requestDotTitleVal string
-					if err := func() error {
-						val, err := d.DecodeValue()
-						if err != nil {
-							return err
-						}
-
-						c, err := conv.ToString(val)
-						if err != nil {
-							return err
-						}
-
-						requestDotTitleVal = c
-						return nil
-					}(); err != nil {
+					val, err := d.DecodeValue()
+					if err != nil {
 						return err
 					}
-					request.Title.SetTo(requestDotTitleVal)
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					request.Title = c
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"title\"")
 				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -3004,28 +3344,23 @@ func (s *Server) decodeSendTestNotificationRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					var requestDotBodyVal string
-					if err := func() error {
-						val, err := d.DecodeValue()
-						if err != nil {
-							return err
-						}
-
-						c, err := conv.ToString(val)
-						if err != nil {
-							return err
-						}
-
-						requestDotBodyVal = c
-						return nil
-					}(); err != nil {
+					val, err := d.DecodeValue()
+					if err != nil {
 						return err
 					}
-					request.Body.SetTo(requestDotBodyVal)
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					request.Body = c
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"body\"")
 				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -3077,13 +3412,13 @@ func (s *Server) decodeSolveOpinionReportRequest(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
@@ -3162,13 +3497,13 @@ func (s *Server) decodeToggleReportVisibilityManageRequest(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
@@ -3231,13 +3566,13 @@ func (s *Server) decodeUpdateNotificationPreferencesRequest(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
@@ -3276,7 +3611,6 @@ func (s *Server) decodeUpdateNotificationPreferencesRequest(r *http.Request) (
 						return err
 					}
 					if err := func(d *jx.Decoder) error {
-						request.PushNotificationEnabled.Reset()
 						if err := request.PushNotificationEnabled.Decode(d); err != nil {
 							return err
 						}
@@ -3288,6 +3622,108 @@ func (s *Server) decodeUpdateNotificationPreferencesRequest(r *http.Request) (
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"push_notification_enabled\"")
 				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
+			}
+		}
+		return &request, close, nil
+	default:
+		return req, close, validate.InvalidContentType(ct)
+	}
+}
+
+func (s *Server) decodeUpdateOrganizationRequest(r *http.Request) (
+	req *UpdateOrganizationReq,
+	close func() error,
+	rerr error,
+) {
+	var closers []func() error
+	close = func() error {
+		var merr error
+		// Close in reverse order, to match defer behavior.
+		for i := len(closers) - 1; i >= 0; i-- {
+			c := closers[i]
+			merr = errors.Join(merr, c())
+		}
+		return merr
+	}
+	defer func() {
+		if rerr != nil {
+			rerr = errors.Join(rerr, close())
+		}
+	}()
+	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
+	if err != nil {
+		return req, close, errors.Wrap(err, "parse media type")
+	}
+	switch {
+	case ct == "multipart/form-data":
+		if r.ContentLength == 0 {
+			return req, close, validate.ErrBodyRequired
+		}
+		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
+			return req, close, errors.Wrap(err, "parse multipart form")
+		}
+		// Remove all temporary files created by ParseMultipartForm when the request is done.
+		//
+		// Notice that the closers are called in reverse order, to match defer behavior, so
+		// any opened file will be closed before RemoveAll call.
+		closers = append(closers, r.MultipartForm.RemoveAll)
+		// Form values may be unused.
+		form := url.Values(r.MultipartForm.Value)
+		_ = form
+
+		var request UpdateOrganizationReq
+		q := uri.NewQueryDecoder(form)
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "name",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					request.Name = c
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"name\"")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
+			}
+		}
+		{
+			if err := func() error {
+				files, ok := r.MultipartForm.File["icon"]
+				if !ok || len(files) < 1 {
+					return nil
+				}
+				fh := files[0]
+
+				f, err := fh.Open()
+				if err != nil {
+					return errors.Wrap(err, "open")
+				}
+				closers = append(closers, f.Close)
+				request.Icon.SetTo(ht.MultipartFile{
+					Name:   fh.Filename,
+					File:   f,
+					Size:   fh.Size,
+					Header: fh.Header,
+				})
+				return nil
+			}(); err != nil {
+				return req, close, errors.Wrap(err, "decode \"icon\"")
 			}
 		}
 		return &request, close, nil
@@ -3307,13 +3743,13 @@ func (s *Server) decodeUpdateUserProfileRequest(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
@@ -3406,43 +3842,24 @@ func (s *Server) decodeUpdateUserProfileRequest(r *http.Request) (
 			}
 			if err := q.HasParam(cfg); err == nil {
 				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					var requestDotDateOfBirthVal float64
-					if err := func() error {
-						val, err := d.DecodeValue()
-						if err != nil {
-							return err
-						}
-
-						c, err := conv.ToFloat64(val)
-						if err != nil {
-							return err
-						}
-
-						requestDotDateOfBirthVal = c
-						return nil
-					}(); err != nil {
+					val, err := d.DecodeValue()
+					if err != nil {
 						return err
 					}
-					request.DateOfBirth.SetTo(requestDotDateOfBirthVal)
+					if err := func(d *jx.Decoder) error {
+						if err := request.DateOfBirth.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
 					return nil
 				}); err != nil {
 					return req, close, errors.Wrap(err, "decode \"dateOfBirth\"")
 				}
-				if err := func() error {
-					if value, ok := request.DateOfBirth.Get(); ok {
-						if err := func() error {
-							if err := (validate.Float{}).Validate(float64(value)); err != nil {
-								return errors.Wrap(err, "float")
-							}
-							return nil
-						}(); err != nil {
-							return err
-						}
-					}
-					return nil
-				}(); err != nil {
-					return req, close, errors.Wrap(err, "validate")
-				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -3614,13 +4031,13 @@ func (s *Server) decodeVote2Request(r *http.Request) (
 		// Close in reverse order, to match defer behavior.
 		for i := len(closers) - 1; i >= 0; i-- {
 			c := closers[i]
-			merr = multierr.Append(merr, c())
+			merr = errors.Join(merr, c())
 		}
 		return merr
 	}
 	defer func() {
 		if rerr != nil {
-			rerr = multierr.Append(rerr, close())
+			rerr = errors.Join(rerr, close())
 		}
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))

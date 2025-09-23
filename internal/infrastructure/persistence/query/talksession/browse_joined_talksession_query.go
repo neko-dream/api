@@ -6,11 +6,11 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jinzhu/copier"
-	"github.com/neko-dream/server/internal/application/query/dto"
-	"github.com/neko-dream/server/internal/application/query/talksession"
-	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
-	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/neko-dream/api/internal/application/query/dto"
+	"github.com/neko-dream/api/internal/application/query/talksession"
+	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
+	model "github.com/neko-dream/api/internal/infrastructure/persistence/sqlc/generated"
+	"github.com/neko-dream/api/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 

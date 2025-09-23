@@ -1,10 +1,10 @@
 package auth
 
 import (
-	"github.com/neko-dream/server/internal/domain/model/organization"
-	"github.com/neko-dream/server/internal/domain/model/session"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/api/internal/domain/model/organization"
+	"github.com/neko-dream/api/internal/domain/model/session"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/user"
 )
 
 type AuthenticationContext struct {
@@ -58,4 +58,8 @@ func (ac *AuthenticationContext) IsAdmin() bool {
 // パスワード変更が必要かを確認
 func (ac *AuthenticationContext) RequiresPasswordChange() bool {
 	return ac.RequiredPasswordChange
+}
+
+func (ac *AuthenticationContext) IsKotohiro() bool {
+	return ac.OrganizationID != nil && *ac.OrganizationID == organization.KotohiroOrganizationID
 }

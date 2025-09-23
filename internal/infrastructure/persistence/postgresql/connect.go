@@ -6,7 +6,7 @@ import (
 
 	"github.com/XSAM/otelsql"
 	_ "github.com/jackc/pgx/v5/stdlib"
-	"github.com/neko-dream/server/internal/infrastructure/config"
+	"github.com/neko-dream/api/internal/infrastructure/config"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.10.0"
 )

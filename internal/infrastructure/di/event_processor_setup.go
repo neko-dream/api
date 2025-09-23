@@ -1,10 +1,10 @@
 package di
 
 import (
-	"github.com/neko-dream/server/internal/application/event_processor"
-	"github.com/neko-dream/server/internal/application/event_processor/handlers"
-	"github.com/neko-dream/server/internal/domain/model/event"
-	"github.com/neko-dream/server/internal/domain/model/talksession"
+	"github.com/neko-dream/api/internal/application/event_processor"
+	"github.com/neko-dream/api/internal/application/event_processor/handlers"
+	"github.com/neko-dream/api/internal/domain/model/event"
+	"github.com/neko-dream/api/internal/domain/model/talksession"
 )
 
 func SetupEventProcessor(

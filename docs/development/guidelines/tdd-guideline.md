@@ -100,7 +100,7 @@ go fmt ./...        # Format code
 
 ### Code Generation
 ```bash
-./scripts/gen.sh    # Generate code from TypeSpec and SQLC
+go generate ./...  # Generate code from TypeSpec and SQLC
 ```
 
 ## See Also

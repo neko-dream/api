@@ -4,7 +4,7 @@ import (
 	"slices"
 	"unicode"
 
-	"github.com/neko-dream/server/internal/domain/messages"
+	"github.com/neko-dream/api/internal/domain/messages"
 )
 
 // ValidateOrganizationCode

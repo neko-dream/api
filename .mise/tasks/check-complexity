@@ -1,0 +1,216 @@
+#!/bin/bash
+set -euo pipefail
+
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[1;33m'
+readonly BLUE='\033[0;34m'
+readonly MAGENTA='\033[0;35m'
+readonly CYAN='\033[0;36m'
+readonly BOLD='\033[1m'
+readonly NC='\033[0m' # No Color
+
+readonly COGNITIVE_THRESHOLD=30
+readonly CYCLOMATIC_THRESHOLD=10
+
+print_header() {
+    echo -e "${CYAN}${BOLD}"
+    echo "╔══════════════════════════════════════════════════════════════╗"
+    echo "║              Go コード複雑度分析レポート                     ║"
+    echo "╚══════════════════════════════════════════════════════════════╝"
+    echo -e "${NC}"
+}
+
+find_go_files() {
+    local exclude_paths=(
+        "*/vendor/*"
+        "*/.git/*"
+        "*/.serena/*"
+        "*/internal/infrastructure/persistence/sqlc/generated/*"
+        "*/internal/presentation/oas/*"
+        "*/mock/*"
+    )
+
+    local exclude_names=(
+        "*.gen.go"
+        "*_gen.go"
+        "*.sql.go"
+        "*.pb.go"
+        "*_test.go"
+    )
+
+    local find_args=()
+
+    # パスの除外条件を追加
+    for path in "${exclude_paths[@]}"; do
+        find_args+=("!" "-path" "$path")
+    done
+
+    # ファイル名の除外条件を追加
+    for name in "${exclude_names[@]}"; do
+        find_args+=("!" "-name" "$name")
+    done
+
+    find . -type f -name "*.go" "${find_args[@]}" | sort
+}
+
+main() {
+    print_header
+
+    echo -e "${GREEN}📅 分析日時: $(date '+%Y年%m月%d日 %H:%M:%S')${NC}"
+
+    local files=$(find_go_files)
+    local file_count=$(echo "$files" | wc -l | tr -d ' ')
+    echo -e "${GREEN}📁 分析対象: ${file_count} ファイル（自動生成除く）${NC}"
+    echo ""
+
+    # 認知的複雑度分析（gocognit）
+    if command -v go tool gocognit &> /dev/null; then
+        echo -e "${MAGENTA}${BOLD}🧠 認知的複雑度が高い関数（${COGNITIVE_THRESHOLD}以上）${NC}"
+        echo -e "${CYAN}───────────────────────────────────────────────────────────────────────────────${NC}"
+
+        local cognitive_results=$(echo "$files" | xargs go tool gocognit -over $COGNITIVE_THRESHOLD 2>/dev/null)
+        if [[ -n "$cognitive_results" ]]; then
+            # 結果を1行ずつ処理して色付け
+            while IFS= read -r line; do
+                if [[ $line =~ ^([0-9]+)[[:space:]]+(.+) ]]; then
+                    local complexity="${BASH_REMATCH[1]}"
+                    local location="${BASH_REMATCH[2]}"
+
+                    # 認知的複雑度レベルに応じた色の判定
+                    if [ "$complexity" -le 7 ]; then
+                        local color="${GREEN}"
+                    elif [ "$complexity" -le 15 ]; then
+                        local color="${YELLOW}"
+                    elif [ "$complexity" -le 25 ]; then
+                        local color="${YELLOW}${BOLD}"
+                    elif [ "$complexity" -le 40 ]; then
+                        local color="${RED}"
+                    else
+                        local color="${RED}${BOLD}"
+                    fi
+
+                    # 色付きで出力
+                    echo -e "${color}${complexity} ${location}${NC}"
+                else
+                    echo "$line"
+                fi
+            done <<< "$cognitive_results"
+
+            local cognitive_count=$(echo "$cognitive_results" | wc -l)
+            echo ""
+            echo -e "${YELLOW}⚠️  ${cognitive_count}個の関数が要リファクタリング対象です${NC}"
+        else
+            echo -e "${GREEN}✅ 認知的複雑度${COGNITIVE_THRESHOLD}以上の関数はありません${NC}"
+        fi
+        echo ""
+    else
+        echo -e "${YELLOW}⚠️  gocognitがインストールされていません（認知的複雑度分析をスキップ）${NC}"
+        echo -e "${YELLOW}   インストール方法: go get tool${NC}"
+        echo ""
+    fi
+
+    # 循環的複雑度分析（gocyclo）
+    if command -v go tool gocyclo &> /dev/null; then
+        echo -e "${BLUE}${BOLD}🔄 循環的複雑度が高い関数（${CYCLOMATIC_THRESHOLD}以上）${NC}"
+        echo -e "${CYAN}───────────────────────────────────────────────────────────────────────────────${NC}"
+
+        local cyclo_results=$(echo "$files" | xargs go tool gocyclo -over $CYCLOMATIC_THRESHOLD 2>/dev/null)
+        if [[ -n "$cyclo_results" ]]; then
+            # 結果を1行ずつ処理して色付け
+            while IFS= read -r line; do
+                if [[ $line =~ ^([0-9]+)[[:space:]]+(.+) ]]; then
+                    local complexity="${BASH_REMATCH[1]}"
+                    local location="${BASH_REMATCH[2]}"
+
+                    # 複雑度レベルに応じた色の判定
+                    if [ "$complexity" -le 10 ]; then
+                        local color="${GREEN}"
+                    elif [ "$complexity" -lt 30 ]; then
+                        local color="${YELLOW}"
+                    elif [ "$complexity" -lt 50 ]; then
+                        local color="${YELLOW}${BOLD}"
+                    elif [ "$complexity" -lt 75 ]; then
+                        local color="${RED}"
+                    else
+                        local color="${RED}${BOLD}"
+                    fi
+
+                    # 色付きで出力
+                    echo -e "${color}${complexity} ${location}${NC}"
+                else
+                    echo "$line"
+                fi
+            done <<< "$cyclo_results"
+
+            local cyclo_count=$(echo "$cyclo_results" | wc -l)
+            echo ""
+            echo -e "${YELLOW}⚠️  ${cyclo_count}個の関数が要確認対象です${NC}"
+        else
+            echo -e "${GREEN}✅ 循環的複雑度${CYCLOMATIC_THRESHOLD}以上の関数はありません${NC}"
+        fi
+        echo ""
+    else
+        echo -e "${YELLOW}⚠️  gocycloがインストールされていません（循環的複雑度分析をスキップ）${NC}"
+        echo -e "${YELLOW}   インストール方法: go get tool${NC}"
+        echo ""
+    fi
+
+    echo -e "${YELLOW}${BOLD}📊 プロジェクト全体の統計${NC}"
+    echo -e "${CYAN}───────────────────────────────────────────────────────────────────────────────${NC}"
+    echo "$files" | xargs go tool scc | grep -E "^Go|^Language|^Estimated"
+    echo -e "${CYAN}───────────────────────────────────────────────────────────────────────────────${NC}"
+
+    # 推奨事項
+    echo ""
+    echo -e "${GREEN}${BOLD}💡 リファクタリング推奨事項${NC}"
+    echo -e "  ${YELLOW}●${NC} 認知的複雑度 ≥${COGNITIVE_THRESHOLD} の関数は分割を検討してください"
+    echo -e "  ${YELLOW}●${NC} 循環的複雑度 ≥${CYCLOMATIC_THRESHOLD} の関数は条件分岐の簡略化を検討してください"
+    echo -e "  ${YELLOW}●${NC} 複数の複雑度指標で上位に入るファイルを優先的にリファクタリングしてください"
+
+    # 複雑度の解説
+    echo ""
+    echo -e "${CYAN}${BOLD}📖 複雑度の目安${NC}"
+    echo -e "${BOLD}循環的複雑度:${NC}"
+    echo -e "  ${GREEN}● 10以下${NC}: 非常に良い構造 (バグ混入確率: 25%)"
+    echo -e "  ${YELLOW}● 30以上${NC}: 構造的なリスクあり (バグ混入確率: 40%)"
+    echo -e "  ${RED}● 50以上${NC}: テスト不可能 (バグ混入確率: 70%)"
+    echo -e "  ${RED}${BOLD}● 75以上${NC}: いかなる変更も誤修正を生む (バグ混入確率: 98%)"
+    echo ""
+    echo -e "${BOLD}認知的複雑度:${NC}"
+    echo -e "  ${GREEN}● 7以下${NC}: 非常に良い構造"
+    echo -e "  ${YELLOW}● 8-15${NC}: 良い構造"
+    echo -e "  ${YELLOW}${BOLD}● 16-25${NC}: 構造的なリスクあり"
+    echo -e "  ${RED}● 26-40${NC}: 理解困難・テスト困難"
+    echo -e "  ${RED}${BOLD}● 40以上${NC}: いかなる変更も誤修正を生む"
+    echo ""
+}
+
+echo -e "${CYAN}🔍 必要なツールを確認中...${NC}"
+
+# sccがインストールされているか確認
+if ! command -v go tool scc &> /dev/null; then
+    echo -e "${RED}❌ エラー: sccがインストールされていません${NC}"
+    echo -e "${YELLOW}インストール方法: go get tool${NC}"
+    exit 1
+fi
+
+tools_status="ツール状態: "
+if command -v go tool gocognit &> /dev/null; then
+    tools_status="${tools_status}${GREEN}✅${NC} gocognit "
+else
+    tools_status="${tools_status}${YELLOW}❌${NC} gocognit "
+fi
+
+if command -v go tool gocyclo &> /dev/null; then
+    tools_status="${tools_status}${GREEN}✅${NC} gocyclo"
+else
+    tools_status="${tools_status}${YELLOW}❌${NC} gocyclo"
+fi
+
+echo -e "$tools_status"
+echo ""
+
+main
+
+exit 0

@@ -4,8 +4,8 @@ import (
 	"context"
 	"sort"
 
-	"github.com/neko-dream/server/internal/application/query/talksession"
-	ts "github.com/neko-dream/server/internal/domain/model/talksession"
+	"github.com/neko-dream/api/internal/application/query/talksession"
+	ts "github.com/neko-dream/api/internal/domain/model/talksession"
 	"go.opentelemetry.io/otel"
 )
 

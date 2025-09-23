@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/neko-dream/server/internal/application/query/dto"
-	user_query "github.com/neko-dream/server/internal/application/query/user"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
+	"github.com/neko-dream/api/internal/application/query/dto"
+	user_query "github.com/neko-dream/api/internal/application/query/user"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/user"
+	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -50,6 +50,11 @@ func (m *MockUserRepository) FindByDisplayID(ctx context.Context, displayID stri
 
 func (m *MockUserRepository) Update(ctx context.Context, user user.User) error {
 	args := m.Called(ctx, user)
+	return args.Error(0)
+}
+
+func (m *MockUserRepository) ChangeSubject(ctx context.Context, userID shared.UUID[user.User], newSubject string) error {
+	args := m.Called(ctx, userID, newSubject)
 	return args.Error(0)
 }
 

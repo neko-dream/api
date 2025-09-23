@@ -3,12 +3,12 @@ package repository
 import (
 	"context"
 
-	"github.com/neko-dream/server/internal/domain/model/image"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
-	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/neko-dream/api/internal/domain/model/image"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/user"
+	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
+	model "github.com/neko-dream/api/internal/infrastructure/persistence/sqlc/generated"
+	"github.com/neko-dream/api/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 

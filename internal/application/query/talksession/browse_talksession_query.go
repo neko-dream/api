@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/neko-dream/server/internal/application/query/dto"
-	"github.com/neko-dream/server/pkg/sort"
+	"github.com/neko-dream/api/internal/application/query/dto"
+	"github.com/neko-dream/api/pkg/sort"
 	"github.com/samber/lo"
 )
 
@@ -20,7 +20,7 @@ type (
 		Offset    *int
 		Theme     *string
 		Status    *Status
-		SortKey   sort.SortKey
+		SortKey   *sort.SortKey
 		Latitude  *float64
 		Longitude *float64
 	}
@@ -43,7 +43,7 @@ const (
 func (h *BrowseTalkSessionQueryInput) Validate() error {
 	var errs []error
 
-	if !h.SortKey.IsValid() {
+	if h.SortKey != nil && !h.SortKey.IsValid() {
 		errs = append(errs, fmt.Errorf("無効なSortKeyです。: %s", h.SortKey))
 	}
 

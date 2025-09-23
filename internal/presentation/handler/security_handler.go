@@ -4,9 +4,10 @@ import (
 	"context"
 	"slices"
 
-	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/session"
-	"github.com/neko-dream/server/internal/presentation/oas"
+	"github.com/neko-dream/api/internal/domain/messages"
+	"github.com/neko-dream/api/internal/domain/model/clock"
+	"github.com/neko-dream/api/internal/domain/model/session"
+	"github.com/neko-dream/api/internal/presentation/oas"
 	"go.opentelemetry.io/otel"
 )
 
@@ -18,6 +19,14 @@ type securityHandler struct {
 var skipOperations = []string{
 	"EstablishUser",
 	"GetTokenInfo",
+	"RevokeToken",
+}
+
+var skipOperationsForWithdrawal = []string{
+	"ReactivateUser",
+	"RevokeToken",
+	"DevAuthorize",
+	"PasswordLogin",
 }
 
 func (s *securityHandler) HandleCookieAuth(ctx context.Context, operationName string, t oas.CookieAuth) (context.Context, error) {
@@ -31,6 +40,17 @@ func (s *securityHandler) HandleCookieAuth(ctx context.Context, operationName st
 	// トークンの有効性を確認
 	if claim.IsExpired(ctx) {
 		return ctx, messages.TokenExpiredError
+	}
+
+	if claim.IsWithdrawn &&
+		!slices.Contains(skipOperationsForWithdrawal, operationName) {
+		// 31日以降の場合はTokenExpiredError
+		if claim.WithdrawalDate.AddDate(0, 0, 31).Before(clock.Now(ctx)) {
+			return ctx, messages.TokenExpiredError
+		}
+
+		// 退会済みの場合は30日以内なら復活可能なエラーを返す
+		return ctx, messages.UserWithdrawnRecoverableError
 	}
 
 	// スキップするOperationの場合以外は、ユーザー登録済みか確認

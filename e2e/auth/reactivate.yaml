@@ -1,0 +1,103 @@
+desc: ユーザー復活APIのテスト
+runners:
+  req:
+    endpoint: http://localhost:3000
+    useCookie: true
+    notFollowRedirect: true
+    openapi3: http://localhost:3000/static/oas/openapi.yaml
+    skipValidateRequest: false
+    skipValidateResponse: true
+  dev: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
+
+vars:
+  id: withdraw_test
+  name: WithdrawTest
+
+steps:
+  # Arrange: ユーザー削除とdev login
+  deleteUser:
+    desc: ユーザー削除
+    dev:
+      query: |
+        DELETE FROM user_status_change_logs WHERE (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}') = user_id;
+        DELETE FROM user_demographics WHERE (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}') = user_id;
+        DELETE FROM user_auths WHERE subject = '{{ vars.id }}';
+        DELETE FROM users WHERE display_id = '{{ vars.id }}';
+
+  loginUser:
+    desc: dev loginでログイン
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.id }}:
+        get:
+          headers: null
+    test: len(current.res.headers['Set-Cookie']) > 0
+
+  createUser:
+    desc: ユーザー作成
+    req:
+      /user:
+        post:
+          body:
+            multipart/form-data:
+              displayName: "{{ vars.name }}"
+              displayID: "{{ vars.id }}"
+    test: current.res.status == 200
+
+  # Act: 退会
+  withdrawUser:
+    desc: ユーザー退会
+    req:
+      /user:
+        delete:
+          body:
+            multipart/form-data:
+              reason: "Test withdrawal"
+    test: |
+      current.res.status == 200 &&
+      hasPrefix(current.res.body.message, "退会処理が完了しました") &&
+      current.res.body.withdrawalDate != null
+
+  # Assert: 退会後の認証エラー確認
+  loginAfterWithdrawUser:
+    desc: dev loginでログイン
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.id }}:
+        get:
+          headers: null
+    test: len(current.res.headers['Set-Cookie']) > 0
+
+  checkAuthError:
+    desc: 退会後の認証エラー確認
+    req:
+      /user:
+        get:
+          headers: null
+    test: |
+      current.res.status == 403 &&
+      current.res.body.code == "AUTH-0010"
+
+  # Act: 復活
+  reactivateUser:
+    desc: ユーザー復活
+    req:
+      /auth/reactivate:
+        post:
+          body:
+            multipart/form-data:
+              id: "{{ vars.id }}"
+    test: |
+      current.res.status == 200 &&
+      hasPrefix(current.res.body.message, "アカウントが復活しました") &&
+      current.res.body.user.displayID != null
+
+  # Assert: 復活後の正常アクセス確認
+  checkAccessAfterReactivation:
+    desc: 復活後の正常アクセス確認
+    req:
+      /user:
+        get:
+          headers: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.user.displayID == vars.id &&
+      current.res.body.user.displayName == vars.name

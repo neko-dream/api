@@ -5,17 +5,17 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/neko-dream/server/internal/application/usecase/auth_usecase"
-	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/session"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/domain/service"
-	"github.com/neko-dream/server/internal/infrastructure/http/cookie"
-	"github.com/neko-dream/server/internal/presentation/oas"
-	cookie_utils "github.com/neko-dream/server/pkg/cookie"
-	http_utils "github.com/neko-dream/server/pkg/http"
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/neko-dream/api/internal/application/usecase/auth_usecase"
+	"github.com/neko-dream/api/internal/domain/messages"
+	"github.com/neko-dream/api/internal/domain/model/session"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/user"
+	"github.com/neko-dream/api/internal/domain/service"
+	"github.com/neko-dream/api/internal/infrastructure/http/cookie"
+	"github.com/neko-dream/api/internal/presentation/oas"
+	cookie_utils "github.com/neko-dream/api/pkg/cookie"
+	http_utils "github.com/neko-dream/api/pkg/http"
+	"github.com/neko-dream/api/pkg/utils"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
@@ -30,8 +30,9 @@ type authHandler struct {
 	passwordLogin    auth_usecase.PasswordLogin
 	passwordRegister auth_usecase.PasswordRegister
 	changePassword   auth_usecase.ChangePassword
+	reactivate       auth_usecase.Reactivate
 
-	authService service.AuthenticationService
+	authorizationService service.AuthorizationService
 	cookie.CookieManager
 }
 
@@ -45,21 +46,23 @@ func NewAuthHandler(
 	login auth_usecase.PasswordLogin,
 	register auth_usecase.PasswordRegister,
 	changePassword auth_usecase.ChangePassword,
+	reactivate auth_usecase.Reactivate,
 
-	authService service.AuthenticationService,
+	authorizationService service.AuthorizationService,
 	cookieManger cookie.CookieManager,
 ) oas.AuthHandler {
 	return &authHandler{
-		AuthLogin:        authLogin,
-		AuthCallback:     authCallback,
-		Revoke:           revoke,
-		LoginForDev:      devLogin,
-		DetachAccount:    detachAccount,
-		authService:      authService,
-		CookieManager:    cookieManger,
-		passwordLogin:    login,
-		passwordRegister: register,
-		changePassword:   changePassword,
+		AuthLogin:            authLogin,
+		AuthCallback:         authCallback,
+		Revoke:               revoke,
+		LoginForDev:          devLogin,
+		DetachAccount:        detachAccount,
+		authorizationService: authorizationService,
+		CookieManager:        cookieManger,
+		passwordLogin:        login,
+		passwordRegister:     register,
+		changePassword:       changePassword,
+		reactivate:           reactivate,
 	}
 }
 
@@ -140,14 +143,17 @@ func (a *authHandler) HandleAuthCallback(ctx context.Context, params oas.HandleA
 	return headers, nil
 }
 
-// RevokeToken implements oas.Handler.
+// RevokeToken ログアウト
 func (a *authHandler) RevokeToken(ctx context.Context) (oas.RevokeTokenRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.OAuthTokenRevoke")
 	defer span.End()
 
-	authCtx, err := getAuthenticationContext(a.authService, ctx)
+	authCtx, err := a.authorizationService.GetAuthContext(ctx)
 	if err != nil {
 		return nil, err
+	}
+	if authCtx == nil {
+		return nil, nil
 	}
 
 	_, err = a.Revoke.Execute(ctx, auth_usecase.RevokeInput{
@@ -210,7 +216,7 @@ func (a *authHandler) AuthAccountDetach(ctx context.Context) (oas.AuthAccountDet
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.AuthAccountDetach")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(a.authService, ctx)
+	authCtx, err := a.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -275,7 +281,7 @@ func (a *authHandler) ChangePassword(ctx context.Context, params oas.ChangePassw
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.ChangePassword")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(a.authService, ctx)
+	authCtx, err := a.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -295,4 +301,41 @@ func (a *authHandler) ChangePassword(ctx context.Context, params oas.ChangePassw
 
 	res := &oas.ChangePasswordOK{}
 	return res, nil
+}
+
+func (a *authHandler) ReactivateUser(ctx context.Context) (oas.ReactivateUserRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.ReactivateUser")
+	defer span.End()
+
+	// トークンから退会ユーザー情報を取得
+	claim := session.GetSession(ctx)
+	if claim == nil {
+		return nil, messages.ForbiddenError
+	}
+
+	// 退会していないユーザーからのリクエストの場合
+	if !claim.IsWithdrawn {
+		return nil, messages.UserNotWithdrawn
+	}
+
+	// ユーザーIDを取得
+	userID, err := claim.UserID()
+	if err != nil {
+		utils.HandleError(ctx, err, "claim.UserID")
+		return nil, messages.InternalServerError
+	}
+
+	// 復活処理を実行
+	output, err := a.reactivate.Execute(ctx, auth_usecase.ReactivateInput{
+		UserID: userID,
+	})
+	if err != nil {
+		utils.HandleError(ctx, err, "reactivate.Execute")
+		return nil, err
+	}
+
+	return &oas.ReactivateUserOK{
+		Message: output.Message,
+		User:    output.User.ToResponse(),
+	}, nil
 }

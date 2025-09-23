@@ -3,7 +3,7 @@ package hash_test
 import (
 	"testing"
 
-	"github.com/neko-dream/server/pkg/hash"
+	"github.com/neko-dream/api/pkg/hash"
 )
 
 func Test_HashEmail(t *testing.T) {

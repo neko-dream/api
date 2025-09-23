@@ -2,7 +2,7 @@ package config
 
 import (
 	"github.com/caarlos0/env/v11"
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/neko-dream/api/pkg/utils"
 )
 
 type Config struct {

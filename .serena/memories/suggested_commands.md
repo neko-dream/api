@@ -1,7 +1,7 @@
 # 推奨コマンド一覧
 
 ## 開発コマンド
-- `./scripts/gen.sh` - コード生成（TypeSpec/SQL変更後は必須）
+- `go generate ./...` - コード生成（TypeSpec/SQL変更後は必須）
 - `air` - ホットリロードでサーバー起動
 - `go test ./...` - テスト実行
 - `golangci-lint run` - リンター実行

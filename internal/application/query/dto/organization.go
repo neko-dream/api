@@ -3,15 +3,16 @@ package dto
 import (
 	"time"
 
-	"github.com/neko-dream/server/internal/domain/model/organization"
-	"github.com/neko-dream/server/internal/presentation/oas"
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/neko-dream/api/internal/domain/model/organization"
+	"github.com/neko-dream/api/internal/presentation/oas"
+	"github.com/neko-dream/api/pkg/utils"
 )
 
 type Organization struct {
 	OrganizationID   string    `json:"organization_id"`   // 組織ID
 	Name             string    `json:"name"`              // 組織名
 	Code             string    `json:"code"`              // 組織コード
+	IconURL          *string   `json:"icon_url"`          // 組織アイコンURL
 	OrganizationType int       `json:"organization_type"` // 組織の種類
 	CreatedAt        time.Time `json:"created_at"`        // 組織の作成日時
 	UpdatedAt        time.Time `json:"updated_at"`        // 組織の更新日時
@@ -32,6 +33,7 @@ func (ou *OrganizationUser) SetRoleName(role int) {
 type OrganizationResponse struct {
 	Organization     Organization     `json:"organization"`
 	OrganizationUser OrganizationUser `json:"organization_user"`
+	User             User             `json:"user"`
 }
 
 func (o *OrganizationResponse) ToResponse() oas.Organization {
@@ -42,6 +44,19 @@ func (o *OrganizationResponse) ToResponse() oas.Organization {
 		Type:     o.Organization.OrganizationType,
 		Role:     o.OrganizationUser.Role,
 		RoleName: o.OrganizationUser.RoleName,
+		IconURL:  utils.ToOptNil[oas.OptNilString](o.Organization.IconURL),
+	}
+}
+
+func (o *OrganizationResponse) ToUserResponse() oas.OrganizationUser {
+	user := o.User.ToResponse()
+	return oas.OrganizationUser{
+		DisplayName: user.DisplayName,
+		DisplayID:   user.DisplayID,
+		IconURL:     user.IconURL,
+		Role:        o.OrganizationUser.Role,
+		RoleName:    o.OrganizationUser.RoleName,
+		UserID:      o.OrganizationUser.UserID,
 	}
 }
 

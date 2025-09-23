@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/neko-dream/server/internal/application/query/dto"
-	user_query "github.com/neko-dream/server/internal/application/query/user"
-	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/presentation/oas"
+	"github.com/neko-dream/api/internal/application/query/dto"
+	user_query "github.com/neko-dream/api/internal/application/query/user"
+	"github.com/neko-dream/api/internal/domain/messages"
+	"github.com/neko-dream/api/internal/presentation/oas"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

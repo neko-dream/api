@@ -233,4 +233,35 @@ namespace kotohiro {
     @statusCode statusCode: 500;
     @body body: {};
   };
+
+  @tag("auth")
+  @extension("x-ogen-operation-group", "Auth")
+  @route("/auth/reactivate")
+  @post
+  @summary("退会ユーザーの復活")
+  op reactivateUser(): {
+    @statusCode statusCode: 200;
+    @body body: {
+      message: string;
+      user: User;
+    };
+  } | {
+    @statusCode statusCode: 400;
+    @body body: {
+      code: string;
+      message: string;
+    };
+  } | {
+    @statusCode statusCode: 403;
+    @body body: {
+      code: string;
+      message: string;
+    };
+  } | {
+    @statusCode statusCode: 500;
+    @body body: {
+      code: string;
+      message: string;
+    };
+  };
 }

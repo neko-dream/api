@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/neko-dream/server/internal/domain/model/crypto"
-	"github.com/neko-dream/server/internal/domain/model/notification"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/user"
-	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
+	"github.com/neko-dream/api/internal/domain/model/crypto"
+	"github.com/neko-dream/api/internal/domain/model/notification"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/user"
+	model "github.com/neko-dream/api/internal/infrastructure/persistence/sqlc/generated"
 	"go.opentelemetry.io/otel"
 )
 

@@ -3,7 +3,7 @@ package handlers
 import (
 	"context"
 
-	"github.com/neko-dream/server/internal/domain/model/event"
+	"github.com/neko-dream/api/internal/domain/model/event"
 )
 
 // EventHandler イベントハンドラーのインターフェース

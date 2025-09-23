@@ -1,0 +1,171 @@
+desc: ユーザー復活期限切れのテスト（30日経過後）
+runners:
+  req:
+    endpoint: http://localhost:3000
+    useCookie: true
+    notFollowRedirect: true
+    openapi3: http://localhost:3000/static/oas/openapi.yaml
+    skipValidateRequest: false
+    skipValidateResponse: true
+  dev: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
+
+vars:
+  id: withdraw_expired_test
+  name: WithdrawExpiredTest
+  days_ago: 31 # 31日前に退会したことにする
+
+steps:
+  # 準備: ユーザー削除
+  deleteUser:
+    desc: 既存ユーザーをクリーンアップ
+    dev:
+      query: |
+        DELETE FROM user_status_change_logs WHERE user_id IN (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}');
+        DELETE FROM user_demographics WHERE user_id IN (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}');
+        DELETE FROM user_auths WHERE subject LIKE '{{ vars.id }}%';
+        DELETE FROM users WHERE display_id = '{{ vars.id }}%';
+
+  # ユーザー作成
+  loginUser:
+    desc: テストユーザーでdev login
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.id }}:
+        get:
+          headers: null
+    test: len(current.res.headers['Set-Cookie']) > 0
+
+  createUser:
+    desc: テストユーザーを作成
+    req:
+      /user:
+        post:
+          body:
+            multipart/form-data:
+              displayName: "{{ vars.name }}"
+              displayID: "{{ vars.id }}"
+    test: current.res.status == 200
+
+  # ユーザーを退会させて、退会日時を31日前に更新
+  withdrawUser:
+    desc: ユーザーを退会状態にする
+    req:
+      /user:
+        delete:
+          body:
+            multipart/form-data:
+              reason: "Test withdrawal"
+    test: |
+      current.res.status == 200 &&
+      hasPrefix(current.res.body.message, "退会処理が完了しました")
+
+  updateWithdrawalDate:
+    desc: 退会日時を31日前に更新（復活期限切れ状態を作る）
+    dev:
+      query: |
+        UPDATE users
+        SET withdrawal_date = CURRENT_TIMESTAMP - INTERVAL '{{ vars.days_ago }} days'
+        WHERE display_id = '{{ vars.id }}';
+
+  # 再ログインして復活を試みる
+  loginAfterWithdraw:
+    desc: 退会後に再度dev login
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.id }}:
+        get:
+          query:
+            id: "{{ vars.id }}"
+    test: len(current.res.headers['Set-Cookie']) > 0
+
+  checkAuthError:
+    desc: 新規ユーザーの認証エラーになることを確認
+    req:
+      /user:
+        get:
+          query:
+            id: "{{ vars.id }}"
+    test: |
+      current.res.status == 401 &&
+      current.res.body.code == "AUTH-0007"
+
+  # 復活を試みる 新規登録をしていないため0007エラーが返る
+  tryReactivateExpired:
+    desc: 復活期限切れユーザーの復活を試みる（エラー期待）
+    req:
+      /auth/reactivate:
+        post:
+          body:
+            multipart/form-data:
+              id: "{{ vars.id }}"
+    test: |
+      current.res.status == 401 &&
+      current.res.body.code == "AUTH-0007"
+
+  # ログアウト
+  logout:
+    desc: ログアウト
+    req:
+      /auth/revoke:
+        post:
+          body:
+            multipart/form-data:
+              id: "{{ vars.id }}"
+    test: current.res.status == 204
+
+  # 同じIDで新規登録を試みる（31日経過後は新規ユーザーとして扱われる）
+  loginAsNewUser:
+    desc: 同じIDで新規ユーザーとしてdev login
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.id }}:
+        get:
+          query:
+            id: "{{ vars.id }}"
+    test: len(current.res.headers['Set-Cookie']) > 0
+
+  checkNotRegistered:
+    desc: 新規ユーザーとして未登録状態であることを確認
+    req:
+      /auth/token/info:
+        get:
+          query:
+            id: "{{ vars.id }}"
+    test: |
+      current.res.status == 200 &&
+      current.res.body.isRegistered == false
+
+  createUserAgain:
+    desc: 同じIDで新規ユーザーとして登録
+    req:
+      /user:
+        post:
+          body:
+            multipart/form-data:
+              displayName: "{{ vars.name }}"
+              displayID: "{{ vars.id }}"
+    test: current.res.status == 200
+
+  # 新規ユーザーとして正常にアクセスできることを確認
+  checkNewUserAccess:
+    desc: 新規ユーザーとして正常にアクセスできることを確認
+    req:
+      /user:
+        get:
+          query:
+            id: "{{ vars.id }}"
+    test: |
+      current.res.status == 200 &&
+      current.res.body.user.displayID == vars.id &&
+      current.res.body.user.displayName == 'WithdrawExpiredTest'
+
+  # データベースで古いユーザーのsubjectが変更されていることを確認
+  checkOldUserSubjectChanged:
+    desc: 古いユーザーのsubjectが変更されていることを確認
+    dev:
+      query: |
+        SELECT
+          COUNT(*) as old_user_count,
+          (SELECT subject FROM user_auths WHERE subject LIKE '{{ vars.id }}_withdrawn_%' LIMIT 1) as old_subject
+        FROM user_auths
+        WHERE subject LIKE '{{ vars.id }}_withdrawn_%';
+    test: |
+      one(current.rows, {.old_user_count == 1}) &&
+      hasPrefix(current.rows[0].old_subject, 'withdraw_expired_test_withdrawn')

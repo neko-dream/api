@@ -5,11 +5,11 @@ import (
 	"database/sql"
 	"errors"
 
-	password_auth "github.com/neko-dream/server/internal/domain/model/auth/password"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/infrastructure/config"
-	"github.com/neko-dream/server/pkg/hash"
+	password_auth "github.com/neko-dream/api/internal/domain/model/auth/password"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/user"
+	"github.com/neko-dream/api/internal/infrastructure/config"
+	"github.com/neko-dream/api/pkg/hash"
 	"go.opentelemetry.io/otel"
 )
 

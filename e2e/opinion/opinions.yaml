@@ -1,0 +1,271 @@
+desc: 意見一覧・詳細のテスト（ログイン/未ログイン、投票情報、退会ユーザー表示）
+runners:
+  req:
+    endpoint: http://localhost:3000
+    useCookie: true
+    notFollowRedirect: true
+    openapi3: http://localhost:3000/static/oas/openapi.yaml
+    skipValidateRequest: false
+    skipValidateResponse: true
+  dev: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
+
+vars:
+  id: opinion_test
+  name: OpinionTestUser
+  withdraw_id: opinion_withdraw_test
+  withdraw_name: OpinionWithdrawUser
+  theme: スワイプテストテーマ
+  desc: スワイプテストの説明文です
+  prefecture: 東京都
+  city: 渋谷区
+
+steps:
+  deleteUsers:
+    desc: テストユーザー削除
+    dev:
+      query: |
+        DELETE FROM user_status_change_logs WHERE user_id IN (SELECT user_id FROM users WHERE display_id IN ('{{ vars.id }}', '{{ vars.withdraw_id }}'));
+        DELETE FROM user_demographics WHERE user_id IN (SELECT user_id FROM users WHERE display_id IN ('{{ vars.id }}', '{{ vars.withdraw_id }}'));
+        DELETE FROM user_auths WHERE subject IN ('{{ vars.id }}', '{{ vars.withdraw_id }}');
+        DELETE FROM users WHERE display_id IN ('{{ vars.id }}', '{{ vars.withdraw_id }}');
+        DELETE FROM opinions;
+        DELETE FROM votes;
+        DELETE FROM talk_sessions;
+        DELETE FROM domain_events;
+
+  loginUser1:
+    desc: テストユーザー1ログイン
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.id }}:
+        get:
+          headers: null
+    test: len(current.res.headers['Set-Cookie']) > 0
+
+  createUser1:
+    desc: テストユーザー1作成
+    req:
+      /user:
+        post:
+          body:
+            multipart/form-data:
+              displayName: "{{ vars.name }}"
+              displayID: "{{ vars.id }}"
+              prefecture: "{{ vars.prefecture }}"
+              city: "{{ vars.city }}"
+    test: current.res.status == 200
+
+  createTalkSession:
+    desc: テストセッション作成
+    req:
+      /talksessions:
+        post:
+          body:
+            multipart/form-data:
+              theme: "{{ vars.theme }}"
+              description: "{{ vars.desc }}"
+              scheduledEndTime: "2100-12-31T23:59:59Z"
+              prefecture: "{{ vars.prefecture }}"
+              city: "{{ vars.city }}"
+    bind:
+      talkSession: current.res.body
+    test: current.res.status == 200
+
+  consentSession1:
+    desc: テストセッション1同意
+    req:
+      /talksessions/{{ talkSession.id }}/consent:
+        post:
+          body:
+            multipart/form-data:
+              userID: "{{ vars.id }}"
+    test: current.res.status == 200
+
+  postOpinion1:
+    desc: テスト意見1投稿
+    req:
+      /opinions:
+        post:
+          body:
+            multipart/form-data:
+              talkSessionID: "{{ talkSession.id }}"
+              opinionContent: "テスト意見1"
+              title: "テスト意見1"
+    bind:
+      opinion1: current.res.body
+    test: current.res.status == 200
+
+  # テスト意見1取得
+  voteOpinion1:
+    desc: ユーザー1が自分の意見に賛成投票
+    req:
+      /opinions/{{ opinion1.id }}/votes:
+        post:
+          body:
+            multipart/form-data:
+              voteStatus: "agree"
+    test: current.res.status == 200
+
+  loginUser2:
+    desc: テストユーザー2ログイン
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.withdraw_id }}:
+        get:
+          headers: null
+    test: len(current.res.headers['Set-Cookie']) > 0
+
+  createUser2:
+    desc: テストユーザー2作成
+    req:
+      /user:
+        post:
+          body:
+            multipart/form-data:
+              displayName: "{{ vars.withdraw_name }}"
+              displayID: "{{ vars.withdraw_id }}"
+              prefecture: "{{ vars.prefecture }}"
+              city: "{{ vars.city }}"
+    test: current.res.status == 200
+
+  consentSession2:
+    desc: ユーザー2同意
+    req:
+      /talksessions/{{ talkSession.id }}/consent:
+        post:
+          body:
+            multipart/form-data:
+              userID: "{{ vars.withdraw_id }}"
+    test: current.res.status == 200
+
+  postOpinion2:
+    desc: テスト意見2投稿
+    req:
+      /opinions:
+        post:
+          body:
+            multipart/form-data:
+              talkSessionID: "{{ talkSession.id }}"
+              opinionContent: "テスト意見2"
+              title: "テスト意見2"
+    bind:
+      opinion2: current.res.body
+    test: current.res.status == 200
+
+  voteOpinion1ByUser2:
+    desc: ユーザー2がユーザー1の意見に反対投票
+    req:
+      /opinions/{{ opinion1.id }}/votes:
+        post:
+          body:
+            multipart/form-data:
+              voteStatus: "disagree"
+    test: current.res.status == 200
+
+  withdrawUser2:
+    desc: テストユーザー2退会
+    req:
+      /user:
+        delete:
+          body:
+            multipart/form-data:
+              reason: "テストユーザー2退会"
+    test: |
+      current.res.status == 200 &&
+      hasPrefix(current.res.body.message, "退会処理が完了しました") &&
+      current.res.body.withdrawalDate != null
+
+  # テスト意見1取得
+  reLoginUser1:
+    desc: テストユーザー1再ログイン
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.id }}:
+        get:
+          headers: null
+    test: len(current.res.headers['Set-Cookie']) > 0
+
+  getOpinionsLoggedIn:
+    desc: ログイン状態で意見一覧を取得（投票情報と退会ユーザー表示確認）
+    req:
+      /talksessions/{{ talkSession.id }}/opinions:
+        get:
+          query:
+            limit: 10
+    test: |
+      current.res.status == 200 &&
+      len(current.res.body.opinions) == 2 &&
+      current.res.body.opinions[1].myVoteType == "agree" &&
+      current.res.body.opinions[1].user.displayID == vars.id &&
+      current.res.body.opinions[0].user.displayID == "unknown" &&
+      current.res.body.opinions[0].user.displayName == "unknown"
+
+  getOpinionDetailLoggedInOwn:
+    desc: ログイン状態で自分の投稿した意見の詳細を取得（投票情報確認）
+    req:
+      /opinions/{{ opinion1.id }}:
+        get:
+          headers: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.opinion.id == opinion1.id &&
+      current.res.body.myVoteType == "agree" &&
+      current.res.body.user.displayID == vars.id
+
+  getOpinionDetailLoggedInWithdrawn:
+    desc: ログイン状態で退会ユーザーの意見詳細を取得（unknown表示確認）
+    req:
+      /opinions/{{ opinion2.id }}:
+        get:
+          query:
+            limit: 10
+    test: |
+      current.res.status == 200 &&
+      current.res.body.opinion.id == opinion2.id &&
+      current.res.body.user.displayID == "unknown" &&
+      current.res.body.user.displayName == "unknown"
+
+  logout:
+    desc: テストユーザー1ログアウト
+    req:
+      /auth/revoke:
+        post:
+          body:
+            multipart/form-data:
+              id: "{{ vars.id }}"
+    test: current.res.status == 204
+
+  getOpinionsNotLoggedIn:
+    desc: 未ログイン状態で意見一覧を取得（投票情報なし、退会ユーザー表示確認）
+    req:
+      /talksessions/{{ talkSession.id }}/opinions:
+        get:
+          headers: null
+    test: |
+      current.res.status == 200 &&
+      len(current.res.body.opinions) == 2 &&
+      current.res.body.opinions[1].myVoteType == null &&
+      current.res.body.opinions[1].user.displayID == vars.id &&
+      current.res.body.opinions[0].user.displayID == "unknown" &&
+      current.res.body.opinions[0].user.displayName == "unknown"
+
+  getOpinionDetailNotLoggedIn:
+    desc: 未ログイン状態で意見詳細を取得（投票情報なし確認）
+    req:
+      /opinions/{{ opinion1.id }}:
+        get:
+          headers: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.opinion.id == opinion1.id &&
+      current.res.body.myVoteType == null &&
+      current.res.body.user.displayID == vars.id
+
+  getOpinionDetailNotLoggedInWithdrawn:
+    desc: 未ログイン状態で退会ユーザーの意見詳細を取得（unknown表示確認）
+    req:
+      /opinions/{{ opinion2.id }}:
+        get:
+          headers: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.opinion.id == opinion2.id &&
+      current.res.body.user.displayID == "unknown" &&
+      current.res.body.user.displayName == "unknown"

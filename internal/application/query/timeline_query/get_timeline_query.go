@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/talksession"
-	timelineactions "github.com/neko-dream/server/internal/domain/model/timeline_actions"
+	"github.com/neko-dream/api/internal/domain/messages"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/talksession"
+	timelineactions "github.com/neko-dream/api/internal/domain/model/timeline_actions"
 	"go.opentelemetry.io/otel"
 )
 

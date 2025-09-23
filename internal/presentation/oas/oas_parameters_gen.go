@@ -143,7 +143,7 @@ func decodeAuthorizeParams(args [1]string, argsEscaped bool, r *http.Request) (p
 				return err
 			}
 		} else {
-			return validate.ErrFieldRequired
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -292,7 +292,7 @@ func decodeChangePasswordParams(args [0]string, argsEscaped bool, r *http.Reques
 				return err
 			}
 		} else {
-			return validate.ErrFieldRequired
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -328,7 +328,7 @@ func decodeChangePasswordParams(args [0]string, argsEscaped bool, r *http.Reques
 				return err
 			}
 		} else {
-			return validate.ErrFieldRequired
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -386,7 +386,7 @@ func decodeCheckDeviceExistsParams(args [0]string, argsEscaped bool, r *http.Req
 				return err
 			}
 		} else {
-			return validate.ErrFieldRequired
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -658,7 +658,7 @@ func decodeDevAuthorizeParams(args [0]string, argsEscaped bool, r *http.Request)
 				return err
 			}
 		} else {
-			return validate.ErrFieldRequired
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -694,7 +694,7 @@ func decodeDevAuthorizeParams(args [0]string, argsEscaped bool, r *http.Request)
 				return err
 			}
 		} else {
-			return validate.ErrFieldRequired
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -2830,7 +2830,7 @@ func decodeGetTalkSessionReportCountParams(args [1]string, argsEscaped bool, r *
 				return err
 			}
 		} else {
-			return validate.ErrFieldRequired
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -3400,7 +3400,7 @@ func decodeGetUserStatsListManageParams(args [0]string, argsEscaped bool, r *htt
 				return err
 			}
 		} else {
-			return validate.ErrFieldRequired
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -3488,6 +3488,245 @@ func decodeGetUserStatsListManageParams(args [0]string, argsEscaped bool, r *htt
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "limit",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// GetUserTalkSessionsParams is parameters of getUserTalkSessions operation.
+type GetUserTalkSessionsParams struct {
+	DisplayID string
+	Limit     OptInt
+	Offset    OptInt
+	Status    OptNilGetUserTalkSessionsStatus
+}
+
+func unpackGetUserTalkSessionsParams(packed middleware.Parameters) (params GetUserTalkSessionsParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "displayID",
+			In:   "path",
+		}
+		params.DisplayID = packed[key].(string)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "limit",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Limit = v.(OptInt)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "offset",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Offset = v.(OptInt)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "status",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Status = v.(OptNilGetUserTalkSessionsStatus)
+		}
+	}
+	return params
+}
+
+func decodeGetUserTalkSessionsParams(args [1]string, argsEscaped bool, r *http.Request) (params GetUserTalkSessionsParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode path: displayID.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "displayID",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.DisplayID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "displayID",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	// Set default value for query: limit.
+	{
+		val := int(10)
+		params.Limit.SetTo(val)
+	}
+	// Decode query: limit.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "limit",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotLimitVal int
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToInt(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotLimitVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Limit.SetTo(paramsDotLimitVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "limit",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: offset.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "offset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotOffsetVal int
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToInt(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotOffsetVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Offset.SetTo(paramsDotOffsetVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "offset",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: status.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "status",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotStatusVal GetUserTalkSessionsStatus
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotStatusVal = GetUserTalkSessionsStatus(c)
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Status.SetTo(paramsDotStatusVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.Status.Get(); ok {
+					if err := func() error {
+						if err := value.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "status",
 			In:   "query",
 			Err:  err,
 		}
@@ -3601,7 +3840,7 @@ func decodeHandleAuthCallbackParams(args [1]string, argsEscaped bool, r *http.Re
 				return err
 			}
 		} else {
-			return validate.ErrFieldRequired
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -3637,7 +3876,7 @@ func decodeHandleAuthCallbackParams(args [1]string, argsEscaped bool, r *http.Re
 				return err
 			}
 		} else {
-			return validate.ErrFieldRequired
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -4643,6 +4882,71 @@ func decodeSwipeOpinionsParams(args [1]string, argsEscaped bool, r *http.Request
 	return params, nil
 }
 
+// SwitchOrganizationParams is parameters of switchOrganization operation.
+type SwitchOrganizationParams struct {
+	Code string
+}
+
+func unpackSwitchOrganizationParams(packed middleware.Parameters) (params SwitchOrganizationParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "code",
+			In:   "path",
+		}
+		params.Code = packed[key].(string)
+	}
+	return params
+}
+
+func decodeSwitchOrganizationParams(args [1]string, argsEscaped bool, r *http.Request) (params SwitchOrganizationParams, _ error) {
+	// Decode path: code.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "code",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.Code = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "code",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // TalkSessionAnalysisParams is parameters of talkSessionAnalysis operation.
 type TalkSessionAnalysisParams struct {
 	TalkSessionID string
@@ -4766,6 +5070,71 @@ func decodeToggleReportVisibilityManageParams(args [1]string, argsEscaped bool, 
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "talkSessionID",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// UpdateOrganizationParams is parameters of updateOrganization operation.
+type UpdateOrganizationParams struct {
+	Code string
+}
+
+func unpackUpdateOrganizationParams(packed middleware.Parameters) (params UpdateOrganizationParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "code",
+			In:   "path",
+		}
+		params.Code = packed[key].(string)
+	}
+	return params
+}
+
+func decodeUpdateOrganizationParams(args [1]string, argsEscaped bool, r *http.Request) (params UpdateOrganizationParams, _ error) {
+	// Decode path: code.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "code",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.Code = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "code",
 			In:   "path",
 			Err:  err,
 		}

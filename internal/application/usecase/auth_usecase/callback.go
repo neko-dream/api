@@ -5,17 +5,17 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/neko-dream/server/internal/domain/model/auth"
+	"github.com/neko-dream/api/internal/domain/model/auth"
 
 	"braces.dev/errtrace"
-	"github.com/neko-dream/server/internal/domain/model/clock"
-	"github.com/neko-dream/server/internal/domain/model/organization"
-	"github.com/neko-dream/server/internal/domain/model/session"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/service"
-	"github.com/neko-dream/server/internal/infrastructure/config"
-	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/neko-dream/api/internal/domain/model/clock"
+	"github.com/neko-dream/api/internal/domain/model/organization"
+	"github.com/neko-dream/api/internal/domain/model/session"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/service"
+	"github.com/neko-dream/api/internal/infrastructure/config"
+	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
+	"github.com/neko-dream/api/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
@@ -46,7 +46,7 @@ type (
 	authCallbackInteractor struct {
 		*db.DBManager
 		*config.Config
-		service.AuthService
+		service.AuthenticationService
 		session.SessionRepository
 		session.SessionService
 		session.TokenManager
@@ -60,7 +60,7 @@ type (
 func NewAuthCallback(
 	tm *db.DBManager,
 	config *config.Config,
-	authService service.AuthService,
+	authService service.AuthenticationService,
 	sessionRepository session.SessionRepository,
 	sessionService session.SessionService,
 	tokenManager session.TokenManager,
@@ -69,15 +69,15 @@ func NewAuthCallback(
 	organizationUserRepo organization.OrganizationUserRepository,
 ) AuthCallback {
 	return &authCallbackInteractor{
-		DBManager:            tm,
-		Config:               config,
-		AuthService:          authService,
-		SessionRepository:    sessionRepository,
-		SessionService:       sessionService,
-		TokenManager:         tokenManager,
-		StateRepository:      stateRepository,
-		organizationRepo:     organizationRepo,
-		organizationUserRepo: organizationUserRepo,
+		DBManager:             tm,
+		Config:                config,
+		AuthenticationService: authService,
+		SessionRepository:     sessionRepository,
+		SessionService:        sessionService,
+		TokenManager:          tokenManager,
+		StateRepository:       stateRepository,
+		organizationRepo:      organizationRepo,
+		organizationUserRepo:  organizationUserRepo,
 	}
 }
 
@@ -111,7 +111,7 @@ func (u *authCallbackInteractor) Execute(ctx context.Context, input CallbackInpu
 			return errtrace.Wrap(err)
 		}
 
-		user, err := u.AuthService.Authenticate(ctx, input.Provider, input.Code)
+		user, err := u.AuthenticationService.Authenticate(ctx, input.Provider, input.Code)
 		if err != nil {
 			utils.HandleError(ctx, err, "ユーザー認証に失敗しました") // ユーザー認証失敗
 			return errtrace.Wrap(err)

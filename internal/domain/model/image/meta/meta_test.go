@@ -10,8 +10,8 @@ import (
 	"testing"
 
 	"github.com/h2non/filetype/types"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/user"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 )

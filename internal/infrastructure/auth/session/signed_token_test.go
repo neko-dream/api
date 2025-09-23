@@ -3,8 +3,8 @@ package session
 import (
 	"testing"
 
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/infrastructure/config"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/infrastructure/config"
 	"github.com/stretchr/testify/assert"
 )
 

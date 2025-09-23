@@ -3,10 +3,16 @@ package organization
 import (
 	"context"
 
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/google/uuid"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/user"
 )
 
+var (
+	KotohiroOrganizationID = shared.UUID[Organization](uuid.MustParse("00000000-0000-0000-0000-000000000001"))
+)
+
+//go:generate go tool mockgen -source=$GOFILE -package=mock_${GOPACKAGE}_model -destination=../mock/$GOPACKAGE/$GOFILE
 type OrganizationRepository interface {
 	// 組織の取得
 	FindByID(ctx context.Context, id shared.UUID[Organization]) (*Organization, error)
@@ -16,6 +22,7 @@ type OrganizationRepository interface {
 
 	// 組織の作成・更新・削除
 	Create(ctx context.Context, org *Organization) error
+	Update(ctx context.Context, org *Organization) error
 }
 
 type OrganizationType int
@@ -31,6 +38,7 @@ type Organization struct {
 	OrganizationType OrganizationType
 	Name             string
 	Code             string
+	IconURL          *string
 	OwnerID          shared.UUID[user.User]
 }
 
@@ -39,6 +47,7 @@ func NewOrganization(
 	organizationType OrganizationType,
 	name string,
 	code string,
+	iconURL *string,
 	ownerID shared.UUID[user.User],
 ) *Organization {
 	return &Organization{
@@ -46,6 +55,7 @@ func NewOrganization(
 		OrganizationType: organizationType,
 		Name:             name,
 		Code:             code,
+		IconURL:          iconURL,
 		OwnerID:          ownerID,
 	}
 }

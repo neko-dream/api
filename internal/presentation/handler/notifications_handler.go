@@ -7,13 +7,13 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/neko-dream/server/internal/domain/model/notification"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/domain/service"
-	"github.com/neko-dream/server/internal/infrastructure/config"
-	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
-	"github.com/neko-dream/server/internal/presentation/oas"
+	"github.com/neko-dream/api/internal/domain/model/notification"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/user"
+	"github.com/neko-dream/api/internal/domain/service"
+	"github.com/neko-dream/api/internal/infrastructure/config"
+	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
+	"github.com/neko-dream/api/internal/presentation/oas"
 	"go.opentelemetry.io/otel"
 )
 
@@ -21,7 +21,7 @@ type notificationsHandler struct {
 	dbManager                        *db.DBManager
 	deviceRepository                 notification.DeviceRepository
 	notificationPreferenceRepository user.NotificationPreferenceRepository
-	authService                      service.AuthenticationService
+	authorizationService             service.AuthorizationService
 	pushNotificationSender           notification.PushNotificationSender
 	cfg                              *config.Config
 	vapidKey                         string
@@ -32,7 +32,7 @@ func NewNotificationsHandler(
 	dbManager *db.DBManager,
 	deviceRepository notification.DeviceRepository,
 	notificationPreferenceRepository user.NotificationPreferenceRepository,
-	authService service.AuthenticationService,
+	authorizationService service.AuthorizationService,
 	pushNotificationSender notification.PushNotificationSender,
 	cfg *config.Config,
 ) oas.NotificationsHandler {
@@ -40,7 +40,7 @@ func NewNotificationsHandler(
 		dbManager:                        dbManager,
 		deviceRepository:                 deviceRepository,
 		notificationPreferenceRepository: notificationPreferenceRepository,
-		authService:                      authService,
+		authorizationService:             authorizationService,
 		pushNotificationSender:           pushNotificationSender,
 		cfg:                              cfg,
 		vapidKey:                         cfg.FCM_VAPID_KEY,
@@ -54,7 +54,7 @@ func (h *notificationsHandler) RegisterDevice(ctx context.Context, req *oas.Regi
 	defer span.End()
 
 	// 認証チェック
-	authCtx, err := requireAuthentication(h.authService, ctx)
+	authCtx, err := h.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return &oas.RegisterDeviceUnauthorized{}, nil
 	}
@@ -160,7 +160,7 @@ func (h *notificationsHandler) GetDevices(ctx context.Context) (oas.GetDevicesRe
 	defer span.End()
 
 	// 認証チェック
-	authCtx, err := requireAuthentication(h.authService, ctx)
+	authCtx, err := h.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return &oas.GetDevicesUnauthorized{}, nil
 	}
@@ -214,7 +214,7 @@ func (h *notificationsHandler) DeleteDevice(ctx context.Context, params oas.Dele
 	ctx, span := otel.Tracer("handler").Start(ctx, "notificationsHandler.DeleteDevice")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(h.authService, ctx)
+	authCtx, err := h.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return &oas.DeleteDeviceUnauthorized{}, nil
 	}
@@ -254,7 +254,7 @@ func (h *notificationsHandler) GetNotificationPreferences(ctx context.Context) (
 	defer span.End()
 
 	// 認証チェック
-	authCtx, err := requireAuthentication(h.authService, ctx)
+	authCtx, err := h.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return &oas.GetNotificationPreferencesUnauthorized{}, nil
 	}
@@ -277,7 +277,7 @@ func (h *notificationsHandler) UpdateNotificationPreferences(ctx context.Context
 	ctx, span := otel.Tracer("handler").Start(ctx, "notificationsHandler.UpdateNotificationPreferences")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(h.authService, ctx)
+	authCtx, err := h.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return &oas.UpdateNotificationPreferencesUnauthorized{}, nil
 	}
@@ -290,7 +290,7 @@ func (h *notificationsHandler) UpdateNotificationPreferences(ctx context.Context
 		return &oas.UpdateNotificationPreferencesBadRequest{}, nil
 	}
 
-	if req.PushNotificationEnabled.IsSet() {
+	if !req.PushNotificationEnabled.IsNull() {
 		pref.PushNotificationEnabled = req.PushNotificationEnabled.Value
 	}
 
@@ -362,7 +362,7 @@ func (h *notificationsHandler) SendTestNotification(ctx context.Context, req *oa
 	}
 
 	// 認証チェック
-	authCtx, err := requireAuthentication(h.authService, ctx)
+	authCtx, err := h.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return &oas.SendTestNotificationUnauthorized{}, nil
 	}
@@ -372,11 +372,11 @@ func (h *notificationsHandler) SendTestNotification(ctx context.Context, req *oa
 	title := "Kotohiro テスト通知"
 	body := fmt.Sprintf("これはテスト通知です。時刻: %s", time.Now().Format("15:04:05"))
 
-	if req.Title.IsSet() && req.Title.Value != "" {
-		title = req.Title.Value
+	if req.Title != "" {
+		title = req.Title
 	}
-	if req.Body.IsSet() && req.Body.Value != "" {
-		body = req.Body.Value
+	if req.Body != "" {
+		body = req.Body
 	}
 
 	var devicesToSend []notification.Device

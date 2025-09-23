@@ -15,8 +15,8 @@ namespace kotohiro {
     @path talkSessionID: string,
     @path actionItemID: string,
     @multipartBody body: {
-      content?: HttpPart<string >;
-      status?: HttpPart<string>;
+      content: HttpPart<string | null>;
+      status: HttpPart<string | null>;
     },
   ): ActionItem | {
     @statusCode statusCode: 400;

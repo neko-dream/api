@@ -6,13 +6,13 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/neko-dream/server/internal/domain/model/crypto"
-	"github.com/neko-dream/server/internal/domain/model/notification"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/user"
-	crypto_impl "github.com/neko-dream/server/internal/infrastructure/crypto"
-	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
-	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
+	"github.com/neko-dream/api/internal/domain/model/crypto"
+	"github.com/neko-dream/api/internal/domain/model/notification"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/user"
+	crypto_impl "github.com/neko-dream/api/internal/infrastructure/crypto"
+	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
+	model "github.com/neko-dream/api/internal/infrastructure/persistence/sqlc/generated"
 	"go.opentelemetry.io/otel"
 )
 

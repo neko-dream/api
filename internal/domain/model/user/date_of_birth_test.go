@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/neko-dream/server/internal/domain/model/clock"
-	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/api/internal/domain/model/clock"
+	"github.com/neko-dream/api/internal/domain/model/user"
 	"github.com/stretchr/testify/assert"
 )
 

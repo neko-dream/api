@@ -4,22 +4,20 @@ import (
 	"context"
 	"mime/multipart"
 
-	opinion_query "github.com/neko-dream/server/internal/application/query/opinion"
-	"github.com/neko-dream/server/internal/application/query/report_query"
-	"github.com/neko-dream/server/internal/application/usecase/opinion_usecase"
-	"github.com/neko-dream/server/internal/application/usecase/report_usecase"
-	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/opinion"
-	"github.com/neko-dream/server/internal/domain/model/session"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/talksession"
-	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/domain/service"
-	"github.com/neko-dream/server/internal/presentation/oas"
-	http_utils "github.com/neko-dream/server/pkg/http"
-	"github.com/neko-dream/server/pkg/sort"
-	"github.com/neko-dream/server/pkg/utils"
-	"github.com/samber/lo"
+	opinion_query "github.com/neko-dream/api/internal/application/query/opinion"
+	"github.com/neko-dream/api/internal/application/query/report_query"
+	"github.com/neko-dream/api/internal/application/usecase/opinion_usecase"
+	"github.com/neko-dream/api/internal/application/usecase/report_usecase"
+	"github.com/neko-dream/api/internal/domain/messages"
+	"github.com/neko-dream/api/internal/domain/model/opinion"
+	"github.com/neko-dream/api/internal/domain/model/session"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/talksession"
+	"github.com/neko-dream/api/internal/domain/service"
+	"github.com/neko-dream/api/internal/presentation/oas"
+	http_utils "github.com/neko-dream/api/pkg/http"
+	"github.com/neko-dream/api/pkg/sort"
+	"github.com/neko-dream/api/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
@@ -36,7 +34,7 @@ type opinionHandler struct {
 	reportOpinionCommand opinion_usecase.ReportOpinion
 	solveReportCommand   report_usecase.SolveReportCommand
 
-	authService service.AuthenticationService
+	authorizationService service.AuthorizationService
 	session.TokenManager
 }
 
@@ -53,7 +51,7 @@ func NewOpinionHandler(
 	reportOpinionCommand opinion_usecase.ReportOpinion,
 	solveReportCommand report_usecase.SolveReportCommand,
 
-	authService service.AuthenticationService,
+	authorizationService service.AuthorizationService,
 	tokenManager session.TokenManager,
 ) oas.OpinionHandler {
 	return &opinionHandler{
@@ -69,8 +67,8 @@ func NewOpinionHandler(
 		reportOpinionCommand: reportOpinionCommand,
 		solveReportCommand:   solveReportCommand,
 
-		authService:  authService,
-		TokenManager: tokenManager,
+		authorizationService: authorizationService,
+		TokenManager:         tokenManager,
 	}
 }
 
@@ -79,10 +77,9 @@ func (o *opinionHandler) GetOpinionDetail2(ctx context.Context, params oas.GetOp
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.GetOpinionDetail")
 	defer span.End()
 
-	authCtx, err := getAuthenticationContext(o.authService, o.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if err == nil {
-		userID = &authCtx.UserID
+	userID, err := o.authorizationService.GetUserID(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
@@ -99,10 +96,10 @@ func (o *opinionHandler) GetOpinionDetail2(ctx context.Context, params oas.GetOp
 	}
 
 	// Convert to OpinionWithVote response
-	var myVoteType oas.OptNilOpinionWithVoteMyVoteType
+	var myVoteType oas.OptNilVoteType
 	if opinion.Opinion.GetMyVoteType() != nil {
-		myVoteType = oas.OptNilOpinionWithVoteMyVoteType{
-			Value: oas.OpinionWithVoteMyVoteType(*opinion.Opinion.GetMyVoteType()),
+		myVoteType = oas.OptNilVoteType{
+			Value: oas.VoteType(*opinion.Opinion.GetMyVoteType()),
 			Set:   true,
 			Null:  false,
 		}
@@ -121,10 +118,9 @@ func (o *opinionHandler) OpinionComments2(ctx context.Context, params oas.Opinio
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.OpinionComments")
 	defer span.End()
 
-	authCtx, err := getAuthenticationContext(o.authService, o.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if err == nil {
-		userID = &authCtx.UserID
+	userID, err := o.authorizationService.GetUserID(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	opinionID, err := shared.ParseUUID[opinion.Opinion](params.OpinionID)
@@ -143,10 +139,10 @@ func (o *opinionHandler) OpinionComments2(ctx context.Context, params oas.Opinio
 	var replies []oas.OpinionWithVote
 	for _, reply := range opinions.Replies {
 		// Convert SwipeOpinion to OpinionWithVote
-		var myVoteType oas.OptNilOpinionWithVoteMyVoteType
+		var myVoteType oas.OptNilVoteType
 		if reply.GetMyVoteType() != nil {
-			myVoteType = oas.OptNilOpinionWithVoteMyVoteType{
-				Value: oas.OpinionWithVoteMyVoteType(*reply.GetMyVoteType()),
+			myVoteType = oas.OptNilVoteType{
+				Value: oas.VoteType(*reply.GetMyVoteType()),
 				Set:   true,
 				Null:  false,
 			}
@@ -169,10 +165,9 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.GetOpinionsForTalkSession")
 	defer span.End()
 
-	authCtx, err := getAuthenticationContext(o.authService, o.SetSession(ctx))
-	var userID *shared.UUID[user.User]
-	if err == nil {
-		userID = &authCtx.UserID
+	userID, err := o.authorizationService.GetUserID(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	var sortKey sort.SortKey
@@ -216,10 +211,10 @@ func (o *opinionHandler) GetOpinionsForTalkSession(ctx context.Context, params o
 	opinions := make([]oas.OpinionWithReplyAndVote, 0, len(out.Opinions))
 	for _, opinion := range out.Opinions {
 		// Convert SwipeOpinion to OpinionWithReplyAndVote
-		var myVoteType oas.OptNilOpinionWithReplyAndVoteMyVoteType
+		var myVoteType oas.OptNilVoteType
 		if opinion.GetMyVoteType() != nil {
-			myVoteType = oas.OptNilOpinionWithReplyAndVoteMyVoteType{
-				Value: oas.OpinionWithReplyAndVoteMyVoteType(*opinion.GetMyVoteType()),
+			myVoteType = oas.OptNilVoteType{
+				Value: oas.VoteType(*opinion.GetMyVoteType()),
 				Set:   true,
 				Null:  false,
 			}
@@ -247,7 +242,7 @@ func (o *opinionHandler) SwipeOpinions(ctx context.Context, params oas.SwipeOpin
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.SwipeOpinions")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(o.authService, ctx)
+	authCtx, err := o.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -293,7 +288,7 @@ func (o *opinionHandler) PostOpinionPost2(ctx context.Context, req *oas.PostOpin
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.PostOpinionPost2")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(o.authService, ctx)
+	authCtx, err := o.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -315,7 +310,7 @@ func (o *opinionHandler) PostOpinionPost2(ctx context.Context, req *oas.PostOpin
 	if value.Picture.IsSet() {
 		file, err = http_utils.CreateFileHeader(ctx, value.Picture.Value.File, value.GetPicture().Value.Name)
 		if err != nil {
-			utils.HandleError(ctx, err, "MakeFileHeader")
+			utils.HandleError(ctx, err, "CreateFileHeader")
 			return nil, messages.InternalServerError
 		}
 	}
@@ -334,7 +329,7 @@ func (o *opinionHandler) PostOpinionPost2(ctx context.Context, req *oas.PostOpin
 		isSeed = false
 	}
 
-	if err = o.submitOpinionCommand.Execute(ctx, opinion_usecase.SubmitOpinionInput{
+	out, err := o.submitOpinionCommand.Execute(ctx, opinion_usecase.SubmitOpinionInput{
 		TalkSessionID:   talkSessionID,
 		UserID:          authCtx.UserID,
 		ParentOpinionID: parentOpinionID,
@@ -343,12 +338,13 @@ func (o *opinionHandler) PostOpinionPost2(ctx context.Context, req *oas.PostOpin
 		ReferenceURL:    utils.ToPtrIfNotNullValue(!req.ReferenceURL.IsSet(), value.ReferenceURL.Value),
 		Picture:         file,
 		IsSeed:          isSeed,
-	}); err != nil {
+	})
+	if err != nil {
 		return nil, err
 	}
 
-	res := &oas.PostOpinionPost2OK{}
-	return res, nil
+	res := out.Opinion.ToResponse()
+	return &res, nil
 }
 
 // ReportOpinion 意見を通報する
@@ -356,7 +352,7 @@ func (o *opinionHandler) ReportOpinion(ctx context.Context, req *oas.ReportOpini
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.ReportOpinion")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(o.authService, ctx)
+	authCtx, err := o.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -368,16 +364,12 @@ func (o *opinionHandler) ReportOpinion(ctx context.Context, req *oas.ReportOpini
 	if err != nil {
 		return nil, messages.BadRequestError
 	}
-	var reasonText *string
-	if req.Content.IsSet() && req.Content.Value != "" {
-		reasonText = lo.ToPtr(req.Content.Value)
-	}
 
 	if err := o.reportOpinionCommand.Execute(ctx, opinion_usecase.ReportOpinionInput{
 		ReporterID: authCtx.UserID,
 		OpinionID:  opinionID,
 		Reason:     int32(req.Reason.Value),
-		ReasonText: reasonText,
+		ReasonText: utils.ToPtrIf(!req.Content.IsNull(), req.Content.Value),
 	}); err != nil {
 		utils.HandleError(ctx, err, "reportOpinionCommand.Execute")
 		return nil, err
@@ -433,12 +425,12 @@ func (o *opinionHandler) GetOpinionAnalysis(ctx context.Context, params oas.GetO
 	return &res, nil
 }
 
-// GetOpinionReports implements oas.OpinionHandler.
+// GetOpinionReports 意見の通報一覧取得
 func (o *opinionHandler) GetOpinionReports(ctx context.Context, params oas.GetOpinionReportsParams) (oas.GetOpinionReportsRes, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.GetOpinionReports")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(o.authService, ctx)
+	authCtx, err := o.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -464,7 +456,7 @@ func (o *opinionHandler) SolveOpinionReport(ctx context.Context, req *oas.SolveO
 	ctx, span := otel.Tracer("handler").Start(ctx, "opinionHandler.SolveOpinionReport")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(o.authService, ctx)
+	authCtx, err := o.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}

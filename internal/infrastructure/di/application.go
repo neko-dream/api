@@ -1,31 +1,31 @@
 package di
 
 import (
-	analysis_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/analysis"
-	opinion_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/opinion"
-	report_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/report"
-	talksession_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/talksession"
-	user_query "github.com/neko-dream/server/internal/infrastructure/persistence/query/user"
+	analysis_query "github.com/neko-dream/api/internal/infrastructure/persistence/query/analysis"
+	opinion_query "github.com/neko-dream/api/internal/infrastructure/persistence/query/opinion"
+	report_query "github.com/neko-dream/api/internal/infrastructure/persistence/query/report"
+	talksession_query "github.com/neko-dream/api/internal/infrastructure/persistence/query/talksession"
+	user_query "github.com/neko-dream/api/internal/infrastructure/persistence/query/user"
 
-	"github.com/neko-dream/server/internal/application/event_processor"
-	"github.com/neko-dream/server/internal/application/event_processor/handlers"
-	opinion_q "github.com/neko-dream/server/internal/application/query/opinion"
-	"github.com/neko-dream/server/internal/application/query/organization_query"
-	"github.com/neko-dream/server/internal/application/query/policy_query"
-	report_q "github.com/neko-dream/server/internal/application/query/report_query"
-	"github.com/neko-dream/server/internal/application/query/talksession"
-	"github.com/neko-dream/server/internal/application/query/timeline_query"
-	"github.com/neko-dream/server/internal/application/usecase/analysis_usecase"
-	"github.com/neko-dream/server/internal/application/usecase/auth_usecase"
-	"github.com/neko-dream/server/internal/application/usecase/image_usecase"
-	"github.com/neko-dream/server/internal/application/usecase/opinion_usecase"
-	"github.com/neko-dream/server/internal/application/usecase/organization_usecase"
-	"github.com/neko-dream/server/internal/application/usecase/policy_usecase"
-	"github.com/neko-dream/server/internal/application/usecase/report_usecase"
-	"github.com/neko-dream/server/internal/application/usecase/talksession_usecase"
-	"github.com/neko-dream/server/internal/application/usecase/timeline_usecase"
-	"github.com/neko-dream/server/internal/application/usecase/user_usecase"
-	"github.com/neko-dream/server/internal/application/usecase/vote_usecase"
+	"github.com/neko-dream/api/internal/application/event_processor"
+	"github.com/neko-dream/api/internal/application/event_processor/handlers"
+	opinion_q "github.com/neko-dream/api/internal/application/query/opinion"
+	"github.com/neko-dream/api/internal/application/query/organization_query"
+	"github.com/neko-dream/api/internal/application/query/policy_query"
+	report_q "github.com/neko-dream/api/internal/application/query/report_query"
+	"github.com/neko-dream/api/internal/application/query/talksession"
+	"github.com/neko-dream/api/internal/application/query/timeline_query"
+	"github.com/neko-dream/api/internal/application/usecase/analysis_usecase"
+	"github.com/neko-dream/api/internal/application/usecase/auth_usecase"
+	"github.com/neko-dream/api/internal/application/usecase/image_usecase"
+	"github.com/neko-dream/api/internal/application/usecase/opinion_usecase"
+	"github.com/neko-dream/api/internal/application/usecase/organization_usecase"
+	"github.com/neko-dream/api/internal/application/usecase/policy_usecase"
+	"github.com/neko-dream/api/internal/application/usecase/report_usecase"
+	"github.com/neko-dream/api/internal/application/usecase/talksession_usecase"
+	"github.com/neko-dream/api/internal/application/usecase/timeline_usecase"
+	"github.com/neko-dream/api/internal/application/usecase/user_usecase"
+	"github.com/neko-dream/api/internal/application/usecase/vote_usecase"
 )
 
 // このファイルはアプリケーション層（ユースケース/クエリ）のコンストラクタを管理します。
@@ -56,6 +56,7 @@ func useCaseDeps() []ProvideArg {
 		{opinion_q.NewGetReportReasons, nil},
 		{user_usecase.NewEditHandler, nil},
 		{user_usecase.NewRegisterHandler, nil},
+		{user_usecase.NewWithdraw, nil},
 		{user_query.NewDetailHandler, nil},
 		{user_query.NewGetByDisplayIDHandler, nil},
 		{vote_usecase.NewVoteHandler, nil},
@@ -67,6 +68,7 @@ func useCaseDeps() []ProvideArg {
 		{auth_usecase.NewPasswordRegister, nil},
 		{auth_usecase.NewPasswordLogin, nil},
 		{auth_usecase.NewChangePassword, nil},
+		{auth_usecase.NewReactivate, nil},
 		{timeline_usecase.NewAddTimeLine, nil},
 		{timeline_usecase.NewEditTimeLine, nil},
 		{timeline_query.NewGetTimeLine, nil},
@@ -85,6 +87,8 @@ func useCaseDeps() []ProvideArg {
 		{organization_usecase.NewCreateOrganizationAliasUseCase, nil},
 		{organization_usecase.NewDeactivateOrganizationAliasUseCase, nil},
 		{organization_usecase.NewListOrganizationAliasesUseCase, nil},
+		{organization_usecase.NewSwitchOrganizationUseCase, nil},
+		{organization_usecase.NewUpdateOrganizationInteractor, nil},
 		{organization_query.NewListOrganizationUsersQuery, nil},
 		{analysis_usecase.NewApplyFeedbackInteractor, nil},
 		{event_processor.NewEventHandlerRegistry, nil},

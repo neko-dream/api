@@ -3,27 +3,27 @@ package handler
 import (
 	"context"
 
-	"github.com/neko-dream/server/internal/application/usecase/analysis_usecase"
-	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/analysis"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/service"
-	"github.com/neko-dream/server/internal/presentation/oas"
+	"github.com/neko-dream/api/internal/application/usecase/analysis_usecase"
+	"github.com/neko-dream/api/internal/domain/messages"
+	"github.com/neko-dream/api/internal/domain/model/analysis"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/service"
+	"github.com/neko-dream/api/internal/presentation/oas"
 	"go.opentelemetry.io/otel"
 )
 
 type analysisHandler struct {
 	applyFeedbackUseCase analysis_usecase.ApplyFeedbackUseCase
-	authService          service.AuthenticationService
+	authorizationService service.AuthorizationService
 }
 
 func NewAnalysisHandler(
 	applyFeedbackUseCase analysis_usecase.ApplyFeedbackUseCase,
-	authService service.AuthenticationService,
+	authorizationService service.AuthorizationService,
 ) oas.AnalysisHandler {
 	return &analysisHandler{
 		applyFeedbackUseCase: applyFeedbackUseCase,
-		authService:          authService,
+		authorizationService: authorizationService,
 	}
 }
 
@@ -32,7 +32,7 @@ func (a *analysisHandler) ApplyFeedbackToReport(ctx context.Context, req *oas.Ap
 	ctx, span := otel.Tracer("handler").Start(ctx, "analysisHandler.ApplyFeedbackToReport")
 	defer span.End()
 
-	authCtx, err := requireAuthentication(a.authService, ctx)
+	authCtx, err := a.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
 	}

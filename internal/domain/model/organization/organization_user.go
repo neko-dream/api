@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/user"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/user"
 )
 
+//go:generate go tool mockgen -source=$GOFILE -package=mock_${GOPACKAGE}_model -destination=../mock/$GOPACKAGE/$GOFILE
 type OrganizationUserRepository interface {
 	// OrganizationUserの取得
 	FindByOrganizationIDAndUserID(ctx context.Context, orgID shared.UUID[Organization], userID shared.UUID[user.User]) (*OrganizationUser, error)

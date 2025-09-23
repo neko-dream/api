@@ -6,11 +6,11 @@ import (
 	"errors"
 
 	"github.com/jinzhu/copier"
-	"github.com/neko-dream/server/internal/application/query/dto"
-	"github.com/neko-dream/server/internal/application/query/talksession"
-	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
-	model "github.com/neko-dream/server/internal/infrastructure/persistence/sqlc/generated"
-	"github.com/neko-dream/server/pkg/utils"
+	"github.com/neko-dream/api/internal/application/query/dto"
+	"github.com/neko-dream/api/internal/application/query/talksession"
+	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
+	model "github.com/neko-dream/api/internal/infrastructure/persistence/sqlc/generated"
+	"github.com/neko-dream/api/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
@@ -34,31 +34,14 @@ func (b *BrowseTalkSessionQueryImpl) Execute(ctx context.Context, in talksession
 		return nil, err
 	}
 
-	var latitude, longitude sql.NullFloat64
-	if in.Latitude != nil {
-		latitude = sql.NullFloat64{Float64: *in.Latitude, Valid: true}
-	}
-	if in.Longitude != nil {
-		longitude = sql.NullFloat64{Float64: *in.Longitude, Valid: true}
-	}
-	var theme sql.NullString
-	if in.Theme != nil {
-		theme = sql.NullString{String: *in.Theme, Valid: true}
-	}
-
-	var status sql.NullString
-	if in.Status != nil {
-		status = sql.NullString{String: string(*in.Status), Valid: true}
-	}
-
 	talkSessionRow, err := b.GetQueries(ctx).ListTalkSessions(ctx, model.ListTalkSessionsParams{
 		Limit:     int32(*in.Limit),
 		Offset:    int32(*in.Offset),
-		Theme:     theme,
-		Status:    status,
-		SortKey:   sql.NullString{String: in.SortKey.String(), Valid: true},
-		Latitude:  latitude,
-		Longitude: longitude,
+		Theme:     utils.ToNullableSQL[sql.NullString](in.Theme),
+		Status:    utils.ToNullableSQL[sql.NullString](in.Status),
+		SortKey:   utils.ToNullableSQL[sql.NullString](in.SortKey),
+		Latitude:  utils.ToNullableSQL[sql.NullFloat64](in.Latitude),
+		Longitude: utils.ToNullableSQL[sql.NullFloat64](in.Longitude),
 	})
 
 	var out talksession.BrowseTalkSessionQueryOutput
@@ -84,8 +67,8 @@ func (b *BrowseTalkSessionQueryImpl) Execute(ctx context.Context, in talksession
 	}
 
 	talkSessionCount, err := b.GetQueries(ctx).CountTalkSessions(ctx, model.CountTalkSessionsParams{
-		Theme:  theme,
-		Status: status,
+		Theme:  utils.ToNullableSQL[sql.NullString](in.Theme),
+		Status: utils.ToNullableSQL[sql.NullString](in.Status),
 	})
 	if err != nil {
 		utils.HandleError(ctx, err, "failed to count talk sessions")

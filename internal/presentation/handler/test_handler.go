@@ -3,8 +3,8 @@ package handler
 import (
 	"context"
 
-	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
-	"github.com/neko-dream/server/internal/presentation/oas"
+	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
+	"github.com/neko-dream/api/internal/presentation/oas"
 	"go.opentelemetry.io/otel"
 )
 
@@ -20,16 +20,16 @@ func NewTestHandler(
 	}
 }
 
-// DummiInit implements oas.TestHandler.
-func (t *testHandler) DummiInit(ctx context.Context) (oas.DummiInitRes, error) {
-	ctx, span := otel.Tracer("handler").Start(ctx, "testHandler.DummiInit")
+// DummyInit implements oas.TestHandler.
+func (t *testHandler) DummyInit(ctx context.Context, req *oas.DummyInitReq) (oas.DummyInitRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "testHandler.DummyInit")
 	defer span.End()
 
 	_ = ctx
 
 	t.DummyInitializer.Initialize()
 
-	return &oas.DummiInitOK{}, nil
+	return &oas.DummyInitOK{}, nil
 }
 
 // Test implements oas.TestHandler.

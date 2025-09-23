@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/neko-dream/server/internal/domain/model/event"
+	"github.com/neko-dream/api/internal/domain/model/event"
 	"go.opentelemetry.io/otel"
 )
 

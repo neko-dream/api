@@ -19,7 +19,7 @@
 
 ### 3. コード生成（1回目）
 ```bash
-./scripts/gen.sh
+go generate ./...
 ```
 - OpenAPIスペックが生成される
 - `presentation/oas/`にインターフェースが生成される
@@ -44,7 +44,7 @@
 
 ### 8. コード生成（2回目）
 ```bash
-./scripts/gen.sh
+go generate ./...
 ```
 - SQLCによりクエリからGoコードが生成される
 

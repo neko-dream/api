@@ -4,8 +4,8 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/neko-dream/server/internal/application/event_processor/handlers"
-	"github.com/neko-dream/server/internal/domain/model/event"
+	"github.com/neko-dream/api/internal/application/event_processor/handlers"
+	"github.com/neko-dream/api/internal/domain/model/event"
 )
 
 // EventHandlerRegistry イベントハンドラーを管理するレジストリ

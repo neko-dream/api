@@ -5,18 +5,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/neko-dream/server/internal/application/usecase/talksession_usecase"
-	"github.com/neko-dream/server/internal/domain/messages"
-	"github.com/neko-dream/server/internal/domain/model/clock"
-	"github.com/neko-dream/server/internal/domain/model/shared"
-	"github.com/neko-dream/server/internal/domain/model/talksession"
-	"github.com/neko-dream/server/internal/domain/model/user"
-	"github.com/neko-dream/server/internal/infrastructure/config"
-	"github.com/neko-dream/server/internal/infrastructure/crypto"
-	"github.com/neko-dream/server/internal/infrastructure/di"
-	"github.com/neko-dream/server/internal/infrastructure/persistence/db"
-	"github.com/neko-dream/server/internal/infrastructure/persistence/repository"
-	"github.com/neko-dream/server/internal/test/txtest"
+	"github.com/neko-dream/api/internal/application/usecase/talksession_usecase"
+	"github.com/neko-dream/api/internal/domain/messages"
+	"github.com/neko-dream/api/internal/domain/model/clock"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/talksession"
+	"github.com/neko-dream/api/internal/domain/model/user"
+	"github.com/neko-dream/api/internal/infrastructure/config"
+	"github.com/neko-dream/api/internal/infrastructure/crypto"
+	"github.com/neko-dream/api/internal/infrastructure/di"
+	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
+	"github.com/neko-dream/api/internal/infrastructure/persistence/repository"
+	"github.com/neko-dream/api/internal/test/txtest"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/otel"
@@ -114,6 +114,7 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					nil, // location
 					lo.ToPtr("初期市区町村"),
 					lo.ToPtr("初期都道府県"),
+					true,
 					nil, // organizationID
 					nil, // organizationAliasID
 				)
@@ -209,6 +210,7 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					nil,
 					lo.ToPtr("初期市区町村"),
 					lo.ToPtr("初期都道府県"),
+					true,
 					nil, // organizationID
 					nil, // organizationAliasID
 				)
@@ -275,6 +277,7 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					nil,
 					lo.ToPtr("初期市区町村"),
 					lo.ToPtr("初期都道府県"),
+					true,
 					nil, // organizationID
 					nil, // organizationAliasID
 				)
@@ -329,6 +332,7 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					nil,
 					lo.ToPtr("初期市区町村"),
 					lo.ToPtr("初期都道府県"),
+					true,
 					nil, // organizationID
 					nil, // organizationAliasID
 				)
@@ -384,6 +388,7 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					nil,
 					lo.ToPtr("初期市区町村"),
 					lo.ToPtr("初期都道府県"),
+					true,
 					nil, // organizationID
 					nil, // organizationAliasID
 				)
@@ -432,6 +437,7 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					nil, // location
 					lo.ToPtr("初期市区町村"),
 					lo.ToPtr("初期都道府県"),
+					true,
 					nil, // organizationID
 					nil, // organizationAliasID
 				)
@@ -487,6 +493,7 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					nil, // location
 					lo.ToPtr("初期市区町村"),
 					lo.ToPtr("初期都道府県"),
+					true,
 					nil, // organizationID
 					nil, // organizationAliasID
 				)
@@ -700,6 +707,7 @@ func TestEditTalkSessionUseCase_ProductionEnvironment(t *testing.T) {
 			nil,
 			lo.ToPtr("初期市区町村"),
 			lo.ToPtr("初期都道府県"),
+			true,
 			nil, // organizationID
 			nil, // organizationAliasID
 		)

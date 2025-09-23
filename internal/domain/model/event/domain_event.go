@@ -3,7 +3,7 @@ package event
 import (
 	"time"
 
-	"github.com/neko-dream/server/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/shared"
 )
 
 // EventType represents the type of domain event
