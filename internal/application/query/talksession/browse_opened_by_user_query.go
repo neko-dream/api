@@ -31,12 +31,6 @@ type (
 func (h *BrowseOpenedByUserInput) Validate() error {
 	var err error
 
-	if h.Status == "" {
-		h.Status = StatusOpen
-	}
-	if h.Status != StatusOpen && h.Status != StatusClosed {
-		err = errors.Join(err, fmt.Errorf("無効なステータスです。: %s", h.Status))
-	}
 	if h.Limit == nil {
 		h.Limit = lo.ToPtr(10)
 	} else if *h.Limit <= 0 || *h.Limit > 100 {

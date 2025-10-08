@@ -34,13 +34,20 @@ func (h *BrowseOpenedByUserQueryImpl) Execute(ctx context.Context, input talkses
 	}
 
 	var out talksession.BrowseOpenedByUserOutput
+	status := sql.NullString{Valid: false}
+	if input.Status != "" {
+		status = sql.NullString{
+			String: string(input.Status),
+			Valid:  true,
+		}
+	}
 
 	talkSessionRow, err := h.GetQueries(ctx).GetOwnTalkSessionByDisplayIDWithCount(ctx, model.GetOwnTalkSessionByDisplayIDWithCountParams{
 		DisplayID: input.DisplayID,
 		Limit:     utils.ToNullableSQL[sql.NullInt32](input.Limit),
 		Offset:    utils.ToNullableSQL[sql.NullInt32](input.Offset),
 		Theme:     utils.ToNullableSQL[sql.NullString](input.Theme),
-		Status:    utils.ToNullableSQL[sql.NullString](input.Status),
+		Status:    status,
 	})
 	if err != nil {
 		utils.HandleError(ctx, err, "GetOwnTalkSessionByIDでエラー")
