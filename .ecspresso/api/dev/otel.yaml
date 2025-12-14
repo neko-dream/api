@@ -1,0 +1,58 @@
+extensions:
+  health_check:
+  basicauth/grafana_cloud:
+    client_auth:
+      username: ${env:GRAFANA_CLOUD_INSTANCE_ID}
+      password: ${env:GRAFANA_CLOUD_API_KEY}
+
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 500ms
+    send_batch_size: 50
+  memory_limiter:
+    limit_mib: 30
+    check_interval: 1s
+  resource:
+    attributes:
+      - key: deployment.environment
+        value: development
+        action: upsert
+      - key: service.name
+        value: kotohiro-api-dev
+        action: upsert
+      - key: service.namespace
+        value: kotohiro
+        action: upsert
+  filter/health:
+    error_mode: ignore
+    traces:
+      span:
+        - 'attributes["http.target"] == "/health"'
+        - 'attributes["url.path"] == "/health"'
+        - 'attributes["http.route"] == "/health"'
+
+exporters:
+  otlphttp/grafana:
+    endpoint: "https://otlp-gateway-prod-ap-northeast-0.grafana.net/otlp"
+    auth:
+      authenticator: basicauth/grafana_cloud
+
+service:
+  extensions:
+    - health_check
+    - basicauth/grafana_cloud
+  pipelines:
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, resource, filter/health]
+      exporters: [otlphttp/grafana]
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, resource, filter/health]
+      exporters: [otlphttp/grafana]

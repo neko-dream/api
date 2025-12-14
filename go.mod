@@ -9,7 +9,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.18.12
 	github.com/aws/aws-sdk-go-v2/service/pinpoint v1.39.4
 	github.com/aws/aws-sdk-go-v2/service/sesv2 v1.53.3
-	github.com/getsentry/sentry-go v0.35.2
 	github.com/jackc/pgx/v5 v5.7.6
 	github.com/jinzhu/copier v0.4.0
 	github.com/joho/godotenv v1.5.1
@@ -286,7 +285,6 @@ require (
 	github.com/coreos/go-oidc/v3 v3.15.0
 	github.com/dlclark/regexp2 v1.11.5 // indirect
 	github.com/fatih/color v1.18.0 // indirect
-	github.com/getsentry/sentry-go/otel v0.35.2
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-faster/errors v0.7.1
 	github.com/go-faster/jx v1.1.0
