@@ -1,6 +1,7 @@
 FROM  --platform=linux/arm64 alpine:latest
 
 EXPOSE 3000
+ENV ENV=dev
 
 COPY ./server /server
 
@@ -12,6 +13,8 @@ RUN  useradd api && \
   chmod 700 /var/log/amazon && \
   chmod +x /server
 
-VOLUME /var/lib/amazon /var/log/amazon
+COPY .ecspresso/api/${ENV}/otel.yaml /etc/ecs/otel.yaml
+
+VOLUME /var/lib/amazon /var/log/amazon /etc/ecs
 
 CMD ["./server"]

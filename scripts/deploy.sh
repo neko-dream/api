@@ -47,13 +47,15 @@ TIMESTAMP=$(date '+%s%3')
 export IMAGE_TAG=$COMMIT_HASH$TIMESTAMP
 
 if [ "$ENV" = "prod" ]; then
+    export APP_ENV=prd
     ECR_REPO="kotohiro-prd-api"
 else
+    export APP_ENV=dev
     ECR_REPO="kotohiro-dev-api"
 fi
 TAG=$ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/$ECR_REPO:$IMAGE_TAG
 
-docker build -f ./container/Dockerfile.gh . -t $TAG --no-cache
+docker build -f ./container/Dockerfile.gh . -t $TAG --build-arg ENV=$APP_ENV
 docker push $TAG
 
 rm -rf ./server
