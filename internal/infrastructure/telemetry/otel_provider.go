@@ -11,6 +11,8 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
+// Otelのトレースプロバイダーを設定
+// 基本的にプロバイダごとの設定はOpenTelemetry Collector側で行い、ここではOpenTelemetryCollectorへの通信のみを設定する
 func SetupOtelProvider(conf *config.Config) *sdktrace.TracerProvider {
 	ctx := context.Background()
 	var exporter sdktrace.SpanExporter
