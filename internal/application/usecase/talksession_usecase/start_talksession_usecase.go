@@ -90,6 +90,22 @@ func NewStartTalkSessionUseCase(
 func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSessionUseCaseInput) (StartTalkSessionUseCaseOutput, error) {
 	ctx, span := otel.Tracer("talksession_command").Start(ctx, "startTalkSessionHandler.Execute")
 	defer span.End()
+
+	// ゲストユーザーはセッションを作成できない
+	owner, err := i.UserRepository.FindByID(ctx, input.OwnerID)
+	if err != nil {
+		utils.HandleError(ctx, err, "UserRepository.FindByID")
+		return StartTalkSessionUseCaseOutput{}, messages.UserNotFoundError
+	}
+	if owner != nil && owner.IsGuest() {
+		e := messages.APIError{
+			Code:       "guest_cannot_create_session",
+			StatusCode: 403,
+			Message:    "ゲストユーザーはセッションを作成できません。正規アカウントでログインしてください。",
+		}
+		return StartTalkSessionUseCaseOutput{}, &e
+	}
+
 	// セッションから組織IDとエイリアスIDを取得
 	var organizationID *shared.UUID[organization.Organization]
 	var organizationAliasID *shared.UUID[organization.OrganizationAlias]

@@ -97,6 +97,17 @@ func (e *editHandler) Execute(ctx context.Context, input EditInput) (*EditOutput
 			utils.HandleError(ctx, err, "UserRepository.FindByID")
 			return messages.UserNotFoundError
 		}
+
+		// ゲストユーザーは表示名を変更できない
+		if foundUser.IsGuest() && input.DisplayName != nil {
+			e := messages.APIError{
+				Code:       "guest_cannot_change_name",
+				StatusCode: 403,
+				Message:    "ゲストユーザーは表示名を変更できません。正規アカウントでログインしてください。",
+			}
+			return &e
+		}
+
 		// ユーザーの表示名を変更
 		foundUser.ChangeName(ctx, input.DisplayName)
 
