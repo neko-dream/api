@@ -178,6 +178,7 @@ func (s *sessionTokenManager) Parse(ctx context.Context, token string) (*session
 		IsRegistered:           user.Verify(),
 		IsEmailVerified:        user.IsEmailVerified(),
 		RequiredPasswordChange: requiredPasswordChange,
+		IsGuest:                user.IsGuest(),
 		OrgType:                orgType,
 		OrganizationID:         organizationID,
 		OrganizationCode:       organizationCode,
