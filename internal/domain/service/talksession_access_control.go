@@ -72,6 +72,16 @@ func (t *talkSessionAccessControl) CanUserJoin(ctx context.Context, talkSessionI
 		}
 	}
 
+	// ゲストユーザーかつ制限付きセッションの場合は参加不可
+	if user != nil && user.IsGuest() && len(talkSession.Restrictions()) > 0 {
+		e := messages.APIError{
+			Code:       "guest_restricted",
+			StatusCode: 403,
+			Message:    "ゲストユーザーは登録制限があるセッションには参加できません。正規アカウントでログインしてください。",
+		}
+		return false, &e
+	}
+
 	// 参加制限がある場合は、ユーザーが参加可能かを判定し、もし参加制限に引っかかる場合はエラーを返す
 	var restrictions []talksession.RestrictionAttribute
 	for _, restriction := range talkSession.Restrictions() {
