@@ -17,6 +17,7 @@ type AuthenticationContext struct {
 	IconURL         *string
 	IsRegistered    bool
 	IsEmailVerified bool
+	IsGuest         bool // ゲストユーザーかどうか
 
 	// パスワード変更要求
 	RequiredPasswordChange bool

@@ -26,6 +26,7 @@ const (
 	ProviderLine     AuthProviderName = "LINE"
 	ProviderDEV      AuthProviderName = "DEV"
 	ProviderPassword AuthProviderName = "PASSWORD"
+	ProviderGuest    AuthProviderName = "GUEST"
 )
 
 func NewAuthProviderName(provider string) (AuthProviderName, error) {
@@ -38,9 +39,16 @@ func NewAuthProviderName(provider string) (AuthProviderName, error) {
 		return ProviderDEV, nil
 	case ProviderPassword.String():
 		return ProviderPassword, nil
+	case ProviderGuest.String():
+		return ProviderGuest, nil
 	default:
 		return "", errtrace.Wrap(errors.New("invalid auth provider"))
 	}
+}
+
+// IsGuest ゲストプロバイダーかどうかを判定
+func (a AuthProviderName) IsGuest() bool {
+	return a == ProviderGuest
 }
 
 func (a AuthProviderName) IssuerURI() IssuerURI {
