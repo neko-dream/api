@@ -14,6 +14,32 @@ import (
 	"github.com/sqlc-dev/pqtype"
 )
 
+const addUserAuthForMerge = `-- name: AddUserAuthForMerge :exec
+INSERT INTO user_auths (user_auth_id, user_id, provider, subject, created_at, is_verified) VALUES ($1, $2, $3, $4, $5, true)
+`
+
+type AddUserAuthForMergeParams struct {
+	UserAuthID uuid.UUID
+	UserID     uuid.UUID
+	Provider   string
+	Subject    string
+	CreatedAt  time.Time
+}
+
+// ゲストユーザーがOAuth認証した際にAuthを追加する（is_verified=true）
+//
+//	INSERT INTO user_auths (user_auth_id, user_id, provider, subject, created_at, is_verified) VALUES ($1, $2, $3, $4, $5, true)
+func (q *Queries) AddUserAuthForMerge(ctx context.Context, arg AddUserAuthForMergeParams) error {
+	_, err := q.db.ExecContext(ctx, addUserAuthForMerge,
+		arg.UserAuthID,
+		arg.UserID,
+		arg.Provider,
+		arg.Subject,
+		arg.CreatedAt,
+	)
+	return err
+}
+
 const changeSubject = `-- name: ChangeSubject :exec
 UPDATE "user_auths" SET subject = $2 WHERE user_id = $1
 `
@@ -32,7 +58,7 @@ func (q *Queries) ChangeSubject(ctx context.Context, arg ChangeSubjectParams) er
 }
 
 const createUser = `-- name: CreateUser :exec
-INSERT INTO users (user_id, created_at, email, email_verified) VALUES ($1, $2, $3, $4)
+INSERT INTO users (user_id, created_at, email, email_verified, display_id, display_name) VALUES ($1, $2, $3, $4, $5, $6)
 `
 
 type CreateUserParams struct {
@@ -40,17 +66,21 @@ type CreateUserParams struct {
 	CreatedAt     time.Time
 	Email         sql.NullString
 	EmailVerified bool
+	DisplayID     sql.NullString
+	DisplayName   sql.NullString
 }
 
 // CreateUser
 //
-//	INSERT INTO users (user_id, created_at, email, email_verified) VALUES ($1, $2, $3, $4)
+//	INSERT INTO users (user_id, created_at, email, email_verified, display_id, display_name) VALUES ($1, $2, $3, $4, $5, $6)
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
 	_, err := q.db.ExecContext(ctx, createUser,
 		arg.UserID,
 		arg.CreatedAt,
 		arg.Email,
 		arg.EmailVerified,
+		arg.DisplayID,
+		arg.DisplayName,
 	)
 	return err
 }
@@ -518,6 +548,23 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
 		arg.EmailVerified,
 		arg.WithdrawalDate,
 	)
+	return err
+}
+
+const updateUserAuthProvider = `-- name: UpdateUserAuthProvider :exec
+UPDATE user_auths SET provider = $2 WHERE user_id = $1
+`
+
+type UpdateUserAuthProviderParams struct {
+	UserID   uuid.UUID
+	Provider string
+}
+
+// ユーザーのプロバイダーを更新する（ゲスト昇格用）
+//
+//	UPDATE user_auths SET provider = $2 WHERE user_id = $1
+func (q *Queries) UpdateUserAuthProvider(ctx context.Context, arg UpdateUserAuthProviderParams) error {
+	_, err := q.db.ExecContext(ctx, updateUserAuthProvider, arg.UserID, arg.Provider)
 	return err
 }
 

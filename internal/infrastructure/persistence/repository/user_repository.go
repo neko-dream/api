@@ -194,9 +194,18 @@ func (u *userRepository) Create(ctx context.Context, usr user.User) error {
 		}
 		email = sql.NullString{String: emailEncrypted, Valid: true}
 	}
+	var displayID, displayName sql.NullString
+	if usr.DisplayID() != nil {
+		displayID = sql.NullString{String: *usr.DisplayID(), Valid: true}
+	}
+	if usr.DisplayName() != nil {
+		displayName = sql.NullString{String: *usr.DisplayName(), Valid: true}
+	}
 
 	if err := u.GetQueries(ctx).CreateUser(ctx, model.CreateUserParams{
 		UserID:        usr.UserID().UUID(),
+		DisplayID:     displayID,
+		DisplayName:   displayName,
 		CreatedAt:     clock.Now(ctx),
 		Email:         email,
 		EmailVerified: usr.IsEmailVerified(),
@@ -214,6 +223,29 @@ func (u *userRepository) Create(ctx context.Context, usr user.User) error {
 		CreatedAt:  clock.Now(ctx),
 	}); err != nil {
 		return errtrace.Wrap(err)
+	}
+
+	if usr.Demographics() != nil {
+		encryptedDemo, err := ci.EncryptUserDemographics(ctx, u.encryptor, usr.UserID(), usr.Demographics())
+		if err != nil {
+			return errtrace.Wrap(err)
+		}
+
+		if err := u.GetQueries(ctx).UpdateOrCreateUserDemographic(ctx, model.UpdateOrCreateUserDemographicParams{
+			UserDemographicsID: encryptedDemo.UserDemographicsID,
+			UserID:             encryptedDemo.UserID,
+			DateOfBirth:        encryptedDemo.DateOfBirth,
+			City:               encryptedDemo.City,
+			Gender:             encryptedDemo.Gender,
+			Prefecture:         encryptedDemo.Prefecture,
+		}); err != nil {
+			utils.HandleError(ctx, err, "UpdateOrCreateUserDemographic")
+			return errtrace.Wrap(err)
+		}
+		if err := u.GetQueries(ctx).VerifyUser(ctx, usr.UserID().UUID()); err != nil {
+			utils.HandleError(ctx, err, "VerifyUser")
+			return errtrace.Wrap(err)
+		}
 	}
 
 	return nil
@@ -294,5 +326,30 @@ func (u *userRepository) ChangeSubject(ctx context.Context, userID shared.UUID[u
 	return u.GetQueries(ctx).ChangeSubject(ctx, model.ChangeSubjectParams{
 		UserID:  userID.UUID(),
 		Subject: newSubject,
+	})
+}
+
+// AddUserAuthForMerge ゲストユーザーがOAuth認証した際にAuthを追加する
+func (u *userRepository) AddUserAuthForMerge(ctx context.Context, userID shared.UUID[user.User], provider shared.AuthProviderName, subject string) error {
+	ctx, span := otel.Tracer("repository").Start(ctx, "userRepository.AddUserAuthForMerge")
+	defer span.End()
+
+	return u.GetQueries(ctx).AddUserAuthForMerge(ctx, model.AddUserAuthForMergeParams{
+		UserAuthID: shared.NewUUID[user.User]().UUID(),
+		UserID:     userID.UUID(),
+		Provider:   strings.ToUpper(provider.String()),
+		Subject:    subject,
+		CreatedAt:  clock.Now(ctx),
+	})
+}
+
+// UpdateUserAuthProvider ユーザーのプロバイダーを更新する（ゲスト昇格用）
+func (u *userRepository) UpdateUserAuthProvider(ctx context.Context, userID shared.UUID[user.User], provider shared.AuthProviderName) error {
+	ctx, span := otel.Tracer("repository").Start(ctx, "userRepository.UpdateUserAuthProvider")
+	defer span.End()
+
+	return u.GetQueries(ctx).UpdateUserAuthProvider(ctx, model.UpdateUserAuthProviderParams{
+		UserID:   userID.UUID(),
+		Provider: strings.ToUpper(provider.String()),
 	})
 }
