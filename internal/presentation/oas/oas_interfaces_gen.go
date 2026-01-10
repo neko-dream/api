@@ -161,6 +161,10 @@ type GetUserTalkSessionsRes interface {
 	getUserTalkSessionsRes()
 }
 
+type GuestLoginRes interface {
+	guestLoginRes()
+}
+
 type HandleAuthCallbackRes interface {
 	handleAuthCallbackRes()
 }

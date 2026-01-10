@@ -425,6 +425,17 @@ func (UnimplementedHandler) GetVapidKey(ctx context.Context) (r *GetVapidKeyOK, 
 	return r, ht.ErrNotImplemented
 }
 
+// GuestLogin implements guestLogin operation.
+//
+// ゲストユーザーとしてログインします。
+// ゲストユーザーは登録制限のないセッションでのみ意見投稿・投票が可能です。
+// Google/LINEログインすると正規ユーザーに昇格します。.
+//
+// POST /auth/guest/login
+func (UnimplementedHandler) GuestLogin(ctx context.Context) (r GuestLoginRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // HandleAuthCallback implements handleAuthCallback operation.
 //
 // Auth Callback.

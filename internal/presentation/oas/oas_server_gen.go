@@ -70,6 +70,14 @@ type AuthHandler interface {
 	//
 	// GET /auth/token/info
 	GetTokenInfo(ctx context.Context) (GetTokenInfoRes, error)
+	// GuestLogin implements guestLogin operation.
+	//
+	// ゲストユーザーとしてログインします。
+	// ゲストユーザーは登録制限のないセッションでのみ意見投稿・投票が可能です。
+	// Google/LINEログインすると正規ユーザーに昇格します。.
+	//
+	// POST /auth/guest/login
+	GuestLogin(ctx context.Context) (GuestLoginRes, error)
 	// HandleAuthCallback implements handleAuthCallback operation.
 	//
 	// Auth Callback.
