@@ -31,6 +31,7 @@ type authHandler struct {
 	passwordRegister auth_usecase.PasswordRegister
 	changePassword   auth_usecase.ChangePassword
 	reactivate       auth_usecase.Reactivate
+	guestLogin       auth_usecase.GuestLogin
 
 	authorizationService service.AuthorizationService
 	cookie.CookieManager
@@ -42,6 +43,7 @@ func NewAuthHandler(
 	revoke auth_usecase.Revoke,
 	devLogin auth_usecase.LoginForDev,
 	detachAccount auth_usecase.DetachAccount,
+	guestLogin auth_usecase.GuestLogin,
 
 	login auth_usecase.PasswordLogin,
 	register auth_usecase.PasswordRegister,
@@ -57,6 +59,7 @@ func NewAuthHandler(
 		Revoke:               revoke,
 		LoginForDev:          devLogin,
 		DetachAccount:        detachAccount,
+		guestLogin:           guestLogin,
 		authorizationService: authorizationService,
 		CookieManager:        cookieManger,
 		passwordLogin:        login,
@@ -208,6 +211,7 @@ func (a *authHandler) GetTokenInfo(ctx context.Context) (oas.GetTokenInfoRes, er
 		OrganizationRole:       utils.ToOptNil[oas.OptNilString](claim.OrganizationRole),
 		OrganizationCode:       utils.ToOptNil[oas.OptNilString](claim.OrganizationCode),
 		OrganizationID:         utils.ToOptNil[oas.OptNilString](claim.OrganizationID),
+		IsGuest:                oas.NewOptBool(claim.IsGuest),
 	}, nil
 }
 
@@ -338,4 +342,20 @@ func (a *authHandler) ReactivateUser(ctx context.Context) (oas.ReactivateUserRes
 		Message: output.Message,
 		User:    output.User.ToResponse(),
 	}, nil
+}
+
+// GuestLogin ゲストユーザーとしてログイン
+func (a *authHandler) GuestLogin(ctx context.Context) (oas.GuestLoginRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.GuestLogin")
+	defer span.End()
+
+	output, err := a.guestLogin.Execute(ctx, auth_usecase.GuestLoginInput{})
+	if err != nil {
+		utils.HandleError(ctx, err, "GuestLogin.Execute")
+		return nil, err
+	}
+
+	headers := new(oas.GuestLoginOKHeaders)
+	headers.SetSetCookie(cookie_utils.EncodeCookies([]*http.Cookie{a.CookieManager.CreateGuestSessionCookie(output.Token)}))
+	return headers, nil
 }
