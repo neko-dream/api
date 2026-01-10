@@ -21,9 +21,8 @@
       "Bash(go vet:*)",
       "Bash(golangci-lint:*)",
       "Bash(go generate:*)",
-      "Bash(rm *)",
       "Bash(ls:*)",
-      "Bash(cat **)",
+      "Bash(cat:*)",
       "Bash(chmod:*)",
       "mcp__context7__resolve-library-id",
       "mcp__context7__get-library-docs"
