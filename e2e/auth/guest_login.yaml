@@ -93,6 +93,7 @@ steps:
           body:
             multipart/form-data:
               displayName: "新しい名前"
+              dateOfBirth: 19990101
     test: |
       current.res.status == 403
 
