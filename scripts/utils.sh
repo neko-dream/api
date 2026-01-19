@@ -42,7 +42,7 @@ print_info() {
 }
 
 login_aws() {
-  aws sts get-caller-identity --profile $AWS_PROFILE &>/dev/null || aws sso login --profile $AWS_PROFILE &>/dev/null
+  aws sts get-caller-identity --profile $1 &>/dev/null || aws sso login --profile $1 &>/dev/null
   if [ -z "$1" ]; then
       echo "AWS profile name is required" >&2
       return 1
