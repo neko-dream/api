@@ -178,7 +178,7 @@ func SortByLastActivity(sessions []Session) []Session {
 		}
 	}
 
-	return sessions
+	return sortedSession
 }
 
 func FilterActiveSessions(ctx context.Context, sessions []Session) []Session {
