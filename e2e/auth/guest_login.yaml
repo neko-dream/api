@@ -121,6 +121,14 @@ steps:
               city: "渋谷区"
     test: current.res.body.displayID == vars.normalUserId
 
+  reLoginNormalUser:
+    desc: 通常ユーザー再ログイン
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.normalUserId }}:
+        get:
+          headers: null
+    test: len(current.res.headers['Set-Cookie']) > 0
+
   createUnrestrictedSession:
     desc: 制限なしセッション作成
     req:
@@ -200,7 +208,7 @@ steps:
           body:
             multipart/form-data:
               talkSessionID: "{{ unrestrictedSession.id }}"
-              content: "ゲストユーザーからの意見です"
+              opinionContent: "ゲストユーザーからの意見です"
     bind:
       guestOpinion: current.res.body
     test: |
