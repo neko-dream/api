@@ -90,6 +90,17 @@ func NewStartTalkSessionUseCase(
 func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSessionUseCaseInput) (StartTalkSessionUseCaseOutput, error) {
 	ctx, span := otel.Tracer("talksession_command").Start(ctx, "startTalkSessionHandler.Execute")
 	defer span.End()
+
+	// ゲストユーザーはセッションを作成できない
+	owner, err := i.UserRepository.FindByID(ctx, input.OwnerID)
+	if err != nil {
+		utils.HandleError(ctx, err, "UserRepository.FindByID")
+		return StartTalkSessionUseCaseOutput{}, messages.UserNotFoundError
+	}
+	if owner != nil && owner.IsGuest() {
+		return StartTalkSessionUseCaseOutput{}, messages.GuestCannotCreateSessionError
+	}
+
 	// セッションから組織IDとエイリアスIDを取得
 	var organizationID *shared.UUID[organization.Organization]
 	var organizationAliasID *shared.UUID[organization.OrganizationAlias]

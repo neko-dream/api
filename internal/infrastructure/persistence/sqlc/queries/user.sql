@@ -1,8 +1,16 @@
 -- name: CreateUser :exec
-INSERT INTO users (user_id, created_at, email, email_verified) VALUES ($1, $2, $3, $4);
+INSERT INTO users (user_id, created_at, email, email_verified, display_id, display_name) VALUES ($1, $2, $3, $4, $5, $6);
 
 -- name: CreateUserAuth :exec
 INSERT INTO user_auths (user_auth_id, user_id, provider, subject, created_at, is_verified) VALUES ($1, $2, $3, $4, $5, false);
+
+-- name: AddUserAuthForMerge :exec
+-- ゲストユーザーがOAuth認証した際にAuthを追加する（is_verified=true）
+INSERT INTO user_auths (user_auth_id, user_id, provider, subject, created_at, is_verified) VALUES ($1, $2, $3, $4, $5, true);
+
+-- name: UpdateUserAuthProvider :exec
+-- ユーザーのプロバイダーを更新する（ゲスト昇格用）
+UPDATE user_auths SET provider = $2 WHERE user_id = $1;
 
 -- name: GetUserBySubject :one
 SELECT

@@ -112,6 +112,35 @@ namespace kotohiro {
     @body body: {};
   };
 
+  /**
+   * ゲストユーザーとしてログインします。
+   * ゲストユーザーは登録制限のないセッションでのみ意見投稿・投票が可能です。
+   * Google/LINEログインすると正規ユーザーに昇格します。
+   */
+  @tag("auth")
+  @extension("x-ogen-operation-group", "Auth")
+  @route("/auth/guest/login")
+  @post
+  @summary("ゲストログイン")
+  @useAuth([])
+  op guestLogin(): {
+    @statusCode statusCode: 200;
+    @header("Set-Cookie") SetCookie: string[];
+    @body body: {};
+  } | {
+    @statusCode statusCode: 400;
+    @body body: {
+      code: string;
+      message: string;
+    };
+  } | {
+    @statusCode statusCode: 500;
+    @body body: {
+      code: string;
+      message: string;
+    };
+  };
+
   @tag("auth")
   @extension("x-ogen-operation-group", "Auth")
   @route("/auth/{provider}/login")

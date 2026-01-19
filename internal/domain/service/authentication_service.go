@@ -1,5 +1,7 @@
 package service
 
+//go:generate go tool mockgen -source=$GOFILE -package=mock_service -destination=./mock/service/authentication_service.go
+
 import (
 	"context"
 	"crypto/rand"
@@ -20,6 +22,12 @@ import (
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
+
+// AuthenticateResult OAuth認証の結果
+type AuthenticateResult struct {
+	User    *user.User
+	Subject string // OAuth認証で取得したsubject（マージ用）
+}
 
 // AuthenticationService ユーザー認証を扱うサービス
 type AuthenticationService interface {
@@ -107,11 +115,46 @@ func (a *authenticationService) Authenticate(
 		return existUser, nil
 	}
 
+	// 既存ユーザーが見つからない場合、ゲストユーザーのマージをチェック
 	authProviderName, err := shared.NewAuthProviderName(providerName)
 	if err != nil {
 		utils.HandleError(ctx, err, "AuthProviderName.NewAuthProviderName")
 		return nil, errtrace.Wrap(err)
 	}
+
+	// 現在のセッションがゲストユーザーかチェック
+	currentClaim := session.GetSession(ctx)
+	if currentClaim != nil {
+		currentUserID, err := currentClaim.UserID()
+		if err == nil {
+			currentUser, err := a.userRepository.FindByID(ctx, currentUserID)
+			if err == nil && currentUser != nil && currentUser.IsGuest() {
+				// ゲストユーザーに新しいAuthを追加
+				if err := a.userRepository.AddUserAuthForMerge(ctx, currentUserID, authProviderName, *subject); err != nil {
+					utils.HandleError(ctx, err, "UserRepository.AddUserAuthForMerge")
+					return nil, errtrace.Wrap(err)
+				}
+				// ゲストユーザーのproviderを更新
+				currentUser.UpgradeFromGuest(authProviderName)
+				if err := a.userRepository.UpdateUserAuthProvider(ctx, currentUserID, authProviderName); err != nil {
+					utils.HandleError(ctx, err, "UserRepository.UpdateUserAuthProvider")
+					return nil, errtrace.Wrap(err)
+				}
+				// メール情報があれば設定
+				if email != nil {
+					currentUser.ChangeEmail(*email)
+					currentUser.SetEmailVerified(true)
+					if err := a.userRepository.Update(ctx, *currentUser); err != nil {
+						utils.HandleError(ctx, err, "UserRepository.Update guest user email")
+						return nil, errtrace.Wrap(err)
+					}
+				}
+				return currentUser, nil
+			}
+		}
+	}
+
+	// 新規ユーザーを作成
 	newUser := user.NewUser(
 		shared.NewUUID[user.User](),
 		nil,
@@ -195,6 +238,7 @@ func (a *authenticationService) BuildAuthContext(ctx context.Context, claim *ses
 		IsRegistered:           claim.IsRegistered,
 		IsEmailVerified:        claim.IsEmailVerified,
 		RequiredPasswordChange: claim.RequiredPasswordChange,
+		IsGuest:                claim.IsGuest,
 	}
 
 	// 組織コンテキストがある場合は設定

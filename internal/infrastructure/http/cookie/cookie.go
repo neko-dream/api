@@ -7,9 +7,10 @@ import (
 )
 
 const (
-	SessionCookieName = "SessionId"
-	SessionMaxAge     = 86400 * 5 // 24 hours
-	AuthCookieMaxAge  = 900       // 15 minutes
+	SessionCookieName  = "SessionId"
+	SessionMaxAge      = 86400 * 5  // 24 hours
+	AuthCookieMaxAge   = 900        // 15 minutes
+	GuestSessionMaxAge = 86400 * 30 // 30 days
 )
 
 type CookieManager struct {
@@ -51,5 +52,18 @@ func (cm *CookieManager) CreateRevokeCookie() *http.Cookie {
 		SameSite: http.SameSiteLaxMode,
 		Domain:   "." + cm.config.DOMAIN,
 		MaxAge:   -1,
+	}
+}
+
+func (cm *CookieManager) CreateGuestSessionCookie(token string) *http.Cookie {
+	return &http.Cookie{
+		Name:     SessionCookieName,
+		Value:    token,
+		HttpOnly: true,
+		Secure:   cm.secure,
+		Path:     "/",
+		SameSite: cm.sameSite,
+		Domain:   "." + cm.config.DOMAIN,
+		MaxAge:   GuestSessionMaxAge,
 	}
 }

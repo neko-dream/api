@@ -11,6 +11,7 @@ codeToTestRatio:
     - "!**/*.gen.go"
     - "!**/*.sql.go"
     - "!**/mock/**"
+    - "!**/di/**"
   test:
     - "**/*_test.go"
 testExecutionTime:

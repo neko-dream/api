@@ -21,6 +21,26 @@ if [ "$ENV" != "dev" ] && [ "$ENV" != "prod" ]; then
     exit 1
 fi
 
+# AWS_PROFILEが設定されていない場合はpecoで選択
+if [ -z "${AWS_PROFILE:-}" ]; then
+    if ! command -v peco &> /dev/null; then
+        print_error "pecoがインストールされていません"
+        print_info "AWS_PROFILE環境変数を設定するか、pecoをインストールしてください"
+        exit 1
+    fi
+
+    print_info "AWSプロファイルを選択してください:"
+    AWS_PROFILE=$(aws configure list-profiles | peco --prompt "AWS Profile > ")
+
+    if [ -z "$AWS_PROFILE" ]; then
+        print_error "プロファイルが選択されませんでした"
+        exit 1
+    fi
+
+    print_info "選択されたプロファイル: $AWS_PROFILE"
+fi
+
+export AWS_PROFILE
 export ACCOUNT_ID=$(login_aws $AWS_PROFILE)
 if [ -z "$ACCOUNT_ID" ]; then
     print_error "AWSアカウントIDの取得に失敗しました"
@@ -31,10 +51,11 @@ aws --profile $AWS_PROFILE ecr get-login-password --region ap-northeast-1 |
 docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com
 
 cd admin-ui
+bun install
 if [ "$ENV" = "prod" ]; then
-    bun build:prod
+    bun run build:prod
 else
-    bun build:dev
+    bun run build:dev
 fi
 cd ../
 
@@ -47,13 +68,15 @@ TIMESTAMP=$(date '+%s%3')
 export IMAGE_TAG=$COMMIT_HASH$TIMESTAMP
 
 if [ "$ENV" = "prod" ]; then
+    export APP_ENV=prd
     ECR_REPO="kotohiro-prd-api"
 else
+    export APP_ENV=dev
     ECR_REPO="kotohiro-dev-api"
 fi
 TAG=$ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/$ECR_REPO:$IMAGE_TAG
 
-docker build -f ./container/Dockerfile.gh . -t $TAG --no-cache
+docker build -f ./container/Dockerfile.gh . -t $TAG --build-arg ENV=$APP_ENV
 docker push $TAG
 
 rm -rf ./server

@@ -42,6 +42,16 @@ func NewExpiresAt(ctx context.Context) *expiresAt {
 	return &e
 }
 
+// NewGuestExpiresAt ゲストユーザー用の30日間有効期限
+func NewGuestExpiresAt(ctx context.Context) *expiresAt {
+	ctx, span := otel.Tracer("session").Start(ctx, "NewGuestExpiresAt")
+	defer span.End()
+
+	t := clock.Now(ctx).Add(30 * 24 * time.Hour)
+	e := expiresAt(t)
+	return &e
+}
+
 type (
 	SessionRepository interface {
 		Create(context.Context, Session) (*Session, error)
@@ -168,7 +178,7 @@ func SortByLastActivity(sessions []Session) []Session {
 		}
 	}
 
-	return sessions
+	return sortedSession
 }
 
 func FilterActiveSessions(ctx context.Context, sessions []Session) []Session {

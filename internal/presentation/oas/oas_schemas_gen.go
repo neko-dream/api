@@ -2204,6 +2204,90 @@ func (s *GetVapidKeyOK) SetVapidKey(val string) {
 	s.VapidKey = val
 }
 
+type GuestLoginBadRequest struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *GuestLoginBadRequest) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *GuestLoginBadRequest) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *GuestLoginBadRequest) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *GuestLoginBadRequest) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*GuestLoginBadRequest) guestLoginRes() {}
+
+type GuestLoginInternalServerError struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *GuestLoginInternalServerError) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *GuestLoginInternalServerError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *GuestLoginInternalServerError) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *GuestLoginInternalServerError) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*GuestLoginInternalServerError) guestLoginRes() {}
+
+type GuestLoginOK struct{}
+
+// GuestLoginOKHeaders wraps GuestLoginOK with response headers.
+type GuestLoginOKHeaders struct {
+	SetCookie []string
+	Response  GuestLoginOK
+}
+
+// GetSetCookie returns the value of SetCookie.
+func (s *GuestLoginOKHeaders) GetSetCookie() []string {
+	return s.SetCookie
+}
+
+// GetResponse returns the value of Response.
+func (s *GuestLoginOKHeaders) GetResponse() GuestLoginOK {
+	return s.Response
+}
+
+// SetSetCookie sets the value of SetCookie.
+func (s *GuestLoginOKHeaders) SetSetCookie(val []string) {
+	s.SetCookie = val
+}
+
+// SetResponse sets the value of Response.
+func (s *GuestLoginOKHeaders) SetResponse(val GuestLoginOK) {
+	s.Response = val
+}
+
+func (*GuestLoginOKHeaders) guestLoginRes() {}
+
 type HandleAuthCallbackBadRequest struct{}
 
 func (*HandleAuthCallbackBadRequest) handleAuthCallbackRes() {}
@@ -7114,6 +7198,8 @@ type TokenClaim struct {
 	OrganizationCode OptNilString `json:"organizationCode"`
 	// 組織ID.
 	OrganizationID OptNilString `json:"organizationID"`
+	// ゲストユーザーかどうか.
+	IsGuest OptBool `json:"isGuest"`
 }
 
 // GetAud returns the value of Aud.
@@ -7196,6 +7282,11 @@ func (s *TokenClaim) GetOrganizationID() OptNilString {
 	return s.OrganizationID
 }
 
+// GetIsGuest returns the value of IsGuest.
+func (s *TokenClaim) GetIsGuest() OptBool {
+	return s.IsGuest
+}
+
 // SetAud sets the value of Aud.
 func (s *TokenClaim) SetAud(val string) {
 	s.Aud = val
@@ -7274,6 +7365,11 @@ func (s *TokenClaim) SetOrganizationCode(val OptNilString) {
 // SetOrganizationID sets the value of OrganizationID.
 func (s *TokenClaim) SetOrganizationID(val OptNilString) {
 	s.OrganizationID = val
+}
+
+// SetIsGuest sets the value of IsGuest.
+func (s *TokenClaim) SetIsGuest(val OptBool) {
+	s.IsGuest = val
 }
 
 func (*TokenClaim) getTokenInfoRes() {}

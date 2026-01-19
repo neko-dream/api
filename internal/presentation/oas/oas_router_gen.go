@@ -128,6 +128,27 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					}
 
 					elem = origElem
+				case 'g': // Prefix: "guest/login"
+					origElem := elem
+					if l := len("guest/login"); len(elem) >= l && elem[0:l] == "guest/login" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch r.Method {
+						case "POST":
+							s.handleGuestLoginRequest([0]string{}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, "POST")
+						}
+
+						return
+					}
+
+					elem = origElem
 				case 'p': // Prefix: "password/"
 					origElem := elem
 					if l := len("password/"); len(elem) >= l && elem[0:l] == "password/" {
@@ -2136,6 +2157,31 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							}
 						}
 
+					}
+
+					elem = origElem
+				case 'g': // Prefix: "guest/login"
+					origElem := elem
+					if l := len("guest/login"); len(elem) >= l && elem[0:l] == "guest/login" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch method {
+						case "POST":
+							r.name = GuestLoginOperation
+							r.summary = "ゲストログイン"
+							r.operationID = "guestLogin"
+							r.pathPattern = "/auth/guest/login"
+							r.args = args
+							r.count = 0
+							return r, true
+						default:
+							return
+						}
 					}
 
 					elem = origElem

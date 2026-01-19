@@ -58,6 +58,16 @@ func (m *MockUserRepository) ChangeSubject(ctx context.Context, userID shared.UU
 	return args.Error(0)
 }
 
+func (m *MockUserRepository) AddUserAuthForMerge(ctx context.Context, userID shared.UUID[user.User], provider shared.AuthProviderName, subject string) error {
+	args := m.Called(ctx, userID, provider, subject)
+	return args.Error(0)
+}
+
+func (m *MockUserRepository) UpdateUserAuthProvider(ctx context.Context, userID shared.UUID[user.User], provider shared.AuthProviderName) error {
+	args := m.Called(ctx, userID, provider)
+	return args.Error(0)
+}
+
 func TestGetByDisplayIDHandler_Execute(t *testing.T) {
 	tests := []struct {
 		name           string

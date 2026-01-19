@@ -6,6 +6,7 @@ ecspresso = "latest"
 go = "1.25.1"
 jq = "latest"
 task = "latest"
+bun = "latest"
 
 [tasks.migrate-create]
 description = "Create a new migration file"

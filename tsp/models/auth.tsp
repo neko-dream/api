@@ -79,5 +79,10 @@ namespace kotohiro {
      * 組織ID
      */
     organizationID?: string | null;
+
+    /**
+     * ゲストユーザーかどうか
+     */
+    isGuest?: boolean;
   }
 }

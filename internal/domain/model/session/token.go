@@ -32,6 +32,7 @@ type (
 		IsRegistered           bool       `json:"isRegistered"`
 		IsEmailVerified        bool       `json:"isEmailVerified"`
 		RequiredPasswordChange bool       `json:"requiredPasswordChange"`
+		IsGuest                bool       `json:"isGuest,omitempty"`          // ゲストユーザーフラグ
 		OrgType                *int       `json:"orgType,omitempty"`          // 組織の種類
 		OrganizationID         *string    `json:"organizationID,omitempty"`   // ログイン時に使用した組織ID
 		OrganizationCode       *string    `json:"organizationCode,omitempty"` // ログイン時に使用した組織コード
@@ -45,17 +46,28 @@ func NewClaim(ctx context.Context, user user.User, sessionID shared.UUID[Session
 	ctx, span := otel.Tracer("session").Start(ctx, "NewClaim")
 	defer span.End()
 	now := clock.Now(ctx)
+
+	// ゲストユーザーは30日、通常ユーザーは7日
+	expDuration := time.Second * 60 * 60 * 24 * 7
+	if user.IsGuest() {
+		expDuration = time.Second * 60 * 60 * 24 * 30
+	}
+
+	// ゲストユーザーも登録済み扱い
+	isRegistered := user.Verify() || user.IsGuest()
+
 	return Claim{
 		Sub:                    user.UserID().String(),
 		Iat:                    now.Unix(),
-		Exp:                    now.Add(time.Second * 60 * 60 * 24 * 7).Unix(),
+		Exp:                    now.Add(expDuration).Unix(),
 		Jti:                    sessionID.String(),
 		IconURL:                user.IconURL(),
 		DisplayID:              user.DisplayID(),
 		DisplayName:            user.DisplayName(),
-		IsRegistered:           user.Verify(),
+		IsRegistered:           isRegistered,
 		IsEmailVerified:        user.IsEmailVerified(),
 		RequiredPasswordChange: requiredPasswordChange,
+		IsGuest:                user.IsGuest(),
 		OrgType:                orgType,
 	}
 }
@@ -64,17 +76,28 @@ func NewClaimWithOrganization(ctx context.Context, user user.User, sessionID sha
 	ctx, span := otel.Tracer("session").Start(ctx, "NewClaimWithOrganization")
 	defer span.End()
 	now := clock.Now(ctx)
+
+	// ゲストユーザーは30日、通常ユーザーは7日
+	expDuration := time.Second * 60 * 60 * 24 * 7
+	if user.IsGuest() {
+		expDuration = time.Second * 60 * 60 * 24 * 30
+	}
+
+	// ゲストユーザーも登録済み扱い
+	isRegistered := user.Verify() || user.IsGuest()
+
 	return Claim{
 		Sub:                    user.UserID().String(),
 		Iat:                    now.Unix(),
-		Exp:                    now.Add(time.Second * 60 * 60 * 24 * 7).Unix(),
+		Exp:                    now.Add(expDuration).Unix(),
 		Jti:                    sessionID.String(),
 		IconURL:                user.IconURL(),
 		DisplayID:              user.DisplayID(),
 		DisplayName:            user.DisplayName(),
-		IsRegistered:           user.Verify(),
+		IsRegistered:           isRegistered,
 		IsEmailVerified:        user.IsEmailVerified(),
 		RequiredPasswordChange: requiredPasswordChange,
+		IsGuest:                user.IsGuest(),
 		OrgType:                orgType,
 		OrganizationID:         organizationID,
 		OrganizationCode:       organizationCode,
@@ -118,6 +141,10 @@ func NewClaimFromMap(claims jwt.MapClaims) Claim {
 	if claims["organizationRole"] != nil {
 		organizationRole = lo.ToPtr(claims["organizationRole"].(string))
 	}
+	var isGuest bool
+	if claims["isGuest"] != nil {
+		isGuest = claims["isGuest"].(bool)
+	}
 
 	return Claim{
 		Sub:                    claims["sub"].(string),
@@ -130,6 +157,7 @@ func NewClaimFromMap(claims jwt.MapClaims) Claim {
 		IsRegistered:           claims["isRegistered"].(bool),
 		IsEmailVerified:        isEmailVerified,
 		RequiredPasswordChange: requiredPasswordChange,
+		IsGuest:                isGuest,
 		OrgType:                orgType,
 		OrganizationID:         organizationID,
 		OrganizationCode:       organizationCode,
@@ -183,6 +211,7 @@ func (c *Claim) GenMapClaim() *jwt.MapClaims {
 		"isRegistered":           c.IsRegistered,
 		"isEmailVerified":        c.IsEmailVerified,
 		"requiredPasswordChange": c.RequiredPasswordChange,
+		"isGuest":                c.IsGuest,
 	}
 
 	if c.OrgType != nil {

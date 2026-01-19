@@ -53,6 +53,7 @@ const (
 	GetUserStatsTotalManageOperation            OperationName = "GetUserStatsTotalManage"
 	GetUserTalkSessionsOperation                OperationName = "GetUserTalkSessions"
 	GetVapidKeyOperation                        OperationName = "GetVapidKey"
+	GuestLoginOperation                         OperationName = "GuestLogin"
 	HandleAuthCallbackOperation                 OperationName = "HandleAuthCallback"
 	HasConsentOperation                         OperationName = "HasConsent"
 	HealthOperation                             OperationName = "Health"

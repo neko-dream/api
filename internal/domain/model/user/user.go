@@ -1,5 +1,7 @@
 package user
 
+//go:generate go tool mockgen -source=$GOFILE -package=mock_user -destination=../../mock/user/user.go
+
 import (
 	"context"
 	"database/sql"
@@ -39,6 +41,10 @@ type (
 		FindByDisplayID(context.Context, string) (*User, error)
 		Update(context.Context, User) error
 		ChangeSubject(context.Context, shared.UUID[User], string) error
+		// AddUserAuthForMerge ゲストユーザーがOAuth認証した際にAuthを追加する
+		AddUserAuthForMerge(context.Context, shared.UUID[User], shared.AuthProviderName, string) error
+		// UpdateUserAuthProvider ユーザーのプロバイダーを更新する（ゲスト昇格用）
+		UpdateUserAuthProvider(context.Context, shared.UUID[User], shared.AuthProviderName) error
 	}
 
 	// UserService ユーザードメインサービス
@@ -114,6 +120,16 @@ func (u *User) DeleteIcon() {
 
 func (u *User) Provider() shared.AuthProviderName {
 	return u.provider
+}
+
+// IsGuest ゲストユーザーかどうかを判定
+func (u *User) IsGuest() bool {
+	return u.provider.IsGuest()
+}
+
+// UpgradeFromGuest ゲストユーザーから正規ユーザーに昇格
+func (u *User) UpgradeFromGuest(newProvider shared.AuthProviderName) {
+	u.provider = newProvider
 }
 
 func (u *User) Email() *string {
