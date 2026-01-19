@@ -19,8 +19,8 @@ fi
 ENV="$1"
 shift  # 最初の引数（環境）を削除して、残りをpsqlに渡す
 
-
-ACCOUNT_ID=$(login_aws $AWS_PROFILE)
+export AWS_PROFILE="admin"
+ACCOUNT_ID=$(login_aws "admin")
 if [ -z "$ACCOUNT_ID" ]; then
     print_error "AWS認証に失敗しました"
     exit 1
@@ -102,7 +102,7 @@ print_info "ポートフォワード開始..."
 print_info "localhost:5432 → ${RDS_ENDPOINT}:${RDS_PORT}"
 
 ecspresso exec --config ./.ecspresso/api/${ENV}/ecspresso.yml \
-    --port-forward -L 5432:${RDS_ENDPOINT}:${RDS_PORT} --id $id &
+    --container api --port-forward -L 5432:${RDS_ENDPOINT}:${RDS_PORT} --id $id &
 
 PF_PID=$!
 
