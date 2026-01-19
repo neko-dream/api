@@ -98,12 +98,7 @@ func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSe
 		return StartTalkSessionUseCaseOutput{}, messages.UserNotFoundError
 	}
 	if owner != nil && owner.IsGuest() {
-		e := messages.APIError{
-			Code:       "guest_cannot_create_session",
-			StatusCode: 403,
-			Message:    "ゲストユーザーはセッションを作成できません。正規アカウントでログインしてください。",
-		}
-		return StartTalkSessionUseCaseOutput{}, &e
+		return StartTalkSessionUseCaseOutput{}, messages.GuestCannotCreateSessionError
 	}
 
 	// セッションから組織IDとエイリアスIDを取得

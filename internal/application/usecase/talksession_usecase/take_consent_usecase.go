@@ -26,15 +26,18 @@ type TakeConsentUseCaseInput struct {
 type takeConsentUseCase struct {
 	talkSessionConsentService talksession_consent.TalkSessionConsentService
 	talkSessionRep            talksession.TalkSessionRepository
+	userRepository            user.UserRepository
 }
 
 func NewTakeConsentUseCase(
 	talkSessionConsentService talksession_consent.TalkSessionConsentService,
 	talkSessionRep talksession.TalkSessionRepository,
+	userRepository user.UserRepository,
 ) TakeConsentUseCase {
 	return &takeConsentUseCase{
 		talkSessionConsentService: talkSessionConsentService,
 		talkSessionRep:            talkSessionRep,
+		userRepository:            userRepository,
 	}
 }
 
@@ -51,6 +54,19 @@ func (uc *takeConsentUseCase) Execute(ctx context.Context, input TakeConsentUseC
 		utils.HandleError(ctx, err, "セッション取得に失敗。")
 		return messages.InternalServerError
 	}
+
+	// ゲストユーザーは制限ありセッションに同意できない
+	if len(talkSession.Restrictions()) > 0 {
+		currentUser, err := uc.userRepository.FindByID(ctx, input.UserID)
+		if err != nil {
+			utils.HandleError(ctx, err, "UserRepository.FindByID")
+			return messages.UserNotFoundError
+		}
+		if currentUser != nil && currentUser.IsGuest() {
+			return messages.GuestCannotJoinRestrictedSessionError
+		}
+	}
+
 	if err := uc.talkSessionConsentService.TakeConsent(
 		ctx,
 		input.TalkSessionID,
