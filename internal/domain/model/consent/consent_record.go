@@ -1,5 +1,7 @@
 package consent
 
+//go:generate go tool mockgen -source=$GOFILE -package=mock_consent -destination=../../mock/consent/consent_record.go
+
 import (
 	"context"
 	"time"

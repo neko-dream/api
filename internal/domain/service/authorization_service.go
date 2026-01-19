@@ -148,8 +148,8 @@ func (a *authorizationService) IsAuthenticated(ctx context.Context) bool {
 	ctx, span := otel.Tracer("service").Start(ctx, "authorizationService.IsAuthenticated")
 	defer span.End()
 
-	_, err := a.GetAuthContext(ctx)
-	return err == nil
+	authCtx, err := a.GetAuthContext(ctx)
+	return err == nil && authCtx != nil
 }
 
 // IsInOrganization 組織コンテキスト内かをチェック
@@ -158,19 +158,19 @@ func (a *authorizationService) IsInOrganization(ctx context.Context) bool {
 	defer span.End()
 
 	authCtx, err := a.GetAuthContext(ctx)
-	if err != nil {
+	if err != nil || authCtx == nil {
 		return false
 	}
 	return authCtx.IsInOrganization()
 }
 
-// IsKotohio implements AuthorizationService.
+// IsKotohiro implements AuthorizationService.
 func (a *authorizationService) IsKotohiro(ctx context.Context) bool {
 	ctx, span := otel.Tracer("service").Start(ctx, "authorizationService.IsKotohiro")
 	defer span.End()
 
 	authCtx, err := a.GetAuthContext(ctx)
-	if err != nil {
+	if err != nil || authCtx == nil {
 		return false
 	}
 

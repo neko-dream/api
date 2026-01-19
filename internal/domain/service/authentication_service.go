@@ -1,5 +1,7 @@
 package service
 
+//go:generate go tool mockgen -source=$GOFILE -package=mock_service -destination=./mock/service/authentication_service.go
+
 import (
 	"context"
 	"crypto/rand"

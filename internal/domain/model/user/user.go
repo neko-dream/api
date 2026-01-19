@@ -1,5 +1,7 @@
 package user
 
+//go:generate go tool mockgen -source=$GOFILE -package=mock_user -destination=../../mock/user/user.go
+
 import (
 	"context"
 	"database/sql"
