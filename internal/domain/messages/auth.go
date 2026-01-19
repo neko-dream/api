@@ -75,4 +75,16 @@ var (
 		Code:       "AUTH-0012",
 		Message:    "セッション情報の解析に失敗しました。再度ログインしてください。",
 	}
+	// ゲストユーザーがセッション作成を試みた場合のエラー
+	GuestCannotCreateSessionError = &APIError{
+		StatusCode: 403,
+		Code:       "AUTH-0013",
+		Message:    "ゲストユーザーはセッションを作成できません。LINEまたはGoogleアカウントでログインしてください。",
+	}
+	// ゲストユーザーが制限付きセッションに参加を試みた場合のエラー
+	GuestCannotJoinRestrictedSessionError = &APIError{
+		StatusCode: 403,
+		Code:       "AUTH-0014",
+		Message:    "ゲストユーザーは制限付きセッションに参加できません。LINEまたはGoogleアカウントでログインしてください。",
+	}
 )
