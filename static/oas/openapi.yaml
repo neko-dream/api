@@ -2410,11 +2410,16 @@ paths:
                 hideTop:
                   type: boolean
                   nullable: true
+                disableAnalysis:
+                  type: boolean
+                  nullable: true
               required:
                 - theme
                 - scheduledEndTime
             encoding:
               hideTop:
+                contentType: application/json
+              disableAnalysis:
                 contentType: application/json
       x-ogen-operation-group: TalkSession
   /talksessions/{talkSessionID}/analysis:
@@ -4373,6 +4378,10 @@ components:
           type: boolean
           nullable: true
           description: トップに表示するかどうか
+        disableAnalysis:
+          type: boolean
+          nullable: true
+          description: 分析を無効化するかどうか
     TalkSessionForManage:
       type: object
       required:

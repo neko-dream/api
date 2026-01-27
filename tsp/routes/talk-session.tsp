@@ -60,6 +60,8 @@ namespace kotohiro {
       thumbnailURL?: HttpPart<string>;
       // hideTop nullの場合は変更しない
       hideTop?: HttpPart<boolean | null>;
+      // disableAnalysis nullの場合は変更しない
+      disableAnalysis?: HttpPart<boolean | null>;
     },
   ): TalkSession | {
     @statusCode statusCode: 400;

@@ -8,6 +8,7 @@ import (
 	"braces.dev/errtrace"
 	"github.com/neko-dream/api/internal/application/query/dto"
 	"github.com/neko-dream/api/internal/domain/messages"
+	"github.com/neko-dream/api/internal/domain/model/analysis"
 	"github.com/neko-dream/api/internal/domain/model/clock"
 	"github.com/neko-dream/api/internal/domain/model/shared"
 	"github.com/neko-dream/api/internal/domain/model/talksession"
@@ -16,6 +17,7 @@ import (
 	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/api/pkg/utils"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type (
@@ -36,6 +38,7 @@ type (
 		City             *string                              // 市区町村
 		Prefecture       *string                              // 都道府県
 		HideTop          *bool                                // トップに表示するかどうか
+		DisableAnalysis  *bool                                // 分析を無効化するかどうか
 	}
 
 	EditTalkSessionOutput struct {
@@ -45,6 +48,7 @@ type (
 	editTalkSessionHandler struct {
 		talksession.TalkSessionRepository
 		user.UserRepository
+		analysis.AnalysisService
 		*db.DBManager
 		*config.Config
 	}
@@ -69,12 +73,14 @@ func (in *EditTalkSessionInput) Validate() error {
 func NewEditTalkSessionUseCase(
 	talkSessionRepository talksession.TalkSessionRepository,
 	userRepository user.UserRepository,
+	analysisService analysis.AnalysisService,
 	DBManager *db.DBManager,
 	config *config.Config,
 ) EditTalkSessionUseCase {
 	return &editTalkSessionHandler{
 		TalkSessionRepository: talkSessionRepository,
 		UserRepository:        userRepository,
+		AnalysisService:       analysisService,
 		DBManager:             DBManager,
 		Config:                config,
 	}
@@ -95,6 +101,9 @@ func (i *editTalkSessionHandler) Execute(ctx context.Context, input EditTalkSess
 	if i.Config.Env != config.LOCAL && talkSession.OwnerUserID() != input.UserID {
 		return nil, messages.ForbiddenError
 	}
+
+	// 分析有効化の判定用に変更前の状態を保存
+	wasAnalysisDisabled := talkSession.DisableAnalysis()
 
 	var output EditTalkSessionOutput
 	if err := input.Validate(); err != nil {
@@ -121,6 +130,9 @@ func (i *editTalkSessionHandler) Execute(ctx context.Context, input EditTalkSess
 		}
 		if input.HideTop != nil {
 			talkSession.ChangeHideTop(*input.HideTop)
+		}
+		if input.DisableAnalysis != nil {
+			talkSession.SetDisableAnalysis(*input.DisableAnalysis)
 		}
 
 		if err := i.TalkSessionRepository.Update(ctx, talkSession); err != nil {
@@ -169,6 +181,21 @@ func (i *editTalkSessionHandler) Execute(ctx context.Context, input EditTalkSess
 		return nil
 	}); err != nil {
 		return nil, errtrace.Wrap(err)
+	}
+
+	// 分析がdisable→enableに変更された場合、分析を開始
+	if wasAnalysisDisabled && input.DisableAnalysis != nil && !*input.DisableAnalysis {
+		bg := context.Background()
+		span := trace.SpanFromContext(ctx)
+		bg = trace.ContextWithSpan(bg, span)
+		go func() {
+			defer func() {
+				if r := recover(); r != nil {
+					utils.HandleError(bg, nil, "AnalysisService.StartAnalysis panicked")
+				}
+			}()
+			_ = i.AnalysisService.StartAnalysis(bg, input.TalkSessionID)
+		}()
 	}
 
 	return &output, nil

@@ -15057,9 +15057,15 @@ func (s *TalkSession) encodeFields(e *jx.Encoder) {
 			s.HideTop.Encode(e)
 		}
 	}
+	{
+		if s.DisableAnalysis.Set {
+			e.FieldStart("disableAnalysis")
+			s.DisableAnalysis.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfTalkSession = [14]string{
+var jsonFieldsNameOfTalkSession = [15]string{
 	0:  "id",
 	1:  "theme",
 	2:  "description",
@@ -15074,6 +15080,7 @@ var jsonFieldsNameOfTalkSession = [14]string{
 	11: "restrictions",
 	12: "hideReport",
 	13: "hideTop",
+	14: "disableAnalysis",
 }
 
 // Decode decodes TalkSession from json.
@@ -15242,6 +15249,16 @@ func (s *TalkSession) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"hideTop\"")
+			}
+		case "disableAnalysis":
+			if err := func() error {
+				s.DisableAnalysis.Reset()
+				if err := s.DisableAnalysis.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"disableAnalysis\"")
 			}
 		default:
 			return d.Skip()

@@ -211,6 +211,7 @@ type TalkSession struct {
 	OrganizationID      uuid.NullUUID
 	OrganizationAliasID uuid.NullUUID
 	HideTop             bool
+	DisableAnalysis     bool
 }
 
 type TalkSessionConclusion struct {

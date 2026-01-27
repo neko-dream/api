@@ -495,6 +495,7 @@ func (t *talkSessionHandler) EditTalkSession(ctx context.Context, req *oas.EditT
 		City:             utils.ToPtrIf(req.City.IsSet(), req.City.Value),
 		Prefecture:       utils.ToPtrIf(req.Prefecture.IsSet(), req.Prefecture.Value),
 		HideTop:          utils.ToPtrIf(req.HideTop.IsSet(), req.HideTop.Value),
+		DisableAnalysis:  utils.ToPtrIf(req.DisableAnalysis.IsSet(), req.DisableAnalysis.Value),
 	})
 	if err != nil {
 		return nil, err
