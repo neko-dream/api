@@ -170,7 +170,7 @@ steps:
   logoutBeforeGuestSwitch:
     desc: 通常ユーザーからログアウト
     req:
-      /auth/token/revoke:
+      /auth/revoke:
         post:
           body:
             application/json: {}
