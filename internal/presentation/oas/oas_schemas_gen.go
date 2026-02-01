@@ -7187,6 +7187,30 @@ func (s *ToggleReportVisibilityResponse) SetMessage(val string) {
 	s.Message = val
 }
 
+type ToggleTalkSessionAnalysisBadRequest struct{}
+
+func (*ToggleTalkSessionAnalysisBadRequest) toggleTalkSessionAnalysisRes() {}
+
+type ToggleTalkSessionAnalysisInternalServerError struct{}
+
+func (*ToggleTalkSessionAnalysisInternalServerError) toggleTalkSessionAnalysisRes() {}
+
+type ToggleTalkSessionAnalysisOK struct {
+	DisableAnalysis bool `json:"disableAnalysis"`
+}
+
+// GetDisableAnalysis returns the value of DisableAnalysis.
+func (s *ToggleTalkSessionAnalysisOK) GetDisableAnalysis() bool {
+	return s.DisableAnalysis
+}
+
+// SetDisableAnalysis sets the value of DisableAnalysis.
+func (s *ToggleTalkSessionAnalysisOK) SetDisableAnalysis(val bool) {
+	s.DisableAnalysis = val
+}
+
+func (*ToggleTalkSessionAnalysisOK) toggleTalkSessionAnalysisRes() {}
+
 // Ref: #/components/schemas/TokenClaim
 type TokenClaim struct {
 	// Audience.

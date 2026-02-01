@@ -85,6 +85,7 @@ var operationRolesCookieAuth = map[string][]string{
 	SolveOpinionReportOperation:            []string{},
 	SwitchOrganizationOperation:            []string{},
 	ToggleReportVisibilityManageOperation:  []string{},
+	ToggleTalkSessionAnalysisOperation:     []string{},
 	UpdateNotificationPreferencesOperation: []string{},
 	UpdateOrganizationOperation:            []string{},
 	UpdateUserProfileOperation:             []string{},

@@ -269,6 +269,10 @@ type TestRes interface {
 	testRes()
 }
 
+type ToggleTalkSessionAnalysisRes interface {
+	toggleTalkSessionAnalysisRes()
+}
+
 type UpdateNotificationPreferencesRes interface {
 	updateNotificationPreferencesRes()
 }

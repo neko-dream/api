@@ -153,6 +153,26 @@ namespace kotohiro {
     };
   };
 
+  /**
+   * 分析の有効/無効をトグルする
+   *
+   * 分析を有効にすると（disableAnalysis: true → false）、自動的に分析処理が開始されます。
+   */
+  @tag("talk_session")
+  @extension("x-ogen-operation-group", "TalkSession")
+  @route("/talksessions/{talkSessionID}/analysis/toggle")
+  @put
+  @summary("分析設定をトグル")
+  op toggleTalkSessionAnalysis(@path talkSessionID: string): Body<{
+    disableAnalysis: boolean;
+  }> | {
+    @statusCode statusCode: 400;
+    @body body: {};
+  } | {
+    @statusCode statusCode: 500;
+    @body body: {};
+  };
+
   @tag("talk_session")
   @extension("x-ogen-operation-group", "TalkSession")
   @route("/talksessions/{talkSessionID}/analysis")

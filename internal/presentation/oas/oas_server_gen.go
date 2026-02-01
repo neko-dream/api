@@ -499,6 +499,14 @@ type TalkSessionHandler interface {
 	//
 	// GET /talksessions/{talkSessionID}/analysis
 	TalkSessionAnalysis(ctx context.Context, params TalkSessionAnalysisParams) (TalkSessionAnalysisRes, error)
+	// ToggleTalkSessionAnalysis implements toggleTalkSessionAnalysis operation.
+	//
+	// 分析の有効/無効をトグルする
+	// 分析を有効にすると（disableAnalysis: true →
+	// false）、自動的に分析処理が開始されます。.
+	//
+	// PUT /talksessions/{talkSessionID}/analysis/toggle
+	ToggleTalkSessionAnalysis(ctx context.Context, params ToggleTalkSessionAnalysisParams) (ToggleTalkSessionAnalysisRes, error)
 }
 
 // TestHandler handles operations described by OpenAPI v3 specification.

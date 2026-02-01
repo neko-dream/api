@@ -37,6 +37,7 @@ func useCaseDeps() []ProvideArg {
 		{talksession_usecase.NewStartTalkSessionUseCase, nil},
 		{talksession_usecase.NewTakeConsentUseCase, nil},
 		{talksession_usecase.NewEditTalkSessionUseCase, nil},
+		{talksession_usecase.NewToggleAnalysisUseCase, nil},
 		{talksession_query.NewBrowseTalkSessionQueryHandler, nil},
 		{talksession_query.NewBrowseOpenedByUserQueryHandler, nil},
 		{talksession_query.NewBrowseJoinedTalkSessionQueryHandler, nil},
