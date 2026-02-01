@@ -82,6 +82,7 @@ const (
 	TalkSessionAnalysisOperation                OperationName = "TalkSessionAnalysis"
 	TestOperation                               OperationName = "Test"
 	ToggleReportVisibilityManageOperation       OperationName = "ToggleReportVisibilityManage"
+	ToggleTalkSessionAnalysisOperation          OperationName = "ToggleTalkSessionAnalysis"
 	UpdateNotificationPreferencesOperation      OperationName = "UpdateNotificationPreferences"
 	UpdateOrganizationOperation                 OperationName = "UpdateOrganization"
 	UpdateUserProfileOperation                  OperationName = "UpdateUserProfile"

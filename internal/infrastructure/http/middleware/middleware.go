@@ -103,10 +103,15 @@ func SetContextCookieKey(cont *dig.Container) Middleware {
 				return
 			}
 
-			// セッションの存在確認
-			_, err = sessionRepository.FindBySessionID(ctx, sessionID)
+			// セッションの存在確認とアクティブ状態を確認
+			sess, err := sessionRepository.FindBySessionID(ctx, sessionID)
 			if err != nil {
 				// セッションが見つからない場合もそのまま続行
+				h.ServeHTTP(w, r)
+				return
+			}
+			// セッションが無効（revoke済み）の場合はセッションを設定しない
+			if sess == nil || !sess.IsActive(ctx) {
 				h.ServeHTTP(w, r)
 				return
 			}

@@ -699,6 +699,17 @@ func (UnimplementedHandler) ToggleReportVisibilityManage(ctx context.Context, re
 	return r, ht.ErrNotImplemented
 }
 
+// ToggleTalkSessionAnalysis implements toggleTalkSessionAnalysis operation.
+//
+// 分析の有効/無効をトグルする
+// 分析を有効にすると（disableAnalysis: true →
+// false）、自動的に分析処理が開始されます。.
+//
+// PUT /talksessions/{talkSessionID}/analysis/toggle
+func (UnimplementedHandler) ToggleTalkSessionAnalysis(ctx context.Context, params ToggleTalkSessionAnalysisParams) (r ToggleTalkSessionAnalysisRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // UpdateNotificationPreferences implements updateNotificationPreferences operation.
 //
 // 通知設定更新.

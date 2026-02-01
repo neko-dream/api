@@ -75,6 +75,11 @@ namespace kotohiro {
      * トップに表示するかどうか
      */
     hideTop?: boolean | null;
+
+    /**
+     * 分析を無効化するかどうか
+     */
+    disableAnalysis?: boolean | null;
   }
 
   model Report {

@@ -59,6 +59,7 @@ func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talkses
 		OrganizationAliasID: utils.ToNullableSQL[uuid.NullUUID](talkSession.OrganizationAliasID()),
 		OrganizationID:      utils.ToNullableSQL[uuid.NullUUID](talkSession.OrganizationID()),
 		HideTop:             talkSession.HideTop(),
+		DisableAnalysis:     talkSession.DisableAnalysis(),
 	}); err != nil {
 		return errtrace.Wrap(err)
 	}
@@ -111,6 +112,7 @@ func (t *talkSessionRepository) Update(ctx context.Context, talkSession *talkses
 		Restrictions:     talksession.Restrictions(restrictions),
 		HideReport:       utils.ToNullableSQL[sql.NullBool](talkSession.HideReport()),
 		HideTop:          talkSession.HideTop(),
+		DisableAnalysis:  talkSession.DisableAnalysis(),
 	}); err != nil {
 		return errtrace.Wrap(err)
 	}
@@ -183,6 +185,7 @@ func (t *talkSessionRepository) FindByID(ctx context.Context, talkSessionID shar
 		nil,
 	)
 	ts.SetReportVisibility(row.TalkSession.HideReport.Bool)
+	ts.SetDisableAnalysis(row.TalkSession.DisableAnalysis)
 
 	if len(row.TalkSession.Restrictions) > 0 {
 		if err := ts.UpdateRestrictions(ctx, row.TalkSession.Restrictions); err != nil {
@@ -253,6 +256,8 @@ func (t *talkSessionRepository) GetUnprocessedEndedSessions(ctx context.Context,
 		}
 		// レポート表示設定
 		session.SetReportVisibility(row.HideReport.Bool)
+		// 分析無効化設定
+		session.SetDisableAnalysis(row.DisableAnalysis)
 		sessions = append(sessions, session)
 	}
 

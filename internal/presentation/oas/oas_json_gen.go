@@ -15057,9 +15057,15 @@ func (s *TalkSession) encodeFields(e *jx.Encoder) {
 			s.HideTop.Encode(e)
 		}
 	}
+	{
+		if s.DisableAnalysis.Set {
+			e.FieldStart("disableAnalysis")
+			s.DisableAnalysis.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfTalkSession = [14]string{
+var jsonFieldsNameOfTalkSession = [15]string{
 	0:  "id",
 	1:  "theme",
 	2:  "description",
@@ -15074,6 +15080,7 @@ var jsonFieldsNameOfTalkSession = [14]string{
 	11: "restrictions",
 	12: "hideReport",
 	13: "hideTop",
+	14: "disableAnalysis",
 }
 
 // Decode decodes TalkSession from json.
@@ -15242,6 +15249,16 @@ func (s *TalkSession) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"hideTop\"")
+			}
+		case "disableAnalysis":
+			if err := func() error {
+				s.DisableAnalysis.Reset()
+				if err := s.DisableAnalysis.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"disableAnalysis\"")
 			}
 		default:
 			return d.Skip()
@@ -17042,6 +17059,234 @@ func (s *ToggleReportVisibilityResponse) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *ToggleReportVisibilityResponse) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *ToggleTalkSessionAnalysisBadRequest) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *ToggleTalkSessionAnalysisBadRequest) encodeFields(e *jx.Encoder) {
+}
+
+var jsonFieldsNameOfToggleTalkSessionAnalysisBadRequest = [0]string{}
+
+// Decode decodes ToggleTalkSessionAnalysisBadRequest from json.
+func (s *ToggleTalkSessionAnalysisBadRequest) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ToggleTalkSessionAnalysisBadRequest to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		default:
+			return d.Skip()
+		}
+	}); err != nil {
+		return errors.Wrap(err, "decode ToggleTalkSessionAnalysisBadRequest")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *ToggleTalkSessionAnalysisBadRequest) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ToggleTalkSessionAnalysisBadRequest) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *ToggleTalkSessionAnalysisInternalServerError) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *ToggleTalkSessionAnalysisInternalServerError) encodeFields(e *jx.Encoder) {
+}
+
+var jsonFieldsNameOfToggleTalkSessionAnalysisInternalServerError = [0]string{}
+
+// Decode decodes ToggleTalkSessionAnalysisInternalServerError from json.
+func (s *ToggleTalkSessionAnalysisInternalServerError) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ToggleTalkSessionAnalysisInternalServerError to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		default:
+			return d.Skip()
+		}
+	}); err != nil {
+		return errors.Wrap(err, "decode ToggleTalkSessionAnalysisInternalServerError")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *ToggleTalkSessionAnalysisInternalServerError) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ToggleTalkSessionAnalysisInternalServerError) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *ToggleTalkSessionAnalysisNotFound) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *ToggleTalkSessionAnalysisNotFound) encodeFields(e *jx.Encoder) {
+}
+
+var jsonFieldsNameOfToggleTalkSessionAnalysisNotFound = [0]string{}
+
+// Decode decodes ToggleTalkSessionAnalysisNotFound from json.
+func (s *ToggleTalkSessionAnalysisNotFound) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ToggleTalkSessionAnalysisNotFound to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		default:
+			return d.Skip()
+		}
+	}); err != nil {
+		return errors.Wrap(err, "decode ToggleTalkSessionAnalysisNotFound")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *ToggleTalkSessionAnalysisNotFound) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ToggleTalkSessionAnalysisNotFound) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *ToggleTalkSessionAnalysisOK) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *ToggleTalkSessionAnalysisOK) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("disableAnalysis")
+		e.Bool(s.DisableAnalysis)
+	}
+}
+
+var jsonFieldsNameOfToggleTalkSessionAnalysisOK = [1]string{
+	0: "disableAnalysis",
+}
+
+// Decode decodes ToggleTalkSessionAnalysisOK from json.
+func (s *ToggleTalkSessionAnalysisOK) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ToggleTalkSessionAnalysisOK to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "disableAnalysis":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Bool()
+				s.DisableAnalysis = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"disableAnalysis\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode ToggleTalkSessionAnalysisOK")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfToggleTalkSessionAnalysisOK) {
+					name = jsonFieldsNameOfToggleTalkSessionAnalysisOK[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *ToggleTalkSessionAnalysisOK) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ToggleTalkSessionAnalysisOK) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

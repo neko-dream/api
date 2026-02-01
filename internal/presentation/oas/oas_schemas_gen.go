@@ -713,6 +713,7 @@ type EditTalkSessionReq struct {
 	Description      OptString  `json:"description"`
 	ThumbnailURL     OptString  `json:"thumbnailURL"`
 	HideTop          OptNilBool `json:"hideTop"`
+	DisableAnalysis  OptNilBool `json:"disableAnalysis"`
 }
 
 // GetTheme returns the value of Theme.
@@ -760,6 +761,11 @@ func (s *EditTalkSessionReq) GetHideTop() OptNilBool {
 	return s.HideTop
 }
 
+// GetDisableAnalysis returns the value of DisableAnalysis.
+func (s *EditTalkSessionReq) GetDisableAnalysis() OptNilBool {
+	return s.DisableAnalysis
+}
+
 // SetTheme sets the value of Theme.
 func (s *EditTalkSessionReq) SetTheme(val string) {
 	s.Theme = val
@@ -803,6 +809,11 @@ func (s *EditTalkSessionReq) SetThumbnailURL(val OptString) {
 // SetHideTop sets the value of HideTop.
 func (s *EditTalkSessionReq) SetHideTop(val OptNilBool) {
 	s.HideTop = val
+}
+
+// SetDisableAnalysis sets the value of DisableAnalysis.
+func (s *EditTalkSessionReq) SetDisableAnalysis(val OptNilBool) {
+	s.DisableAnalysis = val
 }
 
 type EditTimeLineBadRequest struct{}
@@ -6389,6 +6400,8 @@ type TalkSession struct {
 	HideReport bool `json:"hideReport"`
 	// トップに表示するかどうか.
 	HideTop OptNilBool `json:"hideTop"`
+	// 分析を無効化するかどうか.
+	DisableAnalysis OptNilBool `json:"disableAnalysis"`
 }
 
 // GetID returns the value of ID.
@@ -6461,6 +6474,11 @@ func (s *TalkSession) GetHideTop() OptNilBool {
 	return s.HideTop
 }
 
+// GetDisableAnalysis returns the value of DisableAnalysis.
+func (s *TalkSession) GetDisableAnalysis() OptNilBool {
+	return s.DisableAnalysis
+}
+
 // SetID sets the value of ID.
 func (s *TalkSession) SetID(val string) {
 	s.ID = val
@@ -6529,6 +6547,11 @@ func (s *TalkSession) SetHideReport(val bool) {
 // SetHideTop sets the value of HideTop.
 func (s *TalkSession) SetHideTop(val OptNilBool) {
 	s.HideTop = val
+}
+
+// SetDisableAnalysis sets the value of DisableAnalysis.
+func (s *TalkSession) SetDisableAnalysis(val OptNilBool) {
+	s.DisableAnalysis = val
 }
 
 func (*TalkSession) editTalkSessionRes()      {}
@@ -7163,6 +7186,34 @@ func (s *ToggleReportVisibilityResponse) SetStatus(val string) {
 func (s *ToggleReportVisibilityResponse) SetMessage(val string) {
 	s.Message = val
 }
+
+type ToggleTalkSessionAnalysisBadRequest struct{}
+
+func (*ToggleTalkSessionAnalysisBadRequest) toggleTalkSessionAnalysisRes() {}
+
+type ToggleTalkSessionAnalysisInternalServerError struct{}
+
+func (*ToggleTalkSessionAnalysisInternalServerError) toggleTalkSessionAnalysisRes() {}
+
+type ToggleTalkSessionAnalysisNotFound struct{}
+
+func (*ToggleTalkSessionAnalysisNotFound) toggleTalkSessionAnalysisRes() {}
+
+type ToggleTalkSessionAnalysisOK struct {
+	DisableAnalysis bool `json:"disableAnalysis"`
+}
+
+// GetDisableAnalysis returns the value of DisableAnalysis.
+func (s *ToggleTalkSessionAnalysisOK) GetDisableAnalysis() bool {
+	return s.DisableAnalysis
+}
+
+// SetDisableAnalysis sets the value of DisableAnalysis.
+func (s *ToggleTalkSessionAnalysisOK) SetDisableAnalysis(val bool) {
+	s.DisableAnalysis = val
+}
+
+func (*ToggleTalkSessionAnalysisOK) toggleTalkSessionAnalysisRes() {}
 
 // Ref: #/components/schemas/TokenClaim
 type TokenClaim struct {
