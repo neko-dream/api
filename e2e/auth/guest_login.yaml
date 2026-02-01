@@ -167,6 +167,15 @@ steps:
   # ========================================
   # テスト4: ゲストユーザーで制限なしセッションに参加可能
   # ========================================
+  logoutBeforeGuestSwitch:
+    desc: 通常ユーザーからログアウト
+    req:
+      /auth/token/revoke:
+        post:
+          body:
+            application/json: {}
+    test: current.res.status == 204
+
   switchBackToGuest:
     desc: ゲストユーザーに切り替え（新規ゲスト作成）
     req:
