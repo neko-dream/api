@@ -169,6 +169,9 @@ namespace kotohiro {
     @statusCode statusCode: 400;
     @body body: {};
   } | {
+    @statusCode statusCode: 404;
+    @body body: {};
+  } | {
     @statusCode statusCode: 500;
     @body body: {};
   };

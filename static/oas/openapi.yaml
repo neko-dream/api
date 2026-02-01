@@ -2548,6 +2548,12 @@ paths:
             application/json:
               schema:
                 type: object
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                type: object
         '500':
           description: Server error
           content:

@@ -7195,6 +7195,10 @@ type ToggleTalkSessionAnalysisInternalServerError struct{}
 
 func (*ToggleTalkSessionAnalysisInternalServerError) toggleTalkSessionAnalysisRes() {}
 
+type ToggleTalkSessionAnalysisNotFound struct{}
+
+func (*ToggleTalkSessionAnalysisNotFound) toggleTalkSessionAnalysisRes() {}
+
 type ToggleTalkSessionAnalysisOK struct {
 	DisableAnalysis bool `json:"disableAnalysis"`
 }
