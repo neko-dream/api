@@ -1,0 +1,1 @@
+ALTER TABLE talk_sessions ADD COLUMN disable_analysis BOOLEAN NOT NULL DEFAULT FALSE;

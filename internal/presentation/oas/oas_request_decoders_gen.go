@@ -840,6 +840,33 @@ func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
 				}
 			}
 		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "disableAnalysis",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+					if err := func(d *jx.Decoder) error {
+						request.DisableAnalysis.Reset()
+						if err := request.DisableAnalysis.Decode(d); err != nil {
+							return err
+						}
+						return nil
+					}(jx.DecodeStr(val)); err != nil {
+						return err
+					}
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"disableAnalysis\"")
+				}
+			}
+		}
 		return &request, close, nil
 	default:
 		return req, close, validate.InvalidContentType(ct)

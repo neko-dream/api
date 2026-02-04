@@ -349,6 +349,11 @@ func (a *authHandler) GuestLogin(ctx context.Context) (oas.GuestLoginRes, error)
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.GuestLogin")
 	defer span.End()
 
+	// すでにログイン済みなら何もしない（ゲスト・Google・LINE等問わず）
+	if session.GetSession(ctx) != nil {
+		return new(oas.GuestLoginOKHeaders), nil
+	}
+
 	output, err := a.guestLogin.Execute(ctx, auth_usecase.GuestLoginInput{})
 	if err != nil {
 		utils.HandleError(ctx, err, "GuestLogin.Execute")

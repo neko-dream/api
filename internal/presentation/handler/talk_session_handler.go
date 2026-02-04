@@ -40,6 +40,7 @@ type talkSessionHandler struct {
 	startTalkSessionCommand talksession_usecase.StartTalkSessionUseCase
 	editTalkSessionCommand  talksession_usecase.EditTalkSessionUseCase
 	takeConsentCommand      talksession_usecase.TakeConsentUseCase
+	toggleAnalysisUseCase   talksession_usecase.ToggleAnalysisUseCase
 
 	authorizationService service.AuthorizationService
 	session.TokenManager
@@ -62,6 +63,7 @@ func NewTalkSessionHandler(
 	startTalkSessionCommand talksession_usecase.StartTalkSessionUseCase,
 	editTalkSessionCommand talksession_usecase.EditTalkSessionUseCase,
 	takeConsentCommand talksession_usecase.TakeConsentUseCase,
+	toggleAnalysisUseCase talksession_usecase.ToggleAnalysisUseCase,
 
 	authorizationService service.AuthorizationService,
 	tokenManager session.TokenManager,
@@ -83,6 +85,7 @@ func NewTalkSessionHandler(
 		startTalkSessionCommand: startTalkSessionCommand,
 		editTalkSessionCommand:  editTalkSessionCommand,
 		takeConsentCommand:      takeConsentCommand,
+		toggleAnalysisUseCase:   toggleAnalysisUseCase,
 
 		authorizationService: authorizationService,
 		TokenManager:         tokenManager,
@@ -495,6 +498,7 @@ func (t *talkSessionHandler) EditTalkSession(ctx context.Context, req *oas.EditT
 		City:             utils.ToPtrIf(req.City.IsSet(), req.City.Value),
 		Prefecture:       utils.ToPtrIf(req.Prefecture.IsSet(), req.Prefecture.Value),
 		HideTop:          utils.ToPtrIf(req.HideTop.IsSet(), req.HideTop.Value),
+		DisableAnalysis:  utils.ToPtrIf(req.DisableAnalysis.IsSet(), req.DisableAnalysis.Value),
 	})
 	if err != nil {
 		return nil, err
@@ -690,5 +694,33 @@ func (t *talkSessionHandler) HasConsent(ctx context.Context, params oas.HasConse
 
 	return &oas.HasConsentOK{
 		HasConsent: hasConsent,
+	}, nil
+}
+
+// ToggleTalkSessionAnalysis implements oas.TalkSessionHandler.
+func (t *talkSessionHandler) ToggleTalkSessionAnalysis(ctx context.Context, params oas.ToggleTalkSessionAnalysisParams) (oas.ToggleTalkSessionAnalysisRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.ToggleTalkSessionAnalysis")
+	defer span.End()
+
+	authCtx, err := t.authorizationService.RequireAuthentication(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
+	out, err := t.toggleAnalysisUseCase.Execute(ctx, talksession_usecase.ToggleAnalysisInput{
+		TalkSessionID: talkSessionID,
+		UserID:        authCtx.UserID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &oas.ToggleTalkSessionAnalysisOK{
+		DisableAnalysis: out.DisableAnalysis,
 	}, nil
 }

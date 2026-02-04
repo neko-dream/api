@@ -39,7 +39,8 @@ type (
 		hideReport          bool
 		organizationID      *shared.UUID[organization.Organization]
 		organizationAliasID *shared.UUID[organization.OrganizationAlias]
-		hideTop             bool // トップに表示するかどうか
+		hideTop         bool // トップに表示するかどうか
+		disableAnalysis bool // 分析を無効化するかどうか
 		// イベント記録用（埋め込み）
 		event.EventRecorder
 		// 終了処理済みフラグ
@@ -150,6 +151,14 @@ func (t *TalkSession) ChangePrefecture(prefecture *string) {
 
 func (t *TalkSession) ChangeHideTop(hideTop bool) {
 	t.hideTop = hideTop
+}
+
+func (t *TalkSession) DisableAnalysis() bool {
+	return t.disableAnalysis
+}
+
+func (t *TalkSession) SetDisableAnalysis(disableAnalysis bool) {
+	t.disableAnalysis = disableAnalysis
 }
 
 func (t *TalkSession) Restrictions() []*RestrictionAttribute {

@@ -70,6 +70,7 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 	editCommand := talksession_usecase.NewEditTalkSessionUseCase(
 		talkSessionRepo,
 		userRepo,
+		repository.NewAnalysisServiceMock(),
 		dbManager,
 		testConfig,
 	)
@@ -659,6 +660,7 @@ func TestEditTalkSessionUseCase_ProductionEnvironment(t *testing.T) {
 	editCommand := talksession_usecase.NewEditTalkSessionUseCase(
 		talkSessionRepo,
 		userRepo,
+		repository.NewAnalysisServiceMock(),
 		dbManager,
 		prodConfig,
 	)

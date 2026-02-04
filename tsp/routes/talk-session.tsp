@@ -60,6 +60,8 @@ namespace kotohiro {
       thumbnailURL?: HttpPart<string>;
       // hideTop nullの場合は変更しない
       hideTop?: HttpPart<boolean | null>;
+      // disableAnalysis nullの場合は変更しない
+      disableAnalysis?: HttpPart<boolean | null>;
     },
   ): TalkSession | {
     @statusCode statusCode: 400;
@@ -149,6 +151,29 @@ namespace kotohiro {
       code: string;
       message: string;
     };
+  };
+
+  /**
+   * 分析の有効/無効をトグルする
+   *
+   * 分析を有効にすると（disableAnalysis: true → false）、自動的に分析処理が開始されます。
+   */
+  @tag("talk_session")
+  @extension("x-ogen-operation-group", "TalkSession")
+  @route("/talksessions/{talkSessionID}/analysis/toggle")
+  @put
+  @summary("分析設定をトグル")
+  op toggleTalkSessionAnalysis(@path talkSessionID: string): Body<{
+    disableAnalysis: boolean;
+  }> | {
+    @statusCode statusCode: 400;
+    @body body: {};
+  } | {
+    @statusCode statusCode: 404;
+    @body body: {};
+  } | {
+    @statusCode statusCode: 500;
+    @body body: {};
   };
 
   @tag("talk_session")

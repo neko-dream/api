@@ -155,8 +155,10 @@ func (i *voteHandler) Execute(ctx context.Context, input VoteInput) error {
 		return errtrace.Wrap(err)
 	}
 
-	// 非同期で分析を開始
-	i.StartAnalysisIfNeeded(ctx, op.TalkSessionID())
+	// 非同期で分析を開始（分析が無効化されていない場合のみ）
+	if !session.DisableAnalysis() {
+		i.StartAnalysisIfNeeded(ctx, op.TalkSessionID())
+	}
 
 	return nil
 }
@@ -169,6 +171,12 @@ func (i *voteHandler) StartAnalysisIfNeeded(ctx context.Context, talkSessionID s
 	span = trace.SpanFromContext(ctx)
 	bg = trace.ContextWithSpan(bg, span)
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				utils.HandleError(bg, nil, "StartAnalysisIfNeeded panicked")
+			}
+		}()
+
 		_ = i.AnalysisService.StartAnalysis(bg, talkSessionID)
 
 		// 分析レポートを取得
