@@ -57,7 +57,7 @@ func NewOpinion(
 	createdAt time.Time,
 	referenceURL *string,
 ) (*Opinion, error) {
-	if utf8.RuneCountInString(content) > 140 || utf8.RuneCountInString(content) < 5 {
+	if utf8.RuneCountInString(content) > 140 || utf8.RuneCountInString(content) < 1 {
 		return nil, messages.OpinionContentBadLength
 	}
 	if parentOpinionID != nil && opinionID == *parentOpinionID {
