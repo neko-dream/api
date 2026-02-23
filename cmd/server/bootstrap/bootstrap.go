@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/neko-dream/api/internal/application/event_processor"
+	"github.com/neko-dream/api/internal/application/usecase/analysis_usecase"
 	"github.com/neko-dream/api/internal/infrastructure/config"
 	"github.com/neko-dream/api/internal/infrastructure/di"
 	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
@@ -14,11 +15,12 @@ import (
 
 // Bootstrap アプリケーションの起動を管理する
 type Bootstrap struct {
-	container      *dig.Container
-	config         *config.Config
-	migrator       *db.Migrator
-	eventProcessor *event_processor.EventProcessor
-	cancelFunc     context.CancelFunc
+	container          *dig.Container
+	config             *config.Config
+	migrator           *db.Migrator
+	eventProcessor     *event_processor.EventProcessor
+	analysisScheduler  analysis_usecase.AnalysisScheduler
+	cancelFunc         context.CancelFunc
 }
 
 // New 新しいBootstrapインスタンスを作成する
@@ -38,11 +40,17 @@ func New(container *dig.Container) (*Bootstrap, error) {
 		return nil, fmt.Errorf("failed to invoke event processor: %w", err)
 	}
 
+	analysisScheduler, err := di.InvokeWithError[analysis_usecase.AnalysisScheduler](container)
+	if err != nil {
+		return nil, fmt.Errorf("failed to invoke analysis scheduler: %w", err)
+	}
+
 	return &Bootstrap{
-		container:      container,
-		config:         config,
-		migrator:       migrator,
-		eventProcessor: eventProcessor,
+		container:         container,
+		config:            config,
+		migrator:          migrator,
+		eventProcessor:    eventProcessor,
+		analysisScheduler: analysisScheduler,
 	}, nil
 }
 
@@ -56,6 +64,7 @@ func (b *Bootstrap) Run() error {
 	}
 
 	b.startEventProcessor(ctx)
+	b.analysisScheduler.Start(ctx)
 
 	return b.startHTTPServer()
 }
@@ -78,4 +87,6 @@ func (b *Bootstrap) Shutdown() {
 		log.Println("Shutting down event processor...")
 		b.cancelFunc()
 	}
+	log.Println("Shutting down analysis scheduler...")
+	b.analysisScheduler.Stop()
 }
