@@ -2,12 +2,10 @@ package vote_usecase
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 
 	"braces.dev/errtrace"
+	"github.com/neko-dream/api/internal/application/usecase/analysis_usecase"
 	"github.com/neko-dream/api/internal/domain/messages"
-	"github.com/neko-dream/api/internal/domain/model/analysis"
 	"github.com/neko-dream/api/internal/domain/model/clock"
 	"github.com/neko-dream/api/internal/domain/model/opinion"
 	"github.com/neko-dream/api/internal/domain/model/shared"
@@ -19,7 +17,6 @@ import (
 	"github.com/neko-dream/api/pkg/utils"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/trace"
 )
 
 type (
@@ -38,8 +35,7 @@ type (
 		opinion.OpinionRepository
 		talksession.TalkSessionRepository
 		vote.VoteRepository
-		analysis.AnalysisService
-		analysis.AnalysisRepository
+		analysis_usecase.AnalysisScheduler
 		service.TalkSessionAccessControl
 		*db.DBManager
 	}
@@ -50,8 +46,7 @@ func NewVoteHandler(
 	opinionRepository opinion.OpinionRepository,
 	talkSessionRepository talksession.TalkSessionRepository,
 	voteRepository vote.VoteRepository,
-	analysisService analysis.AnalysisService,
-	analysisRepository analysis.AnalysisRepository,
+	analysisScheduler analysis_usecase.AnalysisScheduler,
 	talkSessionAccessControl service.TalkSessionAccessControl,
 	DBManager *db.DBManager,
 ) Vote {
@@ -60,8 +55,7 @@ func NewVoteHandler(
 		OpinionRepository:        opinionRepository,
 		VoteRepository:           voteRepository,
 		TalkSessionRepository:    talkSessionRepository,
-		AnalysisService:          analysisService,
-		AnalysisRepository:       analysisRepository,
+		AnalysisScheduler:        analysisScheduler,
 		TalkSessionAccessControl: talkSessionAccessControl,
 		DBManager:                DBManager,
 	}
@@ -157,39 +151,8 @@ func (i *voteHandler) Execute(ctx context.Context, input VoteInput) error {
 
 	// 非同期で分析を開始（分析が無効化されていない場合のみ）
 	if !session.DisableAnalysis() {
-		i.StartAnalysisIfNeeded(ctx, op.TalkSessionID())
+		i.AnalysisScheduler.ScheduleAnalysis(ctx, op.TalkSessionID(), analysis_usecase.ScheduleDebounced)
 	}
 
 	return nil
-}
-
-func (i *voteHandler) StartAnalysisIfNeeded(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession]) {
-	ctx, span := otel.Tracer("vote_command").Start(ctx, "voteHandler.StartAnalysisIfNeeded")
-	defer span.End()
-
-	bg := context.Background()
-	span = trace.SpanFromContext(ctx)
-	bg = trace.ContextWithSpan(bg, span)
-	go func() {
-		defer func() {
-			if r := recover(); r != nil {
-				utils.HandleError(bg, nil, "StartAnalysisIfNeeded panicked")
-			}
-		}()
-
-		_ = i.AnalysisService.StartAnalysis(bg, talkSessionID)
-
-		// 分析レポートを取得
-		report, err := i.AnalysisRepository.FindByTalkSessionID(bg, talkSessionID)
-		if err != nil && !errors.Is(err, sql.ErrNoRows) {
-			utils.HandleError(ctx, err, "AnalysisRepository.FindByTalkSessionID")
-			return
-		}
-		if report == nil {
-			return
-		}
-		if report.ShouldReGenerateReport() {
-			_ = i.AnalysisService.GenerateReport(bg, talkSessionID)
-		}
-	}()
 }
