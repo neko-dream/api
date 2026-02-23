@@ -71,7 +71,7 @@ func TestNewOpinion(t *testing.T) {
 			userID:          shared.MustParseUUID[user.User]("00000000-0000-0000-0000-00000000000d"),
 			parentOpinionID: nil,
 			title:           nil,
-			content:         "短い",
+			content:         "",
 			createdAt:       time.Now(),
 			referenceURL:    nil,
 			wantErr:         messages.OpinionContentBadLength,
