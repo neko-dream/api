@@ -734,6 +734,10 @@ func (t *talkSessionHandler) JoinClosedSession(ctx context.Context, req *oas.Joi
 	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.JoinClosedSession")
 	defer span.End()
 
+	if req == nil {
+		return nil, messages.BadRequestError
+	}
+
 	authCtx, err := t.authorizationService.RequireAuthentication(ctx)
 	if err != nil {
 		return nil, err
@@ -747,7 +751,7 @@ func (t *talkSessionHandler) JoinClosedSession(ctx context.Context, req *oas.Joi
 	if err := t.joinClosedSessionCommand.Execute(ctx, talksession_usecase.JoinClosedSessionInput{
 		TalkSessionID: talkSessionID,
 		UserID:        authCtx.UserID,
-		Passphrase:    req.GetPassphrase(),
+		Passphrase:    req.GetPassphrase().Value,
 	}); err != nil {
 		return nil, err
 	}

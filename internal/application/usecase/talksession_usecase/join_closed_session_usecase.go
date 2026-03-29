@@ -99,6 +99,10 @@ func (h *joinClosedSessionHandler) Execute(ctx context.Context, input JoinClosed
 	if err := h.DBManager.ExecTx(ctx, func(ctx context.Context) error {
 		return h.TalkSessionConsentService.TakeConsent(ctx, input.TalkSessionID, input.UserID, nil)
 	}); err != nil {
+		// 並行joinで既に同意済みになった場合は成功扱い
+		if errors.Is(err, messages.TalkSessionAlreadyConsented) {
+			return nil
+		}
 		utils.HandleError(ctx, err, "TalkSessionConsentService.TakeConsent")
 		return errtrace.Wrap(err)
 	}
