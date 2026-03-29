@@ -7,8 +7,8 @@ import (
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/api/internal/application/query/dto"
+	"github.com/neko-dream/api/internal/application/usecase/analysis_usecase"
 	"github.com/neko-dream/api/internal/domain/messages"
-	"github.com/neko-dream/api/internal/domain/model/analysis"
 	"github.com/neko-dream/api/internal/domain/model/clock"
 	"github.com/neko-dream/api/internal/domain/model/shared"
 	"github.com/neko-dream/api/internal/domain/model/talksession"
@@ -17,7 +17,6 @@ import (
 	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/api/pkg/utils"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/trace"
 )
 
 type (
@@ -48,7 +47,7 @@ type (
 	editTalkSessionHandler struct {
 		talksession.TalkSessionRepository
 		user.UserRepository
-		analysis.AnalysisService
+		analysis_usecase.AnalysisScheduler
 		*db.DBManager
 		*config.Config
 	}
@@ -73,14 +72,14 @@ func (in *EditTalkSessionInput) Validate() error {
 func NewEditTalkSessionUseCase(
 	talkSessionRepository talksession.TalkSessionRepository,
 	userRepository user.UserRepository,
-	analysisService analysis.AnalysisService,
+	analysisScheduler analysis_usecase.AnalysisScheduler,
 	DBManager *db.DBManager,
 	config *config.Config,
 ) EditTalkSessionUseCase {
 	return &editTalkSessionHandler{
 		TalkSessionRepository: talkSessionRepository,
 		UserRepository:        userRepository,
-		AnalysisService:       analysisService,
+		AnalysisScheduler:     analysisScheduler,
 		DBManager:             DBManager,
 		Config:                config,
 	}
@@ -185,17 +184,7 @@ func (i *editTalkSessionHandler) Execute(ctx context.Context, input EditTalkSess
 
 	// 分析がdisable→enableに変更された場合、分析を開始
 	if wasAnalysisDisabled && input.DisableAnalysis != nil && !*input.DisableAnalysis {
-		bg := context.Background()
-		span := trace.SpanFromContext(ctx)
-		bg = trace.ContextWithSpan(bg, span)
-		go func() {
-			defer func() {
-				if r := recover(); r != nil {
-					utils.HandleError(bg, nil, "AnalysisService.StartAnalysis panicked")
-				}
-			}()
-			_ = i.AnalysisService.StartAnalysis(bg, input.TalkSessionID)
-		}()
+		i.AnalysisScheduler.ScheduleAnalysis(ctx, input.TalkSessionID, analysis_usecase.ScheduleImmediate)
 	}
 
 	return &output, nil

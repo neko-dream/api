@@ -6,6 +6,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/neko-dream/api/internal/application/usecase/analysis_usecase"
 	"github.com/neko-dream/api/internal/domain/messages"
 	"github.com/neko-dream/api/internal/domain/model/analysis"
 	"github.com/neko-dream/api/internal/domain/model/session"
@@ -22,6 +23,7 @@ import (
 type manageHandler struct {
 	analysis.AnalysisService
 	analysis.AnalysisRepository
+	analysisScheduler analysis_usecase.AnalysisScheduler
 	*db.DBManager
 	authorizationService service.AuthorizationService
 	session.TokenManager
@@ -128,6 +130,7 @@ func NewManageHandler(
 	dbm *db.DBManager,
 	ansv analysis.AnalysisService,
 	arep analysis.AnalysisRepository,
+	scheduler analysis_usecase.AnalysisScheduler,
 	authorizationService service.AuthorizationService,
 	tokenManager session.TokenManager,
 ) oas.ManageHandler {
@@ -135,6 +138,7 @@ func NewManageHandler(
 		DBManager:            dbm,
 		AnalysisService:      ansv,
 		AnalysisRepository:   arep,
+		analysisScheduler:    scheduler,
 		authorizationService: authorizationService,
 		TokenManager:         tokenManager,
 	}
@@ -277,10 +281,7 @@ func (m *manageHandler) ManageRegenerateManage(ctx context.Context, req *oas.Reg
 
 	switch tpt {
 	case "group":
-		if err := m.AnalysisService.StartAnalysis(ctx, talkSessionID); err != nil {
-			utils.HandleError(ctx, err, "AnalysisService.StartAnalysis")
-			return nil, err
-		}
+		m.analysisScheduler.ScheduleAnalysis(ctx, talkSessionID, analysis_usecase.ScheduleImmediate)
 	case "report":
 		if err := m.AnalysisService.GenerateReport(ctx, talkSessionID); err != nil {
 			utils.HandleError(ctx, err, "AnalysisService.GenerateReport")
