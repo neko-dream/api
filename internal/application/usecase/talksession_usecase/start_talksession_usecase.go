@@ -52,6 +52,7 @@ type (
 		user.UserRepository
 		organization.OrganizationUserRepository
 		organization.OrganizationAliasRepository
+		talksession.PassphraseManager
 		*db.DBManager
 		*config.Config
 	}
@@ -75,16 +76,18 @@ func NewStartTalkSessionUseCase(
 	userRepository user.UserRepository,
 	organizationUserRepository organization.OrganizationUserRepository,
 	organizationAliasRepository organization.OrganizationAliasRepository,
+	passphraseManager talksession.PassphraseManager,
 	DBManager *db.DBManager,
-	config *config.Config,
+	cfg *config.Config,
 ) StartTalkSessionUseCase {
 	return &startTalkSessionHandler{
 		TalkSessionRepository:       talkSessionRepository,
 		UserRepository:              userRepository,
 		OrganizationUserRepository:  organizationUserRepository,
 		OrganizationAliasRepository: organizationAliasRepository,
+		PassphraseManager:           passphraseManager,
 		DBManager:                   DBManager,
-		Config:                      config,
+		Config:                      cfg,
 	}
 }
 
@@ -157,7 +160,7 @@ func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSe
 		// 合言葉が設定されている場合はハッシュ化
 		var passphraseHash *string
 		if input.Passphrase != nil && *input.Passphrase != "" {
-			hash, err := talksession.HashPassphrase(*input.Passphrase, i.Config.HASH_PEPPER)
+			hash, err := i.PassphraseManager.Hash(*input.Passphrase)
 			if err != nil {
 				return errtrace.Wrap(err)
 			}

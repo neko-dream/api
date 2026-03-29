@@ -11,7 +11,6 @@ import (
 	"github.com/neko-dream/api/internal/domain/model/talksession"
 	"github.com/neko-dream/api/internal/domain/model/talksession/talksession_consent"
 	"github.com/neko-dream/api/internal/domain/model/user"
-	"github.com/neko-dream/api/internal/infrastructure/config"
 	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/api/pkg/utils"
 	"go.opentelemetry.io/otel"
@@ -31,22 +30,22 @@ type (
 	joinClosedSessionHandler struct {
 		talksession.TalkSessionRepository
 		talksession_consent.TalkSessionConsentService
+		talksession.PassphraseManager
 		*db.DBManager
-		*config.Config
 	}
 )
 
 func NewJoinClosedSessionUseCase(
 	talkSessionRepository talksession.TalkSessionRepository,
 	consentService talksession_consent.TalkSessionConsentService,
+	passphraseManager talksession.PassphraseManager,
 	DBManager *db.DBManager,
-	cfg *config.Config,
 ) JoinClosedSessionUseCase {
 	return &joinClosedSessionHandler{
 		TalkSessionRepository:     talkSessionRepository,
 		TalkSessionConsentService: consentService,
+		PassphraseManager:         passphraseManager,
 		DBManager:                 DBManager,
-		Config:                    cfg,
 	}
 }
 
@@ -92,7 +91,7 @@ func (h *joinClosedSessionHandler) Execute(ctx context.Context, input JoinClosed
 	}
 
 	// 合言葉を検証
-	if err := ts.VerifyPassphrase(input.Passphrase, h.Config.HASH_PEPPER); err != nil {
+	if !ts.VerifyPassphrase(h.PassphraseManager, input.Passphrase) {
 		return messages.TalkSessionPassphraseInvalid
 	}
 

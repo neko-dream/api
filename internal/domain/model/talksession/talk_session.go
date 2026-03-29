@@ -12,7 +12,6 @@ import (
 	"github.com/neko-dream/api/internal/domain/model/user"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type (
@@ -87,13 +86,12 @@ func NewTalkSession(
 	}
 }
 
-// HashPassphrase は平文パスフレーズをbcryptハッシュ化する（pepperを付与してから）
-func HashPassphrase(plaintext, pepper string) (string, error) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(pepper+plaintext), bcrypt.DefaultCost)
-	if err != nil {
-		return "", err
-	}
-	return string(hash), nil
+// PassphraseManager は合言葉のハッシュ化・検証を担うドメインサービスのインターフェース
+type PassphraseManager interface {
+	// Hash 平文パスフレーズをハッシュ化する
+	Hash(plaintext string) (string, error)
+	// Verify 平文パスフレーズがハッシュと一致するか検証する
+	Verify(plaintext, hashedPassphrase string) bool
 }
 
 func (t *TalkSession) TalkSessionID() shared.UUID[TalkSession] {
@@ -179,12 +177,12 @@ func (t *TalkSession) IsClosed() bool {
 	return t.passphraseHash != nil
 }
 
-// VerifyPassphrase は平文パスフレーズがハッシュと一致するか検証する（pepperを付与してから）
-func (t *TalkSession) VerifyPassphrase(plaintext, pepper string) error {
+// VerifyPassphrase は平文パスフレーズがハッシュと一致するか検証する
+func (t *TalkSession) VerifyPassphrase(manager PassphraseManager, plaintext string) bool {
 	if t.passphraseHash == nil {
-		return nil
+		return true
 	}
-	return bcrypt.CompareHashAndPassword([]byte(*t.passphraseHash), []byte(pepper+plaintext))
+	return manager.Verify(plaintext, *t.passphraseHash)
 }
 
 func (t *TalkSession) DisableAnalysis() bool {
