@@ -172,8 +172,8 @@ func (t *TalkSession) SetPassphraseHash(hash *string) {
 	t.passphraseHash = hash
 }
 
-// IsClosed は合言葉が設定されているかどうかを返す
-func (t *TalkSession) IsClosed() bool {
+// IsLocked は合言葉が設定されているかどうかを返す
+func (t *TalkSession) IsLocked() bool {
 	return t.passphraseHash != nil
 }
 

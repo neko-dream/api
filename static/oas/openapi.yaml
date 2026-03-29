@@ -2714,7 +2714,7 @@ paths:
       x-ogen-operation-group: TalkSession
   /talksessions/{talkSessionID}/join:
     post:
-      operationId: joinClosedSession
+      operationId: joinLockedSession
       summary: クローズドセッションに参加
       description: |-
         クローズドセッションに合言葉を使って参加する。
@@ -4430,7 +4430,7 @@ components:
         - scheduledEndTime
         - restrictions
         - hideReport
-        - isClosed
+        - isLocked
       properties:
         id:
           type: string
@@ -4490,9 +4490,9 @@ components:
           type: boolean
           nullable: true
           description: 分析を無効化するかどうか
-        isClosed:
+        isLocked:
           type: boolean
-          description: クローズドセッションかどうか
+          description: 合言葉でロックされたセッションかどうか
     TalkSessionForManage:
       type: object
       required:

@@ -41,7 +41,7 @@ type talkSessionHandler struct {
 	editTalkSessionCommand     talksession_usecase.EditTalkSessionUseCase
 	takeConsentCommand         talksession_usecase.TakeConsentUseCase
 	toggleAnalysisUseCase      talksession_usecase.ToggleAnalysisUseCase
-	joinClosedSessionCommand   talksession_usecase.JoinClosedSessionUseCase
+	joinLockedSessionCommand   talksession_usecase.JoinLockedSessionUseCase
 
 	authorizationService service.AuthorizationService
 	session.TokenManager
@@ -65,7 +65,7 @@ func NewTalkSessionHandler(
 	editTalkSessionCommand talksession_usecase.EditTalkSessionUseCase,
 	takeConsentCommand talksession_usecase.TakeConsentUseCase,
 	toggleAnalysisUseCase talksession_usecase.ToggleAnalysisUseCase,
-	joinClosedSessionCommand talksession_usecase.JoinClosedSessionUseCase,
+	joinLockedSessionCommand talksession_usecase.JoinLockedSessionUseCase,
 
 	authorizationService service.AuthorizationService,
 	tokenManager session.TokenManager,
@@ -88,7 +88,7 @@ func NewTalkSessionHandler(
 		editTalkSessionCommand:  editTalkSessionCommand,
 		takeConsentCommand:      takeConsentCommand,
 		toggleAnalysisUseCase:   toggleAnalysisUseCase,
-		joinClosedSessionCommand: joinClosedSessionCommand,
+		joinLockedSessionCommand: joinLockedSessionCommand,
 
 		authorizationService: authorizationService,
 		TokenManager:         tokenManager,
@@ -729,9 +729,9 @@ func (t *talkSessionHandler) ToggleTalkSessionAnalysis(ctx context.Context, para
 	}, nil
 }
 
-// JoinClosedSession クローズドセッションに合言葉で参加
-func (t *talkSessionHandler) JoinClosedSession(ctx context.Context, req *oas.JoinClosedSessionReq, params oas.JoinClosedSessionParams) (oas.JoinClosedSessionRes, error) {
-	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.JoinClosedSession")
+// JoinLockedSession ロックされたセッションに合言葉で参加
+func (t *talkSessionHandler) JoinLockedSession(ctx context.Context, req *oas.JoinLockedSessionReq, params oas.JoinLockedSessionParams) (oas.JoinLockedSessionRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.JoinLockedSession")
 	defer span.End()
 
 	if req == nil {
@@ -748,7 +748,7 @@ func (t *talkSessionHandler) JoinClosedSession(ctx context.Context, req *oas.Joi
 		return nil, messages.BadRequestError
 	}
 
-	if err := t.joinClosedSessionCommand.Execute(ctx, talksession_usecase.JoinClosedSessionInput{
+	if err := t.joinLockedSessionCommand.Execute(ctx, talksession_usecase.JoinLockedSessionInput{
 		TalkSessionID: talkSessionID,
 		UserID:        authCtx.UserID,
 		Passphrase:    req.GetPassphrase().Value,
@@ -756,5 +756,5 @@ func (t *talkSessionHandler) JoinClosedSession(ctx context.Context, req *oas.Joi
 		return nil, err
 	}
 
-	return &oas.JoinClosedSessionOK{}, nil
+	return &oas.JoinLockedSessionOK{}, nil
 }

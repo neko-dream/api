@@ -380,7 +380,7 @@ namespace kotohiro {
   @route("/talksessions/{talkSessionID}/join")
   @post
   @summary("クローズドセッションに参加")
-  op joinClosedSession(
+  op joinLockedSession(
     @path talkSessionID: string,
     @body body: {
       passphrase?: string;

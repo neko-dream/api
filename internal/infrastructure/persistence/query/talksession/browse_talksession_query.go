@@ -66,7 +66,7 @@ func (b *BrowseTalkSessionQueryImpl) Execute(ctx context.Context, in talksession
 		return nil, err
 	}
 	for i, row := range talkSessionRow {
-		talkSessions[i].IsClosed = row.TalkSession.PassphraseHash.Valid
+		talkSessions[i].IsLocked = row.TalkSession.PassphraseHash.Valid
 	}
 
 	talkSessionCount, err := b.GetQueries(ctx).CountTalkSessions(ctx, model.CountTalkSessionsParams{

@@ -2118,8 +2118,8 @@ func (s *Server) decodeInviteOrganizationForUserRequest(r *http.Request) (
 	}
 }
 
-func (s *Server) decodeJoinClosedSessionRequest(r *http.Request) (
-	req *JoinClosedSessionReq,
+func (s *Server) decodeJoinLockedSessionRequest(r *http.Request) (
+	req *JoinLockedSessionReq,
 	close func() error,
 	rerr error,
 ) {
@@ -2158,7 +2158,7 @@ func (s *Server) decodeJoinClosedSessionRequest(r *http.Request) (
 
 		d := jx.DecodeBytes(buf)
 
-		var request JoinClosedSessionReq
+		var request JoinLockedSessionReq
 		if err := func() error {
 			if err := request.Decode(d); err != nil {
 				return err

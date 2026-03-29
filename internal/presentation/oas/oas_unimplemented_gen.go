@@ -501,13 +501,13 @@ func (UnimplementedHandler) InviteOrganizationForUser(ctx context.Context, req *
 	return r, ht.ErrNotImplemented
 }
 
-// JoinClosedSession implements joinClosedSession operation.
+// JoinLockedSession implements joinLockedSession operation.
 //
 // クローズドセッションに合言葉を使って参加する。
 // 既に参加済みの場合は合言葉なしで成功する。.
 //
 // POST /talksessions/{talkSessionID}/join
-func (UnimplementedHandler) JoinClosedSession(ctx context.Context, req *JoinClosedSessionReq, params JoinClosedSessionParams) (r JoinClosedSessionRes, _ error) {
+func (UnimplementedHandler) JoinLockedSession(ctx context.Context, req *JoinLockedSessionReq, params JoinLockedSessionParams) (r JoinLockedSessionRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

@@ -82,9 +82,9 @@ namespace kotohiro {
     disableAnalysis?: boolean | null;
 
     /**
-     * クローズドセッションかどうか
+     * 合言葉でロックされたセッションかどうか
      */
-    isClosed: boolean;
+    isLocked: boolean;
   }
 
   model Report {

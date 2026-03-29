@@ -515,7 +515,7 @@ func TestTalkSession_VerifyPassphrase(t *testing.T) {
 		ts := newTS(nil)
 		manager := &mockPassphraseManager{}
 		assert.True(t, ts.VerifyPassphrase(manager, "anything"))
-		assert.False(t, ts.IsClosed())
+		assert.False(t, ts.IsLocked())
 	})
 
 	t.Run("正しい合言葉で検証成功", func(t *testing.T) {
@@ -540,9 +540,9 @@ func TestTalkSession_VerifyPassphrase(t *testing.T) {
 		assert.False(t, ts.VerifyPassphrase(manager, "wrong"))
 	})
 
-	t.Run("クローズドセッションはIsClosed==true", func(t *testing.T) {
+	t.Run("ロックされたセッションはIsLocked==true", func(t *testing.T) {
 		hash := "hashed-value"
 		ts := newTS(&hash)
-		assert.True(t, ts.IsClosed())
+		assert.True(t, ts.IsLocked())
 	})
 }

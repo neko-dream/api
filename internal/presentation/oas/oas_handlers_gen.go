@@ -8905,23 +8905,23 @@ func (s *Server) handleInviteOrganizationForUserRequest(args [0]string, argsEsca
 	}
 }
 
-// handleJoinClosedSessionRequest handles joinClosedSession operation.
+// handleJoinLockedSessionRequest handles joinLockedSession operation.
 //
 // クローズドセッションに合言葉を使って参加する。
 // 既に参加済みの場合は合言葉なしで成功する。.
 //
 // POST /talksessions/{talkSessionID}/join
-func (s *Server) handleJoinClosedSessionRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleJoinLockedSessionRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	statusWriter := &codeRecorder{ResponseWriter: w}
 	w = statusWriter
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("joinClosedSession"),
+		otelogen.OperationID("joinLockedSession"),
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/join"),
 	}
 
 	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), JoinClosedSessionOperation,
+	ctx, span := s.cfg.Tracer.Start(r.Context(), JoinLockedSessionOperation,
 		trace.WithAttributes(otelAttrs...),
 		serverSpanKind,
 	)
@@ -8976,15 +8976,15 @@ func (s *Server) handleJoinClosedSessionRequest(args [1]string, argsEscaped bool
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: JoinClosedSessionOperation,
-			ID:   "joinClosedSession",
+			Name: JoinLockedSessionOperation,
+			ID:   "joinLockedSession",
 		}
 	)
 	{
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityCookieAuth(ctx, JoinClosedSessionOperation, r)
+			sctx, ok, err := s.securityCookieAuth(ctx, JoinLockedSessionOperation, r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
@@ -9024,7 +9024,7 @@ func (s *Server) handleJoinClosedSessionRequest(args [1]string, argsEscaped bool
 			return
 		}
 	}
-	params, err := decodeJoinClosedSessionParams(args, argsEscaped, r)
+	params, err := decodeJoinLockedSessionParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
 			OperationContext: opErrContext,
@@ -9034,7 +9034,7 @@ func (s *Server) handleJoinClosedSessionRequest(args [1]string, argsEscaped bool
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
-	request, close, err := s.decodeJoinClosedSessionRequest(r)
+	request, close, err := s.decodeJoinLockedSessionRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -9050,13 +9050,13 @@ func (s *Server) handleJoinClosedSessionRequest(args [1]string, argsEscaped bool
 		}
 	}()
 
-	var response JoinClosedSessionRes
+	var response JoinLockedSessionRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
-			OperationName:    JoinClosedSessionOperation,
+			OperationName:    JoinLockedSessionOperation,
 			OperationSummary: "クローズドセッションに参加",
-			OperationID:      "joinClosedSession",
+			OperationID:      "joinLockedSession",
 			Body:             request,
 			Params: middleware.Parameters{
 				{
@@ -9068,9 +9068,9 @@ func (s *Server) handleJoinClosedSessionRequest(args [1]string, argsEscaped bool
 		}
 
 		type (
-			Request  = *JoinClosedSessionReq
-			Params   = JoinClosedSessionParams
-			Response = JoinClosedSessionRes
+			Request  = *JoinLockedSessionReq
+			Params   = JoinLockedSessionParams
+			Response = JoinLockedSessionRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -9079,14 +9079,14 @@ func (s *Server) handleJoinClosedSessionRequest(args [1]string, argsEscaped bool
 		](
 			m,
 			mreq,
-			unpackJoinClosedSessionParams,
+			unpackJoinLockedSessionParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.JoinClosedSession(ctx, request, params)
+				response, err = s.h.JoinLockedSession(ctx, request, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.JoinClosedSession(ctx, request, params)
+		response, err = s.h.JoinLockedSession(ctx, request, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -9094,7 +9094,7 @@ func (s *Server) handleJoinClosedSessionRequest(args [1]string, argsEscaped bool
 		return
 	}
 
-	if err := encodeJoinClosedSessionResponse(response, w, span); err != nil {
+	if err := encodeJoinLockedSessionResponse(response, w, span); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)

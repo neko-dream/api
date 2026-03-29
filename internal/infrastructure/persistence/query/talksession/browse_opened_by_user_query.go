@@ -65,7 +65,7 @@ func (h *BrowseOpenedByUserQueryImpl) Execute(ctx context.Context, input talkses
 		return nil, err
 	}
 	for i, row := range talkSessionRow {
-		talkSessions[i].IsClosed = row.TalkSession.PassphraseHash.Valid
+		talkSessions[i].IsLocked = row.TalkSession.PassphraseHash.Valid
 	}
 	out.TalkSessions = talkSessions
 	out.TotalCount = int32(talkSessionRow[0].TotalCount)

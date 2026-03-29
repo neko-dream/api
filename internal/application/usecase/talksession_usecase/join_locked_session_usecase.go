@@ -17,17 +17,17 @@ import (
 )
 
 type (
-	JoinClosedSessionUseCase interface {
-		Execute(context.Context, JoinClosedSessionInput) error
+	JoinLockedSessionUseCase interface {
+		Execute(context.Context, JoinLockedSessionInput) error
 	}
 
-	JoinClosedSessionInput struct {
+	JoinLockedSessionInput struct {
 		TalkSessionID shared.UUID[talksession.TalkSession]
 		UserID        shared.UUID[user.User]
 		Passphrase    string
 	}
 
-	joinClosedSessionHandler struct {
+	joinLockedSessionHandler struct {
 		talksession.TalkSessionRepository
 		talksession_consent.TalkSessionConsentService
 		talksession.PassphraseManager
@@ -35,13 +35,13 @@ type (
 	}
 )
 
-func NewJoinClosedSessionUseCase(
+func NewJoinLockedSessionUseCase(
 	talkSessionRepository talksession.TalkSessionRepository,
 	consentService talksession_consent.TalkSessionConsentService,
 	passphraseManager talksession.PassphraseManager,
 	DBManager *db.DBManager,
-) JoinClosedSessionUseCase {
-	return &joinClosedSessionHandler{
+) JoinLockedSessionUseCase {
+	return &joinLockedSessionHandler{
 		TalkSessionRepository:     talkSessionRepository,
 		TalkSessionConsentService: consentService,
 		PassphraseManager:         passphraseManager,
@@ -49,8 +49,8 @@ func NewJoinClosedSessionUseCase(
 	}
 }
 
-func (h *joinClosedSessionHandler) Execute(ctx context.Context, input JoinClosedSessionInput) error {
-	ctx, span := otel.Tracer("talksession_command").Start(ctx, "joinClosedSessionHandler.Execute")
+func (h *joinLockedSessionHandler) Execute(ctx context.Context, input JoinLockedSessionInput) error {
+	ctx, span := otel.Tracer("talksession_command").Start(ctx, "joinLockedSessionHandler.Execute")
 	defer span.End()
 
 	ts, err := h.TalkSessionRepository.FindByID(ctx, input.TalkSessionID)
@@ -66,7 +66,7 @@ func (h *joinClosedSessionHandler) Execute(ctx context.Context, input JoinClosed
 	}
 
 	// 公開セッションは参加不要
-	if !ts.IsClosed() {
+	if !ts.IsLocked() {
 		return nil
 	}
 

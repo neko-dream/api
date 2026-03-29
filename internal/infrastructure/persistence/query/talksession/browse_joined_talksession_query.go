@@ -69,7 +69,7 @@ func (h *BrowseJoinedTalkSessionQueryHandler) Execute(ctx context.Context, input
 		return nil, err
 	}
 	for i, row := range talkSessionRows {
-		talkSessions[i].IsClosed = row.TalkSession.PassphraseHash.Valid
+		talkSessions[i].IsLocked = row.TalkSession.PassphraseHash.Valid
 	}
 
 	return &talksession.BrowseJoinedTalkSessionsQueryOutput{

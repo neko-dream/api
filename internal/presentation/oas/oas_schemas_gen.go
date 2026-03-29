@@ -2632,56 +2632,56 @@ func (s *InviteOrganizationReq) SetRole(val float64) {
 	s.Role = val
 }
 
-type JoinClosedSessionBadRequest struct{}
+type JoinLockedSessionBadRequest struct{}
 
-func (*JoinClosedSessionBadRequest) joinClosedSessionRes() {}
+func (*JoinLockedSessionBadRequest) joinLockedSessionRes() {}
 
-type JoinClosedSessionForbidden struct {
+type JoinLockedSessionForbidden struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
 }
 
 // GetCode returns the value of Code.
-func (s *JoinClosedSessionForbidden) GetCode() string {
+func (s *JoinLockedSessionForbidden) GetCode() string {
 	return s.Code
 }
 
 // GetMessage returns the value of Message.
-func (s *JoinClosedSessionForbidden) GetMessage() string {
+func (s *JoinLockedSessionForbidden) GetMessage() string {
 	return s.Message
 }
 
 // SetCode sets the value of Code.
-func (s *JoinClosedSessionForbidden) SetCode(val string) {
+func (s *JoinLockedSessionForbidden) SetCode(val string) {
 	s.Code = val
 }
 
 // SetMessage sets the value of Message.
-func (s *JoinClosedSessionForbidden) SetMessage(val string) {
+func (s *JoinLockedSessionForbidden) SetMessage(val string) {
 	s.Message = val
 }
 
-func (*JoinClosedSessionForbidden) joinClosedSessionRes() {}
+func (*JoinLockedSessionForbidden) joinLockedSessionRes() {}
 
-type JoinClosedSessionNotFound struct{}
+type JoinLockedSessionNotFound struct{}
 
-func (*JoinClosedSessionNotFound) joinClosedSessionRes() {}
+func (*JoinLockedSessionNotFound) joinLockedSessionRes() {}
 
-type JoinClosedSessionOK struct{}
+type JoinLockedSessionOK struct{}
 
-func (*JoinClosedSessionOK) joinClosedSessionRes() {}
+func (*JoinLockedSessionOK) joinLockedSessionRes() {}
 
-type JoinClosedSessionReq struct {
+type JoinLockedSessionReq struct {
 	Passphrase OptString `json:"passphrase"`
 }
 
 // GetPassphrase returns the value of Passphrase.
-func (s *JoinClosedSessionReq) GetPassphrase() OptString {
+func (s *JoinLockedSessionReq) GetPassphrase() OptString {
 	return s.Passphrase
 }
 
 // SetPassphrase sets the value of Passphrase.
-func (s *JoinClosedSessionReq) SetPassphrase(val OptString) {
+func (s *JoinLockedSessionReq) SetPassphrase(val OptString) {
 	s.Passphrase = val
 }
 
@@ -6466,8 +6466,8 @@ type TalkSession struct {
 	HideTop OptNilBool `json:"hideTop"`
 	// 分析を無効化するかどうか.
 	DisableAnalysis OptNilBool `json:"disableAnalysis"`
-	// クローズドセッションかどうか.
-	IsClosed bool `json:"isClosed"`
+	// 合言葉でロックされたセッションかどうか.
+	IsLocked bool `json:"isLocked"`
 }
 
 // GetID returns the value of ID.
@@ -6545,9 +6545,9 @@ func (s *TalkSession) GetDisableAnalysis() OptNilBool {
 	return s.DisableAnalysis
 }
 
-// GetIsClosed returns the value of IsClosed.
-func (s *TalkSession) GetIsClosed() bool {
-	return s.IsClosed
+// GetIsLocked returns the value of IsLocked.
+func (s *TalkSession) GetIsLocked() bool {
+	return s.IsLocked
 }
 
 // SetID sets the value of ID.
@@ -6625,9 +6625,9 @@ func (s *TalkSession) SetDisableAnalysis(val OptNilBool) {
 	s.DisableAnalysis = val
 }
 
-// SetIsClosed sets the value of IsClosed.
-func (s *TalkSession) SetIsClosed(val bool) {
-	s.IsClosed = val
+// SetIsLocked sets the value of IsLocked.
+func (s *TalkSession) SetIsLocked(val bool) {
+	s.IsLocked = val
 }
 
 func (*TalkSession) editTalkSessionRes()      {}

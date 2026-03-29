@@ -2344,9 +2344,9 @@ func encodeInviteOrganizationForUserResponse(response InviteOrganizationForUserR
 	}
 }
 
-func encodeJoinClosedSessionResponse(response JoinClosedSessionRes, w http.ResponseWriter, span trace.Span) error {
+func encodeJoinLockedSessionResponse(response JoinLockedSessionRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *JoinClosedSessionOK:
+	case *JoinLockedSessionOK:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -2359,7 +2359,7 @@ func encodeJoinClosedSessionResponse(response JoinClosedSessionRes, w http.Respo
 
 		return nil
 
-	case *JoinClosedSessionBadRequest:
+	case *JoinLockedSessionBadRequest:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
@@ -2372,7 +2372,7 @@ func encodeJoinClosedSessionResponse(response JoinClosedSessionRes, w http.Respo
 
 		return nil
 
-	case *JoinClosedSessionForbidden:
+	case *JoinLockedSessionForbidden:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(403)
 		span.SetStatus(codes.Error, http.StatusText(403))
@@ -2385,7 +2385,7 @@ func encodeJoinClosedSessionResponse(response JoinClosedSessionRes, w http.Respo
 
 		return nil
 
-	case *JoinClosedSessionNotFound:
+	case *JoinLockedSessionNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))

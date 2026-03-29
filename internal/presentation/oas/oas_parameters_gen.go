@@ -3954,12 +3954,12 @@ func decodeHasConsentParams(args [1]string, argsEscaped bool, r *http.Request) (
 	return params, nil
 }
 
-// JoinClosedSessionParams is parameters of joinClosedSession operation.
-type JoinClosedSessionParams struct {
+// JoinLockedSessionParams is parameters of joinLockedSession operation.
+type JoinLockedSessionParams struct {
 	TalkSessionID string
 }
 
-func unpackJoinClosedSessionParams(packed middleware.Parameters) (params JoinClosedSessionParams) {
+func unpackJoinLockedSessionParams(packed middleware.Parameters) (params JoinLockedSessionParams) {
 	{
 		key := middleware.ParameterKey{
 			Name: "talkSessionID",
@@ -3970,7 +3970,7 @@ func unpackJoinClosedSessionParams(packed middleware.Parameters) (params JoinClo
 	return params
 }
 
-func decodeJoinClosedSessionParams(args [1]string, argsEscaped bool, r *http.Request) (params JoinClosedSessionParams, _ error) {
+func decodeJoinLockedSessionParams(args [1]string, argsEscaped bool, r *http.Request) (params JoinLockedSessionParams, _ error) {
 	// Decode path: talkSessionID.
 	if err := func() error {
 		param := args[0]

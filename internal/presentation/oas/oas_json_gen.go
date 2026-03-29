@@ -8142,22 +8142,22 @@ func (s *InviteOrganizationOK) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
-func (s *JoinClosedSessionBadRequest) Encode(e *jx.Encoder) {
+func (s *JoinLockedSessionBadRequest) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *JoinClosedSessionBadRequest) encodeFields(e *jx.Encoder) {
+func (s *JoinLockedSessionBadRequest) encodeFields(e *jx.Encoder) {
 }
 
-var jsonFieldsNameOfJoinClosedSessionBadRequest = [0]string{}
+var jsonFieldsNameOfJoinLockedSessionBadRequest = [0]string{}
 
-// Decode decodes JoinClosedSessionBadRequest from json.
-func (s *JoinClosedSessionBadRequest) Decode(d *jx.Decoder) error {
+// Decode decodes JoinLockedSessionBadRequest from json.
+func (s *JoinLockedSessionBadRequest) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode JoinClosedSessionBadRequest to nil")
+		return errors.New("invalid: unable to decode JoinLockedSessionBadRequest to nil")
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
@@ -8166,34 +8166,34 @@ func (s *JoinClosedSessionBadRequest) Decode(d *jx.Decoder) error {
 			return d.Skip()
 		}
 	}); err != nil {
-		return errors.Wrap(err, "decode JoinClosedSessionBadRequest")
+		return errors.Wrap(err, "decode JoinLockedSessionBadRequest")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *JoinClosedSessionBadRequest) MarshalJSON() ([]byte, error) {
+func (s *JoinLockedSessionBadRequest) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *JoinClosedSessionBadRequest) UnmarshalJSON(data []byte) error {
+func (s *JoinLockedSessionBadRequest) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
 // Encode implements json.Marshaler.
-func (s *JoinClosedSessionForbidden) Encode(e *jx.Encoder) {
+func (s *JoinLockedSessionForbidden) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *JoinClosedSessionForbidden) encodeFields(e *jx.Encoder) {
+func (s *JoinLockedSessionForbidden) encodeFields(e *jx.Encoder) {
 	{
 		e.FieldStart("code")
 		e.Str(s.Code)
@@ -8204,15 +8204,15 @@ func (s *JoinClosedSessionForbidden) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfJoinClosedSessionForbidden = [2]string{
+var jsonFieldsNameOfJoinLockedSessionForbidden = [2]string{
 	0: "code",
 	1: "message",
 }
 
-// Decode decodes JoinClosedSessionForbidden from json.
-func (s *JoinClosedSessionForbidden) Decode(d *jx.Decoder) error {
+// Decode decodes JoinLockedSessionForbidden from json.
+func (s *JoinLockedSessionForbidden) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode JoinClosedSessionForbidden to nil")
+		return errors.New("invalid: unable to decode JoinLockedSessionForbidden to nil")
 	}
 	var requiredBitSet [1]uint8
 
@@ -8247,7 +8247,7 @@ func (s *JoinClosedSessionForbidden) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode JoinClosedSessionForbidden")
+		return errors.Wrap(err, "decode JoinLockedSessionForbidden")
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
@@ -8264,8 +8264,8 @@ func (s *JoinClosedSessionForbidden) Decode(d *jx.Decoder) error {
 				bitIdx := bits.TrailingZeros8(result)
 				fieldIdx := i*8 + bitIdx
 				var name string
-				if fieldIdx < len(jsonFieldsNameOfJoinClosedSessionForbidden) {
-					name = jsonFieldsNameOfJoinClosedSessionForbidden[fieldIdx]
+				if fieldIdx < len(jsonFieldsNameOfJoinLockedSessionForbidden) {
+					name = jsonFieldsNameOfJoinLockedSessionForbidden[fieldIdx]
 				} else {
 					name = strconv.Itoa(fieldIdx)
 				}
@@ -8286,35 +8286,35 @@ func (s *JoinClosedSessionForbidden) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *JoinClosedSessionForbidden) MarshalJSON() ([]byte, error) {
+func (s *JoinLockedSessionForbidden) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *JoinClosedSessionForbidden) UnmarshalJSON(data []byte) error {
+func (s *JoinLockedSessionForbidden) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
 // Encode implements json.Marshaler.
-func (s *JoinClosedSessionNotFound) Encode(e *jx.Encoder) {
+func (s *JoinLockedSessionNotFound) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *JoinClosedSessionNotFound) encodeFields(e *jx.Encoder) {
+func (s *JoinLockedSessionNotFound) encodeFields(e *jx.Encoder) {
 }
 
-var jsonFieldsNameOfJoinClosedSessionNotFound = [0]string{}
+var jsonFieldsNameOfJoinLockedSessionNotFound = [0]string{}
 
-// Decode decodes JoinClosedSessionNotFound from json.
-func (s *JoinClosedSessionNotFound) Decode(d *jx.Decoder) error {
+// Decode decodes JoinLockedSessionNotFound from json.
+func (s *JoinLockedSessionNotFound) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode JoinClosedSessionNotFound to nil")
+		return errors.New("invalid: unable to decode JoinLockedSessionNotFound to nil")
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
@@ -8323,42 +8323,42 @@ func (s *JoinClosedSessionNotFound) Decode(d *jx.Decoder) error {
 			return d.Skip()
 		}
 	}); err != nil {
-		return errors.Wrap(err, "decode JoinClosedSessionNotFound")
+		return errors.Wrap(err, "decode JoinLockedSessionNotFound")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *JoinClosedSessionNotFound) MarshalJSON() ([]byte, error) {
+func (s *JoinLockedSessionNotFound) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *JoinClosedSessionNotFound) UnmarshalJSON(data []byte) error {
+func (s *JoinLockedSessionNotFound) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
 // Encode implements json.Marshaler.
-func (s *JoinClosedSessionOK) Encode(e *jx.Encoder) {
+func (s *JoinLockedSessionOK) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *JoinClosedSessionOK) encodeFields(e *jx.Encoder) {
+func (s *JoinLockedSessionOK) encodeFields(e *jx.Encoder) {
 }
 
-var jsonFieldsNameOfJoinClosedSessionOK = [0]string{}
+var jsonFieldsNameOfJoinLockedSessionOK = [0]string{}
 
-// Decode decodes JoinClosedSessionOK from json.
-func (s *JoinClosedSessionOK) Decode(d *jx.Decoder) error {
+// Decode decodes JoinLockedSessionOK from json.
+func (s *JoinLockedSessionOK) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode JoinClosedSessionOK to nil")
+		return errors.New("invalid: unable to decode JoinLockedSessionOK to nil")
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
@@ -8367,34 +8367,34 @@ func (s *JoinClosedSessionOK) Decode(d *jx.Decoder) error {
 			return d.Skip()
 		}
 	}); err != nil {
-		return errors.Wrap(err, "decode JoinClosedSessionOK")
+		return errors.Wrap(err, "decode JoinLockedSessionOK")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *JoinClosedSessionOK) MarshalJSON() ([]byte, error) {
+func (s *JoinLockedSessionOK) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *JoinClosedSessionOK) UnmarshalJSON(data []byte) error {
+func (s *JoinLockedSessionOK) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
 // Encode implements json.Marshaler.
-func (s *JoinClosedSessionReq) Encode(e *jx.Encoder) {
+func (s *JoinLockedSessionReq) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *JoinClosedSessionReq) encodeFields(e *jx.Encoder) {
+func (s *JoinLockedSessionReq) encodeFields(e *jx.Encoder) {
 	{
 		if s.Passphrase.Set {
 			e.FieldStart("passphrase")
@@ -8403,14 +8403,14 @@ func (s *JoinClosedSessionReq) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfJoinClosedSessionReq = [1]string{
+var jsonFieldsNameOfJoinLockedSessionReq = [1]string{
 	0: "passphrase",
 }
 
-// Decode decodes JoinClosedSessionReq from json.
-func (s *JoinClosedSessionReq) Decode(d *jx.Decoder) error {
+// Decode decodes JoinLockedSessionReq from json.
+func (s *JoinLockedSessionReq) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode JoinClosedSessionReq to nil")
+		return errors.New("invalid: unable to decode JoinLockedSessionReq to nil")
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
@@ -8430,21 +8430,21 @@ func (s *JoinClosedSessionReq) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode JoinClosedSessionReq")
+		return errors.Wrap(err, "decode JoinLockedSessionReq")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *JoinClosedSessionReq) MarshalJSON() ([]byte, error) {
+func (s *JoinLockedSessionReq) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *JoinClosedSessionReq) UnmarshalJSON(data []byte) error {
+func (s *JoinLockedSessionReq) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -15372,8 +15372,8 @@ func (s *TalkSession) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		e.FieldStart("isClosed")
-		e.Bool(s.IsClosed)
+		e.FieldStart("isLocked")
+		e.Bool(s.IsLocked)
 	}
 }
 
@@ -15393,7 +15393,7 @@ var jsonFieldsNameOfTalkSession = [16]string{
 	12: "hideReport",
 	13: "hideTop",
 	14: "disableAnalysis",
-	15: "isClosed",
+	15: "isLocked",
 }
 
 // Decode decodes TalkSession from json.
@@ -15573,17 +15573,17 @@ func (s *TalkSession) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"disableAnalysis\"")
 			}
-		case "isClosed":
+		case "isLocked":
 			requiredBitSet[1] |= 1 << 7
 			if err := func() error {
 				v, err := d.Bool()
-				s.IsClosed = bool(v)
+				s.IsLocked = bool(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"isClosed\"")
+				return errors.Wrap(err, "decode field \"isLocked\"")
 			}
 		default:
 			return d.Skip()
