@@ -33,12 +33,12 @@ func (u *passwordAuthManager) RegisterPassword(ctx context.Context, userID share
 	ctx, span := otel.Tracer("usecase").Start(ctx, "passwordAuthUseCase.RegisterPassword")
 	defer span.End()
 
-	salt, err := hash.GenerateSalt(16)
+	salt, err := hash.GenerateRandomToken(16)
 	if err != nil {
 		return err
 	}
 
-	hashedPassword, err := hash.HashPassword(plainPassword, salt, u.cfg.HASH_PEPPER, u.cfg.HASH_ITERATIONS)
+	hashedPassword, err := hash.BcryptHash(plainPassword, u.cfg.HASH_PEPPER, u.cfg.HASH_ITERATIONS)
 	if err != nil {
 		return err
 	}
@@ -51,7 +51,6 @@ func (u *passwordAuthManager) VerifyPassword(ctx context.Context, userID shared.
 	ctx, span := otel.Tracer("usecase").Start(ctx, "passwordAuthUseCase.VerifyPassword")
 	defer span.End()
 
-	// ユーザーのパスワード認証情報を取得
 	auth, err := u.passwordAuthRepo.GetPasswordAuthByUserID(ctx, userID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -60,10 +59,7 @@ func (u *passwordAuthManager) VerifyPassword(ctx context.Context, userID shared.
 		return false, err
 	}
 
-	// パスワードを検証
-	bs := hash.VerifyPassword(plainPassword, auth.PasswordHash)
-
-	return bs, err
+	return hash.BcryptVerify(plainPassword, u.cfg.HASH_PEPPER, auth.PasswordHash), nil
 }
 
 // UpdatePassword パスワードを更新
@@ -71,12 +67,12 @@ func (u *passwordAuthManager) UpdatePassword(ctx context.Context, userID shared.
 	ctx, span := otel.Tracer("usecase").Start(ctx, "passwordAuthUseCase.UpdatePassword")
 	defer span.End()
 
-	salt, err := hash.GenerateSalt(16)
+	salt, err := hash.GenerateRandomToken(16)
 	if err != nil {
 		return err
 	}
 
-	hashedPassword, err := hash.HashPassword(plainPassword, salt, u.cfg.HASH_PEPPER, u.cfg.HASH_ITERATIONS)
+	hashedPassword, err := hash.BcryptHash(plainPassword, u.cfg.HASH_PEPPER, u.cfg.HASH_ITERATIONS)
 	if err != nil {
 		return err
 	}

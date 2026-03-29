@@ -76,7 +76,7 @@ func (p *passwordLoginInteractor) Execute(ctx context.Context, input PasswordLog
 		var usr *user.User
 		// IDorEmailがメールアドレスの場合は、ユーザーをメールアドレスで取得
 		if IsEmail(input.IDorEmail) {
-			emailHash, err := hash.HashEmail(input.IDorEmail, p.Config.HASH_PEPPER)
+			emailHash, err := hash.HMACHash(input.IDorEmail, p.Config.HASH_PEPPER)
 			if err != nil {
 				utils.HandleError(ctx, err, "failed to hash email")
 				return messages.InvalidPasswordOrEmailError

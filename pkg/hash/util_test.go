@@ -6,22 +6,62 @@ import (
 	"github.com/neko-dream/api/pkg/hash"
 )
 
-func Test_HashEmail(t *testing.T) {
-	salt, err := hash.GenerateSalt(16)
+func Test_BcryptHash(t *testing.T) {
+	hashed, err := hash.BcryptHash("password", "pepper", 10)
 	if err != nil {
-		t.Fatalf("failed to generate salt: %v", err)
+		t.Fatalf("failed to hash: %v", err)
 	}
+	if !hash.BcryptVerify("password", "pepper", hashed) {
+		t.Fatal("verification failed")
+	}
+}
 
-	password := "password123"
-	pepper := "pepper"
-	cost := 10
-	hashedPassword, err := hash.HashPassword(password, salt, pepper, cost)
+func Test_BcryptVerify_WrongPassword(t *testing.T) {
+	hashed, err := hash.BcryptHash("correct", "pepper", 10)
 	if err != nil {
-		t.Fatalf("failed to hash password: %v", err)
+		t.Fatalf("failed to hash: %v", err)
 	}
+	if hash.BcryptVerify("wrong", "pepper", hashed) {
+		t.Fatal("should not verify with wrong password")
+	}
+}
 
-	isValid := hash.VerifyPassword(password, hashedPassword)
-	if !isValid {
-		t.Fatalf("password verification failed")
+func Test_BcryptVerify_WrongPepper(t *testing.T) {
+	hashed, err := hash.BcryptHash("password", "pepper-a", 10)
+	if err != nil {
+		t.Fatalf("failed to hash: %v", err)
+	}
+	if hash.BcryptVerify("password", "pepper-b", hashed) {
+		t.Fatal("should not verify with wrong pepper")
+	}
+}
+
+func Test_HMACHash(t *testing.T) {
+	hashed, err := hash.HMACHash("email@example.com", "pepper")
+	if err != nil {
+		t.Fatalf("failed to hash: %v", err)
+	}
+	if !hash.HMACVerify("email@example.com", "pepper", hashed) {
+		t.Fatal("verification failed")
+	}
+}
+
+func Test_HMACVerify_WrongValue(t *testing.T) {
+	hashed, err := hash.HMACHash("correct@example.com", "pepper")
+	if err != nil {
+		t.Fatalf("failed to hash: %v", err)
+	}
+	if hash.HMACVerify("wrong@example.com", "pepper", hashed) {
+		t.Fatal("should not verify with wrong value")
+	}
+}
+
+func Test_HMACVerify_WrongPepper(t *testing.T) {
+	hashed, err := hash.HMACHash("email@example.com", "pepper-a")
+	if err != nil {
+		t.Fatalf("failed to hash: %v", err)
+	}
+	if hash.HMACVerify("email@example.com", "pepper-b", hashed) {
+		t.Fatal("should not verify with wrong pepper")
 	}
 }
