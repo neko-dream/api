@@ -2769,8 +2769,6 @@ paths:
               properties:
                 passphrase:
                   type: string
-              required:
-                - passphrase
       x-ogen-operation-group: TalkSession
   /talksessions/{talkSessionID}/opinions:
     get:

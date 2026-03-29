@@ -2672,16 +2672,16 @@ type JoinClosedSessionOK struct{}
 func (*JoinClosedSessionOK) joinClosedSessionRes() {}
 
 type JoinClosedSessionReq struct {
-	Passphrase string `json:"passphrase"`
+	Passphrase OptString `json:"passphrase"`
 }
 
 // GetPassphrase returns the value of Passphrase.
-func (s *JoinClosedSessionReq) GetPassphrase() string {
+func (s *JoinClosedSessionReq) GetPassphrase() OptString {
 	return s.Passphrase
 }
 
 // SetPassphrase sets the value of Passphrase.
-func (s *JoinClosedSessionReq) SetPassphrase(val string) {
+func (s *JoinClosedSessionReq) SetPassphrase(val OptString) {
 	s.Passphrase = val
 }
 

@@ -383,7 +383,7 @@ namespace kotohiro {
   op joinClosedSession(
     @path talkSessionID: string,
     @body body: {
-      passphrase: string;
+      passphrase?: string;
     },
   ): Body<{}> | {
     @statusCode statusCode: 400;
