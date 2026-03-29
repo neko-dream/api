@@ -16,9 +16,9 @@ func NewPassphraseManager(cfg *config.Config) talksession.PassphraseManager {
 }
 
 func (p *passphraseManager) Hash(plaintext string) (string, error) {
-	return hash.BcryptHash(plaintext, p.cfg.HASH_PEPPER, bcrypt.DefaultCost)
+	return hash.BcryptHashHMAC(plaintext, p.cfg.HASH_PEPPER, bcrypt.DefaultCost)
 }
 
 func (p *passphraseManager) Verify(plaintext, hashedPassphrase string) bool {
-	return hash.BcryptVerify(plaintext, p.cfg.HASH_PEPPER, hashedPassphrase)
+	return hash.BcryptVerifyHMAC(plaintext, p.cfg.HASH_PEPPER, hashedPassphrase)
 }
