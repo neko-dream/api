@@ -64,6 +64,9 @@ func (h *BrowseOpenedByUserQueryImpl) Execute(ctx context.Context, input talkses
 		utils.HandleError(ctx, err, "copier.CopyWithOptionでエラー")
 		return nil, err
 	}
+	for i, row := range talkSessionRow {
+		talkSessions[i].IsClosed = row.TalkSession.PassphraseHash.Valid
+	}
 	out.TalkSessions = talkSessions
 	out.TotalCount = int32(talkSessionRow[0].TotalCount)
 

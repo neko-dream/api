@@ -69,6 +69,7 @@ var operationRolesCookieAuth = map[string][]string{
 	InitiateTalkSessionOperation:           []string{},
 	InviteOrganizationOperation:            []string{},
 	InviteOrganizationForUserOperation:     []string{},
+	JoinClosedSessionOperation:             []string{},
 	ManageRegenerateManageOperation:        []string{},
 	OpinionsHistoryOperation:               []string{},
 	PolicyConsentOperation:                 []string{},

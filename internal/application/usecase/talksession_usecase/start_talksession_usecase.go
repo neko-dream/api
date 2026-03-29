@@ -39,7 +39,8 @@ type (
 		Restrictions        []string
 		SessionClaim        *session.Claim // セッション情報を追加
 		OrganizationAliasID *shared.UUID[organization.OrganizationAlias]
-		HideTop             *bool // トップに表示するかどうか
+		HideTop             *bool   // トップに表示するかどうか
+		Passphrase          *string // 合言葉（設定するとプライベートセッションになる）
 	}
 
 	StartTalkSessionUseCaseOutput struct {
@@ -152,6 +153,17 @@ func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSe
 		if input.ScheduledEndTime.Before(clock.Now(ctx)) {
 			return messages.InvalidScheduledEndTime
 		}
+
+		// 合言葉が設定されている場合はハッシュ化
+		var passphraseHash *string
+		if input.Passphrase != nil && *input.Passphrase != "" {
+			hash, err := talksession.HashPassphrase(*input.Passphrase, i.Config.HASH_PEPPER)
+			if err != nil {
+				return errtrace.Wrap(err)
+			}
+			passphraseHash = &hash
+		}
+
 		talkSession := talksession.NewTalkSession(
 			talkSessionID,
 			input.Theme,
@@ -166,6 +178,7 @@ func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSe
 			lo.FromPtrOr(input.HideTop, false),
 			organizationID,
 			organizationAliasID,
+			passphraseHash,
 		)
 
 		if len(input.Restrictions) > 0 {

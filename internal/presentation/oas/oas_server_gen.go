@@ -486,6 +486,13 @@ type TalkSessionHandler interface {
 	//
 	// POST /talksessions
 	InitiateTalkSession(ctx context.Context, req *InitiateTalkSessionReq) (InitiateTalkSessionRes, error)
+	// JoinClosedSession implements joinClosedSession operation.
+	//
+	// クローズドセッションに合言葉を使って参加する。
+	// 既に参加済みの場合は合言葉なしで成功する。.
+	//
+	// POST /talksessions/{talkSessionID}/join
+	JoinClosedSession(ctx context.Context, req *JoinClosedSessionReq, params JoinClosedSessionParams) (JoinClosedSessionRes, error)
 	// PostConclusion implements postConclusion operation.
 	//
 	// 結論（conclusion）はセッションが終了した後にセッっションの作成者が投稿できる文章。

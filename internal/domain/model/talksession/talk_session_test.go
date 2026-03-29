@@ -81,6 +81,7 @@ func TestNewTalkSession(t *testing.T) {
 				tt.hideTop,
 				tt.organizationID,
 				tt.organizationAliasID,
+				nil,
 			)
 
 			assert.Equal(t, tt.talkSessionID, ts.TalkSessionID())
@@ -116,6 +117,7 @@ func TestTalkSession_ChangeTheme(t *testing.T) {
 			nil,
 			nil,
 			true,
+			nil,
 			nil,
 			nil,
 		)
@@ -169,6 +171,7 @@ func TestTalkSession_ChangeDescription(t *testing.T) {
 				true,
 				nil,
 				nil,
+				nil,
 			)
 
 			ts.ChangeDescription(tt.newDescription)
@@ -192,6 +195,7 @@ func TestTalkSession_ChangeThumbnailURL(t *testing.T) {
 			nil,
 			nil,
 			true,
+			nil,
 			nil,
 			nil,
 		)
@@ -218,6 +222,7 @@ func TestTalkSession_ChangeScheduledEndTime(t *testing.T) {
 			nil,
 			nil,
 			true,
+			nil,
 			nil,
 			nil,
 		)
@@ -253,6 +258,7 @@ func TestTalkSession_StartSession(t *testing.T) {
 			true,
 			lo.ToPtr(shared.MustParseUUID[organization.Organization]("00000000-0000-0000-0000-000000000003")),
 			nil,
+			nil,
 		)
 
 		err := ts.StartSession()
@@ -277,6 +283,7 @@ func TestTalkSession_StartSession(t *testing.T) {
 			nil,
 			nil,
 			true,
+			nil,
 			nil,
 			nil,
 		)
@@ -305,6 +312,7 @@ func TestTalkSession_EndSession(t *testing.T) {
 			nil,
 			nil,
 			true,
+			nil,
 			nil,
 			nil,
 		)
@@ -344,6 +352,7 @@ func TestTalkSession_EndSession(t *testing.T) {
 			true,
 			nil,
 			nil,
+			nil,
 		)
 
 		participantIDs := []shared.UUID[user.User]{}
@@ -365,6 +374,7 @@ func TestTalkSession_EndSession(t *testing.T) {
 			nil,
 			nil,
 			true,
+			nil,
 			nil,
 			nil,
 		)
@@ -398,6 +408,7 @@ func TestTalkSession_SetReportVisibility(t *testing.T) {
 			true,
 			nil,
 			nil,
+			nil,
 		)
 
 		// デフォルトはfalse
@@ -429,6 +440,7 @@ func TestTalkSession_MarkAsEndProcessed(t *testing.T) {
 			true,
 			nil,
 			nil,
+			nil,
 		)
 
 		// デフォルトはfalse
@@ -454,6 +466,7 @@ func TestTalkSession_UpdateRestrictions(t *testing.T) {
 			nil,
 			nil,
 			true,
+			nil,
 			nil,
 			nil,
 		)

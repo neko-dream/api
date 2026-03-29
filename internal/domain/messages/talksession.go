@@ -91,4 +91,14 @@ var (
 		Code:       "TALKSESSION-0017",
 		Message:    "セッションは終了しています。",
 	}
+	TalkSessionPassphraseRequired = &APIError{
+		StatusCode: 403,
+		Code:       "TALKSESSION-0018",
+		Message:    "このセッションは合言葉が必要です。",
+	}
+	TalkSessionPassphraseInvalid = &APIError{
+		StatusCode: 403,
+		Code:       "TALKSESSION-0019",
+		Message:    "合言葉が正しくありません。",
+	}
 )

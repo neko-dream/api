@@ -212,6 +212,7 @@ type TalkSession struct {
 	OrganizationAliasID uuid.NullUUID
 	HideTop             bool
 	DisableAnalysis     bool
+	PassphraseHash      sql.NullString
 }
 
 type TalkSessionConclusion struct {

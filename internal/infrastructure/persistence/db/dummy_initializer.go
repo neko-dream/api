@@ -417,6 +417,7 @@ func (d *DummyInitializer) TalkSession() error {
 			true,
 			nil,
 			nil,
+			nil,
 		),
 		talksession.NewTalkSession(
 			shared.NewUUID[talksession.TalkSession](),
@@ -430,6 +431,7 @@ func (d *DummyInitializer) TalkSession() error {
 			nil,
 			nil,
 			true,
+			nil,
 			nil,
 			nil,
 		),

@@ -144,6 +144,8 @@ namespace kotohiro {
       aliasId?: HttpPart<string>;
       // hideTop デフォルトfalse
       hideTop?: HttpPart<boolean | null>;
+      // 合言葉（設定するとプライベートセッションになる）
+      passphrase?: HttpPart<string>;
     },
   ): TalkSession | {
     @statusCode statusCode: 400;
@@ -366,6 +368,34 @@ namespace kotohiro {
     @body body: {};
   } | {
     @statusCode statusCode: 500;
+    @body body: {};
+  };
+
+  /**
+   * クローズドセッションに合言葉を使って参加する。
+   * 既に参加済みの場合は合言葉なしで成功する。
+   */
+  @tag("talk_session")
+  @extension("x-ogen-operation-group", "TalkSession")
+  @route("/talksessions/{talkSessionID}/join")
+  @post
+  @summary("クローズドセッションに参加")
+  op joinClosedSession(
+    @path talkSessionID: string,
+    @body body: {
+      passphrase: string;
+    },
+  ): Body<{}> | {
+    @statusCode statusCode: 400;
+    @body body: {};
+  } | {
+    @statusCode statusCode: 403;
+    @body body: {
+      code: string;
+      message: string;
+    };
+  } | {
+    @statusCode statusCode: 404;
     @body body: {};
   };
 

@@ -189,6 +189,10 @@ type InviteOrganizationRes interface {
 	inviteOrganizationRes()
 }
 
+type JoinClosedSessionRes interface {
+	joinClosedSessionRes()
+}
+
 type OpinionComments2Res interface {
 	opinionComments2Res()
 }

@@ -12,6 +12,7 @@ import (
 	"github.com/neko-dream/api/internal/domain/model/user"
 	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type (
@@ -41,6 +42,7 @@ type (
 		organizationAliasID *shared.UUID[organization.OrganizationAlias]
 		hideTop         bool // トップに表示するかどうか
 		disableAnalysis bool // 分析を無効化するかどうか
+		passphraseHash  *string // 合言葉のbcryptハッシュ（nilの場合は公開セッション）
 		// イベント記録用（埋め込み）
 		event.EventRecorder
 		// 終了処理済みフラグ
@@ -62,6 +64,7 @@ func NewTalkSession(
 	hideTop bool,
 	organizationID *shared.UUID[organization.Organization],
 	organizationAliasID *shared.UUID[organization.OrganizationAlias],
+	passphraseHash *string,
 ) *TalkSession {
 	return &TalkSession{
 		talkSessionID:       talkSessionID,
@@ -78,9 +81,19 @@ func NewTalkSession(
 		hideTop:             hideTop,
 		organizationID:      organizationID,
 		organizationAliasID: organizationAliasID,
+		passphraseHash:      passphraseHash,
 		EventRecorder:       event.EventRecorder{},
 		endProcessed:        false,
 	}
+}
+
+// HashPassphrase は平文パスフレーズをbcryptハッシュ化する（pepperを付与してから）
+func HashPassphrase(plaintext, pepper string) (string, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(pepper+plaintext), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	return string(hash), nil
 }
 
 func (t *TalkSession) TalkSessionID() shared.UUID[TalkSession] {
@@ -151,6 +164,27 @@ func (t *TalkSession) ChangePrefecture(prefecture *string) {
 
 func (t *TalkSession) ChangeHideTop(hideTop bool) {
 	t.hideTop = hideTop
+}
+
+func (t *TalkSession) PassphraseHash() *string {
+	return t.passphraseHash
+}
+
+func (t *TalkSession) SetPassphraseHash(hash *string) {
+	t.passphraseHash = hash
+}
+
+// IsClosed は合言葉が設定されているかどうかを返す
+func (t *TalkSession) IsClosed() bool {
+	return t.passphraseHash != nil
+}
+
+// VerifyPassphrase は平文パスフレーズがハッシュと一致するか検証する（pepperを付与してから）
+func (t *TalkSession) VerifyPassphrase(plaintext, pepper string) error {
+	if t.passphraseHash == nil {
+		return nil
+	}
+	return bcrypt.CompareHashAndPassword([]byte(*t.passphraseHash), []byte(pepper+plaintext))
 }
 
 func (t *TalkSession) DisableAnalysis() bool {

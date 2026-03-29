@@ -60,6 +60,7 @@ const (
 	InitiateTalkSessionOperation                OperationName = "InitiateTalkSession"
 	InviteOrganizationOperation                 OperationName = "InviteOrganization"
 	InviteOrganizationForUserOperation          OperationName = "InviteOrganizationForUser"
+	JoinClosedSessionOperation                  OperationName = "JoinClosedSession"
 	ManageRegenerateManageOperation             OperationName = "ManageRegenerateManage"
 	OpinionComments2Operation                   OperationName = "OpinionComments2"
 	OpinionsHistoryOperation                    OperationName = "OpinionsHistory"

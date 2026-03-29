@@ -36,11 +36,12 @@ type talkSessionHandler struct {
 	getReportCount                report_query.GetCountQuery
 	hasConsent                    talksession_query.HasConsentQuery
 
-	addConclusionCommand    talksession_usecase.AddConclusionCommand
-	startTalkSessionCommand talksession_usecase.StartTalkSessionUseCase
-	editTalkSessionCommand  talksession_usecase.EditTalkSessionUseCase
-	takeConsentCommand      talksession_usecase.TakeConsentUseCase
-	toggleAnalysisUseCase   talksession_usecase.ToggleAnalysisUseCase
+	addConclusionCommand       talksession_usecase.AddConclusionCommand
+	startTalkSessionCommand    talksession_usecase.StartTalkSessionUseCase
+	editTalkSessionCommand     talksession_usecase.EditTalkSessionUseCase
+	takeConsentCommand         talksession_usecase.TakeConsentUseCase
+	toggleAnalysisUseCase      talksession_usecase.ToggleAnalysisUseCase
+	joinClosedSessionCommand   talksession_usecase.JoinClosedSessionUseCase
 
 	authorizationService service.AuthorizationService
 	session.TokenManager
@@ -64,6 +65,7 @@ func NewTalkSessionHandler(
 	editTalkSessionCommand talksession_usecase.EditTalkSessionUseCase,
 	takeConsentCommand talksession_usecase.TakeConsentUseCase,
 	toggleAnalysisUseCase talksession_usecase.ToggleAnalysisUseCase,
+	joinClosedSessionCommand talksession_usecase.JoinClosedSessionUseCase,
 
 	authorizationService service.AuthorizationService,
 	tokenManager session.TokenManager,
@@ -86,6 +88,7 @@ func NewTalkSessionHandler(
 		editTalkSessionCommand:  editTalkSessionCommand,
 		takeConsentCommand:      takeConsentCommand,
 		toggleAnalysisUseCase:   toggleAnalysisUseCase,
+		joinClosedSessionCommand: joinClosedSessionCommand,
 
 		authorizationService: authorizationService,
 		TokenManager:         tokenManager,
@@ -323,6 +326,7 @@ func (t *talkSessionHandler) InitiateTalkSession(ctx context.Context, req *oas.I
 		SessionClaim:        session.GetSession(ctx),
 		OrganizationAliasID: organizationAliasID,
 		HideTop:             utils.ToPtrIf(req.HideTop.IsSet(), req.HideTop.Value),
+		Passphrase:          utils.ToPtrIf(req.Passphrase.IsSet(), req.Passphrase.Value),
 	})
 	if err != nil {
 		return nil, errtrace.Wrap(err)
@@ -723,4 +727,30 @@ func (t *talkSessionHandler) ToggleTalkSessionAnalysis(ctx context.Context, para
 	return &oas.ToggleTalkSessionAnalysisOK{
 		DisableAnalysis: out.DisableAnalysis,
 	}, nil
+}
+
+// JoinClosedSession クローズドセッションに合言葉で参加
+func (t *talkSessionHandler) JoinClosedSession(ctx context.Context, req *oas.JoinClosedSessionReq, params oas.JoinClosedSessionParams) (oas.JoinClosedSessionRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.JoinClosedSession")
+	defer span.End()
+
+	authCtx, err := t.authorizationService.RequireAuthentication(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
+	if err := t.joinClosedSessionCommand.Execute(ctx, talksession_usecase.JoinClosedSessionInput{
+		TalkSessionID: talkSessionID,
+		UserID:        authCtx.UserID,
+		Passphrase:    req.GetPassphrase(),
+	}); err != nil {
+		return nil, err
+	}
+
+	return &oas.JoinClosedSessionOK{}, nil
 }
