@@ -210,6 +210,7 @@ func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSe
 			City:             input.City,
 			Prefecture:       input.Prefecture,
 			HideTop:          talkSession.HideTop(),
+			IsLocked:         talkSession.IsLocked(),
 		}
 		output.Latitude = input.Latitude
 		output.Longitude = input.Longitude

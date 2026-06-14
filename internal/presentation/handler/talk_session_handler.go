@@ -116,10 +116,11 @@ func (t *talkSessionHandler) GetUserTalkSessions(ctx context.Context, params oas
 		}
 	}
 	out, err := t.browseOpenedByUserQuery.Execute(ctx, talksession_query.BrowseOpenedByUserInput{
-		DisplayID: params.DisplayID,
-		Limit:     limit,
-		Offset:    offset,
-		Status:    talksession_query.Status(status),
+		DisplayID:     params.DisplayID,
+		Limit:         limit,
+		Offset:        offset,
+		Status:        talksession_query.Status(status),
+		ExcludeLocked: true,
 	})
 	if err != nil {
 		return nil, err

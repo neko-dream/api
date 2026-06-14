@@ -173,7 +173,6 @@ LEFT JOIN votes
     ON votes.talk_session_id = talk_sessions.talk_session_id
 WHERE
     talk_sessions.hide_top = FALSE AND
-    talk_sessions.passphrase_hash IS NULL AND
     CASE
         WHEN sqlc.narg('user_id')::uuid IS NOT NULL
             THEN votes.user_id = sqlc.narg('user_id')::uuid
@@ -199,6 +198,8 @@ WITH filtered_sessions AS (
     LEFT JOIN users ON ts.owner_id = users.user_id
     WHERE
         users.display_id = sqlc.arg('display_id')::text
+        AND
+        (sqlc.arg('exclude_locked')::boolean = FALSE OR ts.passphrase_hash IS NULL)
         AND
         CASE sqlc.narg('status')::text
             WHEN 'finished' THEN ts.scheduled_end_time <= now()

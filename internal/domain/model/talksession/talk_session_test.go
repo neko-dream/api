@@ -511,10 +511,10 @@ func TestTalkSession_VerifyPassphrase(t *testing.T) {
 		return ts
 	}
 
-	t.Run("クローズドでない場合は常にtrue", func(t *testing.T) {
+	t.Run("ロック未設定のセッションはfalse（検証対象がない）", func(t *testing.T) {
 		ts := newTS(nil)
 		manager := &mockPassphraseManager{}
-		assert.True(t, ts.VerifyPassphrase(manager, "anything"))
+		assert.False(t, ts.VerifyPassphrase(manager, "anything"))
 		assert.False(t, ts.IsLocked())
 	})
 

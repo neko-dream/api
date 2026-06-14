@@ -177,10 +177,12 @@ func (t *TalkSession) IsLocked() bool {
 	return t.passphraseHash != nil
 }
 
-// VerifyPassphrase は平文パスフレーズがハッシュと一致するか検証する
+// VerifyPassphrase は平文パスフレーズがハッシュと一致するか検証する。
+// passphraseHash が nil（=ロック未設定）のときは検証する対象がないため false を返す。
+// 呼び出し側は IsLocked() を先にチェックすること。
 func (t *TalkSession) VerifyPassphrase(manager PassphraseManager, plaintext string) bool {
 	if t.passphraseHash == nil {
-		return true
+		return false
 	}
 	return manager.Verify(plaintext, *t.passphraseHash)
 }

@@ -55,6 +55,11 @@ func (uc *takeConsentUseCase) Execute(ctx context.Context, input TakeConsentUseC
 		return messages.InternalServerError
 	}
 
+	// ロック済みセッションは合言葉経由の参加のみ許可（/talksessions/{id}/join を使う）
+	if talkSession.IsLocked() {
+		return messages.TalkSessionPassphraseRequired
+	}
+
 	// ゲストユーザーは制限ありセッションに同意できない
 	if len(talkSession.Restrictions()) > 0 {
 		currentUser, err := uc.userRepository.FindByID(ctx, input.UserID)
