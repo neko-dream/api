@@ -133,29 +133,24 @@
 
 ## 参加フロー
 
-```
-Client                    API
-  │                       │
-  │ GET /survey           │
-  ├──────────────────────►│
-  │◄─ TalkSessionSurvey ──┤
-  │                       │
-  │ POST /submissions     │
-  ├──────────────────────►│
-  │   バリデーション      │
-  │   ・必須質問の確認    │
-  │   ・選択肢ID 整合性   │
-  │   ・rating 範囲       │
-  │   ・date 形式         │
-  │   ・max_length        │
-  │◄─ submission_id ──────┤
-  │                       │
-  │ POST /consent         │ ← survey.answered の restriction を
-  ├──────────────────────►│   満たせるようになったので OK
-  │◄─ 200 ────────────────┤
-  │                       │
-  │ POST /votes           │ ← CanUserJoin が通る
-  ├──────────────────────►│
+```mermaid
+sequenceDiagram
+    participant Client
+    participant API
+
+    Client->>API: GET /survey
+    API-->>Client: TalkSessionSurvey
+
+    Client->>API: POST /submissions
+    Note over API: バリデーション<br/>・必須質問の確認<br/>・選択肢ID 整合性<br/>・rating 範囲<br/>・date 形式<br/>・max_length
+    API-->>Client: submission_id
+
+    Client->>API: POST /consent
+    Note right of API: survey.answered の restriction を<br/>満たせるようになったので OK
+    API-->>Client: 200
+
+    Client->>API: POST /votes
+    Note right of API: CanUserJoin が通る
 ```
 
 ## バリデーション
