@@ -3010,6 +3010,312 @@ paths:
       security:
         - {}
       x-ogen-operation-group: TalkSession
+  /talksessions/{talkSessionID}/survey:
+    get:
+      operationId: getTalkSessionSurvey
+      summary: アンケート定義取得
+      description: セッションのアンケート定義を取得（参加前に質問を表示するため）
+      parameters:
+        - name: talkSessionID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TalkSessionSurvey'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - talk_session
+      security:
+        - {}
+      x-ogen-operation-group: TalkSession
+    post:
+      operationId: createTalkSessionSurvey
+      summary: アンケート作成
+      description: セッションにアンケートを作成（オーナーのみ、セッションあたり 1 件まで）
+      parameters:
+        - name: talkSessionID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TalkSessionSurvey'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                type: object
+        '409':
+          description: The request conflicts with the current state of the server.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+      tags:
+        - talk_session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                questions:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/TalkSessionSurveyQuestionInput'
+              required:
+                - questions
+      x-ogen-operation-group: TalkSession
+    put:
+      operationId: updateTalkSessionSurvey
+      summary: アンケート編集
+      description: |-
+        アンケートを編集（オーナーのみ）。
+        既に回答がある質問・選択肢は soft delete 経由でのみ非表示化可能。
+        questionID / choiceID 指定で既存項目を編集、省略で新規追加。
+      parameters:
+        - name: talkSessionID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TalkSessionSurvey'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - talk_session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                questions:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/TalkSessionSurveyQuestionInput'
+                deletedQuestionIDs:
+                  type: array
+                  items:
+                    type: string
+                  description: 削除する質問ID（回答があれば soft delete、なければ hard delete）
+                deletedChoiceIDs:
+                  type: array
+                  items:
+                    type: string
+                  description: 削除する選択肢ID
+              required:
+                - questions
+      x-ogen-operation-group: TalkSession
+  /talksessions/{talkSessionID}/survey/submissions:
+    post:
+      operationId: submitTalkSessionSurvey
+      summary: アンケート回答送信
+      description: |-
+        アンケートに回答を送信（1 ユーザー 1 送信、修正不可）。
+        成功すると survey.answered restriction が自動的に満たされた状態になる。
+      parameters:
+        - name: talkSessionID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  submissionID:
+                    type: string
+                required:
+                  - submissionID
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                type: object
+        '409':
+          description: The request conflicts with the current state of the server.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+      tags:
+        - talk_session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                answers:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/TalkSessionSurveyAnswerInput'
+              required:
+                - answers
+      x-ogen-operation-group: TalkSession
+    get:
+      operationId: listTalkSessionSurveySubmissions
+      summary: アンケート回答一覧（オーナー）
+      description: セッションオーナー向け：回答一覧を取得
+      parameters:
+        - name: talkSessionID
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  submissions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TalkSessionSurveySubmission'
+                  totalCount:
+                    type: integer
+                    format: int32
+                required:
+                  - submissions
+                  - totalCount
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - talk_session
+      x-ogen-operation-group: TalkSession
   /talksessions/{talkSessionID}/swipe_opinions:
     get:
       operationId: swipeOpinions
@@ -4594,6 +4900,271 @@ components:
         voteUserCount:
           type: integer
           format: int32
+    TalkSessionSurvey:
+      type: object
+      required:
+        - surveyID
+        - talkSessionID
+        - questions
+      properties:
+        surveyID:
+          type: string
+          description: アンケートID
+        talkSessionID:
+          type: string
+          description: 紐付くセッションID
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/TalkSessionSurveyQuestion'
+          description: 質問一覧（display_order 昇順）
+      description: アンケート定義
+    TalkSessionSurveyAnswer:
+      type: object
+      required:
+        - questionID
+        - selectedChoiceIDs
+      properties:
+        questionID:
+          type: string
+          description: 質問ID
+        text:
+          type: string
+          nullable: true
+          description: 自由記述（free_text）
+        selectedChoiceIDs:
+          type: array
+          items:
+            type: string
+          description: 選択された choice_id 配列
+        other:
+          type: string
+          nullable: true
+          description: 「その他」自由記述
+        rating:
+          type: integer
+          format: int32
+          nullable: true
+          description: 評価値
+        date:
+          type: string
+          nullable: true
+          description: 日付
+      description: アンケート回答（取得用）
+    TalkSessionSurveyAnswerInput:
+      type: object
+      required:
+        - questionID
+      properties:
+        questionID:
+          type: string
+          description: 質問ID
+        text:
+          type: string
+          nullable: true
+          description: 自由記述（free_text）
+        selectedChoiceIDs:
+          type: array
+          items:
+            type: string
+          description: 選択された choice_id 配列（single/multi/dropdown）
+        other:
+          type: string
+          nullable: true
+          description: 「その他」自由記述（allowOther=true の choice 系で使用）
+        rating:
+          type: integer
+          format: int32
+          nullable: true
+          description: 評価値（rating）
+        date:
+          type: string
+          nullable: true
+          description: 日付（date, YYYY-MM-DD）
+      description: |-
+        回答送信用：単一回答
+        質問タイプによって意味が変わる：
+        - free_text: text を使用
+        - single_choice / dropdown: selectedChoiceIDs を 1 件、または allowOther の場合 other
+        - multi_choice: selectedChoiceIDs を 1 件以上、加えて allowOther の場合 other
+        - rating: rating を使用
+        - date: date を使用 (YYYY-MM-DD)
+    TalkSessionSurveyChoice:
+      type: object
+      required:
+        - choiceID
+        - text
+        - displayOrder
+      properties:
+        choiceID:
+          type: string
+          description: 選択肢ID
+        text:
+          type: string
+          description: 選択肢テキスト
+        displayOrder:
+          type: integer
+          format: int32
+          description: 表示順
+      description: アンケート選択肢
+    TalkSessionSurveyChoiceInput:
+      type: object
+      required:
+        - text
+        - displayOrder
+      properties:
+        choiceID:
+          type: string
+          nullable: true
+          description: 既存選択肢を編集する場合は choiceID を指定。新規追加時は省略。
+        text:
+          type: string
+        displayOrder:
+          type: integer
+          format: int32
+      description: アンケート作成用：選択肢入力
+    TalkSessionSurveyQuestion:
+      type: object
+      required:
+        - questionID
+        - text
+        - type
+        - isRequired
+        - allowOther
+        - displayOrder
+        - choices
+      properties:
+        questionID:
+          type: string
+          description: 質問ID
+        text:
+          type: string
+          description: 質問文
+        type:
+          allOf:
+            - $ref: '#/components/schemas/TalkSessionSurveyQuestionType'
+          description: 質問タイプ
+        isRequired:
+          type: boolean
+          description: 必須回答かどうか
+        allowOther:
+          type: boolean
+          description: 「その他」入力を許可するか（single_choice / multi_choice / dropdown のみ有効）
+        maxLength:
+          type: integer
+          format: int32
+          nullable: true
+          description: 自由記述の最大文字数（free_text または allowOther の入力に適用）
+        minValue:
+          type: integer
+          format: int32
+          nullable: true
+          description: rating の下限値（rating のみ有効）
+        maxValue:
+          type: integer
+          format: int32
+          nullable: true
+          description: rating の上限値（rating のみ有効）
+        minLabel:
+          type: string
+          nullable: true
+          description: rating の下限ラベル（例：「全く満足していない」）
+        maxLabel:
+          type: string
+          nullable: true
+          description: rating の上限ラベル（例：「非常に満足している」）
+        displayOrder:
+          type: integer
+          format: int32
+          description: 表示順
+        choices:
+          type: array
+          items:
+            $ref: '#/components/schemas/TalkSessionSurveyChoice'
+          description: 選択肢（single_choice / multi_choice / dropdown のみ）
+      description: アンケート質問
+    TalkSessionSurveyQuestionInput:
+      type: object
+      required:
+        - text
+        - type
+        - isRequired
+        - allowOther
+        - displayOrder
+        - choices
+      properties:
+        questionID:
+          type: string
+          nullable: true
+          description: 既存質問を編集する場合は questionID を指定。新規追加時は省略。
+        text:
+          type: string
+        type:
+          $ref: '#/components/schemas/TalkSessionSurveyQuestionType'
+        isRequired:
+          type: boolean
+        allowOther:
+          type: boolean
+        maxLength:
+          type: integer
+          format: int32
+          nullable: true
+        minValue:
+          type: integer
+          format: int32
+          nullable: true
+        maxValue:
+          type: integer
+          format: int32
+          nullable: true
+        minLabel:
+          type: string
+          nullable: true
+        maxLabel:
+          type: string
+          nullable: true
+        displayOrder:
+          type: integer
+          format: int32
+        choices:
+          type: array
+          items:
+            $ref: '#/components/schemas/TalkSessionSurveyChoiceInput'
+      description: アンケート作成用：質問入力
+    TalkSessionSurveyQuestionType:
+      type: string
+      enum:
+        - free_text
+        - single_choice
+        - multi_choice
+        - rating
+        - date
+        - dropdown
+      description: アンケートの質問タイプ
+    TalkSessionSurveySubmission:
+      type: object
+      required:
+        - submissionID
+        - userID
+        - submittedAt
+        - answers
+      properties:
+        submissionID:
+          type: string
+          description: 送信ID
+        userID:
+          type: string
+          description: ユーザーID
+        submittedAt:
+          type: string
+          format: date-time
+          description: 送信日時
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/TalkSessionSurveyAnswer'
+          description: 回答（質問ごと）
+      description: 回答送信レコード
     ToggleReportVisibilityRequest:
       type: object
       required:

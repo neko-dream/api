@@ -401,6 +401,13 @@ type TalkSessionHandler interface {
 	//
 	// POST /talksessions/{talkSessionID}/consent
 	ConsentTalkSession(ctx context.Context, params ConsentTalkSessionParams) (ConsentTalkSessionRes, error)
+	// CreateTalkSessionSurvey implements createTalkSessionSurvey operation.
+	//
+	// セッションにアンケートを作成（オーナーのみ、セッションあたり 1
+	// 件まで）.
+	//
+	// POST /talksessions/{talkSessionID}/survey
+	CreateTalkSessionSurvey(ctx context.Context, req *CreateTalkSessionSurveyReq, params CreateTalkSessionSurveyParams) (CreateTalkSessionSurveyRes, error)
 	// EditTalkSession implements editTalkSession operation.
 	//
 	// セッション編集.
@@ -461,6 +468,12 @@ type TalkSessionHandler interface {
 	//
 	// GET /talksessions/{talkSessionID}/restrictions
 	GetTalkSessionRestrictionSatisfied(ctx context.Context, params GetTalkSessionRestrictionSatisfiedParams) (GetTalkSessionRestrictionSatisfiedRes, error)
+	// GetTalkSessionSurvey implements getTalkSessionSurvey operation.
+	//
+	// セッションのアンケート定義を取得（参加前に質問を表示するため）.
+	//
+	// GET /talksessions/{talkSessionID}/survey
+	GetTalkSessionSurvey(ctx context.Context, params GetTalkSessionSurveyParams) (GetTalkSessionSurveyRes, error)
 	// GetUserTalkSessions implements getUserTalkSessions operation.
 	//
 	// 特定ユーザが開いたセッション一覧.
@@ -493,6 +506,12 @@ type TalkSessionHandler interface {
 	//
 	// POST /talksessions/{talkSessionID}/join
 	JoinLockedSession(ctx context.Context, req *JoinLockedSessionReq, params JoinLockedSessionParams) (JoinLockedSessionRes, error)
+	// ListTalkSessionSurveySubmissions implements listTalkSessionSurveySubmissions operation.
+	//
+	// セッションオーナー向け：回答一覧を取得.
+	//
+	// GET /talksessions/{talkSessionID}/survey/submissions
+	ListTalkSessionSurveySubmissions(ctx context.Context, params ListTalkSessionSurveySubmissionsParams) (ListTalkSessionSurveySubmissionsRes, error)
 	// PostConclusion implements postConclusion operation.
 	//
 	// 結論（conclusion）はセッションが終了した後にセッっションの作成者が投稿できる文章。
@@ -500,6 +519,13 @@ type TalkSessionHandler interface {
 	//
 	// POST /talksessions/{talkSessionID}/conclusion
 	PostConclusion(ctx context.Context, req *PostConclusionReq, params PostConclusionParams) (PostConclusionRes, error)
+	// SubmitTalkSessionSurvey implements submitTalkSessionSurvey operation.
+	//
+	// アンケートに回答を送信（1 ユーザー 1 送信、修正不可）。
+	// 成功すると survey.answered restriction が自動的に満たされた状態になる。.
+	//
+	// POST /talksessions/{talkSessionID}/survey/submissions
+	SubmitTalkSessionSurvey(ctx context.Context, req *SubmitTalkSessionSurveyReq, params SubmitTalkSessionSurveyParams) (SubmitTalkSessionSurveyRes, error)
 	// TalkSessionAnalysis implements talkSessionAnalysis operation.
 	//
 	// 分析結果一覧.
@@ -514,6 +540,14 @@ type TalkSessionHandler interface {
 	//
 	// PUT /talksessions/{talkSessionID}/analysis/toggle
 	ToggleTalkSessionAnalysis(ctx context.Context, params ToggleTalkSessionAnalysisParams) (ToggleTalkSessionAnalysisRes, error)
+	// UpdateTalkSessionSurvey implements updateTalkSessionSurvey operation.
+	//
+	// アンケートを編集（オーナーのみ）。
+	// 既に回答がある質問・選択肢は soft delete 経由でのみ非表示化可能。
+	// questionID / choiceID 指定で既存項目を編集、省略で新規追加。.
+	//
+	// PUT /talksessions/{talkSessionID}/survey
+	UpdateTalkSessionSurvey(ctx context.Context, req *UpdateTalkSessionSurveyReq, params UpdateTalkSessionSurveyParams) (UpdateTalkSessionSurveyRes, error)
 }
 
 // TestHandler handles operations described by OpenAPI v3 specification.

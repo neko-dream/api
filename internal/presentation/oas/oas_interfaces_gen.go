@@ -29,6 +29,10 @@ type CreateOrganizationAliasRes interface {
 	createOrganizationAliasRes()
 }
 
+type CreateTalkSessionSurveyRes interface {
+	createTalkSessionSurveyRes()
+}
+
 type DeleteDeviceRes interface {
 	deleteDeviceRes()
 }
@@ -141,6 +145,10 @@ type GetTalkSessionRestrictionSatisfiedRes interface {
 	getTalkSessionRestrictionSatisfiedRes()
 }
 
+type GetTalkSessionSurveyRes interface {
+	getTalkSessionSurveyRes()
+}
+
 type GetTimeLineRes interface {
 	getTimeLineRes()
 }
@@ -191,6 +199,10 @@ type InviteOrganizationRes interface {
 
 type JoinLockedSessionRes interface {
 	joinLockedSessionRes()
+}
+
+type ListTalkSessionSurveySubmissionsRes interface {
+	listTalkSessionSurveySubmissionsRes()
 }
 
 type OpinionComments2Res interface {
@@ -257,6 +269,10 @@ type SolveOpinionReportRes interface {
 	solveOpinionReportRes()
 }
 
+type SubmitTalkSessionSurveyRes interface {
+	submitTalkSessionSurveyRes()
+}
+
 type SwipeOpinionsRes interface {
 	swipeOpinionsRes()
 }
@@ -283,6 +299,10 @@ type UpdateNotificationPreferencesRes interface {
 
 type UpdateOrganizationRes interface {
 	updateOrganizationRes()
+}
+
+type UpdateTalkSessionSurveyRes interface {
+	updateTalkSessionSurveyRes()
 }
 
 type UpdateUserProfileRes interface {
