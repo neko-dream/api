@@ -52,4 +52,7 @@ type Repository interface {
 		surveyID shared.UUID[Survey],
 		limit, offset int,
 	) ([]*Submission, int32, error)
+
+	// ListAllSubmissions は survey の全回答を返す（集計用）。
+	ListAllSubmissions(ctx context.Context, surveyID shared.UUID[Survey]) ([]*Submission, error)
 }

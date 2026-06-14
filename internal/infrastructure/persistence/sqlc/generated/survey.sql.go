@@ -70,8 +70,8 @@ func (q *Queries) CountSurveySubmissions(ctx context.Context, surveyID uuid.UUID
 }
 
 const createSurveyAnswer = `-- name: CreateSurveyAnswer :exec
-INSERT INTO talk_session_survey_answers (answer_id, submission_id, question_id, answer_value, created_at)
-VALUES ($1, $2, $3, $4, $5)
+INSERT INTO talk_session_survey_answers (answer_id, submission_id, question_id, answer_value, is_encrypted, created_at)
+VALUES ($1, $2, $3, $4, $5, $6)
 `
 
 type CreateSurveyAnswerParams struct {
@@ -79,19 +79,21 @@ type CreateSurveyAnswerParams struct {
 	SubmissionID uuid.UUID
 	QuestionID   uuid.UUID
 	AnswerValue  json.RawMessage
+	IsEncrypted  bool
 	CreatedAt    time.Time
 }
 
 // CreateSurveyAnswer
 //
-//	INSERT INTO talk_session_survey_answers (answer_id, submission_id, question_id, answer_value, created_at)
-//	VALUES ($1, $2, $3, $4, $5)
+//	INSERT INTO talk_session_survey_answers (answer_id, submission_id, question_id, answer_value, is_encrypted, created_at)
+//	VALUES ($1, $2, $3, $4, $5, $6)
 func (q *Queries) CreateSurveyAnswer(ctx context.Context, arg CreateSurveyAnswerParams) error {
 	_, err := q.db.ExecContext(ctx, createSurveyAnswer,
 		arg.AnswerID,
 		arg.SubmissionID,
 		arg.QuestionID,
 		arg.AnswerValue,
+		arg.IsEncrypted,
 		arg.CreatedAt,
 	)
 	return err
@@ -133,7 +135,7 @@ const createSurveyQuestion = `-- name: CreateSurveyQuestion :exec
 INSERT INTO talk_session_survey_questions (
     question_id, survey_id, question_text, question_type,
     is_required, allow_other, max_length, min_value, max_value,
-    min_label, max_label, display_order, created_at, updated_at
+    min_label, max_label, display_order, contains_pii, created_at, updated_at
 ) VALUES (
     $1::uuid,
     $2::uuid,
@@ -147,8 +149,9 @@ INSERT INTO talk_session_survey_questions (
     $10::varchar,
     $11::varchar,
     $12::int,
-    $13::timestamptz,
-    $14::timestamptz
+    $13::boolean,
+    $14::timestamptz,
+    $15::timestamptz
 )
 `
 
@@ -165,6 +168,7 @@ type CreateSurveyQuestionParams struct {
 	MinLabel     sql.NullString
 	MaxLabel     sql.NullString
 	DisplayOrder int32
+	ContainsPii  bool
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }
@@ -174,7 +178,7 @@ type CreateSurveyQuestionParams struct {
 //	INSERT INTO talk_session_survey_questions (
 //	    question_id, survey_id, question_text, question_type,
 //	    is_required, allow_other, max_length, min_value, max_value,
-//	    min_label, max_label, display_order, created_at, updated_at
+//	    min_label, max_label, display_order, contains_pii, created_at, updated_at
 //	) VALUES (
 //	    $1::uuid,
 //	    $2::uuid,
@@ -188,8 +192,9 @@ type CreateSurveyQuestionParams struct {
 //	    $10::varchar,
 //	    $11::varchar,
 //	    $12::int,
-//	    $13::timestamptz,
-//	    $14::timestamptz
+//	    $13::boolean,
+//	    $14::timestamptz,
+//	    $15::timestamptz
 //	)
 func (q *Queries) CreateSurveyQuestion(ctx context.Context, arg CreateSurveyQuestionParams) error {
 	_, err := q.db.ExecContext(ctx, createSurveyQuestion,
@@ -205,6 +210,7 @@ func (q *Queries) CreateSurveyQuestion(ctx context.Context, arg CreateSurveyQues
 		arg.MinLabel,
 		arg.MaxLabel,
 		arg.DisplayOrder,
+		arg.ContainsPii,
 		arg.CreatedAt,
 		arg.UpdatedAt,
 	)
@@ -390,33 +396,84 @@ func (q *Queries) HasSubmittedSurveyBySessionID(ctx context.Context, arg HasSubm
 	return has_submitted, err
 }
 
+const listAllSurveySubmissions = `-- name: ListAllSurveySubmissions :many
+SELECT submission_id, survey_id, user_id, submitted_at
+FROM talk_session_survey_submissions
+WHERE survey_id = $1
+ORDER BY submitted_at ASC
+`
+
+// ListAllSurveySubmissions
+//
+//	SELECT submission_id, survey_id, user_id, submitted_at
+//	FROM talk_session_survey_submissions
+//	WHERE survey_id = $1
+//	ORDER BY submitted_at ASC
+func (q *Queries) ListAllSurveySubmissions(ctx context.Context, surveyID uuid.UUID) ([]TalkSessionSurveySubmission, error) {
+	rows, err := q.db.QueryContext(ctx, listAllSurveySubmissions, surveyID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TalkSessionSurveySubmission
+	for rows.Next() {
+		var i TalkSessionSurveySubmission
+		if err := rows.Scan(
+			&i.SubmissionID,
+			&i.SurveyID,
+			&i.UserID,
+			&i.SubmittedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listSurveyAnswersBySubmissionIDs = `-- name: ListSurveyAnswersBySubmissionIDs :many
-SELECT answer_id, submission_id, question_id, answer_value, created_at
+SELECT answer_id, submission_id, question_id, answer_value, is_encrypted, created_at
 FROM talk_session_survey_answers
 WHERE submission_id = ANY($1::uuid[])
 ORDER BY created_at ASC
 `
 
+type ListSurveyAnswersBySubmissionIDsRow struct {
+	AnswerID     uuid.UUID
+	SubmissionID uuid.UUID
+	QuestionID   uuid.UUID
+	AnswerValue  json.RawMessage
+	IsEncrypted  bool
+	CreatedAt    time.Time
+}
+
 // ListSurveyAnswersBySubmissionIDs
 //
-//	SELECT answer_id, submission_id, question_id, answer_value, created_at
+//	SELECT answer_id, submission_id, question_id, answer_value, is_encrypted, created_at
 //	FROM talk_session_survey_answers
 //	WHERE submission_id = ANY($1::uuid[])
 //	ORDER BY created_at ASC
-func (q *Queries) ListSurveyAnswersBySubmissionIDs(ctx context.Context, submissionIds []uuid.UUID) ([]TalkSessionSurveyAnswer, error) {
+func (q *Queries) ListSurveyAnswersBySubmissionIDs(ctx context.Context, submissionIds []uuid.UUID) ([]ListSurveyAnswersBySubmissionIDsRow, error) {
 	rows, err := q.db.QueryContext(ctx, listSurveyAnswersBySubmissionIDs, pq.Array(submissionIds))
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []TalkSessionSurveyAnswer
+	var items []ListSurveyAnswersBySubmissionIDsRow
 	for rows.Next() {
-		var i TalkSessionSurveyAnswer
+		var i ListSurveyAnswersBySubmissionIDsRow
 		if err := rows.Scan(
 			&i.AnswerID,
 			&i.SubmissionID,
 			&i.QuestionID,
 			&i.AnswerValue,
+			&i.IsEncrypted,
 			&i.CreatedAt,
 		); err != nil {
 			return nil, err
@@ -490,7 +547,7 @@ const listSurveyQuestions = `-- name: ListSurveyQuestions :many
 SELECT
     question_id, survey_id, question_text, question_type::text AS question_type,
     is_required, allow_other, max_length, min_value, max_value,
-    min_label, max_label, display_order, deleted_at, created_at, updated_at
+    min_label, max_label, display_order, contains_pii, deleted_at, created_at, updated_at
 FROM talk_session_survey_questions
 WHERE survey_id = $1
 ORDER BY display_order ASC, created_at ASC
@@ -509,6 +566,7 @@ type ListSurveyQuestionsRow struct {
 	MinLabel     sql.NullString
 	MaxLabel     sql.NullString
 	DisplayOrder int32
+	ContainsPii  bool
 	DeletedAt    sql.NullTime
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
@@ -519,7 +577,7 @@ type ListSurveyQuestionsRow struct {
 //	SELECT
 //	    question_id, survey_id, question_text, question_type::text AS question_type,
 //	    is_required, allow_other, max_length, min_value, max_value,
-//	    min_label, max_label, display_order, deleted_at, created_at, updated_at
+//	    min_label, max_label, display_order, contains_pii, deleted_at, created_at, updated_at
 //	FROM talk_session_survey_questions
 //	WHERE survey_id = $1
 //	ORDER BY display_order ASC, created_at ASC
@@ -545,6 +603,7 @@ func (q *Queries) ListSurveyQuestions(ctx context.Context, surveyID uuid.UUID) (
 			&i.MinLabel,
 			&i.MaxLabel,
 			&i.DisplayOrder,
+			&i.ContainsPii,
 			&i.DeletedAt,
 			&i.CreatedAt,
 			&i.UpdatedAt,
@@ -714,8 +773,9 @@ SET question_text = $1::text,
     min_label = $8::varchar,
     max_label = $9::varchar,
     display_order = $10::int,
-    updated_at = $11::timestamptz
-WHERE question_id = $12::uuid
+    contains_pii = $11::boolean,
+    updated_at = $12::timestamptz
+WHERE question_id = $13::uuid
 `
 
 type UpdateSurveyQuestionParams struct {
@@ -729,6 +789,7 @@ type UpdateSurveyQuestionParams struct {
 	MinLabel     sql.NullString
 	MaxLabel     sql.NullString
 	DisplayOrder int32
+	ContainsPii  bool
 	UpdatedAt    time.Time
 	QuestionID   uuid.UUID
 }
@@ -746,8 +807,9 @@ type UpdateSurveyQuestionParams struct {
 //	    min_label = $8::varchar,
 //	    max_label = $9::varchar,
 //	    display_order = $10::int,
-//	    updated_at = $11::timestamptz
-//	WHERE question_id = $12::uuid
+//	    contains_pii = $11::boolean,
+//	    updated_at = $12::timestamptz
+//	WHERE question_id = $13::uuid
 func (q *Queries) UpdateSurveyQuestion(ctx context.Context, arg UpdateSurveyQuestionParams) error {
 	_, err := q.db.ExecContext(ctx, updateSurveyQuestion,
 		arg.QuestionText,
@@ -760,6 +822,7 @@ func (q *Queries) UpdateSurveyQuestion(ctx context.Context, arg UpdateSurveyQues
 		arg.MinLabel,
 		arg.MaxLabel,
 		arg.DisplayOrder,
+		arg.ContainsPii,
 		arg.UpdatedAt,
 		arg.QuestionID,
 	)

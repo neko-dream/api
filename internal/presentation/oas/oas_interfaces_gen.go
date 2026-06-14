@@ -149,6 +149,10 @@ type GetTalkSessionSurveyRes interface {
 	getTalkSessionSurveyRes()
 }
 
+type GetTalkSessionSurveySummaryRes interface {
+	getTalkSessionSurveySummaryRes()
+}
+
 type GetTimeLineRes interface {
 	getTimeLineRes()
 }

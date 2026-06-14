@@ -62,6 +62,7 @@ type Answer struct {
 	submissionID shared.UUID[Submission]
 	questionID   shared.UUID[Question]
 	value        AnswerValue
+	isEncrypted  bool
 	createdAt    time.Time
 }
 
@@ -85,6 +86,7 @@ func ReconstructAnswer(
 	submissionID shared.UUID[Submission],
 	questionID shared.UUID[Question],
 	value AnswerValue,
+	isEncrypted bool,
 	createdAt time.Time,
 ) *Answer {
 	return &Answer{
@@ -92,6 +94,7 @@ func ReconstructAnswer(
 		submissionID: submissionID,
 		questionID:   questionID,
 		value:        value,
+		isEncrypted:  isEncrypted,
 		createdAt:    createdAt,
 	}
 }
@@ -100,4 +103,19 @@ func (a *Answer) AnswerID() shared.UUID[Answer]         { return a.answerID }
 func (a *Answer) SubmissionID() shared.UUID[Submission] { return a.submissionID }
 func (a *Answer) QuestionID() shared.UUID[Question]     { return a.questionID }
 func (a *Answer) Value() AnswerValue                    { return a.value }
+func (a *Answer) IsEncrypted() bool                     { return a.isEncrypted }
 func (a *Answer) CreatedAt() time.Time                  { return a.createdAt }
+
+// SetEncryptedValue は保存直前に呼び出される。
+// PII フラグがある質問の場合、暗号文の値と is_encrypted=true をセットする。
+func (a *Answer) SetEncryptedValue(v AnswerValue) {
+	a.value = v
+	a.isEncrypted = true
+}
+
+// SetDecryptedValue は読み出し後に呼び出される。
+// is_encrypted=true の Answer に対し、復号した値をセットする。
+// 復号後も isEncrypted フラグは true のまま（DB 上の状態を表す）。
+func (a *Answer) SetDecryptedValue(v AnswerValue) {
+	a.value = v
+}

@@ -44,6 +44,7 @@ func useCaseDeps() []ProvideArg {
 		{talksession_usecase.NewGetSurveyUseCase, nil},
 		{talksession_usecase.NewSubmitSurveyUseCase, nil},
 		{talksession_usecase.NewListSurveySubmissionsUseCase, nil},
+		{talksession_usecase.NewGetSurveySummaryUseCase, nil},
 		{talksession_query.NewBrowseTalkSessionQueryHandler, nil},
 		{talksession_query.NewBrowseOpenedByUserQueryHandler, nil},
 		{talksession_query.NewBrowseJoinedTalkSessionQueryHandler, nil},

@@ -47,6 +47,7 @@ type talkSessionHandler struct {
 	getSurveyQuery                talksession_usecase.GetSurveyUseCase
 	submitSurveyCommand           talksession_usecase.SubmitSurveyUseCase
 	listSurveySubmissionsQuery    talksession_usecase.ListSurveySubmissionsUseCase
+	getSurveySummaryQuery         talksession_usecase.GetSurveySummaryUseCase
 
 	authorizationService service.AuthorizationService
 	session.TokenManager
@@ -76,6 +77,7 @@ func NewTalkSessionHandler(
 	getSurveyQuery talksession_usecase.GetSurveyUseCase,
 	submitSurveyCommand talksession_usecase.SubmitSurveyUseCase,
 	listSurveySubmissionsQuery talksession_usecase.ListSurveySubmissionsUseCase,
+	getSurveySummaryQuery talksession_usecase.GetSurveySummaryUseCase,
 
 	authorizationService service.AuthorizationService,
 	tokenManager session.TokenManager,
@@ -104,6 +106,7 @@ func NewTalkSessionHandler(
 		getSurveyQuery:             getSurveyQuery,
 		submitSurveyCommand:        submitSurveyCommand,
 		listSurveySubmissionsQuery: listSurveySubmissionsQuery,
+		getSurveySummaryQuery:      getSurveySummaryQuery,
 
 		authorizationService: authorizationService,
 		TokenManager:         tokenManager,

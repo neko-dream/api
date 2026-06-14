@@ -60,6 +60,7 @@ var operationRolesCookieAuth = map[string][]string{
 	GetTalkSessionListManageOperation:         []string{},
 	GetTalkSessionManageOperation:             []string{},
 	GetTalkSessionReportCountOperation:        []string{},
+	GetTalkSessionSurveySummaryOperation:      []string{},
 	GetTokenInfoOperation:                     []string{},
 	GetUserInfoOperation:                      []string{},
 	GetUserListManageOperation:                []string{},

@@ -311,6 +311,7 @@ type TalkSessionSurveyAnswer struct {
 	QuestionID   uuid.UUID
 	AnswerValue  json.RawMessage
 	CreatedAt    time.Time
+	IsEncrypted  bool
 }
 
 type TalkSessionSurveyChoice struct {
@@ -339,6 +340,7 @@ type TalkSessionSurveyQuestion struct {
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 	DeletedAt    sql.NullTime
+	ContainsPii  bool
 }
 
 type TalkSessionSurveySubmission struct {

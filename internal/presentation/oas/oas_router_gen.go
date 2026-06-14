@@ -1603,30 +1603,66 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										return
 									}
 									switch elem[0] {
-									case '/': // Prefix: "/submissions"
+									case '/': // Prefix: "/su"
 
-										if l := len("/submissions"); len(elem) >= l && elem[0:l] == "/submissions" {
+										if l := len("/su"); len(elem) >= l && elem[0:l] == "/su" {
 											elem = elem[l:]
 										} else {
 											break
 										}
 
 										if len(elem) == 0 {
-											// Leaf node.
-											switch r.Method {
-											case "GET":
-												s.handleListTalkSessionSurveySubmissionsRequest([1]string{
-													args[0],
-												}, elemIsEscaped, w, r)
-											case "POST":
-												s.handleSubmitTalkSessionSurveyRequest([1]string{
-													args[0],
-												}, elemIsEscaped, w, r)
-											default:
-												s.notAllowed(w, r, "GET,POST")
+											break
+										}
+										switch elem[0] {
+										case 'b': // Prefix: "bmissions"
+
+											if l := len("bmissions"); len(elem) >= l && elem[0:l] == "bmissions" {
+												elem = elem[l:]
+											} else {
+												break
 											}
 
-											return
+											if len(elem) == 0 {
+												// Leaf node.
+												switch r.Method {
+												case "GET":
+													s.handleListTalkSessionSurveySubmissionsRequest([1]string{
+														args[0],
+													}, elemIsEscaped, w, r)
+												case "POST":
+													s.handleSubmitTalkSessionSurveyRequest([1]string{
+														args[0],
+													}, elemIsEscaped, w, r)
+												default:
+													s.notAllowed(w, r, "GET,POST")
+												}
+
+												return
+											}
+
+										case 'm': // Prefix: "mmary"
+
+											if l := len("mmary"); len(elem) >= l && elem[0:l] == "mmary" {
+												elem = elem[l:]
+											} else {
+												break
+											}
+
+											if len(elem) == 0 {
+												// Leaf node.
+												switch r.Method {
+												case "GET":
+													s.handleGetTalkSessionSurveySummaryRequest([1]string{
+														args[0],
+													}, elemIsEscaped, w, r)
+												default:
+													s.notAllowed(w, r, "GET")
+												}
+
+												return
+											}
+
 										}
 
 									}
@@ -3971,36 +4007,74 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										}
 									}
 									switch elem[0] {
-									case '/': // Prefix: "/submissions"
+									case '/': // Prefix: "/su"
 
-										if l := len("/submissions"); len(elem) >= l && elem[0:l] == "/submissions" {
+										if l := len("/su"); len(elem) >= l && elem[0:l] == "/su" {
 											elem = elem[l:]
 										} else {
 											break
 										}
 
 										if len(elem) == 0 {
-											// Leaf node.
-											switch method {
-											case "GET":
-												r.name = ListTalkSessionSurveySubmissionsOperation
-												r.summary = "アンケート回答一覧（オーナー）"
-												r.operationID = "listTalkSessionSurveySubmissions"
-												r.pathPattern = "/talksessions/{talkSessionID}/survey/submissions"
-												r.args = args
-												r.count = 1
-												return r, true
-											case "POST":
-												r.name = SubmitTalkSessionSurveyOperation
-												r.summary = "アンケート回答送信"
-												r.operationID = "submitTalkSessionSurvey"
-												r.pathPattern = "/talksessions/{talkSessionID}/survey/submissions"
-												r.args = args
-												r.count = 1
-												return r, true
-											default:
-												return
+											break
+										}
+										switch elem[0] {
+										case 'b': // Prefix: "bmissions"
+
+											if l := len("bmissions"); len(elem) >= l && elem[0:l] == "bmissions" {
+												elem = elem[l:]
+											} else {
+												break
 											}
+
+											if len(elem) == 0 {
+												// Leaf node.
+												switch method {
+												case "GET":
+													r.name = ListTalkSessionSurveySubmissionsOperation
+													r.summary = "アンケート回答一覧（オーナー）"
+													r.operationID = "listTalkSessionSurveySubmissions"
+													r.pathPattern = "/talksessions/{talkSessionID}/survey/submissions"
+													r.args = args
+													r.count = 1
+													return r, true
+												case "POST":
+													r.name = SubmitTalkSessionSurveyOperation
+													r.summary = "アンケート回答送信"
+													r.operationID = "submitTalkSessionSurvey"
+													r.pathPattern = "/talksessions/{talkSessionID}/survey/submissions"
+													r.args = args
+													r.count = 1
+													return r, true
+												default:
+													return
+												}
+											}
+
+										case 'm': // Prefix: "mmary"
+
+											if l := len("mmary"); len(elem) >= l && elem[0:l] == "mmary" {
+												elem = elem[l:]
+											} else {
+												break
+											}
+
+											if len(elem) == 0 {
+												// Leaf node.
+												switch method {
+												case "GET":
+													r.name = GetTalkSessionSurveySummaryOperation
+													r.summary = "アンケート集計結果（オーナー）"
+													r.operationID = "getTalkSessionSurveySummary"
+													r.pathPattern = "/talksessions/{talkSessionID}/survey/summary"
+													r.args = args
+													r.count = 1
+													return r, true
+												default:
+													return
+												}
+											}
+
 										}
 
 									}

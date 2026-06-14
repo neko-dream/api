@@ -46,6 +46,7 @@ const (
 	GetTalkSessionRestrictionKeysOperation      OperationName = "GetTalkSessionRestrictionKeys"
 	GetTalkSessionRestrictionSatisfiedOperation OperationName = "GetTalkSessionRestrictionSatisfied"
 	GetTalkSessionSurveyOperation               OperationName = "GetTalkSessionSurvey"
+	GetTalkSessionSurveySummaryOperation        OperationName = "GetTalkSessionSurveySummary"
 	GetTimeLineOperation                        OperationName = "GetTimeLine"
 	GetTokenInfoOperation                       OperationName = "GetTokenInfo"
 	GetUserByDisplayIDOperation                 OperationName = "GetUserByDisplayID"

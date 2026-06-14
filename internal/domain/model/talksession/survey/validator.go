@@ -80,7 +80,10 @@ func validateAnswerAgainstQuestion(q *Question, a *Answer) error {
 
 	case QuestionTypeSingleChoice, QuestionTypeDropdown:
 		hasChoice := len(v.SelectedChoiceIDs) >= 1
-		hasOther := q.AllowOther() && v.Other != nil && *v.Other != ""
+		hasOther, err := validateOther(q, v)
+		if err != nil {
+			return err
+		}
 		if !hasChoice && !hasOther {
 			return fmt.Errorf("single_choice/dropdown question %s requires exactly one choice or other", q.QuestionID())
 		}
@@ -94,12 +97,13 @@ func validateAnswerAgainstQuestion(q *Question, a *Answer) error {
 		if err := validateChoiceIDsBelongToQuestion(q, v.SelectedChoiceIDs); err != nil {
 			return err
 		}
-		if hasOther && q.MaxLength() != nil && utf8.RuneCountInString(*v.Other) > *q.MaxLength() {
-			return fmt.Errorf("other text exceeds max_length for question %s", q.QuestionID())
-		}
 
 	case QuestionTypeMultiChoice:
-		if len(v.SelectedChoiceIDs) == 0 && !(q.AllowOther() && v.Other != nil && *v.Other != "") {
+		hasOther, err := validateOther(q, v)
+		if err != nil {
+			return err
+		}
+		if len(v.SelectedChoiceIDs) == 0 && !hasOther {
 			return fmt.Errorf("multi_choice question %s requires at least one choice or other", q.QuestionID())
 		}
 		// 重複ID チェック
@@ -112,9 +116,6 @@ func validateAnswerAgainstQuestion(q *Question, a *Answer) error {
 		}
 		if err := validateChoiceIDsBelongToQuestion(q, v.SelectedChoiceIDs); err != nil {
 			return err
-		}
-		if q.AllowOther() && v.Other != nil && q.MaxLength() != nil && utf8.RuneCountInString(*v.Other) > *q.MaxLength() {
-			return fmt.Errorf("other text exceeds max_length for question %s", q.QuestionID())
 		}
 
 	case QuestionTypeRating:
@@ -141,6 +142,18 @@ func validateAnswerAgainstQuestion(q *Question, a *Answer) error {
 	}
 
 	return nil
+}
+
+// validateOther は AllowOther=true の choice 系設問に対する Other フィールドを検証する。
+// 戻り値 hasOther は「Other に意味のある値があるか」を示す（型/許可フラグ判定はここで吸収）。
+func validateOther(q *Question, v AnswerValue) (hasOther bool, err error) {
+	if !q.AllowOther() || v.Other == nil || *v.Other == "" {
+		return false, nil
+	}
+	if q.MaxLength() != nil && utf8.RuneCountInString(*v.Other) > *q.MaxLength() {
+		return true, fmt.Errorf("other text exceeds max_length for question %s", q.QuestionID())
+	}
+	return true, nil
 }
 
 func validateChoiceIDsBelongToQuestion(q *Question, ids []shared.UUID[Choice]) error {

@@ -369,6 +369,15 @@ func (UnimplementedHandler) GetTalkSessionSurvey(ctx context.Context, params Get
 	return r, ht.ErrNotImplemented
 }
 
+// GetTalkSessionSurveySummary implements getTalkSessionSurveySummary operation.
+//
+// セッションオーナー向け：質問ごとに集計した結果を取得.
+//
+// GET /talksessions/{talkSessionID}/survey/summary
+func (UnimplementedHandler) GetTalkSessionSurveySummary(ctx context.Context, params GetTalkSessionSurveySummaryParams) (r GetTalkSessionSurveySummaryRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetTimeLine implements getTimeLine operation.
 //
 // タイムラインはセッション終了後にセッション作成者が設定できるその後の予定を知らせるもの.

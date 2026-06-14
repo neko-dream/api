@@ -95,6 +95,11 @@ namespace kotohiro {
     displayOrder: int32;
 
     /**
+     * 個人情報を含む設問かどうか。true のとき、回答の text / other / date は AES-GCM で暗号化して保存される。
+     */
+    containsPii: boolean;
+
+    /**
      * 選択肢（single_choice / multi_choice / dropdown のみ）
      */
     choices: TalkSessionSurveyChoice[];
@@ -240,6 +245,10 @@ namespace kotohiro {
     minLabel?: string | null;
     maxLabel?: string | null;
     displayOrder: int32;
+    /**
+     * 個人情報を含む設問かどうか。省略時は false。
+     */
+    containsPii?: boolean;
     choices: TalkSessionSurveyChoiceInput[];
   }
 
@@ -254,5 +263,74 @@ namespace kotohiro {
 
     text: string;
     displayOrder: int32;
+  }
+
+  /**
+   * 集計：選択肢ごとの件数
+   */
+  model TalkSessionSurveyChoiceCount {
+    choiceID: string;
+    text: string;
+    count: int32;
+  }
+
+  /**
+   * 集計：rating の分布
+   */
+  model TalkSessionSurveyRatingBucket {
+    value: int32;
+    count: int32;
+  }
+
+  /**
+   * 集計：質問ごとの結果
+   * - free_text / date: answerCount のみ意味を持つ（生データは /submissions で取得）
+   * - single_choice / multi_choice / dropdown: choiceCounts + otherCount
+   * - rating: ratingAverage + ratingDistribution
+   */
+  model TalkSessionSurveyQuestionSummary {
+    questionID: string;
+    text: string;
+    type: TalkSessionSurveyQuestionType;
+    /**
+     * 個人情報設問かどうか
+     */
+    containsPii: boolean;
+    /**
+     * この質問に有効な回答を行ったユーザー数
+     */
+    answerCount: int32;
+    /**
+     * choice 系のみ：選択肢ごとの件数
+     */
+    choiceCounts: TalkSessionSurveyChoiceCount[];
+    /**
+     * choice 系（allowOther=true）のみ：その他テキストを記入したユーザー数
+     */
+    otherCount: int32;
+    /**
+     * rating のみ：回答の平均値
+     */
+    ratingAverage?: float64 | null;
+    /**
+     * rating のみ：値ごとの件数分布（minValue〜maxValue 昇順）
+     */
+    ratingDistribution: TalkSessionSurveyRatingBucket[];
+  }
+
+  /**
+   * 集計：survey 全体
+   */
+  model TalkSessionSurveySummary {
+    surveyID: string;
+    talkSessionID: string;
+    /**
+     * 送信ユーザー総数
+     */
+    submissionCount: int32;
+    /**
+     * 質問ごとの集計（display_order 昇順、削除済みは除外）
+     */
+    questionSummaries: TalkSessionSurveyQuestionSummary[];
   }
 }

@@ -474,6 +474,12 @@ type TalkSessionHandler interface {
 	//
 	// GET /talksessions/{talkSessionID}/survey
 	GetTalkSessionSurvey(ctx context.Context, params GetTalkSessionSurveyParams) (GetTalkSessionSurveyRes, error)
+	// GetTalkSessionSurveySummary implements getTalkSessionSurveySummary operation.
+	//
+	// セッションオーナー向け：質問ごとに集計した結果を取得.
+	//
+	// GET /talksessions/{talkSessionID}/survey/summary
+	GetTalkSessionSurveySummary(ctx context.Context, params GetTalkSessionSurveySummaryParams) (GetTalkSessionSurveySummaryRes, error)
 	// GetUserTalkSessions implements getUserTalkSessions operation.
 	//
 	// 特定ユーザが開いたセッション一覧.

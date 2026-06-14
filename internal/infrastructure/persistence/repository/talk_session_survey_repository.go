@@ -70,8 +70,23 @@ func (r *talkSessionSurveyRepository) Save(ctx context.Context, s *survey.Survey
 		return err
 	}
 	existingQuestions := make(map[uuid.UUID]bool, len(existingRows))
+	allQuestionIDs := make([]uuid.UUID, 0, len(existingRows))
 	for _, row := range existingRows {
 		existingQuestions[row.QuestionID] = true
+		allQuestionIDs = append(allQuestionIDs, row.QuestionID)
+	}
+
+	// 既存選択肢を質問単位の N+1 にせず一括取得する
+	existingChoices := make(map[uuid.UUID]bool)
+	if len(allQuestionIDs) > 0 {
+		choiceRows, err := q.ListSurveyChoicesByQuestionIDs(ctx, allQuestionIDs)
+		if err != nil {
+			utils.HandleError(ctx, err, "ListSurveyChoicesByQuestionIDs")
+			return err
+		}
+		for _, row := range choiceRows {
+			existingChoices[row.ChoiceID] = true
+		}
 	}
 
 	for _, qn := range s.Questions() {
@@ -95,17 +110,6 @@ func (r *talkSessionSurveyRepository) Save(ctx context.Context, s *survey.Survey
 			if err := r.insertQuestion(ctx, qn); err != nil {
 				return err
 			}
-		}
-
-		// 既存の選択肢取得
-		choiceRows, err := q.ListSurveyChoicesByQuestionIDs(ctx, []uuid.UUID{qid})
-		if err != nil {
-			utils.HandleError(ctx, err, "ListSurveyChoicesByQuestionIDs")
-			return err
-		}
-		existingChoices := make(map[uuid.UUID]bool, len(choiceRows))
-		for _, row := range choiceRows {
-			existingChoices[row.ChoiceID] = true
 		}
 
 		for _, c := range qn.Choices() {
@@ -156,12 +160,13 @@ func (r *talkSessionSurveyRepository) insertQuestion(ctx context.Context, qn *su
 		QuestionType: model.TalkSessionSurveyQuestionType(qn.Type()),
 		IsRequired:   qn.IsRequired(),
 		AllowOther:   qn.AllowOther(),
-		MaxLength:    nullInt32FromPtr(qn.MaxLength()),
-		MinValue:     nullInt32FromPtr(qn.MinValue()),
-		MaxValue:     nullInt32FromPtr(qn.MaxValue()),
-		MinLabel:     nullStringFromPtr(qn.MinLabel()),
-		MaxLabel:     nullStringFromPtr(qn.MaxLabel()),
+		MaxLength:    utils.ToNullableSQL[sql.NullInt32](qn.MaxLength()),
+		MinValue:     utils.ToNullableSQL[sql.NullInt32](qn.MinValue()),
+		MaxValue:     utils.ToNullableSQL[sql.NullInt32](qn.MaxValue()),
+		MinLabel:     utils.ToNullableSQL[sql.NullString](qn.MinLabel()),
+		MaxLabel:     utils.ToNullableSQL[sql.NullString](qn.MaxLabel()),
 		DisplayOrder: int32(qn.DisplayOrder()),
+		ContainsPii:  qn.ContainsPii(),
 		CreatedAt:    qn.CreatedAt(),
 		UpdatedAt:    qn.UpdatedAt(),
 	})
@@ -174,12 +179,13 @@ func (r *talkSessionSurveyRepository) updateQuestion(ctx context.Context, qn *su
 		QuestionType: model.TalkSessionSurveyQuestionType(qn.Type()),
 		IsRequired:   qn.IsRequired(),
 		AllowOther:   qn.AllowOther(),
-		MaxLength:    nullInt32FromPtr(qn.MaxLength()),
-		MinValue:     nullInt32FromPtr(qn.MinValue()),
-		MaxValue:     nullInt32FromPtr(qn.MaxValue()),
-		MinLabel:     nullStringFromPtr(qn.MinLabel()),
-		MaxLabel:     nullStringFromPtr(qn.MaxLabel()),
+		MaxLength:    utils.ToNullableSQL[sql.NullInt32](qn.MaxLength()),
+		MinValue:     utils.ToNullableSQL[sql.NullInt32](qn.MinValue()),
+		MaxValue:     utils.ToNullableSQL[sql.NullInt32](qn.MaxValue()),
+		MinLabel:     utils.ToNullableSQL[sql.NullString](qn.MinLabel()),
+		MaxLabel:     utils.ToNullableSQL[sql.NullString](qn.MaxLabel()),
 		DisplayOrder: int32(qn.DisplayOrder()),
+		ContainsPii:  qn.ContainsPii(),
 		UpdatedAt:    time.Now(),
 	})
 }
@@ -256,7 +262,7 @@ func (r *talkSessionSurveyRepository) reconstruct(
 				shared.UUID[survey.Question](row.QuestionID),
 				row.ChoiceText,
 				int(row.DisplayOrder),
-				nullTimeToPtr(row.DeletedAt),
+				utils.ToPtrIf(row.DeletedAt.Valid, row.DeletedAt.Time),
 				row.CreatedAt,
 				row.UpdatedAt,
 			)
@@ -277,14 +283,15 @@ func (r *talkSessionSurveyRepository) reconstruct(
 			qt,
 			row.IsRequired,
 			row.AllowOther,
-			nullInt32ToIntPtr(row.MaxLength),
-			nullInt32ToIntPtr(row.MinValue),
-			nullInt32ToIntPtr(row.MaxValue),
-			nullStringToPtr(row.MinLabel),
-			nullStringToPtr(row.MaxLabel),
+			utils.ToPtrIf(row.MaxLength.Valid, int(row.MaxLength.Int32)),
+			utils.ToPtrIf(row.MinValue.Valid, int(row.MinValue.Int32)),
+			utils.ToPtrIf(row.MaxValue.Valid, int(row.MaxValue.Int32)),
+			utils.ToPtrIf(row.MinLabel.Valid, row.MinLabel.String),
+			utils.ToPtrIf(row.MaxLabel.Valid, row.MaxLabel.String),
 			int(row.DisplayOrder),
+			row.ContainsPii,
 			cRowsByQuestion[row.QuestionID],
-			nullTimeToPtr(row.DeletedAt),
+			utils.ToPtrIf(row.DeletedAt.Valid, row.DeletedAt.Time),
 			row.CreatedAt,
 			row.UpdatedAt,
 		)
@@ -377,6 +384,7 @@ func (r *talkSessionSurveyRepository) CreateSubmission(ctx context.Context, sub 
 			SubmissionID: a.SubmissionID().UUID(),
 			QuestionID:   a.QuestionID().UUID(),
 			AnswerValue:  payload,
+			IsEncrypted:  a.IsEncrypted(),
 			CreatedAt:    a.CreatedAt(),
 		}); err != nil {
 			utils.HandleError(ctx, err, "CreateSurveyAnswer")
@@ -423,6 +431,32 @@ func (r *talkSessionSurveyRepository) ListSubmissions(
 		return nil, 0, err
 	}
 
+	subs, err := r.buildSubmissions(ctx, subRows)
+	if err != nil {
+		return nil, 0, err
+	}
+	return subs, int32(total), nil
+}
+
+func (r *talkSessionSurveyRepository) ListAllSubmissions(
+	ctx context.Context,
+	surveyID shared.UUID[survey.Survey],
+) ([]*survey.Submission, error) {
+	ctx, span := otel.Tracer("repository").Start(ctx, "talkSessionSurveyRepository.ListAllSubmissions")
+	defer span.End()
+
+	subRows, err := r.GetQueries(ctx).ListAllSurveySubmissions(ctx, surveyID.UUID())
+	if err != nil {
+		return nil, err
+	}
+	return r.buildSubmissions(ctx, subRows)
+}
+
+// buildSubmissions は submissions 行に紐付く answers をまとめて取得し、ドメインオブジェクトを組み立てる。
+func (r *talkSessionSurveyRepository) buildSubmissions(
+	ctx context.Context,
+	subRows []model.TalkSessionSurveySubmission,
+) ([]*survey.Submission, error) {
 	subIDs := make([]uuid.UUID, 0, len(subRows))
 	for _, s := range subRows {
 		subIDs = append(subIDs, s.SubmissionID)
@@ -430,20 +464,21 @@ func (r *talkSessionSurveyRepository) ListSubmissions(
 
 	answersBySubmission := make(map[uuid.UUID][]*survey.Answer, len(subIDs))
 	if len(subIDs) > 0 {
-		aRows, err := q.ListSurveyAnswersBySubmissionIDs(ctx, subIDs)
+		aRows, err := r.GetQueries(ctx).ListSurveyAnswersBySubmissionIDs(ctx, subIDs)
 		if err != nil {
-			return nil, 0, err
+			return nil, err
 		}
 		for _, row := range aRows {
 			v, err := survey.UnmarshalAnswerValue(row.AnswerValue)
 			if err != nil {
-				return nil, 0, err
+				return nil, err
 			}
 			a := survey.ReconstructAnswer(
 				shared.UUID[survey.Answer](row.AnswerID),
 				shared.UUID[survey.Submission](row.SubmissionID),
 				shared.UUID[survey.Question](row.QuestionID),
 				v,
+				row.IsEncrypted,
 				row.CreatedAt,
 			)
 			answersBySubmission[row.SubmissionID] = append(answersBySubmission[row.SubmissionID], a)
@@ -460,42 +495,6 @@ func (r *talkSessionSurveyRepository) ListSubmissions(
 			answersBySubmission[row.SubmissionID],
 		))
 	}
-	return subs, int32(total), nil
+	return subs, nil
 }
 
-// ヘルパ
-func nullInt32FromPtr(p *int) sql.NullInt32 {
-	if p == nil {
-		return sql.NullInt32{}
-	}
-	return sql.NullInt32{Int32: int32(*p), Valid: true}
-}
-
-func nullStringFromPtr(p *string) sql.NullString {
-	if p == nil {
-		return sql.NullString{}
-	}
-	return sql.NullString{String: *p, Valid: true}
-}
-
-func nullInt32ToIntPtr(n sql.NullInt32) *int {
-	if !n.Valid {
-		return nil
-	}
-	v := int(n.Int32)
-	return &v
-}
-
-func nullStringToPtr(n sql.NullString) *string {
-	if !n.Valid {
-		return nil
-	}
-	return &n.String
-}
-
-func nullTimeToPtr(n sql.NullTime) *time.Time {
-	if !n.Valid {
-		return nil
-	}
-	return &n.Time
-}

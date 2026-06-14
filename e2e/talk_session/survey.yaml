@@ -21,7 +21,7 @@ vars:
 
 steps:
   cleanup:
-    desc: テストデータ削除
+    desc: テストデータ削除（talk_sessions / users から CASCADE で配下 survey/answer/submission も消える）
     dev:
       query: |
         DELETE FROM user_status_change_logs WHERE user_id IN (SELECT user_id FROM users WHERE display_id IN ('{{ vars.ownerID }}', '{{ vars.joinerID }}'));
@@ -30,11 +30,6 @@ steps:
         DELETE FROM talksession_consents;
         DELETE FROM votes;
         DELETE FROM opinions;
-        DELETE FROM talk_session_survey_answers;
-        DELETE FROM talk_session_survey_submissions;
-        DELETE FROM talk_session_survey_choices;
-        DELETE FROM talk_session_survey_questions;
-        DELETE FROM talk_session_surveys;
         DELETE FROM talk_sessions;
         DELETE FROM users WHERE display_id IN ('{{ vars.ownerID }}', '{{ vars.joinerID }}');
         DELETE FROM domain_events;

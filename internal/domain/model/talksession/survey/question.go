@@ -19,6 +19,7 @@ type Question struct {
 	minLabel     *string
 	maxLabel     *string
 	displayOrder int
+	containsPii  bool
 	choices      []*Choice
 	deletedAt    *time.Time
 	createdAt    time.Time
@@ -34,6 +35,7 @@ type QuestionConfig struct {
 	MinLabel     *string
 	MaxLabel     *string
 	DisplayOrder int
+	ContainsPii  bool
 }
 
 func NewQuestion(
@@ -57,6 +59,7 @@ func NewQuestion(
 		minLabel:     cfg.MinLabel,
 		maxLabel:     cfg.MaxLabel,
 		displayOrder: cfg.DisplayOrder,
+		containsPii:  cfg.ContainsPii,
 		createdAt:    now,
 		updatedAt:    now,
 	}
@@ -72,6 +75,7 @@ func ReconstructQuestion(
 	maxLength, minValue, maxValue *int,
 	minLabel, maxLabel *string,
 	displayOrder int,
+	containsPii bool,
 	choices []*Choice,
 	deletedAt *time.Time,
 	createdAt, updatedAt time.Time,
@@ -89,6 +93,7 @@ func ReconstructQuestion(
 		minLabel:     minLabel,
 		maxLabel:     maxLabel,
 		displayOrder: displayOrder,
+		containsPii:  containsPii,
 		choices:      choices,
 		deletedAt:    deletedAt,
 		createdAt:    createdAt,
@@ -108,6 +113,7 @@ func (q *Question) MaxValue() *int                    { return q.maxValue }
 func (q *Question) MinLabel() *string                 { return q.minLabel }
 func (q *Question) MaxLabel() *string                 { return q.maxLabel }
 func (q *Question) DisplayOrder() int                 { return q.displayOrder }
+func (q *Question) ContainsPii() bool                 { return q.containsPii }
 func (q *Question) Choices() []*Choice                { return q.choices }
 func (q *Question) DeletedAt() *time.Time             { return q.deletedAt }
 func (q *Question) IsDeleted() bool                   { return q.deletedAt != nil }
@@ -169,6 +175,7 @@ func (q *Question) SetConfig(cfg QuestionConfig) {
 	q.minLabel = cfg.MinLabel
 	q.maxLabel = cfg.MaxLabel
 	q.displayOrder = cfg.DisplayOrder
+	q.containsPii = cfg.ContainsPii
 	q.updatedAt = time.Now()
 }
 

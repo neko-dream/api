@@ -3316,6 +3316,39 @@ paths:
       tags:
         - talk_session
       x-ogen-operation-group: TalkSession
+  /talksessions/{talkSessionID}/survey/summary:
+    get:
+      operationId: getTalkSessionSurveySummary
+      summary: アンケート集計結果（オーナー）
+      description: セッションオーナー向け：質問ごとに集計した結果を取得
+      parameters:
+        - name: talkSessionID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TalkSessionSurveySummary'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - talk_session
+      x-ogen-operation-group: TalkSession
   /talksessions/{talkSessionID}/swipe_opinions:
     get:
       operationId: swipeOpinions
@@ -5007,6 +5040,21 @@ components:
           format: int32
           description: 表示順
       description: アンケート選択肢
+    TalkSessionSurveyChoiceCount:
+      type: object
+      required:
+        - choiceID
+        - text
+        - count
+      properties:
+        choiceID:
+          type: string
+        text:
+          type: string
+        count:
+          type: integer
+          format: int32
+      description: 集計：選択肢ごとの件数
     TalkSessionSurveyChoiceInput:
       type: object
       required:
@@ -5032,6 +5080,7 @@ components:
         - isRequired
         - allowOther
         - displayOrder
+        - containsPii
         - choices
       properties:
         questionID:
@@ -5077,6 +5126,9 @@ components:
           type: integer
           format: int32
           description: 表示順
+        containsPii:
+          type: boolean
+          description: 個人情報を含む設問かどうか。true のとき、回答の text / other / date は AES-GCM で暗号化して保存される。
         choices:
           type: array
           items:
@@ -5126,11 +5178,63 @@ components:
         displayOrder:
           type: integer
           format: int32
+        containsPii:
+          type: boolean
+          description: 個人情報を含む設問かどうか。省略時は false。
         choices:
           type: array
           items:
             $ref: '#/components/schemas/TalkSessionSurveyChoiceInput'
       description: アンケート作成用：質問入力
+    TalkSessionSurveyQuestionSummary:
+      type: object
+      required:
+        - questionID
+        - text
+        - type
+        - containsPii
+        - answerCount
+        - choiceCounts
+        - otherCount
+        - ratingDistribution
+      properties:
+        questionID:
+          type: string
+        text:
+          type: string
+        type:
+          $ref: '#/components/schemas/TalkSessionSurveyQuestionType'
+        containsPii:
+          type: boolean
+          description: 個人情報設問かどうか
+        answerCount:
+          type: integer
+          format: int32
+          description: この質問に有効な回答を行ったユーザー数
+        choiceCounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/TalkSessionSurveyChoiceCount'
+          description: choice 系のみ：選択肢ごとの件数
+        otherCount:
+          type: integer
+          format: int32
+          description: choice 系（allowOther=true）のみ：その他テキストを記入したユーザー数
+        ratingAverage:
+          type: number
+          format: double
+          nullable: true
+          description: rating のみ：回答の平均値
+        ratingDistribution:
+          type: array
+          items:
+            $ref: '#/components/schemas/TalkSessionSurveyRatingBucket'
+          description: rating のみ：値ごとの件数分布（minValue〜maxValue 昇順）
+      description: |-
+        集計：質問ごとの結果
+        - free_text / date: answerCount のみ意味を持つ（生データは /submissions で取得）
+        - single_choice / multi_choice / dropdown: choiceCounts + otherCount
+        - rating: ratingAverage + ratingDistribution
     TalkSessionSurveyQuestionType:
       type: string
       enum:
@@ -5141,6 +5245,19 @@ components:
         - date
         - dropdown
       description: アンケートの質問タイプ
+    TalkSessionSurveyRatingBucket:
+      type: object
+      required:
+        - value
+        - count
+      properties:
+        value:
+          type: integer
+          format: int32
+        count:
+          type: integer
+          format: int32
+      description: 集計：rating の分布
     TalkSessionSurveySubmission:
       type: object
       required:
@@ -5165,6 +5282,28 @@ components:
             $ref: '#/components/schemas/TalkSessionSurveyAnswer'
           description: 回答（質問ごと）
       description: 回答送信レコード
+    TalkSessionSurveySummary:
+      type: object
+      required:
+        - surveyID
+        - talkSessionID
+        - submissionCount
+        - questionSummaries
+      properties:
+        surveyID:
+          type: string
+        talkSessionID:
+          type: string
+        submissionCount:
+          type: integer
+          format: int32
+          description: 送信ユーザー総数
+        questionSummaries:
+          type: array
+          items:
+            $ref: '#/components/schemas/TalkSessionSurveyQuestionSummary'
+          description: 質問ごとの集計（display_order 昇順、削除済みは除外）
+      description: 集計：survey 全体
     ToggleReportVisibilityRequest:
       type: object
       required:

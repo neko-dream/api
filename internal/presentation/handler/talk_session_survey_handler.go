@@ -90,11 +90,11 @@ func (t *talkSessionHandler) UpdateTalkSessionSurvey(ctx context.Context, req *o
 		return nil, err
 	}
 
-	deletedQIDs, err := parseUUIDList[survey.Question](req.GetDeletedQuestionIDs())
+	deletedQIDs, err := shared.ParseUUIDs[survey.Question](req.GetDeletedQuestionIDs())
 	if err != nil {
 		return nil, messages.BadRequestError
 	}
-	deletedCIDs, err := parseUUIDList[survey.Choice](req.GetDeletedChoiceIDs())
+	deletedCIDs, err := shared.ParseUUIDs[survey.Choice](req.GetDeletedChoiceIDs())
 	if err != nil {
 		return nil, messages.BadRequestError
 	}
@@ -190,6 +190,75 @@ func (t *talkSessionHandler) ListTalkSessionSurveySubmissions(ctx context.Contex
 	}, nil
 }
 
+func (t *talkSessionHandler) GetTalkSessionSurveySummary(ctx context.Context, params oas.GetTalkSessionSurveySummaryParams) (oas.GetTalkSessionSurveySummaryRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.GetTalkSessionSurveySummary")
+	defer span.End()
+
+	authCtx, err := t.authorizationService.RequireAuthentication(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
+	summary, err := t.getSurveySummaryQuery.Execute(ctx, talksession_usecase.GetSurveySummaryInput{
+		TalkSessionID: talkSessionID,
+		ActorUserID:   authCtx.UserID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return summaryToResponse(summary), nil
+}
+
+func summaryToResponse(s *survey.Summary) *oas.TalkSessionSurveySummary {
+	qs := make([]oas.TalkSessionSurveyQuestionSummary, 0, len(s.QuestionSummaries))
+	for _, q := range s.QuestionSummaries {
+		choices := make([]oas.TalkSessionSurveyChoiceCount, 0, len(q.ChoiceCounts))
+		for _, cc := range q.ChoiceCounts {
+			choices = append(choices, oas.TalkSessionSurveyChoiceCount{
+				ChoiceID: cc.ChoiceID.String(),
+				Text:     cc.Text,
+				Count:    int32(cc.Count),
+			})
+		}
+		dist := make([]oas.TalkSessionSurveyRatingBucket, 0, len(q.RatingDistribution))
+		for _, b := range q.RatingDistribution {
+			dist = append(dist, oas.TalkSessionSurveyRatingBucket{
+				Value: int32(b.Value),
+				Count: int32(b.Count),
+			})
+		}
+		qs = append(qs, oas.TalkSessionSurveyQuestionSummary{
+			QuestionID:         q.QuestionID.String(),
+			Text:               q.Text,
+			Type:               oas.TalkSessionSurveyQuestionType(q.Type),
+			ContainsPii:        q.ContainsPii,
+			AnswerCount:        int32(q.AnswerCount),
+			ChoiceCounts:       choices,
+			OtherCount:         int32(q.OtherCount),
+			RatingAverage:      floatPtrToOptNilFloat64(q.RatingAverage),
+			RatingDistribution: dist,
+		})
+	}
+	return &oas.TalkSessionSurveySummary{
+		SurveyID:          s.SurveyID.String(),
+		TalkSessionID:     s.TalkSessionID.String(),
+		SubmissionCount:   int32(s.SubmissionCount),
+		QuestionSummaries: qs,
+	}
+}
+
+func floatPtrToOptNilFloat64(p *float64) oas.OptNilFloat64 {
+	if p == nil {
+		return oas.OptNilFloat64{}
+	}
+	return oas.NewOptNilFloat64(*p)
+}
+
 // --- 変換ヘルパ ---
 
 func convertCreateQuestions(in []oas.TalkSessionSurveyQuestionInput) ([]talksession_usecase.SurveyQuestionInput, error) {
@@ -214,6 +283,7 @@ func convertCreateQuestions(in []oas.TalkSessionSurveyQuestionInput) ([]talksess
 			MinLabel:     optNilStringToPtr(qi.GetMinLabel()),
 			MaxLabel:     optNilStringToPtr(qi.GetMaxLabel()),
 			DisplayOrder: int(qi.GetDisplayOrder()),
+			ContainsPii:  qi.GetContainsPii().Or(false),
 			Choices:      choices,
 		})
 	}
@@ -264,6 +334,7 @@ func convertUpdateQuestions(in []oas.TalkSessionSurveyQuestionInput) ([]talksess
 			MinLabel:     optNilStringToPtr(qi.GetMinLabel()),
 			MaxLabel:     optNilStringToPtr(qi.GetMaxLabel()),
 			DisplayOrder: int(qi.GetDisplayOrder()),
+			ContainsPii:  qi.GetContainsPii().Or(false),
 			Choices:      choices,
 		})
 	}
@@ -297,7 +368,7 @@ func convertSubmitAnswers(in []oas.TalkSessionSurveyAnswerInput) ([]talksession_
 		if err != nil {
 			return nil, err
 		}
-		selected, err := parseUUIDList[survey.Choice](ai.GetSelectedChoiceIDs())
+		selected, err := shared.ParseUUIDs[survey.Choice](ai.GetSelectedChoiceIDs())
 		if err != nil {
 			return nil, err
 		}
@@ -313,25 +384,14 @@ func convertSubmitAnswers(in []oas.TalkSessionSurveyAnswerInput) ([]talksession_
 	return out, nil
 }
 
-func parseUUIDList[T any](in []string) ([]shared.UUID[T], error) {
-	out := make([]shared.UUID[T], 0, len(in))
-	for _, s := range in {
-		u, err := shared.ParseUUID[T](s)
-		if err != nil {
-			return nil, err
-		}
-		out = append(out, u)
-	}
-	return out, nil
-}
-
 func surveyToResponse(s *survey.Survey) *oas.TalkSessionSurvey {
 	res := &oas.TalkSessionSurvey{
 		SurveyID:      s.SurveyID().String(),
 		TalkSessionID: s.TalkSessionID().String(),
 	}
-	questions := make([]oas.TalkSessionSurveyQuestion, 0, len(s.ActiveQuestions()))
-	for _, q := range s.ActiveQuestions() {
+	active := s.ActiveQuestions()
+	questions := make([]oas.TalkSessionSurveyQuestion, 0, len(active))
+	for _, q := range active {
 		questions = append(questions, questionToResponse(q))
 	}
 	res.Questions = questions
@@ -339,8 +399,9 @@ func surveyToResponse(s *survey.Survey) *oas.TalkSessionSurvey {
 }
 
 func questionToResponse(q *survey.Question) oas.TalkSessionSurveyQuestion {
-	choices := make([]oas.TalkSessionSurveyChoice, 0, len(q.ActiveChoices()))
-	for _, c := range q.ActiveChoices() {
+	active := q.ActiveChoices()
+	choices := make([]oas.TalkSessionSurveyChoice, 0, len(active))
+	for _, c := range active {
 		choices = append(choices, oas.TalkSessionSurveyChoice{
 			ChoiceID:     c.ChoiceID().String(),
 			Text:         c.Text(),
@@ -359,6 +420,7 @@ func questionToResponse(q *survey.Question) oas.TalkSessionSurveyQuestion {
 		MinLabel:     utils.ToOptNil[oas.OptNilString](q.MinLabel()),
 		MaxLabel:     utils.ToOptNil[oas.OptNilString](q.MaxLabel()),
 		DisplayOrder: int32(q.DisplayOrder()),
+		ContainsPii:  q.ContainsPii(),
 		Choices:      choices,
 	}
 }

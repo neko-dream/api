@@ -19,7 +19,7 @@ UPDATE talk_session_surveys SET updated_at = $2 WHERE survey_id = $1;
 SELECT
     question_id, survey_id, question_text, question_type::text AS question_type,
     is_required, allow_other, max_length, min_value, max_value,
-    min_label, max_label, display_order, deleted_at, created_at, updated_at
+    min_label, max_label, display_order, contains_pii, deleted_at, created_at, updated_at
 FROM talk_session_survey_questions
 WHERE survey_id = $1
 ORDER BY display_order ASC, created_at ASC;
@@ -28,7 +28,7 @@ ORDER BY display_order ASC, created_at ASC;
 INSERT INTO talk_session_survey_questions (
     question_id, survey_id, question_text, question_type,
     is_required, allow_other, max_length, min_value, max_value,
-    min_label, max_label, display_order, created_at, updated_at
+    min_label, max_label, display_order, contains_pii, created_at, updated_at
 ) VALUES (
     sqlc.arg('question_id')::uuid,
     sqlc.arg('survey_id')::uuid,
@@ -42,6 +42,7 @@ INSERT INTO talk_session_survey_questions (
     sqlc.narg('min_label')::varchar,
     sqlc.narg('max_label')::varchar,
     sqlc.arg('display_order')::int,
+    sqlc.arg('contains_pii')::boolean,
     sqlc.arg('created_at')::timestamptz,
     sqlc.arg('updated_at')::timestamptz
 );
@@ -58,6 +59,7 @@ SET question_text = sqlc.arg('question_text')::text,
     min_label = sqlc.narg('min_label')::varchar,
     max_label = sqlc.narg('max_label')::varchar,
     display_order = sqlc.arg('display_order')::int,
+    contains_pii = sqlc.arg('contains_pii')::boolean,
     updated_at = sqlc.arg('updated_at')::timestamptz
 WHERE question_id = sqlc.arg('question_id')::uuid;
 
@@ -111,8 +113,8 @@ INSERT INTO talk_session_survey_submissions (submission_id, survey_id, user_id, 
 VALUES ($1, $2, $3, $4);
 
 -- name: CreateSurveyAnswer :exec
-INSERT INTO talk_session_survey_answers (answer_id, submission_id, question_id, answer_value, created_at)
-VALUES ($1, $2, $3, $4, $5);
+INSERT INTO talk_session_survey_answers (answer_id, submission_id, question_id, answer_value, is_encrypted, created_at)
+VALUES ($1, $2, $3, $4, $5, $6);
 
 -- name: HasSubmittedSurveyBySessionID :one
 SELECT EXISTS (
@@ -134,13 +136,19 @@ WHERE survey_id = $1
 ORDER BY submitted_at DESC
 LIMIT $2 OFFSET $3;
 
+-- name: ListAllSurveySubmissions :many
+SELECT submission_id, survey_id, user_id, submitted_at
+FROM talk_session_survey_submissions
+WHERE survey_id = $1
+ORDER BY submitted_at ASC;
+
 -- name: CountSurveySubmissions :one
 SELECT COUNT(*) AS submission_count
 FROM talk_session_survey_submissions
 WHERE survey_id = $1;
 
 -- name: ListSurveyAnswersBySubmissionIDs :many
-SELECT answer_id, submission_id, question_id, answer_value, created_at
+SELECT answer_id, submission_id, question_id, answer_value, is_encrypted, created_at
 FROM talk_session_survey_answers
 WHERE submission_id = ANY(sqlc.arg('submission_ids')::uuid[])
 ORDER BY created_at ASC;

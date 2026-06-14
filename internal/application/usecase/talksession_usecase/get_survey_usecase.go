@@ -2,8 +2,6 @@ package talksession_usecase
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/api/internal/domain/messages"
@@ -32,11 +30,9 @@ func (uc *getSurveyUseCase) Execute(ctx context.Context, talkSessionID shared.UU
 	ctx, span := otel.Tracer("talksession_query").Start(ctx, "getSurveyUseCase.Execute")
 	defer span.End()
 
+	// FindBySessionID は存在しない場合 (nil, nil) を返す契約
 	s, err := uc.surveyRepo.FindBySessionID(ctx, talkSessionID)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, messages.TalkSessionSurveyNotFound
-		}
 		utils.HandleError(ctx, err, "surveyRepo.FindBySessionID")
 		return nil, errtrace.Wrap(err)
 	}

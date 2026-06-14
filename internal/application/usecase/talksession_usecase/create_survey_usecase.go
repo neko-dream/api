@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"slices"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/api/internal/domain/messages"
@@ -39,6 +38,7 @@ type (
 		MinLabel     *string
 		MaxLabel     *string
 		DisplayOrder int
+		ContainsPii  bool
 		Choices      []SurveyChoiceInput
 	}
 
@@ -114,6 +114,7 @@ func (uc *createSurveyUseCase) Execute(ctx context.Context, input CreateSurveyIn
 			MinLabel:     qi.MinLabel,
 			MaxLabel:     qi.MaxLabel,
 			DisplayOrder: qi.DisplayOrder,
+			ContainsPii:  qi.ContainsPii,
 		})
 		for _, ci := range qi.Choices {
 			q.AddChoice(survey.NewChoice(shared.NewUUID[survey.Choice](), qid, ci.Text, ci.DisplayOrder))
@@ -127,13 +128,8 @@ func (uc *createSurveyUseCase) Execute(ctx context.Context, input CreateSurveyIn
 			return err
 		}
 
-		// 既存制限に survey.answered を追加
-		current := ts.RestrictionList()
-		if !slices.Contains(current, string(talksession.SurveyAnswered)) {
-			next := append(current, string(talksession.SurveyAnswered))
-			if err := ts.UpdateRestrictions(ctx, next); err != nil {
-				return err
-			}
+		// 既存制限に survey.answered を追加（既に含まれていれば no-op）
+		if ts.EnsureRestriction(talksession.SurveyAnswered) {
 			if err := uc.talkSessionRepo.Update(ctx, ts); err != nil {
 				return err
 			}

@@ -1,0 +1,351 @@
+desc: アンケート機能（全質問タイプ × 編集 × 集計）正常系
+runners:
+  req:
+    endpoint: http://localhost:3000
+    useCookie: true
+    notFollowRedirect: true
+    openapi3: http://localhost:3000/static/oas/openapi.yaml
+    skipValidateRequest: false
+    skipValidateResponse: true
+  dev: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
+
+vars:
+  ownerID: survey_full_owner
+  joinerID1: survey_full_joiner1
+  joinerID2: survey_full_joiner2
+  prefecture: 東京都
+  city: 渋谷区
+
+steps:
+  cleanup:
+    desc: テストデータ削除
+    dev:
+      query: |
+        DELETE FROM user_status_change_logs WHERE user_id IN (SELECT user_id FROM users WHERE display_id IN ('{{ vars.ownerID }}', '{{ vars.joinerID1 }}', '{{ vars.joinerID2 }}'));
+        DELETE FROM user_demographics WHERE user_id IN (SELECT user_id FROM users WHERE display_id IN ('{{ vars.ownerID }}', '{{ vars.joinerID1 }}', '{{ vars.joinerID2 }}'));
+        DELETE FROM user_auths WHERE subject IN ('{{ vars.ownerID }}', '{{ vars.joinerID1 }}', '{{ vars.joinerID2 }}');
+        DELETE FROM talksession_consents;
+        DELETE FROM votes;
+        DELETE FROM opinions;
+        DELETE FROM talk_sessions;
+        DELETE FROM users WHERE display_id IN ('{{ vars.ownerID }}', '{{ vars.joinerID1 }}', '{{ vars.joinerID2 }}');
+        DELETE FROM domain_events;
+
+  loginOwner:
+    desc: オーナーログイン
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.ownerID }}:
+        get:
+          headers: null
+
+  createOwner:
+    desc: オーナー作成
+    req:
+      /user:
+        post:
+          body:
+            multipart/form-data:
+              displayName: "{{ vars.ownerID }}"
+              displayID: "{{ vars.ownerID }}"
+              prefecture: "{{ vars.prefecture }}"
+              city: "{{ vars.city }}"
+
+  createSession:
+    desc: セッション作成
+    req:
+      /talksessions:
+        post:
+          body:
+            multipart/form-data:
+              theme: "全タイプアンケート"
+              description: "全質問タイプ"
+              scheduledEndTime: "2100-12-31T23:59:59Z"
+              prefecture: "{{ vars.prefecture }}"
+              city: "{{ vars.city }}"
+    bind:
+      session: current.res.body
+    test: current.res.status == 200
+
+  createSurveyAllTypes:
+    desc: 全 6 タイプ + allowOther でアンケート作成
+    req:
+      /talksessions/{{ session.id }}/survey:
+        post:
+          body:
+            application/json:
+              questions:
+                - text: "好きな色（単一・その他可）"
+                  type: "single_choice"
+                  isRequired: true
+                  allowOther: true
+                  maxLength: 200
+                  displayOrder: 0
+                  choices:
+                    - text: "赤"
+                      displayOrder: 0
+                    - text: "青"
+                      displayOrder: 1
+                - text: "好きな食べ物（複数可）"
+                  type: "multi_choice"
+                  isRequired: true
+                  allowOther: false
+                  displayOrder: 1
+                  choices:
+                    - text: "寿司"
+                      displayOrder: 0
+                    - text: "ラーメン"
+                      displayOrder: 1
+                    - text: "カレー"
+                      displayOrder: 2
+                - text: "満足度"
+                  type: "rating"
+                  isRequired: true
+                  allowOther: false
+                  minValue: 1
+                  maxValue: 5
+                  minLabel: "不満"
+                  maxLabel: "満足"
+                  displayOrder: 2
+                  choices: []
+                - text: "誕生日"
+                  type: "date"
+                  isRequired: false
+                  allowOther: false
+                  displayOrder: 3
+                  choices: []
+                - text: "ご職業（ドロップダウン）"
+                  type: "dropdown"
+                  isRequired: false
+                  allowOther: false
+                  displayOrder: 4
+                  choices:
+                    - text: "会社員"
+                      displayOrder: 0
+                    - text: "学生"
+                      displayOrder: 1
+                - text: "ご意見"
+                  type: "free_text"
+                  isRequired: false
+                  allowOther: false
+                  maxLength: 500
+                  displayOrder: 5
+                  choices: []
+    bind:
+      survey: current.res.body
+    test: |
+      current.res.status == 200 &&
+      len(current.res.body.questions) == 6
+
+  updateSurveyAddQuestionAndEditText:
+    desc: 編集：新規質問を追加 + 既存の単一選択質問のテキストを変更
+    req:
+      /talksessions/{{ session.id }}/survey:
+        put:
+          body:
+            application/json:
+              questions:
+                - questionID: "{{ survey.questions[0].questionID }}"
+                  text: "好きな色は何ですか？（改訂）"
+                  type: "single_choice"
+                  isRequired: true
+                  allowOther: true
+                  maxLength: 200
+                  displayOrder: 0
+                  choices:
+                    - choiceID: "{{ survey.questions[0].choices[0].choiceID }}"
+                      text: "赤"
+                      displayOrder: 0
+                    - choiceID: "{{ survey.questions[0].choices[1].choiceID }}"
+                      text: "青"
+                      displayOrder: 1
+                - text: "追加質問：おすすめのプログラミング言語"
+                  type: "free_text"
+                  isRequired: false
+                  allowOther: false
+                  maxLength: 100
+                  displayOrder: 6
+                  choices: []
+    bind:
+      updatedSurvey: current.res.body
+    test: |
+      current.res.status == 200 &&
+      len(current.res.body.questions) == 7 &&
+      current.res.body.questions[0].text == "好きな色は何ですか？（改訂）"
+
+  loginJoiner1:
+    desc: 参加者1ログイン
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.joinerID1 }}:
+        get:
+          headers: null
+
+  createJoiner1:
+    desc: 参加者1作成
+    req:
+      /user:
+        post:
+          body:
+            multipart/form-data:
+              displayName: "{{ vars.joinerID1 }}"
+              displayID: "{{ vars.joinerID1 }}"
+              prefecture: "{{ vars.prefecture }}"
+              city: "{{ vars.city }}"
+
+  submitJoiner1:
+    desc: 参加者1が全タイプ回答（rating=5、色=赤、食べ物=寿司+ラーメン、職業=会社員、日付・自由記述あり）
+    req:
+      /talksessions/{{ session.id }}/survey/submissions:
+        post:
+          body:
+            application/json:
+              answers:
+                - questionID: "{{ updatedSurvey.questions[0].questionID }}"
+                  selectedChoiceIDs: ["{{ updatedSurvey.questions[0].choices[0].choiceID }}"]
+                - questionID: "{{ updatedSurvey.questions[1].questionID }}"
+                  selectedChoiceIDs:
+                    - "{{ updatedSurvey.questions[1].choices[0].choiceID }}"
+                    - "{{ updatedSurvey.questions[1].choices[1].choiceID }}"
+                - questionID: "{{ updatedSurvey.questions[2].questionID }}"
+                  rating: 5
+                - questionID: "{{ updatedSurvey.questions[3].questionID }}"
+                  date: "1990-04-01"
+                - questionID: "{{ updatedSurvey.questions[4].questionID }}"
+                  selectedChoiceIDs: ["{{ updatedSurvey.questions[4].choices[0].choiceID }}"]
+                - questionID: "{{ updatedSurvey.questions[5].questionID }}"
+                  text: "良かったです"
+                - questionID: "{{ updatedSurvey.questions[6].questionID }}"
+                  text: "Go"
+    test: current.res.status == 200
+
+  loginJoiner2:
+    desc: 参加者2ログイン
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.joinerID2 }}:
+        get:
+          headers: null
+
+  createJoiner2:
+    desc: 参加者2作成
+    req:
+      /user:
+        post:
+          body:
+            multipart/form-data:
+              displayName: "{{ vars.joinerID2 }}"
+              displayID: "{{ vars.joinerID2 }}"
+              prefecture: "{{ vars.prefecture }}"
+              city: "{{ vars.city }}"
+
+  submitJoiner2:
+    desc: 参加者2 は色=その他、食べ物=カレーのみ、rating=3
+    req:
+      /talksessions/{{ session.id }}/survey/submissions:
+        post:
+          body:
+            application/json:
+              answers:
+                - questionID: "{{ updatedSurvey.questions[0].questionID }}"
+                  other: "緑"
+                - questionID: "{{ updatedSurvey.questions[1].questionID }}"
+                  selectedChoiceIDs:
+                    - "{{ updatedSurvey.questions[1].choices[2].choiceID }}"
+                - questionID: "{{ updatedSurvey.questions[2].questionID }}"
+                  rating: 3
+    test: current.res.status == 200
+
+  loginOwnerAgain:
+    desc: オーナーで再ログイン
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.ownerID }}:
+        get:
+          headers: null
+
+  getSummary:
+    desc: 集計取得
+    req:
+      /talksessions/{{ session.id }}/survey/summary:
+        get:
+          headers: null
+    bind:
+      summary: current.res.body
+    test: |
+      current.res.status == 200 &&
+      current.res.body.submissionCount == 2 &&
+      len(current.res.body.questionSummaries) == 7
+
+  verifySingleChoiceSummary:
+    desc: single_choice：赤=1件、青=0件、other=1件、answerCount=2
+    req:
+      /talksessions/{{ session.id }}/survey/summary:
+        get:
+          headers: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.questionSummaries[0].type == "single_choice" &&
+      current.res.body.questionSummaries[0].answerCount == 2 &&
+      current.res.body.questionSummaries[0].otherCount == 1 &&
+      len(filter(current.res.body.questionSummaries[0].choiceCounts, #.text == "赤" && #.count == 1)) == 1 &&
+      len(filter(current.res.body.questionSummaries[0].choiceCounts, #.text == "青" && #.count == 0)) == 1
+
+  verifyMultiChoiceSummary:
+    desc: multi_choice：寿司=1、ラーメン=1、カレー=1、answerCount=2
+    req:
+      /talksessions/{{ session.id }}/survey/summary:
+        get:
+          headers: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.questionSummaries[1].type == "multi_choice" &&
+      current.res.body.questionSummaries[1].answerCount == 2 &&
+      len(filter(current.res.body.questionSummaries[1].choiceCounts, #.text == "寿司" && #.count == 1)) == 1 &&
+      len(filter(current.res.body.questionSummaries[1].choiceCounts, #.text == "ラーメン" && #.count == 1)) == 1 &&
+      len(filter(current.res.body.questionSummaries[1].choiceCounts, #.text == "カレー" && #.count == 1)) == 1
+
+  verifyRatingSummary:
+    desc: rating：平均=(5+3)/2=4.0、分布で 5=1件、3=1件、その他は 0
+    req:
+      /talksessions/{{ session.id }}/survey/summary:
+        get:
+          headers: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.questionSummaries[2].type == "rating" &&
+      current.res.body.questionSummaries[2].answerCount == 2 &&
+      current.res.body.questionSummaries[2].ratingAverage == 4.0 &&
+      len(filter(current.res.body.questionSummaries[2].ratingDistribution, #.value == 5 && #.count == 1)) == 1 &&
+      len(filter(current.res.body.questionSummaries[2].ratingDistribution, #.value == 3 && #.count == 1)) == 1 &&
+      len(filter(current.res.body.questionSummaries[2].ratingDistribution, #.value == 1 && #.count == 0)) == 1
+
+  verifyDateSummary:
+    desc: date：joiner1のみ回答 → answerCount=1
+    req:
+      /talksessions/{{ session.id }}/survey/summary:
+        get:
+          headers: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.questionSummaries[3].type == "date" &&
+      current.res.body.questionSummaries[3].answerCount == 1
+
+  verifyDropdownSummary:
+    desc: dropdown：会社員=1、学生=0、answerCount=1
+    req:
+      /talksessions/{{ session.id }}/survey/summary:
+        get:
+          headers: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.questionSummaries[4].type == "dropdown" &&
+      current.res.body.questionSummaries[4].answerCount == 1 &&
+      len(filter(current.res.body.questionSummaries[4].choiceCounts, #.text == "会社員" && #.count == 1)) == 1
+
+  verifyFreeTextSummary:
+    desc: free_text：joiner1のみ回答 → answerCount=1
+    req:
+      /talksessions/{{ session.id }}/survey/summary:
+        get:
+          headers: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.questionSummaries[5].type == "free_text" &&
+      current.res.body.questionSummaries[5].answerCount == 1

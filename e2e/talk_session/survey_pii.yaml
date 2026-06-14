@@ -1,0 +1,203 @@
+desc: アンケート PII フラグ：暗号化保存 → 復号取得の正常系
+runners:
+  req:
+    endpoint: http://localhost:3000
+    useCookie: true
+    notFollowRedirect: true
+    openapi3: http://localhost:3000/static/oas/openapi.yaml
+    skipValidateRequest: false
+    skipValidateResponse: true
+  dev: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
+
+vars:
+  ownerID: survey_pii_owner
+  joinerID: survey_pii_joiner
+  prefecture: 東京都
+  city: 渋谷区
+
+steps:
+  cleanup:
+    desc: テストデータ削除
+    dev:
+      query: |
+        DELETE FROM user_status_change_logs WHERE user_id IN (SELECT user_id FROM users WHERE display_id IN ('{{ vars.ownerID }}', '{{ vars.joinerID }}'));
+        DELETE FROM user_demographics WHERE user_id IN (SELECT user_id FROM users WHERE display_id IN ('{{ vars.ownerID }}', '{{ vars.joinerID }}'));
+        DELETE FROM user_auths WHERE subject IN ('{{ vars.ownerID }}', '{{ vars.joinerID }}');
+        DELETE FROM talksession_consents;
+        DELETE FROM votes;
+        DELETE FROM opinions;
+        DELETE FROM talk_sessions;
+        DELETE FROM users WHERE display_id IN ('{{ vars.ownerID }}', '{{ vars.joinerID }}');
+        DELETE FROM domain_events;
+
+  loginOwner:
+    desc: オーナーログイン
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.ownerID }}:
+        get:
+          headers: null
+
+  createOwner:
+    desc: オーナー作成
+    req:
+      /user:
+        post:
+          body:
+            multipart/form-data:
+              displayName: "{{ vars.ownerID }}"
+              displayID: "{{ vars.ownerID }}"
+              prefecture: "{{ vars.prefecture }}"
+              city: "{{ vars.city }}"
+
+  createSession:
+    desc: セッション作成
+    req:
+      /talksessions:
+        post:
+          body:
+            multipart/form-data:
+              theme: "PIIアンケート"
+              description: "PII"
+              scheduledEndTime: "2100-12-31T23:59:59Z"
+              prefecture: "{{ vars.prefecture }}"
+              city: "{{ vars.city }}"
+    bind:
+      session: current.res.body
+    test: current.res.status == 200
+
+  createSurveyWithPii:
+    desc: PII フラグ付きで free_text 質問を含むアンケート作成
+    req:
+      /talksessions/{{ session.id }}/survey:
+        post:
+          body:
+            application/json:
+              questions:
+                - text: "あなたのメールアドレス（PII）"
+                  type: "free_text"
+                  isRequired: true
+                  allowOther: false
+                  maxLength: 200
+                  displayOrder: 0
+                  containsPii: true
+                  choices: []
+                - text: "誕生日（PII）"
+                  type: "date"
+                  isRequired: false
+                  allowOther: false
+                  displayOrder: 1
+                  containsPii: true
+                  choices: []
+                - text: "公開可能なコメント"
+                  type: "free_text"
+                  isRequired: false
+                  allowOther: false
+                  maxLength: 500
+                  displayOrder: 2
+                  containsPii: false
+                  choices: []
+    bind:
+      survey: current.res.body
+    test: |
+      current.res.status == 200 &&
+      current.res.body.questions[0].containsPii == true &&
+      current.res.body.questions[1].containsPii == true &&
+      current.res.body.questions[2].containsPii == false
+
+  loginJoiner:
+    desc: 参加者ログイン
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.joinerID }}:
+        get:
+          headers: null
+
+  createJoiner:
+    desc: 参加者作成
+    req:
+      /user:
+        post:
+          body:
+            multipart/form-data:
+              displayName: "{{ vars.joinerID }}"
+              displayID: "{{ vars.joinerID }}"
+              prefecture: "{{ vars.prefecture }}"
+              city: "{{ vars.city }}"
+
+  submitAnswers:
+    desc: PII を含めて回答送信
+    req:
+      /talksessions/{{ session.id }}/survey/submissions:
+        post:
+          body:
+            application/json:
+              answers:
+                - questionID: "{{ survey.questions[0].questionID }}"
+                  text: "secret@example.com"
+                - questionID: "{{ survey.questions[1].questionID }}"
+                  date: "1990-04-01"
+                - questionID: "{{ survey.questions[2].questionID }}"
+                  text: "公開コメント"
+    test: current.res.status == 200
+
+  verifyDbStoredEncrypted:
+    desc: DB 上では PII 設問の text/date が暗号文として保存されている（v1.xxxxx.yyyy 形式・平文と一致しない）
+    dev:
+      query: |
+        SELECT
+          (SELECT is_encrypted FROM talk_session_survey_answers ans
+            INNER JOIN talk_session_survey_questions q ON q.question_id = ans.question_id
+            WHERE q.question_text = 'あなたのメールアドレス（PII）') AS email_is_encrypted,
+          (SELECT (answer_value->>'text') LIKE 'v1.%' FROM talk_session_survey_answers ans
+            INNER JOIN talk_session_survey_questions q ON q.question_id = ans.question_id
+            WHERE q.question_text = 'あなたのメールアドレス（PII）') AS email_text_looks_encrypted,
+          (SELECT (answer_value->>'text') = 'secret@example.com' FROM talk_session_survey_answers ans
+            INNER JOIN talk_session_survey_questions q ON q.question_id = ans.question_id
+            WHERE q.question_text = 'あなたのメールアドレス（PII）') AS email_text_is_plaintext,
+          (SELECT is_encrypted FROM talk_session_survey_answers ans
+            INNER JOIN talk_session_survey_questions q ON q.question_id = ans.question_id
+            WHERE q.question_text = '公開可能なコメント') AS public_is_encrypted,
+          (SELECT (answer_value->>'text') = '公開コメント' FROM talk_session_survey_answers ans
+            INNER JOIN talk_session_survey_questions q ON q.question_id = ans.question_id
+            WHERE q.question_text = '公開可能なコメント') AS public_text_is_plaintext;
+    test: |
+      current.rows[0].email_is_encrypted == true &&
+      current.rows[0].email_text_looks_encrypted == true &&
+      current.rows[0].email_text_is_plaintext == false &&
+      current.rows[0].public_is_encrypted == false &&
+      current.rows[0].public_text_is_plaintext == true
+
+  loginOwnerAgain:
+    desc: オーナーで再ログイン
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.ownerID }}:
+        get:
+          headers: null
+
+  listSubmissionsDecrypted:
+    desc: オーナーが回答一覧取得時、PII 設問の text/date は復号されて平文で返る
+    req:
+      /talksessions/{{ session.id }}/survey/submissions:
+        get:
+          headers: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.totalCount == 1 &&
+      len(filter(current.res.body.submissions[0].answers,
+        #.questionID == survey.questions[0].questionID && #.text == "secret@example.com")) == 1 &&
+      len(filter(current.res.body.submissions[0].answers,
+        #.questionID == survey.questions[1].questionID && #.date == "1990-04-01")) == 1 &&
+      len(filter(current.res.body.submissions[0].answers,
+        #.questionID == survey.questions[2].questionID && #.text == "公開コメント")) == 1
+
+  summaryAnswerCount:
+    desc: 集計：PII でも answerCount は数えられる
+    req:
+      /talksessions/{{ session.id }}/survey/summary:
+        get:
+          headers: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.questionSummaries[0].containsPii == true &&
+      current.res.body.questionSummaries[0].answerCount == 1 &&
+      current.res.body.questionSummaries[1].containsPii == true &&
+      current.res.body.questionSummaries[1].answerCount == 1

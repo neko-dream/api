@@ -147,4 +147,22 @@ namespace kotohiro {
     @statusCode statusCode: 404;
     @body body: {};
   };
+
+  /**
+   * セッションオーナー向け：質問ごとに集計した結果を取得
+   */
+  @tag("talk_session")
+  @extension("x-ogen-operation-group", "TalkSession")
+  @route("/talksessions/{talkSessionID}/survey/summary")
+  @get
+  @summary("アンケート集計結果（オーナー）")
+  op getTalkSessionSurveySummary(
+    @path talkSessionID: string,
+  ): TalkSessionSurveySummary | {
+    @statusCode statusCode: 403;
+    @body body: {};
+  } | {
+    @statusCode statusCode: 404;
+    @body body: {};
+  };
 }
