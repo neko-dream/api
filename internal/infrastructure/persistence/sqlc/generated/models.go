@@ -6,13 +6,61 @@ package model
 
 import (
 	"database/sql"
+	"database/sql/driver"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/neko-dream/api/internal/domain/model/talksession"
 	"github.com/sqlc-dev/pqtype"
 )
+
+type TalkSessionSurveyQuestionType string
+
+const (
+	TalkSessionSurveyQuestionTypeFreeText     TalkSessionSurveyQuestionType = "free_text"
+	TalkSessionSurveyQuestionTypeSingleChoice TalkSessionSurveyQuestionType = "single_choice"
+	TalkSessionSurveyQuestionTypeMultiChoice  TalkSessionSurveyQuestionType = "multi_choice"
+	TalkSessionSurveyQuestionTypeRating       TalkSessionSurveyQuestionType = "rating"
+	TalkSessionSurveyQuestionTypeDate         TalkSessionSurveyQuestionType = "date"
+	TalkSessionSurveyQuestionTypeDropdown     TalkSessionSurveyQuestionType = "dropdown"
+)
+
+func (e *TalkSessionSurveyQuestionType) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = TalkSessionSurveyQuestionType(s)
+	case string:
+		*e = TalkSessionSurveyQuestionType(s)
+	default:
+		return fmt.Errorf("unsupported scan type for TalkSessionSurveyQuestionType: %T", src)
+	}
+	return nil
+}
+
+type NullTalkSessionSurveyQuestionType struct {
+	TalkSessionSurveyQuestionType TalkSessionSurveyQuestionType
+	Valid                         bool // Valid is true if TalkSessionSurveyQuestionType is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullTalkSessionSurveyQuestionType) Scan(value interface{}) error {
+	if value == nil {
+		ns.TalkSessionSurveyQuestionType, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.TalkSessionSurveyQuestionType.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullTalkSessionSurveyQuestionType) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.TalkSessionSurveyQuestionType), nil
+}
 
 type ActionItem struct {
 	ActionItemID  uuid.UUID
@@ -248,6 +296,56 @@ type TalkSessionReportHistory struct {
 	TalkSessionID              uuid.UUID
 	Report                     string
 	CreatedAt                  time.Time
+}
+
+type TalkSessionSurvey struct {
+	SurveyID      uuid.UUID
+	TalkSessionID uuid.UUID
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+}
+
+type TalkSessionSurveyAnswer struct {
+	AnswerID     uuid.UUID
+	SubmissionID uuid.UUID
+	QuestionID   uuid.UUID
+	AnswerValue  json.RawMessage
+	CreatedAt    time.Time
+}
+
+type TalkSessionSurveyChoice struct {
+	ChoiceID     uuid.UUID
+	QuestionID   uuid.UUID
+	ChoiceText   string
+	DisplayOrder int32
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	DeletedAt    sql.NullTime
+}
+
+type TalkSessionSurveyQuestion struct {
+	QuestionID   uuid.UUID
+	SurveyID     uuid.UUID
+	QuestionText string
+	QuestionType TalkSessionSurveyQuestionType
+	IsRequired   bool
+	AllowOther   bool
+	MaxLength    sql.NullInt32
+	MinValue     sql.NullInt32
+	MaxValue     sql.NullInt32
+	MinLabel     sql.NullString
+	MaxLabel     sql.NullString
+	DisplayOrder int32
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	DeletedAt    sql.NullTime
+}
+
+type TalkSessionSurveySubmission struct {
+	SubmissionID uuid.UUID
+	SurveyID     uuid.UUID
+	UserID       uuid.UUID
+	SubmittedAt  time.Time
 }
 
 type TalksessionConsent struct {

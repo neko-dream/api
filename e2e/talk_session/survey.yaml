@@ -1,0 +1,226 @@
+desc: アンケート機能（作成・回答・参加ゲート）のテスト
+runners:
+  req:
+    endpoint: http://localhost:3000
+    useCookie: true
+    notFollowRedirect: true
+    openapi3: http://localhost:3000/static/oas/openapi.yaml
+    skipValidateRequest: false
+    skipValidateResponse: true
+  dev: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
+
+vars:
+  ownerID: survey_owner
+  ownerName: survey_owner
+  joinerID: survey_joiner
+  joinerName: survey_joiner
+  prefecture: 東京都
+  city: 渋谷区
+  theme: アンケート付きセッション
+  desc: 参加にアンケート回答が必要
+
+steps:
+  cleanup:
+    desc: テストデータ削除
+    dev:
+      query: |
+        DELETE FROM user_status_change_logs WHERE user_id IN (SELECT user_id FROM users WHERE display_id IN ('{{ vars.ownerID }}', '{{ vars.joinerID }}'));
+        DELETE FROM user_demographics WHERE user_id IN (SELECT user_id FROM users WHERE display_id IN ('{{ vars.ownerID }}', '{{ vars.joinerID }}'));
+        DELETE FROM user_auths WHERE subject IN ('{{ vars.ownerID }}', '{{ vars.joinerID }}');
+        DELETE FROM talksession_consents;
+        DELETE FROM votes;
+        DELETE FROM opinions;
+        DELETE FROM talk_session_survey_answers;
+        DELETE FROM talk_session_survey_submissions;
+        DELETE FROM talk_session_survey_choices;
+        DELETE FROM talk_session_survey_questions;
+        DELETE FROM talk_session_surveys;
+        DELETE FROM talk_sessions;
+        DELETE FROM users WHERE display_id IN ('{{ vars.ownerID }}', '{{ vars.joinerID }}');
+        DELETE FROM domain_events;
+
+  loginOwner:
+    desc: オーナーログイン
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.ownerID }}:
+        get:
+          headers: null
+
+  createOwner:
+    desc: オーナー作成
+    req:
+      /user:
+        post:
+          body:
+            multipart/form-data:
+              displayName: "{{ vars.ownerName }}"
+              displayID: "{{ vars.ownerID }}"
+              prefecture: "{{ vars.prefecture }}"
+              city: "{{ vars.city }}"
+
+  createSession:
+    desc: セッション作成
+    req:
+      /talksessions:
+        post:
+          body:
+            multipart/form-data:
+              theme: "{{ vars.theme }}"
+              description: "{{ vars.desc }}"
+              scheduledEndTime: "2100-12-31T23:59:59Z"
+              prefecture: "{{ vars.prefecture }}"
+              city: "{{ vars.city }}"
+    bind:
+      session: current.res.body
+    test: current.res.status == 200
+
+  createSurvey:
+    desc: アンケート作成
+    req:
+      /talksessions/{{ session.id }}/survey:
+        post:
+          body:
+            application/json:
+              questions:
+                - text: "好きな色は？"
+                  type: "single_choice"
+                  isRequired: true
+                  allowOther: false
+                  displayOrder: 0
+                  choices:
+                    - text: "赤"
+                      displayOrder: 0
+                    - text: "青"
+                      displayOrder: 1
+                - text: "ご意見（任意）"
+                  type: "free_text"
+                  isRequired: false
+                  allowOther: false
+                  maxLength: 500
+                  displayOrder: 1
+                  choices: []
+    bind:
+      survey: current.res.body
+    test: |
+      current.res.status == 200 &&
+      len(current.res.body.questions) == 2 &&
+      current.res.body.questions[0].type == "single_choice" &&
+      len(current.res.body.questions[0].choices) == 2
+
+  createSurveyTwiceFails:
+    desc: 2回目の作成は 409 Conflict
+    req:
+      /talksessions/{{ session.id }}/survey:
+        post:
+          body:
+            application/json:
+              questions: []
+    test: current.res.status == 409
+
+  getSurveyByOwner:
+    desc: オーナーがアンケート取得
+    req:
+      /talksessions/{{ session.id }}/survey:
+        get:
+          headers: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.surveyID == survey.surveyID
+
+  loginJoiner:
+    desc: 参加者ログイン
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.joinerID }}:
+        get:
+          headers: null
+
+  createJoiner:
+    desc: 参加者作成
+    req:
+      /user:
+        post:
+          body:
+            multipart/form-data:
+              displayName: "{{ vars.joinerName }}"
+              displayID: "{{ vars.joinerID }}"
+              prefecture: "{{ vars.prefecture }}"
+              city: "{{ vars.city }}"
+
+  consentBeforeSurveyFails:
+    desc: アンケート未回答で /consent しても restriction に survey.answered が出る
+    req:
+      /talksessions/{{ session.id }}/restrictions:
+        get:
+          headers: null
+    test: |
+      current.res.status == 200 &&
+      len(filter(current.res.body, #.key == "survey.answered")) == 1
+
+  submitInvalidAnswerFails:
+    desc: 必須質問を空にすると400
+    req:
+      /talksessions/{{ session.id }}/survey/submissions:
+        post:
+          body:
+            application/json:
+              answers:
+                - questionID: "{{ survey.questions[0].questionID }}"
+                  selectedChoiceIDs: []
+    test: current.res.status == 400
+
+  submitValidAnswer:
+    desc: 正しい回答で 200
+    req:
+      /talksessions/{{ session.id }}/survey/submissions:
+        post:
+          body:
+            application/json:
+              answers:
+                - questionID: "{{ survey.questions[0].questionID }}"
+                  selectedChoiceIDs: ["{{ survey.questions[0].choices[0].choiceID }}"]
+                - questionID: "{{ survey.questions[1].questionID }}"
+                  text: "テストです"
+    test: |
+      current.res.status == 200 &&
+      current.res.body.submissionID != ""
+
+  submitTwiceFails:
+    desc: 2回目の送信は 409
+    req:
+      /talksessions/{{ session.id }}/survey/submissions:
+        post:
+          body:
+            application/json:
+              answers:
+                - questionID: "{{ survey.questions[0].questionID }}"
+                  selectedChoiceIDs: ["{{ survey.questions[0].choices[0].choiceID }}"]
+    test: current.res.status == 409
+
+  restrictionSatisfiedAfterSubmit:
+    desc: 回答後は survey.answered が満たされている（restrictions/satisfied に出ない）
+    req:
+      /talksessions/{{ session.id }}/restrictions:
+        get:
+          headers: null
+    test: |
+      current.res.status == 200 &&
+      len(filter(current.res.body, #.key == "survey.answered")) == 0
+
+  loginOwnerAgain:
+    desc: オーナーで再ログイン
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.ownerID }}:
+        get:
+          headers: null
+
+  listSubmissions:
+    desc: オーナーが回答一覧を取得
+    req:
+      /talksessions/{{ session.id }}/survey/submissions:
+        get:
+          headers: null
+    test: |
+      current.res.status == 200 &&
+      current.res.body.totalCount == 1 &&
+      len(current.res.body.submissions) == 1 &&
+      len(current.res.body.submissions[0].answers) == 2

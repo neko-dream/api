@@ -7,6 +7,7 @@ import (
 	"github.com/neko-dream/api/internal/domain/messages"
 	"github.com/neko-dream/api/internal/domain/model/shared"
 	"github.com/neko-dream/api/internal/domain/model/talksession"
+	"github.com/neko-dream/api/internal/domain/model/talksession/survey"
 	"github.com/neko-dream/api/internal/domain/model/talksession/talksession_consent"
 	"github.com/neko-dream/api/internal/domain/model/user"
 	"github.com/neko-dream/api/pkg/utils"
@@ -23,17 +24,20 @@ type talkSessionAccessControl struct {
 	talksession.TalkSessionRepository
 	user.UserRepository
 	talksession_consent.TalkSessionConsentService
+	surveyRepository survey.Repository
 }
 
 func NewTalkSessionAccessControl(
 	talkSessionRepository talksession.TalkSessionRepository,
 	userRepository user.UserRepository,
 	talkSessionConsentService talksession_consent.TalkSessionConsentService,
+	surveyRepository survey.Repository,
 ) TalkSessionAccessControl {
 	return &talkSessionAccessControl{
 		TalkSessionRepository:     talkSessionRepository,
 		UserRepository:            userRepository,
 		TalkSessionConsentService: talkSessionConsentService,
+		surveyRepository:          surveyRepository,
 	}
 }
 
@@ -77,9 +81,27 @@ func (t *talkSessionAccessControl) CanUserJoin(ctx context.Context, talkSessionI
 		return false, messages.GuestCannotJoinRestrictedSessionError
 	}
 
+	// 未認証ユーザーは制限付きセッションには参加できない（user/userID 参照前のガード）
+	if userID == nil && len(talkSession.Restrictions()) > 0 {
+		e := ErrRestrictionNotSatisfied
+		e.Message = "このセッションは認証が必要です。"
+		return false, &e
+	}
+
 	// 参加制限がある場合は、ユーザーが参加可能かを判定し、もし参加制限に引っかかる場合はエラーを返す
 	var restrictions []talksession.RestrictionAttribute
 	for _, restriction := range talkSession.Restrictions() {
+		if restriction.Key == talksession.SurveyAnswered {
+			submitted, err := t.surveyRepository.HasSubmittedBySessionID(ctx, talkSessionID, *userID)
+			if err != nil {
+				utils.HandleError(ctx, err, "surveyRepository.HasSubmittedBySessionID")
+				return false, err
+			}
+			if !submitted {
+				restrictions = append(restrictions, *restriction)
+			}
+			continue
+		}
 		if !restriction.IsSatisfied(*user) {
 			restrictions = append(restrictions, *restriction)
 		}
@@ -145,6 +167,17 @@ func (t *talkSessionAccessControl) UserSatisfiesRestriction(ctx context.Context,
 	// 参加制限がある場合は、ユーザーが参加可能かを判定し、もし参加制限に引っかかる場合はエラーを返す
 	var restrictions []talksession.RestrictionAttribute
 	for _, restriction := range talkSession.Restrictions() {
+		if restriction.Key == talksession.SurveyAnswered {
+			submitted, err := t.surveyRepository.HasSubmittedBySessionID(ctx, talkSessionID, userID)
+			if err != nil {
+				utils.HandleError(ctx, err, "surveyRepository.HasSubmittedBySessionID")
+				return nil, err
+			}
+			if !submitted {
+				restrictions = append(restrictions, *restriction)
+			}
+			continue
+		}
 		if !restriction.IsSatisfied(*u) {
 			restrictions = append(restrictions, *restriction)
 		}

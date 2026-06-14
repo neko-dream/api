@@ -7,6 +7,7 @@ import (
 	"github.com/neko-dream/api/internal/domain/messages"
 	"github.com/neko-dream/api/internal/domain/model/shared"
 	"github.com/neko-dream/api/internal/domain/model/talksession"
+	"github.com/neko-dream/api/internal/domain/model/talksession/survey"
 	"github.com/neko-dream/api/internal/domain/model/talksession/talksession_consent"
 	"github.com/neko-dream/api/internal/domain/model/user"
 	"github.com/samber/lo"
@@ -57,6 +58,11 @@ func (m *mockTalkSessionConsentService) HasConsented(ctx context.Context, talkSe
 	return args.Get(0).(bool), args.Error(1)
 }
 
+// テストでは survey 関連の判定は使わないため、survey.Repository を埋め込みのみで満たす。
+type mockSurveyRepository struct {
+	survey.Repository
+}
+
 func TestCanUserJoin(t *testing.T) {
 	ctx := context.Background()
 
@@ -67,7 +73,7 @@ func TestCanUserJoin(t *testing.T) {
 		mockTSConsent := &mockTalkSessionConsentService{}
 		talkSessionID := shared.NewUUID[talksession.TalkSession]()
 		userID := shared.NewUUID[user.User]()
-		svc := NewTalkSessionAccessControl(mockTS, mockUser, mockTSConsent)
+		svc := NewTalkSessionAccessControl(mockTS, mockUser, mockTSConsent, &mockSurveyRepository{})
 
 		mockTS.On("FindByID", mock.Anything, talkSessionID).Return(&talksession.TalkSession{}, nil)
 		mockUser.On("FindByID", mock.Anything, userID).Return(&user.User{}, nil)
@@ -90,7 +96,7 @@ func TestCanUserJoin(t *testing.T) {
 		mockTSConsent := &mockTalkSessionConsentService{}
 		talkSessionID := shared.NewUUID[talksession.TalkSession]()
 		userID := shared.NewUUID[user.User]()
-		svc := NewTalkSessionAccessControl(mockTS, mockUser, mockTSConsent)
+		svc := NewTalkSessionAccessControl(mockTS, mockUser, mockTSConsent, &mockSurveyRepository{})
 
 		mockTS.On("FindByID", mock.Anything, talkSessionID).Return(nil, messages.TalkSessionNotFound)
 
@@ -111,7 +117,7 @@ func TestCanUserJoin(t *testing.T) {
 		mockTSConsent := &mockTalkSessionConsentService{}
 		talkSessionID := shared.NewUUID[talksession.TalkSession]()
 		userID := shared.NewUUID[user.User]()
-		svc := NewTalkSessionAccessControl(mockTS, mockUser, mockTSConsent)
+		svc := NewTalkSessionAccessControl(mockTS, mockUser, mockTSConsent, &mockSurveyRepository{})
 
 		ts := &talksession.TalkSession{}
 		demographics := user.NewUserDemographic(
@@ -149,7 +155,7 @@ func TestCanUserJoin(t *testing.T) {
 		mockTSConsent := &mockTalkSessionConsentService{}
 		talkSessionID := shared.NewUUID[talksession.TalkSession]()
 		userID := shared.NewUUID[user.User]()
-		svc := NewTalkSessionAccessControl(mockTS, mockUser, mockTSConsent)
+		svc := NewTalkSessionAccessControl(mockTS, mockUser, mockTSConsent, &mockSurveyRepository{})
 
 		ts := &talksession.TalkSession{}
 		demographics := user.NewUserDemographic(
@@ -188,7 +194,7 @@ func TestCanUserJoin(t *testing.T) {
 		mockTSConsent := &mockTalkSessionConsentService{}
 		talkSessionID := shared.NewUUID[talksession.TalkSession]()
 		userID := shared.NewUUID[user.User]()
-		svc := NewTalkSessionAccessControl(mockTS, mockUser, mockTSConsent)
+		svc := NewTalkSessionAccessControl(mockTS, mockUser, mockTSConsent, &mockSurveyRepository{})
 
 		ts := &talksession.TalkSession{}
 		demographics := user.NewUserDemographic(
