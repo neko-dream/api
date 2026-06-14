@@ -2423,6 +2423,7 @@ type InitiateTalkSessionReq struct {
 	Restrictions     []string   `json:"restrictions"`
 	AliasId          OptString  `json:"aliasId"`
 	HideTop          OptNilBool `json:"hideTop"`
+	Passphrase       OptString  `json:"passphrase"`
 }
 
 // GetTheme returns the value of Theme.
@@ -2480,6 +2481,11 @@ func (s *InitiateTalkSessionReq) GetHideTop() OptNilBool {
 	return s.HideTop
 }
 
+// GetPassphrase returns the value of Passphrase.
+func (s *InitiateTalkSessionReq) GetPassphrase() OptString {
+	return s.Passphrase
+}
+
 // SetTheme sets the value of Theme.
 func (s *InitiateTalkSessionReq) SetTheme(val string) {
 	s.Theme = val
@@ -2533,6 +2539,11 @@ func (s *InitiateTalkSessionReq) SetAliasId(val OptString) {
 // SetHideTop sets the value of HideTop.
 func (s *InitiateTalkSessionReq) SetHideTop(val OptNilBool) {
 	s.HideTop = val
+}
+
+// SetPassphrase sets the value of Passphrase.
+func (s *InitiateTalkSessionReq) SetPassphrase(val OptString) {
+	s.Passphrase = val
 }
 
 type InviteOrganizationBadRequest struct{}
@@ -2619,6 +2630,59 @@ func (s *InviteOrganizationReq) SetEmail(val string) {
 // SetRole sets the value of Role.
 func (s *InviteOrganizationReq) SetRole(val float64) {
 	s.Role = val
+}
+
+type JoinLockedSessionBadRequest struct{}
+
+func (*JoinLockedSessionBadRequest) joinLockedSessionRes() {}
+
+type JoinLockedSessionForbidden struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *JoinLockedSessionForbidden) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *JoinLockedSessionForbidden) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *JoinLockedSessionForbidden) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *JoinLockedSessionForbidden) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*JoinLockedSessionForbidden) joinLockedSessionRes() {}
+
+type JoinLockedSessionNotFound struct{}
+
+func (*JoinLockedSessionNotFound) joinLockedSessionRes() {}
+
+type JoinLockedSessionOK struct{}
+
+func (*JoinLockedSessionOK) joinLockedSessionRes() {}
+
+type JoinLockedSessionReq struct {
+	Passphrase OptString `json:"passphrase"`
+}
+
+// GetPassphrase returns the value of Passphrase.
+func (s *JoinLockedSessionReq) GetPassphrase() OptString {
+	return s.Passphrase
+}
+
+// SetPassphrase sets the value of Passphrase.
+func (s *JoinLockedSessionReq) SetPassphrase(val OptString) {
+	s.Passphrase = val
 }
 
 // Ref: #/components/schemas/Location
@@ -6402,6 +6466,8 @@ type TalkSession struct {
 	HideTop OptNilBool `json:"hideTop"`
 	// 分析を無効化するかどうか.
 	DisableAnalysis OptNilBool `json:"disableAnalysis"`
+	// 合言葉でロックされたセッションかどうか.
+	IsLocked bool `json:"isLocked"`
 }
 
 // GetID returns the value of ID.
@@ -6479,6 +6545,11 @@ func (s *TalkSession) GetDisableAnalysis() OptNilBool {
 	return s.DisableAnalysis
 }
 
+// GetIsLocked returns the value of IsLocked.
+func (s *TalkSession) GetIsLocked() bool {
+	return s.IsLocked
+}
+
 // SetID sets the value of ID.
 func (s *TalkSession) SetID(val string) {
 	s.ID = val
@@ -6552,6 +6623,11 @@ func (s *TalkSession) SetHideTop(val OptNilBool) {
 // SetDisableAnalysis sets the value of DisableAnalysis.
 func (s *TalkSession) SetDisableAnalysis(val OptNilBool) {
 	s.DisableAnalysis = val
+}
+
+// SetIsLocked sets the value of IsLocked.
+func (s *TalkSession) SetIsLocked(val bool) {
+	s.IsLocked = val
 }
 
 func (*TalkSession) editTalkSessionRes()      {}

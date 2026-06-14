@@ -39,7 +39,8 @@ type (
 		Restrictions        []string
 		SessionClaim        *session.Claim // セッション情報を追加
 		OrganizationAliasID *shared.UUID[organization.OrganizationAlias]
-		HideTop             *bool // トップに表示するかどうか
+		HideTop             *bool   // トップに表示するかどうか
+		Passphrase          *string // 合言葉（設定するとプライベートセッションになる）
 	}
 
 	StartTalkSessionUseCaseOutput struct {
@@ -51,6 +52,7 @@ type (
 		user.UserRepository
 		organization.OrganizationUserRepository
 		organization.OrganizationAliasRepository
+		talksession.PassphraseManager
 		*db.DBManager
 		*config.Config
 	}
@@ -74,16 +76,18 @@ func NewStartTalkSessionUseCase(
 	userRepository user.UserRepository,
 	organizationUserRepository organization.OrganizationUserRepository,
 	organizationAliasRepository organization.OrganizationAliasRepository,
+	passphraseManager talksession.PassphraseManager,
 	DBManager *db.DBManager,
-	config *config.Config,
+	cfg *config.Config,
 ) StartTalkSessionUseCase {
 	return &startTalkSessionHandler{
 		TalkSessionRepository:       talkSessionRepository,
 		UserRepository:              userRepository,
 		OrganizationUserRepository:  organizationUserRepository,
 		OrganizationAliasRepository: organizationAliasRepository,
+		PassphraseManager:           passphraseManager,
 		DBManager:                   DBManager,
-		Config:                      config,
+		Config:                      cfg,
 	}
 }
 
@@ -152,6 +156,17 @@ func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSe
 		if input.ScheduledEndTime.Before(clock.Now(ctx)) {
 			return messages.InvalidScheduledEndTime
 		}
+
+		// 合言葉が設定されている場合はハッシュ化
+		var passphraseHash *string
+		if input.Passphrase != nil && *input.Passphrase != "" {
+			hash, err := i.PassphraseManager.Hash(*input.Passphrase)
+			if err != nil {
+				return errtrace.Wrap(err)
+			}
+			passphraseHash = &hash
+		}
+
 		talkSession := talksession.NewTalkSession(
 			talkSessionID,
 			input.Theme,
@@ -166,6 +181,7 @@ func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSe
 			lo.FromPtrOr(input.HideTop, false),
 			organizationID,
 			organizationAliasID,
+			passphraseHash,
 		)
 
 		if len(input.Restrictions) > 0 {
@@ -194,6 +210,7 @@ func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSe
 			City:             input.City,
 			Prefecture:       input.Prefecture,
 			HideTop:          talkSession.HideTop(),
+			IsLocked:         talkSession.IsLocked(),
 		}
 		output.Latitude = input.Latitude
 		output.Longitude = input.Longitude

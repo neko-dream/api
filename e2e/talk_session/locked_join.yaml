@@ -1,0 +1,219 @@
+desc: クローズドセッション（合言葉ロック）の参加フロー
+runners:
+  req:
+    endpoint: http://localhost:3000
+    useCookie: true
+    notFollowRedirect: true
+    openapi3: http://localhost:3000/static/oas/openapi.yaml
+    skipValidateRequest: false
+    skipValidateResponse: true
+  dev: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
+
+vars:
+  ownerID: locked_owner
+  ownerName: locked_owner
+  joinerID: locked_joiner
+  joinerName: locked_joiner
+  prefecture: 東京都
+  city: 渋谷区
+  lockedTheme: ロックされたセッション
+  lockedDesc: 合言葉が必要なセッション
+  passphrase: open-sesame-1234
+  publicTheme: 公開セッション
+
+steps:
+  cleanup:
+    desc: テストデータ削除
+    dev:
+      query: |
+        DELETE FROM user_status_change_logs WHERE user_id IN (SELECT user_id FROM users WHERE display_id IN ('{{ vars.ownerID }}', '{{ vars.joinerID }}'));
+        DELETE FROM user_demographics WHERE user_id IN (SELECT user_id FROM users WHERE display_id IN ('{{ vars.ownerID }}', '{{ vars.joinerID }}'));
+        DELETE FROM user_auths WHERE subject IN ('{{ vars.ownerID }}', '{{ vars.joinerID }}');
+        DELETE FROM talksession_consents;
+        DELETE FROM votes;
+        DELETE FROM opinions;
+        DELETE FROM talk_sessions;
+        DELETE FROM users WHERE display_id IN ('{{ vars.ownerID }}', '{{ vars.joinerID }}');
+        DELETE FROM domain_events;
+
+  loginOwner:
+    desc: オーナーログイン
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.ownerID }}:
+        get:
+          headers: null
+    test: len(current.res.headers['Set-Cookie']) > 0
+
+  createOwner:
+    desc: オーナー作成
+    req:
+      /user:
+        post:
+          body:
+            multipart/form-data:
+              displayName: "{{ vars.ownerName }}"
+              displayID: "{{ vars.ownerID }}"
+              prefecture: "{{ vars.prefecture }}"
+              city: "{{ vars.city }}"
+
+  createLockedSession:
+    desc: 合言葉付きセッション作成
+    req:
+      /talksessions:
+        post:
+          body:
+            multipart/form-data:
+              theme: "{{ vars.lockedTheme }}"
+              description: "{{ vars.lockedDesc }}"
+              scheduledEndTime: "2100-12-31T23:59:59Z"
+              prefecture: "{{ vars.prefecture }}"
+              city: "{{ vars.city }}"
+              passphrase: "{{ vars.passphrase }}"
+    bind:
+      lockedSession: current.res.body
+    test: |
+      current.res.status == 200 &&
+      current.res.body.theme == vars.lockedTheme &&
+      current.res.body.isLocked == true
+
+  createPublicSession:
+    desc: 公開セッション作成（比較用）
+    req:
+      /talksessions:
+        post:
+          body:
+            multipart/form-data:
+              theme: "{{ vars.publicTheme }}"
+              description: "公開"
+              scheduledEndTime: "2100-12-31T23:59:59Z"
+              prefecture: "{{ vars.prefecture }}"
+              city: "{{ vars.city }}"
+    bind:
+      publicSession: current.res.body
+    test: |
+      current.res.status == 200 &&
+      current.res.body.isLocked == false
+
+  ownerJoinIsNoop:
+    desc: オーナー自身は合言葉なしで /join 200
+    req:
+      /talksessions/{{ lockedSession.id }}/join:
+        post:
+          body:
+            application/json:
+              passphrase: ""
+    test: current.res.status == 200
+
+  loginJoiner:
+    desc: 参加者ログイン
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.joinerID }}:
+        get:
+          headers: null
+    test: len(current.res.headers['Set-Cookie']) > 0
+
+  createJoiner:
+    desc: 参加者作成
+    req:
+      /user:
+        post:
+          body:
+            multipart/form-data:
+              displayName: "{{ vars.joinerName }}"
+              displayID: "{{ vars.joinerID }}"
+              prefecture: "{{ vars.prefecture }}"
+              city: "{{ vars.city }}"
+
+  consentBypassIsBlocked:
+    desc: ロック済みに /consent は 403（passphrase ゲートを迂回できないこと）
+    req:
+      /talksessions/{{ lockedSession.id }}/consent:
+        post:
+          body:
+            application/json: {}
+    test: |
+      current.res.status == 403 &&
+      current.res.body.code == "TALKSESSION-0018"
+
+  joinWithEmptyPassphrase:
+    desc: 空 passphrase は 403
+    req:
+      /talksessions/{{ lockedSession.id }}/join:
+        post:
+          body:
+            application/json:
+              passphrase: ""
+    test: |
+      current.res.status == 403 &&
+      current.res.body.code == "TALKSESSION-0018"
+
+  joinWithWrongPassphrase:
+    desc: 誤った passphrase は 403
+    req:
+      /talksessions/{{ lockedSession.id }}/join:
+        post:
+          body:
+            application/json:
+              passphrase: "wrong-passphrase"
+    test: |
+      current.res.status == 403 &&
+      current.res.body.code == "TALKSESSION-0019"
+
+  joinWithCorrectPassphrase:
+    desc: 正しい passphrase で 200
+    req:
+      /talksessions/{{ lockedSession.id }}/join:
+        post:
+          body:
+            application/json:
+              passphrase: "{{ vars.passphrase }}"
+    test: current.res.status == 200
+
+  joinIsIdempotent:
+    desc: もう一度 /join しても 200（idempotent）
+    req:
+      /talksessions/{{ lockedSession.id }}/join:
+        post:
+          body:
+            application/json:
+              passphrase: "{{ vars.passphrase }}"
+    test: current.res.status == 200
+
+  publicListExcludesLocked:
+    desc: /talksessions （公開リスト）に locked セッションが出ない
+    req:
+      /talksessions?limit=50&offset=0:
+        get:
+          headers: null
+    test: |
+      current.res.status == 200 &&
+      len(filter(current.res.body.talkSessions, #.talkSession.theme == vars.publicTheme)) == 1 &&
+      len(filter(current.res.body.talkSessions, #.talkSession.theme == vars.lockedTheme)) == 0
+
+  userProfileHidesLockedForStranger:
+    desc: 他人のプロフィール /users/{ownerID}/talksessions に locked セッションが出ない
+    req:
+      /users/{{ vars.ownerID }}/talksessions?limit=50&offset=0:
+        get:
+          headers: null
+    test: |
+      current.res.status == 200 &&
+      len(filter(current.res.body.talkSessions, #.talkSession.theme == vars.publicTheme)) == 1 &&
+      len(filter(current.res.body.talkSessions, #.talkSession.theme == vars.lockedTheme)) == 0
+
+  loginOwnerAgain:
+    desc: オーナーで再ログイン
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.ownerID }}:
+        get:
+          headers: null
+
+  ownerProfileSeesOwnLocked:
+    desc: オーナー自身は /talksessions/opened で locked を見られる
+    req:
+      /talksessions/opened?limit=50&offset=0:
+        get:
+          headers: null
+    test: |
+      current.res.status == 200 &&
+      len(filter(current.res.body.talkSessions, #.talkSession.theme == vars.lockedTheme)) == 1

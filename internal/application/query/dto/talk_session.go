@@ -25,6 +25,7 @@ type TalkSession struct {
 	HideReport       bool
 	HideTop          bool
 	DisableAnalysis  bool
+	IsLocked         bool
 }
 
 type TalkSessionWithDetail struct {
@@ -91,5 +92,6 @@ func (t *TalkSessionWithDetail) ToResponse() oas.TalkSession {
 		HideReport:        t.HideReport,
 		HideTop:           utils.ToOptNil[oas.OptNilBool](lo.ToPtr(t.HideTop)),
 		DisableAnalysis:   utils.ToOptNil[oas.OptNilBool](lo.ToPtr(t.DisableAnalysis)),
+		IsLocked:          t.IsLocked,
 	}
 }

@@ -36,11 +36,12 @@ type talkSessionHandler struct {
 	getReportCount                report_query.GetCountQuery
 	hasConsent                    talksession_query.HasConsentQuery
 
-	addConclusionCommand    talksession_usecase.AddConclusionCommand
-	startTalkSessionCommand talksession_usecase.StartTalkSessionUseCase
-	editTalkSessionCommand  talksession_usecase.EditTalkSessionUseCase
-	takeConsentCommand      talksession_usecase.TakeConsentUseCase
-	toggleAnalysisUseCase   talksession_usecase.ToggleAnalysisUseCase
+	addConclusionCommand       talksession_usecase.AddConclusionCommand
+	startTalkSessionCommand    talksession_usecase.StartTalkSessionUseCase
+	editTalkSessionCommand     talksession_usecase.EditTalkSessionUseCase
+	takeConsentCommand         talksession_usecase.TakeConsentUseCase
+	toggleAnalysisUseCase      talksession_usecase.ToggleAnalysisUseCase
+	joinLockedSessionCommand   talksession_usecase.JoinLockedSessionUseCase
 
 	authorizationService service.AuthorizationService
 	session.TokenManager
@@ -64,6 +65,7 @@ func NewTalkSessionHandler(
 	editTalkSessionCommand talksession_usecase.EditTalkSessionUseCase,
 	takeConsentCommand talksession_usecase.TakeConsentUseCase,
 	toggleAnalysisUseCase talksession_usecase.ToggleAnalysisUseCase,
+	joinLockedSessionCommand talksession_usecase.JoinLockedSessionUseCase,
 
 	authorizationService service.AuthorizationService,
 	tokenManager session.TokenManager,
@@ -86,6 +88,7 @@ func NewTalkSessionHandler(
 		editTalkSessionCommand:  editTalkSessionCommand,
 		takeConsentCommand:      takeConsentCommand,
 		toggleAnalysisUseCase:   toggleAnalysisUseCase,
+		joinLockedSessionCommand: joinLockedSessionCommand,
 
 		authorizationService: authorizationService,
 		TokenManager:         tokenManager,
@@ -113,10 +116,11 @@ func (t *talkSessionHandler) GetUserTalkSessions(ctx context.Context, params oas
 		}
 	}
 	out, err := t.browseOpenedByUserQuery.Execute(ctx, talksession_query.BrowseOpenedByUserInput{
-		DisplayID: params.DisplayID,
-		Limit:     limit,
-		Offset:    offset,
-		Status:    talksession_query.Status(status),
+		DisplayID:     params.DisplayID,
+		Limit:         limit,
+		Offset:        offset,
+		Status:        talksession_query.Status(status),
+		ExcludeLocked: true,
 	})
 	if err != nil {
 		return nil, err
@@ -323,6 +327,7 @@ func (t *talkSessionHandler) InitiateTalkSession(ctx context.Context, req *oas.I
 		SessionClaim:        session.GetSession(ctx),
 		OrganizationAliasID: organizationAliasID,
 		HideTop:             utils.ToPtrIf(req.HideTop.IsSet(), req.HideTop.Value),
+		Passphrase:          utils.ToPtrIf(req.Passphrase.IsSet(), req.Passphrase.Value),
 	})
 	if err != nil {
 		return nil, errtrace.Wrap(err)
@@ -723,4 +728,34 @@ func (t *talkSessionHandler) ToggleTalkSessionAnalysis(ctx context.Context, para
 	return &oas.ToggleTalkSessionAnalysisOK{
 		DisableAnalysis: out.DisableAnalysis,
 	}, nil
+}
+
+// JoinLockedSession ロックされたセッションに合言葉で参加
+func (t *talkSessionHandler) JoinLockedSession(ctx context.Context, req *oas.JoinLockedSessionReq, params oas.JoinLockedSessionParams) (oas.JoinLockedSessionRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "talkSessionHandler.JoinLockedSession")
+	defer span.End()
+
+	if req == nil {
+		return nil, messages.BadRequestError
+	}
+
+	authCtx, err := t.authorizationService.RequireAuthentication(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+
+	if err := t.joinLockedSessionCommand.Execute(ctx, talksession_usecase.JoinLockedSessionInput{
+		TalkSessionID: talkSessionID,
+		UserID:        authCtx.UserID,
+		Passphrase:    req.GetPassphrase().Value,
+	}); err != nil {
+		return nil, err
+	}
+
+	return &oas.JoinLockedSessionOK{}, nil
 }

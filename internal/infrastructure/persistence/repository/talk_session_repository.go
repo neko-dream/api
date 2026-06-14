@@ -60,6 +60,7 @@ func (t *talkSessionRepository) Create(ctx context.Context, talkSession *talkses
 		OrganizationID:      utils.ToNullableSQL[uuid.NullUUID](talkSession.OrganizationID()),
 		HideTop:             talkSession.HideTop(),
 		DisableAnalysis:     talkSession.DisableAnalysis(),
+		PassphraseHash:      utils.ToNullableSQL[sql.NullString](talkSession.PassphraseHash()),
 	}); err != nil {
 		return errtrace.Wrap(err)
 	}
@@ -113,6 +114,7 @@ func (t *talkSessionRepository) Update(ctx context.Context, talkSession *talkses
 		HideReport:       utils.ToNullableSQL[sql.NullBool](talkSession.HideReport()),
 		HideTop:          talkSession.HideTop(),
 		DisableAnalysis:  talkSession.DisableAnalysis(),
+		PassphraseHash:   utils.ToNullableSQL[sql.NullString](talkSession.PassphraseHash()),
 	}); err != nil {
 		return errtrace.Wrap(err)
 	}
@@ -169,6 +171,11 @@ func (t *talkSessionRepository) FindByID(ctx context.Context, talkSessionID shar
 		thumbnailURL = &row.TalkSession.ThumbnailUrl.String
 	}
 
+	var passphraseHash *string
+	if row.TalkSession.PassphraseHash.Valid {
+		passphraseHash = &row.TalkSession.PassphraseHash.String
+	}
+
 	ts := talksession.NewTalkSession(
 		talkSessionID,
 		row.TalkSession.Theme,
@@ -183,6 +190,7 @@ func (t *talkSessionRepository) FindByID(ctx context.Context, talkSessionID shar
 		row.TalkSession.HideTop,
 		nil,
 		nil,
+		passphraseHash,
 	)
 	ts.SetReportVisibility(row.TalkSession.HideReport.Bool)
 	ts.SetDisableAnalysis(row.TalkSession.DisableAnalysis)
@@ -233,6 +241,11 @@ func (t *talkSessionRepository) GetUnprocessedEndedSessions(ctx context.Context,
 			organizationAliasID = &aliasID
 		}
 
+		var sessionPassphraseHash *string
+		if row.PassphraseHash.Valid {
+			sessionPassphraseHash = &row.PassphraseHash.String
+		}
+
 		session := talksession.NewTalkSession(
 			shared.UUID[talksession.TalkSession](row.TalkSessionID),
 			row.Theme,
@@ -247,6 +260,7 @@ func (t *talkSessionRepository) GetUnprocessedEndedSessions(ctx context.Context,
 			row.HideTop,
 			organizationID,
 			organizationAliasID,
+			sessionPassphraseHash,
 		)
 		// 制限事項を設定
 		if len(row.Restrictions) > 0 {

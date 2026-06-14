@@ -14,6 +14,20 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// mockPassphraseManager はテスト用のPassphraseManagerモック
+type mockPassphraseManager struct {
+	hashFn   func(plaintext string) (string, error)
+	verifyFn func(plaintext, hashedPassphrase string) bool
+}
+
+func (m *mockPassphraseManager) Hash(plaintext string) (string, error) {
+	return m.hashFn(plaintext)
+}
+
+func (m *mockPassphraseManager) Verify(plaintext, hashedPassphrase string) bool {
+	return m.verifyFn(plaintext, hashedPassphrase)
+}
+
 func TestNewTalkSession(t *testing.T) {
 	tests := []struct {
 		name                string
@@ -81,6 +95,7 @@ func TestNewTalkSession(t *testing.T) {
 				tt.hideTop,
 				tt.organizationID,
 				tt.organizationAliasID,
+				nil,
 			)
 
 			assert.Equal(t, tt.talkSessionID, ts.TalkSessionID())
@@ -116,6 +131,7 @@ func TestTalkSession_ChangeTheme(t *testing.T) {
 			nil,
 			nil,
 			true,
+			nil,
 			nil,
 			nil,
 		)
@@ -169,6 +185,7 @@ func TestTalkSession_ChangeDescription(t *testing.T) {
 				true,
 				nil,
 				nil,
+				nil,
 			)
 
 			ts.ChangeDescription(tt.newDescription)
@@ -192,6 +209,7 @@ func TestTalkSession_ChangeThumbnailURL(t *testing.T) {
 			nil,
 			nil,
 			true,
+			nil,
 			nil,
 			nil,
 		)
@@ -218,6 +236,7 @@ func TestTalkSession_ChangeScheduledEndTime(t *testing.T) {
 			nil,
 			nil,
 			true,
+			nil,
 			nil,
 			nil,
 		)
@@ -253,6 +272,7 @@ func TestTalkSession_StartSession(t *testing.T) {
 			true,
 			lo.ToPtr(shared.MustParseUUID[organization.Organization]("00000000-0000-0000-0000-000000000003")),
 			nil,
+			nil,
 		)
 
 		err := ts.StartSession()
@@ -277,6 +297,7 @@ func TestTalkSession_StartSession(t *testing.T) {
 			nil,
 			nil,
 			true,
+			nil,
 			nil,
 			nil,
 		)
@@ -305,6 +326,7 @@ func TestTalkSession_EndSession(t *testing.T) {
 			nil,
 			nil,
 			true,
+			nil,
 			nil,
 			nil,
 		)
@@ -344,6 +366,7 @@ func TestTalkSession_EndSession(t *testing.T) {
 			true,
 			nil,
 			nil,
+			nil,
 		)
 
 		participantIDs := []shared.UUID[user.User]{}
@@ -365,6 +388,7 @@ func TestTalkSession_EndSession(t *testing.T) {
 			nil,
 			nil,
 			true,
+			nil,
 			nil,
 			nil,
 		)
@@ -398,6 +422,7 @@ func TestTalkSession_SetReportVisibility(t *testing.T) {
 			true,
 			nil,
 			nil,
+			nil,
 		)
 
 		// デフォルトはfalse
@@ -429,6 +454,7 @@ func TestTalkSession_MarkAsEndProcessed(t *testing.T) {
 			true,
 			nil,
 			nil,
+			nil,
 		)
 
 		// デフォルトはfalse
@@ -456,6 +482,7 @@ func TestTalkSession_UpdateRestrictions(t *testing.T) {
 			true,
 			nil,
 			nil,
+			nil,
 		)
 
 		// 初期状態では制限なし
@@ -468,5 +495,54 @@ func TestTalkSession_UpdateRestrictions(t *testing.T) {
 
 		assert.NotEmpty(t, ts.RestrictionList())
 		assert.NotNil(t, ts.Restrictions())
+	})
+}
+
+func TestTalkSession_VerifyPassphrase(t *testing.T) {
+	newTS := func(passphraseHash *string) *talksession.TalkSession {
+		ts := talksession.NewTalkSession(
+			shared.MustParseUUID[talksession.TalkSession]("00000000-0000-0000-0000-000000000001"),
+			"テーマ", nil, nil,
+			shared.MustParseUUID[user.User]("00000000-0000-0000-0000-000000000002"),
+			time.Now(), time.Now().Add(1*time.Hour),
+			nil, nil, nil, false, nil, nil,
+			passphraseHash,
+		)
+		return ts
+	}
+
+	t.Run("ロック未設定のセッションはfalse（検証対象がない）", func(t *testing.T) {
+		ts := newTS(nil)
+		manager := &mockPassphraseManager{}
+		assert.False(t, ts.VerifyPassphrase(manager, "anything"))
+		assert.False(t, ts.IsLocked())
+	})
+
+	t.Run("正しい合言葉で検証成功", func(t *testing.T) {
+		hash := "hashed-value"
+		ts := newTS(&hash)
+		manager := &mockPassphraseManager{
+			verifyFn: func(plaintext, hashedPassphrase string) bool {
+				return plaintext == "correct" && hashedPassphrase == hash
+			},
+		}
+		assert.True(t, ts.VerifyPassphrase(manager, "correct"))
+	})
+
+	t.Run("誤った合言葉で検証失敗", func(t *testing.T) {
+		hash := "hashed-value"
+		ts := newTS(&hash)
+		manager := &mockPassphraseManager{
+			verifyFn: func(plaintext, hashedPassphrase string) bool {
+				return false
+			},
+		}
+		assert.False(t, ts.VerifyPassphrase(manager, "wrong"))
+	})
+
+	t.Run("ロックされたセッションはIsLocked==true", func(t *testing.T) {
+		hash := "hashed-value"
+		ts := newTS(&hash)
+		assert.True(t, ts.IsLocked())
 	})
 }

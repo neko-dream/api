@@ -41,6 +41,7 @@ type (
 		organizationAliasID *shared.UUID[organization.OrganizationAlias]
 		hideTop         bool // トップに表示するかどうか
 		disableAnalysis bool // 分析を無効化するかどうか
+		passphraseHash  *string // 合言葉のbcryptハッシュ（nilの場合は公開セッション）
 		// イベント記録用（埋め込み）
 		event.EventRecorder
 		// 終了処理済みフラグ
@@ -62,6 +63,7 @@ func NewTalkSession(
 	hideTop bool,
 	organizationID *shared.UUID[organization.Organization],
 	organizationAliasID *shared.UUID[organization.OrganizationAlias],
+	passphraseHash *string,
 ) *TalkSession {
 	return &TalkSession{
 		talkSessionID:       talkSessionID,
@@ -78,9 +80,18 @@ func NewTalkSession(
 		hideTop:             hideTop,
 		organizationID:      organizationID,
 		organizationAliasID: organizationAliasID,
+		passphraseHash:      passphraseHash,
 		EventRecorder:       event.EventRecorder{},
 		endProcessed:        false,
 	}
+}
+
+// PassphraseManager は合言葉のハッシュ化・検証を担うドメインサービスのインターフェース
+type PassphraseManager interface {
+	// Hash 平文パスフレーズをハッシュ化する
+	Hash(plaintext string) (string, error)
+	// Verify 平文パスフレーズがハッシュと一致するか検証する
+	Verify(plaintext, hashedPassphrase string) bool
 }
 
 func (t *TalkSession) TalkSessionID() shared.UUID[TalkSession] {
@@ -151,6 +162,29 @@ func (t *TalkSession) ChangePrefecture(prefecture *string) {
 
 func (t *TalkSession) ChangeHideTop(hideTop bool) {
 	t.hideTop = hideTop
+}
+
+func (t *TalkSession) PassphraseHash() *string {
+	return t.passphraseHash
+}
+
+func (t *TalkSession) SetPassphraseHash(hash *string) {
+	t.passphraseHash = hash
+}
+
+// IsLocked は合言葉が設定されているかどうかを返す
+func (t *TalkSession) IsLocked() bool {
+	return t.passphraseHash != nil
+}
+
+// VerifyPassphrase は平文パスフレーズがハッシュと一致するか検証する。
+// passphraseHash が nil（=ロック未設定）のときは検証する対象がないため false を返す。
+// 呼び出し側は IsLocked() を先にチェックすること。
+func (t *TalkSession) VerifyPassphrase(manager PassphraseManager, plaintext string) bool {
+	if t.passphraseHash == nil {
+		return false
+	}
+	return manager.Verify(plaintext, *t.passphraseHash)
 }
 
 func (t *TalkSession) DisableAnalysis() bool {

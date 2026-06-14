@@ -116,6 +116,7 @@ func TestToggleAnalysisUseCase_Execute(t *testing.T) {
 					false,              // hideTop
 					nil,                // organizationID
 					nil,                // organizationAliasID
+					nil,
 				)
 				return data.TalkSessionRepo.Create(ctx, data.TalkSession)
 			},
@@ -175,6 +176,7 @@ func TestToggleAnalysisUseCase_Execute(t *testing.T) {
 					false,              // hideTop
 					nil,                // organizationID
 					nil,                // organizationAliasID
+					nil,
 				)
 				data.TalkSession.SetDisableAnalysis(true) // 分析無効化状態にする
 				return data.TalkSessionRepo.Create(ctx, data.TalkSession)
@@ -234,6 +236,7 @@ func TestToggleAnalysisUseCase_Execute(t *testing.T) {
 					false,              // hideTop
 					nil,                // organizationID
 					nil,                // organizationAliasID
+					nil,
 				)
 				return data.TalkSessionRepo.Create(ctx, data.TalkSession)
 			},
@@ -306,6 +309,7 @@ func TestToggleAnalysisUseCase_Execute(t *testing.T) {
 					false,              // hideTop
 					nil,                // organizationID
 					nil,                // organizationAliasID
+					nil,
 				)
 				return data.TalkSessionRepo.Create(ctx, data.TalkSession)
 			},
@@ -403,6 +407,7 @@ func TestToggleAnalysisUseCase_ProductionEnvironment(t *testing.T) {
 			false,              // hideTop
 			nil,                // organizationID
 			nil,                // organizationAliasID
+			nil,
 		)
 		if err := talkSessionRepo.Create(ctx, talkSession); err != nil {
 			return err

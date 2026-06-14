@@ -15,11 +15,12 @@ type (
 	}
 
 	BrowseOpenedByUserInput struct {
-		DisplayID string
-		Limit     *int
-		Offset    *int
-		Status    Status
-		Theme     *string
+		DisplayID     string
+		Limit         *int
+		Offset        *int
+		Status        Status
+		Theme         *string
+		ExcludeLocked bool // 他人がプロフィールを閲覧する場合はtrue（合言葉でロック済みのセッションを隠す）
 	}
 
 	BrowseOpenedByUserOutput struct {

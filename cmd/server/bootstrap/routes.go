@@ -8,7 +8,7 @@ import (
 	"github.com/neko-dream/api/internal/presentation/handler"
 	"github.com/neko-dream/api/internal/presentation/oas"
 	"github.com/rs/cors"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Route ルート定義を表す
@@ -63,7 +63,7 @@ func (b *Bootstrap) setupAPIHandler() http.Handler {
 	})
 
 	routeFinder := middleware.MakeRouteFinder(srv)
-	tracerProvider := di.Invoke[*sdktrace.TracerProvider](b.container)
+	tracerProvider := di.Invoke[trace.TracerProvider](b.container)
 
 	return c.Handler(middleware.Wrap(
 		srv,

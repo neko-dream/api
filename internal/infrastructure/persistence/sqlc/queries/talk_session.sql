@@ -18,7 +18,7 @@ INNER JOIN opinions o ON u.user_id = o.user_id
 WHERE o.talk_session_id = $1;
 
 -- name: CreateTalkSession :exec
-INSERT INTO talk_sessions (talk_session_id, theme, description, thumbnail_url, owner_id, scheduled_end_time, created_at, city, prefecture, restrictions, hide_report, organization_id, organization_alias_id, hide_top, disable_analysis) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15);
+INSERT INTO talk_sessions (talk_session_id, theme, description, thumbnail_url, owner_id, scheduled_end_time, created_at, city, prefecture, restrictions, hide_report, organization_id, organization_alias_id, hide_top, disable_analysis, passphrase_hash) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16);
 
 -- name: CreateTalkSessionLocation :exec
 INSERT INTO talk_session_locations (talk_session_id, location) VALUES ($1, ST_GeographyFromText($2));
@@ -43,7 +43,8 @@ UPDATE talk_sessions
         organization_id = $10,
         organization_alias_id = $11,
         hide_top = $12,
-        disable_analysis = $13
+        disable_analysis = $13,
+        passphrase_hash = $14
     WHERE talk_session_id = $1;
 
 -- name: GetTalkSessionByID :one
@@ -117,6 +118,7 @@ LEFT JOIN talk_session_locations
     ON ts.talk_session_id = talk_session_locations.talk_session_id
 WHERE
     ts.hide_top = FALSE AND
+    ts.passphrase_hash IS NULL AND
     CASE sqlc.narg('status')::text
         WHEN 'finished' THEN ts.scheduled_end_time <= now()
         WHEN 'open' THEN ts.scheduled_end_time > now()
@@ -196,6 +198,8 @@ WITH filtered_sessions AS (
     LEFT JOIN users ON ts.owner_id = users.user_id
     WHERE
         users.display_id = sqlc.arg('display_id')::text
+        AND
+        (sqlc.arg('exclude_locked')::boolean = FALSE OR ts.passphrase_hash IS NULL)
         AND
         CASE sqlc.narg('status')::text
             WHEN 'finished' THEN ts.scheduled_end_time <= now()

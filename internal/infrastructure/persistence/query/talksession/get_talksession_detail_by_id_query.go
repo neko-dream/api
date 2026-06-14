@@ -37,6 +37,7 @@ func (h *getTalkSessionDetailByIDQuery) Execute(ctx context.Context, input talks
 	}); err != nil {
 		return nil, messages.TalkSessionNotFound
 	}
+	result.IsLocked = talkSessionRow.TalkSession.PassphraseHash.Valid
 
 	return &talksession.GetTalkSessionDetailOutput{
 		TalkSessionWithDetail: result,
