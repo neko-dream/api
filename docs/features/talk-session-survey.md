@@ -88,16 +88,14 @@ sequenceDiagram
     User->>Client: 回答を入力して送信
     Client->>Server: POST /talksessions/{id}/survey/submissions
     alt 送信成功
-        Server-->>Client: 回答を保存（以降は回答済み扱い）
-    else 必須未回答・不正な回答
+        Server-->>Client: 回答を保存し以降は回答済み扱い
+    else バリデーションNG or 再送信
         Server-->>Client: エラー
-    else 既に回答済み
-        Server-->>Client: エラー（再回答不可）
     end
 
     User->>Client: 参加に同意
     Client->>Server: POST /talksessions/{id}/consent
-    Server-->>Client: 「アンケート回答済み」を満たし参加成立
+    Server-->>Client: アンケート回答済みを満たし参加成立
 ```
 
 ### アンケートの設定（オーナー）
@@ -110,7 +108,7 @@ sequenceDiagram
 
     Owner->>Client: セッション作成時にアンケートを設定
     Client->>Server: POST /talksessions/{id}/survey
-    Server-->>Client: アンケート作成（参加制限を自動追加）
+    Server-->>Client: アンケート作成 / 参加制限を自動追加
 
     Owner->>Client: 設問・選択肢を追加・編集
     Client->>Server: PUT /talksessions/{id}/survey
