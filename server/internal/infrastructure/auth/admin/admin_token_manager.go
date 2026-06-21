@@ -38,7 +38,8 @@ func (m *adminTokenManager) Generate(ctx context.Context, adminUser adminmodel.A
 		"role":        int(adminUser.Role),
 		"isAdmin":     true,
 		"iat":         now.Unix(),
-		"exp":         now.Add(time.Hour * 24 * 7).Unix(),
+		// access は短命。失効後は refresh トークンで再発行する。
+		"exp": now.Add(time.Minute * 15).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return errtrace.Wrap2(token.SignedString([]byte(m.secret)))

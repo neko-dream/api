@@ -1999,6 +1999,26 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 						}
 
+					case 'r': // Prefix: "refresh"
+
+						if l := len("refresh"); len(elem) >= l && elem[0:l] == "refresh" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch r.Method {
+							case "POST":
+								s.handleAdminRefreshRequest([0]string{}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "POST")
+							}
+
+							return
+						}
+
 					case 't': // Prefix: "token/info"
 
 						if l := len("token/info"); len(elem) >= l && elem[0:l] == "token/info" {
@@ -4560,6 +4580,30 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								}
 							}
 
+						}
+
+					case 'r': // Prefix: "refresh"
+
+						if l := len("refresh"); len(elem) >= l && elem[0:l] == "refresh" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch method {
+							case "POST":
+								r.name = AdminRefreshOperation
+								r.summary = "リフレッシュトークンでアクセストークンを再発行"
+								r.operationID = "adminRefresh"
+								r.pathPattern = "/v1/admin/refresh"
+								r.args = args
+								r.count = 0
+								return r, true
+							default:
+								return
+							}
 						}
 
 					case 't': // Prefix: "token/info"

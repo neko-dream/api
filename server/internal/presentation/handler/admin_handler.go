@@ -9,22 +9,60 @@ import (
 	"github.com/neko-dream/api/internal/infrastructure/http/cookie"
 	"github.com/neko-dream/api/internal/presentation/oas"
 	cookie_utils "github.com/neko-dream/api/pkg/cookie"
+	http_utils "github.com/neko-dream/api/pkg/http"
 	"go.opentelemetry.io/otel"
 )
 
 type adminHandler struct {
 	adminLogin    admin_usecase.AdminLogin
+	adminRefresh  admin_usecase.AdminRefresh
+	adminLogout   admin_usecase.AdminLogout
 	cookieManager cookie.CookieManager
 }
 
 func NewAdminHandler(
 	adminLogin admin_usecase.AdminLogin,
+	adminRefresh admin_usecase.AdminRefresh,
+	adminLogout admin_usecase.AdminLogout,
 	cookieManager cookie.CookieManager,
 ) oas.AdminHandler {
 	return &adminHandler{
 		adminLogin:    adminLogin,
+		adminRefresh:  adminRefresh,
+		adminLogout:   adminLogout,
 		cookieManager: cookieManager,
 	}
+}
+
+// sessionCookies は access(AdminSessionId) と refresh(AdminRefreshToken) の Set-Cookie を生成する。
+func (h *adminHandler) sessionCookies(out *admin_usecase.AdminAuthOutput) []string {
+	return cookie_utils.EncodeCookies([]*http.Cookie{
+		h.cookieManager.CreateAdminSessionCookie(out.AccessToken),
+		h.cookieManager.CreateAdminRefreshCookie(out.RefreshToken),
+	})
+}
+
+func (h *adminHandler) tokenInfo(out *admin_usecase.AdminAuthOutput) oas.AdminTokenInfo {
+	return oas.AdminTokenInfo{
+		Sub:         out.AdminUser.AdminUserID.String(),
+		Email:       out.AdminUser.Email,
+		DisplayName: out.AdminUser.DisplayName,
+		Role:        int(out.AdminUser.Role),
+		IsAdmin:     true,
+	}
+}
+
+// adminRefreshTokenFromCtx は HTTP リクエストから AdminRefreshToken Cookie を読む。
+func adminRefreshTokenFromCtx(ctx context.Context) string {
+	req := http_utils.GetHTTPRequest(ctx)
+	if req == nil {
+		return ""
+	}
+	c, err := req.Cookie(cookie.AdminRefreshCookieName)
+	if err != nil {
+		return ""
+	}
+	return c.Value
 }
 
 // AdminLogin implements adminLogin operation.
@@ -37,20 +75,28 @@ func (h *adminHandler) AdminLogin(ctx context.Context, req *oas.AdminLoginReq) (
 		Password: req.Password,
 	})
 	if err != nil {
-		// 認証失敗は 401（資格情報の有無を区別しない）
 		return &oas.AdminLoginUnauthorized{}, nil
 	}
 
-	sessionCookie := h.cookieManager.CreateAdminSessionCookie(out.Token)
 	return &oas.AdminTokenInfoHeaders{
-		SetCookie: cookie_utils.EncodeCookies([]*http.Cookie{sessionCookie}),
-		Response: oas.AdminTokenInfo{
-			Sub:         out.AdminUser.AdminUserID.String(),
-			Email:       out.AdminUser.Email,
-			DisplayName: out.AdminUser.DisplayName,
-			Role:        int(out.AdminUser.Role),
-			IsAdmin:     true,
-		},
+		SetCookie: h.sessionCookies(out),
+		Response:  h.tokenInfo(out),
+	}, nil
+}
+
+// AdminRefresh implements adminRefresh operation.
+func (h *adminHandler) AdminRefresh(ctx context.Context) (oas.AdminRefreshRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "adminHandler.AdminRefresh")
+	defer span.End()
+
+	out, err := h.adminRefresh.Execute(ctx, adminRefreshTokenFromCtx(ctx))
+	if err != nil {
+		return &oas.AdminRefreshUnauthorized{}, nil
+	}
+
+	return &oas.AdminTokenInfoHeaders{
+		SetCookie: h.sessionCookies(out),
+		Response:  h.tokenInfo(out),
 	}, nil
 }
 
@@ -77,8 +123,13 @@ func (h *adminHandler) AdminLogout(ctx context.Context) (*oas.AdminLogoutNoConte
 	ctx, span := otel.Tracer("handler").Start(ctx, "adminHandler.AdminLogout")
 	defer span.End()
 
-	revokeCookie := h.cookieManager.CreateAdminRevokeCookie()
+	// refresh セッションをサーバー側で失効させる(エラーでも cookie は消す)。
+	_ = h.adminLogout.Execute(ctx, adminRefreshTokenFromCtx(ctx))
+
 	return &oas.AdminLogoutNoContent{
-		SetCookie: cookie_utils.EncodeCookies([]*http.Cookie{revokeCookie}),
+		SetCookie: cookie_utils.EncodeCookies([]*http.Cookie{
+			h.cookieManager.CreateAdminRevokeCookie(),
+			h.cookieManager.CreateAdminRefreshRevokeCookie(),
+		}),
 	}, nil
 }

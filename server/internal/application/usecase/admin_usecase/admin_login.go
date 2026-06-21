@@ -14,7 +14,7 @@ import (
 var ErrInvalidAdminCredentials = errors.New("invalid admin credentials")
 
 type AdminLogin interface {
-	Execute(ctx context.Context, input AdminLoginInput) (*AdminLoginOutput, error)
+	Execute(ctx context.Context, input AdminLoginInput) (*AdminAuthOutput, error)
 }
 
 type AdminLoginInput struct {
@@ -22,30 +22,28 @@ type AdminLoginInput struct {
 	Password string
 }
 
-type AdminLoginOutput struct {
-	Token     string
-	AdminUser admin.AdminUser
-}
-
 type adminLoginInteractor struct {
 	adminUserRepo     admin.AdminUserRepository
+	adminSessionRepo  admin.AdminSessionRepository
 	adminTokenManager admin.AdminTokenManager
 	cfg               *config.Config
 }
 
 func NewAdminLogin(
 	adminUserRepo admin.AdminUserRepository,
+	adminSessionRepo admin.AdminSessionRepository,
 	adminTokenManager admin.AdminTokenManager,
 	cfg *config.Config,
 ) AdminLogin {
 	return &adminLoginInteractor{
 		adminUserRepo:     adminUserRepo,
+		adminSessionRepo:  adminSessionRepo,
 		adminTokenManager: adminTokenManager,
 		cfg:               cfg,
 	}
 }
 
-func (a *adminLoginInteractor) Execute(ctx context.Context, input AdminLoginInput) (*AdminLoginOutput, error) {
+func (a *adminLoginInteractor) Execute(ctx context.Context, input AdminLoginInput) (*AdminAuthOutput, error) {
 	ctx, span := otel.Tracer("admin_usecase").Start(ctx, "adminLoginInteractor.Execute")
 	defer span.End()
 
@@ -61,13 +59,5 @@ func (a *adminLoginInteractor) Execute(ctx context.Context, input AdminLoginInpu
 		return nil, ErrInvalidAdminCredentials
 	}
 
-	token, err := a.adminTokenManager.Generate(ctx, *adminUser)
-	if err != nil {
-		return nil, err
-	}
-
-	return &AdminLoginOutput{
-		Token:     token,
-		AdminUser: *adminUser,
-	}, nil
+	return issueAccessAndRefresh(ctx, a.adminTokenManager, a.adminSessionRepo, a.cfg, *adminUser)
 }

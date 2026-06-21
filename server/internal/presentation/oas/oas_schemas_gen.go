@@ -156,6 +156,10 @@ func (s *AdminLogoutNoContent) SetSetCookie(val []string) {
 	s.SetCookie = val
 }
 
+type AdminRefreshUnauthorized struct{}
+
+func (*AdminRefreshUnauthorized) adminRefreshRes() {}
+
 // 管理者トークンの内容.
 // Ref: #/components/schemas/AdminTokenInfo
 type AdminTokenInfo struct {
@@ -246,7 +250,8 @@ func (s *AdminTokenInfoHeaders) SetResponse(val AdminTokenInfo) {
 	s.Response = val
 }
 
-func (*AdminTokenInfoHeaders) adminLoginRes() {}
+func (*AdminTokenInfoHeaders) adminLoginRes()   {}
+func (*AdminTokenInfoHeaders) adminRefreshRes() {}
 
 // Ref: #/components/schemas/AnalysisReportResponse
 type AnalysisReportResponse struct {

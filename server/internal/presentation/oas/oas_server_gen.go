@@ -41,6 +41,12 @@ type AdminHandler interface {
 	//
 	// POST /v1/admin/logout
 	AdminLogout(ctx context.Context) (*AdminLogoutNoContent, error)
+	// AdminRefresh implements adminRefresh operation.
+	//
+	// リフレッシュトークンでアクセストークンを再発行.
+	//
+	// POST /v1/admin/refresh
+	AdminRefresh(ctx context.Context) (AdminRefreshRes, error)
 	// GetAdminTokenInfo implements getAdminTokenInfo operation.
 	//
 	// 管理者トークンの内容を返す.

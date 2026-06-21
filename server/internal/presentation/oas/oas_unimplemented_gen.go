@@ -31,6 +31,15 @@ func (UnimplementedHandler) AdminLogout(ctx context.Context) (r *AdminLogoutNoCo
 	return r, ht.ErrNotImplemented
 }
 
+// AdminRefresh implements adminRefresh operation.
+//
+// リフレッシュトークンでアクセストークンを再発行.
+//
+// POST /v1/admin/refresh
+func (UnimplementedHandler) AdminRefresh(ctx context.Context) (r AdminRefreshRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // ApplyFeedbackToReport implements applyFeedbackToReport operation.
 //
 // セッションのレポートにフィードバックを適用する.

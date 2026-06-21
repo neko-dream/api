@@ -4127,6 +4127,37 @@ paths:
       security:
         - {}
       x-ogen-operation-group: Admin
+  /v1/admin/refresh:
+    post:
+      operationId: adminRefresh
+      summary: リフレッシュトークンでアクセストークンを再発行
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            Set-Cookie:
+              required: true
+              description: 新しい AdminSessionId / AdminRefreshToken Cookie
+              schema:
+                type: array
+                items:
+                  type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminTokenInfo'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - admin
+      security:
+        - {}
+      x-ogen-operation-group: Admin
   /v1/admin/token/info:
     get:
       operationId: getAdminTokenInfo

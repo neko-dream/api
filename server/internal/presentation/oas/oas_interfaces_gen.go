@@ -5,6 +5,10 @@ type AdminLoginRes interface {
 	adminLoginRes()
 }
 
+type AdminRefreshRes interface {
+	adminRefreshRes()
+}
+
 type ApplyFeedbackToReportRes interface {
 	applyFeedbackToReportRes()
 }

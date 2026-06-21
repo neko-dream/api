@@ -8,6 +8,7 @@ type OperationName = string
 const (
 	AdminLoginOperation                         OperationName = "AdminLogin"
 	AdminLogoutOperation                        OperationName = "AdminLogout"
+	AdminRefreshOperation                       OperationName = "AdminRefresh"
 	ApplyFeedbackToReportOperation              OperationName = "ApplyFeedbackToReport"
 	AuthAccountDetachOperation                  OperationName = "AuthAccountDetach"
 	AuthorizeOperation                          OperationName = "Authorize"

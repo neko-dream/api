@@ -9,10 +9,12 @@ import (
 const (
 	SessionCookieName      = "SessionId"
 	AdminSessionCookieName = "AdminSessionId"
+	AdminRefreshCookieName = "AdminRefreshToken"
 	SessionMaxAge          = 86400 * 5  // 24 hours
 	AuthCookieMaxAge       = 900        // 15 minutes
 	GuestSessionMaxAge     = 86400 * 30 // 30 days
 	AdminSessionMaxAge     = 86400 * 7  // 7 days
+	AdminRefreshMaxAge     = 86400 * 30 // 30 days
 )
 
 type CookieManager struct {
@@ -73,6 +75,32 @@ func (cm *CookieManager) CreateAdminSessionCookie(token string) *http.Cookie {
 func (cm *CookieManager) CreateAdminRevokeCookie() *http.Cookie {
 	return &http.Cookie{
 		Name:     AdminSessionCookieName,
+		Value:    "",
+		HttpOnly: true,
+		Secure:   cm.secure,
+		Path:     "/",
+		SameSite: http.SameSiteLaxMode,
+		Domain:   "." + cm.config.DOMAIN,
+		MaxAge:   -1,
+	}
+}
+
+func (cm *CookieManager) CreateAdminRefreshCookie(token string) *http.Cookie {
+	return &http.Cookie{
+		Name:     AdminRefreshCookieName,
+		Value:    token,
+		HttpOnly: true,
+		Secure:   cm.secure,
+		Path:     "/",
+		SameSite: cm.sameSite,
+		Domain:   "." + cm.config.DOMAIN,
+		MaxAge:   AdminRefreshMaxAge,
+	}
+}
+
+func (cm *CookieManager) CreateAdminRefreshRevokeCookie() *http.Cookie {
+	return &http.Cookie{
+		Name:     AdminRefreshCookieName,
 		Value:    "",
 		HttpOnly: true,
 		Secure:   cm.secure,

@@ -32,6 +32,7 @@ func infraDeps() []ProvideArg {
 		{session.NewSessionTokenManager, nil},
 		{adminauth.NewAdminTokenManager, nil},
 		{repository.NewAdminUserRepository, nil},
+		{repository.NewAdminSessionRepository, nil},
 		{telemetry.SetupOtelProvider, nil},
 		{repository.InitS3Client, nil},
 		{repository.NewImageRepository, nil},

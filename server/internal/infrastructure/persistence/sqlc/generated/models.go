@@ -72,6 +72,15 @@ type ActionItem struct {
 	UpdatedAt     time.Time
 }
 
+type AdminSession struct {
+	AdminSessionID uuid.UUID
+	AdminUserID    uuid.UUID
+	TokenHash      string
+	ExpiresAt      time.Time
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+}
+
 type AdminUser struct {
 	AdminUserID  uuid.UUID
 	Email        string

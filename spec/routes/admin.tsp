@@ -50,6 +50,27 @@ namespace kotohiro {
       @body body: {};
     };
 
+    @route("/refresh")
+    @operationId("adminRefresh")
+    @extension("x-ogen-operation-group", "Admin")
+    @tag("admin")
+    @post
+    @summary("リフレッシュトークンでアクセストークンを再発行")
+    @useAuth([])
+    op adminRefresh(): {
+      @statusCode statusCode: 200;
+
+      /**
+       * 新しい AdminSessionId / AdminRefreshToken Cookie
+       */
+      @header("Set-Cookie") SetCookie: string[];
+
+      @body body: AdminTokenInfo;
+    } | {
+      @statusCode statusCode: 401;
+      @body body: {};
+    };
+
     @route("/logout")
     @operationId("adminLogout")
     @extension("x-ogen-operation-group", "Admin")
