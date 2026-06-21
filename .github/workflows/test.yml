@@ -4,10 +4,10 @@ on:
   push:
     paths-ignore:
       - '.vscode/**'
-      - 'static/**'
-      - 'api/**' # OpenAPIのスキーマファイルなど
-      - 'internal/presentation/oas/**'
-      - 'internal/infrastructure/persistence/sqlc/generated/**'
+      - 'server/static/**'
+      - 'server/api/**' # OpenAPIのスキーマファイルなど
+      - 'server/internal/presentation/oas/**'
+      - 'server/internal/infrastructure/persistence/sqlc/generated/**'
 
   workflow_call:
     inputs:
@@ -28,6 +28,9 @@ jobs:
   test:
     name: Tests
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
     services:
       postgres:
         image: postgis/postgis:15-3.3
@@ -57,11 +60,11 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version-file: 'go.mod'
+          go-version-file: 'server/go.mod'
           cache: true
           cache-dependency-path: |
-            go.mod
-            go.sum
+            server/go.mod
+            server/go.sum
 
       - name: Install golang-migrate
         run: go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
@@ -99,6 +102,8 @@ jobs:
       - name: Run octocov
         continue-on-error: true
         uses: k1LoW/octocov-action@v1
+        with:
+          config: server/.octocov.yml
         env:
           OCTOCOV_GITHUB_REF: "${{ github.ref }}"
           OCTOCOV_GITHUB_SHA: none
