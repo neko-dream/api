@@ -1,0 +1,11 @@
+{
+  "name": "neko-dream",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.26.0",
+  "scripts": {
+    "generate": "pnpm --filter spec compile",
+    "generate:app": "pnpm --filter spec compile:app",
+    "generate:admin": "pnpm --filter spec compile:admin"
+  }
+}
