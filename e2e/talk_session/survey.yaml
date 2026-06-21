@@ -87,20 +87,24 @@ steps:
                       displayOrder: 0
                     - text: "青"
                       displayOrder: 1
-                - text: "ご意見（任意）"
-                  type: "free_text"
+                - text: "ご職業（任意）"
+                  type: "dropdown"
                   isRequired: false
                   allowOther: false
-                  maxLength: 500
                   displayOrder: 1
-                  choices: []
+                  choices:
+                    - text: "会社員"
+                      displayOrder: 0
+                    - text: "学生"
+                      displayOrder: 1
     bind:
       survey: current.res.body
     test: |
       current.res.status == 200 &&
       len(current.res.body.questions) == 2 &&
       current.res.body.questions[0].type == "single_choice" &&
-      len(current.res.body.questions[0].choices) == 2
+      len(current.res.body.questions[0].choices) == 2 &&
+      current.res.body.questions[1].type == "dropdown"
 
   createSurveyTwiceFails:
     desc: 2回目の作成は 409 Conflict
@@ -174,7 +178,7 @@ steps:
                 - questionID: "{{ survey.questions[0].questionID }}"
                   selectedChoiceIDs: ["{{ survey.questions[0].choices[0].choiceID }}"]
                 - questionID: "{{ survey.questions[1].questionID }}"
-                  text: "テストです"
+                  selectedChoiceIDs: ["{{ survey.questions[1].choices[0].choiceID }}"]
     test: |
       current.res.status == 200 &&
       current.res.body.submissionID != ""

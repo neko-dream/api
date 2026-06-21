@@ -1,4 +1,4 @@
-desc: アンケート PII フラグ：暗号化保存 → 復号取得の正常系
+desc: アンケート全回答暗号化：暗号化保存 → 復号取得の正常系
 runners:
   req:
     endpoint: http://localhost:3000
@@ -56,8 +56,8 @@ steps:
         post:
           body:
             multipart/form-data:
-              theme: "PIIアンケート"
-              description: "PII"
+              theme: "暗号化アンケート"
+              description: "全回答暗号化"
               scheduledEndTime: "2100-12-31T23:59:59Z"
               prefecture: "{{ vars.prefecture }}"
               city: "{{ vars.city }}"
@@ -65,44 +65,38 @@ steps:
       session: current.res.body
     test: current.res.status == 200
 
-  createSurveyWithPii:
-    desc: PII フラグ付きで free_text 質問を含むアンケート作成
+  createSurvey:
+    desc: single_choice（その他可）でアンケート作成
     req:
       /talksessions/{{ session.id }}/survey:
         post:
           body:
             application/json:
               questions:
-                - text: "あなたのメールアドレス（PII）"
-                  type: "free_text"
+                - text: "好きな色は？"
+                  type: "single_choice"
                   isRequired: true
                   allowOther: false
-                  maxLength: 200
                   displayOrder: 0
-                  containsPii: true
-                  choices: []
-                - text: "誕生日（PII）"
-                  type: "date"
+                  choices:
+                    - text: "赤"
+                      displayOrder: 0
+                    - text: "青"
+                      displayOrder: 1
+                - text: "ひとことメモ（その他自由入力）"
+                  type: "single_choice"
                   isRequired: false
-                  allowOther: false
+                  allowOther: true
+                  maxLength: 200
                   displayOrder: 1
-                  containsPii: true
-                  choices: []
-                - text: "公開可能なコメント"
-                  type: "free_text"
-                  isRequired: false
-                  allowOther: false
-                  maxLength: 500
-                  displayOrder: 2
-                  containsPii: false
-                  choices: []
+                  choices:
+                    - text: "なし"
+                      displayOrder: 0
     bind:
       survey: current.res.body
     test: |
       current.res.status == 200 &&
-      current.res.body.questions[0].containsPii == true &&
-      current.res.body.questions[1].containsPii == true &&
-      current.res.body.questions[2].containsPii == false
+      len(current.res.body.questions) == 2
 
   loginJoiner:
     desc: 参加者ログイン
@@ -124,7 +118,7 @@ steps:
               city: "{{ vars.city }}"
 
   submitAnswers:
-    desc: PII を含めて回答送信
+    desc: 選択肢 + その他自由入力で回答送信
     req:
       /talksessions/{{ session.id }}/survey/submissions:
         post:
@@ -132,39 +126,37 @@ steps:
             application/json:
               answers:
                 - questionID: "{{ survey.questions[0].questionID }}"
-                  text: "secret@example.com"
+                  selectedChoiceIDs: ["{{ survey.questions[0].choices[0].choiceID }}"]
                 - questionID: "{{ survey.questions[1].questionID }}"
-                  date: "1990-04-01"
-                - questionID: "{{ survey.questions[2].questionID }}"
-                  text: "公開コメント"
+                  other: "secret@example.com"
     test: current.res.status == 200
 
   verifyDbStoredEncrypted:
-    desc: DB 上では PII 設問の text/date が暗号文として保存されている（v1.xxxxx.yyyy 形式・平文と一致しない）
+    desc: DB 上では回答が暗号化 blob（enc, v1.xxx 形式）として保存され、選択肢 ID・その他テキストは平文で残らない
     dev:
       query: |
         SELECT
           (SELECT is_encrypted FROM talk_session_survey_answers ans
             INNER JOIN talk_session_survey_questions q ON q.question_id = ans.question_id
-            WHERE q.question_text = 'あなたのメールアドレス（PII）') AS email_is_encrypted,
-          (SELECT (answer_value->>'text') LIKE 'v1.%' FROM talk_session_survey_answers ans
+            WHERE q.question_text = '好きな色は？') AS choice_is_encrypted,
+          (SELECT (answer_value->>'enc') LIKE 'v1.%' FROM talk_session_survey_answers ans
             INNER JOIN talk_session_survey_questions q ON q.question_id = ans.question_id
-            WHERE q.question_text = 'あなたのメールアドレス（PII）') AS email_text_looks_encrypted,
-          (SELECT (answer_value->>'text') = 'secret@example.com' FROM talk_session_survey_answers ans
+            WHERE q.question_text = '好きな色は？') AS choice_enc_looks_encrypted,
+          (SELECT (answer_value ? 'selectedChoiceIDs') FROM talk_session_survey_answers ans
             INNER JOIN talk_session_survey_questions q ON q.question_id = ans.question_id
-            WHERE q.question_text = 'あなたのメールアドレス（PII）') AS email_text_is_plaintext,
-          (SELECT is_encrypted FROM talk_session_survey_answers ans
+            WHERE q.question_text = '好きな色は？') AS choice_has_plaintext_ids,
+          (SELECT (answer_value->>'enc') LIKE 'v1.%' FROM talk_session_survey_answers ans
             INNER JOIN talk_session_survey_questions q ON q.question_id = ans.question_id
-            WHERE q.question_text = '公開可能なコメント') AS public_is_encrypted,
-          (SELECT (answer_value->>'text') = '公開コメント' FROM talk_session_survey_answers ans
+            WHERE q.question_text = 'ひとことメモ（その他自由入力）') AS other_enc_looks_encrypted,
+          (SELECT (answer_value ? 'other') FROM talk_session_survey_answers ans
             INNER JOIN talk_session_survey_questions q ON q.question_id = ans.question_id
-            WHERE q.question_text = '公開可能なコメント') AS public_text_is_plaintext;
+            WHERE q.question_text = 'ひとことメモ（その他自由入力）') AS other_has_plaintext;
     test: |
-      current.rows[0].email_is_encrypted == true &&
-      current.rows[0].email_text_looks_encrypted == true &&
-      current.rows[0].email_text_is_plaintext == false &&
-      current.rows[0].public_is_encrypted == false &&
-      current.rows[0].public_text_is_plaintext == true
+      current.rows[0].choice_is_encrypted == true &&
+      current.rows[0].choice_enc_looks_encrypted == true &&
+      current.rows[0].choice_has_plaintext_ids == false &&
+      current.rows[0].other_enc_looks_encrypted == true &&
+      current.rows[0].other_has_plaintext == false
 
   loginOwnerAgain:
     desc: オーナーで再ログイン
@@ -174,7 +166,7 @@ steps:
           headers: null
 
   listSubmissionsDecrypted:
-    desc: オーナーが回答一覧取得時、PII 設問の text/date は復号されて平文で返る
+    desc: オーナーが回答一覧取得時、選択肢 ID・その他は復号されて平文で返る
     req:
       /talksessions/{{ session.id }}/survey/submissions:
         get:
@@ -183,21 +175,18 @@ steps:
       current.res.status == 200 &&
       current.res.body.totalCount == 1 &&
       len(filter(current.res.body.submissions[0].answers,
-        #.questionID == survey.questions[0].questionID && #.text == "secret@example.com")) == 1 &&
+        #.questionID == survey.questions[0].questionID && survey.questions[0].choices[0].choiceID in #.selectedChoiceIDs)) == 1 &&
       len(filter(current.res.body.submissions[0].answers,
-        #.questionID == survey.questions[1].questionID && #.date == "1990-04-01")) == 1 &&
-      len(filter(current.res.body.submissions[0].answers,
-        #.questionID == survey.questions[2].questionID && #.text == "公開コメント")) == 1
+        #.questionID == survey.questions[1].questionID && #.other == "secret@example.com")) == 1
 
-  summaryAnswerCount:
-    desc: 集計：PII でも answerCount は数えられる
+  summaryDecryptedAggregation:
+    desc: 集計はサーバ側で復号して行われ、選択肢の件数が数えられる
     req:
       /talksessions/{{ session.id }}/survey/summary:
         get:
           headers: null
     test: |
       current.res.status == 200 &&
-      current.res.body.questionSummaries[0].containsPii == true &&
       current.res.body.questionSummaries[0].answerCount == 1 &&
-      current.res.body.questionSummaries[1].containsPii == true &&
-      current.res.body.questionSummaries[1].answerCount == 1
+      len(filter(current.res.body.questionSummaries[0].choiceCounts, #.text == "赤" && #.count == 1)) == 1 &&
+      current.res.body.questionSummaries[1].otherCount == 1
