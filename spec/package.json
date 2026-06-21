@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "tsp compile . --watch",
     "build": "tsp compile .",
+    "compile": "tsp compile . && tsp compile admin",
+    "compile:app": "tsp compile .",
+    "compile:admin": "tsp compile admin",
     "format": "tsp format **/*.tsp"
   },
   "devDependencies": {
