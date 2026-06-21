@@ -1,0 +1,90 @@
+import { Authenticated, Refine } from "@refinedev/core";
+import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
+import {
+  ErrorComponent,
+  ThemedLayout,
+  useNotificationProvider,
+} from "@refinedev/antd";
+import "@refinedev/antd/dist/reset.css";
+import routerProvider, {
+  CatchAllNavigate,
+  NavigateToResource,
+} from "@refinedev/react-router";
+import { App as AntdApp, ConfigProvider, Typography } from "antd";
+import { BrowserRouter, Outlet, Route, Routes } from "react-router";
+
+import { LoginPage } from "./pages/login";
+import { authProvider, dataProvider } from "./providers";
+
+function App() {
+  return (
+    <BrowserRouter>
+      <RefineKbarProvider>
+        <ConfigProvider>
+          <AntdApp>
+            <Refine
+              dataProvider={dataProvider}
+              authProvider={authProvider}
+              routerProvider={routerProvider}
+              notificationProvider={useNotificationProvider}
+              resources={[
+                {
+                  name: "talksessions",
+                  list: "/talksessions",
+                  meta: { label: "トークセッション" },
+                },
+              ]}
+              options={{
+                syncWithLocation: true,
+                warnWhenUnsavedChanges: true,
+                title: { text: "Kotohiro 管理画面" },
+              }}
+            >
+              <Routes>
+                <Route
+                  element={
+                    <Authenticated
+                      key="authenticated-routes"
+                      fallback={<CatchAllNavigate to="/login" />}
+                    >
+                      <ThemedLayout>
+                        <Outlet />
+                      </ThemedLayout>
+                    </Authenticated>
+                  }
+                >
+                  <Route
+                    index
+                    element={<NavigateToResource resource="talksessions" />}
+                  />
+                  <Route
+                    path="/talksessions"
+                    element={
+                      <Typography.Paragraph>
+                        TODO: トークセッション一覧（ベースのみ。内容は今後実装）
+                      </Typography.Paragraph>
+                    }
+                  />
+                  <Route path="*" element={<ErrorComponent />} />
+                </Route>
+
+                <Route
+                  element={
+                    <Authenticated key="auth-pages" fallback={<Outlet />}>
+                      <NavigateToResource resource="talksessions" />
+                    </Authenticated>
+                  }
+                >
+                  <Route path="/login" element={<LoginPage />} />
+                </Route>
+              </Routes>
+              <RefineKbar />
+            </Refine>
+          </AntdApp>
+        </ConfigProvider>
+      </RefineKbarProvider>
+    </BrowserRouter>
+  );
+}
+
+export default App;

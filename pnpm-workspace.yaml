@@ -1,3 +1,4 @@
 packages:
   - spec
+  - admin
   - admin-ui
