@@ -4,14 +4,10 @@ using Http;
 
 namespace kotohiro {
   /**
-   * アンケートの質問タイプ
+   * アンケートの質問タイプ（選択肢系のみ）
    */
   enum TalkSessionSurveyQuestionType {
-    freeText: "free_text",
     singleChoice: "single_choice",
-    multiChoice: "multi_choice",
-    rating: "rating",
-    date: "date",
     dropdown: "dropdown",
   }
 
@@ -60,34 +56,14 @@ namespace kotohiro {
     isRequired: boolean;
 
     /**
-     * 「その他」入力を許可するか（single_choice / multi_choice / dropdown のみ有効）
+     * 「その他」入力を許可するか（single_choice / dropdown のみ有効）
      */
     allowOther: boolean;
 
     /**
-     * 自由記述の最大文字数（free_text または allowOther の入力に適用）
+     * 「その他」自由記述の最大文字数（allowOther の入力に適用）
      */
     maxLength?: int32 | null;
-
-    /**
-     * rating の下限値（rating のみ有効）
-     */
-    minValue?: int32 | null;
-
-    /**
-     * rating の上限値（rating のみ有効）
-     */
-    maxValue?: int32 | null;
-
-    /**
-     * rating の下限ラベル（例：「全く満足していない」）
-     */
-    minLabel?: string | null;
-
-    /**
-     * rating の上限ラベル（例：「非常に満足している」）
-     */
-    maxLabel?: string | null;
 
     /**
      * 表示順
@@ -95,12 +71,7 @@ namespace kotohiro {
     displayOrder: int32;
 
     /**
-     * 個人情報を含む設問かどうか。true のとき、回答の text / other / date は AES-GCM で暗号化して保存される。
-     */
-    containsPii: boolean;
-
-    /**
-     * 選択肢（single_choice / multi_choice / dropdown のみ）
+     * 選択肢（single_choice / dropdown）
      */
     choices: TalkSessionSurveyChoice[];
   }
@@ -127,12 +98,8 @@ namespace kotohiro {
 
   /**
    * 回答送信用：単一回答
-   * 質問タイプによって意味が変わる：
-   * - free_text: text を使用
-   * - single_choice / dropdown: selectedChoiceIDs を 1 件、または allowOther の場合 other
-   * - multi_choice: selectedChoiceIDs を 1 件以上、加えて allowOther の場合 other
-   * - rating: rating を使用
-   * - date: date を使用 (YYYY-MM-DD)
+   * 質問タイプは single_choice / dropdown のみ：
+   * - selectedChoiceIDs を 1 件、または allowOther の場合 other
    */
   model TalkSessionSurveyAnswerInput {
     /**
@@ -141,29 +108,14 @@ namespace kotohiro {
     questionID: string;
 
     /**
-     * 自由記述（free_text）
-     */
-    text?: string | null;
-
-    /**
-     * 選択された choice_id 配列（single/multi/dropdown）
+     * 選択された choice_id 配列（single_choice / dropdown は 1 件）
      */
     selectedChoiceIDs?: string[];
 
     /**
-     * 「その他」自由記述（allowOther=true の choice 系で使用）
+     * 「その他」自由記述（allowOther=true の場合に使用）
      */
     other?: string | null;
-
-    /**
-     * 評価値（rating）
-     */
-    rating?: int32 | null;
-
-    /**
-     * 日付（date, YYYY-MM-DD）
-     */
-    date?: string | null;
   }
 
   /**
@@ -176,11 +128,6 @@ namespace kotohiro {
     questionID: string;
 
     /**
-     * 自由記述（free_text）
-     */
-    text?: string | null;
-
-    /**
      * 選択された choice_id 配列
      */
     selectedChoiceIDs: string[];
@@ -189,16 +136,6 @@ namespace kotohiro {
      * 「その他」自由記述
      */
     other?: string | null;
-
-    /**
-     * 評価値
-     */
-    rating?: int32 | null;
-
-    /**
-     * 日付
-     */
-    date?: string | null;
   }
 
   /**
@@ -240,15 +177,7 @@ namespace kotohiro {
     isRequired: boolean;
     allowOther: boolean;
     maxLength?: int32 | null;
-    minValue?: int32 | null;
-    maxValue?: int32 | null;
-    minLabel?: string | null;
-    maxLabel?: string | null;
     displayOrder: int32;
-    /**
-     * 個人情報を含む設問かどうか。省略時は false。
-     */
-    containsPii?: boolean;
     choices: TalkSessionSurveyChoiceInput[];
   }
 
@@ -275,47 +204,25 @@ namespace kotohiro {
   }
 
   /**
-   * 集計：rating の分布
-   */
-  model TalkSessionSurveyRatingBucket {
-    value: int32;
-    count: int32;
-  }
-
-  /**
-   * 集計：質問ごとの結果
-   * - free_text / date: answerCount のみ意味を持つ（生データは /submissions で取得）
-   * - single_choice / multi_choice / dropdown: choiceCounts + otherCount
-   * - rating: ratingAverage + ratingDistribution
+   * 集計：質問ごとの結果（single_choice / dropdown）
+   * choiceCounts + otherCount を持つ。
    */
   model TalkSessionSurveyQuestionSummary {
     questionID: string;
     text: string;
     type: TalkSessionSurveyQuestionType;
     /**
-     * 個人情報設問かどうか
-     */
-    containsPii: boolean;
-    /**
      * この質問に有効な回答を行ったユーザー数
      */
     answerCount: int32;
     /**
-     * choice 系のみ：選択肢ごとの件数
+     * 選択肢ごとの件数
      */
     choiceCounts: TalkSessionSurveyChoiceCount[];
     /**
-     * choice 系（allowOther=true）のみ：その他テキストを記入したユーザー数
+     * allowOther=true のみ：その他テキストを記入したユーザー数
      */
     otherCount: int32;
-    /**
-     * rating のみ：回答の平均値
-     */
-    ratingAverage?: float64 | null;
-    /**
-     * rating のみ：値ごとの件数分布（minValue〜maxValue 昇順）
-     */
-    ratingDistribution: TalkSessionSurveyRatingBucket[];
   }
 
   /**

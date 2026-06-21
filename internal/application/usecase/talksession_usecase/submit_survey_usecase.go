@@ -29,11 +29,8 @@ type (
 
 	SurveyAnswerInput struct {
 		QuestionID        shared.UUID[survey.Question]
-		Text              *string
 		SelectedChoiceIDs []shared.UUID[survey.Choice]
 		Other             *string
-		Rating            *int
-		Date              *string
 	}
 
 	submitSurveyUseCase struct {
@@ -80,11 +77,8 @@ func (uc *submitSurveyUseCase) Execute(ctx context.Context, input SubmitSurveyIn
 	answers := make([]*survey.Answer, 0, len(input.Answers))
 	for _, ai := range input.Answers {
 		v := survey.AnswerValue{
-			Text:              ai.Text,
 			SelectedChoiceIDs: ai.SelectedChoiceIDs,
 			Other:             ai.Other,
-			Rating:            ai.Rating,
-			Date:              ai.Date,
 		}
 		answers = append(answers, survey.NewAnswer(
 			shared.NewUUID[survey.Answer](),
@@ -101,12 +95,8 @@ func (uc *submitSurveyUseCase) Execute(ctx context.Context, input SubmitSurveyIn
 		return shared.UUID[survey.Submission]{}, &e
 	}
 
-	// PII フラグが立っている設問への回答は text/other/date を暗号化する
+	// すべての回答を暗号化して保存する（選択肢 ID / その他テキストを含む）。
 	for _, a := range answers {
-		q := s.FindQuestion(a.QuestionID())
-		if q == nil || !q.ContainsPii() {
-			continue
-		}
 		enc, err := crypto.EncryptAnswerValue(ctx, uc.encryptor, a.Value())
 		if err != nil {
 			utils.HandleError(ctx, err, "crypto.EncryptAnswerValue")
@@ -129,4 +119,3 @@ func (uc *submitSurveyUseCase) Execute(ctx context.Context, input SubmitSurveyIn
 
 	return submissionID, nil
 }
-

@@ -2161,35 +2161,6 @@ func (s *TalkSessionSurveyQuestionSummary) Validate() error {
 			Error: err,
 		})
 	}
-	if err := func() error {
-		if value, ok := s.RatingAverage.Get(); ok {
-			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(value)); err != nil {
-					return errors.Wrap(err, "float")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "ratingAverage",
-			Error: err,
-		})
-	}
-	if err := func() error {
-		if s.RatingDistribution == nil {
-			return errors.New("nil is invalid value")
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "ratingDistribution",
-			Error: err,
-		})
-	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
@@ -2198,15 +2169,7 @@ func (s *TalkSessionSurveyQuestionSummary) Validate() error {
 
 func (s TalkSessionSurveyQuestionType) Validate() error {
 	switch s {
-	case "free_text":
-		return nil
 	case "single_choice":
-		return nil
-	case "multi_choice":
-		return nil
-	case "rating":
-		return nil
-	case "date":
 		return nil
 	case "dropdown":
 		return nil

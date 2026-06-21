@@ -7464,26 +7464,15 @@ func (*TalkSessionSurvey) updateTalkSessionSurveyRes() {}
 type TalkSessionSurveyAnswer struct {
 	// 質問ID.
 	QuestionID string `json:"questionID"`
-	// 自由記述（free_text）.
-	Text OptNilString `json:"text"`
 	// 選択された choice_id 配列.
 	SelectedChoiceIDs []string `json:"selectedChoiceIDs"`
 	// 「その他」自由記述.
 	Other OptNilString `json:"other"`
-	// 評価値.
-	Rating OptNilInt32 `json:"rating"`
-	// 日付.
-	Date OptNilString `json:"date"`
 }
 
 // GetQuestionID returns the value of QuestionID.
 func (s *TalkSessionSurveyAnswer) GetQuestionID() string {
 	return s.QuestionID
-}
-
-// GetText returns the value of Text.
-func (s *TalkSessionSurveyAnswer) GetText() OptNilString {
-	return s.Text
 }
 
 // GetSelectedChoiceIDs returns the value of SelectedChoiceIDs.
@@ -7496,24 +7485,9 @@ func (s *TalkSessionSurveyAnswer) GetOther() OptNilString {
 	return s.Other
 }
 
-// GetRating returns the value of Rating.
-func (s *TalkSessionSurveyAnswer) GetRating() OptNilInt32 {
-	return s.Rating
-}
-
-// GetDate returns the value of Date.
-func (s *TalkSessionSurveyAnswer) GetDate() OptNilString {
-	return s.Date
-}
-
 // SetQuestionID sets the value of QuestionID.
 func (s *TalkSessionSurveyAnswer) SetQuestionID(val string) {
 	s.QuestionID = val
-}
-
-// SetText sets the value of Text.
-func (s *TalkSessionSurveyAnswer) SetText(val OptNilString) {
-	s.Text = val
 }
 
 // SetSelectedChoiceIDs sets the value of SelectedChoiceIDs.
@@ -7526,47 +7500,22 @@ func (s *TalkSessionSurveyAnswer) SetOther(val OptNilString) {
 	s.Other = val
 }
 
-// SetRating sets the value of Rating.
-func (s *TalkSessionSurveyAnswer) SetRating(val OptNilInt32) {
-	s.Rating = val
-}
-
-// SetDate sets the value of Date.
-func (s *TalkSessionSurveyAnswer) SetDate(val OptNilString) {
-	s.Date = val
-}
-
 // 回答送信用：単一回答
-// 質問タイプによって意味が変わる：
-// - free_text: text を使用
-// - single_choice / dropdown: selectedChoiceIDs を 1 件、または allowOther の場合 other
-// - multi_choice: selectedChoiceIDs を 1 件以上、加えて allowOther の場合 other
-// - rating: rating を使用
-// - date: date を使用 (YYYY-MM-DD).
+// 質問タイプは single_choice / dropdown のみ：
+// - selectedChoiceIDs を 1 件、または allowOther の場合 other.
 // Ref: #/components/schemas/TalkSessionSurveyAnswerInput
 type TalkSessionSurveyAnswerInput struct {
 	// 質問ID.
 	QuestionID string `json:"questionID"`
-	// 自由記述（free_text）.
-	Text OptNilString `json:"text"`
-	// 選択された choice_id 配列（single/multi/dropdown）.
+	// 選択された choice_id 配列（single_choice / dropdown は 1 件）.
 	SelectedChoiceIDs []string `json:"selectedChoiceIDs"`
-	// 「その他」自由記述（allowOther=true の choice 系で使用）.
+	// 「その他」自由記述（allowOther=true の場合に使用）.
 	Other OptNilString `json:"other"`
-	// 評価値（rating）.
-	Rating OptNilInt32 `json:"rating"`
-	// 日付（date, YYYY-MM-DD）.
-	Date OptNilString `json:"date"`
 }
 
 // GetQuestionID returns the value of QuestionID.
 func (s *TalkSessionSurveyAnswerInput) GetQuestionID() string {
 	return s.QuestionID
-}
-
-// GetText returns the value of Text.
-func (s *TalkSessionSurveyAnswerInput) GetText() OptNilString {
-	return s.Text
 }
 
 // GetSelectedChoiceIDs returns the value of SelectedChoiceIDs.
@@ -7579,24 +7528,9 @@ func (s *TalkSessionSurveyAnswerInput) GetOther() OptNilString {
 	return s.Other
 }
 
-// GetRating returns the value of Rating.
-func (s *TalkSessionSurveyAnswerInput) GetRating() OptNilInt32 {
-	return s.Rating
-}
-
-// GetDate returns the value of Date.
-func (s *TalkSessionSurveyAnswerInput) GetDate() OptNilString {
-	return s.Date
-}
-
 // SetQuestionID sets the value of QuestionID.
 func (s *TalkSessionSurveyAnswerInput) SetQuestionID(val string) {
 	s.QuestionID = val
-}
-
-// SetText sets the value of Text.
-func (s *TalkSessionSurveyAnswerInput) SetText(val OptNilString) {
-	s.Text = val
 }
 
 // SetSelectedChoiceIDs sets the value of SelectedChoiceIDs.
@@ -7607,16 +7541,6 @@ func (s *TalkSessionSurveyAnswerInput) SetSelectedChoiceIDs(val []string) {
 // SetOther sets the value of Other.
 func (s *TalkSessionSurveyAnswerInput) SetOther(val OptNilString) {
 	s.Other = val
-}
-
-// SetRating sets the value of Rating.
-func (s *TalkSessionSurveyAnswerInput) SetRating(val OptNilInt32) {
-	s.Rating = val
-}
-
-// SetDate sets the value of Date.
-func (s *TalkSessionSurveyAnswerInput) SetDate(val OptNilString) {
-	s.Date = val
 }
 
 // アンケート選択肢.
@@ -7748,24 +7672,13 @@ type TalkSessionSurveyQuestion struct {
 	Type TalkSessionSurveyQuestionType `json:"type"`
 	// 必須回答かどうか.
 	IsRequired bool `json:"isRequired"`
-	// 「その他」入力を許可するか（single_choice / multi_choice / dropdown のみ有効）.
+	// 「その他」入力を許可するか（single_choice / dropdown のみ有効）.
 	AllowOther bool `json:"allowOther"`
-	// 自由記述の最大文字数（free_text または allowOther の入力に適用）.
+	// 「その他」自由記述の最大文字数（allowOther の入力に適用）.
 	MaxLength OptNilInt32 `json:"maxLength"`
-	// Rating の下限値（rating のみ有効）.
-	MinValue OptNilInt32 `json:"minValue"`
-	// Rating の上限値（rating のみ有効）.
-	MaxValue OptNilInt32 `json:"maxValue"`
-	// Rating の下限ラベル（例：「全く満足していない」）.
-	MinLabel OptNilString `json:"minLabel"`
-	// Rating の上限ラベル（例：「非常に満足している」）.
-	MaxLabel OptNilString `json:"maxLabel"`
 	// 表示順.
 	DisplayOrder int32 `json:"displayOrder"`
-	// 個人情報を含む設問かどうか。true のとき、回答の text / other / date は
-	// AES-GCM で暗号化して保存される。.
-	ContainsPii bool `json:"containsPii"`
-	// 選択肢（single_choice / multi_choice / dropdown のみ）.
+	// 選択肢（single_choice / dropdown）.
 	Choices []TalkSessionSurveyChoice `json:"choices"`
 }
 
@@ -7799,34 +7712,9 @@ func (s *TalkSessionSurveyQuestion) GetMaxLength() OptNilInt32 {
 	return s.MaxLength
 }
 
-// GetMinValue returns the value of MinValue.
-func (s *TalkSessionSurveyQuestion) GetMinValue() OptNilInt32 {
-	return s.MinValue
-}
-
-// GetMaxValue returns the value of MaxValue.
-func (s *TalkSessionSurveyQuestion) GetMaxValue() OptNilInt32 {
-	return s.MaxValue
-}
-
-// GetMinLabel returns the value of MinLabel.
-func (s *TalkSessionSurveyQuestion) GetMinLabel() OptNilString {
-	return s.MinLabel
-}
-
-// GetMaxLabel returns the value of MaxLabel.
-func (s *TalkSessionSurveyQuestion) GetMaxLabel() OptNilString {
-	return s.MaxLabel
-}
-
 // GetDisplayOrder returns the value of DisplayOrder.
 func (s *TalkSessionSurveyQuestion) GetDisplayOrder() int32 {
 	return s.DisplayOrder
-}
-
-// GetContainsPii returns the value of ContainsPii.
-func (s *TalkSessionSurveyQuestion) GetContainsPii() bool {
-	return s.ContainsPii
 }
 
 // GetChoices returns the value of Choices.
@@ -7864,34 +7752,9 @@ func (s *TalkSessionSurveyQuestion) SetMaxLength(val OptNilInt32) {
 	s.MaxLength = val
 }
 
-// SetMinValue sets the value of MinValue.
-func (s *TalkSessionSurveyQuestion) SetMinValue(val OptNilInt32) {
-	s.MinValue = val
-}
-
-// SetMaxValue sets the value of MaxValue.
-func (s *TalkSessionSurveyQuestion) SetMaxValue(val OptNilInt32) {
-	s.MaxValue = val
-}
-
-// SetMinLabel sets the value of MinLabel.
-func (s *TalkSessionSurveyQuestion) SetMinLabel(val OptNilString) {
-	s.MinLabel = val
-}
-
-// SetMaxLabel sets the value of MaxLabel.
-func (s *TalkSessionSurveyQuestion) SetMaxLabel(val OptNilString) {
-	s.MaxLabel = val
-}
-
 // SetDisplayOrder sets the value of DisplayOrder.
 func (s *TalkSessionSurveyQuestion) SetDisplayOrder(val int32) {
 	s.DisplayOrder = val
-}
-
-// SetContainsPii sets the value of ContainsPii.
-func (s *TalkSessionSurveyQuestion) SetContainsPii(val bool) {
-	s.ContainsPii = val
 }
 
 // SetChoices sets the value of Choices.
@@ -7903,20 +7766,14 @@ func (s *TalkSessionSurveyQuestion) SetChoices(val []TalkSessionSurveyChoice) {
 // Ref: #/components/schemas/TalkSessionSurveyQuestionInput
 type TalkSessionSurveyQuestionInput struct {
 	// 既存質問を編集する場合は questionID を指定。新規追加時は省略。.
-	QuestionID   OptNilString                  `json:"questionID"`
-	Text         string                        `json:"text"`
-	Type         TalkSessionSurveyQuestionType `json:"type"`
-	IsRequired   bool                          `json:"isRequired"`
-	AllowOther   bool                          `json:"allowOther"`
-	MaxLength    OptNilInt32                   `json:"maxLength"`
-	MinValue     OptNilInt32                   `json:"minValue"`
-	MaxValue     OptNilInt32                   `json:"maxValue"`
-	MinLabel     OptNilString                  `json:"minLabel"`
-	MaxLabel     OptNilString                  `json:"maxLabel"`
-	DisplayOrder int32                         `json:"displayOrder"`
-	// 個人情報を含む設問かどうか。省略時は false。.
-	ContainsPii OptBool                        `json:"containsPii"`
-	Choices     []TalkSessionSurveyChoiceInput `json:"choices"`
+	QuestionID   OptNilString                   `json:"questionID"`
+	Text         string                         `json:"text"`
+	Type         TalkSessionSurveyQuestionType  `json:"type"`
+	IsRequired   bool                           `json:"isRequired"`
+	AllowOther   bool                           `json:"allowOther"`
+	MaxLength    OptNilInt32                    `json:"maxLength"`
+	DisplayOrder int32                          `json:"displayOrder"`
+	Choices      []TalkSessionSurveyChoiceInput `json:"choices"`
 }
 
 // GetQuestionID returns the value of QuestionID.
@@ -7949,34 +7806,9 @@ func (s *TalkSessionSurveyQuestionInput) GetMaxLength() OptNilInt32 {
 	return s.MaxLength
 }
 
-// GetMinValue returns the value of MinValue.
-func (s *TalkSessionSurveyQuestionInput) GetMinValue() OptNilInt32 {
-	return s.MinValue
-}
-
-// GetMaxValue returns the value of MaxValue.
-func (s *TalkSessionSurveyQuestionInput) GetMaxValue() OptNilInt32 {
-	return s.MaxValue
-}
-
-// GetMinLabel returns the value of MinLabel.
-func (s *TalkSessionSurveyQuestionInput) GetMinLabel() OptNilString {
-	return s.MinLabel
-}
-
-// GetMaxLabel returns the value of MaxLabel.
-func (s *TalkSessionSurveyQuestionInput) GetMaxLabel() OptNilString {
-	return s.MaxLabel
-}
-
 // GetDisplayOrder returns the value of DisplayOrder.
 func (s *TalkSessionSurveyQuestionInput) GetDisplayOrder() int32 {
 	return s.DisplayOrder
-}
-
-// GetContainsPii returns the value of ContainsPii.
-func (s *TalkSessionSurveyQuestionInput) GetContainsPii() OptBool {
-	return s.ContainsPii
 }
 
 // GetChoices returns the value of Choices.
@@ -8014,34 +7846,9 @@ func (s *TalkSessionSurveyQuestionInput) SetMaxLength(val OptNilInt32) {
 	s.MaxLength = val
 }
 
-// SetMinValue sets the value of MinValue.
-func (s *TalkSessionSurveyQuestionInput) SetMinValue(val OptNilInt32) {
-	s.MinValue = val
-}
-
-// SetMaxValue sets the value of MaxValue.
-func (s *TalkSessionSurveyQuestionInput) SetMaxValue(val OptNilInt32) {
-	s.MaxValue = val
-}
-
-// SetMinLabel sets the value of MinLabel.
-func (s *TalkSessionSurveyQuestionInput) SetMinLabel(val OptNilString) {
-	s.MinLabel = val
-}
-
-// SetMaxLabel sets the value of MaxLabel.
-func (s *TalkSessionSurveyQuestionInput) SetMaxLabel(val OptNilString) {
-	s.MaxLabel = val
-}
-
 // SetDisplayOrder sets the value of DisplayOrder.
 func (s *TalkSessionSurveyQuestionInput) SetDisplayOrder(val int32) {
 	s.DisplayOrder = val
-}
-
-// SetContainsPii sets the value of ContainsPii.
-func (s *TalkSessionSurveyQuestionInput) SetContainsPii(val OptBool) {
-	s.ContainsPii = val
 }
 
 // SetChoices sets the value of Choices.
@@ -8049,27 +7856,19 @@ func (s *TalkSessionSurveyQuestionInput) SetChoices(val []TalkSessionSurveyChoic
 	s.Choices = val
 }
 
-// 集計：質問ごとの結果
-// - free_text / date: answerCount のみ意味を持つ（生データは /submissions で取得）
-// - single_choice / multi_choice / dropdown: choiceCounts + otherCount
-// - rating: ratingAverage + ratingDistribution.
+// 集計：質問ごとの結果（single_choice / dropdown）
+// choiceCounts + otherCount を持つ。.
 // Ref: #/components/schemas/TalkSessionSurveyQuestionSummary
 type TalkSessionSurveyQuestionSummary struct {
 	QuestionID string                        `json:"questionID"`
 	Text       string                        `json:"text"`
 	Type       TalkSessionSurveyQuestionType `json:"type"`
-	// 個人情報設問かどうか.
-	ContainsPii bool `json:"containsPii"`
 	// この質問に有効な回答を行ったユーザー数.
 	AnswerCount int32 `json:"answerCount"`
-	// Choice 系のみ：選択肢ごとの件数.
+	// 選択肢ごとの件数.
 	ChoiceCounts []TalkSessionSurveyChoiceCount `json:"choiceCounts"`
-	// Choice 系（allowOther=true）のみ：その他テキストを記入したユーザー数.
+	// AllowOther=true のみ：その他テキストを記入したユーザー数.
 	OtherCount int32 `json:"otherCount"`
-	// Rating のみ：回答の平均値.
-	RatingAverage OptNilFloat64 `json:"ratingAverage"`
-	// Rating のみ：値ごとの件数分布（minValue〜maxValue 昇順）.
-	RatingDistribution []TalkSessionSurveyRatingBucket `json:"ratingDistribution"`
 }
 
 // GetQuestionID returns the value of QuestionID.
@@ -8087,11 +7886,6 @@ func (s *TalkSessionSurveyQuestionSummary) GetType() TalkSessionSurveyQuestionTy
 	return s.Type
 }
 
-// GetContainsPii returns the value of ContainsPii.
-func (s *TalkSessionSurveyQuestionSummary) GetContainsPii() bool {
-	return s.ContainsPii
-}
-
 // GetAnswerCount returns the value of AnswerCount.
 func (s *TalkSessionSurveyQuestionSummary) GetAnswerCount() int32 {
 	return s.AnswerCount
@@ -8105,16 +7899,6 @@ func (s *TalkSessionSurveyQuestionSummary) GetChoiceCounts() []TalkSessionSurvey
 // GetOtherCount returns the value of OtherCount.
 func (s *TalkSessionSurveyQuestionSummary) GetOtherCount() int32 {
 	return s.OtherCount
-}
-
-// GetRatingAverage returns the value of RatingAverage.
-func (s *TalkSessionSurveyQuestionSummary) GetRatingAverage() OptNilFloat64 {
-	return s.RatingAverage
-}
-
-// GetRatingDistribution returns the value of RatingDistribution.
-func (s *TalkSessionSurveyQuestionSummary) GetRatingDistribution() []TalkSessionSurveyRatingBucket {
-	return s.RatingDistribution
 }
 
 // SetQuestionID sets the value of QuestionID.
@@ -8132,11 +7916,6 @@ func (s *TalkSessionSurveyQuestionSummary) SetType(val TalkSessionSurveyQuestion
 	s.Type = val
 }
 
-// SetContainsPii sets the value of ContainsPii.
-func (s *TalkSessionSurveyQuestionSummary) SetContainsPii(val bool) {
-	s.ContainsPii = val
-}
-
 // SetAnswerCount sets the value of AnswerCount.
 func (s *TalkSessionSurveyQuestionSummary) SetAnswerCount(val int32) {
 	s.AnswerCount = val
@@ -8152,37 +7931,19 @@ func (s *TalkSessionSurveyQuestionSummary) SetOtherCount(val int32) {
 	s.OtherCount = val
 }
 
-// SetRatingAverage sets the value of RatingAverage.
-func (s *TalkSessionSurveyQuestionSummary) SetRatingAverage(val OptNilFloat64) {
-	s.RatingAverage = val
-}
-
-// SetRatingDistribution sets the value of RatingDistribution.
-func (s *TalkSessionSurveyQuestionSummary) SetRatingDistribution(val []TalkSessionSurveyRatingBucket) {
-	s.RatingDistribution = val
-}
-
-// アンケートの質問タイプ.
+// アンケートの質問タイプ（選択肢系のみ）.
 // Ref: #/components/schemas/TalkSessionSurveyQuestionType
 type TalkSessionSurveyQuestionType string
 
 const (
-	TalkSessionSurveyQuestionTypeFreeText     TalkSessionSurveyQuestionType = "free_text"
 	TalkSessionSurveyQuestionTypeSingleChoice TalkSessionSurveyQuestionType = "single_choice"
-	TalkSessionSurveyQuestionTypeMultiChoice  TalkSessionSurveyQuestionType = "multi_choice"
-	TalkSessionSurveyQuestionTypeRating       TalkSessionSurveyQuestionType = "rating"
-	TalkSessionSurveyQuestionTypeDate         TalkSessionSurveyQuestionType = "date"
 	TalkSessionSurveyQuestionTypeDropdown     TalkSessionSurveyQuestionType = "dropdown"
 )
 
 // AllValues returns all TalkSessionSurveyQuestionType values.
 func (TalkSessionSurveyQuestionType) AllValues() []TalkSessionSurveyQuestionType {
 	return []TalkSessionSurveyQuestionType{
-		TalkSessionSurveyQuestionTypeFreeText,
 		TalkSessionSurveyQuestionTypeSingleChoice,
-		TalkSessionSurveyQuestionTypeMultiChoice,
-		TalkSessionSurveyQuestionTypeRating,
-		TalkSessionSurveyQuestionTypeDate,
 		TalkSessionSurveyQuestionTypeDropdown,
 	}
 }
@@ -8190,15 +7951,7 @@ func (TalkSessionSurveyQuestionType) AllValues() []TalkSessionSurveyQuestionType
 // MarshalText implements encoding.TextMarshaler.
 func (s TalkSessionSurveyQuestionType) MarshalText() ([]byte, error) {
 	switch s {
-	case TalkSessionSurveyQuestionTypeFreeText:
-		return []byte(s), nil
 	case TalkSessionSurveyQuestionTypeSingleChoice:
-		return []byte(s), nil
-	case TalkSessionSurveyQuestionTypeMultiChoice:
-		return []byte(s), nil
-	case TalkSessionSurveyQuestionTypeRating:
-		return []byte(s), nil
-	case TalkSessionSurveyQuestionTypeDate:
 		return []byte(s), nil
 	case TalkSessionSurveyQuestionTypeDropdown:
 		return []byte(s), nil
@@ -8210,20 +7963,8 @@ func (s TalkSessionSurveyQuestionType) MarshalText() ([]byte, error) {
 // UnmarshalText implements encoding.TextUnmarshaler.
 func (s *TalkSessionSurveyQuestionType) UnmarshalText(data []byte) error {
 	switch TalkSessionSurveyQuestionType(data) {
-	case TalkSessionSurveyQuestionTypeFreeText:
-		*s = TalkSessionSurveyQuestionTypeFreeText
-		return nil
 	case TalkSessionSurveyQuestionTypeSingleChoice:
 		*s = TalkSessionSurveyQuestionTypeSingleChoice
-		return nil
-	case TalkSessionSurveyQuestionTypeMultiChoice:
-		*s = TalkSessionSurveyQuestionTypeMultiChoice
-		return nil
-	case TalkSessionSurveyQuestionTypeRating:
-		*s = TalkSessionSurveyQuestionTypeRating
-		return nil
-	case TalkSessionSurveyQuestionTypeDate:
-		*s = TalkSessionSurveyQuestionTypeDate
 		return nil
 	case TalkSessionSurveyQuestionTypeDropdown:
 		*s = TalkSessionSurveyQuestionTypeDropdown
@@ -8231,33 +7972,6 @@ func (s *TalkSessionSurveyQuestionType) UnmarshalText(data []byte) error {
 	default:
 		return errors.Errorf("invalid value: %q", data)
 	}
-}
-
-// 集計：rating の分布.
-// Ref: #/components/schemas/TalkSessionSurveyRatingBucket
-type TalkSessionSurveyRatingBucket struct {
-	Value int32 `json:"value"`
-	Count int32 `json:"count"`
-}
-
-// GetValue returns the value of Value.
-func (s *TalkSessionSurveyRatingBucket) GetValue() int32 {
-	return s.Value
-}
-
-// GetCount returns the value of Count.
-func (s *TalkSessionSurveyRatingBucket) GetCount() int32 {
-	return s.Count
-}
-
-// SetValue sets the value of Value.
-func (s *TalkSessionSurveyRatingBucket) SetValue(val int32) {
-	s.Value = val
-}
-
-// SetCount sets the value of Count.
-func (s *TalkSessionSurveyRatingBucket) SetCount(val int32) {
-	s.Count = val
 }
 
 // 回答送信レコード.

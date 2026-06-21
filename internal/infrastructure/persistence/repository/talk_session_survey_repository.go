@@ -161,12 +161,7 @@ func (r *talkSessionSurveyRepository) insertQuestion(ctx context.Context, qn *su
 		IsRequired:   qn.IsRequired(),
 		AllowOther:   qn.AllowOther(),
 		MaxLength:    utils.ToNullableSQL[sql.NullInt32](qn.MaxLength()),
-		MinValue:     utils.ToNullableSQL[sql.NullInt32](qn.MinValue()),
-		MaxValue:     utils.ToNullableSQL[sql.NullInt32](qn.MaxValue()),
-		MinLabel:     utils.ToNullableSQL[sql.NullString](qn.MinLabel()),
-		MaxLabel:     utils.ToNullableSQL[sql.NullString](qn.MaxLabel()),
 		DisplayOrder: int32(qn.DisplayOrder()),
-		ContainsPii:  qn.ContainsPii(),
 		CreatedAt:    qn.CreatedAt(),
 		UpdatedAt:    qn.UpdatedAt(),
 	})
@@ -180,12 +175,7 @@ func (r *talkSessionSurveyRepository) updateQuestion(ctx context.Context, qn *su
 		IsRequired:   qn.IsRequired(),
 		AllowOther:   qn.AllowOther(),
 		MaxLength:    utils.ToNullableSQL[sql.NullInt32](qn.MaxLength()),
-		MinValue:     utils.ToNullableSQL[sql.NullInt32](qn.MinValue()),
-		MaxValue:     utils.ToNullableSQL[sql.NullInt32](qn.MaxValue()),
-		MinLabel:     utils.ToNullableSQL[sql.NullString](qn.MinLabel()),
-		MaxLabel:     utils.ToNullableSQL[sql.NullString](qn.MaxLabel()),
 		DisplayOrder: int32(qn.DisplayOrder()),
-		ContainsPii:  qn.ContainsPii(),
 		UpdatedAt:    time.Now(),
 	})
 }
@@ -284,12 +274,7 @@ func (r *talkSessionSurveyRepository) reconstruct(
 			row.IsRequired,
 			row.AllowOther,
 			utils.ToPtrIf(row.MaxLength.Valid, int(row.MaxLength.Int32)),
-			utils.ToPtrIf(row.MinValue.Valid, int(row.MinValue.Int32)),
-			utils.ToPtrIf(row.MaxValue.Valid, int(row.MaxValue.Int32)),
-			utils.ToPtrIf(row.MinLabel.Valid, row.MinLabel.String),
-			utils.ToPtrIf(row.MaxLabel.Valid, row.MaxLabel.String),
 			int(row.DisplayOrder),
-			row.ContainsPii,
 			cRowsByQuestion[row.QuestionID],
 			utils.ToPtrIf(row.DeletedAt.Valid, row.DeletedAt.Time),
 			row.CreatedAt,
@@ -327,7 +312,7 @@ func (r *talkSessionSurveyRepository) HardDeleteChoice(ctx context.Context, choi
 	defer span.End()
 
 	q := r.GetQueries(ctx)
-	count, err := q.CountAnswersForChoice(ctx, choiceID.UUID().String())
+	count, err := q.CountAnswersForChoice(ctx, choiceID.UUID())
 	if err != nil {
 		return err
 	}
@@ -352,7 +337,7 @@ func (r *talkSessionSurveyRepository) HasAnswersForChoice(ctx context.Context, c
 	ctx, span := otel.Tracer("repository").Start(ctx, "talkSessionSurveyRepository.HasAnswersForChoice")
 	defer span.End()
 
-	count, err := r.GetQueries(ctx).CountAnswersForChoice(ctx, choiceID.UUID().String())
+	count, err := r.GetQueries(ctx).CountAnswersForChoice(ctx, choiceID.UUID())
 	if err != nil {
 		return false, err
 	}

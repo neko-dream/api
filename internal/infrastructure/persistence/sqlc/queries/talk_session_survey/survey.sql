@@ -18,8 +18,7 @@ UPDATE talk_session_surveys SET updated_at = $2 WHERE survey_id = $1;
 -- name: ListSurveyQuestions :many
 SELECT
     question_id, survey_id, question_text, question_type::text AS question_type,
-    is_required, allow_other, max_length, min_value, max_value,
-    min_label, max_label, display_order, contains_pii, deleted_at, created_at, updated_at
+    is_required, allow_other, max_length, display_order, deleted_at, created_at, updated_at
 FROM talk_session_survey_questions
 WHERE survey_id = $1
 ORDER BY display_order ASC, created_at ASC;
@@ -27,8 +26,7 @@ ORDER BY display_order ASC, created_at ASC;
 -- name: CreateSurveyQuestion :exec
 INSERT INTO talk_session_survey_questions (
     question_id, survey_id, question_text, question_type,
-    is_required, allow_other, max_length, min_value, max_value,
-    min_label, max_label, display_order, contains_pii, created_at, updated_at
+    is_required, allow_other, max_length, display_order, created_at, updated_at
 ) VALUES (
     sqlc.arg('question_id')::uuid,
     sqlc.arg('survey_id')::uuid,
@@ -37,12 +35,7 @@ INSERT INTO talk_session_survey_questions (
     sqlc.arg('is_required')::boolean,
     sqlc.arg('allow_other')::boolean,
     sqlc.narg('max_length')::int,
-    sqlc.narg('min_value')::int,
-    sqlc.narg('max_value')::int,
-    sqlc.narg('min_label')::varchar,
-    sqlc.narg('max_label')::varchar,
     sqlc.arg('display_order')::int,
-    sqlc.arg('contains_pii')::boolean,
     sqlc.arg('created_at')::timestamptz,
     sqlc.arg('updated_at')::timestamptz
 );
@@ -54,12 +47,7 @@ SET question_text = sqlc.arg('question_text')::text,
     is_required = sqlc.arg('is_required')::boolean,
     allow_other = sqlc.arg('allow_other')::boolean,
     max_length = sqlc.narg('max_length')::int,
-    min_value = sqlc.narg('min_value')::int,
-    max_value = sqlc.narg('max_value')::int,
-    min_label = sqlc.narg('min_label')::varchar,
-    max_label = sqlc.narg('max_label')::varchar,
     display_order = sqlc.arg('display_order')::int,
-    contains_pii = sqlc.arg('contains_pii')::boolean,
     updated_at = sqlc.arg('updated_at')::timestamptz
 WHERE question_id = sqlc.arg('question_id')::uuid;
 
@@ -103,10 +91,12 @@ FROM talk_session_survey_answers
 WHERE question_id = $1;
 
 -- name: CountAnswersForChoice :one
--- 選択肢 ID が answer_value.selectedChoiceIDs 配列に含まれる回答件数を返す
+-- 回答はすべて暗号化されており選択肢 ID で直接絞り込めないため、
+-- 当該選択肢が属する質問への回答件数を返す（hard delete 可否判定用の保守的なカウント）。
 SELECT COUNT(*) AS answer_count
-FROM talk_session_survey_answers
-WHERE answer_value -> 'selectedChoiceIDs' @> to_jsonb(sqlc.arg('choice_id')::text);
+FROM talk_session_survey_answers a
+INNER JOIN talk_session_survey_choices c ON c.question_id = a.question_id
+WHERE c.choice_id = sqlc.arg('choice_id')::uuid;
 
 -- name: CreateSurveySubmission :exec
 INSERT INTO talk_session_survey_submissions (submission_id, survey_id, user_id, submitted_at)

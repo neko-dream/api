@@ -9,34 +9,27 @@ import (
 )
 
 // AnswerValue は質問への回答値（JSONB として永続化）。
-// 質問タイプによって有効なフィールドが異なる：
-//   - free_text:                  Text
-//   - single_choice / dropdown:   SelectedChoiceIDs（1件）、または Other（allowOther=true）
-//   - multi_choice:               SelectedChoiceIDs（1件以上）、加えて Other
-//   - rating:                     Rating
-//   - date:                       Date (YYYY-MM-DD)
+// 質問タイプは single_choice / dropdown のみで、いずれも選択肢系：
+//   - SelectedChoiceIDs（1件）、または Other（allowOther=true）
+//
+// すべての回答は保存時に暗号化される。暗号化済みの場合は SelectedChoiceIDs /
+// Other は空となり、平文をまとめて暗号化した文字列を Encrypted に格納する。
 type AnswerValue struct {
-	Text              *string              `json:"text,omitempty"`
 	SelectedChoiceIDs []shared.UUID[Choice] `json:"selectedChoiceIDs,omitempty"`
-	Other             *string              `json:"other,omitempty"`
-	Rating            *int                 `json:"rating,omitempty"`
-	Date              *string              `json:"date,omitempty"`
+	Other             *string               `json:"other,omitempty"`
+	// Encrypted は平文 AnswerValue（SelectedChoiceIDs / Other）を JSON 化して暗号化した文字列。
+	// is_encrypted=true の回答でのみ値を持つ。
+	Encrypted *string `json:"enc,omitempty"`
 }
 
 func (v AnswerValue) IsEmpty() bool {
-	if v.Text != nil && *v.Text != "" {
-		return false
-	}
 	if len(v.SelectedChoiceIDs) > 0 {
 		return false
 	}
 	if v.Other != nil && *v.Other != "" {
 		return false
 	}
-	if v.Rating != nil {
-		return false
-	}
-	if v.Date != nil && *v.Date != "" {
+	if v.Encrypted != nil && *v.Encrypted != "" {
 		return false
 	}
 	return true

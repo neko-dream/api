@@ -17,16 +17,19 @@ import (
 
 const countAnswersForChoice = `-- name: CountAnswersForChoice :one
 SELECT COUNT(*) AS answer_count
-FROM talk_session_survey_answers
-WHERE answer_value -> 'selectedChoiceIDs' @> to_jsonb($1::text)
+FROM talk_session_survey_answers a
+INNER JOIN talk_session_survey_choices c ON c.question_id = a.question_id
+WHERE c.choice_id = $1::uuid
 `
 
-// 選択肢 ID が answer_value.selectedChoiceIDs 配列に含まれる回答件数を返す
+// 回答はすべて暗号化されており選択肢 ID で直接絞り込めないため、
+// 当該選択肢が属する質問への回答件数を返す（hard delete 可否判定用の保守的なカウント）。
 //
 //	SELECT COUNT(*) AS answer_count
-//	FROM talk_session_survey_answers
-//	WHERE answer_value -> 'selectedChoiceIDs' @> to_jsonb($1::text)
-func (q *Queries) CountAnswersForChoice(ctx context.Context, choiceID string) (int64, error) {
+//	FROM talk_session_survey_answers a
+//	INNER JOIN talk_session_survey_choices c ON c.question_id = a.question_id
+//	WHERE c.choice_id = $1::uuid
+func (q *Queries) CountAnswersForChoice(ctx context.Context, choiceID uuid.UUID) (int64, error) {
 	row := q.db.QueryRowContext(ctx, countAnswersForChoice, choiceID)
 	var answer_count int64
 	err := row.Scan(&answer_count)
@@ -134,8 +137,7 @@ func (q *Queries) CreateSurveyChoice(ctx context.Context, arg CreateSurveyChoice
 const createSurveyQuestion = `-- name: CreateSurveyQuestion :exec
 INSERT INTO talk_session_survey_questions (
     question_id, survey_id, question_text, question_type,
-    is_required, allow_other, max_length, min_value, max_value,
-    min_label, max_label, display_order, contains_pii, created_at, updated_at
+    is_required, allow_other, max_length, display_order, created_at, updated_at
 ) VALUES (
     $1::uuid,
     $2::uuid,
@@ -145,13 +147,8 @@ INSERT INTO talk_session_survey_questions (
     $6::boolean,
     $7::int,
     $8::int,
-    $9::int,
-    $10::varchar,
-    $11::varchar,
-    $12::int,
-    $13::boolean,
-    $14::timestamptz,
-    $15::timestamptz
+    $9::timestamptz,
+    $10::timestamptz
 )
 `
 
@@ -163,12 +160,7 @@ type CreateSurveyQuestionParams struct {
 	IsRequired   bool
 	AllowOther   bool
 	MaxLength    sql.NullInt32
-	MinValue     sql.NullInt32
-	MaxValue     sql.NullInt32
-	MinLabel     sql.NullString
-	MaxLabel     sql.NullString
 	DisplayOrder int32
-	ContainsPii  bool
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }
@@ -177,8 +169,7 @@ type CreateSurveyQuestionParams struct {
 //
 //	INSERT INTO talk_session_survey_questions (
 //	    question_id, survey_id, question_text, question_type,
-//	    is_required, allow_other, max_length, min_value, max_value,
-//	    min_label, max_label, display_order, contains_pii, created_at, updated_at
+//	    is_required, allow_other, max_length, display_order, created_at, updated_at
 //	) VALUES (
 //	    $1::uuid,
 //	    $2::uuid,
@@ -188,13 +179,8 @@ type CreateSurveyQuestionParams struct {
 //	    $6::boolean,
 //	    $7::int,
 //	    $8::int,
-//	    $9::int,
-//	    $10::varchar,
-//	    $11::varchar,
-//	    $12::int,
-//	    $13::boolean,
-//	    $14::timestamptz,
-//	    $15::timestamptz
+//	    $9::timestamptz,
+//	    $10::timestamptz
 //	)
 func (q *Queries) CreateSurveyQuestion(ctx context.Context, arg CreateSurveyQuestionParams) error {
 	_, err := q.db.ExecContext(ctx, createSurveyQuestion,
@@ -205,12 +191,7 @@ func (q *Queries) CreateSurveyQuestion(ctx context.Context, arg CreateSurveyQues
 		arg.IsRequired,
 		arg.AllowOther,
 		arg.MaxLength,
-		arg.MinValue,
-		arg.MaxValue,
-		arg.MinLabel,
-		arg.MaxLabel,
 		arg.DisplayOrder,
-		arg.ContainsPii,
 		arg.CreatedAt,
 		arg.UpdatedAt,
 	)
@@ -546,8 +527,7 @@ func (q *Queries) ListSurveyChoicesByQuestionIDs(ctx context.Context, questionId
 const listSurveyQuestions = `-- name: ListSurveyQuestions :many
 SELECT
     question_id, survey_id, question_text, question_type::text AS question_type,
-    is_required, allow_other, max_length, min_value, max_value,
-    min_label, max_label, display_order, contains_pii, deleted_at, created_at, updated_at
+    is_required, allow_other, max_length, display_order, deleted_at, created_at, updated_at
 FROM talk_session_survey_questions
 WHERE survey_id = $1
 ORDER BY display_order ASC, created_at ASC
@@ -561,12 +541,7 @@ type ListSurveyQuestionsRow struct {
 	IsRequired   bool
 	AllowOther   bool
 	MaxLength    sql.NullInt32
-	MinValue     sql.NullInt32
-	MaxValue     sql.NullInt32
-	MinLabel     sql.NullString
-	MaxLabel     sql.NullString
 	DisplayOrder int32
-	ContainsPii  bool
 	DeletedAt    sql.NullTime
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
@@ -576,8 +551,7 @@ type ListSurveyQuestionsRow struct {
 //
 //	SELECT
 //	    question_id, survey_id, question_text, question_type::text AS question_type,
-//	    is_required, allow_other, max_length, min_value, max_value,
-//	    min_label, max_label, display_order, contains_pii, deleted_at, created_at, updated_at
+//	    is_required, allow_other, max_length, display_order, deleted_at, created_at, updated_at
 //	FROM talk_session_survey_questions
 //	WHERE survey_id = $1
 //	ORDER BY display_order ASC, created_at ASC
@@ -598,12 +572,7 @@ func (q *Queries) ListSurveyQuestions(ctx context.Context, surveyID uuid.UUID) (
 			&i.IsRequired,
 			&i.AllowOther,
 			&i.MaxLength,
-			&i.MinValue,
-			&i.MaxValue,
-			&i.MinLabel,
-			&i.MaxLabel,
 			&i.DisplayOrder,
-			&i.ContainsPii,
 			&i.DeletedAt,
 			&i.CreatedAt,
 			&i.UpdatedAt,
@@ -768,14 +737,9 @@ SET question_text = $1::text,
     is_required = $3::boolean,
     allow_other = $4::boolean,
     max_length = $5::int,
-    min_value = $6::int,
-    max_value = $7::int,
-    min_label = $8::varchar,
-    max_label = $9::varchar,
-    display_order = $10::int,
-    contains_pii = $11::boolean,
-    updated_at = $12::timestamptz
-WHERE question_id = $13::uuid
+    display_order = $6::int,
+    updated_at = $7::timestamptz
+WHERE question_id = $8::uuid
 `
 
 type UpdateSurveyQuestionParams struct {
@@ -784,12 +748,7 @@ type UpdateSurveyQuestionParams struct {
 	IsRequired   bool
 	AllowOther   bool
 	MaxLength    sql.NullInt32
-	MinValue     sql.NullInt32
-	MaxValue     sql.NullInt32
-	MinLabel     sql.NullString
-	MaxLabel     sql.NullString
 	DisplayOrder int32
-	ContainsPii  bool
 	UpdatedAt    time.Time
 	QuestionID   uuid.UUID
 }
@@ -802,14 +761,9 @@ type UpdateSurveyQuestionParams struct {
 //	    is_required = $3::boolean,
 //	    allow_other = $4::boolean,
 //	    max_length = $5::int,
-//	    min_value = $6::int,
-//	    max_value = $7::int,
-//	    min_label = $8::varchar,
-//	    max_label = $9::varchar,
-//	    display_order = $10::int,
-//	    contains_pii = $11::boolean,
-//	    updated_at = $12::timestamptz
-//	WHERE question_id = $13::uuid
+//	    display_order = $6::int,
+//	    updated_at = $7::timestamptz
+//	WHERE question_id = $8::uuid
 func (q *Queries) UpdateSurveyQuestion(ctx context.Context, arg UpdateSurveyQuestionParams) error {
 	_, err := q.db.ExecContext(ctx, updateSurveyQuestion,
 		arg.QuestionText,
@@ -817,12 +771,7 @@ func (q *Queries) UpdateSurveyQuestion(ctx context.Context, arg UpdateSurveyQues
 		arg.IsRequired,
 		arg.AllowOther,
 		arg.MaxLength,
-		arg.MinValue,
-		arg.MaxValue,
-		arg.MinLabel,
-		arg.MaxLabel,
 		arg.DisplayOrder,
-		arg.ContainsPii,
 		arg.UpdatedAt,
 		arg.QuestionID,
 	)

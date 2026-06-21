@@ -9,8 +9,10 @@ import (
 	"go.opentelemetry.io/otel"
 )
 
-// EncryptAnswerValue は PII フラグ付き設問への回答を暗号化する。
-// 暗号化対象は Text / Other / Date のみ。SelectedChoiceIDs と Rating は集計可能性のため平文のまま。
+// EncryptAnswerValue は回答値全体を暗号化する。
+// 平文（SelectedChoiceIDs / Other）を JSON 化し、AES-GCM で暗号化した文字列を
+// Encrypted フィールドにのみ格納した AnswerValue を返す。集計に必要な選択肢 ID も
+// 含めてすべて暗号化されるため、集計時はサーバ側で復号する必要がある。
 func EncryptAnswerValue(
 	ctx context.Context,
 	encryptor crypto.Encryptor,
@@ -19,45 +21,24 @@ func EncryptAnswerValue(
 	ctx, span := otel.Tracer("crypto").Start(ctx, "EncryptAnswerValue")
 	defer span.End()
 
-	out := survey.AnswerValue{
+	// Encrypted を除いた平文部分のみを JSON 化する。
+	plain := survey.AnswerValue{
 		SelectedChoiceIDs: v.SelectedChoiceIDs,
-		Rating:            v.Rating,
+		Other:             v.Other,
+	}
+	data, err := plain.Marshal()
+	if err != nil {
+		utils.HandleError(ctx, err, "AnswerValue.Marshal")
+		return survey.AnswerValue{}, err
 	}
 
-	if v.Text != nil && *v.Text != "" {
-		enc, err := encryptor.EncryptString(ctx, *v.Text)
-		if err != nil {
-			utils.HandleError(ctx, err, "EncryptString Text")
-			return survey.AnswerValue{}, err
-		}
-		out.Text = &enc
-	} else {
-		out.Text = v.Text
+	enc, err := encryptor.EncryptString(ctx, string(data))
+	if err != nil {
+		utils.HandleError(ctx, err, "EncryptString AnswerValue")
+		return survey.AnswerValue{}, err
 	}
 
-	if v.Other != nil && *v.Other != "" {
-		enc, err := encryptor.EncryptString(ctx, *v.Other)
-		if err != nil {
-			utils.HandleError(ctx, err, "EncryptString Other")
-			return survey.AnswerValue{}, err
-		}
-		out.Other = &enc
-	} else {
-		out.Other = v.Other
-	}
-
-	if v.Date != nil && *v.Date != "" {
-		enc, err := encryptor.EncryptString(ctx, *v.Date)
-		if err != nil {
-			utils.HandleError(ctx, err, "EncryptString Date")
-			return survey.AnswerValue{}, err
-		}
-		out.Date = &enc
-	} else {
-		out.Date = v.Date
-	}
-
-	return out, nil
+	return survey.AnswerValue{Encrypted: &enc}, nil
 }
 
 // DecryptAnswerValue は EncryptAnswerValue で暗号化した値を復号する。
@@ -70,43 +51,20 @@ func DecryptAnswerValue(
 	ctx, span := otel.Tracer("crypto").Start(ctx, "DecryptAnswerValue")
 	defer span.End()
 
-	out := survey.AnswerValue{
-		SelectedChoiceIDs: v.SelectedChoiceIDs,
-		Rating:            v.Rating,
+	if v.Encrypted == nil || *v.Encrypted == "" {
+		return v, nil
 	}
 
-	if v.Text != nil && *v.Text != "" {
-		dec, err := encryptor.DecryptString(ctx, *v.Text)
-		if err != nil {
-			utils.HandleError(ctx, err, "DecryptString Text")
-			return survey.AnswerValue{}, err
-		}
-		out.Text = &dec
-	} else {
-		out.Text = v.Text
+	data, err := encryptor.DecryptString(ctx, *v.Encrypted)
+	if err != nil {
+		utils.HandleError(ctx, err, "DecryptString AnswerValue")
+		return survey.AnswerValue{}, err
 	}
 
-	if v.Other != nil && *v.Other != "" {
-		dec, err := encryptor.DecryptString(ctx, *v.Other)
-		if err != nil {
-			utils.HandleError(ctx, err, "DecryptString Other")
-			return survey.AnswerValue{}, err
-		}
-		out.Other = &dec
-	} else {
-		out.Other = v.Other
+	out, err := survey.UnmarshalAnswerValue([]byte(data))
+	if err != nil {
+		utils.HandleError(ctx, err, "UnmarshalAnswerValue")
+		return survey.AnswerValue{}, err
 	}
-
-	if v.Date != nil && *v.Date != "" {
-		dec, err := encryptor.DecryptString(ctx, *v.Date)
-		if err != nil {
-			utils.HandleError(ctx, err, "DecryptString Date")
-			return survey.AnswerValue{}, err
-		}
-		out.Date = &dec
-	} else {
-		out.Date = v.Date
-	}
-
 	return out, nil
 }
