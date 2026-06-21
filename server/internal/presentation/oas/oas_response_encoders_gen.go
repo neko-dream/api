@@ -14,6 +14,109 @@ import (
 	"github.com/ogen-go/ogen/uri"
 )
 
+func encodeAdminLoginResponse(response AdminLoginRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *AdminTokenInfoHeaders:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		// Encoding response headers.
+		{
+			h := uri.NewHeaderEncoder(w.Header())
+			// Encode "Set-Cookie" header.
+			{
+				cfg := uri.HeaderParameterEncodingConfig{
+					Name:    "Set-Cookie",
+					Explode: false,
+				}
+				if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+					return e.EncodeArray(func(e uri.Encoder) error {
+						for i, item := range response.SetCookie {
+							if err := func() error {
+								return e.EncodeValue(conv.StringToString(item))
+							}(); err != nil {
+								return errors.Wrapf(err, "[%d]", i)
+							}
+						}
+						return nil
+					})
+				}); err != nil {
+					return errors.Wrap(err, "encode Set-Cookie header")
+				}
+			}
+		}
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := new(jx.Encoder)
+		response.Response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *AdminLoginUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *AdminLoginInternalServerError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(500)
+		span.SetStatus(codes.Error, http.StatusText(500))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
+func encodeAdminLogoutResponse(response *AdminLogoutNoContent, w http.ResponseWriter, span trace.Span) error {
+	// Encoding response headers.
+	{
+		h := uri.NewHeaderEncoder(w.Header())
+		// Encode "Set-Cookie" header.
+		{
+			cfg := uri.HeaderParameterEncodingConfig{
+				Name:    "Set-Cookie",
+				Explode: false,
+			}
+			if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range response.SetCookie {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}); err != nil {
+				return errors.Wrap(err, "encode Set-Cookie header")
+			}
+		}
+	}
+	w.WriteHeader(204)
+	span.SetStatus(codes.Ok, http.StatusText(204))
+
+	return nil
+}
+
 func encodeApplyFeedbackToReportResponse(response ApplyFeedbackToReportRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
 	case *ApplyFeedbackToReportOK:
@@ -853,6 +956,39 @@ func encodeEstablishUserResponse(response EstablishUserRes, w http.ResponseWrite
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
+func encodeGetAdminTokenInfoResponse(response GetAdminTokenInfoRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *AdminTokenInfo:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetAdminTokenInfoForbidden:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(403)
+		span.SetStatus(codes.Error, http.StatusText(403))
 
 		e := new(jx.Encoder)
 		response.Encode(e)

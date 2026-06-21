@@ -5,6 +5,7 @@ import (
 	"slices"
 
 	"github.com/neko-dream/api/internal/domain/messages"
+	"github.com/neko-dream/api/internal/domain/model/admin"
 	"github.com/neko-dream/api/internal/domain/model/clock"
 	"github.com/neko-dream/api/internal/domain/model/session"
 	"github.com/neko-dream/api/internal/presentation/oas"
@@ -14,6 +15,7 @@ import (
 type securityHandler struct {
 	session.TokenManager
 	session.SessionRepository
+	adminTokenManager admin.AdminTokenManager
 }
 
 var skipOperations = []string{
@@ -80,12 +82,31 @@ func (s *securityHandler) HandleCookieAuth(ctx context.Context, operationName st
 	return session.SetSession(ctx, claim), nil
 }
 
+// HandleAdminCookieAuth は管理画面用の AdminSessionId Cookie を検証する。
+// user の SessionId 認証とは完全に独立した経路。
+func (s *securityHandler) HandleAdminCookieAuth(ctx context.Context, operationName oas.OperationName, t oas.AdminCookieAuth) (context.Context, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "securityHandler.HandleAdminCookieAuth")
+	defer span.End()
+
+	claim, err := s.adminTokenManager.Parse(ctx, t.GetAPIKey())
+	if err != nil {
+		return ctx, messages.ForbiddenError
+	}
+	if claim.IsExpired(clock.Now(ctx)) {
+		return ctx, messages.TokenExpiredError
+	}
+
+	return admin.SetAdminSession(ctx, claim), nil
+}
+
 func NewSecurityHandler(
 	tokenManager session.TokenManager,
 	sessRepository session.SessionRepository,
+	adminTokenManager admin.AdminTokenManager,
 ) oas.SecurityHandler {
 	return &securityHandler{
 		TokenManager:      tokenManager,
 		SessionRepository: sessRepository,
+		adminTokenManager: adminTokenManager,
 	}
 }

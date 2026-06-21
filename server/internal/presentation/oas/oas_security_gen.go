@@ -14,6 +14,10 @@ import (
 
 // SecurityHandler is handler for security parameters.
 type SecurityHandler interface {
+	// HandleAdminCookieAuth handles AdminCookieAuth security.
+	// 管理画面用のCookie認証。user の SessionId とは独立した AdminSessionId
+	// を使用する.
+	HandleAdminCookieAuth(ctx context.Context, operationName OperationName, t AdminCookieAuth) (context.Context, error)
 	// HandleCookieAuth handles CookieAuth security.
 	// Cookie-based authentication using JWT tokens stored in secure HTTP-only cookies.
 	HandleCookieAuth(ctx context.Context, operationName OperationName, t CookieAuth) (context.Context, error)
@@ -32,6 +36,33 @@ func findAuthorization(h http.Header, prefix string) (string, bool) {
 		return value, true
 	}
 	return "", false
+}
+
+var operationRolesAdminCookieAuth = map[string][]string{
+	GetAdminTokenInfoOperation: []string{},
+}
+
+func (s *Server) securityAdminCookieAuth(ctx context.Context, operationName OperationName, req *http.Request) (context.Context, bool, error) {
+	var t AdminCookieAuth
+	const parameterName = "AdminSessionId"
+	var value string
+	switch cookie, err := req.Cookie(parameterName); {
+	case err == nil: // if NO error
+		value = cookie.Value
+	case errors.Is(err, http.ErrNoCookie):
+		return ctx, false, nil
+	default:
+		return nil, false, errors.Wrap(err, "get cookie value")
+	}
+	t.APIKey = value
+	t.Roles = operationRolesAdminCookieAuth[operationName]
+	rctx, err := s.sec.HandleAdminCookieAuth(ctx, operationName, t)
+	if errors.Is(err, ogenerrors.ErrSkipServerSecurity) {
+		return nil, false, nil
+	} else if err != nil {
+		return nil, false, err
+	}
+	return rctx, true, err
 }
 
 var operationRolesCookieAuth = map[string][]string{

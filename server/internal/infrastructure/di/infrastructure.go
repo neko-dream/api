@@ -1,6 +1,7 @@
 package di
 
 import (
+	adminauth "github.com/neko-dream/api/internal/infrastructure/auth/admin"
 	"github.com/neko-dream/api/internal/infrastructure/auth/oauth"
 	"github.com/neko-dream/api/internal/infrastructure/auth/session"
 	"github.com/neko-dream/api/internal/infrastructure/config"
@@ -29,6 +30,8 @@ func infraDeps() []ProvideArg {
 		{db.NewDBManager, nil},
 		{oauth.NewProviderFactory, nil},
 		{session.NewSessionTokenManager, nil},
+		{adminauth.NewAdminTokenManager, nil},
+		{repository.NewAdminUserRepository, nil},
 		{telemetry.SetupOtelProvider, nil},
 		{repository.InitS3Client, nil},
 		{repository.NewImageRepository, nil},

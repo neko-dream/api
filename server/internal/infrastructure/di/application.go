@@ -15,6 +15,7 @@ import (
 	report_q "github.com/neko-dream/api/internal/application/query/report_query"
 	"github.com/neko-dream/api/internal/application/query/talksession"
 	"github.com/neko-dream/api/internal/application/query/timeline_query"
+	"github.com/neko-dream/api/internal/application/usecase/admin_usecase"
 	"github.com/neko-dream/api/internal/application/usecase/analysis_usecase"
 	"github.com/neko-dream/api/internal/application/usecase/auth_usecase"
 	"github.com/neko-dream/api/internal/application/usecase/image_usecase"
@@ -77,6 +78,7 @@ func useCaseDeps() []ProvideArg {
 		{auth_usecase.NewPasswordLogin, nil},
 		{auth_usecase.NewChangePassword, nil},
 		{auth_usecase.NewReactivate, nil},
+		{admin_usecase.NewAdminLogin, nil},
 		{auth_usecase.NewGuestLogin, nil},
 		{timeline_usecase.NewAddTimeLine, nil},
 		{timeline_usecase.NewEditTimeLine, nil},

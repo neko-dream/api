@@ -13,6 +13,24 @@ type UnimplementedHandler struct{}
 
 var _ Handler = UnimplementedHandler{}
 
+// AdminLogin implements adminLogin operation.
+//
+// 管理者ログイン.
+//
+// POST /v1/admin/login
+func (UnimplementedHandler) AdminLogin(ctx context.Context, req *AdminLoginReq) (r AdminLoginRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// AdminLogout implements adminLogout operation.
+//
+// 管理者ログアウト.
+//
+// POST /v1/admin/logout
+func (UnimplementedHandler) AdminLogout(ctx context.Context) (r *AdminLogoutNoContent, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // ApplyFeedbackToReport implements applyFeedbackToReport operation.
 //
 // セッションのレポートにフィードバックを適用する.
@@ -156,6 +174,15 @@ func (UnimplementedHandler) EstablishOrganization(ctx context.Context, req *Esta
 //
 // POST /user
 func (UnimplementedHandler) EstablishUser(ctx context.Context, req *EstablishUserReq) (r EstablishUserRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetAdminTokenInfo implements getAdminTokenInfo operation.
+//
+// 管理者トークンの内容を返す.
+//
+// GET /v1/admin/token/info
+func (UnimplementedHandler) GetAdminTokenInfo(ctx context.Context) (r GetAdminTokenInfoRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

@@ -8,6 +8,7 @@ import (
 
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
+	AdminHandler
 	AnalysisHandler
 	AuthHandler
 	HealthHandler
@@ -22,6 +23,30 @@ type Handler interface {
 	TimelineHandler
 	UserHandler
 	VoteHandler
+}
+
+// AdminHandler handles operations described by OpenAPI v3 specification.
+//
+// x-ogen-operation-group: Admin
+type AdminHandler interface {
+	// AdminLogin implements adminLogin operation.
+	//
+	// 管理者ログイン.
+	//
+	// POST /v1/admin/login
+	AdminLogin(ctx context.Context, req *AdminLoginReq) (AdminLoginRes, error)
+	// AdminLogout implements adminLogout operation.
+	//
+	// 管理者ログアウト.
+	//
+	// POST /v1/admin/logout
+	AdminLogout(ctx context.Context) (*AdminLogoutNoContent, error)
+	// GetAdminTokenInfo implements getAdminTokenInfo operation.
+	//
+	// 管理者トークンの内容を返す.
+	//
+	// GET /v1/admin/token/info
+	GetAdminTokenInfo(ctx context.Context) (GetAdminTokenInfoRes, error)
 }
 
 // AnalysisHandler handles operations described by OpenAPI v3 specification.

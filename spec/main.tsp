@@ -12,6 +12,7 @@ import "./models/talk-session.tsp";
 import "./models/talk-session-survey.tsp";
 import "./models/organization.tsp";
 import "./models/manage.tsp";
+import "./models/admin.tsp";
 import "./models/notifications.tsp";
 
 // Route imports
@@ -28,6 +29,7 @@ import "./routes/image.tsp";
 import "./routes/test.tsp";
 import "./routes/health.tsp";
 import "./routes/manage.tsp";
+import "./routes/admin.tsp";
 import "./routes/analysis.tsp";
 import "./routes/notifications.tsp";
 

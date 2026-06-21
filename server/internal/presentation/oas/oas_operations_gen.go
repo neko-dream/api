@@ -6,6 +6,8 @@ package oas
 type OperationName = string
 
 const (
+	AdminLoginOperation                         OperationName = "AdminLogin"
+	AdminLogoutOperation                        OperationName = "AdminLogout"
 	ApplyFeedbackToReportOperation              OperationName = "ApplyFeedbackToReport"
 	AuthAccountDetachOperation                  OperationName = "AuthAccountDetach"
 	AuthorizeOperation                          OperationName = "Authorize"
@@ -22,6 +24,7 @@ const (
 	EditTimeLineOperation                       OperationName = "EditTimeLine"
 	EstablishOrganizationOperation              OperationName = "EstablishOrganization"
 	EstablishUserOperation                      OperationName = "EstablishUser"
+	GetAdminTokenInfoOperation                  OperationName = "GetAdminTokenInfo"
 	GetAnalysisReportManageOperation            OperationName = "GetAnalysisReportManage"
 	GetConclusionOperation                      OperationName = "GetConclusion"
 	GetDevicesOperation                         OperationName = "GetDevices"

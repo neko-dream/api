@@ -17,6 +17,7 @@ tags:
   - name: analysis
   - name: notifications
   - name: manage
+  - name: admin
 paths:
   /auth/dev/detach:
     delete:
@@ -4054,6 +4055,101 @@ paths:
       security:
         - {}
       x-ogen-operation-group: TalkSession
+  /v1/admin/login:
+    post:
+      operationId: adminLogin
+      summary: 管理者ログイン
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            Set-Cookie:
+              required: true
+              description: AdminSessionId Cookie
+              schema:
+                type: array
+                items:
+                  type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminTokenInfo'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - admin
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - password
+      security:
+        - {}
+      x-ogen-operation-group: Admin
+  /v1/admin/logout:
+    post:
+      operationId: adminLogout
+      summary: 管理者ログアウト
+      parameters: []
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+          headers:
+            Set-Cookie:
+              required: true
+              description: Cookie削除用のSet-Cookie
+              schema:
+                type: array
+                items:
+                  type: string
+      tags:
+        - admin
+      security:
+        - {}
+      x-ogen-operation-group: Admin
+  /v1/admin/token/info:
+    get:
+      operationId: getAdminTokenInfo
+      summary: 管理者トークンの内容を返す
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminTokenInfo'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - admin
+      security:
+        - AdminCookieAuth: []
+      x-ogen-operation-group: Admin
   /v1/manage/talksessions/list:
     get:
       operationId: getTalkSessionListManage
@@ -4310,6 +4406,51 @@ components:
           type: string
         updatedAt:
           type: string
+    AdminCookieAuth:
+      type: object
+      required:
+        - type
+        - in
+        - name
+      properties:
+        type:
+          type: string
+          enum:
+            - apiKey
+          description: API key authentication
+        in:
+          type: string
+          enum:
+            - cookie
+          description: location of the API key
+        name:
+          type: string
+          enum:
+            - AdminSessionId
+          description: name of the API key
+      description: 管理画面用のCookie認証。user の SessionId とは独立した AdminSessionId を使用する
+    AdminTokenInfo:
+      type: object
+      required:
+        - sub
+        - email
+        - displayName
+        - role
+        - isAdmin
+      properties:
+        sub:
+          type: string
+          description: 管理者ID
+        email:
+          type: string
+        displayName:
+          type: string
+        role:
+          type: integer
+          description: 管理者ロール (数値が小さいほど高権限)
+        isAdmin:
+          type: boolean
+      description: 管理者トークンの内容
     AnalysisReportResponse:
       type: object
       properties:
@@ -5544,3 +5685,8 @@ components:
       in: cookie
       name: SessionId
       description: Cookie-based authentication using JWT tokens stored in secure HTTP-only cookies
+    AdminCookieAuth:
+      type: apiKey
+      in: cookie
+      name: AdminSessionId
+      description: 管理画面用のCookie認証。user の SessionId とは独立した AdminSessionId を使用する

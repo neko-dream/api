@@ -5,7 +5,9 @@ import "@typespec/openapi3";
 // 管理API は app spec のサブセット。管理画面(Refine)向けに独立した OpenAPI を出力する。
 import "../config/service.tsp";
 import "../models/manage.tsp";
+import "../models/admin.tsp";
 import "../routes/manage.tsp";
+import "../routes/admin.tsp";
 
 using Http;
 using OpenAPI;

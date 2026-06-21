@@ -83,6 +83,171 @@ func (s *ActionItem) SetUpdatedAt(val string) {
 
 func (*ActionItem) editTimeLineRes() {}
 
+type AdminCookieAuth struct {
+	APIKey string
+	Roles  []string
+}
+
+// GetAPIKey returns the value of APIKey.
+func (s *AdminCookieAuth) GetAPIKey() string {
+	return s.APIKey
+}
+
+// GetRoles returns the value of Roles.
+func (s *AdminCookieAuth) GetRoles() []string {
+	return s.Roles
+}
+
+// SetAPIKey sets the value of APIKey.
+func (s *AdminCookieAuth) SetAPIKey(val string) {
+	s.APIKey = val
+}
+
+// SetRoles sets the value of Roles.
+func (s *AdminCookieAuth) SetRoles(val []string) {
+	s.Roles = val
+}
+
+type AdminLoginInternalServerError struct{}
+
+func (*AdminLoginInternalServerError) adminLoginRes() {}
+
+type AdminLoginReq struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+// GetEmail returns the value of Email.
+func (s *AdminLoginReq) GetEmail() string {
+	return s.Email
+}
+
+// GetPassword returns the value of Password.
+func (s *AdminLoginReq) GetPassword() string {
+	return s.Password
+}
+
+// SetEmail sets the value of Email.
+func (s *AdminLoginReq) SetEmail(val string) {
+	s.Email = val
+}
+
+// SetPassword sets the value of Password.
+func (s *AdminLoginReq) SetPassword(val string) {
+	s.Password = val
+}
+
+type AdminLoginUnauthorized struct{}
+
+func (*AdminLoginUnauthorized) adminLoginRes() {}
+
+// AdminLogoutNoContent is response for AdminLogout operation.
+type AdminLogoutNoContent struct {
+	SetCookie []string
+}
+
+// GetSetCookie returns the value of SetCookie.
+func (s *AdminLogoutNoContent) GetSetCookie() []string {
+	return s.SetCookie
+}
+
+// SetSetCookie sets the value of SetCookie.
+func (s *AdminLogoutNoContent) SetSetCookie(val []string) {
+	s.SetCookie = val
+}
+
+// 管理者トークンの内容.
+// Ref: #/components/schemas/AdminTokenInfo
+type AdminTokenInfo struct {
+	// 管理者ID.
+	Sub         string `json:"sub"`
+	Email       string `json:"email"`
+	DisplayName string `json:"displayName"`
+	// 管理者ロール (数値が小さいほど高権限).
+	Role    int  `json:"role"`
+	IsAdmin bool `json:"isAdmin"`
+}
+
+// GetSub returns the value of Sub.
+func (s *AdminTokenInfo) GetSub() string {
+	return s.Sub
+}
+
+// GetEmail returns the value of Email.
+func (s *AdminTokenInfo) GetEmail() string {
+	return s.Email
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *AdminTokenInfo) GetDisplayName() string {
+	return s.DisplayName
+}
+
+// GetRole returns the value of Role.
+func (s *AdminTokenInfo) GetRole() int {
+	return s.Role
+}
+
+// GetIsAdmin returns the value of IsAdmin.
+func (s *AdminTokenInfo) GetIsAdmin() bool {
+	return s.IsAdmin
+}
+
+// SetSub sets the value of Sub.
+func (s *AdminTokenInfo) SetSub(val string) {
+	s.Sub = val
+}
+
+// SetEmail sets the value of Email.
+func (s *AdminTokenInfo) SetEmail(val string) {
+	s.Email = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *AdminTokenInfo) SetDisplayName(val string) {
+	s.DisplayName = val
+}
+
+// SetRole sets the value of Role.
+func (s *AdminTokenInfo) SetRole(val int) {
+	s.Role = val
+}
+
+// SetIsAdmin sets the value of IsAdmin.
+func (s *AdminTokenInfo) SetIsAdmin(val bool) {
+	s.IsAdmin = val
+}
+
+func (*AdminTokenInfo) getAdminTokenInfoRes() {}
+
+// AdminTokenInfoHeaders wraps AdminTokenInfo with response headers.
+type AdminTokenInfoHeaders struct {
+	SetCookie []string
+	Response  AdminTokenInfo
+}
+
+// GetSetCookie returns the value of SetCookie.
+func (s *AdminTokenInfoHeaders) GetSetCookie() []string {
+	return s.SetCookie
+}
+
+// GetResponse returns the value of Response.
+func (s *AdminTokenInfoHeaders) GetResponse() AdminTokenInfo {
+	return s.Response
+}
+
+// SetSetCookie sets the value of SetCookie.
+func (s *AdminTokenInfoHeaders) SetSetCookie(val []string) {
+	s.SetCookie = val
+}
+
+// SetResponse sets the value of Response.
+func (s *AdminTokenInfoHeaders) SetResponse(val AdminTokenInfo) {
+	s.Response = val
+}
+
+func (*AdminTokenInfoHeaders) adminLoginRes() {}
+
 // Ref: #/components/schemas/AnalysisReportResponse
 type AnalysisReportResponse struct {
 	// レポート本文.
@@ -1134,6 +1299,10 @@ func (s *EstablishUserReq) SetCity(val OptString) {
 func (s *EstablishUserReq) SetEmail(val OptString) {
 	s.Email = val
 }
+
+type GetAdminTokenInfoForbidden struct{}
+
+func (*GetAdminTokenInfoForbidden) getAdminTokenInfoRes() {}
 
 type GetConclusionBadRequest struct{}
 
