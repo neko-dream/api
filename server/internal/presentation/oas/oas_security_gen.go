@@ -39,7 +39,15 @@ func findAuthorization(h http.Header, prefix string) (string, bool) {
 }
 
 var operationRolesAdminCookieAuth = map[string][]string{
-	GetAdminTokenInfoOperation: []string{},
+	GetAdminTokenInfoOperation:            []string{},
+	GetAnalysisReportManageOperation:      []string{},
+	GetTalkSessionListManageOperation:     []string{},
+	GetTalkSessionManageOperation:         []string{},
+	GetUserListManageOperation:            []string{},
+	GetUserStatsListManageOperation:       []string{},
+	GetUserStatsTotalManageOperation:      []string{},
+	ManageRegenerateManageOperation:       []string{},
+	ToggleReportVisibilityManageOperation: []string{},
 }
 
 func (s *Server) securityAdminCookieAuth(ctx context.Context, operationName OperationName, req *http.Request) (context.Context, bool, error) {
@@ -79,7 +87,6 @@ var operationRolesCookieAuth = map[string][]string{
 	EditTimeLineOperation:                     []string{},
 	EstablishOrganizationOperation:            []string{},
 	EstablishUserOperation:                    []string{},
-	GetAnalysisReportManageOperation:          []string{},
 	GetDevicesOperation:                       []string{},
 	GetNotificationPreferencesOperation:       []string{},
 	GetOpenedTalkSessionOperation:             []string{},
@@ -88,15 +95,10 @@ var operationRolesCookieAuth = map[string][]string{
 	GetOrganizationUsersOperation:             []string{},
 	GetOrganizationsOperation:                 []string{},
 	GetReportsForTalkSessionOperation:         []string{},
-	GetTalkSessionListManageOperation:         []string{},
-	GetTalkSessionManageOperation:             []string{},
 	GetTalkSessionReportCountOperation:        []string{},
 	GetTalkSessionSurveySummaryOperation:      []string{},
 	GetTokenInfoOperation:                     []string{},
 	GetUserInfoOperation:                      []string{},
-	GetUserListManageOperation:                []string{},
-	GetUserStatsListManageOperation:           []string{},
-	GetUserStatsTotalManageOperation:          []string{},
 	GetVapidKeyOperation:                      []string{},
 	HasConsentOperation:                       []string{},
 	InitiateTalkSessionOperation:              []string{},
@@ -104,7 +106,6 @@ var operationRolesCookieAuth = map[string][]string{
 	InviteOrganizationForUserOperation:        []string{},
 	JoinLockedSessionOperation:                []string{},
 	ListTalkSessionSurveySubmissionsOperation: []string{},
-	ManageRegenerateManageOperation:           []string{},
 	OpinionsHistoryOperation:                  []string{},
 	PolicyConsentOperation:                    []string{},
 	PostConclusionOperation:                   []string{},
@@ -120,7 +121,6 @@ var operationRolesCookieAuth = map[string][]string{
 	SolveOpinionReportOperation:               []string{},
 	SubmitTalkSessionSurveyOperation:          []string{},
 	SwitchOrganizationOperation:               []string{},
-	ToggleReportVisibilityManageOperation:     []string{},
 	ToggleTalkSessionAnalysisOperation:        []string{},
 	UpdateNotificationPreferencesOperation:    []string{},
 	UpdateOrganizationOperation:               []string{},

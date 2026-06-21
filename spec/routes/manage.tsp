@@ -1,5 +1,6 @@
 import "@typespec/http";
 import "@typespec/openapi";
+import "../config/service.tsp";
 import "../models/manage.tsp";
 
 using Http;
@@ -7,6 +8,7 @@ using OpenAPI;
 
 namespace kotohiro {
   @route("/v1/manage")
+  @useAuth(AdminCookieAuth)
   namespace KotohiroManageService {
     @route("/talksessions")
     @tag("manage")

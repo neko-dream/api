@@ -8,6 +8,7 @@ import (
 
 	"github.com/neko-dream/api/internal/application/usecase/analysis_usecase"
 	"github.com/neko-dream/api/internal/domain/messages"
+	"github.com/neko-dream/api/internal/domain/model/admin"
 	"github.com/neko-dream/api/internal/domain/model/analysis"
 	"github.com/neko-dream/api/internal/domain/model/session"
 	"github.com/neko-dream/api/internal/domain/model/shared"
@@ -44,7 +45,7 @@ func (m *manageHandler) GetUserStatsTotalManage(ctx context.Context) (*oas.UserS
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetUserStatsTotalManage")
 	defer span.End()
 
-	if !m.authorizationService.IsKotohiro(m.SetSession(ctx)) {
+	if admin.GetAdminSession(ctx) == nil {
 		return nil, messages.ForbiddenError
 	}
 
@@ -72,7 +73,7 @@ func (m *manageHandler) GetUserStatsListManage(ctx context.Context, params oas.G
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetUserStatsListManage")
 	defer span.End()
 
-	if !m.authorizationService.IsKotohiro(m.SetSession(ctx)) {
+	if admin.GetAdminSession(ctx) == nil {
 		return nil, messages.ForbiddenError
 	}
 
@@ -149,7 +150,7 @@ func (m *manageHandler) GetTalkSessionListManage(ctx context.Context, params oas
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetTalkSessionListManage")
 	defer span.End()
 
-	if !m.authorizationService.IsKotohiro(m.SetSession(ctx)) {
+	if admin.GetAdminSession(ctx) == nil {
 		return nil, messages.ForbiddenError
 	}
 
@@ -261,7 +262,7 @@ func (m *manageHandler) ManageRegenerateManage(ctx context.Context, req *oas.Reg
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.ManageRegenerate")
 	defer span.End()
 
-	if !m.authorizationService.IsKotohiro(m.SetSession(ctx)) {
+	if admin.GetAdminSession(ctx) == nil {
 		return nil, messages.ForbiddenError
 	}
 
@@ -308,7 +309,7 @@ func (m *manageHandler) ToggleReportVisibilityManage(ctx context.Context, req *o
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.ToggleReportVisibilityManage")
 	defer span.End()
 
-	if !m.authorizationService.IsKotohiro(m.SetSession(ctx)) {
+	if admin.GetAdminSession(ctx) == nil {
 		return nil, messages.ForbiddenError
 	}
 
@@ -336,12 +337,7 @@ func (m *manageHandler) GetAnalysisReportManage(ctx context.Context, params oas.
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetReportBySessionId")
 	defer span.End()
 
-	authCtx, err := m.authorizationService.RequireAuthentication(m.SetSession(ctx))
-	if err != nil {
-		return nil, err
-	}
-	// org所属のユーザであることを確認
-	if !authCtx.IsInOrganization() {
+	if admin.GetAdminSession(ctx) == nil {
 		return nil, messages.ForbiddenError
 	}
 

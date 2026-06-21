@@ -3370,14 +3370,14 @@ func (s *Server) handleGetAnalysisReportManageRequest(args [1]string, argsEscape
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityCookieAuth(ctx, GetAnalysisReportManageOperation, r)
+			sctx, ok, err := s.securityAdminCookieAuth(ctx, GetAnalysisReportManageOperation, r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "CookieAuth",
+					Security:         "AdminCookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:CookieAuth", err)
+				defer recordError("Security:AdminCookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -6053,14 +6053,14 @@ func (s *Server) handleGetTalkSessionListManageRequest(args [0]string, argsEscap
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityCookieAuth(ctx, GetTalkSessionListManageOperation, r)
+			sctx, ok, err := s.securityAdminCookieAuth(ctx, GetTalkSessionListManageOperation, r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "CookieAuth",
+					Security:         "AdminCookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:CookieAuth", err)
+				defer recordError("Security:AdminCookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -6241,14 +6241,14 @@ func (s *Server) handleGetTalkSessionManageRequest(args [1]string, argsEscaped b
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityCookieAuth(ctx, GetTalkSessionManageOperation, r)
+			sctx, ok, err := s.securityAdminCookieAuth(ctx, GetTalkSessionManageOperation, r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "CookieAuth",
+					Security:         "AdminCookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:CookieAuth", err)
+				defer recordError("Security:AdminCookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -7932,14 +7932,14 @@ func (s *Server) handleGetUserListManageRequest(args [0]string, argsEscaped bool
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityCookieAuth(ctx, GetUserListManageOperation, r)
+			sctx, ok, err := s.securityAdminCookieAuth(ctx, GetUserListManageOperation, r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "CookieAuth",
+					Security:         "AdminCookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:CookieAuth", err)
+				defer recordError("Security:AdminCookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -8128,14 +8128,14 @@ func (s *Server) handleGetUserStatsListManageRequest(args [0]string, argsEscaped
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityCookieAuth(ctx, GetUserStatsListManageOperation, r)
+			sctx, ok, err := s.securityAdminCookieAuth(ctx, GetUserStatsListManageOperation, r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "CookieAuth",
+					Security:         "AdminCookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:CookieAuth", err)
+				defer recordError("Security:AdminCookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -8316,14 +8316,14 @@ func (s *Server) handleGetUserStatsTotalManageRequest(args [0]string, argsEscape
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityCookieAuth(ctx, GetUserStatsTotalManageOperation, r)
+			sctx, ok, err := s.securityAdminCookieAuth(ctx, GetUserStatsTotalManageOperation, r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "CookieAuth",
+					Security:         "AdminCookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:CookieAuth", err)
+				defer recordError("Security:AdminCookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -10311,14 +10311,14 @@ func (s *Server) handleManageRegenerateManageRequest(args [1]string, argsEscaped
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityCookieAuth(ctx, ManageRegenerateManageOperation, r)
+			sctx, ok, err := s.securityAdminCookieAuth(ctx, ManageRegenerateManageOperation, r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "CookieAuth",
+					Security:         "AdminCookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:CookieAuth", err)
+				defer recordError("Security:AdminCookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -14119,14 +14119,14 @@ func (s *Server) handleToggleReportVisibilityManageRequest(args [1]string, argsE
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityCookieAuth(ctx, ToggleReportVisibilityManageOperation, r)
+			sctx, ok, err := s.securityAdminCookieAuth(ctx, ToggleReportVisibilityManageOperation, r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "CookieAuth",
+					Security:         "AdminCookieAuth",
 					Err:              err,
 				}
-				defer recordError("Security:CookieAuth", err)
+				defer recordError("Security:AdminCookieAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}

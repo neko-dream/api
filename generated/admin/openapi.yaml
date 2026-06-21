@@ -137,6 +137,8 @@ paths:
                 $ref: '#/components/schemas/TalkSessionListResponse'
       tags:
         - manage
+      security:
+        - AdminCookieAuth: []
       x-ogen-operation-group: manage
   /v1/manage/talksessions/{talkSessionID}:
     get:
@@ -156,6 +158,8 @@ paths:
                 $ref: '#/components/schemas/TalkSessionForManage'
       tags:
         - manage
+      security:
+        - AdminCookieAuth: []
       x-ogen-operation-group: manage
   /v1/manage/talksessions/{talkSessionID}/analysis/regenerate:
     post:
@@ -181,6 +185,8 @@ paths:
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/RegenerateRequest'
+      security:
+        - AdminCookieAuth: []
       x-ogen-operation-group: manage
   /v1/manage/talksessions/{talkSessionID}/analysis/report:
     get:
@@ -200,6 +206,8 @@ paths:
                 $ref: '#/components/schemas/AnalysisReportResponse'
       tags:
         - manage
+      security:
+        - AdminCookieAuth: []
       x-ogen-operation-group: manage
     post:
       operationId: toggleReportVisibilityManage
@@ -224,6 +232,8 @@ paths:
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/ToggleReportVisibilityRequest'
+      security:
+        - AdminCookieAuth: []
       x-ogen-operation-group: manage
   /v1/manage/users/list:
     get:
@@ -280,6 +290,8 @@ paths:
                   $ref: '#/components/schemas/UserForManage'
       tags:
         - manage
+      security:
+        - AdminCookieAuth: []
       x-ogen-operation-group: manage
   /v1/manage/users/stats/list:
     get:
@@ -316,6 +328,8 @@ paths:
                   $ref: '#/components/schemas/UserStatsResponse'
       tags:
         - manage
+      security:
+        - AdminCookieAuth: []
       x-ogen-operation-group: manage
   /v1/manage/users/stats/total:
     get:
@@ -330,6 +344,8 @@ paths:
                 $ref: '#/components/schemas/UserStatsResponse'
       tags:
         - manage
+      security:
+        - AdminCookieAuth: []
       x-ogen-operation-group: manage
 security:
   - CookieAuth: []
