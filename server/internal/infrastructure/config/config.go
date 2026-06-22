@@ -13,6 +13,10 @@ type Config struct {
 	GoogleClientSecret string `env:"GOOGLE_CLIENT_SECRET"`
 	GoogleCallbackURL  string `env:"GOOGLE_CALLBACK_URL"`
 
+	// 初期管理者。起動時に admin_users に存在しなければ作成する。
+	InitialAdminEmail string `env:"INITIAL_ADMIN_EMAIL"`
+	InitialAdminName  string `env:"INITIAL_ADMIN_NAME"`
+
 	LineClientID     string `env:"LINE_CHANNEL_ID"`
 	LineClientSecret string `env:"LINE_CHANNEL_SECRET"`
 	LineCallbackURL  string `env:"LINE_CALLBACK_URL"`

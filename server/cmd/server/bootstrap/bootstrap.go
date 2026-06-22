@@ -7,6 +7,8 @@ import (
 
 	"github.com/neko-dream/api/internal/application/event_processor"
 	"github.com/neko-dream/api/internal/application/usecase/analysis_usecase"
+	"github.com/neko-dream/api/internal/domain/model/admin"
+	"github.com/neko-dream/api/internal/domain/model/shared"
 	"github.com/neko-dream/api/internal/infrastructure/config"
 	"github.com/neko-dream/api/internal/infrastructure/di"
 	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
@@ -15,12 +17,12 @@ import (
 
 // Bootstrap アプリケーションの起動を管理する
 type Bootstrap struct {
-	container          *dig.Container
-	config             *config.Config
-	migrator           *db.Migrator
-	eventProcessor     *event_processor.EventProcessor
-	analysisScheduler  analysis_usecase.AnalysisScheduler
-	cancelFunc         context.CancelFunc
+	container         *dig.Container
+	config            *config.Config
+	migrator          *db.Migrator
+	eventProcessor    *event_processor.EventProcessor
+	analysisScheduler analysis_usecase.AnalysisScheduler
+	cancelFunc        context.CancelFunc
 }
 
 // New 新しいBootstrapインスタンスを作成する
@@ -63,6 +65,10 @@ func (b *Bootstrap) Run() error {
 		return fmt.Errorf("migration failed: %w", err)
 	}
 
+	if err := b.bootstrapInitialAdmin(ctx); err != nil {
+		return fmt.Errorf("initial admin bootstrap failed: %w", err)
+	}
+
 	b.startEventProcessor(ctx)
 	b.analysisScheduler.Start(ctx)
 
@@ -71,6 +77,43 @@ func (b *Bootstrap) Run() error {
 
 func (b *Bootstrap) runMigrations() error {
 	return b.migrator.Up()
+}
+
+// bootstrapInitialAdmin INITIAL_ADMIN_EMAIL が設定されていれば、未登録の場合に初期管理者を作成する。
+// これ以降の管理者は管理画面から作成する。
+func (b *Bootstrap) bootstrapInitialAdmin(ctx context.Context) error {
+	if b.config.InitialAdminEmail == "" {
+		return nil
+	}
+
+	adminUserRepo, err := di.InvokeWithError[admin.AdminUserRepository](b.container)
+	if err != nil {
+		return fmt.Errorf("failed to invoke admin user repository: %w", err)
+	}
+
+	existing, err := adminUserRepo.FindByEmail(ctx, b.config.InitialAdminEmail)
+	if err != nil {
+		return err
+	}
+	if existing != nil {
+		return nil
+	}
+
+	name := b.config.InitialAdminName
+	if name == "" {
+		name = b.config.InitialAdminEmail
+	}
+
+	if err := adminUserRepo.Create(ctx, admin.AdminUser{
+		AdminUserID: shared.NewUUID[admin.AdminUser](),
+		Email:       b.config.InitialAdminEmail,
+		DisplayName: name,
+		Role:        admin.AdminRoleSuperAdmin,
+	}); err != nil {
+		return err
+	}
+	log.Printf("bootstrapped initial admin: %s", b.config.InitialAdminEmail)
+	return nil
 }
 
 // startEventProcessor イベントプロセッサーを起動する
