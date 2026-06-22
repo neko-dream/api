@@ -3,7 +3,6 @@ package survey
 import (
 	"errors"
 	"fmt"
-	"time"
 	"unicode/utf8"
 
 	"github.com/neko-dream/api/internal/domain/model/shared"
@@ -70,14 +69,6 @@ func validateAnswerAgainstQuestion(q *Question, a *Answer) error {
 	}
 
 	switch q.Type() {
-	case QuestionTypeFreeText:
-		if v.Text == nil {
-			return fmt.Errorf("free_text question %s requires text", q.QuestionID())
-		}
-		if q.MaxLength() != nil && utf8.RuneCountInString(*v.Text) > *q.MaxLength() {
-			return fmt.Errorf("text exceeds max_length for question %s", q.QuestionID())
-		}
-
 	case QuestionTypeSingleChoice, QuestionTypeDropdown:
 		hasChoice := len(v.SelectedChoiceIDs) >= 1
 		hasOther, err := validateOther(q, v)
@@ -96,45 +87,6 @@ func validateAnswerAgainstQuestion(q *Question, a *Answer) error {
 		}
 		if err := validateChoiceIDsBelongToQuestion(q, v.SelectedChoiceIDs); err != nil {
 			return err
-		}
-
-	case QuestionTypeMultiChoice:
-		hasOther, err := validateOther(q, v)
-		if err != nil {
-			return err
-		}
-		if len(v.SelectedChoiceIDs) == 0 && !hasOther {
-			return fmt.Errorf("multi_choice question %s requires at least one choice or other", q.QuestionID())
-		}
-		// 重複ID チェック
-		idSet := make(map[shared.UUID[Choice]]bool, len(v.SelectedChoiceIDs))
-		for _, cid := range v.SelectedChoiceIDs {
-			if idSet[cid] {
-				return fmt.Errorf("duplicate choice id in multi_choice answer for question %s", q.QuestionID())
-			}
-			idSet[cid] = true
-		}
-		if err := validateChoiceIDsBelongToQuestion(q, v.SelectedChoiceIDs); err != nil {
-			return err
-		}
-
-	case QuestionTypeRating:
-		if v.Rating == nil {
-			return fmt.Errorf("rating question %s requires rating value", q.QuestionID())
-		}
-		if q.MinValue() != nil && *v.Rating < *q.MinValue() {
-			return fmt.Errorf("rating below min_value for question %s", q.QuestionID())
-		}
-		if q.MaxValue() != nil && *v.Rating > *q.MaxValue() {
-			return fmt.Errorf("rating above max_value for question %s", q.QuestionID())
-		}
-
-	case QuestionTypeDate:
-		if v.Date == nil {
-			return fmt.Errorf("date question %s requires date", q.QuestionID())
-		}
-		if _, err := time.Parse("2006-01-02", *v.Date); err != nil {
-			return fmt.Errorf("date question %s expects YYYY-MM-DD: %w", q.QuestionID(), err)
 		}
 
 	default:

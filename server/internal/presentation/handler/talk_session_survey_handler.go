@@ -225,23 +225,13 @@ func summaryToResponse(s *survey.Summary) *oas.TalkSessionSurveySummary {
 				Count:    int32(cc.Count),
 			})
 		}
-		dist := make([]oas.TalkSessionSurveyRatingBucket, 0, len(q.RatingDistribution))
-		for _, b := range q.RatingDistribution {
-			dist = append(dist, oas.TalkSessionSurveyRatingBucket{
-				Value: int32(b.Value),
-				Count: int32(b.Count),
-			})
-		}
 		qs = append(qs, oas.TalkSessionSurveyQuestionSummary{
-			QuestionID:         q.QuestionID.String(),
-			Text:               q.Text,
-			Type:               oas.TalkSessionSurveyQuestionType(q.Type),
-			ContainsPii:        q.ContainsPii,
-			AnswerCount:        int32(q.AnswerCount),
-			ChoiceCounts:       choices,
-			OtherCount:         int32(q.OtherCount),
-			RatingAverage:      floatPtrToOptNilFloat64(q.RatingAverage),
-			RatingDistribution: dist,
+			QuestionID:   q.QuestionID.String(),
+			Text:         q.Text,
+			Type:         oas.TalkSessionSurveyQuestionType(q.Type),
+			AnswerCount:  int32(q.AnswerCount),
+			ChoiceCounts: choices,
+			OtherCount:   int32(q.OtherCount),
 		})
 	}
 	return &oas.TalkSessionSurveySummary{
@@ -250,13 +240,6 @@ func summaryToResponse(s *survey.Summary) *oas.TalkSessionSurveySummary {
 		SubmissionCount:   int32(s.SubmissionCount),
 		QuestionSummaries: qs,
 	}
-}
-
-func floatPtrToOptNilFloat64(p *float64) oas.OptNilFloat64 {
-	if p == nil {
-		return oas.OptNilFloat64{}
-	}
-	return oas.NewOptNilFloat64(*p)
 }
 
 // --- 変換ヘルパ ---
@@ -278,12 +261,7 @@ func convertCreateQuestions(in []oas.TalkSessionSurveyQuestionInput) ([]talksess
 			IsRequired:   qi.GetIsRequired(),
 			AllowOther:   qi.GetAllowOther(),
 			MaxLength:    optNilInt32ToIntPtr(qi.GetMaxLength()),
-			MinValue:     optNilInt32ToIntPtr(qi.GetMinValue()),
-			MaxValue:     optNilInt32ToIntPtr(qi.GetMaxValue()),
-			MinLabel:     optNilStringToPtr(qi.GetMinLabel()),
-			MaxLabel:     optNilStringToPtr(qi.GetMaxLabel()),
 			DisplayOrder: int(qi.GetDisplayOrder()),
-			ContainsPii:  qi.GetContainsPii().Or(false),
 			Choices:      choices,
 		})
 	}
@@ -329,12 +307,7 @@ func convertUpdateQuestions(in []oas.TalkSessionSurveyQuestionInput) ([]talksess
 			IsRequired:   qi.GetIsRequired(),
 			AllowOther:   qi.GetAllowOther(),
 			MaxLength:    optNilInt32ToIntPtr(qi.GetMaxLength()),
-			MinValue:     optNilInt32ToIntPtr(qi.GetMinValue()),
-			MaxValue:     optNilInt32ToIntPtr(qi.GetMaxValue()),
-			MinLabel:     optNilStringToPtr(qi.GetMinLabel()),
-			MaxLabel:     optNilStringToPtr(qi.GetMaxLabel()),
 			DisplayOrder: int(qi.GetDisplayOrder()),
-			ContainsPii:  qi.GetContainsPii().Or(false),
 			Choices:      choices,
 		})
 	}
@@ -374,11 +347,8 @@ func convertSubmitAnswers(in []oas.TalkSessionSurveyAnswerInput) ([]talksession_
 		}
 		out = append(out, talksession_usecase.SurveyAnswerInput{
 			QuestionID:        qid,
-			Text:              optNilStringToPtr(ai.GetText()),
 			SelectedChoiceIDs: selected,
 			Other:             optNilStringToPtr(ai.GetOther()),
-			Rating:            optNilInt32ToIntPtr(ai.GetRating()),
-			Date:              optNilStringToPtr(ai.GetDate()),
 		})
 	}
 	return out, nil
@@ -415,12 +385,7 @@ func questionToResponse(q *survey.Question) oas.TalkSessionSurveyQuestion {
 		IsRequired:   q.IsRequired(),
 		AllowOther:   q.AllowOther(),
 		MaxLength:    intPtrToOptNilInt32(q.MaxLength()),
-		MinValue:     intPtrToOptNilInt32(q.MinValue()),
-		MaxValue:     intPtrToOptNilInt32(q.MaxValue()),
-		MinLabel:     utils.ToOptNil[oas.OptNilString](q.MinLabel()),
-		MaxLabel:     utils.ToOptNil[oas.OptNilString](q.MaxLabel()),
 		DisplayOrder: int32(q.DisplayOrder()),
-		ContainsPii:  q.ContainsPii(),
 		Choices:      choices,
 	}
 }
@@ -435,11 +400,8 @@ func submissionToResponse(sub *survey.Submission) oas.TalkSessionSurveySubmissio
 		}
 		answers = append(answers, oas.TalkSessionSurveyAnswer{
 			QuestionID:        a.QuestionID().String(),
-			Text:              utils.ToOptNil[oas.OptNilString](v.Text),
 			SelectedChoiceIDs: selected,
 			Other:             utils.ToOptNil[oas.OptNilString](v.Other),
-			Rating:            intPtrToOptNilInt32(v.Rating),
-			Date:              utils.ToOptNil[oas.OptNilString](v.Date),
 		})
 	}
 	return oas.TalkSessionSurveySubmission{

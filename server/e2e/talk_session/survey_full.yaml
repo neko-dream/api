@@ -1,4 +1,4 @@
-desc: アンケート機能（全質問タイプ × 編集 × 集計）正常系
+desc: アンケート機能（single_choice / dropdown × 編集 × 集計）正常系
 runners:
   req:
     endpoint: http://localhost:3000
@@ -57,8 +57,8 @@ steps:
         post:
           body:
             multipart/form-data:
-              theme: "全タイプアンケート"
-              description: "全質問タイプ"
+              theme: "選択式アンケート"
+              description: "single_choice / dropdown"
               scheduledEndTime: "2100-12-31T23:59:59Z"
               prefecture: "{{ vars.prefecture }}"
               city: "{{ vars.city }}"
@@ -66,8 +66,8 @@ steps:
       session: current.res.body
     test: current.res.status == 200
 
-  createSurveyAllTypes:
-    desc: 全 6 タイプ + allowOther でアンケート作成
+  createSurvey:
+    desc: single_choice（その他可）+ dropdown でアンケート作成
     req:
       /talksessions/{{ session.id }}/survey:
         post:
@@ -85,59 +85,24 @@ steps:
                       displayOrder: 0
                     - text: "青"
                       displayOrder: 1
-                - text: "好きな食べ物（複数可）"
-                  type: "multi_choice"
-                  isRequired: true
-                  allowOther: false
-                  displayOrder: 1
-                  choices:
-                    - text: "寿司"
-                      displayOrder: 0
-                    - text: "ラーメン"
-                      displayOrder: 1
-                    - text: "カレー"
-                      displayOrder: 2
-                - text: "満足度"
-                  type: "rating"
-                  isRequired: true
-                  allowOther: false
-                  minValue: 1
-                  maxValue: 5
-                  minLabel: "不満"
-                  maxLabel: "満足"
-                  displayOrder: 2
-                  choices: []
-                - text: "誕生日"
-                  type: "date"
-                  isRequired: false
-                  allowOther: false
-                  displayOrder: 3
-                  choices: []
                 - text: "ご職業（ドロップダウン）"
                   type: "dropdown"
                   isRequired: false
                   allowOther: false
-                  displayOrder: 4
+                  displayOrder: 1
                   choices:
                     - text: "会社員"
                       displayOrder: 0
                     - text: "学生"
                       displayOrder: 1
-                - text: "ご意見"
-                  type: "free_text"
-                  isRequired: false
-                  allowOther: false
-                  maxLength: 500
-                  displayOrder: 5
-                  choices: []
     bind:
       survey: current.res.body
     test: |
       current.res.status == 200 &&
-      len(current.res.body.questions) == 6
+      len(current.res.body.questions) == 2
 
   updateSurveyAddQuestionAndEditText:
-    desc: 編集：新規質問を追加 + 既存の単一選択質問のテキストを変更
+    desc: 編集：新規の single_choice 質問を追加 + 既存質問のテキストを変更
     req:
       /talksessions/{{ session.id }}/survey:
         put:
@@ -158,18 +123,21 @@ steps:
                     - choiceID: "{{ survey.questions[0].choices[1].choiceID }}"
                       text: "青"
                       displayOrder: 1
-                - text: "追加質問：おすすめのプログラミング言語"
-                  type: "free_text"
+                - text: "また参加したいですか？"
+                  type: "single_choice"
                   isRequired: false
                   allowOther: false
-                  maxLength: 100
-                  displayOrder: 6
-                  choices: []
+                  displayOrder: 2
+                  choices:
+                    - text: "はい"
+                      displayOrder: 0
+                    - text: "いいえ"
+                      displayOrder: 1
     bind:
       updatedSurvey: current.res.body
     test: |
       current.res.status == 200 &&
-      len(current.res.body.questions) == 7 &&
+      len(current.res.body.questions) == 3 &&
       current.res.body.questions[0].text == "好きな色は何ですか？（改訂）"
 
   loginJoiner1:
@@ -192,7 +160,7 @@ steps:
               city: "{{ vars.city }}"
 
   submitJoiner1:
-    desc: 参加者1が全タイプ回答（rating=5、色=赤、食べ物=寿司+ラーメン、職業=会社員、日付・自由記述あり）
+    desc: 参加者1（色=赤、職業=会社員、また参加=はい）
     req:
       /talksessions/{{ session.id }}/survey/submissions:
         post:
@@ -202,19 +170,9 @@ steps:
                 - questionID: "{{ updatedSurvey.questions[0].questionID }}"
                   selectedChoiceIDs: ["{{ updatedSurvey.questions[0].choices[0].choiceID }}"]
                 - questionID: "{{ updatedSurvey.questions[1].questionID }}"
-                  selectedChoiceIDs:
-                    - "{{ updatedSurvey.questions[1].choices[0].choiceID }}"
-                    - "{{ updatedSurvey.questions[1].choices[1].choiceID }}"
+                  selectedChoiceIDs: ["{{ updatedSurvey.questions[1].choices[0].choiceID }}"]
                 - questionID: "{{ updatedSurvey.questions[2].questionID }}"
-                  rating: 5
-                - questionID: "{{ updatedSurvey.questions[3].questionID }}"
-                  date: "1990-04-01"
-                - questionID: "{{ updatedSurvey.questions[4].questionID }}"
-                  selectedChoiceIDs: ["{{ updatedSurvey.questions[4].choices[0].choiceID }}"]
-                - questionID: "{{ updatedSurvey.questions[5].questionID }}"
-                  text: "良かったです"
-                - questionID: "{{ updatedSurvey.questions[6].questionID }}"
-                  text: "Go"
+                  selectedChoiceIDs: ["{{ updatedSurvey.questions[2].choices[0].choiceID }}"]
     test: current.res.status == 200
 
   loginJoiner2:
@@ -237,7 +195,7 @@ steps:
               city: "{{ vars.city }}"
 
   submitJoiner2:
-    desc: 参加者2 は色=その他、食べ物=カレーのみ、rating=3
+    desc: 参加者2（色=その他「緑」、職業=学生、また参加は未回答）
     req:
       /talksessions/{{ session.id }}/survey/submissions:
         post:
@@ -247,10 +205,7 @@ steps:
                 - questionID: "{{ updatedSurvey.questions[0].questionID }}"
                   other: "緑"
                 - questionID: "{{ updatedSurvey.questions[1].questionID }}"
-                  selectedChoiceIDs:
-                    - "{{ updatedSurvey.questions[1].choices[2].choiceID }}"
-                - questionID: "{{ updatedSurvey.questions[2].questionID }}"
-                  rating: 3
+                  selectedChoiceIDs: ["{{ updatedSurvey.questions[1].choices[1].choiceID }}"]
     test: current.res.status == 200
 
   loginOwnerAgain:
@@ -271,7 +226,7 @@ steps:
     test: |
       current.res.status == 200 &&
       current.res.body.submissionCount == 2 &&
-      len(current.res.body.questionSummaries) == 7
+      len(current.res.body.questionSummaries) == 3
 
   verifySingleChoiceSummary:
     desc: single_choice：赤=1件、青=0件、other=1件、answerCount=2
@@ -287,65 +242,27 @@ steps:
       len(filter(current.res.body.questionSummaries[0].choiceCounts, #.text == "赤" && #.count == 1)) == 1 &&
       len(filter(current.res.body.questionSummaries[0].choiceCounts, #.text == "青" && #.count == 0)) == 1
 
-  verifyMultiChoiceSummary:
-    desc: multi_choice：寿司=1、ラーメン=1、カレー=1、answerCount=2
-    req:
-      /talksessions/{{ session.id }}/survey/summary:
-        get:
-          headers: null
-    test: |
-      current.res.status == 200 &&
-      current.res.body.questionSummaries[1].type == "multi_choice" &&
-      current.res.body.questionSummaries[1].answerCount == 2 &&
-      len(filter(current.res.body.questionSummaries[1].choiceCounts, #.text == "寿司" && #.count == 1)) == 1 &&
-      len(filter(current.res.body.questionSummaries[1].choiceCounts, #.text == "ラーメン" && #.count == 1)) == 1 &&
-      len(filter(current.res.body.questionSummaries[1].choiceCounts, #.text == "カレー" && #.count == 1)) == 1
-
-  verifyRatingSummary:
-    desc: rating：平均=(5+3)/2=4.0、分布で 5=1件、3=1件、その他は 0
-    req:
-      /talksessions/{{ session.id }}/survey/summary:
-        get:
-          headers: null
-    test: |
-      current.res.status == 200 &&
-      current.res.body.questionSummaries[2].type == "rating" &&
-      current.res.body.questionSummaries[2].answerCount == 2 &&
-      current.res.body.questionSummaries[2].ratingAverage == 4.0 &&
-      len(filter(current.res.body.questionSummaries[2].ratingDistribution, #.value == 5 && #.count == 1)) == 1 &&
-      len(filter(current.res.body.questionSummaries[2].ratingDistribution, #.value == 3 && #.count == 1)) == 1 &&
-      len(filter(current.res.body.questionSummaries[2].ratingDistribution, #.value == 1 && #.count == 0)) == 1
-
-  verifyDateSummary:
-    desc: date：joiner1のみ回答 → answerCount=1
-    req:
-      /talksessions/{{ session.id }}/survey/summary:
-        get:
-          headers: null
-    test: |
-      current.res.status == 200 &&
-      current.res.body.questionSummaries[3].type == "date" &&
-      current.res.body.questionSummaries[3].answerCount == 1
-
   verifyDropdownSummary:
-    desc: dropdown：会社員=1、学生=0、answerCount=1
+    desc: dropdown：会社員=1、学生=1、answerCount=2
     req:
       /talksessions/{{ session.id }}/survey/summary:
         get:
           headers: null
     test: |
       current.res.status == 200 &&
-      current.res.body.questionSummaries[4].type == "dropdown" &&
-      current.res.body.questionSummaries[4].answerCount == 1 &&
-      len(filter(current.res.body.questionSummaries[4].choiceCounts, #.text == "会社員" && #.count == 1)) == 1
+      current.res.body.questionSummaries[1].type == "dropdown" &&
+      current.res.body.questionSummaries[1].answerCount == 2 &&
+      len(filter(current.res.body.questionSummaries[1].choiceCounts, #.text == "会社員" && #.count == 1)) == 1 &&
+      len(filter(current.res.body.questionSummaries[1].choiceCounts, #.text == "学生" && #.count == 1)) == 1
 
-  verifyFreeTextSummary:
-    desc: free_text：joiner1のみ回答 → answerCount=1
+  verifyAddedQuestionSummary:
+    desc: 追加した single_choice：はい=1件、answerCount=1（joiner2 は未回答）
     req:
       /talksessions/{{ session.id }}/survey/summary:
         get:
           headers: null
     test: |
       current.res.status == 200 &&
-      current.res.body.questionSummaries[5].type == "free_text" &&
-      current.res.body.questionSummaries[5].answerCount == 1
+      current.res.body.questionSummaries[2].type == "single_choice" &&
+      current.res.body.questionSummaries[2].answerCount == 1 &&
+      len(filter(current.res.body.questionSummaries[2].choiceCounts, #.text == "はい" && #.count == 1)) == 1

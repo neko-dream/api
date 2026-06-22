@@ -36,12 +36,7 @@ type (
 		IsRequired   bool
 		AllowOther   bool
 		MaxLength    *int
-		MinValue     *int
-		MaxValue     *int
-		MinLabel     *string
-		MaxLabel     *string
 		DisplayOrder int
-		ContainsPii  bool
 		Choices      []UpdateSurveyChoiceInput
 	}
 
@@ -107,12 +102,7 @@ func (uc *updateSurveyUseCase) Execute(ctx context.Context, input UpdateSurveyIn
 			IsRequired:   qi.IsRequired,
 			AllowOther:   qi.AllowOther,
 			MaxLength:    qi.MaxLength,
-			MinValue:     qi.MinValue,
-			MaxValue:     qi.MaxValue,
-			MinLabel:     qi.MinLabel,
-			MaxLabel:     qi.MaxLabel,
 			DisplayOrder: qi.DisplayOrder,
-			ContainsPii:  qi.ContainsPii,
 		}
 		if qi.QuestionID != nil {
 			q := s.FindQuestion(*qi.QuestionID)

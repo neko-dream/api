@@ -5235,10 +5235,6 @@ components:
         questionID:
           type: string
           description: 質問ID
-        text:
-          type: string
-          nullable: true
-          description: 自由記述（free_text）
         selectedChoiceIDs:
           type: array
           items:
@@ -5248,15 +5244,6 @@ components:
           type: string
           nullable: true
           description: 「その他」自由記述
-        rating:
-          type: integer
-          format: int32
-          nullable: true
-          description: 評価値
-        date:
-          type: string
-          nullable: true
-          description: 日付
       description: アンケート回答（取得用）
     TalkSessionSurveyAnswerInput:
       type: object
@@ -5266,36 +5253,19 @@ components:
         questionID:
           type: string
           description: 質問ID
-        text:
-          type: string
-          nullable: true
-          description: 自由記述（free_text）
         selectedChoiceIDs:
           type: array
           items:
             type: string
-          description: 選択された choice_id 配列（single/multi/dropdown）
+          description: 選択された choice_id 配列（single_choice / dropdown は 1 件）
         other:
           type: string
           nullable: true
-          description: 「その他」自由記述（allowOther=true の choice 系で使用）
-        rating:
-          type: integer
-          format: int32
-          nullable: true
-          description: 評価値（rating）
-        date:
-          type: string
-          nullable: true
-          description: 日付（date, YYYY-MM-DD）
+          description: 「その他」自由記述（allowOther=true の場合に使用）
       description: |-
         回答送信用：単一回答
-        質問タイプによって意味が変わる：
-        - free_text: text を使用
-        - single_choice / dropdown: selectedChoiceIDs を 1 件、または allowOther の場合 other
-        - multi_choice: selectedChoiceIDs を 1 件以上、加えて allowOther の場合 other
-        - rating: rating を使用
-        - date: date を使用 (YYYY-MM-DD)
+        質問タイプは single_choice / dropdown のみ：
+        - selectedChoiceIDs を 1 件、または allowOther の場合 other
     TalkSessionSurveyChoice:
       type: object
       required:
@@ -5354,7 +5324,6 @@ components:
         - isRequired
         - allowOther
         - displayOrder
-        - containsPii
         - choices
       properties:
         questionID:
@@ -5372,42 +5341,21 @@ components:
           description: 必須回答かどうか
         allowOther:
           type: boolean
-          description: 「その他」入力を許可するか（single_choice / multi_choice / dropdown のみ有効）
+          description: 「その他」入力を許可するか（single_choice / dropdown のみ有効）
         maxLength:
           type: integer
           format: int32
           nullable: true
-          description: 自由記述の最大文字数（free_text または allowOther の入力に適用）
-        minValue:
-          type: integer
-          format: int32
-          nullable: true
-          description: rating の下限値（rating のみ有効）
-        maxValue:
-          type: integer
-          format: int32
-          nullable: true
-          description: rating の上限値（rating のみ有効）
-        minLabel:
-          type: string
-          nullable: true
-          description: rating の下限ラベル（例：「全く満足していない」）
-        maxLabel:
-          type: string
-          nullable: true
-          description: rating の上限ラベル（例：「非常に満足している」）
+          description: 「その他」自由記述の最大文字数（allowOther の入力に適用）
         displayOrder:
           type: integer
           format: int32
           description: 表示順
-        containsPii:
-          type: boolean
-          description: 個人情報を含む設問かどうか。true のとき、回答の text / other / date は AES-GCM で暗号化して保存される。
         choices:
           type: array
           items:
             $ref: '#/components/schemas/TalkSessionSurveyChoice'
-          description: 選択肢（single_choice / multi_choice / dropdown のみ）
+          description: 選択肢（single_choice / dropdown）
       description: アンケート質問
     TalkSessionSurveyQuestionInput:
       type: object
@@ -5435,26 +5383,9 @@ components:
           type: integer
           format: int32
           nullable: true
-        minValue:
-          type: integer
-          format: int32
-          nullable: true
-        maxValue:
-          type: integer
-          format: int32
-          nullable: true
-        minLabel:
-          type: string
-          nullable: true
-        maxLabel:
-          type: string
-          nullable: true
         displayOrder:
           type: integer
           format: int32
-        containsPii:
-          type: boolean
-          description: 個人情報を含む設問かどうか。省略時は false。
         choices:
           type: array
           items:
@@ -5466,11 +5397,9 @@ components:
         - questionID
         - text
         - type
-        - containsPii
         - answerCount
         - choiceCounts
         - otherCount
-        - ratingDistribution
       properties:
         questionID:
           type: string
@@ -5478,9 +5407,6 @@ components:
           type: string
         type:
           $ref: '#/components/schemas/TalkSessionSurveyQuestionType'
-        containsPii:
-          type: boolean
-          description: 個人情報設問かどうか
         answerCount:
           type: integer
           format: int32
@@ -5489,49 +5415,20 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TalkSessionSurveyChoiceCount'
-          description: choice 系のみ：選択肢ごとの件数
+          description: 選択肢ごとの件数
         otherCount:
           type: integer
           format: int32
-          description: choice 系（allowOther=true）のみ：その他テキストを記入したユーザー数
-        ratingAverage:
-          type: number
-          format: double
-          nullable: true
-          description: rating のみ：回答の平均値
-        ratingDistribution:
-          type: array
-          items:
-            $ref: '#/components/schemas/TalkSessionSurveyRatingBucket'
-          description: rating のみ：値ごとの件数分布（minValue〜maxValue 昇順）
+          description: allowOther=true のみ：その他テキストを記入したユーザー数
       description: |-
-        集計：質問ごとの結果
-        - free_text / date: answerCount のみ意味を持つ（生データは /submissions で取得）
-        - single_choice / multi_choice / dropdown: choiceCounts + otherCount
-        - rating: ratingAverage + ratingDistribution
+        集計：質問ごとの結果（single_choice / dropdown）
+        choiceCounts + otherCount を持つ。
     TalkSessionSurveyQuestionType:
       type: string
       enum:
-        - free_text
         - single_choice
-        - multi_choice
-        - rating
-        - date
         - dropdown
-      description: アンケートの質問タイプ
-    TalkSessionSurveyRatingBucket:
-      type: object
-      required:
-        - value
-        - count
-      properties:
-        value:
-          type: integer
-          format: int32
-        count:
-          type: integer
-          format: int32
-      description: 集計：rating の分布
+      description: アンケートの質問タイプ（選択肢系のみ）
     TalkSessionSurveySubmission:
       type: object
       required:

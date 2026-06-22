@@ -19,11 +19,7 @@ import (
 type TalkSessionSurveyQuestionType string
 
 const (
-	TalkSessionSurveyQuestionTypeFreeText     TalkSessionSurveyQuestionType = "free_text"
 	TalkSessionSurveyQuestionTypeSingleChoice TalkSessionSurveyQuestionType = "single_choice"
-	TalkSessionSurveyQuestionTypeMultiChoice  TalkSessionSurveyQuestionType = "multi_choice"
-	TalkSessionSurveyQuestionTypeRating       TalkSessionSurveyQuestionType = "rating"
-	TalkSessionSurveyQuestionTypeDate         TalkSessionSurveyQuestionType = "date"
 	TalkSessionSurveyQuestionTypeDropdown     TalkSessionSurveyQuestionType = "dropdown"
 )
 
@@ -349,15 +345,10 @@ type TalkSessionSurveyQuestion struct {
 	IsRequired   bool
 	AllowOther   bool
 	MaxLength    sql.NullInt32
-	MinValue     sql.NullInt32
-	MaxValue     sql.NullInt32
-	MinLabel     sql.NullString
-	MaxLabel     sql.NullString
 	DisplayOrder int32
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 	DeletedAt    sql.NullTime
-	ContainsPii  bool
 }
 
 type TalkSessionSurveySubmission struct {

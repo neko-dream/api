@@ -7,10 +7,12 @@ import (
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/api/internal/domain/messages"
+	domain_crypto "github.com/neko-dream/api/internal/domain/model/crypto"
 	"github.com/neko-dream/api/internal/domain/model/shared"
 	"github.com/neko-dream/api/internal/domain/model/talksession"
 	"github.com/neko-dream/api/internal/domain/model/talksession/survey"
 	"github.com/neko-dream/api/internal/domain/model/user"
+	"github.com/neko-dream/api/internal/infrastructure/crypto"
 	"github.com/neko-dream/api/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
@@ -28,16 +30,19 @@ type (
 	getSurveySummaryUseCase struct {
 		talkSessionRepo talksession.TalkSessionRepository
 		surveyRepo      survey.Repository
+		encryptor       domain_crypto.Encryptor
 	}
 )
 
 func NewGetSurveySummaryUseCase(
 	talkSessionRepo talksession.TalkSessionRepository,
 	surveyRepo survey.Repository,
+	encryptor domain_crypto.Encryptor,
 ) GetSurveySummaryUseCase {
 	return &getSurveySummaryUseCase{
 		talkSessionRepo: talkSessionRepo,
 		surveyRepo:      surveyRepo,
+		encryptor:       encryptor,
 	}
 }
 
@@ -73,6 +78,21 @@ func (uc *getSurveySummaryUseCase) Execute(ctx context.Context, input GetSurveyS
 	if err != nil {
 		utils.HandleError(ctx, err, "surveyRepo.ListAllSubmissions")
 		return nil, errtrace.Wrap(err)
+	}
+
+	// 回答はすべて暗号化されているため、集計前にサーバ側で復号する。
+	for _, sub := range subs {
+		for _, a := range sub.Answers() {
+			if !a.IsEncrypted() {
+				continue
+			}
+			dec, err := crypto.DecryptAnswerValue(ctx, uc.encryptor, a.Value())
+			if err != nil {
+				utils.HandleError(ctx, err, "crypto.DecryptAnswerValue")
+				return nil, errtrace.Wrap(err)
+			}
+			a.SetDecryptedValue(dec)
+		}
 	}
 
 	return survey.Aggregate(s, subs), nil

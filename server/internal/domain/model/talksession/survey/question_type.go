@@ -9,20 +9,12 @@ import (
 type QuestionType string
 
 const (
-	QuestionTypeFreeText     QuestionType = "free_text"
 	QuestionTypeSingleChoice QuestionType = "single_choice"
-	QuestionTypeMultiChoice  QuestionType = "multi_choice"
-	QuestionTypeRating       QuestionType = "rating"
-	QuestionTypeDate         QuestionType = "date"
 	QuestionTypeDropdown     QuestionType = "dropdown"
 )
 
 var allQuestionTypes = []QuestionType{
-	QuestionTypeFreeText,
 	QuestionTypeSingleChoice,
-	QuestionTypeMultiChoice,
-	QuestionTypeRating,
-	QuestionTypeDate,
 	QuestionTypeDropdown,
 }
 
@@ -31,12 +23,9 @@ func (t QuestionType) IsValid() bool {
 }
 
 // HasChoices は選択肢を持つタイプか返す。
+// 現在サポートする質問タイプ（single_choice / dropdown）はいずれも選択肢を持つ。
 func (t QuestionType) HasChoices() bool {
-	switch t {
-	case QuestionTypeSingleChoice, QuestionTypeMultiChoice, QuestionTypeDropdown:
-		return true
-	}
-	return false
+	return t.IsValid()
 }
 
 func ParseQuestionType(s string) (QuestionType, error) {

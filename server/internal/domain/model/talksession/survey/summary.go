@@ -1,8 +1,6 @@
 package survey
 
 import (
-	"sort"
-
 	"github.com/neko-dream/api/internal/domain/model/shared"
 	"github.com/neko-dream/api/internal/domain/model/talksession"
 )
@@ -16,31 +14,20 @@ type Summary struct {
 }
 
 // QuestionSummary は質問ごとの集計結果。
-// 質問タイプによって意味のあるフィールドが異なる：
-//   - free_text / date:                    AnswerCount のみ
-//   - single_choice / multi_choice / dropdown: ChoiceCounts + OtherCount
-//   - rating:                              RatingAverage + RatingDistribution
+// 質問タイプは single_choice / dropdown のみで、いずれも ChoiceCounts + OtherCount を持つ。
 type QuestionSummary struct {
-	QuestionID         shared.UUID[Question]
-	Text               string
-	Type               QuestionType
-	ContainsPii        bool
-	AnswerCount        int
-	ChoiceCounts       []*ChoiceCount
-	OtherCount         int
-	RatingAverage      *float64
-	RatingDistribution []*RatingBucket
+	QuestionID   shared.UUID[Question]
+	Text         string
+	Type         QuestionType
+	AnswerCount  int
+	ChoiceCounts []*ChoiceCount
+	OtherCount   int
 }
 
 type ChoiceCount struct {
 	ChoiceID shared.UUID[Choice]
 	Text     string
 	Count    int
-}
-
-type RatingBucket struct {
-	Value int
-	Count int
 }
 
 // Aggregate は submissions を質問タイプに応じて集計する。
@@ -60,13 +47,12 @@ func Aggregate(s *Survey, submissions []*Submission) *Summary {
 
 func aggregateQuestion(q *Question, submissions []*Submission) *QuestionSummary {
 	qs := &QuestionSummary{
-		QuestionID:  q.QuestionID(),
-		Text:        q.Text(),
-		Type:        q.Type(),
-		ContainsPii: q.ContainsPii(),
+		QuestionID: q.QuestionID(),
+		Text:       q.Text(),
+		Type:       q.Type(),
 	}
 
-	// この質問に対する全 Answer を抽出
+	// この質問に対する全 Answer を抽出（呼び出し元で復号済みであること）
 	var answers []AnswerValue
 	for _, sub := range submissions {
 		for _, a := range sub.Answers() {
@@ -77,53 +63,27 @@ func aggregateQuestion(q *Question, submissions []*Submission) *QuestionSummary 
 		}
 	}
 
-	switch q.Type() {
-	case QuestionTypeFreeText, QuestionTypeDate:
-		for _, v := range answers {
-			if !v.IsEmpty() {
-				qs.AnswerCount++
-			}
-		}
-
-	case QuestionTypeSingleChoice, QuestionTypeMultiChoice, QuestionTypeDropdown:
-		qs.ChoiceCounts = buildChoiceCounts(q)
-		idx := make(map[shared.UUID[Choice]]*ChoiceCount, len(qs.ChoiceCounts))
-		for _, cc := range qs.ChoiceCounts {
-			idx[cc.ChoiceID] = cc
-		}
-		for _, v := range answers {
-			counted := false
-			for _, cid := range v.SelectedChoiceIDs {
-				if cc, ok := idx[cid]; ok {
-					cc.Count++
-					counted = true
-				}
-			}
-			if v.Other != nil && *v.Other != "" {
-				qs.OtherCount++
+	// single_choice / dropdown はいずれも選択肢系として集計する。
+	qs.ChoiceCounts = buildChoiceCounts(q)
+	idx := make(map[shared.UUID[Choice]]*ChoiceCount, len(qs.ChoiceCounts))
+	for _, cc := range qs.ChoiceCounts {
+		idx[cc.ChoiceID] = cc
+	}
+	for _, v := range answers {
+		counted := false
+		for _, cid := range v.SelectedChoiceIDs {
+			if cc, ok := idx[cid]; ok {
+				cc.Count++
 				counted = true
 			}
-			if counted {
-				qs.AnswerCount++
-			}
 		}
-
-	case QuestionTypeRating:
-		bucket := make(map[int]int)
-		sum := 0
-		for _, v := range answers {
-			if v.Rating == nil {
-				continue
-			}
+		if v.Other != nil && *v.Other != "" {
+			qs.OtherCount++
+			counted = true
+		}
+		if counted {
 			qs.AnswerCount++
-			sum += *v.Rating
-			bucket[*v.Rating]++
 		}
-		if qs.AnswerCount > 0 {
-			avg := float64(sum) / float64(qs.AnswerCount)
-			qs.RatingAverage = &avg
-		}
-		qs.RatingDistribution = buildRatingDistribution(q, bucket)
 	}
 
 	return qs
@@ -138,30 +98,6 @@ func buildChoiceCounts(q *Question) []*ChoiceCount {
 			Text:     c.Text(),
 			Count:    0,
 		})
-	}
-	return out
-}
-
-// buildRatingDistribution は minValue〜maxValue 範囲（指定があれば）と
-// 実際に出現した値の和集合を作り、value 昇順で返す。
-func buildRatingDistribution(q *Question, bucket map[int]int) []*RatingBucket {
-	values := make(map[int]struct{})
-	if q.MinValue() != nil && q.MaxValue() != nil && *q.MinValue() <= *q.MaxValue() {
-		for v := *q.MinValue(); v <= *q.MaxValue(); v++ {
-			values[v] = struct{}{}
-		}
-	}
-	for v := range bucket {
-		values[v] = struct{}{}
-	}
-	sorted := make([]int, 0, len(values))
-	for v := range values {
-		sorted = append(sorted, v)
-	}
-	sort.Ints(sorted)
-	out := make([]*RatingBucket, 0, len(sorted))
-	for _, v := range sorted {
-		out = append(out, &RatingBucket{Value: v, Count: bucket[v]})
 	}
 	return out
 }

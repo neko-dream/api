@@ -33,12 +33,7 @@ type (
 		IsRequired   bool
 		AllowOther   bool
 		MaxLength    *int
-		MinValue     *int
-		MaxValue     *int
-		MinLabel     *string
-		MaxLabel     *string
 		DisplayOrder int
-		ContainsPii  bool
 		Choices      []SurveyChoiceInput
 	}
 
@@ -109,12 +104,7 @@ func (uc *createSurveyUseCase) Execute(ctx context.Context, input CreateSurveyIn
 			IsRequired:   qi.IsRequired,
 			AllowOther:   qi.AllowOther,
 			MaxLength:    qi.MaxLength,
-			MinValue:     qi.MinValue,
-			MaxValue:     qi.MaxValue,
-			MinLabel:     qi.MinLabel,
-			MaxLabel:     qi.MaxLabel,
 			DisplayOrder: qi.DisplayOrder,
-			ContainsPii:  qi.ContainsPii,
 		})
 		for _, ci := range qi.Choices {
 			q.AddChoice(survey.NewChoice(shared.NewUUID[survey.Choice](), qid, ci.Text, ci.DisplayOrder))
