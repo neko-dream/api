@@ -16,6 +16,8 @@ import { BrowserRouter, Outlet, Route, Routes } from "react-router";
 
 import { env } from "./config/env";
 import { LoginPage } from "./pages/login";
+import { AdminUserCreate } from "./pages/admin-users/create";
+import { AdminUserList } from "./pages/admin-users/list";
 import { authProvider, dataProvider } from "./providers";
 
 function App() {
@@ -35,6 +37,12 @@ function App() {
                   name: "talksessions",
                   list: "/talksessions",
                   meta: { label: "トークセッション" },
+                },
+                {
+                  name: "admin-users",
+                  list: "/admin-users",
+                  create: "/admin-users/create",
+                  meta: { label: "管理者アカウント" },
                 },
               ]}
               options={{
@@ -68,6 +76,8 @@ function App() {
                       </Typography.Paragraph>
                     }
                   />
+                  <Route path="/admin-users" element={<AdminUserList />} />
+                  <Route path="/admin-users/create" element={<AdminUserCreate />} />
                   <Route path="*" element={<ErrorComponent />} />
                 </Route>
 
