@@ -11,13 +11,14 @@ import routerProvider, {
   NavigateToResource,
 } from "@refinedev/react-router";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import { App as AntdApp, ConfigProvider, Typography } from "antd";
+import { App as AntdApp, ConfigProvider } from "antd";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router";
 
 import { env } from "./config/env";
 import { LoginPage } from "./pages/login";
 import { AdminUserCreate } from "./pages/admin-users/create";
 import { AdminUserList } from "./pages/admin-users/list";
+import { TalkSessionList } from "./pages/talksessions/list";
 import { authProvider, dataProvider } from "./providers";
 
 function App() {
@@ -68,14 +69,7 @@ function App() {
                     index
                     element={<NavigateToResource resource="talksessions" />}
                   />
-                  <Route
-                    path="/talksessions"
-                    element={
-                      <Typography.Paragraph>
-                        TODO: トークセッション一覧（ベースのみ。内容は今後実装）
-                      </Typography.Paragraph>
-                    }
-                  />
+                  <Route path="/talksessions" element={<TalkSessionList />} />
                   <Route path="/admin-users" element={<AdminUserList />} />
                   <Route path="/admin-users/create" element={<AdminUserCreate />} />
                   <Route path="*" element={<ErrorComponent />} />
