@@ -6,6 +6,63 @@ tags:
   - name: manage
   - name: admin
 paths:
+  /v1/admin/admin-users:
+    get:
+      operationId: listAdminUsers
+      summary: 管理者アカウント一覧
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserListResponse'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - admin
+      security:
+        - AdminCookieAuth: []
+      x-ogen-operation-group: Admin
+    post:
+      operationId: createAdminUser
+      summary: 管理者アカウント作成(作成した email の Google アカウントがログイン可能になる)
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserItem'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                type: object
+        '409':
+          description: The request conflicts with the current state of the server.
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAdminUserRequest'
+      security:
+        - AdminCookieAuth: []
+      x-ogen-operation-group: Admin
   /v1/admin/login:
     post:
       operationId: adminLogin
@@ -402,12 +459,54 @@ components:
         isAdmin:
           type: boolean
       description: 管理者トークンの内容
+    AdminUserItem:
+      type: object
+      required:
+        - id
+        - email
+        - displayName
+        - role
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        displayName:
+          type: string
+        role:
+          type: integer
+          description: 管理者ロール (数値が小さいほど高権限)
+      description: 管理者アカウント
+    AdminUserListResponse:
+      type: object
+      required:
+        - adminUsers
+      properties:
+        adminUsers:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminUserItem'
+      description: 管理者アカウント一覧
     AnalysisReportResponse:
       type: object
       properties:
         report:
           type: string
           description: レポート本文
+    CreateAdminUserRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          description: Google アカウントのメールアドレス
+        displayName:
+          type: string
+        role:
+          type: integer
+          description: 管理者ロール (未指定は一般管理者)
+      description: 管理者アカウント作成リクエスト
     RegenerateRequest:
       type: object
       required:

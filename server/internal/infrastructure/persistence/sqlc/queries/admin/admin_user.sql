@@ -7,3 +7,6 @@ SELECT * FROM admin_users WHERE email = $1;
 
 -- name: GetAdminUserByID :one
 SELECT * FROM admin_users WHERE admin_user_id = $1;
+
+-- name: ListAdminUsers :many
+SELECT * FROM admin_users ORDER BY created_at ASC;

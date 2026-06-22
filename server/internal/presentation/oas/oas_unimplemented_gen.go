@@ -94,6 +94,16 @@ func (UnimplementedHandler) ConsentTalkSession(ctx context.Context, params Conse
 	return r, ht.ErrNotImplemented
 }
 
+// CreateAdminUser implements createAdminUser operation.
+//
+// 管理者アカウント作成(作成した email の Google
+// アカウントがログイン可能になる).
+//
+// POST /v1/admin/admin-users
+func (UnimplementedHandler) CreateAdminUser(ctx context.Context, req *CreateAdminUserRequest) (r CreateAdminUserRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // CreateOrganizationAlias implements createOrganizationAlias operation.
 //
 // 組織エイリアス作成.
@@ -572,6 +582,15 @@ func (UnimplementedHandler) InviteOrganizationForUser(ctx context.Context, req *
 //
 // POST /talksessions/{talkSessionID}/join
 func (UnimplementedHandler) JoinLockedSession(ctx context.Context, req *JoinLockedSessionReq, params JoinLockedSessionParams) (r JoinLockedSessionRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// ListAdminUsers implements listAdminUsers operation.
+//
+// 管理者アカウント一覧.
+//
+// GET /v1/admin/admin-users
+func (UnimplementedHandler) ListAdminUsers(ctx context.Context) (r ListAdminUsersRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

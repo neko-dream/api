@@ -1945,6 +1945,28 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						break
 					}
 					switch elem[0] {
+					case 'a': // Prefix: "admin-users"
+
+						if l := len("admin-users"); len(elem) >= l && elem[0:l] == "admin-users" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch r.Method {
+							case "GET":
+								s.handleListAdminUsersRequest([0]string{}, elemIsEscaped, w, r)
+							case "POST":
+								s.handleCreateAdminUserRequest([0]string{}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "GET,POST")
+							}
+
+							return
+						}
+
 					case 'l': // Prefix: "log"
 
 						if l := len("log"); len(elem) >= l && elem[0:l] == "log" {
@@ -4520,6 +4542,38 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						break
 					}
 					switch elem[0] {
+					case 'a': // Prefix: "admin-users"
+
+						if l := len("admin-users"); len(elem) >= l && elem[0:l] == "admin-users" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch method {
+							case "GET":
+								r.name = ListAdminUsersOperation
+								r.summary = "管理者アカウント一覧"
+								r.operationID = "listAdminUsers"
+								r.pathPattern = "/v1/admin/admin-users"
+								r.args = args
+								r.count = 0
+								return r, true
+							case "POST":
+								r.name = CreateAdminUserOperation
+								r.summary = "管理者アカウント作成(作成した email の Google アカウントがログイン可能になる)"
+								r.operationID = "createAdminUser"
+								r.pathPattern = "/v1/admin/admin-users"
+								r.args = args
+								r.count = 0
+								return r, true
+							default:
+								return
+							}
+						}
+
 					case 'l': // Prefix: "log"
 
 						if l := len("log"); len(elem) >= l && elem[0:l] == "log" {

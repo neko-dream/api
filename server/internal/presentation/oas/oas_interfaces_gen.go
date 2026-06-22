@@ -33,6 +33,10 @@ type ConsentTalkSessionRes interface {
 	consentTalkSessionRes()
 }
 
+type CreateAdminUserRes interface {
+	createAdminUserRes()
+}
+
 type CreateOrganizationAliasRes interface {
 	createOrganizationAliasRes()
 }
@@ -215,6 +219,10 @@ type InviteOrganizationRes interface {
 
 type JoinLockedSessionRes interface {
 	joinLockedSessionRes()
+}
+
+type ListAdminUsersRes interface {
+	listAdminUsersRes()
 }
 
 type ListTalkSessionSurveySubmissionsRes interface {

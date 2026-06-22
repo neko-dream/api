@@ -243,6 +243,76 @@ func (s *AdminTokenInfoHeaders) SetResponse(val AdminTokenInfo) {
 func (*AdminTokenInfoHeaders) adminLoginRes()   {}
 func (*AdminTokenInfoHeaders) adminRefreshRes() {}
 
+// 管理者アカウント.
+// Ref: #/components/schemas/AdminUserItem
+type AdminUserItem struct {
+	ID          string `json:"id"`
+	Email       string `json:"email"`
+	DisplayName string `json:"displayName"`
+	// 管理者ロール (数値が小さいほど高権限).
+	Role int `json:"role"`
+}
+
+// GetID returns the value of ID.
+func (s *AdminUserItem) GetID() string {
+	return s.ID
+}
+
+// GetEmail returns the value of Email.
+func (s *AdminUserItem) GetEmail() string {
+	return s.Email
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *AdminUserItem) GetDisplayName() string {
+	return s.DisplayName
+}
+
+// GetRole returns the value of Role.
+func (s *AdminUserItem) GetRole() int {
+	return s.Role
+}
+
+// SetID sets the value of ID.
+func (s *AdminUserItem) SetID(val string) {
+	s.ID = val
+}
+
+// SetEmail sets the value of Email.
+func (s *AdminUserItem) SetEmail(val string) {
+	s.Email = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *AdminUserItem) SetDisplayName(val string) {
+	s.DisplayName = val
+}
+
+// SetRole sets the value of Role.
+func (s *AdminUserItem) SetRole(val int) {
+	s.Role = val
+}
+
+func (*AdminUserItem) createAdminUserRes() {}
+
+// 管理者アカウント一覧.
+// Ref: #/components/schemas/AdminUserListResponse
+type AdminUserListResponse struct {
+	AdminUsers []AdminUserItem `json:"adminUsers"`
+}
+
+// GetAdminUsers returns the value of AdminUsers.
+func (s *AdminUserListResponse) GetAdminUsers() []AdminUserItem {
+	return s.AdminUsers
+}
+
+// SetAdminUsers sets the value of AdminUsers.
+func (s *AdminUserListResponse) SetAdminUsers(val []AdminUserItem) {
+	s.AdminUsers = val
+}
+
+func (*AdminUserListResponse) listAdminUsersRes() {}
+
 // Ref: #/components/schemas/AnalysisReportResponse
 type AnalysisReportResponse struct {
 	// レポート本文.
@@ -522,6 +592,54 @@ func (s *CookieAuth) SetAPIKey(val string) {
 // SetRoles sets the value of Roles.
 func (s *CookieAuth) SetRoles(val []string) {
 	s.Roles = val
+}
+
+type CreateAdminUserConflict struct{}
+
+func (*CreateAdminUserConflict) createAdminUserRes() {}
+
+type CreateAdminUserForbidden struct{}
+
+func (*CreateAdminUserForbidden) createAdminUserRes() {}
+
+// 管理者アカウント作成リクエスト.
+// Ref: #/components/schemas/CreateAdminUserRequest
+type CreateAdminUserRequest struct {
+	// Google アカウントのメールアドレス.
+	Email       string    `json:"email"`
+	DisplayName OptString `json:"displayName"`
+	// 管理者ロール (未指定は一般管理者).
+	Role OptInt `json:"role"`
+}
+
+// GetEmail returns the value of Email.
+func (s *CreateAdminUserRequest) GetEmail() string {
+	return s.Email
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *CreateAdminUserRequest) GetDisplayName() OptString {
+	return s.DisplayName
+}
+
+// GetRole returns the value of Role.
+func (s *CreateAdminUserRequest) GetRole() OptInt {
+	return s.Role
+}
+
+// SetEmail sets the value of Email.
+func (s *CreateAdminUserRequest) SetEmail(val string) {
+	s.Email = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *CreateAdminUserRequest) SetDisplayName(val OptString) {
+	s.DisplayName = val
+}
+
+// SetRole sets the value of Role.
+func (s *CreateAdminUserRequest) SetRole(val OptInt) {
+	s.Role = val
 }
 
 type CreateOrganizationAliasBadRequest struct{}
@@ -2936,6 +3054,10 @@ func (s *JoinLockedSessionReq) GetPassphrase() OptString {
 func (s *JoinLockedSessionReq) SetPassphrase(val OptString) {
 	s.Passphrase = val
 }
+
+type ListAdminUsersForbidden struct{}
+
+func (*ListAdminUsersForbidden) listAdminUsersRes() {}
 
 type ListTalkSessionSurveySubmissionsForbidden struct{}
 

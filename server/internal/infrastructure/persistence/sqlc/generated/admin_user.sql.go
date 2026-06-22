@@ -78,3 +78,40 @@ func (q *Queries) GetAdminUserByID(ctx context.Context, adminUserID uuid.UUID) (
 	)
 	return i, err
 }
+
+const listAdminUsers = `-- name: ListAdminUsers :many
+SELECT admin_user_id, email, display_name, role, created_at, updated_at FROM admin_users ORDER BY created_at ASC
+`
+
+// ListAdminUsers
+//
+//	SELECT admin_user_id, email, display_name, role, created_at, updated_at FROM admin_users ORDER BY created_at ASC
+func (q *Queries) ListAdminUsers(ctx context.Context) ([]AdminUser, error) {
+	rows, err := q.db.QueryContext(ctx, listAdminUsers)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AdminUser
+	for rows.Next() {
+		var i AdminUser
+		if err := rows.Scan(
+			&i.AdminUserID,
+			&i.Email,
+			&i.DisplayName,
+			&i.Role,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

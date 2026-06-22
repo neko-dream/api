@@ -30,6 +30,7 @@ type AdminUserRepository interface {
 	Create(ctx context.Context, adminUser AdminUser) error
 	FindByEmail(ctx context.Context, email string) (*AdminUser, error)
 	FindByID(ctx context.Context, id shared.UUID[AdminUser]) (*AdminUser, error)
+	List(ctx context.Context) ([]AdminUser, error)
 }
 
 // GoogleClaims Google ID トークンから取り出した検証済みクレーム。

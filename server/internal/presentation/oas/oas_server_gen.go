@@ -47,12 +47,25 @@ type AdminHandler interface {
 	//
 	// POST /v1/admin/refresh
 	AdminRefresh(ctx context.Context) (AdminRefreshRes, error)
+	// CreateAdminUser implements createAdminUser operation.
+	//
+	// 管理者アカウント作成(作成した email の Google
+	// アカウントがログイン可能になる).
+	//
+	// POST /v1/admin/admin-users
+	CreateAdminUser(ctx context.Context, req *CreateAdminUserRequest) (CreateAdminUserRes, error)
 	// GetAdminTokenInfo implements getAdminTokenInfo operation.
 	//
 	// 管理者トークンの内容を返す.
 	//
 	// GET /v1/admin/token/info
 	GetAdminTokenInfo(ctx context.Context) (GetAdminTokenInfoRes, error)
+	// ListAdminUsers implements listAdminUsers operation.
+	//
+	// 管理者アカウント一覧.
+	//
+	// GET /v1/admin/admin-users
+	ListAdminUsers(ctx context.Context) (ListAdminUsersRes, error)
 }
 
 // AnalysisHandler handles operations described by OpenAPI v3 specification.

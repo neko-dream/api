@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/neko-dream/api/internal/application/usecase/admin_usecase"
@@ -14,24 +15,75 @@ import (
 )
 
 type adminHandler struct {
-	adminLogin    admin_usecase.AdminLogin
-	adminRefresh  admin_usecase.AdminRefresh
-	adminLogout   admin_usecase.AdminLogout
-	cookieManager cookie.CookieManager
+	adminLogin      admin_usecase.AdminLogin
+	adminRefresh    admin_usecase.AdminRefresh
+	adminLogout     admin_usecase.AdminLogout
+	listAdminUsers  admin_usecase.ListAdminUsers
+	createAdminUser admin_usecase.CreateAdminUser
+	cookieManager   cookie.CookieManager
 }
 
 func NewAdminHandler(
 	adminLogin admin_usecase.AdminLogin,
 	adminRefresh admin_usecase.AdminRefresh,
 	adminLogout admin_usecase.AdminLogout,
+	listAdminUsers admin_usecase.ListAdminUsers,
+	createAdminUser admin_usecase.CreateAdminUser,
 	cookieManager cookie.CookieManager,
 ) oas.AdminHandler {
 	return &adminHandler{
-		adminLogin:    adminLogin,
-		adminRefresh:  adminRefresh,
-		adminLogout:   adminLogout,
-		cookieManager: cookieManager,
+		adminLogin:      adminLogin,
+		adminRefresh:    adminRefresh,
+		adminLogout:     adminLogout,
+		listAdminUsers:  listAdminUsers,
+		createAdminUser: createAdminUser,
+		cookieManager:   cookieManager,
 	}
+}
+
+// ListAdminUsers implements listAdminUsers operation.
+func (h *adminHandler) ListAdminUsers(ctx context.Context) (oas.ListAdminUsersRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "adminHandler.ListAdminUsers")
+	defer span.End()
+
+	users, err := h.listAdminUsers.Execute(ctx)
+	if err != nil {
+		return nil, err
+	}
+	items := make([]oas.AdminUserItem, 0, len(users))
+	for _, u := range users {
+		items = append(items, oas.AdminUserItem{
+			ID:          u.AdminUserID.String(),
+			Email:       u.Email,
+			DisplayName: u.DisplayName,
+			Role:        int(u.Role),
+		})
+	}
+	return &oas.AdminUserListResponse{AdminUsers: items}, nil
+}
+
+// CreateAdminUser implements createAdminUser operation.
+func (h *adminHandler) CreateAdminUser(ctx context.Context, req *oas.CreateAdminUserRequest) (oas.CreateAdminUserRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "adminHandler.CreateAdminUser")
+	defer span.End()
+
+	out, err := h.createAdminUser.Execute(ctx, admin_usecase.CreateAdminUserInput{
+		Email:       req.Email,
+		DisplayName: req.DisplayName.Or(""),
+		Role:        req.Role.Or(0),
+	})
+	if err != nil {
+		if errors.Is(err, admin_usecase.ErrAdminUserAlreadyExists) {
+			return &oas.CreateAdminUserConflict{}, nil
+		}
+		return nil, err
+	}
+	return &oas.AdminUserItem{
+		ID:          out.AdminUserID.String(),
+		Email:       out.Email,
+		DisplayName: out.DisplayName,
+		Role:        int(out.Role),
+	}, nil
 }
 
 // sessionCookies は access(AdminSessionId) と refresh(AdminRefreshToken) の Set-Cookie を生成する。

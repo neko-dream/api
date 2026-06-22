@@ -52,6 +52,38 @@ namespace kotohiro {
       @body body: {};
     };
 
+    @route("/admin-users")
+    @operationId("listAdminUsers")
+    @extension("x-ogen-operation-group", "Admin")
+    @tag("admin")
+    @get
+    @summary("管理者アカウント一覧")
+    @useAuth(AdminCookieAuth)
+    op listAdminUsers(): Body<AdminUserListResponse> | {
+      @statusCode statusCode: 403;
+      @body body: {};
+    };
+
+    @route("/admin-users")
+    @operationId("createAdminUser")
+    @extension("x-ogen-operation-group", "Admin")
+    @tag("admin")
+    @post
+    @summary("管理者アカウント作成(作成した email の Google アカウントがログイン可能になる)")
+    @useAuth(AdminCookieAuth)
+    op createAdminUser(
+      @body body: CreateAdminUserRequest,
+    ): {
+      @statusCode statusCode: 200;
+      @body body: AdminUserItem;
+    } | {
+      @statusCode statusCode: 403;
+      @body body: {};
+    } | {
+      @statusCode statusCode: 409;
+      @body body: {};
+    };
+
     @route("/refresh")
     @operationId("adminRefresh")
     @extension("x-ogen-operation-group", "Admin")

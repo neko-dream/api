@@ -67,6 +67,22 @@ func (r *adminUserRepository) FindByID(ctx context.Context, id shared.UUID[admin
 	return toAdminUser(row), nil
 }
 
+func (r *adminUserRepository) List(ctx context.Context) ([]admin.AdminUser, error) {
+	ctx, span := otel.Tracer("repository").Start(ctx, "adminUserRepository.List")
+	defer span.End()
+
+	rows, err := r.DBManager.GetQueries(ctx).ListAdminUsers(ctx)
+	if err != nil {
+		utils.HandleError(ctx, err, "ListAdminUsers")
+		return nil, err
+	}
+	users := make([]admin.AdminUser, 0, len(rows))
+	for _, row := range rows {
+		users = append(users, *toAdminUser(row))
+	}
+	return users, nil
+}
+
 func toAdminUser(row model.AdminUser) *admin.AdminUser {
 	return &admin.AdminUser{
 		AdminUserID: shared.UUID[admin.AdminUser](row.AdminUserID),

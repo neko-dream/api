@@ -81,6 +81,8 @@ func useCaseDeps() []ProvideArg {
 		{admin_usecase.NewAdminLogin, nil},
 		{admin_usecase.NewAdminRefresh, nil},
 		{admin_usecase.NewAdminLogout, nil},
+		{admin_usecase.NewListAdminUsers, nil},
+		{admin_usecase.NewCreateAdminUser, nil},
 		{auth_usecase.NewGuestLogin, nil},
 		{timeline_usecase.NewAddTimeLine, nil},
 		{timeline_usecase.NewEditTimeLine, nil},
