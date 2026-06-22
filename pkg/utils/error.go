@@ -2,15 +2,27 @@ package utils
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"runtime"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 )
+
+// IsUniqueViolation は PostgreSQL の unique_violation (SQLSTATE 23505) を検出する。
+// otelsql や errtrace で包まれていても errors.As でアンラップして判定する。
+func IsUniqueViolation(err error) bool {
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) {
+		return pgErr.Code == "23505"
+	}
+	return false
+}
 
 // ErrorInfo はエラーに関する追加情報を保持する構造体です
 type ErrorInfo struct {

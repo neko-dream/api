@@ -245,6 +245,19 @@ func (t *TalkSession) UpdateRestrictions(ctx context.Context, restrictions []str
 	return nil
 }
 
+// EnsureRestriction は指定された restriction key が含まれていない場合のみ追加する。
+// 戻り値は実際に追加されたかどうか（既に含まれていれば false）。
+func (t *TalkSession) EnsureRestriction(key RestrictionAttributeKey) bool {
+	for _, r := range t.restrictions {
+		if r.Key == key {
+			return false
+		}
+	}
+	attr := key.RestrictionAttribute()
+	t.restrictions = append(t.restrictions, &attr)
+	return true
+}
+
 func (t *TalkSession) HideReport() bool {
 	return t.hideReport
 }

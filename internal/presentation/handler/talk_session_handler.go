@@ -36,12 +36,18 @@ type talkSessionHandler struct {
 	getReportCount                report_query.GetCountQuery
 	hasConsent                    talksession_query.HasConsentQuery
 
-	addConclusionCommand       talksession_usecase.AddConclusionCommand
-	startTalkSessionCommand    talksession_usecase.StartTalkSessionUseCase
-	editTalkSessionCommand     talksession_usecase.EditTalkSessionUseCase
-	takeConsentCommand         talksession_usecase.TakeConsentUseCase
-	toggleAnalysisUseCase      talksession_usecase.ToggleAnalysisUseCase
-	joinLockedSessionCommand   talksession_usecase.JoinLockedSessionUseCase
+	addConclusionCommand          talksession_usecase.AddConclusionCommand
+	startTalkSessionCommand       talksession_usecase.StartTalkSessionUseCase
+	editTalkSessionCommand        talksession_usecase.EditTalkSessionUseCase
+	takeConsentCommand            talksession_usecase.TakeConsentUseCase
+	toggleAnalysisUseCase         talksession_usecase.ToggleAnalysisUseCase
+	joinLockedSessionCommand      talksession_usecase.JoinLockedSessionUseCase
+	createSurveyCommand           talksession_usecase.CreateSurveyUseCase
+	updateSurveyCommand           talksession_usecase.UpdateSurveyUseCase
+	getSurveyQuery                talksession_usecase.GetSurveyUseCase
+	submitSurveyCommand           talksession_usecase.SubmitSurveyUseCase
+	listSurveySubmissionsQuery    talksession_usecase.ListSurveySubmissionsUseCase
+	getSurveySummaryQuery         talksession_usecase.GetSurveySummaryUseCase
 
 	authorizationService service.AuthorizationService
 	session.TokenManager
@@ -66,6 +72,12 @@ func NewTalkSessionHandler(
 	takeConsentCommand talksession_usecase.TakeConsentUseCase,
 	toggleAnalysisUseCase talksession_usecase.ToggleAnalysisUseCase,
 	joinLockedSessionCommand talksession_usecase.JoinLockedSessionUseCase,
+	createSurveyCommand talksession_usecase.CreateSurveyUseCase,
+	updateSurveyCommand talksession_usecase.UpdateSurveyUseCase,
+	getSurveyQuery talksession_usecase.GetSurveyUseCase,
+	submitSurveyCommand talksession_usecase.SubmitSurveyUseCase,
+	listSurveySubmissionsQuery talksession_usecase.ListSurveySubmissionsUseCase,
+	getSurveySummaryQuery talksession_usecase.GetSurveySummaryUseCase,
 
 	authorizationService service.AuthorizationService,
 	tokenManager session.TokenManager,
@@ -83,12 +95,18 @@ func NewTalkSessionHandler(
 		getReportCount:                getReportCount,
 		hasConsent:                    hasConsent,
 
-		addConclusionCommand:    AddConclusionCommand,
-		startTalkSessionCommand: startTalkSessionCommand,
-		editTalkSessionCommand:  editTalkSessionCommand,
-		takeConsentCommand:      takeConsentCommand,
-		toggleAnalysisUseCase:   toggleAnalysisUseCase,
-		joinLockedSessionCommand: joinLockedSessionCommand,
+		addConclusionCommand:       AddConclusionCommand,
+		startTalkSessionCommand:    startTalkSessionCommand,
+		editTalkSessionCommand:     editTalkSessionCommand,
+		takeConsentCommand:         takeConsentCommand,
+		toggleAnalysisUseCase:      toggleAnalysisUseCase,
+		joinLockedSessionCommand:   joinLockedSessionCommand,
+		createSurveyCommand:        createSurveyCommand,
+		updateSurveyCommand:        updateSurveyCommand,
+		getSurveyQuery:             getSurveyQuery,
+		submitSurveyCommand:        submitSurveyCommand,
+		listSurveySubmissionsQuery: listSurveySubmissionsQuery,
+		getSurveySummaryQuery:      getSurveySummaryQuery,
 
 		authorizationService: authorizationService,
 		TokenManager:         tokenManager,

@@ -33,4 +33,34 @@ func ParseUUID[T any](s string) (UUID[T], error) {
 	return UUID[T](u), errtrace.Wrap(err)
 }
 
+// ParseUUIDs は文字列スライスをまとめて UUID[T] にパースする。
+// いずれか一件でも失敗したら nil とそのエラーを返す。
+func ParseUUIDs[T any](in []string) ([]UUID[T], error) {
+	out := make([]UUID[T], 0, len(in))
+	for _, s := range in {
+		u, err := ParseUUID[T](s)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, u)
+	}
+	return out, nil
+}
+
+// MarshalText は uuid.UUID の文字列形式（"xxxxxxxx-xxxx-..."）で出力する。
+// 名前付きジェネリック型は uuid.UUID の MarshalText を継承しないため、明示的に実装する。
+// encoding/json は TextMarshaler を引用符付きで使うため、これだけで JSONB へも正しい文字列で保存される。
+func (a UUID[T]) MarshalText() ([]byte, error) {
+	return uuid.UUID(a).MarshalText()
+}
+
+func (a *UUID[T]) UnmarshalText(data []byte) error {
+	var u uuid.UUID
+	if err := u.UnmarshalText(data); err != nil {
+		return errtrace.Wrap(err)
+	}
+	*a = UUID[T](u)
+	return nil
+}
+
 var NilUUID = uuid.MustParse("00000000-0000-0000-0000-000000000000")
