@@ -7,48 +7,43 @@ package model
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/google/uuid"
 )
 
 const createAdminUser = `-- name: CreateAdminUser :exec
-INSERT INTO admin_users (admin_user_id, email, display_name, password_hash, salt, role)
-VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO admin_users (admin_user_id, email, display_name, role)
+VALUES ($1, $2, $3, $4)
 `
 
 type CreateAdminUserParams struct {
-	AdminUserID  uuid.UUID
-	Email        string
-	DisplayName  string
-	PasswordHash string
-	Salt         sql.NullString
-	Role         int32
+	AdminUserID uuid.UUID
+	Email       string
+	DisplayName string
+	Role        int32
 }
 
 // CreateAdminUser
 //
-//	INSERT INTO admin_users (admin_user_id, email, display_name, password_hash, salt, role)
-//	VALUES ($1, $2, $3, $4, $5, $6)
+//	INSERT INTO admin_users (admin_user_id, email, display_name, role)
+//	VALUES ($1, $2, $3, $4)
 func (q *Queries) CreateAdminUser(ctx context.Context, arg CreateAdminUserParams) error {
 	_, err := q.db.ExecContext(ctx, createAdminUser,
 		arg.AdminUserID,
 		arg.Email,
 		arg.DisplayName,
-		arg.PasswordHash,
-		arg.Salt,
 		arg.Role,
 	)
 	return err
 }
 
 const getAdminUserByEmail = `-- name: GetAdminUserByEmail :one
-SELECT admin_user_id, email, display_name, password_hash, salt, role, created_at, updated_at FROM admin_users WHERE email = $1
+SELECT admin_user_id, email, display_name, role, created_at, updated_at FROM admin_users WHERE email = $1
 `
 
 // GetAdminUserByEmail
 //
-//	SELECT admin_user_id, email, display_name, password_hash, salt, role, created_at, updated_at FROM admin_users WHERE email = $1
+//	SELECT admin_user_id, email, display_name, role, created_at, updated_at FROM admin_users WHERE email = $1
 func (q *Queries) GetAdminUserByEmail(ctx context.Context, email string) (AdminUser, error) {
 	row := q.db.QueryRowContext(ctx, getAdminUserByEmail, email)
 	var i AdminUser
@@ -56,8 +51,6 @@ func (q *Queries) GetAdminUserByEmail(ctx context.Context, email string) (AdminU
 		&i.AdminUserID,
 		&i.Email,
 		&i.DisplayName,
-		&i.PasswordHash,
-		&i.Salt,
 		&i.Role,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -66,12 +59,12 @@ func (q *Queries) GetAdminUserByEmail(ctx context.Context, email string) (AdminU
 }
 
 const getAdminUserByID = `-- name: GetAdminUserByID :one
-SELECT admin_user_id, email, display_name, password_hash, salt, role, created_at, updated_at FROM admin_users WHERE admin_user_id = $1
+SELECT admin_user_id, email, display_name, role, created_at, updated_at FROM admin_users WHERE admin_user_id = $1
 `
 
 // GetAdminUserByID
 //
-//	SELECT admin_user_id, email, display_name, password_hash, salt, role, created_at, updated_at FROM admin_users WHERE admin_user_id = $1
+//	SELECT admin_user_id, email, display_name, role, created_at, updated_at FROM admin_users WHERE admin_user_id = $1
 func (q *Queries) GetAdminUserByID(ctx context.Context, adminUserID uuid.UUID) (AdminUser, error) {
 	row := q.db.QueryRowContext(ctx, getAdminUserByID, adminUserID)
 	var i AdminUser
@@ -79,8 +72,6 @@ func (q *Queries) GetAdminUserByID(ctx context.Context, adminUserID uuid.UUID) (
 		&i.AdminUserID,
 		&i.Email,
 		&i.DisplayName,
-		&i.PasswordHash,
-		&i.Salt,
 		&i.Role,
 		&i.CreatedAt,
 		&i.UpdatedAt,

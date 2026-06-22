@@ -43,77 +43,37 @@ func (s *Server) decodeAdminLoginRequest(r *http.Request) (
 		return req, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
-	case ct == "multipart/form-data":
+	case ct == "application/json":
 		if r.ContentLength == 0 {
 			return req, close, validate.ErrBodyRequired
 		}
-		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+		buf, err := io.ReadAll(r.Body)
+		if err != nil {
+			return req, close, err
 		}
-		// Remove all temporary files created by ParseMultipartForm when the request is done.
-		//
-		// Notice that the closers are called in reverse order, to match defer behavior, so
-		// any opened file will be closed before RemoveAll call.
-		closers = append(closers, r.MultipartForm.RemoveAll)
-		// Form values may be unused.
-		form := url.Values(r.MultipartForm.Value)
-		_ = form
+
+		if len(buf) == 0 {
+			return req, close, validate.ErrBodyRequired
+		}
+
+		d := jx.DecodeBytes(buf)
 
 		var request AdminLoginReq
-		q := uri.NewQueryDecoder(form)
-		{
-			cfg := uri.QueryParameterDecodingConfig{
-				Name:    "email",
-				Style:   uri.QueryStyleForm,
-				Explode: true,
+		if err := func() error {
+			if err := request.Decode(d); err != nil {
+				return err
 			}
-			if err := q.HasParam(cfg); err == nil {
-				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-
-					c, err := conv.ToString(val)
-					if err != nil {
-						return err
-					}
-
-					request.Email = c
-					return nil
-				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"email\"")
-				}
-			} else {
-				return req, close, errors.Wrap(err, "query")
+			if err := d.Skip(); err != io.EOF {
+				return errors.New("unexpected trailing data")
 			}
-		}
-		{
-			cfg := uri.QueryParameterDecodingConfig{
-				Name:    "password",
-				Style:   uri.QueryStyleForm,
-				Explode: true,
+			return nil
+		}(); err != nil {
+			err = &ogenerrors.DecodeBodyError{
+				ContentType: ct,
+				Body:        buf,
+				Err:         err,
 			}
-			if err := q.HasParam(cfg); err == nil {
-				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-
-					c, err := conv.ToString(val)
-					if err != nil {
-						return err
-					}
-
-					request.Password = c
-					return nil
-				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"password\"")
-				}
-			} else {
-				return req, close, errors.Wrap(err, "query")
-			}
+			return req, close, err
 		}
 		return &request, close, nil
 	default:

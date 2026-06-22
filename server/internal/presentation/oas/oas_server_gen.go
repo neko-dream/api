@@ -31,7 +31,7 @@ type Handler interface {
 type AdminHandler interface {
 	// AdminLogin implements adminLogin operation.
 	//
-	// 管理者ログイン.
+	// 管理者ログイン(Google認証).
 	//
 	// POST /v1/admin/login
 	AdminLogin(ctx context.Context, req *AdminLoginReq) (AdminLoginRes, error)

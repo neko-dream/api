@@ -19,6 +19,7 @@ require (
 	go.uber.org/dig v1.19.0
 	go.uber.org/mock v0.6.0
 	golang.org/x/crypto v0.45.0
+	google.golang.org/api v0.248.0
 )
 
 require (
@@ -259,7 +260,6 @@ require (
 	golang.org/x/term v0.37.0 // indirect
 	golang.org/x/time v0.12.0 // indirect
 	golang.org/x/tools v0.38.0 // indirect
-	google.golang.org/api v0.248.0 // indirect
 	google.golang.org/genproto v0.0.0-20250804133106-a7a43d27e69b // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250908214217-97024824d090 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250908214217-97024824d090 // indirect

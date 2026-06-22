@@ -71,8 +71,7 @@ func (h *adminHandler) AdminLogin(ctx context.Context, req *oas.AdminLoginReq) (
 	defer span.End()
 
 	out, err := h.adminLogin.Execute(ctx, admin_usecase.AdminLoginInput{
-		Email:    req.Email,
-		Password: req.Password,
+		IDToken: req.IdToken,
 	})
 	if err != nil {
 		return &oas.AdminLoginUnauthorized{}, nil

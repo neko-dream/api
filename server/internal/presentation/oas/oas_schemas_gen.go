@@ -113,28 +113,18 @@ type AdminLoginInternalServerError struct{}
 func (*AdminLoginInternalServerError) adminLoginRes() {}
 
 type AdminLoginReq struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	// Google Identity Services で取得した ID トークン(credential).
+	IdToken string `json:"idToken"`
 }
 
-// GetEmail returns the value of Email.
-func (s *AdminLoginReq) GetEmail() string {
-	return s.Email
+// GetIdToken returns the value of IdToken.
+func (s *AdminLoginReq) GetIdToken() string {
+	return s.IdToken
 }
 
-// GetPassword returns the value of Password.
-func (s *AdminLoginReq) GetPassword() string {
-	return s.Password
-}
-
-// SetEmail sets the value of Email.
-func (s *AdminLoginReq) SetEmail(val string) {
-	s.Email = val
-}
-
-// SetPassword sets the value of Password.
-func (s *AdminLoginReq) SetPassword(val string) {
-	s.Password = val
+// SetIdToken sets the value of IdToken.
+func (s *AdminLoginReq) SetIdToken(val string) {
+	s.IdToken = val
 }
 
 type AdminLoginUnauthorized struct{}

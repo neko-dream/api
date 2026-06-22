@@ -1,13 +1,9 @@
 import { useLogin } from "@refinedev/core";
-import { Button, Card, Form, Input, Layout, Typography } from "antd";
-
-interface LoginFormValues {
-  email: string;
-  password: string;
-}
+import { GoogleLogin } from "@react-oauth/google";
+import { Card, Layout, Space, Typography } from "antd";
 
 export const LoginPage = () => {
-  const { mutate: login } = useLogin<LoginFormValues>();
+  const { mutate: login } = useLogin();
 
   return (
     <Layout
@@ -20,24 +16,20 @@ export const LoginPage = () => {
       }}
     >
       <Card style={{ width: 360 }}>
-        <Typography.Title level={3} style={{ textAlign: "center" }}>
-          Kotohiro 管理画面
-        </Typography.Title>
-        <Form<LoginFormValues> layout="vertical" onFinish={(values) => login(values)}>
-          <Form.Item
-            label="メールアドレス"
-            name="email"
-            rules={[{ required: true, type: "email" }]}
-          >
-            <Input size="large" autoComplete="username" />
-          </Form.Item>
-          <Form.Item label="パスワード" name="password" rules={[{ required: true }]}>
-            <Input.Password size="large" autoComplete="current-password" />
-          </Form.Item>
-          <Button type="primary" size="large" htmlType="submit" block>
-            ログイン
-          </Button>
-        </Form>
+        <Space direction="vertical" align="center" style={{ width: "100%" }} size="large">
+          <Typography.Title level={3} style={{ textAlign: "center", margin: 0 }}>
+            Kotohiro 管理画面
+          </Typography.Title>
+          <Typography.Text type="secondary">Google アカウントでログイン</Typography.Text>
+          <GoogleLogin
+            onSuccess={(credentialResponse) =>
+              login({ credential: credentialResponse.credential })
+            }
+            onError={() => {
+              // GoogleLogin 側のエラー。authProvider 側で資格情報なしとして扱われる。
+            }}
+          />
+        </Space>
       </Card>
     </Layout>
   );

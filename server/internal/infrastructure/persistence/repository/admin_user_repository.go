@@ -26,12 +26,10 @@ func (r *adminUserRepository) Create(ctx context.Context, adminUser admin.AdminU
 	defer span.End()
 
 	if err := r.DBManager.GetQueries(ctx).CreateAdminUser(ctx, model.CreateAdminUserParams{
-		AdminUserID:  adminUser.AdminUserID.UUID(),
-		Email:        adminUser.Email,
-		DisplayName:  adminUser.DisplayName,
-		PasswordHash: adminUser.PasswordHash,
-		Salt:         sql.NullString{String: adminUser.Salt, Valid: adminUser.Salt != ""},
-		Role:         int32(adminUser.Role),
+		AdminUserID: adminUser.AdminUserID.UUID(),
+		Email:       adminUser.Email,
+		DisplayName: adminUser.DisplayName,
+		Role:        int32(adminUser.Role),
 	}); err != nil {
 		utils.HandleError(ctx, err, "CreateAdminUser")
 		return err
@@ -71,13 +69,11 @@ func (r *adminUserRepository) FindByID(ctx context.Context, id shared.UUID[admin
 
 func toAdminUser(row model.AdminUser) *admin.AdminUser {
 	return &admin.AdminUser{
-		AdminUserID:  shared.UUID[admin.AdminUser](row.AdminUserID),
-		Email:        row.Email,
-		DisplayName:  row.DisplayName,
-		PasswordHash: row.PasswordHash,
-		Salt:         row.Salt.String,
-		Role:         admin.AdminRole(row.Role),
-		CreatedAt:    row.CreatedAt,
-		UpdatedAt:    row.UpdatedAt,
+		AdminUserID: shared.UUID[admin.AdminUser](row.AdminUserID),
+		Email:       row.Email,
+		DisplayName: row.DisplayName,
+		Role:        admin.AdminRole(row.Role),
+		CreatedAt:   row.CreatedAt,
+		UpdatedAt:   row.UpdatedAt,
 	}
 }

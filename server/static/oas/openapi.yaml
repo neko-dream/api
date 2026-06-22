@@ -4058,7 +4058,7 @@ paths:
   /v1/admin/login:
     post:
       operationId: adminLogin
-      summary: 管理者ログイン
+      summary: 管理者ログイン(Google認証)
       parameters: []
       responses:
         '200':
@@ -4092,17 +4092,15 @@ paths:
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
               type: object
               properties:
-                email:
+                idToken:
                   type: string
-                password:
-                  type: string
+                  description: Google Identity Services で取得した ID トークン(credential)
               required:
-                - email
-                - password
+                - idToken
       security:
         - {}
       x-ogen-operation-group: Admin

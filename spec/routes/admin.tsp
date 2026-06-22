@@ -14,12 +14,14 @@ namespace kotohiro {
     @extension("x-ogen-operation-group", "Admin")
     @tag("admin")
     @post
-    @summary("管理者ログイン")
+    @summary("管理者ログイン(Google認証)")
     @useAuth([])
     op adminLogin(
-      @multipartBody body: {
-        email: HttpPart<string>;
-        password: HttpPart<string>;
+      @body body: {
+        /**
+         * Google Identity Services で取得した ID トークン(credential)
+         */
+        idToken: string;
       },
     ): {
       @statusCode statusCode: 200;

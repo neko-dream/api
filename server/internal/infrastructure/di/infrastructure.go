@@ -31,6 +31,7 @@ func infraDeps() []ProvideArg {
 		{oauth.NewProviderFactory, nil},
 		{session.NewSessionTokenManager, nil},
 		{adminauth.NewAdminTokenManager, nil},
+		{adminauth.NewGoogleTokenVerifier, nil},
 		{repository.NewAdminUserRepository, nil},
 		{repository.NewAdminSessionRepository, nil},
 		{telemetry.SetupOtelProvider, nil},

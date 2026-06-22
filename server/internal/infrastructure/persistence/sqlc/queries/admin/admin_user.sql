@@ -1,6 +1,6 @@
 -- name: CreateAdminUser :exec
-INSERT INTO admin_users (admin_user_id, email, display_name, password_hash, salt, role)
-VALUES ($1, $2, $3, $4, $5, $6);
+INSERT INTO admin_users (admin_user_id, email, display_name, role)
+VALUES ($1, $2, $3, $4);
 
 -- name: GetAdminUserByEmail :one
 SELECT * FROM admin_users WHERE email = $1;

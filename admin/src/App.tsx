@@ -10,15 +10,18 @@ import routerProvider, {
   CatchAllNavigate,
   NavigateToResource,
 } from "@refinedev/react-router";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { App as AntdApp, ConfigProvider, Typography } from "antd";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router";
 
+import { env } from "./config/env";
 import { LoginPage } from "./pages/login";
 import { authProvider, dataProvider } from "./providers";
 
 function App() {
   return (
-    <BrowserRouter>
+    <GoogleOAuthProvider clientId={env.googleClientId}>
+      <BrowserRouter>
       <RefineKbarProvider>
         <ConfigProvider>
           <AntdApp>
@@ -83,7 +86,8 @@ function App() {
           </AntdApp>
         </ConfigProvider>
       </RefineKbarProvider>
-    </BrowserRouter>
+      </BrowserRouter>
+    </GoogleOAuthProvider>
   );
 }
 

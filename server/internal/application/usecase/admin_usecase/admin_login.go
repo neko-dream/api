@@ -6,11 +6,10 @@ import (
 
 	"github.com/neko-dream/api/internal/domain/model/admin"
 	"github.com/neko-dream/api/internal/infrastructure/config"
-	"github.com/neko-dream/api/pkg/hash"
 	"go.opentelemetry.io/otel"
 )
 
-// ErrInvalidAdminCredentials メールアドレスまたはパスワードが正しくない。
+// ErrInvalidAdminCredentials Google 認証に失敗、または許可リストに無い。
 var ErrInvalidAdminCredentials = errors.New("invalid admin credentials")
 
 type AdminLogin interface {
@@ -18,14 +17,15 @@ type AdminLogin interface {
 }
 
 type AdminLoginInput struct {
-	Email    string
-	Password string
+	// Google Identity Services で取得した ID トークン(credential)。
+	IDToken string
 }
 
 type adminLoginInteractor struct {
 	adminUserRepo     admin.AdminUserRepository
 	adminSessionRepo  admin.AdminSessionRepository
 	adminTokenManager admin.AdminTokenManager
+	googleVerifier    admin.GoogleTokenVerifier
 	cfg               *config.Config
 }
 
@@ -33,12 +33,14 @@ func NewAdminLogin(
 	adminUserRepo admin.AdminUserRepository,
 	adminSessionRepo admin.AdminSessionRepository,
 	adminTokenManager admin.AdminTokenManager,
+	googleVerifier admin.GoogleTokenVerifier,
 	cfg *config.Config,
 ) AdminLogin {
 	return &adminLoginInteractor{
 		adminUserRepo:     adminUserRepo,
 		adminSessionRepo:  adminSessionRepo,
 		adminTokenManager: adminTokenManager,
+		googleVerifier:    googleVerifier,
 		cfg:               cfg,
 	}
 }
@@ -47,15 +49,17 @@ func (a *adminLoginInteractor) Execute(ctx context.Context, input AdminLoginInpu
 	ctx, span := otel.Tracer("admin_usecase").Start(ctx, "adminLoginInteractor.Execute")
 	defer span.End()
 
-	adminUser, err := a.adminUserRepo.FindByEmail(ctx, input.Email)
+	claims, err := a.googleVerifier.Verify(ctx, input.IDToken)
+	if err != nil {
+		return nil, ErrInvalidAdminCredentials
+	}
+
+	// 許可リスト(admin_users)に登録された Google アカウントのみログイン可能。
+	adminUser, err := a.adminUserRepo.FindByEmail(ctx, claims.Email)
 	if err != nil {
 		return nil, err
 	}
 	if adminUser == nil {
-		return nil, ErrInvalidAdminCredentials
-	}
-
-	if !hash.BcryptVerify(input.Password, a.cfg.HASH_PEPPER, adminUser.PasswordHash) {
 		return nil, ErrInvalidAdminCredentials
 	}
 

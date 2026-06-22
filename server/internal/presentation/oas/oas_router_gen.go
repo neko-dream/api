@@ -4545,7 +4545,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								switch method {
 								case "POST":
 									r.name = AdminLoginOperation
-									r.summary = "管理者ログイン"
+									r.summary = "管理者ログイン(Google認証)"
 									r.operationID = "adminLogin"
 									r.pathPattern = "/v1/admin/login"
 									r.args = args

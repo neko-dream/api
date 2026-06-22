@@ -15,12 +15,18 @@ interface AdminTokenInfo {
 
 export const authProvider: AuthProvider = {
   login: async (params) => {
-    const { email, password } = params as { email: string; password: string };
+    // Google Identity Services から受け取った credential(ID トークン)。
+    const { credential } = params as { credential?: string };
+    if (!credential) {
+      return {
+        success: false,
+        error: { name: "LoginError", message: "Google 認証に失敗しました" },
+      };
+    }
     try {
-      const form = new FormData();
-      form.append("email", email);
-      form.append("password", password);
-      const res = await httpClient.post<AdminTokenInfo>("/v1/admin/login", form);
+      const res = await httpClient.post<AdminTokenInfo>("/v1/admin/login", {
+        idToken: credential,
+      });
       localStorage.setItem(USER_KEY, JSON.stringify(res.data));
       return { success: true, redirectTo: "/" };
     } catch {
@@ -28,7 +34,7 @@ export const authProvider: AuthProvider = {
         success: false,
         error: {
           name: "LoginError",
-          message: "メールアドレスまたはパスワードが正しくありません",
+          message: "このGoogleアカウントは管理者として登録されていません",
         },
       };
     }

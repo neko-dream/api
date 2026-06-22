@@ -82,14 +82,12 @@ type AdminSession struct {
 }
 
 type AdminUser struct {
-	AdminUserID  uuid.UUID
-	Email        string
-	DisplayName  string
-	PasswordHash string
-	Salt         sql.NullString
-	Role         int32
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
+	AdminUserID uuid.UUID
+	Email       string
+	DisplayName string
+	Role        int32
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 type AuthState struct {

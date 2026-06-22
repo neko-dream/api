@@ -32,7 +32,7 @@ func (c *codeRecorder) WriteHeader(status int) {
 
 // handleAdminLoginRequest handles adminLogin operation.
 //
-// 管理者ログイン.
+// 管理者ログイン(Google認証).
 //
 // POST /v1/admin/login
 func (s *Server) handleAdminLoginRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
@@ -125,7 +125,7 @@ func (s *Server) handleAdminLoginRequest(args [0]string, argsEscaped bool, w htt
 		mreq := middleware.Request{
 			Context:          ctx,
 			OperationName:    AdminLoginOperation,
-			OperationSummary: "管理者ログイン",
+			OperationSummary: "管理者ログイン(Google認証)",
 			OperationID:      "adminLogin",
 			Body:             request,
 			Params:           middleware.Parameters{},
