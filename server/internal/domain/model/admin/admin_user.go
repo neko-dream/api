@@ -7,21 +7,12 @@ import (
 	"github.com/neko-dream/api/internal/domain/model/shared"
 )
 
-// AdminRole 管理者ロール。数値が小さいほど高権限。
-type AdminRole int
-
-const (
-	AdminRoleSuperAdmin AdminRole = 1
-	AdminRoleOperator   AdminRole = 10
-)
-
-// AdminUser 管理画面用の管理者アカウント(許可リスト)。
-// ログインは Google 認証で、email により照合する。既存の user.User とは無関係。
+// AdminUser 管理画面の管理者。ログインは Google 認証で email により照合する。
+// 既存の user.User とは無関係。
 type AdminUser struct {
 	AdminUserID shared.UUID[AdminUser]
 	Email       string
 	DisplayName string
-	Role        AdminRole
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }

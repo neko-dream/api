@@ -15,7 +15,6 @@ var ErrAdminUserAlreadyExists = errors.New("admin user already exists")
 type CreateAdminUserInput struct {
 	Email       string
 	DisplayName string
-	Role        int
 }
 
 type CreateAdminUser interface {
@@ -42,10 +41,6 @@ func (a *createAdminUserInteractor) Execute(ctx context.Context, input CreateAdm
 		return nil, ErrAdminUserAlreadyExists
 	}
 
-	role := admin.AdminRole(input.Role)
-	if role == 0 {
-		role = admin.AdminRoleOperator
-	}
 	displayName := input.DisplayName
 	if displayName == "" {
 		displayName = input.Email
@@ -55,7 +50,6 @@ func (a *createAdminUserInteractor) Execute(ctx context.Context, input CreateAdm
 		AdminUserID: shared.NewUUID[admin.AdminUser](),
 		Email:       input.Email,
 		DisplayName: displayName,
-		Role:        role,
 	}
 	if err := a.adminUserRepo.Create(ctx, adminUser); err != nil {
 		return nil, err

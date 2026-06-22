@@ -42,7 +42,7 @@ function App() {
                   name: "admin-users",
                   list: "/admin-users",
                   create: "/admin-users/create",
-                  meta: { label: "管理者アカウント" },
+                  meta: { label: "管理者" },
                 },
               ]}
               options={{

@@ -12,38 +12,32 @@ import (
 )
 
 const createAdminUser = `-- name: CreateAdminUser :exec
-INSERT INTO admin_users (admin_user_id, email, display_name, role)
-VALUES ($1, $2, $3, $4)
+INSERT INTO admin_users (admin_user_id, email, display_name)
+VALUES ($1, $2, $3)
 `
 
 type CreateAdminUserParams struct {
 	AdminUserID uuid.UUID
 	Email       string
 	DisplayName string
-	Role        int32
 }
 
 // CreateAdminUser
 //
-//	INSERT INTO admin_users (admin_user_id, email, display_name, role)
-//	VALUES ($1, $2, $3, $4)
+//	INSERT INTO admin_users (admin_user_id, email, display_name)
+//	VALUES ($1, $2, $3)
 func (q *Queries) CreateAdminUser(ctx context.Context, arg CreateAdminUserParams) error {
-	_, err := q.db.ExecContext(ctx, createAdminUser,
-		arg.AdminUserID,
-		arg.Email,
-		arg.DisplayName,
-		arg.Role,
-	)
+	_, err := q.db.ExecContext(ctx, createAdminUser, arg.AdminUserID, arg.Email, arg.DisplayName)
 	return err
 }
 
 const getAdminUserByEmail = `-- name: GetAdminUserByEmail :one
-SELECT admin_user_id, email, display_name, role, created_at, updated_at FROM admin_users WHERE email = $1
+SELECT admin_user_id, email, display_name, created_at, updated_at FROM admin_users WHERE email = $1
 `
 
 // GetAdminUserByEmail
 //
-//	SELECT admin_user_id, email, display_name, role, created_at, updated_at FROM admin_users WHERE email = $1
+//	SELECT admin_user_id, email, display_name, created_at, updated_at FROM admin_users WHERE email = $1
 func (q *Queries) GetAdminUserByEmail(ctx context.Context, email string) (AdminUser, error) {
 	row := q.db.QueryRowContext(ctx, getAdminUserByEmail, email)
 	var i AdminUser
@@ -51,7 +45,6 @@ func (q *Queries) GetAdminUserByEmail(ctx context.Context, email string) (AdminU
 		&i.AdminUserID,
 		&i.Email,
 		&i.DisplayName,
-		&i.Role,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -59,12 +52,12 @@ func (q *Queries) GetAdminUserByEmail(ctx context.Context, email string) (AdminU
 }
 
 const getAdminUserByID = `-- name: GetAdminUserByID :one
-SELECT admin_user_id, email, display_name, role, created_at, updated_at FROM admin_users WHERE admin_user_id = $1
+SELECT admin_user_id, email, display_name, created_at, updated_at FROM admin_users WHERE admin_user_id = $1
 `
 
 // GetAdminUserByID
 //
-//	SELECT admin_user_id, email, display_name, role, created_at, updated_at FROM admin_users WHERE admin_user_id = $1
+//	SELECT admin_user_id, email, display_name, created_at, updated_at FROM admin_users WHERE admin_user_id = $1
 func (q *Queries) GetAdminUserByID(ctx context.Context, adminUserID uuid.UUID) (AdminUser, error) {
 	row := q.db.QueryRowContext(ctx, getAdminUserByID, adminUserID)
 	var i AdminUser
@@ -72,7 +65,6 @@ func (q *Queries) GetAdminUserByID(ctx context.Context, adminUserID uuid.UUID) (
 		&i.AdminUserID,
 		&i.Email,
 		&i.DisplayName,
-		&i.Role,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -80,12 +72,12 @@ func (q *Queries) GetAdminUserByID(ctx context.Context, adminUserID uuid.UUID) (
 }
 
 const listAdminUsers = `-- name: ListAdminUsers :many
-SELECT admin_user_id, email, display_name, role, created_at, updated_at FROM admin_users ORDER BY created_at ASC
+SELECT admin_user_id, email, display_name, created_at, updated_at FROM admin_users ORDER BY created_at ASC
 `
 
 // ListAdminUsers
 //
-//	SELECT admin_user_id, email, display_name, role, created_at, updated_at FROM admin_users ORDER BY created_at ASC
+//	SELECT admin_user_id, email, display_name, created_at, updated_at FROM admin_users ORDER BY created_at ASC
 func (q *Queries) ListAdminUsers(ctx context.Context) ([]AdminUser, error) {
 	rows, err := q.db.QueryContext(ctx, listAdminUsers)
 	if err != nil {
@@ -99,7 +91,6 @@ func (q *Queries) ListAdminUsers(ctx context.Context) ([]AdminUser, error) {
 			&i.AdminUserID,
 			&i.Email,
 			&i.DisplayName,
-			&i.Role,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {

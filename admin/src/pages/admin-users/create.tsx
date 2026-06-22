@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { App, Button, Card, Form, Input, InputNumber, Typography } from "antd";
+import { App, Button, Card, Form, Input, Typography } from "antd";
 
 import { httpClient } from "../../providers";
 
 interface CreateAdminUserValues {
   email: string;
   displayName?: string;
-  role?: number;
 }
 
 export const AdminUserCreate = () => {
@@ -19,7 +18,7 @@ export const AdminUserCreate = () => {
     setSubmitting(true);
     try {
       await httpClient.post("/v1/admin/admin-users", values);
-      message.success("管理者アカウントを作成しました");
+      message.success("管理者を作成しました");
       navigate("/admin-users");
     } catch (e) {
       const status = (e as { response?: { status?: number } })?.response?.status;
@@ -35,7 +34,7 @@ export const AdminUserCreate = () => {
 
   return (
     <div style={{ padding: 24, maxWidth: 480 }}>
-      <Typography.Title level={4}>管理者アカウント作成</Typography.Title>
+      <Typography.Title level={4}>管理者作成</Typography.Title>
       <Card>
         <Form<CreateAdminUserValues> layout="vertical" onFinish={onFinish}>
           <Form.Item
@@ -47,9 +46,6 @@ export const AdminUserCreate = () => {
           </Form.Item>
           <Form.Item label="表示名" name="displayName">
             <Input />
-          </Form.Item>
-          <Form.Item label="ロール (小さいほど高権限・未指定は 10)" name="role">
-            <InputNumber min={1} style={{ width: "100%" }} />
           </Form.Item>
           <Button type="primary" htmlType="submit" loading={submitting}>
             作成

@@ -108,7 +108,6 @@ func (b *Bootstrap) bootstrapInitialAdmin(ctx context.Context) error {
 		AdminUserID: shared.NewUUID[admin.AdminUser](),
 		Email:       b.config.InitialAdminEmail,
 		DisplayName: name,
-		Role:        admin.AdminRoleSuperAdmin,
 	}); err != nil {
 		return err
 	}

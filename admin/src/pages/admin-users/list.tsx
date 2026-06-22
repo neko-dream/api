@@ -8,7 +8,6 @@ interface AdminUserItem {
   id: string;
   email: string;
   displayName: string;
-  role: number;
 }
 
 export const AdminUserList = () => {
@@ -36,7 +35,7 @@ export const AdminUserList = () => {
     <div style={{ padding: 24 }}>
       <Space style={{ marginBottom: 16, justifyContent: "space-between", width: "100%" }}>
         <Typography.Title level={4} style={{ margin: 0 }}>
-          管理者アカウント
+          管理者
         </Typography.Title>
         <Button type="primary" onClick={() => navigate("/admin-users/create")}>
           新規作成
@@ -49,7 +48,6 @@ export const AdminUserList = () => {
         columns={[
           { title: "メールアドレス", dataIndex: "email" },
           { title: "表示名", dataIndex: "displayName" },
-          { title: "ロール", dataIndex: "role" },
         ]}
       />
     </div>

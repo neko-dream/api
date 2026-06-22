@@ -9,7 +9,6 @@ interface AdminTokenInfo {
   sub: string;
   email: string;
   displayName: string;
-  role: number;
   isAdmin: boolean;
 }
 

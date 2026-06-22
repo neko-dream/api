@@ -35,7 +35,6 @@ func (m *adminTokenManager) Generate(ctx context.Context, adminUser adminmodel.A
 		"sub":         adminUser.AdminUserID.String(),
 		"email":       adminUser.Email,
 		"displayName": adminUser.DisplayName,
-		"role":        int(adminUser.Role),
 		"isAdmin":     true,
 		"iat":         now.Unix(),
 		// access は短命。失効後は refresh トークンで再発行する。
@@ -82,9 +81,6 @@ func adminClaimFromMap(claims jwt.MapClaims) *adminmodel.AdminClaim {
 	}
 	if v, ok := claims["displayName"].(string); ok {
 		claim.DisplayName = v
-	}
-	if v, ok := claims["role"].(float64); ok {
-		claim.Role = int(v)
 	}
 	if v, ok := claims["iat"].(float64); ok {
 		claim.Iat = int64(v)

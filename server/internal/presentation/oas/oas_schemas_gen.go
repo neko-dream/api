@@ -157,9 +157,7 @@ type AdminTokenInfo struct {
 	Sub         string `json:"sub"`
 	Email       string `json:"email"`
 	DisplayName string `json:"displayName"`
-	// 管理者ロール (数値が小さいほど高権限).
-	Role    int  `json:"role"`
-	IsAdmin bool `json:"isAdmin"`
+	IsAdmin     bool   `json:"isAdmin"`
 }
 
 // GetSub returns the value of Sub.
@@ -175,11 +173,6 @@ func (s *AdminTokenInfo) GetEmail() string {
 // GetDisplayName returns the value of DisplayName.
 func (s *AdminTokenInfo) GetDisplayName() string {
 	return s.DisplayName
-}
-
-// GetRole returns the value of Role.
-func (s *AdminTokenInfo) GetRole() int {
-	return s.Role
 }
 
 // GetIsAdmin returns the value of IsAdmin.
@@ -200,11 +193,6 @@ func (s *AdminTokenInfo) SetEmail(val string) {
 // SetDisplayName sets the value of DisplayName.
 func (s *AdminTokenInfo) SetDisplayName(val string) {
 	s.DisplayName = val
-}
-
-// SetRole sets the value of Role.
-func (s *AdminTokenInfo) SetRole(val int) {
-	s.Role = val
 }
 
 // SetIsAdmin sets the value of IsAdmin.
@@ -243,14 +231,12 @@ func (s *AdminTokenInfoHeaders) SetResponse(val AdminTokenInfo) {
 func (*AdminTokenInfoHeaders) adminLoginRes()   {}
 func (*AdminTokenInfoHeaders) adminRefreshRes() {}
 
-// 管理者アカウント.
+// 管理者.
 // Ref: #/components/schemas/AdminUserItem
 type AdminUserItem struct {
 	ID          string `json:"id"`
 	Email       string `json:"email"`
 	DisplayName string `json:"displayName"`
-	// 管理者ロール (数値が小さいほど高権限).
-	Role int `json:"role"`
 }
 
 // GetID returns the value of ID.
@@ -268,11 +254,6 @@ func (s *AdminUserItem) GetDisplayName() string {
 	return s.DisplayName
 }
 
-// GetRole returns the value of Role.
-func (s *AdminUserItem) GetRole() int {
-	return s.Role
-}
-
 // SetID sets the value of ID.
 func (s *AdminUserItem) SetID(val string) {
 	s.ID = val
@@ -286,11 +267,6 @@ func (s *AdminUserItem) SetEmail(val string) {
 // SetDisplayName sets the value of DisplayName.
 func (s *AdminUserItem) SetDisplayName(val string) {
 	s.DisplayName = val
-}
-
-// SetRole sets the value of Role.
-func (s *AdminUserItem) SetRole(val int) {
-	s.Role = val
 }
 
 func (*AdminUserItem) createAdminUserRes() {}
@@ -602,14 +578,12 @@ type CreateAdminUserForbidden struct{}
 
 func (*CreateAdminUserForbidden) createAdminUserRes() {}
 
-// 管理者アカウント作成リクエスト.
+// 管理者作成リクエスト.
 // Ref: #/components/schemas/CreateAdminUserRequest
 type CreateAdminUserRequest struct {
 	// Google アカウントのメールアドレス.
 	Email       string    `json:"email"`
 	DisplayName OptString `json:"displayName"`
-	// 管理者ロール (未指定は一般管理者).
-	Role OptInt `json:"role"`
 }
 
 // GetEmail returns the value of Email.
@@ -622,11 +596,6 @@ func (s *CreateAdminUserRequest) GetDisplayName() OptString {
 	return s.DisplayName
 }
 
-// GetRole returns the value of Role.
-func (s *CreateAdminUserRequest) GetRole() OptInt {
-	return s.Role
-}
-
 // SetEmail sets the value of Email.
 func (s *CreateAdminUserRequest) SetEmail(val string) {
 	s.Email = val
@@ -635,11 +604,6 @@ func (s *CreateAdminUserRequest) SetEmail(val string) {
 // SetDisplayName sets the value of DisplayName.
 func (s *CreateAdminUserRequest) SetDisplayName(val OptString) {
 	s.DisplayName = val
-}
-
-// SetRole sets the value of Role.
-func (s *CreateAdminUserRequest) SetRole(val OptInt) {
-	s.Role = val
 }
 
 type CreateOrganizationAliasBadRequest struct{}

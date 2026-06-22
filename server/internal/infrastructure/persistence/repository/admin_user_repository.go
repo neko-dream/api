@@ -29,7 +29,6 @@ func (r *adminUserRepository) Create(ctx context.Context, adminUser admin.AdminU
 		AdminUserID: adminUser.AdminUserID.UUID(),
 		Email:       adminUser.Email,
 		DisplayName: adminUser.DisplayName,
-		Role:        int32(adminUser.Role),
 	}); err != nil {
 		utils.HandleError(ctx, err, "CreateAdminUser")
 		return err
@@ -88,7 +87,6 @@ func toAdminUser(row model.AdminUser) *admin.AdminUser {
 		AdminUserID: shared.UUID[admin.AdminUser](row.AdminUserID),
 		Email:       row.Email,
 		DisplayName: row.DisplayName,
-		Role:        admin.AdminRole(row.Role),
 		CreatedAt:   row.CreatedAt,
 		UpdatedAt:   row.UpdatedAt,
 	}

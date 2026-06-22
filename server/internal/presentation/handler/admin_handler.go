@@ -56,7 +56,6 @@ func (h *adminHandler) ListAdminUsers(ctx context.Context) (oas.ListAdminUsersRe
 			ID:          u.AdminUserID.String(),
 			Email:       u.Email,
 			DisplayName: u.DisplayName,
-			Role:        int(u.Role),
 		})
 	}
 	return &oas.AdminUserListResponse{AdminUsers: items}, nil
@@ -70,7 +69,6 @@ func (h *adminHandler) CreateAdminUser(ctx context.Context, req *oas.CreateAdmin
 	out, err := h.createAdminUser.Execute(ctx, admin_usecase.CreateAdminUserInput{
 		Email:       req.Email,
 		DisplayName: req.DisplayName.Or(""),
-		Role:        req.Role.Or(0),
 	})
 	if err != nil {
 		if errors.Is(err, admin_usecase.ErrAdminUserAlreadyExists) {
@@ -82,7 +80,6 @@ func (h *adminHandler) CreateAdminUser(ctx context.Context, req *oas.CreateAdmin
 		ID:          out.AdminUserID.String(),
 		Email:       out.Email,
 		DisplayName: out.DisplayName,
-		Role:        int(out.Role),
 	}, nil
 }
 
@@ -99,7 +96,6 @@ func (h *adminHandler) tokenInfo(out *admin_usecase.AdminAuthOutput) oas.AdminTo
 		Sub:         out.AdminUser.AdminUserID.String(),
 		Email:       out.AdminUser.Email,
 		DisplayName: out.AdminUser.DisplayName,
-		Role:        int(out.AdminUser.Role),
 		IsAdmin:     true,
 	}
 }
@@ -164,7 +160,6 @@ func (h *adminHandler) GetAdminTokenInfo(ctx context.Context) (oas.GetAdminToken
 		Sub:         claim.Sub,
 		Email:       claim.Email,
 		DisplayName: claim.DisplayName,
-		Role:        claim.Role,
 		IsAdmin:     true,
 	}, nil
 }

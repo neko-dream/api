@@ -12,7 +12,6 @@ type AdminClaim struct {
 	Sub         string // admin_user_id
 	Email       string
 	DisplayName string
-	Role        int
 	Iat         int64
 	Exp         int64
 }

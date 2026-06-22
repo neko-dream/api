@@ -14,24 +14,14 @@ namespace kotohiro {
 
     displayName: string;
 
-    /**
-     * 管理者ロール (数値が小さいほど高権限)
-     */
-    role: integer;
-
     isAdmin: boolean;
   }
 
-  @doc("管理者アカウント")
+  @doc("管理者")
   model AdminUserItem {
     id: string;
     email: string;
     displayName: string;
-
-    /**
-     * 管理者ロール (数値が小さいほど高権限)
-     */
-    role: integer;
   }
 
   @doc("管理者アカウント一覧")
@@ -39,7 +29,7 @@ namespace kotohiro {
     adminUsers: AdminUserItem[];
   }
 
-  @doc("管理者アカウント作成リクエスト")
+  @doc("管理者作成リクエスト")
   model CreateAdminUserRequest {
     /**
      * Google アカウントのメールアドレス
@@ -47,10 +37,5 @@ namespace kotohiro {
     email: string;
 
     displayName?: string;
-
-    /**
-     * 管理者ロール (未指定は一般管理者)
-     */
-    role?: integer;
   }
 }

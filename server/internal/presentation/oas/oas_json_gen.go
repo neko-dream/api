@@ -444,21 +444,16 @@ func (s *AdminTokenInfo) encodeFields(e *jx.Encoder) {
 		e.Str(s.DisplayName)
 	}
 	{
-		e.FieldStart("role")
-		e.Int(s.Role)
-	}
-	{
 		e.FieldStart("isAdmin")
 		e.Bool(s.IsAdmin)
 	}
 }
 
-var jsonFieldsNameOfAdminTokenInfo = [5]string{
+var jsonFieldsNameOfAdminTokenInfo = [4]string{
 	0: "sub",
 	1: "email",
 	2: "displayName",
-	3: "role",
-	4: "isAdmin",
+	3: "isAdmin",
 }
 
 // Decode decodes AdminTokenInfo from json.
@@ -506,20 +501,8 @@ func (s *AdminTokenInfo) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"displayName\"")
 			}
-		case "role":
-			requiredBitSet[0] |= 1 << 3
-			if err := func() error {
-				v, err := d.Int()
-				s.Role = int(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"role\"")
-			}
 		case "isAdmin":
-			requiredBitSet[0] |= 1 << 4
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
 				v, err := d.Bool()
 				s.IsAdmin = bool(v)
@@ -540,7 +523,7 @@ func (s *AdminTokenInfo) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00011111,
+		0b00001111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -607,17 +590,12 @@ func (s *AdminUserItem) encodeFields(e *jx.Encoder) {
 		e.FieldStart("displayName")
 		e.Str(s.DisplayName)
 	}
-	{
-		e.FieldStart("role")
-		e.Int(s.Role)
-	}
 }
 
-var jsonFieldsNameOfAdminUserItem = [4]string{
+var jsonFieldsNameOfAdminUserItem = [3]string{
 	0: "id",
 	1: "email",
 	2: "displayName",
-	3: "role",
 }
 
 // Decode decodes AdminUserItem from json.
@@ -665,18 +643,6 @@ func (s *AdminUserItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"displayName\"")
 			}
-		case "role":
-			requiredBitSet[0] |= 1 << 3
-			if err := func() error {
-				v, err := d.Int()
-				s.Role = int(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"role\"")
-			}
 		default:
 			return d.Skip()
 		}
@@ -687,7 +653,7 @@ func (s *AdminUserItem) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00001111,
+		0b00000111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -1920,18 +1886,11 @@ func (s *CreateAdminUserRequest) encodeFields(e *jx.Encoder) {
 			s.DisplayName.Encode(e)
 		}
 	}
-	{
-		if s.Role.Set {
-			e.FieldStart("role")
-			s.Role.Encode(e)
-		}
-	}
 }
 
-var jsonFieldsNameOfCreateAdminUserRequest = [3]string{
+var jsonFieldsNameOfCreateAdminUserRequest = [2]string{
 	0: "email",
 	1: "displayName",
-	2: "role",
 }
 
 // Decode decodes CreateAdminUserRequest from json.
@@ -1964,16 +1923,6 @@ func (s *CreateAdminUserRequest) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"displayName\"")
-			}
-		case "role":
-			if err := func() error {
-				s.Role.Reset()
-				if err := s.Role.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"role\"")
 			}
 		default:
 			return d.Skip()

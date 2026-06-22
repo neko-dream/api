@@ -443,7 +443,6 @@ components:
         - sub
         - email
         - displayName
-        - role
         - isAdmin
       properties:
         sub:
@@ -453,9 +452,6 @@ components:
           type: string
         displayName:
           type: string
-        role:
-          type: integer
-          description: 管理者ロール (数値が小さいほど高権限)
         isAdmin:
           type: boolean
       description: 管理者トークンの内容
@@ -465,7 +461,6 @@ components:
         - id
         - email
         - displayName
-        - role
       properties:
         id:
           type: string
@@ -473,10 +468,7 @@ components:
           type: string
         displayName:
           type: string
-        role:
-          type: integer
-          description: 管理者ロール (数値が小さいほど高権限)
-      description: 管理者アカウント
+      description: 管理者
     AdminUserListResponse:
       type: object
       required:
@@ -503,10 +495,7 @@ components:
           description: Google アカウントのメールアドレス
         displayName:
           type: string
-        role:
-          type: integer
-          description: 管理者ロール (未指定は一般管理者)
-      description: 管理者アカウント作成リクエスト
+      description: 管理者作成リクエスト
     RegenerateRequest:
       type: object
       required:

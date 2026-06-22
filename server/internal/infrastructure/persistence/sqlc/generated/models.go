@@ -85,7 +85,6 @@ type AdminUser struct {
 	AdminUserID uuid.UUID
 	Email       string
 	DisplayName string
-	Role        int32
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
