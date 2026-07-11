@@ -2,12 +2,10 @@ package talksession_usecase
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 
 	"braces.dev/errtrace"
+	"github.com/neko-dream/api/internal/application/usecase/analysis_usecase"
 	"github.com/neko-dream/api/internal/domain/messages"
-	"github.com/neko-dream/api/internal/domain/model/analysis"
 	"github.com/neko-dream/api/internal/domain/model/shared"
 	"github.com/neko-dream/api/internal/domain/model/talksession"
 	"github.com/neko-dream/api/internal/domain/model/user"
@@ -15,7 +13,6 @@ import (
 	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/api/pkg/utils"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/trace"
 )
 
 type (
@@ -34,8 +31,7 @@ type (
 
 	toggleAnalysisHandler struct {
 		talksession.TalkSessionRepository
-		analysis.AnalysisService
-		analysis.AnalysisRepository
+		analysis_usecase.AnalysisScheduler
 		*db.DBManager
 		*config.Config
 	}
@@ -43,15 +39,13 @@ type (
 
 func NewToggleAnalysisUseCase(
 	talkSessionRepository talksession.TalkSessionRepository,
-	analysisService analysis.AnalysisService,
-	analysisRepository analysis.AnalysisRepository,
+	analysisScheduler analysis_usecase.AnalysisScheduler,
 	DBManager *db.DBManager,
 	config *config.Config,
 ) ToggleAnalysisUseCase {
 	return &toggleAnalysisHandler{
 		TalkSessionRepository: talkSessionRepository,
-		AnalysisService:       analysisService,
-		AnalysisRepository:    analysisRepository,
+		AnalysisScheduler:     analysisScheduler,
 		DBManager:             DBManager,
 		Config:                config,
 	}
@@ -93,43 +87,10 @@ func (h *toggleAnalysisHandler) Execute(ctx context.Context, input ToggleAnalysi
 
 	// 分析が有効化された場合（disable: true → false）、分析を開始
 	if wasDisabled && !newState {
-		h.startAnalysisIfNeeded(ctx, input.TalkSessionID)
+		h.AnalysisScheduler.ScheduleAnalysis(ctx, input.TalkSessionID, analysis_usecase.ScheduleImmediate)
 	}
 
 	return &ToggleAnalysisOutput{
 		DisableAnalysis: newState,
 	}, nil
-}
-
-// startAnalysisIfNeeded は分析を非同期で開始する
-// vote_usecase/vote.go の StartAnalysisIfNeeded と同様の処理
-func (h *toggleAnalysisHandler) startAnalysisIfNeeded(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession]) {
-	ctx, span := otel.Tracer("talksession_usecase").Start(ctx, "toggleAnalysisHandler.startAnalysisIfNeeded")
-	defer span.End()
-
-	bg := context.Background()
-	span = trace.SpanFromContext(ctx)
-	bg = trace.ContextWithSpan(bg, span)
-	go func() {
-		defer func() {
-			if r := recover(); r != nil {
-				utils.HandleError(bg, nil, "startAnalysisIfNeeded panicked")
-			}
-		}()
-
-		_ = h.AnalysisService.StartAnalysis(bg, talkSessionID)
-
-		// 分析レポートを取得
-		report, err := h.AnalysisRepository.FindByTalkSessionID(bg, talkSessionID)
-		if err != nil && !errors.Is(err, sql.ErrNoRows) {
-			utils.HandleError(ctx, err, "AnalysisRepository.FindByTalkSessionID")
-			return
-		}
-		if report == nil {
-			return
-		}
-		if report.ShouldReGenerateReport() {
-			_ = h.AnalysisService.GenerateReport(bg, talkSessionID)
-		}
-	}()
 }

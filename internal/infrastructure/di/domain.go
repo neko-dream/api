@@ -22,6 +22,7 @@ func domainDeps() []ProvideArg {
 		{service.NewTalkSessionAccessControl, nil},
 		{service.NewConsentService, nil},
 		{service.NewPasswordAuthManager, nil},
+		{service.NewPassphraseManager, nil},
 		{organization_svc.NewOrganizationService, nil},
 		{organization_svc.NewOrganizationMemberManager, nil},
 		{talksession_consent.NewTalkSessionConsentService, nil},

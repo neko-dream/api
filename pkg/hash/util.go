@@ -10,7 +10,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func GenerateSalt(length int) (string, error) {
+// GenerateRandomToken 指定バイト長のランダムなトークンをbase64で返す
+func GenerateRandomToken(length int) (string, error) {
 	b := make([]byte, length)
 	_, err := rand.Read(b)
 	if err != nil {
@@ -19,47 +20,73 @@ func GenerateSalt(length int) (string, error) {
 	return base64.StdEncoding.EncodeToString(b), nil
 }
 
-func HashPassword(password, salt, pepper string, cost int) (string, error) {
+// BcryptHash pepperを付与してbcryptでハッシュ化する
+func BcryptHash(plaintext, pepper string, cost int) (string, error) {
 	if cost < bcrypt.MinCost || cost > bcrypt.MaxCost {
 		return "", fmt.Errorf("cost must be between %d and %d", bcrypt.MinCost, bcrypt.MaxCost)
 	}
-
-	hash, err := bcrypt.GenerateFromPassword([]byte(password), cost)
+	h, err := bcrypt.GenerateFromPassword([]byte(pepper+plaintext), cost)
 	if err != nil {
-		return "", fmt.Errorf("failed to hash password: %w", err)
+		return "", fmt.Errorf("failed to hash: %w", err)
 	}
-
-	return string(hash), nil
+	return string(h), nil
 }
 
-func VerifyPassword(password string, hashedPassword string) bool {
-	res := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
-	return res == nil
+// BcryptVerify pepperを付与してbcryptで検証する
+func BcryptVerify(plaintext, pepper, hashed string) bool {
+	return bcrypt.CompareHashAndPassword([]byte(hashed), []byte(pepper+plaintext)) == nil
 }
 
-func getBinaryBySHA256(s string) []byte {
-	r := sha256.Sum256([]byte(s))
-	return r[:]
+// BcryptHashHMAC pepperをキーとしてHMAC-SHA256で事前ハッシュしてからbcryptでハッシュ化する。
+// HMAC-SHA256の出力は常に32バイトのため、bcryptの72バイト上限に依存しない。
+// BcryptHash（pepper+plaintextの単純連結）とは互換性がない。
+func BcryptHashHMAC(plaintext, pepper string, cost int) (string, error) {
+	if cost < bcrypt.MinCost || cost > bcrypt.MaxCost {
+		return "", fmt.Errorf("cost must be between %d and %d", bcrypt.MinCost, bcrypt.MaxCost)
+	}
+	pre := hmacSHA256(plaintext, pepper)
+	h, err := bcrypt.GenerateFromPassword(pre, cost)
+	if err != nil {
+		return "", fmt.Errorf("failed to hash: %w", err)
+	}
+	return string(h), nil
 }
 
-func HashEmail(email, pepper string) (string, error) {
-	mac := hmac.New(sha256.New, getBinaryBySHA256(pepper))
-	_, err := mac.Write([]byte(email))
+// BcryptVerifyHMAC BcryptHashHMACで生成したハッシュを検証する
+func BcryptVerifyHMAC(plaintext, pepper, hashed string) bool {
+	pre := hmacSHA256(plaintext, pepper)
+	return bcrypt.CompareHashAndPassword([]byte(hashed), pre) == nil
+}
+
+// hmacSHA256 pepperをキーとしてHMAC-SHA256を計算する（32バイト固定）
+func hmacSHA256(plaintext, pepper string) []byte {
+	mac := hmac.New(sha256.New, sha256sum(pepper))
+	mac.Write([]byte(plaintext))
+	return mac.Sum(nil)
+}
+
+// HMACHash pepperをキーとしてHMAC-SHA256でハッシュ化する
+func HMACHash(plaintext, pepper string) (string, error) {
+	mac := hmac.New(sha256.New, sha256sum(pepper))
+	_, err := mac.Write([]byte(plaintext))
 	if err != nil {
 		return "", err
 	}
-
-	hashedEmail := mac.Sum(nil)
-	return base64.StdEncoding.EncodeToString(hashedEmail), err
+	return base64.StdEncoding.EncodeToString(mac.Sum(nil)), nil
 }
 
-func VerifyEmail(email, pepper, hashedEmail string) bool {
-	mac := hmac.New(sha256.New, getBinaryBySHA256(pepper))
-	_, err := mac.Write([]byte(email))
+// HMACVerify pepperをキーとしてHMAC-SHA256で検証する
+func HMACVerify(plaintext, pepper, hashed string) bool {
+	mac := hmac.New(sha256.New, sha256sum(pepper))
+	_, err := mac.Write([]byte(plaintext))
 	if err != nil {
 		return false
 	}
-	expectedMAC := mac.Sum(nil)
-	expected := base64.StdEncoding.EncodeToString(expectedMAC)
-	return hmac.Equal([]byte(hashedEmail), []byte(expected))
+	expected := base64.StdEncoding.EncodeToString(mac.Sum(nil))
+	return hmac.Equal([]byte(hashed), []byte(expected))
+}
+
+func sha256sum(s string) []byte {
+	r := sha256.Sum256([]byte(s))
+	return r[:]
 }

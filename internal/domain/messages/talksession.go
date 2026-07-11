@@ -91,4 +91,49 @@ var (
 		Code:       "TALKSESSION-0017",
 		Message:    "セッションは終了しています。",
 	}
+	TalkSessionPassphraseRequired = &APIError{
+		StatusCode: 403,
+		Code:       "TALKSESSION-0018",
+		Message:    "このセッションは合言葉が必要です。",
+	}
+	TalkSessionPassphraseInvalid = &APIError{
+		StatusCode: 403,
+		Code:       "TALKSESSION-0019",
+		Message:    "合言葉が正しくありません。",
+	}
+	TalkSessionSurveyAlreadyExists = &APIError{
+		StatusCode: 409,
+		Code:       "TALKSESSION-0020",
+		Message:    "このセッションには既にアンケートが設定されています。",
+	}
+	TalkSessionSurveyNotFound = &APIError{
+		StatusCode: 404,
+		Code:       "TALKSESSION-0021",
+		Message:    "アンケートが見つかりません。",
+	}
+	TalkSessionSurveyAlreadySubmitted = &APIError{
+		StatusCode: 409,
+		Code:       "TALKSESSION-0022",
+		Message:    "既にアンケートに回答済みです。",
+	}
+	TalkSessionSurveyAnswerRequired = &APIError{
+		StatusCode: 400,
+		Code:       "TALKSESSION-0023",
+		Message:    "このセッションに参加するにはアンケートの回答が必要です。",
+	}
+	TalkSessionSurveyAnswerInvalid = &APIError{
+		StatusCode: 400,
+		Code:       "TALKSESSION-0024",
+		Message:    "アンケートの回答が不正です。",
+	}
+	TalkSessionSurveyCannotHardDelete = &APIError{
+		StatusCode: 409,
+		Code:       "TALKSESSION-0025",
+		Message:    "既に回答がある項目は削除できません。",
+	}
+	TalkSessionSurveyQuestionTypeImmutable = &APIError{
+		StatusCode: 409,
+		Code:       "TALKSESSION-0026",
+		Message:    "既に回答がある質問の種類は変更できません。",
+	}
 )

@@ -164,7 +164,7 @@ func (s *organizationMemberManager) InviteUser(ctx context.Context, input Invite
 			utils.HandleError(ctx, err, "AuthProviderName")
 			return errtrace.Wrap(err)
 		}
-		subject, err := hash.HashEmail(input.Email, s.cfg.HASH_PEPPER)
+		subject, err := hash.HMACHash(input.Email, s.cfg.HASH_PEPPER)
 		if err != nil {
 			utils.HandleError(ctx, err, "HashEmail")
 			return messages.InvalidPasswordOrEmailError

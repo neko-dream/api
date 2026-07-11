@@ -79,7 +79,7 @@ func (p *passwordRegisterInteractor) Execute(ctx context.Context, input Password
 			utils.HandleError(ctx, err, "NewAuthProviderName")
 			return errtrace.Wrap(err)
 		}
-		subject, err := hash.HashEmail(input.Email, p.cfg.HASH_PEPPER)
+		subject, err := hash.HMACHash(input.Email, p.cfg.HASH_PEPPER)
 		if err != nil {
 			utils.HandleError(ctx, err, "HashEmail")
 			return messages.InvalidPasswordOrEmailError

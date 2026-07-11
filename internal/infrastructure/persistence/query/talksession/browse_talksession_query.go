@@ -65,6 +65,9 @@ func (b *BrowseTalkSessionQueryImpl) Execute(ctx context.Context, in talksession
 		utils.HandleError(ctx, err, "failed to copy talk session")
 		return nil, err
 	}
+	for i, row := range talkSessionRow {
+		talkSessions[i].IsLocked = row.TalkSession.PassphraseHash.Valid
+	}
 
 	talkSessionCount, err := b.GetQueries(ctx).CountTalkSessions(ctx, model.CountTalkSessionsParams{
 		Theme:  utils.ToNullableSQL[sql.NullString](in.Theme),

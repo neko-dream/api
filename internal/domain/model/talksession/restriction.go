@@ -25,6 +25,10 @@ const (
 	DemographicsPrefecture RestrictionAttributeKey = "demographics.prefecture"
 	DemographicsGender     RestrictionAttributeKey = "demographics.gender"
 	DemographicsBirth      RestrictionAttributeKey = "demographics.birth"
+	// SurveyAnswered はアンケート回答済みであることを要求する。
+	// このキーの IsSatisfied は常に false を返す（実際の判定は TalkSessionAccessControl が
+	// SurveyRepository を参照して行う）。
+	SurveyAnswered RestrictionAttributeKey = "survey.answered"
 )
 
 var (
@@ -71,6 +75,14 @@ var (
 				}
 				return user.Demographics().Prefecture() != nil
 			}},
+		SurveyAnswered: {
+			Key:         SurveyAnswered,
+			Description: "アンケート回答",
+			Order:       4,
+			// セッション情報が必要なため、ここでは判定できない。
+			// 実際の判定は TalkSessionAccessControl 側で行う。
+			IsSatisfied: func(_ user.User) bool { return false },
+		},
 	}
 )
 

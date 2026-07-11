@@ -76,6 +76,16 @@ func (UnimplementedHandler) CreateOrganizationAlias(ctx context.Context, req *Cr
 	return r, ht.ErrNotImplemented
 }
 
+// CreateTalkSessionSurvey implements createTalkSessionSurvey operation.
+//
+// セッションにアンケートを作成（オーナーのみ、セッションあたり 1
+// 件まで）.
+//
+// POST /talksessions/{talkSessionID}/survey
+func (UnimplementedHandler) CreateTalkSessionSurvey(ctx context.Context, req *CreateTalkSessionSurveyReq, params CreateTalkSessionSurveyParams) (r CreateTalkSessionSurveyRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // DeleteDevice implements deleteDevice operation.
 //
 // デバイス削除.
@@ -350,6 +360,24 @@ func (UnimplementedHandler) GetTalkSessionRestrictionSatisfied(ctx context.Conte
 	return r, ht.ErrNotImplemented
 }
 
+// GetTalkSessionSurvey implements getTalkSessionSurvey operation.
+//
+// セッションのアンケート定義を取得（参加前に質問を表示するため）.
+//
+// GET /talksessions/{talkSessionID}/survey
+func (UnimplementedHandler) GetTalkSessionSurvey(ctx context.Context, params GetTalkSessionSurveyParams) (r GetTalkSessionSurveyRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetTalkSessionSurveySummary implements getTalkSessionSurveySummary operation.
+//
+// セッションオーナー向け：質問ごとに集計した結果を取得.
+//
+// GET /talksessions/{talkSessionID}/survey/summary
+func (UnimplementedHandler) GetTalkSessionSurveySummary(ctx context.Context, params GetTalkSessionSurveySummaryParams) (r GetTalkSessionSurveySummaryRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetTimeLine implements getTimeLine operation.
 //
 // タイムラインはセッション終了後にセッション作成者が設定できるその後の予定を知らせるもの.
@@ -498,6 +526,25 @@ func (UnimplementedHandler) InviteOrganization(ctx context.Context, req *InviteO
 //
 // POST /organizations/invite_user
 func (UnimplementedHandler) InviteOrganizationForUser(ctx context.Context, req *InviteOrganizationForUserReq) (r InviteOrganizationForUserRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// JoinLockedSession implements joinLockedSession operation.
+//
+// クローズドセッションに合言葉を使って参加する。
+// 既に参加済みの場合は合言葉なしで成功する。.
+//
+// POST /talksessions/{talkSessionID}/join
+func (UnimplementedHandler) JoinLockedSession(ctx context.Context, req *JoinLockedSessionReq, params JoinLockedSessionParams) (r JoinLockedSessionRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// ListTalkSessionSurveySubmissions implements listTalkSessionSurveySubmissions operation.
+//
+// セッションオーナー向け：回答一覧を取得.
+//
+// GET /talksessions/{talkSessionID}/survey/submissions
+func (UnimplementedHandler) ListTalkSessionSurveySubmissions(ctx context.Context, params ListTalkSessionSurveySubmissionsParams) (r ListTalkSessionSurveySubmissionsRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -655,6 +702,16 @@ func (UnimplementedHandler) SolveOpinionReport(ctx context.Context, req *SolveOp
 	return r, ht.ErrNotImplemented
 }
 
+// SubmitTalkSessionSurvey implements submitTalkSessionSurvey operation.
+//
+// アンケートに回答を送信（1 ユーザー 1 送信、修正不可）。
+// 成功すると survey.answered restriction が自動的に満たされた状態になる。.
+//
+// POST /talksessions/{talkSessionID}/survey/submissions
+func (UnimplementedHandler) SubmitTalkSessionSurvey(ctx context.Context, req *SubmitTalkSessionSurveyReq, params SubmitTalkSessionSurveyParams) (r SubmitTalkSessionSurveyRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // SwipeOpinions implements swipeOpinions operation.
 //
 // セッションの中からまだ投票していない意見をランダムに取得する
@@ -726,6 +783,17 @@ func (UnimplementedHandler) UpdateNotificationPreferences(ctx context.Context, r
 //
 // PUT /organizations/{code}
 func (UnimplementedHandler) UpdateOrganization(ctx context.Context, req *UpdateOrganizationReq, params UpdateOrganizationParams) (r UpdateOrganizationRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// UpdateTalkSessionSurvey implements updateTalkSessionSurvey operation.
+//
+// アンケートを編集（オーナーのみ）。
+// 既に回答がある質問・選択肢は soft delete 経由でのみ非表示化可能。
+// questionID / choiceID 指定で既存項目を編集、省略で新規追加。.
+//
+// PUT /talksessions/{talkSessionID}/survey
+func (UnimplementedHandler) UpdateTalkSessionSurvey(ctx context.Context, req *UpdateTalkSessionSurveyReq, params UpdateTalkSessionSurveyParams) (r UpdateTalkSessionSurveyRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

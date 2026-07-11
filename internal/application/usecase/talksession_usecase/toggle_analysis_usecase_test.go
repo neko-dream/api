@@ -2,13 +2,11 @@ package talksession_usecase_test
 
 import (
 	"context"
-	"database/sql"
 	"testing"
 	"time"
 
 	"github.com/neko-dream/api/internal/application/usecase/talksession_usecase"
 	"github.com/neko-dream/api/internal/domain/messages"
-	"github.com/neko-dream/api/internal/domain/model/analysis"
 	"github.com/neko-dream/api/internal/domain/model/clock"
 	"github.com/neko-dream/api/internal/domain/model/shared"
 	"github.com/neko-dream/api/internal/domain/model/talksession"
@@ -24,25 +22,6 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace/noop"
 )
-
-// AnalysisRepositoryのモック
-type analysisRepositoryMock struct{}
-
-func (m *analysisRepositoryMock) FindByTalkSessionID(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession]) (*analysis.AnalysisReport, error) {
-	return nil, sql.ErrNoRows
-}
-
-func (m *analysisRepositoryMock) FindByID(ctx context.Context, analysisReportID shared.UUID[analysis.AnalysisReport]) (*analysis.AnalysisReport, error) {
-	return nil, sql.ErrNoRows
-}
-
-func (m *analysisRepositoryMock) SaveReport(ctx context.Context, report *analysis.AnalysisReport) error {
-	return nil
-}
-
-func newAnalysisRepositoryMock() analysis.AnalysisRepository {
-	return &analysisRepositoryMock{}
-}
 
 type ToggleAnalysisUseCaseTestData struct {
 	ToggleAnalysisUseCase talksession_usecase.ToggleAnalysisUseCase
@@ -90,8 +69,7 @@ func TestToggleAnalysisUseCase_Execute(t *testing.T) {
 	// ユースケースの初期化
 	toggleUseCase := talksession_usecase.NewToggleAnalysisUseCase(
 		talkSessionRepo,
-		repository.NewAnalysisServiceMock(),
-		newAnalysisRepositoryMock(),
+		repository.NewAnalysisSchedulerMock(),
 		dbManager,
 		testConfig,
 	)
@@ -138,6 +116,7 @@ func TestToggleAnalysisUseCase_Execute(t *testing.T) {
 					false,              // hideTop
 					nil,                // organizationID
 					nil,                // organizationAliasID
+					nil,
 				)
 				return data.TalkSessionRepo.Create(ctx, data.TalkSession)
 			},
@@ -197,6 +176,7 @@ func TestToggleAnalysisUseCase_Execute(t *testing.T) {
 					false,              // hideTop
 					nil,                // organizationID
 					nil,                // organizationAliasID
+					nil,
 				)
 				data.TalkSession.SetDisableAnalysis(true) // 分析無効化状態にする
 				return data.TalkSessionRepo.Create(ctx, data.TalkSession)
@@ -256,6 +236,7 @@ func TestToggleAnalysisUseCase_Execute(t *testing.T) {
 					false,              // hideTop
 					nil,                // organizationID
 					nil,                // organizationAliasID
+					nil,
 				)
 				return data.TalkSessionRepo.Create(ctx, data.TalkSession)
 			},
@@ -328,6 +309,7 @@ func TestToggleAnalysisUseCase_Execute(t *testing.T) {
 					false,              // hideTop
 					nil,                // organizationID
 					nil,                // organizationAliasID
+					nil,
 				)
 				return data.TalkSessionRepo.Create(ctx, data.TalkSession)
 			},
@@ -386,8 +368,7 @@ func TestToggleAnalysisUseCase_ProductionEnvironment(t *testing.T) {
 	// プロダクション環境用のユースケースの初期化
 	toggleUseCase := talksession_usecase.NewToggleAnalysisUseCase(
 		talkSessionRepo,
-		repository.NewAnalysisServiceMock(),
-		newAnalysisRepositoryMock(),
+		repository.NewAnalysisSchedulerMock(),
 		dbManager,
 		prodConfig,
 	)
@@ -426,6 +407,7 @@ func TestToggleAnalysisUseCase_ProductionEnvironment(t *testing.T) {
 			false,              // hideTop
 			nil,                // organizationID
 			nil,                // organizationAliasID
+			nil,
 		)
 		if err := talkSessionRepo.Create(ctx, talkSession); err != nil {
 			return err

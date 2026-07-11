@@ -9,4 +9,4 @@ INSERT INTO talksession_consents (
     $2,
     $3,
     $4
-);
+) ON CONFLICT (talksession_id, user_id) DO NOTHING;

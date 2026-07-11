@@ -68,6 +68,9 @@ func (h *BrowseJoinedTalkSessionQueryHandler) Execute(ctx context.Context, input
 		utils.HandleError(ctx, err, "マッピングに失敗")
 		return nil, err
 	}
+	for i, row := range talkSessionRows {
+		talkSessions[i].IsLocked = row.TalkSession.PassphraseHash.Valid
+	}
 
 	return &talksession.BrowseJoinedTalkSessionsQueryOutput{
 		TalkSessions: talkSessions,

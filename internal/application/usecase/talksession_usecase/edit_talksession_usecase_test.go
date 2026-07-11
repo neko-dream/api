@@ -70,7 +70,7 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 	editCommand := talksession_usecase.NewEditTalkSessionUseCase(
 		talkSessionRepo,
 		userRepo,
-		repository.NewAnalysisServiceMock(),
+		repository.NewAnalysisSchedulerMock(),
 		dbManager,
 		testConfig,
 	)
@@ -118,6 +118,7 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					true,
 					nil, // organizationID
 					nil, // organizationAliasID
+					nil,
 				)
 				return data.TalkSessionRepo.Create(ctx, data.TalkSession)
 			},
@@ -214,6 +215,7 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					true,
 					nil, // organizationID
 					nil, // organizationAliasID
+					nil,
 				)
 				return data.TalkSessionRepo.Create(ctx, data.TalkSession)
 			},
@@ -281,6 +283,7 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					true,
 					nil, // organizationID
 					nil, // organizationAliasID
+					nil,
 				)
 				return data.TalkSessionRepo.Create(ctx, data.TalkSession)
 			},
@@ -336,6 +339,7 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					true,
 					nil, // organizationID
 					nil, // organizationAliasID
+					nil,
 				)
 				return data.TalkSessionRepo.Create(ctx, data.TalkSession)
 			},
@@ -392,6 +396,7 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					true,
 					nil, // organizationID
 					nil, // organizationAliasID
+					nil,
 				)
 				return data.TalkSessionRepo.Create(ctx, data.TalkSession)
 			},
@@ -441,6 +446,7 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					true,
 					nil, // organizationID
 					nil, // organizationAliasID
+					nil,
 				)
 				return data.TalkSessionRepo.Create(ctx, data.TalkSession)
 			},
@@ -497,6 +503,7 @@ func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 					true,
 					nil, // organizationID
 					nil, // organizationAliasID
+					nil,
 				)
 				return data.TalkSessionRepo.Create(ctx, data.TalkSession)
 			},
@@ -660,7 +667,7 @@ func TestEditTalkSessionUseCase_ProductionEnvironment(t *testing.T) {
 	editCommand := talksession_usecase.NewEditTalkSessionUseCase(
 		talkSessionRepo,
 		userRepo,
-		repository.NewAnalysisServiceMock(),
+		repository.NewAnalysisSchedulerMock(),
 		dbManager,
 		prodConfig,
 	)
@@ -712,6 +719,7 @@ func TestEditTalkSessionUseCase_ProductionEnvironment(t *testing.T) {
 			true,
 			nil, // organizationID
 			nil, // organizationAliasID
+			nil,
 		)
 		if err := talkSessionRepo.Create(ctx, talkSession); err != nil {
 			return err

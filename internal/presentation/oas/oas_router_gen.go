@@ -1414,6 +1414,28 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 								}
 
+							case 'j': // Prefix: "join"
+
+								if l := len("join"); len(elem) >= l && elem[0:l] == "join" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								if len(elem) == 0 {
+									// Leaf node.
+									switch r.Method {
+									case "POST":
+										s.handleJoinLockedSessionRequest([1]string{
+											args[0],
+										}, elemIsEscaped, w, r)
+									default:
+										s.notAllowed(w, r, "POST")
+									}
+
+									return
+								}
+
 							case 'o': // Prefix: "opinions"
 
 								if l := len("opinions"); len(elem) >= l && elem[0:l] == "opinions" {
@@ -1540,26 +1562,133 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 								}
 
-							case 's': // Prefix: "swipe_opinions"
+							case 's': // Prefix: "s"
 
-								if l := len("swipe_opinions"); len(elem) >= l && elem[0:l] == "swipe_opinions" {
+								if l := len("s"); len(elem) >= l && elem[0:l] == "s" {
 									elem = elem[l:]
 								} else {
 									break
 								}
 
 								if len(elem) == 0 {
-									// Leaf node.
-									switch r.Method {
-									case "GET":
-										s.handleSwipeOpinionsRequest([1]string{
-											args[0],
-										}, elemIsEscaped, w, r)
-									default:
-										s.notAllowed(w, r, "GET")
+									break
+								}
+								switch elem[0] {
+								case 'u': // Prefix: "urvey"
+
+									if l := len("urvey"); len(elem) >= l && elem[0:l] == "urvey" {
+										elem = elem[l:]
+									} else {
+										break
 									}
 
-									return
+									if len(elem) == 0 {
+										switch r.Method {
+										case "GET":
+											s.handleGetTalkSessionSurveyRequest([1]string{
+												args[0],
+											}, elemIsEscaped, w, r)
+										case "POST":
+											s.handleCreateTalkSessionSurveyRequest([1]string{
+												args[0],
+											}, elemIsEscaped, w, r)
+										case "PUT":
+											s.handleUpdateTalkSessionSurveyRequest([1]string{
+												args[0],
+											}, elemIsEscaped, w, r)
+										default:
+											s.notAllowed(w, r, "GET,POST,PUT")
+										}
+
+										return
+									}
+									switch elem[0] {
+									case '/': // Prefix: "/su"
+
+										if l := len("/su"); len(elem) >= l && elem[0:l] == "/su" {
+											elem = elem[l:]
+										} else {
+											break
+										}
+
+										if len(elem) == 0 {
+											break
+										}
+										switch elem[0] {
+										case 'b': // Prefix: "bmissions"
+
+											if l := len("bmissions"); len(elem) >= l && elem[0:l] == "bmissions" {
+												elem = elem[l:]
+											} else {
+												break
+											}
+
+											if len(elem) == 0 {
+												// Leaf node.
+												switch r.Method {
+												case "GET":
+													s.handleListTalkSessionSurveySubmissionsRequest([1]string{
+														args[0],
+													}, elemIsEscaped, w, r)
+												case "POST":
+													s.handleSubmitTalkSessionSurveyRequest([1]string{
+														args[0],
+													}, elemIsEscaped, w, r)
+												default:
+													s.notAllowed(w, r, "GET,POST")
+												}
+
+												return
+											}
+
+										case 'm': // Prefix: "mmary"
+
+											if l := len("mmary"); len(elem) >= l && elem[0:l] == "mmary" {
+												elem = elem[l:]
+											} else {
+												break
+											}
+
+											if len(elem) == 0 {
+												// Leaf node.
+												switch r.Method {
+												case "GET":
+													s.handleGetTalkSessionSurveySummaryRequest([1]string{
+														args[0],
+													}, elemIsEscaped, w, r)
+												default:
+													s.notAllowed(w, r, "GET")
+												}
+
+												return
+											}
+
+										}
+
+									}
+
+								case 'w': // Prefix: "wipe_opinions"
+
+									if l := len("wipe_opinions"); len(elem) >= l && elem[0:l] == "wipe_opinions" {
+										elem = elem[l:]
+									} else {
+										break
+									}
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch r.Method {
+										case "GET":
+											s.handleSwipeOpinionsRequest([1]string{
+												args[0],
+											}, elemIsEscaped, w, r)
+										default:
+											s.notAllowed(w, r, "GET")
+										}
+
+										return
+									}
+
 								}
 
 							case 't': // Prefix: "timeline"
@@ -3667,6 +3796,30 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 
 								}
 
+							case 'j': // Prefix: "join"
+
+								if l := len("join"); len(elem) >= l && elem[0:l] == "join" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								if len(elem) == 0 {
+									// Leaf node.
+									switch method {
+									case "POST":
+										r.name = JoinLockedSessionOperation
+										r.summary = "クローズドセッションに参加"
+										r.operationID = "joinLockedSession"
+										r.pathPattern = "/talksessions/{talkSessionID}/join"
+										r.args = args
+										r.count = 1
+										return r, true
+									default:
+										return
+									}
+								}
+
 							case 'o': // Prefix: "opinions"
 
 								if l := len("opinions"); len(elem) >= l && elem[0:l] == "opinions" {
@@ -3803,28 +3956,153 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 
 								}
 
-							case 's': // Prefix: "swipe_opinions"
+							case 's': // Prefix: "s"
 
-								if l := len("swipe_opinions"); len(elem) >= l && elem[0:l] == "swipe_opinions" {
+								if l := len("s"); len(elem) >= l && elem[0:l] == "s" {
 									elem = elem[l:]
 								} else {
 									break
 								}
 
 								if len(elem) == 0 {
-									// Leaf node.
-									switch method {
-									case "GET":
-										r.name = SwipeOpinionsOperation
-										r.summary = "スワイプ用のエンドポイント"
-										r.operationID = "swipeOpinions"
-										r.pathPattern = "/talksessions/{talkSessionID}/swipe_opinions"
-										r.args = args
-										r.count = 1
-										return r, true
-									default:
-										return
+									break
+								}
+								switch elem[0] {
+								case 'u': // Prefix: "urvey"
+
+									if l := len("urvey"); len(elem) >= l && elem[0:l] == "urvey" {
+										elem = elem[l:]
+									} else {
+										break
 									}
+
+									if len(elem) == 0 {
+										switch method {
+										case "GET":
+											r.name = GetTalkSessionSurveyOperation
+											r.summary = "アンケート定義取得"
+											r.operationID = "getTalkSessionSurvey"
+											r.pathPattern = "/talksessions/{talkSessionID}/survey"
+											r.args = args
+											r.count = 1
+											return r, true
+										case "POST":
+											r.name = CreateTalkSessionSurveyOperation
+											r.summary = "アンケート作成"
+											r.operationID = "createTalkSessionSurvey"
+											r.pathPattern = "/talksessions/{talkSessionID}/survey"
+											r.args = args
+											r.count = 1
+											return r, true
+										case "PUT":
+											r.name = UpdateTalkSessionSurveyOperation
+											r.summary = "アンケート編集"
+											r.operationID = "updateTalkSessionSurvey"
+											r.pathPattern = "/talksessions/{talkSessionID}/survey"
+											r.args = args
+											r.count = 1
+											return r, true
+										default:
+											return
+										}
+									}
+									switch elem[0] {
+									case '/': // Prefix: "/su"
+
+										if l := len("/su"); len(elem) >= l && elem[0:l] == "/su" {
+											elem = elem[l:]
+										} else {
+											break
+										}
+
+										if len(elem) == 0 {
+											break
+										}
+										switch elem[0] {
+										case 'b': // Prefix: "bmissions"
+
+											if l := len("bmissions"); len(elem) >= l && elem[0:l] == "bmissions" {
+												elem = elem[l:]
+											} else {
+												break
+											}
+
+											if len(elem) == 0 {
+												// Leaf node.
+												switch method {
+												case "GET":
+													r.name = ListTalkSessionSurveySubmissionsOperation
+													r.summary = "アンケート回答一覧（オーナー）"
+													r.operationID = "listTalkSessionSurveySubmissions"
+													r.pathPattern = "/talksessions/{talkSessionID}/survey/submissions"
+													r.args = args
+													r.count = 1
+													return r, true
+												case "POST":
+													r.name = SubmitTalkSessionSurveyOperation
+													r.summary = "アンケート回答送信"
+													r.operationID = "submitTalkSessionSurvey"
+													r.pathPattern = "/talksessions/{talkSessionID}/survey/submissions"
+													r.args = args
+													r.count = 1
+													return r, true
+												default:
+													return
+												}
+											}
+
+										case 'm': // Prefix: "mmary"
+
+											if l := len("mmary"); len(elem) >= l && elem[0:l] == "mmary" {
+												elem = elem[l:]
+											} else {
+												break
+											}
+
+											if len(elem) == 0 {
+												// Leaf node.
+												switch method {
+												case "GET":
+													r.name = GetTalkSessionSurveySummaryOperation
+													r.summary = "アンケート集計結果（オーナー）"
+													r.operationID = "getTalkSessionSurveySummary"
+													r.pathPattern = "/talksessions/{talkSessionID}/survey/summary"
+													r.args = args
+													r.count = 1
+													return r, true
+												default:
+													return
+												}
+											}
+
+										}
+
+									}
+
+								case 'w': // Prefix: "wipe_opinions"
+
+									if l := len("wipe_opinions"); len(elem) >= l && elem[0:l] == "wipe_opinions" {
+										elem = elem[l:]
+									} else {
+										break
+									}
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch method {
+										case "GET":
+											r.name = SwipeOpinionsOperation
+											r.summary = "スワイプ用のエンドポイント"
+											r.operationID = "swipeOpinions"
+											r.pathPattern = "/talksessions/{talkSessionID}/swipe_opinions"
+											r.args = args
+											r.count = 1
+											return r, true
+										default:
+											return
+										}
+									}
+
 								}
 
 							case 't': // Prefix: "timeline"

@@ -10,7 +10,6 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/dig"
@@ -48,7 +47,7 @@ func Labeler(find RouteFinder) Middleware {
 	}
 }
 
-func Instrument(serviceName string, find RouteFinder, traceProvider *sdktrace.TracerProvider) Middleware {
+func Instrument(serviceName string, find RouteFinder, traceProvider trace.TracerProvider) Middleware {
 	return func(h http.Handler) http.Handler {
 		return otelhttp.NewHandler(h, "",
 			otelhttp.WithPropagators(otel.GetTextMapPropagator()),
