@@ -1,6 +1,7 @@
 package config
 
 import "testing"
+import "slices"
 
 func TestEnvironmentValidationAndDevelopmentAuthentication(t *testing.T) {
 	for _, tc := range []struct {
@@ -19,5 +20,17 @@ func TestEnvironmentValidationAndDevelopmentAuthentication(t *testing.T) {
 				t.Fatal("unsafe development authentication policy")
 			}
 		})
+	}
+}
+
+func TestBrowserOriginsProductionAliasAndDevelopmentIsolation(t *testing.T) {
+	for _, website := range []string{"https://www.kotohiro.com", "https://www.kotohiro.com/"} {
+		cfg := &Config{Env: PROD, WEBSITE_URL: website, EMAIL_VERIFICATION_BASE_URL: "https://api.kotohiro.com"}
+		if !slices.Contains(cfg.BrowserOrigins(), "https://kotohiro.com") {
+			t.Fatal("canonical origin rejected apex")
+		}
+		if slices.Contains(cfg.BrowserOrigins(), "https://api-dev.kotohiro.com") {
+			t.Fatal("development alias leaked into production")
+		}
 	}
 }

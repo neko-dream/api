@@ -115,8 +115,17 @@ func (c *Config) BrowserOrigins() []string {
 		}
 	}
 	// Both production Web domains are routed to the same app, not redirected.
-	if c.Env == PROD && c.WEBSITE_URL == "https://www.kotohiro.com" {
-		origins = append(origins, "https://kotohiro.com")
+	if c.Env == PROD {
+		for _, origin := range origins {
+			if origin == "https://www.kotohiro.com" {
+				origins = append(origins, "https://kotohiro.com")
+				break
+			}
+		}
+	}
+	// Legacy development Swagger/admin URLs still use this explicit API alias.
+	if c.Env == DEV {
+		origins = append(origins, "https://api-dev.kotohiro.com")
 	}
 	return origins
 }

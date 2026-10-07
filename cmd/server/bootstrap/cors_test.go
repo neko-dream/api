@@ -14,7 +14,7 @@ func TestCredentialedCORSUsesExplicitOrigins(t *testing.T) {
 		website, api string
 		allowed      []string
 	}{
-		{config.DEV, "https://develop.kotohiro.com", "https://api.dev.kotohiro.com", []string{"https://develop.kotohiro.com", "https://api.dev.kotohiro.com"}},
+		{config.DEV, "https://develop.kotohiro.com", "https://api.dev.kotohiro.com", []string{"https://develop.kotohiro.com", "https://api.dev.kotohiro.com", "https://api-dev.kotohiro.com"}},
 		{config.PROD, "https://www.kotohiro.com", "https://api.kotohiro.com", []string{"https://www.kotohiro.com", "https://kotohiro.com", "https://api.kotohiro.com"}},
 		{config.LOCAL, "https://localhost:3000", "https://localhost:3000/api", []string{"https://localhost:3000"}},
 	} {
@@ -70,9 +70,12 @@ func TestMutationOriginGuardPreventsSimpleFormCSRF(t *testing.T) {
 			if w.Code != http.StatusForbidden || called {
 				t.Fatal("cross-site mutation accepted", method, origin)
 			}
+			if w.Header().Get("Content-Type") != "application/json; charset=utf-8" {
+				t.Fatal("API error format missing")
+			}
 		}
 	}
-	for _, origin := range []string{"", "https://develop.kotohiro.com", "https://api.dev.kotohiro.com"} {
+	for _, origin := range []string{"", "https://develop.kotohiro.com", "https://api.dev.kotohiro.com", "https://api-dev.kotohiro.com"} {
 		called := false
 		h := b.browserOriginGuard(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { called = true }))
 		req := httptest.NewRequest("POST", "/", nil)

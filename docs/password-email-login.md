@@ -59,6 +59,7 @@ Cookie植え付けを防ぐ。CookieはSecure / HttpOnly。POSTのOriginは設�
 本番Webのwwwとapexは同じアプリを配信するため両方を明示許可し、確認後の移動先はwwwへ統一する。
 Credential付きCORSも同じ許可リストを使い、任意HTTPSサイトやworkers.devプレビューは許可しない。
 ブラウザからの変更系リクエストも未許可Originを拒否し、単純フォームによるクロスサイト書き込みを防ぐ。
+developmentでは既存Swagger/管理画面の `https://api-dev.kotohiro.com` 別名も明示許可する。
 非ブラウザクライアントではOriginを省略できるが、秘密値とCookieの両方が必要。
 
 ## 検証

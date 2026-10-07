@@ -12,6 +12,8 @@
 `SessionId` は Domain 指定なしの host-only Cookie で、`Secure` / `HttpOnly` /
 `SameSite=Lax` を維持する。SSR は受信した Cookie を HTTP のローカル API に
 転送するので、自己署名証明書の検証を無効化する設定は不要。
+ブラウザの変更系API操作はこのHTTPS Webプロキシ経由で行う。
+HTTPの直接Swaggerや別ポートの管理画面開発サーバーは許可Originに含めない。
 本番では既存のCookie Domain / SameSite=Laxを維持する。
 developmentでは既存のクロスサイト認証修正（SameSite=None）を含む。
 

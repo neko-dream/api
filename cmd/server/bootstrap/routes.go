@@ -77,7 +77,9 @@ func (b *Bootstrap) browserOriginGuard(next http.Handler) http.Handler {
 		switch r.Method {
 		case http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete:
 			if origin := r.Header.Get("Origin"); origin != "" && !slices.Contains(origins, origin) {
-				http.Error(w, "Forbidden origin", http.StatusForbidden)
+				w.Header().Set("Content-Type", "application/json; charset=utf-8")
+				w.WriteHeader(http.StatusForbidden)
+				_, _ = w.Write([]byte(`{"code":"AUTH-FORBIDDEN-ORIGIN","message":"許可されていないアクセス元です。"}`))
 				return
 			}
 		}
@@ -88,10 +90,10 @@ func (b *Bootstrap) browserOriginGuard(next http.Handler) http.Handler {
 func (b *Bootstrap) apiCORS() *cors.Cors {
 	origins := b.config.BrowserOrigins()
 	return cors.New(cors.Options{
-		AllowOriginFunc: func(origin string) bool { return slices.Contains(origins, origin) },
-		AllowedMethods:    []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:    []string{"*"},
-		AllowCredentials:  true,
+		AllowOriginFunc:  func(origin string) bool { return slices.Contains(origins, origin) },
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"*"},
+		AllowCredentials: true,
 	})
 }
 
