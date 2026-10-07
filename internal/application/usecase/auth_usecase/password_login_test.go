@@ -139,6 +139,9 @@ func (s *loginTestSessions) DeactivateUserSessions(context.Context, shared.UUID[
 	s.deactivated++
 	return s.deactivateErr
 }
+func (s *loginTestSessions) DeactivateAllByUserID(ctx context.Context, id shared.UUID[user.User]) error {
+	return s.DeactivateUserSessions(ctx, id)
+}
 
 type loginTestTokens struct {
 	session.TokenManager

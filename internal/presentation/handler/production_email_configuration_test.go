@@ -71,4 +71,8 @@ func TestProductionEmailConfiguration(t *testing.T) {
 	if fake.verifies != called {
 		t.Fatal("unsafe origin reached authentication")
 	}
+	ctx, _ := emailHandlerContext("POST", "https://kotohiro.com", "pending")
+	if _, err := a.VerifyPasswordEmailPIN(ctx, &oas.VerifyPasswordEmailPINReq{Pin: "000001"}); err != nil {
+		t.Fatal("production apex origin rejected", err)
+	}
 }

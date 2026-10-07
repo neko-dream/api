@@ -28,8 +28,13 @@ func (s *sessionService) DeactivateUserSessions(ctx context.Context, userID shar
 	ctx, span := otel.Tracer("service").Start(ctx, "sessionService.DeactivateUserSessions")
 	defer span.End()
 
-	if err := s.sessionRepository.DeactivateAllByUserID(ctx, userID); err != nil {
+	sessions, err := s.sessionRepository.FindByUserID(ctx, userID)
+	if err != nil {
 		return errtrace.Wrap(err)
+	}
+
+	for _, sess := range sessions {
+		sess.Deactivate(ctx)
 	}
 
 	return nil

@@ -39,8 +39,8 @@ func TestToggleAnalysisUseCase_Execute(t *testing.T) {
 	// 必要な環境変数を設定
 	t.Setenv("ENCRYPTION_VERSION", "v1")
 	t.Setenv("ENCRYPTION_SECRET", "12345678901234567890123456789012")
-	t.Setenv("DATABASE_URL", "postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable")
-	t.Setenv("ENV", "test")
+	t.Setenv("DATABASE_URL", talkSessionTestDatabaseURL())
+	t.Setenv("ENV", "local")
 
 	// OpenTelemetryのnoop tracerを設定
 	otel.SetTracerProvider(noop.NewTracerProvider())
@@ -110,12 +110,12 @@ func TestToggleAnalysisUseCase_Execute(t *testing.T) {
 					data.OwnerUserID,
 					clock.Now(ctx),
 					clock.Now(ctx).Add(time.Hour*24),
-					nil,                // location
+					nil,             // location
 					lo.ToPtr("渋谷区"), // city
 					lo.ToPtr("東京都"), // prefecture
-					false,              // hideTop
-					nil,                // organizationID
-					nil,                // organizationAliasID
+					false,           // hideTop
+					nil,             // organizationID
+					nil,             // organizationAliasID
 					nil,
 				)
 				return data.TalkSessionRepo.Create(ctx, data.TalkSession)
@@ -170,12 +170,12 @@ func TestToggleAnalysisUseCase_Execute(t *testing.T) {
 					data.OwnerUserID,
 					clock.Now(ctx),
 					clock.Now(ctx).Add(time.Hour*24),
-					nil,                // location
+					nil,             // location
 					lo.ToPtr("渋谷区"), // city
 					lo.ToPtr("東京都"), // prefecture
-					false,              // hideTop
-					nil,                // organizationID
-					nil,                // organizationAliasID
+					false,           // hideTop
+					nil,             // organizationID
+					nil,             // organizationAliasID
 					nil,
 				)
 				data.TalkSession.SetDisableAnalysis(true) // 分析無効化状態にする
@@ -230,12 +230,12 @@ func TestToggleAnalysisUseCase_Execute(t *testing.T) {
 					data.OwnerUserID,
 					clock.Now(ctx),
 					clock.Now(ctx).Add(time.Hour*24),
-					nil,                // location
+					nil,             // location
 					lo.ToPtr("渋谷区"), // city
 					lo.ToPtr("東京都"), // prefecture
-					false,              // hideTop
-					nil,                // organizationID
-					nil,                // organizationAliasID
+					false,           // hideTop
+					nil,             // organizationID
+					nil,             // organizationAliasID
 					nil,
 				)
 				return data.TalkSessionRepo.Create(ctx, data.TalkSession)
@@ -299,16 +299,16 @@ func TestToggleAnalysisUseCase_Execute(t *testing.T) {
 					data.TalkSessionID,
 					"テストテーマ",
 					lo.ToPtr("テスト説明"),
-					nil, // thumbnailURL
+					nil,              // thumbnailURL
 					data.OwnerUserID, // オーナーは別ユーザー
 					clock.Now(ctx),
 					clock.Now(ctx).Add(time.Hour*24),
-					nil,                // location
+					nil,             // location
 					lo.ToPtr("渋谷区"), // city
 					lo.ToPtr("東京都"), // prefecture
-					false,              // hideTop
-					nil,                // organizationID
-					nil,                // organizationAliasID
+					false,           // hideTop
+					nil,             // organizationID
+					nil,             // organizationAliasID
 					nil,
 				)
 				return data.TalkSessionRepo.Create(ctx, data.TalkSession)
@@ -343,7 +343,7 @@ func TestToggleAnalysisUseCase_ProductionEnvironment(t *testing.T) {
 	// 環境変数設定
 	t.Setenv("ENCRYPTION_VERSION", "v1")
 	t.Setenv("ENCRYPTION_SECRET", "12345678901234567890123456789012")
-	t.Setenv("DATABASE_URL", "postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable")
+	t.Setenv("DATABASE_URL", talkSessionTestDatabaseURL())
 	t.Setenv("ENV", "production")
 
 	// OpenTelemetryのnoop tracerを設定
@@ -401,12 +401,12 @@ func TestToggleAnalysisUseCase_ProductionEnvironment(t *testing.T) {
 			ownerUserID,
 			clock.Now(ctx),
 			clock.Now(ctx).Add(time.Hour*24),
-			nil,                // location
+			nil,             // location
 			lo.ToPtr("渋谷区"), // city
 			lo.ToPtr("東京都"), // prefecture
-			false,              // hideTop
-			nil,                // organizationID
-			nil,                // organizationAliasID
+			false,           // hideTop
+			nil,             // organizationID
+			nil,             // organizationAliasID
 			nil,
 		)
 		if err := talkSessionRepo.Create(ctx, talkSession); err != nil {

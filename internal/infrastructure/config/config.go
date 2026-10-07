@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/caarlos0/env/v11"
 	"github.com/neko-dream/api/pkg/utils"
+	"net/url"
 )
 
 type Config struct {
@@ -98,6 +99,26 @@ func (e ENV) Validate() error {
 	default:
 		return fmt.Errorf("ENV must be production, development or local; got %q", e)
 	}
+}
+
+// BrowserOrigins is shared by credentialed CORS and email-login CSRF checks.
+// No arbitrary HTTPS hosts, wildcard previews, or unknown environments are trusted.
+func (c *Config) BrowserOrigins() []string {
+	if c == nil || c.Env.Validate() != nil {
+		return nil
+	}
+	var origins []string
+	for _, base := range []string{c.WEBSITE_URL, c.EMAIL_VERIFICATION_BASE_URL} {
+		u, err := url.Parse(base)
+		if err == nil && u.Scheme == "https" && u.Host != "" && u.User == nil && u.RawQuery == "" && u.Fragment == "" {
+			origins = append(origins, u.Scheme+"://"+u.Host)
+		}
+	}
+	// Both production Web domains are routed to the same app, not redirected.
+	if c.Env == PROD && c.WEBSITE_URL == "https://www.kotohiro.com" {
+		origins = append(origins, "https://kotohiro.com")
+	}
+	return origins
 }
 
 func LoadConfig() *Config {

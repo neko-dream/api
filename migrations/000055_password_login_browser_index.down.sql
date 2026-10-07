@@ -1,0 +1,1 @@
+DROP INDEX password_login_challenges_browser_hash_idx;

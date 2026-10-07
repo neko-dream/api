@@ -251,6 +251,9 @@ func (p *passwordLoginInteractor) VerifyPIN(ctx context.Context, pin, browserSec
 			return nil
 		}
 		consumed, err := p.challenges.Consume(ctx, challenge.TokenHash, browserHash, clock.Now(ctx))
+		if errors.Is(err, sql.ErrNoRows) {
+			return messages.InvalidEmailLoginPINError
+		}
 		if err != nil {
 			return err
 		}
@@ -289,7 +292,7 @@ func (p *passwordLoginInteractor) completeEmailLogin(ctx context.Context, challe
 		return "", err
 	}
 	// Existing password-login policy; shared-account concurrent sessions are #319.
-	if err := p.SessionService.DeactivateUserSessions(ctx, usr.UserID()); err != nil {
+	if err := p.SessionRepository.DeactivateAllByUserID(ctx, usr.UserID()); err != nil {
 		return "", err
 	}
 	sess := session.NewSession(shared.NewUUID[session.Session](), usr.UserID(), usr.Provider(), session.SESSION_ACTIVE, *session.NewExpiresAt(ctx), clock.Now(ctx))

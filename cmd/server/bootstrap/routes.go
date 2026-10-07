@@ -2,6 +2,7 @@ package bootstrap
 
 import (
 	"net/http"
+	"slices"
 
 	"github.com/neko-dream/api/internal/infrastructure/di"
 	"github.com/neko-dream/api/internal/infrastructure/http/middleware"
@@ -55,22 +56,43 @@ func (b *Bootstrap) setupAPIHandler() http.Handler {
 		panic(err) // 初期化エラーは致命的
 	}
 
-	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"https://*", "http://localhost:3000"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"*"},
-		AllowCredentials: true,
-	})
+	c := b.apiCORS()
 
 	routeFinder := middleware.MakeRouteFinder(srv)
 	tracerProvider := di.Invoke[trace.TracerProvider](b.container)
 
-	return c.Handler(middleware.Wrap(
+	return c.Handler(b.browserOriginGuard(middleware.Wrap(
 		srv,
 		middleware.Instrument("kotohiro-api", routeFinder, tracerProvider),
 		middleware.SetContextCookieKey(b.container),
 		middleware.Labeler(routeFinder),
-	))
+	)))
+}
+
+// CORS protects response reads, not simple cross-site form writes. Reject
+// untrusted browser origins for mutations as well, including SameSite=None dev.
+func (b *Bootstrap) browserOriginGuard(next http.Handler) http.Handler {
+	origins := b.config.BrowserOrigins()
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete:
+			if origin := r.Header.Get("Origin"); origin != "" && !slices.Contains(origins, origin) {
+				http.Error(w, "Forbidden origin", http.StatusForbidden)
+				return
+			}
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (b *Bootstrap) apiCORS() *cors.Cors {
+	origins := b.config.BrowserOrigins()
+	return cors.New(cors.Options{
+		AllowedOriginFunc: func(origin string) bool { return slices.Contains(origins, origin) },
+		AllowedMethods:    []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:    []string{"*"},
+		AllowCredentials:  true,
+	})
 }
 
 // getAdminRoutes 管理画面のルート定義を返す

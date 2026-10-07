@@ -124,9 +124,8 @@ func (a *authHandler) validateEmailLoginOrigin(ctx context.Context) error {
 	if origin == "" {
 		return nil
 	}
-	for _, base := range []string{a.cfg.WEBSITE_URL, a.cfg.EMAIL_VERIFICATION_BASE_URL} {
-		u, err := url.Parse(base)
-		if err == nil && u.Scheme == "https" && u.Host != "" && origin == u.Scheme+"://"+u.Host {
+	for _, allowed := range a.cfg.BrowserOrigins() {
+		if origin == allowed {
 			return nil
 		}
 	}
