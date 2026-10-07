@@ -42,16 +42,15 @@ CI では `MAIL_TEST_DATABASE_URL`、`MAIL_TEST_SMTP_ADDR`、
 
 ### デプロイ前の送信元設定
 
-dev / prd の API タスク定義は、それぞれの既存のアプリケーション用
-Secrets Manager シークレットの JSON キー `EMAIL_FROM` を注入する。
-参照するシークレットの ARN は SSM の `/kotohiro-dev-app-secret/arn` と
-`/kotohiro-prd-app-secret/arn` で解決する。
+dev / prd の API タスク定義の `environment` に
+`EMAIL_FROM=noreply@kotohiro.com` を設定する。送信元アドレスは秘密情報では
+ないため、Secrets Manager に `EMAIL_FROM` キーを追加する必要はない。
 
-タスク定義をデプロイする前に、両環境のシークレットに `EMAIL_FROM` キーが
-存在し、その値が API の利用リージョンで SES 検証済みの送信元アドレスであることを
-確認する。実際の送信元アドレスを仮の値で代用しない。
-キーが存在しない場合、ECS はシークレットを注入できず、タスク起動に失敗する。
-このリポジトリの変更だけではシークレットの値や SES の設定は変更されない。
+2026-10-08 に admin プロファイルで東京リージョン（`ap-northeast-1`）の
+SES を照会し、`noreply@kotohiro.com` が検証済み（`SUCCESS`）かつ
+送信可能（`SendingEnabled=true`）であることを確認した。
+送信元や AWS アカウント・リージョンを変更する場合は検証状態を再確認する。
+このリポジトリの変更だけでは ECS の稼働中タスクや SES の設定は変更されない。
 
 ### 残課題
 

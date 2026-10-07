@@ -38,15 +38,15 @@
 					"value": "kotohiro"
 				},
 				{
+					"name": "EMAIL_FROM",
+					"value": "noreply@kotohiro.com"
+				},
+				{
 					"name": "WEBSITE_URL",
 					"value": "https://kotohiro.com"
 				}
 			],
 			"secrets": [
-				{
-					"name": "EMAIL_FROM",
-					"valueFrom": "{{ ssm `/kotohiro-prd-app-secret/arn` }}:EMAIL_FROM::"
-				},
 				{
 					"name": "DATABASE_URL",
 					"valueFrom": "{{ ssm `/kotohiro-prd-app-secret/arn` }}:DATABASE_URL::"
