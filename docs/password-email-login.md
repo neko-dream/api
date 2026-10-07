@@ -22,7 +22,7 @@ ENV=local go run ./cmd/local-email-account city-login@localhost.test local-email
 
 1. `https://localhost:3000/` の「自治体・組織の方はこちら」から
    `https://localhost:3000/organization/login` を開く。
-2. 利用規約への同意を選び、アカウントとパスワードを入力してログインする。
+2. 配布されたアカウントのメールアドレスとパスワードを入力してログインする。
 3. 同じブラウザで `http://localhost:8025` を開き、Mailpitのメールを確認する。
 4. メールのリンクを開き、「ログインを確認する」を押す。
    リンクを開けない場合は、元の確認待ち画面にメールの6桁PINを入力し「PINで確認する」を押す。
