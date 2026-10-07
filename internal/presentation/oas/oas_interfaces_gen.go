@@ -317,6 +317,14 @@ type ValidateOrganizationCodeRes interface {
 	validateOrganizationCodeRes()
 }
 
+type VerifyPasswordEmailPINRes interface {
+	verifyPasswordEmailPINRes()
+}
+
+type VerifyPasswordEmailRes interface {
+	verifyPasswordEmailRes()
+}
+
 type Vote2Res interface {
 	vote2Res()
 }

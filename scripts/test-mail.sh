@@ -8,4 +8,4 @@ docker compose -p kotohiro-local -f compose.local.yaml up -d --wait db mailpit
 export MAIL_TEST_DATABASE_URL='postgres://kotohiro:kotohiro@127.0.0.1:5433/kotohiro?sslmode=disable'
 export MAIL_TEST_SMTP_ADDR='127.0.0.1:1025'
 export MAIL_TEST_HTTP_URL='http://127.0.0.1:8025'
-go test -race -count=1 ./internal/infrastructure/email/... ./internal/infrastructure/external/aws/ses ./internal/domain/service/organization
+go test -race -count=1 ./internal/infrastructure/email/... ./internal/infrastructure/external/aws/ses ./internal/domain/service/organization ./internal/application/usecase/auth_usecase ./internal/presentation/handler

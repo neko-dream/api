@@ -13,6 +13,20 @@ func mailConfig() *config.Config {
 	return &config.Config{EMAIL_FROM: "ことひろ <noreply@example.com>", APP_NAME: "ことひろ", WEBSITE_URL: "https://example.com"}
 }
 
+func TestRenderPasswordLoginPIN(t *testing.T) {
+	for _, pin := range []any{"000001", "", "12345", "1234567", "１２３４５６", 123456, nil} {
+		data := map[string]any{"Title": "ログインの本人確認", "VerificationURL": "https://example.com/verify#token", "ExpiryMinutes": 15, "PIN": pin}
+		m, err := RenderMessage(mailConfig(), "user@example.com", email_template.PasswordLoginEmailTemplate, data)
+		if pin == "000001" {
+			if err != nil || !strings.Contains(m.HTML, "000001") || !strings.Contains(m.HTML, "15") {
+				t.Fatal("missing login PIN", err)
+			}
+		} else if err == nil {
+			t.Fatalf("invalid PIN accepted: %v", pin)
+		}
+	}
+}
+
 func verificationData() map[string]any {
 	return map[string]any{"Title": "メールの確認", "VerificationURL": "https://example.com/verify?token=one&next=two", "ExpiryHours": 1}
 }

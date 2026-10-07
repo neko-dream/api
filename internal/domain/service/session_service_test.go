@@ -122,10 +122,12 @@ func TestSessionService_DeactivateUserSessions(t *testing.T) {
 		err := svc.DeactivateUserSessions(ctx, userID)
 		require.NoError(t, err)
 
-		// 実行後は無効化されている
-		// Note: DeactivateUserSessionsはリポジトリから取得したセッションを無効化するが、
-		// リポジトリへの永続化は行わない（sess.Deactivateを呼ぶだけ）
-		// これは実装の問題かもしれないが、現状の挙動をテストする
+		stored1, err := repo.FindBySessionID(ctx, sess1.SessionID())
+		require.NoError(t, err)
+		stored2, err := repo.FindBySessionID(ctx, sess2.SessionID())
+		require.NoError(t, err)
+		assert.False(t, stored1.IsActive(ctx), "永続化されたsess1も無効であるべき")
+		assert.False(t, stored2.IsActive(ctx), "永続化されたsess2も無効であるべき")
 	})
 
 	t.Run("セッションが存在しない場合もエラーにならない", func(t *testing.T) {
@@ -140,7 +142,7 @@ func TestSessionService_DeactivateUserSessions(t *testing.T) {
 
 	t.Run("リポジトリエラーの場合はエラーを返す", func(t *testing.T) {
 		repo := newFakeSessionRepository()
-		repo.findByUserIDError = errors.New("database error")
+		repo.deactivateAllByUserIDErr = errors.New("database error")
 		svc := NewSessionService(repo)
 
 		userID := shared.NewUUID[user.User]()

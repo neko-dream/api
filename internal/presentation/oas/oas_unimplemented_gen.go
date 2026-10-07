@@ -573,9 +573,18 @@ func (UnimplementedHandler) OpinionsHistory(ctx context.Context, params Opinions
 	return r, ht.ErrNotImplemented
 }
 
+// PasswordEmailConfirmation implements passwordEmailConfirmation operation.
+//
+// GETではリンクを消費しない。ログインを開始したブラウザで確認ボタンを押す。.
+//
+// GET /auth/password/verify
+func (UnimplementedHandler) PasswordEmailConfirmation(ctx context.Context) (r PasswordEmailConfirmationOK, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // PasswordLogin implements passwordLogin operation.
 //
-// パスワードによるログイン.
+// パスワードを確認し、ログインごとのメール本人確認を開始する.
 //
 // POST /auth/password/login
 func (UnimplementedHandler) PasswordLogin(ctx context.Context, req *PasswordLoginReq) (r PasswordLoginRes, _ error) {
@@ -812,6 +821,24 @@ func (UnimplementedHandler) UpdateUserProfile(ctx context.Context, req *UpdateUs
 //
 // GET /organization/{code}/validate
 func (UnimplementedHandler) ValidateOrganizationCode(ctx context.Context, params ValidateOrganizationCodeParams) (r ValidateOrganizationCodeRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// VerifyPasswordEmail implements verifyPasswordEmail operation.
+//
+// メール本人確認を完了し、初めてログインCookieを発行する.
+//
+// POST /auth/password/verify
+func (UnimplementedHandler) VerifyPasswordEmail(ctx context.Context, req *VerifyPasswordEmailReq) (r VerifyPasswordEmailRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// VerifyPasswordEmailPIN implements verifyPasswordEmailPIN operation.
+//
+// メールの6桁PINで本人確認を完了する.
+//
+// POST /auth/password/verify-pin
+func (UnimplementedHandler) VerifyPasswordEmailPIN(ctx context.Context, req *VerifyPasswordEmailPINReq) (r VerifyPasswordEmailPINRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

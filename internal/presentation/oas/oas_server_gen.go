@@ -84,9 +84,15 @@ type AuthHandler interface {
 	//
 	// GET /auth/{provider}/callback
 	HandleAuthCallback(ctx context.Context, params HandleAuthCallbackParams) (HandleAuthCallbackRes, error)
+	// PasswordEmailConfirmation implements passwordEmailConfirmation operation.
+	//
+	// GETではリンクを消費しない。ログインを開始したブラウザで確認ボタンを押す。.
+	//
+	// GET /auth/password/verify
+	PasswordEmailConfirmation(ctx context.Context) (PasswordEmailConfirmationOK, error)
 	// PasswordLogin implements passwordLogin operation.
 	//
-	// パスワードによるログイン.
+	// パスワードを確認し、ログインごとのメール本人確認を開始する.
 	//
 	// POST /auth/password/login
 	PasswordLogin(ctx context.Context, req *PasswordLoginReq) (PasswordLoginRes, error)
@@ -108,6 +114,18 @@ type AuthHandler interface {
 	//
 	// POST /auth/revoke
 	RevokeToken(ctx context.Context) (RevokeTokenRes, error)
+	// VerifyPasswordEmail implements verifyPasswordEmail operation.
+	//
+	// メール本人確認を完了し、初めてログインCookieを発行する.
+	//
+	// POST /auth/password/verify
+	VerifyPasswordEmail(ctx context.Context, req *VerifyPasswordEmailReq) (VerifyPasswordEmailRes, error)
+	// VerifyPasswordEmailPIN implements verifyPasswordEmailPIN operation.
+	//
+	// メールの6桁PINで本人確認を完了する.
+	//
+	// POST /auth/password/verify-pin
+	VerifyPasswordEmailPIN(ctx context.Context, req *VerifyPasswordEmailPINReq) (VerifyPasswordEmailPINRes, error)
 }
 
 // HealthHandler handles operations described by OpenAPI v3 specification.

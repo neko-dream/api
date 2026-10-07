@@ -11,6 +11,7 @@ import (
 	"github.com/neko-dream/api/internal/domain/model/shared"
 	"github.com/neko-dream/api/internal/domain/model/user"
 	"github.com/neko-dream/api/internal/domain/service"
+	"github.com/neko-dream/api/internal/infrastructure/config"
 	"github.com/neko-dream/api/internal/infrastructure/http/cookie"
 	"github.com/neko-dream/api/internal/presentation/oas"
 	cookie_utils "github.com/neko-dream/api/pkg/cookie"
@@ -34,6 +35,7 @@ type authHandler struct {
 	guestLogin       auth_usecase.GuestLogin
 
 	authorizationService service.AuthorizationService
+	cfg                  *config.Config
 	cookie.CookieManager
 }
 
@@ -52,6 +54,7 @@ func NewAuthHandler(
 
 	authorizationService service.AuthorizationService,
 	cookieManger cookie.CookieManager,
+	cfg *config.Config,
 ) oas.AuthHandler {
 	return &authHandler{
 		AuthLogin:            authLogin,
@@ -62,6 +65,7 @@ func NewAuthHandler(
 		guestLogin:           guestLogin,
 		authorizationService: authorizationService,
 		CookieManager:        cookieManger,
+		cfg:                  cfg,
 		passwordLogin:        login,
 		passwordRegister:     register,
 		changePassword:       changePassword,
@@ -249,6 +253,9 @@ func (a *authHandler) PasswordLogin(ctx context.Context, req *oas.PasswordLoginR
 	ctx, span := otel.Tracer("handler").Start(ctx, "authHandler.PasswordLogin")
 	defer span.End()
 
+	if err := a.validateEmailLoginOrigin(ctx); err != nil {
+		return nil, err
+	}
 	out, err := a.passwordLogin.Execute(ctx, auth_usecase.PasswordLoginInput{
 		IDorEmail: req.IdOrEmail,
 		Password:  req.Password,
@@ -257,9 +264,17 @@ func (a *authHandler) PasswordLogin(ctx context.Context, req *oas.PasswordLoginR
 		return nil, err
 	}
 
-	res := http_utils.GetHTTPResponse(ctx)
-	res.Header().Set("Set-Cookie", cookie_utils.EncodeCookies([]*http.Cookie{a.CookieManager.CreateSessionCookie(out.Token)})[0])
-	return &oas.PasswordLoginOK{}, nil
+	pending := a.CookieManager.CreateSessionCookie(out.BrowserSecret)
+	pending.Name = passwordLoginPendingCookie
+	// __Host- prevents other subdomains from planting a login-binding cookie.
+	pending.Domain = ""
+	pending.MaxAge = int(auth_usecase.EmailLoginTTL.Seconds())
+	pending.Expires = out.ExpiresAt
+	setEmailLoginSecurityHeaders(http_utils.GetHTTPResponse(ctx))
+	return &oas.PasswordLoginAcceptedHeaders{
+		SetCookie: cookie_utils.EncodeCookies([]*http.Cookie{pending}),
+		Response:  oas.PasswordLoginAccepted{VerificationRequired: oas.PasswordLoginAcceptedVerificationRequiredTrue, ExpiresAt: out.ExpiresAt},
+	}, nil
 }
 
 // PasswordRegister

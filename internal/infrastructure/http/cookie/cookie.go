@@ -15,17 +15,32 @@ const (
 
 type CookieManager struct {
 	config   *config.Config
+	domain   string
 	secure   bool
 	sameSite http.SameSite
 }
 
 func NewCookieManager(
-	config *config.Config,
+	cfg *config.Config,
 ) CookieManager {
+	// dev環境ではフロントエンド(kotohiro.workers.dev)がAPI(*.kotohiro.com)に対して
+	// クロスサイトになるため、SameSite=NoneにしないとCookieが送信されない。
+	sameSite := http.SameSiteLaxMode
+	if cfg.Env == config.DEV {
+		sameSite = http.SameSiteNoneMode
+	}
+	// Local requests are proxied through the Web origin. Host-only cookies
+	// work on localhost without depending on a shared domain or hosts entries.
+	domain := "." + cfg.DOMAIN
+	if cfg.Env == config.LOCAL {
+		domain = ""
+	}
+
 	return CookieManager{
-		config:   config,
+		config:   cfg,
+		domain:   domain,
 		secure:   true,
-		sameSite: http.SameSiteLaxMode,
+		sameSite: sameSite,
 	}
 }
 
@@ -37,7 +52,7 @@ func (cm *CookieManager) CreateSessionCookie(token string) *http.Cookie {
 		Secure:   cm.secure,
 		Path:     "/",
 		SameSite: cm.sameSite,
-		Domain:   "." + cm.config.DOMAIN,
+		Domain:   cm.domain,
 		MaxAge:   SessionMaxAge,
 	}
 }
@@ -49,8 +64,8 @@ func (cm *CookieManager) CreateRevokeCookie() *http.Cookie {
 		HttpOnly: true,
 		Secure:   cm.secure,
 		Path:     "/",
-		SameSite: http.SameSiteLaxMode,
-		Domain:   "." + cm.config.DOMAIN,
+		SameSite: cm.sameSite,
+		Domain:   cm.domain,
 		MaxAge:   -1,
 	}
 }
@@ -63,7 +78,7 @@ func (cm *CookieManager) CreateGuestSessionCookie(token string) *http.Cookie {
 		Secure:   cm.secure,
 		Path:     "/",
 		SameSite: cm.sameSite,
-		Domain:   "." + cm.config.DOMAIN,
+		Domain:   cm.domain,
 		MaxAge:   GuestSessionMaxAge,
 	}
 }

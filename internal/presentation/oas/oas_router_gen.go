@@ -221,6 +221,49 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							return
 						}
 
+					case 'v': // Prefix: "verify"
+
+						if l := len("verify"); len(elem) >= l && elem[0:l] == "verify" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							switch r.Method {
+							case "GET":
+								s.handlePasswordEmailConfirmationRequest([0]string{}, elemIsEscaped, w, r)
+							case "POST":
+								s.handleVerifyPasswordEmailRequest([0]string{}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "GET,POST")
+							}
+
+							return
+						}
+						switch elem[0] {
+						case '-': // Prefix: "-pin"
+
+							if l := len("-pin"); len(elem) >= l && elem[0:l] == "-pin" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch r.Method {
+								case "POST":
+									s.handleVerifyPasswordEmailPINRequest([0]string{}, elemIsEscaped, w, r)
+								default:
+									s.notAllowed(w, r, "POST")
+								}
+
+								return
+							}
+
+						}
+
 					}
 
 					elem = origElem
@@ -2386,7 +2429,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							switch method {
 							case "POST":
 								r.name = PasswordLoginOperation
-								r.summary = "パスワードによるログイン"
+								r.summary = "パスワードを確認し、ログインごとのメール本人確認を開始する"
 								r.operationID = "passwordLogin"
 								r.pathPattern = "/auth/password/login"
 								r.args = args
@@ -2419,6 +2462,63 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							default:
 								return
 							}
+						}
+
+					case 'v': // Prefix: "verify"
+
+						if l := len("verify"); len(elem) >= l && elem[0:l] == "verify" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							switch method {
+							case "GET":
+								r.name = PasswordEmailConfirmationOperation
+								r.summary = "メール本人確認ページ（リンクはURLフラグメントに格納）"
+								r.operationID = "passwordEmailConfirmation"
+								r.pathPattern = "/auth/password/verify"
+								r.args = args
+								r.count = 0
+								return r, true
+							case "POST":
+								r.name = VerifyPasswordEmailOperation
+								r.summary = "メール本人確認を完了し、初めてログインCookieを発行する"
+								r.operationID = "verifyPasswordEmail"
+								r.pathPattern = "/auth/password/verify"
+								r.args = args
+								r.count = 0
+								return r, true
+							default:
+								return
+							}
+						}
+						switch elem[0] {
+						case '-': // Prefix: "-pin"
+
+							if l := len("-pin"); len(elem) >= l && elem[0:l] == "-pin" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch method {
+								case "POST":
+									r.name = VerifyPasswordEmailPINOperation
+									r.summary = "メールの6桁PINで本人確認を完了する"
+									r.operationID = "verifyPasswordEmailPIN"
+									r.pathPattern = "/auth/password/verify-pin"
+									r.args = args
+									r.count = 0
+									return r, true
+								default:
+									return
+								}
+							}
+
 						}
 
 					}

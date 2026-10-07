@@ -68,6 +68,7 @@ const (
 	ManageRegenerateManageOperation             OperationName = "ManageRegenerateManage"
 	OpinionComments2Operation                   OperationName = "OpinionComments2"
 	OpinionsHistoryOperation                    OperationName = "OpinionsHistory"
+	PasswordEmailConfirmationOperation          OperationName = "PasswordEmailConfirmation"
 	PasswordLoginOperation                      OperationName = "PasswordLogin"
 	PasswordRegisterOperation                   OperationName = "PasswordRegister"
 	PolicyConsentOperation                      OperationName = "PolicyConsent"
@@ -94,6 +95,8 @@ const (
 	UpdateTalkSessionSurveyOperation            OperationName = "UpdateTalkSessionSurvey"
 	UpdateUserProfileOperation                  OperationName = "UpdateUserProfile"
 	ValidateOrganizationCodeOperation           OperationName = "ValidateOrganizationCode"
+	VerifyPasswordEmailOperation                OperationName = "VerifyPasswordEmail"
+	VerifyPasswordEmailPINOperation             OperationName = "VerifyPasswordEmailPIN"
 	Vote2Operation                              OperationName = "Vote2"
 	WithdrawUserOperation                       OperationName = "WithdrawUser"
 )
