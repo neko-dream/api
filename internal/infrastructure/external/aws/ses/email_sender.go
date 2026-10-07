@@ -1,7 +1,6 @@
 package ses
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 
@@ -12,22 +11,37 @@ import (
 	email_template "github.com/neko-dream/api/internal/infrastructure/email/template"
 	"github.com/neko-dream/api/internal/infrastructure/external/aws"
 	"github.com/neko-dream/api/pkg/utils"
-	"github.com/samber/lo"
 	"go.opentelemetry.io/otel"
 )
 
 type SESEmailSender struct {
 	*config.Config
-	sesClient *sesv2.Client
+	sesClient SESClient
+}
+
+// SESClient allows delivery tests without AWS credentials or external mail.
+type SESClient interface {
+	SendEmail(context.Context, *sesv2.SendEmailInput, ...func(*sesv2.Options)) (*sesv2.SendEmailOutput, error)
 }
 
 func NewSESEmailSender(
 	cfg *config.Config,
-) email.EmailSender {
-	return &SESEmailSender{
-		Config:    cfg,
-		sesClient: aws.NewSESClient(),
+) (email.EmailSender, error) {
+	if cfg == nil {
+		return nil, fmt.Errorf("email configuration is missing")
 	}
+	awsCfg, err := aws.NewAWSConfig()
+	if err != nil {
+		return nil, fmt.Errorf("initialize SES: %w", err)
+	}
+	return NewSESEmailSenderWithClient(cfg, sesv2.NewFromConfig(awsCfg))
+}
+
+func NewSESEmailSenderWithClient(cfg *config.Config, client SESClient) (email.EmailSender, error) {
+	if cfg == nil || client == nil {
+		return nil, fmt.Errorf("email configuration and SES client are required")
+	}
+	return &SESEmailSender{Config: cfg, sesClient: client}, nil
 }
 
 // Send sends an email using AWS SES.
@@ -39,42 +53,32 @@ func (s *SESEmailSender) Send(
 ) error {
 	ctx, span := otel.Tracer("ses").Start(ctx, "SESEmailSender.Send")
 	defer span.End()
-
-	if to == "" {
-		return fmt.Errorf("メール送信先アドレスが指定されていません")
-	}
-
-	dataWithCommon := email_template.DataWithCommonFields(
-		s.Config,
-		data,
-	)
-	t, err := email_template.LoadMailTemplate(tmpl)
-	if err != nil {
-		utils.HandleError(ctx, err, "LoadMailTemplate")
+	if err := ctx.Err(); err != nil {
 		return err
 	}
 
-	resultBuf := new(bytes.Buffer)
-	if err = t.ExecuteTemplate(resultBuf, string(tmpl), dataWithCommon); err != nil {
-		utils.HandleError(ctx, err, "ExecuteTemplate")
+	message, err := email.RenderMessage(s.Config, to, tmpl, data)
+	if err != nil {
 		return err
 	}
 
 	input := sesv2.SendEmailInput{
-		FromEmailAddress: &s.Config.EMAIL_FROM,
+		FromEmailAddress: &message.From,
 		Destination: &types.Destination{
 			ToAddresses: []string{
-				to,
+				message.To,
 			},
 		},
 		Content: &types.EmailContent{
 			Simple: &types.Message{
 				Subject: &types.Content{
-					Data: lo.ToPtr(data["Title"].(string)),
+					Data:    &message.Subject,
+					Charset: stringPtr("UTF-8"),
 				},
 				Body: &types.Body{
 					Html: &types.Content{
-						Data: lo.ToPtr(resultBuf.String()),
+						Data:    &message.HTML,
+						Charset: stringPtr("UTF-8"),
 					},
 				},
 			},
@@ -84,8 +88,10 @@ func (s *SESEmailSender) Send(
 	_, err = s.sesClient.SendEmail(ctx, &input)
 	if err != nil {
 		utils.HandleError(ctx, err, "SESEmailSender.SendEmail")
-		return err
+		return fmt.Errorf("send email via SES: %w", err)
 	}
 
 	return nil
 }
+
+func stringPtr(value string) *string { return &value }
