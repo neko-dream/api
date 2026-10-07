@@ -58,6 +58,7 @@ type Config struct {
 	POLICY_CREATED_AT string `env:"POLICY_CREATED_AT"`
 
 	EMAIL_FROM  string `env:"EMAIL_FROM"`
+	SMTP_ADDR   string `env:"SMTP_ADDR" envDefault:"127.0.0.1:1025"`
 	APP_NAME    string `env:"APP_NAME"`
 	WEBSITE_URL string `env:"WEBSITE_URL"`
 

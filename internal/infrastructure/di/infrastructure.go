@@ -5,10 +5,10 @@ import (
 	"github.com/neko-dream/api/internal/infrastructure/auth/session"
 	"github.com/neko-dream/api/internal/infrastructure/config"
 	"github.com/neko-dream/api/internal/infrastructure/crypto"
+	"github.com/neko-dream/api/internal/infrastructure/email/delivery"
 	client "github.com/neko-dream/api/internal/infrastructure/external/analysis"
 	"github.com/neko-dream/api/internal/infrastructure/external/aws"
 	"github.com/neko-dream/api/internal/infrastructure/external/aws/pinpoint"
-	"github.com/neko-dream/api/internal/infrastructure/external/aws/ses"
 	"github.com/neko-dream/api/internal/infrastructure/http/cookie"
 	"github.com/neko-dream/api/internal/infrastructure/persistence"
 	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
@@ -56,7 +56,7 @@ func infraDeps() []ProvideArg {
 		{aws.NewAWSConfig, nil},
 		{aws.NewSESClient, nil},
 		{aws.NewPinpointClient, nil},
-		{ses.NewSESEmailSender, nil},
+		{delivery.NewSender, nil},
 		{cookie.NewCookieManager, nil},
 		{crypto.NewEncryptor, nil},
 		{pinpoint.NewPushNotificationSender, nil},

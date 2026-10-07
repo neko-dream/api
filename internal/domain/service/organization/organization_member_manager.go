@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"net/mail"
+	"strings"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/api/internal/domain/messages"
@@ -46,7 +48,11 @@ type organizationMemberManager struct {
 	consentService       consent.ConsentService
 	passwordAuthManager  password_auth.PasswordAuthManager
 	emailSender          email.EmailSender
-	*db.DBManager
+	txRunner             transactionRunner
+}
+
+type transactionRunner interface {
+	ExecTx(context.Context, func(context.Context) error) error
 }
 
 func NewOrganizationMemberManager(
@@ -69,7 +75,7 @@ func NewOrganizationMemberManager(
 		consentService:       consentService,
 		passwordAuthManager:  passwordAuthManager,
 		emailSender:          emailSender,
-		DBManager:            dbManager,
+		txRunner:             dbManager,
 	}
 }
 
@@ -137,6 +143,20 @@ func (s *organizationMemberManager) IsSuperAdmin(ctx context.Context, userID sha
 func (s *organizationMemberManager) InviteUser(ctx context.Context, input InviteUserParams) (*organization.OrganizationUser, error) {
 	ctx, span := otel.Tracer("organization").Start(ctx, "organizationMemberManager.CreateOrganizationUser")
 	defer span.End()
+	// Validate before any DB mutation or email delivery.
+	if strings.ContainsAny(input.Email, "\r\n") {
+		return nil, messages.BadRequestError
+	}
+	address, err := mail.ParseAddress(strings.TrimSpace(input.Email))
+	if err != nil || address.Address != strings.TrimSpace(input.Email) {
+		return nil, messages.BadRequestError
+	}
+	input.Email = address.Address
+	switch input.Role {
+	case organization.OrganizationUserRoleSuperAdmin, organization.OrganizationUserRoleOwner, organization.OrganizationUserRoleAdmin, organization.OrganizationUserRoleMember:
+	default:
+		return nil, messages.OrganizationPermissionDenied
+	}
 
 	// SuperAdminのみがユーザーを作成できる
 	isSuperAdmin, err := s.IsSuperAdmin(ctx, input.UserID)
@@ -149,11 +169,11 @@ func (s *organizationMemberManager) InviteUser(ctx context.Context, input Invite
 	}
 
 	var orgUser *organization.OrganizationUser
-	if err := s.DBManager.ExecTx(ctx, func(ctx context.Context) error {
+	if err := s.txRunner.ExecTx(ctx, func(ctx context.Context) error {
 
 		// 組織取得
 		org, err := s.organizationRepo.FindByID(ctx, input.OrganizationID)
-		if err != nil {
+		if err != nil || org == nil {
 			utils.HandleError(ctx, err, "OrganizationRepository.FindByID")
 			return messages.OrganizationForbidden
 		}
@@ -176,15 +196,22 @@ func (s *organizationMemberManager) InviteUser(ctx context.Context, input Invite
 				return errtrace.Wrap(err)
 			}
 		}
-		pass := password_auth.GeneratePassword(16)
 		if existUser != nil {
-			// 登録済みなので、一旦OK
-			if err := s.passwordAuthManager.UpdatePassword(ctx, existUser.UserID(), pass); err != nil {
-				utils.HandleError(ctx, err, "PasswordAuthManager.RegisterPassword")
+			// Re-inviting must not reset another account's credentials or role.
+			membership, err := s.organizationUserRepo.FindByOrganizationIDAndUserID(ctx, input.OrganizationID, existUser.UserID())
+			if err != nil && !errors.Is(err, sql.ErrNoRows) {
 				return errtrace.Wrap(err)
 			}
-			return s.SendMail(ctx, input.Email, pass, org)
+			if membership == nil {
+				membership = organization.NewOrganizationUser(shared.NewUUID[organization.OrganizationUser](), input.OrganizationID, existUser.UserID(), input.Role)
+				if err := s.organizationUserRepo.Create(ctx, *membership); err != nil {
+					return errtrace.Wrap(err)
+				}
+			}
+			orgUser = membership
+			return s.SendMail(ctx, input.Email, "", org)
 		}
+		pass := password_auth.GeneratePassword(16)
 
 		newUser := user.NewUser(
 			shared.NewUUID[user.User](),
@@ -258,6 +285,7 @@ func (s *organizationMemberManager) SendMail(ctx context.Context, email string, 
 		"Email":            email,
 		"Password":         pass,
 		"InvitationURL":    s.cfg.WEBSITE_URL,
+		"ExistingAccount":  pass == "",
 	}); err != nil {
 		utils.HandleError(ctx, err, "EmailSender.Send")
 		return errtrace.Wrap(err)

@@ -38,6 +38,10 @@
 					"value": "kotohiro"
 				},
 				{
+					"name": "EMAIL_FROM",
+					"value": "noreply@kotohiro.com"
+				},
+				{
 					"name": "WEBSITE_URL",
 					"value": "https://develop.kotohiro.com"
 				}
