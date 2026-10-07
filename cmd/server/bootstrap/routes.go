@@ -88,7 +88,7 @@ func (b *Bootstrap) browserOriginGuard(next http.Handler) http.Handler {
 func (b *Bootstrap) apiCORS() *cors.Cors {
 	origins := b.config.BrowserOrigins()
 	return cors.New(cors.Options{
-		AllowedOriginFunc: func(origin string) bool { return slices.Contains(origins, origin) },
+		AllowOriginFunc: func(origin string) bool { return slices.Contains(origins, origin) },
 		AllowedMethods:    []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:    []string{"*"},
 		AllowCredentials:  true,
