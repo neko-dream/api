@@ -7,6 +7,7 @@ on:
 
 
 permissions:
+    contents: read         # checkout でリポジトリを読み取る権限
     pull-requests: write   # Pull Request作成・変更権限
 
 jobs:
