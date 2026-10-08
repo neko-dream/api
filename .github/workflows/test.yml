@@ -80,6 +80,9 @@ jobs:
       - name: Install dependencies
         run: go mod download
 
+      - name: Test email login and delivery with race detector
+        run: go test -race -count=1 ./internal/application/usecase/auth_usecase ./internal/presentation/handler ./internal/infrastructure/email/... ./internal/infrastructure/external/aws/ses
+
       - name: Run unit tests with coverage
         run: |
           go test -parallel 2 -v -coverprofile=coverage.out.tmp ./...

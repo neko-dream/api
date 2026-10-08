@@ -68,7 +68,7 @@ func NewPasswordRegister(
 func (p *passwordRegisterInteractor) Execute(ctx context.Context, input PasswordRegisterInput) (*PasswordRegisterOutput, error) {
 	ctx, span := otel.Tracer("auth_command").Start(ctx, "passwordRegisterInteractor.Execute")
 	defer span.End()
-	if p.cfg.Env == config.PROD {
+	if !p.cfg.Env.AllowsDevelopmentAuthentication() {
 		return nil, messages.InternalServerError
 	}
 

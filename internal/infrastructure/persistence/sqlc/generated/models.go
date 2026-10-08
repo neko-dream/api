@@ -194,6 +194,18 @@ type PasswordAuth struct {
 	UpdatedAt              time.Time
 }
 
+type PasswordLoginChallenge struct {
+	UserID         uuid.UUID
+	TokenHash      []byte
+	BrowserHash    []byte
+	CredentialHash []byte
+	CreatedAt      time.Time
+	ExpiresAt      time.Time
+	ConsumedAt     sql.NullTime
+	PinHash        []byte
+	PinAttempts    int32
+}
+
 type PolicyConsent struct {
 	PolicyConsentID uuid.UUID
 	UserID          uuid.UUID

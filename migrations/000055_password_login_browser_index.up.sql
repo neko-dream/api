@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX password_login_challenges_browser_hash_idx ON password_login_challenges (browser_hash);

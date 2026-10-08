@@ -65,7 +65,7 @@ func (a *loginForDevInteractor) Execute(ctx context.Context, input LoginForDevIn
 	ctx, span := otel.Tracer("auth_usecase").Start(ctx, "loginForDevInteractor.Execute")
 	defer span.End()
 
-	if a.Config.Env == config.PROD {
+	if !a.Config.Env.AllowsDevelopmentAuthentication() {
 		utils.HandleError(ctx, errtrace.New("このエンドポイントは開発でのみ有効です。"), "failed to login for dev")
 		return LoginForDevOutput{}, errtrace.New("このエンドポイントは開発でのみ有効です。")
 	}

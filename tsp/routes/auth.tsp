@@ -229,14 +229,24 @@ namespace kotohiro {
   @extension("x-ogen-operation-group", "Auth")
   @route("/auth/password/login")
   @post
-  @summary("パスワードによるログイン")
+  @summary("パスワードを確認し、ログインごとのメール本人確認を開始する")
   @useAuth([])
   op passwordLogin(
     @multipartBody body: {
       idOrEmail: HttpPart<string>;
       password: HttpPart<string>;
     },
-  ): Body<{}> | {
+  ): {
+    @statusCode statusCode: 202;
+    @header("Set-Cookie") SetCookie: string[];
+    @body body: { verificationRequired: true; expiresAt: utcDateTime; };
+  } | {
+    @statusCode statusCode: 401;
+    @body body: { code: string; message: string; };
+  } | {
+    @statusCode statusCode: 429;
+    @body body: { code: string; message: string; };
+  } | {
     @statusCode statusCode: 400;
     @body body: {};
   } | {
@@ -244,6 +254,57 @@ namespace kotohiro {
     @body body: {};
   };
 
+  /** GETではリンクを消費しない。ログインを開始したブラウザで確認ボタンを押す。 */
+  @tag("auth")
+  @extension("x-ogen-operation-group", "Auth")
+  @route("/auth/password/verify")
+  @get
+  @useAuth([])
+  @summary("メール本人確認ページ（リンクはURLフラグメントに格納）")
+  op passwordEmailConfirmation(): {
+    @statusCode statusCode: 200;
+    @header contentType: "text/html; charset=utf-8";
+    @body body: string;
+  };
+
+  @tag("auth")
+  @extension("x-ogen-operation-group", "Auth")
+  @route("/auth/password/verify")
+  @post
+  @useAuth([])
+  @summary("メール本人確認を完了し、初めてログインCookieを発行する")
+  op verifyPasswordEmail(@body body: { token: string; }): {
+    @statusCode statusCode: 200;
+    @header("Set-Cookie") SetCookie: string[];
+    @body body: { redirectURL: string; };
+  } | {
+    @statusCode statusCode: 400;
+    @body body: { code: string; message: string; };
+  } | {
+    @statusCode statusCode: 500;
+    @body body: { code: string; message: string; };
+  };
+
+  @tag("auth")
+  @extension("x-ogen-operation-group", "Auth")
+  @route("/auth/password/verify-pin")
+  @post
+  @useAuth([])
+  @summary("メールの6桁PINで本人確認を完了する")
+  op verifyPasswordEmailPIN(@body body: { pin: string; }): {
+    @statusCode statusCode: 200;
+    @header("Set-Cookie") SetCookie: string[];
+    @body body: { redirectURL: string; };
+  } | {
+    @statusCode statusCode: 400;
+    @body body: { code: string; message: string; };
+  } | {
+    @statusCode statusCode: 429;
+    @body body: { code: string; message: string; };
+  } | {
+    @statusCode statusCode: 500;
+    @body body: { code: string; message: string; };
+  };
   @tag("auth")
   @extension("x-ogen-operation-group", "Auth")
   @route("/auth/password/register")

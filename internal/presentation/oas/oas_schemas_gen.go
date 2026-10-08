@@ -3,6 +3,7 @@
 package oas
 
 import (
+	"io"
 	"net/url"
 	"time"
 
@@ -5244,6 +5245,86 @@ func (s *OrganizationUser) SetRoleName(val string) {
 	s.RoleName = val
 }
 
+type PasswordEmailConfirmationOK struct {
+	Data io.Reader
+}
+
+// Read reads data from the Data reader.
+//
+// Kept to satisfy the io.Reader interface.
+func (s PasswordEmailConfirmationOK) Read(p []byte) (n int, err error) {
+	if s.Data == nil {
+		return 0, io.EOF
+	}
+	return s.Data.Read(p)
+}
+
+type PasswordLoginAccepted struct {
+	VerificationRequired PasswordLoginAcceptedVerificationRequired `json:"verificationRequired"`
+	ExpiresAt            time.Time                                 `json:"expiresAt"`
+}
+
+// GetVerificationRequired returns the value of VerificationRequired.
+func (s *PasswordLoginAccepted) GetVerificationRequired() PasswordLoginAcceptedVerificationRequired {
+	return s.VerificationRequired
+}
+
+// GetExpiresAt returns the value of ExpiresAt.
+func (s *PasswordLoginAccepted) GetExpiresAt() time.Time {
+	return s.ExpiresAt
+}
+
+// SetVerificationRequired sets the value of VerificationRequired.
+func (s *PasswordLoginAccepted) SetVerificationRequired(val PasswordLoginAcceptedVerificationRequired) {
+	s.VerificationRequired = val
+}
+
+// SetExpiresAt sets the value of ExpiresAt.
+func (s *PasswordLoginAccepted) SetExpiresAt(val time.Time) {
+	s.ExpiresAt = val
+}
+
+// PasswordLoginAcceptedHeaders wraps PasswordLoginAccepted with response headers.
+type PasswordLoginAcceptedHeaders struct {
+	SetCookie []string
+	Response  PasswordLoginAccepted
+}
+
+// GetSetCookie returns the value of SetCookie.
+func (s *PasswordLoginAcceptedHeaders) GetSetCookie() []string {
+	return s.SetCookie
+}
+
+// GetResponse returns the value of Response.
+func (s *PasswordLoginAcceptedHeaders) GetResponse() PasswordLoginAccepted {
+	return s.Response
+}
+
+// SetSetCookie sets the value of SetCookie.
+func (s *PasswordLoginAcceptedHeaders) SetSetCookie(val []string) {
+	s.SetCookie = val
+}
+
+// SetResponse sets the value of Response.
+func (s *PasswordLoginAcceptedHeaders) SetResponse(val PasswordLoginAccepted) {
+	s.Response = val
+}
+
+func (*PasswordLoginAcceptedHeaders) passwordLoginRes() {}
+
+type PasswordLoginAcceptedVerificationRequired bool
+
+const (
+	PasswordLoginAcceptedVerificationRequiredTrue PasswordLoginAcceptedVerificationRequired = true
+)
+
+// AllValues returns all PasswordLoginAcceptedVerificationRequired values.
+func (PasswordLoginAcceptedVerificationRequired) AllValues() []PasswordLoginAcceptedVerificationRequired {
+	return []PasswordLoginAcceptedVerificationRequired{
+		PasswordLoginAcceptedVerificationRequiredTrue,
+	}
+}
+
 type PasswordLoginBadRequest struct{}
 
 func (*PasswordLoginBadRequest) passwordLoginRes() {}
@@ -5251,10 +5332,6 @@ func (*PasswordLoginBadRequest) passwordLoginRes() {}
 type PasswordLoginInternalServerError struct{}
 
 func (*PasswordLoginInternalServerError) passwordLoginRes() {}
-
-type PasswordLoginOK struct{}
-
-func (*PasswordLoginOK) passwordLoginRes() {}
 
 type PasswordLoginReq struct {
 	IdOrEmail string `json:"idOrEmail"`
@@ -5280,6 +5357,60 @@ func (s *PasswordLoginReq) SetIdOrEmail(val string) {
 func (s *PasswordLoginReq) SetPassword(val string) {
 	s.Password = val
 }
+
+type PasswordLoginTooManyRequests struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *PasswordLoginTooManyRequests) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *PasswordLoginTooManyRequests) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *PasswordLoginTooManyRequests) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *PasswordLoginTooManyRequests) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*PasswordLoginTooManyRequests) passwordLoginRes() {}
+
+type PasswordLoginUnauthorized struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *PasswordLoginUnauthorized) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *PasswordLoginUnauthorized) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *PasswordLoginUnauthorized) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *PasswordLoginUnauthorized) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*PasswordLoginUnauthorized) passwordLoginRes() {}
 
 type PasswordRegisterBadRequest struct{}
 
@@ -9080,6 +9211,253 @@ func (s *ValidateOrganizationCodeOK) SetOrganization(val OptOrganization) {
 }
 
 func (*ValidateOrganizationCodeOK) validateOrganizationCodeRes() {}
+
+type VerifyPasswordEmailBadRequest struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *VerifyPasswordEmailBadRequest) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *VerifyPasswordEmailBadRequest) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *VerifyPasswordEmailBadRequest) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *VerifyPasswordEmailBadRequest) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*VerifyPasswordEmailBadRequest) verifyPasswordEmailRes() {}
+
+type VerifyPasswordEmailInternalServerError struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *VerifyPasswordEmailInternalServerError) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *VerifyPasswordEmailInternalServerError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *VerifyPasswordEmailInternalServerError) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *VerifyPasswordEmailInternalServerError) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*VerifyPasswordEmailInternalServerError) verifyPasswordEmailRes() {}
+
+type VerifyPasswordEmailOK struct {
+	RedirectURL string `json:"redirectURL"`
+}
+
+// GetRedirectURL returns the value of RedirectURL.
+func (s *VerifyPasswordEmailOK) GetRedirectURL() string {
+	return s.RedirectURL
+}
+
+// SetRedirectURL sets the value of RedirectURL.
+func (s *VerifyPasswordEmailOK) SetRedirectURL(val string) {
+	s.RedirectURL = val
+}
+
+// VerifyPasswordEmailOKHeaders wraps VerifyPasswordEmailOK with response headers.
+type VerifyPasswordEmailOKHeaders struct {
+	SetCookie []string
+	Response  VerifyPasswordEmailOK
+}
+
+// GetSetCookie returns the value of SetCookie.
+func (s *VerifyPasswordEmailOKHeaders) GetSetCookie() []string {
+	return s.SetCookie
+}
+
+// GetResponse returns the value of Response.
+func (s *VerifyPasswordEmailOKHeaders) GetResponse() VerifyPasswordEmailOK {
+	return s.Response
+}
+
+// SetSetCookie sets the value of SetCookie.
+func (s *VerifyPasswordEmailOKHeaders) SetSetCookie(val []string) {
+	s.SetCookie = val
+}
+
+// SetResponse sets the value of Response.
+func (s *VerifyPasswordEmailOKHeaders) SetResponse(val VerifyPasswordEmailOK) {
+	s.Response = val
+}
+
+func (*VerifyPasswordEmailOKHeaders) verifyPasswordEmailRes() {}
+
+type VerifyPasswordEmailPINBadRequest struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *VerifyPasswordEmailPINBadRequest) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *VerifyPasswordEmailPINBadRequest) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *VerifyPasswordEmailPINBadRequest) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *VerifyPasswordEmailPINBadRequest) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*VerifyPasswordEmailPINBadRequest) verifyPasswordEmailPINRes() {}
+
+type VerifyPasswordEmailPINInternalServerError struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *VerifyPasswordEmailPINInternalServerError) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *VerifyPasswordEmailPINInternalServerError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *VerifyPasswordEmailPINInternalServerError) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *VerifyPasswordEmailPINInternalServerError) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*VerifyPasswordEmailPINInternalServerError) verifyPasswordEmailPINRes() {}
+
+type VerifyPasswordEmailPINOK struct {
+	RedirectURL string `json:"redirectURL"`
+}
+
+// GetRedirectURL returns the value of RedirectURL.
+func (s *VerifyPasswordEmailPINOK) GetRedirectURL() string {
+	return s.RedirectURL
+}
+
+// SetRedirectURL sets the value of RedirectURL.
+func (s *VerifyPasswordEmailPINOK) SetRedirectURL(val string) {
+	s.RedirectURL = val
+}
+
+// VerifyPasswordEmailPINOKHeaders wraps VerifyPasswordEmailPINOK with response headers.
+type VerifyPasswordEmailPINOKHeaders struct {
+	SetCookie []string
+	Response  VerifyPasswordEmailPINOK
+}
+
+// GetSetCookie returns the value of SetCookie.
+func (s *VerifyPasswordEmailPINOKHeaders) GetSetCookie() []string {
+	return s.SetCookie
+}
+
+// GetResponse returns the value of Response.
+func (s *VerifyPasswordEmailPINOKHeaders) GetResponse() VerifyPasswordEmailPINOK {
+	return s.Response
+}
+
+// SetSetCookie sets the value of SetCookie.
+func (s *VerifyPasswordEmailPINOKHeaders) SetSetCookie(val []string) {
+	s.SetCookie = val
+}
+
+// SetResponse sets the value of Response.
+func (s *VerifyPasswordEmailPINOKHeaders) SetResponse(val VerifyPasswordEmailPINOK) {
+	s.Response = val
+}
+
+func (*VerifyPasswordEmailPINOKHeaders) verifyPasswordEmailPINRes() {}
+
+type VerifyPasswordEmailPINReq struct {
+	Pin string `json:"pin"`
+}
+
+// GetPin returns the value of Pin.
+func (s *VerifyPasswordEmailPINReq) GetPin() string {
+	return s.Pin
+}
+
+// SetPin sets the value of Pin.
+func (s *VerifyPasswordEmailPINReq) SetPin(val string) {
+	s.Pin = val
+}
+
+type VerifyPasswordEmailPINTooManyRequests struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *VerifyPasswordEmailPINTooManyRequests) GetCode() string {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *VerifyPasswordEmailPINTooManyRequests) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *VerifyPasswordEmailPINTooManyRequests) SetCode(val string) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *VerifyPasswordEmailPINTooManyRequests) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*VerifyPasswordEmailPINTooManyRequests) verifyPasswordEmailPINRes() {}
+
+type VerifyPasswordEmailReq struct {
+	Token string `json:"token"`
+}
+
+// GetToken returns the value of Token.
+func (s *VerifyPasswordEmailReq) GetToken() string {
+	return s.Token
+}
+
+// SetToken sets the value of Token.
+func (s *VerifyPasswordEmailReq) SetToken(val string) {
+	s.Token = val
+}
 
 type Vote2BadRequest struct {
 	Code    string `json:"code"`

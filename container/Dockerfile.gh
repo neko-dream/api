@@ -1,7 +1,7 @@
 FROM  --platform=linux/arm64 alpine:latest
 
 EXPOSE 3000
-ENV ENV=dev
+ARG ENV=dev
 
 COPY ./server /server
 
@@ -14,6 +14,9 @@ RUN  useradd api && \
   chmod +x /server
 
 COPY .ecspresso/api/${ENV}/otel.yaml /etc/ecs/otel.yaml
+
+# ECS must explicitly opt into development; a standalone image defaults closed.
+ENV ENV=production
 
 VOLUME /var/lib/amazon /var/log/amazon /etc/ecs
 

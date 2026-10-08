@@ -42,6 +42,14 @@
 					"value": "noreply@kotohiro.com"
 				},
 				{
+					"name": "EMAIL_VERIFICATION_BASE_URL",
+					"value": "https://api.dev.kotohiro.com"
+				},
+				{
+					"name": "EMAIL_VERIFICATION_PAGE_URL",
+					"value": "https://develop.kotohiro.com/auth/email/verify"
+				},
+				{
 					"name": "WEBSITE_URL",
 					"value": "https://develop.kotohiro.com"
 				}

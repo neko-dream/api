@@ -81,6 +81,8 @@ airを用いてホットリロードが可能
 air
 ```
 
+Web と API を接続する手順は [ローカル開発](docs/local-development.md) を参照。
+
 ## ⚖️ License
 
 ことひろ は GNU Affero General Public License v3.0 (AGPL-3.0) の下で提供されています。詳細については[LICENSE](LICENSE)をご確認ください。
@@ -97,4 +99,3 @@ air
 
 [repo_license_url]: https://github.com/neko-dream/api/blob/main/LICENSE
 [repo_license_img]: https://img.shields.io/badge/license-AGPL--v3-red?style=for-the-badge&logo=none
-

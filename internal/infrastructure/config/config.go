@@ -1,8 +1,10 @@
 package config
 
 import (
+	"fmt"
 	"github.com/caarlos0/env/v11"
 	"github.com/neko-dream/api/pkg/utils"
+	"net/url"
 )
 
 type Config struct {
@@ -57,10 +59,12 @@ type Config struct {
 	// ポリシー作成日 現状は固定。API生えたら別途取得する
 	POLICY_CREATED_AT string `env:"POLICY_CREATED_AT"`
 
-	EMAIL_FROM  string `env:"EMAIL_FROM"`
-	SMTP_ADDR   string `env:"SMTP_ADDR" envDefault:"127.0.0.1:1025"`
-	APP_NAME    string `env:"APP_NAME"`
-	WEBSITE_URL string `env:"WEBSITE_URL"`
+	EMAIL_FROM                  string `env:"EMAIL_FROM"`
+	EMAIL_VERIFICATION_BASE_URL string `env:"EMAIL_VERIFICATION_BASE_URL"`
+	EMAIL_VERIFICATION_PAGE_URL string `env:"EMAIL_VERIFICATION_PAGE_URL"`
+	SMTP_ADDR                   string `env:"SMTP_ADDR" envDefault:"127.0.0.1:1025"`
+	APP_NAME                    string `env:"APP_NAME"`
+	WEBSITE_URL                 string `env:"WEBSITE_URL"`
 
 	HASH_PEPPER     string `env:"HASH_PEPPER"`
 	HASH_ITERATIONS int    `env:"HASH_ITERATIONS"`
@@ -83,12 +87,58 @@ func (e ENV) String() string {
 	return string(e)
 }
 
+// Development-only authentication is opt-in, never "anything but production".
+func (e ENV) AllowsDevelopmentAuthentication() bool {
+	return e == DEV || e == LOCAL
+}
+
+func (e ENV) Validate() error {
+	switch e {
+	case PROD, DEV, LOCAL:
+		return nil
+	default:
+		return fmt.Errorf("ENV must be production, development or local; got %q", e)
+	}
+}
+
+// BrowserOrigins is shared by credentialed CORS and email-login CSRF checks.
+// No arbitrary HTTPS hosts, wildcard previews, or unknown environments are trusted.
+func (c *Config) BrowserOrigins() []string {
+	if c == nil || c.Env.Validate() != nil {
+		return nil
+	}
+	var origins []string
+	for _, base := range []string{c.WEBSITE_URL, c.EMAIL_VERIFICATION_BASE_URL} {
+		u, err := url.Parse(base)
+		if err == nil && u.Scheme == "https" && u.Host != "" && u.User == nil && u.RawQuery == "" && u.Fragment == "" {
+			origins = append(origins, u.Scheme+"://"+u.Host)
+		}
+	}
+	// Both production Web domains are routed to the same app, not redirected.
+	if c.Env == PROD {
+		for _, origin := range origins {
+			if origin == "https://www.kotohiro.com" {
+				origins = append(origins, "https://kotohiro.com")
+				break
+			}
+		}
+	}
+	// Legacy development Swagger/admin URLs still use this explicit API alias.
+	if c.Env == DEV {
+		origins = append(origins, "https://api-dev.kotohiro.com")
+	}
+	return origins
+}
+
 func LoadConfig() *Config {
 	utils.LoadEnv()
 
 	config, err := env.ParseAs[Config]()
 	if err != nil {
 		panic("Failed to load config: " + err.Error())
+	}
+	if err := config.Env.Validate(); err != nil {
+		panic(err)
 	}
 
 	return &config

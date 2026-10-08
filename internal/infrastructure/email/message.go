@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/mail"
 	"net/url"
+	"regexp"
 	"strings"
 
 	"github.com/neko-dream/api/internal/infrastructure/config"
@@ -15,6 +16,8 @@ import (
 type Message struct {
 	From, To, Subject, HTML string
 }
+
+var loginPINPattern = regexp.MustCompile(`^[0-9]{6}$`)
 
 func RenderMessage(cfg *config.Config, to string, tmpl email_template.EmailTemplateType, data map[string]any) (Message, error) {
 	if cfg == nil {
@@ -71,6 +74,16 @@ func validateTemplate(tmpl email_template.EmailTemplateType, fields map[string]a
 	var required []string
 	var linkKey string
 	switch tmpl {
+	case email_template.PasswordLoginEmailTemplate:
+		linkKey = "VerificationURL"
+		pin, ok := fields["PIN"].(string)
+		if !ok || !loginPINPattern.MatchString(pin) {
+			return fmt.Errorf("PIN must contain exactly six ASCII digits")
+		}
+		minutes, ok := fields["ExpiryMinutes"].(int)
+		if !ok || minutes <= 0 {
+			return fmt.Errorf("ExpiryMinutes must be a positive integer")
+		}
 	case email_template.VerificationEmailTemplate:
 		linkKey = "VerificationURL"
 		hours, ok := fields["ExpiryHours"].(int)
