@@ -112,6 +112,44 @@ func (f *invitationFixture) allowInvitation() {
 	f.orgs.EXPECT().FindByID(gomock.Any(), f.input.OrganizationID).Return(f.organization, nil)
 }
 
+func TestAddUserPreservesMembershipConflict(t *testing.T) {
+	for _, tc := range []struct {
+		name      string
+		createErr error
+		wantErr   error
+	}{
+		{"membership conflict", fmt.Errorf("wrapped: %w", messages.OrganizationMembershipConflict), messages.OrganizationMembershipConflict},
+		{"database failure", errors.New("database unavailable"), messages.OrganizationInternalServerError},
+		{"success", nil, nil},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			f := newInvitationFixture(t)
+			f.members.EXPECT().FindByOrganizationIDAndUserID(gomock.Any(), f.input.OrganizationID, f.input.UserID).Return(nil, sql.ErrNoRows)
+			f.orgs.EXPECT().FindByID(gomock.Any(), f.input.OrganizationID).Return(f.organization, nil)
+			f.members.EXPECT().Create(gomock.Any(), gomock.Any()).Return(tc.createErr)
+			if err := f.manager.AddUser(context.Background(), f.input); !errors.Is(err, tc.wantErr) {
+				t.Fatalf("error %v, want %v", err, tc.wantErr)
+			}
+		})
+	}
+}
+
+func TestAddUserRejectsInvalidRoleBeforeRepositoryAccess(t *testing.T) {
+	f := newInvitationFixture(t)
+	f.input.Role = 11
+	if err := f.manager.AddUser(context.Background(), f.input); !errors.Is(err, messages.OrganizationPermissionDenied) {
+		t.Fatalf("invalid role accepted: %v", err)
+	}
+}
+
+func TestIsSuperAdminRejectsInvalidRole(t *testing.T) {
+	f := newInvitationFixture(t)
+	f.members.EXPECT().FindByUserID(gomock.Any(), f.input.UserID).Return([]*org.OrganizationUser{{Role: 0}}, nil)
+	if ok, err := f.manager.IsSuperAdmin(context.Background(), f.input.UserID); err != nil || ok {
+		t.Fatalf("invalid role granted operator access: %v, %v", ok, err)
+	}
+}
+
 func TestInviteExistingUser(t *testing.T) {
 	for _, alreadyMember := range []bool{false, true} {
 		for _, sendFailure := range []bool{false, true} {

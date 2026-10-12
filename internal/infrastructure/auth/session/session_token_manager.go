@@ -149,21 +149,29 @@ func (s *sessionTokenManager) Parse(ctx context.Context, token string) (*session
 	if sess.OrganizationID() != nil {
 		orgUUID, err := shared.ParseUUID[organization.Organization](sess.OrganizationID().String())
 		if err != nil {
-			utils.HandleError(ctx, err, "ParseUUID")
-			return nil, nil
+			return nil, errtrace.Wrap(ErrSessionNotFound)
 		}
 		org, err := s.OrganizationRepository.FindByID(ctx, orgUUID)
-		if err == nil && org != nil {
-			organizationID = lo.ToPtr(org.OrganizationID.String())
-			organizationCode = lo.ToPtr(org.Code)
-			orgType = lo.ToPtr(int(org.OrganizationType))
-
-			// 組織でのロールを取得
-			orgUser, err := s.OrganizationUserRepository.FindByOrganizationIDAndUserID(ctx, org.OrganizationID, sess.UserID())
-			if err == nil && orgUser != nil {
-				organizationRole = lo.ToPtr(organization.RoleToName(orgUser.Role))
-			}
+		if err != nil {
+			return nil, err
 		}
+		if org == nil {
+			return nil, errtrace.Wrap(ErrSessionNotFound)
+		}
+		membership, err := s.OrganizationUserRepository.FindByOrganizationIDAndUserID(ctx, orgUUID, sess.UserID())
+		if err != nil {
+			return nil, err
+		}
+		if membership == nil || membership.UserID != sess.UserID() || membership.OrganizationID != orgUUID {
+			return nil, errtrace.Wrap(ErrSessionNotFound)
+		}
+		if !membership.Role.IsValid() {
+			return nil, errtrace.Wrap(ErrSessionNotFound)
+		}
+		organizationID = lo.ToPtr(org.OrganizationID.String())
+		organizationCode = lo.ToPtr(org.Code)
+		orgType = lo.ToPtr(int(org.OrganizationType))
+		organizationRole = lo.ToPtr(organization.RoleToName(membership.Role))
 	}
 
 	// Claimオブジェクトを構築

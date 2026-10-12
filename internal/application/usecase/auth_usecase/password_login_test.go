@@ -12,6 +12,7 @@ import (
 	"github.com/neko-dream/api/internal/domain/messages"
 	password_auth "github.com/neko-dream/api/internal/domain/model/auth/password"
 	"github.com/neko-dream/api/internal/domain/model/clock"
+	"github.com/neko-dream/api/internal/domain/model/organization"
 	"github.com/neko-dream/api/internal/domain/model/session"
 	"github.com/neko-dream/api/internal/domain/model/shared"
 	"github.com/neko-dream/api/internal/domain/model/user"
@@ -131,6 +132,25 @@ type loginTestSessions struct {
 	createErr, deactivateErr error
 }
 
+type loginTestOrganizations struct {
+	organization.OrganizationRepository
+	org *organization.Organization
+}
+
+func (r *loginTestOrganizations) FindByID(context.Context, shared.UUID[organization.Organization]) (*organization.Organization, error) {
+	return r.org, nil
+}
+
+type loginTestMemberships struct {
+	organization.OrganizationUserRepository
+	memberships []*organization.OrganizationUser
+	err         error
+}
+
+func (r *loginTestMemberships) FindByUserID(context.Context, shared.UUID[user.User]) ([]*organization.OrganizationUser, error) {
+	return r.memberships, r.err
+}
+
 func (s *loginTestSessions) Create(_ context.Context, sess session.Session) (*session.Session, error) {
 	s.created++
 	return &sess, s.createErr
@@ -172,6 +192,8 @@ func newLoginHarness() *loginTestHarness {
 	u.ChangeEmail("city@example.com")
 	h := &loginTestHarness{ctx: clock.SetNow(context.Background(), time.Date(2026, 10, 8, 0, 0, 0, 0, time.UTC)), users: &loginTestUsers{usr: &u}, passwords: &loginTestPasswords{valid: true, auth: password_auth.PasswordAuth{PasswordHash: "hash", Salt: "salt"}}, challenges: &loginTestChallenges{}, sender: &loginTestSender{cfg: cfg}, sessions: &loginTestSessions{}, tokens: &loginTestTokens{}, tx: &loginTestTx{}}
 	h.p = &passwordLoginInteractor{UserRepository: h.users, SessionService: h.sessions, SessionRepository: h.sessions, TokenManager: h.tokens, txRunner: h.tx, Config: cfg, PasswordAuthManager: h.passwords, passwordRepository: h.passwords, challenges: h.challenges, emailSender: h.sender}
+	h.p.organizationUserRepository = &loginTestMemberships{}
+	h.p.organizationRepository = &loginTestOrganizations{}
 	return h
 }
 func (h *loginTestHarness) begin(t *testing.T) (*PasswordLoginOutput, string) {

@@ -2,10 +2,10 @@ package auth_usecase
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 
+	"github.com/neko-dream/api/internal/domain/messages"
 	"github.com/neko-dream/api/internal/domain/model/auth"
+	organization_service "github.com/neko-dream/api/internal/domain/service/organization"
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/api/internal/domain/model/clock"
@@ -25,7 +25,7 @@ type (
 		// Execute コールバック時の認証・セッション生成処理を行う
 		//
 		// stateにRegistrationURLが設定されている場合、userが存在しなければ登録画面にリダイレクト
-		// stateにOrganizationIDが設定されている場合、ユーザーを組織に追加
+		// 永続化された単一所属を解決し、組織付きセッションを作成
 		Execute(ctx context.Context, input CallbackInput) (CallbackOutput, error)
 	}
 
@@ -129,49 +129,18 @@ func (u *authCallbackInteractor) Execute(ctx context.Context, input CallbackInpu
 				utils.HandleError(ctx, err, "既存セッションの無効化に失敗しました")
 			}
 
-			// stateにOrganizationIDが設定されている場合の処理
-			if state.OrganizationID != nil && !state.OrganizationID.IsZero() {
-				// UUIDを組織型に変換
-				orgID := shared.UUID[organization.Organization](state.OrganizationID.UUID())
-
-				// ユーザーが既に組織のメンバーかチェック
-				_, err := u.organizationUserRepo.FindByOrganizationIDAndUserID(ctx, orgID, user.UserID())
-				if err != nil {
-					if !errors.Is(err, sql.ErrNoRows) {
-						// SQL以外のエラーは返す
-						utils.HandleError(ctx, err, "failed to check organization membership")
-						return errtrace.Wrap(err)
-					}
-					// ユーザーが組織のメンバーでない場合
-					// 組織コードを知っているだけでは自動的にメンバーにはしない
-					// 招待制であるべきなので、ここでは何もしない
-				}
-				// 既にメンバーの場合は通常通りログイン
-			}
 		}
-
-		// セッション作成時に組織IDを含める
-		var sess *session.Session
-		if state.OrganizationID != nil && !state.OrganizationID.IsZero() {
-			sess = session.NewSessionWithOrganization(
-				shared.NewUUID[session.Session](),
-				user.UserID(),
-				user.Provider(),
-				session.SESSION_ACTIVE,
-				*session.NewExpiresAt(ctx),
-				clock.Now(ctx),
-				state.OrganizationID,
-			)
-		} else {
-			sess = session.NewSession(
-				shared.NewUUID[session.Session](),
-				user.UserID(),
-				user.Provider(),
-				session.SESSION_ACTIVE,
-				*session.NewExpiresAt(ctx),
-				clock.Now(ctx),
-			)
+		if user == nil {
+			return messages.InvalidUserIDError
 		}
+		organizationID, err := organization_service.ResolveLoginOrganization(ctx, u.organizationUserRepo, u.organizationRepo, user.UserID(), state.OrganizationID)
+		if err != nil {
+			return err
+		}
+		sess := session.NewSessionWithOrganization(
+			shared.NewUUID[session.Session](), user.UserID(), user.Provider(),
+			session.SESSION_ACTIVE, *session.NewExpiresAt(ctx), clock.Now(ctx), organizationID,
+		)
 
 		if _, err := u.SessionRepository.Create(ctx, *sess); err != nil {
 			utils.HandleError(ctx, err, "セッション生成に失敗しました") // セッション生成失敗

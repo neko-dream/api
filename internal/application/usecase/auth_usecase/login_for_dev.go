@@ -5,6 +5,7 @@ import (
 
 	"braces.dev/errtrace"
 	"github.com/neko-dream/api/internal/domain/model/clock"
+	"github.com/neko-dream/api/internal/domain/model/organization"
 	"github.com/neko-dream/api/internal/domain/model/session"
 	"github.com/neko-dream/api/internal/domain/model/shared"
 	"github.com/neko-dream/api/internal/domain/service"
@@ -37,7 +38,9 @@ type (
 		session.SessionRepository
 		session.SessionService
 		session.TokenManager
-		organizationService organizationService.OrganizationService
+		organizationService  organizationService.OrganizationService
+		organizationRepo     organization.OrganizationRepository
+		organizationUserRepo organization.OrganizationUserRepository
 	}
 )
 
@@ -49,6 +52,8 @@ func NewLoginForDev(
 	sessionService session.SessionService,
 	tokenManager session.TokenManager,
 	organizationService organizationService.OrganizationService,
+	organizationRepo organization.OrganizationRepository,
+	organizationUserRepo organization.OrganizationUserRepository,
 ) LoginForDev {
 	return &loginForDevInteractor{
 		DBManager:             tm,
@@ -58,6 +63,8 @@ func NewLoginForDev(
 		SessionService:        sessionService,
 		TokenManager:          tokenManager,
 		organizationService:   organizationService,
+		organizationRepo:      organizationRepo,
+		organizationUserRepo:  organizationUserRepo,
 	}
 }
 
@@ -92,28 +99,14 @@ func (a *loginForDevInteractor) Execute(ctx context.Context, input LoginForDevIn
 			return errtrace.Wrap(err)
 		}
 
-		// セッション作成
-		var sess *session.Session
-		if organizationID != nil {
-			sess = session.NewSessionWithOrganization(
-				shared.NewUUID[session.Session](),
-				newUser.UserID(),
-				newUser.Provider(),
-				session.SESSION_ACTIVE,
-				*session.NewExpiresAt(ctx),
-				clock.Now(ctx),
-				organizationID,
-			)
-		} else {
-			sess = session.NewSession(
-				shared.NewUUID[session.Session](),
-				newUser.UserID(),
-				newUser.Provider(),
-				session.SESSION_ACTIVE,
-				*session.NewExpiresAt(ctx),
-				clock.Now(ctx),
-			)
+		organizationID, err = organizationService.ResolveLoginOrganization(ctx, a.organizationUserRepo, a.organizationRepo, newUser.UserID(), organizationID)
+		if err != nil {
+			return err
 		}
+		sess := session.NewSessionWithOrganization(
+			shared.NewUUID[session.Session](), newUser.UserID(), newUser.Provider(),
+			session.SESSION_ACTIVE, *session.NewExpiresAt(ctx), clock.Now(ctx), organizationID,
+		)
 
 		if _, err := a.SessionRepository.Create(ctx, *sess); err != nil {
 			utils.HandleError(ctx, err, "failed to create session")

@@ -84,6 +84,9 @@ func NewOrganizationMemberManager(
 func (s *organizationMemberManager) AddUser(ctx context.Context, params InviteUserParams) error {
 	ctx, span := otel.Tracer("organization").Start(ctx, "organizationMemberManager.AddUser")
 	defer span.End()
+	if !params.Role.IsValid() {
+		return messages.OrganizationPermissionDenied
+	}
 
 	// ユーザーの組織ユーザーを取得。既に所属している場合はエラー
 	orgUser, err := s.organizationUserRepo.FindByOrganizationIDAndUserID(ctx, params.OrganizationID, params.UserID)
@@ -111,6 +114,9 @@ func (s *organizationMemberManager) AddUser(ctx context.Context, params InviteUs
 		Role:               params.Role,
 	}
 	if err := s.organizationUserRepo.Create(ctx, *orgUser); err != nil {
+		if errors.Is(err, messages.OrganizationMembershipConflict) {
+			return err
+		}
 		utils.HandleError(ctx, err, "OrganizationUserRepository.Create")
 		return messages.OrganizationInternalServerError
 	}
@@ -131,7 +137,7 @@ func (s *organizationMemberManager) IsSuperAdmin(ctx context.Context, userID sha
 
 	// スーパーユーザーかどうかをチェック
 	for _, orgUser := range orgUsers {
-		if orgUser.Role <= organization.OrganizationUserRoleSuperAdmin {
+		if orgUser.Role == organization.OrganizationUserRoleSuperAdmin {
 			return true, nil
 		}
 	}
@@ -152,9 +158,7 @@ func (s *organizationMemberManager) InviteUser(ctx context.Context, input Invite
 		return nil, messages.BadRequestError
 	}
 	input.Email = address.Address
-	switch input.Role {
-	case organization.OrganizationUserRoleSuperAdmin, organization.OrganizationUserRoleOwner, organization.OrganizationUserRoleAdmin, organization.OrganizationUserRoleMember:
-	default:
+	if !input.Role.IsValid() {
 		return nil, messages.OrganizationPermissionDenied
 	}
 

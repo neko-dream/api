@@ -21,11 +21,17 @@ type OrganizationUserRepository interface {
 
 type OrganizationUserRole int
 
-func NewOrganizationUserRole(role int) OrganizationUserRole {
-	if role < int(OrganizationUserRoleSuperAdmin) || role > int(OrganizationUserRoleMember) {
-		return OrganizationUserRoleMember
+func (role OrganizationUserRole) IsValid() bool {
+	switch role {
+	case OrganizationUserRoleSuperAdmin, OrganizationUserRoleOwner, OrganizationUserRoleAdmin, OrganizationUserRoleMember:
+		return true
+	default:
+		return false
 	}
-	if role == 0 {
+}
+
+func NewOrganizationUserRole(role int) OrganizationUserRole {
+	if !OrganizationUserRole(role).IsValid() {
 		return OrganizationUserRoleMember
 	}
 
@@ -93,7 +99,7 @@ func NewOrganizationUser(
 
 // SetRole
 func (ou *OrganizationUser) SetRole(role OrganizationUserRole) error {
-	if role < OrganizationUserRoleSuperAdmin || role > OrganizationUserRoleMember {
+	if !role.IsValid() {
 		return errors.New("invalid role")
 	}
 	ou.Role = role
@@ -102,5 +108,5 @@ func (ou *OrganizationUser) SetRole(role OrganizationUserRole) error {
 
 // HasPermissionToChangeRoleTo
 func (ou *OrganizationUser) HasPermissionToChangeRoleTo(targetRole OrganizationUserRole) bool {
-	return int(ou.Role) <= int(targetRole) && ou.Role <= OrganizationUserRoleAdmin
+	return ou.Role.IsValid() && targetRole.IsValid() && ou.Role <= targetRole && ou.Role <= OrganizationUserRoleAdmin
 }
