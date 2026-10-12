@@ -62,13 +62,14 @@ func (q *managementQuery) FindByID(ctx context.Context, id shared.UUID[user.User
 
 func (q *managementQuery) mapUser(ctx context.Context, row model.User, providers []string) (*userquery.ManagedUser, error) {
 	u := &userquery.ManagedUser{
-		UserID:        shared.UUID[user.User](row.UserID),
-		DisplayID:     row.DisplayID.String,
-		DisplayName:   row.DisplayName.String,
-		EmailVerified: row.EmailVerified,
-		Providers:     providers,
-		CreatedAt:     row.CreatedAt,
-		UpdatedAt:     row.UpdatedAt,
+		CanCreateTalkSession: row.CanCreateTalkSession,
+		UserID:               shared.UUID[user.User](row.UserID),
+		DisplayID:            row.DisplayID.String,
+		DisplayName:          row.DisplayName.String,
+		EmailVerified:        row.EmailVerified,
+		Providers:            providers,
+		CreatedAt:            row.CreatedAt,
+		UpdatedAt:            row.UpdatedAt,
 	}
 	if u.Providers == nil {
 		u.Providers = []string{}

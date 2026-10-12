@@ -1,9 +1,11 @@
 import "@typespec/http";
+import "./user.tsp";
 
 using Http;
 
 namespace kotohiro {
   model ManagedUser {
+    permissions: UserPermissions;
     userID: string;
     displayID: string;
     displayName: string;

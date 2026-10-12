@@ -705,6 +705,43 @@ func (s *CreateTalkSessionSurveyReq) SetQuestions(val []TalkSessionSurveyQuestio
 	s.Questions = val
 }
 
+// Ref: #/components/schemas/CurrentUser
+type CurrentUser struct {
+	UserID      string          `json:"userID"`
+	User        User            `json:"user"`
+	Permissions UserPermissions `json:"permissions"`
+}
+
+// GetUserID returns the value of UserID.
+func (s *CurrentUser) GetUserID() string {
+	return s.UserID
+}
+
+// GetUser returns the value of User.
+func (s *CurrentUser) GetUser() User {
+	return s.User
+}
+
+// GetPermissions returns the value of Permissions.
+func (s *CurrentUser) GetPermissions() UserPermissions {
+	return s.Permissions
+}
+
+// SetUserID sets the value of UserID.
+func (s *CurrentUser) SetUserID(val string) {
+	s.UserID = val
+}
+
+// SetUser sets the value of User.
+func (s *CurrentUser) SetUser(val User) {
+	s.User = val
+}
+
+// SetPermissions sets the value of Permissions.
+func (s *CurrentUser) SetPermissions(val UserPermissions) {
+	s.Permissions = val
+}
+
 // DeleteDeviceNoContent is response for DeleteDevice operation.
 type DeleteDeviceNoContent struct{}
 
@@ -2997,15 +3034,21 @@ func (s *Location) SetLongitude(val OptFloat64) {
 
 // Ref: #/components/schemas/ManagedUser
 type ManagedUser struct {
-	UserID         string      `json:"userID"`
-	DisplayID      string      `json:"displayID"`
-	DisplayName    string      `json:"displayName"`
-	Email          OptString   `json:"email"`
-	EmailVerified  bool        `json:"emailVerified"`
-	Providers      []string    `json:"providers"`
-	CreatedAt      time.Time   `json:"createdAt"`
-	UpdatedAt      time.Time   `json:"updatedAt"`
-	WithdrawalDate OptDateTime `json:"withdrawalDate"`
+	Permissions    UserPermissions `json:"permissions"`
+	UserID         string          `json:"userID"`
+	DisplayID      string          `json:"displayID"`
+	DisplayName    string          `json:"displayName"`
+	Email          OptString       `json:"email"`
+	EmailVerified  bool            `json:"emailVerified"`
+	Providers      []string        `json:"providers"`
+	CreatedAt      time.Time       `json:"createdAt"`
+	UpdatedAt      time.Time       `json:"updatedAt"`
+	WithdrawalDate OptDateTime     `json:"withdrawalDate"`
+}
+
+// GetPermissions returns the value of Permissions.
+func (s *ManagedUser) GetPermissions() UserPermissions {
+	return s.Permissions
 }
 
 // GetUserID returns the value of UserID.
@@ -3051,6 +3094,11 @@ func (s *ManagedUser) GetUpdatedAt() time.Time {
 // GetWithdrawalDate returns the value of WithdrawalDate.
 func (s *ManagedUser) GetWithdrawalDate() OptDateTime {
 	return s.WithdrawalDate
+}
+
+// SetPermissions sets the value of Permissions.
+func (s *ManagedUser) SetPermissions(val UserPermissions) {
+	s.Permissions = val
 }
 
 // SetUserID sets the value of UserID.
@@ -9366,6 +9414,21 @@ func (s *UserGroupPosition) SetGroupID(val int) {
 // SetPerimeterIndex sets the value of PerimeterIndex.
 func (s *UserGroupPosition) SetPerimeterIndex(val OptInt) {
 	s.PerimeterIndex = val
+}
+
+// Ref: #/components/schemas/UserPermissions
+type UserPermissions struct {
+	CanCreateTalkSession bool `json:"canCreateTalkSession"`
+}
+
+// GetCanCreateTalkSession returns the value of CanCreateTalkSession.
+func (s *UserPermissions) GetCanCreateTalkSession() bool {
+	return s.CanCreateTalkSession
+}
+
+// SetCanCreateTalkSession sets the value of CanCreateTalkSession.
+func (s *UserPermissions) SetCanCreateTalkSession(val bool) {
+	s.CanCreateTalkSession = val
 }
 
 // Ref: #/components/schemas/UserStatsResponse

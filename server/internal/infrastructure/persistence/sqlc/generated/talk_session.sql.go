@@ -273,7 +273,7 @@ WITH filtered_sessions AS (
 SELECT
     ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id, ts.hide_top, ts.disable_analysis, ts.passphrase_hash,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
     COALESCE(organization_aliases.alias_name, '') AS alias_name,
     COALESCE(organization_aliases.alias_id, '00000000-0000-0000-0000-000000000000'::uuid) AS alias_id,
     COALESCE(organization_aliases.organization_id, '00000000-0000-0000-0000-000000000000'::uuid) AS organization_id,
@@ -341,7 +341,7 @@ type GetOwnTalkSessionByDisplayIDWithCountRow struct {
 //	SELECT
 //	    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id, ts.hide_top, ts.disable_analysis, ts.passphrase_hash,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
 //	    COALESCE(organization_aliases.alias_name, '') AS alias_name,
 //	    COALESCE(organization_aliases.alias_id, '00000000-0000-0000-0000-000000000000'::uuid) AS alias_id,
 //	    COALESCE(organization_aliases.organization_id, '00000000-0000-0000-0000-000000000000'::uuid) AS organization_id,
@@ -404,6 +404,7 @@ func (q *Queries) GetOwnTalkSessionByDisplayIDWithCount(ctx context.Context, arg
 			&i.User.Email,
 			&i.User.EmailVerified,
 			&i.User.WithdrawalDate,
+			&i.User.CanCreateTalkSession,
 			&i.AliasName,
 			&i.AliasID,
 			&i.OrganizationID,
@@ -428,7 +429,7 @@ const getRespondTalkSessionByUserID = `-- name: GetRespondTalkSessionByUserID :m
 SELECT
     ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id, ts.hide_top, ts.disable_analysis, ts.passphrase_hash,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
     COALESCE(organization_aliases.alias_name, '') AS alias_name,
     COALESCE(organization_aliases.alias_id, '00000000-0000-0000-0000-000000000000'::uuid) AS alias_id,
     COALESCE(organization_aliases.organization_id, '00000000-0000-0000-0000-000000000000'::uuid) AS organization_id,
@@ -495,7 +496,7 @@ type GetRespondTalkSessionByUserIDRow struct {
 //	SELECT
 //	    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id, ts.hide_top, ts.disable_analysis, ts.passphrase_hash,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
 //	    COALESCE(organization_aliases.alias_name, '') AS alias_name,
 //	    COALESCE(organization_aliases.alias_id, '00000000-0000-0000-0000-000000000000'::uuid) AS alias_id,
 //	    COALESCE(organization_aliases.organization_id, '00000000-0000-0000-0000-000000000000'::uuid) AS organization_id,
@@ -577,6 +578,7 @@ func (q *Queries) GetRespondTalkSessionByUserID(ctx context.Context, arg GetResp
 			&i.User.Email,
 			&i.User.EmailVerified,
 			&i.User.WithdrawalDate,
+			&i.User.CanCreateTalkSession,
 			&i.AliasName,
 			&i.AliasID,
 			&i.OrganizationID,
@@ -602,7 +604,7 @@ const getTalkSessionByID = `-- name: GetTalkSessionByID :one
 SELECT
     ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id, ts.hide_top, ts.disable_analysis, ts.passphrase_hash,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
     COALESCE(organization_aliases.alias_name, '') AS alias_name,
     COALESCE(organization_aliases.alias_id, '00000000-0000-0000-0000-000000000000'::uuid) AS alias_id,
     COALESCE(organization_aliases.organization_id, '00000000-0000-0000-0000-000000000000'::uuid) AS organization_id,
@@ -641,7 +643,7 @@ type GetTalkSessionByIDRow struct {
 //	SELECT
 //	    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id, ts.hide_top, ts.disable_analysis, ts.passphrase_hash,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
 //	    COALESCE(organization_aliases.alias_name, '') AS alias_name,
 //	    COALESCE(organization_aliases.alias_id, '00000000-0000-0000-0000-000000000000'::uuid) AS alias_id,
 //	    COALESCE(organization_aliases.organization_id, '00000000-0000-0000-0000-000000000000'::uuid) AS organization_id,
@@ -692,6 +694,7 @@ func (q *Queries) GetTalkSessionByID(ctx context.Context, talkSessionID uuid.UUI
 		&i.User.Email,
 		&i.User.EmailVerified,
 		&i.User.WithdrawalDate,
+		&i.User.CanCreateTalkSession,
 		&i.AliasName,
 		&i.AliasID,
 		&i.OrganizationID,
@@ -810,7 +813,7 @@ const listTalkSessions = `-- name: ListTalkSessions :many
 SELECT
     ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id, ts.hide_top, ts.disable_analysis, ts.passphrase_hash,
     COALESCE(oc.opinion_count, 0) AS opinion_count,
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
     COALESCE(organization_aliases.alias_name, '') AS alias_name,
     COALESCE(organization_aliases.alias_id, '00000000-0000-0000-0000-000000000000'::uuid) AS alias_id,
     COALESCE(organization_aliases.organization_id, '00000000-0000-0000-0000-000000000000'::uuid) AS organization_id,
@@ -926,7 +929,7 @@ type ListTalkSessionsRow struct {
 //	SELECT
 //	    ts.talk_session_id, ts.owner_id, ts.theme, ts.scheduled_end_time, ts.created_at, ts.city, ts.prefecture, ts.description, ts.thumbnail_url, ts.restrictions, ts.updated_at, ts.hide_report, ts.organization_id, ts.organization_alias_id, ts.hide_top, ts.disable_analysis, ts.passphrase_hash,
 //	    COALESCE(oc.opinion_count, 0) AS opinion_count,
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
 //	    COALESCE(organization_aliases.alias_name, '') AS alias_name,
 //	    COALESCE(organization_aliases.alias_id, '00000000-0000-0000-0000-000000000000'::uuid) AS alias_id,
 //	    COALESCE(organization_aliases.organization_id, '00000000-0000-0000-0000-000000000000'::uuid) AS organization_id,
@@ -1055,6 +1058,7 @@ func (q *Queries) ListTalkSessions(ctx context.Context, arg ListTalkSessionsPara
 			&i.User.Email,
 			&i.User.EmailVerified,
 			&i.User.WithdrawalDate,
+			&i.User.CanCreateTalkSession,
 			&i.AliasName,
 			&i.AliasID,
 			&i.OrganizationID,

@@ -387,7 +387,8 @@ type User struct {
 	Email         sql.NullString
 	EmailVerified bool
 	// ユーザーの退会日時。NULLの場合はアクティブユーザー
-	WithdrawalDate sql.NullTime
+	WithdrawalDate       sql.NullTime
+	CanCreateTalkSession bool
 }
 
 type UserAuth struct {

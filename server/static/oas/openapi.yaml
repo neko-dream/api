@@ -4202,6 +4202,21 @@ paths:
       security:
         - {}
       x-ogen-operation-group: User
+  /users/me:
+    get:
+      operationId: getCurrentUser
+      summary: ログイン中ユーザーと現在の権限
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentUser'
+      tags:
+        - user
+      x-ogen-operation-group: user
   /users/{displayID}/talksessions:
     get:
       operationId: getUserTalkSessions
@@ -4704,6 +4719,33 @@ paths:
       security:
         - AdminCookieAuth: []
       x-ogen-operation-group: manage
+  /v1/manage/users/{userID}/permissions:
+    put:
+      operationId: setUserPermissionsManage
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPermissions'
+      tags:
+        - manage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPermissions'
+      security:
+        - AdminCookieAuth: []
+      x-ogen-operation-group: manage
 security:
   - CookieAuth: []
 components:
@@ -4848,6 +4890,19 @@ components:
         displayName:
           type: string
       description: 管理者作成リクエスト
+    CurrentUser:
+      type: object
+      required:
+        - userID
+        - user
+        - permissions
+      properties:
+        userID:
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
+        permissions:
+          $ref: '#/components/schemas/UserPermissions'
     Device:
       type: object
       required:
@@ -4901,6 +4956,7 @@ components:
     ManagedUser:
       type: object
       required:
+        - permissions
         - userID
         - displayID
         - displayName
@@ -4909,6 +4965,8 @@ components:
         - createdAt
         - updatedAt
       properties:
+        permissions:
+          $ref: '#/components/schemas/UserPermissions'
         userID:
           type: string
         displayID:
@@ -5935,6 +5993,13 @@ components:
         perimeterIndex:
           type: integer
           description: 境界ポイントのインデックス
+    UserPermissions:
+      type: object
+      required:
+        - canCreateTalkSession
+      properties:
+        canCreateTalkSession:
+          type: boolean
     UserStatsResponse:
       type: object
       required:

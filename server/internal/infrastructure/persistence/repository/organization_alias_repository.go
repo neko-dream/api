@@ -51,8 +51,8 @@ func (r *organizationAliasRepository) FindByID(ctx context.Context, aliasID shar
 	queries := r.GetQueries(ctx)
 	row, err := queries.GetOrganizationAliasById(ctx, aliasID.UUID())
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, errors.New("organization alias not found")
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, organization.ErrOrganizationAliasNotFound
 		}
 		return nil, err
 	}

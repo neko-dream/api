@@ -442,6 +442,33 @@ paths:
       security:
         - AdminCookieAuth: []
       x-ogen-operation-group: manage
+  /v1/manage/users/{userID}/permissions:
+    put:
+      operationId: setUserPermissionsManage
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPermissions'
+      tags:
+        - manage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPermissions'
+      security:
+        - AdminCookieAuth: []
+      x-ogen-operation-group: manage
 security:
   - CookieAuth: []
 components:
@@ -508,6 +535,7 @@ components:
     ManagedUser:
       type: object
       required:
+        - permissions
         - userID
         - displayID
         - displayName
@@ -516,6 +544,8 @@ components:
         - createdAt
         - updatedAt
       properties:
+        permissions:
+          $ref: '#/components/schemas/UserPermissions'
         userID:
           type: string
         displayID:
@@ -732,6 +762,13 @@ components:
           type: string
           format: date-time
           description: 更新日時
+    UserPermissions:
+      type: object
+      required:
+        - canCreateTalkSession
+      properties:
+        canCreateTalkSession:
+          type: boolean
     UserStatsResponse:
       type: object
       required:

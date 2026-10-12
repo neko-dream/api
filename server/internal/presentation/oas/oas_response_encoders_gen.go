@@ -1168,6 +1168,20 @@ func encodeGetConclusionResponse(response GetConclusionRes, w http.ResponseWrite
 	}
 }
 
+func encodeGetCurrentUserResponse(response *CurrentUser, w http.ResponseWriter, span trace.Span) error {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(200)
+	span.SetStatus(codes.Ok, http.StatusText(200))
+
+	e := new(jx.Encoder)
+	response.Encode(e)
+	if _, err := e.WriteTo(w); err != nil {
+		return errors.Wrap(err, "write")
+	}
+
+	return nil
+}
+
 func encodeGetDevicesResponse(response GetDevicesRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
 	case *GetDevicesOK:
@@ -3703,6 +3717,20 @@ func encodeSessionsHistoryResponse(response SessionsHistoryRes, w http.ResponseW
 	default:
 		return errors.Errorf("unexpected response type: %T", response)
 	}
+}
+
+func encodeSetUserPermissionsManageResponse(response *UserPermissions, w http.ResponseWriter, span trace.Span) error {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(200)
+	span.SetStatus(codes.Ok, http.StatusText(200))
+
+	e := new(jx.Encoder)
+	response.Encode(e)
+	if _, err := e.WriteTo(w); err != nil {
+		return errors.Wrap(err, "write")
+	}
+
+	return nil
 }
 
 func encodeSolveOpinionReportResponse(response SolveOpinionReportRes, w http.ResponseWriter, span trace.Span) error {

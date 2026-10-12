@@ -3,6 +3,16 @@ import "@typespec/http";
 using Http;
 
 namespace kotohiro {
+  model UserPermissions {
+    canCreateTalkSession: boolean;
+  }
+
+  model CurrentUser {
+    userID: string;
+    user: User;
+    permissions: UserPermissions;
+  }
+
   model User {
     @minLength(3)
     @maxLength(25)

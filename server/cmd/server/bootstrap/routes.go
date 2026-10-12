@@ -57,8 +57,6 @@ func (b *Bootstrap) setupAPIHandler() http.Handler {
 		panic(err) // 初期化エラーは致命的
 	}
 
-	c := b.apiCORS()
-
 	routeFinder := middleware.MakeRouteFinder(srv)
 	tracerProvider := di.Invoke[trace.TracerProvider](b.container)
 
@@ -68,7 +66,12 @@ func (b *Bootstrap) setupAPIHandler() http.Handler {
 		middleware.SetContextCookieKey(b.container),
 		middleware.Labeler(routeFinder),
 	)
-	normal := c.Handler(b.browserOriginGuard(api))
+	return b.wrapAPIOrigins(api)
+}
+
+// wrapAPIOrigins selects the dedicated administrator guard before the ordinary API guard.
+func (b *Bootstrap) wrapAPIOrigins(api http.Handler) http.Handler {
+	normal := b.apiCORS().Handler(b.browserOriginGuard(api))
 	adminAPI := b.adminOriginGuard(api)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasPrefix(r.URL.Path, "/v1/admin/") || strings.HasPrefix(r.URL.Path, "/v1/manage/") {

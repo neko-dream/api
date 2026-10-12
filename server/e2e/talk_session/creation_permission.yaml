@@ -1,0 +1,143 @@
+desc: 独立した作成権限の付与・解除（組織未所属、再ログインなし）
+runners:
+  req:
+    endpoint: http://localhost:3000
+    useCookie: true
+    notFollowRedirect: true
+    openapi3: http://localhost:3000/static/oas/openapi.yaml
+    skipValidateRequest: false
+    skipValidateResponse: true
+  dev: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
+vars:
+  id: creation_permission_e2e_user
+  organizationID: 00000000-0000-4000-8000-000000005831
+  organizationCode: CREATION-PERMISSION-E2E
+steps:
+  cleanup:
+    desc: このシナリオの使い捨てユーザーだけを削除
+    dev:
+      query: |
+        DELETE FROM user_status_change_logs WHERE user_id IN (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}');
+        DELETE FROM user_demographics WHERE user_id IN (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}');
+        DELETE FROM talk_sessions WHERE owner_id IN (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}');
+        DELETE FROM organizations WHERE organization_id = '{{ vars.organizationID }}' AND code = '{{ vars.organizationCode }}';
+        DELETE FROM user_auths WHERE subject = '{{ vars.id }}';
+        DELETE FROM users WHERE display_id = '{{ vars.id }}';
+  login:
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.id }}:
+        get:
+          headers: null
+    test: current.res.status == 302
+  createUser:
+    req:
+      /user:
+        post:
+          body:
+            multipart/form-data:
+              displayName: "{{ vars.id }}"
+              displayID: "{{ vars.id }}"
+    test: current.res.status == 200
+  initialPermission:
+    req:
+      /users/me:
+        get:
+          headers: null
+    test: current.res.status == 200 && current.res.body.permissions.canCreateTalkSession == false
+  denied:
+    req:
+      /talksessions:
+        post:
+          body:
+            multipart/form-data:
+              theme: 未許可ユーザー
+              scheduledEndTime: "2100-12-31T23:59:59Z"
+    test: current.res.status == 403 && current.res.body.code == 'TALKSESSION-0027' && current.res.body.message == 'セッションの作成は許可されていません。運営にお問い合わせください。'
+  grant:
+    desc: E2Eのセットアップとして明示的に付与（実環境では管理者APIを使用）
+    dev:
+      query: UPDATE users SET can_create_talk_session = true WHERE display_id = '{{ vars.id }}';
+  permissionWithoutRelogin:
+    req:
+      /users/me:
+        get:
+          headers: null
+    test: current.res.status == 200 && current.res.body.permissions.canCreateTalkSession == true
+  checkNoMembership:
+    dev:
+      query: SELECT count(*) AS count FROM organization_users WHERE user_id IN (SELECT user_id FROM users WHERE display_id = '{{ vars.id }}');
+    test: current.rows[0].count == 0
+  allowed:
+    req:
+      /talksessions:
+        post:
+          body:
+            multipart/form-data:
+              theme: 独立した作成権限
+              scheduledEndTime: "2100-12-31T23:59:59Z"
+    bind:
+      created: current.res.body
+    test: current.res.status == 200 && current.res.body.owner.displayID == vars.id
+  createOrganizationFixture:
+    desc: コード指定ログインの非所属拒否を検証するための専用組織（所属は作らない）
+    dev:
+      query: |
+        INSERT INTO organizations (organization_id, organization_type, name, owner_id, code)
+        SELECT '{{ vars.organizationID }}', 0, 'creation permission E2E', user_id, '{{ vars.organizationCode }}'
+        FROM users WHERE display_id = '{{ vars.id }}';
+  loginWithOrganizationCode:
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.id }}&organizationCode={{ vars.organizationCode }}:
+        get:
+          headers: null
+    test: current.res.status == 302
+  permissionWithOrganizationCode:
+    req:
+      /users/me:
+        get:
+          headers: null
+    test: current.res.status == 200 && current.res.body.permissions.canCreateTalkSession == true
+  nonMemberDenied:
+    desc: 作成許可があっても非所属の組織としては作成できず、ログイン要求とは別のエラーになる
+    req:
+      /talksessions:
+        post:
+          body:
+            multipart/form-data:
+              theme: 非所属の組織
+              scheduledEndTime: "2100-12-31T23:59:59Z"
+    test: current.res.status == 403 && current.res.body.code == 'TALKSESSION-0028' && current.res.body.message == 'この組織のメンバーではありません。組織を指定せずにログインし直してください。'
+  loginWithoutOrganizationCode:
+    req:
+      /auth/dev/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ftoken%2Finfo&id={{ vars.id }}:
+        get:
+          headers: null
+    test: current.res.status == 302
+  revoke:
+    dev:
+      query: UPDATE users SET can_create_talk_session = false WHERE display_id = '{{ vars.id }}';
+  revokedPermission:
+    req:
+      /users/me:
+        get:
+          headers: null
+    test: current.res.status == 200 && current.res.body.permissions.canCreateTalkSession == false
+  revokedCreation:
+    req:
+      /talksessions:
+        post:
+          body:
+            multipart/form-data:
+              theme: 許可解除後
+              scheduledEndTime: "2100-12-31T23:59:59Z"
+    test: current.res.status == 403 && current.res.body.code == 'TALKSESSION-0027' && current.res.body.message == 'セッションの作成は許可されていません。運営にお問い合わせください。'
+  editExisting:
+    desc: 既存セッションの所有者編集は作成許可の解除で失われない
+    req:
+      /talksessions/{{ created.id }}:
+        put:
+          body:
+            multipart/form-data:
+              theme: 許可解除後の編集
+              scheduledEndTime: "2100-12-31T23:59:59Z"
+    test: current.res.status == 200

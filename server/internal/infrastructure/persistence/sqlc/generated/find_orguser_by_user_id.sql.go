@@ -60,7 +60,7 @@ func (q *Queries) FindOrgUserByUserID(ctx context.Context, userID uuid.UUID) ([]
 
 const findOrgUserByUserIDWithOrganization = `-- name: FindOrgUserByUserIDWithOrganization :many
 SELECT
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
     organization_users.organization_user_id, organization_users.user_id, organization_users.organization_id, organization_users.created_at, organization_users.updated_at, organization_users.role,
     organizations.organization_id, organizations.organization_type, organizations.name, organizations.owner_id, organizations.code, organizations.icon_url
 FROM organization_users
@@ -79,7 +79,7 @@ type FindOrgUserByUserIDWithOrganizationRow struct {
 // FindOrgUserByUserIDWithOrganization
 //
 //	SELECT
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
 //	    organization_users.organization_user_id, organization_users.user_id, organization_users.organization_id, organization_users.created_at, organization_users.updated_at, organization_users.role,
 //	    organizations.organization_id, organizations.organization_type, organizations.name, organizations.owner_id, organizations.code, organizations.icon_url
 //	FROM organization_users
@@ -106,6 +106,7 @@ func (q *Queries) FindOrgUserByUserIDWithOrganization(ctx context.Context, userI
 			&i.User.Email,
 			&i.User.EmailVerified,
 			&i.User.WithdrawalDate,
+			&i.User.CanCreateTalkSession,
 			&i.OrganizationUser.OrganizationUserID,
 			&i.OrganizationUser.UserID,
 			&i.OrganizationUser.OrganizationID,

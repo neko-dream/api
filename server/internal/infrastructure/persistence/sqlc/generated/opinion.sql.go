@@ -184,7 +184,7 @@ func (q *Queries) CreateOpinion(ctx context.Context, arg CreateOpinionParams) er
 const getOpinionByID = `-- name: GetOpinionByID :one
 SELECT
     opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
     COALESCE(cv.vote_type, 0) AS current_vote_type,
     COALESCE(pv.vote_type, 0) AS parent_vote_type,
     COALESCE(rc.reply_count, 0) AS reply_count
@@ -228,7 +228,7 @@ type GetOpinionByIDRow struct {
 //
 //	SELECT
 //	    opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
 //	    COALESCE(cv.vote_type, 0) AS current_vote_type,
 //	    COALESCE(pv.vote_type, 0) AS parent_vote_type,
 //	    COALESCE(rc.reply_count, 0) AS reply_count
@@ -273,6 +273,7 @@ func (q *Queries) GetOpinionByID(ctx context.Context, arg GetOpinionByIDParams) 
 		&i.User.Email,
 		&i.User.EmailVerified,
 		&i.User.WithdrawalDate,
+		&i.User.CanCreateTalkSession,
 		&i.CurrentVoteType,
 		&i.ParentVoteType,
 		&i.ReplyCount,
@@ -284,7 +285,7 @@ const getOpinionReplies = `-- name: GetOpinionReplies :many
 SELECT
     DISTINCT opinions.opinion_id,
     opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
     COALESCE(pv.vote_type, 0) AS parent_vote_type,
     COALESCE(cv.vote_type, 0) AS current_vote_type
 FROM opinions
@@ -325,7 +326,7 @@ type GetOpinionRepliesRow struct {
 //	SELECT
 //	    DISTINCT opinions.opinion_id,
 //	    opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
 //	    COALESCE(pv.vote_type, 0) AS parent_vote_type,
 //	    COALESCE(cv.vote_type, 0) AS current_vote_type
 //	FROM opinions
@@ -374,6 +375,7 @@ func (q *Queries) GetOpinionReplies(ctx context.Context, arg GetOpinionRepliesPa
 			&i.User.Email,
 			&i.User.EmailVerified,
 			&i.User.WithdrawalDate,
+			&i.User.CanCreateTalkSession,
 			&i.ParentVoteType,
 			&i.CurrentVoteType,
 		); err != nil {
@@ -393,7 +395,7 @@ func (q *Queries) GetOpinionReplies(ctx context.Context, arg GetOpinionRepliesPa
 const getOpinionsByRank = `-- name: GetOpinionsByRank :many
 SELECT
     opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
     COALESCE(rc.reply_count, 0) AS reply_count
 FROM opinions
 LEFT JOIN users
@@ -458,7 +460,7 @@ type GetOpinionsByRankRow struct {
 //
 //	SELECT
 //	    opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
 //	    COALESCE(rc.reply_count, 0) AS reply_count
 //	FROM opinions
 //	LEFT JOIN users
@@ -534,6 +536,7 @@ func (q *Queries) GetOpinionsByRank(ctx context.Context, arg GetOpinionsByRankPa
 			&i.User.Email,
 			&i.User.EmailVerified,
 			&i.User.WithdrawalDate,
+			&i.User.CanCreateTalkSession,
 			&i.ReplyCount,
 		); err != nil {
 			return nil, err
@@ -558,7 +561,7 @@ WITH unique_opinions AS (
 )
 SELECT
     opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
     COALESCE(pv.vote_type, 0) AS parent_vote_type,
     COALESCE(rc.reply_count, 0) AS reply_count,
     COALESCE(cv.vote_type, 0) AS current_vote_type
@@ -623,7 +626,7 @@ type GetOpinionsByTalkSessionIDRow struct {
 //	)
 //	SELECT
 //	    opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
 //	    COALESCE(pv.vote_type, 0) AS parent_vote_type,
 //	    COALESCE(rc.reply_count, 0) AS reply_count,
 //	    COALESCE(cv.vote_type, 0) AS current_vote_type
@@ -694,6 +697,7 @@ func (q *Queries) GetOpinionsByTalkSessionID(ctx context.Context, arg GetOpinion
 			&i.User.Email,
 			&i.User.EmailVerified,
 			&i.User.WithdrawalDate,
+			&i.User.CanCreateTalkSession,
 			&i.ParentVoteType,
 			&i.ReplyCount,
 			&i.CurrentVoteType,
@@ -714,7 +718,7 @@ func (q *Queries) GetOpinionsByTalkSessionID(ctx context.Context, arg GetOpinion
 const getOpinionsByUserID = `-- name: GetOpinionsByUserID :many
 SELECT
     opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
     COALESCE(pv.vote_type, 0) AS parent_vote_type,
     -- 意見に対するリプライ数（再帰）
     COALESCE(rc.reply_count, 0) AS reply_count
@@ -759,7 +763,7 @@ type GetOpinionsByUserIDRow struct {
 //
 //	SELECT
 //	    opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
 //	    COALESCE(pv.vote_type, 0) AS parent_vote_type,
 //	    -- 意見に対するリプライ数（再帰）
 //	    COALESCE(rc.reply_count, 0) AS reply_count
@@ -817,6 +821,7 @@ func (q *Queries) GetOpinionsByUserID(ctx context.Context, arg GetOpinionsByUser
 			&i.User.Email,
 			&i.User.EmailVerified,
 			&i.User.WithdrawalDate,
+			&i.User.CanCreateTalkSession,
 			&i.ParentVoteType,
 			&i.ReplyCount,
 		); err != nil {
@@ -854,7 +859,7 @@ WITH RECURSIVE opinion_tree AS (
 )
 SELECT
     o.opinion_id, o.talk_session_id, o.user_id, o.parent_opinion_id, o.title, o.content, o.created_at, o.picture_url, o.reference_url,
-    u.user_id, u.display_id, u.display_name, u.icon_url, u.created_at, u.updated_at, u.email, u.email_verified, u.withdrawal_date,
+    u.user_id, u.display_id, u.display_name, u.icon_url, u.created_at, u.updated_at, u.email, u.email_verified, u.withdrawal_date, u.can_create_talk_session,
     COALESCE(pv.vote_type, 0) AS parent_vote_type,
     COALESCE(rc.reply_count, 0) AS reply_count,
     COALESCE(cv.vote_type, 0) AS current_vote_type,
@@ -916,7 +921,7 @@ type GetParentOpinionsRow struct {
 //	)
 //	SELECT
 //	    o.opinion_id, o.talk_session_id, o.user_id, o.parent_opinion_id, o.title, o.content, o.created_at, o.picture_url, o.reference_url,
-//	    u.user_id, u.display_id, u.display_name, u.icon_url, u.created_at, u.updated_at, u.email, u.email_verified, u.withdrawal_date,
+//	    u.user_id, u.display_id, u.display_name, u.icon_url, u.created_at, u.updated_at, u.email, u.email_verified, u.withdrawal_date, u.can_create_talk_session,
 //	    COALESCE(pv.vote_type, 0) AS parent_vote_type,
 //	    COALESCE(rc.reply_count, 0) AS reply_count,
 //	    COALESCE(cv.vote_type, 0) AS current_vote_type,
@@ -968,6 +973,7 @@ func (q *Queries) GetParentOpinions(ctx context.Context, arg GetParentOpinionsPa
 			&i.User.Email,
 			&i.User.EmailVerified,
 			&i.User.WithdrawalDate,
+			&i.User.CanCreateTalkSession,
 			&i.ParentVoteType,
 			&i.ReplyCount,
 			&i.CurrentVoteType,
@@ -989,7 +995,7 @@ func (q *Queries) GetParentOpinions(ctx context.Context, arg GetParentOpinionsPa
 const getRandomOpinions = `-- name: GetRandomOpinions :many
 SELECT
     opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
     COALESCE(rc.reply_count, 0) AS reply_count
 FROM opinions
 LEFT JOIN users
@@ -1049,7 +1055,7 @@ type GetRandomOpinionsRow struct {
 //
 //	SELECT
 //	    opinions.opinion_id, opinions.talk_session_id, opinions.user_id, opinions.parent_opinion_id, opinions.title, opinions.content, opinions.created_at, opinions.picture_url, opinions.reference_url,
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
 //	    COALESCE(rc.reply_count, 0) AS reply_count
 //	FROM opinions
 //	LEFT JOIN users
@@ -1120,6 +1126,7 @@ func (q *Queries) GetRandomOpinions(ctx context.Context, arg GetRandomOpinionsPa
 			&i.User.Email,
 			&i.User.EmailVerified,
 			&i.User.WithdrawalDate,
+			&i.User.CanCreateTalkSession,
 			&i.ReplyCount,
 		); err != nil {
 			return nil, err

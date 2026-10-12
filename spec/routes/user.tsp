@@ -7,6 +7,13 @@ using OpenAPI;
 
 namespace kotohiro {
   @tag("user")
+  @extension("x-ogen-operation-group", "user")
+  @route("/users/me")
+  @get
+  @summary("ログイン中ユーザーと現在の権限")
+  op getCurrentUser(): CurrentUser;
+
+  @tag("user")
   @extension("x-ogen-operation-group", "User")
   @route("/user")
   @get
