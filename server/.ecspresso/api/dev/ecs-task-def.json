@@ -6,6 +6,14 @@
 			"image": "{{ ssm `/kotohiro-dev-api-rep/uri` }}:{{ must_env `IMAGE_TAG` }}",
 			"environment": [
 				{
+					"name": "INITIAL_ADMIN_EMAIL",
+					"value": "{{ must_env `INITIAL_ADMIN_EMAIL` }}"
+				},
+				{
+					"name": "INITIAL_ADMIN_NAME",
+					"value": "{{ must_env `INITIAL_ADMIN_NAME` }}"
+				},
+				{
 					"name": "ENV",
 					"value": "development"
 				},

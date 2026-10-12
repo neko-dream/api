@@ -1,14 +1,25 @@
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 
-// 管理画面。dev では API(localhost:3000) を /v1・/auth でプロキシし、Cookie を同一オリジン扱いにする。
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    port: 3300,
-    proxy: {
-      "/v1": "http://localhost:3000",
-      "/auth": "http://localhost:3000",
+// Local API is separate from the public Web dev server on port 3000.
+export default defineConfig(({ mode }) => {
+  const config = loadEnv(mode, process.cwd(), "");
+  const apiTarget = config.LOCAL_API_URL || "http://127.0.0.1:8081";
+  return {
+    base: "/admin/",
+    plugins: [react()],
+    build: {
+      outDir: "../server/static/admin-ui",
+      emptyOutDir: true,
     },
-  },
+    server: {
+      host: "127.0.0.1",
+      port: 3300,
+      strictPort: true,
+      proxy: {
+        "/v1": apiTarget,
+        "/auth": apiTarget,
+      },
+    },
+  };
 });

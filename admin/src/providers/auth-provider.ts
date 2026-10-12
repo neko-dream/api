@@ -1,4 +1,5 @@
 import type { AuthProvider } from "@refinedev/core";
+import axios from "axios";
 
 import { httpClient } from "./data-provider";
 
@@ -28,12 +29,15 @@ export const authProvider: AuthProvider = {
       });
       localStorage.setItem(USER_KEY, JSON.stringify(res.data));
       return { success: true, redirectTo: "/" };
-    } catch {
+    } catch (error) {
+      const rejected = axios.isAxiosError(error) && error.response?.status === 401;
       return {
         success: false,
         error: {
           name: "LoginError",
-          message: "このGoogleアカウントは管理者として登録されていません",
+          message: rejected
+            ? "このGoogleアカウントは管理者として登録されていません"
+            : "ログインできませんでした。接続を確認して、もう一度試してください",
         },
       };
     }
@@ -43,7 +47,14 @@ export const authProvider: AuthProvider = {
     try {
       await httpClient.post("/v1/admin/logout");
     } catch {
-      // Cookie はサーバー側で失効。失敗してもローカルは掃除してログイン画面へ。
+      // Do not claim logout while HttpOnly cookies may still be valid.
+      return {
+        success: false,
+        error: {
+          name: "LogoutError",
+          message: "ログアウトできませんでした。もう一度試してください",
+        },
+      };
     }
     localStorage.removeItem(USER_KEY);
     return { success: true, redirectTo: "/login" };
@@ -51,11 +62,22 @@ export const authProvider: AuthProvider = {
 
   check: async () => {
     try {
-      await httpClient.get("/v1/admin/token/info");
+      const { data } = await httpClient.get<AdminTokenInfo>("/v1/admin/token/info");
+      localStorage.setItem(USER_KEY, JSON.stringify(data));
       return { authenticated: true };
-    } catch {
-      localStorage.removeItem(USER_KEY);
-      return { authenticated: false, redirectTo: "/login" };
+    } catch (error) {
+      const status = axios.isAxiosError(error) ? error.response?.status : undefined;
+      if (status === 401 || status === 403) {
+        localStorage.removeItem(USER_KEY);
+        return { authenticated: false, redirectTo: "/login" };
+      }
+      return {
+        authenticated: false,
+        error: {
+          name: "ConnectionError",
+          message: "認証状態を確認できませんでした。接続を確認してください",
+        },
+      };
     }
   },
 

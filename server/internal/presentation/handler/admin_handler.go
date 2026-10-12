@@ -122,7 +122,10 @@ func (h *adminHandler) AdminLogin(ctx context.Context, req *oas.AdminLoginReq) (
 		IDToken: req.IdToken,
 	})
 	if err != nil {
-		return &oas.AdminLoginUnauthorized{}, nil
+		if errors.Is(err, admin_usecase.ErrInvalidAdminCredentials) {
+			return &oas.AdminLoginUnauthorized{}, nil
+		}
+		return nil, err
 	}
 
 	return &oas.AdminTokenInfoHeaders{
@@ -138,7 +141,10 @@ func (h *adminHandler) AdminRefresh(ctx context.Context) (oas.AdminRefreshRes, e
 
 	out, err := h.adminRefresh.Execute(ctx, adminRefreshTokenFromCtx(ctx))
 	if err != nil {
-		return &oas.AdminRefreshUnauthorized{}, nil
+		if errors.Is(err, admin_usecase.ErrInvalidRefreshToken) {
+			return &oas.AdminRefreshUnauthorized{}, nil
+		}
+		return nil, err
 	}
 
 	return &oas.AdminTokenInfoHeaders{
@@ -169,8 +175,10 @@ func (h *adminHandler) AdminLogout(ctx context.Context) (*oas.AdminLogoutNoConte
 	ctx, span := otel.Tracer("handler").Start(ctx, "adminHandler.AdminLogout")
 	defer span.End()
 
-	// refresh セッションをサーバー側で失効させる(エラーでも cookie は消す)。
-	_ = h.adminLogout.Execute(ctx, adminRefreshTokenFromCtx(ctx))
+	// Do not report success if server-side refresh revocation failed.
+	if err := h.adminLogout.Execute(ctx, adminRefreshTokenFromCtx(ctx)); err != nil {
+		return nil, err
+	}
 
 	return &oas.AdminLogoutNoContent{
 		SetCookie: cookie_utils.EncodeCookies([]*http.Cookie{

@@ -1,7 +1,7 @@
 FROM  --platform=linux/arm64 alpine:latest
 
 EXPOSE 3000
-ENV ENV=dev
+ARG ENV=dev
 
 COPY ./server /server
 

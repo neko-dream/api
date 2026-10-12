@@ -1,0 +1,18 @@
+services:
+  db:
+    image: ghcr.io/baosystems/postgis:16-3.5
+    ports:
+      - "127.0.0.1:5434:5432"
+    environment:
+      POSTGRES_DB: kotohiro
+      POSTGRES_USER: kotohiro
+      POSTGRES_PASSWORD: kotohiro
+    volumes:
+      - admin-local-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kotohiro -d kotohiro"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+volumes:
+  admin-local-db:

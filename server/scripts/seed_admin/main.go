@@ -35,12 +35,12 @@ func main() {
 	defer db.Close()
 
 	if _, err := db.Exec(
-		`INSERT INTO admin_users (admin_user_id, email, display_name, role)
-		 VALUES ($1, $2, $3, $4)
+		`INSERT INTO admin_users (admin_user_id, email, display_name)
+		 VALUES ($1, $2, $3)
 		 ON CONFLICT (email) DO UPDATE
 		 SET display_name = EXCLUDED.display_name,
 		     updated_at = CURRENT_TIMESTAMP`,
-		uuid.New(), *email, *name, 10,
+		uuid.New(), *email, *name,
 	); err != nil {
 		log.Fatalf("insert: %v", err)
 	}

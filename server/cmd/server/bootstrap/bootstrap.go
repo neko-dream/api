@@ -109,6 +109,10 @@ func (b *Bootstrap) bootstrapInitialAdmin(ctx context.Context) error {
 		Email:       b.config.InitialAdminEmail,
 		DisplayName: name,
 	}); err != nil {
+		// 複数のECSタスクが同時に初回起動しても、登録済みなら起動を継続する。
+		if existing, lookupErr := adminUserRepo.FindByEmail(ctx, b.config.InitialAdminEmail); lookupErr == nil && existing != nil {
+			return nil
+		}
 		return err
 	}
 	log.Printf("bootstrapped initial admin: %s", b.config.InitialAdminEmail)

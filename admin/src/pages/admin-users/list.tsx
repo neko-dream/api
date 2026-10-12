@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { Button, Space, Table, Typography } from "antd";
+import { Alert, Button, Space, Table, Typography } from "antd";
 
 import { httpClient } from "../../providers";
 
@@ -14,14 +14,23 @@ export const AdminUserList = () => {
   const [data, setData] = useState<AdminUserItem[]>([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [error, setError] = useState(false);
+  const [retry, setRetry] = useState(0);
 
   useEffect(() => {
     let active = true;
     setLoading(true);
+    setError(false);
     httpClient
       .get<{ adminUsers: AdminUserItem[] }>("/v1/admin/admin-users")
       .then((res) => {
         if (active) setData(res.data.adminUsers ?? []);
+      })
+      .catch(() => {
+        if (active) {
+          setData([]);
+          setError(true);
+        }
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -29,7 +38,7 @@ export const AdminUserList = () => {
     return () => {
       active = false;
     };
-  }, []);
+  }, [retry]);
 
   return (
     <div style={{ padding: 24 }}>
@@ -41,6 +50,14 @@ export const AdminUserList = () => {
           新規作成
         </Button>
       </Space>
+      {error && (
+        <Alert
+          type="error"
+          showIcon
+          message="管理者一覧を取得できませんでした"
+          action={<Button onClick={() => setRetry((value) => value + 1)}>再試行</Button>}
+        />
+      )}
       <Table
         rowKey="id"
         loading={loading}

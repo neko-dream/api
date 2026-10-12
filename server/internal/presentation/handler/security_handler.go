@@ -2,7 +2,10 @@ package handler
 
 import (
 	"context"
+	"errors"
 	"slices"
+
+	"github.com/golang-jwt/jwt/v5"
 
 	"github.com/neko-dream/api/internal/domain/messages"
 	"github.com/neko-dream/api/internal/domain/model/admin"
@@ -90,6 +93,12 @@ func (s *securityHandler) HandleAdminCookieAuth(ctx context.Context, operationNa
 
 	claim, err := s.adminTokenManager.Parse(ctx, t.GetAPIKey())
 	if err != nil {
+		if errors.Is(err, jwt.ErrTokenExpired) {
+			return ctx, messages.TokenExpiredError
+		}
+		return ctx, messages.ForbiddenError
+	}
+	if claim == nil {
 		return ctx, messages.ForbiddenError
 	}
 	if claim.IsExpired(clock.Now(ctx)) {
