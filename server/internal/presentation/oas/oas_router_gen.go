@@ -2251,7 +2251,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						}
 						switch elem[0] {
 						case 'l': // Prefix: "list"
-
+							origElem := elem
 							if l := len("list"); len(elem) >= l && elem[0:l] == "list" {
 								elem = elem[l:]
 							} else {
@@ -2270,8 +2270,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								return
 							}
 
+							elem = origElem
 						case 's': // Prefix: "stats/"
-
+							origElem := elem
 							if l := len("stats/"); len(elem) >= l && elem[0:l] == "stats/" {
 								elem = elem[l:]
 							} else {
@@ -2324,6 +2325,29 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 							}
 
+							elem = origElem
+						}
+						// Param: "userID"
+						// Leaf parameter, slashes are prohibited
+						idx := strings.IndexByte(elem, '/')
+						if idx >= 0 {
+							break
+						}
+						args[0] = elem
+						elem = ""
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch r.Method {
+							case "GET":
+								s.handleGetUserDetailManageRequest([1]string{
+									args[0],
+								}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "GET")
+							}
+
+							return
 						}
 
 					}
@@ -4945,7 +4969,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						}
 						switch elem[0] {
 						case 'l': // Prefix: "list"
-
+							origElem := elem
 							if l := len("list"); len(elem) >= l && elem[0:l] == "list" {
 								elem = elem[l:]
 							} else {
@@ -4968,8 +4992,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								}
 							}
 
+							elem = origElem
 						case 's': // Prefix: "stats/"
-
+							origElem := elem
 							if l := len("stats/"); len(elem) >= l && elem[0:l] == "stats/" {
 								elem = elem[l:]
 							} else {
@@ -5030,6 +5055,31 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 
 							}
 
+							elem = origElem
+						}
+						// Param: "userID"
+						// Leaf parameter, slashes are prohibited
+						idx := strings.IndexByte(elem, '/')
+						if idx >= 0 {
+							break
+						}
+						args[0] = elem
+						elem = ""
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch method {
+							case "GET":
+								r.name = GetUserDetailManageOperation
+								r.summary = ""
+								r.operationID = "getUserDetailManage"
+								r.pathPattern = "/v1/manage/users/{userID}"
+								r.args = args
+								r.count = 1
+								return r, true
+							default:
+								return
+							}
 						}
 
 					}

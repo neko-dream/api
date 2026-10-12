@@ -12,6 +12,8 @@ import { LoginPage } from "./pages/login";
 import { AdminUserCreate } from "./pages/admin-users/create";
 import { AdminUserList } from "./pages/admin-users/list";
 import { TalkSessionList } from "./pages/talksessions/list";
+import { UserList } from "./pages/users/list";
+import { UserShow } from "./pages/users/show";
 import { authProvider, dataProvider } from "./providers";
 
 function App() {
@@ -27,6 +29,12 @@ function App() {
                 routerProvider={routerProvider}
                 notificationProvider={useNotificationProvider}
                 resources={[
+                  {
+                    name: "users",
+                    list: "/users",
+                    show: "/users/show/:id",
+                    meta: { label: "ユーザー", canDelete: false },
+                  },
                   {
                     name: "talksessions",
                     list: "/talksessions",
@@ -60,6 +68,8 @@ function App() {
                   >
                     <Route index element={<NavigateToResource resource="talksessions" />} />
                     <Route path="/talksessions" element={<TalkSessionList />} />
+                    <Route path="/users" element={<UserList />} />
+                    <Route path="/users/show/:id" element={<UserShow />} />
                     <Route path="/admin-users" element={<AdminUserList />} />
                     <Route path="/admin-users/create" element={<AdminUserCreate />} />
                     <Route path="*" element={<ErrorComponent />} />

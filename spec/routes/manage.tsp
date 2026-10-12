@@ -72,16 +72,23 @@ namespace kotohiro {
       @operationId("getUserListManage")
       @get
       getUserList(
+        @minValue(0)
         @query offset?: int32,
+        @minValue(1)
+        @maxValue(100)
         @query limit?: int32,
+        @maxLength(200)
         @query search?: string,
-        @query orderBy?:
-          | "createdAt"
-          | "updatedAt"
-          | "displayName"
-          | "lastLoginAt",
-        @query order?: "asc" | "desc",
-      ): kotohiro.UserForManage[];
+      ): kotohiro.ManagedUserList;
+
+      @route("/{userID}")
+      @extension("x-ogen-operation-group", "manage")
+      @operationId("getUserDetailManage")
+      @get
+      getUserDetail(@path userID: string): Body<kotohiro.ManagedUser> | {
+        @statusCode statusCode: 404;
+        @body body: {};
+      };
 
       @route("/stats/list")
       @extension("x-ogen-operation-group", "manage")
