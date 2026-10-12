@@ -3,6 +3,11 @@ package messages
 import "net/http"
 
 var (
+	OrganizationMembershipConflict = &APIError{
+		StatusCode: http.StatusConflict,
+		Code:       "ORGANIZATION-013",
+		Message:    "組織所属は1アカウントにつき1つです。所属設定を確認してください。",
+	}
 	OrganizationAlreadyExists = &APIError{
 		StatusCode: http.StatusBadRequest,
 		Code:       "OPINION-001",

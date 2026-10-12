@@ -1,0 +1,1 @@
+ALTER TABLE organization_users DROP CONSTRAINT organization_users_one_per_user;

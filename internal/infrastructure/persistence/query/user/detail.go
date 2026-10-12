@@ -2,6 +2,8 @@ package user_query
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 
 	"github.com/jinzhu/copier"
 	"github.com/neko-dream/api/internal/application/query/dto"
@@ -35,10 +37,6 @@ func (d *DetailHandler) Execute(ctx context.Context, input user_query.DetailInpu
 		return nil, err
 	}
 
-	userDemographic, err := crypto_infra.DecryptUserDemographicsDTO(ctx, d.encryptor, &userRow.UserDemographic)
-	if err != nil {
-		return nil, err
-	}
 	var userDetail dto.UserDetail
 	if err := copier.CopyWithOption(&userDetail, userRow, copier.Option{
 		IgnoreEmpty: true,
@@ -46,8 +44,17 @@ func (d *DetailHandler) Execute(ctx context.Context, input user_query.DetailInpu
 	}); err != nil {
 		return nil, err
 	}
-	if userDemographic != nil {
-		userDetail.UserDemographic = userDemographic
+	// Demographics are optional. A LEFT JOIN with sqlc.embed scans NULL
+	// timestamps into time.Time when the row is absent, so fetch separately.
+	demographicRow, err := d.GetQueries(ctx).GetUserDemographicByUserID(ctx, input.UserID.UUID())
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+	if err == nil {
+		userDetail.UserDemographic, err = crypto_infra.DecryptUserDemographicsDTO(ctx, d.encryptor, &demographicRow)
+		if err != nil {
+			return nil, err
+		}
 	}
 	if userRow.User.Email.Valid {
 		decrypted, err := d.encryptor.DecryptString(ctx, userRow.User.Email.String)

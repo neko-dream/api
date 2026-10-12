@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/neko-dream/api/internal/domain/model/organization"
 	"github.com/neko-dream/api/internal/domain/model/shared"
 	"github.com/neko-dream/api/internal/domain/model/user"
 	"github.com/neko-dream/api/internal/domain/service"
@@ -27,10 +28,17 @@ func main() {
 	if os.Getenv("ENV") != "local" {
 		log.Fatal("set ENV=local; this command is only for local test fixtures")
 	}
-	if len(os.Args) != 3 {
-		log.Fatal("usage: ENV=local go run ./cmd/local-email-account EMAIL LOCAL_TEST_PASSWORD")
+	if len(os.Args) != 3 && len(os.Args) != 4 {
+		log.Fatal("usage: ENV=local go run ./cmd/local-email-account EMAIL LOCAL_TEST_PASSWORD [NEW_ORGANIZATION_CODE]")
 	}
 	address, password := os.Args[1], os.Args[2]
+	orgCode := ""
+	if len(os.Args) == 4 {
+		orgCode = os.Args[3]
+		if err := organization.ValidateOrganizationCode(orgCode); err != nil {
+			log.Fatal(err)
+		}
+	}
 	parsed, err := mail.ParseAddress(address)
 	if err != nil || parsed.Address != address || strings.ContainsAny(address, "\r\n") || len(password) < 12 {
 		log.Fatal("provide a bare email address and a local-only password of at least 12 characters")
@@ -49,6 +57,8 @@ func main() {
 		log.Fatal(err)
 	}
 	users := repository.NewUserRepository(manager, nil, encryptor)
+	organizations := repository.NewOrganizationRepository(manager)
+	members := repository.NewOrganizationUserRepository(manager)
 	passwords := service.NewPasswordAuthManager(repository.NewPasswordAuthRepository(manager), cfg)
 	subject, err := hash.HMACHash(address, cfg.HASH_PEPPER)
 	if err != nil {
@@ -70,10 +80,30 @@ func main() {
 		if err := users.Create(ctx, usr); err != nil {
 			return err
 		}
-		return passwords.RegisterPassword(ctx, id, password, false)
+		if err := passwords.RegisterPassword(ctx, id, password, false); err != nil {
+			return err
+		}
+		if orgCode == "" {
+			return nil
+		}
+		existingOrg, err := organizations.FindByCode(ctx, orgCode)
+		if err != nil && !errors.Is(err, sql.ErrNoRows) {
+			return err
+		}
+		if existingOrg != nil {
+			return fmt.Errorf("organization already exists; no existing data was changed")
+		}
+		org := organization.NewOrganization(shared.NewUUID[organization.Organization](), organization.OrganizationTypeGovernment, "ローカル検証市", orgCode, nil, id)
+		if err := organizations.Create(ctx, org); err != nil {
+			return err
+		}
+		return members.Create(ctx, *organization.NewOrganizationUser(shared.NewUUID[organization.OrganizationUser](), org.OrganizationID, id, organization.OrganizationUserRoleOwner))
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("Created local-only fixture: %s\nOpen https://localhost:3000/api/auth/password/verify\n", address)
+	fmt.Printf("Created local-only fixture: %s\nOpen https://localhost:3000/organization/login\n", address)
+	if orgCode != "" {
+		fmt.Printf("Organization: ローカル検証市 (%s), role: owner\n", orgCode)
+	}
 }

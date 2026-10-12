@@ -152,6 +152,18 @@ func TestSessionService_DeactivateUserSessions(t *testing.T) {
 }
 
 func TestSessionService_RefreshSession(t *testing.T) {
+	t.Run("organization remains after refresh", func(t *testing.T) {
+		ctx := context.Background()
+		repo := newFakeSessionRepository()
+		uid := shared.NewUUID[user.User]()
+		oid := shared.NewUUID[any]()
+		sess := session.NewSessionWithOrganization(shared.NewUUID[session.Session](), uid, shared.ProviderGoogle, session.SESSION_ACTIVE, *session.NewExpiresAt(ctx), time.Now(), &oid)
+		repo.addSession(sess)
+		refreshed, err := NewSessionService(repo).RefreshSession(ctx, uid)
+		require.NoError(t, err)
+		require.NotNil(t, refreshed.OrganizationID())
+		assert.Equal(t, oid, *refreshed.OrganizationID())
+	})
 	t.Run("セッションを更新して新しいセッションを返す", func(t *testing.T) {
 		repo := newFakeSessionRepository()
 		svc := NewSessionService(repo)

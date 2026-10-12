@@ -70,13 +70,14 @@ func (s *sessionService) RefreshSession(
 	}
 
 	// sessionを更新
-	newSess := session.NewSession(
+	newSess := session.NewSessionWithOrganization(
 		shared.NewUUID[session.Session](),
 		sessList[0].UserID(),
 		sessList[0].Provider(),
 		session.SESSION_ACTIVE,
 		*session.NewExpiresAt(ctx),
 		clock.Now(ctx),
+		sessList[0].OrganizationID(),
 	)
 	updatedSess, err := s.sessionRepository.Create(ctx, *newSess)
 	if err != nil {

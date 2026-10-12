@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"net/url"
-	"os"
 	"strings"
 	"sync"
 	"testing"
@@ -15,6 +14,7 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/neko-dream/api/internal/domain/messages"
 	"github.com/neko-dream/api/internal/domain/model/clock"
+	"github.com/neko-dream/api/internal/domain/model/organization"
 	"github.com/neko-dream/api/internal/domain/model/session"
 	"github.com/neko-dream/api/internal/domain/model/shared"
 	"github.com/neko-dream/api/internal/domain/model/user"
@@ -24,6 +24,7 @@ import (
 	"github.com/neko-dream/api/internal/infrastructure/crypto"
 	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/api/internal/infrastructure/persistence/repository"
+	"github.com/neko-dream/api/internal/test/integration"
 	"github.com/neko-dream/api/pkg/hash"
 )
 
@@ -39,47 +40,8 @@ func (t *failingLoginTokens) Generate(ctx context.Context, u user.User, id share
 	return t.TokenManager.Generate(ctx, u, id)
 }
 
-func emailLoginTestDB(t *testing.T) *sql.DB {
-	t.Helper()
-	raw := os.Getenv("MAIL_TEST_DATABASE_URL")
-	if raw == "" {
-		t.Skip("set MAIL_TEST_DATABASE_URL to run real login transaction tests")
-	}
-	admin, err := sql.Open("pgx", raw)
-	if err != nil {
-		t.Fatal(err)
-	}
-	schema := "email_login_test_" + strings.ReplaceAll(uuid.NewString(), "-", "")
-	if _, err := admin.Exec(`CREATE SCHEMA "` + schema + `"`); err != nil {
-		admin.Close()
-		t.Fatal(err)
-	}
-	t.Cleanup(func() {
-		if _, err := admin.Exec(`DROP SCHEMA "` + schema + `" CASCADE`); err != nil {
-			t.Error(err)
-		}
-		admin.Close()
-	})
-	u, err := url.Parse(raw)
-	if err != nil {
-		t.Fatal(err)
-	}
-	q := u.Query()
-	q.Set("search_path", schema+",public")
-	u.RawQuery = q.Encode()
-	if err := db.NewMigrator(&config.Config{DatabaseURL: u.String()}).Up(); err != nil {
-		t.Fatal(err)
-	}
-	conn, err := sql.Open("pgx", u.String())
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() { conn.Close() })
-	return conn
-}
-
 func TestPasswordEmailLoginTransactionsIntegration(t *testing.T) {
-	conn := emailLoginTestDB(t)
+	conn := integration.NewDatabase(t)
 	manager := db.NewDBManager(conn)
 	cfg := &config.Config{Env: config.LOCAL, TokenSecret: "local-integration-secret", HASH_PEPPER: "local-integration-pepper", HASH_ITERATIONS: 4, EMAIL_FROM: "noreply@example.com", APP_NAME: "ことひろ", WEBSITE_URL: "https://localhost:3000", ENCRYPTION_VERSION: "v1", ENCRYPTION_SECRET: "local-dev-key16!"}
 	encryptor, err := crypto.NewEncryptor(cfg)
@@ -92,7 +54,7 @@ func TestPasswordEmailLoginTransactionsIntegration(t *testing.T) {
 	sessions := repository.NewSessionRepository(manager)
 	sessionService := service.NewSessionService(sessions)
 	realTokens := tokens.NewSessionTokenManager(cfg, manager, sessions, users, repository.NewOrganizationUserRepository(manager), repository.NewOrganizationRepository(manager))
-	for _, scenario := range []string{"single use concurrency", "session failure rollback", "resend and expiry", "changed password", "changed email", "send failure rollback", "PIN concurrency", "PIN attempts and resend", "PIN session rollback"} {
+	for _, scenario := range []string{"single use concurrency", "session failure rollback", "resend and expiry", "changed password", "changed email", "send failure rollback", "PIN concurrency", "PIN attempts and resend", "PIN session rollback", "organization link", "organization PIN"} {
 		t.Run(scenario, func(t *testing.T) {
 			ctx := clock.SetNow(context.Background(), time.Now().UTC())
 			address := "login-" + uuid.NewString() + "@example.com"
@@ -108,13 +70,26 @@ func TestPasswordEmailLoginTransactionsIntegration(t *testing.T) {
 			if err := passwordManager.RegisterPassword(ctx, usr.UserID(), "original-password", true); err != nil {
 				t.Fatal(err)
 			}
+			var orgID *shared.UUID[organization.Organization]
+			if strings.HasPrefix(scenario, "organization") {
+				id := shared.NewUUID[organization.Organization]()
+				orgID = &id
+				org := organization.NewOrganization(id, organization.OrganizationTypeNormal, "City "+id.String(), "city-"+id.String(), nil, usr.UserID())
+				if err := repository.NewOrganizationRepository(manager).Create(ctx, org); err != nil {
+					t.Fatal(err)
+				}
+				membership := organization.NewOrganizationUser(shared.NewUUID[organization.OrganizationUser](), id, usr.UserID(), organization.OrganizationUserRoleOwner)
+				if err := repository.NewOrganizationUserRepository(manager).Create(ctx, *membership); err != nil {
+					t.Fatal(err)
+				}
+			}
 			previous := session.NewSession(shared.NewUUID[session.Session](), usr.UserID(), usr.Provider(), session.SESSION_ACTIVE, *session.NewExpiresAt(ctx), clock.Now(ctx))
 			if _, err := sessions.Create(ctx, *previous); err != nil {
 				t.Fatal(err)
 			}
 			sender := &loginTestSender{cfg: cfg}
 			tokenManager := &failingLoginTokens{TokenManager: realTokens}
-			p := NewPasswordLogin(users, sessionService, sessions, manager, cfg, passwordManager, tokenManager, passwords, repository.NewPasswordLoginChallengeRepository(manager), sender)
+			p := NewPasswordLogin(users, sessionService, sessions, manager, cfg, passwordManager, tokenManager, passwords, repository.NewPasswordLoginChallengeRepository(manager), sender, repository.NewOrganizationRepository(manager), repository.NewOrganizationUserRepository(manager))
 			input := PasswordLoginInput{IDorEmail: address, Password: "original-password"}
 			if scenario == "send failure rollback" {
 				sender.err = loginTestErr
@@ -304,7 +279,7 @@ func TestPasswordEmailLoginTransactionsIntegration(t *testing.T) {
 			if scenario != "single use concurrency" && scenario != "PIN concurrency" {
 				var signed string
 				var err error
-				if strings.HasPrefix(scenario, "PIN") {
+				if strings.HasPrefix(scenario, "PIN") || scenario == "organization PIN" {
 					signed, err = p.VerifyPIN(ctx, pin, out.BrowserSecret)
 				} else {
 					signed, err = p.Verify(ctx, token, out.BrowserSecret)
@@ -315,6 +290,13 @@ func TestPasswordEmailLoginTransactionsIntegration(t *testing.T) {
 				claim, err := realTokens.Parse(ctx, signed)
 				if err != nil || claim == nil || !claim.IsEmailVerified {
 					t.Fatalf("invalid authenticated token: %#v %v", claim, err)
+				}
+				if orgID != nil {
+					if claim.OrganizationID == nil || *claim.OrganizationID != orgID.String() || claim.OrganizationRole == nil || *claim.OrganizationRole != organization.RoleToName(organization.OrganizationUserRoleOwner) {
+						t.Fatalf("missing organization claims: %#v", claim)
+					}
+				} else if claim.OrganizationID != nil {
+					t.Fatal("ordinary user elevated to organization")
 				}
 			}
 			if _, err := p.Verify(ctx, token, out.BrowserSecret); !errors.Is(err, messages.InvalidEmailLoginLinkError) {

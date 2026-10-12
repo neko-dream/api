@@ -1,8 +1,8 @@
 package messages
 
 var (
-	InvalidEmailLoginPINError = &APIError{StatusCode: 400, Code: "AUTH-0017", Message: "PINが正しくないか、期限切れです。メールの6桁のPINを確認してください。"}
-	EmailLoginPINAttemptsError = &APIError{StatusCode: 429, Code: "AUTH-0018", Message: "PINを5回間違えたため、このメールでは確認できません。新しい確認メールを送信してください。"}
+	InvalidEmailLoginPINError  = &APIError{StatusCode: 400, Code: "AUTH-0017", Message: "確認コードが正しくないか、期限切れです。メールの6桁の確認コードを確認してください。"}
+	EmailLoginPINAttemptsError = &APIError{StatusCode: 429, Code: "AUTH-0018", Message: "確認コードを5回間違えたため、このメールでは確認できません。新しい確認メールを送信してください。"}
 	InvalidEmailLoginLinkError = &APIError{StatusCode: 400, Code: "AUTH-0015", Message: "確認リンクが無効です。ログインを開始したブラウザで開くか、再度ログインしてください。"}
 	EmailLoginRateLimitError   = &APIError{StatusCode: 429, Code: "AUTH-0016", Message: "確認メールの再送は60秒以上待ってから行ってください。"}
 	// 組織に所属していない場合のエラー

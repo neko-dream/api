@@ -70,15 +70,7 @@ func (i *inviteOrganizationInteractor) Execute(ctx context.Context, input Invite
 	}
 
 	// 有効なロール値かチェック (10, 20, 30, 40)
-	validRoles := []int{10, 20, 30, 40}
-	isValidRole := false
-	for _, validRole := range validRoles {
-		if input.Role == validRole {
-			isValidRole = true
-			break
-		}
-	}
-	if !isValidRole {
+	if !organization.OrganizationUserRole(input.Role).IsValid() {
 		return nil, errors.New("invalid role")
 	}
 

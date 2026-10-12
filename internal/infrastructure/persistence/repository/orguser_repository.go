@@ -2,6 +2,11 @@ package repository
 
 import (
 	"context"
+	"errors"
+
+	legacy_pgconn "github.com/jackc/pgconn"
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/neko-dream/api/internal/domain/messages"
 
 	"github.com/neko-dream/api/internal/domain/model/clock"
 	"github.com/neko-dream/api/internal/domain/model/organization"
@@ -35,10 +40,24 @@ func (o *organizationUserRepository) Create(ctx context.Context, orgUser organiz
 		UpdatedAt:          clock.Now(ctx),
 		CreatedAt:          clock.Now(ctx),
 	}); err != nil {
+		if isSingleMembershipConflict(err) {
+			return messages.OrganizationMembershipConflict
+		}
 		return err
 	}
 
 	return nil
+}
+
+// Migrator imports pgx/v4 while application code also imports pgx/v5. Whichever
+// registered the "pgx" SQL driver first can supply the server error type.
+func isSingleMembershipConflict(err error) bool {
+	var current *pgconn.PgError
+	if errors.As(err, &current) {
+		return current.Code == "23505" && current.ConstraintName == "organization_users_one_per_user"
+	}
+	var legacy *legacy_pgconn.PgError
+	return errors.As(err, &legacy) && legacy.Code == "23505" && legacy.ConstraintName == "organization_users_one_per_user"
 }
 
 // FindByOrganizationID implements organization.OrganizationUserRepository.

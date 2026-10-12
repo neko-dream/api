@@ -19,9 +19,11 @@ import (
 	"github.com/neko-dream/api/internal/domain/messages"
 	password_auth "github.com/neko-dream/api/internal/domain/model/auth/password"
 	"github.com/neko-dream/api/internal/domain/model/clock"
+	"github.com/neko-dream/api/internal/domain/model/organization"
 	"github.com/neko-dream/api/internal/domain/model/session"
 	"github.com/neko-dream/api/internal/domain/model/shared"
 	"github.com/neko-dream/api/internal/domain/model/user"
+	organization_service "github.com/neko-dream/api/internal/domain/service/organization"
 	"github.com/neko-dream/api/internal/infrastructure/config"
 	"github.com/neko-dream/api/internal/infrastructure/email"
 	email_template "github.com/neko-dream/api/internal/infrastructure/email/template"
@@ -62,9 +64,11 @@ type passwordLoginInteractor struct {
 	txRunner loginTransactionRunner
 	*config.Config
 	password_auth.PasswordAuthManager
-	passwordRepository password_auth.PasswordAuthRepository
-	challenges         password_auth.LoginChallengeRepository
-	emailSender        email.EmailSender
+	passwordRepository         password_auth.PasswordAuthRepository
+	challenges                 password_auth.LoginChallengeRepository
+	emailSender                email.EmailSender
+	organizationRepository     organization.OrganizationRepository
+	organizationUserRepository organization.OrganizationUserRepository
 	session.TokenManager
 }
 
@@ -79,18 +83,22 @@ func NewPasswordLogin(
 	passwordRepository password_auth.PasswordAuthRepository,
 	challenges password_auth.LoginChallengeRepository,
 	emailSender email.EmailSender,
+	organizationRepository organization.OrganizationRepository,
+	organizationUserRepository organization.OrganizationUserRepository,
 ) PasswordLogin {
 	return &passwordLoginInteractor{
-		UserRepository:      userRep,
-		SessionService:      sessService,
-		SessionRepository:   sessionRepository,
-		txRunner:            tm,
-		Config:              config,
-		PasswordAuthManager: passwordAuthManager,
-		TokenManager:        tokenManager,
-		passwordRepository:  passwordRepository,
-		challenges:          challenges,
-		emailSender:         emailSender,
+		UserRepository:             userRep,
+		SessionService:             sessService,
+		SessionRepository:          sessionRepository,
+		txRunner:                   tm,
+		Config:                     config,
+		PasswordAuthManager:        passwordAuthManager,
+		TokenManager:               tokenManager,
+		passwordRepository:         passwordRepository,
+		challenges:                 challenges,
+		emailSender:                emailSender,
+		organizationRepository:     organizationRepository,
+		organizationUserRepository: organizationUserRepository,
 	}
 }
 
@@ -178,7 +186,7 @@ func (p *passwordLoginInteractor) Execute(ctx context.Context, input PasswordLog
 			}
 			return err
 		}
-		if err := p.emailSender.Send(ctx, *usr.Email(), email_template.PasswordLoginEmailTemplate, map[string]any{"Title": "ログインの本人確認", "VerificationURL": verificationURL, "ExpiryMinutes": 15, "PIN": pin}); err != nil {
+		if err := p.emailSender.Send(ctx, *usr.Email(), email_template.PasswordLoginEmailTemplate, map[string]any{"Title": "ログインの確認", "VerificationURL": verificationURL, "ExpiryMinutes": 15, "PIN": pin}); err != nil {
 			return err
 		}
 		output = PasswordLoginOutput{BrowserSecret: browser, ExpiresAt: expires}
@@ -291,11 +299,15 @@ func (p *passwordLoginInteractor) completeEmailLogin(ctx context.Context, challe
 	if err := p.UserRepository.Update(ctx, *usr); err != nil {
 		return "", err
 	}
-	// Existing password-login policy; shared-account concurrent sessions are #319.
+	orgID, err := organization_service.ResolveLoginOrganization(ctx, p.organizationUserRepository, p.organizationRepository, usr.UserID(), nil)
+	if err != nil {
+		return "", err
+	}
+	// Existing password-login session policy is retained.
 	if err := p.SessionRepository.DeactivateAllByUserID(ctx, usr.UserID()); err != nil {
 		return "", err
 	}
-	sess := session.NewSession(shared.NewUUID[session.Session](), usr.UserID(), usr.Provider(), session.SESSION_ACTIVE, *session.NewExpiresAt(ctx), clock.Now(ctx))
+	sess := session.NewSessionWithOrganization(shared.NewUUID[session.Session](), usr.UserID(), usr.Provider(), session.SESSION_ACTIVE, *session.NewExpiresAt(ctx), clock.Now(ctx), orgID)
 	if _, err := p.SessionRepository.Create(ctx, *sess); err != nil {
 		return "", err
 	}

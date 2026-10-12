@@ -8,6 +8,7 @@ import (
 	"github.com/neko-dream/api/internal/domain/model/shared"
 	"github.com/neko-dream/api/internal/domain/model/user"
 	organization_svc "github.com/neko-dream/api/internal/domain/service/organization"
+	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/api/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
@@ -29,13 +30,16 @@ type CreateOrganizationOutput struct {
 
 type createOrganizationInteractor struct {
 	organizationService organization_svc.OrganizationService
+	dbManager           *db.DBManager
 }
 
 func NewCreateOrganizationInteractor(
 	organizationService organization_svc.OrganizationService,
+	dbManager *db.DBManager,
 ) CreateOrganizationCommand {
 	return &createOrganizationInteractor{
 		organizationService: organizationService,
+		dbManager:           dbManager,
 	}
 }
 
@@ -46,7 +50,10 @@ func (c *createOrganizationInteractor) Execute(ctx context.Context, input Create
 	orgType := organization.OrganizationType(input.Type)
 	ownerID := input.UserID
 
-	_, err := c.organizationService.CreateOrganization(ctx, input.Name, input.Code, input.IconImage, orgType, ownerID)
+	err := c.dbManager.ExecTx(ctx, func(ctx context.Context) error {
+		_, err := c.organizationService.CreateOrganization(ctx, input.Name, input.Code, input.IconImage, orgType, ownerID)
+		return err
+	})
 	if err != nil {
 		utils.HandleError(ctx, err, "CreateOrganization")
 		return nil, err
