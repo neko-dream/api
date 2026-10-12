@@ -209,21 +209,67 @@ paths:
   /auth/password/login:
     post:
       operationId: passwordLogin
-      summary: パスワードによるログイン
+      summary: パスワードを確認し、ログインごとのメール本人確認を開始する
       parameters: []
       responses:
-        '200':
-          description: The request has succeeded.
+        '202':
+          description: The request has been accepted for processing, but processing has not yet completed.
+          headers:
+            Set-Cookie:
+              required: true
+              schema:
+                type: array
+                items:
+                  type: string
           content:
             application/json:
               schema:
                 type: object
+                properties:
+                  verificationRequired:
+                    type: boolean
+                    enum:
+                      - true
+                  expiresAt:
+                    type: string
+                    format: date-time
+                required:
+                  - verificationRequired
+                  - expiresAt
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
             application/json:
               schema:
                 type: object
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+        '429':
+          description: Client error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
         '500':
           description: Server error
           content:
@@ -289,6 +335,173 @@ paths:
               required:
                 - password
                 - email
+      security:
+        - {}
+      x-ogen-operation-group: Auth
+  /auth/password/verify:
+    get:
+      operationId: passwordEmailConfirmation
+      summary: メール本人確認ページ（リンクはURLフラグメントに格納）
+      description: GETではリンクを消費しない。ログインを開始したブラウザで確認ボタンを押す。
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            text/html; charset=utf-8:
+              schema:
+                type: string
+      tags:
+        - auth
+      security:
+        - {}
+      x-ogen-operation-group: Auth
+    post:
+      operationId: verifyPasswordEmail
+      summary: メール本人確認を完了し、初めてログインCookieを発行する
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            Set-Cookie:
+              required: true
+              schema:
+                type: array
+                items:
+                  type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  redirectURL:
+                    type: string
+                required:
+                  - redirectURL
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+      tags:
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+              required:
+                - token
+      security:
+        - {}
+      x-ogen-operation-group: Auth
+  /auth/password/verify-pin:
+    post:
+      operationId: verifyPasswordEmailPIN
+      summary: メールの6桁PINで本人確認を完了する
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            Set-Cookie:
+              required: true
+              schema:
+                type: array
+                items:
+                  type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  redirectURL:
+                    type: string
+                required:
+                  - redirectURL
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+        '429':
+          description: Client error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - message
+      tags:
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pin:
+                  type: string
+              required:
+                - pin
       security:
         - {}
       x-ogen-operation-group: Auth

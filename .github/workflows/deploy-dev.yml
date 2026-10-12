@@ -18,6 +18,7 @@ jobs:
         working-directory: server
     env:
       INITIAL_ADMIN_EMAIL: ${{ vars.INITIAL_ADMIN_EMAIL }}
+      ADMIN_ALLOWED_ORIGINS: ${{ vars.ADMIN_ALLOWED_ORIGINS }}
       INITIAL_ADMIN_NAME: ${{ vars.INITIAL_ADMIN_NAME || '管理者' }}
     if: github.ref == 'refs/heads/develop'
     permissions:
@@ -40,6 +41,7 @@ jobs:
           GOOGLE_CLIENT_ID: ${{ vars.ADMIN_GOOGLE_CLIENT_ID }}
         run: |
           test -n "$INITIAL_ADMIN_EMAIL" || { echo "::error::Set INITIAL_ADMIN_EMAIL in the GitHub environment"; exit 1; }
+          test -n "$ADMIN_ALLOWED_ORIGINS" || { echo "::error::Set ADMIN_ALLOWED_ORIGINS in the GitHub environment"; exit 1; }
           test -n "$GOOGLE_CLIENT_ID" || { echo "::error::Set ADMIN_GOOGLE_CLIENT_ID to the API's Google client ID"; exit 1; }
 
       - name: Set up Node

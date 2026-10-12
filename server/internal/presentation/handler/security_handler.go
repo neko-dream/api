@@ -19,6 +19,7 @@ type securityHandler struct {
 	session.TokenManager
 	session.SessionRepository
 	adminTokenManager admin.AdminTokenManager
+	adminUserRepo     admin.AdminUserRepository
 }
 
 var skipOperations = []string{
@@ -104,6 +105,17 @@ func (s *securityHandler) HandleAdminCookieAuth(ctx context.Context, operationNa
 	if claim.IsExpired(clock.Now(ctx)) {
 		return ctx, messages.TokenExpiredError
 	}
+	id, err := claim.AdminUserID()
+	if err != nil {
+		return ctx, messages.ForbiddenError
+	}
+	user, err := s.adminUserRepo.FindByID(ctx, id)
+	if err != nil {
+		return ctx, err
+	}
+	if user == nil {
+		return ctx, messages.ForbiddenError
+	}
 
 	return admin.SetAdminSession(ctx, claim), nil
 }
@@ -112,10 +124,12 @@ func NewSecurityHandler(
 	tokenManager session.TokenManager,
 	sessRepository session.SessionRepository,
 	adminTokenManager admin.AdminTokenManager,
+	adminUserRepo admin.AdminUserRepository,
 ) oas.SecurityHandler {
 	return &securityHandler{
 		TokenManager:      tokenManager,
 		SessionRepository: sessRepository,
 		adminTokenManager: adminTokenManager,
+		adminUserRepo:     adminUserRepo,
 	}
 }

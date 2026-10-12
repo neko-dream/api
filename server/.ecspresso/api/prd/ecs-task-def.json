@@ -6,6 +6,10 @@
 			"image": "{{ ssm `/kotohiro-prd-api-rep/uri` }}:{{ must_env `IMAGE_TAG` }}",
 			"environment": [
 				{
+					"name": "ADMIN_ALLOWED_ORIGINS",
+					"value": "{{ must_env `ADMIN_ALLOWED_ORIGINS` }}"
+				},
+				{
 					"name": "INITIAL_ADMIN_EMAIL",
 					"value": "{{ must_env `INITIAL_ADMIN_EMAIL` }}"
 				},
@@ -46,11 +50,27 @@
 					"value": "kotohiro"
 				},
 				{
+					"name": "EMAIL_FROM",
+					"value": "noreply@kotohiro.com"
+				},
+				{
+					"name": "EMAIL_VERIFICATION_BASE_URL",
+					"value": "https://api.kotohiro.com"
+				},
+				{
+					"name": "EMAIL_VERIFICATION_PAGE_URL",
+					"value": "https://www.kotohiro.com/auth/email/verify"
+				},
+				{
 					"name": "WEBSITE_URL",
-					"value": "https://kotohiro.com"
+					"value": "https://www.kotohiro.com"
 				}
 			],
 			"secrets": [
+				{
+					"name": "ADMIN_JWT_SECRET",
+					"valueFrom": "{{ ssm `/kotohiro-prd-app-secret/arn` }}:ADMIN_JWT_SECRET::"
+				},
 				{
 					"name": "DATABASE_URL",
 					"valueFrom": "{{ ssm `/kotohiro-prd-app-secret/arn` }}:DATABASE_URL::"

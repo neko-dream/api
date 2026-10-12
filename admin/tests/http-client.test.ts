@@ -58,6 +58,12 @@ test("failed refresh does not loop", async () => {
   assert.deepEqual(paths, ["/v1/admin/admin-users", "/v1/admin/refresh"]);
 });
 
+test("refresh server failure remains a server failure, not authentication rejection", async () => {
+  const client = createAdminHTTPClient("");
+  client.defaults.adapter = async (config) => reject(config, config.url === "/v1/admin/refresh" ? 500 : 401);
+  await assert.rejects(client.get("/v1/admin/admin-users"), (error: any) => error.response?.status === 500);
+});
+
 test("authentication endpoints and non-401 errors never trigger refresh", async () => {
   for (const [path, status] of [
     ["/v1/admin/login", 401],

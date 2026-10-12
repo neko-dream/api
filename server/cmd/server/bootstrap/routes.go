@@ -2,6 +2,8 @@ package bootstrap
 
 import (
 	"net/http"
+	"slices"
+	"strings"
 
 	"github.com/neko-dream/api/internal/infrastructure/di"
 	"github.com/neko-dream/api/internal/infrastructure/http/middleware"
@@ -55,22 +57,67 @@ func (b *Bootstrap) setupAPIHandler() http.Handler {
 		panic(err) // 初期化エラーは致命的
 	}
 
-	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"https://*", "http://localhost:3000"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"*"},
-		AllowCredentials: true,
-	})
+	c := b.apiCORS()
 
 	routeFinder := middleware.MakeRouteFinder(srv)
 	tracerProvider := di.Invoke[trace.TracerProvider](b.container)
 
-	return c.Handler(middleware.Wrap(
+	api := middleware.Wrap(
 		srv,
 		middleware.Instrument("kotohiro-api", routeFinder, tracerProvider),
 		middleware.SetContextCookieKey(b.container),
 		middleware.Labeler(routeFinder),
-	))
+	)
+	normal := c.Handler(b.browserOriginGuard(api))
+	adminAPI := b.adminOriginGuard(api)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasPrefix(r.URL.Path, "/v1/admin/") || strings.HasPrefix(r.URL.Path, "/v1/manage/") {
+			adminAPI.ServeHTTP(w, r)
+			return
+		}
+		normal.ServeHTTP(w, r)
+	})
+}
+
+func (b *Bootstrap) adminOriginGuard(next http.Handler) http.Handler {
+	origins := b.config.AdminAllowedOrigins
+	guard := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		origin := r.Header.Get("Origin")
+		if r.Method != http.MethodGet && r.Method != http.MethodHead && r.Method != http.MethodOptions && (origin == "" || !slices.Contains(origins, origin)) {
+			http.Error(w, "Forbidden Origin", http.StatusForbidden)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+	return cors.New(cors.Options{AllowedOrigins: origins, AllowedMethods: []string{"GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}, AllowedHeaders: []string{"Content-Type"}, AllowCredentials: true}).Handler(guard)
+}
+
+// CORS protects response reads, not simple cross-site form writes. Reject
+// untrusted browser origins for mutations as well, including SameSite=None dev.
+func (b *Bootstrap) browserOriginGuard(next http.Handler) http.Handler {
+	origins := b.config.BrowserOrigins()
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete:
+			if origin := r.Header.Get("Origin"); origin != "" && !slices.Contains(origins, origin) {
+				w.Header().Set("Content-Type", "application/json; charset=utf-8")
+				w.WriteHeader(http.StatusForbidden)
+				_, _ = w.Write([]byte(`{"code":"AUTH-FORBIDDEN-ORIGIN","message":"許可されていないアクセス元です。"}`))
+				return
+			}
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (b *Bootstrap) apiCORS() *cors.Cors {
+	origins := b.config.BrowserOrigins()
+	return cors.New(cors.Options{
+		AllowOriginFunc:  func(origin string) bool { return slices.Contains(origins, origin) },
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"*"},
+		AllowCredentials: true,
+	})
 }
 
 // getAdminRoutes 管理画面のルート定義を返す

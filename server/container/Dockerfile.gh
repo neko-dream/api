@@ -15,6 +15,9 @@ RUN  useradd api && \
 
 COPY .ecspresso/api/${ENV}/otel.yaml /etc/ecs/otel.yaml
 
+# ECS must explicitly opt into development; a standalone image defaults closed.
+ENV ENV=production
+
 VOLUME /var/lib/amazon /var/log/amazon /etc/ecs
 
 CMD ["./server"]

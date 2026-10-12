@@ -8,6 +8,8 @@ docker compose -p kotohiro-admin-local -f compose.admin-local.yaml up -d --wait 
 export ENV=local PORT=8081 DOMAIN=localhost
 export DATABASE_URL='postgres://kotohiro:kotohiro@127.0.0.1:5434/kotohiro?sslmode=disable'
 export TOKEN_SECRET='local-admin-development-only-secret'
+export ADMIN_JWT_SECRET='local-admin-jwt-only-secret-at-least-32-bytes'
+export ADMIN_ALLOWED_ORIGINS='http://localhost:3300,http://localhost:8081'
 export ENCRYPTION_VERSION=v1 ENCRYPTION_SECRET='local-dev-key16!'
 export HASH_PEPPER='local-admin-development-only-pepper' HASH_ITERATIONS=4
 export ANALYSIS_API_DOMAIN='http://127.0.0.1:8091'

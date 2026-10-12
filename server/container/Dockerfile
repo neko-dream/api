@@ -29,6 +29,8 @@ RUN go build -tags timetzdata -ldflags="-s -w" -trimpath -o server ./cmd/server
 
 FROM alpine:latest
 
+ENV ENV=production
+
 EXPOSE 3000
 
 COPY --from=builder /app/server /server

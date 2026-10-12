@@ -16,7 +16,8 @@ const (
 	headerTemplate EmailTemplateType = "header.tpl"
 	footerTemplate EmailTemplateType = "footer.tpl"
 	// VerificationEmailTemplate
-	VerificationEmailTemplate EmailTemplateType = "verification_email.tpl"
+	VerificationEmailTemplate  EmailTemplateType = "verification_email.tpl"
+	PasswordLoginEmailTemplate EmailTemplateType = "password_login.tpl"
 	// OrganizationInvitationEmailTemplate
 	OrganizationInvitationEmailTemplate EmailTemplateType = "organization_invitation.tpl"
 )

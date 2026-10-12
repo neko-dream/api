@@ -11,12 +11,17 @@
           <p><strong>{{.OrganizationName}}</strong>があなたをメンバーとして招待しています。</p>
 
           <div class="invitation-details">
+              {{if .ExistingAccount}}
+              <p>既存のアカウントでログインして、この組織をご利用ください。</p>
+              <p><strong>Email: </strong> {{.Email}}</p>
+              {{else}}
               <p>以下の情報でログインすることができます。</p>
               <ul>
                   <li><strong>Email: </strong> {{.Email}}</li>
                   <li><strong>初期パスワード：</strong> {{.Password}}</li>
               </ul>
               <p class="important-note">※初回ログイン時にパスワードの変更が必要です。</p>
+              {{end}}
           </div>
 
           <p>下記のURLよりログインしてください。</p>

@@ -11,6 +11,15 @@ GitHub Environmentsの `development` / `production` にそれぞれ以下のVari
 | INITIAL_ADMIN_EMAIL | 最初の管理者のGoogleアカウントのメールアドレス |
 | INITIAL_ADMIN_NAME | 表示名。省略時は「管理者」 |
 | ADMIN_GOOGLE_CLIENT_ID | APIのGOOGLE_CLIENT_IDと同じ公開クライアントID |
+| ADMIN_ALLOWED_ORIGINS | 管理画面のOriginのカンマ区切り許可リスト。API配信ではdevは https://api.dev.kotohiro.com、本番は https://api.kotohiro.com |
+
+各環境の既存Secrets Managerのapp-secret JSONへ、管理者専用の `ADMIN_JWT_SECRET` を追加する。暗号学的乱数で生成した32バイト以上のキーを使い、一般ユーザーのTOKEN_SECRETとは共有しない。GitHub Variablesへ署名キーを保存しない。
+
+この変更で管理者JWTのissuer・audience・署名キー・Cookieスコープが変わるため、既存管理者は再ログインが必要。旧スコープの管理者Cookieがブラウザーに残っている場合は削除してから再ログインする。
+
+## マイグレーションの互換性
+
+developのメール認証53〜55はそのまま保持し、管理者用テーブルを56・57に移動した。新規DBとdevelopの55まで適用したDBでは順に適用できる。旧admin-splitの53・54を適用したDBでは、メール認証テーブルがないまま番号だけ進んでいる可能性がある。現物のschema_migrationsとテーブルを確認し、バックアップと移行手順を用意するまでデプロイしない。今回のコードは既存DBの履歴を自動で書き換えない。
 
 初期管理者メールとクライアントIDが未設定の場合、CIはデプロイ前に失敗する。ローカルのメールやGoogle IDを本番用の既定値にはしない。
 

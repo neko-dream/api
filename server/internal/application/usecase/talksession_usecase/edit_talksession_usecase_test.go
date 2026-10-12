@@ -2,6 +2,7 @@ package talksession_usecase_test
 
 import (
 	"context"
+	"os"
 	"testing"
 	"time"
 
@@ -35,12 +36,19 @@ type EditTalkSessionUseCaseTestData struct {
 	NonOwnerUserID         shared.UUID[user.User]
 }
 
+func talkSessionTestDatabaseURL() string {
+	if value := os.Getenv("MAIL_TEST_DATABASE_URL"); value != "" {
+		return value
+	}
+	return "postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable"
+}
+
 func TestEditTalkSessionUseCase_Execute(t *testing.T) {
 	// 必要な環境変数を設定
 	t.Setenv("ENCRYPTION_VERSION", "v1")
 	t.Setenv("ENCRYPTION_SECRET", "12345678901234567890123456789012")
-	t.Setenv("DATABASE_URL", "postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable")
-	t.Setenv("ENV", "test")
+	t.Setenv("DATABASE_URL", talkSessionTestDatabaseURL())
+	t.Setenv("ENV", "local")
 
 	// OpenTelemetryのnoop tracerを設定
 	otel.SetTracerProvider(noop.NewTracerProvider())
@@ -641,7 +649,7 @@ func TestEditTalkSessionUseCase_ProductionEnvironment(t *testing.T) {
 	// 環境変数設定
 	t.Setenv("ENCRYPTION_VERSION", "v1")
 	t.Setenv("ENCRYPTION_SECRET", "12345678901234567890123456789012")
-	t.Setenv("DATABASE_URL", "postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable")
+	t.Setenv("DATABASE_URL", talkSessionTestDatabaseURL())
 	t.Setenv("ENV", "production")
 
 	// OpenTelemetryのnoop tracerを設定
