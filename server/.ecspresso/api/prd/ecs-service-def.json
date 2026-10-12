@@ -1,7 +1,7 @@
 {
 	"deploymentConfiguration": {
 		"alarms": {
-			"alarmNames": ["rollback-alert"],
+			"alarmNames": ["kotohiro-prd-rollback-alert"],
 			"enable": true,
 			"rollback": true
 		},
