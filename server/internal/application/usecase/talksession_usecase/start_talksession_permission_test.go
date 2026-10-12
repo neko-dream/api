@@ -87,12 +87,13 @@ func TestCreationOrganizationErrorsUseExpectedStatus(t *testing.T) {
 		org     creationOrganizationStub
 		want    error
 	}{
-		{"non-member", nil, creationAliasStub{}, creationOrganizationStub{err: sql.ErrNoRows}, messages.ForbiddenError},
+		{"non-member", nil, creationAliasStub{}, creationOrganizationStub{err: sql.ErrNoRows}, messages.TalkSessionOrganizationMembershipRequired},
+		{"nil membership", nil, creationAliasStub{}, creationOrganizationStub{}, messages.TalkSessionOrganizationMembershipRequired},
 		{"membership database failure", nil, creationAliasStub{}, creationOrganizationStub{err: failure}, failure},
 		{"missing alias", &aliasID, creationAliasStub{err: organization.ErrOrganizationAliasNotFound}, creationOrganizationStub{}, messages.BadRequestError},
 		{"inactive alias", &aliasID, creationAliasStub{value: inactive}, creationOrganizationStub{}, messages.BadRequestError},
 		{"alias database failure", &aliasID, creationAliasStub{err: failure}, creationOrganizationStub{}, failure},
-		{"alias non-member", &aliasID, creationAliasStub{value: alias}, creationOrganizationStub{err: sql.ErrNoRows}, messages.ForbiddenError},
+		{"alias non-member", &aliasID, creationAliasStub{value: alias}, creationOrganizationStub{err: sql.ErrNoRows}, messages.TalkSessionOrganizationMembershipRequired},
 		{"member", nil, creationAliasStub{}, creationOrganizationStub{value: &organization.OrganizationUser{}}, messages.TalkSessionThemeTooLong},
 		{"alias member", &aliasID, creationAliasStub{value: alias}, creationOrganizationStub{value: &organization.OrganizationUser{}}, messages.TalkSessionThemeTooLong},
 	} {
@@ -128,10 +129,10 @@ func TestCreationRequiresIndependentGrant(t *testing.T) {
 		granted, guest, withdrawn bool
 		want                      error
 	}{
-		{"ungranted", false, false, false, messages.ForbiddenError},
+		{"ungranted", false, false, false, messages.TalkSessionCreationNotAllowed},
 		{"granted without organization", true, false, false, messages.TalkSessionThemeTooLong},
 		{"guest even if granted", true, true, false, messages.GuestCannotCreateSessionError},
-		{"withdrawn even if granted", true, false, true, messages.ForbiddenError},
+		{"withdrawn even if granted", true, false, true, messages.TalkSessionCreationNotAllowed},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			provider := shared.ProviderGoogle
@@ -180,13 +181,13 @@ func TestGrantedUserCreatesWithoutOrganizationAndRevocationBlocksNextRequest(t *
 	}
 	grants.granted = false
 	sessions.created = nil
-	if _, err := h.Execute(context.Background(), input); !errors.Is(err, messages.ForbiddenError) || sessions.created != nil {
+	if _, err := h.Execute(context.Background(), input); !errors.Is(err, messages.TalkSessionCreationNotAllowed) || sessions.created != nil {
 		t.Fatal("revocation did not block next request", err)
 	}
 	grants.granted = true
 	orgID := shared.NewUUID[organization.Organization]().String()
 	input.SessionClaim = &session.Claim{OrganizationID: &orgID}
-	if _, err := h.Execute(context.Background(), input); !errors.Is(err, messages.ForbiddenError) || sessions.created != nil || orgs.calls != 1 {
+	if _, err := h.Execute(context.Background(), input); !errors.Is(err, messages.TalkSessionOrganizationMembershipRequired) || sessions.created != nil || orgs.calls != 1 {
 		t.Fatal("unrelated organization identity accepted", err)
 	}
 	orgs.err = nil

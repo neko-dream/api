@@ -113,7 +113,7 @@ func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSe
 		return StartTalkSessionUseCaseOutput{}, err
 	}
 	if !owner.CanCreateTalkSession(granted) {
-		return StartTalkSessionUseCaseOutput{}, messages.ForbiddenError
+		return StartTalkSessionUseCaseOutput{}, messages.TalkSessionCreationNotAllowed
 	}
 
 	// セッションから組織IDとエイリアスIDを取得
@@ -149,12 +149,12 @@ func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSe
 		membership, err := i.OrganizationUserRepository.FindByOrganizationIDAndUserID(ctx, *organizationID, input.OwnerID)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
-				return StartTalkSessionUseCaseOutput{}, messages.ForbiddenError
+				return StartTalkSessionUseCaseOutput{}, messages.TalkSessionOrganizationMembershipRequired
 			}
 			return StartTalkSessionUseCaseOutput{}, errtrace.Wrap(err)
 		}
 		if membership == nil {
-			return StartTalkSessionUseCaseOutput{}, messages.ForbiddenError
+			return StartTalkSessionUseCaseOutput{}, messages.TalkSessionOrganizationMembershipRequired
 		}
 	}
 
