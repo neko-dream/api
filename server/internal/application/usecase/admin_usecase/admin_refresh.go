@@ -85,8 +85,12 @@ func (a *adminRefreshInteractor) Execute(ctx context.Context, refreshToken strin
 	if err != nil {
 		return nil, err
 	}
-	if err := a.adminSessionRepo.Rotate(ctx, session.AdminSessionID, newHash, clock.Now(ctx).Add(refreshTokenTTL)); err != nil {
+	rotated, err := a.adminSessionRepo.Rotate(ctx, session.AdminSessionID, tokenHash, newHash, clock.Now(ctx).Add(refreshTokenTTL))
+	if err != nil {
 		return nil, err
+	}
+	if !rotated {
+		return nil, ErrInvalidRefreshToken
 	}
 
 	return &AdminAuthOutput{AccessToken: access, RefreshToken: newRefresh, AdminUser: *adminUser}, nil

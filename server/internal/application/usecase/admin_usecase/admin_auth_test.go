@@ -46,12 +46,15 @@ func (r *authTestSessions) FindByTokenHash(_ context.Context, hash string) (*adm
 	}
 	return nil, nil
 }
-func (r *authTestSessions) Rotate(_ context.Context, id shared.UUID[admin.AdminSession], hash string, expires time.Time) error {
+func (r *authTestSessions) Rotate(_ context.Context, id shared.UUID[admin.AdminSession], oldHash, hash string, expires time.Time) (bool, error) {
 	if r.row == nil || r.row.AdminSessionID != id {
-		return errors.New("unknown session")
+		return false, errors.New("unknown session")
+	}
+	if r.row.TokenHash != oldHash {
+		return false, nil
 	}
 	r.row.TokenHash, r.row.ExpiresAt = hash, expires
-	return nil
+	return true, nil
 }
 func (r *authTestSessions) DeleteByTokenHash(_ context.Context, hash string) error {
 	if r.row != nil && r.row.TokenHash == hash {
@@ -62,7 +65,7 @@ func (r *authTestSessions) DeleteByTokenHash(_ context.Context, hash string) err
 
 func TestAdminLoginRefreshAndLogout(t *testing.T) {
 	ctx := context.Background()
-	cfg := &config.Config{TokenSecret: "local-test-only-secret", HASH_PEPPER: "local-test-only-pepper"}
+	cfg := &config.Config{AdminJWTSecret: "local-test-only-secret-at-least-32-bytes", HASH_PEPPER: "local-test-only-pepper"}
 	users := &authTestUsers{user: &admin.AdminUser{AdminUserID: shared.NewUUID[admin.AdminUser](), Email: "operator@example.com", DisplayName: "Operator"}}
 	sessions := &authTestSessions{}
 	tokens := adminauth.NewAdminTokenManager(cfg)
@@ -106,7 +109,7 @@ func TestAdminLoginRefreshAndLogout(t *testing.T) {
 }
 
 func TestAdminLoginRejectsUnverifiedAndUnlistedAccounts(t *testing.T) {
-	cfg := &config.Config{TokenSecret: "local-test-only-secret", HASH_PEPPER: "local-test-only-pepper"}
+	cfg := &config.Config{AdminJWTSecret: "local-test-only-secret-at-least-32-bytes", HASH_PEPPER: "local-test-only-pepper"}
 	for _, verificationError := range []error{nil, errors.New("invalid Google token")} {
 		sessions := &authTestSessions{}
 		login := NewAdminLogin(&authTestUsers{}, sessions, adminauth.NewAdminTokenManager(cfg), authTestVerifier{verificationError}, cfg)

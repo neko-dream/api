@@ -19,12 +19,12 @@ type AdminSession struct {
 }
 
 func (s *AdminSession) IsExpired(now time.Time) bool {
-	return now.After(s.ExpiresAt)
+	return !now.Before(s.ExpiresAt)
 }
 
 type AdminSessionRepository interface {
 	Create(ctx context.Context, session AdminSession) error
 	FindByTokenHash(ctx context.Context, tokenHash string) (*AdminSession, error)
-	Rotate(ctx context.Context, id shared.UUID[AdminSession], newTokenHash string, expiresAt time.Time) error
+	Rotate(ctx context.Context, id shared.UUID[AdminSession], oldTokenHash, newTokenHash string, expiresAt time.Time) (bool, error)
 	DeleteByTokenHash(ctx context.Context, tokenHash string) error
 }

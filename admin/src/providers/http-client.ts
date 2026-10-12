@@ -43,8 +43,8 @@ export function createAdminHTTPClient(apiUrl: string) {
 
       try {
         await refreshAccessToken();
-      } catch {
-        return Promise.reject(error);
+      } catch (refreshError) {
+        return Promise.reject(refreshError);
       }
 
       original._retried = true;

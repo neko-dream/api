@@ -60,19 +60,21 @@ func (r *adminSessionRepository) FindByTokenHash(ctx context.Context, tokenHash 
 	}, nil
 }
 
-func (r *adminSessionRepository) Rotate(ctx context.Context, id shared.UUID[admin.AdminSession], newTokenHash string, expiresAt time.Time) error {
+func (r *adminSessionRepository) Rotate(ctx context.Context, id shared.UUID[admin.AdminSession], oldTokenHash, newTokenHash string, expiresAt time.Time) (bool, error) {
 	ctx, span := otel.Tracer("repository").Start(ctx, "adminSessionRepository.Rotate")
 	defer span.End()
 
-	if err := r.DBManager.GetQueries(ctx).RotateAdminSession(ctx, model.RotateAdminSessionParams{
+	rows, err := r.DBManager.GetQueries(ctx).RotateAdminSession(ctx, model.RotateAdminSessionParams{
 		AdminSessionID: id.UUID(),
 		TokenHash:      newTokenHash,
 		ExpiresAt:      expiresAt,
-	}); err != nil {
+		TokenHash_2:    oldTokenHash,
+	})
+	if err != nil {
 		utils.HandleError(ctx, err, "RotateAdminSession")
-		return err
+		return false, err
 	}
-	return nil
+	return rows == 1, nil
 }
 
 func (r *adminSessionRepository) DeleteByTokenHash(ctx context.Context, tokenHash string) error {

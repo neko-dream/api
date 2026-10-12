@@ -21,6 +21,7 @@ type adminHandler struct {
 	listAdminUsers  admin_usecase.ListAdminUsers
 	createAdminUser admin_usecase.CreateAdminUser
 	cookieManager   cookie.CookieManager
+	adminUserRepo   admin.AdminUserRepository
 }
 
 func NewAdminHandler(
@@ -30,6 +31,7 @@ func NewAdminHandler(
 	listAdminUsers admin_usecase.ListAdminUsers,
 	createAdminUser admin_usecase.CreateAdminUser,
 	cookieManager cookie.CookieManager,
+	adminUserRepo admin.AdminUserRepository,
 ) oas.AdminHandler {
 	return &adminHandler{
 		adminLogin:      adminLogin,
@@ -38,6 +40,7 @@ func NewAdminHandler(
 		listAdminUsers:  listAdminUsers,
 		createAdminUser: createAdminUser,
 		cookieManager:   cookieManager,
+		adminUserRepo:   adminUserRepo,
 	}
 }
 
@@ -162,10 +165,21 @@ func (h *adminHandler) GetAdminTokenInfo(ctx context.Context) (oas.GetAdminToken
 	if claim == nil {
 		return &oas.GetAdminTokenInfoForbidden{}, nil
 	}
+	id, err := claim.AdminUserID()
+	if err != nil {
+		return &oas.GetAdminTokenInfoForbidden{}, nil
+	}
+	user, err := h.adminUserRepo.FindByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return &oas.GetAdminTokenInfoForbidden{}, nil
+	}
 	return &oas.AdminTokenInfo{
 		Sub:         claim.Sub,
-		Email:       claim.Email,
-		DisplayName: claim.DisplayName,
+		Email:       user.Email,
+		DisplayName: user.DisplayName,
 		IsAdmin:     true,
 	}, nil
 }

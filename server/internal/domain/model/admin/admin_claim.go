@@ -9,11 +9,9 @@ import (
 
 // AdminClaim 管理者トークン(JWT)のクレーム。user.Session とは無関係の独立認証コンテキスト。
 type AdminClaim struct {
-	Sub         string // admin_user_id
-	Email       string
-	DisplayName string
-	Iat         int64
-	Exp         int64
+	Sub string // admin_user_id
+	Iat int64
+	Exp int64
 }
 
 func (c *AdminClaim) AdminUserID() (shared.UUID[AdminUser], error) {
@@ -21,7 +19,7 @@ func (c *AdminClaim) AdminUserID() (shared.UUID[AdminUser], error) {
 }
 
 func (c *AdminClaim) IsExpired(now time.Time) bool {
-	return now.Unix() > c.Exp
+	return now.Unix() >= c.Exp
 }
 
 // AdminTokenManager 管理者トークンの生成・検証を行う。
