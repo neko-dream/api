@@ -13,7 +13,8 @@ node_modules/
 .env.development
 .env.production
 
-./static/admin-ui
+# 管理画面のビルド成果物(admin で pnpm build すると生成される)
+/server/static/admin-ui/assets/
 poc
 .serena/cache
 *.csv
