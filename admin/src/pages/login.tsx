@@ -19,7 +19,7 @@ export const LoginPage = () => {
       <Card style={{ width: 360 }}>
         <Space direction="vertical" align="center" style={{ width: "100%" }} size="large">
           <Typography.Title level={3} style={{ textAlign: "center", margin: 0 }}>
-            Kotohiro 管理画面
+            ことひろ 管理画面
           </Typography.Title>
           <Typography.Text type="secondary">Google アカウントでログイン</Typography.Text>
           {env.googleClientId ? (

@@ -50,7 +50,7 @@ function App() {
                 options={{
                   syncWithLocation: true,
                   warnWhenUnsavedChanges: true,
-                  title: { text: "Kotohiro 管理画面" },
+                  title: { text: "ことひろ 管理画面" },
                 }}
               >
                 <Routes>
