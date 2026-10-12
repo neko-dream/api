@@ -3,6 +3,23 @@ import "@typespec/http";
 using Http;
 
 namespace kotohiro {
+  model ManagedUser {
+    userID: string;
+    displayID: string;
+    displayName: string;
+    email?: string;
+    emailVerified: boolean;
+    providers: string[];
+    createdAt: utcDateTime;
+    updatedAt: utcDateTime;
+    withdrawalDate?: utcDateTime;
+  }
+
+  model ManagedUserList {
+    users: ManagedUser[];
+    totalCount: int64;
+  }
+
   model TalkSessionForManage {
     talkSessionID: string;
     theme: string;

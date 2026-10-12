@@ -3233,13 +3233,76 @@ func decodeGetUserByDisplayIDParams(args [1]string, argsEscaped bool, r *http.Re
 	return params, nil
 }
 
+// GetUserDetailManageParams is parameters of getUserDetailManage operation.
+type GetUserDetailManageParams struct {
+	UserID string
+}
+
+func unpackGetUserDetailManageParams(packed middleware.Parameters) (params GetUserDetailManageParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "userID",
+			In:   "path",
+		}
+		params.UserID = packed[key].(string)
+	}
+	return params
+}
+
+func decodeGetUserDetailManageParams(args [1]string, argsEscaped bool, r *http.Request) (params GetUserDetailManageParams, _ error) {
+	// Decode path: userID.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "userID",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.UserID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "userID",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // GetUserListManageParams is parameters of getUserListManage operation.
 type GetUserListManageParams struct {
-	Offset  OptInt32
-	Limit   OptInt32
-	Search  OptString
-	OrderBy OptGetUserListManageOrderBy
-	Order   OptGetUserListManageOrder
+	Offset OptInt32
+	Limit  OptInt32
+	Search OptString
 }
 
 func unpackGetUserListManageParams(packed middleware.Parameters) (params GetUserListManageParams) {
@@ -3268,24 +3331,6 @@ func unpackGetUserListManageParams(packed middleware.Parameters) (params GetUser
 		}
 		if v, ok := packed[key]; ok {
 			params.Search = v.(OptString)
-		}
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "orderBy",
-			In:   "query",
-		}
-		if v, ok := packed[key]; ok {
-			params.OrderBy = v.(OptGetUserListManageOrderBy)
-		}
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "order",
-			In:   "query",
-		}
-		if v, ok := packed[key]; ok {
-			params.Order = v.(OptGetUserListManageOrder)
 		}
 	}
 	return params
@@ -3323,6 +3368,30 @@ func decodeGetUserListManageParams(args [0]string, argsEscaped bool, r *http.Req
 				params.Offset.SetTo(paramsDotOffsetVal)
 				return nil
 			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.Offset.Get(); ok {
+					if err := func() error {
+						if err := (validate.Int{
+							MinSet:        true,
+							Min:           0,
+							MaxSet:        false,
+							Max:           0,
+							MinExclusive:  false,
+							MaxExclusive:  false,
+							MultipleOfSet: false,
+							MultipleOf:    0,
+						}).Validate(int64(value)); err != nil {
+							return errors.Wrap(err, "int")
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
 				return err
 			}
 		}
@@ -3366,6 +3435,30 @@ func decodeGetUserListManageParams(args [0]string, argsEscaped bool, r *http.Req
 			}); err != nil {
 				return err
 			}
+			if err := func() error {
+				if value, ok := params.Limit.Get(); ok {
+					if err := func() error {
+						if err := (validate.Int{
+							MinSet:        true,
+							Min:           1,
+							MaxSet:        true,
+							Max:           100,
+							MinExclusive:  false,
+							MaxExclusive:  false,
+							MultipleOfSet: false,
+							MultipleOf:    0,
+						}).Validate(int64(value)); err != nil {
+							return errors.Wrap(err, "int")
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {
@@ -3407,123 +3500,34 @@ func decodeGetUserListManageParams(args [0]string, argsEscaped bool, r *http.Req
 			}); err != nil {
 				return err
 			}
+			if err := func() error {
+				if value, ok := params.Search.Get(); ok {
+					if err := func() error {
+						if err := (validate.String{
+							MinLength:    0,
+							MinLengthSet: false,
+							MaxLength:    200,
+							MaxLengthSet: true,
+							Email:        false,
+							Hostname:     false,
+							Regex:        nil,
+						}).Validate(string(value)); err != nil {
+							return errors.Wrap(err, "string")
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "search",
-			In:   "query",
-			Err:  err,
-		}
-	}
-	// Decode query: orderBy.
-	if err := func() error {
-		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "orderBy",
-			Style:   uri.QueryStyleForm,
-			Explode: false,
-		}
-
-		if err := q.HasParam(cfg); err == nil {
-			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotOrderByVal GetUserListManageOrderBy
-				if err := func() error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-
-					c, err := conv.ToString(val)
-					if err != nil {
-						return err
-					}
-
-					paramsDotOrderByVal = GetUserListManageOrderBy(c)
-					return nil
-				}(); err != nil {
-					return err
-				}
-				params.OrderBy.SetTo(paramsDotOrderByVal)
-				return nil
-			}); err != nil {
-				return err
-			}
-			if err := func() error {
-				if value, ok := params.OrderBy.Get(); ok {
-					if err := func() error {
-						if err := value.Validate(); err != nil {
-							return err
-						}
-						return nil
-					}(); err != nil {
-						return err
-					}
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "orderBy",
-			In:   "query",
-			Err:  err,
-		}
-	}
-	// Decode query: order.
-	if err := func() error {
-		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "order",
-			Style:   uri.QueryStyleForm,
-			Explode: false,
-		}
-
-		if err := q.HasParam(cfg); err == nil {
-			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotOrderVal GetUserListManageOrder
-				if err := func() error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-
-					c, err := conv.ToString(val)
-					if err != nil {
-						return err
-					}
-
-					paramsDotOrderVal = GetUserListManageOrder(c)
-					return nil
-				}(); err != nil {
-					return err
-				}
-				params.Order.SetTo(paramsDotOrderVal)
-				return nil
-			}); err != nil {
-				return err
-			}
-			if err := func() error {
-				if value, ok := params.Order.Get(); ok {
-					if err := func() error {
-						if err := value.Validate(); err != nil {
-							return err
-						}
-						return nil
-					}(); err != nil {
-						return err
-					}
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "order",
 			In:   "query",
 			Err:  err,
 		}

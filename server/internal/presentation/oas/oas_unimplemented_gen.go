@@ -451,6 +451,13 @@ func (UnimplementedHandler) GetUserByDisplayID(ctx context.Context, params GetUs
 	return r, ht.ErrNotImplemented
 }
 
+// GetUserDetailManage implements getUserDetailManage operation.
+//
+// GET /v1/manage/users/{userID}
+func (UnimplementedHandler) GetUserDetailManage(ctx context.Context, params GetUserDetailManageParams) (r GetUserDetailManageRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetUserInfo implements getUserInfo operation.
 //
 // ユーザー情報の取得.
@@ -463,7 +470,7 @@ func (UnimplementedHandler) GetUserInfo(ctx context.Context) (r GetUserInfoRes, 
 // GetUserListManage implements getUserListManage operation.
 //
 // GET /v1/manage/users/list
-func (UnimplementedHandler) GetUserListManage(ctx context.Context, params GetUserListManageParams) (r []UserForManage, _ error) {
+func (UnimplementedHandler) GetUserListManage(ctx context.Context, params GetUserListManageParams) (r *ManagedUserList, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

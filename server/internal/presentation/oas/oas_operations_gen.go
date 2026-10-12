@@ -55,6 +55,7 @@ const (
 	GetTimeLineOperation                        OperationName = "GetTimeLine"
 	GetTokenInfoOperation                       OperationName = "GetTokenInfo"
 	GetUserByDisplayIDOperation                 OperationName = "GetUserByDisplayID"
+	GetUserDetailManageOperation                OperationName = "GetUserDetailManage"
 	GetUserInfoOperation                        OperationName = "GetUserInfo"
 	GetUserListManageOperation                  OperationName = "GetUserListManage"
 	GetUserStatsListManageOperation             OperationName = "GetUserStatsListManage"

@@ -2235,6 +2235,39 @@ func encodeGetUserByDisplayIDResponse(response GetUserByDisplayIDRes, w http.Res
 	}
 }
 
+func encodeGetUserDetailManageResponse(response GetUserDetailManageRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *ManagedUser:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetUserDetailManageNotFound:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(404)
+		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
 func encodeGetUserInfoResponse(response GetUserInfoRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
 	case *GetUserInfoOK:
@@ -2268,17 +2301,13 @@ func encodeGetUserInfoResponse(response GetUserInfoRes, w http.ResponseWriter, s
 	}
 }
 
-func encodeGetUserListManageResponse(response []UserForManage, w http.ResponseWriter, span trace.Span) error {
+func encodeGetUserListManageResponse(response *ManagedUserList, w http.ResponseWriter, span trace.Span) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(200)
 	span.SetStatus(codes.Ok, http.StatusText(200))
 
 	e := new(jx.Encoder)
-	e.ArrStart()
-	for _, elem := range response {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
+	response.Encode(e)
 	if _, err := e.WriteTo(w); err != nil {
 		return errors.Wrap(err, "write")
 	}

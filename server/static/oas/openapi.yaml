@@ -4593,6 +4593,7 @@ paths:
           schema:
             type: integer
             format: int32
+            minimum: 0
           explode: false
         - name: limit
           in: query
@@ -4600,32 +4601,15 @@ paths:
           schema:
             type: integer
             format: int32
+            minimum: 1
+            maximum: 100
           explode: false
         - name: search
           in: query
           required: false
           schema:
             type: string
-          explode: false
-        - name: orderBy
-          in: query
-          required: false
-          schema:
-            type: string
-            enum:
-              - createdAt
-              - updatedAt
-              - displayName
-              - lastLoginAt
-          explode: false
-        - name: order
-          in: query
-          required: false
-          schema:
-            type: string
-            enum:
-              - asc
-              - desc
+            maxLength: 200
           explode: false
       responses:
         '200':
@@ -4633,9 +4617,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/UserForManage'
+                $ref: '#/components/schemas/ManagedUserList'
       tags:
         - manage
       security:
@@ -4690,6 +4672,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserStatsResponse'
+      tags:
+        - manage
+      security:
+        - AdminCookieAuth: []
+      x-ogen-operation-group: manage
+  /v1/manage/users/{userID}:
+    get:
+      operationId: getUserDetailManage
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManagedUser'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                type: object
       tags:
         - manage
       security:
@@ -4889,6 +4898,53 @@ components:
         longitude:
           type: number
           description: 経度
+    ManagedUser:
+      type: object
+      required:
+        - userID
+        - displayID
+        - displayName
+        - emailVerified
+        - providers
+        - createdAt
+        - updatedAt
+      properties:
+        userID:
+          type: string
+        displayID:
+          type: string
+        displayName:
+          type: string
+        email:
+          type: string
+        emailVerified:
+          type: boolean
+        providers:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        withdrawalDate:
+          type: string
+          format: date-time
+    ManagedUserList:
+      type: object
+      required:
+        - users
+        - totalCount
+      properties:
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/ManagedUser'
+        totalCount:
+          type: integer
+          format: int64
     NotificationPreferences:
       type: object
       required:

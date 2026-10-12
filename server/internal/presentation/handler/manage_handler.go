@@ -4,8 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"strings"
 	"time"
+	"unicode/utf8"
 
+	userquery "github.com/neko-dream/api/internal/application/query/user"
 	"github.com/neko-dream/api/internal/application/usecase/analysis_usecase"
 	"github.com/neko-dream/api/internal/domain/messages"
 	"github.com/neko-dream/api/internal/domain/model/admin"
@@ -13,6 +16,7 @@ import (
 	"github.com/neko-dream/api/internal/domain/model/session"
 	"github.com/neko-dream/api/internal/domain/model/shared"
 	"github.com/neko-dream/api/internal/domain/model/talksession"
+	"github.com/neko-dream/api/internal/domain/model/user"
 	"github.com/neko-dream/api/internal/domain/service"
 	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/api/internal/infrastructure/persistence/sqlc/generated"
@@ -22,6 +26,7 @@ import (
 )
 
 type manageHandler struct {
+	userManagement userquery.Management
 	analysis.AnalysisService
 	analysis.AnalysisRepository
 	analysisScheduler analysis_usecase.AnalysisScheduler
@@ -31,13 +36,60 @@ type manageHandler struct {
 }
 
 // GetUserListManage implements oas.ManageHandler.
-func (m *manageHandler) GetUserListManage(ctx context.Context, params oas.GetUserListManageParams) ([]oas.UserForManage, error) {
+func (m *manageHandler) GetUserListManage(ctx context.Context, params oas.GetUserListManageParams) (*oas.ManagedUserList, error) {
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetUserListManage")
 	defer span.End()
 
-	_ = ctx
+	if admin.GetAdminSession(ctx) == nil {
+		return nil, messages.ForbiddenError
+	}
+	limit, offset := params.Limit.Or(20), params.Offset.Or(0)
+	search := strings.TrimSpace(params.Search.Or(""))
+	if limit < 1 || limit > 100 || offset < 0 || utf8.RuneCountInString(search) > 200 {
+		return nil, messages.BadRequestError
+	}
+	out, err := m.userManagement.List(ctx, userquery.ManagementListInput{Offset: offset, Limit: limit, Search: search})
+	if err != nil {
+		return nil, err
+	}
+	items := make([]oas.ManagedUser, 0, len(out.Users))
+	for _, u := range out.Users {
+		items = append(items, managedUserResponse(u))
+	}
+	return &oas.ManagedUserList{Users: items, TotalCount: out.TotalCount}, nil
+}
 
-	panic("unimplemented")
+func (m *manageHandler) GetUserDetailManage(ctx context.Context, params oas.GetUserDetailManageParams) (oas.GetUserDetailManageRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetUserDetailManage")
+	defer span.End()
+
+	if admin.GetAdminSession(ctx) == nil {
+		return nil, messages.ForbiddenError
+	}
+	id, err := shared.ParseUUID[user.User](params.UserID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+	u, err := m.userManagement.FindByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if u == nil {
+		return &oas.GetUserDetailManageNotFound{}, nil
+	}
+	out := managedUserResponse(*u)
+	return &out, nil
+}
+
+func managedUserResponse(u userquery.ManagedUser) oas.ManagedUser {
+	out := oas.ManagedUser{UserID: u.UserID.String(), DisplayID: u.DisplayID, DisplayName: u.DisplayName, EmailVerified: u.EmailVerified, Providers: u.Providers, CreatedAt: u.CreatedAt, UpdatedAt: u.UpdatedAt}
+	if u.Email != nil {
+		out.Email = oas.NewOptString(*u.Email)
+	}
+	if u.WithdrawalDate != nil {
+		out.WithdrawalDate = oas.NewOptDateTime(*u.WithdrawalDate)
+	}
+	return out
 }
 
 // GetUserStatsTotalManage implements oas.ManageHandler.
@@ -134,6 +186,7 @@ func NewManageHandler(
 	scheduler analysis_usecase.AnalysisScheduler,
 	authorizationService service.AuthorizationService,
 	tokenManager session.TokenManager,
+	userManagement userquery.Management,
 ) oas.ManageHandler {
 	return &manageHandler{
 		DBManager:            dbm,
@@ -142,6 +195,7 @@ func NewManageHandler(
 		analysisScheduler:    scheduler,
 		authorizationService: authorizationService,
 		TokenManager:         tokenManager,
+		userManagement:       userManagement,
 	}
 }
 

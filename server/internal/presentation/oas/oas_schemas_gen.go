@@ -2301,6 +2301,10 @@ func (s *GetUserByDisplayIDNotFound) SetMessage(val string) {
 
 func (*GetUserByDisplayIDNotFound) getUserByDisplayIDRes() {}
 
+type GetUserDetailManageNotFound struct{}
+
+func (*GetUserDetailManageNotFound) getUserDetailManageRes() {}
+
 type GetUserInfoInternalServerError struct{}
 
 func (*GetUserInfoInternalServerError) getUserInfoRes() {}
@@ -2342,102 +2346,6 @@ func (s *GetUserInfoOK) SetEmail(val OptNilString) {
 }
 
 func (*GetUserInfoOK) getUserInfoRes() {}
-
-type GetUserListManageOrder string
-
-const (
-	GetUserListManageOrderAsc  GetUserListManageOrder = "asc"
-	GetUserListManageOrderDesc GetUserListManageOrder = "desc"
-)
-
-// AllValues returns all GetUserListManageOrder values.
-func (GetUserListManageOrder) AllValues() []GetUserListManageOrder {
-	return []GetUserListManageOrder{
-		GetUserListManageOrderAsc,
-		GetUserListManageOrderDesc,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s GetUserListManageOrder) MarshalText() ([]byte, error) {
-	switch s {
-	case GetUserListManageOrderAsc:
-		return []byte(s), nil
-	case GetUserListManageOrderDesc:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *GetUserListManageOrder) UnmarshalText(data []byte) error {
-	switch GetUserListManageOrder(data) {
-	case GetUserListManageOrderAsc:
-		*s = GetUserListManageOrderAsc
-		return nil
-	case GetUserListManageOrderDesc:
-		*s = GetUserListManageOrderDesc
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
-}
-
-type GetUserListManageOrderBy string
-
-const (
-	GetUserListManageOrderByCreatedAt   GetUserListManageOrderBy = "createdAt"
-	GetUserListManageOrderByUpdatedAt   GetUserListManageOrderBy = "updatedAt"
-	GetUserListManageOrderByDisplayName GetUserListManageOrderBy = "displayName"
-	GetUserListManageOrderByLastLoginAt GetUserListManageOrderBy = "lastLoginAt"
-)
-
-// AllValues returns all GetUserListManageOrderBy values.
-func (GetUserListManageOrderBy) AllValues() []GetUserListManageOrderBy {
-	return []GetUserListManageOrderBy{
-		GetUserListManageOrderByCreatedAt,
-		GetUserListManageOrderByUpdatedAt,
-		GetUserListManageOrderByDisplayName,
-		GetUserListManageOrderByLastLoginAt,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s GetUserListManageOrderBy) MarshalText() ([]byte, error) {
-	switch s {
-	case GetUserListManageOrderByCreatedAt:
-		return []byte(s), nil
-	case GetUserListManageOrderByUpdatedAt:
-		return []byte(s), nil
-	case GetUserListManageOrderByDisplayName:
-		return []byte(s), nil
-	case GetUserListManageOrderByLastLoginAt:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *GetUserListManageOrderBy) UnmarshalText(data []byte) error {
-	switch GetUserListManageOrderBy(data) {
-	case GetUserListManageOrderByCreatedAt:
-		*s = GetUserListManageOrderByCreatedAt
-		return nil
-	case GetUserListManageOrderByUpdatedAt:
-		*s = GetUserListManageOrderByUpdatedAt
-		return nil
-	case GetUserListManageOrderByDisplayName:
-		*s = GetUserListManageOrderByDisplayName
-		return nil
-	case GetUserListManageOrderByLastLoginAt:
-		*s = GetUserListManageOrderByLastLoginAt
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
-}
 
 type GetUserTalkSessionsBadRequest struct{}
 
@@ -3085,6 +2993,137 @@ func (s *Location) SetLatitude(val OptFloat64) {
 // SetLongitude sets the value of Longitude.
 func (s *Location) SetLongitude(val OptFloat64) {
 	s.Longitude = val
+}
+
+// Ref: #/components/schemas/ManagedUser
+type ManagedUser struct {
+	UserID         string      `json:"userID"`
+	DisplayID      string      `json:"displayID"`
+	DisplayName    string      `json:"displayName"`
+	Email          OptString   `json:"email"`
+	EmailVerified  bool        `json:"emailVerified"`
+	Providers      []string    `json:"providers"`
+	CreatedAt      time.Time   `json:"createdAt"`
+	UpdatedAt      time.Time   `json:"updatedAt"`
+	WithdrawalDate OptDateTime `json:"withdrawalDate"`
+}
+
+// GetUserID returns the value of UserID.
+func (s *ManagedUser) GetUserID() string {
+	return s.UserID
+}
+
+// GetDisplayID returns the value of DisplayID.
+func (s *ManagedUser) GetDisplayID() string {
+	return s.DisplayID
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *ManagedUser) GetDisplayName() string {
+	return s.DisplayName
+}
+
+// GetEmail returns the value of Email.
+func (s *ManagedUser) GetEmail() OptString {
+	return s.Email
+}
+
+// GetEmailVerified returns the value of EmailVerified.
+func (s *ManagedUser) GetEmailVerified() bool {
+	return s.EmailVerified
+}
+
+// GetProviders returns the value of Providers.
+func (s *ManagedUser) GetProviders() []string {
+	return s.Providers
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *ManagedUser) GetCreatedAt() time.Time {
+	return s.CreatedAt
+}
+
+// GetUpdatedAt returns the value of UpdatedAt.
+func (s *ManagedUser) GetUpdatedAt() time.Time {
+	return s.UpdatedAt
+}
+
+// GetWithdrawalDate returns the value of WithdrawalDate.
+func (s *ManagedUser) GetWithdrawalDate() OptDateTime {
+	return s.WithdrawalDate
+}
+
+// SetUserID sets the value of UserID.
+func (s *ManagedUser) SetUserID(val string) {
+	s.UserID = val
+}
+
+// SetDisplayID sets the value of DisplayID.
+func (s *ManagedUser) SetDisplayID(val string) {
+	s.DisplayID = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *ManagedUser) SetDisplayName(val string) {
+	s.DisplayName = val
+}
+
+// SetEmail sets the value of Email.
+func (s *ManagedUser) SetEmail(val OptString) {
+	s.Email = val
+}
+
+// SetEmailVerified sets the value of EmailVerified.
+func (s *ManagedUser) SetEmailVerified(val bool) {
+	s.EmailVerified = val
+}
+
+// SetProviders sets the value of Providers.
+func (s *ManagedUser) SetProviders(val []string) {
+	s.Providers = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *ManagedUser) SetCreatedAt(val time.Time) {
+	s.CreatedAt = val
+}
+
+// SetUpdatedAt sets the value of UpdatedAt.
+func (s *ManagedUser) SetUpdatedAt(val time.Time) {
+	s.UpdatedAt = val
+}
+
+// SetWithdrawalDate sets the value of WithdrawalDate.
+func (s *ManagedUser) SetWithdrawalDate(val OptDateTime) {
+	s.WithdrawalDate = val
+}
+
+func (*ManagedUser) getUserDetailManageRes() {}
+
+// Ref: #/components/schemas/ManagedUserList
+type ManagedUserList struct {
+	Users      []ManagedUser `json:"users"`
+	TotalCount int64         `json:"totalCount"`
+}
+
+// GetUsers returns the value of Users.
+func (s *ManagedUserList) GetUsers() []ManagedUser {
+	return s.Users
+}
+
+// GetTotalCount returns the value of TotalCount.
+func (s *ManagedUserList) GetTotalCount() int64 {
+	return s.TotalCount
+}
+
+// SetUsers sets the value of Users.
+func (s *ManagedUserList) SetUsers(val []ManagedUser) {
+	s.Users = val
+}
+
+// SetTotalCount sets the value of TotalCount.
+func (s *ManagedUserList) SetTotalCount(val int64) {
+	s.TotalCount = val
 }
 
 // NewNilBool returns new NilBool with value set to v.
@@ -3833,6 +3872,52 @@ func (o OptBool) Or(d bool) bool {
 	return d
 }
 
+// NewOptDateTime returns new OptDateTime with value set to v.
+func NewOptDateTime(v time.Time) OptDateTime {
+	return OptDateTime{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptDateTime is optional time.Time.
+type OptDateTime struct {
+	Value time.Time
+	Set   bool
+}
+
+// IsSet returns true if OptDateTime was set.
+func (o OptDateTime) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptDateTime) Reset() {
+	var v time.Time
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptDateTime) SetTo(v time.Time) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptDateTime) Get() (v time.Time, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptDateTime) Or(d time.Time) time.Time {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptFloat64 returns new OptFloat64 with value set to v.
 func NewOptFloat64(v float64) OptFloat64 {
 	return OptFloat64{
@@ -4011,98 +4096,6 @@ func (o OptGetTalkSessionListSortKey) Get() (v GetTalkSessionListSortKey, ok boo
 
 // Or returns value if set, or given parameter if does not.
 func (o OptGetTalkSessionListSortKey) Or(d GetTalkSessionListSortKey) GetTalkSessionListSortKey {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptGetUserListManageOrder returns new OptGetUserListManageOrder with value set to v.
-func NewOptGetUserListManageOrder(v GetUserListManageOrder) OptGetUserListManageOrder {
-	return OptGetUserListManageOrder{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptGetUserListManageOrder is optional GetUserListManageOrder.
-type OptGetUserListManageOrder struct {
-	Value GetUserListManageOrder
-	Set   bool
-}
-
-// IsSet returns true if OptGetUserListManageOrder was set.
-func (o OptGetUserListManageOrder) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptGetUserListManageOrder) Reset() {
-	var v GetUserListManageOrder
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptGetUserListManageOrder) SetTo(v GetUserListManageOrder) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptGetUserListManageOrder) Get() (v GetUserListManageOrder, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptGetUserListManageOrder) Or(d GetUserListManageOrder) GetUserListManageOrder {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptGetUserListManageOrderBy returns new OptGetUserListManageOrderBy with value set to v.
-func NewOptGetUserListManageOrderBy(v GetUserListManageOrderBy) OptGetUserListManageOrderBy {
-	return OptGetUserListManageOrderBy{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptGetUserListManageOrderBy is optional GetUserListManageOrderBy.
-type OptGetUserListManageOrderBy struct {
-	Value GetUserListManageOrderBy
-	Set   bool
-}
-
-// IsSet returns true if OptGetUserListManageOrderBy was set.
-func (o OptGetUserListManageOrderBy) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptGetUserListManageOrderBy) Reset() {
-	var v GetUserListManageOrderBy
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptGetUserListManageOrderBy) SetTo(v GetUserListManageOrderBy) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptGetUserListManageOrderBy) Get() (v GetUserListManageOrderBy, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptGetUserListManageOrderBy) Or(d GetUserListManageOrderBy) GetUserListManageOrderBy {
 	if v, ok := o.Get(); ok {
 		return v
 	}

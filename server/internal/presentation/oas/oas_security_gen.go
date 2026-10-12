@@ -44,6 +44,7 @@ var operationRolesAdminCookieAuth = map[string][]string{
 	GetAnalysisReportManageOperation:      []string{},
 	GetTalkSessionListManageOperation:     []string{},
 	GetTalkSessionManageOperation:         []string{},
+	GetUserDetailManageOperation:          []string{},
 	GetUserListManageOperation:            []string{},
 	GetUserStatsListManageOperation:       []string{},
 	GetUserStatsTotalManageOperation:      []string{},

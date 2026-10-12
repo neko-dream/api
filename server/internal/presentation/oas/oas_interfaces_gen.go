@@ -181,6 +181,10 @@ type GetUserByDisplayIDRes interface {
 	getUserByDisplayIDRes()
 }
 
+type GetUserDetailManageRes interface {
+	getUserDetailManageRes()
+}
+
 type GetUserInfoRes interface {
 	getUserInfoRes()
 }
