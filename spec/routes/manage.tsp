@@ -67,6 +67,12 @@ namespace kotohiro {
     @route("/users")
     @tag("manage")
     interface UserStats {
+      @route("/{userID}/permissions")
+      @extension("x-ogen-operation-group", "manage")
+      @operationId("setUserPermissionsManage")
+      @put
+      setUserPermissions(@path userID: string, @body permissions: UserPermissions): UserPermissions;
+
       @route("/list")
       @extension("x-ogen-operation-group", "manage")
       @operationId("getUserListManage")

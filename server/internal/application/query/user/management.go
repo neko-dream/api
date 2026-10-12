@@ -22,6 +22,7 @@ type ManagementListOutput struct {
 	TotalCount int64
 }
 type ManagedUser struct {
+	CanCreateTalkSession   bool
 	UserID                 shared.UUID[user.User]
 	DisplayID, DisplayName string
 	Email                  *string

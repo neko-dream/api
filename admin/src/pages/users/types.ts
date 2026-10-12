@@ -9,6 +9,7 @@ export interface ManagedUser {
   createdAt: string;
   updatedAt: string;
   withdrawalDate?: string;
+  permissions: { canCreateTalkSession: boolean };
 }
 
 export function formatUserDate(value?: string): string {

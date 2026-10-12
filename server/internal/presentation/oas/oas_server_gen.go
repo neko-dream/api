@@ -232,6 +232,10 @@ type ManageHandler interface {
 	//
 	// POST /v1/manage/talksessions/{talkSessionID}/analysis/regenerate
 	ManageRegenerateManage(ctx context.Context, req *RegenerateRequest, params ManageRegenerateManageParams) (*RegenerateResponse, error)
+	// SetUserPermissionsManage implements setUserPermissionsManage operation.
+	//
+	// PUT /v1/manage/users/{userID}/permissions
+	SetUserPermissionsManage(ctx context.Context, req *UserPermissions, params SetUserPermissionsManageParams) (*UserPermissions, error)
 	// ToggleReportVisibilityManage implements toggleReportVisibilityManage operation.
 	//
 	// POST /v1/manage/talksessions/{talkSessionID}/analysis/report
@@ -674,6 +678,12 @@ type UserHandler interface {
 	//
 	// POST /user
 	EstablishUser(ctx context.Context, req *EstablishUserReq) (EstablishUserRes, error)
+	// GetCurrentUser implements getCurrentUser operation.
+	//
+	// ログイン中ユーザーと現在の権限.
+	//
+	// GET /users/me
+	GetCurrentUser(ctx context.Context) (*CurrentUser, error)
 	// GetUserByDisplayID implements getUserByDisplayID operation.
 	//
 	// 表示IDからユーザー情報の取得.

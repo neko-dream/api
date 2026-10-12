@@ -35,7 +35,7 @@ func (q *Queries) CountManagedUsers(ctx context.Context, search string) (int64, 
 }
 
 const getManagedUser = `-- name: GetManagedUser :one
-SELECT users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+SELECT users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
   ARRAY(SELECT provider FROM user_auths WHERE user_auths.user_id = users.user_id
         UNION SELECT 'PASSWORD'::varchar FROM password_auth WHERE password_auth.user_id = users.user_id ORDER BY provider)::text[] AS providers
 FROM users WHERE users.user_id = $1
@@ -48,7 +48,7 @@ type GetManagedUserRow struct {
 
 // GetManagedUser
 //
-//	SELECT users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+//	SELECT users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
 //	  ARRAY(SELECT provider FROM user_auths WHERE user_auths.user_id = users.user_id
 //	        UNION SELECT 'PASSWORD'::varchar FROM password_auth WHERE password_auth.user_id = users.user_id ORDER BY provider)::text[] AS providers
 //	FROM users WHERE users.user_id = $1
@@ -65,13 +65,14 @@ func (q *Queries) GetManagedUser(ctx context.Context, userID uuid.UUID) (GetMana
 		&i.User.Email,
 		&i.User.EmailVerified,
 		&i.User.WithdrawalDate,
+		&i.User.CanCreateTalkSession,
 		pq.Array(&i.Providers),
 	)
 	return i, err
 }
 
 const listManagedUsers = `-- name: ListManagedUsers :many
-SELECT users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+SELECT users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
   ARRAY(SELECT provider FROM user_auths WHERE user_auths.user_id = users.user_id
         UNION SELECT 'PASSWORD'::varchar FROM password_auth WHERE password_auth.user_id = users.user_id ORDER BY provider)::text[] AS providers
 FROM users
@@ -96,7 +97,7 @@ type ListManagedUsersRow struct {
 
 // ListManagedUsers
 //
-//	SELECT users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+//	SELECT users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
 //	  ARRAY(SELECT provider FROM user_auths WHERE user_auths.user_id = users.user_id
 //	        UNION SELECT 'PASSWORD'::varchar FROM password_auth WHERE password_auth.user_id = users.user_id ORDER BY provider)::text[] AS providers
 //	FROM users
@@ -125,6 +126,7 @@ func (q *Queries) ListManagedUsers(ctx context.Context, arg ListManagedUsersPara
 			&i.User.Email,
 			&i.User.EmailVerified,
 			&i.User.WithdrawalDate,
+			&i.User.CanCreateTalkSession,
 			pq.Array(&i.Providers),
 		); err != nil {
 			return nil, err

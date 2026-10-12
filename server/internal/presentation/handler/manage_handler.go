@@ -9,6 +9,7 @@ import (
 	"unicode/utf8"
 
 	userquery "github.com/neko-dream/api/internal/application/query/user"
+	"github.com/neko-dream/api/internal/application/usecase/admin_usecase"
 	"github.com/neko-dream/api/internal/application/usecase/analysis_usecase"
 	"github.com/neko-dream/api/internal/domain/messages"
 	"github.com/neko-dream/api/internal/domain/model/admin"
@@ -26,7 +27,8 @@ import (
 )
 
 type manageHandler struct {
-	userManagement userquery.Management
+	userManagement        userquery.Management
+	setCreationPermission admin_usecase.SetSessionCreationPermission
 	analysis.AnalysisService
 	analysis.AnalysisRepository
 	analysisScheduler analysis_usecase.AnalysisScheduler
@@ -86,6 +88,7 @@ func managedUserResponse(u userquery.ManagedUser) oas.ManagedUser {
 	if u.Email != nil {
 		out.Email = oas.NewOptString(*u.Email)
 	}
+	out.Permissions = oas.UserPermissions{CanCreateTalkSession: u.CanCreateTalkSession}
 	if u.WithdrawalDate != nil {
 		out.WithdrawalDate = oas.NewOptDateTime(*u.WithdrawalDate)
 	}
@@ -187,15 +190,17 @@ func NewManageHandler(
 	authorizationService service.AuthorizationService,
 	tokenManager session.TokenManager,
 	userManagement userquery.Management,
+	setCreationPermission admin_usecase.SetSessionCreationPermission,
 ) oas.ManageHandler {
 	return &manageHandler{
-		DBManager:            dbm,
-		AnalysisService:      ansv,
-		AnalysisRepository:   arep,
-		analysisScheduler:    scheduler,
-		authorizationService: authorizationService,
-		TokenManager:         tokenManager,
-		userManagement:       userManagement,
+		DBManager:             dbm,
+		AnalysisService:       ansv,
+		AnalysisRepository:    arep,
+		analysisScheduler:     scheduler,
+		authorizationService:  authorizationService,
+		TokenManager:          tokenManager,
+		userManagement:        userManagement,
+		setCreationPermission: setCreationPermission,
 	}
 }
 

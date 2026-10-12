@@ -221,6 +221,15 @@ func (UnimplementedHandler) GetConclusion(ctx context.Context, params GetConclus
 	return r, ht.ErrNotImplemented
 }
 
+// GetCurrentUser implements getCurrentUser operation.
+//
+// ログイン中ユーザーと現在の権限.
+//
+// GET /users/me
+func (UnimplementedHandler) GetCurrentUser(ctx context.Context) (r *CurrentUser, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetDevices implements getDevices operation.
 //
 // デバイス一覧取得.
@@ -761,6 +770,13 @@ func (UnimplementedHandler) SendTestNotification(ctx context.Context, req *SendT
 //
 // GET /talksessions/histories
 func (UnimplementedHandler) SessionsHistory(ctx context.Context, params SessionsHistoryParams) (r SessionsHistoryRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// SetUserPermissionsManage implements setUserPermissionsManage operation.
+//
+// PUT /v1/manage/users/{userID}/permissions
+func (UnimplementedHandler) SetUserPermissionsManage(ctx context.Context, req *UserPermissions, params SetUserPermissionsManageParams) (r *UserPermissions, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

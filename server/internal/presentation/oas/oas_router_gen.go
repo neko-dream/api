@@ -1925,6 +1925,32 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						break
 					}
 
+					if len(elem) == 0 {
+						break
+					}
+					switch elem[0] {
+					case 'm': // Prefix: "me"
+						origElem := elem
+						if l := len("me"); len(elem) >= l && elem[0:l] == "me" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch r.Method {
+							case "GET":
+								s.handleGetCurrentUserRequest([0]string{}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "GET")
+							}
+
+							return
+						}
+
+						elem = origElem
+					}
 					// Param: "displayID"
 					// Match until "/"
 					idx := strings.IndexByte(elem, '/')
@@ -2328,16 +2354,15 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							elem = origElem
 						}
 						// Param: "userID"
-						// Leaf parameter, slashes are prohibited
+						// Match until "/"
 						idx := strings.IndexByte(elem, '/')
-						if idx >= 0 {
-							break
+						if idx < 0 {
+							idx = len(elem)
 						}
-						args[0] = elem
-						elem = ""
+						args[0] = elem[:idx]
+						elem = elem[idx:]
 
 						if len(elem) == 0 {
-							// Leaf node.
 							switch r.Method {
 							case "GET":
 								s.handleGetUserDetailManageRequest([1]string{
@@ -2348,6 +2373,30 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							}
 
 							return
+						}
+						switch elem[0] {
+						case '/': // Prefix: "/permissions"
+
+							if l := len("/permissions"); len(elem) >= l && elem[0:l] == "/permissions" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch r.Method {
+								case "PUT":
+									s.handleSetUserPermissionsManageRequest([1]string{
+										args[0],
+									}, elemIsEscaped, w, r)
+								default:
+									s.notAllowed(w, r, "PUT")
+								}
+
+								return
+							}
+
 						}
 
 					}
@@ -4601,6 +4650,36 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						break
 					}
 
+					if len(elem) == 0 {
+						break
+					}
+					switch elem[0] {
+					case 'm': // Prefix: "me"
+						origElem := elem
+						if l := len("me"); len(elem) >= l && elem[0:l] == "me" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch method {
+							case "GET":
+								r.name = GetCurrentUserOperation
+								r.summary = "ログイン中ユーザーと現在の権限"
+								r.operationID = "getCurrentUser"
+								r.pathPattern = "/users/me"
+								r.args = args
+								r.count = 0
+								return r, true
+							default:
+								return
+							}
+						}
+
+						elem = origElem
+					}
 					// Param: "displayID"
 					// Match until "/"
 					idx := strings.IndexByte(elem, '/')
@@ -5058,16 +5137,15 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							elem = origElem
 						}
 						// Param: "userID"
-						// Leaf parameter, slashes are prohibited
+						// Match until "/"
 						idx := strings.IndexByte(elem, '/')
-						if idx >= 0 {
-							break
+						if idx < 0 {
+							idx = len(elem)
 						}
-						args[0] = elem
-						elem = ""
+						args[0] = elem[:idx]
+						elem = elem[idx:]
 
 						if len(elem) == 0 {
-							// Leaf node.
 							switch method {
 							case "GET":
 								r.name = GetUserDetailManageOperation
@@ -5080,6 +5158,32 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							default:
 								return
 							}
+						}
+						switch elem[0] {
+						case '/': // Prefix: "/permissions"
+
+							if l := len("/permissions"); len(elem) >= l && elem[0:l] == "/permissions" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch method {
+								case "PUT":
+									r.name = SetUserPermissionsManageOperation
+									r.summary = ""
+									r.operationID = "setUserPermissionsManage"
+									r.pathPattern = "/v1/manage/users/{userID}/permissions"
+									r.args = args
+									r.count = 1
+									return r, true
+								default:
+									return
+								}
+							}
+
 						}
 
 					}
