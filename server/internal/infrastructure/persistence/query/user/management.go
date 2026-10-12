@@ -11,6 +11,7 @@ import (
 	"github.com/neko-dream/api/internal/domain/model/user"
 	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/api/internal/infrastructure/persistence/sqlc/generated"
+	"github.com/neko-dream/api/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
@@ -75,9 +76,11 @@ func (q *managementQuery) mapUser(ctx context.Context, row model.User, providers
 	if row.Email.Valid {
 		email, err := q.encryptor.DecryptString(ctx, row.Email.String)
 		if err != nil {
-			return nil, err
+			utils.HandleError(ctx, err, "メアドの復号に失敗しました。")
+			u.EmailVerified = false
+		} else {
+			u.Email = &email
 		}
-		u.Email = &email
 	}
 	if row.WithdrawalDate.Valid {
 		u.WithdrawalDate = &row.WithdrawalDate.Time

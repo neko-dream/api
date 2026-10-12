@@ -3,6 +3,11 @@ package user_query
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"os"
+	"testing"
+	"time"
+
 	_ "github.com/jackc/pgx/v5/stdlib"
 	userquery "github.com/neko-dream/api/internal/application/query/user"
 	"github.com/neko-dream/api/internal/domain/model/shared"
@@ -10,9 +15,6 @@ import (
 	cryptoinfra "github.com/neko-dream/api/internal/infrastructure/crypto"
 	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/api/internal/infrastructure/persistence/sqlc/generated"
-	"os"
-	"testing"
-	"time"
 )
 
 func TestManagementQuery(t *testing.T) {
@@ -54,7 +56,6 @@ func TestManagementQuery(t *testing.T) {
 				return err
 			}
 		}
-		out, err := q.List(ctx, userquery.ManagementListInput{Search: prefix, Limit: 1})
 		if err := queries.CreatePasswordAuth(ctx, model.CreatePasswordAuthParams{
 			PasswordAuthID: shared.NewUUID[user.User]().UUID(), UserID: id.UUID(),
 			PasswordHash: "test-only-unused-password-hash", LastChanged: time.Now(),
@@ -62,49 +63,73 @@ func TestManagementQuery(t *testing.T) {
 		}); err != nil {
 			return err
 		}
+		out, err := q.List(ctx, userquery.ManagementListInput{Search: prefix, Limit: 1})
 		if err != nil {
 			return err
 		}
 		if out.TotalCount != 2 || len(out.Users) != 1 || out.Users[0].UserID != second {
-			t.Fatal("pagination or stable ordering incorrect")
+			return errors.New("pagination or stable ordering incorrect")
 		}
 		out, err = q.List(ctx, userquery.ManagementListInput{Search: prefix, Offset: 1, Limit: 1})
 		if err != nil {
 			return err
 		}
 		if len(out.Users) != 1 || out.Users[0].UserID != id || len(out.Users[0].Providers) != 3 {
-			t.Fatal("providers duplicated users")
+			return errors.New("providers duplicated users")
 		}
 		if out.Users[0].Email == nil || *out.Users[0].Email != "city@example.com" {
-			t.Fatal("encrypted email not decrypted")
+			return errors.New("encrypted email not decrypted")
 		}
 		out, err = q.List(ctx, userquery.ManagementListInput{Search: prefix + "%_", Limit: 20})
 		if err != nil {
 			return err
 		}
 		if out.TotalCount != 1 {
-			t.Fatal("search wildcard was not literal")
+			return errors.New("search wildcard was not literal")
 		}
 		out, err = q.List(ctx, userquery.ManagementListInput{Search: prefix, Offset: 50, Limit: 20})
 		if err != nil {
 			return err
 		}
 		if len(out.Users) != 0 || out.TotalCount != 2 {
-			t.Fatal("empty page lost total")
+			return errors.New("empty page lost total")
 		}
 		missing, err := q.FindByID(ctx, shared.NewUUID[user.User]())
 		if err != nil {
 			return err
 		}
 		if missing != nil {
-			t.Fatal("missing user was not nil")
+			return errors.New("missing user was not nil")
 		}
 		found, err := q.FindByID(ctx, id)
 		if err != nil {
 			return err
 		}
 		if len(found.Providers) != 3 {
-			t.Fatal("detail auth methods incorrect")
+			return errors.New("detail auth methods incorrect")
+		}
+		corruptID := shared.NewUUID[user.User]()
+		corruptName := prefix + "-corrupted-email"
+		if err := queries.CreateUser(ctx, model.CreateUserParams{
+			UserID: corruptID.UUID(), CreatedAt: time.Now(),
+			DisplayName: sql.NullString{String: corruptName, Valid: true},
+			Email:       sql.NullString{String: "invalid-ciphertext", Valid: true}, EmailVerified: true,
+		}); err != nil {
+			return err
+		}
+		out, err = q.List(ctx, userquery.ManagementListInput{Search: corruptName, Limit: 20})
+		if err != nil {
+			return err
+		}
+		if out.TotalCount != 1 || len(out.Users) != 1 || out.Users[0].Email != nil || out.Users[0].EmailVerified {
+			return errors.New("corrupted email prevented safe list projection")
+		}
+		found, err = q.FindByID(ctx, corruptID)
+		if err != nil {
+			return err
+		}
+		if found == nil || found.Email != nil || found.EmailVerified {
+			return errors.New("corrupted email prevented safe detail projection")
 		}
 		return nil
 	})

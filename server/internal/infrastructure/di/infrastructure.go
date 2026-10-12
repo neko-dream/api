@@ -15,7 +15,6 @@ import (
 	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/api/internal/infrastructure/persistence/postgresql"
 	"github.com/neko-dream/api/internal/infrastructure/persistence/query/organization"
-	userquery "github.com/neko-dream/api/internal/infrastructure/persistence/query/user"
 	"github.com/neko-dream/api/internal/infrastructure/persistence/repository"
 	"github.com/neko-dream/api/internal/infrastructure/telemetry"
 )
@@ -29,7 +28,6 @@ func infraDeps() []ProvideArg {
 		{postgresql.Connect, nil},
 		{db.NewMigrator, nil},
 		{db.NewDBManager, nil},
-		{userquery.NewManagementQuery, nil},
 		{oauth.NewProviderFactory, nil},
 		{session.NewSessionTokenManager, nil},
 		{adminauth.NewAdminTokenManager, nil},

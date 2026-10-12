@@ -4,12 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	userquery "github.com/neko-dream/api/internal/application/query/user"
-	"github.com/neko-dream/api/internal/domain/model/user"
 	"strings"
 	"time"
 	"unicode/utf8"
 
+	userquery "github.com/neko-dream/api/internal/application/query/user"
 	"github.com/neko-dream/api/internal/application/usecase/analysis_usecase"
 	"github.com/neko-dream/api/internal/domain/messages"
 	"github.com/neko-dream/api/internal/domain/model/admin"
@@ -17,6 +16,7 @@ import (
 	"github.com/neko-dream/api/internal/domain/model/session"
 	"github.com/neko-dream/api/internal/domain/model/shared"
 	"github.com/neko-dream/api/internal/domain/model/talksession"
+	"github.com/neko-dream/api/internal/domain/model/user"
 	"github.com/neko-dream/api/internal/domain/service"
 	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
 	model "github.com/neko-dream/api/internal/infrastructure/persistence/sqlc/generated"
@@ -60,6 +60,9 @@ func (m *manageHandler) GetUserListManage(ctx context.Context, params oas.GetUse
 }
 
 func (m *manageHandler) GetUserDetailManage(ctx context.Context, params oas.GetUserDetailManageParams) (oas.GetUserDetailManageRes, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetUserDetailManage")
+	defer span.End()
+
 	if admin.GetAdminSession(ctx) == nil {
 		return nil, messages.ForbiddenError
 	}
