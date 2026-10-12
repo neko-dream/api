@@ -1,0 +1,23 @@
+FROM  --platform=linux/arm64 alpine:latest
+
+EXPOSE 3000
+ARG ENV=dev
+
+COPY ./server /server
+
+RUN  apk add shadow
+RUN  useradd api && \
+  mkdir -p /var/lib/amazon && \
+  chmod 750 /var/lib/amazon && \
+  mkdir -p /var/log/amazon && \
+  chmod 700 /var/log/amazon && \
+  chmod +x /server
+
+COPY .ecspresso/api/${ENV}/otel.yaml /etc/ecs/otel.yaml
+
+# ECS must explicitly opt into development; a standalone image defaults closed.
+ENV ENV=production
+
+VOLUME /var/lib/amazon /var/log/amazon /etc/ecs
+
+CMD ["./server"]

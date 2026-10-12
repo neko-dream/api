@@ -1,0 +1,25 @@
+services:
+  db:
+    image: ghcr.io/baosystems/postgis:16-3.5
+    ports:
+      - "127.0.0.1:5433:5432"
+    environment:
+      POSTGRES_DB: kotohiro
+      POSTGRES_USER: kotohiro
+      POSTGRES_PASSWORD: kotohiro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kotohiro -d kotohiro"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    volumes:
+      - local-pgdata:/var/lib/postgresql/data
+
+  mailpit:
+    image: axllent/mailpit:v1.27.9
+    ports:
+      - "127.0.0.1:1025:1025"
+      - "127.0.0.1:8025:8025"
+
+volumes:
+  local-pgdata:

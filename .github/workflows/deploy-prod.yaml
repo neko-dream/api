@@ -12,6 +12,14 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        working-directory: server
+    env:
+      INITIAL_ADMIN_EMAIL: ${{ vars.INITIAL_ADMIN_EMAIL }}
+      ADMIN_ALLOWED_ORIGINS: ${{ vars.ADMIN_ALLOWED_ORIGINS }}
+      INITIAL_ADMIN_NAME: ${{ vars.INITIAL_ADMIN_NAME || '管理者' }}
     if: github.ref == 'refs/heads/main'
     permissions:
       id-token: write
@@ -20,23 +28,41 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Set up Go
+        id: setup-go
         uses: actions/setup-go@v5
         with:
-          go-version-file: 'go.mod'
+          go-version-file: 'server/go.mod'
           cache: true
           cache-dependency-path: |
-            go.mod
-            go.sum
+            server/go.mod
+            server/go.sum
 
-      - name: Install Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Validate admin configuration
+        env:
+          GOOGLE_CLIENT_ID: ${{ vars.ADMIN_GOOGLE_CLIENT_ID }}
+        run: |
+          test -n "$INITIAL_ADMIN_EMAIL" || { echo "::error::Set INITIAL_ADMIN_EMAIL in the GitHub environment"; exit 1; }
+          test -n "$ADMIN_ALLOWED_ORIGINS" || { echo "::error::Set ADMIN_ALLOWED_ORIGINS in the GitHub environment"; exit 1; }
+          test -n "$GOOGLE_CLIENT_ID" || { echo "::error::Set ADMIN_GOOGLE_CLIENT_ID to the API's Google client ID"; exit 1; }
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+      - name: Install frontend dependencies
+        working-directory: .
+        run: pnpm install --frozen-lockfile
 
       - name: Build Admin UI
+        working-directory: admin
+        env:
+          VITE_GOOGLE_CLIENT_ID: ${{ vars.ADMIN_GOOGLE_CLIENT_ID }}
+          VITE_API_URL: ''
         run: |
-          cd admin-ui
-          bun i
-          bun build:prod
-          cd ../
+          pnpm test
+          pnpm build
 
       - name: Download Go Modules
         if: ${{ steps.setup-go.outputs.cache-hit != 'true' }}
@@ -86,16 +112,16 @@ jobs:
       - name: Build Container
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./server
           push: false
           platforms: linux/arm64
-          file: ./container/Dockerfile.gh
+          file: ./server/container/Dockerfile.gh
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
           build-args: |
-            "ENV=prod"
+            "ENV=prd"
           outputs: type=docker
 
       - name: Push Container
