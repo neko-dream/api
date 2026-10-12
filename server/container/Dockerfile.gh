@@ -13,7 +13,11 @@ RUN  useradd api && \
   chmod 700 /var/log/amazon && \
   chmod +x /server
 
-COPY .ecspresso/api/${ENV}/otel.yaml /etc/ecs/otel.yaml
+# OTel Collector の設定は dev にしかない(本番のタスク定義にはコレクターがない)ため、ある場合だけ配置する
+RUN --mount=type=bind,source=.ecspresso/api,target=/tmp/ecspresso \
+  if [ -f "/tmp/ecspresso/${ENV}/otel.yaml" ]; then \
+    mkdir -p /etc/ecs && cp "/tmp/ecspresso/${ENV}/otel.yaml" /etc/ecs/otel.yaml; \
+  fi
 
 # ECS must explicitly opt into development; a standalone image defaults closed.
 ENV ENV=production
