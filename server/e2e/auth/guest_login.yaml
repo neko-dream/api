@@ -129,6 +129,11 @@ steps:
           headers: null
     test: len(current.res.headers['Set-Cookie']) > 0
 
+  grantCreationPermission:
+    desc: テスト作成者にセッション作成を許可（通常ログインには付与しない）
+    dev:
+      query: UPDATE users SET can_create_talk_session = true WHERE display_id = '{{ vars.normalUserId }}';
+
   createUnrestrictedSession:
     desc: 制限なしセッション作成
     req:

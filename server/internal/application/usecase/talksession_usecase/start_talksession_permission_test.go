@@ -44,11 +44,66 @@ func (s *creationGrantStub) Set(context.Context, shared.UUID[user.User], bool) e
 type creationOrganizationStub struct {
 	organization.OrganizationUserRepository
 	calls int
+	value *organization.OrganizationUser
+	err   error
 }
 
 func (s *creationOrganizationStub) FindByOrganizationIDAndUserID(context.Context, shared.UUID[organization.Organization], shared.UUID[user.User]) (*organization.OrganizationUser, error) {
 	s.calls++
-	return nil, nil
+	return s.value, s.err
+}
+
+type creationAliasStub struct {
+	organization.OrganizationAliasRepository
+	value *organization.OrganizationAlias
+	err   error
+}
+
+func (s creationAliasStub) FindByID(context.Context, shared.UUID[organization.OrganizationAlias]) (*organization.OrganizationAlias, error) {
+	return s.value, s.err
+}
+
+func TestCreationOrganizationErrorsUseExpectedStatus(t *testing.T) {
+	u := creationUser(shared.ProviderGoogle, false)
+	orgID := shared.NewUUID[organization.Organization]()
+	orgString := orgID.String()
+	alias, err := organization.NewOrganizationAlias("test alias", orgID, u.UserID())
+	if err != nil {
+		t.Fatal(err)
+	}
+	aliasID := alias.AliasID()
+	inactive, err := organization.NewOrganizationAlias("inactive alias", orgID, u.UserID())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := inactive.Deactivate(u.UserID()); err != nil {
+		t.Fatal(err)
+	}
+	failure := errors.New("organization database unavailable")
+	for _, tc := range []struct {
+		name    string
+		aliasID *shared.UUID[organization.OrganizationAlias]
+		alias   creationAliasStub
+		org     creationOrganizationStub
+		want    error
+	}{
+		{"non-member", nil, creationAliasStub{}, creationOrganizationStub{err: sql.ErrNoRows}, messages.ForbiddenError},
+		{"membership database failure", nil, creationAliasStub{}, creationOrganizationStub{err: failure}, failure},
+		{"missing alias", &aliasID, creationAliasStub{err: organization.ErrOrganizationAliasNotFound}, creationOrganizationStub{}, messages.BadRequestError},
+		{"inactive alias", &aliasID, creationAliasStub{value: inactive}, creationOrganizationStub{}, messages.BadRequestError},
+		{"alias database failure", &aliasID, creationAliasStub{err: failure}, creationOrganizationStub{}, failure},
+		{"alias non-member", &aliasID, creationAliasStub{value: alias}, creationOrganizationStub{err: sql.ErrNoRows}, messages.ForbiddenError},
+		{"member", nil, creationAliasStub{}, creationOrganizationStub{value: &organization.OrganizationUser{}}, messages.TalkSessionThemeTooLong},
+		{"alias member", &aliasID, creationAliasStub{value: alias}, creationOrganizationStub{value: &organization.OrganizationUser{}}, messages.TalkSessionThemeTooLong},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			h := &startTalkSessionHandler{UserRepository: creationUserStub{value: &u}, creationPermissions: &creationGrantStub{granted: true}, OrganizationUserRepository: &tc.org, OrganizationAliasRepository: tc.alias}
+			_, err := h.Execute(context.Background(), StartTalkSessionUseCaseInput{OwnerID: u.UserID(), Theme: strings.Repeat("x", 101), SessionClaim: &session.Claim{OrganizationID: &orgString}, OrganizationAliasID: tc.aliasID})
+			if !errors.Is(err, tc.want) {
+				t.Fatalf("err=%v want=%v", err, tc.want)
+			}
+		})
+	}
 }
 
 type creationSessionStub struct {
@@ -105,9 +160,9 @@ func TestCreationRequiresIndependentGrant(t *testing.T) {
 }
 
 func TestGrantedUserCreatesWithoutOrganizationAndRevocationBlocksNextRequest(t *testing.T) {
-	url := os.Getenv("ADMIN_TEST_DATABASE_URL")
+	url := os.Getenv("MAIL_TEST_DATABASE_URL")
 	if url == "" {
-		t.Skip("ADMIN_TEST_DATABASE_URL required")
+		t.Skip("MAIL_TEST_DATABASE_URL required")
 	}
 	c, err := sql.Open("pgx", url)
 	if err != nil {
@@ -117,7 +172,7 @@ func TestGrantedUserCreatesWithoutOrganizationAndRevocationBlocksNextRequest(t *
 	u := creationUser(shared.ProviderGoogle, false)
 	grants := &creationGrantStub{granted: true}
 	sessions := &creationSessionStub{}
-	orgs := &creationOrganizationStub{}
+	orgs := &creationOrganizationStub{err: sql.ErrNoRows}
 	h := &startTalkSessionHandler{UserRepository: creationUserStub{value: &u}, creationPermissions: grants, TalkSessionRepository: sessions, OrganizationUserRepository: orgs, DBManager: db.NewDBManager(c)}
 	input := StartTalkSessionUseCaseInput{OwnerID: u.UserID(), Theme: "permission test", ScheduledEndTime: time.Now().Add(time.Hour)}
 	if _, err := h.Execute(context.Background(), input); err != nil || sessions.created == nil || sessions.created.OrganizationID() != nil || orgs.calls != 0 {
@@ -133,5 +188,21 @@ func TestGrantedUserCreatesWithoutOrganizationAndRevocationBlocksNextRequest(t *
 	input.SessionClaim = &session.Claim{OrganizationID: &orgID}
 	if _, err := h.Execute(context.Background(), input); !errors.Is(err, messages.ForbiddenError) || sessions.created != nil || orgs.calls != 1 {
 		t.Fatal("unrelated organization identity accepted", err)
+	}
+	orgs.err = nil
+	orgs.value = &organization.OrganizationUser{}
+	if _, err := h.Execute(context.Background(), input); err != nil || sessions.created == nil || sessions.created.OrganizationID() == nil || sessions.created.OrganizationID().String() != orgID {
+		t.Fatal("member could not create for their organization", err)
+	}
+	aliasOrgID, _ := shared.ParseUUID[organization.Organization](orgID)
+	alias, err := organization.NewOrganizationAlias("member alias", aliasOrgID, u.UserID())
+	if err != nil {
+		t.Fatal(err)
+	}
+	aliasID := alias.AliasID()
+	input.OrganizationAliasID = &aliasID
+	h.OrganizationAliasRepository = creationAliasStub{value: alias}
+	if _, err := h.Execute(context.Background(), input); err != nil || sessions.created.OrganizationAliasID() == nil || *sessions.created.OrganizationAliasID() != aliasID {
+		t.Fatal("member could not create using their organization alias", err)
 	}
 }

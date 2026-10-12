@@ -4,9 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"log/slog"
 
-	userquery "github.com/neko-dream/api/internal/application/query/user"
+	"braces.dev/errtrace"
 	"github.com/neko-dream/api/internal/domain/messages"
+	"github.com/neko-dream/api/internal/domain/model/admin"
 	"github.com/neko-dream/api/internal/domain/model/shared"
 	"github.com/neko-dream/api/internal/domain/model/user"
 	"go.opentelemetry.io/otel"
@@ -17,32 +19,31 @@ type SetSessionCreationPermission interface {
 }
 
 type setSessionCreationPermission struct {
-	users       userquery.Current
 	permissions user.SessionCreationPermissionRepository
 }
 
-func NewSetSessionCreationPermission(users userquery.Current, permissions user.SessionCreationPermissionRepository) SetSessionCreationPermission {
-	return &setSessionCreationPermission{users: users, permissions: permissions}
+func NewSetSessionCreationPermission(permissions user.SessionCreationPermissionRepository) SetSessionCreationPermission {
+	return &setSessionCreationPermission{permissions: permissions}
 }
 
 func (s *setSessionCreationPermission) Execute(ctx context.Context, id shared.UUID[user.User], allowed bool) error {
 	ctx, span := otel.Tracer("admin_usecase").Start(ctx, "setSessionCreationPermission.Execute")
 	defer span.End()
-	u, err := s.users.FindByID(ctx, id)
-	if err != nil {
-		return err
-	}
-	if u == nil {
-		return messages.UserNotFoundError
-	}
-	if allowed && !user.CanCreateTalkSession(true, u.IsGuest, u.User.WithdrawalDate != nil) {
-		return messages.BadRequestError
+	claim := admin.GetAdminSession(ctx)
+	if claim == nil {
+		slog.WarnContext(ctx, "session creation permission change denied", "user_id", id.String(), "allowed", allowed)
+		return messages.ForbiddenError
 	}
 	if err := s.permissions.Set(ctx, id, allowed); err != nil {
+		slog.WarnContext(ctx, "session creation permission change failed", "admin_user_id", claim.Sub, "user_id", id.String(), "allowed", allowed)
 		if errors.Is(err, sql.ErrNoRows) {
 			return messages.UserNotFoundError
 		}
-		return err
+		if errors.Is(err, user.ErrSessionCreationPermissionIneligible) {
+			return messages.BadRequestError
+		}
+		return errtrace.Wrap(err)
 	}
+	slog.InfoContext(ctx, "session creation permission changed", "admin_user_id", claim.Sub, "user_id", id.String(), "allowed", allowed)
 	return nil
 }

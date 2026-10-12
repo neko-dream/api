@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/neko-dream/api/internal/domain/messages"
 	"github.com/neko-dream/api/internal/domain/model/admin"
@@ -26,6 +25,5 @@ func (m *manageHandler) SetUserPermissionsManage(ctx context.Context, req *oas.U
 	if err := m.setCreationPermission.Execute(ctx, id, req.CanCreateTalkSession); err != nil {
 		return nil, err
 	}
-	slog.InfoContext(ctx, "session creation permission changed", "admin_user_id", claim.Sub, "user_id", id.String(), "allowed", req.CanCreateTalkSession)
 	return &oas.UserPermissions{CanCreateTalkSession: req.CanCreateTalkSession}, nil
 }

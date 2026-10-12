@@ -54,6 +54,11 @@ steps:
               displayID: "{{ vars.id }}"
               prefecture: "{{ vars.prefecture }}"
               city: "{{ vars.city }}"
+  grantCreationPermission:
+    desc: テスト作成者にセッション作成を許可（通常ログインには付与しない）
+    dev:
+      query: UPDATE users SET can_create_talk_session = true WHERE display_id = '{{ vars.id }}';
+
   createTalkSession:
     desc: トークセッション作成
     req:
@@ -115,6 +120,11 @@ steps:
               displayID: "{{ vars.id2 }}"
               prefecture: "{{ vars.prefecture2 }}"
               city: "{{ vars.city2 }}"
+
+  grantCreationPermission2:
+    desc: テスト作成者にセッション作成を許可（通常ログインには付与しない）
+    dev:
+      query: UPDATE users SET can_create_talk_session = true WHERE display_id = '{{ vars.id2 }}';
 
   createTalkSession2:
     desc: セッション2作成

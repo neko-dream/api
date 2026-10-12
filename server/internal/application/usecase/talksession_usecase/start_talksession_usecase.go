@@ -2,6 +2,8 @@ package talksession_usecase
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"time"
 	"unicode/utf8"
 
@@ -124,9 +126,12 @@ func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSe
 		// エイリアスから組織IDを取得
 		alias, err := i.OrganizationAliasRepository.FindByID(ctx, *input.OrganizationAliasID)
 		if err != nil {
-			return StartTalkSessionUseCaseOutput{}, err
+			if errors.Is(err, organization.ErrOrganizationAliasNotFound) {
+				return StartTalkSessionUseCaseOutput{}, messages.BadRequestError
+			}
+			return StartTalkSessionUseCaseOutput{}, errtrace.Wrap(err)
 		}
-		if alias == nil {
+		if alias == nil || !alias.IsActive() {
 			return StartTalkSessionUseCaseOutput{}, messages.BadRequestError
 		}
 		orgID := alias.OrganizationID()
@@ -143,7 +148,10 @@ func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSe
 	if organizationID != nil {
 		membership, err := i.OrganizationUserRepository.FindByOrganizationIDAndUserID(ctx, *organizationID, input.OwnerID)
 		if err != nil {
-			return StartTalkSessionUseCaseOutput{}, err
+			if errors.Is(err, sql.ErrNoRows) {
+				return StartTalkSessionUseCaseOutput{}, messages.ForbiddenError
+			}
+			return StartTalkSessionUseCaseOutput{}, errtrace.Wrap(err)
 		}
 		if membership == nil {
 			return StartTalkSessionUseCaseOutput{}, messages.ForbiddenError

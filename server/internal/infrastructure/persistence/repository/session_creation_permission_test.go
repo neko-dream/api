@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -88,11 +89,23 @@ func TestSessionCreationPermissionDatabase(t *testing.T) {
 		if err := q.CreateUserAuth(ctx, model.CreateUserAuthParams{UserAuthID: shared.NewUUID[user.User]().UUID(), UserID: guestID.UUID(), Provider: "GUEST", Subject: guestID.String(), CreatedAt: time.Now()}); err != nil {
 			return err
 		}
-		if err := r.Set(ctx, guestID, true); !errors.Is(err, sql.ErrNoRows) {
+		if err := r.Set(ctx, guestID, true); !errors.Is(err, user.ErrSessionCreationPermissionIneligible) {
 			return errors.New("storage accepted guest grant")
 		}
 		if err := r.Set(ctx, guestID, false); err != nil {
 			return err
+		}
+		if err := q.WithdrawUser(ctx, model.WithdrawUserParams{UserID: id.UUID(), WithdrawalDate: sql.NullTime{Time: time.Now(), Valid: true}}); err != nil {
+			return err
+		}
+		if err := r.Set(ctx, id, true); !errors.Is(err, user.ErrSessionCreationPermissionIneligible) {
+			return errors.New("storage accepted withdrawn grant")
+		}
+		if err := r.Set(ctx, id, false); err != nil {
+			return err
+		}
+		if err := r.Set(ctx, shared.NewUUID[user.User](), true); !errors.Is(err, sql.ErrNoRows) {
+			return errors.New("missing mutation target not distinguished")
 		}
 		return nil
 	}); err != nil {
@@ -107,11 +120,12 @@ func TestSessionCreationPermissionMigration(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer tx.Rollback()
-	down, err := migrations.MigrationFiles.ReadFile("000058_user_session_creation_permission.down.sql")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if _, err := tx.Exec(string(down)); err != nil {
+	// Use transaction-local fixture tables, never ALTER the shared application's users table.
+	schema := "permission_migration_" + strings.ReplaceAll(shared.NewUUID[user.User]().String(), "-", "")
+	if _, err := tx.Exec(`CREATE SCHEMA "` + schema + `"; SET LOCAL search_path TO "` + schema + `";
+		CREATE TABLE users (user_id uuid PRIMARY KEY, withdrawal_date timestamptz);
+		CREATE TABLE user_auths (user_auth_id uuid, user_id uuid, provider text, subject text, is_verified boolean);
+		CREATE TABLE organization_users (organization_user_id uuid, user_id uuid, organization_id uuid);`); err != nil {
 		t.Fatal(err)
 	}
 	ids := make([]shared.UUID[user.User], 5)
@@ -160,5 +174,12 @@ func TestSessionCreationPermissionMigration(t *testing.T) {
 	var value bool
 	if err := tx.QueryRow("SELECT can_create_talk_session FROM users WHERE user_id=$1", ids[4].UUID()).Scan(&value); err != nil || value {
 		t.Fatal("new membership granted permission", err)
+	}
+	down, err := migrations.MigrationFiles.ReadFile("000058_user_session_creation_permission.down.sql")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := tx.Exec(string(down)); err != nil {
+		t.Fatal(err)
 	}
 }

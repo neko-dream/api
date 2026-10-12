@@ -2,9 +2,12 @@ package user
 
 import (
 	"context"
+	"errors"
 
 	"github.com/neko-dream/api/internal/domain/model/shared"
 )
+
+var ErrSessionCreationPermissionIneligible = errors.New("session creation permission cannot be granted to an inactive or guest user")
 
 // SessionCreationPermissionRepository stores the operator's grant, independently of organizations.
 type SessionCreationPermissionRepository interface {

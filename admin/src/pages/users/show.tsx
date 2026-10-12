@@ -4,7 +4,7 @@ import { Alert, Button, Descriptions, Popconfirm, Result, Space, Tag, Typography
 import axios from "axios";
 import { Link } from "react-router";
 import type { ManagedUser } from "./types";
-import { formatUserDate, providerLabel } from "./types";
+import { canGrantSessionCreation, formatUserDate, providerLabel, sessionCreationPermissionLabel } from "./types";
 import { env } from "../../config/env";
 
 export function UserShow() {
@@ -80,8 +80,8 @@ export function UserShow() {
             </Descriptions.Item>
             <Descriptions.Item label="セッション作成の許可">
               <Space wrap>
-                <Tag color={user.permissions.canCreateTalkSession ? "green" : undefined}>
-                  {user.permissions.canCreateTalkSession ? "許可あり" : "許可なし"}
+                <Tag color={user.permissions.canCreateTalkSession && canGrantSessionCreation(user) ? "green" : undefined}>
+                  {sessionCreationPermissionLabel(user)}
                 </Tag>
                 <Popconfirm
                   title={
@@ -100,7 +100,7 @@ export function UserShow() {
                     disabled={
                       query.isFetching ||
                       (!user.permissions.canCreateTalkSession &&
-                        (!!user.withdrawalDate || user.providers.every((p) => p === "GUEST")))
+                        !canGrantSessionCreation(user))
                     }
                   >
                     {user.permissions.canCreateTalkSession ? "許可を解除" : "作成を許可"}

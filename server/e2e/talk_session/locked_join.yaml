@@ -56,6 +56,11 @@ steps:
               prefecture: "{{ vars.prefecture }}"
               city: "{{ vars.city }}"
 
+  grantCreationPermission:
+    desc: テスト作成者にセッション作成を許可（通常ログインには付与しない）
+    dev:
+      query: UPDATE users SET can_create_talk_session = true WHERE display_id = '{{ vars.ownerID }}';
+
   createLockedSession:
     desc: 合言葉付きセッション作成
     req:

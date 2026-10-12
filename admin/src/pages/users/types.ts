@@ -12,6 +12,15 @@ export interface ManagedUser {
   permissions: { canCreateTalkSession: boolean };
 }
 
+export function canGrantSessionCreation(user: Pick<ManagedUser, "withdrawalDate" | "providers">): boolean {
+  return !user.withdrawalDate && user.providers.some((provider) => provider !== "GUEST");
+}
+
+export function sessionCreationPermissionLabel(user: Pick<ManagedUser, "withdrawalDate" | "providers" | "permissions">): string {
+  if (!user.permissions.canCreateTalkSession) return "許可なし";
+  return canGrantSessionCreation(user) ? "許可あり" : "許可あり（現在は無効）";
+}
+
 export function formatUserDate(value?: string): string {
   return value ? new Date(value).toLocaleString("ja-JP") : "—";
 }

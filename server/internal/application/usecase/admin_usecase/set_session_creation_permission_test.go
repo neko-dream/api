@@ -1,25 +1,19 @@
 package admin_usecase
 
 import (
+	"bytes"
 	"context"
+	"database/sql"
 	"errors"
+	"log/slog"
+	"strings"
 	"testing"
-	"time"
 
-	userquery "github.com/neko-dream/api/internal/application/query/user"
 	"github.com/neko-dream/api/internal/domain/messages"
+	"github.com/neko-dream/api/internal/domain/model/admin"
 	"github.com/neko-dream/api/internal/domain/model/shared"
 	"github.com/neko-dream/api/internal/domain/model/user"
 )
-
-type permissionCurrentStub struct {
-	output *userquery.CurrentOutput
-	err    error
-}
-
-func (s *permissionCurrentStub) FindByID(context.Context, shared.UUID[user.User]) (*userquery.CurrentOutput, error) {
-	return s.output, s.err
-}
 
 type permissionGrantStub struct {
 	granted bool
@@ -27,8 +21,32 @@ type permissionGrantStub struct {
 	err     error
 }
 
+func TestPermissionChangeAuditIncludesActorForSuccessAndFailure(t *testing.T) {
+	var output bytes.Buffer
+	previous := slog.Default()
+	slog.SetDefault(slog.New(slog.NewJSONHandler(&output, nil)))
+	t.Cleanup(func() { slog.SetDefault(previous) })
+	actor := shared.NewUUID[admin.AdminUser]().String()
+	target := shared.NewUUID[user.User]()
+	ctx := admin.SetAdminSession(context.Background(), &admin.AdminClaim{Sub: actor})
+	permission := &permissionGrantStub{}
+	s := NewSetSessionCreationPermission(permission)
+	if err := s.Execute(ctx, target, true); err != nil {
+		t.Fatal(err)
+	}
+	permission.err = user.ErrSessionCreationPermissionIneligible
+	if err := s.Execute(ctx, target, true); !errors.Is(err, messages.BadRequestError) {
+		t.Fatal(err)
+	}
+	for _, expected := range []string{"session creation permission changed", "session creation permission change failed", actor, target.String(), `"allowed":true`} {
+		if !strings.Contains(output.String(), expected) {
+			t.Fatalf("missing audit field %q", expected)
+		}
+	}
+}
+
 func (s *permissionGrantStub) Get(context.Context, shared.UUID[user.User]) (bool, error) {
-	return s.granted, s.err
+	panic("permission mutation must not depend on a profile or preflight read")
 }
 func (s *permissionGrantStub) Set(_ context.Context, _ shared.UUID[user.User], value bool) error {
 	s.calls++
@@ -41,40 +59,26 @@ func (s *permissionGrantStub) Set(_ context.Context, _ shared.UUID[user.User], v
 
 func TestSetSessionCreationPermission(t *testing.T) {
 	id := shared.NewUUID[user.User]()
-	q := &permissionCurrentStub{output: &userquery.CurrentOutput{}}
+	ctx := admin.SetAdminSession(context.Background(), &admin.AdminClaim{Sub: shared.NewUUID[admin.AdminUser]().String()})
 	p := &permissionGrantStub{}
-	s := NewSetSessionCreationPermission(q, p)
+	s := NewSetSessionCreationPermission(p)
+	if err := s.Execute(context.Background(), id, true); !errors.Is(err, messages.ForbiddenError) || p.calls != 0 {
+		t.Fatal("mutation without admin context was allowed", err)
+	}
 	for _, allowed := range []bool{true, true, false, false} {
-		if err := s.Execute(context.Background(), id, allowed); err != nil || p.granted != allowed {
+		if err := s.Execute(ctx, id, allowed); err != nil || p.granted != allowed {
 			t.Fatalf("allowed=%v err=%v", allowed, err)
 		}
 	}
-	q.output.IsGuest = true
-	before := p.calls
-	if err := s.Execute(context.Background(), id, true); !errors.Is(err, messages.BadRequestError) || p.calls != before {
-		t.Fatal("guest grant accepted", err)
-	}
-	if err := s.Execute(context.Background(), id, false); err != nil {
-		t.Fatal("guest revoke rejected", err)
-	}
-	q.output.IsGuest = false
-	now := time.Now()
-	q.output.User.WithdrawalDate = &now
-	if err := s.Execute(context.Background(), id, true); !errors.Is(err, messages.BadRequestError) {
-		t.Fatal("withdrawn grant accepted", err)
-	}
-	q.output = nil
-	if err := s.Execute(context.Background(), id, true); !errors.Is(err, messages.UserNotFoundError) {
-		t.Fatal("missing user accepted", err)
-	}
-	q.err = errors.New("db failed")
-	if err := s.Execute(context.Background(), id, true); !errors.Is(err, q.err) {
-		t.Fatal("db error hidden", err)
-	}
-	q.err = nil
-	q.output = &userquery.CurrentOutput{}
-	p.err = errors.New("write failed")
-	if err := s.Execute(context.Background(), id, true); !errors.Is(err, p.err) {
-		t.Fatal("write error hidden", err)
+	failure := errors.New("permission database unavailable")
+	for _, tc := range []struct{ err, want error }{
+		{sql.ErrNoRows, messages.UserNotFoundError},
+		{user.ErrSessionCreationPermissionIneligible, messages.BadRequestError},
+		{failure, failure},
+	} {
+		p.err = tc.err
+		if err := s.Execute(ctx, id, true); !errors.Is(err, tc.want) {
+			t.Fatalf("err=%v want=%v", err, tc.want)
+		}
 	}
 }
