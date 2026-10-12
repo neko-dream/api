@@ -1,0 +1,713 @@
+openapi: 3.0.0
+info:
+  title: Kotohiro Admin API
+  version: 1.0.0
+tags:
+  - name: manage
+  - name: admin
+paths:
+  /v1/admin/admin-users:
+    get:
+      operationId: listAdminUsers
+      summary: 管理者アカウント一覧
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserListResponse'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - admin
+      security:
+        - AdminCookieAuth: []
+      x-ogen-operation-group: Admin
+    post:
+      operationId: createAdminUser
+      summary: 管理者アカウント作成(作成した email の Google アカウントがログイン可能になる)
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserItem'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                type: object
+        '409':
+          description: The request conflicts with the current state of the server.
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAdminUserRequest'
+      security:
+        - AdminCookieAuth: []
+      x-ogen-operation-group: Admin
+  /v1/admin/login:
+    post:
+      operationId: adminLogin
+      summary: 管理者ログイン(Google認証)
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            Set-Cookie:
+              required: true
+              description: AdminSessionId Cookie
+              schema:
+                type: array
+                items:
+                  type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminTokenInfo'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idToken:
+                  type: string
+                  description: Google Identity Services で取得した ID トークン(credential)
+              required:
+                - idToken
+      security:
+        - {}
+      x-ogen-operation-group: Admin
+  /v1/admin/logout:
+    post:
+      operationId: adminLogout
+      summary: 管理者ログアウト
+      parameters: []
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+          headers:
+            Set-Cookie:
+              required: true
+              description: Cookie削除用のSet-Cookie
+              schema:
+                type: array
+                items:
+                  type: string
+      tags:
+        - admin
+      security:
+        - {}
+      x-ogen-operation-group: Admin
+  /v1/admin/refresh:
+    post:
+      operationId: adminRefresh
+      summary: リフレッシュトークンでアクセストークンを再発行
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            Set-Cookie:
+              required: true
+              description: 新しい AdminSessionId / AdminRefreshToken Cookie
+              schema:
+                type: array
+                items:
+                  type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminTokenInfo'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - admin
+      security:
+        - {}
+      x-ogen-operation-group: Admin
+  /v1/admin/token/info:
+    get:
+      operationId: getAdminTokenInfo
+      summary: 管理者トークンの内容を返す
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminTokenInfo'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                type: object
+      tags:
+        - admin
+      security:
+        - AdminCookieAuth: []
+      x-ogen-operation-group: Admin
+  /v1/manage/talksessions/list:
+    get:
+      operationId: getTalkSessionListManage
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - active
+              - inactive
+          explode: false
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TalkSessionListResponse'
+      tags:
+        - manage
+      security:
+        - AdminCookieAuth: []
+      x-ogen-operation-group: manage
+  /v1/manage/talksessions/{talkSessionID}:
+    get:
+      operationId: getTalkSessionManage
+      parameters:
+        - name: talkSessionID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TalkSessionForManage'
+      tags:
+        - manage
+      security:
+        - AdminCookieAuth: []
+      x-ogen-operation-group: manage
+  /v1/manage/talksessions/{talkSessionID}/analysis/regenerate:
+    post:
+      operationId: manageRegenerateManage
+      parameters:
+        - name: talkSessionID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegenerateResponse'
+      tags:
+        - manage
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RegenerateRequest'
+      security:
+        - AdminCookieAuth: []
+      x-ogen-operation-group: manage
+  /v1/manage/talksessions/{talkSessionID}/analysis/report:
+    get:
+      operationId: getAnalysisReportManage
+      parameters:
+        - name: talkSessionID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisReportResponse'
+      tags:
+        - manage
+      security:
+        - AdminCookieAuth: []
+      x-ogen-operation-group: manage
+    post:
+      operationId: toggleReportVisibilityManage
+      parameters:
+        - name: talkSessionID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToggleReportVisibilityResponse'
+      tags:
+        - manage
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ToggleReportVisibilityRequest'
+      security:
+        - AdminCookieAuth: []
+      x-ogen-operation-group: manage
+  /v1/manage/users/list:
+    get:
+      operationId: getUserListManage
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+          explode: false
+        - name: orderBy
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - createdAt
+              - updatedAt
+              - displayName
+              - lastLoginAt
+          explode: false
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserForManage'
+      tags:
+        - manage
+      security:
+        - AdminCookieAuth: []
+      x-ogen-operation-group: manage
+  /v1/manage/users/stats/list:
+    get:
+      operationId: getUserStatsListManage
+      parameters:
+        - name: range
+          in: query
+          required: true
+          schema:
+            type: string
+          explode: false
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserStatsResponse'
+      tags:
+        - manage
+      security:
+        - AdminCookieAuth: []
+      x-ogen-operation-group: manage
+  /v1/manage/users/stats/total:
+    get:
+      operationId: getUserStatsTotalManage
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStatsResponse'
+      tags:
+        - manage
+      security:
+        - AdminCookieAuth: []
+      x-ogen-operation-group: manage
+security:
+  - CookieAuth: []
+components:
+  schemas:
+    AdminTokenInfo:
+      type: object
+      required:
+        - sub
+        - email
+        - displayName
+        - isAdmin
+      properties:
+        sub:
+          type: string
+          description: 管理者ID
+        email:
+          type: string
+        displayName:
+          type: string
+        isAdmin:
+          type: boolean
+      description: 管理者トークンの内容
+    AdminUserItem:
+      type: object
+      required:
+        - id
+        - email
+        - displayName
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        displayName:
+          type: string
+      description: 管理者
+    AdminUserListResponse:
+      type: object
+      required:
+        - adminUsers
+      properties:
+        adminUsers:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminUserItem'
+      description: 管理者アカウント一覧
+    AnalysisReportResponse:
+      type: object
+      properties:
+        report:
+          type: string
+          description: レポート本文
+    CreateAdminUserRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          description: Google アカウントのメールアドレス
+        displayName:
+          type: string
+      description: 管理者作成リクエスト
+    RegenerateRequest:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum:
+            - report
+            - group
+            - image
+          description: 再生成するタイプ
+    RegenerateResponse:
+      type: object
+      required:
+        - status
+        - message
+      properties:
+        status:
+          type: string
+          description: ステータス
+        message:
+          type: string
+          description: メッセージ
+    TalkSessionForManage:
+      type: object
+      required:
+        - talkSessionID
+        - theme
+        - description
+        - owner
+        - scheduledEndTime
+        - thumbnailURL
+        - hidden
+        - updatedAt
+        - createdAt
+      properties:
+        talkSessionID:
+          type: string
+        theme:
+          type: string
+        description:
+          type: string
+        owner:
+          $ref: '#/components/schemas/UserForManage'
+        scheduledEndTime:
+          type: string
+          format: date-time
+        city:
+          type: string
+        prefecture:
+          type: string
+        thumbnailURL:
+          type: string
+        hidden:
+          type: boolean
+        updatedAt:
+          type: string
+        createdAt:
+          type: string
+    TalkSessionListResponse:
+      type: object
+      required:
+        - talkSessionStats
+        - totalCount
+      properties:
+        talkSessionStats:
+          type: array
+          items:
+            $ref: '#/components/schemas/TalkSessionStats'
+        totalCount:
+          type: integer
+          format: int32
+    TalkSessionStats:
+      type: object
+      required:
+        - talkSessionID
+        - theme
+        - description
+        - owner
+        - scheduledEndTime
+        - thumbnailURL
+        - hidden
+        - updatedAt
+        - createdAt
+        - opinionCount
+        - opinionUserCount
+        - voteCount
+        - voteUserCount
+      properties:
+        talkSessionID:
+          type: string
+        theme:
+          type: string
+        description:
+          type: string
+        owner:
+          $ref: '#/components/schemas/UserForManage'
+        scheduledEndTime:
+          type: string
+          format: date-time
+        city:
+          type: string
+        prefecture:
+          type: string
+        thumbnailURL:
+          type: string
+        hidden:
+          type: boolean
+        updatedAt:
+          type: string
+        createdAt:
+          type: string
+        opinionCount:
+          type: integer
+          format: int32
+        opinionUserCount:
+          type: integer
+          format: int32
+        voteCount:
+          type: integer
+          format: int32
+        voteUserCount:
+          type: integer
+          format: int32
+    ToggleReportVisibilityRequest:
+      type: object
+      required:
+        - hidden
+      properties:
+        hidden:
+          type: boolean
+          description: 非表示にするかどうか
+    ToggleReportVisibilityResponse:
+      type: object
+      required:
+        - status
+        - message
+      properties:
+        status:
+          type: string
+          description: ステータス
+        message:
+          type: string
+          description: メッセージ
+    UserForManage:
+      type: object
+      required:
+        - userID
+        - displayID
+        - displayName
+        - iconURL
+        - lastLoginAt
+        - createdAt
+        - updatedAt
+      properties:
+        userID:
+          type: string
+          description: ユーザーID
+        displayID:
+          type: string
+          description: 表示ID
+        displayName:
+          type: string
+          description: 表示名
+        iconURL:
+          type: string
+          description: アイコンURL
+        lastLoginAt:
+          type: string
+          format: date-time
+          description: 最終ログイン日時
+        createdAt:
+          type: string
+          format: date-time
+          description: 作成日時
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新日時
+    UserStatsResponse:
+      type: object
+      required:
+        - uniqueActionUserCount
+        - userCount
+        - talkSessionCount
+        - date
+      properties:
+        uniqueActionUserCount:
+          type: integer
+          format: int32
+          description: ユニークアクション数
+        userCount:
+          type: integer
+          format: int32
+          description: 登録ユーザー数
+        talkSessionCount:
+          type: integer
+          format: int32
+          description: セッション数
+        date:
+          type: string
+          format: date-time
+          description: 日付
+  securitySchemes:
+    CookieAuth:
+      type: apiKey
+      in: cookie
+      name: SessionId
+      description: Cookie-based authentication using JWT tokens stored in secure HTTP-only cookies
+    AdminCookieAuth:
+      type: apiKey
+      in: cookie
+      name: AdminSessionId
+      description: 管理画面用のCookie認証。user の SessionId とは独立した AdminSessionId を使用する

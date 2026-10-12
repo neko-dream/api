@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => {
       TanStackRouterVite(),
     ],
     build: {
-      outDir: '../static/admin-ui',
+      outDir: '../server/static/admin-ui',
       emptyOutDir: true,
     },
     server: {

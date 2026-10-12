@@ -14,6 +14,7 @@ API は `ENV=local`、SMTP は `127.0.0.1:1025` の Mailpit を使う。
 専用のローカルDB（127.0.0.1:5433）に検証用アカウントを作成する:
 
 ```sh
+cd server
 ENV=local go run ./cmd/local-email-account city-login@localhost.test local-email-login-only
 ```
 

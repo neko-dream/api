@@ -21,4 +21,5 @@ export EMAIL_FROM='ことひろ <noreply@localhost.test>'
 export WEBSITE_URL='https://localhost:3000' APP_NAME='ことひろ'
 export EMAIL_VERIFICATION_PAGE_URL='https://localhost:3000/auth/email/verify'
 
+cd server
 exec go run ./cmd/server

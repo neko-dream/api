@@ -4,10 +4,10 @@ on:
   push:
     paths-ignore:
       - '.vscode/**'
-      - 'static/**'
-      - 'api/**' # OpenAPIのスキーマファイルなど
-      - 'internal/presentation/oas/**'
-      - 'internal/infrastructure/persistence/sqlc/generated/**'
+      - 'server/static/**'
+      - 'server/api/**' # OpenAPIのスキーマファイルなど
+      - 'server/internal/presentation/oas/**'
+      - 'server/internal/infrastructure/persistence/sqlc/generated/**'
 
   workflow_call:
     inputs:
@@ -21,13 +21,16 @@ permissions:
       actions: write
 
 concurrency:
-  group: ${ inputs.concurrency-group || test-${{ github.workflow }}-${{ github.ref || github.run_id  }}
+  group: ${{ inputs.concurrency-group || format('test-{0}-{1}', github.workflow, github.ref || github.run_id) }}
   cancel-in-progress: true
 
 jobs:
   test:
     name: Tests
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
     services:
       mailpit:
         image: axllent/mailpit:v1.27.9
@@ -50,6 +53,7 @@ jobs:
 
     env:
       DATABASE_URL: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
+      ADMIN_TEST_DATABASE_URL: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
       MAIL_TEST_DATABASE_URL: postgres://kotohiro:kotohiro@localhost:5432/kotohiro?sslmode=disable
       MAIL_TEST_SMTP_ADDR: 127.0.0.1:1025
       MAIL_TEST_HTTP_URL: http://127.0.0.1:8025
@@ -65,11 +69,11 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version-file: 'go.mod'
+          go-version-file: 'server/go.mod'
           cache: true
           cache-dependency-path: |
-            go.mod
-            go.sum
+            server/go.mod
+            server/go.sum
 
       - name: Install golang-migrate
         run: go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
@@ -110,6 +114,8 @@ jobs:
       - name: Run octocov
         continue-on-error: true
         uses: k1LoW/octocov-action@v1
+        with:
+          config: server/.octocov.yml
         env:
           OCTOCOV_GITHUB_REF: "${{ github.ref }}"
           OCTOCOV_GITHUB_SHA: none

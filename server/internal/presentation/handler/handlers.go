@@ -1,0 +1,59 @@
+package handler
+
+import (
+	"github.com/neko-dream/api/internal/presentation/oas"
+)
+
+type handlers struct {
+	oas.AuthHandler
+	oas.VoteHandler
+	oas.OpinionHandler
+	oas.TalkSessionHandler
+	oas.UserHandler
+	oas.TestHandler
+	oas.ManageHandler
+	oas.TimelineHandler
+	oas.ImageHandler
+	oas.PolicyHandler
+	oas.OrganizationHandler
+	oas.HealthHandler
+	oas.AnalysisHandler
+	oas.NotificationsHandler
+	oas.AdminHandler
+}
+
+func NewHandler(
+	authHandler oas.AuthHandler,
+	voteHandler oas.VoteHandler,
+	opinionHandler oas.OpinionHandler,
+	talkSessionHandler oas.TalkSessionHandler,
+	userHandler oas.UserHandler,
+	testHandler oas.TestHandler,
+	manageHandler oas.ManageHandler,
+	timelineHandler oas.TimelineHandler,
+	imageHandler oas.ImageHandler,
+	policyHandler oas.PolicyHandler,
+	organizationHandler oas.OrganizationHandler,
+	healthHandler oas.HealthHandler,
+	analysisHandler oas.AnalysisHandler,
+	notificationsHandler oas.NotificationsHandler,
+	adminHandler oas.AdminHandler,
+) oas.Handler {
+	return &handlers{
+		AuthHandler:          authHandler,
+		VoteHandler:          voteHandler,
+		OpinionHandler:       opinionHandler,
+		TalkSessionHandler:   talkSessionHandler,
+		UserHandler:          userHandler,
+		TestHandler:          testHandler,
+		ManageHandler:        manageHandler,
+		TimelineHandler:      timelineHandler,
+		ImageHandler:         imageHandler,
+		PolicyHandler:        policyHandler,
+		OrganizationHandler:  organizationHandler,
+		HealthHandler:        healthHandler,
+		AnalysisHandler:      analysisHandler,
+		NotificationsHandler: notificationsHandler,
+		AdminHandler:         adminHandler,
+	}
+}
