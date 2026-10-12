@@ -29,17 +29,17 @@ export function UserShow() {
         )
       ) : (
         user && (
-          <Descriptions bordered column={{ xs: 1, sm: 1, md: 2 }}>
+          <Descriptions bordered column={1}>
             <Descriptions.Item label="表示名">{user.displayName || "未設定"}</Descriptions.Item>
             <Descriptions.Item label="表示ID">{user.displayID || "未設定"}</Descriptions.Item>
-            <Descriptions.Item label="ユーザーID" span={2}>
+            <Descriptions.Item label="ユーザーID">
               <Typography.Text copyable>{user.userID}</Typography.Text>
             </Descriptions.Item>
             <Descriptions.Item label="メールアドレス">{user.email || "未登録"}</Descriptions.Item>
             <Descriptions.Item label="メールの確認">
               {user.email ? (user.emailVerified ? "確認済み" : "未確認") : "—"}
             </Descriptions.Item>
-            <Descriptions.Item label="ログイン方法" span={2}>
+            <Descriptions.Item label="ログイン方法">
               <Space wrap>
                 {user.providers.length
                   ? user.providers.map((provider) => (
