@@ -1750,6 +1750,31 @@ func (s *GetOrganizationsOK) SetOrganizations(val []Organization) {
 
 func (*GetOrganizationsOK) getOrganizationsRes() {}
 
+type GetPasswordPolicyOK struct {
+	MinLength int32 `json:"minLength"`
+	MaxBytes  int32 `json:"maxBytes"`
+}
+
+// GetMinLength returns the value of MinLength.
+func (s *GetPasswordPolicyOK) GetMinLength() int32 {
+	return s.MinLength
+}
+
+// GetMaxBytes returns the value of MaxBytes.
+func (s *GetPasswordPolicyOK) GetMaxBytes() int32 {
+	return s.MaxBytes
+}
+
+// SetMinLength sets the value of MinLength.
+func (s *GetPasswordPolicyOK) SetMinLength(val int32) {
+	s.MinLength = val
+}
+
+// SetMaxBytes sets the value of MaxBytes.
+func (s *GetPasswordPolicyOK) SetMaxBytes(val int32) {
+	s.MaxBytes = val
+}
+
 type GetPolicyConsentStatusBadRequest struct{}
 
 func (*GetPolicyConsentStatusBadRequest) getPolicyConsentStatusRes() {}
@@ -2826,6 +2851,32 @@ func (s *InitiateTalkSessionReq) SetPassphrase(val OptString) {
 	s.Passphrase = val
 }
 
+// Ref: #/components/schemas/InviteManagedUserRequest
+type InviteManagedUserRequest struct {
+	DisplayName string `json:"displayName"`
+	Email       string `json:"email"`
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *InviteManagedUserRequest) GetDisplayName() string {
+	return s.DisplayName
+}
+
+// GetEmail returns the value of Email.
+func (s *InviteManagedUserRequest) GetEmail() string {
+	return s.Email
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *InviteManagedUserRequest) SetDisplayName(val string) {
+	s.DisplayName = val
+}
+
+// SetEmail sets the value of Email.
+func (s *InviteManagedUserRequest) SetEmail(val string) {
+	s.Email = val
+}
+
 type InviteOrganizationBadRequest struct{}
 
 func (*InviteOrganizationBadRequest) inviteOrganizationRes() {}
@@ -3034,16 +3085,17 @@ func (s *Location) SetLongitude(val OptFloat64) {
 
 // Ref: #/components/schemas/ManagedUser
 type ManagedUser struct {
-	Permissions    UserPermissions `json:"permissions"`
-	UserID         string          `json:"userID"`
-	DisplayID      string          `json:"displayID"`
-	DisplayName    string          `json:"displayName"`
-	Email          OptString       `json:"email"`
-	EmailVerified  bool            `json:"emailVerified"`
-	Providers      []string        `json:"providers"`
-	CreatedAt      time.Time       `json:"createdAt"`
-	UpdatedAt      time.Time       `json:"updatedAt"`
-	WithdrawalDate OptDateTime     `json:"withdrawalDate"`
+	Permissions           UserPermissions `json:"permissions"`
+	UserID                string          `json:"userID"`
+	DisplayID             string          `json:"displayID"`
+	DisplayName           string          `json:"displayName"`
+	Email                 OptString       `json:"email"`
+	EmailVerified         bool            `json:"emailVerified"`
+	PasswordSetupRequired bool            `json:"passwordSetupRequired"`
+	Providers             []string        `json:"providers"`
+	CreatedAt             time.Time       `json:"createdAt"`
+	UpdatedAt             time.Time       `json:"updatedAt"`
+	WithdrawalDate        OptDateTime     `json:"withdrawalDate"`
 }
 
 // GetPermissions returns the value of Permissions.
@@ -3074,6 +3126,11 @@ func (s *ManagedUser) GetEmail() OptString {
 // GetEmailVerified returns the value of EmailVerified.
 func (s *ManagedUser) GetEmailVerified() bool {
 	return s.EmailVerified
+}
+
+// GetPasswordSetupRequired returns the value of PasswordSetupRequired.
+func (s *ManagedUser) GetPasswordSetupRequired() bool {
+	return s.PasswordSetupRequired
 }
 
 // GetProviders returns the value of Providers.
@@ -3126,6 +3183,11 @@ func (s *ManagedUser) SetEmailVerified(val bool) {
 	s.EmailVerified = val
 }
 
+// SetPasswordSetupRequired sets the value of PasswordSetupRequired.
+func (s *ManagedUser) SetPasswordSetupRequired(val bool) {
+	s.PasswordSetupRequired = val
+}
+
 // SetProviders sets the value of Providers.
 func (s *ManagedUser) SetProviders(val []string) {
 	s.Providers = val
@@ -3147,6 +3209,32 @@ func (s *ManagedUser) SetWithdrawalDate(val OptDateTime) {
 }
 
 func (*ManagedUser) getUserDetailManageRes() {}
+
+// Ref: #/components/schemas/ManagedUserInvitation
+type ManagedUserInvitation struct {
+	UserID         string `json:"userID"`
+	InvitationSent bool   `json:"invitationSent"`
+}
+
+// GetUserID returns the value of UserID.
+func (s *ManagedUserInvitation) GetUserID() string {
+	return s.UserID
+}
+
+// GetInvitationSent returns the value of InvitationSent.
+func (s *ManagedUserInvitation) GetInvitationSent() bool {
+	return s.InvitationSent
+}
+
+// SetUserID sets the value of UserID.
+func (s *ManagedUserInvitation) SetUserID(val string) {
+	s.UserID = val
+}
+
+// SetInvitationSent sets the value of InvitationSent.
+func (s *ManagedUserInvitation) SetInvitationSent(val bool) {
+	s.InvitationSent = val
+}
 
 // Ref: #/components/schemas/ManagedUserList
 type ManagedUserList struct {
@@ -6908,6 +6996,34 @@ func (s *SessionsHistoryStatus) UnmarshalText(data []byte) error {
 	default:
 		return errors.Errorf("invalid value: %q", data)
 	}
+}
+
+// SetupPasswordNoContent is response for SetupPassword operation.
+type SetupPasswordNoContent struct{}
+
+type SetupPasswordReq struct {
+	Token    string `json:"token"`
+	Password string `json:"password"`
+}
+
+// GetToken returns the value of Token.
+func (s *SetupPasswordReq) GetToken() string {
+	return s.Token
+}
+
+// GetPassword returns the value of Password.
+func (s *SetupPasswordReq) GetPassword() string {
+	return s.Password
+}
+
+// SetToken sets the value of Token.
+func (s *SetupPasswordReq) SetToken(val string) {
+	s.Token = val
+}
+
+// SetPassword sets the value of Password.
+func (s *SetupPasswordReq) SetPassword(val string) {
+	s.Password = val
 }
 
 type SolveOpinionReportBadRequest struct{}

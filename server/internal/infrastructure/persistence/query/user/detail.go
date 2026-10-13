@@ -2,6 +2,8 @@ package user_query
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 
 	"github.com/jinzhu/copier"
 	"github.com/neko-dream/api/internal/application/query/dto"
@@ -30,15 +32,12 @@ func (d *DetailHandler) Execute(ctx context.Context, input user_query.DetailInpu
 	ctx, span := otel.Tracer("user_query").Start(ctx, "DetailHandler.Execute")
 	defer span.End()
 
-	userRow, err := d.GetQueries(ctx).GetUserDetailByID(ctx, input.UserID.UUID())
+	queries := d.GetQueries(ctx)
+	userRow, err := queries.GetUserDetailByID(ctx, input.UserID.UUID())
 	if err != nil {
 		return nil, err
 	}
 
-	userDemographic, err := crypto_infra.DecryptUserDemographicsDTO(ctx, d.encryptor, &userRow.UserDemographic)
-	if err != nil {
-		return nil, err
-	}
 	var userDetail dto.UserDetail
 	if err := copier.CopyWithOption(&userDetail, userRow, copier.Option{
 		IgnoreEmpty: true,
@@ -46,8 +45,17 @@ func (d *DetailHandler) Execute(ctx context.Context, input user_query.DetailInpu
 	}); err != nil {
 		return nil, err
 	}
-	if userDemographic != nil {
-		userDetail.UserDemographic = userDemographic
+	// 補助データは任意。LEFT JOIN + sqlc.embed では未登録行の日時を読めないため、
+	// 既存の単独クエリで取得し、未登録と読み取り・復号の失敗を区別する。
+	demographicRow, err := queries.GetUserDemographicByUserID(ctx, input.UserID.UUID())
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+	if err == nil {
+		userDetail.UserDemographic, err = crypto_infra.DecryptUserDemographicsDTO(ctx, d.encryptor, &demographicRow)
+		if err != nil {
+			return nil, err
+		}
 	}
 	if userRow.User.Email.Valid {
 		decrypted, err := d.encryptor.DecryptString(ctx, userRow.User.Email.String)

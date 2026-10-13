@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
+	password_auth "github.com/neko-dream/api/internal/domain/model/auth/password"
 	"github.com/neko-dream/api/internal/domain/model/shared"
 	"github.com/neko-dream/api/internal/domain/model/user"
 	"github.com/neko-dream/api/internal/domain/service"
@@ -32,12 +33,19 @@ func main() {
 	}
 	address, password := os.Args[1], os.Args[2]
 	parsed, err := mail.ParseAddress(address)
-	if err != nil || parsed.Address != address || strings.ContainsAny(address, "\r\n") || len(password) < 12 {
-		log.Fatal("provide a bare email address and a local-only password of at least 12 characters")
+	if err != nil || parsed.Address != address || strings.ContainsAny(address, "\r\n") {
+		log.Fatal("provide a bare email address")
 	}
 	// These values deliberately match scripts/dev-local.sh; arbitrary DB URLs
 	// are never accepted so invoking this command cannot mutate a remote DB.
 	cfg := &config.Config{Env: config.LOCAL, HASH_PEPPER: "local-development-only-password-pepper", HASH_ITERATIONS: 10, ENCRYPTION_VERSION: "v1", ENCRYPTION_SECRET: "local-dev-key16!"}
+	policy, err := password_auth.NewPasswordPolicy(len(cfg.HASH_PEPPER))
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := policy.Validate(password); err != nil {
+		log.Fatal(err)
+	}
 	connection, err := sql.Open("pgx", "postgres://kotohiro:kotohiro@127.0.0.1:5433/kotohiro?sslmode=disable")
 	if err != nil {
 		log.Fatal(err)

@@ -12,7 +12,6 @@ import (
 	"fmt"
 	"math/big"
 	"net/url"
-	"regexp"
 	"strings"
 	"time"
 
@@ -94,13 +93,6 @@ func NewPasswordLogin(
 	}
 }
 
-func IsEmail(s string) bool {
-	// メールアドレスの正規表現
-	emailRegex := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
-	re := regexp.MustCompile(emailRegex)
-	return re.MatchString(s)
-}
-
 func (p *passwordLoginInteractor) Execute(ctx context.Context, input PasswordLoginInput) (*PasswordLoginOutput, error) {
 	ctx, span := otel.Tracer("auth_command").Start(ctx, "passwordLoginInteractor.Execute")
 	defer span.End()
@@ -109,7 +101,7 @@ func (p *passwordLoginInteractor) Execute(ctx context.Context, input PasswordLog
 	if err := p.txRunner.ExecTx(ctx, func(ctx context.Context) error {
 		var usr *user.User
 		// IDorEmailがメールアドレスの場合は、ユーザーをメールアドレスで取得
-		if IsEmail(input.IDorEmail) {
+		if utils.IsEmail(input.IDorEmail) {
 			emailHash, err := hash.HMACHash(input.IDorEmail, p.Config.HASH_PEPPER)
 			if err != nil {
 				utils.HandleError(ctx, err, "failed to hash email")
@@ -178,7 +170,7 @@ func (p *passwordLoginInteractor) Execute(ctx context.Context, input PasswordLog
 			}
 			return err
 		}
-		if err := p.emailSender.Send(ctx, *usr.Email(), email_template.PasswordLoginEmailTemplate, map[string]any{"Title": "ログインの本人確認", "VerificationURL": verificationURL, "ExpiryMinutes": 15, "PIN": pin}); err != nil {
+		if err := p.emailSender.Send(ctx, *usr.Email(), email_template.PasswordLoginEmailTemplate, map[string]any{"Title": "ことひろのログイン確認", "VerificationURL": verificationURL, "ExpiryMinutes": 15, "PIN": pin}); err != nil {
 			return err
 		}
 		output = PasswordLoginOutput{BrowserSecret: browser, ExpiresAt: expires}

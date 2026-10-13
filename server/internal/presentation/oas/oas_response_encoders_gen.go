@@ -671,6 +671,20 @@ func encodeCreateTalkSessionSurveyResponse(response CreateTalkSessionSurveyRes, 
 	}
 }
 
+func encodeCreateUserManageResponse(response *ManagedUserInvitation, w http.ResponseWriter, span trace.Span) error {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(201)
+	span.SetStatus(codes.Ok, http.StatusText(201))
+
+	e := new(jx.Encoder)
+	response.Encode(e)
+	if _, err := e.WriteTo(w); err != nil {
+		return errors.Wrap(err, "write")
+	}
+
+	return nil
+}
+
 func encodeDeleteDeviceResponse(response DeleteDeviceRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
 	case *DeleteDeviceNoContent:
@@ -1660,6 +1674,20 @@ func encodeGetOrganizationsResponse(response GetOrganizationsRes, w http.Respons
 	default:
 		return errors.Errorf("unexpected response type: %T", response)
 	}
+}
+
+func encodeGetPasswordPolicyResponse(response *GetPasswordPolicyOK, w http.ResponseWriter, span trace.Span) error {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(200)
+	span.SetStatus(codes.Ok, http.StatusText(200))
+
+	e := new(jx.Encoder)
+	response.Encode(e)
+	if _, err := e.WriteTo(w); err != nil {
+		return errors.Wrap(err, "write")
+	}
+
+	return nil
 }
 
 func encodeGetPolicyConsentStatusResponse(response GetPolicyConsentStatusRes, w http.ResponseWriter, span trace.Span) error {
@@ -3563,6 +3591,20 @@ func encodeReportOpinionResponse(response ReportOpinionRes, w http.ResponseWrite
 	}
 }
 
+func encodeResendUserInvitationManageResponse(response *ManagedUserInvitation, w http.ResponseWriter, span trace.Span) error {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(200)
+	span.SetStatus(codes.Ok, http.StatusText(200))
+
+	e := new(jx.Encoder)
+	response.Encode(e)
+	if _, err := e.WriteTo(w); err != nil {
+		return errors.Wrap(err, "write")
+	}
+
+	return nil
+}
+
 func encodeRevokeTokenResponse(response RevokeTokenRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
 	case *RevokeTokenNoContent:
@@ -3729,6 +3771,13 @@ func encodeSetUserPermissionsManageResponse(response *UserPermissions, w http.Re
 	if _, err := e.WriteTo(w); err != nil {
 		return errors.Wrap(err, "write")
 	}
+
+	return nil
+}
+
+func encodeSetupPasswordResponse(response *SetupPasswordNoContent, w http.ResponseWriter, span trace.Span) error {
+	w.WriteHeader(204)
+	span.SetStatus(codes.Ok, http.StatusText(204))
 
 	return nil
 }

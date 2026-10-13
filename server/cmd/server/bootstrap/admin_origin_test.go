@@ -10,7 +10,7 @@ import (
 func TestAdminOriginGuard(t *testing.T) {
 	b := &Bootstrap{config: &config.Config{AdminAllowedOrigins: []string{"https://admin.example.com"}}}
 	for _, origin := range []string{"", "null", "https://evil.example.com", "https://admin.example.com"} {
-		for _, endpoint := range []struct{ method, path string }{{"POST", "/v1/admin/refresh"}, {"PUT", "/v1/manage/users/user-id/permissions"}} {
+		for _, endpoint := range []struct{ method, path string }{{"POST", "/v1/admin/refresh"}, {"PUT", "/v1/manage/users/user-id/permissions"}, {"POST", "/v1/manage/users"}, {"POST", "/v1/manage/users/user-id/invitation"}} {
 			t.Run(origin+endpoint.path, func(t *testing.T) {
 				called := false
 				h := b.adminOriginGuard(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { called = true; w.WriteHeader(204) }))
@@ -30,7 +30,7 @@ func TestAdminOriginGuard(t *testing.T) {
 
 func TestAdminPermissionRouteUsesDedicatedOriginGuard(t *testing.T) {
 	b := &Bootstrap{config: &config.Config{Env: config.DEV, WEBSITE_URL: "https://web.example.com", AdminAllowedOrigins: []string{"https://admin.example.com"}}}
-	for _, path := range []string{"/v1/manage/users/user-id/permissions", "/v1/admin/refresh"} {
+	for _, path := range []string{"/v1/manage/users/user-id/permissions", "/v1/admin/refresh", "/v1/manage/users", "/v1/manage/users/user-id/invitation"} {
 		for _, origin := range []string{"", "https://web.example.com", "https://evil.example.com", "https://admin.example.com"} {
 			called := false
 			h := b.wrapAPIOrigins(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) { called = true; w.WriteHeader(http.StatusNoContent) }))

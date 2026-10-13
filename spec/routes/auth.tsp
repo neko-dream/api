@@ -326,6 +326,33 @@ namespace kotohiro {
 
   @tag("auth")
   @extension("x-ogen-operation-group", "Auth")
+  @route("/auth/password/setup")
+  @post
+  @useAuth([])
+  @summary("メールから初回パスワードを設定する（ログインCookieは発行しない）")
+  op setupPassword(@body body: {
+    @minLength(44)
+    @maxLength(44)
+    token: string;
+    password: string;
+  }): {
+    @statusCode statusCode: 204;
+  };
+
+  /** 入力条件はサーバーの共通パスワード検証から取得する。秘密値は返さない。 */
+  @tag("auth")
+  @extension("x-ogen-operation-group", "Auth")
+  @route("/auth/password/policy")
+  @get
+  @useAuth([])
+  @summary("新規設定・変更用のパスワード入力条件")
+  op getPasswordPolicy(): {
+    @statusCode statusCode: 200;
+    @body body: { minLength: int32; maxBytes: int32; };
+  };
+
+  @tag("auth")
+  @extension("x-ogen-operation-group", "Auth")
   @route("/auth/reactivate")
   @post
   @summary("退会ユーザーの復活")

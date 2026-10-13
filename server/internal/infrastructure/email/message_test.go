@@ -1,9 +1,11 @@
 package email
 
 import (
+	"html"
 	"maps"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/neko-dream/api/internal/infrastructure/config"
 	email_template "github.com/neko-dream/api/internal/infrastructure/email/template"
@@ -13,13 +15,46 @@ func mailConfig() *config.Config {
 	return &config.Config{EMAIL_FROM: "ことひろ <noreply@example.com>", APP_NAME: "ことひろ", WEBSITE_URL: "https://example.com"}
 }
 
+func TestRenderInitialPasswordSetupEmail(t *testing.T) {
+	// Base64 punctuation must survive HTML attribute decoding in the fragment.
+	setupURL := "https://example.com/auth/password/setup#" + strings.Repeat("A", 40) + "+/A="
+	data := map[string]any{"Title": "ことひろのパスワードを設定してください", "RecipientName": `<script>alert("name")</script>`, "SetupURL": setupURL, "ExpiryHours": 24}
+	m, err := RenderMessage(mailConfig(), "user@example.com", email_template.PasswordSetupEmailTemplate, data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(m.HTML, "<script>") || !strings.Contains(m.HTML, "&lt;script&gt;") || !strings.Contains(html.UnescapeString(m.HTML), `href="`+setupURL+`"`) || !strings.Contains(m.HTML, "24時間") || !strings.Contains(m.HTML, "6桁の番号") || !strings.Contains(m.HTML, time.Now().Format("2006")) {
+		t.Fatal("unsafe or incomplete setup email", m.HTML)
+	}
+	for _, link := range []string{"http://example.com/setup#token", "https://u@example.com/setup#token", "https://example.com/setup?token=secret", "javascript:alert(1)", "/setup#token"} {
+		data["SetupURL"] = link
+		if _, err := RenderMessage(mailConfig(), "user@example.com", email_template.PasswordSetupEmailTemplate, data); err == nil {
+			t.Fatal("unsafe setup URL accepted")
+		}
+	}
+	data["SetupURL"] = "https://example.com/setup#token"
+	for _, key := range []string{"RecipientName", "ExpiryHours"} {
+		missing := maps.Clone(data)
+		delete(missing, key)
+		if _, err := RenderMessage(mailConfig(), "user@example.com", email_template.PasswordSetupEmailTemplate, missing); err == nil {
+			t.Fatal("missing setup field accepted", key)
+		}
+	}
+}
+
 func TestRenderPasswordLoginPIN(t *testing.T) {
 	for _, pin := range []any{"000001", "", "12345", "1234567", "１２３４５６", 123456, nil} {
-		data := map[string]any{"Title": "ログインの本人確認", "VerificationURL": "https://example.com/verify#token", "ExpiryMinutes": 15, "PIN": pin}
+		data := map[string]any{"Title": "ことひろのログイン確認", "VerificationURL": "https://example.com/verify#token", "ExpiryMinutes": 15, "PIN": pin}
 		m, err := RenderMessage(mailConfig(), "user@example.com", email_template.PasswordLoginEmailTemplate, data)
 		if pin == "000001" {
 			if err != nil || !strings.Contains(m.HTML, "000001") || !strings.Contains(m.HTML, "15") {
 				t.Fatal("missing login PIN", err)
+			}
+			if strings.Count(html.UnescapeString(m.HTML), data["VerificationURL"].(string)) != 1 ||
+				!strings.Contains(m.HTML, `class="button">確認する</a>`) ||
+				!strings.Contains(m.HTML, "6桁の番号") || strings.Contains(m.HTML, "PIN") ||
+				strings.Contains(m.HTML, "ログインの本人確認") || m.Subject != "ことひろのログイン確認" {
+				t.Fatal("login email must retain its confirmation button without exposing a raw verification URL or technical labels")
 			}
 		} else if err == nil {
 			t.Fatalf("invalid PIN accepted: %v", pin)

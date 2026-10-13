@@ -392,32 +392,27 @@ func (q *Queries) GetUserDemographicByUserID(ctx context.Context, userID uuid.UU
 const getUserDetailByID = `-- name: GetUserDetailByID :one
 SELECT
     users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
-    user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at,
-    user_demographics.user_demographics_id, user_demographics.user_id, user_demographics.date_of_birth, user_demographics.gender, user_demographics.city, user_demographics.created_at, user_demographics.updated_at, user_demographics.prefecture
+    user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at
 FROM
     users
-LEFT JOIN user_auths ON users.user_id = user_auths.user_id
-LEFT JOIN user_demographics ON users.user_id = user_demographics.user_id
+JOIN user_auths ON users.user_id = user_auths.user_id
 WHERE
     users.user_id = $1
 `
 
 type GetUserDetailByIDRow struct {
-	User            User
-	UserAuth        UserAuth
-	UserDemographic UserDemographic
+	User     User
+	UserAuth UserAuth
 }
 
 // GetUserDetailByID
 //
 //	SELECT
 //	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
-//	    user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at,
-//	    user_demographics.user_demographics_id, user_demographics.user_id, user_demographics.date_of_birth, user_demographics.gender, user_demographics.city, user_demographics.created_at, user_demographics.updated_at, user_demographics.prefecture
+//	    user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at
 //	FROM
 //	    users
-//	LEFT JOIN user_auths ON users.user_id = user_auths.user_id
-//	LEFT JOIN user_demographics ON users.user_id = user_demographics.user_id
+//	JOIN user_auths ON users.user_id = user_auths.user_id
 //	WHERE
 //	    users.user_id = $1
 func (q *Queries) GetUserDetailByID(ctx context.Context, userID uuid.UUID) (GetUserDetailByIDRow, error) {
@@ -440,14 +435,6 @@ func (q *Queries) GetUserDetailByID(ctx context.Context, userID uuid.UUID) (GetU
 		&i.UserAuth.Subject,
 		&i.UserAuth.IsVerified,
 		&i.UserAuth.CreatedAt,
-		&i.UserDemographic.UserDemographicsID,
-		&i.UserDemographic.UserID,
-		&i.UserDemographic.DateOfBirth,
-		&i.UserDemographic.Gender,
-		&i.UserDemographic.City,
-		&i.UserDemographic.CreatedAt,
-		&i.UserDemographic.UpdatedAt,
-		&i.UserDemographic.Prefecture,
 	)
 	return i, err
 }

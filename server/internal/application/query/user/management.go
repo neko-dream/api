@@ -27,6 +27,7 @@ type ManagedUser struct {
 	DisplayID, DisplayName string
 	Email                  *string
 	EmailVerified          bool
+	PasswordSetupRequired  bool
 	Providers              []string
 	CreatedAt, UpdatedAt   time.Time
 	WithdrawalDate         *time.Time

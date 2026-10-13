@@ -74,6 +74,13 @@ func validateTemplate(tmpl email_template.EmailTemplateType, fields map[string]a
 	var required []string
 	var linkKey string
 	switch tmpl {
+	case email_template.PasswordSetupEmailTemplate:
+		linkKey = "SetupURL"
+		required = []string{"RecipientName"}
+		hours, ok := fields["ExpiryHours"].(int)
+		if !ok || hours <= 0 {
+			return fmt.Errorf("ExpiryHours must be a positive integer")
+		}
 	case email_template.PasswordLoginEmailTemplate:
 		linkKey = "VerificationURL"
 		pin, ok := fields["PIN"].(string)
@@ -113,6 +120,9 @@ func validateTemplate(tmpl email_template.EmailTemplateType, fields map[string]a
 	parsed, err := url.Parse(link)
 	if !ok || err != nil || parsed.Host == "" || (parsed.Scheme != "https" && parsed.Scheme != "http") {
 		return fmt.Errorf("%s must be an absolute HTTP(S) URL", linkKey)
+	}
+	if tmpl == email_template.PasswordSetupEmailTemplate && (parsed.Scheme != "https" || parsed.User != nil || parsed.RawQuery != "" || parsed.Fragment == "") {
+		return fmt.Errorf("SetupURL must be an HTTPS URL with a fragment token")
 	}
 	return nil
 }

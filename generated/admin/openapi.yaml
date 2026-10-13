@@ -321,6 +321,29 @@ paths:
       security:
         - AdminCookieAuth: []
       x-ogen-operation-group: manage
+  /v1/manage/users:
+    post:
+      operationId: createUserManage
+      summary: メールログイン用ユーザーを作成し、初回パスワード設定メールを送信する
+      parameters: []
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManagedUserInvitation'
+      tags:
+        - manage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InviteManagedUserRequest'
+      security:
+        - AdminCookieAuth: []
+      x-ogen-operation-group: manage
   /v1/manage/users/list:
     get:
       operationId: getUserListManage
@@ -442,6 +465,27 @@ paths:
       security:
         - AdminCookieAuth: []
       x-ogen-operation-group: manage
+  /v1/manage/users/{userID}/invitation:
+    post:
+      operationId: resendUserInvitationManage
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManagedUserInvitation'
+      tags:
+        - manage
+      security:
+        - AdminCookieAuth: []
+      x-ogen-operation-group: manage
   /v1/manage/users/{userID}/permissions:
     put:
       operationId: setUserPermissionsManage
@@ -532,6 +576,20 @@ components:
         displayName:
           type: string
       description: 管理者作成リクエスト
+    InviteManagedUserRequest:
+      type: object
+      required:
+        - displayName
+        - email
+      properties:
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 50
+        email:
+          type: string
+          minLength: 3
+          maxLength: 254
     ManagedUser:
       type: object
       required:
@@ -540,6 +598,7 @@ components:
         - displayID
         - displayName
         - emailVerified
+        - passwordSetupRequired
         - providers
         - createdAt
         - updatedAt
@@ -556,6 +615,8 @@ components:
           type: string
         emailVerified:
           type: boolean
+        passwordSetupRequired:
+          type: boolean
         providers:
           type: array
           items:
@@ -569,6 +630,16 @@ components:
         withdrawalDate:
           type: string
           format: date-time
+    ManagedUserInvitation:
+      type: object
+      required:
+        - userID
+        - invitationSent
+      properties:
+        userID:
+          type: string
+        invitationSent:
+          type: boolean
     ManagedUserList:
       type: object
       required:

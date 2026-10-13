@@ -10,7 +10,6 @@ import (
 	"github.com/neko-dream/api/internal/infrastructure/email"
 	email_template "github.com/neko-dream/api/internal/infrastructure/email/template"
 	"github.com/neko-dream/api/internal/infrastructure/external/aws"
-	"github.com/neko-dream/api/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
@@ -87,7 +86,8 @@ func (s *SESEmailSender) Send(
 
 	_, err = s.sesClient.SendEmail(ctx, &input)
 	if err != nil {
-		utils.HandleError(ctx, err, "SESEmailSender.SendEmail")
+		// The caller records delivery failures without logging raw provider errors,
+		// which may contain recipient addresses or one-time links.
 		return fmt.Errorf("send email via SES: %w", err)
 	}
 

@@ -33,6 +33,14 @@ func (u *passwordAuthManager) RegisterPassword(ctx context.Context, userID share
 	ctx, span := otel.Tracer("usecase").Start(ctx, "passwordAuthUseCase.RegisterPassword")
 	defer span.End()
 
+	policy, err := password_auth.NewPasswordPolicy(len(u.cfg.HASH_PEPPER))
+	if err != nil {
+		return err
+	}
+	if err := policy.Validate(plainPassword); err != nil {
+		return err
+	}
+
 	salt, err := hash.GenerateRandomToken(16)
 	if err != nil {
 		return err
@@ -66,6 +74,14 @@ func (u *passwordAuthManager) VerifyPassword(ctx context.Context, userID shared.
 func (u *passwordAuthManager) UpdatePassword(ctx context.Context, userID shared.UUID[user.User], plainPassword string) error {
 	ctx, span := otel.Tracer("usecase").Start(ctx, "passwordAuthUseCase.UpdatePassword")
 	defer span.End()
+
+	policy, err := password_auth.NewPasswordPolicy(len(u.cfg.HASH_PEPPER))
+	if err != nil {
+		return err
+	}
+	if err := policy.Validate(plainPassword); err != nil {
+		return err
+	}
 
 	salt, err := hash.GenerateRandomToken(16)
 	if err != nil {

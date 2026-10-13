@@ -223,6 +223,14 @@ type PasswordLoginChallenge struct {
 	PinAttempts    int32
 }
 
+type PasswordSetupToken struct {
+	UserID       uuid.UUID
+	TokenHash    []byte
+	EmailSubject string
+	CreatedAt    time.Time
+	ExpiresAt    time.Time
+}
+
 type PolicyConsent struct {
 	PolicyConsentID uuid.UUID
 	UserID          uuid.UUID
