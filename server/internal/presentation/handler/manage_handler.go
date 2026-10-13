@@ -29,6 +29,7 @@ import (
 type manageHandler struct {
 	userManagement        userquery.Management
 	setCreationPermission admin_usecase.SetSessionCreationPermission
+	userInvitations       admin_usecase.ManageUserInvitations
 	analysis.AnalysisService
 	analysis.AnalysisRepository
 	analysisScheduler analysis_usecase.AnalysisScheduler
@@ -89,6 +90,7 @@ func managedUserResponse(u userquery.ManagedUser) oas.ManagedUser {
 		out.Email = oas.NewOptString(*u.Email)
 	}
 	out.Permissions = oas.UserPermissions{CanCreateTalkSession: u.CanCreateTalkSession}
+	out.PasswordSetupRequired = u.PasswordSetupRequired
 	if u.WithdrawalDate != nil {
 		out.WithdrawalDate = oas.NewOptDateTime(*u.WithdrawalDate)
 	}
@@ -191,6 +193,7 @@ func NewManageHandler(
 	tokenManager session.TokenManager,
 	userManagement userquery.Management,
 	setCreationPermission admin_usecase.SetSessionCreationPermission,
+	userInvitations admin_usecase.ManageUserInvitations,
 ) oas.ManageHandler {
 	return &manageHandler{
 		DBManager:             dbm,
@@ -201,6 +204,7 @@ func NewManageHandler(
 		TokenManager:          tokenManager,
 		userManagement:        userManagement,
 		setCreationPermission: setCreationPermission,
+		userInvitations:       userInvitations,
 	}
 }
 

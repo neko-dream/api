@@ -51,6 +51,7 @@ func infraDeps() []ProvideArg {
 		{repository.NewReportRepository, nil},
 		{repository.NewPasswordAuthRepository, nil},
 		{repository.NewPasswordLoginChallengeRepository, nil},
+		{repository.NewPasswordSetupTokenRepository, nil},
 		{repository.NewOrganizationUserRepository, nil},
 		{repository.NewOrganizationRepository, nil},
 		{repository.NewOrganizationAliasRepository, nil},

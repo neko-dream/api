@@ -36,12 +36,10 @@ WHERE
 -- name: GetUserDetailByID :one
 SELECT
     sqlc.embed(users),
-    sqlc.embed(user_auths),
-    sqlc.embed(user_demographics)
+    sqlc.embed(user_auths)
 FROM
     users
-LEFT JOIN user_auths ON users.user_id = user_auths.user_id
-LEFT JOIN user_demographics ON users.user_id = user_demographics.user_id
+JOIN user_auths ON users.user_id = user_auths.user_id
 WHERE
     users.user_id = $1;
 

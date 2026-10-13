@@ -67,6 +67,21 @@ namespace kotohiro {
     @route("/users")
     @tag("manage")
     interface UserStats {
+      @extension("x-ogen-operation-group", "manage")
+      @operationId("createUserManage")
+      @post
+      @summary("メールログイン用ユーザーを作成し、初回パスワード設定メールを送信する")
+      createUser(@body body: InviteManagedUserRequest): {
+        @statusCode statusCode: 201;
+        @body body: ManagedUserInvitation;
+      };
+
+      @route("/{userID}/invitation")
+      @extension("x-ogen-operation-group", "manage")
+      @operationId("resendUserInvitationManage")
+      @post
+      resendUserInvitation(@path userID: string): ManagedUserInvitation;
+
       @route("/{userID}/permissions")
       @extension("x-ogen-operation-group", "manage")
       @operationId("setUserPermissionsManage")

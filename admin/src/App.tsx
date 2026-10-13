@@ -14,6 +14,7 @@ import { AdminUserList } from "./pages/admin-users/list";
 import { TalkSessionList } from "./pages/talksessions/list";
 import { UserList } from "./pages/users/list";
 import { UserShow } from "./pages/users/show";
+import { UserCreate } from "./pages/users/create";
 import { authProvider, dataProvider } from "./providers";
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
                   {
                     name: "users",
                     list: "/users",
+                    create: "/users/create",
                     show: "/users/show/:id",
                     meta: { label: "ユーザー", canDelete: false },
                   },
@@ -69,6 +71,7 @@ function App() {
                     <Route index element={<NavigateToResource resource="talksessions" />} />
                     <Route path="/talksessions" element={<TalkSessionList />} />
                     <Route path="/users" element={<UserList />} />
+                    <Route path="/users/create" element={<UserCreate />} />
                     <Route path="/users/show/:id" element={<UserShow />} />
                     <Route path="/admin-users" element={<AdminUserList />} />
                     <Route path="/admin-users/create" element={<AdminUserCreate />} />

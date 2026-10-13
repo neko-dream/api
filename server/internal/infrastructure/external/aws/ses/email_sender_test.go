@@ -1,8 +1,10 @@
 package ses
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"log/slog"
 	"strings"
 	"testing"
 
@@ -11,6 +13,26 @@ import (
 	"github.com/neko-dream/api/internal/infrastructure/config"
 	email_template "github.com/neko-dream/api/internal/infrastructure/email/template"
 )
+
+func TestSESEmailSender_ProviderFailureDoesNotLogPrivateContent(t *testing.T) {
+	var logs bytes.Buffer
+	previous := slog.Default()
+	slog.SetDefault(slog.New(slog.NewJSONHandler(&logs, nil)))
+	t.Cleanup(func() { slog.SetDefault(previous) })
+	providerErr := errors.New("delivery failed for user@example.com: https://example.com/auth/password/setup#private-secret")
+	client := &fakeSESClient{err: providerErr}
+	sender, err := NewSESEmailSenderWithClient(&config.Config{EMAIL_FROM: "noreply@example.com", APP_NAME: "ことひろ", WEBSITE_URL: "https://example.com"}, client)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = sender.Send(context.Background(), "user@example.com", email_template.PasswordSetupEmailTemplate, map[string]any{"Title": "パスワード設定", "RecipientName": "ユーザー", "SetupURL": "https://example.com/auth/password/setup#private-secret", "ExpiryHours": 24})
+	if !errors.Is(err, providerErr) {
+		t.Fatalf("provider error was lost: %v", err)
+	}
+	if strings.Contains(logs.String(), "user@example.com") || strings.Contains(logs.String(), "private-secret") {
+		t.Fatal("private provider error was logged")
+	}
+}
 
 type fakeSESClient struct {
 	input *sesv2.SendEmailInput

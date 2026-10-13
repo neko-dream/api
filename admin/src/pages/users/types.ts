@@ -5,6 +5,7 @@ export interface ManagedUser {
   displayName: string;
   email?: string;
   emailVerified: boolean;
+  passwordSetupRequired: boolean;
   providers: string[];
   createdAt: string;
   updatedAt: string;

@@ -30,6 +30,7 @@ type authHandler struct {
 
 	passwordLogin    auth_usecase.PasswordLogin
 	passwordRegister auth_usecase.PasswordRegister
+	setupPassword    auth_usecase.SetupPassword
 	changePassword   auth_usecase.ChangePassword
 	reactivate       auth_usecase.Reactivate
 	guestLogin       auth_usecase.GuestLogin
@@ -49,6 +50,7 @@ func NewAuthHandler(
 
 	login auth_usecase.PasswordLogin,
 	register auth_usecase.PasswordRegister,
+	setupPassword auth_usecase.SetupPassword,
 	changePassword auth_usecase.ChangePassword,
 	reactivate auth_usecase.Reactivate,
 
@@ -68,6 +70,7 @@ func NewAuthHandler(
 		cfg:                  cfg,
 		passwordLogin:        login,
 		passwordRegister:     register,
+		setupPassword:        setupPassword,
 		changePassword:       changePassword,
 		reactivate:           reactivate,
 	}

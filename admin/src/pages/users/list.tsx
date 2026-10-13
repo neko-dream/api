@@ -17,7 +17,7 @@ export function UserList() {
     filters: [{ field: "search", operator: "contains", value: search }],
   });
   return (
-    <List title="ユーザー" canCreate={false}>
+    <List title="ユーザー" canCreate createButtonProps={{ children: "ユーザーを作成" }}>
       <Space direction="vertical" size="middle" style={{ width: "100%" }}>
         <Input.Search
           key={search}

@@ -2,15 +2,14 @@
 <div class="container">
   <div class="header"><h2>{{.AppName}}</h2></div>
   <div class="content">
-    <h1>ログインの本人確認</h1>
-    <p>ログインを開始したブラウザで、以下のリンクを開いて本人確認を完了してください。</p>
-    <a href="{{.VerificationURL}}" class="button">ログインを確認する</a>
-    <p>リンクを開けない場合は、ログインを開始したブラウザの確認画面に以下の6桁のPINを入力してください。</p>
-    <p style="font-size: 28px; font-weight: bold; letter-spacing: 0.2em;">{{.PIN}}</p>
-    <p>PINの誤入力は5回までです。リンクまたはPINのどちらかで確認すると、両方とも使えなくなります。</p>
-    <p class="expiry-notice">リンクとPINは{{.ExpiryMinutes}}分で期限切れになり、一度だけ使えます。再送すると以前のリンクとPINは使えなくなります。</p>
-    <p style="word-break: break-all;">{{.VerificationURL}}</p>
-    <p>心当たりがない場合は、リンクを開かずこのメールを無視してください。</p>
+    <h1>ログインの確認</h1>
+    <p>ログインを開始したブラウザで、下のボタンを押してください。</p>
+    <a href="{{.VerificationURL}}" class="button">確認する</a>
+    <p>ボタンで確認できない場合は、ログイン画面に以下の6桁の番号を入力してください。</p>
+    <p style="font-size: 28px; font-weight: bold; letter-spacing: 0.2em; text-align: center;">{{.PIN}}</p>
+    <p>番号を5回間違えると、このメールでは確認できなくなります。</p>
+    <p class="expiry-notice">このメールでの確認は{{.ExpiryMinutes}}分以内に、一度だけ行えます。再送すると以前のメールでは確認できなくなります。</p>
+    <p>心当たりがない場合は、ボタンを押さず、このメールを無視してください。</p>
   </div>
 </div>
 {{ template "footer" . }}

@@ -123,6 +123,15 @@ func (UnimplementedHandler) CreateTalkSessionSurvey(ctx context.Context, req *Cr
 	return r, ht.ErrNotImplemented
 }
 
+// CreateUserManage implements createUserManage operation.
+//
+// メールログイン用ユーザーを作成し、初回パスワード設定メールを送信する.
+//
+// POST /v1/manage/users
+func (UnimplementedHandler) CreateUserManage(ctx context.Context, req *InviteManagedUserRequest) (r *ManagedUserInvitation, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // DeleteDevice implements deleteDevice operation.
 //
 // デバイス削除.
@@ -326,6 +335,15 @@ func (UnimplementedHandler) GetOrganizationUsers(ctx context.Context) (r GetOrga
 //
 // GET /organizations
 func (UnimplementedHandler) GetOrganizations(ctx context.Context) (r GetOrganizationsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetPasswordPolicy implements getPasswordPolicy operation.
+//
+// 入力条件はサーバーの共通パスワード検証から取得する。秘密値は返さない。.
+//
+// GET /auth/password/policy
+func (UnimplementedHandler) GetPasswordPolicy(ctx context.Context) (r *GetPasswordPolicyOK, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -746,6 +764,13 @@ func (UnimplementedHandler) ReportOpinion(ctx context.Context, req *ReportOpinio
 	return r, ht.ErrNotImplemented
 }
 
+// ResendUserInvitationManage implements resendUserInvitationManage operation.
+//
+// POST /v1/manage/users/{userID}/invitation
+func (UnimplementedHandler) ResendUserInvitationManage(ctx context.Context, params ResendUserInvitationManageParams) (r *ManagedUserInvitation, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // RevokeToken implements revokeToken operation.
 //
 // トークンを失効（ログアウト）.
@@ -778,6 +803,15 @@ func (UnimplementedHandler) SessionsHistory(ctx context.Context, params Sessions
 // PUT /v1/manage/users/{userID}/permissions
 func (UnimplementedHandler) SetUserPermissionsManage(ctx context.Context, req *UserPermissions, params SetUserPermissionsManageParams) (r *UserPermissions, _ error) {
 	return r, ht.ErrNotImplemented
+}
+
+// SetupPassword implements setupPassword operation.
+//
+// メールから初回パスワードを設定する（ログインCookieは発行しない）.
+//
+// POST /auth/password/setup
+func (UnimplementedHandler) SetupPassword(ctx context.Context, req *SetupPasswordReq) error {
+	return ht.ErrNotImplemented
 }
 
 // SolveOpinionReport implements solveOpinionReport operation.

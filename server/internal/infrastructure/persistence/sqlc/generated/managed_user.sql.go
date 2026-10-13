@@ -7,6 +7,7 @@ package model
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/google/uuid"
 	"github.com/lib/pq"
@@ -36,19 +37,24 @@ func (q *Queries) CountManagedUsers(ctx context.Context, search string) (int64, 
 
 const getManagedUser = `-- name: GetManagedUser :one
 SELECT users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
+  EXISTS(SELECT 1 FROM password_setup_tokens WHERE password_setup_tokens.user_id = users.user_id)
+    AND NOT EXISTS(SELECT 1 FROM password_auth WHERE password_auth.user_id = users.user_id) AS password_setup_required,
   ARRAY(SELECT provider FROM user_auths WHERE user_auths.user_id = users.user_id
         UNION SELECT 'PASSWORD'::varchar FROM password_auth WHERE password_auth.user_id = users.user_id ORDER BY provider)::text[] AS providers
 FROM users WHERE users.user_id = $1
 `
 
 type GetManagedUserRow struct {
-	User      User
-	Providers []string
+	User                  User
+	PasswordSetupRequired sql.NullBool
+	Providers             []string
 }
 
 // GetManagedUser
 //
 //	SELECT users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
+//	  EXISTS(SELECT 1 FROM password_setup_tokens WHERE password_setup_tokens.user_id = users.user_id)
+//	    AND NOT EXISTS(SELECT 1 FROM password_auth WHERE password_auth.user_id = users.user_id) AS password_setup_required,
 //	  ARRAY(SELECT provider FROM user_auths WHERE user_auths.user_id = users.user_id
 //	        UNION SELECT 'PASSWORD'::varchar FROM password_auth WHERE password_auth.user_id = users.user_id ORDER BY provider)::text[] AS providers
 //	FROM users WHERE users.user_id = $1
@@ -66,6 +72,7 @@ func (q *Queries) GetManagedUser(ctx context.Context, userID uuid.UUID) (GetMana
 		&i.User.EmailVerified,
 		&i.User.WithdrawalDate,
 		&i.User.CanCreateTalkSession,
+		&i.PasswordSetupRequired,
 		pq.Array(&i.Providers),
 	)
 	return i, err
@@ -73,6 +80,8 @@ func (q *Queries) GetManagedUser(ctx context.Context, userID uuid.UUID) (GetMana
 
 const listManagedUsers = `-- name: ListManagedUsers :many
 SELECT users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
+  EXISTS(SELECT 1 FROM password_setup_tokens WHERE password_setup_tokens.user_id = users.user_id)
+    AND NOT EXISTS(SELECT 1 FROM password_auth WHERE password_auth.user_id = users.user_id) AS password_setup_required,
   ARRAY(SELECT provider FROM user_auths WHERE user_auths.user_id = users.user_id
         UNION SELECT 'PASSWORD'::varchar FROM password_auth WHERE password_auth.user_id = users.user_id ORDER BY provider)::text[] AS providers
 FROM users
@@ -91,13 +100,16 @@ type ListManagedUsersParams struct {
 }
 
 type ListManagedUsersRow struct {
-	User      User
-	Providers []string
+	User                  User
+	PasswordSetupRequired sql.NullBool
+	Providers             []string
 }
 
 // ListManagedUsers
 //
 //	SELECT users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
+//	  EXISTS(SELECT 1 FROM password_setup_tokens WHERE password_setup_tokens.user_id = users.user_id)
+//	    AND NOT EXISTS(SELECT 1 FROM password_auth WHERE password_auth.user_id = users.user_id) AS password_setup_required,
 //	  ARRAY(SELECT provider FROM user_auths WHERE user_auths.user_id = users.user_id
 //	        UNION SELECT 'PASSWORD'::varchar FROM password_auth WHERE password_auth.user_id = users.user_id ORDER BY provider)::text[] AS providers
 //	FROM users
@@ -127,6 +139,7 @@ func (q *Queries) ListManagedUsers(ctx context.Context, arg ListManagedUsersPara
 			&i.User.EmailVerified,
 			&i.User.WithdrawalDate,
 			&i.User.CanCreateTalkSession,
+			&i.PasswordSetupRequired,
 			pq.Array(&i.Providers),
 		); err != nil {
 			return nil, err

@@ -85,7 +85,7 @@ jobs:
         run: go mod download
 
       - name: Test email login and delivery with race detector
-        run: go test -race -count=1 ./internal/application/usecase/auth_usecase ./internal/presentation/handler ./internal/infrastructure/email/... ./internal/infrastructure/external/aws/ses
+        run: go test -race -count=1 ./internal/domain/model/auth/password ./internal/domain/service ./internal/application/usecase/admin_usecase ./internal/application/usecase/auth_usecase ./internal/presentation/handler ./internal/infrastructure/persistence/query/user ./internal/infrastructure/email/... ./internal/infrastructure/external/aws/ses
 
       - name: Run unit tests with coverage
         run: |
