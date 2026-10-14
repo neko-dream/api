@@ -31,7 +31,8 @@ func Labeler(find RouteFinder) Middleware {
 				semconv.HTTPSchemeKey.String(r.URL.Scheme),
 				semconv.HTTPHostKey.String(r.URL.Host),
 				semconv.HTTPTargetKey.String(r.URL.Path),
-				semconv.HTTPURLKey.String(r.URL.String()),
+				// クエリ文字列にはパスワード等の秘密値が含まれうるため記録しない
+				semconv.HTTPURLKey.String(urlWithoutQuery(r.URL)),
 				semconv.HTTPUserAgentKey.String(r.UserAgent()),
 			}
 

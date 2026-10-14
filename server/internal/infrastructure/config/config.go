@@ -5,6 +5,7 @@ import (
 	"github.com/caarlos0/env/v11"
 	"github.com/neko-dream/api/pkg/utils"
 	"net/url"
+	"strings"
 )
 
 type Config struct {
@@ -20,6 +21,9 @@ type Config struct {
 	InitialAdminName    string   `env:"INITIAL_ADMIN_NAME"`
 	AdminJWTSecret      string   `env:"ADMIN_JWT_SECRET"`
 	AdminAllowedOrigins []string `env:"ADMIN_ALLOWED_ORIGINS" envSeparator:","`
+
+	// AdditionalBrowserOrigins WEBSITE_URL 以外に、ブラウザからの認証付きアクセスを許可するオリジン（例: ステージングのWeb）。
+	AdditionalBrowserOrigins []string `env:"ADDITIONAL_BROWSER_ORIGINS" envSeparator:","`
 
 	LineClientID     string `env:"LINE_CHANNEL_ID"`
 	LineClientSecret string `env:"LINE_CHANNEL_SECRET"`
@@ -133,7 +137,22 @@ func (c *Config) BrowserOrigins() []string {
 	if c.Env == DEV {
 		origins = append(origins, "https://api-dev.kotohiro.com")
 	}
+	for _, raw := range c.AdditionalBrowserOrigins {
+		if origin, ok := explicitHTTPSOrigin(raw); ok {
+			origins = append(origins, origin)
+		}
+	}
 	return origins
+}
+
+// explicitHTTPSOrigin はパス・クエリ・認証情報・ワイルドカードを含まない HTTPS オリジンだけを受け付ける。
+func explicitHTTPSOrigin(raw string) (string, bool) {
+	u, err := url.Parse(strings.TrimSpace(raw))
+	if err != nil || u.Scheme != "https" || u.Host == "" || strings.Contains(u.Host, "*") || u.User != nil ||
+		(u.Path != "" && u.Path != "/") || u.RawQuery != "" || u.ForceQuery || u.Fragment != "" {
+		return "", false
+	}
+	return u.Scheme + "://" + u.Host, true
 }
 
 func LoadConfig() *Config {

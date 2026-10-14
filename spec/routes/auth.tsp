@@ -348,7 +348,19 @@ namespace kotohiro {
   @summary("新規設定・変更用のパスワード入力条件")
   op getPasswordPolicy(): {
     @statusCode statusCode: 200;
-    @body body: { minLength: int32; maxBytes: int32; };
+    @body body: {
+      /** 最小文字数（Unicodeコードポイント数） */
+      minLength: int32;
+
+      /** 最大バイト数（UTF-8） */
+      maxBytes: int32;
+
+      /** 改行・タブなどの制御文字を禁止する */
+      forbidControlCharacters: boolean;
+
+      /** 先頭・末尾の空白（全角空白を含む）を禁止する */
+      forbidSurroundingWhitespace: boolean;
+    };
   };
 
   @tag("auth")

@@ -19,7 +19,7 @@
 - `POST /v1/manage/users`: JSON `{ displayName, email }`。管理者Cookie認証と管理画面用Origin制限が必要。201 `{ userID, invitationSent }`。
 - `POST /v1/manage/users/{userID}/invitation`: 初回設定が未完了のアカウントに再送。管理者専用。200 `{ userID, invitationSent }`。
 - `POST /auth/password/setup`: JSON `{ token, password }`。初回設定用リンクの秘密値で認証する。成功204。ログインCookie・トークンは返さない。
-- `GET /auth/password/policy`: 認証不要。新しいパスワードの制約 `{ minLength, maxBytes }` を返す。キャッシュしない。pepperやハッシュの値は返さない。
+- `GET /auth/password/policy`: 認証不要。新しいパスワードの制約 `{ minLength, maxBytes, forbidControlCharacters, forbidSurroundingWhitespace }` を返す。キャッシュしない。pepperやハッシュの値は返さない。
 - 管理者用ユーザー情報の `passwordSetupRequired` は初回設定待ちかを示す。ユーザーJWTや `/users/me` には追加しない。
 
 リンクは `WEBSITE_URL` のHTTPSオリジン + `/auth/password/setup#...`。
@@ -42,8 +42,9 @@ Webは[Figmaの「新しいパスワードを設定」画面](https://www.figma.
 - リンクを開いただけでは設定もログインも行わない。メールクライアントのプレビュー等でリンクを消費しない。
 - 再送は60秒間隔。再送すると古いリンクを無効化する。期限切れでも未完了アカウントは再送できる。
 - パスワードは12文字以上。既存bcrypt方式を使うため、UTF-8バイト長とpepperの合計は72バイト以内。パスワードはトリミングしない。
+- 改行・タブなどの制御文字と、先頭・末尾の空白（全角空白を含む）を含むパスワードは `PASSWORD-INVALID-CHARACTER` で拒否する。途中の空白、日本語、絵文字は使用できる。
 - サーバーの `password_auth.PasswordPolicy.Validate` に制約判定を集約し、登録・初回設定・変更・ローカル作成CLIで共用する。ログインではこの新規設定用ルールを適用せず、既存の短いパスワードとの互換性を維持する。
-- Webは上記APIから制約を取得し、Unicodeコードポイント数とUTF-8バイト数で検証する。取得に失敗した場合は固定値にフォールバックせず、入力と送信を無効にする。確認用パスワードとの一致はWebだけの入力補助で、サーバーは受け取ったパスワードを必ず再検証する。
+- Webは上記APIから制約を取得し、Unicodeコードポイント数・UTF-8バイト数・禁止文字で検証する。取得に失敗した場合は固定値にフォールバックせず、入力と送信を無効にする。確認用パスワードとの一致はWebだけの入力補助で、サーバーは受け取ったパスワードを必ず再検証する。
 - 管理画面の表示名は50コードポイント以内、メールは既存のメールログイン対応形式で254バイト以内。前後の空白を同じ扱いで除去する。HTMLのUTF-16文字数上限やブラウザ独自の検証に依存しない。
 - ユーザー行を同一の順序でロックし、初回パスワード登録・メール確認・リンク消費を同一トランザクションで実行する。
 - メール／subjectの変更、退会、既存パスワードの存在を確認し、既存の認証情報を上書きしない。

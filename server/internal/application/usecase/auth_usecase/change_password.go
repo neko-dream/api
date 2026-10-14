@@ -18,7 +18,9 @@ type ChangePassword interface {
 }
 
 type ChangePasswordInput struct {
-	UserID      shared.UUID[user.User]
+	UserID shared.UUID[user.User]
+	// SessionID 変更操作を行った現在のセッション。これ以外のセッションは無効にする。
+	SessionID   shared.UUID[session.Session]
 	OldPassword string
 	NewPassword string
 }
@@ -32,7 +34,7 @@ type changePasswordInteractor struct {
 	cfg                 *config.Config
 	session.TokenManager
 	session.SessionRepository
-	*db.DBManager
+	txRunner loginTransactionRunner
 }
 
 func NewChangePassword(
@@ -49,7 +51,7 @@ func NewChangePassword(
 		cfg:                 cfg,
 		TokenManager:        tokenManager,
 		SessionRepository:   sessionRepository,
-		DBManager:           dbManager,
+		txRunner:            dbManager,
 	}
 }
 
@@ -66,11 +68,32 @@ func (c *changePasswordInteractor) Execute(ctx context.Context, input ChangePass
 		return nil, messages.InvalidPasswordError
 	}
 
-	// 新しいパスワードを登録
-	err = c.passwordAuthManager.UpdatePassword(ctx, input.UserID, input.NewPassword)
-	if err != nil {
+	// 新しいパスワードを登録し、漏洩したパスワードで作られた可能性のある他のセッションを無効にする
+	if err := c.txRunner.ExecTx(ctx, func(ctx context.Context) error {
+		if err := c.passwordAuthManager.UpdatePassword(ctx, input.UserID, input.NewPassword); err != nil {
+			return err
+		}
+		return c.deactivateOtherSessions(ctx, input.UserID, input.SessionID)
+	}); err != nil {
 		return nil, err
 	}
 
 	return &ChangePasswordOutput{Success: true}, nil
+}
+
+func (c *changePasswordInteractor) deactivateOtherSessions(ctx context.Context, userID shared.UUID[user.User], currentSessionID shared.UUID[session.Session]) error {
+	sessions, err := c.SessionRepository.FindByUserID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	for _, sess := range sessions {
+		if sess.SessionID() == currentSessionID || !sess.IsActive(ctx) {
+			continue
+		}
+		sess.Deactivate(ctx)
+		if _, err := c.SessionRepository.Update(ctx, sess); err != nil {
+			return err
+		}
+	}
+	return nil
 }

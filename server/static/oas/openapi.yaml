@@ -312,12 +312,22 @@ paths:
                   minLength:
                     type: integer
                     format: int32
+                    description: 最小文字数（Unicodeコードポイント数）
                   maxBytes:
                     type: integer
                     format: int32
+                    description: 最大バイト数（UTF-8）
+                  forbidControlCharacters:
+                    type: boolean
+                    description: 改行・タブなどの制御文字を禁止する
+                  forbidSurroundingWhitespace:
+                    type: boolean
+                    description: 先頭・末尾の空白（全角空白を含む）を禁止する
                 required:
                   - minLength
                   - maxBytes
+                  - forbidControlCharacters
+                  - forbidSurroundingWhitespace
       tags:
         - auth
       security:

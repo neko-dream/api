@@ -5875,11 +5875,21 @@ func (s *GetPasswordPolicyOK) encodeFields(e *jx.Encoder) {
 		e.FieldStart("maxBytes")
 		e.Int32(s.MaxBytes)
 	}
+	{
+		e.FieldStart("forbidControlCharacters")
+		e.Bool(s.ForbidControlCharacters)
+	}
+	{
+		e.FieldStart("forbidSurroundingWhitespace")
+		e.Bool(s.ForbidSurroundingWhitespace)
+	}
 }
 
-var jsonFieldsNameOfGetPasswordPolicyOK = [2]string{
+var jsonFieldsNameOfGetPasswordPolicyOK = [4]string{
 	0: "minLength",
 	1: "maxBytes",
+	2: "forbidControlCharacters",
+	3: "forbidSurroundingWhitespace",
 }
 
 // Decode decodes GetPasswordPolicyOK from json.
@@ -5915,6 +5925,30 @@ func (s *GetPasswordPolicyOK) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"maxBytes\"")
 			}
+		case "forbidControlCharacters":
+			requiredBitSet[0] |= 1 << 2
+			if err := func() error {
+				v, err := d.Bool()
+				s.ForbidControlCharacters = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"forbidControlCharacters\"")
+			}
+		case "forbidSurroundingWhitespace":
+			requiredBitSet[0] |= 1 << 3
+			if err := func() error {
+				v, err := d.Bool()
+				s.ForbidSurroundingWhitespace = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"forbidSurroundingWhitespace\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -5925,7 +5959,7 @@ func (s *GetPasswordPolicyOK) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000011,
+		0b00001111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
