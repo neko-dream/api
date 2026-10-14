@@ -34,3 +34,40 @@ func TestBrowserOriginsProductionAliasAndDevelopmentIsolation(t *testing.T) {
 		}
 	}
 }
+
+func TestBrowserOriginsAdditionalOrigins(t *testing.T) {
+	cfg := &Config{
+		Env:                      PROD,
+		WEBSITE_URL:              "https://www.kotohiro.com",
+		AdditionalBrowserOrigins: []string{"https://staging.kotohiro.com", " https://staging2.kotohiro.com/ "},
+	}
+	origins := cfg.BrowserOrigins()
+	for _, want := range []string{"https://www.kotohiro.com", "https://kotohiro.com", "https://staging.kotohiro.com", "https://staging2.kotohiro.com"} {
+		if !slices.Contains(origins, want) {
+			t.Fatalf("%s not allowed: %v", want, origins)
+		}
+	}
+
+	// 明示的な HTTPS オリジン以外は、設定ミスでも信頼しない
+	for _, invalid := range []string{
+		"",
+		"*",
+		"https://*",
+		"https://*.kotohiro.com",
+		"http://staging.kotohiro.com",
+		"https://staging.kotohiro.com/path",
+		"https://staging.kotohiro.com?x=1",
+		"https://staging.kotohiro.com#x",
+		"https://user@staging.kotohiro.com",
+		"staging.kotohiro.com",
+	} {
+		cfg := &Config{Env: PROD, AdditionalBrowserOrigins: []string{invalid}}
+		if origins := cfg.BrowserOrigins(); len(origins) != 0 {
+			t.Fatalf("%q accepted: %v", invalid, origins)
+		}
+	}
+
+	if origins := (&Config{Env: "unknown", AdditionalBrowserOrigins: []string{"https://staging.kotohiro.com"}}).BrowserOrigins(); origins != nil {
+		t.Fatalf("unknown environment trusted origins: %v", origins)
+	}
+}
