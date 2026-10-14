@@ -64,6 +64,10 @@
 				{
 					"name": "WEBSITE_URL",
 					"value": "https://www.kotohiro.com"
+				},
+				{
+					"name": "ADDITIONAL_BROWSER_ORIGINS",
+					"value": "https://staging.kotohiro.com"
 				}
 			],
 			"secrets": [
