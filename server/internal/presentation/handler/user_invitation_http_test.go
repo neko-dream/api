@@ -36,12 +36,13 @@ func TestPasswordPolicyHTTPIsPublicAndDoesNotExposeHashingSecrets(t *testing.T) 
 		if w.Code != 200 || w.Header().Get("Set-Cookie") != "" || w.Header().Get("Cache-Control") != "no-store" {
 			t.Fatal("unsafe policy response", w.Code)
 		}
-		var body map[string]int
+		var body map[string]any
 		if err := json.Unmarshal(w.Body.Bytes(), &body); err != nil {
 			t.Fatal(err)
 		}
 		policy, _ := password_auth.NewPasswordPolicy(len(pepper))
-		if len(body) != 2 || body["minLength"] != policy.MinLength || body["maxBytes"] != policy.MaxBytes {
+		if len(body) != 4 || body["minLength"] != float64(policy.MinLength) || body["maxBytes"] != float64(policy.MaxBytes) ||
+			body["forbidControlCharacters"] != policy.ForbidControlCharacters || body["forbidSurroundingWhitespace"] != policy.ForbidSurroundingWhitespace {
 			t.Fatal("public policy does not match validation", body)
 		}
 	}

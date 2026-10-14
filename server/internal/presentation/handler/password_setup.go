@@ -16,7 +16,12 @@ func (a *authHandler) GetPasswordPolicy(ctx context.Context) (*oas.GetPasswordPo
 	if err != nil {
 		return nil, err
 	}
-	return &oas.GetPasswordPolicyOK{MinLength: int32(policy.MinLength), MaxBytes: int32(policy.MaxBytes)}, nil
+	return &oas.GetPasswordPolicyOK{
+		MinLength:                   int32(policy.MinLength),
+		MaxBytes:                    int32(policy.MaxBytes),
+		ForbidControlCharacters:     policy.ForbidControlCharacters,
+		ForbidSurroundingWhitespace: policy.ForbidSurroundingWhitespace,
+	}, nil
 }
 
 func (a *authHandler) SetupPassword(ctx context.Context, req *oas.SetupPasswordReq) error {

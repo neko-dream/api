@@ -1751,8 +1751,14 @@ func (s *GetOrganizationsOK) SetOrganizations(val []Organization) {
 func (*GetOrganizationsOK) getOrganizationsRes() {}
 
 type GetPasswordPolicyOK struct {
+	// 最小文字数（Unicodeコードポイント数）.
 	MinLength int32 `json:"minLength"`
-	MaxBytes  int32 `json:"maxBytes"`
+	// 最大バイト数（UTF-8）.
+	MaxBytes int32 `json:"maxBytes"`
+	// 改行・タブなどの制御文字を禁止する.
+	ForbidControlCharacters bool `json:"forbidControlCharacters"`
+	// 先頭・末尾の空白（全角空白を含む）を禁止する.
+	ForbidSurroundingWhitespace bool `json:"forbidSurroundingWhitespace"`
 }
 
 // GetMinLength returns the value of MinLength.
@@ -1765,6 +1771,16 @@ func (s *GetPasswordPolicyOK) GetMaxBytes() int32 {
 	return s.MaxBytes
 }
 
+// GetForbidControlCharacters returns the value of ForbidControlCharacters.
+func (s *GetPasswordPolicyOK) GetForbidControlCharacters() bool {
+	return s.ForbidControlCharacters
+}
+
+// GetForbidSurroundingWhitespace returns the value of ForbidSurroundingWhitespace.
+func (s *GetPasswordPolicyOK) GetForbidSurroundingWhitespace() bool {
+	return s.ForbidSurroundingWhitespace
+}
+
 // SetMinLength sets the value of MinLength.
 func (s *GetPasswordPolicyOK) SetMinLength(val int32) {
 	s.MinLength = val
@@ -1773,6 +1789,16 @@ func (s *GetPasswordPolicyOK) SetMinLength(val int32) {
 // SetMaxBytes sets the value of MaxBytes.
 func (s *GetPasswordPolicyOK) SetMaxBytes(val int32) {
 	s.MaxBytes = val
+}
+
+// SetForbidControlCharacters sets the value of ForbidControlCharacters.
+func (s *GetPasswordPolicyOK) SetForbidControlCharacters(val bool) {
+	s.ForbidControlCharacters = val
+}
+
+// SetForbidSurroundingWhitespace sets the value of ForbidSurroundingWhitespace.
+func (s *GetPasswordPolicyOK) SetForbidSurroundingWhitespace(val bool) {
+	s.ForbidSurroundingWhitespace = val
 }
 
 type GetPolicyConsentStatusBadRequest struct{}
