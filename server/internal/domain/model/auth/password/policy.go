@@ -2,6 +2,8 @@ package password_auth
 
 import (
 	"fmt"
+	"strings"
+	"unicode"
 	"unicode/utf8"
 
 	"github.com/neko-dream/api/internal/domain/messages"
@@ -31,6 +33,10 @@ func (p PasswordPolicy) Validate(password string) error {
 	}
 	if len(password) > p.MaxBytes {
 		return messages.PasswordTooLong
+	}
+	// 改行などの制御文字と、コピー＆ペーストで混入しやすい先頭・末尾の空白（全角空白を含む）を拒否する。
+	if strings.ContainsFunc(password, unicode.IsControl) || strings.TrimSpace(password) != password {
+		return messages.PasswordInvalidCharacter
 	}
 	return nil
 }
