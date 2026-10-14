@@ -26,3 +26,14 @@ func MakeRouteFinder[R Route, S Server[R]](server S) RouteFinder {
 		return server.FindPath(method, u)
 	}
 }
+
+// urlWithoutQuery は認証情報・クエリ・フラグメントを除いたURLを返す。
+func urlWithoutQuery(u *url.URL) string {
+	stripped := *u
+	stripped.User = nil
+	stripped.RawQuery = ""
+	stripped.ForceQuery = false
+	stripped.Fragment = ""
+	stripped.RawFragment = ""
+	return stripped.String()
+}
