@@ -311,6 +311,7 @@ func (a *authHandler) ChangePassword(ctx context.Context, params oas.ChangePassw
 
 	out, err := a.changePassword.Execute(ctx, auth_usecase.ChangePasswordInput{
 		UserID:      shared.UUID[user.User](userID),
+		SessionID:   authCtx.SessionID,
 		OldPassword: params.OldPassword,
 		NewPassword: params.NewPassword,
 	})
