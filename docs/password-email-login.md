@@ -61,6 +61,8 @@ Cookie植え付けを防ぐ。CookieはSecure / HttpOnly。POSTのOriginは設�
 Credential付きCORSも同じ許可リストを使い、任意HTTPSサイトやworkers.devプレビューは許可しない。
 ブラウザからの変更系リクエストも未許可Originを拒否し、単純フォームによるクロスサイト書き込みを防ぐ。
 developmentでは既存Swagger/管理画面の `https://api-dev.kotohiro.com` 別名も明示許可する。
+ステージングのWebなど、ほかに許可するオリジンは `ADDITIONAL_BROWSER_ORIGINS`（カンマ区切り）で明示する。
+パス付き・ワイルドカード・HTTPのオリジンは設定しても無視する。本番は `https://staging.kotohiro.com` を許可している。
 非ブラウザクライアントではOriginを省略できるが、秘密値とCookieの両方が必要。
 
 ## 検証
