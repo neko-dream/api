@@ -1,14 +1,17 @@
 import "@typespec/http";
+import "./user.tsp";
 
 using Http;
 
 namespace kotohiro {
   model ManagedUser {
+    permissions: UserPermissions;
     userID: string;
     displayID: string;
     displayName: string;
     email?: string;
     emailVerified: boolean;
+    passwordSetupRequired: boolean;
     providers: string[];
     createdAt: utcDateTime;
     updatedAt: utcDateTime;
@@ -18,6 +21,20 @@ namespace kotohiro {
   model ManagedUserList {
     users: ManagedUser[];
     totalCount: int64;
+  }
+
+  model InviteManagedUserRequest {
+    @minLength(1)
+    @maxLength(50)
+    displayName: string;
+    @minLength(3)
+    @maxLength(254)
+    email: string;
+  }
+
+  model ManagedUserInvitation {
+    userID: string;
+    invitationSent: boolean;
   }
 
   model TalkSessionForManage {

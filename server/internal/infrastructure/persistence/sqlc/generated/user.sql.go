@@ -269,7 +269,7 @@ func (q *Queries) GetUserAuthByUserID(ctx context.Context, userID uuid.UUID) (Ge
 
 const getUserByID = `-- name: GetUserByID :one
 SELECT
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session
 FROM
     "users"
 WHERE
@@ -283,7 +283,7 @@ type GetUserByIDRow struct {
 // GetUserByID
 //
 //	SELECT
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session
 //	FROM
 //	    "users"
 //	WHERE
@@ -301,13 +301,14 @@ func (q *Queries) GetUserByID(ctx context.Context, userID uuid.UUID) (GetUserByI
 		&i.User.Email,
 		&i.User.EmailVerified,
 		&i.User.WithdrawalDate,
+		&i.User.CanCreateTalkSession,
 	)
 	return i, err
 }
 
 const getUserBySubject = `-- name: GetUserBySubject :one
 SELECT
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
     user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at
 FROM
     "users"
@@ -324,7 +325,7 @@ type GetUserBySubjectRow struct {
 // GetUserBySubject
 //
 //	SELECT
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
 //	    user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at
 //	FROM
 //	    "users"
@@ -344,6 +345,7 @@ func (q *Queries) GetUserBySubject(ctx context.Context, subject string) (GetUser
 		&i.User.Email,
 		&i.User.EmailVerified,
 		&i.User.WithdrawalDate,
+		&i.User.CanCreateTalkSession,
 		&i.UserAuth.UserAuthID,
 		&i.UserAuth.UserID,
 		&i.UserAuth.Provider,
@@ -389,33 +391,28 @@ func (q *Queries) GetUserDemographicByUserID(ctx context.Context, userID uuid.UU
 
 const getUserDetailByID = `-- name: GetUserDetailByID :one
 SELECT
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
-    user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at,
-    user_demographics.user_demographics_id, user_demographics.user_id, user_demographics.date_of_birth, user_demographics.gender, user_demographics.city, user_demographics.created_at, user_demographics.updated_at, user_demographics.prefecture
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
+    user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at
 FROM
     users
-LEFT JOIN user_auths ON users.user_id = user_auths.user_id
-LEFT JOIN user_demographics ON users.user_id = user_demographics.user_id
+JOIN user_auths ON users.user_id = user_auths.user_id
 WHERE
     users.user_id = $1
 `
 
 type GetUserDetailByIDRow struct {
-	User            User
-	UserAuth        UserAuth
-	UserDemographic UserDemographic
+	User     User
+	UserAuth UserAuth
 }
 
 // GetUserDetailByID
 //
 //	SELECT
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date,
-//	    user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at,
-//	    user_demographics.user_demographics_id, user_demographics.user_id, user_demographics.date_of_birth, user_demographics.gender, user_demographics.city, user_demographics.created_at, user_demographics.updated_at, user_demographics.prefecture
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session,
+//	    user_auths.user_auth_id, user_auths.user_id, user_auths.provider, user_auths.subject, user_auths.is_verified, user_auths.created_at
 //	FROM
 //	    users
-//	LEFT JOIN user_auths ON users.user_id = user_auths.user_id
-//	LEFT JOIN user_demographics ON users.user_id = user_demographics.user_id
+//	JOIN user_auths ON users.user_id = user_auths.user_id
 //	WHERE
 //	    users.user_id = $1
 func (q *Queries) GetUserDetailByID(ctx context.Context, userID uuid.UUID) (GetUserDetailByIDRow, error) {
@@ -431,20 +428,13 @@ func (q *Queries) GetUserDetailByID(ctx context.Context, userID uuid.UUID) (GetU
 		&i.User.Email,
 		&i.User.EmailVerified,
 		&i.User.WithdrawalDate,
+		&i.User.CanCreateTalkSession,
 		&i.UserAuth.UserAuthID,
 		&i.UserAuth.UserID,
 		&i.UserAuth.Provider,
 		&i.UserAuth.Subject,
 		&i.UserAuth.IsVerified,
 		&i.UserAuth.CreatedAt,
-		&i.UserDemographic.UserDemographicsID,
-		&i.UserDemographic.UserID,
-		&i.UserDemographic.DateOfBirth,
-		&i.UserDemographic.Gender,
-		&i.UserDemographic.City,
-		&i.UserDemographic.CreatedAt,
-		&i.UserDemographic.UpdatedAt,
-		&i.UserDemographic.Prefecture,
 	)
 	return i, err
 }
@@ -587,7 +577,7 @@ func (q *Queries) UpdateUserEmailAndSubject(ctx context.Context, arg UpdateUserE
 
 const userFindByDisplayID = `-- name: UserFindByDisplayID :one
 SELECT
-    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date
+    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session
 FROM
     "users"
 WHERE
@@ -601,7 +591,7 @@ type UserFindByDisplayIDRow struct {
 // UserFindByDisplayID
 //
 //	SELECT
-//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date
+//	    users.user_id, users.display_id, users.display_name, users.icon_url, users.created_at, users.updated_at, users.email, users.email_verified, users.withdrawal_date, users.can_create_talk_session
 //	FROM
 //	    "users"
 //	WHERE
@@ -619,6 +609,7 @@ func (q *Queries) UserFindByDisplayID(ctx context.Context, displayID sql.NullStr
 		&i.User.Email,
 		&i.User.EmailVerified,
 		&i.User.WithdrawalDate,
+		&i.User.CanCreateTalkSession,
 	)
 	return i, err
 }

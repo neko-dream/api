@@ -10,6 +10,8 @@ import (
 	"github.com/neko-dream/api/internal/domain/model/user"
 )
 
+var ErrOrganizationAliasNotFound = errors.New("organization alias not found")
+
 // OrganizationAliasRepository リポジトリインターフェース
 type OrganizationAliasRepository interface {
 	Create(ctx context.Context, alias *OrganizationAlias) error

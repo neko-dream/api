@@ -108,6 +108,12 @@ type AuthHandler interface {
 	//
 	// GET /auth/dev/login
 	DevAuthorize(ctx context.Context, params DevAuthorizeParams) (DevAuthorizeRes, error)
+	// GetPasswordPolicy implements getPasswordPolicy operation.
+	//
+	// 入力条件はサーバーの共通パスワード検証から取得する。秘密値は返さない。.
+	//
+	// GET /auth/password/policy
+	GetPasswordPolicy(ctx context.Context) (*GetPasswordPolicyOK, error)
 	// GetTokenInfo implements getTokenInfo operation.
 	//
 	// JWTの内容を返してくれる.
@@ -158,6 +164,12 @@ type AuthHandler interface {
 	//
 	// POST /auth/revoke
 	RevokeToken(ctx context.Context) (RevokeTokenRes, error)
+	// SetupPassword implements setupPassword operation.
+	//
+	// メールから初回パスワードを設定する（ログインCookieは発行しない）.
+	//
+	// POST /auth/password/setup
+	SetupPassword(ctx context.Context, req *SetupPasswordReq) error
 	// VerifyPasswordEmail implements verifyPasswordEmail operation.
 	//
 	// メール本人確認を完了し、初めてログインCookieを発行する.
@@ -200,6 +212,12 @@ type ImageHandler interface {
 //
 // x-ogen-operation-group: Manage
 type ManageHandler interface {
+	// CreateUserManage implements createUserManage operation.
+	//
+	// メールログイン用ユーザーを作成し、初回パスワード設定メールを送信する.
+	//
+	// POST /v1/manage/users
+	CreateUserManage(ctx context.Context, req *InviteManagedUserRequest) (*ManagedUserInvitation, error)
 	// GetAnalysisReportManage implements getAnalysisReportManage operation.
 	//
 	// GET /v1/manage/talksessions/{talkSessionID}/analysis/report
@@ -232,6 +250,14 @@ type ManageHandler interface {
 	//
 	// POST /v1/manage/talksessions/{talkSessionID}/analysis/regenerate
 	ManageRegenerateManage(ctx context.Context, req *RegenerateRequest, params ManageRegenerateManageParams) (*RegenerateResponse, error)
+	// ResendUserInvitationManage implements resendUserInvitationManage operation.
+	//
+	// POST /v1/manage/users/{userID}/invitation
+	ResendUserInvitationManage(ctx context.Context, params ResendUserInvitationManageParams) (*ManagedUserInvitation, error)
+	// SetUserPermissionsManage implements setUserPermissionsManage operation.
+	//
+	// PUT /v1/manage/users/{userID}/permissions
+	SetUserPermissionsManage(ctx context.Context, req *UserPermissions, params SetUserPermissionsManageParams) (*UserPermissions, error)
 	// ToggleReportVisibilityManage implements toggleReportVisibilityManage operation.
 	//
 	// POST /v1/manage/talksessions/{talkSessionID}/analysis/report
@@ -674,6 +700,12 @@ type UserHandler interface {
 	//
 	// POST /user
 	EstablishUser(ctx context.Context, req *EstablishUserReq) (EstablishUserRes, error)
+	// GetCurrentUser implements getCurrentUser operation.
+	//
+	// ログイン中ユーザーと現在の権限.
+	//
+	// GET /users/me
+	GetCurrentUser(ctx context.Context) (*CurrentUser, error)
 	// GetUserByDisplayID implements getUserByDisplayID operation.
 	//
 	// 表示IDからユーザー情報の取得.

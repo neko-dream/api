@@ -22,10 +22,12 @@ type ManagementListOutput struct {
 	TotalCount int64
 }
 type ManagedUser struct {
+	CanCreateTalkSession   bool
 	UserID                 shared.UUID[user.User]
 	DisplayID, DisplayName string
 	Email                  *string
 	EmailVerified          bool
+	PasswordSetupRequired  bool
 	Providers              []string
 	CreatedAt, UpdatedAt   time.Time
 	WithdrawalDate         *time.Time

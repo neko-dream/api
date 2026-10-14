@@ -201,6 +201,26 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							return
 						}
 
+					case 'p': // Prefix: "policy"
+
+						if l := len("policy"); len(elem) >= l && elem[0:l] == "policy" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch r.Method {
+							case "GET":
+								s.handleGetPasswordPolicyRequest([0]string{}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "GET")
+							}
+
+							return
+						}
+
 					case 'r': // Prefix: "register"
 
 						if l := len("register"); len(elem) >= l && elem[0:l] == "register" {
@@ -214,6 +234,26 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							switch r.Method {
 							case "POST":
 								s.handlePasswordRegisterRequest([0]string{}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "POST")
+							}
+
+							return
+						}
+
+					case 's': // Prefix: "setup"
+
+						if l := len("setup"); len(elem) >= l && elem[0:l] == "setup" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch r.Method {
+							case "POST":
+								s.handleSetupPasswordRequest([0]string{}, elemIsEscaped, w, r)
 							default:
 								s.notAllowed(w, r, "POST")
 							}
@@ -1925,6 +1965,32 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						break
 					}
 
+					if len(elem) == 0 {
+						break
+					}
+					switch elem[0] {
+					case 'm': // Prefix: "me"
+						origElem := elem
+						if l := len("me"); len(elem) >= l && elem[0:l] == "me" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch r.Method {
+							case "GET":
+								s.handleGetCurrentUserRequest([0]string{}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "GET")
+							}
+
+							return
+						}
+
+						elem = origElem
+					}
 					// Param: "displayID"
 					// Match until "/"
 					idx := strings.IndexByte(elem, '/')
@@ -2238,42 +2304,28 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 						}
 
-					case 'u': // Prefix: "users/"
+					case 'u': // Prefix: "users"
 
-						if l := len("users/"); len(elem) >= l && elem[0:l] == "users/" {
+						if l := len("users"); len(elem) >= l && elem[0:l] == "users" {
 							elem = elem[l:]
 						} else {
 							break
 						}
 
 						if len(elem) == 0 {
-							break
+							switch r.Method {
+							case "POST":
+								s.handleCreateUserManageRequest([0]string{}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "POST")
+							}
+
+							return
 						}
 						switch elem[0] {
-						case 'l': // Prefix: "list"
-							origElem := elem
-							if l := len("list"); len(elem) >= l && elem[0:l] == "list" {
-								elem = elem[l:]
-							} else {
-								break
-							}
+						case '/': // Prefix: "/"
 
-							if len(elem) == 0 {
-								// Leaf node.
-								switch r.Method {
-								case "GET":
-									s.handleGetUserListManageRequest([0]string{}, elemIsEscaped, w, r)
-								default:
-									s.notAllowed(w, r, "GET")
-								}
-
-								return
-							}
-
-							elem = origElem
-						case 's': // Prefix: "stats/"
-							origElem := elem
-							if l := len("stats/"); len(elem) >= l && elem[0:l] == "stats/" {
+							if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 								elem = elem[l:]
 							} else {
 								break
@@ -2284,7 +2336,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							}
 							switch elem[0] {
 							case 'l': // Prefix: "list"
-
+								origElem := elem
 								if l := len("list"); len(elem) >= l && elem[0:l] == "list" {
 									elem = elem[l:]
 								} else {
@@ -2295,7 +2347,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									// Leaf node.
 									switch r.Method {
 									case "GET":
-										s.handleGetUserStatsListManageRequest([0]string{}, elemIsEscaped, w, r)
+										s.handleGetUserListManageRequest([0]string{}, elemIsEscaped, w, r)
 									default:
 										s.notAllowed(w, r, "GET")
 									}
@@ -2303,51 +2355,145 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									return
 								}
 
-							case 't': // Prefix: "total"
-
-								if l := len("total"); len(elem) >= l && elem[0:l] == "total" {
+								elem = origElem
+							case 's': // Prefix: "stats/"
+								origElem := elem
+								if l := len("stats/"); len(elem) >= l && elem[0:l] == "stats/" {
 									elem = elem[l:]
 								} else {
 									break
 								}
 
 								if len(elem) == 0 {
-									// Leaf node.
-									switch r.Method {
-									case "GET":
-										s.handleGetUserStatsTotalManageRequest([0]string{}, elemIsEscaped, w, r)
-									default:
-										s.notAllowed(w, r, "GET")
+									break
+								}
+								switch elem[0] {
+								case 'l': // Prefix: "list"
+
+									if l := len("list"); len(elem) >= l && elem[0:l] == "list" {
+										elem = elem[l:]
+									} else {
+										break
 									}
 
-									return
+									if len(elem) == 0 {
+										// Leaf node.
+										switch r.Method {
+										case "GET":
+											s.handleGetUserStatsListManageRequest([0]string{}, elemIsEscaped, w, r)
+										default:
+											s.notAllowed(w, r, "GET")
+										}
+
+										return
+									}
+
+								case 't': // Prefix: "total"
+
+									if l := len("total"); len(elem) >= l && elem[0:l] == "total" {
+										elem = elem[l:]
+									} else {
+										break
+									}
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch r.Method {
+										case "GET":
+											s.handleGetUserStatsTotalManageRequest([0]string{}, elemIsEscaped, w, r)
+										default:
+											s.notAllowed(w, r, "GET")
+										}
+
+										return
+									}
+
+								}
+
+								elem = origElem
+							}
+							// Param: "userID"
+							// Match until "/"
+							idx := strings.IndexByte(elem, '/')
+							if idx < 0 {
+								idx = len(elem)
+							}
+							args[0] = elem[:idx]
+							elem = elem[idx:]
+
+							if len(elem) == 0 {
+								switch r.Method {
+								case "GET":
+									s.handleGetUserDetailManageRequest([1]string{
+										args[0],
+									}, elemIsEscaped, w, r)
+								default:
+									s.notAllowed(w, r, "GET")
+								}
+
+								return
+							}
+							switch elem[0] {
+							case '/': // Prefix: "/"
+
+								if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								if len(elem) == 0 {
+									break
+								}
+								switch elem[0] {
+								case 'i': // Prefix: "invitation"
+
+									if l := len("invitation"); len(elem) >= l && elem[0:l] == "invitation" {
+										elem = elem[l:]
+									} else {
+										break
+									}
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch r.Method {
+										case "POST":
+											s.handleResendUserInvitationManageRequest([1]string{
+												args[0],
+											}, elemIsEscaped, w, r)
+										default:
+											s.notAllowed(w, r, "POST")
+										}
+
+										return
+									}
+
+								case 'p': // Prefix: "permissions"
+
+									if l := len("permissions"); len(elem) >= l && elem[0:l] == "permissions" {
+										elem = elem[l:]
+									} else {
+										break
+									}
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch r.Method {
+										case "PUT":
+											s.handleSetUserPermissionsManageRequest([1]string{
+												args[0],
+											}, elemIsEscaped, w, r)
+										default:
+											s.notAllowed(w, r, "PUT")
+										}
+
+										return
+									}
+
 								}
 
 							}
 
-							elem = origElem
-						}
-						// Param: "userID"
-						// Leaf parameter, slashes are prohibited
-						idx := strings.IndexByte(elem, '/')
-						if idx >= 0 {
-							break
-						}
-						args[0] = elem
-						elem = ""
-
-						if len(elem) == 0 {
-							// Leaf node.
-							switch r.Method {
-							case "GET":
-								s.handleGetUserDetailManageRequest([1]string{
-									args[0],
-								}, elemIsEscaped, w, r)
-							default:
-								s.notAllowed(w, r, "GET")
-							}
-
-							return
 						}
 
 					}
@@ -2608,6 +2754,30 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							}
 						}
 
+					case 'p': // Prefix: "policy"
+
+						if l := len("policy"); len(elem) >= l && elem[0:l] == "policy" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch method {
+							case "GET":
+								r.name = GetPasswordPolicyOperation
+								r.summary = "新規設定・変更用のパスワード入力条件"
+								r.operationID = "getPasswordPolicy"
+								r.pathPattern = "/auth/password/policy"
+								r.args = args
+								r.count = 0
+								return r, true
+							default:
+								return
+							}
+						}
+
 					case 'r': // Prefix: "register"
 
 						if l := len("register"); len(elem) >= l && elem[0:l] == "register" {
@@ -2624,6 +2794,30 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.summary = "パスワードによる登録（devのみ）"
 								r.operationID = "passwordRegister"
 								r.pathPattern = "/auth/password/register"
+								r.args = args
+								r.count = 0
+								return r, true
+							default:
+								return
+							}
+						}
+
+					case 's': // Prefix: "setup"
+
+						if l := len("setup"); len(elem) >= l && elem[0:l] == "setup" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch method {
+							case "POST":
+								r.name = SetupPasswordOperation
+								r.summary = "メールから初回パスワードを設定する（ログインCookieは発行しない）"
+								r.operationID = "setupPassword"
+								r.pathPattern = "/auth/password/setup"
 								r.args = args
 								r.count = 0
 								return r, true
@@ -4601,6 +4795,36 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						break
 					}
 
+					if len(elem) == 0 {
+						break
+					}
+					switch elem[0] {
+					case 'm': // Prefix: "me"
+						origElem := elem
+						if l := len("me"); len(elem) >= l && elem[0:l] == "me" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch method {
+							case "GET":
+								r.name = GetCurrentUserOperation
+								r.summary = "ログイン中ユーザーと現在の権限"
+								r.operationID = "getCurrentUser"
+								r.pathPattern = "/users/me"
+								r.args = args
+								r.count = 0
+								return r, true
+							default:
+								return
+							}
+						}
+
+						elem = origElem
+					}
 					// Param: "displayID"
 					// Match until "/"
 					idx := strings.IndexByte(elem, '/')
@@ -4956,46 +5180,32 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 
 						}
 
-					case 'u': // Prefix: "users/"
+					case 'u': // Prefix: "users"
 
-						if l := len("users/"); len(elem) >= l && elem[0:l] == "users/" {
+						if l := len("users"); len(elem) >= l && elem[0:l] == "users" {
 							elem = elem[l:]
 						} else {
 							break
 						}
 
 						if len(elem) == 0 {
-							break
+							switch method {
+							case "POST":
+								r.name = CreateUserManageOperation
+								r.summary = "メールログイン用ユーザーを作成し、初回パスワード設定メールを送信する"
+								r.operationID = "createUserManage"
+								r.pathPattern = "/v1/manage/users"
+								r.args = args
+								r.count = 0
+								return r, true
+							default:
+								return
+							}
 						}
 						switch elem[0] {
-						case 'l': // Prefix: "list"
-							origElem := elem
-							if l := len("list"); len(elem) >= l && elem[0:l] == "list" {
-								elem = elem[l:]
-							} else {
-								break
-							}
+						case '/': // Prefix: "/"
 
-							if len(elem) == 0 {
-								// Leaf node.
-								switch method {
-								case "GET":
-									r.name = GetUserListManageOperation
-									r.summary = ""
-									r.operationID = "getUserListManage"
-									r.pathPattern = "/v1/manage/users/list"
-									r.args = args
-									r.count = 0
-									return r, true
-								default:
-									return
-								}
-							}
-
-							elem = origElem
-						case 's': // Prefix: "stats/"
-							origElem := elem
-							if l := len("stats/"); len(elem) >= l && elem[0:l] == "stats/" {
+							if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 								elem = elem[l:]
 							} else {
 								break
@@ -5006,7 +5216,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							}
 							switch elem[0] {
 							case 'l': // Prefix: "list"
-
+								origElem := elem
 								if l := len("list"); len(elem) >= l && elem[0:l] == "list" {
 									elem = elem[l:]
 								} else {
@@ -5017,10 +5227,10 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									// Leaf node.
 									switch method {
 									case "GET":
-										r.name = GetUserStatsListManageOperation
+										r.name = GetUserListManageOperation
 										r.summary = ""
-										r.operationID = "getUserStatsListManage"
-										r.pathPattern = "/v1/manage/users/stats/list"
+										r.operationID = "getUserListManage"
+										r.pathPattern = "/v1/manage/users/list"
 										r.args = args
 										r.count = 0
 										return r, true
@@ -5029,57 +5239,159 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									}
 								}
 
-							case 't': // Prefix: "total"
-
-								if l := len("total"); len(elem) >= l && elem[0:l] == "total" {
+								elem = origElem
+							case 's': // Prefix: "stats/"
+								origElem := elem
+								if l := len("stats/"); len(elem) >= l && elem[0:l] == "stats/" {
 									elem = elem[l:]
 								} else {
 									break
 								}
 
 								if len(elem) == 0 {
-									// Leaf node.
-									switch method {
-									case "GET":
-										r.name = GetUserStatsTotalManageOperation
-										r.summary = ""
-										r.operationID = "getUserStatsTotalManage"
-										r.pathPattern = "/v1/manage/users/stats/total"
-										r.args = args
-										r.count = 0
-										return r, true
-									default:
-										return
+									break
+								}
+								switch elem[0] {
+								case 'l': // Prefix: "list"
+
+									if l := len("list"); len(elem) >= l && elem[0:l] == "list" {
+										elem = elem[l:]
+									} else {
+										break
 									}
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch method {
+										case "GET":
+											r.name = GetUserStatsListManageOperation
+											r.summary = ""
+											r.operationID = "getUserStatsListManage"
+											r.pathPattern = "/v1/manage/users/stats/list"
+											r.args = args
+											r.count = 0
+											return r, true
+										default:
+											return
+										}
+									}
+
+								case 't': // Prefix: "total"
+
+									if l := len("total"); len(elem) >= l && elem[0:l] == "total" {
+										elem = elem[l:]
+									} else {
+										break
+									}
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch method {
+										case "GET":
+											r.name = GetUserStatsTotalManageOperation
+											r.summary = ""
+											r.operationID = "getUserStatsTotalManage"
+											r.pathPattern = "/v1/manage/users/stats/total"
+											r.args = args
+											r.count = 0
+											return r, true
+										default:
+											return
+										}
+									}
+
+								}
+
+								elem = origElem
+							}
+							// Param: "userID"
+							// Match until "/"
+							idx := strings.IndexByte(elem, '/')
+							if idx < 0 {
+								idx = len(elem)
+							}
+							args[0] = elem[:idx]
+							elem = elem[idx:]
+
+							if len(elem) == 0 {
+								switch method {
+								case "GET":
+									r.name = GetUserDetailManageOperation
+									r.summary = ""
+									r.operationID = "getUserDetailManage"
+									r.pathPattern = "/v1/manage/users/{userID}"
+									r.args = args
+									r.count = 1
+									return r, true
+								default:
+									return
+								}
+							}
+							switch elem[0] {
+							case '/': // Prefix: "/"
+
+								if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+									elem = elem[l:]
+								} else {
+									break
+								}
+
+								if len(elem) == 0 {
+									break
+								}
+								switch elem[0] {
+								case 'i': // Prefix: "invitation"
+
+									if l := len("invitation"); len(elem) >= l && elem[0:l] == "invitation" {
+										elem = elem[l:]
+									} else {
+										break
+									}
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch method {
+										case "POST":
+											r.name = ResendUserInvitationManageOperation
+											r.summary = ""
+											r.operationID = "resendUserInvitationManage"
+											r.pathPattern = "/v1/manage/users/{userID}/invitation"
+											r.args = args
+											r.count = 1
+											return r, true
+										default:
+											return
+										}
+									}
+
+								case 'p': // Prefix: "permissions"
+
+									if l := len("permissions"); len(elem) >= l && elem[0:l] == "permissions" {
+										elem = elem[l:]
+									} else {
+										break
+									}
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch method {
+										case "PUT":
+											r.name = SetUserPermissionsManageOperation
+											r.summary = ""
+											r.operationID = "setUserPermissionsManage"
+											r.pathPattern = "/v1/manage/users/{userID}/permissions"
+											r.args = args
+											r.count = 1
+											return r, true
+										default:
+											return
+										}
+									}
+
 								}
 
 							}
 
-							elem = origElem
-						}
-						// Param: "userID"
-						// Leaf parameter, slashes are prohibited
-						idx := strings.IndexByte(elem, '/')
-						if idx >= 0 {
-							break
-						}
-						args[0] = elem
-						elem = ""
-
-						if len(elem) == 0 {
-							// Leaf node.
-							switch method {
-							case "GET":
-								r.name = GetUserDetailManageOperation
-								r.summary = ""
-								r.operationID = "getUserDetailManage"
-								r.pathPattern = "/v1/manage/users/{userID}"
-								r.args = args
-								r.count = 1
-								return r, true
-							default:
-								return
-							}
 						}
 
 					}

@@ -40,6 +40,7 @@ func findAuthorization(h http.Header, prefix string) (string, bool) {
 
 var operationRolesAdminCookieAuth = map[string][]string{
 	CreateAdminUserOperation:              []string{},
+	CreateUserManageOperation:             []string{},
 	GetAdminTokenInfoOperation:            []string{},
 	GetAnalysisReportManageOperation:      []string{},
 	GetTalkSessionListManageOperation:     []string{},
@@ -50,6 +51,8 @@ var operationRolesAdminCookieAuth = map[string][]string{
 	GetUserStatsTotalManageOperation:      []string{},
 	ListAdminUsersOperation:               []string{},
 	ManageRegenerateManageOperation:       []string{},
+	ResendUserInvitationManageOperation:   []string{},
+	SetUserPermissionsManageOperation:     []string{},
 	ToggleReportVisibilityManageOperation: []string{},
 }
 
@@ -90,6 +93,7 @@ var operationRolesCookieAuth = map[string][]string{
 	EditTimeLineOperation:                     []string{},
 	EstablishOrganizationOperation:            []string{},
 	EstablishUserOperation:                    []string{},
+	GetCurrentUserOperation:                   []string{},
 	GetDevicesOperation:                       []string{},
 	GetNotificationPreferencesOperation:       []string{},
 	GetOpenedTalkSessionOperation:             []string{},

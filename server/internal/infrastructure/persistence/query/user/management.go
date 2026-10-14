@@ -42,6 +42,7 @@ func (q *managementQuery) List(ctx context.Context, input userquery.ManagementLi
 		if err != nil {
 			return nil, err
 		}
+		u.PasswordSetupRequired = row.PasswordSetupRequired.Bool
 		users = append(users, *u)
 	}
 	return &userquery.ManagementListOutput{Users: users, TotalCount: total}, nil
@@ -57,18 +58,24 @@ func (q *managementQuery) FindByID(ctx context.Context, id shared.UUID[user.User
 	if err != nil {
 		return nil, err
 	}
-	return q.mapUser(ctx, row.User, row.Providers)
+	u, err := q.mapUser(ctx, row.User, row.Providers)
+	if err != nil {
+		return nil, err
+	}
+	u.PasswordSetupRequired = row.PasswordSetupRequired.Bool
+	return u, nil
 }
 
 func (q *managementQuery) mapUser(ctx context.Context, row model.User, providers []string) (*userquery.ManagedUser, error) {
 	u := &userquery.ManagedUser{
-		UserID:        shared.UUID[user.User](row.UserID),
-		DisplayID:     row.DisplayID.String,
-		DisplayName:   row.DisplayName.String,
-		EmailVerified: row.EmailVerified,
-		Providers:     providers,
-		CreatedAt:     row.CreatedAt,
-		UpdatedAt:     row.UpdatedAt,
+		CanCreateTalkSession: row.CanCreateTalkSession,
+		UserID:               shared.UUID[user.User](row.UserID),
+		DisplayID:            row.DisplayID.String,
+		DisplayName:          row.DisplayName.String,
+		EmailVerified:        row.EmailVerified,
+		Providers:            providers,
+		CreatedAt:            row.CreatedAt,
+		UpdatedAt:            row.UpdatedAt,
 	}
 	if u.Providers == nil {
 		u.Providers = []string{}

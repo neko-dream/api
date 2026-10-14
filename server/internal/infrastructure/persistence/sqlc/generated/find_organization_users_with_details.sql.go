@@ -14,7 +14,7 @@ import (
 const findOrganizationUsersWithDetails = `-- name: FindOrganizationUsersWithDetails :many
 SELECT
     ou.organization_user_id, ou.user_id, ou.organization_id, ou.created_at, ou.updated_at, ou.role,
-    u.user_id, u.display_id, u.display_name, u.icon_url, u.created_at, u.updated_at, u.email, u.email_verified, u.withdrawal_date,
+    u.user_id, u.display_id, u.display_name, u.icon_url, u.created_at, u.updated_at, u.email, u.email_verified, u.withdrawal_date, u.can_create_talk_session,
     o.organization_id, o.organization_type, o.name, o.owner_id, o.code, o.icon_url
 FROM organizations o
 LEFT JOIN organization_users ou ON o.organization_id = ou.organization_id
@@ -34,7 +34,7 @@ type FindOrganizationUsersWithDetailsRow struct {
 //
 //	SELECT
 //	    ou.organization_user_id, ou.user_id, ou.organization_id, ou.created_at, ou.updated_at, ou.role,
-//	    u.user_id, u.display_id, u.display_name, u.icon_url, u.created_at, u.updated_at, u.email, u.email_verified, u.withdrawal_date,
+//	    u.user_id, u.display_id, u.display_name, u.icon_url, u.created_at, u.updated_at, u.email, u.email_verified, u.withdrawal_date, u.can_create_talk_session,
 //	    o.organization_id, o.organization_type, o.name, o.owner_id, o.code, o.icon_url
 //	FROM organizations o
 //	LEFT JOIN organization_users ou ON o.organization_id = ou.organization_id
@@ -67,6 +67,7 @@ func (q *Queries) FindOrganizationUsersWithDetails(ctx context.Context, organiza
 			&i.User.Email,
 			&i.User.EmailVerified,
 			&i.User.WithdrawalDate,
+			&i.User.CanCreateTalkSession,
 			&i.Organization.OrganizationID,
 			&i.Organization.OrganizationType,
 			&i.Organization.Name,

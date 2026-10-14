@@ -1,5 +1,7 @@
 -- name: ListManagedUsers :many
 SELECT sqlc.embed(users),
+  EXISTS(SELECT 1 FROM password_setup_tokens WHERE password_setup_tokens.user_id = users.user_id)
+    AND NOT EXISTS(SELECT 1 FROM password_auth WHERE password_auth.user_id = users.user_id) AS password_setup_required,
   ARRAY(SELECT provider FROM user_auths WHERE user_auths.user_id = users.user_id
         UNION SELECT 'PASSWORD'::varchar FROM password_auth WHERE password_auth.user_id = users.user_id ORDER BY provider)::text[] AS providers
 FROM users
@@ -19,6 +21,8 @@ WHERE sqlc.arg(search)::text = ''
 
 -- name: GetManagedUser :one
 SELECT sqlc.embed(users),
+  EXISTS(SELECT 1 FROM password_setup_tokens WHERE password_setup_tokens.user_id = users.user_id)
+    AND NOT EXISTS(SELECT 1 FROM password_auth WHERE password_auth.user_id = users.user_id) AS password_setup_required,
   ARRAY(SELECT provider FROM user_auths WHERE user_auths.user_id = users.user_id
         UNION SELECT 'PASSWORD'::varchar FROM password_auth WHERE password_auth.user_id = users.user_id ORDER BY provider)::text[] AS providers
 FROM users WHERE users.user_id = $1;

@@ -136,4 +136,14 @@ var (
 		Code:       "TALKSESSION-0026",
 		Message:    "既に回答がある質問の種類は変更できません。",
 	}
+	TalkSessionCreationNotAllowed = &APIError{
+		StatusCode: 403,
+		Code:       "TALKSESSION-0027",
+		Message:    "セッションの作成は許可されていません。運営にお問い合わせください。",
+	}
+	TalkSessionOrganizationMembershipRequired = &APIError{
+		StatusCode: 403,
+		Code:       "TALKSESSION-0028",
+		Message:    "この組織のメンバーではありません。組織を指定せずにログインし直してください。",
+	}
 )

@@ -29,6 +29,7 @@ type userHandler struct {
 	withdrawUser user_usecase.Withdraw
 
 	userDetail           user_query.Detail
+	currentUser          user_query.Current
 	getByDisplayID       user_query.GetByDisplayID
 	authorizationService service.AuthorizationService
 	cookie.CookieManager
@@ -46,6 +47,7 @@ func NewUserHandler(
 	getByDisplayID user_query.GetByDisplayID,
 	authorizationService service.AuthorizationService,
 	cookieManager cookie.CookieManager,
+	currentUser user_query.Current,
 ) oas.UserHandler {
 	return &userHandler{
 		getMyOpinionsQuery:           getMyOpinionsQuery,
@@ -57,6 +59,7 @@ func NewUserHandler(
 		getByDisplayID:               getByDisplayID,
 		authorizationService:         authorizationService,
 		CookieManager:                cookieManager,
+		currentUser:                  currentUser,
 	}
 }
 

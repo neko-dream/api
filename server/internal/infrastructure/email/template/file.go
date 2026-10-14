@@ -3,6 +3,7 @@ package email_template
 import (
 	"embed"
 	"html/template"
+	"time"
 
 	"github.com/neko-dream/api/internal/infrastructure/config"
 )
@@ -18,6 +19,7 @@ const (
 	// VerificationEmailTemplate
 	VerificationEmailTemplate  EmailTemplateType = "verification_email.tpl"
 	PasswordLoginEmailTemplate EmailTemplateType = "password_login.tpl"
+	PasswordSetupEmailTemplate EmailTemplateType = "password_setup.tpl"
 	// OrganizationInvitationEmailTemplate
 	OrganizationInvitationEmailTemplate EmailTemplateType = "organization_invitation.tpl"
 )
@@ -54,6 +56,7 @@ func DataWithCommonFields(cfg *config.Config, data map[string]any) map[string]an
 	commonFields := map[string]any{
 		"AppName":    cfg.APP_NAME,
 		"WebsiteURL": cfg.WEBSITE_URL,
+		"Year":       time.Now().Year(),
 	}
 
 	for k, v := range data {

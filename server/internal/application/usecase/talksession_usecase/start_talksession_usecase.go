@@ -2,6 +2,8 @@ package talksession_usecase
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"time"
 	"unicode/utf8"
 
@@ -14,7 +16,6 @@ import (
 	"github.com/neko-dream/api/internal/domain/model/shared"
 	"github.com/neko-dream/api/internal/domain/model/talksession"
 	"github.com/neko-dream/api/internal/domain/model/user"
-	"github.com/neko-dream/api/internal/infrastructure/config"
 	"github.com/neko-dream/api/internal/infrastructure/persistence/db"
 	"github.com/neko-dream/api/pkg/utils"
 	"github.com/samber/lo"
@@ -51,10 +52,10 @@ type (
 		talksession.TalkSessionRepository
 		user.UserRepository
 		organization.OrganizationUserRepository
+		creationPermissions user.SessionCreationPermissionRepository
 		organization.OrganizationAliasRepository
 		talksession.PassphraseManager
 		*db.DBManager
-		*config.Config
 	}
 )
 
@@ -78,7 +79,7 @@ func NewStartTalkSessionUseCase(
 	organizationAliasRepository organization.OrganizationAliasRepository,
 	passphraseManager talksession.PassphraseManager,
 	DBManager *db.DBManager,
-	cfg *config.Config,
+	creationPermissions user.SessionCreationPermissionRepository,
 ) StartTalkSessionUseCase {
 	return &startTalkSessionHandler{
 		TalkSessionRepository:       talkSessionRepository,
@@ -87,7 +88,7 @@ func NewStartTalkSessionUseCase(
 		OrganizationAliasRepository: organizationAliasRepository,
 		PassphraseManager:           passphraseManager,
 		DBManager:                   DBManager,
-		Config:                      cfg,
+		creationPermissions:         creationPermissions,
 	}
 }
 
@@ -101,8 +102,18 @@ func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSe
 		utils.HandleError(ctx, err, "UserRepository.FindByID")
 		return StartTalkSessionUseCaseOutput{}, messages.UserNotFoundError
 	}
-	if owner != nil && owner.IsGuest() {
+	if owner == nil {
+		return StartTalkSessionUseCaseOutput{}, messages.UserNotFoundError
+	}
+	if owner.IsGuest() {
 		return StartTalkSessionUseCaseOutput{}, messages.GuestCannotCreateSessionError
+	}
+	granted, err := i.creationPermissions.Get(ctx, input.OwnerID)
+	if err != nil {
+		return StartTalkSessionUseCaseOutput{}, err
+	}
+	if !owner.CanCreateTalkSession(granted) {
+		return StartTalkSessionUseCaseOutput{}, messages.TalkSessionCreationNotAllowed
 	}
 
 	// セッションから組織IDとエイリアスIDを取得
@@ -114,26 +125,36 @@ func (i *startTalkSessionHandler) Execute(ctx context.Context, input StartTalkSe
 		organizationAliasID = input.OrganizationAliasID
 		// エイリアスから組織IDを取得
 		alias, err := i.OrganizationAliasRepository.FindByID(ctx, *input.OrganizationAliasID)
-		if err == nil && alias != nil {
-			orgID := alias.OrganizationID()
-			organizationID = &orgID
+		if err != nil {
+			if errors.Is(err, organization.ErrOrganizationAliasNotFound) {
+				return StartTalkSessionUseCaseOutput{}, messages.BadRequestError
+			}
+			return StartTalkSessionUseCaseOutput{}, errtrace.Wrap(err)
 		}
+		if alias == nil || !alias.IsActive() {
+			return StartTalkSessionUseCaseOutput{}, messages.BadRequestError
+		}
+		orgID := alias.OrganizationID()
+		organizationID = &orgID
 	} else if input.SessionClaim != nil && input.SessionClaim.OrganizationID != nil {
 		// セッションに組織IDがある場合
 		orgID, err := shared.ParseUUID[organization.Organization](*input.SessionClaim.OrganizationID)
-		if err == nil {
-			organizationID = &orgID
-		}
-	}
-	// ローカル環境以外ではOrganizationに所属していないとセッションを開始できない
-	if i.Config.Env != config.LOCAL {
-		orgs, err := i.OrganizationUserRepository.FindByUserID(ctx, input.OwnerID)
 		if err != nil {
-			utils.HandleError(ctx, err, "OrganizationUserRepository.FindByUserID")
-			return StartTalkSessionUseCaseOutput{}, messages.ForbiddenError
+			return StartTalkSessionUseCaseOutput{}, messages.BadRequestError
 		}
-		if len(orgs) == 0 {
-			return StartTalkSessionUseCaseOutput{}, messages.ForbiddenError
+		organizationID = &orgID
+	}
+	// Creation permission does not authorize using another organization's identity.
+	if organizationID != nil {
+		membership, err := i.OrganizationUserRepository.FindByOrganizationIDAndUserID(ctx, *organizationID, input.OwnerID)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return StartTalkSessionUseCaseOutput{}, messages.TalkSessionOrganizationMembershipRequired
+			}
+			return StartTalkSessionUseCaseOutput{}, errtrace.Wrap(err)
+		}
+		if membership == nil {
+			return StartTalkSessionUseCaseOutput{}, messages.TalkSessionOrganizationMembershipRequired
 		}
 	}
 

@@ -123,6 +123,15 @@ func (UnimplementedHandler) CreateTalkSessionSurvey(ctx context.Context, req *Cr
 	return r, ht.ErrNotImplemented
 }
 
+// CreateUserManage implements createUserManage operation.
+//
+// メールログイン用ユーザーを作成し、初回パスワード設定メールを送信する.
+//
+// POST /v1/manage/users
+func (UnimplementedHandler) CreateUserManage(ctx context.Context, req *InviteManagedUserRequest) (r *ManagedUserInvitation, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // DeleteDevice implements deleteDevice operation.
 //
 // デバイス削除.
@@ -218,6 +227,15 @@ func (UnimplementedHandler) GetAnalysisReportManage(ctx context.Context, params 
 //
 // GET /talksessions/{talkSessionID}/conclusion
 func (UnimplementedHandler) GetConclusion(ctx context.Context, params GetConclusionParams) (r GetConclusionRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetCurrentUser implements getCurrentUser operation.
+//
+// ログイン中ユーザーと現在の権限.
+//
+// GET /users/me
+func (UnimplementedHandler) GetCurrentUser(ctx context.Context) (r *CurrentUser, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -317,6 +335,15 @@ func (UnimplementedHandler) GetOrganizationUsers(ctx context.Context) (r GetOrga
 //
 // GET /organizations
 func (UnimplementedHandler) GetOrganizations(ctx context.Context) (r GetOrganizationsRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetPasswordPolicy implements getPasswordPolicy operation.
+//
+// 入力条件はサーバーの共通パスワード検証から取得する。秘密値は返さない。.
+//
+// GET /auth/password/policy
+func (UnimplementedHandler) GetPasswordPolicy(ctx context.Context) (r *GetPasswordPolicyOK, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -737,6 +764,13 @@ func (UnimplementedHandler) ReportOpinion(ctx context.Context, req *ReportOpinio
 	return r, ht.ErrNotImplemented
 }
 
+// ResendUserInvitationManage implements resendUserInvitationManage operation.
+//
+// POST /v1/manage/users/{userID}/invitation
+func (UnimplementedHandler) ResendUserInvitationManage(ctx context.Context, params ResendUserInvitationManageParams) (r *ManagedUserInvitation, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // RevokeToken implements revokeToken operation.
 //
 // トークンを失効（ログアウト）.
@@ -762,6 +796,22 @@ func (UnimplementedHandler) SendTestNotification(ctx context.Context, req *SendT
 // GET /talksessions/histories
 func (UnimplementedHandler) SessionsHistory(ctx context.Context, params SessionsHistoryParams) (r SessionsHistoryRes, _ error) {
 	return r, ht.ErrNotImplemented
+}
+
+// SetUserPermissionsManage implements setUserPermissionsManage operation.
+//
+// PUT /v1/manage/users/{userID}/permissions
+func (UnimplementedHandler) SetUserPermissionsManage(ctx context.Context, req *UserPermissions, params SetUserPermissionsManageParams) (r *UserPermissions, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// SetupPassword implements setupPassword operation.
+//
+// メールから初回パスワードを設定する（ログインCookieは発行しない）.
+//
+// POST /auth/password/setup
+func (UnimplementedHandler) SetupPassword(ctx context.Context, req *SetupPasswordReq) error {
+	return ht.ErrNotImplemented
 }
 
 // SolveOpinionReport implements solveOpinionReport operation.

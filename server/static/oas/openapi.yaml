@@ -295,6 +295,34 @@ paths:
       security:
         - {}
       x-ogen-operation-group: Auth
+  /auth/password/policy:
+    get:
+      operationId: getPasswordPolicy
+      summary: 新規設定・変更用のパスワード入力条件
+      description: 入力条件はサーバーの共通パスワード検証から取得する。秘密値は返さない。
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  minLength:
+                    type: integer
+                    format: int32
+                  maxBytes:
+                    type: integer
+                    format: int32
+                required:
+                  - minLength
+                  - maxBytes
+      tags:
+        - auth
+      security:
+        - {}
+      x-ogen-operation-group: Auth
   /auth/password/register:
     post:
       operationId: passwordRegister
@@ -335,6 +363,35 @@ paths:
               required:
                 - password
                 - email
+      security:
+        - {}
+      x-ogen-operation-group: Auth
+  /auth/password/setup:
+    post:
+      operationId: setupPassword
+      summary: メールから初回パスワードを設定する（ログインCookieは発行しない）
+      parameters: []
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+      tags:
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  minLength: 44
+                  maxLength: 44
+                password:
+                  type: string
+              required:
+                - token
+                - password
       security:
         - {}
       x-ogen-operation-group: Auth
@@ -4202,6 +4259,21 @@ paths:
       security:
         - {}
       x-ogen-operation-group: User
+  /users/me:
+    get:
+      operationId: getCurrentUser
+      summary: ログイン中ユーザーと現在の権限
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentUser'
+      tags:
+        - user
+      x-ogen-operation-group: user
   /users/{displayID}/talksessions:
     get:
       operationId: getUserTalkSessions
@@ -4583,6 +4655,29 @@ paths:
       security:
         - AdminCookieAuth: []
       x-ogen-operation-group: manage
+  /v1/manage/users:
+    post:
+      operationId: createUserManage
+      summary: メールログイン用ユーザーを作成し、初回パスワード設定メールを送信する
+      parameters: []
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManagedUserInvitation'
+      tags:
+        - manage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InviteManagedUserRequest'
+      security:
+        - AdminCookieAuth: []
+      x-ogen-operation-group: manage
   /v1/manage/users/list:
     get:
       operationId: getUserListManage
@@ -4701,6 +4796,54 @@ paths:
                 type: object
       tags:
         - manage
+      security:
+        - AdminCookieAuth: []
+      x-ogen-operation-group: manage
+  /v1/manage/users/{userID}/invitation:
+    post:
+      operationId: resendUserInvitationManage
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManagedUserInvitation'
+      tags:
+        - manage
+      security:
+        - AdminCookieAuth: []
+      x-ogen-operation-group: manage
+  /v1/manage/users/{userID}/permissions:
+    put:
+      operationId: setUserPermissionsManage
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPermissions'
+      tags:
+        - manage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPermissions'
       security:
         - AdminCookieAuth: []
       x-ogen-operation-group: manage
@@ -4848,6 +4991,19 @@ components:
         displayName:
           type: string
       description: 管理者作成リクエスト
+    CurrentUser:
+      type: object
+      required:
+        - userID
+        - user
+        - permissions
+      properties:
+        userID:
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
+        permissions:
+          $ref: '#/components/schemas/UserPermissions'
     Device:
       type: object
       required:
@@ -4889,6 +5045,20 @@ components:
           type: string
         message:
           type: string
+    InviteManagedUserRequest:
+      type: object
+      required:
+        - displayName
+        - email
+      properties:
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 50
+        email:
+          type: string
+          minLength: 3
+          maxLength: 254
     Location:
       type: object
       properties:
@@ -4901,14 +5071,18 @@ components:
     ManagedUser:
       type: object
       required:
+        - permissions
         - userID
         - displayID
         - displayName
         - emailVerified
+        - passwordSetupRequired
         - providers
         - createdAt
         - updatedAt
       properties:
+        permissions:
+          $ref: '#/components/schemas/UserPermissions'
         userID:
           type: string
         displayID:
@@ -4918,6 +5092,8 @@ components:
         email:
           type: string
         emailVerified:
+          type: boolean
+        passwordSetupRequired:
           type: boolean
         providers:
           type: array
@@ -4932,6 +5108,16 @@ components:
         withdrawalDate:
           type: string
           format: date-time
+    ManagedUserInvitation:
+      type: object
+      required:
+        - userID
+        - invitationSent
+      properties:
+        userID:
+          type: string
+        invitationSent:
+          type: boolean
     ManagedUserList:
       type: object
       required:
@@ -5935,6 +6121,13 @@ components:
         perimeterIndex:
           type: integer
           description: 境界ポイントのインデックス
+    UserPermissions:
+      type: object
+      required:
+        - canCreateTalkSession
+      properties:
+        canCreateTalkSession:
+          type: boolean
     UserStatsResponse:
       type: object
       required:
