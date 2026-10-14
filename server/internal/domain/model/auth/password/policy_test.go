@@ -11,7 +11,7 @@ import (
 func TestPasswordPolicy(t *testing.T) {
 	for _, pepperBytes := range []int{0, 6, 17, 36, 60} {
 		policy, err := NewPasswordPolicy(pepperBytes)
-		if err != nil || policy.MinLength != 12 || policy.MaxBytes != 72-pepperBytes {
+		if err != nil || policy.MinLength != 12 || policy.MaxBytes != 72-pepperBytes || !policy.ForbidControlCharacters || !policy.ForbidSurroundingWhitespace {
 			t.Fatalf("incorrect public policy: %#v %v", policy, err)
 		}
 		cases := []struct {
