@@ -878,6 +878,71 @@ func decodeEditTalkSessionParams(args [1]string, argsEscaped bool, r *http.Reque
 	return params, nil
 }
 
+// EditTalkSessionManageParams is parameters of editTalkSessionManage operation.
+type EditTalkSessionManageParams struct {
+	TalkSessionID string
+}
+
+func unpackEditTalkSessionManageParams(packed middleware.Parameters) (params EditTalkSessionManageParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "talkSessionID",
+			In:   "path",
+		}
+		params.TalkSessionID = packed[key].(string)
+	}
+	return params
+}
+
+func decodeEditTalkSessionManageParams(args [1]string, argsEscaped bool, r *http.Request) (params EditTalkSessionManageParams, _ error) {
+	// Decode path: talkSessionID.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "talkSessionID",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.TalkSessionID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "talkSessionID",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // EditTimeLineParams is parameters of editTimeLine operation.
 type EditTimeLineParams struct {
 	TalkSessionID string

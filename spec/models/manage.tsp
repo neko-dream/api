@@ -49,6 +49,48 @@ namespace kotohiro {
     hidden: boolean;
     updatedAt: string;
     createdAt: string;
+
+    /** ホームの一覧に表示しない */
+    hideTop: boolean;
+
+    /** レポートを表示しない */
+    hideReport: boolean;
+
+    /** 分析を無効にする */
+    disableAnalysis: boolean;
+
+    /** 参加制限のキー（GET /talksessions/restrictions の key） */
+    restrictions: string[];
+
+    /** アンケートがあるか */
+    hasSurvey: boolean;
+
+    /** 意見を投稿したか投票したユーザーの数。参加制限を変えるときの警告に使う */
+    participantCount: int32;
+  }
+
+  model TalkSessionEditForManage {
+    /** 1〜100文字 */
+    theme: string;
+
+    /** 本文（HTML）。40000文字まで */
+    description: string;
+
+    /** 変更する場合は未来の日時にする。変更しない場合は現在の値をそのまま送る */
+    scheduledEndTime: utcDateTime;
+
+    /** 空文字は未設定として扱う */
+    prefecture: string;
+
+    /** 空文字は未設定として扱う */
+    city: string;
+
+    hideTop: boolean;
+    hideReport: boolean;
+    disableAnalysis: boolean;
+
+    /** 参加制限のキー。survey.answered はアンケートがあるセッションにだけ付けられる */
+    restrictions: string[];
   }
 
   model TalkSessionStats {
@@ -60,7 +102,13 @@ namespace kotohiro {
     city?: string;
     prefecture?: string;
     thumbnailURL: string;
+
+    /** レポートを表示しない（hideReport と同じ値） */
     hidden: boolean;
+
+    /** ホームの一覧に表示しない */
+    hideTop: boolean;
+
     updatedAt: string;
     createdAt: string;
     opinionCount: int32;

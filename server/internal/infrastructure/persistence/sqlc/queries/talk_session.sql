@@ -285,3 +285,11 @@ LIMIT $1 OFFSET $2;
 SELECT
     COUNT(DISTINCT talk_sessions.talk_session_id) AS talk_session_count
 FROM talk_sessions;
+
+-- name: CountTalkSessionParticipants :one
+SELECT COUNT(*)::int AS participant_count
+FROM (
+    SELECT user_id FROM opinions WHERE opinions.talk_session_id = $1
+    UNION
+    SELECT user_id FROM votes WHERE votes.talk_session_id = $1
+) participants;

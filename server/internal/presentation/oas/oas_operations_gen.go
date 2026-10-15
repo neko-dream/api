@@ -24,6 +24,7 @@ const (
 	DevAuthorizeOperation                       OperationName = "DevAuthorize"
 	DummyInitOperation                          OperationName = "DummyInit"
 	EditTalkSessionOperation                    OperationName = "EditTalkSession"
+	EditTalkSessionManageOperation              OperationName = "EditTalkSessionManage"
 	EditTimeLineOperation                       OperationName = "EditTimeLine"
 	EstablishOrganizationOperation              OperationName = "EstablishOrganization"
 	EstablishUserOperation                      OperationName = "EstablishUser"

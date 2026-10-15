@@ -177,6 +177,15 @@ func (UnimplementedHandler) EditTalkSession(ctx context.Context, req *EditTalkSe
 	return r, ht.ErrNotImplemented
 }
 
+// EditTalkSessionManage implements editTalkSessionManage operation.
+//
+// 管理者がセッションの内容・表示設定・参加制限を編集する。変更は監査ログに残す。.
+//
+// PUT /v1/manage/talksessions/{talkSessionID}
+func (UnimplementedHandler) EditTalkSessionManage(ctx context.Context, req *TalkSessionEditForManage, params EditTalkSessionManageParams) (r *TalkSessionForManage, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // EditTimeLine implements editTimeLine operation.
 //
 // タイムライン編集.

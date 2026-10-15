@@ -11,6 +11,7 @@ import { env } from "./config/env";
 import { LoginPage } from "./pages/login";
 import { AdminUserCreate } from "./pages/admin-users/create";
 import { AdminUserList } from "./pages/admin-users/list";
+import { TalkSessionEdit } from "./pages/talksessions/edit";
 import { TalkSessionList } from "./pages/talksessions/list";
 import { UserList } from "./pages/users/list";
 import { UserShow } from "./pages/users/show";
@@ -40,6 +41,7 @@ function App() {
                   {
                     name: "talksessions",
                     list: "/talksessions",
+                    edit: "/talksessions/edit/:id",
                     meta: { label: "トークセッション" },
                   },
                   {
@@ -70,6 +72,7 @@ function App() {
                   >
                     <Route index element={<NavigateToResource resource="talksessions" />} />
                     <Route path="/talksessions" element={<TalkSessionList />} />
+                    <Route path="/talksessions/edit/:id" element={<TalkSessionEdit />} />
                     <Route path="/users" element={<UserList />} />
                     <Route path="/users/create" element={<UserCreate />} />
                     <Route path="/users/show/:id" element={<UserShow />} />
