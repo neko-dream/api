@@ -5724,6 +5724,7 @@ components:
         - scheduledEndTime
         - thumbnailURL
         - hidden
+        - hideTop
         - updatedAt
         - createdAt
         - opinionCount
@@ -5750,6 +5751,10 @@ components:
           type: string
         hidden:
           type: boolean
+          description: レポートを表示しない（hideReport と同じ値）
+        hideTop:
+          type: boolean
+          description: ホームの一覧に表示しない
         updatedAt:
           type: string
         createdAt:

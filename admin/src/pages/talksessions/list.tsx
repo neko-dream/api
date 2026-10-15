@@ -11,7 +11,7 @@ interface TalkSessionStat {
   scheduledEndTime: string;
   opinionCount: number;
   voteCount: number;
-  hidden: boolean;
+  hideTop: boolean;
 }
 
 const PAGE_SIZE = 20;
@@ -86,11 +86,11 @@ export const TalkSessionList = () => {
             render: (v: string) => (v ? new Date(v).toLocaleString("ja-JP") : ""),
           },
           {
-            title: "表示",
-            dataIndex: "hidden",
-            width: 90,
-            render: (hidden: boolean) =>
-              hidden ? <Tag color="red">非表示</Tag> : <Tag color="green">表示</Tag>,
+            title: "ホーム一覧",
+            dataIndex: "hideTop",
+            width: 110,
+            render: (hideTop: boolean) =>
+              hideTop ? <Tag>表示しない</Tag> : <Tag color="green">表示する</Tag>,
           },
           {
             title: "",

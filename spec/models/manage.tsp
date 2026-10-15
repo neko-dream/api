@@ -102,7 +102,13 @@ namespace kotohiro {
     city?: string;
     prefecture?: string;
     thumbnailURL: string;
+
+    /** レポートを表示しない（hideReport と同じ値） */
     hidden: boolean;
+
+    /** ホームの一覧に表示しない */
+    hideTop: boolean;
+
     updatedAt: string;
     createdAt: string;
     opinionCount: int32;

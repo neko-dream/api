@@ -8001,13 +8001,16 @@ type TalkSessionStats struct {
 	City             OptString     `json:"city"`
 	Prefecture       OptString     `json:"prefecture"`
 	ThumbnailURL     string        `json:"thumbnailURL"`
-	Hidden           bool          `json:"hidden"`
-	UpdatedAt        string        `json:"updatedAt"`
-	CreatedAt        string        `json:"createdAt"`
-	OpinionCount     int32         `json:"opinionCount"`
-	OpinionUserCount int32         `json:"opinionUserCount"`
-	VoteCount        int32         `json:"voteCount"`
-	VoteUserCount    int32         `json:"voteUserCount"`
+	// レポートを表示しない（hideReport と同じ値）.
+	Hidden bool `json:"hidden"`
+	// ホームの一覧に表示しない.
+	HideTop          bool   `json:"hideTop"`
+	UpdatedAt        string `json:"updatedAt"`
+	CreatedAt        string `json:"createdAt"`
+	OpinionCount     int32  `json:"opinionCount"`
+	OpinionUserCount int32  `json:"opinionUserCount"`
+	VoteCount        int32  `json:"voteCount"`
+	VoteUserCount    int32  `json:"voteUserCount"`
 }
 
 // GetTalkSessionID returns the value of TalkSessionID.
@@ -8053,6 +8056,11 @@ func (s *TalkSessionStats) GetThumbnailURL() string {
 // GetHidden returns the value of Hidden.
 func (s *TalkSessionStats) GetHidden() bool {
 	return s.Hidden
+}
+
+// GetHideTop returns the value of HideTop.
+func (s *TalkSessionStats) GetHideTop() bool {
+	return s.HideTop
 }
 
 // GetUpdatedAt returns the value of UpdatedAt.
@@ -8128,6 +8136,11 @@ func (s *TalkSessionStats) SetThumbnailURL(val string) {
 // SetHidden sets the value of Hidden.
 func (s *TalkSessionStats) SetHidden(val bool) {
 	s.Hidden = val
+}
+
+// SetHideTop sets the value of HideTop.
+func (s *TalkSessionStats) SetHideTop(val bool) {
+	s.HideTop = val
 }
 
 // SetUpdatedAt sets the value of UpdatedAt.

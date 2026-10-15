@@ -20719,6 +20719,10 @@ func (s *TalkSessionStats) encodeFields(e *jx.Encoder) {
 		e.Bool(s.Hidden)
 	}
 	{
+		e.FieldStart("hideTop")
+		e.Bool(s.HideTop)
+	}
+	{
 		e.FieldStart("updatedAt")
 		e.Str(s.UpdatedAt)
 	}
@@ -20744,7 +20748,7 @@ func (s *TalkSessionStats) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfTalkSessionStats = [15]string{
+var jsonFieldsNameOfTalkSessionStats = [16]string{
 	0:  "talkSessionID",
 	1:  "theme",
 	2:  "description",
@@ -20754,12 +20758,13 @@ var jsonFieldsNameOfTalkSessionStats = [15]string{
 	6:  "prefecture",
 	7:  "thumbnailURL",
 	8:  "hidden",
-	9:  "updatedAt",
-	10: "createdAt",
-	11: "opinionCount",
-	12: "opinionUserCount",
-	13: "voteCount",
-	14: "voteUserCount",
+	9:  "hideTop",
+	10: "updatedAt",
+	11: "createdAt",
+	12: "opinionCount",
+	13: "opinionUserCount",
+	14: "voteCount",
+	15: "voteUserCount",
 }
 
 // Decode decodes TalkSessionStats from json.
@@ -20873,8 +20878,20 @@ func (s *TalkSessionStats) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"hidden\"")
 			}
-		case "updatedAt":
+		case "hideTop":
 			requiredBitSet[1] |= 1 << 1
+			if err := func() error {
+				v, err := d.Bool()
+				s.HideTop = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hideTop\"")
+			}
+		case "updatedAt":
+			requiredBitSet[1] |= 1 << 2
 			if err := func() error {
 				v, err := d.Str()
 				s.UpdatedAt = string(v)
@@ -20886,7 +20903,7 @@ func (s *TalkSessionStats) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"updatedAt\"")
 			}
 		case "createdAt":
-			requiredBitSet[1] |= 1 << 2
+			requiredBitSet[1] |= 1 << 3
 			if err := func() error {
 				v, err := d.Str()
 				s.CreatedAt = string(v)
@@ -20898,7 +20915,7 @@ func (s *TalkSessionStats) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"createdAt\"")
 			}
 		case "opinionCount":
-			requiredBitSet[1] |= 1 << 3
+			requiredBitSet[1] |= 1 << 4
 			if err := func() error {
 				v, err := d.Int32()
 				s.OpinionCount = int32(v)
@@ -20910,7 +20927,7 @@ func (s *TalkSessionStats) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"opinionCount\"")
 			}
 		case "opinionUserCount":
-			requiredBitSet[1] |= 1 << 4
+			requiredBitSet[1] |= 1 << 5
 			if err := func() error {
 				v, err := d.Int32()
 				s.OpinionUserCount = int32(v)
@@ -20922,7 +20939,7 @@ func (s *TalkSessionStats) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"opinionUserCount\"")
 			}
 		case "voteCount":
-			requiredBitSet[1] |= 1 << 5
+			requiredBitSet[1] |= 1 << 6
 			if err := func() error {
 				v, err := d.Int32()
 				s.VoteCount = int32(v)
@@ -20934,7 +20951,7 @@ func (s *TalkSessionStats) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"voteCount\"")
 			}
 		case "voteUserCount":
-			requiredBitSet[1] |= 1 << 6
+			requiredBitSet[1] |= 1 << 7
 			if err := func() error {
 				v, err := d.Int32()
 				s.VoteUserCount = int32(v)
@@ -20956,7 +20973,7 @@ func (s *TalkSessionStats) Decode(d *jx.Decoder) error {
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
 		0b10011111,
-		0b01111111,
+		0b11111111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

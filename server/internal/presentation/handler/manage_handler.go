@@ -298,6 +298,7 @@ func (m *manageHandler) GetTalkSessionListManage(ctx context.Context, params oas
 			Prefecture:       prefecture,
 			ThumbnailURL:     thumbnailURL,
 			Hidden:           row.TalkSession.HideReport.Bool,
+			HideTop:          row.TalkSession.HideTop,
 			Owner:            owner,
 			ScheduledEndTime: row.TalkSession.ScheduledEndTime,
 			CreatedAt:        row.TalkSession.CreatedAt.Format(time.RFC3339),
