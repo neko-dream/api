@@ -414,3 +414,25 @@ func BenchmarkToNullableSQL_AllTypes(b *testing.B) {
 		}
 	}
 }
+
+// shared.UUID[T] のように uuid.UUID を元にした型
+type typedUUID uuid.UUID
+
+func TestToNullableSQL_TypedUUID(t *testing.T) {
+	id := uuid.New()
+	typed := typedUUID(id)
+
+	if got := utils.ToNullableSQL[uuid.NullUUID](&typed); got != (uuid.NullUUID{UUID: id, Valid: true}) {
+		t.Errorf("pointer: got %+v", got)
+	}
+	if got := utils.ToNullableSQL[uuid.NullUUID](typed); got != (uuid.NullUUID{UUID: id, Valid: true}) {
+		t.Errorf("value: got %+v", got)
+	}
+	var nilTyped *typedUUID
+	if got := utils.ToNullableSQL[uuid.NullUUID](nilTyped); got.Valid {
+		t.Errorf("nil pointer: got %+v", got)
+	}
+	if got := utils.ToNullableSQL[uuid.NullUUID](id); got != (uuid.NullUUID{UUID: id, Valid: true}) {
+		t.Errorf("uuid.UUID: got %+v", got)
+	}
+}
