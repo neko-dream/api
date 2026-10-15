@@ -69,12 +69,14 @@ type ActionItem struct {
 }
 
 type AdminSession struct {
-	AdminSessionID uuid.UUID
-	AdminUserID    uuid.UUID
-	TokenHash      string
-	ExpiresAt      time.Time
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
+	AdminSessionID    uuid.UUID
+	AdminUserID       uuid.UUID
+	TokenHash         string
+	ExpiresAt         time.Time
+	CreatedAt         time.Time
+	UpdatedAt         time.Time
+	PreviousTokenHash sql.NullString
+	RotatedAt         sql.NullTime
 }
 
 type AdminUser struct {

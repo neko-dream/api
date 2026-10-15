@@ -87,11 +87,14 @@ func (h *adminHandler) CreateAdminUser(ctx context.Context, req *oas.CreateAdmin
 }
 
 // sessionCookies は access(AdminSessionId) と refresh(AdminRefreshToken) の Set-Cookie を生成する。
+// リフレッシュトークンが空（ローテーション直後の猶予期間内のリフレッシュ）のときは、
+// 先にローテーションしたタブが受け取った新しいリフレッシュトークンを上書きしないよう access だけを返す。
 func (h *adminHandler) sessionCookies(out *admin_usecase.AdminAuthOutput) []string {
-	return cookie_utils.EncodeCookies([]*http.Cookie{
-		h.cookieManager.CreateAdminSessionCookie(out.AccessToken),
-		h.cookieManager.CreateAdminRefreshCookie(out.RefreshToken),
-	})
+	cookies := []*http.Cookie{h.cookieManager.CreateAdminSessionCookie(out.AccessToken)}
+	if out.RefreshToken != "" {
+		cookies = append(cookies, h.cookieManager.CreateAdminRefreshCookie(out.RefreshToken))
+	}
+	return cookie_utils.EncodeCookies(cookies)
 }
 
 func (h *adminHandler) tokenInfo(out *admin_usecase.AdminAuthOutput) oas.AdminTokenInfo {
