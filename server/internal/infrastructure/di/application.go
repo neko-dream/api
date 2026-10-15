@@ -88,6 +88,7 @@ func useCaseDeps() []ProvideArg {
 		{admin_usecase.NewCreateAdminUser, nil},
 		{admin_usecase.NewSetSessionCreationPermission, nil},
 		{admin_usecase.NewManageUserInvitations, nil},
+		{admin_usecase.NewEditTalkSession, nil},
 		{auth_usecase.NewGuestLogin, nil},
 		{timeline_usecase.NewAddTimeLine, nil},
 		{timeline_usecase.NewEditTimeLine, nil},
