@@ -44,7 +44,8 @@ export function TalkSessionEdit() {
   const navigate = useNavigate();
   const { modal } = App.useApp();
   const [form] = Form.useForm<TalkSessionEditValues>();
-  const description = Form.useWatch("description", form) ?? "";
+  // 入力に合わせてプレビューを再描画するために購読する。値はフォームの現在値から読む
+  Form.useWatch("description", form);
   const { query, result: session } = useShow<ManagedTalkSession>({
     resource: "talksessions",
     id,
@@ -53,6 +54,9 @@ export function TalkSessionEdit() {
   const invalidate = useInvalidate();
   const [options, setOptions] = useState<RestrictionOption[] | null>(null);
   const [optionsError, setOptionsError] = useState(false);
+  // フォームに値を入れたセッションのID。値を入れる前に作った iframe は、
+  // 直後の srcdoc の書き換えが反映されず空のままになるため、値を入れてから作る
+  const [initializedID, setInitializedID] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -66,7 +70,9 @@ export function TalkSessionEdit() {
   }, []);
 
   useEffect(() => {
-    if (session) form.setFieldsValue(toEditValues(session));
+    if (!session) return;
+    form.setFieldsValue(toEditValues(session));
+    setInitializedID(session.talkSessionID);
   }, [session, form]);
 
   const save = (values: TalkSessionEditValues) => {
@@ -193,18 +199,21 @@ export function TalkSessionEdit() {
                     extra="web と同じ条件で表示します。使えないタグ（見出しなど）は文字のまま表示されます"
                   >
                     {/* 利用者が書いたHTMLなので、スクリプトを動かさない sandbox 付き iframe で表示する */}
-                    <iframe
-                      title="本文のプレビュー"
-                      sandbox="allow-popups allow-popups-to-escape-sandbox"
-                      srcDoc={buildPreviewDocument(description)}
-                      style={{
-                        width: "100%",
-                        height: 318,
-                        border: "1px solid #d9d9d9",
-                        borderRadius: 6,
-                        background: "#fff",
-                      }}
-                    />
+                    {initializedID === session.talkSessionID && (
+                      <iframe
+                        key={session.talkSessionID}
+                        title="本文のプレビュー"
+                        sandbox="allow-popups allow-popups-to-escape-sandbox"
+                        srcDoc={buildPreviewDocument(form.getFieldValue("description") ?? "")}
+                        style={{
+                          width: "100%",
+                          height: 318,
+                          border: "1px solid #d9d9d9",
+                          borderRadius: 6,
+                          background: "#fff",
+                        }}
+                      />
+                    )}
                   </Form.Item>
                 </Col>
               </Row>
