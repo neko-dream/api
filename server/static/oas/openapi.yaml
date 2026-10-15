@@ -4591,6 +4591,33 @@ paths:
       security:
         - AdminCookieAuth: []
       x-ogen-operation-group: manage
+    put:
+      operationId: editTalkSessionManage
+      description: 管理者がセッションの内容・表示設定・参加制限を編集する。変更は監査ログに残す。
+      parameters:
+        - name: talkSessionID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TalkSessionForManage'
+      tags:
+        - manage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TalkSessionEditForManage'
+      security:
+        - AdminCookieAuth: []
+      x-ogen-operation-group: manage
   /v1/manage/talksessions/{talkSessionID}/analysis/regenerate:
     post:
       operationId: manageRegenerateManage
@@ -5571,6 +5598,46 @@ components:
         isLocked:
           type: boolean
           description: 合言葉でロックされたセッションかどうか
+    TalkSessionEditForManage:
+      type: object
+      required:
+        - theme
+        - description
+        - scheduledEndTime
+        - prefecture
+        - city
+        - hideTop
+        - hideReport
+        - disableAnalysis
+        - restrictions
+      properties:
+        theme:
+          type: string
+          description: 1〜100文字
+        description:
+          type: string
+          description: 本文（HTML）。40000文字まで
+        scheduledEndTime:
+          type: string
+          format: date-time
+          description: 変更する場合は未来の日時にする。変更しない場合は現在の値をそのまま送る
+        prefecture:
+          type: string
+          description: 空文字は未設定として扱う
+        city:
+          type: string
+          description: 空文字は未設定として扱う
+        hideTop:
+          type: boolean
+        hideReport:
+          type: boolean
+        disableAnalysis:
+          type: boolean
+        restrictions:
+          type: array
+          items:
+            type: string
+          description: 参加制限のキー。survey.answered はアンケートがあるセッションにだけ付けられる
     TalkSessionForManage:
       type: object
       required:
@@ -5583,6 +5650,12 @@ components:
         - hidden
         - updatedAt
         - createdAt
+        - hideTop
+        - hideReport
+        - disableAnalysis
+        - restrictions
+        - hasSurvey
+        - participantCount
       properties:
         talkSessionID:
           type: string
@@ -5607,6 +5680,27 @@ components:
           type: string
         createdAt:
           type: string
+        hideTop:
+          type: boolean
+          description: ホームの一覧に表示しない
+        hideReport:
+          type: boolean
+          description: レポートを表示しない
+        disableAnalysis:
+          type: boolean
+          description: 分析を無効にする
+        restrictions:
+          type: array
+          items:
+            type: string
+          description: 参加制限のキー（GET /talksessions/restrictions の key）
+        hasSurvey:
+          type: boolean
+          description: アンケートがあるか
+        participantCount:
+          type: integer
+          format: int32
+          description: 意見を投稿したか投票したユーザーの数。参加制限を変えるときの警告に使う
     TalkSessionListResponse:
       type: object
       required:

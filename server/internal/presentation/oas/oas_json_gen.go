@@ -19922,6 +19922,251 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) UnmarshalJSON(data 
 }
 
 // Encode implements json.Marshaler.
+func (s *TalkSessionEditForManage) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *TalkSessionEditForManage) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("theme")
+		e.Str(s.Theme)
+	}
+	{
+		e.FieldStart("description")
+		e.Str(s.Description)
+	}
+	{
+		e.FieldStart("scheduledEndTime")
+		json.EncodeDateTime(e, s.ScheduledEndTime)
+	}
+	{
+		e.FieldStart("prefecture")
+		e.Str(s.Prefecture)
+	}
+	{
+		e.FieldStart("city")
+		e.Str(s.City)
+	}
+	{
+		e.FieldStart("hideTop")
+		e.Bool(s.HideTop)
+	}
+	{
+		e.FieldStart("hideReport")
+		e.Bool(s.HideReport)
+	}
+	{
+		e.FieldStart("disableAnalysis")
+		e.Bool(s.DisableAnalysis)
+	}
+	{
+		e.FieldStart("restrictions")
+		e.ArrStart()
+		for _, elem := range s.Restrictions {
+			e.Str(elem)
+		}
+		e.ArrEnd()
+	}
+}
+
+var jsonFieldsNameOfTalkSessionEditForManage = [9]string{
+	0: "theme",
+	1: "description",
+	2: "scheduledEndTime",
+	3: "prefecture",
+	4: "city",
+	5: "hideTop",
+	6: "hideReport",
+	7: "disableAnalysis",
+	8: "restrictions",
+}
+
+// Decode decodes TalkSessionEditForManage from json.
+func (s *TalkSessionEditForManage) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode TalkSessionEditForManage to nil")
+	}
+	var requiredBitSet [2]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "theme":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Str()
+				s.Theme = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"theme\"")
+			}
+		case "description":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := d.Str()
+				s.Description = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"description\"")
+			}
+		case "scheduledEndTime":
+			requiredBitSet[0] |= 1 << 2
+			if err := func() error {
+				v, err := json.DecodeDateTime(d)
+				s.ScheduledEndTime = v
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"scheduledEndTime\"")
+			}
+		case "prefecture":
+			requiredBitSet[0] |= 1 << 3
+			if err := func() error {
+				v, err := d.Str()
+				s.Prefecture = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"prefecture\"")
+			}
+		case "city":
+			requiredBitSet[0] |= 1 << 4
+			if err := func() error {
+				v, err := d.Str()
+				s.City = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"city\"")
+			}
+		case "hideTop":
+			requiredBitSet[0] |= 1 << 5
+			if err := func() error {
+				v, err := d.Bool()
+				s.HideTop = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hideTop\"")
+			}
+		case "hideReport":
+			requiredBitSet[0] |= 1 << 6
+			if err := func() error {
+				v, err := d.Bool()
+				s.HideReport = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hideReport\"")
+			}
+		case "disableAnalysis":
+			requiredBitSet[0] |= 1 << 7
+			if err := func() error {
+				v, err := d.Bool()
+				s.DisableAnalysis = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"disableAnalysis\"")
+			}
+		case "restrictions":
+			requiredBitSet[1] |= 1 << 0
+			if err := func() error {
+				s.Restrictions = make([]string, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem string
+					v, err := d.Str()
+					elem = string(v)
+					if err != nil {
+						return err
+					}
+					s.Restrictions = append(s.Restrictions, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"restrictions\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode TalkSessionEditForManage")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [2]uint8{
+		0b11111111,
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfTalkSessionEditForManage) {
+					name = jsonFieldsNameOfTalkSessionEditForManage[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *TalkSessionEditForManage) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *TalkSessionEditForManage) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s *TalkSessionForManage) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -19978,9 +20223,37 @@ func (s *TalkSessionForManage) encodeFields(e *jx.Encoder) {
 		e.FieldStart("createdAt")
 		e.Str(s.CreatedAt)
 	}
+	{
+		e.FieldStart("hideTop")
+		e.Bool(s.HideTop)
+	}
+	{
+		e.FieldStart("hideReport")
+		e.Bool(s.HideReport)
+	}
+	{
+		e.FieldStart("disableAnalysis")
+		e.Bool(s.DisableAnalysis)
+	}
+	{
+		e.FieldStart("restrictions")
+		e.ArrStart()
+		for _, elem := range s.Restrictions {
+			e.Str(elem)
+		}
+		e.ArrEnd()
+	}
+	{
+		e.FieldStart("hasSurvey")
+		e.Bool(s.HasSurvey)
+	}
+	{
+		e.FieldStart("participantCount")
+		e.Int32(s.ParticipantCount)
+	}
 }
 
-var jsonFieldsNameOfTalkSessionForManage = [11]string{
+var jsonFieldsNameOfTalkSessionForManage = [17]string{
 	0:  "talkSessionID",
 	1:  "theme",
 	2:  "description",
@@ -19992,6 +20265,12 @@ var jsonFieldsNameOfTalkSessionForManage = [11]string{
 	8:  "hidden",
 	9:  "updatedAt",
 	10: "createdAt",
+	11: "hideTop",
+	12: "hideReport",
+	13: "disableAnalysis",
+	14: "restrictions",
+	15: "hasSurvey",
+	16: "participantCount",
 }
 
 // Decode decodes TalkSessionForManage from json.
@@ -19999,7 +20278,7 @@ func (s *TalkSessionForManage) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode TalkSessionForManage to nil")
 	}
-	var requiredBitSet [2]uint8
+	var requiredBitSet [3]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -20129,6 +20408,86 @@ func (s *TalkSessionForManage) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"createdAt\"")
 			}
+		case "hideTop":
+			requiredBitSet[1] |= 1 << 3
+			if err := func() error {
+				v, err := d.Bool()
+				s.HideTop = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hideTop\"")
+			}
+		case "hideReport":
+			requiredBitSet[1] |= 1 << 4
+			if err := func() error {
+				v, err := d.Bool()
+				s.HideReport = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hideReport\"")
+			}
+		case "disableAnalysis":
+			requiredBitSet[1] |= 1 << 5
+			if err := func() error {
+				v, err := d.Bool()
+				s.DisableAnalysis = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"disableAnalysis\"")
+			}
+		case "restrictions":
+			requiredBitSet[1] |= 1 << 6
+			if err := func() error {
+				s.Restrictions = make([]string, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem string
+					v, err := d.Str()
+					elem = string(v)
+					if err != nil {
+						return err
+					}
+					s.Restrictions = append(s.Restrictions, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"restrictions\"")
+			}
+		case "hasSurvey":
+			requiredBitSet[1] |= 1 << 7
+			if err := func() error {
+				v, err := d.Bool()
+				s.HasSurvey = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hasSurvey\"")
+			}
+		case "participantCount":
+			requiredBitSet[2] |= 1 << 0
+			if err := func() error {
+				v, err := d.Int32()
+				s.ParticipantCount = int32(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"participantCount\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -20138,9 +20497,10 @@ func (s *TalkSessionForManage) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [2]uint8{
+	for i, mask := range [3]uint8{
 		0b10011111,
-		0b00000111,
+		0b11111111,
+		0b00000001,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

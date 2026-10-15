@@ -7658,6 +7658,116 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) SetPassCount(val in
 	s.PassCount = val
 }
 
+// Ref: #/components/schemas/TalkSessionEditForManage
+type TalkSessionEditForManage struct {
+	// 1〜100文字.
+	Theme string `json:"theme"`
+	// 本文（HTML）。40000文字まで.
+	Description string `json:"description"`
+	// 変更する場合は未来の日時にする。変更しない場合は現在の値をそのまま送る.
+	ScheduledEndTime time.Time `json:"scheduledEndTime"`
+	// 空文字は未設定として扱う.
+	Prefecture string `json:"prefecture"`
+	// 空文字は未設定として扱う.
+	City            string `json:"city"`
+	HideTop         bool   `json:"hideTop"`
+	HideReport      bool   `json:"hideReport"`
+	DisableAnalysis bool   `json:"disableAnalysis"`
+	// 参加制限のキー。survey.answered
+	// はアンケートがあるセッションにだけ付けられる.
+	Restrictions []string `json:"restrictions"`
+}
+
+// GetTheme returns the value of Theme.
+func (s *TalkSessionEditForManage) GetTheme() string {
+	return s.Theme
+}
+
+// GetDescription returns the value of Description.
+func (s *TalkSessionEditForManage) GetDescription() string {
+	return s.Description
+}
+
+// GetScheduledEndTime returns the value of ScheduledEndTime.
+func (s *TalkSessionEditForManage) GetScheduledEndTime() time.Time {
+	return s.ScheduledEndTime
+}
+
+// GetPrefecture returns the value of Prefecture.
+func (s *TalkSessionEditForManage) GetPrefecture() string {
+	return s.Prefecture
+}
+
+// GetCity returns the value of City.
+func (s *TalkSessionEditForManage) GetCity() string {
+	return s.City
+}
+
+// GetHideTop returns the value of HideTop.
+func (s *TalkSessionEditForManage) GetHideTop() bool {
+	return s.HideTop
+}
+
+// GetHideReport returns the value of HideReport.
+func (s *TalkSessionEditForManage) GetHideReport() bool {
+	return s.HideReport
+}
+
+// GetDisableAnalysis returns the value of DisableAnalysis.
+func (s *TalkSessionEditForManage) GetDisableAnalysis() bool {
+	return s.DisableAnalysis
+}
+
+// GetRestrictions returns the value of Restrictions.
+func (s *TalkSessionEditForManage) GetRestrictions() []string {
+	return s.Restrictions
+}
+
+// SetTheme sets the value of Theme.
+func (s *TalkSessionEditForManage) SetTheme(val string) {
+	s.Theme = val
+}
+
+// SetDescription sets the value of Description.
+func (s *TalkSessionEditForManage) SetDescription(val string) {
+	s.Description = val
+}
+
+// SetScheduledEndTime sets the value of ScheduledEndTime.
+func (s *TalkSessionEditForManage) SetScheduledEndTime(val time.Time) {
+	s.ScheduledEndTime = val
+}
+
+// SetPrefecture sets the value of Prefecture.
+func (s *TalkSessionEditForManage) SetPrefecture(val string) {
+	s.Prefecture = val
+}
+
+// SetCity sets the value of City.
+func (s *TalkSessionEditForManage) SetCity(val string) {
+	s.City = val
+}
+
+// SetHideTop sets the value of HideTop.
+func (s *TalkSessionEditForManage) SetHideTop(val bool) {
+	s.HideTop = val
+}
+
+// SetHideReport sets the value of HideReport.
+func (s *TalkSessionEditForManage) SetHideReport(val bool) {
+	s.HideReport = val
+}
+
+// SetDisableAnalysis sets the value of DisableAnalysis.
+func (s *TalkSessionEditForManage) SetDisableAnalysis(val bool) {
+	s.DisableAnalysis = val
+}
+
+// SetRestrictions sets the value of Restrictions.
+func (s *TalkSessionEditForManage) SetRestrictions(val []string) {
+	s.Restrictions = val
+}
+
 // Ref: #/components/schemas/TalkSessionForManage
 type TalkSessionForManage struct {
 	TalkSessionID    string        `json:"talkSessionID"`
@@ -7671,6 +7781,18 @@ type TalkSessionForManage struct {
 	Hidden           bool          `json:"hidden"`
 	UpdatedAt        string        `json:"updatedAt"`
 	CreatedAt        string        `json:"createdAt"`
+	// ホームの一覧に表示しない.
+	HideTop bool `json:"hideTop"`
+	// レポートを表示しない.
+	HideReport bool `json:"hideReport"`
+	// 分析を無効にする.
+	DisableAnalysis bool `json:"disableAnalysis"`
+	// 参加制限のキー（GET /talksessions/restrictions の key）.
+	Restrictions []string `json:"restrictions"`
+	// アンケートがあるか.
+	HasSurvey bool `json:"hasSurvey"`
+	// 意見を投稿したか投票したユーザーの数。参加制限を変えるときの警告に使う.
+	ParticipantCount int32 `json:"participantCount"`
 }
 
 // GetTalkSessionID returns the value of TalkSessionID.
@@ -7728,6 +7850,36 @@ func (s *TalkSessionForManage) GetCreatedAt() string {
 	return s.CreatedAt
 }
 
+// GetHideTop returns the value of HideTop.
+func (s *TalkSessionForManage) GetHideTop() bool {
+	return s.HideTop
+}
+
+// GetHideReport returns the value of HideReport.
+func (s *TalkSessionForManage) GetHideReport() bool {
+	return s.HideReport
+}
+
+// GetDisableAnalysis returns the value of DisableAnalysis.
+func (s *TalkSessionForManage) GetDisableAnalysis() bool {
+	return s.DisableAnalysis
+}
+
+// GetRestrictions returns the value of Restrictions.
+func (s *TalkSessionForManage) GetRestrictions() []string {
+	return s.Restrictions
+}
+
+// GetHasSurvey returns the value of HasSurvey.
+func (s *TalkSessionForManage) GetHasSurvey() bool {
+	return s.HasSurvey
+}
+
+// GetParticipantCount returns the value of ParticipantCount.
+func (s *TalkSessionForManage) GetParticipantCount() int32 {
+	return s.ParticipantCount
+}
+
 // SetTalkSessionID sets the value of TalkSessionID.
 func (s *TalkSessionForManage) SetTalkSessionID(val string) {
 	s.TalkSessionID = val
@@ -7781,6 +7933,36 @@ func (s *TalkSessionForManage) SetUpdatedAt(val string) {
 // SetCreatedAt sets the value of CreatedAt.
 func (s *TalkSessionForManage) SetCreatedAt(val string) {
 	s.CreatedAt = val
+}
+
+// SetHideTop sets the value of HideTop.
+func (s *TalkSessionForManage) SetHideTop(val bool) {
+	s.HideTop = val
+}
+
+// SetHideReport sets the value of HideReport.
+func (s *TalkSessionForManage) SetHideReport(val bool) {
+	s.HideReport = val
+}
+
+// SetDisableAnalysis sets the value of DisableAnalysis.
+func (s *TalkSessionForManage) SetDisableAnalysis(val bool) {
+	s.DisableAnalysis = val
+}
+
+// SetRestrictions sets the value of Restrictions.
+func (s *TalkSessionForManage) SetRestrictions(val []string) {
+	s.Restrictions = val
+}
+
+// SetHasSurvey sets the value of HasSurvey.
+func (s *TalkSessionForManage) SetHasSurvey(val bool) {
+	s.HasSurvey = val
+}
+
+// SetParticipantCount sets the value of ParticipantCount.
+func (s *TalkSessionForManage) SetParticipantCount(val int32) {
+	s.ParticipantCount = val
 }
 
 // Ref: #/components/schemas/TalkSessionListResponse

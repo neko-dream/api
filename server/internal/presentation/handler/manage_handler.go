@@ -30,6 +30,7 @@ type manageHandler struct {
 	userManagement        userquery.Management
 	setCreationPermission admin_usecase.SetSessionCreationPermission
 	userInvitations       admin_usecase.ManageUserInvitations
+	editTalkSession       admin_usecase.EditTalkSession
 	analysis.AnalysisService
 	analysis.AnalysisRepository
 	analysisScheduler analysis_usecase.AnalysisScheduler
@@ -194,6 +195,7 @@ func NewManageHandler(
 	userManagement userquery.Management,
 	setCreationPermission admin_usecase.SetSessionCreationPermission,
 	userInvitations admin_usecase.ManageUserInvitations,
+	editTalkSession admin_usecase.EditTalkSession,
 ) oas.ManageHandler {
 	return &manageHandler{
 		DBManager:             dbm,
@@ -205,6 +207,7 @@ func NewManageHandler(
 		userManagement:        userManagement,
 		setCreationPermission: setCreationPermission,
 		userInvitations:       userInvitations,
+		editTalkSession:       editTalkSession,
 	}
 }
 
@@ -315,9 +318,98 @@ func (m *manageHandler) GetTalkSessionManage(ctx context.Context, params oas.Get
 	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.GetTalkSessionManage")
 	defer span.End()
 
-	_ = ctx
+	if admin.GetAdminSession(ctx) == nil {
+		return nil, messages.ForbiddenError
+	}
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+	return m.talkSessionForManage(ctx, talkSessionID)
+}
 
-	panic("unimplemented")
+// EditTalkSessionManage implements oas.ManageHandler.
+func (m *manageHandler) EditTalkSessionManage(ctx context.Context, req *oas.TalkSessionEditForManage, params oas.EditTalkSessionManageParams) (*oas.TalkSessionForManage, error) {
+	ctx, span := otel.Tracer("handler").Start(ctx, "manageHandler.EditTalkSessionManage")
+	defer span.End()
+
+	talkSessionID, err := shared.ParseUUID[talksession.TalkSession](params.TalkSessionID)
+	if err != nil {
+		return nil, messages.BadRequestError
+	}
+	if err := m.editTalkSession.Execute(ctx, admin_usecase.EditTalkSessionInput{
+		TalkSessionID:    talkSessionID,
+		Theme:            req.Theme,
+		Description:      req.Description,
+		ScheduledEndTime: req.ScheduledEndTime,
+		Prefecture:       req.Prefecture,
+		City:             req.City,
+		HideTop:          req.HideTop,
+		HideReport:       req.HideReport,
+		DisableAnalysis:  req.DisableAnalysis,
+		Restrictions:     req.Restrictions,
+	}); err != nil {
+		return nil, err
+	}
+	return m.talkSessionForManage(ctx, talkSessionID)
+}
+
+// talkSessionForManage は管理画面の詳細・編集画面で使うセッション情報を組み立てる。
+func (m *manageHandler) talkSessionForManage(ctx context.Context, talkSessionID shared.UUID[talksession.TalkSession]) (*oas.TalkSessionForManage, error) {
+	q := m.GetQueries(ctx)
+	row, err := q.GetTalkSessionByID(ctx, talkSessionID.UUID())
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, messages.TalkSessionNotFound
+	}
+	if err != nil {
+		utils.HandleError(ctx, err, "GetQueries.GetTalkSessionByID")
+		return nil, err
+	}
+	participantCount, err := q.CountTalkSessionParticipants(ctx, talkSessionID.UUID())
+	if err != nil {
+		utils.HandleError(ctx, err, "GetQueries.CountTalkSessionParticipants")
+		return nil, err
+	}
+	hasSurvey := true
+	if _, err := q.GetSurveyByTalkSessionID(ctx, talkSessionID.UUID()); errors.Is(err, sql.ErrNoRows) {
+		hasSurvey = false
+	} else if err != nil {
+		utils.HandleError(ctx, err, "GetQueries.GetSurveyByTalkSessionID")
+		return nil, err
+	}
+
+	ts := row.TalkSession
+	restrictions := make([]string, 0, len(ts.Restrictions))
+	restrictions = append(restrictions, ts.Restrictions...)
+	res := &oas.TalkSessionForManage{
+		TalkSessionID: ts.TalkSessionID.String(),
+		Theme:         ts.Theme,
+		Description:   ts.Description.String,
+		Owner: oas.UserForManage{
+			UserID:      row.User.UserID.String(),
+			DisplayID:   row.User.DisplayID.String,
+			DisplayName: row.User.DisplayName.String,
+			IconURL:     row.User.IconUrl.String,
+		},
+		ScheduledEndTime: ts.ScheduledEndTime,
+		ThumbnailURL:     ts.ThumbnailUrl.String,
+		Hidden:           ts.HideReport.Bool,
+		UpdatedAt:        ts.UpdatedAt.Format(time.RFC3339),
+		CreatedAt:        ts.CreatedAt.Format(time.RFC3339),
+		HideTop:          ts.HideTop,
+		HideReport:       ts.HideReport.Bool,
+		DisableAnalysis:  ts.DisableAnalysis,
+		Restrictions:     restrictions,
+		HasSurvey:        hasSurvey,
+		ParticipantCount: participantCount,
+	}
+	if ts.City.Valid {
+		res.City = oas.NewOptString(ts.City.String)
+	}
+	if ts.Prefecture.Valid {
+		res.Prefecture = oas.NewOptString(ts.Prefecture.String)
+	}
+	return res, nil
 }
 
 // ManageRegenerateManage implements oas.ManageHandler.
