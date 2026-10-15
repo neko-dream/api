@@ -34,30 +34,42 @@ func (v authTestVerifier) Verify(context.Context, string) (*admin.GoogleClaims, 
 type authTestSessions struct {
 	admin.AdminSessionRepository
 	row *admin.AdminSession
+	// beforeRotate は Rotate の直前に呼ばれる。別タブが先にローテーションした状況を再現する
+	beforeRotate func()
 }
 
 func (r *authTestSessions) Create(_ context.Context, row admin.AdminSession) error {
 	r.row = &row
 	return nil
 }
+func (r *authTestSessions) matches(hash string) bool {
+	return r.row != nil && (r.row.TokenHash == hash || (r.row.PreviousTokenHash != nil && *r.row.PreviousTokenHash == hash))
+}
 func (r *authTestSessions) FindByTokenHash(_ context.Context, hash string) (*admin.AdminSession, error) {
-	if r.row != nil && r.row.TokenHash == hash {
-		return r.row, nil
+	if r.matches(hash) {
+		copied := *r.row
+		return &copied, nil
 	}
 	return nil, nil
 }
-func (r *authTestSessions) Rotate(_ context.Context, id shared.UUID[admin.AdminSession], oldHash, hash string, expires time.Time) (bool, error) {
+func (r *authTestSessions) Rotate(_ context.Context, id shared.UUID[admin.AdminSession], oldHash, hash string, expires, rotatedAt time.Time) (bool, error) {
+	if hook := r.beforeRotate; hook != nil {
+		r.beforeRotate = nil
+		hook()
+	}
 	if r.row == nil || r.row.AdminSessionID != id {
 		return false, errors.New("unknown session")
 	}
 	if r.row.TokenHash != oldHash {
 		return false, nil
 	}
+	previous := r.row.TokenHash
+	r.row.PreviousTokenHash, r.row.RotatedAt = &previous, &rotatedAt
 	r.row.TokenHash, r.row.ExpiresAt = hash, expires
 	return true, nil
 }
 func (r *authTestSessions) DeleteByTokenHash(_ context.Context, hash string) error {
-	if r.row != nil && r.row.TokenHash == hash {
+	if r.matches(hash) {
 		r.row = nil
 	}
 	return nil
@@ -84,11 +96,21 @@ func TestAdminLoginRefreshAndLogout(t *testing.T) {
 		t.Fatal("refresh token missing or stored in plaintext")
 	}
 	updated, err := refresh.Execute(ctx, out.RefreshToken)
-	if err != nil || updated.RefreshToken == out.RefreshToken {
+	if err != nil || updated.RefreshToken == "" || updated.RefreshToken == out.RefreshToken {
 		t.Fatalf("refresh rotation: %v", err)
 	}
-	if _, err := refresh.Execute(ctx, out.RefreshToken); !errors.Is(err, ErrInvalidRefreshToken) {
-		t.Fatalf("old refresh accepted: %v", err)
+	// 猶予期間内の直前のトークンは、ローテーションせずアクセストークンだけを発行する
+	concurrent, err := refresh.Execute(ctx, out.RefreshToken)
+	if err != nil || concurrent.AccessToken == "" || concurrent.RefreshToken != "" {
+		t.Fatalf("previous refresh within grace period: %+v %v", concurrent, err)
+	}
+	afterGrace := clock.SetNow(ctx, time.Now().Add(admin.RotationGracePeriod+time.Second))
+	if _, err := refresh.Execute(afterGrace, out.RefreshToken); !errors.Is(err, ErrInvalidRefreshToken) {
+		t.Fatalf("old refresh accepted after grace period: %v", err)
+	}
+	updated, err = refresh.Execute(ctx, updated.RefreshToken)
+	if err != nil || updated.RefreshToken == "" {
+		t.Fatalf("current refresh was invalidated by the previous one: %v", err)
 	}
 	if err := logout.Execute(ctx, updated.RefreshToken); err != nil {
 		t.Fatal(err)
@@ -119,5 +141,30 @@ func TestAdminLoginRejectsUnverifiedAndUnlistedAccounts(t *testing.T) {
 		if sessions.row != nil {
 			t.Fatal("rejected login created session")
 		}
+	}
+}
+
+func TestAdminRefreshConcurrentRotationSucceedsWithinGracePeriod(t *testing.T) {
+	ctx := context.Background()
+	cfg := &config.Config{AdminJWTSecret: "local-test-only-secret-at-least-32-bytes", HASH_PEPPER: "local-test-only-pepper"}
+	users := &authTestUsers{user: &admin.AdminUser{AdminUserID: shared.NewUUID[admin.AdminUser](), Email: "operator@example.com", DisplayName: "Operator"}}
+	sessions := &authTestSessions{}
+	tokens := adminauth.NewAdminTokenManager(cfg)
+	login := NewAdminLogin(users, sessions, tokens, authTestVerifier{}, cfg)
+	refresh := NewAdminRefresh(users, sessions, tokens, cfg)
+	out, err := login.Execute(ctx, AdminLoginInput{IDToken: "verified-by-test-double"})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// 同じリフレッシュトークンで、別タブが先にローテーションを終えた
+	sessions.beforeRotate = func() {
+		if _, err := refresh.Execute(ctx, out.RefreshToken); err != nil {
+			t.Fatal(err)
+		}
+	}
+	got, err := refresh.Execute(ctx, out.RefreshToken)
+	if err != nil || got.AccessToken == "" || got.RefreshToken != "" {
+		t.Fatalf("concurrent refresh: %+v %v", got, err)
 	}
 }

@@ -45,7 +45,7 @@ func TestAdminRefreshRotationIsAtomic(t *testing.T) {
 		go func(hash string) {
 			defer wg.Done()
 			<-start
-			ok, err := repo.Rotate(ctx, id, old, hash, time.Now().Add(time.Hour))
+			ok, err := repo.Rotate(ctx, id, old, hash, time.Now().Add(time.Hour), time.Now())
 			successes <- ok
 			failures <- err
 		}(hash)
@@ -68,7 +68,22 @@ func TestAdminRefreshRotationIsAtomic(t *testing.T) {
 	if count != 1 {
 		t.Fatalf("successful rotations=%d, want 1", count)
 	}
-	if oldSession, err := repo.FindByTokenHash(ctx, old); err != nil || oldSession != nil {
-		t.Fatalf("old token remains valid: %v", err)
+	// 直前のトークンでも見つかるが、現在のトークンではなく、猶予期間を過ぎると使えない
+	oldSession, err := repo.FindByTokenHash(ctx, old)
+	if err != nil || oldSession == nil || oldSession.TokenHash == old {
+		t.Fatalf("previous token lookup: %+v %v", oldSession, err)
+	}
+	if !oldSession.IsPreviousTokenInGracePeriod(old, time.Now()) {
+		t.Fatal("previous token must be accepted within the grace period")
+	}
+	if oldSession.IsPreviousTokenInGracePeriod(old, time.Now().Add(admin.RotationGracePeriod+time.Second)) {
+		t.Fatal("previous token must be rejected after the grace period")
+	}
+	// 直前のトークンでログアウトしても、セッションごと消える
+	if err := repo.DeleteByTokenHash(ctx, old); err != nil {
+		t.Fatal(err)
+	}
+	if current, err := repo.FindByTokenHash(ctx, oldSession.TokenHash); err != nil || current != nil {
+		t.Fatalf("session remains after logout with previous token: %v", err)
 	}
 }
