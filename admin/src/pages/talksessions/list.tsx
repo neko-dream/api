@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Alert, Button, Table, Tag, Typography } from "antd";
+import { Link } from "react-router";
 
 import { httpClient } from "../../providers";
 
@@ -90,6 +91,14 @@ export const TalkSessionList = () => {
             width: 90,
             render: (hidden: boolean) =>
               hidden ? <Tag color="red">非表示</Tag> : <Tag color="green">表示</Tag>,
+          },
+          {
+            title: "",
+            key: "actions",
+            width: 80,
+            render: (_: unknown, row: TalkSessionStat) => (
+              <Link to={`/talksessions/edit/${encodeURIComponent(row.talkSessionID)}`}>編集</Link>
+            ),
           },
         ]}
       />
