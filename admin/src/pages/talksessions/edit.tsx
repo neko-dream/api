@@ -6,10 +6,12 @@ import {
   App,
   Button,
   Checkbox,
+  Col,
   Descriptions,
   Form,
   Input,
   Result,
+  Row,
   Space,
   Switch,
   Typography,
@@ -19,6 +21,7 @@ import { Link, useNavigate, useParams } from "react-router";
 
 import { env } from "../../config/env";
 import { httpClient } from "../../providers";
+import { buildPreviewDocument } from "./description-preview";
 import {
   type ManagedTalkSession,
   type RestrictionOption,
@@ -41,6 +44,7 @@ export function TalkSessionEdit() {
   const navigate = useNavigate();
   const { modal } = App.useApp();
   const [form] = Form.useForm<TalkSessionEditValues>();
+  const description = Form.useWatch("description", form) ?? "";
   const { query, result: session } = useShow<ManagedTalkSession>({
     resource: "talksessions",
     id,
@@ -173,13 +177,37 @@ export function TalkSessionEdit() {
               <Form.Item label="テーマ" name="theme" extra="100文字以内">
                 <Input />
               </Form.Item>
-              <Form.Item
-                label="ストーリー（本文）"
-                name="description"
-                extra="HTMLのまま編集します。40000文字以内"
-              >
-                <Input.TextArea rows={12} style={{ fontFamily: "monospace" }} />
-              </Form.Item>
+              <Row gutter={16}>
+                <Col xs={24} lg={12}>
+                  <Form.Item
+                    label="ストーリー（本文）"
+                    name="description"
+                    extra="HTMLのまま編集します。40000文字以内"
+                  >
+                    <Input.TextArea rows={14} style={{ fontFamily: "monospace" }} />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} lg={12}>
+                  <Form.Item
+                    label="プレビュー"
+                    extra="web と同じ条件で表示します。使えないタグ（見出しなど）は文字のまま表示されます"
+                  >
+                    {/* 利用者が書いたHTMLなので、スクリプトを動かさない sandbox 付き iframe で表示する */}
+                    <iframe
+                      title="本文のプレビュー"
+                      sandbox="allow-popups allow-popups-to-escape-sandbox"
+                      srcDoc={buildPreviewDocument(description)}
+                      style={{
+                        width: "100%",
+                        height: 318,
+                        border: "1px solid #d9d9d9",
+                        borderRadius: 6,
+                        background: "#fff",
+                      }}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
               <Form.Item
                 label="募集の終了日時"
                 name="scheduledEndTime"
