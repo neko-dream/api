@@ -119,15 +119,18 @@ fi
 REGISTRY="${ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com"
 aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin "$REGISTRY"
 
-# 管理画面のビルドは、コミット済みの server/static/admin-ui/index.html を書き換える。
-# 元々変更がなければ、終了時に元に戻して作業ツリーを汚さない
-ADMIN_INDEX="server/static/admin-ui/index.html"
-RESTORE_ADMIN_INDEX=false
-git -C "$REPO_ROOT" diff --quiet -- "$ADMIN_INDEX" && RESTORE_ADMIN_INDEX=true
+# ビルドはコミット済みのファイルを書き換える（管理画面の index.html、go mod download による go.work.sum）。
+# 元々変更がなかったものは、終了時に元に戻して作業ツリーを汚さない
+RESTORE_FILES=()
+for file in server/static/admin-ui/index.html go.work.sum; do
+    if git -C "$REPO_ROOT" ls-files --error-unmatch -- "$file" &>/dev/null && git -C "$REPO_ROOT" diff --quiet -- "$file"; then
+        RESTORE_FILES+=("$file")
+    fi
+done
 cleanup() {
     rm -f "${SERVER_DIR}/server"
-    if [ "$RESTORE_ADMIN_INDEX" = true ]; then
-        git -C "$REPO_ROOT" checkout -- "$ADMIN_INDEX"
+    if [ ${#RESTORE_FILES[@]} -gt 0 ]; then
+        git -C "$REPO_ROOT" checkout -- "${RESTORE_FILES[@]}"
     fi
 }
 trap cleanup EXIT
