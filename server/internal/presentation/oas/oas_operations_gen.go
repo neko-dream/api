@@ -50,6 +50,7 @@ const (
 	GetTalkSessionListOperation                 OperationName = "GetTalkSessionList"
 	GetTalkSessionListManageOperation           OperationName = "GetTalkSessionListManage"
 	GetTalkSessionManageOperation               OperationName = "GetTalkSessionManage"
+	GetTalkSessionOpinionsManageOperation       OperationName = "GetTalkSessionOpinionsManage"
 	GetTalkSessionReportOperation               OperationName = "GetTalkSessionReport"
 	GetTalkSessionReportCountOperation          OperationName = "GetTalkSessionReportCount"
 	GetTalkSessionRestrictionKeysOperation      OperationName = "GetTalkSessionRestrictionKeys"

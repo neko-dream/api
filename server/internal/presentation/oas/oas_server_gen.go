@@ -236,6 +236,12 @@ type ManageHandler interface {
 	//
 	// GET /v1/manage/talksessions/{talkSessionID}
 	GetTalkSessionManage(ctx context.Context, params GetTalkSessionManageParams) (*TalkSessionForManage, error)
+	// GetTalkSessionOpinionsManage implements getTalkSessionOpinionsManage operation.
+	//
+	// 削除済み・通報された意見も含めて、新しい順に返す。投票は意見ごとの集計だけを返す。.
+	//
+	// GET /v1/manage/talksessions/{talkSessionID}/opinions
+	GetTalkSessionOpinionsManage(ctx context.Context, params GetTalkSessionOpinionsManageParams) (*TalkSessionOpinionsForManage, error)
 	// GetUserDetailManage implements getUserDetailManage operation.
 	//
 	// GET /v1/manage/users/{userID}

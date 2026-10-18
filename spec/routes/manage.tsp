@@ -42,6 +42,20 @@ namespace kotohiro {
       ): kotohiro.TalkSessionForManage;
     }
 
+    @route("/talksessions/{talkSessionID}/opinions")
+    @tag("manage")
+    interface TalkSessionOpinions {
+      /** 削除済み・通報された意見も含めて、新しい順に返す。投票は意見ごとの集計だけを返す。 */
+      @operationId("getTalkSessionOpinionsManage")
+      @extension("x-ogen-operation-group", "manage")
+      @get
+      getTalkSessionOpinions(
+        @path talkSessionID: string,
+        @query offset?: int32,
+        @query limit?: int32,
+      ): kotohiro.TalkSessionOpinionsForManage;
+    }
+
     @route("/talksessions/{talkSessionID}/analysis")
     @tag("manage")
     interface Analysis {

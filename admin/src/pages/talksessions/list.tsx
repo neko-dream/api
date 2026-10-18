@@ -76,7 +76,13 @@ export const TalkSessionList = () => {
           showSizeChanger: false,
         }}
         columns={[
-          { title: "テーマ", dataIndex: "theme" },
+          {
+            title: "テーマ",
+            dataIndex: "theme",
+            render: (theme: string, row: TalkSessionStat) => (
+              <Link to={`/talksessions/show/${encodeURIComponent(row.talkSessionID)}`}>{theme}</Link>
+            ),
+          },
           { title: "オーナー", dataIndex: ["owner", "displayName"] },
           { title: "意見数", dataIndex: "opinionCount", width: 90 },
           { title: "投票数", dataIndex: "voteCount", width: 90 },

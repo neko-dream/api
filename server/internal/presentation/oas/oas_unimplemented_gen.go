@@ -406,6 +406,15 @@ func (UnimplementedHandler) GetTalkSessionManage(ctx context.Context, params Get
 	return r, ht.ErrNotImplemented
 }
 
+// GetTalkSessionOpinionsManage implements getTalkSessionOpinionsManage operation.
+//
+// 削除済み・通報された意見も含めて、新しい順に返す。投票は意見ごとの集計だけを返す。.
+//
+// GET /v1/manage/talksessions/{talkSessionID}/opinions
+func (UnimplementedHandler) GetTalkSessionOpinionsManage(ctx context.Context, params GetTalkSessionOpinionsManageParams) (r *TalkSessionOpinionsForManage, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetTalkSessionReport implements getTalkSessionReport operation.
 //
 // セッションレポートを返す.

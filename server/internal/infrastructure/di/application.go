@@ -57,6 +57,7 @@ func useCaseDeps() []ProvideArg {
 		{opinion_usecase.NewSubmitOpinionHandler, nil},
 		{opinion_usecase.NewReportOpinion, nil},
 		{opinion_query.NewGetOpinionsByTalkSessionIDQueryHandler, nil},
+		{opinion_query.NewManageOpinionsQuery, nil},
 		{opinion_query.NewGetOpinionDetailByIDQueryHandler, nil},
 		{opinion_query.NewGetOpinionRepliesQueryHandler, nil},
 		{opinion_query.NewSwipeOpinionsQueryHandler, nil},
