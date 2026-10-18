@@ -16,12 +16,13 @@ import (
 type capturingAdminRefresh struct {
 	got string
 	out *admin_usecase.AdminAuthOutput
+	// valid が空でなければ、それ以外のトークンは本物のユースケースと同じく無効として扱う
+	valid string
 }
 
-// 空のトークンは本物のユースケースと同じく無効として扱う
 func (c *capturingAdminRefresh) Execute(_ context.Context, token string) (*admin_usecase.AdminAuthOutput, error) {
 	c.got = token
-	if token == "" {
+	if token == "" || (c.valid != "" && token != c.valid) {
 		return nil, admin_usecase.ErrInvalidRefreshToken
 	}
 	return c.out, nil
@@ -74,18 +75,20 @@ func TestAdminRefreshDecodesURLEncodedCookie(t *testing.T) {
 	}
 }
 
-func TestAdminRefreshRejectsMalformedEncodedCookie(t *testing.T) {
-	refresh := &capturingAdminRefresh{out: &admin_usecase.AdminAuthOutput{AccessToken: "access", RefreshToken: "next"}}
+// デコードできない値（% の後が16進数でない）は生の値のまま照合する。保存したハッシュとは一致しないので拒否され、
+// ログアウトでも空として扱わずに照合する（空として扱うと、サーバー側のセッションを消さずに成功を返してしまう）
+func TestAdminRefreshPassesUndecodableCookieAsIs(t *testing.T) {
+	refresh := &capturingAdminRefresh{out: &admin_usecase.AdminAuthOutput{AccessToken: "access", RefreshToken: "next"}, valid: "issued-token"}
 	h := &adminHandler{cookieManager: cookie.NewCookieManager(&config.Config{Env: config.LOCAL}), adminRefresh: refresh}
 
 	res := serveAdminRefresh(t, h, cookie.AdminRefreshCookieName+"=broken%ZZ")
+	if refresh.got != "broken%ZZ" {
+		t.Fatalf("token passed to usecase = %q, want the raw value", refresh.got)
+	}
 	if res.StatusCode != http.StatusUnauthorized {
 		t.Fatalf("status = %d, want 401", res.StatusCode)
 	}
-	if refresh.got != "" {
-		t.Fatalf("malformed cookie passed to usecase as %q", refresh.got)
-	}
 	if _, ok := responseCookies(res)[cookie.AdminRefreshCookieName]; ok {
-		t.Fatal("refresh cookie must not be issued for a malformed cookie")
+		t.Fatal("refresh cookie must not be issued for an unknown token")
 	}
 }

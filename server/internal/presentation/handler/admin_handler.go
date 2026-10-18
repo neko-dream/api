@@ -123,7 +123,8 @@ func adminRefreshTokenFromCtx(ctx context.Context) string {
 	// 旧形式の Cookie がすべて期限切れになったら（リフレッシュトークンの寿命の30日後）このデコードは不要。
 	value, err := url.PathUnescape(c.Value)
 	if err != nil {
-		return ""
+		// デコードできない値は生の値のまま照合する（空にすると、ログアウトでサーバー側のセッションを消さずに成功を返してしまう）
+		return c.Value
 	}
 	return value
 }

@@ -21,23 +21,50 @@ func TestEncodeCookiesKeepsValueAsIs(t *testing.T) {
 	if len(encoded) != 1 {
 		t.Fatalf("encoded = %v", encoded)
 	}
-	req := &http.Request{Header: http.Header{"Cookie": {encoded[0]}}}
+	// ブラウザと同じく Set-Cookie を解析し、名前と値だけを Cookie ヘッダーで送り返す
+	stored, err := http.ParseSetCookie(encoded[0])
+	if err != nil {
+		t.Fatalf("parse %q: %v", encoded[0], err)
+	}
+	if stored.Value != value {
+		t.Fatalf("stored value = %q, want %q (Set-Cookie = %q)", stored.Value, value, encoded[0])
+	}
+	req := &http.Request{Header: http.Header{"Cookie": {stored.Name + "=" + stored.Value}}}
 	c, err := req.Cookie("AdminRefreshToken")
-	if err != nil || c.Value != value {
-		t.Fatalf("value read back = %q (%v), Set-Cookie = %q", c.Value, err, encoded[0])
+	if err != nil {
+		t.Fatalf("read back: %v", err)
+	}
+	if c.Value != value {
+		t.Fatalf("value read back = %q, want %q", c.Value, value)
 	}
 }
 
-func TestEncodeCookiesMatchesStandardLibrary(t *testing.T) {
-	cookies := []*http.Cookie{
-		{Name: "SessionId", Value: "a.b-c_d", Path: "/", Domain: "kotohiro.com", MaxAge: 3600, HttpOnly: true, Secure: true, SameSite: http.SameSiteNoneMode},
-		{Name: "__Host-PasswordLoginPending", Value: "x", Path: "/", Expires: time.Date(2026, 10, 18, 12, 0, 0, 0, time.UTC), MaxAge: 900, HttpOnly: true, Secure: true, SameSite: http.SameSiteStrictMode},
-		{Name: "AdminSessionId", Path: "/v1", MaxAge: -1, HttpOnly: true, SameSite: http.SameSiteLaxMode},
-	}
-	encoded := EncodeCookies(cookies)
-	for i, c := range cookies {
-		if encoded[i] != c.String() {
-			t.Fatalf("encoded[%d] = %q, want %q", i, encoded[i], c.String())
-		}
+func TestEncodeCookiesAttributes(t *testing.T) {
+	for name, tc := range map[string]struct {
+		cookie *http.Cookie
+		want   string
+	}{
+		"ドメイン・SameSite=None": {
+			&http.Cookie{Name: "SessionId", Value: "a.b-c_d", Path: "/", Domain: "kotohiro.com", MaxAge: 3600, HttpOnly: true, Secure: true, SameSite: http.SameSiteNoneMode},
+			"SessionId=a.b-c_d; Path=/; Domain=kotohiro.com; Max-Age=3600; HttpOnly; Secure; SameSite=None",
+		},
+		"Expires・SameSite=Strict": {
+			&http.Cookie{Name: "__Host-PasswordLoginPending", Value: "x", Path: "/", Expires: time.Date(2026, 10, 18, 12, 0, 0, 0, time.UTC), MaxAge: 900, HttpOnly: true, Secure: true, SameSite: http.SameSiteStrictMode},
+			"__Host-PasswordLoginPending=x; Path=/; Expires=Sun, 18 Oct 2026 12:00:00 GMT; Max-Age=900; HttpOnly; Secure; SameSite=Strict",
+		},
+		"取り消し（MaxAge<0）": {
+			&http.Cookie{Name: "AdminSessionId", Path: "/v1", MaxAge: -1, HttpOnly: true, SameSite: http.SameSiteLaxMode},
+			"AdminSessionId=; Path=/v1; Max-Age=0; HttpOnly; SameSite=Lax",
+		},
+		"base64 の値": {
+			&http.Cookie{Name: "AdminRefreshToken", Value: "a+b/c=", Path: "/v1/admin", MaxAge: 60},
+			"AdminRefreshToken=a+b/c=; Path=/v1/admin; Max-Age=60",
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			if got := EncodeCookies([]*http.Cookie{tc.cookie}); len(got) != 1 || got[0] != tc.want {
+				t.Fatalf("got %q, want %q", got, tc.want)
+			}
+		})
 	}
 }
