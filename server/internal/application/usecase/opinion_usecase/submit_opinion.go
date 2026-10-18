@@ -152,7 +152,7 @@ func (h *submitOpinionHandler) Execute(ctx context.Context, input SubmitOpinionI
 			}
 			if err := imageMeta.Validate(ctx, meta.ReferenceImageValidationRule); err != nil {
 				utils.HandleError(ctx, err, "ImageMeta.Validate")
-				return messages.OpinionReferenceImageUploadFailed.WithMessage(err.Error()).WithCause(err)
+				return messages.OpinionReferenceImageUploadFailed.WithCause(err)
 			}
 
 			// 画像をアップロード

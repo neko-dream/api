@@ -3,6 +3,7 @@ package talksession
 import (
 	"context"
 	"errors"
+	"strings"
 	"testing"
 
 	"github.com/neko-dream/api/internal/domain/messages"
@@ -14,8 +15,7 @@ func TestUpdateRestrictionsDoesNotModifySharedError(t *testing.T) {
 	original := ErrInvalidRestrictionAttribute.Message
 
 	errA := (&TalkSession{}).UpdateRestrictions(ctx, []string{"unknown.a"})
-	// 不正なキーの数を変え、呼び出しごとに文言が変わるようにする
-	errB := (&TalkSession{}).UpdateRestrictions(ctx, []string{"unknown.a", "unknown.b"})
+	errB := (&TalkSession{}).UpdateRestrictions(ctx, []string{"unknown.b"})
 
 	var a, b *messages.APIError
 	if !errors.As(errA, &a) || !errors.As(errB, &b) {
@@ -24,8 +24,8 @@ func TestUpdateRestrictionsDoesNotModifySharedError(t *testing.T) {
 	if a == b {
 		t.Fatal("each call must return its own error, not the shared one")
 	}
-	if a.Message == b.Message {
-		t.Fatalf("messages must reflect each call: %q", a.Message)
+	if !strings.Contains(a.Message, "unknown.a") || !strings.Contains(b.Message, "unknown.b") {
+		t.Fatalf("messages must name the invalid key of each call: %q / %q", a.Message, b.Message)
 	}
 	if ErrInvalidRestrictionAttribute.Message != original {
 		t.Fatalf("shared error was modified: %q", ErrInvalidRestrictionAttribute.Message)

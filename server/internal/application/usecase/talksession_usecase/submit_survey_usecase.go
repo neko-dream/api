@@ -90,7 +90,7 @@ func (uc *submitSurveyUseCase) Execute(ctx context.Context, input SubmitSurveyIn
 
 	// バリデーション（平文に対して実施）
 	if err := survey.ValidateAnswers(s, answers); err != nil {
-		return shared.UUID[survey.Submission]{}, messages.TalkSessionSurveyAnswerInvalid.WithMessage(err.Error())
+		return shared.UUID[survey.Submission]{}, messages.TalkSessionSurveyAnswerInvalid.WithCause(err)
 	}
 
 	// すべての回答を暗号化して保存する（選択肢 ID / その他テキストを含む）。

@@ -52,7 +52,7 @@ func (i *profileIconService) UploadProfileIcon(ctx context.Context, userID share
 
 	if err := imageMeta.Validate(ctx, meta.ProfileImageValidationRule); err != nil {
 		utils.HandleError(ctx, err, "ImageMeta.Validate")
-		return nil, messages.UserUpdateError.WithMessage(err.Error()).WithCause(err)
+		return nil, messages.UserUpdateError.WithCause(err)
 	}
 
 	// 画像をアップロード
