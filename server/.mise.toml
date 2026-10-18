@@ -3,7 +3,7 @@
 "npm:@openapitools/openapi-generator-cli" = "latest"
 "npm:@typespec/compiler" = "latest"
 ecspresso = "latest"
-go = "1.25.1"
+go = "1.26.9"
 jq = "latest"
 task = "latest"
 bun = "latest"
