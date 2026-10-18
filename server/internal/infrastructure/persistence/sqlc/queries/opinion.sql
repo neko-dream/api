@@ -344,7 +344,11 @@ SELECT
     (SELECT COUNT(*) FROM votes v WHERE v.opinion_id = o.opinion_id AND v.vote_type = 3)::int AS pass_count,
     (SELECT COUNT(*) FROM opinion_reports r WHERE r.opinion_id = o.opinion_id)::int AS report_count,
     (SELECT COUNT(*) FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'unsolved')::int AS unsolved_report_count,
-    EXISTS (SELECT 1 FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'deleted') AS deleted
+    -- 一般の画面の意見一覧と同じ判定: 通報があり、そのすべてが削除済みのときだけ表示されない
+    (
+        EXISTS (SELECT 1 FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'deleted')
+        AND NOT EXISTS (SELECT 1 FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status <> 'deleted')
+    )::bool AS hidden
 FROM opinions o
 JOIN users u ON u.user_id = o.user_id
 WHERE o.talk_session_id = sqlc.arg(talk_session_id)
@@ -353,3 +357,6 @@ LIMIT sqlc.arg(row_limit) OFFSET sqlc.arg(row_offset);
 
 -- name: CountOpinionsForManage :one
 SELECT COUNT(*)::int FROM opinions WHERE talk_session_id = $1;
+
+-- name: TalkSessionExists :one
+SELECT EXISTS (SELECT 1 FROM talk_sessions WHERE talk_session_id = $1)::bool;

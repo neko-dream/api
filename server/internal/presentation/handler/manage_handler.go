@@ -8,6 +8,7 @@ import (
 	"time"
 	"unicode/utf8"
 
+	opinionquery "github.com/neko-dream/api/internal/application/query/opinion"
 	userquery "github.com/neko-dream/api/internal/application/query/user"
 	"github.com/neko-dream/api/internal/application/usecase/admin_usecase"
 	"github.com/neko-dream/api/internal/application/usecase/analysis_usecase"
@@ -31,6 +32,7 @@ type manageHandler struct {
 	setCreationPermission admin_usecase.SetSessionCreationPermission
 	userInvitations       admin_usecase.ManageUserInvitations
 	editTalkSession       admin_usecase.EditTalkSession
+	manageOpinions        opinionquery.ManageOpinions
 	analysis.AnalysisService
 	analysis.AnalysisRepository
 	analysisScheduler analysis_usecase.AnalysisScheduler
@@ -196,6 +198,7 @@ func NewManageHandler(
 	setCreationPermission admin_usecase.SetSessionCreationPermission,
 	userInvitations admin_usecase.ManageUserInvitations,
 	editTalkSession admin_usecase.EditTalkSession,
+	manageOpinions opinionquery.ManageOpinions,
 ) oas.ManageHandler {
 	return &manageHandler{
 		DBManager:             dbm,
@@ -208,6 +211,7 @@ func NewManageHandler(
 		setCreationPermission: setCreationPermission,
 		userInvitations:       userInvitations,
 		editTalkSession:       editTalkSession,
+		manageOpinions:        manageOpinions,
 	}
 }
 

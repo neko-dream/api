@@ -1165,7 +1165,11 @@ SELECT
     (SELECT COUNT(*) FROM votes v WHERE v.opinion_id = o.opinion_id AND v.vote_type = 3)::int AS pass_count,
     (SELECT COUNT(*) FROM opinion_reports r WHERE r.opinion_id = o.opinion_id)::int AS report_count,
     (SELECT COUNT(*) FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'unsolved')::int AS unsolved_report_count,
-    EXISTS (SELECT 1 FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'deleted') AS deleted
+    -- 一般の画面の意見一覧と同じ判定: 通報があり、そのすべてが削除済みのときだけ表示されない
+    (
+        EXISTS (SELECT 1 FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'deleted')
+        AND NOT EXISTS (SELECT 1 FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status <> 'deleted')
+    )::bool AS hidden
 FROM opinions o
 JOIN users u ON u.user_id = o.user_id
 WHERE o.talk_session_id = $1
@@ -1187,7 +1191,7 @@ type ListOpinionsForManageRow struct {
 	PassCount           int32
 	ReportCount         int32
 	UnsolvedReportCount int32
-	Deleted             bool
+	Hidden              bool
 }
 
 // 管理画面用。削除済み・通報された意見も含め、投票は意見ごとの集計だけを返す
@@ -1200,7 +1204,11 @@ type ListOpinionsForManageRow struct {
 //	    (SELECT COUNT(*) FROM votes v WHERE v.opinion_id = o.opinion_id AND v.vote_type = 3)::int AS pass_count,
 //	    (SELECT COUNT(*) FROM opinion_reports r WHERE r.opinion_id = o.opinion_id)::int AS report_count,
 //	    (SELECT COUNT(*) FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'unsolved')::int AS unsolved_report_count,
-//	    EXISTS (SELECT 1 FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'deleted') AS deleted
+//	    -- 一般の画面の意見一覧と同じ判定: 通報があり、そのすべてが削除済みのときだけ表示されない
+//	    (
+//	        EXISTS (SELECT 1 FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'deleted')
+//	        AND NOT EXISTS (SELECT 1 FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status <> 'deleted')
+//	    )::bool AS hidden
 //	FROM opinions o
 //	JOIN users u ON u.user_id = o.user_id
 //	WHERE o.talk_session_id = $1
@@ -1240,7 +1248,7 @@ func (q *Queries) ListOpinionsForManage(ctx context.Context, arg ListOpinionsFor
 			&i.PassCount,
 			&i.ReportCount,
 			&i.UnsolvedReportCount,
-			&i.Deleted,
+			&i.Hidden,
 		); err != nil {
 			return nil, err
 		}
@@ -1253,4 +1261,18 @@ func (q *Queries) ListOpinionsForManage(ctx context.Context, arg ListOpinionsFor
 		return nil, err
 	}
 	return items, nil
+}
+
+const talkSessionExists = `-- name: TalkSessionExists :one
+SELECT EXISTS (SELECT 1 FROM talk_sessions WHERE talk_session_id = $1)::bool
+`
+
+// TalkSessionExists
+//
+//	SELECT EXISTS (SELECT 1 FROM talk_sessions WHERE talk_session_id = $1)::bool
+func (q *Queries) TalkSessionExists(ctx context.Context, talkSessionID uuid.UUID) (bool, error) {
+	row := q.db.QueryRowContext(ctx, talkSessionExists, talkSessionID)
+	var column_1 bool
+	err := row.Scan(&column_1)
+	return column_1, err
 }

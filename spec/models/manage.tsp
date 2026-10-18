@@ -119,8 +119,8 @@ namespace kotohiro {
     /** 未対応の通報の件数 */
     unsolvedReportCount: int32;
 
-    /** 通報の対応で削除された（一般の画面には表示されない） */
-    deleted: boolean;
+    /** 通報の対応で削除され、一般の画面に表示されない（通報があり、そのすべてが削除済み） */
+    hidden: boolean;
   }
 
   model TalkSessionStats {

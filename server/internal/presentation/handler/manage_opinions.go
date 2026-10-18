@@ -3,13 +3,12 @@ package handler
 import (
 	"context"
 
+	opinionquery "github.com/neko-dream/api/internal/application/query/opinion"
 	"github.com/neko-dream/api/internal/domain/messages"
 	"github.com/neko-dream/api/internal/domain/model/admin"
 	"github.com/neko-dream/api/internal/domain/model/shared"
 	"github.com/neko-dream/api/internal/domain/model/talksession"
-	model "github.com/neko-dream/api/internal/infrastructure/persistence/sqlc/generated"
 	"github.com/neko-dream/api/internal/presentation/oas"
-	"github.com/neko-dream/api/pkg/utils"
 	"go.opentelemetry.io/otel"
 )
 
@@ -32,27 +31,20 @@ func (m *manageHandler) GetTalkSessionOpinionsManage(ctx context.Context, params
 	}
 	limit, offset := manageOpinionPage(params.Limit, params.Offset)
 
-	q := m.GetQueries(ctx)
-	total, err := q.CountOpinionsForManage(ctx, talkSessionID.UUID())
-	if err != nil {
-		utils.HandleError(ctx, err, "GetQueries.CountOpinionsForManage")
-		return nil, err
-	}
-	rows, err := q.ListOpinionsForManage(ctx, model.ListOpinionsForManageParams{
-		TalkSessionID: talkSessionID.UUID(),
-		RowLimit:      limit,
-		RowOffset:     offset,
+	out, err := m.manageOpinions.List(ctx, opinionquery.ManageOpinionsInput{
+		TalkSessionID: talkSessionID,
+		Limit:         limit,
+		Offset:        offset,
 	})
 	if err != nil {
-		utils.HandleError(ctx, err, "GetQueries.ListOpinionsForManage")
 		return nil, err
 	}
 
-	opinions := make([]oas.OpinionForManage, 0, len(rows))
-	for _, row := range rows {
-		opinions = append(opinions, opinionForManage(row))
+	opinions := make([]oas.OpinionForManage, 0, len(out.Opinions))
+	for _, o := range out.Opinions {
+		opinions = append(opinions, opinionForManage(o))
 	}
-	return &oas.TalkSessionOpinionsForManage{TotalCount: total, Opinions: opinions}, nil
+	return &oas.TalkSessionOpinionsForManage{TotalCount: out.TotalCount, Opinions: opinions}, nil
 }
 
 func manageOpinionPage(limitParam, offsetParam oas.OptInt32) (limit, offset int32) {
@@ -66,33 +58,32 @@ func manageOpinionPage(limitParam, offsetParam oas.OptInt32) (limit, offset int3
 	return limit, offset
 }
 
-func opinionForManage(row model.ListOpinionsForManageRow) oas.OpinionForManage {
-	o := row.Opinion
+func opinionForManage(o opinionquery.ManagedOpinion) oas.OpinionForManage {
 	res := oas.OpinionForManage{
 		OpinionID: o.OpinionID.String(),
 		Content:   o.Content,
 		Author: oas.UserForManage{
-			UserID:      row.User.UserID.String(),
-			DisplayID:   row.User.DisplayID.String,
-			DisplayName: row.User.DisplayName.String,
-			IconURL:     row.User.IconUrl.String,
+			UserID:      o.Author.UserID.String(),
+			DisplayID:   o.Author.DisplayID,
+			DisplayName: o.Author.DisplayName,
+			IconURL:     o.Author.IconURL,
 		},
 		CreatedAt:           o.CreatedAt,
-		AgreeCount:          row.AgreeCount,
-		DisagreeCount:       row.DisagreeCount,
-		PassCount:           row.PassCount,
-		ReportCount:         row.ReportCount,
-		UnsolvedReportCount: row.UnsolvedReportCount,
-		Deleted:             row.Deleted,
+		AgreeCount:          o.AgreeCount,
+		DisagreeCount:       o.DisagreeCount,
+		PassCount:           o.PassCount,
+		ReportCount:         o.ReportCount,
+		UnsolvedReportCount: o.UnsolvedReportCount,
+		Hidden:              o.Hidden,
 	}
-	if o.ParentOpinionID.Valid {
-		res.ParentOpinionID = oas.NewOptString(o.ParentOpinionID.UUID.String())
+	if o.ParentOpinionID != nil {
+		res.ParentOpinionID = oas.NewOptString(o.ParentOpinionID.String())
 	}
-	if o.PictureUrl.Valid {
-		res.PictureURL = oas.NewOptString(o.PictureUrl.String)
+	if o.PictureURL != nil {
+		res.PictureURL = oas.NewOptString(*o.PictureURL)
 	}
-	if o.ReferenceUrl.Valid {
-		res.ReferenceURL = oas.NewOptString(o.ReferenceUrl.String)
+	if o.ReferenceURL != nil {
+		res.ReferenceURL = oas.NewOptString(*o.ReferenceURL)
 	}
 	return res
 }

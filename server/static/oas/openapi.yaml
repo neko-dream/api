@@ -5274,7 +5274,7 @@ components:
         - passCount
         - reportCount
         - unsolvedReportCount
-        - deleted
+        - hidden
       properties:
         opinionID:
           type: string
@@ -5309,9 +5309,9 @@ components:
           type: integer
           format: int32
           description: 未対応の通報の件数
-        deleted:
+        hidden:
           type: boolean
-          description: 通報の対応で削除された（一般の画面には表示されない）
+          description: 通報の対応で削除され、一般の画面に表示されない（通報があり、そのすべてが削除済み）
     OpinionGroupRatio:
       type: object
       required:

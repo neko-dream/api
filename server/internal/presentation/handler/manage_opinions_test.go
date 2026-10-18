@@ -2,16 +2,34 @@ package handler
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
+	opinionquery "github.com/neko-dream/api/internal/application/query/opinion"
 	"github.com/neko-dream/api/internal/domain/messages"
-	model "github.com/neko-dream/api/internal/infrastructure/persistence/sqlc/generated"
+	"github.com/neko-dream/api/internal/domain/model/admin"
+	"github.com/neko-dream/api/internal/domain/model/opinion"
+	"github.com/neko-dream/api/internal/domain/model/shared"
+	"github.com/neko-dream/api/internal/domain/model/talksession"
+	"github.com/neko-dream/api/internal/domain/model/user"
 	"github.com/neko-dream/api/internal/presentation/oas"
 )
+
+type fakeManageOpinions struct {
+	got opinionquery.ManageOpinionsInput
+	out *opinionquery.ManageOpinionsOutput
+	err error
+}
+
+func (f *fakeManageOpinions) List(_ context.Context, in opinionquery.ManageOpinionsInput) (*opinionquery.ManageOpinionsOutput, error) {
+	f.got = in
+	return f.out, f.err
+}
+
+func adminCtx() context.Context {
+	return admin.SetAdminSession(context.Background(), &admin.AdminClaim{Sub: shared.NewUUID[admin.AdminUser]().String()})
+}
 
 func TestManageOpinionPage(t *testing.T) {
 	for name, tc := range map[string]struct {
@@ -32,39 +50,67 @@ func TestManageOpinionPage(t *testing.T) {
 	}
 }
 
-func TestOpinionForManage(t *testing.T) {
-	opinionID, parentID, userID := uuid.New(), uuid.New(), uuid.New()
-	created := time.Date(2026, 10, 1, 0, 0, 0, 0, time.UTC)
-	got := opinionForManage(model.ListOpinionsForManageRow{
-		Opinion: model.Opinion{
-			OpinionID: opinionID, UserID: userID, Content: "本文", CreatedAt: created,
-			ParentOpinionID: uuid.NullUUID{UUID: parentID, Valid: true},
-			PictureUrl:      sql.NullString{String: "https://example.com/a.png", Valid: true},
-		},
-		User:       model.User{UserID: userID, DisplayID: sql.NullString{String: "id", Valid: true}, DisplayName: sql.NullString{String: "名前", Valid: true}},
-		AgreeCount: 2, DisagreeCount: 1, PassCount: 3,
-		ReportCount: 2, UnsolvedReportCount: 1, Deleted: true,
-	})
-	if got.OpinionID != opinionID.String() || got.Content != "本文" || !got.CreatedAt.Equal(created) {
-		t.Fatalf("basic fields: %+v", got)
-	}
-	if got.ParentOpinionID.Value != parentID.String() || !got.ParentOpinionID.Set {
-		t.Fatalf("parent: %+v", got.ParentOpinionID)
-	}
-	if got.PictureURL.Value != "https://example.com/a.png" || got.ReferenceURL.Set {
-		t.Fatalf("urls: %+v %+v", got.PictureURL, got.ReferenceURL)
-	}
-	if got.Author.UserID != userID.String() || got.Author.DisplayName != "名前" || got.Author.DisplayID != "id" {
-		t.Fatalf("author: %+v", got.Author)
-	}
-	if got.AgreeCount != 2 || got.DisagreeCount != 1 || got.PassCount != 3 || got.ReportCount != 2 || got.UnsolvedReportCount != 1 || !got.Deleted {
-		t.Fatalf("counts: %+v", got)
-	}
-}
+func TestGetTalkSessionOpinionsManage(t *testing.T) {
+	talkSessionID := shared.NewUUID[talksession.TalkSession]()
+	params := oas.GetTalkSessionOpinionsManageParams{TalkSessionID: talkSessionID.String(), Limit: oas.NewOptInt32(1000)}
 
-func TestGetTalkSessionOpinionsManageRequiresAdmin(t *testing.T) {
-	h := &manageHandler{}
-	if _, err := h.GetTalkSessionOpinionsManage(context.Background(), oas.GetTalkSessionOpinionsManageParams{TalkSessionID: uuid.NewString()}); !errors.Is(err, messages.ForbiddenError) {
-		t.Fatalf("err = %v, want %v", err, messages.ForbiddenError)
-	}
+	t.Run("管理者でなければ拒否", func(t *testing.T) {
+		h := &manageHandler{manageOpinions: &fakeManageOpinions{}}
+		if _, err := h.GetTalkSessionOpinionsManage(context.Background(), params); !errors.Is(err, messages.ForbiddenError) {
+			t.Fatalf("err = %v, want %v", err, messages.ForbiddenError)
+		}
+	})
+
+	t.Run("不正なIDは400", func(t *testing.T) {
+		h := &manageHandler{manageOpinions: &fakeManageOpinions{}}
+		if _, err := h.GetTalkSessionOpinionsManage(adminCtx(), oas.GetTalkSessionOpinionsManageParams{TalkSessionID: "x"}); !errors.Is(err, messages.BadRequestError) {
+			t.Fatalf("err = %v, want %v", err, messages.BadRequestError)
+		}
+	})
+
+	t.Run("存在しないセッションのエラーをそのまま返す", func(t *testing.T) {
+		h := &manageHandler{manageOpinions: &fakeManageOpinions{err: messages.TalkSessionNotFound}}
+		if _, err := h.GetTalkSessionOpinionsManage(adminCtx(), params); !errors.Is(err, messages.TalkSessionNotFound) {
+			t.Fatalf("err = %v, want %v", err, messages.TalkSessionNotFound)
+		}
+	})
+
+	t.Run("ページングを補正し、レスポンスに変換する", func(t *testing.T) {
+		opinionID, parentID := shared.NewUUID[opinion.Opinion](), shared.NewUUID[opinion.Opinion]()
+		userID := shared.NewUUID[user.User]()
+		created := time.Date(2026, 10, 1, 0, 0, 0, 0, time.UTC)
+		picture := "https://example.com/a.png"
+		query := &fakeManageOpinions{out: &opinionquery.ManageOpinionsOutput{
+			TotalCount: 7,
+			Opinions: []opinionquery.ManagedOpinion{{
+				OpinionID: opinionID, ParentOpinionID: &parentID, Content: "本文", PictureURL: &picture, CreatedAt: created,
+				Author:     opinionquery.ManagedOpinionAuthor{UserID: userID, DisplayID: "id", DisplayName: "名前"},
+				AgreeCount: 2, DisagreeCount: 1, PassCount: 3, ReportCount: 2, UnsolvedReportCount: 1, Hidden: true,
+			}},
+		}}
+		h := &manageHandler{manageOpinions: query}
+		res, err := h.GetTalkSessionOpinionsManage(adminCtx(), params)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if query.got.TalkSessionID != talkSessionID || query.got.Limit != 100 || query.got.Offset != 0 {
+			t.Fatalf("query input: %+v", query.got)
+		}
+		if res.TotalCount != 7 || len(res.Opinions) != 1 {
+			t.Fatalf("response: %+v", res)
+		}
+		got := res.Opinions[0]
+		if got.OpinionID != opinionID.String() || got.Content != "本文" || !got.CreatedAt.Equal(created) {
+			t.Fatalf("basic fields: %+v", got)
+		}
+		if got.ParentOpinionID.Value != parentID.String() || got.PictureURL.Value != picture || got.ReferenceURL.Set {
+			t.Fatalf("optional fields: %+v", got)
+		}
+		if got.Author.UserID != userID.String() || got.Author.DisplayName != "名前" || got.Author.DisplayID != "id" {
+			t.Fatalf("author: %+v", got.Author)
+		}
+		if got.AgreeCount != 2 || got.DisagreeCount != 1 || got.PassCount != 3 || got.ReportCount != 2 || got.UnsolvedReportCount != 1 || !got.Hidden {
+			t.Fatalf("counts: %+v", got)
+		}
+	})
 }

@@ -12175,8 +12175,8 @@ func (s *OpinionForManage) encodeFields(e *jx.Encoder) {
 		e.Int32(s.UnsolvedReportCount)
 	}
 	{
-		e.FieldStart("deleted")
-		e.Bool(s.Deleted)
+		e.FieldStart("hidden")
+		e.Bool(s.Hidden)
 	}
 }
 
@@ -12193,7 +12193,7 @@ var jsonFieldsNameOfOpinionForManage = [13]string{
 	9:  "passCount",
 	10: "reportCount",
 	11: "unsolvedReportCount",
-	12: "deleted",
+	12: "hidden",
 }
 
 // Decode decodes OpinionForManage from json.
@@ -12341,17 +12341,17 @@ func (s *OpinionForManage) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"unsolvedReportCount\"")
 			}
-		case "deleted":
+		case "hidden":
 			requiredBitSet[1] |= 1 << 4
 			if err := func() error {
 				v, err := d.Bool()
-				s.Deleted = bool(v)
+				s.Hidden = bool(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"deleted\"")
+				return errors.Wrap(err, "decode field \"hidden\"")
 			}
 		default:
 			return d.Skip()
