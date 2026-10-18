@@ -68,6 +68,20 @@ func (q *Queries) CountOpinions(ctx context.Context, arg CountOpinionsParams) (i
 	return opinion_count, err
 }
 
+const countOpinionsForManage = `-- name: CountOpinionsForManage :one
+SELECT COUNT(*)::int FROM opinions WHERE talk_session_id = $1
+`
+
+// ListOpinionsForManage の行が0件（範囲外のページ）のときだけ使う
+//
+//	SELECT COUNT(*)::int FROM opinions WHERE talk_session_id = $1
+func (q *Queries) CountOpinionsForManage(ctx context.Context, talkSessionID uuid.UUID) (int32, error) {
+	row := q.db.QueryRowContext(ctx, countOpinionsForManage, talkSessionID)
+	var column_1 int32
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
 const countSwipeableOpinions = `-- name: CountSwipeableOpinions :one
 SELECT COUNT(opinions.opinion_id) AS random_opinion_count
 FROM opinions
@@ -1140,4 +1154,129 @@ func (q *Queries) GetRandomOpinions(ctx context.Context, arg GetRandomOpinionsPa
 		return nil, err
 	}
 	return items, nil
+}
+
+const listOpinionsForManage = `-- name: ListOpinionsForManage :many
+SELECT
+    o.opinion_id, o.talk_session_id, o.user_id, o.parent_opinion_id, o.title, o.content, o.created_at, o.picture_url, o.reference_url,
+    u.user_id AS author_user_id,
+    u.display_id AS author_display_id,
+    u.display_name AS author_display_name,
+    u.icon_url AS author_icon_url,
+    (SELECT COUNT(*) FROM votes v WHERE v.opinion_id = o.opinion_id AND v.vote_type = 1)::int AS agree_count,
+    (SELECT COUNT(*) FROM votes v WHERE v.opinion_id = o.opinion_id AND v.vote_type = 2)::int AS disagree_count,
+    (SELECT COUNT(*) FROM votes v WHERE v.opinion_id = o.opinion_id AND v.vote_type = 3)::int AS pass_count,
+    (SELECT COUNT(*) FROM opinion_reports r WHERE r.opinion_id = o.opinion_id)::int AS report_count,
+    (SELECT COUNT(*) FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'unsolved')::int AS unsolved_report_count,
+    -- 一般の意見一覧・返信・詳細と同じ判定（ProcessReportedOpinions）: 削除済みの通報が1件でもあれば削除済み
+    EXISTS (SELECT 1 FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'deleted')::bool AS deleted,
+    -- 件数を同じクエリで数え、別のクエリとの間に投稿があっても件数と行がずれないようにする
+    COUNT(*) OVER ()::int AS total_count
+FROM opinions o
+LEFT JOIN users u ON u.user_id = o.user_id
+WHERE o.talk_session_id = $1
+ORDER BY o.created_at DESC, o.opinion_id
+LIMIT $3 OFFSET $2
+`
+
+type ListOpinionsForManageParams struct {
+	TalkSessionID uuid.UUID
+	RowOffset     int32
+	RowLimit      int32
+}
+
+type ListOpinionsForManageRow struct {
+	Opinion             Opinion
+	AuthorUserID        uuid.NullUUID
+	AuthorDisplayID     sql.NullString
+	AuthorDisplayName   sql.NullString
+	AuthorIconUrl       sql.NullString
+	AgreeCount          int32
+	DisagreeCount       int32
+	PassCount           int32
+	ReportCount         int32
+	UnsolvedReportCount int32
+	Deleted             bool
+	TotalCount          int32
+}
+
+// 管理画面用。削除済み・通報された意見も含め、投票は意見ごとの集計だけを返す。
+// opinions.user_id に外部キーはないので、件数（CountOpinionsForManage）とそろえるため users は LEFT JOIN する
+//
+//	SELECT
+//	    o.opinion_id, o.talk_session_id, o.user_id, o.parent_opinion_id, o.title, o.content, o.created_at, o.picture_url, o.reference_url,
+//	    u.user_id AS author_user_id,
+//	    u.display_id AS author_display_id,
+//	    u.display_name AS author_display_name,
+//	    u.icon_url AS author_icon_url,
+//	    (SELECT COUNT(*) FROM votes v WHERE v.opinion_id = o.opinion_id AND v.vote_type = 1)::int AS agree_count,
+//	    (SELECT COUNT(*) FROM votes v WHERE v.opinion_id = o.opinion_id AND v.vote_type = 2)::int AS disagree_count,
+//	    (SELECT COUNT(*) FROM votes v WHERE v.opinion_id = o.opinion_id AND v.vote_type = 3)::int AS pass_count,
+//	    (SELECT COUNT(*) FROM opinion_reports r WHERE r.opinion_id = o.opinion_id)::int AS report_count,
+//	    (SELECT COUNT(*) FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'unsolved')::int AS unsolved_report_count,
+//	    -- 一般の意見一覧・返信・詳細と同じ判定（ProcessReportedOpinions）: 削除済みの通報が1件でもあれば削除済み
+//	    EXISTS (SELECT 1 FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'deleted')::bool AS deleted,
+//	    -- 件数を同じクエリで数え、別のクエリとの間に投稿があっても件数と行がずれないようにする
+//	    COUNT(*) OVER ()::int AS total_count
+//	FROM opinions o
+//	LEFT JOIN users u ON u.user_id = o.user_id
+//	WHERE o.talk_session_id = $1
+//	ORDER BY o.created_at DESC, o.opinion_id
+//	LIMIT $3 OFFSET $2
+func (q *Queries) ListOpinionsForManage(ctx context.Context, arg ListOpinionsForManageParams) ([]ListOpinionsForManageRow, error) {
+	rows, err := q.db.QueryContext(ctx, listOpinionsForManage, arg.TalkSessionID, arg.RowOffset, arg.RowLimit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListOpinionsForManageRow
+	for rows.Next() {
+		var i ListOpinionsForManageRow
+		if err := rows.Scan(
+			&i.Opinion.OpinionID,
+			&i.Opinion.TalkSessionID,
+			&i.Opinion.UserID,
+			&i.Opinion.ParentOpinionID,
+			&i.Opinion.Title,
+			&i.Opinion.Content,
+			&i.Opinion.CreatedAt,
+			&i.Opinion.PictureUrl,
+			&i.Opinion.ReferenceUrl,
+			&i.AuthorUserID,
+			&i.AuthorDisplayID,
+			&i.AuthorDisplayName,
+			&i.AuthorIconUrl,
+			&i.AgreeCount,
+			&i.DisagreeCount,
+			&i.PassCount,
+			&i.ReportCount,
+			&i.UnsolvedReportCount,
+			&i.Deleted,
+			&i.TotalCount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const talkSessionExists = `-- name: TalkSessionExists :one
+SELECT EXISTS (SELECT 1 FROM talk_sessions WHERE talk_session_id = $1)::bool
+`
+
+// TalkSessionExists
+//
+//	SELECT EXISTS (SELECT 1 FROM talk_sessions WHERE talk_session_id = $1)::bool
+func (q *Queries) TalkSessionExists(ctx context.Context, talkSessionID uuid.UUID) (bool, error) {
+	row := q.db.QueryRowContext(ctx, talkSessionExists, talkSessionID)
+	var column_1 bool
+	err := row.Scan(&column_1)
+	return column_1, err
 }

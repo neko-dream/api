@@ -22,6 +22,10 @@ func NewAdminSessionRepository(dbManager *db.DBManager) admin.AdminSessionReposi
 	return &adminSessionRepository{DBManager: dbManager}
 }
 
+// admin_sessions の時刻はタイムゾーンなしの TIMESTAMP なので、UTC にそろえて保存する。
+// SQL では DB の CURRENT_TIMESTAMP（UTC）と比べ、読み出した値も UTC として扱われるため、
+// プロセスのタイムゾーンが UTC 以外でも時刻がずれないようにする。
+
 func (r *adminSessionRepository) Create(ctx context.Context, session admin.AdminSession) error {
 	ctx, span := otel.Tracer("repository").Start(ctx, "adminSessionRepository.Create")
 	defer span.End()
@@ -30,7 +34,7 @@ func (r *adminSessionRepository) Create(ctx context.Context, session admin.Admin
 		AdminSessionID: session.AdminSessionID.UUID(),
 		AdminUserID:    session.AdminUserID.UUID(),
 		TokenHash:      session.TokenHash,
-		ExpiresAt:      session.ExpiresAt,
+		ExpiresAt:      session.ExpiresAt.UTC(),
 	}); err != nil {
 		utils.HandleError(ctx, err, "CreateAdminSession")
 		return err
@@ -50,25 +54,33 @@ func (r *adminSessionRepository) FindByTokenHash(ctx context.Context, tokenHash 
 		utils.HandleError(ctx, err, "GetAdminSessionByTokenHash")
 		return nil, err
 	}
-	return &admin.AdminSession{
+	session := &admin.AdminSession{
 		AdminSessionID: shared.UUID[admin.AdminSession](row.AdminSessionID),
 		AdminUserID:    shared.UUID[admin.AdminUser](row.AdminUserID),
 		TokenHash:      row.TokenHash,
 		ExpiresAt:      row.ExpiresAt,
 		CreatedAt:      row.CreatedAt,
 		UpdatedAt:      row.UpdatedAt,
-	}, nil
+	}
+	if row.PreviousTokenHash.Valid {
+		session.PreviousTokenHash = &row.PreviousTokenHash.String
+	}
+	if row.RotatedAt.Valid {
+		session.RotatedAt = &row.RotatedAt.Time
+	}
+	return session, nil
 }
 
-func (r *adminSessionRepository) Rotate(ctx context.Context, id shared.UUID[admin.AdminSession], oldTokenHash, newTokenHash string, expiresAt time.Time) (bool, error) {
+func (r *adminSessionRepository) Rotate(ctx context.Context, id shared.UUID[admin.AdminSession], oldTokenHash, newTokenHash string, expiresAt, rotatedAt time.Time) (bool, error) {
 	ctx, span := otel.Tracer("repository").Start(ctx, "adminSessionRepository.Rotate")
 	defer span.End()
 
 	rows, err := r.DBManager.GetQueries(ctx).RotateAdminSession(ctx, model.RotateAdminSessionParams{
 		AdminSessionID: id.UUID(),
-		TokenHash:      newTokenHash,
-		ExpiresAt:      expiresAt,
-		TokenHash_2:    oldTokenHash,
+		NewTokenHash:   newTokenHash,
+		ExpiresAt:      expiresAt.UTC(),
+		OldTokenHash:   oldTokenHash,
+		RotatedAt:      sql.NullTime{Time: rotatedAt.UTC(), Valid: true},
 	})
 	if err != nil {
 		utils.HandleError(ctx, err, "RotateAdminSession")

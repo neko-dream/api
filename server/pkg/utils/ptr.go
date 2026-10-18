@@ -208,6 +208,12 @@ func ToNullableSQL[O any](v any) O {
 		case uuid.UUID:
 			return any(uuid.NullUUID{UUID: v, Valid: true}).(O)
 		default:
+			// shared.UUID[T] のように uuid.UUID を元にした型も UUID として扱う
+			var zero O
+			uuidType := reflect.TypeOf(uuid.UUID{})
+			if _, isNullUUID := any(zero).(uuid.NullUUID); isNullUUID && rv.Type().ConvertibleTo(uuidType) {
+				return any(uuid.NullUUID{UUID: rv.Convert(uuidType).Interface().(uuid.UUID), Valid: true}).(O)
+			}
 			return newNullValue[O]()
 		}
 	}

@@ -2233,16 +2233,20 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								s.handleGetTalkSessionManageRequest([1]string{
 									args[0],
 								}, elemIsEscaped, w, r)
+							case "PUT":
+								s.handleEditTalkSessionManageRequest([1]string{
+									args[0],
+								}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "GET")
+								s.notAllowed(w, r, "GET,PUT")
 							}
 
 							return
 						}
 						switch elem[0] {
-						case '/': // Prefix: "/analysis/re"
+						case '/': // Prefix: "/"
 
-							if l := len("/analysis/re"); len(elem) >= l && elem[0:l] == "/analysis/re" {
+							if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 								elem = elem[l:]
 							} else {
 								break
@@ -2252,31 +2256,71 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								break
 							}
 							switch elem[0] {
-							case 'g': // Prefix: "generate"
+							case 'a': // Prefix: "analysis/re"
 
-								if l := len("generate"); len(elem) >= l && elem[0:l] == "generate" {
+								if l := len("analysis/re"); len(elem) >= l && elem[0:l] == "analysis/re" {
 									elem = elem[l:]
 								} else {
 									break
 								}
 
 								if len(elem) == 0 {
-									// Leaf node.
-									switch r.Method {
-									case "POST":
-										s.handleManageRegenerateManageRequest([1]string{
-											args[0],
-										}, elemIsEscaped, w, r)
-									default:
-										s.notAllowed(w, r, "POST")
+									break
+								}
+								switch elem[0] {
+								case 'g': // Prefix: "generate"
+
+									if l := len("generate"); len(elem) >= l && elem[0:l] == "generate" {
+										elem = elem[l:]
+									} else {
+										break
 									}
 
-									return
+									if len(elem) == 0 {
+										// Leaf node.
+										switch r.Method {
+										case "POST":
+											s.handleManageRegenerateManageRequest([1]string{
+												args[0],
+											}, elemIsEscaped, w, r)
+										default:
+											s.notAllowed(w, r, "POST")
+										}
+
+										return
+									}
+
+								case 'p': // Prefix: "port"
+
+									if l := len("port"); len(elem) >= l && elem[0:l] == "port" {
+										elem = elem[l:]
+									} else {
+										break
+									}
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch r.Method {
+										case "GET":
+											s.handleGetAnalysisReportManageRequest([1]string{
+												args[0],
+											}, elemIsEscaped, w, r)
+										case "POST":
+											s.handleToggleReportVisibilityManageRequest([1]string{
+												args[0],
+											}, elemIsEscaped, w, r)
+										default:
+											s.notAllowed(w, r, "GET,POST")
+										}
+
+										return
+									}
+
 								}
 
-							case 'p': // Prefix: "port"
+							case 'o': // Prefix: "opinions"
 
-								if l := len("port"); len(elem) >= l && elem[0:l] == "port" {
+								if l := len("opinions"); len(elem) >= l && elem[0:l] == "opinions" {
 									elem = elem[l:]
 								} else {
 									break
@@ -2286,15 +2330,11 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									// Leaf node.
 									switch r.Method {
 									case "GET":
-										s.handleGetAnalysisReportManageRequest([1]string{
-											args[0],
-										}, elemIsEscaped, w, r)
-									case "POST":
-										s.handleToggleReportVisibilityManageRequest([1]string{
+										s.handleGetTalkSessionOpinionsManageRequest([1]string{
 											args[0],
 										}, elemIsEscaped, w, r)
 									default:
-										s.notAllowed(w, r, "GET,POST")
+										s.notAllowed(w, r, "GET")
 									}
 
 									return
@@ -5103,14 +5143,22 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.args = args
 								r.count = 1
 								return r, true
+							case "PUT":
+								r.name = EditTalkSessionManageOperation
+								r.summary = ""
+								r.operationID = "editTalkSessionManage"
+								r.pathPattern = "/v1/manage/talksessions/{talkSessionID}"
+								r.args = args
+								r.count = 1
+								return r, true
 							default:
 								return
 							}
 						}
 						switch elem[0] {
-						case '/': // Prefix: "/analysis/re"
+						case '/': // Prefix: "/"
 
-							if l := len("/analysis/re"); len(elem) >= l && elem[0:l] == "/analysis/re" {
+							if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 								elem = elem[l:]
 							} else {
 								break
@@ -5120,33 +5168,79 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								break
 							}
 							switch elem[0] {
-							case 'g': // Prefix: "generate"
+							case 'a': // Prefix: "analysis/re"
 
-								if l := len("generate"); len(elem) >= l && elem[0:l] == "generate" {
+								if l := len("analysis/re"); len(elem) >= l && elem[0:l] == "analysis/re" {
 									elem = elem[l:]
 								} else {
 									break
 								}
 
 								if len(elem) == 0 {
-									// Leaf node.
-									switch method {
-									case "POST":
-										r.name = ManageRegenerateManageOperation
-										r.summary = ""
-										r.operationID = "manageRegenerateManage"
-										r.pathPattern = "/v1/manage/talksessions/{talkSessionID}/analysis/regenerate"
-										r.args = args
-										r.count = 1
-										return r, true
-									default:
-										return
+									break
+								}
+								switch elem[0] {
+								case 'g': // Prefix: "generate"
+
+									if l := len("generate"); len(elem) >= l && elem[0:l] == "generate" {
+										elem = elem[l:]
+									} else {
+										break
 									}
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch method {
+										case "POST":
+											r.name = ManageRegenerateManageOperation
+											r.summary = ""
+											r.operationID = "manageRegenerateManage"
+											r.pathPattern = "/v1/manage/talksessions/{talkSessionID}/analysis/regenerate"
+											r.args = args
+											r.count = 1
+											return r, true
+										default:
+											return
+										}
+									}
+
+								case 'p': // Prefix: "port"
+
+									if l := len("port"); len(elem) >= l && elem[0:l] == "port" {
+										elem = elem[l:]
+									} else {
+										break
+									}
+
+									if len(elem) == 0 {
+										// Leaf node.
+										switch method {
+										case "GET":
+											r.name = GetAnalysisReportManageOperation
+											r.summary = ""
+											r.operationID = "getAnalysisReportManage"
+											r.pathPattern = "/v1/manage/talksessions/{talkSessionID}/analysis/report"
+											r.args = args
+											r.count = 1
+											return r, true
+										case "POST":
+											r.name = ToggleReportVisibilityManageOperation
+											r.summary = ""
+											r.operationID = "toggleReportVisibilityManage"
+											r.pathPattern = "/v1/manage/talksessions/{talkSessionID}/analysis/report"
+											r.args = args
+											r.count = 1
+											return r, true
+										default:
+											return
+										}
+									}
+
 								}
 
-							case 'p': // Prefix: "port"
+							case 'o': // Prefix: "opinions"
 
-								if l := len("port"); len(elem) >= l && elem[0:l] == "port" {
+								if l := len("opinions"); len(elem) >= l && elem[0:l] == "opinions" {
 									elem = elem[l:]
 								} else {
 									break
@@ -5156,18 +5250,10 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									// Leaf node.
 									switch method {
 									case "GET":
-										r.name = GetAnalysisReportManageOperation
+										r.name = GetTalkSessionOpinionsManageOperation
 										r.summary = ""
-										r.operationID = "getAnalysisReportManage"
-										r.pathPattern = "/v1/manage/talksessions/{talkSessionID}/analysis/report"
-										r.args = args
-										r.count = 1
-										return r, true
-									case "POST":
-										r.name = ToggleReportVisibilityManageOperation
-										r.summary = ""
-										r.operationID = "toggleReportVisibilityManage"
-										r.pathPattern = "/v1/manage/talksessions/{talkSessionID}/analysis/report"
+										r.operationID = "getTalkSessionOpinionsManage"
+										r.pathPattern = "/v1/manage/talksessions/{talkSessionID}/opinions"
 										r.args = args
 										r.count = 1
 										return r, true

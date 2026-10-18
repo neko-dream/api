@@ -177,6 +177,15 @@ func (UnimplementedHandler) EditTalkSession(ctx context.Context, req *EditTalkSe
 	return r, ht.ErrNotImplemented
 }
 
+// EditTalkSessionManage implements editTalkSessionManage operation.
+//
+// 管理者がセッションの内容・表示設定・参加制限を編集する。変更は監査ログに残す。.
+//
+// PUT /v1/manage/talksessions/{talkSessionID}
+func (UnimplementedHandler) EditTalkSessionManage(ctx context.Context, req *TalkSessionEditForManage, params EditTalkSessionManageParams) (r *TalkSessionForManage, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // EditTimeLine implements editTimeLine operation.
 //
 // タイムライン編集.
@@ -394,6 +403,15 @@ func (UnimplementedHandler) GetTalkSessionListManage(ctx context.Context, params
 //
 // GET /v1/manage/talksessions/{talkSessionID}
 func (UnimplementedHandler) GetTalkSessionManage(ctx context.Context, params GetTalkSessionManageParams) (r *TalkSessionForManage, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetTalkSessionOpinionsManage implements getTalkSessionOpinionsManage operation.
+//
+// 削除済み・通報された意見も含めて、新しい順に返す。投票は意見ごとの集計だけを返す。.
+//
+// GET /v1/manage/talksessions/{talkSessionID}/opinions
+func (UnimplementedHandler) GetTalkSessionOpinionsManage(ctx context.Context, params GetTalkSessionOpinionsManageParams) (r *TalkSessionOpinionsForManage, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

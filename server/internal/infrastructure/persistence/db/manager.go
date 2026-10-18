@@ -13,11 +13,22 @@ import (
 
 type txKey struct{}
 
+type afterCommitKey struct{}
+
 func getTx(ctx context.Context) *sql.Tx {
 	if tx, ok := ctx.Value(txKey{}).(*sql.Tx); ok {
 		return tx
 	}
 	return nil
+}
+
+// AfterCommit トランザクション中ならコミット後に、そうでなければすぐに fn を実行する
+func AfterCommit(ctx context.Context, fn func()) {
+	if hooks, ok := ctx.Value(afterCommitKey{}).(*[]func()); ok {
+		*hooks = append(*hooks, fn)
+		return
+	}
+	fn()
 }
 
 // DBManager DBコネクションおよびトランザクションを管理
@@ -80,7 +91,8 @@ func (s *DBManager) ExecTx(ctx context.Context, fn func(context.Context) error) 
 		}
 	}()
 
-	txCtx := context.WithValue(ctx, txKey{}, tx)
+	var afterCommitHooks []func()
+	txCtx := context.WithValue(context.WithValue(ctx, txKey{}, tx), afterCommitKey{}, &afterCommitHooks)
 	if err := fn(txCtx); err != nil {
 		if rbErr := tx.Rollback(); rbErr != nil {
 			utils.HandleError(ctx, rbErr, fmt.Sprintf("ロールバックに失敗: %v (元エラー: %v)", rbErr, err))
@@ -92,6 +104,10 @@ func (s *DBManager) ExecTx(ctx context.Context, fn func(context.Context) error) 
 	if err := tx.Commit(); err != nil {
 		utils.HandleError(ctx, err, "トランザクションのコミットに失敗")
 		return errtrace.Wrap(err)
+	}
+
+	for _, hook := range afterCommitHooks {
+		hook()
 	}
 
 	return nil

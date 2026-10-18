@@ -14,6 +14,30 @@ import (
 	"github.com/neko-dream/api/internal/domain/model/talksession"
 )
 
+const countTalkSessionParticipants = `-- name: CountTalkSessionParticipants :one
+SELECT COUNT(*)::int AS participant_count
+FROM (
+    SELECT user_id FROM opinions WHERE opinions.talk_session_id = $1
+    UNION
+    SELECT user_id FROM votes WHERE votes.talk_session_id = $1
+) participants
+`
+
+// CountTalkSessionParticipants
+//
+//	SELECT COUNT(*)::int AS participant_count
+//	FROM (
+//	    SELECT user_id FROM opinions WHERE opinions.talk_session_id = $1
+//	    UNION
+//	    SELECT user_id FROM votes WHERE votes.talk_session_id = $1
+//	) participants
+func (q *Queries) CountTalkSessionParticipants(ctx context.Context, talkSessionID uuid.UUID) (int32, error) {
+	row := q.db.QueryRowContext(ctx, countTalkSessionParticipants, talkSessionID)
+	var participant_count int32
+	err := row.Scan(&participant_count)
+	return participant_count, err
+}
+
 const countTalkSessions = `-- name: CountTalkSessions :one
 SELECT
     COUNT(DISTINCT talk_sessions.talk_session_id) AS talk_session_count,

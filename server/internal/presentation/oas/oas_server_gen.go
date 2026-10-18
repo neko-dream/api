@@ -218,6 +218,12 @@ type ManageHandler interface {
 	//
 	// POST /v1/manage/users
 	CreateUserManage(ctx context.Context, req *InviteManagedUserRequest) (*ManagedUserInvitation, error)
+	// EditTalkSessionManage implements editTalkSessionManage operation.
+	//
+	// 管理者がセッションの内容・表示設定・参加制限を編集する。変更は監査ログに残す。.
+	//
+	// PUT /v1/manage/talksessions/{talkSessionID}
+	EditTalkSessionManage(ctx context.Context, req *TalkSessionEditForManage, params EditTalkSessionManageParams) (*TalkSessionForManage, error)
 	// GetAnalysisReportManage implements getAnalysisReportManage operation.
 	//
 	// GET /v1/manage/talksessions/{talkSessionID}/analysis/report
@@ -230,6 +236,12 @@ type ManageHandler interface {
 	//
 	// GET /v1/manage/talksessions/{talkSessionID}
 	GetTalkSessionManage(ctx context.Context, params GetTalkSessionManageParams) (*TalkSessionForManage, error)
+	// GetTalkSessionOpinionsManage implements getTalkSessionOpinionsManage operation.
+	//
+	// 削除済み・通報された意見も含めて、新しい順に返す。投票は意見ごとの集計だけを返す。.
+	//
+	// GET /v1/manage/talksessions/{talkSessionID}/opinions
+	GetTalkSessionOpinionsManage(ctx context.Context, params GetTalkSessionOpinionsManageParams) (*TalkSessionOpinionsForManage, error)
 	// GetUserDetailManage implements getUserDetailManage operation.
 	//
 	// GET /v1/manage/users/{userID}

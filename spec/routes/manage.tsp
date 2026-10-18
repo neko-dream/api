@@ -30,6 +30,30 @@ namespace kotohiro {
       getTalkSession(
         @path talkSessionID: string,
       ): kotohiro.TalkSessionForManage;
+
+      /** 管理者がセッションの内容・表示設定・参加制限を編集する。変更は監査ログに残す。 */
+      @route("/{talkSessionID}")
+      @operationId("editTalkSessionManage")
+      @extension("x-ogen-operation-group", "manage")
+      @put
+      editTalkSession(
+        @path talkSessionID: string,
+        @body body: kotohiro.TalkSessionEditForManage,
+      ): kotohiro.TalkSessionForManage;
+    }
+
+    @route("/talksessions/{talkSessionID}/opinions")
+    @tag("manage")
+    interface TalkSessionOpinions {
+      /** 削除済み・通報された意見も含めて、新しい順に返す。投票は意見ごとの集計だけを返す。 */
+      @operationId("getTalkSessionOpinionsManage")
+      @extension("x-ogen-operation-group", "manage")
+      @get
+      getTalkSessionOpinions(
+        @path talkSessionID: string,
+        @query offset?: int32,
+        @query limit?: int32,
+      ): kotohiro.TalkSessionOpinionsForManage;
     }
 
     @route("/talksessions/{talkSessionID}/analysis")

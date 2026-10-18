@@ -3705,6 +3705,157 @@ func (s *OpinionComments2OK) SetOpinions(val []OpinionWithVote) {
 
 func (*OpinionComments2OK) opinionComments2Res() {}
 
+// Ref: #/components/schemas/OpinionForManage
+type OpinionForManage struct {
+	OpinionID    string    `json:"opinionID"`
+	Content      string    `json:"content"`
+	PictureURL   OptString `json:"pictureURL"`
+	ReferenceURL OptString `json:"referenceURL"`
+	// 返信の場合は返信先の意見ID.
+	ParentOpinionID OptString     `json:"parentOpinionID"`
+	Author          UserForManage `json:"author"`
+	CreatedAt       time.Time     `json:"createdAt"`
+	AgreeCount      int32         `json:"agreeCount"`
+	DisagreeCount   int32         `json:"disagreeCount"`
+	PassCount       int32         `json:"passCount"`
+	// 通報の件数（すべての状態）.
+	ReportCount int32 `json:"reportCount"`
+	// 未対応の通報の件数.
+	UnsolvedReportCount int32 `json:"unsolvedReportCount"`
+	// 通報の対応で削除された。削除済みの通報が1件でもあると、一般の意見一覧・返信・詳細では「運営により削除されました」と表示される.
+	Deleted bool `json:"deleted"`
+}
+
+// GetOpinionID returns the value of OpinionID.
+func (s *OpinionForManage) GetOpinionID() string {
+	return s.OpinionID
+}
+
+// GetContent returns the value of Content.
+func (s *OpinionForManage) GetContent() string {
+	return s.Content
+}
+
+// GetPictureURL returns the value of PictureURL.
+func (s *OpinionForManage) GetPictureURL() OptString {
+	return s.PictureURL
+}
+
+// GetReferenceURL returns the value of ReferenceURL.
+func (s *OpinionForManage) GetReferenceURL() OptString {
+	return s.ReferenceURL
+}
+
+// GetParentOpinionID returns the value of ParentOpinionID.
+func (s *OpinionForManage) GetParentOpinionID() OptString {
+	return s.ParentOpinionID
+}
+
+// GetAuthor returns the value of Author.
+func (s *OpinionForManage) GetAuthor() UserForManage {
+	return s.Author
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *OpinionForManage) GetCreatedAt() time.Time {
+	return s.CreatedAt
+}
+
+// GetAgreeCount returns the value of AgreeCount.
+func (s *OpinionForManage) GetAgreeCount() int32 {
+	return s.AgreeCount
+}
+
+// GetDisagreeCount returns the value of DisagreeCount.
+func (s *OpinionForManage) GetDisagreeCount() int32 {
+	return s.DisagreeCount
+}
+
+// GetPassCount returns the value of PassCount.
+func (s *OpinionForManage) GetPassCount() int32 {
+	return s.PassCount
+}
+
+// GetReportCount returns the value of ReportCount.
+func (s *OpinionForManage) GetReportCount() int32 {
+	return s.ReportCount
+}
+
+// GetUnsolvedReportCount returns the value of UnsolvedReportCount.
+func (s *OpinionForManage) GetUnsolvedReportCount() int32 {
+	return s.UnsolvedReportCount
+}
+
+// GetDeleted returns the value of Deleted.
+func (s *OpinionForManage) GetDeleted() bool {
+	return s.Deleted
+}
+
+// SetOpinionID sets the value of OpinionID.
+func (s *OpinionForManage) SetOpinionID(val string) {
+	s.OpinionID = val
+}
+
+// SetContent sets the value of Content.
+func (s *OpinionForManage) SetContent(val string) {
+	s.Content = val
+}
+
+// SetPictureURL sets the value of PictureURL.
+func (s *OpinionForManage) SetPictureURL(val OptString) {
+	s.PictureURL = val
+}
+
+// SetReferenceURL sets the value of ReferenceURL.
+func (s *OpinionForManage) SetReferenceURL(val OptString) {
+	s.ReferenceURL = val
+}
+
+// SetParentOpinionID sets the value of ParentOpinionID.
+func (s *OpinionForManage) SetParentOpinionID(val OptString) {
+	s.ParentOpinionID = val
+}
+
+// SetAuthor sets the value of Author.
+func (s *OpinionForManage) SetAuthor(val UserForManage) {
+	s.Author = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *OpinionForManage) SetCreatedAt(val time.Time) {
+	s.CreatedAt = val
+}
+
+// SetAgreeCount sets the value of AgreeCount.
+func (s *OpinionForManage) SetAgreeCount(val int32) {
+	s.AgreeCount = val
+}
+
+// SetDisagreeCount sets the value of DisagreeCount.
+func (s *OpinionForManage) SetDisagreeCount(val int32) {
+	s.DisagreeCount = val
+}
+
+// SetPassCount sets the value of PassCount.
+func (s *OpinionForManage) SetPassCount(val int32) {
+	s.PassCount = val
+}
+
+// SetReportCount sets the value of ReportCount.
+func (s *OpinionForManage) SetReportCount(val int32) {
+	s.ReportCount = val
+}
+
+// SetUnsolvedReportCount sets the value of UnsolvedReportCount.
+func (s *OpinionForManage) SetUnsolvedReportCount(val int32) {
+	s.UnsolvedReportCount = val
+}
+
+// SetDeleted sets the value of Deleted.
+func (s *OpinionForManage) SetDeleted(val bool) {
+	s.Deleted = val
+}
+
 // Ref: #/components/schemas/OpinionGroupRatio
 type OpinionGroupRatio struct {
 	AgreeCount    int    `json:"agreeCount"`
@@ -7658,6 +7809,116 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) SetPassCount(val in
 	s.PassCount = val
 }
 
+// Ref: #/components/schemas/TalkSessionEditForManage
+type TalkSessionEditForManage struct {
+	// 1〜100文字.
+	Theme string `json:"theme"`
+	// 本文（HTML）。40000文字まで.
+	Description string `json:"description"`
+	// 変更する場合は未来の日時にする。変更しない場合は現在の値をそのまま送る.
+	ScheduledEndTime time.Time `json:"scheduledEndTime"`
+	// 空文字は未設定として扱う.
+	Prefecture string `json:"prefecture"`
+	// 空文字は未設定として扱う.
+	City            string `json:"city"`
+	HideTop         bool   `json:"hideTop"`
+	HideReport      bool   `json:"hideReport"`
+	DisableAnalysis bool   `json:"disableAnalysis"`
+	// 参加制限のキー。survey.answered
+	// はアンケートがあるセッションにだけ付けられる.
+	Restrictions []string `json:"restrictions"`
+}
+
+// GetTheme returns the value of Theme.
+func (s *TalkSessionEditForManage) GetTheme() string {
+	return s.Theme
+}
+
+// GetDescription returns the value of Description.
+func (s *TalkSessionEditForManage) GetDescription() string {
+	return s.Description
+}
+
+// GetScheduledEndTime returns the value of ScheduledEndTime.
+func (s *TalkSessionEditForManage) GetScheduledEndTime() time.Time {
+	return s.ScheduledEndTime
+}
+
+// GetPrefecture returns the value of Prefecture.
+func (s *TalkSessionEditForManage) GetPrefecture() string {
+	return s.Prefecture
+}
+
+// GetCity returns the value of City.
+func (s *TalkSessionEditForManage) GetCity() string {
+	return s.City
+}
+
+// GetHideTop returns the value of HideTop.
+func (s *TalkSessionEditForManage) GetHideTop() bool {
+	return s.HideTop
+}
+
+// GetHideReport returns the value of HideReport.
+func (s *TalkSessionEditForManage) GetHideReport() bool {
+	return s.HideReport
+}
+
+// GetDisableAnalysis returns the value of DisableAnalysis.
+func (s *TalkSessionEditForManage) GetDisableAnalysis() bool {
+	return s.DisableAnalysis
+}
+
+// GetRestrictions returns the value of Restrictions.
+func (s *TalkSessionEditForManage) GetRestrictions() []string {
+	return s.Restrictions
+}
+
+// SetTheme sets the value of Theme.
+func (s *TalkSessionEditForManage) SetTheme(val string) {
+	s.Theme = val
+}
+
+// SetDescription sets the value of Description.
+func (s *TalkSessionEditForManage) SetDescription(val string) {
+	s.Description = val
+}
+
+// SetScheduledEndTime sets the value of ScheduledEndTime.
+func (s *TalkSessionEditForManage) SetScheduledEndTime(val time.Time) {
+	s.ScheduledEndTime = val
+}
+
+// SetPrefecture sets the value of Prefecture.
+func (s *TalkSessionEditForManage) SetPrefecture(val string) {
+	s.Prefecture = val
+}
+
+// SetCity sets the value of City.
+func (s *TalkSessionEditForManage) SetCity(val string) {
+	s.City = val
+}
+
+// SetHideTop sets the value of HideTop.
+func (s *TalkSessionEditForManage) SetHideTop(val bool) {
+	s.HideTop = val
+}
+
+// SetHideReport sets the value of HideReport.
+func (s *TalkSessionEditForManage) SetHideReport(val bool) {
+	s.HideReport = val
+}
+
+// SetDisableAnalysis sets the value of DisableAnalysis.
+func (s *TalkSessionEditForManage) SetDisableAnalysis(val bool) {
+	s.DisableAnalysis = val
+}
+
+// SetRestrictions sets the value of Restrictions.
+func (s *TalkSessionEditForManage) SetRestrictions(val []string) {
+	s.Restrictions = val
+}
+
 // Ref: #/components/schemas/TalkSessionForManage
 type TalkSessionForManage struct {
 	TalkSessionID    string        `json:"talkSessionID"`
@@ -7671,6 +7932,18 @@ type TalkSessionForManage struct {
 	Hidden           bool          `json:"hidden"`
 	UpdatedAt        string        `json:"updatedAt"`
 	CreatedAt        string        `json:"createdAt"`
+	// ホームの一覧に表示しない.
+	HideTop bool `json:"hideTop"`
+	// レポートを表示しない.
+	HideReport bool `json:"hideReport"`
+	// 分析を無効にする.
+	DisableAnalysis bool `json:"disableAnalysis"`
+	// 参加制限のキー（GET /talksessions/restrictions の key）.
+	Restrictions []string `json:"restrictions"`
+	// アンケートがあるか.
+	HasSurvey bool `json:"hasSurvey"`
+	// 意見を投稿したか投票したユーザーの数。参加制限を変えるときの警告に使う.
+	ParticipantCount int32 `json:"participantCount"`
 }
 
 // GetTalkSessionID returns the value of TalkSessionID.
@@ -7728,6 +8001,36 @@ func (s *TalkSessionForManage) GetCreatedAt() string {
 	return s.CreatedAt
 }
 
+// GetHideTop returns the value of HideTop.
+func (s *TalkSessionForManage) GetHideTop() bool {
+	return s.HideTop
+}
+
+// GetHideReport returns the value of HideReport.
+func (s *TalkSessionForManage) GetHideReport() bool {
+	return s.HideReport
+}
+
+// GetDisableAnalysis returns the value of DisableAnalysis.
+func (s *TalkSessionForManage) GetDisableAnalysis() bool {
+	return s.DisableAnalysis
+}
+
+// GetRestrictions returns the value of Restrictions.
+func (s *TalkSessionForManage) GetRestrictions() []string {
+	return s.Restrictions
+}
+
+// GetHasSurvey returns the value of HasSurvey.
+func (s *TalkSessionForManage) GetHasSurvey() bool {
+	return s.HasSurvey
+}
+
+// GetParticipantCount returns the value of ParticipantCount.
+func (s *TalkSessionForManage) GetParticipantCount() int32 {
+	return s.ParticipantCount
+}
+
 // SetTalkSessionID sets the value of TalkSessionID.
 func (s *TalkSessionForManage) SetTalkSessionID(val string) {
 	s.TalkSessionID = val
@@ -7783,6 +8086,36 @@ func (s *TalkSessionForManage) SetCreatedAt(val string) {
 	s.CreatedAt = val
 }
 
+// SetHideTop sets the value of HideTop.
+func (s *TalkSessionForManage) SetHideTop(val bool) {
+	s.HideTop = val
+}
+
+// SetHideReport sets the value of HideReport.
+func (s *TalkSessionForManage) SetHideReport(val bool) {
+	s.HideReport = val
+}
+
+// SetDisableAnalysis sets the value of DisableAnalysis.
+func (s *TalkSessionForManage) SetDisableAnalysis(val bool) {
+	s.DisableAnalysis = val
+}
+
+// SetRestrictions sets the value of Restrictions.
+func (s *TalkSessionForManage) SetRestrictions(val []string) {
+	s.Restrictions = val
+}
+
+// SetHasSurvey sets the value of HasSurvey.
+func (s *TalkSessionForManage) SetHasSurvey(val bool) {
+	s.HasSurvey = val
+}
+
+// SetParticipantCount sets the value of ParticipantCount.
+func (s *TalkSessionForManage) SetParticipantCount(val int32) {
+	s.ParticipantCount = val
+}
+
 // Ref: #/components/schemas/TalkSessionListResponse
 type TalkSessionListResponse struct {
 	TalkSessionStats []TalkSessionStats `json:"talkSessionStats"`
@@ -7809,6 +8142,32 @@ func (s *TalkSessionListResponse) SetTotalCount(val int32) {
 	s.TotalCount = val
 }
 
+// Ref: #/components/schemas/TalkSessionOpinionsForManage
+type TalkSessionOpinionsForManage struct {
+	TotalCount int32              `json:"totalCount"`
+	Opinions   []OpinionForManage `json:"opinions"`
+}
+
+// GetTotalCount returns the value of TotalCount.
+func (s *TalkSessionOpinionsForManage) GetTotalCount() int32 {
+	return s.TotalCount
+}
+
+// GetOpinions returns the value of Opinions.
+func (s *TalkSessionOpinionsForManage) GetOpinions() []OpinionForManage {
+	return s.Opinions
+}
+
+// SetTotalCount sets the value of TotalCount.
+func (s *TalkSessionOpinionsForManage) SetTotalCount(val int32) {
+	s.TotalCount = val
+}
+
+// SetOpinions sets the value of Opinions.
+func (s *TalkSessionOpinionsForManage) SetOpinions(val []OpinionForManage) {
+	s.Opinions = val
+}
+
 // Ref: #/components/schemas/TalkSessionStats
 type TalkSessionStats struct {
 	TalkSessionID    string        `json:"talkSessionID"`
@@ -7819,13 +8178,16 @@ type TalkSessionStats struct {
 	City             OptString     `json:"city"`
 	Prefecture       OptString     `json:"prefecture"`
 	ThumbnailURL     string        `json:"thumbnailURL"`
-	Hidden           bool          `json:"hidden"`
-	UpdatedAt        string        `json:"updatedAt"`
-	CreatedAt        string        `json:"createdAt"`
-	OpinionCount     int32         `json:"opinionCount"`
-	OpinionUserCount int32         `json:"opinionUserCount"`
-	VoteCount        int32         `json:"voteCount"`
-	VoteUserCount    int32         `json:"voteUserCount"`
+	// レポートを表示しない（hideReport と同じ値）.
+	Hidden bool `json:"hidden"`
+	// ホームの一覧に表示しない.
+	HideTop          bool   `json:"hideTop"`
+	UpdatedAt        string `json:"updatedAt"`
+	CreatedAt        string `json:"createdAt"`
+	OpinionCount     int32  `json:"opinionCount"`
+	OpinionUserCount int32  `json:"opinionUserCount"`
+	VoteCount        int32  `json:"voteCount"`
+	VoteUserCount    int32  `json:"voteUserCount"`
 }
 
 // GetTalkSessionID returns the value of TalkSessionID.
@@ -7871,6 +8233,11 @@ func (s *TalkSessionStats) GetThumbnailURL() string {
 // GetHidden returns the value of Hidden.
 func (s *TalkSessionStats) GetHidden() bool {
 	return s.Hidden
+}
+
+// GetHideTop returns the value of HideTop.
+func (s *TalkSessionStats) GetHideTop() bool {
+	return s.HideTop
 }
 
 // GetUpdatedAt returns the value of UpdatedAt.
@@ -7946,6 +8313,11 @@ func (s *TalkSessionStats) SetThumbnailURL(val string) {
 // SetHidden sets the value of Hidden.
 func (s *TalkSessionStats) SetHidden(val bool) {
 	s.Hidden = val
+}
+
+// SetHideTop sets the value of HideTop.
+func (s *TalkSessionStats) SetHideTop(val bool) {
+	s.HideTop = val
 }
 
 // SetUpdatedAt sets the value of UpdatedAt.

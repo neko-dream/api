@@ -333,3 +333,34 @@ WHERE
         ELSE TRUE
     END
 ;
+
+-- name: ListOpinionsForManage :many
+-- 管理画面用。削除済み・通報された意見も含め、投票は意見ごとの集計だけを返す。
+-- opinions.user_id に外部キーはないので、件数（CountOpinionsForManage）とそろえるため users は LEFT JOIN する
+SELECT
+    sqlc.embed(o),
+    u.user_id AS author_user_id,
+    u.display_id AS author_display_id,
+    u.display_name AS author_display_name,
+    u.icon_url AS author_icon_url,
+    (SELECT COUNT(*) FROM votes v WHERE v.opinion_id = o.opinion_id AND v.vote_type = 1)::int AS agree_count,
+    (SELECT COUNT(*) FROM votes v WHERE v.opinion_id = o.opinion_id AND v.vote_type = 2)::int AS disagree_count,
+    (SELECT COUNT(*) FROM votes v WHERE v.opinion_id = o.opinion_id AND v.vote_type = 3)::int AS pass_count,
+    (SELECT COUNT(*) FROM opinion_reports r WHERE r.opinion_id = o.opinion_id)::int AS report_count,
+    (SELECT COUNT(*) FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'unsolved')::int AS unsolved_report_count,
+    -- 一般の意見一覧・返信・詳細と同じ判定（ProcessReportedOpinions）: 削除済みの通報が1件でもあれば削除済み
+    EXISTS (SELECT 1 FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'deleted')::bool AS deleted,
+    -- 件数を同じクエリで数え、別のクエリとの間に投稿があっても件数と行がずれないようにする
+    COUNT(*) OVER ()::int AS total_count
+FROM opinions o
+LEFT JOIN users u ON u.user_id = o.user_id
+WHERE o.talk_session_id = sqlc.arg(talk_session_id)
+ORDER BY o.created_at DESC, o.opinion_id
+LIMIT sqlc.arg(row_limit) OFFSET sqlc.arg(row_offset);
+
+-- name: CountOpinionsForManage :one
+-- ListOpinionsForManage の行が0件（範囲外のページ）のときだけ使う
+SELECT COUNT(*)::int FROM opinions WHERE talk_session_id = $1;
+
+-- name: TalkSessionExists :one
+SELECT EXISTS (SELECT 1 FROM talk_sessions WHERE talk_session_id = $1)::bool;

@@ -12112,6 +12112,305 @@ func (s *OpinionComments2OK) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
+func (s *OpinionForManage) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *OpinionForManage) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("opinionID")
+		e.Str(s.OpinionID)
+	}
+	{
+		e.FieldStart("content")
+		e.Str(s.Content)
+	}
+	{
+		if s.PictureURL.Set {
+			e.FieldStart("pictureURL")
+			s.PictureURL.Encode(e)
+		}
+	}
+	{
+		if s.ReferenceURL.Set {
+			e.FieldStart("referenceURL")
+			s.ReferenceURL.Encode(e)
+		}
+	}
+	{
+		if s.ParentOpinionID.Set {
+			e.FieldStart("parentOpinionID")
+			s.ParentOpinionID.Encode(e)
+		}
+	}
+	{
+		e.FieldStart("author")
+		s.Author.Encode(e)
+	}
+	{
+		e.FieldStart("createdAt")
+		json.EncodeDateTime(e, s.CreatedAt)
+	}
+	{
+		e.FieldStart("agreeCount")
+		e.Int32(s.AgreeCount)
+	}
+	{
+		e.FieldStart("disagreeCount")
+		e.Int32(s.DisagreeCount)
+	}
+	{
+		e.FieldStart("passCount")
+		e.Int32(s.PassCount)
+	}
+	{
+		e.FieldStart("reportCount")
+		e.Int32(s.ReportCount)
+	}
+	{
+		e.FieldStart("unsolvedReportCount")
+		e.Int32(s.UnsolvedReportCount)
+	}
+	{
+		e.FieldStart("deleted")
+		e.Bool(s.Deleted)
+	}
+}
+
+var jsonFieldsNameOfOpinionForManage = [13]string{
+	0:  "opinionID",
+	1:  "content",
+	2:  "pictureURL",
+	3:  "referenceURL",
+	4:  "parentOpinionID",
+	5:  "author",
+	6:  "createdAt",
+	7:  "agreeCount",
+	8:  "disagreeCount",
+	9:  "passCount",
+	10: "reportCount",
+	11: "unsolvedReportCount",
+	12: "deleted",
+}
+
+// Decode decodes OpinionForManage from json.
+func (s *OpinionForManage) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode OpinionForManage to nil")
+	}
+	var requiredBitSet [2]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "opinionID":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Str()
+				s.OpinionID = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"opinionID\"")
+			}
+		case "content":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := d.Str()
+				s.Content = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"content\"")
+			}
+		case "pictureURL":
+			if err := func() error {
+				s.PictureURL.Reset()
+				if err := s.PictureURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"pictureURL\"")
+			}
+		case "referenceURL":
+			if err := func() error {
+				s.ReferenceURL.Reset()
+				if err := s.ReferenceURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"referenceURL\"")
+			}
+		case "parentOpinionID":
+			if err := func() error {
+				s.ParentOpinionID.Reset()
+				if err := s.ParentOpinionID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"parentOpinionID\"")
+			}
+		case "author":
+			requiredBitSet[0] |= 1 << 5
+			if err := func() error {
+				if err := s.Author.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"author\"")
+			}
+		case "createdAt":
+			requiredBitSet[0] |= 1 << 6
+			if err := func() error {
+				v, err := json.DecodeDateTime(d)
+				s.CreatedAt = v
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"createdAt\"")
+			}
+		case "agreeCount":
+			requiredBitSet[0] |= 1 << 7
+			if err := func() error {
+				v, err := d.Int32()
+				s.AgreeCount = int32(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"agreeCount\"")
+			}
+		case "disagreeCount":
+			requiredBitSet[1] |= 1 << 0
+			if err := func() error {
+				v, err := d.Int32()
+				s.DisagreeCount = int32(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"disagreeCount\"")
+			}
+		case "passCount":
+			requiredBitSet[1] |= 1 << 1
+			if err := func() error {
+				v, err := d.Int32()
+				s.PassCount = int32(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"passCount\"")
+			}
+		case "reportCount":
+			requiredBitSet[1] |= 1 << 2
+			if err := func() error {
+				v, err := d.Int32()
+				s.ReportCount = int32(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"reportCount\"")
+			}
+		case "unsolvedReportCount":
+			requiredBitSet[1] |= 1 << 3
+			if err := func() error {
+				v, err := d.Int32()
+				s.UnsolvedReportCount = int32(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"unsolvedReportCount\"")
+			}
+		case "deleted":
+			requiredBitSet[1] |= 1 << 4
+			if err := func() error {
+				v, err := d.Bool()
+				s.Deleted = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"deleted\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode OpinionForManage")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [2]uint8{
+		0b11100011,
+		0b00011111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfOpinionForManage) {
+					name = jsonFieldsNameOfOpinionForManage[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *OpinionForManage) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OpinionForManage) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s *OpinionGroupRatio) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -19922,6 +20221,251 @@ func (s *TalkSessionAnalysisOKGroupOpinionsItemOpinionsItem) UnmarshalJSON(data 
 }
 
 // Encode implements json.Marshaler.
+func (s *TalkSessionEditForManage) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *TalkSessionEditForManage) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("theme")
+		e.Str(s.Theme)
+	}
+	{
+		e.FieldStart("description")
+		e.Str(s.Description)
+	}
+	{
+		e.FieldStart("scheduledEndTime")
+		json.EncodeDateTime(e, s.ScheduledEndTime)
+	}
+	{
+		e.FieldStart("prefecture")
+		e.Str(s.Prefecture)
+	}
+	{
+		e.FieldStart("city")
+		e.Str(s.City)
+	}
+	{
+		e.FieldStart("hideTop")
+		e.Bool(s.HideTop)
+	}
+	{
+		e.FieldStart("hideReport")
+		e.Bool(s.HideReport)
+	}
+	{
+		e.FieldStart("disableAnalysis")
+		e.Bool(s.DisableAnalysis)
+	}
+	{
+		e.FieldStart("restrictions")
+		e.ArrStart()
+		for _, elem := range s.Restrictions {
+			e.Str(elem)
+		}
+		e.ArrEnd()
+	}
+}
+
+var jsonFieldsNameOfTalkSessionEditForManage = [9]string{
+	0: "theme",
+	1: "description",
+	2: "scheduledEndTime",
+	3: "prefecture",
+	4: "city",
+	5: "hideTop",
+	6: "hideReport",
+	7: "disableAnalysis",
+	8: "restrictions",
+}
+
+// Decode decodes TalkSessionEditForManage from json.
+func (s *TalkSessionEditForManage) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode TalkSessionEditForManage to nil")
+	}
+	var requiredBitSet [2]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "theme":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Str()
+				s.Theme = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"theme\"")
+			}
+		case "description":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := d.Str()
+				s.Description = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"description\"")
+			}
+		case "scheduledEndTime":
+			requiredBitSet[0] |= 1 << 2
+			if err := func() error {
+				v, err := json.DecodeDateTime(d)
+				s.ScheduledEndTime = v
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"scheduledEndTime\"")
+			}
+		case "prefecture":
+			requiredBitSet[0] |= 1 << 3
+			if err := func() error {
+				v, err := d.Str()
+				s.Prefecture = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"prefecture\"")
+			}
+		case "city":
+			requiredBitSet[0] |= 1 << 4
+			if err := func() error {
+				v, err := d.Str()
+				s.City = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"city\"")
+			}
+		case "hideTop":
+			requiredBitSet[0] |= 1 << 5
+			if err := func() error {
+				v, err := d.Bool()
+				s.HideTop = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hideTop\"")
+			}
+		case "hideReport":
+			requiredBitSet[0] |= 1 << 6
+			if err := func() error {
+				v, err := d.Bool()
+				s.HideReport = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hideReport\"")
+			}
+		case "disableAnalysis":
+			requiredBitSet[0] |= 1 << 7
+			if err := func() error {
+				v, err := d.Bool()
+				s.DisableAnalysis = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"disableAnalysis\"")
+			}
+		case "restrictions":
+			requiredBitSet[1] |= 1 << 0
+			if err := func() error {
+				s.Restrictions = make([]string, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem string
+					v, err := d.Str()
+					elem = string(v)
+					if err != nil {
+						return err
+					}
+					s.Restrictions = append(s.Restrictions, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"restrictions\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode TalkSessionEditForManage")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [2]uint8{
+		0b11111111,
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfTalkSessionEditForManage) {
+					name = jsonFieldsNameOfTalkSessionEditForManage[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *TalkSessionEditForManage) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *TalkSessionEditForManage) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s *TalkSessionForManage) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -19978,9 +20522,37 @@ func (s *TalkSessionForManage) encodeFields(e *jx.Encoder) {
 		e.FieldStart("createdAt")
 		e.Str(s.CreatedAt)
 	}
+	{
+		e.FieldStart("hideTop")
+		e.Bool(s.HideTop)
+	}
+	{
+		e.FieldStart("hideReport")
+		e.Bool(s.HideReport)
+	}
+	{
+		e.FieldStart("disableAnalysis")
+		e.Bool(s.DisableAnalysis)
+	}
+	{
+		e.FieldStart("restrictions")
+		e.ArrStart()
+		for _, elem := range s.Restrictions {
+			e.Str(elem)
+		}
+		e.ArrEnd()
+	}
+	{
+		e.FieldStart("hasSurvey")
+		e.Bool(s.HasSurvey)
+	}
+	{
+		e.FieldStart("participantCount")
+		e.Int32(s.ParticipantCount)
+	}
 }
 
-var jsonFieldsNameOfTalkSessionForManage = [11]string{
+var jsonFieldsNameOfTalkSessionForManage = [17]string{
 	0:  "talkSessionID",
 	1:  "theme",
 	2:  "description",
@@ -19992,6 +20564,12 @@ var jsonFieldsNameOfTalkSessionForManage = [11]string{
 	8:  "hidden",
 	9:  "updatedAt",
 	10: "createdAt",
+	11: "hideTop",
+	12: "hideReport",
+	13: "disableAnalysis",
+	14: "restrictions",
+	15: "hasSurvey",
+	16: "participantCount",
 }
 
 // Decode decodes TalkSessionForManage from json.
@@ -19999,7 +20577,7 @@ func (s *TalkSessionForManage) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode TalkSessionForManage to nil")
 	}
-	var requiredBitSet [2]uint8
+	var requiredBitSet [3]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -20129,6 +20707,86 @@ func (s *TalkSessionForManage) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"createdAt\"")
 			}
+		case "hideTop":
+			requiredBitSet[1] |= 1 << 3
+			if err := func() error {
+				v, err := d.Bool()
+				s.HideTop = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hideTop\"")
+			}
+		case "hideReport":
+			requiredBitSet[1] |= 1 << 4
+			if err := func() error {
+				v, err := d.Bool()
+				s.HideReport = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hideReport\"")
+			}
+		case "disableAnalysis":
+			requiredBitSet[1] |= 1 << 5
+			if err := func() error {
+				v, err := d.Bool()
+				s.DisableAnalysis = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"disableAnalysis\"")
+			}
+		case "restrictions":
+			requiredBitSet[1] |= 1 << 6
+			if err := func() error {
+				s.Restrictions = make([]string, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem string
+					v, err := d.Str()
+					elem = string(v)
+					if err != nil {
+						return err
+					}
+					s.Restrictions = append(s.Restrictions, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"restrictions\"")
+			}
+		case "hasSurvey":
+			requiredBitSet[1] |= 1 << 7
+			if err := func() error {
+				v, err := d.Bool()
+				s.HasSurvey = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hasSurvey\"")
+			}
+		case "participantCount":
+			requiredBitSet[2] |= 1 << 0
+			if err := func() error {
+				v, err := d.Int32()
+				s.ParticipantCount = int32(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"participantCount\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -20138,9 +20796,10 @@ func (s *TalkSessionForManage) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [2]uint8{
+	for i, mask := range [3]uint8{
 		0b10011111,
-		0b00000111,
+		0b11111111,
+		0b00000001,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -20310,6 +20969,129 @@ func (s *TalkSessionListResponse) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
+func (s *TalkSessionOpinionsForManage) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *TalkSessionOpinionsForManage) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("totalCount")
+		e.Int32(s.TotalCount)
+	}
+	{
+		e.FieldStart("opinions")
+		e.ArrStart()
+		for _, elem := range s.Opinions {
+			elem.Encode(e)
+		}
+		e.ArrEnd()
+	}
+}
+
+var jsonFieldsNameOfTalkSessionOpinionsForManage = [2]string{
+	0: "totalCount",
+	1: "opinions",
+}
+
+// Decode decodes TalkSessionOpinionsForManage from json.
+func (s *TalkSessionOpinionsForManage) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode TalkSessionOpinionsForManage to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "totalCount":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Int32()
+				s.TotalCount = int32(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"totalCount\"")
+			}
+		case "opinions":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				s.Opinions = make([]OpinionForManage, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem OpinionForManage
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Opinions = append(s.Opinions, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"opinions\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode TalkSessionOpinionsForManage")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000011,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfTalkSessionOpinionsForManage) {
+					name = jsonFieldsNameOfTalkSessionOpinionsForManage[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *TalkSessionOpinionsForManage) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *TalkSessionOpinionsForManage) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s *TalkSessionStats) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -20359,6 +21141,10 @@ func (s *TalkSessionStats) encodeFields(e *jx.Encoder) {
 		e.Bool(s.Hidden)
 	}
 	{
+		e.FieldStart("hideTop")
+		e.Bool(s.HideTop)
+	}
+	{
 		e.FieldStart("updatedAt")
 		e.Str(s.UpdatedAt)
 	}
@@ -20384,7 +21170,7 @@ func (s *TalkSessionStats) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfTalkSessionStats = [15]string{
+var jsonFieldsNameOfTalkSessionStats = [16]string{
 	0:  "talkSessionID",
 	1:  "theme",
 	2:  "description",
@@ -20394,12 +21180,13 @@ var jsonFieldsNameOfTalkSessionStats = [15]string{
 	6:  "prefecture",
 	7:  "thumbnailURL",
 	8:  "hidden",
-	9:  "updatedAt",
-	10: "createdAt",
-	11: "opinionCount",
-	12: "opinionUserCount",
-	13: "voteCount",
-	14: "voteUserCount",
+	9:  "hideTop",
+	10: "updatedAt",
+	11: "createdAt",
+	12: "opinionCount",
+	13: "opinionUserCount",
+	14: "voteCount",
+	15: "voteUserCount",
 }
 
 // Decode decodes TalkSessionStats from json.
@@ -20513,8 +21300,20 @@ func (s *TalkSessionStats) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"hidden\"")
 			}
-		case "updatedAt":
+		case "hideTop":
 			requiredBitSet[1] |= 1 << 1
+			if err := func() error {
+				v, err := d.Bool()
+				s.HideTop = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hideTop\"")
+			}
+		case "updatedAt":
+			requiredBitSet[1] |= 1 << 2
 			if err := func() error {
 				v, err := d.Str()
 				s.UpdatedAt = string(v)
@@ -20526,7 +21325,7 @@ func (s *TalkSessionStats) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"updatedAt\"")
 			}
 		case "createdAt":
-			requiredBitSet[1] |= 1 << 2
+			requiredBitSet[1] |= 1 << 3
 			if err := func() error {
 				v, err := d.Str()
 				s.CreatedAt = string(v)
@@ -20538,7 +21337,7 @@ func (s *TalkSessionStats) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"createdAt\"")
 			}
 		case "opinionCount":
-			requiredBitSet[1] |= 1 << 3
+			requiredBitSet[1] |= 1 << 4
 			if err := func() error {
 				v, err := d.Int32()
 				s.OpinionCount = int32(v)
@@ -20550,7 +21349,7 @@ func (s *TalkSessionStats) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"opinionCount\"")
 			}
 		case "opinionUserCount":
-			requiredBitSet[1] |= 1 << 4
+			requiredBitSet[1] |= 1 << 5
 			if err := func() error {
 				v, err := d.Int32()
 				s.OpinionUserCount = int32(v)
@@ -20562,7 +21361,7 @@ func (s *TalkSessionStats) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"opinionUserCount\"")
 			}
 		case "voteCount":
-			requiredBitSet[1] |= 1 << 5
+			requiredBitSet[1] |= 1 << 6
 			if err := func() error {
 				v, err := d.Int32()
 				s.VoteCount = int32(v)
@@ -20574,7 +21373,7 @@ func (s *TalkSessionStats) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"voteCount\"")
 			}
 		case "voteUserCount":
-			requiredBitSet[1] |= 1 << 6
+			requiredBitSet[1] |= 1 << 7
 			if err := func() error {
 				v, err := d.Int32()
 				s.VoteUserCount = int32(v)
@@ -20596,7 +21395,7 @@ func (s *TalkSessionStats) Decode(d *jx.Decoder) error {
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
 		0b10011111,
-		0b01111111,
+		0b11111111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

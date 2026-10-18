@@ -3,6 +3,7 @@ package admin_usecase
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/neko-dream/api/internal/domain/model/admin"
 	"github.com/neko-dream/api/internal/domain/model/clock"
@@ -52,6 +53,7 @@ func (a *adminRefreshInteractor) Execute(ctx context.Context, refreshToken strin
 		return nil, err
 	}
 
+	now := clock.Now(ctx)
 	session, err := a.adminSessionRepo.FindByTokenHash(ctx, tokenHash)
 	if err != nil {
 		return nil, err
@@ -59,7 +61,7 @@ func (a *adminRefreshInteractor) Execute(ctx context.Context, refreshToken strin
 	if session == nil {
 		return nil, ErrInvalidRefreshToken
 	}
-	if session.IsExpired(clock.Now(ctx)) {
+	if session.IsExpired(now) {
 		_ = a.adminSessionRepo.DeleteByTokenHash(ctx, tokenHash)
 		return nil, ErrInvalidRefreshToken
 	}
@@ -72,7 +74,12 @@ func (a *adminRefreshInteractor) Execute(ctx context.Context, refreshToken strin
 		return nil, ErrInvalidRefreshToken
 	}
 
-	// access を再発行し、refresh をローテーション(旧トークンは即時無効化)。
+	// ローテーション直前のトークン。別タブが先にリフレッシュした場合なので、猶予期間内ならアクセストークンだけ発行する
+	if session.TokenHash != tokenHash {
+		return a.accessOnly(ctx, session, tokenHash, adminUser, now)
+	}
+
+	// access を再発行し、refresh をローテーションする（旧トークンは猶予期間を過ぎると使えなくなる）
 	access, err := a.adminTokenManager.Generate(ctx, *adminUser)
 	if err != nil {
 		return nil, err
@@ -85,13 +92,34 @@ func (a *adminRefreshInteractor) Execute(ctx context.Context, refreshToken strin
 	if err != nil {
 		return nil, err
 	}
-	rotated, err := a.adminSessionRepo.Rotate(ctx, session.AdminSessionID, tokenHash, newHash, clock.Now(ctx).Add(refreshTokenTTL))
+	rotated, err := a.adminSessionRepo.Rotate(ctx, session.AdminSessionID, tokenHash, newHash, now.Add(refreshTokenTTL), now)
 	if err != nil {
 		return nil, err
 	}
 	if !rotated {
-		return nil, ErrInvalidRefreshToken
+		// 読み込んでからローテーションするまでに、別タブが先にローテーションした
+		latest, err := a.adminSessionRepo.FindByTokenHash(ctx, tokenHash)
+		if err != nil {
+			return nil, err
+		}
+		if latest == nil {
+			return nil, ErrInvalidRefreshToken
+		}
+		return a.accessOnly(ctx, latest, tokenHash, adminUser, now)
 	}
 
 	return &AdminAuthOutput{AccessToken: access, RefreshToken: newRefresh, AdminUser: *adminUser}, nil
+}
+
+// accessOnly は猶予期間内の直前のトークンに対して、アクセストークンだけを発行する。
+// リフレッシュトークンは先にローテーションしたタブが受け取った新しいものを使うので、返さない（Cookie を上書きしない）。
+func (a *adminRefreshInteractor) accessOnly(ctx context.Context, session *admin.AdminSession, tokenHash string, adminUser *admin.AdminUser, now time.Time) (*AdminAuthOutput, error) {
+	if !session.IsPreviousTokenInGracePeriod(tokenHash, now) {
+		return nil, ErrInvalidRefreshToken
+	}
+	access, err := a.adminTokenManager.Generate(ctx, *adminUser)
+	if err != nil {
+		return nil, err
+	}
+	return &AdminAuthOutput{AccessToken: access, AdminUser: *adminUser}, nil
 }
