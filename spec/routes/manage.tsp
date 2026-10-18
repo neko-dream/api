@@ -30,6 +30,16 @@ namespace kotohiro {
       getTalkSession(
         @path talkSessionID: string,
       ): kotohiro.TalkSessionForManage;
+
+      /** 管理者がセッションの内容・表示設定・参加制限を編集する。変更は監査ログに残す。 */
+      @route("/{talkSessionID}")
+      @operationId("editTalkSessionManage")
+      @extension("x-ogen-operation-group", "manage")
+      @put
+      editTalkSession(
+        @path talkSessionID: string,
+        @body body: kotohiro.TalkSessionEditForManage,
+      ): kotohiro.TalkSessionForManage;
     }
 
     @route("/talksessions/{talkSessionID}/analysis")

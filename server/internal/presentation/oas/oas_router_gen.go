@@ -2233,8 +2233,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								s.handleGetTalkSessionManageRequest([1]string{
 									args[0],
 								}, elemIsEscaped, w, r)
+							case "PUT":
+								s.handleEditTalkSessionManageRequest([1]string{
+									args[0],
+								}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "GET")
+								s.notAllowed(w, r, "GET,PUT")
 							}
 
 							return
@@ -5099,6 +5103,14 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = GetTalkSessionManageOperation
 								r.summary = ""
 								r.operationID = "getTalkSessionManage"
+								r.pathPattern = "/v1/manage/talksessions/{talkSessionID}"
+								r.args = args
+								r.count = 1
+								return r, true
+							case "PUT":
+								r.name = EditTalkSessionManageOperation
+								r.summary = ""
+								r.operationID = "editTalkSessionManage"
 								r.pathPattern = "/v1/manage/talksessions/{talkSessionID}"
 								r.args = args
 								r.count = 1
