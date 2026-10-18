@@ -41,12 +41,14 @@ type ManagedOpinion struct {
 	// ReportCount は通報の件数（すべての状態）、UnsolvedReportCount はそのうち未対応の件数。
 	ReportCount         int32
 	UnsolvedReportCount int32
-	// Hidden は通報の対応で削除され、一般の画面に表示されない（一般の画面の意見一覧と同じ判定）。
-	Hidden bool
+	// Deleted は通報の対応で削除されたか。削除済みの通報が1件でもあると、一般の意見一覧・返信・詳細では
+	// 「運営により削除されました」と表示される（ProcessReportedOpinions と同じ判定）。
+	Deleted bool
 }
 
+// ManagedOpinionAuthor は投稿者。opinions.user_id に外部キーはないため、ユーザーがいなければ UserID は nil。
 type ManagedOpinionAuthor struct {
-	UserID      shared.UUID[user.User]
+	UserID      *shared.UUID[user.User]
 	DisplayID   string
 	DisplayName string
 	IconURL     string

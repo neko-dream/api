@@ -63,7 +63,6 @@ func opinionForManage(o opinionquery.ManagedOpinion) oas.OpinionForManage {
 		OpinionID: o.OpinionID.String(),
 		Content:   o.Content,
 		Author: oas.UserForManage{
-			UserID:      o.Author.UserID.String(),
 			DisplayID:   o.Author.DisplayID,
 			DisplayName: o.Author.DisplayName,
 			IconURL:     o.Author.IconURL,
@@ -74,7 +73,10 @@ func opinionForManage(o opinionquery.ManagedOpinion) oas.OpinionForManage {
 		PassCount:           o.PassCount,
 		ReportCount:         o.ReportCount,
 		UnsolvedReportCount: o.UnsolvedReportCount,
-		Hidden:              o.Hidden,
+		Deleted:             o.Deleted,
+	}
+	if o.Author.UserID != nil {
+		res.Author.UserID = o.Author.UserID.String()
 	}
 	if o.ParentOpinionID != nil {
 		res.ParentOpinionID = oas.NewOptString(o.ParentOpinionID.String())

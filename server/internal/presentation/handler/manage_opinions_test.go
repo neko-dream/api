@@ -84,8 +84,8 @@ func TestGetTalkSessionOpinionsManage(t *testing.T) {
 			TotalCount: 7,
 			Opinions: []opinionquery.ManagedOpinion{{
 				OpinionID: opinionID, ParentOpinionID: &parentID, Content: "本文", PictureURL: &picture, CreatedAt: created,
-				Author:     opinionquery.ManagedOpinionAuthor{UserID: userID, DisplayID: "id", DisplayName: "名前"},
-				AgreeCount: 2, DisagreeCount: 1, PassCount: 3, ReportCount: 2, UnsolvedReportCount: 1, Hidden: true,
+				Author:     opinionquery.ManagedOpinionAuthor{UserID: &userID, DisplayID: "id", DisplayName: "名前"},
+				AgreeCount: 2, DisagreeCount: 1, PassCount: 3, ReportCount: 2, UnsolvedReportCount: 1, Deleted: true,
 			}},
 		}}
 		h := &manageHandler{manageOpinions: query}
@@ -109,8 +109,21 @@ func TestGetTalkSessionOpinionsManage(t *testing.T) {
 		if got.Author.UserID != userID.String() || got.Author.DisplayName != "名前" || got.Author.DisplayID != "id" {
 			t.Fatalf("author: %+v", got.Author)
 		}
-		if got.AgreeCount != 2 || got.DisagreeCount != 1 || got.PassCount != 3 || got.ReportCount != 2 || got.UnsolvedReportCount != 1 || !got.Hidden {
+		if got.AgreeCount != 2 || got.DisagreeCount != 1 || got.PassCount != 3 || got.ReportCount != 2 || got.UnsolvedReportCount != 1 || !got.Deleted {
 			t.Fatalf("counts: %+v", got)
+		}
+	})
+
+	t.Run("ユーザーがいない意見は投稿者IDを空にする", func(t *testing.T) {
+		query := &fakeManageOpinions{out: &opinionquery.ManageOpinionsOutput{TotalCount: 1, Opinions: []opinionquery.ManagedOpinion{{
+			OpinionID: shared.NewUUID[opinion.Opinion](), Content: "本文",
+		}}}}
+		res, err := (&manageHandler{manageOpinions: query}).GetTalkSessionOpinionsManage(adminCtx(), params)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if res.Opinions[0].Author.UserID != "" {
+			t.Fatalf("author: %+v", res.Opinions[0].Author)
 		}
 	})
 }

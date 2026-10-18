@@ -34,7 +34,7 @@ func TestManageOpinions(t *testing.T) {
 	for i := range users {
 		users[i] = uuid.New()
 	}
-	parentID, replyID, mixedID, hiddenID := uuid.New(), uuid.New(), uuid.New(), uuid.New()
+	parentID, replyID, mixedID, deletedID, orphanID := uuid.New(), uuid.New(), uuid.New(), uuid.New(), uuid.New()
 	base := time.Date(2026, 10, 1, 0, 0, 0, 0, time.UTC)
 
 	setup := func(ctx context.Context, _ *TestData) error {
@@ -58,7 +58,9 @@ func TestManageOpinions(t *testing.T) {
 			{OpinionID: parentID, UserID: users[0], Content: "親の意見"},
 			{OpinionID: replyID, UserID: users[1], Content: "返信", ParentOpinionID: uuid.NullUUID{UUID: parentID, Valid: true}},
 			{OpinionID: mixedID, UserID: users[2], Content: "削除後にまた通報された意見"},
-			{OpinionID: hiddenID, UserID: users[3], Content: "削除された意見"},
+			{OpinionID: deletedID, UserID: users[3], Content: "削除された意見"},
+			// opinions.user_id に外部キーはない。ユーザーがいない意見も一覧から消えてはいけない
+			{OpinionID: orphanID, UserID: uuid.New(), Content: "ユーザーがいない意見"},
 		} {
 			op.TalkSessionID = talkSessionID.UUID()
 			op.CreatedAt = base.Add(time.Duration(i) * time.Hour)
@@ -76,9 +78,9 @@ func TestManageOpinions(t *testing.T) {
 			}
 		}
 		for _, report := range []model.CreateReportParams{
-			{OpinionID: hiddenID, ReporterID: users[0], Status: "deleted"},
-			{OpinionID: hiddenID, ReporterID: users[1], Status: "deleted"},
-			// 削除済みの通報と未対応の通報が混ざると、一般の画面では表示される
+			{OpinionID: deletedID, ReporterID: users[0], Status: "deleted"},
+			{OpinionID: deletedID, ReporterID: users[1], Status: "deleted"},
+			// 削除後にまた通報されても、一般の意見一覧・詳細では削除済みとして表示される
 			{OpinionID: mixedID, ReporterID: users[0], Status: "deleted"},
 			{OpinionID: mixedID, ReporterID: users[1], Status: "unsolved"},
 			{OpinionID: parentID, ReporterID: users[3], Status: "hold"},
@@ -102,29 +104,32 @@ func TestManageOpinions(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				if out.TotalCount != 4 || len(out.Opinions) != 4 {
-					return fmt.Errorf("total=%d len=%d, want 4", out.TotalCount, len(out.Opinions))
+				if out.TotalCount != 5 || len(out.Opinions) != 5 {
+					return fmt.Errorf("total=%d len=%d, want 5", out.TotalCount, len(out.Opinions))
 				}
-				order := []uuid.UUID{hiddenID, mixedID, replyID, parentID}
+				order := []uuid.UUID{orphanID, deletedID, mixedID, replyID, parentID}
 				for i, want := range order {
 					if out.Opinions[i].OpinionID.UUID() != want {
 						return errors.New("opinions are not ordered newest first")
 					}
 				}
-				hidden, mixed, reply, parent := out.Opinions[0], out.Opinions[1], out.Opinions[2], out.Opinions[3]
-				if !hidden.Hidden || hidden.ReportCount != 2 || hidden.UnsolvedReportCount != 0 {
-					return fmt.Errorf("hidden opinion: %+v", hidden)
+				orphan, deleted, mixed, reply, parent := out.Opinions[0], out.Opinions[1], out.Opinions[2], out.Opinions[3], out.Opinions[4]
+				if orphan.Author.UserID != nil || orphan.Author.DisplayName != "" || orphan.Deleted {
+					return fmt.Errorf("opinion without user: %+v", orphan)
 				}
-				if mixed.Hidden || mixed.ReportCount != 2 || mixed.UnsolvedReportCount != 1 {
-					return fmt.Errorf("mixed reports must be visible like the public list: %+v", mixed)
+				if !deleted.Deleted || deleted.ReportCount != 2 || deleted.UnsolvedReportCount != 0 {
+					return fmt.Errorf("deleted opinion: %+v", deleted)
 				}
-				if reply.ParentOpinionID == nil || reply.ParentOpinionID.UUID() != parentID || reply.Hidden {
+				if !mixed.Deleted || mixed.ReportCount != 2 || mixed.UnsolvedReportCount != 1 {
+					return fmt.Errorf("an opinion with any deleted report is shown as deleted in public lists: %+v", mixed)
+				}
+				if reply.ParentOpinionID == nil || reply.ParentOpinionID.UUID() != parentID || reply.Deleted {
 					return fmt.Errorf("reply: %+v", reply)
 				}
-				if parent.AgreeCount != 2 || parent.DisagreeCount != 1 || parent.PassCount != 1 || parent.ReportCount != 1 || parent.Hidden {
+				if parent.AgreeCount != 2 || parent.DisagreeCount != 1 || parent.PassCount != 1 || parent.ReportCount != 1 || parent.Deleted {
 					return fmt.Errorf("parent counts: %+v", parent)
 				}
-				if parent.Author.UserID.UUID() != users[0] || parent.Author.DisplayName != "ユーザー0" {
+				if parent.Author.UserID == nil || parent.Author.UserID.UUID() != users[0] || parent.Author.DisplayName != "ユーザー0" {
 					return fmt.Errorf("author: %+v", parent.Author)
 				}
 
@@ -132,7 +137,7 @@ func TestManageOpinions(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				if page.TotalCount != 4 || len(page.Opinions) != 1 || page.Opinions[0].OpinionID.UUID() != replyID {
+				if page.TotalCount != 5 || len(page.Opinions) != 1 || page.Opinions[0].OpinionID.UUID() != mixedID {
 					return errors.New("offset/limit not applied")
 				}
 				return nil

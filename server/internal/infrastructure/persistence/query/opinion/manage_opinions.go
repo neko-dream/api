@@ -60,17 +60,20 @@ func toManagedOpinion(row model.ListOpinionsForManageRow) opinionquery.ManagedOp
 		Content:   o.Content,
 		CreatedAt: o.CreatedAt,
 		Author: opinionquery.ManagedOpinionAuthor{
-			UserID:      shared.UUID[user.User](row.User.UserID),
-			DisplayID:   row.User.DisplayID.String,
-			DisplayName: row.User.DisplayName.String,
-			IconURL:     row.User.IconUrl.String,
+			DisplayID:   row.AuthorDisplayID.String,
+			DisplayName: row.AuthorDisplayName.String,
+			IconURL:     row.AuthorIconUrl.String,
 		},
 		AgreeCount:          row.AgreeCount,
 		DisagreeCount:       row.DisagreeCount,
 		PassCount:           row.PassCount,
 		ReportCount:         row.ReportCount,
 		UnsolvedReportCount: row.UnsolvedReportCount,
-		Hidden:              row.Hidden,
+		Deleted:             row.Deleted,
+	}
+	if row.AuthorUserID.Valid {
+		userID := shared.UUID[user.User](row.AuthorUserID.UUID)
+		res.Author.UserID = &userID
 	}
 	if o.ParentOpinionID.Valid {
 		parent := shared.UUID[opinion.Opinion](o.ParentOpinionID.UUID)

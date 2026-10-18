@@ -3722,8 +3722,8 @@ type OpinionForManage struct {
 	ReportCount int32 `json:"reportCount"`
 	// 未対応の通報の件数.
 	UnsolvedReportCount int32 `json:"unsolvedReportCount"`
-	// 通報の対応で削除され、一般の画面に表示されない（通報があり、そのすべてが削除済み）.
-	Hidden bool `json:"hidden"`
+	// 通報の対応で削除された。削除済みの通報が1件でもあると、一般の意見一覧・返信・詳細では「運営により削除されました」と表示される.
+	Deleted bool `json:"deleted"`
 }
 
 // GetOpinionID returns the value of OpinionID.
@@ -3786,9 +3786,9 @@ func (s *OpinionForManage) GetUnsolvedReportCount() int32 {
 	return s.UnsolvedReportCount
 }
 
-// GetHidden returns the value of Hidden.
-func (s *OpinionForManage) GetHidden() bool {
-	return s.Hidden
+// GetDeleted returns the value of Deleted.
+func (s *OpinionForManage) GetDeleted() bool {
+	return s.Deleted
 }
 
 // SetOpinionID sets the value of OpinionID.
@@ -3851,9 +3851,9 @@ func (s *OpinionForManage) SetUnsolvedReportCount(val int32) {
 	s.UnsolvedReportCount = val
 }
 
-// SetHidden sets the value of Hidden.
-func (s *OpinionForManage) SetHidden(val bool) {
-	s.Hidden = val
+// SetDeleted sets the value of Deleted.
+func (s *OpinionForManage) SetDeleted(val bool) {
+	s.Deleted = val
 }
 
 // Ref: #/components/schemas/OpinionGroupRatio

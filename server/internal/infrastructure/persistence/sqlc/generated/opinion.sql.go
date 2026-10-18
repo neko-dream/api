@@ -1159,19 +1159,19 @@ func (q *Queries) GetRandomOpinions(ctx context.Context, arg GetRandomOpinionsPa
 const listOpinionsForManage = `-- name: ListOpinionsForManage :many
 SELECT
     o.opinion_id, o.talk_session_id, o.user_id, o.parent_opinion_id, o.title, o.content, o.created_at, o.picture_url, o.reference_url,
-    u.user_id, u.display_id, u.display_name, u.icon_url, u.created_at, u.updated_at, u.email, u.email_verified, u.withdrawal_date, u.can_create_talk_session,
+    u.user_id AS author_user_id,
+    u.display_id AS author_display_id,
+    u.display_name AS author_display_name,
+    u.icon_url AS author_icon_url,
     (SELECT COUNT(*) FROM votes v WHERE v.opinion_id = o.opinion_id AND v.vote_type = 1)::int AS agree_count,
     (SELECT COUNT(*) FROM votes v WHERE v.opinion_id = o.opinion_id AND v.vote_type = 2)::int AS disagree_count,
     (SELECT COUNT(*) FROM votes v WHERE v.opinion_id = o.opinion_id AND v.vote_type = 3)::int AS pass_count,
     (SELECT COUNT(*) FROM opinion_reports r WHERE r.opinion_id = o.opinion_id)::int AS report_count,
     (SELECT COUNT(*) FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'unsolved')::int AS unsolved_report_count,
-    -- 一般の画面の意見一覧と同じ判定: 通報があり、そのすべてが削除済みのときだけ表示されない
-    (
-        EXISTS (SELECT 1 FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'deleted')
-        AND NOT EXISTS (SELECT 1 FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status <> 'deleted')
-    )::bool AS hidden
+    -- 一般の意見一覧・返信・詳細と同じ判定（ProcessReportedOpinions）: 削除済みの通報が1件でもあれば削除済み
+    EXISTS (SELECT 1 FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'deleted')::bool AS deleted
 FROM opinions o
-JOIN users u ON u.user_id = o.user_id
+LEFT JOIN users u ON u.user_id = o.user_id
 WHERE o.talk_session_id = $1
 ORDER BY o.created_at DESC, o.opinion_id
 LIMIT $3 OFFSET $2
@@ -1185,32 +1185,36 @@ type ListOpinionsForManageParams struct {
 
 type ListOpinionsForManageRow struct {
 	Opinion             Opinion
-	User                User
+	AuthorUserID        uuid.NullUUID
+	AuthorDisplayID     sql.NullString
+	AuthorDisplayName   sql.NullString
+	AuthorIconUrl       sql.NullString
 	AgreeCount          int32
 	DisagreeCount       int32
 	PassCount           int32
 	ReportCount         int32
 	UnsolvedReportCount int32
-	Hidden              bool
+	Deleted             bool
 }
 
-// 管理画面用。削除済み・通報された意見も含め、投票は意見ごとの集計だけを返す
+// 管理画面用。削除済み・通報された意見も含め、投票は意見ごとの集計だけを返す。
+// opinions.user_id に外部キーはないので、件数（CountOpinionsForManage）とそろえるため users は LEFT JOIN する
 //
 //	SELECT
 //	    o.opinion_id, o.talk_session_id, o.user_id, o.parent_opinion_id, o.title, o.content, o.created_at, o.picture_url, o.reference_url,
-//	    u.user_id, u.display_id, u.display_name, u.icon_url, u.created_at, u.updated_at, u.email, u.email_verified, u.withdrawal_date, u.can_create_talk_session,
+//	    u.user_id AS author_user_id,
+//	    u.display_id AS author_display_id,
+//	    u.display_name AS author_display_name,
+//	    u.icon_url AS author_icon_url,
 //	    (SELECT COUNT(*) FROM votes v WHERE v.opinion_id = o.opinion_id AND v.vote_type = 1)::int AS agree_count,
 //	    (SELECT COUNT(*) FROM votes v WHERE v.opinion_id = o.opinion_id AND v.vote_type = 2)::int AS disagree_count,
 //	    (SELECT COUNT(*) FROM votes v WHERE v.opinion_id = o.opinion_id AND v.vote_type = 3)::int AS pass_count,
 //	    (SELECT COUNT(*) FROM opinion_reports r WHERE r.opinion_id = o.opinion_id)::int AS report_count,
 //	    (SELECT COUNT(*) FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'unsolved')::int AS unsolved_report_count,
-//	    -- 一般の画面の意見一覧と同じ判定: 通報があり、そのすべてが削除済みのときだけ表示されない
-//	    (
-//	        EXISTS (SELECT 1 FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'deleted')
-//	        AND NOT EXISTS (SELECT 1 FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status <> 'deleted')
-//	    )::bool AS hidden
+//	    -- 一般の意見一覧・返信・詳細と同じ判定（ProcessReportedOpinions）: 削除済みの通報が1件でもあれば削除済み
+//	    EXISTS (SELECT 1 FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'deleted')::bool AS deleted
 //	FROM opinions o
-//	JOIN users u ON u.user_id = o.user_id
+//	LEFT JOIN users u ON u.user_id = o.user_id
 //	WHERE o.talk_session_id = $1
 //	ORDER BY o.created_at DESC, o.opinion_id
 //	LIMIT $3 OFFSET $2
@@ -1233,22 +1237,16 @@ func (q *Queries) ListOpinionsForManage(ctx context.Context, arg ListOpinionsFor
 			&i.Opinion.CreatedAt,
 			&i.Opinion.PictureUrl,
 			&i.Opinion.ReferenceUrl,
-			&i.User.UserID,
-			&i.User.DisplayID,
-			&i.User.DisplayName,
-			&i.User.IconUrl,
-			&i.User.CreatedAt,
-			&i.User.UpdatedAt,
-			&i.User.Email,
-			&i.User.EmailVerified,
-			&i.User.WithdrawalDate,
-			&i.User.CanCreateTalkSession,
+			&i.AuthorUserID,
+			&i.AuthorDisplayID,
+			&i.AuthorDisplayName,
+			&i.AuthorIconUrl,
 			&i.AgreeCount,
 			&i.DisagreeCount,
 			&i.PassCount,
 			&i.ReportCount,
 			&i.UnsolvedReportCount,
-			&i.Hidden,
+			&i.Deleted,
 		); err != nil {
 			return nil, err
 		}
