@@ -3,6 +3,7 @@
 package oas
 
 import (
+	"bytes"
 	"io"
 	"mime"
 	"net/http"
@@ -10,7 +11,6 @@ import (
 
 	"github.com/go-faster/errors"
 	"github.com/go-faster/jx"
-
 	"github.com/ogen-go/ogen/conv"
 	ht "github.com/ogen-go/ogen/http"
 	"github.com/ogen-go/ogen/ogenerrors"
@@ -20,6 +20,7 @@ import (
 
 func (s *Server) decodeAdminLoginRequest(r *http.Request) (
 	req *AdminLoginReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -40,22 +41,29 @@ func (s *Server) decodeAdminLoginRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "application/json":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		buf, err := io.ReadAll(r.Body)
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		if err != nil {
-			return req, close, err
+			return req, rawBody, close, err
 		}
+
+		// Reset the body to allow for downstream reading.
+		r.Body = io.NopCloser(bytes.NewBuffer(buf))
 
 		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 
+		rawBody = append(rawBody, buf...)
 		d := jx.DecodeBytes(buf)
 
 		var request AdminLoginReq
@@ -73,16 +81,17 @@ func (s *Server) decodeAdminLoginRequest(r *http.Request) (
 				Body:        buf,
 				Err:         err,
 			}
-			return req, close, err
+			return req, rawBody, close, err
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeApplyFeedbackToReportRequest(r *http.Request) (
 	req *ApplyFeedbackToReportReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -103,15 +112,15 @@ func (s *Server) decodeApplyFeedbackToReportRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -145,10 +154,10 @@ func (s *Server) decodeApplyFeedbackToReportRequest(r *http.Request) (
 					request.ReportID = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"reportID\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"reportID\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -172,20 +181,21 @@ func (s *Server) decodeApplyFeedbackToReportRequest(r *http.Request) (
 					request.FeedbackType = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"feedbackType\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"feedbackType\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeCreateAdminUserRequest(r *http.Request) (
 	req *CreateAdminUserRequest,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -206,22 +216,29 @@ func (s *Server) decodeCreateAdminUserRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "application/json":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		buf, err := io.ReadAll(r.Body)
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		if err != nil {
-			return req, close, err
+			return req, rawBody, close, err
 		}
+
+		// Reset the body to allow for downstream reading.
+		r.Body = io.NopCloser(bytes.NewBuffer(buf))
 
 		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 
+		rawBody = append(rawBody, buf...)
 		d := jx.DecodeBytes(buf)
 
 		var request CreateAdminUserRequest
@@ -239,16 +256,17 @@ func (s *Server) decodeCreateAdminUserRequest(r *http.Request) (
 				Body:        buf,
 				Err:         err,
 			}
-			return req, close, err
+			return req, rawBody, close, err
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeCreateOrganizationAliasRequest(r *http.Request) (
 	req *CreateOrganizationAliasReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -269,15 +287,15 @@ func (s *Server) decodeCreateOrganizationAliasRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -311,20 +329,21 @@ func (s *Server) decodeCreateOrganizationAliasRequest(r *http.Request) (
 					request.AliasName = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"aliasName\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"aliasName\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeCreateTalkSessionSurveyRequest(r *http.Request) (
 	req *CreateTalkSessionSurveyReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -345,22 +364,29 @@ func (s *Server) decodeCreateTalkSessionSurveyRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "application/json":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		buf, err := io.ReadAll(r.Body)
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		if err != nil {
-			return req, close, err
+			return req, rawBody, close, err
 		}
+
+		// Reset the body to allow for downstream reading.
+		r.Body = io.NopCloser(bytes.NewBuffer(buf))
 
 		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 
+		rawBody = append(rawBody, buf...)
 		d := jx.DecodeBytes(buf)
 
 		var request CreateTalkSessionSurveyReq
@@ -378,7 +404,7 @@ func (s *Server) decodeCreateTalkSessionSurveyRequest(r *http.Request) (
 				Body:        buf,
 				Err:         err,
 			}
-			return req, close, err
+			return req, rawBody, close, err
 		}
 		if err := func() error {
 			if err := request.Validate(); err != nil {
@@ -386,16 +412,17 @@ func (s *Server) decodeCreateTalkSessionSurveyRequest(r *http.Request) (
 			}
 			return nil
 		}(); err != nil {
-			return req, close, errors.Wrap(err, "validate")
+			return req, rawBody, close, errors.Wrap(err, "validate")
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeCreateUserManageRequest(r *http.Request) (
 	req *InviteManagedUserRequest,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -416,22 +443,29 @@ func (s *Server) decodeCreateUserManageRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "application/json":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		buf, err := io.ReadAll(r.Body)
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		if err != nil {
-			return req, close, err
+			return req, rawBody, close, err
 		}
+
+		// Reset the body to allow for downstream reading.
+		r.Body = io.NopCloser(bytes.NewBuffer(buf))
 
 		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 
+		rawBody = append(rawBody, buf...)
 		d := jx.DecodeBytes(buf)
 
 		var request InviteManagedUserRequest
@@ -449,7 +483,7 @@ func (s *Server) decodeCreateUserManageRequest(r *http.Request) (
 				Body:        buf,
 				Err:         err,
 			}
-			return req, close, err
+			return req, rawBody, close, err
 		}
 		if err := func() error {
 			if err := request.Validate(); err != nil {
@@ -457,16 +491,17 @@ func (s *Server) decodeCreateUserManageRequest(r *http.Request) (
 			}
 			return nil
 		}(); err != nil {
-			return req, close, errors.Wrap(err, "validate")
+			return req, rawBody, close, errors.Wrap(err, "validate")
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeDummyInitRequest(r *http.Request) (
 	req *DummyInitReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -487,15 +522,15 @@ func (s *Server) decodeDummyInitRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -530,10 +565,10 @@ func (s *Server) decodeDummyInitRequest(r *http.Request) (
 					}
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"integerNull\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"integerNull\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -559,7 +594,7 @@ func (s *Server) decodeDummyInitRequest(r *http.Request) (
 					}
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"numericOptionalNull\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"numericOptionalNull\"")
 				}
 				if err := func() error {
 					if value, ok := request.NumericOptionalNull.Get(); ok {
@@ -574,7 +609,7 @@ func (s *Server) decodeDummyInitRequest(r *http.Request) (
 					}
 					return nil
 				}(); err != nil {
-					return req, close, errors.Wrap(err, "validate")
+					return req, rawBody, close, errors.Wrap(err, "validate")
 				}
 			}
 		}
@@ -600,7 +635,7 @@ func (s *Server) decodeDummyInitRequest(r *http.Request) (
 					}
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"numericNull\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"numericNull\"")
 				}
 				if err := func() error {
 					if value, ok := request.NumericNull.Get(); ok {
@@ -615,10 +650,10 @@ func (s *Server) decodeDummyInitRequest(r *http.Request) (
 					}
 					return nil
 				}(); err != nil {
-					return req, close, errors.Wrap(err, "validate")
+					return req, rawBody, close, errors.Wrap(err, "validate")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -649,7 +684,7 @@ func (s *Server) decodeDummyInitRequest(r *http.Request) (
 					request.NumericOptional.SetTo(requestDotNumericOptionalVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"numericOptional\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"numericOptional\"")
 				}
 				if err := func() error {
 					if value, ok := request.NumericOptional.Get(); ok {
@@ -664,7 +699,7 @@ func (s *Server) decodeDummyInitRequest(r *http.Request) (
 					}
 					return nil
 				}(); err != nil {
-					return req, close, errors.Wrap(err, "validate")
+					return req, rawBody, close, errors.Wrap(err, "validate")
 				}
 			}
 		}
@@ -689,7 +724,7 @@ func (s *Server) decodeDummyInitRequest(r *http.Request) (
 					request.Numeric = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"numeric\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"numeric\"")
 				}
 				if err := func() error {
 					if err := (validate.Float{}).Validate(float64(request.Numeric)); err != nil {
@@ -697,10 +732,10 @@ func (s *Server) decodeDummyInitRequest(r *http.Request) (
 					}
 					return nil
 				}(); err != nil {
-					return req, close, errors.Wrap(err, "validate")
+					return req, rawBody, close, errors.Wrap(err, "validate")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -726,7 +761,7 @@ func (s *Server) decodeDummyInitRequest(r *http.Request) (
 					}
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"booleanOptionalNull\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"booleanOptionalNull\"")
 				}
 			}
 		}
@@ -752,20 +787,21 @@ func (s *Server) decodeDummyInitRequest(r *http.Request) (
 					}
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"booleanNull\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"booleanNull\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
 	req *EditTalkSessionReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -786,15 +822,15 @@ func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -828,10 +864,10 @@ func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
 					request.Theme = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"theme\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"theme\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -855,10 +891,10 @@ func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
 					request.ScheduledEndTime = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"scheduledEndTime\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"scheduledEndTime\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -889,7 +925,7 @@ func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
 					request.Latitude.SetTo(requestDotLatitudeVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"latitude\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"latitude\"")
 				}
 				if err := func() error {
 					if value, ok := request.Latitude.Get(); ok {
@@ -904,7 +940,7 @@ func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
 					}
 					return nil
 				}(); err != nil {
-					return req, close, errors.Wrap(err, "validate")
+					return req, rawBody, close, errors.Wrap(err, "validate")
 				}
 			}
 		}
@@ -936,7 +972,7 @@ func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
 					request.Longitude.SetTo(requestDotLongitudeVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"longitude\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"longitude\"")
 				}
 				if err := func() error {
 					if value, ok := request.Longitude.Get(); ok {
@@ -951,7 +987,7 @@ func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
 					}
 					return nil
 				}(); err != nil {
-					return req, close, errors.Wrap(err, "validate")
+					return req, rawBody, close, errors.Wrap(err, "validate")
 				}
 			}
 		}
@@ -983,7 +1019,7 @@ func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
 					request.Prefecture.SetTo(requestDotPrefectureVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"prefecture\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"prefecture\"")
 				}
 			}
 		}
@@ -1015,7 +1051,7 @@ func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
 					request.City.SetTo(requestDotCityVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"city\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"city\"")
 				}
 			}
 		}
@@ -1047,7 +1083,7 @@ func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
 					request.Description.SetTo(requestDotDescriptionVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"description\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"description\"")
 				}
 			}
 		}
@@ -1079,7 +1115,7 @@ func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
 					request.ThumbnailURL.SetTo(requestDotThumbnailURLVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"thumbnailURL\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"thumbnailURL\"")
 				}
 			}
 		}
@@ -1106,7 +1142,7 @@ func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
 					}
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"hideTop\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"hideTop\"")
 				}
 			}
 		}
@@ -1133,18 +1169,19 @@ func (s *Server) decodeEditTalkSessionRequest(r *http.Request) (
 					}
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"disableAnalysis\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"disableAnalysis\"")
 				}
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeEditTalkSessionManageRequest(r *http.Request) (
 	req *TalkSessionEditForManage,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -1165,22 +1202,29 @@ func (s *Server) decodeEditTalkSessionManageRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "application/json":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		buf, err := io.ReadAll(r.Body)
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		if err != nil {
-			return req, close, err
+			return req, rawBody, close, err
 		}
+
+		// Reset the body to allow for downstream reading.
+		r.Body = io.NopCloser(bytes.NewBuffer(buf))
 
 		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 
+		rawBody = append(rawBody, buf...)
 		d := jx.DecodeBytes(buf)
 
 		var request TalkSessionEditForManage
@@ -1198,7 +1242,7 @@ func (s *Server) decodeEditTalkSessionManageRequest(r *http.Request) (
 				Body:        buf,
 				Err:         err,
 			}
-			return req, close, err
+			return req, rawBody, close, err
 		}
 		if err := func() error {
 			if err := request.Validate(); err != nil {
@@ -1206,16 +1250,17 @@ func (s *Server) decodeEditTalkSessionManageRequest(r *http.Request) (
 			}
 			return nil
 		}(); err != nil {
-			return req, close, errors.Wrap(err, "validate")
+			return req, rawBody, close, errors.Wrap(err, "validate")
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeEditTimeLineRequest(r *http.Request) (
 	req *EditTimeLineReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -1236,15 +1281,15 @@ func (s *Server) decodeEditTimeLineRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -1279,10 +1324,10 @@ func (s *Server) decodeEditTimeLineRequest(r *http.Request) (
 					}
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"content\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"content\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -1307,20 +1352,21 @@ func (s *Server) decodeEditTimeLineRequest(r *http.Request) (
 					}
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"status\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"status\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeEstablishOrganizationRequest(r *http.Request) (
 	req *EstablishOrganizationReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -1341,15 +1387,15 @@ func (s *Server) decodeEstablishOrganizationRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -1383,10 +1429,10 @@ func (s *Server) decodeEstablishOrganizationRequest(r *http.Request) (
 					request.Name = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"name\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"name\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -1410,10 +1456,10 @@ func (s *Server) decodeEstablishOrganizationRequest(r *http.Request) (
 					request.Code = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"code\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"code\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -1437,7 +1483,7 @@ func (s *Server) decodeEstablishOrganizationRequest(r *http.Request) (
 					request.OrgType = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"orgType\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"orgType\"")
 				}
 				if err := func() error {
 					if err := (validate.Float{}).Validate(float64(request.OrgType)); err != nil {
@@ -1445,10 +1491,10 @@ func (s *Server) decodeEstablishOrganizationRequest(r *http.Request) (
 					}
 					return nil
 				}(); err != nil {
-					return req, close, errors.Wrap(err, "validate")
+					return req, rawBody, close, errors.Wrap(err, "validate")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -1472,17 +1518,18 @@ func (s *Server) decodeEstablishOrganizationRequest(r *http.Request) (
 				})
 				return nil
 			}(); err != nil {
-				return req, close, errors.Wrap(err, "decode \"icon\"")
+				return req, rawBody, close, errors.Wrap(err, "decode \"icon\"")
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeEstablishUserRequest(r *http.Request) (
 	req *EstablishUserReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -1503,15 +1550,15 @@ func (s *Server) decodeEstablishUserRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -1545,10 +1592,10 @@ func (s *Server) decodeEstablishUserRequest(r *http.Request) (
 					request.DisplayName = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"displayName\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"displayName\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -1572,10 +1619,10 @@ func (s *Server) decodeEstablishUserRequest(r *http.Request) (
 					request.DisplayID = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"displayID\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"displayID\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -1606,7 +1653,7 @@ func (s *Server) decodeEstablishUserRequest(r *http.Request) (
 					request.DateOfBirth.SetTo(requestDotDateOfBirthVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"dateOfBirth\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"dateOfBirth\"")
 				}
 				if err := func() error {
 					if value, ok := request.DateOfBirth.Get(); ok {
@@ -1621,7 +1668,7 @@ func (s *Server) decodeEstablishUserRequest(r *http.Request) (
 					}
 					return nil
 				}(); err != nil {
-					return req, close, errors.Wrap(err, "validate")
+					return req, rawBody, close, errors.Wrap(err, "validate")
 				}
 			}
 		}
@@ -1653,7 +1700,7 @@ func (s *Server) decodeEstablishUserRequest(r *http.Request) (
 					request.Gender.SetTo(requestDotGenderVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"gender\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"gender\"")
 				}
 			}
 		}
@@ -1685,7 +1732,7 @@ func (s *Server) decodeEstablishUserRequest(r *http.Request) (
 					request.Prefecture.SetTo(requestDotPrefectureVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"prefecture\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"prefecture\"")
 				}
 			}
 		}
@@ -1717,7 +1764,7 @@ func (s *Server) decodeEstablishUserRequest(r *http.Request) (
 					request.City.SetTo(requestDotCityVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"city\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"city\"")
 				}
 			}
 		}
@@ -1749,7 +1796,7 @@ func (s *Server) decodeEstablishUserRequest(r *http.Request) (
 					request.Email.SetTo(requestDotEmailVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"email\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"email\"")
 				}
 			}
 		}
@@ -1774,17 +1821,18 @@ func (s *Server) decodeEstablishUserRequest(r *http.Request) (
 				})
 				return nil
 			}(); err != nil {
-				return req, close, errors.Wrap(err, "decode \"icon\"")
+				return req, rawBody, close, errors.Wrap(err, "decode \"icon\"")
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeInitiateTalkSessionRequest(r *http.Request) (
 	req *InitiateTalkSessionReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -1805,15 +1853,15 @@ func (s *Server) decodeInitiateTalkSessionRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -1847,10 +1895,10 @@ func (s *Server) decodeInitiateTalkSessionRequest(r *http.Request) (
 					request.Theme = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"theme\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"theme\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -1874,10 +1922,10 @@ func (s *Server) decodeInitiateTalkSessionRequest(r *http.Request) (
 					request.ScheduledEndTime = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"scheduledEndTime\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"scheduledEndTime\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -1908,7 +1956,7 @@ func (s *Server) decodeInitiateTalkSessionRequest(r *http.Request) (
 					request.Latitude.SetTo(requestDotLatitudeVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"latitude\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"latitude\"")
 				}
 				if err := func() error {
 					if value, ok := request.Latitude.Get(); ok {
@@ -1923,7 +1971,7 @@ func (s *Server) decodeInitiateTalkSessionRequest(r *http.Request) (
 					}
 					return nil
 				}(); err != nil {
-					return req, close, errors.Wrap(err, "validate")
+					return req, rawBody, close, errors.Wrap(err, "validate")
 				}
 			}
 		}
@@ -1955,7 +2003,7 @@ func (s *Server) decodeInitiateTalkSessionRequest(r *http.Request) (
 					request.Longitude.SetTo(requestDotLongitudeVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"longitude\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"longitude\"")
 				}
 				if err := func() error {
 					if value, ok := request.Longitude.Get(); ok {
@@ -1970,7 +2018,7 @@ func (s *Server) decodeInitiateTalkSessionRequest(r *http.Request) (
 					}
 					return nil
 				}(); err != nil {
-					return req, close, errors.Wrap(err, "validate")
+					return req, rawBody, close, errors.Wrap(err, "validate")
 				}
 			}
 		}
@@ -2002,7 +2050,7 @@ func (s *Server) decodeInitiateTalkSessionRequest(r *http.Request) (
 					request.City.SetTo(requestDotCityVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"city\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"city\"")
 				}
 			}
 		}
@@ -2034,7 +2082,7 @@ func (s *Server) decodeInitiateTalkSessionRequest(r *http.Request) (
 					request.Prefecture.SetTo(requestDotPrefectureVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"prefecture\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"prefecture\"")
 				}
 			}
 		}
@@ -2066,7 +2114,7 @@ func (s *Server) decodeInitiateTalkSessionRequest(r *http.Request) (
 					request.Description.SetTo(requestDotDescriptionVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"description\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"description\"")
 				}
 			}
 		}
@@ -2098,7 +2146,7 @@ func (s *Server) decodeInitiateTalkSessionRequest(r *http.Request) (
 					request.ThumbnailURL.SetTo(requestDotThumbnailURLVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"thumbnailURL\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"thumbnailURL\"")
 				}
 			}
 		}
@@ -2134,7 +2182,7 @@ func (s *Server) decodeInitiateTalkSessionRequest(r *http.Request) (
 					}
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"restrictions\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"restrictions\"")
 				}
 			}
 		}
@@ -2166,7 +2214,7 @@ func (s *Server) decodeInitiateTalkSessionRequest(r *http.Request) (
 					request.AliasId.SetTo(requestDotAliasIdVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"aliasId\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"aliasId\"")
 				}
 			}
 		}
@@ -2193,7 +2241,7 @@ func (s *Server) decodeInitiateTalkSessionRequest(r *http.Request) (
 					}
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"hideTop\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"hideTop\"")
 				}
 			}
 		}
@@ -2225,18 +2273,19 @@ func (s *Server) decodeInitiateTalkSessionRequest(r *http.Request) (
 					request.Passphrase.SetTo(requestDotPassphraseVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"passphrase\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"passphrase\"")
 				}
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeInviteOrganizationRequest(r *http.Request) (
 	req *InviteOrganizationReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -2257,15 +2306,15 @@ func (s *Server) decodeInviteOrganizationRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -2299,10 +2348,10 @@ func (s *Server) decodeInviteOrganizationRequest(r *http.Request) (
 					request.Email = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"email\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"email\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -2326,7 +2375,7 @@ func (s *Server) decodeInviteOrganizationRequest(r *http.Request) (
 					request.Role = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"role\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"role\"")
 				}
 				if err := func() error {
 					if err := (validate.Float{}).Validate(float64(request.Role)); err != nil {
@@ -2334,20 +2383,21 @@ func (s *Server) decodeInviteOrganizationRequest(r *http.Request) (
 					}
 					return nil
 				}(); err != nil {
-					return req, close, errors.Wrap(err, "validate")
+					return req, rawBody, close, errors.Wrap(err, "validate")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeInviteOrganizationForUserRequest(r *http.Request) (
 	req *InviteOrganizationForUserReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -2368,15 +2418,15 @@ func (s *Server) decodeInviteOrganizationForUserRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -2410,10 +2460,10 @@ func (s *Server) decodeInviteOrganizationForUserRequest(r *http.Request) (
 					request.DisplayID = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"displayID\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"displayID\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -2437,7 +2487,7 @@ func (s *Server) decodeInviteOrganizationForUserRequest(r *http.Request) (
 					request.Role = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"role\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"role\"")
 				}
 				if err := func() error {
 					if err := (validate.Float{}).Validate(float64(request.Role)); err != nil {
@@ -2445,20 +2495,21 @@ func (s *Server) decodeInviteOrganizationForUserRequest(r *http.Request) (
 					}
 					return nil
 				}(); err != nil {
-					return req, close, errors.Wrap(err, "validate")
+					return req, rawBody, close, errors.Wrap(err, "validate")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeJoinLockedSessionRequest(r *http.Request) (
 	req *JoinLockedSessionReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -2479,22 +2530,29 @@ func (s *Server) decodeJoinLockedSessionRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "application/json":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		buf, err := io.ReadAll(r.Body)
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		if err != nil {
-			return req, close, err
+			return req, rawBody, close, err
 		}
+
+		// Reset the body to allow for downstream reading.
+		r.Body = io.NopCloser(bytes.NewBuffer(buf))
 
 		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 
+		rawBody = append(rawBody, buf...)
 		d := jx.DecodeBytes(buf)
 
 		var request JoinLockedSessionReq
@@ -2512,16 +2570,17 @@ func (s *Server) decodeJoinLockedSessionRequest(r *http.Request) (
 				Body:        buf,
 				Err:         err,
 			}
-			return req, close, err
+			return req, rawBody, close, err
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeManageRegenerateManageRequest(r *http.Request) (
 	req *RegenerateRequest,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -2542,16 +2601,16 @@ func (s *Server) decodeManageRegenerateManageRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "application/x-www-form-urlencoded":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		form, err := ht.ParseForm(r)
 		if err != nil {
-			return req, close, errors.Wrap(err, "parse form")
+			return req, rawBody, close, errors.Wrap(err, "parse form")
 		}
 
 		var request RegenerateRequest
@@ -2577,7 +2636,7 @@ func (s *Server) decodeManageRegenerateManageRequest(r *http.Request) (
 					request.Type = RegenerateRequestType(c)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"type\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"type\"")
 				}
 				if err := func() error {
 					if err := request.Type.Validate(); err != nil {
@@ -2585,20 +2644,21 @@ func (s *Server) decodeManageRegenerateManageRequest(r *http.Request) (
 					}
 					return nil
 				}(); err != nil {
-					return req, close, errors.Wrap(err, "validate")
+					return req, rawBody, close, errors.Wrap(err, "validate")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodePasswordLoginRequest(r *http.Request) (
 	req *PasswordLoginReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -2619,15 +2679,15 @@ func (s *Server) decodePasswordLoginRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -2661,10 +2721,10 @@ func (s *Server) decodePasswordLoginRequest(r *http.Request) (
 					request.IdOrEmail = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"idOrEmail\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"idOrEmail\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -2688,20 +2748,21 @@ func (s *Server) decodePasswordLoginRequest(r *http.Request) (
 					request.Password = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"password\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"password\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodePasswordRegisterRequest(r *http.Request) (
 	req *PasswordRegisterReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -2722,15 +2783,15 @@ func (s *Server) decodePasswordRegisterRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -2764,10 +2825,10 @@ func (s *Server) decodePasswordRegisterRequest(r *http.Request) (
 					request.Password = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"password\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"password\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -2791,20 +2852,21 @@ func (s *Server) decodePasswordRegisterRequest(r *http.Request) (
 					request.Email = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"email\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"email\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodePolicyConsentRequest(r *http.Request) (
 	req *PolicyConsentReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -2825,15 +2887,15 @@ func (s *Server) decodePolicyConsentRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -2867,20 +2929,21 @@ func (s *Server) decodePolicyConsentRequest(r *http.Request) (
 					request.PolicyVersion = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"policyVersion\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"policyVersion\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodePostConclusionRequest(r *http.Request) (
 	req *PostConclusionReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -2901,15 +2964,15 @@ func (s *Server) decodePostConclusionRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -2943,20 +3006,21 @@ func (s *Server) decodePostConclusionRequest(r *http.Request) (
 					request.Content = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"content\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"content\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodePostImageRequest(r *http.Request) (
 	req *PostImageReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -2977,15 +3041,15 @@ func (s *Server) decodePostImageRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -3018,17 +3082,18 @@ func (s *Server) decodePostImageRequest(r *http.Request) (
 				}
 				return nil
 			}(); err != nil {
-				return req, close, errors.Wrap(err, "decode \"image\"")
+				return req, rawBody, close, errors.Wrap(err, "decode \"image\"")
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodePostOpinionPost2Request(r *http.Request) (
 	req *PostOpinionPost2Req,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -3049,15 +3114,15 @@ func (s *Server) decodePostOpinionPost2Request(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -3098,7 +3163,7 @@ func (s *Server) decodePostOpinionPost2Request(r *http.Request) (
 					request.TalkSessionID.SetTo(requestDotTalkSessionIDVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"talkSessionID\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"talkSessionID\"")
 				}
 			}
 		}
@@ -3130,7 +3195,7 @@ func (s *Server) decodePostOpinionPost2Request(r *http.Request) (
 					request.ParentOpinionID.SetTo(requestDotParentOpinionIDVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"parentOpinionID\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"parentOpinionID\"")
 				}
 			}
 		}
@@ -3162,7 +3227,7 @@ func (s *Server) decodePostOpinionPost2Request(r *http.Request) (
 					request.Title.SetTo(requestDotTitleVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"title\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"title\"")
 				}
 			}
 		}
@@ -3187,10 +3252,10 @@ func (s *Server) decodePostOpinionPost2Request(r *http.Request) (
 					request.OpinionContent = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"opinionContent\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"opinionContent\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -3221,7 +3286,7 @@ func (s *Server) decodePostOpinionPost2Request(r *http.Request) (
 					request.ReferenceURL.SetTo(requestDotReferenceURLVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"referenceURL\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"referenceURL\"")
 				}
 			}
 		}
@@ -3248,7 +3313,7 @@ func (s *Server) decodePostOpinionPost2Request(r *http.Request) (
 					}
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"isSeed\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"isSeed\"")
 				}
 			}
 		}
@@ -3273,17 +3338,18 @@ func (s *Server) decodePostOpinionPost2Request(r *http.Request) (
 				})
 				return nil
 			}(); err != nil {
-				return req, close, errors.Wrap(err, "decode \"picture\"")
+				return req, rawBody, close, errors.Wrap(err, "decode \"picture\"")
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodePostTimeLineItemRequest(r *http.Request) (
 	req *PostTimeLineItemReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -3304,15 +3370,15 @@ func (s *Server) decodePostTimeLineItemRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -3346,10 +3412,10 @@ func (s *Server) decodePostTimeLineItemRequest(r *http.Request) (
 					request.Content = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"content\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"content\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -3373,10 +3439,10 @@ func (s *Server) decodePostTimeLineItemRequest(r *http.Request) (
 					request.Status = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"status\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"status\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -3407,18 +3473,19 @@ func (s *Server) decodePostTimeLineItemRequest(r *http.Request) (
 					request.ParentActionItemID.SetTo(requestDotParentActionItemIDVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"parentActionItemID\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"parentActionItemID\"")
 				}
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeRegisterDeviceRequest(r *http.Request) (
 	req *RegisterDeviceReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -3439,15 +3506,15 @@ func (s *Server) decodeRegisterDeviceRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -3481,10 +3548,10 @@ func (s *Server) decodeRegisterDeviceRequest(r *http.Request) (
 					request.DeviceToken = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"device_token\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"device_token\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -3508,7 +3575,7 @@ func (s *Server) decodeRegisterDeviceRequest(r *http.Request) (
 					request.Platform = RegisterDeviceReqPlatform(c)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"platform\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"platform\"")
 				}
 				if err := func() error {
 					if err := request.Platform.Validate(); err != nil {
@@ -3516,10 +3583,10 @@ func (s *Server) decodeRegisterDeviceRequest(r *http.Request) (
 					}
 					return nil
 				}(); err != nil {
-					return req, close, errors.Wrap(err, "validate")
+					return req, rawBody, close, errors.Wrap(err, "validate")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -3550,7 +3617,7 @@ func (s *Server) decodeRegisterDeviceRequest(r *http.Request) (
 					request.DeviceName.SetTo(requestDotDeviceNameVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"device_name\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"device_name\"")
 				}
 			}
 		}
@@ -3582,7 +3649,7 @@ func (s *Server) decodeRegisterDeviceRequest(r *http.Request) (
 					request.AppVersion.SetTo(requestDotAppVersionVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"app_version\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"app_version\"")
 				}
 			}
 		}
@@ -3614,18 +3681,19 @@ func (s *Server) decodeRegisterDeviceRequest(r *http.Request) (
 					request.OsVersion.SetTo(requestDotOsVersionVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"os_version\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"os_version\"")
 				}
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeReportOpinionRequest(r *http.Request) (
 	req *ReportOpinionReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -3646,15 +3714,15 @@ func (s *Server) decodeReportOpinionRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -3689,10 +3757,10 @@ func (s *Server) decodeReportOpinionRequest(r *http.Request) (
 					}
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"reason\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"reason\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -3717,20 +3785,21 @@ func (s *Server) decodeReportOpinionRequest(r *http.Request) (
 					}
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"content\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"content\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeSendTestNotificationRequest(r *http.Request) (
 	req *SendTestNotificationReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -3751,15 +3820,15 @@ func (s *Server) decodeSendTestNotificationRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -3793,10 +3862,10 @@ func (s *Server) decodeSendTestNotificationRequest(r *http.Request) (
 					request.Title = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"title\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"title\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -3820,10 +3889,10 @@ func (s *Server) decodeSendTestNotificationRequest(r *http.Request) (
 					request.Body = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"body\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"body\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -3854,18 +3923,19 @@ func (s *Server) decodeSendTestNotificationRequest(r *http.Request) (
 					request.DeviceID.SetTo(requestDotDeviceIDVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"device_id\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"device_id\"")
 				}
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeSetUserPermissionsManageRequest(r *http.Request) (
 	req *UserPermissions,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -3886,22 +3956,29 @@ func (s *Server) decodeSetUserPermissionsManageRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "application/json":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		buf, err := io.ReadAll(r.Body)
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		if err != nil {
-			return req, close, err
+			return req, rawBody, close, err
 		}
+
+		// Reset the body to allow for downstream reading.
+		r.Body = io.NopCloser(bytes.NewBuffer(buf))
 
 		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 
+		rawBody = append(rawBody, buf...)
 		d := jx.DecodeBytes(buf)
 
 		var request UserPermissions
@@ -3919,16 +3996,17 @@ func (s *Server) decodeSetUserPermissionsManageRequest(r *http.Request) (
 				Body:        buf,
 				Err:         err,
 			}
-			return req, close, err
+			return req, rawBody, close, err
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeSetupPasswordRequest(r *http.Request) (
 	req *SetupPasswordReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -3949,22 +4027,29 @@ func (s *Server) decodeSetupPasswordRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "application/json":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		buf, err := io.ReadAll(r.Body)
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		if err != nil {
-			return req, close, err
+			return req, rawBody, close, err
 		}
+
+		// Reset the body to allow for downstream reading.
+		r.Body = io.NopCloser(bytes.NewBuffer(buf))
 
 		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 
+		rawBody = append(rawBody, buf...)
 		d := jx.DecodeBytes(buf)
 
 		var request SetupPasswordReq
@@ -3982,7 +4067,7 @@ func (s *Server) decodeSetupPasswordRequest(r *http.Request) (
 				Body:        buf,
 				Err:         err,
 			}
-			return req, close, err
+			return req, rawBody, close, err
 		}
 		if err := func() error {
 			if err := request.Validate(); err != nil {
@@ -3990,16 +4075,17 @@ func (s *Server) decodeSetupPasswordRequest(r *http.Request) (
 			}
 			return nil
 		}(); err != nil {
-			return req, close, errors.Wrap(err, "validate")
+			return req, rawBody, close, errors.Wrap(err, "validate")
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeSolveOpinionReportRequest(r *http.Request) (
 	req *SolveOpinionReportReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -4020,15 +4106,15 @@ func (s *Server) decodeSolveOpinionReportRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -4063,7 +4149,7 @@ func (s *Server) decodeSolveOpinionReportRequest(r *http.Request) (
 					}
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"action\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"action\"")
 				}
 				if err := func() error {
 					if err := request.Action.Validate(); err != nil {
@@ -4071,20 +4157,21 @@ func (s *Server) decodeSolveOpinionReportRequest(r *http.Request) (
 					}
 					return nil
 				}(); err != nil {
-					return req, close, errors.Wrap(err, "validate")
+					return req, rawBody, close, errors.Wrap(err, "validate")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeSubmitTalkSessionSurveyRequest(r *http.Request) (
 	req *SubmitTalkSessionSurveyReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -4105,22 +4192,29 @@ func (s *Server) decodeSubmitTalkSessionSurveyRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "application/json":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		buf, err := io.ReadAll(r.Body)
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		if err != nil {
-			return req, close, err
+			return req, rawBody, close, err
 		}
+
+		// Reset the body to allow for downstream reading.
+		r.Body = io.NopCloser(bytes.NewBuffer(buf))
 
 		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 
+		rawBody = append(rawBody, buf...)
 		d := jx.DecodeBytes(buf)
 
 		var request SubmitTalkSessionSurveyReq
@@ -4138,7 +4232,7 @@ func (s *Server) decodeSubmitTalkSessionSurveyRequest(r *http.Request) (
 				Body:        buf,
 				Err:         err,
 			}
-			return req, close, err
+			return req, rawBody, close, err
 		}
 		if err := func() error {
 			if err := request.Validate(); err != nil {
@@ -4146,16 +4240,17 @@ func (s *Server) decodeSubmitTalkSessionSurveyRequest(r *http.Request) (
 			}
 			return nil
 		}(); err != nil {
-			return req, close, errors.Wrap(err, "validate")
+			return req, rawBody, close, errors.Wrap(err, "validate")
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeToggleReportVisibilityManageRequest(r *http.Request) (
 	req *ToggleReportVisibilityRequest,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -4176,16 +4271,16 @@ func (s *Server) decodeToggleReportVisibilityManageRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "application/x-www-form-urlencoded":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		form, err := ht.ParseForm(r)
 		if err != nil {
-			return req, close, errors.Wrap(err, "parse form")
+			return req, rawBody, close, errors.Wrap(err, "parse form")
 		}
 
 		var request ToggleReportVisibilityRequest
@@ -4211,20 +4306,21 @@ func (s *Server) decodeToggleReportVisibilityManageRequest(r *http.Request) (
 					request.Hidden = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"hidden\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"hidden\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeUpdateNotificationPreferencesRequest(r *http.Request) (
 	req *UpdateNotificationPreferencesReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -4245,15 +4341,15 @@ func (s *Server) decodeUpdateNotificationPreferencesRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -4288,20 +4384,21 @@ func (s *Server) decodeUpdateNotificationPreferencesRequest(r *http.Request) (
 					}
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"push_notification_enabled\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"push_notification_enabled\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeUpdateOrganizationRequest(r *http.Request) (
 	req *UpdateOrganizationReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -4322,15 +4419,15 @@ func (s *Server) decodeUpdateOrganizationRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -4364,10 +4461,10 @@ func (s *Server) decodeUpdateOrganizationRequest(r *http.Request) (
 					request.Name = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"name\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"name\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -4391,17 +4488,18 @@ func (s *Server) decodeUpdateOrganizationRequest(r *http.Request) (
 				})
 				return nil
 			}(); err != nil {
-				return req, close, errors.Wrap(err, "decode \"icon\"")
+				return req, rawBody, close, errors.Wrap(err, "decode \"icon\"")
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeUpdateTalkSessionSurveyRequest(r *http.Request) (
 	req *UpdateTalkSessionSurveyReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -4422,22 +4520,29 @@ func (s *Server) decodeUpdateTalkSessionSurveyRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "application/json":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		buf, err := io.ReadAll(r.Body)
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		if err != nil {
-			return req, close, err
+			return req, rawBody, close, err
 		}
+
+		// Reset the body to allow for downstream reading.
+		r.Body = io.NopCloser(bytes.NewBuffer(buf))
 
 		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 
+		rawBody = append(rawBody, buf...)
 		d := jx.DecodeBytes(buf)
 
 		var request UpdateTalkSessionSurveyReq
@@ -4455,7 +4560,7 @@ func (s *Server) decodeUpdateTalkSessionSurveyRequest(r *http.Request) (
 				Body:        buf,
 				Err:         err,
 			}
-			return req, close, err
+			return req, rawBody, close, err
 		}
 		if err := func() error {
 			if err := request.Validate(); err != nil {
@@ -4463,16 +4568,17 @@ func (s *Server) decodeUpdateTalkSessionSurveyRequest(r *http.Request) (
 			}
 			return nil
 		}(); err != nil {
-			return req, close, errors.Wrap(err, "validate")
+			return req, rawBody, close, errors.Wrap(err, "validate")
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeUpdateUserProfileRequest(r *http.Request) (
 	req *UpdateUserProfileReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -4493,15 +4599,15 @@ func (s *Server) decodeUpdateUserProfileRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -4542,7 +4648,7 @@ func (s *Server) decodeUpdateUserProfileRequest(r *http.Request) (
 					request.DisplayName.SetTo(requestDotDisplayNameVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"displayName\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"displayName\"")
 				}
 			}
 		}
@@ -4569,7 +4675,7 @@ func (s *Server) decodeUpdateUserProfileRequest(r *http.Request) (
 					}
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"deleteIcon\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"deleteIcon\"")
 				}
 			}
 		}
@@ -4595,10 +4701,10 @@ func (s *Server) decodeUpdateUserProfileRequest(r *http.Request) (
 					}
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"dateOfBirth\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"dateOfBirth\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
 		{
@@ -4629,7 +4735,7 @@ func (s *Server) decodeUpdateUserProfileRequest(r *http.Request) (
 					request.Gender.SetTo(requestDotGenderVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"gender\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"gender\"")
 				}
 			}
 		}
@@ -4661,7 +4767,7 @@ func (s *Server) decodeUpdateUserProfileRequest(r *http.Request) (
 					request.City.SetTo(requestDotCityVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"city\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"city\"")
 				}
 			}
 		}
@@ -4693,7 +4799,7 @@ func (s *Server) decodeUpdateUserProfileRequest(r *http.Request) (
 					request.Prefecture.SetTo(requestDotPrefectureVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"prefecture\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"prefecture\"")
 				}
 			}
 		}
@@ -4725,7 +4831,7 @@ func (s *Server) decodeUpdateUserProfileRequest(r *http.Request) (
 					request.Email.SetTo(requestDotEmailVal)
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"email\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"email\"")
 				}
 			}
 		}
@@ -4750,17 +4856,18 @@ func (s *Server) decodeUpdateUserProfileRequest(r *http.Request) (
 				})
 				return nil
 			}(); err != nil {
-				return req, close, errors.Wrap(err, "decode \"icon\"")
+				return req, rawBody, close, errors.Wrap(err, "decode \"icon\"")
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeVerifyPasswordEmailRequest(r *http.Request) (
 	req *VerifyPasswordEmailReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -4781,22 +4888,29 @@ func (s *Server) decodeVerifyPasswordEmailRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "application/json":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		buf, err := io.ReadAll(r.Body)
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		if err != nil {
-			return req, close, err
+			return req, rawBody, close, err
 		}
+
+		// Reset the body to allow for downstream reading.
+		r.Body = io.NopCloser(bytes.NewBuffer(buf))
 
 		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 
+		rawBody = append(rawBody, buf...)
 		d := jx.DecodeBytes(buf)
 
 		var request VerifyPasswordEmailReq
@@ -4814,16 +4928,17 @@ func (s *Server) decodeVerifyPasswordEmailRequest(r *http.Request) (
 				Body:        buf,
 				Err:         err,
 			}
-			return req, close, err
+			return req, rawBody, close, err
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeVerifyPasswordEmailPINRequest(r *http.Request) (
 	req *VerifyPasswordEmailPINReq,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -4844,22 +4959,29 @@ func (s *Server) decodeVerifyPasswordEmailPINRequest(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "application/json":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		buf, err := io.ReadAll(r.Body)
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		if err != nil {
-			return req, close, err
+			return req, rawBody, close, err
 		}
+
+		// Reset the body to allow for downstream reading.
+		r.Body = io.NopCloser(bytes.NewBuffer(buf))
 
 		if len(buf) == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 
+		rawBody = append(rawBody, buf...)
 		d := jx.DecodeBytes(buf)
 
 		var request VerifyPasswordEmailPINReq
@@ -4877,16 +4999,17 @@ func (s *Server) decodeVerifyPasswordEmailPINRequest(r *http.Request) (
 				Body:        buf,
 				Err:         err,
 			}
-			return req, close, err
+			return req, rawBody, close, err
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
 
 func (s *Server) decodeVote2Request(r *http.Request) (
 	req *Vote2Req,
+	rawBody []byte,
 	close func() error,
 	rerr error,
 ) {
@@ -4907,15 +5030,15 @@ func (s *Server) decodeVote2Request(r *http.Request) (
 	}()
 	ct, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return req, close, errors.Wrap(err, "parse media type")
+		return req, rawBody, close, errors.Wrap(err, "parse media type")
 	}
 	switch {
 	case ct == "multipart/form-data":
 		if r.ContentLength == 0 {
-			return req, close, validate.ErrBodyRequired
+			return req, rawBody, close, validate.ErrBodyRequired
 		}
 		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
-			return req, close, errors.Wrap(err, "parse multipart form")
+			return req, rawBody, close, errors.Wrap(err, "parse multipart form")
 		}
 		// Remove all temporary files created by ParseMultipartForm when the request is done.
 		//
@@ -4949,14 +5072,14 @@ func (s *Server) decodeVote2Request(r *http.Request) (
 					request.VoteStatus = c
 					return nil
 				}); err != nil {
-					return req, close, errors.Wrap(err, "decode \"voteStatus\"")
+					return req, rawBody, close, errors.Wrap(err, "decode \"voteStatus\"")
 				}
 			} else {
-				return req, close, errors.Wrap(err, "query")
+				return req, rawBody, close, errors.Wrap(err, "query")
 			}
 		}
-		return &request, close, nil
+		return &request, rawBody, close, nil
 	default:
-		return req, close, validate.InvalidContentType(ct)
+		return req, rawBody, close, validate.InvalidContentType(ct)
 	}
 }
