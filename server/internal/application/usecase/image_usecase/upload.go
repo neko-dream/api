@@ -63,9 +63,7 @@ func (h *uploadImageHandler) Execute(ctx context.Context, input UploadImageInput
 
 	if err := imageMeta.Validate(ctx, meta.NoValidationRule); err != nil {
 		utils.HandleError(ctx, err, "ImageMeta.Validate")
-		msg := messages.ImageUploadFailedError
-		msg.Message = err.Error()
-		return nil, msg
+		return nil, messages.ImageUploadFailedError.WithMessage(err.Error()).WithCause(err)
 	}
 
 	// 画像をアップロード

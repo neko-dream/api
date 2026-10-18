@@ -99,7 +99,8 @@ func (k *RestrictionAttributeKey) IsValid() error {
 }
 
 var (
-	ErrInvalidRestrictionAttribute = messages.APIError{
+	// 共有のエラー。文言は書き換えず WithMessage で複製して返す
+	ErrInvalidRestrictionAttribute = &messages.APIError{
 		Code:       "restriction_attribute_invalid",
 		StatusCode: 400,
 		Message:    "不正な値です。",
