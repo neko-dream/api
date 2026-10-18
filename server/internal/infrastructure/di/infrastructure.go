@@ -1,6 +1,7 @@
 package di
 
 import (
+	"github.com/neko-dream/api/internal/domain/model/event"
 	adminauth "github.com/neko-dream/api/internal/infrastructure/auth/admin"
 	"github.com/neko-dream/api/internal/infrastructure/auth/oauth"
 	"github.com/neko-dream/api/internal/infrastructure/auth/session"
@@ -72,6 +73,7 @@ func infraDeps() []ProvideArg {
 		{repository.NewNotificationPreferenceRepository, nil},
 		{db.NewDummyInitializer, nil},
 		{organization.NewListJoinedOrganizationQuery, nil},
+		{event.NewNotifier, nil},
 		{persistence.NewEventStore, nil},
 	}
 }

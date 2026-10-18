@@ -10,29 +10,35 @@ import (
 	"go.opentelemetry.io/otel"
 )
 
+// EventProcessor 保存されたイベントを処理する。
+// DB を定期的に見に行くと Aurora Serverless v2 が自動一時停止できないため、
+// 起動時と、イベントが保存されたとき(Notifier)だけ処理し、失敗したイベントがある間だけ retryInterval ごとに再試行する。
 type EventProcessor struct {
-	eventStore event.EventStore
-	registry   *EventHandlerRegistry
-	logger     *slog.Logger
-	interval   time.Duration
-	batchSize  int
+	eventStore    event.EventStore
+	notifier      *event.Notifier
+	registry      *EventHandlerRegistry
+	logger        *slog.Logger
+	retryInterval time.Duration
+	batchSize     int
 }
 
 func NewEventProcessor(
 	eventStore event.EventStore,
+	notifier *event.Notifier,
 	registry *EventHandlerRegistry,
 ) *EventProcessor {
 	return &EventProcessor{
-		eventStore: eventStore,
-		registry:   registry,
-		logger:     slog.Default(),
-		interval:   10 * time.Second,
-		batchSize:  100,
+		eventStore:    eventStore,
+		notifier:      notifier,
+		registry:      registry,
+		logger:        slog.Default(),
+		retryInterval: time.Minute,
+		batchSize:     100,
 	}
 }
 
-func (p *EventProcessor) WithInterval(interval time.Duration) *EventProcessor {
-	p.interval = interval
+func (p *EventProcessor) WithRetryInterval(retryInterval time.Duration) *EventProcessor {
+	p.retryInterval = retryInterval
 	return p
 }
 
@@ -50,35 +56,41 @@ func (p *EventProcessor) Start(ctx context.Context) {
 	ctx, span := otel.Tracer("event_processor").Start(ctx, "EventProcessor.Start")
 	defer span.End()
 
-	ticker := time.NewTicker(p.interval)
-	defer ticker.Stop()
-
 	p.logger.Info("イベントプロセッサーを開始しました",
-		slog.Duration("interval", p.interval),
+		slog.Duration("retry_interval", p.retryInterval),
 		slog.Int("batch_size", p.batchSize),
 	)
 
-	p.processBatch(ctx)
+	// 停止中に保存されたイベントを拾うため、起動時に一度処理する
+	retry := p.processBatch(ctx)
 
 	for {
+		var retryC <-chan time.Time
+		if retry {
+			retryC = time.After(p.retryInterval)
+		}
+
 		select {
 		case <-ctx.Done():
 			p.logger.Info("イベントプロセッサーを停止します")
 			return
-		case <-ticker.C:
-			p.processBatch(ctx)
+		case <-p.notifier.C():
+			retry = p.processBatch(ctx)
+		case <-retryC:
+			retry = p.processBatch(ctx)
 		}
 	}
 }
 
-func (p *EventProcessor) processBatch(ctx context.Context) {
+// processBatch 未処理のイベントを処理する。再試行が必要なイベントが残っていれば true を返す
+func (p *EventProcessor) processBatch(ctx context.Context) bool {
 	ctx, span := otel.Tracer("event_processor").Start(ctx, "EventProcessor.processBatch")
 	defer span.End()
 
 	eventTypes := p.registry.GetRegisteredEventTypes()
 	if len(eventTypes) == 0 {
 		p.logger.Debug("登録されているイベントタイプがありません")
-		return
+		return false
 	}
 
 	events, err := p.eventStore.GetUnprocessedEvents(ctx, eventTypes, p.batchSize)
@@ -86,19 +98,21 @@ func (p *EventProcessor) processBatch(ctx context.Context) {
 		p.logger.Error("未処理イベントの取得に失敗しました",
 			slog.String("error", err.Error()),
 		)
-		return
+		return true
 	}
 
 	if len(events) == 0 {
-		return
+		return false
 	}
 
 	p.logger.Info("イベントを処理します",
 		slog.Int("count", len(events)),
 	)
 
+	failed := false
 	for _, storedEvent := range events {
 		if err := p.processEvent(ctx, storedEvent); err != nil {
+			failed = true
 			p.logger.Error("イベント処理に失敗しました",
 				slog.String("event_id", storedEvent.ID.String()),
 				slog.String("event_type", string(storedEvent.EventType)),
@@ -121,6 +135,15 @@ func (p *EventProcessor) processBatch(ctx context.Context) {
 			)
 		}
 	}
+
+	// バッチに収まらなかったイベントは続けて処理する。失敗があれば再試行の間隔を空ける
+	if failed {
+		return true
+	}
+	if len(events) >= p.batchSize {
+		p.notifier.Notify()
+	}
+	return false
 }
 
 // processEvent 個別のイベントを処理
