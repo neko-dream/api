@@ -1,6 +1,7 @@
 import type { AuthProvider } from "@refinedev/core";
 import axios from "axios";
 
+import { authErrorResult } from "./auth-error";
 import { httpClient } from "./data-provider";
 
 // 認証状態の正は HttpOnly Cookie(AdminSessionId)。ここに保存するのは UI 表示用キャッシュのみ。
@@ -82,10 +83,9 @@ export const authProvider: AuthProvider = {
   },
 
   onError: async (error) => {
-    if (error?.response?.status === 403 || error?.response?.status === 401) {
-      return { logout: true, redirectTo: "/login" };
-    }
-    return {};
+    const result = authErrorResult(error);
+    if (result.redirectTo) localStorage.removeItem(USER_KEY);
+    return result;
   },
 
   getIdentity: async () => {
