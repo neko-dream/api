@@ -4946,29 +4946,6 @@ components:
           type: string
         updatedAt:
           type: string
-    AdminCookieAuth:
-      type: object
-      required:
-        - type
-        - in
-        - name
-      properties:
-        type:
-          type: string
-          enum:
-            - apiKey
-          description: API key authentication
-        in:
-          type: string
-          enum:
-            - cookie
-          description: location of the API key
-        name:
-          type: string
-          enum:
-            - AdminSessionId
-          description: name of the API key
-      description: 管理画面用のCookie認証。user の SessionId とは独立した AdminSessionId を使用する
     AdminTokenInfo:
       type: object
       required:
@@ -5030,29 +5007,6 @@ components:
         content:
           type: string
           description: 結論本文
-    CookieAuth:
-      type: object
-      required:
-        - type
-        - in
-        - name
-      properties:
-        type:
-          type: string
-          enum:
-            - apiKey
-          description: API key authentication
-        in:
-          type: string
-          enum:
-            - cookie
-          description: location of the API key
-        name:
-          type: string
-          enum:
-            - SessionId
-          description: name of the API key
-      description: Cookie-based authentication using JWT tokens stored in secure HTTP-only cookies
     CreateAdminUserRequest:
       type: object
       required:

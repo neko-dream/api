@@ -36,7 +36,7 @@ import "./routes/notifications.tsp";
 using Http;
 using OpenAPI;
 
-@service(#{ title: "Kotohiro API", version: "1.0.0" })
+@service(#{ title: "Kotohiro API" })
 @info(#{ version: "1.0.0" })
 @useAuth(CookieAuth)
 namespace kotohiro {
