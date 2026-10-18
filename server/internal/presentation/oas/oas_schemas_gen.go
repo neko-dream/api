@@ -3705,6 +3705,157 @@ func (s *OpinionComments2OK) SetOpinions(val []OpinionWithVote) {
 
 func (*OpinionComments2OK) opinionComments2Res() {}
 
+// Ref: #/components/schemas/OpinionForManage
+type OpinionForManage struct {
+	OpinionID    string    `json:"opinionID"`
+	Content      string    `json:"content"`
+	PictureURL   OptString `json:"pictureURL"`
+	ReferenceURL OptString `json:"referenceURL"`
+	// 返信の場合は返信先の意見ID.
+	ParentOpinionID OptString     `json:"parentOpinionID"`
+	Author          UserForManage `json:"author"`
+	CreatedAt       time.Time     `json:"createdAt"`
+	AgreeCount      int32         `json:"agreeCount"`
+	DisagreeCount   int32         `json:"disagreeCount"`
+	PassCount       int32         `json:"passCount"`
+	// 通報の件数（すべての状態）.
+	ReportCount int32 `json:"reportCount"`
+	// 未対応の通報の件数.
+	UnsolvedReportCount int32 `json:"unsolvedReportCount"`
+	// 通報の対応で削除された（一般の画面には表示されない）.
+	Deleted bool `json:"deleted"`
+}
+
+// GetOpinionID returns the value of OpinionID.
+func (s *OpinionForManage) GetOpinionID() string {
+	return s.OpinionID
+}
+
+// GetContent returns the value of Content.
+func (s *OpinionForManage) GetContent() string {
+	return s.Content
+}
+
+// GetPictureURL returns the value of PictureURL.
+func (s *OpinionForManage) GetPictureURL() OptString {
+	return s.PictureURL
+}
+
+// GetReferenceURL returns the value of ReferenceURL.
+func (s *OpinionForManage) GetReferenceURL() OptString {
+	return s.ReferenceURL
+}
+
+// GetParentOpinionID returns the value of ParentOpinionID.
+func (s *OpinionForManage) GetParentOpinionID() OptString {
+	return s.ParentOpinionID
+}
+
+// GetAuthor returns the value of Author.
+func (s *OpinionForManage) GetAuthor() UserForManage {
+	return s.Author
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *OpinionForManage) GetCreatedAt() time.Time {
+	return s.CreatedAt
+}
+
+// GetAgreeCount returns the value of AgreeCount.
+func (s *OpinionForManage) GetAgreeCount() int32 {
+	return s.AgreeCount
+}
+
+// GetDisagreeCount returns the value of DisagreeCount.
+func (s *OpinionForManage) GetDisagreeCount() int32 {
+	return s.DisagreeCount
+}
+
+// GetPassCount returns the value of PassCount.
+func (s *OpinionForManage) GetPassCount() int32 {
+	return s.PassCount
+}
+
+// GetReportCount returns the value of ReportCount.
+func (s *OpinionForManage) GetReportCount() int32 {
+	return s.ReportCount
+}
+
+// GetUnsolvedReportCount returns the value of UnsolvedReportCount.
+func (s *OpinionForManage) GetUnsolvedReportCount() int32 {
+	return s.UnsolvedReportCount
+}
+
+// GetDeleted returns the value of Deleted.
+func (s *OpinionForManage) GetDeleted() bool {
+	return s.Deleted
+}
+
+// SetOpinionID sets the value of OpinionID.
+func (s *OpinionForManage) SetOpinionID(val string) {
+	s.OpinionID = val
+}
+
+// SetContent sets the value of Content.
+func (s *OpinionForManage) SetContent(val string) {
+	s.Content = val
+}
+
+// SetPictureURL sets the value of PictureURL.
+func (s *OpinionForManage) SetPictureURL(val OptString) {
+	s.PictureURL = val
+}
+
+// SetReferenceURL sets the value of ReferenceURL.
+func (s *OpinionForManage) SetReferenceURL(val OptString) {
+	s.ReferenceURL = val
+}
+
+// SetParentOpinionID sets the value of ParentOpinionID.
+func (s *OpinionForManage) SetParentOpinionID(val OptString) {
+	s.ParentOpinionID = val
+}
+
+// SetAuthor sets the value of Author.
+func (s *OpinionForManage) SetAuthor(val UserForManage) {
+	s.Author = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *OpinionForManage) SetCreatedAt(val time.Time) {
+	s.CreatedAt = val
+}
+
+// SetAgreeCount sets the value of AgreeCount.
+func (s *OpinionForManage) SetAgreeCount(val int32) {
+	s.AgreeCount = val
+}
+
+// SetDisagreeCount sets the value of DisagreeCount.
+func (s *OpinionForManage) SetDisagreeCount(val int32) {
+	s.DisagreeCount = val
+}
+
+// SetPassCount sets the value of PassCount.
+func (s *OpinionForManage) SetPassCount(val int32) {
+	s.PassCount = val
+}
+
+// SetReportCount sets the value of ReportCount.
+func (s *OpinionForManage) SetReportCount(val int32) {
+	s.ReportCount = val
+}
+
+// SetUnsolvedReportCount sets the value of UnsolvedReportCount.
+func (s *OpinionForManage) SetUnsolvedReportCount(val int32) {
+	s.UnsolvedReportCount = val
+}
+
+// SetDeleted sets the value of Deleted.
+func (s *OpinionForManage) SetDeleted(val bool) {
+	s.Deleted = val
+}
+
 // Ref: #/components/schemas/OpinionGroupRatio
 type OpinionGroupRatio struct {
 	AgreeCount    int    `json:"agreeCount"`
@@ -7989,6 +8140,32 @@ func (s *TalkSessionListResponse) SetTalkSessionStats(val []TalkSessionStats) {
 // SetTotalCount sets the value of TotalCount.
 func (s *TalkSessionListResponse) SetTotalCount(val int32) {
 	s.TotalCount = val
+}
+
+// Ref: #/components/schemas/TalkSessionOpinionsForManage
+type TalkSessionOpinionsForManage struct {
+	TotalCount int32              `json:"totalCount"`
+	Opinions   []OpinionForManage `json:"opinions"`
+}
+
+// GetTotalCount returns the value of TotalCount.
+func (s *TalkSessionOpinionsForManage) GetTotalCount() int32 {
+	return s.TotalCount
+}
+
+// GetOpinions returns the value of Opinions.
+func (s *TalkSessionOpinionsForManage) GetOpinions() []OpinionForManage {
+	return s.Opinions
+}
+
+// SetTotalCount sets the value of TotalCount.
+func (s *TalkSessionOpinionsForManage) SetTotalCount(val int32) {
+	s.TotalCount = val
+}
+
+// SetOpinions sets the value of Opinions.
+func (s *TalkSessionOpinionsForManage) SetOpinions(val []OpinionForManage) {
+	s.Opinions = val
 }
 
 // Ref: #/components/schemas/TalkSessionStats

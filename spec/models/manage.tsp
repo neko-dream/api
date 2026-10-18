@@ -93,6 +93,36 @@ namespace kotohiro {
     restrictions: string[];
   }
 
+  model TalkSessionOpinionsForManage {
+    totalCount: int32;
+    opinions: OpinionForManage[];
+  }
+
+  model OpinionForManage {
+    opinionID: string;
+    content: string;
+    pictureURL?: string;
+    referenceURL?: string;
+
+    /** 返信の場合は返信先の意見ID */
+    parentOpinionID?: string;
+
+    author: UserForManage;
+    createdAt: utcDateTime;
+    agreeCount: int32;
+    disagreeCount: int32;
+    passCount: int32;
+
+    /** 通報の件数（すべての状態） */
+    reportCount: int32;
+
+    /** 未対応の通報の件数 */
+    unsolvedReportCount: int32;
+
+    /** 通報の対応で削除された（一般の画面には表示されない） */
+    deleted: boolean;
+  }
+
   model TalkSessionStats {
     talkSessionID: string;
     theme: string;

@@ -4692,6 +4692,42 @@ paths:
       security:
         - AdminCookieAuth: []
       x-ogen-operation-group: manage
+  /v1/manage/talksessions/{talkSessionID}/opinions:
+    get:
+      operationId: getTalkSessionOpinionsManage
+      description: 削除済み・通報された意見も含めて、新しい順に返す。投票は意見ごとの集計だけを返す。
+      parameters:
+        - name: talkSessionID
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TalkSessionOpinionsForManage'
+      tags:
+        - manage
+      security:
+        - AdminCookieAuth: []
+      x-ogen-operation-group: manage
   /v1/manage/users:
     post:
       operationId: createUserManage
@@ -5226,6 +5262,56 @@ components:
           type: string
         isDeleted:
           type: boolean
+    OpinionForManage:
+      type: object
+      required:
+        - opinionID
+        - content
+        - author
+        - createdAt
+        - agreeCount
+        - disagreeCount
+        - passCount
+        - reportCount
+        - unsolvedReportCount
+        - deleted
+      properties:
+        opinionID:
+          type: string
+        content:
+          type: string
+        pictureURL:
+          type: string
+        referenceURL:
+          type: string
+        parentOpinionID:
+          type: string
+          description: 返信の場合は返信先の意見ID
+        author:
+          $ref: '#/components/schemas/UserForManage'
+        createdAt:
+          type: string
+          format: date-time
+        agreeCount:
+          type: integer
+          format: int32
+        disagreeCount:
+          type: integer
+          format: int32
+        passCount:
+          type: integer
+          format: int32
+        reportCount:
+          type: integer
+          format: int32
+          description: 通報の件数（すべての状態）
+        unsolvedReportCount:
+          type: integer
+          format: int32
+          description: 未対応の通報の件数
+        deleted:
+          type: boolean
+          description: 通報の対応で削除された（一般の画面には表示されない）
     OpinionGroupRatio:
       type: object
       required:
@@ -5714,6 +5800,19 @@ components:
         totalCount:
           type: integer
           format: int32
+    TalkSessionOpinionsForManage:
+      type: object
+      required:
+        - totalCount
+        - opinions
+      properties:
+        totalCount:
+          type: integer
+          format: int32
+        opinions:
+          type: array
+          items:
+            $ref: '#/components/schemas/OpinionForManage'
     TalkSessionStats:
       type: object
       required:

@@ -333,3 +333,23 @@ WHERE
         ELSE TRUE
     END
 ;
+
+-- name: ListOpinionsForManage :many
+-- 管理画面用。削除済み・通報された意見も含め、投票は意見ごとの集計だけを返す
+SELECT
+    sqlc.embed(o),
+    sqlc.embed(u),
+    (SELECT COUNT(*) FROM votes v WHERE v.opinion_id = o.opinion_id AND v.vote_type = 1)::int AS agree_count,
+    (SELECT COUNT(*) FROM votes v WHERE v.opinion_id = o.opinion_id AND v.vote_type = 2)::int AS disagree_count,
+    (SELECT COUNT(*) FROM votes v WHERE v.opinion_id = o.opinion_id AND v.vote_type = 3)::int AS pass_count,
+    (SELECT COUNT(*) FROM opinion_reports r WHERE r.opinion_id = o.opinion_id)::int AS report_count,
+    (SELECT COUNT(*) FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'unsolved')::int AS unsolved_report_count,
+    EXISTS (SELECT 1 FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'deleted') AS deleted
+FROM opinions o
+JOIN users u ON u.user_id = o.user_id
+WHERE o.talk_session_id = sqlc.arg(talk_session_id)
+ORDER BY o.created_at DESC, o.opinion_id
+LIMIT sqlc.arg(row_limit) OFFSET sqlc.arg(row_offset);
+
+-- name: CountOpinionsForManage :one
+SELECT COUNT(*)::int FROM opinions WHERE talk_session_id = $1;
