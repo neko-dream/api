@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useShow } from "@refinedev/core";
 import { Show } from "@refinedev/antd";
 import {
@@ -24,6 +24,7 @@ import { Link, useParams } from "react-router";
 
 import { env } from "../../config/env";
 import { httpClient } from "../../providers";
+import { formatUserDate } from "../users/types";
 import type { ManagedTalkSession } from "./edit-form";
 import {
   type ManagedOpinion,
@@ -38,7 +39,7 @@ import {
   voteSummary,
 } from "./detail-view";
 
-const formatDate = (iso?: string) => (iso ? new Date(iso).toLocaleString("ja-JP") : "—");
+const formatDate = formatUserDate;
 const yesNo = (value: boolean, yes: string, no: string) =>
   value ? <Tag color="green">{yes}</Tag> : <Tag>{no}</Tag>;
 const formHeaders = { "Content-Type": "application/x-www-form-urlencoded" };
@@ -59,7 +60,8 @@ export function TalkSessionShow() {
         </Link>
       )}
     >
-      {query.isError ? (
+      {/* 読み込み済みのデータがあれば、再読み込みに失敗してもタブを消さない */}
+      {query.isError && !session ? (
         notFound ? (
           <Result
             status="404"
@@ -220,11 +222,15 @@ function OpinionsTab({ talkSessionID }: { talkSessionID: string }) {
           {
             title: "内容",
             key: "content",
-            render: (_: unknown, row: ManagedOpinion) => (
+            render: (_: unknown, row: ManagedOpinion) => {
+              const tags = opinionStatusTags(row);
+              const pictureURL = safeExternalURL(row.pictureURL);
+              const referenceURL = safeExternalURL(row.referenceURL);
+              return (
               <Space direction="vertical" size={4}>
-                {opinionStatusTags(row).length > 0 && (
+                {tags.length > 0 && (
                   <Space wrap size={4}>
-                    {opinionStatusTags(row).map((tag) => (
+                    {tags.map((tag) => (
                       <Tag key={tag.label} color={tag.color}>
                         {tag.label}
                       </Tag>
@@ -234,18 +240,19 @@ function OpinionsTab({ talkSessionID }: { talkSessionID: string }) {
                 <Typography.Text delete={row.deleted} style={{ whiteSpace: "pre-wrap" }}>
                   {row.content}
                 </Typography.Text>
-                {safeExternalURL(row.pictureURL) && (
-                  <a href={safeExternalURL(row.pictureURL) ?? undefined} target="_blank" rel="noopener noreferrer">
+                {pictureURL && (
+                  <a href={pictureURL} target="_blank" rel="noopener noreferrer">
                     画像を開く
                   </a>
                 )}
-                {safeExternalURL(row.referenceURL) && (
-                  <a href={safeExternalURL(row.referenceURL) ?? undefined} target="_blank" rel="noopener noreferrer">
+                {referenceURL && (
+                  <a href={referenceURL} target="_blank" rel="noopener noreferrer">
                     参考URL
                   </a>
                 )}
               </Space>
-            ),
+              );
+            },
           },
           {
             title: "投票（賛成 / 反対 / 保留）",
@@ -277,7 +284,7 @@ function AnalysisTab({
   onSessionChange,
 }: {
   session: ManagedTalkSession;
-  onSessionChange: () => void;
+  onSessionChange: () => Promise<unknown>;
 }) {
   const { message } = App.useApp();
   const id = session.talkSessionID;
@@ -289,6 +296,7 @@ function AnalysisTab({
   });
   const [toggling, setToggling] = useState(false);
   const [regenerating, setRegenerating] = useState<RegenerateType | null>(null);
+  const groups = useMemo(() => (analysis.data ? groupSummaries(analysis.data) : []), [analysis.data]);
   // 再生成や再試行で読み込み直したとき、先に始めた遅い応答で新しい表示を上書きしないよう、最後の読み込みだけを反映する
   const latestLoad = useRef(0);
 
@@ -330,9 +338,10 @@ function AnalysisTab({
       .post(`/v1/manage/talksessions/${encodeURIComponent(id)}/analysis/report`, reportVisibilityBody(!visible), {
         headers: formHeaders,
       })
-      .then(() => {
+      .then(async () => {
         message.success(visible ? "レポートを公開しました" : "レポートを非公開にしました");
-        onSessionChange();
+        // スイッチはセッションの値を表示しているので、読み込み直すまで操作できないままにする
+        await onSessionChange();
       })
       .catch(() => message.error("レポートの公開設定を変更できませんでした"))
       .finally(() => setToggling(false));
@@ -408,11 +417,11 @@ function AnalysisTab({
       <Card title="グループ分け" size="small" loading={analysis.loading}>
         {analysis.error ? (
           <Alert type="error" showIcon message="分析結果を取得できませんでした" action={<Button onClick={load}>再試行</Button>} />
-        ) : !analysis.data || groupSummaries(analysis.data).length === 0 ? (
+        ) : groups.length === 0 ? (
           <Empty description="まだグループ分けの結果がありません" />
         ) : (
           <Space direction="vertical" style={{ width: "100%" }}>
-            {groupSummaries(analysis.data).map((group) => (
+            {groups.map((group) => (
               <Card
                 key={group.groupID}
                 type="inner"
@@ -435,7 +444,8 @@ function AnalysisTab({
                       >
                         <List.Item.Meta
                           title={<span style={{ whiteSpace: "pre-wrap" }}>{item.opinion.content}</span>}
-                          description={item.user.displayName || item.user.displayID}
+                          // 削除済みの意見は、公開APIが投稿者を空にして返す
+                          description={item.user.displayName || item.user.displayID || "（削除済み）"}
                         />
                       </List.Item>
                     )}
