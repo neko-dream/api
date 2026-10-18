@@ -9,6 +9,7 @@ import (
 
 func SetupEventProcessor(
 	eventStore event.EventStore,
+	notifier *event.Notifier,
 	registry *event_processor.EventHandlerRegistry,
 	pushHandler *handlers.TalkSessionPushNotificationHandler,
 ) *event_processor.EventProcessor {
@@ -16,5 +17,5 @@ func SetupEventProcessor(
 	registry.Register(talksession.EventTypeTalkSessionStarted, pushHandler)
 	registry.Register(talksession.EventTypeTalkSessionEnded, pushHandler)
 
-	return event_processor.NewEventProcessor(eventStore, registry)
+	return event_processor.NewEventProcessor(eventStore, notifier, registry)
 }

@@ -17,11 +17,13 @@ import (
 
 type eventStore struct {
 	*db.DBManager
+	notifier *event.Notifier
 }
 
-func NewEventStore(dbManager *db.DBManager) event.EventStore {
+func NewEventStore(dbManager *db.DBManager, notifier *event.Notifier) event.EventStore {
 	return &eventStore{
 		DBManager: dbManager,
+		notifier:  notifier,
 	}
 }
 
@@ -45,8 +47,12 @@ func (s *eventStore) Store(ctx context.Context, evt event.DomainEvent) error {
 		RetryCount:    0,
 	}
 
-	_, err = s.GetQueries(ctx).CreateDomainEvent(ctx, params)
-	return err
+	if _, err := s.GetQueries(ctx).CreateDomainEvent(ctx, params); err != nil {
+		return err
+	}
+	// コミット前に知らせるとプロセッサーから行が見えないため、コミット後に知らせる
+	db.AfterCommit(ctx, s.notifier.Notify)
+	return nil
 }
 
 func (s *eventStore) StoreBatch(ctx context.Context, events []event.DomainEvent) error {
@@ -79,6 +85,7 @@ func (s *eventStore) StoreBatch(ctx context.Context, events []event.DomainEvent)
 				return errtrace.Wrap(fmt.Errorf("failed to insert event: %w", err))
 			}
 		}
+		db.AfterCommit(ctx, s.notifier.Notify)
 		return nil
 	})
 }
