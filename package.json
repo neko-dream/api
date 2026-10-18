@@ -10,7 +10,8 @@
   },
   "pnpm": {
     "overrides": {
-      "@ant-design/pro-layout>path-to-regexp": "^8.4.0"
+      "@ant-design/pro-layout>path-to-regexp": "^8.4.0",
+      "@scalar/json-magic>undici": "^7.29.1"
     }
   }
 }
