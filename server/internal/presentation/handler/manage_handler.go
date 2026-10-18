@@ -27,6 +27,9 @@ import (
 	"go.opentelemetry.io/otel"
 )
 
+// imageGenerationTimeout は管理画面から再生成した画像の生成の上限時間。
+const imageGenerationTimeout = 10 * time.Minute
+
 type manageHandler struct {
 	userManagement        userquery.Management
 	setCreationPermission admin_usecase.SetSessionCreationPermission
@@ -449,10 +452,13 @@ func (m *manageHandler) ManageRegenerateManage(ctx context.Context, req *oas.Reg
 			return nil, err
 		}
 	case "image":
-		// 非同期で画像生成
+		// 非同期で画像生成する。リクエストの ctx はレスポンスを返すとキャンセルされるので、
+		// トレースなどの値だけ引き継いだ ctx に上限時間を付けて動かす
+		bgCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), imageGenerationTimeout)
 		go func() {
-			if _, err := m.AnalysisService.GenerateImage(ctx, talkSessionID); err != nil {
-				utils.HandleError(ctx, err, "AnalysisService.GenerateImage")
+			defer cancel()
+			if _, err := m.AnalysisService.GenerateImage(bgCtx, talkSessionID); err != nil {
+				utils.HandleError(bgCtx, err, "AnalysisService.GenerateImage")
 				return
 			}
 		}()
