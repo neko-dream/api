@@ -5,6 +5,8 @@ import {
   opinionStatusTags,
   regenerateBody,
   reportVisibilityBody,
+  safeExternalURL,
+  shouldReloadAfterRegenerate,
   voteSummary,
   type ManagedOpinion,
   type TalkSessionAnalysis,
@@ -20,7 +22,7 @@ const opinion: ManagedOpinion = {
   passCount: 0,
   reportCount: 0,
   unsolvedReportCount: 0,
-  hidden: false,
+  deleted: false,
 };
 
 test("status tags show reply, deletion and reports only when relevant", () => {
@@ -28,11 +30,11 @@ test("status tags show reply, deletion and reports only when relevant", () => {
   const labels = opinionStatusTags({
     ...opinion,
     parentOpinionID: "o-0",
-    hidden: true,
+    deleted: true,
     reportCount: 3,
     unsolvedReportCount: 2,
   }).map((t) => t.label);
-  assert.deepEqual(labels, ["返信", "非表示（削除済み）", "通報 3件（未対応 2件）"]);
+  assert.deepEqual(labels, ["返信", "削除済み", "通報 3件（未対応 2件）"]);
   assert.deepEqual(
     opinionStatusTags({ ...opinion, reportCount: 1 }).map((t) => t.label),
     ["通報 1件"],
@@ -91,4 +93,19 @@ test("report visibility is sent as the form body the API expects", () => {
 test("regenerate request is sent as a form body", () => {
   assert.equal(regenerateBody("report"), "type=report");
   assert.equal(regenerateBody("group"), "type=group");
+});
+
+test("only http and https URLs submitted by users are linked", () => {
+  assert.equal(safeExternalURL("https://example.com/a?b=1"), "https://example.com/a?b=1");
+  assert.equal(safeExternalURL("http://example.com"), "http://example.com/");
+  for (const unsafe of ["javascript:alert(1)", "data:text/html,x", "vbscript:x", "file:///etc/passwd", "/relative", "not a url", ""]) {
+    assert.equal(safeExternalURL(unsafe), null, unsafe);
+  }
+  assert.equal(safeExternalURL(undefined), null);
+});
+
+test("only the synchronous report regeneration reloads right away", () => {
+  assert.equal(shouldReloadAfterRegenerate("report"), true);
+  assert.equal(shouldReloadAfterRegenerate("group"), false);
+  assert.equal(shouldReloadAfterRegenerate("image"), false);
 });

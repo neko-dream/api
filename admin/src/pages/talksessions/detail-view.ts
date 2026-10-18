@@ -13,8 +13,8 @@ export interface ManagedOpinion {
   passCount: number;
   reportCount: number;
   unsolvedReportCount: number;
-  /** 通報の対応で削除され、一般の画面に表示されない */
-  hidden: boolean;
+  /** 通報の対応で削除された（一般の意見一覧・詳細では「運営により削除されました」と表示される） */
+  deleted: boolean;
 }
 
 export interface OpinionStatusTag {
@@ -25,7 +25,7 @@ export interface OpinionStatusTag {
 export function opinionStatusTags(opinion: ManagedOpinion): OpinionStatusTag[] {
   const tags: OpinionStatusTag[] = [];
   if (opinion.parentOpinionID) tags.push({ label: "返信", color: "blue" });
-  if (opinion.hidden) tags.push({ label: "非表示（削除済み）", color: "red" });
+  if (opinion.deleted) tags.push({ label: "削除済み", color: "red" });
   if (opinion.reportCount > 0) {
     tags.push({
       label:
@@ -93,4 +93,20 @@ export type RegenerateType = "report" | "group" | "image";
 /** POST /v1/manage/talksessions/{id}/analysis/regenerate も application/x-www-form-urlencoded を受け取る */
 export function regenerateBody(type: RegenerateType): string {
   return new URLSearchParams({ type }).toString();
+}
+
+/** レポートは同期で生成されるので直後に読み込み直す。グループ分け・画像は非同期なので、直後に読み込んでも変わらない */
+export function shouldReloadAfterRegenerate(type: RegenerateType): boolean {
+  return type === "report";
+}
+
+/** 利用者が入力した URL は、http / https のときだけリンクにする */
+export function safeExternalURL(raw: string | undefined): string | null {
+  if (!raw) return null;
+  try {
+    const url = new URL(raw);
+    return url.protocol === "http:" || url.protocol === "https:" ? url.toString() : null;
+  } catch {
+    return null;
+  }
 }

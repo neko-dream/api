@@ -22,6 +22,7 @@ import axios from "axios";
 import ReactMarkdown from "react-markdown";
 import { Link, useParams } from "react-router";
 
+import { env } from "../../config/env";
 import { httpClient } from "../../providers";
 import type { ManagedTalkSession } from "./edit-form";
 import {
@@ -32,6 +33,8 @@ import {
   opinionStatusTags,
   regenerateBody,
   reportVisibilityBody,
+  safeExternalURL,
+  shouldReloadAfterRegenerate,
   voteSummary,
 } from "./detail-view";
 
@@ -76,12 +79,13 @@ export function TalkSessionShow() {
           <Tabs
             items={[
               { key: "overview", label: "概要", children: <Overview session={session} /> },
-              { key: "opinions", label: "意見", children: <OpinionsTab talkSessionID={id} /> },
+              // セッションが変わったらタブを作り直し、ページ番号などを引き継がない
+              { key: "opinions", label: "意見", children: <OpinionsTab key={id} talkSessionID={id} /> },
               {
                 key: "analysis",
                 label: "AI分析",
                 children: (
-                  <AnalysisTab session={session} onSessionChange={() => query.refetch()} />
+                  <AnalysisTab key={id} session={session} onSessionChange={() => query.refetch()} />
                 ),
               },
             ]}
@@ -179,7 +183,7 @@ function OpinionsTab({ talkSessionID }: { talkSessionID: string }) {
         />
       )}
       <Typography.Text type="secondary">
-        一般の画面に表示されない意見（通報の対応で削除されたもの）や返信も含めて、新しい順に表示します。投票は意見ごとの集計だけで、誰がどう投票したかは表示しません。
+        通報の対応で削除された意見や返信も含めて、新しい順に表示します。投票は意見ごとの集計だけで、誰がどう投票したかは表示しません。
       </Typography.Text>
       <Table
         rowKey="opinionID"
@@ -227,16 +231,16 @@ function OpinionsTab({ talkSessionID }: { talkSessionID: string }) {
                     ))}
                   </Space>
                 )}
-                <Typography.Text delete={row.hidden} style={{ whiteSpace: "pre-wrap" }}>
+                <Typography.Text delete={row.deleted} style={{ whiteSpace: "pre-wrap" }}>
                   {row.content}
                 </Typography.Text>
-                {row.pictureURL && (
-                  <a href={row.pictureURL} target="_blank" rel="noopener noreferrer">
+                {safeExternalURL(row.pictureURL) && (
+                  <a href={safeExternalURL(row.pictureURL) ?? undefined} target="_blank" rel="noopener noreferrer">
                     画像を開く
                   </a>
                 )}
-                {row.referenceURL && (
-                  <a href={row.referenceURL} target="_blank" rel="noopener noreferrer">
+                {safeExternalURL(row.referenceURL) && (
+                  <a href={safeExternalURL(row.referenceURL) ?? undefined} target="_blank" rel="noopener noreferrer">
                     参考URL
                   </a>
                 )}
@@ -305,8 +309,9 @@ function AnalysisTab({
               : { loading: false, error: true },
           ),
       );
-    httpClient
-      .get<TalkSessionAnalysis>(`/talksessions/${encodeURIComponent(id)}/analysis`, { withCredentials: false })
+    // 公開APIなので、401 で管理者のリフレッシュを試みる管理画面用のクライアントは使わない
+    axios
+      .get<TalkSessionAnalysis>(`${env.apiUrl}/talksessions/${encodeURIComponent(id)}/analysis`)
       .then((res) => isLatest() && setAnalysis({ loading: false, data: res.data }))
       .catch(() => isLatest() && setAnalysis({ loading: false, error: true }));
   }, [id]);
@@ -340,8 +345,12 @@ function AnalysisTab({
         headers: formHeaders,
       })
       .then(() => {
-        message.success("再生成を始めました。反映まで時間がかかることがあります");
-        load();
+        if (shouldReloadAfterRegenerate(type)) {
+          message.success("レポートを再生成しました");
+          load();
+        } else {
+          message.success("再生成を始めました。反映まで時間がかかるので、しばらくしてから開き直してください");
+        }
       })
       .catch(() => message.error("再生成を始められませんでした"))
       .finally(() => setRegenerating(null));
