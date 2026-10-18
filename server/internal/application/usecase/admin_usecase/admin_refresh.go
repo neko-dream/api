@@ -8,7 +8,6 @@ import (
 	"github.com/neko-dream/api/internal/domain/model/admin"
 	"github.com/neko-dream/api/internal/domain/model/clock"
 	"github.com/neko-dream/api/internal/infrastructure/config"
-	"github.com/neko-dream/api/pkg/hash"
 	"go.opentelemetry.io/otel"
 )
 
@@ -84,7 +83,7 @@ func (a *adminRefreshInteractor) Execute(ctx context.Context, refreshToken strin
 	if err != nil {
 		return nil, err
 	}
-	newRefresh, err := hash.GenerateRandomToken(48)
+	newRefresh, err := newRefreshToken()
 	if err != nil {
 		return nil, err
 	}

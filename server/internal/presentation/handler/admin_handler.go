@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"net/url"
 
 	"github.com/neko-dream/api/internal/application/usecase/admin_usecase"
 	"github.com/neko-dream/api/internal/domain/model/admin"
@@ -116,7 +117,14 @@ func adminRefreshTokenFromCtx(ctx context.Context) string {
 	if err != nil {
 		return ""
 	}
-	return c.Value
+	// ogen は Set-Cookie の値を URL エンコードして返すため、以前の base64（+ / =）のトークンは
+	// %2B などに変わった値で保存されている。トークンに % は含まれないので、デコードして元に戻す。
+	// QueryUnescape は + を空白に変えるので使わない。
+	value, err := url.PathUnescape(c.Value)
+	if err != nil {
+		return ""
+	}
+	return value
 }
 
 // AdminLogin implements adminLogin operation.

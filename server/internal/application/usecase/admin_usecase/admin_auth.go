@@ -2,6 +2,8 @@ package admin_usecase
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/base64"
 	"time"
 
 	"github.com/neko-dream/api/internal/domain/model/admin"
@@ -22,6 +24,16 @@ type AdminAuthOutput struct {
 }
 
 // hashRefreshToken は保存・検索用に refresh トークンを HMAC でハッシュ化する。
+// newRefreshToken はリフレッシュトークンを作る。Cookie に入れる値で、ogen は Set-Cookie の値を
+// URL エンコードするので、URL で使える文字だけ（base64url、パディングなし）にする。
+func newRefreshToken() (string, error) {
+	b := make([]byte, 48)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
+	}
+	return base64.RawURLEncoding.EncodeToString(b), nil
+}
+
 func hashRefreshToken(raw string, cfg *config.Config) (string, error) {
 	return hash.HMACHash(raw, cfg.HASH_PEPPER)
 }
@@ -38,7 +50,7 @@ func issueAccessAndRefresh(
 	if err != nil {
 		return nil, err
 	}
-	refresh, err := hash.GenerateRandomToken(48)
+	refresh, err := newRefreshToken()
 	if err != nil {
 		return nil, err
 	}
