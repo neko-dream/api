@@ -85,8 +85,11 @@ func (cm *CookieManager) CreateGuestSessionCookie(token string) *http.Cookie {
 
 const AdminSessionCookieName = "AdminSessionId"
 const AdminRefreshCookieName = "AdminRefreshToken"
-const AdminSessionMaxAge = 900
 const AdminRefreshMaxAge = 86400 * 30
+
+// AdminSessionMaxAge はアクセストークン（JWT、15分）の Cookie の寿命。
+// JWT が切れても Cookie は残し、期限切れの JWT を送らせて 401 → リフレッシュの流れにする
+const AdminSessionMaxAge = AdminRefreshMaxAge
 
 func (cm *CookieManager) adminCookie(name, path, value string, age int) *http.Cookie {
 	return &http.Cookie{Name: name, Path: path, Value: value, MaxAge: age, HttpOnly: true, Secure: cm.config.Env != config.LOCAL, SameSite: http.SameSiteLaxMode}

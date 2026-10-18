@@ -7,6 +7,7 @@ package model
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -39,24 +40,28 @@ func (q *Queries) CreateAdminSession(ctx context.Context, arg CreateAdminSession
 }
 
 const deleteAdminSessionByTokenHash = `-- name: DeleteAdminSessionByTokenHash :exec
-DELETE FROM admin_sessions WHERE token_hash = $1
+DELETE FROM admin_sessions WHERE token_hash = $1 OR previous_token_hash = $1
 `
 
-// DeleteAdminSessionByTokenHash
+// ローテーション直後に古いトークンでログアウトされても、セッションを消せるようにする
 //
-//	DELETE FROM admin_sessions WHERE token_hash = $1
+//	DELETE FROM admin_sessions WHERE token_hash = $1 OR previous_token_hash = $1
 func (q *Queries) DeleteAdminSessionByTokenHash(ctx context.Context, tokenHash string) error {
 	_, err := q.db.ExecContext(ctx, deleteAdminSessionByTokenHash, tokenHash)
 	return err
 }
 
 const getAdminSessionByTokenHash = `-- name: GetAdminSessionByTokenHash :one
-SELECT admin_session_id, admin_user_id, token_hash, expires_at, created_at, updated_at FROM admin_sessions WHERE token_hash = $1
+SELECT admin_session_id, admin_user_id, token_hash, expires_at, created_at, updated_at, previous_token_hash, rotated_at FROM admin_sessions
+WHERE token_hash = $1 OR previous_token_hash = $1
+LIMIT 1
 `
 
-// GetAdminSessionByTokenHash
+// 現在のトークンか、ローテーション直前のトークンで探す（猶予期間の判定は呼び出し側で行う）
 //
-//	SELECT admin_session_id, admin_user_id, token_hash, expires_at, created_at, updated_at FROM admin_sessions WHERE token_hash = $1
+//	SELECT admin_session_id, admin_user_id, token_hash, expires_at, created_at, updated_at, previous_token_hash, rotated_at FROM admin_sessions
+//	WHERE token_hash = $1 OR previous_token_hash = $1
+//	LIMIT 1
 func (q *Queries) GetAdminSessionByTokenHash(ctx context.Context, tokenHash string) (AdminSession, error) {
 	row := q.db.QueryRowContext(ctx, getAdminSessionByTokenHash, tokenHash)
 	var i AdminSession
@@ -67,34 +72,50 @@ func (q *Queries) GetAdminSessionByTokenHash(ctx context.Context, tokenHash stri
 		&i.ExpiresAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.PreviousTokenHash,
+		&i.RotatedAt,
 	)
 	return i, err
 }
 
 const rotateAdminSession = `-- name: RotateAdminSession :execrows
 UPDATE admin_sessions
-SET token_hash = $2, expires_at = $3, updated_at = CURRENT_TIMESTAMP
-WHERE admin_session_id = $1 AND token_hash = $4 AND expires_at > CURRENT_TIMESTAMP
+SET previous_token_hash = token_hash,
+    rotated_at = $1,
+    token_hash = $2,
+    expires_at = $3,
+    updated_at = CURRENT_TIMESTAMP
+WHERE admin_session_id = $4
+  AND token_hash = $5
+  AND expires_at > CURRENT_TIMESTAMP
 `
 
 type RotateAdminSessionParams struct {
-	AdminSessionID uuid.UUID
-	TokenHash      string
+	RotatedAt      sql.NullTime
+	NewTokenHash   string
 	ExpiresAt      time.Time
-	TokenHash_2    string
+	AdminSessionID uuid.UUID
+	OldTokenHash   string
 }
 
 // RotateAdminSession
 //
 //	UPDATE admin_sessions
-//	SET token_hash = $2, expires_at = $3, updated_at = CURRENT_TIMESTAMP
-//	WHERE admin_session_id = $1 AND token_hash = $4 AND expires_at > CURRENT_TIMESTAMP
+//	SET previous_token_hash = token_hash,
+//	    rotated_at = $1,
+//	    token_hash = $2,
+//	    expires_at = $3,
+//	    updated_at = CURRENT_TIMESTAMP
+//	WHERE admin_session_id = $4
+//	  AND token_hash = $5
+//	  AND expires_at > CURRENT_TIMESTAMP
 func (q *Queries) RotateAdminSession(ctx context.Context, arg RotateAdminSessionParams) (int64, error) {
 	result, err := q.db.ExecContext(ctx, rotateAdminSession,
-		arg.AdminSessionID,
-		arg.TokenHash,
+		arg.RotatedAt,
+		arg.NewTokenHash,
 		arg.ExpiresAt,
-		arg.TokenHash_2,
+		arg.AdminSessionID,
+		arg.OldTokenHash,
 	)
 	if err != nil {
 		return 0, err

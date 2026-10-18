@@ -22,8 +22,11 @@ func TestAdminCookieScope(t *testing.T) {
 					t.Fatalf("path=%q want=%q", c.Path, wantPath)
 				}
 			}
-			if cm.CreateAdminSessionCookie("access").MaxAge != 900 {
-				t.Fatal("access cookie exceeds JWT lifetime")
+			// アクセストークンの Cookie は、JWT（15分）が切れても送られる必要がある。
+			// 期限切れの JWT は 401 になり、管理画面がリフレッシュする。Cookie ごと消えると 403 になり、
+			// リフレッシュされずにログイン画面に戻される
+			if got := cm.CreateAdminSessionCookie("access").MaxAge; got != cm.CreateAdminRefreshCookie("refresh").MaxAge {
+				t.Fatalf("access cookie MaxAge=%d must match refresh cookie lifetime", got)
 			}
 		})
 	}
