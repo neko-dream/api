@@ -13,7 +13,8 @@ export interface ManagedOpinion {
   passCount: number;
   reportCount: number;
   unsolvedReportCount: number;
-  deleted: boolean;
+  /** 通報の対応で削除され、一般の画面に表示されない */
+  hidden: boolean;
 }
 
 export interface OpinionStatusTag {
@@ -24,7 +25,7 @@ export interface OpinionStatusTag {
 export function opinionStatusTags(opinion: ManagedOpinion): OpinionStatusTag[] {
   const tags: OpinionStatusTag[] = [];
   if (opinion.parentOpinionID) tags.push({ label: "返信", color: "blue" });
-  if (opinion.deleted) tags.push({ label: "削除済み", color: "red" });
+  if (opinion.hidden) tags.push({ label: "非表示（削除済み）", color: "red" });
   if (opinion.reportCount > 0) {
     tags.push({
       label:

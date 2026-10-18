@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useShow } from "@refinedev/core";
 import { Show } from "@refinedev/antd";
 import {
@@ -156,7 +156,12 @@ function OpinionsTab({ talkSessionID }: { talkSessionID: string }) {
         { params: { limit: OPINION_PAGE_SIZE, offset: (page - 1) * OPINION_PAGE_SIZE } },
       )
       .then((res) => active && setData({ totalCount: res.data.totalCount, opinions: res.data.opinions ?? [] }))
-      .catch(() => active && setError(true))
+      .catch(() => {
+        if (!active) return;
+        // ページ番号だけ進んで前のページの意見が残らないよう、表を空にする
+        setData((prev) => ({ totalCount: prev.totalCount, opinions: [] }));
+        setError(true);
+      })
       .finally(() => active && setLoading(false));
     return () => {
       active = false;
@@ -174,7 +179,7 @@ function OpinionsTab({ talkSessionID }: { talkSessionID: string }) {
         />
       )}
       <Typography.Text type="secondary">
-        削除済みの意見や返信も含めて、新しい順に表示します。投票は意見ごとの集計だけで、誰がどう投票したかは表示しません。
+        一般の画面に表示されない意見（通報の対応で削除されたもの）や返信も含めて、新しい順に表示します。投票は意見ごとの集計だけで、誰がどう投票したかは表示しません。
       </Typography.Text>
       <Table
         rowKey="opinionID"
@@ -222,7 +227,7 @@ function OpinionsTab({ talkSessionID }: { talkSessionID: string }) {
                     ))}
                   </Space>
                 )}
-                <Typography.Text delete={row.deleted} style={{ whiteSpace: "pre-wrap" }}>
+                <Typography.Text delete={row.hidden} style={{ whiteSpace: "pre-wrap" }}>
                   {row.content}
                 </Typography.Text>
                 {row.pictureURL && (
@@ -280,27 +285,39 @@ function AnalysisTab({
   });
   const [toggling, setToggling] = useState(false);
   const [regenerating, setRegenerating] = useState<RegenerateType | null>(null);
+  // 再生成や再試行で読み込み直したとき、先に始めた遅い応答で新しい表示を上書きしないよう、最後の読み込みだけを反映する
+  const latestLoad = useRef(0);
 
   const load = useCallback(() => {
+    const loadID = ++latestLoad.current;
+    const isLatest = () => loadID === latestLoad.current;
     setReport({ loading: true });
     setAnalysis({ loading: true });
     httpClient
       .get<{ report?: string }>(`/v1/manage/talksessions/${encodeURIComponent(id)}/analysis/report`)
-      .then((res) => setReport({ loading: false, text: res.data.report }))
-      .catch((error) =>
-        setReport(
-          axios.isAxiosError(error) && error.response?.status === 404
-            ? { loading: false, missing: true }
-            : { loading: false, error: true },
-        ),
+      .then((res) => isLatest() && setReport({ loading: false, text: res.data.report }))
+      .catch(
+        (error) =>
+          isLatest() &&
+          setReport(
+            axios.isAxiosError(error) && error.response?.status === 404
+              ? { loading: false, missing: true }
+              : { loading: false, error: true },
+          ),
       );
     httpClient
       .get<TalkSessionAnalysis>(`/talksessions/${encodeURIComponent(id)}/analysis`, { withCredentials: false })
-      .then((res) => setAnalysis({ loading: false, data: res.data }))
-      .catch(() => setAnalysis({ loading: false, error: true }));
+      .then((res) => isLatest() && setAnalysis({ loading: false, data: res.data }))
+      .catch(() => isLatest() && setAnalysis({ loading: false, error: true }));
   }, [id]);
 
-  useEffect(load, [load]);
+  useEffect(() => {
+    load();
+    return () => {
+      // タブを離れたあとに届いた応答は捨てる
+      latestLoad.current++;
+    };
+  }, [load]);
 
   const toggleReport = (visible: boolean) => {
     setToggling(true);
