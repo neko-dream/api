@@ -112,9 +112,12 @@ func (t *talkSessionRepository) Update(ctx context.Context, talkSession *talkses
 		Prefecture:       utils.ToNullableSQL[sql.NullString](talkSession.Prefecture()),
 		Restrictions:     talksession.Restrictions(restrictions),
 		HideReport:       utils.ToNullableSQL[sql.NullBool](talkSession.HideReport()),
-		HideTop:          talkSession.HideTop(),
-		DisableAnalysis:  talkSession.DisableAnalysis(),
-		PassphraseHash:   utils.ToNullableSQL[sql.NullString](talkSession.PassphraseHash()),
+		// 渡さないと NULL で上書きされ、組織との紐づけが消える
+		OrganizationID:      utils.ToNullableSQL[uuid.NullUUID](talkSession.OrganizationID()),
+		OrganizationAliasID: utils.ToNullableSQL[uuid.NullUUID](talkSession.OrganizationAliasID()),
+		HideTop:             talkSession.HideTop(),
+		DisableAnalysis:     talkSession.DisableAnalysis(),
+		PassphraseHash:      utils.ToNullableSQL[sql.NullString](talkSession.PassphraseHash()),
 	}); err != nil {
 		return errtrace.Wrap(err)
 	}
@@ -176,6 +179,17 @@ func (t *talkSessionRepository) FindByID(ctx context.Context, talkSessionID shar
 		passphraseHash = &row.TalkSession.PassphraseHash.String
 	}
 
+	var organizationID *shared.UUID[organization.Organization]
+	if row.TalkSession.OrganizationID.Valid {
+		id := shared.UUID[organization.Organization](row.TalkSession.OrganizationID.UUID)
+		organizationID = &id
+	}
+	var organizationAliasID *shared.UUID[organization.OrganizationAlias]
+	if row.TalkSession.OrganizationAliasID.Valid {
+		id := shared.UUID[organization.OrganizationAlias](row.TalkSession.OrganizationAliasID.UUID)
+		organizationAliasID = &id
+	}
+
 	ts := talksession.NewTalkSession(
 		talkSessionID,
 		row.TalkSession.Theme,
@@ -188,8 +202,8 @@ func (t *talkSessionRepository) FindByID(ctx context.Context, talkSessionID shar
 		city,
 		prefecture,
 		row.TalkSession.HideTop,
-		nil,
-		nil,
+		organizationID,
+		organizationAliasID,
 		passphraseHash,
 	)
 	ts.SetReportVisibility(row.TalkSession.HideReport.Bool)
