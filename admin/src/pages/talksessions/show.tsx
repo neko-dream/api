@@ -19,6 +19,7 @@ import {
   Typography,
 } from "antd";
 import axios from "axios";
+import ReactMarkdown from "react-markdown";
 import { Link, useParams } from "react-router";
 
 import { httpClient } from "../../providers";
@@ -365,7 +366,16 @@ function AnalysisTab({
         ) : report.missing || !report.text ? (
           <Empty description="まだレポートがありません" />
         ) : (
-          <Typography.Paragraph style={{ whiteSpace: "pre-wrap", marginBottom: 0 }}>{report.text}</Typography.Paragraph>
+          // web のレポート表示と同じく react-markdown で整形する（HTML は描画しない）
+          <Typography>
+            <ReactMarkdown
+              components={{
+                a: ({ node: _node, ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" />,
+              }}
+            >
+              {report.text}
+            </ReactMarkdown>
+          </Typography>
         )}
       </Card>
 
