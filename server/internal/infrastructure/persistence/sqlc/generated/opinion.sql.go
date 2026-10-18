@@ -72,7 +72,7 @@ const countOpinionsForManage = `-- name: CountOpinionsForManage :one
 SELECT COUNT(*)::int FROM opinions WHERE talk_session_id = $1
 `
 
-// CountOpinionsForManage
+// ListOpinionsForManage の行が0件（範囲外のページ）のときだけ使う
 //
 //	SELECT COUNT(*)::int FROM opinions WHERE talk_session_id = $1
 func (q *Queries) CountOpinionsForManage(ctx context.Context, talkSessionID uuid.UUID) (int32, error) {
@@ -1169,7 +1169,9 @@ SELECT
     (SELECT COUNT(*) FROM opinion_reports r WHERE r.opinion_id = o.opinion_id)::int AS report_count,
     (SELECT COUNT(*) FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'unsolved')::int AS unsolved_report_count,
     -- 一般の意見一覧・返信・詳細と同じ判定（ProcessReportedOpinions）: 削除済みの通報が1件でもあれば削除済み
-    EXISTS (SELECT 1 FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'deleted')::bool AS deleted
+    EXISTS (SELECT 1 FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'deleted')::bool AS deleted,
+    -- 件数を同じクエリで数え、別のクエリとの間に投稿があっても件数と行がずれないようにする
+    COUNT(*) OVER ()::int AS total_count
 FROM opinions o
 LEFT JOIN users u ON u.user_id = o.user_id
 WHERE o.talk_session_id = $1
@@ -1195,6 +1197,7 @@ type ListOpinionsForManageRow struct {
 	ReportCount         int32
 	UnsolvedReportCount int32
 	Deleted             bool
+	TotalCount          int32
 }
 
 // 管理画面用。削除済み・通報された意見も含め、投票は意見ごとの集計だけを返す。
@@ -1212,7 +1215,9 @@ type ListOpinionsForManageRow struct {
 //	    (SELECT COUNT(*) FROM opinion_reports r WHERE r.opinion_id = o.opinion_id)::int AS report_count,
 //	    (SELECT COUNT(*) FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'unsolved')::int AS unsolved_report_count,
 //	    -- 一般の意見一覧・返信・詳細と同じ判定（ProcessReportedOpinions）: 削除済みの通報が1件でもあれば削除済み
-//	    EXISTS (SELECT 1 FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'deleted')::bool AS deleted
+//	    EXISTS (SELECT 1 FROM opinion_reports r WHERE r.opinion_id = o.opinion_id AND r.status = 'deleted')::bool AS deleted,
+//	    -- 件数を同じクエリで数え、別のクエリとの間に投稿があっても件数と行がずれないようにする
+//	    COUNT(*) OVER ()::int AS total_count
 //	FROM opinions o
 //	LEFT JOIN users u ON u.user_id = o.user_id
 //	WHERE o.talk_session_id = $1
@@ -1247,6 +1252,7 @@ func (q *Queries) ListOpinionsForManage(ctx context.Context, arg ListOpinionsFor
 			&i.ReportCount,
 			&i.UnsolvedReportCount,
 			&i.Deleted,
+			&i.TotalCount,
 		); err != nil {
 			return nil, err
 		}

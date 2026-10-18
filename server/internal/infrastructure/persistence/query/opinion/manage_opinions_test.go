@@ -140,6 +140,15 @@ func TestManageOpinions(t *testing.T) {
 				if page.TotalCount != 5 || len(page.Opinions) != 1 || page.Opinions[0].OpinionID.UUID() != mixedID {
 					return errors.New("offset/limit not applied")
 				}
+
+				// 範囲外のページでも件数は返す
+				beyond, err := q.List(ctx, opinionquery.ManageOpinionsInput{TalkSessionID: talkSessionID, Limit: 10, Offset: 100})
+				if err != nil {
+					return err
+				}
+				if beyond.TotalCount != 5 || len(beyond.Opinions) != 0 {
+					return fmt.Errorf("beyond the last page: total=%d len=%d", beyond.TotalCount, len(beyond.Opinions))
+				}
 				return nil
 			},
 		},

@@ -33,16 +33,19 @@ func (q *manageOpinionsQuery) List(ctx context.Context, input opinionquery.Manag
 	if !exists {
 		return nil, messages.TalkSessionNotFound
 	}
-	total, err := queries.CountOpinionsForManage(ctx, input.TalkSessionID.UUID())
-	if err != nil {
-		return nil, err
-	}
 	rows, err := queries.ListOpinionsForManage(ctx, model.ListOpinionsForManageParams{
 		TalkSessionID: input.TalkSessionID.UUID(),
 		RowLimit:      input.Limit,
 		RowOffset:     input.Offset,
 	})
 	if err != nil {
+		return nil, err
+	}
+	// 件数は一覧と同じクエリで数えている。行がない（範囲外のページ）ときだけ別に数える
+	var total int32
+	if len(rows) > 0 {
+		total = rows[0].TotalCount
+	} else if total, err = queries.CountOpinionsForManage(ctx, input.TalkSessionID.UUID()); err != nil {
 		return nil, err
 	}
 
