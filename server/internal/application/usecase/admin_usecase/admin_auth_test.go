@@ -3,7 +3,6 @@ package admin_usecase
 import (
 	"context"
 	"errors"
-	"strings"
 	"testing"
 	"time"
 
@@ -167,33 +166,5 @@ func TestAdminRefreshConcurrentRotationSucceedsWithinGracePeriod(t *testing.T) {
 	got, err := refresh.Execute(ctx, out.RefreshToken)
 	if err != nil || got.AccessToken == "" || got.RefreshToken != "" {
 		t.Fatalf("concurrent refresh: %+v %v", got, err)
-	}
-}
-
-// リフレッシュトークンは Cookie に入れる。ogen は Set-Cookie の値を URL エンコードするので、
-// URL で使える文字だけにして、ブラウザに保存される値が変わらないようにする。
-func TestAdminRefreshTokensAreURLSafe(t *testing.T) {
-	ctx := context.Background()
-	cfg := &config.Config{AdminJWTSecret: "local-test-only-secret-at-least-32-bytes", HASH_PEPPER: "local-test-only-pepper"}
-	users := &authTestUsers{user: &admin.AdminUser{AdminUserID: shared.NewUUID[admin.AdminUser](), Email: "operator@example.com", DisplayName: "Operator"}}
-	sessions := &authTestSessions{}
-	tokens := adminauth.NewAdminTokenManager(cfg)
-	login := NewAdminLogin(users, sessions, tokens, authTestVerifier{}, cfg)
-	refresh := NewAdminRefresh(users, sessions, tokens, cfg)
-
-	for i := 0; i < 20; i++ {
-		out, err := login.Execute(ctx, AdminLoginInput{IDToken: "verified-by-test-double"})
-		if err != nil {
-			t.Fatal(err)
-		}
-		rotated, err := refresh.Execute(ctx, out.RefreshToken)
-		if err != nil {
-			t.Fatal(err)
-		}
-		for _, token := range []string{out.RefreshToken, rotated.RefreshToken} {
-			if len(token) < 64 || strings.Trim(token, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_") != "" {
-				t.Fatalf("refresh token is not URL-safe: %q", token)
-			}
-		}
 	}
 }

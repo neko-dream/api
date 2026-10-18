@@ -18,8 +18,12 @@ type capturingAdminRefresh struct {
 	out *admin_usecase.AdminAuthOutput
 }
 
+// 空のトークンは本物のユースケースと同じく無効として扱う
 func (c *capturingAdminRefresh) Execute(_ context.Context, token string) (*admin_usecase.AdminAuthOutput, error) {
 	c.got = token
+	if token == "" {
+		return nil, admin_usecase.ErrInvalidRefreshToken
+	}
 	return c.out, nil
 }
 
@@ -38,10 +42,19 @@ func serveAdminRefresh(t *testing.T, h *adminHandler, cookieHeader string) *http
 	return w.Result()
 }
 
-// ogen は Set-Cookie の値を URL エンコードするため、base64（+ / =）のリフレッシュトークンは
+func responseCookies(res *http.Response) map[string]string {
+	got := map[string]string{}
+	for _, c := range res.Cookies() {
+		got[c.Name] = c.Value
+	}
+	return got
+}
+
+// 以前は cookie_utils.EncodeCookies が値を URL エンコードしていたため、base64（+ / =）のリフレッシュトークンが
 // %2B などに変わった値でブラウザに保存されていた。保存済みの Cookie も使えるよう、読み取り時にデコードする。
 func TestAdminRefreshDecodesURLEncodedCookie(t *testing.T) {
-	refresh := &capturingAdminRefresh{out: &admin_usecase.AdminAuthOutput{AccessToken: "access", RefreshToken: "next_token-1"}}
+	const next = "Nx+Rot/ated=="
+	refresh := &capturingAdminRefresh{out: &admin_usecase.AdminAuthOutput{AccessToken: "access", RefreshToken: next}}
 	h := &adminHandler{cookieManager: cookie.NewCookieManager(&config.Config{Env: config.LOCAL}), adminRefresh: refresh}
 
 	res := serveAdminRefresh(t, h, cookie.AdminRefreshCookieName+"=Q4Whk%2BUbhG%2FpBen4%3D")
@@ -51,19 +64,28 @@ func TestAdminRefreshDecodesURLEncodedCookie(t *testing.T) {
 	if refresh.got != "Q4Whk+UbhG/pBen4=" {
 		t.Fatalf("token passed to usecase = %q", refresh.got)
 	}
-	// URL で使える文字だけのトークンは、エンコードされずにそのまま保存される
-	for _, c := range res.Cookies() {
-		if c.Name == cookie.AdminRefreshCookieName && c.Value != "next_token-1" {
-			t.Fatalf("refresh cookie value = %q", c.Value)
-		}
+	// 新しいリフレッシュトークンは、+ / = を含んでもそのままの値でブラウザに保存される
+	got := responseCookies(res)
+	if v, ok := got[cookie.AdminRefreshCookieName]; !ok || v != next {
+		t.Fatalf("refresh cookie = %q (present=%v), want %q; Set-Cookie = %q", v, ok, next, res.Header.Values("Set-Cookie"))
+	}
+	if got[cookie.AdminSessionCookieName] != "access" {
+		t.Fatalf("access cookie = %q", got[cookie.AdminSessionCookieName])
 	}
 }
 
 func TestAdminRefreshRejectsMalformedEncodedCookie(t *testing.T) {
 	refresh := &capturingAdminRefresh{out: &admin_usecase.AdminAuthOutput{AccessToken: "access", RefreshToken: "next"}}
 	h := &adminHandler{cookieManager: cookie.NewCookieManager(&config.Config{Env: config.LOCAL}), adminRefresh: refresh}
-	serveAdminRefresh(t, h, cookie.AdminRefreshCookieName+"=broken%ZZ")
+
+	res := serveAdminRefresh(t, h, cookie.AdminRefreshCookieName+"=broken%ZZ")
+	if res.StatusCode != http.StatusUnauthorized {
+		t.Fatalf("status = %d, want 401", res.StatusCode)
+	}
 	if refresh.got != "" {
 		t.Fatalf("malformed cookie passed to usecase as %q", refresh.got)
+	}
+	if _, ok := responseCookies(res)[cookie.AdminRefreshCookieName]; ok {
+		t.Fatal("refresh cookie must not be issued for a malformed cookie")
 	}
 }

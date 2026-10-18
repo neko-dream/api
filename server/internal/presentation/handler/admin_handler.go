@@ -117,9 +117,10 @@ func adminRefreshTokenFromCtx(ctx context.Context) string {
 	if err != nil {
 		return ""
 	}
-	// ogen は Set-Cookie の値を URL エンコードして返すため、以前の base64（+ / =）のトークンは
-	// %2B などに変わった値で保存されている。トークンに % は含まれないので、デコードして元に戻す。
-	// QueryUnescape は + を空白に変えるので使わない。
+	// 以前の cookie_utils.EncodeCookies は値を url.QueryEscape していたため、それ以前に発行された
+	// リフレッシュトークン（base64 の + / =）は %2B などに変わった値でブラウザに保存されている。
+	// トークンに % は含まれないので、デコードして元に戻す（QueryUnescape は + を空白に変えるので使わない）。
+	// 旧形式の Cookie がすべて期限切れになったら（リフレッシュトークンの寿命の30日後）このデコードは不要。
 	value, err := url.PathUnescape(c.Value)
 	if err != nil {
 		return ""
