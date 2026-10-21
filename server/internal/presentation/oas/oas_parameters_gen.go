@@ -7,7 +7,6 @@ import (
 	"net/url"
 
 	"github.com/go-faster/errors"
-
 	"github.com/ogen-go/ogen/conv"
 	"github.com/ogen-go/ogen/middleware"
 	"github.com/ogen-go/ogen/ogenerrors"
@@ -21,9 +20,9 @@ type AuthorizeParams struct {
 	// ログイン後にリダイレクトするURL.
 	RedirectURL string
 	// 組織コード（組織ログインの場合）.
-	OrganizationCode OptString
+	OrganizationCode OptString `json:",omitempty,omitzero"`
 	// 登録していなかった場合に飛ばすURL.
-	RegistrationURL OptString
+	RegistrationURL OptString `json:",omitempty,omitzero"`
 }
 
 func unpackAuthorizeParams(packed middleware.Parameters) (params AuthorizeParams) {
@@ -665,7 +664,7 @@ type DevAuthorizeParams struct {
 	// Devのみで使用するsubjectです。ここで指定した値はログインした後も確認できないため覚えておいてください。同じ値を指定すると同じアカウントにログインできます。.
 	ID string
 	// 組織コード（組織ログインの場合）.
-	OrganizationCode OptString
+	OrganizationCode OptString `json:",omitempty,omitzero"`
 }
 
 func unpackDevAuthorizeParams(packed middleware.Parameters) (params DevAuthorizeParams) {
@@ -1193,11 +1192,11 @@ func decodeGetConclusionParams(args [1]string, argsEscaped bool, r *http.Request
 
 // GetOpenedTalkSessionParams is parameters of getOpenedTalkSession operation.
 type GetOpenedTalkSessionParams struct {
-	Limit  OptInt
-	Offset OptInt
+	Limit  OptInt `json:",omitempty,omitzero"`
+	Offset OptInt `json:",omitempty,omitzero"`
 	// テーマ.
-	Theme  OptString
-	Status OptNilGetOpenedTalkSessionStatus
+	Theme  OptString                        `json:",omitempty,omitzero"`
+	Status OptNilGetOpenedTalkSessionStatus `json:",omitempty,omitzero"`
 }
 
 func unpackGetOpenedTalkSessionParams(packed middleware.Parameters) (params GetOpenedTalkSessionParams) {
@@ -1627,10 +1626,10 @@ func decodeGetOpinionReportsParams(args [1]string, argsEscaped bool, r *http.Req
 // GetOpinionsForTalkSessionParams is parameters of getOpinionsForTalkSession operation.
 type GetOpinionsForTalkSessionParams struct {
 	TalkSessionID string
-	Sort          OptNilGetOpinionsForTalkSessionSort
-	Limit         OptNilInt
-	Offset        OptNilInt
-	Seed          OptNilBool
+	Sort          OptNilGetOpinionsForTalkSessionSort `json:",omitempty,omitzero"`
+	Limit         OptNilInt                           `json:",omitempty,omitzero"`
+	Offset        OptNilInt                           `json:",omitempty,omitzero"`
+	Seed          OptNilBool                          `json:",omitempty,omitzero"`
 }
 
 func unpackGetOpinionsForTalkSessionParams(packed middleware.Parameters) (params GetOpinionsForTalkSessionParams) {
@@ -1912,7 +1911,7 @@ func decodeGetOpinionsForTalkSessionParams(args [1]string, argsEscaped bool, r *
 // GetReportsForTalkSessionParams is parameters of getReportsForTalkSession operation.
 type GetReportsForTalkSessionParams struct {
 	TalkSessionID string
-	Status        OptGetReportsForTalkSessionStatus
+	Status        OptGetReportsForTalkSessionStatus `json:",omitempty,omitzero"`
 }
 
 func unpackGetReportsForTalkSessionParams(packed middleware.Parameters) (params GetReportsForTalkSessionParams) {
@@ -2108,16 +2107,15 @@ func decodeGetTalkSessionDetailParams(args [1]string, argsEscaped bool, r *http.
 
 // GetTalkSessionListParams is parameters of getTalkSessionList operation.
 type GetTalkSessionListParams struct {
-	// Ir
-	// 1ページあたりの要素数.
-	Limit OptNilInt
+	// Ir 1ページあたりの要素数.
+	Limit OptNilInt `json:",omitempty,omitzero"`
 	// どの要素から始めるか.
-	Offset    OptNilInt
-	Theme     OptNilString
-	Status    OptNilGetTalkSessionListStatus
-	SortKey   OptGetTalkSessionListSortKey
-	Latitude  OptNilFloat64
-	Longitude OptNilFloat64
+	Offset    OptNilInt                      `json:",omitempty,omitzero"`
+	Theme     OptNilString                   `json:",omitempty,omitzero"`
+	Status    OptNilGetTalkSessionListStatus `json:",omitempty,omitzero"`
+	SortKey   OptGetTalkSessionListSortKey   `json:",omitempty,omitzero"`
+	Latitude  OptNilFloat64                  `json:",omitempty,omitzero"`
+	Longitude OptNilFloat64                  `json:",omitempty,omitzero"`
 }
 
 func unpackGetTalkSessionListParams(packed middleware.Parameters) (params GetTalkSessionListParams) {
@@ -2546,9 +2544,9 @@ func decodeGetTalkSessionListParams(args [0]string, argsEscaped bool, r *http.Re
 
 // GetTalkSessionListManageParams is parameters of getTalkSessionListManage operation.
 type GetTalkSessionListManageParams struct {
-	Status OptGetTalkSessionListManageStatus
-	Offset OptInt32
-	Limit  OptInt32
+	Status OptGetTalkSessionListManageStatus `json:",omitempty,omitzero"`
+	Offset OptInt32                          `json:",omitempty,omitzero"`
+	Limit  OptInt32                          `json:",omitempty,omitzero"`
 }
 
 func unpackGetTalkSessionListManageParams(packed middleware.Parameters) (params GetTalkSessionListManageParams) {
@@ -2793,8 +2791,8 @@ func decodeGetTalkSessionManageParams(args [1]string, argsEscaped bool, r *http.
 // GetTalkSessionOpinionsManageParams is parameters of getTalkSessionOpinionsManage operation.
 type GetTalkSessionOpinionsManageParams struct {
 	TalkSessionID string
-	Offset        OptInt32
-	Limit         OptInt32
+	Offset        OptInt32 `json:",omitempty,omitzero"`
+	Limit         OptInt32 `json:",omitempty,omitzero"`
 }
 
 func unpackGetTalkSessionOpinionsManageParams(packed middleware.Parameters) (params GetTalkSessionOpinionsManageParams) {
@@ -3533,9 +3531,9 @@ func decodeGetUserDetailManageParams(args [1]string, argsEscaped bool, r *http.R
 
 // GetUserListManageParams is parameters of getUserListManage operation.
 type GetUserListManageParams struct {
-	Offset OptInt32
-	Limit  OptInt32
-	Search OptString
+	Offset OptInt32  `json:",omitempty,omitzero"`
+	Limit  OptInt32  `json:",omitempty,omitzero"`
+	Search OptString `json:",omitempty,omitzero"`
 }
 
 func unpackGetUserListManageParams(packed middleware.Parameters) (params GetUserListManageParams) {
@@ -3615,6 +3613,7 @@ func decodeGetUserListManageParams(args [0]string, argsEscaped bool, r *http.Req
 							MaxExclusive:  false,
 							MultipleOfSet: false,
 							MultipleOf:    0,
+							Pattern:       nil,
 						}).Validate(int64(value)); err != nil {
 							return errors.Wrap(err, "int")
 						}
@@ -3680,6 +3679,7 @@ func decodeGetUserListManageParams(args [0]string, argsEscaped bool, r *http.Req
 							MaxExclusive:  false,
 							MultipleOfSet: false,
 							MultipleOf:    0,
+							Pattern:       nil,
 						}).Validate(int64(value)); err != nil {
 							return errors.Wrap(err, "int")
 						}
@@ -3737,13 +3737,17 @@ func decodeGetUserListManageParams(args [0]string, argsEscaped bool, r *http.Req
 				if value, ok := params.Search.Get(); ok {
 					if err := func() error {
 						if err := (validate.String{
-							MinLength:    0,
-							MinLengthSet: false,
-							MaxLength:    200,
-							MaxLengthSet: true,
-							Email:        false,
-							Hostname:     false,
-							Regex:        nil,
+							MinLength:     0,
+							MinLengthSet:  false,
+							MaxLength:     200,
+							MaxLengthSet:  true,
+							Email:         false,
+							Hostname:      false,
+							Regex:         nil,
+							MinNumeric:    0,
+							MinNumericSet: false,
+							MaxNumeric:    0,
+							MaxNumericSet: false,
 						}).Validate(string(value)); err != nil {
 							return errors.Wrap(err, "string")
 						}
@@ -3771,8 +3775,8 @@ func decodeGetUserListManageParams(args [0]string, argsEscaped bool, r *http.Req
 // GetUserStatsListManageParams is parameters of getUserStatsListManage operation.
 type GetUserStatsListManageParams struct {
 	Range  string
-	Offset OptInt32
-	Limit  OptInt32
+	Offset OptInt32 `json:",omitempty,omitzero"`
+	Limit  OptInt32 `json:",omitempty,omitzero"`
 }
 
 func unpackGetUserStatsListManageParams(packed middleware.Parameters) (params GetUserStatsListManageParams) {
@@ -3930,9 +3934,9 @@ func decodeGetUserStatsListManageParams(args [0]string, argsEscaped bool, r *htt
 // GetUserTalkSessionsParams is parameters of getUserTalkSessions operation.
 type GetUserTalkSessionsParams struct {
 	DisplayID string
-	Limit     OptInt
-	Offset    OptInt
-	Status    OptNilGetUserTalkSessionsStatus
+	Limit     OptInt                          `json:",omitempty,omitzero"`
+	Offset    OptInt                          `json:",omitempty,omitzero"`
+	Status    OptNilGetUserTalkSessionsStatus `json:",omitempty,omitzero"`
 }
 
 func unpackGetUserTalkSessionsParams(packed middleware.Parameters) (params GetUserTalkSessionsParams) {
@@ -4454,8 +4458,8 @@ func decodeJoinLockedSessionParams(args [1]string, argsEscaped bool, r *http.Req
 // ListTalkSessionSurveySubmissionsParams is parameters of listTalkSessionSurveySubmissions operation.
 type ListTalkSessionSurveySubmissionsParams struct {
 	TalkSessionID string
-	Limit         OptInt32
-	Offset        OptInt32
+	Limit         OptInt32 `json:",omitempty,omitzero"`
+	Offset        OptInt32 `json:",omitempty,omitzero"`
 }
 
 func unpackListTalkSessionSurveySubmissionsParams(packed middleware.Parameters) (params ListTalkSessionSurveySubmissionsParams) {
@@ -4753,9 +4757,9 @@ func decodeOpinionComments2Params(args [1]string, argsEscaped bool, r *http.Requ
 // OpinionsHistoryParams is parameters of opinionsHistory operation.
 type OpinionsHistoryParams struct {
 	// ソートきー.
-	Sort   OptNilOpinionsHistorySort
-	Limit  OptInt
-	Offset OptInt
+	Sort   OptNilOpinionsHistorySort `json:",omitempty,omitzero"`
+	Limit  OptInt                    `json:",omitempty,omitzero"`
+	Offset OptInt                    `json:",omitempty,omitzero"`
 }
 
 func unpackOpinionsHistoryParams(packed middleware.Parameters) (params OpinionsHistoryParams) {
@@ -5194,11 +5198,11 @@ func decodeResendUserInvitationManageParams(args [1]string, argsEscaped bool, r 
 
 // SessionsHistoryParams is parameters of sessionsHistory operation.
 type SessionsHistoryParams struct {
-	Limit  OptInt
-	Offset OptInt
+	Limit  OptInt `json:",omitempty,omitzero"`
+	Offset OptInt `json:",omitempty,omitzero"`
 	// テーマ.
-	Theme  OptNilString
-	Status OptNilSessionsHistoryStatus
+	Theme  OptNilString                `json:",omitempty,omitzero"`
+	Status OptNilSessionsHistoryStatus `json:",omitempty,omitzero"`
 }
 
 func unpackSessionsHistoryParams(packed middleware.Parameters) (params SessionsHistoryParams) {
@@ -5623,7 +5627,7 @@ func decodeSubmitTalkSessionSurveyParams(args [1]string, argsEscaped bool, r *ht
 // SwipeOpinionsParams is parameters of swipeOpinions operation.
 type SwipeOpinionsParams struct {
 	TalkSessionID string
-	Limit         OptNilInt
+	Limit         OptNilInt `json:",omitempty,omitzero"`
 }
 
 func unpackSwipeOpinionsParams(packed middleware.Parameters) (params SwipeOpinionsParams) {

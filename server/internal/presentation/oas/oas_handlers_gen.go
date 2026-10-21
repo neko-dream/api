@@ -8,16 +8,15 @@ import (
 	"time"
 
 	"github.com/go-faster/errors"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/codes"
-	"go.opentelemetry.io/otel/metric"
-	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
-	"go.opentelemetry.io/otel/trace"
-
 	ht "github.com/ogen-go/ogen/http"
 	"github.com/ogen-go/ogen/middleware"
 	"github.com/ogen-go/ogen/ogenerrors"
 	"github.com/ogen-go/ogen/otelogen"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/metric"
+	semconv "go.opentelemetry.io/otel/semconv/v1.39.0"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type codeRecorder struct {
@@ -28,6 +27,10 @@ type codeRecorder struct {
 func (c *codeRecorder) WriteHeader(status int) {
 	c.status = status
 	c.ResponseWriter.WriteHeader(status)
+}
+
+func (c *codeRecorder) Unwrap() http.ResponseWriter {
+	return c.ResponseWriter
 }
 
 // handleAdminLoginRequest handles adminLogin operation.
@@ -43,6 +46,8 @@ func (s *Server) handleAdminLoginRequest(args [0]string, argsEscaped bool, w htt
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/v1/admin/login"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), AdminLoginOperation,
@@ -66,7 +71,7 @@ func (s *Server) handleAdminLoginRequest(args [0]string, argsEscaped bool, w htt
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -86,7 +91,7 @@ func (s *Server) handleAdminLoginRequest(args [0]string, argsEscaped bool, w htt
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -104,7 +109,9 @@ func (s *Server) handleAdminLoginRequest(args [0]string, argsEscaped bool, w htt
 			ID:   "adminLogin",
 		}
 	)
-	request, close, err := s.decodeAdminLoginRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeAdminLoginRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -128,6 +135,7 @@ func (s *Server) handleAdminLoginRequest(args [0]string, argsEscaped bool, w htt
 			OperationSummary: "管理者ログイン(Google認証)",
 			OperationID:      "adminLogin",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -181,6 +189,8 @@ func (s *Server) handleAdminLogoutRequest(args [0]string, argsEscaped bool, w ht
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/v1/admin/logout"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), AdminLogoutOperation,
@@ -204,7 +214,7 @@ func (s *Server) handleAdminLogoutRequest(args [0]string, argsEscaped bool, w ht
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -224,7 +234,7 @@ func (s *Server) handleAdminLogoutRequest(args [0]string, argsEscaped bool, w ht
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -239,6 +249,8 @@ func (s *Server) handleAdminLogoutRequest(args [0]string, argsEscaped bool, w ht
 		err error
 	)
 
+	var rawBody []byte
+
 	var response *AdminLogoutNoContent
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -247,6 +259,7 @@ func (s *Server) handleAdminLogoutRequest(args [0]string, argsEscaped bool, w ht
 			OperationSummary: "管理者ログアウト",
 			OperationID:      "adminLogout",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -300,6 +313,8 @@ func (s *Server) handleAdminRefreshRequest(args [0]string, argsEscaped bool, w h
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/v1/admin/refresh"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), AdminRefreshOperation,
@@ -323,7 +338,7 @@ func (s *Server) handleAdminRefreshRequest(args [0]string, argsEscaped bool, w h
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -343,7 +358,7 @@ func (s *Server) handleAdminRefreshRequest(args [0]string, argsEscaped bool, w h
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -358,6 +373,8 @@ func (s *Server) handleAdminRefreshRequest(args [0]string, argsEscaped bool, w h
 		err error
 	)
 
+	var rawBody []byte
+
 	var response AdminRefreshRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -366,6 +383,7 @@ func (s *Server) handleAdminRefreshRequest(args [0]string, argsEscaped bool, w h
 			OperationSummary: "リフレッシュトークンでアクセストークンを再発行",
 			OperationID:      "adminRefresh",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -419,6 +437,8 @@ func (s *Server) handleApplyFeedbackToReportRequest(args [0]string, argsEscaped 
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/report/feedback"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), ApplyFeedbackToReportOperation,
@@ -442,7 +462,7 @@ func (s *Server) handleApplyFeedbackToReportRequest(args [0]string, argsEscaped 
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -462,7 +482,7 @@ func (s *Server) handleApplyFeedbackToReportRequest(args [0]string, argsEscaped 
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -524,7 +544,9 @@ func (s *Server) handleApplyFeedbackToReportRequest(args [0]string, argsEscaped 
 			return
 		}
 	}
-	request, close, err := s.decodeApplyFeedbackToReportRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeApplyFeedbackToReportRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -548,6 +570,7 @@ func (s *Server) handleApplyFeedbackToReportRequest(args [0]string, argsEscaped 
 			OperationSummary: "セッションのレポートにフィードバックを適用する",
 			OperationID:      "applyFeedbackToReport",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -601,6 +624,8 @@ func (s *Server) handleAuthAccountDetachRequest(args [0]string, argsEscaped bool
 		semconv.HTTPRequestMethodKey.String("DELETE"),
 		semconv.HTTPRouteKey.String("/auth/dev/detach"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), AuthAccountDetachOperation,
@@ -624,7 +649,7 @@ func (s *Server) handleAuthAccountDetachRequest(args [0]string, argsEscaped bool
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -644,7 +669,7 @@ func (s *Server) handleAuthAccountDetachRequest(args [0]string, argsEscaped bool
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -707,6 +732,8 @@ func (s *Server) handleAuthAccountDetachRequest(args [0]string, argsEscaped bool
 		}
 	}
 
+	var rawBody []byte
+
 	var response AuthAccountDetachRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -715,6 +742,7 @@ func (s *Server) handleAuthAccountDetachRequest(args [0]string, argsEscaped bool
 			OperationSummary: "**開発用** 現在のアカウントを切り離す",
 			OperationID:      "authAccountDetach",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -768,6 +796,8 @@ func (s *Server) handleAuthorizeRequest(args [1]string, argsEscaped bool, w http
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/auth/{provider}/login"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), AuthorizeOperation,
@@ -791,7 +821,7 @@ func (s *Server) handleAuthorizeRequest(args [1]string, argsEscaped bool, w http
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -811,7 +841,7 @@ func (s *Server) handleAuthorizeRequest(args [1]string, argsEscaped bool, w http
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -840,6 +870,8 @@ func (s *Server) handleAuthorizeRequest(args [1]string, argsEscaped bool, w http
 		return
 	}
 
+	var rawBody []byte
+
 	var response AuthorizeRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -848,6 +880,7 @@ func (s *Server) handleAuthorizeRequest(args [1]string, argsEscaped bool, w http
 			OperationSummary: "ログイン",
 			OperationID:      "authorize",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "provider",
@@ -918,6 +951,8 @@ func (s *Server) handleChangePasswordRequest(args [0]string, argsEscaped bool, w
 		semconv.HTTPRequestMethodKey.String("PUT"),
 		semconv.HTTPRouteKey.String("/auth/password/change"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), ChangePasswordOperation,
@@ -941,7 +976,7 @@ func (s *Server) handleChangePasswordRequest(args [0]string, argsEscaped bool, w
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -961,7 +996,7 @@ func (s *Server) handleChangePasswordRequest(args [0]string, argsEscaped bool, w
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -1034,6 +1069,8 @@ func (s *Server) handleChangePasswordRequest(args [0]string, argsEscaped bool, w
 		return
 	}
 
+	var rawBody []byte
+
 	var response ChangePasswordRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -1042,6 +1079,7 @@ func (s *Server) handleChangePasswordRequest(args [0]string, argsEscaped bool, w
 			OperationSummary: "パスワード変更",
 			OperationID:      "changePassword",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "oldPassword",
@@ -1104,6 +1142,8 @@ func (s *Server) handleCheckDeviceExistsRequest(args [0]string, argsEscaped bool
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/notifications/devices/exists"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), CheckDeviceExistsOperation,
@@ -1127,7 +1167,7 @@ func (s *Server) handleCheckDeviceExistsRequest(args [0]string, argsEscaped bool
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -1147,7 +1187,7 @@ func (s *Server) handleCheckDeviceExistsRequest(args [0]string, argsEscaped bool
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -1220,6 +1260,8 @@ func (s *Server) handleCheckDeviceExistsRequest(args [0]string, argsEscaped bool
 		return
 	}
 
+	var rawBody []byte
+
 	var response CheckDeviceExistsRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -1228,6 +1270,7 @@ func (s *Server) handleCheckDeviceExistsRequest(args [0]string, argsEscaped bool
 			OperationSummary: "デバイストークンが登録されているか確認",
 			OperationID:      "checkDeviceExists",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "device_token",
@@ -1286,6 +1329,8 @@ func (s *Server) handleConsentTalkSessionRequest(args [1]string, argsEscaped boo
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/consent"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), ConsentTalkSessionOperation,
@@ -1309,7 +1354,7 @@ func (s *Server) handleConsentTalkSessionRequest(args [1]string, argsEscaped boo
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -1329,7 +1374,7 @@ func (s *Server) handleConsentTalkSessionRequest(args [1]string, argsEscaped boo
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -1402,6 +1447,8 @@ func (s *Server) handleConsentTalkSessionRequest(args [1]string, argsEscaped boo
 		return
 	}
 
+	var rawBody []byte
+
 	var response ConsentTalkSessionRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -1410,6 +1457,7 @@ func (s *Server) handleConsentTalkSessionRequest(args [1]string, argsEscaped boo
 			OperationSummary: "セッションへの同意",
 			OperationID:      "consentTalkSession",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -1469,6 +1517,8 @@ func (s *Server) handleCreateAdminUserRequest(args [0]string, argsEscaped bool, 
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/v1/admin/admin-users"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), CreateAdminUserOperation,
@@ -1492,7 +1542,7 @@ func (s *Server) handleCreateAdminUserRequest(args [0]string, argsEscaped bool, 
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -1512,7 +1562,7 @@ func (s *Server) handleCreateAdminUserRequest(args [0]string, argsEscaped bool, 
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -1574,7 +1624,9 @@ func (s *Server) handleCreateAdminUserRequest(args [0]string, argsEscaped bool, 
 			return
 		}
 	}
-	request, close, err := s.decodeCreateAdminUserRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeCreateAdminUserRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -1598,6 +1650,7 @@ func (s *Server) handleCreateAdminUserRequest(args [0]string, argsEscaped bool, 
 			OperationSummary: "管理者アカウント作成(作成した email の Google アカウントがログイン可能になる)",
 			OperationID:      "createAdminUser",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -1651,6 +1704,8 @@ func (s *Server) handleCreateOrganizationAliasRequest(args [0]string, argsEscape
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/organizations/aliases"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), CreateOrganizationAliasOperation,
@@ -1674,7 +1729,7 @@ func (s *Server) handleCreateOrganizationAliasRequest(args [0]string, argsEscape
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -1694,7 +1749,7 @@ func (s *Server) handleCreateOrganizationAliasRequest(args [0]string, argsEscape
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -1756,7 +1811,9 @@ func (s *Server) handleCreateOrganizationAliasRequest(args [0]string, argsEscape
 			return
 		}
 	}
-	request, close, err := s.decodeCreateOrganizationAliasRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeCreateOrganizationAliasRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -1780,6 +1837,7 @@ func (s *Server) handleCreateOrganizationAliasRequest(args [0]string, argsEscape
 			OperationSummary: "組織エイリアス作成",
 			OperationID:      "createOrganizationAlias",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -1834,6 +1892,8 @@ func (s *Server) handleCreateTalkSessionSurveyRequest(args [1]string, argsEscape
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/survey"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), CreateTalkSessionSurveyOperation,
@@ -1857,7 +1917,7 @@ func (s *Server) handleCreateTalkSessionSurveyRequest(args [1]string, argsEscape
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -1877,7 +1937,7 @@ func (s *Server) handleCreateTalkSessionSurveyRequest(args [1]string, argsEscape
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -1949,7 +2009,9 @@ func (s *Server) handleCreateTalkSessionSurveyRequest(args [1]string, argsEscape
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
-	request, close, err := s.decodeCreateTalkSessionSurveyRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeCreateTalkSessionSurveyRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -1973,6 +2035,7 @@ func (s *Server) handleCreateTalkSessionSurveyRequest(args [1]string, argsEscape
 			OperationSummary: "アンケート作成",
 			OperationID:      "createTalkSessionSurvey",
 			Body:             request,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -2031,6 +2094,8 @@ func (s *Server) handleCreateUserManageRequest(args [0]string, argsEscaped bool,
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/v1/manage/users"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), CreateUserManageOperation,
@@ -2054,7 +2119,7 @@ func (s *Server) handleCreateUserManageRequest(args [0]string, argsEscaped bool,
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -2074,7 +2139,7 @@ func (s *Server) handleCreateUserManageRequest(args [0]string, argsEscaped bool,
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -2136,7 +2201,9 @@ func (s *Server) handleCreateUserManageRequest(args [0]string, argsEscaped bool,
 			return
 		}
 	}
-	request, close, err := s.decodeCreateUserManageRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeCreateUserManageRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -2160,6 +2227,7 @@ func (s *Server) handleCreateUserManageRequest(args [0]string, argsEscaped bool,
 			OperationSummary: "メールログイン用ユーザーを作成し、初回パスワード設定メールを送信する",
 			OperationID:      "createUserManage",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -2213,6 +2281,8 @@ func (s *Server) handleDeleteDeviceRequest(args [1]string, argsEscaped bool, w h
 		semconv.HTTPRequestMethodKey.String("DELETE"),
 		semconv.HTTPRouteKey.String("/notifications/devices/{deviceId}"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), DeleteDeviceOperation,
@@ -2236,7 +2306,7 @@ func (s *Server) handleDeleteDeviceRequest(args [1]string, argsEscaped bool, w h
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -2256,7 +2326,7 @@ func (s *Server) handleDeleteDeviceRequest(args [1]string, argsEscaped bool, w h
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -2329,6 +2399,8 @@ func (s *Server) handleDeleteDeviceRequest(args [1]string, argsEscaped bool, w h
 		return
 	}
 
+	var rawBody []byte
+
 	var response DeleteDeviceRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -2337,6 +2409,7 @@ func (s *Server) handleDeleteDeviceRequest(args [1]string, argsEscaped bool, w h
 			OperationSummary: "デバイス削除",
 			OperationID:      "deleteDevice",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "deviceId",
@@ -2395,6 +2468,8 @@ func (s *Server) handleDeleteOrganizationAliasRequest(args [1]string, argsEscape
 		semconv.HTTPRequestMethodKey.String("DELETE"),
 		semconv.HTTPRouteKey.String("/organizations/aliases/{aliasID}"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), DeleteOrganizationAliasOperation,
@@ -2418,7 +2493,7 @@ func (s *Server) handleDeleteOrganizationAliasRequest(args [1]string, argsEscape
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -2438,7 +2513,7 @@ func (s *Server) handleDeleteOrganizationAliasRequest(args [1]string, argsEscape
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -2511,6 +2586,8 @@ func (s *Server) handleDeleteOrganizationAliasRequest(args [1]string, argsEscape
 		return
 	}
 
+	var rawBody []byte
+
 	var response DeleteOrganizationAliasRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -2519,6 +2596,7 @@ func (s *Server) handleDeleteOrganizationAliasRequest(args [1]string, argsEscape
 			OperationSummary: "組織エイリアス削除",
 			OperationID:      "deleteOrganizationAlias",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "aliasID",
@@ -2577,6 +2655,8 @@ func (s *Server) handleDevAuthorizeRequest(args [0]string, argsEscaped bool, w h
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/auth/dev/login"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), DevAuthorizeOperation,
@@ -2600,7 +2680,7 @@ func (s *Server) handleDevAuthorizeRequest(args [0]string, argsEscaped bool, w h
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -2620,7 +2700,7 @@ func (s *Server) handleDevAuthorizeRequest(args [0]string, argsEscaped bool, w h
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -2649,6 +2729,8 @@ func (s *Server) handleDevAuthorizeRequest(args [0]string, argsEscaped bool, w h
 		return
 	}
 
+	var rawBody []byte
+
 	var response DevAuthorizeRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -2657,6 +2739,7 @@ func (s *Server) handleDevAuthorizeRequest(args [0]string, argsEscaped bool, w h
 			OperationSummary: "開発用登録/ログイン",
 			OperationID:      "devAuthorize",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "redirect_url",
@@ -2723,6 +2806,8 @@ func (s *Server) handleDummyInitRequest(args [0]string, argsEscaped bool, w http
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/test/dummy"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), DummyInitOperation,
@@ -2746,7 +2831,7 @@ func (s *Server) handleDummyInitRequest(args [0]string, argsEscaped bool, w http
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -2766,7 +2851,7 @@ func (s *Server) handleDummyInitRequest(args [0]string, argsEscaped bool, w http
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -2784,7 +2869,9 @@ func (s *Server) handleDummyInitRequest(args [0]string, argsEscaped bool, w http
 			ID:   "dummyInit",
 		}
 	)
-	request, close, err := s.decodeDummyInitRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeDummyInitRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -2808,6 +2895,7 @@ func (s *Server) handleDummyInitRequest(args [0]string, argsEscaped bool, w http
 			OperationSummary: "init dummy",
 			OperationID:      "dummyInit",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -2861,6 +2949,8 @@ func (s *Server) handleEditTalkSessionRequest(args [1]string, argsEscaped bool, 
 		semconv.HTTPRequestMethodKey.String("PUT"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), EditTalkSessionOperation,
@@ -2884,7 +2974,7 @@ func (s *Server) handleEditTalkSessionRequest(args [1]string, argsEscaped bool, 
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -2904,7 +2994,7 @@ func (s *Server) handleEditTalkSessionRequest(args [1]string, argsEscaped bool, 
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -2976,7 +3066,9 @@ func (s *Server) handleEditTalkSessionRequest(args [1]string, argsEscaped bool, 
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
-	request, close, err := s.decodeEditTalkSessionRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeEditTalkSessionRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -3000,6 +3092,7 @@ func (s *Server) handleEditTalkSessionRequest(args [1]string, argsEscaped bool, 
 			OperationSummary: "セッション編集",
 			OperationID:      "editTalkSession",
 			Body:             request,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -3058,6 +3151,8 @@ func (s *Server) handleEditTalkSessionManageRequest(args [1]string, argsEscaped 
 		semconv.HTTPRequestMethodKey.String("PUT"),
 		semconv.HTTPRouteKey.String("/v1/manage/talksessions/{talkSessionID}"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), EditTalkSessionManageOperation,
@@ -3081,7 +3176,7 @@ func (s *Server) handleEditTalkSessionManageRequest(args [1]string, argsEscaped 
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -3101,7 +3196,7 @@ func (s *Server) handleEditTalkSessionManageRequest(args [1]string, argsEscaped 
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -3173,7 +3268,9 @@ func (s *Server) handleEditTalkSessionManageRequest(args [1]string, argsEscaped 
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
-	request, close, err := s.decodeEditTalkSessionManageRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeEditTalkSessionManageRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -3197,6 +3294,7 @@ func (s *Server) handleEditTalkSessionManageRequest(args [1]string, argsEscaped 
 			OperationSummary: "",
 			OperationID:      "editTalkSessionManage",
 			Body:             request,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -3255,6 +3353,8 @@ func (s *Server) handleEditTimeLineRequest(args [2]string, argsEscaped bool, w h
 		semconv.HTTPRequestMethodKey.String("PUT"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/timelines/{actionItemID}"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), EditTimeLineOperation,
@@ -3278,7 +3378,7 @@ func (s *Server) handleEditTimeLineRequest(args [2]string, argsEscaped bool, w h
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -3298,7 +3398,7 @@ func (s *Server) handleEditTimeLineRequest(args [2]string, argsEscaped bool, w h
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -3370,7 +3470,9 @@ func (s *Server) handleEditTimeLineRequest(args [2]string, argsEscaped bool, w h
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
-	request, close, err := s.decodeEditTimeLineRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeEditTimeLineRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -3394,6 +3496,7 @@ func (s *Server) handleEditTimeLineRequest(args [2]string, argsEscaped bool, w h
 			OperationSummary: "タイムライン編集",
 			OperationID:      "editTimeLine",
 			Body:             request,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -3457,6 +3560,8 @@ func (s *Server) handleEstablishOrganizationRequest(args [0]string, argsEscaped 
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/organizations"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), EstablishOrganizationOperation,
@@ -3480,7 +3585,7 @@ func (s *Server) handleEstablishOrganizationRequest(args [0]string, argsEscaped 
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -3500,7 +3605,7 @@ func (s *Server) handleEstablishOrganizationRequest(args [0]string, argsEscaped 
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -3562,7 +3667,9 @@ func (s *Server) handleEstablishOrganizationRequest(args [0]string, argsEscaped 
 			return
 		}
 	}
-	request, close, err := s.decodeEstablishOrganizationRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeEstablishOrganizationRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -3586,6 +3693,7 @@ func (s *Server) handleEstablishOrganizationRequest(args [0]string, argsEscaped 
 			OperationSummary: "組織作成（運営ユーザーのみ）",
 			OperationID:      "establishOrganization",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -3639,6 +3747,8 @@ func (s *Server) handleEstablishUserRequest(args [0]string, argsEscaped bool, w 
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/user"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), EstablishUserOperation,
@@ -3662,7 +3772,7 @@ func (s *Server) handleEstablishUserRequest(args [0]string, argsEscaped bool, w 
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -3682,7 +3792,7 @@ func (s *Server) handleEstablishUserRequest(args [0]string, argsEscaped bool, w 
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -3744,7 +3854,9 @@ func (s *Server) handleEstablishUserRequest(args [0]string, argsEscaped bool, w 
 			return
 		}
 	}
-	request, close, err := s.decodeEstablishUserRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeEstablishUserRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -3768,6 +3880,7 @@ func (s *Server) handleEstablishUserRequest(args [0]string, argsEscaped bool, w 
 			OperationSummary: "ユーザー作成",
 			OperationID:      "establishUser",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -3821,6 +3934,8 @@ func (s *Server) handleGetAdminTokenInfoRequest(args [0]string, argsEscaped bool
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/v1/admin/token/info"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetAdminTokenInfoOperation,
@@ -3844,7 +3959,7 @@ func (s *Server) handleGetAdminTokenInfoRequest(args [0]string, argsEscaped bool
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -3864,7 +3979,7 @@ func (s *Server) handleGetAdminTokenInfoRequest(args [0]string, argsEscaped bool
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -3927,6 +4042,8 @@ func (s *Server) handleGetAdminTokenInfoRequest(args [0]string, argsEscaped bool
 		}
 	}
 
+	var rawBody []byte
+
 	var response GetAdminTokenInfoRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -3935,6 +4052,7 @@ func (s *Server) handleGetAdminTokenInfoRequest(args [0]string, argsEscaped bool
 			OperationSummary: "管理者トークンの内容を返す",
 			OperationID:      "getAdminTokenInfo",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -3986,6 +4104,8 @@ func (s *Server) handleGetAnalysisReportManageRequest(args [1]string, argsEscape
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/v1/manage/talksessions/{talkSessionID}/analysis/report"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetAnalysisReportManageOperation,
@@ -4009,7 +4129,7 @@ func (s *Server) handleGetAnalysisReportManageRequest(args [1]string, argsEscape
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -4029,7 +4149,7 @@ func (s *Server) handleGetAnalysisReportManageRequest(args [1]string, argsEscape
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -4102,6 +4222,8 @@ func (s *Server) handleGetAnalysisReportManageRequest(args [1]string, argsEscape
 		return
 	}
 
+	var rawBody []byte
+
 	var response *AnalysisReportResponse
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -4110,6 +4232,7 @@ func (s *Server) handleGetAnalysisReportManageRequest(args [1]string, argsEscape
 			OperationSummary: "",
 			OperationID:      "getAnalysisReportManage",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -4168,6 +4291,8 @@ func (s *Server) handleGetConclusionRequest(args [1]string, argsEscaped bool, w 
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/conclusion"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetConclusionOperation,
@@ -4191,7 +4316,7 @@ func (s *Server) handleGetConclusionRequest(args [1]string, argsEscaped bool, w 
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -4211,7 +4336,7 @@ func (s *Server) handleGetConclusionRequest(args [1]string, argsEscaped bool, w 
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -4240,6 +4365,8 @@ func (s *Server) handleGetConclusionRequest(args [1]string, argsEscaped bool, w 
 		return
 	}
 
+	var rawBody []byte
+
 	var response GetConclusionRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -4248,6 +4375,7 @@ func (s *Server) handleGetConclusionRequest(args [1]string, argsEscaped bool, w 
 			OperationSummary: "結論取得",
 			OperationID:      "getConclusion",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -4306,6 +4434,8 @@ func (s *Server) handleGetCurrentUserRequest(args [0]string, argsEscaped bool, w
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/users/me"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetCurrentUserOperation,
@@ -4329,7 +4459,7 @@ func (s *Server) handleGetCurrentUserRequest(args [0]string, argsEscaped bool, w
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -4349,7 +4479,7 @@ func (s *Server) handleGetCurrentUserRequest(args [0]string, argsEscaped bool, w
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -4412,6 +4542,8 @@ func (s *Server) handleGetCurrentUserRequest(args [0]string, argsEscaped bool, w
 		}
 	}
 
+	var rawBody []byte
+
 	var response *CurrentUser
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -4420,6 +4552,7 @@ func (s *Server) handleGetCurrentUserRequest(args [0]string, argsEscaped bool, w
 			OperationSummary: "ログイン中ユーザーと現在の権限",
 			OperationID:      "getCurrentUser",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -4473,6 +4606,8 @@ func (s *Server) handleGetDevicesRequest(args [0]string, argsEscaped bool, w htt
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/notifications/devices"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetDevicesOperation,
@@ -4496,7 +4631,7 @@ func (s *Server) handleGetDevicesRequest(args [0]string, argsEscaped bool, w htt
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -4516,7 +4651,7 @@ func (s *Server) handleGetDevicesRequest(args [0]string, argsEscaped bool, w htt
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -4579,6 +4714,8 @@ func (s *Server) handleGetDevicesRequest(args [0]string, argsEscaped bool, w htt
 		}
 	}
 
+	var rawBody []byte
+
 	var response GetDevicesRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -4587,6 +4724,7 @@ func (s *Server) handleGetDevicesRequest(args [0]string, argsEscaped bool, w htt
 			OperationSummary: "デバイス一覧取得",
 			OperationID:      "getDevices",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -4640,6 +4778,8 @@ func (s *Server) handleGetNotificationPreferencesRequest(args [0]string, argsEsc
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/notifications/preferences"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetNotificationPreferencesOperation,
@@ -4663,7 +4803,7 @@ func (s *Server) handleGetNotificationPreferencesRequest(args [0]string, argsEsc
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -4683,7 +4823,7 @@ func (s *Server) handleGetNotificationPreferencesRequest(args [0]string, argsEsc
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -4746,6 +4886,8 @@ func (s *Server) handleGetNotificationPreferencesRequest(args [0]string, argsEsc
 		}
 	}
 
+	var rawBody []byte
+
 	var response GetNotificationPreferencesRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -4754,6 +4896,7 @@ func (s *Server) handleGetNotificationPreferencesRequest(args [0]string, argsEsc
 			OperationSummary: "通知設定取得",
 			OperationID:      "getNotificationPreferences",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -4807,6 +4950,8 @@ func (s *Server) handleGetOpenedTalkSessionRequest(args [0]string, argsEscaped b
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/talksessions/opened"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetOpenedTalkSessionOperation,
@@ -4830,7 +4975,7 @@ func (s *Server) handleGetOpenedTalkSessionRequest(args [0]string, argsEscaped b
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -4850,7 +4995,7 @@ func (s *Server) handleGetOpenedTalkSessionRequest(args [0]string, argsEscaped b
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -4923,6 +5068,8 @@ func (s *Server) handleGetOpenedTalkSessionRequest(args [0]string, argsEscaped b
 		return
 	}
 
+	var rawBody []byte
+
 	var response GetOpenedTalkSessionRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -4931,6 +5078,7 @@ func (s *Server) handleGetOpenedTalkSessionRequest(args [0]string, argsEscaped b
 			OperationSummary: "自分が開いたセッション一覧",
 			OperationID:      "getOpenedTalkSession",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "limit",
@@ -5001,6 +5149,8 @@ func (s *Server) handleGetOpinionAnalysisRequest(args [1]string, argsEscaped boo
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/opinions/{opinionID}/analysis"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetOpinionAnalysisOperation,
@@ -5024,7 +5174,7 @@ func (s *Server) handleGetOpinionAnalysisRequest(args [1]string, argsEscaped boo
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -5044,7 +5194,7 @@ func (s *Server) handleGetOpinionAnalysisRequest(args [1]string, argsEscaped boo
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -5073,6 +5223,8 @@ func (s *Server) handleGetOpinionAnalysisRequest(args [1]string, argsEscaped boo
 		return
 	}
 
+	var rawBody []byte
+
 	var response GetOpinionAnalysisRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -5081,6 +5233,7 @@ func (s *Server) handleGetOpinionAnalysisRequest(args [1]string, argsEscaped boo
 			OperationSummary: "意見に投票したグループごとの割合",
 			OperationID:      "getOpinionAnalysis",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "opinionID",
@@ -5139,6 +5292,8 @@ func (s *Server) handleGetOpinionDetail2Request(args [1]string, argsEscaped bool
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/opinions/{opinionID}"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetOpinionDetail2Operation,
@@ -5162,7 +5317,7 @@ func (s *Server) handleGetOpinionDetail2Request(args [1]string, argsEscaped bool
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -5182,7 +5337,7 @@ func (s *Server) handleGetOpinionDetail2Request(args [1]string, argsEscaped bool
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -5211,6 +5366,8 @@ func (s *Server) handleGetOpinionDetail2Request(args [1]string, argsEscaped bool
 		return
 	}
 
+	var rawBody []byte
+
 	var response GetOpinionDetail2Res
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -5219,6 +5376,7 @@ func (s *Server) handleGetOpinionDetail2Request(args [1]string, argsEscaped bool
 			OperationSummary: "意見詳細",
 			OperationID:      "getOpinionDetail2",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "opinionID",
@@ -5277,6 +5435,8 @@ func (s *Server) handleGetOpinionReportReasonsRequest(args [0]string, argsEscape
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/opinions/report_reasons"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetOpinionReportReasonsOperation,
@@ -5300,7 +5460,7 @@ func (s *Server) handleGetOpinionReportReasonsRequest(args [0]string, argsEscape
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -5320,7 +5480,7 @@ func (s *Server) handleGetOpinionReportReasonsRequest(args [0]string, argsEscape
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -5335,6 +5495,8 @@ func (s *Server) handleGetOpinionReportReasonsRequest(args [0]string, argsEscape
 		err error
 	)
 
+	var rawBody []byte
+
 	var response GetOpinionReportReasonsRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -5343,6 +5505,7 @@ func (s *Server) handleGetOpinionReportReasonsRequest(args [0]string, argsEscape
 			OperationSummary: "意見への通報理由一覧",
 			OperationID:      "getOpinionReportReasons",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -5396,6 +5559,8 @@ func (s *Server) handleGetOpinionReportsRequest(args [1]string, argsEscaped bool
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/opinions/{opinionID}/reports"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetOpinionReportsOperation,
@@ -5419,7 +5584,7 @@ func (s *Server) handleGetOpinionReportsRequest(args [1]string, argsEscaped bool
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -5439,7 +5604,7 @@ func (s *Server) handleGetOpinionReportsRequest(args [1]string, argsEscaped bool
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -5512,6 +5677,8 @@ func (s *Server) handleGetOpinionReportsRequest(args [1]string, argsEscaped bool
 		return
 	}
 
+	var rawBody []byte
+
 	var response GetOpinionReportsRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -5520,6 +5687,7 @@ func (s *Server) handleGetOpinionReportsRequest(args [1]string, argsEscaped bool
 			OperationSummary: "意見に対する通報取得",
 			OperationID:      "getOpinionReports",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "opinionID",
@@ -5578,6 +5746,8 @@ func (s *Server) handleGetOpinionsForTalkSessionRequest(args [1]string, argsEsca
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/opinions"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetOpinionsForTalkSessionOperation,
@@ -5601,7 +5771,7 @@ func (s *Server) handleGetOpinionsForTalkSessionRequest(args [1]string, argsEsca
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -5621,7 +5791,7 @@ func (s *Server) handleGetOpinionsForTalkSessionRequest(args [1]string, argsEsca
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -5650,6 +5820,8 @@ func (s *Server) handleGetOpinionsForTalkSessionRequest(args [1]string, argsEsca
 		return
 	}
 
+	var rawBody []byte
+
 	var response GetOpinionsForTalkSessionRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -5658,6 +5830,7 @@ func (s *Server) handleGetOpinionsForTalkSessionRequest(args [1]string, argsEsca
 			OperationSummary: "セッションに対する意見一覧",
 			OperationID:      "getOpinionsForTalkSession",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -5732,6 +5905,8 @@ func (s *Server) handleGetOrganizationAliasesRequest(args [0]string, argsEscaped
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/organizations/aliases"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetOrganizationAliasesOperation,
@@ -5755,7 +5930,7 @@ func (s *Server) handleGetOrganizationAliasesRequest(args [0]string, argsEscaped
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -5775,7 +5950,7 @@ func (s *Server) handleGetOrganizationAliasesRequest(args [0]string, argsEscaped
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -5838,6 +6013,8 @@ func (s *Server) handleGetOrganizationAliasesRequest(args [0]string, argsEscaped
 		}
 	}
 
+	var rawBody []byte
+
 	var response GetOrganizationAliasesRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -5846,6 +6023,7 @@ func (s *Server) handleGetOrganizationAliasesRequest(args [0]string, argsEscaped
 			OperationSummary: "組織エイリアス一覧取得",
 			OperationID:      "getOrganizationAliases",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -5899,6 +6077,8 @@ func (s *Server) handleGetOrganizationUsersRequest(args [0]string, argsEscaped b
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/organizations/users"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetOrganizationUsersOperation,
@@ -5922,7 +6102,7 @@ func (s *Server) handleGetOrganizationUsersRequest(args [0]string, argsEscaped b
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -5942,7 +6122,7 @@ func (s *Server) handleGetOrganizationUsersRequest(args [0]string, argsEscaped b
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -6005,6 +6185,8 @@ func (s *Server) handleGetOrganizationUsersRequest(args [0]string, argsEscaped b
 		}
 	}
 
+	var rawBody []byte
+
 	var response GetOrganizationUsersRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -6013,6 +6195,7 @@ func (s *Server) handleGetOrganizationUsersRequest(args [0]string, argsEscaped b
 			OperationSummary: "現在の組織のユーザー一覧取得",
 			OperationID:      "getOrganizationUsers",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -6066,6 +6249,8 @@ func (s *Server) handleGetOrganizationsRequest(args [0]string, argsEscaped bool,
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/organizations"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetOrganizationsOperation,
@@ -6089,7 +6274,7 @@ func (s *Server) handleGetOrganizationsRequest(args [0]string, argsEscaped bool,
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -6109,7 +6294,7 @@ func (s *Server) handleGetOrganizationsRequest(args [0]string, argsEscaped bool,
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -6172,6 +6357,8 @@ func (s *Server) handleGetOrganizationsRequest(args [0]string, argsEscaped bool,
 		}
 	}
 
+	var rawBody []byte
+
 	var response GetOrganizationsRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -6180,6 +6367,7 @@ func (s *Server) handleGetOrganizationsRequest(args [0]string, argsEscaped bool,
 			OperationSummary: "所属組織一覧",
 			OperationID:      "getOrganizations",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -6233,6 +6421,8 @@ func (s *Server) handleGetPasswordPolicyRequest(args [0]string, argsEscaped bool
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/auth/password/policy"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetPasswordPolicyOperation,
@@ -6256,7 +6446,7 @@ func (s *Server) handleGetPasswordPolicyRequest(args [0]string, argsEscaped bool
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -6276,7 +6466,7 @@ func (s *Server) handleGetPasswordPolicyRequest(args [0]string, argsEscaped bool
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -6291,6 +6481,8 @@ func (s *Server) handleGetPasswordPolicyRequest(args [0]string, argsEscaped bool
 		err error
 	)
 
+	var rawBody []byte
+
 	var response *GetPasswordPolicyOK
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -6299,6 +6491,7 @@ func (s *Server) handleGetPasswordPolicyRequest(args [0]string, argsEscaped bool
 			OperationSummary: "新規設定・変更用のパスワード入力条件",
 			OperationID:      "getPasswordPolicy",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -6352,6 +6545,8 @@ func (s *Server) handleGetPolicyConsentStatusRequest(args [0]string, argsEscaped
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/policy/consent"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetPolicyConsentStatusOperation,
@@ -6375,7 +6570,7 @@ func (s *Server) handleGetPolicyConsentStatusRequest(args [0]string, argsEscaped
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -6395,7 +6590,7 @@ func (s *Server) handleGetPolicyConsentStatusRequest(args [0]string, argsEscaped
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -6410,6 +6605,8 @@ func (s *Server) handleGetPolicyConsentStatusRequest(args [0]string, argsEscaped
 		err error
 	)
 
+	var rawBody []byte
+
 	var response GetPolicyConsentStatusRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -6418,6 +6615,7 @@ func (s *Server) handleGetPolicyConsentStatusRequest(args [0]string, argsEscaped
 			OperationSummary: "最新のポリシーに同意したかを取得",
 			OperationID:      "getPolicyConsentStatus",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -6471,6 +6669,8 @@ func (s *Server) handleGetReportsForTalkSessionRequest(args [1]string, argsEscap
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/reports"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetReportsForTalkSessionOperation,
@@ -6494,7 +6694,7 @@ func (s *Server) handleGetReportsForTalkSessionRequest(args [1]string, argsEscap
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -6514,7 +6714,7 @@ func (s *Server) handleGetReportsForTalkSessionRequest(args [1]string, argsEscap
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -6587,6 +6787,8 @@ func (s *Server) handleGetReportsForTalkSessionRequest(args [1]string, argsEscap
 		return
 	}
 
+	var rawBody []byte
+
 	var response GetReportsForTalkSessionRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -6595,6 +6797,7 @@ func (s *Server) handleGetReportsForTalkSessionRequest(args [1]string, argsEscap
 			OperationSummary: "通報一覧",
 			OperationID:      "getReportsForTalkSession",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -6657,6 +6860,8 @@ func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped b
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetTalkSessionDetailOperation,
@@ -6680,7 +6885,7 @@ func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped b
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -6700,7 +6905,7 @@ func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped b
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -6729,6 +6934,8 @@ func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped b
 		return
 	}
 
+	var rawBody []byte
+
 	var response GetTalkSessionDetailRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -6737,6 +6944,7 @@ func (s *Server) handleGetTalkSessionDetailRequest(args [1]string, argsEscaped b
 			OperationSummary: "トークセッションの詳細",
 			OperationID:      "getTalkSessionDetail",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -6795,6 +7003,8 @@ func (s *Server) handleGetTalkSessionListRequest(args [0]string, argsEscaped boo
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/talksessions"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetTalkSessionListOperation,
@@ -6818,7 +7028,7 @@ func (s *Server) handleGetTalkSessionListRequest(args [0]string, argsEscaped boo
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -6838,7 +7048,7 @@ func (s *Server) handleGetTalkSessionListRequest(args [0]string, argsEscaped boo
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -6867,6 +7077,8 @@ func (s *Server) handleGetTalkSessionListRequest(args [0]string, argsEscaped boo
 		return
 	}
 
+	var rawBody []byte
+
 	var response GetTalkSessionListRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -6875,6 +7087,7 @@ func (s *Server) handleGetTalkSessionListRequest(args [0]string, argsEscaped boo
 			OperationSummary: "セッション一覧",
 			OperationID:      "getTalkSessionList",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "limit",
@@ -6955,6 +7168,8 @@ func (s *Server) handleGetTalkSessionListManageRequest(args [0]string, argsEscap
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/v1/manage/talksessions/list"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetTalkSessionListManageOperation,
@@ -6978,7 +7193,7 @@ func (s *Server) handleGetTalkSessionListManageRequest(args [0]string, argsEscap
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -6998,7 +7213,7 @@ func (s *Server) handleGetTalkSessionListManageRequest(args [0]string, argsEscap
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -7071,6 +7286,8 @@ func (s *Server) handleGetTalkSessionListManageRequest(args [0]string, argsEscap
 		return
 	}
 
+	var rawBody []byte
+
 	var response *TalkSessionListResponse
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -7079,6 +7296,7 @@ func (s *Server) handleGetTalkSessionListManageRequest(args [0]string, argsEscap
 			OperationSummary: "",
 			OperationID:      "getTalkSessionListManage",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "status",
@@ -7143,6 +7361,8 @@ func (s *Server) handleGetTalkSessionManageRequest(args [1]string, argsEscaped b
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/v1/manage/talksessions/{talkSessionID}"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetTalkSessionManageOperation,
@@ -7166,7 +7386,7 @@ func (s *Server) handleGetTalkSessionManageRequest(args [1]string, argsEscaped b
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -7186,7 +7406,7 @@ func (s *Server) handleGetTalkSessionManageRequest(args [1]string, argsEscaped b
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -7259,6 +7479,8 @@ func (s *Server) handleGetTalkSessionManageRequest(args [1]string, argsEscaped b
 		return
 	}
 
+	var rawBody []byte
+
 	var response *TalkSessionForManage
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -7267,6 +7489,7 @@ func (s *Server) handleGetTalkSessionManageRequest(args [1]string, argsEscaped b
 			OperationSummary: "",
 			OperationID:      "getTalkSessionManage",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -7325,6 +7548,8 @@ func (s *Server) handleGetTalkSessionOpinionsManageRequest(args [1]string, argsE
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/v1/manage/talksessions/{talkSessionID}/opinions"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetTalkSessionOpinionsManageOperation,
@@ -7348,7 +7573,7 @@ func (s *Server) handleGetTalkSessionOpinionsManageRequest(args [1]string, argsE
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -7368,7 +7593,7 @@ func (s *Server) handleGetTalkSessionOpinionsManageRequest(args [1]string, argsE
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -7441,6 +7666,8 @@ func (s *Server) handleGetTalkSessionOpinionsManageRequest(args [1]string, argsE
 		return
 	}
 
+	var rawBody []byte
+
 	var response *TalkSessionOpinionsForManage
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -7449,6 +7676,7 @@ func (s *Server) handleGetTalkSessionOpinionsManageRequest(args [1]string, argsE
 			OperationSummary: "",
 			OperationID:      "getTalkSessionOpinionsManage",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -7515,6 +7743,8 @@ func (s *Server) handleGetTalkSessionReportRequest(args [1]string, argsEscaped b
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/report"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetTalkSessionReportOperation,
@@ -7538,7 +7768,7 @@ func (s *Server) handleGetTalkSessionReportRequest(args [1]string, argsEscaped b
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -7558,7 +7788,7 @@ func (s *Server) handleGetTalkSessionReportRequest(args [1]string, argsEscaped b
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -7587,6 +7817,8 @@ func (s *Server) handleGetTalkSessionReportRequest(args [1]string, argsEscaped b
 		return
 	}
 
+	var rawBody []byte
+
 	var response GetTalkSessionReportRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -7595,6 +7827,7 @@ func (s *Server) handleGetTalkSessionReportRequest(args [1]string, argsEscaped b
 			OperationSummary: "セッションレポートを返す",
 			OperationID:      "getTalkSessionReport",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -7653,6 +7886,8 @@ func (s *Server) handleGetTalkSessionReportCountRequest(args [1]string, argsEsca
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/reports/count"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetTalkSessionReportCountOperation,
@@ -7676,7 +7911,7 @@ func (s *Server) handleGetTalkSessionReportCountRequest(args [1]string, argsEsca
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -7696,7 +7931,7 @@ func (s *Server) handleGetTalkSessionReportCountRequest(args [1]string, argsEsca
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -7769,6 +8004,8 @@ func (s *Server) handleGetTalkSessionReportCountRequest(args [1]string, argsEsca
 		return
 	}
 
+	var rawBody []byte
+
 	var response GetTalkSessionReportCountRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -7777,6 +8014,7 @@ func (s *Server) handleGetTalkSessionReportCountRequest(args [1]string, argsEsca
 			OperationSummary: "通報件数",
 			OperationID:      "getTalkSessionReportCount",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -7839,6 +8077,8 @@ func (s *Server) handleGetTalkSessionRestrictionKeysRequest(args [0]string, args
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/talksessions/restrictions"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetTalkSessionRestrictionKeysOperation,
@@ -7862,7 +8102,7 @@ func (s *Server) handleGetTalkSessionRestrictionKeysRequest(args [0]string, args
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -7882,7 +8122,7 @@ func (s *Server) handleGetTalkSessionRestrictionKeysRequest(args [0]string, args
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -7897,6 +8137,8 @@ func (s *Server) handleGetTalkSessionRestrictionKeysRequest(args [0]string, args
 		err error
 	)
 
+	var rawBody []byte
+
 	var response GetTalkSessionRestrictionKeysRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -7905,6 +8147,7 @@ func (s *Server) handleGetTalkSessionRestrictionKeysRequest(args [0]string, args
 			OperationSummary: "セッションで指定可能な制限一覧",
 			OperationID:      "getTalkSessionRestrictionKeys",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -7958,6 +8201,8 @@ func (s *Server) handleGetTalkSessionRestrictionSatisfiedRequest(args [1]string,
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/restrictions"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetTalkSessionRestrictionSatisfiedOperation,
@@ -7981,7 +8226,7 @@ func (s *Server) handleGetTalkSessionRestrictionSatisfiedRequest(args [1]string,
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -8001,7 +8246,7 @@ func (s *Server) handleGetTalkSessionRestrictionSatisfiedRequest(args [1]string,
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -8030,6 +8275,8 @@ func (s *Server) handleGetTalkSessionRestrictionSatisfiedRequest(args [1]string,
 		return
 	}
 
+	var rawBody []byte
+
 	var response GetTalkSessionRestrictionSatisfiedRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -8038,6 +8285,7 @@ func (s *Server) handleGetTalkSessionRestrictionSatisfiedRequest(args [1]string,
 			OperationSummary: "セッションで満たしていない制限",
 			OperationID:      "getTalkSessionRestrictionSatisfied",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -8096,6 +8344,8 @@ func (s *Server) handleGetTalkSessionSurveyRequest(args [1]string, argsEscaped b
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/survey"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetTalkSessionSurveyOperation,
@@ -8119,7 +8369,7 @@ func (s *Server) handleGetTalkSessionSurveyRequest(args [1]string, argsEscaped b
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -8139,7 +8389,7 @@ func (s *Server) handleGetTalkSessionSurveyRequest(args [1]string, argsEscaped b
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -8168,6 +8418,8 @@ func (s *Server) handleGetTalkSessionSurveyRequest(args [1]string, argsEscaped b
 		return
 	}
 
+	var rawBody []byte
+
 	var response GetTalkSessionSurveyRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -8176,6 +8428,7 @@ func (s *Server) handleGetTalkSessionSurveyRequest(args [1]string, argsEscaped b
 			OperationSummary: "アンケート定義取得",
 			OperationID:      "getTalkSessionSurvey",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -8234,6 +8487,8 @@ func (s *Server) handleGetTalkSessionSurveySummaryRequest(args [1]string, argsEs
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/survey/summary"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetTalkSessionSurveySummaryOperation,
@@ -8257,7 +8512,7 @@ func (s *Server) handleGetTalkSessionSurveySummaryRequest(args [1]string, argsEs
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -8277,7 +8532,7 @@ func (s *Server) handleGetTalkSessionSurveySummaryRequest(args [1]string, argsEs
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -8350,6 +8605,8 @@ func (s *Server) handleGetTalkSessionSurveySummaryRequest(args [1]string, argsEs
 		return
 	}
 
+	var rawBody []byte
+
 	var response GetTalkSessionSurveySummaryRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -8358,6 +8615,7 @@ func (s *Server) handleGetTalkSessionSurveySummaryRequest(args [1]string, argsEs
 			OperationSummary: "アンケート集計結果（オーナー）",
 			OperationID:      "getTalkSessionSurveySummary",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -8416,6 +8674,8 @@ func (s *Server) handleGetTimeLineRequest(args [1]string, argsEscaped bool, w ht
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/timelines"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetTimeLineOperation,
@@ -8439,7 +8699,7 @@ func (s *Server) handleGetTimeLineRequest(args [1]string, argsEscaped bool, w ht
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -8459,7 +8719,7 @@ func (s *Server) handleGetTimeLineRequest(args [1]string, argsEscaped bool, w ht
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -8488,6 +8748,8 @@ func (s *Server) handleGetTimeLineRequest(args [1]string, argsEscaped bool, w ht
 		return
 	}
 
+	var rawBody []byte
+
 	var response GetTimeLineRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -8496,6 +8758,7 @@ func (s *Server) handleGetTimeLineRequest(args [1]string, argsEscaped bool, w ht
 			OperationSummary: "タイムライン取得",
 			OperationID:      "getTimeLine",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -8554,6 +8817,8 @@ func (s *Server) handleGetTokenInfoRequest(args [0]string, argsEscaped bool, w h
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/auth/token/info"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetTokenInfoOperation,
@@ -8577,7 +8842,7 @@ func (s *Server) handleGetTokenInfoRequest(args [0]string, argsEscaped bool, w h
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -8597,7 +8862,7 @@ func (s *Server) handleGetTokenInfoRequest(args [0]string, argsEscaped bool, w h
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -8660,6 +8925,8 @@ func (s *Server) handleGetTokenInfoRequest(args [0]string, argsEscaped bool, w h
 		}
 	}
 
+	var rawBody []byte
+
 	var response GetTokenInfoRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -8668,6 +8935,7 @@ func (s *Server) handleGetTokenInfoRequest(args [0]string, argsEscaped bool, w h
 			OperationSummary: "JWTの内容を返してくれる",
 			OperationID:      "getTokenInfo",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -8721,6 +8989,8 @@ func (s *Server) handleGetUserByDisplayIDRequest(args [1]string, argsEscaped boo
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/user/{displayID}"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetUserByDisplayIDOperation,
@@ -8744,7 +9014,7 @@ func (s *Server) handleGetUserByDisplayIDRequest(args [1]string, argsEscaped boo
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -8764,7 +9034,7 @@ func (s *Server) handleGetUserByDisplayIDRequest(args [1]string, argsEscaped boo
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -8793,6 +9063,8 @@ func (s *Server) handleGetUserByDisplayIDRequest(args [1]string, argsEscaped boo
 		return
 	}
 
+	var rawBody []byte
+
 	var response GetUserByDisplayIDRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -8801,6 +9073,7 @@ func (s *Server) handleGetUserByDisplayIDRequest(args [1]string, argsEscaped boo
 			OperationSummary: "表示IDからユーザー情報の取得",
 			OperationID:      "getUserByDisplayID",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "displayID",
@@ -8857,6 +9130,8 @@ func (s *Server) handleGetUserDetailManageRequest(args [1]string, argsEscaped bo
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/v1/manage/users/{userID}"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetUserDetailManageOperation,
@@ -8880,7 +9155,7 @@ func (s *Server) handleGetUserDetailManageRequest(args [1]string, argsEscaped bo
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -8900,7 +9175,7 @@ func (s *Server) handleGetUserDetailManageRequest(args [1]string, argsEscaped bo
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -8973,6 +9248,8 @@ func (s *Server) handleGetUserDetailManageRequest(args [1]string, argsEscaped bo
 		return
 	}
 
+	var rawBody []byte
+
 	var response GetUserDetailManageRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -8981,6 +9258,7 @@ func (s *Server) handleGetUserDetailManageRequest(args [1]string, argsEscaped bo
 			OperationSummary: "",
 			OperationID:      "getUserDetailManage",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "userID",
@@ -9039,6 +9317,8 @@ func (s *Server) handleGetUserInfoRequest(args [0]string, argsEscaped bool, w ht
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/user"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetUserInfoOperation,
@@ -9062,7 +9342,7 @@ func (s *Server) handleGetUserInfoRequest(args [0]string, argsEscaped bool, w ht
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -9082,7 +9362,7 @@ func (s *Server) handleGetUserInfoRequest(args [0]string, argsEscaped bool, w ht
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -9145,6 +9425,8 @@ func (s *Server) handleGetUserInfoRequest(args [0]string, argsEscaped bool, w ht
 		}
 	}
 
+	var rawBody []byte
+
 	var response GetUserInfoRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -9153,6 +9435,7 @@ func (s *Server) handleGetUserInfoRequest(args [0]string, argsEscaped bool, w ht
 			OperationSummary: "ユーザー情報の取得",
 			OperationID:      "getUserInfo",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -9204,6 +9487,8 @@ func (s *Server) handleGetUserListManageRequest(args [0]string, argsEscaped bool
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/v1/manage/users/list"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetUserListManageOperation,
@@ -9227,7 +9512,7 @@ func (s *Server) handleGetUserListManageRequest(args [0]string, argsEscaped bool
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -9247,7 +9532,7 @@ func (s *Server) handleGetUserListManageRequest(args [0]string, argsEscaped bool
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -9320,6 +9605,8 @@ func (s *Server) handleGetUserListManageRequest(args [0]string, argsEscaped bool
 		return
 	}
 
+	var rawBody []byte
+
 	var response *ManagedUserList
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -9328,6 +9615,7 @@ func (s *Server) handleGetUserListManageRequest(args [0]string, argsEscaped bool
 			OperationSummary: "",
 			OperationID:      "getUserListManage",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "offset",
@@ -9392,6 +9680,8 @@ func (s *Server) handleGetUserStatsListManageRequest(args [0]string, argsEscaped
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/v1/manage/users/stats/list"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetUserStatsListManageOperation,
@@ -9415,7 +9705,7 @@ func (s *Server) handleGetUserStatsListManageRequest(args [0]string, argsEscaped
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -9435,7 +9725,7 @@ func (s *Server) handleGetUserStatsListManageRequest(args [0]string, argsEscaped
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -9508,6 +9798,8 @@ func (s *Server) handleGetUserStatsListManageRequest(args [0]string, argsEscaped
 		return
 	}
 
+	var rawBody []byte
+
 	var response []UserStatsResponse
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -9516,6 +9808,7 @@ func (s *Server) handleGetUserStatsListManageRequest(args [0]string, argsEscaped
 			OperationSummary: "",
 			OperationID:      "getUserStatsListManage",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "range",
@@ -9580,6 +9873,8 @@ func (s *Server) handleGetUserStatsTotalManageRequest(args [0]string, argsEscape
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/v1/manage/users/stats/total"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetUserStatsTotalManageOperation,
@@ -9603,7 +9898,7 @@ func (s *Server) handleGetUserStatsTotalManageRequest(args [0]string, argsEscape
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -9623,7 +9918,7 @@ func (s *Server) handleGetUserStatsTotalManageRequest(args [0]string, argsEscape
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -9686,6 +9981,8 @@ func (s *Server) handleGetUserStatsTotalManageRequest(args [0]string, argsEscape
 		}
 	}
 
+	var rawBody []byte
+
 	var response *UserStatsResponse
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -9694,6 +9991,7 @@ func (s *Server) handleGetUserStatsTotalManageRequest(args [0]string, argsEscape
 			OperationSummary: "",
 			OperationID:      "getUserStatsTotalManage",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -9747,6 +10045,8 @@ func (s *Server) handleGetUserTalkSessionsRequest(args [1]string, argsEscaped bo
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/users/{displayID}/talksessions"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetUserTalkSessionsOperation,
@@ -9770,7 +10070,7 @@ func (s *Server) handleGetUserTalkSessionsRequest(args [1]string, argsEscaped bo
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -9790,7 +10090,7 @@ func (s *Server) handleGetUserTalkSessionsRequest(args [1]string, argsEscaped bo
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -9819,6 +10119,8 @@ func (s *Server) handleGetUserTalkSessionsRequest(args [1]string, argsEscaped bo
 		return
 	}
 
+	var rawBody []byte
+
 	var response GetUserTalkSessionsRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -9827,6 +10129,7 @@ func (s *Server) handleGetUserTalkSessionsRequest(args [1]string, argsEscaped bo
 			OperationSummary: "特定ユーザが開いたセッション一覧",
 			OperationID:      "getUserTalkSessions",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "displayID",
@@ -9897,6 +10200,8 @@ func (s *Server) handleGetVapidKeyRequest(args [0]string, argsEscaped bool, w ht
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/notifications/vapid-key"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GetVapidKeyOperation,
@@ -9920,7 +10225,7 @@ func (s *Server) handleGetVapidKeyRequest(args [0]string, argsEscaped bool, w ht
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -9940,7 +10245,7 @@ func (s *Server) handleGetVapidKeyRequest(args [0]string, argsEscaped bool, w ht
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -10003,6 +10308,8 @@ func (s *Server) handleGetVapidKeyRequest(args [0]string, argsEscaped bool, w ht
 		}
 	}
 
+	var rawBody []byte
+
 	var response *GetVapidKeyOK
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -10011,6 +10318,7 @@ func (s *Server) handleGetVapidKeyRequest(args [0]string, argsEscaped bool, w ht
 			OperationSummary: "VAPID公開鍵取得",
 			OperationID:      "getVapidKey",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -10066,6 +10374,8 @@ func (s *Server) handleGuestLoginRequest(args [0]string, argsEscaped bool, w htt
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/auth/guest/login"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), GuestLoginOperation,
@@ -10089,7 +10399,7 @@ func (s *Server) handleGuestLoginRequest(args [0]string, argsEscaped bool, w htt
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -10109,7 +10419,7 @@ func (s *Server) handleGuestLoginRequest(args [0]string, argsEscaped bool, w htt
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -10124,6 +10434,8 @@ func (s *Server) handleGuestLoginRequest(args [0]string, argsEscaped bool, w htt
 		err error
 	)
 
+	var rawBody []byte
+
 	var response GuestLoginRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -10132,6 +10444,7 @@ func (s *Server) handleGuestLoginRequest(args [0]string, argsEscaped bool, w htt
 			OperationSummary: "ゲストログイン",
 			OperationID:      "guestLogin",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -10185,6 +10498,8 @@ func (s *Server) handleHandleAuthCallbackRequest(args [1]string, argsEscaped boo
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/auth/{provider}/callback"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), HandleAuthCallbackOperation,
@@ -10208,7 +10523,7 @@ func (s *Server) handleHandleAuthCallbackRequest(args [1]string, argsEscaped boo
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -10228,7 +10543,7 @@ func (s *Server) handleHandleAuthCallbackRequest(args [1]string, argsEscaped boo
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -10257,6 +10572,8 @@ func (s *Server) handleHandleAuthCallbackRequest(args [1]string, argsEscaped boo
 		return
 	}
 
+	var rawBody []byte
+
 	var response HandleAuthCallbackRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -10265,6 +10582,7 @@ func (s *Server) handleHandleAuthCallbackRequest(args [1]string, argsEscaped boo
 			OperationSummary: "Auth Callback",
 			OperationID:      "handleAuthCallback",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "provider",
@@ -10331,6 +10649,8 @@ func (s *Server) handleHasConsentRequest(args [1]string, argsEscaped bool, w htt
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/consent"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), HasConsentOperation,
@@ -10354,7 +10674,7 @@ func (s *Server) handleHasConsentRequest(args [1]string, argsEscaped bool, w htt
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -10374,7 +10694,7 @@ func (s *Server) handleHasConsentRequest(args [1]string, argsEscaped bool, w htt
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -10447,6 +10767,8 @@ func (s *Server) handleHasConsentRequest(args [1]string, argsEscaped bool, w htt
 		return
 	}
 
+	var rawBody []byte
+
 	var response HasConsentRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -10455,6 +10777,7 @@ func (s *Server) handleHasConsentRequest(args [1]string, argsEscaped bool, w htt
 			OperationSummary: "セッションに同意しているか",
 			OperationID:      "hasConsent",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -10513,6 +10836,8 @@ func (s *Server) handleHealthRequest(args [0]string, argsEscaped bool, w http.Re
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/health"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), HealthOperation,
@@ -10536,7 +10861,7 @@ func (s *Server) handleHealthRequest(args [0]string, argsEscaped bool, w http.Re
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -10556,7 +10881,7 @@ func (s *Server) handleHealthRequest(args [0]string, argsEscaped bool, w http.Re
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -10571,6 +10896,8 @@ func (s *Server) handleHealthRequest(args [0]string, argsEscaped bool, w http.Re
 		err error
 	)
 
+	var rawBody []byte
+
 	var response HealthRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -10579,6 +10906,7 @@ func (s *Server) handleHealthRequest(args [0]string, argsEscaped bool, w http.Re
 			OperationSummary: "ヘルスチェック",
 			OperationID:      "health",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -10621,16 +10949,20 @@ func (s *Server) handleHealthRequest(args [0]string, argsEscaped bool, w http.Re
 
 // handleInitiateTalkSessionRequest handles initiateTalkSession operation.
 //
-// ## サムネイル画像について
-// - `Description中に出てくる画像で一番最初のものを使用`。
-// - 画像自体は`POST /images`でサーバにポストしたものを使用してください。
-// ## 投稿制限のキーについて
-// restrictionsに値を入れると一定のデモグラ情報を登録していない限り、セッションへの投稿が制限されるようにできる。
-// restrictionsには [GET /talksessions/restrictions](https://app.apidog.
-// com/link/project/674502/apis/api-14271260)
+// # サムネイル画像について
+//
+//   - `Description中に出てくる画像で一番最初のものを使用`。
+//   - 画像自体は`POST /images`でサーバにポストしたものを使用してください。
+//
+// # 投稿制限のキーについて
+//
+// Restrictionsに値を入れると一定のデモグラ情報を登録していない限り、セッションへの投稿が制限されるようにできる。
+// restrictionsには [GET /talksessions/restrictions]
 // より取れるkeyをカンマ区切りで入力してください。.
 //
 // POST /talksessions
+//
+// [GET /talksessions/restrictions]: https://app.apidog.com/link/project/674502/apis/api-14271260
 func (s *Server) handleInitiateTalkSessionRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	statusWriter := &codeRecorder{ResponseWriter: w}
 	w = statusWriter
@@ -10639,6 +10971,8 @@ func (s *Server) handleInitiateTalkSessionRequest(args [0]string, argsEscaped bo
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/talksessions"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), InitiateTalkSessionOperation,
@@ -10662,7 +10996,7 @@ func (s *Server) handleInitiateTalkSessionRequest(args [0]string, argsEscaped bo
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -10682,7 +11016,7 @@ func (s *Server) handleInitiateTalkSessionRequest(args [0]string, argsEscaped bo
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -10744,7 +11078,9 @@ func (s *Server) handleInitiateTalkSessionRequest(args [0]string, argsEscaped bo
 			return
 		}
 	}
-	request, close, err := s.decodeInitiateTalkSessionRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeInitiateTalkSessionRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -10768,6 +11104,7 @@ func (s *Server) handleInitiateTalkSessionRequest(args [0]string, argsEscaped bo
 			OperationSummary: "セッション作成",
 			OperationID:      "initiateTalkSession",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -10811,10 +11148,11 @@ func (s *Server) handleInitiateTalkSessionRequest(args [0]string, argsEscaped bo
 // handleInviteOrganizationRequest handles inviteOrganization operation.
 //
 // Role
-// - 10: SuperAdmin
-// - 20: Owner
-// - 30: Admin
-// - 40: Member.
+//
+//   - 10: SuperAdmin
+//   - 20: Owner
+//   - 30: Admin
+//   - 40: Member
 //
 // POST /organizations/invite
 func (s *Server) handleInviteOrganizationRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
@@ -10825,6 +11163,8 @@ func (s *Server) handleInviteOrganizationRequest(args [0]string, argsEscaped boo
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/organizations/invite"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), InviteOrganizationOperation,
@@ -10848,7 +11188,7 @@ func (s *Server) handleInviteOrganizationRequest(args [0]string, argsEscaped boo
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -10868,7 +11208,7 @@ func (s *Server) handleInviteOrganizationRequest(args [0]string, argsEscaped boo
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -10930,7 +11270,9 @@ func (s *Server) handleInviteOrganizationRequest(args [0]string, argsEscaped boo
 			return
 		}
 	}
-	request, close, err := s.decodeInviteOrganizationRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeInviteOrganizationRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -10954,6 +11296,7 @@ func (s *Server) handleInviteOrganizationRequest(args [0]string, argsEscaped boo
 			OperationSummary: "組織ユーザー招待（運営ユーザーのみ）",
 			OperationID:      "inviteOrganization",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -11007,6 +11350,8 @@ func (s *Server) handleInviteOrganizationForUserRequest(args [0]string, argsEsca
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/organizations/invite_user"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), InviteOrganizationForUserOperation,
@@ -11030,7 +11375,7 @@ func (s *Server) handleInviteOrganizationForUserRequest(args [0]string, argsEsca
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -11050,7 +11395,7 @@ func (s *Server) handleInviteOrganizationForUserRequest(args [0]string, argsEsca
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -11112,7 +11457,9 @@ func (s *Server) handleInviteOrganizationForUserRequest(args [0]string, argsEsca
 			return
 		}
 	}
-	request, close, err := s.decodeInviteOrganizationForUserRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeInviteOrganizationForUserRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -11136,6 +11483,7 @@ func (s *Server) handleInviteOrganizationForUserRequest(args [0]string, argsEsca
 			OperationSummary: "組織にユーザーを追加",
 			OperationID:      "inviteOrganizationForUser",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -11190,6 +11538,8 @@ func (s *Server) handleJoinLockedSessionRequest(args [1]string, argsEscaped bool
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/join"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), JoinLockedSessionOperation,
@@ -11213,7 +11563,7 @@ func (s *Server) handleJoinLockedSessionRequest(args [1]string, argsEscaped bool
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -11233,7 +11583,7 @@ func (s *Server) handleJoinLockedSessionRequest(args [1]string, argsEscaped bool
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -11305,7 +11655,9 @@ func (s *Server) handleJoinLockedSessionRequest(args [1]string, argsEscaped bool
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
-	request, close, err := s.decodeJoinLockedSessionRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeJoinLockedSessionRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -11329,6 +11681,7 @@ func (s *Server) handleJoinLockedSessionRequest(args [1]string, argsEscaped bool
 			OperationSummary: "クローズドセッションに参加",
 			OperationID:      "joinLockedSession",
 			Body:             request,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -11387,6 +11740,8 @@ func (s *Server) handleListAdminUsersRequest(args [0]string, argsEscaped bool, w
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/v1/admin/admin-users"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), ListAdminUsersOperation,
@@ -11410,7 +11765,7 @@ func (s *Server) handleListAdminUsersRequest(args [0]string, argsEscaped bool, w
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -11430,7 +11785,7 @@ func (s *Server) handleListAdminUsersRequest(args [0]string, argsEscaped bool, w
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -11493,6 +11848,8 @@ func (s *Server) handleListAdminUsersRequest(args [0]string, argsEscaped bool, w
 		}
 	}
 
+	var rawBody []byte
+
 	var response ListAdminUsersRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -11501,6 +11858,7 @@ func (s *Server) handleListAdminUsersRequest(args [0]string, argsEscaped bool, w
 			OperationSummary: "管理者アカウント一覧",
 			OperationID:      "listAdminUsers",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -11554,6 +11912,8 @@ func (s *Server) handleListTalkSessionSurveySubmissionsRequest(args [1]string, a
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/survey/submissions"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), ListTalkSessionSurveySubmissionsOperation,
@@ -11577,7 +11937,7 @@ func (s *Server) handleListTalkSessionSurveySubmissionsRequest(args [1]string, a
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -11597,7 +11957,7 @@ func (s *Server) handleListTalkSessionSurveySubmissionsRequest(args [1]string, a
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -11670,6 +12030,8 @@ func (s *Server) handleListTalkSessionSurveySubmissionsRequest(args [1]string, a
 		return
 	}
 
+	var rawBody []byte
+
 	var response ListTalkSessionSurveySubmissionsRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -11678,6 +12040,7 @@ func (s *Server) handleListTalkSessionSurveySubmissionsRequest(args [1]string, a
 			OperationSummary: "アンケート回答一覧（オーナー）",
 			OperationID:      "listTalkSessionSurveySubmissions",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -11742,6 +12105,8 @@ func (s *Server) handleManageRegenerateManageRequest(args [1]string, argsEscaped
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/v1/manage/talksessions/{talkSessionID}/analysis/regenerate"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), ManageRegenerateManageOperation,
@@ -11765,7 +12130,7 @@ func (s *Server) handleManageRegenerateManageRequest(args [1]string, argsEscaped
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -11785,7 +12150,7 @@ func (s *Server) handleManageRegenerateManageRequest(args [1]string, argsEscaped
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -11857,7 +12222,9 @@ func (s *Server) handleManageRegenerateManageRequest(args [1]string, argsEscaped
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
-	request, close, err := s.decodeManageRegenerateManageRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeManageRegenerateManageRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -11881,6 +12248,7 @@ func (s *Server) handleManageRegenerateManageRequest(args [1]string, argsEscaped
 			OperationSummary: "",
 			OperationID:      "manageRegenerateManage",
 			Body:             request,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -11939,6 +12307,8 @@ func (s *Server) handleOpinionComments2Request(args [1]string, argsEscaped bool,
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/opinions/{opinionID}/replies"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), OpinionComments2Operation,
@@ -11962,7 +12332,7 @@ func (s *Server) handleOpinionComments2Request(args [1]string, argsEscaped bool,
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -11982,7 +12352,7 @@ func (s *Server) handleOpinionComments2Request(args [1]string, argsEscaped bool,
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -12011,6 +12381,8 @@ func (s *Server) handleOpinionComments2Request(args [1]string, argsEscaped bool,
 		return
 	}
 
+	var rawBody []byte
+
 	var response OpinionComments2Res
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -12019,6 +12391,7 @@ func (s *Server) handleOpinionComments2Request(args [1]string, argsEscaped bool,
 			OperationSummary: "意見に対するリプライ意見一覧",
 			OperationID:      "opinionComments2",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "opinionID",
@@ -12077,6 +12450,8 @@ func (s *Server) handleOpinionsHistoryRequest(args [0]string, argsEscaped bool, 
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/opinions/histories"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), OpinionsHistoryOperation,
@@ -12100,7 +12475,7 @@ func (s *Server) handleOpinionsHistoryRequest(args [0]string, argsEscaped bool, 
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -12120,7 +12495,7 @@ func (s *Server) handleOpinionsHistoryRequest(args [0]string, argsEscaped bool, 
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -12193,6 +12568,8 @@ func (s *Server) handleOpinionsHistoryRequest(args [0]string, argsEscaped bool, 
 		return
 	}
 
+	var rawBody []byte
+
 	var response OpinionsHistoryRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -12201,6 +12578,7 @@ func (s *Server) handleOpinionsHistoryRequest(args [0]string, argsEscaped bool, 
 			OperationSummary: "今までに投稿した意見",
 			OperationID:      "opinionsHistory",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "sort",
@@ -12267,6 +12645,8 @@ func (s *Server) handlePasswordEmailConfirmationRequest(args [0]string, argsEsca
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/auth/password/verify"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), PasswordEmailConfirmationOperation,
@@ -12290,7 +12670,7 @@ func (s *Server) handlePasswordEmailConfirmationRequest(args [0]string, argsEsca
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -12310,7 +12690,7 @@ func (s *Server) handlePasswordEmailConfirmationRequest(args [0]string, argsEsca
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -12325,6 +12705,8 @@ func (s *Server) handlePasswordEmailConfirmationRequest(args [0]string, argsEsca
 		err error
 	)
 
+	var rawBody []byte
+
 	var response PasswordEmailConfirmationOK
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -12333,6 +12715,7 @@ func (s *Server) handlePasswordEmailConfirmationRequest(args [0]string, argsEsca
 			OperationSummary: "メール本人確認ページ（リンクはURLフラグメントに格納）",
 			OperationID:      "passwordEmailConfirmation",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -12386,6 +12769,8 @@ func (s *Server) handlePasswordLoginRequest(args [0]string, argsEscaped bool, w 
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/auth/password/login"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), PasswordLoginOperation,
@@ -12409,7 +12794,7 @@ func (s *Server) handlePasswordLoginRequest(args [0]string, argsEscaped bool, w 
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -12429,7 +12814,7 @@ func (s *Server) handlePasswordLoginRequest(args [0]string, argsEscaped bool, w 
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -12447,7 +12832,9 @@ func (s *Server) handlePasswordLoginRequest(args [0]string, argsEscaped bool, w 
 			ID:   "passwordLogin",
 		}
 	)
-	request, close, err := s.decodePasswordLoginRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodePasswordLoginRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -12471,6 +12858,7 @@ func (s *Server) handlePasswordLoginRequest(args [0]string, argsEscaped bool, w 
 			OperationSummary: "パスワードを確認し、ログインごとのメール本人確認を開始する",
 			OperationID:      "passwordLogin",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -12524,6 +12912,8 @@ func (s *Server) handlePasswordRegisterRequest(args [0]string, argsEscaped bool,
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/auth/password/register"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), PasswordRegisterOperation,
@@ -12547,7 +12937,7 @@ func (s *Server) handlePasswordRegisterRequest(args [0]string, argsEscaped bool,
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -12567,7 +12957,7 @@ func (s *Server) handlePasswordRegisterRequest(args [0]string, argsEscaped bool,
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -12585,7 +12975,9 @@ func (s *Server) handlePasswordRegisterRequest(args [0]string, argsEscaped bool,
 			ID:   "passwordRegister",
 		}
 	)
-	request, close, err := s.decodePasswordRegisterRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodePasswordRegisterRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -12609,6 +13001,7 @@ func (s *Server) handlePasswordRegisterRequest(args [0]string, argsEscaped bool,
 			OperationSummary: "パスワードによる登録（devのみ）",
 			OperationID:      "passwordRegister",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -12662,6 +13055,8 @@ func (s *Server) handlePolicyConsentRequest(args [0]string, argsEscaped bool, w 
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/policy/consent"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), PolicyConsentOperation,
@@ -12685,7 +13080,7 @@ func (s *Server) handlePolicyConsentRequest(args [0]string, argsEscaped bool, w 
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -12705,7 +13100,7 @@ func (s *Server) handlePolicyConsentRequest(args [0]string, argsEscaped bool, w 
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -12767,7 +13162,9 @@ func (s *Server) handlePolicyConsentRequest(args [0]string, argsEscaped bool, w 
 			return
 		}
 	}
-	request, close, err := s.decodePolicyConsentRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodePolicyConsentRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -12791,6 +13188,7 @@ func (s *Server) handlePolicyConsentRequest(args [0]string, argsEscaped bool, w 
 			OperationSummary: "最新のポリシーに同意する",
 			OperationID:      "policyConsent",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -12845,6 +13243,8 @@ func (s *Server) handlePostConclusionRequest(args [1]string, argsEscaped bool, w
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/conclusion"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), PostConclusionOperation,
@@ -12868,7 +13268,7 @@ func (s *Server) handlePostConclusionRequest(args [1]string, argsEscaped bool, w
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -12888,7 +13288,7 @@ func (s *Server) handlePostConclusionRequest(args [1]string, argsEscaped bool, w
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -12960,7 +13360,9 @@ func (s *Server) handlePostConclusionRequest(args [1]string, argsEscaped bool, w
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
-	request, close, err := s.decodePostConclusionRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodePostConclusionRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -12984,6 +13386,7 @@ func (s *Server) handlePostConclusionRequest(args [1]string, argsEscaped bool, w
 			OperationSummary: "結論投稿",
 			OperationID:      "postConclusion",
 			Body:             request,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -13042,6 +13445,8 @@ func (s *Server) handlePostImageRequest(args [0]string, argsEscaped bool, w http
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/images"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), PostImageOperation,
@@ -13065,7 +13470,7 @@ func (s *Server) handlePostImageRequest(args [0]string, argsEscaped bool, w http
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -13085,7 +13490,7 @@ func (s *Server) handlePostImageRequest(args [0]string, argsEscaped bool, w http
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -13147,7 +13552,9 @@ func (s *Server) handlePostImageRequest(args [0]string, argsEscaped bool, w http
 			return
 		}
 	}
-	request, close, err := s.decodePostImageRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodePostImageRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -13171,6 +13578,7 @@ func (s *Server) handlePostImageRequest(args [0]string, argsEscaped bool, w http
 			OperationSummary: "画像投稿",
 			OperationID:      "postImage",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -13215,6 +13623,7 @@ func (s *Server) handlePostImageRequest(args [0]string, argsEscaped bool, w http
 //
 // ParentOpinionIDがなければルートの意見として投稿される
 // parentOpinionIDがない場合はtalkSessionIDが必須
+//
 // セッション管理者はisSeedをtrueにするとシード意見として投稿できる.
 //
 // POST /opinions
@@ -13226,6 +13635,8 @@ func (s *Server) handlePostOpinionPost2Request(args [0]string, argsEscaped bool,
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/opinions"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), PostOpinionPost2Operation,
@@ -13249,7 +13660,7 @@ func (s *Server) handlePostOpinionPost2Request(args [0]string, argsEscaped bool,
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -13269,7 +13680,7 @@ func (s *Server) handlePostOpinionPost2Request(args [0]string, argsEscaped bool,
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -13331,7 +13742,9 @@ func (s *Server) handlePostOpinionPost2Request(args [0]string, argsEscaped bool,
 			return
 		}
 	}
-	request, close, err := s.decodePostOpinionPost2Request(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodePostOpinionPost2Request(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -13355,6 +13768,7 @@ func (s *Server) handlePostOpinionPost2Request(args [0]string, argsEscaped bool,
 			OperationSummary: "セッションに対して意見投稿 or 意見に対するリプライ",
 			OperationID:      "postOpinionPost2",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -13408,6 +13822,8 @@ func (s *Server) handlePostTimeLineItemRequest(args [1]string, argsEscaped bool,
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/timeline"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), PostTimeLineItemOperation,
@@ -13431,7 +13847,7 @@ func (s *Server) handlePostTimeLineItemRequest(args [1]string, argsEscaped bool,
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -13451,7 +13867,7 @@ func (s *Server) handlePostTimeLineItemRequest(args [1]string, argsEscaped bool,
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -13523,7 +13939,9 @@ func (s *Server) handlePostTimeLineItemRequest(args [1]string, argsEscaped bool,
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
-	request, close, err := s.decodePostTimeLineItemRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodePostTimeLineItemRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -13547,6 +13965,7 @@ func (s *Server) handlePostTimeLineItemRequest(args [1]string, argsEscaped bool,
 			OperationSummary: "タイムラインアイテム追加",
 			OperationID:      "postTimeLineItem",
 			Body:             request,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -13605,6 +14024,8 @@ func (s *Server) handleReactivateUserRequest(args [0]string, argsEscaped bool, w
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/auth/reactivate"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), ReactivateUserOperation,
@@ -13628,7 +14049,7 @@ func (s *Server) handleReactivateUserRequest(args [0]string, argsEscaped bool, w
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -13648,7 +14069,7 @@ func (s *Server) handleReactivateUserRequest(args [0]string, argsEscaped bool, w
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -13711,6 +14132,8 @@ func (s *Server) handleReactivateUserRequest(args [0]string, argsEscaped bool, w
 		}
 	}
 
+	var rawBody []byte
+
 	var response ReactivateUserRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -13719,6 +14142,7 @@ func (s *Server) handleReactivateUserRequest(args [0]string, argsEscaped bool, w
 			OperationSummary: "退会ユーザーの復活",
 			OperationID:      "reactivateUser",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -13772,6 +14196,8 @@ func (s *Server) handleRegisterDeviceRequest(args [0]string, argsEscaped bool, w
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/notifications/devices"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), RegisterDeviceOperation,
@@ -13795,7 +14221,7 @@ func (s *Server) handleRegisterDeviceRequest(args [0]string, argsEscaped bool, w
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -13815,7 +14241,7 @@ func (s *Server) handleRegisterDeviceRequest(args [0]string, argsEscaped bool, w
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -13877,7 +14303,9 @@ func (s *Server) handleRegisterDeviceRequest(args [0]string, argsEscaped bool, w
 			return
 		}
 	}
-	request, close, err := s.decodeRegisterDeviceRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeRegisterDeviceRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -13901,6 +14329,7 @@ func (s *Server) handleRegisterDeviceRequest(args [0]string, argsEscaped bool, w
 			OperationSummary: "デバイス登録/更新",
 			OperationID:      "registerDevice",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -13954,6 +14383,8 @@ func (s *Server) handleReportOpinionRequest(args [1]string, argsEscaped bool, w 
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/opinions/{opinionID}/report"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), ReportOpinionOperation,
@@ -13977,7 +14408,7 @@ func (s *Server) handleReportOpinionRequest(args [1]string, argsEscaped bool, w 
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -13997,7 +14428,7 @@ func (s *Server) handleReportOpinionRequest(args [1]string, argsEscaped bool, w 
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -14069,7 +14500,9 @@ func (s *Server) handleReportOpinionRequest(args [1]string, argsEscaped bool, w 
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
-	request, close, err := s.decodeReportOpinionRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeReportOpinionRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -14093,6 +14526,7 @@ func (s *Server) handleReportOpinionRequest(args [1]string, argsEscaped bool, w 
 			OperationSummary: "意見通報API",
 			OperationID:      "reportOpinion",
 			Body:             request,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "opinionID",
@@ -14149,6 +14583,8 @@ func (s *Server) handleResendUserInvitationManageRequest(args [1]string, argsEsc
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/v1/manage/users/{userID}/invitation"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), ResendUserInvitationManageOperation,
@@ -14172,7 +14608,7 @@ func (s *Server) handleResendUserInvitationManageRequest(args [1]string, argsEsc
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -14192,7 +14628,7 @@ func (s *Server) handleResendUserInvitationManageRequest(args [1]string, argsEsc
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -14265,6 +14701,8 @@ func (s *Server) handleResendUserInvitationManageRequest(args [1]string, argsEsc
 		return
 	}
 
+	var rawBody []byte
+
 	var response *ManagedUserInvitation
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -14273,6 +14711,7 @@ func (s *Server) handleResendUserInvitationManageRequest(args [1]string, argsEsc
 			OperationSummary: "",
 			OperationID:      "resendUserInvitationManage",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "userID",
@@ -14331,6 +14770,8 @@ func (s *Server) handleRevokeTokenRequest(args [0]string, argsEscaped bool, w ht
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/auth/revoke"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), RevokeTokenOperation,
@@ -14354,7 +14795,7 @@ func (s *Server) handleRevokeTokenRequest(args [0]string, argsEscaped bool, w ht
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -14374,7 +14815,7 @@ func (s *Server) handleRevokeTokenRequest(args [0]string, argsEscaped bool, w ht
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -14437,6 +14878,8 @@ func (s *Server) handleRevokeTokenRequest(args [0]string, argsEscaped bool, w ht
 		}
 	}
 
+	var rawBody []byte
+
 	var response RevokeTokenRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -14445,6 +14888,7 @@ func (s *Server) handleRevokeTokenRequest(args [0]string, argsEscaped bool, w ht
 			OperationSummary: "トークンを失効（ログアウト）",
 			OperationID:      "revokeToken",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -14498,6 +14942,8 @@ func (s *Server) handleSendTestNotificationRequest(args [0]string, argsEscaped b
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/notifications/test"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), SendTestNotificationOperation,
@@ -14521,7 +14967,7 @@ func (s *Server) handleSendTestNotificationRequest(args [0]string, argsEscaped b
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -14541,7 +14987,7 @@ func (s *Server) handleSendTestNotificationRequest(args [0]string, argsEscaped b
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -14603,7 +15049,9 @@ func (s *Server) handleSendTestNotificationRequest(args [0]string, argsEscaped b
 			return
 		}
 	}
-	request, close, err := s.decodeSendTestNotificationRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeSendTestNotificationRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -14627,6 +15075,7 @@ func (s *Server) handleSendTestNotificationRequest(args [0]string, argsEscaped b
 			OperationSummary: "テスト通知送信",
 			OperationID:      "sendTestNotification",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -14680,6 +15129,8 @@ func (s *Server) handleSessionsHistoryRequest(args [0]string, argsEscaped bool, 
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/talksessions/histories"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), SessionsHistoryOperation,
@@ -14703,7 +15154,7 @@ func (s *Server) handleSessionsHistoryRequest(args [0]string, argsEscaped bool, 
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -14723,7 +15174,7 @@ func (s *Server) handleSessionsHistoryRequest(args [0]string, argsEscaped bool, 
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -14796,6 +15247,8 @@ func (s *Server) handleSessionsHistoryRequest(args [0]string, argsEscaped bool, 
 		return
 	}
 
+	var rawBody []byte
+
 	var response SessionsHistoryRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -14804,6 +15257,7 @@ func (s *Server) handleSessionsHistoryRequest(args [0]string, argsEscaped bool, 
 			OperationSummary: "リアクション済みのセッション一覧",
 			OperationID:      "sessionsHistory",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "limit",
@@ -14872,6 +15326,8 @@ func (s *Server) handleSetUserPermissionsManageRequest(args [1]string, argsEscap
 		semconv.HTTPRequestMethodKey.String("PUT"),
 		semconv.HTTPRouteKey.String("/v1/manage/users/{userID}/permissions"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), SetUserPermissionsManageOperation,
@@ -14895,7 +15351,7 @@ func (s *Server) handleSetUserPermissionsManageRequest(args [1]string, argsEscap
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -14915,7 +15371,7 @@ func (s *Server) handleSetUserPermissionsManageRequest(args [1]string, argsEscap
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -14987,7 +15443,9 @@ func (s *Server) handleSetUserPermissionsManageRequest(args [1]string, argsEscap
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
-	request, close, err := s.decodeSetUserPermissionsManageRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeSetUserPermissionsManageRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -15011,6 +15469,7 @@ func (s *Server) handleSetUserPermissionsManageRequest(args [1]string, argsEscap
 			OperationSummary: "",
 			OperationID:      "setUserPermissionsManage",
 			Body:             request,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "userID",
@@ -15069,6 +15528,8 @@ func (s *Server) handleSetupPasswordRequest(args [0]string, argsEscaped bool, w 
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/auth/password/setup"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), SetupPasswordOperation,
@@ -15092,7 +15553,7 @@ func (s *Server) handleSetupPasswordRequest(args [0]string, argsEscaped bool, w 
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -15112,7 +15573,7 @@ func (s *Server) handleSetupPasswordRequest(args [0]string, argsEscaped bool, w 
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -15130,7 +15591,9 @@ func (s *Server) handleSetupPasswordRequest(args [0]string, argsEscaped bool, w 
 			ID:   "setupPassword",
 		}
 	)
-	request, close, err := s.decodeSetupPasswordRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeSetupPasswordRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -15154,6 +15617,7 @@ func (s *Server) handleSetupPasswordRequest(args [0]string, argsEscaped bool, w 
 			OperationSummary: "メールから初回パスワードを設定する（ログインCookieは発行しない）",
 			OperationID:      "setupPassword",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -15207,6 +15671,8 @@ func (s *Server) handleSolveOpinionReportRequest(args [1]string, argsEscaped boo
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/opinions/{opinionID}/reports/solve"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), SolveOpinionReportOperation,
@@ -15230,7 +15696,7 @@ func (s *Server) handleSolveOpinionReportRequest(args [1]string, argsEscaped boo
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -15250,7 +15716,7 @@ func (s *Server) handleSolveOpinionReportRequest(args [1]string, argsEscaped boo
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -15322,7 +15788,9 @@ func (s *Server) handleSolveOpinionReportRequest(args [1]string, argsEscaped boo
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
-	request, close, err := s.decodeSolveOpinionReportRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeSolveOpinionReportRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -15346,6 +15814,7 @@ func (s *Server) handleSolveOpinionReportRequest(args [1]string, argsEscaped boo
 			OperationSummary: "通報を解決",
 			OperationID:      "solveOpinionReport",
 			Body:             request,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "opinionID",
@@ -15393,8 +15862,8 @@ func (s *Server) handleSolveOpinionReportRequest(args [1]string, argsEscaped boo
 
 // handleSubmitTalkSessionSurveyRequest handles submitTalkSessionSurvey operation.
 //
-// アンケートに回答を送信（1 ユーザー 1 送信、修正不可）。
-// 成功すると survey.answered restriction が自動的に満たされた状態になる。.
+// アンケートに回答を送信（1 ユーザー 1 送信、修正不可）。 成功すると
+// survey.answered restriction が自動的に満たされた状態になる。.
 //
 // POST /talksessions/{talkSessionID}/survey/submissions
 func (s *Server) handleSubmitTalkSessionSurveyRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
@@ -15405,6 +15874,8 @@ func (s *Server) handleSubmitTalkSessionSurveyRequest(args [1]string, argsEscape
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/survey/submissions"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), SubmitTalkSessionSurveyOperation,
@@ -15428,7 +15899,7 @@ func (s *Server) handleSubmitTalkSessionSurveyRequest(args [1]string, argsEscape
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -15448,7 +15919,7 @@ func (s *Server) handleSubmitTalkSessionSurveyRequest(args [1]string, argsEscape
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -15520,7 +15991,9 @@ func (s *Server) handleSubmitTalkSessionSurveyRequest(args [1]string, argsEscape
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
-	request, close, err := s.decodeSubmitTalkSessionSurveyRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeSubmitTalkSessionSurveyRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -15544,6 +16017,7 @@ func (s *Server) handleSubmitTalkSessionSurveyRequest(args [1]string, argsEscape
 			OperationSummary: "アンケート回答送信",
 			OperationID:      "submitTalkSessionSurvey",
 			Body:             request,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -15603,6 +16077,8 @@ func (s *Server) handleSwipeOpinionsRequest(args [1]string, argsEscaped bool, w 
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/swipe_opinions"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), SwipeOpinionsOperation,
@@ -15626,7 +16102,7 @@ func (s *Server) handleSwipeOpinionsRequest(args [1]string, argsEscaped bool, w 
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -15646,7 +16122,7 @@ func (s *Server) handleSwipeOpinionsRequest(args [1]string, argsEscaped bool, w 
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -15675,6 +16151,8 @@ func (s *Server) handleSwipeOpinionsRequest(args [1]string, argsEscaped bool, w 
 		return
 	}
 
+	var rawBody []byte
+
 	var response SwipeOpinionsRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -15683,6 +16161,7 @@ func (s *Server) handleSwipeOpinionsRequest(args [1]string, argsEscaped bool, w 
 			OperationSummary: "スワイプ用のエンドポイント",
 			OperationID:      "swipeOpinions",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -15745,6 +16224,8 @@ func (s *Server) handleSwitchOrganizationRequest(args [1]string, argsEscaped boo
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/organizations/switch/{code}"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), SwitchOrganizationOperation,
@@ -15768,7 +16249,7 @@ func (s *Server) handleSwitchOrganizationRequest(args [1]string, argsEscaped boo
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -15788,7 +16269,7 @@ func (s *Server) handleSwitchOrganizationRequest(args [1]string, argsEscaped boo
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -15861,6 +16342,8 @@ func (s *Server) handleSwitchOrganizationRequest(args [1]string, argsEscaped boo
 		return
 	}
 
+	var rawBody []byte
+
 	var response SwitchOrganizationRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -15869,6 +16352,7 @@ func (s *Server) handleSwitchOrganizationRequest(args [1]string, argsEscaped boo
 			OperationSummary: "組織切り替え",
 			OperationID:      "switchOrganization",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "code",
@@ -15927,6 +16411,8 @@ func (s *Server) handleTalkSessionAnalysisRequest(args [1]string, argsEscaped bo
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/analysis"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), TalkSessionAnalysisOperation,
@@ -15950,7 +16436,7 @@ func (s *Server) handleTalkSessionAnalysisRequest(args [1]string, argsEscaped bo
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -15970,7 +16456,7 @@ func (s *Server) handleTalkSessionAnalysisRequest(args [1]string, argsEscaped bo
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -15999,6 +16485,8 @@ func (s *Server) handleTalkSessionAnalysisRequest(args [1]string, argsEscaped bo
 		return
 	}
 
+	var rawBody []byte
+
 	var response TalkSessionAnalysisRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -16007,6 +16495,7 @@ func (s *Server) handleTalkSessionAnalysisRequest(args [1]string, argsEscaped bo
 			OperationSummary: "分析結果一覧",
 			OperationID:      "talkSessionAnalysis",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -16065,6 +16554,8 @@ func (s *Server) handleTestRequest(args [0]string, argsEscaped bool, w http.Resp
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/test"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), TestOperation,
@@ -16088,7 +16579,7 @@ func (s *Server) handleTestRequest(args [0]string, argsEscaped bool, w http.Resp
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -16108,7 +16599,7 @@ func (s *Server) handleTestRequest(args [0]string, argsEscaped bool, w http.Resp
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -16123,6 +16614,8 @@ func (s *Server) handleTestRequest(args [0]string, argsEscaped bool, w http.Resp
 		err error
 	)
 
+	var rawBody []byte
+
 	var response TestRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -16131,6 +16624,7 @@ func (s *Server) handleTestRequest(args [0]string, argsEscaped bool, w http.Resp
 			OperationSummary: "OpenAPIテスト用",
 			OperationID:      "test",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -16182,6 +16676,8 @@ func (s *Server) handleToggleReportVisibilityManageRequest(args [1]string, argsE
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/v1/manage/talksessions/{talkSessionID}/analysis/report"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), ToggleReportVisibilityManageOperation,
@@ -16205,7 +16701,7 @@ func (s *Server) handleToggleReportVisibilityManageRequest(args [1]string, argsE
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -16225,7 +16721,7 @@ func (s *Server) handleToggleReportVisibilityManageRequest(args [1]string, argsE
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -16297,7 +16793,9 @@ func (s *Server) handleToggleReportVisibilityManageRequest(args [1]string, argsE
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
-	request, close, err := s.decodeToggleReportVisibilityManageRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeToggleReportVisibilityManageRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -16321,6 +16819,7 @@ func (s *Server) handleToggleReportVisibilityManageRequest(args [1]string, argsE
 			OperationSummary: "",
 			OperationID:      "toggleReportVisibilityManage",
 			Body:             request,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -16369,6 +16868,7 @@ func (s *Server) handleToggleReportVisibilityManageRequest(args [1]string, argsE
 // handleToggleTalkSessionAnalysisRequest handles toggleTalkSessionAnalysis operation.
 //
 // 分析の有効/無効をトグルする
+//
 // 分析を有効にすると（disableAnalysis: true →
 // false）、自動的に分析処理が開始されます。.
 //
@@ -16381,6 +16881,8 @@ func (s *Server) handleToggleTalkSessionAnalysisRequest(args [1]string, argsEsca
 		semconv.HTTPRequestMethodKey.String("PUT"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/analysis/toggle"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), ToggleTalkSessionAnalysisOperation,
@@ -16404,7 +16906,7 @@ func (s *Server) handleToggleTalkSessionAnalysisRequest(args [1]string, argsEsca
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -16424,7 +16926,7 @@ func (s *Server) handleToggleTalkSessionAnalysisRequest(args [1]string, argsEsca
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -16497,6 +16999,8 @@ func (s *Server) handleToggleTalkSessionAnalysisRequest(args [1]string, argsEsca
 		return
 	}
 
+	var rawBody []byte
+
 	var response ToggleTalkSessionAnalysisRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -16505,6 +17009,7 @@ func (s *Server) handleToggleTalkSessionAnalysisRequest(args [1]string, argsEsca
 			OperationSummary: "分析設定をトグル",
 			OperationID:      "toggleTalkSessionAnalysis",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -16563,6 +17068,8 @@ func (s *Server) handleUpdateNotificationPreferencesRequest(args [0]string, args
 		semconv.HTTPRequestMethodKey.String("PUT"),
 		semconv.HTTPRouteKey.String("/notifications/preferences"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), UpdateNotificationPreferencesOperation,
@@ -16586,7 +17093,7 @@ func (s *Server) handleUpdateNotificationPreferencesRequest(args [0]string, args
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -16606,7 +17113,7 @@ func (s *Server) handleUpdateNotificationPreferencesRequest(args [0]string, args
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -16668,7 +17175,9 @@ func (s *Server) handleUpdateNotificationPreferencesRequest(args [0]string, args
 			return
 		}
 	}
-	request, close, err := s.decodeUpdateNotificationPreferencesRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeUpdateNotificationPreferencesRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -16692,6 +17201,7 @@ func (s *Server) handleUpdateNotificationPreferencesRequest(args [0]string, args
 			OperationSummary: "通知設定更新",
 			OperationID:      "updateNotificationPreferences",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -16734,8 +17244,7 @@ func (s *Server) handleUpdateNotificationPreferencesRequest(args [0]string, args
 
 // handleUpdateOrganizationRequest handles updateOrganization operation.
 //
-// 組織を更新できる。
-// 組織のAdmin以上のユーザーが実行可能。.
+// 組織を更新できる。 組織のAdmin以上のユーザーが実行可能。.
 //
 // PUT /organizations/{code}
 func (s *Server) handleUpdateOrganizationRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
@@ -16746,6 +17255,8 @@ func (s *Server) handleUpdateOrganizationRequest(args [1]string, argsEscaped boo
 		semconv.HTTPRequestMethodKey.String("PUT"),
 		semconv.HTTPRouteKey.String("/organizations/{code}"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), UpdateOrganizationOperation,
@@ -16769,7 +17280,7 @@ func (s *Server) handleUpdateOrganizationRequest(args [1]string, argsEscaped boo
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -16789,7 +17300,7 @@ func (s *Server) handleUpdateOrganizationRequest(args [1]string, argsEscaped boo
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -16861,7 +17372,9 @@ func (s *Server) handleUpdateOrganizationRequest(args [1]string, argsEscaped boo
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
-	request, close, err := s.decodeUpdateOrganizationRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeUpdateOrganizationRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -16885,6 +17398,7 @@ func (s *Server) handleUpdateOrganizationRequest(args [1]string, argsEscaped boo
 			OperationSummary: "組織更新（組織のAdmin以上のユーザーのみ）",
 			OperationID:      "updateOrganization",
 			Body:             request,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "code",
@@ -16932,9 +17446,9 @@ func (s *Server) handleUpdateOrganizationRequest(args [1]string, argsEscaped boo
 
 // handleUpdateTalkSessionSurveyRequest handles updateTalkSessionSurvey operation.
 //
-// アンケートを編集（オーナーのみ）。
-// 既に回答がある質問・選択肢は soft delete 経由でのみ非表示化可能。
-// questionID / choiceID 指定で既存項目を編集、省略で新規追加。.
+// アンケートを編集（オーナーのみ）。 既に回答がある質問・選択肢は soft
+// delete 経由でのみ非表示化可能。 questionID / choiceID
+// 指定で既存項目を編集、省略で新規追加。.
 //
 // PUT /talksessions/{talkSessionID}/survey
 func (s *Server) handleUpdateTalkSessionSurveyRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
@@ -16945,6 +17459,8 @@ func (s *Server) handleUpdateTalkSessionSurveyRequest(args [1]string, argsEscape
 		semconv.HTTPRequestMethodKey.String("PUT"),
 		semconv.HTTPRouteKey.String("/talksessions/{talkSessionID}/survey"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), UpdateTalkSessionSurveyOperation,
@@ -16968,7 +17484,7 @@ func (s *Server) handleUpdateTalkSessionSurveyRequest(args [1]string, argsEscape
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -16988,7 +17504,7 @@ func (s *Server) handleUpdateTalkSessionSurveyRequest(args [1]string, argsEscape
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -17060,7 +17576,9 @@ func (s *Server) handleUpdateTalkSessionSurveyRequest(args [1]string, argsEscape
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
-	request, close, err := s.decodeUpdateTalkSessionSurveyRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeUpdateTalkSessionSurveyRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -17084,6 +17602,7 @@ func (s *Server) handleUpdateTalkSessionSurveyRequest(args [1]string, argsEscape
 			OperationSummary: "アンケート編集",
 			OperationID:      "updateTalkSessionSurvey",
 			Body:             request,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "talkSessionID",
@@ -17142,6 +17661,8 @@ func (s *Server) handleUpdateUserProfileRequest(args [0]string, argsEscaped bool
 		semconv.HTTPRequestMethodKey.String("PUT"),
 		semconv.HTTPRouteKey.String("/user"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), UpdateUserProfileOperation,
@@ -17165,7 +17686,7 @@ func (s *Server) handleUpdateUserProfileRequest(args [0]string, argsEscaped bool
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -17185,7 +17706,7 @@ func (s *Server) handleUpdateUserProfileRequest(args [0]string, argsEscaped bool
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -17247,7 +17768,9 @@ func (s *Server) handleUpdateUserProfileRequest(args [0]string, argsEscaped bool
 			return
 		}
 	}
-	request, close, err := s.decodeUpdateUserProfileRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeUpdateUserProfileRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -17271,6 +17794,7 @@ func (s *Server) handleUpdateUserProfileRequest(args [0]string, argsEscaped bool
 			OperationSummary: "ユーザー情報の変更",
 			OperationID:      "updateUserProfile",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -17324,6 +17848,8 @@ func (s *Server) handleValidateOrganizationCodeRequest(args [1]string, argsEscap
 		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/organization/{code}/validate"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), ValidateOrganizationCodeOperation,
@@ -17347,7 +17873,7 @@ func (s *Server) handleValidateOrganizationCodeRequest(args [1]string, argsEscap
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -17367,7 +17893,7 @@ func (s *Server) handleValidateOrganizationCodeRequest(args [1]string, argsEscap
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -17396,6 +17922,8 @@ func (s *Server) handleValidateOrganizationCodeRequest(args [1]string, argsEscap
 		return
 	}
 
+	var rawBody []byte
+
 	var response ValidateOrganizationCodeRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -17404,6 +17932,7 @@ func (s *Server) handleValidateOrganizationCodeRequest(args [1]string, argsEscap
 			OperationSummary: "組織コード検証",
 			OperationID:      "validateOrganizationCode",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "code",
@@ -17462,6 +17991,8 @@ func (s *Server) handleVerifyPasswordEmailRequest(args [0]string, argsEscaped bo
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/auth/password/verify"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), VerifyPasswordEmailOperation,
@@ -17485,7 +18016,7 @@ func (s *Server) handleVerifyPasswordEmailRequest(args [0]string, argsEscaped bo
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -17505,7 +18036,7 @@ func (s *Server) handleVerifyPasswordEmailRequest(args [0]string, argsEscaped bo
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -17523,7 +18054,9 @@ func (s *Server) handleVerifyPasswordEmailRequest(args [0]string, argsEscaped bo
 			ID:   "verifyPasswordEmail",
 		}
 	)
-	request, close, err := s.decodeVerifyPasswordEmailRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeVerifyPasswordEmailRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -17547,6 +18080,7 @@ func (s *Server) handleVerifyPasswordEmailRequest(args [0]string, argsEscaped bo
 			OperationSummary: "メール本人確認を完了し、初めてログインCookieを発行する",
 			OperationID:      "verifyPasswordEmail",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -17600,6 +18134,8 @@ func (s *Server) handleVerifyPasswordEmailPINRequest(args [0]string, argsEscaped
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/auth/password/verify-pin"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), VerifyPasswordEmailPINOperation,
@@ -17623,7 +18159,7 @@ func (s *Server) handleVerifyPasswordEmailPINRequest(args [0]string, argsEscaped
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -17643,7 +18179,7 @@ func (s *Server) handleVerifyPasswordEmailPINRequest(args [0]string, argsEscaped
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -17661,7 +18197,9 @@ func (s *Server) handleVerifyPasswordEmailPINRequest(args [0]string, argsEscaped
 			ID:   "verifyPasswordEmailPIN",
 		}
 	)
-	request, close, err := s.decodeVerifyPasswordEmailPINRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeVerifyPasswordEmailPINRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -17685,6 +18223,7 @@ func (s *Server) handleVerifyPasswordEmailPINRequest(args [0]string, argsEscaped
 			OperationSummary: "メールの6桁PINで本人確認を完了する",
 			OperationID:      "verifyPasswordEmailPIN",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -17738,6 +18277,8 @@ func (s *Server) handleVote2Request(args [1]string, argsEscaped bool, w http.Res
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/opinions/{opinionID}/votes"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), Vote2Operation,
@@ -17761,7 +18302,7 @@ func (s *Server) handleVote2Request(args [1]string, argsEscaped bool, w http.Res
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -17781,7 +18322,7 @@ func (s *Server) handleVote2Request(args [1]string, argsEscaped bool, w http.Res
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -17853,7 +18394,9 @@ func (s *Server) handleVote2Request(args [1]string, argsEscaped bool, w http.Res
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
-	request, close, err := s.decodeVote2Request(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeVote2Request(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -17877,6 +18420,7 @@ func (s *Server) handleVote2Request(args [1]string, argsEscaped bool, w http.Res
 			OperationSummary: "意思表明API",
 			OperationID:      "vote2",
 			Body:             request,
+			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
 					Name: "opinionID",
@@ -17935,6 +18479,8 @@ func (s *Server) handleWithdrawUserRequest(args [0]string, argsEscaped bool, w h
 		semconv.HTTPRequestMethodKey.String("DELETE"),
 		semconv.HTTPRouteKey.String("/user"),
 	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
 
 	// Start a span for this request.
 	ctx, span := s.cfg.Tracer.Start(r.Context(), WithdrawUserOperation,
@@ -17958,7 +18504,7 @@ func (s *Server) handleWithdrawUserRequest(args [0]string, argsEscaped bool, w h
 		if code != 0 {
 			codeAttr := semconv.HTTPResponseStatusCode(code)
 			attrs = append(attrs, codeAttr)
-			span.SetAttributes(codeAttr)
+			span.SetAttributes(attrs...)
 		}
 		attrOpt := metric.WithAttributes(attrs...)
 
@@ -17978,7 +18524,7 @@ func (s *Server) handleWithdrawUserRequest(args [0]string, argsEscaped bool, w h
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -18041,6 +18587,8 @@ func (s *Server) handleWithdrawUserRequest(args [0]string, argsEscaped bool, w h
 		}
 	}
 
+	var rawBody []byte
+
 	var response WithdrawUserRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -18049,6 +18597,7 @@ func (s *Server) handleWithdrawUserRequest(args [0]string, argsEscaped bool, w h
 			OperationSummary: "ユーザー退会",
 			OperationID:      "withdrawUser",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
