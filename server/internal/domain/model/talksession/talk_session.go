@@ -236,9 +236,7 @@ func (t *TalkSession) UpdateRestrictions(ctx context.Context, restrictions []str
 		attrs = append(attrs, lo.ToPtr(attribute.RestrictionAttribute()))
 	}
 	if errs != nil {
-		err := &ErrInvalidRestrictionAttribute
-		err.Message = errs.Error()
-		return err
+		return ErrInvalidRestrictionAttribute.WithMessage(errs.Error())
 	}
 
 	t.restrictions = attrs

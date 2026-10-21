@@ -2,7 +2,6 @@ package talksession
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 
 	"github.com/neko-dream/api/internal/domain/messages"
@@ -91,15 +90,16 @@ func (k *RestrictionAttributeKey) RestrictionAttribute() RestrictionAttribute {
 }
 
 func (k *RestrictionAttributeKey) IsValid() error {
-	attr, ok := RestrictionAttributeKeyMap[*k]
-	if !ok {
-		return errors.New(attr.Description + "が不正な値です")
+	if _, ok := RestrictionAttributeKeyMap[*k]; !ok {
+		// 見つからなかったキーの説明文は空なので、キーそのものを文言に入れる
+		return fmt.Errorf("%sは不正な値です", *k)
 	}
 	return nil
 }
 
 var (
-	ErrInvalidRestrictionAttribute = messages.APIError{
+	// 共有のエラー。文言は書き換えず WithMessage で複製して返す
+	ErrInvalidRestrictionAttribute = &messages.APIError{
 		Code:       "restriction_attribute_invalid",
 		StatusCode: 400,
 		Message:    "不正な値です。",

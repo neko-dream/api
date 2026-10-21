@@ -43,7 +43,8 @@ func NewTalkSessionAccessControl(
 
 var (
 	// 制限が満たされていない場合のエラーメッセージ
-	ErrRestrictionNotSatisfied = messages.APIError{
+	// 共有のエラー。文言は書き換えず WithMessage で複製して返す
+	ErrRestrictionNotSatisfied = &messages.APIError{
 		Code:       "restriction_not_satisfied",
 		StatusCode: 400,
 		Message:    "参加条件が満たされていません",
@@ -83,9 +84,7 @@ func (t *talkSessionAccessControl) CanUserJoin(ctx context.Context, talkSessionI
 
 	// 未認証ユーザーは制限付きセッションには参加できない（user/userID 参照前のガード）
 	if userID == nil && len(talkSession.Restrictions()) > 0 {
-		e := ErrRestrictionNotSatisfied
-		e.Message = "このセッションは認証が必要です。"
-		return false, &e
+		return false, ErrRestrictionNotSatisfied.WithMessage("このセッションは認証が必要です。")
 	}
 
 	// 参加制限がある場合は、ユーザーが参加可能かを判定し、もし参加制限に引っかかる場合はエラーを返す
@@ -114,9 +113,7 @@ func (t *talkSessionAccessControl) CanUserJoin(ctx context.Context, talkSessionI
 			restrictionKeys = append(restrictionKeys, string(restriction.Key))
 		}
 
-		e := ErrRestrictionNotSatisfied
-		e.Message = "このセッションでは、" + strings.Join(restrictionKeys, ",") + "が必要です。"
-		return false, &e
+		return false, ErrRestrictionNotSatisfied.WithMessage("このセッションでは、" + strings.Join(restrictionKeys, ",") + "が必要です。")
 	}
 
 	// 同意ししていなければ参加できない
@@ -127,9 +124,7 @@ func (t *talkSessionAccessControl) CanUserJoin(ctx context.Context, talkSessionI
 	}
 
 	if !consent {
-		e := ErrRestrictionNotSatisfied
-		e.Message = "このセッションでは、参加するために同意が必要です。"
-		return false, &e
+		return false, ErrRestrictionNotSatisfied.WithMessage("このセッションでは、参加するために同意が必要です。")
 	}
 
 	return true, nil

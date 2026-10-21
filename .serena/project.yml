@@ -20,8 +20,6 @@ ignored_paths:
   - "internal/infrastructure/external/analysis/client.gen.go"
   - "internal/infrastructure/persistence/sqlc/generated/"
   - "static/admin-ui/assets/"
-  - "admin-ui/dist/"
-  - "admin-ui/node_modules/"
   - "tsp/node_modules/"
   - "tsp-output/"
   # ログファイル
@@ -35,7 +33,6 @@ ignored_paths:
   # 静的アセット
   - "static/oas/"
   # ロックファイル
-  - "admin-ui/bun.lockb"
 
 # whether the project is in read-only mode
 # If set to true, all editing tools will be disabled and attempts to use them will result in an error

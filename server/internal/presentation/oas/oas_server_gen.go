@@ -374,6 +374,7 @@ type OpinionHandler interface {
 	//
 	// ParentOpinionIDがなければルートの意見として投稿される
 	// parentOpinionIDがない場合はtalkSessionIDが必須
+	//
 	// セッション管理者はisSeedをtrueにするとシード意見として投稿できる.
 	//
 	// POST /opinions
@@ -443,10 +444,11 @@ type OrganizationHandler interface {
 	// InviteOrganization implements inviteOrganization operation.
 	//
 	// Role
-	// - 10: SuperAdmin
-	// - 20: Owner
-	// - 30: Admin
-	// - 40: Member.
+	//
+	//  - 10: SuperAdmin
+	//  - 20: Owner
+	//  - 30: Admin
+	//  - 40: Member
 	//
 	// POST /organizations/invite
 	InviteOrganization(ctx context.Context, req *InviteOrganizationReq) (InviteOrganizationRes, error)
@@ -464,8 +466,7 @@ type OrganizationHandler interface {
 	SwitchOrganization(ctx context.Context, params SwitchOrganizationParams) (SwitchOrganizationRes, error)
 	// UpdateOrganization implements updateOrganization operation.
 	//
-	// 組織を更新できる。
-	// 組織のAdmin以上のユーザーが実行可能。.
+	// 組織を更新できる。 組織のAdmin以上のユーザーが実行可能。.
 	//
 	// PUT /organizations/{code}
 	UpdateOrganization(ctx context.Context, req *UpdateOrganizationReq, params UpdateOrganizationParams) (UpdateOrganizationRes, error)
@@ -598,14 +599,18 @@ type TalkSessionHandler interface {
 	HasConsent(ctx context.Context, params HasConsentParams) (HasConsentRes, error)
 	// InitiateTalkSession implements initiateTalkSession operation.
 	//
-	// ## サムネイル画像について
-	// - `Description中に出てくる画像で一番最初のものを使用`。
-	// - 画像自体は`POST /images`でサーバにポストしたものを使用してください。
-	// ## 投稿制限のキーについて
-	// restrictionsに値を入れると一定のデモグラ情報を登録していない限り、セッションへの投稿が制限されるようにできる。
-	// restrictionsには [GET /talksessions/restrictions](https://app.apidog.
-	// com/link/project/674502/apis/api-14271260)
+	// # サムネイル画像について
+	//
+	//  - `Description中に出てくる画像で一番最初のものを使用`。
+	//  - 画像自体は`POST /images`でサーバにポストしたものを使用してください。
+	//
+	// # 投稿制限のキーについて
+	//
+	// Restrictionsに値を入れると一定のデモグラ情報を登録していない限り、セッションへの投稿が制限されるようにできる。
+	// restrictionsには [GET /talksessions/restrictions]
 	// より取れるkeyをカンマ区切りで入力してください。.
+	//
+	// [GET /talksessions/restrictions]: https://app.apidog.com/link/project/674502/apis/api-14271260
 	//
 	// POST /talksessions
 	InitiateTalkSession(ctx context.Context, req *InitiateTalkSessionReq) (InitiateTalkSessionRes, error)
@@ -631,8 +636,8 @@ type TalkSessionHandler interface {
 	PostConclusion(ctx context.Context, req *PostConclusionReq, params PostConclusionParams) (PostConclusionRes, error)
 	// SubmitTalkSessionSurvey implements submitTalkSessionSurvey operation.
 	//
-	// アンケートに回答を送信（1 ユーザー 1 送信、修正不可）。
-	// 成功すると survey.answered restriction が自動的に満たされた状態になる。.
+	// アンケートに回答を送信（1 ユーザー 1 送信、修正不可）。 成功すると
+	// survey.answered restriction が自動的に満たされた状態になる。.
 	//
 	// POST /talksessions/{talkSessionID}/survey/submissions
 	SubmitTalkSessionSurvey(ctx context.Context, req *SubmitTalkSessionSurveyReq, params SubmitTalkSessionSurveyParams) (SubmitTalkSessionSurveyRes, error)
@@ -645,6 +650,7 @@ type TalkSessionHandler interface {
 	// ToggleTalkSessionAnalysis implements toggleTalkSessionAnalysis operation.
 	//
 	// 分析の有効/無効をトグルする
+	//
 	// 分析を有効にすると（disableAnalysis: true →
 	// false）、自動的に分析処理が開始されます。.
 	//
@@ -652,9 +658,9 @@ type TalkSessionHandler interface {
 	ToggleTalkSessionAnalysis(ctx context.Context, params ToggleTalkSessionAnalysisParams) (ToggleTalkSessionAnalysisRes, error)
 	// UpdateTalkSessionSurvey implements updateTalkSessionSurvey operation.
 	//
-	// アンケートを編集（オーナーのみ）。
-	// 既に回答がある質問・選択肢は soft delete 経由でのみ非表示化可能。
-	// questionID / choiceID 指定で既存項目を編集、省略で新規追加。.
+	// アンケートを編集（オーナーのみ）。 既に回答がある質問・選択肢は soft
+	// delete 経由でのみ非表示化可能。 questionID / choiceID
+	// 指定で既存項目を編集、省略で新規追加。.
 	//
 	// PUT /talksessions/{talkSessionID}/survey
 	UpdateTalkSessionSurvey(ctx context.Context, req *UpdateTalkSessionSurveyReq, params UpdateTalkSessionSurveyParams) (UpdateTalkSessionSurveyRes, error)

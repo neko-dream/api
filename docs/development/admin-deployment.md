@@ -1,6 +1,6 @@
 # 管理画面のデプロイ
 
-現段階ではRefineをAPIの `/admin/` から配信する。CIは `admin/` をビルドしてから `server/` のGoバイナリへ埋め込む。旧 `admin-ui/` はビルドしない。S3 + CloudFrontへの配信分離は未実装。
+現段階ではRefineをAPIの `/admin/` から配信する。CIは `admin/` をビルドしてから `server/` のGoバイナリへ埋め込む（出力先は `server/static/admin-ui/`）。旧 `admin-ui/` パッケージは削除済み。S3 + CloudFrontへの配信分離は未実装。
 
 ## 環境設定
 

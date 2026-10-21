@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/go-faster/errors"
-
 	"github.com/ogen-go/ogen/ogenerrors"
 )
 
@@ -38,6 +37,7 @@ func findAuthorization(h http.Header, prefix string) (string, bool) {
 	return "", false
 }
 
+// operationRolesAdminCookieAuth is a private map storing roles per operation.
 var operationRolesAdminCookieAuth = map[string][]string{
 	CreateAdminUserOperation:              []string{},
 	CreateUserManageOperation:             []string{},
@@ -58,29 +58,28 @@ var operationRolesAdminCookieAuth = map[string][]string{
 	ToggleReportVisibilityManageOperation: []string{},
 }
 
-func (s *Server) securityAdminCookieAuth(ctx context.Context, operationName OperationName, req *http.Request) (context.Context, bool, error) {
-	var t AdminCookieAuth
-	const parameterName = "AdminSessionId"
-	var value string
-	switch cookie, err := req.Cookie(parameterName); {
-	case err == nil: // if NO error
-		value = cookie.Value
-	case errors.Is(err, http.ErrNoCookie):
-		return ctx, false, nil
-	default:
-		return nil, false, errors.Wrap(err, "get cookie value")
+// GetRolesForAdminCookieAuth returns the required roles for the given operation.
+//
+// This is useful for authorization scenarios where you need to know which roles
+// are required for an operation.
+//
+// Example:
+//
+//	requiredRoles := GetRolesForAdminCookieAuth(AddPetOperation)
+//
+// Returns nil if the operation has no role requirements or if the operation is unknown.
+func GetRolesForAdminCookieAuth(operation string) []string {
+	roles, ok := operationRolesAdminCookieAuth[operation]
+	if !ok {
+		return nil
 	}
-	t.APIKey = value
-	t.Roles = operationRolesAdminCookieAuth[operationName]
-	rctx, err := s.sec.HandleAdminCookieAuth(ctx, operationName, t)
-	if errors.Is(err, ogenerrors.ErrSkipServerSecurity) {
-		return nil, false, nil
-	} else if err != nil {
-		return nil, false, err
-	}
-	return rctx, true, err
+	// Return a copy to prevent external modification
+	result := make([]string, len(roles))
+	copy(result, roles)
+	return result
 }
 
+// operationRolesCookieAuth is a private map storing roles per operation.
 var operationRolesCookieAuth = map[string][]string{
 	ApplyFeedbackToReportOperation:            []string{},
 	AuthAccountDetachOperation:                []string{},
@@ -137,6 +136,50 @@ var operationRolesCookieAuth = map[string][]string{
 	UpdateUserProfileOperation:                []string{},
 	Vote2Operation:                            []string{},
 	WithdrawUserOperation:                     []string{},
+}
+
+// GetRolesForCookieAuth returns the required roles for the given operation.
+//
+// This is useful for authorization scenarios where you need to know which roles
+// are required for an operation.
+//
+// Example:
+//
+//	requiredRoles := GetRolesForCookieAuth(AddPetOperation)
+//
+// Returns nil if the operation has no role requirements or if the operation is unknown.
+func GetRolesForCookieAuth(operation string) []string {
+	roles, ok := operationRolesCookieAuth[operation]
+	if !ok {
+		return nil
+	}
+	// Return a copy to prevent external modification
+	result := make([]string, len(roles))
+	copy(result, roles)
+	return result
+}
+
+func (s *Server) securityAdminCookieAuth(ctx context.Context, operationName OperationName, req *http.Request) (context.Context, bool, error) {
+	var t AdminCookieAuth
+	const parameterName = "AdminSessionId"
+	var value string
+	switch cookie, err := req.Cookie(parameterName); {
+	case err == nil: // if NO error
+		value = cookie.Value
+	case errors.Is(err, http.ErrNoCookie):
+		return ctx, false, nil
+	default:
+		return nil, false, errors.Wrap(err, "get cookie value")
+	}
+	t.APIKey = value
+	t.Roles = operationRolesAdminCookieAuth[operationName]
+	rctx, err := s.sec.HandleAdminCookieAuth(ctx, operationName, t)
+	if errors.Is(err, ogenerrors.ErrSkipServerSecurity) {
+		return nil, false, nil
+	} else if err != nil {
+		return nil, false, err
+	}
+	return rctx, true, err
 }
 
 func (s *Server) securityCookieAuth(ctx context.Context, operationName OperationName, req *http.Request) (context.Context, bool, error) {

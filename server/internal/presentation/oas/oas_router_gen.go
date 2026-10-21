@@ -10,6 +10,122 @@ import (
 	"github.com/ogen-go/ogen/uri"
 )
 
+var (
+	rn100AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn101AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn114AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn99AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn128AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn102AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn43AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn45AllowedHeaders = map[string]string{
+		"PUT": "Content-Type",
+	}
+	rn110AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn103AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn106AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn115AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn129AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn36AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn18AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn89AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn90AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn123AllowedHeaders = map[string]string{
+		"PUT": "Content-Type",
+	}
+	rn59AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn7AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn61AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn15AllowedHeaders = map[string]string{
+		"PUT": "Content-Type",
+	}
+	rn41AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn91AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn20AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+		"PUT":  "Content-Type",
+	}
+	rn93AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn104AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn35AllowedHeaders = map[string]string{
+		"PUT": "Content-Type",
+	}
+	rn30AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn37AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+		"PUT":  "Content-Type",
+	}
+	rn17AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn1AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn33AllowedHeaders = map[string]string{
+		"PUT": "Content-Type",
+	}
+	rn95AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn39AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn22AllowedHeaders = map[string]string{
+		"POST": "Content-Type",
+	}
+	rn113AllowedHeaders = map[string]string{
+		"PUT": "Content-Type",
+	}
+)
+
 func (s *Server) cutPrefix(path string) (string, bool) {
 	prefix := s.cfg.Prefix
 	if prefix == "" {
@@ -99,7 +215,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "DELETE":
 								s.handleAuthAccountDetachRequest([0]string{}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "DELETE")
+								s.notAllowed(w, r, notAllowedParams{
+									allowedMethods: "DELETE",
+									allowedHeaders: nil,
+									acceptPost:     "",
+									acceptPatch:    "",
+								})
 							}
 
 							return
@@ -119,7 +240,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "GET":
 								s.handleDevAuthorizeRequest([0]string{}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "GET")
+								s.notAllowed(w, r, notAllowedParams{
+									allowedMethods: "GET",
+									allowedHeaders: nil,
+									acceptPost:     "",
+									acceptPatch:    "",
+								})
 							}
 
 							return
@@ -142,7 +268,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						case "POST":
 							s.handleGuestLoginRequest([0]string{}, elemIsEscaped, w, r)
 						default:
-							s.notAllowed(w, r, "POST")
+							s.notAllowed(w, r, notAllowedParams{
+								allowedMethods: "POST",
+								allowedHeaders: nil,
+								acceptPost:     "",
+								acceptPatch:    "",
+							})
 						}
 
 						return
@@ -175,7 +306,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "PUT":
 								s.handleChangePasswordRequest([0]string{}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "PUT")
+								s.notAllowed(w, r, notAllowedParams{
+									allowedMethods: "PUT",
+									allowedHeaders: nil,
+									acceptPost:     "",
+									acceptPatch:    "",
+								})
 							}
 
 							return
@@ -195,7 +331,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "POST":
 								s.handlePasswordLoginRequest([0]string{}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "POST")
+								s.notAllowed(w, r, notAllowedParams{
+									allowedMethods: "POST",
+									allowedHeaders: rn100AllowedHeaders,
+									acceptPost:     "multipart/form-data",
+									acceptPatch:    "",
+								})
 							}
 
 							return
@@ -215,7 +356,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "GET":
 								s.handleGetPasswordPolicyRequest([0]string{}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "GET")
+								s.notAllowed(w, r, notAllowedParams{
+									allowedMethods: "GET",
+									allowedHeaders: nil,
+									acceptPost:     "",
+									acceptPatch:    "",
+								})
 							}
 
 							return
@@ -235,7 +381,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "POST":
 								s.handlePasswordRegisterRequest([0]string{}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "POST")
+								s.notAllowed(w, r, notAllowedParams{
+									allowedMethods: "POST",
+									allowedHeaders: rn101AllowedHeaders,
+									acceptPost:     "multipart/form-data",
+									acceptPatch:    "",
+								})
 							}
 
 							return
@@ -255,7 +406,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "POST":
 								s.handleSetupPasswordRequest([0]string{}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "POST")
+								s.notAllowed(w, r, notAllowedParams{
+									allowedMethods: "POST",
+									allowedHeaders: rn114AllowedHeaders,
+									acceptPost:     "application/json",
+									acceptPatch:    "",
+								})
 							}
 
 							return
@@ -276,7 +432,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "POST":
 								s.handleVerifyPasswordEmailRequest([0]string{}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "GET,POST")
+								s.notAllowed(w, r, notAllowedParams{
+									allowedMethods: "GET,POST",
+									allowedHeaders: rn99AllowedHeaders,
+									acceptPost:     "application/json",
+									acceptPatch:    "",
+								})
 							}
 
 							return
@@ -296,7 +457,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								case "POST":
 									s.handleVerifyPasswordEmailPINRequest([0]string{}, elemIsEscaped, w, r)
 								default:
-									s.notAllowed(w, r, "POST")
+									s.notAllowed(w, r, notAllowedParams{
+										allowedMethods: "POST",
+										allowedHeaders: rn128AllowedHeaders,
+										acceptPost:     "application/json",
+										acceptPatch:    "",
+									})
 								}
 
 								return
@@ -333,7 +499,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "POST":
 								s.handleReactivateUserRequest([0]string{}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "POST")
+								s.notAllowed(w, r, notAllowedParams{
+									allowedMethods: "POST",
+									allowedHeaders: nil,
+									acceptPost:     "",
+									acceptPatch:    "",
+								})
 							}
 
 							return
@@ -353,7 +524,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "POST":
 								s.handleRevokeTokenRequest([0]string{}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "POST")
+								s.notAllowed(w, r, notAllowedParams{
+									allowedMethods: "POST",
+									allowedHeaders: nil,
+									acceptPost:     "",
+									acceptPatch:    "",
+								})
 							}
 
 							return
@@ -376,7 +552,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						case "GET":
 							s.handleGetTokenInfoRequest([0]string{}, elemIsEscaped, w, r)
 						default:
-							s.notAllowed(w, r, "GET")
+							s.notAllowed(w, r, notAllowedParams{
+								allowedMethods: "GET",
+								allowedHeaders: nil,
+								acceptPost:     "",
+								acceptPatch:    "",
+							})
 						}
 
 						return
@@ -425,7 +606,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									args[0],
 								}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "GET")
+								s.notAllowed(w, r, notAllowedParams{
+									allowedMethods: "GET",
+									allowedHeaders: nil,
+									acceptPost:     "",
+									acceptPatch:    "",
+								})
 							}
 
 							return
@@ -447,7 +633,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									args[0],
 								}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "GET")
+								s.notAllowed(w, r, notAllowedParams{
+									allowedMethods: "GET",
+									allowedHeaders: nil,
+									acceptPost:     "",
+									acceptPatch:    "",
+								})
 							}
 
 							return
@@ -471,7 +662,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					case "GET":
 						s.handleHealthRequest([0]string{}, elemIsEscaped, w, r)
 					default:
-						s.notAllowed(w, r, "GET")
+						s.notAllowed(w, r, notAllowedParams{
+							allowedMethods: "GET",
+							allowedHeaders: nil,
+							acceptPost:     "",
+							acceptPatch:    "",
+						})
 					}
 
 					return
@@ -491,7 +687,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					case "POST":
 						s.handlePostImageRequest([0]string{}, elemIsEscaped, w, r)
 					default:
-						s.notAllowed(w, r, "POST")
+						s.notAllowed(w, r, notAllowedParams{
+							allowedMethods: "POST",
+							allowedHeaders: rn102AllowedHeaders,
+							acceptPost:     "multipart/form-data",
+							acceptPatch:    "",
+						})
 					}
 
 					return
@@ -524,7 +725,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						case "POST":
 							s.handleRegisterDeviceRequest([0]string{}, elemIsEscaped, w, r)
 						default:
-							s.notAllowed(w, r, "GET,POST")
+							s.notAllowed(w, r, notAllowedParams{
+								allowedMethods: "GET,POST",
+								allowedHeaders: rn43AllowedHeaders,
+								acceptPost:     "multipart/form-data",
+								acceptPatch:    "",
+							})
 						}
 
 						return
@@ -556,7 +762,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								case "GET":
 									s.handleCheckDeviceExistsRequest([0]string{}, elemIsEscaped, w, r)
 								default:
-									s.notAllowed(w, r, "GET")
+									s.notAllowed(w, r, notAllowedParams{
+										allowedMethods: "GET",
+										allowedHeaders: nil,
+										acceptPost:     "",
+										acceptPatch:    "",
+									})
 								}
 
 								return
@@ -581,7 +792,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									args[0],
 								}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "DELETE")
+								s.notAllowed(w, r, notAllowedParams{
+									allowedMethods: "DELETE",
+									allowedHeaders: nil,
+									acceptPost:     "",
+									acceptPatch:    "",
+								})
 							}
 
 							return
@@ -605,7 +821,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						case "PUT":
 							s.handleUpdateNotificationPreferencesRequest([0]string{}, elemIsEscaped, w, r)
 						default:
-							s.notAllowed(w, r, "GET,PUT")
+							s.notAllowed(w, r, notAllowedParams{
+								allowedMethods: "GET,PUT",
+								allowedHeaders: rn45AllowedHeaders,
+								acceptPost:     "",
+								acceptPatch:    "",
+							})
 						}
 
 						return
@@ -625,7 +846,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						case "POST":
 							s.handleSendTestNotificationRequest([0]string{}, elemIsEscaped, w, r)
 						default:
-							s.notAllowed(w, r, "POST")
+							s.notAllowed(w, r, notAllowedParams{
+								allowedMethods: "POST",
+								allowedHeaders: rn110AllowedHeaders,
+								acceptPost:     "multipart/form-data",
+								acceptPatch:    "",
+							})
 						}
 
 						return
@@ -645,7 +871,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						case "GET":
 							s.handleGetVapidKeyRequest([0]string{}, elemIsEscaped, w, r)
 						default:
-							s.notAllowed(w, r, "GET")
+							s.notAllowed(w, r, notAllowedParams{
+								allowedMethods: "GET",
+								allowedHeaders: nil,
+								acceptPost:     "",
+								acceptPatch:    "",
+							})
 						}
 
 						return
@@ -678,7 +909,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						case "POST":
 							s.handlePostOpinionPost2Request([0]string{}, elemIsEscaped, w, r)
 						default:
-							s.notAllowed(w, r, "POST")
+							s.notAllowed(w, r, notAllowedParams{
+								allowedMethods: "POST",
+								allowedHeaders: rn103AllowedHeaders,
+								acceptPost:     "multipart/form-data",
+								acceptPatch:    "",
+							})
 						}
 
 						return
@@ -710,7 +946,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								case "GET":
 									s.handleOpinionsHistoryRequest([0]string{}, elemIsEscaped, w, r)
 								default:
-									s.notAllowed(w, r, "GET")
+									s.notAllowed(w, r, notAllowedParams{
+										allowedMethods: "GET",
+										allowedHeaders: nil,
+										acceptPost:     "",
+										acceptPatch:    "",
+									})
 								}
 
 								return
@@ -731,7 +972,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								case "GET":
 									s.handleGetOpinionReportReasonsRequest([0]string{}, elemIsEscaped, w, r)
 								default:
-									s.notAllowed(w, r, "GET")
+									s.notAllowed(w, r, notAllowedParams{
+										allowedMethods: "GET",
+										allowedHeaders: nil,
+										acceptPost:     "",
+										acceptPatch:    "",
+									})
 								}
 
 								return
@@ -755,7 +1001,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									args[0],
 								}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "GET")
+								s.notAllowed(w, r, notAllowedParams{
+									allowedMethods: "GET",
+									allowedHeaders: nil,
+									acceptPost:     "",
+									acceptPatch:    "",
+								})
 							}
 
 							return
@@ -789,7 +1040,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 											args[0],
 										}, elemIsEscaped, w, r)
 									default:
-										s.notAllowed(w, r, "GET")
+										s.notAllowed(w, r, notAllowedParams{
+											allowedMethods: "GET",
+											allowedHeaders: nil,
+											acceptPost:     "",
+											acceptPatch:    "",
+										})
 									}
 
 									return
@@ -823,7 +1079,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 												args[0],
 											}, elemIsEscaped, w, r)
 										default:
-											s.notAllowed(w, r, "GET")
+											s.notAllowed(w, r, notAllowedParams{
+												allowedMethods: "GET",
+												allowedHeaders: nil,
+												acceptPost:     "",
+												acceptPatch:    "",
+											})
 										}
 
 										return
@@ -844,7 +1105,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 												args[0],
 											}, elemIsEscaped, w, r)
 										default:
-											s.notAllowed(w, r, "POST")
+											s.notAllowed(w, r, notAllowedParams{
+												allowedMethods: "POST",
+												allowedHeaders: rn106AllowedHeaders,
+												acceptPost:     "multipart/form-data",
+												acceptPatch:    "",
+											})
 										}
 
 										return
@@ -865,7 +1131,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 													args[0],
 												}, elemIsEscaped, w, r)
 											default:
-												s.notAllowed(w, r, "GET")
+												s.notAllowed(w, r, notAllowedParams{
+													allowedMethods: "GET",
+													allowedHeaders: nil,
+													acceptPost:     "",
+													acceptPatch:    "",
+												})
 											}
 
 											return
@@ -887,7 +1158,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 														args[0],
 													}, elemIsEscaped, w, r)
 												default:
-													s.notAllowed(w, r, "POST")
+													s.notAllowed(w, r, notAllowedParams{
+														allowedMethods: "POST",
+														allowedHeaders: rn115AllowedHeaders,
+														acceptPost:     "multipart/form-data",
+														acceptPatch:    "",
+													})
 												}
 
 												return
@@ -915,7 +1191,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 											args[0],
 										}, elemIsEscaped, w, r)
 									default:
-										s.notAllowed(w, r, "POST")
+										s.notAllowed(w, r, notAllowedParams{
+											allowedMethods: "POST",
+											allowedHeaders: rn129AllowedHeaders,
+											acceptPost:     "multipart/form-data",
+											acceptPatch:    "",
+										})
 									}
 
 									return
@@ -976,7 +1257,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										args[0],
 									}, elemIsEscaped, w, r)
 								default:
-									s.notAllowed(w, r, "GET")
+									s.notAllowed(w, r, notAllowedParams{
+										allowedMethods: "GET",
+										allowedHeaders: nil,
+										acceptPost:     "",
+										acceptPatch:    "",
+									})
 								}
 
 								return
@@ -999,7 +1285,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "POST":
 								s.handleEstablishOrganizationRequest([0]string{}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "GET,POST")
+								s.notAllowed(w, r, notAllowedParams{
+									allowedMethods: "GET,POST",
+									allowedHeaders: rn36AllowedHeaders,
+									acceptPost:     "multipart/form-data",
+									acceptPatch:    "",
+								})
 							}
 
 							return
@@ -1032,7 +1323,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									case "POST":
 										s.handleCreateOrganizationAliasRequest([0]string{}, elemIsEscaped, w, r)
 									default:
-										s.notAllowed(w, r, "GET,POST")
+										s.notAllowed(w, r, notAllowedParams{
+											allowedMethods: "GET,POST",
+											allowedHeaders: rn18AllowedHeaders,
+											acceptPost:     "multipart/form-data",
+											acceptPatch:    "",
+										})
 									}
 
 									return
@@ -1063,7 +1359,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 												args[0],
 											}, elemIsEscaped, w, r)
 										default:
-											s.notAllowed(w, r, "DELETE")
+											s.notAllowed(w, r, notAllowedParams{
+												allowedMethods: "DELETE",
+												allowedHeaders: nil,
+												acceptPost:     "",
+												acceptPatch:    "",
+											})
 										}
 
 										return
@@ -1085,7 +1386,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									case "POST":
 										s.handleInviteOrganizationRequest([0]string{}, elemIsEscaped, w, r)
 									default:
-										s.notAllowed(w, r, "POST")
+										s.notAllowed(w, r, notAllowedParams{
+											allowedMethods: "POST",
+											allowedHeaders: rn89AllowedHeaders,
+											acceptPost:     "multipart/form-data",
+											acceptPatch:    "",
+										})
 									}
 
 									return
@@ -1105,7 +1411,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										case "POST":
 											s.handleInviteOrganizationForUserRequest([0]string{}, elemIsEscaped, w, r)
 										default:
-											s.notAllowed(w, r, "POST")
+											s.notAllowed(w, r, notAllowedParams{
+												allowedMethods: "POST",
+												allowedHeaders: rn90AllowedHeaders,
+												acceptPost:     "multipart/form-data",
+												acceptPatch:    "",
+											})
 										}
 
 										return
@@ -1139,7 +1450,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 											args[0],
 										}, elemIsEscaped, w, r)
 									default:
-										s.notAllowed(w, r, "POST")
+										s.notAllowed(w, r, notAllowedParams{
+											allowedMethods: "POST",
+											allowedHeaders: nil,
+											acceptPost:     "",
+											acceptPatch:    "",
+										})
 									}
 
 									return
@@ -1160,7 +1476,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									case "GET":
 										s.handleGetOrganizationUsersRequest([0]string{}, elemIsEscaped, w, r)
 									default:
-										s.notAllowed(w, r, "GET")
+										s.notAllowed(w, r, notAllowedParams{
+											allowedMethods: "GET",
+											allowedHeaders: nil,
+											acceptPost:     "",
+											acceptPatch:    "",
+										})
 									}
 
 									return
@@ -1185,7 +1506,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										args[0],
 									}, elemIsEscaped, w, r)
 								default:
-									s.notAllowed(w, r, "PUT")
+									s.notAllowed(w, r, notAllowedParams{
+										allowedMethods: "PUT",
+										allowedHeaders: rn123AllowedHeaders,
+										acceptPost:     "",
+										acceptPatch:    "",
+									})
 								}
 
 								return
@@ -1213,7 +1539,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					case "POST":
 						s.handlePolicyConsentRequest([0]string{}, elemIsEscaped, w, r)
 					default:
-						s.notAllowed(w, r, "GET,POST")
+						s.notAllowed(w, r, notAllowedParams{
+							allowedMethods: "GET,POST",
+							allowedHeaders: rn59AllowedHeaders,
+							acceptPost:     "multipart/form-data",
+							acceptPatch:    "",
+						})
 					}
 
 					return
@@ -1233,7 +1564,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					case "POST":
 						s.handleApplyFeedbackToReportRequest([0]string{}, elemIsEscaped, w, r)
 					default:
-						s.notAllowed(w, r, "POST")
+						s.notAllowed(w, r, notAllowedParams{
+							allowedMethods: "POST",
+							allowedHeaders: rn7AllowedHeaders,
+							acceptPost:     "multipart/form-data",
+							acceptPatch:    "",
+						})
 					}
 
 					return
@@ -1266,7 +1602,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						case "POST":
 							s.handleInitiateTalkSessionRequest([0]string{}, elemIsEscaped, w, r)
 						default:
-							s.notAllowed(w, r, "GET,POST")
+							s.notAllowed(w, r, notAllowedParams{
+								allowedMethods: "GET,POST",
+								allowedHeaders: rn61AllowedHeaders,
+								acceptPost:     "multipart/form-data",
+								acceptPatch:    "",
+							})
 						}
 
 						return
@@ -1298,7 +1639,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								case "GET":
 									s.handleSessionsHistoryRequest([0]string{}, elemIsEscaped, w, r)
 								default:
-									s.notAllowed(w, r, "GET")
+									s.notAllowed(w, r, notAllowedParams{
+										allowedMethods: "GET",
+										allowedHeaders: nil,
+										acceptPost:     "",
+										acceptPatch:    "",
+									})
 								}
 
 								return
@@ -1319,7 +1665,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								case "GET":
 									s.handleGetOpenedTalkSessionRequest([0]string{}, elemIsEscaped, w, r)
 								default:
-									s.notAllowed(w, r, "GET")
+									s.notAllowed(w, r, notAllowedParams{
+										allowedMethods: "GET",
+										allowedHeaders: nil,
+										acceptPost:     "",
+										acceptPatch:    "",
+									})
 								}
 
 								return
@@ -1340,7 +1691,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								case "GET":
 									s.handleGetTalkSessionRestrictionKeysRequest([0]string{}, elemIsEscaped, w, r)
 								default:
-									s.notAllowed(w, r, "GET")
+									s.notAllowed(w, r, notAllowedParams{
+										allowedMethods: "GET",
+										allowedHeaders: nil,
+										acceptPost:     "",
+										acceptPatch:    "",
+									})
 								}
 
 								return
@@ -1368,7 +1724,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									args[0],
 								}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "GET,PUT")
+								s.notAllowed(w, r, notAllowedParams{
+									allowedMethods: "GET,PUT",
+									allowedHeaders: rn15AllowedHeaders,
+									acceptPost:     "",
+									acceptPatch:    "",
+								})
 							}
 
 							return
@@ -1401,7 +1762,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 											args[0],
 										}, elemIsEscaped, w, r)
 									default:
-										s.notAllowed(w, r, "GET")
+										s.notAllowed(w, r, notAllowedParams{
+											allowedMethods: "GET",
+											allowedHeaders: nil,
+											acceptPost:     "",
+											acceptPatch:    "",
+										})
 									}
 
 									return
@@ -1423,7 +1789,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 												args[0],
 											}, elemIsEscaped, w, r)
 										default:
-											s.notAllowed(w, r, "PUT")
+											s.notAllowed(w, r, notAllowedParams{
+												allowedMethods: "PUT",
+												allowedHeaders: nil,
+												acceptPost:     "",
+												acceptPatch:    "",
+											})
 										}
 
 										return
@@ -1463,7 +1834,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 												args[0],
 											}, elemIsEscaped, w, r)
 										default:
-											s.notAllowed(w, r, "GET,POST")
+											s.notAllowed(w, r, notAllowedParams{
+												allowedMethods: "GET,POST",
+												allowedHeaders: rn41AllowedHeaders,
+												acceptPost:     "multipart/form-data",
+												acceptPatch:    "",
+											})
 										}
 
 										return
@@ -1489,7 +1865,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 												args[0],
 											}, elemIsEscaped, w, r)
 										default:
-											s.notAllowed(w, r, "GET,POST")
+											s.notAllowed(w, r, notAllowedParams{
+												allowedMethods: "GET,POST",
+												allowedHeaders: nil,
+												acceptPost:     "",
+												acceptPatch:    "",
+											})
 										}
 
 										return
@@ -1513,7 +1894,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 											args[0],
 										}, elemIsEscaped, w, r)
 									default:
-										s.notAllowed(w, r, "POST")
+										s.notAllowed(w, r, notAllowedParams{
+											allowedMethods: "POST",
+											allowedHeaders: rn91AllowedHeaders,
+											acceptPost:     "application/json",
+											acceptPatch:    "",
+										})
 									}
 
 									return
@@ -1535,7 +1921,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 											args[0],
 										}, elemIsEscaped, w, r)
 									default:
-										s.notAllowed(w, r, "GET")
+										s.notAllowed(w, r, notAllowedParams{
+											allowedMethods: "GET",
+											allowedHeaders: nil,
+											acceptPost:     "",
+											acceptPatch:    "",
+										})
 									}
 
 									return
@@ -1568,7 +1959,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 												args[0],
 											}, elemIsEscaped, w, r)
 										default:
-											s.notAllowed(w, r, "GET")
+											s.notAllowed(w, r, notAllowedParams{
+												allowedMethods: "GET",
+												allowedHeaders: nil,
+												acceptPost:     "",
+												acceptPatch:    "",
+											})
 										}
 
 										return
@@ -1589,7 +1985,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 													args[0],
 												}, elemIsEscaped, w, r)
 											default:
-												s.notAllowed(w, r, "GET")
+												s.notAllowed(w, r, notAllowedParams{
+													allowedMethods: "GET",
+													allowedHeaders: nil,
+													acceptPost:     "",
+													acceptPatch:    "",
+												})
 											}
 
 											return
@@ -1611,7 +2012,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 														args[0],
 													}, elemIsEscaped, w, r)
 												default:
-													s.notAllowed(w, r, "GET")
+													s.notAllowed(w, r, notAllowedParams{
+														allowedMethods: "GET",
+														allowedHeaders: nil,
+														acceptPost:     "",
+														acceptPatch:    "",
+													})
 												}
 
 												return
@@ -1637,7 +2043,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 												args[0],
 											}, elemIsEscaped, w, r)
 										default:
-											s.notAllowed(w, r, "GET")
+											s.notAllowed(w, r, notAllowedParams{
+												allowedMethods: "GET",
+												allowedHeaders: nil,
+												acceptPost:     "",
+												acceptPatch:    "",
+											})
 										}
 
 										return
@@ -1680,7 +2091,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 												args[0],
 											}, elemIsEscaped, w, r)
 										default:
-											s.notAllowed(w, r, "GET,POST,PUT")
+											s.notAllowed(w, r, notAllowedParams{
+												allowedMethods: "GET,POST,PUT",
+												allowedHeaders: rn20AllowedHeaders,
+												acceptPost:     "application/json",
+												acceptPatch:    "",
+											})
 										}
 
 										return
@@ -1718,7 +2134,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 														args[0],
 													}, elemIsEscaped, w, r)
 												default:
-													s.notAllowed(w, r, "GET,POST")
+													s.notAllowed(w, r, notAllowedParams{
+														allowedMethods: "GET,POST",
+														allowedHeaders: rn93AllowedHeaders,
+														acceptPost:     "application/json",
+														acceptPatch:    "",
+													})
 												}
 
 												return
@@ -1740,7 +2161,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 														args[0],
 													}, elemIsEscaped, w, r)
 												default:
-													s.notAllowed(w, r, "GET")
+													s.notAllowed(w, r, notAllowedParams{
+														allowedMethods: "GET",
+														allowedHeaders: nil,
+														acceptPost:     "",
+														acceptPatch:    "",
+													})
 												}
 
 												return
@@ -1766,7 +2192,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 												args[0],
 											}, elemIsEscaped, w, r)
 										default:
-											s.notAllowed(w, r, "GET")
+											s.notAllowed(w, r, notAllowedParams{
+												allowedMethods: "GET",
+												allowedHeaders: nil,
+												acceptPost:     "",
+												acceptPatch:    "",
+											})
 										}
 
 										return
@@ -1789,7 +2220,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 											args[0],
 										}, elemIsEscaped, w, r)
 									default:
-										s.notAllowed(w, r, "POST")
+										s.notAllowed(w, r, notAllowedParams{
+											allowedMethods: "POST",
+											allowedHeaders: rn104AllowedHeaders,
+											acceptPost:     "multipart/form-data",
+											acceptPatch:    "",
+										})
 									}
 
 									return
@@ -1810,7 +2246,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 												args[0],
 											}, elemIsEscaped, w, r)
 										default:
-											s.notAllowed(w, r, "GET")
+											s.notAllowed(w, r, notAllowedParams{
+												allowedMethods: "GET",
+												allowedHeaders: nil,
+												acceptPost:     "",
+												acceptPatch:    "",
+											})
 										}
 
 										return
@@ -1842,7 +2283,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 													args[1],
 												}, elemIsEscaped, w, r)
 											default:
-												s.notAllowed(w, r, "PUT")
+												s.notAllowed(w, r, notAllowedParams{
+													allowedMethods: "PUT",
+													allowedHeaders: rn35AllowedHeaders,
+													acceptPost:     "",
+													acceptPatch:    "",
+												})
 											}
 
 											return
@@ -1871,7 +2317,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						case "GET":
 							s.handleTestRequest([0]string{}, elemIsEscaped, w, r)
 						default:
-							s.notAllowed(w, r, "GET")
+							s.notAllowed(w, r, notAllowedParams{
+								allowedMethods: "GET",
+								allowedHeaders: nil,
+								acceptPost:     "",
+								acceptPatch:    "",
+							})
 						}
 
 						return
@@ -1891,7 +2342,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "POST":
 								s.handleDummyInitRequest([0]string{}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "POST")
+								s.notAllowed(w, r, notAllowedParams{
+									allowedMethods: "POST",
+									allowedHeaders: rn30AllowedHeaders,
+									acceptPost:     "multipart/form-data",
+									acceptPatch:    "",
+								})
 							}
 
 							return
@@ -1920,7 +2376,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					case "PUT":
 						s.handleUpdateUserProfileRequest([0]string{}, elemIsEscaped, w, r)
 					default:
-						s.notAllowed(w, r, "DELETE,GET,POST,PUT")
+						s.notAllowed(w, r, notAllowedParams{
+							allowedMethods: "DELETE,GET,POST,PUT",
+							allowedHeaders: rn37AllowedHeaders,
+							acceptPost:     "multipart/form-data",
+							acceptPatch:    "",
+						})
 					}
 
 					return
@@ -1951,7 +2412,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								args[0],
 							}, elemIsEscaped, w, r)
 						default:
-							s.notAllowed(w, r, "GET")
+							s.notAllowed(w, r, notAllowedParams{
+								allowedMethods: "GET",
+								allowedHeaders: nil,
+								acceptPost:     "",
+								acceptPatch:    "",
+							})
 						}
 
 						return
@@ -1983,7 +2449,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "GET":
 								s.handleGetCurrentUserRequest([0]string{}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "GET")
+								s.notAllowed(w, r, notAllowedParams{
+									allowedMethods: "GET",
+									allowedHeaders: nil,
+									acceptPost:     "",
+									acceptPatch:    "",
+								})
 							}
 
 							return
@@ -2020,7 +2491,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									args[0],
 								}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "GET")
+								s.notAllowed(w, r, notAllowedParams{
+									allowedMethods: "GET",
+									allowedHeaders: nil,
+									acceptPost:     "",
+									acceptPatch:    "",
+								})
 							}
 
 							return
@@ -2070,7 +2546,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "POST":
 								s.handleCreateAdminUserRequest([0]string{}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "GET,POST")
+								s.notAllowed(w, r, notAllowedParams{
+									allowedMethods: "GET,POST",
+									allowedHeaders: rn17AllowedHeaders,
+									acceptPost:     "application/json",
+									acceptPatch:    "",
+								})
 							}
 
 							return
@@ -2102,7 +2583,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								case "POST":
 									s.handleAdminLoginRequest([0]string{}, elemIsEscaped, w, r)
 								default:
-									s.notAllowed(w, r, "POST")
+									s.notAllowed(w, r, notAllowedParams{
+										allowedMethods: "POST",
+										allowedHeaders: rn1AllowedHeaders,
+										acceptPost:     "application/json",
+										acceptPatch:    "",
+									})
 								}
 
 								return
@@ -2122,7 +2608,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								case "POST":
 									s.handleAdminLogoutRequest([0]string{}, elemIsEscaped, w, r)
 								default:
-									s.notAllowed(w, r, "POST")
+									s.notAllowed(w, r, notAllowedParams{
+										allowedMethods: "POST",
+										allowedHeaders: nil,
+										acceptPost:     "",
+										acceptPatch:    "",
+									})
 								}
 
 								return
@@ -2144,7 +2635,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "POST":
 								s.handleAdminRefreshRequest([0]string{}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "POST")
+								s.notAllowed(w, r, notAllowedParams{
+									allowedMethods: "POST",
+									allowedHeaders: nil,
+									acceptPost:     "",
+									acceptPatch:    "",
+								})
 							}
 
 							return
@@ -2164,7 +2660,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "GET":
 								s.handleGetAdminTokenInfoRequest([0]string{}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "GET")
+								s.notAllowed(w, r, notAllowedParams{
+									allowedMethods: "GET",
+									allowedHeaders: nil,
+									acceptPost:     "",
+									acceptPatch:    "",
+								})
 							}
 
 							return
@@ -2210,7 +2711,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								case "GET":
 									s.handleGetTalkSessionListManageRequest([0]string{}, elemIsEscaped, w, r)
 								default:
-									s.notAllowed(w, r, "GET")
+									s.notAllowed(w, r, notAllowedParams{
+										allowedMethods: "GET",
+										allowedHeaders: nil,
+										acceptPost:     "",
+										acceptPatch:    "",
+									})
 								}
 
 								return
@@ -2238,7 +2744,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									args[0],
 								}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "GET,PUT")
+								s.notAllowed(w, r, notAllowedParams{
+									allowedMethods: "GET,PUT",
+									allowedHeaders: rn33AllowedHeaders,
+									acceptPost:     "",
+									acceptPatch:    "",
+								})
 							}
 
 							return
@@ -2284,7 +2795,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 												args[0],
 											}, elemIsEscaped, w, r)
 										default:
-											s.notAllowed(w, r, "POST")
+											s.notAllowed(w, r, notAllowedParams{
+												allowedMethods: "POST",
+												allowedHeaders: rn95AllowedHeaders,
+												acceptPost:     "application/x-www-form-urlencoded",
+												acceptPatch:    "",
+											})
 										}
 
 										return
@@ -2310,7 +2826,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 												args[0],
 											}, elemIsEscaped, w, r)
 										default:
-											s.notAllowed(w, r, "GET,POST")
+											s.notAllowed(w, r, notAllowedParams{
+												allowedMethods: "GET,POST",
+												allowedHeaders: rn39AllowedHeaders,
+												acceptPost:     "application/x-www-form-urlencoded",
+												acceptPatch:    "",
+											})
 										}
 
 										return
@@ -2334,7 +2855,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 											args[0],
 										}, elemIsEscaped, w, r)
 									default:
-										s.notAllowed(w, r, "GET")
+										s.notAllowed(w, r, notAllowedParams{
+											allowedMethods: "GET",
+											allowedHeaders: nil,
+											acceptPost:     "",
+											acceptPatch:    "",
+										})
 									}
 
 									return
@@ -2357,7 +2883,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							case "POST":
 								s.handleCreateUserManageRequest([0]string{}, elemIsEscaped, w, r)
 							default:
-								s.notAllowed(w, r, "POST")
+								s.notAllowed(w, r, notAllowedParams{
+									allowedMethods: "POST",
+									allowedHeaders: rn22AllowedHeaders,
+									acceptPost:     "application/json",
+									acceptPatch:    "",
+								})
 							}
 
 							return
@@ -2389,7 +2920,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									case "GET":
 										s.handleGetUserListManageRequest([0]string{}, elemIsEscaped, w, r)
 									default:
-										s.notAllowed(w, r, "GET")
+										s.notAllowed(w, r, notAllowedParams{
+											allowedMethods: "GET",
+											allowedHeaders: nil,
+											acceptPost:     "",
+											acceptPatch:    "",
+										})
 									}
 
 									return
@@ -2422,7 +2958,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										case "GET":
 											s.handleGetUserStatsListManageRequest([0]string{}, elemIsEscaped, w, r)
 										default:
-											s.notAllowed(w, r, "GET")
+											s.notAllowed(w, r, notAllowedParams{
+												allowedMethods: "GET",
+												allowedHeaders: nil,
+												acceptPost:     "",
+												acceptPatch:    "",
+											})
 										}
 
 										return
@@ -2442,7 +2983,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										case "GET":
 											s.handleGetUserStatsTotalManageRequest([0]string{}, elemIsEscaped, w, r)
 										default:
-											s.notAllowed(w, r, "GET")
+											s.notAllowed(w, r, notAllowedParams{
+												allowedMethods: "GET",
+												allowedHeaders: nil,
+												acceptPost:     "",
+												acceptPatch:    "",
+											})
 										}
 
 										return
@@ -2468,7 +3014,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 										args[0],
 									}, elemIsEscaped, w, r)
 								default:
-									s.notAllowed(w, r, "GET")
+									s.notAllowed(w, r, notAllowedParams{
+										allowedMethods: "GET",
+										allowedHeaders: nil,
+										acceptPost:     "",
+										acceptPatch:    "",
+									})
 								}
 
 								return
@@ -2502,7 +3053,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 												args[0],
 											}, elemIsEscaped, w, r)
 										default:
-											s.notAllowed(w, r, "POST")
+											s.notAllowed(w, r, notAllowedParams{
+												allowedMethods: "POST",
+												allowedHeaders: nil,
+												acceptPost:     "",
+												acceptPatch:    "",
+											})
 										}
 
 										return
@@ -2524,7 +3080,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 												args[0],
 											}, elemIsEscaped, w, r)
 										default:
-											s.notAllowed(w, r, "PUT")
+											s.notAllowed(w, r, notAllowedParams{
+												allowedMethods: "PUT",
+												allowedHeaders: rn113AllowedHeaders,
+												acceptPost:     "",
+												acceptPatch:    "",
+											})
 										}
 
 										return
@@ -2549,12 +3110,13 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // Route is route object.
 type Route struct {
-	name        string
-	summary     string
-	operationID string
-	pathPattern string
-	count       int
-	args        [2]string
+	name           string
+	summary        string
+	operationID    string
+	operationGroup string
+	pathPattern    string
+	count          int
+	args           [2]string
 }
 
 // Name returns ogen operation name.
@@ -2572,6 +3134,11 @@ func (r Route) Summary() string {
 // OperationID returns OpenAPI operationId.
 func (r Route) OperationID() string {
 	return r.operationID
+}
+
+// OperationGroup returns the x-ogen-operation-group value.
+func (r Route) OperationGroup() string {
+	return r.operationGroup
 }
 
 // PathPattern returns OpenAPI path.
@@ -2673,6 +3240,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = AuthAccountDetachOperation
 								r.summary = "**開発用** 現在のアカウントを切り離す"
 								r.operationID = "authAccountDetach"
+								r.operationGroup = "Auth"
 								r.pathPattern = "/auth/dev/detach"
 								r.args = args
 								r.count = 0
@@ -2697,6 +3265,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = DevAuthorizeOperation
 								r.summary = "開発用登録/ログイン"
 								r.operationID = "devAuthorize"
+								r.operationGroup = "Auth"
 								r.pathPattern = "/auth/dev/login"
 								r.args = args
 								r.count = 0
@@ -2724,6 +3293,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							r.name = GuestLoginOperation
 							r.summary = "ゲストログイン"
 							r.operationID = "guestLogin"
+							r.operationGroup = "Auth"
 							r.pathPattern = "/auth/guest/login"
 							r.args = args
 							r.count = 0
@@ -2761,6 +3331,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = ChangePasswordOperation
 								r.summary = "パスワード変更"
 								r.operationID = "changePassword"
+								r.operationGroup = "Auth"
 								r.pathPattern = "/auth/password/change"
 								r.args = args
 								r.count = 0
@@ -2785,6 +3356,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = PasswordLoginOperation
 								r.summary = "パスワードを確認し、ログインごとのメール本人確認を開始する"
 								r.operationID = "passwordLogin"
+								r.operationGroup = "Auth"
 								r.pathPattern = "/auth/password/login"
 								r.args = args
 								r.count = 0
@@ -2809,6 +3381,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = GetPasswordPolicyOperation
 								r.summary = "新規設定・変更用のパスワード入力条件"
 								r.operationID = "getPasswordPolicy"
+								r.operationGroup = "Auth"
 								r.pathPattern = "/auth/password/policy"
 								r.args = args
 								r.count = 0
@@ -2833,6 +3406,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = PasswordRegisterOperation
 								r.summary = "パスワードによる登録（devのみ）"
 								r.operationID = "passwordRegister"
+								r.operationGroup = "Auth"
 								r.pathPattern = "/auth/password/register"
 								r.args = args
 								r.count = 0
@@ -2857,6 +3431,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = SetupPasswordOperation
 								r.summary = "メールから初回パスワードを設定する（ログインCookieは発行しない）"
 								r.operationID = "setupPassword"
+								r.operationGroup = "Auth"
 								r.pathPattern = "/auth/password/setup"
 								r.args = args
 								r.count = 0
@@ -2880,6 +3455,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = PasswordEmailConfirmationOperation
 								r.summary = "メール本人確認ページ（リンクはURLフラグメントに格納）"
 								r.operationID = "passwordEmailConfirmation"
+								r.operationGroup = "Auth"
 								r.pathPattern = "/auth/password/verify"
 								r.args = args
 								r.count = 0
@@ -2888,6 +3464,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = VerifyPasswordEmailOperation
 								r.summary = "メール本人確認を完了し、初めてログインCookieを発行する"
 								r.operationID = "verifyPasswordEmail"
+								r.operationGroup = "Auth"
 								r.pathPattern = "/auth/password/verify"
 								r.args = args
 								r.count = 0
@@ -2912,6 +3489,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									r.name = VerifyPasswordEmailPINOperation
 									r.summary = "メールの6桁PINで本人確認を完了する"
 									r.operationID = "verifyPasswordEmailPIN"
+									r.operationGroup = "Auth"
 									r.pathPattern = "/auth/password/verify-pin"
 									r.args = args
 									r.count = 0
@@ -2953,6 +3531,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = ReactivateUserOperation
 								r.summary = "退会ユーザーの復活"
 								r.operationID = "reactivateUser"
+								r.operationGroup = "Auth"
 								r.pathPattern = "/auth/reactivate"
 								r.args = args
 								r.count = 0
@@ -2977,6 +3556,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = RevokeTokenOperation
 								r.summary = "トークンを失効（ログアウト）"
 								r.operationID = "revokeToken"
+								r.operationGroup = "Auth"
 								r.pathPattern = "/auth/revoke"
 								r.args = args
 								r.count = 0
@@ -3004,6 +3584,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							r.name = GetTokenInfoOperation
 							r.summary = "JWTの内容を返してくれる"
 							r.operationID = "getTokenInfo"
+							r.operationGroup = "Auth"
 							r.pathPattern = "/auth/token/info"
 							r.args = args
 							r.count = 0
@@ -3055,6 +3636,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = HandleAuthCallbackOperation
 								r.summary = "Auth Callback"
 								r.operationID = "handleAuthCallback"
+								r.operationGroup = "Auth"
 								r.pathPattern = "/auth/{provider}/callback"
 								r.args = args
 								r.count = 1
@@ -3079,6 +3661,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = AuthorizeOperation
 								r.summary = "ログイン"
 								r.operationID = "authorize"
+								r.operationGroup = "Auth"
 								r.pathPattern = "/auth/{provider}/login"
 								r.args = args
 								r.count = 1
@@ -3107,6 +3690,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						r.name = HealthOperation
 						r.summary = "ヘルスチェック"
 						r.operationID = "health"
+						r.operationGroup = "Health"
 						r.pathPattern = "/health"
 						r.args = args
 						r.count = 0
@@ -3131,6 +3715,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						r.name = PostImageOperation
 						r.summary = "画像投稿"
 						r.operationID = "postImage"
+						r.operationGroup = "Image"
 						r.pathPattern = "/images"
 						r.args = args
 						r.count = 0
@@ -3166,6 +3751,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							r.name = GetDevicesOperation
 							r.summary = "デバイス一覧取得"
 							r.operationID = "getDevices"
+							r.operationGroup = "Notifications"
 							r.pathPattern = "/notifications/devices"
 							r.args = args
 							r.count = 0
@@ -3174,6 +3760,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							r.name = RegisterDeviceOperation
 							r.summary = "デバイス登録/更新"
 							r.operationID = "registerDevice"
+							r.operationGroup = "Notifications"
 							r.pathPattern = "/notifications/devices"
 							r.args = args
 							r.count = 0
@@ -3210,6 +3797,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									r.name = CheckDeviceExistsOperation
 									r.summary = "デバイストークンが登録されているか確認"
 									r.operationID = "checkDeviceExists"
+									r.operationGroup = "Notifications"
 									r.pathPattern = "/notifications/devices/exists"
 									r.args = args
 									r.count = 0
@@ -3237,6 +3825,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = DeleteDeviceOperation
 								r.summary = "デバイス削除"
 								r.operationID = "deleteDevice"
+								r.operationGroup = "Notifications"
 								r.pathPattern = "/notifications/devices/{deviceId}"
 								r.args = args
 								r.count = 1
@@ -3263,6 +3852,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							r.name = GetNotificationPreferencesOperation
 							r.summary = "通知設定取得"
 							r.operationID = "getNotificationPreferences"
+							r.operationGroup = "Notifications"
 							r.pathPattern = "/notifications/preferences"
 							r.args = args
 							r.count = 0
@@ -3271,6 +3861,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							r.name = UpdateNotificationPreferencesOperation
 							r.summary = "通知設定更新"
 							r.operationID = "updateNotificationPreferences"
+							r.operationGroup = "Notifications"
 							r.pathPattern = "/notifications/preferences"
 							r.args = args
 							r.count = 0
@@ -3295,6 +3886,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							r.name = SendTestNotificationOperation
 							r.summary = "テスト通知送信"
 							r.operationID = "sendTestNotification"
+							r.operationGroup = "Notifications"
 							r.pathPattern = "/notifications/test"
 							r.args = args
 							r.count = 0
@@ -3319,6 +3911,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							r.name = GetVapidKeyOperation
 							r.summary = "VAPID公開鍵取得"
 							r.operationID = "getVapidKey"
+							r.operationGroup = "Notifications"
 							r.pathPattern = "/notifications/vapid-key"
 							r.args = args
 							r.count = 0
@@ -3356,6 +3949,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							r.name = PostOpinionPost2Operation
 							r.summary = "セッションに対して意見投稿 or 意見に対するリプライ"
 							r.operationID = "postOpinionPost2"
+							r.operationGroup = "Opinion"
 							r.pathPattern = "/opinions"
 							r.args = args
 							r.count = 0
@@ -3392,6 +3986,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									r.name = OpinionsHistoryOperation
 									r.summary = "今までに投稿した意見"
 									r.operationID = "opinionsHistory"
+									r.operationGroup = "User"
 									r.pathPattern = "/opinions/histories"
 									r.args = args
 									r.count = 0
@@ -3417,6 +4012,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									r.name = GetOpinionReportReasonsOperation
 									r.summary = "意見への通報理由一覧"
 									r.operationID = "getOpinionReportReasons"
+									r.operationGroup = "Opinion"
 									r.pathPattern = "/opinions/report_reasons"
 									r.args = args
 									r.count = 0
@@ -3443,6 +4039,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = GetOpinionDetail2Operation
 								r.summary = "意見詳細"
 								r.operationID = "getOpinionDetail2"
+								r.operationGroup = "Opinion"
 								r.pathPattern = "/opinions/{opinionID}"
 								r.args = args
 								r.count = 1
@@ -3479,6 +4076,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										r.name = GetOpinionAnalysisOperation
 										r.summary = "意見に投票したグループごとの割合"
 										r.operationID = "getOpinionAnalysis"
+										r.operationGroup = "Opinion"
 										r.pathPattern = "/opinions/{opinionID}/analysis"
 										r.args = args
 										r.count = 1
@@ -3515,6 +4113,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = OpinionComments2Operation
 											r.summary = "意見に対するリプライ意見一覧"
 											r.operationID = "opinionComments2"
+											r.operationGroup = "Opinion"
 											r.pathPattern = "/opinions/{opinionID}/replies"
 											r.args = args
 											r.count = 1
@@ -3538,6 +4137,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = ReportOpinionOperation
 											r.summary = "意見通報API"
 											r.operationID = "reportOpinion"
+											r.operationGroup = "Opinion"
 											r.pathPattern = "/opinions/{opinionID}/report"
 											r.args = args
 											r.count = 1
@@ -3561,6 +4161,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 												r.name = GetOpinionReportsOperation
 												r.summary = "意見に対する通報取得"
 												r.operationID = "getOpinionReports"
+												r.operationGroup = "Opinion"
 												r.pathPattern = "/opinions/{opinionID}/reports"
 												r.args = args
 												r.count = 1
@@ -3585,6 +4186,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 													r.name = SolveOpinionReportOperation
 													r.summary = "通報を解決"
 													r.operationID = "solveOpinionReport"
+													r.operationGroup = "Opinion"
 													r.pathPattern = "/opinions/{opinionID}/reports/solve"
 													r.args = args
 													r.count = 1
@@ -3615,6 +4217,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										r.name = Vote2Operation
 										r.summary = "意思表明API"
 										r.operationID = "vote2"
+										r.operationGroup = "Vote"
 										r.pathPattern = "/opinions/{opinionID}/votes"
 										r.args = args
 										r.count = 1
@@ -3678,6 +4281,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									r.name = ValidateOrganizationCodeOperation
 									r.summary = "組織コード検証"
 									r.operationID = "validateOrganizationCode"
+									r.operationGroup = "Organization"
 									r.pathPattern = "/organization/{code}/validate"
 									r.args = args
 									r.count = 1
@@ -3703,6 +4307,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = GetOrganizationsOperation
 								r.summary = "所属組織一覧"
 								r.operationID = "getOrganizations"
+								r.operationGroup = "Organization"
 								r.pathPattern = "/organizations"
 								r.args = args
 								r.count = 0
@@ -3711,6 +4316,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = EstablishOrganizationOperation
 								r.summary = "組織作成（運営ユーザーのみ）"
 								r.operationID = "establishOrganization"
+								r.operationGroup = "Organization"
 								r.pathPattern = "/organizations"
 								r.args = args
 								r.count = 0
@@ -3746,6 +4352,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										r.name = GetOrganizationAliasesOperation
 										r.summary = "組織エイリアス一覧取得"
 										r.operationID = "getOrganizationAliases"
+										r.operationGroup = "Organization"
 										r.pathPattern = "/organizations/aliases"
 										r.args = args
 										r.count = 0
@@ -3754,6 +4361,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										r.name = CreateOrganizationAliasOperation
 										r.summary = "組織エイリアス作成"
 										r.operationID = "createOrganizationAlias"
+										r.operationGroup = "Organization"
 										r.pathPattern = "/organizations/aliases"
 										r.args = args
 										r.count = 0
@@ -3787,6 +4395,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = DeleteOrganizationAliasOperation
 											r.summary = "組織エイリアス削除"
 											r.operationID = "deleteOrganizationAlias"
+											r.operationGroup = "Organization"
 											r.pathPattern = "/organizations/aliases/{aliasID}"
 											r.args = args
 											r.count = 1
@@ -3813,6 +4422,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										r.name = InviteOrganizationOperation
 										r.summary = "組織ユーザー招待（運営ユーザーのみ）"
 										r.operationID = "inviteOrganization"
+										r.operationGroup = "Organization"
 										r.pathPattern = "/organizations/invite"
 										r.args = args
 										r.count = 0
@@ -3837,6 +4447,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = InviteOrganizationForUserOperation
 											r.summary = "組織にユーザーを追加"
 											r.operationID = "inviteOrganizationForUser"
+											r.operationGroup = "Organization"
 											r.pathPattern = "/organizations/invite_user"
 											r.args = args
 											r.count = 0
@@ -3873,6 +4484,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										r.name = SwitchOrganizationOperation
 										r.summary = "組織切り替え"
 										r.operationID = "switchOrganization"
+										r.operationGroup = "Organization"
 										r.pathPattern = "/organizations/switch/{code}"
 										r.args = args
 										r.count = 1
@@ -3898,6 +4510,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										r.name = GetOrganizationUsersOperation
 										r.summary = "現在の組織のユーザー一覧取得"
 										r.operationID = "getOrganizationUsers"
+										r.operationGroup = "Organization"
 										r.pathPattern = "/organizations/users"
 										r.args = args
 										r.count = 0
@@ -3925,6 +4538,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									r.name = UpdateOrganizationOperation
 									r.summary = "組織更新（組織のAdmin以上のユーザーのみ）"
 									r.operationID = "updateOrganization"
+									r.operationGroup = "Organization"
 									r.pathPattern = "/organizations/{code}"
 									r.args = args
 									r.count = 1
@@ -3955,6 +4569,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						r.name = GetPolicyConsentStatusOperation
 						r.summary = "最新のポリシーに同意したかを取得"
 						r.operationID = "getPolicyConsentStatus"
+						r.operationGroup = "Policy"
 						r.pathPattern = "/policy/consent"
 						r.args = args
 						r.count = 0
@@ -3963,6 +4578,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						r.name = PolicyConsentOperation
 						r.summary = "最新のポリシーに同意する"
 						r.operationID = "policyConsent"
+						r.operationGroup = "Policy"
 						r.pathPattern = "/policy/consent"
 						r.args = args
 						r.count = 0
@@ -3987,6 +4603,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						r.name = ApplyFeedbackToReportOperation
 						r.summary = "セッションのレポートにフィードバックを適用する"
 						r.operationID = "applyFeedbackToReport"
+						r.operationGroup = "Analysis"
 						r.pathPattern = "/report/feedback"
 						r.args = args
 						r.count = 0
@@ -4022,6 +4639,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							r.name = GetTalkSessionListOperation
 							r.summary = "セッション一覧"
 							r.operationID = "getTalkSessionList"
+							r.operationGroup = "TalkSession"
 							r.pathPattern = "/talksessions"
 							r.args = args
 							r.count = 0
@@ -4030,6 +4648,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							r.name = InitiateTalkSessionOperation
 							r.summary = "セッション作成"
 							r.operationID = "initiateTalkSession"
+							r.operationGroup = "TalkSession"
 							r.pathPattern = "/talksessions"
 							r.args = args
 							r.count = 0
@@ -4066,6 +4685,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									r.name = SessionsHistoryOperation
 									r.summary = "リアクション済みのセッション一覧"
 									r.operationID = "sessionsHistory"
+									r.operationGroup = "User"
 									r.pathPattern = "/talksessions/histories"
 									r.args = args
 									r.count = 0
@@ -4091,6 +4711,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									r.name = GetOpenedTalkSessionOperation
 									r.summary = "自分が開いたセッション一覧"
 									r.operationID = "getOpenedTalkSession"
+									r.operationGroup = "TalkSession"
 									r.pathPattern = "/talksessions/opened"
 									r.args = args
 									r.count = 0
@@ -4116,6 +4737,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									r.name = GetTalkSessionRestrictionKeysOperation
 									r.summary = "セッションで指定可能な制限一覧"
 									r.operationID = "getTalkSessionRestrictionKeys"
+									r.operationGroup = "TalkSession"
 									r.pathPattern = "/talksessions/restrictions"
 									r.args = args
 									r.count = 0
@@ -4142,6 +4764,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = GetTalkSessionDetailOperation
 								r.summary = "トークセッションの詳細"
 								r.operationID = "getTalkSessionDetail"
+								r.operationGroup = "TalkSession"
 								r.pathPattern = "/talksessions/{talkSessionID}"
 								r.args = args
 								r.count = 1
@@ -4150,6 +4773,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = EditTalkSessionOperation
 								r.summary = "セッション編集"
 								r.operationID = "editTalkSession"
+								r.operationGroup = "TalkSession"
 								r.pathPattern = "/talksessions/{talkSessionID}"
 								r.args = args
 								r.count = 1
@@ -4185,6 +4809,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										r.name = TalkSessionAnalysisOperation
 										r.summary = "分析結果一覧"
 										r.operationID = "talkSessionAnalysis"
+										r.operationGroup = "TalkSession"
 										r.pathPattern = "/talksessions/{talkSessionID}/analysis"
 										r.args = args
 										r.count = 1
@@ -4209,6 +4834,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = ToggleTalkSessionAnalysisOperation
 											r.summary = "分析設定をトグル"
 											r.operationID = "toggleTalkSessionAnalysis"
+											r.operationGroup = "TalkSession"
 											r.pathPattern = "/talksessions/{talkSessionID}/analysis/toggle"
 											r.args = args
 											r.count = 1
@@ -4247,6 +4873,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = GetConclusionOperation
 											r.summary = "結論取得"
 											r.operationID = "getConclusion"
+											r.operationGroup = "TalkSession"
 											r.pathPattern = "/talksessions/{talkSessionID}/conclusion"
 											r.args = args
 											r.count = 1
@@ -4255,6 +4882,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = PostConclusionOperation
 											r.summary = "結論投稿"
 											r.operationID = "postConclusion"
+											r.operationGroup = "TalkSession"
 											r.pathPattern = "/talksessions/{talkSessionID}/conclusion"
 											r.args = args
 											r.count = 1
@@ -4279,6 +4907,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = HasConsentOperation
 											r.summary = "セッションに同意しているか"
 											r.operationID = "hasConsent"
+											r.operationGroup = "TalkSession"
 											r.pathPattern = "/talksessions/{talkSessionID}/consent"
 											r.args = args
 											r.count = 1
@@ -4287,6 +4916,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = ConsentTalkSessionOperation
 											r.summary = "セッションへの同意"
 											r.operationID = "consentTalkSession"
+											r.operationGroup = "TalkSession"
 											r.pathPattern = "/talksessions/{talkSessionID}/consent"
 											r.args = args
 											r.count = 1
@@ -4313,6 +4943,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										r.name = JoinLockedSessionOperation
 										r.summary = "クローズドセッションに参加"
 										r.operationID = "joinLockedSession"
+										r.operationGroup = "TalkSession"
 										r.pathPattern = "/talksessions/{talkSessionID}/join"
 										r.args = args
 										r.count = 1
@@ -4337,6 +4968,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										r.name = GetOpinionsForTalkSessionOperation
 										r.summary = "セッションに対する意見一覧"
 										r.operationID = "getOpinionsForTalkSession"
+										r.operationGroup = "Opinion"
 										r.pathPattern = "/talksessions/{talkSessionID}/opinions"
 										r.args = args
 										r.count = 1
@@ -4372,6 +5004,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = GetTalkSessionReportOperation
 											r.summary = "セッションレポートを返す"
 											r.operationID = "getTalkSessionReport"
+											r.operationGroup = "TalkSession"
 											r.pathPattern = "/talksessions/{talkSessionID}/report"
 											r.args = args
 											r.count = 1
@@ -4395,6 +5028,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 												r.name = GetReportsForTalkSessionOperation
 												r.summary = "通報一覧"
 												r.operationID = "getReportsForTalkSession"
+												r.operationGroup = "TalkSession"
 												r.pathPattern = "/talksessions/{talkSessionID}/reports"
 												r.args = args
 												r.count = 1
@@ -4419,6 +5053,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 													r.name = GetTalkSessionReportCountOperation
 													r.summary = "通報件数"
 													r.operationID = "getTalkSessionReportCount"
+													r.operationGroup = "TalkSession"
 													r.pathPattern = "/talksessions/{talkSessionID}/reports/count"
 													r.args = args
 													r.count = 1
@@ -4447,6 +5082,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = GetTalkSessionRestrictionSatisfiedOperation
 											r.summary = "セッションで満たしていない制限"
 											r.operationID = "getTalkSessionRestrictionSatisfied"
+											r.operationGroup = "TalkSession"
 											r.pathPattern = "/talksessions/{talkSessionID}/restrictions"
 											r.args = args
 											r.count = 1
@@ -4484,6 +5120,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = GetTalkSessionSurveyOperation
 											r.summary = "アンケート定義取得"
 											r.operationID = "getTalkSessionSurvey"
+											r.operationGroup = "TalkSession"
 											r.pathPattern = "/talksessions/{talkSessionID}/survey"
 											r.args = args
 											r.count = 1
@@ -4492,6 +5129,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = CreateTalkSessionSurveyOperation
 											r.summary = "アンケート作成"
 											r.operationID = "createTalkSessionSurvey"
+											r.operationGroup = "TalkSession"
 											r.pathPattern = "/talksessions/{talkSessionID}/survey"
 											r.args = args
 											r.count = 1
@@ -4500,6 +5138,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = UpdateTalkSessionSurveyOperation
 											r.summary = "アンケート編集"
 											r.operationID = "updateTalkSessionSurvey"
+											r.operationGroup = "TalkSession"
 											r.pathPattern = "/talksessions/{talkSessionID}/survey"
 											r.args = args
 											r.count = 1
@@ -4536,6 +5175,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 													r.name = ListTalkSessionSurveySubmissionsOperation
 													r.summary = "アンケート回答一覧（オーナー）"
 													r.operationID = "listTalkSessionSurveySubmissions"
+													r.operationGroup = "TalkSession"
 													r.pathPattern = "/talksessions/{talkSessionID}/survey/submissions"
 													r.args = args
 													r.count = 1
@@ -4544,6 +5184,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 													r.name = SubmitTalkSessionSurveyOperation
 													r.summary = "アンケート回答送信"
 													r.operationID = "submitTalkSessionSurvey"
+													r.operationGroup = "TalkSession"
 													r.pathPattern = "/talksessions/{talkSessionID}/survey/submissions"
 													r.args = args
 													r.count = 1
@@ -4568,6 +5209,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 													r.name = GetTalkSessionSurveySummaryOperation
 													r.summary = "アンケート集計結果（オーナー）"
 													r.operationID = "getTalkSessionSurveySummary"
+													r.operationGroup = "TalkSession"
 													r.pathPattern = "/talksessions/{talkSessionID}/survey/summary"
 													r.args = args
 													r.count = 1
@@ -4596,6 +5238,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = SwipeOpinionsOperation
 											r.summary = "スワイプ用のエンドポイント"
 											r.operationID = "swipeOpinions"
+											r.operationGroup = "Opinion"
 											r.pathPattern = "/talksessions/{talkSessionID}/swipe_opinions"
 											r.args = args
 											r.count = 1
@@ -4621,6 +5264,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										r.name = PostTimeLineItemOperation
 										r.summary = "タイムラインアイテム追加"
 										r.operationID = "postTimeLineItem"
+										r.operationGroup = "Timeline"
 										r.pathPattern = "/talksessions/{talkSessionID}/timeline"
 										r.args = args
 										r.count = 1
@@ -4644,6 +5288,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = GetTimeLineOperation
 											r.summary = "タイムライン取得"
 											r.operationID = "getTimeLine"
+											r.operationGroup = "Timeline"
 											r.pathPattern = "/talksessions/{talkSessionID}/timelines"
 											r.args = args
 											r.count = 1
@@ -4677,6 +5322,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 												r.name = EditTimeLineOperation
 												r.summary = "タイムライン編集"
 												r.operationID = "editTimeLine"
+												r.operationGroup = "Timeline"
 												r.pathPattern = "/talksessions/{talkSessionID}/timelines/{actionItemID}"
 												r.args = args
 												r.count = 2
@@ -4710,6 +5356,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							r.name = TestOperation
 							r.summary = "OpenAPIテスト用"
 							r.operationID = "test"
+							r.operationGroup = "Test"
 							r.pathPattern = "/test"
 							r.args = args
 							r.count = 0
@@ -4734,6 +5381,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = DummyInitOperation
 								r.summary = "init dummy"
 								r.operationID = "dummyInit"
+								r.operationGroup = "Test"
 								r.pathPattern = "/test/dummy"
 								r.args = args
 								r.count = 0
@@ -4761,6 +5409,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						r.name = WithdrawUserOperation
 						r.summary = "ユーザー退会"
 						r.operationID = "withdrawUser"
+						r.operationGroup = "User"
 						r.pathPattern = "/user"
 						r.args = args
 						r.count = 0
@@ -4769,6 +5418,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						r.name = GetUserInfoOperation
 						r.summary = "ユーザー情報の取得"
 						r.operationID = "getUserInfo"
+						r.operationGroup = "User"
 						r.pathPattern = "/user"
 						r.args = args
 						r.count = 0
@@ -4777,6 +5427,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						r.name = EstablishUserOperation
 						r.summary = "ユーザー作成"
 						r.operationID = "establishUser"
+						r.operationGroup = "User"
 						r.pathPattern = "/user"
 						r.args = args
 						r.count = 0
@@ -4785,6 +5436,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						r.name = UpdateUserProfileOperation
 						r.summary = "ユーザー情報の変更"
 						r.operationID = "updateUserProfile"
+						r.operationGroup = "User"
 						r.pathPattern = "/user"
 						r.args = args
 						r.count = 0
@@ -4818,6 +5470,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							r.name = GetUserByDisplayIDOperation
 							r.summary = "表示IDからユーザー情報の取得"
 							r.operationID = "getUserByDisplayID"
+							r.operationGroup = "User"
 							r.pathPattern = "/user/{displayID}"
 							r.args = args
 							r.count = 1
@@ -4854,6 +5507,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = GetCurrentUserOperation
 								r.summary = "ログイン中ユーザーと現在の権限"
 								r.operationID = "getCurrentUser"
+								r.operationGroup = "User"
 								r.pathPattern = "/users/me"
 								r.args = args
 								r.count = 0
@@ -4893,6 +5547,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = GetUserTalkSessionsOperation
 								r.summary = "特定ユーザが開いたセッション一覧"
 								r.operationID = "getUserTalkSessions"
+								r.operationGroup = "TalkSession"
 								r.pathPattern = "/users/{displayID}/talksessions"
 								r.args = args
 								r.count = 1
@@ -4945,6 +5600,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = ListAdminUsersOperation
 								r.summary = "管理者アカウント一覧"
 								r.operationID = "listAdminUsers"
+								r.operationGroup = "Admin"
 								r.pathPattern = "/v1/admin/admin-users"
 								r.args = args
 								r.count = 0
@@ -4953,6 +5609,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = CreateAdminUserOperation
 								r.summary = "管理者アカウント作成(作成した email の Google アカウントがログイン可能になる)"
 								r.operationID = "createAdminUser"
+								r.operationGroup = "Admin"
 								r.pathPattern = "/v1/admin/admin-users"
 								r.args = args
 								r.count = 0
@@ -4989,6 +5646,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									r.name = AdminLoginOperation
 									r.summary = "管理者ログイン(Google認証)"
 									r.operationID = "adminLogin"
+									r.operationGroup = "Admin"
 									r.pathPattern = "/v1/admin/login"
 									r.args = args
 									r.count = 0
@@ -5013,6 +5671,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									r.name = AdminLogoutOperation
 									r.summary = "管理者ログアウト"
 									r.operationID = "adminLogout"
+									r.operationGroup = "Admin"
 									r.pathPattern = "/v1/admin/logout"
 									r.args = args
 									r.count = 0
@@ -5039,6 +5698,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = AdminRefreshOperation
 								r.summary = "リフレッシュトークンでアクセストークンを再発行"
 								r.operationID = "adminRefresh"
+								r.operationGroup = "Admin"
 								r.pathPattern = "/v1/admin/refresh"
 								r.args = args
 								r.count = 0
@@ -5063,6 +5723,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = GetAdminTokenInfoOperation
 								r.summary = "管理者トークンの内容を返す"
 								r.operationID = "getAdminTokenInfo"
+								r.operationGroup = "Admin"
 								r.pathPattern = "/v1/admin/token/info"
 								r.args = args
 								r.count = 0
@@ -5113,6 +5774,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									r.name = GetTalkSessionListManageOperation
 									r.summary = ""
 									r.operationID = "getTalkSessionListManage"
+									r.operationGroup = "Manage"
 									r.pathPattern = "/v1/manage/talksessions/list"
 									r.args = args
 									r.count = 0
@@ -5139,6 +5801,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = GetTalkSessionManageOperation
 								r.summary = ""
 								r.operationID = "getTalkSessionManage"
+								r.operationGroup = "Manage"
 								r.pathPattern = "/v1/manage/talksessions/{talkSessionID}"
 								r.args = args
 								r.count = 1
@@ -5147,6 +5810,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = EditTalkSessionManageOperation
 								r.summary = ""
 								r.operationID = "editTalkSessionManage"
+								r.operationGroup = "Manage"
 								r.pathPattern = "/v1/manage/talksessions/{talkSessionID}"
 								r.args = args
 								r.count = 1
@@ -5195,6 +5859,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = ManageRegenerateManageOperation
 											r.summary = ""
 											r.operationID = "manageRegenerateManage"
+											r.operationGroup = "Manage"
 											r.pathPattern = "/v1/manage/talksessions/{talkSessionID}/analysis/regenerate"
 											r.args = args
 											r.count = 1
@@ -5219,6 +5884,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = GetAnalysisReportManageOperation
 											r.summary = ""
 											r.operationID = "getAnalysisReportManage"
+											r.operationGroup = "Manage"
 											r.pathPattern = "/v1/manage/talksessions/{talkSessionID}/analysis/report"
 											r.args = args
 											r.count = 1
@@ -5227,6 +5893,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = ToggleReportVisibilityManageOperation
 											r.summary = ""
 											r.operationID = "toggleReportVisibilityManage"
+											r.operationGroup = "Manage"
 											r.pathPattern = "/v1/manage/talksessions/{talkSessionID}/analysis/report"
 											r.args = args
 											r.count = 1
@@ -5253,6 +5920,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										r.name = GetTalkSessionOpinionsManageOperation
 										r.summary = ""
 										r.operationID = "getTalkSessionOpinionsManage"
+										r.operationGroup = "Manage"
 										r.pathPattern = "/v1/manage/talksessions/{talkSessionID}/opinions"
 										r.args = args
 										r.count = 1
@@ -5280,6 +5948,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.name = CreateUserManageOperation
 								r.summary = "メールログイン用ユーザーを作成し、初回パスワード設定メールを送信する"
 								r.operationID = "createUserManage"
+								r.operationGroup = "Manage"
 								r.pathPattern = "/v1/manage/users"
 								r.args = args
 								r.count = 0
@@ -5316,6 +5985,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 										r.name = GetUserListManageOperation
 										r.summary = ""
 										r.operationID = "getUserListManage"
+										r.operationGroup = "Manage"
 										r.pathPattern = "/v1/manage/users/list"
 										r.args = args
 										r.count = 0
@@ -5353,6 +6023,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = GetUserStatsListManageOperation
 											r.summary = ""
 											r.operationID = "getUserStatsListManage"
+											r.operationGroup = "Manage"
 											r.pathPattern = "/v1/manage/users/stats/list"
 											r.args = args
 											r.count = 0
@@ -5377,6 +6048,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = GetUserStatsTotalManageOperation
 											r.summary = ""
 											r.operationID = "getUserStatsTotalManage"
+											r.operationGroup = "Manage"
 											r.pathPattern = "/v1/manage/users/stats/total"
 											r.args = args
 											r.count = 0
@@ -5405,6 +6077,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 									r.name = GetUserDetailManageOperation
 									r.summary = ""
 									r.operationID = "getUserDetailManage"
+									r.operationGroup = "Manage"
 									r.pathPattern = "/v1/manage/users/{userID}"
 									r.args = args
 									r.count = 1
@@ -5441,6 +6114,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = ResendUserInvitationManageOperation
 											r.summary = ""
 											r.operationID = "resendUserInvitationManage"
+											r.operationGroup = "Manage"
 											r.pathPattern = "/v1/manage/users/{userID}/invitation"
 											r.args = args
 											r.count = 1
@@ -5465,6 +6139,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 											r.name = SetUserPermissionsManageOperation
 											r.summary = ""
 											r.operationID = "setUserPermissionsManage"
+											r.operationGroup = "Manage"
 											r.pathPattern = "/v1/manage/users/{userID}/permissions"
 											r.args = args
 											r.count = 1

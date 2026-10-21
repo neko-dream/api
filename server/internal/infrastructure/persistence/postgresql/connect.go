@@ -32,7 +32,7 @@ func Connect(config *config.Config, tp trace.TracerProvider) *sql.DB {
 	}
 
 	// DBStatsメトリクスを登録
-	err = otelsql.RegisterDBStatsMetrics(db, otelsql.WithAttributes(
+	_, err = otelsql.RegisterDBStatsMetrics(db, otelsql.WithAttributes(
 		semconv.DBSystemPostgreSQL,
 	))
 	if err != nil {
@@ -44,7 +44,7 @@ func Connect(config *config.Config, tp trace.TracerProvider) *sql.DB {
 	db.SetMaxIdleConns(25)
 	db.SetConnMaxLifetime(5 * time.Minute)
 	// 使っていない接続を閉じて、Aurora Serverless v2 がアイドル時に自動一時停止できるようにする
-	db.SetConnMaxIdleTime(5 * time.Minute)
+	db.SetConnMaxIdleTime(time.Minute)
 
 	return db
 }
