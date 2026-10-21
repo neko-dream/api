@@ -10,7 +10,6 @@ import (
 	"github.com/neko-dream/api/internal/presentation/handler"
 	"github.com/neko-dream/api/internal/presentation/oas"
 	"github.com/rs/cors"
-	"go.opentelemetry.io/otel/trace"
 )
 
 // Route ルート定義を表す
@@ -46,7 +45,7 @@ func (b *Bootstrap) setupRoutes() *http.ServeMux {
 	return mux
 }
 
-// setupAPIHandler API用のハンドラーを設定して返す（CORS、認証、トレーシングなど）
+// setupAPIHandler API用のハンドラーを設定して返す（CORS、認証など）
 func (b *Bootstrap) setupAPIHandler() http.Handler {
 	srv, err := oas.NewServer(
 		di.Invoke[oas.Handler](b.container),
@@ -57,14 +56,10 @@ func (b *Bootstrap) setupAPIHandler() http.Handler {
 		panic(err) // 初期化エラーは致命的
 	}
 
-	routeFinder := middleware.MakeRouteFinder(srv)
-	tracerProvider := di.Invoke[trace.TracerProvider](b.container)
-
 	api := middleware.Wrap(
 		srv,
-		middleware.Instrument("kotohiro-api", routeFinder, tracerProvider),
 		middleware.SetContextCookieKey(b.container),
-		middleware.Labeler(routeFinder),
+		middleware.WithHTTPContext(),
 	)
 	return b.wrapAPIOrigins(api)
 }
