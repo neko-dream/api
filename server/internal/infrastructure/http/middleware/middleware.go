@@ -1,68 +1,21 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/neko-dream/api/internal/domain/model/session"
 	"github.com/neko-dream/api/internal/infrastructure/di"
 	http_utils "github.com/neko-dream/api/pkg/http"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
-	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/dig"
 )
 
-func Labeler(find RouteFinder) Middleware {
+// WithHTTPContext はリクエストとレスポンスを ctx に入れる。ハンドラーは ctx から Cookie を読んだり、
+// ヘッダーを足したりする（http_utils.GetHTTPRequest / GetHTTPResponse）。
+func WithHTTPContext() Middleware {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ctx := http_utils.WithHTTPResReqContext(r.Context(), r, w)
-			route, ok := find(r.Method, r.URL)
-			if !ok {
-				h.ServeHTTP(w, r)
-				return
-			}
-
-			attrs := []attribute.KeyValue{
-				semconv.HTTPRouteKey.String(route.PathPattern()),
-				semconv.HTTPMethodKey.String(r.Method),
-				semconv.HTTPSchemeKey.String(r.URL.Scheme),
-				semconv.HTTPHostKey.String(r.URL.Host),
-				semconv.HTTPTargetKey.String(r.URL.Path),
-				// クエリ文字列にはパスワード等の秘密値が含まれうるため記録しない
-				semconv.HTTPURLKey.String(urlWithoutQuery(r.URL)),
-				semconv.HTTPUserAgentKey.String(r.UserAgent()),
-			}
-
-			span := trace.SpanFromContext(r.Context())
-			span.SetAttributes(attrs...)
-
-			labeler, _ := otelhttp.LabelerFromContext(r.Context())
-			labeler.Add(attrs...)
-
-			r = r.WithContext(ctx)
-			h.ServeHTTP(w, r)
+			h.ServeHTTP(w, r.WithContext(http_utils.WithHTTPResReqContext(r.Context(), r, w)))
 		})
-	}
-}
-
-func Instrument(serviceName string, find RouteFinder, traceProvider trace.TracerProvider) Middleware {
-	return func(h http.Handler) http.Handler {
-		return otelhttp.NewHandler(h, "",
-			otelhttp.WithPropagators(otel.GetTextMapPropagator()),
-			otelhttp.WithTracerProvider(traceProvider),
-			otelhttp.WithMessageEvents(otelhttp.ReadEvents, otelhttp.WriteEvents),
-			otelhttp.WithServerName(serviceName),
-			otelhttp.WithSpanNameFormatter(func(operation string, r *http.Request) string {
-				op, ok := find(r.Method, r.URL)
-				if ok {
-					return fmt.Sprintf("%s %s", r.Method, op.PathPattern())
-				}
-				return operation
-			}),
-		)
 	}
 }
 
