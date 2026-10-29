@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/go-faster/errors"
-
 	ht "github.com/ogen-go/ogen/http"
 )
 
@@ -1220,11 +1219,12 @@ func (*EstablishOrganizationOK) establishOrganizationRes() {}
 type EstablishOrganizationReq struct {
 	// 組織名.
 	Name string `json:"name"`
-	// 組織コード（ログイン時に使用）
-	// 4文字以上127文字以下の英数字 _- のみ使用可能.
+	// 組織コード（ログイン時に使用） 4文字以上127文字以下の英数字 _-
+	// のみ使用可能.
 	Code string `json:"code"`
 	// 組織タイプ
-	// - 1: 通常（基本これ）.
+	//
+	//  - 1: 通常（基本これ）
 	OrgType float64 `json:"orgType"`
 	// 組織アイコン.
 	Icon OptMultipartFile `json:"icon"`
@@ -4643,6 +4643,11 @@ func (o *OptNilBool) SetToNull() {
 	o.Value = v
 }
 
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilBool) IsEmpty() bool {
+	return !o.Set && !o.Null
+}
+
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilBool) Get() (v bool, ok bool) {
 	if o.Null {
@@ -4704,6 +4709,11 @@ func (o *OptNilFloat64) SetToNull() {
 	o.Null = true
 	var v float64
 	o.Value = v
+}
+
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilFloat64) IsEmpty() bool {
+	return !o.Set && !o.Null
 }
 
 // Get returns value and boolean that denotes whether value was set.
@@ -4769,6 +4779,11 @@ func (o *OptNilGetOpenedTalkSessionStatus) SetToNull() {
 	o.Value = v
 }
 
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilGetOpenedTalkSessionStatus) IsEmpty() bool {
+	return !o.Set && !o.Null
+}
+
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilGetOpenedTalkSessionStatus) Get() (v GetOpenedTalkSessionStatus, ok bool) {
 	if o.Null {
@@ -4830,6 +4845,11 @@ func (o *OptNilGetOpinionsForTalkSessionSort) SetToNull() {
 	o.Null = true
 	var v GetOpinionsForTalkSessionSort
 	o.Value = v
+}
+
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilGetOpinionsForTalkSessionSort) IsEmpty() bool {
+	return !o.Set && !o.Null
 }
 
 // Get returns value and boolean that denotes whether value was set.
@@ -4895,6 +4915,11 @@ func (o *OptNilGetTalkSessionListStatus) SetToNull() {
 	o.Value = v
 }
 
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilGetTalkSessionListStatus) IsEmpty() bool {
+	return !o.Set && !o.Null
+}
+
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilGetTalkSessionListStatus) Get() (v GetTalkSessionListStatus, ok bool) {
 	if o.Null {
@@ -4956,6 +4981,11 @@ func (o *OptNilGetUserTalkSessionsStatus) SetToNull() {
 	o.Null = true
 	var v GetUserTalkSessionsStatus
 	o.Value = v
+}
+
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilGetUserTalkSessionsStatus) IsEmpty() bool {
+	return !o.Set && !o.Null
 }
 
 // Get returns value and boolean that denotes whether value was set.
@@ -5021,6 +5051,11 @@ func (o *OptNilInt) SetToNull() {
 	o.Value = v
 }
 
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilInt) IsEmpty() bool {
+	return !o.Set && !o.Null
+}
+
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilInt) Get() (v int, ok bool) {
 	if o.Null {
@@ -5082,6 +5117,11 @@ func (o *OptNilInt32) SetToNull() {
 	o.Null = true
 	var v int32
 	o.Value = v
+}
+
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilInt32) IsEmpty() bool {
+	return !o.Set && !o.Null
 }
 
 // Get returns value and boolean that denotes whether value was set.
@@ -5147,6 +5187,11 @@ func (o *OptNilOpinionsHistorySort) SetToNull() {
 	o.Value = v
 }
 
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilOpinionsHistorySort) IsEmpty() bool {
+	return !o.Set && !o.Null
+}
+
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilOpinionsHistorySort) Get() (v OpinionsHistorySort, ok bool) {
 	if o.Null {
@@ -5208,6 +5253,11 @@ func (o *OptNilOrganizationAlias) SetToNull() {
 	o.Null = true
 	var v OrganizationAlias
 	o.Value = v
+}
+
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilOrganizationAlias) IsEmpty() bool {
+	return !o.Set && !o.Null
 }
 
 // Get returns value and boolean that denotes whether value was set.
@@ -5273,6 +5323,11 @@ func (o *OptNilSessionsHistoryStatus) SetToNull() {
 	o.Value = v
 }
 
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilSessionsHistoryStatus) IsEmpty() bool {
+	return !o.Set && !o.Null
+}
+
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilSessionsHistoryStatus) Get() (v SessionsHistoryStatus, ok bool) {
 	if o.Null {
@@ -5336,6 +5391,11 @@ func (o *OptNilString) SetToNull() {
 	o.Value = v
 }
 
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilString) IsEmpty() bool {
+	return !o.Set && !o.Null
+}
+
 // Get returns value and boolean that denotes whether value was set.
 func (o OptNilString) Get() (v string, ok bool) {
 	if o.Null {
@@ -5397,6 +5457,11 @@ func (o *OptNilVoteType) SetToNull() {
 	o.Null = true
 	var v VoteType
 	o.Value = v
+}
+
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilVoteType) IsEmpty() bool {
+	return !o.Set && !o.Null
 }
 
 // Get returns value and boolean that denotes whether value was set.
@@ -8436,9 +8501,10 @@ func (s *TalkSessionSurveyAnswer) SetOther(val OptNilString) {
 	s.Other = val
 }
 
-// 回答送信用：単一回答
-// 質問タイプは single_choice / dropdown のみ：
-// - selectedChoiceIDs を 1 件、または allowOther の場合 other.
+// 回答送信用：単一回答 質問タイプは single_choice / dropdown のみ：
+//
+//   - selectedChoiceIDs を 1 件、または allowOther の場合 other
+//
 // Ref: #/components/schemas/TalkSessionSurveyAnswerInput
 type TalkSessionSurveyAnswerInput struct {
 	// 質問ID.
@@ -8792,8 +8858,7 @@ func (s *TalkSessionSurveyQuestionInput) SetChoices(val []TalkSessionSurveyChoic
 	s.Choices = val
 }
 
-// 集計：質問ごとの結果（single_choice / dropdown）
-// choiceCounts + otherCount を持つ。.
+// 集計：質問ごとの結果（single_choice / dropdown） choiceCounts + otherCount を持つ。.
 // Ref: #/components/schemas/TalkSessionSurveyQuestionSummary
 type TalkSessionSurveyQuestionSummary struct {
 	QuestionID string                        `json:"questionID"`
@@ -9196,8 +9261,7 @@ type TokenClaim struct {
 	RequiredPasswordChange bool `json:"requiredPasswordChange"`
 	// 組織のRole.
 	OrganizationRole OptNilString `json:"organizationRole"`
-	// 組織コード
-	// ログイン時に使用する.
+	// 組織コード ログイン時に使用する.
 	OrganizationCode OptNilString `json:"organizationCode"`
 	// 組織ID.
 	OrganizationID OptNilString `json:"organizationID"`

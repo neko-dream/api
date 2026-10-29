@@ -7,5 +7,12 @@
     "generate": "pnpm --filter spec compile",
     "generate:app": "pnpm --filter spec compile:app",
     "generate:admin": "pnpm --filter spec compile:admin"
+  },
+  "pnpm": {
+    "overrides": {
+      "@ant-design/pro-layout>path-to-regexp": "^8.4.0",
+      "@scalar/json-magic>undici": "^7.29.1",
+      "query-string>decode-uri-component": "^0.5.0"
+    }
   }
 }
