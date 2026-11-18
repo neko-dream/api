@@ -16,7 +16,7 @@ func TestCredentialedCORSUsesExplicitOrigins(t *testing.T) {
 	}{
 		{config.DEV, "https://develop.kotohiro.com", "https://api.dev.kotohiro.com", []string{"https://develop.kotohiro.com", "https://api.dev.kotohiro.com", "https://api-dev.kotohiro.com"}},
 		{config.PROD, "https://www.kotohiro.com", "https://api.kotohiro.com", []string{"https://www.kotohiro.com", "https://kotohiro.com", "https://api.kotohiro.com"}},
-		{config.LOCAL, "https://localhost:3000", "https://localhost:3000/api", []string{"https://localhost:3000"}},
+		{config.LOCAL, "https://localhost:3000", "https://localhost:3000/api", []string{"https://localhost:3000", "https://local.kotohiro.com:3000"}},
 	} {
 		t.Run(string(tc.env), func(t *testing.T) {
 			b := &Bootstrap{config: &config.Config{Env: tc.env, WEBSITE_URL: tc.website, EMAIL_VERIFICATION_BASE_URL: tc.api}}
