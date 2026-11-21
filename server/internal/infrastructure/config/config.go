@@ -137,6 +137,10 @@ func (c *Config) BrowserOrigins() []string {
 	if c.Env == DEV {
 		origins = append(origins, "https://api-dev.kotohiro.com")
 	}
+	// ローカル開発のフロントエンドはカスタムHTTPSホストの別名で配信されることがある。
+	if c.Env == LOCAL {
+		origins = append(origins, "https://local.kotohiro.com:3000")
+	}
 	for _, raw := range c.AdditionalBrowserOrigins {
 		if origin, ok := explicitHTTPSOrigin(raw); ok {
 			origins = append(origins, origin)
