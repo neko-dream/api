@@ -49,6 +49,45 @@ func TestBrowserOriginsLocalFrontendAlias(t *testing.T) {
 	}
 }
 
+func TestBrowserOriginsDevelopmentPreviewDomains(t *testing.T) {
+	cfg := &Config{Env: DEV, WEBSITE_URL: "https://develop.kotohiro.com", EMAIL_VERIFICATION_BASE_URL: "https://api.dev.kotohiro.com"}
+	for _, origin := range []string{
+		"https://b4d54a3f.kotohiro.com",
+		"https://pr-123.kotohiro.com",
+		"https://a.kotohiro.com",
+	} {
+		if !cfg.IsBrowserOriginAllowed(origin) {
+			t.Fatalf("%s not allowed", origin)
+		}
+	}
+	for _, origin := range []string{
+		"http://b4d54a3f.kotohiro.com",
+		"https://b4d54a3f.kotohiro.com:3000",
+		"https://a.b.kotohiro.com",
+		"https://b4d54a3f.kotohiro.com.evil.example",
+		"https://bad_label.kotohiro.com",
+		"https://-bad.kotohiro.com",
+		"https://bad-.kotohiro.com",
+		"https://.kotohiro.com",
+		"https://kotohiro.com",
+		"https://evil.example",
+	} {
+		if cfg.IsBrowserOriginAllowed(origin) {
+			t.Fatalf("%s accepted", origin)
+		}
+	}
+	// プレビュー用サブドメインは development だけ
+	for _, env := range []ENV{PROD, LOCAL} {
+		cfg := &Config{Env: env, WEBSITE_URL: "https://www.kotohiro.com", EMAIL_VERIFICATION_BASE_URL: "https://api.kotohiro.com"}
+		if cfg.IsBrowserOriginAllowed("https://b4d54a3f.kotohiro.com") {
+			t.Fatalf("%s trusted a development preview origin", env)
+		}
+	}
+	if (&Config{Env: "unknown"}).IsBrowserOriginAllowed("https://b4d54a3f.kotohiro.com") {
+		t.Fatal("unknown environment trusted a preview origin")
+	}
+}
+
 func TestBrowserOriginsAdditionalOrigins(t *testing.T) {
 	cfg := &Config{
 		Env:                      PROD,

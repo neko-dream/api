@@ -93,11 +93,10 @@ func (b *Bootstrap) adminOriginGuard(next http.Handler) http.Handler {
 // CORS protects response reads, not simple cross-site form writes. Reject
 // untrusted browser origins for mutations as well, including SameSite=None dev.
 func (b *Bootstrap) browserOriginGuard(next http.Handler) http.Handler {
-	origins := b.config.BrowserOrigins()
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete:
-			if origin := r.Header.Get("Origin"); origin != "" && !slices.Contains(origins, origin) {
+			if origin := r.Header.Get("Origin"); origin != "" && !b.config.IsBrowserOriginAllowed(origin) {
 				w.Header().Set("Content-Type", "application/json; charset=utf-8")
 				w.WriteHeader(http.StatusForbidden)
 				_, _ = w.Write([]byte(`{"code":"AUTH-FORBIDDEN-ORIGIN","message":"許可されていないアクセス元です。"}`))
@@ -109,9 +108,8 @@ func (b *Bootstrap) browserOriginGuard(next http.Handler) http.Handler {
 }
 
 func (b *Bootstrap) apiCORS() *cors.Cors {
-	origins := b.config.BrowserOrigins()
 	return cors.New(cors.Options{
-		AllowOriginFunc:  func(origin string) bool { return slices.Contains(origins, origin) },
+		AllowOriginFunc:  b.config.IsBrowserOriginAllowed,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"*"},
 		AllowCredentials: true,

@@ -13,10 +13,23 @@ func TestCredentialedCORSUsesExplicitOrigins(t *testing.T) {
 		env          config.ENV
 		website, api string
 		allowed      []string
+		denied       []string
 	}{
-		{config.DEV, "https://develop.kotohiro.com", "https://api.dev.kotohiro.com", []string{"https://develop.kotohiro.com", "https://api.dev.kotohiro.com", "https://api-dev.kotohiro.com"}},
-		{config.PROD, "https://www.kotohiro.com", "https://api.kotohiro.com", []string{"https://www.kotohiro.com", "https://kotohiro.com", "https://api.kotohiro.com"}},
-		{config.LOCAL, "https://localhost:3000", "https://localhost:3000/api", []string{"https://localhost:3000", "https://local.kotohiro.com:3000"}},
+		{
+			config.DEV, "https://develop.kotohiro.com", "https://api.dev.kotohiro.com",
+			[]string{"https://develop.kotohiro.com", "https://api.dev.kotohiro.com", "https://api-dev.kotohiro.com", "https://b4d54a3f.kotohiro.com", "https://pr-123.kotohiro.com"},
+			[]string{"https://untrusted.kotohiro.com.name", "https://a.b.kotohiro.com", "https://b4d54a3f.kotohiro.com:3000"},
+		},
+		{
+			config.PROD, "https://www.kotohiro.com", "https://api.kotohiro.com",
+			[]string{"https://www.kotohiro.com", "https://kotohiro.com", "https://api.kotohiro.com"},
+			[]string{"https://untrusted.kotohiro.com", "https://b4d54a3f.kotohiro.com"},
+		},
+		{
+			config.LOCAL, "https://localhost:3000", "https://localhost:3000/api",
+			[]string{"https://localhost:3000", "https://local.kotohiro.com:3000"},
+			[]string{"https://untrusted.kotohiro.com", "https://b4d54a3f.kotohiro.com"},
+		},
 	} {
 		t.Run(string(tc.env), func(t *testing.T) {
 			b := &Bootstrap{config: &config.Config{Env: tc.env, WEBSITE_URL: tc.website, EMAIL_VERIFICATION_BASE_URL: tc.api}}
@@ -30,7 +43,8 @@ func TestCredentialedCORSUsesExplicitOrigins(t *testing.T) {
 					t.Fatal("trusted origin rejected", origin)
 				}
 			}
-			for _, origin := range []string{"https://evil.example", "https://untrusted.kotohiro.com", "https://preview.workers.dev", "null", "http://localhost:3000"} {
+			denied := append([]string{"https://evil.example", "https://preview.workers.dev", "null", "http://localhost:3000"}, tc.denied...)
+			for _, origin := range denied {
 				for _, method := range []string{"GET", "OPTIONS"} {
 					req := httptest.NewRequest(method, "/auth/token/info", nil)
 					req.Header.Set("Origin", origin)
@@ -75,7 +89,7 @@ func TestMutationOriginGuardPreventsSimpleFormCSRF(t *testing.T) {
 			}
 		}
 	}
-	for _, origin := range []string{"", "https://develop.kotohiro.com", "https://api.dev.kotohiro.com", "https://api-dev.kotohiro.com"} {
+	for _, origin := range []string{"", "https://develop.kotohiro.com", "https://api.dev.kotohiro.com", "https://api-dev.kotohiro.com", "https://b4d54a3f.kotohiro.com"} {
 		called := false
 		h := b.browserOriginGuard(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { called = true }))
 		req := httptest.NewRequest("POST", "/", nil)

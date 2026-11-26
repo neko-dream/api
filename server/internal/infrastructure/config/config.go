@@ -2,10 +2,12 @@ package config
 
 import (
 	"fmt"
+	"net/url"
+	"slices"
+	"strings"
+
 	"github.com/caarlos0/env/v11"
 	"github.com/neko-dream/api/pkg/utils"
-	"net/url"
-	"strings"
 )
 
 type Config struct {
@@ -147,6 +149,43 @@ func (c *Config) BrowserOrigins() []string {
 		}
 	}
 	return origins
+}
+
+// previewOriginSuffix は Web のプレビュー配信に使うドメイン。
+const previewOriginSuffix = ".kotohiro.com"
+
+// IsBrowserOriginAllowed は Credential 付き CORS とブラウザ由来の変更系リクエストで
+// 信頼する Origin かどうかを返す。development だけはプレビュー用サブドメインも許可する。
+func (c *Config) IsBrowserOriginAllowed(origin string) bool {
+	if c == nil {
+		return false
+	}
+	if slices.Contains(c.BrowserOrigins(), origin) {
+		return true
+	}
+	return c.Env == DEV && isPreviewOrigin(origin)
+}
+
+// isPreviewOrigin は https://<label>.kotohiro.com だけを受け付ける。
+// ネストしたサブドメイン・ポート・パス・HTTP は許可しない。
+func isPreviewOrigin(origin string) bool {
+	u, err := url.Parse(origin)
+	if err != nil || u.Scheme != "https" || u.User != nil || u.Port() != "" ||
+		u.Path != "" || u.RawQuery != "" || u.ForceQuery || u.Fragment != "" {
+		return false
+	}
+	host := strings.ToLower(u.Host)
+	label, ok := strings.CutSuffix(host, previewOriginSuffix)
+	if !ok || label == "" || strings.Contains(label, ".") || len(label) > 63 {
+		return false
+	}
+	for i, r := range label {
+		if (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9') || (r == '-' && i > 0 && i < len(label)-1) {
+			continue
+		}
+		return false
+	}
+	return true
 }
 
 // explicitHTTPSOrigin はパス・クエリ・認証情報・ワイルドカードを含まない HTTPS オリジンだけを受け付ける。
