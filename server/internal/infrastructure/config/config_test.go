@@ -36,16 +36,16 @@ func TestBrowserOriginsProductionAliasAndDevelopmentIsolation(t *testing.T) {
 }
 
 func TestBrowserOriginsLocalFrontendAlias(t *testing.T) {
-	local := (&Config{Env: LOCAL, WEBSITE_URL: "https://localhost:3000", EMAIL_VERIFICATION_BASE_URL: "https://localhost:3000/api"}).BrowserOrigins()
-	if !slices.Contains(local, "https://local.kotohiro.com:3000") {
-		t.Fatalf("local frontend alias not allowed: %v", local)
-	}
-	// ローカル開発の別名は development / production に漏らさない
-	for _, env := range []ENV{DEV, PROD} {
-		cfg := &Config{Env: env, WEBSITE_URL: "https://develop.kotohiro.com", EMAIL_VERIFICATION_BASE_URL: "https://api.dev.kotohiro.com"}
-		if slices.Contains(cfg.BrowserOrigins(), "https://local.kotohiro.com:3000") {
-			t.Fatalf("%s trusted local frontend alias", env)
+	for _, env := range []ENV{LOCAL, DEV} {
+		cfg := &Config{Env: env, WEBSITE_URL: "https://localhost:3000", EMAIL_VERIFICATION_BASE_URL: "https://localhost:3000/api"}
+		if !slices.Contains(cfg.BrowserOrigins(), "https://local.kotohiro.com:3000") {
+			t.Fatalf("%s: local frontend alias not allowed: %v", env, cfg.BrowserOrigins())
 		}
+	}
+	// ローカル開発の別名は production に漏らさない
+	cfg := &Config{Env: PROD, WEBSITE_URL: "https://www.kotohiro.com", EMAIL_VERIFICATION_BASE_URL: "https://api.kotohiro.com"}
+	if slices.Contains(cfg.BrowserOrigins(), "https://local.kotohiro.com:3000") {
+		t.Fatal("production trusted local frontend alias")
 	}
 }
 
