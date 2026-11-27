@@ -124,10 +124,8 @@ func (a *authHandler) validateEmailLoginOrigin(ctx context.Context) error {
 	if origin == "" {
 		return nil
 	}
-	for _, allowed := range a.cfg.BrowserOrigins() {
-		if origin == allowed {
-			return nil
-		}
+	if a.cfg.IsBrowserOriginAllowed(origin) {
+		return nil
 	}
 	return messages.ForbiddenError
 }

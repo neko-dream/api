@@ -2,7 +2,7 @@
 
 ## 構成
 
-- Web: `https://localhost:3000`
+- Web: `https://localhost:3000`（カスタムホスト `https://local.kotohiro.com:3000` でも可）
 - ブラウザ用 API: `https://localhost:3000/api`（Vite が `/api` を除いて API に中継）
 - API / SSR 用 API: `http://127.0.0.1:8080`
 - PostgreSQL: `127.0.0.1:5433`（専用 Compose project / volume）
