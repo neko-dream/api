@@ -140,7 +140,8 @@ func (c *Config) BrowserOrigins() []string {
 		origins = append(origins, "https://api-dev.kotohiro.com")
 	}
 	// ローカル開発のフロントエンドはカスタムHTTPSホストの別名で配信されることがある。
-	if c.Env == LOCAL {
+	// ローカルのWebからdevelopmentのAPIを呼ぶ場合もあるため、本番以外では同じ別名を許可する。
+	if c.Env == LOCAL || c.Env == DEV {
 		origins = append(origins, "https://local.kotohiro.com:3000")
 	}
 	for _, raw := range c.AdditionalBrowserOrigins {

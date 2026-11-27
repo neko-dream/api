@@ -17,13 +17,13 @@ func TestCredentialedCORSUsesExplicitOrigins(t *testing.T) {
 	}{
 		{
 			config.DEV, "https://develop.kotohiro.com", "https://api.dev.kotohiro.com",
-			[]string{"https://develop.kotohiro.com", "https://api.dev.kotohiro.com", "https://api-dev.kotohiro.com", "https://b4d54a3f.kotohiro.com", "https://pr-123.kotohiro.com"},
+			[]string{"https://develop.kotohiro.com", "https://api.dev.kotohiro.com", "https://api-dev.kotohiro.com", "https://b4d54a3f.kotohiro.com", "https://pr-123.kotohiro.com", "https://local.kotohiro.com:3000"},
 			[]string{"https://untrusted.kotohiro.com.name", "https://a.b.kotohiro.com", "https://b4d54a3f.kotohiro.com:3000"},
 		},
 		{
 			config.PROD, "https://www.kotohiro.com", "https://api.kotohiro.com",
 			[]string{"https://www.kotohiro.com", "https://kotohiro.com", "https://api.kotohiro.com"},
-			[]string{"https://untrusted.kotohiro.com", "https://b4d54a3f.kotohiro.com"},
+			[]string{"https://untrusted.kotohiro.com", "https://b4d54a3f.kotohiro.com", "https://local.kotohiro.com:3000"},
 		},
 		{
 			config.LOCAL, "https://localhost:3000", "https://localhost:3000/api",
@@ -89,7 +89,7 @@ func TestMutationOriginGuardPreventsSimpleFormCSRF(t *testing.T) {
 			}
 		}
 	}
-	for _, origin := range []string{"", "https://develop.kotohiro.com", "https://api.dev.kotohiro.com", "https://api-dev.kotohiro.com", "https://b4d54a3f.kotohiro.com"} {
+	for _, origin := range []string{"", "https://develop.kotohiro.com", "https://api.dev.kotohiro.com", "https://api-dev.kotohiro.com", "https://b4d54a3f.kotohiro.com", "https://local.kotohiro.com:3000"} {
 		called := false
 		h := b.browserOriginGuard(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { called = true }))
 		req := httptest.NewRequest("POST", "/", nil)

@@ -62,7 +62,7 @@ Credential付きCORSも同じ許可リストを使い、任意HTTPSサイトやw
 ブラウザからの変更系リクエストも未許可Originを拒否し、単純フォームによるクロスサイト書き込みを防ぐ。
 developmentでは既存Swagger/管理画面の `https://api-dev.kotohiro.com` 別名も明示許可する。
 developmentではWebのプレビュー配信 `https://<任意の文字列>.kotohiro.com` も許可する（サブドメイン1階層のみ。ポート・パス・HTTPは不可）。
-localではフロント開発用のカスタムホスト `https://local.kotohiro.com:3000` も明示許可する。
+local / developmentではフロント開発・確認用のカスタムホスト `https://local.kotohiro.com:3000` も明示許可する。
 ステージングのWebなど、ほかに許可するオリジンは `ADDITIONAL_BROWSER_ORIGINS`（カンマ区切り）で明示する。
 パス付き・ワイルドカード・HTTPのオリジンは設定しても無視する。本番は `https://staging.kotohiro.com` を許可している。
 非ブラウザクライアントではOriginを省略できるが、秘密値とCookieの両方が必要。
